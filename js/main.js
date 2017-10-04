@@ -64,11 +64,22 @@ function naDisplay() {
 
     function naDisplayPorts() {
 
-        naSvg
+        var ports = naSvg.selectAll(".na-port").data(naPorts.features);
+
+        ports
+            .enter()
             .append("path")
-            .datum(naPorts)
+            .attr("d", naPath)
             .attr("class", "na-port")
-            .attr("d", naPath);
+            .attr("stroke", function (d) {
+                var f;
+                if (!d.properties.shallow && !d.properties.countyCapital ) {
+                    f = "#be3e4b";
+                } else {
+                    f = "#9ea4a8";
+                }
+                return f;
+            });
 
         /*
         naSvg
@@ -229,9 +240,7 @@ function naDisplay() {
                 return (!d.properties.shallow && !d.properties.countyCapital )
             })
             .map(function (d) {
-                if ("true" !== d.properties.shallow) {
-                    return [d.geometry.coordinates[0], d.geometry.coordinates[1]];
-                }
+                return [d.geometry.coordinates[0], d.geometry.coordinates[1]];
             });
 
         //console.log("ports: ", ports);
