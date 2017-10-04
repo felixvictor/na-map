@@ -1,0 +1,22 @@
+path {
+    //stroke-linejoin: round;
+}
+
+.na-country {
+    fill: #6B7377;
+}
+
+svg {
+    background: #233D47;
+}
+
+.na-port {
+    fill: none;
+    stroke: red;
+}
+
+.voronoi {
+    fill: none;
+    stroke: blue;
+    stroke-width: 0.5px;
+}
