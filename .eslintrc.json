@@ -1,0 +1,28 @@
+{
+    "parserOptions": {
+        "ecmaVersion": 5,
+        "sourceType": "module",
+        "ecmaFeatures": {
+            "modules": false,
+            "impliedStrict": true
+        }
+    },
+    "env": {
+        "amd": true,
+        "browser": true,
+        "node": true,
+        "jquery": true
+    },
+    "parser": "babel-eslint",
+    "plugins": ["prettier"],
+    "extends": "prettier",
+    "rules": {
+        "prettier/prettier": ["error", { "tabWidth": 4, "printWidth": 120 }],
+        "brace-style": ["error", "1tbs"],
+        "camelcase": ["error"],
+        "no-console": 0,
+        "curly": ["error", "all"],
+        "eqeqeq": ["error", "smart"],
+        "quotes": ["error", "double", { "avoidEscape": true }]
+    }
+}
