@@ -224,10 +224,17 @@ function naDisplay() {
         naLHeight = window.getComputedStyle(document.getElementById("na")).getPropertyValue("line-height");
         naDisplayPorts();
 
-        var ports = naPorts.features.map(function (d) {
-            return [d.geometry.coordinates[0], d.geometry.coordinates[1]];
+        var ports = naPorts.features.filter(function (d) {
+            return (!d.properties.shallow && !d.properties.countyCapital )
         });
-        //console.log("ports: ", ports);
+        console.log("ports: ", ports);
+        ports = ports.map(function (d) {
+            if ("true" !== d.properties.shallow) {
+                return [d.geometry.coordinates[0], d.geometry.coordinates[1]];
+            }
+        });
+
+        console.log("ports: ", ports);
 
 
         var port = naSvg
