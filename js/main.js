@@ -195,8 +195,11 @@ function naDisplay() {
     */
 
     d3.json(naJson, function (error, naMap) {
+        if (error) throw error;
+
         naCountries = topojson.feature(naMap, naMap.objects.countries);
         naPorts = topojson.feature(naMap, naMap.objects.ports);
+        console.log("naPorts: ", naPorts.features);
         /*
         naTopo.forEach(function (f) {
             const naCountryDetail = naBets.filter(function (a) {
@@ -221,31 +224,27 @@ function naDisplay() {
         naLHeight = window.getComputedStyle(document.getElementById("na")).getPropertyValue("line-height");
         naDisplayPorts();
 
-        var ports = naPorts
-            .filter(function(d) {
-                console.log("d: " + d);
-                return d.arcs.coordinates.length; });
-        naSvg.append("path")
-            .data(voronoi()
-                    .extent([[-1, -1], [naWidth + 1, naHeight + 1]])
-                    .polygons(ports.map(naProjection))
-            )
-            .attr("d", function(d) { return d ? "M" + d.join("L") + "Z" : null; })
+        var ports = naPorts.features.map(function (d) {
+            return [d.geometry.coordinates[0], d.geometry.coordinates[1]];
+        });
+        //console.log("ports: ", ports);
 
-            .attr("class", "voronoi")
-            /*
-            .attr("d", function (d) {
-                    return "M" + d
-                        .filter(function (d) {
-                            return null !== d;
-                        })
-                        .map(function (d) {
-                            return d.join("L");
-                        })
-                        .join("ZM") + "Z";
-                }
+
+        var port = naSvg
+            .selectAll(".voronoi")
+            .data(ports)
+            .enter().append("g")
+            .attr("class", "voronoi");
+
+        port.append("path")
+            .data(d3.voronoi()
+                .extent([[-1, -1], [naWidth + 1, naHeight + 1]])
+                .polygons(ports.map(naProjection))
             )
-            */
-            ;
+            .attr("d", function (d) {
+                //console.log("d: " + d);
+                return d ? "M" + d.join("L") + "Z" : null;
+            })
+        ;
     });
 }
