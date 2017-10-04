@@ -17,6 +17,6 @@ svg {
 
 .voronoi {
     fill: none;
-    stroke: blue;
+    stroke: white;
     stroke-width: 0.5px;
 }
