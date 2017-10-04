@@ -12,7 +12,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Trinidad",
                                             "id":  "59",
                                             "nation":  "NT"
@@ -29,7 +29,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Píritu",
                                             "id":  "191",
                                             "nation":  "NT"
@@ -46,7 +46,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Ysil",
                                             "id":  "267",
                                             "nation":  "NT"
@@ -63,7 +63,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Saint Marys",
                                             "id":  "330",
                                             "nation":  "US"
@@ -80,7 +80,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Port Antonio",
                                             "id":  "77",
                                             "nation":  "GB"
@@ -97,7 +97,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Útila",
                                             "id":  "247",
                                             "nation":  "GB"
@@ -114,7 +114,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Cariaco",
                                             "id":  "188",
                                             "nation":  "NT"
@@ -131,7 +131,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Ayamonte",
                                             "id":  "325",
                                             "nation":  "US"
@@ -148,7 +148,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "La Bermeja",
                                             "id":  "341",
                                             "nation":  "NT"
@@ -165,7 +165,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Guánica",
                                             "id":  "119",
                                             "nation":  "DK"
@@ -182,7 +182,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Tantun Cuzamil",
                                             "id":  "263",
                                             "nation":  "GB"
@@ -199,7 +199,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Mangrove Cay",
                                             "id":  "358",
                                             "nation":  "US"
@@ -216,7 +216,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Vermiou",
                                             "id":  "293",
                                             "nation":  "FR"
@@ -233,7 +233,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "San Sebastian",
                                             "id":  "322",
                                             "nation":  "US"
@@ -250,7 +250,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Deshaies",
                                             "id":  "147",
                                             "nation":  "SE"
@@ -267,7 +267,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Oranjestad",
                                             "id":  "136",
                                             "nation":  "SE"
@@ -284,7 +284,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Rum Cove",
                                             "id":  "377",
                                             "nation":  "US"
@@ -301,7 +301,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Río Chico",
                                             "id":  "192",
                                             "nation":  "VP"
@@ -318,7 +318,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Casigua",
                                             "id":  "198",
                                             "nation":  "VP"
@@ -335,7 +335,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Sancti Spíritus",
                                             "id":  "58",
                                             "nation":  "GB"
@@ -352,7 +352,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Alvarado",
                                             "id":  "275",
                                             "nation":  "ES"
@@ -369,7 +369,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Brangman\u0027s Bluff",
                                             "id":  "237",
                                             "nation":  "GB"
@@ -386,7 +386,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Aguadilla",
                                             "id":  "113",
                                             "nation":  "DK"
@@ -403,7 +403,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Mimbres",
                                             "id":  "11",
                                             "nation":  "ES"
@@ -420,7 +420,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Santa Fe",
                                             "id":  "68",
                                             "nation":  "NT"
@@ -437,7 +437,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Barranquilla",
                                             "id":  "211",
                                             "nation":  "GB"
@@ -454,7 +454,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Deadman\u0027s Cay",
                                             "id":  "20",
                                             "nation":  "PR"
@@ -471,7 +471,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "All Saints",
                                             "id":  "375",
                                             "nation":  "US"
@@ -488,7 +488,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Galdonas",
                                             "id":  "183",
                                             "nation":  "VP"
@@ -505,7 +505,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Tiburon",
                                             "id":  "87",
                                             "nation":  "NT"
@@ -522,7 +522,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Baní",
                                             "id":  "109",
                                             "nation":  "DK"
@@ -539,7 +539,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Fort Baai",
                                             "id":  "135",
                                             "nation":  "SE"
@@ -556,7 +556,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Rincón",
                                             "id":  "102",
                                             "nation":  "DK"
@@ -573,7 +573,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Cuyo",
                                             "id":  "265",
                                             "nation":  "NT"
@@ -590,7 +590,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "La Guanaja",
                                             "id":  "45",
                                             "nation":  "NT"
@@ -607,7 +607,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Mobile",
                                             "id":  "300",
                                             "nation":  "DK"
@@ -624,7 +624,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Coral Bay",
                                             "id":  "124",
                                             "nation":  "DK"
@@ -641,7 +641,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Truxillo",
                                             "id":  "244",
                                             "nation":  "GB"
@@ -658,7 +658,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Belize",
                                             "id":  "253",
                                             "nation":  "GB"
@@ -675,7 +675,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "San Timoteo",
                                             "id":  "200",
                                             "nation":  "VP"
@@ -692,7 +692,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Conil",
                                             "id":  "264",
                                             "nation":  "GB"
@@ -709,7 +709,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Croata",
                                             "id":  "241",
                                             "nation":  "NT"
@@ -726,7 +726,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Bensalem",
                                             "id":  "257",
                                             "nation":  "GB"
@@ -743,7 +743,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Little Harbour",
                                             "id":  "8",
                                             "nation":  "US"
@@ -760,7 +760,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Placer",
                                             "id":  "346",
                                             "nation":  "GB"
@@ -777,7 +777,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Montego Bay",
                                             "id":  "75",
                                             "nation":  "GB"
@@ -794,7 +794,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Little Cayman",
                                             "id":  "73",
                                             "nation":  "GB"
@@ -811,7 +811,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Cayo Biscayno",
                                             "id":  "323",
                                             "nation":  "US"
@@ -828,7 +828,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Salina Point",
                                             "id":  "25",
                                             "nation":  "PR"
@@ -845,7 +845,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Tampico",
                                             "id":  "280",
                                             "nation":  "NT"
@@ -862,7 +862,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Fajardo",
                                             "id":  "116",
                                             "nation":  "DK"
@@ -879,7 +879,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Cayo Romano",
                                             "id":  "44",
                                             "nation":  "ES"
@@ -896,7 +896,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Chiriquí",
                                             "id":  "224",
                                             "nation":  "DK"
@@ -913,7 +913,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Pampatar",
                                             "id":  "185",
                                             "nation":  "NT"
@@ -930,7 +930,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Sant Iago",
                                             "id":  "52",
                                             "nation":  "SE"
@@ -947,7 +947,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Alacranes",
                                             "id":  "342",
                                             "nation":  "NT"
@@ -964,7 +964,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Turneffe",
                                             "id":  "254",
                                             "nation":  "NT"
@@ -981,7 +981,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Shroud Cay",
                                             "id":  "366",
                                             "nation":  "FT"
@@ -998,7 +998,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Saint George",
                                             "id":  "164",
                                             "nation":  "FR"
@@ -1015,7 +1015,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Daguilla",
                                             "id":  "69",
                                             "nation":  "NT"
@@ -1032,7 +1032,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Las Aves",
                                             "id":  "172",
                                             "nation":  "VP"
@@ -1049,7 +1049,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Río de la Hacha",
                                             "id":  "209",
                                             "nation":  "VP"
@@ -1066,7 +1066,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "New Edinburgh",
                                             "id":  "217",
                                             "nation":  "NT"
@@ -1083,7 +1083,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Watling",
                                             "id":  "22",
                                             "nation":  "PR"
@@ -1100,7 +1100,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Sandy Point",
                                             "id":  "7",
                                             "nation":  "US"
@@ -1117,7 +1117,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Coquibacoa",
                                             "id":  "207",
                                             "nation":  "VP"
@@ -1134,7 +1134,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Mugeres",
                                             "id":  "345",
                                             "nation":  "GB"
@@ -1151,7 +1151,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Cartagena de Indias",
                                             "id":  "212",
                                             "nation":  "GB"
@@ -1168,7 +1168,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Espíritu Santo",
                                             "id":  "274",
                                             "nation":  "ES"
@@ -1185,7 +1185,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Puerto Cabello",
                                             "id":  "194",
                                             "nation":  "VP"
@@ -1202,7 +1202,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Cabo Cañaveral",
                                             "id":  "318",
                                             "nation":  "US"
@@ -1219,7 +1219,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Port Howe",
                                             "id":  "19",
                                             "nation":  "PR"
@@ -1236,7 +1236,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Sandy Hill",
                                             "id":  "371",
                                             "nation":  "SE"
@@ -1253,7 +1253,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Bluefields",
                                             "id":  "230",
                                             "nation":  "GB"
@@ -1270,7 +1270,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Maracaibo",
                                             "id":  "204",
                                             "nation":  "VP"
@@ -1287,7 +1287,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Esteros",
                                             "id":  "284",
                                             "nation":  "NT"
@@ -1304,7 +1304,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Bahía Honda",
                                             "id":  "36",
                                             "nation":  "ES"
@@ -1321,7 +1321,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "San José",
                                             "id":  "303",
                                             "nation":  "GB"
@@ -1338,7 +1338,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Islet",
                                             "id":  "28",
                                             "nation":  "PR"
@@ -1355,7 +1355,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Coro",
                                             "id":  "196",
                                             "nation":  "VP"
@@ -1372,7 +1372,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Saint-Louis",
                                             "id":  "84",
                                             "nation":  "NT"
@@ -1389,7 +1389,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Bimini",
                                             "id":  "10",
                                             "nation":  "US"
@@ -1406,7 +1406,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Savanna la Mar",
                                             "id":  "81",
                                             "nation":  "GB"
@@ -1423,7 +1423,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Sale-Trou",
                                             "id":  "82",
                                             "nation":  "DK"
@@ -1440,7 +1440,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "San Agustín",
                                             "id":  "326",
                                             "nation":  "US"
@@ -1457,7 +1457,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Frederiksted",
                                             "id":  "128",
                                             "nation":  "DK"
@@ -1474,7 +1474,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Charles Town",
                                             "id":  "138",
                                             "nation":  "SE"
@@ -1491,7 +1491,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Sinamaica",
                                             "id":  "205",
                                             "nation":  "VP"
@@ -1508,7 +1508,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Bonacca",
                                             "id":  "245",
                                             "nation":  "GB"
@@ -1525,7 +1525,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Sabina",
                                             "id":  "290",
                                             "nation":  "FR"
@@ -1542,7 +1542,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Aransas",
                                             "id":  "285",
                                             "nation":  "NT"
@@ -1559,7 +1559,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Harbour Island",
                                             "id":  "15",
                                             "nation":  "ES"
@@ -1576,7 +1576,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Azua",
                                             "id":  "110",
                                             "nation":  "DK"
@@ -1593,7 +1593,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Cojoro",
                                             "id":  "206",
                                             "nation":  "VP"
@@ -1610,7 +1610,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Cumaná",
                                             "id":  "189",
                                             "nation":  "VP"
@@ -1627,7 +1627,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Mandinga",
                                             "id":  "219",
                                             "nation":  "NT"
@@ -1644,7 +1644,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Triunfo de la Cruz",
                                             "id":  "249",
                                             "nation":  "GB"
@@ -1661,7 +1661,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Jérémie",
                                             "id":  "88",
                                             "nation":  "SE"
@@ -1678,7 +1678,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Tolú",
                                             "id":  "213",
                                             "nation":  "GB"
@@ -1695,7 +1695,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Carúpano",
                                             "id":  "184",
                                             "nation":  "VP"
@@ -1712,7 +1712,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Morro Chico",
                                             "id":  "248",
                                             "nation":  "GB"
@@ -1729,7 +1729,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Willemstad",
                                             "id":  "174",
                                             "nation":  "VP"
@@ -1746,7 +1746,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Key West",
                                             "id":  "313",
                                             "nation":  "ES"
@@ -1763,7 +1763,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Great Corn",
                                             "id":  "231",
                                             "nation":  "FT"
@@ -1780,7 +1780,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Cochinos",
                                             "id":  "61",
                                             "nation":  "GB"
@@ -1797,7 +1797,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Mayaguana",
                                             "id":  "26",
                                             "nation":  "PR"
@@ -1814,7 +1814,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Buena Vista",
                                             "id":  "215",
                                             "nation":  "GB"
@@ -1831,7 +1831,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Santo Tomás",
                                             "id":  "251",
                                             "nation":  "GB"
@@ -1848,7 +1848,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Bone Cay",
                                             "id":  "350",
                                             "nation":  "GB"
@@ -1865,7 +1865,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Hat Island",
                                             "id":  "130",
                                             "nation":  "SE"
@@ -1882,7 +1882,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Ruatan",
                                             "id":  "246",
                                             "nation":  "GB"
@@ -1899,7 +1899,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Guamá Sevilla",
                                             "id":  "53",
                                             "nation":  "NT"
@@ -1916,7 +1916,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Calobelo",
                                             "id":  "222",
                                             "nation":  "NT"
@@ -1933,7 +1933,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "William\u0027s Bay",
                                             "id":  "364",
                                             "nation":  "ES"
@@ -1950,7 +1950,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Road Rocks",
                                             "id":  "5",
                                             "nation":  "US"
@@ -1967,7 +1967,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Ays",
                                             "id":  "321",
                                             "nation":  "US"
@@ -1984,7 +1984,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Marin",
                                             "id":  "155",
                                             "nation":  "FR"
@@ -2001,7 +2001,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Mariel",
                                             "id":  "37",
                                             "nation":  "ES"
@@ -2018,7 +2018,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "La Tortuga",
                                             "id":  "187",
                                             "nation":  "VP"
@@ -2035,7 +2035,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "English Harbour",
                                             "id":  "141",
                                             "nation":  "SE"
@@ -2052,7 +2052,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "La Tortue",
                                             "id":  "96",
                                             "nation":  "FT"
@@ -2069,7 +2069,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "La Moussette",
                                             "id":  "373",
                                             "nation":  "FR"
@@ -2086,7 +2086,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Barataria",
                                             "id":  "298",
                                             "nation":  "FR"
@@ -2103,7 +2103,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Port Morant",
                                             "id":  "78",
                                             "nation":  "GB"
@@ -2120,7 +2120,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Nuevitas",
                                             "id":  "46",
                                             "nation":  "DK"
@@ -2137,7 +2137,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Serrana",
                                             "id":  "349",
                                             "nation":  "NT"
@@ -2154,7 +2154,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "North Inlet",
                                             "id":  "356",
                                             "nation":  "US"
@@ -2171,7 +2171,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Kingston / Port Royal",
                                             "id":  "79",
                                             "nation":  "GB"
@@ -2188,7 +2188,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Grindstone",
                                             "id":  "229",
                                             "nation":  "GB"
@@ -2205,7 +2205,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Bugle Cay",
                                             "id":  "351",
                                             "nation":  "GB"
@@ -2222,7 +2222,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Philipsburg",
                                             "id":  "132",
                                             "nation":  "SE"
@@ -2239,7 +2239,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Fort-Royal",
                                             "id":  "156",
                                             "nation":  "FR"
@@ -2256,7 +2256,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Tamiagua",
                                             "id":  "281",
                                             "nation":  "NT"
@@ -2273,7 +2273,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Morgan\u0027s Bluff",
                                             "id":  "12",
                                             "nation":  "SE"
@@ -2290,7 +2290,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Triangles",
                                             "id":  "338",
                                             "nation":  "NT"
@@ -2307,7 +2307,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Arecibo",
                                             "id":  "114",
                                             "nation":  "DK"
@@ -2324,7 +2324,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Cabo de la Vela",
                                             "id":  "208",
                                             "nation":  "VP"
@@ -2341,7 +2341,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Fort Oranje",
                                             "id":  "173",
                                             "nation":  "VP"
@@ -2358,7 +2358,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Apalachicola",
                                             "id":  "304",
                                             "nation":  "GB"
@@ -2375,7 +2375,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Saint Ann",
                                             "id":  "76",
                                             "nation":  "GB"
@@ -2392,7 +2392,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Governor\u0027s Harbour",
                                             "id":  "16",
                                             "nation":  "NT"
@@ -2409,7 +2409,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Baracoa",
                                             "id":  "50",
                                             "nation":  "PR"
@@ -2426,7 +2426,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Bridgetown",
                                             "id":  "161",
                                             "nation":  "FR"
@@ -2443,7 +2443,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Champotón",
                                             "id":  "270",
                                             "nation":  "NT"
@@ -2460,7 +2460,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "La Anguilla",
                                             "id":  "42",
                                             "nation":  "PR"
@@ -2477,7 +2477,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Lagunillas",
                                             "id":  "199",
                                             "nation":  "VP"
@@ -2494,7 +2494,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Brewers",
                                             "id":  "242",
                                             "nation":  "GB"
@@ -2511,7 +2511,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Mosquito Cay",
                                             "id":  "238",
                                             "nation":  "GB"
@@ -2528,7 +2528,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "San Fernando",
                                             "id":  "283",
                                             "nation":  "NT"
@@ -2545,7 +2545,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "El Rancho",
                                             "id":  "286",
                                             "nation":  "FT"
@@ -2562,7 +2562,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Santa María",
                                             "id":  "57",
                                             "nation":  "GB"
@@ -2579,7 +2579,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "San Marcos",
                                             "id":  "305",
                                             "nation":  "GB"
@@ -2596,7 +2596,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Nouvelle-Orléans",
                                             "id":  "297",
                                             "nation":  "FR"
@@ -2613,7 +2613,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Puerto de Nipe",
                                             "id":  "49",
                                             "nation":  "PR"
@@ -2630,7 +2630,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Saint-Nicolas",
                                             "id":  "94",
                                             "nation":  "NT"
@@ -2647,7 +2647,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Santo Domingo",
                                             "id":  "108",
                                             "nation":  "DK"
@@ -2664,7 +2664,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Roseau",
                                             "id":  "152",
                                             "nation":  "FR"
@@ -2681,7 +2681,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Río Seco",
                                             "id":  "319",
                                             "nation":  "US"
@@ -2698,7 +2698,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Remedios",
                                             "id":  "43",
                                             "nation":  "ES"
@@ -2715,7 +2715,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Barcos",
                                             "id":  "67",
                                             "nation":  "NT"
@@ -2732,7 +2732,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Mortimer Town",
                                             "id":  "27",
                                             "nation":  "PR"
@@ -2749,7 +2749,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Santa Cruz",
                                             "id":  "56",
                                             "nation":  "NT"
@@ -2766,7 +2766,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Chagres",
                                             "id":  "221",
                                             "nation":  "NT"
@@ -2783,7 +2783,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Penzacola",
                                             "id":  "301",
                                             "nation":  "DK"
@@ -2800,7 +2800,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "La Blanquilla",
                                             "id":  "170",
                                             "nation":  "VP"
@@ -2817,7 +2817,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Sunbury",
                                             "id":  "328",
                                             "nation":  "US"
@@ -2834,7 +2834,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Gustavia",
                                             "id":  "133",
                                             "nation":  "SE"
@@ -2851,7 +2851,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Basse-Terre",
                                             "id":  "146",
                                             "nation":  "SE"
@@ -2868,7 +2868,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Canalete",
                                             "id":  "216",
                                             "nation":  "GB"
@@ -2885,7 +2885,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Calcasieu",
                                             "id":  "291",
                                             "nation":  "FR"
@@ -2902,7 +2902,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "West End",
                                             "id":  "4",
                                             "nation":  "US"
@@ -2919,7 +2919,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Cayo Vacas",
                                             "id":  "315",
                                             "nation":  "ES"
@@ -2936,7 +2936,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Camp du Roy",
                                             "id":  "149",
                                             "nation":  "SE"
@@ -2953,7 +2953,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Port-Louis",
                                             "id":  "142",
                                             "nation":  "SE"
@@ -2970,7 +2970,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Savannah",
                                             "id":  "331",
                                             "nation":  "US"
@@ -2987,7 +2987,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Le Moule",
                                             "id":  "143",
                                             "nation":  "SE"
@@ -3004,7 +3004,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Hitten Hatcha",
                                             "id":  "306",
                                             "nation":  "GB"
@@ -3021,7 +3021,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Cayo del Anclote",
                                             "id":  "308",
                                             "nation":  "NT"
@@ -3038,7 +3038,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Santa Rosa",
                                             "id":  "302",
                                             "nation":  "DK"
@@ -3055,7 +3055,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Green Cay",
                                             "id":  "367",
                                             "nation":  "ES"
@@ -3072,7 +3072,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Fort-Dauphin",
                                             "id":  "98",
                                             "nation":  "DK"
@@ -3089,7 +3089,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Pasaje",
                                             "id":  "122",
                                             "nation":  "DK"
@@ -3106,7 +3106,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Kingstown",
                                             "id":  "162",
                                             "nation":  "FR"
@@ -3123,7 +3123,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Little River",
                                             "id":  "381",
                                             "nation":  "US"
@@ -3140,7 +3140,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Saint Joseph",
                                             "id":  "160",
                                             "nation":  "FR"
@@ -3157,7 +3157,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Grand Anse",
                                             "id":  "153",
                                             "nation":  "FR"
@@ -3174,7 +3174,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Crown Haven",
                                             "id":  "361",
                                             "nation":  "US"
@@ -3191,7 +3191,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Carriacou",
                                             "id":  "163",
                                             "nation":  "FR"
@@ -3208,7 +3208,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "San Lazaro",
                                             "id":  "62",
                                             "nation":  "ES"
@@ -3225,7 +3225,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Perijá",
                                             "id":  "203",
                                             "nation":  "VP"
@@ -3242,7 +3242,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Islamorada",
                                             "id":  "316",
                                             "nation":  "ES"
@@ -3259,7 +3259,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Chinchorro",
                                             "id":  "258",
                                             "nation":  "GB"
@@ -3276,7 +3276,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Puerto Real",
                                             "id":  "271",
                                             "nation":  "NT"
@@ -3293,7 +3293,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Concepción",
                                             "id":  "223",
                                             "nation":  "GB"
@@ -3310,7 +3310,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "La Habana",
                                             "id":  "38",
                                             "nation":  "ES"
@@ -3327,7 +3327,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Jacmel",
                                             "id":  "83",
                                             "nation":  "NT"
@@ -3344,7 +3344,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Río Tocuyo",
                                             "id":  "195",
                                             "nation":  "VP"
@@ -3361,7 +3361,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Kidd\u0027s Harbour",
                                             "id":  "357",
                                             "nation":  "US"
@@ -3378,7 +3378,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Beaufort",
                                             "id":  "332",
                                             "nation":  "US"
@@ -3395,7 +3395,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Gracias a Dios",
                                             "id":  "240",
                                             "nation":  "GB"
@@ -3412,7 +3412,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Campeche",
                                             "id":  "269",
                                             "nation":  "NT"
@@ -3429,7 +3429,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Naparima",
                                             "id":  "168",
                                             "nation":  "FR"
@@ -3446,7 +3446,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Portobelo",
                                             "id":  "220",
                                             "nation":  "NT"
@@ -3463,7 +3463,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Ocean Bight",
                                             "id":  "368",
                                             "nation":  "PR"
@@ -3480,7 +3480,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Nippes",
                                             "id":  "89",
                                             "nation":  "SE"
@@ -3497,7 +3497,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Arcas",
                                             "id":  "337",
                                             "nation":  "NT"
@@ -3514,7 +3514,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "The Settlement",
                                             "id":  "126",
                                             "nation":  "NT"
@@ -3531,7 +3531,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Ponce",
                                             "id":  "118",
                                             "nation":  "DK"
@@ -3548,7 +3548,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "San Juan",
                                             "id":  "115",
                                             "nation":  "DK"
@@ -3565,7 +3565,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Parrot Cay",
                                             "id":  "30",
                                             "nation":  "NT"
@@ -3582,7 +3582,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Barahona",
                                             "id":  "111",
                                             "nation":  "DK"
@@ -3599,7 +3599,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "George Town",
                                             "id":  "72",
                                             "nation":  "GB"
@@ -3616,7 +3616,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Congrios",
                                             "id":  "259",
                                             "nation":  "GB"
@@ -3633,7 +3633,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Tampa",
                                             "id":  "309",
                                             "nation":  "NT"
@@ -3650,7 +3650,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "La Trinité",
                                             "id":  "154",
                                             "nation":  "FR"
@@ -3667,7 +3667,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Arthur\u0027s Town",
                                             "id":  "17",
                                             "nation":  "PR"
@@ -3684,7 +3684,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Las Tortugas",
                                             "id":  "314",
                                             "nation":  "ES"
@@ -3701,7 +3701,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Cocodrillo",
                                             "id":  "70",
                                             "nation":  "NT"
@@ -3718,7 +3718,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Frozen Cay",
                                             "id":  "359",
                                             "nation":  "ES"
@@ -3735,7 +3735,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Arenas",
                                             "id":  "340",
                                             "nation":  "NT"
@@ -3752,7 +3752,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Water Bay",
                                             "id":  "360",
                                             "nation":  "US"
@@ -3769,7 +3769,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Mitara",
                                             "id":  "197",
                                             "nation":  "VP"
@@ -3786,7 +3786,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "La Bahía",
                                             "id":  "287",
                                             "nation":  "FR"
@@ -3803,7 +3803,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Aves",
                                             "id":  "150",
                                             "nation":  "FT"
@@ -3820,7 +3820,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Yaguaraparo",
                                             "id":  "181",
                                             "nation":  "FR"
@@ -3837,7 +3837,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Codrington",
                                             "id":  "134",
                                             "nation":  "SE"
@@ -3854,7 +3854,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "San Luis",
                                             "id":  "288",
                                             "nation":  "NT"
@@ -3871,7 +3871,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Guibara",
                                             "id":  "48",
                                             "nation":  "NT"
@@ -3888,7 +3888,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Black River",
                                             "id":  "243",
                                             "nation":  "GB"
@@ -3905,7 +3905,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Saint-Pierre",
                                             "id":  "157",
                                             "nation":  "FR"
@@ -3922,7 +3922,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Robras",
                                             "id":  "64",
                                             "nation":  "NT"
@@ -3939,7 +3939,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Port-de-Paix",
                                             "id":  "95",
                                             "nation":  "DK"
@@ -3956,7 +3956,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Island Harbour",
                                             "id":  "370",
                                             "nation":  "SE"
@@ -3973,7 +3973,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Flatts",
                                             "id":  "354",
                                             "nation":  "US"
@@ -3990,7 +3990,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Marigot",
                                             "id":  "131",
                                             "nation":  "SE"
@@ -4007,7 +4007,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Carlisle",
                                             "id":  "80",
                                             "nation":  "GB"
@@ -4024,7 +4024,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Dariena",
                                             "id":  "214",
                                             "nation":  "FT"
@@ -4041,7 +4041,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Higüey",
                                             "id":  "106",
                                             "nation":  "DK"
@@ -4058,7 +4058,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Güiria",
                                             "id":  "182",
                                             "nation":  "FR"
@@ -4075,7 +4075,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Little Isaac Rocks",
                                             "id":  "362",
                                             "nation":  "US"
@@ -4092,7 +4092,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Santo Tomé de Guayana",
                                             "id":  "176",
                                             "nation":  "FR"
@@ -4109,7 +4109,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "New Smyrna",
                                             "id":  "324",
                                             "nation":  "US"
@@ -4126,7 +4126,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Siguanea",
                                             "id":  "71",
                                             "nation":  "NT"
@@ -4143,7 +4143,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "George\u0027s Town",
                                             "id":  "18",
                                             "nation":  "PR"
@@ -4160,7 +4160,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Saint-François",
                                             "id":  "144",
                                             "nation":  "SE"
@@ -4177,7 +4177,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Samaná",
                                             "id":  "104",
                                             "nation":  "DK"
@@ -4194,7 +4194,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Old Providence",
                                             "id":  "235",
                                             "nation":  "GB"
@@ -4211,7 +4211,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Salamanca",
                                             "id":  "256",
                                             "nation":  "GB"
@@ -4228,7 +4228,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Ahumada",
                                             "id":  "289",
                                             "nation":  "FR"
@@ -4245,7 +4245,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Cayo Largo",
                                             "id":  "317",
                                             "nation":  "ES"
@@ -4262,7 +4262,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Alabaster Rocks",
                                             "id":  "365",
                                             "nation":  "NT"
@@ -4279,7 +4279,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Tumbado",
                                             "id":  "343",
                                             "nation":  "FT"
@@ -4296,7 +4296,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Macanao",
                                             "id":  "186",
                                             "nation":  "VP"
@@ -4313,7 +4313,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Cap-Français",
                                             "id":  "97",
                                             "nation":  "DK"
@@ -4330,7 +4330,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Sisal",
                                             "id":  "268",
                                             "nation":  "NT"
@@ -4347,7 +4347,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Saint John\u0027s",
                                             "id":  "140",
                                             "nation":  "SE"
@@ -4364,7 +4364,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Blondel Cay",
                                             "id":  "32",
                                             "nation":  "PR"
@@ -4381,7 +4381,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Matanzas",
                                             "id":  "39",
                                             "nation":  "ES"
@@ -4398,7 +4398,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "La Mona",
                                             "id":  "112",
                                             "nation":  "FT"
@@ -4415,7 +4415,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "La Navasse",
                                             "id":  "85",
                                             "nation":  "SE"
@@ -4432,7 +4432,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Caño Araguabisi",
                                             "id":  "178",
                                             "nation":  "FR"
@@ -4449,7 +4449,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Monte Cristi",
                                             "id":  "99",
                                             "nation":  "DK"
@@ -4466,7 +4466,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Santa Ana",
                                             "id":  "272",
                                             "nation":  "ES"
@@ -4483,7 +4483,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Spanish Town",
                                             "id":  "127",
                                             "nation":  "DK"
@@ -4500,7 +4500,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Little Inagua",
                                             "id":  "29",
                                             "nation":  "PR"
@@ -4517,7 +4517,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Fort Zoutman",
                                             "id":  "175",
                                             "nation":  "VP"
@@ -4534,7 +4534,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Guayaguayare",
                                             "id":  "179",
                                             "nation":  "FT"
@@ -4551,7 +4551,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Misteriosa",
                                             "id":  "347",
                                             "nation":  "GB"
@@ -4568,7 +4568,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Rosaly",
                                             "id":  "151",
                                             "nation":  "FR"
@@ -4585,7 +4585,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Bernal",
                                             "id":  "277",
                                             "nation":  "ES"
@@ -4602,7 +4602,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Vieques",
                                             "id":  "121",
                                             "nation":  "DK"
@@ -4619,7 +4619,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Wilmington",
                                             "id":  "335",
                                             "nation":  "US"
@@ -4636,7 +4636,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Nueva Barcelona",
                                             "id":  "190",
                                             "nation":  "VP"
@@ -4653,7 +4653,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Les Gonaïves",
                                             "id":  "93",
                                             "nation":  "SE"
@@ -4670,7 +4670,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Somerset",
                                             "id":  "353",
                                             "nation":  "US"
@@ -4687,7 +4687,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Prinzapolka",
                                             "id":  "234",
                                             "nation":  "GB"
@@ -4704,7 +4704,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Marsh Harbour",
                                             "id":  "9",
                                             "nation":  "US"
@@ -4721,7 +4721,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Asunción",
                                             "id":  "260",
                                             "nation":  "GB"
@@ -4738,7 +4738,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Manataca",
                                             "id":  "312",
                                             "nation":  "ES"
@@ -4755,7 +4755,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Jobe",
                                             "id":  "320",
                                             "nation":  "US"
@@ -4772,7 +4772,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Almirante",
                                             "id":  "225",
                                             "nation":  "DK"
@@ -4789,7 +4789,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Vieux-Fort",
                                             "id":  "159",
                                             "nation":  "FR"
@@ -4806,7 +4806,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "El Toco",
                                             "id":  "166",
                                             "nation":  "FR"
@@ -4823,7 +4823,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Salinas",
                                             "id":  "379",
                                             "nation":  "NT"
@@ -4840,7 +4840,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Pinar del Río",
                                             "id":  "65",
                                             "nation":  "NT"
@@ -4857,7 +4857,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Caño Araguao",
                                             "id":  "177",
                                             "nation":  "FR"
@@ -4874,7 +4874,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Ambergrease Caye",
                                             "id":  "255",
                                             "nation":  "GB"
@@ -4891,7 +4891,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Walker\u0027s Cay",
                                             "id":  "3",
                                             "nation":  "US"
@@ -4908,7 +4908,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Playón",
                                             "id":  "218",
                                             "nation":  "GB"
@@ -4925,7 +4925,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Ragged Cay",
                                             "id":  "21",
                                             "nation":  "PR"
@@ -4942,7 +4942,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Puerto del Padre",
                                             "id":  "47",
                                             "nation":  "NT"
@@ -4959,7 +4959,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Guacata",
                                             "id":  "374",
                                             "nation":  "GB"
@@ -4976,7 +4976,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Tordo",
                                             "id":  "380",
                                             "nation":  "NT"
@@ -4993,7 +4993,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Las Sabinas",
                                             "id":  "307",
                                             "nation":  "GB"
@@ -5010,7 +5010,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Les Cayes",
                                             "id":  "86",
                                             "nation":  "NT"
@@ -5027,7 +5027,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Baxo Nuevo",
                                             "id":  "339",
                                             "nation":  "NT"
@@ -5044,7 +5044,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Batabanó",
                                             "id":  "63",
                                             "nation":  "NT"
@@ -5061,7 +5061,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Tuspan",
                                             "id":  "279",
                                             "nation":  "ES"
@@ -5078,7 +5078,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Plymouth",
                                             "id":  "369",
                                             "nation":  "SE"
@@ -5095,7 +5095,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Brunswick",
                                             "id":  "329",
                                             "nation":  "US"
@@ -5112,7 +5112,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Pedro Cay",
                                             "id":  "352",
                                             "nation":  "GB"
@@ -5129,7 +5129,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Wantlands Ferry",
                                             "id":  "376",
                                             "nation":  "US"
@@ -5146,7 +5146,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Lorimers",
                                             "id":  "31",
                                             "nation":  "DK"
@@ -5163,7 +5163,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Amalienborg",
                                             "id":  "123",
                                             "nation":  "DK"
@@ -5180,7 +5180,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Mantua",
                                             "id":  "34",
                                             "nation":  "ES"
@@ -5197,7 +5197,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "El Soco",
                                             "id":  "107",
                                             "nation":  "DK"
@@ -5214,7 +5214,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Santa Marta",
                                             "id":  "210",
                                             "nation":  "NT"
@@ -5231,7 +5231,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Soto La Marina",
                                             "id":  "282",
                                             "nation":  "NT"
@@ -5248,7 +5248,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Puerto Plata",
                                             "id":  "101",
                                             "nation":  "DK"
@@ -5265,7 +5265,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Tulum",
                                             "id":  "261",
                                             "nation":  "NT"
@@ -5282,7 +5282,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Gibraltar",
                                             "id":  "201",
                                             "nation":  "VP"
@@ -5299,7 +5299,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Omoa",
                                             "id":  "250",
                                             "nation":  "NT"
@@ -5316,7 +5316,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Puerto de España",
                                             "id":  "169",
                                             "nation":  "FR"
@@ -5333,7 +5333,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Pointe-à-Pitre",
                                             "id":  "145",
                                             "nation":  "SE"
@@ -5350,7 +5350,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Victoria",
                                             "id":  "273",
                                             "nation":  "ES"
@@ -5367,7 +5367,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Encontrados",
                                             "id":  "202",
                                             "nation":  "VP"
@@ -5384,7 +5384,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Santanillas",
                                             "id":  "348",
                                             "nation":  "GB"
@@ -5401,7 +5401,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Placentia",
                                             "id":  "252",
                                             "nation":  "GB"
@@ -5418,7 +5418,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Pitt\u0027s Town",
                                             "id":  "23",
                                             "nation":  "PR"
@@ -5435,7 +5435,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Terre-de-Bas",
                                             "id":  "148",
                                             "nation":  "SE"
@@ -5452,7 +5452,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Haulover",
                                             "id":  "232",
                                             "nation":  "GB"
@@ -5469,7 +5469,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "La Isabela",
                                             "id":  "100",
                                             "nation":  "DK"
@@ -5486,7 +5486,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Portillo",
                                             "id":  "54",
                                             "nation":  "NT"
@@ -5503,7 +5503,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Cabo Rojo",
                                             "id":  "120",
                                             "nation":  "DK"
@@ -5520,7 +5520,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Pedernales",
                                             "id":  "180",
                                             "nation":  "FR"
@@ -5537,7 +5537,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Cul-de-Sac",
                                             "id":  "372",
                                             "nation":  "SE"
@@ -5554,7 +5554,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Macao",
                                             "id":  "105",
                                             "nation":  "DK"
@@ -5571,7 +5571,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Saint-Marc",
                                             "id":  "92",
                                             "nation":  "SE"
@@ -5588,7 +5588,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Atchafalaya",
                                             "id":  "294",
                                             "nation":  "FR"
@@ -5605,7 +5605,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Turtle Cay",
                                             "id":  "6",
                                             "nation":  "US"
@@ -5622,7 +5622,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "La Orchila",
                                             "id":  "171",
                                             "nation":  "VP"
@@ -5639,7 +5639,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Manzanilla",
                                             "id":  "55",
                                             "nation":  "GB"
@@ -5656,7 +5656,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Biloxi",
                                             "id":  "299",
                                             "nation":  "DK"
@@ -5673,7 +5673,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Saint George\u0027s Town",
                                             "id":  "355",
                                             "nation":  "US"
@@ -5690,7 +5690,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Atwood",
                                             "id":  "24",
                                             "nation":  "PR"
@@ -5707,7 +5707,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Port-au-Prince",
                                             "id":  "91",
                                             "nation":  "SE"
@@ -5724,7 +5724,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Constance",
                                             "id":  "292",
                                             "nation":  "FR"
@@ -5741,7 +5741,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Sarazota",
                                             "id":  "310",
                                             "nation":  "NT"
@@ -5758,7 +5758,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Jagua",
                                             "id":  "60",
                                             "nation":  "NT"
@@ -5775,7 +5775,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Terrebonne",
                                             "id":  "295",
                                             "nation":  "FR"
@@ -5792,7 +5792,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Guayama",
                                             "id":  "117",
                                             "nation":  "DK"
@@ -5809,7 +5809,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Kemps Bay",
                                             "id":  "13",
                                             "nation":  "ES"
@@ -5826,7 +5826,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Road Town",
                                             "id":  "125",
                                             "nation":  "DK"
@@ -5843,7 +5843,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Conttoy",
                                             "id":  "344",
                                             "nation":  "NT"
@@ -5860,7 +5860,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "La Desconocida",
                                             "id":  "363",
                                             "nation":  "US"
@@ -5877,7 +5877,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Sandy Bay",
                                             "id":  "239",
                                             "nation":  "GB"
@@ -5894,7 +5894,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Selam",
                                             "id":  "266",
                                             "nation":  "GB"
@@ -5911,7 +5911,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Saint-Malo",
                                             "id":  "296",
                                             "nation":  "FR"
@@ -5928,7 +5928,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Carahatas",
                                             "id":  "40",
                                             "nation":  "ES"
@@ -5945,7 +5945,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Caracas",
                                             "id":  "193",
                                             "nation":  "NT"
@@ -5962,7 +5962,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Matina",
                                             "id":  "227",
                                             "nation":  "NT"
@@ -5979,7 +5979,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Nassau",
                                             "id":  "14",
                                             "nation":  "ES"
@@ -5996,7 +5996,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Castries",
                                             "id":  "158",
                                             "nation":  "FR"
@@ -6013,7 +6013,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Grand Turk",
                                             "id":  "33",
                                             "nation":  "DK"
@@ -6030,7 +6030,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Christiansted",
                                             "id":  "129",
                                             "nation":  "DK"
@@ -6047,7 +6047,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Charleston",
                                             "id":  "333",
                                             "nation":  "US"
@@ -6064,7 +6064,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Scarborough",
                                             "id":  "165",
                                             "nation":  "FR"
@@ -6081,7 +6081,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Gasparilla",
                                             "id":  "311",
                                             "nation":  "ES"
@@ -6098,7 +6098,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "San Juan del Norte",
                                             "id":  "228",
                                             "nation":  "GB"
@@ -6115,7 +6115,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Almeria",
                                             "id":  "278",
                                             "nation":  "ES"
@@ -6132,7 +6132,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Bahía Escocesa",
                                             "id":  "103",
                                             "nation":  "DK"
@@ -6149,7 +6149,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Georgetown",
                                             "id":  "334",
                                             "nation":  "US"
@@ -6166,7 +6166,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Xpu Ha",
                                             "id":  "262",
                                             "nation":  "GB"
@@ -6183,7 +6183,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "San Andrés",
                                             "id":  "236",
                                             "nation":  "GB"
@@ -6200,7 +6200,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Puerto Escondido",
                                             "id":  "51",
                                             "nation":  "SE"
@@ -6217,7 +6217,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Baja",
                                             "id":  "35",
                                             "nation":  "ES"
@@ -6234,7 +6234,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  false,
+                                            "shallow":  true,
                                             "name":  "Talamanca",
                                             "id":  "226",
                                             "nation":  "NT"
@@ -6251,7 +6251,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Cayo de Sal",
                                             "id":  "41",
                                             "nation":  "ES"
@@ -6268,7 +6268,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Caño Macareo",
                                             "id":  "167",
                                             "nation":  "FR"
@@ -6285,7 +6285,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  true,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Vera Cruz",
                                             "id":  "276",
                                             "nation":  "ES"
@@ -6302,7 +6302,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Swannsborough",
                                             "id":  "336",
                                             "nation":  "US"
@@ -6319,7 +6319,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "San Mateo",
                                             "id":  "327",
                                             "nation":  "US"
@@ -6336,7 +6336,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Great River",
                                             "id":  "233",
                                             "nation":  "GB"
@@ -6353,7 +6353,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Cayman Brac",
                                             "id":  "74",
                                             "nation":  "GB"
@@ -6370,7 +6370,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Corrientes",
                                             "id":  "66",
                                             "nation":  "GB"
@@ -6387,7 +6387,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Basseterre Town",
                                             "id":  "137",
                                             "nation":  "SE"
@@ -6404,7 +6404,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "La Désirade",
                                             "id":  "139",
                                             "nation":  "SE"
@@ -6421,7 +6421,7 @@
                                       },
                          "properties":  {
                                             "countyCapital":  false,
-                                            "shallow":  true,
+                                            "shallow":  false,
                                             "name":  "Léogane",
                                             "id":  "90",
                                             "nation":  "SE"
