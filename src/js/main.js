@@ -96,7 +96,7 @@ function naDisplay() {
             .layoutTextLabel()
             .padding(labelPadding)
             .value(function(d) {
-                return d.properties.name + " (" + d.properties.nation + ")";
+                return d.properties.name;
             });
 
         //let strategy = fc.layoutAnnealing();
