@@ -2,7 +2,7 @@
 
  */
 
-jQuery(document).ready(function ($) {
+jQuery(document).ready(function($) {
     "use strict";
 
     naDisplay();
@@ -13,8 +13,7 @@ function naDisplay() {
     var naCountries, naPorts;
     var naJson = "topojson/50m-na.json";
 
-    function naSetupColours() {
-    }
+    function naSetupColours() {}
 
     function naSetupProjection() {
         // http://stackoverflow.com/questions/14492284/center-a-map-in-d3-given-a-geojson-object
@@ -22,12 +21,11 @@ function naDisplay() {
             .geoEquirectangular()
             .scale(1)
             .translate([0, 0]);
-        naPath = d3.geoPath()
-            .projection(naProjection);
+        naPath = d3.geoPath().projection(naProjection);
     }
 
     function naUpdateProjection() {
-        const naMargin = {top: 0, right: 0, bottom: -50, left: 0};
+        const naMargin = { top: 0, right: 0, bottom: -50, left: 0 };
         var naScale, naTranslate, boundsWidth, boundsHeight;
 
         naWidth = document.getElementById("na").offsetWidth - naMargin.left - naMargin.right;
@@ -55,15 +53,14 @@ function naDisplay() {
     }
 
     function naDisplayCountries() {
-        naSvg.append("path")
+        naSvg
+            .append("path")
             .datum(naCountries)
             .attr("class", "na-country")
             .attr("d", naPath);
     }
 
-
     function naDisplayPorts() {
-
         var ports = naSvg.selectAll(".na-port").data(naPorts.features);
 
         ports
@@ -71,9 +68,9 @@ function naDisplay() {
             .append("path")
             .attr("d", naPath)
             .attr("class", "na-port")
-            .attr("stroke", function (d) {
+            .attr("stroke", function(d) {
                 var f;
-                if (!d.properties.shallow && !d.properties.countyCapital ) {
+                if (!d.properties.shallow && !d.properties.countyCapital) {
                     f = "#be3e4b";
                 } else {
                     f = "#9ea4a8";
@@ -166,7 +163,6 @@ function naDisplay() {
         */
     }
 
-
     /*
         d3.queue()
             .defer(d3.json, naJson)
@@ -205,8 +201,10 @@ function naDisplay() {
         }
     */
 
-    d3.json(naJson, function (error, naMap) {
-        if (error) throw error;
+    d3.json(naJson, function(error, naMap) {
+        if (error) {
+            throw error;
+        }
 
         naCountries = topojson.feature(naMap, naMap.objects.countries);
         naPorts = topojson.feature(naMap, naMap.objects.ports);
@@ -236,31 +234,33 @@ function naDisplay() {
         naDisplayPorts();
 
         var ports = naPorts.features
-            .filter(function (d) {
-                return (!d.properties.shallow && !d.properties.countyCapital )
+            .filter(function(d) {
+                return !d.properties.shallow && !d.properties.countyCapital;
             })
-            .map(function (d) {
+            .map(function(d) {
                 return [d.geometry.coordinates[0], d.geometry.coordinates[1]];
             });
 
         //console.log("ports: ", ports);
 
-
         var port = naSvg
             .selectAll(".voronoi")
             .data(ports)
-            .enter().append("g")
+            .enter()
+            .append("g")
             .attr("class", "voronoi");
 
-        port.append("path")
-            .data(d3.voronoi()
-                .extent([[-1, -1], [naWidth + 1, naHeight + 1]])
-                .polygons(ports.map(naProjection))
+        port
+            .append("path")
+            .data(
+                d3
+                    .voronoi()
+                    .extent([[-1, -1], [naWidth + 1, naHeight + 1]])
+                    .polygons(ports.map(naProjection))
             )
-            .attr("d", function (d) {
+            .attr("d", function(d) {
                 //console.log("d: " + d);
                 return d ? "M" + d.join("L") + "Z" : null;
-            })
-        ;
+            });
     });
 }
