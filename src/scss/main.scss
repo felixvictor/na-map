@@ -1,0 +1,53 @@
+$country-colour: #6B7377;
+$bg-colour: #233D47;
+
+$sat: saturation($bg-colour);
+$lit: lightness($bg-colour);
+$hue: hue($bg-colour);
+
+$mix-weight: 60%;
+@function colour-mixin($colour) {
+  @return mix(hsl(hue($colour), $sat, $lit), $colour, $mix-weight);
+}
+
+$in-colour: colour-mixin(red);
+$out-colour: colour-mixin($country-colour);
+$voronoi-colour: ghostwhite;
+
+.na-country {
+  fill: $country-colour;
+}
+
+svg {
+  background: $bg-colour;
+}
+
+.na-port-in {
+  fill: $in-colour;
+}
+
+.na-port-out {
+  fill: $out-colour;
+}
+
+text {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
+  "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px;
+  pointer-events: none;
+  text-anchor: start;
+}
+
+.label rect {
+  fill: transparent;
+}
+
+circle {
+  fill: none;
+}
+
+.voronoi {
+  fill: none;
+  stroke: $voronoi-colour;
+  stroke-width: 0.5px;
+}
