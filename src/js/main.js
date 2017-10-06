@@ -4,8 +4,9 @@
 
 import { geoEquirectangular as d3geoEquirectangular, geoPath as d3GeoPath } from "d3-geo";
 import { json as d3Json } from "d3-request";
-import { select as d3Select } from "d3-selection";
+import { event as d3Event, select as d3Select } from "d3-selection";
 import { voronoi as d3Voronoi } from "d3-voronoi";
+import { zoom as d3Zoom } from "d3-zoom";
 
 import {
     layoutTextLabel as fcLayoutTextLabel,
@@ -23,11 +24,13 @@ jQuery(document).ready(function($) {
 
 function naDisplay() {
     const d3 = {
+            event: d3Event,
             geoEquirectangular: d3geoEquirectangular,
             geoPath: d3GeoPath,
             json: d3Json,
             select: d3Select,
-            voronoi: d3Voronoi
+            voronoi: d3Voronoi,
+            zoom: d3Zoom
         },
         fc = {
             layoutTextLabel: fcLayoutTextLabel,
@@ -41,29 +44,6 @@ function naDisplay() {
     let naWidth, naHeight, naBounds, naProjection, naPath, naSvg, naG, naLHeight;
     let naCountries, naPorts;
     let naJson = "topojson/50m-na.json";
-
-    function naSetupColours() {}
-
-    function bettyContrastColour(bg, cOne, cTwo) {
-        function contrastLuma(c) {
-            const cRGB = rgb(c);
-
-            return (0.2126 * cRGB.r + 0.7152 * cRGB.g + 0.0722 * cRGB.b) / 255;
-        }
-
-        const bgLuma = contrastLuma(bg),
-            cOneLuma = contrastLuma(cOne),
-            cTwoLuma = contrastLuma(cTwo);
-
-        const cOneDiff = Math.abs(bgLuma - cOneLuma),
-            cTwoDiff = Math.abs(bgLuma - cTwoLuma);
-
-        if (cOneDiff > cTwoDiff) {
-            return cOne;
-        } else {
-            return cTwo;
-        }
-    }
 
     function naSetupProjection() {
         // http://stackoverflow.com/questions/14492284/center-a-map-in-d3-given-a-geojson-object
@@ -177,7 +157,6 @@ function naDisplay() {
         naPorts = topojson.feature(naMap, naMap.objects.ports);
         //        console.log("naPorts: ", naPorts.features);
 
-        naSetupColours();
         naSetupProjection();
         // update projection
         naBounds = naPath.bounds(topojson.feature(naMap, naMap.objects.countries));

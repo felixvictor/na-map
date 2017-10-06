@@ -37,6 +37,7 @@
     "d3-request": "^1.0.6",
     "d3-selection": "^1.1.0",
     "d3-voronoi": "^1.1.2",
+    "d3-zoom": "^1.6.0",
     "d3fc-label-layout": "^5.0.1",
     "jquery": "^3.2.1",
     "ndjson-cli": "^0.3.1",
