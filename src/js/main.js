@@ -55,7 +55,7 @@ function naDisplay() {
     }
 
     function naUpdateProjection() {
-        const naMargin = { top: 0, right: 0, bottom: -50, left: 0 };
+        const naMargin = { top: 0, right: 0, bottom: 0, left: 0 };
         let naScale, naTranslate, boundsWidth, boundsHeight;
 
         naWidth = document.getElementById("na").offsetWidth - naMargin.left - naMargin.right;
