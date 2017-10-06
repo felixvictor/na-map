@@ -32,10 +32,37 @@
     "webpack": "^3.5.5"
   },
   "dependencies": {
+    "d3-collection": "^1.0.4",
+    "d3-geo": "^1.6.4",
+    "d3-request": "^1.0.6",
+    "d3-selection": "^1.1.0",
+    "d3-voronoi": "^1.1.2",
+    "d3fc-label-layout": "^5.0.1",
+    "jquery": "^3.2.1",
     "ndjson-cli": "^0.3.1",
     "shapefile": "^0.6.6",
-    "topojson": "^3.0.2"
+    "topojson": "^3.0.2",
+    "topojson-client": "^3.0.0"
   },
+  "scripts": {
+    "clean": "rm -rf public",
+    "prod": "yarn run clean && NODE_ENV=${NODE_ENV:=prod} webpack --colors --config webpack.config.js",
+    "js-lint": "eslint -c .eslintrc.json src/js",
+    "prettier": "prettier --tab-width 4 --print-width 120 --write .eslintrc.json package.json *.js src/js/*.json src/css/scss/*.scss",
+    "css-lint": "sass-lint -c src/css/scss/.sass-lint.yml src/css/scss/*.scss",
+    "watch": "yarn run clean && NODE_ENV=${NODE_ENV:=dev} webpack --watch --colors --config webpack.config.js"
+  },
+  "browserslist": [
+    "Chrome >= 54",
+    "Firefox >= 49",
+    "Edge >= 13",
+    "Explorer >= 11",
+    "iOS >= 9.3",
+    "Safari >= 9.1",
+    "Android >= 4.4"
+  ],
+  "main": "src/js/main.js",
+  "sass": "src/scss/main.scss",
   "author": "",
   "license": "ISC"
 }
