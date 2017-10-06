@@ -133,6 +133,8 @@ function naDisplay() {
             return f;
         });
 
+        naSvg.selectAll(".label rect").attr("class", "label-rect");
+
         // Port circle colour
         naSvg
             .selectAll(".label circle")
