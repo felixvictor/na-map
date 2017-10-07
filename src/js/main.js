@@ -150,25 +150,7 @@ function naDisplay() {
             });
     }
 
-    d3.json(naJson, function(error, naMap) {
-        if (error) {
-            throw error;
-        }
-
-        naCountries = topojson.feature(naMap, naMap.objects.countries);
-        naPorts = topojson.feature(naMap, naMap.objects.ports);
-        //        console.log("naPorts: ", naPorts.features);
-
-        naSetupProjection();
-        // update projection
-        naBounds = naPath.bounds(topojson.feature(naMap, naMap.objects.countries));
-        naUpdateProjection();
-        naSetupCanvas();
-        naDisplayCountries();
-
-        naLHeight = window.getComputedStyle(document.getElementById("na")).getPropertyValue("line-height");
-        naDisplayPorts();
-
+    function naDisplayTeleports() {
         let ports = naPorts.features
             .filter(function(d) {
                 return !d.properties.shallow && !d.properties.countyCapital;
@@ -177,14 +159,11 @@ function naDisplay() {
                 return [d.geometry.coordinates[0], d.geometry.coordinates[1]];
             });
 
-        //console.log("ports: ", ports);
-
         let port = naSvg
             .selectAll(".voronoi")
             .data(ports)
             .enter()
-            .append("g")
-            .attr("class", "voronoi");
+            .append("g");
 
         port
             .append("path")
@@ -197,5 +176,25 @@ function naDisplay() {
             .attr("d", function(d) {
                 return d ? "M" + d.join("L") + "Z" : null;
             });
+    }
+
+    d3.json(naJson, function(error, naMap) {
+        if (error) {
+            throw error;
+        }
+
+        naCountries = topojson.feature(naMap, naMap.objects.countries);
+        naPorts = topojson.feature(naMap, naMap.objects.ports);
+
+        naSetupProjection();
+        // update projection
+        naBounds = naPath.bounds(topojson.feature(naMap, naMap.objects.countries));
+        naUpdateProjection();
+        naSetupCanvas();
+        naDisplayCountries();
+
+        naLHeight = window.getComputedStyle(document.getElementById("na")).getPropertyValue("line-height");
+        naDisplayPorts();
+        naDisplayTeleports();
     });
 }
