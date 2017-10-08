@@ -5,7 +5,7 @@ $sat: saturation($bg-colour);
 $lit: lightness($bg-colour);
 $hue: hue($bg-colour);
 
-$mix-weight: 50%;
+$mix-weight: 40%;
 
 @function colour-mixin($colour) {
   @return mix(hsl(hue($colour), $sat, $lit), $colour, $mix-weight);
