@@ -82,9 +82,10 @@ function naDisplay() {
 
     function naDisplayCountries() {
         naSvg
+            .append("g")
+            .attr("class", "na-country")
             .append("path")
             .datum(naCountries)
-            .attr("class", "na-country")
             .attr("d", naPath);
     }
 
@@ -164,11 +165,11 @@ function naDisplay() {
 
         let port = naSvg
             .append("g")
+            .attr("class", "voronoi")
             .selectAll(".voronoi")
             .data(ports)
             .enter()
-            .append("g")
-            .attr("class", "voronoi");
+            .append("g");
 
         port
             .append("path")
