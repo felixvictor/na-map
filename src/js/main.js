@@ -41,12 +41,11 @@ function naDisplay() {
             feature: topojsonFeature
         };
 
-    let naWidth, naHeight, naBounds, naProjection, naPath, naSvg, naG, naLHeight;
+    let naWidth, naHeight, naBounds, naProjection, naPath, naSvg, naLHeight;
     let naCountries, naPorts;
     let naJson = "topojson/50m-na.json";
 
     function naSetupProjection() {
-        // http://stackoverflow.com/questions/14492284/center-a-map-in-d3-given-a-geojson-object
         naProjection = d3
             .geoEquirectangular()
             .scale(1)
@@ -100,7 +99,6 @@ function naDisplay() {
                 return d.properties.name;
             });
 
-        //let strategy = fc.layoutAnnealing();
         let strategy = fc.layoutGreedy();
 
         // create the layout that positions the labels
@@ -139,7 +137,7 @@ function naDisplay() {
 
         naSvg.selectAll(".label rect").attr("class", "label-rect");
 
-        // Port circle colour
+        // Port circle colour and size
         naSvg
             .selectAll(".label circle")
             .attr("r", 4)
