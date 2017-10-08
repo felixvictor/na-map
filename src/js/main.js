@@ -163,7 +163,8 @@ function naDisplay() {
             .selectAll(".voronoi")
             .data(ports)
             .enter()
-            .append("g");
+            .append("g")
+            .attr("class", "voronoi");
 
         port
             .append("path")
