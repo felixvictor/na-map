@@ -120,7 +120,10 @@ function naDisplay() {
             .component(textLabel);
 
         // render!
-        naSvg.datum(naPorts.features).call(labels);
+        naSvg
+            .append("g")
+            .datum(naPorts.features)
+            .call(labels);
 
         // Port text colour
         naSvg.selectAll(".label text").attr("class", function(d) {
@@ -160,6 +163,7 @@ function naDisplay() {
             });
 
         let port = naSvg
+            .append("g")
             .selectAll(".voronoi")
             .data(ports)
             .enter()

@@ -5,14 +5,14 @@ $sat: saturation($bg-colour);
 $lit: lightness($bg-colour);
 $hue: hue($bg-colour);
 
-$mix-weight: 60%;
+$mix-weight: 50%;
 
 @function colour-mixin($colour) {
   @return mix(hsl(hue($colour), $sat, $lit), $colour, $mix-weight);
 }
 
 $in-colour: colour-mixin(red);
-$out-colour: colour-mixin($country-colour);
+$out-colour: lighten($country-colour, 20%);
 $voronoi-colour: ghostwhite;
 
 .na-country {
