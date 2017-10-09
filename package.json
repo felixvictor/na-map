@@ -50,7 +50,7 @@
     "topojson-client": "^3.0.0"
   },
   "scripts": {
-    "clean": "rm -rf public",
+    "clean": "rm -rf public/js public/css",
     "prod": "yarn run clean && NODE_ENV=${NODE_ENV:=prod} webpack --colors --config webpack.config.js",
     "js-lint": "eslint -c .eslintrc.json src/js",
     "prettier": "prettier --tab-width 4 --print-width 120 --write .eslintrc.json package.json *.js src/js/*.json src/scss/*.scss",
