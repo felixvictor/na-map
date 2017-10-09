@@ -22,13 +22,7 @@ const babelOpt = {
                 }
             }
         ],
-        [
-            "minify",
-            {
-                evaluate: false,
-                mangle: false
-            }
-        ]
+        ["minify"]
     ]
 };
 
