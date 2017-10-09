@@ -43,7 +43,7 @@ function naDisplay() {
 
     let naWidth, naHeight, naBounds, naProjection, naPath, naSvg, naLHeight;
     let naCountries, naPorts;
-    let naJson = "topojson/50m-na.json";
+    let naJson = "50m-na.json";
 
     function naSetupProjection() {
         naProjection = d3

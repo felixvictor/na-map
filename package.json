@@ -17,6 +17,7 @@
     "file-loader": "^0.11.2",
     "git": "^0.1.5",
     "imports-loader": "^0.7.1",
+    "netlify-cli": "^1.2.2",
     "node-sass": "^4.5.3",
     "postcss": "^6.0.10",
     "postcss-clean": "^1.0.3",
@@ -51,6 +52,7 @@
   },
   "scripts": {
     "clean": "rm -rf public/js public/css",
+    "deploy": "yarn run prod && cd public && netlify deploy",
     "prod": "yarn run clean && NODE_ENV=${NODE_ENV:=prod} webpack --colors --config webpack.config.js",
     "js-lint": "eslint -c .eslintrc.json src/js",
     "prettier": "prettier --tab-width 4 --print-width 120 --write .eslintrc.json package.json *.js src/js/*.json src/scss/*.scss",
