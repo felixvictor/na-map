@@ -52,15 +52,17 @@ function naDisplay() {
         const naMargin = { top: 0, right: 0, bottom: 0, left: 0 };
         const minWidth = 768;
 
+        naPath = d3.geoPath().projection(naProjection);
         naWidth = document.getElementById("na").offsetWidth - naMargin.left - naMargin.right;
         naWidth = minWidth > naWidth ? minWidth : naWidth;
-        naHeight = naWidth - naMargin.top - naMargin.bottom;
-
-        naProjection = d3.geoEquirectangular();
-        naPath = d3
-            .geoPath()
-            .projection(naProjection)
-            .fitSize([naWidth, naHeight], naCountries);
+        const naBounds = naPath.bounds(naPorts);
+        const naBoundsWidth = naBounds[1][0] - naBounds[0][0];
+        const naBoundsHeight = naBounds[1][1] - naBounds[0][1];
+        naHeight = naWidth / (naBoundsWidth / naBoundsHeight) - naMargin.top - naMargin.bottom;
+        naProjection = d3
+            .geoEquirectangular()
+            .fitExtent([[-naBoundsWidth / 2, -naBoundsHeight], [naWidth, naHeight]], naCountries);
+        naPath = d3.geoPath().projection(naProjection);
     }
 
     function naSetupCanvas() {

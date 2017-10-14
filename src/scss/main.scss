@@ -11,8 +11,8 @@ $mix-weight: 40%;
   @return mix(hsl(hue($colour), $sat, $lit), $colour, $mix-weight);
 }
 
-$in-colour: colour-mixin(red);
-$out-colour: lighten($country-colour, 20%);
+$in-colour: colour-mixin(white);
+$out-colour: lighten($country-colour, 5%);
 $voronoi-colour: ghostwhite;
 
 .na-country {
