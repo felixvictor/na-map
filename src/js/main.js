@@ -41,42 +41,33 @@ function naDisplay() {
             feature: topojsonFeature
         };
 
-    let naWidth, naHeight, naBounds, naProjection, naPath, naSvg, naLHeight;
+    let naWidth, naHeight;
+    let naProjection, naPath, naSvg;
     let naCountries, naPorts;
     let naJson = "50m-na.json";
 
     function naSetupProjection() {
-        naProjection = d3
-            .geoEquirectangular()
-            .scale(1)
-            .translate([0, 0]);
-        naPath = d3.geoPath().projection(naProjection);
-    }
-
-    function naUpdateProjection() {
         const naMargin = { top: 0, right: 0, bottom: 0, left: 0 };
-        let naScale, naTranslate, boundsWidth, boundsHeight;
+        const minWidth = 768;
 
         naWidth = document.getElementById("na").offsetWidth - naMargin.left - naMargin.right;
-        naWidth = 768 > naWidth ? 768 : naWidth;
-        boundsWidth = naBounds[1][0] - naBounds[0][0];
-        boundsHeight = naBounds[1][1] - naBounds[0][1];
-        naHeight = naWidth / (boundsWidth / boundsHeight) - naMargin.top - naMargin.bottom;
-        naScale = 1 / Math.max(boundsWidth / naWidth, boundsHeight / naHeight);
-        naTranslate = [
-            (naWidth - naScale * (naBounds[1][0] + naBounds[0][0])) / 2,
-            (naHeight - naScale * (naBounds[1][1] + naBounds[0][1])) / 2
-        ];
-        naProjection.scale(naScale).translate(naTranslate);
+        naWidth = minWidth > naWidth ? minWidth : naWidth;
+        naHeight = naWidth - naMargin.top - naMargin.bottom;
+
+        naProjection = d3.geoEquirectangular();
+        naPath = d3
+            .geoPath()
+            .projection(naProjection)
+            .fitSize([naWidth, naHeight], naCountries);
     }
 
     function naSetupCanvas() {
         naSvg = d3
             .select("#na")
             .append("svg")
+            .attr("id", "na-svg")
             .attr("width", naWidth)
-            .attr("height", naHeight)
-            .attr("id", "na-svg");
+            .attr("height", naHeight);
     }
 
     function naDisplayCountries() {
@@ -191,13 +182,9 @@ function naDisplay() {
         naPorts = topojson.feature(naMap, naMap.objects.ports);
 
         naSetupProjection();
-        // update projection
-        naBounds = naPath.bounds(topojson.feature(naMap, naMap.objects.countries));
-        naUpdateProjection();
         naSetupCanvas();
         naDisplayCountries();
 
-        naLHeight = window.getComputedStyle(document.getElementById("na")).getPropertyValue("line-height");
         naDisplayPorts();
         naDisplayTeleports();
     });
