@@ -1,5 +1,7 @@
 /*
+    Draws teleport map for Naval Action
 
+    iB 2017
  */
 
 import { geoEquirectangular as d3geoEquirectangular, geoPath as d3GeoPath } from "d3-geo";
@@ -143,15 +145,19 @@ function naDisplay() {
             });
     }
 
-    function naDisplayTeleports() {
+    function naDisplayTeleportAreas() {
+        // Extract port coordinates
         let ports = naPorts.features
+            // Use only ports that deep water ports and not a county capital
             .filter(function(d) {
                 return !d.properties.shallow && !d.properties.countyCapital;
             })
+            // Map to coordinates array
             .map(function(d) {
                 return [d.geometry.coordinates[0], d.geometry.coordinates[1]];
             });
 
+        // Append group with class .voronoi
         let port = naSvg
             .append("g")
             .attr("class", "voronoi")
@@ -160,6 +166,7 @@ function naDisplay() {
             .enter()
             .append("g");
 
+        // Draw teleport areas
         port
             .append("path")
             .data(
@@ -178,6 +185,7 @@ function naDisplay() {
             throw error;
         }
 
+        // Read map data
         naCountries = topojson.feature(naMap, naMap.objects.countries);
         naPorts = topojson.feature(naMap, naMap.objects.ports);
 
@@ -186,6 +194,6 @@ function naDisplay() {
         naDisplayCountries();
 
         naDisplayPorts();
-        naDisplayTeleports();
+        naDisplayTeleportAreas();
     });
 }
