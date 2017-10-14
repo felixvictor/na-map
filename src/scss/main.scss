@@ -5,15 +5,15 @@ $sat: saturation($bg-colour);
 $lit: lightness($bg-colour);
 $hue: hue($bg-colour);
 
-$mix-weight: 40%;
+$mix-weight: 20%;
 
 @function colour-mixin($colour) {
   @return mix(hsl(hue($colour), $sat, $lit), $colour, $mix-weight);
 }
 
-$in-colour: colour-mixin(white);
-$out-colour: lighten($country-colour, 5%);
-$voronoi-colour: ghostwhite;
+$in-colour: colour-mixin(lighten($country-colour, 50%));
+$out-colour: colour-mixin(lighten($country-colour, 30%));
+$voronoi-colour: $in-colour;
 
 .na-country {
   fill: $country-colour;
@@ -25,15 +25,17 @@ svg {
 
 .na-port-in {
   fill: $in-colour;
+  font-weight: 700;
 }
 
 .na-port-out {
   fill: $out-colour;
+  font-size: smaller;
 }
 
 text {
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, Arial, sans-serif;
-  font-size: 14px;
+  font-size: .9rem;
   pointer-events: none;
   text-anchor: start;
 }
