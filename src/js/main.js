@@ -193,9 +193,9 @@ function naDisplay() {
 
         naSetupProjection();
         naSetupCanvas();
-        naDisplayCountries();
 
-        naDisplayPorts();
         naDisplayTeleportAreas();
+        naDisplayCountries();
+        naDisplayPorts();
     });
 }
