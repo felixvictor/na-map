@@ -41,6 +41,7 @@ function naDisplay() {
 
     let naWidth, naHeight;
     let naProjection, naPath, naSvg, gPorts, gCountries, gVoronoi, naZoom;
+    let naTooltip;
     let naCountries, naPorts;
     let naJson = "50m-na.json";
 
@@ -61,6 +62,12 @@ function naDisplay() {
     }
 
     function naSetupCanvas() {
+        naTooltip = d3
+            .select("body")
+            .append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
+
         naSvg = d3
             .select("#na")
             .append("svg")
@@ -163,6 +170,40 @@ function naDisplay() {
                     f = "na-port-out";
                 }
                 return f;
+            })
+            .on("mouseover", function(d) {
+                naTooltip
+                    .transition()
+                    .duration(200)
+                    .style("opacity", 0.9);
+                let h = "<b>" + d.properties.name + "</b>";
+                h += " (" + (d.properties.shallow ? "shallow" : "deep-water");
+                h += " port";
+                if (d.properties.countyCapital) {
+                    h += ", county capital";
+                }
+                h += ")<br>";
+                h += "<table>";
+                if (d.properties.produces.length) {
+                    h += "<tr><td>Produces</td><td>" + d.properties.produces.join(", ") + "</td></tr>";
+                }
+                if (d.properties.drops.length) {
+                    h += "<tr><td>Drops</td><td>" + d.properties.drops.join(", ") + "</tr>";
+                }
+                if (d.properties.consumes.length) {
+                    h += "<tr><td>Consumes</td><td>" + d.properties.consumes.join(", ") + "</tr>";
+                }
+                h += "</table>";
+                naTooltip
+                    .html(h)
+                    .style("left", currentD3Event.pageX + "px")
+                    .style("top", currentD3Event.pageY - 28 + "px");
+            })
+            .on("mouseout", function(d) {
+                naTooltip
+                    .transition()
+                    .duration(500)
+                    .style("opacity", 0);
             });
     }
 
