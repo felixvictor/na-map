@@ -47,7 +47,7 @@ function naDisplay() {
 
     function naSetupProjection() {
         const naMargin = { top: 0, right: 0, bottom: 0, left: 0 };
-        const minWidth = 4000;
+        const minWidth = 3000;
         let naBounds, naBoundsWidth, naBoundsHeight;
 
         naPath = d3.geoPath().projection(naProjection);
@@ -57,7 +57,9 @@ function naDisplay() {
         naBoundsWidth = naBounds[1][0] - naBounds[0][0];
         naBoundsHeight = naBounds[1][1] - naBounds[0][1];
         naHeight = naWidth / (naBoundsWidth / naBoundsHeight) - naMargin.top - naMargin.bottom;
-        naProjection = d3.geoEquirectangular().fitExtent([[-40, -50], [naWidth, naHeight]], naCountries);
+        naProjection = d3
+            .geoEquirectangular()
+            .fitExtent([[-naWidth / 90, -naWidth / 90], [naWidth, naHeight]], naCountries);
         naPath = d3.geoPath().projection(naProjection);
     }
 
