@@ -58,11 +58,6 @@ let config = {
         new ExtractTextPlugin({
             filename: "../css/" + libraryName + ".min.css",
             allChunks: true
-        }),
-        new webpack.ProvidePlugin({
-            $: "jquery",
-            jQuery: "jquery",
-            "window.jQuery": "jquery"
         })
     ],
 

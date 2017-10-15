@@ -19,8 +19,9 @@ $voronoi-colour: $in-colour;
   fill: $country-colour;
 }
 
-svg {
-  background: $bg-colour;
+.background {
+  fill: $bg-colour;
+  pointer-events: all;
 }
 
 .na-port-in {
