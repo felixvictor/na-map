@@ -6,7 +6,8 @@
 
 import { geoEquirectangular as d3geoEquirectangular, geoPath as d3GeoPath } from "d3-geo";
 import { json as d3Json } from "d3-request";
-import { event as d3Event, select as d3Select } from "d3-selection";
+// event needs live-binding
+import { event as currentD3Event, select as d3Select } from "d3-selection";
 import { voronoi as d3Voronoi } from "d3-voronoi";
 import { zoom as d3Zoom } from "d3-zoom";
 
@@ -18,15 +19,10 @@ import {
 
 import { feature as topojsonFeature } from "topojson-client";
 
-jQuery(document).ready(function($) {
-    "use strict";
-
-    naDisplay();
-});
+naDisplay();
 
 function naDisplay() {
     const d3 = {
-            event: d3Event,
             geoEquirectangular: d3geoEquirectangular,
             geoPath: d3GeoPath,
             json: d3Json,
@@ -44,13 +40,13 @@ function naDisplay() {
         };
 
     let naWidth, naHeight;
-    let naProjection, naPath, naSvg;
+    let naProjection, naPath, naSvg, gPorts, gCountries, gVoronoi, naZoom;
     let naCountries, naPorts;
     let naJson = "50m-na.json";
 
     function naSetupProjection() {
         const naMargin = { top: 0, right: 0, bottom: 0, left: 0 };
-        const minWidth = 768;
+        const minWidth = 4000;
         let naBounds, naBoundsWidth, naBoundsHeight;
 
         naPath = d3.geoPath().projection(naProjection);
@@ -60,9 +56,7 @@ function naDisplay() {
         naBoundsWidth = naBounds[1][0] - naBounds[0][0];
         naBoundsHeight = naBounds[1][1] - naBounds[0][1];
         naHeight = naWidth / (naBoundsWidth / naBoundsHeight) - naMargin.top - naMargin.bottom;
-        naProjection = d3
-            .geoEquirectangular()
-            .fitExtent([[-naBoundsWidth / 2, -naBoundsHeight], [naWidth, naHeight]], naCountries);
+        naProjection = d3.geoEquirectangular().fitExtent([[-40, -50], [naWidth, naHeight]], naCountries);
         naPath = d3.geoPath().projection(naProjection);
     }
 
@@ -72,11 +66,35 @@ function naDisplay() {
             .append("svg")
             .attr("id", "na-svg")
             .attr("width", naWidth)
+            .attr("height", naHeight)
+            .on("click", naStopProp, true);
+
+        naSvg
+            .append("rect")
+            .attr("class", "background")
+            .attr("width", naWidth)
             .attr("height", naHeight);
+
+        naZoom = d3
+            .zoom()
+            .scaleExtent([1, 3])
+            .on("zoom", naZoomed);
+
+        naSvg.call(naZoom);
+    }
+
+    function naZoomed() {
+        naSvg.attr("transform", currentD3Event.transform);
+    }
+
+    function naStopProp() {
+        if (currentD3Event.defaultPrevented) {
+            currentD3Event.stopPropagation();
+        }
     }
 
     function naDisplayCountries() {
-        naSvg
+        gCountries = naSvg
             .append("g")
             .attr("class", "na-country")
             .append("path")
@@ -115,13 +133,13 @@ function naDisplay() {
             .component(textLabel);
 
         // render!
-        naSvg
+        gPorts = naSvg
             .append("g")
             .datum(naPorts.features)
             .call(labels);
 
         // Port text colour
-        naSvg.selectAll(".label text").attr("class", function(d) {
+        gPorts.selectAll(".label text").attr("class", function(d) {
             let f;
             if (!d.properties.shallow && !d.properties.countyCapital) {
                 f = "na-port-in";
@@ -131,10 +149,10 @@ function naDisplay() {
             return f;
         });
 
-        naSvg.selectAll(".label rect").attr("class", "label-rect");
+        gPorts.selectAll(".label rect").attr("class", "label-rect");
 
         // Port circle colour and size
-        naSvg
+        gPorts
             .selectAll(".label circle")
             .attr("r", 4)
             .attr("class", function(d) {
@@ -161,7 +179,7 @@ function naDisplay() {
             });
 
         // Append group with class .voronoi
-        let port = naSvg
+        gVoronoi = naSvg
             .append("g")
             .attr("class", "voronoi")
             .selectAll(".voronoi")
@@ -170,7 +188,7 @@ function naDisplay() {
             .append("g");
 
         // Draw teleport areas
-        port
+        gVoronoi
             .append("path")
             .data(
                 d3
