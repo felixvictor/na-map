@@ -11,6 +11,8 @@ import { event as currentD3Event, select as d3Select } from "d3-selection";
 import { voronoi as d3Voronoi } from "d3-voronoi";
 import { zoom as d3Zoom } from "d3-zoom";
 
+import d3Tip from "d3-tip";
+
 import {
     layoutTextLabel as fcLayoutTextLabel,
     layoutGreedy as fcLayoutGreedy,
@@ -41,7 +43,31 @@ function naDisplay() {
 
     let naWidth, naHeight;
     let naProjection, naPath, naSvg, gPorts, gCountries, gVoronoi, naZoom;
-    let naTooltip;
+    let naTooltip = d3Tip()
+        .attr("class", "d3-tip")
+        .html(function(d) {
+            let h = "<b>" + d.properties.name + "</b>";
+            h += " (" + (d.properties.shallow ? "shallow" : "deep-water");
+            h += " port";
+            if (d.properties.countyCapital) {
+                h += ", county capital";
+            }
+            h += ")<br>";
+            h += "<table>";
+            if (d.properties.produces.length) {
+                h += "<tr><td>Produces</td><td>" + d.properties.produces.join(", ") + "</td></tr>";
+            }
+            if (d.properties.drops.length) {
+                h += "<tr><td>Drops</td><td>" + d.properties.drops.join(", ") + "</tr>";
+            }
+            if (d.properties.consumes.length) {
+                h += "<tr><td>Consumes</td><td>" + d.properties.consumes.join(", ") + "</tr>";
+            }
+            h += "</table>";
+
+            return h;
+        })
+        .direction("n");
     let naCountries, naPorts;
     let naJson = "50m-na.json";
 
@@ -64,12 +90,6 @@ function naDisplay() {
     }
 
     function naSetupCanvas() {
-        naTooltip = d3
-            .select("body")
-            .append("div")
-            .attr("class", "tooltip")
-            .style("opacity", 0);
-
         naSvg = d3
             .select("#na")
             .append("svg")
@@ -89,7 +109,7 @@ function naDisplay() {
             .scaleExtent([1, 3])
             .on("zoom", naZoomed);
 
-        naSvg.call(naZoom);
+        naSvg.call(naZoom).call(naTooltip);
     }
 
     function naZoomed() {
@@ -158,7 +178,11 @@ function naDisplay() {
             return f;
         });
 
-        gPorts.selectAll(".label rect").attr("class", "label-rect");
+        gPorts
+            .selectAll(".label rect")
+            .attr("class", "label-rect")
+            .on("mouseover", naTooltip.show)
+            .on("mouseout", naTooltip.hide);
 
         // Port circle colour and size
         gPorts
@@ -173,40 +197,8 @@ function naDisplay() {
                 }
                 return f;
             })
-            .on("mouseover", function(d) {
-                naTooltip
-                    .transition()
-                    .duration(200)
-                    .style("opacity", 0.9);
-                let h = "<b>" + d.properties.name + "</b>";
-                h += " (" + (d.properties.shallow ? "shallow" : "deep-water");
-                h += " port";
-                if (d.properties.countyCapital) {
-                    h += ", county capital";
-                }
-                h += ")<br>";
-                h += "<table>";
-                if (d.properties.produces.length) {
-                    h += "<tr><td>Produces</td><td>" + d.properties.produces.join(", ") + "</td></tr>";
-                }
-                if (d.properties.drops.length) {
-                    h += "<tr><td>Drops</td><td>" + d.properties.drops.join(", ") + "</tr>";
-                }
-                if (d.properties.consumes.length) {
-                    h += "<tr><td>Consumes</td><td>" + d.properties.consumes.join(", ") + "</tr>";
-                }
-                h += "</table>";
-                naTooltip
-                    .html(h)
-                    .style("left", currentD3Event.pageX + "px")
-                    .style("top", currentD3Event.pageY - 28 + "px");
-            })
-            .on("mouseout", function(d) {
-                naTooltip
-                    .transition()
-                    .duration(500)
-                    .style("opacity", 0);
-            });
+            .on("mouseover", naTooltip.show)
+            .on("mouseout", naTooltip.hide);
     }
 
     function naDisplayTeleportAreas() {
