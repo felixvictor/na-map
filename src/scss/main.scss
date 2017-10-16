@@ -55,25 +55,11 @@ text {
   stroke-width: .5px;
 }
 
-.tooltip {
-  position: absolute;
-  width: auto;
-  min-width: 30rem;
-  height: auto;
-  padding: .7rem;
-  color: $in-colour;
-  text-align: left;
-  pointer-events: none;
-  background: colour-mixin($bg-colour);
-}
-
 table {
-  width: 100%;
   border-collapse: collapse;
-  ;
 }
 
-tr {
+tr:not(:last-of-type) {
   border-top: 1px solid $country-colour;
   border-bottom: 1px solid $country-colour;
 }
@@ -83,4 +69,13 @@ td {
   &:not(:last-of-type) {
     padding-right: .5rem;
   }
+}
+
+.d3-tip {
+  padding: .7rem;
+  font-size: smaller;
+  color: $in-colour;
+  text-align: left;
+  pointer-events: none;
+  background: colour-mixin(darken($country-colour, 10%));
 }
