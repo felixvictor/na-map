@@ -66,8 +66,7 @@ function naDisplay() {
             h += "</table>";
 
             return h;
-        })
-        .direction("n");
+        });
     let naCountries, naPorts;
     let naJson = "50m-na.json";
 
