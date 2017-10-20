@@ -77,6 +77,6 @@ td {
   font-size: smaller;
   color: $in-colour;
   text-align: left;
-  pointer-events: none;
-  background: colour-mixin(darken($country-colour, 10%));
+  background: $bg-colour;
+  box-shadow: 0 14px 28px rgba(colour-mixin(darken($bg-colour, 50%)),.25), 0 10px 10px rgba(colour-mixin(darken($bg-colour, 50%)),.22);
 }
