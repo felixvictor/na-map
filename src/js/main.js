@@ -68,23 +68,27 @@ function naDisplay() {
             return h;
         });
     let naCountries, naPorts;
-    let naJson = "50m-na.json";
+    let naJson = "na.json";
 
     function naSetupProjection() {
         const naMargin = { top: 0, right: 0, bottom: 0, left: 0 };
-        const minWidth = 3000;
+        const minWidth = 4000;
         let naBounds, naBoundsWidth, naBoundsHeight;
 
         naPath = d3.geoPath().projection(naProjection);
         naWidth = document.getElementById("na").offsetWidth - naMargin.left - naMargin.right;
         naWidth = minWidth > naWidth ? minWidth : naWidth;
-        naBounds = naPath.bounds(naPorts);
+        naBounds = naPath.bounds(naCountries);
         naBoundsWidth = naBounds[1][0] - naBounds[0][0];
         naBoundsHeight = naBounds[1][1] - naBounds[0][1];
         naHeight = naWidth / (naBoundsWidth / naBoundsHeight) - naMargin.top - naMargin.bottom;
+
         naProjection = d3
             .geoEquirectangular()
-            .fitExtent([[-naWidth / 90, -naWidth / 90], [naWidth, naHeight]], naCountries);
+            .fitExtent(
+                [[-naBoundsWidth, -naBoundsHeight], [naWidth + naBoundsWidth, naHeight + naBoundsHeight]],
+                naCountries
+            );
         naPath = d3.geoPath().projection(naProjection);
     }
 
@@ -105,7 +109,7 @@ function naDisplay() {
 
         naZoom = d3
             .zoom()
-            .scaleExtent([1, 3])
+            .scaleExtent([0.6, 3])
             .on("zoom", naZoomed);
 
         naSvg.call(naZoom).call(naTooltip);

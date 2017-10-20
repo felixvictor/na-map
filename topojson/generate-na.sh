@@ -3,7 +3,7 @@
 # ogrinfo -geom=summary natural_earth/50m_cultural/ne_50m_admin_0_map_units.shp ne_50m_admin_0_map_units > ne_50m_admin_0_map_units.txt
 
 # Auflösung 10m, 50m oder 110m
-RES=50m
+RES=10m
 
 DIR="/home/ibey/src/topojson/natural_earth"
 
@@ -15,7 +15,7 @@ IN_SHP_COUNTRIES=${DIR}/${RES}/ne_${RES}_admin_0_countries.shp
 # N Swannsborough lat 34.69 long -77.12
 CLIP="-98 7.5 -59 35"
 
-OUT=${RES}-na.json
+OUT=na.json
 OUT_COUNTRIES=countries.geojson
 OUT_SHP_COUNTRIES=countries.shp
 IN_PORTS=ports.geojson
@@ -40,7 +40,7 @@ $(yarn bin)/geo2topo \
 	   ${IN_PORTS}
 
 $(yarn bin)/topoquantize \
-	   -o ${OUT} \
+	   -o ../public/${OUT} \
 	   1e4 \
 	   ${OUT}1
 

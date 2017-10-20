@@ -240,7 +240,7 @@
         "name": "Mangrove Cay",
         "shallow": true,
         "drops": ["Contraband Goods", "Russian Vodka"],
-        "nation": "US",
+        "nation": "NT",
         "produces": ["Lignum Vitae Log", "Sulphur"],
         "countyCapital": false,
         "consumes": []
@@ -332,7 +332,7 @@
           "Live Oak Log",
           "Spanish Gold Coins"
         ],
-        "nation": "PR",
+        "nation": "RU",
         "produces": ["Coal", "Iron Ore", "Sugar"],
         "countyCapital": false,
         "consumes": []
@@ -618,7 +618,7 @@
           "Versailles Terracotta",
           "White Oak Log"
         ],
-        "nation": "DK",
+        "nation": "NT",
         "produces": ["Sugar"],
         "countyCapital": false,
         "consumes": []
@@ -659,7 +659,7 @@
           "Sabicu Log",
           "Spanish Dried Fruits"
         ],
-        "nation": "DK",
+        "nation": "NT",
         "produces": ["Lignum Vitae Log"],
         "countyCapital": false,
         "consumes": []
@@ -699,7 +699,7 @@
           "Provence Oak",
           "Sabicu Log"
         ],
-        "nation": "PR",
+        "nation": "DE",
         "produces": ["Coal", "Iron Ore", "Sugar"],
         "countyCapital": false,
         "consumes": []
@@ -722,7 +722,7 @@
           "Longleaf Pine Log",
           "Spanish Almonds"
         ],
-        "nation": "DK",
+        "nation": "ES",
         "produces": ["Hemp", "Stone Block"],
         "countyCapital": false,
         "consumes": []
@@ -872,7 +872,7 @@
           "Mahogany Log",
           "Malabar Teak"
         ],
-        "nation": "VP",
+        "nation": "NT",
         "produces": ["Food Supplies", "Oak Log"],
         "countyCapital": false,
         "consumes": []
@@ -900,7 +900,7 @@
           "Suriname Indigo",
           "Swedish Iron"
         ],
-        "nation": "NT",
+        "nation": "GB",
         "produces": ["Coal", "Gold", "Lignum Vitae Log", "Silver"],
         "countyCapital": false,
         "consumes": [
@@ -1207,7 +1207,7 @@
         "name": "Chiriquí",
         "shallow": true,
         "drops": ["Fine Leather", "Iberian Dried Pork", "Spanish Almonds"],
-        "nation": "DK",
+        "nation": "NT",
         "produces": ["Lignum Vitae Log", "Sulphur"],
         "countyCapital": false,
         "consumes": []
@@ -1486,7 +1486,7 @@
           "Suriname Indigo",
           "Yorkshire Pudding"
         ],
-        "nation": "NT",
+        "nation": "PR",
         "produces": ["Food Supplies", "Iron Ore"],
         "countyCapital": false,
         "consumes": []
@@ -1503,7 +1503,7 @@
         "name": "Sandy Point",
         "shallow": true,
         "drops": ["Dutch Cacao", "French Gold Livres", "Sabicu Log"],
-        "nation": "US",
+        "nation": "NT",
         "produces": ["Food Supplies", "Oak Log"],
         "countyCapital": false,
         "consumes": []
@@ -1798,7 +1798,7 @@
           "Sevres Stained Glass",
           "Versailles Terracotta"
         ],
-        "nation": "NT",
+        "nation": "DE",
         "produces": ["Coal", "Fir Log", "Gold", "Oak Log", "Silver"],
         "countyCapital": true,
         "consumes": [
@@ -1851,7 +1851,7 @@
           "Spanish Walnut Oil",
           "Spanish Walnut Oil"
         ],
-        "nation": "VP",
+        "nation": "NT",
         "produces": ["Gold", "Oak Log", "Silver"],
         "countyCapital": true,
         "consumes": [
@@ -1934,7 +1934,7 @@
           "Vermont Maple Sugar",
           "White Oak Log"
         ],
-        "nation": "DK",
+        "nation": "GB",
         "produces": ["Oak Log"],
         "countyCapital": false,
         "consumes": []
@@ -2317,7 +2317,7 @@
         "name": "Azua",
         "shallow": false,
         "drops": ["Cocoa", "Cognac", "Spanish Almonds", "White Oak Log"],
-        "nation": "DK",
+        "nation": "PL",
         "produces": ["Hemp", "Tobacco"],
         "countyCapital": false,
         "consumes": []
@@ -2407,7 +2407,7 @@
         "name": "Mandinga",
         "shallow": false,
         "drops": ["Coffee", "Madeira Wine", "Sabicu Log"],
-        "nation": "NT",
+        "nation": "DE",
         "produces": ["Hemp", "Silver"],
         "countyCapital": false,
         "consumes": []
@@ -2908,7 +2908,7 @@
         "name": "Road Rocks",
         "shallow": true,
         "drops": ["Madagascar Jewels", "Swedish Sail Cloth"],
-        "nation": "US",
+        "nation": "NT",
         "produces": ["Food Supplies", "Oak Log"],
         "countyCapital": false,
         "consumes": []
@@ -3201,7 +3201,7 @@
           "Stolen Goods",
           "White Oak Log"
         ],
-        "nation": "PR",
+        "nation": "RU",
         "produces": ["Fir Log", "Lignum Vitae Log", "Stone Block"],
         "countyCapital": false,
         "consumes": []
@@ -3552,7 +3552,7 @@
           "Spanish Almonds",
           "Spanish Dried Fruits"
         ],
-        "nation": "DK",
+        "nation": "NT",
         "produces": ["Extra Labor", "Lignum Vitae Log"],
         "countyCapital": false,
         "consumes": []
@@ -4107,7 +4107,7 @@
           "Sabicu Log",
           "Sevres Stained Glass"
         ],
-        "nation": "PR",
+        "nation": "NT",
         "produces": ["Coal", "Hemp", "Sugar"],
         "countyCapital": false,
         "consumes": []
@@ -4476,7 +4476,7 @@
           "Sevilla Muskets",
           "White Oak Log"
         ],
-        "nation": "DK",
+        "nation": "ES",
         "produces": ["Fir Log", "Sugar"],
         "countyCapital": true,
         "consumes": []
@@ -4888,7 +4888,7 @@
           "Spanish Dried Fruits",
           "Spanish Walnut Oil"
         ],
-        "nation": "US",
+        "nation": "GB",
         "produces": [],
         "countyCapital": false,
         "consumes": [
@@ -4925,7 +4925,7 @@
           "Madeira Wine",
           "Oregon Beaver Coats"
         ],
-        "nation": "DK",
+        "nation": "GB",
         "produces": ["Food Supplies", "Iron Ore"],
         "countyCapital": false,
         "consumes": []
@@ -4942,7 +4942,7 @@
         "name": "Green Cay",
         "shallow": true,
         "drops": ["China Tea", "Cocoa", "Lancashire Iron", "Malabar Teak"],
-        "nation": "NT",
+        "nation": "DE",
         "produces": ["Food Supplies", "Iron Ore"],
         "countyCapital": false,
         "consumes": []
@@ -5119,7 +5119,7 @@
         "name": "Crown Haven",
         "shallow": true,
         "drops": ["Contraband Goods", "Dutch Peanut Butter", "Mahogany Log"],
-        "nation": "US",
+        "nation": "NT",
         "produces": ["Hemp", "Silver"],
         "countyCapital": false,
         "consumes": []
@@ -5208,7 +5208,7 @@
           "Suffolk Cheese",
           "Textile Machinery"
         ],
-        "nation": "VP",
+        "nation": "NT",
         "produces": ["Coal", "Fir Log", "Sugar"],
         "countyCapital": false,
         "consumes": []
@@ -5296,7 +5296,7 @@
           "Spanish Dried Fruits",
           "Spanish Walnut Oil"
         ],
-        "nation": "DK",
+        "nation": "DE",
         "produces": [],
         "countyCapital": false,
         "consumes": [
@@ -5464,7 +5464,7 @@
           "Spanish Gold Coins",
           "Stolen Goods"
         ],
-        "nation": "PR",
+        "nation": "RU",
         "produces": ["Food Supplies", "Hemp", "Oak Log"],
         "countyCapital": true,
         "consumes": []
@@ -5529,7 +5529,7 @@
           "Russian Sail Duck",
           "Spanish Dried Fruits"
         ],
-        "nation": "NT",
+        "nation": "ES",
         "produces": ["Coal", "Gold", "Hemp", "Silver", "Sugar"],
         "countyCapital": true,
         "consumes": [
@@ -5724,7 +5724,7 @@
           "Spanish Walnut Oil",
           "Suriname Indigo"
         ],
-        "nation": "DK",
+        "nation": "NT",
         "produces": ["Coal", "Fir Log", "Gold", "Silver", "Sugar"],
         "countyCapital": true,
         "consumes": [
@@ -5786,7 +5786,7 @@
         "name": "Barahona",
         "shallow": false,
         "drops": ["Black Ironwood", "Catalonian Olive Oil", "Live Oak Log"],
-        "nation": "NT",
+        "nation": "PL",
         "produces": ["Coal", "Lignum Vitae Log"],
         "countyCapital": false,
         "consumes": []
@@ -5873,7 +5873,7 @@
         "name": "Tampa",
         "shallow": false,
         "drops": ["Fine Leather", "Iberian Dried Pork", "Spanish Almonds"],
-        "nation": "NT",
+        "nation": "GB",
         "produces": ["Hemp", "Stone Block"],
         "countyCapital": false,
         "consumes": []
@@ -5944,7 +5944,7 @@
           "Indigo",
           "Spanish Dried Fruits"
         ],
-        "nation": "ES",
+        "nation": "NT",
         "produces": [],
         "countyCapital": false,
         "consumes": [
@@ -6211,7 +6211,7 @@
           "Spanish Almonds",
           "Sumatran Pepper"
         ],
-        "nation": "NT",
+        "nation": "FR",
         "produces": ["Hemp", "Stone Block"],
         "countyCapital": false,
         "consumes": []
@@ -6321,7 +6321,7 @@
           "Sabicu Log",
           "Versailles Terracotta"
         ],
-        "nation": "DK",
+        "nation": "NT",
         "produces": ["Fir Log", "Food Supplies", "Oak Log"],
         "countyCapital": false,
         "consumes": []
@@ -6364,7 +6364,7 @@
           "Suffolk Cheese",
           "Teak Log"
         ],
-        "nation": "US",
+        "nation": "RU",
         "produces": ["Coal", "Iron Ore", "Sugar"],
         "countyCapital": false,
         "consumes": []
@@ -6919,7 +6919,7 @@
           "Sussex Oak",
           "Teak Log"
         ],
-        "nation": "DK",
+        "nation": "RU",
         "produces": ["Hemp", "Sugar"],
         "countyCapital": false,
         "consumes": []
@@ -7054,7 +7054,7 @@
           "Norwegian Fox Fur",
           "Spanish Walnut Oil"
         ],
-        "nation": "DK",
+        "nation": "NT",
         "produces": ["Coal", "Hemp"],
         "countyCapital": false,
         "consumes": []
@@ -7360,7 +7360,7 @@
           "Lancashire Iron",
           "Yorkshire Pudding"
         ],
-        "nation": "US",
+        "nation": "RU",
         "produces": ["Fir Log", "Lignum Vitae Log", "Stone Block"],
         "countyCapital": false,
         "consumes": []
@@ -7503,7 +7503,7 @@
         "name": "Almirante",
         "shallow": false,
         "drops": ["Catalonian Olive Oil", "Coffee", "Historical Artifact"],
-        "nation": "DK",
+        "nation": "DE",
         "produces": ["Coal", "Fir Log", "Sugar"],
         "countyCapital": false,
         "consumes": []
@@ -7741,7 +7741,7 @@
           "Vermont Maple Sugar",
           "Yorkshire Pudding"
         ],
-        "nation": "SE",
+        "nation": "PR",
         "produces": ["Coal", "Gold", "Hemp", "Silver", "Sugar"],
         "countyCapital": false,
         "consumes": [
@@ -7865,7 +7865,7 @@
         "name": "Les Cayes",
         "shallow": false,
         "drops": ["Corsican Mint", "Parisian Furniture", "Spanish Almonds"],
-        "nation": "VP",
+        "nation": "NT",
         "produces": ["Food Supplies", "Iron Ore"],
         "countyCapital": true,
         "consumes": []
@@ -8548,7 +8548,7 @@
         "name": "Pitt\u0027s Town",
         "shallow": false,
         "drops": ["Carolina Tobacco", "Crooked Cedar", "Mahogany Log"],
-        "nation": "PR",
+        "nation": "NT",
         "produces": ["Iron Ore", "Stone Block"],
         "countyCapital": true,
         "consumes": []
@@ -8565,7 +8565,7 @@
         "name": "Terre-de-Bas",
         "shallow": false,
         "drops": ["Cocoa", "Cuban Tobacco", "Historical Artifact"],
-        "nation": "SE",
+        "nation": "FR",
         "produces": ["Food Supplies", "Iron Ore", "Sugar"],
         "countyCapital": false,
         "consumes": []
@@ -8610,7 +8610,7 @@
           "Parisian Furniture",
           "Sevilla Muskets"
         ],
-        "nation": "DK",
+        "nation": "NT",
         "produces": ["Iron Ore"],
         "countyCapital": false,
         "consumes": []
@@ -8701,7 +8701,7 @@
         "name": "Macao",
         "shallow": false,
         "drops": ["Jutland Amber", "Madeira Wine"],
-        "nation": "DK",
+        "nation": "NT",
         "produces": ["Cotton", "Stone Block"],
         "countyCapital": false,
         "consumes": []
@@ -8839,7 +8839,7 @@
           "Coffee",
           "Historical Artifact"
         ],
-        "nation": "DK",
+        "nation": "FR",
         "produces": ["Coal", "Lignum Vitae Log"],
         "countyCapital": false,
         "consumes": []
@@ -8866,7 +8866,7 @@
           "Teak Log",
           "Textile Machinery"
         ],
-        "nation": "US",
+        "nation": "RU",
         "produces": ["Food Supplies", "Hemp", "Oak Log"],
         "countyCapital": true,
         "consumes": []
@@ -8997,7 +8997,7 @@
         "name": "Sarazota",
         "shallow": false,
         "drops": ["Cocoa", "Merino Wool", "Sevilla Muskets"],
-        "nation": "NT",
+        "nation": "GB",
         "produces": ["Fir Log", "Sugar"],
         "countyCapital": false,
         "consumes": []
@@ -9095,7 +9095,7 @@
           "Russian Sail Duck",
           "Teak Log"
         ],
-        "nation": "SE",
+        "nation": "DK",
         "produces": ["Coal", "Iron Ore", "Sugar"],
         "countyCapital": true,
         "consumes": []
@@ -9425,7 +9425,7 @@
           "Teak Log",
           "Vermont Maple Sugar"
         ],
-        "nation": "DK",
+        "nation": "RU",
         "produces": ["Coal", "Fir Log", "Gold", "Oak Log", "Silver"],
         "countyCapital": true,
         "consumes": [
