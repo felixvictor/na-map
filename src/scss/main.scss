@@ -61,8 +61,8 @@ table {
 }
 
 tr:not(:last-of-type) {
-  border-top: 1px solid $country-colour;
-  border-bottom: 1px solid $country-colour;
+  border-top: 1px solid colour-mixin(darken($country-colour, 10%));
+  border-bottom: 1px solid colour-mixin(darken($country-colour, 10%));
 }
 
 td {
@@ -77,6 +77,6 @@ td {
   font-size: smaller;
   color: $in-colour;
   text-align: left;
-  background: colour-mixin(darken($country-colour, 10%));
+  background: colour-mixin(darken($country-colour, 30%));
   box-shadow: 0 14px 28px rgba(colour-mixin(darken($country-colour, 50%)),.25), 0 10px 10px rgba(colour-mixin(darken($country-colour, 50%)),.22);
 }
