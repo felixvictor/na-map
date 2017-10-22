@@ -145,6 +145,26 @@ function naDisplay() {
     function naDisplayPorts() {
         const labelPadding = 3;
 
+        let naDefs = naSvg.append("defs");
+
+        for (let i = 0; i <= 12; i++) {
+            naDefs
+                .append("pattern")
+                .attr("id", "n" + i)
+                .attr("x", "0%")
+                .attr("y", "0%")
+                .attr("width", "100%")
+                .attr("height", "100%")
+                .attr("viewBox", "0 0 50 50")
+                .append("image")
+                .attr("x", "0")
+                .attr("y", "0")
+                .attr("height", "50")
+                .attr("width", "50")
+                //.attr("height", "10")
+                .attr("xlink:href", "icons/n" + i + ".svg");
+        }
+
         // the component used to render each label
         let textLabel = fc
             .layoutTextLabel()
@@ -198,28 +218,12 @@ function naDisplay() {
         // Port circle colour and size
         gPorts
             .selectAll(".label circle")
-            .attr("r", 4)
-            .attr("class", function(d) {
-                let f;
-                if (!d.properties.shallow && !d.properties.countyCapital) {
-                    f = "na-port-in";
-                } else {
-                    f = "na-port-out";
-                }
-                return f;
+            .attr("r", 15)
+            .attr("fill", function(d) {
+                return "url(#" + d.properties.nation + ")";
             })
             .on("mouseover", naTooltip.show)
             .on("mouseout", naTooltip.hide);
-
-        gPorts
-            .append("image")
-            .attr("x", 10)
-            .attr("y", 20)
-            .attr("width", "20px")
-            .attr("height", "15px")
-            .attr("xlink:href", function(d) {
-                return "public/icons/" + d.properties.nation + ".svg";
-            });
     }
 
     function naDisplayTeleportAreas() {
