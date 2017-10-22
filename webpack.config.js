@@ -44,10 +44,65 @@ const sassOpt = {
     precision: 6
 };
 
+const svgoOpt = {
+    plugins: [
+        { cleanupAttrs: true },
+        { removeDoctype: true },
+        { removeXMLProcInst: true },
+        { removeComments: true },
+        { removeMetadata: true },
+        { removeTitle: true },
+        { removeDesc: true },
+        { removeUselessDefs: true },
+        { removeXMLNS: false },
+        { removeEditorsNSData: true },
+        { removeEmptyAttrs: true },
+        { removeHiddenElems: true },
+        { removeEmptyText: true },
+        { removeEmptyContainers: true },
+        { removeViewBox: false },
+        { cleanupEnableBackground: true },
+        { minifyStyles: true },
+        { convertStyleToAttrs: true },
+        { convertColors: true },
+        { convertPathData: true },
+        { convertTransform: true },
+        { removeUnknownsAndDefaults: true },
+        { removeNonInheritableGroupAttrs: true },
+        { removeUselessStrokeAndFill: true },
+        { removeUnusedNS: true },
+        { cleanupIDs: true },
+        { cleanupNumericValues: true },
+        { cleanupListOfValues: false },
+        { moveElemsAttrsToGroup: true },
+        { moveGroupAttrsToElems: true },
+        { collapseGroups: true },
+        { removeRasterImages: false },
+        { mergePaths: true },
+        { convertShapeToPath: true },
+        { sortAttrs: false },
+        { transformsWithOnePath: false },
+        { removeDimensions: true },
+        { removeAttrs: false },
+        { removeElementsByAttr: true },
+        { removeStyleElement: true },
+        { addClassesToSVGElement: false },
+        { addAttributesToSVGElement: false },
+        { removeStyleElement: false },
+        { removeScriptElement: false }
+    ]
+};
+
 let config = {
     context: path.resolve(__dirname, "src"),
 
     entry: [path.resolve(__dirname, PACKAGE.main), path.resolve(__dirname, PACKAGE.sass)],
+
+    resolve: {
+        alias: {
+            Icons: path.resolve(__dirname, "src/icons/")
+        }
+    },
 
     output: {
         path: __dirname + "/public/js",
@@ -91,6 +146,26 @@ let config = {
                         }
                     ]
                 })
+            },
+            {
+                test: /\.svg$/,
+                include: path.resolve(__dirname, "src/icons"),
+                use: [
+                    {
+                        loader: "svg-url-loader",
+                        options: {
+                            limit: 1,
+                            name: "[name].[ext]",
+                            outputPath: "../icons/"
+                        }
+                    },
+                    {
+                        loader: "image-webpack-loader",
+                        options: {
+                            svgo: svgoOpt
+                        }
+                    }
+                ]
             }
         ]
     }

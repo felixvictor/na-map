@@ -49,14 +49,15 @@ function naDisplay() {
     let naTooltip = d3Tip()
         .attr("class", "d3-tip")
         .html(function(d) {
-            let h = "<b>" + d.properties.name + "</b>";
+            let h;
+            h = "<i class='flag-icon " + d.properties.nation + "'></i>";
+            h += "<b>" + d.properties.name + "</b>";
             h += " (" + (d.properties.shallow ? "shallow" : "deep-water");
             h += " port";
             if (d.properties.countyCapital) {
                 h += ", county capital";
             }
-            h += ")";
-            h += " Nation: " + d.properties.nation + "<br>";
+            h += ")<br>";
             h += "<table>";
             if (d.properties.produces.length) {
                 h += "<tr><td>Produces</td><td>" + d.properties.produces.join(", ") + "</td></tr>";
@@ -209,6 +210,16 @@ function naDisplay() {
             })
             .on("mouseover", naTooltip.show)
             .on("mouseout", naTooltip.hide);
+
+        gPorts
+            .append("image")
+            .attr("x", 10)
+            .attr("y", 20)
+            .attr("width", "20px")
+            .attr("height", "15px")
+            .attr("xlink:href", function(d) {
+                return "public/icons/" + d.properties.nation + ".svg";
+            });
     }
 
     function naDisplayTeleportAreas() {
@@ -254,7 +265,7 @@ function naDisplay() {
             let t = naLivePorts.filter(function(live) {
                 return live.Id === d.properties.id;
             });
-            d.properties.nation = t[0].Nation;
+            d.properties.nation = "n" + t[0].Nation;
         });
     }
 

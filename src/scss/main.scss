@@ -78,5 +78,42 @@ td {
   color: $in-colour;
   text-align: left;
   background: colour-mixin(darken($country-colour, 30%));
-  box-shadow: 0 14px 28px rgba(colour-mixin(darken($country-colour, 50%)),.25), 0 10px 10px rgba(colour-mixin(darken($country-colour, 50%)),.22);
+  box-shadow: 0 14px 28px rgba(colour-mixin(darken($country-colour, 50%)), .25), 0 10px 10px rgba(colour-mixin(darken($country-colour, 50%)), .22);
 }
+
+.flag-icon {
+  display: inline-block;
+  width: 2rem;
+  margin-right: .4rem;
+  background-repeat: no-repeat;
+  background-size: contain;
+
+  &::before {
+    content: "\00a0";
+  }
+}
+
+$flags-dir: "~Icons";
+$flags: n0, // Neutral
+n1, // Pirates
+n2, // Spain
+n3, // France
+n4, // Great Britain
+n5, // Netherlands
+n6, // Danmark
+n7, // Sweden
+n8, // USA
+n9, // Free town
+n10, // Russian Empire
+n11, // Kingdom of Prussia
+n12; // Commonwealth of Poland
+
+@mixin flags {
+  @each $flag in $flags {
+    .flag-icon.#{$flag} {
+      background-image: url("#{$flags-dir}/#{$flag}.svg");
+    }
+  }
+}
+
+@include flags;
