@@ -618,7 +618,7 @@
           "Versailles Terracotta",
           "White Oak Log"
         ],
-        "nation": "NT",
+        "nation": "PL",
         "produces": ["Sugar"],
         "countyCapital": false,
         "consumes": []
@@ -659,7 +659,7 @@
           "Sabicu Log",
           "Spanish Dried Fruits"
         ],
-        "nation": "NT",
+        "nation": "RU",
         "produces": ["Lignum Vitae Log"],
         "countyCapital": false,
         "consumes": []
@@ -1851,7 +1851,7 @@
           "Spanish Walnut Oil",
           "Spanish Walnut Oil"
         ],
-        "nation": "NT",
+        "nation": "DE",
         "produces": ["Gold", "Oak Log", "Silver"],
         "countyCapital": true,
         "consumes": [
@@ -2083,7 +2083,7 @@
           "Sevres Stained Glass",
           "Versailles Terracotta"
         ],
-        "nation": "NT",
+        "nation": "PL",
         "produces": ["Oak Log"],
         "countyCapital": false,
         "consumes": []
@@ -2733,7 +2733,7 @@
           "Indigo",
           "Madeira Wine"
         ],
-        "nation": "GB",
+        "nation": "PR",
         "produces": ["Fir Log", "Oak Log", "Silver"],
         "countyCapital": false,
         "consumes": []
@@ -3552,7 +3552,7 @@
           "Spanish Almonds",
           "Spanish Dried Fruits"
         ],
-        "nation": "NT",
+        "nation": "DK",
         "produces": ["Extra Labor", "Lignum Vitae Log"],
         "countyCapital": false,
         "consumes": []
@@ -4139,7 +4139,7 @@
           "Spanish Walnut Oil",
           "Spanish Walnut Oil"
         ],
-        "nation": "DK",
+        "nation": "RU",
         "produces": ["Gold", "Oak Log", "Silver"],
         "countyCapital": true,
         "consumes": [
@@ -5208,7 +5208,7 @@
           "Suffolk Cheese",
           "Textile Machinery"
         ],
-        "nation": "NT",
+        "nation": "DE",
         "produces": ["Coal", "Fir Log", "Sugar"],
         "countyCapital": false,
         "consumes": []
@@ -5944,7 +5944,7 @@
           "Indigo",
           "Spanish Dried Fruits"
         ],
-        "nation": "NT",
+        "nation": "ES",
         "produces": [],
         "countyCapital": false,
         "consumes": [
@@ -6494,7 +6494,7 @@
         "name": "Little Isaac Rocks",
         "shallow": true,
         "drops": ["Indigo", "Spanish Gold Coins"],
-        "nation": "US",
+        "nation": "NT",
         "produces": ["Sugar"],
         "countyCapital": false,
         "consumes": []
@@ -8610,7 +8610,7 @@
           "Parisian Furniture",
           "Sevilla Muskets"
         ],
-        "nation": "NT",
+        "nation": "RU",
         "produces": ["Iron Ore"],
         "countyCapital": false,
         "consumes": []
