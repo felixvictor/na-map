@@ -5,7 +5,8 @@
  */
 
 import { geoEquirectangular as d3geoEquirectangular, geoPath as d3GeoPath } from "d3-geo";
-import { json as d3Json } from "d3-request";
+import { queue as d3Queue } from "d3-queue";
+import { json as d3Json, request as d3Request } from "d3-request";
 // event needs live-binding
 import { event as currentD3Event, select as d3Select } from "d3-selection";
 import { voronoi as d3Voronoi } from "d3-voronoi";
@@ -28,6 +29,8 @@ function naDisplay() {
             geoEquirectangular: d3geoEquirectangular,
             geoPath: d3GeoPath,
             json: d3Json,
+            queue: d3Queue,
+            request: d3Request,
             select: d3Select,
             voronoi: d3Voronoi,
             zoom: d3Zoom
@@ -52,7 +55,8 @@ function naDisplay() {
             if (d.properties.countyCapital) {
                 h += ", county capital";
             }
-            h += ")<br>";
+            h += ")";
+            h += " Nation: " + d.properties.nation + "<br>";
             h += "<table>";
             if (d.properties.produces.length) {
                 h += "<tr><td>Produces</td><td>" + d.properties.produces.join(", ") + "</td></tr>";
@@ -68,7 +72,10 @@ function naDisplay() {
             return h;
         });
     let naCountries, naPorts;
-    let naJson = "na.json";
+    const naMapJson = "na.json";
+    const sourceBaseUrl = "http://storage.googleapis.com/nacleanopenworldprodshards/",
+        serverName = "cleanopenworldprodeu1",
+        naServerJson = sourceBaseUrl + "Ports" + "_" + serverName + ".json";
 
     function naSetupProjection() {
         const naMargin = { top: 0, right: 0, bottom: 0, left: 0 };
@@ -239,7 +246,19 @@ function naDisplay() {
             });
     }
 
-    d3.json(naJson, function(error, naMap) {
+    // Replace nation with live data from server
+    function naSetNation(naServerData) {
+        const naLivePorts = JSON.parse(naServerData.response.replace("var Ports = ", "").replace(";", ""));
+
+        naPorts.features.map(function(d) {
+            let t = naLivePorts.filter(function(live) {
+                return live.Id === d.properties.id;
+            });
+            d.properties.nation = t[0].Nation;
+        });
+    }
+
+    function naReady(error, naMap, naServerData) {
         if (error) {
             throw error;
         }
@@ -251,8 +270,15 @@ function naDisplay() {
         naSetupProjection();
         naSetupCanvas();
 
+        naSetNation(naServerData);
         naDisplayTeleportAreas();
         naDisplayCountries();
         naDisplayPorts();
-    });
+    }
+
+    d3
+        .queue()
+        .defer(d3.json, naMapJson)
+        .defer(d3.request, naServerJson)
+        .await(naReady);
 }
