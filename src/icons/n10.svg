@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="900" height="600">
-    <rect fill="#fff" width="900" height="300"/>
-    <rect fill="#d52b1e" y="300" width="900" height="300"/>
-    <rect fill="#0039a6" y="200" width="900" height="200"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="933.28" height="649.92" viewBox="0 0 933.28 649.92">
+    <title>test</title>
+    <rect x="16.64" y="24.96" width="900" height="600" style="fill: #fff"/>
+    <path d="M0,0L900,600M0,600L900,0" transform="translate(16.64 24.96)" style="stroke: #0039a6;stroke-width: 90px"/>
 </svg>
