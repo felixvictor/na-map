@@ -74,9 +74,6 @@ function naDisplay() {
         });
     let naCountries, naPorts;
     const naMapJson = "na.json";
-    const sourceBaseUrl = "http://storage.googleapis.com/nacleanopenworldprodshards/",
-        serverName = "cleanopenworldprodeu1",
-        naServerJson = sourceBaseUrl + "Ports" + "_" + serverName + ".json";
 
     function naSetupProjection() {
         const naMargin = { top: 0, right: 0, bottom: 0, left: 0 };
@@ -124,7 +121,9 @@ function naDisplay() {
     }
 
     function naZoomed() {
-        naSvg.attr("transform", currentD3Event.transform);
+        gCountries.attr("transform", currentD3Event.transform);
+        gPorts.attr("transform", currentD3Event.transform);
+        gVoronoi.attr("transform", currentD3Event.transform);
     }
 
     function naStopProp() {
@@ -218,7 +217,7 @@ function naDisplay() {
         // Port circle colour and size
         gPorts
             .selectAll(".label circle")
-            .attr("r", 15)
+            .attr("r", 10)
             .attr("fill", function(d) {
                 return "url(#" + d.properties.nation + ")";
             })
@@ -242,6 +241,7 @@ function naDisplay() {
         gVoronoi = naSvg
             .append("g")
             .attr("class", "voronoi")
+            .call(naZoom)
             .selectAll(".voronoi")
             .data(ports)
             .enter()
@@ -263,10 +263,9 @@ function naDisplay() {
 
     // Replace nation with live data from server
     function naSetNation(naServerData) {
-        const naLivePorts = JSON.parse(naServerData.response.replace("var Ports = ", "").replace(";", ""));
-
         naPorts.features.map(function(d) {
-            let t = naLivePorts.filter(function(live) {
+            // Ports from external json
+            let t = Ports.filter(function(live) {
                 return live.Id === d.properties.id;
             });
             d.properties.nation = "n" + t[0].Nation;
@@ -294,6 +293,5 @@ function naDisplay() {
     d3
         .queue()
         .defer(d3.json, naMapJson)
-        .defer(d3.request, naServerJson)
         .await(naReady);
 }
