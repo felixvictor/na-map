@@ -145,8 +145,9 @@ function naDisplay() {
         const labelPadding = 3;
 
         let naDefs = naSvg.append("defs");
+        const naNations = 12;
 
-        for (let i = 0; i <= 12; i++) {
+        for (let i = 0; i <= naNations; i++) {
             naDefs
                 .append("pattern")
                 .attr("id", "n" + i)
@@ -160,7 +161,6 @@ function naDisplay() {
                 .attr("y", "0")
                 .attr("height", "50")
                 .attr("width", "50")
-                //.attr("height", "10")
                 .attr("xlink:href", "icons/n" + i + ".svg");
         }
 
