@@ -278,6 +278,9 @@ function naDisplay() {
             throw error;
         }
 
+        // Open modal
+        window.location.hash = "modal";
+
         // Read map data
         naCountries = topojson.feature(naMap, naMap.objects.countries);
         naPorts = topojson.feature(naMap, naMap.objects.ports);
@@ -290,9 +293,6 @@ function naDisplay() {
         naDisplayCountries();
         naDisplayPorts();
     }
-
-    // Open modal
-    window.location.hash = "modal";
 
     d3
         .queue()
