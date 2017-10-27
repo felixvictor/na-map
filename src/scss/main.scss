@@ -1,3 +1,4 @@
+
 $country-colour: #6b7377;
 $bg-colour: #233d47;
 
@@ -79,6 +80,27 @@ td {
   text-align: left;
   background: colour-mixin(darken($country-colour, 30%));
   box-shadow: 0 14px 28px rgba(colour-mixin(darken($country-colour, 50%)), .25), 0 10px 10px rgba(colour-mixin(darken($country-colour, 50%)), .22);
+}
+
+// modal
+$modal-border-radius: 0;
+
+@import "~css-modal/modal";
+
+.modal--show {
+  footer {
+    background-color: inherit;
+  }
+
+  .close-action {
+    display: inline-block;
+    padding: .6em 1em;
+    color: $in-colour;
+    text-decoration: none;
+    background: $bg-colour;
+    border-radius: 4px;
+    transition: .1s;
+  }
 }
 
 .flag-icon {

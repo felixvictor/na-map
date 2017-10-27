@@ -21,6 +21,7 @@ import {
 } from "d3fc-label-layout";
 
 import { feature as topojsonFeature } from "topojson-client";
+import "css-modal";
 
 naDisplay();
 
@@ -289,6 +290,9 @@ function naDisplay() {
         naDisplayCountries();
         naDisplayPorts();
     }
+
+    // Open modal
+    window.location.hash = "modal";
 
     d3
         .queue()
