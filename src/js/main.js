@@ -122,9 +122,14 @@ function naDisplay() {
     }
 
     function naZoomed() {
-        gCountries.attr("transform", currentD3Event.transform);
-        gPorts.attr("transform", currentD3Event.transform);
-        gVoronoi.attr("transform", currentD3Event.transform);
+        const transform = currentD3Event.transform;
+
+        gCountries.attr("transform", transform);
+        gPorts.attr("transform", transform);
+        gVoronoi.attr("transform", transform);
+
+        gPorts.selectAll(".label text").style("font-size", 12 / transform.k);
+        gPorts.selectAll(".label circle").attr("r", 10 / transform.k);
     }
 
     function naStopProp() {
@@ -143,7 +148,7 @@ function naDisplay() {
     }
 
     function naDisplayPorts() {
-        const labelPadding = 7;
+        const labelPadding = 3;
 
         let naDefs = naSvg.append("defs");
         const naNations = 12;
@@ -185,7 +190,7 @@ function naDisplay() {
                     .select("text")
                     .node()
                     .getBBox();
-                return [textSize.width + labelPadding * 2, textSize.height + labelPadding * 2];
+                return [textSize.width, textSize.height];
             })
             .position(function(d) {
                 return naProjection(d.geometry.coordinates);
@@ -199,15 +204,18 @@ function naDisplay() {
             .call(labels);
 
         // Port text colour
-        gPorts.selectAll(".label text").attr("class", function(d) {
-            let f;
-            if (!d.properties.shallow && !d.properties.countyCapital) {
-                f = "na-port-in";
-            } else {
-                f = "na-port-out";
-            }
-            return f;
-        });
+        gPorts
+            .selectAll(".label text")
+            .attr("dx", 10)
+            .attr("class", function(d) {
+                let f;
+                if (!d.properties.shallow && !d.properties.countyCapital) {
+                    f = "na-port-in";
+                } else {
+                    f = "na-port-out";
+                }
+                return f;
+            });
 
         gPorts
             .selectAll(".label rect")
