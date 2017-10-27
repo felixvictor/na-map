@@ -143,7 +143,7 @@ function naDisplay() {
     }
 
     function naDisplayPorts() {
-        const labelPadding = 3;
+        const labelPadding = 7;
 
         let naDefs = naSvg.append("defs");
         const naNations = 12;
