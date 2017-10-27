@@ -1,6 +1,6 @@
 
-$country-colour: #6b7377;
-$bg-colour: #233d47;
+$country-colour: #d5c3ab;
+$bg-colour: #cddfe6;
 
 $sat: saturation($bg-colour);
 $lit: lightness($bg-colour);
@@ -12,9 +12,10 @@ $mix-weight: 20%;
   @return mix(hsl(hue($colour), $sat, $lit), $colour, $mix-weight);
 }
 
-$in-colour: colour-mixin(lighten($country-colour, 50%));
-$out-colour: colour-mixin(lighten($country-colour, 30%));
-$voronoi-colour: $in-colour;
+$in-colour: colour-mixin(darken($country-colour, 60%));
+$out-colour: colour-mixin(darken($country-colour, 50%));
+$voronoi-colour: $out-colour;
+$background: colour-mixin(lighten($country-colour, 20%));
 
 .na-country {
   fill: $country-colour;
@@ -78,12 +79,14 @@ td {
   font-size: smaller;
   color: $in-colour;
   text-align: left;
-  background: colour-mixin(darken($country-colour, 30%));
+  background: $background;
   box-shadow: 0 14px 28px rgba(colour-mixin(darken($country-colour, 50%)), .25), 0 10px 10px rgba(colour-mixin(darken($country-colour, 50%)), .22);
 }
 
 // modal
 $modal-border-radius: 0;
+$modal-color: $in-colour;
+$modal-inner-background: $background;
 
 @import "~css-modal/modal";
 
@@ -95,7 +98,6 @@ $modal-border-radius: 0;
   .close-action {
     display: inline-block;
     padding: .6em 1em;
-    color: $in-colour;
     text-decoration: none;
     background: $bg-colour;
     border-radius: 4px;
