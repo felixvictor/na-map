@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="933.28" height="649.92" viewBox="0 0 933.28 649.92">
-    <title>test</title>
-    <rect x="16.64" y="24.96" width="900" height="600" style="fill: #fff"/>
-    <path d="M0,0L900,600M0,600L900,0" transform="translate(16.64 24.96)" style="stroke: #0039a6;stroke-width: 90px"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="641" height="481" viewBox="0 0 641 481">
+    <rect width="640" height="480" style="fill: #fff"/>
+    <path d="M640,0H580.38L0,435.28V480H59.63L640,44.72V0Z" transform="translate(0.5 0.5)" style="fill: #0039a6"/>
+    <path d="M0,0V44.72L580.38,480H640V435.28L59.63,0H0Z" transform="translate(0.5 0.5)" style="fill: #0039a6"/>
 </svg>
