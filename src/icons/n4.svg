@@ -1,8 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1016.33" height="575.95" viewBox="0 0 1016.33 575.95">
-    <rect x="8.33" y="15.95" width="1008" height="560" style="fill: #fff"/>
-    <rect x="8.33" y="15.95" width="470" height="246" style="fill: #00247d"/>
-    <path d="M0,0L469,245M469,0L0,245" transform="translate(8.33 15.95)" style="stroke: #fff;stroke-width: 36px"/>
-    <path d="M0,122.5H470M234.5,0V246" transform="translate(8.33 15.95)" style="stroke: #fff;stroke-width: 83px"/>
-    <path d="M0,122.5H470M234.5,0V246" transform="translate(8.33 15.95)" style="stroke: #cf142b;stroke-width: 47px"/>
-    <path d="M0,280H1008M504,0V560" transform="translate(8.33 15.95)" style="stroke: #cf142b;stroke-width: 70px"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="480">
+    <rect width="640" height="480" style="fill: #fff"/>
+    <path d="M0,0 v210 h290 v-210 z" fill="#00247d"/>
+    <path d="M0,0 L290,210 M290,0 L0,210" stroke="#fff" stroke-width="36"/>
+    <path d="M145,0 v210 M0,105 h290" stroke="#fff" stroke-width="83"/>
+    <path d="M145,0 v210 M0,105 h290" stroke="#cf142b" stroke-width="47"/>
+    <path d="M0,240H640M320,0V480" stroke="#cf142b" stroke-width="60"/>
 </svg>
