@@ -30,6 +30,24 @@ const cssOpt = {
     sourceMap: true
 };
 
+const imagewebpackOpt = {
+    gifsicle: {
+        optimizationLevel: 3,
+        interlaced: false
+    },
+    mozjpeg: {
+        quality: 95,
+        progressive: true
+    },
+    optipng: {
+        optimizationLevel: 7
+    },
+    pngquant: {
+        floyd: 0.5,
+        speed: 2
+    }
+};
+
 const postcssOpt = {
     config: {
         path: "build/postcss.config.js"
@@ -100,7 +118,8 @@ let config = {
 
     resolve: {
         alias: {
-            Icons: path.resolve(__dirname, "src/icons/")
+            Icons: path.resolve(__dirname, "src/icons/"),
+            Images: path.resolve(__dirname, "src/images/")
         }
     },
 
@@ -146,6 +165,43 @@ let config = {
                         }
                     ]
                 })
+            },
+            {
+                test: /\.(gif|png|jpe?g)$/i,
+                include: path.resolve(__dirname, "src/images"),
+                use: [
+                    {
+                        loader: "file-loader",
+                        options: {
+                            name: "[name].[ext]",
+                            outputPath: "../images/"
+                        }
+                    },
+                    {
+                        loader: "image-webpack-loader",
+                        options: imagewebpackOpt
+                    }
+                ]
+            },
+            {
+                test: /\.svg$/,
+                include: path.resolve(__dirname, "src/images"),
+                use: [
+                    {
+                        loader: "svg-url-loader",
+                        options: {
+                            limit: 1,
+                            name: "[name].[ext]",
+                            outputPath: "../images/"
+                        }
+                    },
+                    {
+                        loader: "image-webpack-loader",
+                        options: {
+                            svgo: svgoOpt
+                        }
+                    }
+                ]
             },
             {
                 test: /\.svg$/,
