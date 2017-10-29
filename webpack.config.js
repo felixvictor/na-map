@@ -118,6 +118,7 @@ let config = {
 
     resolve: {
         alias: {
+            Fonts: path.resolve(__dirname, "src/fonts/"),
             Icons: path.resolve(__dirname, "src/icons/"),
             Images: path.resolve(__dirname, "src/images/")
         }
@@ -165,6 +166,17 @@ let config = {
                         }
                     ]
                 })
+            },
+            {
+                test: /\.(woff2?|ttf|eot|svg)$/,
+                include: path.resolve(__dirname, "src/fonts"),
+                use: {
+                    loader: "file-loader",
+                    options: {
+                        name: "[name].[ext]",
+                        outputPath: "../fonts/"
+                    }
+                }
             },
             {
                 test: /\.(gif|png|jpe?g)$/i,
