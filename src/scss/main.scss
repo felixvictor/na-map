@@ -1,3 +1,8 @@
+@import "caslon";
+
+$font-family-sans-serif: librecaslon, -apple-system, blinkmacsystemfont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", arial, sans-serif;
+$font-family-base: $font-family-sans-serif;
+
 $country-colour: #d5bb99;
 $bg-colour: #cddfe6;
 
@@ -17,7 +22,7 @@ $voronoi-colour: $out-colour;
 $background-colour: colour-mixin(lighten($country-colour, 10%));
 
 html {
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, Arial, sans-serif;
+  font-family: $font-family-base;
   font-size: 16px;
   line-height: 1.618rem;
 }
@@ -35,12 +40,11 @@ html {
 
 .na-port-in {
   fill: $in-colour;
-  font-weight: 700;
 }
 
 .na-port-out {
   fill: $out-colour;
-  font-size: 14px;
+  font-style: italic;
 }
 
 text {
@@ -92,6 +96,8 @@ $modal-inner-background: $background-colour;
 @import "~css-modal/modal";
 
 .modal--show {
+  line-height: inherit;
+
   footer {
     background-color: inherit;
   }

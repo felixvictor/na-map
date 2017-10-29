@@ -1,0 +1,27 @@
+/**
+ * scss definitions: font LibreCaslon
+ *
+ * @author    Ingo Beyritz
+ * @copyright Copyright (c) 2017, Ingo Beyritz
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
+$font-name: "LibreCaslon";
+$font-path: "~Fonts/#{$font-name}/";
+
+$font-weight: 500;
+$font-weight-name: "regular";
+
+  @font-face {
+    font-family: "#{$font-name}";
+    src: url("#{$font-path}#{$font-name}-#{$font-weight-name}.woff") format("woff");
+    font-style: normal;
+    font-weight: $font-weight;
+  }
+
+  @font-face {
+    font-family: "#{$font-name}";
+    src: url("#{$font-path}#{$font-name}-#{$font-weight-name}-italic.woff") format("woff");
+    font-style: italic;
+    font-weight: $font-weight;
+  }

@@ -53,7 +53,7 @@ function naDisplay() {
         .html(function(d) {
             let h;
             h = "<i class='flag-icon " + d.properties.nation + "'></i>";
-            h += "<b>" + d.properties.name + "</b>";
+            h += "<em>" + d.properties.name + "</em>";
             h += " (" + (d.properties.shallow ? "shallow" : "deep-water");
             h += " port";
             if (d.properties.countyCapital) {
@@ -131,7 +131,16 @@ function naDisplay() {
         gPorts.attr("transform", transform);
         gVoronoi.attr("transform", transform);
 
-        gPorts.selectAll(".label text").style("font-size", 12 / transform.k);
+        gPorts.selectAll(".label text").style("font-size", function(d) {
+            let f;
+            if (!d.properties.shallow && !d.properties.countyCapital) {
+                f = "14 / transform.k";
+            } else {
+                f = "14 / transform.k";
+            }
+            return f;
+        });
+
         gPorts.selectAll(".label circle").attr("r", 10 / transform.k);
     }
 
@@ -201,9 +210,7 @@ function naDisplay() {
             .attr("class", "na-country")
             .datum(naCountries)
             .attr("d", naPath)
-            .style("filter", "url(#border)")
-
-        gCountries.append("path").attr("fill", "url(#texture)");
+            .style("filter", "url(#border)");
     }
 
     function naDisplayPorts() {
