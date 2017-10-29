@@ -46,7 +46,8 @@ function naDisplay() {
         };
 
     let naWidth, naHeight;
-    let naProjection, naPath, naSvg, gPorts, gCountries, gVoronoi, naZoom;
+    let naProjection, naPath, naSvg, naDefs, naZoom;
+    let gPorts, gCountries, gVoronoi;
     let naTooltip = d3Tip()
         .attr("class", "d3-tip")
         .html(function(d) {
@@ -119,6 +120,8 @@ function naDisplay() {
             .on("zoom", naZoomed);
 
         naSvg.call(naZoom).call(naTooltip);
+
+        naDefs = naSvg.append("defs");
     }
 
     function naZoomed() {
@@ -139,18 +142,73 @@ function naDisplay() {
     }
 
     function naDisplayCountries() {
-        gCountries = naSvg
-            .append("g")
-            .attr("class", "na-country")
+        let naFilter = naDefs.append("filter").attr("id", "border");
+
+        naFilter
+            .append("feColorMatrix")
+            .attr("in", "SourceGraphic")
+            .attr("type", "matrix")
+            .attr("values", "0 0 0 0 0.6 0 0 0 0 0.5333333333333333 0 0 0 0 0.5333333333333333  0 0 0 1 0")
+            .attr("result", "f1coloredMask");
+        naFilter
+            .append("feGaussianBlur")
+            .attr("in", "f1coloredMask")
+            .attr("stdDeviation", 15)
+            .attr("result", "f1blur");
+
+        naFilter
+            .append("feColorMatrix")
+            .attr("in", "SourceGraphic")
+            .attr("type", "matrix")
+            .attr("values", "0 0 0 0 0   0 0 0 0 0   0 0 0 0 0   0 0 0 500 0")
+            .attr("result", "f2mask");
+        naFilter
+            .append("feMorphology")
+            .attr("in", "f2mask")
+            .attr("radius", "1")
+            .attr("operator", "erode")
+            .attr("result", "f2r1");
+        naFilter
+            .append("feGaussianBlur")
+            .attr("in", "f2r1")
+            .attr("stdDeviation", "4")
+            .attr("result", "f2r2");
+        naFilter
+            .append("feColorMatrix")
+            .attr("in", "f2r2")
+            .attr("type", "matrix")
+            .attr(
+                "values",
+                "1 0 0 0 0.5803921568627451 0 1 0 0 0.3607843137254902 0 0 1 0 0.10588235294117647 0 0 0 -1 1"
+            )
+            .attr("result", "f2r3");
+        naFilter
+            .append("feComposite")
+            .attr("operator", "in")
+            .attr("in", "f2r3")
+            .attr("in2", "f2mask")
+            .attr("result", "f2comp");
+        let feMerge = naFilter.append("feMerge");
+
+        feMerge.append("feMergeNode").attr("in", "f1blur");
+        feMerge.append("feMergeNode").attr("in", "f2comp");
+        feMerge.append("feMergeNode").attr("in", "SourceGraphic");
+
+        gCountries = naSvg.append("g");
+
+        gCountries
             .append("path")
+            .attr("class", "na-country")
             .datum(naCountries)
-            .attr("d", naPath);
+            .attr("d", naPath)
+            .style("filter", "url(#border)")
+
+        gCountries.append("path").attr("fill", "url(#texture)");
     }
 
     function naDisplayPorts() {
         const labelPadding = 3;
 
-        let naDefs = naSvg.append("defs");
         const naNations = 12;
 
         for (let i = 0; i <= naNations; i++) {
