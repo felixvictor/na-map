@@ -157,8 +157,9 @@ function naDisplay() {
             .append("feColorMatrix")
             .attr("in", "SourceGraphic")
             .attr("type", "matrix")
-            .attr("values", "0 0 0 0 0.6 0 0 0 0 0.5333333333333333 0 0 0 0 0.5333333333333333  0 0 0 1 0")
+            .attr("values", "0 0 0 0 0.6  0 0 0 0 0.5  0 0 0 0 0.5  0 0 0 1 0")
             .attr("result", "f1coloredMask");
+            
         naFilter
             .append("feGaussianBlur")
             .attr("in", "f1coloredMask")
@@ -188,7 +189,7 @@ function naDisplay() {
             .attr("type", "matrix")
             .attr(
                 "values",
-                "1 0 0 0 0.5803921568627451 0 1 0 0 0.3607843137254902 0 0 1 0 0.10588235294117647 0 0 0 -1 1"
+                "1 0 0 0 0.58  0 1 0 0 0.36  0 0 1 0 0.11  0 0 0 -1 1"
             )
             .attr("result", "f2r3");
         naFilter
@@ -197,8 +198,8 @@ function naDisplay() {
             .attr("in", "f2r3")
             .attr("in2", "f2mask")
             .attr("result", "f2comp");
+            
         let feMerge = naFilter.append("feMerge");
-
         feMerge.append("feMergeNode").attr("in", "f1blur");
         feMerge.append("feMergeNode").attr("in", "f2comp");
         feMerge.append("feMergeNode").attr("in", "SourceGraphic");
