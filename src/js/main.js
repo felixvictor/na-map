@@ -54,12 +54,15 @@ function naDisplay() {
             let h;
             h = "<i class='flag-icon " + d.properties.nation + "'></i>";
             h += "<em>" + d.properties.name + "</em>";
-            h += " (" + (d.properties.shallow ? "shallow" : "deep-water");
-            h += " port";
+            h += " (" + (d.properties.shallow ? "shallow" : "deep");
+            h += " water port";
             if (d.properties.countyCapital) {
                 h += ", county capital";
             }
-            h += "owned by " + ")";
+            h += ", " + d.properties.brLimit + " BR limit";
+            if (d.properties.capturer) {
+                h += ", owned by " + d.properties.capturer;
+            }
             h += ")<br>";
             h += "<table>";
             if (d.properties.produces.length) {
@@ -160,7 +163,7 @@ function naDisplay() {
             .attr("type", "matrix")
             .attr("values", "0 0 0 0 0.6  0 0 0 0 0.5  0 0 0 0 0.5  0 0 0 1 0")
             .attr("result", "f1coloredMask");
-            
+
         naFilter
             .append("feGaussianBlur")
             .attr("in", "f1coloredMask")
@@ -188,10 +191,7 @@ function naDisplay() {
             .append("feColorMatrix")
             .attr("in", "f2r2")
             .attr("type", "matrix")
-            .attr(
-                "values",
-                "1 0 0 0 0.58  0 1 0 0 0.36  0 0 1 0 0.11  0 0 0 -1 1"
-            )
+            .attr("values", "1 0 0 0 0.58  0 1 0 0 0.36  0 0 1 0 0.11  0 0 0 -1 1")
             .attr("result", "f2r3");
         naFilter
             .append("feComposite")
@@ -199,7 +199,7 @@ function naDisplay() {
             .attr("in", "f2r3")
             .attr("in2", "f2mask")
             .attr("result", "f2comp");
-            
+
         let feMerge = naFilter.append("feMerge");
         feMerge.append("feMergeNode").attr("in", "f1blur");
         feMerge.append("feMergeNode").attr("in", "f2comp");
