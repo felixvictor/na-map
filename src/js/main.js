@@ -59,6 +59,7 @@ function naDisplay() {
             if (d.properties.countyCapital) {
                 h += ", county capital";
             }
+            h += "owned by " + ")";
             h += ")<br>";
             h += "<table>";
             if (d.properties.produces.length) {
@@ -343,6 +344,7 @@ function naDisplay() {
                 return live.Id === d.properties.id;
             });
             d.properties.nation = "n" + t[0].Nation;
+            d.properties.capturer = t[0].Capturer;
         });
     }
 
