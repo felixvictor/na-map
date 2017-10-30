@@ -29,8 +29,9 @@ html {
 
 .na-country {
   fill: $country-colour;
-  stroke-width: .2;
+  stroke-width: 3;
   stroke: $out-colour;
+  stroke-opacity: .4;
 }
 
 .background {
