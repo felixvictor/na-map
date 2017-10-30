@@ -17,7 +17,7 @@ $mix-weight: 20%;
 }
 
 $in-colour: colour-mixin(darken($country-colour, 60%));
-$out-colour: colour-mixin(darken($country-colour, 50%));
+$out-colour: colour-mixin(darken($country-colour, 40%));
 $voronoi-colour: $out-colour;
 $background-colour: colour-mixin(lighten($country-colour, 10%));
 
