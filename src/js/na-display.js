@@ -12,8 +12,6 @@ import { event as currentD3Event, select as d3Select } from "d3-selection";
 import { voronoi as d3Voronoi } from "d3-voronoi";
 import { zoom as d3Zoom } from "d3-zoom";
 
-import d3Tip from "d3-tip";
-
 import {
     layoutTextLabel as fcLayoutTextLabel,
     layoutGreedy as fcLayoutGreedy,
@@ -21,7 +19,6 @@ import {
 } from "d3fc-label-layout";
 
 import { feature as topojsonFeature } from "topojson-client";
-import "css-modal";
 
 export default function naDisplay() {
     const d3 = {
@@ -46,36 +43,6 @@ export default function naDisplay() {
     let naWidth, naHeight;
     let naProjection, naPath, naSvg, naDefs, naZoom;
     let gPorts, gCountries, gVoronoi;
-    let naTooltip = d3Tip()
-        .attr("class", "d3-tip")
-        .html(function(d) {
-            let h;
-            h = "<i class='flag-icon " + d.properties.nation + "'></i>";
-            h += "<em>" + d.properties.name + "</em>";
-            h += " (" + (d.properties.shallow ? "shallow" : "deep");
-            h += " water port";
-            if (d.properties.countyCapital) {
-                h += ", county capital";
-            }
-            h += ", " + d.properties.brLimit + " BR limit";
-            if (d.properties.capturer) {
-                h += ", owned by " + d.properties.capturer;
-            }
-            h += ")<br>";
-            h += "<table>";
-            if (d.properties.produces.length) {
-                h += "<tr><td>Produces</td><td>" + d.properties.produces.join(", ") + "</td></tr>";
-            }
-            if (d.properties.drops.length) {
-                h += "<tr><td>Drops</td><td>" + d.properties.drops.join(", ") + "</tr>";
-            }
-            if (d.properties.consumes.length) {
-                h += "<tr><td>Consumes</td><td>" + d.properties.consumes.join(", ") + "</tr>";
-            }
-            h += "</table>";
-
-            return h;
-        });
     let naCountries, naPorts;
     const naMapJson = "na.json";
 
@@ -121,7 +88,7 @@ export default function naDisplay() {
             .scaleExtent([0.6, 3])
             .on("zoom", naZoomed);
 
-        naSvg.call(naZoom).call(naTooltip);
+        naSvg.call(naZoom);
 
         naDefs = naSvg.append("defs");
     }
@@ -282,11 +249,7 @@ export default function naDisplay() {
                 return f;
             });
 
-        gPorts
-            .selectAll(".label rect")
-            .attr("class", "label-rect")
-            .on("mouseover", naTooltip.show)
-            .on("mouseout", naTooltip.hide);
+        gPorts.selectAll(".label rect").attr("class", "label-rect");
 
         // Port circle colour and size
         gPorts
@@ -295,8 +258,46 @@ export default function naDisplay() {
             .attr("fill", function(d) {
                 return "url(#" + d.properties.nation + ")";
             })
-            .on("mouseover", naTooltip.show)
-            .on("mouseout", naTooltip.hide);
+            .attr("data-toggle", "tooltip")
+            .attr("title", function(d) {
+                return naTooltip(d.properties);
+            });
+    }
+
+    function naTooltip(d) {
+        let h;
+        h = "<p><i class='flag-icon " + d.nation + "'></i>";
+        h += "<em>" + d.name + "</em><br>";
+        h += d.shallow ? "Shallow" : "Deep";
+        h += " water port";
+        if (d.countyCapital) {
+            h += ", county capital";
+        }
+        h += ", " + d.brLimit + " BR limit";
+        if (d.capturer) {
+            h += ", owned by " + d.capturer;
+        }
+        h += "</p>";
+        h += "<table class='table table-sm'>";
+        if (d.produces.length) {
+            h +=
+                "<tr><th scope='row' class='text-left'>Produces</th><td class='text-left'>" +
+                d.produces.join(", ") +
+                "</td></tr>";
+        }
+        if (d.drops.length) {
+            h +=
+                "<tr><th scope='row' class='text-left'>Drops</th><td class='text-left'>" + d.drops.join(", ") + "</tr>";
+        }
+        if (d.consumes.length) {
+            h +=
+                "<tr><th scope='row' class='text-left'>Consumes</th><td class='text-left'>" +
+                d.consumes.join(", ") +
+                "</tr>";
+        }
+        h += "</table>";
+
+        return h;
     }
 
     function naDisplayTeleportAreas() {
@@ -351,9 +352,6 @@ export default function naDisplay() {
         if (error) {
             throw error;
         }
-
-        // Open modal
-        window.location.hash = "modal";
 
         // Read map data
         naCountries = topojson.feature(naMap, naMap.objects.countries);

@@ -13,10 +13,14 @@
 
 <body>
 
-<section class="modal--show" id="modal" tabindex="-1" role="dialog" aria-labelledby="modal-label" aria-hidden="true">
-    <div class="modal-inner">
-        <header id="modal-label"><h3>Naval Action Teleport Map</h3></header>
+<section id="modal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
         <div class="modal-content">
+            <header class="modal-header">
+        <h3>Naval Action Teleport Map</h3>
+            </header>
+
+        <div class="modal-body">
             <p>PvP EU map</p>
             <ul>
                 <li>Teleport areas: indicates the area where you can teleport to this port (deep-water port and not a county capital)</li>
@@ -26,8 +30,8 @@
             </ul>
             <p>Designed by iB aka Felix Victor.</p>
         </div>
-        <footer>
-            <p><a href="#!" title="Ok" class="close-action" data-dismiss="modal">Ok</a></p>
+        <footer class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Ok</button>
         </footer>
     </div>
 </section>
