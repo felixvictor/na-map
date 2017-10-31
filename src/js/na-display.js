@@ -266,9 +266,9 @@ export default function naDisplay() {
 
     function naTooltip(d) {
         let h;
-        h = "<p><i class='flag-icon " + d.nation + "'></i>";
-        h += "<em>" + d.name + "</em><br>";
-        h += d.shallow ? "Shallow" : "Deep";
+        h = "<table><tbody<tr><td class='align-middle'><i class='flag-icon " + d.nation + "'></i></td>";
+        h += "<td class='align-middle port-name'>" + d.name + "</td></tr></tbody></table>";
+        h += "<p class='text-left'>" + (d.shallow ? "Shallow" : "Deep");
         h += " water port";
         if (d.countyCapital) {
             h += ", county capital";
