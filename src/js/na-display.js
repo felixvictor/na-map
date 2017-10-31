@@ -273,7 +273,11 @@ export default function naDisplay() {
         if (d.countyCapital) {
             h += ", county capital";
         }
-        h += ", " + d.brLimit + " BR limit";
+        if(!d.nonCapturable) {
+            h += ", " + d.brLimit + " BR limit";
+        } else {
+            h += ", not capturable";
+        }
         if (d.capturer) {
             h += ", owned by " + d.capturer;
         }
