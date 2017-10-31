@@ -12,7 +12,17 @@ import "bootstrap/js/dist/util";
 
 function main() {
     naAnalytics();
+
     naDisplay();
+    jQuery(document).ready(function($) {
+        // Open modal
+        $("#modal").modal("show");
+        $('[data-toggle="tooltip"]').tooltip({
+            delay: { show: 500, hide: 100 },
+            html: true,
+            placement: "auto"
+        });
+    });
 }
 
 main();

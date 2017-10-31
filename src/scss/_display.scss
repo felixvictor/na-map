@@ -1,0 +1,97 @@
+/*
+ * scss definitions: display
+ *
+ * @author    Ingo Beyritz
+ * @copyright Copyright (c) 2017, Ingo Beyritz
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
+$in-colour: $primary-900;
+$out-colour: $primary-700;
+$voronoi-colour: $out-colour;
+$background-colour: $primary-300;
+
+.na-country {
+  fill: $primary;
+  stroke-width: 3;
+  stroke: $out-colour;
+  stroke-opacity: .4;
+}
+
+.background {
+  fill: $background-colour;
+  pointer-events: all;
+}
+
+.na-port-in {
+  fill: $in-colour;
+}
+
+.na-port-out {
+  fill: $out-colour;
+  font-style: italic;
+}
+
+text {
+  pointer-events: none;
+  text-anchor: start;
+}
+
+.label-rect {
+  fill: transparent;
+}
+
+.voronoi {
+  fill: none;
+  stroke: $voronoi-colour;
+  stroke-width: .5px;
+}
+
+.tooltip {
+  font-size: smaller;
+  color: $in-colour;
+  text-align: left;
+  background: $primary-400;
+  box-shadow: 0 14px 28px rgba($primary-900, .25), 0 10px 10px rgba($primary-900, .22);
+}
+
+.tooltip-inner {
+  min-width: 30rem;
+}
+
+.flag-icon {
+  display: inline-block;
+  width: 2rem;
+  margin-right: .4rem;
+  background-repeat: no-repeat;
+  background-size: contain;
+
+  &::before {
+    content: "\00a0";
+  }
+}
+
+$flags-dir: "~Icons";
+$flags: n0, // Neutral
+n1, // Pirates
+n2, // Spain
+n3, // France
+n4, // Great Britain
+n5, // Netherlands
+n6, // Danmark
+n7, // Sweden
+n8, // USA
+n9, // Free town
+n10, // Russian Empire
+n11, // Kingdom of Prussia
+n12; // Commonwealth of Poland
+
+@mixin flags {
+  @each $flag in $flags {
+    .flag-icon.#{$flag} {
+      background-image: url("#{$flags-dir}/#{$flag}.svg");
+    }
+  }
+}
+
+@include flags;
