@@ -21,7 +21,6 @@ import {
 } from "d3fc-label-layout";
 
 import { feature as topojsonFeature } from "topojson-client";
-import "css-modal";
 
 export default function naDisplay() {
     const d3 = {
