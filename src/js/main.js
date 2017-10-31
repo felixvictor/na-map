@@ -18,7 +18,7 @@ function main() {
         // Open modal
         $("#modal").modal("show");
         $('[data-toggle="tooltip"]').tooltip({
-            delay: { show: 500, hide: 100 },
+            delay: { show: 100, hide: 100 },
             html: true,
             placement: "auto"
         });
