@@ -1,0 +1,18 @@
+/*
+ * scss definitions: pre-bootstrap
+ *
+ * @author    Ingo Beyritz
+ * @copyright Copyright (c) 2017, Ingo Beyritz
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
+$primary-colour: #d5bb99;
+$secondary-colour: #cddfe6;
+
+@import "mixins";
+
+@import "colour";
+
+@import "variables";
+
+@import "font";

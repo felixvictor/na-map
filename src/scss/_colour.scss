@@ -1,0 +1,161 @@
+/**
+ * scss definitions: colours
+ *
+ * @author    Ingo Beyritz
+ * @copyright Copyright (c) 2016, Ingo Beyritz
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
+// Colour scheme
+$sat: saturation($primary-colour);
+$lit: lightness($primary-colour);
+$hue: hue($primary-colour);
+
+$mix-weight: 60%;
+
+@function colour-mixin($colour) {
+  @return mix(hsl(hue($colour), $sat, $lit), $colour, $mix-weight);
+}
+
+// Palettes
+$betty-white: mix(#eee, colour-mixin(#eee), 80);
+$blue: colour-mixin(#007bff);
+$green: colour-mixin(#28a745);
+$indigo: colour-mixin(#6610f2);
+$orange: colour-mixin(#fd7e14);
+$pink: colour-mixin(#e83e8c);
+$purple: colour-mixin(#6f42c1);
+$red: colour-mixin(#dc3545);
+$teal: colour-mixin(#20c997);
+$yellow: colour-mixin(#ffc107);
+
+$gray-dark: mix(#343a40, colour-mixin(#343a40), 60);
+$gray: mix(#495057, colour-mixin(#495057), 60);
+$gray-light: mix(#868e96, colour-mixin(#868e96), 60);
+$gray-lighter: mix(#ced4da, colour-mixin(#ced4da), 60);
+$gray-lightest: mix(#f8f9fa, colour-mixin(#f8f9fa), 60);
+
+$theme-colors: (
+  "primary": $primary-colour,
+  "secondary": $secondary-colour,
+  "success": $green,
+  "info": $blue,
+  "warning": $orange,
+  "danger": $red,
+  "foreground": $gray-light,
+  "background": $betty-white
+);
+
+@function theme-color($key: "primary") {
+  @return map-get($theme-colors, $key);
+}
+
+$theme-color-interval: 8% !default;
+
+@function theme-color-level($color-name: "primary", $level: 0) {
+  $color: theme-color($color-name);
+  $color-base: if($level > 0, #000, #fff);
+
+  @if $level < 0 {
+    // Lighter values need a quick double negative for the Sass math to work
+
+    @return mix($color-base, $color, $level * -1 * $theme-color-interval);
+  }
+
+  @else
+  {
+    @return mix($color-base, $color, $level * $theme-color-interval);
+  }
+}
+
+$primary: theme-color-level("primary", 0) !default;
+$primary-050: theme-color-level("primary", -11);
+$primary-100: theme-color-level("primary", -9.5) !default;
+$primary-200: theme-color-level("primary", -7) !default;
+$primary-300: theme-color-level("primary", -4) !default;
+$primary-400: theme-color-level("primary", -2) !default;
+$primary-500: $primary !default;
+$primary-600: theme-color-level("primary", 2) !default;
+$primary-700: theme-color-level("primary", 4) !default;
+$primary-800: theme-color-level("primary", 6) !default;
+$primary-900: theme-color-level("primary", 8) !default;
+
+$secondary: theme-color-level("secondary", 0);
+$secondary-050: theme-color-level("secondary", -11);
+$secondary-100: theme-color-level("secondary", -9.5);
+$secondary-200: theme-color-level("secondary", -7);
+$secondary-300: theme-color-level("secondary", -4);
+$secondary-400: theme-color-level("secondary", -2);
+$secondary-500: $secondary;
+$secondary-600: theme-color-level("secondary", 2);
+$secondary-700: theme-color-level("secondary", 4);
+$secondary-800: theme-color-level("secondary", 6);
+$secondary-900: theme-color-level("secondary", 8);
+
+$foreground: theme-color-level("foreground", 0) !default;
+$foreground-050: theme-color-level("foreground", -12);
+$foreground-100: theme-color-level("foreground", -11) !default;
+$foreground-200: theme-color-level("foreground", -8) !default;
+$foreground-300: theme-color-level("foreground", -6) !default;
+$foreground-400: theme-color-level("foreground", -3) !default;
+$foreground-500: $foreground !default;
+$foreground-600: theme-color-level("foreground", 2) !default;
+$foreground-700: theme-color-level("foreground", 4) !default;
+$foreground-800: theme-color-level("foreground", 6) !default;
+$foreground-900: theme-color-level("foreground", 8) !default;
+
+$background: theme-color-level("background", 0);
+$background-050: theme-color-level("background", -12);
+$background-100: theme-color-level("background", -11);
+$background-200: theme-color-level("background", -8);
+$background-300: theme-color-level("background", -6);
+$background-400: theme-color-level("background", -3);
+$background-500: $background;
+$background-600: theme-color-level("background", 2);
+$background-700: theme-color-level("background", 4);
+$background-800: theme-color-level("background", 6);
+$background-900: theme-color-level("background", 8);
+
+$success: theme-color-level("success", 0) !default;
+$success-100: theme-color-level("success", -9.5) !default;
+$success-200: theme-color-level("success", -7) !default;
+$success-300: theme-color-level("success", -4) !default;
+$success-400: theme-color-level("success", -2) !default;
+$success-500: $success !default;
+$success-600: theme-color-level("success", 2) !default;
+$success-700: theme-color-level("success", 4) !default;
+$success-800: theme-color-level("success", 6) !default;
+$success-900: theme-color-level("success", 8) !default;
+
+$info: theme-color-level("info", 0) !default;
+$info-100: theme-color-level("info", -9.5) !default;
+$info-200: theme-color-level("info", -7) !default;
+$info-300: theme-color-level("info", -4) !default;
+$info-400: theme-color-level("info", -2) !default;
+$info-500: $info !default;
+$info-600: theme-color-level("info", 2) !default;
+$info-700: theme-color-level("info", 4) !default;
+$info-800: theme-color-level("info", 6) !default;
+$info-900: theme-color-level("info", 8) !default;
+
+$warning: theme-color-level("warning", 0) !default;
+$warning-100: theme-color-level("warning", -9.5) !default;
+$warning-200: theme-color-level("warning", -7) !default;
+$warning-300: theme-color-level("warning", -4) !default;
+$warning-400: theme-color-level("warning", -2) !default;
+$warning-500: $warning !default;
+$warning-600: theme-color-level("warning", 2) !default;
+$warning-700: theme-color-level("warning", 4) !default;
+$warning-800: theme-color-level("warning", 6) !default;
+$warning-900: theme-color-level("warning", 8) !default;
+
+$danger: theme-color-level("danger", 0) !default;
+$danger-100: theme-color-level("danger", -9.5) !default;
+$danger-200: theme-color-level("danger", -7) !default;
+$danger-300: theme-color-level("danger", -4) !default;
+$danger-400: theme-color-level("danger", -2) !default;
+$danger-500: $danger !default;
+$danger-600: theme-color-level("danger", 2) !default;
+$danger-700: theme-color-level("danger", 4) !default;
+$danger-800: theme-color-level("danger", 6) !default;
+$danger-900: theme-color-level("danger", 8) !default;
