@@ -1,0 +1,92 @@
+/**
+ * scss definitions: bootstrap variables
+ *
+ * @author    Ingo Beyritz
+ * @copyright Copyright (c) 2017, Ingo Beyritz
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
+// Options
+$enable-rounded: false;
+$enable-gradients: true;
+$enable-hover-media-query: false;
+
+// Spacing
+$spacer: 1.618rem;
+$spacers: (
+        0: 0,
+        1: ($spacer * .309),
+        2: ($spacer * .618),
+        3: $spacer,
+        4: ($spacer * 1.618),
+        5: ($spacer * 3.2)
+);
+
+// Body
+$body-bg: $background-100;
+$body-color: $primary-800;
+
+// Links
+$link-color: $primary-300;
+$link-hover-color: $primary-200;
+
+// Grid columns
+$grid-columns: 12 !default;
+$grid-gutter-width: 30px !default;
+
+$input-color: $primary;
+$input-group-addon-bg: $primary-200;
+$input-border-color: $primary-300;
+$input-border-radius: 0;
+
+// Fonts
+$font-size-base: 1rem !default;
+$font-size-lg: 1.618rem;
+$font-size-sm: $font-size-base/$font-size-lg*1.2;
+
+$line-height-base: 1.618;
+
+$h6-font-size: $font-size-base;
+$h5-font-size: $h6-font-size + $font-size-base/$font-size-lg/2;
+$h4-font-size: $font-size-lg;
+$h3-font-size: $h4-font-size+ $h6-font-size/2;
+$h2-font-size: $h3-font-size + $h5-font-size/2;
+$h1-font-size: $h2-font-size + $h4-font-size/2;
+
+$lead-font-size: $font-size-lg;
+
+// Tables
+$table-hover-bg: $primary-100;
+$table-border-color: $primary-200;
+
+// Forms
+$input-focus-border-color: $primary-200;
+$input-focus-box-shadow: $primary-200;
+
+// Tooltip
+$tooltip-color: $body-color;
+$tooltip-bg: $primary-100;
+$tooltip-opacity: 1;
+$tooltip-padding-y: 1rem;
+$tooltip-padding-x: 1rem;
+$tooltip-arrow-width: 0;
+
+// Dropdown
+$dropdown-link-hover-bg: $primary-100;
+
+// Pagination
+$pagination-color: $body-color;
+$pagination-bg: $secondary-100;
+$pagination-border-color: $pagination-bg;
+
+$pagination-hover-color: $body-bg;
+$pagination-hover-bg: $secondary-300;
+$pagination-hover-border-color: $pagination-hover-bg;
+
+$pagination-active-color: $pagination-hover-color;
+$pagination-active-bg: $pagination-hover-bg;
+$pagination-active-border-color: $pagination-active-bg;
+
+$pagination-disabled-color: $foreground-500;
+$pagination-disabled-bg: $pagination-bg;
+$pagination-disabled-border-color: $pagination-bg;

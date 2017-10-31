@@ -1,25 +1,14 @@
-@import "caslon";
+/*
+ * scss definitions: main
+ *
+ * @author    Ingo Beyritz
+ * @copyright Copyright (c) 2017, Ingo Beyritz
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
 
-$font-family-sans-serif: librecaslon, -apple-system, blinkmacsystemfont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", arial, sans-serif;
-$font-family-base: $font-family-sans-serif;
+@import "pre-bootstrap";
 
-$country-colour: #d5bb99;
-$bg-colour: #cddfe6;
-
-$sat: saturation($bg-colour);
-$lit: lightness($bg-colour);
-$hue: hue($bg-colour);
-
-$mix-weight: 20%;
-
-@function colour-mixin($colour) {
-  @return mix(hsl(hue($colour), $sat, $lit), $colour, $mix-weight);
-}
-
-$in-colour: colour-mixin(darken($country-colour, 60%));
-$out-colour: colour-mixin(darken($country-colour, 40%));
-$voronoi-colour: $out-colour;
-$background-colour: colour-mixin(lighten($country-colour, 10%));
+@import "~bootstrap/scss/bootstrap";
 
 html {
   font-family: $font-family-base;
@@ -27,125 +16,22 @@ html {
   line-height: 1.618rem;
 }
 
-.na-country {
-  fill: $country-colour;
-  stroke-width: 3;
-  stroke: $out-colour;
-  stroke-opacity: .4;
+//////////////////////////////////////////
+// opentype
+
+$opentype-features: "liga", "kern", "dlig", "onum", "calt";
+$opentype-features-tnum: "liga", "kern", "dlig", "tnum", "onum" off, "calt";
+
+body,
+html,
+button {
+  font-family: $font-family-base;
+  font-feature-settings: $opentype-features;
 }
 
-.background {
-  fill: $background-colour;
-  pointer-events: all;
+table,
+.page-link {
+  font-feature-settings: $opentype-features-tnum;
 }
 
-.na-port-in {
-  fill: $in-colour;
-}
-
-.na-port-out {
-  fill: $out-colour;
-  font-style: italic;
-}
-
-text {
-  pointer-events: none;
-  text-anchor: start;
-}
-
-.label-rect {
-  fill: transparent;
-}
-
-.voronoi {
-  fill: none;
-  stroke: $voronoi-colour;
-  stroke-width: .5px;
-}
-
-table {
-  max-width: 50rem;
-  border-collapse: collapse;
-}
-
-tr:not(:last-of-type) {
-  border-top: 1px solid colour-mixin(darken($country-colour, 10%));
-  border-bottom: 1px solid colour-mixin(darken($country-colour, 10%));
-}
-
-td {
-  vertical-align: top;
-  &:not(:last-of-type) {
-    padding-right: .5rem;
-  }
-}
-
-.d3-tip {
-  padding: .7rem;
-  font-size: smaller;
-  color: $in-colour;
-  text-align: left;
-  background: $background-colour;
-  box-shadow: 0 14px 28px rgba(colour-mixin(darken($country-colour, 50%)), .25), 0 10px 10px rgba(colour-mixin(darken($country-colour, 50%)), .22);
-}
-
-// modal
-$modal-border-radius: 0;
-$modal-color: $in-colour;
-$modal-inner-background: $background-colour;
-
-@import "~css-modal/modal";
-
-.modal--show {
-  line-height: inherit;
-
-  footer {
-    background-color: inherit;
-  }
-
-  .close-action {
-    display: inline-block;
-    padding: .6em 1em;
-    text-decoration: none;
-    background: $bg-colour;
-    border-radius: 4px;
-    transition: .1s;
-  }
-}
-
-.flag-icon {
-  display: inline-block;
-  width: 2rem;
-  margin-right: .4rem;
-  background-repeat: no-repeat;
-  background-size: contain;
-
-  &::before {
-    content: "\00a0";
-  }
-}
-
-$flags-dir: "~Icons";
-$flags: n0, // Neutral
-n1, // Pirates
-n2, // Spain
-n3, // France
-n4, // Great Britain
-n5, // Netherlands
-n6, // Danmark
-n7, // Sweden
-n8, // USA
-n9, // Free town
-n10, // Russian Empire
-n11, // Kingdom of Prussia
-n12; // Commonwealth of Poland
-
-@mixin flags {
-  @each $flag in $flags {
-    .flag-icon.#{$flag} {
-      background-image: url("#{$flags-dir}/#{$flag}.svg");
-    }
-  }
-}
-
-@include flags;
+@import "display";
