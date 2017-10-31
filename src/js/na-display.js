@@ -266,14 +266,14 @@ export default function naDisplay() {
 
     function naTooltip(d) {
         let h;
-        h = "<table><tbody<tr><td class='align-middle'><i class='flag-icon " + d.nation + "'></i></td>";
-        h += "<td class='align-middle port-name'>" + d.name + "</td></tr></tbody></table>";
-        h += "<p class='text-left'>" + (d.shallow ? "Shallow" : "Deep");
+        h = "<table><tbody<tr><td><i class='flag-icon " + d.nation + "'></i></td>";
+        h += "<td class='port-name'>" + d.name + "</td></tr></tbody></table>";
+        h += "<p>" + (d.shallow ? "Shallow" : "Deep");
         h += " water port";
         if (d.countyCapital) {
             h += ", county capital";
         }
-        if(!d.nonCapturable) {
+        if (!d.nonCapturable) {
             h += ", " + d.brLimit + " BR limit";
         } else {
             h += ", not capturable";
@@ -284,20 +284,13 @@ export default function naDisplay() {
         h += "</p>";
         h += "<table class='table table-sm'>";
         if (d.produces.length) {
-            h +=
-                "<tr><th scope='row' class='text-left'>Produces</th><td class='text-left'>" +
-                d.produces.join(", ") +
-                "</td></tr>";
+            h += "<tr><td>Produces</td><td>" + d.produces.join(", ") + "</td></tr>";
         }
         if (d.drops.length) {
-            h +=
-                "<tr><th scope='row' class='text-left'>Drops</th><td class='text-left'>" + d.drops.join(", ") + "</tr>";
+            h += "<tr><td>Drops</td><td>" + d.drops.join(", ") + "</tr>";
         }
         if (d.consumes.length) {
-            h +=
-                "<tr><th scope='row' class='text-left'>Consumes</th><td class='text-left'>" +
-                d.consumes.join(", ") +
-                "</tr>";
+            h += "<tr><td>Consumes</td><td>" + d.consumes.join(", ") + "</tr>";
         }
         h += "</table>";
 

@@ -36,6 +36,15 @@ $background-colour: $primary-300;
   font-size: large;
 }
 
+table td {
+  vertical-align: middle;
+}
+
+table tr,
+p {
+  text-align: left;
+}
+
 text {
   pointer-events: none;
   text-anchor: start;
