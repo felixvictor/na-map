@@ -1,7 +1,5 @@
 #! /bin/bash
 
-# ogrinfo -geom=summary natural_earth/50m_cultural/ne_50m_admin_0_map_units.shp ne_50m_admin_0_map_units > ne_50m_admin_0_map_units.txt
-
 # Auflösung 10m, 50m oder 110m
 RES=10m
 
@@ -17,22 +15,26 @@ CLIP="-98 7.5 -59 35"
 
 OUT=na.json
 OUT_COUNTRIES=countries.geojson
-OUT_SHP_COUNTRIES=countries.shp
+OUT_SHP=countries.shp
+OUT_SQL=countries.sqlite
 IN_PORTS=ports.geojson
 
 rm -f ${OUT_COUNTRIES}
 
+#ogrinfo -geom=summary ${DIR}/${RES}/ne_${RES}_admin_0_map_units.shp ne_${RES}_admin_0_map_units > ne_${RES}_admin_0_map_units.txt
+
 ogr2ogr \
 	-clipsrc ${CLIP} \
-	${OUT_SHP_COUNTRIES} ${IN_SHP_COUNTRIES} 
+	${OUT_SHP} ${IN_SHP_COUNTRIES}
 
-$(yarn bin)/shp2json \
-	   --newline-delimited \
-	   ${OUT_SHP_COUNTRIES} | \
-    $(yarn bin)/ndjson-filter 'delete d.properties, true' | \
-    $(yarn bin)/ndjson-reduce 'p.features.push(d), p' '{type: "FeatureCollection", features: []}' \
-	   > ${OUT_COUNTRIES}
+ogr2ogr \
+    -f sqlite -dsco spatialite=yes ${OUT_SQL} ${OUT_SHP} \
+    -nlt promote_to_multi
 
+ogr2ogr \
+    -f GeoJSON -dialect sqlite \
+    -sql "select st_union(geometry) as geom from countries" \
+    ${OUT_COUNTRIES} ${OUT_SQL}
 
 $(yarn bin)/geo2topo \
 	   -o ${OUT}1 \
@@ -44,4 +46,4 @@ $(yarn bin)/topoquantize \
 	   1e4 \
 	   ${OUT}1
 
-rm -f ${OUT}1 ${OUT}2
+rm -f ${OUT}1 ${OUT_SQL}
