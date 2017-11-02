@@ -354,6 +354,7 @@ export default function naDisplay() {
             });
             d.properties.nation = "n" + t[0].Nation;
             d.properties.capturer = t[0].Capturer;
+            d.properties.brLimit = t[0].PortBattleBRLimit;
         });
     }
 
