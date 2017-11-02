@@ -15,14 +15,7 @@ function main() {
     naDisplay();
     window.onload = function() {
         $("#modal")
-            .modal("show")
-            .on("hidden.bs.modal", function(e) {
-                $('[data-toggle="tooltip"]').tooltip({
-                    delay: { show: 100, hide: 100 },
-                    html: true,
-                    placement: "auto"
-                });
-            });
+            .modal("show");
     };
 }
 
