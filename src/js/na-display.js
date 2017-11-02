@@ -254,17 +254,30 @@ export default function naDisplay() {
         // Port circle colour and size
         gPorts
             .selectAll(".label circle")
+                        //.attr("id", function(d) { return d.properties.id; })
             .attr("r", 10)
             .attr("fill", function(d) {
                 return "url(#" + d.properties.nation + ")";
             })
+            on("mouseover", function(d) {
+                      let circle = d3.select(this);
+        circle
             .attr("data-toggle", "tooltip")
             .attr("title", function(d) {
-                return naTooltip(d.properties);
+                return naTooltipData(d.properties);
             });
+        //$("#" + d.properties.id).tooltip("show");
+        circle.tooltip({
+                    delay: { show: 100, hide: 100 },
+                    html: true,
+                    placement: "auto"
+                });
+        circle.tooltip("show");
+})
+            on("mouseout", d3.select(this).tooltip("hide"));
     }
 
-    function naTooltip(d) {
+    function naTooltipData(d) {
         let h;
         h = "<table><tbody<tr><td><i class='flag-icon " + d.nation + "'></i></td>";
         h += "<td class='port-name'>" + d.name + "</td></tr></tbody></table>";
