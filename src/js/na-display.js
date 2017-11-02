@@ -44,6 +44,7 @@ export default function naDisplay() {
     let naProjection, naPath, naSvg, naDefs, naZoom;
     let gPorts, gCountries, gVoronoi;
     let naCountries, naPorts;
+    const naFontSize = parseInt(window.getComputedStyle(document.getElementById("na")).fontSize);
     const naMapJson = "na.json";
 
     function naSetupProjection() {
@@ -101,13 +102,7 @@ export default function naDisplay() {
         gVoronoi.attr("transform", transform);
 
         gPorts.selectAll(".label text").style("font-size", function(d) {
-            let f;
-            if (!d.properties.shallow && !d.properties.countyCapital) {
-                f = "14 / transform.k";
-            } else {
-                f = "14 / transform.k";
-            }
-            return f;
+            return "naFontSize / transform.k";
         });
 
         gPorts.selectAll(".label circle").attr("r", 10 / transform.k);
