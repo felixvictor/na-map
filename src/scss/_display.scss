@@ -8,7 +8,6 @@
 
 $in-colour: $primary-900;
 $out-colour: $primary-700;
-$voronoi-colour: $out-colour;
 $background-colour: $primary-300;
 
 .na-country {
@@ -56,8 +55,13 @@ text {
 
 .voronoi {
   fill: none;
-  stroke: $voronoi-colour;
+  stroke: $primary-700;
   stroke-width: .5px;
+}
+
+.highlight-voronoi {
+  fill: $primary-400;
+  stroke-width: 5px;
 }
 
 .tooltip {

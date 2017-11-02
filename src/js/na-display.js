@@ -8,7 +8,7 @@ import { geoEquirectangular as d3geoEquirectangular, geoPath as d3GeoPath } from
 import { queue as d3Queue } from "d3-queue";
 import { json as d3Json, request as d3Request } from "d3-request";
 // event needs live-binding
-import { event as currentD3Event, select as d3Select } from "d3-selection";
+import { event as currentD3Event, mouse as currentD3mouse, select as d3Select } from "d3-selection";
 import { voronoi as d3Voronoi } from "d3-voronoi";
 import { zoom as d3Zoom } from "d3-zoom";
 
@@ -42,7 +42,7 @@ export default function naDisplay() {
 
     let naWidth, naHeight;
     let naProjection, naPath, naSvg, naDefs, naZoom;
-    let gPorts, gCountries, gVoronoi;
+    let gPorts, gCountries, gVoronoi, naCurrentVoronoi;
     let naCountries, naPorts;
     const naFontSize = parseInt(window.getComputedStyle(document.getElementById("na")).fontSize);
     const naMapJson = "na.json";
@@ -250,7 +250,7 @@ export default function naDisplay() {
         gPorts
             .selectAll(".label circle")
             .attr("id", function(d) {
-                return d.properties.id;
+                return "p" + d.properties.id;
             })
             .attr("r", 10)
             .attr("fill", function(d) {
@@ -263,7 +263,7 @@ export default function naDisplay() {
                     .attr("title", function(d) {
                         return naTooltipData(d.properties);
                     });
-                $("#" + d.properties.id)
+                $("#p" + d.properties.id)
                     .tooltip({
                         delay: { show: 100, hide: 100 },
                         html: true,
@@ -272,7 +272,7 @@ export default function naDisplay() {
                     .tooltip("show");
             })
             .on("mouseout", function(d) {
-                $("#" + d.properties.id).tooltip("hide");
+                $("#p" + d.properties.id).tooltip("hide");
             });
     }
 
@@ -331,18 +331,54 @@ export default function naDisplay() {
             .enter()
             .append("g");
 
+        // limit how far away the mouse can be from finding a voronoi site
+        const voronoiRadius = naWidth / 10;
+        const naVoronoi = d3.voronoi().extent([[-1, -1], [naWidth + 1, naHeight + 1]]);
+        const naVoronoiDiagram = naVoronoi(ports.map(naProjection));
+
         // Draw teleport areas
         gVoronoi
             .append("path")
-            .data(
-                d3
-                    .voronoi()
-                    .extent([[-1, -1], [naWidth + 1, naHeight + 1]])
-                    .polygons(ports.map(naProjection))
-            )
+            .data(naVoronoi.polygons(ports.map(naProjection)))
             .attr("d", function(d) {
                 return d ? "M" + d.join("L") + "Z" : null;
+            })
+            .attr("pointer-events", "visibleFill")
+            .on("mouseover", function(d) {
+                // get the current mouse position
+                let ref = currentD3mouse(this);
+                const mx = ref[0],
+                    my = ref[1];
+
+                // use the new diagram.find() function to find the voronoi site closest to
+                // the mouse, limited by max distance defined by voronoiRadius
+                const site = naVoronoiDiagram.find(mx, my, voronoiRadius);
+                //console.log("site: " + site.index);
+                naCurrentVoronoi = gVoronoi._groups[0][site.index];
+                naCurrentVoronoi.classList.add("highlight-voronoi");
+                // highlight the point if we found one, otherwise hide the highlight circle
+                //naVoronoiHighlight(site.data, site.index);
+            })
+            .on("mouseout", function() {
+                // hide the highlight circle when the mouse leaves the chart
+                //naVoronoiHighlight(null);
+                naCurrentVoronoi.classList.remove("highlight-voronoi");
             });
+    }
+
+    // callback to highlight a point
+    function naVoronoiHighlight(d, id) {
+        console.log("d: " + d);
+        // no point to highlight - hide the circle and clear the text
+        if (!d) {
+            d3.select("#p" + id).attr("r", 10);
+            // otherwise, show the highlight circle at the correct position
+        } else {
+            d3
+                .select("#p" + id)
+                .style("display", "")
+                .attr("r", 30);
+        }
     }
 
     // Replace nation with live data from server
