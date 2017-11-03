@@ -322,7 +322,7 @@ export default function naDisplay() {
             })
             // Map to coordinates array
             .map(function(d) {
-                return [d.geometry.coordinates[0], d.geometry.coordinates[1]];
+                return {coord: [d.geometry.coordinates[0], d.geometry.coordinates[1]], id: d.properties.id};
             });
 
         // Append group with class .voronoi
@@ -338,14 +338,17 @@ export default function naDisplay() {
         // limit how far away the mouse can be from finding a voronoi site
         const voronoiRadius = naWidth / 10;
         const naVoronoi = d3.voronoi().extent([[-1, -1], [naWidth + 1, naHeight + 1]]);
-        const naVoronoiDiagram = naVoronoi(ports.map(naProjection));
+        const naVoronoiDiagram = naVoronoi(ports.coord.map(naProjection));
 
         // Draw teleport areas
         gVoronoi
             .append("path")
-            .data(naVoronoi.polygons(ports.map(naProjection)))
+            .data(naVoronoi.polygons(ports.coord.map(naProjection)))
+            .attr("id", function(d) {
+                return "v" + d.id;
+            })
             .attr("d", function(d) {
-                return d ? "M" + d.join("L") + "Z" : null;
+                return d ? "M" + d.coord.join("L") + "Z" : null;
             })
             .attr("pointer-events", "visibleFill")
             .on("mouseover", function(d) {
