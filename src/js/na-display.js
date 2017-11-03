@@ -121,18 +121,53 @@ export default function naDisplay() {
             .append("feColorMatrix")
             .attr("in", "SourceGraphic")
             .attr("type", "matrix")
-            .attr("values", "0 0 0 0 0.3  0 0 0 0 0.26  0 0 0 0 0.21  0 0 0 1 0")
-            .attr("result", "fcoloredMask");
+            .attr("values", "0 0 0 0 0.302  0 0 0 0 0.263  0 0 0 0 0.216  0 0 0 1 0")
+            .attr("result", "fmask");
 
         naFilter
             .append("feGaussianBlur")
-            .attr("in", "fcoloredMask")
+            .attr("in", "fmask")
             .attr("stdDeviation", 15)
-            .attr("result", "fblur");
+            .attr("result", "f1blur");
+            
+        naFilter
+            .append("feColorMatrix")
+            .attr("in", "SourceGraphic")
+            .attr("type", "matrix")
+            .attr("values", "0 0 0 0 0   0 0 0 0 0   0 0 0 0 0   0 0 0 1 0")
+            .attr("result", "f2mask1");
+            
+        naFilter
+            .append("feMorphology")
+            .attr("in", "f2mask1")
+            .attr("radius", 1)
+            .attr("operator", "erode")
+            .attr("result", "f2m");
+            
+        naFilter
+            .append("feGaussianBlur")
+            .attr("in", "f2m")
+            .attr("stdDeviation", 5)
+            .attr("result", "f2blur");
+            
+        naFilter
+            .append("feColorMatrix")
+            .attr("in", "f2blur")
+            .attr("type", "matrix")
+            .attr("values", "1 0 0 0 0.302 0 1 0 0 0.263 0 0 1 0 0.216 0 0 0 -1 1")
+            .attr("result", "f2mask2");
 
+        naFilter
+            .append("feComposite")
+            .attr("operator", "in")
+            .attr("in", "f2mask2")
+            .attr("in2", "f2mask1")
+            .attr("result", "f2border");
+            
         let feMerge = naFilter.append("feMerge");
-        feMerge.append("feMergeNode").attr("in", "fblur");
+        feMerge.append("feMergeNode").attr("in", "f1blur");
         feMerge.append("feMergeNode").attr("in", "SourceGraphic");
+        feMerge.append("feMergeNode").attr("in", "f2border");
 
         gCountries = naSvg.append("g");
 
