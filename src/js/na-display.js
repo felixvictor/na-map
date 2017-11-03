@@ -121,48 +121,17 @@ export default function naDisplay() {
             .append("feColorMatrix")
             .attr("in", "SourceGraphic")
             .attr("type", "matrix")
-            .attr("values", "0 0 0 0 0.6  0 0 0 0 0.5  0 0 0 0 0.5  0 0 0 1 0")
-            .attr("result", "f1coloredMask");
+            .attr("values", "0 0 0 0 0.3  0 0 0 0 0.26  0 0 0 0 0.21  0 0 0 1 0")
+            .attr("result", "fcoloredMask");
 
         naFilter
             .append("feGaussianBlur")
-            .attr("in", "f1coloredMask")
+            .attr("in", "fcoloredMask")
             .attr("stdDeviation", 15)
-            .attr("result", "f1blur");
-
-        naFilter
-            .append("feColorMatrix")
-            .attr("in", "SourceGraphic")
-            .attr("type", "matrix")
-            .attr("values", "0 0 0 0 0   0 0 0 0 0   0 0 0 0 0   0 0 0 500 0")
-            .attr("result", "f2mask");
-        naFilter
-            .append("feMorphology")
-            .attr("in", "f2mask")
-            .attr("radius", "1")
-            .attr("operator", "erode")
-            .attr("result", "f2r1");
-        naFilter
-            .append("feGaussianBlur")
-            .attr("in", "f2r1")
-            .attr("stdDeviation", "4")
-            .attr("result", "f2r2");
-        naFilter
-            .append("feColorMatrix")
-            .attr("in", "f2r2")
-            .attr("type", "matrix")
-            .attr("values", "1 0 0 0 0.58  0 1 0 0 0.36  0 0 1 0 0.11  0 0 0 -1 1")
-            .attr("result", "f2r3");
-        naFilter
-            .append("feComposite")
-            .attr("operator", "in")
-            .attr("in", "f2r3")
-            .attr("in2", "f2mask")
-            .attr("result", "f2comp");
+            .attr("result", "fblur");
 
         let feMerge = naFilter.append("feMerge");
-        feMerge.append("feMergeNode").attr("in", "f1blur");
-        feMerge.append("feMergeNode").attr("in", "f2comp");
+        feMerge.append("feMergeNode").attr("in", "fblur");
         feMerge.append("feMergeNode").attr("in", "SourceGraphic");
 
         gCountries = naSvg.append("g");
