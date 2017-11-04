@@ -20,7 +20,7 @@ import {
 
 import { feature as topojsonFeature } from "topojson-client";
 
-export default function naDisplay() {
+export default function naDisplay(serverName) {
     const d3 = {
             geoEquirectangular: d3geoEquirectangular,
             geoPath: d3GeoPath,
@@ -45,7 +45,7 @@ export default function naDisplay() {
     let gPorts, gCountries, gVoronoi, naCurrentVoronoi;
     let naCountries, naPorts;
     const naFontSize = parseInt(window.getComputedStyle(document.getElementById("na")).fontSize);
-    const naMapJson = "na.json";
+    const naMapJson = serverName + ".json";
 
     function naSetupProjection() {
         const naMargin = { top: 0, right: 0, bottom: 0, left: 0 };
@@ -95,8 +95,6 @@ export default function naDisplay() {
     }
 
     function naZoomed() {
-        const transform = currentD3Event.transform;
-
         gCountries.attr("transform", transform);
         gPorts.attr("transform", transform);
         gVoronoi.attr("transform", transform);
@@ -129,27 +127,27 @@ export default function naDisplay() {
             .attr("in", "fmask")
             .attr("stdDeviation", 15)
             .attr("result", "f1blur");
-            
+
         naFilter
             .append("feColorMatrix")
             .attr("in", "SourceGraphic")
             .attr("type", "matrix")
             .attr("values", "0 0 0 0 0   0 0 0 0 0   0 0 0 0 0   0 0 0 1 0")
             .attr("result", "f2mask1");
-            
+
         naFilter
             .append("feMorphology")
             .attr("in", "f2mask1")
             .attr("radius", 1)
             .attr("operator", "erode")
             .attr("result", "f2m");
-            
+
         naFilter
             .append("feGaussianBlur")
             .attr("in", "f2m")
             .attr("stdDeviation", 5)
             .attr("result", "f2blur");
-            
+
         naFilter
             .append("feColorMatrix")
             .attr("in", "f2blur")
@@ -163,7 +161,7 @@ export default function naDisplay() {
             .attr("in", "f2mask2")
             .attr("in2", "f2mask1")
             .attr("result", "f2border");
-            
+
         let feMerge = naFilter.append("feMerge");
         feMerge.append("feMergeNode").attr("in", "f1blur");
         feMerge.append("feMergeNode").attr("in", "SourceGraphic");
@@ -182,12 +180,12 @@ export default function naDisplay() {
     function naDisplayPorts() {
         const labelPadding = 3;
 
-        const naNations = 12;
+        const naNations = ["DE", "DK", "ES", "FR", "FT", "GB", "NL", "NT", "PL", "PR", "RU", "SE", "US"];
 
-        for (let i = 0; i <= naNations; i++) {
+        naNations.forEach(function(nation) {
             naDefs
                 .append("pattern")
-                .attr("id", "n" + i)
+                .attr("id", nation)
                 .attr("x", "0%")
                 .attr("y", "0%")
                 .attr("width", "100%")
@@ -198,8 +196,8 @@ export default function naDisplay() {
                 .attr("y", "0")
                 .attr("height", "50")
                 .attr("width", "50")
-                .attr("xlink:href", "icons/n" + i + ".svg");
-        }
+                .attr("xlink:href", "icons/" + nation + ".svg");
+        });
 
         // the component used to render each label
         let textLabel = fc
@@ -322,7 +320,7 @@ export default function naDisplay() {
             })
             // Map to coordinates array
             .map(function(d) {
-                return {coord: [d.geometry.coordinates[0], d.geometry.coordinates[1]], id: d.properties.id};
+                return [d.geometry.coordinates[0], d.geometry.coordinates[1]];
             });
 
         // Append group with class .voronoi
@@ -338,17 +336,14 @@ export default function naDisplay() {
         // limit how far away the mouse can be from finding a voronoi site
         const voronoiRadius = naWidth / 10;
         const naVoronoi = d3.voronoi().extent([[-1, -1], [naWidth + 1, naHeight + 1]]);
-        const naVoronoiDiagram = naVoronoi(ports.coord.map(naProjection));
+        const naVoronoiDiagram = naVoronoi(ports.map(naProjection));
 
         // Draw teleport areas
         gVoronoi
             .append("path")
-            .data(naVoronoi.polygons(ports.coord.map(naProjection)))
-            .attr("id", function(d) {
-                return "v" + d.id;
-            })
+            .data(naVoronoi.polygons(ports.map(naProjection)))
             .attr("d", function(d) {
-                return d ? "M" + d.coord.join("L") + "Z" : null;
+                return d ? "M" + d.join("L") + "Z" : null;
             })
             .attr("pointer-events", "visibleFill")
             .on("mouseover", function(d) {
@@ -388,20 +383,7 @@ export default function naDisplay() {
         }
     }
 
-    // Replace nation with live data from server
-    function naSetNation(naServerData) {
-        naPorts.features.map(function(d) {
-            // Ports from external json
-            let t = Ports.filter(function(live) {
-                return live.Id === d.properties.id;
-            });
-            d.properties.nation = "n" + t[0].Nation;
-            d.properties.capturer = t[0].Capturer;
-            d.properties.brLimit = t[0].PortBattleBRLimit;
-        });
-    }
-
-    function naReady(error, naMap, naServerData) {
+    function naReady(error, naMap) {
         if (error) {
             throw error;
         }
@@ -413,7 +395,6 @@ export default function naDisplay() {
         naSetupProjection();
         naSetupCanvas();
 
-        naSetNation(naServerData);
         naDisplayTeleportAreas();
         naDisplayCountries();
         naDisplayPorts();
