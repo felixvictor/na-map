@@ -89,19 +89,19 @@ text {
 }
 
 $flags-dir: "~Icons";
-$flags: n0, // Neutral
-n1, // Pirates
-n2, // Spain
-n3, // France
-n4, // Great Britain
-n5, // Netherlands
-n6, // Danmark
-n7, // Sweden
-n8, // USA
-n9, // Free town
-n10, // Russian Empire
-n11, // Kingdom of Prussia
-n12; // Commonwealth of Poland
+$flags: "NT", // Neutral
+"PR", // Pirates
+"ES", // Spain
+"FR", // France
+"GB", // Great Britain
+"NL", // Netherlands
+"DK", // Danmark
+"SE", // Sweden
+"US", // USA
+"FT", // Free town
+"RU", // Russian Empire
+"DE", // Kingdom of Prussia
+"PL"; // Commonwealth of Poland
 
 @mixin flags {
   @each $flag in $flags {

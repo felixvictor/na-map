@@ -42,8 +42,12 @@ $(yarn bin)/geo2topo \
 	   ${IN_PORTS}
 
 $(yarn bin)/topoquantize \
-	   -o ../public/${OUT} \
+	   -o ${OUT} \
 	   1e4 \
 	   ${OUT}1
 
-rm -f ${OUT}1 ${OUT_SQL}
+for SERVER_NAME in "eu1" "eu2" "us2"; do
+    cp ${OUT} "../public/${SERVER_NAME}.json"
+done
+
+rm -f ${OUT} ${OUT}1 ${OUT_SQL}
