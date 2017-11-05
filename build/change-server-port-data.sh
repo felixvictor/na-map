@@ -41,8 +41,8 @@ function get-file () {
 }
 
 if [ "$1" == "update" ]; then
-    GIT_DIR=na-topo.git
-    cd "$HOME/${GIT_DIR}"
+    GIT_DIR="$HOME/na-topo.git"
+    cd "${GIT_DIR}"
     yarn --silent
     get-git-update
 else
