@@ -95,12 +95,14 @@ export default function naDisplay(serverName) {
     }
 
     function naZoomed() {
+        let transform = currentD3Event.transform;
+
         gCountries.attr("transform", transform);
         gPorts.attr("transform", transform);
         gVoronoi.attr("transform", transform);
 
         gPorts.selectAll(".label text").style("font-size", function(d) {
-            return "naFontSize / transform.k";
+            return naFontSize / transform.k;
         });
 
         gPorts.selectAll(".label circle").attr("r", 10 / transform.k);

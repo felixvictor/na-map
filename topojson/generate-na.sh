@@ -47,7 +47,7 @@ $(yarn bin)/topoquantize \
 	   ${OUT}1
 
 for SERVER_NAME in "eu1" "eu2" "us2"; do
-    cp ${OUT} "../public/${SERVER_NAME}.json"
+    cp "${OUT}" "${SERVER_NAME}.json"
 done
 
 rm -f ${OUT} ${OUT}1 ${OUT_SQL}
