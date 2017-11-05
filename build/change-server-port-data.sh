@@ -9,7 +9,7 @@ function get-git-update () {
 }
 
 function push-git-update () {
-    git add --ignore-errors
+    git add --ignore-errors "${GIT_DIR}"
     git diff-index --quiet HEAD || git commit -m "change server port data"
     git push
 }
