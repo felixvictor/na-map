@@ -53,7 +53,7 @@ fi
 change-port-data
 
 if [ "$1" == "update" ]; then
-    cd "$HOME/${GIT_DIR}"
     push-git-update
+    #yarn run deploy
 fi
 
