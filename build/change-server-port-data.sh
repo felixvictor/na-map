@@ -54,6 +54,6 @@ change-port-data
 
 if [ "$1" == "update" ]; then
     push-git-update
-    #yarn run deploy
+    yarn run deploy
 fi
 
