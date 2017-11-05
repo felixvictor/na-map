@@ -57,7 +57,8 @@
   "scripts": {
     "clean": "rm -rf public/js public/css",
     "css-lint": "stylelint --config .stylelintrc --syntax scss \"src/scss/*.scss\"",
-    "deploy": "yarn run prod && yarn run update-ports && yarn run push && cd public && netlify deploy",
+    "deploy": "yarn run prod && yarn run update-ports && yarn run push && yarn run deploy-netlify",
+    "deploy-netlify": "cd public && netlify deploy",
     "js-lint": "eslint -c .eslintrc.json src/js",
     "prettier": "prettier --tab-width 4 --print-width 120 --write .eslintrc.json package.json *.js src/js/*.json src/scss/*.scss",
     "prod": "yarn run clean && NODE_ENV=${NODE_ENV:=prod} webpack --colors --config webpack.config.js",
