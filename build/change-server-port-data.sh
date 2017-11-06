@@ -3,7 +3,7 @@
 SERVER_BASE_NAME="cleanopenworldprod"
 SOURCE_BASE_URL="http://storage.googleapis.com/nacleanopenworldprodshards/"
 DATE=$(date +%Y-%m-%d)
-LAST_UPDATE_FILE=".last-port-update"
+LAST_UPDATE_FILE="build/.last-port-update"
 LAST_UPDATE=$(date --reference="${LAST_UPDATE_FILE}" +%Y-%m-%d)
 
 function get-git-update () {
