@@ -12,7 +12,7 @@ function get-git-update () {
 
 function push-git-update () {
     git add --ignore-errors "${GIT_DIR}"
-    if [ git diff-index --quiet HEAD ]; then
+    if [[ -z $(git status -s) ]]; then
         git commit -m "change server port data"
         touch "${LAST_UPDATE_FILE}"
     fi
