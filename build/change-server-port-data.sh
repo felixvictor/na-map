@@ -15,8 +15,8 @@ function push-git-update-deploy () {
     if [[ -z $(git status -s) ]]; then
         git commit -m "change server port data"
         touch "${LAST_UPDATE_FILE}"
-	git push
-	yarn run deploy-netlify
+	    git push
+	    yarn run deploy-netlify
     fi
 }
 
