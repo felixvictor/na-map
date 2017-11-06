@@ -3,6 +3,8 @@
 SERVER_BASE_NAME="cleanopenworldprod"
 SOURCE_BASE_URL="http://storage.googleapis.com/nacleanopenworldprodshards/"
 DATE=$(date +%Y-%m-%d)
+LAST_UPDATE_FILE=".last-port-update"
+LAST_UPDATE=$(date --reference="${LAST_UPDATE_FILE}" +%Y-%m-%d)
 
 function get-git-update () {
     git pull
@@ -10,7 +12,10 @@ function get-git-update () {
 
 function push-git-update () {
     git add --ignore-errors "${GIT_DIR}"
-    git diff-index --quiet HEAD || git commit -m "change server port data"
+    if [ git diff-index --quiet HEAD ]; then
+        git commit -m "change server port data"
+        touch "${LAST_UPDATE_FILE}"
+    fi
     git push
 }
 
@@ -40,20 +45,25 @@ function get-file () {
     fi
 }
 
-if [ "$1" == "update" ]; then
-    GIT_DIR="$HOME/na-topo.git"
-    cd "${GIT_DIR}"
-    yarn --silent
-    get-git-update
-else
-    GIT_DIR=$(pwd)
-    copy-geojson
+if [ "$1" != "update" ]; then
+    LAST_UPDATE=""
 fi
 
-change-port-data
-
-if [ "$1" == "update" ]; then
-    push-git-update
-    yarn run deploy-netlify
+if [ "${LAST_UPDATE}" != "${DATE}" ]; then
+    if [ "$1" == "update" ]; then
+        GIT_DIR="$HOME/na-topo.git"
+        cd "${GIT_DIR}"
+        yarn --silent
+        get-git-update
+    else
+        GIT_DIR=$(pwd)
+        copy-geojson
+    fi
+    
+    change-port-data
+    
+    if [ "$1" == "update" ]; then
+        push-git-update
+        yarn run deploy-netlify
+    fi
 fi
-
