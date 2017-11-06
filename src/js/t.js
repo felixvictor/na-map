@@ -1,8 +1,7 @@
-
 function naDisplayTeleportAreas() {
     // Extract port coordinates
     let ports = naPorts.features
-    // Use only ports that deep water ports and not a county capital
+        // Use only ports that deep water ports and not a county capital
         .filter(function(d) {
             return !d.properties.shallow && !d.properties.countyCapital;
         })
@@ -12,7 +11,7 @@ function naDisplayTeleportAreas() {
             //                return [d.geometry.coordinates[0], d.geometry.coordinates[1]];
         });
     let projectedPorts = ports
-    // Map to coordinates array
+        // Map to coordinates array
         .map(function(d) {
             return d.coord;
         });
