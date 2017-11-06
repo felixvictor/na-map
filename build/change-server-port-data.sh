@@ -10,13 +10,14 @@ function get-git-update () {
     git pull
 }
 
-function push-git-update () {
+function push-git-update-deploy () {
     git add --ignore-errors "${GIT_DIR}"
     if [[ -z $(git status -s) ]]; then
         git commit -m "change server port data"
         touch "${LAST_UPDATE_FILE}"
+	git push
+	yarn run deploy-netlify
     fi
-    git push
 }
 
 function copy-geojson() {
@@ -63,7 +64,6 @@ if [ "${LAST_UPDATE}" != "${DATE}" ]; then
     change-port-data
     
     if [ "$1" == "update" ]; then
-        push-git-update
-        yarn run deploy-netlify
+        push-git-update-deploy
     fi
 fi
