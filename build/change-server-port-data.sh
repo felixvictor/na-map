@@ -64,7 +64,6 @@ fi
 
 if [ "${LAST_UPDATE}" != "${DATE}" ]; then
     if [ "$1" == "update" ]; then
-        cd "${GIT_DIR}"
         yarn --silent
         get-git-update
     else
