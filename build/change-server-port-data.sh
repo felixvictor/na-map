@@ -1,17 +1,21 @@
 #!/usr/bin/env bash
 
+set -e
+
 if [ "$1" == "update" ]; then
-    GIT_DIR="$HOME/na-topo.git"
+    GIT_DIR="/home/natopo/na-topo.git"
 else
     GIT_DIR=$(pwd)
 fi
+cd "${GIT_DIR}"
+
 SERVER_BASE_NAME="cleanopenworldprod"
 SOURCE_BASE_URL="http://storage.googleapis.com/nacleanopenworldprodshards/"
 DATE=$(date +%Y-%m-%d)
 LAST_UPDATE_FILE="${GIT_DIR}/build/.last-port-update"
 
 # If file not exists create it with date of last commit
-[[ ! -f "${LAST_UPDATE_FILE}" ]] && touch -d $(git log -1 --format=%cI) "${LAST_UPDATE_FILE}"
+[[ ! -f "${LAST_UPDATE_FILE}" ]] && touch -d "$(git log -1 --format=%cI)" "${LAST_UPDATE_FILE}"
 LAST_UPDATE=$(date --reference="${LAST_UPDATE_FILE}" +%Y-%m-%d)
 
 function get-git-update () {
