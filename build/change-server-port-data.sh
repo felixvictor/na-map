@@ -1,9 +1,17 @@
 #!/usr/bin/env bash
 
+if [ "$1" == "update" ]; then
+    GIT_DIR="$HOME/na-topo.git"
+else
+    GIT_DIR=$(pwd)
+fi
 SERVER_BASE_NAME="cleanopenworldprod"
 SOURCE_BASE_URL="http://storage.googleapis.com/nacleanopenworldprodshards/"
 DATE=$(date +%Y-%m-%d)
-LAST_UPDATE_FILE="build/.last-port-update"
+LAST_UPDATE_FILE="${GIT_DIR}/build/.last-port-update"
+
+# If file not exists create it with date of last commit
+[[ ! -f "${LAST_UPDATE_FILE}" ]] && touch -d $(git log -1 --format=%cI) "${LAST_UPDATE_FILE}"
 LAST_UPDATE=$(date --reference="${LAST_UPDATE_FILE}" +%Y-%m-%d)
 
 function get-git-update () {
@@ -52,12 +60,10 @@ fi
 
 if [ "${LAST_UPDATE}" != "${DATE}" ]; then
     if [ "$1" == "update" ]; then
-        GIT_DIR="$HOME/na-topo.git"
         cd "${GIT_DIR}"
         yarn --silent
         get-git-update
     else
-        GIT_DIR=$(pwd)
         copy-geojson
     fi
     
