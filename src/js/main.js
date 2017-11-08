@@ -20,7 +20,6 @@ function main() {
             const serverName = $(this)
                 .find(".modal-result")
                 .attr("data-server");
-            console.log("server: " + serverName);
             naDisplay(serverName); // invoke the callback with result
         });
     window.onload = function() {
