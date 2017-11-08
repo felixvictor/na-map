@@ -23,6 +23,7 @@ function get-git-update () {
 function push-git-update-deploy () {
     git add --ignore-errors "${GIT_DIR}"
     if [[ -z $(git status -s) ]]; then
+        echo git status -s
         git commit -m "change server port data"
         touch "${LAST_UPDATE_FILE}"
 	    git push
