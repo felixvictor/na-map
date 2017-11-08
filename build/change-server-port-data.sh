@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-set -e
-
 if [ "$1" == "update" ]; then
     GIT_DIR="/home/natopo/na-topo.git"
 else
