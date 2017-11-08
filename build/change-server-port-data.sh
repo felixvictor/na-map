@@ -57,6 +57,8 @@ function get-file () {
     fi
 }
 
+echo 'change server port data'
+
 if [ "$1" != "update" ]; then
     LAST_UPDATE=""
 fi
