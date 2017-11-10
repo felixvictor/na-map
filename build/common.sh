@@ -14,7 +14,7 @@ function change-port-data () {
     # http://api.shipsofwar.net/servers?apikey=1ZptRtpXAyEaBe2SEp63To1aLmISuJj3Gxcl5ivl&callback=setActiveRealms
     for SERVER_NAME in "eu1" "eu2" "us2"; do
         GIT_FILE="public/${SERVER_NAME}.json"
-        API_FILE="./API-${SERVER_NAME}-${DATE}.json"
+        API_FILE="$(pwd)/API-${SERVER_NAME}-${DATE}.json"
         get-file "${SERVER_NAME}" "${API_FILE}"
         nodejs build/change-port-data.js "${GIT_FILE}" "${API_FILE}"
         rm "${API_FILE}"
