@@ -18,11 +18,11 @@
           "Mahogany Log"
         ],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Trinidad",
         "nonCapturable": false,
         "shallow": false,
-        "size": 4,
-        "brLimit": 6800,
+        "brLimit": 9600,
         "nation": "GB",
         "produces": ["Cotton", "Oak Log"]
       }
@@ -44,11 +44,11 @@
           "Textile Machinery"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Píritu",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "VP",
         "produces": ["Sugar"]
       }
@@ -61,16 +61,16 @@
       },
       "properties": {
         "id": "267",
-        "capturer": "",
+        "capturer": "SH",
         "countyCapital": false,
         "drops": ["Danish Yeasts", "Ukrainian Grain"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Ysil",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
-        "nation": "NT",
+        "brLimit": 7200,
+        "nation": "ES",
         "produces": ["Sugar"]
       }
     },
@@ -107,11 +107,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Medium",
         "name": "Saint Marys",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "US",
         "produces": []
       }
@@ -133,11 +133,11 @@
           "Indian Saltpeter"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Port Antonio",
         "nonCapturable": true,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "GB",
         "produces": ["Hemp", "Sugar"]
       }
@@ -154,11 +154,11 @@
         "countyCapital": false,
         "drops": ["Coffee", "Historical Artifact", "Pino Ocote Log"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Útila",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "GB",
         "produces": ["Fir Log", "Sugar"]
       }
@@ -180,11 +180,11 @@
           "Suffolk Cheese"
         ],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Cariaco",
         "nonCapturable": false,
         "shallow": true,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 2500,
         "nation": "VP",
         "produces": ["Fir Log", "Stone Block"]
       }
@@ -201,11 +201,11 @@
         "countyCapital": false,
         "drops": ["Live Oak Log", "Merino Wool", "Spanish Walnut Oil"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Ayamonte",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "US",
         "produces": ["Lignum Vitae Log", "Tobacco"]
       }
@@ -222,11 +222,11 @@
         "countyCapital": false,
         "drops": ["Batavian Spices", "Indigo"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "La Bermeja",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "ES",
         "produces": ["Hemp", "Silver"]
       }
@@ -243,11 +243,11 @@
         "countyCapital": false,
         "drops": ["Black Ironwood", "Cuban Tobacco", "Merino Wool"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Guánica",
         "nonCapturable": false,
         "shallow": true,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 2500,
         "nation": "DK",
         "produces": ["Fir Log", "Sugar"]
       }
@@ -264,11 +264,11 @@
         "countyCapital": false,
         "drops": ["Cheshire Cheese", "Indigo", "Textile Machinery"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Tantun Cuzamil",
         "nonCapturable": false,
         "shallow": true,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 2500,
         "nation": "GB",
         "produces": ["Iron Ore"]
       }
@@ -285,11 +285,11 @@
         "countyCapital": false,
         "drops": ["Contraband Goods", "Russian Vodka"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Mangrove Cay",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "US",
         "produces": ["Lignum Vitae Log", "Sulphur"]
       }
@@ -306,11 +306,11 @@
         "countyCapital": false,
         "drops": ["Cognac", "Sevres Stained Glass"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Vermiou",
         "nonCapturable": true,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "FR",
         "produces": ["Coal", "Lignum Vitae Log"]
       }
@@ -327,11 +327,11 @@
         "countyCapital": false,
         "drops": ["Indigo", "Live Oak Log"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "San Sebastian",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "US",
         "produces": ["Lignum Vitae Log", "Sulphur"]
       }
@@ -348,11 +348,11 @@
         "countyCapital": false,
         "drops": ["Burgundian Wine", "Caguairan Log", "Coffee", "Fine Leather"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Deshaies",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "SE",
         "produces": ["Coal", "Fir Log", "Lignum Vitae Log", "Stone Block"]
       }
@@ -369,11 +369,11 @@
         "countyCapital": true,
         "drops": ["Caguairan Log", "Grietje van Dijk", "Swedish Sail Cloth"],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Oranjestad",
         "nonCapturable": false,
         "shallow": false,
-        "size": 4,
-        "brLimit": 6800,
+        "brLimit": 9600,
         "nation": "SE",
         "produces": ["Coal", "Fir Log", "Oak Log"]
       }
@@ -397,11 +397,11 @@
           "Spanish Gold Coins"
         ],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Rum Cove",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "RU",
         "produces": ["Coal", "Iron Ore", "Sugar"]
       }
@@ -423,11 +423,11 @@
           "Spanish Almonds"
         ],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Río Chico",
         "nonCapturable": false,
         "shallow": true,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 2500,
         "nation": "VP",
         "produces": ["Hemp", "Stone Block"]
       }
@@ -449,11 +449,11 @@
           "Sevilla Muskets"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Casigua",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "VP",
         "produces": ["Coal", "Fir Log", "Sugar"]
       }
@@ -476,11 +476,11 @@
           "Sussex Oak"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Sancti Spíritus",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "GB",
         "produces": ["Coal", "Iron Ore"]
       }
@@ -497,11 +497,11 @@
         "countyCapital": false,
         "drops": ["Caguairan Log", "Spanish Walnut Oil"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Alvarado",
         "nonCapturable": true,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "ES",
         "produces": ["Coal", "Oak Log"]
       }
@@ -518,11 +518,11 @@
         "countyCapital": true,
         "drops": ["Cocoa", "Sabicu Log"],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Brangman\u0027s Bluff",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "NT",
         "produces": ["Food Supplies", "Oak Log"]
       }
@@ -544,11 +544,11 @@
           "Spanish Walnut Oil"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Aguadilla",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "DK",
         "produces": ["Food Supplies", "Oak Log"]
       }
@@ -565,11 +565,11 @@
         "countyCapital": false,
         "drops": ["Contraband Goods", "Cuban Tobacco"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Mimbres",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "ES",
         "produces": ["Lignum Vitae Log"]
       }
@@ -592,11 +592,11 @@
           "Parisian Furniture"
         ],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Santa Fe",
         "nonCapturable": false,
         "shallow": true,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 2500,
         "nation": "ES",
         "produces": ["Coal", "Hemp", "Sugar"]
       }
@@ -609,7 +609,7 @@
       },
       "properties": {
         "id": "211",
-        "capturer": "",
+        "capturer": "CABAL",
         "countyCapital": false,
         "drops": [
           "Catalonian Olive Oil",
@@ -618,12 +618,12 @@
           "Spanish Dried Fruits"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Barranquilla",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
-        "nation": "NT",
+        "brLimit": 4800,
+        "nation": "SE",
         "produces": ["Hemp", "Sugar"]
       }
     },
@@ -635,16 +635,16 @@
       },
       "properties": {
         "id": "20",
-        "capturer": "WTF",
+        "capturer": "",
         "countyCapital": false,
         "drops": ["Arabian Coffee", "Assam Tea", "Sumatran Pepper"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Deadman\u0027s Cay",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
-        "nation": "PR",
+        "brLimit": 1250,
+        "nation": "NT",
         "produces": ["Coal", "Lignum Vitae Log"]
       }
     },
@@ -660,11 +660,11 @@
         "countyCapital": false,
         "drops": ["Vermont Maple Sugar"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "All Saints",
         "nonCapturable": true,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "US",
         "produces": ["Cotton", "Fir Log", "Oak Log"]
       }
@@ -685,11 +685,11 @@
           "Yorkshire Pudding"
         ],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Galdonas",
         "nonCapturable": false,
         "shallow": true,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 2500,
         "nation": "VP",
         "produces": ["Extra Labor", "Hemp"]
       }
@@ -711,11 +711,11 @@
           "Madagascar Tallow"
         ],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Tiburon",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "SE",
         "produces": ["Fir Log", "Sugar"]
       }
@@ -739,11 +739,11 @@
           "White Oak Log"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Baní",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "PL",
         "produces": ["Sugar"]
       }
@@ -760,11 +760,11 @@
         "countyCapital": false,
         "drops": ["Caguairan Log", "Russian Vodka", "Swedish Iron"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Fort Baai",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "SE",
         "produces": ["Food Supplies", "Lignum Vitae Log"]
       }
@@ -788,11 +788,11 @@
           "Spanish Dried Fruits"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Rincón",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "RU",
         "produces": ["Lignum Vitae Log"]
       }
@@ -809,11 +809,11 @@
         "countyCapital": false,
         "drops": ["Danish Salted Pork", "Russian Vodka"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Cuyo",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "GB",
         "produces": ["Stone Block"]
       }
@@ -836,11 +836,11 @@
           "Sabicu Log"
         ],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "La Guanaja",
         "nonCapturable": false,
         "shallow": true,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 2500,
         "nation": "DE",
         "produces": ["Coal", "Iron Ore", "Sugar"]
       }
@@ -863,11 +863,11 @@
           "Spanish Almonds"
         ],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Mobile",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "ES",
         "produces": ["Hemp", "Stone Block"]
       }
@@ -884,11 +884,11 @@
         "countyCapital": false,
         "drops": ["Danish Yeasts", "Russian Sail Duck"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Coral Bay",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "DK",
         "produces": ["Iron Ore", "Stone Block"]
       }
@@ -910,11 +910,11 @@
           "Textile Machinery"
         ],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Truxillo",
         "nonCapturable": false,
         "shallow": false,
-        "size": 4,
-        "brLimit": 6800,
+        "brLimit": 9600,
         "nation": "GB",
         "produces": ["Hemp", "Stone Block"]
       }
@@ -1002,11 +1002,11 @@
           "Vermont Maple Sugar",
           "Versailles Terracotta"
         ],
+        "portBattleType": "Large",
         "name": "Belize",
         "nonCapturable": true,
         "shallow": false,
-        "size": 4,
-        "brLimit": 6800,
+        "brLimit": 9600,
         "nation": "GB",
         "produces": ["Coal", "Fir Log", "Oak Log"]
       }
@@ -1029,11 +1029,11 @@
           "Malabar Teak"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "San Timoteo",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "VP",
         "produces": ["Food Supplies", "Oak Log"]
       }
@@ -1082,11 +1082,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Medium",
         "name": "Conil",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "GB",
         "produces": ["Coal", "Gold", "Lignum Vitae Log", "Silver"]
       }
@@ -1103,11 +1103,11 @@
         "countyCapital": false,
         "drops": ["Cocoa", "Merino Wool"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Croata",
         "nonCapturable": false,
         "shallow": true,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 2500,
         "nation": "GB",
         "produces": ["Food Supplies", "Iron Ore"]
       }
@@ -1144,11 +1144,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Medium",
         "name": "Bensalem",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "GB",
         "produces": []
       }
@@ -1165,11 +1165,11 @@
         "countyCapital": false,
         "drops": ["Dutch Laudanum", "Sabicu Log", "Suriname Indigo"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Little Harbour",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "US",
         "produces": ["Fir Log", "Stone Block"]
       }
@@ -1186,11 +1186,11 @@
         "countyCapital": false,
         "drops": ["American Cotton", "Caguairan Log", "Indian Saltpeter"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Placer",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "GB",
         "produces": ["Fir Log", "Sugar"]
       }
@@ -1214,11 +1214,11 @@
           "Yorkshire Pudding"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Montego Bay",
         "nonCapturable": true,
         "shallow": false,
-        "size": 4,
-        "brLimit": 6800,
+        "brLimit": 9600,
         "nation": "GB",
         "produces": ["Fir Log", "Lignum Vitae Log", "Stone Block"]
       }
@@ -1235,11 +1235,11 @@
         "countyCapital": false,
         "drops": ["Kentucky Bourbon", "Yorkshire Pudding"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Little Cayman",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "GB",
         "produces": ["Coal", "Lignum Vitae Log"]
       }
@@ -1279,11 +1279,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Large",
         "name": "Cayo Biscayno",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "US",
         "produces": []
       }
@@ -1300,11 +1300,11 @@
         "countyCapital": false,
         "drops": ["Kentucky Bourbon", "Live Oak Log", "Oregon Beaver Coats"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Salina Point",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "PR",
         "produces": ["Lignum Vitae Log", "Tobacco"]
       }
@@ -1326,11 +1326,11 @@
           "Sevilla Muskets"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Tampico",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "NT",
         "produces": ["Fir Log", "Sugar"]
       }
@@ -1353,11 +1353,11 @@
           "Sevilla Muskets"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Fajardo",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "DK",
         "produces": ["Gold", "Iron Ore"]
       }
@@ -1395,11 +1395,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Medium",
         "name": "Cayo Romano",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "ES",
         "produces": []
       }
@@ -1412,16 +1412,16 @@
       },
       "properties": {
         "id": "224",
-        "capturer": "",
+        "capturer": "ROVER",
         "countyCapital": false,
         "drops": ["Fine Leather", "Iberian Dried Pork", "Spanish Almonds"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Chiriquí",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
-        "nation": "NT",
+        "brLimit": 1250,
+        "nation": "DE",
         "produces": ["Lignum Vitae Log", "Sulphur"]
       }
     },
@@ -1437,11 +1437,11 @@
         "countyCapital": true,
         "drops": ["Historical Artifact", "Indigo", "Sabicu Log"],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Pampatar",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "VP",
         "produces": ["Cotton", "Food Supplies", "Lignum Vitae Log"]
       }
@@ -1492,11 +1492,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Large",
         "name": "Sant Iago",
         "nonCapturable": false,
         "shallow": false,
-        "size": 5,
-        "brLimit": 8500,
+        "brLimit": 11000,
         "nation": "SE",
         "produces": ["Coal", "Fir Log", "Gold", "Silver", "Sugar"]
       }
@@ -1518,11 +1518,11 @@
           "Historical Artifact"
         ],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Alacranes",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "ES",
         "produces": ["Cotton", "Sugar"]
       }
@@ -1545,11 +1545,11 @@
           "Scottish Wool"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Turneffe",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "GB",
         "produces": ["Hemp", "Sugar"]
       }
@@ -1593,11 +1593,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Small",
         "name": "Shroud Cay",
         "nonCapturable": true,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "FT",
         "produces": []
       }
@@ -1621,11 +1621,11 @@
           "Stolen Goods"
         ],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Saint George",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "FR",
         "produces": ["Iron Ore", "Stone Block"]
       }
@@ -1650,11 +1650,11 @@
           "Versailles Terracotta"
         ],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Daguilla",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "ES",
         "produces": ["Lignum Vitae Log", "Silver"]
       }
@@ -1671,11 +1671,11 @@
         "countyCapital": false,
         "drops": ["Dutch Peanut Butter", "Gold Coast Ivory"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Las Aves",
         "nonCapturable": true,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "VP",
         "produces": ["Iron Ore", "Stone Block"]
       }
@@ -1692,11 +1692,11 @@
         "countyCapital": false,
         "drops": ["Cocoa", "Iberian Dried Pork", "Madeira Wine", "Sabicu Log"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Río de la Hacha",
         "nonCapturable": false,
         "shallow": false,
-        "size": 4,
-        "brLimit": 6800,
+        "brLimit": 9600,
         "nation": "VP",
         "produces": ["Coal", "Fir Log", "Oak Log"]
       }
@@ -1713,11 +1713,11 @@
         "countyCapital": false,
         "drops": ["Black Ironwood", "Iberian Dried Pork", "Merino Wool"],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "New Edinburgh",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "DE",
         "produces": ["Sugar"]
       }
@@ -1739,11 +1739,11 @@
           "Yorkshire Pudding"
         ],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Watling",
         "nonCapturable": false,
         "shallow": true,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 2500,
         "nation": "PR",
         "produces": ["Food Supplies", "Iron Ore"]
       }
@@ -1760,11 +1760,11 @@
         "countyCapital": false,
         "drops": ["Dutch Cacao", "French Gold Livres", "Sabicu Log"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Sandy Point",
         "nonCapturable": false,
         "shallow": true,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 2500,
         "nation": "US",
         "produces": ["Food Supplies", "Oak Log"]
       }
@@ -1804,11 +1804,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Medium",
         "name": "Coquibacoa",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "VP",
         "produces": []
       }
@@ -1825,11 +1825,11 @@
         "countyCapital": false,
         "drops": ["Kurland Oak", "Merino Wool", "Russian Sail Duck"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Mugeres",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "GB",
         "produces": ["Food Supplies", "Iron Ore"]
       }
@@ -1936,11 +1936,11 @@
           "Versailles Terracotta",
           "Yorkshire Pudding"
         ],
+        "portBattleType": "Large",
         "name": "Cartagena de Indias",
         "nonCapturable": false,
         "shallow": false,
-        "size": 4,
-        "brLimit": 6800,
+        "brLimit": 9600,
         "nation": "SE",
         "produces": ["Gold", "Iron Ore", "Silver", "Stone Block"]
       }
@@ -1957,11 +1957,11 @@
         "countyCapital": false,
         "drops": ["Spanish Almonds"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Espíritu Santo",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "ES",
         "produces": ["Hemp", "Silver"]
       }
@@ -1983,11 +1983,11 @@
           "Historical Artifact"
         ],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Puerto Cabello",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "VP",
         "produces": ["Coal", "Lignum Vitae Log"]
       }
@@ -2009,11 +2009,11 @@
           "Sabicu Log"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Cabo Cañaveral",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "US",
         "produces": ["Iron Ore", "Saltpeter"]
       }
@@ -2036,11 +2036,11 @@
           "Textile Machinery"
         ],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Port Howe",
         "nonCapturable": false,
         "shallow": true,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 2500,
         "nation": "PR",
         "produces": ["Hemp", "Stone Block"]
       }
@@ -2057,11 +2057,11 @@
         "countyCapital": false,
         "drops": ["Kurland Oak", "Ukrainian Grain"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Sandy Hill",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "SE",
         "produces": ["Iron Ore", "Stone Block"]
       }
@@ -2112,11 +2112,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Large",
         "name": "Bluefields",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "DE",
         "produces": ["Coal", "Fir Log", "Gold", "Oak Log", "Silver"]
       }
@@ -2169,11 +2169,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Large",
         "name": "Maracaibo",
         "nonCapturable": false,
         "shallow": false,
-        "size": 4,
-        "brLimit": 6800,
+        "brLimit": 9600,
         "nation": "DE",
         "produces": ["Gold", "Oak Log", "Silver"]
       }
@@ -2195,11 +2195,11 @@
           "Normandy Cider"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Esteros",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "FR",
         "produces": ["Coal", "Lignum Vitae Log"]
       }
@@ -2216,11 +2216,11 @@
         "countyCapital": false,
         "drops": ["Iberian Dried Pork", "Madeira Wine"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Bahía Honda",
         "nonCapturable": true,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "ES",
         "produces": ["Coal", "Lignum Vitae Log"]
       }
@@ -2243,11 +2243,11 @@
           "White Oak Log"
         ],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "San José",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "GB",
         "produces": ["Oak Log"]
       }
@@ -2264,11 +2264,11 @@
         "countyCapital": false,
         "drops": ["Madagascar Jewels"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Islet",
         "nonCapturable": true,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "PR",
         "produces": ["Hemp", "Sugar"]
       }
@@ -2285,11 +2285,11 @@
         "countyCapital": false,
         "drops": ["Indigo", "Spanish Dried Fruits", "Spanish Walnut Oil"],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Coro",
         "nonCapturable": false,
         "shallow": false,
-        "size": 4,
-        "brLimit": 6800,
+        "brLimit": 9600,
         "nation": "VP",
         "produces": ["Oak Log"]
       }
@@ -2343,11 +2343,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Medium",
         "name": "Saint-Louis",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "VP",
         "produces": ["Coal", "Gold", "Lignum Vitae Log", "Silver"]
       }
@@ -2364,11 +2364,11 @@
         "countyCapital": false,
         "drops": ["Cocoa", "French Gold Livres"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Bimini",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "US",
         "produces": ["Stone Block"]
       }
@@ -2391,11 +2391,11 @@
           "Textile Machinery"
         ],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Savanna la Mar",
         "nonCapturable": true,
         "shallow": false,
-        "size": 4,
-        "brLimit": 6800,
+        "brLimit": 9600,
         "nation": "GB",
         "produces": ["Food Supplies", "Hemp", "Oak Log"]
       }
@@ -2416,11 +2416,11 @@
           "Versailles Terracotta"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Sale-Trou",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "PL",
         "produces": ["Oak Log"]
       }
@@ -2470,11 +2470,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Large",
         "name": "San Agustín",
         "nonCapturable": false,
         "shallow": false,
-        "size": 4,
-        "brLimit": 6800,
+        "brLimit": 9600,
         "nation": "US",
         "produces": ["Gold", "Iron Ore", "Silver", "Stone Block"]
       }
@@ -2491,11 +2491,11 @@
         "countyCapital": false,
         "drops": ["Danish Salted Pork", "Norwegian Fox Fur"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Frederiksted",
         "nonCapturable": true,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "DK",
         "produces": ["Coal", "Lignum Vitae Log"]
       }
@@ -2517,11 +2517,11 @@
           "Yorkshire Pudding"
         ],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Charles Town",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "SE",
         "produces": ["Food Supplies", "Lignum Vitae Log"]
       }
@@ -2544,11 +2544,11 @@
           "Normandy Cider"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Sinamaica",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "VP",
         "produces": ["Coal", "Lignum Vitae Log"]
       }
@@ -2585,11 +2585,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Medium",
         "name": "Bonacca",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "GB",
         "produces": []
       }
@@ -2611,11 +2611,11 @@
           "White Oak Log"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Sabina",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "FR",
         "produces": ["Fir Log", "Sugar"]
       }
@@ -2637,11 +2637,11 @@
           "Norwegian Fox Fur"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Aransas",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "ES",
         "produces": ["Food Supplies", "Iron Ore"]
       }
@@ -2665,11 +2665,11 @@
           "Teak Log"
         ],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Harbour Island",
         "nonCapturable": false,
         "shallow": true,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 2500,
         "nation": "PR",
         "produces": ["Fir Log", "Sugar"]
       }
@@ -2686,11 +2686,11 @@
         "countyCapital": false,
         "drops": ["Cocoa", "Cognac", "Spanish Almonds", "White Oak Log"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Azua",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "PL",
         "produces": ["Hemp", "Tobacco"]
       }
@@ -2712,11 +2712,11 @@
           "Versailles Terracotta"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Cojoro",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "VP",
         "produces": ["Hemp", "Stone Block"]
       }
@@ -2767,11 +2767,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Large",
         "name": "Cumaná",
         "nonCapturable": false,
         "shallow": false,
-        "size": 4,
-        "brLimit": 6800,
+        "brLimit": 9600,
         "nation": "FR",
         "produces": ["Food Supplies", "Gold", "Iron Ore", "Silver"]
       }
@@ -2788,11 +2788,11 @@
         "countyCapital": false,
         "drops": ["Coffee", "Madeira Wine", "Sabicu Log"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Mandinga",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "DE",
         "produces": ["Hemp", "Silver"]
       }
@@ -2816,11 +2816,11 @@
           "Sussex Oak"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Triunfo de la Cruz",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "GB",
         "produces": ["Oak Log"]
       }
@@ -2837,11 +2837,11 @@
         "countyCapital": false,
         "drops": ["Burgundian Wine", "Versailles Terracotta"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Jérémie",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "SE",
         "produces": ["Iron Ore", "Silver"]
       }
@@ -2864,11 +2864,11 @@
           "Spanish Dried Fruits"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Tolú",
         "nonCapturable": false,
         "shallow": false,
-        "size": 4,
-        "brLimit": 6800,
+        "brLimit": 9600,
         "nation": "NT",
         "produces": ["Coal", "Food Supplies", "Hemp", "Sugar"]
       }
@@ -2890,11 +2890,11 @@
           "Sabicu Log"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Carúpano",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "VP",
         "produces": ["Coal", "Lignum Vitae Log"]
       }
@@ -2917,11 +2917,11 @@
           "Pino Ocote Log"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Morro Chico",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "GB",
         "produces": ["Fir Log", "Sugar"]
       }
@@ -3017,11 +3017,11 @@
           "Versailles Terracotta",
           "Yorkshire Pudding"
         ],
+        "portBattleType": "Large",
         "name": "Willemstad",
         "nonCapturable": true,
         "shallow": false,
-        "size": 4,
-        "brLimit": 6800,
+        "brLimit": 9600,
         "nation": "VP",
         "produces": ["Hemp", "Sugar"]
       }
@@ -3043,11 +3043,11 @@
           "Mahogany Log"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Key West",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "ES",
         "produces": ["Iron Ore", "Stone Block"]
       }
@@ -3084,11 +3084,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Medium",
         "name": "Great Corn",
         "nonCapturable": true,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "FT",
         "produces": []
       }
@@ -3111,11 +3111,11 @@
           "Textile Machinery"
         ],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Cochinos",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "GB",
         "produces": ["Sugar"]
       }
@@ -3132,11 +3132,11 @@
         "countyCapital": false,
         "drops": ["American Cotton", "Live Oak Log"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Mayaguana",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "NT",
         "produces": ["Fir Log", "Food Supplies", "Oak Log"]
       }
@@ -3158,11 +3158,11 @@
           "Madeira Wine"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Buena Vista",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "DE",
         "produces": ["Fir Log", "Oak Log", "Silver"]
       }
@@ -3186,11 +3186,11 @@
           "Yorkshire Pudding"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Santo Tomás",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "GB",
         "produces": ["Food Supplies", "Iron Ore"]
       }
@@ -3212,11 +3212,11 @@
           "Yorkshire Pudding"
         ],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Bone Cay",
         "nonCapturable": true,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "GB",
         "produces": ["Hemp", "Oak Log", "Tobacco"]
       }
@@ -3255,11 +3255,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Medium",
         "name": "Hat Island",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "SE",
         "produces": []
       }
@@ -3276,11 +3276,11 @@
         "countyCapital": false,
         "drops": ["Fine Leather", "Pino Ocote Log"],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Ruatan",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "GB",
         "produces": ["Coal", "Lignum Vitae Log"]
       }
@@ -3302,11 +3302,11 @@
           "Ukrainian Grain"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Guamá Sevilla",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "SE",
         "produces": ["Hemp", "Stone Block"]
       }
@@ -3323,11 +3323,11 @@
         "countyCapital": false,
         "drops": ["Catalonian Olive Oil", "Indigo"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Calobelo",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "VP",
         "produces": ["Food Supplies", "Iron Ore"]
       }
@@ -3344,11 +3344,11 @@
         "countyCapital": false,
         "drops": ["Coffee", "Madagascar Jewels", "White Oak Log"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "William\u0027s Bay",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "ES",
         "produces": ["Oak Log"]
       }
@@ -3365,11 +3365,11 @@
         "countyCapital": false,
         "drops": ["Madagascar Jewels", "Swedish Sail Cloth"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Road Rocks",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "US",
         "produces": ["Food Supplies", "Oak Log"]
       }
@@ -3386,11 +3386,11 @@
         "countyCapital": true,
         "drops": ["American Cotton", "Cocoa", "Live Oak Log"],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Ays",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "US",
         "produces": ["Food Supplies", "Oak Log"]
       }
@@ -3407,11 +3407,11 @@
         "countyCapital": false,
         "drops": ["Burgundian Wine", "Cognac", "Parisian Furniture"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Marin",
         "nonCapturable": true,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "FR",
         "produces": ["Coal", "Lignum Vitae Log"]
       }
@@ -3428,11 +3428,11 @@
         "countyCapital": false,
         "drops": ["Catalonian Olive Oil", "Spanish Dried Fruits"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Mariel",
         "nonCapturable": true,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "ES",
         "produces": ["Fir Log", "Oak Log"]
       }
@@ -3449,11 +3449,11 @@
         "countyCapital": false,
         "drops": ["Black Ironwood", "Coffee"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "La Tortuga",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "VP",
         "produces": ["Iron Ore", "Stone Block"]
       }
@@ -3470,11 +3470,11 @@
         "countyCapital": false,
         "drops": ["Assam Tea", "Gold Coast Ivory", "Sussex Oak"],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "English Harbour",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "SE",
         "produces": ["Coal", "Oak Log"]
       }
@@ -3518,11 +3518,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Medium",
         "name": "La Tortue",
         "nonCapturable": true,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "FT",
         "produces": []
       }
@@ -3545,11 +3545,11 @@
           "Versailles Terracotta"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "La Moussette",
         "nonCapturable": true,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "FR",
         "produces": ["Hemp", "Oak Log", "Silver"]
       }
@@ -3569,11 +3569,11 @@
           "Languedoc Violins"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Barataria",
         "nonCapturable": true,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "FR",
         "produces": ["Oak Log"]
       }
@@ -3595,11 +3595,11 @@
           "Sussex Oak"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Port Morant",
         "nonCapturable": true,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "GB",
         "produces": ["Iron Ore", "Stone Block"]
       }
@@ -3612,7 +3612,7 @@
       },
       "properties": {
         "id": "46",
-        "capturer": "",
+        "capturer": "SMOKE",
         "countyCapital": true,
         "drops": [
           "Burgundian Wine",
@@ -3650,12 +3650,12 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Large",
         "name": "Nuevitas",
         "nonCapturable": false,
         "shallow": false,
-        "size": 4,
-        "brLimit": 6800,
-        "nation": "NT",
+        "brLimit": 9600,
+        "nation": "PR",
         "produces": [
           "Fir Log",
           "Gold",
@@ -3677,11 +3677,11 @@
         "countyCapital": false,
         "drops": ["Cocoa", "Cuban Tobacco", "Historical Artifact"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Serrana",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "GB",
         "produces": ["Fir Log", "Lignum Vitae Log", "Stone Block"]
       }
@@ -3706,11 +3706,11 @@
           "White Oak Log"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "North Inlet",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "RU",
         "produces": ["Fir Log", "Lignum Vitae Log", "Stone Block"]
       }
@@ -3809,11 +3809,11 @@
           "Vermont Maple Sugar",
           "Versailles Terracotta"
         ],
+        "portBattleType": "Large",
         "name": "Kingston / Port Royal",
         "nonCapturable": true,
         "shallow": false,
-        "size": 6,
-        "brLimit": 10200,
+        "brLimit": 11000,
         "nation": "GB",
         "produces": ["Fir Log", "Oak Log"]
       }
@@ -3830,11 +3830,11 @@
         "countyCapital": false,
         "drops": ["American Cotton"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Grindstone",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "NT",
         "produces": ["Iron Ore", "Stone Block"]
       }
@@ -3857,11 +3857,11 @@
           "Suffolk Cheese"
         ],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Bugle Cay",
         "nonCapturable": true,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "GB",
         "produces": ["Coal", "Fir Log", "Lignum Vitae Log", "Stone Block"]
       }
@@ -3878,11 +3878,11 @@
         "countyCapital": false,
         "drops": ["Kurland Oak", "Ukrainian Grain"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Philipsburg",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "SE",
         "produces": ["Iron Ore", "Stone Block"]
       }
@@ -3981,11 +3981,11 @@
           "Vermont Maple Sugar",
           "Yorkshire Pudding"
         ],
+        "portBattleType": "Large",
         "name": "Fort-Royal",
         "nonCapturable": true,
         "shallow": false,
-        "size": 4,
-        "brLimit": 6800,
+        "brLimit": 9600,
         "nation": "FR",
         "produces": ["Iron Ore", "Stone Block"]
       }
@@ -4024,11 +4024,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Medium",
         "name": "Tamiagua",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "ES",
         "produces": []
       }
@@ -4045,11 +4045,11 @@
         "countyCapital": true,
         "drops": ["Fine Leather", "Stolen Goods"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Morgan\u0027s Bluff",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "SE",
         "produces": ["Coal", "Cotton", "Fir Log", "Gold", "Iron Ore"]
       }
@@ -4066,11 +4066,11 @@
         "countyCapital": false,
         "drops": ["Cocoa", "Dutch Cacao", "Sevilla Muskets"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Triangles",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "ES",
         "produces": ["Food Supplies", "Iron Ore"]
       }
@@ -4093,11 +4093,11 @@
           "Spanish Dried Fruits"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Arecibo",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "DK",
         "produces": ["Extra Labor", "Lignum Vitae Log"]
       }
@@ -4120,11 +4120,11 @@
           "Spanish Almonds"
         ],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Cabo de la Vela",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "VP",
         "produces": ["Food Supplies", "Lignum Vitae Log"]
       }
@@ -4141,11 +4141,11 @@
         "countyCapital": false,
         "drops": ["Sumatran Pepper", "Suriname Indigo"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Fort Oranje",
         "nonCapturable": true,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "VP",
         "produces": ["Coal", "Lignum Vitae Log"]
       }
@@ -4162,11 +4162,11 @@
         "countyCapital": false,
         "drops": ["French Gold Livres", "White Oak Log"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Apalachicola",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "GB",
         "produces": ["Coal", "Fir Log", "Oak Log"]
       }
@@ -4190,11 +4190,11 @@
           "Textile Machinery"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Saint Ann",
         "nonCapturable": true,
         "shallow": false,
-        "size": 4,
-        "brLimit": 6800,
+        "brLimit": 9600,
         "nation": "GB",
         "produces": ["Coal", "Iron Ore", "Sugar"]
       }
@@ -4216,11 +4216,11 @@
           "Textile Machinery"
         ],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Governor\u0027s Harbour",
         "nonCapturable": false,
         "shallow": true,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 2500,
         "nation": "PR",
         "produces": ["Coal", "Lignum Vitae Log"]
       }
@@ -4233,7 +4233,7 @@
       },
       "properties": {
         "id": "50",
-        "capturer": "ALOHA",
+        "capturer": "",
         "countyCapital": true,
         "drops": [
           "Black Ironwood",
@@ -4243,12 +4243,12 @@
           "Merino Wool"
         ],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Baracoa",
         "nonCapturable": false,
         "shallow": false,
-        "size": 4,
-        "brLimit": 6800,
-        "nation": "PR",
+        "brLimit": 9600,
+        "nation": "NT",
         "produces": [
           "Fir Log",
           "Food Supplies",
@@ -4312,11 +4312,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Large",
         "name": "Bridgetown",
         "nonCapturable": false,
         "shallow": false,
-        "size": 4,
-        "brLimit": 6800,
+        "brLimit": 9600,
         "nation": "FR",
         "produces": [
           "Coal",
@@ -4346,11 +4346,11 @@
           "Stolen Goods"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Champotón",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "NT",
         "produces": ["Iron Ore", "Stone Block"]
       }
@@ -4367,11 +4367,11 @@
         "countyCapital": false,
         "drops": ["Madeira Wine", "Sevilla Muskets"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "La Anguilla",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "ES",
         "produces": ["Food Supplies", "Oak Log"]
       }
@@ -4394,11 +4394,11 @@
           "Sussex Oak"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Lagunillas",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "VP",
         "produces": ["Lignum Vitae Log", "Sulphur"]
       }
@@ -4415,11 +4415,11 @@
         "countyCapital": false,
         "drops": ["Caguairan Log", "Indigo", "Spanish Walnut Oil"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Brewers",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "GB",
         "produces": ["Hemp", "Stone Block"]
       }
@@ -4436,11 +4436,11 @@
         "countyCapital": false,
         "drops": ["Indigo", "Pino Ocote Log", "Spanish Dried Fruits"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Mosquito Cay",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "GB",
         "produces": ["Lignum Vitae Log", "Sulphur"]
       }
@@ -4462,11 +4462,11 @@
           "Spanish Walnut Oil"
         ],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "San Fernando",
         "nonCapturable": false,
         "shallow": true,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 2500,
         "nation": "ES",
         "produces": ["Oak Log"]
       }
@@ -4506,11 +4506,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Medium",
         "name": "El Rancho",
         "nonCapturable": true,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "FT",
         "produces": []
       }
@@ -4527,11 +4527,11 @@
         "countyCapital": false,
         "drops": ["Arabian Coffee", "Fine Leather", "Yorkshire Pudding"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Santa María",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "GB",
         "produces": ["Food Supplies", "Hemp"]
       }
@@ -4580,11 +4580,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Small",
         "name": "San Marcos",
         "nonCapturable": false,
         "shallow": true,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 2500,
         "nation": "GB",
         "produces": ["Gold", "Iron Ore", "Silver", "Stone Block"]
       }
@@ -4667,11 +4667,11 @@
           "Vermont Maple Sugar",
           "Yorkshire Pudding"
         ],
+        "portBattleType": "Large",
         "name": "Nouvelle-Orléans",
         "nonCapturable": true,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "FR",
         "produces": ["Fir Log", "Stone Block"]
       }
@@ -4696,11 +4696,11 @@
           "Spanish Walnut Oil"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Puerto de Nipe",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "PR",
         "produces": ["Coal", "Hemp", "Oak Log", "Saltpeter"]
       }
@@ -4724,11 +4724,11 @@
           "Sevres Stained Glass"
         ],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Saint-Nicolas",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "SE",
         "produces": ["Coal", "Hemp", "Sugar"]
       }
@@ -4834,11 +4834,11 @@
           "Versailles Terracotta",
           "Yorkshire Pudding"
         ],
+        "portBattleType": "Large",
         "name": "Santo Domingo",
         "nonCapturable": false,
         "shallow": false,
-        "size": 4,
-        "brLimit": 6800,
+        "brLimit": 9600,
         "nation": "RU",
         "produces": ["Gold", "Oak Log", "Silver"]
       }
@@ -4864,11 +4864,11 @@
           "Teak Log"
         ],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Roseau",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "FR",
         "produces": ["Coal", "Iron Ore", "Sugar"]
       }
@@ -4885,11 +4885,11 @@
         "countyCapital": false,
         "drops": ["Black Ironwood", "Cuban Tobacco"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Río Seco",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "US",
         "produces": ["Hemp", "Stone Block"]
       }
@@ -4906,11 +4906,11 @@
         "countyCapital": true,
         "drops": ["Merino Wool", "Sevilla Muskets"],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Remedios",
         "nonCapturable": true,
         "shallow": false,
-        "size": 4,
-        "brLimit": 6800,
+        "brLimit": 9600,
         "nation": "ES",
         "produces": ["Iron Ore", "Saltpeter"]
       }
@@ -4948,11 +4948,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Small",
         "name": "Barcos",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "ES",
         "produces": []
       }
@@ -5049,11 +5049,11 @@
           "Versailles Terracotta",
           "Yorkshire Pudding"
         ],
+        "portBattleType": "Large",
         "name": "Mortimer Town",
         "nonCapturable": true,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "PR",
         "produces": ["Fir Log", "Oak Log"]
       }
@@ -5076,11 +5076,11 @@
           "Spanish Square Sails"
         ],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Santa Cruz",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "NT",
         "produces": ["Lignum Vitae Log"]
       }
@@ -5102,11 +5102,11 @@
           "Spanish Almonds"
         ],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Chagres",
         "nonCapturable": false,
         "shallow": false,
-        "size": 4,
-        "brLimit": 6800,
+        "brLimit": 9600,
         "nation": "DE",
         "produces": ["Fir Log", "Stone Block"]
       }
@@ -5129,11 +5129,11 @@
           "White Oak Log"
         ],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Penzacola",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "GB",
         "produces": ["Fir Log", "Sugar"]
       }
@@ -5150,11 +5150,11 @@
         "countyCapital": false,
         "drops": ["Cuban Tobacco", "Fine Leather"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "La Blanquilla",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "SE",
         "produces": ["Hemp", "Sugar"]
       }
@@ -5176,11 +5176,11 @@
           "White Oak Log"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Sunbury",
         "nonCapturable": true,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "US",
         "produces": ["Food Supplies", "Iron Ore", "Sugar"]
       }
@@ -5276,11 +5276,11 @@
           "Versailles Terracotta",
           "Yorkshire Pudding"
         ],
+        "portBattleType": "Large",
         "name": "Gustavia",
         "nonCapturable": true,
         "shallow": false,
-        "size": 4,
-        "brLimit": 6800,
+        "brLimit": 9600,
         "nation": "SE",
         "produces": ["Hemp", "Sugar"]
       }
@@ -5303,11 +5303,11 @@
           "Madagascar Tallow"
         ],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Basse-Terre",
         "nonCapturable": false,
         "shallow": false,
-        "size": 4,
-        "brLimit": 6800,
+        "brLimit": 9600,
         "nation": "SE",
         "produces": ["Cotton", "Hemp", "Oak Log", "Tobacco"]
       }
@@ -5330,11 +5330,11 @@
           "Spanish Almonds"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Canalete",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "PR",
         "produces": ["Gold", "Lignum Vitae Log"]
       }
@@ -5373,11 +5373,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Medium",
         "name": "Calcasieu",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "FR",
         "produces": []
       }
@@ -5424,11 +5424,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Small",
         "name": "West End",
         "nonCapturable": false,
         "shallow": true,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 2500,
         "nation": "US",
         "produces": ["Coal", "Fir Log", "Gold", "Silver", "Sugar"]
       }
@@ -5452,11 +5452,11 @@
           "Spanish Square Sails"
         ],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Cayo Vacas",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "ES",
         "produces": ["Food Supplies", "Lignum Vitae Log"]
       }
@@ -5473,11 +5473,11 @@
         "countyCapital": false,
         "drops": ["Fine Fabrics", "Scottish Wool", "Yorkshire Pudding"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Camp du Roy",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "SE",
         "produces": ["Food Supplies", "Oak Log"]
       }
@@ -5494,11 +5494,11 @@
         "countyCapital": false,
         "drops": ["Cheshire Cheese", "Indian Saltpeter", "Sussex Oak"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Port-Louis",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "SE",
         "produces": ["Hemp", "Stone Block"]
       }
@@ -5520,11 +5520,11 @@
           "White Oak Log"
         ],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Savannah",
         "nonCapturable": true,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "US",
         "produces": ["Cotton", "Hemp", "Oak Log"]
       }
@@ -5541,11 +5541,11 @@
         "countyCapital": false,
         "drops": ["China Tea", "Lancashire Iron", "Malabar Teak"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Le Moule",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "SE",
         "produces": ["Iron Ore", "Saltpeter"]
       }
@@ -5567,11 +5567,11 @@
           "Stolen Goods"
         ],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Hitten Hatcha",
         "nonCapturable": false,
         "shallow": true,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 2500,
         "nation": "GB",
         "produces": ["Hemp", "Sugar"]
       }
@@ -5611,11 +5611,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Medium",
         "name": "Cayo del Anclote",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "GB",
         "produces": []
       }
@@ -5638,11 +5638,11 @@
           "Oregon Beaver Coats"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Santa Rosa",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "GB",
         "produces": ["Food Supplies", "Iron Ore"]
       }
@@ -5659,11 +5659,11 @@
         "countyCapital": false,
         "drops": ["China Tea", "Cocoa", "Lancashire Iron", "Malabar Teak"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Green Cay",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "DE",
         "produces": ["Food Supplies", "Iron Ore"]
       }
@@ -5688,11 +5688,11 @@
           "Spanish Dried Fruits"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Fort-Dauphin",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "NT",
         "produces": ["Extra Labor", "Lignum Vitae Log"]
       }
@@ -5714,11 +5714,11 @@
           "Sumatran Pepper"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Pasaje",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "DK",
         "produces": ["Hemp", "Stone Block"]
       }
@@ -5742,11 +5742,11 @@
           "Yorkshire Pudding"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Kingstown",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "FR",
         "produces": ["Coal", "Hemp", "Sugar"]
       }
@@ -5759,7 +5759,7 @@
       },
       "properties": {
         "id": "381",
-        "capturer": "RAM",
+        "capturer": "TDY",
         "countyCapital": false,
         "drops": [
           "Black Ironwood",
@@ -5785,11 +5785,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Medium",
         "name": "Little River",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "US",
         "produces": []
       }
@@ -5814,11 +5814,11 @@
           "Provence Oak"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Saint Joseph",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "FR",
         "produces": ["Extra Labor", "Lignum Vitae Log"]
       }
@@ -5843,11 +5843,11 @@
           "Teak Log"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Grand Anse",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "SE",
         "produces": ["Food Supplies", "Hemp", "Oak Log"]
       }
@@ -5864,11 +5864,11 @@
         "countyCapital": false,
         "drops": ["Contraband Goods", "Dutch Peanut Butter", "Mahogany Log"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Crown Haven",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "US",
         "produces": ["Hemp", "Silver"]
       }
@@ -5913,11 +5913,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Medium",
         "name": "Carriacou",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "FR",
         "produces": []
       }
@@ -5939,11 +5939,11 @@
           "Merino Wool"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "San Lazaro",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "ES",
         "produces": ["Oak Log"]
       }
@@ -5965,11 +5965,11 @@
           "Textile Machinery"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Perijá",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "DE",
         "produces": ["Coal", "Fir Log", "Sugar"]
       }
@@ -5992,11 +5992,11 @@
           "Sabicu Log"
         ],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Islamorada",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "ES",
         "produces": ["Coal", "Fir Log", "Oak Log"]
       }
@@ -6013,11 +6013,11 @@
         "countyCapital": false,
         "drops": ["China Tea", "Cocoa", "Scottish Wool"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Chinchorro",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "GB",
         "produces": ["Lignum Vitae Log"]
       }
@@ -6039,11 +6039,11 @@
           "Spanish Gold Coins"
         ],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Puerto Real",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "NT",
         "produces": ["Fir Log", "Food Supplies", "Oak Log"]
       }
@@ -6083,11 +6083,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Medium",
         "name": "Concepción",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "DE",
         "produces": []
       }
@@ -6184,11 +6184,11 @@
           "Versailles Terracotta",
           "Yorkshire Pudding"
         ],
+        "portBattleType": "Large",
         "name": "La Habana",
         "nonCapturable": true,
         "shallow": false,
-        "size": 6,
-        "brLimit": 10200,
+        "brLimit": 11000,
         "nation": "ES",
         "produces": ["Hemp", "Sugar"]
       }
@@ -6205,11 +6205,11 @@
         "countyCapital": false,
         "drops": ["Caguairan Log", "Fine Fabrics", "Normandy Cider"],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Jacmel",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "PL",
         "produces": ["Hemp", "Stone Block"]
       }
@@ -6226,11 +6226,11 @@
         "countyCapital": false,
         "drops": ["Cocoa", "Merino Wool", "Sevilla Muskets"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Río Tocuyo",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "VP",
         "produces": ["Fir Log", "Sugar"]
       }
@@ -6253,11 +6253,11 @@
           "Stolen Goods"
         ],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Kidd\u0027s Harbour",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "RU",
         "produces": ["Food Supplies", "Hemp", "Oak Log"]
       }
@@ -6274,11 +6274,11 @@
         "countyCapital": false,
         "drops": ["Carolina Tobacco", "Live Oak Log"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Beaufort",
         "nonCapturable": true,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "US",
         "produces": ["Coal", "Hemp", "Sugar"]
       }
@@ -6295,11 +6295,11 @@
         "countyCapital": false,
         "drops": ["Coffee", "Historical Artifact"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Gracias a Dios",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "GB",
         "produces": ["Iron Ore", "Saltpeter"]
       }
@@ -6351,11 +6351,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Large",
         "name": "Campeche",
         "nonCapturable": false,
         "shallow": false,
-        "size": 5,
-        "brLimit": 8500,
+        "brLimit": 11000,
         "nation": "ES",
         "produces": ["Coal", "Gold", "Hemp", "Silver", "Sugar"]
       }
@@ -6378,11 +6378,11 @@
           "Spanish Walnut Oil"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Naparima",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "FR",
         "produces": ["Hemp", "Sugar", "Sulphur"]
       }
@@ -6405,11 +6405,11 @@
           "Spanish Dried Fruits"
         ],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Portobelo",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "DE",
         "produces": ["Cotton", "Oak Log"]
       }
@@ -6426,11 +6426,11 @@
         "countyCapital": false,
         "drops": ["French Gold Livres"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Ocean Bight",
         "nonCapturable": true,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "PR",
         "produces": ["Coal", "Lignum Vitae Log"]
       }
@@ -6452,11 +6452,11 @@
           "Parisian Furniture"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Nippes",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "SE",
         "produces": ["Fir Log", "Stone Block"]
       }
@@ -6473,11 +6473,11 @@
         "countyCapital": false,
         "drops": ["Fine Leather", "Gold Coast Ivory"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Arcas",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "ES",
         "produces": ["Coal", "Lignum Vitae Log"]
       }
@@ -6501,11 +6501,11 @@
           "Teak Log"
         ],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "The Settlement",
         "nonCapturable": false,
         "shallow": true,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 2500,
         "nation": "DK",
         "produces": ["Fir Log", "Lignum Vitae Log", "Stone Block"]
       }
@@ -6522,11 +6522,11 @@
         "countyCapital": true,
         "drops": ["Cocoa", "Madeira Wine", "Sabicu Log"],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Ponce",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "DK",
         "produces": ["Food Supplies", "Lignum Vitae Log"]
       }
@@ -6578,11 +6578,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Large",
         "name": "San Juan",
         "nonCapturable": false,
         "shallow": false,
-        "size": 5,
-        "brLimit": 8500,
+        "brLimit": 11000,
         "nation": "DK",
         "produces": ["Coal", "Fir Log", "Gold", "Silver", "Sugar"]
       }
@@ -6606,11 +6606,11 @@
           "Yorkshire Pudding"
         ],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Parrot Cay",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "NT",
         "produces": ["Iron Ore", "Stone Block"]
       }
@@ -6627,11 +6627,11 @@
         "countyCapital": false,
         "drops": ["Black Ironwood", "Catalonian Olive Oil", "Live Oak Log"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Barahona",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "PL",
         "produces": ["Coal", "Lignum Vitae Log"]
       }
@@ -6684,11 +6684,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Large",
         "name": "George Town",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "GB",
         "produces": ["Gold", "Hemp", "Silver", "Stone Block"]
       }
@@ -6705,11 +6705,11 @@
         "countyCapital": false,
         "drops": ["Arabian Coffee", "Fine Leather", "Suffolk Cheese"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Congrios",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "GB",
         "produces": ["Oak Log"]
       }
@@ -6722,16 +6722,16 @@
       },
       "properties": {
         "id": "309",
-        "capturer": "XCLAN",
+        "capturer": "VLTRA",
         "countyCapital": false,
         "drops": ["Fine Leather", "Iberian Dried Pork", "Spanish Almonds"],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Tampa",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
-        "nation": "GB",
+        "brLimit": 2400,
+        "nation": "ES",
         "produces": ["Hemp", "Stone Block"]
       }
     },
@@ -6752,11 +6752,11 @@
           "Versailles Terracotta"
         ],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "La Trinité",
         "nonCapturable": true,
         "shallow": true,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 2500,
         "nation": "FR",
         "produces": ["Fir Log", "Oak Log"]
       }
@@ -6779,11 +6779,11 @@
           "Sabicu Log"
         ],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Arthur\u0027s Town",
         "nonCapturable": false,
         "shallow": true,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 2500,
         "nation": "PR",
         "produces": ["Fir Log", "Sugar"]
       }
@@ -6823,11 +6823,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Medium",
         "name": "Las Tortugas",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "ES",
         "produces": []
       }
@@ -6852,11 +6852,11 @@
           "Spanish Almonds"
         ],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Cocodrillo",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "ES",
         "produces": ["Fir Log", "Food Supplies", "Oak Log"]
       }
@@ -6873,11 +6873,11 @@
         "countyCapital": false,
         "drops": ["Black Ironwood"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Frozen Cay",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "US",
         "produces": ["Food Supplies", "Hemp"]
       }
@@ -6890,7 +6890,7 @@
       },
       "properties": {
         "id": "340",
-        "capturer": "CH",
+        "capturer": "SH",
         "countyCapital": true,
         "drops": [
           "Black Ironwood",
@@ -6899,12 +6899,12 @@
           "Suriname Indigo"
         ],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Arenas",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
-        "nation": "GB",
+        "brLimit": 1250,
+        "nation": "ES",
         "produces": ["Oak Log"]
       }
     },
@@ -6925,11 +6925,11 @@
           "Ukrainian Grain"
         ],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Water Bay",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "US",
         "produces": ["Iron Ore", "Saltpeter"]
       }
@@ -6951,11 +6951,11 @@
           "Madeira Wine"
         ],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Mitara",
         "nonCapturable": false,
         "shallow": true,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 2500,
         "nation": "VP",
         "produces": ["Food Supplies", "Iron Ore"]
       }
@@ -7005,11 +7005,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Small",
         "name": "La Bahía",
         "nonCapturable": false,
         "shallow": true,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 2500,
         "nation": "FR",
         "produces": ["Coal", "Gold", "Lignum Vitae Log", "Silver"]
       }
@@ -7047,11 +7047,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Medium",
         "name": "Aves",
         "nonCapturable": true,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "FT",
         "produces": []
       }
@@ -7068,11 +7068,11 @@
         "countyCapital": false,
         "drops": ["Iberian Dried Pork", "Indigo", "Madeira Wine"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Yaguaraparo",
         "nonCapturable": false,
         "shallow": true,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 2500,
         "nation": "FR",
         "produces": ["Fir Log", "Saltpeter"]
       }
@@ -7089,11 +7089,11 @@
         "countyCapital": false,
         "drops": ["China Tea", "Sumatran Pepper", "Textile Machinery"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Codrington",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "SE",
         "produces": ["Hemp", "Tobacco"]
       }
@@ -7116,11 +7116,11 @@
           "Sumatran Pepper"
         ],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "San Luis",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "FR",
         "produces": ["Hemp", "Stone Block"]
       }
@@ -7145,11 +7145,11 @@
           "Spanish Dried Fruits"
         ],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Guibara",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "NT",
         "produces": ["Iron Ore", "Sugar", "Sulphur"]
       }
@@ -7166,11 +7166,11 @@
         "countyCapital": true,
         "drops": ["Black Ironwood", "Caguairan Log", "Cuban Tobacco"],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Black River",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "GB",
         "produces": ["Oak Log"]
       }
@@ -7192,11 +7192,11 @@
           "Versailles Terracotta"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Saint-Pierre",
         "nonCapturable": true,
         "shallow": false,
-        "size": 4,
-        "brLimit": 6800,
+        "brLimit": 9600,
         "nation": "FR",
         "produces": ["Hemp", "Sugar"]
       }
@@ -7209,7 +7209,7 @@
       },
       "properties": {
         "id": "64",
-        "capturer": "TEARM",
+        "capturer": "",
         "countyCapital": false,
         "drops": [
           "Cheshire Cheese",
@@ -7218,12 +7218,12 @@
           "Spanish Almonds"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Robras",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
-        "nation": "ES",
+        "brLimit": 4800,
+        "nation": "NT",
         "produces": ["Sugar"]
       }
     },
@@ -7235,7 +7235,7 @@
       },
       "properties": {
         "id": "95",
-        "capturer": "EDR",
+        "capturer": "HRE",
         "countyCapital": false,
         "drops": [
           "Historical Artifact",
@@ -7246,12 +7246,12 @@
           "Versailles Terracotta"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Port-de-Paix",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
-        "nation": "FR",
+        "brLimit": 7200,
+        "nation": "SE",
         "produces": ["Fir Log", "Food Supplies", "Oak Log"]
       }
     },
@@ -7267,11 +7267,11 @@
         "countyCapital": false,
         "drops": ["Swedish Carpenter", "Swedish Sail Cloth"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Island Harbour",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "SE",
         "produces": ["Fir Log", "Oak Log"]
       }
@@ -7297,11 +7297,11 @@
           "Teak Log"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Flatts",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "RU",
         "produces": ["Coal", "Iron Ore", "Sugar"]
       }
@@ -7318,11 +7318,11 @@
         "countyCapital": false,
         "drops": ["Arctic Fox Pelts", "Cape Coast Honey"],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Marigot",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "SE",
         "produces": ["Hemp", "Sugar"]
       }
@@ -7339,11 +7339,11 @@
         "countyCapital": false,
         "drops": ["Malabar Teak", "Textile Machinery", "Yorkshire Pudding"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Carlisle",
         "nonCapturable": true,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "GB",
         "produces": ["Coal", "Lignum Vitae Log"]
       }
@@ -7382,11 +7382,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Medium",
         "name": "Dariena",
         "nonCapturable": true,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "FT",
         "produces": []
       }
@@ -7409,11 +7409,11 @@
           "Pino Ocote Log"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Higüey",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "DK",
         "produces": ["Fir Log", "Stone Block"]
       }
@@ -7430,11 +7430,11 @@
         "countyCapital": false,
         "drops": ["Fine Leather", "Spanish Walnut Oil"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Güiria",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "FR",
         "produces": ["Food Supplies", "Iron Ore"]
       }
@@ -7447,16 +7447,16 @@
       },
       "properties": {
         "id": "362",
-        "capturer": "MAD47",
+        "capturer": "",
         "countyCapital": false,
         "drops": ["Indigo", "Spanish Gold Coins"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Little Isaac Rocks",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
-        "nation": "US",
+        "brLimit": 1250,
+        "nation": "NT",
         "produces": ["Sugar"]
       }
     },
@@ -7477,11 +7477,11 @@
           "Spanish Dried Fruits"
         ],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Santo Tomé de Guayana",
         "nonCapturable": false,
         "shallow": false,
-        "size": 4,
-        "brLimit": 6800,
+        "brLimit": 9600,
         "nation": "FR",
         "produces": ["Oak Log"]
       }
@@ -7498,11 +7498,11 @@
         "countyCapital": false,
         "drops": ["Live Oak Log", "Sevilla Muskets", "Spanish Almonds"],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "New Smyrna",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "US",
         "produces": ["Fir Log", "Food Supplies", "Oak Log"]
       }
@@ -7515,7 +7515,7 @@
       },
       "properties": {
         "id": "71",
-        "capturer": "",
+        "capturer": "FNI",
         "countyCapital": false,
         "drops": [
           "Catalonian Olive Oil",
@@ -7526,12 +7526,12 @@
           "Spanish Dried Fruits"
         ],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Siguanea",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
-        "nation": "NT",
+        "brLimit": 1250,
+        "nation": "ES",
         "produces": ["Iron Ore", "Stone Block"]
       }
     },
@@ -7580,11 +7580,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Small",
         "name": "George\u0027s Town",
         "nonCapturable": false,
         "shallow": true,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 2500,
         "nation": "PR",
         "produces": ["Gold", "Oak Log", "Silver"]
       }
@@ -7601,11 +7601,11 @@
         "countyCapital": false,
         "drops": ["Arabian Coffee", "Assam Tea", "Parisian Furniture"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Saint-François",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "SE",
         "produces": ["Coal", "Fir Log", "Sugar"]
       }
@@ -7622,11 +7622,11 @@
         "countyCapital": false,
         "drops": ["Danish Pickled Herring", "Spanish Almonds", "White Oak Log"],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Samaná",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "RU",
         "produces": ["Sugar"]
       }
@@ -7643,11 +7643,11 @@
         "countyCapital": true,
         "drops": ["Coffee", "Fine Leather"],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Old Providence",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "GB",
         "produces": ["Food Supplies", "Hemp", "Oak Log"]
       }
@@ -7664,11 +7664,11 @@
         "countyCapital": true,
         "drops": ["Coffee", "Lancashire Iron"],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Salamanca",
         "nonCapturable": false,
         "shallow": false,
-        "size": 4,
-        "brLimit": 6800,
+        "brLimit": 9600,
         "nation": "GB",
         "produces": ["Coal", "Hemp"]
       }
@@ -7691,11 +7691,11 @@
           "White Oak Log"
         ],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Ahumada",
         "nonCapturable": false,
         "shallow": true,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 2500,
         "nation": "FR",
         "produces": ["Oak Log"]
       }
@@ -7712,11 +7712,11 @@
         "countyCapital": false,
         "drops": ["Cocoa", "Contraband Goods", "Stolen Goods"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Cayo Largo",
         "nonCapturable": false,
         "shallow": true,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 2500,
         "nation": "ES",
         "produces": ["Hemp", "Sugar"]
       }
@@ -7739,11 +7739,11 @@
           "Yorkshire Pudding"
         ],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Alabaster Rocks",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "PR",
         "produces": ["Oak Log"]
       }
@@ -7782,11 +7782,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Medium",
         "name": "Tumbado",
         "nonCapturable": true,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "FT",
         "produces": []
       }
@@ -7803,11 +7803,11 @@
         "countyCapital": false,
         "drops": ["Cocoa", "Sabicu Log"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Macanao",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "VP",
         "produces": ["Coal", "Fir Log", "Oak Log"]
       }
@@ -7820,7 +7820,7 @@
       },
       "properties": {
         "id": "97",
-        "capturer": "DNP",
+        "capturer": "RUS",
         "countyCapital": true,
         "drops": [
           "Burgundian Wine",
@@ -7832,12 +7832,12 @@
           "Parisian Furniture"
         ],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Cap-Français",
         "nonCapturable": false,
         "shallow": false,
-        "size": 4,
-        "brLimit": 6800,
-        "nation": "DK",
+        "brLimit": 9600,
+        "nation": "RU",
         "produces": ["Iron Ore", "Stone Block"]
       }
     },
@@ -7849,7 +7849,7 @@
       },
       "properties": {
         "id": "268",
-        "capturer": "",
+        "capturer": "SH",
         "countyCapital": false,
         "drops": [
           "Bavarian Grain",
@@ -7858,12 +7858,12 @@
           "Spanish Walnut Oil"
         ],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Sisal",
         "nonCapturable": false,
         "shallow": false,
-        "size": 4,
-        "brLimit": 6800,
-        "nation": "NT",
+        "brLimit": 9600,
+        "nation": "ES",
         "produces": ["Oak Log"]
       }
     },
@@ -7916,11 +7916,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Large",
         "name": "Saint John\u0027s",
         "nonCapturable": false,
         "shallow": false,
-        "size": 4,
-        "brLimit": 6800,
+        "brLimit": 9600,
         "nation": "SE",
         "produces": ["Fir Log", "Gold", "Silver", "Stone Block"]
       }
@@ -7933,7 +7933,7 @@
       },
       "properties": {
         "id": "32",
-        "capturer": "REDS",
+        "capturer": "",
         "countyCapital": false,
         "drops": [
           "Kentucky Bourbon",
@@ -7944,12 +7944,12 @@
           "Teak Log"
         ],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Blondel Cay",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
-        "nation": "RU",
+        "brLimit": 1250,
+        "nation": "NT",
         "produces": ["Hemp", "Sugar"]
       }
     },
@@ -7965,11 +7965,11 @@
         "countyCapital": false,
         "drops": ["Caguairan Log", "Catalonian Olive Oil"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Matanzas",
         "nonCapturable": true,
         "shallow": false,
-        "size": 4,
-        "brLimit": 6800,
+        "brLimit": 9600,
         "nation": "ES",
         "produces": ["Coal", "Fir Log", "Sugar"]
       }
@@ -8009,11 +8009,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Medium",
         "name": "La Mona",
         "nonCapturable": true,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "FT",
         "produces": []
       }
@@ -8053,11 +8053,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Medium",
         "name": "La Navasse",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "SE",
         "produces": []
       }
@@ -8074,11 +8074,11 @@
         "countyCapital": false,
         "drops": ["Cuban Tobacco", "Merino Wool"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Caño Araguabisi",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "FR",
         "produces": ["Sugar"]
       }
@@ -8099,11 +8099,11 @@
           "Spanish Walnut Oil"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Monte Cristi",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "NT",
         "produces": ["Coal", "Hemp"]
       }
@@ -8143,11 +8143,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Medium",
         "name": "Santa Ana",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "ES",
         "produces": []
       }
@@ -8170,11 +8170,11 @@
           "Jutland Amber"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Spanish Town",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "DK",
         "produces": ["Food Supplies", "Hemp", "Oak Log"]
       }
@@ -8191,11 +8191,11 @@
         "countyCapital": false,
         "drops": ["Spanish Gold Coins"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Little Inagua",
         "nonCapturable": true,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "PR",
         "produces": ["Iron Ore", "Stone Block"]
       }
@@ -8212,11 +8212,11 @@
         "countyCapital": false,
         "drops": ["Batavian Spices", "Grietje van Dijk", "Swedish Carpenter"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Fort Zoutman",
         "nonCapturable": true,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "VP",
         "produces": ["Fir Log", "Oak Log"]
       }
@@ -8256,11 +8256,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Medium",
         "name": "Guayaguayare",
         "nonCapturable": true,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "FT",
         "produces": []
       }
@@ -8277,11 +8277,11 @@
         "countyCapital": false,
         "drops": ["Caguairan Log", "Carolina Tobacco"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Misteriosa",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "GB",
         "produces": ["Food Supplies", "Iron Ore"]
       }
@@ -8308,11 +8308,11 @@
           "Versailles Terracotta"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Rosaly",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "FR",
         "produces": ["Fir Log", "Lignum Vitae Log", "Stone Block"]
       }
@@ -8329,11 +8329,11 @@
         "countyCapital": false,
         "drops": ["Catalonian Olive Oil", "Iberian Dried Pork", "Sabicu Log"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Bernal",
         "nonCapturable": true,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "ES",
         "produces": ["Food Supplies", "Lignum Vitae Log"]
       }
@@ -8350,11 +8350,11 @@
         "countyCapital": false,
         "drops": ["Catalonian Olive Oil", "Fine Leather"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Vieques",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "DK",
         "produces": ["Coal", "Oak Log"]
       }
@@ -8379,11 +8379,11 @@
           "Suffolk Cheese"
         ],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Wilmington",
         "nonCapturable": true,
         "shallow": false,
-        "size": 4,
-        "brLimit": 6800,
+        "brLimit": 9600,
         "nation": "US",
         "produces": ["Coal", "Fir Log", "Lignum Vitae Log", "Stone Block"]
       }
@@ -8405,11 +8405,11 @@
           "Norwegian Fox Fur"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Nueva Barcelona",
         "nonCapturable": false,
         "shallow": false,
-        "size": 4,
-        "brLimit": 6800,
+        "brLimit": 9600,
         "nation": "VP",
         "produces": ["Oak Log"]
       }
@@ -8426,11 +8426,11 @@
         "countyCapital": false,
         "drops": ["Fine Fabrics", "Languedoc Violins"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Les Gonaïves",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "SE",
         "produces": ["Coal", "Oak Log"]
       }
@@ -8457,11 +8457,11 @@
           "Yorkshire Pudding"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Somerset",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "RU",
         "produces": ["Fir Log", "Lignum Vitae Log", "Stone Block"]
       }
@@ -8478,11 +8478,11 @@
         "countyCapital": false,
         "drops": ["Black Ironwood", "Cuban Tobacco", "Sabicu Log"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Prinzapolka",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "NT",
         "produces": ["Hemp", "Stone Block"]
       }
@@ -8529,11 +8529,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Small",
         "name": "Marsh Harbour",
         "nonCapturable": false,
         "shallow": true,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 2500,
         "nation": "US",
         "produces": ["Coal", "Gold", "Silver", "Sugar"]
       }
@@ -8555,11 +8555,11 @@
           "Yorkshire Pudding"
         ],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Asunción",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "GB",
         "produces": ["Sugar"]
       }
@@ -8582,11 +8582,11 @@
           "Madeira Wine"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Manataca",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "ES",
         "produces": ["Food Supplies", "Iron Ore"]
       }
@@ -8603,11 +8603,11 @@
         "countyCapital": false,
         "drops": ["Fine Leather", "Sabicu Log", "Vermont Maple Sugar"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Jobe",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "US",
         "produces": ["Coal", "Fir Log", "Sugar"]
       }
@@ -8624,11 +8624,11 @@
         "countyCapital": false,
         "drops": ["Catalonian Olive Oil", "Coffee", "Historical Artifact"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Almirante",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "DE",
         "produces": ["Coal", "Fir Log", "Sugar"]
       }
@@ -8650,11 +8650,11 @@
           "Provence Oak"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Vieux-Fort",
         "nonCapturable": true,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "FR",
         "produces": ["Coal", "Fir Log", "Lignum Vitae Log", "Stone Block"]
       }
@@ -8671,11 +8671,11 @@
         "countyCapital": false,
         "drops": ["Cocoa", "Iberian Dried Pork", "Madeira Wine"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "El Toco",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "FR",
         "produces": ["Coal", "Lignum Vitae Log", "Tobacco"]
       }
@@ -8688,7 +8688,7 @@
       },
       "properties": {
         "id": "379",
-        "capturer": "",
+        "capturer": "SH",
         "countyCapital": false,
         "drops": [
           "Black Ironwood",
@@ -8714,12 +8714,12 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Medium",
         "name": "Salinas",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
-        "nation": "NT",
+        "brLimit": 2400,
+        "nation": "ES",
         "produces": []
       }
     },
@@ -8768,11 +8768,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Large",
         "name": "Pinar del Río",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "ES",
         "produces": ["Food Supplies", "Gold", "Hemp", "Silver"]
       }
@@ -8794,11 +8794,11 @@
           "Sevilla Muskets"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Caño Araguao",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "FR",
         "produces": ["Coal", "Lignum Vitae Log"]
       }
@@ -8820,11 +8820,11 @@
           "Sussex Oak"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Ambergrease Caye",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "GB",
         "produces": ["Food Supplies", "Lignum Vitae Log"]
       }
@@ -8841,11 +8841,11 @@
         "countyCapital": false,
         "drops": ["Cape Coast Honey", "French Gold Livres", "Kurland Oak"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Walker\u0027s Cay",
         "nonCapturable": false,
         "shallow": true,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 2500,
         "nation": "US",
         "produces": ["Hemp", "Stone Block"]
       }
@@ -8862,11 +8862,11 @@
         "countyCapital": false,
         "drops": ["Cocoa", "Sabicu Log", "Spanish Walnut Oil"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Playón",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "DE",
         "produces": ["Coal", "Lignum Vitae Log"]
       }
@@ -8919,11 +8919,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Small",
         "name": "Ragged Cay",
         "nonCapturable": false,
         "shallow": true,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 2500,
         "nation": "PR",
         "produces": ["Coal", "Gold", "Hemp", "Silver", "Sugar"]
       }
@@ -8936,7 +8936,7 @@
       },
       "properties": {
         "id": "47",
-        "capturer": "",
+        "capturer": "SMOKE",
         "countyCapital": false,
         "drops": [
           "Cognac",
@@ -8947,12 +8947,12 @@
           "Spanish Dried Fruits"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Puerto del Padre",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
-        "nation": "NT",
+        "brLimit": 4800,
+        "nation": "PR",
         "produces": ["Food Supplies", "Hemp", "Oak Log"]
       }
     },
@@ -8974,11 +8974,11 @@
           "Spanish Walnut Oil"
         ],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Guacata",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "ES",
         "produces": ["Oak Log"]
       }
@@ -9000,11 +9000,11 @@
           "Versailles Terracotta"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Tordo",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "NT",
         "produces": ["Hemp", "Stone Block"]
       }
@@ -9021,11 +9021,11 @@
         "countyCapital": false,
         "drops": ["Live Oak Log", "Longleaf Pine Log", "Spanish Gold Coins"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Las Sabinas",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "GB",
         "produces": ["Food Supplies", "Lignum Vitae Log"]
       }
@@ -9042,11 +9042,11 @@
         "countyCapital": true,
         "drops": ["Corsican Mint", "Parisian Furniture", "Spanish Almonds"],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Les Cayes",
         "nonCapturable": false,
         "shallow": false,
-        "size": 4,
-        "brLimit": 6800,
+        "brLimit": 9600,
         "nation": "PL",
         "produces": ["Food Supplies", "Iron Ore"]
       }
@@ -9059,16 +9059,16 @@
       },
       "properties": {
         "id": "339",
-        "capturer": "",
+        "capturer": "SH",
         "countyCapital": false,
         "drops": ["Coffee", "Spanish Almonds", "Sumatran Pepper"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Baxo Nuevo",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
-        "nation": "NT",
+        "brLimit": 1250,
+        "nation": "ES",
         "produces": ["Fir Log", "Stone Block"]
       }
     },
@@ -9084,11 +9084,11 @@
         "countyCapital": false,
         "drops": ["Arabian Coffee", "Spanish Walnut Oil", "Yorkshire Pudding"],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Batabanó",
         "nonCapturable": false,
         "shallow": false,
-        "size": 4,
-        "brLimit": 6800,
+        "brLimit": 9600,
         "nation": "ES",
         "produces": ["Coal", "Iron Ore"]
       }
@@ -9105,11 +9105,11 @@
         "countyCapital": false,
         "drops": ["Madeira Wine", "Mahogany Log", "Spanish Walnut Oil"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Tuspan",
         "nonCapturable": true,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "ES",
         "produces": ["Extra Labor", "Iron Ore"]
       }
@@ -9126,11 +9126,11 @@
         "countyCapital": false,
         "drops": ["Batavian Spices", "Scottish Wool", "Suffolk Cheese"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Plymouth",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "SE",
         "produces": ["Extra Labor", "Iron Ore"]
       }
@@ -9151,11 +9151,11 @@
           "Vermont Maple Sugar"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Brunswick",
         "nonCapturable": true,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "US",
         "produces": ["Coal", "Fir Log", "Lignum Vitae Log", "Stone Block"]
       }
@@ -9178,11 +9178,11 @@
           "Textile Machinery"
         ],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Pedro Cay",
         "nonCapturable": true,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "GB",
         "produces": ["Food Supplies", "Iron Ore", "Sugar"]
       }
@@ -9209,11 +9209,11 @@
           "Yorkshire Pudding"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Wantlands Ferry",
         "nonCapturable": true,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "US",
         "produces": ["Cotton", "Hemp", "Oak Log"]
       }
@@ -9236,11 +9236,11 @@
           "Vermont Maple Sugar"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Lorimers",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "NT",
         "produces": ["Food Supplies", "Lignum Vitae Log"]
       }
@@ -9257,11 +9257,11 @@
         "countyCapital": false,
         "drops": ["Danish Beer", "Danish Pickled Herring", "Swedish Carpenter"],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Amalienborg",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "DK",
         "produces": ["Fir Log", "Oak Log"]
       }
@@ -9284,11 +9284,11 @@
           "Sussex Oak"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Mantua",
         "nonCapturable": true,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "ES",
         "produces": ["Lignum Vitae Log"]
       }
@@ -9310,11 +9310,11 @@
           "Pino Ocote Log"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "El Soco",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "DK",
         "produces": ["Food Supplies", "Iron Ore"]
       }
@@ -9337,11 +9337,11 @@
           "Spanish Walnut Oil"
         ],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Santa Marta",
         "nonCapturable": false,
         "shallow": false,
-        "size": 4,
-        "brLimit": 6800,
+        "brLimit": 9600,
         "nation": "SE",
         "produces": ["Iron Ore", "Stone Block"]
       }
@@ -9354,7 +9354,7 @@
       },
       "properties": {
         "id": "282",
-        "capturer": "",
+        "capturer": "EDR",
         "countyCapital": true,
         "drops": [
           "Arabian Coffee",
@@ -9396,12 +9396,12 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Large",
         "name": "Soto La Marina",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
-        "nation": "NT",
+        "brLimit": 7200,
+        "nation": "FR",
         "produces": ["Food Supplies", "Gold", "Iron Ore", "Silver"]
       }
     },
@@ -9451,11 +9451,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Large",
         "name": "Puerto Plata",
         "nonCapturable": false,
         "shallow": false,
-        "size": 4,
-        "brLimit": 6800,
+        "brLimit": 9600,
         "nation": "RU",
         "produces": ["Gold", "Oak Log", "Silver"]
       }
@@ -9472,11 +9472,11 @@
         "countyCapital": false,
         "drops": ["Cuban Tobacco", "Indian Saltpeter", "Sabicu Log"],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Tulum",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "GB",
         "produces": ["Fir Log", "Food Supplies"]
       }
@@ -9499,11 +9499,11 @@
           "Yorkshire Pudding"
         ],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Gibraltar",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "DE",
         "produces": ["Hemp", "Stone Block"]
       }
@@ -9527,11 +9527,11 @@
           "Sevilla Muskets"
         ],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Omoa",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "GB",
         "produces": ["Coal", "Lignum Vitae Log"]
       }
@@ -9636,11 +9636,11 @@
           "Versailles Terracotta",
           "Yorkshire Pudding"
         ],
+        "portBattleType": "Large",
         "name": "Puerto de España",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "FR",
         "produces": [
           "Food Supplies",
@@ -9696,11 +9696,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Large",
         "name": "Pointe-à-Pitre",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "SE",
         "produces": ["Gold", "Lignum Vitae Log", "Silver", "Sulphur"]
       }
@@ -9722,11 +9722,11 @@
           "Spanish Walnut Oil"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Victoria",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "ES",
         "produces": ["Gold", "Lignum Vitae Log"]
       }
@@ -9749,11 +9749,11 @@
           "Sabicu Log"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Encontrados",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "DE",
         "produces": ["Iron Ore", "Saltpeter"]
       }
@@ -9774,11 +9774,11 @@
           "Royal Naval College Graduate"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Santanillas",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "GB",
         "produces": ["Oak Log"]
       }
@@ -9800,11 +9800,11 @@
           "Mahogany Log"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Placentia",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "GB",
         "produces": ["Iron Ore", "Stone Block"]
       }
@@ -9817,16 +9817,16 @@
       },
       "properties": {
         "id": "23",
-        "capturer": "WTF",
+        "capturer": "REDS",
         "countyCapital": true,
         "drops": ["Carolina Tobacco", "Crooked Cedar", "Mahogany Log"],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Pitt\u0027s Town",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
-        "nation": "PR",
+        "brLimit": 4800,
+        "nation": "RU",
         "produces": ["Iron Ore", "Stone Block"]
       }
     },
@@ -9842,11 +9842,11 @@
         "countyCapital": false,
         "drops": ["Cocoa", "Cuban Tobacco", "Historical Artifact"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Terre-de-Bas",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "SE",
         "produces": ["Food Supplies", "Iron Ore", "Sugar"]
       }
@@ -9868,11 +9868,11 @@
           "Spanish Almonds"
         ],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Haulover",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "NT",
         "produces": ["Hemp", "Sugar"]
       }
@@ -9895,11 +9895,11 @@
           "Sevilla Muskets"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "La Isabela",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "RU",
         "produces": ["Iron Ore"]
       }
@@ -9922,11 +9922,11 @@
           "Spanish Walnut Oil"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Portillo",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "GB",
         "produces": ["Extra Labor", "Iron Ore"]
       }
@@ -9943,11 +9943,11 @@
         "countyCapital": false,
         "drops": ["Coffee", "Historical Artifact"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Cabo Rojo",
         "nonCapturable": false,
         "shallow": true,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 2500,
         "nation": "DK",
         "produces": ["Hemp", "Stone Block"]
       }
@@ -9964,11 +9964,11 @@
         "countyCapital": false,
         "drops": ["Catalonian Olive Oil", "Cocoa"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Pedernales",
         "nonCapturable": false,
         "shallow": true,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 2500,
         "nation": "FR",
         "produces": ["Hemp", "Sulphur"]
       }
@@ -9985,11 +9985,11 @@
         "countyCapital": false,
         "drops": ["Russian Vodka", "Swedish Iron"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Cul-de-Sac",
         "nonCapturable": true,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "SE",
         "produces": ["Coal", "Lignum Vitae Log"]
       }
@@ -10006,11 +10006,11 @@
         "countyCapital": false,
         "drops": ["Jutland Amber", "Madeira Wine"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Macao",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "NT",
         "produces": ["Cotton", "Stone Block"]
       }
@@ -10027,11 +10027,11 @@
         "countyCapital": false,
         "drops": ["Corsican Mint", "Provence Oak", "Spanish Walnut Oil"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Saint-Marc",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "SE",
         "produces": ["Gold", "Hemp"]
       }
@@ -10053,11 +10053,11 @@
           "Madagascar Tallow"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Atchafalaya",
         "nonCapturable": true,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "FR",
         "produces": ["Sugar"]
       }
@@ -10070,15 +10070,15 @@
       },
       "properties": {
         "id": "6",
-        "capturer": "MAD47",
+        "capturer": "TDY",
         "countyCapital": false,
         "drops": ["Madagascar Jewels", "Sumatran Pepper"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Turtle Cay",
         "nonCapturable": false,
         "shallow": true,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 2500,
         "nation": "US",
         "produces": ["Iron Ore", "Saltpeter"]
       }
@@ -10116,11 +10116,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Medium",
         "name": "La Orchila",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "VP",
         "produces": []
       }
@@ -10142,11 +10142,11 @@
           "Spanish Walnut Oil"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Manzanilla",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "GB",
         "produces": ["Coal", "Oak Log"]
       }
@@ -10168,11 +10168,11 @@
           "Historical Artifact"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Biloxi",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "FR",
         "produces": ["Coal", "Lignum Vitae Log"]
       }
@@ -10199,11 +10199,11 @@
           "Textile Machinery"
         ],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Saint George\u0027s Town",
         "nonCapturable": false,
         "shallow": false,
-        "size": 4,
-        "brLimit": 6800,
+        "brLimit": 9600,
         "nation": "RU",
         "produces": ["Food Supplies", "Hemp", "Oak Log"]
       }
@@ -10247,11 +10247,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Medium",
         "name": "Atwood",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "RU",
         "produces": []
       }
@@ -10304,11 +10304,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Large",
         "name": "Port-au-Prince",
         "nonCapturable": false,
         "shallow": false,
-        "size": 4,
-        "brLimit": 6800,
+        "brLimit": 9600,
         "nation": "SE",
         "produces": ["Food Supplies", "Gold", "Lignum Vitae Log", "Silver"]
       }
@@ -10325,11 +10325,11 @@
         "countyCapital": false,
         "drops": ["Corsican Mint", "Provence Oak"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Constance",
         "nonCapturable": true,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "FR",
         "produces": ["Hemp", "Tobacco"]
       }
@@ -10346,11 +10346,11 @@
         "countyCapital": false,
         "drops": ["Cocoa", "Merino Wool", "Sevilla Muskets"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Sarazota",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "ES",
         "produces": ["Fir Log", "Sugar"]
       }
@@ -10363,7 +10363,7 @@
       },
       "properties": {
         "id": "60",
-        "capturer": "",
+        "capturer": "VLTRA",
         "countyCapital": false,
         "drops": [
           "Caguairan Log",
@@ -10373,12 +10373,12 @@
           "Suffolk Cheese"
         ],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Jagua",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
-        "nation": "NT",
+        "brLimit": 4800,
+        "nation": "ES",
         "produces": ["Fir Log", "Stone Block"]
       }
     },
@@ -10394,11 +10394,11 @@
         "countyCapital": false,
         "drops": ["Burgundian Wine", "Live Oak Log", "Versailles Terracotta"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Terrebonne",
         "nonCapturable": true,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "FR",
         "produces": ["Food Supplies", "Iron Ore"]
       }
@@ -10415,11 +10415,11 @@
         "countyCapital": false,
         "drops": ["Indigo", "Sabicu Log"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Guayama",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "DK",
         "produces": ["Iron Ore", "Silver"]
       }
@@ -10436,11 +10436,11 @@
         "countyCapital": false,
         "drops": ["Historical Artifact", "White Oak Log"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Kemps Bay",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "SE",
         "produces": ["Coal", "Iron Ore"]
       }
@@ -10464,11 +10464,11 @@
           "Teak Log"
         ],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Road Town",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "DK",
         "produces": ["Coal", "Iron Ore", "Sugar"]
       }
@@ -10489,11 +10489,11 @@
           "Swedish Sail Cloth"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Conttoy",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "GB",
         "produces": ["Fir Log", "Saltpeter"]
       }
@@ -10510,11 +10510,11 @@
         "countyCapital": false,
         "drops": ["Batavian Spices", "Spanish Gold Coins"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "La Desconocida",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "US",
         "produces": ["Lignum Vitae Log", "Sulphur"]
       }
@@ -10531,11 +10531,11 @@
         "countyCapital": false,
         "drops": ["Fine Leather", "Pino Ocote Log"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Sandy Bay",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "NT",
         "produces": ["Coal", "Fir Log", "Sugar"]
       }
@@ -10552,11 +10552,11 @@
         "countyCapital": true,
         "drops": ["Arctic Fox Pelts", "Jutland Amber"],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Selam",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "GB",
         "produces": ["Hemp", "Sulphur"]
       }
@@ -10593,11 +10593,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Medium",
         "name": "Saint-Malo",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "FR",
         "produces": []
       }
@@ -10614,11 +10614,11 @@
         "countyCapital": false,
         "drops": ["Caguairan Log", "Iberian Dried Pork", "Spanish Almonds"],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Carahatas",
         "nonCapturable": true,
         "shallow": true,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 2500,
         "nation": "ES",
         "produces": ["Lignum Vitae Log", "Sulphur"]
       }
@@ -10641,11 +10641,11 @@
           "Mahogany Log"
         ],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Caracas",
         "nonCapturable": false,
         "shallow": false,
-        "size": 4,
-        "brLimit": 6800,
+        "brLimit": 9600,
         "nation": "VP",
         "produces": ["Food Supplies", "Iron Ore"]
       }
@@ -10667,11 +10667,11 @@
           "Madeira Wine"
         ],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Matina",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "NT",
         "produces": ["Food Supplies", "Oak Log"]
       }
@@ -10684,7 +10684,7 @@
       },
       "properties": {
         "id": "14",
-        "capturer": "ST0RM",
+        "capturer": "BLACK",
         "countyCapital": true,
         "drops": [
           "Arabian Coffee",
@@ -10778,12 +10778,12 @@
           "Vermont Maple Sugar",
           "Versailles Terracotta"
         ],
+        "portBattleType": "Small",
         "name": "Nassau",
         "nonCapturable": false,
         "shallow": true,
-        "size": 3,
-        "brLimit": 5100,
-        "nation": "SE",
+        "brLimit": 2500,
+        "nation": "PR",
         "produces": ["Gold", "Hemp", "Silver", "Stone Block"]
       }
     },
@@ -10806,11 +10806,11 @@
           "Versailles Terracotta"
         ],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Castries",
         "nonCapturable": true,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "FR",
         "produces": ["Food Supplies", "Iron Ore", "Sugar"]
       }
@@ -10859,11 +10859,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Large",
         "name": "Grand Turk",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "SE",
         "produces": ["Coal", "Fir Log", "Gold", "Oak Log", "Silver"]
       }
@@ -10959,11 +10959,11 @@
           "Versailles Terracotta",
           "Yorkshire Pudding"
         ],
+        "portBattleType": "Large",
         "name": "Christiansted",
         "nonCapturable": true,
         "shallow": false,
-        "size": 4,
-        "brLimit": 6800,
+        "brLimit": 9600,
         "nation": "DK",
         "produces": ["Hemp", "Sugar"]
       }
@@ -11060,11 +11060,11 @@
           "Versailles Terracotta",
           "Yorkshire Pudding"
         ],
+        "portBattleType": "Large",
         "name": "Charleston",
         "nonCapturable": true,
         "shallow": false,
-        "size": 4,
-        "brLimit": 6800,
+        "brLimit": 9600,
         "nation": "US",
         "produces": ["Iron Ore", "Stone Block"]
       }
@@ -11086,11 +11086,11 @@
           "Spanish Dried Fruits"
         ],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Scarborough",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "FR",
         "produces": ["Fir Log", "Oak Log", "Saltpeter"]
       }
@@ -11112,11 +11112,11 @@
           "Live Oak Log"
         ],
         "consumes": [],
+        "portBattleType": "Large",
         "name": "Gasparilla",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "ES",
         "produces": ["Coal", "Lignum Vitae Log"]
       }
@@ -11133,11 +11133,11 @@
         "countyCapital": false,
         "drops": ["Cocoa", "Madeira Wine", "Merino Wool", "Sevilla Muskets"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "San Juan del Norte",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "NT",
         "produces": ["Iron Ore", "Saltpeter"]
       }
@@ -11161,11 +11161,11 @@
           "Spanish Dried Fruits"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Almeria",
         "nonCapturable": true,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "ES",
         "produces": ["Sugar"]
       }
@@ -11187,11 +11187,11 @@
           "Sevilla Muskets"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Bahía Escocesa",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "RU",
         "produces": ["Fir Log", "Food Supplies"]
       }
@@ -11208,11 +11208,11 @@
         "countyCapital": false,
         "drops": ["American Cotton"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Georgetown",
         "nonCapturable": true,
         "shallow": false,
-        "size": 4,
-        "brLimit": 6800,
+        "brLimit": 9600,
         "nation": "US",
         "produces": ["Lignum Vitae Log", "Tobacco"]
       }
@@ -11229,11 +11229,11 @@
         "countyCapital": false,
         "drops": ["Assam Tea", "Historical Artifact", "Malabar Teak"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Xpu Ha",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "GB",
         "produces": ["Stone Block"]
       }
@@ -11250,11 +11250,11 @@
         "countyCapital": false,
         "drops": ["Black Ironwood", "Indigo"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "San Andrés",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "GB",
         "produces": ["Coal", "Iron Ore", "Sugar"]
       }
@@ -11277,11 +11277,11 @@
           "Swedish Sail Cloth"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Puerto Escondido",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "SE",
         "produces": ["Food Supplies", "Lignum Vitae Log"]
       }
@@ -11298,11 +11298,11 @@
         "countyCapital": false,
         "drops": ["Sevilla Muskets", "Spanish Almonds"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Baja",
         "nonCapturable": true,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "ES",
         "produces": ["Iron Ore", "Stone Block"]
       }
@@ -11324,11 +11324,11 @@
           "Spanish Walnut Oil"
         ],
         "consumes": [],
+        "portBattleType": "Small",
         "name": "Talamanca",
         "nonCapturable": false,
         "shallow": true,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 1250,
         "nation": "DE",
         "produces": ["Hemp", "Stone Block"]
       }
@@ -11345,11 +11345,11 @@
         "countyCapital": false,
         "drops": ["Spanish Dried Fruits", "Spanish Walnut Oil"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Cayo de Sal",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "ES",
         "produces": ["Hemp", "Stone Block"]
       }
@@ -11366,11 +11366,11 @@
         "countyCapital": false,
         "drops": ["Coffee", "Spanish Almonds"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Caño Macareo",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "FR",
         "produces": ["Stone Block"]
       }
@@ -11456,11 +11456,11 @@
           "Versailles Terracotta",
           "Yorkshire Pudding"
         ],
+        "portBattleType": "Large",
         "name": "Vera Cruz",
         "nonCapturable": true,
         "shallow": false,
-        "size": 5,
-        "brLimit": 8500,
+        "brLimit": 11000,
         "nation": "ES",
         "produces": ["Fir Log", "Stone Block"]
       }
@@ -11486,11 +11486,11 @@
           "White Oak Log"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Swannsborough",
         "nonCapturable": true,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "US",
         "produces": ["Food Supplies", "Iron Ore", "Sugar"]
       }
@@ -11507,11 +11507,11 @@
         "countyCapital": false,
         "drops": ["Iberian Dried Pork", "Longleaf Pine Log", "Madeira Wine"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "San Mateo",
         "nonCapturable": false,
         "shallow": false,
-        "size": 2,
-        "brLimit": 3400,
+        "brLimit": 4800,
         "nation": "US",
         "produces": ["Coal", "Hemp", "Sugar"]
       }
@@ -11528,11 +11528,11 @@
         "countyCapital": false,
         "drops": ["Mahogany Log", "Vermont Maple Sugar"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Great River",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "NT",
         "produces": ["Food Supplies", "Lignum Vitae Log"]
       }
@@ -11570,11 +11570,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Medium",
         "name": "Cayman Brac",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "GB",
         "produces": []
       }
@@ -11597,11 +11597,11 @@
           "Textile Machinery"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Corrientes",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "ES",
         "produces": ["Fir Log", "Stone Block"]
       }
@@ -11624,11 +11624,11 @@
           "Teak Log"
         ],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Basseterre Town",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "SE",
         "produces": ["Sugar"]
       }
@@ -11668,11 +11668,11 @@
           "Rudder Parts",
           "Small Carriage"
         ],
+        "portBattleType": "Medium",
         "name": "La Désirade",
         "nonCapturable": false,
         "shallow": false,
-        "size": 1,
-        "brLimit": 1700,
+        "brLimit": 2400,
         "nation": "SE",
         "produces": []
       }
@@ -11689,11 +11689,11 @@
         "countyCapital": false,
         "drops": ["Caguairan Log", "Fine Fabrics", "Madagascar Tallow"],
         "consumes": [],
+        "portBattleType": "Medium",
         "name": "Léogane",
         "nonCapturable": false,
         "shallow": false,
-        "size": 3,
-        "brLimit": 5100,
+        "brLimit": 7200,
         "nation": "SE",
         "produces": ["Sugar"]
       }
