@@ -234,7 +234,6 @@ export default function naDisplay(serverName) {
         }
         if (!d.nonCapturable) {
             h += ", " + d.brLimit + " BR limit, ";
-            console.log(d);
             switch (d.portBattleType) {
                 case "Large":
                     h += "1st";
