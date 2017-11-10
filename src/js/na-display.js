@@ -133,8 +133,6 @@ export default function naDisplay(serverName) {
             naDefs
                 .append("pattern")
                 .attr("id", nation)
-                .attr("x", "0%")
-                .attr("y", "0%")
                 .attr("width", "100%")
                 .attr("height", "100%")
                 .attr("viewBox", "0 0 50 50")
@@ -219,9 +217,6 @@ export default function naDisplay(serverName) {
                         placement: "auto"
                     })
                     .tooltip("show");
-            })
-            .on("mouseout", function(d) {
-                $("#p" + d.properties.id).tooltip("hide");
             });
     }
 
@@ -234,13 +229,26 @@ export default function naDisplay(serverName) {
         if (d.countyCapital) {
             h += ", county capital";
         }
-        if (!d.nonCapturable) {
-            h += ", " + d.brLimit + " BR limit";
-        } else {
-            h += ", not capturable";
-        }
         if (d.capturer) {
             h += ", owned by " + d.capturer;
+        }
+        if (!d.nonCapturable) {
+            h += ", " + d.brLimit + " BR limit, ";
+            console.log(d);
+            switch (d.portBattleType) {
+                case "Large":
+                    h += "1st";
+                    break;
+                case "Medium":
+                    h += "4th";
+                    break;
+                case "Small":
+                    h += "7th";
+                    break;
+            }
+            h += " rate AI ships";
+        } else {
+            h += ", not capturable";
         }
         h += "</p>";
         h += "<table class='table table-sm'>";
