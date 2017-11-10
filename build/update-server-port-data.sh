@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-GIT_DIR="/home/natopo/na-topo.git"
-cd "${GIT_DIR}"
+cd "/home/natopo/na-topo.git"
 
 . "build/common.sh"
 
@@ -13,7 +12,7 @@ function get-git-update () {
 
 function push-git-update-deploy () {
     yarn run prod
-    git add --ignore-errors "${GIT_DIR}"
+    git add --ignore-errors .
     if [[ ! -z $(git status -s) ]]; then
         git commit -m "change server port data"
         touch "${LAST_UPDATE_FILE}"
@@ -27,6 +26,6 @@ echo 'change server port data'
 if [ "${LAST_UPDATE}" != "${DATE}" ]; then
     yarn --silent
     get-git-update
-    change-port-data "${GIT_DIR}"
+    change-port-data
     yarn run deploy-update
 fi
