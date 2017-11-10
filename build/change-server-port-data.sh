@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-GIT_DIR=$(pwd)
-cd "${GIT_DIR}"
-
 . "build/common.sh"
 
 function copy-geojson() {
@@ -12,4 +9,4 @@ function copy-geojson() {
 }
 
 copy-geojson
-change-port-data "${GIT_DIR}"
+change-port-data
