@@ -254,7 +254,7 @@ let config = {
 };
 
 if ("prod" === process.env.NODE_ENV) {
-    config.devtool = "";
+    config.devtool = "source-map";
     config.plugins.push(
         new MinifyPlugin({
             mangle: { topLevel: true },
