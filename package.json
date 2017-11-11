@@ -58,7 +58,7 @@
     "clean": "rm -rf public/js public/css",
     "css-lint": "stylelint --config .stylelintrc --syntax scss \"src/scss/*.scss\"",
     "deploy-change": "yarn run prod && yarn run change-ports && yarn run push && yarn run deploy-netlify",
-    "deploy-update": "yarn run prod && yarn run push && yarn run deploy-netlify",
+    "deploy-update": "yarn run push && yarn run deploy-netlify",
     "deploy-netlify": "cd public && netlify deploy",
     "js-lint": "eslint -c .eslintrc.json src/js",
     "prettier": "prettier --tab-width 4 --print-width 120 --write .eslintrc.json package.json *.js src/js/*.json src/scss/*.scss",
