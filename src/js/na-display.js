@@ -42,7 +42,7 @@ export default function naDisplay(serverName) {
 
     let naWidth, naHeight;
     let naProjection, naPath, naSvg, naDefs, naZoom;
-    let gPorts, gCountries, gVoronoi, naCurrentVoronoi;
+    let gPorts, gCountries, gVoronoi;
     let naCountries, naPorts;
     const naFontSize = parseInt(window.getComputedStyle(document.getElementById("na")).fontSize);
     const naMapJson = serverName + ".json";
@@ -221,8 +221,7 @@ export default function naDisplay(serverName) {
     }
 
     function naTooltipData(d) {
-        let h;
-        h = "<table><tbody<tr><td><i class='flag-icon " + d.nation + "'></i></td>";
+        let h = "<table><tbody<tr><td><i class='flag-icon " + d.nation + "'></i></td>";
         h += "<td class='port-name'>" + d.name + "</td></tr></tbody></table>";
         h += "<p>" + (d.shallow ? "Shallow" : "Deep");
         h += " water port";
@@ -266,6 +265,8 @@ export default function naDisplay(serverName) {
     }
 
     function naDisplayTeleportAreas() {
+        let naCurrentVoronoi;
+
         // Extract port coordinates
         let ports = naPorts.features
             // Use only ports that deep water ports and not a county capital
@@ -278,14 +279,16 @@ export default function naDisplay(serverName) {
             });
 
         // Append group with class .voronoi
-        gVoronoi = naSvg
+        let gVoronoi = naSvg
             .append("g")
             .attr("class", "voronoi")
-            .call(naZoom)
+            .call(naZoom);
+
+        let pathVoronoi = gVoronoi
             .selectAll(".voronoi")
             .data(ports)
             .enter()
-            .append("g");
+            .append("path");
 
         // limit how far away the mouse can be from finding a voronoi site
         const voronoiRadius = naWidth / 10;
@@ -293,8 +296,7 @@ export default function naDisplay(serverName) {
         const naVoronoiDiagram = naVoronoi(ports.map(naProjection));
 
         // Draw teleport areas
-        gVoronoi
-            .append("path")
+        pathVoronoi
             .data(naVoronoi.polygons(ports.map(naProjection)))
             .attr("d", function(d) {
                 return d ? "M" + d.join("L") + "Z" : null;
@@ -310,9 +312,9 @@ export default function naDisplay(serverName) {
                 // the mouse, limited by max distance defined by voronoiRadius
                 const site = naVoronoiDiagram.find(mx, my, voronoiRadius);
                 //console.log("site: " + JSON.stringify(site.data));
-                //console.log("gVoronoi._groups[0][site.index]: " + JSON.stringify(gVoronoi._groups[0]));
+                //console.log("pathVoronoi._groups[0][site.index]: " + JSON.stringify(pathVoronoi._groups[0]));
                 if (null !== site) {
-                    naCurrentVoronoi = gVoronoi._groups[0][site.index];
+                    naCurrentVoronoi = pathVoronoi._groups[0][site.index];
                     naCurrentVoronoi.classList.add("highlight-voronoi");
                 }
                 // highlight the point if we found one, otherwise hide the highlight circle
