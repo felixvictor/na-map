@@ -12,9 +12,9 @@ const babelOpt = {
     cacheDirectory: true,
     presets: [
         [
-            "env",
+            "@babel/env",
             {
-                exclude: ["transform-es2015-typeof-symbol"],
+                exclude: ["transform-typeof-symbol"],
                 loose: true,
                 modules: false,
                 targets: {
