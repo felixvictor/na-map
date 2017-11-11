@@ -309,9 +309,12 @@ export default function naDisplay(serverName) {
                 // use the new diagram.find() function to find the voronoi site closest to
                 // the mouse, limited by max distance defined by voronoiRadius
                 const site = naVoronoiDiagram.find(mx, my, voronoiRadius);
-                //console.log("site: " + site.index);
-                naCurrentVoronoi = gVoronoi._groups[0][site.index];
-                naCurrentVoronoi.classList.add("highlight-voronoi");
+                //console.log("site: " + JSON.stringify(site.data));
+                //console.log("gVoronoi._groups[0][site.index]: " + JSON.stringify(gVoronoi._groups[0]));
+                if (null !== site) {
+                    naCurrentVoronoi = gVoronoi._groups[0][site.index];
+                    naCurrentVoronoi.classList.add("highlight-voronoi");
+                }
                 // highlight the point if we found one, otherwise hide the highlight circle
                 //naVoronoiHighlight(site.data, site.index);
             })
