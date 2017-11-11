@@ -242,7 +242,7 @@ export default function naDisplay(serverName) {
                     h += "4th";
                     break;
                 case "Small":
-                    h += "7th";
+                    h += "6th";
                     break;
             }
             h += " rate AI ships";
