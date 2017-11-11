@@ -10,7 +10,7 @@ function get-git-update () {
     git pull
 }
 
-echo 'change server port data'
+echo 'update server port data'
 
 if [ "${LAST_UPDATE}" != "${DATE}" ]; then
     yarn --silent
