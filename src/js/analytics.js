@@ -6,5 +6,5 @@ export default function naAnalytics() {
         dataLayer.push(arguments);
     }
     gtag("js", new Date());
-    gtag("config", "UA-108632741-1");
+    gtag("config", "UA-109520372-1");
 }
