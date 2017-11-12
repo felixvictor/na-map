@@ -21,24 +21,8 @@ IN_PORTS=ports.geojson
 
 rm -f ${OUT_COUNTRIES}
 
-#ogrinfo -geom=summary ${DIR}/${RES}/ne_${RES}_admin_0_map_units.shp ne_${RES}_admin_0_map_units > ne_${RES}_admin_0_map_units.txt
-
-ogr2ogr \
-	-clipsrc ${CLIP} \
-	${OUT_SHP} ${IN_SHP_COUNTRIES}
-
-ogr2ogr \
-    -f sqlite -dsco spatialite=yes ${OUT_SQL} ${OUT_SHP} \
-    -nlt promote_to_multi
-
-ogr2ogr \
-    -f GeoJSON -dialect sqlite \
-    -sql "select st_union(geometry) as geom from countries" \
-    ${OUT_COUNTRIES} ${OUT_SQL}
-
 $(yarn bin)/geo2topo \
 	   -o ${OUT}1 \
-	   ${OUT_COUNTRIES} \
 	   ${IN_PORTS}
 
 $(yarn bin)/topoquantize \
