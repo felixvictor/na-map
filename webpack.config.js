@@ -40,7 +40,7 @@ const imagewebpackOpt = {
         progressive: true
     },
     optipng: {
-        optimizationLevel: 7
+        optimizationLevel: 0
     },
     pngquant: {
         floyd: 0.5,
