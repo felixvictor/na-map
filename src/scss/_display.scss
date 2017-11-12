@@ -87,6 +87,10 @@ text {
   }
 }
 
+.dummy-jpg {
+  background-image: url("~Images/na-map.jpg");
+}
+
 $flags-dir: "~Icons";
 $flags: "NT", // Neutral
 "PR", // Pirates
