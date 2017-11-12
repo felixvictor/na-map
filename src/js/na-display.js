@@ -38,7 +38,7 @@ export default function naDisplay(serverName) {
         };
 
     let naSvg, naDefs, naZoom;
-    let gPorts, gCountries, gVoronoi;
+    let gPorts, gPBZones, gCountries, gVoronoi;
     let naPorts;
     const naWidth = 8196,
         naHeight = 8196;
@@ -76,6 +76,7 @@ export default function naDisplay(serverName) {
 
         gCountries.attr("transform", transform);
         gPorts.attr("transform", transform);
+        gPBZones.attr("transform", transform);
         gVoronoi.attr("transform", transform);
 
         gPorts.selectAll(".label text").style("font-size", function(d) {
@@ -197,6 +198,50 @@ export default function naDisplay(serverName) {
             });
     }
 
+    function naDisplayPBZones() {
+        // Extract port coordinates
+        let ports = naPorts.features
+            // Use only capturable ports
+            .filter(function(d) {
+                return !d.properties.nonCapturable;
+            });
+
+        gPBZones = naSvg.append("g").attr("class", "pb-zone");
+
+        let circlePBZones = gPBZones
+            .selectAll(".pb-zone")
+            .data(ports)
+            .enter();
+
+        circlePBZones
+            .append("circle")
+            .attr("cx", function(d) {
+                return d.properties.pbZones[0][0];
+            })
+            .attr("cy", function(d) {
+                return d.properties.pbZones[0][1];
+            })
+            .attr("r", 2);
+        circlePBZones
+            .append("circle")
+            .attr("cx", function(d) {
+                return d.properties.pbZones[1][0];
+            })
+            .attr("cy", function(d) {
+                return d.properties.pbZones[1][1];
+            })
+            .attr("r", 2);
+        circlePBZones
+            .append("circle")
+            .attr("cx", function(d) {
+                return d.properties.pbZones[2][0];
+            })
+            .attr("cy", function(d) {
+                return d.properties.pbZones[2][1];
+            })
+            .attr("r", 2);
+    }
+
     function naTooltipData(d) {
         let h = "<table><tbody<tr><td><i class='flag-icon " + d.nation + "'></i></td>";
         h += "<td class='port-name'>" + d.name + "</td></tr></tbody></table>";
@@ -296,7 +341,9 @@ export default function naDisplay(serverName) {
             .on("mouseout", function() {
                 // hide the highlight circle when the mouse leaves the chart
                 //naVoronoiHighlight(null);
-                naCurrentVoronoi.classList.remove("highlight-voronoi");
+                if (naCurrentVoronoi) {
+                    naCurrentVoronoi.classList.remove("highlight-voronoi");
+                }
             });
     }
 
@@ -328,6 +375,7 @@ export default function naDisplay(serverName) {
         naDisplayCountries();
         naDisplayTeleportAreas();
         naDisplayPorts();
+        naDisplayPBZones();
     }
 
     d3
