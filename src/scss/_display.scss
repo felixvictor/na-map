@@ -10,12 +10,6 @@ $in-colour: $primary-900;
 $out-colour: $primary-700;
 $background-colour: $primary-300;
 
-.na-country {
-  fill: $primary;
-  stroke-width: 1;
-  stroke: $primary-700;
-}
-
 .background {
   fill: $background-colour;
   pointer-events: all;
@@ -53,13 +47,17 @@ text {
 }
 
 .voronoi {
-  fill: none;
+  fill: transparent;
   stroke: $primary-700;
   stroke-width: .5px;
+  path {
+    pointer-events: visibleFill;
+  }
 }
 
 .highlight-voronoi {
   fill: $primary-400;
+  fill-opacity: .5;
   stroke-width: 5px;
 }
 
@@ -88,7 +86,7 @@ text {
 }
 
 .dummy-jpg {
-  background-image: url("~Images/na-map.jpg");
+  background-image: url("~Images/na-map.png");
 }
 
 $flags-dir: "~Icons";
