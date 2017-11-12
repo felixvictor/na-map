@@ -43,8 +43,8 @@ export default function naDisplay(serverName) {
     const naWidth = 8196,
         naHeight = 8196;
     const naFontSize = parseInt(window.getComputedStyle(document.getElementById("na")).fontSize);
-    const naMapJson = serverName + ".json";
-
+    const naMapJson = serverName + ".json",
+        naImage = "images/na-map.png";
 
     function naSetupCanvas() {
         naSvg = d3
@@ -63,7 +63,7 @@ export default function naDisplay(serverName) {
 
         naZoom = d3
             .zoom()
-            .scaleExtent([0.6, 3])
+            .scaleExtent([0.1, 2])
             .on("zoom", naZoomed);
 
         naSvg.call(naZoom);
@@ -98,7 +98,7 @@ export default function naDisplay(serverName) {
             .append("svg:image")
             .attr("width", naWidth)
             .attr("height", naHeight)
-            .attr("xlink:href", "images/na-map.jpg");
+            .attr("xlink:href", naImage);
     }
 
     function naDisplayPorts() {
@@ -144,7 +144,6 @@ export default function naDisplay(serverName) {
                 return [textSize.width, textSize.height];
             })
             .position(function(d) {
-                console.log("coord: " + d.geometry.coordinates);
                 return d.geometry.coordinates;
             })
             .component(textLabel);
@@ -257,10 +256,7 @@ export default function naDisplay(serverName) {
             });
 
         // Append group with class .voronoi
-        let gVoronoi = naSvg
-            .append("g")
-            .attr("class", "voronoi")
-            .call(naZoom);
+        gVoronoi = naSvg.append("g").attr("class", "voronoi");
 
         let pathVoronoi = gVoronoi
             .selectAll(".voronoi")
@@ -271,15 +267,14 @@ export default function naDisplay(serverName) {
         // limit how far away the mouse can be from finding a voronoi site
         const voronoiRadius = naWidth / 10;
         const naVoronoi = d3.voronoi().extent([[-1, -1], [naWidth + 1, naHeight + 1]]);
-        const naVoronoiDiagram = naVoronoi(ports.map(naProjection));
+        const naVoronoiDiagram = naVoronoi(ports);
 
         // Draw teleport areas
         pathVoronoi
-            .data(naVoronoi.polygons(ports.map(naProjection)))
+            .data(naVoronoi.polygons(ports))
             .attr("d", function(d) {
                 return d ? "M" + d.join("L") + "Z" : null;
             })
-            .attr("pointer-events", "visibleFill")
             .on("mouseover", function(d) {
                 // get the current mouse position
                 let ref = currentD3mouse(this);
@@ -291,7 +286,7 @@ export default function naDisplay(serverName) {
                 const site = naVoronoiDiagram.find(mx, my, voronoiRadius);
                 //console.log("site: " + JSON.stringify(site.data));
                 //console.log("pathVoronoi._groups[0][site.index]: " + JSON.stringify(pathVoronoi._groups[0]));
-                if (null !== site) {
+                if (site) {
                     naCurrentVoronoi = pathVoronoi._groups[0][site.index];
                     naCurrentVoronoi.classList.add("highlight-voronoi");
                 }
@@ -330,8 +325,8 @@ export default function naDisplay(serverName) {
 
         naSetupCanvas();
 
-        //        naDisplayTeleportAreas();
         naDisplayCountries();
+        naDisplayTeleportAreas();
         naDisplayPorts();
     }
 
