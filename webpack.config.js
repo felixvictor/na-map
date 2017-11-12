@@ -1,6 +1,6 @@
 // https://github.com/shakacode/react-webpack-rails-tutorial/blob/master/client%2Fwebpack.client.base.config.js
 
-const libraryName = "na-topo";
+const libraryName = "na-map";
 
 const webpack = require("webpack");
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
