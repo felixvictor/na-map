@@ -4,7 +4,6 @@
     iB 2017
  */
 
-import { geoEquirectangular as d3geoEquirectangular, geoPath as d3GeoPath } from "d3-geo";
 import { queue as d3Queue } from "d3-queue";
 import { json as d3Json, request as d3Request } from "d3-request";
 // event needs live-binding
@@ -22,8 +21,6 @@ import { feature as topojsonFeature } from "topojson-client";
 
 export default function naDisplay(serverName) {
     const d3 = {
-            geoEquirectangular: d3geoEquirectangular,
-            geoPath: d3GeoPath,
             json: d3Json,
             queue: d3Queue,
             request: d3Request,
@@ -40,34 +37,14 @@ export default function naDisplay(serverName) {
             feature: topojsonFeature
         };
 
-    let naWidth, naHeight;
-    let naProjection, naPath, naSvg, naDefs, naZoom;
+    let naSvg, naDefs, naZoom;
     let gPorts, gCountries, gVoronoi;
-    let naCountries, naPorts;
+    let naPorts;
+    const naWidth = 8196,
+        naHeight = 8196;
     const naFontSize = parseInt(window.getComputedStyle(document.getElementById("na")).fontSize);
     const naMapJson = serverName + ".json";
 
-    function naSetupProjection() {
-        const naMargin = { top: 0, right: 0, bottom: 0, left: 0 };
-        const minWidth = 4000;
-        let naBounds, naBoundsWidth, naBoundsHeight;
-
-        naPath = d3.geoPath().projection(naProjection);
-        naWidth = document.getElementById("na").offsetWidth - naMargin.left - naMargin.right;
-        naWidth = minWidth > naWidth ? minWidth : naWidth;
-        naBounds = naPath.bounds(naCountries);
-        naBoundsWidth = naBounds[1][0] - naBounds[0][0];
-        naBoundsHeight = naBounds[1][1] - naBounds[0][1];
-        naHeight = naWidth / (naBoundsWidth / naBoundsHeight) - naMargin.top - naMargin.bottom;
-
-        naProjection = d3
-            .geoEquirectangular()
-            .fitExtent(
-                [[-naBoundsWidth, -naBoundsHeight], [naWidth + naBoundsWidth, naHeight + naBoundsHeight]],
-                naCountries
-            );
-        naPath = d3.geoPath().projection(naProjection);
-    }
 
     function naSetupCanvas() {
         naSvg = d3
@@ -118,10 +95,10 @@ export default function naDisplay(serverName) {
         gCountries = naSvg.append("g");
 
         gCountries
-            .append("path")
-            .attr("class", "na-country")
-            .datum(naCountries)
-            .attr("d", naPath);
+            .append("svg:image")
+            .attr("width", naWidth)
+            .attr("height", naHeight)
+            .attr("xlink:href", "images/na-map.jpg");
     }
 
     function naDisplayPorts() {
@@ -167,7 +144,8 @@ export default function naDisplay(serverName) {
                 return [textSize.width, textSize.height];
             })
             .position(function(d) {
-                return naProjection(d.geometry.coordinates);
+                console.log("coord: " + d.geometry.coordinates);
+                return d.geometry.coordinates;
             })
             .component(textLabel);
 
@@ -348,13 +326,11 @@ export default function naDisplay(serverName) {
         }
 
         // Read map data
-        naCountries = topojson.feature(naMap, naMap.objects.countries);
         naPorts = topojson.feature(naMap, naMap.objects.ports);
 
-        naSetupProjection();
         naSetupCanvas();
 
-        naDisplayTeleportAreas();
+        //        naDisplayTeleportAreas();
         naDisplayCountries();
         naDisplayPorts();
     }
