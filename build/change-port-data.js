@@ -24,7 +24,7 @@ let serverPorts = require(fileName);
 
 serverPorts.objects.ports.geometries.forEach(function(d) {
     let t = APIPorts.filter(function(api) {
-        return api.Id === d.properties.id;
+        return api.Id === d.id;
     });
     d.properties.nation = nation[t[0].Nation];
     d.properties.capturer = t[0].Capturer;
