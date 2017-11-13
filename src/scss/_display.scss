@@ -29,7 +29,18 @@ $background-colour: $primary-300;
 }
 
 .pb-zone {
-  fill: $primary-700;
+  fill: none;
+  stroke: $primary-700;
+}
+
+.fort {
+  fill: $red;
+  opacity: .7;
+}
+
+.tower {
+  fill: $secondary-900;
+  opacity: .7;
 }
 
 table td {

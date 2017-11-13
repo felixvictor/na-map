@@ -5,6 +5,7 @@
  */
 
 import { queue as d3Queue } from "d3-queue";
+import { geoPath as d3GeoPath } from "d3-geo";
 import { json as d3Json, request as d3Request } from "d3-request";
 // event needs live-binding
 import { event as currentD3Event, mouse as currentD3mouse, select as d3Select } from "d3-selection";
@@ -22,6 +23,7 @@ import { feature as topojsonFeature } from "topojson-client";
 export default function naDisplay(serverName) {
     const d3 = {
             json: d3Json,
+            geoPath: d3GeoPath,
             queue: d3Queue,
             request: d3Request,
             select: d3Select,
@@ -39,11 +41,14 @@ export default function naDisplay(serverName) {
 
     let naSvg, naDefs, naZoom;
     let gPorts, gPBZones, gCountries, gVoronoi;
-    let naPorts;
+    let naPorts, naPBZones, naForts, naTowers;
     const naWidth = 8196,
         naHeight = 8196;
     const naFontSize = parseInt(window.getComputedStyle(document.getElementById("na")).fontSize);
     const naMapJson = serverName + ".json",
+        pbZonesJson = "pb-zones.json",
+        fortsJson = "forts.json",
+        towersJson = "towers.json",
         naImage = "images/na-map.png";
 
     function naSetupCanvas() {
@@ -175,7 +180,7 @@ export default function naDisplay(serverName) {
         gPorts
             .selectAll(".label circle")
             .attr("id", function(d) {
-                return "p" + d.properties.id;
+                return "p" + d.id;
             })
             .attr("r", 10)
             .attr("fill", function(d) {
@@ -188,7 +193,7 @@ export default function naDisplay(serverName) {
                     .attr("title", function(d) {
                         return naTooltipData(d.properties);
                     });
-                $("#p" + d.properties.id)
+                $("#p" + d.id)
                     .tooltip({
                         delay: { show: 100, hide: 100 },
                         html: true,
@@ -199,47 +204,25 @@ export default function naDisplay(serverName) {
     }
 
     function naDisplayPBZones() {
-        // Extract port coordinates
-        let ports = naPorts.features
-            // Use only capturable ports
-            .filter(function(d) {
-                return !d.properties.nonCapturable;
-            });
+        gPBZones = naSvg.append("g");
 
-        gPBZones = naSvg.append("g").attr("class", "pb-zone");
+        gPBZones
+            .append("path")
+            .datum(naPBZones)
+            .attr("class", "pb-zone")
+            .attr("d", d3.geoPath().pointRadius(4));
 
-        let circlePBZones = gPBZones
-            .selectAll(".pb-zone")
-            .data(ports)
-            .enter();
+        gPBZones
+            .append("path")
+            .datum(naTowers)
+            .attr("class", "tower")
+            .attr("d", d3.geoPath().pointRadius(2));
 
-        circlePBZones
-            .append("circle")
-            .attr("cx", function(d) {
-                return d.properties.pbZones[0][0];
-            })
-            .attr("cy", function(d) {
-                return d.properties.pbZones[0][1];
-            })
-            .attr("r", 2);
-        circlePBZones
-            .append("circle")
-            .attr("cx", function(d) {
-                return d.properties.pbZones[1][0];
-            })
-            .attr("cy", function(d) {
-                return d.properties.pbZones[1][1];
-            })
-            .attr("r", 2);
-        circlePBZones
-            .append("circle")
-            .attr("cx", function(d) {
-                return d.properties.pbZones[2][0];
-            })
-            .attr("cy", function(d) {
-                return d.properties.pbZones[2][1];
-            })
-            .attr("r", 2);
+        gPBZones
+            .append("path")
+            .datum(naForts)
+            .attr("class", "fort")
+            .attr("d", d3.geoPath().pointRadius(2));
     }
 
     function naTooltipData(d) {
@@ -362,13 +345,16 @@ export default function naDisplay(serverName) {
         }
     }
 
-    function naReady(error, naMap) {
+    function naReady(error, naMap, pbZones, forts, towers) {
         if (error) {
             throw error;
         }
 
         // Read map data
         naPorts = topojson.feature(naMap, naMap.objects.ports);
+        naPBZones = pbZones;
+        naForts = forts;
+        naTowers = towers;
 
         naSetupCanvas();
 
@@ -381,5 +367,8 @@ export default function naDisplay(serverName) {
     d3
         .queue()
         .defer(d3.json, naMapJson)
+        .defer(d3.json, pbZonesJson)
+        .defer(d3.json, fortsJson)
+        .defer(d3.json, towersJson)
         .await(naReady);
 }
