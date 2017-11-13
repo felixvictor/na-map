@@ -7,4 +7,4 @@ if [[ ! -z $(git status -s) ]]; then
     git commit -m "push"
     touch "${LAST_UPDATE_FILE}"
 fi
-git push
+git push gitlab
