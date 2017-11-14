@@ -5,15 +5,23 @@
 # E  Barbados     lat 13.19 long -59.48
 # N Swannsborough lat 34.69 long -77.12
 
-OUT=na.json
+OUT_PORTS=na.json
+OUT_PB_ZONES=pb.json
 IN_PORTS=ports.geojson
 
-$(yarn bin)/geo2topo \
-	   -o ${OUT} \
+$(yarn bin local)/geo2topo \
+	   -o ${OUT_PORTS} \
 	   ${IN_PORTS}
 
-for SERVER_NAME in "eu1" "eu2" "us2"; do
-    cp "${OUT}" "${SERVER_NAME}.json"
-done
+$(yarn bin local)/geo2topo --verbose \
+	   -o ${OUT_PB_ZONES} \
+	   pbzones.json \
+	   towers.json \
+	   forts.json
 
-rm -f ${OUT}
+for SERVER_NAME in "eu1" "eu2" "us2"; do
+    cp --update "${OUT_PORTS}" "${SERVER_NAME}.json"
+done
+cp --update "${OUT_PB_ZONES}" ../public
+
+rm -f "${OUT_PORTS}" "${OUT_PB_ZONES}"
