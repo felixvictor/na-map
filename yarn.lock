@@ -4804,8 +4804,8 @@ pngquant-bin@^3.0.0:
     logalot "^2.0.0"
 
 popper.js@^1.12.6:
-  version "1.12.7"
-  resolved "https://registry.yarnpkg.com/popper.js/-/popper.js-1.12.7.tgz#b8d225618e5d95e27ac2b591debf581857a9c16d"
+  version "1.12.8"
+  resolved "https://registry.yarnpkg.com/popper.js/-/popper.js-1.12.8.tgz#b59b57473621feaf03726e1abe7c17c4b23c8564"
 
 postcss-calc@^5.2.0:
   version "5.3.1"
