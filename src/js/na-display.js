@@ -46,9 +46,7 @@ export default function naDisplay(serverName) {
         naHeight = 8196;
     const naFontSize = parseInt(window.getComputedStyle(document.getElementById("na")).fontSize);
     const naMapJson = serverName + ".json",
-        pbZonesJson = "pb-zones.json",
-        fortsJson = "forts.json",
-        towersJson = "towers.json",
+        pbJson = "pb.json",
         naImage = "images/na-map.png";
 
     function naSetupCanvas() {
@@ -345,16 +343,16 @@ export default function naDisplay(serverName) {
         }
     }
 
-    function naReady(error, naMap, pbZones, forts, towers) {
+    function naReady(error, naMap, pbZones) {
         if (error) {
             throw error;
         }
 
         // Read map data
         naPorts = topojson.feature(naMap, naMap.objects.ports);
-        naPBZones = pbZones;
-        naForts = forts;
-        naTowers = towers;
+        naPBZones = topojson.feature(pbZones, pbZones.objects.pbzones);
+        naForts = topojson.feature(pbZones, pbZones.objects.forts);
+        naTowers = topojson.feature(pbZones, pbZones.objects.towers);
 
         naSetupCanvas();
 
@@ -367,8 +365,6 @@ export default function naDisplay(serverName) {
     d3
         .queue()
         .defer(d3.json, naMapJson)
-        .defer(d3.json, pbZonesJson)
-        .defer(d3.json, fortsJson)
-        .defer(d3.json, towersJson)
+        .defer(d3.json, pbJson)
         .await(naReady);
 }
