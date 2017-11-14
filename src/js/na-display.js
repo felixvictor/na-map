@@ -47,7 +47,7 @@ export default function naDisplay(serverName) {
     const naFontSize = parseInt(window.getComputedStyle(document.getElementById("na")).fontSize);
     const naMapJson = serverName + ".json",
         pbJson = "pb.json",
-        naImage = "images/na-map.png";
+        naImage = "images/na-map.jpg";
 
     function naSetupCanvas() {
         naSvg = d3

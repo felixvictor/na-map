@@ -36,7 +36,7 @@ const imagewebpackOpt = {
         interlaced: false
     },
     mozjpeg: {
-        quality: 100,
+        quality: 90,
         progressive: true
     },
     optipng: {
