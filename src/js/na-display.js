@@ -42,6 +42,7 @@ export default function naDisplay(serverName) {
     let naSvg, naDefs, naZoom;
     let gPorts, gPBZones, gCountries, gVoronoi;
     let naPorts, naPBZones, naForts, naTowers;
+    let IsZoomed = false;
     const naWidth = 8196,
         naHeight = 8196;
     const naFontSize = parseInt(window.getComputedStyle(document.getElementById("na")).fontSize);
@@ -66,7 +67,7 @@ export default function naDisplay(serverName) {
 
         naZoom = d3
             .zoom()
-            .scaleExtent([0.1, 2])
+            .scaleExtent([0.1, 10])
             .on("zoom", naZoomed);
         naSvg.call(naZoom);
 
@@ -76,10 +77,19 @@ export default function naDisplay(serverName) {
     function naZoomed() {
         let transform = currentD3Event.transform;
 
+        if (1.5 < transform.k) {
+            if (!IsZoomed) {
+                naDisplayPBZones();
+                IsZoomed = true;
+            }
+        }
+
         gCountries.attr("transform", transform);
         gPorts.attr("transform", transform);
-        gPBZones.attr("transform", transform);
         gVoronoi.attr("transform", transform);
+        if (IsZoomed) {
+            gPBZones.attr("transform", transform);
+        }
 
         gPorts.selectAll(".label text").style("font-size", function(d) {
             return naFontSize / transform.k;
@@ -359,7 +369,6 @@ export default function naDisplay(serverName) {
         naDisplayCountries();
         naDisplayTeleportAreas();
         naDisplayPorts();
-        naDisplayPBZones();
     }
 
     d3
