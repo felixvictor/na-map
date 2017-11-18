@@ -21,8 +21,7 @@ const babelOpt = {
                     browsers: PACKAGE.browserslist
                 }
             }
-        ],
-        ["minify"]
+        ]
     ]
 };
 
@@ -254,13 +253,16 @@ let config = {
 };
 
 if ("prod" === process.env.NODE_ENV) {
+    config.devtool = "source-map";
+    /*
     config.devtool = "";
     config.plugins.push(
         new MinifyPlugin({
-            mangle: { topLevel: true },
+            mangle: true,
             removeDebugger: true
         })
     );
+    */
 } else {
     config.devtool = "eval-source-map";
     config.plugins.push(new webpack.HotModuleReplacementPlugin(), new webpack.NoEmitOnErrorsPlugin());
