@@ -68,7 +68,6 @@ export default function naDisplay(serverName) {
             .zoom()
             .scaleExtent([0.1, 2])
             .on("zoom", naZoomed);
-
         naSvg.call(naZoom);
 
         naDefs = naSvg.append("defs");
@@ -96,13 +95,13 @@ export default function naDisplay(serverName) {
     }
 
     function naDisplayCountries() {
-        gCountries = naSvg.append("g");
+        gCountries = naSvg.append("g").attr("class", "country");
 
         gCountries
-            .append("svg:image")
+            .append("image")
             .attr("width", naWidth)
             .attr("height", naHeight)
-            .attr("xlink:href", naImage);
+            .attr("href", naImage);
     }
 
     function naDisplayPorts() {
@@ -122,7 +121,7 @@ export default function naDisplay(serverName) {
                 .attr("y", "0")
                 .attr("height", "50")
                 .attr("width", "50")
-                .attr("xlink:href", "icons/" + nation + ".svg");
+                .attr("href", "icons/" + nation + ".svg");
         });
 
         // the component used to render each label
@@ -155,6 +154,7 @@ export default function naDisplay(serverName) {
         // render!
         gPorts = naSvg
             .append("g")
+            .attr("class", "port")
             .datum(naPorts.features)
             .call(labels);
 
@@ -202,7 +202,7 @@ export default function naDisplay(serverName) {
     }
 
     function naDisplayPBZones() {
-        gPBZones = naSvg.append("g");
+        gPBZones = naSvg.append("g").attr("class", "pb");
 
         gPBZones
             .append("path")
