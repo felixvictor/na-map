@@ -12,12 +12,6 @@ import { event as currentD3Event, mouse as currentD3mouse, select as d3Select } 
 import { voronoi as d3Voronoi } from "d3-voronoi";
 import { zoom as d3Zoom } from "d3-zoom";
 
-import {
-    layoutTextLabel as fcLayoutTextLabel,
-    layoutGreedy as fcLayoutGreedy,
-    layoutLabel as fcLayoutLabel
-} from "d3fc-label-layout";
-
 import { feature as topojsonFeature } from "topojson-client";
 
 export default function naDisplay(serverName) {
@@ -29,11 +23,6 @@ export default function naDisplay(serverName) {
             select: d3Select,
             voronoi: d3Voronoi,
             zoom: d3Zoom
-        },
-        fc = {
-            layoutTextLabel: fcLayoutTextLabel,
-            layoutGreedy: fcLayoutGreedy,
-            layoutLabel: fcLayoutLabel
         },
         topojson = {
             feature: topojsonFeature
@@ -51,6 +40,12 @@ export default function naDisplay(serverName) {
         naImage = "images/na-map.jpg";
 
     function naSetupCanvas() {
+        function naStopProp() {
+            if (currentD3Event.defaultPrevented) {
+                currentD3Event.stopPropagation();
+            }
+        }
+
         naSvg = d3
             .select("#na")
             .append("svg")
@@ -75,12 +70,18 @@ export default function naDisplay(serverName) {
     }
 
     function naZoomed() {
+        const zoomExtent = 1.5;
         let transform = currentD3Event.transform;
 
-        if (1.5 < transform.k) {
+        if (zoomExtent < transform.k) {
             if (!IsZoomed) {
                 naDisplayPBZones();
                 IsZoomed = true;
+            }
+        } else {
+            if (IsZoomed) {
+                naRemovePBZones();
+                IsZoomed = false;
             }
         }
 
@@ -89,18 +90,6 @@ export default function naDisplay(serverName) {
         gVoronoi.attr("transform", transform);
         if (IsZoomed) {
             gPBZones.attr("transform", transform);
-        }
-
-        gPorts.selectAll(".label text").style("font-size", function(d) {
-            return naFontSize / transform.k;
-        });
-
-        gPorts.selectAll(".label circle").attr("r", 10 / transform.k);
-    }
-
-    function naStopProp() {
-        if (currentD3Event.defaultPrevented) {
-            currentD3Event.stopPropagation();
         }
     }
 
@@ -115,11 +104,53 @@ export default function naDisplay(serverName) {
     }
 
     function naDisplayPorts() {
-        const labelPadding = 3;
+        function naTooltipData(d) {
+            let h = "<table><tbody<tr><td><i class='flag-icon " + d.nation + "'></i></td>";
+            h += "<td class='port-name'>" + d.name + "</td></tr></tbody></table>";
+            h += "<p>" + (d.shallow ? "Shallow" : "Deep");
+            h += " water port";
+            if (d.countyCapital) {
+                h += ", county capital";
+            }
+            if (d.capturer) {
+                h += ", owned by " + d.capturer;
+            }
+            if (!d.nonCapturable) {
+                h += ", " + d.brLimit + " BR limit, ";
+                switch (d.portBattleType) {
+                    case "Large":
+                        h += "1st";
+                        break;
+                    case "Medium":
+                        h += "4th";
+                        break;
+                    case "Small":
+                        h += "6th";
+                        break;
+                }
+                h += " rate AI ships";
+            } else {
+                h += ", not capturable";
+            }
+            h += "</p>";
+            h += "<table class='table table-sm'>";
+            if (d.produces.length) {
+                h += "<tr><td>Produces</td><td>" + d.produces.join(", ") + "</td></tr>";
+            }
+            if (d.drops.length) {
+                h += "<tr><td>Drops</td><td>" + d.drops.join(", ") + "</tr>";
+            }
+            if (d.consumes.length) {
+                h += "<tr><td>Consumes</td><td>" + d.consumes.join(", ") + "</tr>";
+            }
+            h += "</table>";
 
-        const naNations = ["DE", "DK", "ES", "FR", "FT", "GB", "NL", "NT", "PL", "PR", "RU", "SE", "US"];
+            return h;
+        }
 
-        naNations.forEach(function(nation) {
+        const nations = ["DE", "DK", "ES", "FR", "FT", "GB", "NL", "NT", "PL", "PR", "RU", "SE", "US"];
+
+        nations.forEach(function(nation) {
             naDefs
                 .append("pattern")
                 .attr("id", nation)
@@ -127,68 +158,30 @@ export default function naDisplay(serverName) {
                 .attr("height", "100%")
                 .attr("viewBox", "0 0 50 50")
                 .append("image")
-                .attr("x", "0")
-                .attr("y", "0")
                 .attr("height", "50")
                 .attr("width", "50")
                 .attr("href", "icons/" + nation + ".svg");
         });
 
-        // the component used to render each label
-        let textLabel = fc
-            .layoutTextLabel()
-            .padding(labelPadding)
-            .value(function(d) {
-                return d.properties.name;
-            });
+        gPorts = naSvg.append("g").attr("class", "port");
 
-        let strategy = fc.layoutGreedy();
-
-        // create the layout that positions the labels
-        let labels = fc
-            .layoutLabel(strategy)
-            .size(function(_, i, g) {
-                // measure the label and add the required padding
-                let textSize = d3
-                    .select(g[i])
-                    .select("text")
-                    .node()
-                    .getBBox();
-                return [textSize.width, textSize.height];
-            })
-            .position(function(d) {
-                return d.geometry.coordinates;
-            })
-            .component(textLabel);
-
-        // render!
-        gPorts = naSvg
+        let port = gPorts
+            .selectAll(".port")
+            .data(naPorts.features)
+            .enter()
             .append("g")
-            .attr("class", "port")
-            .datum(naPorts.features)
-            .call(labels);
-
-        // Port text colour
-        gPorts
-            .selectAll(".label text")
-            .attr("dx", 10)
-            .attr("class", function(d) {
-                let f;
-                if (!d.properties.shallow && !d.properties.countyCapital) {
-                    f = "na-port-in";
-                } else {
-                    f = "na-port-out";
-                }
-                return f;
-            });
-
-        gPorts.selectAll(".label rect").attr("class", "label-rect");
-
-        // Port circle colour and size
-        gPorts
-            .selectAll(".label circle")
             .attr("id", function(d) {
                 return "p" + d.id;
+            })
+            .attr("transform", function(d) {
+                return "translate(" + d.geometry.coordinates[0] + "," + d.geometry.coordinates[1] + ")";
+            });
+
+        // Port flags
+        port
+            .append("circle")
+            .attr("id", function(d) {
+                return "c" + d.id;
             })
             .attr("r", 10)
             .attr("fill", function(d) {
@@ -201,13 +194,31 @@ export default function naDisplay(serverName) {
                     .attr("title", function(d) {
                         return naTooltipData(d.properties);
                     });
-                $("#p" + d.id)
+                $("#c" + d.id)
                     .tooltip({
                         delay: { show: 100, hide: 100 },
                         html: true,
                         placement: "auto"
                     })
                     .tooltip("show");
+            });
+
+        // Port text colour
+        port
+            .append("text")
+            .attr("dx", 10)
+            .attr("dy", 20)
+            .text(function(d) {
+                return d.properties.name;
+            })
+            .attr("class", function(d) {
+                let f;
+                if (!d.properties.shallow && !d.properties.countyCapital) {
+                    f = "na-port-in";
+                } else {
+                    f = "na-port-out";
+                }
+                return f;
             });
     }
 
@@ -233,48 +244,8 @@ export default function naDisplay(serverName) {
             .attr("d", d3.geoPath().pointRadius(2));
     }
 
-    function naTooltipData(d) {
-        let h = "<table><tbody<tr><td><i class='flag-icon " + d.nation + "'></i></td>";
-        h += "<td class='port-name'>" + d.name + "</td></tr></tbody></table>";
-        h += "<p>" + (d.shallow ? "Shallow" : "Deep");
-        h += " water port";
-        if (d.countyCapital) {
-            h += ", county capital";
-        }
-        if (d.capturer) {
-            h += ", owned by " + d.capturer;
-        }
-        if (!d.nonCapturable) {
-            h += ", " + d.brLimit + " BR limit, ";
-            switch (d.portBattleType) {
-                case "Large":
-                    h += "1st";
-                    break;
-                case "Medium":
-                    h += "4th";
-                    break;
-                case "Small":
-                    h += "6th";
-                    break;
-            }
-            h += " rate AI ships";
-        } else {
-            h += ", not capturable";
-        }
-        h += "</p>";
-        h += "<table class='table table-sm'>";
-        if (d.produces.length) {
-            h += "<tr><td>Produces</td><td>" + d.produces.join(", ") + "</td></tr>";
-        }
-        if (d.drops.length) {
-            h += "<tr><td>Drops</td><td>" + d.drops.join(", ") + "</tr>";
-        }
-        if (d.consumes.length) {
-            h += "<tr><td>Consumes</td><td>" + d.consumes.join(", ") + "</tr>";
-        }
-        h += "</table>";
-
-        return h;
+    function naRemovePBZones() {
+        gPBZones.remove();
     }
 
     function naDisplayTeleportAreas() {
