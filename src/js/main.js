@@ -7,7 +7,6 @@
 import naDisplay from "./na-display";
 import naAnalytics from "./analytics.js";
 import "bootstrap/js/dist/modal";
-import "bootstrap/js/dist/tooltip";
 import "bootstrap/js/dist/util";
 
 function main() {
