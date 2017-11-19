@@ -14,6 +14,9 @@ import { zoom as d3Zoom } from "d3-zoom";
 
 import { feature as topojsonFeature } from "topojson-client";
 
+import "bootstrap/js/dist/tooltip";
+import "bootstrap/js/dist/util";
+
 export default function naDisplay(serverName) {
     const d3 = {
             json: d3Json,
