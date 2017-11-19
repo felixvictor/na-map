@@ -32,9 +32,13 @@ export default function naDisplay(serverName) {
         };
 
     let naSvg, naDefs, naZoom;
-    let gPorts, gPBZones, gCountries, gVoronoi;
-    let naPorts, naPBZones, naForts, naTowers;
-    let IsZoomed = false;
+    let gPorts, gPBZones, gCountries, gVoronoi, naPort;
+    let naPortData, naPBZoneData, naFortData, naTowerData;
+    let IsZoomed = false,
+        HasLabelRemoved = false;
+    const portCircleSize = 10,
+        portLabelDx = 10,
+        portLabelDy = 20;
     const naWidth = 8196,
         naHeight = 8196;
     const naFontSize = parseInt(window.getComputedStyle(document.getElementById("na")).fontSize);
@@ -65,7 +69,7 @@ export default function naDisplay(serverName) {
 
         naZoom = d3
             .zoom()
-            .scaleExtent([0.1, 10])
+            .scaleExtent([0.15, 10])
             .on("zoom", naZoomed);
         naSvg.call(naZoom);
 
@@ -73,10 +77,12 @@ export default function naDisplay(serverName) {
     }
 
     function naZoomed() {
-        const zoomExtent = 1.5;
+        const PBZonesZoomExtent = 1.5;
+        const labelZoomExtent = 0.5;
+
         let transform = currentD3Event.transform;
 
-        if (zoomExtent < transform.k) {
+        if (PBZonesZoomExtent < transform.k) {
             if (!IsZoomed) {
                 naDisplayPBZones();
                 IsZoomed = true;
@@ -88,11 +94,32 @@ export default function naDisplay(serverName) {
             }
         }
 
+        if (labelZoomExtent > transform.k) {
+            if (!HasLabelRemoved) {
+                naRemoveLabel();
+                HasLabelRemoved = true;
+            }
+        } else {
+            if (HasLabelRemoved) {
+                naDisplayLabel();
+                HasLabelRemoved = false;
+            }
+        }
+
         gCountries.attr("transform", transform);
         gPorts.attr("transform", transform);
         gVoronoi.attr("transform", transform);
         if (IsZoomed) {
             gPBZones.attr("transform", transform);
+        }
+
+        gPorts.selectAll("circle").attr("r", portCircleSize / transform.k);
+        if (!HasLabelRemoved) {
+            gPorts
+                .selectAll("text")
+                .attr("dx", portLabelDx / transform.k)
+                .attr("dy", portLabelDy / transform.k)
+                .style("font-size", naFontSize / transform.k);
         }
     }
 
@@ -118,8 +145,9 @@ export default function naDisplay(serverName) {
             if (d.capturer) {
                 h += ", owned by " + d.capturer;
             }
+            h += "<br>";
             if (!d.nonCapturable) {
-                h += ", " + d.brLimit + " BR limit, ";
+                h += "Port battle: " + d.brLimit + " BR limit, ";
                 switch (d.portBattleType) {
                     case "Large":
                         h += "1st";
@@ -133,7 +161,7 @@ export default function naDisplay(serverName) {
                 }
                 h += " rate AI ships";
             } else {
-                h += ", not capturable";
+                h += "Not capturable";
             }
             h += "</p>";
             h += "<table class='table table-sm'>";
@@ -168,9 +196,9 @@ export default function naDisplay(serverName) {
 
         gPorts = naSvg.append("g").attr("class", "port");
 
-        let port = gPorts
+        naPort = gPorts
             .selectAll(".port")
-            .data(naPorts.features)
+            .data(naPortData.features)
             .enter()
             .append("g")
             .attr("id", function(d) {
@@ -181,12 +209,12 @@ export default function naDisplay(serverName) {
             });
 
         // Port flags
-        port
+        naPort
             .append("circle")
             .attr("id", function(d) {
                 return "c" + d.id;
             })
-            .attr("r", 10)
+            .attr("r", portCircleSize)
             .attr("fill", function(d) {
                 return "url(#" + d.properties.nation + ")";
             })
@@ -205,12 +233,15 @@ export default function naDisplay(serverName) {
                     })
                     .tooltip("show");
             });
+        naDisplayLabel();
+    }
 
+    function naDisplayLabel() {
         // Port text colour
-        port
+        naPort
             .append("text")
-            .attr("dx", 10)
-            .attr("dy", 20)
+            .attr("dx", portLabelDx)
+            .attr("dy", portLabelDy)
             .text(function(d) {
                 return d.properties.name;
             })
@@ -225,24 +256,28 @@ export default function naDisplay(serverName) {
             });
     }
 
+    function naRemoveLabel() {
+        gPorts.selectAll("text").remove();
+    }
+
     function naDisplayPBZones() {
         gPBZones = naSvg.append("g").attr("class", "pb");
 
         gPBZones
             .append("path")
-            .datum(naPBZones)
+            .datum(naPBZoneData)
             .attr("class", "pb-zone")
             .attr("d", d3.geoPath().pointRadius(4));
 
         gPBZones
             .append("path")
-            .datum(naTowers)
+            .datum(naTowerData)
             .attr("class", "tower")
             .attr("d", d3.geoPath().pointRadius(2));
 
         gPBZones
             .append("path")
-            .datum(naForts)
+            .datum(naFortData)
             .attr("class", "fort")
             .attr("d", d3.geoPath().pointRadius(2));
     }
@@ -255,7 +290,7 @@ export default function naDisplay(serverName) {
         let naCurrentVoronoi;
 
         // Extract port coordinates
-        let ports = naPorts.features
+        let ports = naPortData.features
             // Use only ports that deep water ports and not a county capital
             .filter(function(d) {
                 return !d.properties.shallow && !d.properties.countyCapital;
@@ -333,10 +368,10 @@ export default function naDisplay(serverName) {
         }
 
         // Read map data
-        naPorts = topojson.feature(naMap, naMap.objects.ports);
-        naPBZones = topojson.feature(pbZones, pbZones.objects.pbzones);
-        naForts = topojson.feature(pbZones, pbZones.objects.forts);
-        naTowers = topojson.feature(pbZones, pbZones.objects.towers);
+        naPortData = topojson.feature(naMap, naMap.objects.ports);
+        naPBZoneData = topojson.feature(pbZones, pbZones.objects.pbzones);
+        naFortData = topojson.feature(pbZones, pbZones.objects.forts);
+        naTowerData = topojson.feature(pbZones, pbZones.objects.towers);
 
         naSetupCanvas();
 
