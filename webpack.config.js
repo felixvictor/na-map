@@ -253,8 +253,6 @@ let config = {
 };
 
 if ("prod" === process.env.NODE_ENV) {
-    config.devtool = "source-map";
-    /*
     config.devtool = "";
     config.plugins.push(
         new MinifyPlugin({
@@ -262,7 +260,6 @@ if ("prod" === process.env.NODE_ENV) {
             removeDebugger: true
         })
     );
-    */
 } else {
     config.devtool = "eval-source-map";
     config.plugins.push(new webpack.HotModuleReplacementPlugin(), new webpack.NoEmitOnErrorsPlugin());
