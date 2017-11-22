@@ -10,7 +10,7 @@ import { json as d3Json, request as d3Request } from "d3-request";
 // event needs live-binding
 import { event as currentD3Event, mouse as currentD3mouse, select as d3Select } from "d3-selection";
 import { voronoi as d3Voronoi } from "d3-voronoi";
-import { zoom as d3Zoom } from "d3-zoom";
+import { zoom as d3Zoom, zoomIdentity as d3ZoomIdentity } from "d3-zoom";
 
 import { feature as topojsonFeature } from "topojson-client";
 
@@ -25,7 +25,8 @@ export default function naDisplay(serverName) {
             request: d3Request,
             select: d3Select,
             voronoi: d3Voronoi,
-            zoom: d3Zoom
+            zoom: d3Zoom,
+            zoomIdentity: d3ZoomIdentity
         },
         topojson = {
             feature: topojsonFeature
