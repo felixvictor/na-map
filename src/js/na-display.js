@@ -32,16 +32,21 @@ export default function naDisplay(serverName) {
         };
 
     let naSvg, naDefs, naZoom;
-    let gPorts, gPBZones, gCountries, gVoronoi, naPort;
+    let gPorts, gPBZones, gCountries, gVoronoi, pathVoronoi, naPort;
     let naPortData, naPBZoneData, naFortData, naTowerData;
-    let IsZoomed = false,
-        HasLabelRemoved = false;
-    const portCircleSize = 10,
-        portLabelDx = 10,
-        portLabelDy = 20;
     const naWidth = 8196,
         naHeight = 8196;
-    const naFontSize = parseInt(window.getComputedStyle(document.getElementById("na")).fontSize);
+    let IsZoomed = false,
+        HasLabelRemoved = false;
+    const defaultCircleSize = 10,
+        defaultDx = 10,
+        defaultDy = 20;
+    let currentCircleSize = defaultCircleSize,
+        currentDx = defaultDx,
+        currentDy = defaultDy;
+    const defaultFontSize = parseInt(window.getComputedStyle(document.getElementById("na")).fontSize);
+    let currentFontSize = defaultFontSize;
+    let naCurrentVoronoi, highlightId;
     const naMapJson = serverName + ".json",
         pbJson = "pb.json",
         naImage = "images/na-map.jpg";
@@ -74,6 +79,9 @@ export default function naDisplay(serverName) {
         naSvg.call(naZoom);
 
         naDefs = naSvg.append("defs");
+        gCountries = naSvg.append("g").attr("class", "country");
+        gVoronoi = naSvg.append("g").attr("class", "voronoi");
+        gPorts = naSvg.append("g").attr("class", "port");
     }
 
     function naZoomed() {
@@ -85,11 +93,13 @@ export default function naDisplay(serverName) {
         if (PBZonesZoomExtent < transform.k) {
             if (!IsZoomed) {
                 naDisplayPBZones();
+                naRemoveTeleportAreas();
                 IsZoomed = true;
             }
         } else {
             if (IsZoomed) {
                 naRemovePBZones();
+                naDisplayTeleportAreas();
                 IsZoomed = false;
             }
         }
@@ -113,19 +123,24 @@ export default function naDisplay(serverName) {
             gPBZones.attr("transform", transform);
         }
 
-        gPorts.selectAll("circle").attr("r", portCircleSize / transform.k);
+        currentCircleSize = defaultCircleSize / transform.k;
+        gPorts.selectAll("circle").attr("r", currentCircleSize);
         if (!HasLabelRemoved) {
+            currentDx = defaultDx / transform.k;
+            currentDy = defaultDx / transform.k;
+            currentFontSize = defaultFontSize / transform.k;
             gPorts
                 .selectAll("text")
-                .attr("dx", portLabelDx / transform.k)
-                .attr("dy", portLabelDy / transform.k)
-                .style("font-size", naFontSize / transform.k);
+                .attr("dx", currentDx)
+                .attr("dy", currentDy)
+                .style("font-size", currentFontSize);
+            if (highlightId) {
+                naVoronoiHighlight(naCurrentVoronoi, highlightId);
+            }
         }
     }
 
     function naDisplayCountries() {
-        gCountries = naSvg.append("g").attr("class", "country");
-
         gCountries
             .append("image")
             .attr("width", naWidth)
@@ -194,8 +209,6 @@ export default function naDisplay(serverName) {
                 .attr("href", "icons/" + nation + ".svg");
         });
 
-        gPorts = naSvg.append("g").attr("class", "port");
-
         naPort = gPorts
             .selectAll(".port")
             .data(naPortData.features)
@@ -211,21 +224,21 @@ export default function naDisplay(serverName) {
         // Port flags
         naPort
             .append("circle")
-            .attr("id", function(d) {
-                return "c" + d.id;
-            })
-            .attr("r", portCircleSize)
+            .attr("r", defaultCircleSize)
             .attr("fill", function(d) {
                 return "url(#" + d.properties.nation + ")";
             })
             .on("mouseover", function(d) {
+                if (highlightId) {
+                    naVoronoiHighlight(naCurrentVoronoi, highlightId);
+                }
                 d3
                     .select(this)
                     .attr("data-toggle", "tooltip")
                     .attr("title", function(d) {
                         return naTooltipData(d.properties);
                     });
-                $("#c" + d.id)
+                $("#p" + d.id + " circle")
                     .tooltip({
                         delay: { show: 100, hide: 100 },
                         html: true,
@@ -240,8 +253,8 @@ export default function naDisplay(serverName) {
         // Port text colour
         naPort
             .append("text")
-            .attr("dx", portLabelDx)
-            .attr("dy", portLabelDy)
+            .attr("dx", currentDx)
+            .attr("dy", currentDy)
             .text(function(d) {
                 return d.properties.name;
             })
@@ -287,41 +300,32 @@ export default function naDisplay(serverName) {
     }
 
     function naDisplayTeleportAreas() {
-        let naCurrentVoronoi;
-
         // Extract port coordinates
-        let ports = naPortData.features
+        let teleportPorts = naPortData.features
             // Use only ports that deep water ports and not a county capital
-            .filter(function(d) {
-                return !d.properties.shallow && !d.properties.countyCapital;
-            })
+            .filter(d => !d.properties.shallow && !d.properties.countyCapital)
             // Map to coordinates array
-            .map(function(d) {
-                return [d.geometry.coordinates[0], d.geometry.coordinates[1]];
-            });
+            .map(d => ({ id: d.id, coord: { x: d.geometry.coordinates[0], y: d.geometry.coordinates[1] } }));
 
-        // Append group with class .voronoi
-        gVoronoi = naSvg.append("g").attr("class", "voronoi");
-
-        let pathVoronoi = gVoronoi
+        pathVoronoi = gVoronoi
             .selectAll(".voronoi")
-            .data(ports)
+            .data(teleportPorts)
             .enter()
             .append("path");
 
         // limit how far away the mouse can be from finding a voronoi site
         const voronoiRadius = naWidth / 10;
-        const naVoronoi = d3.voronoi().extent([[-1, -1], [naWidth + 1, naHeight + 1]]);
-        const naVoronoiDiagram = naVoronoi(ports);
+        const naVoronoiDiagram = d3
+            .voronoi()
+            .extent([[-1, -1], [naWidth + 1, naHeight + 1]])
+            .x(d => d.coord.x)
+            .y(d => d.coord.y)(teleportPorts);
 
         // Draw teleport areas
         pathVoronoi
-            .data(naVoronoi.polygons(ports))
-            .attr("d", function(d) {
-                return d ? "M" + d.join("L") + "Z" : null;
-            })
-            .on("mouseover", function(d) {
-                // get the current mouse position
+            .data(naVoronoiDiagram.polygons())
+            .attr("d", d => (d ? "M" + d.join("L") + "Z" : null))
+            .on("mouseover", function() {
                 let ref = currentD3mouse(this);
                 const mx = ref[0],
                     my = ref[1];
@@ -329,37 +333,47 @@ export default function naDisplay(serverName) {
                 // use the new diagram.find() function to find the voronoi site closest to
                 // the mouse, limited by max distance defined by voronoiRadius
                 const site = naVoronoiDiagram.find(mx, my, voronoiRadius);
-                //console.log("site: " + JSON.stringify(site.data));
-                //console.log("pathVoronoi._groups[0][site.index]: " + JSON.stringify(pathVoronoi._groups[0]));
                 if (site) {
                     naCurrentVoronoi = pathVoronoi._groups[0][site.index];
-                    naCurrentVoronoi.classList.add("highlight-voronoi");
+                    highlightId = site.data.id;
+                    naVoronoiHighlight(naCurrentVoronoi, highlightId);
                 }
-                // highlight the point if we found one, otherwise hide the highlight circle
-                //naVoronoiHighlight(site.data, site.index);
             })
             .on("mouseout", function() {
-                // hide the highlight circle when the mouse leaves the chart
-                //naVoronoiHighlight(null);
-                if (naCurrentVoronoi) {
-                    naCurrentVoronoi.classList.remove("highlight-voronoi");
+                if (highlightId) {
+                    naVoronoiUnHighlight(naCurrentVoronoi, highlightId);
                 }
             });
     }
 
-    // callback to highlight a point
-    function naVoronoiHighlight(d, id) {
-        console.log("d: " + d);
-        // no point to highlight - hide the circle and clear the text
-        if (!d) {
-            d3.select("#p" + id).attr("r", 10);
-            // otherwise, show the highlight circle at the correct position
-        } else {
-            d3
-                .select("#p" + id)
-                .style("display", "")
-                .attr("r", 30);
-        }
+    function naRemoveTeleportAreas() {
+        pathVoronoi.remove();
+    }
+
+    function naVoronoiHighlight(voronoi, portId) {
+        voronoi.classList.add("highlight-voronoi");
+        d3
+            .select("#p" + portId)
+            .select("circle")
+            .attr("r", currentCircleSize * 3);
+        d3
+            .select("#p" + portId)
+            .select("text")
+            .attr("dx", currentDx * 4)
+            .style("font-size", currentFontSize * 2);
+    }
+
+    function naVoronoiUnHighlight(voronoi, portId) {
+        voronoi.classList.remove("highlight-voronoi");
+        d3
+            .select("#p" + portId)
+            .select("circle")
+            .attr("r", currentCircleSize);
+        d3
+            .select("#p" + portId)
+            .select("text")
+            .attr("dx", currentDx)
+            .style("font-size", currentFontSize);
     }
 
     function naReady(error, naMap, pbZones) {
