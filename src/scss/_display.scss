@@ -10,11 +10,6 @@ $in-colour: $primary-900;
 $out-colour: $primary-700;
 $background-colour: $primary-300;
 
-.background {
-  fill: $background-colour;
-  pointer-events: all;
-}
-
 .na-port-in {
   fill: $in-colour;
 }
@@ -53,7 +48,7 @@ p {
 
 text {
   pointer-events: none;
-  text-anchor: start;
+  text-anchor: middle;
 }
 
 .label-rect {
@@ -72,7 +67,6 @@ text {
 .highlight-voronoi {
   fill: $primary-400;
   fill-opacity: .5;
-  stroke-width: 5px;
 }
 
 .tooltip {

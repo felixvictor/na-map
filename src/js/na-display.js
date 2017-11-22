@@ -38,14 +38,14 @@ export default function naDisplay(serverName) {
         naHeight = 8196;
     let IsZoomed = false,
         HasLabelRemoved = false;
+    const iconSize = 50;
     const defaultFontSize = parseInt(window.getComputedStyle(document.getElementById("na")).fontSize);
     let currentFontSize = defaultFontSize;
     const lineHeight = parseInt(window.getComputedStyle(document.getElementById("na")).lineHeight);
     const defaultCircleSize = 10,
         defaultDx = 0,
-        defaultDy = 20;
+        defaultDy = lineHeight * 1.1;
     let currentCircleSize = defaultCircleSize,
-        currentDx = defaultDx,
         currentDy = defaultDy;
     let naCurrentVoronoi, highlightId;
     const naMapJson = serverName + ".json",
@@ -66,12 +66,6 @@ export default function naDisplay(serverName) {
             .attr("width", naWidth)
             .attr("height", naHeight)
             .on("click", naStopProp, true);
-
-        naSvg
-            .append("rect")
-            .attr("class", "background")
-            .attr("width", naWidth)
-            .attr("height", naHeight);
 
         naZoom = d3
             .zoom()
@@ -127,12 +121,10 @@ export default function naDisplay(serverName) {
         currentCircleSize = defaultCircleSize / transform.k;
         gPorts.selectAll("circle").attr("r", currentCircleSize);
         if (!HasLabelRemoved) {
-            currentDx = defaultDx / transform.k;
             currentDy = defaultDy / transform.k;
             currentFontSize = defaultFontSize / transform.k;
             gPorts
                 .selectAll("text")
-                .attr("dx", currentDx)
                 .attr("dy", currentDy)
                 .style("font-size", currentFontSize);
             if (highlightId) {
@@ -203,10 +195,10 @@ export default function naDisplay(serverName) {
                 .attr("id", nation)
                 .attr("width", "100%")
                 .attr("height", "100%")
-                .attr("viewBox", "0 0 50 50")
+                .attr("viewBox", "0 0 " + iconSize + " " + iconSize)
                 .append("image")
-                .attr("height", "50")
-                .attr("width", "50")
+                .attr("height", iconSize)
+                .attr("width", iconSize)
                 .attr("href", "icons/" + nation + ".svg");
         });
 
@@ -254,8 +246,8 @@ export default function naDisplay(serverName) {
         // Port text colour
         naPort
             .append("text")
-            .attr("dx", currentDx)
-            .attr("dy", currentDy)
+            .attr("dx", defaultDx)
+            .attr("dy", defaultDy)
             .text(function(d) {
                 return d.properties.name;
             })
@@ -360,7 +352,7 @@ export default function naDisplay(serverName) {
         d3
             .select("#p" + portId)
             .select("text")
-            .attr("dx", currentDx * 4)
+            .attr("dy", currentFontSize * 4)
             .style("font-size", currentFontSize * 2);
     }
 
@@ -373,7 +365,7 @@ export default function naDisplay(serverName) {
         d3
             .select("#p" + portId)
             .select("text")
-            .attr("dx", currentDx)
+            .attr("dy", currentDy)
             .style("font-size", currentFontSize);
     }
 
