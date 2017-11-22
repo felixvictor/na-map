@@ -38,14 +38,15 @@ export default function naDisplay(serverName) {
         naHeight = 8196;
     let IsZoomed = false,
         HasLabelRemoved = false;
+    const defaultFontSize = parseInt(window.getComputedStyle(document.getElementById("na")).fontSize);
+    let currentFontSize = defaultFontSize;
+    const lineHeight = parseInt(window.getComputedStyle(document.getElementById("na")).lineHeight);
     const defaultCircleSize = 10,
-        defaultDx = 10,
+        defaultDx = 0,
         defaultDy = 20;
     let currentCircleSize = defaultCircleSize,
         currentDx = defaultDx,
         currentDy = defaultDy;
-    const defaultFontSize = parseInt(window.getComputedStyle(document.getElementById("na")).fontSize);
-    let currentFontSize = defaultFontSize;
     let naCurrentVoronoi, highlightId;
     const naMapJson = serverName + ".json",
         pbJson = "pb.json",
@@ -127,7 +128,7 @@ export default function naDisplay(serverName) {
         gPorts.selectAll("circle").attr("r", currentCircleSize);
         if (!HasLabelRemoved) {
             currentDx = defaultDx / transform.k;
-            currentDy = defaultDx / transform.k;
+            currentDy = defaultDy / transform.k;
             currentFontSize = defaultFontSize / transform.k;
             gPorts
                 .selectAll("text")
