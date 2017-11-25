@@ -32,7 +32,7 @@ export default function naDisplay(serverName) {
             feature: topojsonFeature
         };
 
-    let naSvg, naDefs, naZoom;
+    let naCanvas, naContext, naDefs, naZoom;
     let gPorts, gPBZones, gCountries, gVoronoi, pathVoronoi, naPort;
     let naPortData, naPBZoneData, naFortData, naTowerData;
     const naWidth = 8196,
@@ -60,24 +60,23 @@ export default function naDisplay(serverName) {
             }
         }
 
-        naSvg = d3
-            .select("#na")
-            .append("svg")
-            .attr("id", "na-svg")
+        naCanvas = d3
+            .select("canvas")
             .attr("width", naWidth)
             .attr("height", naHeight)
             .on("click", naStopProp, true);
+        naContext = naCanvas.node().getContext("2d");
 
         naZoom = d3
             .zoom()
             .scaleExtent([0.15, 10])
             .on("zoom", naZoomed);
-        naSvg.call(naZoom);
+        naCanvas.call(naZoom);
 
-        naDefs = naSvg.append("defs");
-        gCountries = naSvg.append("g").attr("class", "country");
-        gVoronoi = naSvg.append("g").attr("class", "voronoi");
-        gPorts = naSvg.append("g").attr("class", "port");
+        naDefs = naCanvas.append("defs");
+        gCountries = naCanvas.append("g").attr("class", "country");
+        gVoronoi = naCanvas.append("g").attr("class", "voronoi");
+        gPorts = naCanvas.append("g").attr("class", "port");
     }
 
     function naZoomed() {
@@ -135,11 +134,12 @@ export default function naDisplay(serverName) {
     }
 
     function naDisplayCountries() {
-        gCountries
-            .append("image")
-            .attr("width", naWidth)
-            .attr("height", naHeight)
-            .attr("href", naImage);
+        let img = new Image();
+        img.onload = function() {
+            naContext.drawImage(this, 0, 0);
+            naContext.getImageData(0, 0, naWidth, naHeight);
+        };
+        img.src = naImage;
     }
 
     function naDisplayPorts() {
@@ -268,7 +268,7 @@ export default function naDisplay(serverName) {
     }
 
     function naDisplayPBZones() {
-        gPBZones = naSvg.append("g").attr("class", "pb");
+        gPBZones = naCanvas.append("g").attr("class", "pb");
 
         gPBZones
             .append("path")
