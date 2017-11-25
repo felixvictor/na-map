@@ -38,10 +38,12 @@ export default function naDisplay(serverName) {
         };
 
     let naSvg, naCanvas, naContext, naDefs, naZoom;
-    let gPorts, gPBZones, gCountries, gVoronoi, pathVoronoi, naPort;
+    let gPorts, gPBZones, gVoronoi, pathVoronoi, naPort;
     let naPortData, naPBZoneData, naFortData, naTowerData;
-    const naWidth = 8196,
-        naHeight = 8196;
+    const naMargin = { top: 20, right: 20, bottom: 20, left: 20 };
+
+    const naWidth = top.innerWidth - naMargin.left - naMargin.right,
+        naHeight = top.innerHeight - naMargin.top - naMargin.bottom;
     let IsZoomed = false,
         HasLabelRemoved = false;
     const iconSize = 50;
@@ -71,6 +73,9 @@ export default function naDisplay(serverName) {
             .append("canvas")
             .attr("width", naWidth)
             .attr("height", naHeight)
+            .style("position", "absolute")
+            .style("top", naMargin.top + "px")
+            .style("left", naMargin.left + "px")
             .on("click", naStopProp, true);
         naContext = naCanvas.node().getContext("2d");
 
@@ -81,8 +86,8 @@ export default function naDisplay(serverName) {
             .attr("width", naWidth)
             .attr("height", naHeight)
             .style("position", "absolute")
-            .style("top", 0)
-            .style("left", 0)
+            .style("top", naMargin.top)
+            .style("left", naMargin.left)
             .on("click", naStopProp, true);
 
         naZoom = d3
@@ -96,6 +101,11 @@ export default function naDisplay(serverName) {
         gPorts = naSvg.append("g").attr("class", "port");
     }
 
+    function naDrawImage() {
+        naContext.drawImage(naImage, 0, 0);
+        naContext.getImageData(0, 0, naWidth, naHeight);
+    }
+
     function naZoomed() {
         const PBZonesZoomExtent = 1.5;
         const labelZoomExtent = 0.5;
@@ -107,8 +117,7 @@ export default function naDisplay(serverName) {
             naContext.clearRect(0, 0, naWidth, naHeight);
             naContext.translate(transform.x, transform.y);
             naContext.scale(transform.k, transform.k);
-            naContext.drawImage(naImage, 0, 0);
-            naContext.getImageData(0, 0, naWidth, naHeight);
+            naDrawImage();
             naContext.restore();
         }
 
@@ -162,8 +171,7 @@ export default function naDisplay(serverName) {
 
     function naDisplayCountries() {
         naImage.onload = function() {
-            naContext.drawImage(this, 0, 0);
-            naContext.getImageData(0, 0, naWidth, naHeight);
+            naDrawImage();
         };
         naImage.src = naImageSrc;
     }
