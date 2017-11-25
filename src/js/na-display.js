@@ -38,7 +38,7 @@ export default function naDisplay(serverName) {
         };
 
     let naSvg, naCanvas, naContext, naDefs, naZoom;
-    let gPorts, gPBZones, gVoronoi, pathVoronoi, naPort;
+    let gPorts, gPBZones, gVoronoi, naVoronoiDiagram, pathVoronoi, naTeleportPorts, naPort;
     let naPortData, naPBZoneData, naFortData, naTowerData;
     const naMargin = { top: 20, right: 20, bottom: 20, left: 20 };
 
@@ -56,6 +56,10 @@ export default function naDisplay(serverName) {
     let currentCircleSize = defaultCircleSize,
         currentDy = defaultDy;
     let naCurrentVoronoi, highlightId;
+    const maxCoord = 8192 + 1;
+    const minCoord = 0 - 1;
+    const voronoiCoordDefault = [[minCoord, minCoord], [naWidth + 1, naHeight + 1]];
+    let voronoiCoord = voronoiCoordDefault;
     let naImage = new Image();
     const naMapJson = serverName + ".json",
         pbJson = "pb.json",
@@ -112,6 +116,18 @@ export default function naDisplay(serverName) {
 
         let transform = currentD3Event.transform;
 
+        function naSetVoronoiCoord(transform) {
+            let x0 = (minCoord - transform.x) / transform.k;
+            x0 = x0 < minCoord ? minCoord : x0;
+            let y0 = (minCoord - transform.y) / transform.k;
+            y0 = y0 < minCoord ? minCoord : y0;
+            let x1 = (naWidth + 1 - transform.x) / transform.k;
+            x1 = x1 > maxCoord ? maxCoord : x1;
+            let y1 = (naHeight + 1 - transform.y) / transform.k;
+            y1 = y1 > maxCoord ? maxCoord : y1;
+            voronoiCoord = [[x0, y0], [x1, y1]];
+        }
+
         function naZoomCountries() {
             naContext.save();
             naContext.clearRect(0, 0, naWidth, naHeight);
@@ -121,18 +137,21 @@ export default function naDisplay(serverName) {
             naContext.restore();
         }
 
+        naSetVoronoiCoord(transform);
         if (PBZonesZoomExtent < transform.k) {
             if (!IsZoomed) {
                 naDisplayPBZones();
                 naRemoveTeleportAreas();
                 IsZoomed = true;
+            } else {
+                naDisplayTeleportAreas();
             }
         } else {
             if (IsZoomed) {
                 naRemovePBZones();
-                naDisplayTeleportAreas();
                 IsZoomed = false;
             }
+            naDisplayTeleportAreas();
         }
 
         if (labelZoomExtent > transform.k) {
@@ -327,27 +346,34 @@ export default function naDisplay(serverName) {
         gPBZones.remove();
     }
 
-    function naDisplayTeleportAreas() {
+    function naSetupTeleportAreas() {
         // Extract port coordinates
-        let teleportPorts = naPortData.features
+        naTeleportPorts = naPortData.features
             // Use only ports that deep water ports and not a county capital
             .filter(d => !d.properties.shallow && !d.properties.countyCapital)
             // Map to coordinates array
             .map(d => ({ id: d.id, coord: { x: d.geometry.coordinates[0], y: d.geometry.coordinates[1] } }));
 
+        naDisplayTeleportAreas();
+    }
+
+    function naDisplayTeleportAreas() {
+        // limit how far away the mouse can be from finding a voronoi site
+        const voronoiRadius = naWidth / 10;
+
+        naRemoveTeleportAreas();
+
         pathVoronoi = gVoronoi
             .selectAll(".voronoi")
-            .data(teleportPorts)
+            .data(naTeleportPorts)
             .enter()
             .append("path");
 
-        // limit how far away the mouse can be from finding a voronoi site
-        const voronoiRadius = naWidth / 10;
-        const naVoronoiDiagram = d3
+        naVoronoiDiagram = d3
             .voronoi()
-            .extent([[-1, -1], [naWidth + 1, naHeight + 1]])
+            .extent(voronoiCoord)
             .x(d => d.coord.x)
-            .y(d => d.coord.y)(teleportPorts);
+            .y(d => d.coord.y)(naTeleportPorts);
 
         // Draw teleport areas
         pathVoronoi
@@ -375,7 +401,9 @@ export default function naDisplay(serverName) {
     }
 
     function naRemoveTeleportAreas() {
-        pathVoronoi.remove();
+        if (pathVoronoi) {
+            pathVoronoi.remove();
+        }
     }
 
     function naVoronoiHighlight(voronoi, portId) {
@@ -418,7 +446,7 @@ export default function naDisplay(serverName) {
         naSetupCanvas();
 
         naDisplayCountries();
-        naDisplayTeleportAreas();
+        naSetupTeleportAreas();
         naDisplayPorts();
     }
 
