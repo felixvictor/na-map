@@ -3,6 +3,11 @@
 
     iB 2017
  */
+/*
+    Draws teleport map for Naval Action
+
+    iB 2017
+ */
 
 import { queue as d3Queue } from "d3-queue";
 import { geoPath as d3GeoPath } from "d3-geo";
@@ -32,7 +37,7 @@ export default function naDisplay(serverName) {
             feature: topojsonFeature
         };
 
-    let naCanvas, naContext, naDefs, naZoom;
+    let naSvg, naCanvas, naContext, naDefs, naZoom;
     let gPorts, gPBZones, gCountries, gVoronoi, pathVoronoi, naPort;
     let naPortData, naPBZoneData, naFortData, naTowerData;
     const naWidth = 8196,
@@ -49,9 +54,10 @@ export default function naDisplay(serverName) {
     let currentCircleSize = defaultCircleSize,
         currentDy = defaultDy;
     let naCurrentVoronoi, highlightId;
+    let naImage = new Image();
     const naMapJson = serverName + ".json",
         pbJson = "pb.json",
-        naImage = "images/na-map.jpg";
+        naImageSrc = "images/na-map.jpg";
 
     function naSetupCanvas() {
         function naStopProp() {
@@ -61,22 +67,33 @@ export default function naDisplay(serverName) {
         }
 
         naCanvas = d3
-            .select("canvas")
+            .select("#na")
+            .append("canvas")
             .attr("width", naWidth)
             .attr("height", naHeight)
             .on("click", naStopProp, true);
         naContext = naCanvas.node().getContext("2d");
 
+        naSvg = d3
+            .select("#na")
+            .append("svg")
+            .attr("id", "na-svg")
+            .attr("width", naWidth)
+            .attr("height", naHeight)
+            .style("position", "absolute")
+            .style("top", 0)
+            .style("left", 0)
+            .on("click", naStopProp, true);
+
         naZoom = d3
             .zoom()
             .scaleExtent([0.15, 10])
             .on("zoom", naZoomed);
-        naCanvas.call(naZoom);
+        naSvg.call(naZoom);
 
-        naDefs = naCanvas.append("defs");
-        gCountries = naCanvas.append("g").attr("class", "country");
-        gVoronoi = naCanvas.append("g").attr("class", "voronoi");
-        gPorts = naCanvas.append("g").attr("class", "port");
+        naDefs = naSvg.append("defs");
+        gVoronoi = naSvg.append("g").attr("class", "voronoi");
+        gPorts = naSvg.append("g").attr("class", "port");
     }
 
     function naZoomed() {
@@ -84,6 +101,16 @@ export default function naDisplay(serverName) {
         const labelZoomExtent = 0.5;
 
         let transform = currentD3Event.transform;
+
+        function naZoomCountries() {
+            naContext.save();
+            naContext.clearRect(0, 0, naWidth, naHeight);
+            naContext.translate(transform.x, transform.y);
+            naContext.scale(transform.k, transform.k);
+            naContext.drawImage(naImage, 0, 0);
+            naContext.getImageData(0, 0, naWidth, naHeight);
+            naContext.restore();
+        }
 
         if (PBZonesZoomExtent < transform.k) {
             if (!IsZoomed) {
@@ -111,7 +138,7 @@ export default function naDisplay(serverName) {
             }
         }
 
-        gCountries.attr("transform", transform);
+        naZoomCountries();
         gPorts.attr("transform", transform);
         gVoronoi.attr("transform", transform);
         if (IsZoomed) {
@@ -134,12 +161,11 @@ export default function naDisplay(serverName) {
     }
 
     function naDisplayCountries() {
-        let img = new Image();
-        img.onload = function() {
+        naImage.onload = function() {
             naContext.drawImage(this, 0, 0);
             naContext.getImageData(0, 0, naWidth, naHeight);
         };
-        img.src = naImage;
+        naImage.src = naImageSrc;
     }
 
     function naDisplayPorts() {
@@ -268,7 +294,7 @@ export default function naDisplay(serverName) {
     }
 
     function naDisplayPBZones() {
-        gPBZones = naCanvas.append("g").attr("class", "pb");
+        gPBZones = naSvg.append("g").attr("class", "pb");
 
         gPBZones
             .append("path")
