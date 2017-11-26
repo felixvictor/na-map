@@ -47,7 +47,7 @@ export default function naDisplay(serverName) {
 
     const naWidth = top.innerWidth - naMargin.left - naMargin.right,
         naHeight = top.innerHeight - naMargin.top - naMargin.bottom;
-    let IsZoomed = false,
+    let IsPBZoneDisplayed = false,
         HasLabelRemoved = false;
     const iconSize = 50;
     const defaultFontSize = parseInt(window.getComputedStyle(document.getElementById("na")).fontSize);
@@ -63,6 +63,8 @@ export default function naDisplay(serverName) {
     const minCoord = 0 - 1;
     const voronoiCoordDefault = [[minCoord, minCoord], [naWidth + 1, naHeight + 1]];
     let voronoiCoord = voronoiCoordDefault;
+    // limit how far away the mouse can be from finding a voronoi site
+    const voronoiRadius = Math.min(naHeight, naWidth);
     let naImage = new Image();
     const naMapJson = serverName + ".json",
         pbJson = "pb.json",
@@ -113,11 +115,10 @@ export default function naDisplay(serverName) {
     }
 
     function naZoomed() {
-        const PBZonesZoomExtent = 1.5;
+        const PBZoneZoomExtent = 1.5;
         const labelZoomExtent = 0.5;
 
         let transform = currentD3Event.transform;
-
         function naSetVoronoiCoord(transform) {
             const x0 = Math.max(minCoord, (minCoord - transform.x) / transform.k);
             const y0 = Math.max(minCoord, (minCoord - transform.y) / transform.k);
@@ -126,7 +127,7 @@ export default function naDisplay(serverName) {
             voronoiCoord = [[x0, y0], [x1, y1]];
         }
 
-        function naZoomCountries() {
+        function naDisplayCountries() {
             naContext.save();
             naContext.clearRect(0, 0, naWidth, naHeight);
             naContext.translate(transform.x, transform.y);
@@ -136,18 +137,16 @@ export default function naDisplay(serverName) {
         }
 
         naSetVoronoiCoord(transform);
-        if (PBZonesZoomExtent < transform.k) {
-            if (!IsZoomed) {
+        if (PBZoneZoomExtent < transform.k) {
+            if (!IsPBZoneDisplayed) {
                 naDisplayPBZones();
                 naRemoveTeleportAreas();
-                IsZoomed = true;
-            } else {
-                naDisplayTeleportAreas();
+                IsPBZoneDisplayed = true;
             }
         } else {
-            if (IsZoomed) {
+            if (IsPBZoneDisplayed) {
                 naRemovePBZones();
-                IsZoomed = false;
+                IsPBZoneDisplayed = false;
             }
             naDisplayTeleportAreas();
         }
@@ -164,10 +163,10 @@ export default function naDisplay(serverName) {
             }
         }
 
-        naZoomCountries();
+        naDisplayCountries();
         gPorts.attr("transform", transform);
         gVoronoi.attr("transform", transform);
-        if (IsZoomed) {
+        if (IsPBZoneDisplayed) {
             gPBZones.attr("transform", transform);
         }
 
@@ -180,13 +179,13 @@ export default function naDisplay(serverName) {
                 .selectAll("text")
                 .attr("dy", currentDy)
                 .style("font-size", currentFontSize);
-            if (highlightId) {
+            if (highlightId && !IsPBZoneDisplayed) {
                 naVoronoiHighlight(naCurrentVoronoi, highlightId);
             }
         }
     }
 
-    function naDisplayCountries() {
+    function naSetupCountries() {
         naImage.onload = function() {
             naDrawImage();
         };
@@ -356,9 +355,6 @@ export default function naDisplay(serverName) {
     }
 
     function naDisplayTeleportAreas() {
-        // limit how far away the mouse can be from finding a voronoi site
-        const voronoiRadius = naWidth / 10;
-
         naRemoveTeleportAreas();
 
         pathVoronoi = gVoronoi
@@ -388,46 +384,47 @@ export default function naDisplay(serverName) {
                 if (site) {
                     naCurrentVoronoi = pathVoronoi._groups[0][site.index];
                     highlightId = site.data.id;
-                    naVoronoiHighlight(naCurrentVoronoi, highlightId);
+                    naVoronoiHighlight();
                 }
             })
             .on("mouseout", function() {
-                if (highlightId) {
-                    naVoronoiUnHighlight(naCurrentVoronoi, highlightId);
-                }
+                naVoronoiUnHighlight();
             });
     }
 
     function naRemoveTeleportAreas() {
         if (pathVoronoi) {
+            naVoronoiUnHighlight();
             pathVoronoi.remove();
         }
     }
 
-    function naVoronoiHighlight(voronoi, portId) {
-        voronoi.classList.add("highlight-voronoi");
+    function naVoronoiHighlight() {
+        naCurrentVoronoi.classList.add("highlight-voronoi");
         d3
-            .select("#p" + portId)
+            .select("#p" + highlightId)
             .select("circle")
             .attr("r", currentCircleSize * 3);
         d3
-            .select("#p" + portId)
+            .select("#p" + highlightId)
             .select("text")
             .attr("dy", currentFontSize * 4)
             .style("font-size", currentFontSize * 2);
     }
 
-    function naVoronoiUnHighlight(voronoi, portId) {
-        voronoi.classList.remove("highlight-voronoi");
-        d3
-            .select("#p" + portId)
-            .select("circle")
-            .attr("r", currentCircleSize);
-        d3
-            .select("#p" + portId)
-            .select("text")
-            .attr("dy", currentDy)
-            .style("font-size", currentFontSize);
+    function naVoronoiUnHighlight() {
+        if (highlightId) {
+            naCurrentVoronoi.classList.remove("highlight-voronoi");
+            d3
+                .select("#p" + highlightId)
+                .select("circle")
+                .attr("r", currentCircleSize);
+            d3
+                .select("#p" + highlightId)
+                .select("text")
+                .attr("dy", currentDy)
+                .style("font-size", currentFontSize);
+        }
     }
 
     function naReady(error, naMap, pbZones) {
@@ -443,7 +440,7 @@ export default function naDisplay(serverName) {
 
         naSetupCanvas();
 
-        naDisplayCountries();
+        naSetupCountries();
         naSetupTeleportAreas();
         naDisplayPorts();
     }
