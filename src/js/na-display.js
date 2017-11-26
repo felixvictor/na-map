@@ -90,8 +90,8 @@ export default function naDisplay(serverName) {
             .attr("width", naWidth)
             .attr("height", naHeight)
             .style("position", "absolute")
-            .style("top", naMargin.top)
-            .style("left", naMargin.left)
+            .style("top", naMargin.top + "px")
+            .style("left", naMargin.left + "px")
             .on("click", naStopProp, true);
 
         naZoom = d3
