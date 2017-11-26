@@ -47,6 +47,7 @@
     "d3-queue": "^3.0.7",
     "d3-request": "^1.0.6",
     "d3-selection": "1.1.0",
+    "d3-transition": "^1.1.1",
     "d3-voronoi": "^1.1.2",
     "d3-zoom": "^1.6.0",
     "jquery": "1.9.1 - 3",
