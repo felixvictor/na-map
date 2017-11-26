@@ -14,6 +14,7 @@ import { geoPath as d3GeoPath } from "d3-geo";
 import { json as d3Json, request as d3Request } from "d3-request";
 // event needs live-binding
 import { event as currentD3Event, mouse as currentD3mouse, select as d3Select } from "d3-selection";
+//import { interrupt as d3Interrupt, transition as d3Transition } from "d3-transition";
 import { voronoi as d3Voronoi } from "d3-voronoi";
 import { zoom as d3Zoom, zoomIdentity as d3ZoomIdentity } from "d3-zoom";
 
@@ -26,9 +27,11 @@ export default function naDisplay(serverName) {
     const d3 = {
             json: d3Json,
             geoPath: d3GeoPath,
+            //            interrupt: d3Interrupt,
             queue: d3Queue,
             request: d3Request,
             select: d3Select,
+            //           transition: d3Transition,
             voronoi: d3Voronoi,
             zoom: d3Zoom,
             zoomIdentity: d3ZoomIdentity
@@ -93,7 +96,6 @@ export default function naDisplay(serverName) {
             .style("top", naMargin.top + "px")
             .style("left", naMargin.left + "px")
             .on("click", naStopProp, true);
-
         naZoom = d3
             .zoom()
             .scaleExtent([0.15, 10])
@@ -117,14 +119,10 @@ export default function naDisplay(serverName) {
         let transform = currentD3Event.transform;
 
         function naSetVoronoiCoord(transform) {
-            let x0 = (minCoord - transform.x) / transform.k;
-            x0 = x0 < minCoord ? minCoord : x0;
-            let y0 = (minCoord - transform.y) / transform.k;
-            y0 = y0 < minCoord ? minCoord : y0;
-            let x1 = (naWidth + 1 - transform.x) / transform.k;
-            x1 = x1 > maxCoord ? maxCoord : x1;
-            let y1 = (naHeight + 1 - transform.y) / transform.k;
-            y1 = y1 > maxCoord ? maxCoord : y1;
+            const x0 = Math.max(minCoord, (minCoord - transform.x) / transform.k);
+            const y0 = Math.max(minCoord, (minCoord - transform.y) / transform.k);
+            const x1 = Math.min(maxCoord, (naWidth + 1 - transform.x) / transform.k);
+            const y1 = Math.min(maxCoord, (naHeight + 1 - transform.y) / transform.k);
             voronoiCoord = [[x0, y0], [x1, y1]];
         }
 
