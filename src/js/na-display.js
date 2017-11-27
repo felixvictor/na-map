@@ -219,9 +219,14 @@ export default function naDisplay(serverName) {
                         break;
                 }
                 h += " rate AI ships";
+                h += ", " + d.conquestMarksPension + " conquest point";
+                h += d.conquestMarksPension > 1 ? "s" : "";
             } else {
                 h += "Not capturable";
             }
+            h += "<br>" + d.portTax * 100 + "% port tax";
+            h += d.tradingCompany ? ", trading company level " + d.tradingCompany : "";
+            h += d.laborHoursDiscount ? ", labor hours discount" : "";
             h += "</p>";
             h += "<table class='table table-sm'>";
             if (d.produces.length) {
