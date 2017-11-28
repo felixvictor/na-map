@@ -130,13 +130,13 @@ export default function naDisplay(serverName) {
 
         if (PBZoneZoomExtent < transform.k) {
             if (!IsPBZoneDisplayed) {
-                naDisplayPBZones();
+                naTogglePBZones();
                 naToggleDisplayTeleportAreas();
                 IsPBZoneDisplayed = true;
             }
         } else {
             if (IsPBZoneDisplayed) {
-                naRemovePBZones();
+                naTogglePBZones();
                 naToggleDisplayTeleportAreas();
                 IsPBZoneDisplayed = false;
             }
@@ -157,9 +157,7 @@ export default function naDisplay(serverName) {
         naDisplayCountries();
         gPorts.attr("transform", transform);
         gVoronoi.attr("transform", transform);
-        if (IsPBZoneDisplayed) {
-            gPBZones.attr("transform", transform);
-        }
+        gPBZones.attr("transform", transform);
 
         currentCircleSize = defaultCircleSize / transform.k;
         gPorts.selectAll("circle").attr("r", currentCircleSize);
@@ -313,8 +311,11 @@ export default function naDisplay(serverName) {
         gPorts.selectAll("text").remove();
     }
 
-    function naDisplayPBZones() {
-        gPBZones = naSvg.append("g").attr("class", "pb");
+    function naSetupPBZones() {
+        gPBZones = naSvg
+            .append("g")
+            .attr("class", "pb")
+            .style("display", "none");
 
         gPBZones
             .append("path")
@@ -335,8 +336,9 @@ export default function naDisplay(serverName) {
             .attr("d", d3.geoPath().pointRadius(2));
     }
 
-    function naRemovePBZones() {
-        gPBZones.remove();
+    function naTogglePBZones() {
+        gPBZones.style("display", gPBZones.active ? "none" : "inherit");
+        gPBZones.active = !gPBZones.active;
     }
 
     function naSetupTeleportAreas() {
@@ -388,11 +390,6 @@ export default function naDisplay(serverName) {
         gVoronoi.active = !gVoronoi.active;
     }
 
-    function naRemoveTeleportAreas() {
-        naToggleDisplayTeleportAreas();
-        naVoronoiUnHighlight();
-    }
-
     function naVoronoiHighlight() {
         naCurrentVoronoi.classList.add("highlight-voronoi");
         d3
@@ -437,6 +434,7 @@ export default function naDisplay(serverName) {
         naSetupCountries();
         naSetupTeleportAreas();
         naDisplayPorts();
+        naSetupPBZones();
     }
 
     d3
