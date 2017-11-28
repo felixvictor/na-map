@@ -66,7 +66,7 @@ export default function naDisplay(serverName) {
     // limit how far away the mouse can be from finding a voronoi site
     const voronoiRadius = Math.min(naHeight, naWidth);
     let naImage = new Image();
-    const naMapJson = serverName + ".json",
+    const naMapJson = `${serverName}.json`,
         pbJson = "pb.json",
         naImageSrc = "images/na-map.jpg";
 
@@ -83,8 +83,8 @@ export default function naDisplay(serverName) {
             .attr("width", naWidth)
             .attr("height", naHeight)
             .style("position", "absolute")
-            .style("top", naMargin.top + "px")
-            .style("left", naMargin.left + "px")
+            .style("top", `${naMargin.top}px`)
+            .style("left", `${naMargin.left}px`)
             .on("click", naStopProp, true);
         naContext = naCanvas.node().getContext("2d");
 
@@ -95,8 +95,8 @@ export default function naDisplay(serverName) {
             .attr("width", naWidth)
             .attr("height", naHeight)
             .style("position", "absolute")
-            .style("top", naMargin.top + "px")
-            .style("left", naMargin.left + "px")
+            .style("top", `${naMargin.top}px`)
+            .style("left", `${naMargin.left}px`)
             .on("click", naStopProp, true);
         naZoom = d3
             .zoom()
@@ -194,19 +194,19 @@ export default function naDisplay(serverName) {
 
     function naDisplayPorts() {
         function naTooltipData(d) {
-            let h = "<table><tbody<tr><td><i class='flag-icon " + d.nation + "'></i></td>";
-            h += "<td class='port-name'>" + d.name + "</td></tr></tbody></table>";
-            h += "<p>" + (d.shallow ? "Shallow" : "Deep");
+            let h = `<table><tbody<tr><td><i class='flag-icon ${d.nation}'></i></td>`;
+            h += `<td class='port-name'>${d.name}</td></tr></tbody></table>`;
+            h += `<p>${d.shallow ? "Shallow" : "Deep"}`;
             h += " water port";
             if (d.countyCapital) {
                 h += ", county capital";
             }
             if (d.capturer) {
-                h += ", owned by " + d.capturer;
+                h += `, owned by ${d.capturer}`;
             }
             h += "<br>";
             if (!d.nonCapturable) {
-                h += "Port battle: " + d.brLimit + " BR limit, ";
+                h += `Port battle: ${d.brLimit} BR limit, `;
                 switch (d.portBattleType) {
                     case "Large":
                         h += "1st";
@@ -219,24 +219,24 @@ export default function naDisplay(serverName) {
                         break;
                 }
                 h += " rate AI ships";
-                h += ", " + d.conquestMarksPension + " conquest point";
+                h += `, ${d.conquestMarksPension} conquest point`;
                 h += d.conquestMarksPension > 1 ? "s" : "";
             } else {
                 h += "Not capturable";
             }
-            h += "<br>" + d.portTax * 100 + "% port tax";
-            h += d.tradingCompany ? ", trading company level " + d.tradingCompany : "";
+            h += `<br>${d.portTax * 100}% port tax`;
+            h += d.tradingCompany ? `, trading company level ${d.tradingCompany}` : "";
             h += d.laborHoursDiscount ? ", labor hours discount" : "";
             h += "</p>";
             h += "<table class='table table-sm'>";
             if (d.produces.length) {
-                h += "<tr><td>Produces</td><td>" + d.produces.join(", ") + "</td></tr>";
+                h += `<tr><td>Produces</td><td>${d.produces.join(", ")}</td></tr>`;
             }
             if (d.drops.length) {
-                h += "<tr><td>Drops</td><td>" + d.drops.join(", ") + "</tr>";
+                h += `<tr><td>Drops</td><td>${d.drops.join(", ")}</tr>`;
             }
             if (d.consumes.length) {
-                h += "<tr><td>Consumes</td><td>" + d.consumes.join(", ") + "</tr>";
+                h += `<tr><td>Consumes</td><td>${d.consumes.join(", ")}</tr>`;
             }
             h += "</table>";
 
@@ -251,11 +251,11 @@ export default function naDisplay(serverName) {
                 .attr("id", nation)
                 .attr("width", "100%")
                 .attr("height", "100%")
-                .attr("viewBox", "0 0 " + iconSize + " " + iconSize)
+                .attr("viewBox", `0 0 ${iconSize} ${iconSize}`)
                 .append("image")
                 .attr("height", iconSize)
                 .attr("width", iconSize)
-                .attr("href", "icons/" + nation + ".svg");
+                .attr("href", `icons/${nation}.svg`);
         });
 
         naPort = gPorts
@@ -264,10 +264,10 @@ export default function naDisplay(serverName) {
             .enter()
             .append("g")
             .attr("id", function(d) {
-                return "p" + d.id;
+                return `p${d.id}`;
             })
             .attr("transform", function(d) {
-                return "translate(" + d.geometry.coordinates[0] + "," + d.geometry.coordinates[1] + ")";
+                return `translate(${d.geometry.coordinates[0]},${d.geometry.coordinates[1]})`;
             });
 
         // Port flags
@@ -275,7 +275,7 @@ export default function naDisplay(serverName) {
             .append("circle")
             .attr("r", defaultCircleSize)
             .attr("fill", function(d) {
-                return "url(#" + d.properties.nation + ")";
+                return `url(#${d.properties.nation})`;
             })
             .on("mouseover", function(d) {
                 if (highlightId) {
@@ -287,7 +287,7 @@ export default function naDisplay(serverName) {
                     .attr("title", function(d) {
                         return naTooltipData(d.properties);
                     });
-                $("#p" + d.id + " circle")
+                $(`#p${d.id} circle`)
                     .tooltip({
                         delay: { show: 100, hide: 100 },
                         html: true,
@@ -377,7 +377,7 @@ export default function naDisplay(serverName) {
         // Draw teleport areas
         pathVoronoi
             .data(naVoronoiDiagram.polygons())
-            .attr("d", d => (d ? "M" + d.join("L") + "Z" : null))
+            .attr("d", d => (d ? `M${d.join("L")}Z` : null))
             .on("mouseover", function() {
                 let ref = currentD3mouse(this);
                 const mx = ref[0],
@@ -407,11 +407,11 @@ export default function naDisplay(serverName) {
     function naVoronoiHighlight() {
         naCurrentVoronoi.classList.add("highlight-voronoi");
         d3
-            .select("#p" + highlightId)
+            .select(`#p${highlightId}`)
             .select("circle")
             .attr("r", currentCircleSize * 3);
         d3
-            .select("#p" + highlightId)
+            .select(`#p${highlightId}`)
             .select("text")
             .attr("dy", currentFontSize * 4)
             .style("font-size", currentFontSize * 2);
@@ -421,11 +421,11 @@ export default function naDisplay(serverName) {
         if (highlightId) {
             naCurrentVoronoi.classList.remove("highlight-voronoi");
             d3
-                .select("#p" + highlightId)
+                .select(`#p${highlightId}`)
                 .select("circle")
                 .attr("r", currentCircleSize);
             d3
-                .select("#p" + highlightId)
+                .select(`#p${highlightId}`)
                 .select("text")
                 .attr("dy", currentDy)
                 .style("font-size", currentFontSize);
