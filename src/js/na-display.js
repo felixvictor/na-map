@@ -61,8 +61,7 @@ export default function naDisplay(serverName) {
     let naCurrentVoronoi, highlightId;
     const maxCoord = 8192 + 1;
     const minCoord = 0 - 1;
-    const voronoiCoordDefault = [[minCoord, minCoord], [naWidth + 1, naHeight + 1]];
-    let voronoiCoord = voronoiCoordDefault;
+    const voronoiCoord = [[minCoord, minCoord], [maxCoord, maxCoord]];
     // limit how far away the mouse can be from finding a voronoi site
     const voronoiRadius = Math.min(naHeight, naWidth);
     let naImage = new Image();
@@ -119,13 +118,6 @@ export default function naDisplay(serverName) {
         const labelZoomExtent = 0.5;
 
         let transform = currentD3Event.transform;
-        function naSetVoronoiCoord(transform) {
-            const x0 = Math.max(minCoord, (minCoord - transform.x) / transform.k);
-            const y0 = Math.max(minCoord, (minCoord - transform.y) / transform.k);
-            const x1 = Math.min(maxCoord, (naWidth + 1 - transform.x) / transform.k);
-            const y1 = Math.min(maxCoord, (naHeight + 1 - transform.y) / transform.k);
-            voronoiCoord = [[x0, y0], [x1, y1]];
-        }
 
         function naDisplayCountries() {
             naContext.save();
@@ -136,19 +128,18 @@ export default function naDisplay(serverName) {
             naContext.restore();
         }
 
-        naSetVoronoiCoord(transform);
         if (PBZoneZoomExtent < transform.k) {
             if (!IsPBZoneDisplayed) {
                 naDisplayPBZones();
-                naRemoveTeleportAreas();
+                naToggleDisplayTeleportAreas();
                 IsPBZoneDisplayed = true;
             }
         } else {
             if (IsPBZoneDisplayed) {
                 naRemovePBZones();
+                naToggleDisplayTeleportAreas();
                 IsPBZoneDisplayed = false;
             }
-            naDisplayTeleportAreas();
         }
 
         if (labelZoomExtent > transform.k) {
@@ -356,12 +347,6 @@ export default function naDisplay(serverName) {
             // Map to coordinates array
             .map(d => ({ id: d.id, coord: { x: d.geometry.coordinates[0], y: d.geometry.coordinates[1] } }));
 
-        naDisplayTeleportAreas();
-    }
-
-    function naDisplayTeleportAreas() {
-        naRemoveTeleportAreas();
-
         pathVoronoi = gVoronoi
             .selectAll(".voronoi")
             .data(naTeleportPorts)
@@ -395,13 +380,17 @@ export default function naDisplay(serverName) {
             .on("mouseout", function() {
                 naVoronoiUnHighlight();
             });
+        naToggleDisplayTeleportAreas();
+    }
+
+    function naToggleDisplayTeleportAreas() {
+        gVoronoi.style("display", gVoronoi.active ? "none" : "inherit");
+        gVoronoi.active = !gVoronoi.active;
     }
 
     function naRemoveTeleportAreas() {
-        if (pathVoronoi) {
-            naVoronoiUnHighlight();
-            pathVoronoi.remove();
-        }
+        naToggleDisplayTeleportAreas();
+        naVoronoiUnHighlight();
     }
 
     function naVoronoiHighlight() {
