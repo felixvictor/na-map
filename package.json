@@ -66,8 +66,8 @@
     "js-lint": "eslint -c .eslintrc.json src/js",
     "prettier": "prettier --tab-width 4 --print-width 120 --write .eslintrc.json package.json *.js src/js/*.json src/scss/*.scss",
     "prod": "yarn run clean && NODE_ENV=${NODE_ENV:=prod} webpack --colors --config webpack.config.js",
-    "push": "build/push.sh",
-    "change-ports": "build/change-server-port-data.sh",
+    "push": "build/port-data.sh push",
+    "change-ports": "build/port-data.sh change",
     "watch": "yarn run clean && NODE_ENV=${NODE_ENV:=dev} webpack --watch --colors --config webpack.config.js"
   },
   "browserslist": [
