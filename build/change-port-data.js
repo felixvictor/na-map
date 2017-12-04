@@ -29,6 +29,9 @@ serverPorts.objects.ports.geometries.forEach(function(d) {
     d.properties.nation = nation[t[0].Nation];
     d.properties.capturer = t[0].Capturer;
     d.properties.brLimit = t[0].PortBattleBRLimit;
+    d.properties.portTax = t[0].PortTax;
+    d.properties.tradingCompany = t[0].TradingCompany;
+    d.properties.laborHoursDiscount = t[0].LaborHoursDiscount;
 });
 //console.log("serverPorts: " + JSON.stringify(serverPorts));
 
