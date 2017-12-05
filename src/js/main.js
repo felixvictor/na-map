@@ -1,7 +1,7 @@
 /*
-    Main
+ Main
 
-    iB 2017
+ iB 2017
  */
 
 import naDisplay from "./na-display";
@@ -12,16 +12,16 @@ import "bootstrap/js/dist/util";
 function main() {
     naAnalytics();
     $("#modal")
-        .on("click", ".btn, .close", function() {
+        .on("click", ".btn, .close", function () {
             $(this).addClass("modal-result"); // mark which button was clicked
         })
-        .on("hide.bs.modal", function() {
+        .on("hide.bs.modal", function () {
             const serverName = $(this)
                 .find(".modal-result")
                 .attr("data-server");
             naDisplay(serverName); // invoke the callback with result
         });
-    window.onload = function() {
+    window.onload = function () {
         $("#modal").modal("show");
     };
 }
