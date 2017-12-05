@@ -3,10 +3,11 @@
 const libraryName = "na-map";
 
 const webpack = require("webpack");
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
-const MinifyPlugin = require("babel-minify-webpack-plugin");
 const path = require("path");
 const PACKAGE = require("./package.json");
+const HtmlPlugin = require("html-webpack-plugin"),
+    ExtractTextPlugin = require("extract-text-webpack-plugin"),
+    MinifyPlugin = require("babel-minify-webpack-plugin");
 
 const babelOpt = {
     cacheDirectory: true,
@@ -124,13 +125,13 @@ let config = {
     },
 
     output: {
-        path: __dirname + "/public/js",
-        filename: libraryName + ".min.js"
+        path: `${__dirname}/public/js`,
+        filename: `${libraryName}.min.js`
     },
 
     plugins: [
         new ExtractTextPlugin({
-            filename: "../css/" + libraryName + ".min.css",
+            filename: `../css/${libraryName}.min.css`,
             allChunks: true
         }),
         new webpack.ProvidePlugin({
@@ -146,6 +147,15 @@ let config = {
             //Popover: "exports-loader?Popover!bootstrap/js/dist/popover",
             Tooltip: "exports-loader?Tooltip!bootstrap/js/dist/tooltip",
             Util: "exports-loader?Util!bootstrap/js/dist/util"
+        }),
+        new HtmlPlugin({
+            gtag: "https://www.googletagmanager.com/gtag/js?id=UA-109520372-1",
+            lang: "en-GB",
+            hash: true,
+            inject: "body",
+            minify: false,
+            template: "index.template.ejs",
+            title: "Naval Action map"
         })
     ],
 

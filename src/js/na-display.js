@@ -1,24 +1,24 @@
 /*
-    Draws teleport map for Naval Action
+ Draws teleport map for Naval Action
 
-    iB 2017
+ iB 2017
  */
 /*
-    Draws teleport map for Naval Action
+ Draws teleport map for Naval Action
 
-    iB 2017
+ iB 2017
  */
 
-import { queue as d3Queue } from "d3-queue";
-import { geoPath as d3GeoPath } from "d3-geo";
-import { json as d3Json, request as d3Request } from "d3-request";
+import {queue as d3Queue} from "d3-queue";
+import {geoPath as d3GeoPath} from "d3-geo";
+import {json as d3Json, request as d3Request} from "d3-request";
 // event needs live-binding
-import { event as currentD3Event, mouse as currentD3mouse, select as d3Select } from "d3-selection";
+import {event as currentD3Event, mouse as currentD3mouse, select as d3Select} from "d3-selection";
 //import { interrupt as d3Interrupt, transition as d3Transition } from "d3-transition";
-import { voronoi as d3Voronoi } from "d3-voronoi";
-import { zoom as d3Zoom, zoomIdentity as d3ZoomIdentity } from "d3-zoom";
+import {voronoi as d3Voronoi} from "d3-voronoi";
+import {zoom as d3Zoom, zoomIdentity as d3ZoomIdentity} from "d3-zoom";
 
-import { feature as topojsonFeature } from "topojson-client";
+import {feature as topojsonFeature} from "topojson-client";
 
 import "bootstrap/js/dist/tooltip";
 import "bootstrap/js/dist/util";
@@ -43,7 +43,7 @@ export default function naDisplay(serverName) {
     let naSvg, naCanvas, naContext, naDefs, naZoom;
     let gPorts, gPBZones, gVoronoi, naVoronoiDiagram, pathVoronoi, naTeleportPorts, naPort;
     let naPortData, naPBZoneData, naFortData, naTowerData;
-    const naMargin = { top: 20, right: 20, bottom: 20, left: 20 };
+    const naMargin = {top: 20, right: 20, bottom: 20, left: 20};
 
     const naWidth = top.innerWidth - naMargin.left - naMargin.right,
         naHeight = top.innerHeight - naMargin.top - naMargin.bottom;
@@ -175,7 +175,7 @@ export default function naDisplay(serverName) {
     }
 
     function naSetupCountries() {
-        naImage.onload = function() {
+        naImage.onload = function () {
             naDrawImage();
         };
         naImage.src = naImageSrc;
@@ -234,7 +234,7 @@ export default function naDisplay(serverName) {
 
         const nations = ["DE", "DK", "ES", "FR", "FT", "GB", "NL", "NT", "PL", "PR", "RU", "SE", "US"];
 
-        nations.forEach(function(nation) {
+        nations.forEach(function (nation) {
             naDefs
                 .append("pattern")
                 .attr("id", nation)
@@ -252,10 +252,10 @@ export default function naDisplay(serverName) {
             .data(naPortData.features)
             .enter()
             .append("g")
-            .attr("id", function(d) {
+            .attr("id", function (d) {
                 return `p${d.id}`;
             })
-            .attr("transform", function(d) {
+            .attr("transform", function (d) {
                 return `translate(${d.geometry.coordinates[0]},${d.geometry.coordinates[1]})`;
             });
 
@@ -263,22 +263,22 @@ export default function naDisplay(serverName) {
         naPort
             .append("circle")
             .attr("r", defaultCircleSize)
-            .attr("fill", function(d) {
+            .attr("fill", function (d) {
                 return `url(#${d.properties.nation})`;
             })
-            .on("mouseover", function(d) {
+            .on("mouseover", function (d) {
                 if (highlightId) {
                     naVoronoiHighlight(naCurrentVoronoi, highlightId);
                 }
                 d3
                     .select(this)
                     .attr("data-toggle", "tooltip")
-                    .attr("title", function(d) {
+                    .attr("title", function (d) {
                         return naTooltipData(d.properties);
                     });
                 $(`#p${d.id} circle`)
                     .tooltip({
-                        delay: { show: 100, hide: 100 },
+                        delay: {show: 100, hide: 100},
                         html: true,
                         placement: "auto"
                     })
@@ -293,10 +293,10 @@ export default function naDisplay(serverName) {
             .append("text")
             .attr("dx", defaultDx)
             .attr("dy", defaultDy)
-            .text(function(d) {
+            .text(function (d) {
                 return d.properties.name;
             })
-            .attr("class", function(d) {
+            .attr("class", function (d) {
                 let f;
                 if (!d.properties.shallow && !d.properties.countyCapital) {
                     f = "na-port-in";
@@ -344,10 +344,10 @@ export default function naDisplay(serverName) {
     function naSetupTeleportAreas() {
         // Extract port coordinates
         naTeleportPorts = naPortData.features
-            // Use only ports that deep water ports and not a county capital
+        // Use only ports that deep water ports and not a county capital
             .filter(d => !d.properties.shallow && !d.properties.countyCapital)
             // Map to coordinates array
-            .map(d => ({ id: d.id, coord: { x: d.geometry.coordinates[0], y: d.geometry.coordinates[1] } }));
+            .map(d => ({id: d.id, coord: {x: d.geometry.coordinates[0], y: d.geometry.coordinates[1]}}));
 
         pathVoronoi = gVoronoi
             .selectAll(".voronoi")
@@ -365,7 +365,7 @@ export default function naDisplay(serverName) {
         pathVoronoi
             .data(naVoronoiDiagram.polygons())
             .attr("d", d => (d ? `M${d.join("L")}Z` : null))
-            .on("mouseover", function() {
+            .on("mouseover", function () {
                 let ref = currentD3mouse(this);
                 const mx = ref[0],
                     my = ref[1];
@@ -379,7 +379,7 @@ export default function naDisplay(serverName) {
                     naVoronoiHighlight();
                 }
             })
-            .on("mouseout", function() {
+            .on("mouseout", function () {
                 naVoronoiUnHighlight();
             });
         naToggleDisplayTeleportAreas();
