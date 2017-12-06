@@ -8,6 +8,7 @@
     "babel-loader": "8.0.0-beta.0",
     "babel-minify-webpack-plugin": "^0.2.0",
     "babel-preset-minify": "^0.2.0",
+    "copy-webpack-plugin": "^4.2.3",
     "css-loader": "^0.28.7",
     "eslint": "^4.6.1",
     "eslint-config-prettier": "^2.4.0",
@@ -59,7 +60,7 @@
     "node": ">=6"
   },
   "scripts": {
-    "clean": "rm -rf public/js public/css",
+    "clean": "rm -rf public/",
     "css-lint": "stylelint --config .stylelintrc --syntax scss \"src/scss/*.scss\"",
     "deploy-change": "yarn run prod && yarn run change-ports && yarn run push && yarn run deploy-netlify",
     "deploy-update": "yarn run push && yarn run deploy-netlify",

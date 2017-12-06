@@ -5,8 +5,9 @@ const libraryName = "na-map";
 const webpack = require("webpack");
 const path = require("path");
 const PACKAGE = require("./package.json");
-const HtmlPlugin = require("html-webpack-plugin"),
+const CopyPlugin = require("copy-webpack-plugin"),
     ExtractTextPlugin = require("extract-text-webpack-plugin"),
+    HtmlPlugin = require("html-webpack-plugin"),
     MinifyPlugin = require("babel-minify-webpack-plugin");
 
 const babelOpt = {
@@ -148,11 +149,17 @@ let config = {
             Tooltip: "exports-loader?Tooltip!bootstrap/js/dist/tooltip",
             Util: "exports-loader?Util!bootstrap/js/dist/util"
         }),
+        new CopyPlugin([
+            { from: ".netlify", to: "../.netlify", toType: "file" },
+            { from: "google979f2cf3bed204d6.html", to: "../google979f2cf3bed204d6.html", toType: "file" },
+            { from: "*.json", to: ".." }
+        ]),
         new HtmlPlugin({
+            filename: "../index.html",
             gtag: "https://www.googletagmanager.com/gtag/js?id=UA-109520372-1",
-            lang: "en-GB",
             hash: true,
             inject: "body",
+            lang: "en-GB",
             minify: false,
             template: "index.template.ejs",
             title: "Naval Action map"
