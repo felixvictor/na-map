@@ -126,13 +126,13 @@ let config = {
     },
 
     output: {
-        path: `${__dirname}/public/js`,
+        path: `${__dirname}/public`,
         filename: `${libraryName}.min.js`
     },
 
     plugins: [
         new ExtractTextPlugin({
-            filename: `../css/${libraryName}.min.css`,
+            filename: `${libraryName}.min.css`,
             allChunks: true
         }),
         new webpack.ProvidePlugin({
@@ -150,17 +150,17 @@ let config = {
             Util: "exports-loader?Util!bootstrap/js/dist/util"
         }),
         new CopyPlugin([
-            { from: ".netlify", to: "../.netlify", toType: "file" },
-            { from: "google979f2cf3bed204d6.html", to: "../google979f2cf3bed204d6.html", toType: "file" },
-            { from: "*.json", to: ".." }
+            { from: ".netlify", to: ".netlify", toType: "file" },
+            { from: "google979f2cf3bed204d6.html", to: "google979f2cf3bed204d6.html", toType: "file" },
+            { from: "*.json" }
         ]),
         new HtmlPlugin({
-            filename: "../index.html",
+            filename: "index.html",
             gtag: "https://www.googletagmanager.com/gtag/js?id=UA-109520372-1",
             hash: true,
             inject: "body",
             lang: "en-GB",
-            minify: false,
+            minify: {html5: true},
             template: "index.template.ejs",
             title: "Naval Action map"
         })
@@ -204,7 +204,7 @@ let config = {
                     loader: "file-loader",
                     options: {
                         name: "[name].[ext]",
-                        outputPath: "../fonts/"
+                        outputPath: "fonts/"
                     }
                 }
             },
@@ -216,7 +216,7 @@ let config = {
                         loader: "file-loader",
                         options: {
                             name: "[name].[ext]",
-                            outputPath: "../images/"
+                            outputPath: "images/"
                         }
                     },
                     {
@@ -234,7 +234,7 @@ let config = {
                         options: {
                             limit: 1,
                             name: "[name].[ext]",
-                            outputPath: "../images/"
+                            outputPath: "images/"
                         }
                     },
                     {
@@ -254,7 +254,7 @@ let config = {
                         options: {
                             limit: 1,
                             name: "[name].[ext]",
-                            outputPath: "../icons/"
+                            outputPath: "icons/"
                         }
                     },
                     {
