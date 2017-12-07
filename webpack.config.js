@@ -31,6 +31,18 @@ const cssOpt = {
     sourceMap: true
 };
 
+const minifyOpt = {
+    collapseBooleanAttributes: true,
+    collapseWhitespace: true,
+    collapseInlineTagWhitespace: true,
+    decodeEntities: true,
+    html5: true,
+    minifyURLs: true,
+    removeComments: true,
+    sortAttributes: true,
+    sortClassName: true
+};
+
 const imagewebpackOpt = {
     gifsicle: {
         optimizationLevel: 3,
@@ -160,7 +172,7 @@ let config = {
             hash: true,
             inject: "body",
             lang: "en-GB",
-            minify: {html5: true},
+            minify: minifyOpt,
             template: "index.template.ejs",
             title: "Naval Action map"
         })
