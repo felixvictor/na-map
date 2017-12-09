@@ -41,7 +41,7 @@ export default function naDisplay(serverName) {
         };
 
     let naSvg, naCanvas, naContext, naDefs, naZoom;
-    let gPorts, gPBZones, gVoronoi, naVoronoiDiagram, pathVoronoi, naTeleportPorts, naPort;
+    let gPorts, gPBZones, gVoronoi, naVoronoiDiagram, pathVoronoi, naTeleportPorts, naPort, naPortLabel;
     let naPortData, naPBZoneData, naFortData, naTowerData;
     const naMargin = { top: 20, right: 20, bottom: 20, left: 20 };
 
@@ -53,11 +53,8 @@ export default function naDisplay(serverName) {
     const defaultFontSize = parseInt(window.getComputedStyle(document.getElementById("na")).fontSize);
     let currentFontSize = defaultFontSize;
     const lineHeight = parseInt(window.getComputedStyle(document.getElementById("na")).lineHeight);
-    const defaultCircleSize = 10,
-        defaultDx = 0,
-        defaultDy = lineHeight * 1.1;
-    let currentCircleSize = defaultCircleSize,
-        currentDy = defaultDy;
+    const defaultCircleSize = 10;
+    let currentCircleSize = defaultCircleSize;
     let naCurrentVoronoi, highlightId;
     const maxCoord = 8192 + 1;
     const minCoord = 0 - 1;
@@ -162,12 +159,8 @@ export default function naDisplay(serverName) {
         currentCircleSize = defaultCircleSize / transform.k;
         gPorts.selectAll("circle").attr("r", currentCircleSize);
         if (!HasLabelRemoved) {
-            currentDy = defaultDy / transform.k;
             currentFontSize = defaultFontSize / transform.k;
-            gPorts
-                .selectAll("text")
-                .attr("dy", currentDy)
-                .style("font-size", currentFontSize);
+            gPorts.selectAll("text").style("font-size", currentFontSize);
             if (highlightId && !IsPBZoneDisplayed) {
                 naVoronoiHighlight(naCurrentVoronoi, highlightId);
             }
@@ -252,20 +245,14 @@ export default function naDisplay(serverName) {
             .data(naPortData.features)
             .enter()
             .append("g")
-            .attr("id", function(d) {
-                return `p${d.id}`;
-            })
-            .attr("transform", function(d) {
-                return `translate(${d.geometry.coordinates[0]},${d.geometry.coordinates[1]})`;
-            });
+            .attr("id", d => `p${d.id}`)
+            .attr("transform", d => `translate(${d.geometry.coordinates[0]},${d.geometry.coordinates[1]})`);
 
         // Port flags
         naPort
             .append("circle")
             .attr("r", defaultCircleSize)
-            .attr("fill", function(d) {
-                return `url(#${d.properties.nation})`;
-            })
+            .attr("fill", d => `url(#${d.properties.nation})`)
             .on("mouseover", function(d) {
                 if (highlightId) {
                     naVoronoiHighlight(naCurrentVoronoi, highlightId);
@@ -273,9 +260,7 @@ export default function naDisplay(serverName) {
                 d3
                     .select(this)
                     .attr("data-toggle", "tooltip")
-                    .attr("title", function(d) {
-                        return naTooltipData(d.properties);
-                    });
+                    .attr("title", d => naTooltipData(d.properties));
                 $(`#p${d.id} circle`)
                     .tooltip({
                         delay: { show: 100, hide: 100 },
@@ -288,20 +273,23 @@ export default function naDisplay(serverName) {
     }
 
     function naDisplayLabel() {
-        // Port text colour
-        naPort
+        naPortLabel = naPort
             .append("text")
-            .attr("dx", defaultDx)
-            .attr("dy", defaultDy)
-            .text(function(d) {
-                return d.properties.name;
+            .attr("dx", d => d.properties.dx)
+            .attr("dy", d => d.properties.dy)
+            .attr("orig-dy", d => d.properties.dy)
+            .attr("text-anchor", d => {
+                if (d.properties.dx < 0) {
+                    return "end";
+                } else {
+                    return "start";
+                }
             })
-            .attr("class", function(d) {
-                let f;
+            .text(d => d.properties.name)
+            .attr("class", d => {
+                let f = "na-port-out";
                 if (!d.properties.shallow && !d.properties.countyCapital) {
                     f = "na-port-in";
-                } else {
-                    f = "na-port-out";
                 }
                 return f;
             });
@@ -353,7 +341,8 @@ export default function naDisplay(serverName) {
             .selectAll(".voronoi")
             .data(naTeleportPorts)
             .enter()
-            .append("path");
+            .append("path")
+            .attr("id", d => `v${d.id}`);
 
         naVoronoiDiagram = d3
             .voronoi()
@@ -365,7 +354,7 @@ export default function naDisplay(serverName) {
         pathVoronoi
             .data(naVoronoiDiagram.polygons())
             .attr("d", d => (d ? `M${d.join("L")}Z` : null))
-            .on("mouseover", function() {
+            .on("mouseover", function(d) {
                 let ref = currentD3mouse(this);
                 const mx = ref[0],
                     my = ref[1];
@@ -391,30 +380,26 @@ export default function naDisplay(serverName) {
     }
 
     function naVoronoiHighlight() {
-        naCurrentVoronoi.classList.add("highlight-voronoi");
+        d3.select(`#v${highlightId}`).attr("class", "highlight-voronoi");
         d3
             .select(`#p${highlightId}`)
             .select("circle")
             .attr("r", currentCircleSize * 3);
-        d3
-            .select(`#p${highlightId}`)
-            .select("text")
-            .attr("dy", currentFontSize * 4)
-            .style("font-size", currentFontSize * 2);
+        let text = d3.select(`#p${highlightId}`).select("text");
+        let origDy = text.attr("orig-dy");
+        text.attr("dy", origDy * 3).style("font-size", currentFontSize * 2);
     }
 
     function naVoronoiUnHighlight() {
         if (highlightId) {
-            naCurrentVoronoi.classList.remove("highlight-voronoi");
+            d3.select(`#v${highlightId}`).attr("class", "");
             d3
                 .select(`#p${highlightId}`)
                 .select("circle")
                 .attr("r", currentCircleSize);
-            d3
-                .select(`#p${highlightId}`)
-                .select("text")
-                .attr("dy", currentDy)
-                .style("font-size", currentFontSize);
+            let text = d3.select(`#p${highlightId}`).select("text");
+            let origDy = text.attr("orig-dy");
+            text.attr("dy", origDy).style("font-size", currentFontSize);
         }
     }
 
