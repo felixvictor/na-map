@@ -14,7 +14,7 @@ import { geoPath as d3GeoPath } from "d3-geo";
 import { json as d3Json, request as d3Request } from "d3-request";
 // event needs live-binding
 import { event as currentD3Event, mouse as currentD3mouse, select as d3Select } from "d3-selection";
-//import { interrupt as d3Interrupt, transition as d3Transition } from "d3-transition";
+import { interrupt as d3Interrupt, transition as d3Transition } from "d3-transition";
 import { voronoi as d3Voronoi } from "d3-voronoi";
 import { zoom as d3Zoom, zoomIdentity as d3ZoomIdentity } from "d3-zoom";
 
@@ -27,11 +27,11 @@ export default function naDisplay(serverName) {
     const d3 = {
             json: d3Json,
             geoPath: d3GeoPath,
-            //            interrupt: d3Interrupt,
+            interrupt: d3Interrupt,
             queue: d3Queue,
             request: d3Request,
             select: d3Select,
-            //           transition: d3Transition,
+            transition: d3Transition,
             voronoi: d3Voronoi,
             zoom: d3Zoom,
             zoomIdentity: d3ZoomIdentity
@@ -66,13 +66,59 @@ export default function naDisplay(serverName) {
         pbJson = "pb.json",
         naImageSrc = "images/na-map.jpg";
 
-    function naSetupCanvas() {
-        function naStopProp() {
-            if (currentD3Event.defaultPrevented) {
-                currentD3Event.stopPropagation();
-            }
-        }
+    function naDisplayCountries(transform) {
+        console.log(`transform: ${JSON.stringify(transform)}`);
+        naContext.save();
+        naContext.clearRect(0, 0, naWidth, naHeight);
+        naContext.translate(transform.x, transform.y);
+        naContext.scale(transform.k, transform.k);
+        naDrawImage();
+        naContext.restore();
+    }
 
+    function naStopProp() {
+        if (currentD3Event.defaultPrevented) {
+            currentD3Event.stopPropagation();
+        }
+    }
+
+    function naSetupSvg() {
+        function initialZoom() {
+            const t = d3.zoomIdentity.translate(-maxCoord / 4, -maxCoord / 4).scale(0.6);
+            naDisplayCountries(t);
+            gVoronoi = gVoronoi.attr("transform", t);
+            gPorts = gPorts.attr("transform", t);
+            gPBZones = gPBZones.attr("transform", t);
+        }
+        naZoom = d3
+            .zoom()
+            .scaleExtent([0.15, 10])
+            .on("zoom", naZoomed);
+
+        naSvg = d3
+            .select("#na")
+            .append("svg")
+            .attr("id", "na-svg")
+            .attr("width", naWidth)
+            .attr("height", naHeight)
+            .style("position", "absolute")
+            .style("top", `${naMargin.top}px`)
+            .style("left", `${naMargin.left}px`)
+            .call(naZoom)
+            .on("click", naStopProp, true);
+
+        naDefs = naSvg.append("defs");
+
+        gVoronoi = naSvg.append("g").attr("class", "voronoi");
+        gPorts = naSvg.append("g").attr("class", "port");
+        gPBZones = naSvg
+            .append("g")
+            .attr("class", "pb")
+            .style("display", "none");
+        initialZoom();
+    }
+
+    function naSetupCanvas() {
         naCanvas = d3
             .select("#na")
             .append("canvas")
@@ -84,25 +130,10 @@ export default function naDisplay(serverName) {
             .on("click", naStopProp, true);
         naContext = naCanvas.node().getContext("2d");
 
-        naSvg = d3
-            .select("#na")
-            .append("svg")
-            .attr("id", "na-svg")
-            .attr("width", naWidth)
-            .attr("height", naHeight)
-            .style("position", "absolute")
-            .style("top", `${naMargin.top}px`)
-            .style("left", `${naMargin.left}px`)
-            .on("click", naStopProp, true);
-        naZoom = d3
-            .zoom()
-            .scaleExtent([0.15, 10])
-            .on("zoom", naZoomed);
-        naSvg.call(naZoom);
-
-        naDefs = naSvg.append("defs");
-        gVoronoi = naSvg.append("g").attr("class", "voronoi");
-        gPorts = naSvg.append("g").attr("class", "port");
+        naImage.onload = function() {
+            naDrawImage();
+        };
+        naImage.src = naImageSrc;
     }
 
     function naDrawImage() {
@@ -115,15 +146,6 @@ export default function naDisplay(serverName) {
         const labelZoomExtent = 0.5;
 
         let transform = currentD3Event.transform;
-
-        function naDisplayCountries() {
-            naContext.save();
-            naContext.clearRect(0, 0, naWidth, naHeight);
-            naContext.translate(transform.x, transform.y);
-            naContext.scale(transform.k, transform.k);
-            naDrawImage();
-            naContext.restore();
-        }
 
         if (PBZoneZoomExtent < transform.k) {
             if (!IsPBZoneDisplayed) {
@@ -151,7 +173,7 @@ export default function naDisplay(serverName) {
             }
         }
 
-        naDisplayCountries();
+        naDisplayCountries(transform);
         gPorts.attr("transform", transform);
         gVoronoi.attr("transform", transform);
         gPBZones.attr("transform", transform);
@@ -165,13 +187,6 @@ export default function naDisplay(serverName) {
                 naVoronoiHighlight(naCurrentVoronoi, highlightId);
             }
         }
-    }
-
-    function naSetupCountries() {
-        naImage.onload = function() {
-            naDrawImage();
-        };
-        naImage.src = naImageSrc;
     }
 
     function naDisplayPorts() {
@@ -300,11 +315,6 @@ export default function naDisplay(serverName) {
     }
 
     function naSetupPBZones() {
-        gPBZones = naSvg
-            .append("g")
-            .attr("class", "pb")
-            .style("display", "none");
-
         gPBZones
             .append("path")
             .datum(naPBZoneData)
@@ -415,8 +425,7 @@ export default function naDisplay(serverName) {
         naTowerData = topojson.feature(pbZones, pbZones.objects.towers);
 
         naSetupCanvas();
-
-        naSetupCountries();
+        naSetupSvg();
         naSetupTeleportAreas();
         naDisplayPorts();
         naSetupPBZones();
