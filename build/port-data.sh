@@ -25,12 +25,6 @@ function update_yarn () {
     yarn --silent
 }
 
-function copy_geojson() {
-    for SERVER_NAME in ${SERVER_NAMES[@]}; do
-        cp --update "topojson/${SERVER_NAME}.json" public/
-    done
-}
-
 function change_port_data () {
     GIT_DIR="$1"
 
@@ -51,7 +45,6 @@ function deploy_data () {
 # Main functions
 
 function change_data () {
-    copy_geojson
     change_port_data
 }
 
