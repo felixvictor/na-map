@@ -90,6 +90,7 @@ export default function naDisplay(serverName) {
             gPorts = gPorts.attr("transform", t);
             gPBZones = gPBZones.attr("transform", t);
         }
+
         naZoom = d3
             .zoom()
             .scaleExtent([0.15, 10])
@@ -115,7 +116,7 @@ export default function naDisplay(serverName) {
             .append("g")
             .attr("class", "pb")
             .style("display", "none");
-        initialZoom();
+        //initialZoom();
     }
 
     function naSetupCanvas() {
@@ -151,6 +152,7 @@ export default function naDisplay(serverName) {
             if (!IsPBZoneDisplayed) {
                 naTogglePBZones();
                 naToggleDisplayTeleportAreas();
+                highlightId = null;
                 IsPBZoneDisplayed = true;
             }
         } else {
