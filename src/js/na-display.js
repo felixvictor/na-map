@@ -3,11 +3,6 @@
 
  iB 2017
  */
-/*
- Draws teleport map for Naval Action
-
- iB 2017
- */
 
 import { queue as d3Queue } from "d3-queue";
 import { geoPath as d3GeoPath } from "d3-geo";
