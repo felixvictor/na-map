@@ -47,7 +47,6 @@ export default function naDisplay(serverName) {
     const iconSize = 50;
     const defaultFontSize = parseInt(window.getComputedStyle(document.getElementById("na")).fontSize);
     let currentFontSize = defaultFontSize;
-    const lineHeight = parseInt(window.getComputedStyle(document.getElementById("na")).lineHeight);
     const defaultCircleSize = 10;
     let currentCircleSize = defaultCircleSize;
     let naCurrentVoronoi, highlightId;
@@ -62,7 +61,6 @@ export default function naDisplay(serverName) {
         naImageSrc = "images/na-map.jpg";
 
     function naDisplayCountries(transform) {
-        console.log(`transform: ${JSON.stringify(transform)}`);
         naContext.save();
         naContext.clearRect(0, 0, naWidth, naHeight);
         naContext.translate(transform.x, transform.y);
@@ -78,14 +76,6 @@ export default function naDisplay(serverName) {
     }
 
     function naSetupSvg() {
-        function initialZoom() {
-            const t = d3.zoomIdentity.translate(-maxCoord / 4, -maxCoord / 4).scale(0.6);
-            naDisplayCountries(t);
-            gVoronoi = gVoronoi.attr("transform", t);
-            gPorts = gPorts.attr("transform", t);
-            gPBZones = gPBZones.attr("transform", t);
-        }
-
         naZoom = d3
             .zoom()
             .scaleExtent([0.15, 10])
@@ -111,7 +101,6 @@ export default function naDisplay(serverName) {
             .append("g")
             .attr("class", "pb")
             .style("display", "none");
-        //initialZoom();
     }
 
     function naSetupCanvas() {
@@ -418,6 +407,14 @@ export default function naDisplay(serverName) {
     }
 
     function naReady(error, naMap, pbZones) {
+        function initialZoom() {
+            const t = d3.zoomIdentity.translate(-maxCoord / 4, -maxCoord / 4).scale(0.6);
+            naDisplayCountries(t);
+            gVoronoi = gVoronoi.attr("transform", t);
+            gPBZones = gPBZones.attr("transform", t);
+            gPorts = gPorts.attr("transform", t).call(naZoom.transform, t);
+        }
+
         if (error) {
             throw error;
         }
@@ -433,6 +430,8 @@ export default function naDisplay(serverName) {
         naSetupTeleportAreas();
         naDisplayPorts();
         naSetupPBZones();
+
+        //initialZoom();
     }
 
     d3
