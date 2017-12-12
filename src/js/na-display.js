@@ -177,6 +177,7 @@ export default function naDisplay(serverName) {
 
         currentCircleSize = defaultCircleSize / transform.k;
         gPorts.selectAll("circle").attr("r", currentCircleSize);
+        gPorts.selectAll("text").attr("dy", d => d.properties.dy/ transform.k);
         if (!HasLabelRemoved) {
             currentFontSize = defaultFontSize / transform.k;
             gPorts.selectAll("text").style("font-size", currentFontSize);
