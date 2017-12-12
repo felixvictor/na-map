@@ -393,11 +393,9 @@ export default function naDisplay(serverName) {
 
     function naVoronoiHighlight() {
         d3.select(`#v${highlightId}`).attr("class", "highlight-voronoi");
-        d3
-            .select(`#p${highlightId}`)
-            .select("circle")
-            .attr("r", currentCircleSize * 3);
-        let text = d3.select(`#p${highlightId}`).select("text");
+        const port =         d3.select(`#p${highlightId}`);
+            port.select("circle").attr("r", currentCircleSize * 3);
+        let text = port.select("text");
         let origDy = text.attr("orig-dy");
         text.attr("dy", origDy * 3).style("font-size", currentFontSize * 2);
     }
@@ -405,11 +403,10 @@ export default function naDisplay(serverName) {
     function naVoronoiUnHighlight() {
         if (highlightId) {
             d3.select(`#v${highlightId}`).attr("class", "");
-            d3
-                .select(`#p${highlightId}`)
-                .select("circle")
+            const port =         d3.select(`#p${highlightId}`);
+                port.select("circle")
                 .attr("r", currentCircleSize);
-            let text = d3.select(`#p${highlightId}`).select("text");
+            let text = port.select("text");
             let origDy = text.attr("orig-dy");
             text.attr("dy", origDy).style("font-size", currentFontSize);
         }
