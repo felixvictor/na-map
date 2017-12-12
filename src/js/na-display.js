@@ -177,7 +177,8 @@ export default function naDisplay(serverName) {
 
         currentCircleSize = defaultCircleSize / transform.k;
         gPorts.selectAll("circle").attr("r", currentCircleSize);
-        gPorts.selectAll("text").attr("dy", d => d.properties.dy/ transform.k);
+        gPorts.selectAll("text").attr("dx", d => d.properties.dx / transform.k);
+        gPorts.selectAll("text").attr("dy", d => d.properties.dy / transform.k);
         if (!HasLabelRemoved) {
             currentFontSize = defaultFontSize / transform.k;
             gPorts.selectAll("text").style("font-size", currentFontSize);
@@ -290,6 +291,7 @@ export default function naDisplay(serverName) {
             .append("text")
             .attr("dx", d => d.properties.dx)
             .attr("dy", d => d.properties.dy)
+            .attr("orig-dx", d => d.properties.dx)
             .attr("orig-dy", d => d.properties.dy)
             .attr("text-anchor", d => {
                 if (d.properties.dx < 0) {
@@ -389,22 +391,29 @@ export default function naDisplay(serverName) {
 
     function naVoronoiHighlight() {
         d3.select(`#v${highlightId}`).attr("class", "highlight-voronoi");
-        const port =         d3.select(`#p${highlightId}`);
-            port.select("circle").attr("r", currentCircleSize * 3);
-        let text = port.select("text");
-        let origDy = text.attr("orig-dy");
-        text.attr("dy", origDy * 3).style("font-size", currentFontSize * 2);
+        const port = d3.select(`#p${highlightId}`);
+        port.select("circle").attr("r", currentCircleSize * 3);
+        let portText = port.select("text");
+        let dx = portText.attr("orig-dx");
+        let dy = portText.attr("orig-dy");
+        portText
+            .attr("dx", dx * 3)
+            .attr("dy", dy * 3)
+            .style("font-size", currentFontSize * 2);
     }
 
     function naVoronoiUnHighlight() {
         if (highlightId) {
             d3.select(`#v${highlightId}`).attr("class", "");
-            const port =         d3.select(`#p${highlightId}`);
-                port.select("circle")
-                .attr("r", currentCircleSize);
-            let text = port.select("text");
-            let origDy = text.attr("orig-dy");
-            text.attr("dy", origDy).style("font-size", currentFontSize);
+            const port = d3.select(`#p${highlightId}`);
+            port.select("circle").attr("r", currentCircleSize);
+            let portText = port.select("text");
+            let dx = portText.attr("orig-dx");
+            let dy = portText.attr("orig-dy");
+            portText
+                .attr("dx", dx)
+                .attr("dy", dy)
+                .style("font-size", currentFontSize);
         }
     }
 
