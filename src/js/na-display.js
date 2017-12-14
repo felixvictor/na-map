@@ -49,7 +49,7 @@ export default function naDisplay(serverName) {
     let currentFontSize = defaultFontSize;
     const defaultCircleSize = 10;
     let currentCircleSize = defaultCircleSize;
-    let naCurrentVoronoi, highlightId;
+    let highlightId;
     const maxCoord = 8192 + 1;
     const minCoord = 0 - 1;
     const voronoiCoord = [[minCoord, minCoord], [maxCoord, maxCoord]];
@@ -172,7 +172,7 @@ export default function naDisplay(serverName) {
             currentFontSize = defaultFontSize / transform.k;
             gPorts.selectAll("text").style("font-size", currentFontSize);
             if (highlightId && !IsPBZoneDisplayed) {
-                naVoronoiHighlight(naCurrentVoronoi, highlightId);
+                naVoronoiHighlight();
             }
         }
     }
@@ -258,7 +258,7 @@ export default function naDisplay(serverName) {
             .attr("fill", d => `url(#${d.properties.nation})`)
             .on("mouseover", function(d) {
                 if (highlightId) {
-                    naVoronoiHighlight(naCurrentVoronoi, highlightId);
+                    naVoronoiHighlight();
                 }
                 d3
                     .select(this)
@@ -362,7 +362,6 @@ export default function naDisplay(serverName) {
                 // the mouse, limited by max distance defined by voronoiRadius
                 const site = naVoronoiDiagram.find(mx, my, voronoiRadius);
                 if (site) {
-                    naCurrentVoronoi = pathVoronoi._groups[0][site.index];
                     highlightId = site.data.id;
                     naVoronoiHighlight();
                 }
