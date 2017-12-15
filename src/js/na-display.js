@@ -4,37 +4,12 @@
  iB 2017
  */
 
-import { queue as d3Queue } from "d3-queue";
-import { geoPath as d3GeoPath } from "d3-geo";
-import { json as d3Json, request as d3Request } from "d3-request";
-// event needs live-binding
-import { event as currentD3Event, mouse as currentD3mouse, select as d3Select } from "d3-selection";
-import { interrupt as d3Interrupt, transition as d3Transition } from "d3-transition";
-import { voronoi as d3Voronoi } from "d3-voronoi";
-import { zoom as d3Zoom, zoomIdentity as d3ZoomIdentity } from "d3-zoom";
-
 import { feature as topojsonFeature } from "topojson-client";
 
 import "bootstrap/js/dist/tooltip";
 import "bootstrap/js/dist/util";
 
 export default function naDisplay(serverName) {
-    const d3 = {
-            json: d3Json,
-            geoPath: d3GeoPath,
-            interrupt: d3Interrupt,
-            queue: d3Queue,
-            request: d3Request,
-            select: d3Select,
-            transition: d3Transition,
-            voronoi: d3Voronoi,
-            zoom: d3Zoom,
-            zoomIdentity: d3ZoomIdentity
-        },
-        topojson = {
-            feature: topojsonFeature
-        };
-
     let naSvg, naCanvas, naContext, naDefs, naZoom;
     let gPorts, gPBZones, gVoronoi, naVoronoiDiagram, pathVoronoi, naTeleportPorts, naPort, naPortLabel;
     let naPortData, naPBZoneData, naFortData, naTowerData;
@@ -70,8 +45,8 @@ export default function naDisplay(serverName) {
     }
 
     function naStopProp() {
-        if (currentD3Event.defaultPrevented) {
-            currentD3Event.stopPropagation();
+        if (d3.event.defaultPrevented) {
+            d3.event.stopPropagation();
         }
     }
 
@@ -130,7 +105,7 @@ export default function naDisplay(serverName) {
         const PBZoneZoomExtent = 1.5;
         const labelZoomExtent = 0.5;
 
-        let transform = currentD3Event.transform;
+        let transform = d3.event.transform;
 
         if (PBZoneZoomExtent < transform.k) {
             if (!IsPBZoneDisplayed) {
@@ -354,7 +329,7 @@ export default function naDisplay(serverName) {
             .data(naVoronoiDiagram.polygons())
             .attr("d", d => (d ? `M${d.join("L")}Z` : null))
             .on("mouseover", function(d) {
-                let ref = currentD3mouse(this);
+                let ref = d3.mouse(this);
                 const mx = ref[0],
                     my = ref[1];
 
@@ -406,31 +381,21 @@ export default function naDisplay(serverName) {
     }
 
     function naReady(error, naMap, pbZones) {
-        function initialZoom() {
-            const t = d3.zoomIdentity.translate(-maxCoord / 4, -maxCoord / 4).scale(0.6);
-            naDisplayCountries(t);
-            gVoronoi = gVoronoi.attr("transform", t);
-            gPBZones = gPBZones.attr("transform", t);
-            gPorts = gPorts.attr("transform", t).call(naZoom.transform, t);
-        }
-
         if (error) {
             throw error;
         }
 
         // Read map data
-        naPortData = topojson.feature(naMap, naMap.objects.ports);
-        naPBZoneData = topojson.feature(pbZones, pbZones.objects.pbzones);
-        naFortData = topojson.feature(pbZones, pbZones.objects.forts);
-        naTowerData = topojson.feature(pbZones, pbZones.objects.towers);
+        naPortData = topojsonFeature(naMap, naMap.objects.ports);
+        naPBZoneData = topojsonFeature(pbZones, pbZones.objects.pbzones);
+        naFortData = topojsonFeature(pbZones, pbZones.objects.forts);
+        naTowerData = topojsonFeature(pbZones, pbZones.objects.towers);
 
         naSetupCanvas();
         naSetupSvg();
         naSetupTeleportAreas();
         naDisplayPorts();
         naSetupPBZones();
-
-        //initialZoom();
     }
 
     d3
