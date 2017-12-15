@@ -20,14 +20,16 @@ export default function naDisplay(serverName) {
     let IsPBZoneDisplayed = false,
         HasLabelRemoved = false;
     const iconSize = 50;
-    const defaultFontSize = parseInt(window.getComputedStyle(document.getElementById("na")).fontSize);
-    let currentFontSize = defaultFontSize;
-    const defaultCircleSize = 10;
-    let currentCircleSize = defaultCircleSize;
     let highlightId;
-    const maxCoord = 8192 + 1;
-    const minCoord = 0 - 1;
-    const voronoiCoord = [[minCoord, minCoord], [maxCoord, maxCoord]];
+    const maxCoord = 8192;
+    const minCoord = 0;
+    const voronoiCoord = [[minCoord - 1, minCoord - 1], [maxCoord + 1, maxCoord + 1]];
+    const initialScale = 0.3,
+        initialTransform = d3.zoomIdentity.translate(-maxCoord / 4, -maxCoord / 4).scale(initialScale);
+    const defaultFontSize = 16;
+    let currentFontSize = defaultFontSize;
+    const defaultCircleSize = 3 ;
+    let currentCircleSize = defaultCircleSize;
     // limit how far away the mouse can be from finding a voronoi site
     const voronoiRadius = Math.min(naHeight, naWidth);
     let naImage = new Image();
@@ -76,6 +78,8 @@ export default function naDisplay(serverName) {
             .append("g")
             .attr("class", "pb")
             .style("display", "none");
+
+        naSvg.call(naZoom.transform, initialTransform);
     }
 
     function naSetupCanvas() {
@@ -91,7 +95,7 @@ export default function naDisplay(serverName) {
         naContext = naCanvas.node().getContext("2d");
 
         naImage.onload = function() {
-            naDrawImage();
+            naDisplayCountries(initialTransform);
         };
         naImage.src = naImageSrc;
     }
@@ -106,7 +110,6 @@ export default function naDisplay(serverName) {
         const labelZoomExtent = 0.5;
 
         let transform = d3.event.transform;
-
         if (PBZoneZoomExtent < transform.k) {
             if (!IsPBZoneDisplayed) {
                 naTogglePBZones();
@@ -203,7 +206,7 @@ export default function naDisplay(serverName) {
             return h;
         }
 
-        const nations = ["DE", "DK", "ES", "FR", "FT", "GB", "NL", "NT", "PL", "PR", "RU", "SE", "US"];
+        const nations = ["DE", "DK", "ES", "FR", "FT", "GB", "NT", "PL", "PR", "RU", "SE", "US", "VP"];
 
         nations.forEach(function(nation) {
             naDefs
@@ -229,7 +232,7 @@ export default function naDisplay(serverName) {
         // Port flags
         naPort
             .append("circle")
-            .attr("r", defaultCircleSize)
+            .attr("r", currentCircleSize)
             .attr("fill", d => `url(#${d.properties.nation})`)
             .on("mouseover", function(d) {
                 if (highlightId) {
@@ -265,6 +268,7 @@ export default function naDisplay(serverName) {
                 }
             })
             .text(d => d.properties.name)
+            .style("font-size", currentFontSize)
             .attr("class", d => {
                 let f = "na-port-out";
                 if (!d.properties.shallow && !d.properties.countyCapital) {
