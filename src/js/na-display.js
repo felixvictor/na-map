@@ -25,10 +25,10 @@ export default function naDisplay(serverName) {
     const minCoord = 0;
     const voronoiCoord = [[minCoord - 1, minCoord - 1], [maxCoord + 1, maxCoord + 1]];
     const initialScale = 0.3,
-        initialTransform = d3.zoomIdentity.translate(-maxCoord / 4, -maxCoord / 4).scale(initialScale);
+        initialTransform = d3.zoomIdentity.translate(-100, -500).scale(initialScale);
     const defaultFontSize = 16;
     let currentFontSize = defaultFontSize;
-    const defaultCircleSize = 3 ;
+    const defaultCircleSize = 10;
     let currentCircleSize = defaultCircleSize;
     // limit how far away the mouse can be from finding a voronoi site
     const voronoiRadius = Math.min(naHeight, naWidth);
@@ -78,8 +78,6 @@ export default function naDisplay(serverName) {
             .append("g")
             .attr("class", "pb")
             .style("display", "none");
-
-        naSvg.call(naZoom.transform, initialTransform);
     }
 
     function naSetupCanvas() {
@@ -127,6 +125,7 @@ export default function naDisplay(serverName) {
 
         if (labelZoomExtent > transform.k) {
             if (!HasLabelRemoved) {
+                console.log("label remove");
                 naRemoveLabel();
                 HasLabelRemoved = true;
             }
@@ -268,7 +267,6 @@ export default function naDisplay(serverName) {
                 }
             })
             .text(d => d.properties.name)
-            .style("font-size", currentFontSize)
             .attr("class", d => {
                 let f = "na-port-out";
                 if (!d.properties.shallow && !d.properties.countyCapital) {
@@ -361,12 +359,14 @@ export default function naDisplay(serverName) {
         const port = d3.select(`#p${highlightId}`);
         port.select("circle").attr("r", currentCircleSize * 3);
         let portText = port.select("text");
-        let dx = portText.attr("orig-dx");
-        let dy = portText.attr("orig-dy");
-        portText
-            .attr("dx", dx * 3)
-            .attr("dy", dy * 3)
-            .style("font-size", currentFontSize * 2);
+        if (!portText.empty()) {
+            let dx = portText.attr("orig-dx");
+            let dy = portText.attr("orig-dy");
+            portText
+                .attr("dx", dx * 3)
+                .attr("dy", dy * 3)
+                .style("font-size", currentFontSize * 2);
+        }
     }
 
     function naVoronoiUnHighlight() {
@@ -375,12 +375,14 @@ export default function naDisplay(serverName) {
             const port = d3.select(`#p${highlightId}`);
             port.select("circle").attr("r", currentCircleSize);
             let portText = port.select("text");
-            let dx = portText.attr("orig-dx");
-            let dy = portText.attr("orig-dy");
-            portText
-                .attr("dx", dx)
-                .attr("dy", dy)
-                .style("font-size", currentFontSize);
+            if (!portText.empty()) {
+                let dx = portText.attr("orig-dx");
+                let dy = portText.attr("orig-dy");
+                portText
+                    .attr("dx", dx)
+                    .attr("dy", dy)
+                    .style("font-size", currentFontSize);
+            }
         }
     }
 
@@ -400,6 +402,11 @@ export default function naDisplay(serverName) {
         naSetupTeleportAreas();
         naDisplayPorts();
         naSetupPBZones();
+        naSvg
+            .transition()
+            .delay(500)
+            .duration(500)
+            .call(naZoom.transform, initialTransform);
     }
 
     d3
