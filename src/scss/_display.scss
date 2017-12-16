@@ -10,6 +10,15 @@ $in-colour: $primary-900;
 $out-colour: $primary-700;
 $background-colour: $primary-300;
 
+#form {
+  position: absolute;
+  top: 40px;
+  left: 40px;
+  z-index: 1000;
+  padding: 2em;
+  background-color: $primary-200;
+  opacity: 0;
+}
 .na-port-in {
   fill: $in-colour;
 }

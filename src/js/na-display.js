@@ -112,36 +112,66 @@ export default function naDisplay(serverName) {
         let coord = d3.mouse(this);
         const mx = coord[0],
             my = coord[1],
-            tx = d3.zoomTransform(this).x,
-            ty = d3.zoomTransform(this).y,
-            tk = d3.zoomTransform(this).k;
+            transform = d3.zoomTransform(this),
+            tk = transform.k;
+        let tx = transform.x,
+            ty = transform.y;
         //console.log(`mouse coord: ${mx}/${my}`);
+
         let x = (-tx + mx) / tk,
             y = (-ty + my) / tk;
         //console.log(`coord: ${x}/${y}`);
-        let F11X = convertInvCoordX(x, y);
-        let F11Y = convertInvCoordY(x, y);
+
+        let F11X = convertInvCoordX(x, y),
+            F11Y = convertInvCoordY(x, y);
         //console.log(`F11 coord: ${F11X}/${F11Y}`);
 
-        let g = gCoord
-            .append("g")
-            .attr("class", "coord")
-            .attr("transform", `translate(${x},${y})`);
-        g.append("circle").attr("r", 20);
-        // g.append("text").text(`${Math.trunc(F11X)}, ${Math.trunc(F11Y)}`);
-        g
-            .append("text")
-            .attr("dy", "-1em")
-            .text(Math.trunc(F11X))
-            .append("text")
-            .attr("dy", "1em")
-            .text(Math.trunc(F11Y));
+        naAddCoordCircle(x, y, F11X, F11Y);
+
+        tx = -x + mx;
+        ty = -y + my;
+        //console.log(`transform coord: ${tx}/${ty}`);
 
         naSvg
             .transition()
             .delay(500)
             .duration(500)
-            .call(naZoom.transform, d3.zoomIdentity.translate(-x + mx, -y + my).scale(1));
+            .call(naZoom.transform, d3.zoomIdentity.translate(tx, ty).scale(1));
+    }
+
+    function naMoveToPos(F11X, F11Y) {
+        //console.log(`F11 coord: ${F11X}/${F11Y}`);
+        let x = convertCoordX(F11X, F11Y),
+            y = convertCoordY(F11X, F11Y);
+        //console.log(`coord: ${x}/${y}`);
+
+        naAddCoordCircle(x, y, F11X, F11Y);
+
+        const tx = -x + naWidth / 2,
+            ty = -y + naHeight / 2;
+        //console.log(`transform coord: ${tx}/${ty}`);
+
+        naSvg
+            .transition()
+            .delay(500)
+            .duration(500)
+            .call(naZoom.transform, d3.zoomIdentity.translate(tx, ty).scale(1));
+    }
+
+    function naAddCoordCircle(x, y, textX, textY) {
+        let g = gCoord
+            .append("g")
+            .attr("class", "coord")
+            .attr("transform", `translate(${x},${y})`);
+        g.append("circle").attr("r", 20);
+        g
+            .append("text")
+            .attr("dy", "-1em")
+            .text(Math.trunc(textX));
+        g
+            .append("text")
+            .attr("dy", "1em")
+            .text(Math.trunc(textY));
     }
 
     function naSetupCanvas() {
@@ -462,11 +492,20 @@ export default function naDisplay(serverName) {
         naSetupTeleportAreas();
         naDisplayPorts();
         naSetupPBZones();
+
         naSvg
             .transition()
             .delay(500)
             .duration(500)
             .call(naZoom.transform, initialTransform);
+
+        d3.select("#form").style("opacity", 0.8);
+        $("form").submit(function(event) {
+            const x = $("#x-coord").val(),
+                z = $("#z-coord").val();
+            naMoveToPos(x, z);
+            event.preventDefault();
+        });
     }
 
     d3
