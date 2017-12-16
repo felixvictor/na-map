@@ -11,7 +11,7 @@ import "bootstrap/js/dist/util";
 
 export default function naDisplay(serverName) {
     let naSvg, naCanvas, naContext, naDefs, naZoom;
-    let gPorts, gPBZones, gVoronoi, naVoronoiDiagram, pathVoronoi, naTeleportPorts, naPort, naPortLabel;
+    let gPorts, gPBZones, gVoronoi, gCoord, naVoronoiDiagram, pathVoronoi, naTeleportPorts, naPort, naPortLabel;
     let naPortData, naPBZoneData, naFortData, naTowerData;
     const naMargin = { top: 20, right: 20, bottom: 20, left: 20 };
 
@@ -25,6 +25,15 @@ export default function naDisplay(serverName) {
     const maxCoord = 8192;
     const minCoord = 0;
     const voronoiCoord = [[minCoord - 1, minCoord - 1], [maxCoord + 1, maxCoord + 1]];
+    const TransA = 0.00494444554690109,
+        TransB = 0.0000053334600512813,
+        TransC = 4082.20289162021,
+        TransD = 4111.1164516551;
+    const TransInvA = 202.246910593215,
+        TransInvB = 0.2181591055887,
+        TransInvC = -826509.800732941,
+        TransInvD = 830570.031704516;
+
     const initialScale = 0.3,
         initialTransform = d3.zoomIdentity.translate(-100, -500).scale(initialScale);
     const defaultFontSize = 16;
@@ -69,7 +78,9 @@ export default function naDisplay(serverName) {
             .style("top", `${naMargin.top}px`)
             .style("left", `${naMargin.left}px`)
             .call(naZoom)
-            .on("click", naStopProp, true);
+            .on("dblclick.zoom", null)
+            .on("click", naStopProp, true)
+            .on("dblclick", naPrintPos);
 
         naDefs = naSvg.append("defs");
 
@@ -79,6 +90,58 @@ export default function naDisplay(serverName) {
             .append("g")
             .attr("class", "pb")
             .style("display", "none");
+        gCoord = naSvg.append("g");
+    }
+
+    function convertCoordX(x, y) {
+        return TransA * x + TransB * y + TransC;
+    }
+    function convertCoordY(x, y) {
+        return TransB * x - TransA * y + TransD;
+    }
+    // svg coord to F11 coord
+    function convertInvCoordX(x, y) {
+        return TransInvA * x + TransInvB * y + TransInvC;
+    }
+    // svg coord to F11 coord
+    function convertInvCoordY(x, y) {
+        return TransInvB * x - TransInvA * y + TransInvD;
+    }
+
+    function naPrintPos() {
+        let coord = d3.mouse(this);
+        const mx = coord[0],
+            my = coord[1],
+            tx = d3.zoomTransform(this).x,
+            ty = d3.zoomTransform(this).y,
+            tk = d3.zoomTransform(this).k;
+        //console.log(`mouse coord: ${mx}/${my}`);
+        let x = (-tx + mx) / tk,
+            y = (-ty + my) / tk;
+        //console.log(`coord: ${x}/${y}`);
+        let F11X = convertInvCoordX(x, y);
+        let F11Y = convertInvCoordY(x, y);
+        //console.log(`F11 coord: ${F11X}/${F11Y}`);
+
+        let g = gCoord
+            .append("g")
+            .attr("class", "coord")
+            .attr("transform", `translate(${x},${y})`);
+        g.append("circle").attr("r", 20);
+        // g.append("text").text(`${Math.trunc(F11X)}, ${Math.trunc(F11Y)}`);
+        g
+            .append("text")
+            .attr("dy", "-1em")
+            .text(Math.trunc(F11X))
+            .append("text")
+            .attr("dy", "1em")
+            .text(Math.trunc(F11Y));
+
+        naSvg
+            .transition()
+            .delay(500)
+            .duration(500)
+            .call(naZoom.transform, d3.zoomIdentity.translate(-x + mx, -y + my).scale(1));
     }
 
     function naSetupCanvas() {
@@ -140,6 +203,7 @@ export default function naDisplay(serverName) {
         gPorts.attr("transform", transform);
         gVoronoi.attr("transform", transform);
         gPBZones.attr("transform", transform);
+        gCoord.attr("transform", transform);
 
         currentCircleSize = defaultCircleSize / transform.k;
         gPorts.selectAll("circle").attr("r", currentCircleSize);
