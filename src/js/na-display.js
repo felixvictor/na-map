@@ -21,6 +21,7 @@ export default function naDisplay(serverName) {
         HasLabelRemoved = false;
     const iconSize = 50;
     let highlightId;
+    const highlightDuration = 500;
     const maxCoord = 8192;
     const minCoord = 0;
     const voronoiCoord = [[minCoord - 1, minCoord - 1], [maxCoord + 1, maxCoord + 1]];
@@ -125,7 +126,6 @@ export default function naDisplay(serverName) {
 
         if (labelZoomExtent > transform.k) {
             if (!HasLabelRemoved) {
-                console.log("label remove");
                 naRemoveLabel();
                 HasLabelRemoved = true;
             }
@@ -225,12 +225,12 @@ export default function naDisplay(serverName) {
             .data(naPortData.features)
             .enter()
             .append("g")
-            .attr("id", d => `p${d.id}`)
             .attr("transform", d => `translate(${d.geometry.coordinates[0]},${d.geometry.coordinates[1]})`);
 
         // Port flags
         naPort
             .append("circle")
+            .attr("id", d => `c${d.id}`)
             .attr("r", currentCircleSize)
             .attr("fill", d => `url(#${d.properties.nation})`)
             .on("mouseover", function(d) {
@@ -241,9 +241,9 @@ export default function naDisplay(serverName) {
                     .select(this)
                     .attr("data-toggle", "tooltip")
                     .attr("title", d => naTooltipData(d.properties));
-                $(`#p${d.id} circle`)
+                $(`#c${d.id}`)
                     .tooltip({
-                        delay: { show: 100, hide: 100 },
+                        delay: { show: highlightDuration, hide: highlightDuration },
                         html: true,
                         placement: "auto"
                     })
@@ -253,7 +253,7 @@ export default function naDisplay(serverName) {
     }
 
     function naDisplayLabel() {
-        naPortLabel = naPort
+        naPort
             .append("text")
             .attr("dx", d => d.properties.dx)
             .attr("dy", d => d.properties.dy)
@@ -330,7 +330,7 @@ export default function naDisplay(serverName) {
         pathVoronoi
             .data(naVoronoiDiagram.polygons())
             .attr("d", d => (d ? `M${d.join("L")}Z` : null))
-            .on("mouseover", function(d) {
+            .on("mouseover", function() {
                 let ref = d3.mouse(this);
                 const mx = ref[0],
                     my = ref[1];
@@ -344,7 +344,7 @@ export default function naDisplay(serverName) {
                 }
             })
             .on("mouseout", function() {
-                naVoronoiUnHighlight();
+                naVoronoiHighlight();
             });
         naToggleDisplayTeleportAreas();
     }
@@ -355,34 +355,30 @@ export default function naDisplay(serverName) {
     }
 
     function naVoronoiHighlight() {
-        d3.select(`#v${highlightId}`).attr("class", "highlight-voronoi");
-        const port = d3.select(`#p${highlightId}`);
-        port.select("circle").attr("r", currentCircleSize * 3);
-        let portText = port.select("text");
-        if (!portText.empty()) {
-            let dx = portText.attr("orig-dx");
-            let dy = portText.attr("orig-dy");
-            portText
-                .attr("dx", dx * 3)
-                .attr("dy", dy * 3)
-                .style("font-size", currentFontSize * 2);
-        }
-    }
-
-    function naVoronoiUnHighlight() {
-        if (highlightId) {
-            d3.select(`#v${highlightId}`).attr("class", "");
-            const port = d3.select(`#p${highlightId}`);
-            port.select("circle").attr("r", currentCircleSize);
-            let portText = port.select("text");
-            if (!portText.empty()) {
-                let dx = portText.attr("orig-dx");
-                let dy = portText.attr("orig-dy");
-                portText
-                    .attr("dx", dx)
-                    .attr("dy", dy)
-                    .style("font-size", currentFontSize);
-            }
+        gVoronoi.selectAll("path").attr("class", function() {
+            return d3.select(this).attr("id") === `v${highlightId}` ? "highlight-voronoi" : "";
+        });
+        gPorts
+            .selectAll("circle")
+            .transition()
+            .duration(highlightDuration)
+            .attr("r", d => {
+                return d.id === highlightId ? currentCircleSize * 3 : currentCircleSize;
+            });
+        if (!HasLabelRemoved) {
+            gPorts
+                .selectAll("text")
+                .transition()
+                .duration(highlightDuration)
+                .attr("dx", d => {
+                    return d.id === highlightId ? d.properties.dx * 3 : d.properties.dx;
+                })
+                .attr("dy", d => {
+                    return d.id === highlightId ? d.properties.dy * 3 : d.properties.dy;
+                })
+                .style("font-size", d => {
+                    return d.id === highlightId ? currentFontSize * 2 : currentFontSize;
+                });
         }
     }
 
