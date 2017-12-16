@@ -68,6 +68,18 @@ text {
   fill-opacity: .5;
 }
 
+.coord {
+  circle {
+    fill: $blue;
+    fill-opacity: .5;
+  }
+  text {
+    text-anchor: middle;
+    alignment-baseline: middle;
+    font-size: 20px;
+  }
+}
+
 .tooltip {
   font-size: smaller;
   color: $in-colour;
