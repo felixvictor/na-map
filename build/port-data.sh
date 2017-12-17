@@ -54,7 +54,7 @@ function push_data () {
         git commit -m "push"
         touch "${LAST_UPDATE_FILE}"
     fi
-    git push gitlab -all
+    git push gitlab --all
 }
 
 function update_data () {
