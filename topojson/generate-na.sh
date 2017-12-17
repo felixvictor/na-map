@@ -20,8 +20,8 @@ $(yarn bin local)/geo2topo --verbose \
 	   forts.json
 
 for SERVER_NAME in "eu1" "eu2" "us2"; do
-    cp --update "${OUT_PORTS}" "${SERVER_NAME}.json"
+    cp "${OUT_PORTS}" ../src/"${SERVER_NAME}.json"
 done
-cp --update "${OUT_PB_ZONES}" ../public
+mv "${OUT_PB_ZONES}" ../src
 
-rm -f "${OUT_PORTS}" "${OUT_PB_ZONES}"
+rm -f "${OUT_PORTS}"

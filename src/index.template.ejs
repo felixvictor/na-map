@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="<%= htmlWebpackPlugin.options.lang %>">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title><%= htmlWebpackPlugin.options.title %></title>
+    <meta name="description" content="<%= htmlWebpackPlugin.options.title %>">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script async src="<%= htmlWebpackPlugin.options.gtag %>"></script>
+</head>
+<body>
+
+<section id="modal" class="modal" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <header class="modal-header">
+                <h3><%= htmlWebpackPlugin.options.title %></h3>
+            </header>
+
+            <div class="modal-body">
+                <ul>
+                    <li>Teleport areas: indicates the area where you can teleport to this port (deep-water port and not
+                        a county capital)
+                    </li>
+                    <li>Port data</li>
+                    <li>Port battle zones (shown when zoomed in)</li>
+                    <li>Double click on map to display F11 coordinates</li>
+                    <li>Enter F11 coordinates to show position on map</li>
+                </ul>
+                <p>Designed by iB aka Felix Victor.</p>
+            </div>
+            <footer class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" data-server="eu1">PvP EU</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" data-server="eu2">PvE</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" data-server="us2">PvP Global</button>
+            </footer>
+        </div>
+    </div>
+</section>
+
+<div id="na" class="na">
+</div>
+
+<div id="form">
+    <form>
+        <div class="form-row">
+            <div class="col-auto align-self-center">
+                F11 coordinates
+            </div>
+            <div class="col-auto">
+                <input type="number" step="0.1" min="-816000" max="830000" class="form-control" id="x-coord" placeholder="X" required>
+            </div>
+            <div class="col-auto">
+                <input type="number" step="0.1" min="-430000" max="830000" class="form-control" id="z-coord" placeholder="Z" required>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">Move To</button>
+            </div>
+                <div class="col-auto">
+                <button id="reset" type="reset" class="btn btn-secondary">Reset</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script src="https://d3js.org/d3.v4.js"></script>
+</body>
+</html>

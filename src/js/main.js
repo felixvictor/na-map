@@ -1,7 +1,7 @@
 /*
-    Main
+ Main
 
-    iB 2017
+ iB 2017
  */
 
 import naDisplay from "./na-display";
