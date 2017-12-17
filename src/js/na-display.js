@@ -164,8 +164,8 @@ export default function naDisplay(serverName) {
 
     const formatCoord = x => {
         let r = numberWithBlanks(Math.abs(Math.trunc(x)));
-        if (x<0) {
-            r = "\u2212\u2009" + r;
+        if (x < 0) {
+            r = `\u2212\u2009${r}`;
         }
         return r;
     };
@@ -490,6 +490,20 @@ export default function naDisplay(serverName) {
         }
     }
 
+    function naInitialTransform() {
+        naSvg
+            .transition()
+            .delay(500)
+            .duration(500)
+            .call(naZoom.transform, initialTransform);
+    }
+
+    function naResetMap() {
+        gCoord.remove();
+        gCoord = naSvg.append("g");
+        naInitialTransform();
+    }
+
     function naReady(error, naMap, pbZones) {
         if (error) {
             throw error;
@@ -507,11 +521,7 @@ export default function naDisplay(serverName) {
         naDisplayPorts();
         naSetupPBZones();
 
-        naSvg
-            .transition()
-            .delay(500)
-            .duration(500)
-            .call(naZoom.transform, initialTransform);
+        naInitialTransform();
 
         d3.select("#form").style("display", "inherit");
         $("form").submit(function(event) {
@@ -519,6 +529,9 @@ export default function naDisplay(serverName) {
                 z = $("#z-coord").val();
             naMoveToPos(x, z);
             event.preventDefault();
+        });
+        $("#reset").on("click", function() {
+            naResetMap();
         });
     }
 
