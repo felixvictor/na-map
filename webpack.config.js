@@ -174,7 +174,8 @@ let config = {
             lang: "en-GB",
             minify: minifyOpt,
             template: "index.template.ejs",
-            title: "Naval Action map"
+            title: "Naval Action map",
+            version: PACKAGE.version
         })
     ],
 
