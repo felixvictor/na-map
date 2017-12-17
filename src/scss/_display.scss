@@ -10,15 +10,18 @@ $in-colour: $primary-900;
 $out-colour: $primary-700;
 $background-colour: $primary-300;
 
-.na-country {
-  fill: $primary;
-  stroke-width: 1;
-  stroke: $primary-700;
-}
-
-.background {
-  fill: $background-colour;
-  pointer-events: all;
+#form {
+  position: absolute;
+  top: 40px;
+  left: 40px;
+  z-index: 1000;
+  display: none;
+  padding: 2em;
+  background-color: $primary-200;
+  opacity: .8;
+  input {
+    color: inherit;
+  }
 }
 
 .na-port-in {
@@ -27,11 +30,25 @@ $background-colour: $primary-300;
 
 .na-port-out {
   fill: $out-colour;
-  font-style: italic;
 }
 
 .port-name {
   font-size: large;
+}
+
+.pb-zone {
+  fill: none;
+  stroke: $primary-700;
+}
+
+.fort {
+  fill: $red;
+  opacity: .7;
+}
+
+.tower {
+  fill: $secondary-900;
+  opacity: .7;
 }
 
 table td {
@@ -45,7 +62,6 @@ p {
 
 text {
   pointer-events: none;
-  text-anchor: start;
 }
 
 .label-rect {
@@ -53,14 +69,31 @@ text {
 }
 
 .voronoi {
-  fill: none;
+  fill: transparent;
   stroke: $primary-700;
   stroke-width: .5px;
+  path {
+    pointer-events: visibleFill;
+  }
 }
 
 .highlight-voronoi {
   fill: $primary-400;
-  stroke-width: 5px;
+  fill-opacity: .5;
+}
+
+.coord {
+  line-height: 1;
+  circle {
+    fill: $secondary-700;
+    fill-opacity: .5;
+  }
+  text {
+    font-size: 1em;
+    fill: $secondary-800;
+    text-anchor: end;
+    alignment-baseline: central;
+  }
 }
 
 .tooltip {
@@ -87,13 +120,17 @@ text {
   }
 }
 
+.dummy-jpg {
+  background-image: url("~Images/na-map.jpg");
+}
+
 $flags-dir: "~Icons";
 $flags: "NT", // Neutral
 "PR", // Pirates
 "ES", // Spain
 "FR", // France
 "GB", // Great Britain
-"NL", // Netherlands
+"VP", // Netherlands
 "DK", // Danmark
 "SE", // Sweden
 "US", // USA
