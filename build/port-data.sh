@@ -63,13 +63,13 @@ function update_data () {
     # If file not exists create it with date of last commit
     [[ ! -f "${LAST_UPDATE_FILE}" ]] && touch -d "$(git log -1 --format=%cI)" "${LAST_UPDATE_FILE}"
     LAST_UPDATE=$(date --reference="${LAST_UPDATE_FILE}" +%Y-%m-%d)
-#    if [ "${LAST_UPDATE}" != "${DATE}" ]; then
+    if [ "${LAST_UPDATE}" != "${DATE}" ]; then
         update_yarn
         get_git_update
         change_port_data
         push_data
         deploy_data
-#    fi
+    fi
 }
 
 case "$1" in
