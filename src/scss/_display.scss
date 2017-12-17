@@ -15,10 +15,15 @@ $background-colour: $primary-300;
   top: 40px;
   left: 40px;
   z-index: 1000;
+  display: none;
   padding: 2em;
   background-color: $primary-200;
-  opacity: 0;
+  opacity: .8;
+  input {
+    color: inherit;
+  }
 }
+
 .na-port-in {
   fill: $in-colour;
 }
@@ -78,14 +83,16 @@ text {
 }
 
 .coord {
+  line-height: 1;
   circle {
-    fill: $blue;
+    fill: $secondary-700;
     fill-opacity: .5;
   }
   text {
-    text-anchor: middle;
-    alignment-baseline: middle;
-    font-size: 20px;
+    font-size: 1em;
+    fill: $secondary-800;
+    text-anchor: end;
+    alignment-baseline: central;
   }
 }
 

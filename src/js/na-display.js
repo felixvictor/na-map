@@ -158,6 +158,18 @@ export default function naDisplay(serverName) {
             .call(naZoom.transform, d3.zoomIdentity.translate(tx, ty).scale(1));
     }
 
+    const numberWithBlanks = x => {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u2009");
+    };
+
+    const formatCoord = x => {
+        let r = numberWithBlanks(Math.abs(Math.trunc(x)));
+        if (x<0) {
+            r = "\u2212\u2009" + r;
+        }
+        return r;
+    };
+
     function naAddCoordCircle(x, y, textX, textY) {
         let g = gCoord
             .append("g")
@@ -166,12 +178,14 @@ export default function naDisplay(serverName) {
         g.append("circle").attr("r", 20);
         g
             .append("text")
-            .attr("dy", "-1em")
-            .text(Math.trunc(textX));
+            .attr("dx", "-1.5em")
+            .attr("dy", "-.5em")
+            .text(formatCoord(textX));
         g
             .append("text")
-            .attr("dy", "1em")
-            .text(Math.trunc(textY));
+            .attr("dx", "-1.5em")
+            .attr("dy", ".5em")
+            .text(formatCoord(textY));
     }
 
     function naSetupCanvas() {
@@ -499,7 +513,7 @@ export default function naDisplay(serverName) {
             .duration(500)
             .call(naZoom.transform, initialTransform);
 
-        d3.select("#form").style("opacity", 0.8);
+        d3.select("#form").style("display", "inherit");
         $("form").submit(function(event) {
             const x = $("#x-coord").val(),
                 z = $("#z-coord").val();
