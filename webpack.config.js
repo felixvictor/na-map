@@ -3,10 +3,12 @@
 const libraryName = "na-map";
 
 const webpack = require("webpack");
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
-const MinifyPlugin = require("babel-minify-webpack-plugin");
 const path = require("path");
 const PACKAGE = require("./package.json");
+const CopyPlugin = require("copy-webpack-plugin"),
+    ExtractTextPlugin = require("extract-text-webpack-plugin"),
+    HtmlPlugin = require("html-webpack-plugin"),
+    MinifyPlugin = require("babel-minify-webpack-plugin");
 
 const babelOpt = {
     cacheDirectory: true,
@@ -27,6 +29,18 @@ const babelOpt = {
 
 const cssOpt = {
     sourceMap: true
+};
+
+const minifyOpt = {
+    collapseBooleanAttributes: true,
+    collapseWhitespace: true,
+    collapseInlineTagWhitespace: true,
+    decodeEntities: true,
+    html5: true,
+    minifyURLs: true,
+    removeComments: true,
+    sortAttributes: true,
+    sortClassName: true
 };
 
 const imagewebpackOpt = {
@@ -124,13 +138,13 @@ let config = {
     },
 
     output: {
-        path: __dirname + "/public/js",
-        filename: libraryName + ".min.js"
+        path: `${__dirname}/public`,
+        filename: `${libraryName}.min.js`
     },
 
     plugins: [
         new ExtractTextPlugin({
-            filename: "../css/" + libraryName + ".min.css",
+            filename: `${libraryName}.min.css`,
             allChunks: true
         }),
         new webpack.ProvidePlugin({
@@ -146,6 +160,21 @@ let config = {
             //Popover: "exports-loader?Popover!bootstrap/js/dist/popover",
             Tooltip: "exports-loader?Tooltip!bootstrap/js/dist/tooltip",
             Util: "exports-loader?Util!bootstrap/js/dist/util"
+        }),
+        new CopyPlugin([
+            { from: ".netlify", to: ".netlify", toType: "file" },
+            { from: "google979f2cf3bed204d6.html", to: "google979f2cf3bed204d6.html", toType: "file" },
+            { from: "*.json" }
+        ]),
+        new HtmlPlugin({
+            filename: "index.html",
+            gtag: "https://www.googletagmanager.com/gtag/js?id=UA-109520372-1",
+            hash: true,
+            inject: "body",
+            lang: "en-GB",
+            minify: minifyOpt,
+            template: "index.template.ejs",
+            title: "Naval Action map"
         })
     ],
 
@@ -187,7 +216,7 @@ let config = {
                     loader: "file-loader",
                     options: {
                         name: "[name].[ext]",
-                        outputPath: "../fonts/"
+                        outputPath: "fonts/"
                     }
                 }
             },
@@ -199,7 +228,7 @@ let config = {
                         loader: "file-loader",
                         options: {
                             name: "[name].[ext]",
-                            outputPath: "../images/"
+                            outputPath: "images/"
                         }
                     },
                     {
@@ -217,7 +246,7 @@ let config = {
                         options: {
                             limit: 1,
                             name: "[name].[ext]",
-                            outputPath: "../images/"
+                            outputPath: "images/"
                         }
                     },
                     {
@@ -237,7 +266,7 @@ let config = {
                         options: {
                             limit: 1,
                             name: "[name].[ext]",
-                            outputPath: "../icons/"
+                            outputPath: "icons/"
                         }
                     },
                     {

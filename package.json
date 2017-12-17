@@ -8,6 +8,7 @@
     "babel-loader": "8.0.0-beta.0",
     "babel-minify-webpack-plugin": "^0.2.0",
     "babel-preset-minify": "^0.2.0",
+    "copy-webpack-plugin": "^4.2.3",
     "css-loader": "^0.28.7",
     "eslint": "^4.6.1",
     "eslint-config-prettier": "^2.4.0",
@@ -16,6 +17,7 @@
     "extract-text-webpack-plugin": "^3.0.0",
     "file-loader": "^0.11.2",
     "git": "^0.1.5",
+    "html-webpack-plugin": "^2.30.1",
     "image-webpack-loader": "^3.4.2",
     "imports-loader": "^0.7.1",
     "ndjson-cli": "^0.3.1",
@@ -42,13 +44,6 @@
   },
   "dependencies": {
     "bootstrap": "4.0.0-beta.2",
-    "d3-collection": "^1.0.4",
-    "d3-geo": "^1.9.0",
-    "d3-queue": "^3.0.7",
-    "d3-request": "^1.0.6",
-    "d3-selection": "1.1.0",
-    "d3-voronoi": "^1.1.2",
-    "d3-zoom": "^1.6.0",
     "jquery": "1.9.1 - 3",
     "popper.js": "^1.12.6",
     "topojson-client": "^3.0.0"
@@ -57,7 +52,7 @@
     "node": ">=6"
   },
   "scripts": {
-    "clean": "rm -rf public/js public/css",
+    "clean": "rm -rf public/",
     "css-lint": "stylelint --config .stylelintrc --syntax scss \"src/scss/*.scss\"",
     "deploy-change": "yarn run prod && yarn run change-ports && yarn run push && yarn run deploy-netlify",
     "deploy-update": "yarn run push && yarn run deploy-netlify",
@@ -65,8 +60,8 @@
     "js-lint": "eslint -c .eslintrc.json src/js",
     "prettier": "prettier --tab-width 4 --print-width 120 --write .eslintrc.json package.json *.js src/js/*.json src/scss/*.scss",
     "prod": "yarn run clean && NODE_ENV=${NODE_ENV:=prod} webpack --colors --config webpack.config.js",
-    "push": "build/push.sh",
-    "change-ports": "build/change-server-port-data.sh",
+    "push": "build/port-data.sh push",
+    "change-ports": "build/port-data.sh change",
     "watch": "yarn run clean && NODE_ENV=${NODE_ENV:=dev} webpack --watch --colors --config webpack.config.js"
   },
   "browserslist": [
