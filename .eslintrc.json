@@ -17,12 +17,13 @@
     "plugins": ["prettier"],
     "extends": "prettier",
     "rules": {
-        "prettier/prettier": ["error", { "tabWidth": 4, "printWidth": 120 }],
         "brace-style": ["error", "1tbs"],
         "camelcase": ["error"],
-        "no-console": 0,
         "curly": ["error", "all"],
         "eqeqeq": ["error", "smart"],
+        "no-console": 0,
+        "prefer-template": ["error"],
+        "prettier/prettier": ["error", { "tabWidth": 4, "printWidth": 120 }],
         "quotes": ["error", "double", { "avoidEscape": true }]
     }
 }
