@@ -17,8 +17,6 @@ export default function naDisplay(serverName) {
 
     const naWidth = top.innerWidth - naMargin.left - naMargin.right,
         naHeight = top.innerHeight - naMargin.top - naMargin.bottom;
-    let IsPBZoneDisplayed = false,
-        HasLabelRemoved = false;
     const iconSize = 50;
     let highlightId;
     const highlightDuration = 200;
@@ -36,6 +34,10 @@ export default function naDisplay(serverName) {
 
     const initialScale = 0.3,
         initialTransform = d3.zoomIdentity.translate(-100, -500).scale(initialScale);
+    const PBZoneZoomScale = 1.5,
+        labelZoomScale = 0.5;
+    let IsPBZoneDisplayed = false,
+        HasLabelRemoved = false;
     const defaultFontSize = 16;
     let currentFontSize = defaultFontSize;
     const defaultCircleSize = 10;
@@ -203,12 +205,8 @@ export default function naDisplay(serverName) {
         naContext.getImageData(0, 0, naWidth, naHeight);
     }
 
-    function naZoomed() {
-        const PBZoneZoomExtent = 1.5;
-        const labelZoomExtent = 0.5;
-
-        let transform = d3.event.transform;
-        if (PBZoneZoomExtent < transform.k) {
+    function naSetupMap(scale) {
+        if (PBZoneZoomScale < scale) {
             if (!IsPBZoneDisplayed) {
                 naTogglePBZones();
                 naToggleDisplayTeleportAreas();
@@ -223,7 +221,7 @@ export default function naDisplay(serverName) {
             }
         }
 
-        if (labelZoomExtent > transform.k) {
+        if (labelZoomScale > scale) {
             if (!HasLabelRemoved) {
                 naRemoveLabel();
                 HasLabelRemoved = true;
@@ -234,8 +232,14 @@ export default function naDisplay(serverName) {
                 HasLabelRemoved = false;
             }
         }
+    }
 
+    function naZoomed() {
+        let transform = d3.event.transform;
+
+        naSetupMap(transform.k);
         naDisplayCountries(transform);
+
         gPorts.attr("transform", transform);
         gVoronoi.attr("transform", transform);
         gPBZones.attr("transform", transform);
