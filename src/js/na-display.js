@@ -132,11 +132,7 @@ export default function naDisplay(serverName) {
         ty = -y + my;
         //console.log(`transform coord: ${tx}/${ty}`);
 
-        naSvg
-            .transition()
-            .delay(200)
-            .duration(500)
-            .call(naZoom.transform, d3.zoomIdentity.translate(tx, ty).scale(1));
+        naZoomAndPan(d3.zoomIdentity.translate(tx, ty).scale(1));
     }
 
     function naMoveToPos(F11X, F11Y) {
@@ -151,11 +147,7 @@ export default function naDisplay(serverName) {
             ty = -y + naHeight / 2;
         //console.log(`transform coord: ${tx}/${ty}`);
 
-        naSvg
-            .transition()
-            .delay(500)
-            .duration(500)
-            .call(naZoom.transform, d3.zoomIdentity.translate(tx, ty).scale(1));
+        naZoomAndPan(d3.zoomIdentity.translate(tx, ty).scale(1));
     }
 
     const numberWithBlanks = x => {
@@ -490,18 +482,18 @@ export default function naDisplay(serverName) {
         }
     }
 
-    function naInitialTransform() {
+    function naZoomAndPan(transform) {
         naSvg
             .transition()
             .delay(500)
             .duration(500)
-            .call(naZoom.transform, initialTransform);
+            .call(naZoom.transform, transform);
     }
 
     function naResetMap() {
         gCoord.remove();
         gCoord = naSvg.append("g");
-        naInitialTransform();
+        naZoomAndPan(initialTransform);
     }
 
     function naReady(error, naMap, pbZones) {
@@ -521,7 +513,7 @@ export default function naDisplay(serverName) {
         naDisplayPorts();
         naSetupPBZones();
 
-        naInitialTransform();
+        naZoomAndPan(initialTransform);
 
         d3.select("#form").style("display", "inherit");
         $("form").submit(function(event) {
