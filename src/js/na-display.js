@@ -21,7 +21,7 @@ export default function naDisplay(serverName) {
         HasLabelRemoved = false;
     const iconSize = 50;
     let highlightId;
-    const highlightDuration = 500;
+    const highlightDuration = 200;
     const maxCoord = 8192;
     const minCoord = 0;
     const voronoiCoord = [[minCoord - 1, minCoord - 1], [maxCoord + 1, maxCoord + 1]];
@@ -134,7 +134,7 @@ export default function naDisplay(serverName) {
 
         naSvg
             .transition()
-            .delay(500)
+            .delay(200)
             .duration(500)
             .call(naZoom.transform, d3.zoomIdentity.translate(tx, ty).scale(1));
     }
