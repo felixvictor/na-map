@@ -498,10 +498,9 @@ export default function naDisplay(serverName) {
             .call(naZoom.transform, transform);
     }
 
-    function naResetMap() {
+    function naClearMap() {
         gCoord.remove();
         gCoord = naSvg.append("g");
-        naZoomAndPan(initialTransform);
     }
 
     function naReady(error, naMap, pbZones) {
@@ -531,7 +530,7 @@ export default function naDisplay(serverName) {
             event.preventDefault();
         });
         $("#reset").on("click", function() {
-            naResetMap();
+            naClearMap();
         });
     }
 
