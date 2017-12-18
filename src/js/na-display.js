@@ -17,25 +17,31 @@ export default function naDisplay(serverName) {
 
     const naWidth = top.innerWidth - naMargin.left - naMargin.right,
         naHeight = top.innerHeight - naMargin.top - naMargin.bottom;
-    let IsPBZoneDisplayed = false,
-        HasLabelRemoved = false;
     const iconSize = 50;
     let highlightId;
-    const highlightDuration = 500;
+    const highlightDuration = 200;
     const maxCoord = 8192;
     const minCoord = 0;
     const voronoiCoord = [[minCoord - 1, minCoord - 1], [maxCoord + 1, maxCoord + 1]];
-    const TransA = 0.00494444554690109,
-        TransB = 0.0000053334600512813,
-        TransC = 4082.20289162021,
-        TransD = 4111.1164516551;
-    const TransInvA = 202.246910593215,
-        TransInvB = 0.2181591055887,
-        TransInvC = -826509.800732941,
-        TransInvD = 830570.031704516;
+    const Trans = {
+        A: 0.00494444554690109,
+        B: 0.0000053334600512813,
+        C: 4082.20289162021,
+        D: 4111.1164516551
+    };
+    const TransInv = {
+        A: 202.246910593215,
+        B: 0.2181591055887,
+        C: -826509.800732941,
+        D: 830570.031704516
+    };
 
     const initialScale = 0.3,
         initialTransform = d3.zoomIdentity.translate(-100, -500).scale(initialScale);
+    const PBZoneZoomScale = 1.5,
+        labelZoomScale = 0.5;
+    let IsPBZoneDisplayed = false,
+        HasLabelRemoved = false;
     const defaultFontSize = 16;
     let currentFontSize = defaultFontSize;
     const defaultCircleSize = 10;
@@ -94,18 +100,18 @@ export default function naDisplay(serverName) {
     }
 
     function convertCoordX(x, y) {
-        return TransA * x + TransB * y + TransC;
+        return Trans.A * x + Trans.B * y + Trans.C;
     }
     function convertCoordY(x, y) {
-        return TransB * x - TransA * y + TransD;
+        return Trans.B * x - Trans.A * y + Trans.D;
     }
     // svg coord to F11 coord
     function convertInvCoordX(x, y) {
-        return TransInvA * x + TransInvB * y + TransInvC;
+        return TransInv.A * x + TransInv.B * y + TransInv.C;
     }
     // svg coord to F11 coord
     function convertInvCoordY(x, y) {
-        return TransInvB * x - TransInvA * y + TransInvD;
+        return TransInv.B * x - TransInv.A * y + TransInv.D;
     }
 
     function naPrintPos() {
@@ -132,11 +138,7 @@ export default function naDisplay(serverName) {
         ty = -y + my;
         //console.log(`transform coord: ${tx}/${ty}`);
 
-        naSvg
-            .transition()
-            .delay(500)
-            .duration(500)
-            .call(naZoom.transform, d3.zoomIdentity.translate(tx, ty).scale(1));
+        naZoomAndPan(d3.zoomIdentity.translate(tx, ty).scale(1));
     }
 
     function naMoveToPos(F11X, F11Y) {
@@ -151,11 +153,7 @@ export default function naDisplay(serverName) {
             ty = -y + naHeight / 2;
         //console.log(`transform coord: ${tx}/${ty}`);
 
-        naSvg
-            .transition()
-            .delay(500)
-            .duration(500)
-            .call(naZoom.transform, d3.zoomIdentity.translate(tx, ty).scale(1));
+        naZoomAndPan(d3.zoomIdentity.translate(tx, ty).scale(1));
     }
 
     const numberWithBlanks = x => {
@@ -211,12 +209,8 @@ export default function naDisplay(serverName) {
         naContext.getImageData(0, 0, naWidth, naHeight);
     }
 
-    function naZoomed() {
-        const PBZoneZoomExtent = 1.5;
-        const labelZoomExtent = 0.5;
-
-        let transform = d3.event.transform;
-        if (PBZoneZoomExtent < transform.k) {
+    function naSetupMap(scale) {
+        if (PBZoneZoomScale < scale) {
             if (!IsPBZoneDisplayed) {
                 naTogglePBZones();
                 naToggleDisplayTeleportAreas();
@@ -231,7 +225,7 @@ export default function naDisplay(serverName) {
             }
         }
 
-        if (labelZoomExtent > transform.k) {
+        if (labelZoomScale > scale) {
             if (!HasLabelRemoved) {
                 naRemoveLabel();
                 HasLabelRemoved = true;
@@ -242,8 +236,14 @@ export default function naDisplay(serverName) {
                 HasLabelRemoved = false;
             }
         }
+    }
 
+    function naZoomed() {
+        let transform = d3.event.transform;
+
+        naSetupMap(transform.k);
         naDisplayCountries(transform);
+
         gPorts.attr("transform", transform);
         gVoronoi.attr("transform", transform);
         gPBZones.attr("transform", transform);
@@ -490,18 +490,17 @@ export default function naDisplay(serverName) {
         }
     }
 
-    function naInitialTransform() {
+    function naZoomAndPan(transform) {
         naSvg
             .transition()
             .delay(500)
             .duration(500)
-            .call(naZoom.transform, initialTransform);
+            .call(naZoom.transform, transform);
     }
 
-    function naResetMap() {
+    function naClearMap() {
         gCoord.remove();
         gCoord = naSvg.append("g");
-        naInitialTransform();
     }
 
     function naReady(error, naMap, pbZones) {
@@ -521,7 +520,7 @@ export default function naDisplay(serverName) {
         naDisplayPorts();
         naSetupPBZones();
 
-        naInitialTransform();
+        naZoomAndPan(initialTransform);
 
         d3.select("#form").style("display", "inherit");
         $("form").submit(function(event) {
@@ -531,7 +530,7 @@ export default function naDisplay(serverName) {
             event.preventDefault();
         });
         $("#reset").on("click", function() {
-            naResetMap();
+            naClearMap();
         });
     }
 
