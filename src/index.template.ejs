@@ -14,7 +14,8 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <header class="modal-header">
-                <h3><%= htmlWebpackPlugin.options.title %>&nbsp;<span class="text-primary small">v<%= htmlWebpackPlugin.options.version %></span></h3>
+                <h3><%= htmlWebpackPlugin.options.title %>&nbsp;<span
+                            class="text-primary small">v<%= htmlWebpackPlugin.options.version %></span></h3>
             </header>
 
             <div class="modal-body">
@@ -48,15 +49,17 @@
                 F11 coordinates
             </div>
             <div class="col-auto">
-                <input type="number" step="0.1" min="-816000" max="830000" class="form-control" id="x-coord" placeholder="X" required>
+                <input type="number" step="0.1" min="-816000" max="830000" class="form-control" id="x-coord"
+                       placeholder="X" required>
             </div>
             <div class="col-auto">
-                <input type="number" step="0.1" min="-430000" max="830000" class="form-control" id="z-coord" placeholder="Z" required>
+                <input type="number" step="0.1" min="-430000" max="830000" class="form-control" id="z-coord"
+                       placeholder="Z" required>
             </div>
             <div class="col-auto">
                 <button type="submit" class="btn btn-primary">Move To</button>
             </div>
-                <div class="col-auto">
+            <div class="col-auto">
                 <button id="reset" type="reset" class="btn btn-secondary">Clear</button>
             </div>
         </div>
