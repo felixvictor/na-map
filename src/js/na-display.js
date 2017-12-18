@@ -294,7 +294,7 @@ export default function naDisplay(serverName) {
             } else {
                 h += "Not capturable";
             }
-            h += `<br>${Math.round(d.portTax * 100)}% port tax`;
+            h += `<br>${d.portTax * 100}% port tax`;
             h += d.tradingCompany ? `, trading company level ${d.tradingCompany}` : "";
             h += d.laborHoursDiscount ? ", labor hours discount" : "";
             h += "</p>";
