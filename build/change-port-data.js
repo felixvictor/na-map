@@ -29,7 +29,7 @@ serverPorts.objects.ports.geometries.forEach(function(d) {
     d.properties.nation = nation[t[0].Nation];
     d.properties.capturer = t[0].Capturer;
     d.properties.brLimit = t[0].PortBattleBRLimit;
-    d.properties.portTax = Math.round(t[0].PortTax*100)/100;
+    d.properties.portTax = Math.round(t[0].PortTax * 100) / 100;
     d.properties.tradingCompany = t[0].TradingCompany;
     d.properties.laborHoursDiscount = t[0].LaborHoursDiscount;
 });
