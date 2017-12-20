@@ -24,6 +24,25 @@ $background-colour: $primary-300;
   }
 }
 
+.form-row-label {
+  margin-bottom: .5em;
+}
+
+.radio-group {
+  display: flex;
+  padding: 1em;
+  margin-top: -.5em;
+  background-color: $primary-100;
+  opacity: 1;
+  label {
+    margin-bottom: 0;
+  }
+}
+
+.radio-group-label {
+  padding-right: 1em;
+}
+
 .na-port-in {
   fill: $in-colour;
 }
@@ -94,6 +113,17 @@ text {
     text-anchor: end;
     alignment-baseline: central;
   }
+  path {
+    stroke: $secondary-700;
+    stroke-width: .5em;
+    fill: none;
+  }
+}
+
+.compass {
+  fill: $secondary-400;
+  stroke: $secondary-900;
+  background-image: url("~Icons/compass.svg"), none;
 }
 
 .tooltip {

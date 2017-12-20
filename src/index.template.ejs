@@ -33,7 +33,8 @@
             <footer class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal" data-server="eu1">PvP EU</button>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal" data-server="eu2">PvE</button>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal" data-server="us2">PvP Global</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" data-server="us2">PvP Global
+                </button>
             </footer>
         </div>
     </div>
@@ -46,7 +47,7 @@
     <form>
         <div class="form-row">
             <div class="col-auto align-self-center">
-                F11 coordinates
+                <span class="form-row-label">F11 coordinates</span>
             </div>
             <div class="col-auto">
                 <input type="number" step="0.1" min="-816000" max="830000" class="form-control" id="x-coord"
@@ -57,10 +58,25 @@
                        placeholder="Z" required>
             </div>
             <div class="col-auto">
-                <button type="submit" class="btn btn-primary">Move To</button>
+                <button type="submit" class="btn btn-primary">Move to</button>
             </div>
             <div class="col-auto">
                 <button id="reset" type="reset" class="btn btn-secondary">Clear</button>
+            </div>
+            <div class="radio-group">
+                <div class="col-auto align-self-center">
+                    <span class="radio-group-label">Double click</span>
+                    <label class="custom-control custom-radio">
+                        <input class="custom-control-input" type="radio" name="mouseFunction" id="F11" value="F11" checked>
+                        <span class="custom-control-indicator"></span>
+                        <span class="custom-control-description">Get F11 coordinates</span>
+                    </label>
+                    <label class="custom-control custom-radio">
+                        <input class="custom-control-input" type="radio" name="mouseFunction" id="compass" value="compass">
+                        <span class="custom-control-indicator"></span>
+                        <span class="custom-control-description">Make a line</span>
+                    </label>
+                </div>
             </div>
         </div>
     </form>

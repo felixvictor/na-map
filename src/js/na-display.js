@@ -11,7 +11,16 @@ import "bootstrap/js/dist/util";
 
 export default function naDisplay(serverName) {
     let naSvg, naCanvas, naContext, naDefs, naZoom;
-    let gPorts, gPBZones, gVoronoi, gCoord, naVoronoiDiagram, pathVoronoi, naTeleportPorts, naPort, naPortLabel;
+    let gPorts,
+        gPBZones,
+        gVoronoi,
+        gCoord,
+        gCompass,
+        naVoronoiDiagram,
+        pathVoronoi,
+        naTeleportPorts,
+        naPort,
+        naPortLabel;
     let naPortData, naPBZoneData, naFortData, naTowerData;
     const naMargin = { top: 20, right: 20, bottom: 20, left: 20 };
 
@@ -48,6 +57,10 @@ export default function naDisplay(serverName) {
     let currentCircleSize = defaultCircleSize;
     // limit how far away the mouse can be from finding a voronoi site
     const voronoiRadius = Math.min(naHeight, naWidth);
+    let radioButton = "F11",
+        firstCoord = true,
+        line = d3.line(),
+        lineData = [];
     let naImage = new Image();
     const naMapJson = `${serverName}.json`,
         pbJson = "pb.json",
@@ -86,7 +99,7 @@ export default function naDisplay(serverName) {
             .call(naZoom)
             .on("dblclick.zoom", null)
             .on("click", naStopProp, true)
-            .on("dblclick", naPrintPos);
+            .on("dblclick", doubleClickAction);
 
         naDefs = naSvg.append("defs");
 
@@ -96,29 +109,45 @@ export default function naDisplay(serverName) {
             .append("g")
             .attr("class", "pb")
             .style("display", "none");
-        gCoord = naSvg.append("g");
+        gCoord = naSvg.append("g").attr("class", "coord");
     }
 
-    function convertCoordX(x, y) {
-        return Trans.A * x + Trans.B * y + Trans.C;
-    }
-    function convertCoordY(x, y) {
-        return Trans.B * x - Trans.A * y + Trans.D;
-    }
-    // svg coord to F11 coord
-    function convertInvCoordX(x, y) {
-        return TransInv.A * x + TransInv.B * y + TransInv.C;
-    }
-    // svg coord to F11 coord
-    function convertInvCoordY(x, y) {
-        return TransInv.B * x - TransInv.A * y + TransInv.D;
-    }
+    function doubleClickAction() {
+        function styleImportedSVG() {}
+        function printCompass(x, y) {
+            const compassSize = 200;
 
-    function naPrintPos() {
-        let coord = d3.mouse(this);
+            d3.xml("icons/compass.svg", "image/svg+xml", function(xml) {
+                let importedNode = document.importNode(xml.documentElement, true);
+                d3.select(".coord")
+                    .each(function() {
+                        this.appendChild(importedNode);
+                        styleImportedSVG();
+                    });
+
+            });
+            /*
+            gCoord
+                .append("object")
+                .attr("type", "image/svg+xml")
+                .attr("class", "compass")
+                .attr("x", x)
+                .attr("y", y)
+                .attr("transform", `translate(${-compassSize / 2},${-compassSize / 2})`)
+                .attr("height", compassSize)
+                .attr("width", compassSize)
+                .attr("data", "icons/compass.svg");
+                */
+            gCompass = gCoord.append("path");
+        }
+        function printLine() {
+            gCompass.datum(lineData).attr("d", line);
+        }
+
+        const coord = d3.mouse(this),
+            transform = d3.zoomTransform(this);
         const mx = coord[0],
             my = coord[1],
-            transform = d3.zoomTransform(this),
             tk = transform.k;
         let tx = transform.x,
             ty = transform.y;
@@ -126,19 +155,46 @@ export default function naDisplay(serverName) {
 
         let x = (-tx + mx) / tk,
             y = (-ty + my) / tk;
-        //console.log(`coord: ${x}/${y}`);
+        if (radioButton === "F11") {
+            printPos(x, y);
+        } else {
+            lineData.push([x, y]);
+            if (firstCoord) {
+                printCompass(x, y);
+                firstCoord = !firstCoord;
+            } else {
+                printLine();
+            }
+        }
+        tx = -x + mx;
+        ty = -y + my;
+        naZoomAndPan(d3.zoomIdentity.translate(tx, ty).scale(1));
+    }
 
+    function convertCoordX(x, y) {
+        return Trans.A * x + Trans.B * y + Trans.C;
+    }
+
+    function convertCoordY(x, y) {
+        return Trans.B * x - Trans.A * y + Trans.D;
+    }
+
+    // svg coord to F11 coord
+    function convertInvCoordX(x, y) {
+        return TransInv.A * x + TransInv.B * y + TransInv.C;
+    }
+
+    // svg coord to F11 coord
+    function convertInvCoordY(x, y) {
+        return TransInv.B * x - TransInv.A * y + TransInv.D;
+    }
+
+    function printPos(x, y) {
         let F11X = convertInvCoordX(x, y),
             F11Y = convertInvCoordY(x, y);
         //console.log(`F11 coord: ${F11X}/${F11Y}`);
 
         naAddCoordCircle(x, y, F11X, F11Y);
-
-        tx = -x + mx;
-        ty = -y + my;
-        //console.log(`transform coord: ${tx}/${ty}`);
-
-        naZoomAndPan(d3.zoomIdentity.translate(tx, ty).scale(1));
     }
 
     function naMoveToPos(F11X, F11Y) {
@@ -169,10 +225,7 @@ export default function naDisplay(serverName) {
     };
 
     function naAddCoordCircle(x, y, textX, textY) {
-        let g = gCoord
-            .append("g")
-            .attr("class", "coord")
-            .attr("transform", `translate(${x},${y})`);
+        let g = gCoord.append("g").attr("transform", `translate(${x},${y})`);
         g.append("circle").attr("r", 20);
         g
             .append("text")
@@ -419,7 +472,10 @@ export default function naDisplay(serverName) {
             // Use only ports that deep water ports and not a county capital
             .filter(d => !d.properties.shallow && !d.properties.countyCapital)
             // Map to coordinates array
-            .map(d => ({ id: d.id, coord: { x: d.geometry.coordinates[0], y: d.geometry.coordinates[1] } }));
+            .map(d => ({
+                id: d.id,
+                coord: { x: d.geometry.coordinates[0], y: d.geometry.coordinates[1] }
+            }));
 
         pathVoronoi = gVoronoi
             .selectAll(".voronoi")
@@ -500,7 +556,9 @@ export default function naDisplay(serverName) {
 
     function naClearMap() {
         gCoord.remove();
-        gCoord = naSvg.append("g");
+        gCoord = naSvg.append("g").attr("class", "coord");
+        firstCoord = true;
+        lineData.splice(0, lineData.length);
     }
 
     function naReady(error, naMap, pbZones) {
@@ -530,6 +588,10 @@ export default function naDisplay(serverName) {
             event.preventDefault();
         });
         $("#reset").on("click", function() {
+            naClearMap();
+        });
+        $(".radio-group").change(function() {
+            radioButton = $("input[name='mouseFunction']:checked").val();
             naClearMap();
         });
     }
