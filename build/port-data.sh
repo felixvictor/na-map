@@ -3,7 +3,7 @@
 SERVER_BASE_NAME="cleanopenworldprod"
 SOURCE_BASE_URL="http://storage.googleapis.com/nacleanopenworldprodshards/"
 # http://api.shipsofwar.net/servers?apikey=1ZptRtpXAyEaBe2SEp63To1aLmISuJj3Gxcl5ivl&callback=setActiveRealms
-SERVER_NAMES=(eu1 eu2 us2)
+SERVER_NAMES=(eu1 eu2)
 DATE=$(date +%Y-%m-%d)
 LAST_UPDATE_FILE="build/.last-port-update"
 

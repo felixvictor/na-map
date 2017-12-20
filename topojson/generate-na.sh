@@ -19,7 +19,7 @@ $(yarn bin local)/geo2topo --verbose \
 	   towers.json \
 	   forts.json
 
-for SERVER_NAME in "eu1" "eu2" "us2"; do
+for SERVER_NAME in "eu1" "eu2"; do
     cp "${OUT_PORTS}" ../src/"${SERVER_NAME}.json"
 done
 mv "${OUT_PB_ZONES}" ../src
