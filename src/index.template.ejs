@@ -44,8 +44,10 @@
 <div id="form">
     <form>
         <div class="form-row">
-            <div class="col-auto align-self-center">
-                F11 coordinates
+            <div class="radio-group">
+                <div class="col-auto align-self-center">
+                    <span class="radio-group-label">F11 coordinates</span>
+                </div>
             </div>
             <div class="col-auto">
                 <input type="number" step="0.1" min="-816000" max="830000" class="form-control" id="x-coord"
@@ -56,10 +58,26 @@
                        placeholder="Z" required>
             </div>
             <div class="col-auto">
-                <button type="submit" class="btn btn-primary">Move To</button>
+                <button type="submit" class="btn btn-primary">Move to</button>
             </div>
             <div class="col-auto">
                 <button id="reset" type="reset" class="btn btn-secondary">Clear</button>
+            </div>
+            <div class="radio-group box">
+                <div class="col-auto align-self-center">
+                    <span class="radio-group-label">Double click to</span>
+                    <label class="custom-control custom-radio">
+                        <input class="custom-control-input" type="radio" name="mouseFunction" id="compass"
+                               value="compass" checked>
+                        <span class="custom-control-indicator"></span>
+                        <span class="custom-control-description">plot a course</span>
+                    </label>
+                    <label class="custom-control custom-radio">
+                        <input class="custom-control-input" type="radio" name="mouseFunction" id="F11" value="F11">
+                        <span class="custom-control-indicator"></span>
+                        <span class="custom-control-description">show F11 coordinates</span>
+                    </label>
+                </div>
             </div>
         </div>
     </form>
