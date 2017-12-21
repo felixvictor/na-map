@@ -17,11 +17,32 @@ $background-colour: $primary-300;
   z-index: 1000;
   display: none;
   padding: 2em;
+  padding-bottom: 1.5em;
   background-color: $primary-200;
   opacity: .8;
   input {
     color: inherit;
   }
+}
+
+.radio-group {
+  display: flex;
+  padding-top: 1em;
+  padding-bottom: 1em;
+  margin-top: -.5em;
+}
+
+.box {
+  margin-left: 1em;
+  background-color: $primary-100;
+  opacity: 1;
+  label {
+    margin-bottom: 0;
+  }
+}
+
+.radio-group-label {
+  padding-right: 1em;
 }
 
 .na-port-in {
@@ -94,6 +115,11 @@ text {
     text-anchor: end;
     alignment-baseline: central;
   }
+  path {
+    stroke: $secondary-600;
+    stroke-width: .3em;
+    fill: none;
+  }
 }
 
 .tooltip {
@@ -122,6 +148,10 @@ text {
 
 .dummy-jpg {
   background-image: url("~Images/na-map.jpg");
+}
+
+.dummy-svg {
+  background-image: url("~Icons/compass.svg");
 }
 
 $flags-dir: "~Icons";
