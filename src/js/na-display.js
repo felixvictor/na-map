@@ -57,7 +57,7 @@ export default function naDisplay(serverName) {
     let currentCircleSize = defaultCircleSize;
     // limit how far away the mouse can be from finding a voronoi site
     const voronoiRadius = Math.min(naHeight, naWidth);
-    let radioButton = "F11",
+    let radioButton = "compass",
         firstCoord = true,
         line = d3.line(),
         lineData = [];
@@ -113,37 +113,6 @@ export default function naDisplay(serverName) {
     }
 
     function doubleClickAction() {
-        function styleImportedSVG() {}
-        function printCompass(x, y) {
-            const compassSize = 200;
-
-            d3.xml("icons/compass.svg", "image/svg+xml", function(xml) {
-                let importedNode = document.importNode(xml.documentElement, true);
-                d3.select(".coord")
-                    .each(function() {
-                        this.appendChild(importedNode);
-                        styleImportedSVG();
-                    });
-
-            });
-            /*
-            gCoord
-                .append("object")
-                .attr("type", "image/svg+xml")
-                .attr("class", "compass")
-                .attr("x", x)
-                .attr("y", y)
-                .attr("transform", `translate(${-compassSize / 2},${-compassSize / 2})`)
-                .attr("height", compassSize)
-                .attr("width", compassSize)
-                .attr("data", "icons/compass.svg");
-                */
-            gCompass = gCoord.append("path");
-        }
-        function printLine() {
-            gCompass.datum(lineData).attr("d", line);
-        }
-
         const coord = d3.mouse(this),
             transform = d3.zoomTransform(this);
         const mx = coord[0],
@@ -151,80 +120,159 @@ export default function naDisplay(serverName) {
             tk = transform.k;
         let tx = transform.x,
             ty = transform.y;
-        //console.log(`mouse coord: ${mx}/${my}`);
 
         let x = (-tx + mx) / tk,
             y = (-ty + my) / tk;
         if (radioButton === "F11") {
-            printPos(x, y);
+            printCoord(x, y);
         } else {
-            lineData.push([x, y]);
-            if (firstCoord) {
-                printCompass(x, y);
-                firstCoord = !firstCoord;
-            } else {
-                printLine();
-            }
+            plotCourse(x, y);
         }
         tx = -x + mx;
         ty = -y + my;
         naZoomAndPan(d3.zoomIdentity.translate(tx, ty).scale(1));
     }
 
-    function convertCoordX(x, y) {
-        return Trans.A * x + Trans.B * y + Trans.C;
+    function plotCourse(x, y) {
+        function printCompass(x, y) {
+            const compassSize = 100;
+
+            gCoord
+                .append("image")
+                .attr("class", "compass")
+                .attr("x", x)
+                .attr("y", y)
+                .attr("transform", `translate(${-compassSize / 2},${-compassSize / 2})`)
+                .attr("height", compassSize)
+                .attr("width", compassSize)
+                .attr("xlink:href", "icons/compass.svg");
+            gCompass = gCoord.append("path");
+        }
+
+        function printLine(x, y) {
+            // Converts from radians to degrees
+            // http://cwestblog.com/2012/11/12/javascript-degree-and-radian-conversion/
+            Math.radiansToDegrees = function(radians) {
+                return radians * 180 / Math.PI;
+            };
+
+            // https://stackoverflow.com/questions/9970281/java-calculating-the-angle-between-two-points-in-degrees
+            function rotationAngleInDegrees(centerPt, targetPt) {
+                let theta = Math.atan2(targetPt[1] - centerPt[1], targetPt[0] - centerPt[0]);
+                theta -= Math.PI / 2.0;
+                let angle = Math.radiansToDegrees(theta);
+                if (angle < 0) {
+                    angle += 360;
+                }
+                return angle;
+            }
+
+            // https://stackoverflow.com/questions/7490660/converting-wind-direction-in-angles-to-text-words
+            function degressToCompass(degrees) {
+                const val = Math.floor(degrees / 22.5 + 0.5);
+                const compassDirections = [
+                    "N",
+                    "NNE",
+                    "NE",
+                    "ENE",
+                    "E",
+                    "ESE",
+                    "SE",
+                    "SSE",
+                    "S",
+                    "SSW",
+                    "SW",
+                    "WSW",
+                    "W",
+                    "WNW",
+                    "NW",
+                    "NNW"
+                ];
+                return compassDirections[val % 16];
+            }
+
+            const degrees = rotationAngleInDegrees(lineData[lineData.length - 1], lineData[lineData.length - 2]);
+            const compass = degressToCompass(degrees);
+            console.log(`degressToCompass: ${degrees}`);
+            gCompass.datum(lineData).attr("d", line);
+            gCoord
+                .append("text")
+                .attr("x", x)
+                .attr("y", y)
+                .attr("dx", "-.5em")
+                .attr("dy", "-.5em")
+                .text(`${compass} (${Math.round(degrees)}°)`);
+        }
+
+        lineData.push([x, y]);
+        if (firstCoord) {
+            printCompass(x, y);
+            firstCoord = !firstCoord;
+        } else {
+            printLine(x, y);
+        }
     }
 
-    function convertCoordY(x, y) {
-        return Trans.B * x - Trans.A * y + Trans.D;
-    }
+    function printCoord(x, y) {
+        // svg coord to F11 coord
+        function convertInvCoordX(x, y) {
+            return TransInv.A * x + TransInv.B * y + TransInv.C;
+        }
 
-    // svg coord to F11 coord
-    function convertInvCoordX(x, y) {
-        return TransInv.A * x + TransInv.B * y + TransInv.C;
-    }
+        // svg coord to F11 coord
+        function convertInvCoordY(x, y) {
+            return TransInv.B * x - TransInv.A * y + TransInv.D;
+        }
 
-    // svg coord to F11 coord
-    function convertInvCoordY(x, y) {
-        return TransInv.B * x - TransInv.A * y + TransInv.D;
-    }
-
-    function printPos(x, y) {
-        let F11X = convertInvCoordX(x, y),
+        const F11X = convertInvCoordX(x, y),
             F11Y = convertInvCoordY(x, y);
-        //console.log(`F11 coord: ${F11X}/${F11Y}`);
 
-        naAddCoordCircle(x, y, F11X, F11Y);
+        if (radioButton === "F11") {
+            printF11Coord(x, y, F11X, F11Y);
+        } else {
+            plotCourse(x, y);
+        }
     }
 
-    function naMoveToPos(F11X, F11Y) {
-        //console.log(`F11 coord: ${F11X}/${F11Y}`);
-        let x = convertCoordX(F11X, F11Y),
-            y = convertCoordY(F11X, F11Y);
-        //console.log(`coord: ${x}/${y}`);
+    function goToF11(F11X, F11Y) {
+        // F11 coord to svg coord
+        function convertCoordX(x, y) {
+            return Trans.A * x + Trans.B * y + Trans.C;
+        }
+        // F11 coord to svg coord
+        function convertCoordY(x, y) {
+            return Trans.B * x - Trans.A * y + Trans.D;
+        }
 
-        naAddCoordCircle(x, y, F11X, F11Y);
+        const x = convertCoordX(F11X, F11Y),
+            y = convertCoordY(F11X, F11Y);
+
+        naClearMap();
+        if (radioButton === "F11") {
+            printF11Coord(x, y, F11X, F11Y);
+        } else {
+            plotCourse(x, y);
+        }
 
         const tx = -x + naWidth / 2,
             ty = -y + naHeight / 2;
-        //console.log(`transform coord: ${tx}/${ty}`);
 
         naZoomAndPan(d3.zoomIdentity.translate(tx, ty).scale(1));
     }
 
-    const numberWithBlanks = x => {
-        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u2009");
-    };
-
     const formatCoord = x => {
-        let r = numberWithBlanks(Math.abs(Math.trunc(x)));
+        const thousandsWithBlanks = x => {
+            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u2009");
+        };
+
+        let r = thousandsWithBlanks(Math.abs(Math.trunc(x)));
         if (x < 0) {
             r = `\u2212\u2009${r}`;
         }
         return r;
     };
 
-    function naAddCoordCircle(x, y, textX, textY) {
+    function printF11Coord(x, y, textX, textY) {
         let g = gCoord.append("g").attr("transform", `translate(${x},${y})`);
         g.append("circle").attr("r", 20);
         g
@@ -584,7 +632,7 @@ export default function naDisplay(serverName) {
         $("form").submit(function(event) {
             const x = $("#x-coord").val(),
                 z = $("#z-coord").val();
-            naMoveToPos(x, z);
+            goToF11(x, z);
             event.preventDefault();
         });
         $("#reset").on("click", function() {

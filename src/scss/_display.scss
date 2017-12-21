@@ -17,6 +17,7 @@ $background-colour: $primary-300;
   z-index: 1000;
   display: none;
   padding: 2em;
+  padding-bottom: 1.5em;
   background-color: $primary-200;
   opacity: .8;
   input {
@@ -24,14 +25,15 @@ $background-colour: $primary-300;
   }
 }
 
-.form-row-label {
-  margin-bottom: .5em;
-}
-
 .radio-group {
   display: flex;
-  padding: 1em;
+  padding-top: 1em;
+  padding-bottom: 1em;
   margin-top: -.5em;
+}
+
+.box {
+  margin-left: 1em;
   background-color: $primary-100;
   opacity: 1;
   label {
@@ -114,16 +116,10 @@ text {
     alignment-baseline: central;
   }
   path {
-    stroke: $secondary-700;
-    stroke-width: .5em;
+    stroke: $secondary-600;
+    stroke-width: .3em;
     fill: none;
   }
-}
-
-.compass {
-  fill: $secondary-400;
-  stroke: $secondary-900;
-  background-image: url("~Icons/compass.svg"), none;
 }
 
 .tooltip {
@@ -152,6 +148,10 @@ text {
 
 .dummy-jpg {
   background-image: url("~Images/na-map.jpg");
+}
+
+.dummy-svg {
+  background-image: url("~Icons/compass.svg");
 }
 
 $flags-dir: "~Icons";
