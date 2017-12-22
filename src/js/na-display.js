@@ -6,6 +6,7 @@
 
 import { feature as topojsonFeature } from "topojson-client";
 
+import "bootstrap/js/dist/collapse";
 import "bootstrap/js/dist/tooltip";
 import "bootstrap/js/dist/util";
 
@@ -622,6 +623,48 @@ export default function naDisplay(serverName) {
         lineData.splice(0, lineData.length);
     }
 
+    function setupSelects() {
+        function setupPortSelect() {
+            const portNames = $("#port-names");
+            const selectPorts = naPortData.features
+                .map(d => ({ id: d.id, name: d.properties.name }))
+                .sort(function(a, b) {
+                    if (a.name < b.name) {
+                        return -1;
+                    }
+                    if (a.name > b.name) {
+                        return 1;
+                    }
+                    return 0;
+                });
+            selectPorts.forEach(function(port) {
+                let option = document.createElement("option");
+                option.text = port.id;
+                option.innerHTML = port.name;
+                portNames.append(option);
+            });
+        }
+
+        function setupGoodSelect() {
+            const goodNames = $("#port-names");
+            const selectGoods = {};
+            const goods = naPortData.features.map(d => ({
+                id: d.id,
+                drops: d.properties.drops,
+                produces: d.properties.produces
+            }));
+            console.log(`goods: ${JSON.stringify(goods)}`);
+            selectGoods.forEach(function(good) {
+                let option = document.createElement("option");
+                option.text = good.id;
+                option.innerHTML = good.name;
+                goodNames.append(option);
+            });
+        }
+        setupPortSelect();
+        setupGoodSelect();
+    }
+
     function naReady(error, naMap, pbZones) {
         if (error) {
             throw error;
@@ -638,7 +681,7 @@ export default function naDisplay(serverName) {
         naSetupTeleportAreas();
         naDisplayPorts();
         naSetupPBZones();
-
+        setupSelects();
         naZoomAndPan(initialTransform);
 
         d3.select("#form").style("display", "inherit");

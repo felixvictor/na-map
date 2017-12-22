@@ -10,6 +10,13 @@ $in-colour: $primary-900;
 $out-colour: $primary-700;
 $background-colour: $primary-300;
 
+#input-toggle {
+  display: flex;
+  .item {
+    padding-right: 1em;
+  }
+}
+
 #form {
   position: absolute;
   top: 40px;
@@ -27,9 +34,6 @@ $background-colour: $primary-300;
 
 .radio-group {
   display: flex;
-  padding-top: 1em;
-  padding-bottom: 1em;
-  margin-top: -.5em;
 }
 
 .box {
