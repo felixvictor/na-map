@@ -168,7 +168,7 @@ export default function naDisplay(serverName) {
             }
 
             // https://stackoverflow.com/questions/7490660/converting-wind-direction-in-angles-to-text-words
-            function degressToCompass(degrees) {
+            function degreesToCompass(degrees) {
                 const val = Math.floor(degrees / 22.5 + 0.5);
                 const compassDirections = [
                     "N",
@@ -192,16 +192,29 @@ export default function naDisplay(serverName) {
             }
 
             const degrees = rotationAngleInDegrees(lineData[lineData.length - 1], lineData[lineData.length - 2]);
-            const compass = degressToCompass(degrees);
-            console.log(`degressToCompass: ${degrees}`);
+            const compass = degreesToCompass(degrees);
             gCompass.datum(lineData).attr("d", line);
-            gCoord
-                .append("text")
+
+            const svg = gCoord
+                .append("svg")
                 .attr("x", x)
-                .attr("y", y)
-                .attr("dx", "-.5em")
-                .attr("dy", "-.5em")
+                .attr("y", y);
+            const rect = svg.append("rect");
+            const text = svg
+                .append("text")
+                .attr("x", "50%")
+                .attr("y", "50%")
                 .text(`${compass} (${Math.round(degrees)}°)`);
+
+            const bbox = text.node().getBBox();
+            const height = bbox.height + defaultFontSize,
+                width = bbox.width + defaultFontSize;
+            rect
+                .attr("x", 0)
+                .attr("y", 0)
+                .attr("height", height)
+                .attr("width", width);
+            svg.attr("height", height).attr("width", width);
         }
 
         lineData.push([x, y]);

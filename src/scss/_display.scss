@@ -112,12 +112,17 @@ text {
   text {
     font-size: 1em;
     fill: $secondary-800;
-    text-anchor: end;
+    text-anchor: middle;
     alignment-baseline: central;
+  }
+  rect {
+    fill: $primary-100;
+    fill-opacity: .5;
   }
   path {
     stroke: $secondary-600;
     stroke-width: .3em;
+    stroke-linecap: round;
     fill: none;
   }
 }
