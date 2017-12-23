@@ -616,7 +616,7 @@ export default function naDisplay(serverName) {
         function setupPortSelect() {
             const portNames = $("#port-names");
             const selectPorts = naPortData.features
-                .map(d => ({ id: d.id, name: d.properties.name }))
+                .map(d => ({ coord: [d.geometry.coordinates[0], d.geometry.coordinates[1]], name: d.properties.name }))
                 .sort(function(a, b) {
                     if (a.name < b.name) {
                         return -1;
@@ -635,7 +635,7 @@ export default function naDisplay(serverName) {
             selectPorts.forEach(function(port) {
                 portNames.append(
                     $("<option>", {
-                        value: port.id,
+                        value: port.coord,
                         text: port.name
                     })
                 );
@@ -687,11 +687,22 @@ export default function naDisplay(serverName) {
         setupPortSelect();
         $("#port-names").change(() => {
             console.log(`port name change: ${JSON.stringify($("#port-names").val())}`);
+            zoomToPort($("#port-names").val());
         });
         setupGoodSelect();
         $("#good-names").change(() => {
             console.log(`good name change: ${JSON.stringify($("#good-names").val())}`);
         });
+    }
+
+    function zoomToPort(coord) {
+        const c = coord.split(","),
+            x = c[0],
+            y = c[1];
+        const tx = -x + naHeight / 2,
+            ty = -y + naWidth / 2;
+
+        naZoomAndPan(d3.zoomIdentity.translate(tx, ty).scale(1));
     }
 
     function naReady(error, naMap, pbZones) {
