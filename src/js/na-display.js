@@ -646,20 +646,40 @@ export default function naDisplay(serverName) {
         }
 
         function setupGoodSelect() {
-            const goodNames = $("#port-names");
-            const selectGoods = {};
-            const goods = naPortData.features.map(d => ({
-                id: d.id,
-                drops: d.properties.drops,
-                produces: d.properties.produces
-            }));
-            console.log(`goods: ${JSON.stringify(goods)}`);
-            selectGoods.forEach(function(good) {
-                let option = document.createElement("option");
-                option.text = good.id;
-                option.innerHTML = good.name;
-                goodNames.append(option);
+            const goodNames = $("#good-names");
+            let selectGoods = new Map();
+            let goodsPerPort = naPortData.features.map(d => {
+                let goods = d.properties.drops;
+                goods += d.properties.produces ? `,${d.properties.produces}` : "";
+                return {
+                    id: d.id,
+                    goods: goods
+                };
             });
+            //console.log(`goodsPerPort: ${JSON.stringify(goodsPerPort)}`);
+
+            goodsPerPort.forEach(function(port) {
+                port.goods.split(",").forEach(good => {
+                    if (good) {
+                        //console.log(`good: ${JSON.stringify(good)}`);
+                        //console.log(`port id: ${JSON.stringify(port.id)}`);
+                        const ports = new Set(selectGoods.get(good)).add(port.id);
+                        selectGoods.set(good, ports);
+                    }
+                });
+            });
+            selectGoods = new Map(Array.from(selectGoods).sort());
+            for (const [key, portIds] of selectGoods.entries()) {
+                console.log(`${key} =`);
+                let ids = "";
+                for (const id of portIds) {
+                    ids += `,${id}`;
+                }
+                let option = document.createElement("option");
+                option.text = ids;
+                option.innerHTML = key;
+                goodNames.append(option);
+            }
         }
         setupPortSelect();
         setupGoodSelect();
