@@ -12,16 +12,7 @@ import "bootstrap/js/dist/util";
 
 export default function naDisplay(serverName) {
     let naSvg, naCanvas, naContext, naDefs, naZoom;
-    let gPorts,
-        gPBZones,
-        gVoronoi,
-        gCoord,
-        gCompass,
-        naVoronoiDiagram,
-        pathVoronoi,
-        naTeleportPorts,
-        naPort,
-        naPortLabel;
+    let gPorts, gPBZones, gVoronoi, gCoord, gCompass, naVoronoiDiagram, pathVoronoi, naTeleportPorts, naPort;
     let naPortData, naPBZoneData, naFortData, naTowerData;
     const naMargin = { top: 20, right: 20, bottom: 20, left: 20 };
 
@@ -480,8 +471,6 @@ export default function naDisplay(serverName) {
             .append("text")
             .attr("dx", d => d.properties.dx)
             .attr("dy", d => d.properties.dy)
-            .attr("orig-dx", d => d.properties.dx)
-            .attr("orig-dy", d => d.properties.dy)
             .attr("text-anchor", d => {
                 if (d.properties.dx < 0) {
                     return "end";
