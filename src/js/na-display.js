@@ -637,11 +637,19 @@ export default function naDisplay(serverName) {
                     }
                     return 0;
                 });
+            portNames.append(
+                $("<option>", {
+                    value: 0,
+                    text: "Select a port"
+                })
+            );
             selectPorts.forEach(function(port) {
-                let option = document.createElement("option");
-                option.text = port.id;
-                option.innerHTML = port.name;
-                portNames.append(option);
+                portNames.append(
+                    $("<option>", {
+                        value: port.id,
+                        text: port.name
+                    })
+                );
             });
         }
 
@@ -661,28 +669,40 @@ export default function naDisplay(serverName) {
             goodsPerPort.forEach(function(port) {
                 port.goods.split(",").forEach(good => {
                     if (good) {
-                        //console.log(`good: ${JSON.stringify(good)}`);
-                        //console.log(`port id: ${JSON.stringify(port.id)}`);
                         const ports = new Set(selectGoods.get(good)).add(port.id);
                         selectGoods.set(good, ports);
                     }
                 });
             });
             selectGoods = new Map(Array.from(selectGoods).sort());
+            goodNames.append(
+                $("<option>", {
+                    value: [],
+                    text: "Select a good"
+                })
+            );
             for (const [key, portIds] of selectGoods.entries()) {
-                console.log(`${key} =`);
                 let ids = "";
                 for (const id of portIds) {
                     ids += `,${id}`;
                 }
-                let option = document.createElement("option");
-                option.text = ids;
-                option.innerHTML = key;
-                goodNames.append(option);
+                goodNames.append(
+                    $("<option>", {
+                        value: ids.substr(1),
+                        text: key
+                    })
+                );
             }
         }
+
         setupPortSelect();
+        $("#port-names").change(() => {
+            console.log(`port name change: ${JSON.stringify($("#port-names").val())}`);
+        });
         setupGoodSelect();
+        $("#good-names").change(() => {
+            console.log(`good name change: ${JSON.stringify($("#good-names").val())}`);
+        });
     }
 
     function naReady(error, naMap, pbZones) {
