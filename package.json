@@ -1,6 +1,6 @@
 {
   "name": "na-topo",
-  "version": "1.2",
+  "version": "1.2.1",
   "devDependencies": {
     "@babel/core": "7.0.0-beta.34",
     "@babel/preset-env": "7.0.0-beta.34",
@@ -57,7 +57,7 @@
     "css-lint": "stylelint --config .stylelintrc --syntax scss \"src/scss/*.scss\"",
     "deploy-change": "yarn run prod && yarn run change-ports && yarn run push && yarn run deploy-netlify",
     "deploy-update": "yarn run push && yarn run deploy-netlify",
-    "deploy-netlify": "cd public && netlify deploy",
+    "deploy-netlify": "netlify deploy --path public",
     "js-lint": "eslint -c .eslintrc.json src/js",
     "prettier": "prettier --tab-width 4 --print-width 120 --write .eslintrc.json package.json *.js src/js/*.json src/scss/*.scss",
     "prod": "yarn run clean && NODE_ENV=${NODE_ENV:=prod} webpack --colors --config webpack.config.js",

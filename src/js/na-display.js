@@ -500,7 +500,7 @@ export default function naDisplay(serverName) {
             .append("path")
             .datum(naTowerData)
             .attr("class", "tower")
-            .attr("d", d3.geoPath().pointRadius(2));
+            .attr("d", d3.geoPath().pointRadius(1.5));
 
         gPBZones
             .append("path")
