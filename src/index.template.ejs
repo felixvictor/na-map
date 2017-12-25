@@ -31,7 +31,8 @@
                 <p>Designed by iB aka Felix Victor.</p>
             </div>
             <footer class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal" data-server="eu1">Caribbean</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" data-server="eu1">Caribbean
+                </button>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal" data-server="eu2">PvE only</button>
             </footer>
         </div>
@@ -44,22 +45,6 @@
 <div id="form">
     <form>
         <div class="form-row">
-            <div class="radio-group">
-                <div class="col-auto align-self-center">
-                    <span class="radio-group-label">F11 coordinates</span>
-                </div>
-            </div>
-            <div class="col-auto">
-                <input type="number" step="0.1" min="-816000" max="830000" class="form-control" id="x-coord"
-                       placeholder="X" required>
-            </div>
-            <div class="col-auto">
-                <input type="number" step="0.1" min="-430000" max="830000" class="form-control" id="z-coord"
-                       placeholder="Z" required>
-            </div>
-            <div class="col-auto">
-                <button type="submit" class="btn btn-primary">Move to</button>
-            </div>
             <div class="col-auto">
                 <button id="reset" type="reset" class="btn btn-secondary">Clear</button>
             </div>
@@ -80,6 +65,64 @@
                 </div>
             </div>
         </div>
+    <div id="input-toggle" data-children=".item">
+        <div class="item">
+            <button class="btn btn-primary" type="button" data-toggle="collapse" data-parent="#input-toggle"
+                    href="#F11coord" aria-expanded="false" aria-controls="F11coord">
+                Move to F11 coordinates
+            </button>
+            <div id="F11coord" class="collapse" role="tabpanel">
+                <form>
+                    <div class="form-row">
+                        <div>
+                            <div class="radio-group">
+                                <div class="col-auto align-self-center">
+                                    <span class="radio-group-label">F11 coordinates</span>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <input type="number" step="0.1" min="-816000" max="830000" class="form-control"
+                                       id="x-coord" placeholder="X" required>
+                            </div>
+                            <div class="col-auto">
+                                <input type="number" step="0.1" min="-430000" max="830000" class="form-control"
+                                       id="z-coord" placeholder="Z" required>
+                            </div>
+                            <div class="col-auto">
+                                <button type="submit" class="btn btn-primary">Move to</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="item">
+            <button class="btn btn-primary" type="button" data-toggle="collapse" data-parent="#input-toggle"
+                    href="#port" aria-expanded="false" aria-controls="port">
+                Move to port
+            </button>
+            <div id="port" class="collapse" role="tabpanel">
+                <div class="form-group">
+                    <label for="port-names"></label>
+                    <select class="custom-select" name="port-names" id="port-names">
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="item">
+            <button class="btn btn-primary" type="button" data-toggle="collapse" data-parent="#input-toggle"
+                    href="#goods" aria-expanded="false" aria-controls="goods">
+                Show goods
+            </button>
+            <div id="goods" class="collapse" role="tabpanel">
+                <div class="form-group">
+                    <label for="good-names"></label>
+                    <select class="custom-select" name="good-names" id="good-names">
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
     </form>
 </div>
 
