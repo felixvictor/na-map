@@ -154,7 +154,7 @@ let config = {
             Popper: ["popper.js", "default"],
             //Alert: "exports-loader?Alert!bootstrap/js/dist/alert",
             //Button: "exports-loader?Button!bootstrap/js/dist/button",
-            //Collapse: "exports-loader?Collapse!bootstrap/js/dist/collapse",
+            Collapse: "exports-loader?Collapse!bootstrap/js/dist/collapse",
             //Dropdown: "exports-loader?Dropdown!bootstrap/js/dist/dropdown",
             Modal: "exports-loader?Modal!bootstrap/js/dist/modal",
             //Popover: "exports-loader?Popover!bootstrap/js/dist/popover",
