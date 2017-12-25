@@ -324,7 +324,6 @@ export default function naDisplay(serverName) {
     }
 
     function naSetupMap(scale) {
-        console.log(`naSetupMap scale: ${scale}`);
         if (PBZoneZoomScale < scale) {
             if (!bPBZoneDisplayed) {
                 naTogglePBZones();
