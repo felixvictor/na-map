@@ -469,7 +469,6 @@ export default function naDisplay(serverName) {
             .enter()
             .append("g")
             .attr("class", "port")
-            .text("enter")
             .attr("transform", d => `translate(${d.geometry.coordinates[0]},${d.geometry.coordinates[1]})`);
         nodeGroupsEnter.append("circle");
         nodeGroupsEnter.append("text");
@@ -480,7 +479,6 @@ export default function naDisplay(serverName) {
             .merge(nodeGroupsEnter)
             .select("circle")
             .attr("id", d => {
-                //console.log(`d: ${JSON.stringify(d)}`);
                 return `c${d.id}`;
             })
             .attr("r", currentCircleSize)
@@ -515,10 +513,7 @@ export default function naDisplay(serverName) {
                 .text("");
         }
         // Remove old
-        gPorts
-            .exit()
-            .text("remove")
-            .remove();
+        gPorts.exit().remove();
     }
 
     function naSetupPBZones() {
