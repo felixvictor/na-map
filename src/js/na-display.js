@@ -603,18 +603,12 @@ export default function naDisplay(serverName) {
         mainGVoronoi.selectAll("path").attr("class", function() {
             return d3.select(this).attr("id") === `v${highlightId}` ? "highlight-voronoi" : "";
         });
-        mainGPort
-            .selectAll("circle")
-            .transition()
-            .duration(highlightDuration)
-            .attr("r", d => {
-                return d.id === highlightId ? currentCircleSize * 3 : currentCircleSize;
-            });
+        mainGPort.selectAll("circle").attr("r", d => {
+            return d.id === highlightId ? currentCircleSize * 3 : currentCircleSize;
+        });
         if (bPortLabelDisplayed) {
             mainGPort
                 .selectAll("text")
-                .transition()
-                .duration(highlightDuration)
                 .attr("dx", d => {
                     return d.id === highlightId ? d.properties.dx * 3 : d.properties.dx;
                 })
