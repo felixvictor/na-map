@@ -50,7 +50,7 @@ export default function naDisplay(serverName) {
     const PBZoneZoomScale = 1.5,
         labelZoomScale = 0.5;
     let bPBZoneDisplayed = false,
-        bLabelRemoved = false;
+        bPortLabelDisplayed = true;
     const defaultFontSize = 16;
     let currentFontSize = defaultFontSize;
     const defaultCircleSize = 10;
@@ -324,6 +324,7 @@ export default function naDisplay(serverName) {
     }
 
     function naSetupMap(scale) {
+        console.log(`naSetupMap scale: ${scale}`);
         if (PBZoneZoomScale < scale) {
             if (!bPBZoneDisplayed) {
                 naTogglePBZones();
@@ -340,12 +341,12 @@ export default function naDisplay(serverName) {
         }
 
         if (labelZoomScale > scale) {
-            if (!bLabelRemoved) {
-                bLabelRemoved = true;
+            if (bPortLabelDisplayed) {
+                bPortLabelDisplayed = false;
             }
         } else {
-            if (bLabelRemoved) {
-                bLabelRemoved = false;
+            if (!bPortLabelDisplayed) {
+                bPortLabelDisplayed = true;
             }
         }
         updatePorts();
@@ -367,7 +368,7 @@ export default function naDisplay(serverName) {
         mainGPort.selectAll("circle").attr("r", currentCircleSize);
         mainGPort.selectAll("text").attr("dx", d => d.properties.dx / transform.k);
         mainGPort.selectAll("text").attr("dy", d => d.properties.dy / transform.k);
-        if (!bLabelRemoved) {
+        if (bPortLabelDisplayed) {
             currentFontSize = defaultFontSize / transform.k;
             mainGPort.selectAll("text").style("font-size", currentFontSize);
             if (highlightId && !bPBZoneDisplayed) {
@@ -487,7 +488,7 @@ export default function naDisplay(serverName) {
             .attr("fill", d => `url(#${d.properties.nation})`)
             .on("mouseover", portMouseover);
         // Add labels
-        if (!bLabelRemoved) {
+        if (bPortLabelDisplayed) {
             gPorts
                 .merge(nodeGroupsEnter)
                 .select("text")
@@ -508,6 +509,11 @@ export default function naDisplay(serverName) {
                     }
                     return f;
                 });
+        } else {
+            gPorts
+                .merge(nodeGroupsEnter)
+                .select("text")
+                .text("");
         }
         // Remove old
         gPorts
@@ -604,7 +610,7 @@ export default function naDisplay(serverName) {
             .attr("r", d => {
                 return d.id === highlightId ? currentCircleSize * 3 : currentCircleSize;
             });
-        if (!bLabelRemoved) {
+        if (bPortLabelDisplayed) {
             mainGPort
                 .selectAll("text")
                 .transition()
@@ -686,7 +692,6 @@ export default function naDisplay(serverName) {
                     goods: goods
                 };
             });
-            //console.log(`goodsPerPort: ${JSON.stringify(goodsPerPort)}`);
 
             goodsPerPort.forEach(function(port) {
                 port.goods.split(",").forEach(good => {
@@ -719,12 +724,10 @@ export default function naDisplay(serverName) {
 
         setupPortSelect();
         $("#port-names").change(() => {
-            console.log(`port name change: ${JSON.stringify($("#port-names").val())}`);
             zoomToPort($("#port-names").val());
         });
         setupGoodSelect();
         $("#good-names").change(() => {
-            console.log(`good name change: ${JSON.stringify($("#good-names").val())}`);
             const portIds = $("#good-names")
                 .val()
                 .split(",");
