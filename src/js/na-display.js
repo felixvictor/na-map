@@ -698,7 +698,7 @@ export default function naDisplay(serverName) {
             selectGoods = new Map(Array.from(selectGoods).sort());
             goodNames.append(
                 $("<option>", {
-                    value: [],
+                    value: 0,
                     text: "Select a good"
                 })
             );
@@ -725,7 +725,11 @@ export default function naDisplay(serverName) {
             const portIds = $("#good-names")
                 .val()
                 .split(",");
-            currentPortData = naPortData.filter(d => portIds.includes(d.id));
+            if (portIds.includes("0")) {
+                currentPortData = naPortData;
+            } else {
+                currentPortData = naPortData.filter(d => portIds.includes(d.id));
+            }
             updatePorts();
         });
     }
