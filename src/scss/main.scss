@@ -33,7 +33,7 @@ html {
 //////////////////////////////////////////
 // opentype
 
-$opentype-features: "liga", "kern", "dlig", "onum", "calt";
+$opentype-features: "liga", "kern", "onum";
 $opentype-features-tnum: "liga", "kern", "dlig", "tnum", "onum" off, "calt";
 
 body,
