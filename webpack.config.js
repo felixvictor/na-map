@@ -162,7 +162,6 @@ let config = {
             Util: "exports-loader?Util!bootstrap/js/dist/util"
         }),
         new CopyPlugin([
-            { from: ".netlify", to: ".netlify", toType: "file" },
             { from: "google979f2cf3bed204d6.html", to: "google979f2cf3bed204d6.html", toType: "file" },
             { from: "*.json" }
         ]),
