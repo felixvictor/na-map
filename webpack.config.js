@@ -33,7 +33,7 @@ const cssOpt = {
 
 const minifyOpt = {
     collapseBooleanAttributes: true,
-    collapseWhitespace: true,
+    collapseWhitespace: false,
     collapseInlineTagWhitespace: true,
     decodeEntities: true,
     html5: true,
