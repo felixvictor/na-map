@@ -19,15 +19,9 @@
             </header>
 
             <div class="modal-body">
-                <ul>
-                    <li>Teleport areas: indicates the area where you can teleport to this port (deep-water port and not
-                        a county capital)
-                    </li>
-                    <li>Port data</li>
-                    <li>Port battle zones (shown when zoomed in)</li>
-                    <li>Double click on map to display F11 coordinates</li>
-                    <li>Enter F11 coordinates to show position on map</li>
-                </ul>
+                <p>Yet another map which uses the in-game map and live data (daily updated soonish after maintenance).
+                    Please check the <a href="http://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/">
+                        Game-Labs forum post</a> for further details. Feedback is very welcome.</p>
                 <p>Designed by iB aka Felix Victor.</p>
             </div>
             <footer class="modal-footer">
@@ -65,64 +59,64 @@
                 </div>
             </div>
         </div>
-    <div id="input-toggle" data-children=".item">
-        <div class="item">
-            <button class="btn btn-primary" type="button" data-toggle="collapse" data-parent="#input-toggle"
-                    href="#F11coord" aria-expanded="false" aria-controls="F11coord">
-                Move to F11 coordinates
-            </button>
-            <div id="F11coord" class="collapse" role="tabpanel">
-                <form>
-                    <div class="form-row">
-                        <div>
-                            <div class="radio-group">
-                                <div class="col-auto align-self-center">
-                                    <span class="radio-group-label">F11 coordinates</span>
+        <div id="input-toggle" data-children=".item">
+            <div class="item">
+                <button class="btn btn-primary" type="button" data-toggle="collapse" data-parent="#input-toggle"
+                        href="#F11coord" aria-expanded="false" aria-controls="F11coord">
+                    Move to F11 coordinates
+                </button>
+                <div id="F11coord" class="collapse" role="tabpanel">
+                    <form>
+                        <div class="form-row">
+                            <div class="box p-2">
+                                <div class="radio-group">
+                                    <div class="col-auto align-self-center">
+                                        <span class="radio-group-label">F11 coordinates</span>
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <input type="number" step="0.1" min="-816000" max="830000" class="form-control"
+                                           id="x-coord" placeholder="X" required>
+                                </div>
+                                <div class="col-auto">
+                                    <input type="number" step="0.1" min="-430000" max="830000" class="form-control"
+                                           id="z-coord" placeholder="Z" required>
+                                </div>
+                                <div class="col-auto">
+                                    <button type="submit" class="btn btn-primary">Move to</button>
                                 </div>
                             </div>
-                            <div class="col-auto">
-                                <input type="number" step="0.1" min="-816000" max="830000" class="form-control"
-                                       id="x-coord" placeholder="X" required>
-                            </div>
-                            <div class="col-auto">
-                                <input type="number" step="0.1" min="-430000" max="830000" class="form-control"
-                                       id="z-coord" placeholder="Z" required>
-                            </div>
-                            <div class="col-auto">
-                                <button type="submit" class="btn btn-primary">Move to</button>
-                            </div>
                         </div>
+                    </form>
+                </div>
+            </div>
+            <div class="item">
+                <button class="btn btn-primary" type="button" data-toggle="collapse" data-parent="#input-toggle"
+                        href="#port" aria-expanded="false" aria-controls="port">
+                    Move to port
+                </button>
+                <div id="port" class="collapse" role="tabpanel">
+                    <div class="form-group">
+                        <label for="port-names"></label>
+                        <select class="custom-select" name="port-names" id="port-names">
+                        </select>
                     </div>
-                </form>
+                </div>
             </div>
-        </div>
-        <div class="item">
-            <button class="btn btn-primary" type="button" data-toggle="collapse" data-parent="#input-toggle"
-                    href="#port" aria-expanded="false" aria-controls="port">
-                Move to port
-            </button>
-            <div id="port" class="collapse" role="tabpanel">
-                <div class="form-group">
-                    <label for="port-names"></label>
-                    <select class="custom-select" name="port-names" id="port-names">
-                    </select>
+            <div class="item">
+                <button class="btn btn-primary" type="button" data-toggle="collapse" data-parent="#input-toggle"
+                        href="#goods" aria-expanded="false" aria-controls="goods">
+                    Show goods
+                </button>
+                <div id="goods" class="collapse" role="tabpanel">
+                    <div class="form-group">
+                        <label for="good-names"></label>
+                        <select class="custom-select" name="good-names" id="good-names">
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="item">
-            <button class="btn btn-primary" type="button" data-toggle="collapse" data-parent="#input-toggle"
-                    href="#goods" aria-expanded="false" aria-controls="goods">
-                Show goods
-            </button>
-            <div id="goods" class="collapse" role="tabpanel">
-                <div class="form-group">
-                    <label for="good-names"></label>
-                    <select class="custom-select" name="good-names" id="good-names">
-                    </select>
-                </div>
-            </div>
-        </div>
-    </div>
     </form>
 </div>
 
