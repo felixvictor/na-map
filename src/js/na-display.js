@@ -396,7 +396,9 @@ export default function naDisplay(serverName) {
     function updatePorts() {
         function naTooltipData(d) {
             let h = `<table><tbody<tr><td><i class='flag-icon ${d.nation}'></i></td>`;
-            h += `<td class='port-name'>${d.name}</td></tr></tbody></table>`;
+            h += `<td><span class='port-name'>${d.name}</span>`;
+            h += d.availableForAll ? " (accessible to all nations)" : "";
+            h += "</td></tr></tbody></table>";
             h += `<p>${d.shallow ? "Shallow" : "Deep"}`;
             h += " water port";
             if (d.countyCapital) {
