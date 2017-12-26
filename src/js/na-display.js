@@ -273,11 +273,11 @@ export default function naDisplay(serverName) {
         naZoomAndPan(d3.zoomIdentity.translate(tx, ty).scale(1));
     }
 
-    const formatCoord = x => {
-        const thousandsWithBlanks = x => {
-            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u2009");
-        };
+    const thousandsWithBlanks = x => {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u2009");
+    };
 
+    const formatCoord = x => {
         let r = thousandsWithBlanks(Math.abs(Math.trunc(x)));
         if (x < 0) {
             r = `\u2212\u2009${r}`;
@@ -396,36 +396,42 @@ export default function naDisplay(serverName) {
     function updatePorts() {
         function naTooltipData(d) {
             let h = `<table><tbody<tr><td><i class='flag-icon ${d.nation}'></i></td>`;
-            h += `<td class='port-name'>${d.name}</td></tr></tbody></table>`;
+            h += `<td><span class='port-name'>${d.name}</span>`;
+            h += d.availableForAll ? " (accessible to all nations)" : "";
+            h += "</td></tr></tbody></table>";
             h += `<p>${d.shallow ? "Shallow" : "Deep"}`;
             h += " water port";
             if (d.countyCapital) {
                 h += ", county capital";
             }
             if (d.capturer) {
-                h += `, owned by ${d.capturer}`;
+                h += ` owned by ${d.capturer}`;
             }
             h += "<br>";
             if (!d.nonCapturable) {
-                h += `Port battle: ${d.brLimit} BR limit, `;
+                const pbTimeRange = !d.portBattleStartTime
+                    ? "11.00\u2009–\u20098.00"
+                    : `${(d.portBattleStartTime + 10) % 24}.00\u2009–\u2009${(d.portBattleStartTime + 13) % 24}.00`;
+                h += `Port battle: ${pbTimeRange}, ${thousandsWithBlanks(d.brLimit)} BR, `;
                 switch (d.portBattleType) {
                     case "Large":
-                        h += "1st";
+                        h += "1<sup>st</sup>";
                         break;
                     case "Medium":
-                        h += "4th";
+                        h += "4<sup>th</sup>";
                         break;
                     case "Small":
-                        h += "6th";
+                        h += "6<sup>th</sup>";
                         break;
                 }
-                h += " rate AI ships";
+
+                h += " rate AI";
                 h += `, ${d.conquestMarksPension} conquest point`;
                 h += d.conquestMarksPension > 1 ? "s" : "";
             } else {
                 h += "Not capturable";
             }
-            h += `<br>${d.portTax * 100}% port tax`;
+            h += `<br>${d.portTax * 100}\u2009% port tax`;
             h += d.tradingCompany ? `, trading company level ${d.tradingCompany}` : "";
             h += d.laborHoursDiscount ? ", labor hours discount" : "";
             h += "</p>";
