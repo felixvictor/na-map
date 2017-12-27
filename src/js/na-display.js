@@ -782,9 +782,250 @@ export default function naDisplay(serverName) {
         });
     }
 
+    naSetupSvg();
+    /*
+    const profileData = [
+        {
+            id: 1,
+            name: "Cerberus",
+            maxSpeed: 13.51336736,
+            minSpeed: -5.045659745,
+            speedDegrees: [
+                -5.045659745,
+                -0.833999419,
+                1.838961022,
+                6.599438361,
+                8.596795061,
+                10.06530579,
+                11.44757313,
+                12.53398738,
+                13.29694155,
+                13.51336736,
+                13.20285597,
+                12.81767647,
+                12.81767647,
+                13.20285597,
+                13.51336736,
+                13.29694155,
+                12.53398738,
+                11.44757313,
+                10.06530579,
+                8.596795061,
+                6.599438361,
+                1.838961022,
+                -0.833999419,
+                -5.045659745
+            ]
+        }
+    ];
+*/
+    d3.json("ships.json", function(profileData) {
+        function drawProfile(profileData, i) {
+            let width = 350,
+                height = 350,
+                svgPerRow = 11,
+                outerRadius = Math.min(width, height) / 2,
+                innerRadius = 0.3 * outerRadius;
+
+            const colorScale = d3
+                .scaleLinear()
+                .domain([profileData.minSpeed, 0, profileData.maxSpeed])
+                .range(["#a62e39", "#fbf8f5", "#2a6838"]);
+
+            let pie = d3
+                .pie()
+                .sort(null)
+                .value(24);
+            const arcs = pie(profileData.speedDegrees);
+
+            const radiusScaleRelative = d3
+                .scaleLinear()
+                .domain([profileData.minSpeed, 0, profileData.maxSpeed])
+                .range([10, innerRadius, outerRadius]);
+
+            const radiusScaleAbsolute = d3
+                .scaleLinear()
+                .domain([minSpeed, 0, maxSpeed])
+                .range([10, innerRadius, outerRadius]);
+
+            let speedArc = d3
+                .arc()
+                .innerRadius(innerRadius)
+                .outerRadius(d => {
+                    //return radiusScaleRelative(d.data);
+                    return radiusScaleAbsolute(d.data);
+                });
+
+            let outlineArc = d3
+                .arc()
+                .innerRadius(innerRadius)
+                .outerRadius(outerRadius);
+
+            let svg = naSvg
+                .append("svg")
+                //.attr("width", width)
+                //.attr("height", height)
+                .attr("class", "profile")
+                .append("g")
+                .attr(
+                    "transform",
+                    `translate(${width / 2 + width * (i % svgPerRow)}, ${height / 2 +
+                        height * Math.trunc(i / svgPerRow)})`
+                );
+
+            let path = svg
+                .selectAll(".solidArc")
+                .data(arcs)
+                .enter()
+                .append("path")
+                .attr("fill", function(d) {
+                    return colorScale(d.data);
+                })
+                .attr("class", "solidArc")
+                .attr("d", speedArc);
+
+            let outerPath = svg
+                .selectAll(".outlineArc")
+                .data(arcs)
+                .enter()
+                .append("path")
+                .attr("class", "outlineArc")
+                .attr("d", outlineArc);
+            /*
+            let label = svg
+                .selectAll("text")
+                .data(arcs)
+                .enter()
+                .append("text")
+                .each(function(d, i) {
+                    const c = outlineArc.centroid(d);
+                    d3
+                        .select(this)
+                        .attr("x", c[0])
+                        .attr("y", c[1])
+                        .attr("dy", "0.33em")
+                        .text(((i + 1) * 15) % 360);
+                });
+*/
+            svg
+                .append("text")
+                .attr("class", "aster-score")
+                .text(profileData.name);
+        }
+
+        //console.log(`profileData: ${JSON.stringify(profileData.shipdata)}`);
+
+        const minSpeed = d3.min(profileData.shipData, d => d.minSpeed);
+        const maxSpeed = d3.max(profileData.shipData, d => d.maxSpeed);
+        console.log(`minSpeed: ${minSpeed}`);
+        console.log(`maxSpeed: ${maxSpeed}`);
+        profileData.shipData.sort(function(a, b) {
+            if (a.class < b.class) {
+                return -1;
+            }
+            if (a.class > b.class) {
+                return 1;
+            }
+            if (a.name < b.name) {
+                return -1;
+            }
+            if (a.name > b.name) {
+                return 1;
+            }
+            return 0;
+        });
+
+        profileData.shipData.forEach((d, i) => {
+            drawProfile(d, i);
+        });
+    });
+
+    /*
     d3
         .queue()
         .defer(d3.json, naMapJson)
         .defer(d3.json, pbJson)
         .await(naReady);
+        */
 }
+
+/*
+
+        let width = 500,
+            height = 500,
+            radius = Math.min(width, height) / 2,
+            innerRadius = 0.3 * radius;
+
+        let pie = d3
+            .pie()
+            .sort(null)
+            .value(function(d) {
+                return d.width;
+            });
+
+        let arc = d3
+            .arc()
+            .innerRadius(innerRadius)
+            .outerRadius(function(d) {
+                return (radius - innerRadius) * (d.data.score / 100.0) + innerRadius;
+            });
+
+        let outlineArc = d3
+            .arc()
+            .innerRadius(innerRadius)
+            .outerRadius(radius);
+
+        let svg = naSvg
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .append("g")
+            .attr("transform", `translate(${width / 2},${height / 2})`);
+
+        d3.csv("aster_data.csv", function(error, data) {
+            data.forEach(function(d) {
+                d.order = +d.order;
+                d.weight = +d.weight;
+                d.score = +d.score;
+                d.width = +d.weight;
+            });
+            let path = svg
+                .selectAll(".solidArc")
+                .data(pie(data))
+                .enter()
+                .append("path")
+                .attr("fill", function(d) {
+                    return d.data.color;
+                })
+                .attr("class", "solidArc")
+                .attr("stroke", "gray")
+                .attr("d", arc);
+            let outerPath = svg
+                .selectAll(".outlineArc")
+                .data(pie(data))
+                .enter()
+                .append("path")
+                .attr("fill", "none")
+                .attr("stroke", "gray")
+                .attr("class", "outlineArc")
+                .attr("d", outlineArc);
+
+            // calculate the weighted mean score
+            let score =
+                data.reduce(function(a, b) {
+                    //console.log('a:' + a + ', b.score: ' + b.score + ', b.weight: ' + b.weight);
+                    return a + b.score * b.weight;
+                }, 0) /
+                data.reduce(function(a, b) {
+                    return a + b.weight;
+                }, 0);
+
+            svg
+                .append("svg:text")
+                .attr("class", "aster-score")
+                .attr("dy", ".35em")
+                .attr("text-anchor", "middle") // text-align: right
+                .text(Math.round(score));
+        });
+
+ */
