@@ -22,8 +22,9 @@ function main() {
             naDisplay(serverName); // invoke the callback with result
         });
     window.onload = function() {
-        $("#modal").modal("show");
+        //$("#modal").modal("show");
     };
+    naDisplay();
 }
 
 main();
