@@ -22,7 +22,7 @@ $background-colour: $primary-300;
   //font-size: 500%;
   //font-weight: 500;
   line-height: 1em;
-  text-anchor:middle;
+  text-anchor: middle;
   alignment-baseline: central;
 }
 
@@ -33,11 +33,10 @@ $background-colour: $primary-300;
 
 .profile {
   text {
-    fill: $primary-800;
+    fill: $green;
     text-anchor: middle;
   }
 }
-
 
 #input-toggle {
   display: flex;

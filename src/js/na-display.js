@@ -829,8 +829,8 @@ export default function naDisplay(serverName) {
 
             const colorScale = d3
                 .scaleLinear()
-                .domain([profileData.minSpeed, 0, profileData.maxSpeed])
-                .range(["#a62e39", "#fbf8f5", "#2a6838"]);
+                .domain([profileData.minSpeed, 0, 10, 12, profileData.maxSpeed])
+                .range(["#a62e39", "#fbf8f5", "#6cc380", "#419f57", "#2a6838"]);
 
             let pie = d3
                 .pie()
