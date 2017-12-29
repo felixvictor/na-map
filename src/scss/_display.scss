@@ -10,6 +10,15 @@ $in-colour: $primary-900;
 $out-colour: $primary-700;
 $background-colour: $primary-300;
 
+.knots-circle {
+  fill: none;
+  stroke: $primary-400;
+}
+
+.knots-text {
+  fill: $primary-400 !important;
+}
+
 .solidArc:hover {
   fill: orangered;
 }
@@ -32,6 +41,7 @@ $background-colour: $primary-300;
 }
 
 .profile {
+  //fill: none;
   text {
     fill: $primary-900;
     text-anchor: middle;
