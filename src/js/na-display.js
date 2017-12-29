@@ -830,12 +830,13 @@ export default function naDisplay(serverName) {
             const colorScale = d3
                 .scaleLinear()
                 .domain([profileData.minSpeed, 0, 10, 12, profileData.maxSpeed])
-                .range(["#a62e39", "#fbf8f5", "#6cc380", "#419f57", "#2a6838"]);
+                .range(["#a62e39", "#fbf8f5", "#6cc380", "#419f57", "#2a6838"])
+                .interpolate(d3.interpolateHcl);
 
             let pie = d3
                 .pie()
                 .sort(null)
-                .value(24);
+                .value(1);
             const arcs = pie(profileData.speedDegrees);
 
             const radiusScaleRelative = d3
@@ -848,35 +849,10 @@ export default function naDisplay(serverName) {
                 .domain([minSpeed, 0, maxSpeed])
                 .range([10, innerRadius, outerRadius]);
 
-            let speedArc = d3
-                .arc()
-                .innerRadius(innerRadius)
-                .outerRadius(d => {
-                    //return radiusScaleRelative(d.data);
-                    return radiusScaleAbsolute(d.data);
-                });
-
-            let outlineArc = d3
-                .arc()
-                .innerRadius(innerRadius)
-                .outerRadius(outerRadius);
-
-            const xScale = d3.scaleLinear().range([0, 2 * Math.PI]),
-                yScale = d3.scaleSqrt().range([0, outerRadius]);
-            let line = d3
-                .line()
-                .x(d => {
-                    console.log(`d: ${JSON.stringify(d)}`);
-                    return xScale(radiusScaleAbsolute(d.data));
-                })
-                .y((d, i) => i * 10)
-                .curve(d3.curveCatmullRom.alpha(0.5));
-
             let svg = naSvg
                 .append("svg")
-                //.attr("width", width)
-                //.attr("height", height)
                 .attr("class", "profile")
+                .attr("fill", "url(#legend-weather)")
                 .append("g")
                 .attr(
                     "transform",
@@ -884,60 +860,113 @@ export default function naDisplay(serverName) {
                         height * Math.trunc(i / svgPerRow)})`
                 );
 
-            let innerpath = svg
-                .selectAll(".solidArc")
-                .data(arcs)
-                .enter()
-                .append("path")
-                .attr("fill", d => colorScale(d.data))
-                .attr("class", "solidArc")
-                .attr("d", speedArc);
+            //Extra scale since the color scale is interpolated
+            const tempScale = d3
+                .scaleLinear()
+                .domain([minSpeed, maxSpeed])
+                .range([0, width]);
 
-            let outerPath = svg
-                .selectAll(".outlineArc")
-                .data(arcs)
-                .enter()
-                .append("path")
-                .attr("class", "outlineArc")
-                .attr("d", outlineArc);
+            //Calculate the variables for the temp gradient
+            const numStops = 30;
+            let tempRange = tempScale.domain();
+            tempRange[2] = tempRange[1] - tempRange[0];
+            let tempPoint = [];
+            for (let i = 0; i < numStops; i++) {
+                tempPoint.push(i * tempRange[2] / (numStops - 1) + tempRange[0]);
+            } //for i
 
-            let label = svg
-                .selectAll("text")
-                .data(arcs)
+            //Create the gradient
+            svg
+                .append("defs")
+                .append("radialGradient")
+                .attr("id", "legend-weather")
+                .attr("cx", 0.5)
+                .attr("cy", 0.25)
+                .attr("r", 0.5)
+                .selectAll("stop")
+                .data(d3.range(numStops))
                 .enter()
-                .append("text")
-                .each(function(d, i) {
-                    const c = outlineArc.centroid(d);
-                    d3
-                        .select(this)
-                        .attr("x", c[0])
-                        .attr("y", c[1])
-                        .attr("dy", "0.33em")
-                        //.text(((i + 1) * 15) % 360);
-                        .text(Math.round(d.data * 10) / 10);
+                .append("stop")
+                .attr("offset", function(d, i) {
+                    return tempScale(tempPoint[i]) / width;
+                })
+                .attr("stop-color", function(d, i) {
+                    return colorScale(tempPoint[i]);
                 });
 
-            svg
-                .append("path")
-                .data(arcs)
-                .attr("class", "line")
-                .style("stroke", d => colorScale(d.data))
-                .attr("id", `tag${i}`) // assign ID
-                .attr("d", line);
+            // Arc for text
+            let knotsArc = d3
+                .arc()
+                .outerRadius(d => radiusScaleAbsolute(d) + 2)
+                .innerRadius(d => radiusScaleAbsolute(d) + 1)
+                .startAngle(-Math.PI / 2)
+                .endAngle(Math.PI / 2);
 
-            // Add the scatterplot
-            svg
-                .selectAll("dot")
-                .data(arcs)
+            // Tick/Grid data
+            const ticks = [12, 8, 4, 0];
+            const tickLabels = ["12 knots", "8 knots", "4 knots", "0 knots"];
+
+            //Add the circles for each tick
+            let grid = svg
+                .selectAll(".circle")
+                .data(ticks)
                 .enter()
                 .append("circle")
-                .attr("r", 4)
-                .attr("cx", function(d) {
-                    return d.data;
-                })
-                .attr("cy", function(d) {
-                    return d.data;
-                });
+                .attr("class", "knots-circle")
+                .attr("r", d => radiusScaleAbsolute(d))
+                .attr("id", (d, i) => `tick${i}`);
+
+            //Add the paths for the text
+            svg
+                .selectAll(".label")
+                .data(ticks)
+                .enter()
+                .append("path")
+                .attr("d", knotsArc)
+                .attr("id", (d, i) => `tic${i}`);
+
+            //And add the text
+            svg
+                .selectAll(".label")
+                .data(ticks)
+                .enter()
+                .append("text")
+                .attr("class", "knots-text")
+                .append("textPath")
+                .attr("xlink:href", (d, i) => `#tic${i}`)
+                .text((d, i) => tickLabels[i])
+                .attr("startOffset", "16%");
+
+            const numSegments = 25,
+                segmentRadians = 2 * Math.PI / numSegments;
+            let curve = d3.curveCatmullRomClosed,
+                line = d3
+                    .radialLine()
+                    .angle((d, i) => i * segmentRadians)
+                    .radius(d => radiusScaleAbsolute(d.data))
+                    .curve(curve);
+            let path = svg.append("path");
+            let markers = svg.append("g").attr("class", "markers");
+            path
+                .attr("d", line(arcs))
+                .attr("fill", "#fff")
+                .style("opacity", 0.8)
+                .attr("stroke-width", "5px")
+                .attr("stroke", "url(#legend-weather)");
+
+            let sel = markers.selectAll("circle").data(arcs);
+            sel
+                .enter()
+                .append("circle")
+                .merge(sel)
+                .attr("r", "5")
+                .attr("cy", (d, i) => Math.cos(i * segmentRadians) * -radiusScaleAbsolute(d.data))
+                .attr("cx", (d, i) => Math.sin(i * segmentRadians) * radiusScaleAbsolute(d.data))
+                .attr("fill", d => colorScale(d.data))
+                .style("opacity", 0.5)
+                .append("title")
+                .text(d => `${Math.round(d.data * 10) / 10} knots`);
+
             svg
                 .append("text")
                 .attr("class", "aster-score")
