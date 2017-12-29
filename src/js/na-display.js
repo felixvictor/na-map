@@ -861,6 +861,17 @@ export default function naDisplay(serverName) {
                 .innerRadius(innerRadius)
                 .outerRadius(outerRadius);
 
+            const xScale = d3.scaleLinear().range([0, 2 * Math.PI]),
+                yScale = d3.scaleSqrt().range([0, outerRadius]);
+            let line = d3
+                .line()
+                .x(d => {
+                    console.log(`d: ${JSON.stringify(d)}`);
+                    return xScale(radiusScaleAbsolute(d.data));
+                })
+                .y((d, i) => i * 10)
+                .curve(d3.curveCatmullRom.alpha(0.5));
+
             let svg = naSvg
                 .append("svg")
                 //.attr("width", width)
@@ -873,14 +884,12 @@ export default function naDisplay(serverName) {
                         height * Math.trunc(i / svgPerRow)})`
                 );
 
-            let path = svg
+            let innerpath = svg
                 .selectAll(".solidArc")
                 .data(arcs)
                 .enter()
                 .append("path")
-                .attr("fill", function(d) {
-                    return colorScale(d.data);
-                })
+                .attr("fill", d => colorScale(d.data))
                 .attr("class", "solidArc")
                 .attr("d", speedArc);
 
@@ -891,7 +900,7 @@ export default function naDisplay(serverName) {
                 .append("path")
                 .attr("class", "outlineArc")
                 .attr("d", outlineArc);
-            /*
+
             let label = svg
                 .selectAll("text")
                 .data(arcs)
@@ -904,9 +913,31 @@ export default function naDisplay(serverName) {
                         .attr("x", c[0])
                         .attr("y", c[1])
                         .attr("dy", "0.33em")
-                        .text(((i + 1) * 15) % 360);
+                        //.text(((i + 1) * 15) % 360);
+                        .text(Math.round(d.data * 10) / 10);
                 });
-*/
+
+            svg
+                .append("path")
+                .data(arcs)
+                .attr("class", "line")
+                .style("stroke", d => colorScale(d.data))
+                .attr("id", `tag${i}`) // assign ID
+                .attr("d", line);
+
+            // Add the scatterplot
+            svg
+                .selectAll("dot")
+                .data(arcs)
+                .enter()
+                .append("circle")
+                .attr("r", 4)
+                .attr("cx", function(d) {
+                    return d.data;
+                })
+                .attr("cy", function(d) {
+                    return d.data;
+                });
             svg
                 .append("text")
                 .attr("class", "aster-score")
