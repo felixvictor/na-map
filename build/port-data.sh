@@ -31,10 +31,13 @@ function update_yarn () {
 
 function get_port_data () {
     API_BASE_FILE="$(pwd)/API"
+    SHIP_FILE="$(pwd)/src/ships.json"
 
     nodejs build/convert-pbZones.js "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${DATE}"
     $(yarn bin local)/geo2topo -o src/pb.json pbZones.geojson towers.geojson forts.geojson
     rm *.geojson
+
+    nodejs build/convert-ships.js "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${SHIP_FILE}" "${DATE}"
 
     for SERVER_NAME in ${SERVER_NAMES[@]}; do
         PORT_FILE="$(pwd)/src/${SERVER_NAME}.json"
@@ -45,7 +48,7 @@ function get_port_data () {
         done
         nodejs build/convert-API-data.js "${API_BASE_FILE}-${SERVER_NAME}" "${TEMP_PORT_FILE}" "${DATE}"
         $(yarn bin local)/geo2topo -o "${PORT_FILE}" "${TEMP_PORT_FILE}"
-        #rm "${BASE_FILE}*.json" "${TEMP_PORT_FILE}"
+        rm ${API_BASE_FILE}*.json "${TEMP_PORT_FILE}"
     done
 }
 

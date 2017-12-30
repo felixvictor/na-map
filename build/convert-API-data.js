@@ -51,7 +51,7 @@ function saveJson(data) {
 
 function getItemNames() {
     APIItems.filter(item => item.ItemType === "Material" || item.ItemType === "Resource").map(item => {
-        ItemNames.set(item.Id, item.Name);
+        ItemNames.set(item.Id, item.Name.replace("'", "’"));
     });
 }
 
