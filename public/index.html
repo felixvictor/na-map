@@ -7,7 +7,7 @@
     <meta content="Naval Action map" name="description">
     <meta content="width=device-width,initial-scale=1" name="viewport">
     <script src="https://www.googletagmanager.com/gtag/js?id=UA-109520372-1" async></script>
-<link href="na-map.min.css?bd8bf90931e6576ef788" rel="stylesheet"></head>
+<link href="na-map.min.css?2e414e31710c66e51db9" rel="stylesheet"></head>
 <body>
 
 <section class="modal" data-backdrop="static" data-keyboard="false" id="modal" role="dialog" tabindex="-1">
@@ -44,16 +44,14 @@
             <div class="box radio-group">
                 <div class="col-auto align-self-center">
                     <span class="radio-group-label">Double click to</span>
-                    <label class="custom-control custom-radio">
+                    <div class="custom-control custom-control-inline custom-radio">
                         <input class="custom-control-input" id="compass" type="radio" name="mouseFunction" value="compass" checked>
-                        <span class="custom-control-indicator"></span>
-                        <span class="custom-control-description">plot a course</span>
-                    </label>
-                    <label class="custom-control custom-radio">
+                        <label for="compass" class="custom-control-label">plot a course</label>
+                    </div>
+                    <div class="custom-control custom-control-inline custom-radio">
                         <input class="custom-control-input" id="F11" type="radio" name="mouseFunction" value="F11">
-                        <span class="custom-control-indicator"></span>
-                        <span class="custom-control-description">show F11 coordinates</span>
-                    </label>
+                        <label for="F11" class="custom-control-label">show F11 coordinates</label>
+                    </div>
                 </div>
             </div>
         </div>
@@ -62,7 +60,7 @@
                 <button class="btn btn-primary" type="button" aria-controls="F11coord" aria-expanded="false" data-parent="#input-toggle" data-toggle="collapse" href="#F11coord">
                     Move to F11 coordinates
                 </button>
-                <div class="collapse" id="F11coord" role="tabpanel">
+                <div class="collapse mt-2" id="F11coord" role="tabpanel">
                     <form>
                         <div class="form-row">
                             <div class="box p-2">
@@ -114,5 +112,5 @@
 </div>
 
 <script src="https://d3js.org/d3.v4.js"></script>
-<script src="na-map.min.js?bd8bf90931e6576ef788" type="text/javascript"></script></body>
+<script src="na-map.min.js?2e414e31710c66e51db9" type="text/javascript"></script></body>
 </html>
