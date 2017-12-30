@@ -45,17 +45,15 @@
             <div class="radio-group box">
                 <div class="col-auto align-self-center">
                     <span class="radio-group-label">Double click to</span>
-                    <label class="custom-control custom-radio">
-                        <input class="custom-control-input" type="radio" name="mouseFunction" id="compass"
+                    <div class="custom-control custom-radio custom-control-inline">
+                        <input type="radio" class="custom-control-input" name="mouseFunction" id="compass"
                                value="compass" checked>
-                        <span class="custom-control-indicator"></span>
-                        <span class="custom-control-description">plot a course</span>
-                    </label>
-                    <label class="custom-control custom-radio">
-                        <input class="custom-control-input" type="radio" name="mouseFunction" id="F11" value="F11">
-                        <span class="custom-control-indicator"></span>
-                        <span class="custom-control-description">show F11 coordinates</span>
-                    </label>
+                        <label class="custom-control-label" for="compass">plot a course</label>
+                    </div>
+                    <div class="custom-control custom-radio custom-control-inline">
+                        <input type="radio" class="custom-control-input" name="mouseFunction" id="F11" value="F11">
+                        <label class="custom-control-label" for="F11">show F11 coordinates</label>
+                    </div>
                 </div>
             </div>
         </div>
