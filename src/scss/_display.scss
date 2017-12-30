@@ -14,6 +14,7 @@ $background-colour: $primary-300;
   display: flex;
   .item {
     padding-right: 1em;
+    padding-bottom: 1em;
   }
 }
 
@@ -149,6 +150,9 @@ text {
   text-align: left;
   background: $primary;
   box-shadow: 0 14px 28px rgba($primary-900, .25), 0 10px 10px rgba($primary-900, .22);
+  table {
+    margin-bottom: 0;
+  }
 }
 
 .tooltip-inner {
