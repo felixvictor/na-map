@@ -30,7 +30,6 @@ function update_yarn () {
 }
 
 function get_port_data () {
-    GIT_DIR="$1"
     API_BASE_FILE="$(pwd)/API"
 
     nodejs build/convert-pbZones.js "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${DATE}"
