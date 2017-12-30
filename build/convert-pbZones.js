@@ -19,9 +19,6 @@ const nation = {
     12: "PL"
 };
 
-console.log(`infileBaseName: ${infileBaseName}`);
-console.log(`date: ${date}`);
-
 const Trans = {
     A: -0.00499866779363828,
     B: -0.00000021464254980645,
@@ -122,83 +119,6 @@ function convertPBZones() {
     });
 
     createAndSaveGeoJson();
-}
-
-function convertPorts() {
-    /*
-    let ports = APIPorts.map(port => {
-
-    */
-    /*
-        $global:PortData[d.Name].dx = Get-MinMax-X -t ($global:PortData[d.Name].Longitude - $pbZones[0].x)
-    #$global:PortData[d.Name].dx = $global:PortData[d.Name].dx + 4
-        $global:PortData[d.Name].dy = Get-MinMax-Y -t ($global:PortData[d.Name].Latitude - $pbZones[0].y)
-    #$global:PortData[d.Name].dy = $global:PortData[d.Name].dy - 4
-        #        $global:PortData[d.Name].dx = ($global:PortData[d.Name].Longitude - $pbZones[0].x)
-    #        $global:PortData[d.Name].dy = ($global:PortData[d.Name].Latitude - $pbZones[0].y)
-        $global:PortName[d.Id] = @{
-            Name = d.Name
-        }
-    }
-    $global:ShopData | ForEach-Object {
-    # Loop only over relevant ports as in $Port
-        $PortName = $global:PortName[d.Id].Name
-        d.ResourcesProduced | ForEach-Object {
-            $global:PortData[$PortName].Produces += $global:Item[d.key].Name
-        }
-        $global:PortData[$PortName].Produces = $global:PortData[$PortName].Produces | Sort-Object
-
-        d.ResourcesAdded | ForEach-Object {
-            $global:PortData[$PortName].Drops += $global:Item[d.Template].Name
-        }
-        $global:PortData[$PortName].Drops = $global:PortData[$PortName].Drops | Sort-Object
-
-        d.ResourcesConsumed | ForEach-Object {
-            $global:PortData[$PortName].Consumes += $global:Item[d.key].Name
-        }
-        $global:PortData[$PortName].Consumes = $global:PortData[$PortName].Consumes | Sort-Object
-    }
-    */
-    /*
-        let geoJson = {};
-        geoJson["type"] = "FeatureCollection";
-        geoJson["features"] = [];
-
-            let feature = {
-                type: "Feature",
-                id: port.id,
-                geometry: {
-                    type: "Point",
-                    coordinates: [Math.round(convertCoordX(d.Position.x, d.Position.z)),
-                    Math.round(convertCoordY(d.Position.x, d.Position.z))]
-                    
-                },
-                properties: {
-                    name                 : d.Name.replace("'", "’"),
-                    nation               : nation[d.Nation],
-            countyCapital        : (d.Name === d.CountyCapitalName),
-            shallow              : (d.Depth),
-            availableForAll      : d.AvailableForAll,
-            portBattleBRLimit    : d.PortBattleBRLimit,
-            portBattleType       : d.PortBattleType,
-            portBattleStartTime  : d.PortBattleStartTime,
-            conquestMarksPension : d.ConquestMarksPension,
-            capturer             : d.Capturer,
-            nonCapturable        : d.NonCapturable,
-            portTax              : Math.round(d.PortTax * 100) / 100,
-            tradingCompany       : d.TradingCompany,
-            laborHoursDiscount   : d.LaborHoursDiscount,
-            dx                   : 0,
-            dy                   : 0,
-            Produces             : d.ResourcesProduced,
-            Drops                : @(),
-            Consumes             : @()
-                }
-            };
-            geoJson["features"].push(feature);
-        });
-        saveJson(element, geoJson);
-        */
 }
 
 convertPBZones();

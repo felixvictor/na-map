@@ -1,5 +1,4 @@
-let fs = require("fs"),
-    d3 = require("d3");
+let fs = require("fs");
 
 const inBaseFilename = process.argv[2],
     outFilename = process.argv[3],
@@ -20,10 +19,6 @@ const nation = {
     11: "DE",
     12: "PL"
 };
-
-console.log(`inBaseFilename: ${inBaseFilename}`);
-console.log(`outFilename: ${outFilename}`);
-console.log(`date: ${date}`);
 
 const Trans = {
     A: -0.00499866779363828,
@@ -84,37 +79,6 @@ function convertPorts() {
     geoJson["features"] = [];
 
     APIPorts.map(port => {
-        /*
-        $global:PortData[d.Name].dx = Get-MinMax-X -t ($global:PortData[d.Name].Longitude - $pbZones[0].x)
-    #$global:PortData[d.Name].dx = $global:PortData[d.Name].dx + 4
-        $global:PortData[d.Name].dy = Get-MinMax-Y -t ($global:PortData[d.Name].Latitude - $pbZones[0].y)
-    #$global:PortData[d.Name].dy = $global:PortData[d.Name].dy - 4
-        #        $global:PortData[d.Name].dx = ($global:PortData[d.Name].Longitude - $pbZones[0].x)
-    #        $global:PortData[d.Name].dy = ($global:PortData[d.Name].Latitude - $pbZones[0].y)
-        $global:PortName[d.Id] = @{
-            Name = d.Name
-        }
-    }
-    $global:ShopData | ForEach-Object {
-    # Loop only over relevant ports as in $Port
-        $PortName = $global:PortName[d.Id].Name
-        d.ResourcesProduced | ForEach-Object {
-            $global:PortData[$PortName].Produces += $global:Item[d.key].Name
-        }
-        $global:PortData[$PortName].Produces = $global:PortData[$PortName].Produces | Sort-Object
-
-        d.ResourcesAdded | ForEach-Object {
-            $global:PortData[$PortName].Drops += $global:Item[d.Template].Name
-        }
-        $global:PortData[$PortName].Drops = $global:PortData[$PortName].Drops | Sort-Object
-
-        d.ResourcesConsumed | ForEach-Object {
-            $global:PortData[$PortName].Consumes += $global:Item[d.key].Name
-        }
-        $global:PortData[$PortName].Consumes = $global:PortData[$PortName].Consumes | Sort-Object
-    }
-    */
-
         let feature = {
             type: "Feature",
             id: port.Id,
