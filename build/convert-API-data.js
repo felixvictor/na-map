@@ -1,8 +1,8 @@
 let fs = require("fs"),
     d3 = require("d3");
 
-const infileBaseName = process.argv[2],
-    outfileBaseName = process.argv[3],
+const inBaseFilename = process.argv[2],
+    outFilename = process.argv[3],
     date = process.argv[4];
 
 const nation = {
@@ -21,8 +21,8 @@ const nation = {
     12: "PL"
 };
 
-console.log(`infileBaseName: ${infileBaseName}`);
-console.log(`outfileBaseName: ${outfileBaseName}`);
+console.log(`inBaseFilename: ${inBaseFilename}`);
+console.log(`outFilename: ${outFilename}`);
 console.log(`date: ${date}`);
 
 const Trans = {
@@ -32,9 +32,9 @@ const Trans = {
     D: 4096.90282787469
 };
 
-let APIItems = require(`${infileBaseName}-ItemTemplates-${date}.json`);
-let APIPorts = require(`${infileBaseName}-Ports-${date}.json`);
-let APIShops = require(`${infileBaseName}-Shops-${date}.json`);
+let APIItems = require(`${inBaseFilename}-ItemTemplates-${date}.json`);
+let APIPorts = require(`${inBaseFilename}-Ports-${date}.json`);
+let APIShops = require(`${inBaseFilename}-Shops-${date}.json`);
 
 // F11 coord to svg coord
 function convertCoordX(x, y) {
@@ -45,107 +45,37 @@ function convertCoordY(x, y) {
     return Trans.B * x - Trans.A * y + Trans.D;
 }
 
-function saveJson(filename, data) {
-    fs.writeFile(`${filename}.json`, JSON.stringify(data), "utf8", function(err) {
+function saveJson(data) {
+    fs.writeFile(outFilename, JSON.stringify(data), "utf8", function(err) {
         if (err) {
             return console.log(err);
         }
     });
 }
 
-function convertPBZones() {
-    function createAndSaveGeoJson() {
-        // https://gist.github.com/Nishchit14/4c6a7349b3c778f7f97b912629a9f228
-        const flattenArray = arr => [].concat.apply([], arr.map(element => element));
-
-        ["pbZones", "forts", "towers"].forEach(element => {
-            let geoJson = {};
-            geoJson["type"] = "FeatureCollection";
-            geoJson["features"] = [];
-
-            ports.map(port => {
-                let feature = {
-                    type: "Feature",
-                    id: port.id,
-                    geometry: {
-                        type: "MultiPoint",
-                        coordinates: flattenArray(
-                            port.features.filter(features => element === features.type).map(features => features.coord)
-                        )
-                    }
-                };
-                geoJson["features"].push(feature);
-            });
-            saveJson(element, geoJson);
-        });
-    }
-
-    function combineGeoJson() {
-
-        topojson.topology();
-/*
-        $(yarn bin local)/geo2topo --verbose \
-	   -o ${OUT_PB_ZONES} \
-	   pbzones.json \
-	   towers.json \
-	   forts.json
-	   */
-    }
-
-    let ports = APIPorts.map(port => {
-        function getPBZones(port) {
-            port.PortBattleZonePositions.forEach(pbZone => {
-                pbZones.push([
-                    Math.round(convertCoordX(pbZone.x, pbZone.z)),
-                    Math.round(convertCoordY(pbZone.x, pbZone.z))
-                ]);
-            });
-        }
-
-        function getPortElements(port) {
-            port.PortElementsSlotGroups.forEach(portElement => {
-                if (portElement.TemplateName === "Fort2") {
-                    portElement.PortElementsSlots.forEach(d => {
-                        pbForts.push([
-                            Math.round(convertCoordX(d.Position.x, d.Position.z)),
-                            Math.round(convertCoordY(d.Position.x, d.Position.z))
-                        ]);
-                    });
-                } else {
-                    portElement.PortElementsSlots.forEach(d => {
-                        pbTowers.push([
-                            Math.round(convertCoordX(d.Position.x, d.Position.z)),
-                            Math.round(convertCoordY(d.Position.x, d.Position.z))
-                        ]);
-                    });
-                }
-            });
-        }
-
-        let pbZones = [],
-            pbForts = [],
-            pbTowers = [];
-
-        getPBZones(port);
-        getPortElements(port);
-        return {
-            id: port.Id,
-            features: [
-                { type: "pbZones", coord: pbZones },
-                { type: "forts", coord: pbForts },
-                { type: "towers", coord: pbTowers }
-            ]
-        };
-    });
-
-    createAndSaveGeoJson();
-    combineGeoJson();
-}
-
 function convertPorts() {
+    function GetMinMaxX(t) {
+        if (t < 0) {
+            return Math.max(Math.min(t, -14), -20);
+        } else {
+            return Math.min(Math.max(t, 14), 20);
+        }
+    }
 
-    let ports = APIPorts.map(port => {
-    /*
+    function GetMinMaxY(t) {
+        if (t < 0) {
+            return Math.max(Math.min(t, -10), -16);
+        } else {
+            return Math.min(Math.max(t, 18), 24);
+        }
+    }
+
+    let geoJson = {};
+    geoJson["type"] = "FeatureCollection";
+    geoJson["features"] = [];
+
+    APIPorts.map(port => {
+        /*
         $global:PortData[d.Name].dx = Get-MinMax-X -t ($global:PortData[d.Name].Longitude - $pbZones[0].x)
     #$global:PortData[d.Name].dx = $global:PortData[d.Name].dx + 4
         $global:PortData[d.Name].dy = Get-MinMax-Y -t ($global:PortData[d.Name].Latitude - $pbZones[0].y)
@@ -176,67 +106,41 @@ function convertPorts() {
     }
     */
 
-
-        let geoJson = {};
-        geoJson["type"] = "FeatureCollection";
-        geoJson["features"] = [];
-
-            let feature = {
-                type: "Feature",
-                id: port.id,
-                geometry: {
-                    type: "Point",
-                    coordinates: [Math.round(convertCoordX(d.Position.x, d.Position.z)),
-                    Math.round(convertCoordY(d.Position.x, d.Position.z))]
-                    
-                },
-                properties: {
-                    name                 : d.Name.replace("'", "’"),
-                    nation               : nation[d.Nation],
-            countyCapital        : (d.Name === d.CountyCapitalName),
-            shallow              : (d.Depth),
-            availableForAll      : d.AvailableForAll,
-            portBattleBRLimit    : d.PortBattleBRLimit,
-            portBattleType       : d.PortBattleType,
-            portBattleStartTime  : d.PortBattleStartTime,
-            conquestMarksPension : d.ConquestMarksPension,
-            capturer             : d.Capturer,
-            nonCapturable        : d.NonCapturable,
-            portTax              : Math.round(d.PortTax * 100) / 100,
-            tradingCompany       : d.TradingCompany,
-            laborHoursDiscount   : d.LaborHoursDiscount,
-            dx                   : 0,
-            dy                   : 0,
-            Produces             : d.ResourcesProduced,
-            Drops                : @(),
-            Consumes             : @()
-                }
-            };
-            geoJson["features"].push(feature);
-        });
-        saveJson(element, geoJson);
+        let feature = {
+            type: "Feature",
+            id: port.id,
+            geometry: {
+                type: "Point",
+                coordinates: [
+                    Math.round(convertCoordX(port.Position.x, port.Position.z)),
+                    Math.round(convertCoordY(port.Position.x, port.Position.z))
+                ]
+            },
+            properties: {
+                name: port.Name.replace("'", "’"),
+                nation: nation[port.Nation],
+                countyCapital: port.Name === port.CountyCapitalName,
+                shallow: port.Depth,
+                availableForAll: port.AvailableForAll,
+                portBattleBRLimit: port.PortBattleBRLimit,
+                portBattleType: port.PortBattleType,
+                portBattleStartTime: port.PortBattleStartTime,
+                conquestMarksPension: port.ConquestMarksPension,
+                capturer: port.Capturer,
+                nonCapturable: port.NonCapturable,
+                portTax: Math.round(port.PortTax * 100) / 100,
+                tradingCompany: port.TradingCompany,
+                laborHoursDiscount: port.LaborHoursDiscount,
+                dx: GetMinMaxX(port.Position.x - port.PortBattleZonePositions[0].x),
+                dy: GetMinMaxY(port.Position.z - port.PortBattleZonePositions[0].z),
+                Produces: APIShops.filter(shop => shop.Id === port.Id).map(shop => shop.ResourcesProduced),
+                Drops: "",
+                Consumes: ""
+            }
+        };
+        geoJson["features"].push(feature);
+    });
+    saveJson(geoJson);
 }
 
 convertPorts();
-convertPBZones();
-
-/*
-let serverPorts = require(outfileBaseName);
-
-serverPorts.objects.ports.geometries.forEach(function(d) {
-    let t = APIPorts.filter(function(api) {
-        return api.Id === d.id;
-    });
-    d.properties.availableForAll = t[0].AvailableForAll;
-    d.properties.brLimit = t[0].PortBattleBRLimit;
-    d.properties.capturer = t[0].Capturer;
-    d.properties.laborHoursDiscount = t[0].LaborHoursDiscount;
-    d.properties.nation = nation[t[0].Nation];
-    d.properties.portBattleStartTime = t[0].PortBattleStartTime;
-    d.properties.portTax = Math.round(t[0].PortTax * 100) / 100;
-    d.properties.tradingCompany = t[0].TradingCompany;
-});
-//console.log("serverPorts: " + JSON.stringify(serverPorts));
-
-
-*/
