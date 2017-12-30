@@ -29,18 +29,24 @@ function update_yarn () {
     yarn --silent
 }
 
-function change_port_data () {
+function get_port_data () {
     GIT_DIR="$1"
+    API_BASE_FILE="$(pwd)/API"
+
+    nodejs build/convert-pbZones.js "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${DATE}"
+    $(yarn bin local)/geo2topo -o src/pb.json pbZones.geojson towers.geojson forts.geojson
+    rm *.geojson
 
     for SERVER_NAME in ${SERVER_NAMES[@]}; do
-        API_BASE_FILE="$(pwd)/API-${SERVER_NAME}"
-        GIT_BASE_FILE="$(pwd)/public/${SERVER_NAME}"
+        PORT_FILE="$(pwd)/src/${SERVER_NAME}.json"
+        TEMP_PORT_FILE="$(pwd)/ports.geojson"
         for API_VAR in ${API_VARS[@]}; do
-            API_FILE="${API_BASE_FILE}-${API_VAR}-${DATE}.json"
+            API_FILE="${API_BASE_FILE}-${SERVER_NAME}-${API_VAR}-${DATE}.json"
             get_API_data "${SERVER_NAME}" "${API_FILE}" "${API_VAR}"
         done
-        NODE_PATH="../node_modules" nodejs build/convert-API-data.js "${API_BASE_FILE}" "${GIT_BASE_FILE}" "${DATE}"
-        #rm "${BASE_FILE}*.json"
+        nodejs build/convert-API-data.js "${API_BASE_FILE}-${SERVER_NAME}" "${TEMP_PORT_FILE}" "${DATE}"
+        $(yarn bin local)/geo2topo -o "${PORT_FILE}" "${TEMP_PORT_FILE}"
+        #rm "${BASE_FILE}*.json" "${TEMP_PORT_FILE}"
     done
 }
 
@@ -52,7 +58,7 @@ function deploy_data () {
 # Main functions
 
 function change_data () {
-    change_port_data
+    get_port_data
 }
 
 function push_data () {
@@ -73,7 +79,7 @@ function update_data () {
     if [ "${LAST_UPDATE}" != "${DATE}" ]; then
         update_yarn
         get_git_update
-        change_port_data
+        get_port_data
         push_data
         deploy_data
     fi
