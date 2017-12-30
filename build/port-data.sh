@@ -1,19 +1,23 @@
 #!/usr/bin/env bash
 
+set -e
+
 SERVER_BASE_NAME="cleanopenworldprod"
 SOURCE_BASE_URL="http://storage.googleapis.com/nacleanopenworldprodshards/"
 # http://api.shipsofwar.net/servers?apikey=1ZptRtpXAyEaBe2SEp63To1aLmISuJj3Gxcl5ivl&callback=setActiveRealms
 SERVER_NAMES=(eu1 eu2)
+API_VARS=(ItemTemplates Ports Shops)
 DATE=$(date +%Y-%m-%d)
 LAST_UPDATE_FILE="build/.last-port-update"
 
-function get_port_data () {
+function get_API_data () {
     SERVER_NAME="$1"
     OUT_FILE="$2"
-    URL="${SOURCE_BASE_URL}Ports_${SERVER_BASE_NAME}${SERVER_NAME}.json"
+    API_VAR="$3"
+    URL="${SOURCE_BASE_URL}${API_VAR}_${SERVER_BASE_NAME}${SERVER_NAME}.json"
     if [ ! -f "${OUT_FILE}" ]; then
         curl --silent --output "${OUT_FILE}" "${URL}"
-        sed -i -e "s/^var Ports = //; s/\;$//" "${OUT_FILE}"
+        sed -i -e "s/^var $API_VAR = //; s/\;$//" "${OUT_FILE}"
     fi
 }
 
@@ -29,11 +33,14 @@ function change_port_data () {
     GIT_DIR="$1"
 
     for SERVER_NAME in ${SERVER_NAMES[@]}; do
-        GIT_FILE="$(pwd)/public/${SERVER_NAME}.json"
-        API_FILE="$(pwd)/API-${SERVER_NAME}-${DATE}.json"
-        get_port_data "${SERVER_NAME}" "${API_FILE}"
-        nodejs build/change-port-data.js "${GIT_FILE}" "${API_FILE}"
-        rm "${API_FILE}"
+        API_BASE_FILE="$(pwd)/API-${SERVER_NAME}"
+        GIT_BASE_FILE="$(pwd)/public/${SERVER_NAME}"
+        for API_VAR in ${API_VARS[@]}; do
+            API_FILE="${API_BASE_FILE}-${API_VAR}-${DATE}.json"
+            get_API_data "${SERVER_NAME}" "${API_FILE}" "${API_VAR}"
+        done
+        NODE_PATH="../node_modules" nodejs build/convert-API-data.js "${API_BASE_FILE}" "${GIT_BASE_FILE}" "${DATE}"
+        #rm "${BASE_FILE}*.json"
     done
 }
 
