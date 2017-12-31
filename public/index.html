@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+    <meta charset="utf-8">
+    <meta content="ie=edge" http-equiv="x-ua-compatible">
+    <title>Naval Action map</title>
+    <meta content="Naval Action map" name="description">
+    <meta content="width=device-width,initial-scale=1" name="viewport">
+    <script src="https://www.googletagmanager.com/gtag/js?id=UA-109520372-1" async></script>
+<link href="na-map.min.css?14675ef012b1456962b4" rel="stylesheet"></head>
+<body>
+
+<section class="modal" data-backdrop="static" data-keyboard="false" id="modal" role="dialog" tabindex="-1">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <header class="modal-header">
+                <h3>Naval Action map <span class="small text-primary">v1.3.1</span></h3>
+            </header>
+
+            <div class="modal-body">
+                <p>Yet another map which uses the in-game map and live data (daily updated soonish after maintenance).
+                    Please check the <a href="http://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/">
+                        Game-Labs forum post</a> for further details. Feedback is very welcome.</p>
+                <p>Designed by iB aka Felix Victor.</p>
+            </div>
+            <footer class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal" data-server="eu1">Caribbean
+                </button>
+                <button class="btn btn-secondary" type="button" data-dismiss="modal" data-server="eu2">PvE only</button>
+            </footer>
+        </div>
+    </div>
+</section>
+
+<div class="na" id="na">
+</div>
+
+<div id="form">
+    <form>
+        <div class="form-row">
+            <div class="col-auto">
+                <button class="btn btn-secondary" type="reset" id="reset">Clear</button>
+            </div>
+            <div class="box radio-group">
+                <div class="col-auto align-self-center">
+                    <span class="radio-group-label">Double click to</span>
+                    <div class="custom-control custom-control-inline custom-radio">
+                        <input class="custom-control-input" id="compass" type="radio" name="mouseFunction" value="compass" checked>
+                        <label for="compass" class="custom-control-label">plot a course</label>
+                    </div>
+                    <div class="custom-control custom-control-inline custom-radio">
+                        <input class="custom-control-input" id="F11" type="radio" name="mouseFunction" value="F11">
+                        <label for="F11" class="custom-control-label">show F11 coordinates</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="input-toggle" data-children=".item">
+            <div class="item">
+                <button class="btn btn-primary" type="button" aria-controls="F11coord" aria-expanded="false" data-parent="#input-toggle" data-toggle="collapse" href="#F11coord">
+                    Move to F11 coordinates
+                </button>
+                <div class="collapse mt-2" id="F11coord" role="tabpanel">
+                    <form>
+                        <div class="form-row">
+                            <div class="box p-2">
+                                <div class="radio-group">
+                                    <div class="col-auto align-self-center">
+                                        <span class="radio-group-label">F11 coordinates</span>
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <input class="form-control" id="x-coord" type="number" max="830000" min="-816000" placeholder="X" required step="0.1">
+                                </div>
+                                <div class="col-auto">
+                                    <input class="form-control" id="z-coord" type="number" max="830000" min="-430000" placeholder="Z" required step="0.1">
+                                </div>
+                                <div class="col-auto">
+                                    <button class="btn btn-primary" type="submit">Move to</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="item">
+                <button class="btn btn-primary" type="button" aria-controls="port" aria-expanded="false" data-parent="#input-toggle" data-toggle="collapse" href="#port">
+                    Move to port
+                </button>
+                <div class="collapse" id="port" role="tabpanel">
+                    <div class="form-group">
+                        <label for="port-names"></label>
+                        <select class="custom-select" id="port-names" name="port-names">
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="item">
+                <button class="btn btn-primary" type="button" aria-controls="goods" aria-expanded="false" data-parent="#input-toggle" data-toggle="collapse" href="#goods">
+                    Show goods
+                </button>
+                <div class="collapse" id="goods" role="tabpanel">
+                    <div class="form-group">
+                        <label for="good-names"></label>
+                        <select class="custom-select" id="good-names" name="good-names">
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script src="https://d3js.org/d3.v4.js"></script>
+<script src="na-map.min.js?14675ef012b1456962b4" type="text/javascript"></script></body>
+</html>
