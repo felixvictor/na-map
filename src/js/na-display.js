@@ -641,6 +641,7 @@ export default function naDisplay(serverName) {
         bFirstCoord = true;
         lineData.splice(0, lineData.length);
         currentPortData = naPortData;
+        $("#good-names").get(0).selectedIndex = 0;
         updatePorts();
     }
 
