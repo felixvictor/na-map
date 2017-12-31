@@ -8,7 +8,10 @@ SOURCE_BASE_URL="http://storage.googleapis.com/nacleanopenworldprodshards/"
 SERVER_NAMES=(eu1 eu2)
 API_VARS=(ItemTemplates Ports Shops)
 DATE=$(date +%Y-%m-%d)
-LAST_UPDATE_FILE="build/.last-port-update"
+LAST_DATE=$(date +%Y-%m-%d --date "-1 day")
+BUILD_DIR="$(pwd)/build"
+SRC_DIR="$(pwd)/src"
+LAST_UPDATE_FILE="${BUILD_DIR}/.last-port-update"
 
 function get_API_data () {
     SERVER_NAME="$1"
@@ -29,27 +32,48 @@ function update_yarn () {
     yarn --silent
 }
 
+function test_for_update () {
+    API_BASE_FILE="$1"
+
+    NEW_FILE="${API_BASE_FILE}-${SERVER_NAMES[0]}-Shops-${DATE}.json"
+    OLD_FILE="${API_BASE_FILE}-${SERVER_NAMES[0]}-Shops-${LAST_DATE}.json"
+
+    get_API_data "${SERVER_NAMES[0]}" "${NEW_FILE}" Shops
+
+    # If old file not exists create it
+    [[ ! -f "${OLD_FILE}" ]] && touch "${OLD_FILE}"
+
+    # Exit if API has not been updated yet
+    cmp --silent "${NEW_FILE}" "${OLD_FILE}" && { rm "${NEW_FILE}"; exit; }
+}
+
 function get_port_data () {
-    API_BASE_FILE="$(pwd)/API"
-    SHIP_FILE="$(pwd)/src/ships.json"
+    API_DIR="${BUILD_DIR}/API"
+    API_BASE_FILE="${API_DIR}/api"
+    SHIP_FILE="${SRC_DIR}/ships.json"
 
-    nodejs build/convert-pbZones.js "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${DATE}"
-    $(yarn bin local)/geo2topo -o src/pb.json pbZones.geojson towers.geojson forts.geojson
-    rm *.geojson
+    mkdir -p "${API_DIR}"
 
-    nodejs build/convert-ships.js "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${SHIP_FILE}" "${DATE}"
+    test_for_update "${API_BASE_FILE}"
 
     for SERVER_NAME in ${SERVER_NAMES[@]}; do
-        PORT_FILE="$(pwd)/src/${SERVER_NAME}.json"
-        TEMP_PORT_FILE="$(pwd)/ports.geojson"
+        PORT_FILE="${SRC_DIR}/${SERVER_NAME}.json"
+        TEMP_PORT_FILE="${BUILD_DIR}/ports.geojson"
         for API_VAR in ${API_VARS[@]}; do
             API_FILE="${API_BASE_FILE}-${SERVER_NAME}-${API_VAR}-${DATE}.json"
             get_API_data "${SERVER_NAME}" "${API_FILE}" "${API_VAR}"
         done
         nodejs build/convert-API-data.js "${API_BASE_FILE}-${SERVER_NAME}" "${TEMP_PORT_FILE}" "${DATE}"
         $(yarn bin local)/geo2topo -o "${PORT_FILE}" "${TEMP_PORT_FILE}"
-        rm ${API_BASE_FILE}*.json "${TEMP_PORT_FILE}"
+        rm "${TEMP_PORT_FILE}"
     done
+
+    nodejs build/convert-pbZones.js "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${BUILD_DIR}" "${DATE}"
+    $(yarn bin local)/geo2topo -o "${SRC_DIR}/pb.json" \
+        "${BUILD_DIR}/pbZones.geojson" "${BUILD_DIR}/towers.geojson" "${BUILD_DIR}/forts.geojson"
+    rm ${BUILD_DIR}/*.geojson
+
+    nodejs build/convert-ships.js "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${SHIP_FILE}" "${DATE}"
 }
 
 function deploy_data () {

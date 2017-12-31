@@ -1,7 +1,8 @@
 let fs = require("fs");
 
 const infileBaseName = process.argv[2],
-    date = process.argv[3];
+    outDir = process.argv[3],
+    date = process.argv[4];
 
 const nation = {
     0: "NT",
@@ -68,7 +69,7 @@ function convertPBZones() {
                 };
                 geoJson["features"].push(feature);
             });
-            saveJson(element, geoJson);
+            saveJson(`${outDir}/${element}`, geoJson);
         });
     }
 
