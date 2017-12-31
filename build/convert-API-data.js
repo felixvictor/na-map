@@ -108,17 +108,17 @@ function convertPorts() {
                 laborHoursDiscount: port.LaborHoursDiscount,
                 produces: flattenArray(
                     APIShops.filter(shop => shop.Id === port.Id).map(shop =>
-                        shop.ResourcesProduced.map(good => ItemNames.get(good.Key))
+                        shop.ResourcesProduced.map(good => ItemNames.get(good.Key)).sort()
                     )
                 ),
                 drops: flattenArray(
                     APIShops.filter(shop => shop.Id === port.Id).map(shop =>
-                        shop.ResourcesAdded.map(good => ItemNames.get(good.Template))
+                        shop.ResourcesAdded.map(good => ItemNames.get(good.Template)).sort()
                     )
                 ),
                 consumes: flattenArray(
                     APIShops.filter(shop => shop.Id === port.Id).map(shop =>
-                        shop.ResourcesConsumed.map(good => ItemNames.get(good.Key))
+                        shop.ResourcesConsumed.map(good => ItemNames.get(good.Key)).sort()
                     )
                 )
             }
