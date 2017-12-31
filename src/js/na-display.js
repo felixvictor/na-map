@@ -752,7 +752,7 @@ export default function naDisplay(serverName) {
         // Read map data
         naPortData = topojsonFeature(naMap, naMap.objects.ports).features;
         currentPortData = naPortData;
-        naPBZoneData = topojsonFeature(pbZones, pbZones.objects.pbzones);
+        naPBZoneData = topojsonFeature(pbZones, pbZones.objects.pbZones);
         naFortData = topojsonFeature(pbZones, pbZones.objects.forts);
         naTowerData = topojsonFeature(pbZones, pbZones.objects.towers);
 
