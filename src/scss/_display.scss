@@ -10,52 +10,35 @@ $in-colour: $primary-900;
 $out-colour: $primary-700;
 $background-colour: $primary-300;
 
-#input-toggle {
-  display: flex;
-  .item {
-    padding-right: 1em;
-    padding-bottom: 1em;
-  }
+#moveToMenu {
+  min-width:30em;
 }
 
-#form {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  z-index: 1000;
-  display: none;
-  padding: 1em;
-  padding-bottom: .5em;
-  background-color: $primary-200;
-  opacity: .8;
-  input {
-    color: inherit;
-  }
+#showGoodsMenu {
+  min-width: 20em;
 }
 
-.form-row {
-  padding-bottom: 1em;
-}
-
-.custom-select {
+.custom-select,
+.form-control,
+.form-control:focus {
   color: $body-color;
 }
 
-.radio-group {
-  display: flex;
+.btn-outline-primary {
+  color: $primary-600;
+}
+
+.btn-outline-secondary {
+  color: $secondary-600;
 }
 
 .box {
-  margin-left: 1em;
+  padding: .5em;
   background-color: $primary-100;
-  opacity: 1;
-  label {
-    margin-bottom: 0;
-  }
 }
 
-.radio-group-label {
-  padding-right: 1em;
+.left-margin {
+  margin-left: 15px;
 }
 
 .compass {
