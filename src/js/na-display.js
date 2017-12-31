@@ -6,7 +6,6 @@
 
 import { feature as topojsonFeature } from "topojson-client";
 
-import "bootstrap/js/dist/collapse";
 import "bootstrap/js/dist/tooltip";
 import "bootstrap/js/dist/util";
 
@@ -766,7 +765,6 @@ export default function naDisplay(serverName) {
         //updatePorts(currentPortData.filter(d => ["234", "237", "238", "239", "240"].includes(d.id)));
         updatePorts();
 
-        d3.select("#form").style("display", "inherit");
         $("form").submit(function(event) {
             const x = $("#x-coord").val(),
                 z = $("#z-coord").val();

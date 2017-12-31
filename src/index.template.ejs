@@ -36,87 +36,86 @@
 <div id="na" class="na">
 </div>
 
-<div id="form">
-    <form>
-        <div class="form-row">
-            <div class="col-auto">
-                <button id="reset" type="reset" class="btn btn-secondary">Clear</button>
-            </div>
-            <div class="radio-group box">
-                <div class="col-auto align-self-center">
-                    <span class="radio-group-label">Double click to</span>
-                    <div class="custom-control custom-radio custom-control-inline">
-                        <input type="radio" class="custom-control-input" name="mouseFunction" id="compass"
-                               value="compass" checked>
-                        <label class="custom-control-label" for="compass">plot a course</label>
-                    </div>
-                    <div class="custom-control custom-radio custom-control-inline">
-                        <input type="radio" class="custom-control-input" name="mouseFunction" id="F11" value="F11">
-                        <label class="custom-control-label" for="F11">show F11 coordinates</label>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div id="input-toggle" data-children=".item">
-            <div class="item">
-                <button class="btn btn-primary" type="button" data-toggle="collapse" data-parent="#input-toggle"
-                        href="#F11coord" aria-expanded="false" aria-controls="F11coord">
-                    Move to F11 coordinates
-                </button>
-                <div id="F11coord" class="collapse mt-2" role="tabpanel">
-                    <form>
-                        <div class="form-row">
-                            <div class="box p-2">
-                                <div class="radio-group">
-                                    <div class="col-auto align-self-center">
-                                        <span class="radio-group-label">F11 coordinates</span>
-                                    </div>
-                                </div>
-                                <div class="col-auto">
+<nav class="navbar fixed-top navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">Naval Action map</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="moveTo" role="button" data-toggle="dropdown"
+                   aria-haspopup="true" aria-expanded="false">
+                    Move to
+                </a>
+                <div class="dropdown-menu" id="moveToMenu" aria-labelledby="moveTo">
+                    <div class="box pb-2">
+                    <h6 class="dropdown-header">F11 coordinates</h6>
+                    <form class="">
+                        <fieldset>
+                            <div class="form-row">
+                                <div class="col-4 left-margin">
                                     <input type="number" step="0.1" min="-816000" max="830000" class="form-control"
                                            id="x-coord" placeholder="X" required>
                                 </div>
-                                <div class="col-auto">
+                                <div class="col-4">
                                     <input type="number" step="0.1" min="-430000" max="830000" class="form-control"
                                            id="z-coord" placeholder="Z" required>
                                 </div>
-                                <div class="col-auto">
-                                    <button type="submit" class="btn btn-primary">Move to</button>
+                                <div class="col-3">
+                                    <button type="submit" class="btn btn-outline-primary">Move to</button>
                                 </div>
                             </div>
-                        </div>
+                        </fieldset>
                     </form>
                 </div>
-            </div>
-            <div class="item">
-                <button class="btn btn-primary" type="button" data-toggle="collapse" data-parent="#input-toggle"
-                        href="#port" aria-expanded="false" aria-controls="port">
-                    Move to port
-                </button>
-                <div id="port" class="collapse" role="tabpanel">
-                    <div class="form-group">
-                        <label for="port-names"></label>
+                    <div class="dropdown-divider"></div>
+                    <div class="box pb-2">
+                    <h6 class="dropdown-header">Port</h6>
+                    <div class="col-12">
                         <select class="custom-select" name="port-names" id="port-names">
                         </select>
                     </div>
+                    </div>
                 </div>
-            </div>
-            <div class="item">
-                <button class="btn btn-primary" type="button" data-toggle="collapse" data-parent="#input-toggle"
-                        href="#goods" aria-expanded="false" aria-controls="goods">
+            </li>
+
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="showGoods" role="button" data-toggle="dropdown"
+                   aria-haspopup="true" aria-expanded="false">
                     Show goods
-                </button>
-                <div id="goods" class="collapse" role="tabpanel">
-                    <div class="form-group">
-                        <label for="good-names"></label>
+                </a>
+                <div class="dropdown-menu" id="showGoodsMenu" aria-labelledby="showGoods">
+                    <div class="col-12">
                         <select class="custom-select" name="good-names" id="good-names">
                         </select>
                     </div>
                 </div>
-            </div>
-        </div>
-    </form>
-</div>
+            </li>
+
+            <li class="nav-item">
+                <div class="radio-group box align-middle ml-1">
+                    <div class="col-auto align-self-center">
+                        <span class="radio-group-label pr-2">Double click to</span>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input" name="mouseFunction" id="compass"
+                                   value="compass" checked>
+                            <label class="custom-control-label" for="compass">plot a course</label>
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input" name="mouseFunction" id="F11" value="F11">
+                            <label class="custom-control-label" for="F11">show F11 coordinates</label>
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+        </ul>
+        <button id="reset" type="reset" class="btn btn-outline-secondary">Clear</button>
+    </div>
+</nav>
 
 <script src="https://d3js.org/d3.v4.js"></script>
 </body>
