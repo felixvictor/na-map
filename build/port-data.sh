@@ -44,7 +44,7 @@ function test_for_update () {
     [[ ! -f "${OLD_FILE}" ]] && touch "${OLD_FILE}"
 
     # Exit if API has not been updated yet
-    cmp --silent "${NEW_FILE}" "${OLD_FILE}" && { rm "${NEW_FILE}"; exit; }
+    cmp --silent "${NEW_FILE}" "${OLD_FILE}" && { rm "${NEW_FILE}"; exit 0; }
 }
 
 function get_port_data () {
