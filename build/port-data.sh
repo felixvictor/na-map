@@ -44,7 +44,8 @@ function test_for_update () {
     [[ ! -f "${OLD_FILE}" ]] && touch "${OLD_FILE}"
 
     # Exit if API has not been updated yet
-    cmp --silent "${NEW_FILE}" "${OLD_FILE}" && { rm "${NEW_FILE}"; exit 0; }
+    cmp --silent "${NEW_FILE}" "${OLD_FILE}" && { rm "${NEW_FILE}"; return 1; }
+    return 0
 }
 
 function get_port_data () {
@@ -53,27 +54,26 @@ function get_port_data () {
     SHIP_FILE="${SRC_DIR}/ships.json"
 
     mkdir -p "${API_DIR}"
-
-    test_for_update "${API_BASE_FILE}"
-
-    for SERVER_NAME in ${SERVER_NAMES[@]}; do
-        PORT_FILE="${SRC_DIR}/${SERVER_NAME}.json"
-        TEMP_PORT_FILE="${BUILD_DIR}/ports.geojson"
-        for API_VAR in ${API_VARS[@]}; do
-            API_FILE="${API_BASE_FILE}-${SERVER_NAME}-${API_VAR}-${DATE}.json"
-            get_API_data "${SERVER_NAME}" "${API_FILE}" "${API_VAR}"
+    if test_for_update "${API_BASE_FILE}"; then
+        for SERVER_NAME in ${SERVER_NAMES[@]}; do
+            PORT_FILE="${SRC_DIR}/${SERVER_NAME}.json"
+            TEMP_PORT_FILE="${BUILD_DIR}/ports.geojson"
+            for API_VAR in ${API_VARS[@]}; do
+                API_FILE="${API_BASE_FILE}-${SERVER_NAME}-${API_VAR}-${DATE}.json"
+                get_API_data "${SERVER_NAME}" "${API_FILE}" "${API_VAR}"
+            done
+            nodejs build/convert-API-data.js "${API_BASE_FILE}-${SERVER_NAME}" "${TEMP_PORT_FILE}" "${DATE}"
+            $(yarn bin local)/geo2topo -o "${PORT_FILE}" "${TEMP_PORT_FILE}"
+            rm "${TEMP_PORT_FILE}"
         done
-        nodejs build/convert-API-data.js "${API_BASE_FILE}-${SERVER_NAME}" "${TEMP_PORT_FILE}" "${DATE}"
-        $(yarn bin local)/geo2topo -o "${PORT_FILE}" "${TEMP_PORT_FILE}"
-        rm "${TEMP_PORT_FILE}"
-    done
 
-    nodejs build/convert-pbZones.js "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${BUILD_DIR}" "${DATE}"
-    $(yarn bin local)/geo2topo -o "${SRC_DIR}/pb.json" \
-        "${BUILD_DIR}/pbZones.geojson" "${BUILD_DIR}/towers.geojson" "${BUILD_DIR}/forts.geojson"
-    rm ${BUILD_DIR}/*.geojson
+        nodejs build/convert-pbZones.js "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${BUILD_DIR}" "${DATE}"
+        $(yarn bin local)/geo2topo -o "${SRC_DIR}/pb.json" \
+            "${BUILD_DIR}/pbZones.geojson" "${BUILD_DIR}/towers.geojson" "${BUILD_DIR}/forts.geojson"
+        rm ${BUILD_DIR}/*.geojson
 
-    nodejs build/convert-ships.js "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${SHIP_FILE}" "${DATE}"
+        nodejs build/convert-ships.js "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${SHIP_FILE}" "${DATE}"
+    fi
 }
 
 function deploy_data () {
