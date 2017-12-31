@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+    <meta charset="utf-8">
+    <meta content="ie=edge" http-equiv="x-ua-compatible">
+    <title>Naval Action map</title>
+    <meta content="Naval Action map" name="description">
+    <meta content="width=device-width,initial-scale=1" name="viewport">
+    <script src="https://www.googletagmanager.com/gtag/js?id=UA-109520372-1" async></script>
+<link href="na-map.min.css?186e8f2f7f8f6343746b" rel="stylesheet"></head>
+<body>
+
+<section class="modal" data-backdrop="static" data-keyboard="false" id="modal" role="dialog" tabindex="-1">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <header class="modal-header">
+                <h3>Naval Action map <span class="small text-primary">v1.3.3</span></h3>
+            </header>
+
+            <div class="modal-body">
+                <p>Yet another map which uses the in-game map and live data (daily updated soonish after maintenance).
+                    Please check the <a href="http://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/">
+                        Game-Labs forum post</a> for further details. Feedback is very welcome.</p>
+                <p>Designed by iB aka Felix Victor.</p>
+            </div>
+            <footer class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal" data-server="eu1">Caribbean
+                </button>
+                <button class="btn btn-secondary" type="button" data-dismiss="modal" data-server="eu2">PvE only</button>
+            </footer>
+        </div>
+    </div>
+</section>
+
+<div class="na" id="na">
+</div>
+
+<nav class="bg-light fixed-top navbar navbar-expand-lg navbar-light">
+    <a href="#" class="navbar-brand">Naval Action map</a>
+    <button class="navbar-toggler" type="button" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation" data-target="#navbarSupportedContent" data-toggle="collapse">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="mr-auto navbar-nav">
+
+            <li class="nav-item dropdown">
+                <a href="#" class="dropdown-toggle nav-link" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" id="moveTo" role="button">
+                    Move to
+                </a>
+                <div class="dropdown-menu" id="moveToMenu" aria-labelledby="moveTo">
+                    <div class="box pb-2">
+                        <h6 class="dropdown-header">F11 coordinates</h6>
+                        <form class="">
+                            <fieldset>
+                                <div class="form-row">
+                                    <div class="col-4 left-margin">
+                                        <input class="form-control" id="x-coord" type="number" max="830000" min="-816000" placeholder="X" required step="0.1">
+                                    </div>
+                                    <div class="col-4">
+                                        <input class="form-control" id="z-coord" type="number" max="830000" min="-430000" placeholder="Z" required step="0.1">
+                                    </div>
+                                    <div class="col-3">
+                                        <button class="btn btn-outline-primary" type="submit">Move to</button>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </form>
+                    </div>
+                </div>
+            </li>
+
+            <li class="nav-item pl-2">
+                <select class="custom-select" id="port-names" name="port-names">
+                </select>
+            </li>
+
+            <li class="nav-item pl-2">
+                <select class="custom-select" id="good-names" name="good-names">
+                </select>
+            </li>
+
+            <li class="nav-item pl-2">
+                <div class="box align-middle ml-1 radio-group">
+                    <div class="align-self-center col-auto">
+                        <span class="pr-2 radio-group-label">Double click to</span>
+                        <div class="custom-control custom-control-inline custom-radio">
+                            <input class="custom-control-input" id="compass" type="radio" name="mouseFunction" value="compass" checked>
+                            <label class="custom-control-label" for="compass">plot a course</label>
+                        </div>
+                        <div class="custom-control custom-control-inline custom-radio">
+                            <input class="custom-control-input" id="F11" type="radio" name="mouseFunction" value="F11">
+                            <label class="custom-control-label" for="F11">show F11 coordinates</label>
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+        </ul>
+        <button class="btn btn-outline-secondary" type="reset" id="reset">Clear</button>
+    </div>
+</nav>
+
+<script src="https://d3js.org/d3.v4.js"></script>
+<script src="na-map.min.js?186e8f2f7f8f6343746b" type="text/javascript"></script></body>
+</html>
