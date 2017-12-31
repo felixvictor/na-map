@@ -11,11 +11,15 @@ $out-colour: $primary-700;
 $background-colour: $primary-300;
 
 #moveToMenu {
-  min-width:30em;
+  min-width: 30em;
 }
 
 #showGoodsMenu {
   min-width: 20em;
+}
+
+.left-margin {
+  margin-left: 15px;
 }
 
 .custom-select,
@@ -35,10 +39,6 @@ $background-colour: $primary-300;
 .box {
   padding: .5em;
   background-color: $primary-100;
-}
-
-.left-margin {
-  margin-left: 15px;
 }
 
 .compass {
