@@ -7,7 +7,7 @@
     <meta content="Naval Action map" name="description">
     <meta content="width=device-width,initial-scale=1" name="viewport">
     <script src="https://www.googletagmanager.com/gtag/js?id=UA-109520372-1" async></script>
-<link href="na-map.min.css?47c7bb75bf002a00e598" rel="stylesheet"></head>
+<link href="na-map.min.css?899e99a004ba642d66b8" rel="stylesheet"></head>
 <body>
 
 <section class="modal" data-backdrop="static" data-keyboard="false" id="modal" role="dialog" tabindex="-1">
@@ -49,44 +49,35 @@
                 </a>
                 <div class="dropdown-menu" id="moveToMenu" aria-labelledby="moveTo">
                     <div class="box pb-2">
-                    <h6 class="dropdown-header">F11 coordinates</h6>
-                    <form class="">
-                        <fieldset>
-                            <div class="form-inline">
-                                <div class="col-4">
-                                    <input class="form-control" id="x-coord" type="number" max="830000" min="-816000" placeholder="X" required step="0.1">
+                        <h6 class="dropdown-header">F11 coordinates</h6>
+                        <form class="">
+                            <fieldset>
+                                <div class="form-inline">
+                                    <div class="col-4">
+                                        <input class="form-control" id="x-coord" type="number" max="830000" min="-816000" placeholder="X" required step="0.1">
+                                    </div>
+                                    <div class="col-4">
+                                        <input class="form-control" id="z-coord" type="number" max="830000" min="-430000" placeholder="Z" required step="0.1">
+                                    </div>
+                                    <div class="col-3">
+                                        <button class="btn btn-outline-primary" type="submit">Move to</button>
+                                    </div>
                                 </div>
-                                <div class="col-4">
-                                    <input class="form-control" id="z-coord" type="number" max="830000" min="-430000" placeholder="Z" required step="0.1">
-                                </div>
-                                <div class="col-3">
-                                    <button class="btn btn-outline-primary" type="submit">Move to</button>
-                                </div>
-                            </div>
-                        </fieldset>
-                    </form>
-                </div>
-                    <div class="dropdown-divider"></div>
-                    <div class="box pb-2">
-                    <h6 class="dropdown-header">Port</h6>
-                    <div class="col-12">
-                        <select class="select" id="port-names" name="port-names">
-                        </select>
-                    </div>
+                            </fieldset>
+                        </form>
                     </div>
                 </div>
             </li>
 
-            <li class="nav-item dropdown">
-                <a href="#" class="dropdown-toggle nav-link" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" id="showGoods" role="button">
-                    Show goods
-                </a>
-                <div class="dropdown-menu" id="showGoodsMenu" aria-labelledby="showGoods">
-                    <div class="col-12">
-                        <select class="select" id="good-names" name="good-names">
-                        </select>
-                    </div>
-                </div>
+            <li class="nav-item">
+
+                <select class="custom-select" id="port-names" name="port-names">
+                </select>
+            </li>
+
+            <li class="nav-item">
+                <select class="custom-select" id="good-names" name="good-names">
+                </select>
             </li>
 
             <li class="nav-item">
@@ -111,5 +102,5 @@
 </nav>
 
 <script src="https://d3js.org/d3.v4.js"></script>
-<script src="na-map.min.js?47c7bb75bf002a00e598" type="text/javascript"></script></body>
+<script src="na-map.min.js?899e99a004ba642d66b8" type="text/javascript"></script></body>
 </html>
