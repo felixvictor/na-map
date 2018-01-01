@@ -82,10 +82,10 @@ function deploy_data () {
 # Main functions
 
 function change_data () {
-    BASE_DIR="$(pwd)"
-    BUILD_DIR="${BASE_DIR}/build"
-    SRC_DIR="${BASE_DIR}/src"
-    LAST_UPDATE_FILE="${BUILD_DIR}/.last-port-update"
+    export BASE_DIR="$(pwd)"
+    export BUILD_DIR="${BASE_DIR}/build"
+    export SRC_DIR="${BASE_DIR}/src"
+    export LAST_UPDATE_FILE="${BUILD_DIR}/.last-port-update"
 
     get_port_data
 }
@@ -100,10 +100,10 @@ function push_data () {
 }
 
 function update_data () {
-    BASE_DIR="/home/natopo/na-topo.git"
-    BUILD_DIR="${BASE_DIR}/build"
-    SRC_DIR="${BASE_DIR}/src"
-    LAST_UPDATE_FILE="${BUILD_DIR}/.last-port-update"
+    export BASE_DIR="/home/natopo/na-topo.git"
+    export BUILD_DIR="${BASE_DIR}/build"
+    export SRC_DIR="${BASE_DIR}/src"
+    export LAST_UPDATE_FILE="${BUILD_DIR}/.last-port-update"
     
     cd ${BASE_DIR}
     # If file not exists create it with date of last commit
