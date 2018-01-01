@@ -105,9 +105,6 @@ function update_data () {
     LAST_UPDATE_FILE="${BUILD_DIR}/.last-port-update"
     
     cd ${BASE_DIR}
-    echo "update port data"
-    echo $(pwd)
-    echo ${BUILD_DIR}
     # If file not exists create it with date of last commit
     [[ ! -f "${LAST_UPDATE_FILE}" ]] && touch -d "$(git log -1 --format=%cI)" "${LAST_UPDATE_FILE}"
     LAST_UPDATE=$(date --reference="${LAST_UPDATE_FILE}" +%Y-%m-%d)
