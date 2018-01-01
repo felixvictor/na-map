@@ -744,6 +744,61 @@ export default function naDisplay(serverName) {
         naZoomAndPan(d3.zoomIdentity.translate(tx, ty).scale(1));
     }
 
+    function predictWind(currentWind, predictTime) {
+        function compassToDegrees(compass) {
+            const compassDirections = [
+                "N",
+                "NNE",
+                "NE",
+                "ENE",
+                "E",
+                "ESE",
+                "SE",
+                "SSE",
+                "S",
+                "SSW",
+                "SW",
+                "WSW",
+                "W",
+                "WNW",
+                "NW",
+                "NNW"
+            ];
+            const degree = 360 / compassDirections.length;
+            return compassDirections.indexOf(compass) * degree;
+        }
+
+        const secondsForFullCircle = 48 * 60,
+            fullCircle = 360,
+            degreesPerSecond = fullCircle / secondsForFullCircle,
+            currentTimeInSec = Math.floor(Date.now() / 1000);
+        let windTime = new Date(),
+            currentWindDegrees;
+        // Add leading zero if necessary
+        if (predictTime.length < 5) {
+            predictTime.unshift("0");
+        }
+        let windTimeInSec = Math.floor(
+            windTime.setHours(predictTime.slice(0, 2), predictTime.slice(3, 5), 0).valueOf() / 1000
+        );
+        if (isNaN(currentWind)) {
+            currentWindDegrees = compassToDegrees(currentWind);
+        } else {
+            currentWindDegrees = +currentWind;
+        }
+        let timeDiffInSec = windTimeInSec - currentTimeInSec;
+        if (timeDiffInSec < 0) {
+            const DayInSec = 24 * 60 * 60;
+            timeDiffInSec += DayInSec;
+        }
+        let predictedWindDegrees = (currentWindDegrees + degreesPerSecond * timeDiffInSec) % 360;
+        console.log(`currentWindDegrees: ${currentWindDegrees}`);
+        console.log(`predictTime: ${predictTime}`);
+        console.log(`windTime: ${windTime}`);
+        console.log(`windTimeInSec: ${windTimeInSec}`);
+        console.log(`predictedWindDegrees: ${predictedWindDegrees}`);
+    }
+
     function naReady(error, naMap, pbZones) {
         if (error) {
             throw error;
@@ -766,10 +821,16 @@ export default function naDisplay(serverName) {
         //updatePorts(currentPortData.filter(d => ["234", "237", "238", "239", "240"].includes(d.id)));
         updatePorts();
 
-        $("form").submit(function(event) {
+        $("#f11").submit(function(event) {
             const x = $("#x-coord").val(),
                 z = $("#z-coord").val();
             goToF11(x, z);
+            event.preventDefault();
+        });
+        $("#windPrediction").submit(function(event) {
+            const currentWindDirection = $("#direction").val(),
+                time = $("#time").val();
+            predictWind(currentWindDirection, time);
             event.preventDefault();
         });
         $("#reset").on("click", function() {
