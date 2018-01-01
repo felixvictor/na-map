@@ -9,9 +9,6 @@ SERVER_NAMES=(eu1 eu2)
 API_VARS=(ItemTemplates Ports Shops)
 DATE=$(date +%Y-%m-%d)
 LAST_DATE=$(date +%Y-%m-%d --date "-1 day")
-BUILD_DIR="$(pwd)/build"
-SRC_DIR="$(pwd)/src"
-LAST_UPDATE_FILE="${BUILD_DIR}/.last-port-update"
 
 function get_API_data () {
     SERVER_NAME="$1"
@@ -62,6 +59,7 @@ function get_port_data () {
                 API_FILE="${API_BASE_FILE}-${SERVER_NAME}-${API_VAR}-${DATE}.json"
                 get_API_data "${SERVER_NAME}" "${API_FILE}" "${API_VAR}"
             done
+
             nodejs build/convert-API-data.js "${API_BASE_FILE}-${SERVER_NAME}" "${TEMP_PORT_FILE}" "${DATE}"
             $(yarn bin local)/geo2topo -o "${PORT_FILE}" "${TEMP_PORT_FILE}"
             rm "${TEMP_PORT_FILE}"
@@ -77,13 +75,18 @@ function get_port_data () {
 }
 
 function deploy_data () {
-    yarn run deploy-netlify
+    yarn run deploy-update
 }
 
 #####
 # Main functions
 
 function change_data () {
+    export BASE_DIR="$(pwd)"
+    export BUILD_DIR="${BASE_DIR}/build"
+    export SRC_DIR="${BASE_DIR}/src"
+    export LAST_UPDATE_FILE="${BUILD_DIR}/.last-port-update"
+
     get_port_data
 }
 
@@ -97,8 +100,12 @@ function push_data () {
 }
 
 function update_data () {
-    cd "/home/natopo/na-topo.git"
-    echo "update port data"
+    export BASE_DIR="/home/natopo/na-topo.git"
+    export BUILD_DIR="${BASE_DIR}/build"
+    export SRC_DIR="${BASE_DIR}/src"
+    export LAST_UPDATE_FILE="${BUILD_DIR}/.last-port-update"
+    
+    cd ${BASE_DIR}
     # If file not exists create it with date of last commit
     [[ ! -f "${LAST_UPDATE_FILE}" ]] && touch -d "$(git log -1 --format=%cI)" "${LAST_UPDATE_FILE}"
     LAST_UPDATE=$(date --reference="${LAST_UPDATE_FILE}" +%Y-%m-%d)
