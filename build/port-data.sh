@@ -49,7 +49,7 @@ function get_port_data () {
     API_DIR="${BUILD_DIR}/API"
     API_BASE_FILE="${API_DIR}/api"
     SHIP_FILE="${SRC_DIR}/ships.json"
-echo "update"
+
     mkdir -p "${API_DIR}"
     if test_for_update "${API_BASE_FILE}"; then
         for SERVER_NAME in ${SERVER_NAMES[@]}; do
@@ -59,12 +59,12 @@ echo "update"
                 API_FILE="${API_BASE_FILE}-${SERVER_NAME}-${API_VAR}-${DATE}.json"
                 get_API_data "${SERVER_NAME}" "${API_FILE}" "${API_VAR}"
             done
-echo "convert API"
+
             nodejs build/convert-API-data.js "${API_BASE_FILE}-${SERVER_NAME}" "${TEMP_PORT_FILE}" "${DATE}"
             $(yarn bin local)/geo2topo -o "${PORT_FILE}" "${TEMP_PORT_FILE}"
             rm "${TEMP_PORT_FILE}"
         done
-echo "convert pb"
+
         nodejs build/convert-pbZones.js "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${BUILD_DIR}" "${DATE}"
         $(yarn bin local)/geo2topo -o "${SRC_DIR}/pb.json" \
             "${BUILD_DIR}/pbZones.geojson" "${BUILD_DIR}/towers.geojson" "${BUILD_DIR}/forts.geojson"
