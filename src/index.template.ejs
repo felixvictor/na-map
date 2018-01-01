@@ -37,7 +37,7 @@
 </div>
 
 <nav class="navbar fixed-top navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="#">Naval Action map</a>
+    <a class="navbar-brand" href="#"><img src="images/na-map%20brand.jpg" width="30" height="30" alt=""></a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -50,7 +50,7 @@
                    aria-haspopup="true" aria-expanded="false">
                     Move to
                 </a>
-                <div class="dropdown-menu" id="moveToMenu" aria-labelledby="moveToDropdown">
+                <div class="dropdown-menu extralarge-width" id="moveToMenu" aria-labelledby="moveToDropdown">
                     <h6 class="dropdown-header">F11 coordinates</h6>
                     <form id="f11" class="pb-2">
                         <fieldset>
@@ -72,15 +72,15 @@
                 </div>
             </li>
 
-            <li class="nav-item dropdown">
+            <li class="nav-item dropdown pl-1">
                 <a class="nav-link dropdown-toggle" href="#" id="predictDropdown" role="button" data-toggle="dropdown"
                    aria-haspopup="true" aria-expanded="false">
                     Wind prediction
                 </a>
-                <div class="dropdown-menu" id="predictMenu" aria-labelledby="predictDropdown">
+                <div class="dropdown-menu extralarge-width" id="predictMenu" aria-labelledby="predictDropdown">
                     <form id="windPrediction" class="p-2">
                         <div class="form-group">
-                            <label for="direction">Current wind direction</label>
+                            <label for="direction">Current wind</label>
                             <input type="text" maxlength="3"
                                    pattern="(N|NNE|NE|ENE|E|ESE|SE|SSE|S|SSW|SW|WSW|W|WNW|NW|NNW)|(?:[012]?[0-9]{1,2}|3(?:[0-5][0-9]|60))"
                                    class="form-control" placeholder="Degrees or compass direction"
@@ -88,7 +88,7 @@
                             <small class="form-text text-muted">Direction in degrees or compass rose, e.g. WSW.</small>
                         </div>
                         <div class="form-group">
-                            <label for="time">Predict wind for time</label>
+                            <label for="time">Predict wind for</label>
                             <input type="text" maxlength="5" pattern="(?:[01]|2(?![4-9])){1}\d[ :\.][0-5]\d"
                                    class="form-control" placeholder="hh.mm" id="time" aria-label="time"
                                    required>
@@ -110,24 +110,32 @@
                 <select class="custom-select" name="good-names" id="good-names">
                 </select>
             </li>
+        </ul>
 
-            <li class="nav-item pl-2">
-                <div class="radio-group box align-middle ml-1 py-1">
-                    <div class="col-auto align-self-center">
-                        <span class="radio-group-label pr-2">Double click to</span>
-                        <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input" name="mouseFunction" id="compass"
-                                   value="compass" checked>
-                            <label class="custom-control-label" for="compass">plot a course</label>
-                        </div>
-                        <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input" name="mouseFunction" id="F11" value="F11">
-                            <label class="custom-control-label" for="F11">show F11 coordinates</label>
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item dropdown pr-2">
+                <a class="nav-link dropdown-toggle" href="#" id="doubleclickDropdown" role="button"
+                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Double click to
+                </a>
+                <div class="dropdown-menu dropdown-menu-right large-width" id="doubleclickMenu"
+                     aria-labelledby="doubleclickDropdown">
+                    <div class="radio-group ml-1 py-1">
+                        <div class="col-auto align-self-center">
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" class="custom-control-input" name="mouseFunction" id="compass"
+                                       value="compass" checked>
+                                <label class="custom-control-label" for="compass">plot a course</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" class="custom-control-input" name="mouseFunction" id="F11"
+                                       value="F11">
+                                <label class="custom-control-label" for="F11">show F11 coordinates</label>
+                            </div>
                         </div>
                     </div>
                 </div>
             </li>
-
         </ul>
         <button id="reset" type="reset" class="btn btn-outline-secondary">Clear</button>
     </div>
