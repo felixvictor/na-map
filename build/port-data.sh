@@ -9,9 +9,6 @@ SERVER_NAMES=(eu1 eu2)
 API_VARS=(ItemTemplates Ports Shops)
 DATE=$(date +%Y-%m-%d)
 LAST_DATE=$(date +%Y-%m-%d --date "-1 day")
-BUILD_DIR="$(pwd)/build"
-SRC_DIR="$(pwd)/src"
-LAST_UPDATE_FILE="${BUILD_DIR}/.last-port-update"
 
 function get_API_data () {
     SERVER_NAME="$1"
@@ -84,6 +81,11 @@ function deploy_data () {
 # Main functions
 
 function change_data () {
+    BASE_DIR="$(pwd)"
+    BUILD_DIR="${BASE_DIR}/build"
+    SRC_DIR="${BASE_DIR}/src"
+    LAST_UPDATE_FILE="${BUILD_DIR}/.last-port-update"
+
     get_port_data
 }
 
@@ -97,7 +99,12 @@ function push_data () {
 }
 
 function update_data () {
-    cd "/home/natopo/na-topo.git"
+    BASE_DIR="/home/natopo/na-topo.git"
+    BUILD_DIR="${BASE_DIR}/build"
+    SRC_DIR="${BASE_DIR}/src"
+    LAST_UPDATE_FILE="${BUILD_DIR}/.last-port-update"
+    
+    cd ${BASE_DIR}
     echo "update port data"
     echo $(pwd)
     echo ${BUILD_DIR}
