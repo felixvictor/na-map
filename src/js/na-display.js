@@ -797,6 +797,15 @@ export default function naDisplay(serverName) {
         console.log(`windTime: ${windTime}`);
         console.log(`windTimeInSec: ${windTimeInSec}`);
         console.log(`predictedWindDegrees: ${predictedWindDegrees}`);
+
+        const x = naHeight / 2,
+            y = naWidth / 2,
+            length = 200,
+            dx = length * Math.cos(predictedWindDegrees),
+            dy = length * Math.sin(predictedWindDegrees);
+        plotCourse(x, y);
+        plotCourse(x + dx, y + dy);
+        naZoomAndPan(d3.zoomIdentity.translate(-x / 2, -y / 2).scale(1));
     }
 
     function naReady(error, naMap, pbZones) {
