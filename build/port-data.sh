@@ -75,7 +75,7 @@ function get_port_data () {
 }
 
 function deploy_data () {
-    yarn run deploy-netlify
+    yarn run deploy-update
 }
 
 #####
