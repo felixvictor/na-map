@@ -46,13 +46,13 @@
         <ul class="navbar-nav mr-auto">
 
             <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="moveTo" role="button" data-toggle="dropdown"
+                <a class="nav-link dropdown-toggle" href="#" id="moveToDropdown" role="button" data-toggle="dropdown"
                    aria-haspopup="true" aria-expanded="false">
                     Move to
                 </a>
-                <div class="dropdown-menu" id="moveToMenu" aria-labelledby="moveTo">
+                <div class="dropdown-menu" id="moveToMenu" aria-labelledby="moveToDropdown">
                     <h6 class="dropdown-header">F11 coordinates</h6>
-                    <form class="pb-2">
+                    <form id="f11" class="pb-2">
                         <fieldset>
                             <div class="form-row">
                                 <div class="col-4 left-margin">
@@ -72,13 +72,35 @@
                 </div>
             </li>
 
-            <li class="nav-item pl-2">
-                <form class="form-inline">
-                    <input type="text" maxlength="5" pattern="(?:[01]|2(?![4-9])){1}\d[ :\.][0-5]\d"
-                           class="form-control" placeholder="hh.mm" id="time" aria-label="time" required>
-                    <button type="submit" class="btn btn-outline-primary">Wind prediction</button>
-                </form>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="predictDropdown" role="button" data-toggle="dropdown"
+                   aria-haspopup="true" aria-expanded="false">
+                    Wind prediction
+                </a>
+                <div class="dropdown-menu" id="predictMenu" aria-labelledby="predictDropdown">
+                    <form id="windPrediction" class="p-2">
+                        <div class="form-group">
+                            <label for="direction">Current wind direction</label>
+                            <input type="text" maxlength="3"
+                                   pattern="(N|NNE|NE|ENE|E|ESE|SE|SSE|S|SSW|SW|WSW|W|WNW|NW|NNW)|(?:[012]?[0-9]{1,2}|3(?:[0-5][0-9]|60))"
+                                   class="form-control" placeholder="Degrees or compass direction"
+                                   id="direction" aria-label="direction" required>
+                            <small class="form-text text-muted">Direction in degrees or compass rose, e.g. WSW.</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="time">Predict wind for time</label>
+                            <input type="text" maxlength="5" pattern="(?:[01]|2(?![4-9])){1}\d[ :\.][0-5]\d"
+                                   class="form-control" placeholder="hh.mm" id="time" aria-label="time"
+                                   required>
+                            <small class="form-text text-muted">If the time entered lies before current time next day is
+                                assumed.
+                            </small>
+                        </div>
+                        <button type="submit" class="btn btn-outline-primary">Predict</button>
+                    </form>
+                </div>
             </li>
+
             <li class="nav-item pl-2">
                 <select class="custom-select" name="port-names" id="port-names">
                 </select>
