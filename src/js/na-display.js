@@ -768,6 +768,19 @@ export default function naDisplay(serverName) {
             return compassDirections.indexOf(compass) * degree;
         }
 
+        function printPredictedWind(predictedWindDegrees) {
+            const x = naHeight / 2,
+                y = naWidth / 2,
+                length = 200,
+                dx = length * Math.cos(predictedWindDegrees),
+                dy = length * Math.sin(predictedWindDegrees);
+
+            naClearMap();
+            plotCourse(x, y);
+            plotCourse(x + dx, y + dy);
+            naZoomAndPan(d3.zoomIdentity.translate(-x / 2, -y / 2).scale(1));
+        }
+
         const secondsForFullCircle = 48 * 60,
             fullCircle = 360,
             degreesPerSecond = fullCircle / secondsForFullCircle,
@@ -792,20 +805,8 @@ export default function naDisplay(serverName) {
             timeDiffInSec += DayInSec;
         }
         let predictedWindDegrees = (currentWindDegrees + degreesPerSecond * timeDiffInSec) % 360;
-        console.log(`currentWindDegrees: ${currentWindDegrees}`);
-        console.log(`predictTime: ${predictTime}`);
-        console.log(`windTime: ${windTime}`);
-        console.log(`windTimeInSec: ${windTimeInSec}`);
-        console.log(`predictedWindDegrees: ${predictedWindDegrees}`);
 
-        const x = naHeight / 2,
-            y = naWidth / 2,
-            length = 200,
-            dx = length * Math.cos(predictedWindDegrees),
-            dy = length * Math.sin(predictedWindDegrees);
-        plotCourse(x, y);
-        plotCourse(x + dx, y + dy);
-        naZoomAndPan(d3.zoomIdentity.translate(-x / 2, -y / 2).scale(1));
+        printPredictedWind(predictedWindDegrees);
     }
 
     function naReady(error, naMap, pbZones) {
@@ -840,6 +841,7 @@ export default function naDisplay(serverName) {
             const currentWindDirection = $("#direction").val(),
                 time = $("#time").val();
             predictWind(currentWindDirection, time);
+            $("#predictDropdown").dropdown("toggle");
             event.preventDefault();
         });
         $("#reset").on("click", function() {
