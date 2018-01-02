@@ -90,6 +90,7 @@ function convertPorts() {
                 ]
             },
             properties: {
+                name: port.Name.replace("'", "’"),
                 dx: GetMinMaxX(
                     convertCoordX(port.Position.x, port.Position.z) -
                         convertCoordX(port.PortBattleZonePositions[0].x, port.PortBattleZonePositions[0].z)
