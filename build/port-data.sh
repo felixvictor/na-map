@@ -78,15 +78,24 @@ function deploy_data () {
     yarn run deploy-update
 }
 
-#####
-# Main functions
-
-function change_data () {
+function change_var () {
     export BASE_DIR="$(pwd)"
     export BUILD_DIR="${BASE_DIR}/build"
     export SRC_DIR="${BASE_DIR}/src"
     export LAST_UPDATE_FILE="${BUILD_DIR}/.last-port-update"
+}
 
+function update_var () {
+    export BASE_DIR="/home/natopo/na-topo.git"
+    export BUILD_DIR="${BASE_DIR}/build"
+    export SRC_DIR="${BASE_DIR}/src"
+    export LAST_UPDATE_FILE="${BUILD_DIR}/.last-port-update"
+}
+
+#####
+# Main functions
+
+function change_data () {
     get_port_data
 }
 
@@ -100,11 +109,6 @@ function push_data () {
 }
 
 function update_data () {
-    export BASE_DIR="/home/natopo/na-topo.git"
-    export BUILD_DIR="${BASE_DIR}/build"
-    export SRC_DIR="${BASE_DIR}/src"
-    export LAST_UPDATE_FILE="${BUILD_DIR}/.last-port-update"
-    
     cd ${BASE_DIR}
     # If file not exists create it with date of last commit
     [[ ! -f "${LAST_UPDATE_FILE}" ]] && touch -d "$(git log -1 --format=%cI)" "${LAST_UPDATE_FILE}"
@@ -120,12 +124,19 @@ function update_data () {
 
 case "$1" in
     change)
+        change_var
         change_data
         ;;
-    push)
+    push-change)
+        change_var
+        push_data
+        ;;
+    push-update)
+        update_var
         push_data
         ;;
     update)
+        update_var
         update_data
         ;;
 esac
