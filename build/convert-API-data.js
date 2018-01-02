@@ -91,8 +91,14 @@ function convertPorts() {
             },
             properties: {
                 name: port.Name.replace("'", "’"),
-                dx: GetMinMaxX(port.Position.x - port.PortBattleZonePositions[0].x),
-                dy: GetMinMaxY(port.Position.z - port.PortBattleZonePositions[0].z),
+                dx: GetMinMaxX(
+                    convertCoordX(port.Position.x, port.Position.z) -
+                        convertCoordX(port.PortBattleZonePositions[0].x, port.PortBattleZonePositions[0].z)
+                ),
+                dy: GetMinMaxY(
+                    convertCoordY(port.Position.x, port.Position.z) -
+                        convertCoordY(port.PortBattleZonePositions[0].x, port.PortBattleZonePositions[0].z)
+                ),
                 nation: nation[port.Nation],
                 countyCapital: port.Name === port.CountyCapitalName,
                 shallow: port.Depth,
