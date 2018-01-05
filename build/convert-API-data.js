@@ -1,4 +1,5 @@
 let fs = require("fs");
+let moment = require("moment");
 
 const inBaseFilename = process.argv[2],
     outFilename = process.argv[3],
@@ -73,11 +74,10 @@ function convertPorts() {
     }
     // https://gist.github.com/Nishchit14/4c6a7349b3c778f7f97b912629a9f228
     const flattenArray = arr => [].concat.apply([], arr.map(element => element));
-
     let geoJson = {};
     geoJson["type"] = "FeatureCollection";
     geoJson["features"] = [];
-
+    const ticks = 621355968000000000;
     APIPorts.map(port => {
         let feature = {
             type: "Feature",
@@ -107,6 +107,7 @@ function convertPorts() {
                 portBattleType: port.PortBattleType,
                 portBattleStartTime: port.PortBattleStartTime,
                 capturer: port.Capturer,
+                lastPortBattle: moment((port.LastPortBattle - ticks) / 10000).format("YYYY-MM-DD HH:mm"),
                 nonCapturable: port.NonCapturable,
                 conquestMarksPension: port.ConquestMarksPension,
                 portTax: Math.round(port.PortTax * 100) / 100,
