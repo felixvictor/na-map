@@ -10,32 +10,6 @@
 </head>
 <body>
 
-<section id="modal" class="modal" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <header class="modal-header">
-                <h3><%= htmlWebpackPlugin.options.title %>&nbsp;<span
-                            class="text-primary small">v<%= htmlWebpackPlugin.options.version %></span></h3>
-            </header>
-
-            <div class="modal-body">
-                <p>Yet another map which uses the in-game map and live data (daily updated soonish after maintenance).
-                    Please check the <a href="http://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/">
-                        Game-Labs forum post</a> for further details. Feedback is very welcome.</p>
-                <p>Designed by iB aka Felix Victor.</p>
-            </div>
-            <footer class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal" data-server="eu1">Caribbean
-                </button>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal" data-server="eu2">PvE only</button>
-            </footer>
-        </div>
-    </div>
-</section>
-
-<div id="na" class="na">
-</div>
-
 <nav class="navbar fixed-top navbar-expand-lg navbar-light bg-light">
     <a class="navbar-brand" href="#">Naval Action map</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
@@ -105,6 +79,32 @@
         <button id="reset" type="reset" class="btn btn-outline-secondary">Clear</button>
     </div>
 </nav>
+
+<div id="na" class="na">
+</div>
+
+<section id="modal" class="modal" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <header class="modal-header">
+                <h3><%= htmlWebpackPlugin.options.title %>&nbsp;<span
+                            class="text-primary small">v<%= htmlWebpackPlugin.options.version %></span></h3>
+            </header>
+
+            <div class="modal-body">
+                <p>Yet another map which uses the in-game map and live data (daily updated soonish after maintenance).
+                    Please check the <a href="http://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/">
+                        Game-Labs forum post</a> for further details. Feedback is very welcome.</p>
+                <p>Designed by iB aka Felix Victor.</p>
+            </div>
+            <footer class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" data-server="eu1">Caribbean
+                </button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" data-server="eu2">PvE only</button>
+            </footer>
+        </div>
+    </div>
+</section>
 
 <script src="https://d3js.org/d3.v4.js"></script>
 </body>
