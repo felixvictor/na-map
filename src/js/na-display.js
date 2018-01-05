@@ -583,9 +583,14 @@ export default function naDisplay(serverName) {
         }
 
         function setupSvg() {
+            const zoomPadding = defaults.coord.max / 50;
             naZoom = d3
                 .zoom()
                 .scaleExtent([0.15, 10])
+                .translateExtent([
+                    [defaults.coord.min - zoomPadding, defaults.coord.min - zoomPadding],
+                    [defaults.coord.max + zoomPadding, defaults.coord.max + zoomPadding]
+                ])
                 .on("zoom", naZoomed);
 
             naSvg = d3
