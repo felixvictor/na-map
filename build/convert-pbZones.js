@@ -67,7 +67,9 @@ function convertPBZones() {
                         )
                     }
                 };
-                geoJson["features"].push(feature);
+                if (feature.geometry.coordinates.length > 0) {
+                    geoJson["features"].push(feature);
+                }
             });
             saveJson(`${outDir}/${element}`, geoJson);
         });
