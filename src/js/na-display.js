@@ -24,7 +24,7 @@ export default function naDisplay(serverName) {
     let initial = { scale: 0.3, x: 0, y: 0 };
     initial.transform = d3.zoomIdentity.translate(initial.x, initial.y).scale(initial.scale);
     let defaults = {
-        margin: { top: 20, right: 20, bottom: 20, left: 20 },
+        margin: { top: parseInt($(".navbar").css("height")), right: 20, bottom: 20, left: 20 },
         coord: {
             min: 0,
             max: 8192
