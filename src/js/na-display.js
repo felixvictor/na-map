@@ -21,14 +21,13 @@ export default function naDisplay(serverName) {
         naTeleportPorts,
         gPorts;
 
-    let initial = { scale: 0.3, x: 0, y: 0 };
-    initial.transform = d3.zoomIdentity.translate(initial.x, initial.y).scale(initial.scale);
     let defaults = {
         margin: { top: parseInt($(".navbar").css("height")), right: 20, bottom: 20, left: 20 },
         coord: {
             min: 0,
             max: 8192
         },
+        maxScale: 10,
         fontSize: 16,
         circleSize: 10,
         iconSize: 50,
@@ -55,8 +54,21 @@ export default function naDisplay(serverName) {
     };
     defaults.width = top.innerWidth - defaults.margin.left - defaults.margin.right;
     defaults.height = top.innerHeight - defaults.margin.top - defaults.margin.bottom;
-    defaults.xScale = d3.scaleLinear().range(0, defaults.width);
-    defaults.yScale = d3.scaleLinear().range(0, defaults.height);
+    defaults.minScale = Math.min(defaults.width / defaults.coord.max, defaults.height / defaults.coord.max);
+    let initial = {
+        scale: defaults.minScale,
+        x: -defaults.coord.max / 2 * defaults.minScale,
+        y: -defaults.coord.max / 2 * defaults.minScale
+    };
+    initial.transform = d3.zoomIdentity.translate(initial.x, initial.y).scale(initial.scale);
+    defaults.xScale = d3
+        .scaleLinear()
+        .clamp(true)
+        .range([0, defaults.width]);
+    defaults.yScale = d3
+        .scaleLinear()
+        .clamp(true)
+        .range([0, defaults.height]);
     defaults.coord.voronoi = [
         [defaults.coord.min - 1, defaults.coord.min - 1],
         [defaults.coord.max + 1, defaults.coord.max + 1]
@@ -107,12 +119,20 @@ export default function naDisplay(serverName) {
         function printCoord(x, y) {
             // svg coord to F11 coord
             function convertInvCoordX(x, y) {
-                return defaults.transInv.A * x + defaults.transInv.B * y + defaults.transInv.C;
+                return (
+                    defaults.transformMatrixInv.A * x +
+                    defaults.transformMatrixInv.B * y +
+                    defaults.transformMatrixInv.C
+                );
             }
 
             // svg coord to F11 coord
             function convertInvCoordY(x, y) {
-                return defaults.transInv.B * x - defaults.transInv.A * y + defaults.transInv.D;
+                return (
+                    defaults.transformMatrixInv.B * x -
+                    defaults.transformMatrixInv.A * y +
+                    defaults.transformMatrixInv.D
+                );
             }
 
             const F11X = convertInvCoordX(x, y),
@@ -130,19 +150,20 @@ export default function naDisplay(serverName) {
         const mx = coord[0],
             my = coord[1],
             tk = transform.k;
-        let tx = transform.x,
-            ty = transform.y;
-
-        let x = (-tx + mx) / tk,
-            y = (-ty + my) / tk;
+        let tx = transform.x * transform.k,
+            ty = transform.y * transform.k;
+        console.log(`mx: ${mx} my: ${my}`);
+        console.log(`tx: ${tx} ty: ${ty}`);
+        let x = (mx - tx) / tk,
+            y = (my - ty) / tk;
+        console.log(`x:  ${x}  y: ${y}`);
         if (current.radioButton === "F11") {
             printCoord(x, y);
         } else {
             plotCourse(x, y);
         }
-        tx = -x + mx;
-        ty = -y + my;
-        zoomAndPan(d3.zoomIdentity.translate(tx, ty).scale(1));
+
+        zoomAndPan(d3.zoomIdentity.translate(-x, -y).scale(1));
     }
 
     function plotCourse(x, y) {
@@ -504,6 +525,9 @@ export default function naDisplay(serverName) {
             t = { delay: 500, duration: 500 };
         }
 
+        transform.x += defaults.width / 2;
+        transform.y += defaults.height / 2;
+
         naSvg
             .transition()
             .delay(t.delay)
@@ -586,7 +610,7 @@ export default function naDisplay(serverName) {
             const zoomPadding = defaults.coord.max / 50;
             naZoom = d3
                 .zoom()
-                .scaleExtent([0.15, 10])
+                .scaleExtent([defaults.minScale, defaults.maxScale])
                 .translateExtent([
                     [defaults.coord.min - zoomPadding, defaults.coord.min - zoomPadding],
                     [defaults.coord.max + zoomPadding, defaults.coord.max + zoomPadding]
@@ -780,10 +804,8 @@ export default function naDisplay(serverName) {
                 const c = coord.split(","),
                     x = c[0],
                     y = c[1];
-                const tx = -x + defaults.height / 2,
-                    ty = -y + defaults.width / 2;
 
-                zoomAndPan(d3.zoomIdentity.translate(tx, ty).scale(1));
+                zoomAndPan(d3.zoomIdentity.translate(-x, -y).scale(1));
             }
 
             setupPortSelect();
