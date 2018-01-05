@@ -5,6 +5,7 @@
  */
 
 import { feature as topojsonFeature } from "topojson-client";
+import moment from "moment";
 
 import "bootstrap/js/dist/tooltip";
 import "bootstrap/js/dist/util";
@@ -365,10 +366,10 @@ export default function naDisplay(serverName) {
             h += `<p>${d.shallow ? "Shallow" : "Deep"}`;
             h += " water port";
             if (d.countyCapital) {
-                h += ", county capital";
+                h += " (county capital)";
             }
             if (d.capturer) {
-                h += ` owned by ${d.capturer}`;
+                h += ` captured by ${d.capturer} ${moment(d.lastPortBattle).fromNow()}`;
             }
             h += "<br>";
             if (!d.nonCapturable) {
