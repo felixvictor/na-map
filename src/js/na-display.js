@@ -55,6 +55,8 @@ export default function naDisplay(serverName) {
     };
     defaults.width = top.innerWidth - defaults.margin.left - defaults.margin.right;
     defaults.height = top.innerHeight - defaults.margin.top - defaults.margin.bottom;
+    defaults.xScale = d3.scaleLinear().range(0, defaults.width);
+    defaults.yScale = d3.scaleLinear().range(0, defaults.height);
     defaults.coord.voronoi = [
         [defaults.coord.min - 1, defaults.coord.min - 1],
         [defaults.coord.max + 1, defaults.coord.max + 1]
@@ -762,6 +764,42 @@ export default function naDisplay(serverName) {
             throw error;
         }
 
+        function setupScaleDomain() {
+            const flattenArray = arr => [].concat.apply([], arr.map(element => element));
+            defaults.xScale.domain(
+                d3.extent(
+                    [].concat(
+                        defaults.portData.map(d => d.geometry.coordinates[0]),
+                        flattenArray(
+                            defaults.PBZoneData.features.map(d => [].concat(d.geometry.coordinates.map(d => d[0])))
+                        ),
+                        flattenArray(
+                            defaults.fortData.features.map(d => [].concat(d.geometry.coordinates.map(d => d[0])))
+                        ),
+                        flattenArray(
+                            defaults.towerData.features.map(d => [].concat(d.geometry.coordinates.map(d => d[0])))
+                        )
+                    )
+                )
+            );
+            defaults.yScale.domain(
+                d3.extent(
+                    [].concat(
+                        defaults.portData.map(d => d.geometry.coordinates[1]),
+                        flattenArray(
+                            defaults.PBZoneData.features.map(d => [].concat(d.geometry.coordinates.map(d => d[1])))
+                        ),
+                        flattenArray(
+                            defaults.fortData.features.map(d => [].concat(d.geometry.coordinates.map(d => d[1])))
+                        ),
+                        flattenArray(
+                            defaults.towerData.features.map(d => [].concat(d.geometry.coordinates.map(d => d[1])))
+                        )
+                    )
+                )
+            );
+        }
+
         // Read map data
         defaults.portData = topojsonFeature(naMap, naMap.objects.ports).features;
         current.portData = defaults.portData;
@@ -769,6 +807,7 @@ export default function naDisplay(serverName) {
         defaults.fortData = topojsonFeature(pbZones, pbZones.objects.forts);
         defaults.towerData = topojsonFeature(pbZones, pbZones.objects.towers);
 
+        setupScaleDomain();
         naSetupCanvas();
         naSetupSvg();
         naSetupTeleportAreas();
