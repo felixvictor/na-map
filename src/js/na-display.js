@@ -40,16 +40,16 @@ export default function naDisplay(serverName) {
         image: new Image(),
         line: d3.line(),
         transformMatrix: {
-            A: 0.00494444554690109,
-            B: 0.0000053334600512813,
-            C: 4082.20289162021,
-            D: 4111.1164516551
+            A: -0.00499866779363828,
+            B: -0.00000021464254980645,
+            C: 4096.88635151897,
+            D: 4096.90282787469
         },
         transformMatrixInv: {
-            A: 202.246910593215,
-            B: 0.2181591055887,
-            C: -826509.800732941,
-            D: 830570.031704516
+            A: -200.053302087577,
+            B: -0.00859027897636011,
+            C: 819630.836437126,
+            D: -819563.745651571
         }
     };
     defaults.width = top.innerWidth - defaults.margin.left - defaults.margin.right;
@@ -149,14 +149,13 @@ export default function naDisplay(serverName) {
             transform = d3.zoomTransform(this);
         const mx = coord[0],
             my = coord[1],
-            tk = transform.k;
-        let tx = transform.x * transform.k,
-            ty = transform.y * transform.k;
-        console.log(`mx: ${mx} my: ${my}`);
-        console.log(`tx: ${tx} ty: ${ty}`);
+            tk = transform.k,
+            tx = transform.x,
+            ty = transform.y;
+
         let x = (mx - tx) / tk,
             y = (my - ty) / tk;
-        console.log(`x:  ${x}  y: ${y}`);
+
         if (current.radioButton === "F11") {
             printCoord(x, y);
         } else {
@@ -281,11 +280,7 @@ export default function naDisplay(serverName) {
         } else {
             plotCourse(x, y);
         }
-
-        const tx = -x + defaults.width / 2,
-            ty = -y + defaults.height / 2;
-
-        zoomAndPan(d3.zoomIdentity.translate(tx, ty).scale(1));
+        zoomAndPan(d3.zoomIdentity.translate(-x, -y).scale(1));
     }
 
     function printF11Coord(x, y, textX, textY) {
