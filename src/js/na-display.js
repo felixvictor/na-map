@@ -78,8 +78,7 @@ export default function naDisplay(serverName) {
     defaults.voronoiRadius = Math.min(defaults.height, defaults.width);
 
     let current = {
-        x: initial.x,
-        y: initial.y,
+        transform: { x: initial.x, y: initial.y, scale: initial.scale },
         fontSize: defaults.fontSize,
         circleSize: defaults.circleSize,
         highlightId: null,
@@ -101,6 +100,30 @@ export default function naDisplay(serverName) {
         }
         return r;
     };
+
+    // https://stackoverflow.com/questions/7490660/converting-wind-direction-in-angles-to-text-words
+    function degreesToCompass(degrees) {
+        const val = Math.floor(degrees / 22.5 + 0.5);
+        const compassDirections = [
+            "N",
+            "NNE",
+            "NE",
+            "ENE",
+            "E",
+            "ESE",
+            "SE",
+            "SSE",
+            "S",
+            "SSW",
+            "SW",
+            "WSW",
+            "W",
+            "WNW",
+            "NW",
+            "NNW"
+        ];
+        return compassDirections[val % 16];
+    }
 
     function naDisplayCountries(transform) {
         function drawImage() {
@@ -183,14 +206,14 @@ export default function naDisplay(serverName) {
         }
 
         function printLine(x, y) {
-            // Converts from radians to degrees
-            // http://cwestblog.com/2012/11/12/javascript-degree-and-radian-conversion/
-            Math.radiansToDegrees = function(radians) {
-                return radians * 180 / Math.PI;
-            };
-
             // https://stackoverflow.com/questions/9970281/java-calculating-the-angle-between-two-points-in-degrees
             function rotationAngleInDegrees(centerPt, targetPt) {
+                // Converts from radians to degrees
+                // http://cwestblog.com/2012/11/12/javascript-degree-and-radian-conversion/
+                Math.radiansToDegrees = function(radians) {
+                    return radians * 180 / Math.PI;
+                };
+
                 let theta = Math.atan2(targetPt[1] - centerPt[1], targetPt[0] - centerPt[0]);
                 theta -= Math.PI / 2.0;
                 let angle = Math.radiansToDegrees(theta);
@@ -198,30 +221,6 @@ export default function naDisplay(serverName) {
                     angle += 360;
                 }
                 return angle;
-            }
-
-            // https://stackoverflow.com/questions/7490660/converting-wind-direction-in-angles-to-text-words
-            function degreesToCompass(degrees) {
-                const val = Math.floor(degrees / 22.5 + 0.5);
-                const compassDirections = [
-                    "N",
-                    "NNE",
-                    "NE",
-                    "ENE",
-                    "E",
-                    "ESE",
-                    "SE",
-                    "SSE",
-                    "S",
-                    "SSW",
-                    "SW",
-                    "WSW",
-                    "W",
-                    "WNW",
-                    "NW",
-                    "NNW"
-                ];
-                return compassDirections[val % 16];
             }
 
             const degrees = rotationAngleInDegrees(
@@ -521,7 +520,9 @@ export default function naDisplay(serverName) {
         } else {
             t = { delay: 500, duration: 500 };
         }
-
+        current.transform.x = transform.x;
+        current.transform.y = transform.y;
+        current.transform.scale = transform.k;
         transform.x += defaults.width / 2;
         transform.y += defaults.height / 2;
 
@@ -629,6 +630,18 @@ export default function naDisplay(serverName) {
                 .on("dblclick", doubleClickAction);
 
             svgDef = naSvg.append("defs");
+            svgDef
+                .append("marker")
+                .attr("id", "arrow")
+                .attr("viewBox", "0 -5 10 10")
+                .attr("refX", 5)
+                .attr("refY", 0)
+                .attr("markerWidth", 4)
+                .attr("markerHeight", 4)
+                .attr("orient", "auto")
+                .append("path")
+                .attr("d", "M0,-5L10,0L0,5")
+                .attr("class", "arrow-head");
 
             mainGVoronoi = naSvg.append("g").attr("class", "voronoi");
             mainGPort = naSvg.append("g").attr("class", "port");
@@ -857,16 +870,53 @@ export default function naDisplay(serverName) {
         }
 
         function printPredictedWind(predictedWindDegrees) {
-            const x = naHeight / 2,
-                y = naWidth / 2,
-                length = 200,
-                dx = length * Math.cos(predictedWindDegrees),
-                dy = length * Math.sin(predictedWindDegrees);
+            function printWindLine(x, dx, y, dy, degrees) {
+                const compass = degreesToCompass(degrees);
 
-            naClearMap();
-            plotCourse(x, y);
-            plotCourse(x + dx, y + dy);
-            naZoomAndPan(d3.zoomIdentity.translate(-x / 2, -y / 2).scale(1));
+                current.lineData.push([x + dx / 2, y + dy / 2]);
+                current.lineData.push([x - dx / 2, y - dy / 2]);
+
+                gCompass
+                    .datum(current.lineData)
+                    .attr("d", defaults.line)
+                    .attr("marker-end", "url(#arrow)");
+
+                const svg = mainGCoord
+                    .append("svg")
+                    .attr("x", x)
+                    .attr("y", y);
+                const rect = svg.append("rect");
+                const text = svg
+                    .append("text")
+                    .attr("x", "50%")
+                    .attr("y", "50%")
+                    .text(`${compass} (${Math.round(degrees)}°)`);
+
+                const bbox = text.node().getBBox();
+                const height = bbox.height + defaults.fontSize,
+                    width = bbox.width + defaults.fontSize;
+                rect
+                    .attr("x", 0)
+                    .attr("y", 0)
+                    .attr("height", height)
+                    .attr("width", width);
+                svg.attr("height", height).attr("width", width);
+            }
+
+            const x = -current.transform.x,
+                xCompass = -current.transform.x - defaults.width / 16 / current.transform.scale,
+                y = -current.transform.y,
+                yCompass = -current.transform.y - defaults.height /16/ current.transform.scale,
+                length = 120,
+                radians = 0.0174533 * (predictedWindDegrees - 90),
+                dx = length * Math.cos(radians),
+                dy = length * Math.sin(radians);
+            console.log(`x: ${x} y: ${y}`);
+            console.log(`xCompass: ${xCompass} yCompass: ${yCompass}`);
+            clearMap();
+            plotCourse(xCompass, yCompass);
+            printWindLine(xCompass, dx, yCompass, dy, predictedWindDegrees);
+            zoomAndPan(d3.zoomIdentity.translate(-x, -y).scale(current.transform.scale));
         }
 
         const secondsForFullCircle = 48 * 60,
@@ -877,7 +927,7 @@ export default function naDisplay(serverName) {
             currentWindDegrees;
         // Add leading zero if necessary
         if (predictTime.length < 5) {
-            predictTime.unshift("0");
+            predictTime = `0${predictTime}`;
         }
         let windTimeInSec = Math.floor(
             windTime.setHours(predictTime.slice(0, 2), predictTime.slice(3, 5), 0).valueOf() / 1000
@@ -921,9 +971,11 @@ export default function naDisplay(serverName) {
             event.preventDefault();
         });
         $("#windPrediction").submit(function(event) {
-            const currentWindDirection = $("#direction").val(),
+            const currentWind = $("#direction")
+                    .val()
+                    .toUpperCase(),
                 time = $("#time").val();
-            predictWind(currentWindDirection, time);
+            predictWind(currentWind, time);
             $("#predictDropdown").dropdown("toggle");
             event.preventDefault();
         });
