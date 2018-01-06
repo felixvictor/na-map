@@ -136,8 +136,8 @@ export default function naDisplay(serverName) {
                 );
             }
 
-            const F11X = convertInvCoordX(x, y),
-                F11Y = convertInvCoordY(x, y);
+            const F11X = convertInvCoordX(x, y) * -1,
+                F11Y = convertInvCoordY(x, y) * -1;
 
             if (current.radioButton === "F11") {
                 printF11Coord(x, y, F11X, F11Y);
@@ -271,7 +271,8 @@ export default function naDisplay(serverName) {
         function convertCoordY(x, y) {
             return defaults.transformMatrix.B * x - defaults.transformMatrix.A * y + defaults.transformMatrix.D;
         }
-
+        F11X *= -1;
+        F11Y *= -1;
         const x = convertCoordX(F11X, F11Y),
             y = convertCoordY(F11X, F11Y);
 
