@@ -54,21 +54,20 @@
                 <div class="dropdown-menu extralarge-width" id="predictMenu" aria-labelledby="predictDropdown">
                     <form id="windPrediction" class="p-2">
                         <div class="form-group">
-                            <label for="direction">Current wind</label>
+                            <div class="alert alert-primary" role="alert">Select a port first.</div>
+                            <label for="direction">Wind currently blowing from</label>
                             <input type="text" maxlength="3"
-                                   pattern="(N|NNE|NE|ENE|E|ESE|SE|SSE|S|SSW|SW|WSW|W|WNW|NW|NNW)|(?:[012]?[0-9]{1,2}|3(?:[0-5][0-9]|60))"
-                                   class="form-control" placeholder="Degrees or compass direction"
+                                   pattern="(N|NNE|NE|ENE|E|ESE|SE|SSE|S|SSW|SW|WSW|W|WNW|NW|NNW|n|nne|ne|ene|e|ese|se|sse|s|ssw|sw|wsw|w|wnw|nw|nnw)|(?:[012]?[0-9]{1,2}|3(?:[0-5][0-9]|60))"
+                                   class="form-control" placeholder="Degrees or direction"
                                    id="direction" aria-label="direction" required>
-                            <small class="form-text text-muted">Direction in degrees or compass rose, e.g. WSW.</small>
+                            <small class="form-text text-muted">Direction in azimuth degrees (e.g. 180) or cardinal directions (e.g. WSW).</small>
                         </div>
                         <div class="form-group">
                             <label for="time">Predict wind for</label>
-                            <input type="text" maxlength="5" pattern="(?:[01]|2(?![4-9])){1}\d[ :\.][0-5]\d"
+                            <input type="text" maxlength="5" pattern="(?:[0-1]?\d|2[0-3])(?:[.:\s][0-5]\d)?"
                                    class="form-control" placeholder="hh.mm" id="time" aria-label="time"
                                    required>
-                            <small class="form-text text-muted">If the time entered lies before current time next day is
-                                assumed.
-                            </small>
+                            <small class="form-text text-muted">Times before current time are considered as next day hours.</small>
                         </div>
                         <button type="submit" class="btn btn-outline-primary">Predict</button>
                     </form>
@@ -76,12 +75,12 @@
             </li>
 
             <li class="nav-item pl-2">
-                <select class="custom-select" name="port-names" id="port-names">
+                <select class="custom-select" name="port-names" id="port-names" title="Select a port">
                 </select>
             </li>
 
             <li class="nav-item pl-2">
-                <select class="custom-select" name="good-names" id="good-names">
+                <select class="custom-select" name="good-names" id="good-names" title="Select a good">
                 </select>
             </li>
         </ul>

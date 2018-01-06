@@ -119,11 +119,15 @@ text {
     fill-opacity: .5;
   }
   path {
-    stroke: $secondary-600;
+    stroke: $secondary-800;
     stroke-width: .3em;
     stroke-linecap: round;
     fill: none;
   }
+}
+
+.arrow-head {
+  fill: $secondary-800;
 }
 
 .tooltip {
