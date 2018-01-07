@@ -130,6 +130,11 @@ text {
   fill: $secondary-800;
 }
 
+.wind {
+  //stroke-width: .3em !important;
+  font-size: .5em !important;
+}
+
 .tooltip {
   font-size: smaller;
   color: $in-colour;
