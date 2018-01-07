@@ -189,9 +189,9 @@ export default function naDisplay(serverName) {
         zoomAndPan(d3.zoomIdentity.translate(-x, -y).scale(1));
     }
 
-    function plotCourse(x, y) {
-        function printCompass(x, y) {
-            const compassSize = 100;
+    function plotCourse(x, y, style = "course") {
+        function printCompass(x, y, style) {
+            const compassSize = "course" === style ? 100 : 30;
 
             mainGCoord
                 .append("image")
@@ -254,7 +254,7 @@ export default function naDisplay(serverName) {
 
         current.lineData.push([x, y]);
         if (current.bFirstCoord) {
-            printCompass(x, y);
+            printCompass(x, y, style);
             current.bFirstCoord = !current.bFirstCoord;
         } else {
             printLine(x, y);
@@ -879,22 +879,24 @@ export default function naDisplay(serverName) {
                 gCompass
                     .datum(current.lineData)
                     .attr("d", defaults.line)
+                    .attr("class", "wind")
                     .attr("marker-end", "url(#arrow)");
 
                 const svg = mainGCoord
                     .append("svg")
-                    .attr("x", x)
-                    .attr("y", y);
+                    .attr("x", x - dx)
+                    .attr("y", y - dy / 2 + 20 / 2);
                 const rect = svg.append("rect");
                 const text = svg
                     .append("text")
                     .attr("x", "50%")
                     .attr("y", "50%")
+                    .attr("class", "wind")
                     .text(`${compass} (${Math.round(degrees)}°)`);
 
                 const bbox = text.node().getBBox();
-                const height = bbox.height + defaults.fontSize,
-                    width = bbox.width + defaults.fontSize;
+                const height = bbox.height + current.fontSize,
+                    width = bbox.width + current.fontSize;
                 rect
                     .attr("x", 0)
                     .attr("y", 0)
@@ -904,17 +906,19 @@ export default function naDisplay(serverName) {
             }
 
             const x = -current.transform.x,
-                xCompass = -current.transform.x - defaults.width / 16 / current.transform.scale,
+                xCompass = -current.transform.x - defaults.width / 20 / current.transform.scale,
                 y = -current.transform.y,
-                yCompass = -current.transform.y - defaults.height / 16 / current.transform.scale,
-                length = 120,
+                yCompass = -current.transform.y - defaults.height / 20 / current.transform.scale,
+                length = 40,
                 radians = 0.0174533 * (predictedWindDegrees - 90),
                 dx = length * Math.cos(radians),
                 dy = length * Math.sin(radians);
-            console.log(`x: ${x} y: ${y}`);
-            console.log(`xCompass: ${xCompass} yCompass: ${yCompass}`);
+
+            //console.log(`x: ${x} y: ${y}`);
+            //console.log(`xCompass: ${xCompass} yCompass: ${yCompass}`);
+
             clearMap();
-            plotCourse(xCompass, yCompass);
+            plotCourse(xCompass, yCompass, "wind");
             printWindLine(xCompass, dx, yCompass, dy, predictedWindDegrees);
             zoomAndPan(d3.zoomIdentity.translate(-x, -y).scale(current.transform.scale));
         }
@@ -950,10 +954,10 @@ export default function naDisplay(serverName) {
         let timeDiffInSec = predictDate.diff(nowDate, "seconds");
         let predictedWindDegrees = (currentWindDegrees + degreesPerSecond * timeDiffInSec) % 360;
 
-        console.log(`currentWind: ${currentWind} predictTime: ${predictTime}`);
-        console.log(`   now: ${nowDate.format()} predictDate: ${predictDate.format()}`);
-        console.log(`   timeDiffInSec: ${timeDiffInSec} predictedWindDegrees: ${predictedWindDegrees}`);
-        //printPredictedWind(predictedWindDegrees);
+        //console.log(`currentWind: ${currentWind} predictTime: ${predictTime}`);
+        //console.log(`   now: ${nowDate.format()} predictDate: ${predictDate.format()}`);
+        //console.log(`   timeDiffInSec: ${timeDiffInSec} predictedWindDegrees: ${predictedWindDegrees}`);
+        printPredictedWind(predictedWindDegrees);
     }
 
     function naReady(error, naMap, pbZones) {
@@ -973,24 +977,9 @@ export default function naDisplay(serverName) {
         //updatePorts(current.portData.filter(d => ["234", "237", "238", "239", "240"].includes(d.id)));
         updatePorts();
 
-        let now = moment().utc(),
-            direction = "E";
-
-        console.log(`---->   now: ${now.format()}`);
-        predictWind(direction, `${now.hours()}:${now.minutes()}`);
-
-        now.add(48, "minutes");
-        console.log(`---->   now: ${now.format()}`);
-        predictWind(direction, `${now.hours()}:${now.minutes()}`);
-
-        now.add(48, "minutes");
-        console.log(`---->   now: ${now.format()}`);
-        predictWind(direction, `${now.hours()}:${now.minutes()}`);
-
-        now.subtract(48 * 7, "minutes");
-        console.log(`---->   now: ${now.format()}`);
-        predictWind(direction, `${now.hours()}:${now.minutes()}`);
-
+        //let now = moment().utc(), direction = "E";
+        //console.log(`---->   now: ${now.format()}`);
+        //predictWind(direction, `${now.hours()}:${now.minutes()}`);
 
         $("#f11").submit(function(event) {
             const x = $("#x-coord").val(),
