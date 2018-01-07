@@ -906,7 +906,7 @@ export default function naDisplay(serverName) {
             const x = -current.transform.x,
                 xCompass = -current.transform.x - defaults.width / 16 / current.transform.scale,
                 y = -current.transform.y,
-                yCompass = -current.transform.y - defaults.height /16/ current.transform.scale,
+                yCompass = -current.transform.y - defaults.height / 16 / current.transform.scale,
                 length = 120,
                 radians = 0.0174533 * (predictedWindDegrees - 90),
                 dx = length * Math.cos(radians),
@@ -921,30 +921,39 @@ export default function naDisplay(serverName) {
 
         const secondsForFullCircle = 48 * 60,
             fullCircle = 360,
-            degreesPerSecond = fullCircle / secondsForFullCircle,
-            currentTimeInSec = Math.floor(Date.now() / 1000);
-        let windTime = new Date(),
-            currentWindDegrees;
-        // Add leading zero if necessary
-        if (predictTime.length < 5) {
-            predictTime = `0${predictTime}`;
-        }
-        let windTimeInSec = Math.floor(
-            windTime.setHours(predictTime.slice(0, 2), predictTime.slice(3, 5), 0).valueOf() / 1000
-        );
+            degreesPerSecond = fullCircle / secondsForFullCircle;
+        let currentWindDegrees;
+
+        const regex = /(\d+)[\s:.](\d+)/;
+        let match = regex.exec(predictTime),
+            predictHours = parseInt(match[1]),
+            predictMinutes = parseInt(match[2]);
+
+        // Set current wind in degrees
         if (isNaN(currentWind)) {
             currentWindDegrees = compassToDegrees(currentWind);
         } else {
             currentWindDegrees = +currentWind;
         }
-        let timeDiffInSec = windTimeInSec - currentTimeInSec;
-        if (timeDiffInSec < 0) {
-            const DayInSec = 24 * 60 * 60;
-            timeDiffInSec += DayInSec;
+
+        let nowDate = moment()
+                .utc()
+                .seconds(0)
+                .milliseconds(0),
+            predictDate = moment(nowDate)
+                .hour(predictHours)
+                .minutes(predictMinutes);
+        if (predictDate.isBefore(nowDate)) {
+            predictDate.add(1, "day");
         }
+
+        let timeDiffInSec = predictDate.diff(nowDate, "seconds");
         let predictedWindDegrees = (currentWindDegrees + degreesPerSecond * timeDiffInSec) % 360;
 
-        printPredictedWind(predictedWindDegrees);
+        console.log(`currentWind: ${currentWind} predictTime: ${predictTime}`);
+        console.log(`   now: ${nowDate.format()} predictDate: ${predictDate.format()}`);
+        console.log(`   timeDiffInSec: ${timeDiffInSec} predictedWindDegrees: ${predictedWindDegrees}`);
+        //printPredictedWind(predictedWindDegrees);
     }
 
     function naReady(error, naMap, pbZones) {
@@ -963,6 +972,25 @@ export default function naDisplay(serverName) {
         zoomAndPan(initial.transform);
         //updatePorts(current.portData.filter(d => ["234", "237", "238", "239", "240"].includes(d.id)));
         updatePorts();
+
+        let now = moment().utc(),
+            direction = "E";
+
+        console.log(`---->   now: ${now.format()}`);
+        predictWind(direction, `${now.hours()}:${now.minutes()}`);
+
+        now.add(48, "minutes");
+        console.log(`---->   now: ${now.format()}`);
+        predictWind(direction, `${now.hours()}:${now.minutes()}`);
+
+        now.add(48, "minutes");
+        console.log(`---->   now: ${now.format()}`);
+        predictWind(direction, `${now.hours()}:${now.minutes()}`);
+
+        now.subtract(48 * 7, "minutes");
+        console.log(`---->   now: ${now.format()}`);
+        predictWind(direction, `${now.hours()}:${now.minutes()}`);
+
 
         $("#f11").submit(function(event) {
             const x = $("#x-coord").val(),
