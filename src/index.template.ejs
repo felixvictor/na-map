@@ -53,17 +53,21 @@
                 </a>
                 <div class="dropdown-menu extralarge-width" id="predictMenu" aria-labelledby="predictDropdown">
                     <form id="windPrediction" class="p-2">
-                        <div class="form-group">
-                            <div class="alert alert-primary" role="alert">Select a port first.</div>
-                            <label for="direction">Wind currently blowing from</label>
+                        <div class="alert alert-primary" role="alert">Select a port first.</div>
+                        <div class="form-group row">
+                            <label class="align-top col-sm-5 col-form-label" for="direction">Wind currently blowing from</label>
+                            <div class="col-sm-7">
                             <input type="text" value="0" class="dial" id="direction" aria-label="direction" required>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="time">Predict wind for</label>
+                        <div class="form-group row">
+                            <label class="col-sm-5 col-form-label" for="time">Predict wind for</label>
+                            <div class="col-sm-7">
                             <input type="text" maxlength="5" pattern="(?:[0-1]?\d|2[0-3])(?:[.:\s][0-5]\d)?"
                                    class="form-control" placeholder="hh.mm" id="time" aria-label="time"
                                    required>
                             <small class="form-text text-muted">Times before current time are considered as next day hours.</small>
+                            </div>
                         </div>
                         <button type="submit" class="btn btn-outline-primary">Predict</button>
                     </form>

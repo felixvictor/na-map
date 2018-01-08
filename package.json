@@ -83,7 +83,7 @@
     "Safari >= 9.1",
     "Android >= 4.4"
   ],
-  "main": "src/js/main.js",
+  "main": "src/js/main",
   "sass": "src/scss/main.scss",
   "author": "",
   "license": "ISC"
