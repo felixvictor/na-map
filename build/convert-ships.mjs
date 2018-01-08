@@ -1,10 +1,10 @@
-let fs = require("fs");
+import fs from "fs";
 
 const inBaseFilename = process.argv[2],
     outFilename = process.argv[3],
     date = process.argv[4];
 
-let APIItems = require(`${inBaseFilename}-ItemTemplates-${date}.json`);
+let APIItems = JSON.parse(fs.readFileSync(`${inBaseFilename}-ItemTemplates-${date}.json`, "utf8"));
 let ItemNames = new Map();
 
 function saveJson(data) {
