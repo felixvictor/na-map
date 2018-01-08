@@ -131,8 +131,13 @@ text {
 }
 
 .wind {
-  //stroke-width: .3em !important;
   font-size: .5em !important;
+}
+
+.dial{
+  font-family: inherit !important;
+  font-size: 2em !important;
+  color: $primary-700  !important;
 }
 
 .tooltip {

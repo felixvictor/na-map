@@ -6,6 +6,7 @@
 
 import { feature as topojsonFeature } from "topojson-client";
 import moment from "moment";
+import "jquery-knob";
 
 import "bootstrap/js/dist/tooltip";
 import "bootstrap/js/dist/util";
@@ -51,7 +52,25 @@ export default function naDisplay(serverName) {
             B: -0.00859027897636011,
             C: 819630.836437126,
             D: -819563.745651571
-        }
+        },
+        compassDirections: [
+            "N",
+            "NNE",
+            "NE",
+            "ENE",
+            "E",
+            "ESE",
+            "SE",
+            "SSE",
+            "S",
+            "SSW",
+            "SW",
+            "WSW",
+            "W",
+            "WNW",
+            "NW",
+            "NNW"
+        ]
     };
     defaults.width = top.innerWidth - defaults.margin.left - defaults.margin.right;
     defaults.height = top.innerHeight - defaults.margin.top - defaults.margin.bottom;
@@ -104,25 +123,7 @@ export default function naDisplay(serverName) {
     // https://stackoverflow.com/questions/7490660/converting-wind-direction-in-angles-to-text-words
     function degreesToCompass(degrees) {
         const val = Math.floor(degrees / 22.5 + 0.5);
-        const compassDirections = [
-            "N",
-            "NNE",
-            "NE",
-            "ENE",
-            "E",
-            "ESE",
-            "SE",
-            "SSE",
-            "S",
-            "SSW",
-            "SW",
-            "WSW",
-            "W",
-            "WNW",
-            "NW",
-            "NNW"
-        ];
-        return compassDirections[val % 16];
+        return defaults.compassDirections[val % 16];
     }
 
     function naDisplayCountries(transform) {
@@ -848,26 +849,8 @@ export default function naDisplay(serverName) {
 
     function predictWind(currentWind, predictTime) {
         function compassToDegrees(compass) {
-            const compassDirections = [
-                "N",
-                "NNE",
-                "NE",
-                "ENE",
-                "E",
-                "ESE",
-                "SE",
-                "SSE",
-                "S",
-                "SSW",
-                "SW",
-                "WSW",
-                "W",
-                "WNW",
-                "NW",
-                "NNW"
-            ];
-            const degree = 360 / compassDirections.length;
-            return compassDirections.indexOf(compass) * degree;
+            const degree = 360 / defaults.compassDirections.length;
+            return defaults.compassDirections.indexOf(compass) * degree;
         }
 
         function printPredictedWind(predictedWindDegrees) {
@@ -990,10 +973,21 @@ export default function naDisplay(serverName) {
             goToF11(x, z);
             event.preventDefault();
         });
+        $("#direction").knob({
+            bgColor: "#ede1d2", // primary-200
+            thickness: 0.2,
+            min: 0,
+            max: 359,
+            step: 360 / defaults.compassDirections.length,
+            cursor: true,
+            fgColor: "#917f68", // primary-700
+            draw: function() {
+                $(this.i).css("class", "knob");
+            },
+            format: input => degreesToCompass(input)
+        });
         $("#windPrediction").submit(function(event) {
-            const currentWind = $("#direction")
-                    .val()
-                    .toUpperCase(),
+            const currentWind = $("#direction").val(),
                 time = $("#time").val();
             predictWind(currentWind, time);
             $("#predictDropdown").dropdown("toggle");
