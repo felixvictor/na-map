@@ -1,4 +1,4 @@
-let fs = require("fs");
+import fs from "fs";
 
 const infileBaseName = process.argv[2],
     outDir = process.argv[3],
@@ -27,7 +27,7 @@ const Trans = {
     D: 4096.90282787469
 };
 
-let APIPorts = require(`${infileBaseName}-Ports-${date}.json`);
+let APIPorts = JSON.parse(fs.readFileSync(`${infileBaseName}-Ports-${date}.json`, "utf8"));
 
 // F11 coord to svg coord
 function convertCoordX(x, y) {
