@@ -520,6 +520,7 @@ export default function naDisplay(serverName) {
         } else {
             t = { delay: 500, duration: 500 };
         }
+
         current.transform.x = transform.x;
         current.transform.y = transform.y;
         current.transform.scale = transform.k;
@@ -905,22 +906,24 @@ export default function naDisplay(serverName) {
                 svg.attr("height", height).attr("width", width);
             }
 
-            const x = -current.transform.x,
-                xCompass = -current.transform.x - defaults.width / 20 / current.transform.scale,
-                y = -current.transform.y,
-                yCompass = -current.transform.y - defaults.height / 20 / current.transform.scale,
+            const targetScale = 4,
+                scale = targetScale / current.transform.scale,
+                x = -current.transform.x * scale,
+                xCompass = -current.transform.x / current.transform.scale - defaults.width / 25,
+                y = -current.transform.y * scale,
+                yCompass = -current.transform.y / current.transform.scale - defaults.height / 25,
                 length = 40,
                 radians = 0.0174533 * (predictedWindDegrees - 90),
                 dx = length * Math.cos(radians),
                 dy = length * Math.sin(radians);
 
-            //console.log(`x: ${x} y: ${y}`);
-            //console.log(`xCompass: ${xCompass} yCompass: ${yCompass}`);
+            console.log(`x: ${x} y: ${y} current.scale: ${current.transform.scale} scale: ${scale}`);
+            console.log(`xCompass: ${xCompass} yCompass: ${yCompass}`);
 
             clearMap();
             plotCourse(xCompass, yCompass, "wind");
             printWindLine(xCompass, dx, yCompass, dy, predictedWindDegrees);
-            zoomAndPan(d3.zoomIdentity.translate(-x, -y).scale(current.transform.scale));
+            zoomAndPan(d3.zoomIdentity.translate(-x, -y).scale(targetScale));
         }
 
         const secondsForFullCircle = 48 * 60,
