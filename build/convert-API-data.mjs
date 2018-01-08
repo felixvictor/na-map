@@ -1,5 +1,5 @@
-let fs = require("fs");
-let moment = require("moment");
+import fs from "fs";
+import moment from "moment";
 
 const inBaseFilename = process.argv[2],
     outFilename = process.argv[3],
@@ -28,9 +28,9 @@ const Trans = {
     D: 4096.90282787469
 };
 
-let APIItems = require(`${inBaseFilename}-ItemTemplates-${date}.json`);
-let APIPorts = require(`${inBaseFilename}-Ports-${date}.json`);
-let APIShops = require(`${inBaseFilename}-Shops-${date}.json`);
+let APIItems = JSON.parse(fs.readFileSync(`${inBaseFilename}-ItemTemplates-${date}.json`, "utf8"));
+let APIPorts = JSON.parse(fs.readFileSync(`${inBaseFilename}-Ports-${date}.json`, "utf8"));
+let APIShops = JSON.parse(fs.readFileSync(`${inBaseFilename}-Shops-${date}.json`, "utf8"));
 let ItemNames = new Map();
 
 // F11 coord to svg coord
