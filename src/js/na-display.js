@@ -6,6 +6,7 @@
 
 import { feature as topojsonFeature } from "topojson-client";
 import moment from "moment";
+import "moment/locale/en-gb";
 import "jquery-knob";
 
 import "bootstrap/js/dist/tooltip";
@@ -845,6 +846,7 @@ export default function naDisplay(serverName) {
         setupPorts();
         setupPBZones();
         setupSelects();
+        moment.locale("en-gb");
     }
 
     function predictWind(currentWind, predictTime) {
@@ -899,9 +901,6 @@ export default function naDisplay(serverName) {
                 radians = 0.0174533 * (predictedWindDegrees - 90),
                 dx = length * Math.cos(radians),
                 dy = length * Math.sin(radians);
-
-            console.log(`x: ${x} y: ${y} current.scale: ${current.transform.scale} scale: ${scale}`);
-            console.log(`xCompass: ${xCompass} yCompass: ${yCompass}`);
 
             clearMap();
             plotCourse(xCompass, yCompass, "wind");

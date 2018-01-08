@@ -11,7 +11,7 @@ $out-colour: $primary-700;
 $background-colour: $primary-300;
 
 .extralarge-width {
-  min-width: 30em;
+  min-width: 25em;
 }
 
 .large-width {
@@ -119,7 +119,7 @@ text {
     fill-opacity: .5;
   }
   path {
-    stroke: $secondary-800;
+    stroke: $secondary-600;
     stroke-width: .3em;
     stroke-linecap: round;
     fill: none;
@@ -127,7 +127,7 @@ text {
 }
 
 .arrow-head {
-  fill: $secondary-800;
+  fill: $secondary-600;
 }
 
 .wind {
