@@ -11,7 +11,7 @@
 <body>
 
 <nav class="navbar fixed-top navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="#">Naval Action map</a>
+    <a class="navbar-brand" href="#"><img src="images/na-map-brand.jpg" width="30" height="30" alt=""></a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -20,61 +20,95 @@
         <ul class="navbar-nav mr-auto">
 
             <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="moveTo" role="button" data-toggle="dropdown"
+                <a class="nav-link dropdown-toggle" href="#" id="moveToDropdown" role="button" data-toggle="dropdown"
                    aria-haspopup="true" aria-expanded="false">
                     Move to
                 </a>
-                <div class="dropdown-menu" id="moveToMenu" aria-labelledby="moveTo">
-                    <div class="box pb-2">
-                        <h6 class="dropdown-header">F11 coordinates</h6>
-                        <form class="">
-                            <fieldset>
-                                <div class="form-row">
-                                    <div class="col-4 left-margin">
-                                        <input type="number" step="0.1" min="-816000" max="830000" class="form-control"
-                                               id="x-coord" placeholder="X" required>
-                                    </div>
-                                    <div class="col-4">
-                                        <input type="number" step="0.1" min="-430000" max="830000" class="form-control"
-                                               id="z-coord" placeholder="Z" required>
-                                    </div>
-                                    <div class="col-3">
-                                        <button type="submit" class="btn btn-outline-primary">Move to</button>
-                                    </div>
+                <div class="dropdown-menu extralarge-width" id="moveToMenu" aria-labelledby="moveToDropdown">
+                    <h6 class="dropdown-header">F11 coordinates</h6>
+                    <form id="f11" class="pb-2">
+                        <fieldset>
+                            <div class="form-row">
+                                <div class="col-4 left-margin">
+                                    <input type="number" step="0.1" min="-816000" max="830000" class="form-control"
+                                           id="x-coord" placeholder="X" required>
                                 </div>
-                            </fieldset>
-                        </form>
-                    </div>
+                                <div class="col-4">
+                                    <input type="number" step="0.1" min="-430000" max="830000" class="form-control"
+                                           id="z-coord" placeholder="Z" required>
+                                </div>
+                                <div class="col-3">
+                                    <button type="submit" class="btn btn-outline-primary">Move to</button>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+            </li>
+
+            <li class="nav-item dropdown pl-1">
+                <a class="nav-link dropdown-toggle" href="#" id="predictDropdown" role="button" data-toggle="dropdown"
+                   aria-haspopup="true" aria-expanded="false">
+                    Wind prediction
+                </a>
+                <div class="dropdown-menu extralarge-width" id="predictMenu" aria-labelledby="predictDropdown">
+                    <form id="windPrediction" class="p-2">
+                        <div class="alert alert-primary" role="alert">Select a port first.</div>
+                        <div class="form-group row">
+                            <label class="align-top col-sm-5 col-form-label" for="direction">Wind currently blowing from</label>
+                            <div class="col-sm-7">
+                            <input type="text" value="0" class="dial" id="direction" aria-label="direction" required>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-5 col-form-label" for="time">Predict wind for</label>
+                            <div class="col-sm-7">
+                            <input type="text" maxlength="5" pattern="(?:[0-1]?\d|2[0-3])(?:[.:\s][0-5]\d)?"
+                                   class="form-control" placeholder="hh.mm" id="time" aria-label="time"
+                                   required>
+                            <small class="form-text text-muted">Server time (wind is reset after maintenance)</small>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-outline-primary">Predict</button>
+                    </form>
                 </div>
             </li>
 
             <li class="nav-item pl-2">
-                <select class="custom-select" name="port-names" id="port-names">
+                <select class="custom-select" name="port-names" id="port-names" title="Select a port">
                 </select>
             </li>
 
             <li class="nav-item pl-2">
-                <select class="custom-select" name="good-names" id="good-names">
+                <select class="custom-select" name="good-names" id="good-names" title="Select a good">
                 </select>
             </li>
+        </ul>
 
-            <li class="nav-item pl-2">
-                <div class="radio-group box align-middle ml-1">
-                    <div class="col-auto align-self-center">
-                        <span class="radio-group-label pr-2">Double click to</span>
-                        <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input" name="mouseFunction" id="compass"
-                                   value="compass" checked>
-                            <label class="custom-control-label" for="compass">plot a course</label>
-                        </div>
-                        <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input" name="mouseFunction" id="F11" value="F11">
-                            <label class="custom-control-label" for="F11">show F11 coordinates</label>
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item dropdown pr-2">
+                <a class="nav-link dropdown-toggle" href="#" id="doubleclickDropdown" role="button"
+                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Double click to
+                </a>
+                <div class="dropdown-menu dropdown-menu-right large-width" id="doubleclickMenu"
+                     aria-labelledby="doubleclickDropdown">
+                    <div class="radio-group ml-1 py-1">
+                        <div class="col-auto align-self-center">
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" class="custom-control-input" name="mouseFunction" id="compass"
+                                       value="compass" checked>
+                                <label class="custom-control-label" for="compass">plot a course</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" class="custom-control-input" name="mouseFunction" id="F11"
+                                       value="F11">
+                                <label class="custom-control-label" for="F11">show F11 coordinates</label>
+                            </div>
                         </div>
                     </div>
                 </div>
             </li>
-
         </ul>
         <button id="reset" type="reset" class="btn btn-outline-secondary">Clear</button>
     </div>
@@ -106,6 +140,6 @@
     </div>
 </section>
 
-<script src="https://d3js.org/d3.v4.js"></script>
+<script src="https://d3js.org/d3.v4.min.js"></script>
 </body>
 </html>
