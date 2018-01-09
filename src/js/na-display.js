@@ -864,7 +864,45 @@ export default function naDisplay(serverName) {
         });
     }
 
-    setupSvg();
+    function stopProp() {
+        if (d3.event.defaultPrevented) {
+            d3.event.stopPropagation();
+        }
+    }
+    const zoomPadding = defaults.coord.max / 50;
+    naZoom = d3
+        .zoom()
+        .scaleExtent([defaults.minScale, defaults.maxScale])
+        .translateExtent([
+            [defaults.coord.min - zoomPadding, defaults.coord.min - zoomPadding],
+            [defaults.coord.max + zoomPadding, defaults.coord.max + zoomPadding]
+        ])
+        .on("zoom", naZoomed);
+
+    naSvg = d3
+        .select("#na")
+        .append("svg")
+        .attr("id", "na-svg")
+        .attr("width", defaults.width)
+        .attr("height", defaults.height)
+        .style("position", "absolute")
+        .style("top", `${defaults.margin.top}px`)
+        .style("left", `${defaults.margin.left}px`)
+        .call(naZoom)
+        .on("dblclick.zoom", null)
+        .on("click", stopProp, true)
+        .on("dblclick", doubleClickAction);
+
+    svgDef = naSvg.append("defs");
+
+    mainGVoronoi = naSvg.append("g").attr("class", "voronoi");
+    mainGPort = naSvg.append("g").attr("class", "port");
+    mainGPBZone = naSvg
+        .append("g")
+        .attr("class", "pb")
+        .style("display", "none");
+    mainGCoord = naSvg.append("g").attr("class", "coord");
+
     /*
     const profileData = [
         {
@@ -912,7 +950,7 @@ export default function naDisplay(serverName) {
             const colorScale = d3
                 .scaleLinear()
                 .domain([profileData.minSpeed, 0, 10, 12, profileData.maxSpeed])
-                .range(["#a62e39", "#fbf8f5", "#6cc380", "#419f57", "#2a6838"])
+                .range(["#a62e39", "#fbf8f5", "#2a6838", "#419f57", "#6cc380"])
                 .interpolate(d3.interpolateHcl);
 
             let pie = d3
@@ -934,7 +972,7 @@ export default function naDisplay(serverName) {
             let svg = naSvg
                 .append("svg")
                 .attr("class", "profile")
-                .attr("fill", "url(#legend-weather)")
+                .attr("fill", "none")
                 .append("g")
                 .attr(
                     "transform",
