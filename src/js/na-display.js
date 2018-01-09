@@ -884,17 +884,17 @@ export default function naDisplay(serverName) {
                     .text(`Currently at ${currentTime} from ${currentWind}`);
                 const bbox1 = text1.node().getBoundingClientRect(),
                     bbox2 = text2.node().getBoundingClientRect(),
-                    height = Math.max(bbox1.height, bbox2.height) * 2 + current.fontSize,
-                    width = Math.max(bbox1.width, bbox2.width) + current.fontSize;
+                    height = Math.max(bbox1.height, bbox2.height) * 2 + defaults.fontSize,
+                    width = Math.max(bbox1.width, bbox2.width) + defaults.fontSize;
                 svg
                     .attr("x", x - width / 2)
-                    .attr("y", y + Math.abs(dy) / 2)
+                    .attr("y", y + 20)
                     .attr("height", height)
                     .attr("width", width);
                 rect
                     .attr("x", x - width / 2)
-                    .attr("y", y - Math.abs(dy) / 2 - current.fontSize / 2)
-                    .attr("height", height + Math.abs(dy) + current.fontSize / 2)
+                    .attr("y", y - 20 - defaults.fontSize / 2)
+                    .attr("height", height + 40 + defaults.fontSize)
                     .attr("width", width);
             }
 
@@ -905,7 +905,7 @@ export default function naDisplay(serverName) {
                 y = -current.transform.y * scale,
                 yCompass = -current.transform.y / current.transform.scale - defaults.height / 25,
                 length = 40,
-                radians = 0.0174533 * (predictedWindDegrees - 90),
+                radians = Math.PI / 180 * (predictedWindDegrees - 90),
                 dx = length * Math.cos(radians),
                 dy = length * Math.sin(radians);
 
@@ -944,12 +944,12 @@ export default function naDisplay(serverName) {
         }
 
         let timeDiffInSec = predictDate.diff(currentDate, "seconds");
-        let predictedWindDegrees = (currentWindDegrees + degreesPerSecond * timeDiffInSec) % 360;
+        let predictedWindDegrees = Math.abs(currentWindDegrees - degreesPerSecond * timeDiffInSec + 360) % 360;
 
-        console.log(`currentWind: ${currentWind} predictTime: ${predictTime}`);
-        console.log(`   now: ${currentDate.format()} predictDate: ${predictDate.format()}`);
-        console.log(`   timeDiffInSec: ${timeDiffInSec} predictedWindDegrees: ${predictedWindDegrees}`);
-        printPredictedWind(predictedWindDegrees, predictDate.format("HH.mm"), currentWind, currentDate.format("HH.mm"));
+        //console.log(`currentWind: ${currentWind} currentWindDegrees: ${currentWindDegrees}`);
+        //console.log(`   currentDate: ${currentDate.format()} predictDate: ${predictDate.format()}`);
+        //console.log(`   predictedWindDegrees: ${predictedWindDegrees} predictTime: ${predictTime}`);
+        printPredictedWind(predictedWindDegrees, predictDate.format("H.mm"), currentWind, currentDate.format("H.mm"));
     }
 
     function naReady(error, naMap, pbZones) {
@@ -969,15 +969,13 @@ export default function naDisplay(serverName) {
         //updatePorts(current.portData.filter(d => ["234", "237", "238", "239", "240"].includes(d.id)));
         updatePorts();
 
-        /*
         let predictTime = moment().utc(),
-            direction = "n".toUpperCase();
+            direction = "nne".toUpperCase();
         console.log(`---->   predictTime: ${predictTime.format()}`);
         predictWind(direction, `${predictTime.hours()}:${predictTime.minutes()}`);
-        predictTime.add(48 * 6, "minutes");
-        console.log(`---->   predictTime: ${predictTime.format()}`);
-        predictWind(direction, `${predictTime.hours()}:${predictTime.minutes()}`);
-        */
+//        predictTime.add(48 / 4, "minutes");
+//        console.log(`---->   predictTime: ${predictTime.format()}`);
+//        predictWind(direction, `${predictTime.hours()}:${predictTime.minutes()}`);
 
         $("#f11").submit(function(event) {
             const x = $("#x-coord").val(),
