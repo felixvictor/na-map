@@ -939,9 +939,9 @@ export default function naDisplay(serverName) {
         let timeDiffInSec = predictDate.diff(nowDate, "seconds");
         let predictedWindDegrees = (currentWindDegrees + degreesPerSecond * timeDiffInSec) % 360;
 
-        //console.log(`currentWind: ${currentWind} predictTime: ${predictTime}`);
-        //console.log(`   now: ${nowDate.format()} predictDate: ${predictDate.format()}`);
-        //console.log(`   timeDiffInSec: ${timeDiffInSec} predictedWindDegrees: ${predictedWindDegrees}`);
+        console.log(`currentWind: ${currentWind} predictTime: ${predictTime}`);
+        console.log(`   now: ${nowDate.format()} predictDate: ${predictDate.format()}`);
+        console.log(`   timeDiffInSec: ${timeDiffInSec} predictedWindDegrees: ${predictedWindDegrees}`);
         printPredictedWind(predictedWindDegrees);
     }
 
@@ -962,9 +962,15 @@ export default function naDisplay(serverName) {
         //updatePorts(current.portData.filter(d => ["234", "237", "238", "239", "240"].includes(d.id)));
         updatePorts();
 
-        //let now = moment().utc(), direction = "E";
-        //console.log(`---->   now: ${now.format()}`);
-        //predictWind(direction, `${now.hours()}:${now.minutes()}`);
+        let now = moment().utc(), direction = "E";
+        console.log(`---->   now: ${now.format()}`);
+        predictWind(direction, `${now.hours()}:${now.minutes()}`);
+        now.add(48+48/2, "minutes");
+        console.log(`---->   now: ${now.format()}`);
+        predictWind(direction, `${now.hours()}:${now.minutes()}`);
+        now.add(48*3, "minutes");
+        console.log(`---->   now: ${now.format()}`);
+        predictWind(direction, `${now.hours()}:${now.minutes()}`);
 
         $("#f11").submit(function(event) {
             const x = $("#x-coord").val(),
