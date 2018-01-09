@@ -855,7 +855,7 @@ export default function naDisplay(serverName) {
             return defaults.compassDirections.indexOf(compass) * degree;
         }
 
-        function printPredictedWind(predictedWindDegrees) {
+        function printPredictedWind(predictedWindDegrees, predictTime, currentWind, currentTime) {
             function printWindLine(x, dx, y, dy, degrees) {
                 const compass = degreesToCompass(degrees);
 
@@ -868,27 +868,34 @@ export default function naDisplay(serverName) {
                     .attr("class", "wind")
                     .attr("marker-end", "url(#arrow)");
 
-                const svg = mainGCoord
-                    .append("svg")
-                    .attr("x", x - dx)
-                    .attr("y", y - dy / 2 + 20 / 2);
-                const rect = svg.append("rect");
-                const text = svg
+                const rect = mainGCoord.append("rect");
+                const svg = mainGCoord.append("svg");
+                const text1 = svg
                     .append("text")
                     .attr("x", "50%")
-                    .attr("y", "50%")
-                    .attr("class", "wind")
-                    .text(`${compass} (${Math.round(degrees)}°)`);
-
-                const bbox = text.node().getBBox();
-                const height = bbox.height + current.fontSize,
-                    width = bbox.width + current.fontSize;
-                rect
-                    .attr("x", 0)
-                    .attr("y", 0)
+                    .attr("y", "33%")
+                    .attr("class", "wind-text")
+                    .text(`From ${compass} at ${predictTime}`);
+                const text2 = svg
+                    .append("text")
+                    .attr("x", "50%")
+                    .attr("y", "66%")
+                    .attr("class", "wind-text-current")
+                    .text(`Currently at ${currentTime} from ${currentWind}`);
+                const bbox1 = text1.node().getBBox(),
+                    bbox2 = text2.node().getBBox(),
+                    height = Math.max(bbox1.height, bbox2.height) * 2 + current.fontSize,
+                    width = Math.max(bbox1.width, bbox2.width) + current.fontSize;
+                svg
+                    .attr("x", x - width / 2)
+                    .attr("y", y + Math.abs(dy) / 2)
                     .attr("height", height)
                     .attr("width", width);
-                svg.attr("height", height).attr("width", width);
+                rect
+                    .attr("x", x - width / 2)
+                    .attr("y", y - Math.abs(dy) / 2 - current.fontSize / 2)
+                    .attr("height", height + Math.abs(dy) + current.fontSize / 2)
+                    .attr("width", width);
             }
 
             const targetScale = 4,
@@ -925,24 +932,24 @@ export default function naDisplay(serverName) {
             currentWindDegrees = +currentWind;
         }
 
-        let nowDate = moment()
+        let currentDate = moment()
                 .utc()
                 .seconds(0)
                 .milliseconds(0),
-            predictDate = moment(nowDate)
+            predictDate = moment(currentDate)
                 .hour(predictHours)
                 .minutes(predictMinutes);
-        if (predictDate.isBefore(nowDate)) {
+        if (predictDate.isBefore(currentDate)) {
             predictDate.add(1, "day");
         }
 
-        let timeDiffInSec = predictDate.diff(nowDate, "seconds");
+        let timeDiffInSec = predictDate.diff(currentDate, "seconds");
         let predictedWindDegrees = (currentWindDegrees + degreesPerSecond * timeDiffInSec) % 360;
 
         console.log(`currentWind: ${currentWind} predictTime: ${predictTime}`);
-        console.log(`   now: ${nowDate.format()} predictDate: ${predictDate.format()}`);
+        console.log(`   now: ${currentDate.format()} predictDate: ${predictDate.format()}`);
         console.log(`   timeDiffInSec: ${timeDiffInSec} predictedWindDegrees: ${predictedWindDegrees}`);
-        printPredictedWind(predictedWindDegrees);
+        printPredictedWind(predictedWindDegrees, predictDate.format("HH.mm"), currentWind, currentDate.format("HH.mm"));
     }
 
     function naReady(error, naMap, pbZones) {
@@ -962,15 +969,15 @@ export default function naDisplay(serverName) {
         //updatePorts(current.portData.filter(d => ["234", "237", "238", "239", "240"].includes(d.id)));
         updatePorts();
 
-        let now = moment().utc(), direction = "E";
-        console.log(`---->   now: ${now.format()}`);
-        predictWind(direction, `${now.hours()}:${now.minutes()}`);
-        now.add(48+48/2, "minutes");
-        console.log(`---->   now: ${now.format()}`);
-        predictWind(direction, `${now.hours()}:${now.minutes()}`);
-        now.add(48*3, "minutes");
-        console.log(`---->   now: ${now.format()}`);
-        predictWind(direction, `${now.hours()}:${now.minutes()}`);
+        /*
+        let predictTime = moment().utc(),
+            direction = "n".toUpperCase();
+        console.log(`---->   predictTime: ${predictTime.format()}`);
+        predictWind(direction, `${predictTime.hours()}:${predictTime.minutes()}`);
+        predictTime.add(48 * 6, "minutes");
+        console.log(`---->   predictTime: ${predictTime.format()}`);
+        predictWind(direction, `${predictTime.hours()}:${predictTime.minutes()}`);
+        */
 
         $("#f11").submit(function(event) {
             const x = $("#x-coord").val(),
@@ -992,7 +999,9 @@ export default function naDisplay(serverName) {
             format: input => degreesToCompass(input)
         });
         $("#windPrediction").submit(function(event) {
-            const currentWind = $("#direction").val(),
+            const currentWind = $("#direction")
+                    .val()
+                    .toUpperCase(),
                 time = $("#time").val();
             predictWind(currentWind, time);
             $("#predictDropdown").dropdown("toggle");
