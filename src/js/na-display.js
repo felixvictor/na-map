@@ -864,7 +864,7 @@ export default function naDisplay(serverName) {
         });
     }
 
-    naSetupSvg();
+    setupSvg();
     /*
     const profileData = [
         {
