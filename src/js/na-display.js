@@ -882,8 +882,8 @@ export default function naDisplay(serverName) {
                     .attr("y", "66%")
                     .attr("class", "wind-text-current")
                     .text(`Currently at ${currentTime} from ${currentWind}`);
-                const bbox1 = text1.node().getBBox(),
-                    bbox2 = text2.node().getBBox(),
+                const bbox1 = text1.node().getBoundingClientRect(),
+                    bbox2 = text2.node().getBoundingClientRect(),
                     height = Math.max(bbox1.height, bbox2.height) * 2 + current.fontSize,
                     width = Math.max(bbox1.width, bbox2.width) + current.fontSize;
                 svg
