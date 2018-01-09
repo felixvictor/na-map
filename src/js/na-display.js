@@ -969,13 +969,15 @@ export default function naDisplay(serverName) {
         //updatePorts(current.portData.filter(d => ["234", "237", "238", "239", "240"].includes(d.id)));
         updatePorts();
 
+        /*
         let predictTime = moment().utc(),
             direction = "nne".toUpperCase();
         console.log(`---->   predictTime: ${predictTime.format()}`);
         predictWind(direction, `${predictTime.hours()}:${predictTime.minutes()}`);
-//        predictTime.add(48 / 4, "minutes");
-//        console.log(`---->   predictTime: ${predictTime.format()}`);
-//        predictWind(direction, `${predictTime.hours()}:${predictTime.minutes()}`);
+        predictTime.add(48 / 4, "minutes");
+        console.log(`---->   predictTime: ${predictTime.format()}`);
+        predictWind(direction, `${predictTime.hours()}:${predictTime.minutes()}`);
+        */
 
         $("#f11").submit(function(event) {
             const x = $("#x-coord").val(),
