@@ -116,7 +116,7 @@ text {
   }
   rect {
     fill: $primary-100;
-    fill-opacity: .5;
+    fill-opacity: .3;
   }
   path {
     stroke: $secondary-600;
@@ -127,17 +127,25 @@ text {
 }
 
 .arrow-head {
-  fill: $secondary-600;
+  fill: $primary-900 !important;
 }
 
 .wind {
-  font-size: .5em !important;
+  stroke: $primary-900 !important;
 }
 
-.dial{
+.wind, .wind-text {
+  font-size: .3em !important;
+}
+
+.wind-text-current {
+  font-size: .25em !important;
+}
+
+.dial {
   font-family: inherit !important;
   font-size: 2em !important;
-  color: $primary-700  !important;
+  color: $primary-700 !important;
 }
 
 .tooltip {
