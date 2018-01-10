@@ -1055,42 +1055,6 @@ export default function naDisplay(serverName) {
         .style("display", "none");
     mainGCoord = naSvg.append("g").attr("class", "coord");
 
-    /*
-    const profileData = [
-        {
-            id: 1,
-            name: "Cerberus",
-            maxSpeed: 13.51336736,
-            minSpeed: -5.045659745,
-            speedDegrees: [
-                -5.045659745,
-                -0.833999419,
-                1.838961022,
-                6.599438361,
-                8.596795061,
-                10.06530579,
-                11.44757313,
-                12.53398738,
-                13.29694155,
-                13.51336736,
-                13.20285597,
-                12.81767647,
-                12.81767647,
-                13.20285597,
-                13.51336736,
-                13.29694155,
-                12.53398738,
-                11.44757313,
-                10.06530579,
-                8.596795061,
-                6.599438361,
-                1.838961022,
-                -0.833999419,
-                -5.045659745
-            ]
-        }
-    ];
-*/
     d3.json("ships.json", function(profileData) {
         function drawProfile(profileData, i) {
             let width = 350,
@@ -1132,26 +1096,26 @@ export default function naDisplay(serverName) {
                         height * Math.trunc(i / svgPerRow)})`
                 );
 
-            //Extra scale since the color scale is interpolated
-            const tempScale = d3
+            // Extra scale since the color scale is interpolated
+            const gradientScale = d3
                 .scaleLinear()
                 .domain([minSpeed, maxSpeed])
                 .range([0, width]);
 
-            //Calculate the variables for the temp gradient
+            // Calculate the variables for the gradient
             const numStops = 30;
-            let tempRange = tempScale.domain();
-            tempRange[2] = tempRange[1] - tempRange[0];
-            let tempPoint = [];
+            let gradientDomain = gradientScale.domain();
+            gradientDomain[2] = gradientDomain[1] - gradientDomain[0];
+            let gradientPoint = [];
             for (let i = 0; i < numStops; i++) {
-                tempPoint.push(i * tempRange[2] / (numStops - 1) + tempRange[0]);
+                gradientPoint.push(i * gradientDomain[2] / (numStops - 1) + gradientDomain[0]);
             } //for i
 
-            //Create the gradient
+            // Create the gradient
             svg
                 .append("defs")
                 .append("radialGradient")
-                .attr("id", "legend-weather")
+                .attr("id", "gradient")
                 .attr("cx", 0.5)
                 .attr("cy", 0.25)
                 .attr("r", 0.5)
@@ -1160,10 +1124,10 @@ export default function naDisplay(serverName) {
                 .enter()
                 .append("stop")
                 .attr("offset", function(d, i) {
-                    return tempScale(tempPoint[i]) / width;
+                    return gradientScale(gradientPoint[i]) / width;
                 })
                 .attr("stop-color", function(d, i) {
-                    return colorScale(tempPoint[i]);
+                    return colorScale(gradientPoint[i]);
                 });
 
             // Arc for text
@@ -1224,7 +1188,7 @@ export default function naDisplay(serverName) {
                 .attr("fill", "#fff")
                 .style("opacity", 0.8)
                 .attr("stroke-width", "5px")
-                .attr("stroke", "url(#legend-weather)");
+                .attr("stroke", "url(#gradient)");
 
             let sel = markers.selectAll("circle").data(arcs);
             sel
