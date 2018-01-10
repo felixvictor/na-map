@@ -55,11 +55,11 @@ $background-colour: $primary-300;
   }
 }
 
-#moveToMenu {
-  min-width: 30em;
+.extralarge-width {
+  min-width: 25em;
 }
 
-#showGoodsMenu {
+.large-width {
   min-width: 20em;
 }
 
@@ -82,7 +82,6 @@ $background-colour: $primary-300;
 }
 
 .box {
-  padding: .5em;
   background-color: $primary-100;
 }
 
@@ -162,7 +161,7 @@ text {
   }
   rect {
     fill: $primary-100;
-    fill-opacity: .5;
+    fill-opacity: .3;
   }
   path {
     stroke: $secondary-600;
@@ -170,6 +169,28 @@ text {
     stroke-linecap: round;
     fill: none;
   }
+}
+
+.arrow-head {
+  fill: $primary-900 !important;
+}
+
+.wind {
+  stroke: $primary-900 !important;
+}
+
+.wind, .wind-text {
+  font-size: .3em !important;
+}
+
+.wind-text-current {
+  font-size: .25em !important;
+}
+
+.dial {
+  font-family: inherit !important;
+  font-size: 2em !important;
+  color: $primary-700 !important;
 }
 
 .tooltip {
@@ -201,6 +222,10 @@ text {
 
 .dummy-jpg {
   background-image: url("~Images/na-map.jpg");
+}
+
+.dummy-brand {
+  background-image: url("~Images/na-map-brand.jpg");
 }
 
 .dummy-svg {

@@ -6,6 +6,8 @@
 
 import { feature as topojsonFeature } from "topojson-client";
 import moment from "moment";
+import "moment/locale/en-gb";
+import "jquery-knob";
 
 import "bootstrap/js/dist/tooltip";
 import "bootstrap/js/dist/util";
@@ -51,7 +53,25 @@ export default function naDisplay(serverName) {
             B: -0.00859027897636011,
             C: 819630.836437126,
             D: -819563.745651571
-        }
+        },
+        compassDirections: [
+            "N",
+            "NNE",
+            "NE",
+            "ENE",
+            "E",
+            "ESE",
+            "SE",
+            "SSE",
+            "S",
+            "SSW",
+            "SW",
+            "WSW",
+            "W",
+            "WNW",
+            "NW",
+            "NNW"
+        ]
     };
     defaults.width = top.innerWidth - defaults.margin.left - defaults.margin.right;
     defaults.height = top.innerHeight - defaults.margin.top - defaults.margin.bottom;
@@ -78,8 +98,7 @@ export default function naDisplay(serverName) {
     defaults.voronoiRadius = Math.min(defaults.height, defaults.width);
 
     let current = {
-        x: initial.x,
-        y: initial.y,
+        transform: { x: initial.x, y: initial.y, scale: initial.scale },
         fontSize: defaults.fontSize,
         circleSize: defaults.circleSize,
         highlightId: null,
@@ -101,6 +120,12 @@ export default function naDisplay(serverName) {
         }
         return r;
     };
+
+    // https://stackoverflow.com/questions/7490660/converting-wind-direction-in-angles-to-text-words
+    function degreesToCompass(degrees) {
+        const val = Math.floor(degrees / 22.5 + 0.5);
+        return defaults.compassDirections[val % 16];
+    }
 
     function naDisplayCountries(transform) {
         function drawImage() {
@@ -166,9 +191,9 @@ export default function naDisplay(serverName) {
         zoomAndPan(d3.zoomIdentity.translate(-x, -y).scale(1));
     }
 
-    function plotCourse(x, y) {
-        function printCompass(x, y) {
-            const compassSize = 100;
+    function plotCourse(x, y, style = "course") {
+        function printCompass(x, y, style) {
+            const compassSize = "course" === style ? 100 : 30;
 
             mainGCoord
                 .append("image")
@@ -183,14 +208,14 @@ export default function naDisplay(serverName) {
         }
 
         function printLine(x, y) {
-            // Converts from radians to degrees
-            // http://cwestblog.com/2012/11/12/javascript-degree-and-radian-conversion/
-            Math.radiansToDegrees = function(radians) {
-                return radians * 180 / Math.PI;
-            };
-
             // https://stackoverflow.com/questions/9970281/java-calculating-the-angle-between-two-points-in-degrees
             function rotationAngleInDegrees(centerPt, targetPt) {
+                // Converts from radians to degrees
+                // http://cwestblog.com/2012/11/12/javascript-degree-and-radian-conversion/
+                Math.radiansToDegrees = function(radians) {
+                    return radians * 180 / Math.PI;
+                };
+
                 let theta = Math.atan2(targetPt[1] - centerPt[1], targetPt[0] - centerPt[0]);
                 theta -= Math.PI / 2.0;
                 let angle = Math.radiansToDegrees(theta);
@@ -198,30 +223,6 @@ export default function naDisplay(serverName) {
                     angle += 360;
                 }
                 return angle;
-            }
-
-            // https://stackoverflow.com/questions/7490660/converting-wind-direction-in-angles-to-text-words
-            function degreesToCompass(degrees) {
-                const val = Math.floor(degrees / 22.5 + 0.5);
-                const compassDirections = [
-                    "N",
-                    "NNE",
-                    "NE",
-                    "ENE",
-                    "E",
-                    "ESE",
-                    "SE",
-                    "SSE",
-                    "S",
-                    "SSW",
-                    "SW",
-                    "WSW",
-                    "W",
-                    "WNW",
-                    "NW",
-                    "NNW"
-                ];
-                return compassDirections[val % 16];
             }
 
             const degrees = rotationAngleInDegrees(
@@ -255,7 +256,7 @@ export default function naDisplay(serverName) {
 
         current.lineData.push([x, y]);
         if (current.bFirstCoord) {
-            printCompass(x, y);
+            printCompass(x, y, style);
             current.bFirstCoord = !current.bFirstCoord;
         } else {
             printLine(x, y);
@@ -522,6 +523,9 @@ export default function naDisplay(serverName) {
             t = { delay: 500, duration: 500 };
         }
 
+        current.transform.x = transform.x;
+        current.transform.y = transform.y;
+        current.transform.scale = transform.k;
         transform.x += defaults.width / 2;
         transform.y += defaults.height / 2;
 
@@ -629,6 +633,18 @@ export default function naDisplay(serverName) {
                 .on("dblclick", doubleClickAction);
 
             svgDef = naSvg.append("defs");
+            svgDef
+                .append("marker")
+                .attr("id", "arrow")
+                .attr("viewBox", "0 -5 10 10")
+                .attr("refX", 5)
+                .attr("refY", 0)
+                .attr("markerWidth", 4)
+                .attr("markerHeight", 4)
+                .attr("orient", "auto")
+                .append("path")
+                .attr("d", "M0,-5L10,0L0,5")
+                .attr("class", "arrow-head");
 
             mainGVoronoi = naSvg.append("g").attr("class", "voronoi");
             mainGPort = naSvg.append("g").attr("class", "port");
@@ -830,6 +846,110 @@ export default function naDisplay(serverName) {
         setupPorts();
         setupPBZones();
         setupSelects();
+        moment.locale("en-gb");
+    }
+
+    function predictWind(currentWind, predictTime) {
+        function compassToDegrees(compass) {
+            const degree = 360 / defaults.compassDirections.length;
+            return defaults.compassDirections.indexOf(compass) * degree;
+        }
+
+        function printPredictedWind(predictedWindDegrees, predictTime, currentWind, currentTime) {
+            function printWindLine(x, dx, y, dy, degrees) {
+                const compass = degreesToCompass(degrees);
+
+                current.lineData.push([x + dx / 2, y + dy / 2]);
+                current.lineData.push([x - dx / 2, y - dy / 2]);
+
+                gCompass
+                    .datum(current.lineData)
+                    .attr("d", defaults.line)
+                    .attr("class", "wind")
+                    .attr("marker-end", "url(#arrow)");
+
+                const rect = mainGCoord.append("rect");
+                const svg = mainGCoord.append("svg");
+                const text1 = svg
+                    .append("text")
+                    .attr("x", "50%")
+                    .attr("y", "33%")
+                    .attr("class", "wind-text")
+                    .text(`From ${compass} at ${predictTime}`);
+                const text2 = svg
+                    .append("text")
+                    .attr("x", "50%")
+                    .attr("y", "66%")
+                    .attr("class", "wind-text-current")
+                    .text(`Currently at ${currentTime} from ${currentWind}`);
+                const bbox1 = text1.node().getBoundingClientRect(),
+                    bbox2 = text2.node().getBoundingClientRect(),
+                    height = Math.max(bbox1.height, bbox2.height) * 2 + defaults.fontSize,
+                    width = Math.max(bbox1.width, bbox2.width) + defaults.fontSize;
+                svg
+                    .attr("x", x - width / 2)
+                    .attr("y", y + 20)
+                    .attr("height", height)
+                    .attr("width", width);
+                rect
+                    .attr("x", x - width / 2)
+                    .attr("y", y - 20 - defaults.fontSize / 2)
+                    .attr("height", height + 40 + defaults.fontSize)
+                    .attr("width", width);
+            }
+
+            const targetScale = 4,
+                scale = targetScale / current.transform.scale,
+                x = -current.transform.x * scale,
+                xCompass = -current.transform.x / current.transform.scale - defaults.width / 25,
+                y = -current.transform.y * scale,
+                yCompass = -current.transform.y / current.transform.scale - defaults.height / 25,
+                length = 40,
+                radians = Math.PI / 180 * (predictedWindDegrees - 90),
+                dx = length * Math.cos(radians),
+                dy = length * Math.sin(radians);
+
+            clearMap();
+            plotCourse(xCompass, yCompass, "wind");
+            printWindLine(xCompass, dx, yCompass, dy, predictedWindDegrees);
+            zoomAndPan(d3.zoomIdentity.translate(-x, -y).scale(targetScale));
+        }
+
+        const secondsForFullCircle = 48 * 60,
+            fullCircle = 360,
+            degreesPerSecond = fullCircle / secondsForFullCircle;
+        let currentWindDegrees;
+
+        const regex = /(\d+)[\s:.](\d+)/;
+        let match = regex.exec(predictTime),
+            predictHours = parseInt(match[1]),
+            predictMinutes = parseInt(match[2]);
+
+        // Set current wind in degrees
+        if (isNaN(currentWind)) {
+            currentWindDegrees = compassToDegrees(currentWind);
+        } else {
+            currentWindDegrees = +currentWind;
+        }
+
+        let currentDate = moment()
+                .utc()
+                .seconds(0)
+                .milliseconds(0),
+            predictDate = moment(currentDate)
+                .hour(predictHours)
+                .minutes(predictMinutes);
+        if (predictDate.isBefore(currentDate)) {
+            predictDate.add(1, "day");
+        }
+
+        let timeDiffInSec = predictDate.diff(currentDate, "seconds");
+        let predictedWindDegrees = Math.abs(currentWindDegrees - degreesPerSecond * timeDiffInSec + 360) % 360;
+
+        //console.log(`currentWind: ${currentWind} currentWindDegrees: ${currentWindDegrees}`);
+        //console.log(`   currentDate: ${currentDate.format()} predictDate: ${predictDate.format()}`);
+        //console.log(`   predictedWindDegrees: ${predictedWindDegrees} predictTime: ${predictTime}`);
+        printPredictedWind(predictedWindDegrees, predictDate.format("H.mm"), currentWind, currentDate.format("H.mm"));
     }
 
     function naReady(error, naMap, pbZones) {
@@ -849,10 +969,42 @@ export default function naDisplay(serverName) {
         //updatePorts(current.portData.filter(d => ["234", "237", "238", "239", "240"].includes(d.id)));
         updatePorts();
 
-        $("form").submit(function(event) {
+        /*
+        let predictTime = moment().utc(),
+            direction = "nne".toUpperCase();
+        console.log(`---->   predictTime: ${predictTime.format()}`);
+        predictWind(direction, `${predictTime.hours()}:${predictTime.minutes()}`);
+        predictTime.add(48 / 4, "minutes");
+        console.log(`---->   predictTime: ${predictTime.format()}`);
+        predictWind(direction, `${predictTime.hours()}:${predictTime.minutes()}`);
+        */
+
+        $("#f11").submit(function(event) {
             const x = $("#x-coord").val(),
                 z = $("#z-coord").val();
             goToF11(x, z);
+            event.preventDefault();
+        });
+        $("#direction").knob({
+            bgColor: "#ede1d2", // primary-200
+            thickness: 0.2,
+            min: 0,
+            max: 359,
+            step: 360 / defaults.compassDirections.length,
+            cursor: true,
+            fgColor: "#917f68", // primary-700
+            draw: function() {
+                $(this.i).css("class", "knob");
+            },
+            format: input => degreesToCompass(input)
+        });
+        $("#windPrediction").submit(function(event) {
+            const currentWind = $("#direction")
+                    .val()
+                    .toUpperCase(),
+                time = $("#time").val();
+            predictWind(currentWind, time);
+            $("#predictDropdown").dropdown("toggle");
             event.preventDefault();
         });
         $("#reset").on("click", function() {
