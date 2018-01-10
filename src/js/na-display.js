@@ -955,53 +955,73 @@ export default function naDisplay(serverName) {
         printPredictedWind(predictedWindDegrees, predictDate.format("H.mm"), currentWind, currentDate.format("H.mm"));
     }
 
-    function naReady(error, naMap, pbZones, shipData) {
-        if (error) {
-            throw error;
-        }
-
-        // Read map data
-        /*
-        defaults.portData = topojsonFeature(naMap, naMap.objects.ports).features;
-        current.portData = defaults.portData;
-        defaults.PBZoneData = topojsonFeature(pbZones, pbZones.objects.pbZones);
-        defaults.fortData = topojsonFeature(pbZones, pbZones.objects.forts);
-        defaults.towerData = topojsonFeature(pbZones, pbZones.objects.towers);
-        */
-        defaults.shipData = shipData.shipData;
-
-        //setup();
-        /*
-        zoomAndPan(initial.transform);
-        //updatePorts(current.portData.filter(d => ["234", "237", "238", "239", "240"].includes(d.id)));
-        updatePorts();
-        */
-
-        function setupShipSelect(id) {
-            const shipSelect = $(id);
-            const selectShips = defaults.shipData.sort(function(a, b) {
-                if (a.name < b.name) {
-                    return -1;
-                }
-                if (a.name > b.name) {
-                    return 1;
-                }
-                return 0;
-            });
-            shipSelect.append(
-                $("<option>", {
-                    value: 0,
-                    text: "Select a ship"
-                })
-            );
-            selectShips.forEach(ship => {
+    function shipCompare() {
+        function shipCompareSetup() {
+            function setupShipSelect(id) {
+                const shipSelect = $(id);
+                const selectShips = defaults.shipData.sort(function(a, b) {
+                    if (a.name < b.name) {
+                        return -1;
+                    }
+                    if (a.name > b.name) {
+                        return 1;
+                    }
+                    return 0;
+                });
                 shipSelect.append(
                     $("<option>", {
-                        value: ship.id,
-                        text: ship.name
+                        value: 0,
+                        text: "Select a ship"
                     })
                 );
+                selectShips.forEach(ship => {
+                    shipSelect.append(
+                        $("<option>", {
+                            value: ship.id,
+                            text: ship.name
+                        })
+                    );
+                });
+            }
+
+            setupShipSelect("#shipA-select");
+            setupShipSelect("#shipB-select");
+            $("#shipA-select").change(() => {
+                shipSelected($("#shipA-select").val(), "A");
             });
+            $("#shipB-select").change(() => {
+                shipSelected($("#shipB-select").val(), "B");
+            });
+
+            const width = 350,
+                height = 350;
+            defaults.svgShipA = d3
+                .select("#shipA")
+                .append("svg")
+                .attr("width", width)
+                .attr("height", height)
+                .attr("class", "profile")
+                .attr("fill", "none")
+                .append("g")
+                .attr("transform", `translate(${width / 2}, ${height / 2})`);
+            defaults.svgShipB = d3
+                .select("#shipB")
+                .append("svg")
+                .attr("width", width)
+                .attr("height", height)
+                .attr("class", "profile")
+                .attr("fill", "none")
+                .append("g")
+                .attr("transform", `translate(${width / 2}, ${height / 2})`);
+            defaults.svgShipCompare = d3
+                .select("#ship-compare")
+                .append("svg")
+                .attr("width", width)
+                .attr("height", height)
+                .attr("class", "profile")
+                .attr("fill", "none")
+                .append("g")
+                .attr("transform", `translate(${width / 2}, ${height / 2 + 20})`);
         }
 
         function shipSelected(shipId, shipNumber) {
@@ -1009,9 +1029,9 @@ export default function naDisplay(serverName) {
                 return Object.getOwnPropertyNames(obj).length === 0 && obj.constructor === Object;
             }
 
-            function drawProfile(profileData, shipNumber) {
-                let width = 350,
-                    height = 350,
+            function drawProfile(profileData, svg) {
+                let width = +svg.attr("width"),
+                    height = +svg.attr("height"),
                     outerRadius = Math.min(width, height) / 2,
                     innerRadius = 0.3 * outerRadius;
 
@@ -1036,16 +1056,6 @@ export default function naDisplay(serverName) {
                     .scaleLinear()
                     .domain([minSpeed, 0, maxSpeed])
                     .range([10, innerRadius, outerRadius]);
-
-                let svg = d3
-                    .select(`#ship${shipNumber}`)
-                    .append("svg")
-                    .attr("width", width)
-                    .attr("height", height)
-                    .attr("class", "profile")
-                    .attr("fill", "none")
-                    .append("g")
-                    .attr("transform", `translate(${width / 2}, ${height / 2})`);
 
                 // Extra scale since the color scale is interpolated
                 const gradientScale = d3
@@ -1164,6 +1174,7 @@ export default function naDisplay(serverName) {
                     .domain(["A", "B"])
                     .range(["#a62e39", "#fbf8f5", "#2a6838", "#419f57", "#6cc380"]);
 
+                svg.select("g").remove();
                 let pie = d3
                     .pie()
                     .sort(null)
@@ -1181,15 +1192,7 @@ export default function naDisplay(serverName) {
                     .domain([minSpeed, 0, maxSpeed])
                     .range([10, innerRadius, outerRadius]);
 
-                let svg = d3
-                    .select("#ship-compare")
-                    .append("svg")
-                    .attr("width", width)
-                    .attr("height", height)
-                    .attr("class", "profile")
-                    .attr("fill", "none")
-                    .append("g")
-                    .attr("transform", `translate(${width / 2}, ${height / 2})`);
+                let svg = defaults.svgShipCompare;
 
                 // Arc for text
                 let knotsArc = d3
@@ -1249,11 +1252,9 @@ export default function naDisplay(serverName) {
                 let markersB = svg.append("g").attr("class", "markers");
 
                 pathA
+                    .transition()
                     .attr("d", line(arcsA))
-                    .attr("fill", "red")
-                    .style("opacity", 0.5)
-                    .attr("stroke-width", "5px")
-                    .attr("stroke", "red");
+                    .attr("class", "arcs arcsA");
 
                 let selA = markersA.selectAll("circle").data(arcsA);
                 selA
@@ -1268,13 +1269,7 @@ export default function naDisplay(serverName) {
                     .append("title")
                     .text(d => `${Math.round(d.data * 10) / 10} knots`);
 
-
-                pathB
-                    .attr("d", line(arcsB))
-                    .attr("fill", "blue")
-                    .style("opacity", 0.5)
-                    .attr("stroke-width", "5px")
-                    .attr("stroke", "blue");
+                pathB.attr("d", line(arcsB)).attr("class", "arcs arcsB");
 
                 let selB = markersB.selectAll("circle").data(arcsB);
                 selB
@@ -1292,13 +1287,16 @@ export default function naDisplay(serverName) {
 
             //console.log(`ship id: ${shipId}`);
             let profileData = defaults.shipData.filter(ship => ship.id === +shipId)[0];
+            let svg;
             if ("A" === shipNumber) {
                 current.shipAData = profileData;
+                svg = defaults.svgShipA;
             } else {
                 current.shipBData = profileData;
+                svg = defaults.svgShipB;
             }
             //console.log(`profileData: ${JSON.stringify(profileData)}`);
-            drawProfile(profileData, shipNumber);
+            drawProfile(profileData, svg);
             if (!isEmpty(current.shipAData) && !isEmpty(current.shipBData)) {
                 console.log("compare");
                 drawDifferenceProfile();
@@ -1311,14 +1309,32 @@ export default function naDisplay(serverName) {
         console.log(`minSpeed: ${minSpeed}`);
         console.log(`maxSpeed: ${maxSpeed}`);
 
-        setupShipSelect("#shipA-select");
-        setupShipSelect("#shipB-select");
-        $("#shipA-select").change(() => {
-            shipSelected($("#shipA-select").val(), "A");
-        });
-        $("#shipB-select").change(() => {
-            shipSelected($("#shipB-select").val(), "B");
-        });
+        shipCompareSetup();
+    }
+
+    function naReady(error, naMap, pbZones, shipData) {
+        if (error) {
+            throw error;
+        }
+
+        // Read map data
+        /*
+        defaults.portData = topojsonFeature(naMap, naMap.objects.ports).features;
+        current.portData = defaults.portData;
+        defaults.PBZoneData = topojsonFeature(pbZones, pbZones.objects.pbZones);
+        defaults.fortData = topojsonFeature(pbZones, pbZones.objects.forts);
+        defaults.towerData = topojsonFeature(pbZones, pbZones.objects.towers);
+        */
+        defaults.shipData = shipData.shipData;
+
+        //setup();
+        /*
+        zoomAndPan(initial.transform);
+        //updatePorts(current.portData.filter(d => ["234", "237", "238", "239", "240"].includes(d.id)));
+        updatePorts();
+        */
+
+        shipCompare();
 
         /*
         let predictTime = moment().utc(),
