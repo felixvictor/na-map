@@ -1005,6 +1005,10 @@ export default function naDisplay(serverName) {
         }
 
         function shipSelected(shipId, shipNumber) {
+            function isEmpty(obj) {
+                return Object.getOwnPropertyNames(obj).length === 0 && obj.constructor === Object;
+            }
+
             function drawProfile(profileData, shipNumber) {
                 let width = 350,
                     height = 350,
@@ -1132,8 +1136,6 @@ export default function naDisplay(serverName) {
                 let markers = svg.append("g").attr("class", "markers");
                 path
                     .attr("d", line(arcs))
-                    .attr("fill", "#fff")
-                    .style("opacity", 0.8)
                     .attr("stroke-width", "5px")
                     .attr("stroke", "url(#gradient)");
 
@@ -1159,15 +1161,15 @@ export default function naDisplay(serverName) {
 
                 const colorScale = d3
                     .scaleLinear()
-                    .domain([profileData.minSpeed, 0, 10, 12, profileData.maxSpeed])
-                    .range(["#a62e39", "#fbf8f5", "#2a6838", "#419f57", "#6cc380"])
-                    .interpolate(d3.interpolateHcl);
+                    .domain(["A", "B"])
+                    .range(["#a62e39", "#fbf8f5", "#2a6838", "#419f57", "#6cc380"]);
 
                 let pie = d3
                     .pie()
                     .sort(null)
                     .value(1);
-                const arcs = pie(profileData.speedDegrees);
+                const arcsA = pie(current.shipAData.speedDegrees),
+                    arcsB = pie(current.shipBData.speedDegrees);
 
                 const radiusScaleRelative = d3
                     .scaleLinear()
@@ -1180,7 +1182,7 @@ export default function naDisplay(serverName) {
                     .range([10, innerRadius, outerRadius]);
 
                 let svg = d3
-                    .select(`#ship${shipNumber}`)
+                    .select("#ship-compare")
                     .append("svg")
                     .attr("width", width)
                     .attr("height", height)
@@ -1188,40 +1190,6 @@ export default function naDisplay(serverName) {
                     .attr("fill", "none")
                     .append("g")
                     .attr("transform", `translate(${width / 2}, ${height / 2})`);
-
-                // Extra scale since the color scale is interpolated
-                const gradientScale = d3
-                    .scaleLinear()
-                    .domain([minSpeed, maxSpeed])
-                    .range([0, width]);
-
-                // Calculate the variables for the gradient
-                const numStops = 30;
-                let gradientDomain = gradientScale.domain();
-                gradientDomain[2] = gradientDomain[1] - gradientDomain[0];
-                let gradientPoint = [];
-                for (let i = 0; i < numStops; i++) {
-                    gradientPoint.push(i * gradientDomain[2] / (numStops - 1) + gradientDomain[0]);
-                } //for i
-
-                // Create the gradient
-                svg
-                    .append("defs")
-                    .append("radialGradient")
-                    .attr("id", "gradient")
-                    .attr("cx", 0.5)
-                    .attr("cy", 0.25)
-                    .attr("r", 0.5)
-                    .selectAll("stop")
-                    .data(d3.range(numStops))
-                    .enter()
-                    .append("stop")
-                    .attr("offset", function(d, i) {
-                        return gradientScale(gradientPoint[i]) / width;
-                    })
-                    .attr("stop-color", function(d, i) {
-                        return colorScale(gradientPoint[i]);
-                    });
 
                 // Arc for text
                 let knotsArc = d3
@@ -1274,28 +1242,52 @@ export default function naDisplay(serverName) {
                         .angle((d, i) => i * segmentRadians)
                         .radius(d => radiusScaleAbsolute(d.data))
                         .curve(curve);
-                let path = svg.append("path");
-                let markers = svg.append("g").attr("class", "markers");
-                path
-                    .attr("d", line(arcs))
-                    .attr("fill", "#fff")
-                    .style("opacity", 0.8)
-                    .attr("stroke-width", "5px")
-                    .attr("stroke", "url(#gradient)");
 
-                let sel = markers.selectAll("circle").data(arcs);
-                sel
+                let pathA = svg.append("path");
+                let pathB = svg.append("path");
+                let markersA = svg.append("g").attr("class", "markers");
+                let markersB = svg.append("g").attr("class", "markers");
+
+                pathA
+                    .attr("d", line(arcsA))
+                    .attr("fill", "red")
+                    .style("opacity", 0.5)
+                    .attr("stroke-width", "5px")
+                    .attr("stroke", "red");
+
+                let selA = markersA.selectAll("circle").data(arcsA);
+                selA
                     .enter()
                     .append("circle")
-                    .merge(sel)
+                    .merge(selA)
                     .attr("r", "5")
                     .attr("cy", (d, i) => Math.cos(i * segmentRadians) * -radiusScaleAbsolute(d.data))
                     .attr("cx", (d, i) => Math.sin(i * segmentRadians) * radiusScaleAbsolute(d.data))
                     .attr("fill", d => colorScale(d.data))
-                    .style("opacity", 0.5)
+                    .style("opacity", 0.2)
                     .append("title")
                     .text(d => `${Math.round(d.data * 10) / 10} knots`);
 
+
+                pathB
+                    .attr("d", line(arcsB))
+                    .attr("fill", "blue")
+                    .style("opacity", 0.5)
+                    .attr("stroke-width", "5px")
+                    .attr("stroke", "blue");
+
+                let selB = markersB.selectAll("circle").data(arcsB);
+                selB
+                    .enter()
+                    .append("circle")
+                    .merge(selB)
+                    .attr("r", "5")
+                    .attr("cy", (d, i) => Math.cos(i * segmentRadians) * -radiusScaleAbsolute(d.data))
+                    .attr("cx", (d, i) => Math.sin(i * segmentRadians) * radiusScaleAbsolute(d.data))
+                    .attr("fill", d => colorScale(d.data))
+                    .style("opacity", 0.2)
+                    .append("title")
+                    .text(d => `${Math.round(d.data * 10) / 10} knots`);
             }
 
             //console.log(`ship id: ${shipId}`);
@@ -1307,7 +1299,8 @@ export default function naDisplay(serverName) {
             }
             //console.log(`profileData: ${JSON.stringify(profileData)}`);
             drawProfile(profileData, shipNumber);
-            if (!current.shipAData.isEmptyObject() && !current.shipBData.isEmptyObject()) {
+            if (!isEmpty(current.shipAData) && !isEmpty(current.shipBData)) {
+                console.log("compare");
                 drawDifferenceProfile();
             }
         }
