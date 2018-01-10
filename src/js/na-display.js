@@ -1251,21 +1251,6 @@ export default function naDisplay(serverName) {
         const maxSpeed = d3.max(profileData.shipData, d => d.maxSpeed);
         console.log(`minSpeed: ${minSpeed}`);
         console.log(`maxSpeed: ${maxSpeed}`);
-        profileData.shipData.sort(function(a, b) {
-            if (a.class < b.class) {
-                return -1;
-            }
-            if (a.class > b.class) {
-                return 1;
-            }
-            if (a.name < b.name) {
-                return -1;
-            }
-            if (a.name > b.name) {
-                return 1;
-            }
-            return 0;
-        });
 
         profileData.shipData.forEach((d, i) => {
             drawProfile(d, i);
