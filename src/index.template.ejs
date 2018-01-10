@@ -117,7 +117,7 @@
 <div id="na" class="na">
 </div>
 
-<section id="modal" class="modal" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog">
+<section id="greetings" class="modal" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <header class="modal-header">
@@ -135,6 +135,36 @@
                 <button type="button" class="btn btn-secondary" data-dismiss="modal" data-server="eu1">Caribbean
                 </button>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal" data-server="eu2">PvE only</button>
+            </footer>
+        </div>
+    </div>
+</section>
+
+<section id="ships" class="modal" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <header class="modal-header">
+                <h3>Ship comparison</h3>
+            </header>
+
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-4 ml-auto">
+                            <select class="custom-select" name="shipA-select" id="shipA-select" title="Select a ship">
+                            </select>
+                            <div id="shipA"></div>
+                        </div>
+                        <div id="ship-compare" class="col-md-4 ml-auto"></div>
+                        <div class="col-md-4 ml-auto">
+                            <select class="custom-select" name="shipB-select" id="shipB-select" title="Select a ship">
+                            </select>
+                            <div id="shipB"></div>
+                        </div>
+                    </div>
+                </div>
+            <footer class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </footer>
         </div>
     </div>

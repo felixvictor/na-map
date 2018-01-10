@@ -39,6 +39,7 @@ export default function naDisplay(serverName) {
         highlightDuration: 200,
         mapJson: `${serverName}.json`,
         pbJson: "pb.json",
+        shipJson: "ships.json",
         imageSrc: "images/na-map.jpg",
         image: new Image(),
         line: d3.line(),
@@ -106,7 +107,9 @@ export default function naDisplay(serverName) {
         bPortLabelDisplayed: true,
         bFirstCoord: true,
         radioButton: "compass",
-        lineData: []
+        lineData: [],
+        shipAData: {},
+        shipBData: {}
     };
 
     const thousandsWithBlanks = x => {
@@ -952,22 +955,377 @@ export default function naDisplay(serverName) {
         printPredictedWind(predictedWindDegrees, predictDate.format("H.mm"), currentWind, currentDate.format("H.mm"));
     }
 
-    function naReady(error, naMap, pbZones) {
+    function naReady(error, naMap, pbZones, shipData) {
         if (error) {
             throw error;
         }
 
         // Read map data
+        /*
         defaults.portData = topojsonFeature(naMap, naMap.objects.ports).features;
         current.portData = defaults.portData;
         defaults.PBZoneData = topojsonFeature(pbZones, pbZones.objects.pbZones);
         defaults.fortData = topojsonFeature(pbZones, pbZones.objects.forts);
         defaults.towerData = topojsonFeature(pbZones, pbZones.objects.towers);
+        */
+        defaults.shipData = shipData.shipData;
 
-        setup();
+        //setup();
+        /*
         zoomAndPan(initial.transform);
         //updatePorts(current.portData.filter(d => ["234", "237", "238", "239", "240"].includes(d.id)));
         updatePorts();
+        */
+
+        function setupShipSelect(id) {
+            const shipSelect = $(id);
+            const selectShips = defaults.shipData.sort(function(a, b) {
+                if (a.name < b.name) {
+                    return -1;
+                }
+                if (a.name > b.name) {
+                    return 1;
+                }
+                return 0;
+            });
+            shipSelect.append(
+                $("<option>", {
+                    value: 0,
+                    text: "Select a ship"
+                })
+            );
+            selectShips.forEach(ship => {
+                shipSelect.append(
+                    $("<option>", {
+                        value: ship.id,
+                        text: ship.name
+                    })
+                );
+            });
+        }
+
+        function shipSelected(shipId, shipNumber) {
+            function drawProfile(profileData, shipNumber) {
+                let width = 350,
+                    height = 350,
+                    outerRadius = Math.min(width, height) / 2,
+                    innerRadius = 0.3 * outerRadius;
+
+                const colorScale = d3
+                    .scaleLinear()
+                    .domain([profileData.minSpeed, 0, 10, 12, profileData.maxSpeed])
+                    .range(["#a62e39", "#fbf8f5", "#2a6838", "#419f57", "#6cc380"])
+                    .interpolate(d3.interpolateHcl);
+
+                let pie = d3
+                    .pie()
+                    .sort(null)
+                    .value(1);
+                const arcs = pie(profileData.speedDegrees);
+
+                const radiusScaleRelative = d3
+                    .scaleLinear()
+                    .domain([profileData.minSpeed, 0, profileData.maxSpeed])
+                    .range([10, innerRadius, outerRadius]);
+
+                const radiusScaleAbsolute = d3
+                    .scaleLinear()
+                    .domain([minSpeed, 0, maxSpeed])
+                    .range([10, innerRadius, outerRadius]);
+
+                let svg = d3
+                    .select(`#ship${shipNumber}`)
+                    .append("svg")
+                    .attr("width", width)
+                    .attr("height", height)
+                    .attr("class", "profile")
+                    .attr("fill", "none")
+                    .append("g")
+                    .attr("transform", `translate(${width / 2}, ${height / 2})`);
+
+                // Extra scale since the color scale is interpolated
+                const gradientScale = d3
+                    .scaleLinear()
+                    .domain([minSpeed, maxSpeed])
+                    .range([0, width]);
+
+                // Calculate the variables for the gradient
+                const numStops = 30;
+                let gradientDomain = gradientScale.domain();
+                gradientDomain[2] = gradientDomain[1] - gradientDomain[0];
+                let gradientPoint = [];
+                for (let i = 0; i < numStops; i++) {
+                    gradientPoint.push(i * gradientDomain[2] / (numStops - 1) + gradientDomain[0]);
+                } //for i
+
+                // Create the gradient
+                svg
+                    .append("defs")
+                    .append("radialGradient")
+                    .attr("id", "gradient")
+                    .attr("cx", 0.5)
+                    .attr("cy", 0.25)
+                    .attr("r", 0.5)
+                    .selectAll("stop")
+                    .data(d3.range(numStops))
+                    .enter()
+                    .append("stop")
+                    .attr("offset", function(d, i) {
+                        return gradientScale(gradientPoint[i]) / width;
+                    })
+                    .attr("stop-color", function(d, i) {
+                        return colorScale(gradientPoint[i]);
+                    });
+
+                // Arc for text
+                let knotsArc = d3
+                    .arc()
+                    .outerRadius(d => radiusScaleAbsolute(d) + 2)
+                    .innerRadius(d => radiusScaleAbsolute(d) + 1)
+                    .startAngle(-Math.PI / 2)
+                    .endAngle(Math.PI / 2);
+
+                // Tick/Grid data
+                const ticks = [12, 8, 4, 0];
+                const tickLabels = ["12 knots", "8 knots", "4 knots", "0 knots"];
+
+                //Add the circles for each tick
+                let grid = svg
+                    .selectAll(".circle")
+                    .data(ticks)
+                    .enter()
+                    .append("circle")
+                    .attr("class", "knots-circle")
+                    .attr("r", d => radiusScaleAbsolute(d))
+                    .attr("id", (d, i) => `tick${i}`);
+
+                //Add the paths for the text
+                svg
+                    .selectAll(".label")
+                    .data(ticks)
+                    .enter()
+                    .append("path")
+                    .attr("d", knotsArc)
+                    .attr("id", (d, i) => `tic${i}`);
+
+                //And add the text
+                svg
+                    .selectAll(".label")
+                    .data(ticks)
+                    .enter()
+                    .append("text")
+                    .attr("class", "knots-text")
+                    .append("textPath")
+                    .attr("xlink:href", (d, i) => `#tic${i}`)
+                    .text((d, i) => tickLabels[i])
+                    .attr("startOffset", "16%");
+
+                const numSegments = 25,
+                    segmentRadians = 2 * Math.PI / numSegments;
+                let curve = d3.curveCatmullRomClosed,
+                    line = d3
+                        .radialLine()
+                        .angle((d, i) => i * segmentRadians)
+                        .radius(d => radiusScaleAbsolute(d.data))
+                        .curve(curve);
+                let path = svg.append("path");
+                let markers = svg.append("g").attr("class", "markers");
+                path
+                    .attr("d", line(arcs))
+                    .attr("fill", "#fff")
+                    .style("opacity", 0.8)
+                    .attr("stroke-width", "5px")
+                    .attr("stroke", "url(#gradient)");
+
+                let sel = markers.selectAll("circle").data(arcs);
+                sel
+                    .enter()
+                    .append("circle")
+                    .merge(sel)
+                    .attr("r", "5")
+                    .attr("cy", (d, i) => Math.cos(i * segmentRadians) * -radiusScaleAbsolute(d.data))
+                    .attr("cx", (d, i) => Math.sin(i * segmentRadians) * radiusScaleAbsolute(d.data))
+                    .attr("fill", d => colorScale(d.data))
+                    .style("opacity", 0.5)
+                    .append("title")
+                    .text(d => `${Math.round(d.data * 10) / 10} knots`);
+            }
+
+            function drawDifferenceProfile() {
+                let width = 350,
+                    height = 350,
+                    outerRadius = Math.min(width, height) / 2,
+                    innerRadius = 0.3 * outerRadius;
+
+                const colorScale = d3
+                    .scaleLinear()
+                    .domain([profileData.minSpeed, 0, 10, 12, profileData.maxSpeed])
+                    .range(["#a62e39", "#fbf8f5", "#2a6838", "#419f57", "#6cc380"])
+                    .interpolate(d3.interpolateHcl);
+
+                let pie = d3
+                    .pie()
+                    .sort(null)
+                    .value(1);
+                const arcs = pie(profileData.speedDegrees);
+
+                const radiusScaleRelative = d3
+                    .scaleLinear()
+                    .domain([profileData.minSpeed, 0, profileData.maxSpeed])
+                    .range([10, innerRadius, outerRadius]);
+
+                const radiusScaleAbsolute = d3
+                    .scaleLinear()
+                    .domain([minSpeed, 0, maxSpeed])
+                    .range([10, innerRadius, outerRadius]);
+
+                let svg = d3
+                    .select(`#ship${shipNumber}`)
+                    .append("svg")
+                    .attr("width", width)
+                    .attr("height", height)
+                    .attr("class", "profile")
+                    .attr("fill", "none")
+                    .append("g")
+                    .attr("transform", `translate(${width / 2}, ${height / 2})`);
+
+                // Extra scale since the color scale is interpolated
+                const gradientScale = d3
+                    .scaleLinear()
+                    .domain([minSpeed, maxSpeed])
+                    .range([0, width]);
+
+                // Calculate the variables for the gradient
+                const numStops = 30;
+                let gradientDomain = gradientScale.domain();
+                gradientDomain[2] = gradientDomain[1] - gradientDomain[0];
+                let gradientPoint = [];
+                for (let i = 0; i < numStops; i++) {
+                    gradientPoint.push(i * gradientDomain[2] / (numStops - 1) + gradientDomain[0]);
+                } //for i
+
+                // Create the gradient
+                svg
+                    .append("defs")
+                    .append("radialGradient")
+                    .attr("id", "gradient")
+                    .attr("cx", 0.5)
+                    .attr("cy", 0.25)
+                    .attr("r", 0.5)
+                    .selectAll("stop")
+                    .data(d3.range(numStops))
+                    .enter()
+                    .append("stop")
+                    .attr("offset", function(d, i) {
+                        return gradientScale(gradientPoint[i]) / width;
+                    })
+                    .attr("stop-color", function(d, i) {
+                        return colorScale(gradientPoint[i]);
+                    });
+
+                // Arc for text
+                let knotsArc = d3
+                    .arc()
+                    .outerRadius(d => radiusScaleAbsolute(d) + 2)
+                    .innerRadius(d => radiusScaleAbsolute(d) + 1)
+                    .startAngle(-Math.PI / 2)
+                    .endAngle(Math.PI / 2);
+
+                // Tick/Grid data
+                const ticks = [12, 8, 4, 0];
+                const tickLabels = ["12 knots", "8 knots", "4 knots", "0 knots"];
+
+                //Add the circles for each tick
+                let grid = svg
+                    .selectAll(".circle")
+                    .data(ticks)
+                    .enter()
+                    .append("circle")
+                    .attr("class", "knots-circle")
+                    .attr("r", d => radiusScaleAbsolute(d))
+                    .attr("id", (d, i) => `tick${i}`);
+
+                //Add the paths for the text
+                svg
+                    .selectAll(".label")
+                    .data(ticks)
+                    .enter()
+                    .append("path")
+                    .attr("d", knotsArc)
+                    .attr("id", (d, i) => `tic${i}`);
+
+                //And add the text
+                svg
+                    .selectAll(".label")
+                    .data(ticks)
+                    .enter()
+                    .append("text")
+                    .attr("class", "knots-text")
+                    .append("textPath")
+                    .attr("xlink:href", (d, i) => `#tic${i}`)
+                    .text((d, i) => tickLabels[i])
+                    .attr("startOffset", "16%");
+
+                const numSegments = 25,
+                    segmentRadians = 2 * Math.PI / numSegments;
+                let curve = d3.curveCatmullRomClosed,
+                    line = d3
+                        .radialLine()
+                        .angle((d, i) => i * segmentRadians)
+                        .radius(d => radiusScaleAbsolute(d.data))
+                        .curve(curve);
+                let path = svg.append("path");
+                let markers = svg.append("g").attr("class", "markers");
+                path
+                    .attr("d", line(arcs))
+                    .attr("fill", "#fff")
+                    .style("opacity", 0.8)
+                    .attr("stroke-width", "5px")
+                    .attr("stroke", "url(#gradient)");
+
+                let sel = markers.selectAll("circle").data(arcs);
+                sel
+                    .enter()
+                    .append("circle")
+                    .merge(sel)
+                    .attr("r", "5")
+                    .attr("cy", (d, i) => Math.cos(i * segmentRadians) * -radiusScaleAbsolute(d.data))
+                    .attr("cx", (d, i) => Math.sin(i * segmentRadians) * radiusScaleAbsolute(d.data))
+                    .attr("fill", d => colorScale(d.data))
+                    .style("opacity", 0.5)
+                    .append("title")
+                    .text(d => `${Math.round(d.data * 10) / 10} knots`);
+
+            }
+
+            //console.log(`ship id: ${shipId}`);
+            let profileData = defaults.shipData.filter(ship => ship.id === +shipId)[0];
+            if ("A" === shipNumber) {
+                current.shipAData = profileData;
+            } else {
+                current.shipBData = profileData;
+            }
+            //console.log(`profileData: ${JSON.stringify(profileData)}`);
+            drawProfile(profileData, shipNumber);
+            if (!current.shipAData.isEmptyObject() && !current.shipBData.isEmptyObject()) {
+                drawDifferenceProfile();
+            }
+        }
+        //console.log(`shipData: ${JSON.stringify(defaults.shipData)}`);
+
+        const minSpeed = d3.min(defaults.shipData, d => d.minSpeed);
+        const maxSpeed = d3.max(defaults.shipData, d => d.maxSpeed);
+        console.log(`minSpeed: ${minSpeed}`);
+        console.log(`maxSpeed: ${maxSpeed}`);
+
+        setupShipSelect("#shipA-select");
+        setupShipSelect("#shipB-select");
+        $("#shipA-select").change(() => {
+            shipSelected($("#shipA-select").val(), "A");
+        });
+        $("#shipB-select").change(() => {
+            shipSelected($("#shipB-select").val(), "B");
+        });
 
         /*
         let predictTime = moment().utc(),
@@ -1016,297 +1374,17 @@ export default function naDisplay(serverName) {
         });
     }
 
-    function stopProp() {
-        if (d3.event.defaultPrevented) {
-            d3.event.stopPropagation();
-        }
-    }
-    const zoomPadding = defaults.coord.max / 50;
-    naZoom = d3
-        .zoom()
-        .scaleExtent([defaults.minScale, defaults.maxScale])
-        .translateExtent([
-            [defaults.coord.min - zoomPadding, defaults.coord.min - zoomPadding],
-            [defaults.coord.max + zoomPadding, defaults.coord.max + zoomPadding]
-        ])
-        .on("zoom", naZoomed);
-
-    naSvg = d3
-        .select("#na")
-        .append("svg")
-        .attr("id", "na-svg")
-        .attr("width", defaults.width)
-        .attr("height", defaults.height)
-        .style("position", "absolute")
-        .style("top", `${defaults.margin.top}px`)
-        .style("left", `${defaults.margin.left}px`)
-        .call(naZoom)
-        .on("dblclick.zoom", null)
-        .on("click", stopProp, true)
-        .on("dblclick", doubleClickAction);
-
-    svgDef = naSvg.append("defs");
-
-    mainGVoronoi = naSvg.append("g").attr("class", "voronoi");
-    mainGPort = naSvg.append("g").attr("class", "port");
-    mainGPBZone = naSvg
-        .append("g")
-        .attr("class", "pb")
-        .style("display", "none");
-    mainGCoord = naSvg.append("g").attr("class", "coord");
-
-    d3.json("ships.json", function(profileData) {
-        function drawProfile(profileData, i) {
-            let width = 350,
-                height = 350,
-                svgPerRow = 11,
-                outerRadius = Math.min(width, height) / 2,
-                innerRadius = 0.3 * outerRadius;
-
-            const colorScale = d3
-                .scaleLinear()
-                .domain([profileData.minSpeed, 0, 10, 12, profileData.maxSpeed])
-                .range(["#a62e39", "#fbf8f5", "#2a6838", "#419f57", "#6cc380"])
-                .interpolate(d3.interpolateHcl);
-
-            let pie = d3
-                .pie()
-                .sort(null)
-                .value(1);
-            const arcs = pie(profileData.speedDegrees);
-
-            const radiusScaleRelative = d3
-                .scaleLinear()
-                .domain([profileData.minSpeed, 0, profileData.maxSpeed])
-                .range([10, innerRadius, outerRadius]);
-
-            const radiusScaleAbsolute = d3
-                .scaleLinear()
-                .domain([minSpeed, 0, maxSpeed])
-                .range([10, innerRadius, outerRadius]);
-
-            let svg = naSvg
-                .append("svg")
-                .attr("class", "profile")
-                .attr("fill", "none")
-                .append("g")
-                .attr(
-                    "transform",
-                    `translate(${width / 2 + width * (i % svgPerRow)}, ${height / 2 +
-                        height * Math.trunc(i / svgPerRow)})`
-                );
-
-            // Extra scale since the color scale is interpolated
-            const gradientScale = d3
-                .scaleLinear()
-                .domain([minSpeed, maxSpeed])
-                .range([0, width]);
-
-            // Calculate the variables for the gradient
-            const numStops = 30;
-            let gradientDomain = gradientScale.domain();
-            gradientDomain[2] = gradientDomain[1] - gradientDomain[0];
-            let gradientPoint = [];
-            for (let i = 0; i < numStops; i++) {
-                gradientPoint.push(i * gradientDomain[2] / (numStops - 1) + gradientDomain[0]);
-            } //for i
-
-            // Create the gradient
-            svg
-                .append("defs")
-                .append("radialGradient")
-                .attr("id", "gradient")
-                .attr("cx", 0.5)
-                .attr("cy", 0.25)
-                .attr("r", 0.5)
-                .selectAll("stop")
-                .data(d3.range(numStops))
-                .enter()
-                .append("stop")
-                .attr("offset", function(d, i) {
-                    return gradientScale(gradientPoint[i]) / width;
-                })
-                .attr("stop-color", function(d, i) {
-                    return colorScale(gradientPoint[i]);
-                });
-
-            // Arc for text
-            let knotsArc = d3
-                .arc()
-                .outerRadius(d => radiusScaleAbsolute(d) + 2)
-                .innerRadius(d => radiusScaleAbsolute(d) + 1)
-                .startAngle(-Math.PI / 2)
-                .endAngle(Math.PI / 2);
-
-            // Tick/Grid data
-            const ticks = [12, 8, 4, 0];
-            const tickLabels = ["12 knots", "8 knots", "4 knots", "0 knots"];
-
-            //Add the circles for each tick
-            let grid = svg
-                .selectAll(".circle")
-                .data(ticks)
-                .enter()
-                .append("circle")
-                .attr("class", "knots-circle")
-                .attr("r", d => radiusScaleAbsolute(d))
-                .attr("id", (d, i) => `tick${i}`);
-
-            //Add the paths for the text
-            svg
-                .selectAll(".label")
-                .data(ticks)
-                .enter()
-                .append("path")
-                .attr("d", knotsArc)
-                .attr("id", (d, i) => `tic${i}`);
-
-            //And add the text
-            svg
-                .selectAll(".label")
-                .data(ticks)
-                .enter()
-                .append("text")
-                .attr("class", "knots-text")
-                .append("textPath")
-                .attr("xlink:href", (d, i) => `#tic${i}`)
-                .text((d, i) => tickLabels[i])
-                .attr("startOffset", "16%");
-
-            const numSegments = 25,
-                segmentRadians = 2 * Math.PI / numSegments;
-            let curve = d3.curveCatmullRomClosed,
-                line = d3
-                    .radialLine()
-                    .angle((d, i) => i * segmentRadians)
-                    .radius(d => radiusScaleAbsolute(d.data))
-                    .curve(curve);
-            let path = svg.append("path");
-            let markers = svg.append("g").attr("class", "markers");
-            path
-                .attr("d", line(arcs))
-                .attr("fill", "#fff")
-                .style("opacity", 0.8)
-                .attr("stroke-width", "5px")
-                .attr("stroke", "url(#gradient)");
-
-            let sel = markers.selectAll("circle").data(arcs);
-            sel
-                .enter()
-                .append("circle")
-                .merge(sel)
-                .attr("r", "5")
-                .attr("cy", (d, i) => Math.cos(i * segmentRadians) * -radiusScaleAbsolute(d.data))
-                .attr("cx", (d, i) => Math.sin(i * segmentRadians) * radiusScaleAbsolute(d.data))
-                .attr("fill", d => colorScale(d.data))
-                .style("opacity", 0.5)
-                .append("title")
-                .text(d => `${Math.round(d.data * 10) / 10} knots`);
-
-            svg
-                .append("text")
-                .attr("class", "aster-score")
-                .text(profileData.name);
-        }
-
-        //console.log(`profileData: ${JSON.stringify(profileData.shipdata)}`);
-
-        const minSpeed = d3.min(profileData.shipData, d => d.minSpeed);
-        const maxSpeed = d3.max(profileData.shipData, d => d.maxSpeed);
-        console.log(`minSpeed: ${minSpeed}`);
-        console.log(`maxSpeed: ${maxSpeed}`);
-
+    /*
         profileData.shipData.forEach((d, i) => {
             drawProfile(d, i);
         });
-    });
+        */
 
-    /*
     d3
         .queue()
-        .defer(d3.json, defaults.mapJson)
+        //.defer(d3.json, defaults.mapJson)
+        .defer(d3.json, "eu1.json")
         .defer(d3.json, defaults.pbJson)
+        .defer(d3.json, defaults.shipJson)
         .await(naReady);
-        */
 }
-
-/*
-
-        let width = 500,
-            height = 500,
-            radius = Math.min(width, height) / 2,
-            innerRadius = 0.3 * radius;
-
-        let pie = d3
-            .pie()
-            .sort(null)
-            .value(function(d) {
-                return d.width;
-            });
-
-        let arc = d3
-            .arc()
-            .innerRadius(innerRadius)
-            .outerRadius(function(d) {
-                return (radius - innerRadius) * (d.data.score / 100.0) + innerRadius;
-            });
-
-        let outlineArc = d3
-            .arc()
-            .innerRadius(innerRadius)
-            .outerRadius(radius);
-
-        let svg = naSvg
-            .append("svg")
-            .attr("width", width)
-            .attr("height", height)
-            .append("g")
-            .attr("transform", `translate(${width / 2},${height / 2})`);
-
-        d3.csv("aster_data.csv", function(error, data) {
-            data.forEach(function(d) {
-                d.order = +d.order;
-                d.weight = +d.weight;
-                d.score = +d.score;
-                d.width = +d.weight;
-            });
-            let path = svg
-                .selectAll(".solidArc")
-                .data(pie(data))
-                .enter()
-                .append("path")
-                .attr("fill", function(d) {
-                    return d.data.color;
-                })
-                .attr("class", "solidArc")
-                .attr("stroke", "gray")
-                .attr("d", arc);
-            let outerPath = svg
-                .selectAll(".outlineArc")
-                .data(pie(data))
-                .enter()
-                .append("path")
-                .attr("fill", "none")
-                .attr("stroke", "gray")
-                .attr("class", "outlineArc")
-                .attr("d", outlineArc);
-
-            // calculate the weighted mean score
-            let score =
-                data.reduce(function(a, b) {
-                    //console.log('a:' + a + ', b.score: ' + b.score + ', b.weight: ' + b.weight);
-                    return a + b.score * b.weight;
-                }, 0) /
-                data.reduce(function(a, b) {
-                    return a + b.weight;
-                }, 0);
-
-            svg
-                .append("svg:text")
-                .attr("class", "aster-score")
-                .attr("dy", ".35em")
-                .attr("text-anchor", "middle") // text-align: right
-                .text(Math.round(score));
-        });
-
- */
