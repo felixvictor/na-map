@@ -41,7 +41,7 @@ function convertShips() {
 
         let shipData = {
             id: ship.Id,
-            name: ship.Name.replace("'", "’"),
+            name: ship.Name.replace("'", "’").replace("L’Ocean", "L’Océan"),
             class: ship.Class,
             healthInfo: ship.HealthInfo,
             shipMass: ship.ShipMass,
