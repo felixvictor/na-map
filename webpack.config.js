@@ -151,6 +151,8 @@ let config = {
             $: "jquery",
             jQuery: "jquery",
             "window.jQuery": "jquery",
+            moment: "moment",
+            "window.moment": "moment",
             Popper: ["popper.js", "default"],
             //Alert: "exports-loader?Alert!bootstrap/js/dist/alert",
             //Button: "exports-loader?Button!bootstrap/js/dist/button",
@@ -161,6 +163,7 @@ let config = {
             Tooltip: "exports-loader?Tooltip!bootstrap/js/dist/tooltip",
             Util: "exports-loader?Util!bootstrap/js/dist/util"
         }),
+        new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
         new CopyPlugin([
             { from: "google979f2cf3bed204d6.html", to: "google979f2cf3bed204d6.html", toType: "file" },
             { from: "*.json" }
