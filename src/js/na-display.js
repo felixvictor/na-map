@@ -43,6 +43,9 @@ export default function naDisplay(serverName) {
         imageSrc: "images/na-map.jpg",
         image: new Image(),
         line: d3.line(),
+        shipSvgWidth: 350,
+        shipSvgHeight: 350,
+        numSegments: 25,
         transformMatrix: {
             A: -0.00499866779363828,
             B: -0.00000021464254980645,
@@ -77,6 +80,7 @@ export default function naDisplay(serverName) {
     defaults.width = top.innerWidth - defaults.margin.left - defaults.margin.right;
     defaults.height = top.innerHeight - defaults.margin.top - defaults.margin.bottom;
     defaults.minScale = Math.min(defaults.width / defaults.coord.max, defaults.height / defaults.coord.max);
+    defaults.segmentRadians = 2 * Math.PI / defaults.numSegments;
     let initial = {
         scale: defaults.minScale,
         x: -defaults.coord.max / 2 * defaults.minScale,
@@ -993,35 +997,36 @@ export default function naDisplay(serverName) {
                 shipSelected($("#shipB-select").val(), "B");
             });
 
-            const width = 350,
-                height = 350;
-            defaults.svgShipA = d3
+            defaults.minSpeed = d3.min(defaults.shipData, d => d.minSpeed);
+            defaults.maxSpeed = d3.max(defaults.shipData, d => d.maxSpeed);
+
+            d3
                 .select("#shipA")
                 .append("svg")
-                .attr("width", width)
-                .attr("height", height)
+                .attr("width", defaults.shipSvgWidth)
+                .attr("height", defaults.shipSvgHeight)
                 .attr("class", "profile")
                 .attr("fill", "none")
                 .append("g")
-                .attr("transform", `translate(${width / 2}, ${height / 2})`);
-            defaults.svgShipB = d3
+                .attr("transform", `translate(${defaults.shipSvgWidth / 2}, ${defaults.shipSvgHeight / 2})`);
+            d3
                 .select("#shipB")
                 .append("svg")
-                .attr("width", width)
-                .attr("height", height)
+                .attr("width", defaults.shipSvgWidth)
+                .attr("height", defaults.shipSvgHeight)
                 .attr("class", "profile")
                 .attr("fill", "none")
                 .append("g")
-                .attr("transform", `translate(${width / 2}, ${height / 2})`);
-            defaults.svgShipCompare = d3
+                .attr("transform", `translate(${defaults.shipSvgWidth / 2}, ${defaults.shipSvgHeight / 2})`);
+            d3
                 .select("#ship-compare")
                 .append("svg")
-                .attr("width", width)
-                .attr("height", height)
+                .attr("width", defaults.shipSvgWidth)
+                .attr("height", defaults.shipSvgHeight)
                 .attr("class", "profile")
                 .attr("fill", "none")
                 .append("g")
-                .attr("transform", `translate(${width / 2}, ${height / 2 + 20})`);
+                .attr("transform", `translate(${defaults.shipSvgWidth / 2}, ${defaults.shipSvgHeight / 2})`);
         }
 
         function shipSelected(shipId, shipNumber) {
@@ -1029,39 +1034,74 @@ export default function naDisplay(serverName) {
                 return Object.getOwnPropertyNames(obj).length === 0 && obj.constructor === Object;
             }
 
-            function drawProfile(profileData, svg) {
-                let width = +svg.attr("width"),
-                    height = +svg.attr("height"),
-                    outerRadius = Math.min(width, height) / 2,
+            function setBackground(svgId) {
+                const svg = d3.select(svgId).select("g"),
+                    outerRadius = Math.min(defaults.shipSvgWidth, defaults.shipSvgHeight) / 2,
                     innerRadius = 0.3 * outerRadius;
 
-                const colorScale = d3
+                defaults.colorScale = d3
                     .scaleLinear()
-                    .domain([profileData.minSpeed, 0, 10, 12, profileData.maxSpeed])
+                    .domain([defaults.minSpeed, 0, 10, 12, defaults.maxSpeed])
                     .range(["#a62e39", "#fbf8f5", "#2a6838", "#419f57", "#6cc380"])
                     .interpolate(d3.interpolateHcl);
 
-                let pie = d3
-                    .pie()
-                    .sort(null)
-                    .value(1);
-                const arcs = pie(profileData.speedDegrees);
-
-                const radiusScaleRelative = d3
+                defaults.radiusScaleAbsolute = d3
                     .scaleLinear()
-                    .domain([profileData.minSpeed, 0, profileData.maxSpeed])
+                    .domain([defaults.minSpeed, 0, defaults.maxSpeed])
                     .range([10, innerRadius, outerRadius]);
 
-                const radiusScaleAbsolute = d3
-                    .scaleLinear()
-                    .domain([minSpeed, 0, maxSpeed])
-                    .range([10, innerRadius, outerRadius]);
+                // Arc for text
+                let knotsArc = d3
+                    .arc()
+                    .outerRadius(d => defaults.radiusScaleAbsolute(d) + 2)
+                    .innerRadius(d => defaults.radiusScaleAbsolute(d) + 1)
+                    .startAngle(-Math.PI / 2)
+                    .endAngle(Math.PI / 2);
+
+                // Tick/Grid data
+                const ticks = [12, 8, 4, 0];
+                const tickLabels = ["12 knots", "8 knots", "4 knots", "0 knots"];
+
+                //Add the circles for each tick
+                svg
+                    .selectAll(".circle")
+                    .data(ticks)
+                    .enter()
+                    .append("circle")
+                    .attr("class", "knots-circle")
+                    .attr("r", d => defaults.radiusScaleAbsolute(d))
+                    .attr("id", (d, i) => `tick${i}`);
+
+                //Add the paths for the text
+                svg
+                    .selectAll(".label")
+                    .data(ticks)
+                    .enter()
+                    .append("path")
+                    .attr("d", knotsArc)
+                    .attr("id", (d, i) => `tic${i}`);
+
+                //And add the text
+                svg
+                    .selectAll(".label")
+                    .data(ticks)
+                    .enter()
+                    .append("text")
+                    .attr("class", "knots-text")
+                    .append("textPath")
+                    .attr("xlink:href", (d, i) => `#tic${i}`)
+                    .text((d, i) => tickLabels[i])
+                    .attr("startOffset", "16%");
+            }
+
+            function setBackgroundGradient(svgId) {
+                const svg = d3.select(svgId).select("g");
 
                 // Extra scale since the color scale is interpolated
                 const gradientScale = d3
                     .scaleLinear()
-                    .domain([minSpeed, maxSpeed])
-                    .range([0, width]);
+                    .domain([defaults.minSpeed, defaults.maxSpeed])
+                    .range([0, defaults.shipSvgWidth]);
 
                 // Calculate the variables for the gradient
                 const numStops = 30;
@@ -1070,7 +1110,7 @@ export default function naDisplay(serverName) {
                 let gradientPoint = [];
                 for (let i = 0; i < numStops; i++) {
                     gradientPoint.push(i * gradientDomain[2] / (numStops - 1) + gradientDomain[0]);
-                } //for i
+                }
 
                 // Create the gradient
                 svg
@@ -1085,63 +1125,29 @@ export default function naDisplay(serverName) {
                     .enter()
                     .append("stop")
                     .attr("offset", function(d, i) {
-                        return gradientScale(gradientPoint[i]) / width;
+                        return gradientScale(gradientPoint[i]) / defaults.shipSvgWidth;
                     })
                     .attr("stop-color", function(d, i) {
-                        return colorScale(gradientPoint[i]);
+                        return defaults.colorScale(gradientPoint[i]);
                     });
+            }
 
-                // Arc for text
-                let knotsArc = d3
-                    .arc()
-                    .outerRadius(d => radiusScaleAbsolute(d) + 2)
-                    .innerRadius(d => radiusScaleAbsolute(d) + 1)
-                    .startAngle(-Math.PI / 2)
-                    .endAngle(Math.PI / 2);
+            function drawProfile(profileData, svgId) {
+                const svg = d3.select(svgId).select("g");
+                let pie = d3
+                    .pie()
+                    .sort(null)
+                    .value(1);
 
-                // Tick/Grid data
-                const ticks = [12, 8, 4, 0];
-                const tickLabels = ["12 knots", "8 knots", "4 knots", "0 knots"];
+                const arcs = pie(profileData.speedDegrees);
 
-                //Add the circles for each tick
-                let grid = svg
-                    .selectAll(".circle")
-                    .data(ticks)
-                    .enter()
-                    .append("circle")
-                    .attr("class", "knots-circle")
-                    .attr("r", d => radiusScaleAbsolute(d))
-                    .attr("id", (d, i) => `tick${i}`);
-
-                //Add the paths for the text
-                svg
-                    .selectAll(".label")
-                    .data(ticks)
-                    .enter()
-                    .append("path")
-                    .attr("d", knotsArc)
-                    .attr("id", (d, i) => `tic${i}`);
-
-                //And add the text
-                svg
-                    .selectAll(".label")
-                    .data(ticks)
-                    .enter()
-                    .append("text")
-                    .attr("class", "knots-text")
-                    .append("textPath")
-                    .attr("xlink:href", (d, i) => `#tic${i}`)
-                    .text((d, i) => tickLabels[i])
-                    .attr("startOffset", "16%");
-
-                const numSegments = 25,
-                    segmentRadians = 2 * Math.PI / numSegments;
                 let curve = d3.curveCatmullRomClosed,
                     line = d3
                         .radialLine()
-                        .angle((d, i) => i * segmentRadians)
-                        .radius(d => radiusScaleAbsolute(d.data))
+                        .angle((d, i) => i * defaults.segmentRadians)
+                        .radius(d => defaults.radiusScaleAbsolute(d.data))
                         .curve(curve);
+
                 let path = svg.append("path");
                 let markers = svg.append("g").attr("class", "markers");
                 path
@@ -1155,95 +1161,38 @@ export default function naDisplay(serverName) {
                     .append("circle")
                     .merge(sel)
                     .attr("r", "5")
-                    .attr("cy", (d, i) => Math.cos(i * segmentRadians) * -radiusScaleAbsolute(d.data))
-                    .attr("cx", (d, i) => Math.sin(i * segmentRadians) * radiusScaleAbsolute(d.data))
-                    .attr("fill", d => colorScale(d.data))
+                    .attr("cy", (d, i) => Math.cos(i * defaults.segmentRadians) * -defaults.radiusScaleAbsolute(d.data))
+                    .attr("cx", (d, i) => Math.sin(i * defaults.segmentRadians) * defaults.radiusScaleAbsolute(d.data))
+                    .attr("fill", d => defaults.colorScale(d.data))
                     .style("opacity", 0.5)
                     .append("title")
                     .text(d => `${Math.round(d.data * 10) / 10} knots`);
             }
 
-            function drawDifferenceProfile() {
-                let width = 350,
-                    height = 350,
-                    outerRadius = Math.min(width, height) / 2,
-                    innerRadius = 0.3 * outerRadius;
+            function drawDifferenceProfile(svgId) {
+                const svg = d3.select(svgId).select("g");
 
                 const colorScale = d3
                     .scaleLinear()
                     .domain(["A", "B"])
                     .range(["#a62e39", "#fbf8f5", "#2a6838", "#419f57", "#6cc380"]);
 
-                svg.select("g").remove();
                 let pie = d3
                     .pie()
                     .sort(null)
                     .value(1);
                 const arcsA = pie(current.shipAData.speedDegrees),
                     arcsB = pie(current.shipBData.speedDegrees);
-
-                const radiusScaleRelative = d3
-                    .scaleLinear()
-                    .domain([profileData.minSpeed, 0, profileData.maxSpeed])
-                    .range([10, innerRadius, outerRadius]);
-
-                const radiusScaleAbsolute = d3
-                    .scaleLinear()
-                    .domain([minSpeed, 0, maxSpeed])
-                    .range([10, innerRadius, outerRadius]);
-
-                let svg = defaults.svgShipCompare;
-
-                // Arc for text
-                let knotsArc = d3
-                    .arc()
-                    .outerRadius(d => radiusScaleAbsolute(d) + 2)
-                    .innerRadius(d => radiusScaleAbsolute(d) + 1)
-                    .startAngle(-Math.PI / 2)
-                    .endAngle(Math.PI / 2);
-
-                // Tick/Grid data
-                const ticks = [12, 8, 4, 0];
-                const tickLabels = ["12 knots", "8 knots", "4 knots", "0 knots"];
-
-                //Add the circles for each tick
-                let grid = svg
-                    .selectAll(".circle")
-                    .data(ticks)
-                    .enter()
-                    .append("circle")
-                    .attr("class", "knots-circle")
-                    .attr("r", d => radiusScaleAbsolute(d))
-                    .attr("id", (d, i) => `tick${i}`);
-
-                //Add the paths for the text
-                svg
-                    .selectAll(".label")
-                    .data(ticks)
-                    .enter()
-                    .append("path")
-                    .attr("d", knotsArc)
-                    .attr("id", (d, i) => `tic${i}`);
-
-                //And add the text
-                svg
-                    .selectAll(".label")
-                    .data(ticks)
-                    .enter()
-                    .append("text")
-                    .attr("class", "knots-text")
-                    .append("textPath")
-                    .attr("xlink:href", (d, i) => `#tic${i}`)
-                    .text((d, i) => tickLabels[i])
-                    .attr("startOffset", "16%");
-
-                const numSegments = 25,
-                    segmentRadians = 2 * Math.PI / numSegments;
                 let curve = d3.curveCatmullRomClosed,
-                    line = d3
+                    lineA = d3
                         .radialLine()
-                        .angle((d, i) => i * segmentRadians)
-                        .radius(d => radiusScaleAbsolute(d.data))
+                        .angle((d, i) => i * defaults.segmentRadians)
+                        .radius(d => defaults.radiusScaleAbsolute(d.data))
+                        .curve(curve),
+                    lineB = d3
+                        .radialLine()
+                        .angle((d, i) => i * defaults.segmentRadians)
+                        .radius(d => defaults.radiusScaleAbsolute(d.data))
                         .curve(curve);
 
                 let pathA = svg.append("path");
@@ -1253,7 +1202,7 @@ export default function naDisplay(serverName) {
 
                 pathA
                     .transition()
-                    .attr("d", line(arcsA))
+                    .attr("d", lineA(arcsA))
                     .attr("class", "arcs arcsA");
 
                 let selA = markersA.selectAll("circle").data(arcsA);
@@ -1262,14 +1211,14 @@ export default function naDisplay(serverName) {
                     .append("circle")
                     .merge(selA)
                     .attr("r", "5")
-                    .attr("cy", (d, i) => Math.cos(i * segmentRadians) * -radiusScaleAbsolute(d.data))
-                    .attr("cx", (d, i) => Math.sin(i * segmentRadians) * radiusScaleAbsolute(d.data))
+                    .attr("cy", (d, i) => Math.cos(i * defaults.segmentRadians) * -defaults.radiusScaleAbsolute(d.data))
+                    .attr("cx", (d, i) => Math.sin(i * defaults.segmentRadians) * defaults.radiusScaleAbsolute(d.data))
                     .attr("fill", d => colorScale(d.data))
                     .style("opacity", 0.2)
                     .append("title")
                     .text(d => `${Math.round(d.data * 10) / 10} knots`);
 
-                pathB.attr("d", line(arcsB)).attr("class", "arcs arcsB");
+                pathB.attr("d", lineB(arcsB)).attr("class", "arcs arcsB");
 
                 let selB = markersB.selectAll("circle").data(arcsB);
                 selB
@@ -1277,8 +1226,8 @@ export default function naDisplay(serverName) {
                     .append("circle")
                     .merge(selB)
                     .attr("r", "5")
-                    .attr("cy", (d, i) => Math.cos(i * segmentRadians) * -radiusScaleAbsolute(d.data))
-                    .attr("cx", (d, i) => Math.sin(i * segmentRadians) * radiusScaleAbsolute(d.data))
+                    .attr("cy", (d, i) => Math.cos(i * defaults.segmentRadians) * -defaults.radiusScaleAbsolute(d.data))
+                    .attr("cx", (d, i) => Math.sin(i * defaults.segmentRadians) * defaults.radiusScaleAbsolute(d.data))
                     .attr("fill", d => colorScale(d.data))
                     .style("opacity", 0.2)
                     .append("title")
@@ -1287,27 +1236,27 @@ export default function naDisplay(serverName) {
 
             //console.log(`ship id: ${shipId}`);
             let profileData = defaults.shipData.filter(ship => ship.id === +shipId)[0];
-            let svg;
+            const svgId = `#ship${shipNumber}`;
             if ("A" === shipNumber) {
-                current.shipAData = profileData;
-                svg = defaults.svgShipA;
+                if (isEmpty(current.shipAData)) {
+                    setBackground(svgId);
+                    setBackgroundGradient(svgId);
+                    current.shipAData = profileData;
+                }
             } else {
-                current.shipBData = profileData;
-                svg = defaults.svgShipB;
+                if (isEmpty(current.shipBData)) {
+                    setBackground(svgId);
+                    setBackgroundGradient(svgId);
+                    current.shipBData = profileData;
+                }
             }
             //console.log(`profileData: ${JSON.stringify(profileData)}`);
-            drawProfile(profileData, svg);
+            drawProfile(profileData, svgId);
             if (!isEmpty(current.shipAData) && !isEmpty(current.shipBData)) {
-                console.log("compare");
-                drawDifferenceProfile();
+                setBackground("#ship-compare");
+                drawDifferenceProfile("#ship-compare");
             }
         }
-        //console.log(`shipData: ${JSON.stringify(defaults.shipData)}`);
-
-        const minSpeed = d3.min(defaults.shipData, d => d.minSpeed);
-        const maxSpeed = d3.max(defaults.shipData, d => d.maxSpeed);
-        console.log(`minSpeed: ${minSpeed}`);
-        console.log(`maxSpeed: ${maxSpeed}`);
 
         shipCompareSetup();
     }
