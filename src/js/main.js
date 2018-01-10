@@ -13,7 +13,7 @@ import "bootstrap/js/dist/util";
 
 function main() {
     naAnalytics();
-    $("#modal")
+    $("#greetings")
         .on("click", ".btn, .close", function() {
             $(this).addClass("modal-result"); // mark which button was clicked
         })
@@ -24,7 +24,8 @@ function main() {
             naDisplay(serverName); // invoke the callback with result
         });
     window.onload = function() {
-        //$("#modal").modal("show");
+        //$("#greetings").modal("show");
+        $("#ships").modal("show");
     };
     naDisplay();
 }
