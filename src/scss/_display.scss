@@ -10,6 +10,29 @@ $in-colour: $primary-900;
 $out-colour: $primary-700;
 $background-colour: $primary-300;
 
+.arcs {
+  stroke-width: 5px;
+  opacity: .5;
+}
+
+.arcsA {
+  fill: $primary-700;
+  stroke: none;
+}
+
+.arcsB {
+  fill: $secondary-700;
+  stroke: none;
+}
+
+.columnA {
+  background-color: $primary-100;
+}
+
+.columnB {
+  background-color: $secondary-100;
+}
+
 .knots-circle {
   fill: none;
   stroke: $primary-400;
