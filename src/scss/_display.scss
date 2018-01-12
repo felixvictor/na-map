@@ -10,6 +10,10 @@ $in-colour: $primary-900;
 $out-colour: $primary-700;
 $background-colour: $primary-300;
 
+.opaque {
+  fill-opacity: .4;
+}
+
 .extralarge-width {
   min-width: 25em;
 }

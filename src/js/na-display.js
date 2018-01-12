@@ -272,8 +272,8 @@ export default function naDisplay(serverName) {
         function convertCoordY(x, y) {
             return defaults.transformMatrix.B * x - defaults.transformMatrix.A * y + defaults.transformMatrix.D;
         }
-        F11X *= -1;
-        F11Y *= -1;
+        F11X = +F11X * -1;
+        F11Y = +F11Y * -1;
         const x = convertCoordX(F11X, F11Y),
             y = convertCoordY(F11X, F11Y);
 
@@ -348,8 +348,10 @@ export default function naDisplay(serverName) {
 
         current.circleSize = defaults.circleSize / transform.k;
         mainGPort.selectAll("circle").attr("r", current.circleSize);
-        mainGPort.selectAll("text").attr("dx", d => d.properties.dx / transform.k);
-        mainGPort.selectAll("text").attr("dy", d => d.properties.dy / transform.k);
+        mainGPort
+            .selectAll("text")
+            .attr("dx", d => d.properties.dx / transform.k)
+            .attr("dy", d => d.properties.dy / transform.k);
         if (current.bPortLabelDisplayed) {
             current.fontSize = defaults.fontSize / transform.k;
             mainGPort.selectAll("text").style("font-size", current.fontSize);
@@ -443,19 +445,26 @@ export default function naDisplay(serverName) {
             .attr("class", "port")
             .attr("transform", d => `translate(${d.geometry.coordinates[0]},${d.geometry.coordinates[1]})`);
         nodeGroupsEnter.append("circle");
+        nodeGroupsEnter.append("circle");
         nodeGroupsEnter.append("text");
 
         // Update
         // Add flags
         gPorts
             .merge(nodeGroupsEnter)
-            .select("circle")
+            .select("circle:nth-child(2)")
             .attr("id", d => {
                 return `c${d.id}`;
             })
             .attr("r", current.circleSize)
             .attr("fill", d => `url(#${d.properties.nation})`)
+            .attr("class", d => (d.properties.availableForAll ? "opaque" : ""))
             .on("mouseover", portMouseover);
+        gPorts
+            .select("circle:nth-child(1)")
+            .attr("r", current.circleSize)
+            .attr("fill", d => (d.properties.availableForAll ? "url(#NT)" : "none"));
+
         // Add labels
         if (current.bPortLabelDisplayed) {
             gPorts
