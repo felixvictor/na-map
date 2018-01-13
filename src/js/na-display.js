@@ -268,22 +268,36 @@ export default function naDisplay(serverName) {
         function convertCoordX(x, y) {
             return defaults.transformMatrix.A * x + defaults.transformMatrix.B * y + defaults.transformMatrix.C;
         }
+
         // F11 coord to svg coord
         function convertCoordY(x, y) {
             return defaults.transformMatrix.B * x - defaults.transformMatrix.A * y + defaults.transformMatrix.D;
         }
+
+        //https://stackoverflow.com/questions/14718561/how-to-check-if-a-number-is-between-two-values
+        Number.prototype.between = function(a, b, inclusive) {
+            const min = Math.min.apply(Math, [a, b]),
+                max = Math.max.apply(Math, [a, b]);
+            return inclusive ? this >= min && this <= max : this > min && this < max;
+        };
+
         F11X = +F11X * -1;
         F11Y = +F11Y * -1;
         const x = convertCoordX(F11X, F11Y),
             y = convertCoordY(F11X, F11Y);
 
-        clearMap();
-        if (current.radioButton === "F11") {
-            printF11Coord(x, y, F11X, F11Y);
-        } else {
-            plotCourse(x, y);
+        if (
+            x.between(-defaults.coord.max, defaults.coord.min, true) &&
+            y.between(-defaults.coord.max, defaults.coord.min, true)
+        ) {
+            clearMap();
+            if (current.radioButton === "F11") {
+                printF11Coord(x, y, F11X, F11Y);
+            } else {
+                plotCourse(x, y);
+            }
+            zoomAndPan(d3.zoomIdentity.translate(-x, -y).scale(1));
         }
-        zoomAndPan(d3.zoomIdentity.translate(-x, -y).scale(1));
     }
 
     function printF11Coord(x, y, textX, textY) {
@@ -988,12 +1002,62 @@ export default function naDisplay(serverName) {
         predictWind(direction, `${predictTime.hours()}:${predictTime.minutes()}`);
         */
 
+        // https://stackoverflow.com/questions/22581345/click-button-copy-to-clipboard-using-jquery
+        function copyF11ToClipboard(F11coord) {
+            const temp = $("<input>");
+
+            $("body").append(temp);
+            temp.val(F11coord).select();
+            document.execCommand("copy");
+            temp.remove();
+        }
+
+        function pasteF11FromClipboard(e) {
+            function addF11StringToInput(F11String) {
+                const regex = /F11 coordinates X: ([-+]?[0-9]*\.?[0-9]+) Z: ([-+]?[0-9]*\.?[0-9]+)/g,
+                    match = regex.exec(F11String);
+
+                if (match && !Number.isNaN(+match[1]) && !Number.isNaN(+match[2])) {
+                    const x = +match[1],
+                        z = +match[2];
+                    if (!Number.isNaN(x) && !Number.isNaN(z)) {
+                        goToF11(x, z);
+                    }
+                }
+            }
+
+            const F11String =
+                e.clipboardData && e.clipboardData.getData
+                    ? e.clipboardData.getData("text/plain") // Standard
+                    : window.clipboardData && window.clipboardData.getData
+                      ? window.clipboardData.getData("Text") // MS
+                      : false;
+            addF11StringToInput(F11String);
+        }
+
+        $("#copy-coord").click(function() {
+            const x = $("#x-coord").val(),
+                z = $("#z-coord").val();
+
+            if (!Number.isNaN(x) && !Number.isNaN(z)) {
+                const F11String = `F11 coordinates X: ${x} Z: ${z}`;
+                copyF11ToClipboard(F11String);
+            }
+        });
+
+        document.addEventListener("paste", function(event) {
+            pasteF11FromClipboard(event);
+            event.preventDefault();
+        });
+
         $("#f11").submit(function(event) {
             const x = $("#x-coord").val(),
                 z = $("#z-coord").val();
+
             goToF11(x, z);
             event.preventDefault();
         });
+
         $("#direction").knob({
             bgColor: "#ede1d2", // primary-200
             thickness: 0.2,
@@ -1007,18 +1071,22 @@ export default function naDisplay(serverName) {
             },
             format: input => degreesToCompass(input)
         });
+
         $("#windPrediction").submit(function(event) {
             const currentWind = $("#direction")
                     .val()
                     .toUpperCase(),
                 time = $("#time").val();
+
             predictWind(currentWind, time);
             $("#predictDropdown").dropdown("toggle");
             event.preventDefault();
         });
+
         $("#reset").on("click", function() {
             clearMap();
         });
+
         $(".radio-group").change(function() {
             current.radioButton = $("input[name='mouseFunction']:checked").val();
             clearMap();
