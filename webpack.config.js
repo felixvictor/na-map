@@ -133,7 +133,9 @@ let config = {
         alias: {
             Fonts: path.resolve(__dirname, "src/fonts/"),
             Icons: path.resolve(__dirname, "src/icons/"),
-            Images: path.resolve(__dirname, "src/images/")
+            Images: path.resolve(__dirname, "src/images/"),
+            "@fortawesome/fontawesome-free-regular$": "@fortawesome/fontawesome-free-regular/shakable.es.js",
+            "@fortawesome/fontawesome-free-solid$": "@fortawesome/fontawesome-free-solid/shakable.es.js"
         }
     },
 
