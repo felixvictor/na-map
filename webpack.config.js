@@ -8,7 +8,10 @@ const PACKAGE = require("./package.json");
 const CopyPlugin = require("copy-webpack-plugin"),
     ExtractTextPlugin = require("extract-text-webpack-plugin"),
     HtmlPlugin = require("html-webpack-plugin"),
-    MinifyPlugin = require("babel-minify-webpack-plugin");
+    MinifyPlugin = require("babel-minify-webpack-plugin"),
+    SitemapPlugin = require("sitemap-webpack-plugin").default;
+
+const sitemapPaths = ["/fonts/", "/icons", "/images"];
 
 const babelOpt = {
     cacheDirectory: true,
@@ -180,7 +183,8 @@ let config = {
             template: "index.template.ejs",
             title: "Naval Action map",
             version: PACKAGE.version
-        })
+        }),
+        new SitemapPlugin("https://na-map.netlify.com/", sitemapPaths, { skipGzip: false })
     ],
 
     stats: "normal",
