@@ -11,7 +11,12 @@ import "bootstrap/js/dist/dropdown";
 import "bootstrap/js/dist/modal";
 import "bootstrap/js/dist/util";
 
+import fontawesome from "@fortawesome/fontawesome";
+import { faCopy } from "@fortawesome/fontawesome-free-regular";
+import { faPaste } from "@fortawesome/fontawesome-free-solid";
+
 function main() {
+    fontawesome.library.add(faCopy, faPaste);
     naAnalytics();
     $("#modal")
         .on("click", ".btn, .close", function() {
