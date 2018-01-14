@@ -1035,9 +1035,7 @@ export default function naDisplay(serverName) {
             }
 
             setupNationSelect();
-            $("#prop-nation")
-                .on("click", event => event.stopPropagation())
-                .on("change", () => nationSelect());
+            $("#prop-nation").on("change", () => nationSelect());
             setupClanSelect();
             $("#prop-clan").on("change", () => clanSelect());
             $("#menu-prop-all").on("click", () => allSelect());
