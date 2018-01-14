@@ -1228,7 +1228,20 @@ export default function naDisplay(serverName) {
                     : window.clipboardData && window.clipboardData.getData
                       ? window.clipboardData.getData("Text") // MS
                       : false;
-            addF11StringToInput(F11String);
+
+            // If one of the F11 input elements is in focus
+            if ("x-coord" === document.activeElement.id || "z-coord" === document.activeElement.id) {
+                // test for number
+                if (!Number.isNaN(+F11String)) {
+                    // paste number in input element
+                    $(`#${document.activeElement.id}`)
+                        .val(F11String)
+                        .select();
+                }
+            } else {
+                // Paste F11string
+                addF11StringToInput(F11String);
+            }
         }
 
         $("#copy-coord").click(function() {
@@ -1249,7 +1262,7 @@ export default function naDisplay(serverName) {
         $("#f11").submit(function(event) {
             const x = $("#x-coord").val(),
                 z = $("#z-coord").val();
-console.log("F11");
+            console.log("F11");
             goToF11(x, z);
             event.preventDefault();
         });
