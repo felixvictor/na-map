@@ -111,6 +111,8 @@ function convertPorts() {
                 nonCapturable: port.NonCapturable,
                 conquestMarksPension: port.ConquestMarksPension,
                 portTax: Math.round(port.PortTax * 100) / 100,
+                taxIncome: port.LastTax,
+                netIncome: port.LastTax - port.LastCost,
                 tradingCompany: port.TradingCompany,
                 laborHoursDiscount: port.LaborHoursDiscount,
                 produces: flattenArray(
