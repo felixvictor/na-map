@@ -877,7 +877,7 @@ export default function naDisplay(serverName) {
                 propCM.append(
                     $("<option>", {
                         value: 0,
-                        text: "Select conquest mark benefit"
+                        text: "Select amount"
                     })
                 );
                 [1, 2, 3].forEach(function(cm) {
@@ -893,24 +893,47 @@ export default function naDisplay(serverName) {
             function CMSelect() {
                 const value = parseInt($("#prop-cm").val());
                 if (0 !== value) {
-                    current.portData = defaults.portData.filter(d => {
-                        return value === d.properties.conquestMarksPension;
-                    });
+                    current.portData = defaults.portData.filter(d => value === d.properties.conquestMarksPension);
                 } else {
                     current.portData = defaults.portData;
                 }
                 updatePorts();
             }
 
+            function filterCaptured(begin, end) {
+                current.portData = defaults.portData.filter(d =>
+                    moment(d.properties.lastPortBattle).isBetween(begin, end, null, "()")
+                );
+                updatePorts();
+            }
+
+            function capturedYesterday() {
+                const begin = moment({ hour: 11, minute: 0 }).subtract(1, "day"),
+                    end = moment({ hour: 8, minute: 0 });
+
+                filterCaptured(begin, end);
+            }
+
+            function capturedThisWeek() {
+                const begin = moment({ hour: 11, minute: 0 }).day(-6), // this Monday
+                    end = moment({ hour: 8, minute: 0 }).day(1); // next Monday
+
+                filterCaptured(begin, end);
+            }
+
+            function capturedLastWeek() {
+                const begin = moment({ hour: 11, minute: 0 }).day(-13), // Monday last week
+                    end = moment({ hour: 8, minute: 0 }).day(-6); // this Monday
+
+                filterCaptured(begin, end);
+            }
+
             setupCMSelect();
             $("#prop-cm").on("change", () => CMSelect());
 
-            /*
-            $("#betty-menu-make-bet, #betty-menu-team-ranking, #betty-menu-points-pb").on("click", function() {
-                const id = `#${this.id.replace("betty-menu-", "content-")}`;
-                $(id).collapse();
-            });
-*/
+            $("#menu-prop-yesterday").on("click", () => capturedYesterday());
+            $("#menu-prop-this-week").on("click", () => capturedThisWeek());
+            $("#menu-prop-last-week").on("click", () => capturedLastWeek());
         }
 
         setupScaleDomain();
