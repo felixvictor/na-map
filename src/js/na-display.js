@@ -71,6 +71,21 @@ export default function naDisplay(serverName) {
             "WNW",
             "NW",
             "NNW"
+        ],
+        nations: [
+            { id: "DE", name: "Kingdom of Prussia", sortName: "Prussia" },
+            { id: "DK", name: "Danmark-Norge", sortName: "Danmark-Norge" },
+            { id: "ES", name: "España", sortName: "España" },
+            { id: "FR", name: "France", sortName: "France" },
+            { id: "FT", name: "Free Town", sortName: "Free Town" },
+            { id: "GB", name: "Great Britain", sortName: "Great Britain" },
+            { id: "NT", name: "Neutral", sortName: "Neutral" },
+            { id: "PL", name: "Commonwealth of Poland", sortName: "Poland" },
+            { id: "PR", name: "Pirates", sortName: "Pirates" },
+            { id: "RU", name: "Russian Empire", sortName: "Russian Empire" },
+            { id: "SE", name: "Sverige", sortName: "Sverige" },
+            { id: "US", name: "United States", sortName: "United States" },
+            { id: "VP", name: "Verenigde Provinciën", sortName: "Verenigde Provinciën" }
         ]
     };
     defaults.width = top.innerWidth - defaults.margin.left - defaults.margin.right;
@@ -106,7 +121,8 @@ export default function naDisplay(serverName) {
         bPortLabelDisplayed: true,
         bFirstCoord: true,
         radioButton: "compass",
-        lineData: []
+        lineData: [],
+        nation: ""
     };
 
     const thousandsWithBlanks = x => {
@@ -683,9 +699,7 @@ export default function naDisplay(serverName) {
         }
 
         function setupPorts() {
-            const nations = ["DE", "DK", "ES", "FR", "FT", "GB", "NT", "PL", "PR", "RU", "SE", "US", "VP"];
-
-            nations.forEach(function(nation) {
+            defaults.nations.map(d => d.id).forEach(function(nation) {
                 svgDef
                     .append("pattern")
                     .attr("id", nation)
@@ -872,8 +886,123 @@ export default function naDisplay(serverName) {
         }
 
         function setupPropertyMenu() {
+            function setupNationSelect() {
+                const propNation = $("#prop-nation");
+
+                propNation.append(
+                    $("<option>", {
+                        value: 0,
+                        text: "Select a nation"
+                    })
+                );
+                defaults.nations
+                    .sort(function(a, b) {
+                        if (a.sortName < b.sortName) {
+                            return -1;
+                        }
+                        if (a.sortName > b.sortName) {
+                            return 1;
+                        }
+                        return 0;
+                    })
+                    .forEach(function(nation) {
+                        propNation.append(
+                            $("<option>", {
+                                value: nation.id,
+                                text: nation.name
+                            })
+                        );
+                    });
+            }
+
+            function nationSelect() {
+                const nationId = $("#prop-nation").val();
+
+                if (0 !== +nationId) {
+                    current.nation = nationId;
+                    current.portData = defaults.portData.filter(d => nationId === d.properties.nation);
+                    setupClanSelect();
+                } else {
+                    current.nation = "";
+                    current.portData = defaults.portData;
+                    setupClanSelect();
+                }
+                updatePorts();
+            }
+
+            function setupClanSelect() {
+                const propClan = $("#prop-clan");
+
+                propClan.empty();
+                propClan.append(
+                    $("<option>", {
+                        value: 0,
+                        text: "Select a clan"
+                    })
+                );
+
+                let clanList = new Set();
+                current.portData.filter(d => d.properties.capturer).map(d => clanList.add(d.properties.capturer));
+                Array.from(clanList)
+                    .sort()
+                    .forEach(function(clan) {
+                        propClan.append(
+                            $("<option>", {
+                                value: clan,
+                                text: clan
+                            })
+                        );
+                    });
+            }
+
+            function clanSelect() {
+                const clan = $("#prop-clan").val();
+
+                if (0 !== +clan) {
+                    current.portData = defaults.portData.filter(d => clan === d.properties.capturer);
+                } else {
+                    if (current.nation) {
+                        current.portData = defaults.portData.filter(d => current.nation === d.properties.nation);
+                    } else {
+                        current.portData = defaults.portData;
+                    }
+                }
+                updatePorts();
+            }
+
+            function allSelect() {
+                current.portData = defaults.portData.filter(d => d.properties.availableForAll);
+                updatePorts();
+            }
+
+            function filterCaptured(begin, end) {
+                current.portData = defaults.portData.filter(d =>
+                    moment(d.properties.lastPortBattle).isBetween(begin, end, null, "()")
+                );
+                updatePorts();
+            }
+
+            function capturedYesterday() {
+                const begin = moment({ hour: 11, minute: 0 }).subtract(1, "day"),
+                    end = moment({ hour: 8, minute: 0 });
+                filterCaptured(begin, end);
+            }
+
+            function capturedThisWeek() {
+                const begin = moment({ hour: 11, minute: 0 }).day(-6), // this Monday
+                    end = moment({ hour: 8, minute: 0 }).day(1); // next Monday
+                filterCaptured(begin, end);
+            }
+
+            function capturedLastWeek() {
+                const begin = moment({ hour: 11, minute: 0 }).day(-13), // Monday last week
+                    end = moment({ hour: 8, minute: 0 }).day(-6); // this Monday
+                filterCaptured(begin, end);
+            }
+
             function setupCMSelect() {
                 const propCM = $("#prop-cm");
+
                 propCM.append(
                     $("<option>", {
                         value: 0,
@@ -892,6 +1021,7 @@ export default function naDisplay(serverName) {
 
             function CMSelect() {
                 const value = parseInt($("#prop-cm").val());
+
                 if (0 !== value) {
                     current.portData = defaults.portData.filter(d => value === d.properties.conquestMarksPension);
                 } else {
@@ -900,40 +1030,18 @@ export default function naDisplay(serverName) {
                 updatePorts();
             }
 
-            function filterCaptured(begin, end) {
-                current.portData = defaults.portData.filter(d =>
-                    moment(d.properties.lastPortBattle).isBetween(begin, end, null, "()")
-                );
-                updatePorts();
-            }
-
-            function capturedYesterday() {
-                const begin = moment({ hour: 11, minute: 0 }).subtract(1, "day"),
-                    end = moment({ hour: 8, minute: 0 });
-
-                filterCaptured(begin, end);
-            }
-
-            function capturedThisWeek() {
-                const begin = moment({ hour: 11, minute: 0 }).day(-6), // this Monday
-                    end = moment({ hour: 8, minute: 0 }).day(1); // next Monday
-
-                filterCaptured(begin, end);
-            }
-
-            function capturedLastWeek() {
-                const begin = moment({ hour: 11, minute: 0 }).day(-13), // Monday last week
-                    end = moment({ hour: 8, minute: 0 }).day(-6); // this Monday
-
-                filterCaptured(begin, end);
-            }
-
-            setupCMSelect();
-            $("#prop-cm").on("change", () => CMSelect());
+            setupNationSelect();
+            $("#prop-nation").on("change", () => nationSelect());
+            setupClanSelect();
+            $("#prop-clan").on("change", () => clanSelect());
+            $("#menu-prop-all").on("click", () => allSelect());
 
             $("#menu-prop-yesterday").on("click", () => capturedYesterday());
             $("#menu-prop-this-week").on("click", () => capturedThisWeek());
             $("#menu-prop-last-week").on("click", () => capturedLastWeek());
+
+            setupCMSelect();
+            $("#prop-cm").on("change", () => CMSelect());
         }
 
         setupScaleDomain();
