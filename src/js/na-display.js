@@ -477,6 +477,7 @@ export default function naDisplay(serverName) {
             .attr("class", d => (d.properties.availableForAll ? "opaque" : ""))
             .on("mouseover", portMouseover);
         gPorts
+            .merge(nodeGroupsEnter)
             .select("circle:nth-child(1)")
             .attr("r", current.circleSize)
             .attr("fill", d => (d.properties.availableForAll ? "url(#NT)" : "none"));
@@ -509,6 +510,7 @@ export default function naDisplay(serverName) {
                 .select("text")
                 .text("");
         }
+
         // Remove old
         gPorts.exit().remove();
     }
@@ -784,7 +786,7 @@ export default function naDisplay(serverName) {
                 portNames.append(
                     $("<option>", {
                         value: 0,
-                        text: "Select a port"
+                        text: "Go to a port"
                     })
                 );
                 selectPorts.forEach(function(port) {
@@ -847,11 +849,16 @@ export default function naDisplay(serverName) {
             }
 
             setupPortSelect();
-            $("#port-names").change(() => {
-                goToPort($("#port-names").val());
+            $("#port-names").on("change", () => {
+                const value = $("#port-names").val();
+                if (0 !== +value) {
+                    goToPort(value);
+                } else {
+                    zoomAndPan(d3.zoomIdentity.translate(initial.x, initial.y).scale(initial.scale));
+                }
             });
             setupGoodSelect();
-            $("#good-names").change(() => {
+            $("#good-names").on("change", () => {
                 const portIds = $("#good-names")
                     .val()
                     .split(",");
