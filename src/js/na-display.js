@@ -71,6 +71,21 @@ export default function naDisplay(serverName) {
             "WNW",
             "NW",
             "NNW"
+        ],
+        nations: [
+            { id: "DE", name: "Kingdom of Prussia", sortName: "Prussia" },
+            { id: "DK", name: "Danmark-Norge", sortName: "Danmark-Norge" },
+            { id: "ES", name: "España", sortName: "España" },
+            { id: "FR", name: "France", sortName: "France" },
+            { id: "FT", name: "Free Town", sortName: "Free Town" },
+            { id: "GB", name: "Great Britain", sortName: "Great Britain" },
+            { id: "NT", name: "Neutral", sortName: "Neutral" },
+            { id: "PL", name: "Commonwealth of Poland", sortName: "Poland" },
+            { id: "PR", name: "Pirates", sortName: "Pirates" },
+            { id: "RU", name: "Russian Empire", sortName: "Russian Empire" },
+            { id: "SE", name: "Sverige", sortName: "Sverige" },
+            { id: "US", name: "United States", sortName: "United States" },
+            { id: "VP", name: "Verenigde Provinciën", sortName: "Verenigde Provinciën" }
         ]
     };
     defaults.width = top.innerWidth - defaults.margin.left - defaults.margin.right;
@@ -106,17 +121,18 @@ export default function naDisplay(serverName) {
         bPortLabelDisplayed: true,
         bFirstCoord: true,
         radioButton: "compass",
-        lineData: []
+        lineData: [],
+        nation: ""
     };
 
     const thousandsWithBlanks = x => {
-        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u2009");
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u202f");
     };
 
     const formatCoord = x => {
         let r = thousandsWithBlanks(Math.abs(Math.trunc(x)));
         if (x < 0) {
-            r = `\u2212\u2009${r}`;
+            r = `\u2212\u202f${r}`;
         }
         return r;
     };
@@ -268,22 +284,36 @@ export default function naDisplay(serverName) {
         function convertCoordX(x, y) {
             return defaults.transformMatrix.A * x + defaults.transformMatrix.B * y + defaults.transformMatrix.C;
         }
+
         // F11 coord to svg coord
         function convertCoordY(x, y) {
             return defaults.transformMatrix.B * x - defaults.transformMatrix.A * y + defaults.transformMatrix.D;
         }
-        F11X *= -1;
-        F11Y *= -1;
+
+        //https://stackoverflow.com/questions/14718561/how-to-check-if-a-number-is-between-two-values
+        Number.prototype.between = function(a, b, inclusive) {
+            const min = Math.min.apply(Math, [a, b]),
+                max = Math.max.apply(Math, [a, b]);
+            return inclusive ? this >= min && this <= max : this > min && this < max;
+        };
+
+        F11X = +F11X * -1;
+        F11Y = +F11Y * -1;
         const x = convertCoordX(F11X, F11Y),
             y = convertCoordY(F11X, F11Y);
 
-        clearMap();
-        if (current.radioButton === "F11") {
-            printF11Coord(x, y, F11X, F11Y);
-        } else {
-            plotCourse(x, y);
+        if (
+            x.between(defaults.coord.min, defaults.coord.max, true) &&
+            y.between(defaults.coord.min, defaults.coord.max, true)
+        ) {
+            clearMap();
+            if (current.radioButton === "F11") {
+                printF11Coord(x, y, F11X, F11Y);
+            } else {
+                plotCourse(x, y);
+            }
+            zoomAndPan(d3.zoomIdentity.translate(-x, -y).scale(1));
         }
-        zoomAndPan(d3.zoomIdentity.translate(-x, -y).scale(1));
     }
 
     function printF11Coord(x, y, textX, textY) {
@@ -348,8 +378,10 @@ export default function naDisplay(serverName) {
 
         current.circleSize = defaults.circleSize / transform.k;
         mainGPort.selectAll("circle").attr("r", current.circleSize);
-        mainGPort.selectAll("text").attr("dx", d => d.properties.dx / transform.k);
-        mainGPort.selectAll("text").attr("dy", d => d.properties.dy / transform.k);
+        mainGPort
+            .selectAll("text")
+            .attr("dx", d => d.properties.dx / transform.k)
+            .attr("dy", d => d.properties.dy / transform.k);
         if (current.bPortLabelDisplayed) {
             current.fontSize = defaults.fontSize / transform.k;
             mainGPort.selectAll("text").style("font-size", current.fontSize);
@@ -376,9 +408,9 @@ export default function naDisplay(serverName) {
             h += "<br>";
             if (!d.nonCapturable) {
                 const pbTimeRange = !d.portBattleStartTime
-                    ? "11.00\u2009–\u20098.00"
-                    : `${(d.portBattleStartTime + 10) % 24}.00\u2009–\u2009${(d.portBattleStartTime + 13) % 24}.00`;
-                h += `Port battle: ${pbTimeRange}, ${thousandsWithBlanks(d.brLimit)} BR, `;
+                    ? "11.00\u202f–\u202f8.00"
+                    : `${(d.portBattleStartTime + 10) % 24}.00\u202f–\u202f${(d.portBattleStartTime + 13) % 24}.00`;
+                h += `Port battle ${pbTimeRange}, ${thousandsWithBlanks(d.brLimit)} BR, `;
                 switch (d.portBattleType) {
                     case "Large":
                         h += "1<sup>st</sup>";
@@ -391,15 +423,17 @@ export default function naDisplay(serverName) {
                         break;
                 }
 
-                h += " rate AI";
-                h += `, ${d.conquestMarksPension} conquest point`;
+                h += "\u202frate AI";
+                h += `, ${d.conquestMarksPension}\u202fconquest point`;
                 h += d.conquestMarksPension > 1 ? "s" : "";
+                h += `<br>Tax income ${thousandsWithBlanks(d.taxIncome)} (${d.portTax *
+                    100}\u202f%), net income ${formatCoord(d.netIncome)}`;
+                h += d.tradingCompany ? `, trading company level\u202f${d.tradingCompany}` : "";
+                h += d.laborHoursDiscount ? ", labor hours discount" : "";
             } else {
                 h += "Not capturable";
+                h += `<br>${d.portTax * 100}\u2009% tax`;
             }
-            h += `<br>${d.portTax * 100}\u2009% port tax`;
-            h += d.tradingCompany ? `, trading company level ${d.tradingCompany}` : "";
-            h += d.laborHoursDiscount ? ", labor hours discount" : "";
             h += "</p>";
             h += "<table class='table table-sm'>";
             if (d.produces.length) {
@@ -443,19 +477,27 @@ export default function naDisplay(serverName) {
             .attr("class", "port")
             .attr("transform", d => `translate(${d.geometry.coordinates[0]},${d.geometry.coordinates[1]})`);
         nodeGroupsEnter.append("circle");
+        nodeGroupsEnter.append("circle");
         nodeGroupsEnter.append("text");
 
         // Update
         // Add flags
         gPorts
             .merge(nodeGroupsEnter)
-            .select("circle")
+            .select("circle:nth-child(2)")
             .attr("id", d => {
                 return `c${d.id}`;
             })
             .attr("r", current.circleSize)
             .attr("fill", d => `url(#${d.properties.nation})`)
+            .attr("class", d => (d.properties.availableForAll ? "opaque" : ""))
             .on("mouseover", portMouseover);
+        gPorts
+            .merge(nodeGroupsEnter)
+            .select("circle:nth-child(1)")
+            .attr("r", current.circleSize)
+            .attr("fill", d => (d.properties.availableForAll ? "url(#NT)" : "none"));
+
         // Add labels
         if (current.bPortLabelDisplayed) {
             gPorts
@@ -484,6 +526,7 @@ export default function naDisplay(serverName) {
                 .select("text")
                 .text("");
         }
+
         // Remove old
         gPorts.exit().remove();
     }
@@ -656,9 +699,7 @@ export default function naDisplay(serverName) {
         }
 
         function setupPorts() {
-            const nations = ["DE", "DK", "ES", "FR", "FT", "GB", "NT", "PL", "PR", "RU", "SE", "US", "VP"];
-
-            nations.forEach(function(nation) {
+            defaults.nations.map(d => d.id).forEach(function(nation) {
                 svgDef
                     .append("pattern")
                     .attr("id", nation)
@@ -759,7 +800,7 @@ export default function naDisplay(serverName) {
                 portNames.append(
                     $("<option>", {
                         value: 0,
-                        text: "Select a port"
+                        text: "Go to a port"
                     })
                 );
                 selectPorts.forEach(function(port) {
@@ -822,11 +863,16 @@ export default function naDisplay(serverName) {
             }
 
             setupPortSelect();
-            $("#port-names").change(() => {
-                goToPort($("#port-names").val());
+            $("#port-names").on("change", () => {
+                const value = $("#port-names").val();
+                if (0 !== +value) {
+                    goToPort(value);
+                } else {
+                    zoomAndPan(d3.zoomIdentity.translate(initial.x, initial.y).scale(initial.scale));
+                }
             });
             setupGoodSelect();
-            $("#good-names").change(() => {
+            $("#good-names").on("change", () => {
                 const portIds = $("#good-names")
                     .val()
                     .split(",");
@@ -839,6 +885,178 @@ export default function naDisplay(serverName) {
             });
         }
 
+        function setupPropertyMenu() {
+            function setupNationSelect() {
+                const propNation = $("#prop-nation");
+
+                propNation.append(
+                    $("<option>", {
+                        value: 0,
+                        text: "Select a nation"
+                    })
+                );
+                defaults.nations
+                    .sort(function(a, b) {
+                        if (a.sortName < b.sortName) {
+                            return -1;
+                        }
+                        if (a.sortName > b.sortName) {
+                            return 1;
+                        }
+                        return 0;
+                    })
+                    .forEach(function(nation) {
+                        propNation.append(
+                            $("<option>", {
+                                value: nation.id,
+                                text: nation.name
+                            })
+                        );
+                    });
+            }
+
+            function nationSelect() {
+                const nationId = $("#prop-nation").val();
+
+                if (0 !== +nationId) {
+                    current.nation = nationId;
+                    current.portData = defaults.portData.filter(d => nationId === d.properties.nation);
+                    setupClanSelect();
+                } else {
+                    current.nation = "";
+                    current.portData = defaults.portData;
+                    setupClanSelect();
+                }
+                $("#propertyDropdown").dropdown("toggle");
+                updatePorts();
+            }
+
+            function setupClanSelect() {
+                const propClan = $("#prop-clan");
+
+                propClan.empty();
+                propClan.append(
+                    $("<option>", {
+                        value: 0,
+                        text: "Select a clan"
+                    })
+                );
+
+                let clanList = new Set();
+                current.portData.filter(d => d.properties.capturer).map(d => clanList.add(d.properties.capturer));
+                Array.from(clanList)
+                    .sort()
+                    .forEach(function(clan) {
+                        propClan.append(
+                            $("<option>", {
+                                value: clan,
+                                text: clan
+                            })
+                        );
+                    });
+            }
+
+            function clanSelect() {
+                const clan = $("#prop-clan").val();
+
+                if (0 !== +clan) {
+                    current.portData = defaults.portData.filter(d => clan === d.properties.capturer);
+                } else {
+                    if (current.nation) {
+                        current.portData = defaults.portData.filter(d => current.nation === d.properties.nation);
+                    } else {
+                        current.portData = defaults.portData;
+                    }
+                }
+                $("#propertyDropdown").dropdown("toggle");
+                updatePorts();
+            }
+
+            function allSelect() {
+                current.portData = defaults.portData.filter(d => d.properties.availableForAll);
+                updatePorts();
+            }
+
+            function filterCaptured(begin, end) {
+                current.portData = defaults.portData.filter(d =>
+                    moment(d.properties.lastPortBattle).isBetween(begin, end, null, "()")
+                );
+                updatePorts();
+            }
+
+            function capturedYesterday() {
+                const begin = moment({ hour: 11, minute: 0 }).subtract(1, "day"),
+                    end = moment({ hour: 8, minute: 0 });
+                filterCaptured(begin, end);
+            }
+
+            function capturedThisWeek() {
+                const begin = moment({ hour: 11, minute: 0 }).day(-6), // this Monday
+                    end = moment({ hour: 8, minute: 0 }).day(1); // next Monday
+                filterCaptured(begin, end);
+            }
+
+            function capturedLastWeek() {
+                const begin = moment({ hour: 11, minute: 0 }).day(-13), // Monday last week
+                    end = moment({ hour: 8, minute: 0 }).day(-6); // this Monday
+                filterCaptured(begin, end);
+            }
+
+            function setupCMSelect() {
+                const propCM = $("#prop-cm");
+
+                propCM.append(
+                    $("<option>", {
+                        value: 0,
+                        text: "Select amount"
+                    })
+                );
+                let cmList = new Set();
+                current.portData
+                    .filter(d => d.properties.capturer)
+                    .map(d => cmList.add(d.properties.conquestMarksPension));
+                cmList.forEach(function(cm) {
+                    propCM.append(
+                        $("<option>", {
+                            value: cm,
+                            text: cm
+                        })
+                    );
+                });
+            }
+
+            function CMSelect() {
+                const value = parseInt($("#prop-cm").val());
+
+                if (0 !== value) {
+                    current.portData = defaults.portData.filter(d => value === d.properties.conquestMarksPension);
+                } else {
+                    current.portData = defaults.portData;
+                }
+                $("#propertyDropdown").dropdown("toggle");
+                updatePorts();
+            }
+
+            setupNationSelect();
+            $("#prop-nation")
+                .on("click", event => event.stopPropagation())
+                .on("change", () => nationSelect());
+            setupClanSelect();
+            $("#prop-clan")
+                .on("click", event => event.stopPropagation())
+                .on("change", () => clanSelect());
+            $("#menu-prop-all").on("click", () => allSelect());
+
+            $("#menu-prop-yesterday").on("click", () => capturedYesterday());
+            $("#menu-prop-this-week").on("click", () => capturedThisWeek());
+            $("#menu-prop-last-week").on("click", () => capturedLastWeek());
+
+            setupCMSelect();
+            $("#prop-cm")
+                .on("click", event => event.stopPropagation())
+                .on("change", () => CMSelect());
+        }
+
         setupScaleDomain();
         setupCanvas();
         setupSvg();
@@ -846,6 +1064,7 @@ export default function naDisplay(serverName) {
         setupPorts();
         setupPBZones();
         setupSelects();
+        setupPropertyMenu();
         moment.locale("en-gb");
     }
 
@@ -979,12 +1198,75 @@ export default function naDisplay(serverName) {
         predictWind(direction, `${predictTime.hours()}:${predictTime.minutes()}`);
         */
 
+        // https://stackoverflow.com/questions/22581345/click-button-copy-to-clipboard-using-jquery
+        function copyF11ToClipboard(F11coord) {
+            const temp = $("<input>");
+
+            $("body").append(temp);
+            temp.val(F11coord).select();
+            document.execCommand("copy");
+            temp.remove();
+        }
+
+        function pasteF11FromClipboard(e) {
+            function addF11StringToInput(F11String) {
+                const regex = /F11 coordinates X: ([-+]?[0-9]*\.?[0-9]+) Z: ([-+]?[0-9]*\.?[0-9]+)/g,
+                    match = regex.exec(F11String);
+
+                if (match && !Number.isNaN(+match[1]) && !Number.isNaN(+match[2])) {
+                    const x = +match[1],
+                        z = +match[2];
+                    if (!Number.isNaN(x) && !Number.isNaN(z)) {
+                        goToF11(x, z);
+                    }
+                }
+            }
+
+            const F11String =
+                e.clipboardData && e.clipboardData.getData
+                    ? e.clipboardData.getData("text/plain") // Standard
+                    : window.clipboardData && window.clipboardData.getData
+                      ? window.clipboardData.getData("Text") // MS
+                      : false;
+
+            // If one of the F11 input elements is in focus
+            if ("x-coord" === document.activeElement.id || "z-coord" === document.activeElement.id) {
+                // test for number
+                if (!Number.isNaN(+F11String)) {
+                    // paste number in input element
+                    $(`#${document.activeElement.id}`)
+                        .val(F11String)
+                        .select();
+                }
+            } else {
+                // Paste F11string
+                addF11StringToInput(F11String);
+            }
+        }
+
+        $("#copy-coord").click(function() {
+            const x = $("#x-coord").val(),
+                z = $("#z-coord").val();
+
+            if (!Number.isNaN(x) && !Number.isNaN(z)) {
+                const F11String = `F11 coordinates X: ${x} Z: ${z}`;
+                copyF11ToClipboard(F11String);
+            }
+        });
+
+        document.addEventListener("paste", function(event) {
+            pasteF11FromClipboard(event);
+            event.preventDefault();
+        });
+
         $("#f11").submit(function(event) {
             const x = $("#x-coord").val(),
                 z = $("#z-coord").val();
+            console.log("F11");
             goToF11(x, z);
             event.preventDefault();
         });
+
         $("#direction").knob({
             bgColor: "#ede1d2", // primary-200
             thickness: 0.2,
@@ -998,18 +1280,22 @@ export default function naDisplay(serverName) {
             },
             format: input => degreesToCompass(input)
         });
+
         $("#windPrediction").submit(function(event) {
             const currentWind = $("#direction")
                     .val()
                     .toUpperCase(),
                 time = $("#time").val();
+
             predictWind(currentWind, time);
             $("#predictDropdown").dropdown("toggle");
             event.preventDefault();
         });
+
         $("#reset").on("click", function() {
             clearMap();
         });
+
         $(".radio-group").change(function() {
             current.radioButton = $("input[name='mouseFunction']:checked").val();
             clearMap();
