@@ -871,6 +871,48 @@ export default function naDisplay(serverName) {
             });
         }
 
+        function setupPropertyMenu() {
+            function setupCMSelect() {
+                const propCM = $("#prop-cm");
+                propCM.append(
+                    $("<option>", {
+                        value: 0,
+                        text: "Select conquest mark benefit"
+                    })
+                );
+                [1, 2, 3].forEach(function(cm) {
+                    propCM.append(
+                        $("<option>", {
+                            value: cm,
+                            text: cm
+                        })
+                    );
+                });
+            }
+
+            function CMSelect() {
+                const value = parseInt($("#prop-cm").val());
+                if (0 !== value) {
+                    current.portData = defaults.portData.filter(d => {
+                        return value === d.properties.conquestMarksPension;
+                    });
+                } else {
+                    current.portData = defaults.portData;
+                }
+                updatePorts();
+            }
+
+            setupCMSelect();
+            $("#prop-cm").on("change", () => CMSelect());
+
+            /*
+            $("#betty-menu-make-bet, #betty-menu-team-ranking, #betty-menu-points-pb").on("click", function() {
+                const id = `#${this.id.replace("betty-menu-", "content-")}`;
+                $(id).collapse();
+            });
+*/
+        }
+
         setupScaleDomain();
         setupCanvas();
         setupSvg();
@@ -878,6 +920,7 @@ export default function naDisplay(serverName) {
         setupPorts();
         setupPBZones();
         setupSelects();
+        setupPropertyMenu();
         moment.locale("en-gb");
     }
 
