@@ -1009,7 +1009,11 @@ export default function naDisplay(serverName) {
                         text: "Select amount"
                     })
                 );
-                [1, 2, 3].forEach(function(cm) {
+                let cmList = new Set();
+                current.portData
+                    .filter(d => d.properties.capturer)
+                    .map(d => cmList.add(d.properties.conquestMarksPension));
+                cmList.forEach(function(cm) {
                     propCM.append(
                         $("<option>", {
                             value: cm,
