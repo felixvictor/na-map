@@ -303,8 +303,8 @@ export default function naDisplay(serverName) {
             y = convertCoordY(F11X, F11Y);
 
         if (
-            x.between(-defaults.coord.max, defaults.coord.min, true) &&
-            y.between(-defaults.coord.max, defaults.coord.min, true)
+            x.between(defaults.coord.min, defaults.coord.max, true) &&
+            y.between(defaults.coord.min, defaults.coord.max, true)
         ) {
             clearMap();
             if (current.radioButton === "F11") {
@@ -927,6 +927,7 @@ export default function naDisplay(serverName) {
                     current.portData = defaults.portData;
                     setupClanSelect();
                 }
+                $("#propertyDropdown").dropdown("toggle");
                 updatePorts();
             }
 
@@ -967,6 +968,7 @@ export default function naDisplay(serverName) {
                         current.portData = defaults.portData;
                     }
                 }
+                $("#propertyDropdown").dropdown("toggle");
                 updatePorts();
             }
 
@@ -1031,13 +1033,18 @@ export default function naDisplay(serverName) {
                 } else {
                     current.portData = defaults.portData;
                 }
+                $("#propertyDropdown").dropdown("toggle");
                 updatePorts();
             }
 
             setupNationSelect();
-            $("#prop-nation").on("change", () => nationSelect());
+            $("#prop-nation")
+                .on("click", event => event.stopPropagation())
+                .on("change", () => nationSelect());
             setupClanSelect();
-            $("#prop-clan").on("change", () => clanSelect());
+            $("#prop-clan")
+                .on("click", event => event.stopPropagation())
+                .on("change", () => clanSelect());
             $("#menu-prop-all").on("click", () => allSelect());
 
             $("#menu-prop-yesterday").on("click", () => capturedYesterday());
@@ -1045,7 +1052,9 @@ export default function naDisplay(serverName) {
             $("#menu-prop-last-week").on("click", () => capturedLastWeek());
 
             setupCMSelect();
-            $("#prop-cm").on("change", () => CMSelect());
+            $("#prop-cm")
+                .on("click", event => event.stopPropagation())
+                .on("change", () => CMSelect());
         }
 
         setupScaleDomain();
@@ -1219,7 +1228,20 @@ export default function naDisplay(serverName) {
                     : window.clipboardData && window.clipboardData.getData
                       ? window.clipboardData.getData("Text") // MS
                       : false;
-            addF11StringToInput(F11String);
+
+            // If one of the F11 input elements is in focus
+            if ("x-coord" === document.activeElement.id || "z-coord" === document.activeElement.id) {
+                // test for number
+                if (!Number.isNaN(+F11String)) {
+                    // paste number in input element
+                    $(`#${document.activeElement.id}`)
+                        .val(F11String)
+                        .select();
+                }
+            } else {
+                // Paste F11string
+                addF11StringToInput(F11String);
+            }
         }
 
         $("#copy-coord").click(function() {
@@ -1240,7 +1262,7 @@ export default function naDisplay(serverName) {
         $("#f11").submit(function(event) {
             const x = $("#x-coord").val(),
                 z = $("#z-coord").val();
-
+            console.log("F11");
             goToF11(x, z);
             event.preventDefault();
         });

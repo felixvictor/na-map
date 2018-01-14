@@ -1,6 +1,6 @@
 {
   "name": "na-topo",
-  "version": "1.4",
+  "version": "1.5",
   "devDependencies": {
     "@babel/core": "7.0.0-beta.36",
     "@babel/preset-env": "7.0.0-beta.36",
