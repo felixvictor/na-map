@@ -303,8 +303,8 @@ export default function naDisplay(serverName) {
             y = convertCoordY(F11X, F11Y);
 
         if (
-            x.between(-defaults.coord.max, defaults.coord.min, true) &&
-            y.between(-defaults.coord.max, defaults.coord.min, true)
+            x.between(defaults.coord.min, defaults.coord.max, true) &&
+            y.between(defaults.coord.min, defaults.coord.max, true)
         ) {
             clearMap();
             if (current.radioButton === "F11") {
@@ -1249,7 +1249,7 @@ export default function naDisplay(serverName) {
         $("#f11").submit(function(event) {
             const x = $("#x-coord").val(),
                 z = $("#z-coord").val();
-
+console.log("F11");
             goToF11(x, z);
             event.preventDefault();
         });
