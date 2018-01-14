@@ -927,6 +927,7 @@ export default function naDisplay(serverName) {
                     current.portData = defaults.portData;
                     setupClanSelect();
                 }
+                $("#propertyDropdown").dropdown("toggle");
                 updatePorts();
             }
 
@@ -967,6 +968,7 @@ export default function naDisplay(serverName) {
                         current.portData = defaults.portData;
                     }
                 }
+                $("#propertyDropdown").dropdown("toggle");
                 updatePorts();
             }
 
@@ -1031,13 +1033,18 @@ export default function naDisplay(serverName) {
                 } else {
                     current.portData = defaults.portData;
                 }
+                $("#propertyDropdown").dropdown("toggle");
                 updatePorts();
             }
 
             setupNationSelect();
-            $("#prop-nation").on("change", () => nationSelect());
+            $("#prop-nation")
+                .on("click", event => event.stopPropagation())
+                .on("change", () => nationSelect());
             setupClanSelect();
-            $("#prop-clan").on("change", () => clanSelect());
+            $("#prop-clan")
+                .on("click", event => event.stopPropagation())
+                .on("change", () => clanSelect());
             $("#menu-prop-all").on("click", () => allSelect());
 
             $("#menu-prop-yesterday").on("click", () => capturedYesterday());
@@ -1045,7 +1052,9 @@ export default function naDisplay(serverName) {
             $("#menu-prop-last-week").on("click", () => capturedLastWeek());
 
             setupCMSelect();
-            $("#prop-cm").on("change", () => CMSelect());
+            $("#prop-cm")
+                .on("click", event => event.stopPropagation())
+                .on("change", () => CMSelect());
         }
 
         setupScaleDomain();
