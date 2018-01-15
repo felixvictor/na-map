@@ -14,15 +14,7 @@ import "bootstrap/js/dist/util";
 
 export default function naDisplay(serverName) {
     let naSvg, naCanvas, naContext, svgDef, naZoom;
-    let mainGPort,
-        mainGPBZone,
-        mainGVoronoi,
-        mainGCoord,
-        gCompass,
-        naVoronoiDiagram,
-        pathVoronoi,
-        naTeleportPorts,
-        gPorts;
+    let mainGPort, mainGPBZone, mainGVoronoi, mainGCoord, gCompass, naVoronoiDiagram, pathVoronoi, naTeleportPorts;
 
     let defaults = {
         margin: { top: parseInt($(".navbar").css("height")), right: 20, bottom: 20, left: 20 },
@@ -31,8 +23,8 @@ export default function naDisplay(serverName) {
             max: 8192
         },
         maxScale: 10,
-        fontSize: 16,
-        circleSize: 10,
+        fontSize: 6,
+        circleSize: 2,
         iconSize: 50,
         PBZoneZoomScale: 1.5,
         labelZoomScale: 0.5,
@@ -368,7 +360,7 @@ export default function naDisplay(serverName) {
                     current.bPortLabelDisplayed = true;
                 }
             }
-            updatePorts();
+            updatePorts(scale);
         }
 
         let transform = d3.event.transform;
@@ -377,27 +369,18 @@ export default function naDisplay(serverName) {
         configureMap(transform.k);
         naDisplayCountries(transform);
 
-        mainGPort.attr("transform", transform);
         mainGVoronoi.attr("transform", transform);
         mainGPBZone.attr("transform", transform);
         mainGCoord.attr("transform", transform);
 
-        current.circleSize = defaults.circleSize / transform.k;
-        mainGPort.selectAll("circle").attr("r", current.circleSize);
-        mainGPort
-            .selectAll("text")
-            .attr("dx", d => d.properties.dx / transform.k)
-            .attr("dy", d => d.properties.dy / transform.k);
         if (current.bPortLabelDisplayed) {
-            current.fontSize = defaults.fontSize / transform.k;
-            mainGPort.selectAll("text").style("font-size", current.fontSize);
             if (current.highlightId && !current.bPBZoneDisplayed) {
                 naVoronoiHighlight();
             }
         }
     }
 
-    function updatePorts() {
+    function updatePorts(scale = current.transform.scale) {
         function naTooltipData(d) {
             let h = `<table><tbody<tr><td><i class="flag-icon ${
                 d.availableForAll ? `${d.nation}a` : d.nation
@@ -476,25 +459,36 @@ export default function naDisplay(serverName) {
         }
 
         // Data join
-        gPorts = mainGPort.selectAll("g.port").data(current.portData, d => d.id);
+        let circle = mainGPort.selectAll("circle").data(current.portData, d => d.id);
+        let text = mainGPort.selectAll("text").data(current.portData, d => d.id);
 
-        // Enter
-        let nodeGroupsEnter = gPorts
+        // Remove old circles
+        circle.exit().remove();
+        // Remove old text
+        text.exit().remove();
+
+        // Update kept circles
+        console.log(`defaults.circleSize ${defaults.circleSize}`);
+        console.log(`  scale ${scale}`);
+        console.log(`  vor current.circleSize ${current.circleSize}`);
+        current.circleSize = defaults.circleSize / scale;
+        console.log(`  nach current.circleSize ${current.circleSize}`);
+        circle.attr("r", current.circleSize);
+        // Update kept texts
+        if (current.bPortLabelDisplayed) {
+            current.fontSize = defaults.fontSize / scale;
+            text.style("font-size", current.fontSize);
+        }
+
+        // Add new circles
+        circle
             .enter()
-            .append("g")
-            .attr("class", "port")
-            .attr("transform", d => `translate(${d.geometry.coordinates[0]},${d.geometry.coordinates[1]})`);
-        nodeGroupsEnter.append("circle");
-        nodeGroupsEnter.append("text");
-
-        // Update
-        // Add flags
-        gPorts
-            .merge(nodeGroupsEnter)
-            .select("circle")
+            .append("circle")
             .attr("id", d => {
                 return `c${d.id}`;
             })
+            .attr("cx", d => defaults.xScale(d.geometry.coordinates[0]))
+            .attr("cy", d => defaults.yScale(d.geometry.coordinates[1]))
             .attr("r", current.circleSize)
             .attr("fill", d => {
                 const icon = d.properties.availableForAll ? `${d.properties.nation}a` : d.properties.nation;
@@ -502,13 +496,13 @@ export default function naDisplay(serverName) {
             })
             .on("mouseover", portMouseover);
 
-        // Add labels
+        // Add new texts
         if (current.bPortLabelDisplayed) {
-            gPorts
-                .merge(nodeGroupsEnter)
-                .select("text")
-                .attr("dx", d => d.properties.dx)
-                .attr("dy", d => d.properties.dy)
+            text
+                .enter()
+                .append("text")
+                .attr("x", d => defaults.xScale(d.geometry.coordinates[0] - d.properties.dx))
+                .attr("y", d => defaults.yScale(d.geometry.coordinates[1] - d.properties.dy))
                 .attr("text-anchor", d => {
                     if (d.properties.dx < 0) {
                         return "end";
@@ -524,15 +518,7 @@ export default function naDisplay(serverName) {
                     }
                     return f;
                 });
-        } else {
-            gPorts
-                .merge(nodeGroupsEnter)
-                .select("text")
-                .text("");
         }
-
-        // Remove old
-        gPorts.exit().remove();
     }
 
     function toggleDisplayTeleportAreas() {
@@ -1190,7 +1176,6 @@ export default function naDisplay(serverName) {
         setup();
         zoomAndPan(initial.transform);
         //updatePorts(current.portData.filter(d => ["234", "237", "238", "239", "240"].includes(d.id)));
-        updatePorts();
 
         /*
         let predictTime = moment().utc(),
