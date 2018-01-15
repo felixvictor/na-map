@@ -82,21 +82,8 @@ export default function naDisplay(serverName) {
     };
     defaults.width = top.innerWidth - defaults.margin.left - defaults.margin.right;
     defaults.height = top.innerHeight - defaults.margin.top - defaults.margin.bottom;
-    defaults.minScale = Math.min(defaults.width / defaults.coord.max, defaults.height / defaults.coord.max);
-    let initial = {
-        scale: defaults.minScale,
-        x: -defaults.coord.max / 2 * defaults.minScale,
-        y: -defaults.coord.max / 2 * defaults.minScale
-    };
-    initial.transform = d3.zoomIdentity.translate(initial.x, initial.y).scale(initial.scale);
-    defaults.xScale = d3
-        .scaleLinear()
-        .clamp(true)
-        .range([0, defaults.width]);
-    defaults.yScale = d3
-        .scaleLinear()
-        .clamp(true)
-        .range([0, defaults.height]);
+
+    let initial = {};
     defaults.coord.voronoi = [
         [defaults.coord.min - 1, defaults.coord.min - 1],
         [defaults.coord.max + 1, defaults.coord.max + 1]
@@ -360,13 +347,13 @@ export default function naDisplay(serverName) {
                     current.bPortLabelDisplayed = true;
                 }
             }
-            updatePorts(scale);
         }
 
         let transform = d3.event.transform;
-        //console.log(`transform: ${JSON.stringify(transform)}`);
+        console.log(`transform: ${JSON.stringify(transform)}`);
 
         configureMap(transform.k);
+        updatePorts(transform.k);
         naDisplayCountries(transform);
 
         mainGVoronoi.attr("transform", transform);
@@ -458,6 +445,22 @@ export default function naDisplay(serverName) {
                 .tooltip("show");
         }
 
+        let path = mainGPort.selectAll("path").data(current.portData, d => d.id);
+        current.circleSize = defaults.circleSize / scale;
+        path.exit().remove();
+        path.attr("d", defaults.path).attr("r", current.circleSize);
+        path
+            .enter()
+            .append("path")
+            .attr("d", defaults.path)
+            .attr("r", current.circleSize)
+            .attr("fill", d => {
+                const icon = d.properties.availableForAll ? `${d.properties.nation}a` : d.properties.nation;
+                return `url(#${icon})`;
+            })
+            .on("mouseover", portMouseover);
+
+        /*
         // Data join
         let circle = mainGPort.selectAll("circle").data(current.portData, d => d.id);
         let text = mainGPort.selectAll("text").data(current.portData, d => d.id);
@@ -519,6 +522,7 @@ export default function naDisplay(serverName) {
                     return f;
                 });
         }
+        */
     }
 
     function toggleDisplayTeleportAreas() {
@@ -647,40 +651,63 @@ export default function naDisplay(serverName) {
             }
         }
 
-        function setupScaleDomain() {
+        // https://gist.github.com/kobben/5932448
+        function setupPath() {
+            function affineTransformation(a, b, c, d, tx, ty) {
+                return d3.geoTransform({
+                    point: function(x, y) {
+                        this.stream.point(a * x + b * y + tx, c * x + d * y + ty);
+                    }
+                });
+            }
+
             const flattenArray = arr => [].concat.apply([], arr.map(element => element));
-            defaults.xScale.domain(
-                d3.extent(
-                    [].concat(
-                        defaults.portData.map(d => d.geometry.coordinates[0]),
-                        flattenArray(
-                            defaults.PBZoneData.features.map(d => [].concat(d.geometry.coordinates.map(d => d[0])))
-                        ),
-                        flattenArray(
-                            defaults.fortData.features.map(d => [].concat(d.geometry.coordinates.map(d => d[0])))
-                        ),
-                        flattenArray(
-                            defaults.towerData.features.map(d => [].concat(d.geometry.coordinates.map(d => d[0])))
-                        )
-                    )
+            defaults.xExtent = d3.extent(
+                [].concat(
+                    defaults.portData.map(d => d.geometry.coordinates[0]),
+                    flattenArray(
+                        defaults.PBZoneData.features.map(d => [].concat(d.geometry.coordinates.map(d => d[0])))
+                    ),
+                    flattenArray(defaults.fortData.features.map(d => [].concat(d.geometry.coordinates.map(d => d[0])))),
+                    flattenArray(defaults.towerData.features.map(d => [].concat(d.geometry.coordinates.map(d => d[0]))))
                 )
             );
-            defaults.yScale.domain(
-                d3.extent(
-                    [].concat(
-                        defaults.portData.map(d => d.geometry.coordinates[1]),
-                        flattenArray(
-                            defaults.PBZoneData.features.map(d => [].concat(d.geometry.coordinates.map(d => d[1])))
-                        ),
-                        flattenArray(
-                            defaults.fortData.features.map(d => [].concat(d.geometry.coordinates.map(d => d[1])))
-                        ),
-                        flattenArray(
-                            defaults.towerData.features.map(d => [].concat(d.geometry.coordinates.map(d => d[1])))
-                        )
-                    )
+            defaults.yExtent = d3.extent(
+                [].concat(
+                    defaults.portData.map(d => d.geometry.coordinates[1]),
+                    flattenArray(
+                        defaults.PBZoneData.features.map(d => [].concat(d.geometry.coordinates.map(d => d[1])))
+                    ),
+                    flattenArray(defaults.fortData.features.map(d => [].concat(d.geometry.coordinates.map(d => d[1])))),
+                    flattenArray(defaults.towerData.features.map(d => [].concat(d.geometry.coordinates.map(d => d[1]))))
                 )
             );
+            defaults.dataWidth = defaults.xExtent[1] - defaults.xExtent[0];
+            defaults.dataHeight = defaults.yExtent[1] - defaults.yExtent[0];
+            //defaults.dataWidth = defaults.coord.max;
+            //defaults.dataHeight = defaults.coord.max;
+            defaults.minScale =
+                Math.min(defaults.height, defaults.width) / Math.max(defaults.dataHeight, defaults.dataWidth);
+
+            initial.scale = defaults.minScale;
+            initial.x = -defaults.coord.max / 2 * defaults.minScale;
+            initial.y = -defaults.coord.max / 2 * defaults.minScale;
+            initial.transform = d3.zoomIdentity.translate(initial.x, initial.y).scale(initial.scale);
+
+console.log(defaults.xExtent);
+console.log(defaults.yExtent);
+            defaults.path = d3.geoPath().projection(
+                affineTransformation(
+                    defaults.minScale,
+                    0,
+                    0,
+                    defaults.minScale,
+                    (defaults.dataWidth/2) * defaults.minScale,
+                            (-defaults.dataHeight/2) * defaults.minScale
+                )
+            );
+
+
         }
 
         function setupCanvas() {
@@ -1048,7 +1075,7 @@ export default function naDisplay(serverName) {
                 .on("change", () => CMSelect());
         }
 
-        setupScaleDomain();
+        setupPath();
         setupCanvas();
         setupSvg();
         setupPorts();
