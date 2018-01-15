@@ -569,24 +569,13 @@ export default function naDisplay(serverName) {
     }
 
     function zoomAndPan(transform) {
-        let t = {};
-        if (JSON.stringify(transform) === JSON.stringify(initial.transform)) {
-            t = { delay: 0, duration: 0 };
-        } else {
-            t = { delay: 500, duration: 500 };
-        }
-
         current.transform.x = transform.x;
         current.transform.y = transform.y;
         current.transform.scale = transform.k;
         transform.x += defaults.width / 2;
         transform.y += defaults.height / 2;
 
-        naSvg
-            .transition()
-            .delay(t.delay)
-            .duration(t.duration)
-            .call(naZoom.transform, transform);
+        naSvg.call(naZoom.transform, transform);
     }
 
     function clearMap() {
