@@ -10,10 +10,6 @@ $in-colour: $primary-900;
 $out-colour: $primary-700;
 $background-colour: $primary-300;
 
-.opaque {
-  fill-opacity: .4;
-}
-
 .extralarge-width {
   min-width: 35em;
 }
@@ -210,6 +206,9 @@ $flags: "NT", // Neutral
   @each $flag in $flags {
     .flag-icon.#{$flag} {
       background-image: url("#{$flags-dir}/#{$flag}.svg");
+    }
+    .flag-icon.#{$flag}a {
+      background-image: url("#{$flags-dir}/#{$flag}a.svg");
     }
   }
 }

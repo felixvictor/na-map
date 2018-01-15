@@ -393,7 +393,9 @@ export default function naDisplay(serverName) {
 
     function updatePorts() {
         function naTooltipData(d) {
-            let h = `<table><tbody<tr><td><i class="flag-icon ${d.availableForAll ? d.nation+"a" : d.nation}"></i></td>`;
+            let h = `<table><tbody<tr><td><i class="flag-icon ${
+                d.availableForAll ? `${d.nation}a` : d.nation
+            }"></i></td>`;
             h += `<td><span class="port-name">${d.name}</span>`;
             h += d.availableForAll ? " (accessible to all nations)" : "";
             h += "</td></tr></tbody></table>";
@@ -477,26 +479,22 @@ export default function naDisplay(serverName) {
             .attr("class", "port")
             .attr("transform", d => `translate(${d.geometry.coordinates[0]},${d.geometry.coordinates[1]})`);
         nodeGroupsEnter.append("circle");
-        nodeGroupsEnter.append("circle");
         nodeGroupsEnter.append("text");
 
         // Update
         // Add flags
         gPorts
             .merge(nodeGroupsEnter)
-            .select("circle:nth-child(2)")
+            .select("circle")
             .attr("id", d => {
                 return `c${d.id}`;
             })
             .attr("r", current.circleSize)
-            .attr("fill", d => `url(#${d.properties.nation})`)
-            .attr("class", d => (d.properties.availableForAll ? "opaque" : ""))
+            .attr("fill", d => {
+                const icon = d.properties.availableForAll ? `${d.properties.nation}a` : d.properties.nation;
+                return `url(#${icon})`;
+            })
             .on("mouseover", portMouseover);
-        gPorts
-            .merge(nodeGroupsEnter)
-            .select("circle:nth-child(1)")
-            .attr("r", current.circleSize)
-            .attr("fill", d => (d.properties.availableForAll ? "url(#NT)" : "none"));
 
         // Add labels
         if (current.bPortLabelDisplayed) {
@@ -710,6 +708,16 @@ export default function naDisplay(serverName) {
                     .attr("height", defaults.iconSize)
                     .attr("width", defaults.iconSize)
                     .attr("href", `icons/${nation}.svg`);
+                svgDef
+                    .append("pattern")
+                    .attr("id", `${nation}a`)
+                    .attr("width", "100%")
+                    .attr("height", "100%")
+                    .attr("viewBox", `0 0 ${defaults.iconSize} ${defaults.iconSize}`)
+                    .append("image")
+                    .attr("height", defaults.iconSize)
+                    .attr("width", defaults.iconSize)
+                    .attr("href", `icons/${nation}a.svg`);
             });
         }
 
