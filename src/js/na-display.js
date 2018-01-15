@@ -334,21 +334,27 @@ export default function naDisplay(serverName) {
     function naZoomed() {
         function configureMap(scale) {
             function naTogglePBZones() {
-                mainGPBZone.style("display", mainGPBZone.active ? "none" : "inherit");
-                mainGPBZone.active = !mainGPBZone.active;
+                if (!mainGPBZone.active) {
+                    setupPBZones();
+                    mainGPBZone.active = true;
+                } else {
+                    mainGPBZone.remove();
+                    mainGPBZone = naSvg.append("g").attr("class", "pb");
+                    mainGPBZone.active = false;
+                }
             }
 
             if (defaults.PBZoneZoomScale < scale) {
                 if (!current.bPBZoneDisplayed) {
                     naTogglePBZones();
-                    naToggleDisplayTeleportAreas();
+                    toggleDisplayTeleportAreas();
                     current.highlightId = null;
                     current.bPBZoneDisplayed = true;
                 }
             } else {
                 if (current.bPBZoneDisplayed) {
                     naTogglePBZones();
-                    naToggleDisplayTeleportAreas();
+                    toggleDisplayTeleportAreas();
                     current.bPBZoneDisplayed = false;
                 }
             }
@@ -529,9 +535,15 @@ export default function naDisplay(serverName) {
         gPorts.exit().remove();
     }
 
-    function naToggleDisplayTeleportAreas() {
-        mainGVoronoi.style("display", mainGVoronoi.active ? "none" : "inherit");
-        mainGVoronoi.active = !mainGVoronoi.active;
+    function toggleDisplayTeleportAreas() {
+        if (!mainGVoronoi.active) {
+            setupTeleportAreas();
+            mainGVoronoi.active = true;
+        } else {
+            mainGVoronoi.remove();
+            mainGVoronoi = naSvg.append("g").attr("class", "voronoi");
+            mainGVoronoi.active = false;
+        }
     }
 
     function naVoronoiHighlight() {
@@ -585,6 +597,72 @@ export default function naDisplay(serverName) {
         current.portData = defaults.portData;
         $("#good-names").get(0).selectedIndex = 0;
         updatePorts();
+    }
+
+    function setupPBZones() {
+        mainGPBZone
+            .append("path")
+            .datum(defaults.PBZoneData)
+            .attr("class", "pb-zone")
+            .attr("d", d3.geoPath().pointRadius(4));
+
+        mainGPBZone
+            .append("path")
+            .datum(defaults.towerData)
+            .attr("class", "tower")
+            .attr("d", d3.geoPath().pointRadius(1.5));
+
+        mainGPBZone
+            .append("path")
+            .datum(defaults.fortData)
+            .attr("class", "fort")
+            .attr("d", d3.geoPath().pointRadius(2));
+    }
+
+    function setupTeleportAreas() {
+        // Extract port coordinates
+        naTeleportPorts = defaults.portData
+            // Use only ports that deep water ports and not a county capital
+            .filter(d => !d.properties.shallow && !d.properties.countyCapital)
+            // Map to coordinates array
+            .map(d => ({
+                id: d.id,
+                coord: { x: d.geometry.coordinates[0], y: d.geometry.coordinates[1] }
+            }));
+
+        pathVoronoi = mainGVoronoi
+            .selectAll(".voronoi")
+            .data(naTeleportPorts)
+            .enter()
+            .append("path")
+            .attr("id", d => `v${d.id}`);
+
+        naVoronoiDiagram = d3
+            .voronoi()
+            .extent(defaults.coord.voronoi)
+            .x(d => d.coord.x)
+            .y(d => d.coord.y)(naTeleportPorts);
+
+        // Draw teleport areas
+        pathVoronoi
+            .data(naVoronoiDiagram.polygons())
+            .attr("d", d => (d ? `M${d.join("L")}Z` : null))
+            .on("mouseover", function() {
+                let ref = d3.mouse(this);
+                const mx = ref[0],
+                    my = ref[1];
+
+                // use the new diagram.find() function to find the voronoi site closest to
+                // the mouse, limited by max distance defined by defaults.voronoiRadius
+                const site = naVoronoiDiagram.find(mx, my, defaults.voronoiRadius);
+                if (site) {
+                    current.highlightId = site.data.id;
+                    naVoronoiHighlight();
+                }
+            })
+            .on("mouseout", function() {
+                naVoronoiHighlight();
+            });
     }
 
     function setup() {
@@ -689,10 +767,7 @@ export default function naDisplay(serverName) {
 
             mainGVoronoi = naSvg.append("g").attr("class", "voronoi");
             mainGPort = naSvg.append("g").attr("class", "port");
-            mainGPBZone = naSvg
-                .append("g")
-                .attr("class", "pb")
-                .style("display", "none");
+            mainGPBZone = naSvg.append("g").attr("class", "pb");
             mainGCoord = naSvg.append("g").attr("class", "coord");
         }
 
@@ -719,73 +794,6 @@ export default function naDisplay(serverName) {
                     .attr("width", defaults.iconSize)
                     .attr("href", `icons/${nation}a.svg`);
             });
-        }
-
-        function setupTeleportAreas() {
-            // Extract port coordinates
-            naTeleportPorts = defaults.portData
-                // Use only ports that deep water ports and not a county capital
-                .filter(d => !d.properties.shallow && !d.properties.countyCapital)
-                // Map to coordinates array
-                .map(d => ({
-                    id: d.id,
-                    coord: { x: d.geometry.coordinates[0], y: d.geometry.coordinates[1] }
-                }));
-
-            pathVoronoi = mainGVoronoi
-                .selectAll(".voronoi")
-                .data(naTeleportPorts)
-                .enter()
-                .append("path")
-                .attr("id", d => `v${d.id}`);
-
-            naVoronoiDiagram = d3
-                .voronoi()
-                .extent(defaults.coord.voronoi)
-                .x(d => d.coord.x)
-                .y(d => d.coord.y)(naTeleportPorts);
-
-            // Draw teleport areas
-            pathVoronoi
-                .data(naVoronoiDiagram.polygons())
-                .attr("d", d => (d ? `M${d.join("L")}Z` : null))
-                .on("mouseover", function() {
-                    let ref = d3.mouse(this);
-                    const mx = ref[0],
-                        my = ref[1];
-
-                    // use the new diagram.find() function to find the voronoi site closest to
-                    // the mouse, limited by max distance defined by defaults.voronoiRadius
-                    const site = naVoronoiDiagram.find(mx, my, defaults.voronoiRadius);
-                    if (site) {
-                        current.highlightId = site.data.id;
-                        naVoronoiHighlight();
-                    }
-                })
-                .on("mouseout", function() {
-                    naVoronoiHighlight();
-                });
-            naToggleDisplayTeleportAreas();
-        }
-
-        function setupPBZones() {
-            mainGPBZone
-                .append("path")
-                .datum(defaults.PBZoneData)
-                .attr("class", "pb-zone")
-                .attr("d", d3.geoPath().pointRadius(4));
-
-            mainGPBZone
-                .append("path")
-                .datum(defaults.towerData)
-                .attr("class", "tower")
-                .attr("d", d3.geoPath().pointRadius(1.5));
-
-            mainGPBZone
-                .append("path")
-                .datum(defaults.fortData)
-                .attr("class", "fort")
-                .attr("d", d3.geoPath().pointRadius(2));
         }
 
         function setupSelects() {
@@ -1068,9 +1076,8 @@ export default function naDisplay(serverName) {
         setupScaleDomain();
         setupCanvas();
         setupSvg();
-        setupTeleportAreas();
         setupPorts();
-        setupPBZones();
+        toggleDisplayTeleportAreas();
         setupSelects();
         setupPropertyMenu();
         moment.locale("en-gb");
