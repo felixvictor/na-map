@@ -23,8 +23,8 @@ export default function naDisplay(serverName) {
             max: 8192
         },
         maxScale: 10,
-        fontSize: 6,
-        circleSize: 2,
+        fontSize: 16,
+        circleSize: 10,
         iconSize: 50,
         PBZoneZoomScale: 1.5,
         labelZoomScale: 0.5,
@@ -82,8 +82,15 @@ export default function naDisplay(serverName) {
     };
     defaults.width = top.innerWidth - defaults.margin.left - defaults.margin.right;
     defaults.height = top.innerHeight - defaults.margin.top - defaults.margin.bottom;
+    defaults.minScale = Math.min(defaults.height, defaults.width) / Math.max(defaults.coord.max, defaults.coord.max);
 
-    let initial = {};
+    let initial = {
+        scale: defaults.minScale,
+        x: -defaults.coord.max / 2 * defaults.minScale,
+        y: -defaults.coord.max / 2 * defaults.minScale
+    };
+    initial.transform = d3.zoomIdentity.translate(initial.x, initial.y).scale(initial.scale);
+
     defaults.coord.voronoi = [
         [defaults.coord.min - 1, defaults.coord.min - 1],
         [defaults.coord.max + 1, defaults.coord.max + 1]
@@ -337,16 +344,7 @@ export default function naDisplay(serverName) {
                     current.bPBZoneDisplayed = false;
                 }
             }
-
-            if (defaults.labelZoomScale > scale) {
-                if (current.bPortLabelDisplayed) {
-                    current.bPortLabelDisplayed = false;
-                }
-            } else {
-                if (!current.bPortLabelDisplayed) {
-                    current.bPortLabelDisplayed = true;
-                }
-            }
+            current.bPortLabelDisplayed = defaults.labelZoomScale < scale;
         }
 
         let transform = d3.event.transform;
@@ -357,6 +355,7 @@ export default function naDisplay(serverName) {
         naDisplayCountries(transform);
 
         mainGVoronoi.attr("transform", transform);
+        mainGPort.attr("transform", transform);
         mainGPBZone.attr("transform", transform);
         mainGCoord.attr("transform", transform);
 
@@ -445,22 +444,6 @@ export default function naDisplay(serverName) {
                 .tooltip("show");
         }
 
-        let path = mainGPort.selectAll("path").data(current.portData, d => d.id);
-        current.circleSize = defaults.circleSize / scale;
-        path.exit().remove();
-        path.attr("d", defaults.path).attr("r", current.circleSize);
-        path
-            .enter()
-            .append("path")
-            .attr("d", defaults.path)
-            .attr("r", current.circleSize)
-            .attr("fill", d => {
-                const icon = d.properties.availableForAll ? `${d.properties.nation}a` : d.properties.nation;
-                return `url(#${icon})`;
-            })
-            .on("mouseover", portMouseover);
-
-        /*
         // Data join
         let circle = mainGPort.selectAll("circle").data(current.portData, d => d.id);
         let text = mainGPort.selectAll("text").data(current.portData, d => d.id);
@@ -471,16 +454,14 @@ export default function naDisplay(serverName) {
         text.exit().remove();
 
         // Update kept circles
-        console.log(`defaults.circleSize ${defaults.circleSize}`);
-        console.log(`  scale ${scale}`);
-        console.log(`  vor current.circleSize ${current.circleSize}`);
         current.circleSize = defaults.circleSize / scale;
-        console.log(`  nach current.circleSize ${current.circleSize}`);
         circle.attr("r", current.circleSize);
         // Update kept texts
         if (current.bPortLabelDisplayed) {
             current.fontSize = defaults.fontSize / scale;
             text.style("font-size", current.fontSize);
+        } else {
+            text.remove();
         }
 
         // Add new circles
@@ -490,8 +471,8 @@ export default function naDisplay(serverName) {
             .attr("id", d => {
                 return `c${d.id}`;
             })
-            .attr("cx", d => defaults.xScale(d.geometry.coordinates[0]))
-            .attr("cy", d => defaults.yScale(d.geometry.coordinates[1]))
+            .attr("cx", d => d.geometry.coordinates[0])
+            .attr("cy", d => d.geometry.coordinates[1])
             .attr("r", current.circleSize)
             .attr("fill", d => {
                 const icon = d.properties.availableForAll ? `${d.properties.nation}a` : d.properties.nation;
@@ -504,8 +485,8 @@ export default function naDisplay(serverName) {
             text
                 .enter()
                 .append("text")
-                .attr("x", d => defaults.xScale(d.geometry.coordinates[0] - d.properties.dx))
-                .attr("y", d => defaults.yScale(d.geometry.coordinates[1] - d.properties.dy))
+                .attr("x", d => d.geometry.coordinates[0] - d.properties.dx)
+                .attr("y", d => d.geometry.coordinates[1] + d.properties.dy)
                 .attr("text-anchor", d => {
                     if (d.properties.dx < 0) {
                         return "end";
@@ -522,7 +503,6 @@ export default function naDisplay(serverName) {
                     return f;
                 });
         }
-        */
     }
 
     function toggleDisplayTeleportAreas() {
@@ -686,28 +666,21 @@ export default function naDisplay(serverName) {
             defaults.dataHeight = defaults.yExtent[1] - defaults.yExtent[0];
             //defaults.dataWidth = defaults.coord.max;
             //defaults.dataHeight = defaults.coord.max;
-            defaults.minScale =
-                Math.min(defaults.height, defaults.width) / Math.max(defaults.dataHeight, defaults.dataWidth);
 
-            initial.scale = defaults.minScale;
-            initial.x = -defaults.coord.max / 2 * defaults.minScale;
-            initial.y = -defaults.coord.max / 2 * defaults.minScale;
-            initial.transform = d3.zoomIdentity.translate(initial.x, initial.y).scale(initial.scale);
-
-console.log(defaults.xExtent);
-console.log(defaults.yExtent);
-            defaults.path = d3.geoPath().projection(
-                affineTransformation(
-                    defaults.minScale,
-                    0,
-                    0,
-                    defaults.minScale,
-                    (defaults.dataWidth/2) * defaults.minScale,
-                            (-defaults.dataHeight/2) * defaults.minScale
-                )
-            );
-
-
+            console.log(defaults.xExtent);
+            console.log(defaults.yExtent);
+            defaults.path = d3
+                .geoPath()
+                .projection(
+                    affineTransformation(
+                        defaults.minScale,
+                        0,
+                        0,
+                        defaults.minScale,
+                        defaults.dataWidth / 2 * defaults.minScale,
+                        -defaults.dataHeight / 2 * defaults.minScale
+                    )
+                );
         }
 
         function setupCanvas() {
