@@ -4,6 +4,10 @@
  iB 2017
  */
 
+/* global d3 : false,
+top : false
+ */
+
 import { feature as topojsonFeature } from "topojson-client";
 import moment from "moment";
 import "moment/locale/en-gb";
@@ -13,11 +17,22 @@ import "bootstrap/js/dist/tooltip";
 import "bootstrap/js/dist/util";
 
 export default function naDisplay(serverName) {
-    let naSvg, naCanvas, naContext, svgDef, naZoom;
-    let mainGPort, mainGPBZone, mainGVoronoi, mainGCoord, gCompass, naVoronoiDiagram, pathVoronoi, naTeleportPorts;
+    let naSvg,
+        naCanvas,
+        naContext,
+        svgDef,
+        naZoom,
+        mainGPort,
+        mainGPBZone,
+        mainGVoronoi,
+        mainGCoord,
+        gCompass,
+        naVoronoiDiagram,
+        pathVoronoi,
+        naTeleportPorts;
 
-    let defaults = {
-        margin: { top: parseInt($(".navbar").css("height")), right: 20, bottom: 20, left: 20 },
+    const defaults = {
+        margin: { top: parseInt($(".navbar").css("height"), 10), right: 20, bottom: 20, left: 20 },
         coord: {
             min: 0,
             max: 8192
@@ -80,11 +95,13 @@ export default function naDisplay(serverName) {
             { id: "VP", name: "Verenigde Provinciën", sortName: "Verenigde Provinciën" }
         ]
     };
+    // eslint-disable-next-line no-restricted-globals
     defaults.width = top.innerWidth - defaults.margin.left - defaults.margin.right;
+    // eslint-disable-next-line no-restricted-globals
     defaults.height = top.innerHeight - defaults.margin.top - defaults.margin.bottom;
     defaults.minScale = Math.min(defaults.height, defaults.width) / Math.max(defaults.coord.max, defaults.coord.max);
 
-    let initial = {
+    const initial = {
         scale: defaults.minScale,
         x: -defaults.coord.max / 2 * defaults.minScale,
         y: -defaults.coord.max / 2 * defaults.minScale
@@ -98,7 +115,7 @@ export default function naDisplay(serverName) {
     // limit how far away the mouse can be from finding a voronoi site
     defaults.voronoiRadius = Math.min(defaults.height, defaults.width);
 
-    let current = {
+    const current = {
         transform: { x: initial.x, y: initial.y, scale: initial.scale },
         fontSize: defaults.fontSize,
         circleSize: defaults.circleSize,
@@ -111,9 +128,7 @@ export default function naDisplay(serverName) {
         nation: ""
     };
 
-    const thousandsWithBlanks = x => {
-        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u202f");
-    };
+    const thousandsWithBlanks = x => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u202f");
 
     const formatCoord = x => {
         let r = thousandsWithBlanks(Math.abs(Math.trunc(x)));
@@ -143,59 +158,235 @@ export default function naDisplay(serverName) {
         naContext.restore();
     }
 
-    function doubleClickAction() {
-        function printCoord(x, y) {
-            // svg coord to F11 coord
-            function convertInvCoordX(x, y) {
-                return (
-                    defaults.transformMatrixInv.A * x +
-                    defaults.transformMatrixInv.B * y +
-                    defaults.transformMatrixInv.C
+    function naVoronoiHighlight() {
+        mainGVoronoi.selectAll("path").attr("class", function() {
+            return d3.select(this).attr("id") === `v${current.highlightId}` ? "highlight-voronoi" : "";
+        });
+        mainGPort
+            .selectAll("circle")
+            .attr("r", d => (d.id === current.highlightId ? current.circleSize * 3 : current.circleSize));
+        if (current.bPortLabelDisplayed) {
+            mainGPort
+                .selectAll("text")
+                .attr("dx", d => (d.id === current.highlightId ? d.properties.dx * 3 : d.properties.dx))
+                .attr("dy", d => (d.id === current.highlightId ? d.properties.dy * 3 : d.properties.dy))
+                .style(
+                    "font-size",
+                    d => (d.id === current.highlightId ? `${current.fontSize * 2}px` : `${current.fontSize}px`)
                 );
-            }
-
-            // svg coord to F11 coord
-            function convertInvCoordY(x, y) {
-                return (
-                    defaults.transformMatrixInv.B * x -
-                    defaults.transformMatrixInv.A * y +
-                    defaults.transformMatrixInv.D
-                );
-            }
-
-            const F11X = convertInvCoordX(x, y) * -1,
-                F11Y = convertInvCoordY(x, y) * -1;
-
-            if (current.radioButton === "F11") {
-                printF11Coord(x, y, F11X, F11Y);
-            } else {
-                plotCourse(x, y);
-            }
         }
+    }
 
-        const coord = d3.mouse(this),
-            transform = d3.zoomTransform(this);
-        const mx = coord[0],
-            my = coord[1],
-            tk = transform.k,
-            tx = transform.x,
-            ty = transform.y;
+    function setupTeleportAreas() {
+        // Extract port coordinates
+        naTeleportPorts = defaults.portData
+            // Use only ports that deep water ports and not a county capital
+            .filter(d => !d.properties.shallow && !d.properties.countyCapital)
+            // Map to coordinates array
+            .map(d => ({
+                id: d.id,
+                coord: { x: d.geometry.coordinates[0], y: d.geometry.coordinates[1] }
+            }));
 
-        let x = (mx - tx) / tk,
-            y = (my - ty) / tk;
+        pathVoronoi = mainGVoronoi
+            .selectAll(".voronoi")
+            .data(naTeleportPorts)
+            .enter()
+            .append("path")
+            .attr("id", d => `v${d.id}`);
 
-        if (current.radioButton === "F11") {
-            printCoord(x, y);
+        naVoronoiDiagram = d3
+            .voronoi()
+            .extent(defaults.coord.voronoi)
+            .x(d => d.coord.x)
+            .y(d => d.coord.y)(naTeleportPorts);
+
+        // Draw teleport areas
+        pathVoronoi
+            .data(naVoronoiDiagram.polygons())
+            .attr("d", d => (d ? `M${d.join("L")}Z` : null))
+            .on("mouseover", function() {
+                const ref = d3.mouse(this),
+                    mx = ref[0],
+                    my = ref[1];
+
+                // use the new diagram.find() function to find the voronoi site closest to
+                // the mouse, limited by max distance defined by defaults.voronoiRadius
+                const site = naVoronoiDiagram.find(mx, my, defaults.voronoiRadius);
+                if (site) {
+                    current.highlightId = site.data.id;
+                    naVoronoiHighlight();
+                }
+            })
+            .on("mouseout", () => {
+                naVoronoiHighlight();
+            });
+    }
+
+    function toggleDisplayTeleportAreas() {
+        if (!mainGVoronoi.active) {
+            setupTeleportAreas();
+            mainGVoronoi.active = true;
         } else {
-            plotCourse(x, y);
+            mainGVoronoi.remove();
+            mainGVoronoi = naSvg.append("g").attr("class", "voronoi");
+            mainGVoronoi.active = false;
+        }
+    }
+
+    function updatePorts(scale = current.transform.scale) {
+        function naTooltipData(d) {
+            let h = `<table><tbody<tr><td><i class="flag-icon ${
+                d.availableForAll ? `${d.nation}a` : d.nation
+            }"></i></td>`;
+            h += `<td><span class="port-name">${d.name}</span>`;
+            h += d.availableForAll ? " (accessible to all nations)" : "";
+            h += "</td></tr></tbody></table>";
+            h += `<p>${d.shallow ? "Shallow" : "Deep"}`;
+            h += " water port";
+            if (d.countyCapital) {
+                h += " (county capital)";
+            }
+            if (d.capturer) {
+                h += ` captured by ${d.capturer} ${moment(d.lastPortBattle).fromNow()}`;
+            }
+            h += "<br>";
+            if (!d.nonCapturable) {
+                const pbTimeRange = !d.portBattleStartTime
+                    ? "11.00\u202f–\u202f8.00"
+                    : `${(d.portBattleStartTime + 10) % 24}.00\u202f–\u202f${(d.portBattleStartTime + 13) % 24}.00`;
+                h += `Port battle ${pbTimeRange}, ${thousandsWithBlanks(d.brLimit)} BR, `;
+                switch (d.portBattleType) {
+                    case "Large":
+                        h += "1<sup>st</sup>";
+                        break;
+                    case "Medium":
+                        h += "4<sup>th</sup>";
+                        break;
+                    default:
+                        h += "6<sup>th</sup>";
+                        break;
+                }
+
+                h += "\u202frate AI";
+                h += `, ${d.conquestMarksPension}\u202fconquest point`;
+                h += d.conquestMarksPension > 1 ? "s" : "";
+                h += `<br>Tax income ${thousandsWithBlanks(d.taxIncome)} (${d.portTax *
+                    100}\u202f%), net income ${formatCoord(d.netIncome)}`;
+                h += d.tradingCompany ? `, trading company level\u202f${d.tradingCompany}` : "";
+                h += d.laborHoursDiscount ? ", labor hours discount" : "";
+            } else {
+                h += "Not capturable";
+                h += `<br>${d.portTax * 100}\u2009% tax`;
+            }
+            h += "</p>";
+            h += "<table class='table table-sm'>";
+            if (d.produces.length) {
+                h += `<tr><td>Produces</td><td>${d.produces.join(", ")}</td></tr>`;
+            }
+            if (d.drops.length) {
+                h += `<tr><td>Drops</td><td>${d.drops.join(", ")}</tr>`;
+            }
+            if (d.consumes.length) {
+                h += `<tr><td>Consumes</td><td>${d.consumes.join(", ")}</tr>`;
+            }
+            h += "</table>";
+
+            return h;
         }
 
-        zoomAndPan(d3.zoomIdentity.translate(-x, -y).scale(1));
+        function portMouseover(d) {
+            if (current.highlightId) {
+                naVoronoiHighlight();
+            }
+            d3
+                .select(this)
+                .attr("data-toggle", "tooltip")
+                .attr("title", () => naTooltipData(d.properties));
+            $(`#c${d.id}`)
+                .tooltip({
+                    delay: { show: defaults.highlightDuration, hide: defaults.highlightDuration },
+                    html: true,
+                    placement: "auto"
+                })
+                .tooltip("show");
+        }
+
+        // Data join
+        const circle = mainGPort.selectAll("circle").data(current.portData, d => d.id);
+        const text = mainGPort.selectAll("text").data(current.portData, d => d.id);
+
+        // Remove old circles
+        circle.exit().remove();
+        // Remove old text
+        text.exit().remove();
+
+        // Update kept circles
+        current.circleSize = defaults.circleSize / scale;
+        circle.attr("r", current.circleSize);
+        // Update kept texts
+        if (current.bPortLabelDisplayed) {
+            current.fontSize = defaults.fontSize / scale;
+            text.style("font-size", current.fontSize);
+        } else {
+            text.remove();
+        }
+
+        // Add new circles
+        circle
+            .enter()
+            .append("circle")
+            .attr("id", d => `c${d.id}`)
+            .attr("cx", d => d.geometry.coordinates[0])
+            .attr("cy", d => d.geometry.coordinates[1])
+            .attr("r", current.circleSize)
+            .attr(
+                "fill",
+                d => `url(#${d.properties.availableForAll ? `${d.properties.nation}a` : d.properties.nation})`
+            )
+            .on("mouseover", portMouseover);
+
+        // Add new texts
+        if (current.bPortLabelDisplayed) {
+            text
+                .enter()
+                .append("text")
+                .attr("x", d => d.geometry.coordinates[0] - d.properties.dx)
+                .attr("y", d => d.geometry.coordinates[1] + d.properties.dy)
+                .attr("text-anchor", d => (d.properties.dx < 0 ? "end" : "start"))
+                .text(d => d.properties.name)
+                .attr(
+                    "class",
+                    d => (!d.properties.shallow && !d.properties.countyCapital ? "na-port-in" : "na-port-out")
+                );
+        }
+    }
+
+    function zoomAndPan(transformIn) {
+        current.transform.x = transformIn.x;
+        current.transform.y = transformIn.y;
+        current.transform.scale = transformIn.k;
+        // eslint-disable-next-line no-param-reassign
+        transformIn.x += defaults.width / 2;
+        // eslint-disable-next-line no-param-reassign
+        transformIn.y += defaults.height / 2;
+
+        naSvg.call(naZoom.transform, transformIn);
+    }
+
+    function clearMap() {
+        mainGCoord.remove();
+        mainGCoord = naSvg.append("g").attr("class", "coord");
+        current.bFirstCoord = true;
+        current.lineData.splice(0, current.lineData.length);
+        current.portData = defaults.portData;
+        $("#good-names").get(0).selectedIndex = 0;
+        updatePorts();
     }
 
     function plotCourse(x, y, style = "course") {
-        function printCompass(x, y, style) {
-            const compassSize = "course" === style ? 100 : 30;
+        function printCompass() {
+            const compassSize = style === "course" ? 100 : 30;
 
             mainGCoord
                 .append("image")
@@ -209,14 +400,12 @@ export default function naDisplay(serverName) {
             gCompass = mainGCoord.append("path");
         }
 
-        function printLine(x, y) {
+        function printLine() {
             // https://stackoverflow.com/questions/9970281/java-calculating-the-angle-between-two-points-in-degrees
             function rotationAngleInDegrees(centerPt, targetPt) {
                 // Converts from radians to degrees
                 // http://cwestblog.com/2012/11/12/javascript-degree-and-radian-conversion/
-                Math.radiansToDegrees = function(radians) {
-                    return radians * 180 / Math.PI;
-                };
+                Math.radiansToDegrees = radians => radians * 180 / Math.PI;
 
                 let theta = Math.atan2(targetPt[1] - centerPt[1], targetPt[0] - centerPt[0]);
                 theta -= Math.PI / 2.0;
@@ -265,7 +454,22 @@ export default function naDisplay(serverName) {
         }
     }
 
-    function goToF11(F11X, F11Y) {
+    function printF11Coord(x, y, textX, textY) {
+        const g = mainGCoord.append("g").attr("transform", `translate(${x},${y})`);
+        g.append("circle").attr("r", 20);
+        g
+            .append("text")
+            .attr("dx", "-1.5em")
+            .attr("dy", "-.5em")
+            .text(formatCoord(textX));
+        g
+            .append("text")
+            .attr("dx", "-1.5em")
+            .attr("dy", ".5em")
+            .text(formatCoord(textY));
+    }
+
+    function goToF11(F11XIn, F11YIn) {
         // F11 coord to svg coord
         function convertCoordX(x, y) {
             return defaults.transformMatrix.A * x + defaults.transformMatrix.B * y + defaults.transformMatrix.C;
@@ -276,15 +480,16 @@ export default function naDisplay(serverName) {
             return defaults.transformMatrix.B * x - defaults.transformMatrix.A * y + defaults.transformMatrix.D;
         }
 
-        //https://stackoverflow.com/questions/14718561/how-to-check-if-a-number-is-between-two-values
-        Number.prototype.between = function(a, b, inclusive) {
+        // https://stackoverflow.com/questions/14718561/how-to-check-if-a-number-is-between-two-values
+        // eslint-disable-next-line no-extend-native
+        Number.prototype.between = (a, b, inclusive) => {
             const min = Math.min.apply(Math, [a, b]),
                 max = Math.max.apply(Math, [a, b]);
             return inclusive ? this >= min && this <= max : this > min && this < max;
         };
 
-        F11X = +F11X * -1;
-        F11Y = +F11Y * -1;
+        const F11X = +F11XIn * -1,
+            F11Y = +F11YIn * -1;
         const x = convertCoordX(F11X, F11Y),
             y = convertCoordY(F11X, F11Y);
 
@@ -302,260 +507,54 @@ export default function naDisplay(serverName) {
         }
     }
 
-    function printF11Coord(x, y, textX, textY) {
-        let g = mainGCoord.append("g").attr("transform", `translate(${x},${y})`);
-        g.append("circle").attr("r", 20);
-        g
-            .append("text")
-            .attr("dx", "-1.5em")
-            .attr("dy", "-.5em")
-            .text(formatCoord(textX));
-        g
-            .append("text")
-            .attr("dx", "-1.5em")
-            .attr("dy", ".5em")
-            .text(formatCoord(textY));
-    }
-
-    function naZoomed() {
-        function configureMap(scale) {
-            function naTogglePBZones() {
-                if (!mainGPBZone.active) {
-                    setupPBZones();
-                    mainGPBZone.active = true;
-                } else {
-                    mainGPBZone.remove();
-                    mainGPBZone = naSvg.append("g").attr("class", "pb");
-                    mainGPBZone.active = false;
-                }
+    function doubleClickAction() {
+        function printCoord(x, y) {
+            // svg coord to F11 coord
+            function convertInvCoordX() {
+                return (
+                    defaults.transformMatrixInv.A * x +
+                    defaults.transformMatrixInv.B * y +
+                    defaults.transformMatrixInv.C
+                );
             }
 
-            if (defaults.PBZoneZoomScale < scale) {
-                if (!current.bPBZoneDisplayed) {
-                    naTogglePBZones();
-                    toggleDisplayTeleportAreas();
-                    current.highlightId = null;
-                    current.bPBZoneDisplayed = true;
-                }
+            // svg coord to F11 coord
+            function convertInvCoordY() {
+                return (
+                    defaults.transformMatrixInv.B * x -
+                    defaults.transformMatrixInv.A * y +
+                    defaults.transformMatrixInv.D
+                );
+            }
+
+            const F11X = convertInvCoordX(x, y) * -1,
+                F11Y = convertInvCoordY(x, y) * -1;
+
+            if (current.radioButton === "F11") {
+                printF11Coord(x, y, F11X, F11Y);
             } else {
-                if (current.bPBZoneDisplayed) {
-                    naTogglePBZones();
-                    toggleDisplayTeleportAreas();
-                    current.bPBZoneDisplayed = false;
-                }
-            }
-            current.bPortLabelDisplayed = defaults.labelZoomScale < scale;
-        }
-
-        let transform = d3.event.transform;
-        console.log(`transform: ${JSON.stringify(transform)}`);
-
-        configureMap(transform.k);
-        updatePorts(transform.k);
-        naDisplayCountries(transform);
-
-        mainGVoronoi.attr("transform", transform);
-        mainGPort.attr("transform", transform);
-        mainGPBZone.attr("transform", transform);
-        mainGCoord.attr("transform", transform);
-
-        if (current.bPortLabelDisplayed) {
-            if (current.highlightId && !current.bPBZoneDisplayed) {
-                naVoronoiHighlight();
+                plotCourse(x, y);
             }
         }
-    }
 
-    function updatePorts(scale = current.transform.scale) {
-        function naTooltipData(d) {
-            let h = `<table><tbody<tr><td><i class="flag-icon ${
-                d.availableForAll ? `${d.nation}a` : d.nation
-            }"></i></td>`;
-            h += `<td><span class="port-name">${d.name}</span>`;
-            h += d.availableForAll ? " (accessible to all nations)" : "";
-            h += "</td></tr></tbody></table>";
-            h += `<p>${d.shallow ? "Shallow" : "Deep"}`;
-            h += " water port";
-            if (d.countyCapital) {
-                h += " (county capital)";
-            }
-            if (d.capturer) {
-                h += ` captured by ${d.capturer} ${moment(d.lastPortBattle).fromNow()}`;
-            }
-            h += "<br>";
-            if (!d.nonCapturable) {
-                const pbTimeRange = !d.portBattleStartTime
-                    ? "11.00\u202f–\u202f8.00"
-                    : `${(d.portBattleStartTime + 10) % 24}.00\u202f–\u202f${(d.portBattleStartTime + 13) % 24}.00`;
-                h += `Port battle ${pbTimeRange}, ${thousandsWithBlanks(d.brLimit)} BR, `;
-                switch (d.portBattleType) {
-                    case "Large":
-                        h += "1<sup>st</sup>";
-                        break;
-                    case "Medium":
-                        h += "4<sup>th</sup>";
-                        break;
-                    case "Small":
-                        h += "6<sup>th</sup>";
-                        break;
-                }
+        const coord = d3.mouse(this),
+            transform = d3.zoomTransform(this);
+        const mx = coord[0],
+            my = coord[1],
+            tk = transform.k,
+            tx = transform.x,
+            ty = transform.y;
 
-                h += "\u202frate AI";
-                h += `, ${d.conquestMarksPension}\u202fconquest point`;
-                h += d.conquestMarksPension > 1 ? "s" : "";
-                h += `<br>Tax income ${thousandsWithBlanks(d.taxIncome)} (${d.portTax *
-                    100}\u202f%), net income ${formatCoord(d.netIncome)}`;
-                h += d.tradingCompany ? `, trading company level\u202f${d.tradingCompany}` : "";
-                h += d.laborHoursDiscount ? ", labor hours discount" : "";
-            } else {
-                h += "Not capturable";
-                h += `<br>${d.portTax * 100}\u2009% tax`;
-            }
-            h += "</p>";
-            h += "<table class='table table-sm'>";
-            if (d.produces.length) {
-                h += `<tr><td>Produces</td><td>${d.produces.join(", ")}</td></tr>`;
-            }
-            if (d.drops.length) {
-                h += `<tr><td>Drops</td><td>${d.drops.join(", ")}</tr>`;
-            }
-            if (d.consumes.length) {
-                h += `<tr><td>Consumes</td><td>${d.consumes.join(", ")}</tr>`;
-            }
-            h += "</table>";
+        const x = (mx - tx) / tk,
+            y = (my - ty) / tk;
 
-            return h;
-        }
-
-        function portMouseover(d) {
-            if (current.highlightId) {
-                naVoronoiHighlight();
-            }
-            d3
-                .select(this)
-                .attr("data-toggle", "tooltip")
-                .attr("title", d => naTooltipData(d.properties));
-            $(`#c${d.id}`)
-                .tooltip({
-                    delay: { show: defaults.highlightDuration, hide: defaults.highlightDuration },
-                    html: true,
-                    placement: "auto"
-                })
-                .tooltip("show");
-        }
-
-        // Data join
-        let circle = mainGPort.selectAll("circle").data(current.portData, d => d.id);
-        let text = mainGPort.selectAll("text").data(current.portData, d => d.id);
-
-        // Remove old circles
-        circle.exit().remove();
-        // Remove old text
-        text.exit().remove();
-
-        // Update kept circles
-        current.circleSize = defaults.circleSize / scale;
-        circle.attr("r", current.circleSize);
-        // Update kept texts
-        if (current.bPortLabelDisplayed) {
-            current.fontSize = defaults.fontSize / scale;
-            text.style("font-size", current.fontSize);
+        if (current.radioButton === "F11") {
+            printCoord(x, y);
         } else {
-            text.remove();
+            plotCourse(x, y);
         }
 
-        // Add new circles
-        circle
-            .enter()
-            .append("circle")
-            .attr("id", d => {
-                return `c${d.id}`;
-            })
-            .attr("cx", d => d.geometry.coordinates[0])
-            .attr("cy", d => d.geometry.coordinates[1])
-            .attr("r", current.circleSize)
-            .attr("fill", d => {
-                const icon = d.properties.availableForAll ? `${d.properties.nation}a` : d.properties.nation;
-                return `url(#${icon})`;
-            })
-            .on("mouseover", portMouseover);
-
-        // Add new texts
-        if (current.bPortLabelDisplayed) {
-            text
-                .enter()
-                .append("text")
-                .attr("x", d => d.geometry.coordinates[0] - d.properties.dx)
-                .attr("y", d => d.geometry.coordinates[1] + d.properties.dy)
-                .attr("text-anchor", d => {
-                    if (d.properties.dx < 0) {
-                        return "end";
-                    } else {
-                        return "start";
-                    }
-                })
-                .text(d => d.properties.name)
-                .attr("class", d => {
-                    let f = "na-port-out";
-                    if (!d.properties.shallow && !d.properties.countyCapital) {
-                        f = "na-port-in";
-                    }
-                    return f;
-                });
-        }
-    }
-
-    function toggleDisplayTeleportAreas() {
-        if (!mainGVoronoi.active) {
-            setupTeleportAreas();
-            mainGVoronoi.active = true;
-        } else {
-            mainGVoronoi.remove();
-            mainGVoronoi = naSvg.append("g").attr("class", "voronoi");
-            mainGVoronoi.active = false;
-        }
-    }
-
-    function naVoronoiHighlight() {
-        mainGVoronoi.selectAll("path").attr("class", function() {
-            return d3.select(this).attr("id") === `v${current.highlightId}` ? "highlight-voronoi" : "";
-        });
-        mainGPort.selectAll("circle").attr("r", d => {
-            return d.id === current.highlightId ? current.circleSize * 3 : current.circleSize;
-        });
-        if (current.bPortLabelDisplayed) {
-            mainGPort
-                .selectAll("text")
-                .attr("dx", d => {
-                    return d.id === current.highlightId ? d.properties.dx * 3 : d.properties.dx;
-                })
-                .attr("dy", d => {
-                    return d.id === current.highlightId ? d.properties.dy * 3 : d.properties.dy;
-                })
-                .style("font-size", d => {
-                    return d.id === current.highlightId ? `${current.fontSize * 2}px` : `${current.fontSize}px`;
-                });
-        }
-    }
-
-    function zoomAndPan(transform) {
-        current.transform.x = transform.x;
-        current.transform.y = transform.y;
-        current.transform.scale = transform.k;
-        transform.x += defaults.width / 2;
-        transform.y += defaults.height / 2;
-
-        naSvg.call(naZoom.transform, transform);
-    }
-
-    function clearMap() {
-        mainGCoord.remove();
-        mainGCoord = naSvg.append("g").attr("class", "coord");
-        current.bFirstCoord = true;
-        current.lineData.splice(0, current.lineData.length);
-        current.portData = defaults.portData;
-        $("#good-names").get(0).selectedIndex = 0;
-        updatePorts();
+        zoomAndPan(d3.zoomIdentity.translate(-x, -y).scale(1));
     }
 
     function setupPBZones() {
@@ -578,50 +577,51 @@ export default function naDisplay(serverName) {
             .attr("d", d3.geoPath().pointRadius(2));
     }
 
-    function setupTeleportAreas() {
-        // Extract port coordinates
-        naTeleportPorts = defaults.portData
-            // Use only ports that deep water ports and not a county capital
-            .filter(d => !d.properties.shallow && !d.properties.countyCapital)
-            // Map to coordinates array
-            .map(d => ({
-                id: d.id,
-                coord: { x: d.geometry.coordinates[0], y: d.geometry.coordinates[1] }
-            }));
-
-        pathVoronoi = mainGVoronoi
-            .selectAll(".voronoi")
-            .data(naTeleportPorts)
-            .enter()
-            .append("path")
-            .attr("id", d => `v${d.id}`);
-
-        naVoronoiDiagram = d3
-            .voronoi()
-            .extent(defaults.coord.voronoi)
-            .x(d => d.coord.x)
-            .y(d => d.coord.y)(naTeleportPorts);
-
-        // Draw teleport areas
-        pathVoronoi
-            .data(naVoronoiDiagram.polygons())
-            .attr("d", d => (d ? `M${d.join("L")}Z` : null))
-            .on("mouseover", function() {
-                let ref = d3.mouse(this);
-                const mx = ref[0],
-                    my = ref[1];
-
-                // use the new diagram.find() function to find the voronoi site closest to
-                // the mouse, limited by max distance defined by defaults.voronoiRadius
-                const site = naVoronoiDiagram.find(mx, my, defaults.voronoiRadius);
-                if (site) {
-                    current.highlightId = site.data.id;
-                    naVoronoiHighlight();
+    function naZoomed() {
+        function configureMap(scale) {
+            function naTogglePBZones() {
+                if (!mainGPBZone.active) {
+                    setupPBZones();
+                    mainGPBZone.active = true;
+                } else {
+                    mainGPBZone.remove();
+                    mainGPBZone = naSvg.append("g").attr("class", "pb");
+                    mainGPBZone.active = false;
                 }
-            })
-            .on("mouseout", function() {
+            }
+
+            if (defaults.PBZoneZoomScale < scale) {
+                if (!current.bPBZoneDisplayed) {
+                    naTogglePBZones();
+                    toggleDisplayTeleportAreas();
+                    current.highlightId = null;
+                    current.bPBZoneDisplayed = true;
+                }
+            } else if (current.bPBZoneDisplayed) {
+                naTogglePBZones();
+                toggleDisplayTeleportAreas();
+                current.bPBZoneDisplayed = false;
+            }
+            current.bPortLabelDisplayed = defaults.labelZoomScale < scale;
+        }
+        // eslint-disable-next-line prefer-destructuring
+        const transform = d3.event.transform;
+        console.log(`transform: ${JSON.stringify(transform)}`);
+
+        configureMap(transform.k);
+        updatePorts(transform.k);
+        naDisplayCountries(transform);
+
+        mainGVoronoi.attr("transform", transform);
+        mainGPort.attr("transform", transform);
+        mainGPBZone.attr("transform", transform);
+        mainGCoord.attr("transform", transform);
+
+        if (current.bPortLabelDisplayed) {
+            if (current.highlightId && !current.bPBZoneDisplayed) {
                 naVoronoiHighlight();
-            });
+            }
+        }
     }
 
     function setup() {
@@ -635,37 +635,37 @@ export default function naDisplay(serverName) {
         function setupPath() {
             function affineTransformation(a, b, c, d, tx, ty) {
                 return d3.geoTransform({
-                    point: function(x, y) {
+                    point(x, y) {
                         this.stream.point(a * x + b * y + tx, c * x + d * y + ty);
                     }
                 });
             }
-
+            // eslint-disable-next-line prefer-spread
             const flattenArray = arr => [].concat.apply([], arr.map(element => element));
             defaults.xExtent = d3.extent(
                 [].concat(
                     defaults.portData.map(d => d.geometry.coordinates[0]),
                     flattenArray(
-                        defaults.PBZoneData.features.map(d => [].concat(d.geometry.coordinates.map(d => d[0])))
+                        defaults.PBZoneData.features.map(d => [].concat(d.geometry.coordinates.map(p => p[0])))
                     ),
-                    flattenArray(defaults.fortData.features.map(d => [].concat(d.geometry.coordinates.map(d => d[0])))),
-                    flattenArray(defaults.towerData.features.map(d => [].concat(d.geometry.coordinates.map(d => d[0]))))
+                    flattenArray(defaults.fortData.features.map(d => [].concat(d.geometry.coordinates.map(p => p[0])))),
+                    flattenArray(defaults.towerData.features.map(d => [].concat(d.geometry.coordinates.map(p => p[0]))))
                 )
             );
             defaults.yExtent = d3.extent(
                 [].concat(
                     defaults.portData.map(d => d.geometry.coordinates[1]),
                     flattenArray(
-                        defaults.PBZoneData.features.map(d => [].concat(d.geometry.coordinates.map(d => d[1])))
+                        defaults.PBZoneData.features.map(d => [].concat(d.geometry.coordinates.map(p => p[1])))
                     ),
-                    flattenArray(defaults.fortData.features.map(d => [].concat(d.geometry.coordinates.map(d => d[1])))),
-                    flattenArray(defaults.towerData.features.map(d => [].concat(d.geometry.coordinates.map(d => d[1]))))
+                    flattenArray(defaults.fortData.features.map(d => [].concat(d.geometry.coordinates.map(p => p[1])))),
+                    flattenArray(defaults.towerData.features.map(d => [].concat(d.geometry.coordinates.map(p => p[1]))))
                 )
             );
             defaults.dataWidth = defaults.xExtent[1] - defaults.xExtent[0];
             defaults.dataHeight = defaults.yExtent[1] - defaults.yExtent[0];
-            //defaults.dataWidth = defaults.coord.max;
-            //defaults.dataHeight = defaults.coord.max;
+            // defaults.dataWidth = defaults.coord.max;
+            // defaults.dataHeight = defaults.coord.max;
 
             console.log(defaults.xExtent);
             console.log(defaults.yExtent);
@@ -695,7 +695,7 @@ export default function naDisplay(serverName) {
                 .on("click", stopProp, true);
             naContext = naCanvas.node().getContext("2d");
 
-            defaults.image.onload = function() {
+            defaults.image.onload = () => {
                 naDisplayCountries(initial.transform);
             };
             defaults.image.src = defaults.imageSrc;
@@ -747,7 +747,7 @@ export default function naDisplay(serverName) {
         }
 
         function setupPorts() {
-            defaults.nations.map(d => d.id).forEach(function(nation) {
+            defaults.nations.map(d => d.id).forEach(nation => {
                 svgDef
                     .append("pattern")
                     .attr("id", nation)
@@ -779,7 +779,7 @@ export default function naDisplay(serverName) {
                         coord: [d.geometry.coordinates[0], d.geometry.coordinates[1]],
                         name: d.properties.name
                     }))
-                    .sort(function(a, b) {
+                    .sort((a, b) => {
                         if (a.name < b.name) {
                             return -1;
                         }
@@ -794,7 +794,7 @@ export default function naDisplay(serverName) {
                         text: "Go to a port"
                     })
                 );
-                selectPorts.forEach(function(port) {
+                selectPorts.forEach(port => {
                     portNames.append(
                         $("<option>", {
                             value: port.coord,
@@ -807,16 +807,16 @@ export default function naDisplay(serverName) {
             function setupGoodSelect() {
                 const goodNames = $("#good-names");
                 let selectGoods = new Map();
-                let goodsPerPort = defaults.portData.map(d => {
+                const goodsPerPort = defaults.portData.map(d => {
                     let goods = d.properties.drops;
                     goods += d.properties.produces ? `,${d.properties.produces}` : "";
                     return {
                         id: d.id,
-                        goods: goods
+                        goods
                     };
                 });
 
-                goodsPerPort.forEach(function(port) {
+                goodsPerPort.forEach(port => {
                     port.goods.split(",").forEach(good => {
                         if (good) {
                             const ports = new Set(selectGoods.get(good)).add(port.id);
@@ -831,8 +831,10 @@ export default function naDisplay(serverName) {
                         text: "Select a good"
                     })
                 );
+                // eslint-disable-next-line no-restricted-syntax
                 for (const [key, portIds] of selectGoods.entries()) {
                     let ids = "";
+                    // eslint-disable-next-line no-restricted-syntax
                     for (const id of portIds) {
                         ids += `,${id}`;
                     }
@@ -856,7 +858,7 @@ export default function naDisplay(serverName) {
             setupPortSelect();
             $("#port-names").on("change", () => {
                 const value = $("#port-names").val();
-                if (0 !== +value) {
+                if (+value !== 0) {
                     goToPort(value);
                 } else {
                     zoomAndPan(d3.zoomIdentity.translate(initial.x, initial.y).scale(initial.scale));
@@ -876,6 +878,45 @@ export default function naDisplay(serverName) {
             });
         }
 
+        function setupClanSelect() {
+            const propClan = $("#prop-clan");
+
+            propClan.empty();
+            propClan.append(
+                $("<option>", {
+                    value: 0,
+                    text: "Select a clan"
+                })
+            );
+
+            const clanList = new Set();
+            current.portData.filter(d => d.properties.capturer).map(d => clanList.add(d.properties.capturer));
+            Array.from(clanList)
+                .sort()
+                .forEach(clan => {
+                    propClan.append(
+                        $("<option>", {
+                            value: clan,
+                            text: clan
+                        })
+                    );
+                });
+        }
+
+        function clanSelect() {
+            const clan = $("#prop-clan").val();
+
+            if (+clan !== 0) {
+                current.portData = defaults.portData.filter(d => clan === d.properties.capturer);
+            } else if (current.nation) {
+                current.portData = defaults.portData.filter(d => current.nation === d.properties.nation);
+            } else {
+                current.portData = defaults.portData;
+            }
+            $("#propertyDropdown").dropdown("toggle");
+            updatePorts();
+        }
+
         function setupPropertyMenu() {
             function setupNationSelect() {
                 const propNation = $("#prop-nation");
@@ -887,7 +928,7 @@ export default function naDisplay(serverName) {
                     })
                 );
                 defaults.nations
-                    .sort(function(a, b) {
+                    .sort((a, b) => {
                         if (a.sortName < b.sortName) {
                             return -1;
                         }
@@ -896,7 +937,7 @@ export default function naDisplay(serverName) {
                         }
                         return 0;
                     })
-                    .forEach(function(nation) {
+                    .forEach(nation => {
                         propNation.append(
                             $("<option>", {
                                 value: nation.id,
@@ -909,7 +950,7 @@ export default function naDisplay(serverName) {
             function nationSelect() {
                 const nationId = $("#prop-nation").val();
 
-                if (0 !== +nationId) {
+                if (+nationId !== 0) {
                     current.nation = nationId;
                     current.portData = defaults.portData.filter(d => nationId === d.properties.nation);
                     setupClanSelect();
@@ -917,47 +958,6 @@ export default function naDisplay(serverName) {
                     current.nation = "";
                     current.portData = defaults.portData;
                     setupClanSelect();
-                }
-                $("#propertyDropdown").dropdown("toggle");
-                updatePorts();
-            }
-
-            function setupClanSelect() {
-                const propClan = $("#prop-clan");
-
-                propClan.empty();
-                propClan.append(
-                    $("<option>", {
-                        value: 0,
-                        text: "Select a clan"
-                    })
-                );
-
-                let clanList = new Set();
-                current.portData.filter(d => d.properties.capturer).map(d => clanList.add(d.properties.capturer));
-                Array.from(clanList)
-                    .sort()
-                    .forEach(function(clan) {
-                        propClan.append(
-                            $("<option>", {
-                                value: clan,
-                                text: clan
-                            })
-                        );
-                    });
-            }
-
-            function clanSelect() {
-                const clan = $("#prop-clan").val();
-
-                if (0 !== +clan) {
-                    current.portData = defaults.portData.filter(d => clan === d.properties.capturer);
-                } else {
-                    if (current.nation) {
-                        current.portData = defaults.portData.filter(d => current.nation === d.properties.nation);
-                    } else {
-                        current.portData = defaults.portData;
-                    }
                 }
                 $("#propertyDropdown").dropdown("toggle");
                 updatePorts();
@@ -1002,11 +1002,11 @@ export default function naDisplay(serverName) {
                         text: "Select amount"
                     })
                 );
-                let cmList = new Set();
+                const cmList = new Set();
                 current.portData
                     .filter(d => d.properties.capturer)
                     .map(d => cmList.add(d.properties.conquestMarksPension));
-                cmList.forEach(function(cm) {
+                cmList.forEach(cm => {
                     propCM.append(
                         $("<option>", {
                             value: cm,
@@ -1017,9 +1017,9 @@ export default function naDisplay(serverName) {
             }
 
             function CMSelect() {
-                const value = parseInt($("#prop-cm").val());
+                const value = parseInt($("#prop-cm").val(), 10);
 
-                if (0 !== value) {
+                if (value !== 0) {
                     current.portData = defaults.portData.filter(d => value === d.properties.conquestMarksPension);
                 } else {
                     current.portData = defaults.portData;
@@ -1129,19 +1129,19 @@ export default function naDisplay(serverName) {
             degreesPerSecond = fullCircle / secondsForFullCircle;
         let currentWindDegrees;
 
-        const regex = /(\d+)[\s:.](\d+)/;
-        let match = regex.exec(predictTime),
-            predictHours = parseInt(match[1]),
-            predictMinutes = parseInt(match[2]);
+        const regex = /(\d+)[\s:.](\d+)/,
+            match = regex.exec(predictTime),
+            predictHours = parseInt(match[1], 10),
+            predictMinutes = parseInt(match[2], 10);
 
         // Set current wind in degrees
-        if (isNaN(currentWind)) {
+        if (Number.isNaN(currentWind)) {
             currentWindDegrees = compassToDegrees(currentWind);
         } else {
             currentWindDegrees = +currentWind;
         }
 
-        let currentDate = moment()
+        const currentDate = moment()
                 .utc()
                 .seconds(0)
                 .milliseconds(0),
@@ -1152,12 +1152,12 @@ export default function naDisplay(serverName) {
             predictDate.add(1, "day");
         }
 
-        let timeDiffInSec = predictDate.diff(currentDate, "seconds");
-        let predictedWindDegrees = Math.abs(currentWindDegrees - degreesPerSecond * timeDiffInSec + 360) % 360;
+        const timeDiffInSec = predictDate.diff(currentDate, "seconds");
+        const predictedWindDegrees = Math.abs(currentWindDegrees - degreesPerSecond * timeDiffInSec + 360) % 360;
 
-        //console.log(`currentWind: ${currentWind} currentWindDegrees: ${currentWindDegrees}`);
-        //console.log(`   currentDate: ${currentDate.format()} predictDate: ${predictDate.format()}`);
-        //console.log(`   predictedWindDegrees: ${predictedWindDegrees} predictTime: ${predictTime}`);
+        // console.log(`currentWind: ${currentWind} currentWindDegrees: ${currentWindDegrees}`);
+        // console.log(`   currentDate: ${currentDate.format()} predictDate: ${predictDate.format()}`);
+        // console.log(`   predictedWindDegrees: ${predictedWindDegrees} predictTime: ${predictTime}`);
         printPredictedWind(predictedWindDegrees, predictDate.format("H.mm"), currentWind, currentDate.format("H.mm"));
     }
 
@@ -1175,7 +1175,7 @@ export default function naDisplay(serverName) {
 
         setup();
         zoomAndPan(initial.transform);
-        //updatePorts(current.portData.filter(d => ["234", "237", "238", "239", "240"].includes(d.id)));
+        // updatePorts(current.portData.filter(d => ["234", "237", "238", "239", "240"].includes(d.id)));
 
         /*
         let predictTime = moment().utc(),
@@ -1210,8 +1210,8 @@ export default function naDisplay(serverName) {
                     }
                 }
             }
-
             const F11String =
+                // eslint-disable-next-line no-nested-ternary
                 e.clipboardData && e.clipboardData.getData
                     ? e.clipboardData.getData("text/plain") // Standard
                     : window.clipboardData && window.clipboardData.getData
@@ -1219,7 +1219,7 @@ export default function naDisplay(serverName) {
                       : false;
 
             // If one of the F11 input elements is in focus
-            if ("x-coord" === document.activeElement.id || "z-coord" === document.activeElement.id) {
+            if (document.activeElement.id === "x-coord" || document.activeElement.id === "z-coord") {
                 // test for number
                 if (!Number.isNaN(+F11String)) {
                     // paste number in input element
@@ -1233,7 +1233,7 @@ export default function naDisplay(serverName) {
             }
         }
 
-        $("#copy-coord").click(function() {
+        $("#copy-coord").click(() => {
             const x = $("#x-coord").val(),
                 z = $("#z-coord").val();
 
@@ -1243,12 +1243,12 @@ export default function naDisplay(serverName) {
             }
         });
 
-        document.addEventListener("paste", function(event) {
+        document.addEventListener("paste", event => {
             pasteF11FromClipboard(event);
             event.preventDefault();
         });
 
-        $("#f11").submit(function(event) {
+        $("#f11").submit(event => {
             const x = $("#x-coord").val(),
                 z = $("#z-coord").val();
             console.log("F11");
@@ -1264,13 +1264,13 @@ export default function naDisplay(serverName) {
             step: 360 / defaults.compassDirections.length,
             cursor: true,
             fgColor: "#917f68", // primary-700
-            draw: function() {
+            draw() {
                 $(this.i).css("class", "knob");
             },
             format: input => degreesToCompass(input)
         });
 
-        $("#windPrediction").submit(function(event) {
+        $("#windPrediction").submit(event => {
             const currentWind = $("#direction")
                     .val()
                     .toUpperCase(),
@@ -1281,11 +1281,11 @@ export default function naDisplay(serverName) {
             event.preventDefault();
         });
 
-        $("#reset").on("click", function() {
+        $("#reset").on("click", () => {
             clearMap();
         });
 
-        $(".radio-group").change(function() {
+        $(".radio-group").change(() => {
             current.radioButton = $("input[name='mouseFunction']:checked").val();
             clearMap();
         });
