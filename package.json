@@ -12,6 +12,7 @@
     "copy-webpack-plugin": "^4.2.3",
     "css-loader": "^0.28.7",
     "eslint": "^4.13.1",
+    "eslint-config-airbnb": "^16.1.0",
     "eslint-config-prettier": "^2.4.0",
     "eslint-plugin-prettier": "^2.2.0",
     "exports-loader": "^0.6.4",
