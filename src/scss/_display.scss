@@ -6,8 +6,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-$in-colour: $primary-900;
-$out-colour: $primary-700;
 $background-colour: $primary-300;
 
 .extralarge-width {
@@ -44,12 +42,8 @@ $background-colour: $primary-300;
   opacity: .8;
 }
 
-.port text {
-  fill: $in-colour;
-}
-
-.port-out {
-  fill: $out-colour;
+text {
+fill: $primary-800;
 }
 
 .port-name {
@@ -150,7 +144,6 @@ text {
 
 .tooltip {
   font-size: smaller;
-  color: $in-colour;
   text-align: left;
   background: $primary;
   box-shadow: 0 14px 28px rgba($primary-900, .25), 0 10px 10px rgba($primary-900, .22);

@@ -27,7 +27,7 @@ export default function naDisplay(serverName) {
         },
         maxScale: 10,
         fontSize: 16,
-        circleSize: 10,
+        circleSize: 30,
         iconSize: 50,
         PBZoneZoomScale: 1.5,
         labelZoomScale: 0.5,
@@ -146,7 +146,7 @@ export default function naDisplay(serverName) {
         naContext.restore();
     }
 
-    function updatePorts(scale = current.transform.scale) {
+    function updatePorts() {
         function naTooltipData(d) {
             let h = `<table><tbody<tr><td><i class="flag-icon ${
                 d.availableForAll ? `${d.nation}a` : d.nation
@@ -221,6 +221,7 @@ export default function naDisplay(serverName) {
                 .tooltip("show");
         }
 
+        const scale = d3.zoomTransform(naSvg).k/2;
         // Data join
         const circleUpdate = mainGPort.selectAll("circle").data(current.portData, d => d.id);
         const textUpdate = mainGPort.selectAll("text").data(current.portData, d => d.id);
@@ -260,8 +261,7 @@ export default function naDisplay(serverName) {
                 .enter()
                 .append("text")
                 .attr("text-anchor", d => (d.properties.dx < 0 ? "end" : "start"))
-                .text(d => d.properties.name)
-                .classed("na-port-out", d => !d.properties.shallow && !d.properties.countyCapital);
+                .text(d => d.properties.name);
             // Apply to both old and new
             textUpdate
                 .merge(textEnter)
@@ -289,6 +289,21 @@ export default function naDisplay(serverName) {
     }
 
     function updateTeleportAreas() {
+        function mouseover(d, i, nodes) {
+            const ref = d3.mouse(nodes[i]),
+                mx = ref[0],
+                my = ref[1];
+
+            // use the new diagram.find() function to find the voronoi site closest to
+            // the mouse, limited by max distance defined by defaults.voronoiRadius
+            const site = defaults.voronoiDiagram.find(mx, my, defaults.voronoiRadius);
+            if (site) {
+                current.highlightId = site.data.id;
+                updateTeleportAreas();
+                updatePorts();
+            }
+        }
+
         // Data join
         const pathUpdate = mainGVoronoi.selectAll("path").data(defaults.voronoiDiagram.polygons(), d => d.data.id);
 
@@ -304,24 +319,7 @@ export default function naDisplay(serverName) {
                 .enter()
                 .append("path")
                 .attr("d", d => (d ? `M${d.join("L")}Z` : null))
-                .on("mouseover", (d, i, nodes) => {
-                    const ref = d3.mouse(nodes[i]),
-                        mx = ref[0],
-                        my = ref[1];
-
-                    // use the new diagram.find() function to find the voronoi site closest to
-                    // the mouse, limited by max distance defined by defaults.voronoiRadius
-                    const site = defaults.voronoiDiagram.find(mx, my, defaults.voronoiRadius);
-                    if (site) {
-                        current.highlightId = site.data.id;
-                        updateTeleportAreas();
-                        updatePorts();
-                    }
-                })
-                .on("mouseout", () => {
-                    updateTeleportAreas();
-                    updatePorts();
-                });
+                .on("mouseover", mouseover);
         } else {
             pathUpdate.remove();
         }
@@ -333,9 +331,6 @@ export default function naDisplay(serverName) {
     }
 
     function zoomAndPan(transformIn) {
-        current.transform.x = transformIn.x;
-        current.transform.y = transformIn.y;
-        current.transform.scale = transformIn.k;
         // eslint-disable-next-line no-param-reassign
         transformIn.x += defaults.width / 2;
         // eslint-disable-next-line no-param-reassign
@@ -547,7 +542,7 @@ export default function naDisplay(serverName) {
     }
 
     function naZoomed() {
-        function configureMap(scale) {
+        function configureMap() {
             function togglePBZones() {
                 if (!mainGPBZone.active) {
                     updatePBZones();
@@ -557,7 +552,7 @@ export default function naDisplay(serverName) {
                 mainGPBZone.active = !mainGPBZone.active;
             }
 
-            if (defaults.PBZoneZoomScale < scale) {
+            if (defaults.PBZoneZoomScale < d3.event.transform.k) {
                 if (!current.bPBZoneDisplayed) {
                     togglePBZones();
                     toggleTeleportAreas();
@@ -569,20 +564,19 @@ export default function naDisplay(serverName) {
                 toggleTeleportAreas();
                 current.bPBZoneDisplayed = false;
             }
-            current.bPortLabelDisplayed = defaults.labelZoomScale < scale;
+            current.bPortLabelDisplayed = defaults.labelZoomScale < d3.event.transform.k;
         }
-        // eslint-disable-next-line prefer-destructuring
-        const transform = d3.event.transform;
-        console.log(`transform: ${JSON.stringify(transform)}`);
 
-        configureMap(transform.k);
-        updatePorts(transform.k);
-        naDisplayCountries(transform);
+        // console.log(`d3.event.transform: ${JSON.stringify(d3.event.transform)}`);
 
-        mainGVoronoi.attr("transform", transform);
-        mainGPort.attr("transform", transform);
-        mainGPBZone.attr("transform", transform);
-        mainGCoord.attr("transform", transform);
+        configureMap();
+        updatePorts();
+        naDisplayCountries(d3.event.transform);
+
+        mainGVoronoi.attr("transform", d3.event.transform);
+        mainGPort.attr("transform", d3.event.transform);
+        mainGPBZone.attr("transform", d3.event.transform);
+        mainGCoord.attr("transform", d3.event.transform);
 
         if (current.bPortLabelDisplayed) {
             if (current.highlightId && !current.bPBZoneDisplayed) {
@@ -631,11 +625,7 @@ export default function naDisplay(serverName) {
             );
             defaults.dataWidth = defaults.xExtent[1] - defaults.xExtent[0];
             defaults.dataHeight = defaults.yExtent[1] - defaults.yExtent[0];
-            // defaults.dataWidth = defaults.coord.max;
-            // defaults.dataHeight = defaults.coord.max;
 
-            console.log(defaults.xExtent);
-            console.log(defaults.yExtent);
             defaults.path = d3
                 .geoPath()
                 .projection(
@@ -1045,7 +1035,7 @@ export default function naDisplay(serverName) {
         moment.locale("en-gb");
     }
 
-    function predictWind(currentWind, predictTime) {
+    function predictWind(currentUserWind, predictUserTime) {
         function compassToDegrees(compass) {
             const degree = 360 / defaults.compassDirections.length;
             return defaults.compassDirections.indexOf(compass) * degree;
@@ -1054,7 +1044,6 @@ export default function naDisplay(serverName) {
         function printPredictedWind(predictedWindDegrees, predictTime, currentWind, currentTime) {
             function printWindLine(x, dx, y, dy, degrees) {
                 const compass = degreesToCompass(degrees);
-
                 current.lineData.push([x + dx / 2, y + dy / 2]);
                 current.lineData.push([x - dx / 2, y - dy / 2]);
 
@@ -1105,6 +1094,12 @@ export default function naDisplay(serverName) {
                 dx = length * Math.cos(radians),
                 dy = length * Math.sin(radians);
 
+            console.log("transform.scale(2) %O", d3.event.transform.scale(2));
+            console.log("transform.applyX(8000) %O", d3.event.transform.applyX(8000));
+            console.log("transform.invertX(8000) %O", d3.event.transform.invertX(1000));
+
+            console.log("current.transform %O", current.transform);
+            console.log("x %d  y %d", x, y);
             clearMap();
             plotCourse(xCompass, yCompass, "wind");
             printWindLine(xCompass, dx, yCompass, dy, predictedWindDegrees);
@@ -1117,15 +1112,15 @@ export default function naDisplay(serverName) {
         let currentWindDegrees;
 
         const regex = /(\d+)[\s:.](\d+)/,
-            match = regex.exec(predictTime),
+            match = regex.exec(predictUserTime),
             predictHours = parseInt(match[1], 10),
             predictMinutes = parseInt(match[2], 10);
 
         // Set current wind in degrees
-        if (Number.isNaN(currentWind)) {
-            currentWindDegrees = compassToDegrees(currentWind);
+        if (Number.isNaN(Number(currentUserWind))) {
+            currentWindDegrees = compassToDegrees(currentUserWind);
         } else {
-            currentWindDegrees = +currentWind;
+            currentWindDegrees = +currentUserWind;
         }
 
         const currentDate = moment()
@@ -1142,10 +1137,15 @@ export default function naDisplay(serverName) {
         const timeDiffInSec = predictDate.diff(currentDate, "seconds");
         const predictedWindDegrees = Math.abs(currentWindDegrees - degreesPerSecond * timeDiffInSec + 360) % 360;
 
-        // console.log(`currentWind: ${currentWind} currentWindDegrees: ${currentWindDegrees}`);
+        // console.log(`currentUserWind: ${currentUserWind} currentWindDegrees: ${currentWindDegrees}`);
         // console.log(`   currentDate: ${currentDate.format()} predictDate: ${predictDate.format()}`);
-        // console.log(`   predictedWindDegrees: ${predictedWindDegrees} predictTime: ${predictTime}`);
-        printPredictedWind(predictedWindDegrees, predictDate.format("H.mm"), currentWind, currentDate.format("H.mm"));
+        // console.log(`   predictedWindDegrees: ${predictedWindDegrees} predictUserTime: ${predictUserTime}`);
+        printPredictedWind(
+            predictedWindDegrees,
+            predictDate.format("H.mm"),
+            currentUserWind,
+            currentDate.format("H.mm")
+        );
     }
 
     function naReady(error, naMap, pbZones) {
