@@ -17,19 +17,7 @@ import "bootstrap/js/dist/tooltip";
 import "bootstrap/js/dist/util";
 
 export default function naDisplay(serverName) {
-    let naSvg,
-        naCanvas,
-        naContext,
-        svgDef,
-        naZoom,
-        mainGPort,
-        mainGPBZone,
-        mainGVoronoi,
-        mainGCoord,
-        gCompass,
-        naVoronoiDiagram,
-        pathVoronoi,
-        naTeleportPorts;
+    let naSvg, naCanvas, naContext, svgDef, naZoom, mainGPort, mainGPBZone, mainGVoronoi, mainGCoord, gCompass;
 
     const defaults = {
         margin: { top: parseInt($(".navbar").css("height"), 10), right: 20, bottom: 20, left: 20 },
@@ -113,7 +101,7 @@ export default function naDisplay(serverName) {
         [defaults.coord.max + 1, defaults.coord.max + 1]
     ];
     // limit how far away the mouse can be from finding a voronoi site
-    defaults.voronoiRadius = Math.min(defaults.height, defaults.width);
+    defaults.voronoiRadius = Math.max(defaults.height, defaults.width);
 
     const current = {
         transform: { x: initial.x, y: initial.y, scale: initial.scale },
@@ -156,82 +144,6 @@ export default function naDisplay(serverName) {
         naContext.scale(transform.k, transform.k);
         drawImage();
         naContext.restore();
-    }
-
-    function naVoronoiHighlight() {
-        mainGVoronoi.selectAll("path").attr("class", function() {
-            return d3.select(this).attr("id") === `v${current.highlightId}` ? "highlight-voronoi" : "";
-        });
-        mainGPort
-            .selectAll("circle")
-            .attr("r", d => (d.id === current.highlightId ? current.circleSize * 3 : current.circleSize));
-        if (current.bPortLabelDisplayed) {
-            mainGPort
-                .selectAll("text")
-                .attr("dx", d => (d.id === current.highlightId ? d.properties.dx * 3 : d.properties.dx))
-                .attr("dy", d => (d.id === current.highlightId ? d.properties.dy * 3 : d.properties.dy))
-                .style(
-                    "font-size",
-                    d => (d.id === current.highlightId ? `${current.fontSize * 2}px` : `${current.fontSize}px`)
-                );
-        }
-    }
-
-    function setupTeleportAreas() {
-        // Extract port coordinates
-        naTeleportPorts = defaults.portData
-            // Use only ports that deep water ports and not a county capital
-            .filter(d => !d.properties.shallow && !d.properties.countyCapital)
-            // Map to coordinates array
-            .map(d => ({
-                id: d.id,
-                coord: { x: d.geometry.coordinates[0], y: d.geometry.coordinates[1] }
-            }));
-
-        pathVoronoi = mainGVoronoi
-            .selectAll(".voronoi")
-            .data(naTeleportPorts)
-            .enter()
-            .append("path")
-            .attr("id", d => `v${d.id}`);
-
-        naVoronoiDiagram = d3
-            .voronoi()
-            .extent(defaults.coord.voronoi)
-            .x(d => d.coord.x)
-            .y(d => d.coord.y)(naTeleportPorts);
-
-        // Draw teleport areas
-        pathVoronoi
-            .data(naVoronoiDiagram.polygons())
-            .attr("d", d => (d ? `M${d.join("L")}Z` : null))
-            .on("mouseover", function() {
-                const ref = d3.mouse(this),
-                    mx = ref[0],
-                    my = ref[1];
-
-                // use the new diagram.find() function to find the voronoi site closest to
-                // the mouse, limited by max distance defined by defaults.voronoiRadius
-                const site = naVoronoiDiagram.find(mx, my, defaults.voronoiRadius);
-                if (site) {
-                    current.highlightId = site.data.id;
-                    naVoronoiHighlight();
-                }
-            })
-            .on("mouseout", () => {
-                naVoronoiHighlight();
-            });
-    }
-
-    function toggleDisplayTeleportAreas() {
-        if (!mainGVoronoi.active) {
-            setupTeleportAreas();
-            mainGVoronoi.active = true;
-        } else {
-            mainGVoronoi.remove();
-            mainGVoronoi = naSvg.append("g").attr("class", "voronoi");
-            mainGVoronoi.active = false;
-        }
     }
 
     function updatePorts(scale = current.transform.scale) {
@@ -296,9 +208,6 @@ export default function naDisplay(serverName) {
         }
 
         function portMouseover(d) {
-            if (current.highlightId) {
-                naVoronoiHighlight();
-            }
             d3
                 .select(this)
                 .attr("data-toggle", "tooltip")
@@ -313,27 +222,20 @@ export default function naDisplay(serverName) {
         }
 
         // Data join
-        const circle = mainGPort.selectAll("circle").data(current.portData, d => d.id);
-        const text = mainGPort.selectAll("text").data(current.portData, d => d.id);
+        const circleUpdate = mainGPort.selectAll("circle").data(current.portData, d => d.id);
+        const textUpdate = mainGPort.selectAll("text").data(current.portData, d => d.id);
 
         // Remove old circles
-        circle.exit().remove();
+        circleUpdate.exit().remove();
         // Remove old text
-        text.exit().remove();
+        textUpdate.exit().remove();
 
         // Update kept circles
-        current.circleSize = defaults.circleSize / scale;
-        circle.attr("r", current.circleSize);
-        // Update kept texts
-        if (current.bPortLabelDisplayed) {
-            current.fontSize = defaults.fontSize / scale;
-            text.style("font-size", current.fontSize);
-        } else {
-            text.remove();
-        }
+        // circleUpdate;
+        // textUpdate;
 
         // Add new circles
-        circle
+        const circleEnter = circleUpdate
             .enter()
             .append("circle")
             .attr("id", d => `c${d.id}`)
@@ -346,20 +248,89 @@ export default function naDisplay(serverName) {
             )
             .on("mouseover", portMouseover);
 
-        // Add new texts
+        // Apply to both old and new
+        current.circleSize = defaults.circleSize / scale;
+        circleUpdate
+            .merge(circleEnter)
+            .attr("r", d => (d.id === current.highlightId ? current.circleSize * 3 : current.circleSize));
+
         if (current.bPortLabelDisplayed) {
-            text
+            current.fontSize = defaults.fontSize / scale;
+            // Add new texts
+            const textEnter = textUpdate
                 .enter()
                 .append("text")
-                .attr("x", d => d.geometry.coordinates[0] - d.properties.dx)
-                .attr("y", d => d.geometry.coordinates[1] + d.properties.dy)
                 .attr("text-anchor", d => (d.properties.dx < 0 ? "end" : "start"))
                 .text(d => d.properties.name)
+                .classed("na-port-out", d => !d.properties.shallow && !d.properties.countyCapital);
+            // Apply to both old and new
+            textUpdate
+                .merge(textEnter)
                 .attr(
-                    "class",
-                    d => (!d.properties.shallow && !d.properties.countyCapital ? "na-port-in" : "na-port-out")
+                    "x",
+                    d =>
+                        d.id === current.highlightId
+                            ? d.geometry.coordinates[0] - d.properties.dx * 3
+                            : d.geometry.coordinates[0] - d.properties.dx
+                )
+                .attr(
+                    "y",
+                    d =>
+                        d.id === current.highlightId
+                            ? d.geometry.coordinates[1] + d.properties.dy * 3
+                            : d.geometry.coordinates[1] + d.properties.dy
+                )
+                .style(
+                    "font-size",
+                    d => (d.id === current.highlightId ? `${current.fontSize * 2}px` : `${current.fontSize}px`)
                 );
+        } else {
+            textUpdate.remove();
         }
+    }
+
+    function updateTeleportAreas() {
+        // Data join
+        const pathUpdate = mainGVoronoi.selectAll("path").data(defaults.voronoiDiagram.polygons(), d => d.data.id);
+
+        // Remove old paths
+        // pathUpdate.exit().remove(); // not needed
+
+        if (mainGVoronoi.active) {
+            // Update kept paths
+            pathUpdate.classed("highlight-voronoi", d => d.data.id === current.highlightId);
+
+            // Add new paths (teleport areas)
+            pathUpdate
+                .enter()
+                .append("path")
+                .attr("d", d => (d ? `M${d.join("L")}Z` : null))
+                .on("mouseover", () => {
+                    const ref = d3.mouse(d3.event.target),
+                        mx = ref[0],
+                        my = ref[1];
+
+                    // use the new diagram.find() function to find the voronoi site closest to
+                    // the mouse, limited by max distance defined by defaults.voronoiRadius
+                    const site = defaults.voronoiDiagram.find(mx, my, defaults.voronoiRadius);
+                    if (site) {
+                        current.highlightId = site.data.id;
+                        updateTeleportAreas();
+                        updatePorts();
+                    }
+                })
+                .on("mouseout", () => {
+                    updateTeleportAreas();
+                    updatePorts();
+                });
+        } else {
+            pathUpdate.remove();
+        }
+    }
+
+    function toggleDisplayTeleportAreas() {
+        mainGVoronoi.active = !mainGVoronoi.active;
+        updateTeleportAreas();
     }
 
     function zoomAndPan(transformIn) {
@@ -588,6 +559,8 @@ export default function naDisplay(serverName) {
                     mainGPBZone = naSvg.append("g").attr("class", "pb");
                     mainGPBZone.active = false;
                 }
+//                mainGPBZone.active = !mainGPBZone.active;
+
             }
 
             if (defaults.PBZoneZoomScale < scale) {
@@ -619,7 +592,7 @@ export default function naDisplay(serverName) {
 
         if (current.bPortLabelDisplayed) {
             if (current.highlightId && !current.bPBZoneDisplayed) {
-                naVoronoiHighlight();
+                // naVoronoiHighlight();
             }
         }
     }
@@ -769,6 +742,26 @@ export default function naDisplay(serverName) {
                     .attr("width", defaults.iconSize)
                     .attr("href", `icons/${nation}a.svg`);
             });
+        }
+
+        function setupTeleportAreas() {
+            // Extract port coordinates
+            const teleportPorts = defaults.portData
+                // Use only ports that deep water ports and not a county capital
+                .filter(d => !d.properties.shallow && !d.properties.countyCapital)
+                // Map to coordinates array
+                .map(d => ({
+                    id: d.id,
+                    coord: { x: d.geometry.coordinates[0], y: d.geometry.coordinates[1] }
+                }));
+
+            defaults.voronoiDiagram = d3
+                .voronoi()
+                .extent(defaults.coord.voronoi)
+                .x(d => d.coord.x)
+                .y(d => d.coord.y)(teleportPorts);
+
+            toggleDisplayTeleportAreas();
         }
 
         function setupSelects() {
@@ -1052,7 +1045,7 @@ export default function naDisplay(serverName) {
         setupCanvas();
         setupSvg();
         setupPorts();
-        toggleDisplayTeleportAreas();
+        setupTeleportAreas();
         setupSelects();
         setupPropertyMenu();
         moment.locale("en-gb");
