@@ -328,7 +328,7 @@ export default function naDisplay(serverName) {
         }
     }
 
-    function toggleDisplayTeleportAreas() {
+    function toggleTeleportAreas() {
         mainGVoronoi.active = !mainGVoronoi.active;
         updateTeleportAreas();
     }
@@ -346,8 +346,7 @@ export default function naDisplay(serverName) {
     }
 
     function clearMap() {
-        mainGCoord.remove();
-        mainGCoord = naSvg.append("g").attr("class", "coord");
+        mainGCoord.selectAll("*").remove();
         current.bFirstCoord = true;
         current.lineData.splice(0, current.lineData.length);
         current.portData = defaults.portData;
@@ -528,7 +527,7 @@ export default function naDisplay(serverName) {
         zoomAndPan(d3.zoomIdentity.translate(-x, -y).scale(1));
     }
 
-    function setupPBZones() {
+    function updatePBZones() {
         mainGPBZone
             .append("path")
             .datum(defaults.PBZoneData)
@@ -550,29 +549,26 @@ export default function naDisplay(serverName) {
 
     function naZoomed() {
         function configureMap(scale) {
-            function naTogglePBZones() {
+            function togglePBZones() {
                 if (!mainGPBZone.active) {
-                    setupPBZones();
-                    mainGPBZone.active = true;
+                    updatePBZones();
                 } else {
-                    mainGPBZone.remove();
-                    mainGPBZone = naSvg.append("g").attr("class", "pb");
-                    mainGPBZone.active = false;
+                    mainGPBZone.selectAll("path").remove();
                 }
-//                mainGPBZone.active = !mainGPBZone.active;
+                mainGPBZone.active = !mainGPBZone.active;
 
             }
 
             if (defaults.PBZoneZoomScale < scale) {
                 if (!current.bPBZoneDisplayed) {
-                    naTogglePBZones();
-                    toggleDisplayTeleportAreas();
+                    togglePBZones();
+                    toggleTeleportAreas();
                     current.highlightId = null;
                     current.bPBZoneDisplayed = true;
                 }
             } else if (current.bPBZoneDisplayed) {
-                naTogglePBZones();
-                toggleDisplayTeleportAreas();
+                togglePBZones();
+                toggleTeleportAreas();
                 current.bPBZoneDisplayed = false;
             }
             current.bPortLabelDisplayed = defaults.labelZoomScale < scale;
@@ -761,7 +757,7 @@ export default function naDisplay(serverName) {
                 .x(d => d.coord.x)
                 .y(d => d.coord.y)(teleportPorts);
 
-            toggleDisplayTeleportAreas();
+            toggleTeleportAreas();
         }
 
         function setupSelects() {
