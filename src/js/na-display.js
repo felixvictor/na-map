@@ -207,12 +207,12 @@ export default function naDisplay(serverName) {
             return h;
         }
 
-        function portMouseover(d) {
-            d3
-                .select(this)
-                .attr("data-toggle", "tooltip")
-                .attr("title", () => naTooltipData(d.properties));
-            $(`#c${d.id}`)
+        function portMouseover(d, i, nodes) {
+            const port = d3.select(nodes[i]);
+
+            port.attr("data-toggle", "tooltip").attr("title", () => naTooltipData(d.properties));
+            // eslint-disable-next-line no-underscore-dangle
+            $(port._groups[0])
                 .tooltip({
                     delay: { show: defaults.highlightDuration, hide: defaults.highlightDuration },
                     html: true,
@@ -238,7 +238,6 @@ export default function naDisplay(serverName) {
         const circleEnter = circleUpdate
             .enter()
             .append("circle")
-            .attr("id", d => `c${d.id}`)
             .attr("cx", d => d.geometry.coordinates[0])
             .attr("cy", d => d.geometry.coordinates[1])
             .attr("r", current.circleSize)
@@ -305,8 +304,8 @@ export default function naDisplay(serverName) {
                 .enter()
                 .append("path")
                 .attr("d", d => (d ? `M${d.join("L")}Z` : null))
-                .on("mouseover", () => {
-                    const ref = d3.mouse(d3.event.target),
+                .on("mouseover", (d, i, nodes) => {
+                    const ref = d3.mouse(nodes[i]),
                         mx = ref[0],
                         my = ref[1];
 
@@ -556,7 +555,6 @@ export default function naDisplay(serverName) {
                     mainGPBZone.selectAll("path").remove();
                 }
                 mainGPBZone.active = !mainGPBZone.active;
-
             }
 
             if (defaults.PBZoneZoomScale < scale) {
