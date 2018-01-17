@@ -19,6 +19,7 @@ const babelOpt = {
         [
             "@babel/env",
             {
+                //debug: true,
                 exclude: ["transform-typeof-symbol"],
                 loose: true,
                 modules: false,
