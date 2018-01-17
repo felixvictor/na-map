@@ -4,30 +4,24 @@ const inBaseFilename = process.argv[2],
     outFilename = process.argv[3],
     date = process.argv[4];
 
-let APIItems = JSON.parse(fs.readFileSync(`${inBaseFilename}-ItemTemplates-${date}.json`, "utf8"));
-let ItemNames = new Map();
+const APIItems = JSON.parse(fs.readFileSync(`${inBaseFilename}-ItemTemplates-${date}.json`, "utf8")),;
 
 function saveJson(data) {
-    fs.writeFile(outFilename, JSON.stringify(data), "utf8", function(err) {
+    // eslint-disable-next-line consistent-return
+    fs.writeFile(outFilename, JSON.stringify(data), "utf8", err => {
         if (err) {
             return console.log(err);
         }
     });
 }
 
-function getItemNames() {
-    APIItems.filter(item => item.ItemType === "Material" || item.ItemType === "Resource").map(item => {
-        ItemNames.set(item.Id, item.Name);
-    });
-}
-
 function convertShips() {
-    let geoJson = {};
+    const geoJson = {};
     geoJson.shipData = [];
 
-    APIItems.filter(item => item.ItemType === "Ship").map(ship => {
-        let calcPortSpeed = ship.Specs.MaxSpeed * 0.076752029372859 - 0.007759512279223;
-        let speedDegrees = ship.Specs.SpeedToWind.map(d => d * calcPortSpeed);
+    APIItems.filter(item => item.ItemType === "Ship").forEach(ship => {
+        const calcPortSpeed = ship.Specs.MaxSpeed * 0.076752029372859 - 0.007759512279223,
+            speedDegrees = ship.Specs.SpeedToWind.map(d => d * calcPortSpeed);
 
         const length = ship.Specs.SpeedToWind.length;
         // Elemente kopieren
@@ -39,7 +33,7 @@ function convertShips() {
         // Dann letztes Element löschen
         speedDegrees.pop();
 
-        let shipData = {
+        const shipData = {
             id: ship.Id,
             name: ship.Name.replace("'", "’"),
             class: ship.Class,
@@ -52,10 +46,11 @@ function convertShips() {
             minCrewRequired: ship.MinCrewRequired,
             minSpeed: speedDegrees.reduce((a, b) => Math.min(a, b)),
             maxSpeed: speedDegrees.reduce((a, b) => Math.max(a, b)),
-            speedDegrees: speedDegrees
+            speedDegrees
         };
         geoJson.shipData.push(shipData);
     });
+
     geoJson.shipData.sort((a, b) => {
         if (a.class < b.class) {
             return -1;
@@ -71,6 +66,7 @@ function convertShips() {
         }
         return 0;
     });
+
     saveJson(geoJson);
 }
 
