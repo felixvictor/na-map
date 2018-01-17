@@ -43,7 +43,7 @@ $background-colour: $primary-300;
 }
 
 text {
-fill: $primary-800;
+  fill: $primary-800;
 }
 
 .port-name {
@@ -128,12 +128,13 @@ text {
   stroke: $primary-900 !important;
 }
 
-.wind, .wind-text {
-  font-size: .3em !important;
+.wind,
+.wind-text {
+  font-size: .5em !important;
 }
 
 .wind-text-current {
-  font-size: .25em !important;
+  font-size: .4em !important;
 }
 
 .dial {

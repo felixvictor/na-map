@@ -337,14 +337,11 @@ export default function naDisplay(serverName) {
         naSvg.call(naZoom.scaleTo, defaults.minScale);
     }
 
-    function zoomAndPan(transformIn) {
-        // eslint-disable-next-line no-param-reassign
-        transformIn.x += defaults.width / 2;
-        // eslint-disable-next-line no-param-reassign
-        transformIn.y += defaults.height / 2;
-
-        //        naSvg.call(naZoom.transform, transformIn);
-        naZoom.translateTo(naSvg, 4000, 4500);
+    function zoomAndPan(x, y, scale) {
+        const transform = d3.zoomIdentity
+            .scale(scale)
+            .translate(-x + defaults.width / 2 / scale, -y + defaults.height / 2 / scale);
+        naSvg.call(naZoom.transform, transform);
     }
 
     function clearMap() {
@@ -418,6 +415,8 @@ export default function naDisplay(serverName) {
         }
 
         current.lineData.push([x, y]);
+        //        console.log(x, y);
+        //        console.log(current.lineData);
         if (current.bFirstCoord) {
             printCompass(x, y, style);
             current.bFirstCoord = !current.bFirstCoord;
@@ -475,7 +474,7 @@ export default function naDisplay(serverName) {
             } else {
                 plotCourse(x, y);
             }
-            zoomAndPan(d3.zoomIdentity.translate(-x, -y).scale(1));
+            zoomAndPan(x, y, 1);
         }
     }
 
@@ -526,7 +525,7 @@ export default function naDisplay(serverName) {
             plotCourse(x, y);
         }
 
-        zoomAndPan(d3.zoomIdentity.translate(-x, -y).scale(1));
+        zoomAndPan(x, y, 1);
     }
 
     function updatePBZones() {
@@ -581,7 +580,7 @@ export default function naDisplay(serverName) {
         }
 
         updateMap();
-        // console.log(`d3.event.transform: ${JSON.stringify(d3.event.transform)}`);
+        //console.log(`zoomed d3.event.transform: ${JSON.stringify(d3.event.transform)}`);
         displayCountries(d3.event.transform);
 
         mainGVoronoi.attr("transform", d3.event.transform);
@@ -840,17 +839,17 @@ export default function naDisplay(serverName) {
 
             function goToPort(coord) {
                 const c = coord.split(","),
-                    x = c[0],
-                    y = c[1];
+                    x = +c[0],
+                    y = +c[1];
 
-                zoomAndPan(d3.zoomIdentity.translate(-x, -y).scale(2));
+                current.portCoord = [x,y];
+                zoomAndPan(x, y, 2);
             }
 
             setupPortSelect();
             $("#port-names").on("change", () => {
                 const value = $("#port-names").val();
                 if (value !== 0) {
-                    current.portCoord = value;
                     goToPort(value);
                 } else {
                     current.portCoord = defaults.portCoord;
@@ -1058,10 +1057,23 @@ export default function naDisplay(serverName) {
         }
 
         function printPredictedWind(predictedWindDegrees, predictTime, currentWind, currentTime) {
-            function printWindLine(x, dx, y, dy, degrees) {
-                const compass = degreesToCompass(degrees);
-                current.lineData.push([x + dx / 2, y + dy / 2]);
-                current.lineData.push([x - dx / 2, y - dy / 2]);
+            const targetScale = 2,
+                x = current.portCoord[0],
+                y = current.portCoord[1],
+                xCompass = x - defaults.width / 8 / targetScale,
+                yCompass = y - defaults.height / 8 / targetScale;
+
+            function printWindLine() {
+                const length = 40,
+                    radians = Math.PI / 180 * (predictedWindDegrees - 90),
+                    dx = length * Math.cos(radians),
+                    dy = length * Math.sin(radians),
+                    compass = degreesToCompass(predictedWindDegrees),
+                    compassSize = 30;
+
+                current.lineData = [];
+                current.lineData.push([Math.round(xCompass + dx / 2), Math.round(yCompass + dy / 2)]);
+                current.lineData.push([Math.round(xCompass - dx / 2), Math.round(yCompass - dy / 2)]);
 
                 gCompass
                     .datum(current.lineData)
@@ -1085,39 +1097,24 @@ export default function naDisplay(serverName) {
                     .text(`Currently at ${currentTime} from ${currentWind}`);
                 const bbox1 = text1.node().getBoundingClientRect(),
                     bbox2 = text2.node().getBoundingClientRect(),
-                    height = Math.max(bbox1.height, bbox2.height) * 2 + defaults.fontSize,
-                    width = Math.max(bbox1.width, bbox2.width) + defaults.fontSize;
+                    height = (Math.max(bbox1.height, bbox2.height) * 2 + defaults.fontSize.portLabel) / targetScale,
+                    width = (Math.max(bbox1.width, bbox2.width) + defaults.fontSize.portLabel) / targetScale;
                 svg
-                    .attr("x", x - width / 2)
-                    .attr("y", y + 20)
+                    .attr("x", xCompass - width / 2)
+                    .attr("y", yCompass + 20)
                     .attr("height", height)
                     .attr("width", width);
                 rect
-                    .attr("x", x - width / 2)
-                    .attr("y", y - 20 - defaults.fontSize / 2)
-                    .attr("height", height + 40 + defaults.fontSize)
+                    .attr("x", xCompass - width / 2)
+                    .attr("y", yCompass + 20 - (height + compassSize))
+                    .attr("height", height + compassSize * 2)
                     .attr("width", width);
             }
 
-            const targetScale = 4,
-                x = current.portCoord[0],
-                xCompass = -x - defaults.width / 25,
-                y = current.portCoord[1],
-                yCompass = -y - defaults.height / 25,
-                length = 40,
-                radians = Math.PI / 180 * (predictedWindDegrees - 90),
-                dx = length * Math.cos(radians),
-                dy = length * Math.sin(radians);
-
-            // console.log("transform.scale(2) %O", d3.event.transform.scale(2));
-            // console.log("transform.applyX(8000) %O", d3.event.transform.applyX(8000));
-            // console.log("transform.invertX(8000) %O", d3.event.transform.invertX(1000));
-
-            console.log("x %d  y %d", x, y);
             clearMap();
-            zoomAndPan(d3.zoomIdentity.translate(-x, -y).scale(targetScale));
-            plotCourse(xCompass, yCompass, "wind");
-            printWindLine(xCompass, dx, yCompass, dy, predictedWindDegrees);
+            zoomAndPan(x, y, targetScale);
+            plotCourse(xCompass, yCompass, targetScale, "wind");
+            printWindLine();
         }
 
         const secondsForFullCircle = 48 * 60,
@@ -1175,6 +1172,7 @@ export default function naDisplay(serverName) {
         defaults.towerData = topojsonFeature(pbZonesJsonData, pbZonesJsonData.objects.towers);
 
         setup();
+
         // updatePorts(current.portData.filter(d => ["234", "237", "238", "239", "240"].includes(d.id)));
 
         /*
