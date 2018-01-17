@@ -17,7 +17,19 @@ import "bootstrap/js/dist/tooltip";
 import "bootstrap/js/dist/util";
 
 export default function naDisplay(serverName) {
-    let naSvg, naCanvas, naContext, svgDef, naZoom, mainGPort, mainGPBZone, mainGVoronoi, mainGCoord, gCompass;
+    let naSvg,
+        naCanvas,
+        naContext,
+        svgDef,
+        naZoom,
+        mainGPort,
+        mainGPBZone,
+        pbZones,
+        towers,
+        forts,
+        mainGVoronoi,
+        mainGCoord,
+        gCompass;
 
     const defaults = {
         margin: { top: parseInt($(".navbar").css("height"), 10), right: 20, bottom: 20, left: 20 },
@@ -26,8 +38,8 @@ export default function naDisplay(serverName) {
             max: 8192
         },
         maxScale: 10,
-        fontSize: 16,
-        circleSize: 30,
+        fontSize: { initial: 30, portLabel: 30, pbZone: 12 },
+        circleSize: { initial: 50, portLabel: 20, pbZone: 6 },
         iconSize: 50,
         PBZoneZoomScale: 1.5,
         labelZoomScale: 0.5,
@@ -105,11 +117,8 @@ export default function naDisplay(serverName) {
 
     const current = {
         transform: { x: initial.x, y: initial.y, scale: initial.scale },
-        fontSize: defaults.fontSize,
-        circleSize: defaults.circleSize,
-        highlightId: null,
-        bPBZoneDisplayed: false,
-        bPortLabelDisplayed: true,
+        fontSize: defaults.fontSize.initial,
+        circleSize: defaults.circleSize.initial,
         bFirstCoord: true,
         radioButton: "compass",
         lineData: [],
@@ -132,7 +141,7 @@ export default function naDisplay(serverName) {
         return defaults.compassDirections[val % 16];
     }
 
-    function naDisplayCountries(transform) {
+    function displayCountries(transform) {
         function drawImage() {
             naContext.drawImage(defaults.image, 0, 0);
             naContext.getImageData(0, 0, defaults.width, defaults.height);
@@ -147,145 +156,139 @@ export default function naDisplay(serverName) {
     }
 
     function updatePorts() {
-        function naTooltipData(d) {
-            let h = `<table><tbody<tr><td><i class="flag-icon ${
-                d.availableForAll ? `${d.nation}a` : d.nation
-            }"></i></td>`;
-            h += `<td><span class="port-name">${d.name}</span>`;
-            h += d.availableForAll ? " (accessible to all nations)" : "";
-            h += "</td></tr></tbody></table>";
-            h += `<p>${d.shallow ? "Shallow" : "Deep"}`;
-            h += " water port";
-            if (d.countyCapital) {
-                h += " (county capital)";
-            }
-            if (d.capturer) {
-                h += ` captured by ${d.capturer} ${moment(d.lastPortBattle).fromNow()}`;
-            }
-            h += "<br>";
-            if (!d.nonCapturable) {
-                const pbTimeRange = !d.portBattleStartTime
-                    ? "11.00\u202f–\u202f8.00"
-                    : `${(d.portBattleStartTime + 10) % 24}.00\u202f–\u202f${(d.portBattleStartTime + 13) % 24}.00`;
-                h += `Port battle ${pbTimeRange}, ${thousandsWithBlanks(d.brLimit)} BR, `;
-                switch (d.portBattleType) {
-                    case "Large":
-                        h += "1<sup>st</sup>";
-                        break;
-                    case "Medium":
-                        h += "4<sup>th</sup>";
-                        break;
-                    default:
-                        h += "6<sup>th</sup>";
-                        break;
+        function updateCircles() {
+            function naTooltipData(d) {
+                let h = `<table><tbody<tr><td><i class="flag-icon ${
+                    d.availableForAll ? `${d.nation}a` : d.nation
+                }"></i></td>`;
+                h += `<td><span class="port-name">${d.name}</span>`;
+                h += d.availableForAll ? " (accessible to all nations)" : "";
+                h += "</td></tr></tbody></table>";
+                h += `<p>${d.shallow ? "Shallow" : "Deep"}`;
+                h += " water port";
+                if (d.countyCapital) {
+                    h += " (county capital)";
                 }
+                if (d.capturer) {
+                    h += ` captured by ${d.capturer} ${moment(d.lastPortBattle).fromNow()}`;
+                }
+                h += "<br>";
+                if (!d.nonCapturable) {
+                    const pbTimeRange = !d.portBattleStartTime
+                        ? "11.00\u202f–\u202f8.00"
+                        : `${(d.portBattleStartTime + 10) % 24}.00\u202f–\u202f${(d.portBattleStartTime + 13) % 24}.00`;
+                    h += `Port battle ${pbTimeRange}, ${thousandsWithBlanks(d.brLimit)} BR, `;
+                    switch (d.portBattleType) {
+                        case "Large":
+                            h += "1<sup>st</sup>";
+                            break;
+                        case "Medium":
+                            h += "4<sup>th</sup>";
+                            break;
+                        default:
+                            h += "6<sup>th</sup>";
+                            break;
+                    }
 
-                h += "\u202frate AI";
-                h += `, ${d.conquestMarksPension}\u202fconquest point`;
-                h += d.conquestMarksPension > 1 ? "s" : "";
-                h += `<br>Tax income ${thousandsWithBlanks(d.taxIncome)} (${d.portTax *
-                    100}\u202f%), net income ${formatCoord(d.netIncome)}`;
-                h += d.tradingCompany ? `, trading company level\u202f${d.tradingCompany}` : "";
-                h += d.laborHoursDiscount ? ", labor hours discount" : "";
-            } else {
-                h += "Not capturable";
-                h += `<br>${d.portTax * 100}\u2009% tax`;
-            }
-            h += "</p>";
-            h += "<table class='table table-sm'>";
-            if (d.produces.length) {
-                h += `<tr><td>Produces</td><td>${d.produces.join(", ")}</td></tr>`;
-            }
-            if (d.drops.length) {
-                h += `<tr><td>Drops</td><td>${d.drops.join(", ")}</tr>`;
-            }
-            if (d.consumes.length) {
-                h += `<tr><td>Consumes</td><td>${d.consumes.join(", ")}</tr>`;
-            }
-            h += "</table>";
+                    h += "\u202frate AI";
+                    h += `, ${d.conquestMarksPension}\u202fconquest point`;
+                    h += d.conquestMarksPension > 1 ? "s" : "";
+                    h += `<br>Tax income ${thousandsWithBlanks(d.taxIncome)} (${d.portTax *
+                        100}\u202f%), net income ${formatCoord(d.netIncome)}`;
+                    h += d.tradingCompany ? `, trading company level\u202f${d.tradingCompany}` : "";
+                    h += d.laborHoursDiscount ? ", labor hours discount" : "";
+                } else {
+                    h += "Not capturable";
+                    h += `<br>${d.portTax * 100}\u2009% tax`;
+                }
+                h += "</p>";
+                h += "<table class='table table-sm'>";
+                if (d.produces.length) {
+                    h += `<tr><td>Produces</td><td>${d.produces.join(", ")}</td></tr>`;
+                }
+                if (d.drops.length) {
+                    h += `<tr><td>Drops</td><td>${d.drops.join(", ")}</tr>`;
+                }
+                if (d.consumes.length) {
+                    h += `<tr><td>Consumes</td><td>${d.consumes.join(", ")}</tr>`;
+                }
+                h += "</table>";
 
-            return h;
+                return h;
+            }
+
+            function portMouseover(d, i, nodes) {
+                const port = d3.select(nodes[i]);
+
+                port.attr("data-toggle", "tooltip").attr("title", () => naTooltipData(d.properties));
+                // eslint-disable-next-line no-underscore-dangle
+                $(port._groups[0])
+                    .tooltip({
+                        delay: { show: defaults.highlightDuration, hide: defaults.highlightDuration },
+                        html: true,
+                        placement: "auto"
+                    })
+                    .tooltip("show");
+            }
+
+            // Data join
+            const circleUpdate = mainGPort.selectAll("circle").data(current.portData, d => d.id);
+
+            // Remove old circles
+            circleUpdate.exit().remove();
+
+            // Update kept circles
+            // circleUpdate; // not needed
+
+            // Add new circles
+            const circleEnter = circleUpdate
+                .enter()
+                .append("circle")
+                .attr("cx", d => d.geometry.coordinates[0])
+                .attr("cy", d => d.geometry.coordinates[1])
+                .attr("r", current.circleSize)
+                .attr(
+                    "fill",
+                    d => `url(#${d.properties.availableForAll ? `${d.properties.nation}a` : d.properties.nation})`
+                )
+                .on("mouseover", portMouseover);
+
+            // Apply to both old and new
+            circleUpdate
+                .merge(circleEnter)
+                .attr("r", d => (d.id === current.highlightId ? current.circleSize * 3 : current.circleSize));
         }
 
-        function portMouseover(d, i, nodes) {
-            const port = d3.select(nodes[i]);
+        function updateTexts() {
+            // Data join
+            const textUpdate = mainGPort.selectAll("text").data(current.portLabelData, d => d.id);
 
-            port.attr("data-toggle", "tooltip").attr("title", () => naTooltipData(d.properties));
-            // eslint-disable-next-line no-underscore-dangle
-            $(port._groups[0])
-                .tooltip({
-                    delay: { show: defaults.highlightDuration, hide: defaults.highlightDuration },
-                    html: true,
-                    placement: "auto"
-                })
-                .tooltip("show");
-        }
+            // Remove old text
+            textUpdate.exit().remove();
 
-        const scale = d3.zoomTransform(naSvg).k/2;
-        // Data join
-        const circleUpdate = mainGPort.selectAll("circle").data(current.portData, d => d.id);
-        const textUpdate = mainGPort.selectAll("text").data(current.portData, d => d.id);
+            // Update kept texts
+            // textUpdate; // not needed
 
-        // Remove old circles
-        circleUpdate.exit().remove();
-        // Remove old text
-        textUpdate.exit().remove();
-
-        // Update kept circles
-        // circleUpdate;
-        // textUpdate;
-
-        // Add new circles
-        const circleEnter = circleUpdate
-            .enter()
-            .append("circle")
-            .attr("cx", d => d.geometry.coordinates[0])
-            .attr("cy", d => d.geometry.coordinates[1])
-            .attr("r", current.circleSize)
-            .attr(
-                "fill",
-                d => `url(#${d.properties.availableForAll ? `${d.properties.nation}a` : d.properties.nation})`
-            )
-            .on("mouseover", portMouseover);
-
-        // Apply to both old and new
-        current.circleSize = defaults.circleSize / scale;
-        circleUpdate
-            .merge(circleEnter)
-            .attr("r", d => (d.id === current.highlightId ? current.circleSize * 3 : current.circleSize));
-
-        if (current.bPortLabelDisplayed) {
-            current.fontSize = defaults.fontSize / scale;
             // Add new texts
             const textEnter = textUpdate
                 .enter()
                 .append("text")
-                .attr("text-anchor", d => (d.properties.dx < 0 ? "end" : "start"))
-                .text(d => d.properties.name);
+                .attr("text-anchor", d => (d.dx < 0 ? "end" : "start"))
+                .text(d => d.name);
+
             // Apply to both old and new
             textUpdate
                 .merge(textEnter)
+                .attr("x", d => (d.id === current.highlightId ? d.coord.x - d.dx * 3 : d.coord.x - d.dx))
+                .attr("y", d => (d.id === current.highlightId ? d.coord.y + d.dy * 3 : d.coord.y + d.dy))
                 .attr(
-                    "x",
-                    d =>
-                        d.id === current.highlightId
-                            ? d.geometry.coordinates[0] - d.properties.dx * 3
-                            : d.geometry.coordinates[0] - d.properties.dx
-                )
-                .attr(
-                    "y",
-                    d =>
-                        d.id === current.highlightId
-                            ? d.geometry.coordinates[1] + d.properties.dy * 3
-                            : d.geometry.coordinates[1] + d.properties.dy
-                )
-                .style(
                     "font-size",
                     d => (d.id === current.highlightId ? `${current.fontSize * 2}px` : `${current.fontSize}px`)
                 );
-        } else {
-            textUpdate.remove();
         }
+
+        updateCircles();
+        updateTexts();
     }
 
     function updateTeleportAreas() {
@@ -305,29 +308,23 @@ export default function naDisplay(serverName) {
         }
 
         // Data join
-        const pathUpdate = mainGVoronoi.selectAll("path").data(defaults.voronoiDiagram.polygons(), d => d.data.id);
+        const pathUpdate = mainGVoronoi.selectAll("path").data(current.TeleportData, d => d.data.id);
 
         // Remove old paths
-        // pathUpdate.exit().remove(); // not needed
+        pathUpdate.exit().remove();
 
-        if (mainGVoronoi.active) {
-            // Update kept paths
-            pathUpdate.classed("highlight-voronoi", d => d.data.id === current.highlightId);
+        // Update kept paths
+        // pathUpdate; // not needed
 
-            // Add new paths (teleport areas)
-            pathUpdate
-                .enter()
-                .append("path")
-                .attr("d", d => (d ? `M${d.join("L")}Z` : null))
-                .on("mouseover", mouseover);
-        } else {
-            pathUpdate.remove();
-        }
-    }
+        // Add new paths (teleport areas)
+        const pathEnter = pathUpdate
+            .enter()
+            .append("path")
+            .attr("d", d => (d ? `M${d.join("L")}Z` : null))
+            .on("mouseover", mouseover);
 
-    function toggleTeleportAreas() {
-        mainGVoronoi.active = !mainGVoronoi.active;
-        updateTeleportAreas();
+        // Apply to both old and new
+        pathUpdate.merge(pathEnter).classed("highlight-voronoi", d => d.data.id === current.highlightId);
     }
 
     function zoomAndPan(transformIn) {
@@ -522,67 +519,63 @@ export default function naDisplay(serverName) {
     }
 
     function updatePBZones() {
-        mainGPBZone
-            .append("path")
-            .datum(defaults.PBZoneData)
-            .attr("class", "pb-zone")
-            .attr("d", d3.geoPath().pointRadius(4));
-
-        mainGPBZone
-            .append("path")
-            .datum(defaults.towerData)
-            .attr("class", "tower")
-            .attr("d", d3.geoPath().pointRadius(1.5));
-
-        mainGPBZone
-            .append("path")
-            .datum(defaults.fortData)
-            .attr("class", "fort")
-            .attr("d", d3.geoPath().pointRadius(2));
+        pbZones.datum(current.PBZoneData).attr("d", d3.geoPath().pointRadius(4));
+        towers.datum(current.fortData).attr("d", d3.geoPath().pointRadius(1.5));
+        forts.datum(current.towerData).attr("d", d3.geoPath().pointRadius(2));
     }
 
     function naZoomed() {
-        function configureMap() {
-            function togglePBZones() {
-                if (!mainGPBZone.active) {
-                    updatePBZones();
-                } else {
-                    mainGPBZone.selectAll("path").remove();
-                }
-                mainGPBZone.active = !mainGPBZone.active;
+        function updateMap() {
+            function setCurrent(zoomStage) {
+                console.log("zoomStage", zoomStage);
+                current.zoomStage = zoomStage;
+                current.circleSize = defaults.circleSize[current.zoomStage];
+                current.fontSize = defaults.fontSize[current.zoomStage];
+                updatePBZones();
+                updateTeleportAreas();
+                updatePorts();
             }
 
-            if (defaults.PBZoneZoomScale < d3.event.transform.k) {
-                if (!current.bPBZoneDisplayed) {
-                    togglePBZones();
-                    toggleTeleportAreas();
+            if (d3.event.transform.k > defaults.PBZoneZoomScale) {
+                if (current.zoomStage !== "pbZone") {
+                    current.PBZoneData = defaults.PBZoneData;
+                    current.fortData = defaults.fortData;
+                    current.towerData = defaults.towerData;
+                    current.portLabelData = defaults.portLabelData;
                     current.highlightId = null;
-                    current.bPBZoneDisplayed = true;
+                    current.TeleportData = {};
+                    setCurrent("pbZone");
                 }
-            } else if (current.bPBZoneDisplayed) {
-                togglePBZones();
-                toggleTeleportAreas();
-                current.bPBZoneDisplayed = false;
+            } else if (d3.event.transform.k > defaults.labelZoomScale) {
+                if (current.zoomStage !== "portLabel") {
+                    current.PBZoneData = {};
+                    current.fortData = {};
+                    current.towerData = {};
+                    current.portLabelData = defaults.portLabelData;
+                    current.highlightId = null;
+                    current.TeleportData = defaults.voronoiDiagram.polygons();
+                    setCurrent("portLabel");
+                }
+            } else if (current.zoomStage !== "initial") {
+                current.PBZoneData = {};
+                current.fortData = {};
+                current.towerData = {};
+                current.portLabelData = {};
+                current.highlightId = null;
+                current.TeleportData = defaults.voronoiDiagram.polygons();
+                setCurrent("initial");
             }
-            current.bPortLabelDisplayed = defaults.labelZoomScale < d3.event.transform.k;
         }
 
-        // console.log(`d3.event.transform: ${JSON.stringify(d3.event.transform)}`);
-
-        configureMap();
-        updatePorts();
-        naDisplayCountries(d3.event.transform);
+        console.log("zoomed");
+        console.log(`d3.event.transform: ${JSON.stringify(d3.event.transform)}`);
+        updateMap();
+        displayCountries(d3.event.transform);
 
         mainGVoronoi.attr("transform", d3.event.transform);
         mainGPort.attr("transform", d3.event.transform);
         mainGPBZone.attr("transform", d3.event.transform);
         mainGCoord.attr("transform", d3.event.transform);
-
-        if (current.bPortLabelDisplayed) {
-            if (current.highlightId && !current.bPBZoneDisplayed) {
-                // naVoronoiHighlight();
-            }
-        }
     }
 
     function setup() {
@@ -653,7 +646,7 @@ export default function naDisplay(serverName) {
             naContext = naCanvas.node().getContext("2d");
 
             defaults.image.onload = () => {
-                naDisplayCountries(initial.transform);
+                displayCountries(initial.transform);
             };
             defaults.image.src = defaults.imageSrc;
         }
@@ -700,10 +693,21 @@ export default function naDisplay(serverName) {
             mainGVoronoi = naSvg.append("g").attr("class", "voronoi");
             mainGPort = naSvg.append("g").attr("class", "port");
             mainGPBZone = naSvg.append("g").attr("class", "pb");
+            pbZones = mainGPBZone.append("path").classed("pb-zone", true);
+            towers = mainGPBZone.append("path").classed("tower", true);
+            forts = mainGPBZone.append("path").classed("fort", true);
             mainGCoord = naSvg.append("g").attr("class", "coord");
         }
 
         function setupPorts() {
+            defaults.portLabelData = defaults.portData.map(d => ({
+                id: d.id,
+                coord: { x: d.geometry.coordinates[0], y: d.geometry.coordinates[1] },
+                name: d.properties.name,
+                dx: d.properties.dx,
+                dy: d.properties.dy
+            }));
+
             defaults.nations.map(d => d.id).forEach(nation => {
                 svgDef
                     .append("pattern")
@@ -744,8 +748,6 @@ export default function naDisplay(serverName) {
                 .extent(defaults.coord.voronoi)
                 .x(d => d.coord.x)
                 .y(d => d.coord.y)(teleportPorts);
-
-            toggleTeleportAreas();
         }
 
         function setupSelects() {
