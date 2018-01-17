@@ -4,8 +4,7 @@
  iB 2017
  */
 
-/* global d3 : false,
-top : false
+/* global d3 : false
  */
 
 import { feature as topojsonFeature } from "topojson-client";
@@ -37,6 +36,7 @@ export default function naDisplay(serverName) {
             min: 0,
             max: 8192
         },
+        portCoord: [4396, 2494], // Shroud Cay
         maxScale: 10,
         fontSize: { initial: 30, portLabel: 18, pbZone: 7 },
         circleSize: { initial: 50, portLabel: 20, pbZone: 5 },
@@ -46,8 +46,8 @@ export default function naDisplay(serverName) {
         highlightDuration: 200,
         mapJson: `${serverName}.json`,
         pbJson: "pb.json",
-        imageSrc: "images/na-map.jpg",
         image: new Image(),
+        imageSrc: "images/na-map.jpg",
         line: d3.line(),
         transformMatrix: {
             A: -0.00499866779363828,
@@ -100,14 +100,6 @@ export default function naDisplay(serverName) {
     // eslint-disable-next-line no-restricted-globals
     defaults.height = top.innerHeight - defaults.margin.top - defaults.margin.bottom;
     defaults.minScale = Math.min(defaults.height, defaults.width) / Math.max(defaults.coord.max, defaults.coord.max);
-
-    const initial = {
-        scale: defaults.minScale,
-        x: -defaults.coord.max / 2 * defaults.minScale,
-        y: -defaults.coord.max / 2 * defaults.minScale
-    };
-    initial.transform = d3.zoomIdentity.translate(initial.x, initial.y).scale(initial.scale);
-
     defaults.coord.voronoi = [
         [defaults.coord.min - 1, defaults.coord.min - 1],
         [defaults.coord.max + 1, defaults.coord.max + 1]
@@ -116,7 +108,7 @@ export default function naDisplay(serverName) {
     defaults.voronoiRadius = Math.max(defaults.height, defaults.width);
 
     const current = {
-        transform: { x: initial.x, y: initial.y, scale: initial.scale },
+        portCoord: defaults.portCoord,
         fontSize: defaults.fontSize.initial,
         circleSize: defaults.circleSize.initial,
         bFirstCoord: true,
@@ -142,16 +134,10 @@ export default function naDisplay(serverName) {
     }
 
     function displayCountries(transform) {
-        function drawImage() {
-            naContext.drawImage(defaults.image, 0, 0);
-            naContext.getImageData(0, 0, defaults.width, defaults.height);
-        }
-
         naContext.save();
         naContext.clearRect(0, 0, defaults.width, defaults.height);
-        naContext.translate(transform.x, transform.y);
-        naContext.scale(transform.k, transform.k);
-        drawImage();
+        naContext.transform(transform.k, 0, 0, transform.k, transform.x, transform.y);
+        naContext.drawImage(defaults.image, 0, 0);
         naContext.restore();
     }
 
@@ -347,13 +333,18 @@ export default function naDisplay(serverName) {
         pathUpdate.merge(pathEnter).classed("highlight-voronoi", d => d.data.id === current.highlightId);
     }
 
+    function initialZoomAndPan() {
+        naSvg.call(naZoom.scaleTo, defaults.minScale);
+    }
+
     function zoomAndPan(transformIn) {
         // eslint-disable-next-line no-param-reassign
         transformIn.x += defaults.width / 2;
         // eslint-disable-next-line no-param-reassign
         transformIn.y += defaults.height / 2;
 
-        naSvg.call(naZoom.transform, transformIn);
+        //        naSvg.call(naZoom.transform, transformIn);
+        naZoom.translateTo(naSvg, 4000, 4500);
     }
 
     function clearMap() {
@@ -667,7 +658,7 @@ export default function naDisplay(serverName) {
             naContext = naCanvas.node().getContext("2d");
 
             defaults.image.onload = () => {
-                displayCountries(initial.transform);
+                initialZoomAndPan();
             };
             defaults.image.src = defaults.imageSrc;
         }
@@ -852,16 +843,18 @@ export default function naDisplay(serverName) {
                     x = c[0],
                     y = c[1];
 
-                zoomAndPan(d3.zoomIdentity.translate(-x, -y).scale(1));
+                zoomAndPan(d3.zoomIdentity.translate(-x, -y).scale(2));
             }
 
             setupPortSelect();
             $("#port-names").on("change", () => {
                 const value = $("#port-names").val();
-                if (+value !== 0) {
+                if (value !== 0) {
+                    current.portCoord = value;
                     goToPort(value);
                 } else {
-                    zoomAndPan(d3.zoomIdentity.translate(initial.x, initial.y).scale(initial.scale));
+                    current.portCoord = defaults.portCoord;
+                    initialZoomAndPan();
                 }
             });
             setupGoodSelect();
@@ -1107,26 +1100,24 @@ export default function naDisplay(serverName) {
             }
 
             const targetScale = 4,
-                scale = targetScale / current.transform.scale,
-                x = -current.transform.x * scale,
-                xCompass = -current.transform.x / current.transform.scale - defaults.width / 25,
-                y = -current.transform.y * scale,
-                yCompass = -current.transform.y / current.transform.scale - defaults.height / 25,
+                x = current.portCoord[0],
+                xCompass = -x - defaults.width / 25,
+                y = current.portCoord[1],
+                yCompass = -y - defaults.height / 25,
                 length = 40,
                 radians = Math.PI / 180 * (predictedWindDegrees - 90),
                 dx = length * Math.cos(radians),
                 dy = length * Math.sin(radians);
 
-            console.log("transform.scale(2) %O", d3.event.transform.scale(2));
-            console.log("transform.applyX(8000) %O", d3.event.transform.applyX(8000));
-            console.log("transform.invertX(8000) %O", d3.event.transform.invertX(1000));
+            // console.log("transform.scale(2) %O", d3.event.transform.scale(2));
+            // console.log("transform.applyX(8000) %O", d3.event.transform.applyX(8000));
+            // console.log("transform.invertX(8000) %O", d3.event.transform.invertX(1000));
 
-            console.log("current.transform %O", current.transform);
             console.log("x %d  y %d", x, y);
             clearMap();
+            zoomAndPan(d3.zoomIdentity.translate(-x, -y).scale(targetScale));
             plotCourse(xCompass, yCompass, "wind");
             printWindLine(xCompass, dx, yCompass, dy, predictedWindDegrees);
-            zoomAndPan(d3.zoomIdentity.translate(-x, -y).scale(targetScale));
         }
 
         const secondsForFullCircle = 48 * 60,
@@ -1171,20 +1162,19 @@ export default function naDisplay(serverName) {
         );
     }
 
-    function naReady(error, naMap, pbZones) {
+    function naReady(error, naMapJsonData, pbZonesJsonData) {
         if (error) {
             throw error;
         }
 
         // Read map data
-        defaults.portData = topojsonFeature(naMap, naMap.objects.ports).features;
+        defaults.portData = topojsonFeature(naMapJsonData, naMapJsonData.objects.ports).features;
         current.portData = defaults.portData;
-        defaults.PBZoneData = topojsonFeature(pbZones, pbZones.objects.pbZones);
-        defaults.fortData = topojsonFeature(pbZones, pbZones.objects.forts);
-        defaults.towerData = topojsonFeature(pbZones, pbZones.objects.towers);
+        defaults.PBZoneData = topojsonFeature(pbZonesJsonData, pbZonesJsonData.objects.pbZones);
+        defaults.fortData = topojsonFeature(pbZonesJsonData, pbZonesJsonData.objects.forts);
+        defaults.towerData = topojsonFeature(pbZonesJsonData, pbZonesJsonData.objects.towers);
 
         setup();
-        zoomAndPan(initial.transform);
         // updatePorts(current.portData.filter(d => ["234", "237", "238", "239", "240"].includes(d.id)));
 
         /*
