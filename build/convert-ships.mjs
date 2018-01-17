@@ -4,7 +4,7 @@ const inBaseFilename = process.argv[2],
     outFilename = process.argv[3],
     date = process.argv[4];
 
-const APIItems = JSON.parse(fs.readFileSync(`${inBaseFilename}-ItemTemplates-${date}.json`, "utf8")),;
+const APIItems = JSON.parse(fs.readFileSync(`${inBaseFilename}-ItemTemplates-${date}.json`, "utf8"));
 
 function saveJson(data) {
     // eslint-disable-next-line consistent-return
