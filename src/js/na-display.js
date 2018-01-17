@@ -38,8 +38,8 @@ export default function naDisplay(serverName) {
             max: 8192
         },
         maxScale: 10,
-        fontSize: { initial: 30, portLabel: 30, pbZone: 12 },
-        circleSize: { initial: 50, portLabel: 20, pbZone: 6 },
+        fontSize: { initial: 30, portLabel: 18, pbZone: 7 },
+        circleSize: { initial: 50, portLabel: 20, pbZone: 5 },
         iconSize: 50,
         PBZoneZoomScale: 1.5,
         labelZoomScale: 0.5,
@@ -273,18 +273,38 @@ export default function naDisplay(serverName) {
             const textEnter = textUpdate
                 .enter()
                 .append("text")
-                .attr("text-anchor", d => (d.dx < 0 ? "end" : "start"))
                 .text(d => d.name);
 
             // Apply to both old and new
             textUpdate
                 .merge(textEnter)
-                .attr("x", d => (d.id === current.highlightId ? d.coord.x - d.dx * 3 : d.coord.x - d.dx))
-                .attr("y", d => (d.id === current.highlightId ? d.coord.y + d.dy * 3 : d.coord.y + d.dy))
+                .attr(
+                    "x",
+                    d =>
+                        d.id === current.highlightId
+                            ? d.coord.x + d.dx * 3 * current.dFactor
+                            : d.coord.x + d.dx * current.dFactor
+                )
+                .attr("y", d => {
+                    if (current.dFactor) {
+                        return d.id === current.highlightId
+                            ? d.coord.y + d.dy * 3 * current.dFactor
+                            : d.coord.y + d.dy * current.dFactor;
+                    }
+                    return d.id === current.highlightId
+                        ? d.coord.y + current.fontSize * 5
+                        : d.coord.y + current.fontSize * 2.2;
+                })
                 .attr(
                     "font-size",
                     d => (d.id === current.highlightId ? `${current.fontSize * 2}px` : `${current.fontSize}px`)
-                );
+                )
+                .attr("text-anchor", d => {
+                    if (current.dFactor) {
+                        return d.dx < 0 ? "end" : "start";
+                    }
+                    return "middle";
+                });
         }
 
         updateCircles();
@@ -527,7 +547,6 @@ export default function naDisplay(serverName) {
     function naZoomed() {
         function updateMap() {
             function setCurrent(zoomStage) {
-                console.log("zoomStage", zoomStage);
                 current.zoomStage = zoomStage;
                 current.circleSize = defaults.circleSize[current.zoomStage];
                 current.fontSize = defaults.fontSize[current.zoomStage];
@@ -542,6 +561,7 @@ export default function naDisplay(serverName) {
                     current.fortData = defaults.fortData;
                     current.towerData = defaults.towerData;
                     current.portLabelData = defaults.portLabelData;
+                    current.dFactor = 0.5;
                     current.highlightId = null;
                     current.TeleportData = {};
                     setCurrent("pbZone");
@@ -552,6 +572,7 @@ export default function naDisplay(serverName) {
                     current.fortData = {};
                     current.towerData = {};
                     current.portLabelData = defaults.portLabelData;
+                    current.dFactor = 0;
                     current.highlightId = null;
                     current.TeleportData = defaults.voronoiDiagram.polygons();
                     setCurrent("portLabel");
@@ -561,15 +582,15 @@ export default function naDisplay(serverName) {
                 current.fortData = {};
                 current.towerData = {};
                 current.portLabelData = {};
+                current.dFactor = 0;
                 current.highlightId = null;
                 current.TeleportData = defaults.voronoiDiagram.polygons();
                 setCurrent("initial");
             }
         }
 
-        console.log("zoomed");
-        console.log(`d3.event.transform: ${JSON.stringify(d3.event.transform)}`);
         updateMap();
+        // console.log(`d3.event.transform: ${JSON.stringify(d3.event.transform)}`);
         displayCountries(d3.event.transform);
 
         mainGVoronoi.attr("transform", d3.event.transform);
@@ -1240,7 +1261,6 @@ export default function naDisplay(serverName) {
         $("#f11").submit(event => {
             const x = $("#x-coord").val(),
                 z = $("#z-coord").val();
-            console.log("F11");
             goToF11(x, z);
             event.preventDefault();
         });
