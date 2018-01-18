@@ -391,7 +391,10 @@ export default function naDisplay(serverName) {
                 current.lineData[current.lineData.length - 2]
             );
             const compass = degreesToCompass(degrees);
-            gCompass.datum(current.lineData).attr("d", defaults.line);
+            gCompass
+                .datum(current.lineData)
+                .attr("marker-end", "url(#course-arrow)")
+                .attr("d", defaults.line);
 
             const svg = mainGCoord
                 .append("svg")
@@ -419,8 +422,8 @@ export default function naDisplay(serverName) {
             clearMap();
         }
         current.lineData.push([x, y]);
-        //console.log(x, y);
-        //console.log(current.lineData);
+        // console.log(x, y);
+        // console.log(current.lineData);
         if (current.bFirstCoord) {
             printCompass(x, y);
             current.bFirstCoord = !current.bFirstCoord;
@@ -645,7 +648,7 @@ export default function naDisplay(serverName) {
             svgDef = naSvg.append("defs");
             svgDef
                 .append("marker")
-                .attr("id", "arrow")
+                .attr("id", "course-arrow")
                 .attr("viewBox", "0 -5 10 10")
                 .attr("refX", 5)
                 .attr("refY", 0)
@@ -654,8 +657,19 @@ export default function naDisplay(serverName) {
                 .attr("orient", "auto")
                 .append("path")
                 .attr("d", "M0,-5L10,0L0,5")
-                .attr("class", "arrow-head");
-
+                .attr("class", "course-head");
+            svgDef
+                .append("marker")
+                .attr("id", "wind-arrow")
+                .attr("viewBox", "0 -5 10 10")
+                .attr("refX", 5)
+                .attr("refY", 0)
+                .attr("markerWidth", 4)
+                .attr("markerHeight", 4)
+                .attr("orient", "auto")
+                .append("path")
+                .attr("d", "M0,-5L10,0L0,5")
+                .attr("class", "wind-head");
             mainGVoronoi = naSvg.append("g").classed("voronoi", true);
             mainGPort = naSvg.append("g").classed("port", true);
             mainGPBZone = naSvg.append("g").classed("pb", true);
@@ -1048,7 +1062,7 @@ export default function naDisplay(serverName) {
                                 .datum(current.lineData)
                                 .attr("d", defaults.line)
                                 .classed("wind", true)
-                                .attr("marker-end", "url(#arrow)");
+                                .attr("marker-end", "url(#wind-arrow)");
 
                             const svg = svgWind.append("svg");
                             const text1 = svg

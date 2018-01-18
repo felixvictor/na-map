@@ -115,12 +115,15 @@ text {
   path {
     stroke: $secondary-600;
     stroke-width: .3em;
-    stroke-linecap: round;
     fill: none;
   }
 }
 
-.arrow-head {
+.course-head {
+  fill: $secondary-600 !important;
+}
+
+.wind-head{
   fill: $primary-900 !important;
 }
 
