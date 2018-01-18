@@ -451,21 +451,20 @@ export default function naDisplay(serverName) {
         }
 
         // https://stackoverflow.com/questions/14718561/how-to-check-if-a-number-is-between-two-values
-        // eslint-disable-next-line no-extend-native
-        Number.prototype.between = (a, b, inclusive) => {
+        function between(value, a, b, inclusive) {
             const min = Math.min.apply(Math, [a, b]),
                 max = Math.max.apply(Math, [a, b]);
-            return inclusive ? this >= min && this <= max : this > min && this < max;
-        };
+            return inclusive ? value >= min && value <= max : value > min && value < max;
+        }
 
-        const F11X = +F11XIn * -1,
-            F11Y = +F11YIn * -1;
+        const F11X = Number(F11XIn * -1),
+            F11Y = Number(F11YIn * -1);
         const x = convertCoordX(F11X, F11Y),
             y = convertCoordY(F11X, F11Y);
 
         if (
-            x.between(defaults.coord.min, defaults.coord.max, true) &&
-            y.between(defaults.coord.min, defaults.coord.max, true)
+            between(x, defaults.coord.min, defaults.coord.max, true) &&
+            between(y, defaults.coord.min, defaults.coord.max, true)
         ) {
             clearMap();
             if (current.radioButton === "F11") {
@@ -991,122 +990,252 @@ export default function naDisplay(serverName) {
                 .on("change", () => CMSelect());
         }
 
+        function setupListener() {
+            function setupWindPrediction() {
+                function predictWind(currentUserWind, predictUserTime) {
+                    function compassToDegrees(compass) {
+                        const degree = 360 / defaults.compassDirections.length;
+                        return defaults.compassDirections.indexOf(compass) * degree;
+                    }
+
+                    function printPredictedWind(predictedWindDegrees, predictTime, currentWind, currentTime) {
+                        const targetScale = 2,
+                            x = current.portCoord[0],
+                            y = current.portCoord[1],
+                            xCompass = x - defaults.width / 8 / targetScale,
+                            yCompass = y - defaults.height / 8 / targetScale;
+
+                        function printWindLine() {
+                            const length = 40,
+                                radians = Math.PI / 180 * (predictedWindDegrees - 90),
+                                dx = length * Math.cos(radians),
+                                dy = length * Math.sin(radians),
+                                compass = degreesToCompass(predictedWindDegrees),
+                                compassSize = 30;
+
+                            current.lineData = [];
+                            current.lineData.push([Math.round(xCompass + dx / 2), Math.round(yCompass + dy / 2)]);
+                            current.lineData.push([Math.round(xCompass - dx / 2), Math.round(yCompass - dy / 2)]);
+
+                            gCompass
+                                .datum(current.lineData)
+                                .attr("d", defaults.line)
+                                .attr("class", "wind")
+                                .attr("marker-end", "url(#arrow)");
+
+                            const rect = mainGCoord.append("rect");
+                            const svg = mainGCoord.append("svg");
+                            const text1 = svg
+                                .append("text")
+                                .attr("x", "50%")
+                                .attr("y", "33%")
+                                .attr("class", "wind-text")
+                                .text(`From ${compass} at ${predictTime}`);
+                            const text2 = svg
+                                .append("text")
+                                .attr("x", "50%")
+                                .attr("y", "66%")
+                                .attr("class", "wind-text-current")
+                                .text(`Currently at ${currentTime} from ${currentWind}`);
+                            const bbox1 = text1.node().getBoundingClientRect(),
+                                bbox2 = text2.node().getBoundingClientRect(),
+                                height =
+                                    (Math.max(bbox1.height, bbox2.height) * 2 + defaults.fontSize.portLabel) /
+                                    targetScale,
+                                width =
+                                    (Math.max(bbox1.width, bbox2.width) + defaults.fontSize.portLabel) / targetScale;
+                            svg
+                                .attr("x", xCompass - width / 2)
+                                .attr("y", yCompass + 20)
+                                .attr("height", height)
+                                .attr("width", width);
+                            rect
+                                .attr("x", xCompass - width / 2)
+                                .attr("y", yCompass + 20 - (height + compassSize))
+                                .attr("height", height + compassSize * 2)
+                                .attr("width", width);
+                        }
+
+                        clearMap();
+                        zoomAndPan(x, y, targetScale);
+                        plotCourse(xCompass, yCompass, targetScale, "wind");
+                        printWindLine();
+                    }
+
+                    const secondsForFullCircle = 48 * 60,
+                        fullCircle = 360,
+                        degreesPerSecond = fullCircle / secondsForFullCircle;
+                    let currentWindDegrees;
+
+                    const regex = /(\d+)[\s:.](\d+)/,
+                        match = regex.exec(predictUserTime),
+                        predictHours = parseInt(match[1], 10),
+                        predictMinutes = parseInt(match[2], 10);
+
+                    // Set current wind in degrees
+                    if (Number.isNaN(Number(currentUserWind))) {
+                        currentWindDegrees = compassToDegrees(currentUserWind);
+                    } else {
+                        currentWindDegrees = +currentUserWind;
+                    }
+
+                    const currentDate = moment()
+                            .utc()
+                            .seconds(0)
+                            .milliseconds(0),
+                        predictDate = moment(currentDate)
+                            .hour(predictHours)
+                            .minutes(predictMinutes);
+                    if (predictDate.isBefore(currentDate)) {
+                        predictDate.add(1, "day");
+                    }
+
+                    const timeDiffInSec = predictDate.diff(currentDate, "seconds");
+                    const predictedWindDegrees =
+                        Math.abs(currentWindDegrees - degreesPerSecond * timeDiffInSec + 360) % 360;
+
+                    // console.log(`currentUserWind: ${currentUserWind} currentWindDegrees: ${currentWindDegrees}`);
+                    // console.log(`   currentDate: ${currentDate.format()} predictDate: ${predictDate.format()}`);
+                    // console.log(`   predictedWindDegrees: ${predictedWindDegrees} predictUserTime: ${predictUserTime}`);
+                    printPredictedWind(
+                        predictedWindDegrees,
+                        predictDate.format("H.mm"),
+                        currentUserWind,
+                        currentDate.format("H.mm")
+                    );
+                }
+
+                /*
+    let predictTime = moment().utc(),
+        direction = "nne".toUpperCase();
+    console.log(`---->   predictTime: ${predictTime.format()}`);
+    predictWind(direction, `${predictTime.hours()}:${predictTime.minutes()}`);
+    predictTime.add(48 / 4, "minutes");
+    console.log(`---->   predictTime: ${predictTime.format()}`);
+    predictWind(direction, `${predictTime.hours()}:${predictTime.minutes()}`);
+    */
+
+                $("#windPrediction").submit(event => {
+                    const currentWind = $("#direction")
+                            .val()
+                            .toUpperCase(),
+                        time = $("#time").val();
+
+                    predictWind(currentWind, time);
+                    $("#predictDropdown").dropdown("toggle");
+                    event.preventDefault();
+                });
+            }
+
+            function setupF11Copy() {
+                // https://stackoverflow.com/questions/22581345/click-button-copy-to-clipboard-using-jquery
+                function copyF11ToClipboard(F11coord) {
+                    const temp = $("<input>");
+
+                    $("body").append(temp);
+                    temp.val(F11coord).select();
+                    document.execCommand("copy");
+                    temp.remove();
+                }
+
+                $("#copy-coord").click(() => {
+                    const x = $("#x-coord").val(),
+                        z = $("#z-coord").val();
+
+                    if (!Number.isNaN(x) && !Number.isNaN(z)) {
+                        const F11String = `F11 coordinates X: ${x} Z: ${z}`;
+                        copyF11ToClipboard(F11String);
+                    }
+                });
+            }
+
+            function setupF11Paste() {
+                function pasteF11FromClipboard(e) {
+                    function addF11StringToInput(F11String) {
+                        const regex = /F11 coordinates X: ([-+]?[0-9]*\.?[0-9]+) Z: ([-+]?[0-9]*\.?[0-9]+)/g,
+                            match = regex.exec(F11String);
+
+                        if (match && !Number.isNaN(+match[1]) && !Number.isNaN(+match[2])) {
+                            const x = +match[1],
+                                z = +match[2];
+                            if (!Number.isNaN(Number(x)) && !Number.isNaN(Number(z))) {
+                                goToF11(x, z);
+                            }
+                        }
+                    }
+                    const F11String =
+                        // eslint-disable-next-line no-nested-ternary
+                        e.clipboardData && e.clipboardData.getData
+                            ? e.clipboardData.getData("text/plain") // Standard
+                            : window.clipboardData && window.clipboardData.getData
+                              ? window.clipboardData.getData("Text") // MS
+                              : false;
+
+                    // If one of the F11 input elements is in focus
+                    if (document.activeElement.id === "x-coord" || document.activeElement.id === "z-coord") {
+                        // test for number
+                        if (!Number.isNaN(+F11String)) {
+                            // paste number in input element
+                            $(`#${document.activeElement.id}`)
+                                .val(F11String)
+                                .select();
+                        }
+                    } else {
+                        // Paste F11string
+                        addF11StringToInput(F11String);
+                    }
+                }
+
+                document.addEventListener("paste", event => {
+                    pasteF11FromClipboard(event);
+                    event.preventDefault();
+                });
+            }
+
+            setupWindPrediction();
+            setupF11Copy();
+            setupF11Paste();
+
+            $("#f11").submit(event => {
+                const x = +$("#x-coord").val(),
+                    z = +$("#z-coord").val();
+                console.log(x, z);
+                goToF11(x, z);
+                event.preventDefault();
+            });
+
+            $("#direction").knob({
+                bgColor: "#ede1d2", // primary-200
+                thickness: 0.2,
+                min: 0,
+                max: 359,
+                step: 360 / defaults.compassDirections.length,
+                cursor: true,
+                fgColor: "#917f68", // primary-700
+                draw() {
+                    $(this.i).css("class", "knob");
+                },
+                format: input => degreesToCompass(input)
+            });
+
+            $("#reset").on("click", () => {
+                clearMap();
+            });
+
+            $(".radio-group").change(() => {
+                current.radioButton = $("input[name='mouseFunction']:checked").val();
+                clearMap();
+            });
+        }
+
         setupCanvas();
         setupSvg();
         setupPorts();
         setupTeleportAreas();
         setupSelects();
         setupPropertyMenu();
+        setupListener();
         moment.locale("en-gb");
-    }
-
-    function predictWind(currentUserWind, predictUserTime) {
-        function compassToDegrees(compass) {
-            const degree = 360 / defaults.compassDirections.length;
-            return defaults.compassDirections.indexOf(compass) * degree;
-        }
-
-        function printPredictedWind(predictedWindDegrees, predictTime, currentWind, currentTime) {
-            const targetScale = 2,
-                x = current.portCoord[0],
-                y = current.portCoord[1],
-                xCompass = x - defaults.width / 8 / targetScale,
-                yCompass = y - defaults.height / 8 / targetScale;
-
-            function printWindLine() {
-                const length = 40,
-                    radians = Math.PI / 180 * (predictedWindDegrees - 90),
-                    dx = length * Math.cos(radians),
-                    dy = length * Math.sin(radians),
-                    compass = degreesToCompass(predictedWindDegrees),
-                    compassSize = 30;
-
-                current.lineData = [];
-                current.lineData.push([Math.round(xCompass + dx / 2), Math.round(yCompass + dy / 2)]);
-                current.lineData.push([Math.round(xCompass - dx / 2), Math.round(yCompass - dy / 2)]);
-
-                gCompass
-                    .datum(current.lineData)
-                    .attr("d", defaults.line)
-                    .attr("class", "wind")
-                    .attr("marker-end", "url(#arrow)");
-
-                const rect = mainGCoord.append("rect");
-                const svg = mainGCoord.append("svg");
-                const text1 = svg
-                    .append("text")
-                    .attr("x", "50%")
-                    .attr("y", "33%")
-                    .attr("class", "wind-text")
-                    .text(`From ${compass} at ${predictTime}`);
-                const text2 = svg
-                    .append("text")
-                    .attr("x", "50%")
-                    .attr("y", "66%")
-                    .attr("class", "wind-text-current")
-                    .text(`Currently at ${currentTime} from ${currentWind}`);
-                const bbox1 = text1.node().getBoundingClientRect(),
-                    bbox2 = text2.node().getBoundingClientRect(),
-                    height = (Math.max(bbox1.height, bbox2.height) * 2 + defaults.fontSize.portLabel) / targetScale,
-                    width = (Math.max(bbox1.width, bbox2.width) + defaults.fontSize.portLabel) / targetScale;
-                svg
-                    .attr("x", xCompass - width / 2)
-                    .attr("y", yCompass + 20)
-                    .attr("height", height)
-                    .attr("width", width);
-                rect
-                    .attr("x", xCompass - width / 2)
-                    .attr("y", yCompass + 20 - (height + compassSize))
-                    .attr("height", height + compassSize * 2)
-                    .attr("width", width);
-            }
-
-            clearMap();
-            zoomAndPan(x, y, targetScale);
-            plotCourse(xCompass, yCompass, targetScale, "wind");
-            printWindLine();
-        }
-
-        const secondsForFullCircle = 48 * 60,
-            fullCircle = 360,
-            degreesPerSecond = fullCircle / secondsForFullCircle;
-        let currentWindDegrees;
-
-        const regex = /(\d+)[\s:.](\d+)/,
-            match = regex.exec(predictUserTime),
-            predictHours = parseInt(match[1], 10),
-            predictMinutes = parseInt(match[2], 10);
-
-        // Set current wind in degrees
-        if (Number.isNaN(Number(currentUserWind))) {
-            currentWindDegrees = compassToDegrees(currentUserWind);
-        } else {
-            currentWindDegrees = +currentUserWind;
-        }
-
-        const currentDate = moment()
-                .utc()
-                .seconds(0)
-                .milliseconds(0),
-            predictDate = moment(currentDate)
-                .hour(predictHours)
-                .minutes(predictMinutes);
-        if (predictDate.isBefore(currentDate)) {
-            predictDate.add(1, "day");
-        }
-
-        const timeDiffInSec = predictDate.diff(currentDate, "seconds");
-        const predictedWindDegrees = Math.abs(currentWindDegrees - degreesPerSecond * timeDiffInSec + 360) % 360;
-
-        // console.log(`currentUserWind: ${currentUserWind} currentWindDegrees: ${currentWindDegrees}`);
-        // console.log(`   currentDate: ${currentDate.format()} predictDate: ${predictDate.format()}`);
-        // console.log(`   predictedWindDegrees: ${predictedWindDegrees} predictUserTime: ${predictUserTime}`);
-        printPredictedWind(
-            predictedWindDegrees,
-            predictDate.format("H.mm"),
-            currentUserWind,
-            currentDate.format("H.mm")
-        );
     }
 
     function naReady(error, naMapJsonData, pbZonesJsonData) {
@@ -1122,120 +1251,7 @@ export default function naDisplay(serverName) {
         defaults.towerData = topojsonFeature(pbZonesJsonData, pbZonesJsonData.objects.towers);
 
         setup();
-
         // updatePorts(current.portData.filter(d => ["234", "237", "238", "239", "240"].includes(d.id)));
-
-        /*
-        let predictTime = moment().utc(),
-            direction = "nne".toUpperCase();
-        console.log(`---->   predictTime: ${predictTime.format()}`);
-        predictWind(direction, `${predictTime.hours()}:${predictTime.minutes()}`);
-        predictTime.add(48 / 4, "minutes");
-        console.log(`---->   predictTime: ${predictTime.format()}`);
-        predictWind(direction, `${predictTime.hours()}:${predictTime.minutes()}`);
-        */
-
-        // https://stackoverflow.com/questions/22581345/click-button-copy-to-clipboard-using-jquery
-        function copyF11ToClipboard(F11coord) {
-            const temp = $("<input>");
-
-            $("body").append(temp);
-            temp.val(F11coord).select();
-            document.execCommand("copy");
-            temp.remove();
-        }
-
-        function pasteF11FromClipboard(e) {
-            function addF11StringToInput(F11String) {
-                const regex = /F11 coordinates X: ([-+]?[0-9]*\.?[0-9]+) Z: ([-+]?[0-9]*\.?[0-9]+)/g,
-                    match = regex.exec(F11String);
-
-                if (match && !Number.isNaN(+match[1]) && !Number.isNaN(+match[2])) {
-                    const x = +match[1],
-                        z = +match[2];
-                    if (!Number.isNaN(x) && !Number.isNaN(z)) {
-                        goToF11(x, z);
-                    }
-                }
-            }
-            const F11String =
-                // eslint-disable-next-line no-nested-ternary
-                e.clipboardData && e.clipboardData.getData
-                    ? e.clipboardData.getData("text/plain") // Standard
-                    : window.clipboardData && window.clipboardData.getData
-                      ? window.clipboardData.getData("Text") // MS
-                      : false;
-
-            // If one of the F11 input elements is in focus
-            if (document.activeElement.id === "x-coord" || document.activeElement.id === "z-coord") {
-                // test for number
-                if (!Number.isNaN(+F11String)) {
-                    // paste number in input element
-                    $(`#${document.activeElement.id}`)
-                        .val(F11String)
-                        .select();
-                }
-            } else {
-                // Paste F11string
-                addF11StringToInput(F11String);
-            }
-        }
-
-        $("#copy-coord").click(() => {
-            const x = $("#x-coord").val(),
-                z = $("#z-coord").val();
-
-            if (!Number.isNaN(x) && !Number.isNaN(z)) {
-                const F11String = `F11 coordinates X: ${x} Z: ${z}`;
-                copyF11ToClipboard(F11String);
-            }
-        });
-
-        document.addEventListener("paste", event => {
-            pasteF11FromClipboard(event);
-            event.preventDefault();
-        });
-
-        $("#f11").submit(event => {
-            const x = $("#x-coord").val(),
-                z = $("#z-coord").val();
-            goToF11(x, z);
-            event.preventDefault();
-        });
-
-        $("#direction").knob({
-            bgColor: "#ede1d2", // primary-200
-            thickness: 0.2,
-            min: 0,
-            max: 359,
-            step: 360 / defaults.compassDirections.length,
-            cursor: true,
-            fgColor: "#917f68", // primary-700
-            draw() {
-                $(this.i).css("class", "knob");
-            },
-            format: input => degreesToCompass(input)
-        });
-
-        $("#windPrediction").submit(event => {
-            const currentWind = $("#direction")
-                    .val()
-                    .toUpperCase(),
-                time = $("#time").val();
-
-            predictWind(currentWind, time);
-            $("#predictDropdown").dropdown("toggle");
-            event.preventDefault();
-        });
-
-        $("#reset").on("click", () => {
-            clearMap();
-        });
-
-        $(".radio-group").change(() => {
-            current.radioButton = $("input[name='mouseFunction']:checked").val();
-            clearMap();
-        });
     }
 
     d3
