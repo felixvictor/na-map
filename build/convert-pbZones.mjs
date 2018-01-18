@@ -48,8 +48,8 @@ function saveJson(filename, data) {
 }
 
 function convertPBZones() {
-    let ports = [];
-    const pbZones = [],
+    let ports = [],
+        pbZones = [],
         pbForts = [],
         pbTowers = [];
 
@@ -111,6 +111,10 @@ function convertPBZones() {
     }
 
     ports = APIPorts.map(port => {
+        pbZones = [];
+        pbForts = [];
+        pbTowers = [];
+
         getPBZones(port);
         getPortElements(port);
         return {
