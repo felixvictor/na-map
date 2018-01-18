@@ -110,7 +110,7 @@ text {
   }
   rect {
     fill: $primary-100;
-    fill-opacity: .3;
+    fill-opacity: .7;
   }
   path {
     stroke: $secondary-600;
@@ -130,11 +130,11 @@ text {
 
 .wind,
 .wind-text {
-  font-size: .5em !important;
+  font-size: 1.2em !important;
 }
 
 .wind-text-current {
-  font-size: .4em !important;
+  font-size: 1em !important;
 }
 
 .dial {

@@ -28,7 +28,8 @@ export default function naDisplay(serverName) {
         forts,
         mainGVoronoi,
         mainGCoord,
-        gCompass;
+        gCompass,
+        svgWind;
 
     const defaults = {
         margin: { top: parseInt($(".navbar").css("height"), 10), right: 20, bottom: 20, left: 20 },
@@ -345,6 +346,7 @@ export default function naDisplay(serverName) {
 
     function clearMap() {
         mainGCoord.selectAll("*").remove();
+        svgWind.selectAll("*").remove();
         current.bFirstCoord = true;
         current.lineData.splice(0, current.lineData.length);
         current.portData = defaults.portData;
@@ -352,13 +354,13 @@ export default function naDisplay(serverName) {
         updatePorts();
     }
 
-    function plotCourse(x, y, style = "course") {
+    function plotCourse(x, y) {
         function printCompass() {
-            const compassSize = style === "course" ? 100 : 30;
+            const compassSize = 100;
 
             mainGCoord
                 .append("image")
-                .attr("class", "compass")
+                .classed("compass", true)
                 .attr("x", x)
                 .attr("y", y)
                 .attr("transform", `translate(${-compassSize / 2},${-compassSize / 2})`)
@@ -417,7 +419,8 @@ export default function naDisplay(serverName) {
         //        console.log(x, y);
         //        console.log(current.lineData);
         if (current.bFirstCoord) {
-            printCompass(x, y, style);
+            clearMap();
+            printCompass(x, y);
             current.bFirstCoord = !current.bFirstCoord;
         } else {
             printLine(x, y);
@@ -651,13 +654,22 @@ export default function naDisplay(serverName) {
                 .attr("d", "M0,-5L10,0L0,5")
                 .attr("class", "arrow-head");
 
-            mainGVoronoi = naSvg.append("g").attr("class", "voronoi");
-            mainGPort = naSvg.append("g").attr("class", "port");
-            mainGPBZone = naSvg.append("g").attr("class", "pb");
+            mainGVoronoi = naSvg.append("g").classed("voronoi", true);
+            mainGPort = naSvg.append("g").classed("port", true);
+            mainGPBZone = naSvg.append("g").classed("pb", true);
             pbZones = mainGPBZone.append("path").classed("pb-zone", true);
             towers = mainGPBZone.append("path").classed("tower", true);
             forts = mainGPBZone.append("path").classed("fort", true);
-            mainGCoord = naSvg.append("g").attr("class", "coord");
+            mainGCoord = naSvg.append("g").classed("coord", true);
+            svgWind = d3
+                .select("body")
+                .append("div")
+                .attr("id", "wind")
+                .append("svg")
+                .style("position", "absolute")
+                .style("top", `${defaults.margin.top}px`)
+                .style("left", `${defaults.margin.left}px`)
+                .classed("coord", true);
         }
 
         function setupPorts() {
@@ -999,32 +1011,44 @@ export default function naDisplay(serverName) {
                     }
 
                     function printPredictedWind(predictedWindDegrees, predictTime, currentWind, currentTime) {
+                        const compassSize = 100,
+                            height = 300,
+                            width = 300,
+                            xCompass = width / 2,
+                            yCompass = height / 3;
                         const targetScale = 2,
                             x = current.portCoord[0],
-                            y = current.portCoord[1],
-                            xCompass = x - defaults.width / 8 / targetScale,
-                            yCompass = y - defaults.height / 8 / targetScale;
+                            y = current.portCoord[1];
 
                         function printWindLine() {
-                            const length = 40,
+                            const length = compassSize*1.3,
                                 radians = Math.PI / 180 * (predictedWindDegrees - 90),
                                 dx = length * Math.cos(radians),
                                 dy = length * Math.sin(radians),
-                                compass = degreesToCompass(predictedWindDegrees),
-                                compassSize = 30;
+                                compass = degreesToCompass(predictedWindDegrees);
 
                             current.lineData = [];
                             current.lineData.push([Math.round(xCompass + dx / 2), Math.round(yCompass + dy / 2)]);
                             current.lineData.push([Math.round(xCompass - dx / 2), Math.round(yCompass - dy / 2)]);
 
-                            gCompass
+                            svgWind.attr("height", height).attr("width", width);
+                            const rect = svgWind.append("rect");
+                            svgWind
+                                .append("image")
+                                .classed("compass", true)
+                                .attr("x", xCompass - compassSize / 2)
+                                .attr("y", yCompass - compassSize / 2)
+                                .attr("height", compassSize)
+                                .attr("width", compassSize)
+                                .attr("xlink:href", "icons/compass.svg");
+                            svgWind
+                                .append("path")
                                 .datum(current.lineData)
                                 .attr("d", defaults.line)
-                                .attr("class", "wind")
+                                .classed("wind", true)
                                 .attr("marker-end", "url(#arrow)");
 
-                            const rect = mainGCoord.append("rect");
-                            const svg = mainGCoord.append("svg");
+                            const svg = svgWind.append("svg");
                             const text1 = svg
                                 .append("text")
                                 .attr("x", "50%")
@@ -1039,26 +1063,29 @@ export default function naDisplay(serverName) {
                                 .text(`Currently at ${currentTime} from ${currentWind}`);
                             const bbox1 = text1.node().getBoundingClientRect(),
                                 bbox2 = text2.node().getBoundingClientRect(),
-                                height =
-                                    (Math.max(bbox1.height, bbox2.height) * 2 + defaults.fontSize.portLabel) /
-                                    targetScale,
-                                width =
-                                    (Math.max(bbox1.width, bbox2.width) + defaults.fontSize.portLabel) / targetScale;
+                                lineHeight = parseInt(
+                                    window
+                                        .getComputedStyle(document.getElementById("wind"))
+                                        .getPropertyValue("line-height"),
+                                    10
+                                ),
+                                textHeight = Math.max(bbox1.height, bbox2.height) * 2 + lineHeight,
+                                textWidth = Math.max(bbox1.width, bbox2.width) + lineHeight;
+                            console.log(lineHeight);
                             svg
-                                .attr("x", xCompass - width / 2)
-                                .attr("y", yCompass + 20)
-                                .attr("height", height)
-                                .attr("width", width);
+                                .attr("x", (width-textWidth)/2)
+                                .attr("y", "60%")
+                                .attr("height", textHeight)
+                                .attr("width", textWidth);
                             rect
-                                .attr("x", xCompass - width / 2)
-                                .attr("y", yCompass + 20 - (height + compassSize))
-                                .attr("height", height + compassSize * 2)
+                                .attr("x", 0)
+                                .attr("y", 0)
+                                .attr("height", height)
                                 .attr("width", width);
                         }
 
                         clearMap();
                         zoomAndPan(x, y, targetScale);
-                        plotCourse(xCompass, yCompass, targetScale, "wind");
                         printWindLine();
                     }
 
@@ -1199,7 +1226,7 @@ export default function naDisplay(serverName) {
             $("#f11").submit(event => {
                 const x = +$("#x-coord").val(),
                     z = +$("#z-coord").val();
-                console.log(x, z);
+
                 goToF11(x, z);
                 event.preventDefault();
             });
