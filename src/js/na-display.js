@@ -134,6 +134,7 @@ export default function naDisplay(serverName) {
     }
 
     function displayCountries(transform) {
+        naContext.setTransform(1, 0, 0, 1, 0, 0);
         naContext.clearRect(0, 0, defaults.width, defaults.height);
         naContext.setTransform(transform.k, 0, 0, transform.k, transform.x, transform.y);
         naContext.drawImage(defaults.image, 0, 0);
@@ -577,8 +578,8 @@ export default function naDisplay(serverName) {
             }
         }
 
-        updateMap();
-        //console.log(`zoomed d3.event.transform: ${JSON.stringify(d3.event.transform)}`);
+        //updateMap();
+        // console.log(`zoomed d3.event.transform: ${JSON.stringify(d3.event.transform)}`);
         displayCountries(d3.event.transform);
 
         mainGVoronoi.attr("transform", d3.event.transform);
@@ -840,7 +841,7 @@ export default function naDisplay(serverName) {
                     x = +c[0],
                     y = +c[1];
 
-                current.portCoord = [x,y];
+                current.portCoord = [x, y];
                 zoomAndPan(x, y, 2);
             }
 
