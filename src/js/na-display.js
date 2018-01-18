@@ -405,8 +405,8 @@ export default function naDisplay(serverName) {
                 .text(`${compass} (${Math.round(degrees)}°)`);
 
             const bbox = text.node().getBBox();
-            const height = bbox.height + defaults.fontSize,
-                width = bbox.width + defaults.fontSize;
+            const height = bbox.height + defaults.fontSize.portLabel,
+                width = bbox.width + defaults.fontSize.portLabel;
             rect
                 .attr("x", 0)
                 .attr("y", 0)
@@ -415,11 +415,13 @@ export default function naDisplay(serverName) {
             svg.attr("height", height).attr("width", width);
         }
 
-        current.lineData.push([x, y]);
-        //        console.log(x, y);
-        //        console.log(current.lineData);
         if (current.bFirstCoord) {
             clearMap();
+        }
+        current.lineData.push([x, y]);
+        //console.log(x, y);
+        //console.log(current.lineData);
+        if (current.bFirstCoord) {
             printCompass(x, y);
             current.bFirstCoord = !current.bFirstCoord;
         } else {
@@ -1021,7 +1023,7 @@ export default function naDisplay(serverName) {
                             y = current.portCoord[1];
 
                         function printWindLine() {
-                            const length = compassSize*1.3,
+                            const length = compassSize * 1.3,
                                 radians = Math.PI / 180 * (predictedWindDegrees - 90),
                                 dx = length * Math.cos(radians),
                                 dy = length * Math.sin(radians),
@@ -1073,7 +1075,7 @@ export default function naDisplay(serverName) {
                                 textWidth = Math.max(bbox1.width, bbox2.width) + lineHeight;
                             console.log(lineHeight);
                             svg
-                                .attr("x", (width-textWidth)/2)
+                                .attr("x", (width - textWidth) / 2)
                                 .attr("y", "60%")
                                 .attr("height", textHeight)
                                 .attr("width", textWidth);
