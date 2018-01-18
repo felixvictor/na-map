@@ -578,7 +578,7 @@ export default function naDisplay(serverName) {
             }
         }
 
-        //updateMap();
+        updateMap();
         // console.log(`zoomed d3.event.transform: ${JSON.stringify(d3.event.transform)}`);
         displayCountries(d3.event.transform);
 
@@ -593,54 +593,6 @@ export default function naDisplay(serverName) {
             if (d3.event.defaultPrevented) {
                 d3.event.stopPropagation();
             }
-        }
-
-        // https://gist.github.com/kobben/5932448
-        function setupPath() {
-            function affineTransformation(a, b, c, d, tx, ty) {
-                return d3.geoTransform({
-                    point(x, y) {
-                        this.stream.point(a * x + b * y + tx, c * x + d * y + ty);
-                    }
-                });
-            }
-            // eslint-disable-next-line prefer-spread
-            const flattenArray = arr => [].concat.apply([], arr.map(element => element));
-            defaults.xExtent = d3.extent(
-                [].concat(
-                    defaults.portData.map(d => d.geometry.coordinates[0]),
-                    flattenArray(
-                        defaults.PBZoneData.features.map(d => [].concat(d.geometry.coordinates.map(p => p[0])))
-                    ),
-                    flattenArray(defaults.fortData.features.map(d => [].concat(d.geometry.coordinates.map(p => p[0])))),
-                    flattenArray(defaults.towerData.features.map(d => [].concat(d.geometry.coordinates.map(p => p[0]))))
-                )
-            );
-            defaults.yExtent = d3.extent(
-                [].concat(
-                    defaults.portData.map(d => d.geometry.coordinates[1]),
-                    flattenArray(
-                        defaults.PBZoneData.features.map(d => [].concat(d.geometry.coordinates.map(p => p[1])))
-                    ),
-                    flattenArray(defaults.fortData.features.map(d => [].concat(d.geometry.coordinates.map(p => p[1])))),
-                    flattenArray(defaults.towerData.features.map(d => [].concat(d.geometry.coordinates.map(p => p[1]))))
-                )
-            );
-            defaults.dataWidth = defaults.xExtent[1] - defaults.xExtent[0];
-            defaults.dataHeight = defaults.yExtent[1] - defaults.yExtent[0];
-
-            defaults.path = d3
-                .geoPath()
-                .projection(
-                    affineTransformation(
-                        defaults.minScale,
-                        0,
-                        0,
-                        defaults.minScale,
-                        defaults.dataWidth / 2 * defaults.minScale,
-                        -defaults.dataHeight / 2 * defaults.minScale
-                    )
-                );
         }
 
         function setupCanvas() {
@@ -1039,7 +991,6 @@ export default function naDisplay(serverName) {
                 .on("change", () => CMSelect());
         }
 
-        setupPath();
         setupCanvas();
         setupSvg();
         setupPorts();
