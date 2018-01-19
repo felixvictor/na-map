@@ -119,24 +119,6 @@ export default function naDisplay(serverName) {
         showTeleportAreas: false
     };
 
-    function printPerformanceMeasure() {
-        function middle(values) {
-            const len = values.length;
-            const half = Math.floor(len / 2);
-
-            if (len % 2) {
-                return (values[half - 1] + values[half]) / 2.0;
-            }
-            return values[half];
-        }
-
-        function median(values) {
-            const val = values.slice(0).sort((a, b) => a - b);
-
-            return middle(val);
-        }
-    }
-
     const thousandsWithBlanks = x => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u202f");
 
     const formatCoord = x => {
