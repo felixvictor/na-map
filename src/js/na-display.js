@@ -136,10 +136,12 @@ export default function naDisplay(serverName) {
     }
 
     function displayCountries(transform) {
-        naContext.setTransform(1, 0, 0, 1, 0, 0);
+        naContext.save();
         naContext.clearRect(0, 0, defaults.width, defaults.height);
-        naContext.setTransform(transform.k, 0, 0, transform.k, transform.x, transform.y);
+        naContext.translate(transform.x, transform.y);
+        naContext.scale(transform.k, transform.k);
         naContext.drawImage(defaults.image, 0, 0);
+        naContext.restore();
     }
 
     function updatePorts() {
