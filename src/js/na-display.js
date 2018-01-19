@@ -237,7 +237,7 @@ export default function naDisplay(serverName) {
                 return h;
             }
 
-            function portMouseover(d, i, nodes) {
+            function showPortDetails(d, i, nodes) {
                 const t0 = performance.now();
                 const port = d3.select(nodes[i]);
 
@@ -275,7 +275,7 @@ export default function naDisplay(serverName) {
                     "fill",
                     d => `url(#${d.properties.availableForAll ? `${d.properties.nation}a` : d.properties.nation})`
                 )
-                .on("mouseover", portMouseover);
+                .on("click", showPortDetails);
 
             // Apply to both old and new
             circleUpdate
