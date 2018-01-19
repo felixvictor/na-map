@@ -37,7 +37,7 @@ export default function naDisplay(serverName) {
             min: 0,
             max: 8192
         },
-        portCoord: [4396, 2494], // Shroud Cay
+        port: { coord: { x: 4396, y: 2494 } }, // Shroud Cay
         maxScale: 10,
         fontSize: { initial: 30, portLabel: 18, pbZone: 7 },
         circleSize: { initial: 50, portLabel: 20, pbZone: 5 },
@@ -109,7 +109,7 @@ export default function naDisplay(serverName) {
     defaults.voronoiRadius = Math.max(defaults.height, defaults.width);
 
     const current = {
-        portCoord: defaults.portCoord,
+        port: { coord: defaults.port.coord },
         fontSize: defaults.fontSize.initial,
         circleSize: defaults.circleSize.initial,
         bFirstCoord: true,
@@ -430,9 +430,9 @@ export default function naDisplay(serverName) {
         if (current.bFirstCoord) {
             clearMap();
         }
+
         current.lineData.push([x, y]);
-        // console.log(x, y);
-        // console.log(current.lineData);
+
         if (current.bFirstCoord) {
             printCompass(x, y);
             current.bFirstCoord = !current.bFirstCoord;
@@ -563,9 +563,6 @@ export default function naDisplay(serverName) {
 
             if (d3.event.transform.k > defaults.PBZoneZoomScale) {
                 if (current.zoomStage !== "pbZone") {
-                    current.PBZoneData = defaults.PBZoneData;
-                    current.fortData = defaults.fortData;
-                    current.towerData = defaults.towerData;
                     current.portLabelData = defaults.portLabelData;
                     current.dFactor = 0.5;
                     current.highlightId = null;
@@ -574,9 +571,6 @@ export default function naDisplay(serverName) {
                 }
             } else if (d3.event.transform.k > defaults.labelZoomScale) {
                 if (current.zoomStage !== "portLabel") {
-                    current.PBZoneData = {};
-                    current.fortData = {};
-                    current.towerData = {};
                     current.portLabelData = defaults.portLabelData;
                     current.dFactor = 0;
                     current.highlightId = null;
@@ -584,9 +578,6 @@ export default function naDisplay(serverName) {
                     setCurrent("portLabel");
                 }
             } else if (current.zoomStage !== "initial") {
-                current.PBZoneData = {};
-                current.fortData = {};
-                current.towerData = {};
                 current.portLabelData = {};
                 current.dFactor = 0;
                 current.highlightId = null;
@@ -603,6 +594,47 @@ export default function naDisplay(serverName) {
         mainGPort.attr("transform", d3.event.transform);
         mainGPBZone.attr("transform", d3.event.transform);
         mainGCoord.attr("transform", d3.event.transform);
+    }
+
+    function goToPort() {
+        if (current.showPBZones) {
+            current.PBZoneData = {
+                type: "FeatureCollection",
+                features: defaults.PBZoneData.features.filter(d => d.id === current.port.id).map(d => ({
+                    type: "Feature",
+                    id: d.id,
+                    geometry: d.geometry
+                }))
+            };
+            current.fortData = {
+                type: "FeatureCollection",
+                features: defaults.fortData.features.filter(d => d.id === current.port.id).map(d => ({
+                    type: "Feature",
+                    id: d.id,
+                    geometry: d.geometry
+                }))
+            };
+            current.towerData = {
+                type: "FeatureCollection",
+                features: defaults.towerData.features.filter(d => d.id === current.port.id).map(d => ({
+                    type: "Feature",
+                    id: d.id,
+                    geometry: d.geometry
+                }))
+            };
+        } else {
+            current.PBZoneData = {};
+            current.fortData = {};
+            current.towerData = {};
+        }
+
+        updatePBZones();
+
+        if (current.port.id) {
+            zoomAndPan(current.port.coord.x, current.port.coord.y, 2);
+        } else {
+            initialZoomAndPan();
+        }
     }
 
     function setup() {
@@ -754,6 +786,7 @@ export default function naDisplay(serverName) {
                 const portNames = $("#port-names");
                 const selectPorts = defaults.portData
                     .map(d => ({
+                        id: d.id,
                         coord: [d.geometry.coordinates[0], d.geometry.coordinates[1]],
                         name: d.properties.name
                     }))
@@ -776,7 +809,8 @@ export default function naDisplay(serverName) {
                     portNames.append(
                         $("<option>", {
                             value: port.coord,
-                            text: port.name
+                            text: port.name,
+                            data: { id: port.id }
                         })
                     );
                 });
@@ -825,24 +859,20 @@ export default function naDisplay(serverName) {
                 }
             }
 
-            function goToPort(coord) {
-                const c = coord.split(","),
-                    x = +c[0],
-                    y = +c[1];
-
-                current.portCoord = [x, y];
-                zoomAndPan(x, y, 2);
-            }
-
             setupPortSelect();
             $("#port-names").on("change", () => {
-                const value = $("#port-names").val();
-                if (value !== 0) {
-                    goToPort(value);
+                const port = $("#port-names").find(":selected");
+
+                if (port.val() !== 0) {
+                    const c = port.val().split(",");
+                    current.port.coord.x = +c[0];
+                    current.port.coord.y = +c[1];
+                    current.port.id = port.data("id");
                 } else {
-                    current.portCoord = defaults.portCoord;
-                    initialZoomAndPan();
+                    current.port.coord = defaults.port.coord;
+                    current.port.id = 0;
                 }
+                goToPort();
             });
             setupGoodSelect();
             $("#good-names").on("change", () => {
@@ -1043,8 +1073,8 @@ export default function naDisplay(serverName) {
                             xCompass = width / 2,
                             yCompass = height / 3;
                         const targetScale = 2,
-                            x = current.portCoord[0],
-                            y = current.portCoord[1];
+                            x = current.port.coord.x,
+                            y = current.port.coord.y;
 
                         function printWindLine() {
                             const length = compassSize * 1.3,
@@ -1097,7 +1127,6 @@ export default function naDisplay(serverName) {
                                 ),
                                 textHeight = Math.max(bbox1.height, bbox2.height) * 2 + lineHeight,
                                 textWidth = Math.max(bbox1.width, bbox2.width) + lineHeight;
-                            console.log(lineHeight);
                             svg
                                 .attr("x", (width - textWidth) / 2)
                                 .attr("y", "60%")
@@ -1289,6 +1318,14 @@ export default function naDisplay(serverName) {
                     current.teleportData = current.showTeleportAreas ? defaults.voronoiDiagram.polygons() : {};
                     updateTeleportAreas();
                 });
+
+            $("#show-pb")
+                .on("click", event => event.stopPropagation())
+                .on("change", () => {
+                    const $input = $("#show-pb");
+                    current.showPBZones = $input.is(":checked");
+                    goToPort(current.port.coord.x, current.port.coord.y);
+                });
         }
 
         setupCanvas();
@@ -1312,6 +1349,9 @@ export default function naDisplay(serverName) {
         defaults.PBZoneData = topojsonFeature(pbZonesJsonData, pbZonesJsonData.objects.pbZones);
         defaults.fortData = topojsonFeature(pbZonesJsonData, pbZonesJsonData.objects.forts);
         defaults.towerData = topojsonFeature(pbZonesJsonData, pbZonesJsonData.objects.towers);
+        current.PBZoneData = {};
+        current.fortData = {};
+        current.towerData = {};
 
         setup();
         // updatePorts(current.portData.filter(d => ["234", "237", "238", "239", "240"].includes(d.id)));
