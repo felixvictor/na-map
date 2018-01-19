@@ -20,7 +20,9 @@ export default function naDisplay(serverName) {
         pbZones: [],
         teleport: [],
         ports: [],
-        map: []
+        map: [],
+        portMouseover: [],
+        teleportMouseover: []
     };
     let measureCount = 1;
 
@@ -126,6 +128,30 @@ export default function naDisplay(serverName) {
         nation: ""
     };
 
+    function printperfMeasure() {
+        function middle(values) {
+            const len = values.length;
+            const half = Math.floor(len / 2);
+
+            if (len % 2) {
+                return (values[half - 1] + values[half]) / 2.0;
+            }
+            return values[half];
+        }
+
+        function median(values) {
+            const val = values.slice(0).sort((a, b) => a - b);
+
+            return middle(val);
+        }
+
+        console.group(`Measure ${measureCount++}`);
+        Object.entries(time).forEach(([key, value]) => {
+            console.log(`Median time for ${key}: ${value.length ? median(value).toFixed(2) : "-"} milliseconds`);
+        });
+        console.groupEnd();
+    }
+
     const thousandsWithBlanks = x => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u202f");
 
     const formatCoord = x => {
@@ -212,6 +238,7 @@ export default function naDisplay(serverName) {
             }
 
             function portMouseover(d, i, nodes) {
+                const t0 = performance.now();
                 const port = d3.select(nodes[i]);
 
                 port.attr("data-toggle", "tooltip").attr("title", () => naTooltipData(d.properties));
@@ -223,6 +250,9 @@ export default function naDisplay(serverName) {
                         placement: "auto"
                     })
                     .tooltip("show");
+                const t1 = performance.now();
+                time.portMouseover.push(t1 - t0);
+                printperfMeasure();
             }
 
             // Data join
@@ -311,6 +341,7 @@ export default function naDisplay(serverName) {
                 mx = ref[0],
                 my = ref[1];
 
+            const t0 = performance.now();
             // use the new diagram.find() function to find the voronoi site closest to
             // the mouse, limited by max distance defined by defaults.voronoiRadius
             const site = defaults.voronoiDiagram.find(mx, my, defaults.voronoiRadius);
@@ -319,6 +350,9 @@ export default function naDisplay(serverName) {
                 updateTeleportAreas();
                 updatePorts();
             }
+            const t1 = performance.now();
+            time.teleportMouseover.push(t1 - t0);
+            printperfMeasure();
         }
 
         // Data join
@@ -610,27 +644,7 @@ export default function naDisplay(serverName) {
         t1 = performance.now();
         time.map.push(t1 - t0);
 
-        function middle(values) {
-            const len = values.length;
-            const half = Math.floor(len / 2);
-
-            if (len % 2) {
-                return (values[half - 1] + values[half]) / 2.0;
-            }
-            return values[half];
-        }
-
-        function median(values) {
-            const val = values.slice(0).sort((a, b) => a - b);
-
-            return middle(val);
-        }
-
-        console.group(`Measure ${measureCount++}`);
-        Object.entries(time).forEach(([key, value]) => {
-            console.log(`Median time for ${key}: ${median(value).toFixed(2)} milliseconds`);
-        });
-        console.groupEnd();
+        printperfMeasure();
 
         mainGVoronoi.attr("transform", d3.event.transform);
         mainGPort.attr("transform", d3.event.transform);
