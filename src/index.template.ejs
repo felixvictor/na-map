@@ -118,11 +118,21 @@
    <li class="nav-item dropdown pr-2">
     <a class="nav-link dropdown-toggle" href="#" id="doubleclickDropdown" role="button"
        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-     Double click to
+     Settings
     </a>
     <div class="dropdown-menu dropdown-menu-right large-width" id="doubleclickMenu"
          aria-labelledby="doubleclickDropdown">
-     <div class="radio-group ml-1 py-1">
+
+     <div class="col-auto align-self-center ml-1 py-1">
+     <div class="custom-control custom-checkbox">
+      <input type="checkbox" class="custom-control-input" id="show-teleport">
+      <label class="custom-control-label" for="show-teleport">Show teleport areas</label>
+     </div>
+     </div>
+
+     <div class="dropdown-divider"></div>
+     <h6 class="dropdown-header">Double click to</h6>
+     <div id="double-click-action" class="radio-group ml-1 py-1">
       <div class="col-auto align-self-center">
        <div class="custom-control custom-radio custom-control-inline">
         <input type="radio" class="custom-control-input" name="mouseFunction" id="compass"
