@@ -16,6 +16,14 @@ import "bootstrap/js/dist/tooltip";
 import "bootstrap/js/dist/util";
 
 export default function naDisplay(serverName) {
+    const time = {
+        pbZones: [],
+        teleport: [],
+        ports: [],
+        map: []
+    };
+    let measureCount = 1;
+
     let naSvg,
         naCanvas,
         naContext,
@@ -541,14 +549,24 @@ export default function naDisplay(serverName) {
     }
 
     function naZoomed() {
+        let t0, t1;
         function updateMap() {
             function setCurrent(zoomStage) {
                 current.zoomStage = zoomStage;
                 current.circleSize = defaults.circleSize[current.zoomStage];
                 current.fontSize = defaults.fontSize[current.zoomStage];
+                t0 = performance.now();
                 updatePBZones();
+                t1 = performance.now();
+                time.pbZones.push(t1 - t0);
+                t0 = performance.now();
                 updateTeleportAreas();
+                t1 = performance.now();
+                time.teleport.push(t1 - t0);
+                t0 = performance.now();
                 updatePorts();
+                t1 = performance.now();
+                time.ports.push(t1 - t0);
             }
 
             if (d3.event.transform.k > defaults.PBZoneZoomScale) {
@@ -587,7 +605,32 @@ export default function naDisplay(serverName) {
 
         updateMap();
         // console.log(`zoomed d3.event.transform: ${JSON.stringify(d3.event.transform)}`);
+        t0 = performance.now();
         displayCountries(d3.event.transform);
+        t1 = performance.now();
+        time.map.push(t1 - t0);
+
+        function middle(values) {
+            const len = values.length;
+            const half = Math.floor(len / 2);
+
+            if (len % 2) {
+                return (values[half - 1] + values[half]) / 2.0;
+            }
+            return values[half];
+        }
+
+        function median(values) {
+            const val = values.slice(0).sort((a, b) => a - b);
+
+            return middle(val);
+        }
+
+        console.group(`Measure ${measureCount++}`);
+        Object.entries(time).forEach(([key, value]) => {
+            console.log(`Median time for ${key}: ${median(value).toFixed(2)} milliseconds`);
+        });
+        console.groupEnd();
 
         mainGVoronoi.attr("transform", d3.event.transform);
         mainGPort.attr("transform", d3.event.transform);
