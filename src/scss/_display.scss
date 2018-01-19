@@ -44,10 +44,12 @@ $background-colour: $primary-300;
 
 text {
   fill: $primary-800;
+  pointer-events: none;
 }
 
 .port-name {
   font-size: large;
+  font-style: italic;
 }
 
 .pb-zone {
@@ -72,10 +74,6 @@ table td {
 table tr,
 p {
   text-align: left;
-}
-
-text {
-  pointer-events: none;
 }
 
 .label-rect {
@@ -149,7 +147,6 @@ text {
 .tooltip {
   font-size: smaller;
   text-align: left;
-  background: $primary;
   box-shadow: 0 14px 28px rgba($primary-900, .25), 0 10px 10px rgba($primary-900, .22);
   table {
     margin-bottom: 0;
