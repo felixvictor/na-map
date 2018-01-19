@@ -16,16 +16,6 @@ import "bootstrap/js/dist/tooltip";
 import "bootstrap/js/dist/util";
 
 export default function naDisplay(serverName) {
-    const time = {
-        pbZones: [],
-        teleport: [],
-        ports: [],
-        map: [],
-        portMouseover: [],
-        teleportMouseover: []
-    };
-    let measureCount = 1;
-
     let naSvg,
         naCanvas,
         naContext,
@@ -145,12 +135,6 @@ export default function naDisplay(serverName) {
 
             return middle(val);
         }
-
-        console.group(`Measure ${measureCount++}`);
-        Object.entries(time).forEach(([key, value]) => {
-            console.log(`Median time for ${key}: ${value.length ? median(value).toFixed(2) : "-"} milliseconds`);
-        });
-        console.groupEnd();
     }
 
     const thousandsWithBlanks = x => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u202f");
@@ -239,7 +223,6 @@ export default function naDisplay(serverName) {
             }
 
             function showPortDetails(d, i, nodes) {
-                const t0 = performance.now();
                 const port = d3.select(nodes[i]);
 
                 port.attr("data-toggle", "tooltip");
@@ -253,9 +236,6 @@ export default function naDisplay(serverName) {
                         trigger: "manual"
                     })
                     .tooltip("show");
-                const t1 = performance.now();
-                time.portMouseover.push(t1 - t0);
-                printPerformanceMeasure();
             }
 
             function hidePortDetails(d, i, nodes) {
@@ -350,7 +330,6 @@ export default function naDisplay(serverName) {
                 mx = ref[0],
                 my = ref[1];
 
-            const t0 = performance.now();
             // use the new diagram.find() function to find the voronoi site closest to
             // the mouse, limited by max distance defined by defaults.voronoiRadius
             const site = defaults.voronoiDiagram.find(mx, my, defaults.voronoiRadius);
@@ -359,9 +338,6 @@ export default function naDisplay(serverName) {
                 updateTeleportAreas();
                 updatePorts();
             }
-            const t1 = performance.now();
-            time.teleportMouseover.push(t1 - t0);
-            printPerformanceMeasure();
         }
 
         // Data join
@@ -592,24 +568,15 @@ export default function naDisplay(serverName) {
     }
 
     function naZoomed() {
-        let t0, t1;
         function updateMap() {
             function setCurrent(zoomStage) {
                 current.zoomStage = zoomStage;
                 current.circleSize = defaults.circleSize[current.zoomStage];
                 current.fontSize = defaults.fontSize[current.zoomStage];
-                t0 = performance.now();
+
                 updatePBZones();
-                t1 = performance.now();
-                time.pbZones.push(t1 - t0);
-                t0 = performance.now();
                 updateTeleportAreas();
-                t1 = performance.now();
-                time.teleport.push(t1 - t0);
-                t0 = performance.now();
                 updatePorts();
-                t1 = performance.now();
-                time.ports.push(t1 - t0);
             }
 
             if (d3.event.transform.k > defaults.PBZoneZoomScale) {
@@ -648,12 +615,7 @@ export default function naDisplay(serverName) {
 
         updateMap();
         // console.log(`zoomed d3.event.transform: ${JSON.stringify(d3.event.transform)}`);
-        t0 = performance.now();
         displayCountries(d3.event.transform);
-        t1 = performance.now();
-        time.map.push(t1 - t0);
-
-        printPerformanceMeasure();
 
         mainGVoronoi.attr("transform", d3.event.transform);
         mainGPort.attr("transform", d3.event.transform);
