@@ -1298,13 +1298,15 @@ export default function naDisplay(serverName) {
                 clearMap();
             });
 
-            $("#show-teleport").change(() => {
-                const $input = $("#show-teleport");
-                console.log(`: ${$input.is(":checked")}`);
-                current.showTeleportAreas = $input.is(":checked");
-                current.teleportData = current.showTeleportAreas ? defaults.voronoiDiagram.polygons() : {};
-                updateTeleportAreas();
-            });
+            $("#show-teleport")
+                .on("click", event => event.stopPropagation())
+                .on("change", () => {
+                    const $input = $("#show-teleport");
+
+                    current.showTeleportAreas = $input.is(":checked");
+                    current.teleportData = current.showTeleportAreas ? defaults.voronoiDiagram.polygons() : {};
+                    updateTeleportAreas();
+                });
         }
 
         setupCanvas();

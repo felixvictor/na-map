@@ -7,7 +7,7 @@
  <meta content="Naval Action map" name="description">
  <meta content="width=device-width,initial-scale=1" name="viewport">
  <script src="https://www.googletagmanager.com/gtag/js?id=UA-109520372-1" async></script>
-<link href="na-map.min.css?5555688cf20b4f1a1e48" rel="stylesheet"></head>
+<link href="na-map.min.css?534e6cfbd028c720c0de" rel="stylesheet"></head>
 <body>
 
 <nav class="bg-light fixed-top navbar navbar-expand-lg navbar-light">
@@ -107,10 +107,20 @@
   <ul class="navbar-nav ml-auto">
    <li class="nav-item dropdown pr-2">
     <a href="#" class="dropdown-toggle nav-link" id="doubleclickDropdown" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
-     Double click to
+     Settings
     </a>
     <div class="dropdown-menu large-width dropdown-menu-right" id="doubleclickMenu" aria-labelledby="doubleclickDropdown">
-     <div class="ml-1 py-1 radio-group">
+
+     <div class="align-self-center col-auto ml-1 py-1">
+     <div class="custom-control custom-checkbox">
+      <input class="custom-control-input" id="show-teleport" type="checkbox">
+      <label class="custom-control-label" for="show-teleport">Show teleport areas</label>
+     </div>
+     </div>
+
+     <div class="dropdown-divider"></div>
+     <h6 class="dropdown-header">Double click to</h6>
+     <div class="ml-1 py-1 radio-group" id="double-click-action">
       <div class="align-self-center col-auto">
        <div class="custom-control custom-control-inline custom-radio">
         <input class="custom-control-input" id="compass" type="radio" value="compass" name="mouseFunction" checked>
@@ -155,5 +165,5 @@
 </section>
 
 <script src="https://d3js.org/d3.v4.min.js"></script>
-<script src="na-map.min.js?5555688cf20b4f1a1e48" type="text/javascript"></script></body>
+<script src="na-map.min.js?534e6cfbd028c720c0de" type="text/javascript"></script></body>
 </html>
