@@ -125,10 +125,11 @@ export default function naDisplay(serverName) {
         bFirstCoord: true,
         radioButton: "compass",
         lineData: [],
-        nation: ""
+        nation: "",
+        showTeleportAreas: false
     };
 
-    function printperfMeasure() {
+    function printPerformanceMeasure() {
         function middle(values) {
             const len = values.length;
             const half = Math.floor(len / 2);
@@ -252,7 +253,7 @@ export default function naDisplay(serverName) {
                     .tooltip("show");
                 const t1 = performance.now();
                 time.portMouseover.push(t1 - t0);
-                printperfMeasure();
+                printPerformanceMeasure();
             }
 
             // Data join
@@ -352,11 +353,11 @@ export default function naDisplay(serverName) {
             }
             const t1 = performance.now();
             time.teleportMouseover.push(t1 - t0);
-            printperfMeasure();
+            printPerformanceMeasure();
         }
 
         // Data join
-        const pathUpdate = mainGVoronoi.selectAll("path").data(current.TeleportData, d => d.data.id);
+        const pathUpdate = mainGVoronoi.selectAll("path").data(current.teleportData, d => d.data.id);
 
         // Remove old paths
         pathUpdate.exit().remove();
@@ -611,7 +612,7 @@ export default function naDisplay(serverName) {
                     current.portLabelData = defaults.portLabelData;
                     current.dFactor = 0.5;
                     current.highlightId = null;
-                    current.TeleportData = {};
+                    current.teleportData = {};
                     setCurrent("pbZone");
                 }
             } else if (d3.event.transform.k > defaults.labelZoomScale) {
@@ -622,7 +623,7 @@ export default function naDisplay(serverName) {
                     current.portLabelData = defaults.portLabelData;
                     current.dFactor = 0;
                     current.highlightId = null;
-                    current.TeleportData = defaults.voronoiDiagram.polygons();
+                    current.teleportData = current.showTeleportAreas ? defaults.voronoiDiagram.polygons() : {};
                     setCurrent("portLabel");
                 }
             } else if (current.zoomStage !== "initial") {
@@ -632,7 +633,7 @@ export default function naDisplay(serverName) {
                 current.portLabelData = {};
                 current.dFactor = 0;
                 current.highlightId = null;
-                current.TeleportData = defaults.voronoiDiagram.polygons();
+                current.teleportData = current.showTeleportAreas ? defaults.voronoiDiagram.polygons() : {};
                 setCurrent("initial");
             }
         }
@@ -644,7 +645,7 @@ export default function naDisplay(serverName) {
         t1 = performance.now();
         time.map.push(t1 - t0);
 
-        printperfMeasure();
+        printPerformanceMeasure();
 
         mainGVoronoi.attr("transform", d3.event.transform);
         mainGPort.attr("transform", d3.event.transform);
@@ -1322,9 +1323,17 @@ export default function naDisplay(serverName) {
                 clearMap();
             });
 
-            $(".radio-group").change(() => {
+            $("#double-click-action").change(() => {
                 current.radioButton = $("input[name='mouseFunction']:checked").val();
                 clearMap();
+            });
+
+            $("#show-teleport").change(() => {
+                const $input = $("#show-teleport");
+                console.log(`: ${$input.is(":checked")}`);
+                current.showTeleportAreas = $input.is(":checked");
+                current.teleportData = current.showTeleportAreas ? defaults.voronoiDiagram.polygons() : {};
+                updateTeleportAreas();
             });
         }
 
