@@ -242,18 +242,25 @@ export default function naDisplay(serverName) {
                 const t0 = performance.now();
                 const port = d3.select(nodes[i]);
 
-                port.attr("data-toggle", "tooltip").attr("title", () => naTooltipData(d.properties));
+                port.attr("data-toggle", "tooltip");
                 // eslint-disable-next-line no-underscore-dangle
                 $(port._groups[0])
                     .tooltip({
                         delay: { show: defaults.highlightDuration, hide: defaults.highlightDuration },
                         html: true,
-                        placement: "auto"
+                        placement: "auto",
+                        title: naTooltipData(d.properties),
+                        trigger: "manual"
                     })
                     .tooltip("show");
                 const t1 = performance.now();
                 time.portMouseover.push(t1 - t0);
                 printPerformanceMeasure();
+            }
+
+            function hidePortDetails(d, i, nodes) {
+                // eslint-disable-next-line no-underscore-dangle
+                $(d3.select(nodes[i])._groups[0]).tooltip("hide");
             }
 
             // Data join
@@ -276,7 +283,8 @@ export default function naDisplay(serverName) {
                     "fill",
                     d => `url(#${d.properties.availableForAll ? `${d.properties.nation}a` : d.properties.nation})`
                 )
-                .on("click", showPortDetails);
+                .on("click", showPortDetails)
+                .on("mouseout", hidePortDetails);
 
             // Apply to both old and new
             circleUpdate
