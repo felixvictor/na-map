@@ -30,9 +30,15 @@ export default function naDisplay(serverName) {
         mainGCoord,
         gCompass,
         svgWind;
-
+    const navbarBrandPaddingLeft = 1.618 * 16; // equals 1.618rem
+    // noinspection JSSuspiciousNameCombination
     const defaults = {
-        margin: { top: parseInt($(".navbar").css("height"), 10), right: 20, bottom: 20, left: 20 },
+        margin: {
+            top: parseFloat($(".navbar").css("height")) + navbarBrandPaddingLeft,
+            right: navbarBrandPaddingLeft,
+            bottom: navbarBrandPaddingLeft,
+            left: navbarBrandPaddingLeft
+        },
         coord: {
             min: 0,
             max: 8192
@@ -100,7 +106,7 @@ export default function naDisplay(serverName) {
     defaults.width = top.innerWidth - defaults.margin.left - defaults.margin.right;
     // eslint-disable-next-line no-restricted-globals
     defaults.height = top.innerHeight - defaults.margin.top - defaults.margin.bottom;
-    defaults.minScale = Math.min(defaults.height, defaults.width) / Math.max(defaults.coord.max, defaults.coord.max);
+    defaults.minScale = Math.min(defaults.width / defaults.coord.max, defaults.height / defaults.coord.max);
     defaults.coord.voronoi = [
         [defaults.coord.min - 1, defaults.coord.min - 1],
         [defaults.coord.max + 1, defaults.coord.max + 1]
@@ -675,13 +681,12 @@ export default function naDisplay(serverName) {
         }
 
         function setupSvg() {
-            const zoomPadding = defaults.coord.max / 50;
             naZoom = d3
                 .zoom()
                 .scaleExtent([defaults.minScale, defaults.maxScale])
                 .translateExtent([
-                    [defaults.coord.min - zoomPadding, defaults.coord.min - zoomPadding],
-                    [defaults.coord.max + zoomPadding, defaults.coord.max + zoomPadding]
+                    [defaults.coord.min, defaults.coord.min],
+                    [defaults.coord.max, defaults.coord.max]
                 ])
                 .on("zoom", naZoomed);
 
