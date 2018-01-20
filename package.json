@@ -83,7 +83,8 @@
     "push-change": "build/port-data.sh push-change",
     "push-update": "build/port-data.sh push-update",
     "update": "yarn run data-update && yarn run prod-update && yarn run push-update",
-    "watch": "yarn run clean && NODE_ENV=${NODE_ENV:=dev} webpack --watch --colors --config webpack.config.js"
+    "watch": "yarn run clean && NODE_ENV=${NODE_ENV:=dev} webpack --watch --colors --config webpack.config.js",
+    "dev": "yarn run clean && NODE_ENV=${NODE_ENV:=dev} webpack --colors --config webpack.config.js"
   },
   "browserslist": [
     "Chrome >= 62",
