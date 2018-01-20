@@ -1076,8 +1076,8 @@ export default function naDisplay(serverName) {
                             xCompass = width / 2,
                             yCompass = height / 3;
                         const targetScale = 2,
-                            x = current.port.coord.x,
-                            y = current.port.coord.y;
+                            { x } = current.port.coord,
+                            { y } = current.port.coord;
 
                         function printWindLine() {
                             const length = compassSize * 1.3,
