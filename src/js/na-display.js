@@ -590,7 +590,7 @@ export default function naDisplay(serverName) {
 
         updateMap();
         // console.log(`zoomed d3.event.transform: ${JSON.stringify(d3.event.transform)}`);
-        displayCountries(d3.event.transform);
+        //displayCountries(d3.event.transform);
 
         mainGVoronoi.attr("transform", d3.event.transform);
         mainGPort.attr("transform", d3.event.transform);
