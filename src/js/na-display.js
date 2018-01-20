@@ -141,6 +141,7 @@ export default function naDisplay(serverName) {
         naContext.translate(transform.x, transform.y);
         naContext.scale(transform.k, transform.k);
         naContext.drawImage(defaults.image, 0, 0);
+        naContext.getImageData(0, 0, defaults.width, defaults.height);
         naContext.restore();
     }
 
@@ -590,7 +591,7 @@ export default function naDisplay(serverName) {
 
         updateMap();
         // console.log(`zoomed d3.event.transform: ${JSON.stringify(d3.event.transform)}`);
-        //displayCountries(d3.event.transform);
+        displayCountries(d3.event.transform);
 
         mainGVoronoi.attr("transform", d3.event.transform);
         mainGPort.attr("transform", d3.event.transform);
