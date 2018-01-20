@@ -37,7 +37,7 @@ export default function naDisplay(serverName) {
             min: 0,
             max: 8192
         },
-        port: { coord: { x: 4396, y: 2494 } }, // Shroud Cay
+        port: { id: 366, coord: { x: 4396, y: 2494 } }, // Shroud Cay
         maxScale: 10,
         fontSize: { initial: 30, portLabel: 18, pbZone: 7 },
         circleSize: { initial: 50, portLabel: 20, pbZone: 5 },
@@ -109,7 +109,7 @@ export default function naDisplay(serverName) {
     defaults.voronoiRadius = Math.max(defaults.height, defaults.width);
 
     const current = {
-        port: { coord: defaults.port.coord },
+        port: { id: defaults.port.id, coord: defaults.port.coord },
         fontSize: defaults.fontSize.initial,
         circleSize: defaults.circleSize.initial,
         bFirstCoord: true,
@@ -276,29 +276,28 @@ export default function naDisplay(serverName) {
             // Apply to both old and new
             textUpdate
                 .merge(textEnter)
-                .attr(
-                    "x",
-                    d =>
-                        d.id === current.highlightId
-                            ? d.coord.x + d.dx * 3 * current.dFactor
-                            : d.coord.x + d.dx * current.dFactor
-                )
-                .attr("y", d => {
-                    if (current.dFactor) {
-                        return d.id === current.highlightId
-                            ? d.coord.y + d.dy * 3 * current.dFactor
-                            : d.coord.y + d.dy * current.dFactor;
+                .attr("x", d => {
+                    if (current.zoomLevel !== "pbZone") {
+                        return d.coord.x;
                     }
-                    return d.id === current.highlightId
-                        ? d.coord.y + current.fontSize * 5
-                        : d.coord.y + current.fontSize * 2.2;
+                    return current.showPBZones && d.id === current.port.id ? d.coord.x + d.dx * 0.25 : d.coord.x;
+                })
+                .attr("y", d => {
+                    if (current.zoomLevel !== "pbZone") {
+                        return d.id === current.highlightId
+                            ? d.coord.y + current.circleSize + current.fontSize * 2
+                            : d.coord.y + current.circleSize + current.fontSize;
+                    }
+                    return current.showPBZones && d.id === current.port.id
+                        ? d.coord.y + d.dy * 0.25
+                        : d.coord.y + current.circleSize + current.fontSize;
                 })
                 .attr(
                     "font-size",
                     d => (d.id === current.highlightId ? `${current.fontSize * 2}px` : `${current.fontSize}px`)
                 )
                 .attr("text-anchor", d => {
-                    if (current.dFactor) {
+                    if (current.showPBZones && current.zoomLevel === "pbZone" && d.id === current.port.id) {
                         return d.dx < 0 ? "end" : "start";
                     }
                     return "middle";
@@ -552,55 +551,16 @@ export default function naDisplay(serverName) {
         forts.datum(current.towerData).attr("d", d3.geoPath().pointRadius(2));
     }
 
-    function naZoomed() {
-        function updateMap() {
-            function setCurrent(zoomStage) {
-                current.zoomStage = zoomStage;
-                current.circleSize = defaults.circleSize[current.zoomStage];
-                current.fontSize = defaults.fontSize[current.zoomStage];
-
-                updatePBZones();
-                updateTeleportAreas();
-                updatePorts();
-            }
-
-            if (d3.event.transform.k > defaults.PBZoneZoomScale) {
-                if (current.zoomStage !== "pbZone") {
-                    current.portLabelData = defaults.portLabelData;
-                    current.dFactor = 0.5;
-                    current.highlightId = null;
-                    current.teleportData = {};
-                    setCurrent("pbZone");
-                }
-            } else if (d3.event.transform.k > defaults.labelZoomScale) {
-                if (current.zoomStage !== "portLabel") {
-                    current.portLabelData = defaults.portLabelData;
-                    current.dFactor = 0;
-                    current.highlightId = null;
-                    current.teleportData = current.showTeleportAreas ? defaults.voronoiDiagram.polygons() : {};
-                    setCurrent("portLabel");
-                }
-            } else if (current.zoomStage !== "initial") {
-                current.portLabelData = {};
-                current.dFactor = 0;
-                current.highlightId = null;
-                current.teleportData = current.showTeleportAreas ? defaults.voronoiDiagram.polygons() : {};
-                setCurrent("initial");
-            }
+    function setTeleportData() {
+        if (current.showTeleportAreas && current.zoomLevel !== "pbZone") {
+            current.teleportData = defaults.voronoiDiagram.polygons();
+        } else {
+            current.teleportData = {};
         }
-
-        updateMap();
-        // console.log(`zoomed d3.event.transform: ${JSON.stringify(d3.event.transform)}`);
-        displayCountries(d3.event.transform);
-
-        mainGVoronoi.attr("transform", d3.event.transform);
-        mainGPort.attr("transform", d3.event.transform);
-        mainGPBZone.attr("transform", d3.event.transform);
-        mainGCoord.attr("transform", d3.event.transform);
     }
 
-    function goToPort() {
-        if (current.showPBZones) {
+    function setPBZoneData() {
+        if (current.showPBZones && current.zoomLevel === "pbZone") {
             current.PBZoneData = {
                 type: "FeatureCollection",
                 features: defaults.PBZoneData.features.filter(d => d.id === current.port.id).map(d => ({
@@ -630,9 +590,58 @@ export default function naDisplay(serverName) {
             current.fortData = {};
             current.towerData = {};
         }
+    }
 
-        updatePBZones();
+    function updateMap() {
+        function setCurrent() {
+            current.circleSize = defaults.circleSize[current.zoomLevel];
+            current.fontSize = defaults.fontSize[current.zoomLevel];
 
+            updatePBZones();
+            updateTeleportAreas();
+            updatePorts();
+        }
+
+        if (d3.event.transform.k > defaults.PBZoneZoomScale) {
+            if (current.zoomLevel !== "pbZone") {
+                current.zoomLevel = "pbZone";
+                setPBZoneData();
+                setTeleportData();
+                current.portLabelData = defaults.portLabelData;
+                current.highlightId = null;
+                setCurrent();
+            }
+        } else if (d3.event.transform.k > defaults.labelZoomScale) {
+            if (current.zoomLevel !== "portLabel") {
+                current.zoomLevel = "portLabel";
+                setPBZoneData();
+                setTeleportData();
+                current.portLabelData = defaults.portLabelData;
+                current.highlightId = null;
+                setCurrent();
+            }
+        } else if (current.zoomLevel !== "initial") {
+            current.zoomLevel = "initial";
+            current.portLabelData = {};
+            current.highlightId = null;
+            setPBZoneData();
+            setTeleportData();
+            setCurrent();
+        }
+    }
+
+    function naZoomed() {
+        updateMap();
+        // console.log(`zoomed d3.event.transform: ${JSON.stringify(d3.event.transform)}`);
+        displayCountries(d3.event.transform);
+
+        mainGVoronoi.attr("transform", d3.event.transform);
+        mainGPort.attr("transform", d3.event.transform);
+        mainGPBZone.attr("transform", d3.event.transform);
+        mainGCoord.attr("transform", d3.event.transform);
+    }
+
+    function goToPort() {
         if (current.port.id) {
             zoomAndPan(current.port.coord.x, current.port.coord.y, 2);
         } else {
@@ -873,7 +882,11 @@ export default function naDisplay(serverName) {
                     current.port.id = port.data("id");
                 } else {
                     current.port.coord = defaults.port.coord;
-                    current.port.id = 0;
+                    current.port.id = defaults.port.id;
+                }
+                if (current.showPBZones) {
+                    setPBZoneData();
+                    updatePBZones();
                 }
                 goToPort();
             });
@@ -1318,7 +1331,7 @@ export default function naDisplay(serverName) {
                     const $input = $("#show-teleport");
 
                     current.showTeleportAreas = $input.is(":checked");
-                    current.teleportData = current.showTeleportAreas ? defaults.voronoiDiagram.polygons() : {};
+                    setTeleportData();
                     updateTeleportAreas();
                 });
 
@@ -1326,8 +1339,10 @@ export default function naDisplay(serverName) {
                 .on("click", event => event.stopPropagation())
                 .on("change", () => {
                     const $input = $("#show-pb");
+
                     current.showPBZones = $input.is(":checked");
-                    goToPort(current.port.coord.x, current.port.coord.y);
+                    setPBZoneData();
+                    updatePBZones();
                 });
         }
 
