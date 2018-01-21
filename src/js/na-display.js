@@ -22,6 +22,7 @@ export default function naDisplay(serverName) {
         svgDef,
         naZoom,
         mainGPort,
+        mainGText,
         mainGPBZone,
         pbZones,
         towers,
@@ -155,7 +156,7 @@ export default function naDisplay(serverName) {
         function naTooltipData(d) {
             let h = `<table><tbody<tr><td><i class="flag-icon ${
                 d.availableForAll ? `${d.nation}a` : d.nation
-                }"></i></td>`;
+            }"></i></td>`;
             h += `<td><span class="port-name">${d.name}</span>`;
             h += d.availableForAll ? " (accessible to all nations)" : "";
             h += "</td></tr></tbody></table>";
@@ -189,7 +190,7 @@ export default function naDisplay(serverName) {
                 h += `, ${d.conquestMarksPension}\u202fconquest point`;
                 h += d.conquestMarksPension > 1 ? "s" : "";
                 h += `<br>Tax income ${thousandsWithBlanks(d.taxIncome)} (${d.portTax *
-                100}\u202f%), net income ${formatCoord(d.netIncome)}`;
+                    100}\u202f%), net income ${formatCoord(d.netIncome)}`;
                 h += d.tradingCompany ? `, trading company level\u202f${d.tradingCompany}` : "";
                 h += d.laborHoursDiscount ? ", labor hours discount" : "";
             } else {
@@ -262,48 +263,60 @@ export default function naDisplay(serverName) {
     }
 
     function updatePortTexts() {
-        // Data join
-        const textUpdate = mainGPort.selectAll("text").data(current.portLabelData, d => d.id);
+        if (current.zoomLevel === "initial") {
+            mainGText.attr("display", "none");
+        } else {
+            mainGText.attr("display", "inherit");
 
-        // Remove old text
-        textUpdate.exit().remove();
+            // Data join
+            const textUpdate = mainGText.selectAll("text").data(current.portData, d => d.id);
 
-        // Update kept texts
-        // textUpdate; // not needed
+            // Remove old text
+            textUpdate.exit().remove();
 
-        // Add new texts
-        const textEnter = textUpdate
-            .enter()
-            .append("text")
-            .text(d => d.name);
+            // Update kept texts
+            // textUpdate; // not needed
 
-        const deltaY = current.circleSize + current.fontSize;
-        const deltaY2 = current.circleSize + current.fontSize * 2;
-        // Apply to both old and new
-        textUpdate
-            .merge(textEnter)
-            .attr("x", d => {
-                if (current.zoomLevel !== "pbZone") {
-                    return d.coord.x;
-                }
-                return current.showPBZones && d.id === current.port.id ? d.coord.x + d.dx : d.coord.x;
-            })
-            .attr("y", d => {
-                if (current.zoomLevel !== "pbZone") {
-                    return d.id === current.highlightId ? d.coord.y + deltaY2 : d.coord.y + deltaY;
-                }
-                return current.showPBZones && d.id === current.port.id ? d.coord.y + d.dy : d.coord.y + deltaY;
-            })
-            .attr(
-                "font-size",
-                d => (d.id === current.highlightId ? `${current.fontSize * 2}px` : `${current.fontSize}px`)
-            )
-            .attr("text-anchor", d => {
-                if (current.showPBZones && current.zoomLevel === "pbZone" && d.id === current.port.id) {
-                    return d.dx < 0 ? "end" : "start";
-                }
-                return "middle";
-            });
+            // Add new texts
+            const textEnter = textUpdate
+                .enter()
+                .append("text")
+                .text(d => d.properties.name);
+
+            const deltaY = current.circleSize + current.fontSize;
+            const deltaY2 = current.circleSize + current.fontSize * 2;
+            // Apply to both old and new
+            textUpdate
+                .merge(textEnter)
+                .attr("x", d => {
+                    if (current.zoomLevel !== "pbZone") {
+                        return d.geometry.coordinates[0];
+                    }
+                    return current.showPBZones && d.id === current.port.id
+                        ? d.geometry.coordinates[0] + d.properties.dx
+                        : d.geometry.coordinates[0];
+                })
+                .attr("y", d => {
+                    if (current.zoomLevel !== "pbZone") {
+                        return d.id === current.highlightId
+                            ? d.geometry.coordinates[1] + deltaY2
+                            : d.geometry.coordinates[1] + deltaY;
+                    }
+                    return current.showPBZones && d.id === current.port.id
+                        ? d.geometry.coordinates[1] + d.properties.dy
+                        : d.geometry.coordinates[1] + deltaY;
+                })
+                .attr(
+                    "font-size",
+                    d => (d.id === current.highlightId ? `${current.fontSize * 2}px` : `${current.fontSize}px`)
+                )
+                .attr("text-anchor", d => {
+                    if (current.showPBZones && current.zoomLevel === "pbZone" && d.id === current.port.id) {
+                        return d.properties.dx < 0 ? "end" : "start";
+                    }
+                    return "middle";
+                });
+        }
     }
 
     function updatePorts() {
@@ -364,7 +377,6 @@ export default function naDisplay(serverName) {
         current.bFirstCoord = true;
         current.lineData.splice(0, current.lineData.length);
         current.portData = defaults.portData;
-        current.portLabelData = defaults.portLabelData;
         $("#good-names").get(0).selectedIndex = 0;
         updatePorts();
     }
@@ -596,16 +608,6 @@ export default function naDisplay(serverName) {
         }
     }
 
-    function setPortLabelData() {
-        current.portLabelData = current.portData.map(d => ({
-            id: d.id,
-            coord: { x: d.geometry.coordinates[0], y: d.geometry.coordinates[1] },
-            name: d.properties.name,
-            dx: d.properties.dx,
-            dy: d.properties.dy
-        }));
-    }
-
     function updateMap() {
         function setCurrent() {
             current.circleSize = defaults.circleSize[current.zoomLevel];
@@ -621,7 +623,6 @@ export default function naDisplay(serverName) {
                 current.zoomLevel = "pbZone";
                 setPBZoneData();
                 setTeleportData();
-                setPortLabelData();
                 current.highlightId = null;
                 setCurrent();
             }
@@ -630,13 +631,11 @@ export default function naDisplay(serverName) {
                 current.zoomLevel = "portLabel";
                 setPBZoneData();
                 setTeleportData();
-                setPortLabelData();
                 current.highlightId = null;
                 setCurrent();
             }
         } else if (current.zoomLevel !== "initial") {
             current.zoomLevel = "initial";
-            current.portLabelData = {};
             current.highlightId = null;
             setPBZoneData();
             setTeleportData();
@@ -736,6 +735,7 @@ export default function naDisplay(serverName) {
                 .attr("class", "wind-head");
             mainGVoronoi = naSvg.append("g").classed("voronoi", true);
             mainGPort = naSvg.append("g").classed("port", true);
+            mainGText = mainGPort.append("g");
             mainGPBZone = naSvg.append("g").classed("pb", true);
             pbZones = mainGPBZone.append("path").classed("pb-zone", true);
             towers = mainGPBZone.append("path").classed("tower", true);
@@ -753,15 +753,6 @@ export default function naDisplay(serverName) {
         }
 
         function setupPorts() {
-            defaults.portLabelData = defaults.portData.map(d => ({
-                id: d.id,
-                coord: { x: d.geometry.coordinates[0], y: d.geometry.coordinates[1] },
-                name: d.properties.name,
-                dx: d.properties.dx,
-                dy: d.properties.dy
-            }));
-            current.portLabelData = {};
-
             defaults.nations.map(d => d.id).forEach(nation => {
                 svgDef
                     .append("pattern")
@@ -910,10 +901,8 @@ export default function naDisplay(serverName) {
                     .split(",");
                 if (portIds.includes("0")) {
                     current.portData = defaults.portData;
-                    current.portLabelData = defaults.portLabelData;
                 } else {
                     current.portData = defaults.portData.filter(d => portIds.includes(d.id));
-                    current.portLabelData = defaults.portLabelData.filter(d => portIds.includes(d.id));
                 }
                 updatePorts();
             });
@@ -949,13 +938,10 @@ export default function naDisplay(serverName) {
 
             if (+clan !== 0) {
                 current.portData = defaults.portData.filter(d => clan === d.properties.capturer);
-                current.portLabelData = defaults.portLabelData.filter(d => clan === d.properties.capturer);
             } else if (current.nation) {
                 current.portData = defaults.portData.filter(d => current.nation === d.properties.nation);
-                current.portLabelData = defaults.portLabelData.filter(d => current.nation === d.properties.nation);
             } else {
                 current.portData = defaults.portData;
-                current.portLabelData = defaults.portLabelData;
             }
             $("#propertyDropdown").dropdown("toggle");
             updatePorts();
@@ -997,12 +983,10 @@ export default function naDisplay(serverName) {
                 if (+nationId !== 0) {
                     current.nation = nationId;
                     current.portData = defaults.portData.filter(d => nationId === d.properties.nation);
-                    current.portLabelData = defaults.portLabelData.filter(d => nationId === d.properties.nation);
                     setupClanSelect();
                 } else {
                     current.nation = "";
                     current.portData = defaults.portData;
-                    current.portLabelData = defaults.portLabelData;
                     setupClanSelect();
                 }
                 $("#propertyDropdown").dropdown("toggle");
@@ -1011,15 +995,16 @@ export default function naDisplay(serverName) {
 
             function allSelect() {
                 current.portData = defaults.portData.filter(d => d.properties.availableForAll);
-                current.portLabelData = defaults.portLabelData.filter(d => d.properties.availableForAll);
                 updatePorts();
             }
 
             function filterCaptured(begin, end) {
-                current.portData = defaults.portData.filter(d =>
-                    moment(d.properties.lastPortBattle).isBetween(begin, end, null, "()")
+                console.log(
+                    "Between %s, and %s",
+                    begin.format("dddd, D MMMM YYYY, h:mm"),
+                    end.format("dddd, D MMMM YYYY, h:mm")
                 );
-                current.portLabelData = defaults.portLabelData.filter(d =>
+                current.portData = defaults.portData.filter(d =>
                     moment(d.properties.lastPortBattle).isBetween(begin, end, null, "()")
                 );
                 updatePorts();
@@ -1071,12 +1056,8 @@ export default function naDisplay(serverName) {
 
                 if (value !== 0) {
                     current.portData = defaults.portData.filter(d => value === d.properties.conquestMarksPension);
-                    current.portLabelData = defaults.portLabelData.filter(
-                        d => value === d.properties.conquestMarksPension
-                    );
                 } else {
                     current.portData = defaults.portData;
-                    current.portLabelData = defaults.portLabelData;
                 }
                 $("#propertyDropdown").dropdown("toggle");
                 updatePorts();
