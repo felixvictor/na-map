@@ -7,7 +7,7 @@
  <meta content="Naval Action map" name="description">
  <meta content="width=device-width,initial-scale=1" name="viewport">
  <script src="https://www.googletagmanager.com/gtag/js?id=UA-109520372-1" async></script>
-<link href="na-map.min.css?0a5c933fcd911845e5ca" rel="stylesheet"></head>
+<link href="na-map.min.css?8a3d0d30e2782de1a865" rel="stylesheet"></head>
 <body>
 
 <nav class="bg-light fixed-top navbar navbar-expand-lg navbar-light">
@@ -47,15 +47,15 @@
     <div class="dropdown-menu extralarge-width" id="predictMenu" aria-labelledby="predictDropdown">
      <form id="windPrediction" class="p-2">
       <div class="form-group row">
-       <label class="col-form-label col-sm-5 align-top" for="direction">Wind currently blowing
+       <label class="col-sm-6 col-form-label align-top" for="direction">Wind currently blowing
         from</label>
-       <div class="col-sm-7">
+       <div class="col-sm-6">
         <div class="rslider" id="direction"></div>
        </div>
       </div>
       <div class="form-group row">
-       <label class="col-form-label col-sm-5" for="time">Predict wind for</label>
-       <div class="col-sm-7">
+       <label class="col-sm-6 col-form-label" for="time">Predict wind for</label>
+       <div class="col-sm-6">
         <div class="form-group">
          <div class="input-group date" id="time" data-target-input="nearest">
           <input class="form-control datetimepicker-input" id="wind-time-input" type="text" required aria-label="time" data-target="#time">
@@ -64,7 +64,7 @@
           </div>
          </div>
         </div>
-        <small class="form-text text-muted">Server time (wind is reset after maintenance)</small>
+        <small class="form-text text-muted">Server time</small>
        </div>
       </div>
       <button class="btn btn-outline-primary" type="submit">Predict</button>
@@ -134,11 +134,11 @@
      <div class="ml-1 py-1 radio-group" id="double-click-action">
       <div class="align-self-center col-auto">
        <div class="custom-control custom-control-inline custom-radio">
-        <input class="custom-control-input" id="compass" type="radio" value="compass" name="mouseFunction" checked>
+        <input class="custom-control-input" id="compass" type="radio" name="mouseFunction" value="compass" checked>
         <label class="custom-control-label" for="compass">plot a course</label>
        </div>
        <div class="custom-control custom-control-inline custom-radio">
-        <input class="custom-control-input" id="F11" type="radio" value="F11" name="mouseFunction">
+        <input class="custom-control-input" id="F11" type="radio" name="mouseFunction" value="F11">
         <label class="custom-control-label" for="F11">show F11 coordinates</label>
        </div>
       </div>
@@ -176,5 +176,5 @@
 </section>
 
 <script src="https://d3js.org/d3.v4.min.js"></script>
-<script src="na-map.min.js?0a5c933fcd911845e5ca" type="text/javascript"></script></body>
+<script src="na-map.min.js?8a3d0d30e2782de1a865" type="text/javascript"></script></body>
 </html>
