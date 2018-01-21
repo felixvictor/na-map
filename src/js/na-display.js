@@ -9,6 +9,7 @@
 
 import { feature as topojsonFeature } from "topojson-client";
 import moment from "moment";
+import "moment-timezone";
 import "moment/locale/en-gb";
 import "round-slider/src/roundslider";
 import "tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4";
@@ -1232,7 +1233,8 @@ export default function naDisplay(serverName) {
                         today: "far fa-calendar-check",
                         clear: "fas fa-trash",
                         close: "fas fa-times"
-                    }
+                    },
+                    timeZone: "UTC"
                 });
 
                 $("#time").datetimepicker({
