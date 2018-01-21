@@ -573,6 +573,7 @@ export default function naDisplay(serverName) {
         } else {
             current.teleportData = {};
         }
+        current.highlightId = null;
     }
 
     function setPBZoneData() {
@@ -623,7 +624,6 @@ export default function naDisplay(serverName) {
                 current.zoomLevel = "pbZone";
                 setPBZoneData();
                 setTeleportData();
-                current.highlightId = null;
                 setCurrent();
             }
         } else if (d3.event.transform.k > defaults.labelZoomScale) {
@@ -631,12 +631,10 @@ export default function naDisplay(serverName) {
                 current.zoomLevel = "portLabel";
                 setPBZoneData();
                 setTeleportData();
-                current.highlightId = null;
                 setCurrent();
             }
         } else if (current.zoomLevel !== "initial") {
             current.zoomLevel = "initial";
-            current.highlightId = null;
             setPBZoneData();
             setTeleportData();
             setCurrent();
@@ -1000,9 +998,9 @@ export default function naDisplay(serverName) {
 
             function filterCaptured(begin, end) {
                 console.log(
-                    "Between %s, and %s",
-                    begin.format("dddd, D MMMM YYYY, h:mm"),
-                    end.format("dddd, D MMMM YYYY, h:mm")
+                    "Between %s and %s",
+                    begin.format("dddd D MMMM YYYY h:mm"),
+                    end.format("dddd D MMMM YYYY h:mm")
                 );
                 current.portData = defaults.portData.filter(d =>
                     moment(d.properties.lastPortBattle).isBetween(begin, end, null, "()")
