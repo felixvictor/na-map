@@ -1258,9 +1258,10 @@ export default function naDisplay(serverName) {
 
                 $("#direction").roundSlider({
                     sliderType: "default",
+                    handleSize: "+1",
                     startAngle: 90,
                     width: 20,
-                    radius: 100,
+                    radius: 110,
                     min: 0,
                     max: 359,
                     step: 360 / defaults.compassDirections.length,
