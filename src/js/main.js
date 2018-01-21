@@ -4,19 +4,40 @@
  iB 2017
  */
 
-import naDisplay from "./na-display";
-import naAnalytics from "./analytics.js";
 import "bootstrap/js/dist/collapse";
 import "bootstrap/js/dist/dropdown";
 import "bootstrap/js/dist/modal";
 import "bootstrap/js/dist/util";
 
 import fontawesome from "@fortawesome/fontawesome";
-import { faCopy } from "@fortawesome/fontawesome-free-regular";
-import { faPaste } from "@fortawesome/fontawesome-free-solid";
+import { faCalendar, faCalendarCheck, faClock, faCopy } from "@fortawesome/fontawesome-free-regular";
+import {
+    faArrowDown,
+    faArrowUp,
+    faChevronLeft,
+    faChevronRight,
+    faPaste,
+    faTimes,
+    faTrash
+} from "@fortawesome/fontawesome-free-solid";
+
+import naDisplay from "./na-display";
+import naAnalytics from "./analytics";
 
 function main() {
-    fontawesome.library.add(faCopy, faPaste);
+    fontawesome.library.add(
+        faCalendar,
+        faCalendarCheck,
+        faClock,
+        faCopy,
+        faArrowDown,
+        faArrowUp,
+        faChevronLeft,
+        faChevronRight,
+        faPaste,
+        faTimes,
+        faTrash
+    );
     naAnalytics();
     $("#modal")
         .on("click", ".btn, .close", function() {
