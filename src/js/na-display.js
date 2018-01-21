@@ -11,6 +11,7 @@ import { feature as topojsonFeature } from "topojson-client";
 import moment from "moment";
 import "moment/locale/en-gb";
 import "jquery-knob";
+import "tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4";
 
 import "bootstrap/js/dist/tooltip";
 import "bootstrap/js/dist/util";
@@ -1220,12 +1221,30 @@ export default function naDisplay(serverName) {
     predictWind(direction, `${predictTime.hours()}:${predictTime.minutes()}`);
     */
 
+                $.fn.datetimepicker.Constructor.Default = $.extend({}, $.fn.datetimepicker.Constructor.Default, {
+                    icons: {
+                        time: "far fa-clock",
+                        date: "far fa-calendar",
+                        up: "fas fa-arrow-up",
+                        down: "fas fa-arrow-down",
+                        previous: "fas fa-chevron-left",
+                        next: "fas fa-chevron-right",
+                        today: "far fa-calendar-check",
+                        clear: "fas fa-trash",
+                        close: "fas fa-times"
+                    }
+                });
+
+                $("#time").datetimepicker({
+                    format: "LT"
+                });
                 $("#windPrediction").submit(event => {
                     const currentWind = $("#direction")
                             .val()
                             .toUpperCase(),
-                        time = $("#time").val();
-
+                        time = $("#wind-time-input")
+                            .val()
+                            .trim();
                     predictWind(currentWind, time);
                     $("#predictDropdown").dropdown("toggle");
                     event.preventDefault();
