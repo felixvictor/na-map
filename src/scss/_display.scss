@@ -121,7 +121,7 @@ p {
   fill: $secondary-600 !important;
 }
 
-.wind-head{
+.wind-head {
   fill: $primary-900 !important;
 }
 
@@ -138,10 +138,48 @@ p {
   font-size: 1em !important;
 }
 
-.dial {
-  font-family: inherit !important;
-  font-size: 2em !important;
-  color: $primary-700 !important;
+.rs-control .rs-path-color {
+  background-color: $primary-200;
+}
+
+.rs-control .rs-handle {
+  background-color: $primary-700;
+}
+
+.rs-tooltip-text {
+  font-family: inherit;
+  font-size: 2em;
+  color: $primary-700;
+}
+
+.rs-handle {
+  position: relative;
+  background: $primary-700;
+  border: 4px solid $primary-200;
+}
+
+.rs-handle::after,
+.rs-handle::before {
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  content: " ";
+  border: solid transparent;
+}
+
+.rs-handle::after {
+  margin-top: -24px;
+  border-width: 24px;
+  border-left-color: $primary-700;
+}
+
+.rs-handle::before {
+  margin-top: -30px;
+  border-width: 30px;
+  border-left-color: $primary-200;
 }
 
 .tooltip {

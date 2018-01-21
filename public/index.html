@@ -7,7 +7,7 @@
  <meta content="Naval Action map" name="description">
  <meta content="width=device-width,initial-scale=1" name="viewport">
  <script src="https://www.googletagmanager.com/gtag/js?id=UA-109520372-1" async></script>
-<link href="na-map.min.css?f702e4b5388b444c384e" rel="stylesheet"></head>
+<link href="na-map.min.css?0a5c933fcd911845e5ca" rel="stylesheet"></head>
 <body>
 
 <nav class="bg-light fixed-top navbar navbar-expand-lg navbar-light">
@@ -28,10 +28,10 @@
        <div class="input-group-prepend">
         <span class="input-group-text">F11 coordinates</span>
        </div>
-       <input class="form-control" id="x-coord" type="number" required placeholder="X" max="830000" min="-816000" step="0.1">
-       <input class="form-control" id="z-coord" type="number" required placeholder="Z" max="830000" min="-430000" step="0.1">
+       <input class="form-control" id="x-coord" type="number" required max="830000" min="-816000" placeholder="X" step="0.1">
+       <input class="form-control" id="z-coord" type="number" required max="830000" min="-430000" placeholder="Z" step="0.1">
        <div class="input-group-append">
-        <button class="btn btn-outline-primary" type="button" id="copy-coord" title="Copy to clipboard"><i class="fa-copy far"></i>
+        <button class="btn btn-outline-primary" type="button" id="copy-coord" title="Copy to clipboard"><i class="far fa-copy"></i>
         </button>
         <button class="btn btn-primary" type="submit">Move to</button>
        </div>
@@ -46,20 +46,25 @@
     </a>
     <div class="dropdown-menu extralarge-width" id="predictMenu" aria-labelledby="predictDropdown">
      <form id="windPrediction" class="p-2">
-      <div class="alert alert-primary" role="alert">Select a port first.</div>
       <div class="form-group row">
        <label class="col-form-label col-sm-5 align-top" for="direction">Wind currently blowing
         from</label>
        <div class="col-sm-7">
-        <input class="dial" id="direction" type="text" required aria-label="direction" value="0">
+        <div class="rslider" id="direction"></div>
        </div>
       </div>
       <div class="form-group row">
        <label class="col-form-label col-sm-5" for="time">Predict wind for</label>
        <div class="col-sm-7">
-        <input class="form-control" id="time" type="text" required placeholder="hh.mm" aria-label="time" maxlength="5" pattern="(?:[0-1]?\d|2[0-3])(?:[.:\s][0-5]\d)?">
-        <small class="form-text text-muted">Server time (wind is reset after maintenance)
-        </small>
+        <div class="form-group">
+         <div class="input-group date" id="time" data-target-input="nearest">
+          <input class="form-control datetimepicker-input" id="wind-time-input" type="text" required aria-label="time" data-target="#time">
+          <div class="input-group-append" data-target="#time" data-toggle="datetimepicker">
+           <span class="input-group-text"><i class="far fa-clock"></i></span>
+          </div>
+         </div>
+        </div>
+        <small class="form-text text-muted">Server time (wind is reset after maintenance)</small>
        </div>
       </div>
       <button class="btn btn-outline-primary" type="submit">Predict</button>
@@ -114,13 +119,13 @@
      <div class="dropdown-divider"></div>
      <h6 class="dropdown-header">Show</h6>
      <div class="align-self-center col-auto ml-1 py-1">
-     <div class="custom-control custom-checkbox">
-      <input class="custom-control-input" id="show-teleport" type="checkbox">
-      <label class="custom-control-label" for="show-teleport">Teleport areas</label>
-     </div>
+      <div class="custom-control custom-checkbox">
+       <input class="custom-control-input" id="show-teleport" type="checkbox">
+       <label class="custom-control-label" for="show-teleport">teleport areas</label>
+      </div>
       <div class="custom-control custom-checkbox">
        <input class="custom-control-input" id="show-pb" type="checkbox">
-       <label class="custom-control-label" for="show-pb">Port battle zone (go to port first)</label>
+       <label class="custom-control-label" for="show-pb">single port battle zone (go to port first)</label>
       </div>
      </div>
 
@@ -171,5 +176,5 @@
 </section>
 
 <script src="https://d3js.org/d3.v4.min.js"></script>
-<script src="na-map.min.js?f702e4b5388b444c384e" type="text/javascript"></script></body>
+<script src="na-map.min.js?0a5c933fcd911845e5ca" type="text/javascript"></script></body>
 </html>
