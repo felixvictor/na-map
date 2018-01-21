@@ -151,166 +151,164 @@ export default function naDisplay(serverName) {
         naContext.restore();
     }
 
-    function updatePorts() {
-        function updateCircles() {
-            function naTooltipData(d) {
-                let h = `<table><tbody<tr><td><i class="flag-icon ${
-                    d.availableForAll ? `${d.nation}a` : d.nation
+    function updatePortCircles() {
+        function naTooltipData(d) {
+            let h = `<table><tbody<tr><td><i class="flag-icon ${
+                d.availableForAll ? `${d.nation}a` : d.nation
                 }"></i></td>`;
-                h += `<td><span class="port-name">${d.name}</span>`;
-                h += d.availableForAll ? " (accessible to all nations)" : "";
-                h += "</td></tr></tbody></table>";
-                h += `<p>${d.shallow ? "Shallow" : "Deep"}`;
-                h += " water port";
-                if (d.countyCapital) {
-                    h += " (county capital)";
-                }
-                if (d.capturer) {
-                    h += ` captured by ${d.capturer} ${moment(d.lastPortBattle).fromNow()}`;
-                }
-                h += "<br>";
-                if (!d.nonCapturable) {
-                    const pbTimeRange = !d.portBattleStartTime
-                        ? "11.00\u202f–\u202f8.00"
-                        : `${(d.portBattleStartTime + 10) % 24}.00\u202f–\u202f${(d.portBattleStartTime + 13) % 24}.00`;
-                    h += `Port battle ${pbTimeRange}, ${thousandsWithBlanks(d.brLimit)} BR, `;
-                    switch (d.portBattleType) {
-                        case "Large":
-                            h += "1<sup>st</sup>";
-                            break;
-                        case "Medium":
-                            h += "4<sup>th</sup>";
-                            break;
-                        default:
-                            h += "6<sup>th</sup>";
-                            break;
-                    }
-
-                    h += "\u202frate AI";
-                    h += `, ${d.conquestMarksPension}\u202fconquest point`;
-                    h += d.conquestMarksPension > 1 ? "s" : "";
-                    h += `<br>Tax income ${thousandsWithBlanks(d.taxIncome)} (${d.portTax *
-                        100}\u202f%), net income ${formatCoord(d.netIncome)}`;
-                    h += d.tradingCompany ? `, trading company level\u202f${d.tradingCompany}` : "";
-                    h += d.laborHoursDiscount ? ", labor hours discount" : "";
-                } else {
-                    h += "Not capturable";
-                    h += `<br>${d.portTax * 100}\u2009% tax`;
-                }
-                h += "</p>";
-                h += "<table class='table table-sm'>";
-                if (d.produces.length) {
-                    h += `<tr><td>Produces</td><td>${d.produces.join(", ")}</td></tr>`;
-                }
-                if (d.drops.length) {
-                    h += `<tr><td>Drops</td><td>${d.drops.join(", ")}</tr>`;
-                }
-                if (d.consumes.length) {
-                    h += `<tr><td>Consumes</td><td>${d.consumes.join(", ")}</tr>`;
-                }
-                h += "</table>";
-
-                return h;
+            h += `<td><span class="port-name">${d.name}</span>`;
+            h += d.availableForAll ? " (accessible to all nations)" : "";
+            h += "</td></tr></tbody></table>";
+            h += `<p>${d.shallow ? "Shallow" : "Deep"}`;
+            h += " water port";
+            if (d.countyCapital) {
+                h += " (county capital)";
             }
-
-            function showPortDetails(d, i, nodes) {
-                const port = d3.select(nodes[i]);
-
-                port.attr("data-toggle", "tooltip");
-                // eslint-disable-next-line no-underscore-dangle
-                $(port._groups[0])
-                    .tooltip({
-                        delay: { show: defaults.highlightDuration, hide: defaults.highlightDuration },
-                        html: true,
-                        placement: "auto",
-                        title: naTooltipData(d.properties),
-                        trigger: "manual"
-                    })
-                    .tooltip("show");
+            if (d.capturer) {
+                h += ` captured by ${d.capturer} ${moment(d.lastPortBattle).fromNow()}`;
             }
+            h += "<br>";
+            if (!d.nonCapturable) {
+                const pbTimeRange = !d.portBattleStartTime
+                    ? "11.00\u202f–\u202f8.00"
+                    : `${(d.portBattleStartTime + 10) % 24}.00\u202f–\u202f${(d.portBattleStartTime + 13) % 24}.00`;
+                h += `Port battle ${pbTimeRange}, ${thousandsWithBlanks(d.brLimit)} BR, `;
+                switch (d.portBattleType) {
+                    case "Large":
+                        h += "1<sup>st</sup>";
+                        break;
+                    case "Medium":
+                        h += "4<sup>th</sup>";
+                        break;
+                    default:
+                        h += "6<sup>th</sup>";
+                        break;
+                }
 
-            function hidePortDetails(d, i, nodes) {
-                // eslint-disable-next-line no-underscore-dangle
-                $(d3.select(nodes[i])._groups[0]).tooltip("hide");
+                h += "\u202frate AI";
+                h += `, ${d.conquestMarksPension}\u202fconquest point`;
+                h += d.conquestMarksPension > 1 ? "s" : "";
+                h += `<br>Tax income ${thousandsWithBlanks(d.taxIncome)} (${d.portTax *
+                100}\u202f%), net income ${formatCoord(d.netIncome)}`;
+                h += d.tradingCompany ? `, trading company level\u202f${d.tradingCompany}` : "";
+                h += d.laborHoursDiscount ? ", labor hours discount" : "";
+            } else {
+                h += "Not capturable";
+                h += `<br>${d.portTax * 100}\u2009% tax`;
             }
+            h += "</p>";
+            h += "<table class='table table-sm'>";
+            if (d.produces.length) {
+                h += `<tr><td>Produces</td><td>${d.produces.join(", ")}</td></tr>`;
+            }
+            if (d.drops.length) {
+                h += `<tr><td>Drops</td><td>${d.drops.join(", ")}</tr>`;
+            }
+            if (d.consumes.length) {
+                h += `<tr><td>Consumes</td><td>${d.consumes.join(", ")}</tr>`;
+            }
+            h += "</table>";
 
-            // Data join
-            const circleUpdate = mainGPort.selectAll("circle").data(current.portData, d => d.id);
-
-            // Remove old circles
-            circleUpdate.exit().remove();
-
-            // Update kept circles
-            // circleUpdate; // not needed
-
-            // Add new circles
-            const circleEnter = circleUpdate
-                .enter()
-                .append("circle")
-                .attr("cx", d => d.geometry.coordinates[0])
-                .attr("cy", d => d.geometry.coordinates[1])
-                .attr(
-                    "fill",
-                    d => `url(#${d.properties.availableForAll ? `${d.properties.nation}a` : d.properties.nation})`
-                )
-                .on("click", showPortDetails)
-                .on("mouseout", hidePortDetails);
-
-            // Apply to both old and new
-            circleUpdate
-                .merge(circleEnter)
-                .attr("r", d => (d.id === current.highlightId ? current.circleSize * 3 : current.circleSize));
+            return h;
         }
 
-        function updateTexts() {
-            // Data join
-            const textUpdate = mainGPort.selectAll("text").data(current.portLabelData, d => d.id);
+        function showPortDetails(d, i, nodes) {
+            const port = d3.select(nodes[i]);
 
-            // Remove old text
-            textUpdate.exit().remove();
-
-            // Update kept texts
-            // textUpdate; // not needed
-
-            // Add new texts
-            const textEnter = textUpdate
-                .enter()
-                .append("text")
-                .text(d => d.name);
-
-            // Apply to both old and new
-            textUpdate
-                .merge(textEnter)
-                .attr("x", d => {
-                    if (current.zoomLevel !== "pbZone") {
-                        return d.coord.x;
-                    }
-                    return current.showPBZones && d.id === current.port.id ? d.coord.x + d.dx * 0.25 : d.coord.x;
+            port.attr("data-toggle", "tooltip");
+            // eslint-disable-next-line no-underscore-dangle
+            $(port._groups[0])
+                .tooltip({
+                    delay: { show: defaults.highlightDuration, hide: defaults.highlightDuration },
+                    html: true,
+                    placement: "auto",
+                    title: naTooltipData(d.properties),
+                    trigger: "manual"
                 })
-                .attr("y", d => {
-                    if (current.zoomLevel !== "pbZone") {
-                        return d.id === current.highlightId
-                            ? d.coord.y + current.circleSize + current.fontSize * 2
-                            : d.coord.y + current.circleSize + current.fontSize;
-                    }
-                    return current.showPBZones && d.id === current.port.id
-                        ? d.coord.y + d.dy * 0.25
-                        : d.coord.y + current.circleSize + current.fontSize;
-                })
-                .attr(
-                    "font-size",
-                    d => (d.id === current.highlightId ? `${current.fontSize * 2}px` : `${current.fontSize}px`)
-                )
-                .attr("text-anchor", d => {
-                    if (current.showPBZones && current.zoomLevel === "pbZone" && d.id === current.port.id) {
-                        return d.dx < 0 ? "end" : "start";
-                    }
-                    return "middle";
-                });
+                .tooltip("show");
         }
 
-        updateCircles();
-        updateTexts();
+        function hidePortDetails(d, i, nodes) {
+            // eslint-disable-next-line no-underscore-dangle
+            $(d3.select(nodes[i])._groups[0]).tooltip("hide");
+        }
+
+        // Data join
+        const circleUpdate = mainGPort.selectAll("circle").data(current.portData, d => d.id);
+
+        // Remove old circles
+        circleUpdate.exit().remove();
+
+        // Update kept circles
+        // circleUpdate; // not needed
+
+        // Add new circles
+        const circleEnter = circleUpdate
+            .enter()
+            .append("circle")
+            .attr("cx", d => d.geometry.coordinates[0])
+            .attr("cy", d => d.geometry.coordinates[1])
+            .attr(
+                "fill",
+                d => `url(#${d.properties.availableForAll ? `${d.properties.nation}a` : d.properties.nation})`
+            )
+            .on("click", showPortDetails)
+            .on("mouseout", hidePortDetails);
+
+        // Apply to both old and new
+        circleUpdate
+            .merge(circleEnter)
+            .attr("r", d => (d.id === current.highlightId ? current.circleSize * 3 : current.circleSize));
+    }
+
+    function updatePortTexts() {
+        // Data join
+        const textUpdate = mainGPort.selectAll("text").data(current.portLabelData, d => d.id);
+
+        // Remove old text
+        textUpdate.exit().remove();
+
+        // Update kept texts
+        // textUpdate; // not needed
+
+        // Add new texts
+        const textEnter = textUpdate
+            .enter()
+            .append("text")
+            .text(d => d.name);
+
+        const deltaY = current.circleSize + current.fontSize;
+        const deltaY2 = current.circleSize + current.fontSize * 2;
+        // Apply to both old and new
+        textUpdate
+            .merge(textEnter)
+            .attr("x", d => {
+                if (current.zoomLevel !== "pbZone") {
+                    return d.coord.x;
+                }
+                return current.showPBZones && d.id === current.port.id ? d.coord.x + d.dx : d.coord.x;
+            })
+            .attr("y", d => {
+                if (current.zoomLevel !== "pbZone") {
+                    return d.id === current.highlightId ? d.coord.y + deltaY2 : d.coord.y + deltaY;
+                }
+                return current.showPBZones && d.id === current.port.id ? d.coord.y + d.dy : d.coord.y + deltaY;
+            })
+            .attr(
+                "font-size",
+                d => (d.id === current.highlightId ? `${current.fontSize * 2}px` : `${current.fontSize}px`)
+            )
+            .attr("text-anchor", d => {
+                if (current.showPBZones && current.zoomLevel === "pbZone" && d.id === current.port.id) {
+                    return d.dx < 0 ? "end" : "start";
+                }
+                return "middle";
+            });
+    }
+
+    function updatePorts() {
+        updatePortCircles();
+        updatePortTexts();
     }
 
     function updateTeleportAreas() {
@@ -650,7 +648,7 @@ export default function naDisplay(serverName) {
         updateMap();
         // console.log(`zoomed d3.event.transform: ${JSON.stringify(d3.event.transform)}`);
         displayCountries(d3.event.transform);
-        current.scale = d3.event.transform.k;
+
         mainGVoronoi.attr("transform", d3.event.transform);
         mainGPort.attr("transform", d3.event.transform);
         mainGPBZone.attr("transform", d3.event.transform);
@@ -900,6 +898,7 @@ export default function naDisplay(serverName) {
                 if (current.showPBZones) {
                     setPBZoneData();
                     updatePBZones();
+                    updatePortTexts();
                 }
                 goToPort();
             });
@@ -1372,6 +1371,7 @@ export default function naDisplay(serverName) {
                     current.showPBZones = $input.is(":checked");
                     setPBZoneData();
                     updatePBZones();
+                    updatePortTexts();
                 });
         }
 
