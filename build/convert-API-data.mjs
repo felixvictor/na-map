@@ -60,16 +60,16 @@ function getItemNames() {
 function convertPorts() {
     function GetMinMaxX(t) {
         if (t < 0) {
-            return Math.max(Math.min(t, -20), -40);
+            return Math.max(Math.min(t, -5), -10);
         }
-        return Math.min(Math.max(t, 20), 40);
+        return Math.min(Math.max(t, 5), 10);
     }
 
     function GetMinMaxY(t) {
         if (t < 0) {
-            return Math.max(Math.min(t, -20), -40);
+            return Math.max(Math.min(t, -5), -10);
         }
-        return Math.min(Math.max(t, 20), 40);
+        return Math.min(Math.max(t, 5), 10);
     }
 
     // https://gist.github.com/Nishchit14/4c6a7349b3c778f7f97b912629a9f228
