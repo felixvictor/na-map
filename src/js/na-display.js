@@ -10,7 +10,7 @@
 import { feature as topojsonFeature } from "topojson-client";
 import moment from "moment";
 import "moment/locale/en-gb";
-import "jquery-knob";
+import "round-slider/src/roundslider";
 import "tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4";
 
 import "bootstrap/js/dist/tooltip";
@@ -1206,7 +1206,7 @@ export default function naDisplay(serverName) {
                     printPredictedWind(
                         predictedWindDegrees,
                         predictDate.format("H.mm"),
-                        currentUserWind,
+                        degreesToCompass(currentUserWind),
                         currentDate.format("H.mm")
                     );
                 }
@@ -1238,13 +1238,25 @@ export default function naDisplay(serverName) {
                 $("#time").datetimepicker({
                     format: "LT"
                 });
+
+                window.tooltip = args => degreesToCompass(args.value);
+
+                $("#direction").roundSlider({
+                    sliderType: "default",
+                    startAngle: 90,
+                    min: 0,
+                    max: 359,
+                    step: 360 / defaults.compassDirections.length,
+                    editableTooltip: false,
+                    tooltipFormat: "tooltip"
+                });
+
                 $("#windPrediction").submit(event => {
-                    const currentWind = $("#direction")
-                            .val()
-                            .toUpperCase(),
+                    const currentWind = $("#direction").roundSlider("option", "value"),
                         time = $("#wind-time-input")
                             .val()
                             .trim();
+                    //console.log(`currentWind ${currentWind} time ${time}`);
                     predictWind(currentWind, time);
                     $("#predictDropdown").dropdown("toggle");
                     event.preventDefault();
@@ -1326,20 +1338,6 @@ export default function naDisplay(serverName) {
 
                 goToF11(x, z);
                 event.preventDefault();
-            });
-
-            $("#direction").knob({
-                bgColor: "#ede1d2", // primary-200
-                thickness: 0.2,
-                min: 0,
-                max: 359,
-                step: 360 / defaults.compassDirections.length,
-                cursor: true,
-                fgColor: "#917f68", // primary-700
-                draw() {
-                    $(this.i).css("class", "knob");
-                },
-                format: input => degreesToCompass(input)
             });
 
             $("#reset").on("click", () => {
