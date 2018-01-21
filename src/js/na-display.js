@@ -249,7 +249,6 @@ export default function naDisplay(serverName) {
                 .append("circle")
                 .attr("cx", d => d.geometry.coordinates[0])
                 .attr("cy", d => d.geometry.coordinates[1])
-                .attr("r", current.circleSize)
                 .attr(
                     "fill",
                     d => `url(#${d.properties.availableForAll ? `${d.properties.nation}a` : d.properties.nation})`
@@ -367,6 +366,7 @@ export default function naDisplay(serverName) {
         current.bFirstCoord = true;
         current.lineData.splice(0, current.lineData.length);
         current.portData = defaults.portData;
+        current.portLabelData = defaults.portLabelData;
         $("#good-names").get(0).selectedIndex = 0;
         updatePorts();
     }
@@ -598,6 +598,16 @@ export default function naDisplay(serverName) {
         }
     }
 
+    function setPortLabelData() {
+        current.portLabelData = current.portData.map(d => ({
+            id: d.id,
+            coord: { x: d.geometry.coordinates[0], y: d.geometry.coordinates[1] },
+            name: d.properties.name,
+            dx: d.properties.dx,
+            dy: d.properties.dy
+        }));
+    }
+
     function updateMap() {
         function setCurrent() {
             current.circleSize = defaults.circleSize[current.zoomLevel];
@@ -613,7 +623,7 @@ export default function naDisplay(serverName) {
                 current.zoomLevel = "pbZone";
                 setPBZoneData();
                 setTeleportData();
-                current.portLabelData = defaults.portLabelData;
+                setPortLabelData();
                 current.highlightId = null;
                 setCurrent();
             }
@@ -622,7 +632,7 @@ export default function naDisplay(serverName) {
                 current.zoomLevel = "portLabel";
                 setPBZoneData();
                 setTeleportData();
-                current.portLabelData = defaults.portLabelData;
+                setPortLabelData();
                 current.highlightId = null;
                 setCurrent();
             }
@@ -640,7 +650,7 @@ export default function naDisplay(serverName) {
         updateMap();
         // console.log(`zoomed d3.event.transform: ${JSON.stringify(d3.event.transform)}`);
         displayCountries(d3.event.transform);
-
+        current.scale = d3.event.transform.k;
         mainGVoronoi.attr("transform", d3.event.transform);
         mainGPort.attr("transform", d3.event.transform);
         mainGPBZone.attr("transform", d3.event.transform);
@@ -684,10 +694,7 @@ export default function naDisplay(serverName) {
             naZoom = d3
                 .zoom()
                 .scaleExtent([defaults.minScale, defaults.maxScale])
-                .translateExtent([
-                    [defaults.coord.min, defaults.coord.min],
-                    [defaults.coord.max, defaults.coord.max]
-                ])
+                .translateExtent([[defaults.coord.min, defaults.coord.min], [defaults.coord.max, defaults.coord.max]])
                 .on("zoom", naZoomed);
 
             naSvg = d3
@@ -755,6 +762,7 @@ export default function naDisplay(serverName) {
                 dx: d.properties.dx,
                 dy: d.properties.dy
             }));
+            current.portLabelData = {};
 
             defaults.nations.map(d => d.id).forEach(nation => {
                 svgDef
@@ -895,6 +903,7 @@ export default function naDisplay(serverName) {
                 }
                 goToPort();
             });
+
             setupGoodSelect();
             $("#good-names").on("change", () => {
                 const portIds = $("#good-names")
@@ -902,8 +911,10 @@ export default function naDisplay(serverName) {
                     .split(",");
                 if (portIds.includes("0")) {
                     current.portData = defaults.portData;
+                    current.portLabelData = defaults.portLabelData;
                 } else {
                     current.portData = defaults.portData.filter(d => portIds.includes(d.id));
+                    current.portLabelData = defaults.portLabelData.filter(d => portIds.includes(d.id));
                 }
                 updatePorts();
             });
@@ -939,10 +950,13 @@ export default function naDisplay(serverName) {
 
             if (+clan !== 0) {
                 current.portData = defaults.portData.filter(d => clan === d.properties.capturer);
+                current.portLabelData = defaults.portLabelData.filter(d => clan === d.properties.capturer);
             } else if (current.nation) {
                 current.portData = defaults.portData.filter(d => current.nation === d.properties.nation);
+                current.portLabelData = defaults.portLabelData.filter(d => current.nation === d.properties.nation);
             } else {
                 current.portData = defaults.portData;
+                current.portLabelData = defaults.portLabelData;
             }
             $("#propertyDropdown").dropdown("toggle");
             updatePorts();
@@ -984,10 +998,12 @@ export default function naDisplay(serverName) {
                 if (+nationId !== 0) {
                     current.nation = nationId;
                     current.portData = defaults.portData.filter(d => nationId === d.properties.nation);
+                    current.portLabelData = defaults.portLabelData.filter(d => nationId === d.properties.nation);
                     setupClanSelect();
                 } else {
                     current.nation = "";
                     current.portData = defaults.portData;
+                    current.portLabelData = defaults.portLabelData;
                     setupClanSelect();
                 }
                 $("#propertyDropdown").dropdown("toggle");
@@ -996,11 +1012,15 @@ export default function naDisplay(serverName) {
 
             function allSelect() {
                 current.portData = defaults.portData.filter(d => d.properties.availableForAll);
+                current.portLabelData = defaults.portLabelData.filter(d => d.properties.availableForAll);
                 updatePorts();
             }
 
             function filterCaptured(begin, end) {
                 current.portData = defaults.portData.filter(d =>
+                    moment(d.properties.lastPortBattle).isBetween(begin, end, null, "()")
+                );
+                current.portLabelData = defaults.portLabelData.filter(d =>
                     moment(d.properties.lastPortBattle).isBetween(begin, end, null, "()")
                 );
                 updatePorts();
@@ -1052,8 +1072,12 @@ export default function naDisplay(serverName) {
 
                 if (value !== 0) {
                     current.portData = defaults.portData.filter(d => value === d.properties.conquestMarksPension);
+                    current.portLabelData = defaults.portLabelData.filter(
+                        d => value === d.properties.conquestMarksPension
+                    );
                 } else {
                     current.portData = defaults.portData;
+                    current.portLabelData = defaults.portLabelData;
                 }
                 $("#propertyDropdown").dropdown("toggle");
                 updatePorts();
