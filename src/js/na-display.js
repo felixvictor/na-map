@@ -1239,16 +1239,34 @@ export default function naDisplay(serverName) {
                     format: "LT"
                 });
 
+                // workaround from https://github.com/soundar24/roundSlider/issues/71
+                // eslint-disable-next-line func-names,no-underscore-dangle
+                const { _getTooltipPos } = $.fn.roundSlider.prototype;
+                // eslint-disable-next-line func-names,no-underscore-dangle
+                $.fn.roundSlider.prototype._getTooltipPos = function() {
+                    if (!this.tooltip.is(":visible")) {
+                        $("body").append(this.tooltip);
+                    }
+                    const pos = _getTooltipPos.call(this);
+                    this.container.append(this.tooltip);
+                    return pos;
+                };
+
                 window.tooltip = args => degreesToCompass(args.value);
 
                 $("#direction").roundSlider({
                     sliderType: "default",
                     startAngle: 90,
+                    width: 20,
+                    radius: 100,
                     min: 0,
                     max: 359,
                     step: 360 / defaults.compassDirections.length,
                     editableTooltip: false,
-                    tooltipFormat: "tooltip"
+                    tooltipFormat: "tooltip",
+                    create() {
+                        this.control.css("display", "block");
+                    }
                 });
 
                 $("#windPrediction").submit(event => {
@@ -1256,7 +1274,7 @@ export default function naDisplay(serverName) {
                         time = $("#wind-time-input")
                             .val()
                             .trim();
-                    //console.log(`currentWind ${currentWind} time ${time}`);
+                    // console.log(`currentWind ${currentWind} time ${time}`);
                     predictWind(currentWind, time);
                     $("#predictDropdown").dropdown("toggle");
                     event.preventDefault();
