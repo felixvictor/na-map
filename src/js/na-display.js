@@ -1005,26 +1005,26 @@ export default function naDisplay(serverName) {
                     end.format("dddd D MMMM YYYY h:mm")
                 );
                 current.portData = defaults.portData.filter(d =>
-                    moment(d.properties.lastPortBattle).isBetween(begin, end, null, "()")
+                    moment(d.properties.lastPortBattle).isBetween(begin, end, null, "(]")
                 );
                 updatePorts();
             }
 
             function capturedYesterday() {
                 const begin = moment({ hour: 11, minute: 0 }).subtract(1, "day"),
-                    end = moment({ hour: 8, minute: 0 });
+                    end = moment({ hour: 11, minute: 0 });
                 filterCaptured(begin, end);
             }
 
             function capturedThisWeek() {
                 const begin = moment({ hour: 11, minute: 0 }).day(-6), // this Monday
-                    end = moment({ hour: 8, minute: 0 }).day(1); // next Monday
+                    end = moment({ hour: 11, minute: 0 }).day(1); // next Monday
                 filterCaptured(begin, end);
             }
 
             function capturedLastWeek() {
                 const begin = moment({ hour: 11, minute: 0 }).day(-13), // Monday last week
-                    end = moment({ hour: 8, minute: 0 }).day(-6); // this Monday
+                    end = moment({ hour: 11, minute: 0 }).day(-6); // this Monday
                 filterCaptured(begin, end);
             }
 
