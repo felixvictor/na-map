@@ -998,6 +998,13 @@ export default function naDisplay(serverName) {
                 updatePorts();
             }
 
+            function greenZoneSelect() {
+                current.portData = defaults.portData.filter(
+                    d => d.properties.nonCapturable && d.properties.nation !== "FT"
+                );
+                updatePorts();
+            }
+
             function filterCaptured(begin, end) {
                 console.log(
                     "Between %s and %s",
@@ -1072,6 +1079,7 @@ export default function naDisplay(serverName) {
                 .on("click", event => event.stopPropagation())
                 .on("change", () => clanSelect());
             $("#menu-prop-all").on("click", () => allSelect());
+            $("#menu-prop-green").on("click", () => greenZoneSelect());
 
             $("#menu-prop-yesterday").on("click", () => capturedYesterday());
             $("#menu-prop-this-week").on("click", () => capturedThisWeek());
