@@ -47,7 +47,7 @@ export default function naDisplay(serverName) {
             min: 0,
             max: 8192
         },
-        port: { id: 366, coord: { x: 4396, y: 2494 } }, // Shroud Cay
+        port: { id: "366", coord: { x: 4396, y: 2494 } }, // Shroud Cay
         maxScale: 10,
         fontSize: { initial: 30, portLabel: 18, pbZone: 7 },
         circleSize: { initial: 50, portLabel: 20, pbZone: 5 },
@@ -654,7 +654,7 @@ export default function naDisplay(serverName) {
     }
 
     function goToPort() {
-        if (current.port.id) {
+        if (current.port.id !== "0") {
             zoomAndPan(current.port.coord.x, current.port.coord.y, 2);
         } else {
             initialZoomAndPan();
@@ -855,16 +855,11 @@ export default function naDisplay(serverName) {
 
             function portSelected() {
                 const port = $(this).find(":selected");
+                const c = port.val().split(",");
+                current.port.coord.x = +c[0];
+                current.port.coord.y = +c[1];
+                current.port.id = port.data("id").toString();
 
-                if (port.val() !== 0) {
-                    const c = port.val().split(",");
-                    current.port.coord.x = +c[0];
-                    current.port.coord.y = +c[1];
-                    current.port.id = port.data("id");
-                } else {
-                    current.port.coord = defaults.port.coord;
-                    current.port.id = defaults.port.id;
-                }
                 if (current.showPBZones) {
                     setPBZoneData();
                     updatePBZones();
@@ -916,28 +911,17 @@ export default function naDisplay(serverName) {
             const propClan = $("#prop-clan");
 
             propClan.empty();
-            propClan.append(
-                $("<option>", {
-                    value: 0,
-                    text: "Select a clan"
-                })
-            );
 
             const clanList = new Set();
             current.portData.filter(d => d.properties.capturer).map(d => clanList.add(d.properties.capturer));
-            Array.from(clanList)
+            const select = `<option value="0">Select a clan/Reset</option>${Array.from(clanList)
                 .sort()
-                .forEach(clan => {
-                    propClan.append(
-                        $("<option>", {
-                            value: clan,
-                            text: clan
-                        })
-                    );
-                });
+                .map(clan => `<option value="${clan}">${clan}</option>`)
+                .join("")}`;
+            propClan.append(select);
         }
 
-        function clanSelect() {
+        function clanSelected() {
             const clan = $("#prop-clan").val();
 
             if (+clan !== 0) {
@@ -954,14 +938,7 @@ export default function naDisplay(serverName) {
         function setupPropertyMenu() {
             function setupNationSelect() {
                 const propNation = $("#prop-nation");
-
-                propNation.append(
-                    $("<option>", {
-                        value: 0,
-                        text: "Select a nation"
-                    })
-                );
-                defaults.nations
+                const select = `<option value="0">Select a nation/Reset</option>${defaults.nations
                     .sort((a, b) => {
                         if (a.sortName < b.sortName) {
                             return -1;
@@ -971,17 +948,12 @@ export default function naDisplay(serverName) {
                         }
                         return 0;
                     })
-                    .forEach(nation => {
-                        propNation.append(
-                            $("<option>", {
-                                value: nation.id,
-                                text: nation.name
-                            })
-                        );
-                    });
+                    .map(nation => `<option value="${nation.id}">${nation.name}</option>`)
+                    .join("")}`;
+                propNation.append(select);
             }
 
-            function nationSelect() {
+            function nationSelected() {
                 const nationId = $("#prop-nation").val();
 
                 if (+nationId !== 0) {
@@ -1077,11 +1049,13 @@ export default function naDisplay(serverName) {
             setupNationSelect();
             $("#prop-nation")
                 .on("click", event => event.stopPropagation())
-                .on("change", () => nationSelect());
+                .on("change", nationSelected);
+
             setupClanSelect();
             $("#prop-clan")
                 .on("click", event => event.stopPropagation())
-                .on("change", () => clanSelect());
+                .on("change", clanSelected);
+
             $("#menu-prop-all").on("click", () => allSelect());
             $("#menu-prop-green").on("click", () => greenZoneSelect());
 
