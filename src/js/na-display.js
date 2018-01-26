@@ -13,6 +13,7 @@ import "moment-timezone";
 import "moment/locale/en-gb";
 import "round-slider/src/roundslider";
 import "tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4";
+import "bootstrap-hardskilled-extend-select";
 
 import "bootstrap/js/dist/tooltip";
 import "bootstrap/js/dist/util";
@@ -378,8 +379,6 @@ export default function naDisplay(serverName) {
         svgWind.selectAll("*").remove();
         current.bFirstCoord = true;
         current.lineData.splice(0, current.lineData.length);
-        current.portData = defaults.portData;
-        $("#good-names").get(0).selectedIndex = 0;
         updatePorts();
     }
 
@@ -813,21 +812,11 @@ export default function naDisplay(serverName) {
                         }
                         return 0;
                     });
-                portNames.append(
-                    $("<option>", {
-                        value: 0,
-                        text: "Go to a port"
-                    })
-                );
-                selectPorts.forEach(port => {
-                    portNames.append(
-                        $("<option>", {
-                            value: port.coord,
-                            text: port.name,
-                            data: { id: port.id }
-                        })
-                    );
-                });
+
+                const select = `<option value="" data-id="0">Reset</option>${selectPorts
+                    .map(port => `<option value="${port.coord}" data-id="${port.id}">${port.name}</option>`)
+                    .join("")}`;
+                portNames.append(select);
             }
 
             function setupGoodSelect() {
@@ -851,12 +840,7 @@ export default function naDisplay(serverName) {
                     });
                 });
                 selectGoods = new Map(Array.from(selectGoods).sort());
-                goodNames.append(
-                    $("<option>", {
-                        value: 0,
-                        text: "Select a good"
-                    })
-                );
+                let select = '<option value="0">Reset</option>';
                 // eslint-disable-next-line no-restricted-syntax
                 for (const [key, portIds] of selectGoods.entries()) {
                     let ids = "";
@@ -864,18 +848,13 @@ export default function naDisplay(serverName) {
                     for (const id of portIds) {
                         ids += `,${id}`;
                     }
-                    goodNames.append(
-                        $("<option>", {
-                            value: ids.substr(1),
-                            text: key
-                        })
-                    );
+                    select += `<option value="${ids.substr(1)}">${key}</option>`;
                 }
+                goodNames.append(select);
             }
 
-            setupPortSelect();
-            $("#port-names").on("change", () => {
-                const port = $("#port-names").find(":selected");
+            function portSelected() {
+                const port = $(this).find(":selected");
 
                 if (port.val() !== 0) {
                     const c = port.val().split(",");
@@ -892,11 +871,10 @@ export default function naDisplay(serverName) {
                     updatePortTexts();
                 }
                 goToPort();
-            });
+            }
 
-            setupGoodSelect();
-            $("#good-names").on("change", () => {
-                const portIds = $("#good-names")
+            function goodSelected() {
+                const portIds = $(this)
                     .val()
                     .split(",");
                 if (portIds.includes("0")) {
@@ -905,7 +883,33 @@ export default function naDisplay(serverName) {
                     current.portData = defaults.portData.filter(d => portIds.includes(d.id));
                 }
                 updatePorts();
-            });
+            }
+
+            setupPortSelect();
+            $("#port-names")
+                .on("change", portSelected)
+                .prop("selectedIndex", -1)
+                .extendSelect({
+                    // Search input placeholder:
+                    search: "Find",
+                    // Title if option not selected:
+                    notSelectedTitle: "Go to a port",
+                    // Message if select list empty:
+                    empty: "Not found"
+                });
+
+            setupGoodSelect();
+            $("#good-names")
+                .on("change", goodSelected)
+                .prop("selectedIndex", -1)
+                .extendSelect({
+                    // Search input placeholder:
+                    search: "Find",
+                    // Title if option not selected:
+                    notSelectedTitle: "Select a good",
+                    // Message if select list empty:
+                    empty: "Not found"
+                });
         }
 
         function setupClanSelect() {
