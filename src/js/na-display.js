@@ -940,6 +940,8 @@ export default function naDisplay(serverName) {
         }
 
         function setupPropertyMenu() {
+            const dateFormat = "dd YYYY-MM-DD";
+
             function setupNationSelect() {
                 const propNation = $("#prop-nation");
                 const select = `<option value="0">Select a nation/Reset</option>${defaults.nations
@@ -998,20 +1000,45 @@ export default function naDisplay(serverName) {
             }
 
             function capturedYesterday() {
-                const begin = moment({ hour: 11, minute: 0 }).subtract(1, "day"),
-                    end = moment({ hour: 11, minute: 0 });
+                const begin = moment()
+                        .utc()
+                        .subtract(1, "day")
+                        .hour(11)
+                        .minute(0),
+                    end = moment()
+                        .utc()
+                        .hour(11)
+                        .minute(0);
                 filterCaptured(begin, end);
             }
 
             function capturedThisWeek() {
-                const begin = moment({ hour: 11, minute: 0 }).day(-6), // this Monday
-                    end = moment({ hour: 11, minute: 0 }).day(1); // next Monday
+                const currentMondayOfWeek = moment()
+                    .utc()
+                    .startOf("week");
+                const begin = currentMondayOfWeek.hour(11), // this Monday
+                    end = moment(currentMondayOfWeek)
+                        .add(7, "day")
+                        .hour(11); // next Monday
                 filterCaptured(begin, end);
             }
 
             function capturedLastWeek() {
-                const begin = moment({ hour: 11, minute: 0 }).day(-13), // Monday last week
-                    end = moment({ hour: 11, minute: 0 }).day(-6); // this Monday
+                const currentMondayOfWeek = moment()
+                    .utc()
+                    .startOf("week");
+                const begin = moment(currentMondayOfWeek)
+                        .subtract(7, "day")
+                        .hour(11), // Monday last week
+                    end = currentMondayOfWeek.hour(11); // this Monday
+                filterCaptured(begin, end);
+            }
+
+            function captureRange() {
+                const begin = moment($("#prop-from-input").val(), dateFormat).hour(11),
+                    end = moment($("#prop-to-input").val(), dateFormat)
+                        .add(1, "day")
+                        .hour(11);
                 filterCaptured(begin, end);
             }
 
@@ -1066,6 +1093,26 @@ export default function naDisplay(serverName) {
             $("#menu-prop-yesterday").on("click", () => capturedYesterday());
             $("#menu-prop-this-week").on("click", () => capturedThisWeek());
             $("#menu-prop-last-week").on("click", () => capturedLastWeek());
+
+            $("#prop-from").datetimepicker({
+                format: dateFormat
+            });
+            $("#prop-to").datetimepicker({
+                format: dateFormat,
+                useCurrent: false
+            });
+            $("#prop-from").on("change.datetimepicker", e => {
+                $("#prop-to").datetimepicker("minDate", e.date);
+            });
+            $("#prop-to").on("change.datetimepicker", e => {
+                $("#prop-from").datetimepicker("maxDate", e.date);
+            });
+
+            $("#prop-range").submit(event => {
+                captureRange();
+                $("#propertyDropdown").dropdown("toggle");
+                event.preventDefault();
+            });
 
             setupCMSelect();
             $("#prop-cm")
@@ -1227,7 +1274,7 @@ export default function naDisplay(serverName) {
                     timeZone: "UTC"
                 });
 
-                $("#time").datetimepicker({
+                $("#wind-time").datetimepicker({
                     format: "LT"
                 });
 
