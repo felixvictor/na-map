@@ -34,11 +34,11 @@ export default function naDisplay(serverName) {
         mainGCoord,
         gCompass,
         svgWind;
-    const navbarBrandPaddingLeft = 1.618 * 16; // equals 1.618rem
+    const navbarBrandPaddingLeft = Math.floor(1.618 * 16); // equals 1.618rem
     // noinspection JSSuspiciousNameCombination
     const defaults = {
         margin: {
-            top: parseFloat($(".navbar").css("height")) + navbarBrandPaddingLeft,
+            top: Math.floor(parseFloat($(".navbar").css("height")) + navbarBrandPaddingLeft),
             right: navbarBrandPaddingLeft,
             bottom: navbarBrandPaddingLeft,
             left: navbarBrandPaddingLeft
@@ -107,9 +107,9 @@ export default function naDisplay(serverName) {
         ]
     };
     // eslint-disable-next-line no-restricted-globals
-    defaults.width = top.innerWidth - defaults.margin.left - defaults.margin.right;
+    defaults.width = Math.floor(top.innerWidth - defaults.margin.left - defaults.margin.right);
     // eslint-disable-next-line no-restricted-globals
-    defaults.height = top.innerHeight - defaults.margin.top - defaults.margin.bottom;
+    defaults.height = Math.floor(top.innerHeight - defaults.margin.top - defaults.margin.bottom);
     defaults.minScale = Math.min(defaults.width / defaults.coord.max, defaults.height / defaults.coord.max);
     defaults.coord.voronoi = [
         [defaults.coord.min - 1, defaults.coord.min - 1],
@@ -681,6 +681,10 @@ export default function naDisplay(serverName) {
             naContext = naCanvas.node().getContext("2d");
 
             defaults.image.onload = () => {
+                naContext.mozImageSmoothingEnabled = false;
+                naContext.webkitImageSmoothingEnabled = false;
+                naContext.msImageSmoothingEnabled = false;
+                naContext.imageSmoothingEnabled = false;
                 initialZoomAndPan();
             };
             defaults.image.src = defaults.imageSrc;
