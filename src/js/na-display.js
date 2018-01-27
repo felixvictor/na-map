@@ -564,8 +564,8 @@ export default function naDisplay(serverName) {
 
     function updatePBZones() {
         pbZones.datum(current.PBZoneData).attr("d", d3.geoPath().pointRadius(4));
-        towers.datum(current.fortData).attr("d", d3.geoPath().pointRadius(1.5));
-        forts.datum(current.towerData).attr("d", d3.geoPath().pointRadius(2));
+        towers.datum(current.towerData).attr("d", d3.geoPath().pointRadius(1.5));
+        forts.datum(current.fortData).attr("d", d3.geoPath().pointRadius(2));
     }
 
     function setTeleportData() {
