@@ -13,6 +13,7 @@ import "moment-timezone";
 import "moment/locale/en-gb";
 import "round-slider/src/roundslider";
 import "tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4";
+import "bootstrap-hardskilled-extend-select";
 
 import "bootstrap/js/dist/tooltip";
 import "bootstrap/js/dist/util";
@@ -33,11 +34,11 @@ export default function naDisplay(serverName) {
         mainGCoord,
         gCompass,
         svgWind;
-    const navbarBrandPaddingLeft = 1.618 * 16; // equals 1.618rem
+    const navbarBrandPaddingLeft = Math.floor(1.618 * 16); // equals 1.618rem
     // noinspection JSSuspiciousNameCombination
     const defaults = {
         margin: {
-            top: parseFloat($(".navbar").css("height")) + navbarBrandPaddingLeft,
+            top: Math.floor(parseFloat($(".navbar").css("height")) + navbarBrandPaddingLeft),
             right: navbarBrandPaddingLeft,
             bottom: navbarBrandPaddingLeft,
             left: navbarBrandPaddingLeft
@@ -46,7 +47,7 @@ export default function naDisplay(serverName) {
             min: 0,
             max: 8192
         },
-        port: { id: 366, coord: { x: 4396, y: 2494 } }, // Shroud Cay
+        port: { id: "366", coord: { x: 4396, y: 2494 } }, // Shroud Cay
         maxScale: 10,
         fontSize: { initial: 30, portLabel: 18, pbZone: 7 },
         circleSize: { initial: 50, portLabel: 20, pbZone: 5 },
@@ -106,9 +107,9 @@ export default function naDisplay(serverName) {
         ]
     };
     // eslint-disable-next-line no-restricted-globals
-    defaults.width = top.innerWidth - defaults.margin.left - defaults.margin.right;
+    defaults.width = Math.floor(top.innerWidth - defaults.margin.left - defaults.margin.right);
     // eslint-disable-next-line no-restricted-globals
-    defaults.height = top.innerHeight - defaults.margin.top - defaults.margin.bottom;
+    defaults.height = Math.floor(top.innerHeight - defaults.margin.top - defaults.margin.bottom);
     defaults.minScale = Math.min(defaults.width / defaults.coord.max, defaults.height / defaults.coord.max);
     defaults.coord.voronoi = [
         [defaults.coord.min - 1, defaults.coord.min - 1],
@@ -201,14 +202,44 @@ export default function naDisplay(serverName) {
             }
             h += "</p>";
             h += "<table class='table table-sm'>";
-            if (d.produces.length) {
-                h += `<tr><td>Produces</td><td>${d.produces.join(", ")}</td></tr>`;
+            if (d.producesTrading.length || d.producesNonTrading.length) {
+                h += "<tr><td>Produces</td><td>";
+                if (d.producesNonTrading.length) {
+                    h += `<span class="non-trading">${d.producesNonTrading.join(", ")}</span>`;
+                    if (d.producesTrading.length) {
+                        h += "<br>";
+                    }
+                }
+                if (d.producesTrading.length) {
+                    h += `${d.producesTrading.join(", ")}`;
+                }
+                h += "</td></tr>";
             }
-            if (d.drops.length) {
-                h += `<tr><td>Drops</td><td>${d.drops.join(", ")}</tr>`;
+            if (d.dropsTrading.length || d.dropsNonTrading.length) {
+                h += "<tr><td>Drops</td><td>";
+                if (d.dropsNonTrading.length) {
+                    h += `<span class="non-trading">${d.dropsNonTrading.join(", ")}</span>`;
+                    if (d.dropsTrading.length) {
+                        h += "<br>";
+                    }
+                }
+                if (d.dropsTrading.length) {
+                    h += `${d.dropsTrading.join(", ")}`;
+                }
+                h += "</td></tr>";
             }
-            if (d.consumes.length) {
-                h += `<tr><td>Consumes</td><td>${d.consumes.join(", ")}</tr>`;
+            if (d.consumesTrading.length || d.consumesNonTrading.length) {
+                h += "<tr><td>Consumes</td><td>";
+                if (d.consumesNonTrading.length) {
+                    h += `<span class="non-trading">${d.consumesNonTrading.join(", ")}</span>`;
+                    if (d.consumesTrading.length) {
+                        h += "<br>";
+                    }
+                }
+                if (d.consumesTrading.length) {
+                    h += `${d.consumesTrading.join(", ")}`;
+                }
+                h += "</td></tr>";
             }
             h += "</table>";
 
@@ -378,8 +409,6 @@ export default function naDisplay(serverName) {
         svgWind.selectAll("*").remove();
         current.bFirstCoord = true;
         current.lineData.splice(0, current.lineData.length);
-        current.portData = defaults.portData;
-        $("#good-names").get(0).selectedIndex = 0;
         updatePorts();
     }
 
@@ -565,8 +594,8 @@ export default function naDisplay(serverName) {
 
     function updatePBZones() {
         pbZones.datum(current.PBZoneData).attr("d", d3.geoPath().pointRadius(4));
-        towers.datum(current.fortData).attr("d", d3.geoPath().pointRadius(1.5));
-        forts.datum(current.towerData).attr("d", d3.geoPath().pointRadius(2));
+        towers.datum(current.towerData).attr("d", d3.geoPath().pointRadius(1.5));
+        forts.datum(current.fortData).attr("d", d3.geoPath().pointRadius(2));
     }
 
     function setTeleportData() {
@@ -655,7 +684,7 @@ export default function naDisplay(serverName) {
     }
 
     function goToPort() {
-        if (current.port.id) {
+        if (current.port.id !== "0") {
             zoomAndPan(current.port.coord.x, current.port.coord.y, 2);
         } else {
             initialZoomAndPan();
@@ -682,6 +711,10 @@ export default function naDisplay(serverName) {
             naContext = naCanvas.node().getContext("2d");
 
             defaults.image.onload = () => {
+                naContext.mozImageSmoothingEnabled = false;
+                naContext.webkitImageSmoothingEnabled = false;
+                naContext.msImageSmoothingEnabled = false;
+                naContext.imageSmoothingEnabled = false;
                 initialZoomAndPan();
             };
             defaults.image.src = defaults.imageSrc;
@@ -813,21 +846,11 @@ export default function naDisplay(serverName) {
                         }
                         return 0;
                     });
-                portNames.append(
-                    $("<option>", {
-                        value: 0,
-                        text: "Go to a port"
-                    })
-                );
-                selectPorts.forEach(port => {
-                    portNames.append(
-                        $("<option>", {
-                            value: port.coord,
-                            text: port.name,
-                            data: { id: port.id }
-                        })
-                    );
-                });
+
+                const select = `<option value="" data-id="0">Reset</option>${selectPorts
+                    .map(port => `<option value="${port.coord}" data-id="${port.id}">${port.name}</option>`)
+                    .join("")}`;
+                portNames.append(select);
             }
 
             function setupGoodSelect() {
@@ -851,12 +874,7 @@ export default function naDisplay(serverName) {
                     });
                 });
                 selectGoods = new Map(Array.from(selectGoods).sort());
-                goodNames.append(
-                    $("<option>", {
-                        value: 0,
-                        text: "Select a good"
-                    })
-                );
+                let select = '<option value="0">Reset</option>';
                 // eslint-disable-next-line no-restricted-syntax
                 for (const [key, portIds] of selectGoods.entries()) {
                     let ids = "";
@@ -864,39 +882,28 @@ export default function naDisplay(serverName) {
                     for (const id of portIds) {
                         ids += `,${id}`;
                     }
-                    goodNames.append(
-                        $("<option>", {
-                            value: ids.substr(1),
-                            text: key
-                        })
-                    );
+                    select += `<option value="${ids.substr(1)}">${key}</option>`;
                 }
+                goodNames.append(select);
             }
 
-            setupPortSelect();
-            $("#port-names").on("change", () => {
-                const port = $("#port-names").find(":selected");
+            function portSelected() {
+                const port = $(this).find(":selected");
+                const c = port.val().split(",");
+                current.port.coord.x = +c[0];
+                current.port.coord.y = +c[1];
+                current.port.id = port.data("id").toString();
 
-                if (port.val() !== 0) {
-                    const c = port.val().split(",");
-                    current.port.coord.x = +c[0];
-                    current.port.coord.y = +c[1];
-                    current.port.id = port.data("id");
-                } else {
-                    current.port.coord = defaults.port.coord;
-                    current.port.id = defaults.port.id;
-                }
                 if (current.showPBZones) {
                     setPBZoneData();
                     updatePBZones();
                     updatePortTexts();
                 }
                 goToPort();
-            });
+            }
 
-            setupGoodSelect();
-            $("#good-names").on("change", () => {
-                const portIds = $("#good-names")
+            function goodSelected() {
+                const portIds = $(this)
                     .val()
                     .split(",");
                 if (portIds.includes("0")) {
@@ -905,35 +912,50 @@ export default function naDisplay(serverName) {
                     current.portData = defaults.portData.filter(d => portIds.includes(d.id));
                 }
                 updatePorts();
-            });
+            }
+
+            setupPortSelect();
+            $("#port-names")
+                .on("change", portSelected)
+                .prop("selectedIndex", -1)
+                .extendSelect({
+                    // Search input placeholder:
+                    search: "Find",
+                    // Title if option not selected:
+                    notSelectedTitle: "Go to a port",
+                    // Message if select list empty:
+                    empty: "Not found"
+                });
+
+            setupGoodSelect();
+            $("#good-names")
+                .on("change", goodSelected)
+                .prop("selectedIndex", -1)
+                .extendSelect({
+                    // Search input placeholder:
+                    search: "Find",
+                    // Title if option not selected:
+                    notSelectedTitle: "Select a good",
+                    // Message if select list empty:
+                    empty: "Not found"
+                });
         }
 
         function setupClanSelect() {
             const propClan = $("#prop-clan");
 
             propClan.empty();
-            propClan.append(
-                $("<option>", {
-                    value: 0,
-                    text: "Select a clan"
-                })
-            );
 
             const clanList = new Set();
             current.portData.filter(d => d.properties.capturer).map(d => clanList.add(d.properties.capturer));
-            Array.from(clanList)
+            const select = `<option value="0">Select a clan/Reset</option>${Array.from(clanList)
                 .sort()
-                .forEach(clan => {
-                    propClan.append(
-                        $("<option>", {
-                            value: clan,
-                            text: clan
-                        })
-                    );
-                });
+                .map(clan => `<option value="${clan}">${clan}</option>`)
+                .join("")}`;
+            propClan.append(select);
         }
 
-        function clanSelect() {
+        function clanSelected() {
             const clan = $("#prop-clan").val();
 
             if (+clan !== 0) {
@@ -948,16 +970,12 @@ export default function naDisplay(serverName) {
         }
 
         function setupPropertyMenu() {
+            const dateFormat = "dd YYYY-MM-DD",
+                timeFormat = "HH:00";
+
             function setupNationSelect() {
                 const propNation = $("#prop-nation");
-
-                propNation.append(
-                    $("<option>", {
-                        value: 0,
-                        text: "Select a nation"
-                    })
-                );
-                defaults.nations
+                const select = `<option value="0">Select a nation/Reset</option>${defaults.nations
                     .sort((a, b) => {
                         if (a.sortName < b.sortName) {
                             return -1;
@@ -967,17 +985,12 @@ export default function naDisplay(serverName) {
                         }
                         return 0;
                     })
-                    .forEach(nation => {
-                        propNation.append(
-                            $("<option>", {
-                                value: nation.id,
-                                text: nation.name
-                            })
-                        );
-                    });
+                    .map(nation => `<option value="${nation.id}">${nation.name}</option>`)
+                    .join("")}`;
+                propNation.append(select);
             }
 
-            function nationSelect() {
+            function nationSelected() {
                 const nationId = $("#prop-nation").val();
 
                 if (+nationId !== 0) {
@@ -998,6 +1011,54 @@ export default function naDisplay(serverName) {
                 updatePorts();
             }
 
+            function greenZoneSelect() {
+                current.portData = defaults.portData.filter(
+                    d => d.properties.nonCapturable && d.properties.nation !== "FT"
+                );
+                updatePorts();
+            }
+
+            function capturePBRange() {
+                const blackOutTimes = [8, 9, 10],
+                    // 24 hours minus black-out hours
+                    maxStartTime = 24 - (blackOutTimes.length + 1);
+                const startTimes = new Set();
+                const begin = moment($("#prop-pb-from-input").val(), timeFormat).hour();
+                let end = moment($("#prop-pb-to-input").val(), timeFormat).hour();
+
+                console.log("Between %d and %d", begin, end);
+
+                // Range not in black-out range of 9 to 10
+                if (!(blackOutTimes.includes(begin) && blackOutTimes.includes(end) && begin <= end)) {
+                    startTimes.add(0);
+                    if (end < begin) {
+                        end += 24;
+                    }
+                    for (let i = begin - 2; i <= end - 3; i += 1) {
+                        startTimes.add((i - 10) % maxStartTime);
+                    }
+                }
+
+                /*
+                console.log(startTimes);
+                for (const time of startTimes.values()) {
+                    console.log(
+                        "%s.00\u202f–\u202f%s.00",
+                        !time ? "11" : (time + 10) % 24,
+                        !time ? "8" : (time + 13) % 24
+                    );
+                }
+                */
+
+                current.portData = defaults.portData.filter(
+                    d =>
+                        !d.properties.nonCapturable &&
+                        d.properties.nation !== "FT" &&
+                        startTimes.has(d.properties.portBattleStartTime)
+                );
+                updatePorts();
+            }
+
             function filterCaptured(begin, end) {
                 console.log(
                     "Between %s and %s",
@@ -1005,26 +1066,51 @@ export default function naDisplay(serverName) {
                     end.format("dddd D MMMM YYYY h:mm")
                 );
                 current.portData = defaults.portData.filter(d =>
-                    moment(d.properties.lastPortBattle).isBetween(begin, end, null, "()")
+                    moment(d.properties.lastPortBattle).isBetween(begin, end, null, "(]")
                 );
                 updatePorts();
             }
 
             function capturedYesterday() {
-                const begin = moment({ hour: 11, minute: 0 }).subtract(1, "day"),
-                    end = moment({ hour: 8, minute: 0 });
+                const begin = moment()
+                        .utc()
+                        .subtract(1, "day")
+                        .hour(11)
+                        .minute(0),
+                    end = moment()
+                        .utc()
+                        .hour(11)
+                        .minute(0);
                 filterCaptured(begin, end);
             }
 
             function capturedThisWeek() {
-                const begin = moment({ hour: 11, minute: 0 }).day(-6), // this Monday
-                    end = moment({ hour: 8, minute: 0 }).day(1); // next Monday
+                const currentMondayOfWeek = moment()
+                    .utc()
+                    .startOf("week");
+                const begin = currentMondayOfWeek.hour(11), // this Monday
+                    end = moment(currentMondayOfWeek)
+                        .add(7, "day")
+                        .hour(11); // next Monday
                 filterCaptured(begin, end);
             }
 
             function capturedLastWeek() {
-                const begin = moment({ hour: 11, minute: 0 }).day(-13), // Monday last week
-                    end = moment({ hour: 8, minute: 0 }).day(-6); // this Monday
+                const currentMondayOfWeek = moment()
+                    .utc()
+                    .startOf("week");
+                const begin = moment(currentMondayOfWeek)
+                        .subtract(7, "day")
+                        .hour(11), // Monday last week
+                    end = currentMondayOfWeek.hour(11); // this Monday
+                filterCaptured(begin, end);
+            }
+
+            function captureRange() {
+                const begin = moment($("#prop-from-input").val(), dateFormat).hour(11),
+                    end = moment($("#prop-to-input").val(), dateFormat)
+                        .add(1, "day")
+                        .hour(11);
                 filterCaptured(begin, end);
             }
 
@@ -1066,16 +1152,57 @@ export default function naDisplay(serverName) {
             setupNationSelect();
             $("#prop-nation")
                 .on("click", event => event.stopPropagation())
-                .on("change", () => nationSelect());
+                .on("change", nationSelected);
+
             setupClanSelect();
             $("#prop-clan")
                 .on("click", event => event.stopPropagation())
-                .on("change", () => clanSelect());
+                .on("change", clanSelected);
+
             $("#menu-prop-all").on("click", () => allSelect());
+            $("#menu-prop-green").on("click", () => greenZoneSelect());
+
+            // noinspection JSJQueryEfficiency
+            $("#prop-pb-from").datetimepicker({
+                format: timeFormat
+            });
+            // noinspection JSJQueryEfficiency
+            $("#prop-pb-to").datetimepicker({
+                format: timeFormat
+            });
+            $("#prop-pb-range").submit(event => {
+                capturePBRange();
+                $("#propertyDropdown").dropdown("toggle");
+                event.preventDefault();
+            });
 
             $("#menu-prop-yesterday").on("click", () => capturedYesterday());
             $("#menu-prop-this-week").on("click", () => capturedThisWeek());
             $("#menu-prop-last-week").on("click", () => capturedLastWeek());
+
+            // noinspection JSJQueryEfficiency
+            $("#prop-from").datetimepicker({
+                format: dateFormat
+            });
+            // noinspection JSJQueryEfficiency
+            $("#prop-to").datetimepicker({
+                format: dateFormat,
+                useCurrent: false
+            });
+            // noinspection JSJQueryEfficiency
+            $("#prop-from").on("change.datetimepicker", e => {
+                $("#prop-to").datetimepicker("minDate", e.date);
+            });
+            // noinspection JSJQueryEfficiency
+            $("#prop-to").on("change.datetimepicker", e => {
+                $("#prop-from").datetimepicker("maxDate", e.date);
+            });
+
+            $("#prop-range").submit(event => {
+                captureRange();
+                $("#propertyDropdown").dropdown("toggle");
+                event.preventDefault();
+            });
 
             setupCMSelect();
             $("#prop-cm")
@@ -1237,7 +1364,7 @@ export default function naDisplay(serverName) {
                     timeZone: "UTC"
                 });
 
-                $("#time").datetimepicker({
+                $("#wind-time").datetimepicker({
                     format: "LT"
                 });
 
