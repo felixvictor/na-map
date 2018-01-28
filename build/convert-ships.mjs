@@ -15,6 +15,13 @@ function saveJson(data) {
     });
 }
 
+// https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
+// eslint-disable-next-line no-extend-native,func-names
+String.prototype.replaceAll = function(search, replacement) {
+    const target = this;
+    return target.replace(new RegExp(search, "g"), replacement);
+};
+
 function convertShips() {
     const geoJson = {};
     geoJson.shipData = [];
@@ -23,7 +30,7 @@ function convertShips() {
         const calcPortSpeed = ship.Specs.MaxSpeed * 0.076752029372859 - 0.007759512279223,
             speedDegrees = ship.Specs.SpeedToWind.map(d => d * calcPortSpeed);
 
-        const length = ship.Specs.SpeedToWind.length;
+        const { length } = ship.Specs.SpeedToWind;
         // Elemente kopieren
         for (let i = 0; i < (length - 1) * 2; i += 2) {
             speedDegrees.unshift(speedDegrees[i]);
@@ -35,7 +42,7 @@ function convertShips() {
 
         const shipData = {
             id: ship.Id,
-            name: ship.Name.replace("'", "’"),
+            name: ship.Name.replaceAll("'", "’"),
             class: ship.Class,
             healthInfo: ship.HealthInfo,
             shipMass: ship.ShipMass,

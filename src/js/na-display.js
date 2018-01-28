@@ -202,14 +202,44 @@ export default function naDisplay(serverName) {
             }
             h += "</p>";
             h += "<table class='table table-sm'>";
-            if (d.produces.length) {
-                h += `<tr><td>Produces</td><td>${d.produces.join(", ")}</td></tr>`;
+            if (d.producesTrading.length || d.producesNonTrading.length) {
+                h += "<tr><td>Produces</td><td>";
+                if (d.producesNonTrading.length) {
+                    h += `<span class="non-trading">${d.producesNonTrading.join(", ")}</span>`;
+                    if (d.producesTrading.length) {
+                        h += "<br>";
+                    }
+                }
+                if (d.producesTrading.length) {
+                    h += `${d.producesTrading.join(", ")}`;
+                }
+                h += "</td></tr>";
             }
-            if (d.drops.length) {
-                h += `<tr><td>Drops</td><td>${d.drops.join(", ")}</tr>`;
+            if (d.dropsTrading.length || d.dropsNonTrading.length) {
+                h += "<tr><td>Drops</td><td>";
+                if (d.dropsNonTrading.length) {
+                    h += `<span class="non-trading">${d.dropsNonTrading.join(", ")}</span>`;
+                    if (d.dropsTrading.length) {
+                        h += "<br>";
+                    }
+                }
+                if (d.dropsTrading.length) {
+                    h += `${d.dropsTrading.join(", ")}`;
+                }
+                h += "</td></tr>";
             }
-            if (d.consumes.length) {
-                h += `<tr><td>Consumes</td><td>${d.consumes.join(", ")}</tr>`;
+            if (d.consumesTrading.length || d.consumesNonTrading.length) {
+                h += "<tr><td>Consumes</td><td>";
+                if (d.consumesNonTrading.length) {
+                    h += `<span class="non-trading">${d.consumesNonTrading.join(", ")}</span>`;
+                    if (d.consumesTrading.length) {
+                        h += "<br>";
+                    }
+                }
+                if (d.consumesTrading.length) {
+                    h += `${d.consumesTrading.join(", ")}`;
+                }
+                h += "</td></tr>";
             }
             h += "</table>";
 

@@ -52,6 +52,10 @@ text {
   }
 }
 
+.non-trading {
+  font-style: italic;
+}
+
 .pb-zone {
   fill: none;
   stroke: $primary-700;

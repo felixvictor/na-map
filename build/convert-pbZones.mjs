@@ -4,22 +4,6 @@ const infileBaseName = process.argv[2],
     outDir = process.argv[3],
     date = process.argv[4];
 
-const nation = {
-    0: "NT",
-    1: "PR",
-    2: "ES",
-    3: "FR",
-    4: "GB",
-    5: "VP",
-    6: "DK",
-    7: "SE",
-    8: "US",
-    9: "FT",
-    10: "RU",
-    11: "DE",
-    12: "PL"
-};
-
 const Trans = {
     A: -0.00499866779363828,
     B: -0.00000021464254980645,
