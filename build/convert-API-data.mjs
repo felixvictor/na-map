@@ -51,9 +51,19 @@ function saveJson(data) {
     });
 }
 
+// https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
+// eslint-disable-next-line no-extend-native,func-names
+String.prototype.replaceAll = function(search, replacement) {
+    const target = this;
+    return target.replace(new RegExp(search, "g"), replacement);
+};
+
 function getItemNames() {
     APIItems.filter(item => item.ItemType === "Material" || item.ItemType === "Resource").forEach(item => {
-        ItemNames.set(item.Id, item.Name.replace("'", "’"));
+        ItemNames.set(item.Id, {
+            name: item.Name.replaceAll("'", "’"),
+            trading: item.SortingGroup === "Resource.Trading"
+        });
     });
 }
 
@@ -91,7 +101,7 @@ function convertPorts() {
                 ]
             },
             properties: {
-                name: port.Name.replace("'", "’"),
+                name: port.Name.replaceAll("'", "’"),
                 dx: GetMinMaxX(
                     Math.round(
                         convertCoordX(port.Position.x, port.Position.z) -
@@ -120,19 +130,46 @@ function convertPorts() {
                 netIncome: port.LastTax - port.LastCost,
                 tradingCompany: port.TradingCompany,
                 laborHoursDiscount: port.LaborHoursDiscount,
-                produces: flattenArray(
+                producesTrading: flattenArray(
                     APIShops.filter(shop => shop.Id === port.Id).map(shop =>
-                        shop.ResourcesProduced.map(good => ItemNames.get(good.Key)).sort()
+                        shop.ResourcesProduced.filter(good => ItemNames.get(good.Key).trading)
+                            .map(good => ItemNames.get(good.Key).name)
+                            .sort()
                     )
                 ),
-                drops: flattenArray(
+                dropsTrading: flattenArray(
                     APIShops.filter(shop => shop.Id === port.Id).map(shop =>
-                        shop.ResourcesAdded.map(good => ItemNames.get(good.Template)).sort()
+                        shop.ResourcesAdded.filter(good => ItemNames.get(good.Template).trading)
+                            .map(good => ItemNames.get(good.Template).name)
+                            .sort()
                     )
                 ),
-                consumes: flattenArray(
+                consumesTrading: flattenArray(
                     APIShops.filter(shop => shop.Id === port.Id).map(shop =>
-                        shop.ResourcesConsumed.map(good => ItemNames.get(good.Key)).sort()
+                        shop.ResourcesConsumed.filter(good => ItemNames.get(good.Key).trading)
+                            .map(good => ItemNames.get(good.Key).name)
+                            .sort()
+                    )
+                ),
+                producesNonTrading: flattenArray(
+                    APIShops.filter(shop => shop.Id === port.Id).map(shop =>
+                        shop.ResourcesProduced.filter(good => !ItemNames.get(good.Key).trading)
+                            .map(good => ItemNames.get(good.Key).name)
+                            .sort()
+                    )
+                ),
+                dropsNonTrading: flattenArray(
+                    APIShops.filter(shop => shop.Id === port.Id).map(shop =>
+                        shop.ResourcesAdded.filter(good => !ItemNames.get(good.Template).trading)
+                            .map(good => ItemNames.get(good.Template).name)
+                            .sort()
+                    )
+                ),
+                consumesNonTrading: flattenArray(
+                    APIShops.filter(shop => shop.Id === port.Id).map(shop =>
+                        shop.ResourcesConsumed.filter(good => !ItemNames.get(good.Key).trading)
+                            .map(good => ItemNames.get(good.Key).name)
+                            .sort()
                     )
                 )
             }

@@ -7,7 +7,11 @@
  <meta content="Naval Action map" name="description">
  <meta content="width=device-width,initial-scale=1" name="viewport">
  <script src="https://www.googletagmanager.com/gtag/js?id=UA-109520372-1" async></script>
+<<<<<<< HEAD
 <link href="na-map.min.css?06d96ad3fd6418f4870b" rel="stylesheet"></head>
+=======
+<link href="na-map.min.css?8a34efa0580d741453b2" rel="stylesheet"></head>
+>>>>>>> release-2.1
 <body>
 
 <nav class="bg-light fixed-top navbar navbar-expand-lg navbar-light">
@@ -47,19 +51,19 @@
     <div class="dropdown-menu extralarge-width" id="predictMenu" aria-labelledby="predictDropdown">
      <form id="windPrediction" class="p-2">
       <div class="form-group row">
-       <label class="col-sm-6 col-form-label align-top" for="direction">Wind currently blowing
+       <label class="col-form-label col-sm-6 align-top" for="direction">Wind currently blowing
         from</label>
        <div class="col-sm-6">
         <div class="rslider" id="direction"></div>
        </div>
       </div>
       <div class="form-group row">
-       <label class="col-sm-6 col-form-label" for="time">Predict wind for</label>
+       <label class="col-form-label col-sm-6" for="wind-time">Predict wind for</label>
        <div class="col-sm-6">
         <div class="form-group">
-         <div class="input-group date" id="time" data-target-input="nearest">
-          <input class="form-control datetimepicker-input" id="wind-time-input" type="text" required aria-label="time" data-target="#time">
-          <div class="input-group-append" data-target="#time" data-toggle="datetimepicker">
+         <div class="input-group date" id="wind-time" data-target-input="nearest">
+          <input class="form-control datetimepicker-input" id="wind-time-input" type="text" required aria-label="wind-time" data-target="#wind-time">
+          <div class="input-group-append" data-target="#wind-time" data-toggle="datetimepicker">
            <span class="input-group-text"><i class="far fa-clock"></i></span>
           </div>
          </div>
@@ -84,12 +88,65 @@
      <a href="#" class="dropdown-item" id="menu-prop-clan">
       <select class="custom-select" id="prop-clan" name="prop-clan" title="Select a clan"></select>
      </a>
+     <div class="dropdown-divider"></div>
+     <h6 class="dropdown-header">Property</h6>
      <a href="#" class="dropdown-item pt-1" id="menu-prop-all">Available to all</a>
+     <a href="#" class="dropdown-item pt-1" id="menu-prop-green">Green zone</a>
+     <div class="dropdown-divider"></div>
+     <h6 class="dropdown-header">Port battle time range</h6>
+     <div class="dropdown-item" id="menu-prop-pb-range">
+      <form id="prop-pb-range">
+       <div class="form-group row">
+        <label class="col-form-label col-sm-2" for="prop-pb-from-input">From</label>
+        <div class="input-group date col-sm-10" id="prop-pb-from" data-target-input="nearest">
+         <input class="form-control datetimepicker-input" id="prop-pb-from-input" type="text" required aria-label="prop-pb-from" data-target="#prop-pb-from">
+         <div class="input-group-append" data-target="#prop-pb-from" data-toggle="datetimepicker">
+          <span class="input-group-text"><i class="far fa-clock"></i></span>
+         </div>
+        </div>
+       </div>
+       <div class="form-group row">
+        <label class="col-form-label col-sm-2" for="prop-pb-to-input">To</label>
+        <div class="input-group date col-sm-10" id="prop-pb-to" data-target-input="nearest">
+         <input class="form-control datetimepicker-input" id="prop-pb-to-input" type="text" required aria-label="prop-pb-to" data-target="#prop-pb-to">
+         <div class="input-group-append" data-target="#prop-pb-to" data-toggle="datetimepicker">
+          <span class="input-group-text"><i class="far fa-clock"></i></span>
+         </div>
+        </div>
+       </div>
+       <button class="btn btn-outline-primary" type="submit">Go</button>
+      </form>
+     </div>
      <div class="dropdown-divider"></div>
      <h6 class="dropdown-header">Capture time</h6>
      <a href="#" class="dropdown-item" id="menu-prop-yesterday">Yesterday</a>
      <a href="#" class="dropdown-item" id="menu-prop-this-week">This week</a>
      <a href="#" class="dropdown-item" id="menu-prop-last-week">Last week</a>
+     <div class="dropdown-divider"></div>
+     <h6 class="dropdown-header">Capture time range</h6>
+     <div class="dropdown-item" id="menu-prop-range">
+      <form id="prop-range">
+       <div class="form-group row">
+        <label class="col-form-label col-sm-2" for="prop-from-input">From</label>
+        <div class="input-group date col-sm-10" id="prop-from" data-target-input="nearest">
+         <input class="form-control datetimepicker-input" id="prop-from-input" type="text" required aria-label="prop-from" data-target="#prop-from">
+         <div class="input-group-append" data-target="#prop-from" data-toggle="datetimepicker">
+          <span class="input-group-text"><i class="far fa-calendar"></i></span>
+         </div>
+        </div>
+       </div>
+       <div class="form-group row">
+        <label class="col-form-label col-sm-2" for="prop-to-input">To</label>
+        <div class="input-group date col-sm-10" id="prop-to" data-target-input="nearest">
+         <input class="form-control datetimepicker-input" id="prop-to-input" type="text" required aria-label="prop-to" data-target="#prop-to">
+         <div class="input-group-append" data-target="#prop-to" data-toggle="datetimepicker">
+          <span class="input-group-text"><i class="far fa-calendar"></i></span>
+         </div>
+        </div>
+       </div>
+       <button class="btn btn-outline-primary" type="submit">Go</button>
+      </form>
+     </div>
      <div class="dropdown-divider"></div>
      <h6 class="dropdown-header">Conquest mark</h6>
      <a href="#" class="dropdown-item" id="menu-prop-cm">
@@ -99,12 +156,12 @@
    </li>
 
    <li class="nav-item pl-2">
-    <select class="custom-select" id="port-names" name="port-names" title="Go to a port">
+    <select class="form-control" id="port-names" name="port-names" title="Go to a port" data-live-search="true">
     </select>
    </li>
 
    <li class="nav-item pl-2">
-    <select class="custom-select" id="good-names" name="good-names" title="Select a good">
+    <select class="form-control" id="good-names" name="good-names" title="Select a good" data-live-search="true">
     </select>
    </li>
   </ul>
@@ -177,5 +234,9 @@
 </section>
 
 <script src="https://d3js.org/d3.v4.min.js"></script>
+<<<<<<< HEAD
 <script src="na-map.min.js?06d96ad3fd6418f4870b" type="text/javascript"></script></body>
+=======
+<script src="na-map.min.js?8a34efa0580d741453b2" type="text/javascript"></script></body>
+>>>>>>> release-2.1
 </html>
