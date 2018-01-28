@@ -149,10 +149,28 @@ export default function naDisplay(serverName) {
         naContext.save();
         naContext.clearRect(0, 0, defaults.width, defaults.height);
         naContext.translate(transform.x, transform.y);
-        naContext.scale(transform.k, transform.k);
+        naContext.scale(transform.k * defaults.imageScaleFactor, transform.k * defaults.imageScaleFactor);
         naContext.drawImage(defaults.image, 0, 0);
         naContext.getImageData(0, 0, defaults.width, defaults.height);
         naContext.restore();
+
+        /*
+        const transform = d3.zoomIdentity
+            .scale(scale)
+            .translate(-x + defaults.width / 2 / scale, -y + defaults.height / 2 / scale);
+        */
+        /*
+        const sx = -transform.x,
+            sy = -transform.y ,
+            sWidth = defaults.width / transform.k,
+            sHeight = defaults.height / transform.k,
+            dx = defaults.coord.min+transform.x,
+            dy = defaults.coord.min+ transform.y,
+            dWidth = defaults.width+ defaults.width / 2,
+            dHeight = defaults.height+ defaults.height / 2;
+        naContext.drawImage(defaults.image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+        console.log(sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+        */
     }
 
     function updatePortCircles() {
@@ -409,6 +427,7 @@ export default function naDisplay(serverName) {
         svgWind.selectAll("*").remove();
         current.bFirstCoord = true;
         current.lineData.splice(0, current.lineData.length);
+        current.portData = defaults.portData;
         updatePorts();
     }
 
@@ -715,6 +734,7 @@ export default function naDisplay(serverName) {
                 naContext.webkitImageSmoothingEnabled = false;
                 naContext.msImageSmoothingEnabled = false;
                 naContext.imageSmoothingEnabled = false;
+                defaults.imageScaleFactor = defaults.coord.max / defaults.image.height;
                 initialZoomAndPan();
             };
             defaults.image.src = defaults.imageSrc;
