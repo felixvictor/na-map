@@ -877,8 +877,10 @@ export default function naDisplay(serverName) {
                 const goodNames = $("#good-names");
                 let selectGoods = new Map();
                 const goodsPerPort = defaults.portData.map(d => {
-                    let goods = d.properties.drops;
-                    goods += d.properties.produces ? `,${d.properties.produces}` : "";
+                    let goods = d.properties.dropsTrading ? d.properties.dropsTrading : "";
+                    goods += d.properties.dropsNonTrading ? `,${d.properties.dropsNonTrading}` : "";
+                    goods += d.properties.producesTrading ? `,${d.properties.producesTrading}` : "";
+                    goods += d.properties.producesNonTrading ? `,${d.properties.producesNonTrading}` : "";
                     return {
                         id: d.id,
                         goods
