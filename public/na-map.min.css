@@ -7063,8 +7063,8 @@ a.text-background:hover, a.text-background:focus {
 }
 
 /*@preserve
- * Tempus Dominus Bootstrap4 v5.0.0-alpha14 (https://tempusdominus.github.io/bootstrap-4/)
- * Copyright 2016-2017 Jonathan Peterson
+ * Tempus Dominus Bootstrap4 v5.0.0-alpha15 (https://tempusdominus.github.io/bootstrap-4/)
+ * Copyright 2016-2018 Jonathan Peterson
  * Licensed under MIT (https://github.com/tempusdominus/bootstrap-3/blob/master/LICENSE)
  */
 .sr-only, .bootstrap-datetimepicker-widget .btn[data-action="incrementHours"]::after, .bootstrap-datetimepicker-widget .btn[data-action="incrementMinutes"]::after, .bootstrap-datetimepicker-widget .btn[data-action="decrementHours"]::after, .bootstrap-datetimepicker-widget .btn[data-action="decrementMinutes"]::after, .bootstrap-datetimepicker-widget .btn[data-action="showHours"]::after, .bootstrap-datetimepicker-widget .btn[data-action="showMinutes"]::after, .bootstrap-datetimepicker-widget .btn[data-action="togglePeriod"]::after, .bootstrap-datetimepicker-widget .btn[data-action="clear"]::after, .bootstrap-datetimepicker-widget .btn[data-action="today"]::after, .bootstrap-datetimepicker-widget .picker-switch::after, .bootstrap-datetimepicker-widget table th.prev::after, .bootstrap-datetimepicker-widget table th.next::after {
@@ -7378,6 +7378,72 @@ a.text-background:hover, a.text-background:focus {
 
 .input-group.date .input-group-append {
   cursor: pointer;
+}
+
+.select-extend {
+  display: none;
+}
+
+.select-last-element .btn {
+  border-top-right-radius: .25rem !important;
+  border-bottom-right-radius: .25rem !important;
+}
+
+.select-extended-element {
+  text-overflow: ellipsis;
+  position: relative;
+}
+
+.select-extended-element.select-checkbox .active {
+  background: none;
+  position: relative;
+  color: #212529;
+}
+
+.select-extended-element.select-checkbox .active:before {
+  content: '';
+  background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiBoZWlnaHQ9IjE2IiB3aWR0aD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiI+ICA8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjIiIGQ9Ik0xLjg2LDYuNDUsTDUuMDUsMTAuNjQsTDEzLjUsMi4yOSI+PC9wYXRoPjwvc3ZnPg==);
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  left: 4px;
+  top: 8px;
+}
+
+.select-extended-element.select-checkbox .dropdown-menu .dropdown-item:active {
+  color: #212529;
+  background: #fff;
+}
+
+.select-extended-element.input-group-prepend {
+  margin-bottom: initial;
+}
+
+.select-extended-element .btn {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.select-extended-element .dropdown-menu .select-search {
+  border-radius: 0;
+  border-right: 0;
+  border-left: 0;
+  border-top: 0;
+}
+
+.select-extended-element .dropdown-menu .select-extend-alert {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  margin-bottom: 0;
+  display: none;
+}
+
+.select-extended-element .dropdown-menu .dropdown-item {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /*!
@@ -7768,6 +7834,14 @@ text {
 
 .port-name {
   font-size: large;
+  font-style: italic;
+}
+
+.port circle {
+  cursor: pointer;
+}
+
+.non-trading {
   font-style: italic;
 }
 
