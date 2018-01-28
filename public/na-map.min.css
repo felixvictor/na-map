@@ -7841,6 +7841,10 @@ text {
   cursor: pointer;
 }
 
+.non-trading {
+  font-style: italic;
+}
+
 .pb-zone {
   fill: none;
   stroke: #917f68;
