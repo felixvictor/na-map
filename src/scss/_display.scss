@@ -46,6 +46,12 @@ text {
   font-style: italic;
 }
 
+.port {
+  circle {
+    cursor: pointer;
+  }
+}
+
 .pb-zone {
   fill: none;
   stroke: $primary-700;
