@@ -409,6 +409,7 @@ export default function naDisplay(serverName) {
         svgWind.selectAll("*").remove();
         current.bFirstCoord = true;
         current.lineData.splice(0, current.lineData.length);
+        current.portData = defaults.portData;
         updatePorts();
     }
 
