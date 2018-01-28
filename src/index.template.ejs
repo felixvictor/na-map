@@ -97,6 +97,33 @@
      <a class="dropdown-item pt-1" id="menu-prop-all" href="#">Available to all</a>
      <a class="dropdown-item pt-1" id="menu-prop-green" href="#">Green zone</a>
      <div class="dropdown-divider"></div>
+     <h6 class="dropdown-header">Port battle time range</h6>
+     <div class="dropdown-item" id="menu-prop-pb-range">
+      <form id="prop-pb-range">
+       <div class="form-group row">
+        <label for="prop-pb-from-input" class="col-sm-2 col-form-label">From</label>
+        <div class="col-sm-10 input-group date" id="prop-pb-from" data-target-input="nearest">
+         <input type="text" class="form-control datetimepicker-input" data-target="#prop-pb-from" aria-label="prop-pb-from"
+                id="prop-pb-from-input" required/>
+         <div class="input-group-append" data-target="#prop-pb-from" data-toggle="datetimepicker">
+          <span class="input-group-text"><i class="far fa-clock"></i></span>
+         </div>
+        </div>
+       </div>
+       <div class="form-group row">
+        <label for="prop-pb-to-input" class="col-sm-2 col-form-label">To</label>
+        <div class="col-sm-10 input-group date" id="prop-pb-to" data-target-input="nearest">
+         <input type="text" class="form-control datetimepicker-input" data-target="#prop-pb-to" aria-label="prop-pb-to"
+                id="prop-pb-to-input" required/>
+         <div class="input-group-append" data-target="#prop-pb-to" data-toggle="datetimepicker">
+          <span class="input-group-text"><i class="far fa-clock"></i></span>
+         </div>
+        </div>
+       </div>
+       <button type="submit" class="btn btn-outline-primary">Go</button>
+      </form>
+     </div>
+     <div class="dropdown-divider"></div>
      <h6 class="dropdown-header">Capture time</h6>
      <a class="dropdown-item" id="menu-prop-yesterday" href="#">Yesterday</a>
      <a class="dropdown-item" id="menu-prop-this-week" href="#">This week</a>

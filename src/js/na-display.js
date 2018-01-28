@@ -940,7 +940,8 @@ export default function naDisplay(serverName) {
         }
 
         function setupPropertyMenu() {
-            const dateFormat = "dd YYYY-MM-DD";
+            const dateFormat = "dd YYYY-MM-DD",
+                timeFormat = "HH:00";
 
             function setupNationSelect() {
                 const propNation = $("#prop-nation");
@@ -983,6 +984,47 @@ export default function naDisplay(serverName) {
             function greenZoneSelect() {
                 current.portData = defaults.portData.filter(
                     d => d.properties.nonCapturable && d.properties.nation !== "FT"
+                );
+                updatePorts();
+            }
+
+            function capturePBRange() {
+                const blackOutTimes = [8, 9, 10],
+                    // 24 hours minus black-out hours
+                    maxStartTime = 24 - (blackOutTimes.length + 1);
+                const startTimes = new Set();
+                const begin = moment($("#prop-pb-from-input").val(), timeFormat).hour();
+                let end = moment($("#prop-pb-to-input").val(), timeFormat).hour();
+
+                console.log("Between %d and %d", begin, end);
+
+                // Range not in black-out range of 9 to 10
+                if (!(blackOutTimes.includes(begin) && blackOutTimes.includes(end) && begin <= end)) {
+                    startTimes.add(0);
+                    if (end < begin) {
+                        end += 24;
+                    }
+                    for (let i = begin - 2; i <= end - 3; i += 1) {
+                        startTimes.add((i - 10) % maxStartTime);
+                    }
+                }
+
+                /*
+                console.log(startTimes);
+                for (const time of startTimes.values()) {
+                    console.log(
+                        "%s.00\u202f–\u202f%s.00",
+                        !time ? "11" : (time + 10) % 24,
+                        !time ? "8" : (time + 13) % 24
+                    );
+                }
+                */
+
+                current.portData = defaults.portData.filter(
+                    d =>
+                        !d.properties.nonCapturable &&
+                        d.properties.nation !== "FT" &&
+                        startTimes.has(d.properties.portBattleStartTime)
                 );
                 updatePorts();
             }
@@ -1090,20 +1132,38 @@ export default function naDisplay(serverName) {
             $("#menu-prop-all").on("click", () => allSelect());
             $("#menu-prop-green").on("click", () => greenZoneSelect());
 
+            // noinspection JSJQueryEfficiency
+            $("#prop-pb-from").datetimepicker({
+                format: timeFormat
+            });
+            // noinspection JSJQueryEfficiency
+            $("#prop-pb-to").datetimepicker({
+                format: timeFormat
+            });
+            $("#prop-pb-range").submit(event => {
+                capturePBRange();
+                $("#propertyDropdown").dropdown("toggle");
+                event.preventDefault();
+            });
+
             $("#menu-prop-yesterday").on("click", () => capturedYesterday());
             $("#menu-prop-this-week").on("click", () => capturedThisWeek());
             $("#menu-prop-last-week").on("click", () => capturedLastWeek());
 
+            // noinspection JSJQueryEfficiency
             $("#prop-from").datetimepicker({
                 format: dateFormat
             });
+            // noinspection JSJQueryEfficiency
             $("#prop-to").datetimepicker({
                 format: dateFormat,
                 useCurrent: false
             });
+            // noinspection JSJQueryEfficiency
             $("#prop-from").on("change.datetimepicker", e => {
                 $("#prop-to").datetimepicker("minDate", e.date);
             });
+            // noinspection JSJQueryEfficiency
             $("#prop-to").on("change.datetimepicker", e => {
                 $("#prop-from").datetimepicker("maxDate", e.date);
             });
