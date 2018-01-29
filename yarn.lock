@@ -1316,9 +1316,11 @@ boom@5.x.x:
   dependencies:
     hoek "4.x.x"
 
-bootstrap-hardskilled-extend-select@^1.2.1:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/bootstrap-hardskilled-extend-select/-/bootstrap-hardskilled-extend-select-1.2.1.tgz#f325c9bf97c1cf94960cc018821023bb6a3f6499"
+bootstrap-select@^1.13.0-alpha:
+  version "1.13.0-alpha"
+  resolved "https://registry.yarnpkg.com/bootstrap-select/-/bootstrap-select-1.13.0-alpha.tgz#745d34152075f9b0e2239e2a58e53afd29c4be1e"
+  dependencies:
+    jquery ">=1.8"
 
 bootstrap@4.0.0:
   version "4.0.0"
@@ -2842,8 +2844,8 @@ eslint-plugin-prettier@^2.2.0:
     jest-docblock "^21.0.0"
 
 eslint-plugin-react@^7.5.1:
-  version "7.6.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-react/-/eslint-plugin-react-7.6.0.tgz#351651188c74c5b2fecc2717e3936b7207baa728"
+  version "7.6.1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-react/-/eslint-plugin-react-7.6.1.tgz#5d0e908be599f0c02fbf4eef0c7ed6f29dff7633"
   dependencies:
     doctrine "^2.0.2"
     has "^1.0.1"
@@ -4554,7 +4556,7 @@ jquery-knob@^1.2.11:
   version "1.2.11"
   resolved "https://registry.yarnpkg.com/jquery-knob/-/jquery-knob-1.2.11.tgz#f37c39dbc1c7a6a6c12cdb2ed4f6bffb683f10d6"
 
-jquery@3.3.1, "jquery@^1.9.1 || ^2.0 || ^3.0":
+jquery@3.3.1, jquery@>=1.8, "jquery@^1.9.1 || ^2.0 || ^3.0":
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.3.1.tgz#958ce29e81c9790f31be7792df5d4d95fc57fbca"
 
