@@ -13,7 +13,7 @@ import "moment-timezone";
 import "moment/locale/en-gb";
 import "round-slider/src/roundslider";
 import "tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4";
-import "bootstrap-hardskilled-extend-select";
+import "bootstrap-select/js/bootstrap-select";
 
 import "bootstrap/js/dist/tooltip";
 import "bootstrap/js/dist/util";
@@ -867,7 +867,7 @@ export default function naDisplay(serverName) {
                         return 0;
                     });
 
-                const select = `<option value="" data-id="0">Reset</option>${selectPorts
+                const select = `${selectPorts
                     .map(port => `<option value="${port.coord}" data-id="${port.id}">${port.name}</option>`)
                     .join("")}`;
                 portNames.append(select);
@@ -896,7 +896,7 @@ export default function naDisplay(serverName) {
                     });
                 });
                 selectGoods = new Map(Array.from(selectGoods).sort());
-                let select = '<option value="0">Reset</option>';
+                let select = "";
                 // eslint-disable-next-line no-restricted-syntax
                 for (const [key, portIds] of selectGoods.entries()) {
                     let ids = "";
@@ -939,27 +939,21 @@ export default function naDisplay(serverName) {
             setupPortSelect();
             $("#port-names")
                 .on("change", portSelected)
-                .prop("selectedIndex", -1)
-                .extendSelect({
-                    // Search input placeholder:
-                    search: "Find",
-                    // Title if option not selected:
-                    notSelectedTitle: "Go to a port",
-                    // Message if select list empty:
-                    empty: "Not found"
+                .selectpicker({
+                    liveSearch: true,
+                    // accent-insensitive searching
+                    liveSearchNormalize: true,
+                    liveSearchStyle: "startsWith"
                 });
 
             setupGoodSelect();
             $("#good-names")
                 .on("change", goodSelected)
-                .prop("selectedIndex", -1)
-                .extendSelect({
-                    // Search input placeholder:
-                    search: "Find",
-                    // Title if option not selected:
-                    notSelectedTitle: "Select a good",
-                    // Message if select list empty:
-                    empty: "Not found"
+                .selectpicker({
+                    liveSearch: true,
+                    // accent-insensitive searching
+                    liveSearchNormalize: true,
+                    liveSearchStyle: "startsWith"
                 });
         }
 
