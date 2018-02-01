@@ -53,7 +53,12 @@ function convertShips() {
             minCrewRequired: ship.MinCrewRequired,
             minSpeed: speedDegrees.reduce((a, b) => Math.min(a, b)),
             maxSpeed: speedDegrees.reduce((a, b) => Math.max(a, b)),
-            speedDegrees
+            speedDegrees,
+            maxTurningSpeed: ship.MaxTurningSpeed,
+            acceleration: ship.Acceleration,
+            deceleration: ship.Deceleration,
+            premium: ship.Premium,
+            captureType: ship.CaptureType
         };
         geoJson.shipData.push(shipData);
     });
