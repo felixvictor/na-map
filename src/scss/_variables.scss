@@ -34,9 +34,9 @@ $link-hover-color: $secondary-800;
 $grid-columns: 12 !default;
 $grid-gutter-width: 30px !default;
 
-$input-color: $primary;
-$input-group-addon-bg: $primary-200;
-$input-border-color: $primary-300;
+$input-color: $body-color;
+$input-group-addon-bg: $primary-100;
+$input-border-color: $primary-400;
 $input-border-radius: 0;
 
 // Fonts
@@ -64,12 +64,16 @@ $input-focus-border-color: $primary-200;
 $input-focus-box-shadow: $primary-200;
 
 // Tooltip
+$tooltip-max-width: 40em;
 $tooltip-color: $body-color;
 $tooltip-bg: $primary-100;
 $tooltip-opacity: 1;
 $tooltip-padding-y: 1rem;
 $tooltip-padding-x: 1rem;
-$tooltip-arrow-width: 0;
+//$tooltip-margin:              0 !default;
+
+$tooltip-arrow-width:         0;
+$tooltip-arrow-height:        0;
 
 // Dropdown
 $dropdown-link-hover-bg: $primary-100;

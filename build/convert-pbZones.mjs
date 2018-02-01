@@ -4,22 +4,6 @@ const infileBaseName = process.argv[2],
     outDir = process.argv[3],
     date = process.argv[4];
 
-const nation = {
-    0: "NT",
-    1: "PR",
-    2: "ES",
-    3: "FR",
-    4: "GB",
-    5: "VP",
-    6: "DK",
-    7: "SE",
-    8: "US",
-    9: "FT",
-    10: "RU",
-    11: "DE",
-    12: "PL"
-};
-
 const Trans = {
     A: -0.00499866779363828,
     B: -0.00000021464254980645,
@@ -27,7 +11,7 @@ const Trans = {
     D: 4096.90282787469
 };
 
-let APIPorts = JSON.parse(fs.readFileSync(`${infileBaseName}-Ports-${date}.json`, "utf8"));
+const APIPorts = JSON.parse(fs.readFileSync(`${infileBaseName}-Ports-${date}.json`, "utf8"));
 
 // F11 coord to svg coord
 function convertCoordX(x, y) {
@@ -39,7 +23,8 @@ function convertCoordY(x, y) {
 }
 
 function saveJson(filename, data) {
-    fs.writeFile(`${filename}.geojson`, JSON.stringify(data), "utf8", function(err) {
+    // eslint-disable-next-line consistent-return
+    fs.writeFile(`${filename}.geojson`, JSON.stringify(data), "utf8", err => {
         if (err) {
             return console.log(err);
         }
@@ -47,17 +32,22 @@ function saveJson(filename, data) {
 }
 
 function convertPBZones() {
+    let ports = [],
+        pbZones = [],
+        pbForts = [],
+        pbTowers = [];
+
     function createAndSaveGeoJson() {
         // https://gist.github.com/Nishchit14/4c6a7349b3c778f7f97b912629a9f228
         const flattenArray = arr => [].concat.apply([], arr.map(element => element));
 
         ["pbZones", "forts", "towers"].forEach(element => {
-            let geoJson = {};
-            geoJson["type"] = "FeatureCollection";
-            geoJson["features"] = [];
+            const geoJson = {};
+            geoJson.type = "FeatureCollection";
+            geoJson.features = [];
 
-            ports.map(port => {
-                let feature = {
+            ports.forEach(port => {
+                const feature = {
                     type: "Feature",
                     id: port.id,
                     geometry: {
@@ -68,46 +58,46 @@ function convertPBZones() {
                     }
                 };
                 if (feature.geometry.coordinates.length > 0) {
-                    geoJson["features"].push(feature);
+                    geoJson.features.push(feature);
                 }
             });
             saveJson(`${outDir}/${element}`, geoJson);
         });
     }
 
-    let ports = APIPorts.map(port => {
-        function getPBZones(port) {
-            port.PortBattleZonePositions.forEach(pbZone => {
-                pbZones.push([
-                    Math.round(convertCoordX(pbZone.x, pbZone.z)),
-                    Math.round(convertCoordY(pbZone.x, pbZone.z))
-                ]);
-            });
-        }
+    function getPBZones(port) {
+        port.PortBattleZonePositions.forEach(pbZone => {
+            pbZones.push([
+                Math.round(convertCoordX(pbZone.x, pbZone.z)),
+                Math.round(convertCoordY(pbZone.x, pbZone.z))
+            ]);
+        });
+    }
 
-        function getPortElements(port) {
-            port.PortElementsSlotGroups.forEach(portElement => {
-                if (portElement.TemplateName === "Fort2") {
-                    portElement.PortElementsSlots.forEach(d => {
-                        pbForts.push([
-                            Math.round(convertCoordX(d.Position.x, d.Position.z)),
-                            Math.round(convertCoordY(d.Position.x, d.Position.z))
-                        ]);
-                    });
-                } else {
-                    portElement.PortElementsSlots.forEach(d => {
-                        pbTowers.push([
-                            Math.round(convertCoordX(d.Position.x, d.Position.z)),
-                            Math.round(convertCoordY(d.Position.x, d.Position.z))
-                        ]);
-                    });
-                }
-            });
-        }
+    function getPortElements(port) {
+        port.PortElementsSlotGroups.forEach(portElement => {
+            if (portElement.TemplateName === "Fort2") {
+                portElement.PortElementsSlots.forEach(d => {
+                    pbForts.push([
+                        Math.round(convertCoordX(d.Position.x, d.Position.z)),
+                        Math.round(convertCoordY(d.Position.x, d.Position.z))
+                    ]);
+                });
+            } else {
+                portElement.PortElementsSlots.forEach(d => {
+                    pbTowers.push([
+                        Math.round(convertCoordX(d.Position.x, d.Position.z)),
+                        Math.round(convertCoordY(d.Position.x, d.Position.z))
+                    ]);
+                });
+            }
+        });
+    }
 
-        let pbZones = [],
-            pbForts = [],
-            pbTowers = [];
+    ports = APIPorts.map(port => {
+        pbZones = [];
+        pbForts = [];
+        pbTowers = [];
 
         getPBZones(port);
         getPortElements(port);
@@ -121,7 +111,7 @@ function convertPBZones() {
         };
     });
 
-    createAndSaveGeoJson();
+    createAndSaveGeoJson(ports);
 }
 
 convertPBZones();

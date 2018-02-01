@@ -3,7 +3,6 @@
 set -e
 
 NODE="$(which node) --experimental-modules --no-warnings"
-BINDIR=$(yarn bin local)
 SERVER_BASE_NAME="cleanopenworldprod"
 SOURCE_BASE_URL="http://storage.googleapis.com/nacleanopenworldprodshards/"
 # http://api.shipsofwar.net/servers?apikey=1ZptRtpXAyEaBe2SEp63To1aLmISuJj3Gxcl5ivl&callback=setActiveRealms
@@ -63,12 +62,12 @@ function get_port_data () {
             done
 
             ${NODE} build/convert-API-data.mjs "${API_BASE_FILE}-${SERVER_NAME}" "${TEMP_PORT_FILE}" "${DATE}"
-            ${BINDIR}/geo2topo -o "${PORT_FILE}" "${TEMP_PORT_FILE}"
+            yarn geo2topo -o "${PORT_FILE}" "${TEMP_PORT_FILE}"
             rm "${TEMP_PORT_FILE}"
         done
 
         ${NODE} build/convert-pbZones.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${BUILD_DIR}" "${DATE}"
-        ${BINDIR}/geo2topo -o "${SRC_DIR}/pb.json" \
+        yarn geo2topo -o "${SRC_DIR}/pb.json" \
             "${BUILD_DIR}/pbZones.geojson" "${BUILD_DIR}/towers.geojson" "${BUILD_DIR}/forts.geojson"
         rm ${BUILD_DIR}/*.geojson
 

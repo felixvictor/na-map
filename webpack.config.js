@@ -8,7 +8,10 @@ const PACKAGE = require("./package.json");
 const CopyPlugin = require("copy-webpack-plugin"),
     ExtractTextPlugin = require("extract-text-webpack-plugin"),
     HtmlPlugin = require("html-webpack-plugin"),
-    MinifyPlugin = require("babel-minify-webpack-plugin");
+    MinifyPlugin = require("babel-minify-webpack-plugin"),
+    SitemapPlugin = require("sitemap-webpack-plugin").default;
+
+const sitemapPaths = ["/fonts/", "/icons", "/images"];
 
 const babelOpt = {
     cacheDirectory: true,
@@ -16,6 +19,8 @@ const babelOpt = {
         [
             "@babel/preset-env",
             {
+                //debug: true,
+                exclude: ["transform-typeof-symbol"],
                 loose: true,
                 modules: false,
                 targets: {
@@ -132,7 +137,9 @@ let config = {
         alias: {
             Fonts: path.resolve(__dirname, "src/fonts/"),
             Icons: path.resolve(__dirname, "src/icons/"),
-            Images: path.resolve(__dirname, "src/images/")
+            Images: path.resolve(__dirname, "src/images/"),
+            "@fortawesome/fontawesome-free-regular$": "@fortawesome/fontawesome-free-regular/shakable.es.js",
+            "@fortawesome/fontawesome-free-solid$": "@fortawesome/fontawesome-free-solid/shakable.es.js"
         }
     },
 
@@ -177,7 +184,8 @@ let config = {
             template: "index.template.ejs",
             title: "Naval Action map",
             version: PACKAGE.version
-        })
+        }),
+        new SitemapPlugin("https://na-map.netlify.com/", sitemapPaths, { skipGzip: false })
     ],
 
     stats: "normal",
