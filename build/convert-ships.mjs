@@ -54,9 +54,9 @@ function convertShips() {
             minSpeed: speedDegrees.reduce((a, b) => Math.min(a, b)),
             maxSpeed: speedDegrees.reduce((a, b) => Math.max(a, b)),
             speedDegrees,
-            maxTurningSpeed: ship.MaxTurningSpeed,
-            acceleration: ship.Acceleration,
-            deceleration: ship.Deceleration,
+            maxTurningSpeed: ship.Specs.MaxTurningSpeed,
+            acceleration: ship.Specs.Acceleration,
+            deceleration: ship.Specs.Deceleration,
             premium: ship.Premium,
             captureType: ship.CaptureType
         };
