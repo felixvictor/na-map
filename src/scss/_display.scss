@@ -6,8 +6,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-$in-colour: $primary-900;
-$out-colour: $primary-700;
 $background-colour: $primary-300;
 
 .arcs {
@@ -79,7 +77,7 @@ $background-colour: $primary-300;
 }
 
 .extralarge-width {
-  min-width: 25em;
+  min-width: 35em;
 }
 
 .large-width {
@@ -88,12 +86,6 @@ $background-colour: $primary-300;
 
 .left-margin {
   margin-left: 15px;
-}
-
-.custom-select,
-.form-control,
-.form-control:focus {
-  color: $body-color;
 }
 
 .btn-outline-primary {
@@ -112,16 +104,24 @@ $background-colour: $primary-300;
   opacity: .8;
 }
 
-.na-port-in {
-  fill: $in-colour;
-}
-
-.na-port-out {
-  fill: $out-colour;
+text {
+  fill: $primary-900;
+  pointer-events: none;
 }
 
 .port-name {
   font-size: large;
+  font-style: italic;
+}
+
+.port {
+  circle {
+    cursor: pointer;
+  }
+}
+
+.non-trading {
+  font-style: italic;
 }
 
 .pb-zone {
@@ -146,10 +146,6 @@ table td {
 table tr,
 p {
   text-align: left;
-}
-
-text {
-  pointer-events: none;
 }
 
 .label-rect {
@@ -184,17 +180,20 @@ text {
   }
   rect {
     fill: $primary-100;
-    fill-opacity: .3;
+    fill-opacity: .7;
   }
   path {
     stroke: $secondary-600;
     stroke-width: .3em;
-    stroke-linecap: round;
     fill: none;
   }
 }
 
-.arrow-head {
+.course-head {
+  fill: $secondary-600 !important;
+}
+
+.wind-head {
   fill: $primary-900 !important;
 }
 
@@ -202,25 +201,68 @@ text {
   stroke: $primary-900 !important;
 }
 
-.wind, .wind-text {
-  font-size: .3em !important;
+.wind,
+.wind-text {
+  font-size: 1.2em !important;
 }
 
 .wind-text-current {
-  font-size: .25em !important;
+  font-size: 1em !important;
 }
 
-.dial {
-  font-family: inherit !important;
-  font-size: 2em !important;
-  color: $primary-700 !important;
+.rs-control .rs-path-color {
+  background-color: $primary-200;
+}
+
+.rs-control .rs-handle {
+  background-color: $primary-900;
+}
+
+.rs-tooltip-text {
+  font-family: inherit;
+  font-size: 1.8em;
+  color: $primary-700;
+}
+
+.rs-handle {
+  position: relative;
+  width: 48px !important;
+  background: $primary-900;
+  border: 3px solid $primary-400;
+  border-radius: 0;
+}
+
+.rs-handle::after,
+.rs-handle::before {
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  content: " ";
+  border: solid transparent;
+}
+
+.rs-handle::after {
+  margin-top: -20px;
+  border-width: 20px;
+  border-left-color: $primary-900;
+}
+
+.rs-handle::before {
+  margin-top: -24px;
+  border-width: 24px;
+  border-left-color: $primary-400;
+}
+
+.rs-border {
+  border-color: $primary-400;
 }
 
 .tooltip {
   font-size: smaller;
-  color: $in-colour;
   text-align: left;
-  background: $primary;
   box-shadow: 0 14px 28px rgba($primary-900, .25), 0 10px 10px rgba($primary-900, .22);
   table {
     margin-bottom: 0;
@@ -274,6 +316,9 @@ $flags: "NT", // Neutral
   @each $flag in $flags {
     .flag-icon.#{$flag} {
       background-image: url("#{$flags-dir}/#{$flag}.svg");
+    }
+    .flag-icon.#{$flag}a {
+      background-image: url("#{$flags-dir}/#{$flag}a.svg");
     }
   }
 }
