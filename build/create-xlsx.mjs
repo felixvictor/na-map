@@ -1,9 +1,11 @@
+/* eslint-disable no-param-reassign */
 import fs from "fs";
+// eslint-disable-next-line import/no-extraneous-dependencies
 import Excel from "exceljs";
 
 const inFilename = process.argv[2],
     outFilename = process.argv[3];
-const ships = JSON.parse(fs.readFileSync(inFilename, "utf8")).shipData;
+const shipsOrig = JSON.parse(fs.readFileSync(inFilename, "utf8")).shipData;
 
 // https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
 // eslint-disable-next-line no-extend-native,func-names
@@ -13,9 +15,83 @@ String.prototype.replaceAll = function(search, replacement) {
 };
 
 function createExcel() {
+    function fillSheet(sheet, ships) {
+        sheet.properties.defaultRowHeight = 20;
+
+        sheet.columns = [
+            { header: "Rate", key: "rate", width: 8 },
+            { header: "Ship", key: "ship", width: 20 },
+            { header: "BR", key: "br", width: 8 },
+            { header: "Player", key: "player", width: 10 },
+            { header: "BR total", key: "brTotal", width: 10 },
+            { header: "Player names", key: "names", width: 20 },
+            { width: 20 },
+            { width: 20 },
+            { width: 20 },
+            { width: 20 },
+            { width: 20 },
+            { width: 20 },
+            { width: 20 },
+            { width: 20 },
+            { width: 20 }
+        ];
+        sheet.mergeCells("F1:G1");
+
+        sheet.addRow({
+            rate: "",
+            ship: "",
+            br: "",
+            player: { formula: `SUM(D3:D${2 + ships.length})` },
+            brTotal: { formula: `SUM(E3:E${2 + ships.length})` }
+        });
+        sheet.mergeCells("A2:C2");
+        sheet.getCell("A2").value = "Total";
+
+        ships.forEach((ship, i) => {
+            if (!i) {
+                sheet.addRow({
+                    rate: ship.class,
+                    ship: ship.name,
+                    br: ship.battleRating,
+                    player: { formula: 'COUNTIF(F3:AE3,"*")' },
+                    brTotal: { formula: "C3*D3" }
+                });
+            } else {
+                sheet.addRow({
+                    rate: ship.class,
+                    ship: ship.name,
+                    br: ship.battleRating,
+                    player: { sharedFormula: "D3" },
+                    brTotal: { sharedFormula: "E3" }
+                });
+            }
+        });
+
+        sheet.getCell("F3").value = "Fritz";
+        sheet.getCell("G3").value = "Franz";
+        sheet.getCell("H3").value = "Klaus";
+        sheet.getCell("F4").value = "x";
+        sheet.getCell("G4").value = "X";
+        sheet.getCell("H4").value = "x";
+
+        sheet.getRow(1).fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: "6f6150" }
+        };
+        sheet.getRow(1).font = { bold: true, color: { argb: "f5efe7" } };
+
+        sheet.getRow(2).fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: "f5efe7" }
+        };
+        sheet.getRow(2).font = { bold: true, color: { argb: "6f6150" } };
+    }
+
     const workbook = new Excel.Workbook(),
         now = new Date();
-    const dwShips = ships.filter(ship => ship.class < 6 || ship.name === "Mortar Brig").sort((a, b) => {
+    const dwShips = shipsOrig.filter(ship => ship.class < 6 || ship.name === "Mortar Brig").sort((a, b) => {
             if (a.class < b.class) {
                 return -1;
             }
@@ -36,27 +112,35 @@ function createExcel() {
             }
             return 0;
         }),
-        swShips = ships.filter(ship => ship.class > 5).sort((a, b) => {
-            if (a.class < b.class) {
-                return -1;
-            }
-            if (a.class > b.class) {
-                return 1;
-            }
-            if (a.battleRating > b.battleRating) {
-                return -1;
-            }
-            if (a.battleRating < b.battleRating) {
-                return 1;
-            }
-            if (a.name < b.name) {
-                return -1;
-            }
-            if (a.name > b.name) {
-                return 1;
-            }
-            return 0;
-        });
+        swShips = shipsOrig
+            .filter(
+                ship =>
+                    ship.class > 5 &&
+                    !ship.name.startsWith("Basic") &&
+                    !ship.name.startsWith("Rookie") &&
+                    !ship.name.startsWith("Trader")
+            )
+            .sort((a, b) => {
+                if (a.class < b.class) {
+                    return -1;
+                }
+                if (a.class > b.class) {
+                    return 1;
+                }
+                if (a.battleRating > b.battleRating) {
+                    return -1;
+                }
+                if (a.battleRating < b.battleRating) {
+                    return 1;
+                }
+                if (a.name < b.name) {
+                    return -1;
+                }
+                if (a.name > b.name) {
+                    return 1;
+                }
+                return 0;
+            });
 
     workbook.creator = "iB aka Felix Victor";
     workbook.created = now;
@@ -70,109 +154,10 @@ function createExcel() {
             views: [{ state: "frozen", xSplit: 5, ySplit: 2 }]
         });
 
-    dwSheet.properties.defaultRowHeight = 20;
-    swSheet.properties.defaultRowHeight = 20;
-
-    dwSheet.columns = [
-        { header: "Rate", key: "rate", width: 8 },
-        { header: "Ship", key: "ship", width: 20 },
-        { header: "BR", key: "br", width: 8 },
-        { header: "Player", key: "player", width: 10 },
-        { header: "BR total", key: "brTotal", width: 10 }
-    ];
-
-    dwSheet.addRow({
-        rate: "",
-        ship: "",
-        br: "",
-        player: { formula: `Sum(D3:D${2 + dwShips.length})` },
-        brTotal: { formula: `Sum(E3:E${2 + dwShips.length})` }
-    });
-    dwSheet.mergeCells("A2:C2");
-    dwSheet.getCell("A2").value = "Total";
-
-    dwShips.forEach((ship, i) => {
-        if (!i) {
-            dwSheet.addRow({
-                rate: ship.class,
-                ship: ship.name,
-                br: ship.battleRating,
-                player: { formula: "Sum(F3:AE3)" },
-                brTotal: { formula: "C3*D3" }
-            });
-        } else {
-            dwSheet.addRow({
-                rate: ship.class,
-                ship: ship.name,
-                br: ship.battleRating,
-                player: { sharedFormula: "D3" },
-                brTotal: { sharedFormula: "E3" }
-            });
-        }
-    });
-
-    dwSheet.getRow(1).fill = {
-        type: "pattern",
-        pattern: "solid",
-        fgColor: { argb: "FF000000" }
-    };
-    dwSheet.getRow(1).alignment = { horizontal: "center" };
-    dwSheet.getRow(1).font = { bold: true, color: { argb: "FFFFFFFF" } };
+    fillSheet(dwSheet, dwShips);
+    fillSheet(swSheet, swShips);
 
     workbook.xlsx.writeFile(outFilename);
-
-    /*
-
-    APIItems.filter(item => item.ItemType === "Ship").forEach(ship => {
-        const calcPortSpeed = ship.Specs.MaxSpeed * 0.076752029372859 - 0.007759512279223,
-            speedDegrees = ship.Specs.SpeedToWind.map(d => d * calcPortSpeed);
-
-        const { length } = ship.Specs.SpeedToWind;
-        // Elemente kopieren
-        for (let i = 0; i < (length - 1) * 2; i += 2) {
-            speedDegrees.unshift(speedDegrees[i]);
-        }
-        // Letztes Element nach vorne stellen
-        speedDegrees.unshift(speedDegrees[length * 2 - 1 - 1]);
-        // Dann letztes Element löschen
-        speedDegrees.pop();
-
-        const shipData = {
-            id: ship.Id,
-            name: ship.Name.replaceAll("'", "’"),
-            class: ship.Class,
-            healthInfo: ship.HealthInfo,
-            shipMass: ship.ShipMass,
-            battleRating: ship.BattleRating,
-            decks: ship.Decks,
-            holdSize: ship.HoldSize,
-            maxWeight: ship.MaxWeight,
-            minCrewRequired: ship.MinCrewRequired,
-            minSpeed: speedDegrees.reduce((a, b) => Math.min(a, b)),
-            maxSpeed: speedDegrees.reduce((a, b) => Math.max(a, b)),
-            speedDegrees
-        };
-        geoJson.shipData.push(shipData);
-    });
-
-    geoJson.shipData.sort((a, b) => {
-        if (a.class < b.class) {
-            return -1;
-        }
-        if (a.class > b.class) {
-            return 1;
-        }
-        if (a.name < b.name) {
-            return -1;
-        }
-        if (a.name > b.name) {
-            return 1;
-        }
-        return 0;
-    });
-
-    saveJson(geoJson);
-    */
 }
 
 createExcel();
