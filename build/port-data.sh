@@ -50,6 +50,7 @@ function get_port_data () {
     API_DIR="${BUILD_DIR}/API"
     API_BASE_FILE="${API_DIR}/api"
     SHIP_FILE="${SRC_DIR}/ships.json"
+    EXCEL_FILE="${SRC_DIR}/port-battle.xlsx"
 
     mkdir -p "${API_DIR}"
     if test_for_update "${API_BASE_FILE}"; then
@@ -72,6 +73,8 @@ function get_port_data () {
         rm ${BUILD_DIR}/*.geojson
 
         ${NODE} build/convert-ships.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${SHIP_FILE}" "${DATE}"
+
+        ${NODE} build/create-xlsx.mjs "${SHIP_FILE}" "${EXCEL_FILE}"
     fi
 }
 
