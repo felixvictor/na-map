@@ -16,25 +16,52 @@ String.prototype.replaceAll = function(search, replacement) {
 
 function createExcel() {
     function fillSheet(sheet, ships) {
-        sheet.properties.defaultRowHeight = 20;
+        sheet.properties.defaultRowHeight = 24;
 
         sheet.columns = [
-            { header: "Rate", key: "rate", width: 8 },
-            { header: "Ship", key: "ship", width: 20 },
-            { header: "BR", key: "br", width: 8 },
-            { header: "Player", key: "player", width: 10 },
-            { header: "BR total", key: "brTotal", width: 10 },
-            { header: "Player names", key: "names", width: 20 },
-            { width: 20 },
-            { width: 20 },
-            { width: 20 },
-            { width: 20 },
-            { width: 20 },
-            { width: 20 },
-            { width: 20 },
-            { width: 20 },
-            { width: 20 }
+            {
+                header: "Rate",
+                key: "rate",
+                width: 8,
+                style: { alignment: { vertical: "middle", horizontal: "right", indent: 1 } }
+            },
+            {
+                header: "Ship",
+                key: "ship",
+                width: 24,
+                style: { alignment: { vertical: "middle", horizontal: "left", indent: 1 } }
+            },
+            {
+                header: "BR",
+                key: "br",
+                width: 8,
+                style: { alignment: { vertical: "middle", horizontal: "right", indent: 1 } }
+            },
+            {
+                header: "# Player",
+                key: "player",
+                width: 12,
+                style: { alignment: { vertical: "middle", horizontal: "right", indent: 1 } }
+            },
+            {
+                header: "BR total",
+                key: "brTotal",
+                width: 12,
+                style: { alignment: { vertical: "middle", horizontal: "right", indent: 1 } }
+            },
+            {
+                header: "Player names",
+                key: "names",
+                width: 20,
+                style: { alignment: { vertical: "middle", horizontal: "left", indent: 1 } }
+            }
         ];
+
+        for (let columnNum = 7; columnNum <= 7 + 23; columnNum += 1) {
+            sheet.getColumn(columnNum).width = 20;
+            sheet.getColumn(columnNum).alignment = { vertical: "middle", horizontal: "left", indent: 1 };
+        }
+
         sheet.mergeCells("F1:G1");
 
         sheet.addRow({
@@ -44,12 +71,11 @@ function createExcel() {
             player: { formula: `SUM(D3:D${2 + ships.length})` },
             brTotal: { formula: `SUM(E3:E${2 + ships.length})` }
         });
-        sheet.mergeCells("A2:C2");
-        sheet.getCell("A2").value = "Total";
 
         ships.forEach((ship, i) => {
             if (!i) {
                 sheet.addRow({
+                    // First row with formula for player/brTotal
                     rate: ship.class,
                     ship: ship.name,
                     br: ship.battleRating,
@@ -57,6 +83,7 @@ function createExcel() {
                     brTotal: { formula: "C3*D3" }
                 });
             } else {
+                // Other rows with formula reference for player/brTotal
                 sheet.addRow({
                     rate: ship.class,
                     ship: ship.name,
@@ -67,26 +94,73 @@ function createExcel() {
             }
         });
 
+        [1, 2].forEach(row => {
+            sheet.getRow(row).height = 40;
+            sheet.getRow(row).fill = {
+                type: "pattern",
+                pattern: "solid",
+                fgColor: { argb: "dcc6a9" }
+            };
+            sheet.getRow(row).font = { bold: true, color: { argb: "6f6150" } };
+        });
+
+        ["A1", "A2", "B1", "B2", "C1", "C2", "D1", "E1"].forEach(cell => {
+            sheet.getCell(cell).fill = {
+                type: "pattern",
+                pattern: "solid",
+                fgColor: { argb: "acbbc1" }
+            };
+            sheet.getCell(cell).font = { bold: true, color: { argb: "f3f7f9" } };
+        });
+
+        ["D2", "E2"].forEach(cell => {
+            sheet.getCell(cell).fill = {
+                type: "pattern",
+                pattern: "solid",
+                fgColor: { argb: "cddfe6" }
+            };
+            sheet.getCell(cell).font = { bold: true, color: { argb: "4a5053" } };
+        });
+
+        sheet.getCell("D2").alignment = { vertical: "middle", horizontal: "right", indent: 1 };
+        sheet.getCell("E2").alignment = { vertical: "middle", horizontal: "right", indent: 1 };
+        sheet.mergeCells("F2:I2");
+        sheet.getCell("F2").value = "Enter player names or any data";
+        sheet.getCell("F2").font = { bold: false, italic: true, color: { argb: "4a5053" } };
+
+        for (let rowNum = 3; rowNum <= 3 + ships.length - 1; rowNum += 1) {
+            sheet.getRow(rowNum);
+        }
+
+        for (let rowNum = 3; rowNum <= 3 + ships.length - 1; rowNum += 1) {
+            const row = sheet.getRow(rowNum);
+            row.border = {
+                top: { style: "thin", color: { argb: "cccccc" } },
+                bottom: { style: "thin", color: { argb: "cccccc" } }
+            };
+            for (let columnNum = 1; columnNum <= 5; columnNum += 1) {
+                row.getCell(columnNum).fill = {
+                    type: "pattern",
+                    pattern: "solid",
+                    fgColor: { argb: "f3f7f9" }
+                };
+            }
+            for (let columnNum = 6; columnNum <= 6 + 24; columnNum += 1) {
+                row.getCell(columnNum).fill = {
+                    type: "pattern",
+                    pattern: "solid",
+                    fgColor: { argb: "f5efe7" }
+                };
+            }
+        }
+
+        // Sample values
         sheet.getCell("F3").value = "Fritz";
         sheet.getCell("G3").value = "Franz";
         sheet.getCell("H3").value = "Klaus";
         sheet.getCell("F4").value = "x";
         sheet.getCell("G4").value = "X";
         sheet.getCell("H4").value = "x";
-
-        sheet.getRow(1).fill = {
-            type: "pattern",
-            pattern: "solid",
-            fgColor: { argb: "6f6150" }
-        };
-        sheet.getRow(1).font = { bold: true, color: { argb: "f5efe7" } };
-
-        sheet.getRow(2).fill = {
-            type: "pattern",
-            pattern: "solid",
-            fgColor: { argb: "f5efe7" }
-        };
-        sheet.getRow(2).font = { bold: true, color: { argb: "6f6150" } };
     }
 
     const workbook = new Excel.Workbook(),
