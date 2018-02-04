@@ -19,7 +19,7 @@ const babelOpt = {
         [
             "@babel/env",
             {
-                //debug: true,
+                // debug: true,
                 exclude: ["transform-typeof-symbol"],
                 loose: true,
                 modules: false,
@@ -128,7 +128,7 @@ const svgoOpt = {
     ]
 };
 
-let config = {
+const config = {
     context: path.resolve(__dirname, "src"),
 
     entry: [path.resolve(__dirname, PACKAGE.main), path.resolve(__dirname, PACKAGE.sass)],
@@ -160,19 +160,20 @@ let config = {
             moment: "moment",
             "window.moment": "moment",
             Popper: ["popper.js", "default"],
-            //Alert: "exports-loader?Alert!bootstrap/js/dist/alert",
-            //Button: "exports-loader?Button!bootstrap/js/dist/button",
+            // Alert: "exports-loader?Alert!bootstrap/js/dist/alert",
+            Button: "exports-loader?Button!bootstrap/js/dist/button",
             Collapse: "exports-loader?Collapse!bootstrap/js/dist/collapse",
-            //Dropdown: "exports-loader?Dropdown!bootstrap/js/dist/dropdown",
+            Dropdown: "exports-loader?Dropdown!bootstrap/js/dist/dropdown",
             Modal: "exports-loader?Modal!bootstrap/js/dist/modal",
-            //Popover: "exports-loader?Popover!bootstrap/js/dist/popover",
+            // Popover: "exports-loader?Popover!bootstrap/js/dist/popover",
             Tooltip: "exports-loader?Tooltip!bootstrap/js/dist/tooltip",
             Util: "exports-loader?Util!bootstrap/js/dist/util"
         }),
         new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
         new CopyPlugin([
             { from: "google979f2cf3bed204d6.html", to: "google979f2cf3bed204d6.html", toType: "file" },
-            { from: "*.json" }
+            { from: "*.json" },
+            { from: "*.xlsx" }
         ]),
         new HtmlPlugin({
             filename: "index.html",
@@ -291,7 +292,7 @@ let config = {
     }
 };
 
-if ("prod" === process.env.NODE_ENV) {
+if (process.env.NODE_ENV === "prod") {
     config.devtool = "";
     config.plugins.push(
         new MinifyPlugin({
