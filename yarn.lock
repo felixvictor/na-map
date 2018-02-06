@@ -1363,9 +1363,9 @@ boom@5.x.x:
   dependencies:
     hoek "4.x.x"
 
-bootstrap-select@^1.13.0-alpha:
-  version "1.13.0-alpha"
-  resolved "https://registry.yarnpkg.com/bootstrap-select/-/bootstrap-select-1.13.0-alpha.tgz#745d34152075f9b0e2239e2a58e53afd29c4be1e"
+"bootstrap-select@https://github.com/heimrichhannot/bootstrap-select.git":
+  version "1.12.2"
+  resolved "https://github.com/heimrichhannot/bootstrap-select.git#0ce465c3ea573a1eac4a0b14486f53f7f3805514"
   dependencies:
     jquery ">=1.8"
 
@@ -4713,7 +4713,7 @@ jquery-knob@^1.2.11:
   version "1.2.11"
   resolved "https://registry.yarnpkg.com/jquery-knob/-/jquery-knob-1.2.11.tgz#f37c39dbc1c7a6a6c12cdb2ed4f6bffb683f10d6"
 
-jquery@3.3.1, jquery@>=1.8, "jquery@^1.9.1 || ^2.0 || ^3.0":
+jquery@>=1.8, "jquery@^1.9.1 || ^2.0 || ^3.0", jquery@^3.3.1:
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.3.1.tgz#958ce29e81c9790f31be7792df5d4d95fc57fbca"
 
@@ -5105,9 +5105,13 @@ lodash@^3.3.1:
   version "3.10.1"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-3.10.1.tgz#5bf45e8e49ba4189e17d482789dfd15bd140b7b6"
 
-lodash@^4.0.0, lodash@^4.14.0, lodash@^4.17.3, lodash@^4.17.4, lodash@^4.2.0, lodash@^4.3.0, lodash@^4.8.0, lodash@~4.17.4:
+lodash@^4.0.0, lodash@^4.14.0, lodash@^4.17.3, lodash@^4.2.0, lodash@^4.3.0, lodash@^4.8.0, lodash@~4.17.4:
   version "4.17.4"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.4.tgz#78203a4d1c328ae1d86dca6460e369b57f4055ae"
+
+lodash@^4.17.4:
+  version "4.17.5"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.5.tgz#99a92d65c0272debe8c96b6057bc8fbfa3bed511"
 
 log-symbols@^1.0.2:
   version "1.0.2"
@@ -7882,8 +7886,8 @@ stylelint-order@^0.8.0:
     postcss-sorting "^3.1.0"
 
 stylelint-scss@^2.2.0:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/stylelint-scss/-/stylelint-scss-2.2.0.tgz#3e324bf13346db7af21cd24ad57fe3202f7c3823"
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/stylelint-scss/-/stylelint-scss-2.3.0.tgz#95089fa0c1cc5690be19ca80f901a4905c95dedc"
   dependencies:
     lodash "^4.17.4"
     postcss-media-query-parser "^0.2.3"

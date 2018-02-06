@@ -13,7 +13,7 @@ import "moment-timezone";
 import "moment/locale/en-gb";
 import "round-slider/src/roundslider";
 import "tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4";
-import "bootstrap-select/js/bootstrap-select";
+import "bootstrap-select";
 
 import "bootstrap/js/dist/tooltip";
 import "bootstrap/js/dist/util";
