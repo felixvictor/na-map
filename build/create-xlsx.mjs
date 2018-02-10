@@ -76,9 +76,9 @@ function createExcel() {
         sheet.getRow(1).fill = {
             type: "pattern",
             pattern: "solid",
-            fgColor: { argb: "dcc6a9" }
+            fgColor: { argb: "e9f1f4" }
         };
-        sheet.getRow(1).font = { color: { argb: "6f6150" } };
+        sheet.getRow(1).font = { color: { argb: "6b7478" } };
 
         sheet.addRow({
             rate: "Rate",
@@ -168,14 +168,14 @@ function createExcel() {
                 row.getCell(columnNum).fill = {
                     type: "pattern",
                     pattern: "solid",
-                    fgColor: { argb: "f3f7f9" }
+                    fgColor: { argb: "e9f1f4" }
                 };
             }
             for (let columnNum = 6; columnNum <= 6 + 24; columnNum += 1) {
                 row.getCell(columnNum).fill = {
                     type: "pattern",
                     pattern: "solid",
-                    fgColor: { argb: "f5efe7" }
+                    fgColor: { argb: "ede1d2" }
                 };
             }
         }
