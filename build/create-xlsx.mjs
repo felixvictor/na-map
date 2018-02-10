@@ -16,68 +16,79 @@ String.prototype.replaceAll = function(search, replacement) {
 
 function createExcel() {
     function fillSheet(sheet, ships) {
-		const textAligment = { vertical: "middle", horizontal: "left", indent: 1 },
-		numberAligment = { vertical: "middle", horizontal: "right", indent: 1 };
-		
-		sheet.views: [{ state: "frozen", xSplit: 5, ySplit: 2 }];
+        const textAligment = { vertical: "middle", horizontal: "left", indent: 1 },
+            numberAligment = { vertical: "middle", horizontal: "right", indent: 1 };
+
+        sheet.views = [{ state: "frozen", xSplit: 5, ySplit: 2 }];
         sheet.properties.defaultRowHeight = 24;
 
-		// First Row (description)
-        sheet.mergeCells("A1:C1");
-		sheet.addRow({
-            rate: "Simple port battle calculator by Felix Victor"
-        });
-		sheet.mergeCells("D1:E1");
-		sheet.getCell('D1').value = { text: 'Game Labs Forum', hyperlink: "http://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/" };
-
-		// ** Columns
-		// Content and format first columns
+        // ** Columns
+        // Content and format first columns
         sheet.columns = [
             {
-                header: "Rate",
                 key: "rate",
                 width: 8,
-                style: { alignment:  numberAligment}
+                style: { alignment: numberAligment }
             },
             {
-                header: "Ship",
                 key: "ship",
                 width: 24,
                 style: { alignment: textAligment }
             },
             {
-                header: "BR",
                 key: "br",
                 width: 8,
                 style: { alignment: numberAligment }
             },
             {
-                header: "# Player",
                 key: "player",
                 width: 12,
                 style: { alignment: numberAligment }
             },
             {
-                header: "BR total",
                 key: "brTotal",
                 width: 12,
-                style: { alignment:numberAligment }
+                style: { alignment: numberAligment }
             },
             {
-                header: "Player names",
                 key: "names",
                 width: 20,
-                style: { alignment: numberAligment }
+                style: { alignment: textAligment }
             }
         ];
 
-		// Format other columns (player names)
-		for (let columnNum = 7; columnNum <= 7 + 23; columnNum += 1) {
+        // Format other columns (player names)
+        for (let columnNum = 7; columnNum <= 7 + 23; columnNum += 1) {
             sheet.getColumn(columnNum).width = 20;
             sheet.getColumn(columnNum).alignment = textAligment;
         }
 
-		// ** Rows
+        // ** Rows
+        // First Row (description)
+        sheet.mergeCells("A1:C1");
+        sheet.getCell("A1").value = "Simple port battle calculator by Felix Victor";
+        sheet.mergeCells("D1:E1");
+        sheet.getCell("D1").value = {
+            text: "Game Labs Forum",
+            hyperlink: "http://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/"
+        };
+        sheet.getRow(1).height = 40;
+        sheet.getRow(1).fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: "dcc6a9" }
+        };
+        sheet.getRow(1).font = { color: { argb: "6f6150" } };
+
+        sheet.addRow({
+            rate: "Rate",
+            ship: "Ship",
+            br: "BR",
+            player: "# Player",
+            brTotal: "BR total",
+            names: "Player names"
+        });
+
         sheet.mergeCells("F2:G2");
         sheet.addRow({
             rate: "",
@@ -109,7 +120,7 @@ function createExcel() {
             }
         });
 
-        [1, 2].forEach(row => {
+        [2, 3].forEach(row => {
             sheet.getRow(row).height = 40;
             sheet.getRow(row).fill = {
                 type: "pattern",
@@ -180,7 +191,9 @@ function createExcel() {
 
     const workbook = new Excel.Workbook(),
         now = new Date();
-    const dwShips = shipsOrig.filter(ship => ship.class < 6 || ship.name === "Mortar Brig").sort((a, b) => a.class - b.class || a.battleRating - b.battleRating || a.name - b.name),
+    const dwShips = shipsOrig
+            .filter(ship => ship.class < 6 || ship.name === "Mortar Brig")
+            .sort((a, b) => a.class - b.class || b.battleRating - a.battleRating || a.name - b.name),
         swShips = shipsOrig
             .filter(
                 ship =>
@@ -198,7 +211,7 @@ function createExcel() {
             properties: { tabColor: { argb: "d5bb99" } }
         }),
         swSheet = workbook.addWorksheet("Shallow water port", {
-            properties: { tabColor: { argb: "cddfe6" } }            
+            properties: { tabColor: { argb: "cddfe6" } }
         });
 
     fillSheet(dwSheet, dwShips);
