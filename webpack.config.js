@@ -172,6 +172,7 @@ const config = {
         new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
         new CopyPlugin([
             { from: "google979f2cf3bed204d6.html", to: "google979f2cf3bed204d6.html", toType: "file" },
+            { from: "images/map", to: "../public/images/map" },
             { from: "*.json" },
             { from: "*.xlsx" }
         ]),
