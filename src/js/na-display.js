@@ -19,11 +19,15 @@ import "bootstrap/js/dist/tooltip";
 import "bootstrap/js/dist/util";
 
 export default function naDisplay(serverName) {
+    // https://bocoup.com/blog/find-the-closest-power-of-2-with-javascript
+    function nearestPow2(aSize) {
+        return 2 ** Math.round(Math.log(aSize) / Math.log(2));
+    }
+
     let naSvg,
-        naCanvas,
-        naContext,
         svgDef,
         naZoom,
+        mainGMap,
         mainGPort,
         mainGText,
         mainGPBZone,
@@ -47,8 +51,9 @@ export default function naDisplay(serverName) {
             min: 0,
             max: 8192
         },
+        tileSize: 256,
         port: { id: "366", coord: { x: 4396, y: 2494 } }, // Shroud Cay
-        maxScale: 10,
+        maxScale: 2 ** 4, // power of 2
         fontSize: { initial: 30, portLabel: 18, pbZone: 7 },
         circleSize: { initial: 50, portLabel: 20, pbZone: 5 },
         iconSize: 50,
@@ -57,8 +62,6 @@ export default function naDisplay(serverName) {
         highlightDuration: 200,
         mapJson: `${serverName}.json`,
         pbJson: "pb.json",
-        image: new Image(),
-        imageSrc: "images/na-map.jpg",
         line: d3.line(),
         transformMatrix: {
             A: -0.00499866779363828,
@@ -106,18 +109,29 @@ export default function naDisplay(serverName) {
             { id: "VP", name: "Verenigde Provinciën", sortName: "Verenigde Provinciën" }
         ]
     };
+
     // eslint-disable-next-line no-restricted-globals
     defaults.width = Math.floor(top.innerWidth - defaults.margin.left - defaults.margin.right);
     // eslint-disable-next-line no-restricted-globals
     defaults.height = Math.floor(top.innerHeight - defaults.margin.top - defaults.margin.bottom);
-    defaults.minScale = Math.min(defaults.width / defaults.coord.max, defaults.height / defaults.coord.max);
+    defaults.minScale = nearestPow2(
+        Math.min(defaults.width / defaults.coord.max, defaults.height / defaults.coord.max)
+    );
+    defaults.log2tileSize = Math.log(defaults.tileSize) / Math.log(2);
+    defaults.maxTileZoom = Math.log(defaults.coord.max) / Math.log(2) - defaults.log2tileSize;
+    defaults.zoomScale = d3
+        .scaleLinear()
+        .rangeRound([
+            Math.round(Math.log(Math.max(defaults.width, defaults.height)) / Math.LN2) - defaults.log2tileSize - 1,
+            defaults.maxTileZoom
+        ])
+        .domain([defaults.minScale, defaults.maxScale]);
     defaults.coord.voronoi = [
         [defaults.coord.min - 1, defaults.coord.min - 1],
         [defaults.coord.max + 1, defaults.coord.max + 1]
     ];
     // limit how far away the mouse can be from finding a voronoi site
     defaults.voronoiRadius = Math.max(defaults.height, defaults.width);
-
     const current = {
         port: { id: defaults.port.id, coord: defaults.port.coord },
         fontSize: defaults.fontSize.initial,
@@ -146,31 +160,61 @@ export default function naDisplay(serverName) {
     }
 
     function displayCountries(transform) {
-        naContext.save();
-        naContext.clearRect(0, 0, defaults.width, defaults.height);
-        naContext.translate(transform.x, transform.y);
-        naContext.scale(transform.k * defaults.imageScaleFactor, transform.k * defaults.imageScaleFactor);
-        naContext.drawImage(defaults.image, 0, 0);
-        naContext.getImageData(0, 0, defaults.width, defaults.height);
-        naContext.restore();
+        // Based on d3-tile v0.0.3
+        // https://github.com/d3/d3-tile/blob/0f8cc9f52564d4439845f651c5fab2fcc2fdef9e/src/tile.js
+        const x0 = 0,
+            y0 = 0,
+            x1 = defaults.width,
+            y1 = defaults.height,
+            scale = transform.k,
+            zoomDelta = 2,
+            zoom = Math.max(Math.log(scale) / Math.LN2 - defaults.log2tileSize, 0),
+            k = 2 ** (zoom + defaults.log2tileSize),
+            { x } = transform,
+            { y } = transform,
+            // crop right side
+            dx = defaults.coord.max * scale < defaults.width ? transform.x : 0,
+            // crop bottom
+            dy = defaults.coord.max * scale < defaults.height ? transform.y : 0,
+            cols = d3.range(Math.max(0, Math.floor((x0 - x) / k)), Math.max(0, Math.ceil((x1 - x - dx) / k))),
+            rows = d3.range(Math.max(0, Math.floor((y0 - y) / k)), Math.max(0, Math.ceil((y1 - y - dy) / k))),
+            tiles = [];
 
-        /*
-        const transform = d3.zoomIdentity
-            .scale(scale)
-            .translate(-x + defaults.width / 2 / scale, -y + defaults.height / 2 / scale);
-        */
-        /*
-        const sx = -transform.x,
-            sy = -transform.y ,
-            sWidth = defaults.width / transform.k,
-            sHeight = defaults.height / transform.k,
-            dx = defaults.coord.min+transform.x,
-            dy = defaults.coord.min+ transform.y,
-            dWidth = defaults.width+ defaults.width / 2,
-            dHeight = defaults.height+ defaults.height / 2;
-        naContext.drawImage(defaults.image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
-        console.log(sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
-        */
+        console.log("x, dx, y, dy ", x, dx, y, dy);
+        console.log("zoom, k ", zoom, k);
+        console.log("cols, rows ", cols, rows);
+
+        rows.forEach(row => {
+            cols.forEach(col => {
+                tiles.push([col, row, zoom + zoomDelta]);
+            });
+        });
+
+        tiles.scale = k;
+
+        console.log("transform ", transform);
+        console.log("tiles ", tiles);
+
+        // noinspection JSSuspiciousNameCombination
+        const tileTransform = d3.zoomIdentity
+            .translate(Math.round(transform.x), Math.round(transform.y))
+            .scale(tiles.scale / defaults.tileSize);
+
+        const image = mainGMap
+            .attr("transform", tileTransform)
+            .selectAll("image")
+            .data(tiles, d => d);
+
+        image.exit().remove();
+
+        image
+            .enter()
+            .append("image")
+            .attr("xlink:href", d => `images/map/${d[2]}/${d[1]}/${d[0]}.jpg`)
+            .attr("x", d => d[0] * defaults.tileSize)
+            .attr("y", d => d[1] * defaults.tileSize)
+            .attr("width", tiles.scale)
+            .attr("height", tiles.scale);
     }
 
     function updatePortCircles() {
@@ -418,7 +462,8 @@ export default function naDisplay(serverName) {
     function zoomAndPan(x, y, scale) {
         const transform = d3.zoomIdentity
             .scale(scale)
-            .translate(-x + defaults.width / 2 / scale, -y + defaults.height / 2 / scale);
+            .translate(Math.round(-x + defaults.width / 2 / scale), Math.round(-y + defaults.height / 2 / scale));
+        console.log("zoomAndPan transform ", transform);
         naSvg.call(naZoom.transform, transform);
     }
 
@@ -693,13 +738,17 @@ export default function naDisplay(serverName) {
 
     function naZoomed() {
         updateMap();
-        // console.log(`zoomed d3.event.transform: ${JSON.stringify(d3.event.transform)}`);
-        displayCountries(d3.event.transform);
 
-        mainGVoronoi.attr("transform", d3.event.transform);
-        mainGPort.attr("transform", d3.event.transform);
-        mainGPBZone.attr("transform", d3.event.transform);
-        mainGCoord.attr("transform", d3.event.transform);
+        // noinspection JSSuspiciousNameCombination
+        const transform = d3.zoomIdentity
+            .translate(Math.round(d3.event.transform.x), Math.round(d3.event.transform.y))
+            .scale(Math.round(d3.event.transform.k * 1000) / 1000);
+
+        displayCountries(transform);
+        mainGVoronoi.attr("transform", transform);
+        mainGPort.attr("transform", transform);
+        mainGPBZone.attr("transform", transform);
+        mainGCoord.attr("transform", transform);
     }
 
     function goToPort() {
@@ -717,34 +766,12 @@ export default function naDisplay(serverName) {
             }
         }
 
-        function setupCanvas() {
-            naCanvas = d3
-                .select("#na")
-                .append("canvas")
-                .attr("width", defaults.width)
-                .attr("height", defaults.height)
-                .style("position", "absolute")
-                .style("top", `${defaults.margin.top}px`)
-                .style("left", `${defaults.margin.left}px`)
-                .on("click", stopProp, true);
-            naContext = naCanvas.node().getContext("2d");
-
-            defaults.image.onload = () => {
-                naContext.mozImageSmoothingEnabled = false;
-                naContext.webkitImageSmoothingEnabled = false;
-                naContext.msImageSmoothingEnabled = false;
-                naContext.imageSmoothingEnabled = false;
-                defaults.imageScaleFactor = defaults.coord.max / defaults.image.height;
-                initialZoomAndPan();
-            };
-            defaults.image.src = defaults.imageSrc;
-        }
-
         function setupSvg() {
             naZoom = d3
                 .zoom()
                 .scaleExtent([defaults.minScale, defaults.maxScale])
                 .translateExtent([[defaults.coord.min, defaults.coord.min], [defaults.coord.max, defaults.coord.max]])
+                .wheelDelta(0.5)
                 .on("zoom", naZoomed);
 
             naSvg = d3
@@ -786,6 +813,7 @@ export default function naDisplay(serverName) {
                 .append("path")
                 .attr("d", "M0,-5L10,0L0,5")
                 .attr("class", "wind-head");
+            mainGMap = naSvg.append("g").classed("map", true);
             mainGVoronoi = naSvg.append("g").classed("voronoi", true);
             mainGPort = naSvg.append("g").classed("port", true);
             mainGText = mainGPort.append("g");
@@ -1541,7 +1569,6 @@ export default function naDisplay(serverName) {
                 });
         }
 
-        setupCanvas();
         setupSvg();
         setupPorts();
         setupTeleportAreas();
@@ -1549,6 +1576,7 @@ export default function naDisplay(serverName) {
         setupPropertyMenu();
         setupListener();
         moment.locale("en-gb");
+        initialZoomAndPan();
     }
 
     function naReady(error, naMapJsonData, pbZonesJsonData) {
