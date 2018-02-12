@@ -21,7 +21,7 @@ import "bootstrap/js/dist/util";
 export default function naDisplay(serverName) {
     // https://bocoup.com/blog/find-the-closest-power-of-2-with-javascript
     function nearestPow2(aSize) {
-        return 2 ** Math.round(Math.log(aSize) / Math.log(2));
+        return 2 ** Math.round(Math.log2(aSize));
     }
 
     let naSvg,
@@ -117,8 +117,8 @@ export default function naDisplay(serverName) {
     defaults.minScale = nearestPow2(
         Math.min(defaults.width / defaults.coord.max, defaults.height / defaults.coord.max)
     );
-    defaults.log2tileSize = Math.log(defaults.tileSize) / Math.log(2);
-    defaults.maxTileZoom = Math.log(defaults.coord.max) / Math.log(2) - defaults.log2tileSize;
+    defaults.log2tileSize = Math.log2(defaults.tileSize);
+    defaults.maxTileZoom = Math.log2(defaults.coord.max) - defaults.log2tileSize;
     defaults.zoomScale = d3
         .scaleLinear()
         .rangeRound([
@@ -166,39 +166,62 @@ export default function naDisplay(serverName) {
             y0 = 0,
             x1 = defaults.width,
             y1 = defaults.height,
-            scale = transform.k,
-            zoomDelta = 2,
-            zoom = Math.max(Math.log(scale) / Math.LN2 - defaults.log2tileSize, 0),
-            k = 2 ** (zoom + defaults.log2tileSize),
+            scale = Math.log2(transform.k),
+            width =
+                defaults.coord.max * transform.k < defaults.width
+                    ? defaults.width - 2 * transform.x
+                    : defaults.coord.max * transform.k,
+            height =
+                defaults.coord.max * transform.k < defaults.height
+                    ? defaults.height - 2 * transform.y
+                    : defaults.coord.max * transform.k,
+            zoomDelta = Math.ceil(Math.log2(Math.max(width, height))) - defaults.log2tileSize,
+            zoom = Math.max(scale - defaults.log2tileSize, 0),
+            zoom0 = Math.round(zoom + zoomDelta),
+            k = 2 ** (zoom - zoom0 + defaults.log2tileSize),
             { x } = transform,
             { y } = transform,
             // crop right side
             dx = defaults.coord.max * scale < defaults.width ? transform.x : 0,
             // crop bottom
             dy = defaults.coord.max * scale < defaults.height ? transform.y : 0,
-            cols = d3.range(Math.max(0, Math.floor((x0 - x) / k)), Math.max(0, Math.ceil((x1 - x - dx) / k))),
-            rows = d3.range(Math.max(0, Math.floor((y0 - y) / k)), Math.max(0, Math.ceil((y1 - y - dy) / k))),
+            cols = d3.range(
+                Math.max(0, Math.floor((x0 - x) / defaults.tileSize)),
+                Math.max(0, Math.ceil((x1 - x - dx) / defaults.tileSize))
+            ),
+            rows = d3.range(
+                Math.max(0, Math.floor((y0 - y) / defaults.tileSize)),
+                Math.max(0, Math.ceil((y1 - y - dy) / defaults.tileSize))
+            ),
             tiles = [];
 
-        console.log("x, dx, y, dy ", x, dx, y, dy);
-        console.log("zoom, k ", zoom, k);
+        [0.125, 0.25, 1, 2].forEach(i => {
+            console.log(Math.log2(i));
+        });
+        console.log("x, dx, y, dy, width, height ", x, dx, y, dy, width, height);
+        console.log("zoomDelta, zoom, zoom0, k, scale ", zoomDelta, zoom, zoom0, k, scale);
+        console.log("defaults.log2tileSize ", defaults.log2tileSize);
+        console.log("defaults.maxTileZoom ", defaults.maxTileZoom);
         console.log("cols, rows ", cols, rows);
 
         rows.forEach(row => {
             cols.forEach(col => {
-                tiles.push([col, row, zoom + zoomDelta]);
+                tiles.push([col, row, zoom0]);
             });
         });
 
-        tiles.scale = k;
+        tiles.translate = [x, y];
+        tiles.scale = defaults.tileSize;
 
         console.log("transform ", transform);
         console.log("tiles ", tiles);
+        console.log("tileScale ", tiles.scale / defaults.tileSize);
 
+        const tileScale = tiles.scale / defaults.tileSize;
         // noinspection JSSuspiciousNameCombination
         const tileTransform = d3.zoomIdentity
-            .translate(Math.round(transform.x), Math.round(transform.y))
-            .scale(tiles.scale / defaults.tileSize);
+            .translate(Math.round(tiles.translate[0]), Math.round(tiles.translate[1]))
+            .scale(tileScale);
 
         const image = mainGMap
             .attr("transform", tileTransform)
@@ -213,8 +236,8 @@ export default function naDisplay(serverName) {
             .attr("xlink:href", d => `images/map/${d[2]}/${d[1]}/${d[0]}.jpg`)
             .attr("x", d => d[0] * defaults.tileSize)
             .attr("y", d => d[1] * defaults.tileSize)
-            .attr("width", tiles.scale)
-            .attr("height", tiles.scale);
+            .attr("width", defaults.tileSize)
+            .attr("height", defaults.tileSize);
     }
 
     function updatePortCircles() {
