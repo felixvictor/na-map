@@ -83,7 +83,7 @@
     "deploy-test2": "yarn run change && yarn run deploy-netlify-test2",
     "deploy-update": "yarn run update && yarn run deploy-netlify",
     "js-lint": "eslint -c .eslintrc.json src/js",
-    "make-tiles": "yarn mapslice -i -t 256 -f src/images/map.tif",
+    "make-tiles": "cp /mnt/na-map.tif src/images/map.tif && yarn mapslice -i -t 256 -f src/images/map.tif && rm src/images/map.tif",
     "prettier": "prettier --tab-width 4 --print-width 120 --write .eslintrc.json package.json *.js src/js/*.json src/scss/*.scss",
     "prod": "yarn run clean && NODE_ENV=${NODE_ENV:=prod} webpack --colors --config webpack.config.js",
     "prod-update": "yarn run clean && NODE_ENV=${NODE_ENV:=prod} webpack --config webpack.config.js",
