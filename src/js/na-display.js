@@ -13,7 +13,7 @@ import "moment-timezone";
 import "moment/locale/en-gb";
 import "round-slider/src/roundslider";
 import "tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4";
-import "bootstrap-select";
+import "bootstrap-select/js/bootstrap-select";
 
 import "bootstrap/js/dist/tooltip";
 import "bootstrap/js/dist/util";
@@ -940,20 +940,20 @@ export default function naDisplay(serverName) {
             $("#port-names")
                 .on("change", portSelected)
                 .selectpicker({
-                    liveSearch: true,
+                    //liveSearch: true,
                     // accent-insensitive searching
-                    liveSearchNormalize: true,
-                    liveSearchStyle: "startsWith"
+                    //liveSearchNormalize: true,
+                    //liveSearchStyle: "startsWith"
                 });
 
             setupGoodSelect();
             $("#good-names")
                 .on("change", goodSelected)
                 .selectpicker({
-                    liveSearch: true,
+                    //liveSearch: true,
                     // accent-insensitive searching
-                    liveSearchNormalize: true,
-                    liveSearchStyle: "startsWith"
+                    //liveSearchNormalize: true,
+                    //liveSearchStyle: "startsWith"
                 });
         }
 
