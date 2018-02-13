@@ -54,6 +54,7 @@ export default function naDisplay(serverName) {
         tileSize: 256,
         port: { id: "366", coord: { x: 4396, y: 2494 } }, // Shroud Cay
         maxScale: 2 ** 4, // power of 2
+        wheelDelta: 0.5,
         fontSize: { initial: 30, portLabel: 18, pbZone: 7 },
         circleSize: { initial: 50, portLabel: 20, pbZone: 5 },
         iconSize: 50,
@@ -119,13 +120,6 @@ export default function naDisplay(serverName) {
     );
     defaults.log2tileSize = Math.log2(defaults.tileSize);
     defaults.maxTileZoom = Math.log2(defaults.coord.max) - defaults.log2tileSize;
-    defaults.zoomScale = d3
-        .scaleLinear()
-        .rangeRound([
-            Math.round(Math.log(Math.max(defaults.width, defaults.height)) / Math.LN2) - defaults.log2tileSize - 1,
-            defaults.maxTileZoom
-        ])
-        .domain([defaults.minScale, defaults.maxScale]);
     defaults.coord.voronoi = [
         [defaults.coord.min - 1, defaults.coord.min - 1],
         [defaults.coord.max + 1, defaults.coord.max + 1]
@@ -140,7 +134,11 @@ export default function naDisplay(serverName) {
         radioButton: "compass",
         lineData: [],
         nation: "",
-        showTeleportAreas: false
+        showTeleportAreas: false,
+        tile: {
+            zoom: 0,
+            scaleBase: 0
+        }
     };
 
     const thousandsWithBlanks = x => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u202f");
@@ -166,7 +164,6 @@ export default function naDisplay(serverName) {
             y0 = 0,
             x1 = defaults.width,
             y1 = defaults.height,
-            scale = Math.log2(transform.k),
             width =
                 defaults.coord.max * transform.k < defaults.width
                     ? defaults.width - 2 * transform.x
@@ -175,11 +172,24 @@ export default function naDisplay(serverName) {
                 defaults.coord.max * transform.k < defaults.height
                     ? defaults.height - 2 * transform.y
                     : defaults.coord.max * transform.k,
-            zoomDelta = Math.ceil(Math.log2(Math.max(width, height))) - defaults.log2tileSize,
-            zoom = Math.max(scale - defaults.log2tileSize, 0),
-            zoom0 = Math.round(zoom + zoomDelta),
-            k = 2 ** (zoom - zoom0 + defaults.log2tileSize),
-            { x } = transform,
+            scale = Math.log2(transform.k);
+
+        const zoom = Math.min(
+            defaults.maxTileZoom,
+            Math.ceil(Math.log2(Math.max(width, height))) - defaults.log2tileSize
+        );
+
+        console.log(typeof zoom, typeof current.tile.zoom);
+
+        if (zoom !== current.tile.zoom) {
+            current.tile.zoom = zoom;
+            current.tile.scaleBase = 0.5;
+        } else {
+            current.tile.scaleBase += 1;
+        }
+        const k = current.tile.scaleBase ** defaults.wheelDelta;
+
+        const { x } = transform,
             { y } = transform,
             // crop right side
             dx = defaults.coord.max * scale < defaults.width ? transform.x : 0,
@@ -195,33 +205,29 @@ export default function naDisplay(serverName) {
             ),
             tiles = [];
 
-        [0.125, 0.25, 1, 2].forEach(i => {
-            console.log(Math.log2(i));
-        });
+        console.log("current.tile ", current.tile);
         console.log("x, dx, y, dy, width, height ", x, dx, y, dy, width, height);
-        console.log("zoomDelta, zoom, zoom0, k, scale ", zoomDelta, zoom, zoom0, k, scale);
-        console.log("defaults.log2tileSize ", defaults.log2tileSize);
-        console.log("defaults.maxTileZoom ", defaults.maxTileZoom);
+        console.log("zoom, k, scale ", zoom, k, scale);
+        // console.log("defaults.log2tileSize ", defaults.log2tileSize);
+        // console.log("defaults.maxTileZoom ", defaults.maxTileZoom);
         console.log("cols, rows ", cols, rows);
 
         rows.forEach(row => {
             cols.forEach(col => {
-                tiles.push([col, row, zoom0]);
+                tiles.push([col, row, zoom]);
             });
         });
 
         tiles.translate = [x, y];
-        tiles.scale = defaults.tileSize;
+        tiles.scale = k;
 
         console.log("transform ", transform);
         console.log("tiles ", tiles);
-        console.log("tileScale ", tiles.scale / defaults.tileSize);
 
-        const tileScale = tiles.scale / defaults.tileSize;
         // noinspection JSSuspiciousNameCombination
         const tileTransform = d3.zoomIdentity
             .translate(Math.round(tiles.translate[0]), Math.round(tiles.translate[1]))
-            .scale(tileScale);
+            .scale(tiles.scale);
 
         const image = mainGMap
             .attr("transform", tileTransform)
@@ -790,11 +796,12 @@ export default function naDisplay(serverName) {
         }
 
         function setupSvg() {
+            // noinspection JSSuspiciousNameCombination
             naZoom = d3
                 .zoom()
                 .scaleExtent([defaults.minScale, defaults.maxScale])
                 .translateExtent([[defaults.coord.min, defaults.coord.min], [defaults.coord.max, defaults.coord.max]])
-                .wheelDelta(0.5)
+                .wheelDelta(() => -defaults.wheelDelta * Math.sign(d3.event.deltaY))
                 .on("zoom", naZoomed);
 
             naSvg = d3
