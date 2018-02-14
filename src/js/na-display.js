@@ -184,17 +184,15 @@ export default function naDisplay(serverName) {
         if (zoom !== current.tile.zoom) {
             current.tile.zoom = zoom;
             current.tile.scaleBase = 0.5;
-        } else {
-            current.tile.scaleBase += 1;
         }
         const k = current.tile.scaleBase ** defaults.wheelDelta;
 
         const { x } = transform,
             { y } = transform,
             // crop right side
-            dx = defaults.coord.max * scale < defaults.width ? transform.x : 0,
+            dx = defaults.coord.max * transform.k < defaults.width ? transform.x : 0,
             // crop bottom
-            dy = defaults.coord.max * scale < defaults.height ? transform.y : 0,
+            dy = defaults.coord.max * transform.k < defaults.height ? transform.y : 0,
             cols = d3.range(
                 Math.max(0, Math.floor((x0 - x) / defaults.tileSize)),
                 Math.max(0, Math.ceil((x1 - x - dx) / defaults.tileSize))
