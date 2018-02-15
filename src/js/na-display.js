@@ -178,14 +178,7 @@ export default function naDisplay(serverName) {
             defaults.maxTileZoom,
             Math.ceil(Math.log2(Math.max(width, height))) - defaults.log2tileSize
         );
-
-        console.log(typeof zoom, typeof current.tile.zoom);
-
-        if (zoom !== current.tile.zoom) {
-            current.tile.zoom = zoom;
-            current.tile.scaleBase = 0.5;
-        }
-        const k = current.tile.scaleBase ** defaults.wheelDelta;
+        const k = defaults.wheelDelta ** (zoom - scale - defaults.maxTileZoom);
 
         const { x } = transform,
             { y } = transform,
@@ -194,21 +187,23 @@ export default function naDisplay(serverName) {
             // crop bottom
             dy = defaults.coord.max * transform.k < defaults.height ? transform.y : 0,
             cols = d3.range(
-                Math.max(0, Math.floor((x0 - x) / defaults.tileSize)),
-                Math.max(0, Math.ceil((x1 - x - dx) / defaults.tileSize))
+                Math.max(0, Math.floor((x0 - x) / defaults.tileSize / k)),
+                Math.max(0, Math.ceil((x1 - x - dx) / defaults.tileSize / k))
             ),
             rows = d3.range(
-                Math.max(0, Math.floor((y0 - y) / defaults.tileSize)),
-                Math.max(0, Math.ceil((y1 - y - dy) / defaults.tileSize))
+                Math.max(0, Math.floor((y0 - y) / defaults.tileSize / k)),
+                Math.max(0, Math.ceil((y1 - y - dy) / defaults.tileSize / k))
             ),
             tiles = [];
 
+        /*
         console.log("current.tile ", current.tile);
         console.log("x, dx, y, dy, width, height ", x, dx, y, dy, width, height);
         console.log("zoom, k, scale ", zoom, k, scale);
         // console.log("defaults.log2tileSize ", defaults.log2tileSize);
         // console.log("defaults.maxTileZoom ", defaults.maxTileZoom);
         console.log("cols, rows ", cols, rows);
+*/
 
         rows.forEach(row => {
             cols.forEach(col => {
@@ -219,8 +214,10 @@ export default function naDisplay(serverName) {
         tiles.translate = [x, y];
         tiles.scale = k;
 
+        /*
         console.log("transform ", transform);
         console.log("tiles ", tiles);
+        */
 
         // noinspection JSSuspiciousNameCombination
         const tileTransform = d3.zoomIdentity
