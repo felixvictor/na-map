@@ -8,6 +8,10 @@
 
 $background-colour: $primary-300;
 
+svg {
+  background-color: $background-colour;
+}
+
 .extralarge-width {
   min-width: 35em;
 }
