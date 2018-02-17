@@ -176,7 +176,7 @@ export default function naDisplay(serverName) {
             defaults.maxTileZoom,
             Math.ceil(Math.log2(Math.max(width, height))) - defaults.log2tileSize
         );
-        const p = Math.floor(zoom * 10 - scale * 10 - defaults.maxTileZoom * 10) / 10,
+        const p = Math.round(zoom * 10 - scale * 10 - defaults.maxTileZoom * 10) / 10,
             k = defaults.wheelDelta ** p;
 
         const { x } = transform,
@@ -197,7 +197,7 @@ export default function naDisplay(serverName) {
 
         console.group("zoom");
         console.log("x, dx, y, dy, width, height ", x, dx, y, dy, width, height);
-        console.log("k, zoom, scale ", k, zoom, scale, defaults.tileSize / k);
+        console.log("k, zoom, scale ", k, zoom, scale);
         // console.log("defaults.log2tileSize ", defaults.log2tileSize);
         // console.log("defaults.maxTileZoom ", defaults.maxTileZoom);
         console.log("cols, rows ", cols, rows);
@@ -220,7 +220,7 @@ export default function naDisplay(serverName) {
         // noinspection JSSuspiciousNameCombination
         const tileTransform = d3.zoomIdentity
             .translate(Math.round(tiles.translate[0]), Math.round(tiles.translate[1]))
-            .scale(tiles.scale);
+            .scale(Math.round(tiles.scale * 1000) / 1000);
 
         const image = mainGMap
             .attr("transform", tileTransform)
