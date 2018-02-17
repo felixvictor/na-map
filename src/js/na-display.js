@@ -134,11 +134,7 @@ export default function naDisplay(serverName) {
         radioButton: "compass",
         lineData: [],
         nation: "",
-        showTeleportAreas: false,
-        tile: {
-            zoom: 0,
-            scaleBase: 0
-        }
+        showTeleportAreas: false
     };
 
     const thousandsWithBlanks = x => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u202f");
@@ -164,21 +160,24 @@ export default function naDisplay(serverName) {
             y0 = 0,
             x1 = defaults.width,
             y1 = defaults.height,
-            width =
+            width = Math.floor(
                 defaults.coord.max * transform.k < defaults.width
                     ? defaults.width - 2 * transform.x
-                    : defaults.coord.max * transform.k,
-            height =
+                    : defaults.coord.max * transform.k
+            ),
+            height = Math.floor(
                 defaults.coord.max * transform.k < defaults.height
                     ? defaults.height - 2 * transform.y
-                    : defaults.coord.max * transform.k,
+                    : defaults.coord.max * transform.k
+            ),
             scale = Math.log2(transform.k);
 
         const zoom = Math.min(
             defaults.maxTileZoom,
             Math.ceil(Math.log2(Math.max(width, height))) - defaults.log2tileSize
         );
-        const k = defaults.wheelDelta ** (zoom - scale - defaults.maxTileZoom);
+        const p = Math.floor(zoom * 10 - scale * 10 - defaults.maxTileZoom * 10) / 10,
+            k = defaults.wheelDelta ** p;
 
         const { x } = transform,
             { y } = transform,
@@ -188,22 +187,21 @@ export default function naDisplay(serverName) {
             dy = defaults.coord.max * transform.k < defaults.height ? transform.y : 0,
             cols = d3.range(
                 Math.max(0, Math.floor((x0 - x) / defaults.tileSize / k)),
-                Math.max(0, Math.ceil((x1 - x - dx) / defaults.tileSize / k))
+                Math.max(0, Math.min(Math.ceil((x1 - x - dx) / defaults.tileSize / k), 2 ** zoom))
             ),
             rows = d3.range(
                 Math.max(0, Math.floor((y0 - y) / defaults.tileSize / k)),
-                Math.max(0, Math.ceil((y1 - y - dy) / defaults.tileSize / k))
+                Math.max(0, Math.min(Math.ceil((y1 - y - dy) / defaults.tileSize / k), 2 ** zoom))
             ),
             tiles = [];
 
-        /*
-        console.log("current.tile ", current.tile);
+        console.group("zoom");
         console.log("x, dx, y, dy, width, height ", x, dx, y, dy, width, height);
-        console.log("zoom, k, scale ", zoom, k, scale);
+        console.log("k, zoom, scale ", k, zoom, scale, defaults.tileSize / k);
         // console.log("defaults.log2tileSize ", defaults.log2tileSize);
         // console.log("defaults.maxTileZoom ", defaults.maxTileZoom);
         console.log("cols, rows ", cols, rows);
-*/
+        console.groupEnd();
 
         rows.forEach(row => {
             cols.forEach(col => {
@@ -487,7 +485,6 @@ export default function naDisplay(serverName) {
         const transform = d3.zoomIdentity
             .scale(scale)
             .translate(Math.round(-x + defaults.width / 2 / scale), Math.round(-y + defaults.height / 2 / scale));
-        console.log("zoomAndPan transform ", transform);
         naSvg.call(naZoom.transform, transform);
     }
 
