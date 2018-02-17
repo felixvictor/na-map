@@ -12,5 +12,6 @@ sharp(inFilename)
         overshootDeringing: true,
         optimiseScans: true
     })
+    .sharpen()
     .tile({ size: tileSize, layout: "google" })
     .toFile(outPath);
