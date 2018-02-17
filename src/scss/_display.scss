@@ -8,6 +8,10 @@
 
 $background-colour: $primary-300;
 
+svg {
+  background-color: $background-colour;
+}
+
 .extralarge-width {
   min-width: 35em;
 }
@@ -100,6 +104,7 @@ p {
 
 .coord {
   line-height: 1;
+  background-color: transparent;
   circle {
     fill: $secondary-700;
     fill-opacity: .5;
@@ -215,10 +220,6 @@ p {
   &::before {
     content: "\00a0";
   }
-}
-
-.dummy-jpg {
-  background-image: url("~Images/na-map.jpg");
 }
 
 .dummy-brand {
