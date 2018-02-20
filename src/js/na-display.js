@@ -849,13 +849,16 @@ export default function naDisplay(serverName) {
         }
 
         function setupSelects() {
+            const portNames = $("#port-names"),
+                goodNames = $("#good-names");
+
             function setupPortSelect() {
-                const portNames = $("#port-names");
                 const selectPorts = defaults.portData
                     .map(d => ({
                         id: d.id,
                         coord: [d.geometry.coordinates[0], d.geometry.coordinates[1]],
-                        name: d.properties.name
+                        name: d.properties.name,
+                        nation: d.properties.nation
                     }))
                     .sort((a, b) => {
                         if (a.name < b.name) {
@@ -868,13 +871,17 @@ export default function naDisplay(serverName) {
                     });
 
                 const select = `${selectPorts
-                    .map(port => `<option value="${port.coord}" data-id="${port.id}">${port.name}</option>`)
+                    .map(
+                        port =>
+                            `<option data-subtext="${port.nation}" value="${port.coord}" data-id="${port.id}">${
+                                port.name
+                            }</option>`
+                    )
                     .join("")}`;
                 portNames.append(select);
             }
 
             function setupGoodSelect() {
-                const goodNames = $("#good-names");
                 let selectGoods = new Map();
                 const goodsPerPort = defaults.portData.map(d => {
                     let goods = d.properties.dropsTrading ? d.properties.dropsTrading : "";
@@ -936,25 +943,27 @@ export default function naDisplay(serverName) {
                 updatePorts();
             }
 
+            portNames.addClass("selectpicker");
+            goodNames.addClass("selectpicker");
+            $(".selectpicker").selectpicker({
+                dropupAuto: false,
+                liveSearch: true,
+                liveSearchPlaceholder: "Search ...",
+                // accent-insensitive searching
+                liveSearchNormalize: true
+            });
+
             setupPortSelect();
-            $("#port-names")
-                .on("change", portSelected)
-                .selectpicker({
-                    //liveSearch: true,
-                    // accent-insensitive searching
-                    //liveSearchNormalize: true,
-                    //liveSearchStyle: "startsWith"
-                });
+            portNames.on("change", portSelected).selectpicker({
+                title: "Go to a port"
+            });
 
             setupGoodSelect();
-            $("#good-names")
-                .on("change", goodSelected)
-                .selectpicker({
-                    //liveSearch: true,
-                    // accent-insensitive searching
-                    //liveSearchNormalize: true,
-                    //liveSearchStyle: "startsWith"
-                });
+            goodNames.on("change", goodSelected).selectpicker({
+                title: "Select a good"
+            });
+
+            $(".selectpicker").selectpicker("refresh");
         }
 
         function setupClanSelect() {
