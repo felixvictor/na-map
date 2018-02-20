@@ -13,7 +13,7 @@ import "moment-timezone";
 import "moment/locale/en-gb";
 import "round-slider/src/roundslider";
 import "tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4";
-import "bootstrap-hardskilled-extend-select";
+import "bootstrap-select/js/bootstrap-select";
 
 import "bootstrap/js/dist/tooltip";
 import "bootstrap/js/dist/util";
@@ -849,13 +849,16 @@ export default function naDisplay(serverName) {
         }
 
         function setupSelects() {
+            const portNames = $("#port-names"),
+                goodNames = $("#good-names");
+
             function setupPortSelect() {
-                const portNames = $("#port-names");
                 const selectPorts = defaults.portData
                     .map(d => ({
                         id: d.id,
                         coord: [d.geometry.coordinates[0], d.geometry.coordinates[1]],
-                        name: d.properties.name
+                        name: d.properties.name,
+                        nation: d.properties.nation
                     }))
                     .sort((a, b) => {
                         if (a.name < b.name) {
@@ -867,14 +870,18 @@ export default function naDisplay(serverName) {
                         return 0;
                     });
 
-                const select = `<option value="" data-id="0">Reset</option>${selectPorts
-                    .map(port => `<option value="${port.coord}" data-id="${port.id}">${port.name}</option>`)
+                const select = `${selectPorts
+                    .map(
+                        port =>
+                            `<option data-subtext="${port.nation}" value="${port.coord}" data-id="${port.id}">${
+                                port.name
+                            }</option>`
+                    )
                     .join("")}`;
                 portNames.append(select);
             }
 
             function setupGoodSelect() {
-                const goodNames = $("#good-names");
                 let selectGoods = new Map();
                 const goodsPerPort = defaults.portData.map(d => {
                     let goods = d.properties.dropsTrading ? d.properties.dropsTrading : "";
@@ -896,7 +903,7 @@ export default function naDisplay(serverName) {
                     });
                 });
                 selectGoods = new Map(Array.from(selectGoods).sort());
-                let select = '<option value="0">Reset</option>';
+                let select = "";
                 // eslint-disable-next-line no-restricted-syntax
                 for (const [key, portIds] of selectGoods.entries()) {
                     let ids = "";
@@ -936,31 +943,27 @@ export default function naDisplay(serverName) {
                 updatePorts();
             }
 
+            portNames.addClass("selectpicker");
+            goodNames.addClass("selectpicker");
+            $(".selectpicker").selectpicker({
+                dropupAuto: false,
+                liveSearch: true,
+                liveSearchPlaceholder: "Search ...",
+                // accent-insensitive searching
+                liveSearchNormalize: true
+            });
+
             setupPortSelect();
-            $("#port-names")
-                .on("change", portSelected)
-                .prop("selectedIndex", -1)
-                .extendSelect({
-                    // Search input placeholder:
-                    search: "Find",
-                    // Title if option not selected:
-                    notSelectedTitle: "Go to a port",
-                    // Message if select list empty:
-                    empty: "Not found"
-                });
+            portNames.on("change", portSelected).selectpicker({
+                title: "Go to a port"
+            });
 
             setupGoodSelect();
-            $("#good-names")
-                .on("change", goodSelected)
-                .prop("selectedIndex", -1)
-                .extendSelect({
-                    // Search input placeholder:
-                    search: "Find",
-                    // Title if option not selected:
-                    notSelectedTitle: "Select a good",
-                    // Message if select list empty:
-                    empty: "Not found"
-                });
+            goodNames.on("change", goodSelected).selectpicker({
+                title: "Select a good"
+            });
+
+            $(".selectpicker").selectpicker("refresh");
         }
 
         function setupClanSelect() {
