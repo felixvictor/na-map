@@ -16,60 +16,86 @@ String.prototype.replaceAll = function(search, replacement) {
 
 function createExcel() {
     function fillSheet(sheet, ships) {
+        const textAligment = { vertical: "middle", horizontal: "left", indent: 1 },
+            numberAligment = { vertical: "middle", horizontal: "right", indent: 1 };
+
+        sheet.views = [{ state: "frozen", xSplit: 5, ySplit: 2 }];
         sheet.properties.defaultRowHeight = 24;
 
+        // ** Columns
+        // Content and format first columns
         sheet.columns = [
             {
-                header: "Rate",
                 key: "rate",
                 width: 8,
-                style: { alignment: { vertical: "middle", horizontal: "right", indent: 1 } }
+                style: { alignment: numberAligment }
             },
             {
-                header: "Ship",
                 key: "ship",
                 width: 24,
-                style: { alignment: { vertical: "middle", horizontal: "left", indent: 1 } }
+                style: { alignment: textAligment }
             },
             {
-                header: "BR",
                 key: "br",
                 width: 8,
-                style: { alignment: { vertical: "middle", horizontal: "right", indent: 1 } }
+                style: { alignment: numberAligment }
             },
             {
-                header: "# Player",
                 key: "player",
                 width: 12,
-                style: { alignment: { vertical: "middle", horizontal: "right", indent: 1 } }
+                style: { alignment: numberAligment }
             },
             {
-                header: "BR total",
                 key: "brTotal",
                 width: 12,
-                style: { alignment: { vertical: "middle", horizontal: "right", indent: 1 } }
+                style: { alignment: numberAligment }
             },
             {
-                header: "Player names",
                 key: "names",
                 width: 20,
-                style: { alignment: { vertical: "middle", horizontal: "left", indent: 1 } }
+                style: { alignment: textAligment }
             }
         ];
 
+        // Format other columns (player names)
         for (let columnNum = 7; columnNum <= 7 + 23; columnNum += 1) {
             sheet.getColumn(columnNum).width = 20;
-            sheet.getColumn(columnNum).alignment = { vertical: "middle", horizontal: "left", indent: 1 };
+            sheet.getColumn(columnNum).alignment = textAligment;
         }
 
-        sheet.mergeCells("F1:G1");
+        // ** Rows
+        // First Row (description)
+        sheet.mergeCells("A1:C1");
+        sheet.getCell("A1").value = "Simple port battle calculator by Felix Victor";
+        sheet.mergeCells("D1:E1");
+        sheet.getCell("D1").value = {
+            text: "Game Labs Forum",
+            hyperlink: "http://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/"
+        };
+        sheet.getRow(1).height = 40;
+        sheet.getRow(1).fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: "e9f1f4" }
+        };
+        sheet.getRow(1).font = { color: { argb: "6b7478" } };
 
+        sheet.addRow({
+            rate: "Rate",
+            ship: "Ship",
+            br: "BR",
+            player: "# Player",
+            brTotal: "BR total",
+            names: "Player names"
+        });
+
+        sheet.mergeCells("F2:G2");
         sheet.addRow({
             rate: "",
             ship: "",
             br: "",
-            player: { formula: `SUM(D3:D${2 + ships.length})` },
-            brTotal: { formula: `SUM(E3:E${2 + ships.length})` }
+            player: { formula: `SUM(D4:D${2 + ships.length})` },
+            brTotal: { formula: `SUM(E4:E${2 + ships.length})` }
         });
 
         ships.forEach((ship, i) => {
@@ -79,8 +105,8 @@ function createExcel() {
                     rate: ship.class,
                     ship: ship.name,
                     br: ship.battleRating,
-                    player: { formula: 'COUNTIF(F3:AE3,"*")' },
-                    brTotal: { formula: "C3*D3" }
+                    player: { formula: 'COUNTIF(F4:AE4,"*")' },
+                    brTotal: { formula: "C4*D4" }
                 });
             } else {
                 // Other rows with formula reference for player/brTotal
@@ -88,13 +114,13 @@ function createExcel() {
                     rate: ship.class,
                     ship: ship.name,
                     br: ship.battleRating,
-                    player: { sharedFormula: "D3" },
-                    brTotal: { sharedFormula: "E3" }
+                    player: { sharedFormula: "D4" },
+                    brTotal: { sharedFormula: "E4" }
                 });
             }
         });
 
-        [1, 2].forEach(row => {
+        [2, 3].forEach(row => {
             sheet.getRow(row).height = 40;
             sheet.getRow(row).fill = {
                 type: "pattern",
@@ -104,7 +130,7 @@ function createExcel() {
             sheet.getRow(row).font = { bold: true, color: { argb: "6f6150" } };
         });
 
-        ["A1", "A2", "B1", "B2", "C1", "C2", "D1", "E1"].forEach(cell => {
+        ["A2", "A3", "B2", "B3", "C2", "C3", "D2", "E2"].forEach(cell => {
             sheet.getCell(cell).fill = {
                 type: "pattern",
                 pattern: "solid",
@@ -113,7 +139,7 @@ function createExcel() {
             sheet.getCell(cell).font = { bold: true, color: { argb: "f3f7f9" } };
         });
 
-        ["D2", "E2"].forEach(cell => {
+        ["D3", "E3"].forEach(cell => {
             sheet.getCell(cell).fill = {
                 type: "pattern",
                 pattern: "solid",
@@ -122,17 +148,17 @@ function createExcel() {
             sheet.getCell(cell).font = { bold: true, color: { argb: "4a5053" } };
         });
 
-        sheet.getCell("D2").alignment = { vertical: "middle", horizontal: "right", indent: 1 };
-        sheet.getCell("E2").alignment = { vertical: "middle", horizontal: "right", indent: 1 };
-        sheet.mergeCells("F2:I2");
-        sheet.getCell("F2").value = "Enter player names or any data";
-        sheet.getCell("F2").font = { bold: false, italic: true, color: { argb: "4a5053" } };
+        sheet.getCell("D3").alignment = numberAligment;
+        sheet.getCell("E3").alignment = numberAligment;
+        sheet.mergeCells("F3:I3");
+        sheet.getCell("F3").value = "Enter player names";
+        sheet.getCell("F3").font = { bold: false, italic: true, color: { argb: "4a5053" } };
 
-        for (let rowNum = 3; rowNum <= 3 + ships.length - 1; rowNum += 1) {
+        for (let rowNum = 4; rowNum <= 4 + ships.length - 1; rowNum += 1) {
             sheet.getRow(rowNum);
         }
 
-        for (let rowNum = 3; rowNum <= 3 + ships.length - 1; rowNum += 1) {
+        for (let rowNum = 4; rowNum <= 4 + ships.length - 1; rowNum += 1) {
             const row = sheet.getRow(rowNum);
             row.border = {
                 top: { style: "thin", color: { argb: "cccccc" } },
@@ -142,50 +168,32 @@ function createExcel() {
                 row.getCell(columnNum).fill = {
                     type: "pattern",
                     pattern: "solid",
-                    fgColor: { argb: "f3f7f9" }
+                    fgColor: { argb: "e9f1f4" }
                 };
             }
             for (let columnNum = 6; columnNum <= 6 + 24; columnNum += 1) {
                 row.getCell(columnNum).fill = {
                     type: "pattern",
                     pattern: "solid",
-                    fgColor: { argb: "f5efe7" }
+                    fgColor: { argb: "ede1d2" }
                 };
             }
         }
 
         // Sample values
-        sheet.getCell("F3").value = "Fritz";
-        sheet.getCell("G3").value = "Franz";
-        sheet.getCell("H3").value = "Klaus";
-        sheet.getCell("F4").value = "x";
-        sheet.getCell("G4").value = "X";
-        sheet.getCell("H4").value = "x";
+        sheet.getCell("F4").value = "Fritz";
+        sheet.getCell("G4").value = "Franz";
+        sheet.getCell("H4").value = "Klaus";
+        sheet.getCell("F5").value = "x";
+        sheet.getCell("G5").value = "X";
+        sheet.getCell("H5").value = "x";
     }
 
     const workbook = new Excel.Workbook(),
         now = new Date();
-    const dwShips = shipsOrig.filter(ship => ship.class < 6 || ship.name === "Mortar Brig").sort((a, b) => {
-            if (a.class < b.class) {
-                return -1;
-            }
-            if (a.class > b.class) {
-                return 1;
-            }
-            if (a.battleRating > b.battleRating) {
-                return -1;
-            }
-            if (a.battleRating < b.battleRating) {
-                return 1;
-            }
-            if (a.name < b.name) {
-                return -1;
-            }
-            if (a.name > b.name) {
-                return 1;
-            }
-            return 0;
-        }),
+    const dwShips = shipsOrig
+            .filter(ship => ship.class < 6 || ship.name === "Mortar Brig")
+            .sort((a, b) => a.class - b.class || b.battleRating - a.battleRating || a.name - b.name),
         swShips = shipsOrig
             .filter(
                 ship =>
@@ -194,38 +202,16 @@ function createExcel() {
                     !ship.name.startsWith("Rookie") &&
                     !ship.name.startsWith("Trader")
             )
-            .sort((a, b) => {
-                if (a.class < b.class) {
-                    return -1;
-                }
-                if (a.class > b.class) {
-                    return 1;
-                }
-                if (a.battleRating > b.battleRating) {
-                    return -1;
-                }
-                if (a.battleRating < b.battleRating) {
-                    return 1;
-                }
-                if (a.name < b.name) {
-                    return -1;
-                }
-                if (a.name > b.name) {
-                    return 1;
-                }
-                return 0;
-            });
+            .sort((a, b) => a.class - b.class || a.battleRating - b.battleRating || a.name - b.name);
 
     workbook.creator = "iB aka Felix Victor";
     workbook.created = now;
 
     const dwSheet = workbook.addWorksheet("Deep water port", {
-            properties: { tabColor: { argb: "d5bb99" } },
-            views: [{ state: "frozen", xSplit: 5, ySplit: 2 }]
+            properties: { tabColor: { argb: "d5bb99" } }
         }),
         swSheet = workbook.addWorksheet("Shallow water port", {
-            properties: { tabColor: { argb: "cddfe6" } },
-            views: [{ state: "frozen", xSplit: 5, ySplit: 2 }]
+            properties: { tabColor: { argb: "cddfe6" } }
         });
 
     fillSheet(dwSheet, dwShips);
