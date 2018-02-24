@@ -42,7 +42,7 @@ function convertShips() {
 
         const shipData = {
             id: ship.Id,
-            name: ship.Name.replaceAll("'", "’"),
+            name: ship.Name.replace("L'Ocean", "L'Océan").replaceAll("'", "’"),
             class: ship.Class,
             healthInfo: ship.HealthInfo,
             shipMass: ship.ShipMass,
