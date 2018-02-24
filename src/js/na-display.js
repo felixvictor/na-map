@@ -1568,7 +1568,6 @@ predictWind(direction, `${predictTime.hours()}:${predictTime.minutes()}`);
         setupListener();
         moment.locale("en-gb");
     }
-
     function shipCompare() {
         function shipSelected(shipId, shipNumber) {
             function isEmpty(obj) {
@@ -1610,8 +1609,7 @@ predictWind(direction, `${predictTime.hours()}:${predictTime.minutes()}`);
                     .enter()
                     .append("circle")
                     .attr("class", "knots-circle")
-                    .attr("r", d => defaults.radiusScaleAbsolute(d))
-                    .attr("id", (d, i) => `tick${i}`);
+                    .attr("r", d => defaults.radiusScaleAbsolute(d));
 
                 // Add the paths for the text
                 svg
@@ -1620,7 +1618,7 @@ predictWind(direction, `${predictTime.hours()}:${predictTime.minutes()}`);
                     .enter()
                     .append("path")
                     .attr("d", knotsArc)
-                    .attr("id", (d, i) => `tic${i}`);
+                    .attr("id", (d, i) => `tick${i}`);
 
                 // And add the text
                 svg
@@ -1630,7 +1628,7 @@ predictWind(direction, `${predictTime.hours()}:${predictTime.minutes()}`);
                     .append("text")
                     .attr("class", "knots-text")
                     .append("textPath")
-                    .attr("xlink:href", (d, i) => `#tic${i}`)
+                    .attr("href", (d, i) => `#tick${i}`)
                     .text((d, i) => tickLabels[i])
                     .attr("startOffset", "16%");
             }
@@ -1685,18 +1683,18 @@ predictWind(direction, `${predictTime.hours()}:${predictTime.minutes()}`);
                         .radius(d => defaults.radiusScaleAbsolute(d.data))
                         .curve(curve);
 
-                const path = svg.append("path");
-                const markers = svg.append("g").attr("class", "markers");
-                path
+                const profile = svg.append("path");
+                const markers = svg.append("g").classed("markers", true);
+                profile
                     .attr("d", line(arcs))
                     .attr("stroke-width", "5px")
                     .attr("stroke", "url(#gradient)");
 
-                const sel = markers.selectAll("circle").data(arcs);
-                sel
+                const markersUpdate = markers
+                    .selectAll("circle")
+                    .data(arcs)
                     .enter()
                     .append("circle")
-                    .merge(sel)
                     .attr("r", "5")
                     .attr("cy", (d, i) => Math.cos(i * defaults.segmentRadians) * -defaults.radiusScaleAbsolute(d.data))
                     .attr("cx", (d, i) => Math.sin(i * defaults.segmentRadians) * defaults.radiusScaleAbsolute(d.data))
@@ -1788,7 +1786,7 @@ predictWind(direction, `${predictTime.hours()}:${predictTime.minutes()}`);
             function printText(ship, svgId) {
                 const p = d3.select(svgId).select("p");
                 let text = "";
-console.log(ship);
+                console.log(ship);
                 text += `${ship.name} (${getOrdinal(ship.class)} rate) <small>${ship.battleRating} battle rating`;
                 text += "<br>";
                 text += `${ship.decks} decks (${getCannonsPerDeck(ship)} cannons)`;
@@ -1887,6 +1885,7 @@ console.log(ship);
             // console.log(`ship id: ${shipId}`);
             const profileData = defaults.shipData.filter(ship => ship.id === +shipId)[0];
             const svgId = `#ship${shipNumber}`;
+            d3.select(`${svgId} g`).remove();
             if (shipNumber === "A") {
                 if (isEmpty(current.shipAData)) {
                     setBackground(svgId);
@@ -1898,10 +1897,11 @@ console.log(ship);
                 setBackgroundGradient(svgId);
                 current.shipBData = JSON.parse(JSON.stringify(profileData));
             }
-            // console.log(`profileData: ${JSON.stringify(profileData)}`);
+            // console.log("profileData ", profileData);
             drawProfile(profileData, svgId);
             printText(profileData, svgId);
             if (!isEmpty(current.shipAData) && !isEmpty(current.shipBData)) {
+                d3.select("#ship-compare g").remove();
                 setBackground("#ship-compare");
                 drawDifferenceProfile("#ship-compare");
                 printTextCompare("#ship-compare");
