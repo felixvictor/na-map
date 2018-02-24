@@ -9,7 +9,8 @@ const CopyPlugin = require("copy-webpack-plugin"),
     ExtractTextPlugin = require("extract-text-webpack-plugin"),
     HtmlPlugin = require("html-webpack-plugin"),
     MinifyPlugin = require("babel-minify-webpack-plugin"),
-    SitemapPlugin = require("sitemap-webpack-plugin").default;
+    SitemapPlugin = require("sitemap-webpack-plugin").default,
+    SriPlugin = require("webpack-subresource-integrity");
 
 const sitemapPaths = ["/fonts/", "/icons", "/images"];
 
@@ -145,7 +146,8 @@ const config = {
 
     output: {
         path: `${__dirname}/public`,
-        filename: `${libraryName}.min.js`
+        filename: `${libraryName}.min.js`,
+        crossOriginLoading: "anonymous"
     },
 
     plugins: [
@@ -172,6 +174,8 @@ const config = {
         new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
         new CopyPlugin([
             { from: "google979f2cf3bed204d6.html", to: "google979f2cf3bed204d6.html", toType: "file" },
+            { from: "images/map", to: "../public/images/map" },
+            { from: "images/icons", to: "../public/images/icons" },
             { from: "*.json" },
             { from: "*.xlsx" }
         ]),
@@ -186,7 +190,11 @@ const config = {
             title: "Naval Action map",
             version: PACKAGE.version
         }),
-        new SitemapPlugin("https://na-map.netlify.com/", sitemapPaths, { skipGzip: false })
+        new SitemapPlugin("https://na-map.netlify.com/", sitemapPaths, { skipGzip: false }),
+        new SriPlugin({
+            hashFuncNames: ["sha256", "sha384"],
+            enabled: process.env.NODE_ENV === "prod"
+        })
     ],
 
     stats: "normal",
