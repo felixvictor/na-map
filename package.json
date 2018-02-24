@@ -48,7 +48,8 @@
     "svg-url-loader": "^2.2.1",
     "topojson": "^3.0.2",
     "url-loader": "^0.5.9",
-    "webpack": "^3.5.5"
+    "webpack": "^3.5.5",
+    "webpack-subresource-integrity": "^1.0.4"
   },
   "dependencies": {
     "@fortawesome/fontawesome": "^1.1.2",
