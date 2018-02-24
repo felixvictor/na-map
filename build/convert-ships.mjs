@@ -4,7 +4,9 @@ const inBaseFilename = process.argv[2],
     outFilename = process.argv[3],
     date = process.argv[4];
 
-const APIItems = JSON.parse(fs.readFileSync(`${inBaseFilename}-ItemTemplates-${date}.json`, "utf8"));
+const APIItems = JSON.parse(fs.readFileSync(`${inBaseFilename}-ItemTemplates-${date}.json`, "utf8")),
+    constA = 0.076752029372859,
+    constB = 0.007759512279223;
 
 function saveJson(data) {
     // eslint-disable-next-line consistent-return
@@ -23,11 +25,13 @@ String.prototype.replaceAll = function(search, replacement) {
 };
 
 function convertShips() {
-    const geoJson = {};
+    const geoJson = {},
+        cannonWeight = [0, 42, 32, 24, 18, 12, 9, 6, 4],
+        carroWeight = [0, 0, 68, 42, 32, 24, 18, 12];
     geoJson.shipData = [];
 
     APIItems.filter(item => item.ItemType === "Ship").forEach(ship => {
-        const calcPortSpeed = ship.Specs.MaxSpeed * 0.076752029372859 - 0.007759512279223,
+        const calcPortSpeed = ship.Specs.MaxSpeed * constA - constB,
             speedDegrees = ship.Specs.SpeedToWind.map(d => d * calcPortSpeed);
 
         const { length } = ship.Specs.SpeedToWind;
@@ -45,6 +49,13 @@ function convertShips() {
             name: ship.Name.replace("'", "’").replace("L’Ocean", "L’Océan"),
             class: ship.Class,
             healthInfo: ship.HealthInfo,
+            gunsPerDeck: ship.GunsPerDeck,
+            deckClassLimit: ship.DeckClassLimit.map(deck => [
+                cannonWeight[deck.Limitation1.Min],
+                carroWeight[deck.Limitation2.Min]
+            ]),
+            frontDeckClassLimit: ship.FrontDeckClassLimit,
+            backDeckClassLimit: ship.BackDeckClassLimit,
             shipMass: ship.ShipMass,
             battleRating: ship.BattleRating,
             decks: ship.Decks,
@@ -55,29 +66,14 @@ function convertShips() {
             maxSpeed: speedDegrees.reduce((a, b) => Math.max(a, b)),
             speedDegrees,
             maxTurningSpeed: ship.Specs.MaxTurningSpeed,
-            acceleration: ship.Specs.Acceleration,
-            deceleration: ship.Specs.Deceleration,
-            premium: ship.Premium,
-            captureType: ship.CaptureType
+            // captureType: ship.CaptureType,
+            upgradeXP: ship.OverrideTotalXpForUpgradeSlots,
+            // hostilityScore: ship.HostilityScore
         };
         geoJson.shipData.push(shipData);
     });
 
-    geoJson.shipData.sort((a, b) => {
-        if (a.class < b.class) {
-            return -1;
-        }
-        if (a.class > b.class) {
-            return 1;
-        }
-        if (a.name < b.name) {
-            return -1;
-        }
-        if (a.name > b.name) {
-            return 1;
-        }
-        return 0;
-    });
+    geoJson.shipData.sort((a, b) => a.class - b.class || b.battleRating - a.battleRating || a.name - b.name);
 
     saveJson(geoJson);
 }
