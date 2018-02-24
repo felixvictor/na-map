@@ -175,6 +175,7 @@ const config = {
         new CopyPlugin([
             { from: "google979f2cf3bed204d6.html", to: "google979f2cf3bed204d6.html", toType: "file" },
             { from: "images/map", to: "../public/images/map" },
+            { from: "images/icons", to: "../public/images/icons" },
             { from: "*.json" },
             { from: "*.xlsx" }
         ]),
