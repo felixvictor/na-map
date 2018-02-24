@@ -190,6 +190,14 @@
     "@babel/traverse" "7.0.0-beta.37"
     "@babel/types" "7.0.0-beta.37"
 
+"@babel/highlight@^7.0.0-beta.40":
+  version "7.0.0-beta.40"
+  resolved "https://registry.yarnpkg.com/@babel/highlight/-/highlight-7.0.0-beta.40.tgz#b43d67d76bf46e1d10d227f68cddcd263786b255"
+  dependencies:
+    chalk "^2.0.0"
+    esutils "^2.0.2"
+    js-tokens "^3.0.0"
+
 "@babel/plugin-check-constants@7.0.0-beta.37":
   version "7.0.0-beta.37"
   resolved "https://registry.yarnpkg.com/@babel/plugin-check-constants/-/plugin-check-constants-7.0.0-beta.37.tgz#dfed9eed66a047f41d900e114b90858888e08222"
