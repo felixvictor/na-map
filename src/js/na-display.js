@@ -195,6 +195,7 @@ export default function naDisplay(serverName) {
             ),
             tiles = [];
 
+        /*
         console.group("zoom");
         console.log("x, dx, y, dy, width, height ", x, dx, y, dy, width, height);
         console.log("k, zoom, scale ", k, zoom, scale);
@@ -202,6 +203,7 @@ export default function naDisplay(serverName) {
         // console.log("defaults.maxTileZoom ", defaults.maxTileZoom);
         console.log("cols, rows ", cols, rows);
         console.groupEnd();
+        */
 
         rows.forEach(row => {
             cols.forEach(col => {
