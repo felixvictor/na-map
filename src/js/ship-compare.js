@@ -63,8 +63,9 @@ export default function shipCompare(shipData) {
                 .attr("fill", "none")
                 .append("g")
                 .attr("transform", `translate(${svgWidth / 2}, ${svgHeight / 2})`);
-            d3Select(`${this.select} p`).remove();
-            d3Select(this.select).append("p");
+            d3Select(`${this.select} 
+            div`).remove();
+            d3Select(this.select).append("div");
         }
 
         static getCannonsPerDeck(healthInfo) {
@@ -197,37 +198,46 @@ export default function shipCompare(shipData) {
         }
 
         printText() {
-            const p = d3Select(`${this.select} p`);
-            let text = "";
-            console.log(this.shipData);
-            text += `${this.shipData.name} (${getOrdinal(this.shipData.class)} rate) <small>${
-                this.shipData.battleRating
-            } battle rating`;
-            text += "<br>";
-            text += `${this.shipData.decks} decks (${Ship.getCannonsPerDeck(this.shipData.healthInfo)} cannons)`;
-            text += "<br>";
-            text += `Minimum speed: ${this.shipData.minSpeed.toFixed(
+            let text = `<p>${this.shipData.name} (${getOrdinal(this.shipData.class)} rate)</p>`;
+            text += '<small><table class="table table-sm  table-striped"><tbody>';
+            text += `<tr><td>Battle rating</td><td colspan="2">${this.shipData.battleRating}</td></tr>`;
+            text += `<tr><td>${this.shipData.decks} decks (cannons)</td><td colspan="2">${Ship.getCannonsPerDeck(
+                this.shipData.healthInfo
+            )}</td></tr>`;
+            text += `<tr><td>Speed (knots)</td><td>${this.shipData.minSpeed.toFixed(
                 2
-            )}, maximum speed: ${this.shipData.maxSpeed.toFixed(2)} knots`;
-            text += "<br>";
-            text += `Turning speed: ${this.shipData.maxTurningSpeed.toFixed(2)}`;
-            text += "<br>";
-            text += `Armor: ${this.shipData.healthInfo.LeftArmor} sides, ${
-                this.shipData.healthInfo.FrontArmor
-            } front, ${this.shipData.healthInfo.BackArmor} back, ${
-                this.shipData.healthInfo.InternalStructure
-            } structure, ${this.shipData.healthInfo.Sails} sails, ${this.shipData.healthInfo.Pump} pump, ${
-                this.shipData.healthInfo.Rudder
-            } rudder`;
-            text += "<br>";
-            text += `${this.shipData.healthInfo.Crew} crew (minimum ${this.shipData.minCrewRequired})`;
-            text += "<br>";
-            text += `${this.shipData.maxWeight} hold in ${this.shipData.holdSize} compartments (${
-                this.shipData.shipMass
-            } ship mass)`;
-            text += "</small>";
+            )}<br><span class='des'>Minimum</span></td><td>${this.shipData.maxSpeed.toFixed(
+                2
+            )}<br><span class='des'>Maximum</span></td></tr>`;
+            text += "";
+            text += `<tr><td>Turning speed</td><td>${this.shipData.maxTurningSpeed.toFixed(2)}</td></tr>`;
 
-            p.html(text);
+            text += `<tr><td>Armor</td><td>${this.shipData.healthInfo.LeftArmor}<br><span class='des'>Sides</span><br>${
+                this.shipData.healthInfo.FrontArmor
+            }<br><span class='des'>Front</span><br>${
+                this.shipData.healthInfo.Pump
+            }<br><span class='des'>Pump</span><br>${
+                this.shipData.healthInfo.Sails
+            }<br><span class='des'>Sails</span></td><td>${
+                this.shipData.healthInfo.InternalStructure
+            }<br><span class='des'>Structure</span><br>${
+                this.shipData.healthInfo.BackArmor
+            }<br><span class='des'>Back</span><br>${
+                this.shipData.healthInfo.Rudder
+            }<br><span class='des'>Rudder</span></td></tr>`;
+
+            text += `<tr><td>Crew</td><td>${
+                this.shipData.minCrewRequired
+            }<br><span class='des'>Minimum</span></td><td>${
+                this.shipData.healthInfo.Crew
+            }<br><span class='des'>Maximum</span></td></tr>`;
+            text += `<tr><td>Hold</td><td>${this.shipData.maxWeight}<br><span class='des'>Tons</span></td><td>${
+                this.shipData.holdSize
+            }<br><span class='des'>Compartments</span></td></tr>`;
+            text += "</tbody></table></small>";
+            $(`${this.select}`)
+                .find("div")
+                .append(text);
         }
     }
 
@@ -304,8 +314,7 @@ export default function shipCompare(shipData) {
                 text += `'>${(a - b).toFixed(decimals)}</span>`;
                 return text;
             }
-            const p = d3Select(`${this.select} p`);
-            let text = "";
+
             const ship = {
                 class: getDiff(this.shipAData.class, this.shipBData.class),
                 battleRating: getDiff(this.shipAData.battleRating, this.shipBData.battleRating),
@@ -335,29 +344,41 @@ export default function shipCompare(shipData) {
                 holdSize: getDiff(this.shipAData.holdSize, this.shipBData.holdSize),
                 shipMass: getDiff(this.shipAData.shipMass, this.shipBData.shipMass)
             };
-            console.log(ship);
-            text += `${this.shipAData.name} (compared to ${this.shipBData.name}) <small>${
-                ship.battleRating
-            } battle rating`;
-            text += "<br>";
-            text += `${ship.decks} decks (${Ship.getCannonsPerDeck(ship.healthInfo)} cannons)`;
-            text += "<br>";
-            text += `Minimal speed: ${ship.minSpeed}, maximal speed: ${ship.maxSpeed} knots`;
-            text += "<br>";
-            text += `Turning speed: ${ship.maxTurningSpeed}`;
-            text += "<br>";
-            text += `Armor: ${ship.healthInfo.LeftArmor} sides, ${ship.healthInfo.FrontArmor} front, ${
-                ship.healthInfo.BackArmor
-            } back, ${ship.healthInfo.InternalStructure} structure, ${ship.healthInfo.Sails} sails, ${
-                ship.healthInfo.Pump
-            } pump, ${ship.healthInfo.Rudder} rudder`;
-            text += "<br>";
-            text += `${ship.healthInfo.Crew} crew (${ship.minCrewRequired} minimal)`;
-            text += "<br>";
-            text += `${ship.maxWeight} hold in ${ship.holdSize} compartments (${ship.shipMass} ship mass)`;
-            text += "</small>";
 
-            p.html(text);
+            let text = `<p>${this.shipAData.name} (compared to ${this.shipBData.name})</p>`;
+            text += '<small><table class="table table-sm  table-striped"><tbody>';
+            text += `<tr><td>Battle rating</td><td colspan="2">${ship.battleRating}</td></tr>`;
+            text += `<tr><td>${ship.decks} decks (cannons)</td><td colspan="2">${Ship.getCannonsPerDeck(
+                ship.healthInfo
+            )}</td></tr>`;
+            text += `<tr><td>Speed (knots)</td><td>${ship.minSpeed}<br><span class='des'>Minimum</span></td><td>${
+                ship.maxSpeed
+            }<br><span class='des'>Maximum</span></td></tr>`;
+            text += "";
+            text += `<tr><td>Turning speed</td><td>${ship.maxTurningSpeed}</td></tr>`;
+
+            text += `<tr><td>Armor</td><td>${ship.healthInfo.LeftArmor}<br><span class='des'>Sides</span><br>${
+                ship.healthInfo.FrontArmor
+            }<br><span class='des'>Front</span><br>${ship.healthInfo.Pump}<br><span class='des'>Pump</span><br>${
+                ship.healthInfo.Sails
+            }<br><span class='des'>Sails</span></td><td>${
+                ship.healthInfo.InternalStructure
+            }<br><span class='des'>Structure</span><br>${
+                ship.healthInfo.BackArmor
+            }<br><span class='des'>Back</span><br>${
+                ship.healthInfo.Rudder
+            }<br><span class='des'>Rudder</span></td></tr>`;
+
+            text += `<tr><td>Crew</td><td>${ship.minCrewRequired}<br><span class='des'>Minimum</span></td><td>${
+                ship.healthInfo.Crew
+            }<br><span class='des'>Maximum</span></td></tr>`;
+            text += `<tr><td>Hold</td><td>${ship.maxWeight}<br><span class='des'>Tons</span></td><td>${
+                ship.holdSize
+            }<br><span class='des'>Compartments</span></td></tr>`;
+            text += "</tbody></table></small>";
+            $(`${this.select}`)
+                .find("div")
+                .append(text);
         }
     }
 

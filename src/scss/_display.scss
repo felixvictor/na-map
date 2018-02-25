@@ -8,11 +8,24 @@
 
 $background-colour: $primary-300;
 
-.mm  {
+table {
+  border: none;
+}
+
+.des {
+  position: relative;
+  top: -.5em;
+  font-size: xx-small;
+  color: $primary-700;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+}
+
+.mm {
   color: $red;
 }
 
-.pp  {
+.pp {
   color: $green;
 }
 
