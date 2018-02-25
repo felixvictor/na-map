@@ -7,7 +7,7 @@
  <meta content="Naval Action map" name="description">
  <meta content="width=device-width,initial-scale=1" name="viewport">
  <script src="https://www.googletagmanager.com/gtag/js?id=UA-109520372-1" async></script>
-<link href="na-map.min.css?da03a1845d4fdd4dae8f" rel="stylesheet"></head>
+<link href="na-map.min.css?95d2b348a1fd0cce0b0e" rel="stylesheet"></head>
 <body>
 
 <nav class="bg-light fixed-top navbar navbar-expand-lg navbar-light">
@@ -218,6 +218,7 @@
     <p>Yet another map which uses the in-game map and live data (daily updated soonish after maintenance).
      Please check the <a href="http://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/">
       Game-Labs forum post</a> for further details. Feedback is very welcome.</p>
+    <p>Ship speed calculation with the help of jodgi.</p>
     <p>Designed by iB aka Felix Victor.</p>
    </div>
    <footer class="modal-footer">
@@ -240,15 +241,15 @@
                 <div class="container-fluid">
                     <div class="row">
                         <div class="ml-auto col-md-4 pt-2 columnA">
-                            <select class="custom-select" id="shipA-select" name="shipA-select" title="Select a ship">
+                            <select class="custom-select" id="ship-A-select" name="ship-A-select" title="Select a ship">
                             </select>
-                            <div id="shipA"></div>
+                            <div id="ship-A"></div>
                         </div>
-                        <div class="ml-auto col-md-4 pt-6" id="ship-compare"></div>
+                        <div class="ml-auto col-md-4 pt-6" id="ship-Compare"></div>
                         <div class="ml-auto col-md-4 pt-2 columnB">
-                            <select class="custom-select" id="shipB-select" name="shipB-select" title="Select a ship">
+                            <select class="custom-select" id="ship-B-select" name="ship-B-select" title="Select a ship">
                             </select>
-                            <div id="shipB"></div>
+                            <div id="ship-B"></div>
                         </div>
                     </div>
                 </div>
@@ -260,5 +261,5 @@
 </div></section>
 
 <script src="https://d3js.org/d3.v4.min.js"></script>
-<script src="na-map.min.js?da03a1845d4fdd4dae8f" type="text/javascript"></script></body>
+<script src="na-map.min.js?95d2b348a1fd0cce0b0e" type="text/javascript"></script></body>
 </html>
