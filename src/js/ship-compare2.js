@@ -80,6 +80,25 @@ export default function shipCompare2(shipData) {
         }
 
         setBackground() {
+            // Compass
+            const data = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                pie = d3Pie()
+                    .sort(null)
+                    .value(1)(data);
+
+            const arc = d3Arc()
+                .outerRadius(radiusScaleAbsolute(12))
+                .innerRadius(0);
+
+            const g = this.g
+                .selectAll(".compass-arc")
+                .data(pie)
+                .enter()
+                .append("g")
+                .attr("class", "compass-arc");
+
+            g.append("path").attr("d", arc);
+
             // Arc for text
             const knotsArc = d3Arc()
                 .outerRadius(d => radiusScaleAbsolute(d) + 2)
