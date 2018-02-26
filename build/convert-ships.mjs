@@ -36,11 +36,9 @@ function convertShips() {
 
         const { length } = ship.Specs.SpeedToWind;
         // Elemente kopieren
-        for (let i = 0; i < (length - 1) * 2; i += 2) {
+        for (let i = 1; i < (length - 1) * 2; i += 2) {
             speedDegrees.unshift(speedDegrees[i]);
         }
-        // Letztes Element nach vorne stellen
-        speedDegrees.unshift(speedDegrees[length * 2 - 1 - 1]);
         // Dann letztes Element löschen
         speedDegrees.pop();
 
