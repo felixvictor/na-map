@@ -45,7 +45,6 @@ export default function shipCompare2(shipData) {
 
     class Ship {
         constructor(compareId) {
-            console.log(compareId);
             this.id = compareId;
             this.select = `#ship-${this.id}`;
 
@@ -438,6 +437,9 @@ export default function shipCompare2(shipData) {
                 ships[compareId] = new ShipBase(compareId, singleShipData);
                 ["C1", "C2"].forEach(id => {
                     $(`#ship-${id}-select`).removeAttr("disabled");
+                    if (!isEmpty(ships[id])) {
+                        ships[id] = new ShipComparison(id, singleShipData, ships[id].shipCompareData);
+                    }
                 });
             } else {
                 ships[compareId] = new ShipComparison(compareId, ships.Base.shipData, singleShipData);
