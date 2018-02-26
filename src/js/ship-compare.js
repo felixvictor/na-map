@@ -36,8 +36,8 @@ export default function shipCompare(shipData) {
         minSpeed = d3Min(shipData, d => d.minSpeed),
         maxSpeed = d3Max(shipData, d => d.maxSpeed),
         colorScale = d3ScaleLinear()
-            .domain([minSpeed, 0, 10, 12, maxSpeed])
-            .range(["#a62e39", "#fbf8f5", "#2a6838", "#419f57", "#6cc380"])
+            .domain([minSpeed, 0, 4, 8, 12, maxSpeed])
+            .range(["#a62e39", "#fbf8f5", "#dbf0e0", "#a4dab0", "#6cc380", "#419f57"])
             .interpolate(d3InterpolateHcl),
         radiusScaleAbsolute = d3ScaleLinear()
             .domain([minSpeed, 0, maxSpeed])
@@ -135,7 +135,7 @@ export default function shipCompare(shipData) {
         setBackgroundGradient() {
             // Extra scale since the color scale is interpolated
             const gradientScale = d3ScaleLinear()
-                .domain([minSpeed, maxSpeed])
+                .domain([this.shipData.minSpeed, this.shipData.maxSpeed])
                 .range([0, svgWidth]);
 
             // Calculate the variables for the gradient
