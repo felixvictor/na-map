@@ -8,13 +8,15 @@
 
 $background-colour: $primary-300;
 
-table {
-  border: none;
+.table {
+  td {
+    border-top: none;
+  }
 }
 
 .des {
   position: relative;
-  top: -.5em;
+  top: -.4em;
   font-size: xx-small;
   color: $primary-700;
   text-transform: uppercase;
