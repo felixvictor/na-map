@@ -18,7 +18,7 @@ import "bootstrap-hardskilled-extend-select";
 import "bootstrap/js/dist/tooltip";
 import "bootstrap/js/dist/util";
 
-import ShipCompare from "./ship-compare";
+import ShipCompare2 from "./ship-compare2";
 
 export default function naDisplay(serverName) {
     let naSvg,
@@ -1592,7 +1592,7 @@ predictWind(direction, `${predictTime.hours()}:${predictTime.minutes()}`);
         updatePorts();
         */
 
-        const shipCompare = new ShipCompare(shipData);
+        const shipCompare = new ShipCompare2(shipData);
 
         /*
         let predictTime = moment().utc(),
