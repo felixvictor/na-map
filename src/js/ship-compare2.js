@@ -19,7 +19,7 @@ const svgWidth = 350,
     svgHeight = 350,
     outerRadius = Math.min(svgWidth, svgHeight) / 2,
     innerRadius = 0.3 * outerRadius,
-    numSegments = 25,
+    numSegments = 24,
     segmentRadians = 2 * Math.PI / numSegments;
 
 export default function shipCompare2(shipData) {
@@ -50,6 +50,7 @@ export default function shipCompare2(shipData) {
 
             this.setupSvg();
             this.g = d3Select(this.select).select("g");
+            this.setCompass();
         }
 
         setupSvg() {
@@ -64,6 +65,28 @@ export default function shipCompare2(shipData) {
                 .attr("transform", `translate(${svgWidth / 2}, ${svgHeight / 2})`);
             d3Select(`${this.select} div`).remove();
             d3Select(this.select).append("div");
+        }
+
+        setCompass() {
+            // Compass
+            const data = new Array(numSegments / 2);
+            data.fill(1, 0);
+            const pie = d3Pie()
+                .sort(null)
+                .value(1)(data);
+
+            const arc = d3Arc()
+                .outerRadius(radiusScaleAbsolute(12))
+                .innerRadius(innerRadius);
+
+            const g = this.g
+                .selectAll(".compass-arc")
+                .data(pie)
+                .enter()
+                .append("g")
+                .attr("class", "compass-arc");
+
+            g.append("path").attr("d", arc);
         }
     }
 
@@ -80,25 +103,6 @@ export default function shipCompare2(shipData) {
         }
 
         setBackground() {
-            // Compass
-            const data = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                pie = d3Pie()
-                    .sort(null)
-                    .value(1)(data);
-
-            const arc = d3Arc()
-                .outerRadius(radiusScaleAbsolute(12))
-                .innerRadius(0);
-
-            const g = this.g
-                .selectAll(".compass-arc")
-                .data(pie)
-                .enter()
-                .append("g")
-                .attr("class", "compass-arc");
-
-            g.append("path").attr("d", arc);
-
             // Arc for text
             const knotsArc = d3Arc()
                 .outerRadius(d => radiusScaleAbsolute(d) + 2)
