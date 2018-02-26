@@ -36,6 +36,10 @@ $background-colour: $primary-300;
   opacity: .4;
 }
 
+.compass-arc path {
+  stroke: $primary-200;
+}
+
 .arcsA {
   fill: $primary-600;
   stroke: none;
@@ -56,11 +60,11 @@ $background-colour: $primary-300;
 
 .knots-circle {
   fill: none;
-  stroke: $primary-400;
+  stroke: $primary-500;
 }
 
 .knots-text {
-  fill: $primary-400 !important;
+  fill: $primary-600 !important;
 }
 
 .solidArc:hover {
