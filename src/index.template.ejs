@@ -10,7 +10,7 @@
 </head>
 <body>
 
-<nav class="navbar fixed-top navbar-expand-lg navbar-light bg-light">
+<nav class="navbar fixed-top navbar-expand-lg">
  <a class="navbar-brand" href="#"><img src="images/na-map-brand.jpg" width="30" height="30" alt=""></a>
  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
          aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -172,6 +172,11 @@
     <select class="form-control" data-live-search="true" name="good-names" id="good-names" title="Select a good">
     </select>
    </li>
+
+   <li class="nav-item pl-2">
+    <a class="btn btn-primary" role="button" id="button-ship-compare">Ships</a>
+   </li>
+
   </ul>
 
   <ul class="navbar-nav ml-auto">
@@ -223,7 +228,7 @@
 <div id="na" class="na">
 </div>
 
-<section id="greetings" class="modal" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog">
+<section id="modal-greetings" class="modal" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <header class="modal-header">
@@ -247,7 +252,7 @@
  </div>
 </section>
 
-<section id="ships" class="modal" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog">
+<section id="modal-ships" class="modal" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <header class="modal-header">
