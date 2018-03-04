@@ -23,7 +23,7 @@ const svgWidth = 350,
     segmentRadians = 2 * Math.PI / numSegments;
 
 export default function shipCompare(shipData) {
-    const shipSelectData = shipData.map(ship => ({ id: ship.id, name: ship.name })).sort((a, b) => {
+    const shipSelectData = shipData.map(ship => ({ id: ship.id, name: ship.name, class: ship.class })).sort((a, b) => {
             if (a.name < b.name) {
                 return -1;
             }
@@ -219,8 +219,7 @@ export default function shipCompare(shipData) {
                 return s;
             }
 
-            let text = `<p>${this.shipData.name} (${getOrdinal(this.shipData.class)} rate)</p>`;
-            text += '<table class="table table-sm  table-striped"><tbody>';
+            let text = '<table class="table table-sm  table-striped"><tbody>';
             text += `<tr><td>Battle rating</td><td colspan="2">${this.shipData.battleRating}</td></tr>`;
             text += `<tr><td>${this.shipData.decks} decks</td><td colspan="2">${getCannonsPerDeck(
                 this.shipData.healthInfo
@@ -386,8 +385,7 @@ export default function shipCompare(shipData) {
                 shipMass: getDiff(this.shipCompareData.shipMass, this.shipBaseData.shipMass)
             };
 
-            let text = `<p>${this.shipCompareData.name} (${getOrdinal(this.shipCompareData.class)} rate)</p>`;
-            text += '<table class="table table-sm table-striped"><tbody>';
+            let text = '<table class="table table-sm table-striped"><tbody>';
             text += `<tr><td>Battle rating</td><td colspan="2">${this.shipCompareData.battleRating} ${
                 ship.battleRating
             }</td></tr>`;
@@ -440,8 +438,10 @@ export default function shipCompare(shipData) {
 
     function setupShipSelect(compareId) {
         const select = $(`#ship-${compareId}-select`);
-        const options = `<option value="" data-id="0">Select a ship</option>${shipSelectData
-            .map(ship => `<option value="${ship.id}">${ship.name}</option>`)
+        const options = `${shipSelectData
+            .map(
+                ship => `<option data-subtext="${getOrdinal(ship.class)} rate" value="${ship.id}">${ship.name}</option>`
+            )
             .join("")}`;
         select.append(options);
         if (compareId !== "Base") {
@@ -469,9 +469,6 @@ export default function shipCompare(shipData) {
                 } else {
                     ships[compareId] = new ShipComparison(compareId, ships.Base.shipData, singleShipData);
                 }
-            })
-            .selectpicker({
-                title: "Select a ship"
             })
             .selectpicker("refresh");
     }
