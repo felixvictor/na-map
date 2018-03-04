@@ -11,7 +11,7 @@ $sat: saturation($primary-colour);
 $lit: lightness($primary-colour);
 $hue: hue($primary-colour);
 
-$mix-weight: 60%;
+$mix-weight: 90%;
 
 @function colour-mixin($colour) {
   @return mix(hsl(hue($colour), $sat, $lit), $colour, $mix-weight);
@@ -20,20 +20,35 @@ $mix-weight: 60%;
 // Palettes
 $betty-white: mix(#eee, colour-mixin(#eee), 80);
 $blue: colour-mixin(#007bff);
-$green: colour-mixin(#28a745);
 $indigo: colour-mixin(#6610f2);
-$orange: colour-mixin(#fd7e14);
-$pink: colour-mixin(#e83e8c);
 $purple: colour-mixin(#6f42c1);
+$pink: colour-mixin(#e83e8c);
 $red: colour-mixin(#dc3545);
-$teal: colour-mixin(#20c997);
+$orange: colour-mixin(#fd7e14);
 $yellow: colour-mixin(#ffc107);
+$green: colour-mixin(#28a745);
+$teal: colour-mixin(#20c997);
+$cyan: colour-mixin(#17a2b8);
 
 $gray-dark: mix(#343a40, colour-mixin(#343a40), 60);
 $gray: mix(#495057, colour-mixin(#495057), 60);
-$gray-light: mix(#868e96, colour-mixin(#868e96), 60);
+$gray-light: mix(#6c757d, colour-mixin(#6c757d), 60);
 $gray-lighter: mix(#ced4da, colour-mixin(#ced4da), 60);
 $gray-lightest: mix(#f8f9fa, colour-mixin(#f8f9fa), 60);
+
+$white: mix(#fff, colour-mixin(#fff), 92);
+$gray-100: mix(#f8f9fa, colour-mixin(#f8f9fa), 60);
+$gray-200: mix(#e9ecef, colour-mixin(#e9ecef), 60);
+$gray-300: mix(#dee2e6, colour-mixin(#dee2e6), 60);
+$gray-400: mix(#ced4da, colour-mixin(#ced4da), 60);
+$gray-500: mix(#adb5bd, colour-mixin(#adb5bd), 60);
+$gray-600: mix(#6c757d, colour-mixin(#6c757d), 60);
+$gray-700: mix(#495057, colour-mixin(#495057), 60);
+$gray-800: mix(#343a40, colour-mixin(#343a40), 60);
+$gray-900: mix(#212529, colour-mixin(#212529), 60);
+//$black:    #000 !default;
+
+$light: $gray-200;
 
 $theme-colors: (
         "primary": $primary-colour,
