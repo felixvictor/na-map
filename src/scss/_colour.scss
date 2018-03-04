@@ -37,7 +37,7 @@ $gray-lighter: mix(#ced4da, colour-mixin(#ced4da), 60);
 $gray-lightest: mix(#f8f9fa, colour-mixin(#f8f9fa), 60);
 
 $white: mix(#fff, colour-mixin(#fff), 92);
-$gray-100: mix(#f8f9fa, colour-mixin(#f8f9fa), 60);
+$gray-100: mix(#f8f9fa, colour-mixin(#f8f9fa), 100);
 $gray-200: mix(#e9ecef, colour-mixin(#e9ecef), 60);
 $gray-300: mix(#dee2e6, colour-mixin(#dee2e6), 60);
 $gray-400: mix(#ced4da, colour-mixin(#ced4da), 60);
@@ -48,7 +48,8 @@ $gray-800: mix(#343a40, colour-mixin(#343a40), 60);
 $gray-900: mix(#212529, colour-mixin(#212529), 60);
 //$black:    #000 !default;
 
-$light: $gray-200;
+//$light:         $gray-100 !default;
+//$dark:          $gray-800 !default;
 
 $theme-colors: (
         "primary": $primary-colour,

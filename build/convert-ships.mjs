@@ -26,8 +26,8 @@ String.prototype.replaceAll = function(search, replacement) {
 
 function convertShips() {
     const geoJson = {},
-        cannonWeight = [0, 42, 32, 24, 18, 12, 9, 6, 4],
-        carroWeight = [0, 0, 68, 42, 32, 24, 18, 12];
+        cannonWeight = [0, 42, 32, 24, 18, 12, 9, 0, 6, 4],
+        carroWeight = [0, 0, 68, 42, 32, 24, 0, 18, 12];
     geoJson.shipData = [];
 
     APIItems.filter(item => item.ItemType === "Ship").forEach(ship => {
@@ -52,8 +52,6 @@ function convertShips() {
                 cannonWeight[deck.Limitation1.Min],
                 carroWeight[deck.Limitation2.Min]
             ]),
-            frontDeckClassLimit: ship.FrontDeckClassLimit,
-            backDeckClassLimit: ship.BackDeckClassLimit,
             shipMass: ship.ShipMass,
             battleRating: ship.BattleRating,
             decks: ship.Decks,
@@ -65,9 +63,44 @@ function convertShips() {
             speedDegrees,
             maxTurningSpeed: ship.Specs.MaxTurningSpeed,
             // captureType: ship.CaptureType,
-            upgradeXP: ship.OverrideTotalXpForUpgradeSlots,
+            upgradeXP: ship.OverrideTotalXpForUpgradeSlots
             // hostilityScore: ship.HostilityScore
         };
+        // Delete mortar entry
+        shipData.gunsPerDeck.pop();
+        shipData.guns = 0;
+        shipData.cannonBroadside = 0;
+        shipData.carroBroadside = 0;
+        let t = [0, 0];
+        for (let i = 0; i < 4; i += 1) {
+            if (shipData.deckClassLimit[i]) {
+                shipData.guns += shipData.gunsPerDeck[i];
+                if (shipData.deckClassLimit[i][1]) {
+                    shipData.carroBroadside += shipData.gunsPerDeck[i] * shipData.deckClassLimit[i][1] / 2;
+                } else {
+                    shipData.carroBroadside += shipData.gunsPerDeck[i] * shipData.deckClassLimit[i][0] / 2;
+                }
+                shipData.cannonBroadside += shipData.gunsPerDeck[i] * shipData.deckClassLimit[i][0] / 2;
+            } else {
+                shipData.deckClassLimit.push(t);
+            }
+        }
+
+        if (ship.FrontDecks) {
+            t = ship.FrontDeckClassLimit.map(deck => [
+                cannonWeight[deck.Limitation1.Min],
+                carroWeight[deck.Limitation2.Min]
+            ])[0];
+        }
+        shipData.deckClassLimit.push(t);
+        t = [0, 0];
+        if (ship.BackDecks) {
+            t = ship.BackDeckClassLimit.map(deck => [
+                cannonWeight[deck.Limitation1.Min],
+                carroWeight[deck.Limitation2.Min]
+            ])[0];
+        }
+        shipData.deckClassLimit.push(t);
         geoJson.shipData.push(shipData);
     });
 
