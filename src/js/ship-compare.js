@@ -451,21 +451,29 @@ export default function shipCompare(shipData) {
 
     function setupListener(compareId) {
         const select = $(`#ship-${compareId}-select`);
-        select.change(() => {
-            const shipId = +select.val();
-            const singleShipData = shipData.filter(ship => ship.id === shipId)[0];
-            if (compareId === "Base") {
-                ships[compareId] = new ShipBase(compareId, singleShipData);
-                ["C1", "C2"].forEach(id => {
-                    $(`#ship-${id}-select`).removeAttr("disabled");
-                    if (!isEmpty(ships[id])) {
-                        ships[id] = new ShipComparison(id, singleShipData, ships[id].shipCompareData);
-                    }
-                });
-            } else {
-                ships[compareId] = new ShipComparison(compareId, ships.Base.shipData, singleShipData);
-            }
-        });
+        select
+            .addClass("selectpicker")
+            .on("change", () => {
+                const shipId = +select.val();
+                const singleShipData = shipData.filter(ship => ship.id === shipId)[0];
+                if (compareId === "Base") {
+                    ships[compareId] = new ShipBase(compareId, singleShipData);
+                    ["C1", "C2"].forEach(id => {
+                        $(`#ship-${id}-select`)
+                            .removeAttr("disabled")
+                            .selectpicker("refresh");
+                        if (!isEmpty(ships[id])) {
+                            ships[id] = new ShipComparison(id, singleShipData, ships[id].shipCompareData);
+                        }
+                    });
+                } else {
+                    ships[compareId] = new ShipComparison(compareId, ships.Base.shipData, singleShipData);
+                }
+            })
+            .selectpicker({
+                title: "Select a ship"
+            })
+            .selectpicker("refresh");
     }
 
     $("#modal-ships").modal("show");
