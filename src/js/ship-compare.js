@@ -1,5 +1,5 @@
 /*
-    ship-compare.js
+    ship-compare2.js
  */
 
 import { min as d3Min, max as d3Max, range as d3Range } from "d3-array";
@@ -19,7 +19,7 @@ const svgWidth = 350,
     svgHeight = 350,
     outerRadius = Math.min(svgWidth, svgHeight) / 2,
     innerRadius = 0.3 * outerRadius,
-    numSegments = 25,
+    numSegments = 24,
     segmentRadians = 2 * Math.PI / numSegments;
 
 export default function shipCompare(shipData) {
@@ -32,12 +32,12 @@ export default function shipCompare(shipData) {
             }
             return 0;
         }),
-        ships = { A: {}, B: {}, Compare: {} },
+        ships = { Base: {}, C1: {}, C2: {} },
         minSpeed = d3Min(shipData, d => d.minSpeed),
         maxSpeed = d3Max(shipData, d => d.maxSpeed),
         colorScale = d3ScaleLinear()
             .domain([minSpeed, 0, 4, 8, 12, maxSpeed])
-            .range(["#a62e39", "#fbf8f5", "#dbf0e0", "#a4dab0", "#6cc380", "#419f57"])
+            .range(["#a62e39", "#fbf8f5", "#a4dab0", "#6cc380", "#419f57"])
             .interpolate(d3InterpolateHcl),
         radiusScaleAbsolute = d3ScaleLinear()
             .domain([minSpeed, 0, maxSpeed])
@@ -45,12 +45,12 @@ export default function shipCompare(shipData) {
 
     class Ship {
         constructor(compareId) {
-            console.log(compareId);
             this.id = compareId;
             this.select = `#ship-${this.id}`;
 
             this.setupSvg();
             this.g = d3Select(this.select).select("g");
+            this.setCompass();
         }
 
         setupSvg() {
@@ -63,21 +63,34 @@ export default function shipCompare(shipData) {
                 .attr("fill", "none")
                 .append("g")
                 .attr("transform", `translate(${svgWidth / 2}, ${svgHeight / 2})`);
-            d3Select(`${this.select} 
-            div`).remove();
+            d3Select(`${this.select} div`).remove();
             d3Select(this.select).append("div");
         }
 
-        static getCannonsPerDeck(healthInfo) {
-            let s = healthInfo.Deck4.toString();
-            [healthInfo.Deck3, healthInfo.Deck2, healthInfo.Deck1].forEach(cannons => {
-                s = `${cannons} | ${s}`;
-            });
-            return s;
+        setCompass() {
+            // Compass
+            const data = new Array(numSegments / 2);
+            data.fill(1, 0);
+            const pie = d3Pie()
+                .sort(null)
+                .value(1)(data);
+
+            const arc = d3Arc()
+                .outerRadius(radiusScaleAbsolute(12))
+                .innerRadius(innerRadius);
+
+            const g = this.g
+                .selectAll(".compass-arc")
+                .data(pie)
+                .enter()
+                .append("g")
+                .attr("class", "compass-arc");
+
+            g.append("path").attr("d", arc);
         }
     }
 
-    class ShipStandard extends Ship {
+    class ShipBase extends Ship {
         constructor(compareId, singleShipData) {
             super(compareId);
 
@@ -198,10 +211,18 @@ export default function shipCompare(shipData) {
         }
 
         printText() {
+            function getCannonsPerDeck(healthInfo) {
+                let s = healthInfo.Deck4.toString();
+                [healthInfo.Deck3, healthInfo.Deck2, healthInfo.Deck1].forEach(cannons => {
+                    s = `${cannons} | ${s}`;
+                });
+                return s;
+            }
+
             let text = `<p>${this.shipData.name} (${getOrdinal(this.shipData.class)} rate)</p>`;
             text += '<small><table class="table table-sm  table-striped"><tbody>';
             text += `<tr><td>Battle rating</td><td colspan="2">${this.shipData.battleRating}</td></tr>`;
-            text += `<tr><td>${this.shipData.decks} decks (cannons)</td><td colspan="2">${Ship.getCannonsPerDeck(
+            text += `<tr><td>${this.shipData.decks} decks</td><td colspan="2">${getCannonsPerDeck(
                 this.shipData.healthInfo
             )}</td></tr>`;
             text += `<tr><td>Speed (knots)</td><td>${this.shipData.minSpeed.toFixed(
@@ -242,10 +263,10 @@ export default function shipCompare(shipData) {
     }
 
     class ShipComparison extends Ship {
-        constructor(shipAData, shipBData) {
-            super("Compare", {});
-            this.shipAData = shipAData;
-            this.shipBData = shipBData;
+        constructor(compareId, shipBaseData, shipCompareData) {
+            super(compareId);
+            this.shipBaseData = shipBaseData;
+            this.shipCompareData = shipCompareData;
 
             this.drawDifferenceProfile();
             this.printTextComparison();
@@ -253,14 +274,14 @@ export default function shipCompare(shipData) {
 
         drawDifferenceProfile() {
             const colorScaleDiff = d3ScaleLinear()
-                .domain(["A", "B"])
-                .range(["#a62e39", "#fbf8f5", "#2a6838", "#419f57", "#6cc380"]);
+                .domain(["Base", "Compare"])
+                .range(["#a62e39", "#fbf8f5", "#a4dab0", "#6cc380", "#419f57"]);
 
             const pie = d3Pie()
                 .sort(null)
                 .value(1);
-            const arcsA = pie(this.shipAData.speedDegrees),
-                arcsB = pie(this.shipBData.speedDegrees);
+            const arcsA = pie(this.shipBaseData.speedDegrees),
+                arcsB = pie(this.shipCompareData.speedDegrees);
             const curve = d3CurveCatmullRomClosed,
                 lineA = d3RadialLine()
                     .angle((d, i) => i * segmentRadians)
@@ -308,71 +329,106 @@ export default function shipCompare(shipData) {
         }
 
         printTextComparison() {
+            function getCannonsPerDeck(shipCompare, shipDiff) {
+                let s = `${shipCompare.Deck4} (${shipDiff.Deck4})`;
+                ["Deck3", "Deck2", "Deck1"].forEach(deck => {
+                    s = `${shipCompare[deck]} (${shipDiff[deck]}) | ${s}`;
+                });
+                return s;
+            }
+
             function getDiff(a, b, decimals = 0) {
-                let text = "<span class='";
-                text += a < b ? "mm" : "pp";
-                text += `'>${(a - b).toFixed(decimals)}</span>`;
-                return text;
+                const diff = parseFloat((a - b).toFixed(decimals));
+                if (diff < 0) {
+                    return `<span class="badge badge-danger">\u2212\u202f${Math.abs(diff)}</span>`;
+                } else if (diff > 0) {
+                    return `<span class="badge badge-success">+\u202f${diff}</span>`;
+                }
+                return '<span class="badge badge-light">0</span>';
             }
 
             const ship = {
-                class: getDiff(this.shipAData.class, this.shipBData.class),
-                battleRating: getDiff(this.shipAData.battleRating, this.shipBData.battleRating),
-                decks: getDiff(this.shipAData.decks, this.shipBData.decks),
-                minSpeed: getDiff(this.shipAData.minSpeed, this.shipBData.minSpeed, 2),
-                maxSpeed: getDiff(this.shipAData.maxSpeed, this.shipBData.maxSpeed, 2),
-                maxTurningSpeed: getDiff(this.shipAData.maxTurningSpeed, this.shipBData.maxTurningSpeed, 2),
+                class: getDiff(this.shipCompareData.class, this.shipBaseData.class),
+                battleRating: getDiff(this.shipCompareData.battleRating, this.shipBaseData.battleRating),
+                decks: getDiff(this.shipCompareData.decks, this.shipBaseData.decks),
+                minSpeed: getDiff(this.shipCompareData.minSpeed, this.shipBaseData.minSpeed, 2),
+                maxSpeed: getDiff(this.shipCompareData.maxSpeed, this.shipBaseData.maxSpeed, 2),
+                maxTurningSpeed: getDiff(this.shipCompareData.maxTurningSpeed, this.shipBaseData.maxTurningSpeed, 2),
                 healthInfo: {
-                    Deck1: getDiff(this.shipAData.healthInfo.Deck1, this.shipBData.healthInfo.Deck1),
-                    Deck2: getDiff(this.shipAData.healthInfo.Deck2, this.shipBData.healthInfo.Deck2),
-                    Deck3: getDiff(this.shipAData.healthInfo.Deck3, this.shipBData.healthInfo.Deck3),
-                    Deck4: getDiff(this.shipAData.healthInfo.Deck4, this.shipBData.healthInfo.Deck4),
-                    LeftArmor: getDiff(this.shipAData.healthInfo.LeftArmor, this.shipBData.healthInfo.LeftArmor),
-                    FrontArmor: getDiff(this.shipAData.healthInfo.FrontArmor, this.shipBData.healthInfo.FrontArmor),
-                    BackArmor: getDiff(this.shipAData.healthInfo.BackArmor, this.shipBData.healthInfo.BackArmor),
-                    InternalStructure: getDiff(
-                        this.shipAData.healthInfo.InternalStructure,
-                        this.shipBData.healthInfo.InternalStructure
+                    Deck1: getDiff(this.shipCompareData.healthInfo.Deck1, this.shipBaseData.healthInfo.Deck1),
+                    Deck2: getDiff(this.shipCompareData.healthInfo.Deck2, this.shipBaseData.healthInfo.Deck2),
+                    Deck3: getDiff(this.shipCompareData.healthInfo.Deck3, this.shipBaseData.healthInfo.Deck3),
+                    Deck4: getDiff(this.shipCompareData.healthInfo.Deck4, this.shipBaseData.healthInfo.Deck4),
+                    LeftArmor: getDiff(
+                        this.shipCompareData.healthInfo.LeftArmor,
+                        this.shipBaseData.healthInfo.LeftArmor
                     ),
-                    Sails: getDiff(this.shipAData.healthInfo.Sails, this.shipBData.healthInfo.Sails),
-                    Pump: getDiff(this.shipAData.healthInfo.Pump, this.shipBData.healthInfo.Pump),
-                    Rudder: getDiff(this.shipAData.healthInfo.Rudder, this.shipBData.healthInfo.Rudder),
-                    Crew: getDiff(this.shipAData.healthInfo.Crew, this.shipBData.healthInfo.Crew)
+                    FrontArmor: getDiff(
+                        this.shipCompareData.healthInfo.FrontArmor,
+                        this.shipBaseData.healthInfo.FrontArmor
+                    ),
+                    BackArmor: getDiff(
+                        this.shipCompareData.healthInfo.BackArmor,
+                        this.shipBaseData.healthInfo.BackArmor
+                    ),
+                    InternalStructure: getDiff(
+                        this.shipCompareData.healthInfo.InternalStructure,
+                        this.shipBaseData.healthInfo.InternalStructure
+                    ),
+                    Sails: getDiff(this.shipCompareData.healthInfo.Sails, this.shipBaseData.healthInfo.Sails),
+                    Pump: getDiff(this.shipCompareData.healthInfo.Pump, this.shipBaseData.healthInfo.Pump),
+                    Rudder: getDiff(this.shipCompareData.healthInfo.Rudder, this.shipBaseData.healthInfo.Rudder),
+                    Crew: getDiff(this.shipCompareData.healthInfo.Crew, this.shipBaseData.healthInfo.Crew)
                 },
-                minCrewRequired: getDiff(this.shipAData.minCrewRequired, this.shipBData.minCrewRequired),
-                maxWeight: getDiff(this.shipAData.maxWeight, this.shipBData.maxWeight),
-                holdSize: getDiff(this.shipAData.holdSize, this.shipBData.holdSize),
-                shipMass: getDiff(this.shipAData.shipMass, this.shipBData.shipMass)
+                minCrewRequired: getDiff(this.shipCompareData.minCrewRequired, this.shipBaseData.minCrewRequired),
+                maxWeight: getDiff(this.shipCompareData.maxWeight, this.shipBaseData.maxWeight),
+                holdSize: getDiff(this.shipCompareData.holdSize, this.shipBaseData.holdSize),
+                shipMass: getDiff(this.shipCompareData.shipMass, this.shipBaseData.shipMass)
             };
 
-            let text = `<p>${this.shipAData.name} (compared to ${this.shipBData.name})</p>`;
-            text += '<small><table class="table table-sm  table-striped"><tbody>';
-            text += `<tr><td>Battle rating</td><td colspan="2">${ship.battleRating}</td></tr>`;
-            text += `<tr><td>${ship.decks} decks (cannons)</td><td colspan="2">${Ship.getCannonsPerDeck(
+            let text = `<p>${this.shipCompareData.name} ${getOrdinal(this.shipCompareData.class)} rate</p>`;
+            text += '<small><table class="table table-sm table-striped"><tbody>';
+            text += `<tr><td>Battle rating</td><td colspan="2">${this.shipCompareData.battleRating} ${
+                ship.battleRating
+            }</td></tr>`;
+            text += `<tr><td>${this.shipCompareData.decks} ${ship.decks} decks</td><td colspan="2">${getCannonsPerDeck(
+                this.shipCompareData.healthInfo,
                 ship.healthInfo
             )}</td></tr>`;
-            text += `<tr><td>Speed (knots)</td><td>${ship.minSpeed}<br><span class='des'>Minimum</span></td><td>${
+            text += `<tr><td>Speed knots</td><td>${this.shipCompareData.minSpeed.toFixed(2)} ${
+                ship.minSpeed
+            }<br><span class='des'>Minimum</span></td><td>${this.shipCompareData.maxSpeed.toFixed(2)} ${
                 ship.maxSpeed
             }<br><span class='des'>Maximum</span></td></tr>`;
             text += "";
-            text += `<tr><td>Turning speed</td><td>${ship.maxTurningSpeed}</td></tr>`;
+            text += `<tr><td>Turning speed</td><td>${this.shipCompareData.maxTurningSpeed.toFixed(2)} ${
+                ship.maxTurningSpeed
+            }</td></tr>`;
 
-            text += `<tr><td>Armor</td><td>${ship.healthInfo.LeftArmor}<br><span class='des'>Sides</span><br>${
+            text += `<tr><td>Armor</td><td>${this.shipCompareData.healthInfo.LeftArmor} ${
+                ship.healthInfo.LeftArmor
+            }<br><span class='des'>Sides</span><br>${this.shipCompareData.healthInfo.FrontArmor} ${
                 ship.healthInfo.FrontArmor
-            }<br><span class='des'>Front</span><br>${ship.healthInfo.Pump}<br><span class='des'>Pump</span><br>${
+            }<br><span class='des'>Front</span><br>${this.shipCompareData.healthInfo.Pump} ${
+                ship.healthInfo.Pump
+            }<br><span class='des'>Pump</span><br>${this.shipCompareData.healthInfo.Sails} ${
                 ship.healthInfo.Sails
-            }<br><span class='des'>Sails</span></td><td>${
+            }<br><span class='des'>Sails</span></td><td>${this.shipCompareData.healthInfo.InternalStructure} ${
                 ship.healthInfo.InternalStructure
-            }<br><span class='des'>Structure</span><br>${
+            }<br><span class='des'>Structure</span><br>${this.shipCompareData.healthInfo.BackArmor} ${
                 ship.healthInfo.BackArmor
-            }<br><span class='des'>Back</span><br>${
+            }<br><span class='des'>Back</span><br>${this.shipCompareData.healthInfo.Rudder} ${
                 ship.healthInfo.Rudder
             }<br><span class='des'>Rudder</span></td></tr>`;
 
-            text += `<tr><td>Crew</td><td>${ship.minCrewRequired}<br><span class='des'>Minimum</span></td><td>${
+            text += `<tr><td>Crew</td><td>${this.shipCompareData.minCrewRequired} ${
+                ship.minCrewRequired
+            }<br><span class='des'>Minimum</span></td><td>${this.shipCompareData.healthInfo.Crew} ${
                 ship.healthInfo.Crew
             }<br><span class='des'>Maximum</span></td></tr>`;
-            text += `<tr><td>Hold</td><td>${ship.maxWeight}<br><span class='des'>Tons</span></td><td>${
+            text += `<tr><td>Hold</td><td>${this.shipCompareData.maxWeight} ${
+                ship.maxWeight
+            }<br><span class='des'>Tons</span></td><td>${this.shipCompareData.holdSize} ${
                 ship.holdSize
             }<br><span class='des'>Compartments</span></td></tr>`;
             text += "</tbody></table></small>";
@@ -388,11 +444,8 @@ export default function shipCompare(shipData) {
             .map(ship => `<option value="${ship.id}">${ship.name}</option>`)
             .join("")}`;
         select.append(options);
-    }
-
-    function CompareShips() {
-        if (!isEmpty(ships.A) && !isEmpty(ships.B)) {
-            ships.Compare = new ShipComparison(ships.A.shipData, ships.B.shipData);
+        if (compareId !== "Base") {
+            select.attr("disabled", "disabled");
         }
     }
 
@@ -401,12 +454,21 @@ export default function shipCompare(shipData) {
         select.change(() => {
             const shipId = +select.val();
             const singleShipData = shipData.filter(ship => ship.id === shipId)[0];
-            ships[compareId] = new ShipStandard(compareId, singleShipData);
-            CompareShips();
+            if (compareId === "Base") {
+                ships[compareId] = new ShipBase(compareId, singleShipData);
+                ["C1", "C2"].forEach(id => {
+                    $(`#ship-${id}-select`).removeAttr("disabled");
+                    if (!isEmpty(ships[id])) {
+                        ships[id] = new ShipComparison(id, singleShipData, ships[id].shipCompareData);
+                    }
+                });
+            } else {
+                ships[compareId] = new ShipComparison(compareId, ships.Base.shipData, singleShipData);
+            }
         });
     }
 
-    ["A", "B"].forEach(compareId => {
+    ["Base", "C1", "C2"].forEach(compareId => {
         setupShipSelect(compareId);
         setupListener(compareId);
     });
