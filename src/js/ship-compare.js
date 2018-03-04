@@ -1,5 +1,5 @@
 /*
-    ship-compare2.js
+    ship-compare.js
  */
 
 import { min as d3Min, max as d3Max, range as d3Range } from "d3-array";
@@ -13,7 +13,7 @@ import {
     radialLine as d3RadialLine
 } from "d3-shape";
 
-import { getOrdinal, isEmpty } from "./util";
+import { formatNumber, getOrdinal, isEmpty } from "./util";
 
 const svgWidth = 350,
     svgHeight = 350,
@@ -220,13 +220,13 @@ export default function shipCompare(shipData) {
             }
 
             let text = `<p>${this.shipData.name} (${getOrdinal(this.shipData.class)} rate)</p>`;
-            text += '<small><table class="table table-sm  table-striped"><tbody>';
+            text += '<table class="table table-sm  table-striped"><tbody>';
             text += `<tr><td>Battle rating</td><td colspan="2">${this.shipData.battleRating}</td></tr>`;
             text += `<tr><td>${this.shipData.decks} decks</td><td colspan="2">${getCannonsPerDeck(
                 this.shipData.healthInfo
             )}</td></tr>`;
-            text += `<tr><td>Speed (knots)</td><td>${this.shipData.minSpeed.toFixed(
-                2
+            text += `<tr><td>Speed (knots)</td><td>${formatNumber(
+                this.shipData.minSpeed.toFixed(2)
             )}<br><span class='des'>Minimum</span></td><td>${this.shipData.maxSpeed.toFixed(
                 2
             )}<br><span class='des'>Maximum</span></td></tr>`;
@@ -255,7 +255,7 @@ export default function shipCompare(shipData) {
             text += `<tr><td>Hold</td><td>${this.shipData.maxWeight}<br><span class='des'>Tons</span></td><td>${
                 this.shipData.holdSize
             }<br><span class='des'>Compartments</span></td></tr>`;
-            text += "</tbody></table></small>";
+            text += "</tbody></table>";
             $(`${this.select}`)
                 .find("div")
                 .append(text);
@@ -329,10 +329,10 @@ export default function shipCompare(shipData) {
         }
 
         printTextComparison() {
-            function getCannonsPerDeck(shipCompare, shipDiff) {
-                let s = `${shipCompare.Deck4} (${shipDiff.Deck4})`;
+            function getCannonsPerDeck(compareData, baseData) {
+                let s = `${compareData.Deck4} ${baseData.Deck4}`;
                 ["Deck3", "Deck2", "Deck1"].forEach(deck => {
-                    s = `${shipCompare[deck]} (${shipDiff[deck]}) | ${s}`;
+                    s = `${compareData[deck]} ${baseData[deck]} | ${s}`;
                 });
                 return s;
             }
@@ -340,11 +340,11 @@ export default function shipCompare(shipData) {
             function getDiff(a, b, decimals = 0) {
                 const diff = parseFloat((a - b).toFixed(decimals));
                 if (diff < 0) {
-                    return `<span class="badge badge-danger">\u2212\u202f${Math.abs(diff)}</span>`;
+                    return `<span class="badge badge-danger">${Math.abs(diff)}</span>`;
                 } else if (diff > 0) {
-                    return `<span class="badge badge-success">+\u202f${diff}</span>`;
+                    return `<span class="badge badge-success">${diff}</span>`;
                 }
-                return '<span class="badge badge-light">0</span>';
+                return "";
             }
 
             const ship = {
@@ -386,8 +386,8 @@ export default function shipCompare(shipData) {
                 shipMass: getDiff(this.shipCompareData.shipMass, this.shipBaseData.shipMass)
             };
 
-            let text = `<p>${this.shipCompareData.name} ${getOrdinal(this.shipCompareData.class)} rate</p>`;
-            text += '<small><table class="table table-sm table-striped"><tbody>';
+            let text = `<p>${this.shipCompareData.name} (${getOrdinal(this.shipCompareData.class)} rate)</p>`;
+            text += '<table class="table table-sm table-striped"><tbody>';
             text += `<tr><td>Battle rating</td><td colspan="2">${this.shipCompareData.battleRating} ${
                 ship.battleRating
             }</td></tr>`;
@@ -395,7 +395,7 @@ export default function shipCompare(shipData) {
                 this.shipCompareData.healthInfo,
                 ship.healthInfo
             )}</td></tr>`;
-            text += `<tr><td>Speed knots</td><td>${this.shipCompareData.minSpeed.toFixed(2)} ${
+            text += `<tr><td>Speed knots</td><td>${formatNumber(this.shipCompareData.minSpeed.toFixed(2))} ${
                 ship.minSpeed
             }<br><span class='des'>Minimum</span></td><td>${this.shipCompareData.maxSpeed.toFixed(2)} ${
                 ship.maxSpeed
@@ -431,7 +431,7 @@ export default function shipCompare(shipData) {
             }<br><span class='des'>Tons</span></td><td>${this.shipCompareData.holdSize} ${
                 ship.holdSize
             }<br><span class='des'>Compartments</span></td></tr>`;
-            text += "</tbody></table></small>";
+            text += "</tbody></table>";
             $(`${this.select}`)
                 .find("div")
                 .append(text);
@@ -468,6 +468,7 @@ export default function shipCompare(shipData) {
         });
     }
 
+    $("#modal-ships").modal("show");
     ["Base", "C1", "C2"].forEach(compareId => {
         setupShipSelect(compareId);
         setupListener(compareId);
