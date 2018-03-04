@@ -25,14 +25,16 @@ $spacers: (
 // Body
 $body-bg: $background-100;
 $body-color: $primary-800;
+$yiq-text-dark: $primary-900;
+//$yiq-text-light: $white !default;
 
 // Links
 $link-color: $secondary-700;
 $link-hover-color: $secondary-800;
 
 // Grid columns
-$grid-columns: 12 !default;
-$grid-gutter-width: 30px !default;
+//$grid-columns: 12 !default;
+//$grid-gutter-width: 30px !default;
 
 $input-color: $body-color;
 $input-group-addon-bg: $primary-100;
@@ -40,7 +42,7 @@ $input-border-color: $primary-400;
 $input-border-radius: 0;
 
 // Fonts
-$font-size-base: 1rem !default;
+$font-size-base: 1rem;
 $font-size-lg: 1.618rem;
 $font-size-sm: $font-size-base/$font-size-lg*1.2;
 
@@ -72,8 +74,8 @@ $tooltip-padding-y: 1rem;
 $tooltip-padding-x: 1rem;
 //$tooltip-margin:              0 !default;
 
-$tooltip-arrow-width:         0;
-$tooltip-arrow-height:        0;
+$tooltip-arrow-width: 0;
+$tooltip-arrow-height: 0;
 
 // Dropdown
 $dropdown-link-hover-bg: $primary-100;
@@ -94,3 +96,17 @@ $pagination-active-border-color: $pagination-active-bg;
 $pagination-disabled-color: $foreground-500;
 $pagination-disabled-bg: $pagination-bg;
 $pagination-disabled-border-color: $pagination-bg;
+
+// Modal
+$modal-lg: 1200px;
+
+// Badges
+//$badge-font-size:                   90%;
+$badge-font-weight: 400;
+$badge-padding-y: .2rem;
+//$badge-padding-x:                   .4rem !default;
+//$badge-border-radius:               $border-radius !default;
+//$badge-pill-padding-x:              .6em !default;
+// Use a higher than normal value to ensure completely rounded edges when
+// customizing padding or font-size on labels.
+//$badge-pill-border-radius:          10rem !default;
