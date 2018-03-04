@@ -211,26 +211,55 @@ export default function shipCompare(shipData) {
         }
 
         printText() {
-            function getCannonsPerDeck(healthInfo) {
-                let s = healthInfo.Deck4.toString();
-                [healthInfo.Deck3, healthInfo.Deck2, healthInfo.Deck1].forEach(cannons => {
-                    s = `${cannons} | ${s}`;
-                });
+            function pd(limit) {
+                let s = `<span class="badge badge-light">${limit[0]}\u202f/\u202f`;
+                if (limit[1]) {
+                    s += `${limit[1]}`;
+                } else {
+                    s += "\u2013";
+                }
+                s += "\u202fpd</span>";
+                return s;
+            }
+
+            function getCannonsPerDeck(deckClassLimit, gunsPerDeck) {
+                let s = `${gunsPerDeck[0]}\u00a0${pd(deckClassLimit[0])}`;
+                for (let i = 1; i < 4; i += 1) {
+                    if (gunsPerDeck[i]) {
+                        s = `${gunsPerDeck[i]}\u00a0${pd(deckClassLimit[i])} | ${s}`;
+                    }
+                }
                 return s;
             }
 
             let text = '<table class="table table-sm  table-striped"><tbody>';
-            text += `<tr><td>Battle rating</td><td colspan="2">${this.shipData.battleRating}</td></tr>`;
+            text += `<tr><td></td><td>${this.shipData.battleRating}<br><span class='des'>Battle rating</span></td><td>${
+                this.shipData.guns
+            }<br><span class='des'>Cannons</span></td></tr>`;
             text += `<tr><td>${this.shipData.decks} decks</td><td colspan="2">${getCannonsPerDeck(
-                this.shipData.healthInfo
-            )}</td></tr>`;
+                this.shipData.deckClassLimit,
+                this.shipData.gunsPerDeck
+            )}<br><span class='des'>Gun decks</span><br></td></tr>`;
+            text += `<tr><td>Broadside (pd)</td><td>${
+                this.shipData.cannonBroadside
+            }<br><span class='des'>Cannons</span></td><td>${
+                this.shipData.carroBroadside
+            }<br><span class='des'>Carronades</span></td></tr>`;
+            text += `<tr><td>Chasers</td><td>${this.shipData.gunsPerDeck[4]}`;
+            if (this.shipData.gunsPerDeck[4]) {
+                text += `\u00a0${pd(this.shipData.deckClassLimit[4])}`;
+            }
+            text += `<br><span class='des'>Front</span></td><td>${this.shipData.gunsPerDeck[5]}`;
+            if (this.shipData.gunsPerDeck[5]) {
+                text += `\u00a0${pd(this.shipData.deckClassLimit[5])}`;
+            }
+            text += "<br><span class='des'>Back</span></td></tr>";
             text += `<tr><td>Speed (knots)</td><td>${formatNumber(
                 this.shipData.minSpeed.toFixed(2)
             )}<br><span class='des'>Minimum</span></td><td>${this.shipData.maxSpeed.toFixed(
                 2
             )}<br><span class='des'>Maximum</span></td></tr>`;
-            text += "";
-            text += `<tr><td>Turning speed</td><td>${this.shipData.maxTurningSpeed.toFixed(2)}</td></tr>`;
+            text += `<tr><td>Turning speed</td><td colspan="2">${this.shipData.maxTurningSpeed.toFixed(2)}</td></tr>`;
 
             text += `<tr><td>Armor</td><td>${this.shipData.healthInfo.LeftArmor}<br><span class='des'>Sides</span><br>${
                 this.shipData.healthInfo.FrontArmor
