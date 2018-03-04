@@ -39,21 +39,19 @@ function main() {
         faTrash
     );
     naAnalytics();
-    $("#greetings")
+    $("#modal-greetings")
         .on("click", ".btn, .close", function() {
-            $(this).addClass("modal-result"); // mark which button was clicked
+            $(this).addClass("modal-greetings-result"); // mark which button was clicked
         })
         .on("hide.bs.modal", function() {
             const serverName = $(this)
-                .find(".modal-result")
+                .find(".modal-greetings-result")
                 .attr("data-server");
             naDisplay(serverName); // invoke the callback with result
         });
     window.onload = function() {
-        //$("#greetings").modal("show");
-        $("#ships").modal("show");
+        $("#modal-greetings").modal("show");
     };
-    naDisplay();
 }
 
 main();

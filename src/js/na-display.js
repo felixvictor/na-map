@@ -130,8 +130,6 @@ export default function naDisplay(serverName) {
         bFirstCoord: true,
         radioButton: "compass",
         lineData: [],
-        shipAData: {},
-        shipBData: {},
         nation: "",
         showTeleportAreas: false
     };
@@ -1557,6 +1555,12 @@ predictWind(direction, `${predictTime.hours()}:${predictTime.minutes()}`);
                     updatePBZones();
                     updatePortTextPositions();
                 });
+
+            $("#button-ship-compare").on("click", event => {
+                event.stopPropagation();
+                // eslint-disable-next-line no-unused-vars
+                const shipCompare = new ShipCompare(defaults.shipData);
+            });
         }
 
         setupCanvas();
@@ -1569,98 +1573,26 @@ predictWind(direction, `${predictTime.hours()}:${predictTime.minutes()}`);
         moment.locale("en-gb");
     }
 
-    // function naReady(error, naMapJsonData, pbZonesJsonData) {
-    function naReady(error, shipJsonData) {
+    function naReady(error, naMapJsonData, pbZonesJsonData, shipJsonData) {
         if (error) {
             throw error;
         }
 
         // Read map data
-        /*
-        defaults.portData = topojsonFeature(naMap, naMap.objects.ports).features;
-        current.portData = defaults.portData;
-        defaults.PBZoneData = topojsonFeature(pbZones, pbZones.objects.pbZones);
-        defaults.fortData = topojsonFeature(pbZones, pbZones.objects.forts);
-        defaults.towerData = topojsonFeature(pbZones, pbZones.objects.towers);
-        */
-        const shipData = JSON.parse(JSON.stringify(shipJsonData.shipData));
-
-        // setup();
-        /*
-        zoomAndPan(initial.transform);
-        //updatePorts(current.portData.filter(d => ["234", "237", "238", "239", "240"].includes(d.id)));
-        updatePorts();
-        */
-
-        const shipCompare = new ShipCompare(shipData);
-
-        /*
-        let predictTime = moment().utc(),
-            direction = "nne".toUpperCase();
-        console.log(`---->   predictTime: ${predictTime.format()}`);
-        predictWind(direction, `${predictTime.hours()}:${predictTime.minutes()}`);
-        predictTime.add(48 / 4, "minutes");
-        console.log(`---->   predictTime: ${predictTime.format()}`);
-        predictWind(direction, `${predictTime.hours()}:${predictTime.minutes()}`);
-        */
-
-        /*
-        $("#f11").submit(event => {
-            const x = $("#x-coord").val(),
-                z = $("#z-coord").val();
-            goToF11(x, z);
-            event.preventDefault();
-        });
-        $("#direction").knob({
-            bgColor: "#ede1d2", // primary-200
-            thickness: 0.2,
-            min: 0,
-            max: 359,
-            step: 360 / defaults.compassDirections.length,
-            cursor: true,
-            fgColor: "#917f68", // primary-700
-            draw() {
-                $(this.i).css("class", "knob");
-            },
-            format: input => degreesToCompass(input)
-        });
-        $("#windPrediction").submit(event => {
-            const currentWind = $("#direction")
-                    .val()
-                    .toUpperCase(),
-                time = $("#time").val();
-            predictWind(currentWind, time);
-            $("#predictDropdown").dropdown("toggle");
-            event.preventDefault();
-        });
-        $("#reset").on("click", () => {
-            clearMap();
-        });
-        $(".radio-group").change(() => {
-            current.radioButton = $("input[name='mouseFunction']:checked").val();
-            clearMap();
-        });
-
         defaults.portData = topojsonFeature(naMapJsonData, naMapJsonData.objects.ports).features;
+        current.portData = defaults.portData;
         defaults.PBZoneData = topojsonFeature(pbZonesJsonData, pbZonesJsonData.objects.pbZones);
         defaults.fortData = topojsonFeature(pbZonesJsonData, pbZonesJsonData.objects.forts);
         defaults.towerData = topojsonFeature(pbZonesJsonData, pbZonesJsonData.objects.towers);
+        defaults.shipData = JSON.parse(JSON.stringify(shipJsonData.shipData));
 
         setup();
-        */
     }
-
-    /*
-        profileData.shipData.forEach((d, i) => {
-            drawProfile(d, i);
-        });
-        */
 
     d3
         .queue()
-        // .defer(d3.json, defaults.mapJson)
-        // .defer(d3.json, "eu1.json")
-        // .defer(d3.json, defaults.pbJson)
+        .defer(d3.json, defaults.mapJson)
+        .defer(d3.json, defaults.pbJson)
         .defer(d3.json, defaults.shipJson)
         .await(naReady);
 }
