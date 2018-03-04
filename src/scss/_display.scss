@@ -14,10 +14,14 @@ $background-colour: $primary-300;
   }
 }
 
+.badge {
+  display: inline;
+}
+
 .des {
   position: relative;
   top: -.4em;
-  font-size: xx-small;
+  font-size: x-small;
   color: $primary-700;
   text-transform: uppercase;
   letter-spacing: .1em;

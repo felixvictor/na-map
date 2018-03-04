@@ -2,6 +2,14 @@
     util.js
  */
 
+export const formatNumber = x => {
+    let r = Math.abs(x);
+    if (x < 0) {
+        r = `\u2212\u202f${r}`;
+    }
+    return r;
+};
+
 export function getOrdinal(n) {
     const s = ["th", "st", "nd", "rd"],
         v = n % 100;
