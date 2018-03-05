@@ -18,6 +18,8 @@ import "bootstrap-select/js/bootstrap-select";
 import "bootstrap/js/dist/tooltip";
 import "bootstrap/js/dist/util";
 
+import ShipCompare from "./ship-compare";
+
 export default function naDisplay(serverName) {
     // https://bocoup.com/blog/find-the-closest-power-of-2-with-javascript
     function nearestPow2(aSize) {
@@ -63,6 +65,7 @@ export default function naDisplay(serverName) {
         highlightDuration: 200,
         mapJson: `${serverName}.json`,
         pbJson: "pb.json",
+        shipJson: "ships.json",
         line: d3.line(),
         transformMatrix: {
             A: -0.00499866779363828,
@@ -363,6 +366,7 @@ export default function naDisplay(serverName) {
         // circleUpdate; // not needed
 
         // Add new circles
+        // eslint-disable-next-line no-unused-vars
         const circleEnter = circleUpdate
             .enter()
             .append("circle")
@@ -1594,6 +1598,12 @@ export default function naDisplay(serverName) {
                     updatePBZones();
                     updatePortTexts();
                 });
+
+            $("#button-ship-compare").on("click", event => {
+                event.stopPropagation();
+                // eslint-disable-next-line no-unused-vars
+                const shipCompare = new ShipCompare(defaults.shipData);
+            });
         }
 
         setupSvg();
@@ -1606,7 +1616,7 @@ export default function naDisplay(serverName) {
         initialZoomAndPan();
     }
 
-    function naReady(error, naMapJsonData, pbZonesJsonData) {
+    function naReady(error, naMapJsonData, pbZonesJsonData, shipJsonData) {
         if (error) {
             throw error;
         }
@@ -1614,6 +1624,7 @@ export default function naDisplay(serverName) {
         // Read map data
         defaults.portData = topojsonFeature(naMapJsonData, naMapJsonData.objects.ports).features;
         current.portData = defaults.portData;
+
         defaults.PBZoneData = topojsonFeature(pbZonesJsonData, pbZonesJsonData.objects.pbZones);
         defaults.fortData = topojsonFeature(pbZonesJsonData, pbZonesJsonData.objects.forts);
         defaults.towerData = topojsonFeature(pbZonesJsonData, pbZonesJsonData.objects.towers);
@@ -1621,13 +1632,15 @@ export default function naDisplay(serverName) {
         current.fortData = {};
         current.towerData = {};
 
+        defaults.shipData = JSON.parse(JSON.stringify(shipJsonData.shipData));
+
         setup();
-        // updatePorts(current.portData.filter(d => ["234", "237", "238", "239", "240"].includes(d.id)));
     }
 
     d3
         .queue()
         .defer(d3.json, defaults.mapJson)
         .defer(d3.json, defaults.pbJson)
+        .defer(d3.json, defaults.shipJson)
         .await(naReady);
 }
