@@ -14,11 +14,11 @@
     <meta content="images/icons/browserconfig.xml" name="msapplication-config">
 
     <script src="https://www.googletagmanager.com/gtag/js?id=UA-109520372-1" async></script>
-<link href="na-map.min.css?9d154c326df78bf79734" rel="stylesheet" crossorigin="anonymous" integrity="sha256-jdgip2RLG13l7wj0txzmAN6USeMC5sAuN0YY9K0hGZA= sha384-GPQ7prxx0P8fNL1JRkEZyOSvdbcop/qZY/js1l4mDoxKIoikzcvJDXw9Q/au/JEk"></head>
+<link href="na-map.min.css?551eae714afc2ff0d22f" rel="stylesheet" crossorigin="anonymous" integrity="sha256-NZj2ynr37eCbbYwK1ZfhHADGw6na1+XLriqaSgsw1tU= sha384-Z0ym41TrJpnBMrRO/I8pe8QgyvHJnzbERKBLXRsPVWj2ApVxkLXhZ9s4qcAuTgqU"></head>
 <body>
 
 <nav class="bg-light fixed-top navbar navbar-expand-lg navbar-light">
-    <a href="#" class="navbar-brand"><img alt="" height="30" src="images/na-map-brand.jpg" width="30"></a>
+    <a class="navbar-brand" href="#"><img alt="" height="30" src="images/na-map-brand.jpg" width="30"></a>
     <button class="navbar-toggler" type="button" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation" data-target="#navbarSupportedContent" data-toggle="collapse">
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -26,7 +26,7 @@
         <ul class="navbar-nav mr-auto">
 
             <li class="nav-item dropdown">
-                <a href="#" class="dropdown-toggle nav-link" id="moveToDropdown" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
+                <a class="dropdown-toggle nav-link" href="#" id="moveToDropdown" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
                     Move to
                 </a>
                 <div class="dropdown-menu extralarge-width p-2" id="moveToMenu" aria-labelledby="moveToDropdown">
@@ -48,20 +48,20 @@
             </li>
 
             <li class="nav-item dropdown pl-1">
-                <a href="#" class="dropdown-toggle nav-link" id="predictDropdown" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
+                <a class="dropdown-toggle nav-link" href="#" id="predictDropdown" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
                     Wind prediction
                 </a>
                 <div class="dropdown-menu extralarge-width" id="predictMenu" aria-labelledby="predictDropdown">
                     <form id="windPrediction" class="p-2">
                         <div class="form-group row">
-                            <label class="col-form-label col-sm-6 align-top" for="direction">Wind currently blowing
+                            <label for="direction" class="col-form-label col-sm-6 align-top">Wind currently blowing
                                 from</label>
                             <div class="col-sm-6">
                                 <div class="rslider" id="direction"></div>
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label class="col-form-label col-sm-6" for="wind-time">Predict wind for</label>
+                            <label for="wind-time" class="col-form-label col-sm-6">Predict wind for</label>
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <div class="input-group date" id="wind-time" data-target-input="nearest">
@@ -80,27 +80,27 @@
             </li>
 
             <li class="nav-item dropdown pl-1">
-                <a href="#" class="dropdown-toggle nav-link" id="propertyDropdown" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
+                <a class="dropdown-toggle nav-link" href="#" id="propertyDropdown" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
                     Select ports on
                 </a>
                 <div class="dropdown-menu large-width" id="propertyMenu" aria-labelledby="propertyDropdown">
                     <h6 class="dropdown-header">Ownership</h6>
-                    <a href="#" class="dropdown-item" id="menu-prop-nation">
-                        <select class="custom-select" id="prop-nation" name="prop-nation" title="Select a nation"></select>
+                    <a class="dropdown-item" href="#" id="menu-prop-nation">
+                        <select id="prop-nation" name="prop-nation" title="Select a nation" class="custom-select"></select>
                     </a>
-                    <a href="#" class="dropdown-item" id="menu-prop-clan">
-                        <select class="custom-select" id="prop-clan" name="prop-clan" title="Select a clan"></select>
+                    <a class="dropdown-item" href="#" id="menu-prop-clan">
+                        <select id="prop-clan" name="prop-clan" title="Select a clan" class="custom-select"></select>
                     </a>
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Property</h6>
-                    <a href="#" class="dropdown-item pt-1" id="menu-prop-all">Available to all</a>
-                    <a href="#" class="dropdown-item pt-1" id="menu-prop-green">Green zone</a>
+                    <a class="dropdown-item pt-1" href="#" id="menu-prop-all">Available to all</a>
+                    <a class="dropdown-item pt-1" href="#" id="menu-prop-green">Green zone</a>
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Port battle time range</h6>
                     <div class="dropdown-item" id="menu-prop-pb-range">
                         <form id="prop-pb-range">
                             <div class="form-group row">
-                                <label class="col-form-label col-sm-2" for="prop-pb-from-input">From</label>
+                                <label for="prop-pb-from-input" class="col-form-label col-sm-2">From</label>
                                 <div class="input-group date col-sm-10" id="prop-pb-from" data-target-input="nearest">
                                     <input class="form-control datetimepicker-input" id="prop-pb-from-input" type="text" required aria-label="prop-pb-from" data-target="#prop-pb-from">
                                     <div class="input-group-append" data-target="#prop-pb-from" data-toggle="datetimepicker">
@@ -109,7 +109,7 @@
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label class="col-form-label col-sm-2" for="prop-pb-to-input">To</label>
+                                <label for="prop-pb-to-input" class="col-form-label col-sm-2">To</label>
                                 <div class="input-group date col-sm-10" id="prop-pb-to" data-target-input="nearest">
                                     <input class="form-control datetimepicker-input" id="prop-pb-to-input" type="text" required aria-label="prop-pb-to" data-target="#prop-pb-to">
                                     <div class="input-group-append" data-target="#prop-pb-to" data-toggle="datetimepicker">
@@ -122,15 +122,15 @@
                     </div>
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Capture time</h6>
-                    <a href="#" class="dropdown-item" id="menu-prop-yesterday">Yesterday</a>
-                    <a href="#" class="dropdown-item" id="menu-prop-this-week">This week</a>
-                    <a href="#" class="dropdown-item" id="menu-prop-last-week">Last week</a>
+                    <a class="dropdown-item" href="#" id="menu-prop-yesterday">Yesterday</a>
+                    <a class="dropdown-item" href="#" id="menu-prop-this-week">This week</a>
+                    <a class="dropdown-item" href="#" id="menu-prop-last-week">Last week</a>
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Capture time range</h6>
                     <div class="dropdown-item" id="menu-prop-range">
                         <form id="prop-range">
                             <div class="form-group row">
-                                <label class="col-form-label col-sm-2" for="prop-from-input">From</label>
+                                <label for="prop-from-input" class="col-form-label col-sm-2">From</label>
                                 <div class="input-group date col-sm-10" id="prop-from" data-target-input="nearest">
                                     <input class="form-control datetimepicker-input" id="prop-from-input" type="text" required aria-label="prop-from" data-target="#prop-from">
                                     <div class="input-group-append" data-target="#prop-from" data-toggle="datetimepicker">
@@ -139,7 +139,7 @@
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label class="col-form-label col-sm-2" for="prop-to-input">To</label>
+                                <label for="prop-to-input" class="col-form-label col-sm-2">To</label>
                                 <div class="input-group date col-sm-10" id="prop-to" data-target-input="nearest">
                                     <input class="form-control datetimepicker-input" id="prop-to-input" type="text" required aria-label="prop-to" data-target="#prop-to">
                                     <div class="input-group-append" data-target="#prop-to" data-toggle="datetimepicker">
@@ -152,31 +152,35 @@
                     </div>
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Conquest mark</h6>
-                    <a href="#" class="dropdown-item" id="menu-prop-cm">
-                        <select class="custom-select" id="prop-cm" name="prop-cm" title="Select amount"></select>
+                    <a class="dropdown-item" href="#" id="menu-prop-cm">
+                        <select id="prop-cm" name="prop-cm" title="Select amount" class="custom-select"></select>
                     </a>
                 </div>
             </li>
 
             <li class="nav-item pl-2">
-                <select class="" id="port-names" name="port-names">
+                <label for="port-names"></label><select id="port-names" name="port-names" class="">
                 </select>
             </li>
 
             <li class="nav-item pl-2">
-                <select class="" id="good-names" name="good-names">
+                <label for="good-names"></label><select id="good-names" name="good-names" class="">
                 </select>
             </li>
 
             <li class="nav-item pl-2">
-                <a href="port-battle.xlsx" class="btn btn-primary" role="button" download="port-battle-calculator.xlsx">Download
+                <a class="btn btn-primary" id="button-ship-compare" role="button">Ship comparison</a>
+            </li>
+
+            <li class="nav-item pl-2">
+                <a class="btn btn-primary" href="port-battle.xlsx" role="button" download="port-battle-calculator.xlsx">Download
                     PB calculator</a>
             </li>
         </ul>
 
-        <ul class="navbar-nav ml-auto">
+        <ul class="ml-auto navbar-nav">
             <li class="nav-item dropdown pr-2">
-                <a href="#" class="dropdown-toggle nav-link" id="doubleclickDropdown" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
+                <a class="dropdown-toggle nav-link" href="#" id="doubleclickDropdown" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
                     Settings
                 </a>
                 <div class="dropdown-menu large-width dropdown-menu-right" id="doubleclickMenu" aria-labelledby="doubleclickDropdown">
@@ -186,11 +190,11 @@
                     <div class="align-self-center col-auto ml-1 py-1">
                         <div class="custom-control custom-checkbox">
                             <input class="custom-control-input" id="show-teleport" type="checkbox">
-                            <label class="custom-control-label" for="show-teleport">teleport areas</label>
+                            <label for="show-teleport" class="custom-control-label">teleport areas</label>
                         </div>
                         <div class="custom-control custom-checkbox">
                             <input class="custom-control-input" id="show-pb" type="checkbox">
-                            <label class="custom-control-label" for="show-pb">single port battle zone</label>
+                            <label for="show-pb" class="custom-control-label">single port battle zone</label>
                             <small class="form-text text-muted">Use 'go to a port'</small>
                         </div>
                     </div>
@@ -201,11 +205,11 @@
                         <div class="align-self-center col-auto">
                             <div class="custom-control custom-control-inline custom-radio">
                                 <input class="custom-control-input" id="compass" type="radio" name="mouseFunction" value="compass" checked>
-                                <label class="custom-control-label" for="compass">plot a course</label>
+                                <label for="compass" class="custom-control-label">plot a course</label>
                             </div>
                             <div class="custom-control custom-control-inline custom-radio">
                                 <input class="custom-control-input" id="F11" type="radio" name="mouseFunction" value="F11">
-                                <label class="custom-control-label" for="F11">show F11 coordinates</label>
+                                <label for="F11" class="custom-control-label">show F11 coordinates</label>
                             </div>
                         </div>
                     </div>
@@ -219,13 +223,12 @@
 <div class="na" id="na">
 </div>
 
-<section class="modal" data-backdrop="static" data-keyboard="false" id="modal" role="dialog" tabindex="-1">
+<section class="modal" data-backdrop="static" data-keyboard="false" id="modal-greetings" role="dialog" tabindex="-1">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <header class="modal-header">
-                <h3>Naval Action map <span class="small text-primary">v2.2</span></h3>
+                <h3>Naval Action map <span class="small text-primary">v3</span></h3>
             </header>
-
             <div class="modal-body">
                 <p>Yet another map which uses the in-game map and live data (daily updated soonish after maintenance).
                     Please check the <a href="http://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/">
@@ -241,6 +244,41 @@
     </div>
 </section>
 
+<section class="modal" data-backdrop="static" data-keyboard="false" id="modal-ships" role="dialog" tabindex="-1">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <header class="modal-header">
+                <h3>Ship comparison</h3>
+            </header>
+
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="ml-auto col-md-4 pt-2 columnA">
+                            <select id="ship-Base-select" name="ship-Base-select" title="Select a ship">
+                            </select>
+                            <div id="ship-Base"></div>
+                        </div>
+                        <div class="ml-auto col-md-4 pt-2 columnC">
+                            <select id="ship-C1-select" name="ship-C1-select" title="Select a ship">
+                            </select>
+                            <div id="ship-C1"></div>
+                        </div>
+                        <div class="ml-auto col-md-4 pt-2 columnC">
+                            <select id="ship-C2-select" name="ship-C2-select" title="Select a ship">
+                            </select>
+                            <div id="ship-C2"></div>
+                        </div>
+                    </div>
+                </div>
+                <footer class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Close</button>
+                </footer>
+            </div>
+        </div>
+    </div>
+</section>
+
 <script src="https://d3js.org/d3.v4.min.js"></script>
-<script src="na-map.min.js?9d154c326df78bf79734" crossorigin="anonymous" integrity="sha256-2j/xqxd9sXs7ZPAeyQ3pJouDfZPzLpU9uIhrFYvWqJU= sha384-tYuV/QfVnPcDkksZ7t9ScUxw68xTLqVk2TdZQuvIsvISlIIBJ2vZub5AXkiUcI1m" type="text/javascript"></script></body>
+<script src="na-map.min.js?551eae714afc2ff0d22f" crossorigin="anonymous" integrity="sha256-qSqyNHGiQTK5WS7Dzn1xGpNPJ6+jIMYHiAqIjdPTYCI= sha384-l7WD+iDh9VnXMiwLBS8COrDYPuuvcOz2RHcfalkcwu1T/96tSBeKeH+2MnAZl47p" type="text/javascript"></script></body>
 </html>
