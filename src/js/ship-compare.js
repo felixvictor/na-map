@@ -318,7 +318,7 @@ export default function shipCompare(shipData) {
                 ship.gunsFront = "\u2013";
             }
             if (ship.gunsBack) {
-                ship.gunsBack = `\u00a0${Ship.pd(ship.limitBack)}`;
+                ship.gunsBack += `\u00a0${Ship.pd(ship.limitBack)}`;
             } else {
                 ship.gunsBack = "\u2013";
             }
@@ -500,7 +500,7 @@ export default function shipCompare(shipData) {
                 ship.gunsFront = "\u2013";
             }
             if (ship.gunsBack) {
-                ship.gunsBack = `\u00a0${Ship.pd(ship.limitBack)}`;
+                ship.gunsBack += `\u00a0${Ship.pd(ship.limitBack)}`;
             } else {
                 ship.gunsBack = "\u2013";
             }
