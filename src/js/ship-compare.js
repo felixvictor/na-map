@@ -15,11 +15,11 @@ import {
 
 import { formatNumber, getOrdinal, isEmpty } from "./util";
 
-const svgWidth = 350,
-    svgHeight = 350,
-    outerRadius = Math.min(svgWidth, svgHeight) / 2,
-    innerRadius = 0.3 * outerRadius,
-    numSegments = 24,
+let svgWidth = 0,
+    svgHeight = 0,
+    outerRadius = 0,
+    innerRadius = 0;
+const numSegments = 24,
     segmentRadians = 2 * Math.PI / numSegments;
 
 export default function shipCompare(shipData) {
@@ -39,9 +39,7 @@ export default function shipCompare(shipData) {
             .domain([minSpeed, 0, 4, 8, 12, maxSpeed])
             .range(["#a62e39", "#fbf8f5", "#a4dab0", "#6cc380", "#419f57"])
             .interpolate(d3InterpolateHcl),
-        radiusScaleAbsolute = d3ScaleLinear()
-            .domain([minSpeed, 0, maxSpeed])
-            .range([10, innerRadius, outerRadius]);
+        radiusScaleAbsolute = d3ScaleLinear().domain([minSpeed, 0, maxSpeed]);
 
     class Ship {
         constructor(compareId) {
@@ -549,6 +547,14 @@ export default function shipCompare(shipData) {
     }
 
     $("#modal-ships").modal("show");
+
+    svgWidth = parseInt($(".columnA").width(), 10);
+    // noinspection JSSuspiciousNameCombination
+    svgHeight = svgWidth;
+    outerRadius = Math.floor(Math.min(svgWidth, svgHeight) / 2);
+    innerRadius = Math.floor(outerRadius * 0.3);
+    radiusScaleAbsolute.range([10, innerRadius, outerRadius]);
+
     ["Base", "C1", "C2"].forEach(compareId => {
         setupShipSelect(compareId);
         setupListener(compareId);
