@@ -2,7 +2,8 @@
     ship-compare.js
  */
 
-import { min as d3Min, max as d3Max, range as d3Range } from "d3-array";
+import { ascending as d3Ascending, min as d3Min, max as d3Max, range as d3Range } from "d3-array";
+import { nest as d3Nest } from "d3-collection";
 import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate";
 import { scaleLinear as d3ScaleLinear } from "d3-scale";
 import { select as d3Select } from "d3-selection";
@@ -23,15 +24,28 @@ const numSegments = 24,
     segmentRadians = 2 * Math.PI / numSegments;
 
 export default function shipCompare(shipData) {
-    const shipSelectData = shipData.map(ship => ({ id: ship.id, name: ship.name, class: ship.class })).sort((a, b) => {
-            if (a.name < b.name) {
-                return -1;
-            }
-            if (a.name > b.name) {
-                return 1;
-            }
-            return 0;
-        }),
+    const shipSelectData = d3Nest()
+            .key(ship => ship.class)
+            .sortKeys(d3Ascending)
+            .entries(
+                shipData
+                    .map(ship => ({
+                        id: ship.id,
+                        name: ship.name,
+                        class: ship.class,
+                        battleRating: ship.battleRating,
+                        guns: ship.guns
+                    }))
+                    .sort((a, b) => {
+                        if (a.name < b.name) {
+                            return -1;
+                        }
+                        if (a.name > b.name) {
+                            return 1;
+                        }
+                        return 0;
+                    })
+            ),
         ships = { Base: {}, C1: {}, C2: {} },
         minSpeed = d3Min(shipData, d => d.minSpeed),
         maxSpeed = d3Max(shipData, d => d.maxSpeed),
@@ -39,7 +53,20 @@ export default function shipCompare(shipData) {
             .domain([minSpeed, 0, 4, 8, 12, maxSpeed])
             .range(["#a62e39", "#fbf8f5", "#a4dab0", "#6cc380", "#419f57"])
             .interpolate(d3InterpolateHcl),
-        radiusScaleAbsolute = d3ScaleLinear().domain([minSpeed, 0, maxSpeed]);
+        radiusScaleAbsolute = d3ScaleLinear().domain([minSpeed, 0, maxSpeed]),
+        options = shipSelectData
+            .map(
+                key =>
+                    `<optgroup label="${getOrdinal(key.key)} rate">${key.values
+                        .map(
+                            ship =>
+                                `<option data-subtext="${ship.battleRating}" value="${ship.id}">${ship.name} (${
+                                    ship.guns
+                                })`
+                        )
+                        .join("</option>")}`
+            )
+            .join("</optgroup>");
 
     class Ship {
         constructor(compareId) {
@@ -102,7 +129,7 @@ export default function shipCompare(shipData) {
             let s = `${gunsPerDeck[0]}\u00a0${Ship.pd(deckClassLimit[0])}`;
             for (let i = 1; i < 4; i += 1) {
                 if (gunsPerDeck[i]) {
-                    s = `${gunsPerDeck[i]}\u00a0${Ship.pd(deckClassLimit[i])} | ${s}`;
+                    s = `${gunsPerDeck[i]}\u00a0${Ship.pd(deckClassLimit[i])}\u202f| ${s}`;
                 }
             }
             return s;
@@ -511,11 +538,6 @@ export default function shipCompare(shipData) {
 
     function setupShipSelect(compareId) {
         const select = $(`#ship-${compareId}-select`);
-        const options = `${shipSelectData
-            .map(
-                ship => `<option data-subtext="${getOrdinal(ship.class)} rate" value="${ship.id}">${ship.name}</option>`
-            )
-            .join("")}`;
         select.append(options);
         if (compareId !== "Base") {
             select.attr("disabled", "disabled");
