@@ -19,6 +19,7 @@ import "bootstrap/js/dist/tooltip";
 import "bootstrap/js/dist/util";
 
 import ShipCompare from "./ship-compare";
+import Teleport from "./teleport";
 
 export default function naDisplay(serverName) {
     // https://bocoup.com/blog/find-the-closest-power-of-2-with-javascript
@@ -36,10 +37,10 @@ export default function naDisplay(serverName) {
         pbZones,
         towers,
         forts,
-        mainGVoronoi,
         mainGCoord,
         gCompass,
-        svgWind;
+        svgWind,
+        teleport;
     const navbarBrandPaddingLeft = Math.floor(1.618 * 16); // equals 1.618rem
     // noinspection JSSuspiciousNameCombination
     const defaults = {
@@ -123,12 +124,6 @@ export default function naDisplay(serverName) {
     );
     defaults.log2tileSize = Math.log2(defaults.tileSize);
     defaults.maxTileZoom = Math.log2(defaults.coord.max) - defaults.log2tileSize;
-    defaults.coord.voronoi = [
-        [defaults.coord.min - 1, defaults.coord.min - 1],
-        [defaults.coord.max + 1, defaults.coord.max + 1]
-    ];
-    // limit how far away the mouse can be from finding a voronoi site
-    defaults.voronoiRadius = Math.max(defaults.height, defaults.width);
     const current = {
         port: { id: defaults.port.id, coord: defaults.port.coord },
         fontSize: defaults.fontSize.initial,
@@ -447,42 +442,6 @@ export default function naDisplay(serverName) {
         updatePortTexts();
     }
 
-    function updateTeleportAreas() {
-        function mouseover(d, i, nodes) {
-            const ref = d3.mouse(nodes[i]),
-                mx = ref[0],
-                my = ref[1];
-
-            // use the new diagram.find() function to find the voronoi site closest to
-            // the mouse, limited by max distance defined by defaults.voronoiRadius
-            const site = defaults.voronoiDiagram.find(mx, my, defaults.voronoiRadius);
-            if (site) {
-                current.highlightId = site.data.id;
-                updateTeleportAreas();
-                updatePorts();
-            }
-        }
-
-        // Data join
-        const pathUpdate = mainGVoronoi.selectAll("path").data(current.teleportData, d => d.data.id);
-
-        // Remove old paths
-        pathUpdate.exit().remove();
-
-        // Update kept paths
-        // pathUpdate; // not needed
-
-        // Add new paths (teleport areas)
-        const pathEnter = pathUpdate
-            .enter()
-            .append("path")
-            .attr("d", d => (d ? `M${d.join("L")}Z` : null))
-            .on("mouseover", mouseover);
-
-        // Apply to both old and new
-        pathUpdate.merge(pathEnter).classed("highlight-voronoi", d => d.data.id === current.highlightId);
-    }
-
     function initialZoomAndPan() {
         naSvg.call(naZoom.scaleTo, defaults.minScale);
     }
@@ -689,15 +648,6 @@ export default function naDisplay(serverName) {
         forts.datum(current.fortData).attr("d", d3.geoPath().pointRadius(2));
     }
 
-    function setTeleportData() {
-        if (current.showTeleportAreas && current.zoomLevel !== "pbZone") {
-            current.teleportData = defaults.voronoiDiagram.polygons();
-        } else {
-            current.teleportData = {};
-        }
-        current.highlightId = null;
-    }
-
     function setPBZoneData() {
         if (current.showPBZones && current.zoomLevel === "pbZone") {
             current.PBZoneData = {
@@ -737,7 +687,7 @@ export default function naDisplay(serverName) {
             current.fontSize = defaults.fontSize[current.zoomLevel];
 
             updatePBZones();
-            updateTeleportAreas();
+            teleport.updateTeleportAreas(current.zoomLevel);
             updatePorts();
         }
 
@@ -745,20 +695,20 @@ export default function naDisplay(serverName) {
             if (current.zoomLevel !== "pbZone") {
                 current.zoomLevel = "pbZone";
                 setPBZoneData();
-                setTeleportData();
+                teleport.setTeleportData(current.zoomLevel);
                 setCurrent();
             }
         } else if (d3.event.transform.k > defaults.labelZoomScale) {
             if (current.zoomLevel !== "portLabel") {
                 current.zoomLevel = "portLabel";
                 setPBZoneData();
-                setTeleportData();
+                teleport.setTeleportData(current.zoomLevel);
                 setCurrent();
             }
         } else if (current.zoomLevel !== "initial") {
             current.zoomLevel = "initial";
             setPBZoneData();
-            setTeleportData();
+            teleport.setTeleportData(current.zoomLevel);
             setCurrent();
         }
     }
@@ -772,7 +722,7 @@ export default function naDisplay(serverName) {
             .scale(Math.round(d3.event.transform.k * 1000) / 1000);
 
         displayCountries(transform);
-        mainGVoronoi.attr("transform", transform);
+        teleport.transform(transform);
         mainGPort.attr("transform", transform);
         mainGPBZone.attr("transform", transform);
         mainGCoord.attr("transform", transform);
@@ -842,7 +792,6 @@ export default function naDisplay(serverName) {
                 .attr("d", "M0,-5L10,0L0,5")
                 .attr("class", "wind-head");
             mainGMap = naSvg.append("g").classed("map", true);
-            mainGVoronoi = naSvg.append("g").classed("voronoi", true);
             mainGPort = naSvg.append("g").classed("port", true);
             mainGText = mainGPort.append("g");
             mainGPBZone = naSvg.append("g").classed("pb", true);
@@ -884,24 +833,6 @@ export default function naDisplay(serverName) {
                     .attr("width", defaults.iconSize)
                     .attr("href", `icons/${nation}a.svg`);
             });
-        }
-
-        function setupTeleportAreas() {
-            // Extract port coordinates
-            const teleportPorts = defaults.portData
-                // Use only ports that deep water ports and not a county capital
-                .filter(d => !d.properties.shallow && !d.properties.countyCapital)
-                // Map to coordinates array
-                .map(d => ({
-                    id: d.id,
-                    coord: { x: d.geometry.coordinates[0], y: d.geometry.coordinates[1] }
-                }));
-
-            defaults.voronoiDiagram = d3
-                .voronoi()
-                .extent(defaults.coord.voronoi)
-                .x(d => d.coord.x)
-                .y(d => d.coord.y)(teleportPorts);
         }
 
         function setupSelects() {
@@ -1533,8 +1464,8 @@ export default function naDisplay(serverName) {
                         e.clipboardData && e.clipboardData.getData
                             ? e.clipboardData.getData("text/plain") // Standard
                             : window.clipboardData && window.clipboardData.getData
-                              ? window.clipboardData.getData("Text") // MS
-                              : false;
+                                ? window.clipboardData.getData("Text") // MS
+                                : false;
 
                     // If one of the F11 input elements is in focus
                     if (document.activeElement.id === "x-coord" || document.activeElement.id === "z-coord") {
@@ -1578,16 +1509,6 @@ export default function naDisplay(serverName) {
                 clearMap();
             });
 
-            $("#show-teleport")
-                .on("click", event => event.stopPropagation())
-                .on("change", () => {
-                    const $input = $("#show-teleport");
-
-                    current.showTeleportAreas = $input.is(":checked");
-                    setTeleportData();
-                    updateTeleportAreas();
-                });
-
             $("#show-pb")
                 .on("click", event => event.stopPropagation())
                 .on("change", () => {
@@ -1608,7 +1529,7 @@ export default function naDisplay(serverName) {
 
         setupSvg();
         setupPorts();
-        setupTeleportAreas();
+        teleport = new Teleport(defaults.portData, defaults.coord.min, defaults.coord.max);
         setupSelects();
         setupPropertyMenu();
         setupListener();
