@@ -2412,7 +2412,7 @@ d3-array@^1.2.0, d3-array@^1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/d3-array/-/d3-array-1.2.1.tgz#d1ca33de2f6ac31efadb8e050a021d7e2396d5dc"
 
-d3-collection@1:
+d3-collection@1, d3-collection@^1.0.4:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/d3-collection/-/d3-collection-1.0.4.tgz#342dfd12837c90974f33f1cc0a785aea570dcdc2"
 
@@ -2464,6 +2464,10 @@ d3-time-format@2:
 d3-time@1:
   version "1.0.8"
   resolved "https://registry.yarnpkg.com/d3-time/-/d3-time-1.0.8.tgz#dbd2d6007bf416fe67a76d17947b784bffea1e84"
+
+d3-voronoi@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/d3-voronoi/-/d3-voronoi-1.1.2.tgz#1687667e8f13a2d158c80c1480c5a29cb0d8973c"
 
 d@1:
   version "1.0.0"
