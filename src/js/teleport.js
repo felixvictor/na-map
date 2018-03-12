@@ -105,7 +105,7 @@ export default class Teleport {
             .on("click", event => event.stopPropagation())
             .on("change", () => {
                 const $input = $("#show-teleport");
-                console.log("change");
+
                 this.showTeleportAreas = $input.is(":checked");
                 this.updateTeleportAreas();
             });
