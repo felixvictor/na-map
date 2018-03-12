@@ -29,3 +29,33 @@ export const formatCoord = x => {
     }
     return r;
 };
+
+export const compassDirections = [
+    "N",
+    "NNE",
+    "NE",
+    "ENE",
+    "E",
+    "ESE",
+    "SE",
+    "SSE",
+    "S",
+    "SSW",
+    "SW",
+    "WSW",
+    "W",
+    "WNW",
+    "NW",
+    "NNW"
+];
+
+export const compassToDegrees = compass => {
+    const degree = 360 / compassDirections.length;
+    return compassDirections.indexOf(compass) * degree;
+};
+
+// https://stackoverflow.com/questions/7490660/converting-wind-direction-in-angles-to-text-words
+export const degreesToCompass = degrees => {
+    const val = Math.floor(degrees / 22.5 + 0.5);
+    return compassDirections[val % 16];
+};
