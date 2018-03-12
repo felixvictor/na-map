@@ -12,6 +12,7 @@ import { formatCoord, thousandsWithBlanks } from "./util";
 
 export default class PortDisplay {
     constructor(portData) {
+        this.portDataDefault = portData;
         this.portData = portData;
         this.zoomLevel = "initial";
         this.showPBZones = false;
@@ -264,6 +265,10 @@ export default class PortDisplay {
                 .attr("width", this.iconSize)
                 .attr("href", `icons/${nation}a.svg`);
         });
+    }
+
+    resetData() {
+        this.portData = this.portDataDefault;
     }
 
     transform(transform) {
