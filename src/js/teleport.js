@@ -2,13 +2,11 @@
 	teleport.js
 */
 
-import { mouse as d3Mouse, select as d3Select } from "d3-selection";
+import { select as d3Select } from "d3-selection";
 import { voronoi as d3Voronoi } from "d3-voronoi";
 
-// import { updatePorts } from "./port";
-
 export default class Teleport {
-    constructor(portData, minCoord, maxCoord) {
+    constructor(portData, minCoord, maxCoord, ports) {
         function getPortData() {
             // Use only ports that deep water ports and not a county capital
             return (
@@ -25,16 +23,15 @@ export default class Teleport {
             );
         }
 
+        this.ports = ports;
         this.showTeleportAreas = false;
         this.voronoiCoord = [[minCoord - 1, minCoord - 1], [maxCoord + 1, maxCoord + 1]];
-        // limit how far away the mouse can be from finding a voronoi site
-        this.voronoiRadius = 1000;
         this.teleportPorts = getPortData();
         this.voronoiDiagram = this.getVoronoiDiagram();
         this.teleportData = {};
         this.highlightId = null;
         this.g = d3Select("#na-svg")
-            .append("g")
+            .insert("g", ".port")
             .classed("voronoi", true);
 
         this.setupListener();
@@ -47,8 +44,8 @@ export default class Teleport {
             .y(d => d.coord.y)(this.teleportPorts);
     }
 
-    setTeleportData(zoomLevel) {
-        if (this.showTeleportAreas && zoomLevel !== "pbZone") {
+    setTeleportData(teleportLevel) {
+        if (this.showTeleportAreas && teleportLevel) {
             this.teleportData = this.voronoiDiagram.polygons();
         } else {
             this.teleportData = {};
@@ -75,10 +72,10 @@ export default class Teleport {
         */
         this.highlightId = event.data.id;
         this.updateTeleportAreas();
-        // updatePorts(zoomLevel);
+        this.ports.updatePorts(this.highlightId);
     }
 
-    updateTeleportAreas(zoomLevel = "") {
+    updateTeleportAreas() {
         // Data join
         const pathUpdate = this.g.selectAll("path").data(this.teleportData, d => d.data.id);
 
@@ -88,7 +85,6 @@ export default class Teleport {
         // Update kept paths
         // pathUpdate; // not needed
 
-        console.log("main ", this.voronoiDiagram);
         // Add new paths (teleport areas)
         const pathEnter = pathUpdate
             .enter()

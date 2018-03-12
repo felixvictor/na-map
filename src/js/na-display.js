@@ -18,6 +18,8 @@ import "bootstrap-select/js/bootstrap-select";
 import "bootstrap/js/dist/tooltip";
 import "bootstrap/js/dist/util";
 
+import { nations } from "./common";
+import PortDisplay from "./port";
 import ShipCompare from "./ship-compare";
 import Teleport from "./teleport";
 
@@ -31,8 +33,6 @@ export default function naDisplay(serverName) {
         svgDef,
         naZoom,
         mainGMap,
-        mainGPort,
-        mainGText,
         mainGPBZone,
         pbZones,
         towers,
@@ -40,6 +40,7 @@ export default function naDisplay(serverName) {
         mainGCoord,
         gCompass,
         svgWind,
+        ports,
         teleport;
     const navbarBrandPaddingLeft = Math.floor(1.618 * 16); // equals 1.618rem
     // noinspection JSSuspiciousNameCombination
@@ -55,15 +56,11 @@ export default function naDisplay(serverName) {
             max: 8192
         },
         tileSize: 256,
-        port: { id: "366", coord: { x: 4396, y: 2494 } }, // Shroud Cay
         maxScale: 2 ** 4, // power of 2
         wheelDelta: 0.5,
         fontSize: { initial: 30, portLabel: 18, pbZone: 7 },
-        circleSize: { initial: 50, portLabel: 20, pbZone: 5 },
-        iconSize: 50,
-        PBZoneZoomScale: 1.5,
-        labelZoomScale: 0.5,
-        highlightDuration: 200,
+        PBZoneZoomThreshold: 1.5,
+        labelZoomThreshold: 0.5,
         mapJson: `${serverName}.json`,
         pbJson: "pb.json",
         shipJson: "ships.json",
@@ -97,21 +94,6 @@ export default function naDisplay(serverName) {
             "WNW",
             "NW",
             "NNW"
-        ],
-        nations: [
-            { id: "DE", name: "Kingdom of Prussia", sortName: "Prussia" },
-            { id: "DK", name: "Danmark-Norge", sortName: "Danmark-Norge" },
-            { id: "ES", name: "España", sortName: "España" },
-            { id: "FR", name: "France", sortName: "France" },
-            { id: "FT", name: "Free Town", sortName: "Free Town" },
-            { id: "GB", name: "Great Britain", sortName: "Great Britain" },
-            { id: "NT", name: "Neutral", sortName: "Neutral" },
-            { id: "PL", name: "Commonwealth of Poland", sortName: "Poland" },
-            { id: "PR", name: "Pirates", sortName: "Pirates" },
-            { id: "RU", name: "Russian Empire", sortName: "Russian Empire" },
-            { id: "SE", name: "Sverige", sortName: "Sverige" },
-            { id: "US", name: "United States", sortName: "United States" },
-            { id: "VP", name: "Verenigde Provinciën", sortName: "Verenigde Provinciën" }
         ]
     };
 
@@ -125,24 +107,10 @@ export default function naDisplay(serverName) {
     defaults.log2tileSize = Math.log2(defaults.tileSize);
     defaults.maxTileZoom = Math.log2(defaults.coord.max) - defaults.log2tileSize;
     const current = {
-        port: { id: defaults.port.id, coord: defaults.port.coord },
-        fontSize: defaults.fontSize.initial,
-        circleSize: defaults.circleSize.initial,
         bFirstCoord: true,
         radioButton: "compass",
         lineData: [],
-        nation: "",
-        showTeleportAreas: false
-    };
-
-    const thousandsWithBlanks = x => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u202f");
-
-    const formatCoord = x => {
-        let r = thousandsWithBlanks(Math.abs(Math.trunc(x)));
-        if (x < 0) {
-            r = `\u2212\u202f${r}`;
-        }
-        return r;
+        nation: ""
     };
 
     // https://stackoverflow.com/questions/7490660/converting-wind-direction-in-angles-to-text-words
@@ -239,209 +207,6 @@ export default function naDisplay(serverName) {
             .attr("height", defaults.tileSize);
     }
 
-    function updatePortCircles() {
-        function naTooltipData(d) {
-            let h = `<table><tbody<tr><td><i class="flag-icon ${
-                d.availableForAll ? `${d.nation}a` : d.nation
-            }"></i></td>`;
-            h += `<td><span class="port-name">${d.name}</span>`;
-            h += d.availableForAll ? " (accessible to all nations)" : "";
-            h += "</td></tr></tbody></table>";
-            h += `<p>${d.shallow ? "Shallow" : "Deep"}`;
-            h += " water port";
-            if (d.countyCapital) {
-                h += " (county capital)";
-            }
-            if (d.capturer) {
-                h += ` captured by ${d.capturer} ${moment(d.lastPortBattle).fromNow()}`;
-            }
-            h += "<br>";
-            if (!d.nonCapturable) {
-                const pbTimeRange = !d.portBattleStartTime
-                    ? "11.00\u202f–\u202f8.00"
-                    : `${(d.portBattleStartTime + 10) % 24}.00\u202f–\u202f${(d.portBattleStartTime + 13) % 24}.00`;
-                h += `Port battle ${pbTimeRange}, ${thousandsWithBlanks(d.brLimit)} BR, `;
-                switch (d.portBattleType) {
-                    case "Large":
-                        h += "1<sup>st</sup>";
-                        break;
-                    case "Medium":
-                        h += "4<sup>th</sup>";
-                        break;
-                    default:
-                        h += "6<sup>th</sup>";
-                        break;
-                }
-
-                h += "\u202frate AI";
-                h += `, ${d.conquestMarksPension}\u202fconquest point`;
-                h += d.conquestMarksPension > 1 ? "s" : "";
-                h += `<br>Tax income ${thousandsWithBlanks(d.taxIncome)} (${d.portTax *
-                    100}\u202f%), net income ${formatCoord(d.netIncome)}`;
-                h += d.tradingCompany ? `, trading company level\u202f${d.tradingCompany}` : "";
-                h += d.laborHoursDiscount ? ", labor hours discount" : "";
-            } else {
-                h += "Not capturable";
-                h += `<br>${d.portTax * 100}\u2009% tax`;
-            }
-            h += "</p>";
-            h += "<table class='table table-sm'>";
-            if (d.producesTrading.length || d.producesNonTrading.length) {
-                h += "<tr><td>Produces</td><td>";
-                if (d.producesNonTrading.length) {
-                    h += `<span class="non-trading">${d.producesNonTrading.join(", ")}</span>`;
-                    if (d.producesTrading.length) {
-                        h += "<br>";
-                    }
-                }
-                if (d.producesTrading.length) {
-                    h += `${d.producesTrading.join(", ")}`;
-                }
-                h += "</td></tr>";
-            }
-            if (d.dropsTrading.length || d.dropsNonTrading.length) {
-                h += "<tr><td>Drops</td><td>";
-                if (d.dropsNonTrading.length) {
-                    h += `<span class="non-trading">${d.dropsNonTrading.join(", ")}</span>`;
-                    if (d.dropsTrading.length) {
-                        h += "<br>";
-                    }
-                }
-                if (d.dropsTrading.length) {
-                    h += `${d.dropsTrading.join(", ")}`;
-                }
-                h += "</td></tr>";
-            }
-            if (d.consumesTrading.length || d.consumesNonTrading.length) {
-                h += "<tr><td>Consumes</td><td>";
-                if (d.consumesNonTrading.length) {
-                    h += `<span class="non-trading">${d.consumesNonTrading.join(", ")}</span>`;
-                    if (d.consumesTrading.length) {
-                        h += "<br>";
-                    }
-                }
-                if (d.consumesTrading.length) {
-                    h += `${d.consumesTrading.join(", ")}`;
-                }
-                h += "</td></tr>";
-            }
-            h += "</table>";
-
-            return h;
-        }
-
-        function showPortDetails(d, i, nodes) {
-            const port = d3.select(nodes[i]);
-
-            port.attr("data-toggle", "tooltip");
-            // eslint-disable-next-line no-underscore-dangle
-            $(port._groups[0])
-                .tooltip({
-                    delay: { show: defaults.highlightDuration, hide: defaults.highlightDuration },
-                    html: true,
-                    placement: "auto",
-                    title: naTooltipData(d.properties),
-                    trigger: "manual"
-                })
-                .tooltip("show");
-        }
-
-        function hidePortDetails(d, i, nodes) {
-            // eslint-disable-next-line no-underscore-dangle
-            $(d3.select(nodes[i])._groups[0]).tooltip("hide");
-        }
-
-        // Data join
-        const circleUpdate = mainGPort.selectAll("circle").data(current.portData, d => d.id);
-
-        // Remove old circles
-        circleUpdate.exit().remove();
-
-        // Update kept circles
-        // circleUpdate; // not needed
-
-        // Add new circles
-        // eslint-disable-next-line no-unused-vars
-        const circleEnter = circleUpdate
-            .enter()
-            .append("circle")
-            .attr("cx", d => d.geometry.coordinates[0])
-            .attr("cy", d => d.geometry.coordinates[1])
-            .attr(
-                "fill",
-                d => `url(#${d.properties.availableForAll ? `${d.properties.nation}a` : d.properties.nation})`
-            )
-            .on("click", showPortDetails)
-            .on("mouseout", hidePortDetails);
-
-        // Apply to both old and new
-        circleUpdate
-            .merge(circleEnter)
-            .attr("r", d => (d.id === current.highlightId ? current.circleSize * 3 : current.circleSize));
-    }
-
-    function updatePortTexts() {
-        if (current.zoomLevel === "initial") {
-            mainGText.attr("display", "none");
-        } else {
-            mainGText.attr("display", "inherit");
-
-            // Data join
-            const textUpdate = mainGText.selectAll("text").data(current.portData, d => d.id);
-
-            // Remove old text
-            textUpdate.exit().remove();
-
-            // Update kept texts
-            // textUpdate; // not needed
-
-            // Add new texts
-            const textEnter = textUpdate
-                .enter()
-                .append("text")
-                .text(d => d.properties.name);
-
-            const deltaY = current.circleSize + current.fontSize;
-            const deltaY2 = current.circleSize + current.fontSize * 2;
-            // Apply to both old and new
-            textUpdate
-                .merge(textEnter)
-                .attr("x", d => {
-                    if (current.zoomLevel !== "pbZone") {
-                        return d.geometry.coordinates[0];
-                    }
-                    return current.showPBZones && d.id === current.port.id
-                        ? d.geometry.coordinates[0] + d.properties.dx
-                        : d.geometry.coordinates[0];
-                })
-                .attr("y", d => {
-                    if (current.zoomLevel !== "pbZone") {
-                        return d.id === current.highlightId
-                            ? d.geometry.coordinates[1] + deltaY2
-                            : d.geometry.coordinates[1] + deltaY;
-                    }
-                    return current.showPBZones && d.id === current.port.id
-                        ? d.geometry.coordinates[1] + d.properties.dy
-                        : d.geometry.coordinates[1] + deltaY;
-                })
-                .attr(
-                    "font-size",
-                    d => (d.id === current.highlightId ? `${current.fontSize * 2}px` : `${current.fontSize}px`)
-                )
-                .attr("text-anchor", d => {
-                    if (current.showPBZones && current.zoomLevel === "pbZone" && d.id === current.port.id) {
-                        return d.properties.dx < 0 ? "end" : "start";
-                    }
-                    return "middle";
-                });
-        }
-    }
-
-    function updatePorts() {
-        updatePortCircles();
-        updatePortTexts();
-    }
-
     function initialZoomAndPan() {
         naSvg.call(naZoom.scaleTo, defaults.minScale);
     }
@@ -458,8 +223,8 @@ export default function naDisplay(serverName) {
         svgWind.selectAll("*").remove();
         current.bFirstCoord = true;
         current.lineData.splice(0, current.lineData.length);
-        current.portData = defaults.portData;
-        updatePorts();
+        ports.portData = defaults.portData;
+        ports.updatePorts(teleport.highlightId);
     }
 
     function plotCourse(x, y) {
@@ -682,34 +447,36 @@ export default function naDisplay(serverName) {
     }
 
     function updateMap() {
-        function setCurrent() {
-            current.circleSize = defaults.circleSize[current.zoomLevel];
-            current.fontSize = defaults.fontSize[current.zoomLevel];
-
+        function setZoomLevel(zoomLevel) {
+            current.zoomLevel = zoomLevel;
+            ports.zoomLevel = zoomLevel;
+            teleport.zoomLevel = zoomLevel;
+        }
+        function updateCurrent() {
             updatePBZones();
-            teleport.updateTeleportAreas(current.zoomLevel);
-            updatePorts();
+            teleport.updateTeleportAreas();
+            ports.updatePorts(teleport.highlightId);
         }
 
-        if (d3.event.transform.k > defaults.PBZoneZoomScale) {
+        if (d3.event.transform.k > defaults.PBZoneZoomThreshold) {
             if (current.zoomLevel !== "pbZone") {
-                current.zoomLevel = "pbZone";
+                setZoomLevel("pbZone");
                 setPBZoneData();
-                teleport.setTeleportData(current.zoomLevel);
-                setCurrent();
+                teleport.setTeleportData(false);
+                updateCurrent();
             }
-        } else if (d3.event.transform.k > defaults.labelZoomScale) {
+        } else if (d3.event.transform.k > defaults.labelZoomThreshold) {
             if (current.zoomLevel !== "portLabel") {
-                current.zoomLevel = "portLabel";
+                setZoomLevel("portLabel");
                 setPBZoneData();
-                teleport.setTeleportData(current.zoomLevel);
-                setCurrent();
+                teleport.setTeleportData(true);
+                updateCurrent();
             }
         } else if (current.zoomLevel !== "initial") {
-            current.zoomLevel = "initial";
+            setZoomLevel("initial");
             setPBZoneData();
-            teleport.setTeleportData(current.zoomLevel);
-            setCurrent();
+            teleport.setTeleportData(true);
+            updateCurrent();
         }
     }
 
@@ -722,8 +489,8 @@ export default function naDisplay(serverName) {
             .scale(Math.round(d3.event.transform.k * 1000) / 1000);
 
         displayCountries(transform);
+        ports.transform(transform);
         teleport.transform(transform);
-        mainGPort.attr("transform", transform);
         mainGPBZone.attr("transform", transform);
         mainGCoord.attr("transform", transform);
     }
@@ -792,8 +559,7 @@ export default function naDisplay(serverName) {
                 .attr("d", "M0,-5L10,0L0,5")
                 .attr("class", "wind-head");
             mainGMap = naSvg.append("g").classed("map", true);
-            mainGPort = naSvg.append("g").classed("port", true);
-            mainGText = mainGPort.append("g");
+
             mainGPBZone = naSvg.append("g").classed("pb", true);
             pbZones = mainGPBZone.append("path").classed("pb-zone", true);
             towers = mainGPBZone.append("path").classed("tower", true);
@@ -808,31 +574,6 @@ export default function naDisplay(serverName) {
                 .style("top", `${defaults.margin.top}px`)
                 .style("left", `${defaults.margin.left}px`)
                 .classed("coord", true);
-        }
-
-        function setupPorts() {
-            defaults.nations.map(d => d.id).forEach(nation => {
-                svgDef
-                    .append("pattern")
-                    .attr("id", nation)
-                    .attr("width", "100%")
-                    .attr("height", "100%")
-                    .attr("viewBox", `0 0 ${defaults.iconSize} ${defaults.iconSize}`)
-                    .append("image")
-                    .attr("height", defaults.iconSize)
-                    .attr("width", defaults.iconSize)
-                    .attr("href", `icons/${nation}.svg`);
-                svgDef
-                    .append("pattern")
-                    .attr("id", `${nation}a`)
-                    .attr("width", "100%")
-                    .attr("height", "100%")
-                    .attr("viewBox", `0 0 ${defaults.iconSize} ${defaults.iconSize}`)
-                    .append("image")
-                    .attr("height", defaults.iconSize)
-                    .attr("width", defaults.iconSize)
-                    .attr("href", `icons/${nation}a.svg`);
-            });
         }
 
         function setupSelects() {
@@ -884,8 +625,8 @@ export default function naDisplay(serverName) {
                 goodsPerPort.forEach(port => {
                     port.goods.split(",").forEach(good => {
                         if (good) {
-                            const ports = new Set(selectGoods.get(good)).add(port.id);
-                            selectGoods.set(good, ports);
+                            const portIds = new Set(selectGoods.get(good)).add(port.id);
+                            selectGoods.set(good, portIds);
                         }
                     });
                 });
@@ -913,7 +654,7 @@ export default function naDisplay(serverName) {
                 if (current.showPBZones) {
                     setPBZoneData();
                     updatePBZones();
-                    updatePortTexts();
+                    ports.updatePorts(teleport.highlightId);
                 }
                 goToPort();
             }
@@ -923,11 +664,11 @@ export default function naDisplay(serverName) {
                     .val()
                     .split(",");
                 if (portIds.includes("0")) {
-                    current.portData = defaults.portData;
+                    ports.portData = defaults.portData;
                 } else {
-                    current.portData = defaults.portData.filter(d => portIds.includes(d.id));
+                    ports.portData = defaults.portData.filter(d => portIds.includes(d.id));
                 }
-                updatePorts();
+                ports.updatePorts(teleport.highlightId);
             }
 
             portNames.addClass("selectpicker");
@@ -959,7 +700,7 @@ export default function naDisplay(serverName) {
             propClan.empty();
 
             const clanList = new Set();
-            current.portData.filter(d => d.properties.capturer).map(d => clanList.add(d.properties.capturer));
+            ports.portData.filter(d => d.properties.capturer).map(d => clanList.add(d.properties.capturer));
             const select = `<option value="0">Select a clan/Reset</option>${Array.from(clanList)
                 .sort()
                 .map(clan => `<option value="${clan}">${clan}</option>`)
@@ -971,14 +712,14 @@ export default function naDisplay(serverName) {
             const clan = $("#prop-clan").val();
 
             if (+clan !== 0) {
-                current.portData = defaults.portData.filter(d => clan === d.properties.capturer);
+                ports.portData = defaults.portData.filter(d => clan === d.properties.capturer);
             } else if (current.nation) {
-                current.portData = defaults.portData.filter(d => current.nation === d.properties.nation);
+                ports.portData = defaults.portData.filter(d => current.nation === d.properties.nation);
             } else {
-                current.portData = defaults.portData;
+                ports.portData = defaults.portData;
             }
             $("#propertyDropdown").dropdown("toggle");
-            updatePorts();
+            ports.updatePorts(teleport.highlightId);
         }
 
         function setupPropertyMenu() {
@@ -987,7 +728,7 @@ export default function naDisplay(serverName) {
 
             function setupNationSelect() {
                 const propNation = $("#prop-nation");
-                const select = `<option value="0">Select a nation/Reset</option>${defaults.nations
+                const select = `<option value="0">Select a nation/Reset</option>${nations
                     .sort((a, b) => {
                         if (a.sortName < b.sortName) {
                             return -1;
@@ -1007,27 +748,27 @@ export default function naDisplay(serverName) {
 
                 if (+nationId !== 0) {
                     current.nation = nationId;
-                    current.portData = defaults.portData.filter(d => nationId === d.properties.nation);
+                    ports.portData = defaults.portData.filter(d => nationId === d.properties.nation);
                     setupClanSelect();
                 } else {
                     current.nation = "";
-                    current.portData = defaults.portData;
+                    ports.portData = defaults.portData;
                     setupClanSelect();
                 }
                 $("#propertyDropdown").dropdown("toggle");
-                updatePorts();
+                ports.updatePorts(teleport.highlightId);
             }
 
             function allSelect() {
-                current.portData = defaults.portData.filter(d => d.properties.availableForAll);
-                updatePorts();
+                ports.portData = defaults.portData.filter(d => d.properties.availableForAll);
+                ports.updatePorts(teleport.highlightId);
             }
 
             function greenZoneSelect() {
-                current.portData = defaults.portData.filter(
+                ports.portData = defaults.portData.filter(
                     d => d.properties.nonCapturable && d.properties.nation !== "FT"
                 );
-                updatePorts();
+                ports.updatePorts(teleport.highlightId);
             }
 
             function capturePBRange() {
@@ -1062,13 +803,13 @@ export default function naDisplay(serverName) {
                 }
                 */
 
-                current.portData = defaults.portData.filter(
+                ports.portData = defaults.portData.filter(
                     d =>
                         !d.properties.nonCapturable &&
                         d.properties.nation !== "FT" &&
                         startTimes.has(d.properties.portBattleStartTime)
                 );
-                updatePorts();
+                ports.updatePorts(teleport.highlightId);
             }
 
             function filterCaptured(begin, end) {
@@ -1077,10 +818,10 @@ export default function naDisplay(serverName) {
                     begin.format("dddd D MMMM YYYY h:mm"),
                     end.format("dddd D MMMM YYYY h:mm")
                 );
-                current.portData = defaults.portData.filter(d =>
+                ports.portData = defaults.portData.filter(d =>
                     moment(d.properties.lastPortBattle).isBetween(begin, end, null, "(]")
                 );
-                updatePorts();
+                ports.updatePorts(teleport.highlightId);
             }
 
             function capturedYesterday() {
@@ -1136,7 +877,7 @@ export default function naDisplay(serverName) {
                     })
                 );
                 const cmList = new Set();
-                current.portData
+                ports.portData
                     .filter(d => d.properties.capturer)
                     .map(d => cmList.add(d.properties.conquestMarksPension));
                 cmList.forEach(cm => {
@@ -1153,12 +894,12 @@ export default function naDisplay(serverName) {
                 const value = parseInt($("#prop-cm").val(), 10);
 
                 if (value !== 0) {
-                    current.portData = defaults.portData.filter(d => value === d.properties.conquestMarksPension);
+                    ports.portData = defaults.portData.filter(d => value === d.properties.conquestMarksPension);
                 } else {
-                    current.portData = defaults.portData;
+                    ports.portData = defaults.portData;
                 }
                 $("#propertyDropdown").dropdown("toggle");
-                updatePorts();
+                ports.updatePorts(teleport.highlightId);
             }
 
             setupNationSelect();
@@ -1488,6 +1229,11 @@ export default function naDisplay(serverName) {
                 });
             }
 
+            function setShowPBZones(showPBZones) {
+                current.showPBZones = showPBZones;
+                ports.showPBZones = showPBZones;
+            }
+
             setupWindPrediction();
             setupF11Copy();
             setupF11Paste();
@@ -1514,10 +1260,10 @@ export default function naDisplay(serverName) {
                 .on("change", () => {
                     const $input = $("#show-pb");
 
-                    current.showPBZones = $input.is(":checked");
+                    setShowPBZones($input.is(":checked"));
                     setPBZoneData();
                     updatePBZones();
-                    updatePortTexts();
+                    ports.updatePortTexts();
                 });
 
             $("#button-ship-compare").on("click", event => {
@@ -1527,13 +1273,13 @@ export default function naDisplay(serverName) {
             });
         }
 
+        moment.locale("en-gb");
         setupSvg();
-        setupPorts();
-        teleport = new Teleport(defaults.portData, defaults.coord.min, defaults.coord.max);
+        ports = new PortDisplay(defaults.portData);
+        teleport = new Teleport(defaults.portData, defaults.coord.min, defaults.coord.max, ports);
         setupSelects();
         setupPropertyMenu();
         setupListener();
-        moment.locale("en-gb");
         initialZoomAndPan();
     }
 
@@ -1544,8 +1290,6 @@ export default function naDisplay(serverName) {
 
         // Read map data
         defaults.portData = topojsonFeature(naMapJsonData, naMapJsonData.objects.ports).features;
-        current.portData = defaults.portData;
-
         defaults.PBZoneData = topojsonFeature(pbZonesJsonData, pbZonesJsonData.objects.pbZones);
         defaults.fortData = topojsonFeature(pbZonesJsonData, pbZonesJsonData.objects.forts);
         defaults.towerData = topojsonFeature(pbZonesJsonData, pbZonesJsonData.objects.towers);

@@ -20,3 +20,12 @@ export function isEmpty(obj) {
     return Object.getOwnPropertyNames(obj).length === 0 && obj.constructor === Object;
 }
 
+export const thousandsWithBlanks = x => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u202f");
+
+export const formatCoord = x => {
+    let r = thousandsWithBlanks(Math.abs(Math.trunc(x)));
+    if (x < 0) {
+        r = `\u2212\u202f${r}`;
+    }
+    return r;
+};
