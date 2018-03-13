@@ -1,5 +1,5 @@
 /*
-	ports.js
+    ports.js
 */
 
 import { select as d3Select } from "d3-selection";
@@ -23,17 +23,47 @@ export default class PortDisplay {
         // Shroud Cay
         this.currentPort = { id: "366", coord: { x: 4396, y: 2494 } };
 
+        this.setupSvg();
+        this.setupFlags();
+    }
+
+    setupSvg() {
         this.g = d3Select("#na-svg")
             .append("g")
             .classed("port", true);
         this.gText = this.g.append("g");
-
-        this.setupFlags();
     }
 
-    updatePortCircles(highlightId) {
-        function showPortDetails(d, i, nodes) {
-            function naTooltipData(portProperties) {
+    setupFlags() {
+        const svgDef = d3Select("#na-svg defs");
+
+        nations.map(d => d.id).forEach(nation => {
+            svgDef
+                .append("pattern")
+                .attr("id", nation)
+                .attr("width", "100%")
+                .attr("height", "100%")
+                .attr("viewBox", `0 0 ${this.iconSize} ${this.iconSize}`)
+                .append("image")
+                .attr("height", this.iconSize)
+                .attr("width", this.iconSize)
+                .attr("href", `icons/${nation}.svg`);
+            svgDef
+                .append("pattern")
+                .attr("id", `${nation}a`)
+                .attr("width", "100%")
+                .attr("height", "100%")
+                .attr("viewBox", `0 0 ${this.iconSize} ${this.iconSize}`)
+                .append("image")
+                .attr("height", this.iconSize)
+                .attr("width", this.iconSize)
+                .attr("href", `icons/${nation}a.svg`);
+        });
+    }
+
+    updateCircles(highlightId) {
+        function showDetails(d, i, nodes) {
+            function tooltipData(portProperties) {
                 let h = `<table><tbody<tr><td><i class="flag-icon ${
                     portProperties.availableForAll ? `${portProperties.nation}a` : portProperties.nation
                 }"></i></td>`;
@@ -138,13 +168,13 @@ export default class PortDisplay {
                     },
                     html: true,
                     placement: "auto",
-                    title: naTooltipData(d.properties),
+                    title: tooltipData(d.properties),
                     trigger: "manual"
                 })
                 .tooltip("show");
         }
 
-        function hidePortDetails(d, i, nodes) {
+        function hideDetails(d, i, nodes) {
             // eslint-disable-next-line no-underscore-dangle
             $(d3Select(nodes[i])._groups[0]).tooltip("hide");
         }
@@ -171,19 +201,19 @@ export default class PortDisplay {
                 "fill",
                 d => `url(#${d.properties.availableForAll ? `${d.properties.nation}a` : d.properties.nation})`
             )
-            .on("click", showPortDetails)
-            .on("mouseout", hidePortDetails);
+            .on("click", showDetails)
+            .on("mouseout", hideDetails);
 
         // Apply to both old and new
         circleUpdate.merge(circleEnter).attr("r", d => (d.id === highlightId ? circleSize * 3 : circleSize));
     }
 
-    updatePortTexts(highlightId) {
+    updateTexts(highlightId) {
         if (this.zoomLevel === "initial") {
             this.gText.attr("display", "none");
         } else {
             this.gText.attr("display", "inherit");
-            console.log("updatePortTexts ", this.zoomLevel);
+
             const circleSize = this.circleSizes[this.zoomLevel],
                 fontSize = this.fontSizes[this.zoomLevel];
 
@@ -235,43 +265,19 @@ export default class PortDisplay {
         }
     }
 
-    updatePorts(highlightId) {
-        this.updatePortCircles(highlightId);
-        this.updatePortTexts(highlightId);
+    update(highlightId) {
+        this.updateCircles(highlightId);
+        this.updateTexts(highlightId);
     }
 
-    setupFlags() {
-        const svgDef = d3Select("#na-svg defs");
 
-        nations.map(d => d.id).forEach(nation => {
-            svgDef
-                .append("pattern")
-                .attr("id", nation)
-                .attr("width", "100%")
-                .attr("height", "100%")
-                .attr("viewBox", `0 0 ${this.iconSize} ${this.iconSize}`)
-                .append("image")
-                .attr("height", this.iconSize)
-                .attr("width", this.iconSize)
-                .attr("href", `icons/${nation}.svg`);
-            svgDef
-                .append("pattern")
-                .attr("id", `${nation}a`)
-                .attr("width", "100%")
-                .attr("height", "100%")
-                .attr("viewBox", `0 0 ${this.iconSize} ${this.iconSize}`)
-                .append("image")
-                .attr("height", this.iconSize)
-                .attr("width", this.iconSize)
-                .attr("href", `icons/${nation}a.svg`);
-        });
-    }
-
-    resetData() {
-        this.portData = this.portDataDefault;
-    }
 
     transform(transform) {
         this.g.attr("transform", transform);
+    }
+
+    clearMap(highlightId) {
+        this.portData = this.portDataDefault;
+        this.update(highlightId);
     }
 }
