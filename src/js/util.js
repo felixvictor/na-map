@@ -81,3 +81,6 @@ export const rotationAngleInDegrees = (centerPt, targetPt) => {
     }
     return angle;
 };
+
+// https://bocoup.com/blog/find-the-closest-power-of-2-with-javascript
+export const nearestPow2 = aSize => 2 ** Math.round(Math.log2(aSize));
