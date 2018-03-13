@@ -27,12 +27,9 @@ import ShipCompare from "./ship-compare";
 import Teleport from "./teleport";
 import WindPrediction from "./wind-prediction";
 
-export default function naDisplay(serverName) {
-    // https://bocoup.com/blog/find-the-closest-power-of-2-with-javascript
-    function nearestPow2(aSize) {
-        return 2 ** Math.round(Math.log2(aSize));
-    }
+import { nearestPow2 } from "./util";
 
+export default function naDisplay(serverName) {
     let naSvg, zoom, mainGMap, ports, teleport, windPrediction, f11, course, pbZone;
     const navbarBrandPaddingLeft = Math.floor(1.618 * 16); // equals 1.618rem
     // noinspection JSSuspiciousNameCombination
@@ -408,8 +405,8 @@ export default function naDisplay(serverName) {
         }
 
         function setupPropertyMenu() {
-            const dateFormat = "dd YYYY-MM-DD",
-                timeFormat = "HH:00";
+            const dateFormat = "D MMM",
+                timeFormat = "HH.00";
 
             function setupNationSelect() {
                 const propNation = $("#prop-nation");
