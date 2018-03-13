@@ -6,27 +6,11 @@ import { select as d3Select } from "d3-selection";
 import { voronoi as d3Voronoi } from "d3-voronoi";
 
 export default class Teleport {
-    constructor(portData, minCoord, maxCoord, ports) {
-        function getPortData() {
-            // Use only ports that deep water ports and not a county capital
-            return (
-                portData
-                    .filter(d => !d.properties.shallow && !d.properties.countyCapital)
-                    // Map to coordinates array
-                    .map(d => ({
-                        id: d.id,
-                        coord: {
-                            x: d.geometry.coordinates[0],
-                            y: d.geometry.coordinates[1]
-                        }
-                    }))
-            );
-        }
-
+    constructor(minCoord, maxCoord, ports) {
         this.ports = ports;
         this.showTeleportAreas = false;
         this.voronoiCoord = [[minCoord - 1, minCoord - 1], [maxCoord + 1, maxCoord + 1]];
-        this.teleportPorts = getPortData();
+        this.teleportPorts = this.getPortData();
         this.voronoiDiagram = this.getVoronoiDiagram();
         this.teleportData = {};
         this.highlightId = null;
@@ -35,6 +19,33 @@ export default class Teleport {
             .classed("voronoi", true);
 
         this.setupListener();
+    }
+
+    setupListener() {
+        $("#show-teleport")
+            .on("click", event => event.stopPropagation())
+            .on("change", () => {
+                const $input = $("#show-teleport");
+
+                this.showTeleportAreas = $input.is(":checked");
+                this.updateTeleportAreas();
+            });
+    }
+
+    getPortData() {
+        // Use only ports that deep water ports and not a county capital
+        return (
+            this.ports.portDataDefault
+                .filter(d => !d.properties.shallow && !d.properties.countyCapital)
+                // Map to coordinates array
+                .map(d => ({
+                    id: d.id,
+                    coord: {
+                        x: d.geometry.coordinates[0],
+                        y: d.geometry.coordinates[1]
+                    }
+                }))
+        );
     }
 
     getVoronoiDiagram() {
@@ -67,12 +78,12 @@ export default class Teleport {
         if (site) {
             this.highlightId = site.data.id;
             this.updateTeleportAreas();
-            // updatePorts(zoomLevel);
+            // update(zoomLevel);
         }
         */
         this.highlightId = event.data.id;
         this.updateTeleportAreas();
-        this.ports.updatePorts(this.highlightId);
+        this.ports.update(this.highlightId);
     }
 
     updateTeleportAreas() {
@@ -98,16 +109,5 @@ export default class Teleport {
 
     transform(transform) {
         this.g.attr("transform", transform);
-    }
-
-    setupListener() {
-        $("#show-teleport")
-            .on("click", event => event.stopPropagation())
-            .on("change", () => {
-                const $input = $("#show-teleport");
-
-                this.showTeleportAreas = $input.is(":checked");
-                this.updateTeleportAreas();
-            });
     }
 }
