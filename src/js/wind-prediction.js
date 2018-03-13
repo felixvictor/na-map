@@ -31,6 +31,19 @@ export default class WindPrediction {
             .style("left", `${this.leftMargin}px`)
             .style("top", `${this.topMargin}px`)
             .classed("coord", true);
+
+        d3Select("#na-svg defs")
+            .append("marker")
+            .attr("id", "wind-arrow")
+            .attr("viewBox", "0 -5 10 10")
+            .attr("refX", 5)
+            .attr("refY", 0)
+            .attr("markerWidth", 4)
+            .attr("markerHeight", 4)
+            .attr("orient", "auto")
+            .append("path")
+            .attr("d", "M0,-5L10,0L0,5")
+            .attr("class", "wind-head");
     }
 
     // eslint-disable-next-line class-methods-use-this
