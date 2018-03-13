@@ -1401,6 +1401,10 @@ boom@5.x.x:
   dependencies:
     hoek "4.x.x"
 
+"bootstrap-4-multi-dropdown-navbar@https://github.com/bootstrapthemesco/bootstrap-4-multi-dropdown-navbar.git":
+  version "0.0.0"
+  resolved "https://github.com/bootstrapthemesco/bootstrap-4-multi-dropdown-navbar.git#b7df377e8b8a5fbc1286c938ddcf9b0e8a7b9fbd"
+
 "bootstrap-select@https://github.com/snapappointments/bootstrap-select.git":
   version "1.13.0-beta"
   resolved "https://github.com/snapappointments/bootstrap-select.git#0df200aa2c1b26b4a88010026ded096070b0e89a"
