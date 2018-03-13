@@ -10,6 +10,7 @@ import "bootstrap/js/dist/dropdown";
 import "bootstrap/js/dist/modal";
 import "bootstrap/js/dist/tooltip";
 import "bootstrap/js/dist/util";
+import "bootstrap-4-multi-dropdown-navbar/js/bootstrap-4-navbar";
 
 import fontawesome from "@fortawesome/fontawesome";
 import { faCalendar, faCalendarCheck, faClock, faCopy } from "@fortawesome/fontawesome-free-regular";
