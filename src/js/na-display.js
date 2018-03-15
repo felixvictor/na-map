@@ -18,8 +18,8 @@ import "bootstrap/js/dist/util";
 import { range as d3Range } from "d3-array";
 import d3Json from "d3-fetch/src/json";
 import { queue as d3Queue } from "d3-queue";
-import { select as d3Select } from "d3-selection";
-// import { zoom as d3Zoom, zoomIdentity as d3ZoomIdentity, zoomTransform as d3ZoomTransform } from "d3-zoom";
+import { event as d3Event, select as d3Select } from "d3-selection";
+import { zoom as d3Zoom, zoomIdentity as d3ZoomIdentity, zoomTransform as d3ZoomTransform } from "d3-zoom";
 
 import { nearestPow2 } from "./util";
 
@@ -82,17 +82,16 @@ export default function naDisplay(serverName) {
 
         _setupSvg() {
             function stopProp() {
-                if (d3.event.defaultPrevented) {
-                    d3.event.stopPropagation();
+                if (d3Event.defaultPrevented) {
+                    d3Event.stopPropagation();
                 }
             }
 
             // noinspection JSSuspiciousNameCombination
-            this._zoom = d3
-                .zoom()
+            this._zoom = d3Zoom()
                 .scaleExtent([this._minScale, this._maxScale])
                 .translateExtent([[this.coord.min, this.coord.min], [this.coord.max, this.coord.max]])
-                .wheelDelta(() => -this._wheelDelta * Math.sign(d3.event.deltaY))
+                .wheelDelta(() => -this._wheelDelta * Math.sign(d3Event.deltaY))
                 .on("zoom", this._naZoomed);
 
             this._svg = d3Select("#na")
@@ -204,7 +203,7 @@ export default function naDisplay(serverName) {
         }
 
         zoomAndPan(x, y, scale) {
-            const transform = d3.zoomIdentity
+            const transform = d3ZoomIdentity
                 .scale(scale)
                 .translate(Math.round(-x + this._width / 2 / scale), Math.round(-y + this._height / 2 / scale));
             this._svg.call(this._zoom.transform, transform);
@@ -220,7 +219,7 @@ export default function naDisplay(serverName) {
 
         _doubleClickAction() {
             const coord = d3.mouse(this),
-                transform = d3.zoomTransform(this);
+                transform = d3ZoomTransform(this);
             const mx = coord[0],
                 my = coord[1],
                 tk = transform.k,
@@ -254,12 +253,12 @@ export default function naDisplay(serverName) {
         }
 
         _updateMap() {
-            if (d3.event.transform.k > this._PBZoneZoomThreshold) {
+            if (d3Event.transform.k > this._PBZoneZoomThreshold) {
                 if (this._zoomLevel !== "pbZone") {
                     this._setZoomLevel("pbZone");
                     this._updateCurrent();
                 }
-            } else if (d3.event.transform.k > this._labelZoomThreshold) {
+            } else if (d3Event.transform.k > this._labelZoomThreshold) {
                 if (this._zoomLevel !== "portLabel") {
                     this._setZoomLevel("portLabel");
                     this._updateCurrent();
@@ -274,9 +273,9 @@ export default function naDisplay(serverName) {
             this._updateMap();
 
             // noinspection JSSuspiciousNameCombination
-            const zoomTransform = d3.zoomIdentity
-                .translate(Math.round(d3.event.transform.x), Math.round(d3.event.transform.y))
-                .scale(Math.round(d3.event.transform.k * 1000) / 1000);
+            const zoomTransform = d3ZoomIdentity
+                .translate(Math.round(d3Event.transform.x), Math.round(d3Event.transform.y))
+                .scale(Math.round(d3Event.transform.k * 1000) / 1000);
 
             this._displayCountries(zoomTransform);
             ports.transform(zoomTransform);
@@ -335,7 +334,7 @@ export default function naDisplay(serverName) {
         setup();
     }
 
-    const queue = d3.queue();
+    const queue = d3Queue();
     jsonFiles.forEach(filename => {
         queue.defer(d3.json, filename);
     });
