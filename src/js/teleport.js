@@ -2,8 +2,8 @@
 	teleport.js
 */
 
-import { select as d3Select } from "d3-selection";
-import { voronoi as d3Voronoi } from "d3-voronoi";
+/* global d3 : false
+ */
 
 export default class Teleport {
     constructor(minCoord, maxCoord, ports) {
@@ -14,7 +14,7 @@ export default class Teleport {
         this.voronoiDiagram = this.getVoronoiDiagram();
         this.teleportData = {};
         this.highlightId = null;
-        this.g = d3Select("#na-svg")
+        this.g = d3.select("#na-svg")
             .insert("g", ".port")
             .classed("voronoi", true);
 
@@ -49,7 +49,7 @@ export default class Teleport {
     }
 
     getVoronoiDiagram() {
-        return d3Voronoi()
+        return d3.voronoi()
             .extent(this.voronoiCoord)
             .x(d => d.coord.x)
             .y(d => d.coord.y)(this.teleportPorts);
@@ -67,7 +67,7 @@ export default class Teleport {
     mouseover(event) {
         // console.log(event);
         /*
-        const ref = d3Mouse(nodes[i]),
+        const ref = d3.mouse(nodes[i]),
             mx = ref[0],
             my = ref[1];
 
