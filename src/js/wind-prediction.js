@@ -2,8 +2,9 @@
     wind-prediction.js
  */
 
-import { select as d3Select } from "d3-selection";
-import { line as d3Line } from "d3-shape";
+/* global d3 : false
+ */
+
 import moment from "moment/moment";
 import "round-slider/src/roundslider";
 import "tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4";
@@ -15,7 +16,7 @@ export default class WindPrediction {
         this.ports = ports;
         this.leftMargin = leftMargin;
         this.topMargin = topMargin;
-        this.line = d3Line();
+        this.line = d3.line();
 
         this.setupSvg();
         this.setupForm();
@@ -23,7 +24,7 @@ export default class WindPrediction {
     }
 
     setupSvg() {
-        this.svg = d3Select("body")
+        this.svg = d3.select("body")
             .append("div")
             .attr("id", "wind")
             .append("svg")
@@ -32,7 +33,7 @@ export default class WindPrediction {
             .style("top", `${this.topMargin}px`)
             .classed("coord", true);
 
-        d3Select("#na-svg defs")
+        d3.select("#na-svg defs")
             .append("marker")
             .attr("id", "wind-arrow")
             .attr("viewBox", "0 -5 10 10")
