@@ -2,7 +2,9 @@
     ports.js
 */
 
-import { select as d3Select } from "d3-selection";
+/* global d3 : false
+ */
+
 import moment from "moment";
 import "moment-timezone";
 import "moment/locale/en-gb";
@@ -28,14 +30,14 @@ export default class PortDisplay {
     }
 
     setupSvg() {
-        this.g = d3Select("#na-svg")
+        this.g = d3.select("#na-svg")
             .append("g")
             .classed("port", true);
         this.gText = this.g.append("g");
     }
 
     setupFlags() {
-        const svgDef = d3Select("#na-svg defs");
+        const svgDef = d3.select("#na-svg defs");
 
         nations.map(d => d.id).forEach(nation => {
             svgDef
@@ -156,7 +158,7 @@ export default class PortDisplay {
                 return h;
             }
 
-            const port = d3Select(nodes[i]);
+            const port = d3.select(nodes[i]);
 
             port.attr("data-toggle", "tooltip");
             // eslint-disable-next-line no-underscore-dangle
@@ -176,7 +178,7 @@ export default class PortDisplay {
 
         function hideDetails(d, i, nodes) {
             // eslint-disable-next-line no-underscore-dangle
-            $(d3Select(nodes[i])._groups[0]).tooltip("hide");
+            $(d3.select(nodes[i])._groups[0]).tooltip("hide");
         }
 
         const circleSize = this.circleSizes[this.zoomLevel];

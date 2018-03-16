@@ -15,12 +15,6 @@ import "moment/locale/en-gb";
 import "bootstrap/js/dist/tooltip";
 import "bootstrap/js/dist/util";
 
-import { range as d3Range } from "d3-array";
-import d3Json from "d3-fetch/src/json";
-import { queue as d3Queue } from "d3-queue";
-import { event as d3Event, select as d3Select } from "d3-selection";
-import { zoom as d3Zoom, zoomIdentity as d3ZoomIdentity, zoomTransform as d3ZoomTransform } from "d3-zoom";
-
 import { nearestPow2 } from "./util";
 
 import Course from "./course";
@@ -82,19 +76,21 @@ export default function naDisplay(serverName) {
 
         _setupSvg() {
             function stopProp() {
-                if (d3Event.defaultPrevented) {
-                    d3Event.stopPropagation();
+                if (d3.event.defaultPrevented) {
+                    d3.event.stopPropagation();
                 }
             }
 
             // noinspection JSSuspiciousNameCombination
-            this._zoom = d3Zoom()
+            this._zoom = d3
+                .zoom()
                 .scaleExtent([this._minScale, this._maxScale])
                 .translateExtent([[this.coord.min, this.coord.min], [this.coord.max, this.coord.max]])
-                .wheelDelta(() => -this._wheelDelta * Math.sign(d3Event.deltaY))
-                .on("zoom", this._naZoomed);
+                .wheelDelta(() => -this._wheelDelta * Math.sign(d3.event.deltaY))
+                .on("zoom", this._naZoomed());
 
-            this._svg = d3Select("#na")
+            this._svg = d3
+                .select("#na")
                 .append("svg")
                 .attr("id", "na-svg")
                 .attr("width", this._width)
@@ -105,7 +101,7 @@ export default function naDisplay(serverName) {
                 .call(this._zoom)
                 .on("dblclick.zoom", null)
                 .on("click", stopProp, true)
-                .on("dblclick", this._doubleClickAction);
+                .on("dblclick", this._doubleClickAction());
             this._svg.append("defs");
 
             this._g = this._svg.append("g").classed("map", true);
@@ -142,11 +138,11 @@ export default function naDisplay(serverName) {
                 dx = this.coord.max * transform.k < this._width ? transform.x : 0,
                 // crop bottom
                 dy = this.coord.max * transform.k < this._height ? transform.y : 0,
-                cols = d3Range(
+                cols = d3.range(
                     Math.max(0, Math.floor((x0 - x) / this._tileSize / k)),
                     Math.max(0, Math.min(Math.ceil((x1 - x - dx) / this._tileSize / k), 2 ** tileZoom))
                 ),
-                rows = d3Range(
+                rows = d3.range(
                     Math.max(0, Math.floor((y0 - y) / this._tileSize / k)),
                     Math.max(0, Math.min(Math.ceil((y1 - y - dy) / this._tileSize / k), 2 ** tileZoom))
                 ),
@@ -177,7 +173,7 @@ export default function naDisplay(serverName) {
             */
 
             // noinspection JSSuspiciousNameCombination
-            const tileTransform = d3ZoomIdentity
+            const tileTransform = d3.zoomIdentity
                 .translate(Math.round(tiles.translate[0]), Math.round(tiles.translate[1]))
                 .scale(Math.round(tiles.scale * 1000) / 1000);
 
@@ -203,7 +199,7 @@ export default function naDisplay(serverName) {
         }
 
         zoomAndPan(x, y, scale) {
-            const transform = d3ZoomIdentity
+            const transform = d3.zoomIdentity
                 .scale(scale)
                 .translate(Math.round(-x + this._width / 2 / scale), Math.round(-y + this._height / 2 / scale));
             this._svg.call(this._zoom.transform, transform);
@@ -219,7 +215,7 @@ export default function naDisplay(serverName) {
 
         _doubleClickAction() {
             const coord = d3.mouse(this),
-                transform = d3ZoomTransform(this);
+                transform = d3.zoomTransform(this);
             const mx = coord[0],
                 my = coord[1],
                 tk = transform.k,
@@ -252,13 +248,14 @@ export default function naDisplay(serverName) {
             ports.update(teleport.highlightId);
         }
 
-        _updateMap() {
-            if (d3Event.transform.k > this._PBZoneZoomThreshold) {
+        updateMap() {
+            console.log(d3.event);
+            if (d3.event.transform.k > this._PBZoneZoomThreshold) {
                 if (this._zoomLevel !== "pbZone") {
                     this._setZoomLevel("pbZone");
                     this._updateCurrent();
                 }
-            } else if (d3Event.transform.k > this._labelZoomThreshold) {
+            } else if (d3.event.transform.k > this._labelZoomThreshold) {
                 if (this._zoomLevel !== "portLabel") {
                     this._setZoomLevel("portLabel");
                     this._updateCurrent();
@@ -270,12 +267,12 @@ export default function naDisplay(serverName) {
         }
 
         _naZoomed() {
-            this._updateMap();
+            this.updateMap();
 
             // noinspection JSSuspiciousNameCombination
-            const zoomTransform = d3ZoomIdentity
-                .translate(Math.round(d3Event.transform.x), Math.round(d3Event.transform.y))
-                .scale(Math.round(d3Event.transform.k * 1000) / 1000);
+            const zoomTransform = d3.zoomIdentity
+                .translate(Math.round(d3.event.transform.x), Math.round(d3.event.transform.y))
+                .scale(Math.round(d3.event.transform.k * 1000) / 1000);
 
             this._displayCountries(zoomTransform);
             ports.transform(zoomTransform);
@@ -310,7 +307,6 @@ export default function naDisplay(serverName) {
         course = new Course(ports.fontSizes.portLabel);
         moment.locale("en-gb");
         setupListener();
-        console.log("d3.event ", d3.event);
         map._initialZoomAndPan();
     }
 
@@ -318,7 +314,6 @@ export default function naDisplay(serverName) {
         if (error) {
             throw error;
         }
-
         map = new NAMap();
         // Read map data
         const portData = topojsonFeature(naMapJsonData, naMapJsonData.objects.ports).features;
@@ -334,7 +329,7 @@ export default function naDisplay(serverName) {
         setup();
     }
 
-    const queue = d3Queue();
+    const queue = d3.queue();
     jsonFiles.forEach(filename => {
         queue.defer(d3.json, filename);
     });
