@@ -2,8 +2,8 @@
     pbzone.js
 */
 
-import { select as d3Select } from "d3-selection";
-import { geoPath as d3GeoPath } from "d3-geo";
+/* global d3 : false
+ */
 
 export default class PBZone {
     constructor(pbZoneData, fortData, towerData, ports) {
@@ -20,7 +20,7 @@ export default class PBZone {
     }
 
     setupSvg() {
-        this.g = d3Select("#na-svg")
+        this.g = d3.select("#na-svg")
             .append("g")
             .classed("pb", true);
         this.pbZones = this.g.append("path").classed("pb-zone", true);
@@ -49,9 +49,9 @@ export default class PBZone {
     }
 
     update() {
-        this.pbZones.datum(this.pbZoneData).attr("d", d3GeoPath().pointRadius(4));
-        this.towers.datum(this.towerData).attr("d", d3GeoPath().pointRadius(1.5));
-        this.forts.datum(this.fortData).attr("d", d3GeoPath().pointRadius(2));
+        this.pbZones.datum(this.pbZoneData).attr("d", d3.geoPath().pointRadius(4));
+        this.towers.datum(this.towerData).attr("d", d3.geoPath().pointRadius(1.5));
+        this.forts.datum(this.fortData).attr("d", d3.geoPath().pointRadius(2));
     }
 
     setData() {

@@ -2,17 +2,8 @@
     ship-compare.js
  */
 
-import { ascending as d3Ascending, min as d3Min, max as d3Max, range as d3Range } from "d3-array";
-import { nest as d3Nest } from "d3-collection";
-import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate";
-import { scaleLinear as d3ScaleLinear } from "d3-scale";
-import { select as d3Select } from "d3-selection";
-import {
-    arc as d3Arc,
-    curveCatmullRomClosed as d3CurveCatmullRomClosed,
-    pie as d3Pie,
-    radialLine as d3RadialLine
-} from "d3-shape";
+/* global d3 : false
+ */
 
 import { formatNumber, getOrdinal, isEmpty } from "./util";
 
@@ -24,9 +15,9 @@ const numSegments = 24,
     segmentRadians = 2 * Math.PI / numSegments;
 
 export default function shipCompare(shipData) {
-    const shipSelectData = d3Nest()
+    const shipSelectData = d3.nest()
             .key(ship => ship.class)
-            .sortKeys(d3Ascending)
+            .sortKeys(d3.ascending)
             .entries(
                 shipData
                     .map(ship => ({
@@ -47,13 +38,13 @@ export default function shipCompare(shipData) {
                     })
             ),
         ships = { Base: {}, C1: {}, C2: {} },
-        minSpeed = d3Min(shipData, d => d.minSpeed),
-        maxSpeed = d3Max(shipData, d => d.maxSpeed),
-        colorScale = d3ScaleLinear()
+        minSpeed = d3.min(shipData, d => d.minSpeed),
+        maxSpeed = d3.max(shipData, d => d.maxSpeed),
+        colorScale = d3.scaleLinear()
             .domain([minSpeed, 0, 4, 8, 12, maxSpeed])
             .range(["#a62e39", "#fbf8f5", "#a4dab0", "#6cc380", "#419f57"])
-            .interpolate(d3InterpolateHcl),
-        radiusScaleAbsolute = d3ScaleLinear().domain([minSpeed, 0, maxSpeed]),
+            .interpolate(d3.interpolateHcl),
+        radiusScaleAbsolute = d3.scaleLinear().domain([minSpeed, 0, maxSpeed]),
         options = shipSelectData
             .map(
                 key =>
@@ -74,13 +65,13 @@ export default function shipCompare(shipData) {
             this.select = `#ship-${this.id}`;
 
             this.setupSvg();
-            this.g = d3Select(this.select).select("g");
+            this.g = d3.select(this.select).select("g");
             this.setCompass();
         }
 
         setupSvg() {
-            d3Select(`${this.select} svg`).remove();
-            d3Select(this.select)
+            d3.select(`${this.select} svg`).remove();
+            d3.select(this.select)
                 .append("svg")
                 .attr("width", svgWidth)
                 .attr("height", svgHeight)
@@ -88,19 +79,19 @@ export default function shipCompare(shipData) {
                 .attr("fill", "none")
                 .append("g")
                 .attr("transform", `translate(${svgWidth / 2}, ${svgHeight / 2})`);
-            d3Select(`${this.select} div`).remove();
-            d3Select(this.select).append("div");
+            d3.select(`${this.select} div`).remove();
+            d3.select(this.select).append("div");
         }
 
         setCompass() {
             // Compass
             const data = new Array(numSegments / 2);
             data.fill(1, 0);
-            const pie = d3Pie()
+            const pie = d3.pie()
                 .sort(null)
                 .value(1)(data);
 
-            const arc = d3Arc()
+            const arc = d3.arc()
                 .outerRadius(radiusScaleAbsolute(12))
                 .innerRadius(innerRadius);
 
@@ -203,7 +194,7 @@ export default function shipCompare(shipData) {
 
         setBackground() {
             // Arc for text
-            const knotsArc = d3Arc()
+            const knotsArc = d3.arc()
                 .outerRadius(d => radiusScaleAbsolute(d) + 2)
                 .innerRadius(d => radiusScaleAbsolute(d) + 1)
                 .startAngle(-Math.PI / 2)
@@ -246,7 +237,7 @@ export default function shipCompare(shipData) {
 
         setBackgroundGradient() {
             // Extra scale since the color scale is interpolated
-            const gradientScale = d3ScaleLinear()
+            const gradientScale = d3.scaleLinear()
                 .domain([this.shipData.minSpeed, this.shipData.maxSpeed])
                 .range([0, svgWidth]);
 
@@ -268,7 +259,7 @@ export default function shipCompare(shipData) {
                 .attr("cy", 0.25)
                 .attr("r", 0.5)
                 .selectAll("stop")
-                .data(d3Range(numStops))
+                .data(d3.range(numStops))
                 .enter()
                 .append("stop")
                 .attr("offset", (d, i) => gradientScale(gradientPoint[i]) / svgWidth)
@@ -276,14 +267,14 @@ export default function shipCompare(shipData) {
         }
 
         drawProfile() {
-            const pie = d3Pie()
+            const pie = d3.pie()
                 .sort(null)
                 .value(1);
 
             const arcs = pie(this.shipData.speedDegrees);
 
-            const curve = d3CurveCatmullRomClosed,
-                line = d3RadialLine()
+            const curve = d3.curveCatmullRomClosed,
+                line = d3.radialLine()
                     .angle((d, i) => i * segmentRadians)
                     .radius(d => radiusScaleAbsolute(d.data))
                     .curve(curve);
@@ -365,21 +356,21 @@ export default function shipCompare(shipData) {
         }
 
         drawDifferenceProfile() {
-            const colorScaleDiff = d3ScaleLinear()
+            const colorScaleDiff = d3.scaleLinear()
                 .domain(["Base", "Compare"])
                 .range(["#a62e39", "#fbf8f5", "#a4dab0", "#6cc380", "#419f57"]);
 
-            const pie = d3Pie()
+            const pie = d3.pie()
                 .sort(null)
                 .value(1);
             const arcsA = pie(this.shipBaseData.speedDegrees),
                 arcsB = pie(this.shipCompareData.speedDegrees);
-            const curve = d3CurveCatmullRomClosed,
-                lineA = d3RadialLine()
+            const curve = d3.curveCatmullRomClosed,
+                lineA = d3.radialLine()
                     .angle((d, i) => i * segmentRadians)
                     .radius(d => radiusScaleAbsolute(d.data))
                     .curve(curve),
-                lineB = d3RadialLine()
+                lineB = d3.radialLine()
                     .angle((d, i) => i * segmentRadians)
                     .radius(d => radiusScaleAbsolute(d.data))
                     .curve(curve);
