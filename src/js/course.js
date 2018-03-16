@@ -2,8 +2,8 @@
     course.js
 */
 
-import { select as d3Select } from "d3-selection";
-import { line as d3Line } from "d3-shape";
+/* global d3 : false
+ */
 
 import { degreesToCompass, rotationAngleInDegrees } from "./util";
 
@@ -12,18 +12,18 @@ export default class Course {
         this.fontSize = fontSize;
         this.bFirstCoord = true;
         this.compassSize = 100;
-        this.line = d3Line();
+        this.line = d3.line();
         this.lineData = [];
 
         this.setupSvg();
     }
 
     setupSvg() {
-        this.g = d3Select("#na-svg")
+        this.g = d3.select("#na-svg")
             .append("g")
             .classed("coord", true);
 
-        d3Select("#na-svg defs")
+        d3.select("#na-svg defs")
             .append("marker")
             .attr("id", "course-arrow")
             .attr("viewBox", "0 -5 10 10")
