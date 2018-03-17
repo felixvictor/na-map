@@ -14,7 +14,8 @@ export default class Teleport {
         this.voronoiDiagram = this.getVoronoiDiagram();
         this.teleportData = {};
         this.highlightId = null;
-        this.g = d3.select("#na-svg")
+        this.g = d3
+            .select("#na-svg")
             .insert("g", ".port")
             .classed("voronoi", true);
 
@@ -49,7 +50,8 @@ export default class Teleport {
     }
 
     getVoronoiDiagram() {
-        return d3.voronoi()
+        return d3
+            .voronoi()
             .extent(this.voronoiCoord)
             .x(d => d.coord.x)
             .y(d => d.coord.y)(this.teleportPorts);

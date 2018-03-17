@@ -42,18 +42,17 @@ function main() {
         faTrash
     );
     naAnalytics();
-    $("#modal-greetings")
-        .on("click", ".btn, .close", function() {
-            $(this).addClass("modal-greetings-result"); // mark which button was clicked
+    const greetings = $("#modal-greetings");
+    greetings
+        .on("click", ".btn, .close", event => {
+            $(event.currentTarget).addClass("modal-greetings-result"); // mark which button was clicked
         })
-        .on("hide.bs.modal", function() {
-            const serverName = $(this)
-                .find(".modal-greetings-result")
-                .attr("data-server");
+        .on("hide.bs.modal", () => {
+            const serverName = greetings.find(".modal-greetings-result").attr("data-server");
             naDisplay(serverName); // invoke the callback with result
         });
-    window.onload = function() {
-        $("#modal-greetings").modal("show");
+    window.onload = () => {
+        greetings.modal("show");
     };
 }
 
