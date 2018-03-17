@@ -19,11 +19,13 @@ export default class Course {
     }
 
     setupSvg() {
-        this.g = d3.select("#na-svg")
+        this.g = d3
+            .select("#na-svg")
             .append("g")
             .classed("coord", true);
 
-        d3.select("#na-svg defs")
+        d3
+            .select("#na-svg defs")
             .append("marker")
             .attr("id", "course-arrow")
             .attr("viewBox", "0 -5 10 10")

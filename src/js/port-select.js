@@ -9,7 +9,8 @@ import "tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4";
 import { nations } from "./common";
 
 export default class PortSelect {
-    constructor(ports, teleport, pbZone) {
+    constructor(map, ports, teleport, pbZone) {
+        this._map = map;
         this._ports = ports;
         this._teleport = teleport;
         this._pbZone = pbZone;
@@ -22,6 +23,18 @@ export default class PortSelect {
 
     _setupSelects() {
         $(".selectpicker").selectpicker({
+            icons: {
+                time: "far fa-clock",
+                date: "far fa-calendar",
+                up: "fas fa-arrow-up",
+                down: "fas fa-arrow-down",
+                previous: "fas fa-chevron-left",
+                next: "fas fa-chevron-right",
+                today: "far fa-calendar-check",
+                clear: "fas fa-trash",
+                close: "fas fa-times"
+            },
+            timeZone: "UTC",
             dropupAuto: false,
             liveSearch: true,
             liveSearchPlaceholder: "Search ...",
@@ -43,26 +56,46 @@ export default class PortSelect {
         portNames.addClass("selectpicker");
         goodNames.addClass("selectpicker");
 
-        portNames.on("change", this._portSelected).selectpicker({
-            title: "Go to a port"
-        });
+        portNames
+            .on("change", (event) => {
+                this._portSelected(event);
+            })
+            .selectpicker({
+                title: "Go to a port"
+            });
 
-        goodNames.on("change", this._goodSelected).selectpicker({
-            title: "Select a good"
-        });
+        goodNames
+            .on("change", (event) => {
+                this._goodSelected(event);
+            })
+            .selectpicker({
+                title: "Select a good"
+            });
 
         selectPicker.selectpicker("refresh");
 
         $("#prop-nation")
-            .on("click", event => event.stopPropagation())
-            .on("change", this._nationSelected);
+            .on("click", event => {
+                event.stopPropagation();
+            })
+            .on("change", () => {
+                this._nationSelected();
+            });
 
         $("#prop-clan")
-            .on("click", event => event.stopPropagation())
-            .on("change", this._clanSelected);
+            .on("click", event => {
+                event.stopPropagation();
+            })
+            .on("change", () => {
+                this._clanSelected();
+            });
 
-        $("#menu-prop-all").on("click", this._allSelected);
-        $("#menu-prop-green").on("click", this._greenZoneSelected);
+        $("#menu-prop-all").on("click", () => {
+            this._allSelected();
+        });
+        $("#menu-prop-green").on("click", () => {
+            this._greenZoneSelected();
+        });
 
         $("#prop-pb-from").datetimepicker({
             format: this._timeFormat
@@ -76,9 +109,15 @@ export default class PortSelect {
             event.preventDefault();
         });
 
-        $("#menu-prop-yesterday").on("click", this._capturedYesterday);
-        $("#menu-prop-this-week").on("click", this._capturedThisWeek);
-        $("#menu-prop-last-week").on("click", this._capturedLastWeek);
+        $("#menu-prop-yesterday").on("click", () => {
+            this._capturedYesterday();
+        });
+        $("#menu-prop-this-week").on("click", () => {
+            this._capturedThisWeek();
+        });
+        $("#menu-prop-last-week").on("click", () => {
+            this._capturedLastWeek();
+        });
 
         const portFrom = $("#prop-from"),
             portTo = $("#prop-to");
@@ -103,8 +142,12 @@ export default class PortSelect {
         });
 
         $("#prop-cm")
-            .on("click", event => event.stopPropagation())
-            .on("change", this._CMSelected);
+            .on("click", event => {
+                event.stopPropagation();
+            })
+            .on("change", () => {
+                this._CMSelected();
+            });
     }
 
     _setupPortSelect() {
@@ -224,8 +267,8 @@ export default class PortSelect {
         });
     }
 
-    _portSelected() {
-        const port = $(this).find(":selected");
+    _portSelected(event) {
+        const port = $(event.currentTarget).find(":selected");
         const c = port.val().split(",");
         this._ports.currentPort.coord.x = +c[0];
         this._ports.currentPort.coord.y = +c[1];
@@ -235,11 +278,11 @@ export default class PortSelect {
             this._pbZone.refresh();
             this._ports.update(this._teleport.highlightId);
         }
-        this._ports.goToPort();
+        this._map.goToPort();
     }
 
-    _goodSelected() {
-        const portIds = $(this)
+    _goodSelected(event) {
+        const portIds = $(event.currentTarget)
             .val()
             .split(",");
         if (portIds.includes("0")) {
