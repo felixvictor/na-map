@@ -65,12 +65,12 @@ export default function naDisplay(serverName) {
 
         _setupListener() {
             $("#reset").on("click", () => {
-                Map.clearMap();
+                this.clearMap();
             });
 
             $("#double-click-action").change(() => {
                 this._radioButton = $("input[name='mouseFunction']:checked").val();
-                Map.clearMap();
+                this.clearMap();
             });
         }
 
@@ -87,7 +87,9 @@ export default function naDisplay(serverName) {
                 .scaleExtent([this._minScale, this._maxScale])
                 .translateExtent([[this.coord.min, this.coord.min], [this.coord.max, this.coord.max]])
                 .wheelDelta(() => -this._wheelDelta * Math.sign(d3.event.deltaY))
-                .on("zoom", this._naZoomed());
+                .on("zoom", () => {
+                    this._naZoomed();
+                });
 
             this._svg = d3
                 .select("#na")
@@ -101,7 +103,9 @@ export default function naDisplay(serverName) {
                 .call(this._zoom)
                 .on("dblclick.zoom", null)
                 .on("click", stopProp, true)
-                .on("dblclick", this._doubleClickAction());
+                .on("dblclick", () => {
+                    this._doubleClickAction();
+                });
             this._svg.append("defs");
 
             this._g = this._svg.append("g").classed("map", true);
@@ -206,7 +210,7 @@ export default function naDisplay(serverName) {
         }
 
         // noinspection JSMethodCanBeStatic
-        static clearMap() {
+        clearMap() {
             windPrediction.clearMap();
             course.clearMap();
             f11.clearMap();
@@ -248,8 +252,7 @@ export default function naDisplay(serverName) {
             ports.update(teleport.highlightId);
         }
 
-        updateMap() {
-            console.log(d3.event);
+        _updateMap() {
             if (d3.event.transform.k > this._PBZoneZoomThreshold) {
                 if (this._zoomLevel !== "pbZone") {
                     this._setZoomLevel("pbZone");
@@ -267,7 +270,7 @@ export default function naDisplay(serverName) {
         }
 
         _naZoomed() {
-            this.updateMap();
+            this._updateMap();
 
             // noinspection JSSuspiciousNameCombination
             const zoomTransform = d3.zoomIdentity
@@ -301,13 +304,14 @@ export default function naDisplay(serverName) {
         }
 
         teleport = new Teleport(map.coord.min, map.coord.max, ports);
-        portSelect = new PortSelect(ports, teleport, pbZone);
+        portSelect = new PortSelect(map, ports, teleport, pbZone);
         windPrediction = new WindPrediction(ports, map.margin.left, map.margin.top);
         f11 = new F11(map.coord.min, map.coord.max);
         course = new Course(ports.fontSizes.portLabel);
         moment.locale("en-gb");
         setupListener();
         map._initialZoomAndPan();
+        ports.clearMap(teleport.highlightId);
     }
 
     function naReady(error, naMapJsonData, pbZonesJsonData, shipJsonData) {
