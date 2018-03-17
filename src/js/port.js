@@ -30,7 +30,8 @@ export default class PortDisplay {
     }
 
     setupSvg() {
-        this.g = d3.select("#na-svg")
+        this.g = d3
+            .select("#na-svg")
             .append("g")
             .classed("port", true);
         this.gText = this.g.append("g");
@@ -271,8 +272,6 @@ export default class PortDisplay {
         this.updateCircles(highlightId);
         this.updateTexts(highlightId);
     }
-
-
 
     transform(transform) {
         this.g.attr("transform", transform);
