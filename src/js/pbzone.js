@@ -20,7 +20,8 @@ export default class PBZone {
     }
 
     setupSvg() {
-        this.g = d3.select("#na-svg")
+        this.g = d3
+            .select("#na-svg")
             .append("g")
             .classed("pb", true);
         this.pbZones = this.g.append("path").classed("pb-zone", true);
@@ -30,8 +31,12 @@ export default class PBZone {
 
     setupListener() {
         $("#show-pb")
-            .on("click", event => event.stopPropagation())
-            .on("change", () => this.showPBZonesSelected());
+            .on("click", event => {
+                event.stopPropagation();
+            })
+            .on("change", () => {
+                this.showPBZonesSelected();
+            });
     }
 
     showPBZonesSelected() {
