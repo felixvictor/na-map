@@ -24,7 +24,8 @@ export default class WindPrediction {
     }
 
     setupSvg() {
-        this.svg = d3.select("body")
+        this.svg = d3
+            .select("body")
             .append("div")
             .attr("id", "wind")
             .append("svg")
@@ -33,7 +34,8 @@ export default class WindPrediction {
             .style("top", `${this.topMargin}px`)
             .classed("coord", true);
 
-        d3.select("#na-svg defs")
+        d3
+            .select("#na-svg defs")
             .append("marker")
             .attr("id", "wind-arrow")
             .attr("viewBox", "0 -5 10 10")
@@ -49,21 +51,6 @@ export default class WindPrediction {
 
     // eslint-disable-next-line class-methods-use-this
     setupForm() {
-        $.fn.datetimepicker.Constructor.Default = $.extend({}, $.fn.datetimepicker.Constructor.Default, {
-            icons: {
-                time: "far fa-clock",
-                date: "far fa-calendar",
-                up: "fas fa-arrow-up",
-                down: "fas fa-arrow-down",
-                previous: "fas fa-chevron-left",
-                next: "fas fa-chevron-right",
-                today: "far fa-calendar-check",
-                clear: "fas fa-trash",
-                close: "fas fa-times"
-            },
-            timeZone: "UTC"
-        });
-
         $("#wind-time").datetimepicker({
             format: "LT"
         });
