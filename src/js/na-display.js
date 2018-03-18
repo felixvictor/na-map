@@ -9,7 +9,6 @@
 
 import { feature as topojsonFeature } from "topojson-client";
 import moment from "moment";
-import "moment-timezone";
 import "moment/locale/en-gb";
 
 import "bootstrap/js/dist/tooltip";
