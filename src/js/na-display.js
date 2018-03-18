@@ -65,12 +65,12 @@ export default function naDisplay(serverName) {
 
         _setupListener() {
             $("#reset").on("click", () => {
-                this.clearMap();
+                this.constructor._clearMap();
             });
 
             $("#double-click-action").change(() => {
                 this._radioButton = $("input[name='mouseFunction']:checked").val();
-                this.clearMap();
+                this.constructor._clearMap();
             });
         }
 
@@ -111,7 +111,7 @@ export default function naDisplay(serverName) {
             this._g = this._svg.append("g").classed("map", true);
         }
 
-        _displayCountries(transform) {
+        _displayMap(transform) {
             // Based on d3-tile v0.0.3
             // https://github.com/d3/d3-tile/blob/0f8cc9f52564d4439845f651c5fab2fcc2fdef9e/src/tile.js
             const log2tileSize = Math.log2(this._tileSize),
@@ -132,8 +132,8 @@ export default function naDisplay(serverName) {
                 ),
                 scale = Math.log2(transform.k);
 
-            const tileZoom = Math.min(maxTileZoom, Math.ceil(Math.log2(Math.max(width, height))) - log2tileSize);
-            const p = Math.round(tileZoom * 10 - scale * 10 - maxTileZoom * 10) / 10,
+            const tileZoom = Math.min(maxTileZoom, Math.ceil(Math.log2(Math.max(width, height))) - log2tileSize),
+                p = Math.round(tileZoom * 10 - scale * 10 - maxTileZoom * 10) / 10,
                 k = this._wheelDelta ** p;
 
             const { x } = transform,
@@ -152,16 +152,6 @@ export default function naDisplay(serverName) {
                 ),
                 tiles = [];
 
-            /*
-            console.group("zoom");
-            console.log("x, dx, y, dy, width, height ", x, dx, y, dy, width, height);
-            console.log("k, zoom, scale ", k, zoom, scale);
-            // console.log("log2tileSize ", log2tileSize);
-            // console.log("maxTileZoom ", maxTileZoom);
-            console.log("cols, rows ", cols, rows);
-            console.groupEnd();
-            */
-
             rows.forEach(row => {
                 cols.forEach(col => {
                     tiles.push([col, row, tileZoom]);
@@ -171,11 +161,10 @@ export default function naDisplay(serverName) {
             tiles.translate = [x, y];
             tiles.scale = k;
 
-            /*
-            console.log("transform ", transform);
-            console.log("tiles ", tiles);
-            */
+            this._updateMap(tiles);
+        }
 
+        _updateMap(tiles) {
             // noinspection JSSuspiciousNameCombination
             const tileTransform = d3.zoomIdentity
                 .translate(Math.round(tiles.translate[0]), Math.round(tiles.translate[1]))
@@ -198,23 +187,11 @@ export default function naDisplay(serverName) {
                 .attr("height", this._tileSize);
         }
 
-        _initialZoomAndPan() {
-            this._svg.call(this._zoom.scaleTo, this._minScale);
-        }
-
-        zoomAndPan(x, y, scale) {
-            const transform = d3.zoomIdentity
-                .scale(scale)
-                .translate(Math.round(-x + this._width / 2 / scale), Math.round(-y + this._height / 2 / scale));
-            this._svg.call(this._zoom.transform, transform);
-        }
-
-        // noinspection JSMethodCanBeStatic
-        clearMap() {
+        static _clearMap() {
             windPrediction.clearMap();
             course.clearMap();
             f11.clearMap();
-            ports.clearMap(teleport.highlightId);
+            ports.clearMap();
         }
 
         _doubleClickAction() {
@@ -240,19 +217,18 @@ export default function naDisplay(serverName) {
 
         _setZoomLevel(zoomLevel) {
             this._zoomLevel = zoomLevel;
-            ports.zoomLevel = zoomLevel;
-            teleport.zoomLevel = zoomLevel;
+            ports.setZoomLevel(zoomLevel);
+            teleport.setZoomLevel(zoomLevel);
         }
 
         _updateCurrent() {
-            pbZone.setData();
-            pbZone.update();
+            pbZone.refresh();
             teleport.setTeleportData(this._zoomLevel === "pbZone");
             teleport.updateTeleportAreas();
-            ports.update(teleport.highlightId);
+            ports.update();
         }
 
-        _updateMap() {
+        _updateAll() {
             if (d3.event.transform.k > this._PBZoneZoomThreshold) {
                 if (this._zoomLevel !== "pbZone") {
                     this._setZoomLevel("pbZone");
@@ -270,14 +246,14 @@ export default function naDisplay(serverName) {
         }
 
         _naZoomed() {
-            this._updateMap();
+            this._updateAll();
 
             // noinspection JSSuspiciousNameCombination
             const zoomTransform = d3.zoomIdentity
                 .translate(Math.round(d3.event.transform.x), Math.round(d3.event.transform.y))
                 .scale(Math.round(d3.event.transform.k * 1000) / 1000);
 
-            this._displayCountries(zoomTransform);
+            this._displayMap(zoomTransform);
             ports.transform(zoomTransform);
             teleport.transform(zoomTransform);
             course.transform(zoomTransform);
@@ -285,11 +261,22 @@ export default function naDisplay(serverName) {
             f11.transform(zoomTransform);
         }
 
+        initialZoomAndPan() {
+            this._svg.call(this._zoom.scaleTo, this._minScale);
+        }
+
+        zoomAndPan(x, y, scale) {
+            const transform = d3.zoomIdentity
+                .scale(scale)
+                .translate(Math.round(-x + this._width / 2 / scale), Math.round(-y + this._height / 2 / scale));
+            this._svg.call(this._zoom.transform, transform);
+        }
+
         goToPort() {
             if (ports.currentPort.id !== "0") {
                 this.zoomAndPan(ports.currentPort.coord.x, ports.currentPort.coord.y, 2);
             } else {
-                this._initialZoomAndPan();
+                this.initialZoomAndPan();
             }
         }
     }
@@ -304,14 +291,14 @@ export default function naDisplay(serverName) {
         }
 
         teleport = new Teleport(map.coord.min, map.coord.max, ports);
-        portSelect = new PortSelect(map, ports, teleport, pbZone);
-        windPrediction = new WindPrediction(ports, map.margin.left, map.margin.top);
-        f11 = new F11(map.coord.min, map.coord.max);
+        portSelect = new PortSelect(map, ports, pbZone);
+        windPrediction = new WindPrediction(map.margin.left, map.margin.top);
+        f11 = new F11(map);
         course = new Course(ports.fontSizes.portLabel);
         moment.locale("en-gb");
         setupListener();
-        map._initialZoomAndPan();
-        ports.clearMap(teleport.highlightId);
+        map.initialZoomAndPan();
+        ports.clearMap();
     }
 
     function naReady(error, naMapJsonData, pbZonesJsonData, shipJsonData) {
@@ -328,7 +315,7 @@ export default function naDisplay(serverName) {
         const towerData = topojsonFeature(pbZonesJsonData, pbZonesJsonData.objects.towers);
         pbZone = new PBZone(pbZoneData, fortData, towerData, ports);
 
-        shipData = JSON.parse(JSON.stringify(shipJsonData.shipData));
+        shipData = JSON.parse(JSON.stringify(shipJsonData._shipData));
 
         setup();
     }
