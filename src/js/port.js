@@ -282,6 +282,11 @@ export default class PortDisplay {
         this.portData = portData;
     }
 
+    setCurrentPort(id, x,y){
+        this.currentPort = { id: id, coord: { x: x, y: y } };
+    }
+
+
     setZoomLevel(zoomLevel) {
         this._zoomLevel = zoomLevel;
     }
