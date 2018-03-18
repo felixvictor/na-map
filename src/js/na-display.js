@@ -63,6 +63,17 @@ export default function naDisplay(serverName) {
         }
 
         _setupListener() {
+            function stopProp() {
+                if (d3.event.defaultPrevented) {
+                    d3.event.stopPropagation();
+                }
+            }
+
+            this._svg
+                .on("dblclick.zoom", null)
+                .on("click", stopProp, true)
+                .on("dblclick", (d, i, nodes) => this._doubleClickAction(nodes[i]));
+
             $("#reset").on("click", () => {
                 this.constructor._clearMap();
             });
@@ -74,21 +85,13 @@ export default function naDisplay(serverName) {
         }
 
         _setupSvg() {
-            function stopProp() {
-                if (d3.event.defaultPrevented) {
-                    d3.event.stopPropagation();
-                }
-            }
-
             // noinspection JSSuspiciousNameCombination
             this._zoom = d3
                 .zoom()
                 .scaleExtent([this._minScale, this._maxScale])
                 .translateExtent([[this.coord.min, this.coord.min], [this.coord.max, this.coord.max]])
                 .wheelDelta(() => -this._wheelDelta * Math.sign(d3.event.deltaY))
-                .on("zoom", () => {
-                    this._naZoomed();
-                });
+                .on("zoom", () => this._naZoomed());
 
             this._svg = d3
                 .select("#na")
@@ -99,12 +102,8 @@ export default function naDisplay(serverName) {
                 .style("position", "absolute")
                 .style("top", `${this.margin.top}px`)
                 .style("left", `${this.margin.left}px`)
-                .call(this._zoom)
-                .on("dblclick.zoom", null)
-                .on("click", stopProp, true)
-                .on("dblclick", () => {
-                    this._doubleClickAction();
-                });
+                .call(this._zoom);
+
             this._svg.append("defs");
 
             this._g = this._svg.append("g").classed("map", true);
@@ -193,9 +192,9 @@ export default function naDisplay(serverName) {
             ports.clearMap();
         }
 
-        _doubleClickAction() {
-            const coord = d3.mouse(this),
-                transform = d3.zoomTransform(this);
+        _doubleClickAction(self) {
+            const coord = d3.mouse(self),
+                transform = d3.zoomTransform(self);
             const mx = coord[0],
                 my = coord[1],
                 tk = transform.k,
