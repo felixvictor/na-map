@@ -6,7 +6,6 @@
  */
 
 import moment from "moment";
-import "moment-timezone";
 import "moment/locale/en-gb";
 
 import { nations } from "./common";
