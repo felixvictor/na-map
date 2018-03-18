@@ -42,9 +42,7 @@ export default class F11 {
             event.preventDefault();
         });
 
-        $("#copy-coord").click(() => {
-            this._copyCoordClicked();
-        });
+        $("#copy-coord").click(() => this._copyCoordClicked());
 
         document.addEventListener("paste", event => {
             this._pasteF11FromClipboard(event);
