@@ -12,26 +12,25 @@ import "tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4";
 import { compassDirections, compassToDegrees, degreesToCompass } from "./util";
 
 export default class WindPrediction {
-    constructor(ports, leftMargin, topMargin) {
-        this.ports = ports;
-        this.leftMargin = leftMargin;
-        this.topMargin = topMargin;
-        this.line = d3.line();
+    constructor(leftMargin, topMargin) {
+        this._leftMargin = leftMargin;
+        this._topMargin = topMargin;
+        this._line = d3.line();
 
-        this.setupSvg();
-        this.setupForm();
-        this.setupListener();
+        this._setupSvg();
+        this.constructor._setupForm();
+        this._setupListener();
     }
 
-    setupSvg() {
-        this.svg = d3
+    _setupSvg() {
+        this._svg = d3
             .select("body")
             .append("div")
             .attr("id", "wind")
             .append("svg")
             .style("position", "absolute")
-            .style("left", `${this.leftMargin}px`)
-            .style("top", `${this.topMargin}px`)
+            .style("left", `${this._leftMargin}px`)
+            .style("top", `${this._topMargin}px`)
             .classed("coord", true);
 
         d3
@@ -49,8 +48,7 @@ export default class WindPrediction {
             .attr("class", "wind-head");
     }
 
-    // eslint-disable-next-line class-methods-use-this
-    setupForm() {
+    static _setupForm() {
         $("#wind-time").datetimepicker({
             format: "LT"
         });
@@ -87,20 +85,20 @@ export default class WindPrediction {
         });
     }
 
-    setupListener() {
+    _setupListener() {
         $("#windPrediction").submit(event => {
             const currentWind = $("#direction").roundSlider("option", "value"),
                 time = $("#wind-time-input")
                     .val()
                     .trim();
             // console.log(`currentWind ${currentWind} time ${time}`);
-            this.predictWind(currentWind, time);
+            this._predictWind(currentWind, time);
             $("#predictDropdown").dropdown("toggle");
             event.preventDefault();
         });
     }
 
-    predictWind(currentUserWind, predictUserTime) {
+    _predictWind(currentUserWind, predictUserTime) {
         const secondsForFullCircle = 48 * 60,
             fullCircle = 360,
             degreesPerSecond = fullCircle / secondsForFullCircle;
@@ -132,10 +130,7 @@ export default class WindPrediction {
         const timeDiffInSec = predictDate.diff(currentDate, "seconds");
         const predictedWindDegrees = Math.abs(currentWindDegrees - degreesPerSecond * timeDiffInSec + 360) % 360;
 
-        // console.log(`currentUserWind: ${currentUserWind} currentWindDegrees: ${currentWindDegrees}`);
-        // console.log(`   currentDate: ${currentDate.format()} predictDate: ${predictDate.format()}`);
-        // console.log(`   predictedWindDegrees: ${predictedWindDegrees} predictUserTime: ${predictUserTime}`);
-        this.printPredictedWind(
+        this._printPredictedWind(
             predictedWindDegrees,
             predictDate.format("H.mm"),
             degreesToCompass(currentUserWind),
@@ -143,7 +138,7 @@ export default class WindPrediction {
         );
     }
 
-    printPredictedWind(predictedWindDegrees, predictTime, currentWind, currentTime) {
+    _printPredictedWind(predictedWindDegrees, predictTime, currentWind, currentTime) {
         const compassSize = 100,
             height = 300,
             width = 300,
@@ -159,9 +154,9 @@ export default class WindPrediction {
         lineData.push([Math.round(xCompass + dx / 2), Math.round(yCompass + dy / 2)]);
         lineData.push([Math.round(xCompass - dx / 2), Math.round(yCompass - dy / 2)]);
 
-        this.svg.attr("height", height).attr("width", width);
-        const rect = this.svg.append("rect");
-        this.svg
+        this._svg.attr("height", height).attr("width", width);
+        const rect = this._svg.append("rect");
+        this._svg
             .append("image")
             .classed("compass", true)
             .attr("x", xCompass - compassSize / 2)
@@ -169,14 +164,14 @@ export default class WindPrediction {
             .attr("height", compassSize)
             .attr("width", compassSize)
             .attr("xlink:href", "icons/compass.svg");
-        this.svg
+        this._svg
             .append("path")
             .datum(lineData)
-            .attr("d", this.line)
+            .attr("d", this._line)
             .classed("wind", true)
             .attr("marker-end", "url(#wind-arrow)");
 
-        const svg = this.svg.append("svg");
+        const svg = this._svg.append("svg");
         const text1 = svg
             .append("text")
             .attr("x", "50%")
@@ -218,16 +213,6 @@ export default class WindPrediction {
     }
 
     clearMap() {
-        this.svg.selectAll("*").remove();
+        this._svg.selectAll("*").remove();
     }
-
-    /*
-let predictTime = moment().utc(),
-direction = "nne".toUpperCase();
-console.log(`---->   predictTime: ${predictTime.format()}`);
-predictWind(direction, `${predictTime.hours()}:${predictTime.minutes()}`);
-predictTime.add(48 / 4, "minutes");
-console.log(`---->   predictTime: ${predictTime.format()}`);
-predictWind(direction, `${predictTime.hours()}:${predictTime.minutes()}`);
-*/
 }
