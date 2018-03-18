@@ -55,10 +55,11 @@ export default class Course {
 
     _printLine(x, y) {
         const degrees = rotationAngleInDegrees(
-            this._lineData[this._lineData.length - 1],
-            this._lineData[this._lineData.length - 2]
-        );
-        const compass = degreesToCompass(degrees);
+                this._lineData[this._lineData.length - 1],
+                this._lineData[this._lineData.length - 2]
+            ),
+            compass = degreesToCompass(degrees);
+
         this.gCompass
             .datum(this._lineData)
             .attr("marker-end", "url(#course-arrow)")
@@ -76,6 +77,7 @@ export default class Course {
             .text(`${compass} (${Math.round(degrees)}°)`);
 
         const bbox = text.node().getBBox();
+        console.log(bbox);
         const height = bbox.height + this._fontSize,
             width = bbox.width + this._fontSize;
         rect
@@ -88,12 +90,12 @@ export default class Course {
 
     /* public */
     plotCourse(x, y) {
+        console.log(this._bFirstCoord);
         if (this._bFirstCoord) {
             this.clearMap();
         }
-
         this._lineData.push([x, y]);
-
+        console.log(this._lineData);
         if (this._bFirstCoord) {
             this._printCompass(x, y);
             this._bFirstCoord = !this._bFirstCoord;
