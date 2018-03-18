@@ -301,7 +301,7 @@ if (process.env.NODE_ENV === "prod") {
     config.devtool = "";
     config.plugins.push(
         new MinifyPlugin({
-            mangle: false,
+            mangle: true,
             removeDebugger: true
         })
     );
