@@ -27,6 +27,48 @@ import naDisplay from "./na-display";
 import naAnalytics from "./analytics";
 
 function main() {
+    const greetings = $("#modal-greetings");
+
+    function setupListener() {
+        // https://github.com/bootstrapthemesco/bootstrap-4-multi-dropdown-navbar
+        $(".dropdown-menu a.dropdown-toggle").on("click", event => {
+            const $el = $(event.currentTarget);
+            const $parent = $el.offsetParent(".dropdown-menu");
+            if (!$el.next().hasClass("show")) {
+                $el
+                    .parents(".dropdown-menu")
+                    .first()
+                    .find(".show")
+                    .removeClass("show");
+            }
+            const $subMenu = $el.next(".dropdown-menu");
+            $subMenu.toggleClass("show");
+
+            $el.parent("li").toggleClass("show");
+
+            $el.parents("li.nav-item.dropdown.show").on("hidden.bs.dropdown", event2 => {
+                $(event2.currentTarget)
+                    .find(".dropdown-menu .show")
+                    .removeClass("show");
+            });
+
+            if (!$parent.parent().hasClass("navbar-nav")) {
+                $el.next().css({ top: $el[0].offsetTop, left: $parent.outerWidth() - 4 });
+            }
+
+            return false;
+        });
+
+        greetings
+            .on("click", ".btn, .close", event => {
+                $(event.currentTarget).addClass("modal-greetings-result"); // mark which button was clicked
+            })
+            .on("hide.bs.modal", () => {
+                const serverName = greetings.find(".modal-greetings-result").attr("data-server");
+                naDisplay(serverName); // invoke the callback with result
+            });
+    }
+
     fontawesome.library.add(
         faCalendar,
         faCalendarCheck,
@@ -40,46 +82,10 @@ function main() {
         faTimes,
         faTrash
     );
+
     naAnalytics();
+    setupListener();
 
-    // https://github.com/bootstrapthemesco/bootstrap-4-multi-dropdown-navbar
-    $(".dropdown-menu a.dropdown-toggle").on("click", event => {
-        const $el = $(event.currentTarget);
-        const $parent = $el.offsetParent(".dropdown-menu");
-        if (!$el.next().hasClass("show")) {
-            $el
-                .parents(".dropdown-menu")
-                .first()
-                .find(".show")
-                .removeClass("show");
-        }
-        const $subMenu = $el.next(".dropdown-menu");
-        $subMenu.toggleClass("show");
-
-        $el.parent("li").toggleClass("show");
-
-        $el.parents("li.nav-item.dropdown.show").on("hidden.bs.dropdown", event2 => {
-            $(event2.currentTarget)
-                .find(".dropdown-menu .show")
-                .removeClass("show");
-        });
-
-        if (!$parent.parent().hasClass("navbar-nav")) {
-            $el.next().css({ top: $el[0].offsetTop, left: $parent.outerWidth() - 4 });
-        }
-
-        return false;
-    });
-
-    const greetings = $("#modal-greetings");
-    greetings
-        .on("click", ".btn, .close", event => {
-            $(event.currentTarget).addClass("modal-greetings-result"); // mark which button was clicked
-        })
-        .on("hide.bs.modal", () => {
-            const serverName = greetings.find(".modal-greetings-result").attr("data-server");
-            naDisplay(serverName); // invoke the callback with result
-        });
     window.onload = () => {
         greetings.modal("show");
     };
