@@ -9,10 +9,9 @@ import "tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4";
 import { nations } from "./common";
 
 export default class PortSelect {
-    constructor(map, ports, teleport, pbZone) {
+    constructor(map, ports, pbZone) {
         this._map = map;
         this._ports = ports;
-        this._teleport = teleport;
         this._pbZone = pbZone;
         this._dateFormat = "D MMM";
         this._timeFormat = "HH.00";
@@ -44,7 +43,7 @@ export default class PortSelect {
 
         this._setupPortSelect();
         this._setupGoodSelect();
-        this._setupNationSelect();
+        this.constructor._setupNationSelect();
         this._setupClanSelect();
         this._setupCMSelect();
     }
@@ -57,7 +56,7 @@ export default class PortSelect {
         goodNames.addClass("selectpicker");
 
         portNames
-            .on("change", (event) => {
+            .on("change", event => {
                 this._portSelected(event);
             })
             .selectpicker({
@@ -65,7 +64,7 @@ export default class PortSelect {
             });
 
         goodNames
-            .on("change", (event) => {
+            .on("change", event => {
                 this._goodSelected(event);
             })
             .selectpicker({
@@ -214,8 +213,7 @@ export default class PortSelect {
         $("#good-names").append(select);
     }
 
-    // noinspection JSMethodCanBeStatic
-    _setupNationSelect() {
+    static _setupNationSelect() {
         const propNation = $("#prop-nation");
         const select = `<option value="0">Select a nation/Reset</option>${nations
             .sort((a, b) => {
@@ -274,9 +272,9 @@ export default class PortSelect {
         this._ports.currentPort.coord.y = +c[1];
         this._ports.currentPort.id = port.data("id").toString();
 
-        if (this._pbZone.showPBZones) {
+        if (this._pbZone._showPBZones) {
             this._pbZone.refresh();
-            this._ports.update(this._teleport.highlightId);
+            this._ports.update();
         }
         this._map.goToPort();
     }
@@ -285,54 +283,63 @@ export default class PortSelect {
         const portIds = $(event.currentTarget)
             .val()
             .split(",");
+        let portData;
+
         if (portIds.includes("0")) {
-            this._ports.portData = this._ports.portDataDefault;
+            portData = this._ports.portDataDefault;
         } else {
-            this._ports.portData = this._ports.portDataDefault.filter(d => portIds.includes(d.id));
+            portData = this._ports.portDataDefault.filter(d => portIds.includes(d.id));
         }
-        this._ports.update(this._teleport.highlightId);
+        this._ports.setPortData(portData);
+        this._ports.update();
     }
 
     _nationSelected() {
         const nationId = $("#prop-nation").val();
+        let portData;
 
         if (+nationId !== 0) {
             this._nation = nationId;
-            this._ports.portData = this._ports.portDataDefault.filter(d => nationId === d.properties.nation);
+            portData = this._ports.portDataDefault.filter(d => nationId === d.properties.nation);
             this._setupClanSelect();
         } else {
             this._nation = "";
-            this._ports.portData = this._ports.portDataDefault;
+            portData = this._ports.portDataDefault;
             this._setupClanSelect();
         }
         $("#propertyDropdown").dropdown("toggle");
-        this._ports.update(this._teleport.highlightId);
+        this._ports.setPortData(portData);
+        this._ports.update();
     }
 
     _clanSelected() {
         const clan = $("#prop-clan").val();
+        let portData;
 
         if (+clan !== 0) {
-            this._ports.portData = this._ports.portDataDefault.filter(d => clan === d.properties.capturer);
+            portData = this._ports.portDataDefault.filter(d => clan === d.properties.capturer);
         } else if (this._nation) {
-            this._ports.portData = this._ports.portDataDefault.filter(d => this._nation === d.properties.nation);
+            portData = this._ports.portDataDefault.filter(d => this._nation === d.properties.nation);
         } else {
-            this._ports.portData = this._ports.portDataDefault;
+            portData = this._ports.portDataDefault;
         }
         $("#propertyDropdown").dropdown("toggle");
-        this._ports.update(this._teleport.highlightId);
+        this._ports.setPortData(portData);
+        this._ports.update();
     }
 
     _allSelected() {
-        this._ports.portData = this._ports.portDataDefault.filter(d => d.properties.availableForAll);
-        this._ports.update(this._teleport.highlightId);
+        const portData = this._ports.portDataDefault.filter(d => d.properties.availableForAll);
+        this._ports.setPortData(portData);
+        this._ports.update();
     }
 
     _greenZoneSelected() {
-        this._ports.portData = this._ports.portDataDefault.filter(
+        const portData = this._ports.portDataDefault.filter(
             d => d.properties.nonCapturable && d.properties.nation !== "FT"
         );
-        this._ports.update(this._teleport.highlightId);
+        this._ports.setPortData(portData);
+        this._ports.update();
     }
 
     _capturePBRange() {
@@ -367,21 +374,23 @@ export default class PortSelect {
         }
         */
 
-        this._ports.portData = this._ports.portDataDefault.filter(
+        const portData = this._ports.portDataDefault.filter(
             d =>
                 !d.properties.nonCapturable &&
                 d.properties.nation !== "FT" &&
                 startTimes.has(d.properties.portBattleStartTime)
         );
-        this._ports.update(this._teleport.highlightId);
+        this._ports.setPortData(portData);
+        this._ports.update();
     }
 
     _filterCaptured(begin, end) {
         console.log("Between %s and %s", begin.format("dddd D MMMM YYYY h:mm"), end.format("dddd D MMMM YYYY h:mm"));
-        this._ports.portData = this._ports.portDataDefault.filter(d =>
+        const portData = this._ports.portDataDefault.filter(d =>
             moment(d.properties.lastPortBattle).isBetween(begin, end, null, "(]")
         );
-        this._ports.update(this._teleport.highlightId);
+        this._ports.setPortData(portData);
+        this._ports.update();
     }
 
     _capturedYesterday() {
@@ -429,13 +438,15 @@ export default class PortSelect {
 
     _CMSelected() {
         const value = parseInt($("#prop-cm").val(), 10);
+        let portData;
 
         if (value !== 0) {
-            this._ports.portData = this._ports.portDataDefault.filter(d => value === d.properties.conquestMarksPension);
+            portData = this._ports.portDataDefault.filter(d => value === d.properties.conquestMarksPension);
         } else {
-            this._ports.portData = this._ports.portDataDefault;
+            portData = this._ports.portDataDefault;
         }
         $("#propertyDropdown").dropdown("toggle");
-        this._ports.update(this._teleport.highlightId);
+        this._ports.setPortData(portData);
+        this._ports.update();
     }
 }

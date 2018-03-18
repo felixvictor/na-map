@@ -7,36 +7,36 @@
 
 export default class Teleport {
     constructor(minCoord, maxCoord, ports) {
-        this.ports = ports;
-        this.showTeleportAreas = false;
-        this.voronoiCoord = [[minCoord - 1, minCoord - 1], [maxCoord + 1, maxCoord + 1]];
-        this.teleportPorts = this.getPortData();
-        this.voronoiDiagram = this.getVoronoiDiagram();
-        this.teleportData = {};
-        this.highlightId = null;
-        this.g = d3
+        this._ports = ports;
+        this._showTeleportAreas = false;
+        this._voronoiCoord = [[minCoord - 1, minCoord - 1], [maxCoord + 1, maxCoord + 1]];
+        this._teleportPorts = this._getPortData();
+        this._voronoiDiagram = this._getVoronoiDiagram();
+        this._teleportData = {};
+        this._highlightId = null;
+        this._g = d3
             .select("#na-svg")
             .insert("g", ".port")
             .classed("voronoi", true);
 
-        this.setupListener();
+        this._setupListener();
     }
 
-    setupListener() {
+    _setupListener() {
         $("#show-teleport")
             .on("click", event => event.stopPropagation())
             .on("change", () => {
                 const $input = $("#show-teleport");
 
-                this.showTeleportAreas = $input.is(":checked");
+                this._showTeleportAreas = $input.is(":checked");
                 this.updateTeleportAreas();
             });
     }
 
-    getPortData() {
+    _getPortData() {
         // Use only ports that deep water ports and not a county capital
         return (
-            this.ports.portDataDefault
+            this._ports.portDataDefault
                 .filter(d => !d.properties.shallow && !d.properties.countyCapital)
                 // Map to coordinates array
                 .map(d => ({
@@ -49,24 +49,15 @@ export default class Teleport {
         );
     }
 
-    getVoronoiDiagram() {
+    _getVoronoiDiagram() {
         return d3
             .voronoi()
-            .extent(this.voronoiCoord)
+            .extent(this._voronoiCoord)
             .x(d => d.coord.x)
-            .y(d => d.coord.y)(this.teleportPorts);
+            .y(d => d.coord.y)(this._teleportPorts);
     }
 
-    setTeleportData(teleportLevel) {
-        if (this.showTeleportAreas && teleportLevel) {
-            this.teleportData = this.voronoiDiagram.polygons();
-        } else {
-            this.teleportData = {};
-        }
-        this.highlightId = null;
-    }
-
-    mouseover(event) {
+    _mouseover(event) {
         // console.log(event);
         /*
         const ref = d3.mouse(nodes[i]),
@@ -75,22 +66,23 @@ export default class Teleport {
 
         // use the new diagram.find() function to find the voronoi site closest to
         // the mouse, limited by max distance defined by voronoiRadius
-        console.log("mouseover ", this.voronoiDiagram);
-        const site = this.getVoronoiDiagram().find(mx, my, this.voronoiRadius);
+        console.log("_mouseover ", this._voronoiDiagram);
+        const site = this._getVoronoiDiagram().find(mx, my, this.voronoiRadius);
         if (site) {
             this.highlightId = site.data.id;
             this.updateTeleportAreas();
             // update(zoomLevel);
         }
         */
-        this.highlightId = event.data.id;
+        this._highlightId = event.data.id;
         this.updateTeleportAreas();
-        this.ports.update(this.highlightId);
+        this._ports.setHighlightId(this._highlightId);
+        this._ports.update();
     }
 
     updateTeleportAreas() {
         // Data join
-        const pathUpdate = this.g.selectAll("path").data(this.teleportData, d => d.data.id);
+        const pathUpdate = this._g.selectAll("path").data(this._teleportData, d => d.data.id);
 
         // Remove old paths
         pathUpdate.exit().remove();
@@ -103,13 +95,27 @@ export default class Teleport {
             .enter()
             .append("path")
             .attr("d", d => (d ? `M${d.join("L")}Z` : null))
-            .on("mouseover", event => this.mouseover(event));
+            .on("_mouseover", event => this._mouseover(event));
 
         // Apply to both old and new
-        pathUpdate.merge(pathEnter).classed("highlight-voronoi", d => d.data.id === this.highlightId);
+        pathUpdate.merge(pathEnter).classed("highlight-voronoi", d => d.data.id === this._highlightId);
+    }
+
+    setTeleportData(teleportLevel) {
+        if (this._showTeleportAreas && teleportLevel) {
+            this._teleportData = this._voronoiDiagram.polygons();
+        } else {
+            this._teleportData = {};
+        }
+        this._highlightId = null;
+        this._ports.setHighlightId(this._highlightId);
+    }
+
+    setZoomLevel(zoomLevel) {
+        this._zoomLevel = zoomLevel;
     }
 
     transform(transform) {
-        this.g.attr("transform", transform);
+        this._g.attr("transform", transform);
     }
 }
