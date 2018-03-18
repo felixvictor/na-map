@@ -6,6 +6,7 @@
  */
 
 import moment from "moment/moment";
+import "moment/locale/en-gb";
 import "round-slider/src/roundslider";
 import "tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4";
 
