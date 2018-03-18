@@ -8,57 +8,59 @@
 import { between, formatCoord } from "./util";
 
 export default class F11 {
-    constructor(minCoord, maxCoord) {
-        this.minCoord = minCoord;
-        this.maxCoord = maxCoord;
-        this.transformMatrix = {
+    constructor(map) {
+        this._map = map;
+        this._minCoord = this._map.coord.min;
+        this._maxCoord = this._map.coord.max;
+        this._transformMatrix = {
             A: -0.00499866779363828,
             B: -0.00000021464254980645,
             C: 4096.88635151897,
             D: 4096.90282787469
         };
-        this.transformMatrixInv = {
+        this._transformMatrixInv = {
             A: -200.053302087577,
             B: -0.00859027897636011,
             C: 819630.836437126,
             D: -819563.745651571
         };
 
-        this.setupSvg();
-        this.setupListener();
+        this._setupSvg();
+        this._setupListener();
     }
 
-    setupSvg() {
-        this.g = d3.select("#na-svg")
+    _setupSvg() {
+        this._g = d3
+            .select("#na-svg")
             .insert("g")
             .classed("f11", true);
     }
 
-    setupListener() {
+    _setupListener() {
         $("#f11").submit(event => {
-            this.f11Submitted(event);
+            this._f11Submitted();
+            event.preventDefault();
         });
 
         $("#copy-coord").click(() => {
-            this.copyCoordClicked();
+            this._copyCoordClicked();
         });
 
         document.addEventListener("paste", event => {
-            this.pasteF11FromClipboard(event);
+            this.constructor._pasteF11FromClipboard(event);
             event.preventDefault();
         });
     }
 
-    f11Submitted(event) {
+    _f11Submitted() {
         const x = +$("#x-coord").val(),
             z = +$("#z-coord").val();
 
-        this.goToF11(x, z);
-        event.preventDefault();
+        this._goToF11(x, z);
     }
 
     // https://stackoverflow.com/questions/22581345/click-button-copy-to-clipboard-using-jquery
-    static copyF11ToClipboard(F11coord) {
+    static _copyF11ToClipboard(F11coord) {
         const temp = $("<input>");
 
         $("body").append(temp);
@@ -67,17 +69,17 @@ export default class F11 {
         temp.remove();
     }
 
-    copyCoordClicked() {
+    _copyCoordClicked() {
         const x = $("#x-coord").val(),
             z = $("#z-coord").val();
 
         if (!Number.isNaN(x) && !Number.isNaN(z)) {
             const F11String = `F11 coordinates X: ${x} Z: ${z}`;
-            this.copyF11ToClipboard(F11String);
+            this.constructor._copyF11ToClipboard(F11String);
         }
     }
 
-    pasteF11FromClipboard(e) {
+    static _pasteF11FromClipboard(e) {
         function addF11StringToInput(F11String) {
             const regex = /F11 coordinates X: ([-+]?[0-9]*\.?[0-9]+) Z: ([-+]?[0-9]*\.?[0-9]+)/g,
                 match = regex.exec(F11String);
@@ -86,7 +88,7 @@ export default class F11 {
                 const x = +match[1],
                     z = +match[2];
                 if (!Number.isNaN(Number(x)) && !Number.isNaN(Number(z))) {
-                    this.goToF11(x, z);
+                    this._goToF11(x, z);
                 }
             }
         }
@@ -114,8 +116,8 @@ export default class F11 {
         }
     }
 
-    printF11Coord(x, y, F11X, F11Y) {
-        const g = this.g.append("g").attr("transform", `translate(${x},${y})`);
+    _printF11Coord(x, y, F11X, F11Y) {
+        const g = this._g.append("g").attr("transform", `translate(${x},${y})`);
         g.append("circle").attr("r", 20);
         g
             .append("text")
@@ -129,46 +131,44 @@ export default class F11 {
             .text(formatCoord(F11Y));
     }
 
+    _goToF11(F11X, F11Y) {
+        // F11 coord to svg coord
+        const convertCoordX = (x, y) =>
+            this._transformMatrix.A * x + this._transformMatrix.B * y + this._transformMatrix.C;
+
+        // F11 coord to svg coord
+        const convertCoordY = (x, y) =>
+            this._transformMatrix.B * x - this._transformMatrix.A * y + this._transformMatrix.D;
+
+        const x = convertCoordX(F11X, F11Y),
+            y = convertCoordY(F11X, F11Y);
+
+        if (between(x, this._minCoord, this._maxCoord, true) && between(y, this._minCoord, this._maxCoord, true)) {
+            this._printF11Coord(x, y, Number(F11X), Number(F11Y));
+            this._map.zoomAndPan(x, y, 1);
+        }
+    }
+
     printCoord(x, y) {
         // svg coord to F11 coord
         const convertInvCoordX = () =>
-            this.transformMatrixInv.A * x + this.transformMatrixInv.B * y + this.transformMatrixInv.C;
+            this._transformMatrixInv.A * x + this._transformMatrixInv.B * y + this._transformMatrixInv.C;
 
         // svg coord to F11 coord
         const convertInvCoordY = () =>
-            this.transformMatrixInv.B * x - this.transformMatrixInv.A * y + this.transformMatrixInv.D;
+            this._transformMatrixInv.B * x - this._transformMatrixInv.A * y + this._transformMatrixInv.D;
 
         const F11X = convertInvCoordX(x, y) * -1,
             F11Y = convertInvCoordY(x, y) * -1;
 
-        this.printF11Coord(x, y, F11X, F11Y);
-    }
-
-    goToF11(F11XIn, F11YIn) {
-        // F11 coord to svg coord
-        const convertCoordX = (x, y) =>
-            this.transformMatrix.A * x + this.transformMatrix.B * y + this.transformMatrix.C;
-
-        // F11 coord to svg coord
-        const convertCoordY = (x, y) =>
-            this.transformMatrix.B * x - this.transformMatrix.A * y + this.transformMatrix.D;
-
-        const F11X = Number(F11XIn),
-            F11Y = Number(F11YIn);
-        const x = convertCoordX(F11X, F11Y),
-            y = convertCoordY(F11X, F11Y);
-
-        if (between(x, this.minCoord, this.maxCoord, true) && between(y, this.minCoord, this.maxCoord, true)) {
-            this.printF11Coord(x, y, F11X, F11Y);
-            //app.zoomAndPan(x, y, 1);
-        }
+        this._printF11Coord(x, y, F11X, F11Y);
     }
 
     transform(transform) {
-        this.g.attr("transform", transform);
+        this._g.attr("transform", transform);
     }
 
     clearMap() {
-        this.g.selectAll("*").remove();
+        this._g.selectAll("*").remove();
     }
 }
