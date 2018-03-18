@@ -190,6 +190,9 @@ export default function naDisplay(serverName) {
             course.clearMap();
             f11.clearMap();
             ports.clearMap();
+            $(".selectpicker")
+                .val("default")
+                .selectpicker("refresh");
         }
 
         _doubleClickAction(self) {
