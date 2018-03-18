@@ -56,46 +56,26 @@ export default class PortSelect {
         portNames.addClass("selectpicker");
         goodNames.addClass("selectpicker");
 
-        portNames
-            .on("change", event => {
-                this._portSelected(event);
-            })
-            .selectpicker({
-                title: "Go to a port"
-            });
+        portNames.on("change", event => this._portSelected(event)).selectpicker({
+            title: "Go to a port"
+        });
 
-        goodNames
-            .on("change", event => {
-                this._goodSelected(event);
-            })
-            .selectpicker({
-                title: "Select a good"
-            });
+        goodNames.on("change", event => this._goodSelected(event)).selectpicker({
+            title: "Select a good"
+        });
 
         selectPicker.selectpicker("refresh");
 
         $("#prop-nation")
-            .on("click", event => {
-                event.stopPropagation();
-            })
-            .on("change", () => {
-                this._nationSelected();
-            });
+            .on("click", event => event.stopPropagation())
+            .on("change", () => this._nationSelected());
 
         $("#prop-clan")
-            .on("click", event => {
-                event.stopPropagation();
-            })
-            .on("change", () => {
-                this._clanSelected();
-            });
+            .on("click", event => event.stopPropagation())
+            .on("change", () => this._clanSelected());
 
-        $("#menu-prop-all").on("click", () => {
-            this._allSelected();
-        });
-        $("#menu-prop-green").on("click", () => {
-            this._greenZoneSelected();
-        });
+        $("#menu-prop-all").on("click", () => this._allSelected());
+        $("#menu-prop-green").on("click", () => this._greenZoneSelected());
 
         $("#prop-pb-from").datetimepicker({
             format: this._timeFormat
@@ -109,15 +89,9 @@ export default class PortSelect {
             event.preventDefault();
         });
 
-        $("#menu-prop-yesterday").on("click", () => {
-            this._capturedYesterday();
-        });
-        $("#menu-prop-this-week").on("click", () => {
-            this._capturedThisWeek();
-        });
-        $("#menu-prop-last-week").on("click", () => {
-            this._capturedLastWeek();
-        });
+        $("#menu-prop-yesterday").on("click", () => this._capturedYesterday());
+        $("#menu-prop-this-week").on("click", () => this._capturedThisWeek());
+        $("#menu-prop-last-week").on("click", () => this._capturedLastWeek());
 
         const portFrom = $("#prop-from"),
             portTo = $("#prop-to");
@@ -128,12 +102,8 @@ export default class PortSelect {
             format: this._dateFormat,
             useCurrent: false
         });
-        portFrom.on("change.datetimepicker", e => {
-            portTo.datetimepicker("minDate", e.date);
-        });
-        portTo.on("change.datetimepicker", e => {
-            portFrom.datetimepicker("maxDate", e.date);
-        });
+        portFrom.on("change.datetimepicker", e => portTo.datetimepicker("minDate", e.date));
+        portTo.on("change.datetimepicker", e => portFrom.datetimepicker("maxDate", e.date));
 
         $("#prop-range").submit(event => {
             this._captureRange();
@@ -142,12 +112,8 @@ export default class PortSelect {
         });
 
         $("#prop-cm")
-            .on("click", event => {
-                event.stopPropagation();
-            })
-            .on("change", () => {
-                this._CMSelected();
-            });
+            .on("click", event => event.stopPropagation())
+            .on("change", () => this._CMSelected());
     }
 
     _setupPortSelect() {
@@ -302,15 +268,14 @@ export default class PortSelect {
         if (+nationId !== 0) {
             this._nation = nationId;
             portData = this._ports.portDataDefault.filter(d => nationId === d.properties.nation);
-            this._setupClanSelect();
         } else {
             this._nation = "";
             portData = this._ports.portDataDefault;
-            this._setupClanSelect();
         }
         $("#propertyDropdown").dropdown("toggle");
         this._ports.setPortData(portData);
         this._ports.update();
+        this._setupClanSelect();
     }
 
     _clanSelected() {

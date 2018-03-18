@@ -34,9 +34,7 @@ export default class PBZone {
             .on("click", event => {
                 event.stopPropagation();
             })
-            .on("change", () => {
-                this._showPBZonesSelected();
-            });
+            .on("change", () => this._showPBZonesSelected());
     }
 
     _showPBZonesSelected() {
