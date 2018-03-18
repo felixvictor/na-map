@@ -7,97 +7,96 @@
 
 export default class PBZone {
     constructor(pbZoneData, fortData, towerData, ports) {
-        this.pbZoneDataDefault = pbZoneData;
-        this.fortDataDefault = fortData;
-        this.towerDataDefault = towerData;
-        this.pbZoneData = pbZoneData;
-        this.fortData = fortData;
-        this.towerData = towerData;
-        this.ports = ports;
+        this._pbZoneDataDefault = pbZoneData;
+        this._fortDataDefault = fortData;
+        this._towerDataDefault = towerData;
+        this._pbZoneData = pbZoneData;
+        this._fortData = fortData;
+        this._towerData = towerData;
+        this._ports = ports;
 
-        this.setupSvg();
-        this.setupListener();
+        this._setupSvg();
+        this._setupListener();
     }
 
-    setupSvg() {
-        this.g = d3
+    _setupSvg() {
+        this._g = d3
             .select("#na-svg")
             .append("g")
             .classed("pb", true);
-        this.pbZones = this.g.append("path").classed("pb-zone", true);
-        this.towers = this.g.append("path").classed("tower", true);
-        this.forts = this.g.append("path").classed("fort", true);
+        this.pbZones = this._g.append("path").classed("pb-zone", true);
+        this.towers = this._g.append("path").classed("tower", true);
+        this.forts = this._g.append("path").classed("fort", true);
     }
 
-    setupListener() {
+    _setupListener() {
         $("#show-pb")
             .on("click", event => {
                 event.stopPropagation();
             })
             .on("change", () => {
-                this.showPBZonesSelected();
+                this._showPBZonesSelected();
             });
     }
 
-    showPBZonesSelected() {
+    _showPBZonesSelected() {
         const $input = $("#show-pb");
 
         this.setShowPBZones($input.is(":checked"));
-        this.setData();
-        this.update();
-        this.ports.updateTexts();
+        this.refresh();
+        this._ports.updateTexts();
     }
 
     setShowPBZones(showPBZones) {
-        this.showPBZones = showPBZones;
-        this.ports.showPBZones = showPBZones;
+        this._showPBZones = showPBZones;
+        this._ports._showPBZones = showPBZones;
     }
 
-    update() {
-        this.pbZones.datum(this.pbZoneData).attr("d", d3.geoPath().pointRadius(4));
-        this.towers.datum(this.towerData).attr("d", d3.geoPath().pointRadius(1.5));
-        this.forts.datum(this.fortData).attr("d", d3.geoPath().pointRadius(2));
+    _update() {
+        this.pbZones.datum(this._pbZoneData).attr("d", d3.geoPath().pointRadius(4));
+        this.towers.datum(this._towerData).attr("d", d3.geoPath().pointRadius(1.5));
+        this.forts.datum(this._fortData).attr("d", d3.geoPath().pointRadius(2));
     }
 
-    setData() {
-        if (this.showPBZones && this.ports.zoomLevel === "pbZone") {
-            this.pbZoneData = {
+    _setData() {
+        if (this._showPBZones && this._ports._zoomLevel === "pbZone") {
+            this._pbZoneData = {
                 type: "FeatureCollection",
-                features: this.pbZoneDataDefault.features.filter(d => d.id === this.ports.currentPort.id).map(d => ({
+                features: this._pbZoneDataDefault.features.filter(d => d.id === this._ports.currentPort.id).map(d => ({
                     type: "Feature",
                     id: d.id,
                     geometry: d.geometry
                 }))
             };
-            this.fortData = {
+            this._fortData = {
                 type: "FeatureCollection",
-                features: this.fortDataDefault.features.filter(d => d.id === this.ports.currentPort.id).map(d => ({
+                features: this._fortDataDefault.features.filter(d => d.id === this._ports.currentPort.id).map(d => ({
                     type: "Feature",
                     id: d.id,
                     geometry: d.geometry
                 }))
             };
-            this.towerData = {
+            this._towerData = {
                 type: "FeatureCollection",
-                features: this.towerDataDefault.features.filter(d => d.id === this.ports.currentPort.id).map(d => ({
+                features: this._towerDataDefault.features.filter(d => d.id === this._ports.currentPort.id).map(d => ({
                     type: "Feature",
                     id: d.id,
                     geometry: d.geometry
                 }))
             };
         } else {
-            this.pbZoneData = {};
-            this.fortData = {};
-            this.towerData = {};
+            this._pbZoneData = {};
+            this._fortData = {};
+            this._towerData = {};
         }
     }
 
     refresh() {
-        this.setData();
-        this.update();
+        this._setData();
+        this._update();
     }
 
     transform(transform) {
-        this.g.attr("transform", transform);
+        this._g.attr("transform", transform);
     }
 }
