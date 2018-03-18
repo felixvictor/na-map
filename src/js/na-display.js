@@ -315,7 +315,7 @@ export default function naDisplay(serverName) {
         const towerData = topojsonFeature(pbZonesJsonData, pbZonesJsonData.objects.towers);
         pbZone = new PBZone(pbZoneData, fortData, towerData, ports);
 
-        shipData = JSON.parse(JSON.stringify(shipJsonData._shipData));
+        shipData = JSON.parse(JSON.stringify(shipJsonData.shipData));
 
         setup();
     }
