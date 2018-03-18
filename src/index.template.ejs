@@ -26,33 +26,7 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
 
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="moveToDropdown" role="button" data-toggle="dropdown"
-                   aria-haspopup="true" aria-expanded="false">
-                    Move to
-                </a>
-                <div class="dropdown-menu extralarge-width p-2" id="moveToMenu" aria-labelledby="moveToDropdown">
-                    <form id="f11">
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">F11 coordinates</span>
-                            </div>
-                            <input class="form-control" id="x-coord" type="number" required placeholder="X" max="830000"
-                                   min="-816000" step="0.1">
-                            <input class="form-control" id="z-coord" type="number" required placeholder="Z" max="830000"
-                                   min="-430000" step="0.1">
-                            <div class="input-group-append">
-                                <button class="btn btn-outline-primary" id="copy-coord" title="Copy to clipboard"
-                                        type="button"><i class="far fa-copy"></i>
-                                </button>
-                                <button class="btn btn-primary" type="submit">Move to</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </li>
-
-            <li class="nav-item dropdown pl-1">
+            <li class="nav-item dropdown pr-2">
                 <a class="nav-link dropdown-toggle" href="#" id="predictDropdown" role="button" data-toggle="dropdown"
                    aria-haspopup="true" aria-expanded="false">
                     Wind prediction
@@ -88,7 +62,38 @@
                 </div>
             </li>
 
-            <li class="nav-item dropdown pl-1">
+            <li class="nav-item dropdown pr-2">
+                <a class="nav-link dropdown-toggle" href="#" id="moveToDropdown" role="button" data-toggle="dropdown"
+                   aria-haspopup="true" aria-expanded="false">
+                    Move to F11
+                </a>
+                <div class="dropdown-menu extralarge-width p-2" id="moveToMenu" aria-labelledby="moveToDropdown">
+                    <form id="f11">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">F11 coordinates</span>
+                            </div>
+                            <input class="form-control" id="x-coord" type="number" required placeholder="X" max="830000"
+                                   min="-816000" step="0.1">
+                            <input class="form-control" id="z-coord" type="number" required placeholder="Z" max="830000"
+                                   min="-430000" step="0.1">
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-primary" id="copy-coord" title="Copy to clipboard"
+                                        type="button"><i class="far fa-copy"></i>
+                                </button>
+                                <button class="btn btn-primary" type="submit">Move to</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </li>
+
+            <li class="nav-item pr-2">
+                <label for="port-names"></label><select name="port-names" id="port-names">
+                </select>
+            </li>
+
+            <li class="nav-item dropdown pr-2">
                 <a class="nav-link dropdown-toggle" href="#" id="propertyDropdown" role="button" data-toggle="dropdown"
                    aria-haspopup="true" aria-expanded="false">
                     Select ports on
@@ -179,6 +184,7 @@
                                 <div class="col-sm-2">
                                     <button type="submit" class="btn btn-outline-primary">Go</button>
                                 </div>
+                            </div>
                         </form>
                     </div>
                     <a class="dropdown-item dropdown-toggle pt-2" href="#">Capture time</a>
@@ -190,41 +196,41 @@
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Conquest mark</h6>
                     <a class="dropdown-item" id="menu-prop-cm" href="#">
-                        <select class="custom-select" name="prop-cm" id="prop-cm" title="Select amount"></select>
+                        <label for="prop-cm"></label><select class="custom-select" name="prop-cm" id="prop-cm"></select>
                     </a>
                 </div>
             </li>
 
-            <li class="nav-item pl-2">
-                <label for="port-names"></label><select class="" name="port-names" id="port-names">
+            <li class="nav-item pr-2">
+                <label for="good-names"></label><select name="good-names" id="good-names">
                 </select>
-            </li>
-
-            <li class="nav-item pl-2">
-                <label for="good-names"></label><select class="" name="good-names" id="good-names">
-                </select>
-            </li>
-
-            <li class="nav-item pl-2">
-                <a class="btn btn-primary" role="button" id="button-ship-compare">Ship comparison</a>
-            </li>
-
-            <li class="nav-item pl-2">
-                <a class="btn btn-primary" role="button" href="port-battle.xlsx" download="port-battle-calculator.xlsx">Download
-                    PB calculator</a>
             </li>
         </ul>
 
         <ul class="navbar-nav ml-auto">
+
             <li class="nav-item dropdown pr-2">
-                <a class="nav-link dropdown-toggle" href="#" id="doubleclickDropdown" role="button"
+                <a class="nav-link dropdown-toggle" href="#" id="extraDropdown" role="button"
+                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Tools
+                </a>
+                <div class="dropdown-menu dropdown-menu-right" id="extraMenu"
+                     aria-labelledby="extraDropdown">
+
+                    <a class="dropdown-item" id="button-ship-compare">Ship comparison</a>
+                    <a class="dropdown-item" href="port-battle.xlsx" download="port-battle-calculator.xlsx">Download
+                        simple port battle calculator</a>
+                </div>
+            </li>
+
+            <li class="nav-item dropdown pr-2">
+                <a class="nav-link dropdown-toggle" href="#" id="settingsDropdown" role="button"
                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Settings
                 </a>
-                <div class="dropdown-menu dropdown-menu-right large-width" id="doubleclickMenu"
-                     aria-labelledby="doubleclickDropdown">
+                <div class="dropdown-menu dropdown-menu-right large-width" id="settingsMenu"
+                     aria-labelledby="settingsDropdown">
 
-                    <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Show</h6>
                     <div class="col-auto align-self-center ml-1 py-1">
                         <div class="custom-control custom-checkbox">
