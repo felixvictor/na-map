@@ -14,7 +14,7 @@
     <meta content="images/icons/browserconfig.xml" name="msapplication-config">
 
     <script src="https://www.googletagmanager.com/gtag/js?id=UA-109520372-1" async></script>
-<link href="na-map.min.css?64ed19b0f8f1af8a4744" rel="stylesheet" crossorigin="anonymous" integrity="sha256-mqq07nz8B6xSjKCDM5FECVW7G2EDeOvYdMJasEzo6Ao= sha384-a+sEMWf0E1J8CfQZFWT1YCuEnohuV0hyAhdPvRTQab1bvVCYlmm0V8Au7PjOZ9qi"></head>
+<link href="na-map.min.css?a4364148f9e03aa3900f" rel="stylesheet" crossorigin="anonymous" integrity="sha256-mqq07nz8B6xSjKCDM5FECVW7G2EDeOvYdMJasEzo6Ao= sha384-a+sEMWf0E1J8CfQZFWT1YCuEnohuV0hyAhdPvRTQab1bvVCYlmm0V8Au7PjOZ9qi"></head>
 <body>
 
 <nav class="bg-light fixed-top navbar navbar-expand-lg navbar-light">
@@ -25,29 +25,7 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
 
-            <li class="nav-item dropdown">
-                <a class="dropdown-toggle nav-link" href="#" id="moveToDropdown" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
-                    Move to
-                </a>
-                <div class="dropdown-menu extralarge-width p-2" id="moveToMenu" aria-labelledby="moveToDropdown">
-                    <form id="f11">
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">F11 coordinates</span>
-                            </div>
-                            <input class="form-control" id="x-coord" type="number" required max="830000" min="-816000" placeholder="X" step="0.1">
-                            <input class="form-control" id="z-coord" type="number" required max="830000" min="-430000" placeholder="Z" step="0.1">
-                            <div class="input-group-append">
-                                <button class="btn btn-outline-primary" type="button" id="copy-coord" title="Copy to clipboard"><i class="far fa-copy"></i>
-                                </button>
-                                <button class="btn btn-primary" type="submit">Move to</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </li>
-
-            <li class="nav-item dropdown pl-1">
+            <li class="nav-item pr-2 dropdown">
                 <a class="dropdown-toggle nav-link" href="#" id="predictDropdown" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
                     Wind prediction
                 </a>
@@ -79,7 +57,34 @@
                 </div>
             </li>
 
-            <li class="nav-item dropdown pl-1">
+            <li class="nav-item pr-2 dropdown">
+                <a class="dropdown-toggle nav-link" href="#" id="moveToDropdown" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
+                    Move to F11
+                </a>
+                <div class="dropdown-menu extralarge-width p-2" id="moveToMenu" aria-labelledby="moveToDropdown">
+                    <form id="f11">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">F11 coordinates</span>
+                            </div>
+                            <input class="form-control" id="x-coord" type="number" required max="830000" min="-816000" placeholder="X" step="0.1">
+                            <input class="form-control" id="z-coord" type="number" required max="830000" min="-430000" placeholder="Z" step="0.1">
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-primary" type="button" id="copy-coord" title="Copy to clipboard"><i class="far fa-copy"></i>
+                                </button>
+                                <button class="btn btn-primary" type="submit">Move to</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </li>
+
+            <li class="nav-item pr-2">
+                <label for="port-names"></label><select id="port-names" name="port-names">
+                </select>
+            </li>
+
+            <li class="nav-item pr-2 dropdown">
                 <a class="dropdown-toggle nav-link" href="#" id="propertyDropdown" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
                     Select ports on
                 </a>
@@ -154,7 +159,8 @@
                                 <div class="col-sm-2">
                                     <button class="btn btn-outline-primary" type="submit">Go</button>
                                 </div>
-                        </div></form>
+                            </div>
+                        </form>
                     </div>
                     <a class="dropdown-item dropdown-toggle pt-2" href="#">Capture time</a>
                     <div class="dropdown-menu">
@@ -165,39 +171,37 @@
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Conquest mark</h6>
                     <a class="dropdown-item" href="#" id="menu-prop-cm">
-                        <select id="prop-cm" name="prop-cm" title="Select amount" class="custom-select"></select>
+                        <label for="prop-cm"></label><select id="prop-cm" name="prop-cm" class="custom-select"></select>
                     </a>
                 </div>
             </li>
 
-            <li class="nav-item pl-2">
-                <label for="port-names"></label><select id="port-names" name="port-names" class="">
+            <li class="nav-item pr-2">
+                <label for="good-names"></label><select id="good-names" name="good-names">
                 </select>
-            </li>
-
-            <li class="nav-item pl-2">
-                <label for="good-names"></label><select id="good-names" name="good-names" class="">
-                </select>
-            </li>
-
-            <li class="nav-item pl-2">
-                <a class="btn btn-primary" id="button-ship-compare" role="button">Ship comparison</a>
-            </li>
-
-            <li class="nav-item pl-2">
-                <a class="btn btn-primary" href="port-battle.xlsx" role="button" download="port-battle-calculator.xlsx">Download
-                    PB calculator</a>
             </li>
         </ul>
 
         <ul class="ml-auto navbar-nav">
-            <li class="nav-item dropdown pr-2">
-                <a class="dropdown-toggle nav-link" href="#" id="doubleclickDropdown" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
+
+            <li class="nav-item pr-2 dropdown">
+                <a class="dropdown-toggle nav-link" href="#" id="extraDropdown" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
+                    Tools
+                </a>
+                <div class="dropdown-menu dropdown-menu-right" id="extraMenu" aria-labelledby="extraDropdown">
+
+                    <a class="dropdown-item" id="button-ship-compare">Ship comparison</a>
+                    <a class="dropdown-item" href="port-battle.xlsx" download="port-battle-calculator.xlsx">Download
+                        simple port battle calculator</a>
+                </div>
+            </li>
+
+            <li class="nav-item pr-2 dropdown">
+                <a class="dropdown-toggle nav-link" href="#" id="settingsDropdown" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
                     Settings
                 </a>
-                <div class="dropdown-menu large-width dropdown-menu-right" id="doubleclickMenu" aria-labelledby="doubleclickDropdown">
+                <div class="dropdown-menu dropdown-menu-right large-width" id="settingsMenu" aria-labelledby="settingsDropdown">
 
-                    <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Show</h6>
                     <div class="align-self-center col-auto ml-1 py-1">
                         <div class="custom-control custom-checkbox">
@@ -291,6 +295,7 @@
     </div>
 </section>
 
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
 <script src="https://d3js.org/d3.v4.min.js"></script>
-<script src="na-map.min.js?64ed19b0f8f1af8a4744" crossorigin="anonymous" integrity="sha256-2t793mAUCIp30+fN2s1Y7NBmAaupkC9ZHk9WX9oC8rs= sha384-EFOscrZKQnUxfkhk9tccxfCch5uLA/fL61yFsniV2BWq3iSn5uVHrJFzlQJ5n9Ij" type="text/javascript"></script></body>
+<script src="na-map.min.js?a4364148f9e03aa3900f" crossorigin="anonymous" integrity="sha256-KcMKvMctOyKCF4/fesZtMfceFL/7Qf8mp/1d9BG+dgg= sha384-ykKeD+re7PUUNIQ9X6AuMcXSWWqKN/gj+EQK7FjC7MEFVgfD9EpnmVE7KPqDSIH5" type="text/javascript"></script></body>
 </html>
