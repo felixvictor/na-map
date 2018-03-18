@@ -47,7 +47,7 @@ export default class F11 {
         });
 
         document.addEventListener("paste", event => {
-            this.constructor._pasteF11FromClipboard(event);
+            this._pasteF11FromClipboard(event);
             event.preventDefault();
         });
     }
@@ -79,20 +79,20 @@ export default class F11 {
         }
     }
 
-    static _pasteF11FromClipboard(e) {
-        function addF11StringToInput(F11String) {
-            const regex = /F11 coordinates X: ([-+]?[0-9]*\.?[0-9]+) Z: ([-+]?[0-9]*\.?[0-9]+)/g,
-                match = regex.exec(F11String);
+    _addF11StringToInput(F11String) {
+        const regex = /F11 coordinates X: ([-+]?[0-9]*\.?[0-9]+) Z: ([-+]?[0-9]*\.?[0-9]+)/g,
+            match = regex.exec(F11String);
 
-            if (match && !Number.isNaN(+match[1]) && !Number.isNaN(+match[2])) {
-                const x = +match[1],
-                    z = +match[2];
-                if (!Number.isNaN(Number(x)) && !Number.isNaN(Number(z))) {
-                    this._goToF11(x, z);
-                }
+        if (match && !Number.isNaN(+match[1]) && !Number.isNaN(+match[2])) {
+            const x = +match[1],
+                z = +match[2];
+            if (!Number.isNaN(Number(x)) && !Number.isNaN(Number(z))) {
+                this._goToF11(x, z);
             }
         }
+    }
 
+    _pasteF11FromClipboard(e) {
         const F11String =
             // eslint-disable-next-line no-nested-ternary
             e.clipboardData && e.clipboardData.getData
@@ -112,7 +112,7 @@ export default class F11 {
             }
         } else {
             // Paste F11string
-            addF11StringToInput(F11String);
+            this._addF11StringToInput(F11String);
         }
     }
 
