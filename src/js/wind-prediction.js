@@ -16,9 +16,13 @@ export default class WindPrediction {
     constructor(leftMargin, topMargin) {
         this._leftMargin = leftMargin;
         this._topMargin = topMargin;
+        this._compassSize = 100;
+        this._height = 300;
+        this._width = 300;
         this._line = d3.line();
 
         this._setupSvg();
+        this.constructor._setupArrow();
         this.constructor._setupForm();
         this._setupListener();
     }
@@ -33,7 +37,9 @@ export default class WindPrediction {
             .style("left", `${this._leftMargin}px`)
             .style("top", `${this._topMargin}px`)
             .classed("coord", true);
+    }
 
+    static _setupArrow() {
         d3
             .select("#na-svg defs")
             .append("marker")
@@ -92,7 +98,7 @@ export default class WindPrediction {
                 time = $("#wind-time-input")
                     .val()
                     .trim();
-            // console.log(`currentWind ${currentWind} time ${time}`);
+
             this._predictWind(currentWind, time);
             $("#predictDropdown").dropdown("toggle");
             event.preventDefault();
@@ -102,7 +108,8 @@ export default class WindPrediction {
     _predictWind(currentUserWind, predictUserTime) {
         const secondsForFullCircle = 48 * 60,
             fullCircle = 360,
-            degreesPerSecond = fullCircle / secondsForFullCircle;
+            degreesPerSecond = fullCircle / secondsForFullCircle,
+            timeFormat = "H.mm";
         let currentWindDegrees;
 
         const regex = /(\d+)[\s:.](\d+)/,
@@ -117,53 +124,48 @@ export default class WindPrediction {
             currentWindDegrees = +currentUserWind;
         }
 
-        const currentDate = moment()
+        const currentTime = moment()
                 .utc()
                 .seconds(0)
                 .milliseconds(0),
-            predictDate = moment(currentDate)
+            predictTime = moment(currentTime)
                 .hour(predictHours)
                 .minutes(predictMinutes);
-        if (predictDate.isBefore(currentDate)) {
-            predictDate.add(1, "day");
+        if (predictTime.isBefore(currentTime)) {
+            predictTime.add(1, "day");
         }
 
-        const timeDiffInSec = predictDate.diff(currentDate, "seconds");
+        const timeDiffInSec = predictTime.diff(currentTime, "seconds");
         const predictedWindDegrees = Math.abs(currentWindDegrees - degreesPerSecond * timeDiffInSec + 360) % 360;
 
         this._printPredictedWind(
             predictedWindDegrees,
-            predictDate.format("H.mm"),
+            predictTime.format(timeFormat),
             degreesToCompass(currentUserWind),
-            currentDate.format("H.mm")
+            currentTime.format(timeFormat)
         );
     }
 
-    _printPredictedWind(predictedWindDegrees, predictTime, currentWind, currentTime) {
-        const compassSize = 100,
-            height = 300,
-            width = 300,
-            xCompass = width / 2,
-            yCompass = height / 3;
-        const length = compassSize * 1.3,
+    _printCompass(predictedWindDegrees) {
+        const xCompass = this._width / 2,
+            yCompass = this._height / 3,
             radians = Math.PI / 180 * (predictedWindDegrees - 90),
+            length = this._compassSize * 1.3,
             dx = length * Math.cos(radians),
             dy = length * Math.sin(radians),
-            compass = degreesToCompass(predictedWindDegrees);
+            lineData = [
+                [Math.round(xCompass + dx / 2), Math.round(yCompass + dy / 2)],
+                [Math.round(xCompass - dx / 2), Math.round(yCompass - dy / 2)]
+            ];
 
-        const lineData = [];
-        lineData.push([Math.round(xCompass + dx / 2), Math.round(yCompass + dy / 2)]);
-        lineData.push([Math.round(xCompass - dx / 2), Math.round(yCompass - dy / 2)]);
-
-        this._svg.attr("height", height).attr("width", width);
-        const rect = this._svg.append("rect");
+        this._svg.attr("height", this._height).attr("width", this._width);
         this._svg
             .append("image")
             .classed("compass", true)
-            .attr("x", xCompass - compassSize / 2)
-            .attr("y", yCompass - compassSize / 2)
-            .attr("height", compassSize)
-            .attr("width", compassSize)
+            .attr("x", xCompass - this._compassSize / 2)
+            .attr("y", yCompass - this._compassSize / 2)
+            .attr("height", this._compassSize)
+            .attr("width", this._compassSize)
             .attr("xlink:href", "icons/compass.svg");
         this._svg
             .append("path")
@@ -171,46 +173,56 @@ export default class WindPrediction {
             .attr("d", this._line)
             .classed("wind", true)
             .attr("marker-end", "url(#wind-arrow)");
+    }
 
-        const svg = this._svg.append("svg");
-        const text1 = svg
+    _printText(predictedWindDegrees, predictTime, currentWind, currentTime) {
+        const compass = degreesToCompass(predictedWindDegrees),
+            lineHeight = parseInt(
+                window.getComputedStyle(document.getElementById("wind")).getPropertyValue("line-height"),
+                10
+            );
+        const textSvg = this._svg.append("svg");
+
+        const text1 = textSvg
             .append("text")
             .attr("x", "50%")
             .attr("y", "33%")
             .attr("class", "wind-text")
             .text(`From ${compass} at ${predictTime}`);
-        const text2 = svg
+
+        const text2 = textSvg
             .append("text")
             .attr("x", "50%")
             .attr("y", "66%")
             .attr("class", "wind-text-current")
             .text(`Currently at ${currentTime} from ${currentWind}`);
+
         const bbox1 = text1.node().getBoundingClientRect(),
             bbox2 = text2.node().getBoundingClientRect(),
-            lineHeight = parseInt(
-                window.getComputedStyle(document.getElementById("wind")).getPropertyValue("line-height"),
-                10
-            ),
             textHeight = Math.max(bbox1.height, bbox2.height) * 2 + lineHeight,
             textWidth = Math.max(bbox1.width, bbox2.width) + lineHeight;
-        svg
-            .attr("x", (width - textWidth) / 2)
+
+        textSvg
+            .attr("x", (this._width - textWidth) / 2)
             .attr("y", "60%")
             .attr("height", textHeight)
             .attr("width", textWidth);
-        rect
+    }
+
+    _addBackground() {
+        this._svg
+            .insert("rect", ":first-child")
             .attr("x", 0)
             .attr("y", 0)
-            .attr("height", height)
-            .attr("width", width);
+            .attr("height", this._height)
+            .attr("width", this._width);
+    }
 
-        /*
-        const targetScale = 2,
-            { x } = this.ports.getCurrentPortCoord(),
-            { y } = this.ports.getCurrentPortCoord();
-         clearMap();
-         zoomAndPan(x, y, targetScale);
-         */
+    _printPredictedWind(predictedWindDegrees, predictTime, currentWind, currentTime) {
+        this.clearMap();
+        this._printCompass(predictedWindDegrees);
+        this._printText(predictedWindDegrees, predictTime, currentWind, currentTime);
+        this._addBackground();
     }
 
     clearMap() {
