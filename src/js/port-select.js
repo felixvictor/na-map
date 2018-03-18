@@ -51,20 +51,17 @@ export default class PortSelect {
 
     _setupListener() {
         const portNames = $("#port-names"),
-            goodNames = $("#good-names"),
-            selectPicker = $(".selectpicker");
+            goodNames = $("#good-names");
+
         portNames.addClass("selectpicker");
-        goodNames.addClass("selectpicker");
-
         portNames.on("change", event => this._portSelected(event)).selectpicker({
-            title: "Go to a port"
+            title: "Move to port"
         });
 
+        goodNames.addClass("selectpicker");
         goodNames.on("change", event => this._goodSelected(event)).selectpicker({
-            title: "Select a good"
+            title: "Select a good/Reset"
         });
-
-        selectPicker.selectpicker("refresh");
 
         $("#prop-nation")
             .on("click", event => event.stopPropagation())
@@ -114,6 +111,8 @@ export default class PortSelect {
         $("#prop-cm")
             .on("click", event => event.stopPropagation())
             .on("change", () => this._CMSelected());
+
+        $(".selectpicker").selectpicker("refresh");
     }
 
     _setupPortSelect() {
@@ -134,7 +133,7 @@ export default class PortSelect {
                 return 0;
             });
 
-        const select = `${selectPorts
+        const select = `<option value="0" selected>Move to port</option>${selectPorts
             .map(
                 port =>
                     `<option data-subtext="${port.nation}" value="${port.coord}" data-id="${port.id}">${
@@ -167,7 +166,7 @@ export default class PortSelect {
             });
         });
         selectGoods = new Map(Array.from(selectGoods).sort());
-        let select = "";
+        let select = '<option value="0" selected>Select a good/Reset</option>';
         // eslint-disable-next-line no-restricted-syntax
         for (const [key, portIds] of selectGoods.entries()) {
             let ids = "";
@@ -182,7 +181,7 @@ export default class PortSelect {
 
     static _setupNationSelect() {
         const propNation = $("#prop-nation");
-        const select = `<option value="0">Select a nation/Reset</option>${nations
+        const select = `<option value="0" selected>Select a nation/Reset</option>${nations
             .sort((a, b) => {
                 if (a.sortName < b.sortName) {
                     return -1;
@@ -204,7 +203,7 @@ export default class PortSelect {
 
         const clanList = new Set();
         this._ports.portData.filter(d => d.properties.capturer).map(d => clanList.add(d.properties.capturer));
-        const select = `<option value="0">Select a clan / Reset</option>${Array.from(clanList)
+        const select = `<option value="0" selected>Select a clan/Reset</option>${Array.from(clanList)
             .sort()
             .map(clan => `<option value="${clan}">${clan}</option>`)
             .join("")}`;
@@ -217,7 +216,7 @@ export default class PortSelect {
         propCM.append(
             $("<option>", {
                 value: 0,
-                text: "Select amount"
+                text: "Select amount/Reset"
             })
         );
         const cmList = new Set();
@@ -235,15 +234,18 @@ export default class PortSelect {
     _portSelected(event) {
         const port = $(event.currentTarget).find(":selected");
         const c = port.val().split(",");
-        this._ports.currentPort.coord.x = +c[0];
-        this._ports.currentPort.coord.y = +c[1];
-        this._ports.currentPort.id = port.data("id").toString();
 
-        if (this._pbZone._showPBZones) {
-            this._pbZone.refresh();
+        if (c[0] === "0") {
+            this._ports.setPortData(this._ports.portDataDefault);
             this._ports.update();
+        } else {
+            this._ports.setCurrentPort(+c[0], +c[1], port.data("id").toString());
+            if (this._pbZone._showPBZones) {
+                this._pbZone.refresh();
+                this._ports.update();
+            }
+            this._map.goToPort();
         }
-        this._map.goToPort();
     }
 
     _goodSelected(event) {
@@ -328,17 +330,6 @@ export default class PortSelect {
                 startTimes.add((i - 10) % maxStartTime);
             }
         }
-
-        /*
-        console.log(startTimes);
-        for (const time of startTimes.values()) {
-            console.log(
-                "%s.00\u202f–\u202f%s.00",
-                !time ? "11" : (time + 10) % 24,
-                !time ? "8" : (time + 13) % 24
-            );
-        }
-        */
 
         const portData = this._ports.portDataDefault.filter(
             d =>
