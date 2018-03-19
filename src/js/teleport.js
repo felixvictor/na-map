@@ -29,6 +29,7 @@ export default class Teleport {
                 const $input = $("#show-teleport");
 
                 this._showTeleportAreas = $input.is(":checked");
+                this.setTeleportData(this._showTeleportAreas);
                 this.updateTeleportAreas();
             });
     }
