@@ -224,7 +224,7 @@ export default function naDisplay(serverName) {
 
         _updateCurrent() {
             pbZone.refresh();
-            teleport.setTeleportData(this._zoomLevel === "pbZone");
+            teleport.setTeleportData(this._zoomLevel !== "pbZone");
             teleport.updateTeleportAreas();
             ports.update();
         }
