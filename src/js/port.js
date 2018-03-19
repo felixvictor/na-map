@@ -67,52 +67,73 @@ export default class PortDisplay {
 
     _updateCircles() {
         function showDetails(d, i, nodes) {
-            function tooltipData(portProperties) {
-                let h = `<table><tbody<tr><td><i class="flag-icon ${
-                    portProperties.availableForAll ? `${portProperties.nation}a` : portProperties.nation
-                }"></i></td>`;
-                h += `<td><span class="port-name">${portProperties.name}</span>`;
-                h += portProperties.availableForAll ? " (accessible to all nations)" : "";
-                h += "</td></tr></tbody></table>";
-                h += `<p>${portProperties.shallow ? "Shallow" : "Deep"}`;
-                h += " water port";
-                if (portProperties.countyCapital) {
-                    h += " (county capital)";
-                }
-                if (portProperties.capturer) {
-                    h += ` captured by ${portProperties.capturer} ${moment(portProperties.lastPortBattle).fromNow()}`;
-                }
-                h += "<br>";
-                if (!portProperties.nonCapturable) {
-                    const pbTimeRange = !portProperties.portBattleStartTime
-                        ? "11.00\u202f–\u202f8.00"
-                        : `${(portProperties.portBattleStartTime + 10) %
-                              24}.00\u202f–\u202f${(portProperties.portBattleStartTime + 13) % 24}.00`;
-                    h += `Port battle ${pbTimeRange}, ${thousandsWithBlanks(portProperties.brLimit)} BR, `;
-                    switch (portProperties.portBattleType) {
-                        case "Large":
-                            h += "1<sup>st</sup>";
-                            break;
-                        case "Medium":
-                            h += "4<sup>th</sup>";
-                            break;
-                        default:
-                            h += "6<sup>th</sup>";
-                            break;
-                    }
-
-                    h += "\u202frate AI";
-                    h += `, ${portProperties.conquestMarksPension}\u202fconquest point`;
-                    h += portProperties.conquestMarksPension > 1 ? "s" : "";
-                    h += `<br>Tax income ${thousandsWithBlanks(portProperties.taxIncome)} (${portProperties.portTax *
-                        100}\u202f%), net income ${formatCoord(portProperties.netIncome)}`;
-                    h += portProperties.tradingCompany
+            function getText(portProperties) {
+                const port = {
+                    name: portProperties.name,
+                    icon: portProperties.availableForAll ? `${portProperties.nation}a` : portProperties.nation,
+                    availableForAll: portProperties.availableForAll,
+                    depth: portProperties.shallow ? "Shallow" : "Deep",
+                    countyCapital: portProperties.countyCapital,
+                    nonCapturable: portProperties.nonCapturable,
+                    // eslint-disable-next-line no-nested-ternary
+                    captured: portProperties.countyCapital
+                        ? " county capital"
+                        : portProperties.capturer
+                            ? ` captured by ${portProperties.capturer} ${moment(
+                                  portProperties.lastPortBattle
+                              ).fromNow()}`
+                            : "",
+                    // eslint-disable-next-line no-nested-ternary
+                    pbTimeRange: portProperties.nonCapturable
+                        ? ""
+                        : !portProperties.portBattleStartTime
+                            ? "11.00\u202f–\u202f8.00"
+                            : `${(portProperties.portBattleStartTime + 10) %
+                                  24}.00\u202f–\u202f${(portProperties.portBattleStartTime + 13) % 24}.00`,
+                    brLimit: thousandsWithBlanks(portProperties.brLimit),
+                    conquestMarksPension: portProperties.conquestMarksPension,
+                    taxIncome: thousandsWithBlanks(portProperties.taxIncome),
+                    portTax: portProperties.portTax * 100,
+                    netIncome: formatCoord(portProperties.netIncome),
+                    tradingCompany: portProperties.tradingCompany
                         ? `, trading company level\u202f${portProperties.tradingCompany}`
-                        : "";
-                    h += portProperties.laborHoursDiscount ? ", labor hours discount" : "";
+                        : "",
+                    laborHoursDiscount: portProperties.laborHoursDiscount ? ", labor hours discount" : ""
+                };
+
+                switch (portProperties.portBattleType) {
+                    case "Large":
+                        port.pbType = "1<sup>st</sup>";
+                        break;
+                    case "Medium":
+                        port.pbType = "4<sup>th</sup>";
+                        break;
+                    default:
+                        port.pbType = "6<sup>th</sup>";
+                        break;
+                }
+                return port;
+            }
+
+            function tooltipData(portProperties) {
+                const port = getText(portProperties);
+
+                let h = `<table><tbody<tr><td><i class="flag-icon ${port.icon}"></i></td>`;
+                h += `<td><span class="port-name">${port.name}</span>`;
+                h += port.availableForAll ? " (accessible to all nations)" : "";
+                h += "</td></tr></tbody></table>";
+                h += `<p>${port.depth} water port ${port.captured}<br>`;
+                if (!port.nonCapturable) {
+                    h += `Port battle ${port.pbTimeRange}, ${port.brLimit} BR, `;
+                    h += `${port.pbType}\u202frate AI`;
+                    h += `, ${port.conquestMarksPension}\u202fconquest point`;
+                    h += port.conquestMarksPension > 1 ? "s" : "";
+                    h += `<br>Tax income ${port.taxIncome} (${port.portTax}\u202f%), net income ${port.netIncome}`;
+                    h += port.tradingCompany;
+                    h += port.laborHoursDiscount;
                 } else {
                     h += "Not capturable";
-                    h += `<br>${portProperties.portTax * 100}\u2009% tax`;
+                    h += `<br>${port.portTax}\u201f% tax`;
                 }
                 h += "</p>";
                 h += "<table class='table table-sm'>";
@@ -282,10 +303,9 @@ export default class PortDisplay {
         this.portData = portData;
     }
 
-    setCurrentPort(id, x,y){
-        this.currentPort = { id: id, coord: { x: x, y: y } };
+    setCurrentPort(id, x, y) {
+        this.currentPort = { id, coord: { x, y } };
     }
-
 
     setZoomLevel(zoomLevel) {
         this._zoomLevel = zoomLevel;
