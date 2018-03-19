@@ -133,7 +133,7 @@ export default class PortDisplay {
                     h += port.laborHoursDiscount;
                 } else {
                     h += "Not capturable";
-                    h += `<br>${port.portTax}\u201f% tax`;
+                    h += `<br>${port.portTax}\u202f% tax`;
                 }
                 h += "</p>";
                 h += "<table class='table table-sm'>";
