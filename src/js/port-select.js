@@ -239,7 +239,7 @@ export default class PortSelect {
             this._ports.setPortData(this._ports.portDataDefault);
             this._ports.update();
         } else {
-            this._ports.setCurrentPort(+c[0], +c[1], port.data("id").toString());
+            this._ports.setCurrentPort(port.data("id").toString(), +c[0], +c[1]);
             if (this._pbZone._showPBZones) {
                 this._pbZone.refresh();
                 this._ports.update();
