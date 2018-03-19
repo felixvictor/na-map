@@ -230,7 +230,7 @@ export default class PortDisplay {
             .on("mouseout", hideDetails);
 
         // Apply to both old and new
-        circleUpdate.merge(circleEnter).attr("r", d => (d.id === this._highlightId ? circleSize * 3 : circleSize));
+        circleUpdate.merge(circleEnter).attr("r", d => (d.id === this._highlightId ? circleSize * 2 : circleSize));
     }
 
     updateTexts() {
@@ -258,7 +258,7 @@ export default class PortDisplay {
                 .text(d => d.properties.name);
 
             const deltaY = circleSize + fontSize;
-            const deltaY2 = circleSize + fontSize * 2;
+            const deltaY2 = circleSize * 2 + fontSize * 2;
             // Apply to both old and new
             textUpdate
                 .merge(textEnter)
