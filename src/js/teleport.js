@@ -58,22 +58,6 @@ export default class Teleport {
     }
 
     _mouseover(event) {
-        // console.log(event);
-        /*
-        const ref = d3.mouse(nodes[i]),
-            mx = ref[0],
-            my = ref[1];
-
-        // use the new diagram.find() function to find the voronoi site closest to
-        // the mouse, limited by max distance defined by voronoiRadius
-        console.log("_mouseover ", this._voronoiDiagram);
-        const site = this._getVoronoiDiagram().find(mx, my, this.voronoiRadius);
-        if (site) {
-            this.highlightId = site.data.id;
-            this.updateTeleportAreas();
-            // update(zoomLevel);
-        }
-        */
         this._highlightId = event.data.id;
         this.updateTeleportAreas();
         this._ports.setHighlightId(this._highlightId);
@@ -95,7 +79,7 @@ export default class Teleport {
             .enter()
             .append("path")
             .attr("d", d => (d ? `M${d.join("L")}Z` : null))
-            .on("_mouseover", event => this._mouseover(event));
+            .on("mouseover", event => this._mouseover(event));
 
         // Apply to both old and new
         pathUpdate.merge(pathEnter).classed("highlight-voronoi", d => d.data.id === this._highlightId);
