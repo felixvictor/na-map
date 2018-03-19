@@ -22,7 +22,21 @@ export default class PortSelect {
     }
 
     _setupSelects() {
-        $(".selectpicker").selectpicker({
+        this._setupPortSelect();
+        this._setupGoodSelect();
+        this.constructor._setupNationSelect();
+        this._setupClanSelect();
+        this._setupCMSelect();
+    }
+
+    _setupListener() {
+        const portNames = $("#port-names"),
+            goodNames = $("#good-names"),
+            selectPicker = $(".selectpicker");
+
+        portNames.addClass("selectpicker");
+        goodNames.addClass("selectpicker");
+        selectPicker.selectpicker({
             icons: {
                 time: "far fa-clock",
                 date: "far fa-calendar",
@@ -42,23 +56,9 @@ export default class PortSelect {
             liveSearchNormalize: true
         });
 
-        this._setupPortSelect();
-        this._setupGoodSelect();
-        this.constructor._setupNationSelect();
-        this._setupClanSelect();
-        this._setupCMSelect();
-    }
-
-    _setupListener() {
-        const portNames = $("#port-names"),
-            goodNames = $("#good-names");
-
-        portNames.addClass("selectpicker");
         portNames.on("change", event => this._portSelected(event)).selectpicker({
             title: "Move to port"
         });
-
-        goodNames.addClass("selectpicker");
         goodNames.on("change", event => this._goodSelected(event)).selectpicker({
             title: "Select a good/Reset"
         });
@@ -112,7 +112,7 @@ export default class PortSelect {
             .on("click", event => event.stopPropagation())
             .on("change", () => this._CMSelected());
 
-        $(".selectpicker").selectpicker("refresh");
+        selectPicker.selectpicker("refresh");
     }
 
     _setupPortSelect() {
