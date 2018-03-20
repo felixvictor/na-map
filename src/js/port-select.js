@@ -31,11 +31,11 @@ export default class PortSelect {
 
     _setupListener() {
         const portNames = $("#port-names"),
-            goodNames = $("#good-names"),
-            selectPicker = $(".selectpicker");
+            goodNames = $("#good-names");
 
         portNames.addClass("selectpicker");
         goodNames.addClass("selectpicker");
+        const selectPicker = $(".selectpicker");
         selectPicker.selectpicker({
             icons: {
                 time: "far fa-clock",
