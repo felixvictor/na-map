@@ -1,5 +1,5 @@
 /*
-    ports.js
+    port.js
 */
 
 /* global d3 : false
@@ -14,7 +14,6 @@ import { formatCoord, thousandsWithBlanks } from "./util";
 export default class PortDisplay {
     constructor(portData) {
         this.portDataDefault = portData;
-        this.portData = portData;
         // Shroud Cay
         this.currentPort = { id: "366", coord: { x: 4396, y: 2494 } };
         this.fontSizes = { initial: 30, portLabel: 18, pbZone: 7 };
@@ -25,9 +24,27 @@ export default class PortDisplay {
         this._highlightDuration = 200;
         this._iconSize = 50;
         this._circleSizes = { initial: 50, portLabel: 20, pbZone: 5 };
+        this._path = d3.geoPath().projection(null);
+        this._showRadius = "taxIncome";
+        this._taxIncomeRadius = d3
+            .scaleSqrt()
+            .range([this._circleSizes[this._zoomLevel], this._circleSizes[this._zoomLevel] * 4]);
+        this._netIncomeRadius = d3
+            .scaleSqrt()
+            .range([this._circleSizes[this._zoomLevel], this._circleSizes[this._zoomLevel] * 4]);
 
+        this.setPortData(portData);
+        this._setupListener();
         this._setupSvg();
         this._setupFlags();
+    }
+
+    _setupListener() {
+        $("#radius-action").change(() => {
+            this._showRadius = $("input[name='showRadius']:checked").val();
+            this.update();
+            this.setPortData(this.portData);
+        });
     }
 
     _setupSvg() {
@@ -219,9 +236,28 @@ export default class PortDisplay {
         // eslint-disable-next-line no-unused-vars
         const circleEnter = circleUpdate
             .enter()
+            .append("g")
+            .attr("transform", d => `translate(${this._path.centroid(d)})`);
+
+        if (this._showRadius) {
+            if (this._showRadius === "taxIncome") {
+                circleEnter
+                    .append("circle")
+                    .attr("class", "bubble pos")
+                    .attr("display", d => (d.properties.nonCapturable ? "none" : "inherit"))
+                    .attr("r", d => this._taxIncomeRadius(Math.abs(d.properties.taxIncome)));
+            } else {
+                circleEnter
+                    .append("circle")
+                    .attr("class", d => (d.properties.netIncome < 0 ? "bubble neg" : "bubble pos"))
+                    .attr("display", d => (d.properties.nonCapturable ? "none" : "inherit"))
+                    .attr("r", d => this._netIncomeRadius(Math.abs(d.properties.netIncome)));
+            }
+        }
+
+        circleEnter
             .append("circle")
-            .attr("cx", d => d.geometry.coordinates[0])
-            .attr("cy", d => d.geometry.coordinates[1])
+            .classed("port", true)
             .attr(
                 "fill",
                 d => `url(#${d.properties.availableForAll ? `${d.properties.nation}a` : d.properties.nation})`
@@ -230,7 +266,10 @@ export default class PortDisplay {
             .on("mouseout", hideDetails);
 
         // Apply to both old and new
-        circleUpdate.merge(circleEnter).attr("r", d => (d.id === this._highlightId ? circleSize * 2 : circleSize));
+        circleUpdate
+            .merge(circleEnter)
+            .selectAll(".port")
+            .attr("r", d => (d.id === this._highlightId ? circleSize * 2 : circleSize));
     }
 
     updateTexts() {
@@ -301,6 +340,13 @@ export default class PortDisplay {
 
     setPortData(portData) {
         this.portData = portData;
+        const minTaxIncome = d3.min(portData, d => Math.abs(d.properties.taxIncome)),
+            maxTaxIncome = d3.max(portData, d => Math.abs(d.properties.taxIncome)),
+            minNetIncome = d3.min(portData, d => Math.abs(d.properties.netIncome)),
+            maxNetIncome = d3.max(portData, d => Math.abs(d.properties.netIncome));
+
+        this._taxIncomeRadius.domain([minTaxIncome, maxTaxIncome]);
+        this._netIncomeRadius.domain([minNetIncome, maxNetIncome]);
     }
 
     setCurrentPort(id, x, y) {
