@@ -12,6 +12,23 @@ $background-colour: $primary-300;
   background-color: $background-colour;
 }
 
+.bubble {
+  fill-opacity: .5;
+  stroke: $white;
+  stroke-width: .5px;
+}
+
+.pos {
+  fill: $green;
+}
+.neg {
+  fill: $red;
+}
+
+.bubble :hover {
+  stroke: $black;
+}
+
 .table {
   td {
     border-top: none;
