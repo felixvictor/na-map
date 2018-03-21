@@ -224,7 +224,10 @@ export default class PortDisplay {
         const circleSize = this._circleSizes[this._zoomLevel];
 
         // Data join
-        const circleUpdate = this._g.selectAll("circle").data(this.portData, d => d.id);
+        const circleUpdate = this._g.selectAll("g").data(this.portData, d => {
+            console.log(d);
+            return d.id;
+        });
 
         // Remove old circles
         circleUpdate.exit().remove();
@@ -245,7 +248,10 @@ export default class PortDisplay {
                     .append("circle")
                     .attr("class", "bubble pos")
                     .attr("display", d => (d.properties.nonCapturable ? "none" : "inherit"))
-                    .attr("r", d => this._taxIncomeRadius(Math.abs(d.properties.taxIncome)));
+                    .attr("r", d => {
+                        console.log(d);
+                        return this._taxIncomeRadius(Math.abs(d.properties.taxIncome));
+                    });
             } else {
                 circleEnter
                     .append("circle")
@@ -266,10 +272,7 @@ export default class PortDisplay {
             .on("mouseout", hideDetails);
 
         // Apply to both old and new
-        circleUpdate
-            .merge(circleEnter)
-            .selectAll(".port")
-            .attr("r", d => (d.id === this._highlightId ? circleSize * 2 : circleSize));
+        circleUpdate.merge(circleEnter).attr("r", d => (d.id === this._highlightId ? circleSize * 2 : circleSize));
     }
 
     updateTexts() {
