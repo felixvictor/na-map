@@ -14,8 +14,6 @@ $background-colour: $primary-300;
 
 .bubble {
   fill-opacity: .5;
-  stroke: $white;
-  stroke-width: .5px;
 }
 
 .pos {
@@ -23,10 +21,6 @@ $background-colour: $primary-300;
 }
 .neg {
   fill: $red;
-}
-
-.bubble :hover {
-  stroke: $black;
 }
 
 .table {
