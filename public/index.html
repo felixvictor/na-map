@@ -14,7 +14,7 @@
     <meta content="images/icons/browserconfig.xml" name="msapplication-config">
 
     <script src="https://www.googletagmanager.com/gtag/js?id=UA-109520372-1" async></script>
-<link href="na-map.min.css?7a403b43ad146dc25695" rel="stylesheet" crossorigin="anonymous" integrity="sha256-0w/xinIW+cJEIRxEoVy/U7XPNzRuL95xdA+FspsM/eM= sha384-jx7bvS5NXznqYCcqs/TmAt3IO2GnCMdAWVo9jTzBd+mmY+0AlrYqCepn41/+rhjf"></head>
+<link href="na-map.min.css?4e04d82369eed8c922fd" rel="stylesheet" crossorigin="anonymous" integrity="sha256-0w/xinIW+cJEIRxEoVy/U7XPNzRuL95xdA+FspsM/eM= sha384-jx7bvS5NXznqYCcqs/TmAt3IO2GnCMdAWVo9jTzBd+mmY+0AlrYqCepn41/+rhjf"></head>
 <body>
 
 <nav class="bg-light fixed-top navbar navbar-expand-lg navbar-light">
@@ -216,17 +216,19 @@
                     </div>
 
                     <div class="dropdown-divider"></div>
-                    <h6 class="dropdown-header">Show income</h6>
-                    <div class="ml-1 py-1 radio-group" id="radius-action">
-                        <div class="align-self-center col-auto">
-                            <div class="custom-control custom-control-inline custom-radio">
-                                <input class="custom-control-input" id="taxIncome" type="radio" name="showRadius" value="taxIncome" checked>
-                                <label for="taxIncome" class="custom-control-label">tax income</label>
-                            </div>
-                            <div class="custom-control custom-control-inline custom-radio">
-                                <input class="custom-control-input" id="netIncome" type="radio" name="showRadius" value="netIncome">
-                                <label for="netIncome" class="custom-control-label">net income</label>
-                            </div>
+                    <h6 class="dropdown-header">Income per port</h6>
+                    <div class="align-self-center col-auto ml-1 py-1 radio-group" id="radius-type">
+                        <div class="custom-control custom-control-inline custom-radio">
+                            <input class="custom-control-input" id="noShow" type="radio" name="showRadiusType" value="noShow" checked>
+                            <label for="noShow" class="custom-control-label">Do not show</label>
+                        </div>
+                        <div class="custom-control custom-control-inline custom-radio">
+                            <input class="custom-control-input" id="taxIncome" type="radio" name="showRadiusType" value="taxIncome">
+                            <label for="taxIncome" class="custom-control-label">tax</label>
+                        </div>
+                        <div class="custom-control custom-control-inline custom-radio">
+                            <input class="custom-control-input" id="netIncome" type="radio" name="showRadiusType" value="netIncome">
+                            <label for="netIncome" class="custom-control-label">net</label>
                         </div>
                     </div>
 
@@ -312,5 +314,5 @@
 
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
 <script src="https://d3js.org/d3.v4.min.js"></script>
-<script src="na-map.min.js?7a403b43ad146dc25695" crossorigin="anonymous" integrity="sha256-+4BxH5LVIdzNWhIBSXiWbwbofNpmm8CNA+0OQnbCisA= sha384-CMhO9FigWTwEHSReBYXfuwdEENv14FhDBnHk6VsX8i/tpyWRGsmN1JQe458T/m3J" type="text/javascript"></script></body>
+<script src="na-map.min.js?4e04d82369eed8c922fd" crossorigin="anonymous" integrity="sha256-x83ChwGcEKNBEXJXG/ewk5FKcd+nYtGREvyMk4H+11E= sha384-OSkPmeie0LTIRwbXgwnmXhoRZyBvTAUN2ySwHT/lxi2zf/cOjlxgEHGL2VEzViEi" type="text/javascript"></script></body>
 </html>
