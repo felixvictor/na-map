@@ -245,19 +245,22 @@
                     </div>
 
                     <div class="dropdown-divider"></div>
-                    <h6 class="dropdown-header">Show income</h6>
-                    <div id="radius-action" class="radio-group ml-1 py-1">
-                        <div class="col-auto align-self-center">
-                            <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" class="custom-control-input" name="showRadius" id="taxIncome"
-                                       value="taxIncome" checked>
-                                <label class="custom-control-label" for="taxIncome">tax income</label>
-                            </div>
-                            <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" class="custom-control-input" name="showRadius" id="netIncome"
-                                       value="netIncome">
-                                <label class="custom-control-label" for="netIncome">net income</label>
-                            </div>
+                    <h6 class="dropdown-header">Income per port</h6>
+                    <div class="col-auto align-self-center radio-group ml-1 py-1" id="radius-type">
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input"
+                                   name="showRadiusType" id="noShow" value="noShow" checked>
+                            <label class="custom-control-label" for="noShow">Do not show</label>
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input"
+                                   name="showRadiusType" id="taxIncome" value="taxIncome">
+                            <label class="custom-control-label" for="taxIncome">tax</label>
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input"
+                                   name="showRadiusType" id="netIncome" value="netIncome">
+                            <label class="custom-control-label" for="netIncome">net</label>
                         </div>
                     </div>
 

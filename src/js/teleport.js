@@ -16,7 +16,7 @@ export default class Teleport {
         this._highlightId = null;
         this._g = d3
             .select("#na-svg")
-            .insert("g", ".port")
+            .insert("g", ".ports")
             .classed("voronoi", true);
 
         this._setupListener();
