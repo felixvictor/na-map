@@ -24,14 +24,9 @@ export default class PortDisplay {
         this._highlightDuration = 200;
         this._iconSize = 50;
         this._circleSizes = { initial: 50, portLabel: 20, pbZone: 5 };
-        this._path = d3.geoPath().projection(null);
-        this._showRadius = "taxIncome";
-        this._taxIncomeRadius = d3
-            .scaleSqrt()
-            .range([this._circleSizes[this._zoomLevel], this._circleSizes[this._zoomLevel] * 4]);
-        this._netIncomeRadius = d3
-            .scaleSqrt()
-            .range([this._circleSizes[this._zoomLevel], this._circleSizes[this._zoomLevel] * 4]);
+        this._showRadiusType = "noShow";
+        this._taxIncomeRadius = d3.scaleSqrt();
+        this._netIncomeRadius = d3.scaleSqrt();
 
         this.setPortData(portData);
         this._setupListener();
@@ -40,10 +35,9 @@ export default class PortDisplay {
     }
 
     _setupListener() {
-        $("#radius-action").change(() => {
-            this._showRadius = $("input[name='showRadius']:checked").val();
+        $("#radius-type").change(() => {
+            this._showRadiusType = $("input[name='showRadiusType']:checked").val();
             this.update();
-            this.setPortData(this.portData);
         });
     }
 
@@ -51,8 +45,10 @@ export default class PortDisplay {
         this._g = d3
             .select("#na-svg")
             .append("g")
-            .classed("port", true);
-        this.gText = this._g.append("g");
+            .classed("ports", true);
+        this._gIncomeCircle = this._g.append("g");
+        this._gPortCircle = this._g.append("g").classed("port", true);
+        this._gText = this._g.append("g");
     }
 
     _setupFlags() {
@@ -82,7 +78,7 @@ export default class PortDisplay {
         });
     }
 
-    _updateCircles() {
+    _updatePortCircles() {
         function showDetails(d, i, nodes) {
             function getText(portProperties) {
                 const port = {
@@ -224,10 +220,7 @@ export default class PortDisplay {
         const circleSize = this._circleSizes[this._zoomLevel];
 
         // Data join
-        const circleUpdate = this._g.selectAll("g").data(this.portData, d => {
-            console.log(d);
-            return d.id;
-        });
+        const circleUpdate = this._gPortCircle.selectAll("circle").data(this.portData, d => d.id);
 
         // Remove old circles
         circleUpdate.exit().remove();
@@ -236,38 +229,15 @@ export default class PortDisplay {
         // circleUpdate; // not needed
 
         // Add new circles
-        // eslint-disable-next-line no-unused-vars
         const circleEnter = circleUpdate
             .enter()
-            .append("g")
-            .attr("transform", d => `translate(${this._path.centroid(d)})`);
-
-        if (this._showRadius) {
-            if (this._showRadius === "taxIncome") {
-                circleEnter
-                    .append("circle")
-                    .attr("class", "bubble pos")
-                    .attr("display", d => (d.properties.nonCapturable ? "none" : "inherit"))
-                    .attr("r", d => {
-                        console.log(d);
-                        return this._taxIncomeRadius(Math.abs(d.properties.taxIncome));
-                    });
-            } else {
-                circleEnter
-                    .append("circle")
-                    .attr("class", d => (d.properties.netIncome < 0 ? "bubble neg" : "bubble pos"))
-                    .attr("display", d => (d.properties.nonCapturable ? "none" : "inherit"))
-                    .attr("r", d => this._netIncomeRadius(Math.abs(d.properties.netIncome)));
-            }
-        }
-
-        circleEnter
             .append("circle")
-            .classed("port", true)
             .attr(
                 "fill",
                 d => `url(#${d.properties.availableForAll ? `${d.properties.nation}a` : d.properties.nation})`
             )
+            .attr("cx", d => d.geometry.coordinates[0])
+            .attr("cy", d => d.geometry.coordinates[1])
             .on("click", showDetails)
             .on("mouseout", hideDetails);
 
@@ -275,17 +245,59 @@ export default class PortDisplay {
         circleUpdate.merge(circleEnter).attr("r", d => (d.id === this._highlightId ? circleSize * 2 : circleSize));
     }
 
+    _updateIncomeCircles() {
+        let data = {};
+        if (this._showRadiusType !== "noShow") {
+            data = this.portData.filter(d => !d.properties.nonCapturable);
+        }
+        // Data join
+        const circleUpdate = this._gIncomeCircle.selectAll("circle").data(data, d => d.id);
+
+        // Remove old circles
+        circleUpdate.exit().remove();
+
+        // Update kept circles
+        // circleUpdate; // not needed
+
+        // Add new circles
+        const circleEnter = circleUpdate
+            .enter()
+            .append("circle")
+            .attr("cx", d => d.geometry.coordinates[0])
+            .attr("cy", d => d.geometry.coordinates[1]);
+
+        // Apply to both old and new
+        const circleMerge = circleUpdate.merge(circleEnter);
+        if (this._showRadiusType === "taxIncome") {
+            this._taxIncomeRadius.range([
+                this._circleSizes[this._zoomLevel] * 1.5,
+                this._circleSizes[this._zoomLevel] * 4
+            ]);
+            circleMerge
+                .attr("class", "bubble pos")
+                .attr("r", d => this._taxIncomeRadius(Math.abs(d.properties.taxIncome)));
+        } else if (this._showRadiusType === "netIncome") {
+            this._netIncomeRadius.range([
+                this._circleSizes[this._zoomLevel] * 1.5,
+                this._circleSizes[this._zoomLevel] * 4
+            ]);
+            circleMerge
+                .attr("class", d => (d.properties.netIncome < 0 ? "bubble neg" : "bubble pos"))
+                .attr("r", d => this._netIncomeRadius(Math.abs(d.properties.netIncome)));
+        }
+    }
+
     updateTexts() {
         if (this._zoomLevel === "initial") {
-            this.gText.attr("display", "none");
+            this._gText.attr("display", "none");
         } else {
-            this.gText.attr("display", "inherit");
+            this._gText.attr("display", "inherit");
 
             const circleSize = this._circleSizes[this._zoomLevel],
                 fontSize = this.fontSizes[this._zoomLevel];
 
             // Data join
-            const textUpdate = this.gText.selectAll("text").data(this.portData, d => d.id);
+            const textUpdate = this._gText.selectAll("text").data(this.portData, d => d.id);
 
             // Remove old text
             textUpdate.exit().remove();
@@ -333,7 +345,8 @@ export default class PortDisplay {
     }
 
     update() {
-        this._updateCircles();
+        this._updatePortCircles();
+        this._updateIncomeCircles();
         this.updateTexts();
     }
 
