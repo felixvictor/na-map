@@ -85,7 +85,6 @@ function convertPorts() {
                 shallow: port.Depth,
                 availableForAll: port.AvailableForAll,
                 brLimit: port.PortBattleBRLimit,
-                portBattleType: port.PortBattleType,
                 portBattleStartTime: port.PortBattleStartTime,
                 capturer: port.Capturer,
                 lastPortBattle: moment((port.LastPortBattle - ticks) / 10000).format("YYYY-MM-DD HH:mm"),
