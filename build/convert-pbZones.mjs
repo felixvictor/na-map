@@ -1,26 +1,11 @@
 import fs from "fs";
+import { convertCoordX, convertCoordY } from "./common.mjs";
 
 const infileBaseName = process.argv[2],
     outDir = process.argv[3],
     date = process.argv[4];
 
-const Trans = {
-    A: -0.00499866779363828,
-    B: -0.00000021464254980645,
-    C: 4096.88635151897,
-    D: 4096.90282787469
-};
-
 const APIPorts = JSON.parse(fs.readFileSync(`${infileBaseName}-Ports-${date}.json`, "utf8"));
-
-// F11 coord to svg coord
-function convertCoordX(x, y) {
-    return Trans.A * x + Trans.B * y + Trans.C;
-}
-// F11 coord to svg coord
-function convertCoordY(x, y) {
-    return Trans.B * x - Trans.A * y + Trans.D;
-}
 
 function saveJson(filename, data) {
     // eslint-disable-next-line consistent-return
