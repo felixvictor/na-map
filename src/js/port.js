@@ -25,8 +25,8 @@ export default class PortDisplay {
         this._iconSize = 50;
         this._circleSizes = { initial: 50, portLabel: 20, pbZone: 5 };
         this._showRadiusType = "noShow";
-        this._taxIncomeRadius = d3.scaleSqrt();
-        this._netIncomeRadius = d3.scaleSqrt();
+        this._taxIncomeRadius = d3.scaleLinear();
+        this._netIncomeRadius = d3.scaleLinear();
 
         this.setPortData(portData);
         this._setupListener();
@@ -269,18 +269,24 @@ export default class PortDisplay {
         // Apply to both old and new
         const circleMerge = circleUpdate.merge(circleEnter);
         if (this._showRadiusType === "taxIncome") {
+            const minTaxIncome = d3.min(data, d => d.properties.taxIncome),
+                maxTaxIncome = d3.max(data, d => d.properties.taxIncome);
+
+            this._taxIncomeRadius.domain([minTaxIncome, maxTaxIncome]);
             this._taxIncomeRadius.range([
-                this._circleSizes[this._zoomLevel] * 1.5,
+                this._circleSizes[this._zoomLevel] * 1,
                 this._circleSizes[this._zoomLevel] * 4
             ]);
             circleMerge
                 .attr("class", "bubble pos")
                 .attr("r", d => this._taxIncomeRadius(Math.abs(d.properties.taxIncome)));
         } else if (this._showRadiusType === "netIncome") {
-            this._netIncomeRadius.range([
-                this._circleSizes[this._zoomLevel] * 1.5,
-                this._circleSizes[this._zoomLevel] * 4
-            ]);
+            const minNetIncome = d3.min(data, d => d.properties.netIncome),
+                maxNetIncome = d3.max(data, d => d.properties.netIncome);
+
+            this._netIncomeRadius
+                .domain([minNetIncome, maxNetIncome])
+                .range([this._circleSizes[this._zoomLevel] * 1, this._circleSizes[this._zoomLevel] * 4]);
             circleMerge
                 .attr("class", d => (d.properties.netIncome < 0 ? "bubble neg" : "bubble pos"))
                 .attr("r", d => this._netIncomeRadius(Math.abs(d.properties.netIncome)));
@@ -356,13 +362,6 @@ export default class PortDisplay {
 
     setPortData(portData) {
         this.portData = portData;
-        const minTaxIncome = d3.min(portData, d => Math.abs(d.properties.taxIncome)),
-            maxTaxIncome = d3.max(portData, d => Math.abs(d.properties.taxIncome)),
-            minNetIncome = d3.min(portData, d => Math.abs(d.properties.netIncome)),
-            maxNetIncome = d3.max(portData, d => Math.abs(d.properties.netIncome));
-
-        this._taxIncomeRadius.domain([minTaxIncome, maxTaxIncome]);
-        this._netIncomeRadius.domain([minNetIncome, maxNetIncome]);
     }
 
     setCurrentPort(id, x, y) {
