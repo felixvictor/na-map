@@ -107,7 +107,13 @@ function convertPorts() {
                 )[0],
                 consumesTrading: APIShops.filter(shop => shop.Id === port.Id).map(shop =>
                     shop.ResourcesConsumed.filter(good => ItemNames.get(good.Key).trading)
-                        .map(good => `${ItemNames.get(good.Key).name}\u202f(${good.Value})`)
+                        .map(good => {
+                            let r = `${ItemNames.get(good.Key).name}`;
+                            if (good.Value > 1) {
+                                r += `\u202f(${good.Value})`;
+                            }
+                            return r;
+                        })
                         .sort()
                 )[0],
                 producesNonTrading: APIShops.filter(shop => shop.Id === port.Id).map(shop =>
@@ -122,7 +128,13 @@ function convertPorts() {
                 )[0],
                 consumesNonTrading: APIShops.filter(shop => shop.Id === port.Id).map(shop =>
                     shop.ResourcesConsumed.filter(good => !ItemNames.get(good.Key).trading)
-                        .map(good => `${ItemNames.get(good.Key).name}\u202f(${good.Value})`)
+                        .map(good => {
+                            let r = `${ItemNames.get(good.Key).name}`;
+                            if (good.Value > 1) {
+                                r += `\u202f(${good.Value})`;
+                            }
+                            return r;
+                        })
                         .sort()
                 )[0]
             }
