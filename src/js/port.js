@@ -12,8 +12,11 @@ import { nations } from "./common";
 import { formatCoord, thousandsWithBlanks } from "./util";
 
 export default class PortDisplay {
-    constructor(portData) {
+    constructor(portData, topMargin, rightMargin) {
         this.portDataDefault = portData;
+        this._topMargin = topMargin;
+        this._rightMargin = rightMargin;
+
         // Shroud Cay
         this.currentPort = { id: "366", coord: { x: 4396, y: 2494 } };
         this.fontSizes = { initial: 30, portLabel: 18, pbZone: 7 };
@@ -42,6 +45,9 @@ export default class PortDisplay {
     }
 
     _setupSvg() {
+        const height = 150,
+            width = 300;
+
         this._g = d3
             .select("#na-svg")
             .append("g")
@@ -49,6 +55,35 @@ export default class PortDisplay {
         this._gIncomeCircle = this._g.append("g");
         this._gPortCircle = this._g.append("g").classed("port", true);
         this._gText = this._g.append("g");
+
+        const svgPortSummary = d3
+            .select("body")
+            .append("svg")
+            .attr("id", "summary")
+            .classed("summary", true)
+            .style("position", "absolute")
+            .style("top", `${this._topMargin}px`)
+            .style("right", `${this._rightMargin}px`)
+            .attr("height", height)
+            .attr("width", width)
+        svgPortSummary
+            .insert("rect")
+            .attr("x", 0)
+            .attr("y", 0)
+            .attr("height", height)
+            .attr("width", width);
+        this._portSummaryText1 = svgPortSummary
+            .append("text")
+            .attr("x", "10%")
+            .attr("y", "25%");
+        this._portSummaryText2 = svgPortSummary
+            .append("text")
+            .attr("x", "10%")
+            .attr("y", "50%");
+        this._portSummaryText3 = svgPortSummary
+            .append("text")
+            .attr("x", "10%")
+            .attr("y", "75%");
     }
 
     _setupFlags() {
@@ -350,10 +385,22 @@ export default class PortDisplay {
         }
     }
 
+    _updateSummary() {
+        const numberPorts = Object.keys(this.portData).length,
+            taxTotal = this.portData.map(d => d.properties.taxIncome).reduce((a, b) => a + b),
+            netTotal = this.portData.map(d => d.properties.netIncome).reduce((a, b) => a + b);
+
+        this._portSummaryText1.text(`${numberPorts} selected ports`);
+        this._portSummaryText2.text(`${taxTotal} tax income`);
+        this._portSummaryText3.text(`${netTotal} net tax income`);
+    }
+
     update() {
+        console.log("port.update");
         this._updatePortCircles();
         this._updateIncomeCircles();
         this.updateTexts();
+        this._updateSummary();
     }
 
     setHighlightId(highlightId) {
