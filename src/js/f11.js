@@ -118,12 +118,14 @@ export default class F11 {
             .text(formatInt(F11Y));
     }
 
-    _goToF11(F11X, F11Y) {
-        const x = convertCoordX(F11X, F11Y),
-            y = convertCoordY(F11X, F11Y);
+    _goToF11(F11XIn, F11YIn) {
+        const F11X = Number(F11XIn),
+            F11Y = Number(F11YIn),
+            x = convertCoordX(F11X * -1, F11Y * -1),
+            y = convertCoordY(F11X * -1, F11Y * -1);
 
         if (between(x, this._minCoord, this._maxCoord, true) && between(y, this._minCoord, this._maxCoord, true)) {
-            this._printF11Coord(x, y, Number(F11X), Number(F11Y));
+            this._printF11Coord(x, y, F11X, F11Y);
             this._map.zoomAndPan(x, y, 1);
         }
     }
