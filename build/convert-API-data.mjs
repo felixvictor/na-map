@@ -1,46 +1,15 @@
 import fs from "fs";
 import moment from "moment";
+import { convertCoordX, convertCoordY, nations } from "./common.mjs";
 
 const inBaseFilename = process.argv[2],
     outFilename = process.argv[3],
     date = process.argv[4];
 
-const nation = {
-    0: "NT",
-    1: "PR",
-    2: "ES",
-    3: "FR",
-    4: "GB",
-    5: "VP",
-    6: "DK",
-    7: "SE",
-    8: "US",
-    9: "FT",
-    10: "RU",
-    11: "DE",
-    12: "PL"
-};
-
-const Trans = {
-    A: -0.00499866779363828,
-    B: -0.00000021464254980645,
-    C: 4096.88635151897,
-    D: 4096.90282787469
-};
-
 const APIItems = JSON.parse(fs.readFileSync(`${inBaseFilename}-ItemTemplates-${date}.json`, "utf8")),
     APIPorts = JSON.parse(fs.readFileSync(`${inBaseFilename}-Ports-${date}.json`, "utf8")),
     APIShops = JSON.parse(fs.readFileSync(`${inBaseFilename}-Shops-${date}.json`, "utf8")),
     ItemNames = new Map();
-
-// F11 coord to svg coord
-function convertCoordX(x, y) {
-    return Trans.A * x + Trans.B * y + Trans.C;
-}
-// F11 coord to svg coord
-function convertCoordY(x, y) {
-    return Trans.B * x - Trans.A * y + Trans.D;
-}
 
 function saveJson(data) {
     // eslint-disable-next-line consistent-return
@@ -111,7 +80,7 @@ function convertPorts() {
                             convertCoordY(port.PortBattleZonePositions[0].x, port.PortBattleZonePositions[0].z)
                     )
                 ),
-                nation: nation[port.Nation],
+                nation: nations[port.Nation].short,
                 countyCapital: port.Name === port.CountyCapitalName,
                 shallow: port.Depth,
                 availableForAll: port.AvailableForAll,
