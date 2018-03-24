@@ -5,7 +5,7 @@
 /* global d3 : false
  */
 
-import { formatNumber, getOrdinal, isEmpty } from "./util";
+import { formatFloat, getOrdinal, isEmpty } from "./util";
 
 let svgWidth = 0,
     svgHeight = 0,
@@ -321,9 +321,9 @@ export default function shipCompare(shipData) {
                 limitFront: this._shipData.deckClassLimit[4],
                 gunsBack: this._shipData.gunsPerDeck[5],
                 limitBack: this._shipData.deckClassLimit[5],
-                minSpeed: formatNumber(this._shipData.minSpeed.toFixed(2)),
-                maxSpeed: this._shipData.maxSpeed.toFixed(2),
-                maxTurningSpeed: this._shipData.maxTurningSpeed.toFixed(2),
+                minSpeed: formatFloat(this._shipData.minSpeed),
+                maxSpeed: formatFloat(this._shipData.maxSpeed),
+                maxTurningSpeed: formatFloat(this._shipData.maxTurningSpeed),
                 sideArmor: this._shipData.healthInfo.LeftArmor,
                 frontArmor: this._shipData.healthInfo.FrontArmor,
                 pump: this._shipData.healthInfo.Pump,
@@ -429,9 +429,9 @@ export default function shipCompare(shipData) {
                 const diff = parseFloat((a - b).toFixed(decimals));
 
                 if (diff < 0) {
-                    return `<span class="badge badge-danger">${formatNumber(Math.abs(diff))}</span>`;
+                    return `<span class="badge badge-danger">${formatFloat(Math.abs(diff))}</span>`;
                 } else if (diff > 0) {
-                    return `<span class="badge badge-success">${formatNumber(diff)}</span>`;
+                    return `<span class="badge badge-success">${formatFloat(diff)}</span>`;
                 }
                 return "";
             }
@@ -465,17 +465,17 @@ export default function shipCompare(shipData) {
                 limitFront: this._shipCompareData.deckClassLimit[4],
                 gunsBack: this._shipCompareData.gunsPerDeck[5],
                 limitBack: this._shipCompareData.deckClassLimit[5],
-                minSpeed: `${formatNumber(this._shipCompareData.minSpeed.toFixed(2))}\u00a0${getDiff(
+                minSpeed: `${formatFloat(this._shipCompareData.minSpeed)}\u00a0${getDiff(
                     this._shipCompareData.minSpeed,
                     this._shipBaseData.minSpeed,
                     2
                 )}`,
-                maxSpeed: `${this._shipCompareData.maxSpeed.toFixed(2)}\u00a0${getDiff(
+                maxSpeed: `${formatFloat(this._shipCompareData.maxSpeed)}\u00a0${getDiff(
                     this._shipCompareData.maxSpeed,
                     this._shipBaseData.maxSpeed,
                     2
                 )}`,
-                maxTurningSpeed: `${this._shipCompareData.maxTurningSpeed.toFixed(2)}\u00a0${getDiff(
+                maxTurningSpeed: `${formatFloat(this._shipCompareData.maxTurningSpeed)}\u00a0${getDiff(
                     this._shipCompareData.maxTurningSpeed,
                     this._shipBaseData.maxTurningSpeed,
                     2
