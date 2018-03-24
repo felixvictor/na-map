@@ -309,7 +309,7 @@ export default function naDisplay(serverName) {
         map = new NAMap();
         // Read map data
         const portData = topojsonFeature(naMapJsonData, naMapJsonData.objects.ports).features;
-        ports = new PortDisplay(portData);
+        ports = new PortDisplay(portData, map.margin.top, map.margin.right);
 
         const pbZoneData = topojsonFeature(pbZonesJsonData, pbZonesJsonData.objects.pbZones);
         const fortData = topojsonFeature(pbZonesJsonData, pbZonesJsonData.objects.forts);
