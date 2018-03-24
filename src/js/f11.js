@@ -5,7 +5,7 @@
 /* global d3 : false
  */
 
-import { between, formatCoord } from "./util";
+import { between, formatInt } from "./util";
 import { convertCoordX, convertCoordY, convertInvCoordX, convertInvCoordY } from "./common";
 
 export default class F11 {
@@ -110,12 +110,12 @@ export default class F11 {
             .append("text")
             .attr("dx", "-1.5em")
             .attr("dy", "-.5em")
-            .text(formatCoord(F11X));
+            .text(formatInt(F11X));
         g
             .append("text")
             .attr("dx", "-1.5em")
             .attr("dy", ".5em")
-            .text(formatCoord(F11Y));
+            .text(formatInt(F11Y));
     }
 
     _goToF11(F11X, F11Y) {

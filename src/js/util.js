@@ -16,7 +16,6 @@ const locale = d3.formatLocale({
 export const formatFloat = x =>
     locale
         .format(",.2r")(x)
-        .replace(".0", "")
         .replace("-", "\u2212\u202f");
 
 export const formatInt = x =>
