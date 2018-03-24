@@ -30,6 +30,12 @@ export const formatSiInt = x =>
         .replace(".0", "")
         .replace("-", "\u2212\u202f");
 
+export const formatPercent = x =>
+    locale
+        .format(".1%")(x)
+        .replace(".0", "")
+        .replace("-", "\u2212\u202f");
+
 export function getOrdinal(n) {
     const s = ["th", "st", "nd", "rd"],
         v = n % 100;
