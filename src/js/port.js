@@ -9,7 +9,7 @@ import moment from "moment";
 import "moment/locale/en-gb";
 
 import { nations } from "./common";
-import { formatCoord, thousandsWithBlanks } from "./util";
+import { formatInt, formatSiInt } from "./util";
 
 export default class PortDisplay {
     constructor(portData, topMargin, rightMargin) {
@@ -65,7 +65,7 @@ export default class PortDisplay {
             .style("top", `${this._topMargin}px`)
             .style("right", `${this._rightMargin}px`)
             .attr("height", height)
-            .attr("width", width)
+            .attr("width", width);
         svgPortSummary
             .insert("rect")
             .attr("x", 0)
@@ -138,11 +138,11 @@ export default class PortDisplay {
                             ? "11.00\u202f–\u202f8.00"
                             : `${(portProperties.portBattleStartTime + 10) %
                                   24}.00\u202f–\u202f${(portProperties.portBattleStartTime + 13) % 24}.00`,
-                    brLimit: thousandsWithBlanks(portProperties.brLimit),
+                    brLimit: formatInt(portProperties.brLimit),
                     conquestMarksPension: portProperties.conquestMarksPension,
-                    taxIncome: thousandsWithBlanks(portProperties.taxIncome),
+                    taxIncome: formatSiInt(portProperties.taxIncome),
                     portTax: portProperties.portTax * 100,
-                    netIncome: formatCoord(portProperties.netIncome),
+                    netIncome: formatSiInt(portProperties.netIncome),
                     tradingCompany: portProperties.tradingCompany
                         ? `, trading company level\u202f${portProperties.tradingCompany}`
                         : "",
@@ -386,13 +386,18 @@ export default class PortDisplay {
     }
 
     _updateSummary() {
-        const numberPorts = Object.keys(this.portData).length,
-            taxTotal = this.portData.map(d => d.properties.taxIncome).reduce((a, b) => a + b),
+        const numberPorts = Object.keys(this.portData).length;
+        let taxTotal = 0,
+            netTotal = 0;
+
+        if (numberPorts) {
+            taxTotal = this.portData.map(d => d.properties.taxIncome).reduce((a, b) => a + b);
             netTotal = this.portData.map(d => d.properties.netIncome).reduce((a, b) => a + b);
+        }
 
         this._portSummaryText1.text(`${numberPorts} selected ports`);
-        this._portSummaryText2.text(`${taxTotal} tax income`);
-        this._portSummaryText3.text(`${netTotal} net tax income`);
+        this._portSummaryText2.text(`${formatSiInt(taxTotal)} tax income`);
+        this._portSummaryText3.text(`${formatSiInt(netTotal)} net tax income`);
     }
 
     update() {
