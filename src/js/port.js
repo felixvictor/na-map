@@ -9,7 +9,7 @@ import moment from "moment";
 import "moment/locale/en-gb";
 
 import { nations } from "./common";
-import { formatInt, formatSiInt } from "./util";
+import { formatInt, formatSiInt, formatPercent } from "./util";
 
 export default class PortDisplay {
     constructor(portData, topMargin, rightMargin) {
@@ -141,7 +141,7 @@ export default class PortDisplay {
                     brLimit: formatInt(portProperties.brLimit),
                     conquestMarksPension: portProperties.conquestMarksPension,
                     taxIncome: formatSiInt(portProperties.taxIncome),
-                    portTax: portProperties.portTax * 100,
+                    portTax: formatPercent(portProperties.portTax),
                     netIncome: formatSiInt(portProperties.netIncome),
                     tradingCompany: portProperties.tradingCompany
                         ? `, trading company level\u202f${portProperties.tradingCompany}`
@@ -176,12 +176,12 @@ export default class PortDisplay {
                     h += `${port.pbType}\u202frate AI`;
                     h += `, ${port.conquestMarksPension}\u202fconquest point`;
                     h += port.conquestMarksPension > 1 ? "s" : "";
-                    h += `<br>Tax income ${port.taxIncome} (${port.portTax}\u202f%), net income ${port.netIncome}`;
+                    h += `<br>Tax income ${port.taxIncome} (${port.portTax}), net income ${port.netIncome}`;
                     h += port.tradingCompany;
                     h += port.laborHoursDiscount;
                 } else {
                     h += "Not capturable";
-                    h += `<br>${port.portTax}\u202f% tax`;
+                    h += `<br>${port.portTax} tax`;
                 }
                 h += "</p>";
                 h += "<table class='table table-sm'>";
