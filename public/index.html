@@ -14,7 +14,7 @@
     <meta content="images/icons/browserconfig.xml" name="msapplication-config">
 
     <script src="https://www.googletagmanager.com/gtag/js?id=UA-109520372-1" async></script>
-<link href="na-map.min.css?4e04d82369eed8c922fd" rel="stylesheet" crossorigin="anonymous" integrity="sha256-0w/xinIW+cJEIRxEoVy/U7XPNzRuL95xdA+FspsM/eM= sha384-jx7bvS5NXznqYCcqs/TmAt3IO2GnCMdAWVo9jTzBd+mmY+0AlrYqCepn41/+rhjf"></head>
+<link href="na-map.min.css?25b9860caea7323c10c9" rel="stylesheet" crossorigin="anonymous" integrity="sha256-wUCM3VVeVhpnHZfjfgxYKYWEYK5NgVx3pDv0siAFK/c= sha384-WLdO3NFXNSXAuPqDZerbYHcDHpmdnYVKT1oSn3bn8Hocg7Br5rAwTDknmsVu6mkJ"></head>
 <body>
 
 <nav class="bg-light fixed-top navbar navbar-expand-lg navbar-light">
@@ -202,16 +202,34 @@
                 </a>
                 <div class="dropdown-menu dropdown-menu-right large-width" id="settingsMenu" aria-labelledby="settingsDropdown">
 
-                    <h6 class="dropdown-header">Show</h6>
-                    <div class="align-self-center col-auto ml-1 py-1">
-                        <div class="custom-control custom-checkbox">
-                            <input class="custom-control-input" id="show-teleport" type="checkbox">
-                            <label for="show-teleport" class="custom-control-label">teleport areas</label>
+                    <div class="dropdown-divider"></div>
+                    <h6 class="dropdown-header">Port battle zones</h6>
+                    <div class="align-self-center col-auto ml-1 py-1 radio-group" id="show-pb">
+                        <div class="custom-control custom-control-inline custom-radio">
+                            <input class="custom-control-input" id="pbAll" type="radio" name="showPB" value="all" checked>
+                            <label for="pbAll" class="custom-control-label">all ports</label>
                         </div>
-                        <div class="custom-control custom-checkbox">
-                            <input class="custom-control-input" id="show-pb" type="checkbox">
-                            <label for="show-pb" class="custom-control-label">single port battle zone</label>
-                            <small class="form-text text-muted">Use 'go to a port'</small>
+                        <div class="custom-control custom-control-inline custom-radio">
+                            <input class="custom-control-input" id="pbSingle" type="radio" name="showPB" value="single">
+                            <label for="pbSingle" class="custom-control-label">single port</label>
+                        </div>
+                        <div class="custom-control custom-control-inline custom-radio">
+                            <input class="custom-control-input" id="pbNoShow" type="radio" name="showPB" value="noShow">
+                            <label for="pbNoShow" class="custom-control-label">not shown</label>
+                        </div>
+
+                    </div>
+
+                    <div class="dropdown-divider"></div>
+                    <h6 class="dropdown-header">Teleport areas</h6>
+                    <div class="align-self-center col-auto ml-1 py-1 radio-group" id="show-teleport">
+                        <div class="custom-control custom-control-inline custom-radio">
+                            <input class="custom-control-input" id="teleportNoShow" type="radio" name="showTeleport" value="noShow" checked>
+                            <label for="teleportNoShow" class="custom-control-label">not shown</label>
+                        </div>
+                        <div class="custom-control custom-control-inline custom-radio">
+                            <input class="custom-control-input" id="teleportShow" type="radio" name="showTeleport" value="show">
+                            <label for="teleportShow" class="custom-control-label">shown</label>
                         </div>
                     </div>
 
@@ -219,16 +237,16 @@
                     <h6 class="dropdown-header">Income per port</h6>
                     <div class="align-self-center col-auto ml-1 py-1 radio-group" id="radius-type">
                         <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="noShow" type="radio" name="showRadiusType" value="noShow" checked>
-                            <label for="noShow" class="custom-control-label">Do not show</label>
+                            <input class="custom-control-input" id="radiusNoShow" type="radio" name="showRadiusType" value="noShow" checked>
+                            <label for="radiusNoShow" class="custom-control-label">not shown</label>
                         </div>
                         <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="taxIncome" type="radio" name="showRadiusType" value="taxIncome">
-                            <label for="taxIncome" class="custom-control-label">tax</label>
+                            <input class="custom-control-input" id="radiusTaxIncome" type="radio" name="showRadiusType" value="taxIncome">
+                            <label for="radiusTaxIncome" class="custom-control-label">tax</label>
                         </div>
                         <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="netIncome" type="radio" name="showRadiusType" value="netIncome">
-                            <label for="netIncome" class="custom-control-label">net</label>
+                            <input class="custom-control-input" id="radiusNetIncome" type="radio" name="showRadiusType" value="netIncome">
+                            <label for="radiusNetIncome" class="custom-control-label">net</label>
                         </div>
                     </div>
 
@@ -314,5 +332,5 @@
 
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
 <script src="https://d3js.org/d3.v4.min.js"></script>
-<script src="na-map.min.js?4e04d82369eed8c922fd" crossorigin="anonymous" integrity="sha256-x83ChwGcEKNBEXJXG/ewk5FKcd+nYtGREvyMk4H+11E= sha384-OSkPmeie0LTIRwbXgwnmXhoRZyBvTAUN2ySwHT/lxi2zf/cOjlxgEHGL2VEzViEi" type="text/javascript"></script></body>
+<script src="na-map.min.js?25b9860caea7323c10c9" crossorigin="anonymous" integrity="sha256-PLKrAgDXFlbMjeUVhEKHsR5TPaJNor+/fadgtb/WBsE= sha384-ATwoT9EKBII2+FYGMCpfuH+yIT5oA2HN1kN2CR4x26ENyL1ucKohNwwLdo084H3H" type="text/javascript"></script></body>
 </html>
