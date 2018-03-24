@@ -231,21 +231,9 @@
                 <div class="dropdown-menu dropdown-menu-right large-width" id="settingsMenu"
                      aria-labelledby="settingsDropdown">
 
-                    <div class="col-auto align-self-center ml-1 py-1">
-                        <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="show-teleport">
-                            <label class="custom-control-label" for="show-teleport">Show teleport areas</label>
-                        </div>
-                    </div>
-
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Port battle zones</h6>
                     <div class="col-auto align-self-center radio-group ml-1 py-1" id="show-pb">
-                        <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input"
-                                   name="showPB" id="pbNoShow" value="noShow">
-                            <label class="custom-control-label" for="pbNoShow">not shown</label>
-                        </div>
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" class="custom-control-input"
                                    name="showPB" id="pbAll" value="all" checked>
@@ -255,6 +243,27 @@
                             <input type="radio" class="custom-control-input"
                                    name="showPB" id="pbSingle" value="single">
                             <label class="custom-control-label" for="pbSingle">single port</label>
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input"
+                                   name="showPB" id="pbNoShow" value="noShow">
+                            <label class="custom-control-label" for="pbNoShow">not shown</label>
+                        </div>
+
+                    </div>
+
+                    <div class="dropdown-divider"></div>
+                    <h6 class="dropdown-header">Teleport areas</h6>
+                    <div class="col-auto align-self-center radio-group ml-1 py-1" id="show-teleport">
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input"
+                                   name="showTeleport" id="teleportNoShow" value="noShow" checked>
+                            <label class="custom-control-label" for="teleportNoShow">not shown</label>
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input"
+                                   name="showTeleport" id="teleportShow" value="show">
+                            <label class="custom-control-label" for="teleportShow">shown</label>
                         </div>
                     </div>
 
