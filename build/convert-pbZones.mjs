@@ -38,9 +38,6 @@ function convertPBZones() {
         pbTowers = [];
 
     function createAndSaveGeoJson() {
-        // https://gist.github.com/Nishchit14/4c6a7349b3c778f7f97b912629a9f228
-        const flattenArray = arr => [].concat.apply([], arr.map(element => element));
-
         ["pbZones", "forts", "towers"].forEach(element => {
             const geoJson = {};
             geoJson.type = "FeatureCollection";
@@ -52,9 +49,9 @@ function convertPBZones() {
                     id: port.id,
                     geometry: {
                         type: "MultiPoint",
-                        coordinates: flattenArray(
-                            port.features.filter(features => element === features.type).map(features => features.coord)
-                        )
+                        coordinates: port.features
+                            .filter(features => element === features.type)
+                            .map(features => features.coord)[0]
                     }
                 };
                 if (feature.geometry.coordinates.length > 0) {
