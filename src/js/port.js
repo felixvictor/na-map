@@ -361,7 +361,8 @@ export default class PortDisplay {
                     if (this._zoomLevel !== "pbZone") {
                         return d.geometry.coordinates[0];
                     }
-                    return this._showPBZones && d.id === this.currentPort.id
+                    return this._showPBZones === "all" ||
+                        (this._showPBZones === "single" && d.id === this.currentPort.id)
                         ? d.geometry.coordinates[0] + d.properties.dx
                         : d.geometry.coordinates[0];
                 })
@@ -371,13 +372,18 @@ export default class PortDisplay {
                             ? d.geometry.coordinates[1] + deltaY2
                             : d.geometry.coordinates[1] + deltaY;
                     }
-                    return this._showPBZones && d.id === this.currentPort.id
+                    return this._showPBZones === "all" ||
+                        (this._showPBZones === "single" && d.id === this.currentPort.id)
                         ? d.geometry.coordinates[1] + d.properties.dy
                         : d.geometry.coordinates[1] + deltaY;
                 })
                 .attr("font-size", d => (d.id === this._highlightId ? `${fontSize * 2}px` : `${fontSize}px`))
                 .attr("text-anchor", d => {
-                    if (this._showPBZones && this._zoomLevel === "pbZone" && d.id === this.currentPort.id) {
+                    if (
+                        this._zoomLevel === "pbZone" &&
+                        (this._showPBZones === "all" ||
+                            (this._showPBZones === "single" && d.id === this.currentPort.id))
+                    ) {
                         return d.properties.dx < 0 ? "end" : "start";
                     }
                     return "middle";
