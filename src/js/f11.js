@@ -6,24 +6,13 @@
  */
 
 import { between, formatCoord } from "./util";
+import { convertCoordX, convertCoordY, convertInvCoordX, convertInvCoordY } from "./common";
 
 export default class F11 {
     constructor(map) {
         this._map = map;
         this._minCoord = this._map.coord.min;
         this._maxCoord = this._map.coord.max;
-        this._transformMatrix = {
-            A: -0.00499866779363828,
-            B: -0.00000021464254980645,
-            C: 4096.88635151897,
-            D: 4096.90282787469
-        };
-        this._transformMatrixInv = {
-            A: -200.053302087577,
-            B: -0.00859027897636011,
-            C: 819630.836437126,
-            D: -819563.745651571
-        };
 
         this._setupSvg();
         this._setupListener();
@@ -130,14 +119,6 @@ export default class F11 {
     }
 
     _goToF11(F11X, F11Y) {
-        // F11 coord to svg coord
-        const convertCoordX = (x, y) =>
-            this._transformMatrix.A * x + this._transformMatrix.B * y + this._transformMatrix.C;
-
-        // F11 coord to svg coord
-        const convertCoordY = (x, y) =>
-            this._transformMatrix.B * x - this._transformMatrix.A * y + this._transformMatrix.D;
-
         const x = convertCoordX(F11X, F11Y),
             y = convertCoordY(F11X, F11Y);
 
@@ -148,14 +129,6 @@ export default class F11 {
     }
 
     printCoord(x, y) {
-        // svg coord to F11 coord
-        const convertInvCoordX = () =>
-            this._transformMatrixInv.A * x + this._transformMatrixInv.B * y + this._transformMatrixInv.C;
-
-        // svg coord to F11 coord
-        const convertInvCoordY = () =>
-            this._transformMatrixInv.B * x - this._transformMatrixInv.A * y + this._transformMatrixInv.D;
-
         const F11X = convertInvCoordX(x, y) * -1,
             F11Y = convertInvCoordY(x, y) * -1;
 
