@@ -82,9 +82,6 @@ function convertPorts() {
         return Math.min(Math.max(t, 5), 10);
     }
 
-    // https://gist.github.com/Nishchit14/4c6a7349b3c778f7f97b912629a9f228
-    // eslint-disable-next-line prefer-spread
-    const flattenArray = arr => [].concat.apply([], arr.map(element => element));
     const geoJson = {};
     geoJson.type = "FeatureCollection";
     geoJson.features = [];
@@ -130,48 +127,36 @@ function convertPorts() {
                 netIncome: port.LastTax - port.LastCost,
                 tradingCompany: port.TradingCompany,
                 laborHoursDiscount: port.LaborHoursDiscount,
-                producesTrading: flattenArray(
-                    APIShops.filter(shop => shop.Id === port.Id).map(shop =>
-                        shop.ResourcesProduced.filter(good => ItemNames.get(good.Key).trading)
-                            .map(good => ItemNames.get(good.Key).name)
-                            .sort()
-                    )
-                ),
-                dropsTrading: flattenArray(
-                    APIShops.filter(shop => shop.Id === port.Id).map(shop =>
-                        shop.ResourcesAdded.filter(good => ItemNames.get(good.Template).trading)
-                            .map(good => ItemNames.get(good.Template).name)
-                            .sort()
-                    )
-                ),
-                consumesTrading: flattenArray(
-                    APIShops.filter(shop => shop.Id === port.Id).map(shop =>
-                        shop.ResourcesConsumed.filter(good => ItemNames.get(good.Key).trading)
-                            .map(good => ItemNames.get(good.Key).name)
-                            .sort()
-                    )
-                ),
-                producesNonTrading: flattenArray(
-                    APIShops.filter(shop => shop.Id === port.Id).map(shop =>
-                        shop.ResourcesProduced.filter(good => !ItemNames.get(good.Key).trading)
-                            .map(good => ItemNames.get(good.Key).name)
-                            .sort()
-                    )
-                ),
-                dropsNonTrading: flattenArray(
-                    APIShops.filter(shop => shop.Id === port.Id).map(shop =>
-                        shop.ResourcesAdded.filter(good => !ItemNames.get(good.Template).trading)
-                            .map(good => ItemNames.get(good.Template).name)
-                            .sort()
-                    )
-                ),
-                consumesNonTrading: flattenArray(
-                    APIShops.filter(shop => shop.Id === port.Id).map(shop =>
-                        shop.ResourcesConsumed.filter(good => !ItemNames.get(good.Key).trading)
-                            .map(good => ItemNames.get(good.Key).name)
-                            .sort()
-                    )
-                )
+                producesTrading: APIShops.filter(shop => shop.Id === port.Id).map(shop =>
+                    shop.ResourcesProduced.filter(good => ItemNames.get(good.Key).trading)
+                        .map(good => ItemNames.get(good.Key).name)
+                        .sort()
+                )[0],
+                dropsTrading: APIShops.filter(shop => shop.Id === port.Id).map(shop =>
+                    shop.ResourcesAdded.filter(good => ItemNames.get(good.Template).trading)
+                        .map(good => ItemNames.get(good.Template).name)
+                        .sort()
+                )[0],
+                consumesTrading: APIShops.filter(shop => shop.Id === port.Id).map(shop =>
+                    shop.ResourcesConsumed.filter(good => ItemNames.get(good.Key).trading)
+                        .map(good => ItemNames.get(good.Key).name)
+                        .sort()
+                )[0],
+                producesNonTrading: APIShops.filter(shop => shop.Id === port.Id).map(shop =>
+                    shop.ResourcesProduced.filter(good => !ItemNames.get(good.Key).trading)
+                        .map(good => ItemNames.get(good.Key).name)
+                        .sort()
+                )[0],
+                dropsNonTrading: APIShops.filter(shop => shop.Id === port.Id).map(shop =>
+                    shop.ResourcesAdded.filter(good => !ItemNames.get(good.Template).trading)
+                        .map(good => ItemNames.get(good.Template).name)
+                        .sort()
+                )[0],
+                consumesNonTrading: APIShops.filter(shop => shop.Id === port.Id).map(shop =>
+                    shop.ResourcesConsumed.filter(good => !ItemNames.get(good.Key).trading)
+                        .map(good => ItemNames.get(good.Key).name)
+                        .sort()
+                )[0]
             }
         };
         geoJson.features.push(feature);
