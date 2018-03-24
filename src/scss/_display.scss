@@ -212,7 +212,8 @@ p {
 }
 
 .f11,
-.coord {
+.coord,
+.summary {
   line-height: 1;
   background-color: transparent;
   circle {
@@ -234,6 +235,10 @@ p {
     stroke-width: .3em;
     fill: none;
   }
+}
+
+.summary text {
+  text-anchor: start;
 }
 
 .course-head {
