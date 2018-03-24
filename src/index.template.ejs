@@ -231,16 +231,30 @@
                 <div class="dropdown-menu dropdown-menu-right large-width" id="settingsMenu"
                      aria-labelledby="settingsDropdown">
 
-                    <h6 class="dropdown-header">Show</h6>
                     <div class="col-auto align-self-center ml-1 py-1">
                         <div class="custom-control custom-checkbox">
                             <input type="checkbox" class="custom-control-input" id="show-teleport">
-                            <label class="custom-control-label" for="show-teleport">teleport areas</label>
+                            <label class="custom-control-label" for="show-teleport">Show teleport areas</label>
                         </div>
-                        <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="show-pb">
-                            <label class="custom-control-label" for="show-pb">single port battle zone</label>
-                            <small class="form-text text-muted">Use 'go to a port'</small>
+                    </div>
+
+                    <div class="dropdown-divider"></div>
+                    <h6 class="dropdown-header">Port battle zones</h6>
+                    <div class="col-auto align-self-center radio-group ml-1 py-1" id="show-pb">
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input"
+                                   name="showPB" id="pbNoShow" value="noShow">
+                            <label class="custom-control-label" for="pbNoShow">not shown</label>
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input"
+                                   name="showPB" id="pbAll" value="all" checked>
+                            <label class="custom-control-label" for="pbAll">all ports</label>
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input"
+                                   name="showPB" id="pbSingle" value="single">
+                            <label class="custom-control-label" for="pbSingle">single port</label>
                         </div>
                     </div>
 
@@ -249,18 +263,18 @@
                     <div class="col-auto align-self-center radio-group ml-1 py-1" id="radius-type">
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" class="custom-control-input"
-                                   name="showRadiusType" id="noShow" value="noShow" checked>
-                            <label class="custom-control-label" for="noShow">Do not show</label>
+                                   name="showRadiusType" id="radiusNoShow" value="noShow" checked>
+                            <label class="custom-control-label" for="radiusNoShow">not shown</label>
                         </div>
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" class="custom-control-input"
-                                   name="showRadiusType" id="taxIncome" value="taxIncome">
-                            <label class="custom-control-label" for="taxIncome">tax</label>
+                                   name="showRadiusType" id="radiusTaxIncome" value="taxIncome">
+                            <label class="custom-control-label" for="radiusTaxIncome">tax</label>
                         </div>
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" class="custom-control-input"
-                                   name="showRadiusType" id="netIncome" value="netIncome">
-                            <label class="custom-control-label" for="netIncome">net</label>
+                                   name="showRadiusType" id="radiusNetIncome" value="netIncome">
+                            <label class="custom-control-label" for="radiusNetIncome">net</label>
                         </div>
                     </div>
 
