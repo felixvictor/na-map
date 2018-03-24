@@ -8,7 +8,7 @@
 export default class Teleport {
     constructor(minCoord, maxCoord, ports) {
         this._ports = ports;
-        this._showTeleportAreas = false;
+        this._showTeleport = "noShow";
         this._voronoiCoord = [[minCoord - 1, minCoord - 1], [maxCoord + 1, maxCoord + 1]];
         this._teleportPorts = this._getPortData();
         this._voronoiDiagram = this._getVoronoiDiagram();
@@ -23,15 +23,16 @@ export default class Teleport {
     }
 
     _setupListener() {
-        $("#show-teleport")
-            .on("click", event => event.stopPropagation())
-            .on("change", () => {
-                const $input = $("#show-teleport");
+        $("#show-teleport").change(() => {
+            this._showTeleportSelected();
+        });
+    }
 
-                this._showTeleportAreas = $input.is(":checked");
-                this.setTeleportData(this._showTeleportAreas);
-                this.updateTeleportAreas();
-            });
+    _showTeleportSelected() {
+        this._showTeleport = $("input[name='showTeleport']:checked").val();
+
+        this.setTeleportData();
+        this.updateTeleportAreas();
     }
 
     _getPortData() {
@@ -86,8 +87,8 @@ export default class Teleport {
         pathUpdate.merge(pathEnter).classed("highlight-voronoi", d => d.data.id === this._highlightId);
     }
 
-    setTeleportData(teleportLevel) {
-        if (this._showTeleportAreas && teleportLevel) {
+    setTeleportData() {
+        if (this._showTeleport === "show" && this._zoomLevel !== "pbZone") {
             this._teleportData = this._voronoiDiagram.polygons();
         } else {
             this._teleportData = {};
