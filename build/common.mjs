@@ -1,5 +1,6 @@
 /*
-    common.js
+    common.mjs
+    Copy of ../src/js/common.js
  */
 
 const transformMatrix = {
