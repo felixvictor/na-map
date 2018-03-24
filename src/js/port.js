@@ -89,7 +89,7 @@ export default class PortDisplay {
     _setupFlags() {
         const svgDef = d3.select("#na-svg defs");
 
-        nations.map(d => d.id).forEach(nation => {
+        nations.map(d => d.short).forEach(nation => {
             svgDef
                 .append("pattern")
                 .attr("id", nation)
