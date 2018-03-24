@@ -22,10 +22,10 @@ export const convertCoordX = (x, y) => transformMatrix.A * x + transformMatrix.B
 export const convertCoordY = (x, y) => transformMatrix.B * x - transformMatrix.A * y + transformMatrix.D;
 
 // svg coord to F11 coord
-export const convertInvCoordX = () => transformMatrixInv.A * x + transformMatrixInv.B * y + transformMatrixInv.C;
+export const convertInvCoordX = (x, y) => transformMatrixInv.A * x + transformMatrixInv.B * y + transformMatrixInv.C;
 
 // svg coord to F11 coord
-export const convertInvCoordY = () => transformMatrixInv.B * x - transformMatrixInv.A * y + transformMatrixInv.D;
+export const convertInvCoordY = (x, y) => transformMatrixInv.B * x - transformMatrixInv.A * y + transformMatrixInv.D;
 
 export const nations = [
     { id: 0, short: "NT", name: "Neutral", sortName: "Neutral" },
