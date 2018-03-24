@@ -2,13 +2,33 @@
     util.js
  */
 
-export const formatNumber = x => {
-    let r = Math.abs(x);
-    if (x < 0) {
-        r = `\u2212\u202f${r}`;
-    }
-    return r;
-};
+/* global d3 : false
+ */
+
+const locale = d3.formatLocale({
+    decimal: ".",
+    thousands: "\u202f",
+    grouping: [3],
+    currency: ["", "\u00a0gold"],
+    percent: "\u202f%"
+});
+
+export const formatFloat = x =>
+    locale
+        .format(",.2r")(x)
+        .replace(".0", "")
+        .replace("-", "\u2212\u202f");
+
+export const formatInt = x =>
+    locale
+        .format(",d")(x)
+        .replace("-", "\u2212\u202f");
+
+export const formatSiInt = x =>
+    locale
+        .format(",.2s")(x)
+        .replace(".0", "")
+        .replace("-", "\u2212\u202f");
 
 export function getOrdinal(n) {
     const s = ["th", "st", "nd", "rd"],
@@ -19,16 +39,6 @@ export function getOrdinal(n) {
 export function isEmpty(obj) {
     return Object.getOwnPropertyNames(obj).length === 0 && obj.constructor === Object;
 }
-
-export const thousandsWithBlanks = x => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u202f");
-
-export const formatCoord = x => {
-    let r = thousandsWithBlanks(Math.abs(Math.trunc(x)));
-    if (x < 0) {
-        r = `\u2212\u202f${r}`;
-    }
-    return r;
-};
 
 export const compassDirections = [
     "N",
