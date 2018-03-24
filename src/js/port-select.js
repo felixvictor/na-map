@@ -191,7 +191,7 @@ export default class PortSelect {
                 }
                 return 0;
             })
-            .map(nation => `<option value="${nation.id}">${nation.name}</option>`)
+            .map(nation => `<option value="${nation.short}">${nation.name}</option>`)
             .join("")}`;
         propNation.append(select);
     }
