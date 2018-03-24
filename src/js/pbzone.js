@@ -14,6 +14,7 @@ export default class PBZone {
         this._fortData = fortData;
         this._towerData = towerData;
         this._ports = ports;
+        this._showPB = "all";
 
         this._setupSvg();
         this._setupListener();
@@ -30,24 +31,16 @@ export default class PBZone {
     }
 
     _setupListener() {
-        $("#show-pb")
-            .on("click", event => {
-                event.stopPropagation();
-            })
-            .on("change", () => this._showPBZonesSelected());
+        $("#show-pb").change(() => {
+            this._showPBZonesSelected();
+        });
     }
 
     _showPBZonesSelected() {
-        const $input = $("#show-pb");
-
-        this.setShowPBZones($input.is(":checked"));
+        this._showPB = $("input[name='showPB']:checked").val();
+        this._ports._showPBZones = this._showPB;
         this.refresh();
         this._ports.updateTexts();
-    }
-
-    setShowPBZones(showPBZones) {
-        this._showPBZones = showPBZones;
-        this._ports._showPBZones = showPBZones;
     }
 
     _update() {
@@ -57,30 +50,45 @@ export default class PBZone {
     }
 
     _setData() {
-        if (this._showPBZones && this._ports._zoomLevel === "pbZone") {
+        if (this._ports._zoomLevel === "pbZone" && this._showPB !== "noShow") {
             this._pbZoneData = {
                 type: "FeatureCollection",
-                features: this._pbZoneDataDefault.features.filter(d => d.id === this._ports.currentPort.id).map(d => ({
-                    type: "Feature",
-                    id: d.id,
-                    geometry: d.geometry
-                }))
+                features: this._pbZoneDataDefault.features
+                    .filter(
+                        d =>
+                            this._showPB === "all" || (this._showPB === "single" && d.id === this._ports.currentPort.id)
+                    )
+                    .map(d => ({
+                        type: "Feature",
+                        id: d.id,
+                        geometry: d.geometry
+                    }))
             };
             this._fortData = {
                 type: "FeatureCollection",
-                features: this._fortDataDefault.features.filter(d => d.id === this._ports.currentPort.id).map(d => ({
-                    type: "Feature",
-                    id: d.id,
-                    geometry: d.geometry
-                }))
+                features: this._fortDataDefault.features
+                    .filter(
+                        d =>
+                            this._showPB === "all" || (this._showPB === "single" && d.id === this._ports.currentPort.id)
+                    )
+                    .map(d => ({
+                        type: "Feature",
+                        id: d.id,
+                        geometry: d.geometry
+                    }))
             };
             this._towerData = {
                 type: "FeatureCollection",
-                features: this._towerDataDefault.features.filter(d => d.id === this._ports.currentPort.id).map(d => ({
-                    type: "Feature",
-                    id: d.id,
-                    geometry: d.geometry
-                }))
+                features: this._towerDataDefault.features
+                    .filter(
+                        d =>
+                            this._showPB === "all" || (this._showPB === "single" && d.id === this._ports.currentPort.id)
+                    )
+                    .map(d => ({
+                        type: "Feature",
+                        id: d.id,
+                        geometry: d.geometry
+                    }))
             };
         } else {
             this._pbZoneData = {};
