@@ -100,6 +100,11 @@
                 </a>
                 <div class="dropdown-menu large-width" id="propertyMenu" aria-labelledby="propertyDropdown">
                     <h6 class="dropdown-header">Ownership</h6>
+                    <a class="dropdown-item dropdown-toggle" href="#">Property</a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" id="menu-prop-all" href="#">Available to all</a>
+                        <a class="dropdown-item" id="menu-prop-green" href="#">Green zone</a>
+                    </div>
                     <a class="dropdown-item" id="menu-prop-nation" href="#">
                         <select class="custom-select" name="prop-nation" id="prop-nation"
                                 title="Select a nation"></select>
@@ -107,12 +112,6 @@
                     <a class="dropdown-item" id="menu-prop-clan" href="#">
                         <select class="custom-select" name="prop-clan" id="prop-clan" title="Select a clan"></select>
                     </a>
-
-                    <a class="dropdown-item dropdown-toggle pt-2" href="#">Property</a>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" id="menu-prop-all" href="#">Available to all</a>
-                        <a class="dropdown-item" id="menu-prop-green" href="#">Green zone</a>
-                    </div>
 
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Port battle time range</h6>
@@ -153,6 +152,12 @@
 
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Capture time range</h6>
+                    <a class="dropdown-item dropdown-toggle" href="#">Capture time</a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" id="menu-prop-yesterday" href="#">Yesterday</a>
+                        <a class="dropdown-item" id="menu-prop-this-week" href="#">This week</a>
+                        <a class="dropdown-item" id="menu-prop-last-week" href="#">Last week</a>
+                    </div>
                     <div class="dropdown-item" id="menu-prop-range">
                         <form id="prop-range">
                             <div class="form-row d-flex align-items-end">
@@ -186,12 +191,6 @@
                                 </div>
                             </div>
                         </form>
-                    </div>
-                    <a class="dropdown-item dropdown-toggle pt-2" href="#">Capture time</a>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" id="menu-prop-yesterday" href="#">Yesterday</a>
-                        <a class="dropdown-item" id="menu-prop-this-week" href="#">This week</a>
-                        <a class="dropdown-item" id="menu-prop-last-week" href="#">Last week</a>
                     </div>
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Conquest mark</h6>
