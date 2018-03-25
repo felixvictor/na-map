@@ -394,7 +394,6 @@ export default class PortDisplay {
     }
 
     update() {
-        console.log("port.update");
         this._updatePortCircles();
         this._updateIncomeCircles();
         this.updateTexts();
