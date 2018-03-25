@@ -11,6 +11,13 @@ $background-colour: $primary-300;
 #na-svg {
   background-color: $background-colour;
 }
+
+.ship tbody {
+  td:nth-child(1) { width: 36%; }
+  td:nth-child(2) { width: 32%; }
+  td:nth-child(3) { width: 32%; }
+}
+
 .dropdown-item .form-row {
   background-color: $primary-100;
 }
