@@ -118,7 +118,7 @@ export default class PortDisplay {
     _updatePortCircles() {
         function showDetails(d, i, nodes) {
             function getText(portProperties) {
-                return {
+                const port = {
                     name: portProperties.name,
                     icon: portProperties.availableForAll ? `${portProperties.nation}a` : portProperties.nation,
                     availableForAll: portProperties.availableForAll,
@@ -146,6 +146,20 @@ export default class PortDisplay {
                         : "",
                     laborHoursDiscount: portProperties.laborHoursDiscount ? ", labor hours discount" : ""
                 };
+
+                switch (portProperties.portBattleType) {
+                    case "Large":
+                        port.pbType = "1<sup>st</sup>";
+                        break;
+                    case "Medium":
+                        port.pbType = "4<sup>th</sup>";
+                        break;
+                    default:
+                        port.pbType = "6<sup>th</sup>";
+                        break;
+                }
+
+                return port;
             }
 
             function tooltipData(portProperties) {
@@ -158,6 +172,7 @@ export default class PortDisplay {
                 h += `<p>${port.depth} water port ${port.countyCapital}${port.captured}<br>`;
                 if (!port.nonCapturable) {
                     h += `Port battle ${port.pbTimeRange}, ${port.brLimit} BR, `;
+                    h += `${port.pbType}\u202frate AI`;
                     h += `${port.conquestMarksPension}\u202fconquest point`;
                     h += port.conquestMarksPension > 1 ? "s" : "";
                     h += `<br>Tax income ${port.taxIncome} (${port.portTax}), net income ${port.netIncome}`;
