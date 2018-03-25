@@ -132,12 +132,7 @@ export default function shipCompare(shipData) {
         }
 
         static getText(ship) {
-            let text =
-                '<table class="table table-sm table-striped small ship">' +
-                '<col style="width: 36%;">' +
-                '<col style="width: 32%;">' +
-                '<col style="width: 32%;">' +
-                "<tbody>";
+            let text = '<table class="table table-sm table-striped small ship"><tbody>';
 
             text += "<tr><td></td>";
             text += `<td>${ship.battleRating}<br><span class="des">Battle rating</span></td>`;
