@@ -22,7 +22,7 @@ export default class PortDisplay {
         this.fontSizes = { initial: 30, portLabel: 18, pbZone: 7 };
 
         this._zoomLevel = "initial";
-        this._showPBZones = false;
+        this._showPBZones = "all";
         this._highlightId = null;
         this._highlightDuration = 200;
         this._iconSize = 50;
@@ -339,15 +339,15 @@ export default class PortDisplay {
             // Apply to both old and new
             textUpdate
                 .merge(textEnter)
-                .attr("x", d => {
-                    if (this._zoomLevel !== "pbZone") {
-                        return d.geometry.coordinates[0];
-                    }
-                    return this._showPBZones === "all" ||
-                        (this._showPBZones === "single" && d.id === this.currentPort.id)
-                        ? d.geometry.coordinates[0] + d.properties.dx
-                        : d.geometry.coordinates[0];
-                })
+                .attr(
+                    "x",
+                    d =>
+                        this._zoomLevel === "pbZone" &&
+                        (this._showPBZones === "all" ||
+                            (this._showPBZones === "single" && d.id === this.currentPort.id))
+                            ? d.geometry.coordinates[0] + d.properties.dx
+                            : d.geometry.coordinates[0]
+                )
                 .attr("y", d => {
                     if (this._zoomLevel !== "pbZone") {
                         return d.id === this._highlightId
