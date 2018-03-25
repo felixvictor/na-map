@@ -11,6 +11,9 @@ $background-colour: $primary-300;
 #na-svg {
   background-color: $background-colour;
 }
+.dropdown-item .form-row {
+  background-color: $primary-100;
+}
 
 .bubble {
   fill-opacity: .5;
