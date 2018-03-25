@@ -116,21 +116,17 @@ export default class PortDisplay {
     _updatePortCircles() {
         function showDetails(d, i, nodes) {
             function getText(portProperties) {
-                const port = {
+                return {
                     name: portProperties.name,
                     icon: portProperties.availableForAll ? `${portProperties.nation}a` : portProperties.nation,
                     availableForAll: portProperties.availableForAll,
                     depth: portProperties.shallow ? "Shallow" : "Deep",
-                    countyCapital: portProperties.countyCapital,
+                    countyCapital: portProperties.countyCapital ? " (county capital)" : "",
                     nonCapturable: portProperties.nonCapturable,
                     // eslint-disable-next-line no-nested-ternary
-                    captured: portProperties.countyCapital
-                        ? " county capital"
-                        : portProperties.capturer
-                            ? ` captured by ${portProperties.capturer} ${moment(
-                                  portProperties.lastPortBattle
-                              ).fromNow()}`
-                            : "",
+                    captured: portProperties.capturer
+                        ? ` captured by ${portProperties.capturer} ${moment(portProperties.lastPortBattle).fromNow()}`
+                        : "",
                     // eslint-disable-next-line no-nested-ternary
                     pbTimeRange: portProperties.nonCapturable
                         ? ""
@@ -148,8 +144,6 @@ export default class PortDisplay {
                         : "",
                     laborHoursDiscount: portProperties.laborHoursDiscount ? ", labor hours discount" : ""
                 };
-
-                return port;
             }
 
             function tooltipData(portProperties) {
@@ -159,7 +153,7 @@ export default class PortDisplay {
                 h += `<td><span class="port-name">${port.name}</span>`;
                 h += port.availableForAll ? " (accessible to all nations)" : "";
                 h += "</td></tr></tbody></table>";
-                h += `<p>${port.depth} water port ${port.captured}<br>`;
+                h += `<p>${port.depth} water port ${port.countyCapital}${port.captured}<br>`;
                 if (!port.nonCapturable) {
                     h += `Port battle ${port.pbTimeRange}, ${port.brLimit} BR, `;
                     h += `${port.conquestMarksPension}\u202fconquest point`;
