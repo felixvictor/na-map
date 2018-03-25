@@ -26,7 +26,7 @@ import Teleport from "./teleport";
 import WindPrediction from "./wind-prediction";
 
 export default function naDisplay(serverName) {
-    let map, ports, teleport, portSelect, windPrediction, f11, course, pbZone, shipData;
+    let map, ports, teleport, portSelect, shipCompare, windPrediction, f11, course, pbZone, shipData;
     const jsonFiles = [`${serverName}.json`, "pb.json", "ships.json"];
 
     class NAMap {
@@ -283,21 +283,14 @@ export default function naDisplay(serverName) {
     }
 
     function setup() {
-        function setupListener() {
-            $("#button-ship-compare").on("click", event => {
-                event.stopPropagation();
-                // eslint-disable-next-line no-unused-vars
-                const shipCompare = new ShipCompare(shipData);
-            });
-        }
-
+        shipCompare = new ShipCompare(shipData);
         teleport = new Teleport(map.coord.min, map.coord.max, ports);
         portSelect = new PortSelect(map, ports, pbZone);
         windPrediction = new WindPrediction(map.margin.left, map.margin.top);
         f11 = new F11(map);
         course = new Course(ports.fontSizes.portLabel);
+
         moment.locale("en-gb");
-        setupListener();
         map.initialZoomAndPan();
         ports.clearMap();
     }
