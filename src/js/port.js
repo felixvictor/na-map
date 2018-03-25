@@ -30,6 +30,8 @@ export default class PortDisplay {
         this._showRadiusType = "noShow";
         this._taxIncomeRadius = d3.scaleLinear();
         this._netIncomeRadius = d3.scaleLinear();
+        this._minRadiusFactor = 1;
+        this._maxRadiusFactor = 6;
 
         this.setPortData(portData);
         this._setupListener();
@@ -291,8 +293,8 @@ export default class PortDisplay {
 
             this._taxIncomeRadius.domain([minTaxIncome, maxTaxIncome]);
             this._taxIncomeRadius.range([
-                this._circleSizes[this._zoomLevel] * 1,
-                this._circleSizes[this._zoomLevel] * 4
+                this._circleSizes[this._zoomLevel] * this._minRadiusFactor,
+                this._circleSizes[this._zoomLevel] * this._maxRadiusFactor
             ]);
             circleMerge
                 .attr("class", "bubble pos")
@@ -303,7 +305,10 @@ export default class PortDisplay {
 
             this._netIncomeRadius
                 .domain([minNetIncome, maxNetIncome])
-                .range([this._circleSizes[this._zoomLevel] * 1, this._circleSizes[this._zoomLevel] * 4]);
+                .range([
+                    this._circleSizes[this._zoomLevel] * this._minRadiusFactor,
+                    this._circleSizes[this._zoomLevel] * this._maxRadiusFactor
+                ]);
             circleMerge
                 .attr("class", d => (d.properties.netIncome < 0 ? "bubble neg" : "bubble pos"))
                 .attr("r", d => this._netIncomeRadius(Math.abs(d.properties.netIncome)));
