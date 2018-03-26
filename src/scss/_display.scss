@@ -12,6 +12,27 @@ $background-colour: $primary-300;
   background-color: $background-colour;
 }
 
+.ship tbody {
+  td:nth-child(1) { width: 36%; }
+  td:nth-child(2) { width: 32%; }
+  td:nth-child(3) { width: 32%; }
+}
+
+.dropdown-item .form-row {
+  background-color: $primary-100;
+}
+
+.bubble {
+  fill-opacity: .5;
+}
+
+.pos {
+  fill: $green;
+}
+.neg {
+  fill: $red;
+}
+
 .table {
   td {
     border-top: none;
@@ -29,7 +50,7 @@ $background-colour: $primary-300;
 .des {
   position: relative;
   top: -.4em;
-  font-size: x-small;
+  font-size: xx-small !important;
   color: $primary-700;
   text-transform: uppercase;
   letter-spacing: .1em;
@@ -117,7 +138,7 @@ $background-colour: $primary-300;
 }
 
 .large-width {
-  min-width: 20em;
+  min-width: 25em;
 }
 
 .left-margin {
@@ -150,10 +171,8 @@ text {
   font-style: italic;
 }
 
-.port {
-  circle {
-    cursor: pointer;
-  }
+.port circle {
+  cursor: pointer;
 }
 
 .non-trading {
@@ -202,7 +221,9 @@ p {
   fill-opacity: .5;
 }
 
-.coord {
+.f11,
+.coord,
+.summary {
   line-height: 1;
   background-color: transparent;
   circle {
@@ -224,6 +245,10 @@ p {
     stroke-width: .3em;
     fill: none;
   }
+}
+
+.summary text {
+  text-anchor: start;
 }
 
 .course-head {
