@@ -9,7 +9,7 @@ import moment from "moment";
 import "moment/locale/en-gb";
 
 import { nations } from "./common";
-import { formatInt, formatSiInt, formatPercent } from "./util";
+import { formatInt, formatSiInt, formatPercent, degreesToCompass } from "./util";
 
 export default class PortDisplay {
     constructor(portData, topMargin, rightMargin) {
@@ -47,9 +47,6 @@ export default class PortDisplay {
     }
 
     _setupSvg() {
-        const height = 150,
-            width = 300;
-
         this._g = d3
             .select("#na-svg")
             .append("g")
@@ -58,6 +55,17 @@ export default class PortDisplay {
         this._gPortCircle = this._g.append("g").classed("port", true);
         this._gText = this._g.append("g");
 
+        const lineHeight = parseInt(
+            window.getComputedStyle(document.getElementById("na-svg")).getPropertyValue("line-height"),
+            10
+        );
+        const height = lineHeight * 3,
+            width = 350,
+            firstRow = "30%",
+            secondRow = "55%",
+            firstCol = "10%",
+            secondCol = "45%",
+            thirdCol = "70%";
         const svgPortSummary = d3
             .select("body")
             .append("svg")
@@ -76,16 +84,34 @@ export default class PortDisplay {
             .attr("width", width);
         this._portSummaryText1 = svgPortSummary
             .append("text")
-            .attr("x", "10%")
-            .attr("y", "25%");
+            .attr("x", firstCol)
+            .attr("y", firstRow);
+        svgPortSummary
+            .append("text")
+            .attr("x", firstCol)
+            .attr("y", secondRow)
+            .classed("des", true)
+            .text("selected ports");
         this._portSummaryText2 = svgPortSummary
             .append("text")
-            .attr("x", "10%")
-            .attr("y", "50%");
+            .attr("x", secondCol)
+            .attr("y", firstRow);
+        svgPortSummary
+            .append("text")
+            .attr("x", secondCol)
+            .attr("y", secondRow)
+            .classed("des", true)
+            .text("tax income");
         this._portSummaryText3 = svgPortSummary
             .append("text")
-            .attr("x", "10%")
-            .attr("y", "75%");
+            .attr("x", thirdCol)
+            .attr("y", firstRow);
+        svgPortSummary
+            .append("text")
+            .attr("x", thirdCol)
+            .attr("y", secondRow)
+            .classed("des", true)
+            .text("net income");
     }
 
     _setupFlags() {
@@ -403,9 +429,9 @@ export default class PortDisplay {
             netTotal = this.portData.map(d => d.properties.netIncome).reduce((a, b) => a + b);
         }
 
-        this._portSummaryText1.text(`${numberPorts} selected ports`);
-        this._portSummaryText2.text(`${formatSiInt(taxTotal)} tax income`);
-        this._portSummaryText3.text(`${formatSiInt(netTotal)} net tax income`);
+        this._portSummaryText1.text(`${numberPorts}`);
+        this._portSummaryText2.text(`${formatSiInt(taxTotal)}`);
+        this._portSummaryText3.text(`${formatSiInt(netTotal)}`);
     }
 
     update() {
