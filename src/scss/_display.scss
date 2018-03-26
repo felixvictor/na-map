@@ -50,7 +50,7 @@ $background-colour: $primary-300;
 .des {
   position: relative;
   top: -.4em;
-  font-size: xx-small;
+  font-size: xx-small !important;
   color: $primary-700;
   text-transform: uppercase;
   letter-spacing: .1em;
