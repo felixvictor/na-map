@@ -32,7 +32,7 @@ function convertShips() {
 
     APIItems.filter(item => item.ItemType === "Ship").forEach(ship => {
         const calcPortSpeed = ship.Specs.MaxSpeed * constA - constB,
-            speedDegrees = ship.Specs.SpeedToWind.map(d => d * calcPortSpeed);
+            speedDegrees = ship.Specs.SpeedToWind.map(d => Math.round(d * calcPortSpeed * 1000) / 1000);
 
         const { length } = ship.Specs.SpeedToWind;
         // Elemente kopieren
