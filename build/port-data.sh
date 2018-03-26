@@ -2,7 +2,7 @@
 
 set -e
 
-NODE="$(which node) --experimental-modules --no-warnings"
+NODE="$(command -v node) --experimental-modules --no-warnings"
 SERVER_BASE_NAME="cleanopenworldprod"
 SOURCE_BASE_URL="http://storage.googleapis.com/nacleanopenworldprodshards/"
 # http://api.shipsofwar.net/servers?apikey=1ZptRtpXAyEaBe2SEp63To1aLmISuJj3Gxcl5ivl&callback=setActiveRealms
@@ -18,7 +18,7 @@ function get_API_data () {
     URL="${SOURCE_BASE_URL}${API_VAR}_${SERVER_BASE_NAME}${SERVER_NAME}.json"
     if [ ! -f "${OUT_FILE}" ]; then
         curl --silent --output "${OUT_FILE}" "${URL}"
-        sed -i -e "s/^var $API_VAR = //; s/\;$//" "${OUT_FILE}"
+        sed -i -e "s/^var $API_VAR = //; s/\\;$//" "${OUT_FILE}"
     fi
 }
 
@@ -54,10 +54,10 @@ function get_port_data () {
 
     mkdir -p "${API_DIR}"
     if test_for_update "${API_BASE_FILE}"; then
-        for SERVER_NAME in ${SERVER_NAMES[@]}; do
+        for SERVER_NAME in "${SERVER_NAMES[@]}"; do
             PORT_FILE="${SRC_DIR}/${SERVER_NAME}.json"
             TEMP_PORT_FILE="${BUILD_DIR}/ports.geojson"
-            for API_VAR in ${API_VARS[@]}; do
+            for API_VAR in "${API_VARS[@]}"; do
                 API_FILE="${API_BASE_FILE}-${SERVER_NAME}-${API_VAR}-${DATE}.json"
                 get_API_data "${SERVER_NAME}" "${API_FILE}" "${API_VAR}"
             done
@@ -70,7 +70,7 @@ function get_port_data () {
         ${NODE} build/convert-pbZones.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${BUILD_DIR}" "${DATE}"
         yarn geo2topo -o "${SRC_DIR}/pb.json" \
             "${BUILD_DIR}/pbZones.geojson" "${BUILD_DIR}/towers.geojson" "${BUILD_DIR}/forts.geojson"
-        rm ${BUILD_DIR}/*.geojson
+        rm "${BUILD_DIR}"/*.geojson
 
         ${NODE} build/convert-ships.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${SHIP_FILE}" "${DATE}"
 
@@ -83,7 +83,8 @@ function deploy_data () {
 }
 
 function change_var () {
-    export BASE_DIR="$(pwd)"
+    BASE_DIR="$(pwd)"
+    export BASE_DIR
     export BUILD_DIR="${BASE_DIR}/build"
     export SRC_DIR="${BASE_DIR}/src"
     export LAST_UPDATE_FILE="${BUILD_DIR}/.last-port-update"
