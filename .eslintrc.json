@@ -21,6 +21,7 @@
         "curly": ["error", "all"],
         "eqeqeq": ["error", "smart"],
         "no-console": 0,
+        "no-underscore-dangle": "off",
         "one-var": ["off"],
         "prefer-template": ["error"],
         "prettier/prettier": ["error", { "tabWidth": 4, "printWidth": 120 }],

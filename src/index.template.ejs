@@ -26,33 +26,7 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
 
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="moveToDropdown" role="button" data-toggle="dropdown"
-                   aria-haspopup="true" aria-expanded="false">
-                    Move to
-                </a>
-                <div class="dropdown-menu extralarge-width p-2" id="moveToMenu" aria-labelledby="moveToDropdown">
-                    <form id="f11">
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">F11 coordinates</span>
-                            </div>
-                            <input class="form-control" id="x-coord" type="number" required placeholder="X" max="830000"
-                                   min="-816000" step="0.1">
-                            <input class="form-control" id="z-coord" type="number" required placeholder="Z" max="830000"
-                                   min="-430000" step="0.1">
-                            <div class="input-group-append">
-                                <button class="btn btn-outline-primary" id="copy-coord" title="Copy to clipboard"
-                                        type="button"><i class="far fa-copy"></i>
-                                </button>
-                                <button class="btn btn-primary" type="submit">Move to</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </li>
-
-            <li class="nav-item dropdown pl-1">
+            <li class="nav-item dropdown pr-2">
                 <a class="nav-link dropdown-toggle" href="#" id="predictDropdown" role="button" data-toggle="dropdown"
                    aria-haspopup="true" aria-expanded="false">
                     Wind prediction
@@ -88,13 +62,49 @@
                 </div>
             </li>
 
-            <li class="nav-item dropdown pl-1">
+            <li class="nav-item dropdown pr-2">
+                <a class="nav-link dropdown-toggle" href="#" id="moveToDropdown" role="button" data-toggle="dropdown"
+                   aria-haspopup="true" aria-expanded="false">
+                    Move to F11
+                </a>
+                <div class="dropdown-menu extralarge-width p-2" id="moveToMenu" aria-labelledby="moveToDropdown">
+                    <form id="f11">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">F11 coordinates</span>
+                            </div>
+                            <input class="form-control" id="x-coord" type="number" required placeholder="X" max="830000"
+                                   min="-816000" step="0.1">
+                            <input class="form-control" id="z-coord" type="number" required placeholder="Z" max="830000"
+                                   min="-430000" step="0.1">
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-primary" id="copy-coord" title="Copy to clipboard"
+                                        type="button"><i class="far fa-copy"></i>
+                                </button>
+                                <button class="btn btn-primary" type="submit">Move to</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </li>
+
+            <li class="nav-item pr-2">
+                <label for="port-names"></label><select name="port-names" id="port-names">
+                </select>
+            </li>
+
+            <li class="nav-item dropdown pr-2">
                 <a class="nav-link dropdown-toggle" href="#" id="propertyDropdown" role="button" data-toggle="dropdown"
                    aria-haspopup="true" aria-expanded="false">
                     Select ports on
                 </a>
                 <div class="dropdown-menu large-width" id="propertyMenu" aria-labelledby="propertyDropdown">
                     <h6 class="dropdown-header">Ownership</h6>
+                    <a class="dropdown-item dropdown-toggle" href="#">Property</a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" id="menu-prop-all" href="#">Available to all</a>
+                        <a class="dropdown-item" id="menu-prop-green" href="#">Green zone</a>
+                    </div>
                     <a class="dropdown-item" id="menu-prop-nation" href="#">
                         <select class="custom-select" name="prop-nation" id="prop-nation"
                                 title="Select a nation"></select>
@@ -102,140 +112,192 @@
                     <a class="dropdown-item" id="menu-prop-clan" href="#">
                         <select class="custom-select" name="prop-clan" id="prop-clan" title="Select a clan"></select>
                     </a>
-                    <div class="dropdown-divider"></div>
-                    <h6 class="dropdown-header">Property</h6>
-                    <a class="dropdown-item pt-1" id="menu-prop-all" href="#">Available to all</a>
-                    <a class="dropdown-item pt-1" id="menu-prop-green" href="#">Green zone</a>
+
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Port battle time range</h6>
                     <div class="dropdown-item" id="menu-prop-pb-range">
                         <form id="prop-pb-range">
-                            <div class="form-group row">
-                                <label for="prop-pb-from-input" class="col-sm-2 col-form-label">From</label>
-                                <div class="col-sm-10 input-group date" id="prop-pb-from" data-target-input="nearest">
-                                    <input type="text" class="form-control datetimepicker-input"
-                                           data-target="#prop-pb-from" aria-label="prop-pb-from"
-                                           id="prop-pb-from-input" required/>
-                                    <div class="input-group-append" data-target="#prop-pb-from"
-                                         data-toggle="datetimepicker">
-                                        <span class="input-group-text"><i class="far fa-clock"></i></span>
+                            <div class="form-row d-flex align-items-end">
+                                <div class="col-sm-5">
+                                    <label for="prop-pb-from-input" class="col-form-label">From</label>
+                                    <div class="input-group date" id="prop-pb-from"
+                                         data-target-input="nearest">
+                                        <input type="text" class="form-control datetimepicker-input"
+                                               data-target="#prop-pb-from" aria-label="prop-pb-from"
+                                               id="prop-pb-from-input" required/>
+                                        <div class="input-group-append" data-target="#prop-pb-from"
+                                             data-toggle="datetimepicker">
+                                            <span class="input-group-text"><i class="far fa-clock"></i></span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="form-group row">
-                                <label for="prop-pb-to-input" class="col-sm-2 col-form-label">To</label>
-                                <div class="col-sm-10 input-group date" id="prop-pb-to" data-target-input="nearest">
-                                    <input type="text" class="form-control datetimepicker-input"
-                                           data-target="#prop-pb-to" aria-label="prop-pb-to"
-                                           id="prop-pb-to-input" required/>
-                                    <div class="input-group-append" data-target="#prop-pb-to"
-                                         data-toggle="datetimepicker">
-                                        <span class="input-group-text"><i class="far fa-clock"></i></span>
+                                <div class="col-sm-5">
+                                    <label for="prop-pb-to-input" class="col-form-label">To</label>
+                                    <div class="input-group date" id="prop-pb-to" data-target-input="nearest">
+                                        <input type="text" class="form-control datetimepicker-input"
+                                               data-target="#prop-pb-to" aria-label="prop-pb-to"
+                                               id="prop-pb-to-input" required/>
+                                        <div class="input-group-append" data-target="#prop-pb-to"
+                                             data-toggle="datetimepicker">
+                                            <span class="input-group-text"><i class="far fa-clock"></i></span>
+                                        </div>
                                     </div>
                                 </div>
+                                <div class="col-sm-2">
+                                    <button type="submit" class="btn btn-outline-primary align-bottom">Go</button>
+                                </div>
                             </div>
-                            <button type="submit" class="btn btn-outline-primary">Go</button>
                         </form>
                     </div>
-                    <div class="dropdown-divider"></div>
-                    <h6 class="dropdown-header">Capture time</h6>
-                    <a class="dropdown-item" id="menu-prop-yesterday" href="#">Yesterday</a>
-                    <a class="dropdown-item" id="menu-prop-this-week" href="#">This week</a>
-                    <a class="dropdown-item" id="menu-prop-last-week" href="#">Last week</a>
+
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Capture time range</h6>
+                    <a class="dropdown-item dropdown-toggle" href="#">Capture time</a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" id="menu-prop-yesterday" href="#">Yesterday</a>
+                        <a class="dropdown-item" id="menu-prop-this-week" href="#">This week</a>
+                        <a class="dropdown-item" id="menu-prop-last-week" href="#">Last week</a>
+                    </div>
                     <div class="dropdown-item" id="menu-prop-range">
                         <form id="prop-range">
-                            <div class="form-group row">
-                                <label for="prop-from-input" class="col-sm-2 col-form-label">From</label>
-                                <div class="col-sm-10 input-group date" id="prop-from" data-target-input="nearest">
-                                    <input type="text" class="form-control datetimepicker-input"
-                                           data-target="#prop-from" aria-label="prop-from"
-                                           id="prop-from-input" required/>
-                                    <div class="input-group-append" data-target="#prop-from"
-                                         data-toggle="datetimepicker">
-                                        <span class="input-group-text"><i class="far fa-calendar"></i></span>
+                            <div class="form-row d-flex align-items-end">
+                                <div class="col-sm-5">
+                                    <label for="prop-from-input" class="col-form-label">From</label>
+                                    <div class="input-group date" id="prop-from" data-target-input="nearest">
+                                        <input type="text" class="form-control datetimepicker-input"
+                                               data-target="#prop-from" aria-label="prop-from"
+                                               id="prop-from-input" required/>
+                                        <div class="input-group-append" data-target="#prop-from"
+                                             data-toggle="datetimepicker">
+                                            <span class="input-group-text"><i class="far fa-calendar"></i></span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="form-group row">
-                                <label for="prop-to-input" class="col-sm-2 col-form-label">To</label>
-                                <div class="col-sm-10 input-group date" id="prop-to" data-target-input="nearest">
-                                    <input type="text" class="form-control datetimepicker-input" data-target="#prop-to"
-                                           aria-label="prop-to"
-                                           id="prop-to-input" required/>
-                                    <div class="input-group-append" data-target="#prop-to" data-toggle="datetimepicker">
-                                        <span class="input-group-text"><i class="far fa-calendar"></i></span>
+                                <div class="col-sm-5">
+                                    <label for="prop-to-input" class="col-form-label">To</label>
+                                    <div class="input-group date" id="prop-to" data-target-input="nearest">
+                                        <input type="text" class="form-control datetimepicker-input"
+                                               data-target="#prop-to"
+                                               aria-label="prop-to"
+                                               id="prop-to-input" required/>
+                                        <div class="input-group-append" data-target="#prop-to"
+                                             data-toggle="datetimepicker">
+                                            <span class="input-group-text"><i class="far fa-calendar"></i></span>
+                                        </div>
                                     </div>
                                 </div>
+                                <div class="col-sm-2">
+                                    <button type="submit" class="btn btn-outline-primary">Go</button>
+                                </div>
                             </div>
-                            <button type="submit" class="btn btn-outline-primary">Go</button>
                         </form>
                     </div>
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Conquest mark</h6>
                     <a class="dropdown-item" id="menu-prop-cm" href="#">
-                        <select class="custom-select" name="prop-cm" id="prop-cm" title="Select amount"></select>
+                        <label for="prop-cm"></label><select class="custom-select" name="prop-cm" id="prop-cm"></select>
                     </a>
                 </div>
             </li>
 
-            <li class="nav-item pl-2">
-                <label for="port-names"></label><select class="" name="port-names" id="port-names">
+            <li class="nav-item pr-2">
+                <label for="good-names"></label><select name="good-names" id="good-names">
                 </select>
-            </li>
-
-            <li class="nav-item pl-2">
-                <label for="good-names"></label><select class="" name="good-names" id="good-names">
-                </select>
-            </li>
-
-            <li class="nav-item pl-2">
-                <a class="btn btn-primary" role="button" id="button-ship-compare">Ship comparison</a>
-            </li>
-
-            <li class="nav-item pl-2">
-                <a class="btn btn-primary" role="button" href="port-battle.xlsx" download="port-battle-calculator.xlsx">Download
-                    PB calculator</a>
             </li>
         </ul>
 
         <ul class="navbar-nav ml-auto">
+
             <li class="nav-item dropdown pr-2">
-                <a class="nav-link dropdown-toggle" href="#" id="doubleclickDropdown" role="button"
+                <a class="nav-link dropdown-toggle" href="#" id="extraDropdown" role="button"
+                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Tools
+                </a>
+                <div class="dropdown-menu dropdown-menu-right" id="extraMenu"
+                     aria-labelledby="extraDropdown">
+
+                    <a class="dropdown-item" id="button-ship-compare">Ship comparison</a>
+                    <a class="dropdown-item" href="port-battle.xlsx" download="port-battle-calculator.xlsx">Download
+                        simple port battle calculator</a>
+                </div>
+            </li>
+
+            <li class="nav-item dropdown pr-2">
+                <a class="nav-link dropdown-toggle" href="#" id="settingsDropdown" role="button"
                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Settings
                 </a>
-                <div class="dropdown-menu dropdown-menu-right large-width" id="doubleclickMenu"
-                     aria-labelledby="doubleclickDropdown">
+                <div class="dropdown-menu dropdown-menu-right large-width" id="settingsMenu"
+                     aria-labelledby="settingsDropdown">
+
+                    <h6 class="dropdown-header">Port battle zones</h6>
+                    <div class="col-auto align-self-center radio-group ml-1" id="show-pb">
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input"
+                                   name="showPB" id="pbAll" value="all" checked>
+                            <label class="custom-control-label" for="pbAll">All ports</label>
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input"
+                                   name="showPB" id="pbSingle" value="single">
+                            <label class="custom-control-label" for="pbSingle">Single port</label>
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input"
+                                   name="showPB" id="pbNoShow" value="noShow">
+                            <label class="custom-control-label" for="pbNoShow">Off</label>
+                        </div>
+
+                    </div>
 
                     <div class="dropdown-divider"></div>
-                    <h6 class="dropdown-header">Show</h6>
-                    <div class="col-auto align-self-center ml-1 py-1">
-                        <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="show-teleport">
-                            <label class="custom-control-label" for="show-teleport">teleport areas</label>
+                    <h6 class="dropdown-header">Teleport areas</h6>
+                    <div class="col-auto align-self-center radio-group ml-1" id="show-teleport">
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input"
+                                   name="showTeleport" id="teleportShow" value="show">
+                            <label class="custom-control-label" for="teleportShow">Show</label>
                         </div>
-                        <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="show-pb">
-                            <label class="custom-control-label" for="show-pb">single port battle zone</label>
-                            <small class="form-text text-muted">Use 'go to a port'</small>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input"
+                                   name="showTeleport" id="teleportNoShow" value="noShow" checked>
+                            <label class="custom-control-label" for="teleportNoShow">Off</label>
+                        </div>
+                    </div>
+
+                    <div class="dropdown-divider"></div>
+                    <h6 class="dropdown-header">Income per port</h6>
+                    <div class="col-auto align-self-center radio-group ml-1" id="radius-type">
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input"
+                                   name="showRadiusType" id="radiusTaxIncome" value="taxIncome">
+                            <label class="custom-control-label" for="radiusTaxIncome">Tax income</label>
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input"
+                                   name="showRadiusType" id="radiusNetIncome" value="netIncome">
+                            <label class="custom-control-label" for="radiusNetIncome">Net income</label>
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input"
+                                   name="showRadiusType" id="radiusNoShow" value="noShow" checked>
+                            <label class="custom-control-label" for="radiusNoShow">Off</label>
                         </div>
                     </div>
 
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Double click to</h6>
-                    <div id="double-click-action" class="radio-group ml-1 py-1">
+                    <div id="double-click-action" class="radio-group ml-1">
                         <div class="col-auto align-self-center">
                             <div class="custom-control custom-radio custom-control-inline">
                                 <input type="radio" class="custom-control-input" name="mouseFunction" id="compass"
                                        value="compass" checked>
-                                <label class="custom-control-label" for="compass">plot a course</label>
+                                <label class="custom-control-label" for="compass">Plot a course</label>
                             </div>
                             <div class="custom-control custom-radio custom-control-inline">
                                 <input type="radio" class="custom-control-input" name="mouseFunction" id="F11"
                                        value="F11">
-                                <label class="custom-control-label" for="F11">show F11 coordinates</label>
+                                <label class="custom-control-label" for="F11">Show F11 coordinates</label>
                             </div>
                         </div>
                     </div>
@@ -306,6 +368,7 @@
     </div>
 </section>
 
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 </body>
 </html>
