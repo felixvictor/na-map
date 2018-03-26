@@ -172,7 +172,7 @@ export default class PortDisplay {
                 h += `<p>${port.depth} water port ${port.countyCapital}${port.captured}<br>`;
                 if (!port.nonCapturable) {
                     h += `Port battle ${port.pbTimeRange}, ${port.brLimit} BR, `;
-                    h += `${port.pbType}\u202frate AI`;
+                    h += `${port.pbType}\u202frate AI, `;
                     h += `${port.conquestMarksPension}\u202fconquest point`;
                     h += port.conquestMarksPension > 1 ? "s" : "";
                     h += `<br>Tax income ${port.taxIncome} (${port.portTax}), net income ${port.netIncome}`;
