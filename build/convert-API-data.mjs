@@ -37,25 +37,30 @@ function getItemNames() {
 }
 
 function convertPorts() {
-    function GetMinMaxX(t) {
+    const minX = 5,
+        maxX = 10,
+        minY = 5,
+        maxY = 10;
+    const GetMinMaxX = t => {
         if (t < 0) {
-            return Math.max(Math.min(t, -5), -10);
+            return Math.max(Math.min(t, -minX), -maxX);
         }
-        return Math.min(Math.max(t, 5), 10);
-    }
+        return Math.min(Math.max(t, minX), maxX);
+    };
 
-    function GetMinMaxY(t) {
+    const GetMinMaxY = t => {
         if (t < 0) {
-            return Math.max(Math.min(t, -5), -10);
+            return Math.max(Math.min(t, -minY), -maxY);
         }
-        return Math.min(Math.max(t, 5), 10);
-    }
+        return Math.min(Math.max(t, minY), maxY);
+    };
 
     const geoJson = {};
     geoJson.type = "FeatureCollection";
     geoJson.features = [];
     const ticks = 621355968000000000;
     APIPorts.forEach(port => {
+        const portShop = APIShops.filter(shop => shop.Id === port.Id);
         const feature = {
             type: "Feature",
             id: port.Id,
@@ -86,6 +91,7 @@ function convertPorts() {
                 availableForAll: port.AvailableForAll,
                 brLimit: port.PortBattleBRLimit,
                 portBattleStartTime: port.PortBattleStartTime,
+                portBattleType: port.PortBattleType,
                 capturer: port.Capturer,
                 lastPortBattle: moment((port.LastPortBattle - ticks) / 10000).format("YYYY-MM-DD HH:mm"),
                 nonCapturable: port.NonCapturable,
@@ -95,17 +101,17 @@ function convertPorts() {
                 netIncome: port.LastTax - port.LastCost,
                 tradingCompany: port.TradingCompany,
                 laborHoursDiscount: port.LaborHoursDiscount,
-                producesTrading: APIShops.filter(shop => shop.Id === port.Id).map(shop =>
+                producesTrading: portShop.map(shop =>
                     shop.ResourcesProduced.filter(good => ItemNames.get(good.Key).trading)
                         .map(good => ItemNames.get(good.Key).name)
                         .sort()
                 )[0],
-                dropsTrading: APIShops.filter(shop => shop.Id === port.Id).map(shop =>
+                dropsTrading: portShop.map(shop =>
                     shop.ResourcesAdded.filter(good => ItemNames.get(good.Template).trading)
                         .map(good => ItemNames.get(good.Template).name)
                         .sort()
                 )[0],
-                consumesTrading: APIShops.filter(shop => shop.Id === port.Id).map(shop =>
+                consumesTrading: portShop.map(shop =>
                     shop.ResourcesConsumed.filter(good => ItemNames.get(good.Key).trading)
                         .map(good => {
                             let r = `${ItemNames.get(good.Key).name}`;
@@ -116,17 +122,17 @@ function convertPorts() {
                         })
                         .sort()
                 )[0],
-                producesNonTrading: APIShops.filter(shop => shop.Id === port.Id).map(shop =>
+                producesNonTrading: portShop.map(shop =>
                     shop.ResourcesProduced.filter(good => !ItemNames.get(good.Key).trading)
                         .map(good => ItemNames.get(good.Key).name)
                         .sort()
                 )[0],
-                dropsNonTrading: APIShops.filter(shop => shop.Id === port.Id).map(shop =>
+                dropsNonTrading: portShop.map(shop =>
                     shop.ResourcesAdded.filter(good => !ItemNames.get(good.Template).trading)
                         .map(good => ItemNames.get(good.Template).name)
                         .sort()
                 )[0],
-                consumesNonTrading: APIShops.filter(shop => shop.Id === port.Id).map(shop =>
+                consumesNonTrading: portShop.map(shop =>
                     shop.ResourcesConsumed.filter(good => !ItemNames.get(good.Key).trading)
                         .map(good => {
                             let r = `${ItemNames.get(good.Key).name}`;
