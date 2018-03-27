@@ -61,8 +61,8 @@ export default class PortDisplay {
         );
         const height = lineHeight * 3,
             width = 350,
-            firstRow = "30%",
-            secondRow = "55%",
+            firstRow = "35%",
+            secondRow = "60%",
             firstCol = "10%",
             secondCol = "45%",
             thirdCol = "70%";
