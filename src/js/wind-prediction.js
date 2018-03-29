@@ -57,6 +57,7 @@ export default class WindPrediction {
 
     static _setupForm() {
         $("#wind-time").datetimepicker({
+            defaultDate: moment.utc(),
             format: "LT"
         });
 
@@ -136,7 +137,7 @@ export default class WindPrediction {
         }
 
         const timeDiffInSec = predictTime.diff(currentTime, "seconds");
-        const predictedWindDegrees = Math.abs(currentWindDegrees - degreesPerSecond * timeDiffInSec + 360) % 360;
+        const predictedWindDegrees = 360 + (currentWindDegrees - degreesPerSecond * timeDiffInSec) % 360;
 
         this._printPredictedWind(
             predictedWindDegrees,
