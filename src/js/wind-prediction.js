@@ -137,7 +137,7 @@ export default class WindPrediction {
         }
 
         const timeDiffInSec = predictTime.diff(currentTime, "seconds");
-        const predictedWindDegrees = (currentWindDegrees - degreesPerSecond * timeDiffInSec + 360) % 360;
+        const predictedWindDegrees = 360 + (currentWindDegrees - degreesPerSecond * timeDiffInSec) % 360;
 
         this._printPredictedWind(
             predictedWindDegrees,
