@@ -53,42 +53,21 @@ export default class PBZone {
         if (this._ports._zoomLevel === "pbZone" && this._showPB !== "noShow") {
             this._pbZoneData = {
                 type: "FeatureCollection",
-                features: this._pbZoneDataDefault.features
-                    .filter(
-                        d =>
-                            this._showPB === "all" || (this._showPB === "single" && d.id === this._ports.currentPort.id)
-                    )
-                    .map(d => ({
-                        type: "Feature",
-                        id: d.id,
-                        geometry: d.geometry
-                    }))
+                features: this._pbZoneDataDefault.filter(
+                    d => this._showPB === "all" || (this._showPB === "single" && d.id === this._ports.currentPort.id)
+                )
             };
             this._fortData = {
                 type: "FeatureCollection",
-                features: this._fortDataDefault.features
-                    .filter(
-                        d =>
-                            this._showPB === "all" || (this._showPB === "single" && d.id === this._ports.currentPort.id)
-                    )
-                    .map(d => ({
-                        type: "Feature",
-                        id: d.id,
-                        geometry: d.geometry
-                    }))
+                features: this._fortDataDefault.filter(
+                    d => this._showPB === "all" || (this._showPB === "single" && d.id === this._ports.currentPort.id)
+                )
             };
             this._towerData = {
                 type: "FeatureCollection",
-                features: this._towerDataDefault.features
-                    .filter(
-                        d =>
-                            this._showPB === "all" || (this._showPB === "single" && d.id === this._ports.currentPort.id)
-                    )
-                    .map(d => ({
-                        type: "Feature",
-                        id: d.id,
-                        geometry: d.geometry
-                    }))
+                features: this._towerDataDefault.filter(
+                    d => this._showPB === "all" || (this._showPB === "single" && d.id === this._ports.currentPort.id)
+                )
             };
         } else {
             this._pbZoneData = {};
