@@ -304,9 +304,26 @@ export default function naDisplay(serverName) {
         const portData = topojsonFeature(naMapJsonData, naMapJsonData.objects.ports).features;
         ports = new PortDisplay(portData, map.margin.top, map.margin.right);
 
-        const pbZoneData = topojsonFeature(pbZonesJsonData, pbZonesJsonData.objects.pbZones);
-        const fortData = topojsonFeature(pbZonesJsonData, pbZonesJsonData.objects.forts);
-        const towerData = topojsonFeature(pbZonesJsonData, pbZonesJsonData.objects.towers);
+        let pbZoneData = topojsonFeature(pbZonesJsonData, pbZonesJsonData.objects.pbZones);
+        // Port ids of capturable ports
+        const portIds = portData.filter(port => !port.properties.nonCapturable).map(port => port.id);
+        pbZoneData = pbZoneData.features.filter(port => portIds.includes(port.id)).map(d => ({
+            type: "Feature",
+            id: d.id,
+            geometry: d.geometry
+        }));
+        let fortData = topojsonFeature(pbZonesJsonData, pbZonesJsonData.objects.forts);
+        fortData = fortData.features.map(d => ({
+            type: "Feature",
+            id: d.id,
+            geometry: d.geometry
+        }));
+        let towerData = topojsonFeature(pbZonesJsonData, pbZonesJsonData.objects.towers);
+        towerData = towerData.features.map(d => ({
+            type: "Feature",
+            id: d.id,
+            geometry: d.geometry
+        }));
         pbZone = new PBZone(pbZoneData, fortData, towerData, ports);
 
         shipData = JSON.parse(JSON.stringify(shipJsonData.shipData));
