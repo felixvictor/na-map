@@ -57,6 +57,7 @@ export default class WindPrediction {
 
     static _setupForm() {
         $("#wind-time").datetimepicker({
+            defaultDate: moment.utc(),
             format: "LT"
         });
 
