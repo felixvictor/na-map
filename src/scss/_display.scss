@@ -235,6 +235,9 @@ p {
     fill: $secondary-800;
     text-anchor: middle;
     alignment-baseline: central;
+    &.des {
+      fill: $secondary-700 !important;
+    }
   }
   rect {
     fill: $primary-100;
