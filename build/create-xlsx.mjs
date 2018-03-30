@@ -16,7 +16,8 @@ String.prototype.replaceAll = function(search, replacement) {
 
 function createExcel() {
     function fillSheet(sheet, ships) {
-        const textAligment = { vertical: "middle", horizontal: "left", indent: 1 },
+        const numHeader = 3,
+            textAligment = { vertical: "middle", horizontal: "left", indent: 1 },
             numberAligment = { vertical: "middle", horizontal: "right", indent: 1 };
 
         sheet.views = [{ state: "frozen", xSplit: 5, ySplit: 2 }];
@@ -94,8 +95,8 @@ function createExcel() {
             rate: "",
             ship: "",
             br: "",
-            player: { formula: `SUM(D4:D${2 + ships.length})` },
-            brTotal: { formula: `SUM(E4:E${2 + ships.length})` }
+            player: { formula: `SUM(D4:D${numHeader + ships.length})` },
+            brTotal: { formula: `SUM(E4:E${numHeader + ships.length})` }
         });
 
         ships.forEach((ship, i) => {
@@ -154,11 +155,11 @@ function createExcel() {
         sheet.getCell("F3").value = "Enter player names";
         sheet.getCell("F3").font = { bold: false, italic: true, color: { argb: "4a5053" } };
 
-        for (let rowNum = 4; rowNum <= 4 + ships.length - 1; rowNum += 1) {
+        for (let rowNum = numHeader + 1; rowNum <= numHeader + ships.length; rowNum += 1) {
             sheet.getRow(rowNum);
         }
 
-        for (let rowNum = 4; rowNum <= 4 + ships.length - 1; rowNum += 1) {
+        for (let rowNum = numHeader + 1; rowNum <= numHeader + ships.length; rowNum += 1) {
             const row = sheet.getRow(rowNum);
             row.border = {
                 top: { style: "thin", color: { argb: "cccccc" } },
@@ -202,7 +203,27 @@ function createExcel() {
                     !ship.name.startsWith("Rookie") &&
                     !ship.name.startsWith("Trader")
             )
-            .sort((a, b) => a.class - b.class || a.battleRating - b.battleRating || a.name - b.name);
+            .sort((a, b) => {
+                if (a.class < b.class) {
+                    return -1;
+                }
+                if (a.class > b.class) {
+                    return 1;
+                }
+                if (a.battleRating > b.battleRating) {
+                    return -1;
+                }
+                if (a.battleRating < b.battleRating) {
+                    return 1;
+                }
+                if (a.name < b.name) {
+                    return -1;
+                }
+                if (a.name > b.name) {
+                    return 1;
+                }
+                return 0;
+            });
 
     workbook.creator = "iB aka Felix Victor";
     workbook.created = now;
