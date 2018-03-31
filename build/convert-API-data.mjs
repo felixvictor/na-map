@@ -113,13 +113,7 @@ function convertPorts() {
                 )[0],
                 consumesTrading: portShop.map(shop =>
                     shop.ResourcesConsumed.filter(good => ItemNames.get(good.Key).trading)
-                        .map(good => {
-                            let r = `${ItemNames.get(good.Key).name}`;
-                            if (good.Value > 1) {
-                                r += `\u202f(${good.Value})`;
-                            }
-                            return r;
-                        })
+                        .map(good => ({ name: `${ItemNames.get(good.Key).name}`, amount: good.Value }))
                         .sort()
                 )[0],
                 producesNonTrading: portShop.map(shop =>
@@ -134,13 +128,7 @@ function convertPorts() {
                 )[0],
                 consumesNonTrading: portShop.map(shop =>
                     shop.ResourcesConsumed.filter(good => !ItemNames.get(good.Key).trading)
-                        .map(good => {
-                            let r = `${ItemNames.get(good.Key).name}`;
-                            if (good.Value > 1) {
-                                r += `\u202f(${good.Value})`;
-                            }
-                            return r;
-                        })
+                        .map(good => ({ name: `${ItemNames.get(good.Key).name}`, amount: good.Value }))
                         .sort()
                 )[0]
             }
