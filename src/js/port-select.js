@@ -23,7 +23,33 @@ export default class PortSelect {
 
     _setupSelects() {
         this._setupPortSelect();
-        this._setupGoodSelect();
+        let goodsPerPort = this._ports.portDataDefault.map(port => {
+            let goods = port.properties.dropsTrading.length > 0 ? port.properties.dropsTrading : "";
+            goods += port.properties.dropsNonTrading.length > 0 ? `,${port.properties.dropsNonTrading}` : "";
+            goods += port.properties.producesTrading.length > 0 ? `,${port.properties.producesTrading}` : "";
+            goods += port.properties.producesNonTrading.length > 0 ? `,${port.properties.producesNonTrading}` : "";
+            return {
+                id: port.id,
+                goods
+            };
+        });
+        this._setupGoodSelect(goodsPerPort, $("#buy-goods"), "Select producible/dropped good");
+        goodsPerPort = this._ports.portDataDefault.map(port => {
+            let goods =
+                port.properties.consumesTrading.length > 0
+                    ? `${port.properties.consumesTrading.map(good => good.name)},`
+                    : "";
+            goods +=
+                port.properties.consumesNonTrading.length > 0
+                    ? `${port.properties.consumesNonTrading.map(good => good.name)}`
+                    : "";
+            console.log(goods);
+            return {
+                id: port.id,
+                goods
+            };
+        });
+        this._setupGoodSelect(goodsPerPort, $("#sell-goods"), "Select consumed good");
         this.constructor._setupNationSelect();
         this._setupClanSelect();
         this._setupCMSelect();
@@ -31,10 +57,12 @@ export default class PortSelect {
 
     _setupListener() {
         const portNames = $("#port-names"),
-            goodNames = $("#good-names");
+            buyGoods = $("#buy-goods"),
+            sellGoods = $("#sell-goods");
 
         portNames.addClass("selectpicker");
-        goodNames.addClass("selectpicker");
+        buyGoods.addClass("selectpicker");
+        sellGoods.addClass("selectpicker");
         const selectPicker = $(".selectpicker");
         selectPicker.selectpicker({
             icons: {
@@ -59,8 +87,11 @@ export default class PortSelect {
         portNames.on("change", event => this._portSelected(event)).selectpicker({
             title: "Move to port"
         });
-        goodNames.on("change", event => this._goodSelected(event)).selectpicker({
-            title: "Select a good/Reset"
+        buyGoods.on("change", event => this._buyGoodsSelected(event)).selectpicker({
+            title: "Select producible/dropped good"
+        });
+        sellGoods.on("change", event => this._sellGoodsSelected(event)).selectpicker({
+            title: "Select consumed good"
         });
 
         $("#prop-nation")
@@ -144,18 +175,8 @@ export default class PortSelect {
         $("#port-names").append(select);
     }
 
-    _setupGoodSelect() {
+    _setupGoodSelect(goodsPerPort, selectItem, title) {
         let selectGoods = new Map();
-        const goodsPerPort = this._ports.portDataDefault.map(d => {
-            let goods = d.properties.dropsTrading ? d.properties.dropsTrading : "";
-            goods += d.properties.dropsNonTrading ? `,${d.properties.dropsNonTrading}` : "";
-            goods += d.properties.producesTrading ? `,${d.properties.producesTrading}` : "";
-            goods += d.properties.producesNonTrading ? `,${d.properties.producesNonTrading}` : "";
-            return {
-                id: d.id,
-                goods
-            };
-        });
 
         goodsPerPort.forEach(port => {
             port.goods.split(",").forEach(good => {
@@ -166,7 +187,7 @@ export default class PortSelect {
             });
         });
         selectGoods = new Map(Array.from(selectGoods).sort());
-        let select = '<option value="0" selected>Select a good/Reset</option>';
+        let select = `<option value="0" selected>${title}</option>`;
         // eslint-disable-next-line no-restricted-syntax
         for (const [key, portIds] of selectGoods.entries()) {
             let ids = "";
@@ -176,7 +197,7 @@ export default class PortSelect {
             }
             select += `<option value="${ids.substr(1)}">${key}</option>`;
         }
-        $("#good-names").append(select);
+        selectItem.append(select);
     }
 
     static _setupNationSelect() {
