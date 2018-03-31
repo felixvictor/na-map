@@ -14,7 +14,7 @@ $hue: hue($primary-colour);
 $mix-weight: 90%;
 
 @function colour-mixin($colour) {
-  @return mix(hsl(hue($colour), $sat, $lit), $colour, $mix-weight);
+    @return mix(hsl(hue($colour), $sat, $lit), $colour, $mix-weight);
 }
 
 // Palettes
@@ -52,33 +52,33 @@ $gray-900: mix(#212529, colour-mixin(#212529), 60);
 //$dark:          $gray-800 !default;
 
 $theme-colors: (
-        "primary": $primary-colour,
-        "secondary": $secondary-colour,
-        "success": $green,
-        "info": $blue,
-        "warning": $orange,
-        "danger": $red,
-        "foreground": $gray-light,
-        "background": $betty-white
+    "primary": $primary-colour,
+    "secondary": $secondary-colour,
+    "success": $green,
+    "info": $blue,
+    "warning": $orange,
+    "danger": $red,
+    "foreground": $gray-light,
+    "background": $betty-white
 );
 
 @function theme-color($key: "primary") {
-  @return map-get($theme-colors, $key);
+    @return map-get($theme-colors, $key);
 }
 
 $theme-color-interval: 8% !default;
 
 @function theme-color-level($color-name: "primary", $level: 0) {
-  $color: theme-color($color-name);
-  $color-base: if($level > 0, #000, #fff);
+    $color: theme-color($color-name);
+    $color-base: if($level > 0, #000, #fff);
 
-  @if $level < 0 {
-    // Lighter values need a quick double negative for the Sass math to work
+    @if $level < 0 {
+        // Lighter values need a quick double negative for the Sass math to work
 
-    @return mix($color-base, $color, $level * -1 * $theme-color-interval);
-  } @else {
-    @return mix($color-base, $color, $level * $theme-color-interval);
-  }
+        @return mix($color-base, $color, $level * -1 * $theme-color-interval);
+    } @else {
+        @return mix($color-base, $color, $level * $theme-color-interval);
+    }
 }
 
 $primary: theme-color-level("primary", 0) !default;
