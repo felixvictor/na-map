@@ -14,12 +14,12 @@ $enable-hover-media-query: false;
 // Spacing
 $spacer: 1.618rem;
 $spacers: (
-        0: 0,
-        1: ($spacer * .309),
-        2: ($spacer * .618),
-        3: $spacer,
-        4: ($spacer * 1.618),
-        5: ($spacer * 3.2)
+    0: 0,
+    1: ($spacer * 0.309),
+    2: ($spacer * 0.618),
+    3: $spacer,
+    4: ($spacer * 1.618),
+    5: ($spacer * 3.2)
 );
 
 // Body
@@ -44,14 +44,14 @@ $input-border-radius: 0;
 // Fonts
 $font-size-base: 1rem;
 $font-size-lg: 1.618rem;
-$font-size-sm: $font-size-base/$font-size-lg*1.2;
+$font-size-sm: $font-size-base/$font-size-lg * 1.2;
 
 $line-height-base: 1.618;
 
 $h6-font-size: $font-size-base;
 $h5-font-size: $h6-font-size + $font-size-base/$font-size-lg/2;
 $h4-font-size: $font-size-lg;
-$h3-font-size: $h4-font-size+ $h6-font-size/2;
+$h3-font-size: $h4-font-size + $h6-font-size/2;
 $h2-font-size: $h3-font-size + $h5-font-size/2;
 $h1-font-size: $h2-font-size + $h4-font-size/2;
 
@@ -103,7 +103,7 @@ $modal-lg: 1200px;
 // Badges
 //$badge-font-size:                   90%;
 $badge-font-weight: 400;
-$badge-padding-y: .2rem;
+$badge-padding-y: 0.2rem;
 //$badge-padding-x:                   .4rem !default;
 //$badge-border-radius:               $border-radius !default;
 //$badge-pill-padding-x:              .6em !default;
