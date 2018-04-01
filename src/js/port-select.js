@@ -42,7 +42,7 @@ export default class PortSelect {
                 goods
             };
         });
-        this.constructor._setupGoodSelect(goodsPerPort, this._buyGoods, "Select producible/dropped good");
+        this.constructor._setupGoodSelect(goodsPerPort, this._buyGoods);
 
         // Sell goods
         goodsPerPort = this._ports.portDataDefault.map(port => {
@@ -58,7 +58,7 @@ export default class PortSelect {
                 goods
             };
         });
-        this.constructor._setupGoodSelect(goodsPerPort, this._sellGoods, "Select consumed good");
+        this.constructor._setupGoodSelect(goodsPerPort, this._sellGoods);
         this.constructor._setupNationSelect();
         this._setupClanSelect();
         this._setupCMSelect();
@@ -70,8 +70,7 @@ export default class PortSelect {
         this._sellGoods.addClass("selectpicker");
         this._propNation.addClass("selectpicker");
         this._propClan.addClass("selectpicker");
-        const selectPicker = $(".selectpicker");
-        selectPicker.selectpicker({
+        const selectPickerDefaults = {
             icons: {
                 time: "far fa-clock",
                 date: "far fa-calendar",
@@ -84,30 +83,25 @@ export default class PortSelect {
                 close: "fas fa-times"
             },
             timeZone: "UTC",
-            dropupAuto: false,
-            liveSearch: true,
-            liveSearchPlaceholder: "Search ...",
-            // accent-insensitive searching
-            liveSearchNormalize: true
-        });
+            noneSelectedText: "",
+            dropupAuto: false
+        };
+        const selectPickerLiveSearch = JSON.parse(JSON.stringify(selectPickerDefaults));
+        selectPickerLiveSearch.liveSearch = true;
+        selectPickerLiveSearch.liveSearchPlaceholder = "Search ...";
+        selectPickerLiveSearch.liveSearchNormalize = true;
 
-        this._portNames.on("change", event => this._portSelected(event)).selectpicker({
-            title: "Move to port"
-        });
-        this._buyGoods.on("change", event => this._goodSelected(event)).selectpicker({
-            title: "Select producible/dropped good"
-        });
-        this._sellGoods.on("change", event => this._goodSelected(event)).selectpicker({
-            title: "Select consumed good"
-        });
+        selectPickerLiveSearch.noneSelectedText = "Move to port";
+        this._portNames.on("change", event => this._portSelected(event)).selectpicker(selectPickerLiveSearch);
+        selectPickerLiveSearch.noneSelectedText = "Select producible/dropped good";
+        this._buyGoods.on("change", event => this._goodSelected(event)).selectpicker(selectPickerLiveSearch);
+        selectPickerLiveSearch.noneSelectedText = "Select consumed good";
+        this._sellGoods.on("change", event => this._goodSelected(event)).selectpicker(selectPickerLiveSearch);
 
-        this._propNation
-            // .on("click", event => event.stopPropagation())
-            .on("change", () => this._nationSelected());
-
-        this._propClan
-            // .on("click", event => event.stopPropagation())
-            .on("change", () => this._clanSelected());
+        selectPickerDefaults.noneSelectedText = "Select nation";
+        this._propNation.on("change", event => this._nationSelected(event)).selectpicker(selectPickerDefaults);
+        selectPickerDefaults.noneSelectedText = "Select clan";
+        this._propClan.on("change", event => this._clanSelected(event)).selectpicker(selectPickerDefaults);
 
         $("#menu-prop-all").on("click", () => this._allSelected());
         $("#menu-prop-green").on("click", () => this._greenZoneSelected());
@@ -150,22 +144,24 @@ export default class PortSelect {
             .on("click", event => event.stopPropagation())
             .on("change", () => this._CMSelected());
 
-        selectPicker.selectpicker("refresh");
+        // Adapted https://github.com/bootstrapthemesco/bootstrap-4-multi-dropdown-navbar
         $(".dropdown-menu .bootstrap-select .dropdown-toggle").on("click", event => {
-            console.log("new code click", event);
             const $el = $(event.currentTarget);
 
-            const $subMenu = $el.next(".dropdown-menu");
-            $subMenu.toggleClass("show");
-
+            $el.next(".dropdown-menu").toggleClass("show");
             $el.parent("li").toggleClass("show");
             $el.parents("li.nav-item.dropdown.show").on("hidden.bs.dropdown", event2 => {
-                const $el2 = $(event2.currentTarget).find("div.dropdown-menu.show");
-                console.log("new code dropdown el2", $el2);
-                $el2.removeClass("show");
+                $(event2.currentTarget)
+                    .find("div.dropdown-menu.show")
+                    .removeClass("show");
             });
+
             return false;
         });
+
+        $(".selectpicker")
+            .val("default")
+            .selectpicker("refresh");
     }
 
     _setupPortSelect() {
@@ -186,7 +182,7 @@ export default class PortSelect {
                 return 0;
             });
 
-        const select = `<option value="0" selected>Move to port</option>${selectPorts
+        const select = `${selectPorts
             .map(
                 port =>
                     `<option data-subtext="${port.nation}" value="${port.coord}" data-id="${port.id}">${
@@ -197,7 +193,7 @@ export default class PortSelect {
         $("#port-names").append(select);
     }
 
-    static _setupGoodSelect(goodsPerPort, selectItem, title) {
+    static _setupGoodSelect(goodsPerPort, selectItem) {
         let selectGoods = new Map();
 
         goodsPerPort.forEach(port => {
@@ -209,7 +205,7 @@ export default class PortSelect {
             });
         });
         selectGoods = new Map(Array.from(selectGoods).sort());
-        let select = `<option value="0" selected>${title}</option>`;
+        let select = "";
         // eslint-disable-next-line no-restricted-syntax
         for (const [key, portIds] of selectGoods.entries()) {
             let ids = "";
@@ -224,7 +220,7 @@ export default class PortSelect {
 
     static _setupNationSelect() {
         const propNation = $("#prop-nation");
-        const select = `<option value="0" selected>Select a nation/Reset</option>${nations
+        const select = `${nations
             .sort((a, b) => {
                 if (a.sortName < b.sortName) {
                     return -1;
@@ -246,11 +242,12 @@ export default class PortSelect {
 
         const clanList = new Set();
         this._ports.portData.filter(d => d.properties.capturer).map(d => clanList.add(d.properties.capturer));
-        const select = `<option value="0" selected>Select a clan/Reset</option>${Array.from(clanList)
+        const select = `${Array.from(clanList)
             .sort()
             .map(clan => `<option value="${clan}">${clan}</option>`)
             .join("")}`;
         propClan.append(select);
+        propClan.val("default").selectpicker("refresh");
     }
 
     _setupCMSelect() {
@@ -306,8 +303,8 @@ export default class PortSelect {
         this._ports.update();
     }
 
-    _nationSelected() {
-        const nationId = $("#prop-nation").val();
+    _nationSelected(event) {
+        const nationId = $(event.currentTarget).val();
         let portData;
 
         if (+nationId !== 0) {
@@ -317,14 +314,14 @@ export default class PortSelect {
             this._nation = "";
             portData = this._ports.portDataDefault;
         }
-        $("#propertyDropdown").dropdown("toggle");
+        // $("#propertyDropdown").dropdown("toggle");
         this._ports.setPortData(portData);
         this._ports.update();
         this._setupClanSelect();
     }
 
-    _clanSelected() {
-        const clan = $("#prop-clan").val();
+    _clanSelected(event) {
+        const clan = $(event.currentTarget).val();
         let portData;
 
         if (+clan !== 0) {
@@ -334,7 +331,7 @@ export default class PortSelect {
         } else {
             portData = this._ports.portDataDefault;
         }
-        $("#propertyDropdown").dropdown("toggle");
+        // $("#propertyDropdown").dropdown("toggle");
         this._ports.setPortData(portData);
         this._ports.update();
     }
@@ -448,5 +445,9 @@ export default class PortSelect {
         $("#propertyDropdown").dropdown("toggle");
         this._ports.setPortData(portData);
         this._ports.update();
+    }
+
+    clearMap() {
+        this._setupClanSelect();
     }
 }
