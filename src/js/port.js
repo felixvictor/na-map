@@ -184,7 +184,15 @@ export default class PortDisplay {
                     tradingCompany: portProperties.tradingCompany
                         ? `, trading company level\u202f${portProperties.tradingCompany}`
                         : "",
-                    laborHoursDiscount: portProperties.laborHoursDiscount ? ", labor hours discount" : ""
+                    laborHoursDiscount: portProperties.laborHoursDiscount ? ", labor hours discount" : "",
+                    producesTrading: portProperties.producesTrading.join(", "),
+                    dropsTrading: portProperties.dropsTrading.join(", "),
+                    producesNonTrading: portProperties.producesNonTrading.join(", "),
+                    dropsNonTrading: portProperties.dropsNonTrading.join(", "),
+                    consumesTrading: portProperties.consumesTrading
+                        .map(good => good.name + (good.amount > 1 ? ` (${good.amount})` : ""))
+                        .join(", "),
+                    consumesNonTrading: portProperties.consumesNonTrading.map(good => good.name).join(", ")
                 };
 
                 switch (portProperties.portBattleType) {
@@ -224,42 +232,42 @@ export default class PortDisplay {
                 }
                 h += "</p>";
                 h += "<table class='table table-sm'>";
-                if (portProperties.producesTrading.length || portProperties.producesNonTrading.length) {
+                if (port.producesTrading.length || port.producesNonTrading.length) {
                     h += "<tr><td>Produces</td><td>";
-                    if (portProperties.producesNonTrading.length) {
-                        h += `<span class="non-trading">${portProperties.producesNonTrading.join(", ")}</span>`;
-                        if (portProperties.producesTrading.length) {
+                    if (port.producesNonTrading.length) {
+                        h += `<span class="non-trading">${port.producesNonTrading}</span>`;
+                        if (port.producesTrading.length) {
                             h += "<br>";
                         }
                     }
-                    if (portProperties.producesTrading.length) {
-                        h += `${portProperties.producesTrading.join(", ")}`;
+                    if (port.producesTrading.length) {
+                        h += `${port.producesTrading}`;
                     }
                     h += "</td></tr>";
                 }
-                if (portProperties.dropsTrading.length || portProperties.dropsNonTrading.length) {
+                if (port.dropsTrading.length || port.dropsNonTrading.length) {
                     h += "<tr><td>Drops</td><td>";
-                    if (portProperties.dropsNonTrading.length) {
-                        h += `<span class="non-trading">${portProperties.dropsNonTrading.join(", ")}</span>`;
-                        if (portProperties.dropsTrading.length) {
+                    if (port.dropsNonTrading.length) {
+                        h += `<span class="non-trading">${port.dropsNonTrading}</span>`;
+                        if (port.dropsTrading.length) {
                             h += "<br>";
                         }
                     }
-                    if (portProperties.dropsTrading.length) {
-                        h += `${portProperties.dropsTrading.join(", ")}`;
+                    if (port.dropsTrading.length) {
+                        h += `${port.dropsTrading}`;
                     }
                     h += "</td></tr>";
                 }
-                if (portProperties.consumesTrading.length || portProperties.consumesNonTrading.length) {
+                if (port.consumesTrading.length || port.consumesNonTrading.length) {
                     h += "<tr><td>Consumes</td><td>";
-                    if (portProperties.consumesNonTrading.length) {
-                        h += `<span class="non-trading">${portProperties.consumesNonTrading.join(", ")}</span>`;
-                        if (portProperties.consumesTrading.length) {
+                    if (port.consumesNonTrading.length) {
+                        h += `<span class="non-trading">${port.consumesNonTrading}</span>`;
+                        if (port.consumesTrading.length) {
                             h += "<br>";
                         }
                     }
-                    if (portProperties.consumesTrading.length) {
-                        h += `${portProperties.consumesTrading.join(", ")}`;
+                    if (port.consumesTrading.length) {
+                        h += `${port.consumesTrading}`;
                     }
                     h += "</td></tr>";
                 }
