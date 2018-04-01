@@ -20,6 +20,8 @@ export default class PortSelect {
         this._portNames = $("#port-names");
         this._buyGoods = $("#buy-goods");
         this._sellGoods = $("#sell-goods");
+        this._propNation = $("#prop-nation");
+        this._propClan = $("#prop-clan");
 
         this._setupSelects();
         this._setupListener();
@@ -40,7 +42,7 @@ export default class PortSelect {
                 goods
             };
         });
-        PortSelect._setupGoodSelect(goodsPerPort, this._buyGoods, "Select producible/dropped good");
+        this.constructor._setupGoodSelect(goodsPerPort, this._buyGoods, "Select producible/dropped good");
 
         // Sell goods
         goodsPerPort = this._ports.portDataDefault.map(port => {
@@ -56,7 +58,7 @@ export default class PortSelect {
                 goods
             };
         });
-        PortSelect._setupGoodSelect(goodsPerPort, this._sellGoods, "Select consumed good");
+        this.constructor._setupGoodSelect(goodsPerPort, this._sellGoods, "Select consumed good");
         this.constructor._setupNationSelect();
         this._setupClanSelect();
         this._setupCMSelect();
@@ -66,6 +68,8 @@ export default class PortSelect {
         this._portNames.addClass("selectpicker");
         this._buyGoods.addClass("selectpicker");
         this._sellGoods.addClass("selectpicker");
+        this._propNation.addClass("selectpicker");
+        this._propClan.addClass("selectpicker");
         const selectPicker = $(".selectpicker");
         selectPicker.selectpicker({
             icons: {
@@ -97,12 +101,12 @@ export default class PortSelect {
             title: "Select consumed good"
         });
 
-        $("#prop-nation")
-            .on("click", event => event.stopPropagation())
+        this._propNation
+            // .on("click", event => event.stopPropagation())
             .on("change", () => this._nationSelected());
 
-        $("#prop-clan")
-            .on("click", event => event.stopPropagation())
+        this._propClan
+            // .on("click", event => event.stopPropagation())
             .on("change", () => this._clanSelected());
 
         $("#menu-prop-all").on("click", () => this._allSelected());
@@ -147,6 +151,21 @@ export default class PortSelect {
             .on("change", () => this._CMSelected());
 
         selectPicker.selectpicker("refresh");
+        $(".dropdown-menu .bootstrap-select .dropdown-toggle").on("click", event => {
+            console.log("new code click", event);
+            const $el = $(event.currentTarget);
+
+            const $subMenu = $el.next(".dropdown-menu");
+            $subMenu.toggleClass("show");
+
+            $el.parent("li").toggleClass("show");
+            $el.parents("li.nav-item.dropdown.show").on("hidden.bs.dropdown", event2 => {
+                const $el2 = $(event2.currentTarget).find("div.dropdown-menu.show");
+                console.log("new code dropdown el2", $el2);
+                $el2.removeClass("show");
+            });
+            return false;
+        });
     }
 
     _setupPortSelect() {
