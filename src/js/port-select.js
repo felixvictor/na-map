@@ -17,6 +17,9 @@ export default class PortSelect {
         this._pbZone = pbZone;
         this._dateFormat = "D MMM";
         this._timeFormat = "HH.00";
+        this._portNames = $("#port-names");
+        this._buyGoods = $("#buy-goods");
+        this._sellGoods = $("#sell-goods");
 
         this._setupSelects();
         this._setupListener();
@@ -24,46 +27,44 @@ export default class PortSelect {
 
     _setupSelects() {
         this._setupPortSelect();
+
+        // Buy goods
         let goodsPerPort = this._ports.portDataDefault.map(port => {
-            let goods = port.properties.dropsTrading.length > 0 ? port.properties.dropsTrading : "";
-            goods += port.properties.dropsNonTrading.length > 0 ? `,${port.properties.dropsNonTrading}` : "";
-            goods += port.properties.producesTrading.length > 0 ? `,${port.properties.producesTrading}` : "";
-            goods += port.properties.producesNonTrading.length > 0 ? `,${port.properties.producesNonTrading}` : "";
+            let goods = port.properties.dropsTrading.length ? port.properties.dropsTrading : "";
+            goods += port.properties.dropsNonTrading.length ? `,${port.properties.dropsNonTrading}` : "";
+            goods += port.properties.producesTrading.length ? `,${port.properties.producesTrading}` : "";
+            goods += port.properties.producesNonTrading.length ? `,${port.properties.producesNonTrading}` : "";
             return {
                 id: port.id,
                 goods
             };
         });
-        this._setupGoodSelect(goodsPerPort, $("#buy-goods"), "Select producible/dropped good");
+        PortSelect._setupGoodSelect(goodsPerPort, this._buyGoods, "Select producible/dropped good");
+
+        // Sell goods
         goodsPerPort = this._ports.portDataDefault.map(port => {
-            let goods =
-                port.properties.consumesTrading.length > 0
-                    ? `${port.properties.consumesTrading.map(good => good.name)},`
-                    : "";
-            goods +=
-                port.properties.consumesNonTrading.length > 0
-                    ? `${port.properties.consumesNonTrading.map(good => good.name)}`
-                    : "";
+            let goods = port.properties.consumesTrading.length
+                ? `${port.properties.consumesTrading.map(good => good.name)},`
+                : "";
+            goods += port.properties.consumesNonTrading.length
+                ? `${port.properties.consumesNonTrading.map(good => good.name)}`
+                : "";
             console.log(goods);
             return {
                 id: port.id,
                 goods
             };
         });
-        this._setupGoodSelect(goodsPerPort, $("#sell-goods"), "Select consumed good");
+        PortSelect._setupGoodSelect(goodsPerPort, this._sellGoods, "Select consumed good");
         this.constructor._setupNationSelect();
         this._setupClanSelect();
         this._setupCMSelect();
     }
 
     _setupListener() {
-        const portNames = $("#port-names"),
-            buyGoods = $("#buy-goods"),
-            sellGoods = $("#sell-goods");
-
-        portNames.addClass("selectpicker");
-        buyGoods.addClass("selectpicker");
-        sellGoods.addClass("selectpicker");
+        this._portNames.addClass("selectpicker");
+        this._buyGoods.addClass("selectpicker");
+        this._sellGoods.addClass("selectpicker");
         const selectPicker = $(".selectpicker");
         selectPicker.selectpicker({
             icons: {
@@ -85,13 +86,13 @@ export default class PortSelect {
             liveSearchNormalize: true
         });
 
-        portNames.on("change", event => this._portSelected(event)).selectpicker({
+        this._portNames.on("change", event => this._portSelected(event)).selectpicker({
             title: "Move to port"
         });
-        buyGoods.on("change", event => this._buyGoodsSelected(event)).selectpicker({
+        this._buyGoods.on("change", event => this._goodSelected(event)).selectpicker({
             title: "Select producible/dropped good"
         });
-        sellGoods.on("change", event => this._sellGoodsSelected(event)).selectpicker({
+        this._sellGoods.on("change", event => this._goodSelected(event)).selectpicker({
             title: "Select consumed good"
         });
 
@@ -176,7 +177,7 @@ export default class PortSelect {
         $("#port-names").append(select);
     }
 
-    _setupGoodSelect(goodsPerPort, selectItem, title) {
+    static _setupGoodSelect(goodsPerPort, selectItem, title) {
         let selectGoods = new Map();
 
         goodsPerPort.forEach(port => {
