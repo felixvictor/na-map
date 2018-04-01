@@ -14,7 +14,7 @@
     <meta content="images/icons/browserconfig.xml" name="msapplication-config">
 
     <script src="https://www.googletagmanager.com/gtag/js?id=UA-109520372-1" async></script>
-<link href="na-map.min.css?e5a70ec5815a9f862006" rel="stylesheet" crossorigin="anonymous" integrity="sha256-lj7hMP8XbyOamgy0s7tf6hCrZjPGn8lDiWlSAZl7Ic8= sha384-Ljnm66cJbfDwrWkRjT76CaUbZ2JDIyEeQyj+sytCQ6QwTaV0tko43mtFvu2b2Im6"></head>
+<link href="na-map.min.css?f5ebc1230e9ea63a5908" rel="stylesheet"></head>
 <body>
 
 <nav class="bg-light fixed-top navbar navbar-expand-lg navbar-light">
@@ -91,8 +91,15 @@
                 <div class="dropdown-menu large-width" id="propertyMenu" aria-labelledby="propertyDropdown">
                     <a class="dropdown-item dropdown-toggle" href="#">Property</a>
                     <div class="dropdown-menu">
+                        <a class="dropdown-item" href="#" id="menu-prop-deep">Deep water</a>
+                        <a class="dropdown-item" href="#" id="menu-prop-shallow">Shallow water</a>
+                        <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="#" id="menu-prop-all">Available to all</a>
                         <a class="dropdown-item" href="#" id="menu-prop-green">Green zone</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="#" id="menu-prop-large">1st rate AI</a>
+                        <a class="dropdown-item" href="#" id="menu-prop-medium">4th rate AI</a>
+                        <a class="dropdown-item" href="#" id="menu-prop-small">6th rate AI</a>
                     </div>
 
                         <a class="dropdown-item" href="#" id="menu-prop-cm">
@@ -199,7 +206,7 @@
 
                     <a class="dropdown-item" id="button-ship-compare">Ship comparison</a>
                     <a class="dropdown-item" href="port-battle.xlsx" download="port-battle-calculator.xlsx">Download
-                        simple port battle calculator</a>
+                        port battle calculator</a>
                 </div>
             </li>
 
@@ -312,17 +319,17 @@
                 <div class="container-fluid">
                     <div class="row">
                         <div class="ml-auto col-md-4 pt-2 columnA">
-                            <select id="ship-Base-select" name="ship-Base-select" title="Select a ship">
+                            <label for="ship-Base-select"></label><select id="ship-Base-select" name="ship-Base-select">
                             </select>
                             <div id="ship-Base"></div>
                         </div>
                         <div class="ml-auto col-md-4 pt-2 columnC">
-                            <select id="ship-C1-select" name="ship-C1-select" title="Select a ship">
+                            <label for="ship-C1-select"></label><select id="ship-C1-select" name="ship-C1-select">
                             </select>
                             <div id="ship-C1"></div>
                         </div>
                         <div class="ml-auto col-md-4 pt-2 columnC">
-                            <select id="ship-C2-select" name="ship-C2-select" title="Select a ship">
+                            <label for="ship-C2-select"></label><select id="ship-C2-select" name="ship-C2-select">
                             </select>
                             <div id="ship-C2"></div>
                         </div>
@@ -338,5 +345,5 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.slim.min.js" crossorigin="anonymous" integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E="></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.13.0/d3.min.js" crossorigin="anonymous" integrity="sha256-hYXbQJK4qdJiAeDVjjQ9G0D6A0xLnDQ4eJI9dkm7Fpk="></script>
-<script src="na-map.min.js?e5a70ec5815a9f862006" crossorigin="anonymous" integrity="sha256-9C/K6lO2dp3nHjIpePvGKB2zBFFw5De+1WCLsEXqnI0= sha384-+YPKxp8JdUN4sJv4WtTUAq/6deM49OT6by5OiXhQHKvU6B/vgzI/ZCIPv569207U" type="text/javascript"></script></body>
+<script src="na-map.min.js?f5ebc1230e9ea63a5908" type="text/javascript"></script></body>
 </html>
