@@ -99,28 +99,44 @@
                     Select ports on
                 </a>
                 <div class="dropdown-menu large-width" id="propertyMenu" aria-labelledby="propertyDropdown">
-                    <h6 class="dropdown-header">Ownership</h6>
                     <a class="dropdown-item dropdown-toggle" href="#">Property</a>
                     <div class="dropdown-menu">
+                        <a class="dropdown-item" id="menu-prop-deep" href="#">Deep water</a>
+                        <a class="dropdown-item" id="menu-prop-shallow" href="#">Shallow water</a>
+                        <div class="dropdown-divider"></div>
                         <a class="dropdown-item" id="menu-prop-all" href="#">Available to all</a>
                         <a class="dropdown-item" id="menu-prop-green" href="#">Green zone</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" id="menu-prop-large" href="#">1st rate AI</a>
+                        <a class="dropdown-item" id="menu-prop-medium" href="#">4th rate AI</a>
+                        <a class="dropdown-item" id="menu-prop-small" href="#">6th rate AI</a>
                     </div>
+
+                        <a class="dropdown-item" id="menu-prop-cm" href="#">
+                            <label for="prop-cm"></label><select class="select" name="prop-cm"
+                                                                 id="prop-cm"></select>
+                        </a>
+
+                    <div class="dropdown-divider"></div>
+                    <h6 class="dropdown-header">Port owner</h6>
                     <a class="dropdown-item" id="menu-prop-nation" href="#">
-                        <select class="custom-select" name="prop-nation" id="prop-nation"
-                                title="Select a nation"></select>
+                        <label for="prop-nation"></label><select class="select" name="prop-nation"
+                                                                 id="prop-nation"></select>
                     </a>
                     <a class="dropdown-item" id="menu-prop-clan" href="#">
-                        <select class="custom-select" name="prop-clan" id="prop-clan" title="Select a clan"></select>
+                        <label for="prop-clan"></label><select class="select" name="prop-clan" id="prop-clan"></select>
                     </a>
 
                     <div class="dropdown-divider"></div>
-                    <h6 class="dropdown-header">Port battle time range</h6>
-                    <div class="dropdown-item" id="menu-prop-pb-range">
-                        <form id="prop-pb-range">
-                            <div class="form-row d-flex align-items-end">
-                                <div class="col-sm-5">
-                                    <label for="prop-pb-from-input" class="col-form-label">From</label>
-                                    <div class="input-group date" id="prop-pb-from"
+                    <h6 class="dropdown-header">Port battle</h6>
+
+                    <a class="dropdown-item dropdown-toggle" href="#">Time range set by port owner</a>
+                    <div class="dropdown-menu col-sm-7">
+                        <div class="dropdown-item" id="menu-prop-pb-range">
+                            <form id="prop-pb-range">
+                                <div class="form-group row">
+                                    <label for="prop-pb-from-input" class="col-sm-4 col-form-label">From</label>
+                                    <div class="col-sm-8 input-group date" id="prop-pb-from"
                                          data-target-input="nearest">
                                         <input type="text" class="form-control datetimepicker-input"
                                                data-target="#prop-pb-from" aria-label="prop-pb-from"
@@ -131,9 +147,9 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-sm-5">
-                                    <label for="prop-pb-to-input" class="col-form-label">To</label>
-                                    <div class="input-group date" id="prop-pb-to" data-target-input="nearest">
+                                <div class="form-group row">
+                                    <label for="prop-pb-to-input" class="col-sm-4 col-form-label">To</label>
+                                    <div class="col-sm-8 input-group date" id="prop-pb-to" data-target-input="nearest">
                                         <input type="text" class="form-control datetimepicker-input"
                                                data-target="#prop-pb-to" aria-label="prop-pb-to"
                                                id="prop-pb-to-input" required/>
@@ -143,27 +159,28 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-sm-2">
-                                    <button type="submit" class="btn btn-outline-primary align-bottom">Go</button>
-                                </div>
-                            </div>
-                        </form>
+                                <button type="submit" class="btn btn-outline-primary align-bottom">Go</button>
+                            </form>
+                        </div>
                     </div>
 
                     <div class="dropdown-divider"></div>
-                    <h6 class="dropdown-header">Capture time range</h6>
-                    <a class="dropdown-item dropdown-toggle" href="#">Capture time</a>
+                    <h6 class="dropdown-header">Port capture</h6>
+
+                    <a class="dropdown-item dropdown-toggle" href="#">Fixed date range</a>
                     <div class="dropdown-menu">
                         <a class="dropdown-item" id="menu-prop-yesterday" href="#">Yesterday</a>
                         <a class="dropdown-item" id="menu-prop-this-week" href="#">This week</a>
                         <a class="dropdown-item" id="menu-prop-last-week" href="#">Last week</a>
                     </div>
-                    <div class="dropdown-item" id="menu-prop-range">
-                        <form id="prop-range">
-                            <div class="form-row d-flex align-items-end">
-                                <div class="col-sm-5">
-                                    <label for="prop-from-input" class="col-form-label">From</label>
-                                    <div class="input-group date" id="prop-from" data-target-input="nearest">
+
+                    <a class="dropdown-item dropdown-toggle" id="menu-prop-range" href="#">Free date range</a>
+                    <div class="dropdown-menu col-sm-7">
+                        <div class="dropdown-item" id="menu-prop-range">
+                            <form id="prop-range">
+                                <div class="form-group row">
+                                    <label for="prop-from-input" class="col-sm-3 col-form-label">From</label>
+                                    <div class="col-sm-9 input-group date" id="prop-from" data-target-input="nearest">
                                         <input type="text" class="form-control datetimepicker-input"
                                                data-target="#prop-from" aria-label="prop-from"
                                                id="prop-from-input" required/>
@@ -173,9 +190,10 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-sm-5">
-                                    <label for="prop-to-input" class="col-form-label">To</label>
-                                    <div class="input-group date" id="prop-to" data-target-input="nearest">
+                                <div class="form-group row">
+
+                                    <label for="prop-to-input" class="col-sm-3 col-form-label">To</label>
+                                    <div class="col-sm-9 input-group date" id="prop-to" data-target-input="nearest">
                                         <input type="text" class="form-control datetimepicker-input"
                                                data-target="#prop-to"
                                                aria-label="prop-to"
@@ -186,22 +204,20 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-sm-2">
-                                    <button type="submit" class="btn btn-outline-primary">Go</button>
-                                </div>
-                            </div>
-                        </form>
+                                <button type="submit" class="btn btn-outline-primary">Go</button>
+                            </form>
+                        </div>
                     </div>
-                    <div class="dropdown-divider"></div>
-                    <h6 class="dropdown-header">Conquest mark</h6>
-                    <a class="dropdown-item" id="menu-prop-cm" href="#">
-                        <label for="prop-cm"></label><select class="custom-select" name="prop-cm" id="prop-cm"></select>
-                    </a>
                 </div>
             </li>
 
             <li class="nav-item pr-2">
-                <label for="good-names"></label><select name="good-names" id="good-names">
+                <label for="buy-goods"></label><select name="buy-goods" id="buy-goods">
+                </select>
+            </li>
+
+            <li class="nav-item">
+                <label for="sell-goods"></label><select name="sell-goods" id="sell-goods">
                 </select>
             </li>
         </ul>
@@ -218,7 +234,7 @@
 
                     <a class="dropdown-item" id="button-ship-compare">Ship comparison</a>
                     <a class="dropdown-item" href="port-battle.xlsx" download="port-battle-calculator.xlsx">Download
-                        simple port battle calculator</a>
+                        port battle calculator</a>
                 </div>
             </li>
 
@@ -344,17 +360,17 @@
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-md-4 ml-auto pt-2 columnA">
-                            <select name="ship-Base-select" id="ship-Base-select" title="Select a ship">
+                            <label for="ship-Base-select"></label><select name="ship-Base-select" id="ship-Base-select">
                             </select>
                             <div id="ship-Base"></div>
                         </div>
                         <div class="col-md-4 ml-auto pt-2 columnC">
-                            <select name="ship-C1-select" id="ship-C1-select" title="Select a ship">
+                            <label for="ship-C1-select"></label><select name="ship-C1-select" id="ship-C1-select">
                             </select>
                             <div id="ship-C1"></div>
                         </div>
                         <div class="col-md-4 ml-auto pt-2 columnC">
-                            <select name="ship-C2-select" id="ship-C2-select" title="Select a ship">
+                            <label for="ship-C2-select"></label><select name="ship-C2-select" id="ship-C2-select">
                             </select>
                             <div id="ship-C2"></div>
                         </div>
@@ -368,7 +384,9 @@
     </div>
 </section>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.slim.min.js" crossorigin="anonymous" integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E="></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.13.0/d3.min.js" crossorigin="anonymous" integrity="sha256-hYXbQJK4qdJiAeDVjjQ9G0D6A0xLnDQ4eJI9dkm7Fpk="></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.slim.min.js" crossorigin="anonymous"
+        integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E="></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.13.0/d3.min.js" crossorigin="anonymous"
+        integrity="sha256-hYXbQJK4qdJiAeDVjjQ9G0D6A0xLnDQ4eJI9dkm7Fpk="></script>
 </body>
 </html>

@@ -77,7 +77,7 @@ export default class Course {
             .text(`${compass} (${Math.round(degrees)}°)`);
 
         const bbox = text.node().getBBox();
-        console.log(bbox);
+
         const height = bbox.height + this._fontSize,
             width = bbox.width + this._fontSize;
         rect
@@ -90,12 +90,10 @@ export default class Course {
 
     /* public */
     plotCourse(x, y) {
-        console.log(this._bFirstCoord);
         if (this._bFirstCoord) {
             this.clearMap();
         }
         this._lineData.push([x, y]);
-        console.log(this._lineData);
         if (this._bFirstCoord) {
             this._printCompass(x, y);
             this._bFirstCoord = !this._bFirstCoord;
