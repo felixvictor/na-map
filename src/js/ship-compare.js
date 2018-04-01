@@ -607,6 +607,6 @@ export default class ShipCompare {
                     );
                 }
             })
-            .selectpicker("refresh");
+            .selectpicker({ noneSelectedText: "Select ship" });
     }
 }
