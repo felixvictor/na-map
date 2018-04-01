@@ -22,6 +22,7 @@ export default class PortSelect {
         this._sellGoods = $("#sell-goods");
         this._propNation = $("#prop-nation");
         this._propClan = $("#prop-clan");
+        this._propCM = $("#prop-cm");
 
         this._setupSelects();
         this._setupListener();
@@ -70,6 +71,7 @@ export default class PortSelect {
         this._sellGoods.addClass("selectpicker");
         this._propNation.addClass("selectpicker");
         this._propClan.addClass("selectpicker");
+        this._propCM.addClass("selectpicker");
         const selectPickerDefaults = {
             icons: {
                 time: "far fa-clock",
@@ -102,6 +104,8 @@ export default class PortSelect {
         this._propNation.on("change", event => this._nationSelected(event)).selectpicker(selectPickerDefaults);
         selectPickerDefaults.noneSelectedText = "Select clan";
         this._propClan.on("change", event => this._clanSelected(event)).selectpicker(selectPickerDefaults);
+        selectPickerDefaults.noneSelectedText = "Select conquest mark";
+        this._propCM.on("change", event => this._CMSelected(event)).selectpicker(selectPickerDefaults);
 
         $("#menu-prop-all").on("click", () => this._allSelected());
         $("#menu-prop-green").on("click", () => this._greenZoneSelected());
@@ -114,8 +118,8 @@ export default class PortSelect {
         });
         $("#prop-pb-range").submit(event => {
             this._capturePBRange();
-            $("#propertyDropdown").dropdown("toggle");
-            event.preventDefault();
+            // $("#propertyDropdown").dropdown("toggle");
+            // event.preventDefault();
         });
 
         $("#menu-prop-yesterday").on("click", () => this._capturedYesterday());
@@ -140,12 +144,8 @@ export default class PortSelect {
             event.preventDefault();
         });
 
-        $("#prop-cm")
-            .on("click", event => event.stopPropagation())
-            .on("change", () => this._CMSelected());
-
         // Adapted https://github.com/bootstrapthemesco/bootstrap-4-multi-dropdown-navbar
-        $(".dropdown-menu .bootstrap-select .dropdown-toggle").on("click", event => {
+        $(".nav-item .dropdown-menu .bootstrap-select .dropdown-toggle").on("click", event => {
             const $el = $(event.currentTarget);
 
             $el.next(".dropdown-menu").toggleClass("show");
@@ -158,7 +158,6 @@ export default class PortSelect {
 
             return false;
         });
-
         $(".selectpicker")
             .val("default")
             .selectpicker("refresh");
@@ -253,12 +252,6 @@ export default class PortSelect {
     _setupCMSelect() {
         const propCM = $("#prop-cm");
 
-        propCM.append(
-            $("<option>", {
-                value: 0,
-                text: "Select amount/Reset"
-            })
-        );
         const cmList = new Set();
         this._ports.portData.filter(d => d.properties.capturer).map(d => cmList.add(d.properties.conquestMarksPension));
         cmList.forEach(cm => {
