@@ -17,8 +17,9 @@ String.prototype.replaceAll = function(search, replacement) {
 function createExcel() {
     function fillSheet(sheet, ships) {
         const numHeader = 3,
-            textAligment = { vertical: "middle", horizontal: "left", indent: 1 },
-            numberAligment = { vertical: "middle", horizontal: "right", indent: 1 };
+            textAlignment = { vertical: "middle", horizontal: "left", indent: 1 },
+            numberAlignment = { vertical: "middle", horizontal: "right", indent: 1 },
+            numFmt = "#";
 
         sheet.views = [{ state: "frozen", xSplit: 5, ySplit: 2 }];
         sheet.properties.defaultRowHeight = 24;
@@ -29,39 +30,39 @@ function createExcel() {
             {
                 key: "rate",
                 width: 8,
-                style: { alignment: numberAligment }
+                style: { alignment: numberAlignment, numFmt }
             },
             {
                 key: "ship",
                 width: 24,
-                style: { alignment: textAligment }
+                style: { alignment: textAlignment }
             },
             {
                 key: "br",
                 width: 8,
-                style: { alignment: numberAligment }
+                style: { alignment: numberAlignment, numFmt }
             },
             {
                 key: "player",
                 width: 12,
-                style: { alignment: numberAligment }
+                style: { alignment: numberAlignment, numFmt }
             },
             {
                 key: "brTotal",
                 width: 12,
-                style: { alignment: numberAligment }
+                style: { alignment: numberAlignment, numFmt }
             },
             {
                 key: "names",
                 width: 20,
-                style: { alignment: textAligment }
+                style: { alignment: textAlignment }
             }
         ];
 
         // Format other columns (player names)
         for (let columnNum = 7; columnNum <= 7 + 23; columnNum += 1) {
             sheet.getColumn(columnNum).width = 20;
-            sheet.getColumn(columnNum).alignment = textAligment;
+            sheet.getColumn(columnNum).alignment = textAlignment;
         }
 
         // ** Rows
@@ -149,8 +150,8 @@ function createExcel() {
             sheet.getCell(cell).font = { bold: true, color: { argb: "4a5053" } };
         });
 
-        sheet.getCell("D3").alignment = numberAligment;
-        sheet.getCell("E3").alignment = numberAligment;
+        sheet.getCell("D3").alignment = numberAlignment;
+        sheet.getCell("E3").alignment = numberAlignment;
         sheet.mergeCells("F3:I3");
         sheet.getCell("F3").value = "Enter player names";
         sheet.getCell("F3").font = { bold: false, italic: true, color: { argb: "4a5053" } };
