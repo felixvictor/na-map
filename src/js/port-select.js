@@ -107,8 +107,8 @@ export default class PortSelect {
         selectPickerDefaults.noneSelectedText = "Select conquest mark";
         this._propCM
             .on("change", event => {
-                event.preventDefault();
                 this._CMSelected(event);
+                event.preventDefault();
             })
             .selectpicker(selectPickerDefaults);
 
@@ -123,7 +123,7 @@ export default class PortSelect {
         });
         $("#prop-pb-range").submit(event => {
             this._capturePBRange();
-            // $("#propertyDropdown").dropdown("toggle");
+            $("#propertyDropdown").dropdown("toggle");
             event.preventDefault();
         });
 
@@ -145,7 +145,7 @@ export default class PortSelect {
 
         $("#prop-range").submit(event => {
             this._captureRange();
-            // $("#propertyDropdown").dropdown("toggle");
+            $("#propertyDropdown").dropdown("toggle");
             event.preventDefault();
         });
 
