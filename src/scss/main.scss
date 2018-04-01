@@ -48,9 +48,9 @@
 @import "~round-slider/src/roundslider";
 
 html {
-  font-family: $font-family-base;
-  font-size: 16px;
-  line-height: 1.618rem;
+    font-family: $font-family-base;
+    font-size: 16px;
+    line-height: 1.618rem;
 }
 
 //////////////////////////////////////////
@@ -62,13 +62,13 @@ $opentype-features-tnum: "liga", "kern", "tnum", "onum" off;
 body,
 html,
 button {
-  font-family: $font-family-base;
-  font-feature-settings: $opentype-features;
+    font-family: $font-family-base;
+    font-feature-settings: $opentype-features;
 }
 
 table,
 .page-link {
-  font-feature-settings: $opentype-features-tnum;
+    font-feature-settings: $opentype-features-tnum;
 }
 
 @import "display";
