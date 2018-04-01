@@ -34,6 +34,7 @@ export default class PortSelect {
             goods += port.properties.dropsNonTrading.length ? `,${port.properties.dropsNonTrading}` : "";
             goods += port.properties.producesTrading.length ? `,${port.properties.producesTrading}` : "";
             goods += port.properties.producesNonTrading.length ? `,${port.properties.producesNonTrading}` : "";
+
             return {
                 id: port.id,
                 goods
@@ -49,7 +50,7 @@ export default class PortSelect {
             goods += port.properties.consumesNonTrading.length
                 ? `${port.properties.consumesNonTrading.map(good => good.name)}`
                 : "";
-            console.log(goods);
+
             return {
                 id: port.id,
                 goods
@@ -341,7 +342,7 @@ export default class PortSelect {
         const begin = moment($("#prop-pb-from-input").val(), this._timeFormat).hour();
         let end = moment($("#prop-pb-to-input").val(), this._timeFormat).hour();
 
-        console.log("Between %d and %d", begin, end);
+        // console.log("Between %d and %d", begin, end);
 
         // Range not in black-out range of 9 to 10
         if (!(blackOutTimes.includes(begin) && blackOutTimes.includes(end) && begin <= end)) {
@@ -365,7 +366,7 @@ export default class PortSelect {
     }
 
     _filterCaptured(begin, end) {
-        console.log("Between %s and %s", begin.format("dddd D MMMM YYYY h:mm"), end.format("dddd D MMMM YYYY h:mm"));
+        // console.log("Between %s and %s", begin.format("dddd D MMMM YYYY h:mm"), end.format("dddd D MMMM YYYY h:mm"));
         const portData = this._ports.portDataDefault.filter(d =>
             moment(d.properties.lastPortBattle).isBetween(begin, end, null, "(]")
         );
