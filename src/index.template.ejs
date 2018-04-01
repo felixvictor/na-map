@@ -114,13 +114,15 @@
                     </a>
 
                     <div class="dropdown-divider"></div>
-                    <h6 class="dropdown-header">Port battle time range</h6>
-                    <div class="dropdown-item" id="menu-prop-pb-range">
-                        <form id="prop-pb-range">
-                            <div class="form-row d-flex align-items-end">
-                                <div class="col-sm-5">
-                                    <label for="prop-pb-from-input" class="col-form-label">From</label>
-                                    <div class="input-group date" id="prop-pb-from"
+                    <h6 class="dropdown-header">Port battle</h6>
+
+                    <a class="dropdown-item dropdown-toggle" href="#">Time range set by port owner</a>
+                    <div class="dropdown-menu col-sm-7">
+                        <div class="dropdown-item" id="menu-prop-pb-range">
+                            <form id="prop-pb-range">
+                                <div class="form-group row">
+                                    <label for="prop-pb-from-input" class="col-sm-4 col-form-label">From</label>
+                                    <div class="col-sm-8 input-group date" id="prop-pb-from"
                                          data-target-input="nearest">
                                         <input type="text" class="form-control datetimepicker-input"
                                                data-target="#prop-pb-from" aria-label="prop-pb-from"
@@ -131,9 +133,9 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-sm-5">
-                                    <label for="prop-pb-to-input" class="col-form-label">To</label>
-                                    <div class="input-group date" id="prop-pb-to" data-target-input="nearest">
+                                <div class="form-group row">
+                                    <label for="prop-pb-to-input" class="col-sm-4 col-form-label">To</label>
+                                    <div class="col-sm-8 input-group date" id="prop-pb-to" data-target-input="nearest">
                                         <input type="text" class="form-control datetimepicker-input"
                                                data-target="#prop-pb-to" aria-label="prop-pb-to"
                                                id="prop-pb-to-input" required/>
@@ -143,27 +145,28 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-sm-2">
-                                    <button type="submit" class="btn btn-outline-primary align-bottom">Go</button>
-                                </div>
-                            </div>
-                        </form>
+                                <button type="submit" class="btn btn-outline-primary align-bottom">Go</button>
+                            </form>
+                        </div>
                     </div>
 
                     <div class="dropdown-divider"></div>
-                    <h6 class="dropdown-header">Capture time range</h6>
-                    <a class="dropdown-item dropdown-toggle" href="#">Capture time</a>
+                    <h6 class="dropdown-header">Port captures</h6>
+
+                    <a class="dropdown-item dropdown-toggle" href="#">Fixed date range</a>
                     <div class="dropdown-menu">
                         <a class="dropdown-item" id="menu-prop-yesterday" href="#">Yesterday</a>
                         <a class="dropdown-item" id="menu-prop-this-week" href="#">This week</a>
                         <a class="dropdown-item" id="menu-prop-last-week" href="#">Last week</a>
                     </div>
-                    <div class="dropdown-item" id="menu-prop-range">
-                        <form id="prop-range">
-                            <div class="form-row d-flex align-items-end">
-                                <div class="col-sm-5">
-                                    <label for="prop-from-input" class="col-form-label">From</label>
-                                    <div class="input-group date" id="prop-from" data-target-input="nearest">
+
+                    <a class="dropdown-item dropdown-toggle" id="menu-prop-range" href="#">Free date range</a>
+                    <div class="dropdown-menu col-sm-7">
+                        <div class="dropdown-item" id="menu-prop-range">
+                            <form id="prop-range">
+                                <div class="form-group row">
+                                    <label for="prop-from-input" class="col-sm-3 col-form-label">From</label>
+                                    <div class="col-sm-9 input-group date" id="prop-from" data-target-input="nearest">
                                         <input type="text" class="form-control datetimepicker-input"
                                                data-target="#prop-from" aria-label="prop-from"
                                                id="prop-from-input" required/>
@@ -173,9 +176,10 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-sm-5">
-                                    <label for="prop-to-input" class="col-form-label">To</label>
-                                    <div class="input-group date" id="prop-to" data-target-input="nearest">
+                                <div class="form-group row">
+
+                                    <label for="prop-to-input" class="col-sm-3 col-form-label">To</label>
+                                    <div class="col-sm-9 input-group date" id="prop-to" data-target-input="nearest">
                                         <input type="text" class="form-control datetimepicker-input"
                                                data-target="#prop-to"
                                                aria-label="prop-to"
@@ -186,16 +190,15 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-sm-2">
-                                    <button type="submit" class="btn btn-outline-primary">Go</button>
-                                </div>
-                            </div>
-                        </form>
+                                <button type="submit" class="btn btn-outline-primary">Go</button>
+                            </form>
+                        </div>
                     </div>
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Conquest mark</h6>
                     <a class="dropdown-item" id="menu-prop-cm" href="#">
-                        <label for="prop-cm"></label><select class="custom-select" name="prop-cm" id="prop-cm"></select>
+                        <label for="prop-cm"></label><select class="custom-select" name="prop-cm"
+                                                             id="prop-cm"></select>
                     </a>
                 </div>
             </li>
@@ -373,7 +376,9 @@
     </div>
 </section>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.slim.min.js" crossorigin="anonymous" integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E="></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.13.0/d3.min.js" crossorigin="anonymous" integrity="sha256-hYXbQJK4qdJiAeDVjjQ9G0D6A0xLnDQ4eJI9dkm7Fpk="></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.slim.min.js" crossorigin="anonymous"
+        integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E="></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.13.0/d3.min.js" crossorigin="anonymous"
+        integrity="sha256-hYXbQJK4qdJiAeDVjjQ9G0D6A0xLnDQ4eJI9dkm7Fpk="></script>
 </body>
 </html>
