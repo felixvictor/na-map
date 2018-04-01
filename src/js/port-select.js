@@ -105,7 +105,12 @@ export default class PortSelect {
         selectPickerDefaults.noneSelectedText = "Select clan";
         this._propClan.on("change", event => this._clanSelected(event)).selectpicker(selectPickerDefaults);
         selectPickerDefaults.noneSelectedText = "Select conquest mark";
-        this._propCM.on("change", event => this._CMSelected(event)).selectpicker(selectPickerDefaults);
+        this._propCM
+            .on("change", event => {
+                event.preventDefault();
+                this._CMSelected(event);
+            })
+            .selectpicker(selectPickerDefaults);
 
         $("#menu-prop-all").on("click", () => this._allSelected());
         $("#menu-prop-green").on("click", () => this._greenZoneSelected());
@@ -119,7 +124,7 @@ export default class PortSelect {
         $("#prop-pb-range").submit(event => {
             this._capturePBRange();
             // $("#propertyDropdown").dropdown("toggle");
-            // event.preventDefault();
+            event.preventDefault();
         });
 
         $("#menu-prop-yesterday").on("click", () => this._capturedYesterday());
@@ -140,7 +145,7 @@ export default class PortSelect {
 
         $("#prop-range").submit(event => {
             this._captureRange();
-            $("#propertyDropdown").dropdown("toggle");
+            // $("#propertyDropdown").dropdown("toggle");
             event.preventDefault();
         });
 
