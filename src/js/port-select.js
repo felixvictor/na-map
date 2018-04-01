@@ -112,8 +112,15 @@ export default class PortSelect {
             })
             .selectpicker(selectPickerDefaults);
 
+        $("#menu-prop-deep").on("click", () => this._depthSelected("deep"));
+        $("#menu-prop-shallow").on("click", () => this._depthSelected("shallow"));
+
         $("#menu-prop-all").on("click", () => this._allSelected());
         $("#menu-prop-green").on("click", () => this._greenZoneSelected());
+
+        $("#menu-prop-large").on("click", () => this._portSizeSelected("Large"));
+        $("#menu-prop-medium").on("click", () => this._portSizeSelected("Medium"));
+        $("#menu-prop-small").on("click", () => this._portSizeSelected("Small"));
 
         $("#prop-pb-from").datetimepicker({
             format: this._timeFormat
@@ -340,6 +347,14 @@ export default class PortSelect {
         this._ports.update();
     }
 
+    _depthSelected(depth) {
+        const portData = this._ports.portDataDefault.filter(
+            d => (depth === "shallow" ? d.properties.shallow : !d.properties.shallow)
+        );
+        this._ports.setPortData(portData);
+        this._ports.update();
+    }
+
     _allSelected() {
         const portData = this._ports.portDataDefault.filter(d => d.properties.availableForAll);
         this._ports.setPortData(portData);
@@ -350,6 +365,12 @@ export default class PortSelect {
         const portData = this._ports.portDataDefault.filter(
             d => d.properties.nonCapturable && d.properties.nation !== "FT"
         );
+        this._ports.setPortData(portData);
+        this._ports.update();
+    }
+
+    _portSizeSelected(size) {
+        const portData = this._ports.portDataDefault.filter(d => size === d.properties.portBattleType);
         this._ports.setPortData(portData);
         this._ports.update();
     }
