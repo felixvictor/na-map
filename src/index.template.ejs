@@ -99,20 +99,29 @@
                     Select ports on
                 </a>
                 <div class="dropdown-menu large-width" id="propertyMenu" aria-labelledby="propertyDropdown">
-                    <h6 class="dropdown-header">Ownership</h6>
                     <a class="dropdown-item dropdown-toggle" href="#">Property</a>
                     <div class="dropdown-menu">
                         <a class="dropdown-item" id="menu-prop-all" href="#">Available to all</a>
                         <a class="dropdown-item" id="menu-prop-green" href="#">Green zone</a>
                     </div>
 
-                    <button class="dropdown-item" id="menu-prop-nation" href="#">
+                    <a class="dropdown-item dropdown-toggle" href="#">Conquest mark</a>
+                    <div class="dropdown-menu">
+                        <button class="dropdown-item" id="menu-prop-cm" href="#">
+                            <label for="prop-cm"></label><select class="select" name="prop-cm"
+                                                                 id="prop-cm"></select>
+                        </button>
+                    </div>
+
+                    <div class="dropdown-divider"></div>
+                    <h6 class="dropdown-header">Port owner</h6>
+                    <a class="dropdown-item" id="menu-prop-nation" href="#">
                         <label for="prop-nation"></label><select class="select" name="prop-nation"
                                                                  id="prop-nation"></select>
-                    </button>
-                    <button class="dropdown-item" id="menu-prop-clan" href="#">
+                    </a>
+                    <a class="dropdown-item" id="menu-prop-clan" href="#">
                         <label for="prop-clan"></label><select class="select" name="prop-clan" id="prop-clan"></select>
-                    </button>
+                    </a>
 
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Port battle</h6>
@@ -152,7 +161,7 @@
                     </div>
 
                     <div class="dropdown-divider"></div>
-                    <h6 class="dropdown-header">Port captures</h6>
+                    <h6 class="dropdown-header">Port capture</h6>
 
                     <a class="dropdown-item dropdown-toggle" href="#">Fixed date range</a>
                     <div class="dropdown-menu">
@@ -195,12 +204,6 @@
                             </form>
                         </div>
                     </div>
-                    <div class="dropdown-divider"></div>
-                    <h6 class="dropdown-header">Conquest mark</h6>
-                    <a class="dropdown-item" id="menu-prop-cm" href="#">
-                        <label for="prop-cm"></label><select class="custom-select" name="prop-cm"
-                                                             id="prop-cm"></select>
-                    </a>
                 </div>
             </li>
 
