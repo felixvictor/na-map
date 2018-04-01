@@ -6,6 +6,7 @@ import "bootstrap-select/js/bootstrap-select";
 import moment from "moment/moment";
 import "moment/locale/en-gb";
 import "tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4";
+import "tempusdominus-core/build/js/tempusdominus-core";
 
 import { nations } from "./common";
 
