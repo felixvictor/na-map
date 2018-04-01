@@ -250,7 +250,13 @@ export default class PortSelect {
             .sort()
             .map(clan => `<option value="${clan}">${clan}</option>`)
             .join("")}`;
-        propClan.append(select);
+
+        if (select.length) {
+            propClan.append(select);
+            propClan.removeAttr("disabled");
+        } else {
+            propClan.attr("disabled", "disabled");
+        }
         propClan.val("default").selectpicker("refresh");
     }
 
