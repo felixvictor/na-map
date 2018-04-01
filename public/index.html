@@ -14,7 +14,7 @@
     <meta content="images/icons/browserconfig.xml" name="msapplication-config">
 
     <script src="https://www.googletagmanager.com/gtag/js?id=UA-109520372-1" async></script>
-<link href="na-map.min.css?b518647d6729133194cb" rel="stylesheet" crossorigin="anonymous" integrity="sha256-pGqso6yWN+vzSfLMLGeddcegVVLM3H/X0+gLMK2ncIk= sha384-LJ2AvsfIR+LZKEp0cIpdbAnw5NaXJOVJryqOJnWTRQP4QG7udUJka0AQp9GLx//e"></head>
+<link href="na-map.min.css?974ae8e45e7b7bb01445" rel="stylesheet" crossorigin="anonymous" integrity="sha256-lj7hMP8XbyOamgy0s7tf6hCrZjPGn8lDiWlSAZl7Ic8= sha384-Ljnm66cJbfDwrWkRjT76CaUbZ2JDIyEeQyj+sytCQ6QwTaV0tko43mtFvu2b2Im6"></head>
 <body>
 
 <nav class="bg-light fixed-top navbar navbar-expand-lg navbar-light">
@@ -89,94 +89,109 @@
                     Select ports on
                 </a>
                 <div class="dropdown-menu large-width" id="propertyMenu" aria-labelledby="propertyDropdown">
-                    <h6 class="dropdown-header">Ownership</h6>
                     <a class="dropdown-item dropdown-toggle" href="#">Property</a>
                     <div class="dropdown-menu">
+                        <a class="dropdown-item" href="#" id="menu-prop-deep">Deep water</a>
+                        <a class="dropdown-item" href="#" id="menu-prop-shallow">Shallow water</a>
+                        <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="#" id="menu-prop-all">Available to all</a>
                         <a class="dropdown-item" href="#" id="menu-prop-green">Green zone</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="#" id="menu-prop-large">1st rate AI</a>
+                        <a class="dropdown-item" href="#" id="menu-prop-medium">4th rate AI</a>
+                        <a class="dropdown-item" href="#" id="menu-prop-small">6th rate AI</a>
                     </div>
+
+                        <a class="dropdown-item" href="#" id="menu-prop-cm">
+                            <label for="prop-cm"></label><select id="prop-cm" name="prop-cm" class="select"></select>
+                        </a>
+
+                    <div class="dropdown-divider"></div>
+                    <h6 class="dropdown-header">Port owner</h6>
                     <a class="dropdown-item" href="#" id="menu-prop-nation">
-                        <select id="prop-nation" name="prop-nation" title="Select a nation" class="custom-select"></select>
+                        <label for="prop-nation"></label><select id="prop-nation" name="prop-nation" class="select"></select>
                     </a>
                     <a class="dropdown-item" href="#" id="menu-prop-clan">
-                        <select id="prop-clan" name="prop-clan" title="Select a clan" class="custom-select"></select>
+                        <label for="prop-clan"></label><select id="prop-clan" name="prop-clan" class="select"></select>
                     </a>
 
                     <div class="dropdown-divider"></div>
-                    <h6 class="dropdown-header">Port battle time range</h6>
-                    <div class="dropdown-item" id="menu-prop-pb-range">
-                        <form id="prop-pb-range">
-                            <div class="align-items-end d-flex form-row">
-                                <div class="col-sm-5">
-                                    <label for="prop-pb-from-input" class="col-form-label">From</label>
-                                    <div class="input-group date" id="prop-pb-from" data-target-input="nearest">
+                    <h6 class="dropdown-header">Port battle</h6>
+
+                    <a class="dropdown-item dropdown-toggle" href="#">Time range set by port owner</a>
+                    <div class="dropdown-menu col-sm-7">
+                        <div class="dropdown-item" id="menu-prop-pb-range">
+                            <form id="prop-pb-range">
+                                <div class="form-group row">
+                                    <label for="prop-pb-from-input" class="col-form-label col-sm-4">From</label>
+                                    <div class="input-group date col-sm-8" id="prop-pb-from" data-target-input="nearest">
                                         <input class="form-control datetimepicker-input" id="prop-pb-from-input" type="text" required aria-label="prop-pb-from" data-target="#prop-pb-from">
                                         <div class="input-group-append" data-target="#prop-pb-from" data-toggle="datetimepicker">
                                             <span class="input-group-text"><i class="far fa-clock"></i></span>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-sm-5">
-                                    <label for="prop-pb-to-input" class="col-form-label">To</label>
-                                    <div class="input-group date" id="prop-pb-to" data-target-input="nearest">
+                                <div class="form-group row">
+                                    <label for="prop-pb-to-input" class="col-form-label col-sm-4">To</label>
+                                    <div class="input-group date col-sm-8" id="prop-pb-to" data-target-input="nearest">
                                         <input class="form-control datetimepicker-input" id="prop-pb-to-input" type="text" required aria-label="prop-pb-to" data-target="#prop-pb-to">
                                         <div class="input-group-append" data-target="#prop-pb-to" data-toggle="datetimepicker">
                                             <span class="input-group-text"><i class="far fa-clock"></i></span>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-sm-2">
-                                    <button class="btn btn-outline-primary align-bottom" type="submit">Go</button>
-                                </div>
-                            </div>
-                        </form>
+                                <button class="btn btn-outline-primary align-bottom" type="submit">Go</button>
+                            </form>
+                        </div>
                     </div>
 
                     <div class="dropdown-divider"></div>
-                    <h6 class="dropdown-header">Capture time range</h6>
-                    <a class="dropdown-item dropdown-toggle" href="#">Capture time</a>
+                    <h6 class="dropdown-header">Port capture</h6>
+
+                    <a class="dropdown-item dropdown-toggle" href="#">Fixed date range</a>
                     <div class="dropdown-menu">
                         <a class="dropdown-item" href="#" id="menu-prop-yesterday">Yesterday</a>
                         <a class="dropdown-item" href="#" id="menu-prop-this-week">This week</a>
                         <a class="dropdown-item" href="#" id="menu-prop-last-week">Last week</a>
                     </div>
-                    <div class="dropdown-item" id="menu-prop-range">
-                        <form id="prop-range">
-                            <div class="align-items-end d-flex form-row">
-                                <div class="col-sm-5">
-                                    <label for="prop-from-input" class="col-form-label">From</label>
-                                    <div class="input-group date" id="prop-from" data-target-input="nearest">
+
+                    <a class="dropdown-item dropdown-toggle" href="#" id="menu-prop-range">Free date range</a>
+                    <div class="dropdown-menu col-sm-7">
+                        <div class="dropdown-item" id="menu-prop-range">
+                            <form id="prop-range">
+                                <div class="form-group row">
+                                    <label for="prop-from-input" class="col-form-label col-sm-3">From</label>
+                                    <div class="input-group date col-sm-9" id="prop-from" data-target-input="nearest">
                                         <input class="form-control datetimepicker-input" id="prop-from-input" type="text" required aria-label="prop-from" data-target="#prop-from">
                                         <div class="input-group-append" data-target="#prop-from" data-toggle="datetimepicker">
                                             <span class="input-group-text"><i class="far fa-calendar"></i></span>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-sm-5">
-                                    <label for="prop-to-input" class="col-form-label">To</label>
-                                    <div class="input-group date" id="prop-to" data-target-input="nearest">
+                                <div class="form-group row">
+
+                                    <label for="prop-to-input" class="col-form-label col-sm-3">To</label>
+                                    <div class="input-group date col-sm-9" id="prop-to" data-target-input="nearest">
                                         <input class="form-control datetimepicker-input" id="prop-to-input" type="text" required aria-label="prop-to" data-target="#prop-to">
                                         <div class="input-group-append" data-target="#prop-to" data-toggle="datetimepicker">
                                             <span class="input-group-text"><i class="far fa-calendar"></i></span>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-sm-2">
-                                    <button class="btn btn-outline-primary" type="submit">Go</button>
-                                </div>
-                            </div>
-                        </form>
+                                <button class="btn btn-outline-primary" type="submit">Go</button>
+                            </form>
+                        </div>
                     </div>
-                    <div class="dropdown-divider"></div>
-                    <h6 class="dropdown-header">Conquest mark</h6>
-                    <a class="dropdown-item" href="#" id="menu-prop-cm">
-                        <label for="prop-cm"></label><select id="prop-cm" name="prop-cm" class="custom-select"></select>
-                    </a>
                 </div>
             </li>
 
             <li class="nav-item pr-2">
-                <label for="good-names"></label><select id="good-names" name="good-names">
+                <label for="buy-goods"></label><select id="buy-goods" name="buy-goods">
+                </select>
+            </li>
+
+            <li class="nav-item">
+                <label for="sell-goods"></label><select id="sell-goods" name="sell-goods">
                 </select>
             </li>
         </ul>
@@ -191,7 +206,7 @@
 
                     <a class="dropdown-item" id="button-ship-compare">Ship comparison</a>
                     <a class="dropdown-item" href="port-battle.xlsx" download="port-battle-calculator.xlsx">Download
-                        simple port battle calculator</a>
+                        port battle calculator</a>
                 </div>
             </li>
 
@@ -276,7 +291,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <header class="modal-header">
-                <h3>Naval Action map <span class="small text-primary">v3.2</span></h3>
+                <h3>Naval Action map <span class="small text-primary">v3.3</span></h3>
             </header>
             <div class="modal-body">
                 <p>Yet another map which uses the in-game map and live data (daily updated soonish after maintenance).
@@ -304,17 +319,17 @@
                 <div class="container-fluid">
                     <div class="row">
                         <div class="ml-auto col-md-4 pt-2 columnA">
-                            <select id="ship-Base-select" name="ship-Base-select" title="Select a ship">
+                            <label for="ship-Base-select"></label><select id="ship-Base-select" name="ship-Base-select">
                             </select>
                             <div id="ship-Base"></div>
                         </div>
                         <div class="ml-auto col-md-4 pt-2 columnC">
-                            <select id="ship-C1-select" name="ship-C1-select" title="Select a ship">
+                            <label for="ship-C1-select"></label><select id="ship-C1-select" name="ship-C1-select">
                             </select>
                             <div id="ship-C1"></div>
                         </div>
                         <div class="ml-auto col-md-4 pt-2 columnC">
-                            <select id="ship-C2-select" name="ship-C2-select" title="Select a ship">
+                            <label for="ship-C2-select"></label><select id="ship-C2-select" name="ship-C2-select">
                             </select>
                             <div id="ship-C2"></div>
                         </div>
@@ -330,5 +345,5 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.slim.min.js" crossorigin="anonymous" integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E="></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.13.0/d3.min.js" crossorigin="anonymous" integrity="sha256-hYXbQJK4qdJiAeDVjjQ9G0D6A0xLnDQ4eJI9dkm7Fpk="></script>
-<script src="na-map.min.js?b518647d6729133194cb" crossorigin="anonymous" integrity="sha256-XqOWExPIg0MquNzpYqZXj4+oXh8kapgQMyN0/dPB+5k= sha384-xuaXKvkx8kjArnIfPHqtbPNC8D2G2Qj4DIqeDFjbXWOEygKScP49+naGazQItvXr" type="text/javascript"></script></body>
+<script src="na-map.min.js?974ae8e45e7b7bb01445" crossorigin="anonymous" integrity="sha256-W56lt/eLy3KeV+orlEZOd1ILd2J3LbY8DrMU5gWHg/8= sha384-A43sQkFKlCVoS11chFDsx7yg8S6mlFMmN+NEDRRO1EN+Y6LGlPB9ma3khja5hshP" type="text/javascript"></script></body>
 </html>
