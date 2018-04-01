@@ -41,17 +41,17 @@ function main() {
                     .parents(".dropdown-menu")
                     .first()
                     .find(".show")
-                  .not(".inner")
+                    .not(".inner")
                     .removeClass("show");
             }
             $el.next(".dropdown-menu").toggleClass("show");
             $el.parent("li").toggleClass("show");
             $el.parents("li.nav-item.dropdown.show").on("hidden.bs.dropdown", event2 => {
-                const el2=$(event2.currentTarget)
+                const el2 = $(event2.currentTarget)
                     .find(".dropdown-menu .show")
-                  .not(".inner");
-                console.log(el2);
-                    el2.removeClass("show");
+                    .not(".inner");
+                console.log("el2", el2);
+                el2.removeClass("show");
             });
             if (!$parent.parent().hasClass("navbar-nav")) {
                 $el.next().css({ top: $el[0].offsetTop, left: $parent.outerWidth() - 4 });
