@@ -107,8 +107,8 @@ export default class PortSelect {
         selectPickerDefaults.noneSelectedText = "Select conquest mark";
         this._propCM
             .on("change", event => {
-                this._CMSelected(event);
                 event.preventDefault();
+                this._CMSelected(event);
             })
             .selectpicker(selectPickerDefaults);
 
