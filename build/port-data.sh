@@ -92,7 +92,13 @@ function deploy_data () {
     yarn run deploy-update
 }
 
-function update_twitter_data () {
+function remove_tweets () {
+    TWEETS_JSON="${BUILD_DIR}/API/tweets.json"
+
+    rm -f "${TWEETS_JSON}"
+}
+
+function update_tweets () {
     TWEETS_JSON="${BUILD_DIR}/API/tweets.json"
     PORT_FILE="${SRC_DIR}/eu1.json"
     QUERY="/1.1/search/tweets.json?q=from:zz569k&tweet_mode=extended&count=100&result_type=recent"
@@ -132,7 +138,7 @@ function change_data () {
 function push_data () {
     git add --ignore-errors .
     if [[ ! -z $(git status -s) ]]; then
-        git commit -m "push"
+        git commit -m "squash! push"
         touch "${LAST_UPDATE_FILE}"
     fi
     git push gitlab --all
@@ -171,10 +177,11 @@ case "$1" in
         ;;
     twitter-update)
         update_var
-        update_twitter_data
+        update_tweets
         ;;
     twitter-change)
         change_var
-        update_twitter_data
+        remove_tweets
+        update_tweets
         ;;
 esac
