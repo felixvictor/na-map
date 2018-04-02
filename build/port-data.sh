@@ -5,6 +5,7 @@ set -e
 JQ="$(command -v jq)"
 NODE="$(command -v node) --experimental-modules --no-warnings"
 TWURL="$(command -v twurl)"
+XZ="$(command -v xz)"
 SERVER_BASE_NAME="cleanopenworldprod"
 SOURCE_BASE_URL="http://storage.googleapis.com/nacleanopenworldprodshards/"
 # http://api.shipsofwar.net/servers?apikey=1ZptRtpXAyEaBe2SEp63To1aLmISuJj3Gxcl5ivl&callback=setActiveRealms
@@ -77,6 +78,11 @@ function get_port_data () {
         ${NODE} build/convert-ships.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${SHIP_FILE}" "${DATE}"
 
         ${NODE} build/create-xlsx.mjs "${SHIP_FILE}" "${EXCEL_FILE}"
+
+        for JSON in "${API_DIR}"/*.json; do
+            ${XZ} -9e "${JSON}"
+        done
+
     fi
 }
 
