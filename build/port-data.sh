@@ -2,7 +2,10 @@
 
 set -e
 
+JQ="$(command -v jq)"
 NODE="$(command -v node) --experimental-modules --no-warnings"
+TWURL="$(command -v twurl)"
+XZ="$(command -v xz)"
 SERVER_BASE_NAME="cleanopenworldprod"
 SOURCE_BASE_URL="http://storage.googleapis.com/nacleanopenworldprodshards/"
 # http://api.shipsofwar.net/servers?apikey=1ZptRtpXAyEaBe2SEp63To1aLmISuJj3Gxcl5ivl&callback=setActiveRealms
@@ -49,11 +52,18 @@ function test_for_update () {
 function get_port_data () {
     API_DIR="${BUILD_DIR}/API"
     API_BASE_FILE="${API_DIR}/api"
+    TWEETS_JSON="${BUILD_DIR}/API/tweets.json"
     SHIP_FILE="${SRC_DIR}/ships.json"
     EXCEL_FILE="${SRC_DIR}/port-battle.xlsx"
 
     mkdir -p "${API_DIR}"
     if test_for_update "${API_BASE_FILE}"; then
+        for JSON in "${API_DIR}"/*.json; do
+            if [ "${JSON}" != "${TWEETS_JSON}" ]; then
+                ${XZ} -9ef "${JSON}"
+            fi
+        done
+
         for SERVER_NAME in "${SERVER_NAMES[@]}"; do
             PORT_FILE="${SRC_DIR}/${SERVER_NAME}.json"
             TEMP_PORT_FILE="${BUILD_DIR}/ports.geojson"
@@ -82,6 +92,27 @@ function deploy_data () {
     yarn run deploy-update
 }
 
+function remove_tweets () {
+    TWEETS_JSON="${BUILD_DIR}/API/tweets.json"
+
+    rm -f "${TWEETS_JSON}"
+}
+
+function update_tweets () {
+    TWEETS_JSON="${BUILD_DIR}/API/tweets.json"
+    PORT_FILE="${SRC_DIR}/eu1.json"
+    QUERY="/1.1/search/tweets.json?q=from:zz569k&tweet_mode=extended&count=100&result_type=recent"
+    JQ_FORMAT="{ tweets: [ .statuses[] | { id: .id_str, text: .full_text } ], refresh: .search_metadata.max_id_str }"
+
+    if [ -f "${TWEETS_JSON}" ]; then
+        SINCE=$(${NODE} -pe 'JSON.parse(process.argv[1]).refresh' "$(cat "${TWEETS_JSON}")")
+        QUERY+="&since_id=${SINCE}"
+    fi
+    echo "${QUERY}"
+    ${TWURL} "${QUERY}" | ${JQ} "${JQ_FORMAT}" > "${TWEETS_JSON}"
+    ${NODE} build/update-ports.mjs "${PORT_FILE}" "${TWEETS_JSON}"
+}
+
 function change_var () {
     BASE_DIR="$(pwd)"
     export BASE_DIR
@@ -107,7 +138,7 @@ function change_data () {
 function push_data () {
     git add --ignore-errors .
     if [[ ! -z $(git status -s) ]]; then
-        git commit -m "push"
+        git commit -m "squash! push"
         touch "${LAST_UPDATE_FILE}"
     fi
     git push gitlab --all
@@ -144,5 +175,13 @@ case "$1" in
         update_var
         update_data
         ;;
+    twitter-update)
+        update_var
+        update_tweets
+        ;;
+    twitter-change)
+        change_var
+        remove_tweets
+        update_tweets
+        ;;
 esac
-
