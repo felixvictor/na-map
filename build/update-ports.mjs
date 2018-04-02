@@ -58,7 +58,7 @@ function updatePorts() {
         console.log("      --- hostilityLevelUp ", i);
         port.properties.attackerNation = result[3];
         port.properties.attackerClan = result[2];
-        port.properties.attackHostility = result[6];
+        port.properties.attackHostility = result[6]/100;
     }
 
     function hostilityLevelDown(result) {
@@ -68,7 +68,7 @@ function updatePorts() {
       console.log("      --- hostilityLevelDown ", i);
         port.properties.attackerNation = result[3];
         port.properties.attackerClan = result[2];
-        port.properties.attackHostility = result[6];
+        port.properties.attackHostility = result[6]/100;
     }
 
     function portBattleScheduled(result) {
@@ -150,7 +150,8 @@ function updatePorts() {
           console.log("\n\n***************************************\nUnmatched tweet\n" + tweet.text + "\n");
         }
     });
-    // saveJson(ports);
+
+    saveJson(ports);
 }
 
 updatePorts();
