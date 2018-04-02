@@ -121,10 +121,10 @@ function updatePorts() {
         );
     let result;
 
-    tweets.tweets.forEach(tweet => {
-      tweet.text=tweet.text.replace("'", "’");
+    tweets.tweets.reverse().forEach(tweet => {
+        tweet.text=tweet.text.replace("'", "’");
 
-      console.log("\n\ntweet", tweet.text);
+        console.log("\n\ntweet", tweet.text);
         // eslint-disable-next-line no-cond-assign
         if ((result = capturedRegex.exec(tweet.text)) !== null) {
             captured(result);
