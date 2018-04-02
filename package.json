@@ -75,6 +75,8 @@
     "change": "yarn run data-change && yarn run prod && yarn run push-change",
     "css-lint": "stylelint --config .stylelintrc --syntax scss \"src/scss/*.scss\"",
     "data-change": "build/port-data.sh change",
+    "data-change-tweets": "build/port-data.sh twitter-change",
+    "data-update-tweets": "build/port-data.sh twitter-update",
     "data-update": "build/port-data.sh update",
     "deploy-change": "yarn run change && yarn run deploy-netlify",
     "deploy-netlify": "netlify deploy --path public --site-id 473eea6a-ae7f-4ba3-8c1f-8eab69d012e2",
