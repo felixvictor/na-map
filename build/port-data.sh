@@ -52,11 +52,18 @@ function test_for_update () {
 function get_port_data () {
     API_DIR="${BUILD_DIR}/API"
     API_BASE_FILE="${API_DIR}/api"
+    TWEETS_JSON="${BUILD_DIR}/API/tweets.json"
     SHIP_FILE="${SRC_DIR}/ships.json"
     EXCEL_FILE="${SRC_DIR}/port-battle.xlsx"
 
     mkdir -p "${API_DIR}"
     if test_for_update "${API_BASE_FILE}"; then
+        for JSON in "${API_DIR}"/*.json; do
+            if [ "${JSON}" != "${TWEETS_JSON}" ]; then
+                ${XZ} -9ef "${JSON}"
+            fi
+        done
+
         for SERVER_NAME in "${SERVER_NAMES[@]}"; do
             PORT_FILE="${SRC_DIR}/${SERVER_NAME}.json"
             TEMP_PORT_FILE="${BUILD_DIR}/ports.geojson"
@@ -78,11 +85,6 @@ function get_port_data () {
         ${NODE} build/convert-ships.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${SHIP_FILE}" "${DATE}"
 
         ${NODE} build/create-xlsx.mjs "${SHIP_FILE}" "${EXCEL_FILE}"
-
-        for JSON in "${API_DIR}"/*.json; do
-            ${XZ} -9e "${JSON}"
-        done
-
     fi
 }
 
