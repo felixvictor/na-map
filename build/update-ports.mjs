@@ -1,3 +1,4 @@
+/* eslint-disable */
 /*
     update-ports.mjs
 */
@@ -22,85 +23,124 @@ function saveJson(data) {
 }
 
 function updatePorts() {
+    function findIndex(element) {
+        return element.properties.name === this;
+    }
+
     function captured(result) {
-        ports.objects.ports.geometries.properties.filter(port => port.name === result[2]).forEach(port => {
-            port.capturer = result[3];
-            port.nation = nations.filter(nation => nation.name === result[4]).map(nation => nation.short);
-            port.lastPortBattle = moment(result[1]).format("YYYY-MM-DD HH:mm");
-            port.attackerNation = "";
-            port.attackerClan = "";
-            port.portBattle = "";
-        });
+        //    port => port.properties.name === result[2].replace("\", """)
+        const i = ports.objects.ports.geometries.findIndex(findIndex, result[2]);
+        const port = ports.objects.ports.geometries[i];
+
+        console.log("      --- captured ", i);
+        // eslint-disable-next-line prefer-destructuring
+        port.properties.capturer = result[3];
+        port.properties.nation = nations.filter(nation => nation.name === result[4]).map(nation => nation.short);
+        port.properties.lastPortBattle = moment(result[1], "DD-MM-YYYY HH:mm UTC").format("YYYY-MM-DD HH:mm");
+        port.properties.attackerNation = "";
+        port.properties.attackerClan = "";
+        port.properties.portBattle = "";
     }
 
     function defended(result) {
-        ports.filter(port => port.name === result[2]).map(port => {
-            port.attackerNation = "";
-            port.attackerClan = "";
-            port.portBattle = "";
-        });
+        const i = ports.objects.ports.geometries.findIndex(findIndex, result[2]);
+        const port = ports.objects.ports.geometries[i];
+        console.log("      --- defended before ", port.properties);
+        port.properties.attackerNation = "";
+        port.properties.attackerClan = "";
+        port.properties.portBattle = "";
+        console.log("      --- defended after ", port.properties);
     }
 
     function hostilityLevelUp(result) {
-        ports.filter(port => port.name === result[4]).map(port => {
-            port.attackerNation = result[3];
-            port.attackerClan = result[2];
-            port.attackHostility = result[6];
-        });
+        const i = ports.objects.ports.geometries.findIndex(findIndex, result[4]);
+        const port = ports.objects.ports.geometries[i];
+
+        console.log("      --- hostilityLevelUp ", i);
+        port.properties.attackerNation = result[3];
+        port.properties.attackerClan = result[2];
+        port.properties.attackHostility = result[6];
     }
 
     function hostilityLevelDown(result) {
-        ports.filter(port => port.name === result[4]).map(port => {
-            port.attackerNation = result[3];
-            port.attackerClan = result[2];
-            port.attackHostility = result[6];
-        });
+        const i = ports.objects.ports.geometries.findIndex(findIndex, result[4]);
+        const port = ports.objects.ports.geometries[i];
+        console.log("      --- hostilityLevelDown before ", port.properties);
+        port.properties.attackerNation = result[3];
+        port.properties.attackerClan = result[2];
+        port.properties.attackHostility = result[6];
+        console.log("      --- hostilityLevelDown after ", port.properties);
     }
 
     function portBattleScheduled(result) {
-        ports.filter(port => port.name === result[2]).map(port => {
-            port.attackerNation = result[7];
-            port.attackerClan = result[6];
-            port.attackHostility = "";
-            port.portBattle = moment(result[4]).format("YYYY-MM-DD HH:mm");
-        });
+        const i = ports.objects.ports.geometries.findIndex(findIndex, result[2]);
+        const port = ports.objects.ports.geometries[i];
+        console.log("      --- portBattleScheduled i ", i);
+        console.log("      --- portBattleScheduled date ", result);
+        console.log("      --- portBattleScheduled before ", port.properties);
+        port.properties.attackerNation = result[7];
+        port.properties.attackerClan = result[6];
+        port.properties.attackHostility = "";
+        port.properties.portBattle = moment(result[4], "DD MMM YYYY HH:mm UTC").format("YYYY-MM-DD HH:mm");
+        console.log("      --- portBattleScheduled after ", port.properties);
     }
 
-    const capturedRegex = new RegExp(
-            "[(d{2}-d{2}-d{4} d{2}:d{2}) UTC] ([w' ]+) captured by (w+) (([w ]+)). Previous owner: (w+) (([w ]+)) #PBCaribbean #PBCaribbeanw+",
-            "mu"
+    const portR = "[A-zÀ-ÿ’ -]+",
+        portHashR = "[A-zÀ-ÿ]+",
+        nationR = "[A-zÀ-ÿ -]+",
+        clanR = "\\w+",
+        timeR = "\\d{2}-\\d{2}-\\d{4} \\d{2}:\\d{2}",
+        pbTimeR = "\\d{1,2} \\w{3} \\d{4} \\d{2}:\\d{2}",
+        percentageR = "\\d*\\.?\\d";
+    // language=JSUnicodeRegexp
+  // noinspection RegExpRedundantEscape
+  const capturedRegex = new RegExp(
+            `\\[(${timeR}) UTC\\] (${portR}) captured by (${clanR}) \\((${nationR})\\)\\. Previous owner: (${clanR}) \\((${nationR})\\) #PBCaribbean #PBCaribbean${portHashR}`,
+            "u"
         ),
+    // language=JSUnicodeRegexp
         defendedRegex = new RegExp(
-            "[(d{2}-d{2}-d{4} d{2}:d{2}) UTC] ([w' ]+) defended by (w+) (([w ]+)) against (w+) (([w ]+)) #PBCaribbean #PBCaribbeanw+",
-            "mu"
+            `\\[(${timeR}) UTC\\] (${portR}) defended by (${clanR}) \\((${nationR})\\) against (${clanR}) \\((${nationR})\\) #PBCaribbean #PBCaribbean${portHashR}`,
+            "u"
         ),
+    // language=JSUnicodeRegexp
         hostilityLevelUpRegex = new RegExp(
-            "[(d{2}-d{2}-d{4} d{2}:d{2}) UTC] The hostility level of the clan (w+) (([w ]+)) on the port ([w' ]+) (([w ]+)) increased to (d*.?d)%. The previous value was (d*.?d)% #HOCaribbeanw+",
-            "mu"
+            `\\[(${timeR}) UTC\\] The hostility level of the clan (${clanR}) \\((${nationR})\\) on the port (${portR}) \\((${nationR})\\) increased to (${percentageR})%\\. The previous value was (${percentageR})% #HOCaribbean${portHashR}`,
+            "u"
         ),
+    // language=JSUnicodeRegexp
         hostilityLevelDownRegex = new RegExp(
-            "[(d{2}-d{2}-d{4} d{2}:d{2}) UTC] The hostility level of the clan (w+) (([w ]+)) on the port ([w' ]+) (([w ]+)) decreased to (d*.?d)%. The previous value was (d*.?d)% #HOCaribbeanw+",
-            "mu"
+            `\\[(${timeR}) UTC\\] The hostility level of the clan (${clanR}) \\((${nationR})\\) on the port (${portR}) \\((${nationR})\\) decreased to (${percentageR})%\\. The previous value was (${percentageR})% #HOCaribbean${portHashR}`,
+            "u"
         ),
+    // language=JSUnicodeRegexp
         portBattleRegex = new RegExp(
-            "[(d{2}-d{2}-d{4} d{2}:d{2}) UTC] The port battle for ([w' ]+) (([w ]+)) is scheduled for (d{1,2} w{3} d{4} d{2}:d{2}) UTC. Defender: (w+). Attacker: (w+) (([w ]+)). BR: d+ #PBCaribbean #PBCaribbeanw+ #NavalAction",
-            "mu"
+            `\\[(${timeR}) UTC\\] The port battle for (${portR}) \\((${nationR})\\) is scheduled for (${pbTimeR}) UTC\\. Defender: (${clanR})\\. Attacker: (${clanR}) \\((${nationR})\\)\\. BR: \\d+ #PBCaribbean #PBCaribbean${portHashR} #NavalAction`,
+            "u"
         );
     let result;
-    tweets.forEach(tweet => {
+
+    tweets.tweets.forEach(tweet => {
+        console.log("\n\ntweet ", tweet);
+        tweet.text.replace("\\\\", "").replace("'", "’");
+        // eslint-disable-next-line no-cond-assign
         if ((result = capturedRegex.exec(tweet.text)) !== null) {
             captured(result);
+            // eslint-disable-next-line no-cond-assign
         } else if ((result = defendedRegex.exec(tweet.text)) !== null) {
             defended(result);
+            // eslint-disable-next-line no-cond-assign
         } else if ((result = hostilityLevelUpRegex.exec(tweet.text)) !== null) {
             hostilityLevelUp(result);
+            // eslint-disable-next-line no-cond-assign
         } else if ((result = hostilityLevelDownRegex.exec(tweet.text)) !== null) {
             hostilityLevelDown(result);
+            // eslint-disable-next-line no-cond-assign
         } else if ((result = portBattleRegex.exec(tweet.text)) !== null) {
             portBattleScheduled(result);
         }
     });
-    saveJson(ports);
+    // saveJson(ports);
 }
 
 updatePorts();
