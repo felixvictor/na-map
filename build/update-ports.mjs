@@ -147,7 +147,7 @@ function updatePorts() {
           // noop
           () => {}
         } else {
-          throw new Error("\n\n***************************************\nUnmatched tweet \n" + tweet.text + "\n");
+          console.log("\n\n***************************************\nUnmatched tweet\n" + tweet.text + "\n");
         }
     });
     // saveJson(ports);
