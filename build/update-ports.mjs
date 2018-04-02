@@ -121,7 +121,9 @@ function updatePorts() {
             "u"
         ),
         checkDateRegex = new RegExp(`\\[(${timeR}) UTC\\]`, "u");
-    let result, tweetTime;
+    let result,
+        tweetTime,
+        isPortDataChanged = false;
     const serverStart = moment()
         .hour(11)
         .minute(0)
@@ -136,18 +138,23 @@ function updatePorts() {
         if (tweetTime.isAfter(serverStart)) {
             // eslint-disable-next-line no-cond-assign
             if ((result = capturedRegex.exec(tweet.text)) !== null) {
+                isPortDataChanged = true;
                 captured(result);
                 // eslint-disable-next-line no-cond-assign
             } else if ((result = defendedRegex.exec(tweet.text)) !== null) {
+                isPortDataChanged = true;
                 defended(result);
                 // eslint-disable-next-line no-cond-assign
             } else if ((result = hostilityLevelUpRegex.exec(tweet.text)) !== null) {
+                isPortDataChanged = true;
                 hostilityLevelUp(result);
                 // eslint-disable-next-line no-cond-assign
             } else if ((result = hostilityLevelDownRegex.exec(tweet.text)) !== null) {
+                isPortDataChanged = true;
                 hostilityLevelDown(result);
                 // eslint-disable-next-line no-cond-assign
             } else if ((result = portBattleRegex.exec(tweet.text)) !== null) {
+                isPortDataChanged = true;
                 portBattleScheduled(result);
             } else if ((result = gainHostilityRegex.exec(tweet.text)) !== null) {
                 // noop
@@ -160,8 +167,9 @@ function updatePorts() {
             }
         }
     });
-
-    saveJson(ports);
+    if (isPortDataChanged) {
+        saveJson(ports);
+    }
 }
 
 updatePorts();
