@@ -77,7 +77,7 @@
   },
   "scripts": {
     "clean": "rm -rf public/",
-    "change": "yarn run data-change && yarn run prod && yarn run push-change",
+    "change": "yarn run data-change && yarn run data-change-tweets && yarn run prod && yarn run push-change",
     "css-lint": "stylelint --config .stylelintrc --syntax scss \"src/scss/*.scss\"",
     "data-change": "build/port-data.sh change",
     "data-change-tweets": "build/port-data.sh twitter-change",
@@ -90,6 +90,7 @@
     "deploy-test": "yarn run change && yarn run deploy-netlify-test",
     "deploy-test2": "yarn run change && yarn run deploy-netlify-test2",
     "deploy-update": "yarn run update && yarn run deploy-netlify",
+    "deploy-update-tweets": "yarn run update-tweets && yarn run deploy-netlify",
     "js-lint": "eslint -c .eslintrc.json src/js",
     "make-tiles": "cp /mnt/na-map.tif src/images/map.tif && rm -rf src/images/map/ && node --experimental-modules build/make-tiles.mjs src/images/map.tif && rm src/images/map.tif",
     "prettier": "prettier --tab-width 4 --print-width 120 --write .eslintrc.json package.json *.js src/js/*.json src/scss/*.scss",
@@ -99,6 +100,7 @@
     "push-update": "build/port-data.sh push-update",
     "stylelint-check": "stylelint-config-prettier-check",
     "update": "yarn run data-update && yarn run prod-update && yarn run push-update",
+    "update-tweets": "yarn run data-update-tweets && yarn run prod-update && yarn run push-update",
     "watch": "yarn run clean && NODE_ENV=${NODE_ENV:=dev} webpack --watch --colors --config webpack.config.js",
     "dev": "yarn run clean && NODE_ENV=${NODE_ENV:=dev} webpack --colors --config webpack.config.js"
   },
