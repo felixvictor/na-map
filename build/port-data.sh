@@ -87,12 +87,12 @@ function deploy_data () {
 function update_twitter_data () {
     TWEETS_JSON="${BUILD_DIR}/API/tweets.json"
     PORT_FILE="${SRC_DIR}/eu1.json"
-    QUERY="/1.1/search/tweets.json?q=from:zz569k"
-    JQ_FORMAT="{ tweets: [ .statuses[] | { id: .id_str, text: .text } ], refresh: .search_metadata.max_id_str }"
+    QUERY="/1.1/search/tweets.json?q=from:zz569k&tweet_mode=extended&count=100&result_type=recent"
+    JQ_FORMAT="{ tweets: [ .statuses[] | { id: .id_str, text: .full_text } ], refresh: .search_metadata.max_id_str }"
 
     if [ -f "${TWEETS_JSON}" ]; then
         SINCE=$(${NODE} -pe 'JSON.parse(process.argv[1]).refresh' "$(cat "${TWEETS_JSON}")")
-        QUERY+="&since_id=${SINCE}"
+        #QUERY+="&since_id=${SINCE}"
     fi
     echo "${QUERY}"
     ${TWURL} "${QUERY}" | ${JQ} "${JQ_FORMAT}" > "${TWEETS_JSON}"
