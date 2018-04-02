@@ -2,7 +2,10 @@
 
 set -e
 
+JQ="$(command -v jq)"
 NODE="$(command -v node) --experimental-modules --no-warnings"
+TWURL="$(command -v twurl)"
+XZ="$(command -v xz)"
 SERVER_BASE_NAME="cleanopenworldprod"
 SOURCE_BASE_URL="http://storage.googleapis.com/nacleanopenworldprodshards/"
 # http://api.shipsofwar.net/servers?apikey=1ZptRtpXAyEaBe2SEp63To1aLmISuJj3Gxcl5ivl&callback=setActiveRealms
@@ -75,11 +78,31 @@ function get_port_data () {
         ${NODE} build/convert-ships.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${SHIP_FILE}" "${DATE}"
 
         ${NODE} build/create-xlsx.mjs "${SHIP_FILE}" "${EXCEL_FILE}"
+
+        for JSON in "${API_DIR}"/*.json; do
+            ${XZ} -9e "${JSON}"
+        done
+
     fi
 }
 
 function deploy_data () {
     yarn run deploy-update
+}
+
+function update_twitter_data () {
+    TWEETS_JSON="${BUILD_DIR}/API/tweets.json"
+    PORT_FILE="${SRC_DIR}/eu1.json"
+    QUERY="/1.1/search/tweets.json?q=from:zz569k&tweet_mode=extended&count=100&result_type=recent"
+    JQ_FORMAT="{ tweets: [ .statuses[] | { id: .id_str, text: .full_text } ], refresh: .search_metadata.max_id_str }"
+
+    if [ -f "${TWEETS_JSON}" ]; then
+        SINCE=$(${NODE} -pe 'JSON.parse(process.argv[1]).refresh' "$(cat "${TWEETS_JSON}")")
+        QUERY+="&since_id=${SINCE}"
+    fi
+    echo "${QUERY}"
+    ${TWURL} "${QUERY}" | ${JQ} "${JQ_FORMAT}" > "${TWEETS_JSON}"
+    ${NODE} build/update-ports.mjs "${PORT_FILE}" "${TWEETS_JSON}"
 }
 
 function change_var () {
@@ -144,5 +167,12 @@ case "$1" in
         update_var
         update_data
         ;;
+    twitter-update)
+        update_var
+        update_twitter_data
+        ;;
+    twitter-change)
+        change_var
+        update_twitter_data
+        ;;
 esac
-
