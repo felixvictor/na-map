@@ -53,6 +53,7 @@ export default class PortDisplay {
             .append("g")
             .classed("ports", true);
         this._gIncomeCircle = this._g.append("g");
+        this._gAlertCircle = this._g.append("g");
         this._gPortCircle = this._g.append("g").classed("port", true);
         this._gText = this._g.append("g");
     }
@@ -165,10 +166,20 @@ export default class PortDisplay {
                     depth: portProperties.shallow ? "Shallow" : "Deep",
                     countyCapital: portProperties.countyCapital ? " (county capital)" : "",
                     nonCapturable: portProperties.nonCapturable,
-                    // eslint-disable-next-line no-nested-ternary
                     captured: portProperties.capturer
-                        ? ` captured by ${portProperties.capturer} ${moment(portProperties.lastPortBattle).fromNow()}`
+                        ? ` captured by ${portProperties.capturer} ${moment
+                              .utc(portProperties.lastPortBattle)
+                              .fromNow()}`
                         : "",
+                    lastPortBattle: portProperties.lastPortBattle,
+                    // eslint-disable-next-line no-nested-ternary
+                    attack: !portProperties.attackerNation.length
+                        ? ""
+                        : `${portProperties.attackerClan} (${portProperties.attackerNation}) attacks${
+                              portProperties.attackHostility
+                                  ? `: ${formatPercent(portProperties.attackHostility)} hostility`
+                                  : ` ${moment.utc(portProperties.portBattle).fromNow()}`
+                          }`,
                     // eslint-disable-next-line no-nested-ternary
                     pbTimeRange: portProperties.nonCapturable
                         ? ""
@@ -217,6 +228,9 @@ export default class PortDisplay {
                 h += `<td><span class="port-name">${port.name}</span>`;
                 h += port.availableForAll ? " (accessible to all nations)" : "";
                 h += "</td></tr></tbody></table>";
+                if (port.attack.length) {
+                    h += `<div class="alert alert-danger mt-2" role="alert">${port.attack}</div>`;
+                }
                 h += `<p>${port.depth} water port ${port.countyCapital}${port.captured}<br>`;
                 if (!port.nonCapturable) {
                     h += `Port battle ${port.pbTimeRange}, ${port.brLimit} BR, `;
@@ -325,6 +339,31 @@ export default class PortDisplay {
 
         // Apply to both old and new
         circleUpdate.merge(circleEnter).attr("r", d => (d.id === this._highlightId ? circleSize * 2 : circleSize));
+    }
+
+    _updateAlertCircles() {
+        const data = this.portData.filter(d => d.properties.attackerNation.length);
+
+        // Data join
+        const circleUpdate = this._gAlertCircle.selectAll("circle").data(data, d => d.id);
+
+        // Remove old circles
+        circleUpdate.exit().remove();
+
+        // Update kept circles
+        // circleUpdate; // not needed
+
+        // Add new circles
+        const circleEnter = circleUpdate
+            .enter()
+            .append("circle")
+            .attr("cx", d => d.geometry.coordinates[0])
+            .attr("cy", d => d.geometry.coordinates[1]);
+
+        // Apply to both old and new
+        const r = this._circleSizes[this._zoomLevel] * this._maxRadiusFactor;
+        const circleMerge = circleUpdate.merge(circleEnter);
+        circleMerge.attr("class", "bubble neg").attr("r", r);
     }
 
     _updateIncomeCircles() {
@@ -458,6 +497,7 @@ export default class PortDisplay {
 
     update() {
         this._updatePortCircles();
+        this._updateAlertCircles();
         this._updateIncomeCircles();
         this.updateTexts();
         this._updateSummary();
