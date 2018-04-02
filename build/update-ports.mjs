@@ -28,7 +28,6 @@ function updatePorts() {
     }
 
     function captured(result) {
-        //    port => port.properties.name === result[2].replace("\", """)
         const i = ports.objects.ports.geometries.findIndex(findIndex, result[2]);
         const port = ports.objects.ports.geometries[i];
 
@@ -45,11 +44,11 @@ function updatePorts() {
     function defended(result) {
         const i = ports.objects.ports.geometries.findIndex(findIndex, result[2]);
         const port = ports.objects.ports.geometries[i];
-        console.log("      --- defended before ", port.properties);
+
+        console.log("      --- defended", i);
         port.properties.attackerNation = "";
         port.properties.attackerClan = "";
         port.properties.portBattle = "";
-        console.log("      --- defended after ", port.properties);
     }
 
     function hostilityLevelUp(result) {
@@ -65,64 +64,67 @@ function updatePorts() {
     function hostilityLevelDown(result) {
         const i = ports.objects.ports.geometries.findIndex(findIndex, result[4]);
         const port = ports.objects.ports.geometries[i];
-        console.log("      --- hostilityLevelDown before ", port.properties);
+
+      console.log("      --- hostilityLevelDown ", i);
         port.properties.attackerNation = result[3];
         port.properties.attackerClan = result[2];
         port.properties.attackHostility = result[6];
-        console.log("      --- hostilityLevelDown after ", port.properties);
     }
 
     function portBattleScheduled(result) {
         const i = ports.objects.ports.geometries.findIndex(findIndex, result[2]);
         const port = ports.objects.ports.geometries[i];
+
         console.log("      --- portBattleScheduled i ", i);
-        console.log("      --- portBattleScheduled date ", result);
-        console.log("      --- portBattleScheduled before ", port.properties);
         port.properties.attackerNation = result[7];
         port.properties.attackerClan = result[6];
         port.properties.attackHostility = "";
         port.properties.portBattle = moment(result[4], "DD MMM YYYY HH:mm UTC").format("YYYY-MM-DD HH:mm");
-        console.log("      --- portBattleScheduled after ", port.properties);
     }
 
     const portR = "[A-zÀ-ÿ’ -]+",
         portHashR = "[A-zÀ-ÿ]+",
         nationR = "[A-zÀ-ÿ -]+",
         clanR = "\\w+",
+        defenderR = "[\\w ]+",
         timeR = "\\d{2}-\\d{2}-\\d{4} \\d{2}:\\d{2}",
         pbTimeR = "\\d{1,2} \\w{3} \\d{4} \\d{2}:\\d{2}",
         percentageR = "\\d*\\.?\\d";
-    // language=JSUnicodeRegexp
-  // noinspection RegExpRedundantEscape
-  const capturedRegex = new RegExp(
-            `\\[(${timeR}) UTC\\] (${portR}) captured by (${clanR}) \\((${nationR})\\)\\. Previous owner: (${clanR}) \\((${nationR})\\) #PBCaribbean #PBCaribbean${portHashR}`,
+
+    // noinspection RegExpRedundantEscape
+    const capturedRegex = new RegExp(
+            `\\[(${timeR}) UTC\\] (${portR}) captured by (${clanR}) \\((${nationR})\\)\\. Previous owner: (${clanR})( \\(${nationR}\\))? #PBCaribbean #PBCaribbean${portHashR}`,
+            "u"
+        ),defendedRegex = new RegExp(
+            `\\[(${timeR}) UTC\\] (${portR}) defended by (${clanR})( \\(${nationR}\\))? against (${clanR}) \\((${nationR})\\) #PBCaribbean #PBCaribbean${portHashR}`,
             "u"
         ),
-    // language=JSUnicodeRegexp
-        defendedRegex = new RegExp(
-            `\\[(${timeR}) UTC\\] (${portR}) defended by (${clanR}) \\((${nationR})\\) against (${clanR}) \\((${nationR})\\) #PBCaribbean #PBCaribbean${portHashR}`,
-            "u"
-        ),
-    // language=JSUnicodeRegexp
         hostilityLevelUpRegex = new RegExp(
             `\\[(${timeR}) UTC\\] The hostility level of the clan (${clanR}) \\((${nationR})\\) on the port (${portR}) \\((${nationR})\\) increased to (${percentageR})%\\. The previous value was (${percentageR})% #HOCaribbean${portHashR}`,
             "u"
         ),
-    // language=JSUnicodeRegexp
         hostilityLevelDownRegex = new RegExp(
             `\\[(${timeR}) UTC\\] The hostility level of the clan (${clanR}) \\((${nationR})\\) on the port (${portR}) \\((${nationR})\\) decreased to (${percentageR})%\\. The previous value was (${percentageR})% #HOCaribbean${portHashR}`,
             "u"
         ),
-    // language=JSUnicodeRegexp
         portBattleRegex = new RegExp(
-            `\\[(${timeR}) UTC\\] The port battle for (${portR}) \\((${nationR})\\) is scheduled for (${pbTimeR}) UTC\\. Defender: (${clanR})\\. Attacker: (${clanR}) \\((${nationR})\\)\\. BR: \\d+ #PBCaribbean #PBCaribbean${portHashR} #NavalAction`,
+            `\\[(${timeR}) UTC\\] The port battle for (${portR}) \\((${nationR})\\) is scheduled for (${pbTimeR}) UTC\\. Defender: (${defenderR})\\. Attacker: (${clanR}) \\((${nationR})\\)\\. BR: \\d+ #PBCaribbean #PBCaribbean${portHashR} #NavalAction`,
+            "u"
+        ),
+        rumorRegex = new RegExp(
+            `\\[(${timeR}) UTC\\] Rumour has it that a great storm has destroyed a large fleet in the West Indies`,
+            "u"
+        ),
+        gainHostilityRegex = new RegExp(
+            `\\[(${timeR}) UTC\\] The port (${portR}) \\((${nationR})\\) can gain hostility`,
             "u"
         );
     let result;
 
     tweets.tweets.forEach(tweet => {
-        console.log("\n\ntweet ", tweet);
-        tweet.text.replace("\\\\", "").replace("'", "’");
+      tweet.text=tweet.text.replace("'", "’");
+
+      console.log("\n\ntweet", tweet.text);
         // eslint-disable-next-line no-cond-assign
         if ((result = capturedRegex.exec(tweet.text)) !== null) {
             captured(result);
@@ -138,6 +140,14 @@ function updatePorts() {
             // eslint-disable-next-line no-cond-assign
         } else if ((result = portBattleRegex.exec(tweet.text)) !== null) {
             portBattleScheduled(result);
+        } else if ((result = gainHostilityRegex.exec(tweet.text)) !== null) {
+          // noop
+          () => {}
+        } else if ((result = rumorRegex.exec(tweet.text)) !== null) {
+          // noop
+          () => {}
+        } else {
+          throw new Error("\n\n***************************************\nUnmatched tweet \n" + tweet.text + "\n");
         }
     });
     // saveJson(ports);
