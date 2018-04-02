@@ -92,7 +92,7 @@ function update_twitter_data () {
 
     if [ -f "${TWEETS_JSON}" ]; then
         SINCE=$(${NODE} -pe 'JSON.parse(process.argv[1]).refresh' "$(cat "${TWEETS_JSON}")")
-        #QUERY+="&since_id=${SINCE}"
+        QUERY+="&since_id=${SINCE}"
     fi
     echo "${QUERY}"
     ${TWURL} "${QUERY}" | ${JQ} "${JQ_FORMAT}" > "${TWEETS_JSON}"
