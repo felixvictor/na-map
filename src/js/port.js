@@ -27,9 +27,15 @@ export default class PortDisplay {
         this._highlightDuration = 200;
         this._iconSize = 50;
         this._circleSizes = { initial: 50, portLabel: 20, pbZone: 5 };
-        this._showRadiusType = "noShow";
+        this._showRadiusType = "attack";
         this._taxIncomeRadius = d3.scaleLinear();
         this._netIncomeRadius = d3.scaleLinear();
+        this._attackRadius = d3.scaleLinear().domain([0, 1]);
+        this._colourScale = d3
+            .scaleLinear()
+            .domain([0, 1])
+            .range(["#fbf8f5", "#a62e39"]);
+
         this._minRadiusFactor = 1;
         this._maxRadiusFactor = 6;
 
@@ -52,9 +58,8 @@ export default class PortDisplay {
             .select("#na-svg")
             .append("g")
             .classed("ports", true);
-        this._gIncomeCircle = this._g.append("g");
-        this._gAlertCircle = this._g.append("g");
         this._gPortCircle = this._g.append("g").classed("port", true);
+        this._gIcon = this._g.append("g");
         this._gText = this._g.append("g");
     }
 
@@ -156,7 +161,7 @@ export default class PortDisplay {
         });
     }
 
-    _updatePortCircles() {
+    _updateIcons() {
         function showDetails(d, i, nodes) {
             function getText(portProperties) {
                 const port = {
@@ -176,9 +181,11 @@ export default class PortDisplay {
                     attack: !portProperties.attackerNation.length
                         ? ""
                         : `${portProperties.attackerClan} (${portProperties.attackerNation}) attacks${
-                              portProperties.attackHostility
-                                  ? `: ${formatPercent(portProperties.attackHostility)} hostility`
-                                  : ` ${moment.utc(portProperties.portBattle).fromNow()}`
+                              portProperties.portBattle.length
+                                  ? ` at ${moment.utc(portProperties.portBattle).format("HH.MM")} (${moment
+                                        .utc(portProperties.portBattle)
+                                        .fromNow()})`
+                                  : `: ${formatPercent(portProperties.attackHostility)} hostility`
                           }`,
                     // eslint-disable-next-line no-nested-ternary
                     pbTimeRange: portProperties.nonCapturable
@@ -316,7 +323,7 @@ export default class PortDisplay {
         const circleSize = this._circleSizes[this._zoomLevel];
 
         // Data join
-        const circleUpdate = this._gPortCircle.selectAll("circle").data(this.portData, d => d.id);
+        const circleUpdate = this._gIcon.selectAll("circle").data(this.portData, d => d.id);
 
         // Remove old circles
         circleUpdate.exit().remove();
@@ -341,38 +348,17 @@ export default class PortDisplay {
         circleUpdate.merge(circleEnter).attr("r", d => (d.id === this._highlightId ? circleSize * 2 : circleSize));
     }
 
-    _updateAlertCircles() {
-        const data = this.portData.filter(d => d.properties.attackerNation.length);
-
-        // Data join
-        const circleUpdate = this._gAlertCircle.selectAll("circle").data(data, d => d.id);
-
-        // Remove old circles
-        circleUpdate.exit().remove();
-
-        // Update kept circles
-        // circleUpdate; // not needed
-
-        // Add new circles
-        const circleEnter = circleUpdate
-            .enter()
-            .append("circle")
-            .attr("cx", d => d.geometry.coordinates[0])
-            .attr("cy", d => d.geometry.coordinates[1]);
-
-        // Apply to both old and new
-        const r = this._circleSizes[this._zoomLevel] * this._maxRadiusFactor;
-        const circleMerge = circleUpdate.merge(circleEnter);
-        circleMerge.attr("class", "bubble neg").attr("r", r);
-    }
-
-    _updateIncomeCircles() {
+    _updatePortCircles() {
+        const rMin = this._circleSizes[this._zoomLevel] * this._minRadiusFactor,
+            rMax = this._circleSizes[this._zoomLevel] * this._maxRadiusFactor;
         let data = {};
-        if (this._showRadiusType !== "noShow") {
+        if (this._showRadiusType === "taxIncome" || this._showRadiusType === "netIncome") {
             data = this.portData.filter(d => !d.properties.nonCapturable);
+        } else if (this._showRadiusType === "attack") {
+            data = this.portData.filter(d => d.properties.attackerNation.length);
         }
         // Data join
-        const circleUpdate = this._gIncomeCircle.selectAll("circle").data(data, d => d.id);
+        const circleUpdate = this._gPortCircle.selectAll("circle").data(data, d => d.id);
 
         // Remove old circles
         circleUpdate.exit().remove();
@@ -394,10 +380,7 @@ export default class PortDisplay {
                 maxTaxIncome = d3.max(data, d => d.properties.taxIncome);
 
             this._taxIncomeRadius.domain([minTaxIncome, maxTaxIncome]);
-            this._taxIncomeRadius.range([
-                this._circleSizes[this._zoomLevel] * this._minRadiusFactor,
-                this._circleSizes[this._zoomLevel] * this._maxRadiusFactor
-            ]);
+            this._taxIncomeRadius.range([rMin, rMax]);
             circleMerge
                 .attr("class", "bubble pos")
                 .attr("r", d => this._taxIncomeRadius(Math.abs(d.properties.taxIncome)));
@@ -405,15 +388,16 @@ export default class PortDisplay {
             const minNetIncome = d3.min(data, d => d.properties.netIncome),
                 maxNetIncome = d3.max(data, d => d.properties.netIncome);
 
-            this._netIncomeRadius
-                .domain([minNetIncome, maxNetIncome])
-                .range([
-                    this._circleSizes[this._zoomLevel] * this._minRadiusFactor,
-                    this._circleSizes[this._zoomLevel] * this._maxRadiusFactor
-                ]);
+            this._netIncomeRadius.domain([minNetIncome, maxNetIncome]).range([rMin, rMax]);
             circleMerge
                 .attr("class", d => (d.properties.netIncome < 0 ? "bubble neg" : "bubble pos"))
                 .attr("r", d => this._netIncomeRadius(Math.abs(d.properties.netIncome)));
+        } else if (this._showRadiusType === "attack") {
+            this._attackRadius.range([rMin, rMax]);
+            circleMerge
+                .attr("class", "bubble")
+                .attr("fill", d => this._colourScale(d.properties.attackHostility))
+                .attr("r", d => this._attackRadius(d.properties.attackHostility));
         }
     }
 
@@ -496,9 +480,8 @@ export default class PortDisplay {
     }
 
     update() {
+        this._updateIcons();
         this._updatePortCircles();
-        this._updateAlertCircles();
-        this._updateIncomeCircles();
         this.updateTexts();
         this._updateSummary();
     }

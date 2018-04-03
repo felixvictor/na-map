@@ -14,7 +14,7 @@
     <meta content="images/icons/browserconfig.xml" name="msapplication-config">
 
     <script src="https://www.googletagmanager.com/gtag/js?id=UA-109520372-1" async></script>
-<link href="na-map.min.css?ba61148e8339f6386464" rel="stylesheet"></head>
+<link href="na-map.min.css?325d2d47730ae755e782" rel="stylesheet"></head>
 <body>
 
 <nav class="bg-light fixed-top navbar navbar-expand-lg navbar-light">
@@ -247,8 +247,12 @@
                     </div>
 
                     <div class="dropdown-divider"></div>
-                    <h6 class="dropdown-header">Income per port</h6>
+                    <h6 class="dropdown-header">Show per port</h6>
                     <div class="align-self-center col-auto ml-1 radio-group" id="radius-type">
+                        <div class="custom-control custom-control-inline custom-radio">
+                            <input class="custom-control-input" id="radiusAttack" type="radio" name="showRadiusType" value="attack" checked>
+                            <label for="radiusAttack" class="custom-control-label">Current attacks</label>
+                        </div>
                         <div class="custom-control custom-control-inline custom-radio">
                             <input class="custom-control-input" id="radiusTaxIncome" type="radio" name="showRadiusType" value="taxIncome">
                             <label for="radiusTaxIncome" class="custom-control-label">Tax income</label>
@@ -258,14 +262,14 @@
                             <label for="radiusNetIncome" class="custom-control-label">Net income</label>
                         </div>
                         <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="radiusNoShow" type="radio" name="showRadiusType" value="noShow" checked>
+                            <input class="custom-control-input" id="radiusNoShow" type="radio" name="showRadiusType" value="noShow">
                             <label for="radiusNoShow" class="custom-control-label">Off</label>
                         </div>
                     </div>
 
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Double click to</h6>
-                    <div class="ml-1 radio-group" id="double-click-action">
+                    <div class="ml-1 radio-group mr-1" id="double-click-action">
                         <div class="align-self-center col-auto">
                             <div class="custom-control custom-control-inline custom-radio">
                                 <input class="custom-control-input" id="compass" type="radio" name="mouseFunction" value="compass" checked>
@@ -291,7 +295,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <header class="modal-header">
-                <h3>Naval Action map <span class="small text-primary">v3.3.1</span></h3>
+                <h3>Naval Action map <span class="small text-primary">v4</span></h3>
             </header>
             <div class="modal-body">
                 <p>Yet another map which uses the in-game map and live data (daily updated soonish after maintenance).
@@ -345,5 +349,5 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.slim.min.js" crossorigin="anonymous" integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E="></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.13.0/d3.min.js" crossorigin="anonymous" integrity="sha256-hYXbQJK4qdJiAeDVjjQ9G0D6A0xLnDQ4eJI9dkm7Fpk="></script>
-<script src="na-map.min.js?ba61148e8339f6386464" type="text/javascript"></script></body>
+<script src="na-map.min.js?325d2d47730ae755e782" type="text/javascript"></script></body>
 </html>
