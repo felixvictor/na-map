@@ -246,6 +246,31 @@
                 <div class="dropdown-menu dropdown-menu-right large-width" id="settingsMenu"
                      aria-labelledby="settingsDropdown">
 
+                    <h6 class="dropdown-header">Show per port</h6>
+                    <div class="col-auto align-self-center radio-group ml-1" id="radius-type">
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input"
+                                   name="showRadiusType" id="radiusAttack" value="attack" checked>
+                            <label class="custom-control-label" for="radiusAttack">Attack</label>
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input"
+                                   name="showRadiusType" id="radiusTaxIncome" value="taxIncome">
+                            <label class="custom-control-label" for="radiusTaxIncome">Tax income</label>
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input"
+                                   name="showRadiusType" id="radiusNetIncome" value="netIncome">
+                            <label class="custom-control-label" for="radiusNetIncome">Net income</label>
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input"
+                                   name="showRadiusType" id="radiusNoShow" value="noShow">
+                            <label class="custom-control-label" for="radiusNoShow">Off</label>
+                        </div>
+                    </div>
+
+                    <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Port battle zones</h6>
                     <div class="col-auto align-self-center radio-group ml-1" id="show-pb">
                         <div class="custom-control custom-radio custom-control-inline">
@@ -282,28 +307,8 @@
                     </div>
 
                     <div class="dropdown-divider"></div>
-                    <h6 class="dropdown-header">Income per port</h6>
-                    <div class="col-auto align-self-center radio-group ml-1" id="radius-type">
-                        <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input"
-                                   name="showRadiusType" id="radiusTaxIncome" value="taxIncome">
-                            <label class="custom-control-label" for="radiusTaxIncome">Tax income</label>
-                        </div>
-                        <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input"
-                                   name="showRadiusType" id="radiusNetIncome" value="netIncome">
-                            <label class="custom-control-label" for="radiusNetIncome">Net income</label>
-                        </div>
-                        <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input"
-                                   name="showRadiusType" id="radiusNoShow" value="noShow" checked>
-                            <label class="custom-control-label" for="radiusNoShow">Off</label>
-                        </div>
-                    </div>
-
-                    <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Double click to</h6>
-                    <div id="double-click-action" class="radio-group ml-1">
+                    <div id="double-click-action" class="radio-group ml-1 mr-1">
                         <div class="col-auto align-self-center">
                             <div class="custom-control custom-radio custom-control-inline">
                                 <input type="radio" class="custom-control-input" name="mouseFunction" id="compass"
