@@ -43,7 +43,15 @@ function get_API_data () {
 }
 
 function get_git_update () {
-    git pull
+    # pull if needed
+    # https://stackoverflow.com/questions/3258243/check-if-pull-needed-in-git/25109122
+    git remote update &> /dev/null
+    LOCAL=$(git rev-parse @)
+    BASE=$(git merge-base @ "@{u}")
+
+    if [ ${LOCAL} -eq ${BASE} ]; then
+        git pull
+    fi
 }
 
 function update_yarn () {
@@ -133,11 +141,16 @@ function update_ports () {
 
 function update_tweets () {
     get_tweets
-    if update_ports; then
+    if ! update_ports; then
         echo "In update_tweets: update_ports is true"
         push_data
         deploy_data
     fi
+}
+
+function change_tweets () {
+    get_tweets
+    update_ports
 }
 
 #####
@@ -201,6 +214,6 @@ case "$1" in
     twitter-change)
         change_var
         remove_tweets
-        update_tweets
+        change_tweets
         ;;
 esac
