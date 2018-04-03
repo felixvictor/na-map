@@ -58,8 +58,8 @@ export default class PortDisplay {
             .select("#na-svg")
             .append("g")
             .classed("ports", true);
-        this._gPortCircle = this._g.append("g").classed("port", true);
-        this._gIcon = this._g.append("g");
+        this._gPortCircle = this._g.append("g");
+        this._gIcon = this._g.append("g").classed("port", true);
         this._gText = this._g.append("g");
     }
 
@@ -182,9 +182,9 @@ export default class PortDisplay {
                         ? ""
                         : `${portProperties.attackerClan} (${portProperties.attackerNation}) attacks${
                               portProperties.portBattle.length
-                                  ? ` at ${moment.utc(portProperties.portBattle).format("HH.MM")} (${moment
-                                        .utc(portProperties.portBattle)
-                                        .fromNow()})`
+                                  ? ` ${moment.utc(portProperties.portBattle).fromNow()} at ${moment(
+                                        portProperties.portBattle
+                                    ).format("H.mm")}`
                                   : `: ${formatPercent(portProperties.attackHostility)} hostility`
                           }`,
                     // eslint-disable-next-line no-nested-ternary

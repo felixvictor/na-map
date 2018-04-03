@@ -14,7 +14,7 @@
     <meta content="images/icons/browserconfig.xml" name="msapplication-config">
 
     <script src="https://www.googletagmanager.com/gtag/js?id=UA-109520372-1" async></script>
-<link href="na-map.min.css?325d2d47730ae755e782" rel="stylesheet"></head>
+<link href="na-map.min.css?9f3213954eaca3c7fadf" rel="stylesheet" crossorigin="anonymous" integrity="sha256-j2PUU2YypAxM23AI3x8OukqvTyro7bZaDgZ9eLfbvr0= sha384-seLomQhO4+KOIkBXiW1ee3iTvr82RuCUdO9miARGY/36zTcKLoQB2HNtZzaQojUU"></head>
 <body>
 
 <nav class="bg-light fixed-top navbar navbar-expand-lg navbar-light">
@@ -216,6 +216,27 @@
                 </a>
                 <div class="dropdown-menu dropdown-menu-right large-width" id="settingsMenu" aria-labelledby="settingsDropdown">
 
+                    <h6 class="dropdown-header">Show per port</h6>
+                    <div class="align-self-center col-auto ml-1 radio-group" id="radius-type">
+                        <div class="custom-control custom-control-inline custom-radio">
+                            <input class="custom-control-input" id="radiusAttack" type="radio" name="showRadiusType" value="attack" checked>
+                            <label for="radiusAttack" class="custom-control-label">Attack</label>
+                        </div>
+                        <div class="custom-control custom-control-inline custom-radio">
+                            <input class="custom-control-input" id="radiusTaxIncome" type="radio" name="showRadiusType" value="taxIncome">
+                            <label for="radiusTaxIncome" class="custom-control-label">Tax income</label>
+                        </div>
+                        <div class="custom-control custom-control-inline custom-radio">
+                            <input class="custom-control-input" id="radiusNetIncome" type="radio" name="showRadiusType" value="netIncome">
+                            <label for="radiusNetIncome" class="custom-control-label">Net income</label>
+                        </div>
+                        <div class="custom-control custom-control-inline custom-radio">
+                            <input class="custom-control-input" id="radiusNoShow" type="radio" name="showRadiusType" value="noShow">
+                            <label for="radiusNoShow" class="custom-control-label">Off</label>
+                        </div>
+                    </div>
+
+                    <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Port battle zones</h6>
                     <div class="align-self-center col-auto ml-1 radio-group" id="show-pb">
                         <div class="custom-control custom-control-inline custom-radio">
@@ -243,27 +264,6 @@
                         <div class="custom-control custom-control-inline custom-radio">
                             <input class="custom-control-input" id="teleportNoShow" type="radio" name="showTeleport" value="noShow" checked>
                             <label for="teleportNoShow" class="custom-control-label">Off</label>
-                        </div>
-                    </div>
-
-                    <div class="dropdown-divider"></div>
-                    <h6 class="dropdown-header">Show per port</h6>
-                    <div class="align-self-center col-auto ml-1 radio-group" id="radius-type">
-                        <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="radiusAttack" type="radio" name="showRadiusType" value="attack" checked>
-                            <label for="radiusAttack" class="custom-control-label">Current attacks</label>
-                        </div>
-                        <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="radiusTaxIncome" type="radio" name="showRadiusType" value="taxIncome">
-                            <label for="radiusTaxIncome" class="custom-control-label">Tax income</label>
-                        </div>
-                        <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="radiusNetIncome" type="radio" name="showRadiusType" value="netIncome">
-                            <label for="radiusNetIncome" class="custom-control-label">Net income</label>
-                        </div>
-                        <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="radiusNoShow" type="radio" name="showRadiusType" value="noShow">
-                            <label for="radiusNoShow" class="custom-control-label">Off</label>
                         </div>
                     </div>
 
@@ -349,5 +349,5 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.slim.min.js" crossorigin="anonymous" integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E="></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.13.0/d3.min.js" crossorigin="anonymous" integrity="sha256-hYXbQJK4qdJiAeDVjjQ9G0D6A0xLnDQ4eJI9dkm7Fpk="></script>
-<script src="na-map.min.js?325d2d47730ae755e782" type="text/javascript"></script></body>
+<script src="na-map.min.js?9f3213954eaca3c7fadf" crossorigin="anonymous" integrity="sha256-bkPh9vl608qFZi6mnS1R4xjXH5NZupaQtqdWyaZLoFc= sha384-oojl5B9wpTlcADqOYDhkalGxvbHXmz5SyJeS3OxuAsZiI70LMm71ezQMGHwZygoY" type="text/javascript"></script></body>
 </html>

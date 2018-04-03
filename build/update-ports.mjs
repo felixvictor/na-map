@@ -196,4 +196,4 @@ function updatePorts() {
     return isPortDataChanged;
 }
 
-process.exit(!updatePorts());
+process.exitCode = !updatePorts();
