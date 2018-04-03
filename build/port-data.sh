@@ -141,7 +141,7 @@ function update_ports () {
 
 function update_tweets () {
     get_tweets
-    if ! update_ports; then
+    if update_ports; then
         echo "In update_tweets: update_ports is true"
         push_data
         deploy_data
