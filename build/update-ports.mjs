@@ -1,4 +1,3 @@
-/* eslint-disable */
 /*
     update-ports.mjs
 */
@@ -38,6 +37,7 @@ function updatePorts() {
         port.properties.lastPortBattle = moment(result[1], "DD-MM-YYYY HH:mm").format("YYYY-MM-DD HH:mm");
         port.properties.attackerNation = "";
         port.properties.attackerClan = "";
+        port.properties.attackHostility = "";
         port.properties.portBattle = "";
     }
 
@@ -48,6 +48,7 @@ function updatePorts() {
         console.log("      --- defended", i);
         port.properties.attackerNation = "";
         port.properties.attackerClan = "";
+        port.properties.attackHostility = "";
         port.properties.portBattle = "";
     }
 
@@ -56,7 +57,9 @@ function updatePorts() {
         const port = ports.objects.ports.geometries[i];
 
         console.log("      --- hostilityLevelUp ", i);
+        // eslint-disable-next-line prefer-destructuring
         port.properties.attackerNation = result[3];
+        // eslint-disable-next-line prefer-destructuring
         port.properties.attackerClan = result[2];
         port.properties.attackHostility = result[6] / 100;
     }
@@ -66,7 +69,9 @@ function updatePorts() {
         const port = ports.objects.ports.geometries[i];
 
         console.log("      --- hostilityLevelDown ", i);
+        // eslint-disable-next-line prefer-destructuring
         port.properties.attackerNation = result[3];
+        // eslint-disable-next-line prefer-destructuring
         port.properties.attackerClan = result[2];
         port.properties.attackHostility = result[6] / 100;
     }
@@ -76,9 +81,11 @@ function updatePorts() {
         const port = ports.objects.ports.geometries[i];
 
         console.log("      --- portBattleScheduled i ", i);
+        // eslint-disable-next-line prefer-destructuring
         port.properties.attackerNation = result[7];
+        // eslint-disable-next-line prefer-destructuring
         port.properties.attackerClan = result[6];
-        port.properties.attackHostility = "";
+        port.properties.attackHostility = 1;
         port.properties.portBattle = moment(result[4], "DD MMM YYYY HH:mm").format("YYYY-MM-DD HH:mm");
     }
 
@@ -123,13 +130,18 @@ function updatePorts() {
         checkDateRegex = new RegExp(`\\[(${timeR}) UTC\\]`, "u");
     let result,
         tweetTime,
-        isPortDataChanged = false;
-    const serverStart = moment()
-        .hour(11)
-        .minute(0)
-        .format("YYYY-MM-DD HH:mm");
+        isPortDataChanged = false,
+        serverStart = moment()
+            .hour(11)
+            .minute(0)
+            .format("YYYY-MM-DD HH:mm");
+    // adjust reference server time is needed
+    if (moment.utc().isBefore(serverStart)) {
+        serverStart = moment(serverStart).subtract(1, "day");
+    }
 
     tweets.tweets.reverse().forEach(tweet => {
+        // eslint-disable-next-line no-param-reassign
         tweet.text = tweet.text.replace("'", "’");
         console.log("\n\ntweet", tweet.text);
 
@@ -156,20 +168,32 @@ function updatePorts() {
             } else if ((result = portBattleRegex.exec(tweet.text)) !== null) {
                 isPortDataChanged = true;
                 portBattleScheduled(result);
+                // eslint-disable-next-line no-cond-assign
             } else if ((result = gainHostilityRegex.exec(tweet.text)) !== null) {
                 // noop
+                // eslint-disable-next-line no-unused-expressions
                 () => {};
+                // eslint-disable-next-line no-cond-assign
             } else if ((result = rumorRegex.exec(tweet.text)) !== null) {
                 // noop
+                // eslint-disable-next-line no-unused-expressions
                 () => {};
             } else {
-                console.log("\n\n***************************************\nUnmatched tweet\n" + tweet.text + "\n");
+                console.log(`\n\n***************************************\nUnmatched tweet\n${tweet.text}\n`);
+            }
+        } else if (tweetTime.isAfter(moment(serverStart).subtract(1, "day"))) {
+            // Add scheduled port battles
+            // eslint-disable-next-line no-cond-assign
+            if ((result = portBattleRegex.exec(tweet.text)) !== null) {
+                isPortDataChanged = true;
+                portBattleScheduled(result);
             }
         }
     });
     if (isPortDataChanged) {
         saveJson(ports);
     }
+    return isPortDataChanged;
 }
 
-updatePorts();
+process.exit(!updatePorts());

@@ -14,6 +14,23 @@ API_VARS=(ItemTemplates Ports Shops)
 DATE=$(date +%Y-%m-%d)
 LAST_DATE=$(date +%Y-%m-%d --date "-1 day")
 
+function change_var () {
+    BASE_DIR="$(pwd)"
+    export BASE_DIR
+    export BUILD_DIR="${BASE_DIR}/build"
+    export SRC_DIR="${BASE_DIR}/src"
+    export LAST_UPDATE_FILE="${BUILD_DIR}/.last-port-update"
+    export TWEETS_JSON="${BUILD_DIR}/API/tweets.json"
+}
+
+function update_var () {
+    export BASE_DIR="/home/natopo/na-topo.git"
+    export BUILD_DIR="${BASE_DIR}/build"
+    export SRC_DIR="${BASE_DIR}/src"
+    export LAST_UPDATE_FILE="${BUILD_DIR}/.last-port-update"
+    export TWEETS_JSON="${BUILD_DIR}/API/tweets.json"
+}
+
 function get_API_data () {
     SERVER_NAME="$1"
     OUT_FILE="$2"
@@ -52,7 +69,6 @@ function test_for_update () {
 function get_port_data () {
     API_DIR="${BUILD_DIR}/API"
     API_BASE_FILE="${API_DIR}/api"
-    TWEETS_JSON="${BUILD_DIR}/API/tweets.json"
     SHIP_FILE="${SRC_DIR}/ships.json"
     EXCEL_FILE="${SRC_DIR}/port-battle.xlsx"
 
@@ -93,14 +109,10 @@ function deploy_data () {
 }
 
 function remove_tweets () {
-    TWEETS_JSON="${BUILD_DIR}/API/tweets.json"
-
     rm -f "${TWEETS_JSON}"
 }
 
-function update_tweets () {
-    TWEETS_JSON="${BUILD_DIR}/API/tweets.json"
-    PORT_FILE="${SRC_DIR}/eu1.json"
+function get_tweets () {
     QUERY="/1.1/search/tweets.json?q=from:zz569k&tweet_mode=extended&count=100&result_type=recent"
     JQ_FORMAT="{ tweets: [ .statuses[] | { id: .id_str, text: .full_text } ], refresh: .search_metadata.max_id_str }"
 
@@ -108,24 +120,24 @@ function update_tweets () {
         SINCE=$(${NODE} -pe 'JSON.parse(process.argv[1]).refresh' "$(cat "${TWEETS_JSON}")")
         QUERY+="&since_id=${SINCE}"
     fi
-    echo "${QUERY}"
     ${TWURL} "${QUERY}" | ${JQ} "${JQ_FORMAT}" > "${TWEETS_JSON}"
+}
+
+function update_ports () {
+    PORT_FILE="${SRC_DIR}/eu1.json"
+
     ${NODE} build/update-ports.mjs "${PORT_FILE}" "${TWEETS_JSON}"
+
+    return $?
 }
 
-function change_var () {
-    BASE_DIR="$(pwd)"
-    export BASE_DIR
-    export BUILD_DIR="${BASE_DIR}/build"
-    export SRC_DIR="${BASE_DIR}/src"
-    export LAST_UPDATE_FILE="${BUILD_DIR}/.last-port-update"
-}
-
-function update_var () {
-    export BASE_DIR="/home/natopo/na-topo.git"
-    export BUILD_DIR="${BASE_DIR}/build"
-    export SRC_DIR="${BASE_DIR}/src"
-    export LAST_UPDATE_FILE="${BUILD_DIR}/.last-port-update"
+function update_tweets () {
+    get_tweets
+    if update_ports; then
+        echo "In update_tweets: update_ports is true"
+        push_data
+        deploy_data
+    fi
 }
 
 #####
@@ -147,12 +159,19 @@ function push_data () {
 function update_data () {
     cd ${BASE_DIR}
     # If file not exists create it with date of last commit
-    [[ ! -f "${LAST_UPDATE_FILE}" ]] && touch -d "$(git log -1 --format=%cI)" "${LAST_UPDATE_FILE}"
+    if [[ ! -f "${LAST_UPDATE_FILE}" ]]; then
+        touch -d "$(git log -1 --format=%cI)" "${LAST_UPDATE_FILE}"
+    fi
     LAST_UPDATE=$(date --reference="${LAST_UPDATE_FILE}" +%Y-%m-%d)
     if [ "${LAST_UPDATE}" != "${DATE}" ]; then
         update_yarn
         get_git_update
         get_port_data
+
+        remove_tweets
+        get_tweets
+        update_ports
+
         push_data
         deploy_data
     fi
