@@ -60,6 +60,7 @@ function get_git_update () {
 
 function update_yarn () {
     #yarn --silent
+    :
 }
 
 function test_for_update () {
