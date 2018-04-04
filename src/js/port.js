@@ -34,7 +34,7 @@ export default class PortDisplay {
         this._colourScale = d3
             .scaleLinear()
             .domain([0, 1])
-            .range(["#fbf8f5", "#a62e39"]);
+            .range(["#8b989c", "#a62e39"]);
 
         this._minRadiusFactor = 1;
         this._maxRadiusFactor = 6;
@@ -178,15 +178,15 @@ export default class PortDisplay {
                         : "",
                     lastPortBattle: portProperties.lastPortBattle,
                     // eslint-disable-next-line no-nested-ternary
-                    attack: !portProperties.attackerNation.length
-                        ? ""
-                        : `${portProperties.attackerClan} (${portProperties.attackerNation}) attacks${
+                    attack: portProperties.attackHostility
+                        ? `${portProperties.attackerClan} (${portProperties.attackerNation}) attacks${
                               portProperties.portBattle.length
                                   ? ` ${moment.utc(portProperties.portBattle).fromNow()} at ${moment(
                                         portProperties.portBattle
                                     ).format("H.mm")}`
                                   : `: ${formatPercent(portProperties.attackHostility)} hostility`
-                          }`,
+                          }`
+                        : "",
                     // eslint-disable-next-line no-nested-ternary
                     pbTimeRange: portProperties.nonCapturable
                         ? ""
@@ -355,8 +355,9 @@ export default class PortDisplay {
         if (this._showRadiusType === "taxIncome" || this._showRadiusType === "netIncome") {
             data = this.portData.filter(d => !d.properties.nonCapturable);
         } else if (this._showRadiusType === "attack") {
-            data = this.portData.filter(d => d.properties.attackerNation.length);
+            data = this.portData.filter(d => d.properties.attackHostility);
         }
+
         // Data join
         const circleUpdate = this._gPortCircle.selectAll("circle").data(data, d => d.id);
 
