@@ -20,6 +20,8 @@ function change_var () {
     export BUILD_DIR="${BASE_DIR}/build"
     export SRC_DIR="${BASE_DIR}/src"
     export LAST_UPDATE_FILE="${BUILD_DIR}/.last-port-update"
+    export SHIP_FILE="${SRC_DIR}/ships.json"
+    export EXCEL_FILE="${SRC_DIR}/port-battle.xlsx"
     export TWEETS_JSON="${BUILD_DIR}/API/tweets.json"
 }
 
@@ -28,6 +30,8 @@ function update_var () {
     export BUILD_DIR="${BASE_DIR}/build"
     export SRC_DIR="${BASE_DIR}/src"
     export LAST_UPDATE_FILE="${BUILD_DIR}/.last-port-update"
+    export SHIP_FILE="${SRC_DIR}/ships.json"
+    export EXCEL_FILE="${SRC_DIR}/port-battle.xlsx"
     export TWEETS_JSON="${BUILD_DIR}/API/tweets.json"
 }
 
@@ -49,13 +53,14 @@ function get_git_update () {
     LOCAL=$(git rev-parse @)
     BASE=$(git merge-base @ "@{u}")
 
-    if [ ${LOCAL} -eq ${BASE} ]; then
+    if [ ${LOCAL} == ${BASE} ]; then
         git pull
     fi
 }
 
 function update_yarn () {
-    yarn --silent
+    #yarn --silent
+    :
 }
 
 function test_for_update () {
@@ -77,8 +82,6 @@ function test_for_update () {
 function get_port_data () {
     API_DIR="${BUILD_DIR}/API"
     API_BASE_FILE="${API_DIR}/api"
-    SHIP_FILE="${SRC_DIR}/ships.json"
-    EXCEL_FILE="${SRC_DIR}/port-battle.xlsx"
 
     mkdir -p "${API_DIR}"
     if test_for_update "${API_BASE_FILE}"; then
@@ -113,7 +116,10 @@ function get_port_data () {
 }
 
 function deploy_data () {
-    yarn run deploy-update
+    #yarn run deploy-update
+
+    PUBLIC_DIR="${BASE_DIR}/public"
+    cp --update "${SRC_DIR}"/*.json "${SHIP_FILE}" "${EXCEL_FILE}" "${PUBLIC_DIR}"/
 }
 
 function remove_tweets () {
@@ -139,11 +145,14 @@ function update_ports () {
     return $?
 }
 
+
+###########################################
+# Main functions
+
 function update_tweets () {
     cd ${BASE_DIR}
     get_tweets
     if update_ports; then
-        echo "In update_tweets: update_ports is true"
         push_data
         deploy_data
     fi
@@ -154,8 +163,6 @@ function change_tweets () {
     update_ports
 }
 
-#####
-# Main functions
 
 function change_data () {
     get_port_data
