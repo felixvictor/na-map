@@ -76,6 +76,17 @@ function updatePorts() {
         port.properties.attackHostility = result[6] / 100;
     }
 
+    function getNation(result) {
+        const i = ports.objects.ports.geometries.findIndex(findIndex, result[4]);
+        const port = ports.objects.ports.geometries[i];
+
+        console.log("      --- getNation ", i);
+        // eslint-disable-next-line prefer-destructuring
+        port.properties.attackerNation = result[3];
+        port.properties.attackerClan = "";
+        port.properties.attackHostility = 0;
+    }
+
     function portBattleScheduled(result) {
         const i = ports.objects.ports.geometries.findIndex(findIndex, result[2]);
         const port = ports.objects.ports.geometries[i];
@@ -193,7 +204,7 @@ function updatePorts() {
                 // eslint-disable-next-line no-cond-assign
             } else if ((result = hostilityLevelUpRegex.exec(tweet.text)) !== null) {
                 isPortDataChanged = true;
-                hostilityLevelUp(result);
+                getNation(result);
                 // eslint-disable-next-line no-cond-assign
             }
         }
