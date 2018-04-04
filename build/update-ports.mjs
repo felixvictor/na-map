@@ -100,7 +100,7 @@ function updatePorts() {
 
     // noinspection RegExpRedundantEscape
     const capturedRegex = new RegExp(
-            `\\[(${timeR}) UTC\\] (${portR}) captured by (${clanR}) \\((${nationR})\\)\\. Previous owner: (${clanR})( \\(${nationR}\\))? #PBCaribbean #PBCaribbean${portHashR}`,
+            `\\[(${timeR}) UTC\\] (${portR}) captured by (${clanR}) \\((${nationR})\\)\\. Previous owner: (${clanR})( ?\\(?(${nationR})?\\)? #PBCaribbean #PBCaribbean${portHashR}`,
             "u"
         ),
         defendedRegex = new RegExp(
@@ -116,7 +116,7 @@ function updatePorts() {
             "u"
         ),
         portBattleRegex = new RegExp(
-            `\\[(${timeR}) UTC\\] The port battle for (${portR}) \\((${nationR})\\) is scheduled for (${pbTimeR}) UTC\\. Defender: (${defenderR})\\. Attacker: (${clanR}) \\((${nationR})\\)\\. BR: \\d+ #PBCaribbean #PBCaribbean${portHashR} #NavalAction`,
+            `\\[(${timeR}) UTC\\] The port battle for (${portR}) \\((${nationR})\\) is scheduled for (${pbTimeR}) UTC\\. Defender: (${defenderR})\\. Attacker: (${clanR}) ?\\(?(${nationR})?\\)?\\. BR: \\d+ #PBCaribbean #PBCaribbean${portHashR} #NavalAction`,
             "u"
         ),
         rumorRegex = new RegExp(
