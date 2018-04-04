@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+    <meta charset="utf-8">
+    <meta content="ie=edge" http-equiv="x-ua-compatible">
+    <title>Naval Action map</title>
+    <meta content="Naval Action map" name="description">
+    <meta content="width=device-width,initial-scale=1" name="viewport">
+
+    <link href="images/icons/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png">
+    <link href="images/icons/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png">
+    <link href="images/icons/android-192x192.png" rel="icon" sizes="192x192" type="image/png">
+    <link href="images/icons/apple-touch-icon-180x180.png" rel="apple-touch-icon" sizes="180x180">
+    <meta content="images/icons/browserconfig.xml" name="msapplication-config">
+
+    <script src="https://www.googletagmanager.com/gtag/js?id=UA-109520372-1" async></script>
+<link href="na-map.min.css?46fca54e11296f2bee13" rel="stylesheet" crossorigin="anonymous" integrity="sha256-j2PUU2YypAxM23AI3x8OukqvTyro7bZaDgZ9eLfbvr0= sha384-seLomQhO4+KOIkBXiW1ee3iTvr82RuCUdO9miARGY/36zTcKLoQB2HNtZzaQojUU"></head>
+<body>
+
+<nav class="bg-light fixed-top navbar navbar-expand-lg navbar-light">
+    <a class="navbar-brand" href="#"><img alt="" height="30" src="images/na-map-brand.jpg" width="30"></a>
+    <button class="navbar-toggler" type="button" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation" data-target="#navbarSupportedContent" data-toggle="collapse">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+
+            <li class="nav-item pr-2 dropdown">
+                <a class="dropdown-toggle nav-link" href="#" id="predictDropdown" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
+                    Wind prediction
+                </a>
+                <div class="dropdown-menu extralarge-width" id="predictMenu" aria-labelledby="predictDropdown">
+                    <form id="windPrediction" class="p-2">
+                        <div class="form-group row">
+                            <label for="direction" class="col-form-label col-sm-6 align-top">Wind currently blowing
+                                from</label>
+                            <div class="col-sm-6">
+                                <div class="rslider" id="direction"></div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="wind-time" class="col-form-label col-sm-6">Predict wind for</label>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <div class="input-group date" id="wind-time" data-target-input="nearest">
+                                        <input class="form-control datetimepicker-input" id="wind-time-input" type="text" required aria-label="wind-time" data-target="#wind-time">
+                                        <div class="input-group-append" data-target="#wind-time" data-toggle="datetimepicker">
+                                            <span class="input-group-text"><i class="far fa-clock"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <small class="form-text text-muted">Server time</small>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline-primary" type="submit">Predict</button>
+                    </form>
+                </div>
+            </li>
+
+            <li class="nav-item pr-2 dropdown">
+                <a class="dropdown-toggle nav-link" href="#" id="moveToDropdown" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
+                    Move to F11
+                </a>
+                <div class="dropdown-menu extralarge-width p-2" id="moveToMenu" aria-labelledby="moveToDropdown">
+                    <form id="f11">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">F11 coordinates</span>
+                            </div>
+                            <input class="form-control" id="x-coord" type="number" required max="830000" min="-816000" placeholder="X" step="0.1">
+                            <input class="form-control" id="z-coord" type="number" required max="830000" min="-430000" placeholder="Z" step="0.1">
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-primary" type="button" id="copy-coord" title="Copy to clipboard"><i class="far fa-copy"></i>
+                                </button>
+                                <button class="btn btn-primary" type="submit">Move to</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </li>
+
+            <li class="nav-item pr-2">
+                <label for="port-names"></label><select id="port-names" name="port-names">
+                </select>
+            </li>
+
+            <li class="nav-item pr-2 dropdown">
+                <a class="dropdown-toggle nav-link" href="#" id="propertyDropdown" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
+                    Select ports on
+                </a>
+                <div class="dropdown-menu large-width" id="propertyMenu" aria-labelledby="propertyDropdown">
+                    <a class="dropdown-item dropdown-toggle" href="#">Property</a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="#" id="menu-prop-deep">Deep water</a>
+                        <a class="dropdown-item" href="#" id="menu-prop-shallow">Shallow water</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="#" id="menu-prop-all">Available to all</a>
+                        <a class="dropdown-item" href="#" id="menu-prop-green">Green zone</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="#" id="menu-prop-large">1st rate AI</a>
+                        <a class="dropdown-item" href="#" id="menu-prop-medium">4th rate AI</a>
+                        <a class="dropdown-item" href="#" id="menu-prop-small">6th rate AI</a>
+                    </div>
+
+                        <a class="dropdown-item" href="#" id="menu-prop-cm">
+                            <label for="prop-cm"></label><select id="prop-cm" name="prop-cm" class="select"></select>
+                        </a>
+
+                    <div class="dropdown-divider"></div>
+                    <h6 class="dropdown-header">Port owner</h6>
+                    <a class="dropdown-item" href="#" id="menu-prop-nation">
+                        <label for="prop-nation"></label><select id="prop-nation" name="prop-nation" class="select"></select>
+                    </a>
+                    <a class="dropdown-item" href="#" id="menu-prop-clan">
+                        <label for="prop-clan"></label><select id="prop-clan" name="prop-clan" class="select"></select>
+                    </a>
+
+                    <div class="dropdown-divider"></div>
+                    <h6 class="dropdown-header">Port battle</h6>
+
+                    <a class="dropdown-item dropdown-toggle" href="#">Time range set by port owner</a>
+                    <div class="dropdown-menu col-sm-7">
+                        <div class="dropdown-item" id="menu-prop-pb-range">
+                            <form id="prop-pb-range">
+                                <div class="form-group row">
+                                    <label for="prop-pb-from-input" class="col-form-label col-sm-4">From</label>
+                                    <div class="input-group date col-sm-8" id="prop-pb-from" data-target-input="nearest">
+                                        <input class="form-control datetimepicker-input" id="prop-pb-from-input" type="text" required aria-label="prop-pb-from" data-target="#prop-pb-from">
+                                        <div class="input-group-append" data-target="#prop-pb-from" data-toggle="datetimepicker">
+                                            <span class="input-group-text"><i class="far fa-clock"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="prop-pb-to-input" class="col-form-label col-sm-4">To</label>
+                                    <div class="input-group date col-sm-8" id="prop-pb-to" data-target-input="nearest">
+                                        <input class="form-control datetimepicker-input" id="prop-pb-to-input" type="text" required aria-label="prop-pb-to" data-target="#prop-pb-to">
+                                        <div class="input-group-append" data-target="#prop-pb-to" data-toggle="datetimepicker">
+                                            <span class="input-group-text"><i class="far fa-clock"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="btn btn-outline-primary align-bottom" type="submit">Go</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="dropdown-divider"></div>
+                    <h6 class="dropdown-header">Port capture</h6>
+
+                    <a class="dropdown-item dropdown-toggle" href="#">Fixed date range</a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="#" id="menu-prop-yesterday">Yesterday</a>
+                        <a class="dropdown-item" href="#" id="menu-prop-this-week">This week</a>
+                        <a class="dropdown-item" href="#" id="menu-prop-last-week">Last week</a>
+                    </div>
+
+                    <a class="dropdown-item dropdown-toggle" href="#" id="menu-prop-range">Free date range</a>
+                    <div class="dropdown-menu col-sm-7">
+                        <div class="dropdown-item" id="menu-prop-range">
+                            <form id="prop-range">
+                                <div class="form-group row">
+                                    <label for="prop-from-input" class="col-form-label col-sm-3">From</label>
+                                    <div class="input-group date col-sm-9" id="prop-from" data-target-input="nearest">
+                                        <input class="form-control datetimepicker-input" id="prop-from-input" type="text" required aria-label="prop-from" data-target="#prop-from">
+                                        <div class="input-group-append" data-target="#prop-from" data-toggle="datetimepicker">
+                                            <span class="input-group-text"><i class="far fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+
+                                    <label for="prop-to-input" class="col-form-label col-sm-3">To</label>
+                                    <div class="input-group date col-sm-9" id="prop-to" data-target-input="nearest">
+                                        <input class="form-control datetimepicker-input" id="prop-to-input" type="text" required aria-label="prop-to" data-target="#prop-to">
+                                        <div class="input-group-append" data-target="#prop-to" data-toggle="datetimepicker">
+                                            <span class="input-group-text"><i class="far fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="btn btn-outline-primary" type="submit">Go</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+            <li class="nav-item pr-2">
+                <label for="buy-goods"></label><select id="buy-goods" name="buy-goods">
+                </select>
+            </li>
+
+            <li class="nav-item">
+                <label for="sell-goods"></label><select id="sell-goods" name="sell-goods">
+                </select>
+            </li>
+        </ul>
+
+        <ul class="ml-auto navbar-nav">
+
+            <li class="nav-item pr-2 dropdown">
+                <a class="dropdown-toggle nav-link" href="#" id="extraDropdown" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
+                    Tools
+                </a>
+                <div class="dropdown-menu dropdown-menu-right" id="extraMenu" aria-labelledby="extraDropdown">
+
+                    <a class="dropdown-item" id="button-ship-compare">Ship comparison</a>
+                    <a class="dropdown-item" href="port-battle.xlsx" download="port-battle-calculator.xlsx">Download
+                        port battle calculator</a>
+                </div>
+            </li>
+
+            <li class="nav-item pr-2 dropdown">
+                <a class="dropdown-toggle nav-link" href="#" id="settingsDropdown" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
+                    Settings
+                </a>
+                <div class="dropdown-menu dropdown-menu-right large-width" id="settingsMenu" aria-labelledby="settingsDropdown">
+
+                    <h6 class="dropdown-header">Show per port</h6>
+                    <div class="align-self-center col-auto ml-1 radio-group" id="radius-type">
+                        <div class="custom-control custom-control-inline custom-radio">
+                            <input class="custom-control-input" id="radiusAttack" type="radio" name="showRadiusType" value="attack" checked>
+                            <label for="radiusAttack" class="custom-control-label">Attack</label>
+                        </div>
+                        <div class="custom-control custom-control-inline custom-radio">
+                            <input class="custom-control-input" id="radiusTaxIncome" type="radio" name="showRadiusType" value="taxIncome">
+                            <label for="radiusTaxIncome" class="custom-control-label">Tax income</label>
+                        </div>
+                        <div class="custom-control custom-control-inline custom-radio">
+                            <input class="custom-control-input" id="radiusNetIncome" type="radio" name="showRadiusType" value="netIncome">
+                            <label for="radiusNetIncome" class="custom-control-label">Net income</label>
+                        </div>
+                        <div class="custom-control custom-control-inline custom-radio">
+                            <input class="custom-control-input" id="radiusNoShow" type="radio" name="showRadiusType" value="noShow">
+                            <label for="radiusNoShow" class="custom-control-label">Off</label>
+                        </div>
+                    </div>
+
+                    <div class="dropdown-divider"></div>
+                    <h6 class="dropdown-header">Port battle zones</h6>
+                    <div class="align-self-center col-auto ml-1 radio-group" id="show-pb">
+                        <div class="custom-control custom-control-inline custom-radio">
+                            <input class="custom-control-input" id="pbAll" type="radio" name="showPB" value="all" checked>
+                            <label for="pbAll" class="custom-control-label">All ports</label>
+                        </div>
+                        <div class="custom-control custom-control-inline custom-radio">
+                            <input class="custom-control-input" id="pbSingle" type="radio" name="showPB" value="single">
+                            <label for="pbSingle" class="custom-control-label">Single port</label>
+                        </div>
+                        <div class="custom-control custom-control-inline custom-radio">
+                            <input class="custom-control-input" id="pbNoShow" type="radio" name="showPB" value="noShow">
+                            <label for="pbNoShow" class="custom-control-label">Off</label>
+                        </div>
+
+                    </div>
+
+                    <div class="dropdown-divider"></div>
+                    <h6 class="dropdown-header">Teleport areas</h6>
+                    <div class="align-self-center col-auto ml-1 radio-group" id="show-teleport">
+                        <div class="custom-control custom-control-inline custom-radio">
+                            <input class="custom-control-input" id="teleportShow" type="radio" name="showTeleport" value="show">
+                            <label for="teleportShow" class="custom-control-label">Show</label>
+                        </div>
+                        <div class="custom-control custom-control-inline custom-radio">
+                            <input class="custom-control-input" id="teleportNoShow" type="radio" name="showTeleport" value="noShow" checked>
+                            <label for="teleportNoShow" class="custom-control-label">Off</label>
+                        </div>
+                    </div>
+
+                    <div class="dropdown-divider"></div>
+                    <h6 class="dropdown-header">Double click to</h6>
+                    <div class="ml-1 radio-group mr-1" id="double-click-action">
+                        <div class="align-self-center col-auto">
+                            <div class="custom-control custom-control-inline custom-radio">
+                                <input class="custom-control-input" id="compass" type="radio" name="mouseFunction" value="compass" checked>
+                                <label for="compass" class="custom-control-label">Plot a course</label>
+                            </div>
+                            <div class="custom-control custom-control-inline custom-radio">
+                                <input class="custom-control-input" id="F11" type="radio" name="mouseFunction" value="F11">
+                                <label for="F11" class="custom-control-label">Show F11 coordinates</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        </ul>
+        <button class="btn btn-outline-secondary" type="reset" id="reset">Clear</button>
+    </div>
+</nav>
+
+<div class="na" id="na">
+</div>
+
+<section class="modal" data-backdrop="static" data-keyboard="false" id="modal-greetings" role="dialog" tabindex="-1">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <header class="modal-header">
+                <h3>Naval Action map <span class="small text-primary">v4.1.2</span></h3>
+            </header>
+            <div class="modal-body">
+                <p>Yet another map which uses the in-game map and live data (daily updated soonish after maintenance).
+                    Please check the <a href="http://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/">
+                        Game-Labs forum post</a> for further details. Feedback is very welcome.</p>
+                <p>Designed by iB aka Felix Victor.</p>
+            </div>
+            <footer class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal" data-server="eu1">Caribbean
+                </button>
+                <button class="btn btn-secondary" type="button" data-dismiss="modal" data-server="eu2">PvE only</button>
+            </footer>
+        </div>
+    </div>
+</section>
+
+<section class="modal" data-backdrop="static" data-keyboard="false" id="modal-ships" role="dialog" tabindex="-1">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <header class="modal-header">
+                <h3>Ship comparison</h3>
+            </header>
+
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="ml-auto col-md-4 pt-2 columnA">
+                            <label for="ship-Base-select"></label><select id="ship-Base-select" name="ship-Base-select">
+                            </select>
+                            <div id="ship-Base"></div>
+                        </div>
+                        <div class="ml-auto col-md-4 pt-2 columnC">
+                            <label for="ship-C1-select"></label><select id="ship-C1-select" name="ship-C1-select">
+                            </select>
+                            <div id="ship-C1"></div>
+                        </div>
+                        <div class="ml-auto col-md-4 pt-2 columnC">
+                            <label for="ship-C2-select"></label><select id="ship-C2-select" name="ship-C2-select">
+                            </select>
+                            <div id="ship-C2"></div>
+                        </div>
+                    </div>
+                </div>
+                <footer class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Close</button>
+                </footer>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.slim.min.js" crossorigin="anonymous" integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E="></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.13.0/d3.min.js" crossorigin="anonymous" integrity="sha256-hYXbQJK4qdJiAeDVjjQ9G0D6A0xLnDQ4eJI9dkm7Fpk="></script>
+<script src="na-map.min.js?46fca54e11296f2bee13" crossorigin="anonymous" integrity="sha256-KgMNejVr5Lcsv1MfUrHnRzWcwGxbR7bvXituZb1KmSM= sha384-Ffi6UUM7EwfM/8+We5wXFvdGPo4WROivdKU7WiqFkIgPIxlQWXXZQJqgGGsojZdC" type="text/javascript"></script></body>
+</html>
