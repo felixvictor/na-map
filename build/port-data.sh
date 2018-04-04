@@ -120,6 +120,7 @@ function deploy_data () {
 
     PUBLIC_DIR="${BASE_DIR}/public"
     cp --update "${SRC_DIR}"/*.json "${SHIP_FILE}" "${EXCEL_FILE}" "${PUBLIC_DIR}"/
+yarn run deploy-netlify
 }
 
 function remove_tweets () {
