@@ -1,8 +1,8 @@
 Arguments: 
-  /usr/bin/node /usr/share/yarn/bin/yarn.js run data-update-tweets
+  /usr/bin/node /usr/share/yarn/bin/yarn.js run data-change-tweets
 
 PATH: 
-  /usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games
+  /home/ibey/texlive/2017/bin/x86_64-linux:/home/ibey/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/usr/lib/jvm/java-8-oracle/bin:/usr/lib/jvm/java-8-oracle/db/bin:/usr/lib/jvm/java-8-oracle/jre/bin:/home/ibey/mingw/mingw64-gcc/bin:/home/ibey/.yarn/bin
 
 Yarn version: 
   1.5.1
@@ -16,7 +16,7 @@ Platform:
 npm manifest: 
   {
     "name": "na-map",
-    "version": "4",
+    "version": "4.1.1",
     "devDependencies": {
       "@babel/core": "7.0.0-beta.42",
       "@babel/highlight": "^7.0.0-beta.42",
@@ -10048,8 +10048,8 @@ Trace:
   Error: Command failed.
   Exit code: 1
   Command: sh
-  Arguments: -c build/port-data.sh twitter-update
-  Directory: /home/natopo/na-topo.git
+  Arguments: -c build/port-data.sh twitter-change
+  Directory: /home/ibey/src/na-topo
   Output:
   
       at ProcessTermError.MessageError (/usr/share/yarn/lib/cli.js:186:110)
