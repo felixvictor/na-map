@@ -185,15 +185,23 @@ function update_data () {
     fi
     LAST_UPDATE=$(date --reference="${LAST_UPDATE_FILE}" +%Y-%m-%d)
     if [ "${LAST_UPDATE}" != "${DATE}" ]; then
+	echo vor         update_yarn
         update_yarn
+	echo vor 
         get_git_update
+	echo vor 
         get_port_data
 
+	echo vor 
         remove_tweets
+	echo vor 
         get_tweets
+	echo vor 
         update_ports
 
+	echo vor 
         push_data
+	echo vor 
         deploy_data
     fi
 }
