@@ -1,5 +1,5 @@
 Arguments: 
-  /usr/bin/node /usr/share/yarn/bin/yarn.js run deploy-change
+  /usr/bin/node /usr/share/yarn/bin/yarn.js run data-change-tweets
 
 PATH: 
   /home/ibey/texlive/2017/bin/x86_64-linux:/home/ibey/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/usr/lib/jvm/java-8-oracle/bin:/usr/lib/jvm/java-8-oracle/db/bin:/usr/lib/jvm/java-8-oracle/jre/bin:/home/ibey/mingw/mingw64-gcc/bin:/home/ibey/.yarn/bin
@@ -10048,7 +10048,7 @@ Trace:
   Error: Command failed.
   Exit code: 1
   Command: sh
-  Arguments: -c yarn run change && yarn run deploy-netlify
+  Arguments: -c build/port-data.sh twitter-change
   Directory: /home/ibey/src/na-topo
   Output:
   

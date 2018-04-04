@@ -357,6 +357,7 @@ export default class PortDisplay {
         } else if (this._showRadiusType === "attack") {
             data = this.portData.filter(d => d.properties.attackerNation.length);
         }
+
         // Data join
         const circleUpdate = this._gPortCircle.selectAll("circle").data(data, d => d.id);
 
