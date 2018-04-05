@@ -119,8 +119,9 @@ function deploy_data () {
     #yarn run deploy-update
 
     PUBLIC_DIR="${BASE_DIR}/public"
-    cp --update "${SRC_DIR}"/*.json "${SHIP_FILE}" "${EXCEL_FILE}" "${PUBLIC_DIR}"/
-yarn run deploy-netlify
+
+    cp --update "${SRC_DIR}"/*.json "${EXCEL_FILE}" "${PUBLIC_DIR}"/
+    yarn run deploy-netlify
 }
 
 function remove_tweets () {
@@ -154,7 +155,7 @@ function update_tweets () {
     cd ${BASE_DIR}
     get_tweets
     if update_ports; then
-        push_data
+        push_data tweets
         deploy_data
     fi
 }
@@ -170,10 +171,14 @@ function change_data () {
 }
 
 function push_data () {
+    TYPE="$1"
+
     git add --ignore-errors .
     if [[ ! -z $(git status -s) ]]; then
         git commit -m "squash! push"
-        touch "${LAST_UPDATE_FILE}"
+        if [ "${TYPE}" == "update" ]; then
+            touch "${LAST_UPDATE_FILE}"
+        fi
     fi
     git push gitlab --all
 }
@@ -194,7 +199,7 @@ function update_data () {
         get_tweets
         update_ports
 
-        push_data
+        push_data update
         deploy_data
     fi
 }
@@ -206,11 +211,11 @@ case "$1" in
         ;;
     push-change)
         change_var
-        push_data
+        push_data change
         ;;
     push-update)
         update_var
-        push_data
+        push_data update
         ;;
     update)
         update_var
