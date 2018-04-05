@@ -179,12 +179,15 @@ export default class PortDisplay {
                     lastPortBattle: portProperties.lastPortBattle,
                     // eslint-disable-next-line no-nested-ternary
                     attack: portProperties.attackHostility
-                        ? `${portProperties.attackerClan} (${portProperties.attackerNation}) attacks${
+                        ? `${portProperties.attackerClan} (${portProperties.attackerNation}) attack${
+                              // eslint-disable-next-line no-nested-ternary
                               portProperties.portBattle.length
-                                  ? ` ${moment.utc(portProperties.portBattle).fromNow()} at ${moment(
+                                  ? `${
+                                        moment.utc(portProperties.portBattle).isAfter(moment.utc()) ? "s" : "ed"
+                                    } ${moment.utc(portProperties.portBattle).fromNow()} at ${moment(
                                         portProperties.portBattle
                                     ).format("H.mm")}`
-                                  : `: ${formatPercent(portProperties.attackHostility)} hostility`
+                                  : `s: ${formatPercent(portProperties.attackHostility)} hostility`
                           }`
                         : "",
                     // eslint-disable-next-line no-nested-ternary
