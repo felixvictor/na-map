@@ -33,7 +33,9 @@ function updatePorts() {
         console.log("      --- captured ", i);
         // eslint-disable-next-line prefer-destructuring
         port.properties.capturer = result[3];
-        port.properties.nation = nations.filter(nation => nation.name === result[4]).map(nation => nation.short);
+        port.properties.nation = nations
+            .filter(nation => nation.name === port.properties.attackerNation)
+            .map(nation => nation.short);
         port.properties.lastPortBattle = moment(result[1], "DD-MM-YYYY HH:mm").format("YYYY-MM-DD HH:mm");
         port.properties.attackerNation = "";
         port.properties.attackerClan = "";
@@ -113,7 +115,7 @@ function updatePorts() {
 
     // noinspection RegExpRedundantEscape
     const capturedRegex = new RegExp(
-            `\\[(${timeR}) UTC\\] (${portR}) captured by (${clanR}) \\((${nationR})\\)\\. Previous owner: (${clanR}) ?\\(?(${nationR})?\\)? #PBCaribbean #PBCaribbean${portHashR}`,
+            `\\[(${timeR}) UTC\\] (${portR}) captured by (${clanR}) ?\\(?(${nationR})?\\)? \\. Previous owner: (${clanR}) ?\\(?(${nationR})?\\)? #PBCaribbean #PBCaribbean${portHashR}`,
             "u"
         ),
         defendedRegex = new RegExp(
@@ -212,7 +214,7 @@ function updatePorts() {
     if (isPortDataChanged) {
         saveJson(ports);
     }
-    return isPortDataChanged;
+    return !isPortDataChanged;
 }
 
-process.exitCode = !updatePorts();
+process.exitCode = updatePorts();
