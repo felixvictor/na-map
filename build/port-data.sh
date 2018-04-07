@@ -20,6 +20,7 @@ function change_var () {
     export BUILD_DIR="${BASE_DIR}/build"
     export SRC_DIR="${BASE_DIR}/src"
     export LAST_UPDATE_FILE="${BUILD_DIR}/.last-port-update"
+    export PB_PORT_FILE="${SRC_DIR}/${SERVER_NAMES[0]}-pb.json"
     export SHIP_FILE="${SRC_DIR}/ships.json"
     export EXCEL_FILE="${SRC_DIR}/port-battle.xlsx"
     export TWEETS_JSON="${BUILD_DIR}/API/tweets.json"
@@ -104,6 +105,8 @@ function get_port_data () {
             rm "${TEMP_PORT_FILE}"
         done
 
+        ${NODE} build/convert-API-pb-data.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${PB_PORT_FILE}" "${DATE}"
+
         ${NODE} build/convert-pbZones.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${BUILD_DIR}" "${DATE}"
         yarn geo2topo -o "${SRC_DIR}/pb.json" \
             "${BUILD_DIR}/pbZones.geojson" "${BUILD_DIR}/towers.geojson" "${BUILD_DIR}/forts.geojson"
@@ -142,7 +145,7 @@ function get_tweets () {
 function update_ports () {
     PORT_FILE="${SRC_DIR}/eu1.json"
 
-    ${NODE} build/update-ports.mjs "${PORT_FILE}" "${TWEETS_JSON}"
+    ${NODE} build/update-ports.mjs "${PB_PORT_FILE}" "${TWEETS_JSON}"
 
     return $?
 }
