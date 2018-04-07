@@ -12,7 +12,7 @@ import { nations } from "./common";
 import { formatInt, formatSiInt, formatPercent } from "./util";
 
 export default class PortDisplay {
-    constructor(portData, topMargin, rightMargin) {
+    constructor(portData, pbData, topMargin, rightMargin) {
         this.portDataDefault = portData;
         this._topMargin = topMargin;
         this._rightMargin = rightMargin;
@@ -40,6 +40,7 @@ export default class PortDisplay {
         this._maxRadiusFactor = 6;
 
         this.setPortData(portData);
+        this.setPBData(pbData);
         this._setupListener();
         this._setupSvg();
         this._setupSummary();
@@ -161,176 +162,177 @@ export default class PortDisplay {
         });
     }
 
-    _updateIcons() {
-        function showDetails(d, i, nodes) {
-            function getText(portProperties) {
-                const portBattleLT = moment.utc(portProperties.portBattle).local(),
-                    portBattleST = moment.utc(portProperties.portBattle),
-                    port = {
-                        name: portProperties.name,
-                        icon: portProperties.availableForAll ? `${portProperties.nation}a` : portProperties.nation,
-                        availableForAll: portProperties.availableForAll,
-                        depth: portProperties.shallow ? "Shallow" : "Deep",
-                        countyCapital: portProperties.countyCapital ? " (county capital)" : "",
-                        nonCapturable: portProperties.nonCapturable,
-                        captured: portProperties.capturer
-                            ? ` captured by ${portProperties.capturer} ${moment
-                                  .utc(portProperties.lastPortBattle)
-                                  .fromNow()}`
-                            : "",
-                        lastPortBattle: portProperties.lastPortBattle,
-                        // eslint-disable-next-line no-nested-ternary
-                        attack: portProperties.attackHostility
-                            ? `${portProperties.attackerClan} (${portProperties.attackerNation}) attack${
-                                  // eslint-disable-next-line no-nested-ternary
-                                  portProperties.portBattle.length
-                                      ? `${
-                                            portBattleST.isAfter(moment.utc()) ? "s" : "ed"
-                                        } ${portBattleST.fromNow()} at ${portBattleST.format("H.mm")}${
-                                            portBattleST !== portBattleLT
-                                                ? ` (${portBattleLT.format("H.mm")} local)`
-                                                : ""
-                                        }`
-                                      : `s: ${formatPercent(portProperties.attackHostility)} hostility`
-                              }`
-                            : "",
-                        // eslint-disable-next-line no-nested-ternary
-                        pbTimeRange: portProperties.nonCapturable
-                            ? ""
-                            : !portProperties.portBattleStartTime
-                                ? "11.00\u202f–\u202f8.00"
-                                : `${(portProperties.portBattleStartTime + 10) %
-                                      24}.00\u202f–\u202f${(portProperties.portBattleStartTime + 13) % 24}.00`,
-                        brLimit: formatInt(portProperties.brLimit),
-                        conquestMarksPension: portProperties.conquestMarksPension,
-                        taxIncome: formatSiInt(portProperties.taxIncome),
-                        portTax: formatPercent(portProperties.portTax),
-                        netIncome: formatSiInt(portProperties.netIncome),
-                        tradingCompany: portProperties.tradingCompany
-                            ? `, trading company level\u202f${portProperties.tradingCompany}`
-                            : "",
-                        laborHoursDiscount: portProperties.laborHoursDiscount ? ", labor hours discount" : "",
-                        producesTrading: portProperties.producesTrading.join(", "),
-                        dropsTrading: portProperties.dropsTrading.join(", "),
-                        producesNonTrading: portProperties.producesNonTrading.join(", "),
-                        dropsNonTrading: portProperties.dropsNonTrading.join(", "),
-                        consumesTrading: portProperties.consumesTrading
-                            .map(good => good.name + (good.amount > 1 ? ` (${good.amount})` : ""))
-                            .join(", "),
-                        consumesNonTrading: portProperties.consumesNonTrading.map(good => good.name).join(", ")
-                    };
+    _getText(id, portProperties) {
+        const pbData = this.pbData.ports.filter(port => port.id === id)[0],
+            portBattleLT = moment.utc(pbData.portBattle).local(),
+            portBattleST = moment.utc(pbData.portBattle),
+            port = {
+                name: portProperties.name,
+                icon: portProperties.availableForAll ? `${pbData.nation}a` : pbData.nation,
+                availableForAll: portProperties.availableForAll,
+                depth: portProperties.shallow ? "Shallow" : "Deep",
+                countyCapital: portProperties.countyCapital ? " (county capital)" : "",
+                nonCapturable: portProperties.nonCapturable,
+                captured: pbData.capturer
+                    ? ` captured by ${pbData.capturer} ${moment.utc(pbData.lastPortBattle).fromNow()}`
+                    : "",
+                lastPortBattle: pbData.lastPortBattle,
+                // eslint-disable-next-line no-nested-ternary
+                attack: pbData.attackHostility
+                    ? `${pbData.attackerClan} (${pbData.attackerNation}) attack${
+                          // eslint-disable-next-line no-nested-ternary
+                          pbData.portBattle.length
+                              ? `${
+                                    portBattleST.isAfter(moment.utc()) ? "s" : "ed"
+                                } ${portBattleST.fromNow()} at ${portBattleST.format("H.mm")}${
+                                    portBattleST !== portBattleLT ? ` (${portBattleLT.format("H.mm")} local)` : ""
+                                }`
+                              : `s: ${formatPercent(pbData.attackHostility)} hostility`
+                      }`
+                    : "",
+                // eslint-disable-next-line no-nested-ternary
+                pbTimeRange: portProperties.nonCapturable
+                    ? ""
+                    : !pbData.portBattleStartTime
+                        ? "11.00\u202f–\u202f8.00"
+                        : `${(pbData.portBattleStartTime + 10) % 24}.00\u202f–\u202f${(pbData.portBattleStartTime +
+                              13) %
+                              24}.00`,
+                brLimit: formatInt(portProperties.brLimit),
+                conquestMarksPension: portProperties.conquestMarksPension,
+                taxIncome: formatSiInt(portProperties.taxIncome),
+                portTax: formatPercent(portProperties.portTax),
+                netIncome: formatSiInt(portProperties.netIncome),
+                tradingCompany: portProperties.tradingCompany
+                    ? `, trading company level\u202f${portProperties.tradingCompany}`
+                    : "",
+                laborHoursDiscount: portProperties.laborHoursDiscount ? ", labor hours discount" : "",
+                producesTrading: portProperties.producesTrading.join(", "),
+                dropsTrading: portProperties.dropsTrading.join(", "),
+                producesNonTrading: portProperties.producesNonTrading.join(", "),
+                dropsNonTrading: portProperties.dropsNonTrading.join(", "),
+                consumesTrading: portProperties.consumesTrading
+                    .map(good => good.name + (good.amount > 1 ? ` (${good.amount})` : ""))
+                    .join(", "),
+                consumesNonTrading: portProperties.consumesNonTrading.map(good => good.name).join(", ")
+            };
 
-                switch (portProperties.portBattleType) {
-                    case "Large":
-                        port.pbType = "1<sup>st</sup>";
-                        break;
-                    case "Medium":
-                        port.pbType = "4<sup>th</sup>";
-                        break;
-                    default:
-                        port.pbType = "6<sup>th</sup>";
-                        break;
-                }
-
-                return port;
-            }
-
-            function tooltipData(portProperties) {
-                const port = getText(portProperties);
-
-                let h = `<table><tbody<tr><td><i class="flag-icon ${port.icon}"></i></td>`;
-                h += `<td><span class="port-name">${port.name}</span>`;
-                h += port.availableForAll ? " (accessible to all nations)" : "";
-                h += "</td></tr></tbody></table>";
-                if (port.attack.length) {
-                    h += `<div class="alert alert-danger mt-2" role="alert">${port.attack}</div>`;
-                }
-                h += `<p>${port.depth} water port ${port.countyCapital}${port.captured}<br>`;
-                if (!port.nonCapturable) {
-                    h += `Port battle ${port.pbTimeRange}, ${port.brLimit} BR, `;
-                    h += `${port.pbType}\u202frate AI, `;
-                    h += `${port.conquestMarksPension}\u202fconquest point`;
-                    h += port.conquestMarksPension > 1 ? "s" : "";
-                    h += `<br>Tax income ${port.taxIncome} (${port.portTax}), net income ${port.netIncome}`;
-                    h += port.tradingCompany;
-                    h += port.laborHoursDiscount;
-                } else {
-                    h += "Not capturable";
-                    h += `<br>${port.portTax} tax`;
-                }
-                h += "</p>";
-                h += "<table class='table table-sm'>";
-                if (port.producesTrading.length || port.producesNonTrading.length) {
-                    h += "<tr><td>Produces</td><td>";
-                    if (port.producesNonTrading.length) {
-                        h += `<span class="non-trading">${port.producesNonTrading}</span>`;
-                        if (port.producesTrading.length) {
-                            h += "<br>";
-                        }
-                    }
-                    if (port.producesTrading.length) {
-                        h += `${port.producesTrading}`;
-                    }
-                    h += "</td></tr>";
-                }
-                if (port.dropsTrading.length || port.dropsNonTrading.length) {
-                    h += "<tr><td>Drops</td><td>";
-                    if (port.dropsNonTrading.length) {
-                        h += `<span class="non-trading">${port.dropsNonTrading}</span>`;
-                        if (port.dropsTrading.length) {
-                            h += "<br>";
-                        }
-                    }
-                    if (port.dropsTrading.length) {
-                        h += `${port.dropsTrading}`;
-                    }
-                    h += "</td></tr>";
-                }
-                if (port.consumesTrading.length || port.consumesNonTrading.length) {
-                    h += "<tr><td>Consumes</td><td>";
-                    if (port.consumesNonTrading.length) {
-                        h += `<span class="non-trading">${port.consumesNonTrading}</span>`;
-                        if (port.consumesTrading.length) {
-                            h += "<br>";
-                        }
-                    }
-                    if (port.consumesTrading.length) {
-                        h += `${port.consumesTrading}`;
-                    }
-                    h += "</td></tr>";
-                }
-                h += "</table>";
-
-                return h;
-            }
-
-            const port = d3.select(nodes[i]);
-
-            port.attr("data-toggle", "tooltip");
-            // eslint-disable-next-line no-underscore-dangle
-            $(port._groups[0])
-                .tooltip({
-                    delay: {
-                        show: this._highlightDuration,
-                        hide: this._highlightDuration
-                    },
-                    html: true,
-                    placement: "auto",
-                    title: tooltipData(d.properties),
-                    trigger: "manual"
-                })
-                .tooltip("show");
+        switch (portProperties.portBattleType) {
+            case "Large":
+                port.pbType = "1<sup>st</sup>";
+                break;
+            case "Medium":
+                port.pbType = "4<sup>th</sup>";
+                break;
+            default:
+                port.pbType = "6<sup>th</sup>";
+                break;
         }
 
+        return port;
+    }
+
+    _showDetails(d, i, nodes) {
+        function tooltipData(port) {
+            let h = `<table><tbody<tr><td><i class="flag-icon ${port.icon}"></i></td>`;
+            h += `<td><span class="port-name">${port.name}</span>`;
+            h += port.availableForAll ? " (accessible to all nations)" : "";
+            h += "</td></tr></tbody></table>";
+            if (port.attack.length) {
+                h += `<div class="alert alert-danger mt-2" role="alert">${port.attack}</div>`;
+            }
+            h += `<p>${port.depth} water port ${port.countyCapital}${port.captured}<br>`;
+            if (!port.nonCapturable) {
+                h += `Port battle ${port.pbTimeRange}, ${port.brLimit} BR, `;
+                h += `${port.pbType}\u202frate AI, `;
+                h += `${port.conquestMarksPension}\u202fconquest point`;
+                h += port.conquestMarksPension > 1 ? "s" : "";
+                h += `<br>Tax income ${port.taxIncome} (${port.portTax}), net income ${port.netIncome}`;
+                h += port.tradingCompany;
+                h += port.laborHoursDiscount;
+            } else {
+                h += "Not capturable";
+                h += `<br>${port.portTax} tax`;
+            }
+            h += "</p>";
+            h += "<table class='table table-sm'>";
+            if (port.producesTrading.length || port.producesNonTrading.length) {
+                h += "<tr><td>Produces</td><td>";
+                if (port.producesNonTrading.length) {
+                    h += `<span class="non-trading">${port.producesNonTrading}</span>`;
+                    if (port.producesTrading.length) {
+                        h += "<br>";
+                    }
+                }
+                if (port.producesTrading.length) {
+                    h += `${port.producesTrading}`;
+                }
+                h += "</td></tr>";
+            }
+            if (port.dropsTrading.length || port.dropsNonTrading.length) {
+                h += "<tr><td>Drops</td><td>";
+                if (port.dropsNonTrading.length) {
+                    h += `<span class="non-trading">${port.dropsNonTrading}</span>`;
+                    if (port.dropsTrading.length) {
+                        h += "<br>";
+                    }
+                }
+                if (port.dropsTrading.length) {
+                    h += `${port.dropsTrading}`;
+                }
+                h += "</td></tr>";
+            }
+            if (port.consumesTrading.length || port.consumesNonTrading.length) {
+                h += "<tr><td>Consumes</td><td>";
+                if (port.consumesNonTrading.length) {
+                    h += `<span class="non-trading">${port.consumesNonTrading}</span>`;
+                    if (port.consumesTrading.length) {
+                        h += "<br>";
+                    }
+                }
+                if (port.consumesTrading.length) {
+                    h += `${port.consumesTrading}`;
+                }
+                h += "</td></tr>";
+            }
+            h += "</table>";
+
+            return h;
+        }
+
+        const port = d3.select(nodes[i]),
+            title = tooltipData(this._getText(d.id, d.properties));
+        port.attr("data-toggle", "tooltip");
+        // eslint-disable-next-line no-underscore-dangle
+        $(port._groups[0])
+            .tooltip({
+                delay: {
+                    show: this._highlightDuration,
+                    hide: this._highlightDuration
+                },
+                html: true,
+                placement: "auto",
+                title,
+                trigger: "manual"
+            })
+            .tooltip("show");
+    }
+
+    _updateIcons() {
         function hideDetails(d, i, nodes) {
             // eslint-disable-next-line no-underscore-dangle
             $(d3.select(nodes[i])._groups[0]).tooltip("hide");
         }
 
         const circleSize = this._circleSizes[this._zoomLevel];
+        const data = this.portData.filter(port => this.pbData.ports.some(d => port.id === d.id)).map(port => {
+            // eslint-disable-next-line prefer-destructuring,no-param-reassign
+            port.properties.nation = this.pbData.ports.filter(d => port.id === d.id).map(d => d.nation)[0];
+            return port;
+        });
 
         // Data join
-        const circleUpdate = this._gIcon.selectAll("circle").data(this.portData, d => d.id);
+        const circleUpdate = this._gIcon.selectAll("circle").data(data, d => d.id);
 
         // Remove old circles
         circleUpdate.exit().remove();
@@ -348,7 +350,7 @@ export default class PortDisplay {
             )
             .attr("cx", d => d.geometry.coordinates[0])
             .attr("cy", d => d.geometry.coordinates[1])
-            .on("click", showDetails)
+            .on("click", (d, i, nodes) => this._showDetails(d, i, nodes))
             .on("mouseout", hideDetails);
 
         // Apply to both old and new
@@ -362,7 +364,14 @@ export default class PortDisplay {
         if (this._showRadiusType === "taxIncome" || this._showRadiusType === "netIncome") {
             data = this.portData.filter(d => !d.properties.nonCapturable);
         } else if (this._showRadiusType === "attack") {
-            data = this.portData.filter(d => d.properties.attackHostility);
+            const pbData = this.pbData.ports
+                .filter(d => d.attackHostility)
+                .map(d => ({ id: d.id, attackHostility: d.attackHostility }));
+            data = this.portData.filter(port => pbData.some(d => port.id === d.id)).map(port => {
+                // eslint-disable-next-line prefer-destructuring,no-param-reassign
+                port.properties.attackHostility = pbData.filter(d => port.id === d.id).map(d => d.attackHostility)[0];
+                return port;
+            });
         }
 
         // Data join
@@ -500,6 +509,10 @@ export default class PortDisplay {
 
     setPortData(portData) {
         this.portData = portData;
+    }
+
+    setPBData(pbData) {
+        this.pbData = pbData;
     }
 
     setCurrentPort(id, x, y) {
