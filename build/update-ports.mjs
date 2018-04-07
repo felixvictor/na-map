@@ -23,85 +23,83 @@ function saveJson(data) {
 
 function updatePorts() {
     function findIndex(element) {
-        return element.properties.name === this;
+        return element.name === this;
     }
 
     function captured(result) {
-        const i = ports.objects.ports.geometries.findIndex(findIndex, result[2]);
-        const port = ports.objects.ports.geometries[i];
+        const i = ports.ports.findIndex(findIndex, result[2]);
+        const port = ports.ports[i];
 
         console.log("      --- captured ", i);
+        port.nation = nations.filter(nation => nation.name === port.attackerNation).map(nation => nation.short);
         // eslint-disable-next-line prefer-destructuring
-        port.properties.capturer = result[3];
-        port.properties.nation = nations
-            .filter(nation => nation.name === port.properties.attackerNation)
-            .map(nation => nation.short);
-        port.properties.lastPortBattle = moment(result[1], "DD-MM-YYYY HH:mm").format("YYYY-MM-DD HH:mm");
-        port.properties.attackerNation = "";
-        port.properties.attackerClan = "";
-        port.properties.attackHostility = "";
-        port.properties.portBattle = "";
+        port.capturer = result[3];
+        port.lastPortBattle = moment(result[1], "DD-MM-YYYY HH:mm").format("YYYY-MM-DD HH:mm");
+        port.attackerNation = "";
+        port.attackerClan = "";
+        port.attackHostility = "";
+        port.portBattle = "";
     }
 
     function defended(result) {
-        const i = ports.objects.ports.geometries.findIndex(findIndex, result[2]);
-        const port = ports.objects.ports.geometries[i];
+        const i = ports.ports.findIndex(findIndex, result[2]);
+        const port = ports.ports[i];
 
         console.log("      --- defended", i);
-        port.properties.attackerNation = "";
-        port.properties.attackerClan = "";
-        port.properties.attackHostility = "";
-        port.properties.portBattle = "";
+        port.attackerNation = "";
+        port.attackerClan = "";
+        port.attackHostility = "";
+        port.portBattle = "";
     }
 
     function hostilityLevelUp(result) {
-        const i = ports.objects.ports.geometries.findIndex(findIndex, result[4]);
-        const port = ports.objects.ports.geometries[i];
+        const i = ports.ports.findIndex(findIndex, result[4]);
+        const port = ports.ports[i];
 
         console.log("      --- hostilityLevelUp ", i);
         // eslint-disable-next-line prefer-destructuring
-        port.properties.attackerNation = result[3];
+        port.attackerNation = result[3];
         // eslint-disable-next-line prefer-destructuring
-        port.properties.attackerClan = result[2];
-        port.properties.attackHostility = result[6] / 100;
+        port.attackerClan = result[2];
+        port.attackHostility = result[6] / 100;
     }
 
     function hostilityLevelDown(result) {
-        const i = ports.objects.ports.geometries.findIndex(findIndex, result[4]);
-        const port = ports.objects.ports.geometries[i];
+        const i = ports.ports.findIndex(findIndex, result[4]);
+        const port = ports.ports[i];
 
         console.log("      --- hostilityLevelDown ", i);
         // eslint-disable-next-line prefer-destructuring
-        port.properties.attackerNation = result[3];
+        port.attackerNation = result[3];
         // eslint-disable-next-line prefer-destructuring
-        port.properties.attackerClan = result[2];
-        port.properties.attackHostility = result[6] / 100;
+        port.attackerClan = result[2];
+        port.attackHostility = result[6] / 100;
     }
 
     function getNation(result) {
-        const i = ports.objects.ports.geometries.findIndex(findIndex, result[4]);
-        const port = ports.objects.ports.geometries[i];
+        const i = ports.ports.findIndex(findIndex, result[4]);
+        const port = ports.ports[i];
 
         console.log("      --- getNation ", i);
         // eslint-disable-next-line prefer-destructuring
-        port.properties.attackerNation = result[3];
-        port.properties.attackerClan = "";
-        port.properties.attackHostility = 0;
+        port.attackerNation = result[3];
+        port.attackerClan = "";
+        port.attackHostility = 0;
     }
 
     function portBattleScheduled(result) {
-        const i = ports.objects.ports.geometries.findIndex(findIndex, result[2]);
-        const port = ports.objects.ports.geometries[i];
+        const i = ports.ports.findIndex(findIndex, result[2]);
+        const port = ports.ports[i];
 
         console.log("      --- portBattleScheduled i ", i);
         if (typeof result[7] !== "undefined") {
             // eslint-disable-next-line prefer-destructuring
-            port.properties.attackerNation = result[7];
+            port.attackerNation = result[7];
         }
         // eslint-disable-next-line prefer-destructuring
-        port.properties.attackerClan = result[6];
-        port.properties.attackHostility = 1;
-        port.properties.portBattle = moment(result[4], "DD MMM YYYY HH:mm").format("YYYY-MM-DD HH:mm");
+        port.attackerClan = result[6];
+        port.attackHostility = 1;
+        port.portBattle = moment(result[4], "DD MMM YYYY HH:mm").format("YYYY-MM-DD HH:mm");
     }
 
     const portR = "[A-zÀ-ÿ’ -]+",
