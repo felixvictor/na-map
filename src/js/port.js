@@ -9,7 +9,7 @@ import moment from "moment";
 import "moment/locale/en-gb";
 
 import { nations } from "./common";
-import { formatInt, formatSiInt, formatPercent, degreesToCompass } from "./util";
+import { formatInt, formatSiInt, formatPercent } from "./util";
 
 export default class PortDisplay {
     constructor(portData, topMargin, rightMargin) {
@@ -33,8 +33,8 @@ export default class PortDisplay {
         this._attackRadius = d3.scaleLinear().domain([0, 1]);
         this._colourScale = d3
             .scaleLinear()
-            .domain([0, 1])
-            .range(["#8b989c", "#a62e39"]);
+            .domain([0, 0.07, 0.95, 1])
+            .range(["#eadfdf", "#8b989c", "#6b7478", "#a62e39"]);
 
         this._minRadiusFactor = 1;
         this._maxRadiusFactor = 6;
