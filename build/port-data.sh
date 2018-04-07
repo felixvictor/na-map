@@ -119,6 +119,7 @@ function deploy_data () {
     #yarn run deploy-update
 
     PUBLIC_DIR="${BASE_DIR}/public"
+
     cp --update "${SRC_DIR}"/*.json "${EXCEL_FILE}" "${PUBLIC_DIR}"/
     yarn run deploy-netlify
 }
