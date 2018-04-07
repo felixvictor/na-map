@@ -94,6 +94,7 @@ function get_port_data () {
 
         for SERVER_NAME in "${SERVER_NAMES[@]}"; do
             PORT_FILE="${SRC_DIR}/${SERVER_NAME}.json"
+            PB_FILE="${SRC_DIR}/${SERVER_NAME}-pb.json"
             TEMP_PORT_FILE="${BUILD_DIR}/ports.geojson"
             for API_VAR in "${API_VARS[@]}"; do
                 API_FILE="${API_BASE_FILE}-${SERVER_NAME}-${API_VAR}-${DATE}.json"
@@ -103,9 +104,10 @@ function get_port_data () {
             ${NODE} build/convert-API-data.mjs "${API_BASE_FILE}-${SERVER_NAME}" "${TEMP_PORT_FILE}" "${DATE}"
             yarn geo2topo -o "${PORT_FILE}" "${TEMP_PORT_FILE}"
             rm "${TEMP_PORT_FILE}"
+
+            ${NODE} build/convert-API-pb-data.mjs "${API_BASE_FILE}-${SERVER_NAME}" "${PB_FILE}" "${DATE}"
         done
 
-        ${NODE} build/convert-API-pb-data.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${PB_PORT_FILE}" "${DATE}"
 
         ${NODE} build/convert-pbZones.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${BUILD_DIR}" "${DATE}"
         yarn geo2topo -o "${SRC_DIR}/pb.json" \
