@@ -27,7 +27,7 @@ import WindPrediction from "./wind-prediction";
 
 export default function naDisplay(serverName) {
     let map, ports, teleport, portSelect, shipCompare, windPrediction, f11, course, pbZone, shipData;
-    const jsonFiles = [`${serverName}.json`, "pb.json", "ships.json"];
+    const jsonFiles = [`${serverName}.json`, `${serverName}-pb.json`, "pb.json", "ships.json"];
 
     class NAMap {
         constructor() {
@@ -296,14 +296,14 @@ export default function naDisplay(serverName) {
         ports.clearMap();
     }
 
-    function naReady(error, naMapJsonData, pbZonesJsonData, shipJsonData) {
+    function naReady(error, naMapJsonData, pbJsonData, pbZonesJsonData, shipJsonData) {
         if (error) {
             throw error;
         }
         map = new NAMap();
         // Read map data
         const portData = topojsonFeature(naMapJsonData, naMapJsonData.objects.ports).features;
-        ports = new PortDisplay(portData, map.margin.top, map.margin.right);
+        ports = new PortDisplay(portData, pbJsonData, map.margin.top, map.margin.right);
 
         let pbZoneData = topojsonFeature(pbZonesJsonData, pbZonesJsonData.objects.pbZones);
         // Port ids of capturable ports
