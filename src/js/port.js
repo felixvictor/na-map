@@ -164,57 +164,61 @@ export default class PortDisplay {
     _updateIcons() {
         function showDetails(d, i, nodes) {
             function getText(portProperties) {
-                const port = {
-                    name: portProperties.name,
-                    icon: portProperties.availableForAll ? `${portProperties.nation}a` : portProperties.nation,
-                    availableForAll: portProperties.availableForAll,
-                    depth: portProperties.shallow ? "Shallow" : "Deep",
-                    countyCapital: portProperties.countyCapital ? " (county capital)" : "",
-                    nonCapturable: portProperties.nonCapturable,
-                    captured: portProperties.capturer
-                        ? ` captured by ${portProperties.capturer} ${moment
-                              .utc(portProperties.lastPortBattle)
-                              .fromNow()}`
-                        : "",
-                    lastPortBattle: portProperties.lastPortBattle,
-                    // eslint-disable-next-line no-nested-ternary
-                    attack: portProperties.attackHostility
-                        ? `${portProperties.attackerClan} (${portProperties.attackerNation}) attack${
-                              // eslint-disable-next-line no-nested-ternary
-                              portProperties.portBattle.length
-                                  ? `${
-                                        moment.utc(portProperties.portBattle).isAfter(moment.utc()) ? "s" : "ed"
-                                    } ${moment.utc(portProperties.portBattle).fromNow()} at ${moment(
-                                        portProperties.portBattle
-                                    ).format("H.mm")}`
-                                  : `s: ${formatPercent(portProperties.attackHostility)} hostility`
-                          }`
-                        : "",
-                    // eslint-disable-next-line no-nested-ternary
-                    pbTimeRange: portProperties.nonCapturable
-                        ? ""
-                        : !portProperties.portBattleStartTime
-                            ? "11.00\u202f–\u202f8.00"
-                            : `${(portProperties.portBattleStartTime + 10) %
-                                  24}.00\u202f–\u202f${(portProperties.portBattleStartTime + 13) % 24}.00`,
-                    brLimit: formatInt(portProperties.brLimit),
-                    conquestMarksPension: portProperties.conquestMarksPension,
-                    taxIncome: formatSiInt(portProperties.taxIncome),
-                    portTax: formatPercent(portProperties.portTax),
-                    netIncome: formatSiInt(portProperties.netIncome),
-                    tradingCompany: portProperties.tradingCompany
-                        ? `, trading company level\u202f${portProperties.tradingCompany}`
-                        : "",
-                    laborHoursDiscount: portProperties.laborHoursDiscount ? ", labor hours discount" : "",
-                    producesTrading: portProperties.producesTrading.join(", "),
-                    dropsTrading: portProperties.dropsTrading.join(", "),
-                    producesNonTrading: portProperties.producesNonTrading.join(", "),
-                    dropsNonTrading: portProperties.dropsNonTrading.join(", "),
-                    consumesTrading: portProperties.consumesTrading
-                        .map(good => good.name + (good.amount > 1 ? ` (${good.amount})` : ""))
-                        .join(", "),
-                    consumesNonTrading: portProperties.consumesNonTrading.map(good => good.name).join(", ")
-                };
+                const portBattleLT = moment.utc(portProperties.portBattle).local(),
+                    portBattleST = moment.utc(portProperties.portBattle),
+                    port = {
+                        name: portProperties.name,
+                        icon: portProperties.availableForAll ? `${portProperties.nation}a` : portProperties.nation,
+                        availableForAll: portProperties.availableForAll,
+                        depth: portProperties.shallow ? "Shallow" : "Deep",
+                        countyCapital: portProperties.countyCapital ? " (county capital)" : "",
+                        nonCapturable: portProperties.nonCapturable,
+                        captured: portProperties.capturer
+                            ? ` captured by ${portProperties.capturer} ${moment
+                                  .utc(portProperties.lastPortBattle)
+                                  .fromNow()}`
+                            : "",
+                        lastPortBattle: portProperties.lastPortBattle,
+                        // eslint-disable-next-line no-nested-ternary
+                        attack: portProperties.attackHostility
+                            ? `${portProperties.attackerClan} (${portProperties.attackerNation}) attack${
+                                  // eslint-disable-next-line no-nested-ternary
+                                  portProperties.portBattle.length
+                                      ? `${
+                                            portBattleST.isAfter(moment.utc()) ? "s" : "ed"
+                                        } ${portBattleST.fromNow()} at ${portBattleST.format("H.mm")}${
+                                            portBattleST !== portBattleLT
+                                                ? ` (${portBattleLT.format("H.mm")} local)`
+                                                : ""
+                                        }`
+                                      : `s: ${formatPercent(portProperties.attackHostility)} hostility`
+                              }`
+                            : "",
+                        // eslint-disable-next-line no-nested-ternary
+                        pbTimeRange: portProperties.nonCapturable
+                            ? ""
+                            : !portProperties.portBattleStartTime
+                                ? "11.00\u202f–\u202f8.00"
+                                : `${(portProperties.portBattleStartTime + 10) %
+                                      24}.00\u202f–\u202f${(portProperties.portBattleStartTime + 13) % 24}.00`,
+                        brLimit: formatInt(portProperties.brLimit),
+                        conquestMarksPension: portProperties.conquestMarksPension,
+                        taxIncome: formatSiInt(portProperties.taxIncome),
+                        portTax: formatPercent(portProperties.portTax),
+                        netIncome: formatSiInt(portProperties.netIncome),
+                        tradingCompany: portProperties.tradingCompany
+                            ? `, trading company level\u202f${portProperties.tradingCompany}`
+                            : "",
+                        laborHoursDiscount: portProperties.laborHoursDiscount ? ", labor hours discount" : "",
+                        producesTrading: portProperties.producesTrading.join(", "),
+                        dropsTrading: portProperties.dropsTrading.join(", "),
+                        producesNonTrading: portProperties.producesNonTrading.join(", "),
+                        dropsNonTrading: portProperties.dropsNonTrading.join(", "),
+                        consumesTrading: portProperties.consumesTrading
+                            .map(good => good.name + (good.amount > 1 ? ` (${good.amount})` : ""))
+                            .join(", "),
+                        consumesNonTrading: portProperties.consumesNonTrading.map(good => good.name).join(", ")
+                    };
 
                 switch (portProperties.portBattleType) {
                     case "Large":
