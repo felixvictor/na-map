@@ -99,3 +99,15 @@ export const rotationAngleInDegrees = (centerPt, targetPt) => {
 
 // https://bocoup.com/blog/find-the-closest-power-of-2-with-javascript
 export const nearestPow2 = aSize => 2 ** Math.round(Math.log2(aSize));
+
+// https://developers.google.com/web/updates/2015/03/introduction-to-fetch
+export function checkFetchStatus(response) {
+    if (response.status >= 200 && response.status < 300) {
+        return Promise.resolve(response);
+    }
+    return Promise.reject(new Error(response.statusText));
+}
+export const getJsonFromFetch = response => response.json();
+export const putFetchError = error => {
+    console.log("Request failed -->", error);
+};
