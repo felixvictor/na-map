@@ -58,7 +58,6 @@ function convertPorts() {
     const geoJson = {};
     geoJson.type = "FeatureCollection";
     geoJson.features = [];
-    const ticks = 621355968000000000;
     APIPorts.forEach(port => {
         const portShop = APIShops.filter(shop => shop.Id === port.Id);
         const feature = {
@@ -85,19 +84,12 @@ function convertPorts() {
                             convertCoordY(port.PortBattleZonePositions[0].x, port.PortBattleZonePositions[0].z)
                     )
                 ),
-                nation: nations[port.Nation].short,
                 countyCapital: port.Name === port.CountyCapitalName,
                 shallow: port.Depth,
                 availableForAll: port.AvailableForAll,
                 brLimit: port.PortBattleBRLimit,
                 portBattleStartTime: port.PortBattleStartTime,
                 portBattleType: port.PortBattleType,
-                capturer: port.Capturer,
-                lastPortBattle: moment((port.LastPortBattle - ticks) / 10000).format("YYYY-MM-DD HH:mm"),
-                attackerNation: "",
-                attackerClan: "",
-                attackHostility: "",
-                portBattle: "",
                 nonCapturable: port.NonCapturable,
                 conquestMarksPension: port.ConquestMarksPension,
                 portTax: Math.round(port.PortTax * 100) / 100,
@@ -117,7 +109,7 @@ function convertPorts() {
                 )[0],
                 consumesTrading: portShop.map(shop =>
                     shop.ResourcesConsumed.filter(good => ItemNames.get(good.Key).trading)
-                        .map(good => ({ name: `${ItemNames.get(good.Key).name}`, amount: good.Value }))
+                        .map(good => ItemNames.get(good.Key).name)
                         .sort()
                 )[0],
                 producesNonTrading: portShop.map(shop =>
@@ -132,7 +124,7 @@ function convertPorts() {
                 )[0],
                 consumesNonTrading: portShop.map(shop =>
                     shop.ResourcesConsumed.filter(good => !ItemNames.get(good.Key).trading)
-                        .map(good => ({ name: `${ItemNames.get(good.Key).name}`, amount: good.Value }))
+                        .map(good => ItemNames.get(good.Key).name)
                         .sort()
                 )[0]
             }
