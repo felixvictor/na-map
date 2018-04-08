@@ -207,7 +207,9 @@ export default class PortDisplay {
                 tradingCompany: portProperties.tradingCompany
                     ? `, trading company level\u202f${portProperties.tradingCompany}`
                     : "",
-                laborHoursDiscount: portProperties.laborHoursDiscount ? ", labor hours discount" : "",
+                laborHoursDiscount: portProperties.laborHoursDiscount
+                    ? `, labor hours discount level\u202f${portProperties.laborHoursDiscount}`
+                    : "",
                 producesTrading: portProperties.producesTrading.join(", "),
                 dropsTrading: portProperties.dropsTrading.join(", "),
                 producesNonTrading: portProperties.producesNonTrading.join(", "),
