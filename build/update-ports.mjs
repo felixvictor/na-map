@@ -113,7 +113,7 @@ function updatePorts() {
 
     // noinspection RegExpRedundantEscape
     const capturedRegex = new RegExp(
-            `\\[(${timeR}) UTC\\] (${portR}) captured by (${clanR}) ?\\(?(${nationR})?\\)? \\. Previous owner: (${clanR}) ?\\(?(${nationR})?\\)? #PBCaribbean #PBCaribbean${portHashR}`,
+            `\\[(${timeR}) UTC\\] (${portR}) captured by (${clanR}) ?\\(?(${nationR})?\\)?\\. Previous owner: (${clanR}) ?\\(?(${nationR})?\\)? #PBCaribbean #PBCaribbean${portHashR}`,
             "u"
         ),
         defendedRegex = new RegExp(
