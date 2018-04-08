@@ -14,7 +14,7 @@ import "moment/locale/en-gb";
 import "bootstrap/js/dist/tooltip";
 import "bootstrap/js/dist/util";
 
-import { nearestPow2 } from "./util";
+import { nearestPow2, checkFetchStatus, getJsonFromFetch, putFetchError } from "./util";
 
 import Course from "./course";
 import F11 from "./f11";
@@ -27,7 +27,6 @@ import WindPrediction from "./wind-prediction";
 
 export default function naDisplay(serverName) {
     let map, ports, teleport, portSelect, shipCompare, windPrediction, f11, course, pbZone, shipData;
-    const jsonFiles = [`${serverName}.json`, `${serverName}-pb.json`, "pb.json", "ships.json"];
 
     class NAMap {
         constructor() {
@@ -296,16 +295,13 @@ export default function naDisplay(serverName) {
         ports.clearMap();
     }
 
-    function naReady(error, naMapJsonData, pbJsonData, pbZonesJsonData, shipJsonData) {
-        if (error) {
-            throw error;
-        }
+    function init(data) {
         map = new NAMap();
         // Read map data
-        const portData = topojsonFeature(naMapJsonData, naMapJsonData.objects.ports).features;
-        ports = new PortDisplay(portData, pbJsonData, map.margin.top, map.margin.right);
+        const portData = topojsonFeature(data.ports, data.ports.objects.ports).features;
+        ports = new PortDisplay(portData, data.pb, map.margin.top, map.margin.right);
 
-        let pbZoneData = topojsonFeature(pbZonesJsonData, pbZonesJsonData.objects.pbZones);
+        let pbZoneData = topojsonFeature(data.pbZones, data.pbZones.objects.pbZones);
         // Port ids of capturable ports
         const portIds = portData.filter(port => !port.properties.nonCapturable).map(port => port.id);
         pbZoneData = pbZoneData.features.filter(port => portIds.includes(port.id)).map(d => ({
@@ -313,13 +309,13 @@ export default function naDisplay(serverName) {
             id: d.id,
             geometry: d.geometry
         }));
-        let fortData = topojsonFeature(pbZonesJsonData, pbZonesJsonData.objects.forts);
+        let fortData = topojsonFeature(data.pbZones, data.pbZones.objects.forts);
         fortData = fortData.features.map(d => ({
             type: "Feature",
             id: d.id,
             geometry: d.geometry
         }));
-        let towerData = topojsonFeature(pbZonesJsonData, pbZonesJsonData.objects.towers);
+        let towerData = topojsonFeature(data.pbZones, data.pbZones.objects.towers);
         towerData = towerData.features.map(d => ({
             type: "Feature",
             id: d.id,
@@ -327,14 +323,24 @@ export default function naDisplay(serverName) {
         }));
         pbZone = new PBZone(pbZoneData, fortData, towerData, ports);
 
-        shipData = JSON.parse(JSON.stringify(shipJsonData.shipData));
+        shipData = JSON.parse(JSON.stringify(data.ships.shipData));
 
         setup();
     }
 
-    const queue = d3.queue();
-    jsonFiles.forEach(filename => {
-        queue.defer(d3.json, filename);
-    });
-    queue.await(naReady);
+    const naMapJsonData = fetch(`${serverName}.json`)
+        .then(checkFetchStatus)
+        .then(getJsonFromFetch);
+    const pbJsonData = fetch(`${serverName}-pb.json`)
+        .then(checkFetchStatus)
+        .then(getJsonFromFetch);
+    const pbZonesJsonData = fetch("pb.json")
+        .then(checkFetchStatus)
+        .then(getJsonFromFetch);
+    const shipJsonData = fetch("ships.json")
+        .then(checkFetchStatus)
+        .then(getJsonFromFetch);
+    Promise.all([naMapJsonData, pbJsonData, pbZonesJsonData, shipJsonData])
+        .then(values => init({ ports: values[0], pb: values[1], pbZones: values[2], ships: values[3] }))
+        .catch(putFetchError);
 }
