@@ -314,19 +314,14 @@ class ShipComparison extends Ship {
     }
 
     _drawDifferenceProfile() {
-        const colorScaleDiff = d3
-            .scaleLinear()
-            .domain(["Base", "Compare"])
-            .range(["#a62e39", "#fbf8f5", "#a4dab0", "#6cc380", "#419f57"]);
-
         const pie = d3
             .pie()
             .sort(null)
             .value(1);
-        const arcsA = pie(this._shipBaseData.speedDegrees),
-            arcsB = pie(this._shipCompareData.speedDegrees);
+        const arcsBase = pie(this._shipBaseData.speedDegrees),
+            arcsComp = pie(this._shipCompareData.speedDegrees);
         const curve = d3.curveCatmullRomClosed,
-            lineA = d3
+            lineBase = d3
                 .radialLine()
                 .angle((d, i) => i * segmentRadians)
                 .radius(d => this._shipCompare.radiusScaleAbsolute(d.data))
@@ -337,38 +332,46 @@ class ShipComparison extends Ship {
                 .radius(d => this._shipCompare.radiusScaleAbsolute(d.data))
                 .curve(curve);
 
-        const pathA = this._g.append("path");
-        const pathB = this._g.append("path");
-        const markersA = this._g.append("g").attr("class", "markers");
-        const markersB = this._g.append("g").attr("class", "markers");
+        const pathComp = this._g.append("path"),
+            markersComp = this._g.append("g").attr("class", "markers"),
+            pathBase = this._g.append("path"),
+            markersBase = this._g.append("g").attr("class", "markers");
 
-        pathA.attr("d", lineA(arcsA)).attr("class", "arcs arcsA");
+        const speedDiff = [];
+        this._shipBaseData.speedDegrees.forEach((speedShipBase, i) => {
+            speedDiff.push(speedShipBase - this._shipCompareData.speedDegrees[i]);
+        });
+        const colourScale = d3
+            .scaleLinear()
+            .domain([Math.min(-0.01, d3.min(speedDiff)), 0, Math.max(0.01, d3.max(speedDiff))])
+            .range(["#a62e39", "#fbf8f5", "#419f57"])
+            .interpolate(d3.interpolateHcl);
 
-        const selA = markersA.selectAll("circle").data(arcsA);
-        selA
+        pathBase.attr("d", lineBase(arcsBase)).classed("base", true);
+        const selBase = markersBase.selectAll("circle").data(arcsBase);
+        selBase
             .enter()
             .append("circle")
-            .merge(selA)
+            .merge(selBase)
             .attr("r", "5")
             .attr("cy", (d, i) => Math.cos(i * segmentRadians) * -this._shipCompare.radiusScaleAbsolute(d.data))
             .attr("cx", (d, i) => Math.sin(i * segmentRadians) * this._shipCompare.radiusScaleAbsolute(d.data))
-            .attr("fill", d => colorScaleDiff(d.data))
-            .style("opacity", 0.2)
+            .attr("fill", (d, i) => colourScale(speedDiff[i]))
+            .classed("base", true)
             .append("title")
             .text(d => `${Math.round(d.data * 10) / 10} knots`);
 
-        pathB.attr("d", lineB(arcsB)).attr("class", "arcs arcsB");
+        pathComp.attr("d", lineB(arcsComp)).classed("comp", true);
 
-        const selB = markersB.selectAll("circle").data(arcsB);
-        selB
+        const selComp = markersComp.selectAll("circle").data(arcsComp);
+        selComp
             .enter()
             .append("circle")
-            .merge(selB)
+            .merge(selComp)
             .attr("r", "5")
             .attr("cy", (d, i) => Math.cos(i * segmentRadians) * -this._shipCompare.radiusScaleAbsolute(d.data))
             .attr("cx", (d, i) => Math.sin(i * segmentRadians) * this._shipCompare.radiusScaleAbsolute(d.data))
-            .attr("fill", d => colorScaleDiff(d.data))
-            .style("opacity", 0.2)
+            .classed("comp", true)
             .append("title")
             .text(d => `${Math.round(d.data * 10) / 10} knots`);
     }
