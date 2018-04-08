@@ -211,10 +211,8 @@ export default class PortDisplay {
                 dropsTrading: portProperties.dropsTrading.join(", "),
                 producesNonTrading: portProperties.producesNonTrading.join(", "),
                 dropsNonTrading: portProperties.dropsNonTrading.join(", "),
-                consumesTrading: portProperties.consumesTrading
-                    .map(good => good.name + (good.amount > 1 ? ` (${good.amount})` : ""))
-                    .join(", "),
-                consumesNonTrading: portProperties.consumesNonTrading.map(good => good.name).join(", ")
+                consumesTrading: portProperties.consumesTrading.join(", "),
+                consumesNonTrading: portProperties.consumesNonTrading.join(", ")
             };
 
         switch (portProperties.portBattleType) {
