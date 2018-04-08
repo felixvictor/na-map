@@ -10,6 +10,7 @@ SERVER_BASE_NAME="cleanopenworldprod"
 SOURCE_BASE_URL="http://storage.googleapis.com/nacleanopenworldprodshards/"
 # http://api.shipsofwar.net/servers?apikey=1ZptRtpXAyEaBe2SEp63To1aLmISuJj3Gxcl5ivl&callback=setActiveRealms
 SERVER_NAMES=(eu1 eu2)
+SERVER_TWITTER_NAMES=(eu1)
 API_VARS=(ItemTemplates Ports Shops)
 DATE=$(date +%Y-%m-%d)
 LAST_DATE=$(date +%Y-%m-%d --date "-1 day")
@@ -93,6 +94,7 @@ function get_port_data () {
 
         for SERVER_NAME in "${SERVER_NAMES[@]}"; do
             PORT_FILE="${SRC_DIR}/${SERVER_NAME}.json"
+            PB_FILE="${SRC_DIR}/${SERVER_NAME}-pb.json"
             TEMP_PORT_FILE="${BUILD_DIR}/ports.geojson"
             for API_VAR in "${API_VARS[@]}"; do
                 API_FILE="${API_BASE_FILE}-${SERVER_NAME}-${API_VAR}-${DATE}.json"
@@ -102,7 +104,10 @@ function get_port_data () {
             ${NODE} build/convert-API-data.mjs "${API_BASE_FILE}-${SERVER_NAME}" "${TEMP_PORT_FILE}" "${DATE}"
             yarn geo2topo -o "${PORT_FILE}" "${TEMP_PORT_FILE}"
             rm "${TEMP_PORT_FILE}"
+
+            ${NODE} build/convert-API-pb-data.mjs "${API_BASE_FILE}-${SERVER_NAME}" "${PB_FILE}" "${DATE}"
         done
+
 
         ${NODE} build/convert-pbZones.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${BUILD_DIR}" "${DATE}"
         yarn geo2topo -o "${SRC_DIR}/pb.json" \
@@ -140,9 +145,10 @@ function get_tweets () {
 }
 
 function update_ports () {
-    PORT_FILE="${SRC_DIR}/eu1.json"
-
-    ${NODE} build/update-ports.mjs "${PORT_FILE}" "${TWEETS_JSON}"
+    for SERVER_NAME in "${SERVER_TWITTER_NAMES[@]}"; do
+        PB_FILE="${SRC_DIR}/${SERVER_NAME}-pb.json"
+        ${NODE} build/update-ports.mjs "${PB_FILE}" "${TWEETS_JSON}"
+    done
 
     return $?
 }
