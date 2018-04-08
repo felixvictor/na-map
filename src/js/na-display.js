@@ -299,7 +299,7 @@ export default function naDisplay(serverName) {
         map = new NAMap();
         // Read map data
         const portData = topojsonFeature(data.ports, data.ports.objects.ports).features;
-        ports = new PortDisplay(portData, data.pb, map.margin.top, map.margin.right);
+        ports = new PortDisplay(portData, data.pb, serverName, map.margin.top, map.margin.right);
 
         let pbZoneData = topojsonFeature(data.pbZones, data.pbZones.objects.pbZones);
         // Port ids of capturable ports
