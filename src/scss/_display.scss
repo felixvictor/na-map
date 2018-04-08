@@ -72,23 +72,21 @@ p {
     color: $green;
 }
 
-.arcs {
-    stroke-width: 5px;
-    opacity: 0.4;
-}
-
 .compass-arc path {
     stroke: $primary-500;
 }
 
-.arcsA {
-    fill: $primary-600;
-    stroke: none;
-}
+.profile {
+    path.base {
+        opacity: 0.4;
+        fill: $primary-600;
+    }
 
-.arcsB {
-    fill: $secondary-600;
-    stroke: none;
+    path.comp,
+    circle.comp {
+        opacity: 0.4;
+        fill: $secondary-600;
+    }
 }
 
 .columnA {
