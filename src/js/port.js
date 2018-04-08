@@ -164,7 +164,7 @@ export default class PortDisplay {
     }
 
     _getText(id, portProperties) {
-        const pbData = this._pbData.ports.filter(port => port.id === id)[0],
+        const pbData = this.pbData.ports.filter(port => port.id === id)[0],
             portBattleLT = moment.utc(pbData.portBattle).local(),
             portBattleST = moment.utc(pbData.portBattle),
             port = {
@@ -326,9 +326,9 @@ export default class PortDisplay {
         }
 
         const circleSize = this._circleSizes[this._zoomLevel];
-        const data = this.portData.filter(port => this._pbData.ports.some(d => port.id === d.id)).map(port => {
+        const data = this.portData.filter(port => this.pbData.ports.some(d => port.id === d.id)).map(port => {
             // eslint-disable-next-line prefer-destructuring,no-param-reassign
-            port.properties.nation = this._pbData.ports.filter(d => port.id === d.id).map(d => d.nation)[0];
+            port.properties.nation = this.pbData.ports.filter(d => port.id === d.id).map(d => d.nation)[0];
             return port;
         });
 
@@ -365,7 +365,7 @@ export default class PortDisplay {
         if (this._showRadiusType === "taxIncome" || this._showRadiusType === "netIncome") {
             data = this.portData.filter(d => !d.properties.nonCapturable);
         } else if (this._showRadiusType === "attack") {
-            const pbData = this._pbData.ports
+            const pbData = this.pbData.ports
                 .filter(d => d.attackHostility)
                 .map(d => ({ id: d.id, attackHostility: d.attackHostility }));
             data = this.portData.filter(port => pbData.some(d => port.id === d.id)).map(port => {
@@ -513,7 +513,7 @@ export default class PortDisplay {
     }
 
     _setPBData(pbData) {
-        this._pbData = pbData;
+        this.pbData = pbData;
     }
 
     setCurrentPort(id, x, y) {
