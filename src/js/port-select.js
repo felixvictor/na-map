@@ -134,6 +134,7 @@ export default class PortSelect {
             event.preventDefault();
         });
 
+        $("#menu-prop-today").on("click", () => this._capturedToday());
         $("#menu-prop-yesterday").on("click", () => this._capturedYesterday());
         $("#menu-prop-this-week").on("click", () => this._capturedThisWeek());
         $("#menu-prop-last-week").on("click", () => this._capturedLastWeek());
@@ -415,17 +416,29 @@ export default class PortSelect {
         this._ports.update();
     }
 
+    _capturedToday() {
+        const now = moment.utc();
+        let begin = moment()
+            .utc()
+            .hour(11)
+            .minute(0);
+        if (now.hour() < begin.hour()) {
+            begin = begin.subtract(1, "day");
+        }
+        this._filterCaptured(begin, moment.utc(begin).add(1, "day"));
+    }
+
     _capturedYesterday() {
-        const begin = moment()
-                .utc()
-                .subtract(1, "day")
-                .hour(11)
-                .minute(0),
-            end = moment()
-                .utc()
-                .hour(11)
-                .minute(0);
-        this._filterCaptured(begin, end);
+        const now = moment.utc();
+        let begin = moment()
+            .utc()
+            .hour(11)
+            .minute(0)
+            .subtract(1, "day");
+        if (now.hour() < begin.hour()) {
+            begin = begin.subtract(1, "day");
+        }
+        this._filterCaptured(begin, moment.utc(begin).add(1, "day"));
     }
 
     _capturedThisWeek() {
