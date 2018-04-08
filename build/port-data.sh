@@ -10,6 +10,7 @@ SERVER_BASE_NAME="cleanopenworldprod"
 SOURCE_BASE_URL="http://storage.googleapis.com/nacleanopenworldprodshards/"
 # http://api.shipsofwar.net/servers?apikey=1ZptRtpXAyEaBe2SEp63To1aLmISuJj3Gxcl5ivl&callback=setActiveRealms
 SERVER_NAMES=(eu1 eu2)
+SERVER_TWITTER_NAMES=(eu1)
 API_VARS=(ItemTemplates Ports Shops)
 DATE=$(date +%Y-%m-%d)
 LAST_DATE=$(date +%Y-%m-%d --date "-1 day")
@@ -20,7 +21,6 @@ function change_var () {
     export BUILD_DIR="${BASE_DIR}/build"
     export SRC_DIR="${BASE_DIR}/src"
     export LAST_UPDATE_FILE="${BUILD_DIR}/.last-port-update"
-    export PB_PORT_FILE="${SRC_DIR}/${SERVER_NAMES[0]}-pb.json"
     export SHIP_FILE="${SRC_DIR}/ships.json"
     export EXCEL_FILE="${SRC_DIR}/port-battle.xlsx"
     export TWEETS_JSON="${BUILD_DIR}/API/tweets.json"
@@ -145,9 +145,10 @@ function get_tweets () {
 }
 
 function update_ports () {
-    PORT_FILE="${SRC_DIR}/eu1.json"
-
-    ${NODE} build/update-ports.mjs "${PB_PORT_FILE}" "${TWEETS_JSON}"
+    for SERVER_NAME in "${SERVER_TWITTER_NAMES[@]}"; do
+        PB_FILE="${SRC_DIR}/${SERVER_NAME}-pb.json"
+        ${NODE} build/update-ports.mjs "${PB_FILE}" "${TWEETS_JSON}"
+    done
 
     return $?
 }
