@@ -47,12 +47,8 @@ export default class PortSelect {
 
         // Sell goods
         goodsPerPort = this._ports.portDataDefault.map(port => {
-            let goods = port.properties.consumesTrading.length
-                ? `${port.properties.consumesTrading.map(good => good.name)},`
-                : "";
-            goods += port.properties.consumesNonTrading.length
-                ? `${port.properties.consumesNonTrading.map(good => good.name)}`
-                : "";
+            let goods = port.properties.consumesTrading.length ? `${port.properties.consumesTrading},` : "";
+            goods += port.properties.consumesNonTrading.length ? `${port.properties.consumesNonTrading}` : "";
 
             return {
                 id: port.id,
@@ -252,8 +248,10 @@ export default class PortSelect {
 
         propClan.empty();
 
-        const clanList = new Set();
-        this._ports.portData.filter(d => d.properties.capturer).map(d => clanList.add(d.properties.capturer));
+        const clanList = new Set(),
+            portId = new Set();
+        this._ports.portData.forEach(d => portId.add(d.id));
+        this._ports.pbData.ports.filter(d => d.capturer && portId.has(d.id)).forEach(d => clanList.add(d.capturer));
         const select = `${Array.from(clanList)
             .sort()
             .map(clan => `<option value="${clan}">${clan}</option>`)
@@ -272,7 +270,7 @@ export default class PortSelect {
         const propCM = $("#prop-cm");
 
         const cmList = new Set();
-        this._ports.portData.filter(d => d.properties.capturer).map(d => cmList.add(d.properties.conquestMarksPension));
+        this._ports.portData.forEach(d => cmList.add(d.properties.conquestMarksPension));
         cmList.forEach(cm => {
             propCM.append(
                 $("<option>", {
@@ -321,7 +319,9 @@ export default class PortSelect {
 
         if (+nationId !== 0) {
             this._nation = nationId;
-            portData = this._ports.portDataDefault.filter(d => nationId === d.properties.nation);
+            const portId = new Set();
+            this._ports.pbData.ports.filter(port => port.nation === this._nation).forEach(port => portId.add(port.id));
+            portData = this._ports.portDataDefault.filter(d => portId.has(d.id));
         } else {
             this._nation = "";
             portData = this._ports.portDataDefault;
@@ -337,9 +337,13 @@ export default class PortSelect {
         let portData;
 
         if (+clan !== 0) {
-            portData = this._ports.portDataDefault.filter(d => clan === d.properties.capturer);
+            const portId = new Set();
+            this._ports.pbData.ports.filter(port => clan === port.capturer).forEach(port => portId.add(port.id));
+            portData = this._ports.portDataDefault.filter(d => portId.has(d.id));
         } else if (this._nation) {
-            portData = this._ports.portDataDefault.filter(d => this._nation === d.properties.nation);
+            const portId = new Set();
+            this._ports.pbData.ports.filter(port => port.nation === this._nation).forEach(port => portId.add(port.id));
+            portData = this._ports.portDataDefault.filter(d => portId.has(d.id));
         } else {
             portData = this._ports.portDataDefault;
         }
@@ -409,9 +413,12 @@ export default class PortSelect {
 
     _filterCaptured(begin, end) {
         // console.log("Between %s and %s", begin.format("dddd D MMMM YYYY h:mm"), end.format("dddd D MMMM YYYY h:mm"));
-        const portData = this._ports.portDataDefault.filter(d =>
-            moment(d.properties.lastPortBattle).isBetween(begin, end, null, "(]")
-        );
+        const portId = new Set();
+        this._ports.pbData.ports
+            .filter(port => moment(port.lastPortBattle).isBetween(begin, end, null, "(]"))
+            .forEach(port => portId.add(port.id));
+        const portData = this._ports.portDataDefault.filter(d => portId.has(d.id));
+
         this._ports.setPortData(portData);
         this._ports.update();
     }
