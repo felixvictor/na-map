@@ -18,16 +18,15 @@ LAST_DATE=$(date +%Y-%m-%d --date "-1 day")
 function change_var () {
     BASE_DIR="$(pwd)"
     export BASE_DIR
-    export BUILD_DIR="${BASE_DIR}/build"
-    export SRC_DIR="${BASE_DIR}/src"
-    export LAST_UPDATE_FILE="${BUILD_DIR}/.last-port-update"
-    export SHIP_FILE="${SRC_DIR}/ships.json"
-    export EXCEL_FILE="${SRC_DIR}/port-battle.xlsx"
-    export TWEETS_JSON="${BUILD_DIR}/API/tweets.json"
+    common_var
 }
 
 function update_var () {
     export BASE_DIR="/home/natopo/na-topo.git"
+    common_var
+}
+
+function common_var () {
     export BUILD_DIR="${BASE_DIR}/build"
     export SRC_DIR="${BASE_DIR}/src"
     export LAST_UPDATE_FILE="${BUILD_DIR}/.last-port-update"
@@ -120,12 +119,13 @@ function get_port_data () {
     fi
 }
 
-function deploy_data () {
-    #yarn run deploy-update
-
+function copy_data () {
     PUBLIC_DIR="${BASE_DIR}/public"
 
     cp --update "${SRC_DIR}"/*.json "${EXCEL_FILE}" "${PUBLIC_DIR}"/
+}
+
+function deploy_data () {
     yarn run deploy-netlify
 }
 
@@ -161,6 +161,7 @@ function update_tweets () {
     cd ${BASE_DIR}
     get_tweets
     if update_ports; then
+        copy_data
         push_data tweets
         deploy_data
     fi
@@ -205,6 +206,7 @@ function update_data () {
         get_tweets
         update_ports
 
+        copy_data
         push_data update
         deploy_data
     fi
