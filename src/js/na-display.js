@@ -108,6 +108,39 @@ export default function naDisplay(serverName) {
             this._g = this._svg.append("g").classed("map", true);
         }
 
+        _setupGrid() {
+            const xScale = d3.scale
+                .linear()
+                .domain([-width / 2, width / 2])
+                .range([0, width]);
+
+            const yScale = d3.scale
+                .linear()
+                .domain([-height / 2, height / 2])
+                .range([height, 0]);
+
+            const xAxis = d3.svg
+                .axis()
+                .scale(xScale)
+                .orient("bottom")
+                .tickSize(-height);
+
+            const yAxis = d3.svg
+                .axis()
+                .scale(yScale)
+                .orient("left")
+                .ticks(5)
+                .tickSize(-width);
+            this._gXAxis = this._svg
+                .append("g")
+                .classed("grid", true)
+                .call(xAxis);
+            this._gYAxis = this._svg
+                .append("g")
+                .classed("grid", true)
+                .call(yAxis);
+        }
+
         _displayMap(transform) {
             // Based on d3-tile v0.0.3
             // https://github.com/d3/d3-tile/blob/0f8cc9f52564d4439845f651c5fab2fcc2fdef9e/src/tile.js
@@ -222,7 +255,7 @@ export default function naDisplay(serverName) {
             teleport.setZoomLevel(zoomLevel);
         }
 
-        _updateCurrent() {
+        static _updateCurrent() {
             pbZone.refresh();
             teleport.setTeleportData();
             teleport.updateTeleportAreas();
@@ -233,16 +266,16 @@ export default function naDisplay(serverName) {
             if (d3.event.transform.k > this._PBZoneZoomThreshold) {
                 if (this._zoomLevel !== "pbZone") {
                     this._setZoomLevel("pbZone");
-                    this._updateCurrent();
+                    Map._updateCurrent();
                 }
             } else if (d3.event.transform.k > this._labelZoomThreshold) {
                 if (this._zoomLevel !== "portLabel") {
                     this._setZoomLevel("portLabel");
-                    this._updateCurrent();
+                    Map._updateCurrent();
                 }
             } else if (this._zoomLevel !== "initial") {
                 this._setZoomLevel("initial");
-                this._updateCurrent();
+                Map._updateCurrent();
             }
         }
 
@@ -255,6 +288,7 @@ export default function naDisplay(serverName) {
                 .scale(Math.round(d3.event.transform.k * 1000) / 1000);
 
             this._displayMap(zoomTransform);
+            this._gXAxis.attr("transform", zoomTransform);
             ports.transform(zoomTransform);
             teleport.transform(zoomTransform);
             course.transform(zoomTransform);
