@@ -136,8 +136,8 @@ export default function naDisplay(serverName) {
         _setupXAxis() {
             this._gXAxis
                 .selectAll(".tick text")
-                .attr("dx", "-0.5em")
-                .attr("dy", "1.5em");
+                .attr("dx", "-0.3em")
+                .attr("dy", "1.2em");
             this._gXAxis
                 .attr("text-anchor", "end")
                 .attr("fill", null)
@@ -151,8 +151,8 @@ export default function naDisplay(serverName) {
                 .attr("font-family", null);
             this._gYAxis
                 .selectAll(".tick text")
-                .attr("dx", "4em")
-                .attr("dy", "-.5em");
+                .attr("dx", "3.5em")
+                .attr("dy", "-.3em");
         }
 
         _setupAxis() {
