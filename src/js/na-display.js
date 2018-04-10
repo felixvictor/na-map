@@ -14,7 +14,7 @@ import "moment/locale/en-gb";
 import "bootstrap/js/dist/tooltip";
 import "bootstrap/js/dist/util";
 
-import { nearestPow2, checkFetchStatus, getJsonFromFetch, putFetchError } from "./util";
+import { formatF11, nearestPow2, checkFetchStatus, getJsonFromFetch, putFetchError } from "./util";
 import { convertInvCoordX, convertInvCoordY } from "./common";
 
 import Course from "./course";
@@ -111,23 +111,60 @@ export default function naDisplay(serverName) {
         }
 
         _displayXAxis() {
-            this._gXAxis.call(this._xAxis.scale(d3.event.transform.rescaleX(this._xScale)));
+            const tk = d3.event ? d3.event.transform.k : 1,
+                ty = d3.event ? d3.event.transform.y : 0,
+                dx = ty / tk;
+            this._gXAxis.call(this._xAxis.tickPadding(-this.coord.max - dx));
+            this._gXAxis.attr("font-size", 16 / tk).attr("stroke-width", 1 / tk);
             this._gXAxis.select(".domain").remove();
-            this._gXAxis.attr("font-size", 30);
-            this._gXAxis
-                .selectAll(".tick text")
-                .attr("dx", ".5em")
-                .attr("dy", "-.5em");
         }
 
         _displayYAxis() {
-            this._gYAxis.call(this._yAxis.scale(d3.event.transform.rescaleY(this._yScale)));
+            const tk = d3.event ? d3.event.transform.k : 1,
+                tx = d3.event ? d3.event.transform.x : 0,
+                dy = tx / tk < this._height ? tx / tk : 0;
+            this._gYAxis.call(this._yAxis.tickPadding(-this.coord.max - dy));
+            this._gYAxis.attr("font-size", 16 / tk).attr("stroke-width", 1 / tk);
             this._gYAxis.select(".domain").remove();
-            this._gYAxis.attr("font-size", 30);
+        }
+
+        _displayAxis() {
+            this._displayXAxis();
+            this._displayYAxis();
+        }
+
+        _setupXAxis() {
+            this._gXAxis
+                .selectAll(".tick text")
+                .attr("dx", "-0.5em")
+                .attr("dy", "1.5em");
+            this._gXAxis
+                .attr("text-anchor", "end")
+                .attr("fill", null)
+                .attr("font-family", null);
+        }
+
+        _setupYAxis() {
+            this._gYAxis
+                .attr("text-anchor", "end")
+                .attr("fill", null)
+                .attr("font-family", null);
             this._gYAxis
                 .selectAll(".tick text")
-                .attr("dx", ".5em")
+                .attr("dx", "4em")
                 .attr("dy", "-.5em");
+        }
+
+        _setupAxis() {
+            this._gAxis = this._svg.append("g").classed("axis", true);
+            this._gXAxis = this._gAxis.append("g").classed("axis-x", true);
+            this._gYAxis = this._gAxis.append("g").classed("axis-y", true);
+
+            // Initialise both Axis first
+            this._displayAxis();
+            // Set default values
+            this._setupXAxis();
+            this._setupYAxis();
         }
 
         _setupGrid() {
@@ -150,18 +187,16 @@ export default function naDisplay(serverName) {
 
             this._xAxis = d3
                 .axisBottom(this._xScale)
+                .tickFormat(formatF11)
                 .ticks(this.coord.max / 256)
-                .tickSize(this.coord.max)
-                .tickPadding(20 - this.coord.max);
+                .tickSize(this.coord.max);
             this._yAxis = d3
                 .axisRight(this._yScale)
+                .tickFormat(formatF11)
                 .ticks(this.coord.max / 256)
-                .tickSize(this.coord.max)
-                .tickPadding(20 - this.coord.max);
+                .tickSize(this.coord.max);
 
-            this._gAxis = this._svg.append("g").classed("axis", true);
-            this._gXAxis = this._gAxis.append("g").classed("axis-x", true);
-            this._gYAxis = this._gAxis.append("g").classed("axis-y", true);
+            this._setupAxis();
         }
 
         _displayMap(transform) {
@@ -312,8 +347,7 @@ export default function naDisplay(serverName) {
 
             this._displayMap(zoomTransform);
             this._gAxis.attr("transform", zoomTransform);
-            this._displayXAxis();
-            this._displayYAxis();
+            this._displayAxis();
             ports.transform(zoomTransform);
             teleport.transform(zoomTransform);
             course.transform(zoomTransform);

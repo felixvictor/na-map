@@ -14,7 +14,11 @@ $background-colour: $primary-300;
 
 .axis {
     line {
-        stroke: $primary-700;
+        stroke: $primary-600;
+      opacity: .5;
+    }
+    text {
+      fill: $primary-800;
     }
 }
 
