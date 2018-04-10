@@ -15,7 +15,7 @@ import "bootstrap/js/dist/tooltip";
 import "bootstrap/js/dist/util";
 
 import { nearestPow2, checkFetchStatus, getJsonFromFetch, putFetchError } from "./util";
-import { convertCoordX, convertCoordY, convertInvCoordX, convertInvCoordY } from "./common";
+import { convertInvCoordX, convertInvCoordY } from "./common";
 
 import Course from "./course";
 import F11 from "./f11";
@@ -110,40 +110,58 @@ export default function naDisplay(serverName) {
             this._g = this._svg.append("g").classed("map", true);
         }
 
+        _displayXAxis() {
+            this._gXAxis.call(this._xAxis.scale(d3.event.transform.rescaleX(this._xScale)));
+            this._gXAxis.select(".domain").remove();
+            this._gXAxis.attr("font-size", 30);
+            this._gXAxis
+                .selectAll(".tick text")
+                .attr("dx", ".5em")
+                .attr("dy", "-.5em");
+        }
+
+        _displayYAxis() {
+            this._gYAxis.call(this._yAxis.scale(d3.event.transform.rescaleY(this._yScale)));
+            this._gYAxis.select(".domain").remove();
+            this._gYAxis.attr("font-size", 30);
+            this._gYAxis
+                .selectAll(".tick text")
+                .attr("dx", ".5em")
+                .attr("dy", "-.5em");
+        }
+
         _setupGrid() {
             this._xScale = d3
                 .scaleLinear()
+                .clamp(true)
                 .domain([
                     convertInvCoordX(this.coord.max, this.coord.max),
                     convertInvCoordX(this.coord.min, this.coord.min)
                 ])
-                .range([this.coord.min, this.coord.max]);
+                .rangeRound([this.coord.min, this.coord.max]);
             this._yScale = d3
                 .scaleLinear()
+                .clamp(true)
                 .domain([
                     convertInvCoordY(this.coord.max, this.coord.max),
                     convertInvCoordY(this.coord.min, this.coord.min)
                 ])
-                .range([this.coord.min, this.coord.max]);
+                .rangeRound([this.coord.min, this.coord.max]);
 
             this._xAxis = d3
                 .axisBottom(this._xScale)
-                .ticks(this.coord.max / 128)
-                .tickSize(this._height / 2)
-                .tickPadding(this._height);
+                .ticks(this.coord.max / 256)
+                .tickSize(this.coord.max)
+                .tickPadding(20 - this.coord.max);
             this._yAxis = d3
                 .axisRight(this._yScale)
-                .ticks(this.coord.max / 128)
-                .tickSize(this._width);
+                .ticks(this.coord.max / 256)
+                .tickSize(this.coord.max)
+                .tickPadding(20 - this.coord.max);
 
-            this._gXAxis = this._svg
-                .append("g")
-                .classed("axis axis-x", true)
-                .call(this._xAxis);
-            this._gYAxis = this._svg
-                .append("g")
-                .classed("axis axis-y", true)
-                .call(this._yAxis);
+            this._gAxis = this._svg.append("g").classed("axis", true);
+            this._gXAxis = this._gAxis.append("g").classed("axis-x", true);
+            this._gYAxis = this._gAxis.append("g").classed("axis-y", true);
         }
 
         _displayMap(transform) {
@@ -293,8 +311,9 @@ export default function naDisplay(serverName) {
                 .scale(Math.round(d3.event.transform.k * 1000) / 1000);
 
             this._displayMap(zoomTransform);
-            this._gXAxis.call(this._xAxis.scale(d3.event.transform.rescaleX(this._xScale)));
-            this._gYAxis.call(this._yAxis.scale(d3.event.transform.rescaleY(this._yScale)));
+            this._gAxis.attr("transform", zoomTransform);
+            this._displayXAxis();
+            this._displayYAxis();
             ports.transform(zoomTransform);
             teleport.transform(zoomTransform);
             course.transform(zoomTransform);
