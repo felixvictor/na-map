@@ -12,6 +12,12 @@ $background-colour: $primary-300;
     background-color: $background-colour;
 }
 
+.axis {
+    line {
+        stroke: $primary-700;
+    }
+}
+
 table tr,
 p {
     text-align: left;
