@@ -194,11 +194,10 @@ export default class PortDisplay {
                 // eslint-disable-next-line no-nested-ternary
                 pbTimeRange: portProperties.nonCapturable
                     ? ""
-                    : !pbData.portBattleStartTime
+                    : !portProperties.portBattleStartTime
                         ? "11.00\u202f–\u202f8.00"
-                        : `${(pbData.portBattleStartTime + 10) % 24}.00\u202f–\u202f${(pbData.portBattleStartTime +
-                              13) %
-                              24}.00`,
+                        : `${(portProperties.portBattleStartTime + 10) %
+                              24}.00\u202f–\u202f${(portProperties.portBattleStartTime + 13) % 24}.00`,
                 brLimit: formatInt(portProperties.brLimit),
                 conquestMarksPension: portProperties.conquestMarksPension,
                 taxIncome: formatSiInt(portProperties.taxIncome),
