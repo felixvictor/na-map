@@ -5,32 +5,35 @@
 /* global d3 : false
  */
 
-const locale = d3.formatLocale({
-    decimal: ".",
-    thousands: "\u202f",
-    grouping: [3],
-    currency: ["", "\u00a0gold"],
-    percent: "\u202f%"
-});
+const formatLocale = d3.formatLocale({
+        decimal: ".",
+        thousands: "\u202f",
+        grouping: [3],
+        currency: ["", "\u00a0gold"],
+        percent: "\u202f%"
+    }),
+    formatPrefix = d3.formatPrefix(",.0", 1e3);
 
 export const formatFloat = x =>
-    locale
+    formatLocale
         .format(",.2r")(x)
         .replace("-", "\u2212\u202f");
 
+export const formatF11 = x => formatPrefix(x).replace("-", "\u2212\u202f");
+
 export const formatInt = x =>
-    locale
+    formatLocale
         .format(",d")(x)
         .replace("-", "\u2212\u202f");
 
 export const formatSiInt = x =>
-    locale
+    formatLocale
         .format(",.2s")(x)
         .replace(".0", "")
         .replace("-", "\u2212\u202f");
 
 export const formatPercent = x =>
-    locale
+    formatLocale
         .format(".1%")(x)
         .replace(".0", "")
         .replace("-", "\u2212\u202f");
