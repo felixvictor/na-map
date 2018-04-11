@@ -1,7 +1,10 @@
-/*
- Main
-
- iB 2017
+/**
+ * This file is part of na-map.
+ *
+ * @file Main file.
+ * @author iB aka Felix Victor
+ * @copyright 2017, 2018
+ * @license   http://www.gnu.org/licenses/gpl.html
  */
 
 import "bootstrap/js/dist/button";
@@ -26,6 +29,9 @@ import {
 import naDisplay from "./na-display";
 import naAnalytics from "./analytics";
 
+/**
+ * @returns {void}
+ */
 function main() {
     const greetings = $("#modal-greetings");
 
