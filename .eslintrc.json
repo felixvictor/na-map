@@ -25,6 +25,7 @@
         "one-var": ["off"],
         "prefer-template": ["error"],
         "prettier/prettier": ["error", { "tabWidth": 4, "printWidth": 120 }],
-        "quotes": ["error", "double", { "avoidEscape": true }]
+        "quotes": ["error", "double", { "avoidEscape": true }],
+        "valid-jsdoc": ["error"]
     }
 }
