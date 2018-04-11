@@ -1,9 +1,9 @@
 /**
  * This file is part of na-map.
  *
- * @file Utility functions.
- * @module util
- * @author iB aka Felix Victor
+ * @file      Utility functions.
+ * @module    util
+ * @author    iB aka Felix Victor
  * @copyright 2017, 2018
  * @license   http://www.gnu.org/licenses/gpl.html
  */
@@ -83,10 +83,9 @@ export const formatPercent = x =>
 
 /**
  * Format ordinal
- * @param {Number} x - Integer
+ * @param {Number} n - Integer
  * @return {String} Formatted Ordinal
  */
-
 export function getOrdinal(n) {
     const s = ["th", "st", "nd", "rd"],
         v = n % 100;
@@ -177,7 +176,8 @@ Math.radiansToDegrees = radians => radians * 180 / Math.PI;
  */
 
 /**
- * Calculate the angle in degrees between two points (see {@link https://stackoverflow.com/questions/9970281/java-calculating-the-angle-between-two-points-in-degrees})
+ * Calculate the angle in degrees between two points
+ * @see https://stackoverflow.com/questions/9970281/java-calculating-the-angle-between-two-points-in-degrees
  * @function
  * @param {Point} centerPt - Center point
  * @param {Point} targetPt - Target point
