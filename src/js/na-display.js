@@ -1,7 +1,11 @@
-/*
- Draws teleport map for Naval Action
-
- iB 2017, 2018
+/**
+ * This file is part of na-map.
+ *
+ * @file Display naval action map.
+ * @module na-display
+ * @author iB aka Felix Victor
+ * @copyright 2017, 2018
+ * @license   http://www.gnu.org/licenses/gpl.html
  */
 
 /* global d3 : false
@@ -26,6 +30,11 @@ import ShipCompare from "./ship-compare";
 import Teleport from "./teleport";
 import WindPrediction from "./wind-prediction";
 
+/**
+ *
+ * @param {string} serverName - Naval action server name
+ * @returns {void}
+ */
 export default function naDisplay(serverName) {
     let map, ports, teleport, portSelect, shipCompare, windPrediction, f11, course, pbZone, shipData;
 
