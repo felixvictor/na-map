@@ -5,7 +5,7 @@
 /* global d3 : false
  */
 
-import { between, formatInt } from "./util";
+import { between, formatF11 } from "./util";
 import { convertCoordX, convertCoordY, convertInvCoordX, convertInvCoordY } from "./common";
 
 export default class F11 {
@@ -40,8 +40,8 @@ export default class F11 {
     }
 
     _f11Submitted() {
-        const x = +$("#x-coord").val(),
-            z = +$("#z-coord").val();
+        const x = +$("#x-coord").val() * 1000,
+            z = +$("#z-coord").val() * 1000;
 
         this._goToF11(x, z);
     }
@@ -61,18 +61,18 @@ export default class F11 {
             z = $("#z-coord").val();
 
         if (!Number.isNaN(x) && !Number.isNaN(z)) {
-            const F11String = `F11 coordinates X: ${x} Z: ${z}`;
+            const F11String = `F11 coordinates X: ${x}k Z: ${z}k`;
             this.constructor._copyF11ToClipboard(F11String);
         }
     }
 
     _addF11StringToInput(F11String) {
-        const regex = /F11 coordinates X: ([-+]?[0-9]*\.?[0-9]+) Z: ([-+]?[0-9]*\.?[0-9]+)/g,
+        const regex = /F11 coordinates X: ([-+]?[0-9]*\.?[0-9]+)k Z: ([-+]?[0-9]*\.?[0-9]+)k/g,
             match = regex.exec(F11String);
 
         if (match && !Number.isNaN(+match[1]) && !Number.isNaN(+match[2])) {
-            const x = +match[1],
-                z = +match[2];
+            const x = +match[1] * 1000,
+                z = +match[2] * 1000;
             if (!Number.isNaN(Number(x)) && !Number.isNaN(Number(z))) {
                 this._goToF11(x, z);
             }
@@ -105,17 +105,17 @@ export default class F11 {
 
     _printF11Coord(x, y, F11X, F11Y) {
         const g = this._g.append("g").attr("transform", `translate(${x},${y})`);
-        g.append("circle").attr("r", 20);
+        g.append("circle").attr("r", 10);
         g
             .append("text")
-            .attr("dx", "-1.5em")
+            .attr("dx", "-.6em")
             .attr("dy", "-.5em")
-            .text(formatInt(F11X));
+            .text(formatF11(F11X));
         g
             .append("text")
-            .attr("dx", "-1.5em")
+            .attr("dx", "-.6em")
             .attr("dy", ".5em")
-            .text(formatInt(F11Y));
+            .text(formatF11(F11Y));
     }
 
     _goToF11(F11XIn, F11YIn) {
