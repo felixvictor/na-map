@@ -60,6 +60,16 @@ export default class Grid {
      * @private
      */
     _setupSvg() {
+        this._setupScale();
+        this._setupAxis();
+    }
+
+    /**
+     * Setup scale
+     * @return {void}
+     * @private
+     */
+    _setupScale() {
         /**
          * X scale
          * @type {Object}
@@ -85,18 +95,15 @@ export default class Grid {
                 convertInvCoordY(this._minCoord, this._minCoord)
             ])
             .range([this._minCoord, this._maxCoord]);
+    }
 
-        const min = Math.round(convertInvCoordY(this._minCoord, this._minCoord)),
-            max = Math.round(convertInvCoordY(this._maxCoord, this._maxCoord)),
-            items = 64, // will be +1 items
-            increments = (max - min) / items,
-            ticks = [];
-
-        for (let i = min; i < max; i += increments) {
-            ticks.push(Math.round(i));
-        }
-        ticks.push(max);
-        console.log(ticks);
+    /**
+     * Setup axis
+     * @return {void}
+     * @private
+     */
+    _setupAxis() {
+        const ticks = this._getTicks(65);
 
         /**
          * X axis
@@ -109,7 +116,7 @@ export default class Grid {
             .tickSize(this._maxCoord);
 
         /**
-         * Y scale
+         * Y Axis
          * @type {Object}
          */
         this._yAxis = d3
@@ -118,15 +125,7 @@ export default class Grid {
             .tickValues(ticks)
             .tickSize(this._maxCoord);
 
-        this._setupAxis();
-    }
-
-    /**
-     * Setup axis
-     * @return {void}
-     * @private
-     */
-    _setupAxis() {
+        // svg groups
         this._gAxis = this._map._svg.append("g").classed("axis", true);
         this._gXAxis = this._gAxis.append("g").classed("axis-x", true);
         this._gYAxis = this._gAxis.append("g").classed("axis-y", true);
@@ -136,6 +135,44 @@ export default class Grid {
         // Set default values
         this._setupXAxis();
         this._setupYAxis();
+    }
+
+    /**
+     * Construct a list of ordered ticks [-maxCoord/2 .. 0 .. maxCoord/2]
+     * @param {Number} items Number of ticks
+     * @returns {Number[]} Tick list
+     * @private
+     */
+    _getTicks(items) {
+        const min = Math.round(convertInvCoordY(this._minCoord, this._minCoord)),
+            max = Math.round(convertInvCoordY(this._maxCoord, this._maxCoord)),
+            increment = (max - min) / (items - 1);
+
+        /**
+         * List of ticks (positive values [increment .. max])
+         * @type {number[]}
+         */
+        const tPos = [];
+        for (let i = increment; i < max; i += increment) {
+            tPos.push(Math.round(i));
+        }
+        tPos.push(max);
+
+        /**
+         * List of ticks (negative values [-max .. 0])
+         * @type {number[]}
+         */
+        const tNeg = tPos
+            // copy values from tPos
+            .slice(0)
+            // reverse items
+            .reverse()
+            // convert to negatives
+            .map(d => -d);
+        tNeg.push(0);
+
+        // Concat negative and positive values
+        return tNeg.concat(tPos);
     }
 
     /**
