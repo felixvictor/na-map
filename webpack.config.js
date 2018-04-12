@@ -23,6 +23,7 @@ const babelOpt = {
                 // debug: true,
                 loose: true,
                 modules: false,
+                shippedProposals: true,
                 targets: {
                     browsers: PACKAGE.browserslist
                 }
