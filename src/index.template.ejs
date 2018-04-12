@@ -70,18 +70,21 @@
                 <div class="dropdown-menu extralarge-width p-2" id="moveToMenu" aria-labelledby="moveToDropdown">
                     <form id="f11">
                         <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">F11 coordinates</span>
+                            <input class="form-control" id="x-coord" type="number" required placeholder="X" max="830"
+                                   min="-816" step="1">
+                            <div class="input-group-append">
+                                <span class="input-group-text">k</span>
                             </div>
-                            <input class="form-control" id="x-coord" type="number" required placeholder="X" max="830000"
-                                   min="-816000" step="0.1">
-                            <input class="form-control" id="z-coord" type="number" required placeholder="Z" max="830000"
-                                   min="-430000" step="0.1">
+                            <input class="form-control" id="z-coord" type="number" required placeholder="Z" max="830"
+                                   min="-430" step="1">
+                            <div class="input-group-append">
+                                <span class="input-group-text">k</span>
+                            </div>
                             <div class="input-group-append">
                                 <button class="btn btn-outline-primary" id="copy-coord" title="Copy to clipboard"
                                         type="button"><i class="far fa-copy"></i>
                                 </button>
-                                <button class="btn btn-primary" type="submit">Move to</button>
+                                <button class="btn btn-outline-primary" type="submit">Move to</button>
                             </div>
                         </div>
                     </form>
