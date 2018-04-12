@@ -14,16 +14,16 @@ $background-colour: $primary-300;
 
 // min-width to allow proper calculation of the ".navbar" height for margin.top even if the window is small
 select {
-  min-width: 15em;
+    min-width: 15em;
 }
 
 .axis {
     line {
         stroke: $primary-700;
-      opacity: .5;
+        opacity: 0.5;
     }
     text {
-      fill: $primary-800;
+        fill: $primary-800;
     }
 }
 
@@ -234,7 +234,8 @@ text {
 
 .f11,
 .coord,
-.summary {
+.summary,
+.grid-background {
     line-height: 1;
     background-color: transparent;
     circle {
@@ -258,6 +259,13 @@ text {
         stroke: $secondary-600;
         stroke-width: 0.3em;
         fill: none;
+    }
+}
+
+.grid-background {
+    rect {
+        fill: $primary-200;
+        fill-opacity: 0.7;
     }
 }
 
