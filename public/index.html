@@ -14,7 +14,7 @@
     <meta content="images/icons/browserconfig.xml" name="msapplication-config">
 
     <script src="https://www.googletagmanager.com/gtag/js?id=UA-109520372-1" async></script>
-<link href="na-map.min.css?90a56e27a8e00b247306" rel="stylesheet" crossorigin="anonymous" integrity="sha256-Txl1NhNHMFlaWk1ubD6v/X9ZjljtF1Sn189icq/tTKU= sha384-5/hVZuXyzo4MYhlVmLCm8bh0CWhhrcNDtOWur425d0Y/VsJVeuC8ldFMa9wdlhZl"></head>
+<link href="na-map.min.css?14c5f5e37975336298cd" rel="stylesheet" crossorigin="anonymous" integrity="sha256-VdtLVeVGUIp07CzeMCeruD/CFeRFVeP4dXUVHoO7HTI= sha384-R63Ai8GgjAVbR9hPTvVgGFUgSE5YylrjSYDmt8gQuhKlYaVOrmfbVelhAcYwytoL"></head>
 <body>
 
 <nav class="bg-light fixed-top navbar navbar-expand-lg navbar-light">
@@ -64,15 +64,18 @@
                 <div class="dropdown-menu extralarge-width p-2" id="moveToMenu" aria-labelledby="moveToDropdown">
                     <form id="f11">
                         <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">F11 coordinates</span>
+                            <input class="form-control" id="x-coord" type="number" required max="830" min="-816" placeholder="X" step="1">
+                            <div class="input-group-append">
+                                <span class="input-group-text">k</span>
                             </div>
-                            <input class="form-control" id="x-coord" type="number" required max="830000" min="-816000" placeholder="X" step="0.1">
-                            <input class="form-control" id="z-coord" type="number" required max="830000" min="-430000" placeholder="Z" step="0.1">
+                            <input class="form-control" id="z-coord" type="number" required max="830" min="-430" placeholder="Z" step="1">
+                            <div class="input-group-append">
+                                <span class="input-group-text">k</span>
+                            </div>
                             <div class="input-group-append">
                                 <button class="btn btn-outline-primary" type="button" id="copy-coord" title="Copy to clipboard"><i class="far fa-copy"></i>
                                 </button>
-                                <button class="btn btn-primary" type="submit">Move to</button>
+                                <button class="btn btn-outline-primary" type="submit">Move to</button>
                             </div>
                         </div>
                     </form>
@@ -256,15 +259,19 @@
                     </div>
 
                     <div class="dropdown-divider"></div>
-                    <h6 class="dropdown-header">Teleport areas</h6>
-                    <div class="align-self-center col-auto ml-1 radio-group" id="show-teleport">
+                    <h6 class="dropdown-header">Show layer</h6>
+                    <div class="align-self-center col-auto ml-1 radio-group" id="show-layer">
                         <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="teleportShow" type="radio" name="showTeleport" value="show">
-                            <label for="teleportShow" class="custom-control-label">Show</label>
+                            <input class="custom-control-input" id="show-layer-grid" type="radio" name="showLayer" value="grid" checked>
+                            <label for="show-layer-grid" class="custom-control-label">Grid</label>
                         </div>
                         <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="teleportNoShow" type="radio" name="showTeleport" value="noShow" checked>
-                            <label for="teleportNoShow" class="custom-control-label">Off</label>
+                            <input class="custom-control-input" id="show-layer-teleport" type="radio" name="showLayer" value="teleport">
+                            <label for="show-layer-teleport" class="custom-control-label">Teleport areas</label>
+                        </div>
+                        <div class="custom-control custom-control-inline custom-radio">
+                            <input class="custom-control-input" id="show-layer-no" type="radio" name="showLayer" value="no">
+                            <label for="show-layer-no" class="custom-control-label">Off</label>
                         </div>
                     </div>
 
@@ -296,7 +303,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <header class="modal-header">
-                <h3>Naval Action map <span class="small text-primary">v4.2.3</span></h3>
+                <h3>Naval Action map <span class="small text-primary">v4.3</span></h3>
             </header>
             <div class="modal-body">
                 <p>Yet another map which uses the in-game map and live data (daily updated soonish after maintenance).
@@ -350,5 +357,5 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.slim.min.js" crossorigin="anonymous" integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E="></script>
 <script src="https://d3js.org/d3.v5.min.js"></script>
-<script src="na-map.min.js?90a56e27a8e00b247306" crossorigin="anonymous" integrity="sha256-b0kiixnwTCzHz+U/s+c9pyadHCl/dbft6rcARzwdb1I= sha384-0Gsic3nTdpkrvA3Lr1bPvedLEeKYK4gfTj+yj5Hi+ee0MJOiph8kgT2MkJ1UisoA" type="text/javascript"></script></body>
+<script src="na-map.min.js?14c5f5e37975336298cd" crossorigin="anonymous" integrity="sha256-7VheORRCB2yutkVvap+N3Pdd4YY0nrk0GALWggpTcRk= sha384-vxQ9pGymDMqkqFtULA9IiIU9yRTgcKTVgMQ/SJZVMy9sQwklgRjWY9peJVPYQ4Xq" type="text/javascript"></script></body>
 </html>

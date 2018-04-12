@@ -8,31 +8,16 @@
 export default class Teleport {
     constructor(minCoord, maxCoord, ports) {
         this._ports = ports;
-        this._showTeleport = "noShow";
+        this._show = false;
         this._voronoiCoord = [[minCoord - 1, minCoord - 1], [maxCoord + 1, maxCoord + 1]];
         this._teleportPorts = this._getPortData();
         this._voronoiDiagram = this._getVoronoiDiagram();
-        this._teleportData = {};
+        this._data = {};
         this._highlightId = null;
         this._g = d3
             .select("#na-svg")
             .insert("g", ".ports")
             .classed("voronoi", true);
-
-        this._setupListener();
-    }
-
-    _setupListener() {
-        $("#show-teleport").change(() => {
-            this._showTeleportSelected();
-        });
-    }
-
-    _showTeleportSelected() {
-        this._showTeleport = $("input[name='showTeleport']:checked").val();
-
-        this.setTeleportData();
-        this.updateTeleportAreas();
     }
 
     _getPortData() {
@@ -61,14 +46,14 @@ export default class Teleport {
 
     _mouseover(event) {
         this._highlightId = event.data.id;
-        this.updateTeleportAreas();
+        this.update();
         this._ports.setHighlightId(this._highlightId);
         this._ports.update();
     }
 
-    updateTeleportAreas() {
+    update() {
         // Data join
-        const pathUpdate = this._g.selectAll("path").data(this._teleportData, d => d.data.id);
+        const pathUpdate = this._g.selectAll("path").data(this._data, d => d.data.id);
 
         // Remove old paths
         pathUpdate.exit().remove();
@@ -87,11 +72,20 @@ export default class Teleport {
         pathUpdate.merge(pathEnter).classed("highlight-voronoi", d => d.data.id === this._highlightId);
     }
 
-    setTeleportData() {
-        if (this._showTeleport === "show" && this._zoomLevel !== "pbZone") {
-            this._teleportData = this._voronoiDiagram.polygons();
+    /**
+     * Set show status
+     * @param {Boolean} show - True if teleport areas are shown
+     * @return {void}
+     */
+    setShow(show) {
+        this._show = show;
+    }
+
+    setData() {
+        if (this._show && this._zoomLevel !== "pbZone") {
+            this._data = this._voronoiDiagram.polygons();
         } else {
-            this._teleportData = {};
+            this._data = {};
         }
         this._highlightId = null;
         this._ports.setHighlightId(this._highlightId);
