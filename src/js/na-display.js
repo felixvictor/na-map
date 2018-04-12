@@ -59,7 +59,7 @@ export default function naDisplay(serverName) {
              * @property {Number} left - Left margin
              */
             this.margin = {
-                top: Math.floor(parseFloat($(".navbar").css("height")) + this._navbarBrandPaddingLeft),
+                top: Math.floor($(".navbar").height() + this._navbarBrandPaddingLeft),
                 right: this._navbarBrandPaddingLeft,
                 bottom: this._navbarBrandPaddingLeft,
                 left: this._navbarBrandPaddingLeft
