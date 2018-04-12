@@ -290,7 +290,7 @@ export default function naDisplay(serverName) {
         }
 
         /**
-         * Zoom
+         * Zoom svg groups
          * @return {void}
          * @private
          */
