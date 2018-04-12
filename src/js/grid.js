@@ -28,26 +28,37 @@ export default class Grid {
         this._map = map;
 
         /**
+         * Show status (grid shown by default)
+         * @type {Boolean}
+         * @private
+         */
+        this._isShown = true;
+
+        /**
          * Minimum world coordinate
          * @type {Number}
+         * @private
          */
         this._minCoord = this._map.coord.min;
 
         /**
          * Maximum world coordinate
          * @type {Number}
+         * @private
          */
         this._maxCoord = this._map.coord.max;
 
         /**
          * Height of map svg (screen coordinates)
          * @type {Number}
+         * @private
          */
         this._height = this._map._height;
 
         /**
          * Width of map svg (screen coordinates)
          * @type {Number}
+         * @private
          */
         this._width = this._map._width;
 
@@ -243,6 +254,41 @@ export default class Grid {
         this._gYAxis.call(this._yAxis.tickPadding(-this._maxCoord - dy));
         this._gYAxis.attr("font-size", 16 / tk).attr("stroke-width", 1 / tk);
         this._gYAxis.select(".domain").remove();
+    }
+
+    /**
+     * Set show status
+     * @param {Boolean} show - True if grid is shown
+     * @return {void}
+     */
+    setShow(show) {
+        this._isShown = show;
+    }
+
+    /**
+     * Set zoom level
+     * @param {String} zoomLevel - Zoom level
+     * @return {void}
+     * @public
+     */
+    setZoomLevel(zoomLevel) {
+        this._zoomLevel = zoomLevel;
+    }
+
+    /**
+     * Update grid (shown or not shown)
+     * @return {void}
+     * @public
+     */
+    update() {
+
+    console.log("grid", this._isShown, this._zoomLevel);
+
+        if (this._isShown && this._zoomLevel !== "initial") {
+            this._gAxis.attr("display", "inherit");
+        } else {
+            this._gAxis.attr("display", "none");
+        }
     }
 
     /**

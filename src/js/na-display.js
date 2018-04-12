@@ -124,6 +124,10 @@ export default function naDisplay(serverName) {
                 this._radioButton = $("input[name='mouseFunction']:checked").val();
                 this.constructor._clearMap();
             });
+
+            $("#show-layer").change(() => {
+                this._showLayerSelected();
+            });
         }
 
         _setupSvg() {
@@ -149,6 +153,25 @@ export default function naDisplay(serverName) {
             this._svg.append("defs");
 
             this._g = this._svg.append("g").classed("map", true);
+        }
+
+        _showLayerSelected() {
+            const input = $("input[name='showLayer']:checked").val();
+            let showGrid = false,
+                showTeleport = false;
+
+            if (input === "grid") {
+                showGrid = true;
+            } else if (input === "teleport") {
+                showTeleport = true;
+            }
+
+            grid.setShow(showGrid);
+            grid.update();
+
+            teleport.setShow(showTeleport);
+            teleport.setData();
+            teleport.update();
         }
 
         _displayMap(transform) {
@@ -262,13 +285,15 @@ export default function naDisplay(serverName) {
         _setZoomLevel(zoomLevel) {
             this._zoomLevel = zoomLevel;
             ports.setZoomLevel(zoomLevel);
+            grid.setZoomLevel(zoomLevel);
             teleport.setZoomLevel(zoomLevel);
         }
 
         _updateCurrent() {
             pbZone.refresh();
-            teleport.setTeleportData();
-            teleport.updateTeleportAreas();
+            grid.update();
+            teleport.setData();
+            teleport.update();
             ports.update();
         }
 
@@ -322,8 +347,14 @@ export default function naDisplay(serverName) {
             f11.transform(zoomTransform);
         }
 
-        initialZoomAndPan() {
+        _initialZoomAndPan() {
             this._svg.call(this._zoom.scaleTo, this._minScale);
+        }
+
+        init() {
+            this._setZoomLevel("initial");
+            this._updateCurrent();
+            this._initialZoomAndPan();
         }
 
         zoomAndPan(x, y, scale) {
@@ -352,7 +383,7 @@ export default function naDisplay(serverName) {
         course = new Course(ports.fontSizes.portLabel);
 
         moment.locale("en-gb");
-        map.initialZoomAndPan();
+        map.init();
         ports.clearMap();
     }
 
