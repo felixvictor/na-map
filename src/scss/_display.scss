@@ -12,6 +12,11 @@ $background-colour: $primary-300;
     background-color: $background-colour;
 }
 
+// min-width to allow proper calculation of the ".navbar" height for margin.top even if the window is small
+select {
+  min-width: 15em;
+}
+
 .axis {
     line {
         stroke: $primary-700;
