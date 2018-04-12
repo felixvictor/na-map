@@ -71,7 +71,7 @@ export default class Grid {
                 convertInvCoordX(this._maxCoord, this._maxCoord),
                 convertInvCoordX(this._minCoord, this._minCoord)
             ])
-            .rangeRound([this._minCoord, this._maxCoord]);
+            .range([this._minCoord, this._maxCoord]);
 
         /**
          * Y scale
@@ -84,7 +84,19 @@ export default class Grid {
                 convertInvCoordY(this._maxCoord, this._maxCoord),
                 convertInvCoordY(this._minCoord, this._minCoord)
             ])
-            .rangeRound([this._minCoord, this._maxCoord]);
+            .range([this._minCoord, this._maxCoord]);
+
+        const min = Math.round(convertInvCoordY(this._minCoord, this._minCoord)),
+            max = Math.round(convertInvCoordY(this._maxCoord, this._maxCoord)),
+            items = 64, // will be +1 items
+            increments = (max - min) / items,
+            ticks = [];
+
+        for (let i = min; i < max; i += increments) {
+            ticks.push(Math.round(i));
+        }
+        ticks.push(max);
+        console.log(ticks);
 
         /**
          * X axis
@@ -93,7 +105,7 @@ export default class Grid {
         this._xAxis = d3
             .axisBottom(this._xScale)
             .tickFormat(formatF11)
-            .ticks(this._maxCoord / 256)
+            .tickValues(ticks)
             .tickSize(this._maxCoord);
 
         /**
@@ -103,7 +115,7 @@ export default class Grid {
         this._yAxis = d3
             .axisRight(this._yScale)
             .tickFormat(formatF11)
-            .ticks(this._maxCoord / 256)
+            .tickValues(ticks)
             .tickSize(this._maxCoord);
 
         this._setupAxis();
