@@ -293,17 +293,22 @@
                     </div>
 
                     <div class="dropdown-divider"></div>
-                    <h6 class="dropdown-header">Teleport areas</h6>
-                    <div class="col-auto align-self-center radio-group ml-1" id="show-teleport">
+                    <h6 class="dropdown-header">Show layer</h6>
+                    <div class="col-auto align-self-center radio-group ml-1" id="show-layer">
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" class="custom-control-input"
-                                   name="showTeleport" id="teleportShow" value="show">
-                            <label class="custom-control-label" for="teleportShow">Show</label>
+                                   name="showLayer" id="show-layer-grid" value="grid" checked>
+                            <label class="custom-control-label" for="show-layer-grid">Grid</label>
                         </div>
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" class="custom-control-input"
-                                   name="showTeleport" id="teleportNoShow" value="noShow" checked>
-                            <label class="custom-control-label" for="teleportNoShow">Off</label>
+                                   name="showLayer" id="show-layer-teleport" value="teleport">
+                            <label class="custom-control-label" for="show-layer-teleport">Teleport areas</label>
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input"
+                                   name="showLayer" id="show-layer-no" value="no">
+                            <label class="custom-control-label" for="show-layer-no">Off</label>
                         </div>
                     </div>
 
