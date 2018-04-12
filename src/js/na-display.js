@@ -1,7 +1,11 @@
-/*
- Draws teleport map for Naval Action
-
- iB 2017, 2018
+/**
+ * This file is part of na-map.
+ *
+ * @file      Display naval action map.
+ * @module    na-display
+ * @author    iB aka Felix Victor
+ * @copyright 2017, 2018
+ * @license   http://www.gnu.org/licenses/gpl.html
  */
 
 /* global d3 : false
@@ -18,6 +22,7 @@ import { nearestPow2, checkFetchStatus, getJsonFromFetch, putFetchError } from "
 
 import Course from "./course";
 import F11 from "./f11";
+import Grid from "./grid";
 import PBZone from "./pbzone";
 import PortDisplay from "./port";
 import PortSelect from "./port-select";
@@ -25,24 +30,66 @@ import ShipCompare from "./ship-compare";
 import Teleport from "./teleport";
 import WindPrediction from "./wind-prediction";
 
+/**
+ * Display naval action map
+ * @param {string} serverName - Naval action server name
+ * @returns {void}
+ */
 export default function naDisplay(serverName) {
-    let map, ports, teleport, portSelect, shipCompare, windPrediction, f11, course, pbZone, shipData;
+    let map, ports, teleport, portSelect, shipCompare, windPrediction, f11, course, grid, pbZone, shipData;
 
+    /** Main map */
     class NAMap {
+        /**
+         * Constructor
+         */
         constructor() {
+            /**
+             * Left padding for brand icon
+             * @type {Number}
+             */
             this._navbarBrandPaddingLeft = Math.floor(1.618 * 16); // equals 1.618rem
-            // noinspection JSSuspiciousNameCombination
 
+            /**
+             * Margins of the map svg
+             * @type {Object}
+             * @property {Number} top - Top margin
+             * @property {Number} right - Right margin
+             * @property {Number} bottom - Bottom margin
+             * @property {Number} left - Left margin
+             */
             this.margin = {
-                top: Math.floor(parseFloat($(".navbar").css("height")) + this._navbarBrandPaddingLeft),
+                top: Math.floor($(".navbar").height() + this._navbarBrandPaddingLeft),
                 right: this._navbarBrandPaddingLeft,
                 bottom: this._navbarBrandPaddingLeft,
                 left: this._navbarBrandPaddingLeft
             };
+
+            /**
+             * Outer bounds (world coordinates)
+             * @type {Object}
+             * @property {Number} min - Minimum world coordinate
+             * @property {Number} max - Maximum world coordinate
+             */
             this.coord = {
                 min: 0,
                 max: 8192
             };
+
+            /**
+             * Width of map svg (screen coordinates)
+             * @type {Number}
+             */
+            // eslint-disable-next-line no-restricted-globals
+            this._width = Math.floor(top.innerWidth - this.margin.left - this.margin.right);
+
+            /**
+             * Height of map svg (screen coordinates)
+             * @type {Number}
+             */
+            // eslint-disable-next-line no-restricted-globals
+            this._height = Math.floor(top.innerHeight - this.margin.top - this.margin.bottom);
+
             this._tileSize = 256;
             this._maxScale = 2 ** 3; // power of 2
             this._wheelDelta = 0.5;
@@ -50,10 +97,6 @@ export default function naDisplay(serverName) {
             this._PBZoneZoomThreshold = 1.5;
             this._labelZoomThreshold = 0.5;
 
-            // eslint-disable-next-line no-restricted-globals
-            this._width = Math.floor(top.innerWidth - this.margin.left - this.margin.right);
-            // eslint-disable-next-line no-restricted-globals
-            this._height = Math.floor(top.innerHeight - this.margin.top - this.margin.bottom);
             this._minScale = nearestPow2(Math.min(this._width / this.coord.max, this._height / this.coord.max));
             this._radioButton = "compass";
 
@@ -81,6 +124,10 @@ export default function naDisplay(serverName) {
                 this._radioButton = $("input[name='mouseFunction']:checked").val();
                 this.constructor._clearMap();
             });
+
+            $("#show-layer").change(() => {
+                this._showLayerSelected();
+            });
         }
 
         _setupSvg() {
@@ -106,6 +153,25 @@ export default function naDisplay(serverName) {
             this._svg.append("defs");
 
             this._g = this._svg.append("g").classed("map", true);
+        }
+
+        _showLayerSelected() {
+            const input = $("input[name='showLayer']:checked").val();
+            let showGrid = false,
+                showTeleport = false;
+
+            if (input === "grid") {
+                showGrid = true;
+            } else if (input === "teleport") {
+                showTeleport = true;
+            }
+
+            grid.setShow(showGrid);
+            grid.update();
+
+            teleport.setShow(showTeleport);
+            teleport.setData();
+            teleport.update();
         }
 
         _displayMap(transform) {
@@ -219,17 +285,19 @@ export default function naDisplay(serverName) {
         _setZoomLevel(zoomLevel) {
             this._zoomLevel = zoomLevel;
             ports.setZoomLevel(zoomLevel);
+            grid.setZoomLevel(zoomLevel);
             teleport.setZoomLevel(zoomLevel);
         }
 
         _updateCurrent() {
             pbZone.refresh();
-            teleport.setTeleportData();
-            teleport.updateTeleportAreas();
+            grid.update();
+            teleport.setData();
+            teleport.update();
             ports.update();
         }
 
-        _updateAll() {
+        _setZoomLevelAndData() {
             if (d3.event.transform.k > this._PBZoneZoomThreshold) {
                 if (this._zoomLevel !== "pbZone") {
                     this._setZoomLevel("pbZone");
@@ -246,15 +314,32 @@ export default function naDisplay(serverName) {
             }
         }
 
+        /**
+         * Zoom svg groups
+         * @return {void}
+         * @private
+         */
         _naZoomed() {
-            this._updateAll();
+            this._setZoomLevelAndData();
 
-            // noinspection JSSuspiciousNameCombination
+            /**
+             * D3 transform ({@link https://github.com/d3/d3-zoom/blob/master/src/transform.js})
+             * @external Transform
+             * @property {number} x - X Coordinate
+             * @property {number} y - Y Coordinate
+             * @property {number} k - Scale factor
+             */
+
+            /**
+             * Current transform
+             * @type {Transform}
+             */
             const zoomTransform = d3.zoomIdentity
                 .translate(Math.round(d3.event.transform.x), Math.round(d3.event.transform.y))
                 .scale(Math.round(d3.event.transform.k * 1000) / 1000);
 
             this._displayMap(zoomTransform);
+            grid.transform(zoomTransform);
             ports.transform(zoomTransform);
             teleport.transform(zoomTransform);
             course.transform(zoomTransform);
@@ -262,8 +347,14 @@ export default function naDisplay(serverName) {
             f11.transform(zoomTransform);
         }
 
-        initialZoomAndPan() {
+        _initialZoomAndPan() {
             this._svg.call(this._zoom.scaleTo, this._minScale);
+        }
+
+        init() {
+            this._setZoomLevel("initial");
+            this._updateCurrent();
+            this._initialZoomAndPan();
         }
 
         zoomAndPan(x, y, scale) {
@@ -288,10 +379,11 @@ export default function naDisplay(serverName) {
         portSelect = new PortSelect(map, ports, pbZone);
         windPrediction = new WindPrediction(map.margin.left, map.margin.top);
         f11 = new F11(map);
+        grid = new Grid(map);
         course = new Course(ports.fontSizes.portLabel);
 
         moment.locale("en-gb");
-        map.initialZoomAndPan();
+        map.init();
         ports.clearMap();
     }
 
