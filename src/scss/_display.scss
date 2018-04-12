@@ -262,6 +262,13 @@ text {
     }
 }
 
+
+.f11 {
+  text {
+    text-anchor: end;
+    }
+}
+
 .grid-background {
     rect {
         fill: $primary-200;
