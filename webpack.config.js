@@ -175,7 +175,7 @@ const config = {
             { from: "images/icons", to: "../public/images/icons" },
             { from: "*.json" },
             { from: "*.xlsx" },
-            { from: "../_header" }
+            { from: "../netlify.toml" }
         ]),
         new HtmlPlugin({
             filename: "index.html",
