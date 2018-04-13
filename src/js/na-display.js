@@ -105,7 +105,7 @@ export default function naDisplay(serverName) {
              * @type {string}
              * @private
              */
-            this._doubleClickActionCookieName = "naMap-doubleClick";
+            this._doubleClickActionCookieName = "na-map--double-click";
 
             /**
              * Default DoubleClickAction setting
@@ -126,7 +126,7 @@ export default function naDisplay(serverName) {
              * @type {string}
              * @private
              */
-            this._showLayerCookieName = "naMap-showLayer";
+            this._showLayerCookieName = "na-map--show-layer";
 
             /**
              * Default showLayer setting
@@ -253,10 +253,10 @@ export default function naDisplay(serverName) {
             this._showLayer = $("input[name='showLayer']:checked").val();
             console.log("_showLayerSelected", this._showLayer);
             this._storeShowLayerSetting();
-            this._updateLayer();
+            this._refreshLayer();
         }
 
-        _updateLayer() {
+        _refreshLayer() {
             const showGrid = this._showLayer === "grid",
                 showTeleport = this._showLayer === "teleport";
 
@@ -449,7 +449,7 @@ export default function naDisplay(serverName) {
             this._setZoomLevel("initial");
             this._updateCurrent();
             this._initialZoomAndPan();
-            this._updateLayer();
+            this._refreshLayer();
         }
 
         zoomAndPan(x, y, scale) {
