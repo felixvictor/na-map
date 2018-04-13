@@ -115,10 +115,10 @@
                         <a class="dropdown-item" id="menu-prop-small" href="#">6th rate AI</a>
                     </div>
 
-                        <a class="dropdown-item" id="menu-prop-cm" href="#">
-                            <label for="prop-cm"></label><select class="select" name="prop-cm"
-                                                                 id="prop-cm"></select>
-                        </a>
+                    <a class="dropdown-item" id="menu-prop-cm" href="#">
+                        <label for="prop-cm"></label><select class="select" name="prop-cm"
+                                                             id="prop-cm"></select>
+                    </a>
 
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Port owner</h6>
@@ -300,7 +300,7 @@
                     <div class="col-auto align-self-center radio-group ml-1" id="show-layer">
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" class="custom-control-input"
-                                   name="showLayer" id="show-layer-grid" value="grid" checked>
+                                   name="showLayer" id="show-layer-grid" value="grid">
                             <label class="custom-control-label" for="show-layer-grid">Grid</label>
                         </div>
                         <div class="custom-control custom-radio custom-control-inline">
@@ -317,18 +317,16 @@
 
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Double click to</h6>
-                    <div id="double-click-action" class="radio-group ml-1 mr-1">
-                        <div class="col-auto align-self-center">
-                            <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" class="custom-control-input" name="mouseFunction" id="compass"
-                                       value="compass" checked>
-                                <label class="custom-control-label" for="compass">Plot a course</label>
-                            </div>
-                            <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" class="custom-control-input" name="mouseFunction" id="F11"
-                                       value="F11">
-                                <label class="custom-control-label" for="F11">Show F11 coordinates</label>
-                            </div>
+                    <div class="col-auto align-self-center radio-group m-1" id="doubleClick-action">
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input" name="doubleClickAction"
+                                   id="doubleClick-action-compass" value="compass">
+                            <label class="custom-control-label" for="doubleClick-action-compass">Plot a course</label>
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input" name="doubleClickAction"
+                                   id="doubleClick-action-f11" value="f11">
+                            <label class="custom-control-label" for="doubleClick-action-f11">Show F11 coordinates</label>
                         </div>
                     </div>
                 </div>
