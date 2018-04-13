@@ -115,10 +115,10 @@
                         <a class="dropdown-item" id="menu-prop-small" href="#">6th rate AI</a>
                     </div>
 
-                        <a class="dropdown-item" id="menu-prop-cm" href="#">
-                            <label for="prop-cm"></label><select class="select" name="prop-cm"
-                                                                 id="prop-cm"></select>
-                        </a>
+                    <a class="dropdown-item" id="menu-prop-cm" href="#">
+                        <label for="prop-cm"></label><select class="select" name="prop-cm"
+                                                             id="prop-cm"></select>
+                    </a>
 
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Port owner</h6>
@@ -251,26 +251,26 @@
                      aria-labelledby="settingsDropdown">
 
                     <h6 class="dropdown-header">Show per port</h6>
-                    <div class="col-auto align-self-center radio-group ml-1" id="radius-type">
+                    <div class="col-auto align-self-center radio-group ml-1" id="show-radius">
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" class="custom-control-input"
-                                   name="showRadiusType" id="radiusAttack" value="attack" checked>
-                            <label class="custom-control-label" for="radiusAttack">Attack</label>
+                                   name="showRadius" id="show-radius-attack" value="attack">
+                            <label class="custom-control-label" for="show-radius-attack">Attack</label>
                         </div>
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" class="custom-control-input"
-                                   name="showRadiusType" id="radiusTaxIncome" value="taxIncome">
-                            <label class="custom-control-label" for="radiusTaxIncome">Tax income</label>
+                                   name="showRadius" id="show-radius-tax" value="tax">
+                            <label class="custom-control-label" for="show-radius-tax">Tax income</label>
                         </div>
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" class="custom-control-input"
-                                   name="showRadiusType" id="radiusNetIncome" value="netIncome">
-                            <label class="custom-control-label" for="radiusNetIncome">Net income</label>
+                                   name="showRadius" id="show-radius-net" value="net">
+                            <label class="custom-control-label" for="show-radius-net">Net income</label>
                         </div>
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" class="custom-control-input"
-                                   name="showRadiusType" id="radiusNoShow" value="noShow">
-                            <label class="custom-control-label" for="radiusNoShow">Off</label>
+                                   name="showRadius" id="show-radius-no" value="no">
+                            <label class="custom-control-label" for="show-radius-no">Off</label>
                         </div>
                     </div>
 
@@ -279,18 +279,18 @@
                     <div class="col-auto align-self-center radio-group ml-1" id="show-pb">
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" class="custom-control-input"
-                                   name="showPB" id="pbAll" value="all" checked>
-                            <label class="custom-control-label" for="pbAll">All ports</label>
+                                   name="showPB" id="show-pb-all" value="all" checked>
+                            <label class="custom-control-label" for="show-pb-all">All ports</label>
                         </div>
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" class="custom-control-input"
-                                   name="showPB" id="pbSingle" value="single">
-                            <label class="custom-control-label" for="pbSingle">Single port</label>
+                                   name="showPB" id="show-pb-single" value="single">
+                            <label class="custom-control-label" for="show-pb-single">Single port</label>
                         </div>
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" class="custom-control-input"
-                                   name="showPB" id="pbNoShow" value="noShow">
-                            <label class="custom-control-label" for="pbNoShow">Off</label>
+                                   name="showPB" id="show-pb-no" value="no">
+                            <label class="custom-control-label" for="show-pb-no">Off</label>
                         </div>
 
                     </div>
@@ -300,7 +300,7 @@
                     <div class="col-auto align-self-center radio-group ml-1" id="show-layer">
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" class="custom-control-input"
-                                   name="showLayer" id="show-layer-grid" value="grid" checked>
+                                   name="showLayer" id="show-layer-grid" value="grid">
                             <label class="custom-control-label" for="show-layer-grid">Grid</label>
                         </div>
                         <div class="custom-control custom-radio custom-control-inline">
@@ -317,18 +317,16 @@
 
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Double click to</h6>
-                    <div id="double-click-action" class="radio-group ml-1 mr-1">
-                        <div class="col-auto align-self-center">
-                            <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" class="custom-control-input" name="mouseFunction" id="compass"
-                                       value="compass" checked>
-                                <label class="custom-control-label" for="compass">Plot a course</label>
-                            </div>
-                            <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" class="custom-control-input" name="mouseFunction" id="F11"
-                                       value="F11">
-                                <label class="custom-control-label" for="F11">Show F11 coordinates</label>
-                            </div>
+                    <div class="col-auto align-self-center radio-group m-1" id="doubleClick-action">
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input" name="doubleClickAction"
+                                   id="doubleClick-action-compass" value="compass">
+                            <label class="custom-control-label" for="doubleClick-action-compass">Plot a course</label>
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input" name="doubleClickAction"
+                                   id="doubleClick-action-f11" value="f11">
+                            <label class="custom-control-label" for="doubleClick-action-f11">Show F11 coordinates</label>
                         </div>
                     </div>
                 </div>
