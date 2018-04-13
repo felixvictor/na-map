@@ -6,12 +6,12 @@
 [[headers]]
     for = "/icons/*"
     [headers.values]
-        Cache-Control = "public, max-age=2628000"
+        Cache-Control = "public, max-age=600"
 
 [[headers]]
     for = "/images/*"
     [headers.values]
-        Cache-Control = "public, max-age=2628000"
+        Cache-Control = "public, max-age=450"
 
 
 
@@ -22,7 +22,7 @@
         Cache-Control = "public, max-age=500"
 
 [[headers]]
-    for = "/images/map/*/*"
+    for = "/images/map/*/*/*"
     [headers.values]
         Cache-Control = "public, max-age=400"
 
