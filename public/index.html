@@ -14,7 +14,7 @@
     <meta content="images/icons/browserconfig.xml" name="msapplication-config">
 
     <script src="https://www.googletagmanager.com/gtag/js?id=UA-109520372-1" async></script>
-<link href="na-map.min.css?f34b745340cf31b0018a" rel="stylesheet" crossorigin="anonymous" integrity="sha256-VdtLVeVGUIp07CzeMCeruD/CFeRFVeP4dXUVHoO7HTI= sha384-R63Ai8GgjAVbR9hPTvVgGFUgSE5YylrjSYDmt8gQuhKlYaVOrmfbVelhAcYwytoL"></head>
+<link href="na-map.min.css?f61f465c5840b3fd06ff" rel="stylesheet" crossorigin="anonymous" integrity="sha256-VdtLVeVGUIp07CzeMCeruD/CFeRFVeP4dXUVHoO7HTI= sha384-R63Ai8GgjAVbR9hPTvVgGFUgSE5YylrjSYDmt8gQuhKlYaVOrmfbVelhAcYwytoL"></head>
 <body>
 
 <nav class="bg-light fixed-top navbar navbar-expand-lg navbar-light">
@@ -105,9 +105,9 @@
                         <a class="dropdown-item" href="#" id="menu-prop-small">6th rate AI</a>
                     </div>
 
-                        <a class="dropdown-item" href="#" id="menu-prop-cm">
-                            <label for="prop-cm"></label><select id="prop-cm" name="prop-cm" class="select"></select>
-                        </a>
+                    <a class="dropdown-item" href="#" id="menu-prop-cm">
+                        <label for="prop-cm"></label><select id="prop-cm" name="prop-cm" class="select"></select>
+                    </a>
 
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Port owner</h6>
@@ -221,48 +221,48 @@
                 <div class="dropdown-menu dropdown-menu-right large-width" id="settingsMenu" aria-labelledby="settingsDropdown">
 
                     <h6 class="dropdown-header">Show per port</h6>
-                    <div class="align-self-center col-auto ml-1 radio-group" id="radius-type">
+                    <div class="align-self-center col-auto radio-group ml-1" id="show-radius">
                         <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="radiusAttack" type="radio" name="showRadiusType" value="attack" checked>
-                            <label for="radiusAttack" class="custom-control-label">Attack</label>
+                            <input class="custom-control-input" id="show-radius-attack" type="radio" name="showRadius" value="attack">
+                            <label for="show-radius-attack" class="custom-control-label">Attack</label>
                         </div>
                         <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="radiusTaxIncome" type="radio" name="showRadiusType" value="taxIncome">
-                            <label for="radiusTaxIncome" class="custom-control-label">Tax income</label>
+                            <input class="custom-control-input" id="show-radius-tax" type="radio" name="showRadius" value="tax">
+                            <label for="show-radius-tax" class="custom-control-label">Tax income</label>
                         </div>
                         <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="radiusNetIncome" type="radio" name="showRadiusType" value="netIncome">
-                            <label for="radiusNetIncome" class="custom-control-label">Net income</label>
+                            <input class="custom-control-input" id="show-radius-net" type="radio" name="showRadius" value="net">
+                            <label for="show-radius-net" class="custom-control-label">Net income</label>
                         </div>
                         <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="radiusNoShow" type="radio" name="showRadiusType" value="noShow">
-                            <label for="radiusNoShow" class="custom-control-label">Off</label>
+                            <input class="custom-control-input" id="show-radius-no" type="radio" name="showRadius" value="no">
+                            <label for="show-radius-no" class="custom-control-label">Off</label>
                         </div>
                     </div>
 
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Port battle zones</h6>
-                    <div class="align-self-center col-auto ml-1 radio-group" id="show-pb">
+                    <div class="align-self-center col-auto radio-group ml-1" id="show-pb">
                         <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="pbAll" type="radio" name="showPB" value="all" checked>
-                            <label for="pbAll" class="custom-control-label">All ports</label>
+                            <input class="custom-control-input" id="show-pb-all" type="radio" name="showPB" value="all" checked>
+                            <label for="show-pb-all" class="custom-control-label">All ports</label>
                         </div>
                         <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="pbSingle" type="radio" name="showPB" value="single">
-                            <label for="pbSingle" class="custom-control-label">Single port</label>
+                            <input class="custom-control-input" id="show-pb-single" type="radio" name="showPB" value="single">
+                            <label for="show-pb-single" class="custom-control-label">Single port</label>
                         </div>
                         <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="pbNoShow" type="radio" name="showPB" value="noShow">
-                            <label for="pbNoShow" class="custom-control-label">Off</label>
+                            <input class="custom-control-input" id="show-pb-no" type="radio" name="showPB" value="no">
+                            <label for="show-pb-no" class="custom-control-label">Off</label>
                         </div>
 
                     </div>
 
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Show layer</h6>
-                    <div class="align-self-center col-auto ml-1 radio-group" id="show-layer">
+                    <div class="align-self-center col-auto radio-group ml-1" id="show-layer">
                         <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="show-layer-grid" type="radio" name="showLayer" value="grid" checked>
+                            <input class="custom-control-input" id="show-layer-grid" type="radio" name="showLayer" value="grid">
                             <label for="show-layer-grid" class="custom-control-label">Grid</label>
                         </div>
                         <div class="custom-control custom-control-inline custom-radio">
@@ -277,16 +277,14 @@
 
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Double click to</h6>
-                    <div class="ml-1 radio-group mr-1" id="double-click-action">
-                        <div class="align-self-center col-auto">
-                            <div class="custom-control custom-control-inline custom-radio">
-                                <input class="custom-control-input" id="compass" type="radio" name="mouseFunction" value="compass" checked>
-                                <label for="compass" class="custom-control-label">Plot a course</label>
-                            </div>
-                            <div class="custom-control custom-control-inline custom-radio">
-                                <input class="custom-control-input" id="F11" type="radio" name="mouseFunction" value="F11">
-                                <label for="F11" class="custom-control-label">Show F11 coordinates</label>
-                            </div>
+                    <div class="align-self-center col-auto radio-group m-1" id="doubleClick-action">
+                        <div class="custom-control custom-control-inline custom-radio">
+                            <input class="custom-control-input" id="doubleClick-action-compass" type="radio" name="doubleClickAction" value="compass">
+                            <label for="doubleClick-action-compass" class="custom-control-label">Plot a course</label>
+                        </div>
+                        <div class="custom-control custom-control-inline custom-radio">
+                            <input class="custom-control-input" id="doubleClick-action-f11" type="radio" name="doubleClickAction" value="f11">
+                            <label for="doubleClick-action-f11" class="custom-control-label">Show F11 coordinates</label>
                         </div>
                     </div>
                 </div>
@@ -357,5 +355,5 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.slim.min.js" crossorigin="anonymous" integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E="></script>
 <script src="https://d3js.org/d3.v5.min.js"></script>
-<script src="na-map.min.js?f34b745340cf31b0018a" crossorigin="anonymous" integrity="sha256-TmaXE4vFWJZtMDs58CYP+GZcRumxIy6US5W2wrLO5P4= sha384-DAeJsORsYO4LP5I6CjvR+FJfp2Dx5pg/ZVjc3hzeEBIBAZX6ayvRbnpZaVwl7hvH" type="text/javascript"></script></body>
+<script src="na-map.min.js?f61f465c5840b3fd06ff" crossorigin="anonymous" integrity="sha256-oovOdeZuqYdJZhYtds3W64CALxOg5out1AjcFVBpogY= sha384-Bai6yWVoLsejEN9MEAE/HEMWtcTIuCeOZHCqWRU9M7Rk0C4jRm9F9nNd3i8lefy6" type="text/javascript"></script></body>
 </html>
