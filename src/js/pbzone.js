@@ -5,6 +5,8 @@
 /* global d3 : false
  */
 
+import Cookies from "js-cookie";
+
 export default class PBZone {
     constructor(pbZoneData, fortData, towerData, ports) {
         this._pbZoneDataDefault = pbZoneData;
@@ -14,7 +16,27 @@ export default class PBZone {
         this._fortData = fortData;
         this._towerData = towerData;
         this._ports = ports;
-        this._showPB = "all";
+
+        /**
+         * showLayer cookie name
+         * @type {string}
+         * @private
+         */
+        this._showPBCookieName = "na-map--show-pb";
+
+        /**
+         * Default showLayer setting
+         * @type {string}
+         * @private
+         */
+        this._showPBDefault = "all";
+
+        /**
+         * Get showLayer setting from cookie or use default value
+         * @type {string}
+         * @private
+         */
+        this._showPB = this._getShowPBSetting();
 
         this._setupSvg();
         this._setupListener();
@@ -31,16 +53,44 @@ export default class PBZone {
     }
 
     _setupListener() {
-        $("#show-pb").change(() => {
-            this._showPBZonesSelected();
-        });
+        $("#show-pb").change(() => this._showPBZonesSelected());
+    }
+
+    /**
+     * Get show setting from cookie or use default value
+     * @returns {string} - Show setting
+     * @private
+     */
+    _getShowPBSetting() {
+        let r = Cookies.get(this._showPBCookieName);
+        // Use default value if cookie is not stored
+        r = typeof r !== "undefined" ? r : this._showPBDefault;
+        $(`#show-pb-${r}`).prop("checked", true);
+        return r;
+    }
+
+    /**
+     * Store show setting in cookie
+     * @return {void}
+     * @private
+     */
+    _storeShowPBSetting() {
+        if (this._showPB !== this._showPBDefault) {
+            Cookies.set(this._showPBCookieName, this._showPB);
+        } else {
+            Cookies.remove(this._showPBCookieName);
+        }
+    }
+
+    _refreshPBZones() {
+        this.refresh();
+        this._ports.updateTexts();
     }
 
     _showPBZonesSelected() {
         this._showPB = $("input[name='showPB']:checked").val();
-        this._ports._showPBZones = this._showPB;
-        this.refresh();
-        this._ports.updateTexts();
+        this._storeShowPBSetting();
+        this._refreshPBZones();
     }
 
     _update() {
