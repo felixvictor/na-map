@@ -174,7 +174,8 @@ const config = {
             { from: "images/map", to: "../public/images/map" },
             { from: "images/icons", to: "../public/images/icons" },
             { from: "*.json" },
-            { from: "*.xlsx" }
+            { from: "*.xlsx" },
+            { from: "../netlify.toml" }
         ]),
         new HtmlPlugin({
             filename: "index.html",
