@@ -63,10 +63,8 @@ export default class PBZone {
      */
     _getShowPBSetting() {
         let r = Cookies.get(this._showPBCookieName);
-        console.log("cookies", r);
         // Use default value if cookie is not stored
         r = typeof r !== "undefined" ? r : this._showPBDefault;
-        console.log("_getShowPBSetting", r);
         $(`#show-pb-${r}`).prop("checked", true);
         return r;
     }
@@ -77,8 +75,11 @@ export default class PBZone {
      * @private
      */
     _storeShowPBSetting() {
-        console.log("set cookie", this._showPBCookieName, this._showPB);
-        Cookies.set(this._showPBCookieName, this._showPB);
+        if (this._showPB !== this._showPBDefault) {
+            Cookies.set(this._showPBCookieName, this._showPB);
+        } else {
+            Cookies.remove(this._showPBCookieName);
+        }
     }
 
     _refreshPBZones() {
@@ -88,9 +89,8 @@ export default class PBZone {
 
     _showPBZonesSelected() {
         this._showPB = $("input[name='showPB']:checked").val();
-        console.log("_showPBZonesSelected", this._showPB);
-        // this._ports._showPBZones = this._showPB;
         this._storeShowPBSetting();
+        this._refreshPBZones();
     }
 
     _update() {

@@ -156,7 +156,7 @@ export default function naDisplay(serverName) {
             this._svg
                 .on("dblclick.zoom", null)
                 .on("click", stopProp, true)
-                .on("dblclick", (d, i, nodes) => this._doubleClickAction(nodes[i]));
+                .on("dblclick", (d, i, nodes) => this._doDoubleClickAction(nodes[i]));
 
             $("#reset").on("click", () => {
                 this.constructor._clearMap();
@@ -199,10 +199,8 @@ export default function naDisplay(serverName) {
          */
         _getDoubleClickActionSetting() {
             let r = Cookies.get(this._doubleClickActionCookieName);
-            console.log("cookies", r);
             // Use default value if cookie is not stored
             r = typeof r !== "undefined" ? r : this._doubleClickActionDefault;
-            console.log("_getDoubleClickActionSetting", r);
             $(`#doubleClick-action-${r}`).prop("checked", true);
             return r;
         }
@@ -213,13 +211,15 @@ export default function naDisplay(serverName) {
          * @private
          */
         _storeDoubleClickActionSetting() {
-            console.log("set", this._doubleClickActionCookieName, this._doubleClickAction);
-            Cookies.set(this._doubleClickActionCookieName, this._doubleClickAction);
+            if (this._doubleClickAction !== this._doubleClickActionDefault) {
+                Cookies.set(this._doubleClickActionCookieName, this._doubleClickAction);
+            } else {
+                Cookies.remove(this._doubleClickActionCookieName);
+            }
         }
 
         _doubleClickSelected() {
             this._doubleClickAction = $("input[name='doubleClickAction']:checked").val();
-            console.log("_doubleClickSelected", this._doubleClickAction);
             this._storeDoubleClickActionSetting();
             this.constructor._clearMap();
         }
@@ -231,10 +231,8 @@ export default function naDisplay(serverName) {
          */
         _getShowLayerSetting() {
             let r = Cookies.get(this._showLayerCookieName);
-            console.log("cookies", r);
             // Use default value if cookie is not stored
             r = typeof r !== "undefined" ? r : this._showLayerDefault;
-            console.log("_getShowLayerSetting", r);
             $(`#show-layer-${r}`).prop("checked", true);
             return r;
         }
@@ -245,13 +243,15 @@ export default function naDisplay(serverName) {
          * @private
          */
         _storeShowLayerSetting() {
-            console.log("set cookie", this._showLayerCookieName, this._showLayer);
-            Cookies.set(this._showLayerCookieName, this._showLayer);
+            if (this._showLayer !== this._showLayerDefault) {
+                Cookies.set(this._showLayerCookieName, this._showLayer);
+            } else {
+                Cookies.remove(this._showLayerCookieName);
+            }
         }
 
         _showLayerSelected() {
             this._showLayer = $("input[name='showLayer']:checked").val();
-            console.log("_showLayerSelected", this._showLayer);
             this._storeShowLayerSetting();
             this._refreshLayer();
         }
@@ -355,7 +355,7 @@ export default function naDisplay(serverName) {
                 .selectpicker("refresh");
         }
 
-        _doubleClickAction(self) {
+        _doDoubleClickAction(self) {
             const coord = d3.mouse(self),
                 transform = d3.zoomTransform(self);
             const mx = coord[0],
