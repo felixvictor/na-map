@@ -90,14 +90,8 @@ export default class Grid {
          */
         this._textPadding = this._defaultFontSize / 2;
 
-        /**
-         * Transition
-         * @private
-         */
-        this._transition = d3
-            .transition()
-            .duration(1000)
-            .ease(d3.easeLinear);
+        this._xBackgroundHeight = "3em";
+        this._yBackgroundWidth = "4em";
 
         this._setupSvg();
     }
@@ -174,7 +168,10 @@ export default class Grid {
             .tickSize(this._maxCoord);
 
         // svg groups
-        this._gAxis = this._map._svg.append("g").classed("axis", true).attr("display", "none");
+        this._gAxis = this._map._svg
+            .append("g")
+            .classed("axis", true)
+            .attr("display", "none");
         this._gXAxis = this._gAxis.append("g").classed("axis-x", true);
         this._gYAxis = this._gAxis.append("g").classed("axis-y", true);
         this._setupBackground();
@@ -294,18 +291,25 @@ export default class Grid {
         this._gYAxis.select(".domain").remove();
     }
 
+    /**
+     * Setup background
+     * @return {void}
+     */
     _setupBackground() {
-        this._gBackground = this._map._svg.insert("g", "g.axis").classed("grid-background", true).attr("opacity", 0);
+        this._gBackground = this._map._svg
+            .insert("g", "g.axis")
+            .classed("grid-background", true)
+            .attr("display", "none");
         // Background for x axis legend
         this._gBackground
             .append("rect")
-            .attr("height", "3em")
+            .attr("height", this._xBackgroundHeight)
             .attr("width", this._width);
         // Background for y axis legend
         this._gBackground
             .append("rect")
             .attr("height", this._height)
-            .attr("width", "4em");
+            .attr("width", this._yBackgroundWidth);
     }
 
     /**
@@ -334,19 +338,17 @@ export default class Grid {
      */
     update() {
         if (this._isShown && this._zoomLevel !== "initial") {
-            this._gAxis.transition(this._transition).attr("display", "inherit");
-            this._gBackground.transition(this._transition).attr("opacity", 1);
-            d3
-                .select("#summary")
-                .transition(this._transition)
-                .style("top", `${this._topMargin + 3 * 16}px`);
+            // Show axis
+            this._gAxis.attr("display", "inherit");
+            this._gBackground.attr("display", "inherit");
+            // Move summary down
+            d3.select("#summary").style("top", `${this._topMargin + 3 * 16}px`);
         } else {
-            this._gAxis.transition(this._transition).attr("display", "none");
-            this._gBackground.transition(this._transition).attr("opacity", 0);
-            d3
-                .select("#summary")
-                .transition(this._transition)
-                .style("top", `${this._topMargin}px`);
+            // Hide axis
+            this._gAxis.attr("display", "none");
+            this._gBackground.attr("display", "none");
+            // Move summary up
+            d3.select("#summary").style("top", `${this._topMargin}px`);
         }
     }
 

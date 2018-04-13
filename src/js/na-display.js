@@ -14,6 +14,7 @@
 import { feature as topojsonFeature } from "topojson-client";
 import moment from "moment";
 import "moment/locale/en-gb";
+import Cookies from "js-cookie";
 
 import "bootstrap/js/dist/tooltip";
 import "bootstrap/js/dist/util";
@@ -98,7 +99,48 @@ export default function naDisplay(serverName) {
             this._labelZoomThreshold = 0.5;
 
             this._minScale = nearestPow2(Math.min(this._width / this.coord.max, this._height / this.coord.max));
-            this._radioButton = "compass";
+
+            /**
+             * DoubleClickAction cookie name
+             * @type {string}
+             * @private
+             */
+            this._doubleClickActionCookieName = "na-map--double-click";
+
+            /**
+             * Default DoubleClickAction setting
+             * @type {string}
+             * @private
+             */
+            this._doubleClickActionDefault = "compass";
+
+            /**
+             * Get DoubleClickAction setting from cookie or use default value
+             * @type {string}
+             * @private
+             */
+            this._doubleClickAction = this._getDoubleClickActionSetting();
+
+            /**
+             * showLayer cookie name
+             * @type {string}
+             * @private
+             */
+            this._showLayerCookieName = "na-map--show-layer";
+
+            /**
+             * Default showLayer setting
+             * @type {string}
+             * @private
+             */
+            this._showLayerDefault = "grid";
+
+            /**
+             * Get showLayer setting from cookie or use default value
+             * @type {string}
+             * @private
+             */
+            this._showLayer = this._getShowLayerSetting();
 
             this._setupSvg();
             this._setupListener();
@@ -114,20 +156,15 @@ export default function naDisplay(serverName) {
             this._svg
                 .on("dblclick.zoom", null)
                 .on("click", stopProp, true)
-                .on("dblclick", (d, i, nodes) => this._doubleClickAction(nodes[i]));
+                .on("dblclick", (d, i, nodes) => this._doDoubleClickAction(nodes[i]));
 
             $("#reset").on("click", () => {
                 this.constructor._clearMap();
             });
 
-            $("#double-click-action").change(() => {
-                this._radioButton = $("input[name='mouseFunction']:checked").val();
-                this.constructor._clearMap();
-            });
+            $("#doubleClick-action").change(() => this._doubleClickSelected());
 
-            $("#show-layer").change(() => {
-                this._showLayerSelected();
-            });
+            $("#show-layer").change(() => this._showLayerSelected());
         }
 
         _setupSvg() {
@@ -155,16 +192,73 @@ export default function naDisplay(serverName) {
             this._g = this._svg.append("g").classed("map", true);
         }
 
-        _showLayerSelected() {
-            const input = $("input[name='showLayer']:checked").val();
-            let showGrid = false,
-                showTeleport = false;
+        /**
+         * Get show setting from cookie or use default value
+         * @returns {string} - Show setting
+         * @private
+         */
+        _getDoubleClickActionSetting() {
+            let r = Cookies.get(this._doubleClickActionCookieName);
+            // Use default value if cookie is not stored
+            r = typeof r !== "undefined" ? r : this._doubleClickActionDefault;
+            $(`#doubleClick-action-${r}`).prop("checked", true);
+            return r;
+        }
 
-            if (input === "grid") {
-                showGrid = true;
-            } else if (input === "teleport") {
-                showTeleport = true;
+        /**
+         * Store show setting in cookie
+         * @return {void}
+         * @private
+         */
+        _storeDoubleClickActionSetting() {
+            if (this._doubleClickAction !== this._doubleClickActionDefault) {
+                Cookies.set(this._doubleClickActionCookieName, this._doubleClickAction);
+            } else {
+                Cookies.remove(this._doubleClickActionCookieName);
             }
+        }
+
+        _doubleClickSelected() {
+            this._doubleClickAction = $("input[name='doubleClickAction']:checked").val();
+            this._storeDoubleClickActionSetting();
+            this.constructor._clearMap();
+        }
+
+        /**
+         * Get show setting from cookie or use default value
+         * @returns {string} - Show setting
+         * @private
+         */
+        _getShowLayerSetting() {
+            let r = Cookies.get(this._showLayerCookieName);
+            // Use default value if cookie is not stored
+            r = typeof r !== "undefined" ? r : this._showLayerDefault;
+            $(`#show-layer-${r}`).prop("checked", true);
+            return r;
+        }
+
+        /**
+         * Store show setting in cookie
+         * @return {void}
+         * @private
+         */
+        _storeShowLayerSetting() {
+            if (this._showLayer !== this._showLayerDefault) {
+                Cookies.set(this._showLayerCookieName, this._showLayer);
+            } else {
+                Cookies.remove(this._showLayerCookieName);
+            }
+        }
+
+        _showLayerSelected() {
+            this._showLayer = $("input[name='showLayer']:checked").val();
+            this._storeShowLayerSetting();
+            this._refreshLayer();
+        }
+
+        _refreshLayer() {
+            const showGrid = this._showLayer === "grid",
+                showTeleport = this._showLayer === "teleport";
 
             grid.setShow(showGrid);
             grid.update();
@@ -261,7 +355,7 @@ export default function naDisplay(serverName) {
                 .selectpicker("refresh");
         }
 
-        _doubleClickAction(self) {
+        _doDoubleClickAction(self) {
             const coord = d3.mouse(self),
                 transform = d3.zoomTransform(self);
             const mx = coord[0],
@@ -273,7 +367,7 @@ export default function naDisplay(serverName) {
             const x = (mx - tx) / tk,
                 y = (my - ty) / tk;
 
-            if (this._radioButton === "F11") {
+            if (this._doubleClickAction === "f11") {
                 f11.printCoord(x, y);
             } else {
                 course.plotCourse(x, y);
@@ -355,6 +449,7 @@ export default function naDisplay(serverName) {
             this._setZoomLevel("initial");
             this._updateCurrent();
             this._initialZoomAndPan();
+            this._refreshLayer();
         }
 
         zoomAndPan(x, y, scale) {
@@ -374,6 +469,9 @@ export default function naDisplay(serverName) {
     }
 
     function setup() {
+        // Set cookies defaults (expiry 365 days)
+        Cookies.defaults = { expires: 365 };
+
         shipCompare = new ShipCompare(shipData);
         teleport = new Teleport(map.coord.min, map.coord.max, ports);
         portSelect = new PortSelect(map, ports, pbZone);
