@@ -5,6 +5,7 @@
 /* global d3 : false
  */
 
+import Cookies from "js-cookie";
 import moment from "moment";
 import "moment/locale/en-gb";
 
@@ -40,6 +41,27 @@ export default class PortDisplay {
         this._minRadiusFactor = 1;
         this._maxRadiusFactor = 6;
 
+        /**
+         * showRadius cookie name
+         * @type {string}
+         * @private
+         */
+        this._showRadiusCookieName = "na-map--show-radius";
+
+        /**
+         * Default showRadius setting
+         * @type {string}
+         * @private
+         */
+        this._showRadiusDefault = "attack";
+
+        /**
+         * Get showRadius setting from cookie or use default value
+         * @type {string}
+         * @private
+         */
+        this._showRadiusType = this._getShowRadiusSetting();
+
         this.setPortData(portData);
         this._setPBData(pbData);
         this._setupListener();
@@ -49,10 +71,39 @@ export default class PortDisplay {
     }
 
     _setupListener() {
-        $("#radius-type").change(() => {
-            this._showRadiusType = $("input[name='showRadiusType']:checked").val();
-            this.update();
-        });
+        $("#show-radius").change(() => this._showRadiusSelected());
+    }
+
+    /**
+     * Get show setting from cookie or use default value
+     * @returns {string} - Show setting
+     * @private
+     */
+    _getShowRadiusSetting() {
+        let r = Cookies.get(this._showRadiusCookieName);
+        // Use default value if cookie is not stored
+        r = typeof r !== "undefined" ? r : this._showRadiusDefault;
+        $(`#show-radius-${r}`).prop("checked", true);
+        return r;
+    }
+
+    /**
+     * Store show setting in cookie
+     * @return {void}
+     * @private
+     */
+    _storeShowRadiusSetting() {
+        if (this._showRadius !== this._showRadiusDefault) {
+            Cookies.set(this._showRadiusCookieName, this._showRadius);
+        } else {
+            Cookies.remove(this._showRadiusCookieName);
+        }
+    }
+
+    _showRadiusSelected() {
+        this._showRadiusType = $("input[name='showRadius']:checked").val();
+        this._storeShowRadiusSetting();
+        this.update();
     }
 
     _setupSvg() {
@@ -361,7 +412,7 @@ export default class PortDisplay {
         const rMin = this._circleSizes[this._zoomLevel] * this._minRadiusFactor,
             rMax = this._circleSizes[this._zoomLevel] * this._maxRadiusFactor;
         let data = {};
-        if (this._showRadiusType === "taxIncome" || this._showRadiusType === "netIncome") {
+        if (this._showRadiusType === "tax" || this._showRadiusType === "net") {
             data = this.portData.filter(d => !d.properties.nonCapturable);
         } else if (this._showRadiusType === "attack") {
             const pbData = this.pbData.ports
@@ -392,7 +443,7 @@ export default class PortDisplay {
 
         // Apply to both old and new
         const circleMerge = circleUpdate.merge(circleEnter);
-        if (this._showRadiusType === "taxIncome") {
+        if (this._showRadiusType === "tax") {
             const minTaxIncome = d3.min(data, d => d.properties.taxIncome),
                 maxTaxIncome = d3.max(data, d => d.properties.taxIncome);
 
@@ -401,7 +452,7 @@ export default class PortDisplay {
             circleMerge
                 .attr("class", "bubble pos")
                 .attr("r", d => this._taxIncomeRadius(Math.abs(d.properties.taxIncome)));
-        } else if (this._showRadiusType === "netIncome") {
+        } else if (this._showRadiusType === "net") {
             const minNetIncome = d3.min(data, d => d.properties.netIncome),
                 maxNetIncome = d3.max(data, d => d.properties.netIncome);
 
