@@ -1,0 +1,14 @@
+/fonts/*
+	Cache-Control: public, max-age=2628000
+
+/icons/*
+	Cache-Control: public, max-age=2628000
+
+/images/*
+	Cache-Control: public, max-age=2628000
+
+/*.json
+	Cache-Control: public, max-age=86400
+
+/*-pb.json
+	Cache-Control: public, max-age=60
