@@ -14,14 +14,55 @@ String.prototype.replaceAll = function(search, replacement) {
     return target.replace(new RegExp(search, "g"), replacement);
 };
 
+function sort(a, b) {
+    if (a.class < b.class) {
+        return -1;
+    }
+    if (a.class > b.class) {
+        return 1;
+    }
+    if (a.battleRating > b.battleRating) {
+        return -1;
+    }
+    if (a.battleRating < b.battleRating) {
+        return 1;
+    }
+    if (a.name < b.name) {
+        return -1;
+    }
+    if (a.name > b.name) {
+        return 1;
+    }
+    return 0;
+}
+
 function createExcel() {
+    const primary050 = "faf7f3",
+        primary200 = "ede1d2",
+        primary400 = "dcc6a9",
+        primary500 = "d5bb99",
+        primary800 = "6f6150",
+        secondary050 = "f9fbfc",
+        secondary100 = "f3f7f9",
+        secondary200 = "e9f1f4",
+        secondary500 = "cddfe6",
+        secondary600 = "acbbc1",
+        secondary800 = "6b7478",
+        secondary900 = "4a5053",
+        background600 = "c5bbbb";
+
     function fillSheet(sheet, ships) {
+        function fillPattern(colour) {
+            return { type: "pattern", pattern: "solid", fgColor: { argb: colour } };
+        }
         const numHeader = 3,
+            numPlayers = 24,
+            rowHeight = 40,
             textAlignment = { vertical: "middle", horizontal: "left", indent: 1 },
             numberAlignment = { vertical: "middle", horizontal: "right", indent: 1 },
             numFmt = "#";
 
-        sheet.views = [{ state: "frozen", xSplit: 5, ySplit: 2 }];
+        sheet.views = [{ state: "frozen", xSplit: 5, ySplit: 2, showGridLines: false }];
         sheet.properties.defaultRowHeight = 24;
 
         // ** Columns
@@ -60,7 +101,7 @@ function createExcel() {
         ];
 
         // Format other columns (player names)
-        for (let columnNum = 7; columnNum <= 7 + 23; columnNum += 1) {
+        for (let columnNum = 7; columnNum <= 7 + numPlayers - 1; columnNum += 1) {
             sheet.getColumn(columnNum).width = 20;
             sheet.getColumn(columnNum).alignment = textAlignment;
         }
@@ -74,13 +115,9 @@ function createExcel() {
             text: "Game Labs Forum",
             hyperlink: "http://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/"
         };
-        sheet.getRow(1).height = 40;
-        sheet.getRow(1).fill = {
-            type: "pattern",
-            pattern: "solid",
-            fgColor: { argb: "e9f1f4" }
-        };
-        sheet.getRow(1).font = { color: { argb: "6b7478" } };
+        sheet.getRow(1).height = rowHeight;
+        sheet.getRow(1).fill = fillPattern(secondary200);
+        sheet.getRow(1).font = { color: { argb: secondary800 } };
 
         sheet.addRow({
             rate: "Rate",
@@ -123,61 +160,47 @@ function createExcel() {
         });
 
         [2, 3].forEach(row => {
-            sheet.getRow(row).height = 40;
-            sheet.getRow(row).fill = {
-                type: "pattern",
-                pattern: "solid",
-                fgColor: { argb: "dcc6a9" }
-            };
-            sheet.getRow(row).font = { bold: true, color: { argb: "6f6150" } };
+            sheet.getRow(row).height = rowHeight;
+            sheet.getRow(row).fill = fillPattern(primary400);
+            sheet.getRow(row).font = { bold: true, color: { argb: primary800 } };
         });
 
         ["A2", "A3", "B2", "B3", "C2", "C3", "D2", "E2"].forEach(cell => {
-            sheet.getCell(cell).fill = {
-                type: "pattern",
-                pattern: "solid",
-                fgColor: { argb: "acbbc1" }
-            };
-            sheet.getCell(cell).font = { bold: true, color: { argb: "f3f7f9" } };
+            sheet.getCell(cell).fill = fillPattern(secondary600);
+            sheet.getCell(cell).font = { bold: true, color: { argb: secondary100 } };
         });
 
         ["D3", "E3"].forEach(cell => {
-            sheet.getCell(cell).fill = {
-                type: "pattern",
-                pattern: "solid",
-                fgColor: { argb: "cddfe6" }
-            };
-            sheet.getCell(cell).font = { bold: true, color: { argb: "4a5053" } };
+            sheet.getCell(cell).fill = fillPattern(secondary500);
+            sheet.getCell(cell).font = { bold: true, color: { argb: secondary900 } };
         });
 
         sheet.getCell("D3").alignment = numberAlignment;
         sheet.getCell("E3").alignment = numberAlignment;
         sheet.mergeCells("F3:I3");
         sheet.getCell("F3").value = "Enter player names";
-        sheet.getCell("F3").font = { bold: false, italic: true, color: { argb: "4a5053" } };
+        sheet.getCell("F3").font = { bold: false, italic: true, color: { argb: secondary900 } };
 
-        for (let rowNum = numHeader + 1; rowNum <= numHeader + ships.length; rowNum += 1) {
-            sheet.getRow(rowNum);
-        }
-
+        const fgColourShip = [{ argb: secondary050 }, { argb: secondary200 }],
+            fgColourPlayer = [{ argb: primary050 }, { argb: primary200 }];
         for (let rowNum = numHeader + 1; rowNum <= numHeader + ships.length; rowNum += 1) {
             const row = sheet.getRow(rowNum);
             row.border = {
-                top: { style: "thin", color: { argb: "cccccc" } },
-                bottom: { style: "thin", color: { argb: "cccccc" } }
+                top: { style: "thin", color: { argb: background600 } },
+                bottom: { style: "thin", color: { argb: background600 } }
             };
             for (let columnNum = 1; columnNum <= 5; columnNum += 1) {
                 row.getCell(columnNum).fill = {
                     type: "pattern",
                     pattern: "solid",
-                    fgColor: { argb: "e9f1f4" }
+                    fgColor: fgColourShip[row.getCell(1).value % 2]
                 };
             }
-            for (let columnNum = 6; columnNum <= 6 + 24; columnNum += 1) {
+            for (let columnNum = 6; columnNum <= 6 + numPlayers; columnNum += 1) {
                 row.getCell(columnNum).fill = {
                     type: "pattern",
                     pattern: "solid",
-                    fgColor: { argb: "ede1d2" }
+                    fgColor: fgColourPlayer[row.getCell(1).value % 2]
                 };
             }
         }
@@ -194,46 +217,32 @@ function createExcel() {
     const workbook = new Excel.Workbook(),
         now = new Date();
     const dwShips = shipsOrig
-            .filter(ship => ship.class < 6 || ship.name === "Mortar Brig")
-            .sort((a, b) => a.class - b.class || b.battleRating - a.battleRating || a.name - b.name),
+            .filter(
+                ship =>
+                    !(
+                        ship.name.startsWith("Basic") ||
+                        ship.name.startsWith("Rookie") ||
+                        ship.name.startsWith("Trader")
+                    ) &&
+                    (ship.battleRating >= 80 || ship.name === "Mortar Brig")
+            )
+            .sort((a, b) => sort(a, b)),
         swShips = shipsOrig
             .filter(
                 ship =>
-                    ship.class > 5 &&
-                    !ship.name.startsWith("Basic") &&
-                    !ship.name.startsWith("Rookie") &&
-                    !ship.name.startsWith("Trader")
+                    ship.class >= 6 &&
+                    !(ship.name.startsWith("Basic") || ship.name.startsWith("Rookie") || ship.name.startsWith("Trader"))
             )
-            .sort((a, b) => {
-                if (a.class < b.class) {
-                    return -1;
-                }
-                if (a.class > b.class) {
-                    return 1;
-                }
-                if (a.battleRating > b.battleRating) {
-                    return -1;
-                }
-                if (a.battleRating < b.battleRating) {
-                    return 1;
-                }
-                if (a.name < b.name) {
-                    return -1;
-                }
-                if (a.name > b.name) {
-                    return 1;
-                }
-                return 0;
-            });
+            .sort((a, b) => sort(a, b));
 
     workbook.creator = "iB aka Felix Victor";
     workbook.created = now;
 
     const dwSheet = workbook.addWorksheet("Deep water port", {
-            properties: { tabColor: { argb: "d5bb99" } }
+            properties: { tabColor: { argb: primary500 } }
         }),
         swSheet = workbook.addWorksheet("Shallow water port", {
-            properties: { tabColor: { argb: "cddfe6" } }
+            properties: { tabColor: { argb: secondary500 } }
         });
 
     fillSheet(dwSheet, dwShips);
