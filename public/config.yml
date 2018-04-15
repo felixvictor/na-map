@@ -1,0 +1,5 @@
+backend:
+  name: gitlab
+  repo: ibey/na-topo
+  branch: master
+  api_root: https://gl.byrtz.de/api/v4
