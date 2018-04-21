@@ -2,35 +2,39 @@
     update-ports.mjs
 */
 
-import fs from "fs";
 import moment from "moment";
-import { nations } from "./common.mjs";
+import { nations, readJson, saveJson } from "./common.mjs";
 
 const portFilename = process.argv[2],
     tweetsFileName = process.argv[3];
 
-const ports = JSON.parse(fs.readFileSync(portFilename, "utf8")),
-    tweets = JSON.parse(fs.readFileSync(tweetsFileName, "utf8"));
+const ports = readJson(portFilename),
+    tweets = readJson(tweetsFileName);
 
-function saveJson(data) {
-    // eslint-disable-next-line consistent-return
-    fs.writeFile(portFilename, JSON.stringify(data), "utf8", err => {
-        if (err) {
-            return console.log(err);
-        }
-    });
-}
-
+/**
+ * Update port data from tweets
+ * @returns {Boolean} True if port data changed (new tweets)
+ */
 function updatePorts() {
+    /**
+     * Find index by port name
+     * @param {Object} element - port data
+     * @returns {Boolean} True if port name equals this
+     */
     function findIndex(element) {
         return element.name === this;
     }
 
+    /**
+     * Port captured
+     * @param {String[]} result - Result from tweet regex
+     * @returns {void}
+     */
     function captured(result) {
         const i = ports.ports.findIndex(findIndex, result[2]);
         const port = ports.ports[i];
 
-        console.log("      --- captured ", i);
+        console.log("      --- captured", i);
         port.nation = nations.filter(nation => nation.name === port.attackerNation).map(nation => nation.short);
         // eslint-disable-next-line prefer-destructuring
         port.capturer = result[3];
@@ -41,6 +45,11 @@ function updatePorts() {
         port.portBattle = "";
     }
 
+    /**
+     * Port defended
+     * @param {String[]} result - Result from tweet regex
+     * @returns {void}
+     */
     function defended(result) {
         const i = ports.ports.findIndex(findIndex, result[2]);
         const port = ports.ports[i];
@@ -52,11 +61,16 @@ function updatePorts() {
         port.portBattle = "";
     }
 
+    /**
+     * Hostility increased
+     * @param {String[]} result - Result from tweet regex
+     * @returns {void}
+     */
     function hostilityLevelUp(result) {
         const i = ports.ports.findIndex(findIndex, result[4]);
         const port = ports.ports[i];
 
-        console.log("      --- hostilityLevelUp ", i);
+        console.log("      --- hostilityLevelUp", i);
         // eslint-disable-next-line prefer-destructuring
         port.attackerNation = result[3];
         // eslint-disable-next-line prefer-destructuring
@@ -64,11 +78,16 @@ function updatePorts() {
         port.attackHostility = result[6] / 100;
     }
 
+    /**
+     * Hostility decreased
+     * @param {String[]} result - Result from tweet regex
+     * @returns {void}
+     */
     function hostilityLevelDown(result) {
         const i = ports.ports.findIndex(findIndex, result[4]);
         const port = ports.ports[i];
 
-        console.log("      --- hostilityLevelDown ", i);
+        console.log("      --- hostilityLevelDown", i);
         // eslint-disable-next-line prefer-destructuring
         port.attackerNation = result[3];
         // eslint-disable-next-line prefer-destructuring
@@ -76,22 +95,32 @@ function updatePorts() {
         port.attackHostility = result[6] / 100;
     }
 
+    /**
+     * Get attacker nation
+     * @param {String[]} result - Result from tweet regex
+     * @returns {void}
+     */
     function getNation(result) {
         const i = ports.ports.findIndex(findIndex, result[4]);
         const port = ports.ports[i];
 
-        console.log("      --- getNation ", i);
+        console.log("      --- getNation", i);
         // eslint-disable-next-line prefer-destructuring
         port.attackerNation = result[3];
         port.attackerClan = "";
         port.attackHostility = 0;
     }
 
+    /**
+     * Port battle scheduled
+     * @param {String[]} result - Result from tweet regex
+     * @returns {void}
+     */
     function portBattleScheduled(result) {
         const i = ports.ports.findIndex(findIndex, result[2]);
         const port = ports.ports[i];
 
-        console.log("      --- portBattleScheduled i ", i);
+        console.log("      --- portBattleScheduled", i);
         if (typeof result[7] !== "undefined") {
             // eslint-disable-next-line prefer-destructuring
             port.attackerNation = result[7];
@@ -192,7 +221,7 @@ function updatePorts() {
                 // eslint-disable-next-line no-unused-expressions
                 () => {};
             } else {
-                console.log(`\n\n***************************************\nUnmatched tweet\n${tweet.text}\n`);
+                console.log(`\n\n***************************************\nUnmatched tweet: ${tweet.text}\n`);
             }
         } else if (tweetTime.isAfter(moment(serverStart).subtract(1, "day"))) {
             // Add scheduled port battles
@@ -210,7 +239,7 @@ function updatePorts() {
         }
     });
     if (isPortDataChanged) {
-        saveJson(ports);
+        saveJson(portFilename, ports);
     }
     return !isPortDataChanged;
 }
