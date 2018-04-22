@@ -8,6 +8,13 @@ const inFilename = process.argv[2],
     outFilename = process.argv[3];
 const shipsOrig = readJson(inFilename).shipData;
 
+/**
+ * Create array with numbers ranging from start to end
+ * {@link https://stackoverflow.com/questions/36947847/how-to-generate-range-of-numbers-from-0-to-n-in-es2015-only/36953272}
+ * @param {Number} start - Start index
+ * @param {Number} end - End index
+ * @returns {Number[]} Result
+ */
 const range = (start, end) => [...Array(1 + end - start).keys()].map(v => start + v);
 
 /**
@@ -263,11 +270,6 @@ function createExcel() {
             });
         });
 
-        /*
-        sheet.mergeCells("F3:I3");
-        sheet.getCell("F3").value = "Enter player names";
-        sheet.getCell("F3").font = { bold: false, italic: true, color: { argb: secondary900 } };
-        */
         sheet.mergeCells(
             `${intToExcelCol(headerColumns + 1)}${headerRows}:${intToExcelCol(headerColumns + 4)}${headerRows}`
         );
