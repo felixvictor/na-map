@@ -1,7 +1,9 @@
 /* eslint-disable no-param-reassign */
 
 // eslint-disable-next-line import/no-extraneous-dependencies
-import Excel from "exceljs";
+// import { Workbook as Excel4Node, getExcelAlpha } from "excel4node";
+import Excel4Node from "excel4node";
+
 import { readJson } from "./common.mjs";
 
 const inFilename = process.argv[2],
@@ -16,42 +18,6 @@ const shipsOrig = readJson(inFilename).shipData;
  * @returns {Number[]} Result
  */
 const range = (start, end) => [...Array(1 + end - start).keys()].map(v => start + v);
-
-/**
- * Converts integer to excel column name
- * {@link https://github.com/avilaton/excel-column-name/blob/master/index.js}
- * @param {Number} number - Column name as integer
- * @returns {String} Excel column name
- */
-const intToExcelCol = number => {
-    let colName = "",
-        dividend = Math.floor(Math.abs(number)),
-        rest;
-
-    while (dividend > 0) {
-        rest = (dividend - 1) % 26;
-        colName = String.fromCharCode(65 + rest) + colName;
-        dividend = parseInt((dividend - rest) / 26, 10);
-    }
-    return colName;
-};
-
-/**
- * Converts excel column name to integer
- * {@link https://github.com/avilaton/excel-column-name/blob/master/index.js}
- * @param {String} colName - Excel column name
- * @returns {Number} Column name as integer
- */
-const excelColToInt = colName => {
-    const digits = colName.toUpperCase().split("");
-    let number = 0;
-
-    for (let i = 0; i < digits.length; i += 1) {
-        number += (digits[i].charCodeAt(0) - 64) * 26 ** (digits.length - i - 1);
-    }
-
-    return number;
-};
 
 // https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
 // eslint-disable-next-line no-extend-native,func-names
@@ -107,6 +73,61 @@ function createExcel() {
         secondary900 = "4a5053",
         background600 = "c5bbbb";
 
+    const wsOptions = {
+        sheetView: {
+            showGridLines: false // Flag indicating whether the sheet should have gridlines enabled or disabled during view
+        },
+        sheetFormat: {
+            baseColWidth: 20, // Defaults to 10. Specifies the number of characters of the maximum digit width of the normal style's font. This value does not include margin padding or extra padding for gridlines. It is only the number of characters.,
+            defaultColWidth: 20,
+            defaultRowHeight: 24
+        }
+    };
+
+    const workbook = new Excel4Node.Workbook();
+
+    /**
+     * Returns fill pattern object
+     * @param {String} colour - Pattern colour
+     * @returns {Object} Fill pattern
+     */
+    const fillPattern = colour =>
+        workbook.createStyle({ fill: { type: "pattern", patternType: "solid", fgColor: colour } }); // §18.8.20 fill (Fill)
+
+    /**
+     * Returns font object with color colour
+     * @param {String} colour - Font colour
+     * @returns {Object} Font object
+     */
+    const fontColour = colour => workbook.createStyle({ font: { color: colour } }); // §18.8.22
+
+    /**
+     * Returns font object with bold font
+     * @param {String} colour - Font colour
+     * @returns {Object} Font object
+     */
+    const fontColourBold = colour => workbook.createStyle({ font: { bold: true, color: colour } }); // §18.8.22
+
+    /**
+     * Returns font object with bold font
+     * @param {String} colour - Font colour
+     * @returns {Object} Font object
+     */
+    const border = () =>
+        workbook.createStyle({
+            // §18.8.4 border (Border)
+            border: {
+                top: {
+                    style: "thin",
+                    color: background600
+                },
+                bottom: {
+                    style: "thin",
+                    color: background600
+                }
+            }
+        });
+
     /**
      * Fill worksheet
      * @param {Worksheet} sheet - Worksheet
@@ -114,207 +135,209 @@ function createExcel() {
      * @returns {void}
      */
     function fillSheet(sheet, ships) {
-        /**
-         * Returns fill pattern object
-         * @param {String} colour - Pattern colour
-         * @returns {Object} Fill pattern
-         */
-        const fillPattern = colour => ({ type: "pattern", pattern: "solid", fgColor: { argb: colour } });
-
         const headerRows = 4,
             headerColumns = 5,
             numPlayers = 24,
-            rowHeight = 40,
-            textAlignment = { vertical: "middle", horizontal: "left", indent: 1 },
-            numberAlignment = { vertical: "middle", horizontal: "right", indent: 1 },
-            numFmt = "#";
+            numRows = headerRows + ships.length,
+            numColumns = headerColumns + numPlayers,
+            rowHeight = 40;
 
-        sheet.views = [{ state: "frozen", xSplit: 5, ySplit: 2, showGridLines: false }];
-        sheet.properties.defaultRowHeight = 24;
+        const numberStyle = {
+                alignment: {
+                    // §18.8.1
+                    horizontal: "right",
+                    indent: 1, // Number of spaces to indent = indent value * 3
+                    //                relativeIndent: integer, // number of additional spaces to indent
+                    vertical: "center"
+                },
+                numberFormat: "#" // §18.8.30 numFmt (Number Format)
+            },
+            textStyle = {
+                alignment: {
+                    // §18.8.1
+                    horizontal: "left",
+                    indent: 1, // Number of spaces to indent = indent value * 3
+                    //                relativeIndent: integer, // number of additional spaces to indent
+                    vertical: "center"
+                }
+            };
+
+        sheet.column(headerColumns).freeze(); // Freezes the first two columns and scrolls the right view to column D
+        sheet.row(headerRows).freeze();
 
         // ***** Columns *****
-        // Content and format first columns
-        const columns = [
-            {
-                key: "rate",
-                width: 8,
-                style: { alignment: numberAlignment, numFmt }
-            },
-            {
-                key: "ship",
-                width: 24,
-                style: { alignment: textAlignment }
-            },
-            {
-                key: "br",
-                width: 8,
-                style: { alignment: numberAlignment, numFmt }
-            },
-            {
-                key: "player",
-                width: 12,
-                style: { alignment: numberAlignment, numFmt }
-            },
-            {
-                key: "brTotal",
-                width: 12,
-                style: { alignment: numberAlignment, numFmt }
-            }
-        ];
+        // Format first columns
+        // Ship rate
+        let currentColumn = 1;
+        sheet.column(currentColumn).setWidth(8);
+        sheet.cell(1, currentColumn, numRows, currentColumn).style(numberStyle);
 
-        // Format other columns (player names)
-        for (let i = 1; i <= numPlayers; i += 1) {
-            columns.push({
-                key: `name-${i}`,
-                width: 20,
-                style: { alignment: textAlignment }
-            });
-        }
+        // Ship name
+        currentColumn += 1;
+        sheet.column(currentColumn).setWidth(24);
+        sheet.cell(1, currentColumn, numRows, currentColumn).style(textStyle);
 
-        // Add columns to sheet
-        sheet.columns = columns;
+        // Ship battle rating
+        currentColumn += 1;
+        sheet.column(currentColumn).setWidth(8);
+        sheet.cell(1, currentColumn, numRows, currentColumn).style(numberStyle);
+
+        // Number of players
+        currentColumn += 1;
+        sheet.column(currentColumn).setWidth(12);
+        sheet.cell(1, currentColumn, numRows, currentColumn).style(numberStyle);
+
+        // Total battle rating
+        currentColumn += 1;
+        sheet.column(currentColumn).setWidth(12);
+        sheet.cell(1, currentColumn, numRows, currentColumn).style(numberStyle);
+
+        // Player names
+        range(headerColumns + 1, headerColumns + numPlayers).forEach(column => {
+            sheet.column(column).setWidth(20);
+            sheet.cell(1, column, numRows, column).style(textStyle);
+        });
 
         // ***** Rows *****
         // General description row
         let currentRow = 1;
-        sheet.mergeCells(`A${currentRow}:C${currentRow}`);
-        sheet.getCell(`A${currentRow}`).value = "Simple port battle calculator by Felix Victor";
-        sheet.mergeCells(`D${currentRow}:E${currentRow}`);
-        sheet.getCell(`D${currentRow}`).value = {
-            text: "Game Labs Forum",
-            hyperlink: "http://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/"
-        };
-        sheet.getRow(currentRow).height = rowHeight;
-        sheet.getRow(currentRow).fill = fillPattern(secondary200);
-        sheet.getRow(currentRow).font = { color: { argb: secondary800 } };
+        sheet.row(currentRow).setHeight(rowHeight);
+        sheet
+            .cell(currentRow, 1, currentRow, numColumns)
+            .style(textStyle)
+            .style(fontColour(secondary800))
+            .style(fillPattern(secondary200));
+        sheet.cell(currentRow, 1, currentRow, 3, true).string("Port battle calculator by Felix Victor");
+        sheet
+            .cell(currentRow, 4, currentRow, 5, true)
+            .link("https://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/", "Game Labs Forum");
 
         // Port description row
         currentRow += 1;
-        sheet.addRow({
-            rate: "",
-            ship: "Ship",
-            br: "",
-            player: "",
-            brTotal: "",
-            names: "Player names"
-        });
-        sheet.getRow(currentRow).height = rowHeight;
-        sheet.getRow(currentRow).fill = fillPattern(secondary200);
-        sheet.getRow(currentRow).font = { color: { argb: secondary800 } };
+        sheet.row(currentRow).setHeight(rowHeight);
+        sheet
+            .cell(currentRow, 1, currentRow, numColumns)
+            .style(textStyle)
+            .style(fontColour(secondary800))
+            .style(fillPattern(secondary200));
+        sheet.cell(currentRow, 1).string("Port");
+        sheet.cell(currentRow, headerColumns - 1).string("Max BR");
+        sheet.cell(currentRow, 1, currentRow, headerColumns).style(numberStyle);
 
         // Column description row
         currentRow += 1;
-        sheet.addRow({
-            rate: "Rate",
-            ship: "Ship",
-            br: "BR",
-            player: "# Player",
-            brTotal: "BR total",
-            names: "Player names"
-        });
-        sheet.mergeCells(`F${currentRow}:G${currentRow}`);
+        sheet.row(currentRow).setHeight(rowHeight);
+        sheet
+            .cell(currentRow, 1, currentRow, headerColumns)
+            .style(textStyle)
+            .style(fontColourBold(secondary100))
+            .style(fillPattern(secondary600));
+        sheet.cell(currentRow, 1).string("Rate");
+        sheet.cell(currentRow, 2).string("Ship");
+        sheet.cell(currentRow, 3).string("BR");
+        sheet.cell(currentRow, 4).string("# Players");
+        sheet.cell(currentRow, 5).string("BR total");
+
+        sheet
+            .cell(currentRow, headerColumns + 1, currentRow, numColumns)
+            .style(textStyle)
+            .style(fontColourBold(primary800))
+            .style(fillPattern(primary400));
+        sheet.cell(currentRow, headerColumns + 1, currentRow, headerColumns + 2, true).string("Player names");
 
         // Total row
         currentRow += 1;
-        sheet.addRow({
-            rate: "",
-            ship: "",
-            br: "",
-            player: { formula: `SUM(D${headerRows + 1}:D${headerRows + ships.length})` },
-            brTotal: { formula: `SUM(E${headerRows + 1}:E${headerRows + ships.length})` }
-        });
+        sheet.row(currentRow).setHeight(rowHeight);
+        sheet
+            .cell(currentRow, 1, currentRow, headerColumns - 2)
+            .style(textStyle)
+            .style(fontColourBold(secondary100))
+            .style(fillPattern(secondary600));
 
-        ships.forEach((ship, i) => {
+        sheet
+            .cell(currentRow, headerColumns - 1, currentRow, headerColumns)
+            .style(textStyle)
+            .style(fontColourBold(secondary900))
+            .style(fillPattern(secondary500));
+        sheet
+            .cell(currentRow, headerColumns - 1)
+            .formula(
+                `SUM(${Excel4Node.getExcelAlpha(headerColumns - 1)}${headerRows + 1}:${Excel4Node.getExcelAlpha(
+                    headerColumns - 1
+                )}${numRows})`
+            )
+            .style(numberStyle);
+        sheet
+            .cell(currentRow, headerColumns)
+            .formula(
+                `SUM(${Excel4Node.getExcelAlpha(headerColumns)}${headerRows + 1}:${Excel4Node.getExcelAlpha(
+                    headerColumns
+                )}${numRows})`
+            )
+            .style(numberStyle);
+
+        sheet
+            .cell(currentRow, headerColumns + 1, currentRow, numColumns, true)
+            .string("Enter player names")
+            .style(textStyle)
+            .style(fontColour(primary800))
+            .style(fillPattern(primary400));
+
+        const fgColourShip = [secondary050, secondary200],
+            fgColourPlayer = [primary050, primary200];
+        ships.forEach(ship => {
             currentRow += 1;
-            if (!i) {
-                sheet.addRow({
-                    // First row with formula for player/brTotal
-                    rate: ship.class,
-                    ship: ship.name,
-                    br: ship.battleRating,
-                    player: { formula: `COUNTIF(F${headerRows + 1}:AE${headerRows + 1},"*")` },
-                    brTotal: { formula: `C${headerRows + 1}*D${headerRows + 1}` }
-                });
-            } else {
-                // Other rows with formula reference for player/brTotal
-                sheet.addRow({
-                    rate: ship.class,
-                    ship: ship.name,
-                    br: ship.battleRating,
-                    player: { sharedFormula: `D${headerRows + 1}` },
-                    brTotal: { sharedFormula: `E${headerRows + 1}` }
-                });
-            }
+
+            sheet
+                .cell(currentRow, 1, currentRow, headerColumns)
+                .style(textStyle)
+                .style(fontColour(primary800))
+                .style(border)
+                .style(fillPattern(fgColourShip[ship.class % 2]));
+
+            sheet
+                .cell(currentRow, 1)
+                .number(ship.class)
+                .style(numberStyle);
+            sheet.cell(currentRow, 2).string(ship.name);
+            sheet
+                .cell(currentRow, 3)
+                .number(ship.battleRating)
+                .style(numberStyle);
+            sheet
+                .cell(currentRow, headerColumns - 1)
+                .formula(
+                    `SUMPRODUCT(NOT(ISBLANK(${Excel4Node.getExcelAlpha(
+                        headerColumns + 1
+                    )}${currentRow}:${Excel4Node.getExcelAlpha(numColumns)}${currentRow})))`
+                )
+                .style(numberStyle);
+            sheet
+                .cell(currentRow, headerColumns)
+                .formula(
+                    `${Excel4Node.getExcelAlpha(headerColumns - 2)}${currentRow}*${Excel4Node.getExcelAlpha(
+                        headerColumns - 1
+                    )}${currentRow}`
+                )
+                .style(numberStyle);
+
+            sheet
+                .cell(currentRow, headerColumns + 1, currentRow, numColumns)
+                .style(textStyle)
+                .style(fontColour(primary800))
+                .style(border)
+                .style(fillPattern(fgColourPlayer[ship.class % 2]));
         });
-
-        range(headerRows - 1, headerRows).forEach(row => {
-            sheet.getRow(row).height = rowHeight;
-            sheet.getRow(row).fill = fillPattern(primary400);
-            sheet.getRow(row).font = { bold: true, color: { argb: primary800 } };
-        });
-
-        range(1, headerColumns).forEach(columnInt => {
-            const column = intToExcelCol(columnInt);
-            range(headerRows - 1, headerRows).forEach(row => {
-                sheet.getCell(column + row).fill = fillPattern(secondary600);
-                sheet.getCell(column + row).font = { bold: true, color: { argb: secondary100 } };
-            });
-        });
-
-        range(headerColumns - 1, headerColumns).forEach(columnInt => {
-            const column = intToExcelCol(columnInt);
-            [headerRows].forEach(row => {
-                sheet.getCell(column + row).fill = fillPattern(secondary500);
-                sheet.getCell(column + row).font = { bold: true, color: { argb: secondary900 } };
-                sheet.getCell(column + row).alignment = numberAlignment;
-            });
-        });
-
-        sheet.mergeCells(
-            `${intToExcelCol(headerColumns + 1)}${headerRows}:${intToExcelCol(headerColumns + 4)}${headerRows}`
-        );
-        sheet.getCell(`${intToExcelCol(headerColumns + 1)}${headerRows}`).value = "Enter player names";
-        sheet.getCell(`${intToExcelCol(headerColumns + 1)}${headerRows}`).font = {
-            bold: false,
-            italic: true,
-            color: { argb: secondary900 }
-        };
-
-        const fgColourShip = [{ argb: secondary050 }, { argb: secondary200 }],
-            fgColourPlayer = [{ argb: primary050 }, { argb: primary200 }];
-        for (let rowNum = headerRows + 1; rowNum <= headerRows + ships.length; rowNum += 1) {
-            const row = sheet.getRow(rowNum);
-            row.border = {
-                top: { style: "thin", color: { argb: background600 } },
-                bottom: { style: "thin", color: { argb: background600 } }
-            };
-            for (let columnNum = 1; columnNum <= headerColumns; columnNum += 1) {
-                row.getCell(columnNum).fill = {
-                    type: "pattern",
-                    pattern: "solid",
-                    fgColor: fgColourShip[row.getCell(1).value % 2]
-                };
-            }
-            for (let columnNum = headerColumns + 1; columnNum < headerColumns + 1 + numPlayers; columnNum += 1) {
-                row.getCell(columnNum).fill = {
-                    type: "pattern",
-                    pattern: "solid",
-                    fgColor: fgColourPlayer[row.getCell(1).value % 2]
-                };
-            }
-        }
 
         // Sample values
-        sheet.getCell(`${intToExcelCol(headerColumns + 1)}${headerRows + 1}`).value = "Fritz";
-        sheet.getCell(`${intToExcelCol(headerColumns + 2)}${headerRows + 1}`).value = "Franz";
-        sheet.getCell(`${intToExcelCol(headerColumns + 3)}${headerRows + 1}`).value = "Klaus";
-        sheet.getCell(`${intToExcelCol(headerColumns + 1)}${headerRows + 2}`).value = "x";
-        sheet.getCell(`${intToExcelCol(headerColumns + 2)}${headerRows + 2}`).value = "X";
-        sheet.getCell(`${intToExcelCol(headerColumns + 3)}${headerRows + 2}`).value = "x";
+        sheet.cell(headerRows + 1, headerColumns + 1).string("Fritz");
+        sheet.cell(headerRows + 1, headerColumns + 2).string("Franz");
+        sheet.cell(headerRows + 1, headerColumns + 3).string("Klaus");
+        sheet.cell(headerRows + 2, headerColumns + 1).string("x");
+        sheet.cell(headerRows + 2, headerColumns + 2).string("X");
+        sheet.cell(headerRows + 2, headerColumns + 3).string("x");
     }
 
-    const workbook = new Excel.Workbook(),
-        now = new Date();
     const dwShips = shipsOrig
             .filter(
                 ship =>
@@ -334,20 +357,25 @@ function createExcel() {
             )
             .sort((a, b) => sort(a, b));
 
-    workbook.creator = "iB aka Felix Victor";
-    workbook.created = now;
-
+    /*
     const dwSheet = workbook.addWorksheet("Deep water port", {
             properties: { tabColor: { argb: primary500 } }
         }),
         swSheet = workbook.addWorksheet("Shallow water port", {
             properties: { tabColor: { argb: secondary500 } }
         });
+        */
+    const dwSheet = workbook.addWorksheet("Deep water port", wsOptions),
+        swSheet = workbook.addWorksheet("Shallow water port", wsOptions);
 
     fillSheet(dwSheet, dwShips);
     fillSheet(swSheet, swShips);
 
-    workbook.xlsx.writeFile(outFilename);
+    workbook.write(outFilename, err => {
+        if (err) {
+            console.error(err);
+        }
+    });
 }
 
 createExcel();
