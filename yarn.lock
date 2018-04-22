@@ -2031,9 +2031,9 @@ boom@5.x.x:
   dependencies:
     hoek "4.x.x"
 
-"bootstrap-select@https://github.com/snapappointments/bootstrap-select.git":
-  version "1.13.0-beta"
-  resolved "https://github.com/snapappointments/bootstrap-select.git#24f1507d3d8ace5b3673d375d28c5a1ef6087105"
+bootstrap-select@^1.13.0:
+  version "1.13.0"
+  resolved "https://registry.yarnpkg.com/bootstrap-select/-/bootstrap-select-1.13.0.tgz#f31d0a23fc6070fd5b17b841bf1ca115ce54775b"
 
 bootstrap@4.0.0:
   version "4.0.0"
@@ -6151,7 +6151,7 @@ jest-docblock@^21.0.0:
   version "21.2.0"
   resolved "https://registry.yarnpkg.com/jest-docblock/-/jest-docblock-21.2.0.tgz#51529c3b30d5fd159da60c27ceedc195faf8d414"
 
-jquery@^3.0, jquery@^3.3.1:
+"jquery@>= 1.4.1", jquery@^3.0, jquery@^3.3.1:
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.3.1.tgz#958ce29e81c9790f31be7792df5d4d95fc57fbca"
 
@@ -9161,8 +9161,10 @@ ripemd160@^2.0.0, ripemd160@^2.0.1:
     inherits "^2.0.1"
 
 round-slider@^1.3.1:
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/round-slider/-/round-slider-1.3.1.tgz#c44e275705d45294ff95bee42028c8ff2494b6b1"
+  version "1.3.2"
+  resolved "https://registry.yarnpkg.com/round-slider/-/round-slider-1.3.2.tgz#8fb363f4fe2ab653b8160a13aa4d493634bac050"
+  dependencies:
+    jquery ">= 1.4.1"
 
 run-async@^0.1.0:
   version "0.1.0"
