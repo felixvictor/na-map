@@ -115,7 +115,7 @@ function get_port_data () {
 
         ${NODE} build/convert-ships.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${SHIP_FILE}" "${DATE}"
 
-        ${NODE} build/create-xlsx.mjs "${SHIP_FILE}" "${EXCEL_FILE}"
+        ${NODE} build/create-xlsx.mjs "${SHIP_FILE}" "${SRC_DIR}/${SERVER_NAMES[0]}.json" "${EXCEL_FILE}"
     fi
 }
 
