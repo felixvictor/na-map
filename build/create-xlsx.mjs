@@ -1,14 +1,15 @@
 /* eslint-disable no-param-reassign */
 
 // eslint-disable-next-line import/no-extraneous-dependencies
-// import { Workbook as Excel4Node, getExcelAlpha } from "excel4node";
 import Excel4Node from "excel4node";
 
 import { readJson } from "./common.mjs";
 
-const inFilename = process.argv[2],
-    outFilename = process.argv[3];
-const shipsOrig = readJson(inFilename).shipData;
+const shipFilename = process.argv[2],
+    portFilename = process.argv[3],
+    outFilename = process.argv[4],
+    shipsOrig = readJson(shipFilename).shipData,
+    ports = readJson(portFilename);
 
 /**
  * Create array with numbers ranging from start to end
@@ -32,7 +33,7 @@ String.prototype.replaceAll = function(search, replacement) {
  * @param {Object} b - Ship b
  * @returns {Number} Sort
  */
-function sort(a, b) {
+function sortShip(a, b) {
     if (a.class < b.class) {
         return -1;
     }
@@ -55,6 +56,29 @@ function sort(a, b) {
 }
 
 /**
+ * Sort ports
+ * @param {Object} a - Ship a
+ * @param {Object} b - Ship b
+ * @returns {Number} Sort
+ */
+function sortPort(a, b) {
+    if (a.name < b.name) {
+        return -1;
+    }
+    if (a.name > b.name) {
+        return 1;
+    }
+    return 0;
+}
+
+const portData = ports.objects.ports.geometries
+    .map(port => ({
+        name: port.properties.name,
+        br: port.properties.brLimit
+    }))
+    .sort(sortPort);
+
+/**
  * Create excel spreadsheet
  * @returns {void}
  */
@@ -71,7 +95,8 @@ function createExcel() {
         secondary600 = "acbbc1",
         secondary800 = "6b7478",
         secondary900 = "4a5053",
-        background600 = "c5bbbb";
+        background600 = "c5bbbb",
+        red = "d68f96";
 
     const wsOptions = {
         sheetView: {
@@ -113,20 +138,26 @@ function createExcel() {
      * @param {String} colour - Font colour
      * @returns {Object} Font object
      */
-    const border = () =>
-        workbook.createStyle({
-            // §18.8.4 border (Border)
-            border: {
-                top: {
-                    style: "thin",
-                    color: background600
-                },
-                bottom: {
-                    style: "thin",
-                    color: background600
-                }
+    const border = workbook.createStyle({
+        // §18.8.4 border (Border)
+        border: {
+            top: {
+                style: "thin",
+                color: background600
+            },
+            bottom: {
+                style: "thin",
+                color: background600
             }
-        });
+        }
+    });
+
+    /**
+     * Returns font object with bold font
+     * @param {String} colour - Font colour
+     * @returns {Object} Font object
+     */
+    const brTooHigh = workbook.createStyle({ font: { bold: true, color: red } }); // §18.8.22
 
     /**
      * Fill worksheet
@@ -329,6 +360,43 @@ function createExcel() {
                 .style(fillPattern(fgColourPlayer[ship.class % 2]));
         });
 
+        sheet.addConditionalFormattingRule(`${Excel4Node.getExcelAlpha(headerColumns)}${headerRows}`, {
+            type: "expression",
+            priority: 1,
+            formula: `AND(NOT(ISBLANK(${Excel4Node.getExcelAlpha(headerColumns)}${headerRows - 2})),
+                ${Excel4Node.getExcelAlpha(headerColumns)}${headerRows} >
+                ${Excel4Node.getExcelAlpha(headerColumns)}${headerRows - 2})`, // formula that returns nonzero or 0
+            style: brTooHigh
+        });
+
+        // Port select dropdown
+        portData.forEach((port, i) => {
+            sheet.cell(i + 1, numColumns + 1).string(port.name);
+            sheet.cell(i + 1, numColumns + 2).number(port.br);
+        });
+
+        sheet.addDataValidation({
+            type: "list",
+            allowBlank: true,
+            prompt: "Select port from dropdown",
+            error: "Invalid choice",
+            showDropDown: true,
+            sqref: "B2",
+            formulas: [
+                `=${Excel4Node.getExcelAlpha(numColumns + 1)}1:${Excel4Node.getExcelAlpha(numColumns + 1)}${
+                    portData.length
+                }`
+            ]
+        });
+
+        sheet
+            .cell(2, headerColumns)
+            .formula(
+                `VLOOKUP(B2,${Excel4Node.getExcelAlpha(numColumns + 1)}1:${Excel4Node.getExcelAlpha(numColumns + 2)}${
+                    portData.length
+                },2,0)`
+            );
+
         // Sample values
         sheet.cell(headerRows + 1, headerColumns + 1).string("Fritz");
         sheet.cell(headerRows + 1, headerColumns + 2).string("Franz");
@@ -348,14 +416,14 @@ function createExcel() {
                     ) &&
                     (ship.battleRating >= 80 || ship.name === "Mortar Brig")
             )
-            .sort((a, b) => sort(a, b)),
+            .sort((a, b) => sortShip(a, b)),
         swShips = shipsOrig
             .filter(
                 ship =>
                     ship.class >= 6 &&
                     !(ship.name.startsWith("Basic") || ship.name.startsWith("Rookie") || ship.name.startsWith("Trader"))
             )
-            .sort((a, b) => sort(a, b));
+            .sort((a, b) => sortShip(a, b));
 
     /*
     const dwSheet = workbook.addWorksheet("Deep water port", {
