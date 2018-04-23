@@ -186,6 +186,9 @@ const config = {
             minify: minifyOpt,
             template: "index.template.ejs",
             title: "Naval Action map",
+            description:
+                "Yet another map with in-game map, F11 coordinates, resources. Port data is updated constantly from twitter and daily after maintenance.",
+            brand: "https://na-map-test.netlify.com/images/na-map-brand.jpg",
             version: PACKAGE.version
         }),
         new SitemapPlugin("https://na-map.netlify.com/", sitemapPaths, { skipGzip: false }),
