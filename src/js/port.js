@@ -412,9 +412,9 @@ export default class PortDisplay {
         const rMin = this._circleSizes[this._zoomLevel] * this._minRadiusFactor,
             rMax = this._circleSizes[this._zoomLevel] * this._maxRadiusFactor;
         let data = {};
-        if (this._showRadiusType === "tax" || this._showRadiusType === "net") {
+        if (this._showRadius === "tax" || this._showRadius === "net") {
             data = this.portData.filter(d => !d.properties.nonCapturable);
-        } else if (this._showRadiusType === "attack") {
+        } else if (this._showRadius === "attack") {
             const pbData = this.pbData.ports
                 .filter(d => d.attackHostility)
                 .map(d => ({ id: d.id, attackHostility: d.attackHostility }));
@@ -443,7 +443,7 @@ export default class PortDisplay {
 
         // Apply to both old and new
         const circleMerge = circleUpdate.merge(circleEnter);
-        if (this._showRadiusType === "tax") {
+        if (this._showRadius === "tax") {
             const minTaxIncome = d3.min(data, d => d.properties.taxIncome),
                 maxTaxIncome = d3.max(data, d => d.properties.taxIncome);
 
@@ -452,7 +452,7 @@ export default class PortDisplay {
             circleMerge
                 .attr("class", "bubble pos")
                 .attr("r", d => this._taxIncomeRadius(Math.abs(d.properties.taxIncome)));
-        } else if (this._showRadiusType === "net") {
+        } else if (this._showRadius === "net") {
             const minNetIncome = d3.min(data, d => d.properties.netIncome),
                 maxNetIncome = d3.max(data, d => d.properties.netIncome);
 
@@ -460,7 +460,7 @@ export default class PortDisplay {
             circleMerge
                 .attr("class", d => (d.properties.netIncome < 0 ? "bubble neg" : "bubble pos"))
                 .attr("r", d => this._netIncomeRadius(Math.abs(d.properties.netIncome)));
-        } else if (this._showRadiusType === "attack") {
+        } else if (this._showRadius === "attack") {
             this._attackRadius.range([rMin, rMax]);
             circleMerge
                 .attr("class", "bubble")
