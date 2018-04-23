@@ -29,7 +29,7 @@ export default class PortDisplay {
         this._highlightDuration = 200;
         this._iconSize = 50;
         this._circleSizes = { initial: 50, portLabel: 20, pbZone: 5 };
-        this._showRadiusType = "attack";
+        this._showRadius = "attack";
         this._taxIncomeRadius = d3.scaleLinear();
         this._netIncomeRadius = d3.scaleLinear();
         this._attackRadius = d3.scaleLinear().domain([0, 1]);
@@ -60,7 +60,7 @@ export default class PortDisplay {
          * @type {string}
          * @private
          */
-        this._showRadiusType = this._getShowRadiusSetting();
+        this._showRadius = this._getShowRadiusSetting();
 
         this.setPortData(portData);
         this._setPBData(pbData);
@@ -101,7 +101,7 @@ export default class PortDisplay {
     }
 
     _showRadiusSelected() {
-        this._showRadiusType = $("input[name='showRadius']:checked").val();
+        this._showRadius = $("input[name='showRadius']:checked").val();
         this._storeShowRadiusSetting();
         this.update();
     }
