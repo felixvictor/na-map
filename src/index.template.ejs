@@ -4,8 +4,13 @@
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <title><%= htmlWebpackPlugin.options.title %></title>
-    <meta name="description" content="<%= htmlWebpackPlugin.options.title %>">
+    <meta property="og:title" content="<%= htmlWebpackPlugin.options.title %>">
+    <meta name="twitter:title" content="<%= htmlWebpackPlugin.options.title %>">
+    <meta name="description" content="<%= htmlWebpackPlugin.options.description %>">
+    <meta property="og:description" content="<%= htmlWebpackPlugin.options.description %>">
+
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:image" content="<%= htmlWebpackPlugin.options.brand %>">
 
     <link rel="icon" type="image/png" href="images/icons/favicon-16x16.png" sizes="16x16">
     <link rel="icon" type="image/png" href="images/icons/favicon-32x32.png" sizes="32x32">
