@@ -1,9 +1,5 @@
 /**
  * scss definitions: colours
- *
- * @author    Ingo Beyritz
- * @copyright Copyright (c) 2016, Ingo Beyritz
- * @license   http://www.gnu.org/licenses/gpl.html
  */
 
 // Colour scheme
@@ -11,7 +7,7 @@ $sat: saturation($primary-colour);
 $lit: lightness($primary-colour);
 $hue: hue($primary-colour);
 
-$mix-weight: 90%;
+$mix-weight: 70%;
 
 @function colour-mixin($colour) {
     @return mix(hsl(hue($colour), $sat, $lit), $colour, $mix-weight);
@@ -74,7 +70,6 @@ $theme-color-interval: 8% !default;
 
     @if $level < 0 {
         // Lighter values need a quick double negative for the Sass math to work
-
         @return mix($color-base, $color, $level * -1 * $theme-color-interval);
     } @else {
         @return mix($color-base, $color, $level * $theme-color-interval);
