@@ -9,7 +9,7 @@ const shipFilename = process.argv[2],
     portFilename = process.argv[3],
     outFilename = process.argv[4],
     shipsOrig = readJson(shipFilename).shipData,
-    ports = readJson(portFilename);
+    portData = readJson(portFilename);
 
 /**
  * Create array with numbers ranging from start to end
@@ -71,7 +71,16 @@ function sortPort(a, b) {
     return 0;
 }
 
-const portData = ports.objects.ports.geometries
+const dwPorts = portData.objects.ports.geometries
+    .filter(port => !port.properties.shallow)
+    .map(port => ({
+        name: port.properties.name,
+        br: port.properties.brLimit
+    }))
+    .sort(sortPort);
+
+const swPorts = portData.objects.ports.geometries
+    .filter(port => port.properties.shallow)
     .map(port => ({
         name: port.properties.name,
         br: port.properties.brLimit
@@ -85,8 +94,6 @@ const portData = ports.objects.ports.geometries
 function createExcel() {
     const primary050 = "faf7f3",
         primary200 = "ede1d2",
-        primary400 = "dcc6a9",
-        primary500 = "d5bb99",
         primary800 = "6f6150",
         secondary050 = "f9fbfc",
         secondary100 = "f3f7f9",
@@ -94,8 +101,8 @@ function createExcel() {
         secondary500 = "cddfe6",
         secondary600 = "acbbc1",
         secondary800 = "6b7478",
-        secondary900 = "4a5053",
         background600 = "c5bbbb",
+        highlight = "586776",
         red = "d68f96";
 
     const wsOptions = {
@@ -163,9 +170,10 @@ function createExcel() {
      * Fill worksheet
      * @param {Worksheet} sheet - Worksheet
      * @param {Object[]} ships - Ship data
+     * @param {Object[]} ports - port data
      * @returns {void}
      */
-    function fillSheet(sheet, ships) {
+    function fillSheet(sheet, ships, ports) {
         const headerRows = 4,
             headerColumns = 5,
             numPlayers = 24,
@@ -190,7 +198,8 @@ function createExcel() {
                     indent: 1, // Number of spaces to indent = indent value * 3
                     //                relativeIndent: integer, // number of additional spaces to indent
                     vertical: "center"
-                }
+                },
+                numberFormat: "@" // §18.8.30 numFmt (Number Format)
             };
 
         sheet.column(headerColumns).freeze(); // Freezes the first two columns and scrolls the right view to column D
@@ -205,7 +214,7 @@ function createExcel() {
 
         // Ship name
         currentColumn += 1;
-        sheet.column(currentColumn).setWidth(24);
+        sheet.column(currentColumn).setWidth(22);
         sheet.cell(1, currentColumn, numRows, currentColumn).style(textStyle);
 
         // Ship battle rating
@@ -252,14 +261,18 @@ function createExcel() {
             .style(fontColour(secondary800))
             .style(fillPattern(secondary200));
         sheet.cell(currentRow, 1).string("Port");
+        sheet
+            .cell(currentRow, 2)
+            .string("1. Select port")
+            .style(fontColourBold(highlight));
         sheet.cell(currentRow, headerColumns - 1).string("Max BR");
-        sheet.cell(currentRow, 1, currentRow, headerColumns).style(numberStyle);
+        sheet.cell(currentRow, headerColumns).style(numberStyle);
 
         // Column description row
         currentRow += 1;
         sheet.row(currentRow).setHeight(rowHeight);
         sheet
-            .cell(currentRow, 1, currentRow, headerColumns)
+            .cell(currentRow, 1, currentRow, numColumns)
             .style(textStyle)
             .style(fontColourBold(secondary100))
             .style(fillPattern(secondary600));
@@ -269,26 +282,21 @@ function createExcel() {
         sheet.cell(currentRow, 4).string("# Players");
         sheet.cell(currentRow, 5).string("BR total");
 
-        sheet
-            .cell(currentRow, headerColumns + 1, currentRow, numColumns)
-            .style(textStyle)
-            .style(fontColourBold(primary800))
-            .style(fillPattern(primary400));
         sheet.cell(currentRow, headerColumns + 1, currentRow, headerColumns + 2, true).string("Player names");
 
         // Total row
         currentRow += 1;
         sheet.row(currentRow).setHeight(rowHeight);
         sheet
-            .cell(currentRow, 1, currentRow, headerColumns - 2)
+            .cell(currentRow, 1, currentRow, numColumns)
             .style(textStyle)
             .style(fontColourBold(secondary100))
             .style(fillPattern(secondary600));
 
         sheet
             .cell(currentRow, headerColumns - 1, currentRow, headerColumns)
-            .style(textStyle)
-            .style(fontColourBold(secondary900))
+            .style(numberStyle)
+            .style(fontColourBold(secondary800))
             .style(fillPattern(secondary500));
         sheet
             .cell(currentRow, headerColumns - 1)
@@ -296,24 +304,21 @@ function createExcel() {
                 `SUM(${Excel4Node.getExcelAlpha(headerColumns - 1)}${headerRows + 1}:${Excel4Node.getExcelAlpha(
                     headerColumns - 1
                 )}${numRows})`
-            )
-            .style(numberStyle);
+            );
         sheet
             .cell(currentRow, headerColumns)
             .formula(
                 `SUM(${Excel4Node.getExcelAlpha(headerColumns)}${headerRows + 1}:${Excel4Node.getExcelAlpha(
                     headerColumns
                 )}${numRows})`
-            )
-            .style(numberStyle);
+            );
 
         sheet
             .cell(currentRow, headerColumns + 1, currentRow, numColumns, true)
-            .string("Enter player names")
-            .style(textStyle)
-            .style(fontColour(primary800))
-            .style(fillPattern(primary400));
+            .string("2. Enter player names")
+            .style(fontColourBold(highlight));
 
+        // Ship rows
         const fgColourShip = [secondary050, secondary200],
             fgColourPlayer = [primary050, primary200];
         ships.forEach(ship => {
@@ -370,7 +375,7 @@ function createExcel() {
         });
 
         // Port select dropdown
-        portData.forEach((port, i) => {
+        ports.forEach((port, i) => {
             sheet.cell(i + 1, numColumns + 1).string(port.name);
             sheet.cell(i + 1, numColumns + 2).number(port.br);
         });
@@ -384,7 +389,7 @@ function createExcel() {
             sqref: "B2",
             formulas: [
                 `=${Excel4Node.getExcelAlpha(numColumns + 1)}1:${Excel4Node.getExcelAlpha(numColumns + 1)}${
-                    portData.length
+                    ports.length
                 }`
             ]
         });
@@ -393,7 +398,7 @@ function createExcel() {
             .cell(2, headerColumns)
             .formula(
                 `VLOOKUP(B2,${Excel4Node.getExcelAlpha(numColumns + 1)}1:${Excel4Node.getExcelAlpha(numColumns + 2)}${
-                    portData.length
+                    ports.length
                 },2,0)`
             );
 
@@ -436,8 +441,8 @@ function createExcel() {
     const dwSheet = workbook.addWorksheet("Deep water port", wsOptions),
         swSheet = workbook.addWorksheet("Shallow water port", wsOptions);
 
-    fillSheet(dwSheet, dwShips);
-    fillSheet(swSheet, swShips);
+    fillSheet(dwSheet, dwShips, dwPorts);
+    fillSheet(swSheet, swShips, swPorts);
 
     workbook.write(outFilename, err => {
         if (err) {
