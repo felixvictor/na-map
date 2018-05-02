@@ -157,6 +157,10 @@ function update_ports () {
 ###########################################
 # Main functions
 
+function log_date () {
+    echo -e "\n\n*****************************\n${DATE}\n"
+}
+
 function update_tweets () {
     cd ${BASE_DIR}
     get_tweets
@@ -223,10 +227,12 @@ case "$1" in
         ;;
     push-update)
         update_var
+        log_date
         push_data update
         ;;
     update)
         update_var
+        log_date
         update_data
         ;;
     twitter-update)
