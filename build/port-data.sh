@@ -191,7 +191,7 @@ function push_data () {
             touch "${LAST_UPDATE_FILE}"
         fi
     fi
-    git push gitlab --all
+    git push --quiet gitlab --all
 }
 
 function update_data () {
