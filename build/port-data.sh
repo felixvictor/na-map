@@ -115,7 +115,7 @@ function get_port_data () {
 
         ${NODE} build/convert-ships.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${SHIP_FILE}" "${DATE}"
 
-        ${NODE} build/create-xlsx.mjs "${SHIP_FILE}" "${EXCEL_FILE}"
+        ${NODE} build/create-xlsx.mjs "${SHIP_FILE}" "${SRC_DIR}/${SERVER_NAMES[0]}.json" "${EXCEL_FILE}"
     fi
 }
 
@@ -157,6 +157,10 @@ function update_ports () {
 ###########################################
 # Main functions
 
+function log_date () {
+    echo -e "\n\n*****************************\n${DATE}\n"
+}
+
 function update_tweets () {
     cd ${BASE_DIR}
     get_tweets
@@ -187,7 +191,7 @@ function push_data () {
             touch "${LAST_UPDATE_FILE}"
         fi
     fi
-    git push gitlab --all
+    git push --quiet gitlab --all
 }
 
 function update_data () {
@@ -223,10 +227,12 @@ case "$1" in
         ;;
     push-update)
         update_var
+        log_date
         push_data update
         ;;
     update)
         update_var
+        log_date
         update_data
         ;;
     twitter-update)
