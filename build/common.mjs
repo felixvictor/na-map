@@ -3,6 +3,8 @@
     Copy of ../src/js/common.js
  */
 
+import fs from "fs";
+
 const transformMatrix = {
         A: -0.00499866779363828,
         B: -0.00000021464254980645,
@@ -43,3 +45,14 @@ export const nations = [
     { id: 11, short: "DE", name: "Kingdom of Prussia", sortName: "Prussia" },
     { id: 12, short: "PL", name: "Commonwealth of Poland", sortName: "Poland" }
 ];
+
+export function saveJson(fileName, data) {
+    // eslint-disable-next-line consistent-return
+    fs.writeFile(fileName, JSON.stringify(data), "utf8", err => {
+        if (err) {
+            return console.log(err);
+        }
+    });
+}
+
+export const readJson = fileName => JSON.parse(fs.readFileSync(fileName, "utf8"));
