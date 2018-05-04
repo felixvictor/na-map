@@ -91,7 +91,7 @@ export default class PortSelect {
 
         selectPickerLiveSearch.noneSelectedText = "Move to port";
         this._portNames.on("change", event => this._portSelected(event)).selectpicker(selectPickerLiveSearch);
-        selectPickerLiveSearch.noneSelectedText = "Select producible/dropped good";
+        selectPickerLiveSearch.noneSelectedText = "Select good";
         this._buyGoods.on("change", event => this._goodSelected(event)).selectpicker(selectPickerLiveSearch);
         selectPickerLiveSearch.noneSelectedText = "Select consumed good";
         this._sellGoods.on("change", event => this._goodSelected(event)).selectpicker(selectPickerLiveSearch);
@@ -300,17 +300,27 @@ export default class PortSelect {
 
     _goodSelected(event) {
         const portIds = $(event.currentTarget)
-            .val()
-            .split(",");
-        let portData;
-
-        if (portIds.includes("0")) {
-            portData = this._ports.portDataDefault;
-        } else {
-            portData = this._ports.portDataDefault.filter(d => portIds.includes(d.id));
-        }
-        this._ports.setPortData(portData);
-        this._ports.update();
+                .val()
+                .split(","),
+            good = $(event.currentTarget).find(":selected")[0].text,
+            sourcePorts = this._ports.portDataDefault.filter(d => portIds.includes(d.id)).map(port => {
+                // eslint-disable-next-line prefer-destructuring,no-param-reassign
+                port.properties.isSource = true;
+                return port;
+            }),
+            consumingPorts = this._ports.portDataDefault
+                .filter(
+                    port =>
+                        port.properties.consumesTrading.includes(good) ||
+                        port.properties.consumesNonTrading.includes(good)
+                )
+                .map(port => {
+                    // eslint-disable-next-line prefer-destructuring,no-param-reassign
+                    port.properties.isSource = false;
+                    return port;
+                });
+        this._ports.setPortData(sourcePorts.concat(consumingPorts), true);
+        this._ports.update(good);
     }
 
     _nationSelected(event) {

@@ -409,9 +409,9 @@ export default class PortDisplay {
     }
 
     _updatePortCircles() {
-        const rMin = this._circleSizes[this._zoomLevel] * this._minRadiusFactor,
-            rMax = this._circleSizes[this._zoomLevel] * this._maxRadiusFactor;
-        let data = {};
+        const rMin = this._circleSizes[this._zoomLevel] * this._minRadiusFactor;
+        let rMax = this._circleSizes[this._zoomLevel] * this._maxRadiusFactor,
+            data = {};
         if (this._showRadiusType === "tax" || this._showRadiusType === "net") {
             data = this.portData.filter(d => !d.properties.nonCapturable);
         } else if (this._showRadiusType === "attack") {
@@ -423,6 +423,9 @@ export default class PortDisplay {
                 port.properties.attackHostility = pbData.filter(d => port.id === d.id).map(d => d.attackHostility)[0];
                 return port;
             });
+        } else if (this._showCurrentGood) {
+            data = this.portData;
+            rMax /= 2;
         }
 
         // Data join
@@ -458,7 +461,7 @@ export default class PortDisplay {
 
             this._netIncomeRadius.domain([minNetIncome, maxNetIncome]).range([rMin, rMax]);
             circleMerge
-                .attr("class", d => (d.properties.netIncome < 0 ? "bubble neg" : "bubble pos"))
+                .attr("class", d => `bubble ${d.properties.netIncome < 0 ? "neg" : "pos"}`)
                 .attr("r", d => this._netIncomeRadius(Math.abs(d.properties.netIncome)));
         } else if (this._showRadiusType === "attack") {
             this._attackRadius.range([rMin, rMax]);
@@ -466,6 +469,8 @@ export default class PortDisplay {
                 .attr("class", "bubble")
                 .attr("fill", d => this._colourScale(d.properties.attackHostility))
                 .attr("r", d => this._attackRadius(d.properties.attackHostility));
+        } else if (this._showCurrentGood) {
+            circleMerge.attr("class", d => `bubble ${d.properties.isSource ? "pos" : "neg"}`).attr("r", rMax);
         }
     }
 
@@ -558,7 +563,12 @@ export default class PortDisplay {
         this._highlightId = highlightId;
     }
 
-    setPortData(portData) {
+    setPortData(portData, showGood = false) {
+        if (showGood) {
+            this._showCurrentGood = true;
+        } else {
+            this._showCurrentGood = false;
+        }
         this.portData = portData;
     }
 
@@ -580,6 +590,7 @@ export default class PortDisplay {
 
     clearMap() {
         this.portData = this.portDataDefault;
+        this._showCurrentGood = false;
         this.update();
     }
 }
