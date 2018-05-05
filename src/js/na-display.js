@@ -46,10 +46,28 @@ export default function naDisplay(serverName) {
          */
         constructor() {
             /**
+             * Font size in px
+             * @type {Number}
+             */
+            this.rem = 16;
+
+            /**
              * Left padding for brand icon
              * @type {Number}
              */
-            this._navbarBrandPaddingLeft = Math.floor(1.618 * 16); // equals 1.618rem
+            this._navbarBrandPaddingLeft = Math.floor(1.618 * this.rem); // equals 1.618rem
+
+            /**
+             * Left padding for brand icon
+             * @type {Number}
+             */
+            this.xGridBackgroundHeight = Math.floor(3 * this.rem);
+
+            /**
+             * Left padding for brand icon
+             * @type {Number}
+             */
+            this.yGridBackgroundWidth = Math.floor(4 * this.rem);
 
             /**
              * Margins of the map svg
@@ -172,7 +190,13 @@ export default function naDisplay(serverName) {
             this._zoom = d3
                 .zoom()
                 .scaleExtent([this._minScale, this._maxScale])
-                .translateExtent([[this.coord.min, this.coord.min], [this.coord.max, this.coord.max]])
+                .translateExtent([
+                    [
+                        this.coord.min - this.yGridBackgroundWidth * this._minScale,
+                        this.coord.min - this.xGridBackgroundHeight * this._minScale
+                    ],
+                    [this.coord.max, this.coord.max]
+                ])
                 .wheelDelta(() => -this._wheelDelta * Math.sign(d3.event.deltaY))
                 .on("zoom", () => this._naZoomed());
 
