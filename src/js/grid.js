@@ -81,7 +81,7 @@ export default class Grid {
          * @type {Number}
          * @private
          */
-        this._defaultFontSize = 16;
+        this._defaultFontSize = this._map.rem;
 
         /**
          * Text padding in px
@@ -90,8 +90,8 @@ export default class Grid {
          */
         this._textPadding = this._defaultFontSize / 2;
 
-        this._xBackgroundHeight = "3em";
-        this._yBackgroundWidth = "4em";
+        this._xBackgroundHeight = this._map.xGridBackgroundHeight;
+        this._yBackgroundWidth = this._map.yGridBackgroundWidth;
 
         this._setupSvg();
     }
