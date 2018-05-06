@@ -191,26 +191,39 @@ export default class PortDisplay {
         const svgDef = d3.select("#na-svg defs");
 
         nations.map(d => d.short).forEach(nation => {
-            svgDef
+            const pattern = svgDef
                 .append("pattern")
                 .attr("id", nation)
-                .attr("width", "100%")
+                .attr("width", "133%")
                 .attr("height", "100%")
-                .attr("viewBox", `0 0 ${this._iconSize} ${this._iconSize}`)
+                .attr("viewBox", `6 6 ${this._iconSize} ${this._iconSize*0.75}`);
+            pattern
                 .append("image")
                 .attr("height", this._iconSize)
                 .attr("width", this._iconSize)
                 .attr("href", `icons/${nation}.svg`);
-            svgDef
+            pattern
+                .append("rect")
+                .attr("height", this._iconSize)
+                .attr("width", this._iconSize)
+                .attr("class", "nation");
+
+            const patternA = svgDef
                 .append("pattern")
                 .attr("id", `${nation}a`)
-                .attr("width", "100%")
+                .attr("width", "133%")
                 .attr("height", "100%")
-                .attr("viewBox", `0 0 ${this._iconSize} ${this._iconSize}`)
+                .attr("viewBox", `7 7 ${this._iconSize} ${this._iconSize*.75}`);
+            patternA
                 .append("image")
                 .attr("height", this._iconSize)
                 .attr("width", this._iconSize)
-                .attr("href", `icons/${nation}a.svg`);
+                .attr("href", `icons/${nation}.svg`);
+            patternA
+                .append("rect")
+                .attr("height", this._iconSize)
+                .attr("width", this._iconSize)
+                .attr("class", "all");
         });
     }
 
