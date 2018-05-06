@@ -17,13 +17,25 @@ select {
     min-width: 15em;
 }
 
+// port icons (available to nation)
+pattern .nation  {
+  fill: $primary-500;
+  fill-opacity: .3;
+}
+
+// port icons (available to all)
+pattern .all {
+  fill: $primary-200;
+  fill-opacity: .8;
+}
+
 .axis {
     line {
-        stroke: $primary-700;
+        stroke: $primary-600;
         opacity: 0.5;
     }
     text {
-        fill: $primary-800;
+        fill: $primary-700;
     }
 }
 
@@ -390,9 +402,6 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
     @each $flag in $flags {
         .flag-icon.#{$flag} {
             background-image: url("#{$flags-dir}/#{$flag}.svg");
-        }
-        .flag-icon.#{$flag}a {
-            background-image: url("#{$flags-dir}/#{$flag}a.svg");
         }
     }
 }
