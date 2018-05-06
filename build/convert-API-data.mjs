@@ -37,10 +37,10 @@ function getItemNames() {
 }
 
 function convertPorts() {
-    const minX = 5,
-        maxX = 10,
-        minY = 5,
-        maxY = 10;
+    const minX = 7,
+        maxX = 7,
+        minY = 3,
+        maxY = 5;
     const GetMinMaxX = t => {
         if (t < 0) {
             return Math.max(Math.min(t, -minX), -maxX);
@@ -59,30 +59,25 @@ function convertPorts() {
     geoJson.type = "FeatureCollection";
     geoJson.features = [];
     APIPorts.forEach(port => {
-        const portShop = APIShops.filter(shop => shop.Id === port.Id);
+        const portShop = APIShops.filter(shop => shop.Id === port.Id),
+            xPos = Math.round(convertCoordX(port.Position.x, port.Position.z)),
+            yPos = Math.round(convertCoordY(port.Position.x, port.Position.z));
         const feature = {
             type: "Feature",
             id: port.Id,
             geometry: {
                 type: "Point",
-                coordinates: [
-                    Math.round(convertCoordX(port.Position.x, port.Position.z)),
-                    Math.round(convertCoordY(port.Position.x, port.Position.z))
-                ]
+                coordinates: [xPos, yPos]
             },
             properties: {
                 name: port.Name.replaceAll("'", "’"),
                 dx: GetMinMaxX(
-                    Math.round(
-                        convertCoordX(port.Position.x, port.Position.z) -
-                            convertCoordX(port.PortBattleZonePositions[0].x, port.PortBattleZonePositions[0].z)
-                    )
+                    xPos -
+                        Math.round(convertCoordX(port.PortBattleZonePositions[0].x, port.PortBattleZonePositions[0].z))
                 ),
                 dy: GetMinMaxY(
-                    Math.round(
-                        convertCoordY(port.Position.x, port.Position.z) -
-                            convertCoordY(port.PortBattleZonePositions[0].x, port.PortBattleZonePositions[0].z)
-                    )
+                    yPos -
+                        Math.round(convertCoordY(port.PortBattleZonePositions[0].x, port.PortBattleZonePositions[0].z))
                 ),
                 countyCapital: port.Name === port.CountyCapitalName,
                 shallow: port.Depth,
@@ -129,6 +124,10 @@ function convertPorts() {
                 )[0]
             }
         };
+        if (Math.abs(feature.properties.dy) >= 4) {
+            feature.properties.dx =
+                (Math.abs(feature.properties.dx) - Math.abs(feature.properties.dy) + 3) * Math.sign(feature.properties.dx);
+        }
         geoJson.features.push(feature);
     });
     saveJson(geoJson);
