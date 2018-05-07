@@ -116,7 +116,7 @@ export default function naDisplay(serverName) {
             this._PBZoneZoomThreshold = 1.5;
             this._labelZoomThreshold = 0.5;
 
-            this._minScale = nearestPow2(Math.min(this._width / this.coord.max, this._height / this.coord.max));
+            this.minScale = nearestPow2(Math.min(this._width / this.coord.max, this._height / this.coord.max));
 
             /**
              * DoubleClickAction cookie name
@@ -177,7 +177,7 @@ export default function naDisplay(serverName) {
                 .on("dblclick", (d, i, nodes) => this._doDoubleClickAction(nodes[i]));
 
             $("#reset").on("click", () => {
-                this.constructor._clearMap();
+                this._clearMap();
             });
 
             $("#doubleClick-action").change(() => this._doubleClickSelected());
@@ -189,11 +189,11 @@ export default function naDisplay(serverName) {
             // noinspection JSSuspiciousNameCombination
             this._zoom = d3
                 .zoom()
-                .scaleExtent([this._minScale, this._maxScale])
+                .scaleExtent([this.minScale, this._maxScale])
                 .translateExtent([
                     [
-                        this.coord.min - this.yGridBackgroundWidth * this._minScale,
-                        this.coord.min - this.xGridBackgroundHeight * this._minScale
+                        this.coord.min - this.yGridBackgroundWidth * this.minScale,
+                        this.coord.min - this.xGridBackgroundHeight * this.minScale
                     ],
                     [this.coord.max, this.coord.max]
                 ])
@@ -245,7 +245,7 @@ export default function naDisplay(serverName) {
         _doubleClickSelected() {
             this._doubleClickAction = $("input[name='doubleClickAction']:checked").val();
             this._storeDoubleClickActionSetting();
-            this.constructor._clearMap();
+            this._clearMap();
         }
 
         /**
@@ -368,11 +368,11 @@ export default function naDisplay(serverName) {
                 .attr("height", this._tileSize);
         }
 
-        static _clearMap() {
+        _clearMap() {
             windPrediction.clearMap();
             course.clearMap();
             f11.clearMap();
-            ports.clearMap();
+            ports.clearMap(this.minScale);
             portSelect.clearMap();
             $(".selectpicker")
                 .val("default")
@@ -412,24 +412,23 @@ export default function naDisplay(serverName) {
             grid.update();
             teleport.setData();
             teleport.update();
-            ports.update();
+            const scale = d3.event ? d3.event.transform.k : this.minScale;
+            ports.update(scale);
         }
 
         _setZoomLevelAndData() {
             if (d3.event.transform.k > this._PBZoneZoomThreshold) {
                 if (this._zoomLevel !== "pbZone") {
                     this._setZoomLevel("pbZone");
-                    this._updateCurrent();
                 }
             } else if (d3.event.transform.k > this._labelZoomThreshold) {
                 if (this._zoomLevel !== "portLabel") {
                     this._setZoomLevel("portLabel");
-                    this._updateCurrent();
                 }
             } else if (this._zoomLevel !== "initial") {
                 this._setZoomLevel("initial");
-                this._updateCurrent();
             }
+            this._updateCurrent();
         }
 
         /**
@@ -466,7 +465,7 @@ export default function naDisplay(serverName) {
         }
 
         _initialZoomAndPan() {
-            this._svg.call(this._zoom.scaleTo, this._minScale);
+            this._svg.call(this._zoom.scaleTo, this.minScale);
         }
 
         init() {
@@ -502,18 +501,18 @@ export default function naDisplay(serverName) {
         windPrediction = new WindPrediction(map.margin.left, map.margin.top);
         f11 = new F11(map);
         grid = new Grid(map);
-        course = new Course(ports.fontSizes.portLabel);
+        course = new Course(map.rem);
 
         moment.locale("en-gb");
         map.init();
-        ports.clearMap();
+        ports.clearMap(map.minScale);
     }
 
     function init(data) {
         map = new NAMap();
         // Read map data
         const portData = topojsonFeature(data.ports, data.ports.objects.ports).features;
-        ports = new PortDisplay(portData, data.pb, serverName, map.margin.top, map.margin.right);
+        ports = new PortDisplay(portData, data.pb, serverName, map.margin.top, map.margin.right, map.rem);
 
         let pbZoneData = topojsonFeature(data.pbZones, data.pbZones.objects.pbZones);
         // Port ids of capturable ports

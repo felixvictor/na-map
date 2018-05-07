@@ -13,7 +13,7 @@ import { nations } from "./common";
 import { formatInt, formatSiInt, formatPercent, checkFetchStatus, getJsonFromFetch } from "./util";
 
 export default class PortDisplay {
-    constructor(portData, pbData, serverName, topMargin, rightMargin) {
+    constructor(portData, pbData, serverName, topMargin, rightMargin, fontSize) {
         this.portDataDefault = portData;
         this._serverName = serverName;
         this._topMargin = topMargin;
@@ -21,14 +21,14 @@ export default class PortDisplay {
 
         // Shroud Cay
         this.currentPort = { id: "366", coord: { x: 4396, y: 2494 } };
-        this.fontSizes = { initial: 30, portLabel: 18, pbZone: 7 };
 
         this._zoomLevel = "initial";
         this._showPBZones = "all";
         this._highlightId = null;
         this._highlightDuration = 200;
-        this._iconSize = 50;
-        this._circleSizes = { initial: 50, portLabel: 20, pbZone: 5 };
+        this._iconSize = 48;
+        this._circleSize = 8;
+        this._fontSize = fontSize;
         this._showRadius = "attack";
         this._taxIncomeRadius = d3.scaleLinear();
         this._netIncomeRadius = d3.scaleLinear();
@@ -196,7 +196,7 @@ export default class PortDisplay {
                 .attr("id", nation)
                 .attr("width", "133%")
                 .attr("height", "100%")
-                .attr("viewBox", `6 6 ${this._iconSize} ${this._iconSize*0.75}`);
+                .attr("viewBox", `6 6 ${this._iconSize} ${this._iconSize * 0.75}`);
             pattern
                 .append("image")
                 .attr("height", this._iconSize)
@@ -213,7 +213,7 @@ export default class PortDisplay {
                 .attr("id", `${nation}a`)
                 .attr("width", "133%")
                 .attr("height", "100%")
-                .attr("viewBox", `7 7 ${this._iconSize} ${this._iconSize*.75}`);
+                .attr("viewBox", `7 7 ${this._iconSize} ${this._iconSize * 0.75}`);
             patternA
                 .append("image")
                 .attr("height", this._iconSize)
@@ -388,7 +388,7 @@ export default class PortDisplay {
             $(d3.select(nodes[i])._groups[0]).tooltip("hide");
         }
 
-        const circleSize = this._circleSizes[this._zoomLevel];
+        const circleSize = this._circleSize / this._scale * (this._zoomLevel === "pbZone" ? 2 : 1);
         const data = this.portData.filter(port => this.pbData.ports.some(d => port.id === d.id)).map(port => {
             // eslint-disable-next-line prefer-destructuring,no-param-reassign
             port.properties.nation = this.pbData.ports.filter(d => port.id === d.id).map(d => d.nation)[0];
@@ -422,8 +422,8 @@ export default class PortDisplay {
     }
 
     _updatePortCircles() {
-        const rMin = this._circleSizes[this._zoomLevel] * this._minRadiusFactor;
-        let rMax = this._circleSizes[this._zoomLevel] * this._maxRadiusFactor,
+        const rMin = this._circleSize / this._scale * this._minRadiusFactor;
+        let rMax = this._circleSize / this._scale * this._maxRadiusFactor,
             data = {};
         if (this._showRadiusType === "tax" || this._showRadiusType === "net") {
             data = this.portData.filter(d => !d.properties.nonCapturable);
@@ -493,8 +493,8 @@ export default class PortDisplay {
         } else {
             this._gText.attr("display", "inherit");
 
-            const circleSize = this._circleSizes[this._zoomLevel],
-                fontSize = this.fontSizes[this._zoomLevel];
+            const circleSize = this._circleSize / this._scale,
+                fontSize = this._fontSize / this._scale;
 
             // Data join
             const textUpdate = this._gText.selectAll("text").data(this.portData, d => d.id);
@@ -511,8 +511,8 @@ export default class PortDisplay {
                 .append("text")
                 .text(d => d.properties.name);
 
-            const deltaY = circleSize + fontSize;
-            const deltaY2 = circleSize * 2 + fontSize * 2;
+            const deltaY = circleSize + fontSize,
+                deltaY2 = circleSize * 2 + fontSize * 2;
             // Apply to both old and new
             textUpdate
                 .merge(textEnter)
@@ -522,7 +522,7 @@ export default class PortDisplay {
                         this._zoomLevel === "pbZone" &&
                         (this._showPBZones === "all" ||
                             (this._showPBZones === "single" && d.id === this.currentPort.id))
-                            ? d.geometry.coordinates[0] + d.properties.dx
+                            ? d.geometry.coordinates[0] + d.properties.dx / this._scale * 3
                             : d.geometry.coordinates[0]
                 )
                 .attr("y", d => {
@@ -533,7 +533,7 @@ export default class PortDisplay {
                     }
                     return this._showPBZones === "all" ||
                         (this._showPBZones === "single" && d.id === this.currentPort.id)
-                        ? d.geometry.coordinates[1] + d.properties.dy
+                        ? d.geometry.coordinates[1] + d.properties.dy / this._scale * 3
                         : d.geometry.coordinates[1] + deltaY;
                 })
                 .attr("font-size", d => (d.id === this._highlightId ? `${fontSize * 2}px` : `${fontSize}px`))
@@ -565,7 +565,9 @@ export default class PortDisplay {
         this._portSummaryTextNetIncome.text(`${formatSiInt(netTotal)}`);
     }
 
-    update() {
+    update(scale = null) {
+        this._scale = scale || d3.event.transform.x;
+        console.log(this._scale);
         this._updateIcons();
         this._updatePortCircles();
         this.updateTexts();
@@ -601,9 +603,9 @@ export default class PortDisplay {
         this._g.attr("transform", transform);
     }
 
-    clearMap() {
+    clearMap(scale) {
         this.portData = this.portDataDefault;
         this._showCurrentGood = false;
-        this.update();
+        this.update(scale);
     }
 }
