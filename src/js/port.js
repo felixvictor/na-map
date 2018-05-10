@@ -10,14 +10,16 @@ import moment from "moment";
 import "moment/locale/en-gb";
 
 import { nations } from "./common";
-import { formatInt, formatSiInt, formatPercent, checkFetchStatus, getJsonFromFetch } from "./util";
+import { formatInt, formatSiInt, formatPercent, roundToThousands } from "./util";
 
 export default class PortDisplay {
-    constructor(portData, pbData, serverName, topMargin, rightMargin, fontSize) {
+    constructor(portData, pbData, serverName, topMargin, rightMargin, fontSize, minScale) {
         this.portDataDefault = portData;
         this._serverName = serverName;
         this._topMargin = topMargin;
         this._rightMargin = rightMargin;
+        this._fontSize = fontSize;
+        this._minScale = minScale;
 
         // Shroud Cay
         this.currentPort = { id: "366", coord: { x: 4396, y: 2494 } };
@@ -27,8 +29,7 @@ export default class PortDisplay {
         this._highlightId = null;
         this._highlightDuration = 200;
         this._iconSize = 48;
-        this._circleSize = 8;
-        this._fontSize = fontSize;
+        this._circleSize = 16;
         this._showRadius = "attack";
         this._taxIncomeRadius = d3.scaleLinear();
         this._netIncomeRadius = d3.scaleLinear();
@@ -388,7 +389,9 @@ export default class PortDisplay {
             $(d3.select(nodes[i])._groups[0]).tooltip("hide");
         }
 
-        const circleSize = this._circleSize / this._scale * (this._zoomLevel === "pbZone" ? 2 : 1);
+        const circleScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale);
+        const circleSize = roundToThousands(this._circleSize / circleScale);
+        console.log(circleSize, roundToThousands(circleScale));
         const data = this.portData.filter(port => this.pbData.ports.some(d => port.id === d.id)).map(port => {
             // eslint-disable-next-line prefer-destructuring,no-param-reassign
             port.properties.nation = this.pbData.ports.filter(d => port.id === d.id).map(d => d.nation)[0];
@@ -422,8 +425,9 @@ export default class PortDisplay {
     }
 
     _updatePortCircles() {
-        const rMin = this._circleSize / this._scale * this._minRadiusFactor;
-        let rMax = this._circleSize / this._scale * this._maxRadiusFactor,
+        const circleScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale);
+        const rMin = this._circleSize / circleScale * this._minRadiusFactor;
+        let rMax = this._circleSize / circleScale * this._maxRadiusFactor,
             data = {};
         if (this._showRadiusType === "tax" || this._showRadiusType === "net") {
             data = this.portData.filter(d => !d.properties.nonCapturable);
@@ -493,8 +497,10 @@ export default class PortDisplay {
         } else {
             this._gText.attr("display", "inherit");
 
-            const circleSize = this._circleSize / this._scale,
-                fontSize = this._fontSize / this._scale;
+            const circleScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale);
+            const fontScale = 2 ** Math.log2((Math.abs(this._minScale) + this._scale) * 0.75);
+            const circleSize = this._circleSize / circleScale,
+                fontSize = this._fontSize / fontScale;
 
             // Data join
             const textUpdate = this._gText.selectAll("text").data(this.portData, d => d.id);
@@ -511,7 +517,7 @@ export default class PortDisplay {
                 .append("text")
                 .text(d => d.properties.name);
 
-            const deltaY = circleSize + fontSize,
+            const deltaY = circleSize + fontSize * 1.2,
                 deltaY2 = circleSize * 2 + fontSize * 2;
             // Apply to both old and new
             textUpdate
@@ -566,8 +572,7 @@ export default class PortDisplay {
     }
 
     update(scale = null) {
-        this._scale = scale || d3.event.transform.x;
-        console.log(this._scale);
+        this._scale = scale || d3.event.transform.k;
         this._updateIcons();
         this._updatePortCircles();
         this.updateTexts();
