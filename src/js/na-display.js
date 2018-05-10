@@ -19,6 +19,7 @@ import Cookies from "js-cookie";
 import "bootstrap/js/dist/tooltip";
 import "bootstrap/js/dist/util";
 
+import {  defaultFontSize} from "./common";
 import { nearestPow2, checkFetchStatus, getJsonFromFetch, putFetchError,roundToThousands } from "./util";
 
 import Course from "./course";
@@ -49,7 +50,7 @@ export default function naDisplay(serverName) {
              * Font size in px
              * @type {Number}
              */
-            this.rem = 16;
+            this.rem = defaultFontSize;
 
             /**
              * Left padding for brand icon
@@ -519,7 +520,7 @@ export default function naDisplay(serverName) {
         map = new NAMap();
         // Read map data
         const portData = topojsonFeature(data.ports, data.ports.objects.ports).features;
-        ports = new PortDisplay(portData, data.pb, serverName, map.margin.top, map.margin.right, map.rem, map.minScale);
+        ports = new PortDisplay(portData, data.pb, serverName, map.margin.top, map.margin.right, map.minScale);
 
         let pbZoneData = topojsonFeature(data.pbZones, data.pbZones.objects.pbZones);
         // Port ids of capturable ports
