@@ -174,7 +174,15 @@ export const between = (value, a, b, inclusive) => {
  * @param {Number} radians - Radians
  * @return {Number} Degrees
  */
-Math.radiansToDegrees = radians => radians * 180 / Math.PI;
+export const radiansToDegrees = radians => radians * 180 / Math.PI;
+
+/**
+ * Convert degrees to radians
+ * @function
+ * @param {Number} degrees - Degrees
+ * @return {Number} Radians
+ */
+export const degreesToRadians = degrees => Math.PI / 180 * (degrees - 90);
 
 /**
  * @typedef {Array} Point
