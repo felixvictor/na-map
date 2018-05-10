@@ -19,7 +19,7 @@ import Cookies from "js-cookie";
 import "bootstrap/js/dist/tooltip";
 import "bootstrap/js/dist/util";
 
-import { nearestPow2, checkFetchStatus, getJsonFromFetch, putFetchError } from "./util";
+import { nearestPow2, checkFetchStatus, getJsonFromFetch, putFetchError,roundToThousands } from "./util";
 
 import Course from "./course";
 import F11 from "./f11";
@@ -117,6 +117,12 @@ export default function naDisplay(serverName) {
             this._labelZoomThreshold = 0.5;
 
             this.minScale = nearestPow2(Math.min(this._width / this.coord.max, this._height / this.coord.max));
+
+            /**
+             * Current map scale
+             * @type {Number}
+             */
+            this.currentScale = this.minScale;
 
             /**
              * DoubleClickAction cookie name
@@ -412,23 +418,25 @@ export default function naDisplay(serverName) {
             grid.update();
             teleport.setData();
             teleport.update();
-            const scale = d3.event ? d3.event.transform.k : this.minScale;
-            ports.update(scale);
+            ports.update(this.currentScale);
         }
 
         _setZoomLevelAndData() {
-            if (d3.event.transform.k > this._PBZoneZoomThreshold) {
-                if (this._zoomLevel !== "pbZone") {
-                    this._setZoomLevel("pbZone");
+            if (d3.event.transform.k !== this.currentScale) {
+                this.currentScale = d3.event.transform.k;
+                if (this.currentScale > this._PBZoneZoomThreshold) {
+                    if (this._zoomLevel !== "pbZone") {
+                        this._setZoomLevel("pbZone");
+                    }
+                } else if (this.currentScale > this._labelZoomThreshold) {
+                    if (this._zoomLevel !== "portLabel") {
+                        this._setZoomLevel("portLabel");
+                    }
+                } else if (this._zoomLevel !== "initial") {
+                    this._setZoomLevel("initial");
                 }
-            } else if (d3.event.transform.k > this._labelZoomThreshold) {
-                if (this._zoomLevel !== "portLabel") {
-                    this._setZoomLevel("portLabel");
-                }
-            } else if (this._zoomLevel !== "initial") {
-                this._setZoomLevel("initial");
+                this._updateCurrent();
             }
-            this._updateCurrent();
         }
 
         /**
@@ -453,7 +461,7 @@ export default function naDisplay(serverName) {
              */
             const zoomTransform = d3.zoomIdentity
                 .translate(Math.round(d3.event.transform.x), Math.round(d3.event.transform.y))
-                .scale(Math.round(d3.event.transform.k * 1000) / 1000);
+                .scale(roundToThousands(d3.event.transform.k));
 
             this._displayMap(zoomTransform);
             grid.transform(zoomTransform);
@@ -470,7 +478,6 @@ export default function naDisplay(serverName) {
 
         init() {
             this._setZoomLevel("initial");
-            this._updateCurrent();
             this._initialZoomAndPan();
             this._refreshLayer();
         }
@@ -512,7 +519,7 @@ export default function naDisplay(serverName) {
         map = new NAMap();
         // Read map data
         const portData = topojsonFeature(data.ports, data.ports.objects.ports).features;
-        ports = new PortDisplay(portData, data.pb, serverName, map.margin.top, map.margin.right, map.rem);
+        ports = new PortDisplay(portData, data.pb, serverName, map.margin.top, map.margin.right, map.rem, map.minScale);
 
         let pbZoneData = topojsonFeature(data.pbZones, data.pbZones.objects.pbZones);
         // Port ids of capturable ports
