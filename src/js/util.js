@@ -93,6 +93,13 @@ export function getOrdinal(n) {
 }
 
 /**
+ * Round to thousands
+ * @param {Number} x - Integer
+ * @return {Number} Rounded input
+ */
+export const roundToThousands = x => Math.round(x * 1000) / 1000;
+
+/**
  * Test if object is empty
  * @param {Object} obj - Object
  * @return {Boolean} True if object is empty
