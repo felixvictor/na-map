@@ -379,7 +379,7 @@ export default function naDisplay(serverName) {
             windPrediction.clearMap();
             course.clearMap();
             f11.clearMap();
-            ports.clearMap(this.minScale);
+            ports.clearMap();
             portSelect.clearMap();
             $(".selectpicker")
                 .val("default")
