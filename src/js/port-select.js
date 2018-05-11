@@ -320,7 +320,7 @@ export default class PortSelect {
                     return port;
                 });
         this._ports.setPortData(sourcePorts.concat(consumingPorts), true);
-        this._ports.update(good);
+        this._ports.update();
     }
 
     _nationSelected(event) {

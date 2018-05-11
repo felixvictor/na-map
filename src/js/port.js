@@ -19,6 +19,7 @@ export default class PortDisplay {
         this._topMargin = topMargin;
         this._rightMargin = rightMargin;
         this._minScale = minScale;
+        this._scale = minScale;
 
         // Shroud Cay
         this.currentPort = { id: "366", coord: { x: 4396, y: 2494 } };
@@ -575,7 +576,7 @@ export default class PortDisplay {
     }
 
     update(scale = null) {
-        this._scale = scale || d3.event.transform.k;
+        this._scale = scale || this._scale;
         this._updateIcons();
         this._updatePortCircles();
         this.updateTexts();
