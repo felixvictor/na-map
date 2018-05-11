@@ -108,7 +108,6 @@ export const rotationAngleInRadians = (centerPt, targetPt) =>
 export const distancePoints = (centerPt, targetPt) =>
     Math.sqrt((centerPt[0] - targetPt[0]) ** 2 + (centerPt[1] - targetPt[1]) ** 2);
 
-
 /**
  * Convert degrees to radians
  * @function
