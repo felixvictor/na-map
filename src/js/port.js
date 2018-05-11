@@ -235,7 +235,7 @@ export default class PortDisplay {
             portBattleST = moment.utc(pbData.portBattle),
             port = {
                 name: portProperties.name,
-                icon: portProperties.availableForAll ? `${pbData.nation}a` : pbData.nation,
+                icon: pbData.nation,
                 availableForAll: portProperties.availableForAll,
                 depth: portProperties.shallow ? "Shallow" : "Deep",
                 countyCapital: portProperties.countyCapital ? " (county capital)" : "",
