@@ -1,7 +1,7 @@
 import { readJson, saveJson } from "./common.mjs";
 
 const itemsFilename = process.argv[2],
-    outFilename = process.argv[3],
+    outDir = process.argv[3],
     date = process.argv[4];
 
 const APIItems = readJson(`${itemsFilename}-ItemTemplates-${date}.json`);
@@ -19,6 +19,7 @@ String.prototype.replaceAll = function(search, replacement) {
  */
 function convertModules() {
     const modules = new Map(),
+        woods = new Map(),
         levels = new Map(),
         modifiers = new Map();
 
@@ -28,18 +29,20 @@ function convertModules() {
     levels.set("Medium", "M");
     levels.set("Lineships", "L");
 
-    modifiers.set("INTERNAL_STRUCTURE MODULE_BASE_HP", "Side armour");
-    modifiers.set("ARMOR_ALL_SIDES MODULE_BASE_HP", "Structure health");
     modifiers.set("ARMOR_ALL_SIDES ARMOR_THICKNESS", "Thickness");
-    modifiers.set("SAIL MAST_THICKNESS", "Mast thickness");
-    modifiers.set("STRUCTURE SHIP_STRUCTURE_LEAKS_PER_SECOND", "Leak resistance");
-    modifiers.set("STRUCTURE FIRE_INCREASE_RATE", "Fire probability");
-    modifiers.set("NONE SHIP_MAX_SPEED", "Ship speed");
-    modifiers.set("NONE RUDDER_HALFTURN_TIME", "Rudder speed");
-    modifiers.set("NONE SHIP_TURNING_SPEED", "Turn speed");
-    modifiers.set("NONE SHIP_PHYSICS_ACC_COEF", "Acceleration");
+    modifiers.set("ARMOR_ALL_SIDES MODULE_BASE_HP", "Structure health");
     modifiers.set("CREW MODULE_BASE_HP", "Crew");
+    modifiers.set("INTERNAL_STRUCTURE MODULE_BASE_HP", "Side armour");
+    modifiers.set("NONE CREW_DAMAGE_RECEIVED_DECREASE_PERCENT", "Crew damage");
     modifiers.set("NONE GROG_MORALE_BONUS", "Grog morale bonus");
+    modifiers.set("NONE RUDDER_HALFTURN_TIME", "Rudder speed");
+    modifiers.set("NONE SHIP_MAX_SPEED", "Ship speed");
+    modifiers.set("NONE SHIP_PHYSICS_ACC_COEF", "Acceleration");
+    modifiers.set("STRUCTURE SHIP_PHYSICS_ACC_COEF", "Acceleration");
+    modifiers.set("NONE SHIP_TURNING_SPEED", "Turn speed");
+    modifiers.set("SAIL MAST_THICKNESS", "Mast thickness");
+    modifiers.set("STRUCTURE FIRE_INCREASE_RATE", "Fire probability");
+    modifiers.set("STRUCTURE SHIP_STRUCTURE_LEAKS_PER_SECOND", "Leak resistance");
 
     APIItems.filter(item => item.ItemType === "Module").forEach(APImodule => {
         const module = {
@@ -71,25 +74,34 @@ function convertModules() {
                 module.name.includes(" Wood Type") ||
                 module.name === "Crew Space"
             ) {
-                module.name = module.name.replace(" Wood Type", " Frame");
-                module.name = module.name.replace(" Planking", " Planks");
-                module.properties = [];
+                const wood = {};
+                if (module.name.includes(" Planking") || module.name === "Crew Space") {
+                    wood.type = "Trim";
+                    wood.name = module.name.replace(" Planking", "");
+                } else {
+                    wood.type = "Wood type";
+                    wood.name = module.name.replace(" Wood Type", "");
+                }
+                wood.properties = [];
                 module.modifiers.forEach(modifier => {
                     // Add modifier if in modifier map
                     if (modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`)) {
-                        module.properties.push({
+                        wood.properties.push({
                             modifier: modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`),
                             amount: modifier.Percentage
                         });
                     }
                 });
-                delete module.modifiers;
+                woods.set(wood.type + wood.name, wood);
+                modules.set(module.name + module.moduleLevel, module);
+            } else {
+                modules.set(module.name + module.moduleLevel, module);
             }
-            modules.set(module.name + module.moduleLevel, module);
         }
     });
 
-    saveJson(outFilename, Array.from(modules.values()));
+    saveJson(`${outDir}/modules.json`, Array.from(modules.values()));
+    saveJson(`${outDir}/woods.json`, Array.from(woods.values()));
 }
 
 convertModules();
