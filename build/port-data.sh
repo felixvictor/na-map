@@ -93,7 +93,6 @@ function get_port_data () {
 
         for SERVER_NAME in "${SERVER_NAMES[@]}"; do
             PORT_FILE="${SRC_DIR}/${SERVER_NAME}.json"
-            MODULE_FILE="${SRC_DIR}/modules.json"
             PB_FILE="${SRC_DIR}/${SERVER_NAME}-pb.json"
             TEMP_PORT_FILE="${BUILD_DIR}/ports.geojson"
             for API_VAR in "${API_VARS[@]}"; do
@@ -115,7 +114,7 @@ function get_port_data () {
         rm "${BUILD_DIR}"/*.geojson
 
         ${NODE} build/convert-ships.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${SHIP_FILE}" "${DATE}"
-        ${NODE} build/convert-modules.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${MODULE_FILE}" "${DATE}"
+        ${NODE} build/convert-modules.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${SRC_DIR}" "${DATE}"
 
         ${NODE} build/create-xlsx.mjs "${SHIP_FILE}" "${SRC_DIR}/${SERVER_NAMES[0]}.json" "${EXCEL_FILE}"
     fi
