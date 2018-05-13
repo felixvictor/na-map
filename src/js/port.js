@@ -499,7 +499,7 @@ export default class PortDisplay {
 
             const circleScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale),
                 circleSize = roundToThousands(this._circleSize / circleScale),
-                fontScale = 2 ** Math.log2((Math.abs(this._minScale) + this._scale) * 0.75),
+                fontScale = 2 ** Math.log2((Math.abs(this._minScale) + this._scale) * 0.9),
                 fontSize = roundToThousands(this._fontSize / fontScale);
 
             // Data join
