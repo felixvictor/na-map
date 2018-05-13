@@ -343,9 +343,9 @@ function createExcel() {
             sheet
                 .cell(currentRow, headerColumns - 1)
                 .formula(
-                    `SUMPRODUCT(NOT(ISBLANK(${Excel4Node.getExcelAlpha(
-                        headerColumns + 1
-                    )}${currentRow}:${Excel4Node.getExcelAlpha(numColumns)}${currentRow})))`
+                    `COUNTA(${Excel4Node.getExcelAlpha(headerColumns + 1)}${currentRow}:${Excel4Node.getExcelAlpha(
+                        numColumns
+                    )}${currentRow})`
                 )
                 .style(numberStyle);
             sheet
