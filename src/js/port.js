@@ -412,7 +412,7 @@ export default class PortDisplay {
         const rMin = this._circleSizes[this._zoomLevel] * this._minRadiusFactor;
         let rMax = this._circleSizes[this._zoomLevel] * this._maxRadiusFactor,
             data = {};
-        if (this._showRadiusType === "tax" || this._showRadiusType === "net") {
+        if (this._showRadius === "tax" || this._showRadius === "net") {
             data = this.portData.filter(d => !d.properties.nonCapturable);
         } else if (this._showRadius === "attack") {
             const pbData = this.pbData.ports
