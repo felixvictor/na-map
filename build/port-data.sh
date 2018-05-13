@@ -53,7 +53,7 @@ function get_git_update () {
     LOCAL=$(git rev-parse @)
     BASE=$(git merge-base @ "@{u}")
 
-    if [ ${LOCAL} == ${BASE} ]; then
+    if [ "${LOCAL}" == "${BASE}" ]; then
         git pull
     fi
 }
