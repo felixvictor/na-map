@@ -215,7 +215,7 @@ export default class PortDisplay {
                 .attr("id", `${nation}a`)
                 .attr("width", "133%")
                 .attr("height", "100%")
-                .attr("viewBox", `7 7 ${this._iconSize} ${this._iconSize * 0.75}`);
+                .attr("viewBox", `6 6 ${this._iconSize} ${this._iconSize * 0.75}`);
             patternA
                 .append("image")
                 .attr("height", this._iconSize)
