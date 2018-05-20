@@ -422,7 +422,7 @@ export default class PortSelect {
     }
 
     _filterCaptured(begin, end) {
-        // console.log("Between %s and %s", begin.format("dddd D MMMM YYYY h:mm"), end.format("dddd D MMMM YYYY h:mm"));
+        // console.log("Between %s and %s", begin.format("dddd D MMMM YYYY H:mm"), end.format("dddd D MMMM YYYY H:mm"));
         const portId = new Set();
         this._ports.pbData.ports
             .filter(port => moment(port.lastPortBattle).isBetween(begin, end, null, "(]"))
