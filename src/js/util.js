@@ -237,6 +237,14 @@ export function checkFetchStatus(response) {
 export const getJsonFromFetch = response => response.json();
 
 /**
+ * Get text from fetch response
+ * @function
+ * @param {Object} response - fetch response
+ * @return {Object} String
+ */
+export const getTextFromFetch = response => response.text();
+
+/**
  * Write error to console
  * @function
  * @param {String} error - Error message

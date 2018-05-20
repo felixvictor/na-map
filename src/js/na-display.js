@@ -19,8 +19,15 @@ import Cookies from "js-cookie";
 import "bootstrap/js/dist/tooltip";
 import "bootstrap/js/dist/util";
 
-import {  defaultFontSize} from "./common";
-import { nearestPow2, checkFetchStatus, getJsonFromFetch, putFetchError,roundToThousands } from "./util";
+import { defaultFontSize } from "./common";
+import {
+    nearestPow2,
+    checkFetchStatus,
+    getJsonFromFetch,
+    getTextFromFetch,
+    putFetchError,
+    roundToThousands
+} from "./util";
 
 import Course from "./course";
 import F11 from "./f11";
@@ -549,19 +556,45 @@ export default function naDisplay(serverName) {
         setup();
     }
 
-    const naMapJsonData = fetch(`${serverName}.json`)
+    function readData(cacheMode) {
+        const naMapJsonData = fetch(`${serverName}.json`, { cache: cacheMode })
+            .then(checkFetchStatus)
+            .then(getJsonFromFetch);
+        const pbJsonData = fetch(`${serverName}-pb.json`, { cache: cacheMode })
+            .then(checkFetchStatus)
+            .then(getJsonFromFetch);
+        const pbZonesJsonData = fetch("pb.json", { cache: cacheMode })
+            .then(checkFetchStatus)
+            .then(getJsonFromFetch);
+        const shipJsonData = fetch("ships.json", { cache: cacheMode })
+            .then(checkFetchStatus)
+            .then(getJsonFromFetch);
+        Promise.all([naMapJsonData, pbJsonData, pbZonesJsonData, shipJsonData])
+            .then(values => init({ ports: values[0], pb: values[1], pbZones: values[2], ships: values[3] }))
+            .catch(putFetchError);
+    }
+
+    let cacheMode = "default";
+    const lastUpdateData = fetch("update.txt", { cache: cacheMode })
         .then(checkFetchStatus)
-        .then(getJsonFromFetch);
-    const pbJsonData = fetch(`${serverName}-pb.json`)
-        .then(checkFetchStatus)
-        .then(getJsonFromFetch);
-    const pbZonesJsonData = fetch("pb.json")
-        .then(checkFetchStatus)
-        .then(getJsonFromFetch);
-    const shipJsonData = fetch("ships.json")
-        .then(checkFetchStatus)
-        .then(getJsonFromFetch);
-    Promise.all([naMapJsonData, pbJsonData, pbZonesJsonData, shipJsonData])
-        .then(values => init({ ports: values[0], pb: values[1], pbZones: values[2], ships: values[3] }))
+        .then(getTextFromFetch);
+    Promise.all([lastUpdateData])
+        .then(values => {
+            let serverDayStart = moment()
+                .utc()
+                .hour(11)
+                .minute(0);
+            if (serverDayStart.isAfter(moment().utc())) {
+                serverDayStart = serverDayStart.subtract(1, "day");
+            }
+            const lastUpdate = moment(values[0], "YYYY-MM-DD H.mm");
+            // console.log(serverDayStart.format("dddd D MMMM YYYY H:mm"), lastUpdate.format("dddd D MMMM YYYY H:mm"));
+
+            if (lastUpdate.isBefore(serverDayStart, "hour")) {
+                cacheMode = "reload";
+            }
+        })
         .catch(putFetchError);
+
+    readData(cacheMode);
 }

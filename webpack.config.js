@@ -193,6 +193,7 @@ const config = {
             { from: "images/map", to: "../public/images/map" },
             { from: "images/icons", to: "../public/images/icons" },
             { from: "*.json" },
+            { from: "*.txt" },
             { from: "*.xlsx" },
             { from: "../netlify.toml" }
         ]),
@@ -213,7 +214,7 @@ const config = {
         new SitemapPlugin("https://na-map.netlify.com/", sitemapPaths, { skipGzip: false }),
         new SriPlugin({
             hashFuncNames: ["sha256", "sha384"],
-            enabled: process.env.NODE_ENV === "prod"
+            enabled: process.env.NODE_ENV === "production"
         })
     ],
 
