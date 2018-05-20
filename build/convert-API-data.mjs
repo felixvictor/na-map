@@ -1,13 +1,5 @@
 import fs from "fs";
-import {
-    convertCoordX,
-    convertCoordY,
-    rotationAngleInDegrees,
-    degreesToRadians,
-    distancePoints,
-    defaultFontSize,
-    defaultCircleSize
-} from "./common.mjs";
+import { convertCoordX, convertCoordY, rotationAngleInDegrees } from "./common.mjs";
 
 const inBaseFilename = process.argv[2],
     outFilename = process.argv[3],
