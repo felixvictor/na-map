@@ -120,8 +120,8 @@ export default class Grid {
             .scaleLinear()
             .clamp(true)
             .domain([
-                convertInvCoordX(this._maxCoord, this._maxCoord),
-                convertInvCoordX(this._minCoord, this._minCoord)
+                convertInvCoordX(this._minCoord, this._minCoord),
+                convertInvCoordX(this._maxCoord, this._maxCoord)
             ])
             .range([this._minCoord, this._maxCoord]);
 
@@ -133,8 +133,8 @@ export default class Grid {
             .scaleLinear()
             .clamp(true)
             .domain([
-                convertInvCoordY(this._maxCoord, this._maxCoord),
-                convertInvCoordY(this._minCoord, this._minCoord)
+                convertInvCoordY(this._minCoord, this._minCoord),
+                convertInvCoordY(this._maxCoord, this._maxCoord)
             ])
             .range([this._minCoord, this._maxCoord]);
     }
