@@ -14,16 +14,18 @@ SERVER_NAMES=(eu1 eu2)
 SERVER_TWITTER_NAMES=(eu1)
 API_VARS=(ItemTemplates Ports Shops)
 DATE=$(date +%Y-%m-%d)
-LAST_DATE=$(date +%Y-%m-%d --date "-1 day")
+LAST_DATE=$(date '+%Y-%m-%d' --date "-1 day")
 
 function change_var () {
     BASE_DIR="$(pwd)"
     export BASE_DIR
+    export UPDATE_FILE="${BASE_DIR}/src/update.txt"
     common_var
 }
 
 function update_var () {
     export BASE_DIR="/home/natopo/na-topo.git"
+    export UPDATE_FILE="${BASE_DIR}/public/update.txt"
     common_var
 }
 
@@ -60,8 +62,7 @@ function get_git_update () {
 }
 
 function update_yarn () {
-    #yarn --silent
-    :
+    yarn --silent
 }
 
 function test_for_update () {
@@ -178,9 +179,13 @@ function change_tweets () {
     update_ports
 }
 
-
 function change_data () {
     get_port_data
+    touch_update
+}
+
+function touch_update () {
+    echo "$(date --utc '+%Y-%m-%d %H.%M')" > "${UPDATE_FILE}"
 }
 
 function push_data () {
@@ -213,6 +218,7 @@ function update_data () {
         update_ports
 
         copy_data
+        touch_update
         push_data update
         deploy_data
     fi
