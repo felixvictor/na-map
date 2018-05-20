@@ -36,30 +36,24 @@
                    aria-haspopup="true" aria-expanded="false">
                     Wind prediction
                 </a>
-                <div class="dropdown-menu extralarge-width" id="predictMenu" aria-labelledby="predictDropdown">
+                <div class="dropdown-menu" id="predictMenu" aria-labelledby="predictDropdown">
                     <form id="windPrediction" class="p-2">
-                        <div class="form-group row">
-                            <label class="align-top col-sm-6 col-form-label" for="direction">Wind currently blowing
-                                from</label>
-                            <div class="col-sm-6">
-                                <div id="direction" class="rslider"></div>
-                            </div>
+                        <div class="form-group">
+                            <label for="direction">1. Set current in-game wind</label>
+                            <div id="direction" class="rslider"></div>
                         </div>
-                        <div class="form-group row">
-                            <label class="col-sm-6 col-form-label" for="wind-time">Predict wind for</label>
-                            <div class="col-sm-6">
-                                <div class="form-group">
-                                    <div class="input-group date" id="wind-time" data-target-input="nearest">
-                                        <input type="text" class="form-control datetimepicker-input"
-                                               data-target="#wind-time" aria-label="wind-time"
-                                               id="wind-time-input" required/>
-                                        <div class="input-group-append" data-target="#wind-time"
-                                             data-toggle="datetimepicker">
-                                            <span class="input-group-text"><i class="far fa-clock"></i></span>
-                                        </div>
+                        <div class="form-group">
+                            <label for="wind-time">2. Set predict time (server time)</label>
+                            <div class="input-group">
+                                <div class="input-group date" id="wind-time" data-target-input="nearest">
+                                    <input type="text" class="form-control datetimepicker-input"
+                                           data-target="#wind-time" aria-label="wind-time"
+                                           id="wind-time-input" required/>
+                                    <div class="input-group-append" data-target="#wind-time"
+                                         data-toggle="datetimepicker">
+                                        <span class="input-group-text"><i class="far fa-clock"></i></span>
                                     </div>
                                 </div>
-                                <small class="form-text text-muted">Server time</small>
                             </div>
                         </div>
                         <button type="submit" class="btn btn-outline-primary">Predict</button>
@@ -92,9 +86,11 @@
                                 <button class="btn btn-outline-primary" type="submit">Move to</button>
                             </div>
                         </div>
+                        <small class="form-text text-muted">Coordinates in k units. Example: enter 43 for in-game value of 43,162.5.</small>
                     </form>
                 </div>
             </li>
+
 
             <li class="nav-item pr-2">
                 <label for="port-names"></label><select name="port-names" id="port-names">
