@@ -19,7 +19,7 @@
     <meta content="images/icons/browserconfig.xml" name="msapplication-config">
 
     <script src="https://www.googletagmanager.com/gtag/js?id=UA-109520372-1" async></script>
-<link href="na-map.min.css?d8f27c97739285e37b53" rel="stylesheet"></head>
+<link href="na-map.min.css?c5bce1740ef751698ac3" rel="stylesheet" crossorigin="anonymous" integrity="sha256-NNjAJbSsTmZVjFCTLuc6G2VI8WYhtws1mwKBsXyitMk= sha384-KaEQ8hdI8tAbuXxWxV4dNBIYQSx6VD/V2jyYM/1yfoxn8BoF91Uc7Ub2IaspRPVM"></head>
 <body>
 
 <nav class="bg-light fixed-top navbar navbar-expand-lg navbar-light">
@@ -34,30 +34,24 @@
                 <a class="dropdown-toggle nav-link" href="#" id="predictDropdown" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
                     Wind prediction
                 </a>
-                <div class="dropdown-menu extralarge-width" id="predictMenu" aria-labelledby="predictDropdown">
+                <div class="dropdown-menu" id="predictMenu" aria-labelledby="predictDropdown">
                     <form id="windPrediction" class="p-2">
-                        <div class="form-group row">
-                            <label for="direction" class="col-form-label col-sm-6 align-top">Wind currently blowing
-                                from</label>
-                            <div class="col-sm-6">
-                                <div class="rslider" id="direction"></div>
-                            </div>
+                        <div class="form-group">
+                            <label for="direction">1. Set current in-game wind</label>
+                            <div class="rslider" id="direction"></div>
                         </div>
-                        <div class="form-group row">
-                            <label for="wind-time" class="col-form-label col-sm-6">Predict wind for</label>
-                            <div class="col-sm-6">
-                                <div class="form-group">
-                                    <div class="input-group date" id="wind-time" data-target-input="nearest">
-                                        <input class="form-control datetimepicker-input" id="wind-time-input" type="text" required aria-label="wind-time" data-target="#wind-time">
-                                        <div class="input-group-append" data-target="#wind-time" data-toggle="datetimepicker">
-                                            <span class="input-group-text"><i class="far fa-clock"></i></span>
-                                        </div>
+                        <div class="form-group">
+                            <label for="wind-time">2. Set predict time (server time)</label>
+                            <div class="input-group">
+                                <div class="input-group date" id="wind-time" data-target-input="nearest">
+                                    <input class="form-control datetimepicker-input" id="wind-time-input" type="text" required aria-label="wind-time" data-target="#wind-time">
+                                    <div class="input-group-append" data-target="#wind-time" data-toggle="datetimepicker">
+                                        <span class="input-group-text"><i class="far fa-clock"></i></span>
                                     </div>
                                 </div>
-                                <small class="form-text text-muted">Server time</small>
                             </div>
                         </div>
-                        <button class="btn btn-outline-primary" type="submit">Predict</button>
+                        <button class="btn btn-outline-secondary float-right" type="submit">Predict</button>
                     </form>
                 </div>
             </li>
@@ -66,26 +60,34 @@
                 <a class="dropdown-toggle nav-link" href="#" id="moveToDropdown" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
                     Move to F11
                 </a>
-                <div class="dropdown-menu extralarge-width p-2" id="moveToMenu" aria-labelledby="moveToDropdown">
+                <div class="dropdown-menu large-width p-2" id="moveToMenu" aria-labelledby="moveToDropdown">
                     <form id="f11">
                         <div class="input-group">
                             <input class="form-control" id="x-coord" type="number" required max="830" min="-816" placeholder="X" step="1">
                             <div class="input-group-append">
                                 <span class="input-group-text">k</span>
                             </div>
+                        </div>
+                        <div class="input-group">
                             <input class="form-control" id="z-coord" type="number" required max="830" min="-430" placeholder="Z" step="1">
                             <div class="input-group-append">
                                 <span class="input-group-text">k</span>
                             </div>
-                            <div class="input-group-append">
-                                <button class="btn btn-outline-primary" type="button" id="copy-coord" title="Copy to clipboard"><i class="far fa-copy"></i>
-                                </button>
-                                <button class="btn btn-outline-primary" type="submit">Move to</button>
-                            </div>
+                        </div>
+                        <small class="form-text text-muted">Coordinates in k units.
+                        </small>
+                        <small class="form-text text-muted">Example: enter <em>43</em> for in-game value
+                            of <em>43,162.5</em>.
+                        </small>
+                        <div class="float-right btn-group" role="group">
+                            <button class="btn btn-outline-secondary" type="button" id="copy-coord" title="Copy to clipboard"><i class="far fa-copy"></i>
+                            </button>
+                            <button class="btn btn-outline-secondary" type="submit">Move to</button>
                         </div>
                     </form>
                 </div>
             </li>
+
 
             <li class="nav-item pr-2">
                 <label for="port-names"></label><select id="port-names" name="port-names">
@@ -96,7 +98,7 @@
                 <a class="dropdown-toggle nav-link" href="#" id="propertyDropdown" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
                     Select ports on
                 </a>
-                <div class="dropdown-menu large-width" id="propertyMenu" aria-labelledby="propertyDropdown">
+                <div class="dropdown-menu" id="propertyMenu" aria-labelledby="propertyDropdown">
                     <a class="dropdown-item dropdown-toggle" href="#">Property</a>
                     <div class="dropdown-menu">
                         <a class="dropdown-item" href="#" id="menu-prop-deep">Deep water</a>
@@ -127,7 +129,7 @@
                     <h6 class="dropdown-header">Port battle</h6>
 
                     <a class="dropdown-item dropdown-toggle" href="#">Time range set by port owner</a>
-                    <div class="dropdown-menu col-sm-7">
+                    <div class="dropdown-menu col-sm-10">
                         <div class="dropdown-item" id="menu-prop-pb-range">
                             <form id="prop-pb-range">
                                 <div class="form-group row">
@@ -148,7 +150,8 @@
                                         </div>
                                     </div>
                                 </div>
-                                <button class="btn btn-outline-primary align-bottom" type="submit">Go</button>
+                                <button class="btn btn-outline-secondary float-right" type="submit">Go
+                                </button>
                             </form>
                         </div>
                     </div>
@@ -223,7 +226,7 @@
                 <a class="dropdown-toggle nav-link" href="#" id="settingsDropdown" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
                     Settings
                 </a>
-                <div class="dropdown-menu dropdown-menu-right large-width" id="settingsMenu" aria-labelledby="settingsDropdown">
+                <div class="dropdown-menu dropdown-menu-right extralarge-width" id="settingsMenu" aria-labelledby="settingsDropdown">
 
                     <h6 class="dropdown-header">Show per port</h6>
                     <div class="align-self-center col-auto radio-group ml-1" id="show-radius">
@@ -289,7 +292,8 @@
                         </div>
                         <div class="custom-control custom-control-inline custom-radio">
                             <input class="custom-control-input" id="doubleClick-action-f11" type="radio" name="doubleClickAction" value="f11">
-                            <label for="doubleClick-action-f11" class="custom-control-label">Show F11 coordinates</label>
+                            <label for="doubleClick-action-f11" class="custom-control-label">Show F11
+                                coordinates</label>
                         </div>
                     </div>
                 </div>
@@ -360,5 +364,5 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.slim.min.js" crossorigin="anonymous" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"></script>
 <script src="https://unpkg.com/d3@5.4.0/dist/d3.min.js" crossorigin="anonymous" integrity="sha384-Ha//YQhNUuPzmPKgC8aYpurZcTiV3JhEvEhH5uGW0IRjBfEgDQxvo0aF1Gef+blI"></script>
-<script src="na-map.min.js?d8f27c97739285e37b53" type="text/javascript"></script></body>
+<script src="na-map.min.js?c5bce1740ef751698ac3" crossorigin="anonymous" integrity="sha256-LWxB+rITobBUc8Fr7vXLf2fXax5VOatfYuPXs/aFov0= sha384-HWjYZAOHEpfiEvw4Gu/WHT/WczJJ2Ewjhz5YEbF+kkVu+c/hwtl/lvHnCoNq2Dj7" type="text/javascript"></script></body>
 </html>
