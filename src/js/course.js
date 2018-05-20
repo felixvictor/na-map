@@ -59,7 +59,25 @@ export default class Course {
                 this._lineData[this._lineData.length - 1],
                 this._lineData[this._lineData.length - 2]
             ),
-            compass = degreesToCompass(degrees);
+            compass = degreesToCompass(degrees),
+            F11X0 = convertInvCoordX(
+                this._lineData[this._lineData.length - 1][0],
+                this._lineData[this._lineData.length - 1][1]
+            ),
+            F11Y0 = convertInvCoordY(
+                this._lineData[this._lineData.length - 1][0],
+                this._lineData[this._lineData.length - 1][1]
+            ),
+            F11X1 = convertInvCoordX(
+                this._lineData[this._lineData.length - 2][0],
+                this._lineData[this._lineData.length - 2][1]
+            ),
+            F11Y1 = convertInvCoordY(
+                this._lineData[this._lineData.length - 2][0],
+                this._lineData[this._lineData.length - 2][1]
+            ),
+            distance = distancePoints([F11X0, F11Y0], [F11X1, F11Y1]) / 400;
+        console.log([F11X0, F11Y0], [F11X1, F11Y1]);
 
         this.gCompass
             .datum(this._lineData)
@@ -75,7 +93,7 @@ export default class Course {
             .append("text")
             .attr("x", "50%")
             .attr("y", "50%")
-            .text(`${compass} (${Math.round(degrees)}°)`);
+            .text(`${compass} (${Math.round(degrees)}°) ${Math.round(distance)}k`);
 
         const bbox = text.node().getBBox();
 
