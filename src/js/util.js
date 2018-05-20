@@ -209,6 +209,17 @@ export const rotationAngleInDegrees = (centerPt, targetPt) => {
 };
 
 /**
+ * Calculate the distance between two points
+ * @see https://www.mathsisfun.com/algebra/distance-2-points.html
+ * @function
+ * @param {Point} centerPt - Center point
+ * @param {Point} targetPt - Target point
+ * @return {Number} Distance between centerPt and targetPt
+ */
+export const distancePoints = (centerPt, targetPt) =>
+    Math.sqrt((centerPt[0] - targetPt[0]) ** 2 + (centerPt[1] - targetPt[1]) ** 2);
+
+/**
  * Calculate the closest power of 2 (see {@link https://bocoup.com/blog/find-the-closest-power-of-2-with-javascript})
  * @function
  * @param {Number} aSize - Input
