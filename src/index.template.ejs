@@ -56,7 +56,7 @@
                                 </div>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-outline-primary">Predict</button>
+                        <button type="submit" class="float-right btn btn-outline-secondary">Predict</button>
                     </form>
                 </div>
             </li>
@@ -66,7 +66,7 @@
                    aria-haspopup="true" aria-expanded="false">
                     Move to F11
                 </a>
-                <div class="dropdown-menu extralarge-width p-2" id="moveToMenu" aria-labelledby="moveToDropdown">
+                <div class="dropdown-menu large-width p-2" id="moveToMenu" aria-labelledby="moveToDropdown">
                     <form id="f11">
                         <div class="input-group">
                             <input class="form-control" id="x-coord" type="number" required placeholder="X" max="830"
@@ -74,19 +74,25 @@
                             <div class="input-group-append">
                                 <span class="input-group-text">k</span>
                             </div>
+                        </div>
+                        <div class="input-group">
                             <input class="form-control" id="z-coord" type="number" required placeholder="Z" max="830"
                                    min="-430" step="1">
                             <div class="input-group-append">
                                 <span class="input-group-text">k</span>
                             </div>
-                            <div class="input-group-append">
-                                <button class="btn btn-outline-primary" id="copy-coord" title="Copy to clipboard"
-                                        type="button"><i class="far fa-copy"></i>
-                                </button>
-                                <button class="btn btn-outline-primary" type="submit">Move to</button>
-                            </div>
                         </div>
-                        <small class="form-text text-muted">Coordinates in k units. Example: enter 43 for in-game value of 43,162.5.</small>
+                        <small class="form-text text-muted">Coordinates in k units.
+                        </small>
+                        <small class="form-text text-muted">Example: enter <em>43</em> for in-game value
+                            of <em>43,162.5</em>.
+                        </small>
+                        <div class="float-right btn-group" role="group">
+                            <button class="btn btn-outline-secondary" id="copy-coord" title="Copy to clipboard"
+                                    type="button"><i class="far fa-copy"></i>
+                            </button>
+                            <button class="btn btn-outline-secondary" type="submit">Move to</button>
+                        </div>
                     </form>
                 </div>
             </li>
@@ -102,7 +108,7 @@
                    aria-haspopup="true" aria-expanded="false">
                     Select ports on
                 </a>
-                <div class="dropdown-menu large-width" id="propertyMenu" aria-labelledby="propertyDropdown">
+                <div class="dropdown-menu" id="propertyMenu" aria-labelledby="propertyDropdown">
                     <a class="dropdown-item dropdown-toggle" href="#">Property</a>
                     <div class="dropdown-menu">
                         <a class="dropdown-item" id="menu-prop-deep" href="#">Deep water</a>
@@ -135,7 +141,7 @@
                     <h6 class="dropdown-header">Port battle</h6>
 
                     <a class="dropdown-item dropdown-toggle" href="#">Time range set by port owner</a>
-                    <div class="dropdown-menu col-sm-7">
+                    <div class="dropdown-menu col-sm-10">
                         <div class="dropdown-item" id="menu-prop-pb-range">
                             <form id="prop-pb-range">
                                 <div class="form-group row">
@@ -163,7 +169,8 @@
                                         </div>
                                     </div>
                                 </div>
-                                <button type="submit" class="btn btn-outline-primary align-bottom">Go</button>
+                                <button type="submit" class="float-right btn btn-outline-secondary">Go
+                                </button>
                             </form>
                         </div>
                     </div>
@@ -248,7 +255,7 @@
                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Settings
                 </a>
-                <div class="dropdown-menu dropdown-menu-right large-width" id="settingsMenu"
+                <div class="dropdown-menu dropdown-menu-right extralarge-width" id="settingsMenu"
                      aria-labelledby="settingsDropdown">
 
                     <h6 class="dropdown-header">Show per port</h6>
@@ -327,7 +334,8 @@
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" class="custom-control-input" name="doubleClickAction"
                                    id="doubleClick-action-f11" value="f11">
-                            <label class="custom-control-label" for="doubleClick-action-f11">Show F11 coordinates</label>
+                            <label class="custom-control-label" for="doubleClick-action-f11">Show F11
+                                coordinates</label>
                         </div>
                     </div>
                 </div>
