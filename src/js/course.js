@@ -5,7 +5,8 @@
 /* global d3 : false
  */
 
-import { degreesToCompass, rotationAngleInDegrees } from "./util";
+import { convertInvCoordX, convertInvCoordY } from "./common";
+import { degreesToCompass, rotationAngleInDegrees, distancePoints } from "./util";
 
 export default class Course {
     constructor(fontSize) {
