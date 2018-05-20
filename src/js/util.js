@@ -201,7 +201,7 @@ export const degreesToRadians = degrees => Math.PI / 180 * (degrees - 90);
 export const rotationAngleInDegrees = (centerPt, targetPt) => {
     let theta = Math.atan2(targetPt[1] - centerPt[1], targetPt[0] - centerPt[0]);
     theta -= Math.PI / 2.0;
-    let degrees = Math.radiansToDegrees(theta);
+    let degrees = radiansToDegrees(theta);
     if (degrees < 0) {
         degrees += 360;
     }
