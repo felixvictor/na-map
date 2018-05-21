@@ -121,8 +121,8 @@ export default class F11 {
     _goToF11(F11XIn, F11YIn) {
         const F11X = Number(F11XIn),
             F11Y = Number(F11YIn),
-            x = convertCoordX(F11X, F11Y),
-            y = convertCoordY(F11X, F11Y);
+            x = convertCoordX(F11X * -1, F11Y * -1),
+            y = convertCoordY(F11X * -1, F11Y * -1);
 
         if (between(x, this._minCoord, this._maxCoord, true) && between(y, this._minCoord, this._maxCoord, true)) {
             this._printF11Coord(x, y, F11X, F11Y);
@@ -131,8 +131,8 @@ export default class F11 {
     }
 
     printCoord(x, y) {
-        const F11X = convertInvCoordX(x, y),
-            F11Y = convertInvCoordY(x, y);
+        const F11X = convertInvCoordX(x, y) * -1,
+            F11Y = convertInvCoordY(x, y) * -1;
 
         this._printF11Coord(x, y, F11X, F11Y);
     }
