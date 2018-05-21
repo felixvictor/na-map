@@ -281,6 +281,12 @@ text {
     }
 }
 
+.coord {
+  text {
+    text-anchor: start;
+  }
+}
+
 .grid-background {
     rect {
         fill: $primary-200;
