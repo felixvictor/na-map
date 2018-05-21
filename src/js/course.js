@@ -79,12 +79,14 @@ export default class Course {
             distance = distancePoints([F11X0, F11Y0], [F11X1, F11Y1]) / kFactor;
         this._totalDistance += distance;
         const duration = moment.duration(distance / speedFactor, "minutes").humanize(true),
-            totalDuration = moment.duration(this._totalDistance / speedFactor, "minutes").humanize(true);
-        let text = `${compass} (${Math.round(degrees)}°) F11: ${formatF11(F11X0)} ${formatF11(F11Y0)} ${Math.round(
-            distance
-        )}k ${duration}`;
+            totalDuration = moment.duration(this._totalDistance / speedFactor, "minutes").humanize(true),
+            textDirection = `${compass} (${Math.round(degrees)}°) \u2606 F11: ${formatF11(
+                F11X0
+            )}\u202f/\u202f${formatF11(F11Y0)}`;
+        let textDistance = `${Math.round(distance)}k ${duration}`;
+        const textLines = 2;
         if (this._lineData.length > 2) {
-            text += ` (total ${Math.round(this._totalDistance)}k ${totalDuration})`;
+            textDistance += ` \u2606 total ${Math.round(this._totalDistance)}k ${totalDuration}`;
         }
 
         this.gCompass
@@ -97,16 +99,23 @@ export default class Course {
             .attr("x", x0)
             .attr("y", y0);
         const textBackgroundBox = svg.append("rect");
-        const textBox = svg
+        const textDirectionBox = svg
             .append("text")
-            .attr("x", "50%")
-            .attr("y", "50%")
-            .text(text);
+            .attr("x", "10%")
+            .attr("y", "33%")
+            .text(textDirection);
 
-        const bbox = textBox.node().getBBox();
+        const textDistanceBox = svg
+            .append("text")
+            .attr("x", "10%")
+            .attr("y", "66%")
+            .text(textDistance);
 
-        const height = bbox.height + this._fontSize,
-            width = bbox.width + this._fontSize;
+        const bbTextDirectionBox = textDirectionBox.node().getBBox(),
+            bbTextDistanceBox = textDistanceBox.node().getBBox();
+
+        const height = (bbTextDirectionBox.height + this._fontSize) * textLines * 1.1,
+            width = (Math.max(bbTextDirectionBox.width, bbTextDistanceBox.width) + this._fontSize) * 1.1;
         textBackgroundBox
             .attr("x", 0)
             .attr("y", 0)
