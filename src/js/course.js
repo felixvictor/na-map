@@ -5,8 +5,11 @@
 /* global d3 : false
  */
 
+import moment from "moment";
+import "moment/locale/en-gb";
+
 import { convertInvCoordX, convertInvCoordY } from "./common";
-import { degreesToCompass, rotationAngleInDegrees, distancePoints } from "./util";
+import { degreesToCompass, rotationAngleInDegrees, distancePoints, formatF11 } from "./util";
 
 export default class Course {
     constructor(fontSize) {
@@ -70,9 +73,19 @@ export default class Course {
             F11Y0 = convertInvCoordY(x0, y0),
             F11X1 = convertInvCoordX(x1, y1),
             F11Y1 = convertInvCoordY(x1, y1),
-            kFactor = 400 * 2.56,
+            factor = 2.56,
+            kFactor = 400 * factor,
+            speedFactor = 19 / factor,
             distance = distancePoints([F11X0, F11Y0], [F11X1, F11Y1]) / kFactor;
-        console.log([F11X0, F11Y0], [F11X1, F11Y1]);
+        this._totalDistance += distance;
+        const duration = moment.duration(distance / speedFactor, "minutes").humanize(true),
+            totalDuration = moment.duration(this._totalDistance / speedFactor, "minutes").humanize(true);
+        let text = `${compass} (${Math.round(degrees)}°) F11: ${formatF11(F11X0)} ${formatF11(F11Y0)} ${Math.round(
+            distance
+        )}k ${duration}`;
+        if (this._lineData.length > 2) {
+            text += ` (total ${Math.round(this._totalDistance)}k ${totalDuration})`;
+        }
 
         this.gCompass
             .datum(this._lineData)
@@ -83,18 +96,18 @@ export default class Course {
             .append("svg")
             .attr("x", x0)
             .attr("y", y0);
-        const rect = svg.append("rect");
-        const text = svg
+        const textBackgroundBox = svg.append("rect");
+        const textBox = svg
             .append("text")
             .attr("x", "50%")
             .attr("y", "50%")
-            .text(`${compass} (${Math.round(degrees)}°) ${Math.round(distance)}k`);
+            .text(text);
 
-        const bbox = text.node().getBBox();
+        const bbox = textBox.node().getBBox();
 
         const height = bbox.height + this._fontSize,
             width = bbox.width + this._fontSize;
-        rect
+        textBackgroundBox
             .attr("x", 0)
             .attr("y", 0)
             .attr("height", height)
@@ -122,6 +135,7 @@ export default class Course {
 
     clearMap() {
         this._bFirstCoord = true;
+        this._totalDistance = 0;
         if (typeof this._lineData !== "undefined") {
             this._lineData.splice(0, this._lineData.length);
         }
