@@ -31,17 +31,20 @@ export default class Course {
             .append("marker")
             .attr("id", "course-arrow")
             .attr("viewBox", "0 -5 10 10")
-            .attr("refX", 5)
+            .attr("refX", 8)
             .attr("refY", 0)
-            .attr("markerWidth", 4)
-            .attr("markerHeight", 4)
+            .attr("markerWidth", 5)
+            .attr("markerHeight", 5)
             .attr("orient", "auto")
             .append("path")
             .attr("d", "M0,-5L10,0L0,5")
             .attr("class", "course-head");
     }
 
-    _printCompass(x, y) {
+    _printCompass() {
+        const pos = this._lineData.length - 1,
+            x = this._lineData[pos][0],
+            y = this._lineData[pos][1];
         this._g
             .append("image")
             .classed("compass", true)
@@ -54,29 +57,21 @@ export default class Course {
         this.gCompass = this._g.append("path");
     }
 
-    _printLine(x, y) {
-        const degrees = rotationAngleInDegrees(
-                this._lineData[this._lineData.length - 1],
-                this._lineData[this._lineData.length - 2]
-            ),
+    _printLine() {
+        const pos0 = this._lineData.length - 1,
+            pos1 = this._lineData.length - 2,
+            degrees = rotationAngleInDegrees(this._lineData[pos0], this._lineData[this._lineData.length - 2]),
             compass = degreesToCompass(degrees),
-            F11X0 = convertInvCoordX(
-                this._lineData[this._lineData.length - 1][0],
-                this._lineData[this._lineData.length - 1][1]
-            ),
-            F11Y0 = convertInvCoordY(
-                this._lineData[this._lineData.length - 1][0],
-                this._lineData[this._lineData.length - 1][1]
-            ),
-            F11X1 = convertInvCoordX(
-                this._lineData[this._lineData.length - 2][0],
-                this._lineData[this._lineData.length - 2][1]
-            ),
-            F11Y1 = convertInvCoordY(
-                this._lineData[this._lineData.length - 2][0],
-                this._lineData[this._lineData.length - 2][1]
-            ),
-            distance = distancePoints([F11X0, F11Y0], [F11X1, F11Y1]) / 400;
+            x0 = this._lineData[pos0][0],
+            y0 = this._lineData[pos0][1],
+            x1 = this._lineData[pos1][0],
+            y1 = this._lineData[pos1][1],
+            F11X0 = convertInvCoordX(x0, y0),
+            F11Y0 = convertInvCoordY(x0, y0),
+            F11X1 = convertInvCoordX(x1, y1),
+            F11Y1 = convertInvCoordY(x1, y1),
+            kFactor = 400 * 2.56,
+            distance = distancePoints([F11X0, F11Y0], [F11X1, F11Y1]) / kFactor;
         console.log([F11X0, F11Y0], [F11X1, F11Y1]);
 
         this.gCompass
@@ -86,8 +81,8 @@ export default class Course {
 
         const svg = this._g
             .append("svg")
-            .attr("x", x)
-            .attr("y", y);
+            .attr("x", x0)
+            .attr("y", y0);
         const rect = svg.append("rect");
         const text = svg
             .append("text")
@@ -114,10 +109,10 @@ export default class Course {
         }
         this._lineData.push([x, y]);
         if (this._bFirstCoord) {
-            this._printCompass(x, y);
+            this._printCompass();
             this._bFirstCoord = !this._bFirstCoord;
         } else {
-            this._printLine(x, y);
+            this._printLine();
         }
     }
 
