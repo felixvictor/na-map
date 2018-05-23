@@ -10,7 +10,7 @@
     <meta content="Yet another map with in-game map, F11 coordinates, resources. Port data is updated constantly from twitter and daily after maintenance." property="og:description">
 
     <meta content="width=device-width,initial-scale=1" name="viewport">
-    <meta content="https://na-map-test.netlify.com/images/na-map-brand.jpg" property="og:image">
+    <meta content="https://na-map-test.netlify.com/images/icons/favicon-32x32.png" property="og:image">
 
     <link href="images/icons/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png">
     <link href="images/icons/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png">
@@ -19,19 +19,19 @@
     <meta content="images/icons/browserconfig.xml" name="msapplication-config">
 
     <script src="https://www.googletagmanager.com/gtag/js?id=UA-109520372-1" async></script>
-<link href="na-map.min.css?ee0ab40c6914f7ad2db6" rel="stylesheet" crossorigin="anonymous" integrity="sha256-sQJvbqExxVIH0SBuXUAPzsd6Mn8b3Gxql/LvrabxbV8= sha384-kr8D5Tuv4YbN41eyAaR4mz6v+3XpxvSCb2K2Y2OssU5uVpcDH451hoEDGPS0Ltrt"></head>
+<link href="na-map.min.css?3d0149470babad942503" rel="stylesheet"></head>
 <body>
 
 <nav class="bg-light fixed-top navbar navbar-expand-lg navbar-light">
-    <a class="navbar-brand" href="#"><img alt="Brand" height="30" src="images/na-map-brand.jpg" width="30"></a>
+    <a href="#" class="navbar-brand"><img alt="Brand" height="32" src="images/icons/favicon-32x32.png" width="32"></a>
     <button class="navbar-toggler" type="button" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation" data-target="#navbarSupportedContent" data-toggle="collapse">
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
+        <ul class="mr-auto navbar-nav">
 
             <li class="nav-item pr-2 dropdown">
-                <a class="dropdown-toggle nav-link" href="#" id="predictDropdown" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
+                <a href="#" class="dropdown-toggle nav-link" id="predictDropdown" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
                     Wind prediction
                 </a>
                 <div class="dropdown-menu" id="predictMenu" aria-labelledby="predictDropdown">
@@ -57,7 +57,7 @@
             </li>
 
             <li class="nav-item pr-2 dropdown">
-                <a class="dropdown-toggle nav-link" href="#" id="moveToDropdown" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
+                <a href="#" class="dropdown-toggle nav-link" id="moveToDropdown" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
                     Move to F11
                 </a>
                 <div class="dropdown-menu large-width p-2" id="moveToMenu" aria-labelledby="moveToDropdown">
@@ -95,40 +95,42 @@
             </li>
 
             <li class="nav-item pr-2 dropdown">
-                <a class="dropdown-toggle nav-link" href="#" id="propertyDropdown" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
+                <a href="#" class="dropdown-toggle nav-link" id="propertyDropdown" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
                     Select ports on
                 </a>
                 <div class="dropdown-menu" id="propertyMenu" aria-labelledby="propertyDropdown">
-                    <a class="dropdown-item dropdown-toggle" href="#">Property</a>
+                    <h6 class="dropdown-header">Property</h6>
+                    <a href="#" class="dropdown-item dropdown-toggle">Select</a>
                     <div class="dropdown-menu">
-                        <a class="dropdown-item" href="#" id="menu-prop-deep">Deep water</a>
-                        <a class="dropdown-item" href="#" id="menu-prop-shallow">Shallow water</a>
+                        <a href="#" class="dropdown-item" id="menu-prop-deep">Deep water</a>
+                        <a href="#" class="dropdown-item" id="menu-prop-shallow">Shallow water</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#" id="menu-prop-all">Available to all</a>
-                        <a class="dropdown-item" href="#" id="menu-prop-green">Green zone</a>
+                        <a href="#" class="dropdown-item" id="menu-prop-all">Available to all</a>
+                        <a href="#" class="dropdown-item" id="menu-prop-green">Green zone</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#" id="menu-prop-large">1st rate AI</a>
-                        <a class="dropdown-item" href="#" id="menu-prop-medium">4th rate AI</a>
-                        <a class="dropdown-item" href="#" id="menu-prop-small">6th rate AI</a>
+                        <a href="#" class="dropdown-item" id="menu-prop-large">1st rate AI</a>
+                        <a href="#" class="dropdown-item" id="menu-prop-medium">4th rate AI</a>
+                        <a href="#" class="dropdown-item" id="menu-prop-small">6th rate AI</a>
                     </div>
 
-                    <a class="dropdown-item" href="#" id="menu-prop-cm">
+                    <div class="dropdown-divider"></div>
+                    <h6 class="dropdown-header">Conquest mark</h6>
+                    <a href="#" class="dropdown-item" id="menu-prop-cm">
                         <label for="prop-cm"></label><select id="prop-cm" name="prop-cm" class="select"></select>
                     </a>
 
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Port owner</h6>
-                    <a class="dropdown-item" href="#" id="menu-prop-nation">
+                    <a href="#" class="dropdown-item" id="menu-prop-nation">
                         <label for="prop-nation"></label><select id="prop-nation" name="prop-nation" class="select"></select>
                     </a>
-                    <a class="dropdown-item" href="#" id="menu-prop-clan">
+                    <a href="#" class="dropdown-item" id="menu-prop-clan">
                         <label for="prop-clan"></label><select id="prop-clan" name="prop-clan" class="select"></select>
                     </a>
 
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Port battle</h6>
-
-                    <a class="dropdown-item dropdown-toggle" href="#">Time range set by port owner</a>
+                    <a href="#" class="dropdown-item dropdown-toggle">Time range set by port owner</a>
                     <div class="dropdown-menu col-sm-10">
                         <div class="dropdown-item" id="menu-prop-pb-range">
                             <form id="prop-pb-range">
@@ -159,16 +161,16 @@
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Port capture</h6>
 
-                    <a class="dropdown-item dropdown-toggle" href="#">Fixed date range</a>
+                    <a href="#" class="dropdown-item dropdown-toggle">Fixed date range</a>
                     <div class="dropdown-menu">
-                        <a class="dropdown-item" href="#" id="menu-prop-today">Today</a>
-                        <a class="dropdown-item" href="#" id="menu-prop-yesterday">Yesterday</a>
-                        <a class="dropdown-item" href="#" id="menu-prop-this-week">This week</a>
-                        <a class="dropdown-item" href="#" id="menu-prop-last-week">Last week</a>
+                        <a href="#" class="dropdown-item" id="menu-prop-today">Today</a>
+                        <a href="#" class="dropdown-item" id="menu-prop-yesterday">Yesterday</a>
+                        <a href="#" class="dropdown-item" id="menu-prop-this-week">This week</a>
+                        <a href="#" class="dropdown-item" id="menu-prop-last-week">Last week</a>
                     </div>
 
-                    <a class="dropdown-item dropdown-toggle" href="#" id="menu-prop-range">Free date range</a>
-                    <div class="dropdown-menu col-sm-7">
+                    <a href="#" class="dropdown-item dropdown-toggle" id="menu-prop-range">Free date range</a>
+                    <div class="dropdown-menu col-sm-10">
                         <div class="dropdown-item" id="menu-prop-range">
                             <form id="prop-range">
                                 <div class="form-group row">
@@ -207,27 +209,41 @@
                 </select>
             </li>
         </ul>
+        <button class="btn btn-outline-secondary mr-auto" type="button" id="reset">Clear</button>
 
         <ul class="ml-auto navbar-nav">
 
             <li class="nav-item pr-2 dropdown">
-                <a class="dropdown-toggle nav-link" href="#" id="extraDropdown" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
+                <a href="#" class="dropdown-toggle nav-link" id="extraDropdown" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
                     Tools
                 </a>
                 <div class="dropdown-menu dropdown-menu-right" id="extraMenu" aria-labelledby="extraDropdown">
 
                     <a class="dropdown-item" id="button-ship-compare">Ship comparison</a>
-                    <a class="dropdown-item" href="port-battle.xlsx" download="port-battle-calculator.xlsx">Download
+                    <a href="port-battle.xlsx" class="dropdown-item" download="port-battle-calculator.xlsx">Download
                         port battle calculator</a>
                 </div>
             </li>
 
             <li class="nav-item pr-2 dropdown">
-                <a class="dropdown-toggle nav-link" href="#" id="settingsDropdown" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
+                <a href="#" class="dropdown-toggle nav-link" id="settingsDropdown" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
                     Settings
                 </a>
                 <div class="dropdown-menu dropdown-menu-right extralarge-width" id="settingsMenu" aria-labelledby="settingsDropdown">
 
+                    <h6 class="dropdown-header">Game server</h6>
+                    <div class="align-self-center col-auto radio-group ml-1" id="server-name">
+                        <div class="custom-control custom-control-inline custom-radio">
+                            <input class="custom-control-input" id="server-name-eu1" type="radio" name="serverName" value="eu1">
+                            <label for="server-name-eu1" class="custom-control-label">Caribbean</label>
+                        </div>
+                        <div class="custom-control custom-control-inline custom-radio">
+                            <input class="custom-control-input" id="server-name-eu2" type="radio" name="serverName" value="eu2">
+                            <label for="server-name-eu2" class="custom-control-label">PvE only</label>
+                        </div>
+                    </div>
+
+                    <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Show per port</h6>
                     <div class="align-self-center col-auto radio-group ml-1" id="show-radius">
                         <div class="custom-control custom-control-inline custom-radio">
@@ -243,8 +259,8 @@
                             <label for="show-radius-net" class="custom-control-label">Net income</label>
                         </div>
                         <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="show-radius-no" type="radio" name="showRadius" value="no">
-                            <label for="show-radius-no" class="custom-control-label">Off</label>
+                            <input class="custom-control-input" id="show-radius-off" type="radio" name="showRadius" value="off">
+                            <label for="show-radius-off" class="custom-control-label">Off</label>
                         </div>
                     </div>
 
@@ -260,8 +276,8 @@
                             <label for="show-pb-single" class="custom-control-label">Single port</label>
                         </div>
                         <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="show-pb-no" type="radio" name="showPB" value="no">
-                            <label for="show-pb-no" class="custom-control-label">Off</label>
+                            <input class="custom-control-input" id="show-pb-off" type="radio" name="showPB" value="off">
+                            <label for="show-pb-off" class="custom-control-label">Off</label>
                         </div>
 
                     </div>
@@ -278,8 +294,8 @@
                             <label for="show-layer-teleport" class="custom-control-label">Teleport areas</label>
                         </div>
                         <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="show-layer-no" type="radio" name="showLayer" value="no">
-                            <label for="show-layer-no" class="custom-control-label">Off</label>
+                            <input class="custom-control-input" id="show-layer-off" type="radio" name="showLayer" value="off">
+                            <label for="show-layer-off" class="custom-control-label">Off</label>
                         </div>
                     </div>
 
@@ -299,14 +315,14 @@
                 </div>
             </li>
         </ul>
-        <button class="btn btn-outline-secondary" type="reset" id="reset">Clear</button>
+        <button class="btn btn-outline-secondary" type="button" id="about">About</button>
     </div>
 </nav>
 
 <div class="na" id="na">
 </div>
 
-<section class="modal" data-backdrop="static" data-keyboard="false" id="modal-greetings" role="dialog" tabindex="-1">
+<section class="modal" data-backdrop="static" data-keyboard="false" id="modal-about" role="dialog" tabindex="-1">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <header class="modal-header">
@@ -314,14 +330,13 @@
             </header>
             <div class="modal-body">
                 <p>Yet another map which uses the in-game map and live data (daily updated soonish after maintenance).
-                    Please check the <a href="http://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/">
+                    Please check the <a href="https://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/">
                         Game-Labs forum post</a> for further details. Feedback is very welcome.</p>
-                <p>Designed by iB aka Felix Victor.</p>
+                <p>Designed by iB aka Felix Victor, clan <a href="https://bccnavalaction.freeforums.net/">British
+                        Captains’ Club (BCC)</a>.</p>
             </div>
             <footer class="modal-footer">
-                <button class="btn btn-secondary" type="button" data-dismiss="modal" data-server="eu1">Caribbean
-                </button>
-                <button class="btn btn-secondary" type="button" data-dismiss="modal" data-server="eu2">PvE only</button>
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Close</button>
             </footer>
         </div>
     </div>
@@ -364,5 +379,5 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.slim.min.js" crossorigin="anonymous" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"></script>
 <script src="https://unpkg.com/d3@5.4.0/dist/d3.min.js" crossorigin="anonymous" integrity="sha384-Ha//YQhNUuPzmPKgC8aYpurZcTiV3JhEvEhH5uGW0IRjBfEgDQxvo0aF1Gef+blI"></script>
-<script src="na-map.min.js?ee0ab40c6914f7ad2db6" crossorigin="anonymous" integrity="sha256-3q46e6Zlkktx3Z0A17u61Lpa0BvM8CAbc1U5HKGM1W4= sha384-ucjAWMMtCd3B7gPkRYmN1B5bKbdtG+ryQuuyxVLqXqoZ4hGDg55UzrAAqmSSwt+L" type="text/javascript"></script></body>
+<script src="na-map.min.js?3d0149470babad942503" type="text/javascript"></script></body>
 </html>
