@@ -100,7 +100,7 @@ export default class PortSelect {
         this._propNation.on("change", event => this._nationSelected(event)).selectpicker(selectPickerDefaults);
         selectPickerDefaults.noneSelectedText = "Select clan";
         this._propClan.on("change", event => this._clanSelected(event)).selectpicker(selectPickerDefaults);
-        selectPickerDefaults.noneSelectedText = "Select conquest mark";
+        selectPickerDefaults.noneSelectedText = "Select";
         this._propCM
             .on("change", event => {
                 event.preventDefault();
@@ -319,8 +319,10 @@ export default class PortSelect {
                     port.properties.isSource = false;
                     return port;
                 });
+
+        this._ports.setShowRadiusSetting("off");
         this._ports.setPortData(sourcePorts.concat(consumingPorts), true);
-        this._ports.update(good);
+        this._ports.update();
     }
 
     _nationSelected(event) {
@@ -422,7 +424,7 @@ export default class PortSelect {
     }
 
     _filterCaptured(begin, end) {
-        // console.log("Between %s and %s", begin.format("dddd D MMMM YYYY h:mm"), end.format("dddd D MMMM YYYY h:mm"));
+        // console.log("Between %s and %s", begin.format("dddd D MMMM YYYY H:mm"), end.format("dddd D MMMM YYYY H:mm"));
         const portId = new Set();
         this._ports.pbData.ports
             .filter(port => moment(port.lastPortBattle).isBetween(begin, end, null, "(]"))
