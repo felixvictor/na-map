@@ -6,7 +6,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-$background-colour: $primary-300;
+$background-colour: $primary-500;
 
 #na-svg {
     background-color: $background-colour;
@@ -17,13 +17,25 @@ select {
     min-width: 15em;
 }
 
+// port icons (available to nation)
+pattern .nation {
+    fill: $primary-500;
+    fill-opacity: 0.3;
+}
+
+// port icons (available to all)
+pattern .all {
+    fill: $primary-200;
+    fill-opacity: 0.8;
+}
+
 .axis {
     line {
-        stroke: $primary-700;
+        stroke: $primary-600;
         opacity: 0.5;
     }
     text {
-        fill: $primary-800;
+        fill: $primary-700;
     }
 }
 
@@ -37,6 +49,10 @@ p {
         vertical-align: top;
         border-top: none;
     }
+}
+
+.wood td + td {
+    text-align: right;
 }
 
 .ship tbody {
@@ -58,6 +74,7 @@ p {
 .pos {
     fill: $green;
 }
+
 .neg {
     fill: $red;
 }
@@ -131,7 +148,7 @@ p {
 .aster-score {
     line-height: 1em;
     text-anchor: middle;
-    alignment-baseline: central;
+    dominant-baseline: central;
 }
 
 .outlineArc {
@@ -159,11 +176,11 @@ text {
 }
 
 .extralarge-width {
-    min-width: 35em;
+    min-width: 25em;
 }
 
 .large-width {
-    min-width: 25em;
+    min-width: 18em;
 }
 
 .left-margin {
@@ -206,11 +223,11 @@ text {
 
 .fort {
     fill: $red;
-    opacity: 0.7;
+    opacity: 0.8;
 }
 
 .tower {
-    fill: $secondary-900;
+    fill: $secondary-800;
     opacity: 0.7;
 }
 
@@ -246,7 +263,7 @@ text {
         font-size: 1em;
         fill: $secondary-800;
         text-anchor: middle;
-        alignment-baseline: central;
+        dominant-baseline: central;
         &.des {
             fill: $secondary-700 !important;
         }
@@ -262,10 +279,15 @@ text {
     }
 }
 
-
 .f11 {
-  text {
-    text-anchor: end;
+    text {
+        text-anchor: end;
+    }
+}
+
+.coord {
+    text {
+        text-anchor: start;
     }
 }
 
@@ -295,10 +317,12 @@ text {
 .wind,
 .wind-text {
     font-size: 1.2em !important;
+    text-anchor: middle !important;
 }
 
 .wind-text-current {
     font-size: 1em !important;
+    text-anchor: middle !important;
 }
 
 .rs-tooltip-text {
@@ -375,10 +399,6 @@ text {
     }
 }
 
-.dummy-brand {
-    background-image: url("~Images/na-map-brand.jpg");
-}
-
 .dummy-svg {
     background-image: url("~Icons/compass.svg");
 }
@@ -390,9 +410,6 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
     @each $flag in $flags {
         .flag-icon.#{$flag} {
             background-image: url("#{$flags-dir}/#{$flag}.svg");
-        }
-        .flag-icon.#{$flag}a {
-            background-image: url("#{$flags-dir}/#{$flag}a.svg");
         }
     }
 }

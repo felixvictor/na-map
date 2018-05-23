@@ -11,7 +11,7 @@
 /* global d3 : false
  */
 
-import { formatF11 } from "./util";
+import { formatF11, roundToThousands } from "./util";
 import { convertInvCoordX, convertInvCoordY } from "./common";
 
 /**
@@ -81,7 +81,7 @@ export default class Grid {
          * @type {Number}
          * @private
          */
-        this._defaultFontSize = 16;
+        this._defaultFontSize = this._map.rem;
 
         /**
          * Text padding in px
@@ -90,8 +90,8 @@ export default class Grid {
          */
         this._textPadding = this._defaultFontSize / 2;
 
-        this._xBackgroundHeight = "3em";
-        this._yBackgroundWidth = "4em";
+        this._xBackgroundHeight = this._map.xGridBackgroundHeight;
+        this._yBackgroundWidth = this._map.yGridBackgroundWidth;
 
         this._setupSvg();
     }
@@ -273,7 +273,9 @@ export default class Grid {
             ty = d3.event ? d3.event.transform.y : 0,
             dx = ty / tk < this._width ? ty / tk : 0;
         this._gXAxis.call(this._xAxis.tickPadding(-this._maxCoord - dx));
-        this._gXAxis.attr("font-size", this._defaultFontSize / tk).attr("stroke-width", 1 / tk);
+        this._gXAxis
+            .attr("font-size", roundToThousands(this._defaultFontSize / tk))
+            .attr("stroke-width", roundToThousands(1 / tk));
         this._gXAxis.select(".domain").remove();
     }
 
@@ -287,7 +289,9 @@ export default class Grid {
             tx = d3.event ? d3.event.transform.x : 0,
             dy = tx / tk < this._height ? tx / tk : 0;
         this._gYAxis.call(this._yAxis.tickPadding(-this._maxCoord - dy));
-        this._gYAxis.attr("font-size", this._defaultFontSize / tk).attr("stroke-width", 1 / tk);
+        this._gYAxis
+            .attr("font-size", roundToThousands(this._defaultFontSize / tk))
+            .attr("stroke-width", roundToThousands(1 / tk));
         this._gYAxis.select(".domain").remove();
     }
 
