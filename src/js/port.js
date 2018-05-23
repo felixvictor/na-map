@@ -37,8 +37,8 @@ export default class PortDisplay {
         this._attackRadius = d3.scaleLinear().domain([0, 1]);
         this._colourScale = d3
             .scaleLinear()
-            .domain([0, 0.07, 0.95, 1])
-            .range(["#eadfdf", "#8b989c", "#6b7478", "#a62e39"]);
+            .domain([0, 0.1, 0.5, 1])
+            .range(["#eaeded", "#8b989c", "#6b7478", "#a62e39"]);
 
         this._minRadiusFactor = 1;
         this._maxRadiusFactor = 6;
