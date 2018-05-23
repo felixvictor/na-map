@@ -197,6 +197,10 @@ export default function naDisplay(serverName) {
             $("#doubleClick-action").change(() => this._doubleClickSelected());
 
             $("#show-layer").change(() => this._showLayerSelected());
+
+            $("#about").on("click", () => {
+                this._showAbout();
+            });
         }
 
         _setupSvg() {
@@ -391,6 +395,10 @@ export default function naDisplay(serverName) {
             $(".selectpicker")
                 .val("default")
                 .selectpicker("refresh");
+        }
+
+        _showAbout() {
+            $("#modal-about").modal("show");
         }
 
         _doDoubleClickAction(self) {
