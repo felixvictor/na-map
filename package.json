@@ -1,6 +1,6 @@
 {
   "name": "na-map",
-  "version": "4.6.2",
+  "version": "5",
   "devDependencies": {
     "@babel/core": "7.0.0-beta.46",
     "@babel/highlight": "^7.0.0-beta.46",
