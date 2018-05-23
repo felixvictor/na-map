@@ -53,7 +53,7 @@ export default class WindPrediction {
             .attr("orient", "auto")
             .append("path")
             .attr("d", "M0,-5L10,0L0,5")
-            .attr("class", "wind-head");
+            .classed("wind-head", true);
     }
 
     static _setupForm() {
