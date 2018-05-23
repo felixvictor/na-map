@@ -264,3 +264,8 @@ export const getTextFromFetch = response => response.text();
 export const putFetchError = error => {
     console.log("Request failed -->", error);
 };
+
+/**
+ * {@link https://stackoverflow.com/questions/1026069/how-do-i-make-the-first-letter-of-a-string-uppercase-in-javascript}
+ */
+export const capitalizeFirstLetter = string => string.charAt(0).toUpperCase() + string.slice(1);
