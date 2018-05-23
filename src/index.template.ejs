@@ -109,7 +109,8 @@
                     Select ports on
                 </a>
                 <div class="dropdown-menu" id="propertyMenu" aria-labelledby="propertyDropdown">
-                    <a class="dropdown-item dropdown-toggle" href="#">Property</a>
+                    <h6 class="dropdown-header">Property</h6>
+                    <a class="dropdown-item dropdown-toggle" href="#">Select</a>
                     <div class="dropdown-menu">
                         <a class="dropdown-item" id="menu-prop-deep" href="#">Deep water</a>
                         <a class="dropdown-item" id="menu-prop-shallow" href="#">Shallow water</a>
@@ -122,6 +123,8 @@
                         <a class="dropdown-item" id="menu-prop-small" href="#">6th rate AI</a>
                     </div>
 
+                    <div class="dropdown-divider"></div>
+                    <h6 class="dropdown-header">Conquest mark</h6>
                     <a class="dropdown-item" id="menu-prop-cm" href="#">
                         <label for="prop-cm"></label><select class="select" name="prop-cm"
                                                              id="prop-cm"></select>
@@ -139,7 +142,6 @@
 
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Port battle</h6>
-
                     <a class="dropdown-item dropdown-toggle" href="#">Time range set by port owner</a>
                     <div class="dropdown-menu col-sm-10">
                         <div class="dropdown-item" id="menu-prop-pb-range">
@@ -187,7 +189,7 @@
                     </div>
 
                     <a class="dropdown-item dropdown-toggle" id="menu-prop-range" href="#">Free date range</a>
-                    <div class="dropdown-menu col-sm-7">
+                    <div class="dropdown-menu col-sm-10">
                         <div class="dropdown-item" id="menu-prop-range">
                             <form id="prop-range">
                                 <div class="form-group row">
@@ -233,6 +235,7 @@
                 </select>
             </li>
         </ul>
+        <button id="reset" type="button" class="btn btn-outline-secondary mr-auto">Clear</button>
 
         <ul class="navbar-nav ml-auto">
 
@@ -258,6 +261,21 @@
                 <div class="dropdown-menu dropdown-menu-right extralarge-width" id="settingsMenu"
                      aria-labelledby="settingsDropdown">
 
+                    <h6 class="dropdown-header">Game server</h6>
+                    <div class="col-auto align-self-center radio-group ml-1" id="server-name">
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input"
+                                   name="serverName" id="server-name-eu1" value="eu1">
+                            <label class="custom-control-label" for="server-name-eu1">Caribbean</label>
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input"
+                                   name="serverName" id="server-name-eu2" value="eu2">
+                            <label class="custom-control-label" for="server-name-eu2">PvE only</label>
+                        </div>
+                    </div>
+
+                    <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Show per port</h6>
                     <div class="col-auto align-self-center radio-group ml-1" id="show-radius">
                         <div class="custom-control custom-radio custom-control-inline">
@@ -341,14 +359,14 @@
                 </div>
             </li>
         </ul>
-        <button id="reset" type="reset" class="btn btn-outline-secondary">Clear</button>
+        <button id="about" type="button" class="btn btn-outline-secondary">About</button>
     </div>
 </nav>
 
 <div id="na" class="na">
 </div>
 
-<section id="modal-greetings" class="modal" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog">
+<section id="modal-about" class="modal" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <header class="modal-header">
@@ -357,14 +375,14 @@
             </header>
             <div class="modal-body">
                 <p>Yet another map which uses the in-game map and live data (daily updated soonish after maintenance).
-                    Please check the <a href="http://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/">
+                    Please check the <a
+                            href="https://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/">
                         Game-Labs forum post</a> for further details. Feedback is very welcome.</p>
-                <p>Designed by iB aka Felix Victor.</p>
+                <p>Designed by iB aka Felix Victor, clan <a href="https://bccnavalaction.freeforums.net/">British
+                        Captains’ Club (BCC)</a>.</p>
             </div>
             <footer class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal" data-server="eu1">Caribbean
-                </button>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal" data-server="eu2">PvE only</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </footer>
         </div>
     </div>

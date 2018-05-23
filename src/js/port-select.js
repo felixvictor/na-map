@@ -100,7 +100,7 @@ export default class PortSelect {
         this._propNation.on("change", event => this._nationSelected(event)).selectpicker(selectPickerDefaults);
         selectPickerDefaults.noneSelectedText = "Select clan";
         this._propClan.on("change", event => this._clanSelected(event)).selectpicker(selectPickerDefaults);
-        selectPickerDefaults.noneSelectedText = "Select conquest mark";
+        selectPickerDefaults.noneSelectedText = "Select";
         this._propCM
             .on("change", event => {
                 event.preventDefault();
