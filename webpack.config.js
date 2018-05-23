@@ -6,8 +6,8 @@ const webpack = require("webpack");
 const path = require("path");
 const PACKAGE = require("./package.json");
 const CopyPlugin = require("copy-webpack-plugin"),
-    ExtractTextPlugin = require("extract-text-webpack-plugin"),
     HtmlPlugin = require("html-webpack-plugin"),
+    MiniCssExtractPlugin = require("mini-css-extract-plugin"),
     MinifyPlugin = require("babel-minify-webpack-plugin"),
     SitemapPlugin = require("sitemap-webpack-plugin").default,
     SriPlugin = require("webpack-subresource-integrity");
@@ -36,7 +36,14 @@ const cssOpt = {
     sourceMap: true
 };
 
-const minifyOpt = {
+const minifyMinifyOpt = {
+    numericLiterals: false,
+    removeDebugger: true
+};
+
+const pluginMinifyOpt = { comments: false };
+
+const htmlMinifyOpt = {
     collapseBooleanAttributes: true,
     collapseWhitespace: false,
     collapseInlineTagWhitespace: true,
@@ -144,6 +151,19 @@ const config = {
         }
     },
 
+    optimization: {
+        splitChunks: {
+            cacheGroups: {
+                styles: {
+                    name: "styles",
+                    test: /\.css$/,
+                    chunks: "all",
+                    enforce: true
+                }
+            }
+        }
+    },
+
     output: {
         path: `${__dirname}/public`,
         filename: `${libraryName}.min.js`,
@@ -151,9 +171,8 @@ const config = {
     },
 
     plugins: [
-        new ExtractTextPlugin({
-            filename: `${libraryName}.min.css`,
-            allChunks: true
+        new MiniCssExtractPlugin({
+            filename: `${libraryName}.min.css`
         }),
         new webpack.ProvidePlugin({
             moment: "moment",
@@ -174,6 +193,7 @@ const config = {
             { from: "images/map", to: "../public/images/map" },
             { from: "images/icons", to: "../public/images/icons" },
             { from: "*.json" },
+            { from: "*.txt" },
             { from: "*.xlsx" },
             { from: "../netlify.toml" }
         ]),
@@ -183,18 +203,18 @@ const config = {
             hash: true,
             inject: "body",
             lang: "en-GB",
-            minify: minifyOpt,
+            minify: htmlMinifyOpt,
             template: "index.template.ejs",
             title: "Naval Action map",
             description:
                 "Yet another map with in-game map, F11 coordinates, resources. Port data is updated constantly from twitter and daily after maintenance.",
-            brand: "https://na-map-test.netlify.com/images/na-map-brand.jpg",
+            brand: "https://na-map-test.netlify.com/images/icons/favicon-32x32.png",
             version: PACKAGE.version
         }),
         new SitemapPlugin("https://na-map.netlify.com/", sitemapPaths, { skipGzip: false }),
         new SriPlugin({
             hashFuncNames: ["sha256", "sha384"],
-            enabled: process.env.NODE_ENV === "prod"
+            enabled: process.env.NODE_ENV === "production"
         })
     ],
 
@@ -211,23 +231,21 @@ const config = {
             {
                 test: /\.scss$/,
                 include: path.resolve(__dirname, "src/scss"),
-                use: ExtractTextPlugin.extract({
-                    fallback: "style-loader",
-                    use: [
-                        {
-                            loader: "css-loader",
-                            options: cssOpt
-                        },
-                        {
-                            loader: "postcss-loader",
-                            options: postcssOpt
-                        },
-                        {
-                            loader: "sass-loader",
-                            options: sassOpt
-                        }
-                    ]
-                })
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    {
+                        loader: "css-loader",
+                        options: cssOpt
+                    },
+                    {
+                        loader: "postcss-loader",
+                        options: postcssOpt
+                    },
+                    {
+                        loader: "sass-loader",
+                        options: sassOpt
+                    }
+                ]
             },
             {
                 test: /\.(woff2?|ttf|eot|svg)$/,
@@ -301,17 +319,14 @@ const config = {
     }
 };
 
-if (process.env.NODE_ENV === "prod") {
-    config.devtool = "";
-    config.plugins.push(
-        new MinifyPlugin({
-            mangle: true,
-            removeDebugger: true
-        })
-    );
-} else {
-    config.devtool = "eval-source-map";
-    config.plugins.push(new webpack.HotModuleReplacementPlugin(), new webpack.NoEmitOnErrorsPlugin());
-}
+module.exports = (env, argv) => {
+    if (argv.mode === "production") {
+        config.devtool = "";
+        config.plugins.push(new MinifyPlugin(minifyMinifyOpt, pluginMinifyOpt));
+    } else {
+        config.devtool = "eval-source-map";
+        config.plugins.push(new webpack.HotModuleReplacementPlugin(), new webpack.NoEmitOnErrorsPlugin());
+    }
 
-module.exports = config;
+    return config;
+};

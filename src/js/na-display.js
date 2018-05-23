@@ -19,7 +19,15 @@ import Cookies from "js-cookie";
 import "bootstrap/js/dist/tooltip";
 import "bootstrap/js/dist/util";
 
-import { nearestPow2, checkFetchStatus, getJsonFromFetch, putFetchError } from "./util";
+import { defaultFontSize } from "./common";
+import {
+    nearestPow2,
+    checkFetchStatus,
+    getJsonFromFetch,
+    getTextFromFetch,
+    putFetchError,
+    roundToThousands
+} from "./util";
 
 import Course from "./course";
 import F11 from "./f11";
@@ -30,6 +38,7 @@ import PortSelect from "./port-select";
 import ShipCompare from "./ship-compare";
 import Teleport from "./teleport";
 import WindPrediction from "./wind-prediction";
+import WoodCompare from "./wood-compare";
 
 /**
  * Display naval action map
@@ -37,7 +46,7 @@ import WindPrediction from "./wind-prediction";
  * @returns {void}
  */
 export default function naDisplay(serverName) {
-    let map, ports, teleport, portSelect, shipCompare, windPrediction, f11, course, grid, pbZone, shipData;
+    let map, ports, teleport, portSelect, shipCompare, woodCompare, windPrediction, f11, course, grid, pbZone, shipData, woodData;
 
     /** Main map */
     class NAMap {
@@ -46,10 +55,28 @@ export default function naDisplay(serverName) {
          */
         constructor() {
             /**
+             * Font size in px
+             * @type {Number}
+             */
+            this.rem = defaultFontSize;
+
+            /**
              * Left padding for brand icon
              * @type {Number}
              */
-            this._navbarBrandPaddingLeft = Math.floor(1.618 * 16); // equals 1.618rem
+            this._navbarBrandPaddingLeft = Math.floor(1.618 * this.rem); // equals 1.618rem
+
+            /**
+             * Left padding for brand icon
+             * @type {Number}
+             */
+            this.xGridBackgroundHeight = Math.floor(3 * this.rem);
+
+            /**
+             * Left padding for brand icon
+             * @type {Number}
+             */
+            this.yGridBackgroundWidth = Math.floor(4 * this.rem);
 
             /**
              * Margins of the map svg
@@ -98,7 +125,13 @@ export default function naDisplay(serverName) {
             this._PBZoneZoomThreshold = 1.5;
             this._labelZoomThreshold = 0.5;
 
-            this._minScale = nearestPow2(Math.min(this._width / this.coord.max, this._height / this.coord.max));
+            this.minScale = nearestPow2(Math.min(this._width / this.coord.max, this._height / this.coord.max));
+
+            /**
+             * Current map scale
+             * @type {Number}
+             */
+            this.currentScale = this.minScale;
 
             /**
              * DoubleClickAction cookie name
@@ -159,20 +192,30 @@ export default function naDisplay(serverName) {
                 .on("dblclick", (d, i, nodes) => this._doDoubleClickAction(nodes[i]));
 
             $("#reset").on("click", () => {
-                this.constructor._clearMap();
+                this._clearMap();
             });
 
             $("#doubleClick-action").change(() => this._doubleClickSelected());
 
             $("#show-layer").change(() => this._showLayerSelected());
+
+            $("#about").on("click", () => {
+                this._showAbout();
+            });
         }
 
         _setupSvg() {
             // noinspection JSSuspiciousNameCombination
             this._zoom = d3
                 .zoom()
-                .scaleExtent([this._minScale, this._maxScale])
-                .translateExtent([[this.coord.min, this.coord.min], [this.coord.max, this.coord.max]])
+                .scaleExtent([this.minScale, this._maxScale])
+                .translateExtent([
+                    [
+                        this.coord.min - this.yGridBackgroundWidth * this.minScale,
+                        this.coord.min - this.xGridBackgroundHeight * this.minScale
+                    ],
+                    [this.coord.max, this.coord.max]
+                ])
                 .wheelDelta(() => -this._wheelDelta * Math.sign(d3.event.deltaY))
                 .on("zoom", () => this._naZoomed());
 
@@ -221,7 +264,7 @@ export default function naDisplay(serverName) {
         _doubleClickSelected() {
             this._doubleClickAction = $("input[name='doubleClickAction']:checked").val();
             this._storeDoubleClickActionSetting();
-            this.constructor._clearMap();
+            this._clearMap();
         }
 
         /**
@@ -344,7 +387,7 @@ export default function naDisplay(serverName) {
                 .attr("height", this._tileSize);
         }
 
-        static _clearMap() {
+        _clearMap() {
             windPrediction.clearMap();
             course.clearMap();
             f11.clearMap();
@@ -353,6 +396,10 @@ export default function naDisplay(serverName) {
             $(".selectpicker")
                 .val("default")
                 .selectpicker("refresh");
+        }
+
+        _showAbout() {
+            $("#modal-about").modal("show");
         }
 
         _doDoubleClickAction(self) {
@@ -388,22 +435,23 @@ export default function naDisplay(serverName) {
             grid.update();
             teleport.setData();
             teleport.update();
-            ports.update();
+            ports.update(this.currentScale);
         }
 
         _setZoomLevelAndData() {
-            if (d3.event.transform.k > this._PBZoneZoomThreshold) {
-                if (this._zoomLevel !== "pbZone") {
-                    this._setZoomLevel("pbZone");
-                    this._updateCurrent();
+            if (d3.event.transform.k !== this.currentScale) {
+                this.currentScale = d3.event.transform.k;
+                if (this.currentScale > this._PBZoneZoomThreshold) {
+                    if (this._zoomLevel !== "pbZone") {
+                        this._setZoomLevel("pbZone");
+                    }
+                } else if (this.currentScale > this._labelZoomThreshold) {
+                    if (this._zoomLevel !== "portLabel") {
+                        this._setZoomLevel("portLabel");
+                    }
+                } else if (this._zoomLevel !== "initial") {
+                    this._setZoomLevel("initial");
                 }
-            } else if (d3.event.transform.k > this._labelZoomThreshold) {
-                if (this._zoomLevel !== "portLabel") {
-                    this._setZoomLevel("portLabel");
-                    this._updateCurrent();
-                }
-            } else if (this._zoomLevel !== "initial") {
-                this._setZoomLevel("initial");
                 this._updateCurrent();
             }
         }
@@ -430,7 +478,7 @@ export default function naDisplay(serverName) {
              */
             const zoomTransform = d3.zoomIdentity
                 .translate(Math.round(d3.event.transform.x), Math.round(d3.event.transform.y))
-                .scale(Math.round(d3.event.transform.k * 1000) / 1000);
+                .scale(roundToThousands(d3.event.transform.k));
 
             this._displayMap(zoomTransform);
             grid.transform(zoomTransform);
@@ -442,12 +490,11 @@ export default function naDisplay(serverName) {
         }
 
         _initialZoomAndPan() {
-            this._svg.call(this._zoom.scaleTo, this._minScale);
+            this._svg.call(this._zoom.scaleTo, this.minScale);
         }
 
         init() {
             this._setZoomLevel("initial");
-            this._updateCurrent();
             this._initialZoomAndPan();
             this._refreshLayer();
         }
@@ -473,23 +520,24 @@ export default function naDisplay(serverName) {
         Cookies.defaults = { expires: 365 };
 
         shipCompare = new ShipCompare(shipData);
+        woodCompare = new WoodCompare(woodData);
         teleport = new Teleport(map.coord.min, map.coord.max, ports);
         portSelect = new PortSelect(map, ports, pbZone);
         windPrediction = new WindPrediction(map.margin.left, map.margin.top);
         f11 = new F11(map);
         grid = new Grid(map);
-        course = new Course(ports.fontSizes.portLabel);
+        course = new Course(map.rem);
 
         moment.locale("en-gb");
         map.init();
-        ports.clearMap();
+        ports.clearMap(map.minScale);
     }
 
     function init(data) {
         map = new NAMap();
         // Read map data
         const portData = topojsonFeature(data.ports, data.ports.objects.ports).features;
-        ports = new PortDisplay(portData, data.pb, serverName, map.margin.top, map.margin.right);
+        ports = new PortDisplay(portData, data.pb, serverName, map.margin.top, map.margin.right, map.minScale);
 
         let pbZoneData = topojsonFeature(data.pbZones, data.pbZones.objects.pbZones);
         // Port ids of capturable ports
@@ -514,23 +562,53 @@ export default function naDisplay(serverName) {
         pbZone = new PBZone(pbZoneData, fortData, towerData, ports);
 
         shipData = JSON.parse(JSON.stringify(data.ships.shipData));
+        woodData = JSON.parse(JSON.stringify(data.woods));
 
         setup();
     }
 
-    const naMapJsonData = fetch(`${serverName}.json`)
+    function readData(cacheMode) {
+        const naMapJsonData = fetch(`${serverName}.json`, { cache: cacheMode })
+            .then(checkFetchStatus)
+            .then(getJsonFromFetch);
+        const pbJsonData = fetch(`${serverName}-pb.json`, { cache: cacheMode })
+            .then(checkFetchStatus)
+            .then(getJsonFromFetch);
+        const pbZonesJsonData = fetch("pb.json", { cache: cacheMode })
+            .then(checkFetchStatus)
+            .then(getJsonFromFetch);
+        const shipJsonData = fetch("ships.json", { cache: cacheMode })
+            .then(checkFetchStatus)
+            .then(getJsonFromFetch);
+        const woodJsonData = fetch("woods.json", { cache: cacheMode })
+            .then(checkFetchStatus)
+            .then(getJsonFromFetch);
+        Promise.all([naMapJsonData, pbJsonData, pbZonesJsonData, shipJsonData, woodJsonData])
+            .then(values => init({ ports: values[0], pb: values[1], pbZones: values[2], ships: values[3], woods: values[4] }))
+            .catch(putFetchError);
+    }
+
+    let cacheMode = "default";
+    const lastUpdateData = fetch("update.txt", { cache: cacheMode })
         .then(checkFetchStatus)
-        .then(getJsonFromFetch);
-    const pbJsonData = fetch(`${serverName}-pb.json`)
-        .then(checkFetchStatus)
-        .then(getJsonFromFetch);
-    const pbZonesJsonData = fetch("pb.json")
-        .then(checkFetchStatus)
-        .then(getJsonFromFetch);
-    const shipJsonData = fetch("ships.json")
-        .then(checkFetchStatus)
-        .then(getJsonFromFetch);
-    Promise.all([naMapJsonData, pbJsonData, pbZonesJsonData, shipJsonData])
-        .then(values => init({ ports: values[0], pb: values[1], pbZones: values[2], ships: values[3] }))
+        .then(getTextFromFetch);
+    Promise.all([lastUpdateData])
+        .then(values => {
+            let serverDayStart = moment()
+                .utc()
+                .hour(11)
+                .minute(0);
+            if (serverDayStart.isAfter(moment().utc())) {
+                serverDayStart = serverDayStart.subtract(1, "day");
+            }
+            const lastUpdate = moment(values[0], "YYYY-MM-DD H.mm");
+            // console.log(serverDayStart.format("dddd D MMMM YYYY H:mm"), lastUpdate.format("dddd D MMMM YYYY H:mm"));
+
+            if (lastUpdate.isBefore(serverDayStart, "hour")) {
+                cacheMode = "reload";
+            }
+        })
         .catch(putFetchError);
+
+    readData(cacheMode);
 }
