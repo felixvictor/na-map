@@ -9,34 +9,36 @@ import Cookies from "js-cookie";
 import moment from "moment";
 import "moment/locale/en-gb";
 
-import { nations } from "./common";
-import { formatInt, formatSiInt, formatPercent, checkFetchStatus, getJsonFromFetch } from "./util";
+import { nations, defaultFontSize, defaultCircleSize } from "./common";
+import { formatInt, formatSiInt, formatPercent, roundToThousands, degreesToRadians } from "./util";
 
 export default class PortDisplay {
-    constructor(portData, pbData, serverName, topMargin, rightMargin) {
+    constructor(portData, pbData, serverName, topMargin, rightMargin, minScale) {
         this.portDataDefault = portData;
         this._serverName = serverName;
         this._topMargin = topMargin;
         this._rightMargin = rightMargin;
+        this._minScale = minScale;
+        this._scale = minScale;
 
         // Shroud Cay
         this.currentPort = { id: "366", coord: { x: 4396, y: 2494 } };
-        this.fontSizes = { initial: 30, portLabel: 18, pbZone: 7 };
 
         this._zoomLevel = "initial";
         this._showPBZones = "all";
         this._highlightId = null;
         this._highlightDuration = 200;
-        this._iconSize = 50;
-        this._circleSizes = { initial: 50, portLabel: 20, pbZone: 5 };
+        this._iconSize = 48;
+        this._fontSize = defaultFontSize;
+        this._circleSize = defaultCircleSize;
         this._showRadius = "attack";
         this._taxIncomeRadius = d3.scaleLinear();
         this._netIncomeRadius = d3.scaleLinear();
         this._attackRadius = d3.scaleLinear().domain([0, 1]);
         this._colourScale = d3
             .scaleLinear()
-            .domain([0, 0.07, 0.95, 1])
-            .range(["#eadfdf", "#8b989c", "#6b7478", "#a62e39"]);
+            .domain([0, 0.1, 0.5, 1])
+            .range(["#eaeded", "#8b989c", "#6b7478", "#a62e39"]);
 
         this._minRadiusFactor = 1;
         this._maxRadiusFactor = 6;
@@ -191,26 +193,39 @@ export default class PortDisplay {
         const svgDef = d3.select("#na-svg defs");
 
         nations.map(d => d.short).forEach(nation => {
-            svgDef
+            const pattern = svgDef
                 .append("pattern")
                 .attr("id", nation)
-                .attr("width", "100%")
+                .attr("width", "133%")
                 .attr("height", "100%")
-                .attr("viewBox", `0 0 ${this._iconSize} ${this._iconSize}`)
+                .attr("viewBox", `6 6 ${this._iconSize} ${this._iconSize * 0.75}`);
+            pattern
                 .append("image")
                 .attr("height", this._iconSize)
                 .attr("width", this._iconSize)
                 .attr("href", `icons/${nation}.svg`);
-            svgDef
+            pattern
+                .append("rect")
+                .attr("height", this._iconSize)
+                .attr("width", this._iconSize)
+                .attr("class", "nation");
+
+            const patternA = svgDef
                 .append("pattern")
                 .attr("id", `${nation}a`)
-                .attr("width", "100%")
+                .attr("width", "133%")
                 .attr("height", "100%")
-                .attr("viewBox", `0 0 ${this._iconSize} ${this._iconSize}`)
+                .attr("viewBox", `6 6 ${this._iconSize} ${this._iconSize * 0.75}`);
+            patternA
                 .append("image")
                 .attr("height", this._iconSize)
                 .attr("width", this._iconSize)
-                .attr("href", `icons/${nation}a.svg`);
+                .attr("href", `icons/${nation}.svg`);
+            patternA
+                .append("rect")
+                .attr("height", this._iconSize)
+                .attr("width", this._iconSize)
+                .attr("class", "all");
         });
     }
 
@@ -220,7 +235,7 @@ export default class PortDisplay {
             portBattleST = moment.utc(pbData.portBattle),
             port = {
                 name: portProperties.name,
-                icon: portProperties.availableForAll ? `${pbData.nation}a` : pbData.nation,
+                icon: pbData.nation,
                 availableForAll: portProperties.availableForAll,
                 depth: portProperties.shallow ? "Shallow" : "Deep",
                 countyCapital: portProperties.countyCapital ? " (county capital)" : "",
@@ -375,12 +390,13 @@ export default class PortDisplay {
             $(d3.select(nodes[i])._groups[0]).tooltip("hide");
         }
 
-        const circleSize = this._circleSizes[this._zoomLevel];
-        const data = this.portData.filter(port => this.pbData.ports.some(d => port.id === d.id)).map(port => {
-            // eslint-disable-next-line prefer-destructuring,no-param-reassign
-            port.properties.nation = this.pbData.ports.filter(d => port.id === d.id).map(d => d.nation)[0];
-            return port;
-        });
+        const circleScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale),
+            circleSize = roundToThousands(this._circleSize / circleScale),
+            data = this.portData.filter(port => this.pbData.ports.some(d => port.id === d.id)).map(port => {
+                // eslint-disable-next-line prefer-destructuring,no-param-reassign
+                port.properties.nation = this.pbData.ports.filter(d => port.id === d.id).map(d => d.nation)[0];
+                return port;
+            });
 
         // Data join
         const circleUpdate = this._gIcon.selectAll("circle").data(data, d => d.id);
@@ -409,8 +425,9 @@ export default class PortDisplay {
     }
 
     _updatePortCircles() {
-        const rMin = this._circleSizes[this._zoomLevel] * this._minRadiusFactor;
-        let rMax = this._circleSizes[this._zoomLevel] * this._maxRadiusFactor,
+        const circleScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale),
+            rMin = roundToThousands(this._circleSize / circleScale * this._minRadiusFactor);
+        let rMax = roundToThousands(this._circleSize / circleScale * this._maxRadiusFactor),
             data = {};
         if (this._showRadius === "tax" || this._showRadius === "net") {
             data = this.portData.filter(d => !d.properties.nonCapturable);
@@ -480,8 +497,10 @@ export default class PortDisplay {
         } else {
             this._gText.attr("display", "inherit");
 
-            const circleSize = this._circleSizes[this._zoomLevel],
-                fontSize = this.fontSizes[this._zoomLevel];
+            const circleScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale),
+                circleSize = roundToThousands(this._circleSize / circleScale),
+                fontScale = 2 ** Math.log2((Math.abs(this._minScale) + this._scale) * 0.9),
+                fontSize = roundToThousands(this._fontSize / fontScale);
 
             // Data join
             const textUpdate = this._gText.selectAll("text").data(this.portData, d => d.id);
@@ -498,8 +517,8 @@ export default class PortDisplay {
                 .append("text")
                 .text(d => d.properties.name);
 
-            const deltaY = circleSize + fontSize;
-            const deltaY2 = circleSize * 2 + fontSize * 2;
+            const deltaY = circleSize + fontSize * 1.2,
+                deltaY2 = circleSize * 2 + fontSize * 2;
             // Apply to both old and new
             textUpdate
                 .merge(textEnter)
@@ -509,7 +528,8 @@ export default class PortDisplay {
                         this._zoomLevel === "pbZone" &&
                         (this._showPBZones === "all" ||
                             (this._showPBZones === "single" && d.id === this.currentPort.id))
-                            ? d.geometry.coordinates[0] + d.properties.dx
+                            ? d.geometry.coordinates[0] +
+                              Math.round(circleSize * 1.2 * Math.cos(degreesToRadians(d.properties.angle)))
                             : d.geometry.coordinates[0]
                 )
                 .attr("y", d => {
@@ -518,9 +538,12 @@ export default class PortDisplay {
                             ? d.geometry.coordinates[1] + deltaY2
                             : d.geometry.coordinates[1] + deltaY;
                     }
+                    const dy = d.properties.angle > 90 && d.properties.angle < 270 ? fontSize : 0;
                     return this._showPBZones === "all" ||
                         (this._showPBZones === "single" && d.id === this.currentPort.id)
-                        ? d.geometry.coordinates[1] + d.properties.dy
+                        ? d.geometry.coordinates[1] +
+                              Math.round(circleSize * 1.2 * Math.sin(degreesToRadians(d.properties.angle))) +
+                              dy
                         : d.geometry.coordinates[1] + deltaY;
                 })
                 .attr("font-size", d => (d.id === this._highlightId ? `${fontSize * 2}px` : `${fontSize}px`))
@@ -530,7 +553,7 @@ export default class PortDisplay {
                         (this._showPBZones === "all" ||
                             (this._showPBZones === "single" && d.id === this.currentPort.id))
                     ) {
-                        return d.properties.dx < 0 ? "end" : "start";
+                        return d.properties.textAnchor;
                     }
                     return "middle";
                 });
@@ -552,7 +575,8 @@ export default class PortDisplay {
         this._portSummaryTextNetIncome.text(`${formatSiInt(netTotal)}`);
     }
 
-    update() {
+    update(scale = null) {
+        this._scale = scale || this._scale;
         this._updateIcons();
         this._updatePortCircles();
         this.updateTexts();
@@ -576,6 +600,12 @@ export default class PortDisplay {
         this.pbData = pbData;
     }
 
+    setShowRadiusSetting(showRadius) {
+        this._showRadius = showRadius;
+        $(`#show-radius-${showRadius}`).prop("checked", true);
+        this._storeShowRadiusSetting();
+    }
+
     setCurrentPort(id, x, y) {
         this.currentPort = { id, coord: { x, y } };
     }
@@ -588,9 +618,9 @@ export default class PortDisplay {
         this._g.attr("transform", transform);
     }
 
-    clearMap() {
+    clearMap(scale) {
         this.portData = this.portDataDefault;
         this._showCurrentGood = false;
-        this.update();
+        this.update(scale);
     }
 }
