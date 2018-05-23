@@ -25,6 +25,7 @@ import {
     faTimes,
     faTrash
 } from "@fortawesome/fontawesome-free-solid";
+import Cookies from "js-cookie";
 
 import naDisplay from "./na-display";
 import naAnalytics from "./analytics";
@@ -33,8 +34,62 @@ import naAnalytics from "./analytics";
  * @returns {void}
  */
 function main() {
-    const greetings = $("#modal-greetings");
+    /**
+     * server name cookie name
+     * @type {string}
+     */
+    const serverNameCookieName = "na-map--server-name";
 
+    /**
+     * Default server name
+     * @type {string}
+     */
+    const serverNameDefault = "eu1";
+
+    /**
+     * Get server name from cookie or use default value
+     * @returns {string} - server name
+     */
+    function getServerName() {
+        let r = Cookies.get(serverNameCookieName);
+        // Use default value if cookie is not stored
+        r = typeof r !== "undefined" ? r : serverNameDefault;
+        $(`#server-name-${r}`).prop("checked", true);
+        return r;
+    }
+
+    /**
+     * Get server name from cookie or use default value
+     * @type {string}
+     */
+    let serverName = getServerName();
+
+    /**
+     * Store server name in cookie
+     * @return {void}
+     */
+    function storeServerName() {
+        if (serverName !== serverNameDefault) {
+            Cookies.set(serverNameCookieName, serverName);
+        } else {
+            Cookies.remove(serverNameCookieName);
+        }
+    }
+
+    /**
+     * Change server name
+     * @return {void}
+     */
+    function serverNameSelected() {
+        serverName = $("input[name='serverName']:checked").val();
+        storeServerName();
+        document.location.reload();
+    }
+
+    /**
+     * Setup listeners
+     * @return {void}
+     */
     function setupListener() {
         // Adapted https://github.com/bootstrapthemesco/bootstrap-4-multi-dropdown-navbar
         $(".dropdown-menu a.dropdown-toggle").on("click", event => {
@@ -63,15 +118,7 @@ function main() {
 
             return false;
         });
-
-        greetings
-            .on("click", ".btn, .close", event => {
-                $(event.currentTarget).addClass("modal-greetings-result"); // mark which button was clicked
-            })
-            .on("hide.bs.modal", () => {
-                const serverName = greetings.find(".modal-greetings-result").attr("data-server");
-                naDisplay(serverName); // invoke the callback with result
-            });
+        $("#server-name").change(() => serverNameSelected());
     }
 
     fontawesome.library.add(
@@ -90,10 +137,7 @@ function main() {
 
     naAnalytics();
     setupListener();
-
-    window.onload = () => {
-        greetings.modal("show");
-    };
+    naDisplay(serverName);
 }
 
 main();
