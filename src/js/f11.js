@@ -67,7 +67,7 @@ export default class F11 {
     }
 
     _addF11StringToInput(F11String) {
-        const regex = /F11 coordinates X: ([-+]?[0-9]*\.?[0-9]+)k Z: ([-+]?[0-9]*\.?[0-9]+)k/g,
+        const regex = /F11 coordinates X: ([-+]?[0-9]*)k Z: ([-+]?[0-9]*)k/g,
             match = regex.exec(F11String);
 
         if (match && !Number.isNaN(+match[1]) && !Number.isNaN(+match[2])) {

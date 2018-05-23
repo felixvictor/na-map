@@ -93,6 +93,13 @@ export function getOrdinal(n) {
 }
 
 /**
+ * Round to thousands
+ * @param {Number} x - Integer
+ * @return {Number} Rounded input
+ */
+export const roundToThousands = x => Math.round(x * 1000) / 1000;
+
+/**
  * Test if object is empty
  * @param {Object} obj - Object
  * @return {Boolean} True if object is empty
@@ -167,7 +174,15 @@ export const between = (value, a, b, inclusive) => {
  * @param {Number} radians - Radians
  * @return {Number} Degrees
  */
-Math.radiansToDegrees = radians => radians * 180 / Math.PI;
+export const radiansToDegrees = radians => radians * 180 / Math.PI;
+
+/**
+ * Convert degrees to radians
+ * @function
+ * @param {Number} degrees - Degrees
+ * @return {Number} Radians
+ */
+export const degreesToRadians = degrees => Math.PI / 180 * (degrees - 90);
 
 /**
  * @typedef {Array} Point
@@ -186,12 +201,23 @@ Math.radiansToDegrees = radians => radians * 180 / Math.PI;
 export const rotationAngleInDegrees = (centerPt, targetPt) => {
     let theta = Math.atan2(targetPt[1] - centerPt[1], targetPt[0] - centerPt[0]);
     theta -= Math.PI / 2.0;
-    let degrees = Math.radiansToDegrees(theta);
+    let degrees = radiansToDegrees(theta);
     if (degrees < 0) {
         degrees += 360;
     }
     return degrees;
 };
+
+/**
+ * Calculate the distance between two points
+ * @see https://www.mathsisfun.com/algebra/distance-2-points.html
+ * @function
+ * @param {Point} centerPt - Center point
+ * @param {Point} targetPt - Target point
+ * @return {Number} Distance between centerPt and targetPt
+ */
+export const distancePoints = (centerPt, targetPt) =>
+    Math.sqrt((centerPt[0] - targetPt[0]) ** 2 + (centerPt[1] - targetPt[1]) ** 2);
 
 /**
  * Calculate the closest power of 2 (see {@link https://bocoup.com/blog/find-the-closest-power-of-2-with-javascript})
@@ -222,6 +248,14 @@ export function checkFetchStatus(response) {
 export const getJsonFromFetch = response => response.json();
 
 /**
+ * Get text from fetch response
+ * @function
+ * @param {Object} response - fetch response
+ * @return {Object} String
+ */
+export const getTextFromFetch = response => response.text();
+
+/**
  * Write error to console
  * @function
  * @param {String} error - Error message
@@ -230,3 +264,8 @@ export const getJsonFromFetch = response => response.json();
 export const putFetchError = error => {
     console.log("Request failed -->", error);
 };
+
+/**
+ * {@link https://stackoverflow.com/questions/1026069/how-do-i-make-the-first-letter-of-a-string-uppercase-in-javascript}
+ */
+export const capitalizeFirstLetter = string => string.charAt(0).toUpperCase() + string.slice(1);

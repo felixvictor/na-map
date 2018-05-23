@@ -2,14 +2,20 @@
 
 // eslint-disable-next-line import/no-extraneous-dependencies
 import Excel4Node from "excel4node";
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { default as readCss } from "read-css";
 
 import { readJson } from "./common.mjs";
 
 const shipFilename = process.argv[2],
     portFilename = process.argv[3],
-    outFilename = process.argv[4],
+    cssFilename = process.argv[4],
+    outFilename = process.argv[5],
     shipsOrig = readJson(shipFilename).shipData,
-    portData = readJson(portFilename);
+    portData = readJson(portFilename),
+    css = readCss(cssFilename);
+
+let colours;
 
 /**
  * Create array with numbers ranging from start to end
@@ -87,23 +93,39 @@ const swPorts = portData.objects.ports.geometries
     }))
     .sort(sortPort);
 
+/** Set colours
+ * @returns {Map}
+ */
+function setColours() {
+    return new Map(
+        css.stylesheet.rules
+            .filter(rule => rule.selectors !== undefined && rule.selectors[0].startsWith(".colour-palette "))
+            .map(rule => [
+                rule.selectors[0].replace(".colour-palette .", ""),
+                rule.declarations
+                    .filter(declaration => declaration.property === "background-color")
+                    .map(declaration => declaration.value.replace("#", ""))[0]
+            ])
+    );
+}
+
 /**
  * Create excel spreadsheet
  * @returns {void}
  */
 function createExcel() {
-    const primary050 = "faf7f3",
-        primary200 = "ede1d2",
-        primary800 = "6f6150",
-        secondary050 = "f9fbfc",
-        secondary100 = "f3f7f9",
-        secondary200 = "e9f1f4",
-        secondary500 = "cddfe6",
-        secondary600 = "acbbc1",
-        secondary800 = "6b7478",
-        background600 = "c5bbbb",
-        highlight = "586776",
-        red = "d68f96";
+    const primary050 = colours.get("primary-050"),
+        primary200 = colours.get("primary-200"),
+        primary800 = colours.get("primary-800"),
+        secondary050 = colours.get("secondary-050"),
+        secondary100 = colours.get("secondary-100"),
+        secondary200 = colours.get("secondary-200"),
+        secondary400 = colours.get("secondary-400"),
+        secondary600 = colours.get("secondary-600"),
+        secondary800 = colours.get("secondary-800"),
+        background600 = colours.get("background-600"),
+        highlight = colours.get("info"),
+        red = colours.get("pink");
 
     const wsOptions = {
         sheetView: {
@@ -297,7 +319,7 @@ function createExcel() {
             .cell(currentRow, headerColumns - 1, currentRow, headerColumns)
             .style(numberStyle)
             .style(fontColourBold(secondary800))
-            .style(fillPattern(secondary500));
+            .style(fillPattern(secondary400));
         sheet
             .cell(currentRow, headerColumns - 1)
             .formula(
@@ -451,4 +473,5 @@ function createExcel() {
     });
 }
 
+colours = setColours();
 createExcel();
