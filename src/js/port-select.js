@@ -319,6 +319,8 @@ export default class PortSelect {
                     port.properties.isSource = false;
                     return port;
                 });
+
+        this._ports.setShowRadiusSetting("off");
         this._ports.setPortData(sourcePorts.concat(consumingPorts), true);
         this._ports.update();
     }

@@ -600,6 +600,12 @@ export default class PortDisplay {
         this.pbData = pbData;
     }
 
+    setShowRadiusSetting(showRadius) {
+        this._showRadius = showRadius;
+        $(`#show-radius-${showRadius}`).prop("checked", true);
+        this._storeShowRadiusSetting();
+    }
+
     setCurrentPort(id, x, y) {
         this.currentPort = { id, coord: { x, y } };
     }
