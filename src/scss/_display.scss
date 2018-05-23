@@ -312,10 +312,12 @@ text {
 .wind,
 .wind-text {
     font-size: 1.2em !important;
+    text-anchor: middle !important;
 }
 
 .wind-text-current {
     font-size: 1em !important;
+    text-anchor: middle !important;
 }
 
 .rs-tooltip-text {
