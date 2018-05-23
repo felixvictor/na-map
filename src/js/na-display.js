@@ -38,6 +38,7 @@ import PortSelect from "./port-select";
 import ShipCompare from "./ship-compare";
 import Teleport from "./teleport";
 import WindPrediction from "./wind-prediction";
+import WoodCompare from "./wood-compare";
 
 /**
  * Display naval action map
@@ -45,7 +46,7 @@ import WindPrediction from "./wind-prediction";
  * @returns {void}
  */
 export default function naDisplay(serverName) {
-    let map, ports, teleport, portSelect, shipCompare, windPrediction, f11, course, grid, pbZone, shipData;
+    let map, ports, teleport, portSelect, shipCompare, woodCompare, windPrediction, f11, course, grid, pbZone, shipData, woodData;
 
     /** Main map */
     class NAMap {
@@ -519,6 +520,7 @@ export default function naDisplay(serverName) {
         Cookies.defaults = { expires: 365 };
 
         shipCompare = new ShipCompare(shipData);
+        woodCompare = new WoodCompare(woodData);
         teleport = new Teleport(map.coord.min, map.coord.max, ports);
         portSelect = new PortSelect(map, ports, pbZone);
         windPrediction = new WindPrediction(map.margin.left, map.margin.top);
@@ -560,6 +562,7 @@ export default function naDisplay(serverName) {
         pbZone = new PBZone(pbZoneData, fortData, towerData, ports);
 
         shipData = JSON.parse(JSON.stringify(data.ships.shipData));
+        woodData = JSON.parse(JSON.stringify(data.woods));
 
         setup();
     }
@@ -577,8 +580,11 @@ export default function naDisplay(serverName) {
         const shipJsonData = fetch("ships.json", { cache: cacheMode })
             .then(checkFetchStatus)
             .then(getJsonFromFetch);
-        Promise.all([naMapJsonData, pbJsonData, pbZonesJsonData, shipJsonData])
-            .then(values => init({ ports: values[0], pb: values[1], pbZones: values[2], ships: values[3] }))
+        const woodJsonData = fetch("woods.json", { cache: cacheMode })
+            .then(checkFetchStatus)
+            .then(getJsonFromFetch);
+        Promise.all([naMapJsonData, pbJsonData, pbZonesJsonData, shipJsonData, woodJsonData])
+            .then(values => init({ ports: values[0], pb: values[1], pbZones: values[2], ships: values[3], woods: values[4] }))
             .catch(putFetchError);
     }
 
