@@ -248,6 +248,7 @@
                      aria-labelledby="extraDropdown">
 
                     <a class="dropdown-item" id="button-ship-compare">Ship comparison</a>
+                    <a class="dropdown-item" id="button-wood-compare">Wood comparison</a>
                     <a class="dropdown-item" href="port-battle.xlsx" download="port-battle-calculator.xlsx">Download
                         port battle calculator</a>
                 </div>
@@ -412,6 +413,53 @@
                             <label for="ship-C2-select"></label><select name="ship-C2-select" id="ship-C2-select">
                             </select>
                             <div id="ship-C2"></div>
+                        </div>
+                    </div>
+                </div>
+                <footer class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </footer>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="modal-woods" class="modal" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <header class="modal-header">
+                <h3>Wood comparison</h3>
+            </header>
+
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-4 ml-auto pt-2 columnA">
+                            <label for="wood-frame-Base-select"></label><select name="wood-frame-Base-select"
+                                                                                id="wood-frame-Base-select">
+                            </select>
+                            <label for="wood-trim-Base-select"></label><select name="wood-trim-Base-select"
+                                                                               id="wood-trim-Base-select">
+                            </select>
+                            <div id="wood-Base"></div>
+                        </div>
+                        <div class="col-md-4 ml-auto pt-2 columnC">
+                            <label for="wood-frame-C1-select"></label><select name="wood-frame-C1-select"
+                                                                                id="wood-frame-C1-select">
+                            </select>
+                            <label for="wood-trim-C1-select"></label><select name="wood-trim-C1-select"
+                                                                               id="wood-trim-C1-select">
+                            </select>
+                            <div id="wood-C1"></div>
+                        </div>
+                        <div class="col-md-4 ml-auto pt-2 columnC">
+                            <label for="wood-frame-C2-select"></label><select name="wood-frame-C2-select"
+                                                                                id="wood-frame-C2-select">
+                            </select>
+                            <label for="wood-trim-C2-select"></label><select name="wood-trim-C2-select"
+                                                                               id="wood-trim-C2-select">
+                            </select>
+                            <div id="wood-C2"></div>
                         </div>
                     </div>
                 </div>
