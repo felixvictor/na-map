@@ -19,9 +19,12 @@ String.prototype.replaceAll = function(search, replacement) {
  */
 function convertModules() {
     const modules = new Map(),
-        woods = new Map(),
         levels = new Map(),
-        modifiers = new Map();
+        modifiers = new Map(),
+        woodJson = {};
+
+    woodJson.trim = [];
+    woodJson.frame = [];
 
     levels.set("Universal", "U");
     levels.set("Regular", "R");
@@ -38,10 +41,10 @@ function convertModules() {
     modifiers.set("NONE RUDDER_HALFTURN_TIME", "Rudder speed");
     modifiers.set("NONE SHIP_MAX_SPEED", "Ship speed");
     modifiers.set("NONE SHIP_PHYSICS_ACC_COEF", "Acceleration");
-    modifiers.set("STRUCTURE SHIP_PHYSICS_ACC_COEF", "Acceleration");
     modifiers.set("NONE SHIP_TURNING_SPEED", "Turn speed");
     modifiers.set("SAIL MAST_THICKNESS", "Mast thickness");
     modifiers.set("STRUCTURE FIRE_INCREASE_RATE", "Fire probability");
+    modifiers.set("STRUCTURE SHIP_PHYSICS_ACC_COEF", "Acceleration");
     modifiers.set("STRUCTURE SHIP_STRUCTURE_LEAKS_PER_SECOND", "Leak resistance");
 
     APIItems.filter(item => item.ItemType === "Module").forEach(APImodule => {
@@ -75,13 +78,6 @@ function convertModules() {
                 module.name === "Crew Space"
             ) {
                 const wood = {};
-                if (module.name.includes(" Planking") || module.name === "Crew Space") {
-                    wood.type = "Trim";
-                    wood.name = module.name.replace(" Planking", "");
-                } else {
-                    wood.type = "Wood type";
-                    wood.name = module.name.replace(" Wood Type", "");
-                }
                 wood.properties = [];
                 module.modifiers.forEach(modifier => {
                     // Add modifier if in modifier map
@@ -92,16 +88,24 @@ function convertModules() {
                         });
                     }
                 });
-                woods.set(wood.type + wood.name, wood);
-                modules.set(module.name + module.moduleLevel, module);
-            } else {
-                modules.set(module.name + module.moduleLevel, module);
+
+                if (module.name.includes(" Planking") || module.name === "Crew Space") {
+                    wood.type = "Trim";
+                    wood.name = module.name.replace(" Planking", "");
+                    woodJson.trim.push(wood);
+                } else {
+                    wood.type = "Frame";
+                    wood.name = module.name.replace(" Wood Type", "");
+                    woodJson.frame.push(wood);
+                }
             }
+
+            modules.set(module.name + module.moduleLevel, module);
         }
     });
 
     saveJson(`${outDir}/modules.json`, Array.from(modules.values()));
-    saveJson(`${outDir}/woods.json`, Array.from(woods.values()));
+    saveJson(`${outDir}/woods.json`, woodJson);
 }
 
 convertModules();
