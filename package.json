@@ -22,7 +22,6 @@
     "eslint-plugin-react": "^7.5.1",
     "excel4node": "^1.3.6",
     "exports-loader": "^0.7.0",
-    "extract-text-webpack-plugin": "^3.0.2",
     "file-loader": "^1.1.11",
     "git": "^0.1.5",
     "html-webpack-plugin": "^3.2.0",
@@ -30,6 +29,7 @@
     "image-webpack-loader": "^4.2.0",
     "imports-loader": "^0.8.0",
     "jquery": "^3.3.1",
+    "mini-css-extract-plugin": "^0.4.0",
     "moment-timezone": "^0.5.14",
     "ndjson-cli": "^0.3.1",
     "netlify-cli": "^1.2.2",
@@ -37,12 +37,13 @@
     "postcss": "^6.0.21",
     "postcss-clean": "^1.1.0",
     "postcss-cli": "^5.0.0",
-    "postcss-loader": "^2.1.3",
+    "postcss-loader": "^2.1.5",
     "prettier": "^1.11.1",
+    "read-css": "^0.3.0",
     "sass-loader": "^6.0.7",
     "shapefile": "^0.6.6",
     "sharp": "^0.19.0",
-    "sitemap-webpack-plugin": "^0.5.1",
+    "sitemap-webpack-plugin": "^0.6.0",
     "style-loader": "^0.20.3",
     "stylelint": "^9.1.3",
     "stylelint-config-prettier": "^3.2.0",
@@ -53,8 +54,9 @@
     "svg-url-loader": "^2.3.2",
     "topojson": "^3.0.2",
     "url-loader": "^1.0.1",
-    "webpack": "^3.11.0",
-    "webpack-subresource-integrity": "^1.0.4"
+    "webpack": "^4.8.3",
+    "webpack-cli": "^2.1.3",
+    "webpack-subresource-integrity": "^1.1.0-rc.4"
   },
   "dependencies": {
     "@fortawesome/fontawesome": "^1.1.2",
@@ -94,11 +96,11 @@
     "make-excel": "node --experimental-modules --no-warnings build/create-xlsx.mjs src/ships.json src/eu1.json src/port-battle.xlsx",
     "make-tiles": "cp /mnt/na-map.tif src/images/map.tif && rm -rf src/images/map/ && node --experimental-modules build/make-tiles.mjs src/images/map.tif && rm src/images/map.tif",
     "prettier": "prettier --tab-width 4 --print-width 120 --write .eslintrc.json package.json *.js src/js/*.json src/scss/*.scss",
-    "prod": "yarn run clean && NODE_ENV=${NODE_ENV:=prod} webpack --colors --config webpack.config.js",
+    "prod": "yarn run clean && NODE_ENV=production webpack --mode=production --colors --config webpack.config.js",
     "push-change": "build/port-data.sh push-change",
     "stylelint-check": "stylelint-config-prettier-check",
-    "watch": "yarn run clean && NODE_ENV=${NODE_ENV:=dev} webpack --watch --colors --config webpack.config.js",
-    "dev": "yarn run clean && NODE_ENV=${NODE_ENV:=dev} webpack --colors --config webpack.config.js"
+    "watch": "yarn run clean && NODE_ENV=development webpack --mode=development --watch --colors --config webpack.config.js",
+    "dev": "yarn run clean && NODE_ENV=development webpack --mode=development --colors --config webpack.config.js"
   },
   "browserslist": [
     "Chrome >= 62",
