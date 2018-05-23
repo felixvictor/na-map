@@ -553,7 +553,7 @@ export default class ShipCompare {
 
     _shipCompareSelected() {
         $("#modal-ships").modal("show");
-        this.svgWidth = parseInt($(".columnA").width(), 10);
+        this.svgWidth = parseInt($("#modal-ships .columnA").width(), 10);
         // noinspection JSSuspiciousNameCombination
         this.svgHeight = this.svgWidth;
         this._outerRadius = Math.floor(Math.min(this.svgWidth, this.svgHeight) / 2);
