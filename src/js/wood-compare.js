@@ -38,7 +38,7 @@ class Wood {
         text += `<th>${wood.frame}<br><span class="des">Frame</span></th>`;
         text += `<th>${wood.trim}<br><span class="des">Trim</span></th></tr></thead><tbody>`;
         wood.properties.forEach((value, key) => {
-            text += `<tr><td>${key}</td><td>${formatPercent(value)}</td></tr>`;
+            text += `<tr><td>${key}</td><td>${value}</td></tr>`;
         });
         text += "</tbody></table>";
         return text;
@@ -88,7 +88,7 @@ class WoodBase extends Wood {
             "Acceleration",
             "Leak resistance"
         ].forEach(property => {
-            wood.properties.set(property, this._getPropertySum(property));
+            wood.properties.set(property, formatPercent(this._getPropertySum(property)));
         });
 
         $(`${this._select}`)
@@ -108,21 +108,65 @@ class WoodComparison extends Wood {
         this._printTextComparison();
     }
 
-    _printTextComparison() {
-        function getDiff(a, b, decimals = 0) {
-            const diff = parseFloat((a - b).toFixed(decimals));
+    _getBaseProperty(property, type) {
+        const amount = this._baseData[type].properties
+            .filter(prop => prop.modifier === property)
+            .map(prop => prop.amount)[0];
+        return typeof amount === "undefined" ? 0 : amount / 100;
+    }
 
+    _getBasePropertySum(property) {
+        return this._getBaseProperty(property, "frame") + this._getBaseProperty(property, "trim");
+    }
+
+    _getCompareProperty(property, type) {
+        const amount = this._compareData[type].properties
+            .filter(prop => prop.modifier === property)
+            .map(prop => prop.amount)[0];
+        return typeof amount === "undefined" ? 0 : amount / 100;
+    }
+
+    _getComparePropertySum(property) {
+        return this._getCompareProperty(property, "frame") + this._getCompareProperty(property, "trim");
+    }
+
+    _printTextComparison() {
+        function getDiff(a, b, decimals = 1) {
+            const diff = parseFloat(((a - b) * 100).toFixed(decimals));
             if (diff < 0) {
-                return `<span class="badge badge-danger">${formatFloat(Math.abs(diff))}</span>`;
+                return `${formatPercent(a)} <span class="badge badge-danger">${formatFloat(Math.abs(diff))}</span>`;
             } else if (diff > 0) {
-                return `<span class="badge badge-success">${formatFloat(diff)}</span>`;
+                return `${formatPercent(a)} <span class="badge badge-success">${formatFloat(diff)}</span>`;
             }
             return "";
         }
 
         const wood = {
-            name: this._compareData.frame.name
+            frame: this._compareData.frame.name,
+            trim: this._compareData.trim.name
         };
+        wood.properties = new Map();
+        [
+            "Thickness",
+            "Structure health",
+            "Crew",
+            "Side armour",
+            "Crew damage",
+            "Grog morale bonus",
+            "Rudder speed",
+            "Ship speed",
+            "Acceleration",
+            "Turn speed",
+            "Mast thickness",
+            "Fire probability",
+            "Acceleration",
+            "Leak resistance"
+        ].forEach(property => {
+            wood.properties.set(
+                property,
+                getDiff(this._getComparePropertySum(property), this._getBasePropertySum(property))
+            );
+        });
 
         $(`${this._select}`)
             .find("div")
@@ -181,7 +225,6 @@ export default class WoodCompare {
     _woodCompareSelected() {
         $("#modal-woods").modal("show");
         this.svgWidth = parseInt($("#modal-woods .columnA").width(), 10);
-        console.log(this.svgWidth);
         // noinspection JSSuspiciousNameCombination
         this.svgHeight = this.svgWidth;
     }
@@ -241,7 +284,7 @@ export default class WoodCompare {
                     this._setOtherSelect(compareId, type);
 
                     if (compareId === "Base") {
-                        this._instance[compareId] = new WoodBase(compareId, this._getWoodData(compareId), this);
+                        this._instance[compareId] = new WoodBase("Base", this._getWoodData("Base"), this);
                         ["C1", "C2", "C3"].forEach(id => {
                             WoodCompare.enableSelect(id);
                             if (typeof this._instance[id] !== "undefined") {
