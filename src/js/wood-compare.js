@@ -4,7 +4,7 @@
 
 /* global d3 : false
  */
-import { capitalizeFirstLetter, formatFloat, isEmpty } from "./util";
+import { capitalizeFirstLetter, formatFloat, formatPercent } from "./util";
 
 class Wood {
     constructor(compareId, woodCompare) {
@@ -33,9 +33,13 @@ class Wood {
     }
 
     static getText(wood) {
-        let text = '<table class="table table-sm table-striped small ship"><tbody>';
-        text += "<tr><td></td>";
-        text += `<td>${wood.name}<br><span class="des">Name</span></td></tr>`;
+        let text = '<table class="table table-sm table-striped small wood"><thead>';
+        text += "<tr>";
+        text += `<th>${wood.frame}<br><span class="des">Frame</span></th>`;
+        text += `<th>${wood.trim}<br><span class="des">Trim</span></th></tr></thead><tbody>`;
+        wood.properties.forEach((value, key) => {
+            text += `<tr><td>${key}</td><td>${formatPercent(value)}</td></tr>`;
+        });
         text += "</tbody></table>";
         return text;
     }
@@ -51,14 +55,41 @@ class WoodBase extends Wood {
         this._printText();
     }
 
-    _printText() {
-        console.log("woodData", this._woodData);
-        console.log("woodData.frame", this._woodData.frame);
-        console.log("woodData.frame.name", this._woodData.frame.name);
-        const wood = {
-            name: this._woodData.frame.name
+    _getProperty(property, type) {
+        const amount = this._woodData[type].properties
+            .filter(prop => prop.modifier === property)
+            .map(prop => prop.amount)[0];
+        return typeof amount === "undefined" ? 0 : amount / 100;
+    }
 
+    _getPropertySum(property) {
+        return this._getProperty(property, "frame") + this._getProperty(property, "trim");
+    }
+
+    _printText() {
+        const wood = {
+            frame: this._woodData.frame.name,
+            trim: this._woodData.trim.name
         };
+        wood.properties = new Map();
+        [
+            "Thickness",
+            "Structure health",
+            "Crew",
+            "Side armour",
+            "Crew damage",
+            "Grog morale bonus",
+            "Rudder speed",
+            "Ship speed",
+            "Acceleration",
+            "Turn speed",
+            "Mast thickness",
+            "Fire probability",
+            "Acceleration",
+            "Leak resistance"
+        ].forEach(property => {
+            wood.properties.set(property, this._getPropertySum(property));
+        });
 
         $(`${this._select}`)
             .find("div")
@@ -113,7 +144,7 @@ export default class WoodCompare {
 
         this._setupData();
         this._setupListener();
-        ["Base", "C1", "C2"].forEach(compareId => {
+        ["Base", "C1", "C2", "C3"].forEach(compareId => {
             this._woodSelected[compareId] = {};
             ["frame", "trim"].forEach(type => {
                 this._woodSelected[compareId][type] = this._defaultWood[type];
@@ -211,9 +242,9 @@ export default class WoodCompare {
 
                     if (compareId === "Base") {
                         this._instance[compareId] = new WoodBase(compareId, this._getWoodData(compareId), this);
-                        ["C1", "C2"].forEach(id => {
+                        ["C1", "C2", "C3"].forEach(id => {
                             WoodCompare.enableSelect(id);
-                            if (this._instance[id] !== "undefined") {
+                            if (typeof this._instance[id] !== "undefined") {
                                 this._instance[id] = new WoodComparison(
                                     id,
                                     this._getWoodData("Base"),
