@@ -33,9 +33,9 @@ function convertModules() {
     levels.set("Lineships", "L");
 
     modifiers.set("ARMOR_ALL_SIDES ARMOR_THICKNESS", "Thickness");
-    modifiers.set("ARMOR_ALL_SIDES MODULE_BASE_HP", "Structure health");
+    modifiers.set("ARMOR_ALL_SIDES MODULE_BASE_HP", "Side armour");
     modifiers.set("CREW MODULE_BASE_HP", "Crew");
-    modifiers.set("INTERNAL_STRUCTURE MODULE_BASE_HP", "Side armour");
+    modifiers.set("INTERNAL_STRUCTURE MODULE_BASE_HP", "Hull strength");
     modifiers.set("NONE CREW_DAMAGE_RECEIVED_DECREASE_PERCENT", "Crew damage");
     modifiers.set("NONE GROG_MORALE_BONUS", "Grog morale bonus");
     modifiers.set("NONE RUDDER_HALFTURN_TIME", "Rudder speed");
