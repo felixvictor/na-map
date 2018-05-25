@@ -10,7 +10,21 @@ class Wood {
     constructor(compareId, woodCompare) {
         this._id = compareId;
         this._woodCompare = woodCompare;
-
+        this._properties = [
+            "Thickness",
+            "Hull strength",
+            "Side armour",
+            "Mast thickness",
+            "Ship speed",
+            "Acceleration",
+            "Rudder speed",
+            "Turn speed",
+            "Crew",
+            "Crew damage",
+            "Grog morale bonus",
+            "Fire probability",
+            "Leak resistance"
+        ];
         this._select = `#wood-${this._id}`;
 
         this._setupSvg();
@@ -72,22 +86,7 @@ class WoodBase extends Wood {
             trim: this._woodData.trim.name
         };
         wood.properties = new Map();
-        [
-            "Thickness",
-            "Structure health",
-            "Crew",
-            "Side armour",
-            "Crew damage",
-            "Grog morale bonus",
-            "Rudder speed",
-            "Ship speed",
-            "Acceleration",
-            "Turn speed",
-            "Mast thickness",
-            "Fire probability",
-            "Acceleration",
-            "Leak resistance"
-        ].forEach(property => {
+        this._properties.forEach(property => {
             wood.properties.set(property, formatPercent(this._getPropertySum(property)));
         });
 
@@ -146,22 +145,7 @@ class WoodComparison extends Wood {
             trim: this._compareData.trim.name
         };
         wood.properties = new Map();
-        [
-            "Thickness",
-            "Structure health",
-            "Crew",
-            "Side armour",
-            "Crew damage",
-            "Grog morale bonus",
-            "Rudder speed",
-            "Ship speed",
-            "Acceleration",
-            "Turn speed",
-            "Mast thickness",
-            "Fire probability",
-            "Acceleration",
-            "Leak resistance"
-        ].forEach(property => {
+        this._properties.forEach(property => {
             wood.properties.set(
                 property,
                 getDiff(this._getComparePropertySum(property), this._getBasePropertySum(property))
