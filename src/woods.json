@@ -10,7 +10,7 @@
                 { "modifier": "Rudder speed", "amount": -1.5 },
                 { "modifier": "Turn speed", "amount": 1.5 },
                 { "modifier": "Acceleration", "amount": 1.5 },
-                { "modifier": "Sides armour", "amount": 0.5 }
+                { "modifier": "Side armour", "amount": 0.5 }
             ],
             "type": "Trim",
             "name": "Mahogany"
@@ -25,7 +25,7 @@
                 { "modifier": "Rudder speed", "amount": -1.75 },
                 { "modifier": "Turn speed", "amount": 1.75 },
                 { "modifier": "Acceleration", "amount": 3 },
-                { "modifier": "Sides armour", "amount": -5 }
+                { "modifier": "Side armour", "amount": -5 }
             ],
             "type": "Trim",
             "name": "Fir"
@@ -40,7 +40,7 @@
                 { "modifier": "Rudder speed", "amount": -1.75 },
                 { "modifier": "Turn speed", "amount": 1.75 },
                 { "modifier": "Acceleration", "amount": 3 },
-                { "modifier": "Sides armour", "amount": -3 }
+                { "modifier": "Side armour", "amount": -3 }
             ],
             "type": "Trim",
             "name": "Bermuda Cedar"
@@ -53,7 +53,7 @@
                 { "modifier": "Rudder speed", "amount": -1.75 },
                 { "modifier": "Turn speed", "amount": 1.75 },
                 { "modifier": "Acceleration", "amount": 1.75 },
-                { "modifier": "Sides armour", "amount": 1 }
+                { "modifier": "Side armour", "amount": 1 }
             ],
             "type": "Trim",
             "name": "Teak"
@@ -68,7 +68,7 @@
                 { "modifier": "Turn speed", "amount": -0.13 },
                 { "modifier": "Acceleration", "amount": -0.25 },
                 { "modifier": "Rudder speed", "amount": -0.13 },
-                { "modifier": "Sides armour", "amount": -0.5 },
+                { "modifier": "Side armour", "amount": -0.5 },
                 { "modifier": "Grog morale bonus", "amount": 0 }
             ],
             "type": "Trim",
@@ -82,7 +82,7 @@
                 { "modifier": "Rudder speed", "amount": -0.5 },
                 { "modifier": "Turn speed", "amount": 0.5 },
                 { "modifier": "Acceleration", "amount": 0.5 },
-                { "modifier": "Sides armour", "amount": 3 }
+                { "modifier": "Side armour", "amount": 3 }
             ],
             "type": "Trim",
             "name": "White Oak"
@@ -96,7 +96,7 @@
                 { "modifier": "Rudder speed", "amount": -0.5 },
                 { "modifier": "Turn speed", "amount": 0.5 },
                 { "modifier": "Acceleration", "amount": 0.5 },
-                { "modifier": "Sides armour", "amount": 2 },
+                { "modifier": "Side armour", "amount": 2 },
                 { "modifier": "Crew damage", "amount": 0 }
             ],
             "type": "Trim",
@@ -110,7 +110,7 @@
                 { "modifier": "Rudder speed", "amount": 0.25 },
                 { "modifier": "Turn speed", "amount": -0.25 },
                 { "modifier": "Acceleration", "amount": -0.25 },
-                { "modifier": "Sides armour", "amount": 3 },
+                { "modifier": "Side armour", "amount": 3 },
                 { "modifier": "Crew damage", "amount": 0 }
             ],
             "type": "Trim",
@@ -127,7 +127,7 @@
                 { "modifier": "Rudder speed", "amount": -1 },
                 { "modifier": "Turn speed", "amount": 1 },
                 { "modifier": "Acceleration", "amount": 1 },
-                { "modifier": "Sides armour", "amount": 7 }
+                { "modifier": "Side armour", "amount": 7 }
             ],
             "type": "Frame",
             "name": "Oak"
@@ -142,7 +142,7 @@
                 { "modifier": "Rudder speed", "amount": -1 },
                 { "modifier": "Turn speed", "amount": 1 },
                 { "modifier": "Acceleration", "amount": 1 },
-                { "modifier": "Sides armour", "amount": 2 }
+                { "modifier": "Side armour", "amount": 2 }
             ],
             "type": "Frame",
             "name": "Sabicu"
@@ -157,7 +157,7 @@
                 { "modifier": "Rudder speed", "amount": 2 },
                 { "modifier": "Turn speed", "amount": -2 },
                 { "modifier": "Acceleration", "amount": -5 },
-                { "modifier": "Sides armour", "amount": 7.5 },
+                { "modifier": "Side armour", "amount": 7.5 },
                 { "modifier": "Mast thickness", "amount": 5 }
             ],
             "type": "Frame",
@@ -173,7 +173,7 @@
                 { "modifier": "Rudder speed", "amount": -2 },
                 { "modifier": "Turn speed", "amount": 2 },
                 { "modifier": "Acceleration", "amount": 5 },
-                { "modifier": "Sides armour", "amount": -3 }
+                { "modifier": "Side armour", "amount": -3 }
             ],
             "type": "Frame",
             "name": "Bermuda Cedar"
@@ -188,7 +188,7 @@
                 { "modifier": "Rudder speed", "amount": 1 },
                 { "modifier": "Turn speed", "amount": -1 },
                 { "modifier": "Acceleration", "amount": -4 },
-                { "modifier": "Sides armour", "amount": 8 },
+                { "modifier": "Side armour", "amount": 8 },
                 { "modifier": "Mast thickness", "amount": 5 }
             ],
             "type": "Frame",
@@ -204,7 +204,7 @@
                 { "modifier": "Rudder speed", "amount": -3 },
                 { "modifier": "Turn speed", "amount": 3 },
                 { "modifier": "Acceleration", "amount": 5 },
-                { "modifier": "Sides armour", "amount": -5 }
+                { "modifier": "Side armour", "amount": -5 }
             ],
             "type": "Frame",
             "name": "Fir"
@@ -219,7 +219,7 @@
                 { "modifier": "Rudder speed", "amount": -3 },
                 { "modifier": "Turn speed", "amount": 3 },
                 { "modifier": "Acceleration", "amount": 3 },
-                { "modifier": "Sides armour", "amount": 0.5 }
+                { "modifier": "Side armour", "amount": 0.5 }
             ],
             "type": "Frame",
             "name": "Teak"
@@ -231,7 +231,7 @@
                 { "modifier": "Leak resistance", "amount": -1 },
                 { "modifier": "Ship speed", "amount": -4 },
                 { "modifier": "Acceleration", "amount": -3 },
-                { "modifier": "Sides armour", "amount": 15 }
+                { "modifier": "Side armour", "amount": 15 }
             ],
             "type": "Frame",
             "name": "White Oak"
@@ -246,7 +246,7 @@
                 { "modifier": "Rudder speed", "amount": -3 },
                 { "modifier": "Turn speed", "amount": 3 },
                 { "modifier": "Acceleration", "amount": 3 },
-                { "modifier": "Sides armour", "amount": 0.5 }
+                { "modifier": "Side armour", "amount": 0.5 }
             ],
             "type": "Frame",
             "name": "Mahogany"
