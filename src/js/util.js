@@ -31,11 +31,12 @@ const formatPrefix = d3.formatPrefix(",.0", 1e3);
  * Format float
  * @function
  * @param {Number} x - Float
+ * @param {Number} s - Signifant digits
  * @return {String} - Formatted float
  */
-export const formatFloat = x =>
+export const formatFloat = (x, s = 2) =>
     formatLocale
-        .format(",.2r")(x)
+        .format(`,.${s}r`)(x)
         .replace("-", "\u2212\u202f");
 
 /**
