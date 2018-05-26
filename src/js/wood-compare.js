@@ -154,7 +154,6 @@ class WoodComparison extends Wood {
                 let compare = value.compare / this._woodCompare.minMaxProperty.get(key).max * 100 * middle,
                     base = value.base / this._woodCompare.minMaxProperty.get(key).max * 100 * middle,
                     sign = "pos";
-                console.log(key, value.base, base, value.compare, compare, this._woodCompare.minMaxProperty.get(key).max);
                 text += `<span class="bar neutral" style="width:${middle}%;"></span>`;
                 if (base < compare) {
                     compare -= base;
@@ -167,9 +166,6 @@ class WoodComparison extends Wood {
                 }
                 text += `<span class="bar pos diff" style="width:${compare}%;"></span>`;
                 text += `<span class="bar ${sign}" style="width:${base}%;"></span>`;
-
-
-
             } else if (value.compare < 0) {
                 let compare = value.compare / this._woodCompare.minMaxProperty.get(key).min * 100 * middle,
                     base = value.base / this._woodCompare.minMaxProperty.get(key).min * 100 * middle,
