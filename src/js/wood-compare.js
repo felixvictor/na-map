@@ -47,9 +47,7 @@ class WoodBase extends Wood {
         const middle = 100 / 2;
         let text = '<table class="table table-sm table-striped small wood mt-4"><thead>';
         text += "<tr>";
-        text += `<th>${wood.frame}<br><span class="des">Frame</span></th>`;
-        text += `<th>${wood.trim}<br><span class="des">Trim</span></th></tr>`;
-        text += "<tr><th><em>Property</em></th><th><em>%</em></th></tr></thead><tbody>";
+        text += "<tr><th><em>Property</em></th><th><em>Change in %</em></th></tr></thead><tbody>";
         wood.properties.forEach((value, key) => {
             text += `<tr><td>${key}</td><td>${formatFloat(value * 100)}`;
             text += '<span class="rate">';
@@ -142,11 +140,8 @@ class WoodComparison extends Wood {
         const middle = 100 / 2;
         let text = '<table class="table table-sm table-striped small wood mt-4"><thead>';
         text += "<tr>";
-        text += `<th>${wood.frame}<br><span class="des">Frame</span></th>`;
-        text += `<th>${wood.trim}<br><span class="des">Trim</span></th></tr>`;
-        text += "<tr><th><em>Property</em></th><th><em>%</em></th></tr></thead><tbody>";
+        text += "<tr><th><em>Property</em></th><th><em>Change in %</em></th></tr></thead><tbody>";
         wood.properties.forEach((value, key) => {
-            console.log(key, value);
             text += `<tr><td>${key}</td><td>${getDiff(value.compare, value.base)}`;
 
             text += '<span class="rate">';
@@ -154,18 +149,26 @@ class WoodComparison extends Wood {
                 let compare = value.compare / this._woodCompare.minMaxProperty.get(key).max * 100 * middle,
                     base = value.base / this._woodCompare.minMaxProperty.get(key).max * 100 * middle,
                     sign = "pos";
-                text += `<span class="bar neutral" style="width:${middle}%;"></span>`;
                 if (base < compare) {
                     compare -= base;
                 } else if (base > compare) {
-                    base -= compare;
+                    const t = compare;
+                    compare = base - t;
+                    base = t;
                     sign = "neg";
                 } else {
                     sign = "pos";
-                    base = 0;
+                    base = compare;
+                    compare = 0;
                 }
-                text += `<span class="bar pos diff" style="width:${compare}%;"></span>`;
-                text += `<span class="bar ${sign}" style="width:${base}%;"></span>`;
+                // If difference is too wide, base and compare have different signs
+                if (value.base <= 0) {
+                    base = 0;
+                    compare = value.compare / this._woodCompare.minMaxProperty.get(key).max * 100 * middle;
+                }
+                text += `<span class="bar neutral" style="width:${middle}%;"></span>`;
+                text += `<span class="bar pos diff" style="width:${base}%;"></span>`;
+                text += `<span class="bar ${sign}" style="width:${compare}%;"></span>`;
             } else if (value.compare < 0) {
                 let compare = value.compare / this._woodCompare.minMaxProperty.get(key).min * 100 * middle,
                     base = value.base / this._woodCompare.minMaxProperty.get(key).min * 100 * middle,
@@ -179,7 +182,13 @@ class WoodComparison extends Wood {
                     sign = "neg";
                     compare = 0;
                 }
-                text += `<span class="bar neutral" style="width:${middle - compare - base}%;"></span>`;
+                // If difference is too wide, base and compare have different signs
+                if (value.base >= 0) {
+                    compare = value.compare / this._woodCompare.minMaxProperty.get(key).min * 100 * middle;
+                    base = 0;
+                }
+                const neutral = middle - compare - base;
+                text += `<span class="bar neutral" style="width:${neutral}%;"></span>`;
                 text += `<span class="bar ${sign}" style="width:${compare}%;"></span>`;
                 text += `<span class="bar neg diff" style="width:${base}%;"></span>`;
             } else {
@@ -233,7 +242,7 @@ export default class WoodCompare {
             "Crew",
             "Crew damage",
             "Grog morale bonus",
-            "Fire probability",
+            "Fire resistance",
             "Leak resistance"
         ];
         this._options = {};

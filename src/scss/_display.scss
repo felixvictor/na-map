@@ -54,8 +54,18 @@ p {
     }
 }
 
-.wood td + td {
-    text-align: right;
+.wood {
+    td + td {
+        text-align: right;
+    }
+    tbody {
+        td:nth-child(1) {
+            width: 50%;
+        }
+        td:nth-child(2) {
+            width: 50%;
+        }
+    }
 }
 
 .ship tbody {
@@ -126,10 +136,28 @@ p {
 
 .columnA {
     background-color: $primary-100;
+    table {
+        thead {
+            background-color: $primary-050;
+            line-height: 3em;
+        }
+        tr:nth-of-type(odd) {
+            background-color: $primary-200;
+        }
+    }
 }
 
 .columnC {
     background-color: $secondary-100;
+  table {
+    thead {
+      background-color: $secondary-050;
+      line-height: 3em;
+    }
+    tr:nth-of-type(odd) {
+      background-color: $secondary-200;
+    }
+  }
 }
 
 .knots-circle {
