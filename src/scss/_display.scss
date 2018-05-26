@@ -431,7 +431,7 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
     @return (0.2126 * $-local-red + 0.7152 * $-local-green + 0.0722 * $-local-blue) / 255;
 }
 
-@function contrast-color($bg, $c1: $primary, $c2: $background-colour) {
+@function contrast-color($bg, $c1: $white, $c2: $primary-900) {
     $bg-luma: contrast-luma($bg);
     $c1-luma: contrast-luma($c1);
     $c2-luma: contrast-luma($c2);
@@ -455,14 +455,14 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
     display: flex;
 
     .bar {
-      position: relative;
-      top: -0.4em;
+        position: relative;
+        top: 0;
         float: left;
-        height: 2rem;
+        height: 1.618rem;
     }
 
-    .base {
-        @include colour($primary-700);
+    .basis {
+        @include colour($primary-600);
     }
 
     .pos {
@@ -471,5 +471,9 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
 
     .neg {
         @include colour($red);
+    }
+
+    .diff {
+        opacity: 0.4;
     }
 }
