@@ -20,45 +20,6 @@ class Wood {
         d3.select(`${this._select} div`).remove();
         d3.select(this._select).append("div");
     }
-
-    _getText(wood) {
-        let text = '<table class="table table-sm table-striped small wood mt-4"><thead>';
-        text += "<tr>";
-        text += `<th>${wood.frame}<br><span class="des">Frame</span></th>`;
-        text += `<th>${wood.trim}<br><span class="des">Trim</span></th></tr></thead><tbody>`;
-        wood.properties.forEach((value, key) => {
-            text += `<tr><td>${key}</td><td>${value}`;
-            /*
-            let base = parseFloat(value.replace("\u2212\u202f", "-"), 10),
-                left,
-                right;
-            if (base > 0) {
-                left = 50;
-                right = base / this._woodCompare.minMaxProperty.get(key).max * 50;
-                text += `<span class="rate"><span class="bar neutral" style="width:${left}%;"></span>`;
-                text += `<span class="bar base" style="width:${right}%;"></span></span></td></tr>`;
-            } else if (base < 0) {
-                right = base / this._woodCompare.minMaxProperty.get(key).max * 50;
-                left = 50 - right;
-                text += `<span class="rate"><span class="bar neutral" style="width:${left}%;"></span>`;
-                text += `<span class="bar base" style="width:${right}%;"></span></span></td></tr>`;
-            } else {
-                left = 50;
-                right = 50;
-            }
-            console.log(
-                key,
-                value,
-                parseFloat(value.replace("\u2212\u202f", "-"), 10),
-                base,
-                this._woodCompare.minMaxProperty.get(key).min,
-                this._woodCompare.minMaxProperty.get(key).max
-            );
-            */
-        });
-        text += "</tbody></table>";
-        return text;
-    }
 }
 
 class WoodBase extends Wood {
@@ -82,6 +43,40 @@ class WoodBase extends Wood {
         return this._getProperty(property, "frame") + this._getProperty(property, "trim");
     }
 
+    _getText(wood) {
+        const middle = 100 / 2;
+        let text = '<table class="table table-sm table-striped small wood mt-4"><thead>';
+        text += "<tr>";
+        text += "<tr><th><em>Property</em></th><th><em>Change in %</em></th></tr></thead><tbody>";
+        wood.properties.forEach((value, key) => {
+            text += `<tr><td>${key}</td><td>${formatFloat(value * 100)}`;
+            text += '<span class="rate">';
+            if (value > 0) {
+                const right = value / this._woodCompare.minMaxProperty.get(key).max * 100 * middle;
+                text += `<span class="bar neutral" style="width:${middle}%;"></span>`;
+                text += `<span class="bar pos diff" style="width:${right}%;"></span>`;
+            } else if (value < 0) {
+                const right = value / this._woodCompare.minMaxProperty.get(key).min * 100 * middle,
+                    left = middle - right;
+                text += `<span class="bar neutral" style="width:${left}%;"></span>`;
+                text += `<span class="bar neg diff" style="width:${right}%;"></span>`;
+            } else {
+                text += '<span class="bar neutral"></span>';
+            }
+            text += "</span></td></tr>";
+            /*
+            console.log(
+                key,
+                value,
+                this._woodCompare.minMaxProperty.get(key).min,
+                this._woodCompare.minMaxProperty.get(key).max
+            );
+            */
+        });
+        text += "</tbody></table>";
+        return text;
+    }
+
     _printText() {
         const wood = {
             frame: this._woodData.frame.name,
@@ -89,7 +84,7 @@ class WoodBase extends Wood {
         };
         wood.properties = new Map();
         this._woodCompare._properties.forEach(property => {
-            wood.properties.set(property, formatPercent(this._getPropertySum(property)));
+            wood.properties.set(property, this._getPropertySum(property));
         });
 
         $(`${this._select}`)
@@ -131,27 +126,91 @@ class WoodComparison extends Wood {
         return this._getCompareProperty(property, "frame") + this._getCompareProperty(property, "trim");
     }
 
-    _printTextComparison() {
+    _getText(wood) {
         function getDiff(a, b, decimals = 1) {
             const diff = parseFloat(((a - b) * 100).toFixed(decimals));
             if (diff < 0) {
-                return `${formatPercent(a)} <span class="badge badge-danger">${formatFloat(Math.abs(diff))}</span>`;
+                return `${formatFloat(a * 100)} <span class="badge badge-light">${formatFloat(diff)}</span>`;
             } else if (diff > 0) {
-                return `${formatPercent(a)} <span class="badge badge-success">${formatFloat(diff)}</span>`;
+                return `${formatFloat(a * 100)} <span class="badge badge-light">+\u202f${formatFloat(diff)}</span>`;
             }
-            return "";
+            return formatFloat(a * 100);
         }
 
+        const middle = 100 / 2;
+        let text = '<table class="table table-sm table-striped small wood mt-4"><thead>';
+        text += "<tr>";
+        text += "<tr><th><em>Property</em></th><th><em>Change in %</em></th></tr></thead><tbody>";
+        wood.properties.forEach((value, key) => {
+            text += `<tr><td>${key}</td><td>${getDiff(value.compare, value.base)}`;
+
+            text += '<span class="rate">';
+            if (value.compare > 0) {
+                let compare = value.compare / this._woodCompare.minMaxProperty.get(key).max * 100 * middle,
+                    base = value.base / this._woodCompare.minMaxProperty.get(key).max * 100 * middle,
+                    sign = "pos";
+                if (base < compare) {
+                    compare -= base;
+                } else if (base > compare) {
+                    const t = compare;
+                    compare = base - t;
+                    base = t;
+                    sign = "neg";
+                } else {
+                    sign = "pos";
+                    base = compare;
+                    compare = 0;
+                }
+                // If difference is too wide, base and compare have different signs
+                if (value.base <= 0) {
+                    base = 0;
+                    compare = value.compare / this._woodCompare.minMaxProperty.get(key).max * 100 * middle;
+                }
+                text += `<span class="bar neutral" style="width:${middle}%;"></span>`;
+                text += `<span class="bar pos diff" style="width:${base}%;"></span>`;
+                text += `<span class="bar ${sign}" style="width:${compare}%;"></span>`;
+            } else if (value.compare < 0) {
+                let compare = value.compare / this._woodCompare.minMaxProperty.get(key).min * 100 * middle,
+                    base = value.base / this._woodCompare.minMaxProperty.get(key).min * 100 * middle,
+                    sign = "neg";
+                if (base < compare) {
+                    compare -= base;
+                } else if (base > compare) {
+                    base -= compare;
+                    sign = "pos";
+                } else {
+                    sign = "neg";
+                    compare = 0;
+                }
+                // If difference is too wide, base and compare have different signs
+                if (value.base >= 0) {
+                    compare = value.compare / this._woodCompare.minMaxProperty.get(key).min * 100 * middle;
+                    base = 0;
+                }
+                const neutral = middle - compare - base;
+                text += `<span class="bar neutral" style="width:${neutral}%;"></span>`;
+                text += `<span class="bar ${sign}" style="width:${compare}%;"></span>`;
+                text += `<span class="bar neg diff" style="width:${base}%;"></span>`;
+            } else {
+                text += '<span class="bar neutral"></span>';
+            }
+            text += "</span></td></tr>";
+        });
+        text += "</tbody></table>";
+        return text;
+    }
+
+    _printTextComparison() {
         const wood = {
             frame: this._compareData.frame.name,
             trim: this._compareData.trim.name
         };
         wood.properties = new Map();
         this._woodCompare._properties.forEach(property => {
-            wood.properties.set(
-                property,
-                getDiff(this._getComparePropertySum(property), this._getBasePropertySum(property))
-            );
+            wood.properties.set(property, {
+                base: this._getBasePropertySum(property),
+                compare: this._getComparePropertySum(property)
+            });
         });
 
         $(`${this._select}`)
@@ -183,9 +242,11 @@ export default class WoodCompare {
             "Crew",
             "Crew damage",
             "Grog morale bonus",
-            "Fire probability",
+            "Fire resistance",
             "Leak resistance"
         ];
+        this._options = {};
+        this.minMaxProperty = new Map();
 
         this._setupData();
         this._setupListener();
@@ -218,33 +279,39 @@ export default class WoodCompare {
             }
             return 0;
         });
-        this._options = {};
         this._options.frame = this._frameSelectData.map(wood => `<option value="${wood.name}">${wood.name}</option>`);
         this._options.trim = this._trimSelectData.map(wood => `<option value="${wood.name}">${wood.name}</option>`);
 
-        this.minMaxProperty = new Map();
         this._properties.forEach(property => {
-            const values = [
-                ...this._woodData.frame.map(
-                    frame =>
-                        frame.properties
-                            .filter(modifier => modifier.modifier === property)
-                            .map(modifier => modifier.amount)[0]
-                ),
-                ...this._woodData.trim.map(
-                    trim =>
-                        trim.properties
-                            .filter(modifier => modifier.modifier === property)
-                            .map(modifier => modifier.amount)[0]
-                )
-            ];
-            const min = d3.min(values);
-            const max = d3.max(values);
-            // console.log("property", property, values, min, max);
+            const frames = [
+                    ...this._woodData.frame.map(
+                        frame =>
+                            frame.properties
+                                .filter(modifier => modifier.modifier === property)
+                                .map(modifier => modifier.amount)[0]
+                    )
+                ],
+                trims = [
+                    ...this._woodData.trim.map(
+                        trim =>
+                            trim.properties
+                                .filter(modifier => modifier.modifier === property)
+                                .map(modifier => modifier.amount)[0]
+                    )
+                ];
+            let minFrames = d3.min(frames),
+                maxFrames = d3.max(frames),
+                minTrims = d3.min(trims),
+                maxTrims = d3.max(trims);
+            minFrames = typeof minFrames === "undefined" ? 0 : minFrames;
+            minTrims = typeof minTrims === "undefined" ? 0 : minTrims;
+            maxFrames = typeof maxFrames === "undefined" ? 0 : maxFrames;
+            maxTrims = typeof maxTrims === "undefined" ? 0 : maxTrims;
             this.minMaxProperty.set(property, {
-                min: typeof min === "undefined" ? 0 : min,
-                max: typeof max === "undefined" ? 0 : max
+                min: minFrames + minTrims >= 0 ? 0 : minFrames + minTrims,
+                max: maxFrames + maxTrims
             });
+            console.log("property", property, frames, trims, this.minMaxProperty.get(property));
         });
     }
 
