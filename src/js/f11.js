@@ -40,8 +40,8 @@ export default class F11 {
     }
 
     _f11Submitted() {
-        const x = +$("#x-coord").val() * 1000,
-            z = +$("#z-coord").val() * 1000;
+        const x = +$("#x-coord").val() * -1000,
+            z = +$("#z-coord").val() * -1000;
 
         this._goToF11(x, z);
     }
