@@ -43,7 +43,7 @@ function convertModules() {
     modifiers.set("NONE SHIP_PHYSICS_ACC_COEF", "Acceleration");
     modifiers.set("NONE SHIP_TURNING_SPEED", "Turn speed");
     modifiers.set("SAIL MAST_THICKNESS", "Mast thickness");
-    modifiers.set("STRUCTURE FIRE_INCREASE_RATE", "Fire probability");
+    modifiers.set("STRUCTURE FIRE_INCREASE_RATE", "Fire resistance");
     modifiers.set("STRUCTURE SHIP_PHYSICS_ACC_COEF", "Acceleration");
     modifiers.set("STRUCTURE SHIP_STRUCTURE_LEAKS_PER_SECOND", "Leak resistance");
 
@@ -84,7 +84,12 @@ function convertModules() {
                     if (modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`)) {
                         wood.properties.push({
                             modifier: modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`),
-                            amount: modifier.Percentage
+                            amount:
+                                modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`) === "Fire resistance" ||
+                                modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`) === "Leak resistance"||
+                                modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`) === "Rudder speed"
+                                    ? -modifier.Percentage
+                                    : modifier.Percentage
                         });
                     }
                 });
