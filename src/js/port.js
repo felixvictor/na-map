@@ -9,7 +9,7 @@ import Cookies from "js-cookie";
 import moment from "moment";
 import "moment/locale/en-gb";
 
-import { nations, defaultFontSize, defaultCircleSize } from "./common";
+import { nations, defaultFontSize, defaultCircleSize, getDistance, convertCoordX, convertCoordY } from "./common";
 import { formatInt, formatSiInt, formatPercent, roundToThousands, degreesToRadians } from "./util";
 
 export default class PortDisplay {
@@ -426,9 +426,11 @@ export default class PortDisplay {
 
     _updatePortCircles() {
         const circleScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale),
-            rMin = roundToThousands(this._circleSize / circleScale * this._minRadiusFactor);
+            rMin = roundToThousands(this._circleSize / circleScale * this._minRadiusFactor),
+            magicNumber = 5;
         let rMax = roundToThousands(this._circleSize / circleScale * this._maxRadiusFactor),
-            data = {};
+            data = {},
+            rGreenZone;
         if (this._showRadius === "tax" || this._showRadius === "net") {
             data = this.portData.filter(d => !d.properties.nonCapturable);
         } else if (this._showRadius === "attack") {
@@ -440,6 +442,16 @@ export default class PortDisplay {
                 port.properties.attackHostility = pbData.filter(d => port.id === d.id).map(d => d.attackHostility)[0];
                 return port;
             });
+        } else if (this._showRadius === "green") {
+            rGreenZone =
+                roundToThousands(
+                    getDistance(
+                        [convertCoordX(-63400, 18800), convertCoordY(-63400, 18800)],
+                        [convertCoordX(-79696, 10642), convertCoordY(-79696, 10642)]
+                    )
+                ) * magicNumber;
+            const pbData = this.pbData.ports.filter(d => d.nation !== "FT").map(d => d.id);
+            data = this.portData.filter(port => pbData.some(d => port.id === d) && port.properties.nonCapturable);
         } else if (this._showCurrentGood) {
             data = this.portData;
             rMax /= 2;
@@ -486,6 +498,8 @@ export default class PortDisplay {
                 .attr("class", "bubble")
                 .attr("fill", d => this._colourScale(d.properties.attackHostility))
                 .attr("r", d => this._attackRadius(d.properties.attackHostility));
+        } else if (this._showRadius === "green") {
+            circleMerge.attr("class", "bubble pos").attr("r", rGreenZone);
         } else if (this._showCurrentGood) {
             circleMerge.attr("class", d => `bubble ${d.properties.isSource ? "pos" : "neg"}`).attr("r", rMax);
         }
