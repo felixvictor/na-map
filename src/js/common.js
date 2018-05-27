@@ -2,6 +2,8 @@
     common.js
  */
 
+import { distancePoints } from "./util";
+
 const transformMatrix = {
         A: -0.00499866779363828,
         B: -0.00000021464254980645,
@@ -45,3 +47,21 @@ export const nations = [
 
 export const defaultFontSize = 16;
 export const defaultCircleSize = 16;
+
+/**
+ * Calculate the k distance between two svg coordinates
+ * @function
+ * @param {Point} pt0 - First point
+ * @param {Point} pt1 - Second point
+ * @return {Number} Distance between Pt0 and Pt1 in k
+ */
+export function getDistance(pt0, pt1) {
+    const F11X0 = convertInvCoordX(pt0[0], pt0[1]),
+        F11Y0 = convertInvCoordY(pt0[0], pt0[1]),
+        F11X1 = convertInvCoordX(pt1[0], pt1[1]),
+        F11Y1 = convertInvCoordY(pt1[0], pt1[1]),
+        factor = 2.56,
+        kFactor = 400 * factor;
+
+    return distancePoints([F11X0, F11Y0], [F11X1, F11Y1]) / kFactor;
+}
