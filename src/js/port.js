@@ -68,6 +68,7 @@ export default class PortDisplay {
         this._setPBData(pbData);
         this._setupListener();
         this._setupSvg();
+        this._setupRegions();
         this._setupSummary();
         this._setupFlags();
     }
@@ -116,6 +117,22 @@ export default class PortDisplay {
         this._gPortCircle = this._g.append("g");
         this._gIcon = this._g.append("g").classed("port", true);
         this._gText = this._g.append("g");
+        this._gRegion = this._g.append("g").classed("region", true);
+    }
+
+    _setupRegions() {
+        // https://stackoverflow.com/questions/40774697/how-to-group-an-array-of-objects-by-key
+        const counties = this.portDataDefault.filter(port => port.properties.county !== "").reduce(
+            (r, a) =>
+                Object.assign(r, {
+                    [a.properties.county]: (r[a.properties.county] || []).concat([a.geometry.coordinates])
+                }),
+            {}
+        );
+        this._countyPolygon = [];
+        Object.entries(counties).forEach(([key, value]) => {
+            this._countyPolygon.push({ name: key, coord: d3.polygonCentroid(d3.polygonHull(value)) });
+        });
     }
 
     _setupSummary() {
@@ -592,12 +609,39 @@ export default class PortDisplay {
         this._portSummaryTextNetIncome.text(`${formatSiInt(netTotal)}`);
     }
 
+    _updateRegion() {
+        let data = {};
+        if (this._zoomLevel !== "pbZone") {
+            data = this._countyPolygon;
+        }
+
+        // Data join
+        const regionUpdate = this._gRegion.selectAll(".region-name").data(data);
+
+        // Remove old
+        regionUpdate.exit().remove();
+
+        // Update kept texts
+        // regionUpdate; // not needed
+
+        // Add new texts
+        regionUpdate
+            .enter()
+            .append("text")
+            .classed("region-name", true)
+            .text(d => d.name)
+            .attr("font-size", 64)
+            .attr("x", d => d.coord[0])
+            .attr("y", d => d.coord[1]);
+    }
+
     update(scale = null) {
         this._scale = scale || this._scale;
         this._updateIcons();
         this._updatePortCircles();
         this.updateTexts();
         this._updateSummary();
+        this._updateRegion();
     }
 
     setHighlightId(highlightId) {
