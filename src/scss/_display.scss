@@ -149,15 +149,15 @@ p {
 
 .columnC {
     background-color: $secondary-100;
-  table {
-    thead {
-      background-color: $secondary-050;
-      line-height: 3em;
+    table {
+        thead {
+            background-color: $secondary-050;
+            line-height: 3em;
+        }
+        tr:nth-of-type(odd) {
+            background-color: $secondary-200;
+        }
     }
-    tr:nth-of-type(odd) {
-      background-color: $secondary-200;
-    }
-  }
 }
 
 .knots-circle {
@@ -504,4 +504,11 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
     .diff {
         opacity: 0.4;
     }
+}
+
+.region-name {
+    fill: $secondary-800;
+    opacity: 0.2;
+    text-anchor: middle;
+    font-style: italic;
 }
