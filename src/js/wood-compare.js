@@ -311,7 +311,6 @@ export default class WoodCompare {
                 min: minFrames + minTrims >= 0 ? 0 : minFrames + minTrims,
                 max: maxFrames + maxTrims
             });
-            console.log("property", property, frames, trims, this.minMaxProperty.get(property));
         });
     }
 
