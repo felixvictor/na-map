@@ -236,8 +236,11 @@ export default class PortDisplay {
             port = {
                 name: portProperties.name,
                 icon: pbData.nation,
-                availableForAll: portProperties.availableForAll,
+                availableForAll: portProperties.availableForAll ? "(accessible to all nations)" : "",
                 depth: portProperties.shallow ? "Shallow" : "Deep",
+                county:
+                    (portProperties.county !== "" ? `${portProperties.county}\u200a/\u200a` : "") +
+                    portProperties.region,
                 countyCapital: portProperties.countyCapital ? " (county capital)" : "",
                 nonCapturable: portProperties.nonCapturable,
                 captured: pbData.capturer
@@ -302,7 +305,7 @@ export default class PortDisplay {
         function tooltipData(port) {
             let h = `<table><tbody<tr><td><i class="flag-icon ${port.icon}"></i></td>`;
             h += `<td><span class="port-name">${port.name}</span>`;
-            h += port.availableForAll ? " (accessible to all nations)" : "";
+            h += `\u2001${port.county} ${port.availableForAll}`;
             h += "</td></tr></tbody></table>";
             if (port.attack.length) {
                 h += `<div class="alert alert-danger mt-2" role="alert">${port.attack}</div>`;
