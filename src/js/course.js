@@ -8,8 +8,8 @@
 import moment from "moment";
 import "moment/locale/en-gb";
 
-import { convertInvCoordX, convertInvCoordY } from "./common";
-import { degreesToCompass, rotationAngleInDegrees, distancePoints, formatF11 } from "./util";
+import { convertInvCoordX, convertInvCoordY, getDistance } from "./common";
+import { degreesToCompass, rotationAngleInDegrees, formatF11 } from "./util";
 
 export default class Course {
     constructor(fontSize) {
@@ -65,24 +65,17 @@ export default class Course {
             pos1 = this._lineData.length - 2,
             degrees = rotationAngleInDegrees(this._lineData[pos0], this._lineData[this._lineData.length - 2]),
             compass = degreesToCompass(degrees),
-            x0 = this._lineData[pos0][0],
-            y0 = this._lineData[pos0][1],
-            x1 = this._lineData[pos1][0],
-            y1 = this._lineData[pos1][1],
-            F11X0 = convertInvCoordX(x0, y0),
-            F11Y0 = convertInvCoordY(x0, y0),
-            F11X1 = convertInvCoordX(x1, y1),
-            F11Y1 = convertInvCoordY(x1, y1),
+            pt0 = [this._lineData[pos0][0], this._lineData[pos0][1]],
+            pt1 = [this._lineData[pos1][0], this._lineData[pos1][1]],
+            distance = getDistance(pt0, pt1),
             factor = 2.56,
-            kFactor = 400 * factor,
-            speedFactor = 19 / factor,
-            distance = distancePoints([F11X0, F11Y0], [F11X1, F11Y1]) / kFactor;
+            speedFactor = 19 / factor;
         this._totalDistance += distance;
         const duration = moment.duration(distance / speedFactor, "minutes").humanize(true),
             totalDuration = moment.duration(this._totalDistance / speedFactor, "minutes").humanize(true),
             textDirection = `${compass} (${Math.round(degrees)}°) \u2606 F11: ${formatF11(
-                F11X0
-            )}\u202f/\u202f${formatF11(F11Y0)}`;
+                convertInvCoordX(pt0[0], pt0[1])
+            )}\u202f/\u202f${formatF11(convertInvCoordY(pt0[0], pt0[1]))}`;
         let textDistance = `${Math.round(distance)}k ${duration}`;
         const textLines = 2;
         if (this._lineData.length > 2) {
@@ -96,8 +89,8 @@ export default class Course {
 
         const svg = this._g
             .append("svg")
-            .attr("x", x0)
-            .attr("y", y0);
+            .attr("x", pt0[0])
+            .attr("y", pt0[1]);
         const textBackgroundBox = svg.append("rect");
         const textDirectionBox = svg
             .append("text")
