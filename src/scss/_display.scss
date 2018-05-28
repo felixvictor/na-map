@@ -506,9 +506,15 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
     }
 }
 
-.region-name {
-    fill: $secondary-800;
-    opacity: 0.2;
+.county text,
+.region text {
+    font-size: 200px;
+    fill: $white;
+    opacity: .7;
     text-anchor: middle;
+}
+
+.county text {
+    font-size: 64px;
     font-style: italic;
 }
