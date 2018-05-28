@@ -68,6 +68,7 @@ export default class PortDisplay {
         this._setPBData(pbData);
         this._setupListener();
         this._setupSvg();
+        this._setupCounties();
         this._setupRegions();
         this._setupSummary();
         this._setupFlags();
@@ -117,10 +118,11 @@ export default class PortDisplay {
         this._gPortCircle = this._g.append("g");
         this._gIcon = this._g.append("g").classed("port", true);
         this._gText = this._g.append("g");
+        this._gCounty = this._g.append("g").classed("county", true);
         this._gRegion = this._g.append("g").classed("region", true);
     }
 
-    _setupRegions() {
+    _setupCounties() {
         // https://stackoverflow.com/questions/40774697/how-to-group-an-array-of-objects-by-key
         const counties = this.portDataDefault.filter(port => port.properties.county !== "").reduce(
             (r, a) =>
@@ -131,7 +133,30 @@ export default class PortDisplay {
         );
         this._countyPolygon = [];
         Object.entries(counties).forEach(([key, value]) => {
-            this._countyPolygon.push({ name: key, coord: d3.polygonCentroid(d3.polygonHull(value)) });
+            this._countyPolygon.push({
+                name: key,
+                // polygon: d3.polygonHull(value),
+                centroid: d3.polygonCentroid(d3.polygonHull(value))
+            });
+        });
+    }
+
+    _setupRegions() {
+        // https://stackoverflow.com/questions/40774697/how-to-group-an-array-of-objects-by-key
+        const regions = this.portDataDefault.filter(port => port.properties.region !== "").reduce(
+            (r, a) =>
+                Object.assign(r, {
+                    [a.properties.region]: (r[a.properties.region] || []).concat([a.geometry.coordinates])
+                }),
+            {}
+        );
+        this._regionPolygon = [];
+        Object.entries(regions).forEach(([key, value]) => {
+            this._regionPolygon.push({
+                name: key,
+                // polygon: d3.polygonHull(value),
+                centroid: d3.polygonCentroid(d3.polygonHull(value))
+            });
         });
     }
 
@@ -244,6 +269,63 @@ export default class PortDisplay {
                 .attr("width", this._iconSize)
                 .attr("class", "all");
         });
+
+        // create filter with id #drop-shadow
+        const filter = svgDef
+            .append("filter")
+            .attr("id", "drop-shadow")
+            .attr("width", "200%")
+            .attr("height", "200%");
+
+        filter
+            .append("feGaussianBlur")
+            .attr("in", "SourceAlpha")
+            .attr("stdDeviation", 5)
+            .attr("result", "blur");
+
+        filter
+            .append("feOffset")
+            .attr("dx", 2)
+            .attr("dy", 4)
+            .attr("result", "offsetblur1");
+
+        filter
+            .append("feOffset")
+            .attr("dx", 3)
+            .attr("dy", 6)
+            .attr("result", "offsetblur2")
+            .attr("in", "blur");
+
+        const feComponentOne = filter
+            .append("feComponentTransfer")
+            .attr("result", "shadow1")
+            .attr("in", "offsetblur1");
+
+        feComponentOne
+            .append("feFuncA")
+            .attr("type", "linear")
+            .attr("slope", "0.1");
+
+        const feComponentTwo = filter
+            .append("feComponentTransfer")
+            .attr("result", "shadow2")
+            .attr("in", "offsetblur2");
+
+        feComponentTwo
+            .append("feFuncA")
+            .attr("type", "linear")
+            .attr("slope", "0.1");
+
+        filter
+            .append("feComposite")
+            .attr("in2", "offsetblur1")
+            .attr("operator", "in");
+
+        const feMerge = filter.append("feMerge");
+
+        feMerge.append("feMergeNode").attr("in", "shadow1");
+        feMerge.append("feMergeNode").attr("in", "shadow2");
+        feMerge.append("feMergeNode").attr("in", "SourceGraphic");
     }
 
     _getText(id, portProperties) {
@@ -446,9 +528,9 @@ export default class PortDisplay {
 
     _updatePortCircles() {
         const circleScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale),
-            rMin = roundToThousands(this._circleSize / circleScale * this._minRadiusFactor),
+            rMin = roundToThousands((this._circleSize / circleScale) * this._minRadiusFactor),
             magicNumber = 5;
-        let rMax = roundToThousands(this._circleSize / circleScale * this._maxRadiusFactor),
+        let rMax = roundToThousands((this._circleSize / circleScale) * this._maxRadiusFactor),
             data = {},
             rGreenZone;
         if (this._showRadius === "tax" || this._showRadius === "net") {
@@ -609,30 +691,88 @@ export default class PortDisplay {
         this._portSummaryTextNetIncome.text(`${formatSiInt(netTotal)}`);
     }
 
-    _updateRegion() {
-        let data = {};
-        if (this._zoomLevel !== "pbZone") {
-            data = this._countyPolygon;
+    _updateCounties() {
+        if (this._zoomLevel !== "portLabel") {
+            this._gCounty.attr("display", "none");
+        } else {
+            this._gCounty.attr("display", "inherit");
+            const data = this._countyPolygon;
+
+            // Data join
+            const countyUpdate = this._gCounty.selectAll("text").data(data);
+
+            // Remove old
+            countyUpdate.exit().remove();
+
+            // Update kept texts
+            // countyUpdate; // not needed
+
+            // Add new texts
+            countyUpdate
+                .enter()
+                .append("text")
+                .text(d => d.name)
+                .style("filter", "url(#drop-shadow)")
+                .attr("x", d => Math.round(d.centroid[0]))
+                .attr("y", d => Math.round(d.centroid[1]));
+
+            /* Show polygon for test purposes
+            const d3line2 = d3
+                .line()
+                .x(d => d[0])
+                .y(d => d[1]);
+
+            this._gCounty
+                .selectAll("path")
+                .data(data)
+                .enter()
+                .append("path")
+                .attr("d", d => d3line2(d.polygon))
+                .attr("fill", "#373");
+                */
         }
+    }
 
-        // Data join
-        const regionUpdate = this._gRegion.selectAll(".region-name").data(data);
+    _updateRegions() {
+        if (this._zoomLevel !== "initial") {
+            this._gRegion.attr("display", "none");
+        } else {
+            this._gRegion.attr("display", "inherit");
+            const data = this._regionPolygon;
 
-        // Remove old
-        regionUpdate.exit().remove();
+            // Data join
+            const regionUpdate = this._gRegion.selectAll("text").data(data);
 
-        // Update kept texts
-        // regionUpdate; // not needed
+            // Remove old
+            regionUpdate.exit().remove();
 
-        // Add new texts
-        regionUpdate
-            .enter()
-            .append("text")
-            .classed("region-name", true)
-            .text(d => d.name)
-            .attr("font-size", 64)
-            .attr("x", d => d.coord[0])
-            .attr("y", d => d.coord[1]);
+            // Update kept texts
+            // regionUpdate; // not needed
+
+            // Add new texts
+            regionUpdate
+                .enter()
+                .append("text")
+                .style("filter", "url(#drop-shadow)")
+                .text(d => d.name)
+                .attr("x", d => Math.round(d.centroid[0]))
+                .attr("y", d => Math.round(d.centroid[1]));
+
+            /* Show polygon for test purposes
+            const d3line2 = d3
+                .line()
+                .x(d => d[0])
+                .y(d => d[1]);
+
+            this._gRegion
+                .selectAll("path")
+                .data(data)
+                .enter()
+                .append("path")
+                .attr("d", d => d3line2(d.polygon))
+                .attr("fill", "#999");
+                */
+        }
     }
 
     update(scale = null) {
@@ -641,7 +781,8 @@ export default class PortDisplay {
         this._updatePortCircles();
         this.updateTexts();
         this._updateSummary();
-        this._updateRegion();
+        this._updateCounties();
+        this._updateRegions();
     }
 
     setHighlightId(highlightId) {
