@@ -223,6 +223,8 @@ export default class PortDisplay {
     }
 
     _setupRegions() {
+        /*
+        ** Automatic calculation of text position
         // https://stackoverflow.com/questions/40774697/how-to-group-an-array-of-objects-by-key
         const regions = this.portDataDefault.filter(port => port.properties.region !== "").reduce(
             (r, a) =>
@@ -239,7 +241,25 @@ export default class PortDisplay {
                 centroid: d3.polygonCentroid(d3.polygonHull(value))
             });
         });
-        console.log(JSON.stringify(this._regionPolygon));
+        */
+
+        this._regionPolygon = [
+            { name: "Atlantic Coast", centroid: [4200, 970], angle: 0 },
+            { name: "Atlantic", centroid: [6401, 684], angle: 0 },
+            { name: "Bahamas", centroid: [5100, 2400], angle: 0 },
+            { name: "Central America", centroid: [3000, 5100], angle: 0 },
+            { name: "Central Antilles", centroid: [6900, 4500], angle: 0 },
+            { name: "East Cuba", centroid: [4454, 3400], angle: 20 },
+            { name: "Gulf", centroid: [1602, 2328], angle: 0 },
+            { name: "Hispaniola", centroid: [5477, 4200], angle: 0 },
+            { name: "Jamaica", centroid: [3500, 3985], angle: 0 },
+            { name: "Lower Antilles", centroid: [7100, 5173], angle: 0 },
+            { name: "Puerto Rico", centroid: [6900, 3750], angle: 0 },
+            { name: "South America", centroid: [6400, 6100], angle: 0 },
+            { name: "Upper Antilles", centroid: [6850, 4250], angle: 0 },
+            { name: "West Cuba", centroid: [3300, 3100], angle: 20 },
+            { name: "Yucatan", centroid: [1462, 3550], angle: 0 }
+        ];
     }
 
     _setupSummary() {
@@ -836,8 +856,7 @@ export default class PortDisplay {
                 .append("text")
                 .style("filter", "url(#drop-shadow)")
                 .text(d => d.name)
-                .attr("x", d => Math.round(d.centroid[0]))
-                .attr("y", d => Math.round(d.centroid[1]));
+                .attr("transform", d => `translate(${d.centroid[0]},${d.centroid[1]})rotate(${d.angle})`);
 
             /* Show polygon for test purposes
             const d3line2 = d3
