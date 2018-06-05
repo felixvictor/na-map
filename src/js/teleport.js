@@ -24,7 +24,7 @@ export default class Teleport {
         // Use only ports that deep water ports and not a county capital
         return (
             this._ports.portDataDefault
-                .filter(d => !d.properties.shallow && !d.properties.countyCapital)
+                .filter(d => !d.properties.shallow)
                 // Map to coordinates array
                 .map(d => ({
                     id: d.id,
