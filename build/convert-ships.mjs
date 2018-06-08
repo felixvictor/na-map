@@ -26,7 +26,7 @@ String.prototype.replaceAll = function(search, replacement) {
 
 function convertShips() {
     const geoJson = {},
-        cannonWeight = [0, 42, 32, 24, 18, 12, 9, 0, 6, 4],
+        cannonWeight = [0, 42, 32, 24, 18, 12, 9, 0, 6, 4, 4, 2],
         carroWeight = [0, 0, 68, 42, 32, 24, 0, 18, 12];
     geoJson.shipData = [];
 
