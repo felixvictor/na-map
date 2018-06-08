@@ -36,7 +36,7 @@ function convertModules() {
     modifiers.set("ARMOR_ALL_SIDES MODULE_BASE_HP", "Side armour");
     modifiers.set("CREW MODULE_BASE_HP", "Crew");
     modifiers.set("INTERNAL_STRUCTURE MODULE_BASE_HP", "Hull strength");
-    modifiers.set("NONE CREW_DAMAGE_RECEIVED_DECREASE_PERCENT", "Crew damage");
+    modifiers.set("NONE CREW_DAMAGE_RECEIVED_DECREASE_PERCENT", "Crew protection");
     modifiers.set("NONE GROG_MORALE_BONUS", "Grog morale bonus");
     modifiers.set("NONE RUDDER_HALFTURN_TIME", "Rudder speed");
     modifiers.set("NONE SHIP_MAX_SPEED", "Ship speed");
@@ -82,14 +82,19 @@ function convertModules() {
                 module.modifiers.forEach(modifier => {
                     // Add modifier if in modifier map
                     if (modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`)) {
+                        let amount = modifier.Percentage;
+                        if (
+                            modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`) === "Fire resistance" ||
+                            modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`) === "Leak resistance" ||
+                            modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`) === "Rudder speed"
+                        ) {
+                            amount = -amount;
+                        } else if (modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`) === "Crew protection") {
+                            amount = modifier.Absolute * 100;
+                        }
                         wood.properties.push({
                             modifier: modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`),
-                            amount:
-                                modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`) === "Fire resistance" ||
-                                modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`) === "Leak resistance"||
-                                modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`) === "Rudder speed"
-                                    ? -modifier.Percentage
-                                    : modifier.Percentage
+                            amount
                         });
                     }
                 });
