@@ -8,7 +8,7 @@
 import { formatFloat, getOrdinal, isEmpty } from "./util";
 
 const numSegments = 24,
-    segmentRadians = 2 * Math.PI / numSegments;
+    segmentRadians = (2 * Math.PI) / numSegments;
 
 class Ship {
     constructor(compareId, shipCompare) {
@@ -24,8 +24,7 @@ class Ship {
 
     _setupSvg() {
         d3.select(`${this._select} svg`).remove();
-        d3
-            .select(this._select)
+        d3.select(this._select)
             .append("svg")
             .attr("width", this._shipCompare.svgWidth)
             .attr("height", this._shipCompare.svgHeight)
@@ -201,7 +200,7 @@ class ShipBase extends Ship {
         gradientDomain[2] = gradientDomain[1] - gradientDomain[0];
         const gradientPoint = [];
         for (let i = 0; i < numStops; i += 1) {
-            gradientPoint.push(i * gradientDomain[2] / (numStops - 1) + gradientDomain[0]);
+            gradientPoint.push((i * gradientDomain[2]) / (numStops - 1) + gradientDomain[0]);
         }
 
         // Create the gradient
