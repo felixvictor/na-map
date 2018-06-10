@@ -151,6 +151,7 @@ class WoodComparison extends Wood {
             if (value.compare >= 0) {
                 if (value.base >= 0) {
                     if (value.compare > value.base) {
+                        // eslint-disable-next-line prefer-destructuring
                         base = value.base;
                         diff = value.compare - value.base;
                         diffColour = "pos";
@@ -181,9 +182,10 @@ class WoodComparison extends Wood {
                         neutral = -value.base;
                         diffColour = "pos";
                     } else {
+                        // eslint-disable-next-line prefer-destructuring
                         base = value.base;
                         diff = value.compare - value.base;
-                        neutral = value.compare + value.base;
+                        neutral = -value.compare;
                         diffColour = "neg";
                     }
                 } else {
