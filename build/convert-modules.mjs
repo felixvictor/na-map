@@ -30,7 +30,7 @@ function convertModules() {
     levels.set("Regular", "R");
     levels.set("LightShips", "S");
     levels.set("Medium", "M");
-    levels.set("Lineships", "L");
+    levels.set("LineShips", "L");
 
     // Woods
     modifiers.set("ARMOR_ALL_SIDES ARMOR_THICKNESS", "Thickness");
@@ -104,13 +104,13 @@ function convertModules() {
     modifiers.set("NONE PERK_BOARDING_ENEMY_EXTRA_CREW_REQUIREMENT", "Enemy boarding crew needed");
     modifiers.set("NONE PERK_BOARDING_ENEMY_MORALE_LOSS_MODIFIER", "Enemy boarding morale loss");
     modifiers.set("NONE PERK_CARRONADE_DISPERSION_MODIFIER", "Carronade dispersion");
-    modifiers.set("NONE PERK_CONTROL_EXIT_TIMER_OVERRIDE_DISTANCE", "Control override distance");
-    modifiers.set("NONE PERK_CRAFT_CREW_HIRE_COST_MODIFIER", "CRAFT_CREW_HIRE_COST_MODIFIER");
+    modifiers.set("NONE PERK_CONTROL_EXIT_TIMER_OVERRIDE_DISTANCE", "Control distance");
+    modifiers.set("NONE PERK_CRAFT_CREW_HIRE_COST_MODIFIER", "Crew hire cost");
     modifiers.set("NONE PERK_CRAFT_DROP_RECIPE_CHANCE_MODIFIER", "CRAFT_DROP_RECIPE_CHANCE_MODIFIER");
-    modifiers.set("NONE PERK_CRAFT_FRIGATE_SHIP_LABOR_PRICE_MODIFIER", "CRAFT_FRIGATE_SHIP_LABOR_PRICE_MODIFIER");
-    modifiers.set("NONE PERK_CRAFT_LIGHT_SHIP_LABOR_PRICE_MODIFIER", "CRAFT_LIGHT_SHIP_LABOR_PRICE_MODIFIER");
-    modifiers.set("NONE PERK_CRAFT_LINE_SHIP_LABOR_PRICE_MODIFIER", "CRAFT_LINE_SHIP_LABOR_PRICE_MODIFIER");
-    modifiers.set("NONE PERK_CRAFT_SHIP_LABOR_PRICE_MODIFIER", "CRAFT_SHIP_LABOR_PRICE_MODIFIER");
+    modifiers.set("NONE PERK_CRAFT_FRIGATE_SHIP_LABOR_PRICE_MODIFIER", "Labour hours to craft frigate");
+    modifiers.set("NONE PERK_CRAFT_LIGHT_SHIP_LABOR_PRICE_MODIFIER", "Labour hours to craft unrated ship");
+    modifiers.set("NONE PERK_CRAFT_LINE_SHIP_LABOR_PRICE_MODIFIER", "Labour hours to craft ship of the line");
+    modifiers.set("NONE PERK_CRAFT_SHIP_LABOR_PRICE_MODIFIER", "Labour hours to craft any ship");
     modifiers.set("NONE PERK_CREW_REPAIR_PERCENT_MODIFIER", "Crew repair");
     modifiers.set("NONE PERK_DONT_CONSUME_BATTLE_REPAIRS", "DONT_CONSUME_BATTLE_REPAIRS");
     modifiers.set("NONE PERK_EMERGENCY_REPAIR_COOLDOWN_MODIFIER", "Emergency repair cooldown");
@@ -123,9 +123,9 @@ function convertModules() {
     modifiers.set("NONE PERK_LABOR_HOURS_GENERATION_MODIFIER", "Labour hour generation");
     modifiers.set("NONE PERK_LABOR_HOURS_WALLET_MODIFIER", "Labour hour wallet");
     modifiers.set("NONE PERK_MAX_FLEET_SIZE_MODIFIER", "Fleet ships");
-    modifiers.set("NONE PERK_MORTAR_BALL_COUNT_MODIFIER", "Mortar balls");
-    modifiers.set("NONE PERK_MORTAR_DISPERSION_MODIFIER", "Mortar dispension modifier");
-    modifiers.set("NONE PERK_MORTAR_RELOAD_TIME_MODIFIER", "Mortar reload time modifier");
+    modifiers.set("NONE PERK_MORTAR_BALL_COUNT_MODIFIER", "Additional mortar balls");
+    modifiers.set("NONE PERK_MORTAR_DISPERSION_MODIFIER", "Mortar dispension");
+    modifiers.set("NONE PERK_MORTAR_RELOAD_TIME_MODIFIER", "Mortar reload time");
     modifiers.set("NONE PERK_NATIONAL_HUNTER_SPEED_ADD_MODIFIER", "National hunter speed modifier");
     modifiers.set("NONE PERK_PIRATE_HUNTER_RELOAD_TIME_MODIFIER", "Pirate hunter reload time");
     modifiers.set("NONE PERK_PRESS_GANG", "Press gang");
@@ -137,7 +137,7 @@ function convertModules() {
     modifiers.set("NONE PERK_SHIP_MASTER_RELOAD_TIME_MODIFIER", "Ship master reload time modifier");
     modifiers.set("NONE PERK_SHIP_MASTER_REPAIR_COUNT_ADD_MODIFIER", "Additional repairs");
     modifiers.set("NONE PERK_SHIP_MASTER_SPEED_ADD_MODIFIER", "Ship master speed add modifier");
-    modifiers.set("NONE PERK_SOLD_SHIP_PRICE_MODIFIER", "Ship sell price modifier");
+    modifiers.set("NONE PERK_SOLD_SHIP_PRICE_MODIFIER", "Ship sell price");
     modifiers.set("NONE PERK_START_ALL_GUNS_LOADED", "Guns loaded at start");
     modifiers.set("NONE PREPARATION_BONUS_PER_ROUND", "Preparation bonus per round");
     modifiers.set("NONE RHEA_TURN_SPEED", "Yard turn speed");
@@ -243,25 +243,20 @@ function convertModules() {
     APIItems.filter(item => item.ItemType === "Module").forEach(APImodule => {
         const module = {
             id: APImodule.Id,
-            name: APImodule.Name.replaceAll("'", "’"),
+            name: APImodule.Name.replaceAll("'", "’").replace("Bow figure - ", ""),
             usageType: APImodule.UsageType,
             APImodifiers: APImodule.Modifiers,
-            // maxItems: APImodule.MaxItems,
-            // maxStack: APImodule.MaxStack,
             sortingGroup: APImodule.SortingGroup.replace("module:", ""),
-            bIsBowFigure: APImodule.bIsBowFigure,
-            bCanBeSetWithSameType: APImodule.bCanBeSetWithSameType,
+            isBowFigure: APImodule.bIsBowFigure,
+            isStackable: APImodule.bCanBeSetWithSameType,
             // minResourcesAmount: APImodule.MinResourcesAmount,
             // maxResourcesAmount: APImodule.MaxResourcesAmount,
             // breakUpItemsAmount: APImodule.BreakUpItemsAmount,
             // canBeBreakedUp: APImodule.CanBeBreakedUp,
             // bCanBeBreakedUp: APImodule.bCanBeBreakedUp,
-            // maxModulesCountOnShip: APImodule.MaxModulesCountOnShip,
             moduleType: APImodule.ModuleType,
-            moduleLevel: APImodule.ModuleLevel
+            moduleLevel: levels.get(APImodule.ModuleLevel)
         };
-
-        module.moduleLevel = levels.get(module.moduleLevel);
 
         // Ignore double entries
         if (!modules.get(module.name + module.moduleLevel)) {
@@ -274,7 +269,70 @@ function convertModules() {
                 setWood(module);
             } else {
                 setModuleModifier(module);
-                modules.set(module.name + module.moduleLevel, module);
+                if (
+                    module.usageType === "All" &&
+                    module.sortingGroup === "speed_turn" &&
+                    module.moduleLevel === "U" &&
+                    module.moduleType === "Hidden"
+                ) {
+                    module.type = "Ship trim";
+                } else if (module.isBowFigure) {
+                    module.type = "Bow figure";
+                } else if (
+                    module.moduleType === "Permanent" &&
+                    !module.name.endsWith(" Bonus") &&
+                    !module.isBowFigure
+                ) {
+                    module.type = "Permanent";
+                } else if (
+                    module.usageType === "All" &&
+                    module.sortingGroup === "" &&
+                    module.moduleLevel === "U" &&
+                    module.moduleType === "Hidden"
+                ) {
+                    module.type = "Perk";
+                } else if (module.moduleType === "Regular") {
+                    module.type = "Ship knowledge";
+                } else {
+                    module.type = "Not used";
+                }
+
+                if (module.name.endsWith(" (1-3 rates)")) {
+                    module.name = module.name.replace(" (1-3 rates)", "");
+                    module.moduleLevel = "L";
+                }
+                if (module.name.endsWith(" (4-5 rates)")) {
+                    module.name = module.name.replace(" (4-5 rates)", "");
+                    module.moduleLevel = "M";
+                }
+                if (module.name.endsWith(" (6-7 rates)")) {
+                    module.name = module.name.replace(" (6-7 rates)", "");
+                    module.moduleLevel = "S";
+                }
+
+                delete module.isBowFigure;
+                delete module.moduleType;
+                if (
+                    module.type !== "Not used" &&
+                    module.name !== "Gifted" &&
+                    module.name !== "Coward" &&
+                    module.name !== "Doctor" &&
+                    module.name !== "Dreadful" &&
+                    module.name !== "Expert Surgeon" &&
+                    module.name !== "Frigate Master" &&
+                    module.name !== "Gifted" &&
+                    module.name !== "Light Ship Master" &&
+                    module.name !== "Lineship Master" &&
+                    module.name !== "Press Gang" &&
+                    module.name !== "Signaling" &&
+                    module.name !== "Thrifty" &&
+                    module.name !== "Lead Sheating" &&
+                    module.name !== "TEST MODULE SPEED IN OW" &&
+                    module.name !== "Cannon nation module - France" &&
+                    module.name !== "Survival Handbooks - OLD"
+                ) {
+                    modules.set(module.name + module.moduleLevel, module);
+                }
             }
         }
     });
@@ -301,6 +359,7 @@ function convertModules() {
         }
         return 0;
     });
+
     saveJson(`${outDir}/modules.json`, result);
     saveJson(`${outDir}/woods.json`, woodJson);
 }
