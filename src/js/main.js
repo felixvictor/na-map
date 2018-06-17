@@ -91,33 +91,17 @@ function main() {
      * @return {void}
      */
     function setupListener() {
-        // Adapted https://github.com/bootstrapthemesco/bootstrap-4-multi-dropdown-navbar
-        $(".dropdown-menu a.dropdown-toggle").on("click", event => {
-            const $el = $(event.currentTarget);
-            const $parent = $el.offsetParent(".dropdown-menu");
-
-            if (!$el.next().hasClass("show")) {
-                $el
-                    .parents(".dropdown-menu")
-                    .first()
-                    .find(".show")
-                    .not(".inner")
-                    .removeClass("show");
-            }
-            $el.next(".dropdown-menu").toggleClass("show");
-            $el.parent("li").toggleClass("show");
-            $el.parents("li.nav-item.dropdown.show").on("hidden.bs.dropdown", event2 => {
-                const el2 = $(event2.currentTarget)
-                    .find(".dropdown-menu .show")
-                    .not(".inner");
-                el2.removeClass("show");
-            });
-            if (!$parent.parent().hasClass("navbar-nav")) {
-                $el.next().css({ top: $el[0].offsetTop, left: $parent.outerWidth() - 4 });
-            }
-
-            return false;
+        // https://stackoverflow.com/questions/44467377/bootstrap-4-multilevel-dropdown-inside-navigation/48953349#48953349
+        $(".dropdown-submenu > a").on("click", event => {
+            const submenu = $(event.currentTarget);
+            submenu.next(".dropdown-menu").toggleClass("show");
+            event.stopPropagation();
         });
+        $(".dropdown").on("hidden.bs.dropdown", () => {
+            // hide any open menus when parent closes
+            $(".dropdown-menu.show").removeClass("show");
+        });
+
         $("#server-name").change(() => serverNameSelected());
     }
 
