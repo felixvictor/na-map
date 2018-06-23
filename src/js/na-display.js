@@ -39,6 +39,7 @@ import ShipCompare from "./ship-compare";
 import Teleport from "./teleport";
 import WindPrediction from "./wind-prediction";
 import WoodCompare from "./wood-compare";
+import Module from "./module-list";
 
 /**
  * Display naval action map
@@ -46,7 +47,21 @@ import WoodCompare from "./wood-compare";
  * @returns {void}
  */
 export default function naDisplay(serverName) {
-    let map, ports, teleport, portSelect, shipCompare, woodCompare, windPrediction, f11, course, grid, pbZone, shipData, woodData;
+    let map,
+        ports,
+        teleport,
+        portSelect,
+        shipCompare,
+        woodCompare,
+        moduleList,
+        windPrediction,
+        f11,
+        course,
+        grid,
+        pbZone,
+        shipData,
+        woodData,
+        moduleData;
 
     /** Main map */
     class NAMap {
@@ -521,6 +536,7 @@ export default function naDisplay(serverName) {
 
         shipCompare = new ShipCompare(shipData);
         woodCompare = new WoodCompare(woodData);
+        moduleList = new Module(moduleData);
         teleport = new Teleport(map.coord.min, map.coord.max, ports);
         portSelect = new PortSelect(map, ports, pbZone);
         windPrediction = new WindPrediction(map.margin.left, map.margin.top);
@@ -563,6 +579,7 @@ export default function naDisplay(serverName) {
 
         shipData = JSON.parse(JSON.stringify(data.ships.shipData));
         woodData = JSON.parse(JSON.stringify(data.woods));
+        moduleData = JSON.parse(JSON.stringify(data.modules));
 
         setup();
     }
@@ -583,8 +600,20 @@ export default function naDisplay(serverName) {
         const woodJsonData = fetch("woods.json", { cache: cacheMode })
             .then(checkFetchStatus)
             .then(getJsonFromFetch);
-        Promise.all([naMapJsonData, pbJsonData, pbZonesJsonData, shipJsonData, woodJsonData])
-            .then(values => init({ ports: values[0], pb: values[1], pbZones: values[2], ships: values[3], woods: values[4] }))
+        const moduleJsonData = fetch("modules.json", { cache: cacheMode })
+            .then(checkFetchStatus)
+            .then(getJsonFromFetch);
+        Promise.all([naMapJsonData, pbJsonData, pbZonesJsonData, shipJsonData, woodJsonData, moduleJsonData])
+            .then(values =>
+                init({
+                    ports: values[0],
+                    pb: values[1],
+                    pbZones: values[2],
+                    ships: values[3],
+                    woods: values[4],
+                    modules: values[5]
+                })
+            )
             .catch(putFetchError);
     }
 
