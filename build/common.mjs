@@ -63,7 +63,7 @@ export const readJson = fileName => JSON.parse(fs.readFileSync(fileName, "utf8")
  * @param {Number} radians - Radians
  * @return {Number} Degrees
  */
-Math.radiansToDegrees = radians => radians * 180 / Math.PI;
+Math.radiansToDegrees = radians => (radians * 180) / Math.PI;
 
 /**
  * @typedef {Array} Point
@@ -114,7 +114,7 @@ export const distancePoints = (centerPt, targetPt) =>
  * @param {Number} degrees - Degrees
  * @return {Number} Radians
  */
-export const degreesToRadians = degrees => Math.PI / 180 * (degrees - 90);
+export const degreesToRadians = degrees => (Math.PI / 180) * (degrees - 90);
 
 export const defaultFontSize = 16;
 export const defaultCircleSize = 16;
