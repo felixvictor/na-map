@@ -94,12 +94,16 @@ function main() {
         // https://stackoverflow.com/questions/44467377/bootstrap-4-multilevel-dropdown-inside-navigation/48953349#48953349
         $(".dropdown-submenu > a").on("click", event => {
             const submenu = $(event.currentTarget);
-            submenu.next(".dropdown-menu").toggleClass("show");
+            submenu.next(".dropdown-menu").addClass("show");
             event.stopPropagation();
         });
-        $(".dropdown").on("hidden.bs.dropdown", () => {
+        $(".dropdown").on("hidden.bs.dropdown", event => {
             // hide any open menus when parent closes
-            $(".dropdown-menu.show").removeClass("show");
+            const dropdown = $(event.currentTarget);
+            dropdown
+                .find(".dropdown-menu.show")
+                .not(".inner")
+                .removeClass("");
         });
 
         $("#server-name").change(() => serverNameSelected());
