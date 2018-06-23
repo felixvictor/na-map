@@ -128,23 +128,25 @@ function convertPorts() {
      * @return {void}
      */
     function setCountyFeature(port, portPos) {
-        console.log(port.county);
-        if (!counties.has(port.county)) {
-            counties.set(port.county, port.county);
+        const county = capitalToCounty.has(port.CountyCapitalName) ? capitalToCounty.get(port.CountyCapitalName) : "";
+        if (county !== "") {
+            if (!counties.has(county)) {
+                counties.set(county, county);
 
-            const feature = {
-                type: "Feature",
-                id: port.county,
-                geometry: {
-                    type: "Polygon",
-                    coordinates: [portPos]
-                }
-            };
-            geoJsonCounties.features.push(feature);
-        } else {
-            geoJsonCounties.features
-                .filter(county => county.id === port.county)
-                .some(county => county.geometry.coordinates.push(portPos));
+                const feature = {
+                    type: "Feature",
+                    id: county,
+                    geometry: {
+                        type: "Polygon",
+                        coordinates: [portPos]
+                    }
+                };
+                geoJsonCounties.features.push(feature);
+            } else {
+                geoJsonCounties.features
+                    .filter(countyFeature => countyFeature.id === county)
+                    .some(countyFeature => countyFeature.geometry.coordinates.push(portPos));
+            }
         }
     }
 
@@ -201,10 +203,7 @@ function convertPorts() {
                 textAnchor: angle > 0 && angle < 180 ? "start" : "end",
                 region: port.Location,
                 countyCapitalName: port.CountyCapitalName,
-                county:
-                    typeof capitalToCounty.get(port.CountyCapitalName) !== "undefined"
-                        ? capitalToCounty.get(port.CountyCapitalName)
-                        : "",
+                county: capitalToCounty.has(port.CountyCapitalName) ? capitalToCounty.get(port.CountyCapitalName) : "",
                 countyCapital: port.Name === port.CountyCapitalName,
                 shallow: port.Depth,
                 availableForAll: port.AvailableForAll,
@@ -267,12 +266,24 @@ function convertPorts() {
     saveJson(`${outDir}/counties.json`, geoJsonCounties);
 
     geoJsonRegions.features.forEach(region => {
-        console.log(region.id, polylabel([region.geometry.coordinates], 1.0));
+        // eslint-disable-next-line no-param-reassign
+        region.geometry.type = "Point";
+        // eslint-disable-next-line no-param-reassign
+        region.geometry.coordinates = polylabel([region.geometry.coordinates], 1.0).map(coordinate =>
+            Math.round(coordinate)
+        );
     });
-    // console.log(JSON.stringify(geoJsonRegion));
-    counties.forEach((value, key) => {
-        console.log(`${key} = ${value}`);
+    saveJson(`${outDir}/region-labels.json`, geoJsonRegions);
+
+    geoJsonCounties.features.forEach(county => {
+        // eslint-disable-next-line no-param-reassign
+        county.geometry.type = "Point";
+        // eslint-disable-next-line no-param-reassign
+        county.geometry.coordinates = polylabel([county.geometry.coordinates], 1.0).map(coordinate =>
+            Math.round(coordinate)
+        );
     });
+    saveJson(`${outDir}/county-labels.json`, geoJsonCounties);
 }
 
 getItemNames();
