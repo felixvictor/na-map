@@ -102,7 +102,7 @@ function get_port_data () {
                 get_API_data "${SERVER_NAME}" "${API_FILE}" "${API_VAR}"
             done
 
-            ${NODE} build/convert-API-data.mjs "${API_BASE_FILE}-${SERVER_NAME}" "${TEMP_PORT_FILE}" "${DATE}"
+            ${NODE} build/convert-API-data.mjs "${API_BASE_FILE}-${SERVER_NAME}" "${TEMP_PORT_FILE}" "${SRC_DIR}" "${DATE}"
             yarn geo2topo -o "${PORT_FILE}" "${TEMP_PORT_FILE}"
             rm "${TEMP_PORT_FILE}"
 
