@@ -21,7 +21,21 @@ function convertModules() {
     const modules = new Map(),
         levels = new Map(),
         modifiers = new Map(),
-        woodJson = {};
+        woodJson = {},
+        moduleType = [
+            {
+                level: "L",
+                names: [" (1-3 rates)", "1-3rd"]
+            },
+            {
+                level: "M",
+                names: [" (4-5 rates)", "4-5th"]
+            },
+            {
+                level: "S",
+                names: [" (6-7 rates)", "6-7th"]
+            }
+        ];
 
     woodJson.trim = [];
     woodJson.frame = [];
@@ -198,7 +212,7 @@ function convertModules() {
             woodJson.trim.push(wood);
         } else {
             wood.type = "Frame";
-            wood.name = module.name.replace(" Wood Type", "");
+            wood.name = module.name.replace(" Frame", "");
             woodJson.frame.push(wood);
         }
     }
@@ -213,7 +227,7 @@ function convertModules() {
         module.properties = [];
         module.APImodifiers.forEach(modifier => {
             if (modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`) === "undefined") {
-                console.log(`${modifier.Slot} ${modifier.MappingIds} undefined`);
+                console.log(`${modifier.Slot} ${modifier.MappingIds} modifier undefined`);
             }
             let amount =
                 modifier.Absolute !== 0
@@ -261,11 +275,7 @@ function convertModules() {
         // Ignore double entries
         if (!modules.get(module.name + module.moduleLevel)) {
             // Check for wood module
-            if (
-                module.name.includes(" Planking") ||
-                module.name.includes(" Wood Type") ||
-                module.name === "Crew Space"
-            ) {
+            if (module.name.includes(" Planking") || module.name.includes(" Frame") || module.name === "Crew Space") {
                 setWood(module);
             } else {
                 setModuleModifier(module);
@@ -297,18 +307,14 @@ function convertModules() {
                     module.type = "Not used";
                 }
 
-                if (module.name.endsWith(" (1-3 rates)")) {
-                    module.name = module.name.replace(" (1-3 rates)", "");
-                    module.moduleLevel = "L";
-                }
-                if (module.name.endsWith(" (4-5 rates)")) {
-                    module.name = module.name.replace(" (4-5 rates)", "");
-                    module.moduleLevel = "M";
-                }
-                if (module.name.endsWith(" (6-7 rates)")) {
-                    module.name = module.name.replace(" (6-7 rates)", "");
-                    module.moduleLevel = "S";
-                }
+                moduleType.forEach(type => {
+                    type.names.forEach(name => {
+                        if (module.name.endsWith(name)) {
+                            module.name = module.name.replace(name, "");
+                            module.moduleLevel = type.level;
+                        }
+                    });
+                });
 
                 delete module.isBowFigure;
                 delete module.moduleType;
@@ -329,9 +335,11 @@ function convertModules() {
                     module.name !== "Lead Sheating" &&
                     module.name !== "TEST MODULE SPEED IN OW" &&
                     module.name !== "Cannon nation module - France" &&
-                    module.name !== "Survival Handbooks - OLD"
+                    !module.name.endsWith(" - OLD")
                 ) {
                     modules.set(module.name + module.moduleLevel, module);
+                } else {
+                    // console.log(module.id, module.name);
                 }
             }
         }
