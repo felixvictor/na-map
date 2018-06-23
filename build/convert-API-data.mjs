@@ -1,23 +1,16 @@
-import fs from "fs";
-import { convertCoordX, convertCoordY, rotationAngleInDegrees } from "./common.mjs";
+import polylabel from "polylabel";
+
+import { convertCoordX, convertCoordY, rotationAngleInDegrees, readJson, saveJson } from "./common.mjs";
 
 const inBaseFilename = process.argv[2],
     outFilename = process.argv[3],
-    date = process.argv[4];
+    outDir = process.argv[4],
+    date = process.argv[5];
 
-const APIItems = JSON.parse(fs.readFileSync(`${inBaseFilename}-ItemTemplates-${date}.json`, "utf8")),
-    APIPorts = JSON.parse(fs.readFileSync(`${inBaseFilename}-Ports-${date}.json`, "utf8")),
-    APIShops = JSON.parse(fs.readFileSync(`${inBaseFilename}-Shops-${date}.json`, "utf8")),
+const APIItems = readJson(`${inBaseFilename}-ItemTemplates-${date}.json`),
+    APIPorts = readJson(`${inBaseFilename}-Ports-${date}.json`),
+    APIShops = readJson(`${inBaseFilename}-Shops-${date}.json`),
     ItemNames = new Map();
-
-function saveJson(data) {
-    // eslint-disable-next-line consistent-return
-    fs.writeFile(outFilename, JSON.stringify(data), "utf8", err => {
-        if (err) {
-            return console.log(err);
-        }
-    });
-}
 
 // https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
 // eslint-disable-next-line no-extend-native,func-names
@@ -36,94 +29,161 @@ function getItemNames() {
 }
 
 function convertPorts() {
-    const county = new Map([
-        ["Arenas", "Cayos del Golfo"],
-        ["Ays", "Costa del Fuego"],
-        ["Baracoa", "Baracoa"],
-        ["Basse-Terre", "Basse-Terre"],
-        ["Belize", "Belize"],
-        ["Black River", "North Mosquito"],
-        ["Bluefields", "South Mosquito"],
-        ["Brangman's Bluff", "Royal Mosquito"],
-        ["Bridgetown", "Windward Isles"],
-        ["Calobelo", "Portobelo"],
-        ["Campeche", "Campeche"],
-        ["Cap-Français", "Cap-Français"],
-        ["Caracas", "Caracas"],
-        ["Cartagena de Indias", "Cartagena"],
-        ["Castries", "Sainte-Lucie"],
-        ["Caymans", "George Town"],
-        ["Charleston", "South Carolina"],
-        ["Christiansted", "Vestindiske Øer"],
-        ["Cumaná", "Cumaná"],
-        ["Fort-Royal", "Martinique"],
-        ["Gasparilla", "Costa de los Calos"],
-        ["George Town", "Caymans"],
-        ["George's Town", "Exuma"],
-        ["Gibraltar", "Lago de Maracaibo"],
-        ["Grand Turk", "Turks and Caicos"],
-        ["Gustavia", "Gustavia"],
-        ["Islamorada", "Los Martires"],
-        ["Kidd's Harbour", "Kidd’s Island"],
-        ["Kingston / Port Royal", "Surrey"],
-        ["La Bahía", "Texas"],
-        ["La Habana", "La Habana"],
-        ["Les Cayes", "Les Cayes"],
-        ["Maracaibo", "Golfo de Maracaibo"],
-        ["Marsh Harbour", "Abaco"],
-        ["Matina", "Costa Rica"],
-        ["Morgan's Bluff", "Andros"],
-        ["Mortimer Town", "Inagua"],
-        ["Nassau", "New Providence"],
-        ["Nouvelle-Orléans", "Louisiane"],
-        ["Nuevitas", "Nuevitas del Principe"],
-        ["Old Providence", "Providencia"],
-        ["Omoa", "Comayaqua"],
-        ["Oranjestad", "Bovenwinds"],
-        ["Pampatar", "Margarita"],
-        ["Pedro Cay", "South Cays"],
-        ["Penzacola", "Florida Occidental"],
-        ["Pinar del Río", "Filipina"],
-        ["Pitt's Town", "Crooked"],
-        ["Pointe-à-Pitre", "Grande-Terre"],
-        ["Ponce", "Ponce"],
-        ["Port-au-Prince", "Port-au-Prince"],
-        ["Portobelo", "Portobelo"],
-        ["Puerto de España", "Trinidad"],
-        ["Puerto Plata", "La Vega"],
-        ["Remedios", "Los Llanos"],
-        ["Road Town", "Virgin Islands"],
-        ["Roseau", "Dominica"],
-        ["Saint George's Town", "Bermuda"],
-        ["Saint John's", "Leeward Islands"],
-        ["Salamanca", "Bacalar"],
-        ["San Agustín", "Timucua"],
-        ["San Juan", "San Juan"],
-        ["San Marcos", "Apalache"],
-        ["Sant Iago", "Cuidad de Cuba"],
-        ["Santa Fe", "Isla de Pinos"],
-        ["Santa Marta", "Santa Marta"],
-        ["Santo Domingo", "Santo Domingo"],
-        ["Santo Tomé de Guayana", "Orinoco"],
-        ["Savanna la Mar", "Cornwall"],
-        ["Savannah", "Georgia"],
-        ["Selam", "Mérida"],
-        ["Soto La Marina", "Nuevo Santander"],
-        ["Trinidad", "Quatro Villas"],
-        ["Vera Cruz", "Vera Cruz"],
-        ["West End", "Grand Bahama"],
-        ["Willemstad", "Benedenwinds"],
-        ["Wilmington", "North Carolina"]
-    ]);
-    const geoJson = {};
-    geoJson.type = "FeatureCollection";
-    geoJson.features = [];
-    APIPorts.forEach(port => {
+    const capitalToCounty = new Map([
+            ["Arenas", "Cayos del Golfo"],
+            ["Ays", "Costa del Fuego"],
+            ["Baracoa", "Baracoa"],
+            ["Basse-Terre", "Basse-Terre"],
+            ["Belize", "Belize"],
+            ["Black River", "North Mosquito"],
+            ["Bluefields", "South Mosquito"],
+            ["Brangman's Bluff", "Royal Mosquito"],
+            ["Bridgetown", "Windward Isles"],
+            ["Calobelo", "Portobelo"],
+            ["Campeche", "Campeche"],
+            ["Cap-Français", "Cap-Français"],
+            ["Caracas", "Caracas"],
+            ["Cartagena de Indias", "Cartagena"],
+            ["Castries", "Sainte-Lucie"],
+            ["Caymans", "George Town"],
+            ["Charleston", "South Carolina"],
+            ["Christiansted", "Vestindiske Øer"],
+            ["Cumaná", "Cumaná"],
+            ["Fort-Royal", "Martinique"],
+            ["Gasparilla", "Costa de los Calos"],
+            ["George Town", "Caymans"],
+            ["George's Town", "Exuma"],
+            ["Gibraltar", "Lago de Maracaibo"],
+            ["Grand Turk", "Turks and Caicos"],
+            ["Gustavia", "Gustavia"],
+            ["Islamorada", "Los Martires"],
+            ["Kidd's Harbour", "Kidd’s Island"],
+            ["Kingston / Port Royal", "Surrey"],
+            ["La Bahía", "Texas"],
+            ["La Habana", "La Habana"],
+            ["Les Cayes", "Les Cayes"],
+            ["Maracaibo", "Golfo de Maracaibo"],
+            ["Marsh Harbour", "Abaco"],
+            ["Matina", "Costa Rica"],
+            ["Morgan's Bluff", "Andros"],
+            ["Mortimer Town", "Inagua"],
+            ["Nassau", "New Providence"],
+            ["Nouvelle-Orléans", "Louisiane"],
+            ["Nuevitas", "Nuevitas del Principe"],
+            ["Old Providence", "Providencia"],
+            ["Omoa", "Comayaqua"],
+            ["Oranjestad", "Bovenwinds"],
+            ["Pampatar", "Margarita"],
+            ["Pedro Cay", "South Cays"],
+            ["Penzacola", "Florida Occidental"],
+            ["Pinar del Río", "Filipina"],
+            ["Pitt's Town", "Crooked"],
+            ["Pointe-à-Pitre", "Grande-Terre"],
+            ["Ponce", "Ponce"],
+            ["Port-au-Prince", "Port-au-Prince"],
+            ["Portobelo", "Portobelo"],
+            ["Puerto de España", "Trinidad"],
+            ["Puerto Plata", "La Vega"],
+            ["Remedios", "Los Llanos"],
+            ["Road Town", "Virgin Islands"],
+            ["Roseau", "Dominica"],
+            ["Saint George's Town", "Bermuda"],
+            ["Saint John's", "Leeward Islands"],
+            ["Salamanca", "Bacalar"],
+            ["San Agustín", "Timucua"],
+            ["San Juan", "San Juan"],
+            ["San Marcos", "Apalache"],
+            ["Sant Iago", "Cuidad de Cuba"],
+            ["Santa Fe", "Isla de Pinos"],
+            ["Santa Marta", "Santa Marta"],
+            ["Santo Domingo", "Santo Domingo"],
+            ["Santo Tomé de Guayana", "Orinoco"],
+            ["Savanna la Mar", "Cornwall"],
+            ["Savannah", "Georgia"],
+            ["Selam", "Mérida"],
+            ["Soto La Marina", "Nuevo Santander"],
+            ["Trinidad", "Quatro Villas"],
+            ["Vera Cruz", "Vera Cruz"],
+            ["West End", "Grand Bahama"],
+            ["Willemstad", "Benedenwinds"],
+            ["Wilmington", "North Carolina"]
+        ]),
+        counties = new Map(),
+        regions = new Map();
+    const geoJsonPort = {},
+        geoJsonRegions = {},
+        geoJsonCounties = {};
+
+    geoJsonPort.type = "FeatureCollection";
+    geoJsonRegions.type = "FeatureCollection";
+    geoJsonCounties.type = "FeatureCollection";
+    geoJsonPort.features = [];
+    geoJsonRegions.features = [];
+    geoJsonCounties.features = [];
+
+    /**
+     *
+     * @param {Object} port Port data.
+     * @param {Array} portPos Port screen x/y coordinates.
+     * @return {void}
+     */
+    function setCountyFeature(port, portPos) {
+        const county = capitalToCounty.has(port.CountyCapitalName) ? capitalToCounty.get(port.CountyCapitalName) : "";
+        if (county !== "") {
+            if (!counties.has(county)) {
+                counties.set(county, county);
+
+                const feature = {
+                    type: "Feature",
+                    id: county,
+                    geometry: {
+                        type: "Polygon",
+                        coordinates: [portPos]
+                    }
+                };
+                geoJsonCounties.features.push(feature);
+            } else {
+                geoJsonCounties.features
+                    .filter(countyFeature => countyFeature.id === county)
+                    .some(countyFeature => countyFeature.geometry.coordinates.push(portPos));
+            }
+        }
+    }
+
+    /**
+     *
+     * @param {Object} port Port data.
+     * @param {Array} portPos Port screen x/y coordinates.
+     * @return {void}
+     */
+    function setRegionFeature(port, portPos) {
+        if (!regions.has(port.Location)) {
+            regions.set(port.Location, port.Location);
+
+            const feature = {
+                type: "Feature",
+                id: port.Location,
+                geometry: {
+                    type: "Polygon",
+                    coordinates: [portPos]
+                }
+            };
+            geoJsonRegions.features.push(feature);
+        } else {
+            geoJsonRegions.features
+                .filter(region => region.id === port.Location)
+                .some(region => region.geometry.coordinates.push(portPos));
+        }
+    }
+
+    /**
+     *
+     * @param {Object} port Port data.
+     * @param {Array} portPos Port screen x/y coordinates.
+     * @return {void}
+     */
+    function setPortFeature(port, portPos) {
         const portShop = APIShops.filter(shop => shop.Id === port.Id),
-            portPos = [
-                Math.round(convertCoordX(port.Position.x, port.Position.z)),
-                Math.round(convertCoordY(port.Position.x, port.Position.z))
-            ],
             circleAPos = [
                 Math.round(convertCoordX(port.PortBattleZonePositions[0].x, port.PortBattleZonePositions[0].z)),
                 Math.round(convertCoordY(port.PortBattleZonePositions[0].x, port.PortBattleZonePositions[0].z))
@@ -143,8 +203,7 @@ function convertPorts() {
                 textAnchor: angle > 0 && angle < 180 ? "start" : "end",
                 region: port.Location,
                 countyCapitalName: port.CountyCapitalName,
-                county:
-                    typeof county.get(port.CountyCapitalName) !== "undefined" ? county.get(port.CountyCapitalName) : "",
+                county: capitalToCounty.has(port.CountyCapitalName) ? capitalToCounty.get(port.CountyCapitalName) : "",
                 countyCapital: port.Name === port.CountyCapitalName,
                 shallow: port.Depth,
                 availableForAll: port.AvailableForAll,
@@ -190,9 +249,41 @@ function convertPorts() {
                 )[0]
             }
         };
-        geoJson.features.push(feature);
+        geoJsonPort.features.push(feature);
+    }
+
+    APIPorts.forEach(port => {
+        const portPos = [
+            Math.round(convertCoordX(port.Position.x, port.Position.z)),
+            Math.round(convertCoordY(port.Position.x, port.Position.z))
+        ];
+        setCountyFeature(port, portPos);
+        setRegionFeature(port, portPos);
+        setPortFeature(port, portPos);
     });
-    saveJson(geoJson);
+    saveJson(outFilename, geoJsonPort);
+    saveJson(`${outDir}/regions.json`, geoJsonRegions);
+    saveJson(`${outDir}/counties.json`, geoJsonCounties);
+
+    geoJsonRegions.features.forEach(region => {
+        // eslint-disable-next-line no-param-reassign
+        region.geometry.type = "Point";
+        // eslint-disable-next-line no-param-reassign
+        region.geometry.coordinates = polylabel([region.geometry.coordinates], 1.0).map(coordinate =>
+            Math.round(coordinate)
+        );
+    });
+    saveJson(`${outDir}/region-labels.json`, geoJsonRegions);
+
+    geoJsonCounties.features.forEach(county => {
+        // eslint-disable-next-line no-param-reassign
+        county.geometry.type = "Point";
+        // eslint-disable-next-line no-param-reassign
+        county.geometry.coordinates = polylabel([county.geometry.coordinates], 1.0).map(coordinate =>
+            Math.round(coordinate)
+        );
+    });
+    saveJson(`${outDir}/county-labels.json`, geoJsonCounties);
 }
 
 getItemNames();
