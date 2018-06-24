@@ -138,12 +138,19 @@ p {
     }
 }
 
+.table-sm th {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
 .columnA {
     background-color: $primary-100;
     table {
         thead {
             background-color: $primary-050;
-            line-height: 3em;
+        }
+        th {
+            border-top: none;
         }
         tr:nth-of-type(odd) {
             background-color: $primary-200;
@@ -156,7 +163,9 @@ p {
     table {
         thead {
             background-color: $secondary-050;
-            line-height: 3em;
+        }
+        th {
+            border-top: none;
         }
         tr:nth-of-type(odd) {
             background-color: $secondary-200;

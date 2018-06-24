@@ -5,7 +5,7 @@
 /* global d3 : false
  */
 
-import { capitalizeFirstLetter, formatPercent, getOrdinal } from "./util";
+import { capitalizeFirstLetter, formatSignPercent, getOrdinal } from "./util";
 
 export default class Module {
     constructor(moduleData) {
@@ -78,7 +78,7 @@ export default class Module {
             ["M", `${getOrdinal(4)}\u202f\u2013\u202f${getOrdinal(5)}`],
             ["S", `${getOrdinal(6)}\u202f\u2013\u202f${getOrdinal(7)}`]
         ]);
-        let text = '<table class="table table-sm table-striped modules small"><thead>';
+        let text = '<table class="table table-sm table-striped modules small mt-4"><thead>';
         text += "<tr>";
         text += "<tr><th><em>Module</em></th><th><em>Ship rate</em></th><th><em>Modifier</em></th></tr></thead><tbody>";
         this._moduleSelectData.forEach(type => {
@@ -87,7 +87,9 @@ export default class Module {
                     const rate = module.moduleLevel !== "U" ? ` ${rates.get(module.moduleLevel)}` : "";
                     text += `<tr><td>${module.name}</td><td>${rate}</td><td>${module.properties
                         .map(property => {
-                            const amount = property.absolute ? property.amount : formatPercent(property.amount / 100);
+                            const amount = property.absolute
+                                ? property.amount
+                                : formatSignPercent(property.amount / 100);
                             return `${property.modifier} ${amount}`;
                         })
                         .join("<br>")}</td></tr>`;
