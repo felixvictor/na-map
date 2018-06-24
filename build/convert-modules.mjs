@@ -93,6 +93,7 @@ function convertModules() {
     modifiers.set("NONE BOARDING_DEFENSE_BONUS", "Boarding defense");
     modifiers.set("NONE CREW_TRANSFER_SPEED", "Crew transfer speed");
     modifiers.set("NONE DECK_GUNS_ACCURACY_BONUS", "Deck guns accuracy");
+    modifiers.set("NONE FIRE_DECREASE_RATE", "Fire resistance");
     modifiers.set("NONE FIREZONE_MAX_HORIZONTAL_ANGLE", "Firezone max horizontal angle");
     modifiers.set("NONE GLOBAL_SIDEBOARD_WATER_FLOW", "Sideboard water flow");
     modifiers.set("NONE GRENADES_BONUS", "Grenades");
@@ -147,6 +148,10 @@ function convertModules() {
     modifiers.set("NONE PERK_RECOVER_LOST_CREW_PERCENT", "Recover lost crew");
     modifiers.set("NONE PERK_SAIL_DAMAGE_MODIFIER", "Sail damage");
     modifiers.set("NONE PERK_SAIL_REPAIR_PERCENT_MODIFIER", "Sail repair amount");
+    modifiers.set("NONE PERK_SHIP_EXTRA_CHAIN_UNITS", "Additional chains");
+    modifiers.set("NONE PERK_SHIP_EXTRA_DOBULE_CHARGE_UNITS", "Additional double charges"); // typo
+    modifiers.set("NONE PERK_SHIP_EXTRA_DOUBLE_CHARGE_UNITS", "Additional double charges");
+    modifiers.set("NONE PERK_SHIP_EXTRA_DOUBLE_SHOT_UNITS", "Additional double shots");
     modifiers.set("NONE PERK_SHIP_MASTER_CLASS_TYPE", "Ship master class type");
     modifiers.set("NONE PERK_SHIP_MASTER_RELOAD_TIME_MODIFIER", "Ship master reload time modifier");
     modifiers.set("NONE PERK_SHIP_MASTER_REPAIR_COUNT_ADD_MODIFIER", "Additional repairs");
@@ -157,6 +162,10 @@ function convertModules() {
     modifiers.set("NONE RHEA_TURN_SPEED", "Yard turn speed");
     modifiers.set("NONE SAIL_RISING_SPEED", "Sail rising speed");
     modifiers.set("NONE SHIP_BOARDING_PREPARATION_BONUS", "Boarding preparation bonus");
+    modifiers.set("NONE SHIP_EXTRA_CHAIN_UNITS", "Additional chains");
+    modifiers.set("NONE SHIP_EXTRA_DOBULE_CHARGE_UNITS", "Additional double charges"); // typo
+    modifiers.set("NONE SHIP_EXTRA_DOUBLE_CHARGE_UNITS", "Additional double charges");
+    modifiers.set("NONE SHIP_EXTRA_DOUBLE_SHOT_UNITS", "Additional double shots");
     modifiers.set("NONE SHIP_MATERIAL", "Ship material");
     modifiers.set("NONE SHIP_MAX_ROLL_ANGLE", "Max roll angle");
     modifiers.set("NONE SHIP_PHYSICS_DEC_COEF", "Speed decrease");
@@ -188,7 +197,7 @@ function convertModules() {
         wood.properties = [];
         module.APImodifiers.forEach(modifier => {
             // Add modifier if in modifier map
-            if (modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`)) {
+            if (modifiers.has(`${modifier.Slot} ${modifier.MappingIds}`)) {
                 let amount = modifier.Percentage;
                 if (
                     modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`) === "Fire resistance" ||
@@ -226,7 +235,7 @@ function convertModules() {
         // eslint-disable-next-line no-param-reassign
         module.properties = [];
         module.APImodifiers.forEach(modifier => {
-            if (modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`) === "undefined") {
+            if (!modifiers.has(`${modifier.Slot} ${modifier.MappingIds}`)) {
                 console.log(`${modifier.Slot} ${modifier.MappingIds} modifier undefined`);
             }
             let amount =
@@ -255,6 +264,7 @@ function convertModules() {
     }
 
     APIItems.filter(item => item.ItemType === "Module").forEach(APImodule => {
+        let isObsolete = false;
         const module = {
             id: APImodule.Id,
             name: APImodule.Name.replaceAll("'", "’").replace("Bow figure - ", ""),
@@ -273,9 +283,13 @@ function convertModules() {
         };
 
         // Ignore double entries
-        if (!modules.get(module.name + module.moduleLevel)) {
+        if (!modules.has(module.name + module.moduleLevel)) {
             // Check for wood module
-            if (module.name.includes(" Planking") || module.name.includes(" Frame") || module.name === "Crew Space") {
+            if (
+                module.name.includes(" Planking") ||
+                (module.name.includes(" Frame") && !module.name.endsWith(" Refit")) ||
+                module.name === "Crew Space"
+            ) {
                 setWood(module);
             } else {
                 setModuleModifier(module);
@@ -337,10 +351,13 @@ function convertModules() {
                     module.name !== "Cannon nation module - France" &&
                     !module.name.endsWith(" - OLD")
                 ) {
-                    modules.set(module.name + module.moduleLevel, module);
+                    isObsolete = true;
                 } else {
                     // console.log(module.id, module.name);
                 }
+            }
+            if (!isObsolete) {
+                modules.set(module.name + module.moduleLevel, module);
             }
         }
     });
