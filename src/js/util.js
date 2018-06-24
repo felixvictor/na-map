@@ -83,6 +83,19 @@ export const formatPercent = x =>
         .replace("-", "\u2212\u202f");
 
 /**
+ * Format percent value with +/- sign
+ * @function
+ * @param {Number} x - Percent
+ * @return {String} Formatted percent value
+ */
+export const formatSignPercent = x =>
+    formatLocale
+        .format("+.1%")(x)
+        .replace(".0", "")
+        .replace("-", "\u2212\u202f")
+        .replace("+", "\uff0b\u202f");
+
+/**
  * Format ordinal
  * @param {Number} n - Integer
  * @return {String} Formatted Ordinal
