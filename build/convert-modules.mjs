@@ -263,8 +263,51 @@ function convertModules() {
         delete module.APImodifiers;
     }
 
+    /**
+     * Improve module modifier properties
+     * @param {Object} module Module data.
+     * @returns {void}
+     */
+    function improveModuleModifier(module) {
+        if (
+            module.usageType === "All" &&
+            module.sortingGroup === "speed_turn" &&
+            module.moduleLevel === "U" &&
+            module.moduleType === "Hidden"
+        ) {
+            module.type = "Ship trim";
+        } else if (module.isBowFigure) {
+            module.type = "Bow figure";
+        } else if (module.moduleType === "Permanent" && !module.name.endsWith(" Bonus") && !module.isBowFigure) {
+            module.type = "Permanent";
+        } else if (
+            module.usageType === "All" &&
+            module.sortingGroup === "" &&
+            module.moduleLevel === "U" &&
+            module.moduleType === "Hidden"
+        ) {
+            module.type = "Perk";
+        } else if (module.moduleType === "Regular") {
+            module.type = "Ship knowledge";
+        } else {
+            module.type = "Not used";
+        }
+
+        moduleType.forEach(type => {
+            type.names.forEach(name => {
+                if (module.name.endsWith(name)) {
+                    module.name = module.name.replace(name, "");
+                    module.moduleLevel = type.level;
+                }
+            });
+        });
+
+        delete module.isBowFigure;
+        delete module.moduleType;
+    }
+
     APIItems.filter(item => item.ItemType === "Module").forEach(APImodule => {
-        let isObsolete = false;
+        let dontSave = false;
         const module = {
             id: APImodule.Id,
             name: APImodule.Name.replaceAll("'", "’").replace("Bow figure - ", ""),
@@ -285,78 +328,37 @@ function convertModules() {
         // Ignore double entries
         if (!modules.has(module.name + module.moduleLevel)) {
             // Check for wood module
-            if (
-                module.name.includes(" Planking") ||
-                (module.name.includes(" Frame") && !module.name.endsWith(" Refit")) ||
-                module.name === "Crew Space"
-            ) {
+            if (module.name.endsWith(" Planking") || module.name.endsWith(" Frame") || module.name === "Crew Space") {
                 setWood(module);
+                dontSave = true;
             } else {
                 setModuleModifier(module);
+                improveModuleModifier(module);
                 if (
-                    module.usageType === "All" &&
-                    module.sortingGroup === "speed_turn" &&
-                    module.moduleLevel === "U" &&
-                    module.moduleType === "Hidden"
+                    module.type === "Not used" ||
+                    module.name === "Gifted" ||
+                    module.name === "Coward" ||
+                    module.name === "Doctor" ||
+                    module.name === "Dreadful" ||
+                    module.name === "Expert Surgeon" ||
+                    module.name === "Frigate Master" ||
+                    module.name === "Gifted" ||
+                    module.name === "Light Ship Master" ||
+                    module.name === "Lineship Master" ||
+                    module.name === "Press Gang" ||
+                    module.name === "Signaling" ||
+                    module.name === "Thrifty" ||
+                    module.name === "Lead Sheating" ||
+                    module.name === "TEST MODULE SPEED IN OW" ||
+                    module.name === "Cannon nation module - France" ||
+                    module.name.endsWith(" - OLD")
                 ) {
-                    module.type = "Ship trim";
-                } else if (module.isBowFigure) {
-                    module.type = "Bow figure";
-                } else if (
-                    module.moduleType === "Permanent" &&
-                    !module.name.endsWith(" Bonus") &&
-                    !module.isBowFigure
-                ) {
-                    module.type = "Permanent";
-                } else if (
-                    module.usageType === "All" &&
-                    module.sortingGroup === "" &&
-                    module.moduleLevel === "U" &&
-                    module.moduleType === "Hidden"
-                ) {
-                    module.type = "Perk";
-                } else if (module.moduleType === "Regular") {
-                    module.type = "Ship knowledge";
-                } else {
-                    module.type = "Not used";
-                }
-
-                moduleType.forEach(type => {
-                    type.names.forEach(name => {
-                        if (module.name.endsWith(name)) {
-                            module.name = module.name.replace(name, "");
-                            module.moduleLevel = type.level;
-                        }
-                    });
-                });
-
-                delete module.isBowFigure;
-                delete module.moduleType;
-                if (
-                    module.type !== "Not used" &&
-                    module.name !== "Gifted" &&
-                    module.name !== "Coward" &&
-                    module.name !== "Doctor" &&
-                    module.name !== "Dreadful" &&
-                    module.name !== "Expert Surgeon" &&
-                    module.name !== "Frigate Master" &&
-                    module.name !== "Gifted" &&
-                    module.name !== "Light Ship Master" &&
-                    module.name !== "Lineship Master" &&
-                    module.name !== "Press Gang" &&
-                    module.name !== "Signaling" &&
-                    module.name !== "Thrifty" &&
-                    module.name !== "Lead Sheating" &&
-                    module.name !== "TEST MODULE SPEED IN OW" &&
-                    module.name !== "Cannon nation module - France" &&
-                    !module.name.endsWith(" - OLD")
-                ) {
-                    isObsolete = true;
+                    dontSave = true;
                 } else {
                     // console.log(module.id, module.name);
                 }
             }
-            if (!isObsolete) {
+            if (!dontSave) {
                 modules.set(module.name + module.moduleLevel, module);
             }
         }
