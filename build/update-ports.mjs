@@ -244,4 +244,5 @@ function updatePorts() {
     return !isPortDataChanged;
 }
 
-process.exitCode = updatePorts();
+// process.exitCode = updatePorts();
+updatePorts();
