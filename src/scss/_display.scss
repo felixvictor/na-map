@@ -80,6 +80,10 @@ p {
     }
 }
 
+.modules {
+    width: auto;
+}
+
 .bubble {
     fill-opacity: 0.5;
 }
@@ -134,12 +138,19 @@ p {
     }
 }
 
+.table-sm th {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
 .columnA {
     background-color: $primary-100;
     table {
         thead {
             background-color: $primary-050;
-            line-height: 3em;
+        }
+        th {
+            border-top: none;
         }
         tr:nth-of-type(odd) {
             background-color: $primary-200;
@@ -152,7 +163,9 @@ p {
     table {
         thead {
             background-color: $secondary-050;
-            line-height: 3em;
+        }
+        th {
+            border-top: none;
         }
         tr:nth-of-type(odd) {
             background-color: $secondary-200;
@@ -510,11 +523,22 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
 .region text {
     font-size: 200px;
     fill: $white;
-    opacity: .7;
+    opacity: 0.7;
     text-anchor: middle;
 }
 
 .county text {
     font-size: 64px;
     font-style: italic;
+}
+
+// https://stackoverflow.com/questions/44467377/bootstrap-4-multilevel-dropdown-inside-navigation/48953349#48953349
+.dropdown-submenu {
+    position: relative;
+}
+
+.dropdown-submenu .dropdown-menu {
+    top: 0;
+    left: 100%;
+    margin-top: -1px;
 }
