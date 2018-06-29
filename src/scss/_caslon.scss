@@ -25,3 +25,10 @@ $font-weight-name: "regular";
     font-style: italic;
     font-weight: $font-weight;
 }
+
+@font-face {
+  font-family: "#{$font-name}Display";
+  src: url("#{$font-path}#{$font-name}Display-#{$font-weight-name}.woff2") format("woff2");
+  font-style: normal;
+  font-weight: $font-weight;
+}
