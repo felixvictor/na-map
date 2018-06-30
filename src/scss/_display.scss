@@ -522,11 +522,14 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
 .county text,
 .region text {
     font-family: LibreCaslonDisplay, -apple-system, blinkmacsystemfont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
-    cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", arial, sans-serif;
-    font-size: 240px;
+        cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", arial, sans-serif;
     fill: $white;
     opacity: 0.7;
     text-anchor: middle;
+}
+
+.region text {
+    font-size: 240px;
 }
 
 .county text {
