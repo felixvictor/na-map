@@ -116,5 +116,10 @@ export const distancePoints = (centerPt, targetPt) =>
  */
 export const degreesToRadians = degrees => (Math.PI / 180) * (degrees - 90);
 
+/**
+ * {@link https://stackoverflow.com/questions/1026069/how-do-i-make-the-first-letter-of-a-string-uppercase-in-javascript}
+ */
+export const capitalizeFirstLetter = string => string.charAt(0).toUpperCase() + string.slice(1);
+
 export const defaultFontSize = 16;
 export const defaultCircleSize = 16;

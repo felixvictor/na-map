@@ -17,37 +17,7 @@ export default class Module {
     }
 
     _setupData() {
-        this._moduleSelectData = d3
-            .nest()
-            .key(module => {
-                const sortingGroup =
-                    module.sortingGroup && module.type !== "Ship trim"
-                        ? `\u202f\u2013\u202f${capitalizeFirstLetter(module.sortingGroup).replace("_", "/")}`
-                        : "";
-                return `${module.type}${sortingGroup}`;
-            })
-            .sortKeys(d3.ascending)
-            .entries(
-                this._moduleData.sort((a, b) => {
-                    if (a.name < b.name) {
-                        return -1;
-                    }
-                    if (a.name > b.name) {
-                        return 1;
-                    }
-                    if (a.moduleLevel < b.moduleLevel) {
-                        return -1;
-                    }
-                    if (a.moduleLevel > b.moduleLevel) {
-                        return 1;
-                    }
-                    return 0;
-                })
-            );
-
-        this._options = `${this._moduleSelectData
-            .map(type => `<option value="${type.key}"">${type.key}</option>`)
-            .join("")}`;
+        this._options = `${this._moduleData.map(type => `<option value="${type[0]}"">${type[0]}</option>;`).join("")}`;
     }
 
     _setupListener() {
@@ -73,6 +43,10 @@ export default class Module {
     }
 
     _getText(moduleType) {
+        function getRate(module) {
+            return module.moduleLevel !== "U" ? ` ${rates.get(module.moduleLevel)}` : "";
+        }
+
         const rates = new Map([
             ["L", `${getOrdinal(1)}\u202f\u2013\u202f${getOrdinal(3)}`],
             ["M", `${getOrdinal(4)}\u202f\u2013\u202f${getOrdinal(5)}`],
@@ -81,18 +55,42 @@ export default class Module {
         let text = '<table class="table table-sm table-striped modules small mt-4"><thead>';
         text += "<tr>";
         text += "<tr><th><em>Module</em></th><th><em>Ship rate</em></th><th><em>Modifier</em></th></tr></thead><tbody>";
-        this._moduleSelectData.forEach(type => {
-            if (type.key === moduleType) {
-                type.values.forEach(module => {
-                    const rate = module.moduleLevel !== "U" ? ` ${rates.get(module.moduleLevel)}` : "";
-                    text += `<tr><td>${module.name}</td><td>${rate}</td><td>${module.properties
-                        .map(property => {
-                            const amount = property.absolute
-                                ? property.amount
-                                : formatSignPercent(property.amount / 100);
-                            return `${property.modifier} ${amount}`;
-                        })
-                        .join("<br>")}</td></tr>`;
+
+        let rate = "";
+        this._moduleData.forEach(type => {
+            if (type[0] === moduleType) {
+                type[1].forEach((module, i) => {
+                    rate = getRate(module);
+                    if (
+                        i + 1 < type[1].length &&
+                        module.name === type[1][i + 1].name &&
+                        JSON.stringify(module.properties) === JSON.stringify(type[1][i + 1].properties)
+                    ) {
+                        type[1][i + 1].hasSamePropertiesAsPrevious = true;
+                        rate += `<br>${getRate(type[1][i + 1])}`;
+                    }
+                    if (
+                        i + 2 < type[1].length &&
+                        module.name === type[1][i + 2].name &&
+                        JSON.stringify(module.properties) === JSON.stringify(type[1][i + 2].properties)
+                    ) {
+                        type[1][i + 2].hasSamePropertiesAsPrevious = true;
+                        rate = "";
+                    }
+                    if (
+                        typeof module.hasSamePropertiesAsPrevious === "undefined" ||
+                        (typeof module.hasSamePropertiesAsPrevious !== "undefined" &&
+                            !module.hasSamePropertiesAsPrevious)
+                    ) {
+                        text += `<tr><td>${module.name}</td><td>${rate}</td><td>${module.properties
+                            .map(property => {
+                                const amount = property.absolute
+                                    ? property.amount
+                                    : formatSignPercent(property.amount / 100);
+                                return `${property.modifier} ${amount}`;
+                            })
+                            .join("<br>")}</td></tr>`;
+                    }
                 });
             }
         });
