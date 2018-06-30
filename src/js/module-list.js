@@ -43,15 +43,15 @@ export default class Module {
     }
 
     _getText(moduleType) {
-        function getRate(module) {
-            return module.moduleLevel !== "U" ? ` ${rates.get(module.moduleLevel)}` : "";
-        }
-
         const rates = new Map([
             ["L", `${getOrdinal(1)}\u202f\u2013\u202f${getOrdinal(3)}`],
             ["M", `${getOrdinal(4)}\u202f\u2013\u202f${getOrdinal(5)}`],
             ["S", `${getOrdinal(6)}\u202f\u2013\u202f${getOrdinal(7)}`]
         ]);
+
+        function getRate(module) {
+            return module.moduleLevel !== "U" ? ` ${rates.get(module.moduleLevel)}` : "";
+        }
         let text = '<table class="table table-sm table-striped modules small mt-4"><thead>';
         text += "<tr>";
         text += "<tr><th><em>Module</em></th><th><em>Ship rate</em></th><th><em>Modifier</em></th></tr></thead><tbody>";
@@ -66,6 +66,7 @@ export default class Module {
                         module.name === type[1][i + 1].name &&
                         JSON.stringify(module.properties) === JSON.stringify(type[1][i + 1].properties)
                     ) {
+                        // eslint-disable-next-line no-param-reassign
                         type[1][i + 1].hasSamePropertiesAsPrevious = true;
                         rate += `<br>${getRate(type[1][i + 1])}`;
                     }
@@ -73,14 +74,15 @@ export default class Module {
                         i + 2 < type[1].length &&
                         module.name === type[1][i + 2].name &&
                         JSON.stringify(module.properties) === JSON.stringify(type[1][i + 2].properties)
+                        // eslint-disable-next-line no-param-reassign
                     ) {
+                        // eslint-disable-next-line no-param-reassign
                         type[1][i + 2].hasSamePropertiesAsPrevious = true;
                         rate = "";
                     }
                     if (
                         typeof module.hasSamePropertiesAsPrevious === "undefined" ||
-                        (typeof module.hasSamePropertiesAsPrevious !== "undefined" &&
-                            !module.hasSamePropertiesAsPrevious)
+                        !module.hasSamePropertiesAsPrevious
                     ) {
                         text += `<tr><td>${module.name}</td><td>${rate}</td><td>${module.properties
                             .map(property => {
