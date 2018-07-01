@@ -230,7 +230,7 @@ function convertModules() {
             }
         });
 
-        if (module.name.includes(" Planking") || module.name === "Crew Space") {
+        if (module.name.endsWith(" Planking") || module.name === "Crew Space") {
             wood.type = "Trim";
             wood.name = module.name.replace(" Planking", "");
             woodJson.trim.push(wood);
@@ -380,14 +380,12 @@ function convertModules() {
                     // console.log(module.id, module.name);
                 }
             }
-            if (!dontSave) {
-                modules.set(module.name + module.moduleLevel, module);
-            }
+            modules.set(module.name + module.moduleLevel, dontSave ? {} : module);
         }
     });
 
-    const result = Array.from(modules.values());
-    result.sort((a, b) => {
+    let result = Array.from(modules.values());
+    result = result.filter(module => module).sort((a, b) => {
         if (a.type < b.type) {
             return -1;
         }
