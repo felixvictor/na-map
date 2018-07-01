@@ -385,7 +385,7 @@ function convertModules() {
     });
 
     let result = Array.from(modules.values());
-    result = result.filter(module => module).sort((a, b) => {
+    result = result.filter(module => Object.keys(module).length).sort((a, b) => {
         if (a.type < b.type) {
             return -1;
         }
