@@ -89,22 +89,19 @@ export default class Module {
                     }
 
                     rate = getRate(module.moduleLevel);
-                    if (hasSameProperties(i + 1)) {
-                        // eslint-disable-next-line no-param-reassign
-                        type[1][i + 1].hasSamePropertiesAsPrevious = true;
-                        rate += `<br>${getRate(type[1][i + 1])}`;
-                    }
-                    if (hasSameProperties(i + 2)) {
-                        // eslint-disable-next-line no-param-reassign
-                        type[1][i + 2].hasSamePropertiesAsPrevious = true;
-                        rate = "";
-                    }
+                    [i + 1, i + 2].forEach(index => {
+                        if (hasSameProperties(index)) {
+                            // eslint-disable-next-line no-param-reassign
+                            type[1][index].hasSamePropertiesAsPrevious = true;
+                            rate += `<br>${getRate(type[1][index].moduleLevel)}`;
+                        }
+                    });
                     if (
                         typeof module.hasSamePropertiesAsPrevious === "undefined" ||
                         !module.hasSamePropertiesAsPrevious
                     ) {
                         rows.push(
-                            `<tr><td>${module.name}<br>${rate}</td><td>${module.properties
+                            `<tr><td><em>${module.name}</em><br>${rate}</td><td>${module.properties
                                 .map(property => {
                                     const amount = property.absolute
                                         ? property.amount
@@ -178,8 +175,7 @@ export default class Module {
         Array.from(Array(splitRows.length).keys()).forEach(column => {
             text += '<table class="col-md table table-sm table-striped modules small mt-4"><thead>';
             text += "<tr>";
-            text +=
-                "<tr><th><em>Module</em></th><th><em>Modifier</em></th></tr></thead><tbody>";
+            text += "<tr><th>Module</th><th>Modifier</th></tr></thead><tbody>";
             text += splitRows[column].join("");
             text += "</tbody></table>";
         });
