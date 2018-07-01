@@ -169,7 +169,7 @@ export default class Grid {
 
         // svg groups
         this._gAxis = this._map._svg
-            .append("g")
+            .insert("g", "g.voronoi")
             .classed("axis", true)
             .attr("display", "none");
         this._gXAxis = this._gAxis.append("g").classed("axis-x", true);

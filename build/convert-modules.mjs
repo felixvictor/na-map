@@ -1,4 +1,4 @@
-import { readJson, saveJson } from "./common.mjs";
+import { readJson, saveJson, capitalizeFirstLetter } from "./common.mjs";
 
 const itemsFilename = process.argv[2],
     outDir = process.argv[3],
@@ -13,6 +13,21 @@ String.prototype.replaceAll = function(search, replacement) {
     return target.replace(new RegExp(search, "g"), replacement);
 };
 
+// https://stackoverflow.com/questions/14446511/what-is-the-most-efficient-method-to-groupby-on-a-javascript-array-of-objects
+function groupBy(list, keyGetter) {
+    const map = new Map();
+    list.forEach(item => {
+        const key = keyGetter(item);
+        const collection = map.get(key);
+        if (!collection) {
+            map.set(key, [item]);
+        } else {
+            collection.push(item);
+        }
+    });
+    return map;
+}
+
 /**
  * Convert API module data and save sorted as JSON
  * @returns {void}
@@ -22,7 +37,7 @@ function convertModules() {
         levels = new Map(),
         modifiers = new Map(),
         woodJson = {},
-        moduleType = [
+        moduleRate = [
             {
                 level: "L",
                 names: [" (1-3 rates)", "1-3rd"]
@@ -264,11 +279,11 @@ function convertModules() {
     }
 
     /**
-     * Improve module modifier properties
+     * Set module type
      * @param {Object} module Module data.
      * @returns {void}
      */
-    function improveModuleModifier(module) {
+    function setModuleType(module) {
         if (
             module.usageType === "All" &&
             module.sortingGroup === "speed_turn" &&
@@ -293,17 +308,24 @@ function convertModules() {
             module.type = "Not used";
         }
 
-        moduleType.forEach(type => {
-            type.names.forEach(name => {
+        module.sortingGroup =
+            module.sortingGroup && module.type !== "Ship trim"
+                ? `\u202f\u2013\u202f${capitalizeFirstLetter(module.sortingGroup).replace("_", "/")}`
+                : "";
+        module.type = `${module.type}${module.sortingGroup}`;
+
+        moduleRate.forEach(rate => {
+            rate.names.forEach(name => {
                 if (module.name.endsWith(name)) {
                     module.name = module.name.replace(name, "");
-                    module.moduleLevel = type.level;
+                    module.moduleLevel = rate.level;
                 }
             });
         });
 
         delete module.isBowFigure;
         delete module.moduleType;
+        delete module.sortingGroup;
     }
 
     APIItems.filter(item => item.ItemType === "Module").forEach(APImodule => {
@@ -333,9 +355,9 @@ function convertModules() {
                 dontSave = true;
             } else {
                 setModuleModifier(module);
-                improveModuleModifier(module);
+                setModuleType(module);
                 if (
-                    module.type === "Not used" ||
+                    module.type.startsWith("Not used") ||
                     module.name === "Gifted" ||
                     module.name === "Coward" ||
                     module.name === "Doctor" ||
@@ -366,16 +388,10 @@ function convertModules() {
 
     const result = Array.from(modules.values());
     result.sort((a, b) => {
-        if (a.moduleType < b.moduleType) {
+        if (a.type < b.type) {
             return -1;
         }
-        if (a.moduleType > b.moduleType) {
-            return 1;
-        }
-        if (a.sortingGroup < b.sortingGroup) {
-            return -1;
-        }
-        if (a.sortingGroup > b.sortingGroup) {
+        if (a.type > b.type) {
             return 1;
         }
         if (a.name < b.name) {
@@ -384,10 +400,17 @@ function convertModules() {
         if (a.name > b.name) {
             return 1;
         }
+        if (a.moduleLevel < b.moduleLevel) {
+            return -1;
+        }
+        if (a.moduleLevel > b.moduleLevel) {
+            return 1;
+        }
         return 0;
     });
+    const grouped = Array.from(groupBy(result, module => module.type));
 
-    saveJson(`${outDir}/modules.json`, result);
+    saveJson(`${outDir}/modules.json`, grouped);
     saveJson(`${outDir}/woods.json`, woodJson);
 }
 
