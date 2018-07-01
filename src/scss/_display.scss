@@ -82,6 +82,8 @@ p {
 
 .modules {
     width: auto;
+    margin-left: 1em;
+    margin-right: 1em;
 }
 
 .bubble {
@@ -521,15 +523,19 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
 
 .county text,
 .region text {
-    font-size: 200px;
+    font-family: LibreCaslonDisplay, -apple-system, blinkmacsystemfont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
+        cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", arial, sans-serif;
     fill: $white;
     opacity: 0.7;
     text-anchor: middle;
 }
 
+.region text {
+    font-size: 240px;
+}
+
 .county text {
-    font-size: 64px;
-    font-style: italic;
+    font-size: 84px;
 }
 
 // https://stackoverflow.com/questions/44467377/bootstrap-4-multilevel-dropdown-inside-navigation/48953349#48953349
