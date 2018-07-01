@@ -2,8 +2,10 @@
     wood-compare.js
  */
 
-/* global d3 : false
+/* global d3 : false,
+    ga : false
  */
+
 import { capitalizeFirstLetter, formatFloat, formatPercent } from "./util";
 
 class Wood {
@@ -337,6 +339,7 @@ export default class WoodCompare {
 
     _setupListener() {
         $("#button-wood-compare").on("click", event => {
+            ga("send", "event", "Wood compare", "click");
             event.stopPropagation();
             this._woodCompareSelected();
         });
