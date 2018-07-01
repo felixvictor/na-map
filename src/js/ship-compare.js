@@ -2,7 +2,8 @@
     ship-compare.js
  */
 
-/* global d3 : false
+/* global d3 : false,
+    ga : false
  */
 
 import { formatFloat, getOrdinal, isEmpty } from "./util";
@@ -565,6 +566,7 @@ export default class ShipCompare {
 
     _setupListener() {
         $("#button-ship-compare").on("click", event => {
+            ga("send", "event", "Ship compare", "click");
             event.stopPropagation();
             this._shipCompareSelected();
         });
