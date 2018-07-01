@@ -2,8 +2,7 @@
     module-list.js
  */
 
-/* global d3 : false,
-    ga : false
+/* global d3 : false
  */
 
 import { capitalizeFirstLetter, formatSignPercent, getOrdinal } from "./util";
@@ -23,7 +22,6 @@ export default class Module {
 
     _setupListener() {
         $("#button-module-list").on("click", event => {
-            ga("send", "event", "Module list", "click");
             event.stopPropagation();
             this._moduleListSelected();
         });
