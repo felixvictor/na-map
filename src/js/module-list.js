@@ -87,19 +87,22 @@ export default class Module {
                     }
 
                     rate = getRate(module.moduleLevel);
-                    [i + 1, i + 2].forEach(index => {
-                        if (hasSameProperties(index)) {
-                            // eslint-disable-next-line no-param-reassign
-                            type[1][index].hasSamePropertiesAsPrevious = true;
-                            rate += `<br>${getRate(type[1][index].moduleLevel)}`;
-                        }
-                    });
+                    if (hasSameProperties(i + 1)) {
+                        // eslint-disable-next-line no-param-reassign
+                        type[1][i + 1].hasSamePropertiesAsPrevious = true;
+                        rate += `<br>${getRate(type[1][i + 1].moduleLevel)}`;
+                    }
+                    if (hasSameProperties(i + 2)) {
+                        // eslint-disable-next-line no-param-reassign
+                        type[1][i + 2].hasSamePropertiesAsPrevious = true;
+                        rate = "";
+                    }
                     if (
                         typeof module.hasSamePropertiesAsPrevious === "undefined" ||
                         !module.hasSamePropertiesAsPrevious
                     ) {
                         rows.push(
-                            `<tr><td><em>${module.name}</em><br>${rate}</td><td>${module.properties
+                            `<tr><td><span class="name">${module.name}</span><br>${rate}</td><td>${module.properties
                                 .map(property => {
                                     const amount = property.absolute
                                         ? property.amount
@@ -169,16 +172,16 @@ export default class Module {
         const columns = 3,
             rows = this._getRows(moduleType),
             splitRows = chunkify(rows, columns);
-        let text = '<div class="container"><div class="row">';
+        let text = "";
         Array.from(Array(splitRows.length).keys()).forEach(column => {
-            text += '<table class="col-md table table-sm table-striped modules small mt-4"><thead>';
+            text += `<div class="col-md-${Math.floor(12 / splitRows.length)} row">`;
+            text += '<table class="offset-sm-1 col-sm-11 table table-sm modules small mt-4"><thead>';
             text += "<tr>";
             text += "<tr><th>Module</th><th>Modifier</th></tr></thead><tbody>";
             text += splitRows[column].join("");
-            text += "</tbody></table>";
+            text += "</tbody></table></div>";
         });
 
-        text += "</div></div>";
         return text;
     }
 
@@ -197,7 +200,9 @@ export default class Module {
         d3.select(`${this._div} div`).remove();
 
         // Add new module list
-        d3.select(this._div).append("div");
+        d3.select(this._div)
+            .append("div")
+            .classed("row", true);
         $(this._div)
             .find("div")
             .append(this._getText(moduleType));
