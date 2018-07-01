@@ -2,8 +2,7 @@
     wind-prediction.js
  */
 
-/* global d3 : false,
-    ga : false
+/* global d3 : false
  */
 
 import moment from "moment/moment";
@@ -42,7 +41,8 @@ export default class WindPrediction {
     }
 
     static _setupArrow() {
-        d3.select("#na-svg defs")
+        d3
+            .select("#na-svg defs")
             .append("marker")
             .attr("id", "wind-arrow")
             .attr("viewBox", "0 -5 10 10")
@@ -101,7 +101,6 @@ export default class WindPrediction {
                     .val()
                     .trim();
 
-            ga("send", "event", "Wind prediction", "click");
             this._predictWind(currentWind, time);
             $("#predictDropdown").dropdown("toggle");
             event.preventDefault();
@@ -139,7 +138,7 @@ export default class WindPrediction {
         }
 
         const timeDiffInSec = predictTime.diff(currentTime, "seconds");
-        const predictedWindDegrees = 360 + ((currentWindDegrees - degreesPerSecond * timeDiffInSec) % 360);
+        const predictedWindDegrees = 360 + (currentWindDegrees - degreesPerSecond * timeDiffInSec) % 360;
 
         this._printPredictedWind(
             predictedWindDegrees,
@@ -152,7 +151,7 @@ export default class WindPrediction {
     _printCompass(predictedWindDegrees) {
         const xCompass = this._width / 2,
             yCompass = this._height / 3,
-            radians = (Math.PI / 180) * (predictedWindDegrees - 90),
+            radians = Math.PI / 180 * (predictedWindDegrees - 90),
             length = this._compassSize * 1.3,
             dx = length * Math.cos(radians),
             dy = length * Math.sin(radians),
