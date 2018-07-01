@@ -82,8 +82,19 @@ p {
 
 .modules {
     width: auto;
-    margin-left: 1em;
-    margin-right: 1em;
+    td {
+        padding-top: 0.6rem;
+        padding-bottom: 0.6rem;
+    }
+    tr:nth-of-type(odd) {
+        background-color: $primary-300;
+    }
+    tr:nth-of-type(even) {
+        background-color: $primary-100;
+    }
+    .name {
+        font-style: italic;
+    }
 }
 
 .bubble {
