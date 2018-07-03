@@ -44,6 +44,11 @@ p {
     text-align: left;
 }
 
+.table-sm th {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
 .table {
     thead th {
         font-weight: normal;
@@ -51,6 +56,27 @@ p {
     td {
         vertical-align: top;
         border-top: none;
+    }
+}
+
+.modules {
+    table {
+        thead {
+            background-color: $secondary-200;
+        }
+        td {
+            padding-top: 0.6rem;
+            padding-bottom: 0.6rem;
+        }
+        tbody tr:nth-of-type(odd) {
+            background-color: $primary-300;
+        }
+        tbody tr:nth-of-type(even) {
+            background-color: $primary-100;
+        }
+        .name {
+            font-style: italic;
+        }
     }
 }
 
@@ -77,23 +103,6 @@ p {
     }
     td:nth-child(3) {
         width: 32%;
-    }
-}
-
-.modules {
-    width: auto;
-    td {
-        padding-top: 0.6rem;
-        padding-bottom: 0.6rem;
-    }
-    tr:nth-of-type(odd) {
-        background-color: $primary-300;
-    }
-    tr:nth-of-type(even) {
-        background-color: $primary-100;
-    }
-    .name {
-        font-style: italic;
     }
 }
 
@@ -151,11 +160,6 @@ p {
     }
 }
 
-.table-sm th {
-    padding-top: 1rem;
-    padding-bottom: 1rem;
-}
-
 .columnA {
     background-color: $primary-100;
     table {
@@ -165,7 +169,7 @@ p {
         th {
             border-top: none;
         }
-        tr:nth-of-type(odd) {
+        tbody tr:nth-of-type(odd) {
             background-color: $primary-200;
         }
     }
@@ -180,7 +184,7 @@ p {
         th {
             border-top: none;
         }
-        tr:nth-of-type(odd) {
+        tbody tr:nth-of-type(odd) {
             background-color: $secondary-200;
         }
     }
