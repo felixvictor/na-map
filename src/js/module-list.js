@@ -5,7 +5,7 @@
 /* global d3 : false
  */
 
-import { capitalizeFirstLetter, formatSignPercent, getOrdinal } from "./util";
+import { formatSignPercent, getOrdinal } from "./util";
 
 export default class Module {
     constructor(moduleData) {
@@ -174,12 +174,13 @@ export default class Module {
             splitRows = chunkify(rows, columns);
         let text = "";
         Array.from(Array(splitRows.length).keys()).forEach(column => {
-            text += `<div class="col-md-${Math.floor(12 / splitRows.length)} row">`;
-            text += '<table class="offset-sm-1 col-sm-11 table table-sm modules small mt-4"><thead>';
+            text += `<div class="col-md-${Math.floor(12 / splitRows.length)}">`;
+            text += '<div class="row modules">';
+            text += '<table class="col-sm-11 table table-sm small mt-4"><thead>';
             text += "<tr>";
             text += "<tr><th>Module</th><th>Modifier</th></tr></thead><tbody>";
             text += splitRows[column].join("");
-            text += "</tbody></table></div>";
+            text += "</tbody></table></div></div>";
         });
 
         return text;
