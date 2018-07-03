@@ -176,11 +176,12 @@ export default class Module {
         Array.from(Array(splitRows.length).keys()).forEach(column => {
             text += `<div class="col-md-${Math.floor(12 / splitRows.length)}">`;
             text += '<div class="row modules">';
-            text += '<table class="col-sm-11 table table-sm small mt-4"><thead>';
+            text += '<div class="col-sm-11">';
+            text += '<table class="table table-sm small mt-4"><thead>';
             text += "<tr>";
             text += "<tr><th>Module</th><th>Modifier</th></tr></thead><tbody>";
             text += splitRows[column].join("");
-            text += "</tbody></table></div></div>";
+            text += "</tbody></table></div></div></div>";
         });
 
         return text;
