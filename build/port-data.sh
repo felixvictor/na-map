@@ -57,7 +57,7 @@ function get_git_update () {
     BASE=$(git merge-base @ "@{u}")
 
     if [ "${LOCAL}" == "${BASE}" ]; then
-        git pull --quiet
+        git pull
     fi
 }
 
@@ -165,8 +165,8 @@ function log_date () {
 }
 
 function update_tweets () {
-    get_git_update
     cd ${BASE_DIR}
+    get_git_update
     get_tweets
     if update_ports; then
         copy_data
