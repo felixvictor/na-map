@@ -9,6 +9,7 @@ import "tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4";
 import "tempusdominus-core/build/js/tempusdominus-core";
 
 import { nations } from "./common";
+import { registerEvent } from "./analytics";
 
 export default class PortSelect {
     constructor(map, ports, pbZone) {
@@ -90,11 +91,26 @@ export default class PortSelect {
         selectPickerLiveSearch.liveSearchNormalize = true;
 
         selectPickerLiveSearch.noneSelectedText = "Move to port";
-        this._portNames.on("change", event => this._portSelected(event)).selectpicker(selectPickerLiveSearch);
+        this._portNames
+            .on("change", event => {
+                registerEvent("Menu", "Move to port");
+                this._portSelected(event);
+            })
+            .selectpicker(selectPickerLiveSearch);
         selectPickerLiveSearch.noneSelectedText = "Select good";
-        this._buyGoods.on("change", event => this._goodSelected(event)).selectpicker(selectPickerLiveSearch);
+        this._buyGoods
+            .on("change", event => {
+                registerEvent("Menu", "Select good");
+                this._goodSelected(event);
+            })
+            .selectpicker(selectPickerLiveSearch);
         selectPickerLiveSearch.noneSelectedText = "Select consumed good";
-        this._sellGoods.on("change", event => this._goodSelected(event)).selectpicker(selectPickerLiveSearch);
+        this._sellGoods
+            .on("change", event => {
+                registerEvent("Menu", "Select consumed good");
+                this._goodSelected(event);
+            })
+            .selectpicker(selectPickerLiveSearch);
 
         selectPickerDefaults.noneSelectedText = "Select nation";
         this._propNation.on("change", event => this._nationSelected(event)).selectpicker(selectPickerDefaults);
