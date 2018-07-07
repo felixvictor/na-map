@@ -567,8 +567,8 @@ export default class ShipCompare {
 
     _setupListener() {
         $("#button-ship-compare").on("click", event => {
-            console.log("click", gtag, window.gtag);
-            if (gtag) {
+            console.log("click", window.gtag);
+            if (window.gtag) {
                 console.log("window.gtag");
                 gtag("event", "play", {
                     event_category: "click",
