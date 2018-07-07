@@ -568,7 +568,10 @@ export default class ShipCompare {
     _setupListener() {
         $("#button-ship-compare").on("click", event => {
             console.log("click", window);
-            if (window.google_tag_manager.dataLayer.gtmLoad) {
+            if (
+                typeof window.google_tag_manager.dataLayer.gtmLoad !== "undefined" &&
+                window.google_tag_manager.dataLayer.gtmLoad
+            ) {
                 console.log("window.gtag");
                 gtag("event", "click", {
                     event_category: "Tools",
