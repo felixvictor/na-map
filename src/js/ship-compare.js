@@ -6,6 +6,7 @@
  */
 
 import { formatFloat, getOrdinal, isEmpty } from "./util";
+import { registerEvent } from "./analytics";
 
 const numSegments = 24,
     segmentRadians = (2 * Math.PI) / numSegments;
@@ -381,7 +382,8 @@ class ShipComparison extends Ship {
 
             if (diff < 0) {
                 return `<span class="badge badge-danger">${formatFloat(Math.abs(diff))}</span>`;
-            } else if (diff > 0) {
+            }
+            if (diff > 0) {
                 return `<span class="badge badge-success">${formatFloat(diff)}</span>`;
             }
             return "";
@@ -565,6 +567,7 @@ export default class ShipCompare {
 
     _setupListener() {
         $("#button-ship-compare").on("click", event => {
+            registerEvent("Tools", "Compare ships");
             event.stopPropagation();
             this._shipCompareSelected();
         });
