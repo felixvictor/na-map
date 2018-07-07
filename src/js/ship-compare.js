@@ -2,11 +2,11 @@
     ship-compare.js
  */
 
-/* global d3 : false,
-    dataLayer : false
+/* global d3 : false
  */
 
 import { formatFloat, getOrdinal, isEmpty } from "./util";
+import { gtag } from "./analytics";
 
 const numSegments = 24,
     segmentRadians = (2 * Math.PI) / numSegments;
@@ -570,7 +570,7 @@ export default class ShipCompare {
             console.log("click", window);
             if (window.google_tag_manager.dataLayer.gtmLoad) {
                 console.log("window.gtag");
-                dataLayer.push("event", "play", {
+                gtag("event", "play", {
                     event_category: "click",
                     event_label: "Ship compare"
                 });
