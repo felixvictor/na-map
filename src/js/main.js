@@ -28,7 +28,7 @@ import {
 import Cookies from "js-cookie";
 
 import naDisplay from "./na-display";
-import naAnalytics from "./analytics";
+import initAnalytics from "./analytics";
 
 /**
  * @returns {void}
@@ -123,7 +123,7 @@ function main() {
         faTrash
     );
 
-    naAnalytics();
+    initAnalytics();
     setupListener();
     naDisplay(serverName);
 }
