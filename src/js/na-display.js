@@ -40,6 +40,7 @@ import Teleport from "./teleport";
 import WindPrediction from "./wind-prediction";
 import WoodCompare from "./wood-compare";
 import Module from "./module-list";
+import { registerEvent } from "./analytics";
 
 /**
  * Display naval action map
@@ -208,6 +209,16 @@ export default function naDisplay(serverName) {
 
             $("#reset").on("click", () => {
                 this._clearMap();
+            });
+
+            $("#propertyDropdown").on("click", () => {
+                registerEvent("Menu", "Select port on property");
+            });
+            $("#settingsDropdown").on("click", () => {
+                registerEvent("Menu", "Settings");
+            });
+            $("#button-download-pb-calc").on("click", () => {
+                registerEvent("Tools", "Download pb calculator");
             });
 
             $("#doubleClick-action").change(() => this._doubleClickSelected());
