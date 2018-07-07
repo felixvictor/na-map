@@ -570,8 +570,8 @@ export default class ShipCompare {
             console.log("click", window);
             if (window.google_tag_manager.dataLayer.gtmLoad) {
                 console.log("window.gtag");
-                gtag("event", "play", {
-                    event_category: "click",
+                gtag("event", "click", {
+                    event_category: "Tools",
                     event_label: "Ship compare"
                 });
             }
