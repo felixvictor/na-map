@@ -6,7 +6,7 @@
  */
 
 import { formatFloat, getOrdinal, isEmpty } from "./util";
-import { gtag } from "./analytics";
+import { registerEvent } from "./analytics";
 
 const numSegments = 24,
     segmentRadians = (2 * Math.PI) / numSegments;
@@ -567,17 +567,7 @@ export default class ShipCompare {
 
     _setupListener() {
         $("#button-ship-compare").on("click", event => {
-            console.log("click", window);
-            if (
-                typeof window.google_tag_manager !== "undefined" &&
-                window.google_tag_manager.dataLayer.gtmLoad
-            ) {
-                console.log("window.gtag");
-                gtag("event", "click", {
-                    event_category: "Tools",
-                    event_label: "Ship compare"
-                });
-            }
+            registerEvent("Tools", "Ship compare");
             event.stopPropagation();
             this._shipCompareSelected();
         });
