@@ -6,6 +6,7 @@
  */
 
 import { formatSignPercent, getOrdinal } from "./util";
+import { registerEvent } from "./analytics";
 
 export default class Module {
     constructor(moduleData) {
@@ -22,6 +23,7 @@ export default class Module {
 
     _setupListener() {
         $("#button-module-list").on("click", event => {
+            registerEvent("Tools", "List modules");
             event.stopPropagation();
             this._moduleListSelected();
         });
