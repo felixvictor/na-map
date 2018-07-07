@@ -3,7 +3,7 @@
  */
 
 /* global d3 : false,
-    gtag : false
+    dataLayer : false
  */
 
 import { formatFloat, getOrdinal, isEmpty } from "./util";
@@ -570,7 +570,7 @@ export default class ShipCompare {
             console.log("click", window);
             if (window.google_tag_manager.dataLayer.gtmLoad) {
                 console.log("window.gtag");
-                gtag("event", "play", {
+                dataLayer.push("event", "play", {
                     event_category: "click",
                     event_label: "Ship compare"
                 });
