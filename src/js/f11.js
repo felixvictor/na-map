@@ -7,6 +7,7 @@
 
 import { between, formatF11 } from "./util";
 import { convertCoordX, convertCoordY, convertInvCoordX, convertInvCoordY } from "./common";
+import { registerEvent } from "./analytics";
 
 export default class F11 {
     constructor(map) {
@@ -27,6 +28,7 @@ export default class F11 {
 
     _setupListener() {
         $("#f11").submit(event => {
+            registerEvent("Menu", "Move to F11");
             this._f11Submitted();
             event.preventDefault();
         });
