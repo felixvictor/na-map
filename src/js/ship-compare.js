@@ -569,7 +569,7 @@ export default class ShipCompare {
         $("#button-ship-compare").on("click", event => {
             console.log("click", window);
             if (
-                typeof window.google_tag_manager.dataLayer.gtmLoad !== "undefined" &&
+                typeof window.google_tag_manager !== "undefined" &&
                 window.google_tag_manager.dataLayer.gtmLoad
             ) {
                 console.log("window.gtag");
