@@ -3,7 +3,7 @@
  */
 
 /* global d3 : false,
-    ga : false
+    gtag : false
  */
 
 import { formatFloat, getOrdinal, isEmpty } from "./util";
@@ -382,7 +382,8 @@ class ShipComparison extends Ship {
 
             if (diff < 0) {
                 return `<span class="badge badge-danger">${formatFloat(Math.abs(diff))}</span>`;
-            } else if (diff > 0) {
+            }
+            if (diff > 0) {
                 return `<span class="badge badge-success">${formatFloat(diff)}</span>`;
             }
             return "";
@@ -566,8 +567,11 @@ export default class ShipCompare {
 
     _setupListener() {
         $("#button-ship-compare").on("click", event => {
-            if (window.ga && ga.create) {
-                window.ga("send", "event", "Ship compare", "click");
+            if (window.gtag) {
+                gtag("event", "play", {
+                    event_category: "click",
+                    event_label: "Ship compare"
+                });
             }
             event.stopPropagation();
             this._shipCompareSelected();
