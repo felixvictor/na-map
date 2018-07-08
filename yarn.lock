@@ -10356,7 +10356,7 @@ tempusdominus-bootstrap-4@^5.0.1:
     moment-timezone "^0.5.11"
     popper.js "^1.12.9"
 
-tempusdominus-core@^5.0.1:
+tempusdominus-core@^5.0.0:
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/tempusdominus-core/-/tempusdominus-core-5.0.0.tgz#c03b2115ece1cada6d84e5e872175d7192ac838d"
   dependencies:
