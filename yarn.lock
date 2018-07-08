@@ -4312,16 +4312,16 @@ evp_bytestokey@^1.0.0, evp_bytestokey@^1.0.3:
     md5.js "^1.3.4"
     safe-buffer "^5.1.1"
 
-excel4node@^1.3.6:
-  version "1.3.6"
-  resolved "https://registry.yarnpkg.com/excel4node/-/excel4node-1.3.6.tgz#8f1d394d2f7e64c417475048408c0a664d8a3240"
+excel4node@^1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/excel4node/-/excel4node-1.4.0.tgz#4072b36413e7d074e86914fe1ef12aae59df1941"
   dependencies:
-    image-size "0.6.1"
+    image-size "0.6.3"
     jszip "3.1.5"
-    lodash "4.17.4"
-    mime "2.0.3"
+    lodash "4.17.10"
+    mime "2.3.1"
     sloth-logger "1.0.3"
-    xmlbuilder "9.0.4"
+    xmlbuilder "9.0.7"
 
 exec-buffer@^3.0.0:
   version "3.2.0"
@@ -5705,9 +5705,9 @@ ignore@^3.3.3, ignore@^3.3.5:
   version "3.3.10"
   resolved "https://registry.yarnpkg.com/ignore/-/ignore-3.3.10.tgz#0a97fb876986e8081c631160f8f9f389157f0043"
 
-image-size@0.6.1:
-  version "0.6.1"
-  resolved "https://registry.yarnpkg.com/image-size/-/image-size-0.6.1.tgz#98122a562d59dcc097ef1b2c8191866eb8f5d663"
+image-size@0.6.3:
+  version "0.6.3"
+  resolved "https://registry.yarnpkg.com/image-size/-/image-size-0.6.3.tgz#e7e5c65bb534bd7cdcedd6cb5166272a85f75fb2"
 
 image-webpack-loader@^4.3.0:
   version "4.3.1"
@@ -6783,17 +6783,13 @@ lodash.templatesettings@^3.0.0:
     lodash._reinterpolate "^3.0.0"
     lodash.escape "^3.0.0"
 
-lodash@4.17.4:
-  version "4.17.4"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.4.tgz#78203a4d1c328ae1d86dca6460e369b57f4055ae"
+lodash@4.17.10, lodash@^4.0.0, lodash@^4.17.10, lodash@^4.17.3, lodash@^4.17.4, lodash@^4.17.5, lodash@^4.2.0, lodash@^4.3.0, lodash@^4.6.1, lodash@~4.17.10:
+  version "4.17.10"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.10.tgz#1b7793cf7259ea38fb3661d4d38b3260af8ae4e7"
 
 lodash@^3.3.1:
   version "3.10.1"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-3.10.1.tgz#5bf45e8e49ba4189e17d482789dfd15bd140b7b6"
-
-lodash@^4.0.0, lodash@^4.17.10, lodash@^4.17.3, lodash@^4.17.4, lodash@^4.17.5, lodash@^4.2.0, lodash@^4.3.0, lodash@^4.6.1, lodash@~4.17.10:
-  version "4.17.10"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.10.tgz#1b7793cf7259ea38fb3661d4d38b3260af8ae4e7"
 
 log-symbols@^2.0.0, log-symbols@^2.1.0:
   version "2.2.0"
@@ -7123,17 +7119,13 @@ mime@1.4.1:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/mime/-/mime-1.4.1.tgz#121f9ebc49e3766f311a76e1fa1c8003c4b03aa6"
 
-mime@2.0.3:
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/mime/-/mime-2.0.3.tgz#4353337854747c48ea498330dc034f9f4bbbcc0b"
+mime@2.3.1, mime@^2.0.3, mime@^2.2.0:
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/mime/-/mime-2.3.1.tgz#b1621c54d63b97c47d3cfe7f7215f7d64517c369"
 
 mime@^1.2.11:
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/mime/-/mime-1.6.0.tgz#32cd9e5c64553bd58d19a568af452acff04981b1"
-
-mime@^2.0.3, mime@^2.2.0:
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/mime/-/mime-2.3.1.tgz#b1621c54d63b97c47d3cfe7f7215f7d64517c369"
 
 mimic-fn@^1.0.0:
   version "1.2.0"
@@ -7513,9 +7505,9 @@ node-pre-gyp@^0.10.0:
     semver "^5.3.0"
     tar "^4"
 
-node-sass@^4.9.1:
-  version "4.9.1"
-  resolved "https://registry.yarnpkg.com/node-sass/-/node-sass-4.9.1.tgz#5416ae7079d991f0e7002e62c8b0ba3fedc15c79"
+node-sass@^4.9.2:
+  version "4.9.2"
+  resolved "https://registry.yarnpkg.com/node-sass/-/node-sass-4.9.2.tgz#5e63fe6bd0f2ae3ac9d6c14ede8620e2b8bdb437"
   dependencies:
     async-foreach "^0.1.3"
     chalk "^1.1.1"
@@ -10356,7 +10348,7 @@ tempusdominus-bootstrap-4@^5.0.1:
     moment-timezone "^0.5.11"
     popper.js "^1.12.9"
 
-tempusdominus-core@^5.0.1:
+tempusdominus-core@^5.0.0:
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/tempusdominus-core/-/tempusdominus-core-5.0.0.tgz#c03b2115ece1cada6d84e5e872175d7192ac838d"
   dependencies:
@@ -11336,9 +11328,9 @@ xdg-basedir@^2.0.0:
   dependencies:
     os-homedir "^1.0.0"
 
-xmlbuilder@9.0.4:
-  version "9.0.4"
-  resolved "https://registry.yarnpkg.com/xmlbuilder/-/xmlbuilder-9.0.4.tgz#519cb4ca686d005a8420d3496f3f0caeecca580f"
+xmlbuilder@9.0.7:
+  version "9.0.7"
+  resolved "https://registry.yarnpkg.com/xmlbuilder/-/xmlbuilder-9.0.7.tgz#132ee63d2ec5565c557e20f4c22df9aca686b10d"
 
 "xtend@>=4.0.0 <4.1.0-0", xtend@^4.0.0, xtend@^4.0.1, xtend@~4.0.0, xtend@~4.0.1:
   version "4.0.1"
