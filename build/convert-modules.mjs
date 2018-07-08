@@ -412,4 +412,109 @@ function convertModules() {
     saveJson(`${outDir}/woods.json`, woodJson);
 }
 
+/**
+ * Convert API building data and save sorted as JSON
+ * @returns {void}
+ */
+function convertBuildings() {
+    const buildings = new Map(),
+        resources = new Map(),
+        lootTables = new Map();
+
+    APIItems.forEach(APIresource => {
+        resources.set(APIresource.Id, APIresource.Name.replaceAll("'", "’"));
+    });
+
+    APIItems.filter(item => item.ItemType === "LootTableItem").forEach(APIlootTable => {
+        const loot = APIlootTable.Items.map(item => ({ item: resources.get(item.Template), chance: item.Chance }));
+        lootTables.set(APIlootTable.Id, loot);
+    });
+
+    APIItems.filter(item => item.ItemType === "Building").forEach(APIbuilding => {
+        const dontSave = false;
+        const building = {
+            id: APIbuilding.Id,
+            name: APIbuilding.Name.replaceAll("'", "’"),
+            loot: lootTables.get(APIbuilding.LootTable),
+            requiredPortResource: resources.get(APIbuilding.RequiredPortResource),
+            baseProduction: APIbuilding.BaseProduction,
+            levels: APIbuilding.Levels.map(level => ({
+                laborDiscount: level.LaborDiscount,
+                production: level.ProductionLevel * APIbuilding.BaseProduction,
+                maxStorage: level.MaxStorage,
+                price: level.UpgradePriceGold,
+                materials: level.UpgradePriceMaterials.map(material => ({
+                    item: resources.get(material.Template),
+                    amount: material.Amount
+                }))
+            }))
+        };
+
+        // Ignore double entries
+        if (!buildings.has(building.name)) {
+            /*
+            // Check for wood module
+            if (building.name.endsWith(" Planking") || building.name.endsWith(" Frame") || building.name === "Crew Space") {
+                setWood(building);
+                dontSave = true;
+            } else {
+                setModuleModifier(building);
+                setModuleType(building);
+                if (
+                    building.type.startsWith("Not used") ||
+                    building.name === "Gifted" ||
+                    building.name === "Coward" ||
+                    building.name === "Doctor" ||
+                    building.name === "Dreadful" ||
+                    building.name === "Expert Surgeon" ||
+                    building.name === "Frigate Master" ||
+                    building.name === "Gifted" ||
+                    building.name === "Light Ship Master" ||
+                    building.name === "Lineship Master" ||
+                    building.name === "Press Gang" ||
+                    building.name === "Signaling" ||
+                    building.name === "Thrifty" ||
+                    building.name === "Lead Sheating" ||
+                    building.name === "TEST MODULE SPEED IN OW" ||
+                    building.name === "Cannon nation module - France" ||
+                    building.name.endsWith(" - OLD")
+                ) {
+                    dontSave = true;
+                } else {
+                    // console.log(module.id, module.name);
+                }
+            }
+            */
+            buildings.set(building.name, dontSave ? {} : building);
+        }
+    });
+
+    const result = Array.from(buildings.values());
+    /*
+    buildings = result.filter(module => Object.keys(module).length).sort((a, b) => {
+        if (a.type < b.type) {
+            return -1;
+        }
+        if (a.type > b.type) {
+            return 1;
+        }
+        if (a.name < b.name) {
+            return -1;
+        }
+        if (a.name > b.name) {
+            return 1;
+        }
+        if (a.moduleLevel < b.moduleLevel) {
+            return -1;
+        }
+        if (a.moduleLevel > b.moduleLevel) {
+            return 1;
+        }
+        return 0;
+    });
+*/
+    saveJson(`${outDir}/buildings.json`, result);
+}
+
 convertModules();
+convertBuildings();
