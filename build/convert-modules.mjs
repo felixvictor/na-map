@@ -451,6 +451,13 @@ function convertBuildings() {
 
         // Ignore double entries
         if (!buildings.has(building.name)) {
+            if (building.name === "Shipyard") {
+                building.resource = { name: "ships", price: 0 };
+                building.byproduct = [];
+            } else if (building.name === "Workshop") {
+                building.resource = { name: "cannons", price: 0 };
+                building.byproduct = [];
+            }
             if (
                 building.name === "Compass Wood Forest" ||
                 building.name === "Copper Ore Mine" ||
