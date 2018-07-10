@@ -422,24 +422,23 @@ function convertBuildings() {
         lootTables = new Map();
 
     APIItems.forEach(APIresource => {
-        resources.set(APIresource.Id, APIresource.Name.replaceAll("'", "’"));
+        resources.set(APIresource.Id, { name: APIresource.Name.replaceAll("'", "’"), price: APIresource.BasePrice });
     });
 
     APIItems.filter(item => item.ItemType === "LootTableItem").forEach(APIlootTable => {
-        const loot = APIlootTable.Items.map(item => ({ item: resources.get(item.Template), chance: item.Chance }));
+        const loot = APIlootTable.Items.map(item => ({ item: resources.get(item.Template).name, chance: item.Chance }));
         lootTables.set(APIlootTable.Id, loot);
     });
 
     APIItems.filter(item => item.ItemType === "Building").forEach(APIbuilding => {
-        const dontSave = false;
+        let dontSave = false;
         const building = {
             id: APIbuilding.Id,
             name: APIbuilding.Name.replaceAll("'", "’"),
-            loot: lootTables.get(APIbuilding.LootTable),
-            requiredPortResource: resources.get(APIbuilding.RequiredPortResource),
-            baseProduction: APIbuilding.BaseProduction,
+            resource: resources.get(APIbuilding.RequiredPortResource),
+            byproduct: lootTables.get(APIbuilding.LootTable),
             levels: APIbuilding.Levels.map(level => ({
-                laborDiscount: level.LaborDiscount,
+                labourDiscount: level.LaborDiscount,
                 production: level.ProductionLevel * APIbuilding.BaseProduction,
                 maxStorage: level.MaxStorage,
                 price: level.UpgradePriceGold,
@@ -452,67 +451,34 @@ function convertBuildings() {
 
         // Ignore double entries
         if (!buildings.has(building.name)) {
-            /*
-            // Check for wood module
-            if (building.name.endsWith(" Planking") || building.name.endsWith(" Frame") || building.name === "Crew Space") {
-                setWood(building);
+            if (
+                building.name === "Compass Wood Forest" ||
+                building.name === "Copper Ore Mine" ||
+                building.name === "Forge" ||
+                building.name === "Live Oak Forest" ||
+                building.name === "Mahogany Forest" ||
+                building.name === "Pine Forest" ||
+                building.name === "Red Wood Forest" ||
+                building.name === "Teak Forest"
+            ) {
                 dontSave = true;
             } else {
-                setModuleModifier(building);
-                setModuleType(building);
-                if (
-                    building.type.startsWith("Not used") ||
-                    building.name === "Gifted" ||
-                    building.name === "Coward" ||
-                    building.name === "Doctor" ||
-                    building.name === "Dreadful" ||
-                    building.name === "Expert Surgeon" ||
-                    building.name === "Frigate Master" ||
-                    building.name === "Gifted" ||
-                    building.name === "Light Ship Master" ||
-                    building.name === "Lineship Master" ||
-                    building.name === "Press Gang" ||
-                    building.name === "Signaling" ||
-                    building.name === "Thrifty" ||
-                    building.name === "Lead Sheating" ||
-                    building.name === "TEST MODULE SPEED IN OW" ||
-                    building.name === "Cannon nation module - France" ||
-                    building.name.endsWith(" - OLD")
-                ) {
-                    dontSave = true;
-                } else {
-                    // console.log(module.id, module.name);
-                }
+                // console.log(module.id, module.name);
             }
-            */
             buildings.set(building.name, dontSave ? {} : building);
         }
     });
 
-    const result = Array.from(buildings.values());
-    /*
-    buildings = result.filter(module => Object.keys(module).length).sort((a, b) => {
-        if (a.type < b.type) {
-            return -1;
-        }
-        if (a.type > b.type) {
-            return 1;
-        }
+    let result = Array.from(buildings.values());
+    result = result.filter(building => Object.keys(building).length).sort((a, b) => {
         if (a.name < b.name) {
             return -1;
         }
         if (a.name > b.name) {
             return 1;
         }
-        if (a.moduleLevel < b.moduleLevel) {
-            return -1;
-        }
-        if (a.moduleLevel > b.moduleLevel) {
-            return 1;
-        }
         return 0;
     });
-*/
     saveJson(`${outDir}/buildings.json`, result);
 }
 
