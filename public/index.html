@@ -19,7 +19,7 @@
     <meta content="images/icons/browserconfig.xml" name="msapplication-config">
 
     <script src="https://www.googletagmanager.com/gtag/js?id=UA-109520372-1" async></script>
-<link href="na-map.min.css?f27f8e3ad05a5c881ec3" rel="stylesheet" crossorigin="anonymous" integrity="sha256-kFbqoXm1Gdq5Q4aTm2s5rIRDpyKiaV0p/WXwcJ6DkvQ= sha384-6gOMTj2QL6Ibnl47l2JbPDjgAOx4OsP3Z+SeussIoeyfr4Pk4LY3BP2ta4JeNwHp"></head>
+<link href="na-map.min.css?0db1e1877875fa04bd18" rel="stylesheet" crossorigin="anonymous" integrity="sha256-kFbqoXm1Gdq5Q4aTm2s5rIRDpyKiaV0p/WXwcJ6DkvQ= sha384-6gOMTj2QL6Ibnl47l2JbPDjgAOx4OsP3Z+SeussIoeyfr4Pk4LY3BP2ta4JeNwHp"></head>
 <body>
 
 <nav class="bg-light fixed-top navbar navbar-expand-lg navbar-light">
@@ -229,11 +229,18 @@
                 </a>
                 <div class="dropdown-menu dropdown-menu-right" id="extraMenu" aria-labelledby="extraDropdown">
 
-                    <a class="dropdown-item" id="button-ship-compare">Ship comparison</a>
-                    <a class="dropdown-item" id="button-wood-compare">Wood comparison</a>
-                    <a class="dropdown-item" id="button-module-list">Module list</a>
-                    <a class="dropdown-item" href="port-battle.xlsx" id="button-download-pb-calc" download="port-battle-calculator.xlsx">Download
-                        port battle calculator</a>
+                    <h6 class="dropdown-header">Compare</h6>
+                    <a class="dropdown-item" id="button-ship-compare">Ships</a>
+                    <a class="dropdown-item" id="button-wood-compare">Woods</a>
+
+                    <div class="dropdown-divider"></div>
+                    <h6 class="dropdown-header">List</h6>
+                    <a class="dropdown-item" id="button-module-list">Modules</a>
+                    <a class="dropdown-item" id="button-building-list">Buildings</a>
+
+                    <div class="dropdown-divider"></div>
+                    <h6 class="dropdown-header">Download</h6>
+                    <a class="dropdown-item" href="port-battle.xlsx" id="button-download-pb-calc" download="port-battle-calculator.xlsx">Port battle calculator</a>
                 </div>
             </li>
 
@@ -343,7 +350,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <header class="modal-header">
-                <h3>Naval Action map <span class="small text-primary">v5.4.3</span></h3>
+                <h3>Naval Action map <span class="small text-primary">v5.4.4</span></h3>
             </header>
             <div class="modal-body">
                 <p>Yet another map which uses the in-game map and live data (daily updated soonish after maintenance).
@@ -363,7 +370,7 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <header class="modal-header">
-                <h3>Ship comparison</h3>
+                <h3>Compare ships</h3>
             </header>
 
             <div class="modal-body">
@@ -398,7 +405,7 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <header class="modal-header">
-                <h3>Wood comparison</h3>
+                <h3>Compare woods</h3>
             </header>
 
             <div class="modal-body">
@@ -446,7 +453,7 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <header class="modal-header">
-                <h3>Module list</h3>
+                <h3>Modules</h3>
             </header>
             <div class="modal-body">
                 <label for="modules-select"></label><select id="modules-select" name="modules-select"></select>
@@ -459,7 +466,24 @@
     </div>
 </section>
 
+<section class="modal" data-backdrop="static" data-keyboard="false" id="modal-buildings" role="dialog" tabindex="-1">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <header class="modal-header">
+                <h3>Buildings</h3>
+            </header>
+            <div class="modal-body">
+                <label for="buildings-select"></label><select id="buildings-select" name="buildings-select"></select>
+                <div class="container" id="buildings-list"></div>
+            </div>
+            <footer class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Close</button>
+            </footer>
+        </div>
+    </div>
+</section>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.slim.min.js" crossorigin="anonymous" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"></script>
 <script src="https://unpkg.com/d3@5.4.0/dist/d3.min.js" crossorigin="anonymous" integrity="sha384-Ha//YQhNUuPzmPKgC8aYpurZcTiV3JhEvEhH5uGW0IRjBfEgDQxvo0aF1Gef+blI"></script>
-<script src="na-map.min.js?f27f8e3ad05a5c881ec3" crossorigin="anonymous" integrity="sha256-JE/fPeugb/YiY5mZ0YhaMxcKLmHeR5AyjKlY+0bz1ow= sha384-RJqw8zXGeu/04nzOvL5++N/yLDX/CwLvpxu3VPwz9lzUb6gEnVIEAdVtB9hGESYF" type="text/javascript"></script></body>
+<script src="na-map.min.js?0db1e1877875fa04bd18" crossorigin="anonymous" integrity="sha256-dN6GfPpWzpIxKE6yTe5rNwphb3UgThWtyFn+XVxXBpY= sha384-SzqxndJO7o+oRkZfWwP+VTqP+htbndqvHznqDS4D2Y8vD5qgjCUiVwo6nwYzy2Oj" type="text/javascript"></script></body>
 </html>
