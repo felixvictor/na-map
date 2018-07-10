@@ -40,6 +40,7 @@ import Teleport from "./teleport";
 import WindPrediction from "./wind-prediction";
 import WoodCompare from "./wood-compare";
 import Module from "./module-list";
+import Building from "./building-list";
 import { registerEvent } from "./analytics";
 
 /**
@@ -55,6 +56,7 @@ export default function naDisplay(serverName) {
         shipCompare,
         woodCompare,
         moduleList,
+        buildingList,
         windPrediction,
         f11,
         course,
@@ -62,7 +64,8 @@ export default function naDisplay(serverName) {
         pbZone,
         shipData,
         woodData,
-        moduleData;
+        moduleData,
+        buildingData;
 
     /** Main map */
     class NAMap {
@@ -548,6 +551,7 @@ export default function naDisplay(serverName) {
         shipCompare = new ShipCompare(shipData);
         woodCompare = new WoodCompare(woodData);
         moduleList = new Module(moduleData);
+        buildingList = new Building(buildingData);
         teleport = new Teleport(map.coord.min, map.coord.max, ports);
         portSelect = new PortSelect(map, ports, pbZone);
         windPrediction = new WindPrediction(map.margin.left, map.margin.top);
@@ -591,6 +595,7 @@ export default function naDisplay(serverName) {
         shipData = JSON.parse(JSON.stringify(data.ships.shipData));
         woodData = JSON.parse(JSON.stringify(data.woods));
         moduleData = JSON.parse(JSON.stringify(data.modules));
+        buildingData = JSON.parse(JSON.stringify(data.buildings));
 
         setup();
     }
@@ -614,7 +619,18 @@ export default function naDisplay(serverName) {
         const moduleJsonData = fetch("modules.json", { cache: cacheMode })
             .then(checkFetchStatus)
             .then(getJsonFromFetch);
-        Promise.all([naMapJsonData, pbJsonData, pbZonesJsonData, shipJsonData, woodJsonData, moduleJsonData])
+        const buildingJsonData = fetch("buildings.json", { cache: cacheMode })
+            .then(checkFetchStatus)
+            .then(getJsonFromFetch);
+        Promise.all([
+            naMapJsonData,
+            pbJsonData,
+            pbZonesJsonData,
+            shipJsonData,
+            woodJsonData,
+            moduleJsonData,
+            buildingJsonData
+        ])
             .then(values =>
                 init({
                     ports: values[0],
@@ -622,7 +638,8 @@ export default function naDisplay(serverName) {
                     pbZones: values[2],
                     ships: values[3],
                     woods: values[4],
-                    modules: values[5]
+                    modules: values[5],
+                    buildings: values[6]
                 })
             )
             .catch(putFetchError);
