@@ -12,6 +12,7 @@ import "tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4";
 import "tempusdominus-core/build/js/tempusdominus-core";
 
 import { compassDirections, compassToDegrees, degreesToCompass } from "./util";
+import { registerEvent } from "./analytics";
 
 export default class WindPrediction {
     constructor(leftMargin, topMargin) {
@@ -101,6 +102,7 @@ export default class WindPrediction {
                     .val()
                     .trim();
 
+            registerEvent("Menu", "Wind prediction");
             this._predictWind(currentWind, time);
             $("#predictDropdown").dropdown("toggle");
             event.preventDefault();

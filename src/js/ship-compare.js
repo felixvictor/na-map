@@ -567,7 +567,7 @@ export default class ShipCompare {
 
     _setupListener() {
         $("#button-ship-compare").on("click", event => {
-            registerEvent("Tools", "Ship compare");
+            registerEvent("Tools", "Compare ships");
             event.stopPropagation();
             this._shipCompareSelected();
         });
