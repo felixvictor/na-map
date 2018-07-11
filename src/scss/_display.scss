@@ -59,7 +59,7 @@ p {
     }
 }
 
-.modules {
+.modules, .buildings {
     table {
         thead {
             background-color: $secondary-200;
@@ -78,6 +78,12 @@ p {
             font-style: italic;
         }
     }
+}
+
+.buildings {
+  table {
+    width: auto;
+  }
 }
 
 .wood {
