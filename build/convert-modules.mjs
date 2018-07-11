@@ -426,7 +426,26 @@ function convertBuildings() {
     });
 
     APIItems.filter(item => item.ItemType === "LootTableItem").forEach(APIlootTable => {
-        const loot = APIlootTable.Items.map(item => ({ item: resources.get(item.Template).name, chance: item.Chance }));
+        const loot = APIlootTable.Items.filter(item => item.Chance)
+            .map(item => ({
+                item: resources.get(item.Template).name,
+                chance: item.Chance
+            }))
+            .sort((a, b) => {
+                if (a.chance > b.chance) {
+                    return -1;
+                }
+                if (a.chance < b.chance) {
+                    return 1;
+                }
+                if (a.name < b.name) {
+                    return -1;
+                }
+                if (a.name > b.name) {
+                    return 1;
+                }
+                return 0;
+            });
         lootTables.set(APIlootTable.Id, loot);
     });
 
@@ -443,7 +462,7 @@ function convertBuildings() {
                 maxStorage: level.MaxStorage,
                 price: level.UpgradePriceGold,
                 materials: level.UpgradePriceMaterials.map(material => ({
-                    item: resources.get(material.Template),
+                    item: resources.get(material.Template).name,
                     amount: material.Amount
                 }))
             }))
