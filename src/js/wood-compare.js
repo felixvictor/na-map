@@ -5,6 +5,7 @@
 /* global d3 : false
  */
 import { capitalizeFirstLetter, formatFloat, formatPercent } from "./util";
+import { registerEvent } from "./analytics";
 
 class Wood {
     constructor(compareId, woodCompare) {
@@ -337,6 +338,7 @@ export default class WoodCompare {
 
     _setupListener() {
         $("#button-wood-compare").on("click", event => {
+            registerEvent("Tools", "Compare woods");
             event.stopPropagation();
             this._woodCompareSelected();
         });
