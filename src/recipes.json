@@ -1,0 +1,475 @@
+{
+    "recipe": [
+        {
+            "id": 1254,
+            "name": "3rd Rate Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 30 }]
+        },
+        {
+            "id": 1496,
+            "name": "Additional Ballast Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 50 }]
+        },
+        {
+            "id": 1253,
+            "name": "Agamemnon Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 30 }]
+        },
+        {
+            "id": 1497,
+            "name": "Almeria Gunpowder Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 50 }]
+        },
+        {
+            "id": 1498,
+            "name": "Almeria Superior Gunpowder Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 100 }]
+        },
+        {
+            "id": 1442,
+            "name": "Art of Ship Handling Blueprint",
+            "module": "Art of Ship Handling",
+            "laborPrice": 20,
+            "goldPrice": 50000,
+            "itemRequirements": [
+                { "name": "Notes on The Best Rudder Angles", "chance": 1, "amount": 1 },
+                { "name": "Art of Proper Cargo Distribution", "chance": 1, "amount": 1 }
+            ]
+        },
+        {
+            "id": 368,
+            "name": "Barrels Blueprint",
+            "laborPrice": 1,
+            "goldPrice": 0,
+            "itemRequirements": [
+                { "name": "Oak Planks", "chance": 1, "amount": 60 },
+                { "name": "Iron Ingots", "chance": 1, "amount": 20 },
+                { "name": "Tar", "chance": 1, "amount": 20 }
+            ]
+        },
+        {
+            "id": 1015,
+            "name": "Bellona Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 50 }]
+        },
+        {
+            "id": 1443,
+            "name": "Book of Five Rings Blueprint",
+            "module": "Book of Five Rings",
+            "laborPrice": 30,
+            "goldPrice": 125000,
+            "itemRequirements": [
+                { "name": "The Water Book", "chance": 1, "amount": 1 },
+                { "name": "The Fire Book", "chance": 1, "amount": 1 },
+                { "name": "The Wind Book", "chance": 1, "amount": 1 },
+                { "name": "The Ground Book", "chance": 1, "amount": 1 },
+                { "name": "The Book of the Void", "chance": 1, "amount": 1 }
+            ]
+        },
+        {
+            "id": 1499,
+            "name": "Bovenwinds Refit Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 50 }]
+        },
+        {
+            "id": 1500,
+            "name": "Bridgetown Frame Refit Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 50 }]
+        },
+        {
+            "id": 1501,
+            "name": "British Gunners Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 50 }]
+        },
+        {
+            "id": 1502,
+            "name": "British Gunnery Sergeant Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 100 }]
+        },
+        {
+            "id": 1503,
+            "name": "British Rig Refit Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 50 }]
+        },
+        {
+            "id": 1255,
+            "name": "Bucentaure Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 50 }]
+        },
+        {
+            "id": 1504,
+            "name": "Cartagena Caulking Refit Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 50 }]
+        },
+        {
+            "id": 369,
+            "name": "Cases Blueprint",
+            "laborPrice": 1,
+            "goldPrice": 0,
+            "itemRequirements": [
+                { "name": "Oak Planks", "chance": 1, "amount": 5 },
+                { "name": "Iron Ingots", "chance": 1, "amount": 1 },
+                { "name": "Canvas Rolls", "chance": 1, "amount": 1 }
+            ]
+        },
+        {
+            "id": 910,
+            "name": "Charcoal Blueprint",
+            "laborPrice": 13,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Oak Log", "chance": 1, "amount": 200 }]
+        },
+        {
+            "id": 1715,
+            "name": "Copper Plating Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 50 }]
+        },
+        {
+            "id": 1580,
+            "name": "Cotton Sails Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 50 }]
+        },
+        {
+            "id": 1505,
+            "name": "Crooked Hull Refit Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 50 }]
+        },
+        {
+            "id": 1506,
+            "name": "Diagonal Riders Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 50 }]
+        },
+        {
+            "id": 1507,
+            "name": "Elite British Rig Refit Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 100 }]
+        },
+        {
+            "id": 1508,
+            "name": "Elite French Rig Refit Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 100 }]
+        },
+        {
+            "id": 1509,
+            "name": "Elite Pirate Rig Refit Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 100 }]
+        },
+        {
+            "id": 1510,
+            "name": "Elite Spanish Rig Refit Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 100 }]
+        },
+        {
+            "id": 1016,
+            "name": "Essex Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 50 }]
+        },
+        {
+            "id": 1511,
+            "name": "False Keel Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 50 }]
+        },
+        {
+            "id": 1512,
+            "name": "Floating Battery 1-3rd Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 100 }]
+        },
+        {
+            "id": 1513,
+            "name": "Floating Battery 4-5th Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 50 }]
+        },
+        {
+            "id": 1575,
+            "name": "French Gunners Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 50 }]
+        },
+        {
+            "id": 1576,
+            "name": "French Gunnery Sergeant Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 100 }]
+        },
+        {
+            "id": 1514,
+            "name": "French Rig Refit Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 50 }]
+        },
+        {
+            "id": 1515,
+            "name": "Guacata Gunpowder Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 50 }]
+        },
+        {
+            "id": 1516,
+            "name": "Guacata Superior Gunpowder Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 100 }]
+        },
+        {
+            "id": 1444,
+            "name": "Gunnery Encyclopedia Blueprint",
+            "module": "Gunnery Encyclopedia",
+            "laborPrice": 30,
+            "goldPrice": 75000,
+            "itemRequirements": [
+                { "name": "Means of Directing the Fire", "chance": 1, "amount": 1 },
+                { "name": "L’Horizon Balistique", "chance": 1, "amount": 1 },
+                { "name": "Sur le Canonnage a Bord", "chance": 1, "amount": 1 },
+                { "name": "Table of Parts of Ships of War", "chance": 1, "amount": 1 }
+            ]
+        },
+        {
+            "id": 1486,
+            "name": "Indiaman Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 50 }]
+        },
+        {
+            "id": 1550,
+            "name": "Ingermanland Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 30 }]
+        },
+        {
+            "id": 1517,
+            "name": "Iron Knees Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 50 }]
+        },
+        {
+            "id": 1256,
+            "name": "L'Ocean Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Victory Mark", "chance": 1, "amount": 1 }]
+        },
+        {
+            "id": 418,
+            "name": "Large Carriage Blueprint",
+            "laborPrice": 3,
+            "goldPrice": 0,
+            "itemRequirements": [
+                { "name": "Oak Planks", "chance": 1, "amount": 9 },
+                { "name": "Iron Fittings", "chance": 1, "amount": 1 },
+                { "name": "Cables And Hawsers", "chance": 1, "amount": 1 }
+            ]
+        },
+        {
+            "id": 1485,
+            "name": "Le Gros Ventre Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 30 }]
+        },
+        {
+            "id": 1713,
+            "name": "Longleaf Pine Yards Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 50 }]
+        },
+        {
+            "id": 419,
+            "name": "Medium Carriage Blueprint",
+            "laborPrice": 4,
+            "goldPrice": 0,
+            "itemRequirements": [
+                { "name": "Oak Planks", "chance": 1, "amount": 14 },
+                { "name": "Iron Fittings", "chance": 1, "amount": 1 },
+                { "name": "Cables And Hawsers", "chance": 1, "amount": 1 }
+            ]
+        },
+        {
+            "id": 1518,
+            "name": "Nassau Boarders Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 50 }]
+        },
+        {
+            "id": 1519,
+            "name": "Nassau Fencing Masters Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 100 }]
+        },
+        {
+            "id": 1551,
+            "name": "Niagara Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 30 }]
+        },
+        {
+            "id": 1520,
+            "name": "Northern Carpenters Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 50 }]
+        },
+        {
+            "id": 1521,
+            "name": "Northern Master Carpenters Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 100 }]
+        },
+        {
+            "id": 1257,
+            "name": "Pavel Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 50 }]
+        },
+        {
+            "id": 1522,
+            "name": "Pino Ocote Masts Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 50 }]
+        },
+        {
+            "id": 1017,
+            "name": "Pirate Frigate Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 25 }]
+        },
+        {
+            "id": 1523,
+            "name": "Pirate Rig Refit Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 50 }]
+        },
+        {
+            "id": 1552,
+            "name": "Rattlesnake Heavy Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 30 }]
+        },
+        {
+            "id": 1258,
+            "name": "Santisima Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Victory Mark", "chance": 1, "amount": 1 }]
+        },
+        {
+            "id": 420,
+            "name": "Small Carriage Blueprint",
+            "laborPrice": 5,
+            "goldPrice": 0,
+            "itemRequirements": [
+                { "name": "Oak Planks", "chance": 1, "amount": 16 },
+                { "name": "Iron Fittings", "chance": 1, "amount": 1 },
+                { "name": "Cables And Hawsers", "chance": 1, "amount": 1 }
+            ]
+        },
+        {
+            "id": 1524,
+            "name": "Spanish Rig Refit Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 50 }]
+        },
+        {
+            "id": 1487,
+            "name": "Traders Brig Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 40 }]
+        },
+        {
+            "id": 1488,
+            "name": "Traders Lynx Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 30 }]
+        },
+        {
+            "id": 1489,
+            "name": "Traders Snow Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 30 }]
+        },
+        {
+            "id": 1259,
+            "name": "Victory Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Victory Mark", "chance": 1, "amount": 1 }]
+        },
+        {
+            "id": 1549,
+            "name": "Wapen von Hamburg Note",
+            "laborPrice": 0,
+            "goldPrice": 0,
+            "itemRequirements": [{ "name": "Combat Mark", "chance": 1, "amount": 30 }]
+        }
+    ]
+}
