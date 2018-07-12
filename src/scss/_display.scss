@@ -59,7 +59,8 @@ p {
     }
 }
 
-.modules, .buildings {
+.modules,
+.buildings {
     table {
         thead {
             background-color: $secondary-200;
@@ -81,9 +82,16 @@ p {
 }
 
 .buildings {
-  table {
-    width: auto;
-  }
+    table {
+        width: auto;
+        th,
+        td {
+            padding-right: 1rem;
+        }
+        td {
+            text-align: right;
+        }
+    }
 }
 
 .wood {

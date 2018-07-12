@@ -58,31 +58,45 @@ export default class Building {
     _getText(selectedBuildingName) {
         const currentBuilding = this._getBuildingData(selectedBuildingName);
         let text = `<p class="mt-4">Produces <em>${currentBuilding.resource.name}</em>`;
+
         if (currentBuilding.resource.price) {
             text += ` at ${currentBuilding.resource.price} gold per unit`;
+            if (typeof currentBuilding.batch !== "undefined") {
+                text += ` (batch of ${currentBuilding.batch.amount} units at ${currentBuilding.batch.price} gold)`;
+            }
         }
         if (currentBuilding.byproduct.length) {
             text += "<br>Byproducts: ";
             text += currentBuilding.byproduct
-                .map(byproduct => `${byproduct.item} (${formatPercent(byproduct.chance)} chance)`)
-                .join(", ");
+                .map(
+                    byproduct =>
+                        `${byproduct.item} <span class="badge badge-light">${formatPercent(
+                            byproduct.chance
+                        )} chance</span>`
+                )
+                .join(" ");
         }
         text += "</p>";
-
         text += '<table class="table table-sm mt-1"><thead>';
-        text += "<tr>";
-        text +=
-            "<tr><th>Level</th><th>Production</th><th>Labour cost</th><th>Storage</th><th>Build price</th><th>Build materials</th></tr>";
-        text += "</thead><tbody>";
-        currentBuilding.levels.forEach((level, i) => {
-            text += `<tr><td class="text-right">${i}</td><td class="text-right">${formatInt(
-                level.production
-            )}</td><td class="text-right">${formatPercent(level.labourDiscount)}</td><td class="text-right">${formatInt(
-                level.maxStorage
-            )}</td><td class="text-right">${formatInt(level.price)}</td><td>`;
-            text += level.materials.map(material => `${formatInt(material.amount)} ${material.item}`).join("<br>");
-            text += "</td></tr>";
-        });
+
+        if (currentBuilding.levels[0].materials.length) {
+            text += "<tr><th>Level</th><th>Level build materials</th></tr>";
+            text += "</thead><tbody>";
+            currentBuilding.levels.forEach((level, i) => {
+                text += `<tr><td>${i}</td><td class="text-left">`;
+                text += level.materials.map(material => `${formatInt(material.amount)} ${material.item}`).join("<br>");
+                text += "</td></tr>";
+            });
+        } else {
+            text +=
+                "<tr><th>Level</th><th>Production (units)</th><th>Labour cost (%)</th><th>Storage (units)</th><th>Level build price (gold)</th></tr>";
+            text += "</thead><tbody>";
+            currentBuilding.levels.forEach((level, i) => {
+                text += `<tr><td>${i}</td><td>${formatInt(level.production)}</td><td>${formatInt(
+                    level.labourDiscount * -100
+                )}</td><td>${formatInt(level.maxStorage)}</td><td>${formatInt(level.price)}</td></tr>`;
+            });
+        }
         text += "</tbody></table>";
 
         return text;
