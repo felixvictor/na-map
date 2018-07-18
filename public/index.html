@@ -19,7 +19,7 @@
     <meta content="images/icons/browserconfig.xml" name="msapplication-config">
 
     <script src="https://www.googletagmanager.com/gtag/js?id=UA-109520372-1" async></script>
-<link href="na-map.min.css?332aa685dde3edeeb959" rel="stylesheet" crossorigin="anonymous" integrity="sha256-3JGzJFPE7IoGLHTEfK11rFpFHDf93M9qQaihwobYNoo= sha384-agtuLEL72AIotfCUAknFF/xNVOZoNPznwvLKt5ZxsukAOxZnao7CNHCAV6qdmUcL"></head>
+<link href="na-map.min.css?424946e54797a02ff4ef" rel="stylesheet" crossorigin="anonymous" integrity="sha256-Qq3aS04anAJzUUMHoy1sspZrfaVVefpnhUQJtNOlJL4= sha384-ijYwpE768kJOy9Cx8Wh0R0S87Mn22k3b4w6dTbK/iHZ7YVMLcST+thBpRJkNBjaq"></head>
 <body>
 
 <nav class="bg-light fixed-top navbar navbar-expand-lg navbar-light">
@@ -236,6 +236,7 @@
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">List</h6>
                     <a class="dropdown-item" id="button-module-list">Modules</a>
+                    <a class="dropdown-item" id="button-recipe-list">Recipes</a>
                     <a class="dropdown-item" id="button-building-list">Buildings</a>
 
                     <div class="dropdown-divider"></div>
@@ -483,7 +484,24 @@
     </div>
 </section>
 
+<section class="modal" data-backdrop="static" data-keyboard="false" id="modal-recipes" role="dialog" tabindex="-1">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <header class="modal-header">
+                <h3>Recipes</h3>
+            </header>
+            <div class="modal-body">
+                <label for="recipes-select"></label><select id="recipes-select" name="recipes-select"></select>
+                <div class="container" id="recipes-list"></div>
+            </div>
+            <footer class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Close</button>
+            </footer>
+        </div>
+    </div>
+</section>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.slim.min.js" crossorigin="anonymous" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"></script>
 <script src="https://unpkg.com/d3@5.4.0/dist/d3.min.js" crossorigin="anonymous" integrity="sha384-Ha//YQhNUuPzmPKgC8aYpurZcTiV3JhEvEhH5uGW0IRjBfEgDQxvo0aF1Gef+blI"></script>
-<script src="na-map.min.js?332aa685dde3edeeb959" crossorigin="anonymous" integrity="sha256-ZBp9BOkaOyzXAZhEYg9zc2YJyKIWkJX3CrOUKuC/w1c= sha384-icLdGeXW30K3tsm/oMLd7KgI0Vk2JS9FBC13mrt7E9G19EHrOiAcpmASSEInBeGU" type="text/javascript"></script></body>
+<script src="na-map.min.js?424946e54797a02ff4ef" crossorigin="anonymous" integrity="sha256-s+J/bd/Gm+IqXZ6mpi2TfdSmUdyghraxA0rHBbUoE0E= sha384-3bgPkyyDGYEFUSzW/83qvHT7sNAYxS6FrkrmT0KRaYDPy+Q3hCsg9fW7lqvc0X4p" type="text/javascript"></script></body>
 </html>
