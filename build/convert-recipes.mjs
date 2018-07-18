@@ -19,6 +19,38 @@ String.prototype.replaceAll = function(search, replacement) {
 
 function convertRecipes() {
     const data = {},
+        recipes = new Map([
+            [1446, "Almeria Gunpowder Blueprint"],
+            [1447, "Almeria Superior Gunpowder Blueprint"],
+            [1442, "Art of Ship Handling Blueprint"],
+            [1443, "Book of Five Rings Blueprint"],
+            [1448, "Bovenwinds Refit Blueprint"],
+            [1449, "Bridgetown Frame Refit Blueprint"],
+            [1450, "British Gunners Blueprint"],
+            [1451, "British Gunnery Sergeant Blueprint"],
+            [1452, "British Rig Refit Blueprint"],
+            [1453, "Cartagena Caulking Refit Blueprint"],
+            [373, "Copper Plating Blueprint"],
+            [1454, "Crooked Hull Refit Blueprint"],
+            [1456, "Elite British Rig Refit Blueprint"],
+            [1457, "Elite French Rig Refit Blueprint"],
+            [1458, "Elite Pirate Rig Refit Blueprint"],
+            [1459, "Elite Spanish Rig Refit Blueprint"],
+            [1577, "French Gunners Blueprint"],
+            [1578, "French Gunnery Sergeant Blueprint"],
+            [1463, "French Rig Refit Blueprint"],
+            [1464, "Guacata Gunpowder Blueprint"],
+            [1465, "Guacata Superior Gunpowder Blueprint"],
+            [1444, "Gunnery Encyclopedia Blueprint"],
+            [1714, "Longleaf Pine Yards Blueprint"],
+            [1467, "Nassau Boarders Blueprint"],
+            [1468, "Nassau Fencing Masters Blueprint"],
+            [1469, "Northern Carpenters Blueprint"],
+            [1470, "Northern Master Carpenters Blueprint"],
+            [1471, "Pino Ocote Masts Blueprint"],
+            [1472, "Pirate Rig Refit Blueprint"],
+            [1473, "Spanish Rig Refit Blueprint"]
+        ]),
         itemNames = new Map(),
         moduleNames = new Map();
     data.recipe = [];
@@ -38,16 +70,11 @@ function convertRecipes() {
     getItemNames();
     getModuleNames();
 
-    APIItems.filter(
-        APIrecipe =>
-            APIrecipe.ItemType === "Recipe" &&
-            //!APIrecipe.Name.endsWith(" Note") &&
-            (APIrecipe.CraftGroup === "Manufacturing" || APIrecipe.CraftGroup === "AdmiraltyRecipes")
-    ).forEach(APIrecipe => {
+    APIItems.filter(APIrecipe => recipes.has(APIrecipe.Id)).forEach(APIrecipe => {
         const recipe = {
             id: APIrecipe.Id,
             name: APIrecipe.Name,
-            module: moduleNames.get(APIrecipe.Results[0].Template),
+            module: typeof APIrecipe.Results[0] !== "undefined" ? moduleNames.get(APIrecipe.Results[0].Template) : "",
             laborPrice: APIrecipe.LaborPrice,
             goldPrice: APIrecipe.GoldRequirements,
             itemRequirements: APIrecipe.FullRequirements.map(requirement => ({
@@ -58,6 +85,7 @@ function convertRecipes() {
         };
         data.recipe.push(recipe);
     });
+
     data.recipe.sort((a, b) => {
         if (a.name < b.name) {
             return -1;
