@@ -40,6 +40,7 @@ import Teleport from "./teleport";
 import WindPrediction from "./wind-prediction";
 import WoodCompare from "./wood-compare";
 import Module from "./module-list";
+import Recipe from "./recipe-list";
 import Building from "./building-list";
 import { registerEvent } from "./analytics";
 
@@ -56,6 +57,7 @@ export default function naDisplay(serverName) {
         shipCompare,
         woodCompare,
         moduleList,
+        recipeList,
         buildingList,
         windPrediction,
         f11,
@@ -65,6 +67,7 @@ export default function naDisplay(serverName) {
         shipData,
         woodData,
         moduleData,
+        recipeData,
         buildingData;
 
     /** Main map */
@@ -551,6 +554,7 @@ export default function naDisplay(serverName) {
         shipCompare = new ShipCompare(shipData);
         woodCompare = new WoodCompare(woodData);
         moduleList = new Module(moduleData);
+        recipeList = new Recipe(recipeData);
         buildingList = new Building(buildingData);
         teleport = new Teleport(map.coord.min, map.coord.max, ports);
         portSelect = new PortSelect(map, ports, pbZone);
@@ -595,6 +599,7 @@ export default function naDisplay(serverName) {
         shipData = JSON.parse(JSON.stringify(data.ships.shipData));
         woodData = JSON.parse(JSON.stringify(data.woods));
         moduleData = JSON.parse(JSON.stringify(data.modules));
+        recipeData = JSON.parse(JSON.stringify(data.recipes.recipe));
         buildingData = JSON.parse(JSON.stringify(data.buildings));
 
         setup();
@@ -619,6 +624,9 @@ export default function naDisplay(serverName) {
         const moduleJsonData = fetch("modules.json", { cache: cacheMode })
             .then(checkFetchStatus)
             .then(getJsonFromFetch);
+        const recipeJsonData = fetch("recipes.json", { cache: cacheMode })
+            .then(checkFetchStatus)
+            .then(getJsonFromFetch);
         const buildingJsonData = fetch("buildings.json", { cache: cacheMode })
             .then(checkFetchStatus)
             .then(getJsonFromFetch);
@@ -629,6 +637,7 @@ export default function naDisplay(serverName) {
             shipJsonData,
             woodJsonData,
             moduleJsonData,
+            recipeJsonData,
             buildingJsonData
         ])
             .then(values =>
@@ -639,7 +648,8 @@ export default function naDisplay(serverName) {
                     ships: values[3],
                     woods: values[4],
                     modules: values[5],
-                    buildings: values[6]
+                    recipes: values[6],
+                    buildings: values[7]
                 })
             )
             .catch(putFetchError);
