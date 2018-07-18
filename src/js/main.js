@@ -28,7 +28,7 @@ import {
 import Cookies from "js-cookie";
 
 import naDisplay from "./na-display";
-import initAnalytics from "./analytics";
+import { initAnalytics, registerPage } from "./analytics";
 
 /**
  * @returns {void}
@@ -125,6 +125,7 @@ function main() {
 
     initAnalytics();
     setupListener();
+    registerPage("Homepage", "/");
     naDisplay(serverName);
 }
 
