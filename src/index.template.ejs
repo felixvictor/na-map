@@ -266,6 +266,7 @@
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">List</h6>
                     <a class="dropdown-item" id="button-module-list">Modules</a>
+                    <a class="dropdown-item" id="button-recipe-list">Recipes</a>
                     <a class="dropdown-item" id="button-building-list">Buildings</a>
 
                     <div class="dropdown-divider"></div>
@@ -532,6 +533,23 @@
             <div class="modal-body">
                 <label for="buildings-select"></label><select name="buildings-select" id="buildings-select"></select>
                 <div id="buildings-list" class="container"></div>
+            </div>
+            <footer class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </footer>
+        </div>
+    </div>
+</section>
+
+<section id="modal-recipes" class="modal" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <header class="modal-header">
+                <h3>Recipes</h3>
+            </header>
+            <div class="modal-body">
+                <label for="recipes-select"></label><select name="recipes-select" id="recipes-select"></select>
+                <div id="recipes-list" class="container"></div>
             </div>
             <footer class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
