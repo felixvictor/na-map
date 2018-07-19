@@ -119,7 +119,7 @@ export default class Building {
         // Add new building list
         d3.select(this._div)
             .append("div")
-            .classed("buildings", true);
+            .classed("row buildings", true);
         $(this._div)
             .find("div")
             .append(this._getText(building));

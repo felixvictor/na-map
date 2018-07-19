@@ -4,15 +4,16 @@
 /* global d3 : false
  */
 
-import { formatPercent, formatInt } from "./util";
+import { formatInt, formatPercent, formatSignPercent } from "./util";
 import { registerEvent } from "./analytics";
 
 export default class Recipe {
-    constructor(recipeData) {
+    constructor(recipeData, moduleData) {
         this._recipeData = recipeData.map(recipe => {
             recipe.name = recipe.name.replace(" Blueprint", "");
             return recipe;
         });
+        this._moduleData = moduleData;
         this._options = this._setupOptions();
 
         this._setupListener();
@@ -51,6 +52,45 @@ export default class Recipe {
         return this._recipeData.filter(recipe => recipe.name === selectedRecipeName)[0];
     }
 
+    _getRequirementText(currentRecipe) {
+        let text = '<p class="card-text">';
+        if (currentRecipe.laborPrice) {
+            text += `${currentRecipe.laborPrice} labour hours<br>`;
+        }
+        if (currentRecipe.goldPrice) {
+            text += `${currentRecipe.goldPrice} gold<br>`;
+        }
+        if (currentRecipe.itemRequirements.length) {
+            text += currentRecipe.itemRequirements
+                .map(requirement => `${requirement.amount} ${requirement.name}`)
+                .join("<br>");
+        }
+        text += "</p>";
+
+        return text;
+    }
+
+    _getModuleText(moduleName) {
+        let text = "",
+            moduleType = "",
+            properties = "";
+        this._moduleData.forEach(type => {
+            type[1].filter(module => module.name === moduleName).forEach(module => {
+                moduleType = type[0];
+                properties = module.properties
+                    .map(property => {
+                        const amount = property.absolute ? property.amount : formatSignPercent(property.amount / 100);
+                        return `${property.modifier} ${amount}`;
+                    })
+                    .join("<br>");
+            });
+        });
+        text = `<h6 class="card-subtitle mb-2 text-muted">${moduleType}</h6>`;
+        text += `<p class="card-text">${properties}</p>`;
+
+        return text;
+    }
+
     /**
      * Construct recipe tables
      * @param {string} selectedRecipeName Selected recipe.
@@ -58,23 +98,22 @@ export default class Recipe {
      * @private
      */
     _getText(selectedRecipeName) {
-        const currentRecipe = this._getRecipeData(selectedRecipeName);
-        let text = `<p class="mt-4">Makes <em>${currentRecipe.module ? currentRecipe.module : currentRecipe.name}</em>`;
+        const currentRecipe = this._getRecipeData(selectedRecipeName),
+            moduleName = currentRecipe.module ? currentRecipe.module : currentRecipe.name;
 
-        text += "<br>Requirements: ";
-        if (currentRecipe.laborPrice) {
-            text += `${currentRecipe.laborPrice} labour hours, `;
-        }
-        if (currentRecipe.goldPrice) {
-            text += `${currentRecipe.goldPrice} gold, `;
-        }
-        if (currentRecipe.itemRequirements.length) {
-            text += currentRecipe.itemRequirements
-                .map(requirement => `${requirement.amount} ${requirement.name}`)
-                .join(", ");
-        }
-        text += "</p>";
+        let text = '<div class="row"><div class="card-deck mt-4">';
 
+        text += '<div class="card"><div class="card-header">Recipe</div>';
+        text += '<div class="card-body"><h5 class="card-title">Requirements</h5>';
+        text += this._getRequirementText(currentRecipe);
+        text += "</div></div>";
+
+        text += '<div class="card"><div class="card-header">Resulting module</div>';
+        text += '<div class="card-body"><h5 class="card-title">Properties</h5>';
+        text += this._getModuleText(moduleName);
+        text += "</div></div>";
+
+        text += "</div></div>";
         return text;
     }
 
