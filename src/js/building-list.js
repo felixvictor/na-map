@@ -49,25 +49,23 @@ export default class Building {
         return this._buildingData.filter(building => building.name === selectedBuildingName)[0];
     }
 
-    /**
-     * Construct building tables
-     * @param {string} selectedBuildingName Selected building.
-     * @return {string} html string
-     * @private
-     */
-    _getText(selectedBuildingName) {
-        const currentBuilding = this._getBuildingData(selectedBuildingName);
-        let text = '<div class="row no-gutters"><div class="col">';
-        text += `<p class="mt-4">Produces <em>${currentBuilding.resource.name}</em>`;
+    _getProductText(currentBuilding) {
+        let text = "";
+        text += `<h5 class="card-title">${currentBuilding.resource.name}</h5>`;
 
         if (currentBuilding.resource.price) {
-            text += ` at ${currentBuilding.resource.price} gold per unit`;
+            text += `<p class="card-text">${currentBuilding.resource.price} gold per unit`;
             if (typeof currentBuilding.batch !== "undefined") {
-                text += ` (batch of ${currentBuilding.batch.amount} units at ${currentBuilding.batch.price} gold)`;
+                text += `<br>Batch of ${currentBuilding.batch.amount} units at ${currentBuilding.batch.price} gold`;
             }
+            text += "</p>";
         }
+        return text;
+    }
+
+    _getByproductText(currentBuilding) {
+        let text = '<p class="card-text">';
         if (currentBuilding.byproduct.length) {
-            text += "<br>Byproducts: ";
             text += currentBuilding.byproduct
                 .map(
                     byproduct =>
@@ -75,9 +73,15 @@ export default class Building {
                             byproduct.chance
                         )} chance</span>`
                 )
-                .join(" ");
+                .join("<br>");
         }
         text += "</p>";
+        return text;
+    }
+
+    _getRequirementText(currentBuilding) {
+        let text = "";
+
         text += '<table class="table table-sm mt-1"><thead>';
 
         if (currentBuilding.levels[0].materials.length) {
@@ -99,9 +103,38 @@ export default class Building {
             });
         }
         text += "</tbody></table>";
+        return text;
+    }
+
+    /**
+     * Construct building tables
+     * @param {string} selectedBuildingName Selected building.
+     * @return {string} html string
+     * @private
+     */
+    _getText(selectedBuildingName) {
+        const currentBuilding = this._getBuildingData(selectedBuildingName);
+
+        let text = '<div class="row"><div class="card-deck mt-4">';
+
+        text += '<div class="card col-3"><div class="card-header">Product</div>';
+        text += '<div class="card-body">';
+        text += this._getProductText(currentBuilding);
         text += "</div></div>";
 
+        text += '<div class="card col-3"><div class="card-header">Byproducts</div>';
+        text += '<div class="card-body">';
+        text += this._getByproductText(currentBuilding);
+        text += "</div></div>";
+
+        text += '<div class="card col-6"><div class="card-header">Requirements</div>';
+        text += '<div class="card-body">';
+        text += this._getRequirementText(currentBuilding);
+        text += "</div></div>";
+
+        text += "</div></div>";
         return text;
+
     }
 
     /**

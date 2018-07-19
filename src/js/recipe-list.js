@@ -21,7 +21,6 @@ export default class Recipe {
     }
 
     _setupOptions() {
-        console.log(this._recipeData);
         return `${this._recipeData.map(recipe => `<option value="${recipe.name}">${recipe.name}</option>;`).join("")}`;
     }
 
