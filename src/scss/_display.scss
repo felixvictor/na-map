@@ -39,6 +39,20 @@ pattern .all {
     }
 }
 
+.card {
+    width: 24rem;
+    border: none;
+}
+
+.card-header {
+    background-color: $secondary-200;
+    border-bottom: none;
+}
+
+.card-body {
+    background-color: $primary-100;
+}
+
 table tr,
 p {
     text-align: left;
