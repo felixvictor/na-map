@@ -554,7 +554,7 @@ export default function naDisplay(serverName) {
         shipCompare = new ShipCompare(shipData);
         woodCompare = new WoodCompare(woodData);
         moduleList = new Module(moduleData);
-        recipeList = new Recipe(recipeData);
+        recipeList = new Recipe(recipeData, moduleData);
         buildingList = new Building(buildingData);
         teleport = new Teleport(map.coord.min, map.coord.max, ports);
         portSelect = new PortSelect(map, ports, pbZone);
