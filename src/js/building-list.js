@@ -57,7 +57,8 @@ export default class Building {
      */
     _getText(selectedBuildingName) {
         const currentBuilding = this._getBuildingData(selectedBuildingName);
-        let text = `<p class="mt-4">Produces <em>${currentBuilding.resource.name}</em>`;
+        let text = '<div class="row no-gutters"><div class="col">';
+        text += `<p class="mt-4">Produces <em>${currentBuilding.resource.name}</em>`;
 
         if (currentBuilding.resource.price) {
             text += ` at ${currentBuilding.resource.price} gold per unit`;
@@ -70,7 +71,7 @@ export default class Building {
             text += currentBuilding.byproduct
                 .map(
                     byproduct =>
-                        `${byproduct.item} <span class="badge badge-light">${formatPercent(
+                        `${byproduct.item} <span class="badge badge-primary">${formatPercent(
                             byproduct.chance
                         )} chance</span>`
                 )
@@ -98,6 +99,7 @@ export default class Building {
             });
         }
         text += "</tbody></table>";
+        text += "</div></div>";
 
         return text;
     }
@@ -119,7 +121,7 @@ export default class Building {
         // Add new building list
         d3.select(this._div)
             .append("div")
-            .classed("row buildings", true);
+            .classed("buildings", true);
         $(this._div)
             .find("div")
             .append(this._getText(building));
