@@ -40,7 +40,7 @@ pattern .all {
 }
 
 .card {
-    width: 24rem;
+    width: 16rem;
     border: none;
 }
 
@@ -78,6 +78,9 @@ p {
     .table-sm td {
         padding: 0.3rem 0;
     }
+    .card {
+        width: 24rem;
+    }
 }
 
 .modules,
@@ -112,6 +115,9 @@ p {
         td {
             text-align: right;
         }
+    }
+    .card:nth-child(3) {
+        width: 24rem !important;
     }
 }
 
