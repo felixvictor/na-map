@@ -73,6 +73,13 @@ p {
     }
 }
 
+.recipes {
+    .table-sm th,
+    .table-sm td {
+        padding: 0.3rem 0;
+    }
+}
+
 .modules,
 .buildings {
     table {

@@ -53,19 +53,19 @@ export default class Recipe {
     }
 
     _getRequirementText(currentRecipe) {
-        let text = '<p class="card-text">';
+        let text = '<table class="table table-sm"><tbody>';
         if (currentRecipe.laborPrice) {
-            text += `${currentRecipe.laborPrice} labour hours<br>`;
+            text += `<tr><td>${currentRecipe.laborPrice} labour hours</td></tr>`;
         }
         if (currentRecipe.goldPrice) {
-            text += `${currentRecipe.goldPrice} gold<br>`;
+            text += `<tr><td>${currentRecipe.goldPrice} gold</td></tr>`;
         }
         if (currentRecipe.itemRequirements.length) {
-            text += currentRecipe.itemRequirements
+            text += `<tr><td>${currentRecipe.itemRequirements
                 .map(requirement => `${requirement.amount} ${requirement.name}`)
-                .join("<br>");
+                .join("</td></tr><tr><td>")}</td></tr>`;
         }
-        text += "</p>";
+        text += "</tbody></table>";
 
         return text;
     }
@@ -77,16 +77,16 @@ export default class Recipe {
         this._moduleData.forEach(type => {
             type[1].filter(module => module.name === moduleName).forEach(module => {
                 moduleType = type[0];
-                properties = module.properties
+                properties = `<tr><td>${module.properties
                     .map(property => {
                         const amount = property.absolute ? property.amount : formatSignPercent(property.amount / 100);
                         return `${property.modifier} ${amount}`;
                     })
-                    .join("<br>");
+                    .join("</td></tr><tr><td>")}</td></tr>`;
             });
         });
         text = `<h6 class="card-subtitle mb-2 text-muted">${moduleType}</h6>`;
-        text += `<p class="card-text">${properties}</p>`;
+        text += `<table class="table table-sm"><tbody>${properties}</tbody></table>`;
 
         return text;
     }
