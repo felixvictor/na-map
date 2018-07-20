@@ -82,11 +82,11 @@ function convertBuildings() {
         // Ignore double entries
         if (!buildings.has(building.name)) {
             if (building.name === "Shipyard") {
-                building.resource = { name: "ships", price: 0 };
+                building.resource = { name: "Ships", price: 0 };
                 building.byproduct = [];
                 building.batch = [];
             } else if (building.name === "Workshop") {
-                building.resource = { name: "cannons", price: 0 };
+                building.resource = { name: "Cannons", price: 0 };
                 building.byproduct = [];
                 building.batch = [];
             }

@@ -46,7 +46,7 @@ class WoodBase extends Wood {
 
     _getText(wood) {
         const middle = 100 / 2;
-        let text = '<table class="table table-sm table-striped small wood mt-4"><thead>';
+        let text = '<table class="table table-sm table-striped small mt-4"><thead>';
         text += "<tr>";
         text += "<tr><th><em>Property</em></th><th><em>Change in %</em></th></tr></thead><tbody>";
         wood.properties.forEach((value, key) => {
