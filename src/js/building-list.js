@@ -54,35 +54,40 @@ export default class Building {
         text += `<h5 class="card-title">${currentBuilding.resource.name}</h5>`;
 
         if (currentBuilding.resource.price) {
-            text += `<p class="card-text">${currentBuilding.resource.price} gold per unit`;
+            text += '<table class="table table-sm"><tbody>';
+            text += `<tr><td>${currentBuilding.resource.price} gold per unit</td></tr>`;
             if (typeof currentBuilding.batch !== "undefined") {
-                text += `<br>Batch of ${currentBuilding.batch.amount} units at ${currentBuilding.batch.price} gold`;
+                text += `<tr><td>Batch of ${currentBuilding.batch.amount} units at ${
+                    currentBuilding.batch.price
+                } gold</td></tr>`;
             }
-            text += "</p>";
+            text += "</tbody></table>";
         }
+
         return text;
     }
 
     _getByproductText(currentBuilding) {
-        let text = '<p class="card-text">';
+        let text = '<table class="table table-sm"><tbody>';
         if (currentBuilding.byproduct.length) {
-            text += currentBuilding.byproduct
+            text += `<tr><td>${currentBuilding.byproduct
                 .map(
                     byproduct =>
-                        `${byproduct.item} <span class="badge badge-primary">${formatPercent(
+                        `${byproduct.item} <span class="badge badge-primary ml-1">${formatPercent(
                             byproduct.chance
                         )} chance</span>`
                 )
-                .join("<br>");
+                .join("</td></tr><tr><td>")}</td></tr>`;
         }
-        text += "</p>";
+        text += "</tbody></table>";
+
         return text;
     }
 
     _getRequirementText(currentBuilding) {
         let text = "";
 
-        text += '<table class="table table-sm mt-1"><thead>';
+        text += '<table class="table table-sm"><thead>';
 
         if (currentBuilding.levels[0].materials.length) {
             text += "<tr><th>Level</th><th>Level build materials</th></tr>";
@@ -115,26 +120,25 @@ export default class Building {
     _getText(selectedBuildingName) {
         const currentBuilding = this._getBuildingData(selectedBuildingName);
 
-        let text = '<div class="row"><div class="card-deck mt-4">';
+        let text = '<div class="row no-gutters card-deck">';
 
         text += '<div class="card col-3"><div class="card-header">Product</div>';
-        text += '<div class="card-body">';
+        text += '<div class="card-body product">';
         text += this._getProductText(currentBuilding);
         text += "</div></div>";
 
         text += '<div class="card col-3"><div class="card-header">Byproducts</div>';
-        text += '<div class="card-body">';
+        text += '<div class="card-body product">';
         text += this._getByproductText(currentBuilding);
         text += "</div></div>";
 
         text += '<div class="card col-6"><div class="card-header">Requirements</div>';
-        text += '<div class="card-body">';
+        text += '<div class="card-body px-0 requirements">';
         text += this._getRequirementText(currentBuilding);
         text += "</div></div>";
 
-        text += "</div></div>";
+        text += "</div>";
         return text;
-
     }
 
     /**
@@ -154,7 +158,7 @@ export default class Building {
         // Add new building list
         d3.select(this._div)
             .append("div")
-            .classed("buildings", true);
+            .classed("buildings mt-4", true);
         $(this._div)
             .find("div")
             .append(this._getText(building));
