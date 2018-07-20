@@ -39,8 +39,20 @@ pattern .all {
     }
 }
 
+.bootstrap-select > .dropdown-toggle {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+}
+
+.modal-body .bootstrap-select > .dropdown-toggle {
+    width: 18rem;
+}
+
+.modal-body .wood .bootstrap-select > .dropdown-toggle {
+    width: 15rem;
+}
+
 .card {
-    width: 16rem;
     border: none;
 }
 
@@ -73,18 +85,8 @@ p {
     }
 }
 
-.recipes {
-    .table-sm th,
-    .table-sm td {
-        padding: 0.3rem 0;
-    }
-    .card {
-        width: 24rem;
-    }
-}
-
 .modules,
-.buildings {
+.buildings .requirements {
     table {
         thead {
             background-color: $secondary-200;
@@ -105,7 +107,7 @@ p {
     }
 }
 
-.buildings {
+.buildings .requirements {
     table {
         width: auto;
         th,
@@ -115,9 +117,6 @@ p {
         td {
             text-align: right;
         }
-    }
-    .card:nth-child(3) {
-        width: 24rem !important;
     }
 }
 
@@ -144,6 +143,14 @@ p {
     }
     td:nth-child(3) {
         width: 32%;
+    }
+}
+
+.recipes,
+.product {
+    .table-sm th,
+    .table-sm td {
+        padding: 0.3rem 0;
     }
 }
 
