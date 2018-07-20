@@ -100,14 +100,14 @@ export default class Recipe {
         const currentRecipe = this._getRecipeData(selectedRecipeName),
             moduleName = currentRecipe.module ? currentRecipe.module : currentRecipe.name;
 
-        let text = '<div class="row"><div class="card-deck mt-4">';
+        let text = '<div class="row no-gutters card-deck">';
 
-        text += '<div class="card"><div class="card-header">Recipe</div>';
+        text += '<div class="card col-4"><div class="card-header">Recipe</div>';
         text += '<div class="card-body"><h5 class="card-title">Requirements</h5>';
         text += this._getRequirementText(currentRecipe);
         text += "</div></div>";
 
-        text += '<div class="card"><div class="card-header">Resulting module</div>';
+        text += '<div class="card col-4"><div class="card-header">Resulting module</div>';
         text += '<div class="card-body"><h5 class="card-title">Properties</h5>';
         text += this._getModuleText(moduleName);
         text += "</div></div>";
@@ -133,7 +133,7 @@ export default class Recipe {
         // Add new recipe list
         d3.select(this._div)
             .append("div")
-            .classed("recipes", true);
+            .classed("recipes mt-4", true);
         $(this._div)
             .find("div")
             .append(this._getText(recipe));
