@@ -177,13 +177,11 @@ export default class Module {
         let text = "";
         Array.from(Array(splitRows.length).keys()).forEach(column => {
             text += `<div class="col-md-${Math.floor(12 / splitRows.length)}">`;
-            text += '<div class="row modules">';
-            text += '<div class="col-sm-11">';
-            text += '<table class="table table-sm small mt-4"><thead>';
+            text += '<table class="table table-sm small"><thead>';
             text += "<tr>";
             text += "<tr><th>Module</th><th>Modifier</th></tr></thead><tbody>";
             text += splitRows[column].join("");
-            text += "</tbody></table></div></div></div>";
+            text += "</tbody></table></div>";
         });
 
         return text;
@@ -206,7 +204,7 @@ export default class Module {
         // Add new module list
         d3.select(this._div)
             .append("div")
-            .classed("row", true);
+            .classed("row modules mt-4", true);
         $(this._div)
             .find("div")
             .append(this._getText(moduleType));
