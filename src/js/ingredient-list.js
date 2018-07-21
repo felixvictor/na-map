@@ -4,12 +4,13 @@
 /* global d3 : false
  */
 
-import { chunkify } from "./util";
+import { chunkify, formatSignPercent } from "./util";
 import { registerEvent } from "./analytics";
 
 export default class Ingredient {
-    constructor(ingredientData) {
+    constructor(ingredientData, moduleData) {
         this._ingredientData = ingredientData;
+        this._moduleData = moduleData;
 
         this._setupListener();
     }
@@ -28,11 +29,43 @@ export default class Ingredient {
         this._showIngredient();
     }
 
+    _getProperties(recipeName) {
+        let text = "",
+            moduleType = "",
+            properties = "";
+        this._moduleData.forEach(type => {
+            type[1].filter(module => module.name === recipeName).forEach(module => {
+                moduleType = type[0];
+                properties = `<tr><td>${module.properties
+                    .map(property => {
+                        const amount = property.absolute ? property.amount : formatSignPercent(property.amount / 100);
+                        return `${property.modifier} ${amount}`;
+                    })
+                    .join("</td></tr><tr><td>")}</td></tr>`;
+            });
+        });
+        text = `<h6 class='mb-2 text-muted'>${moduleType}</h6>`;
+        text += `<table class='table table-sm'><tbody>${properties}</tbody></table>`;
+
+        return text;
+    }
+
     _getRows() {
+        /*
+
+        text = `<h6 class="card-subtitle mb-2 text-muted">${moduleType}</h6>`;
+        text += `<table class="table table-sm"><tbody>${properties}</tbody></table>`;
+        */
+
         return this._ingredientData.map(
             ingredient =>
                 `<tr><td>${ingredient.name}</td><td>${ingredient.recipe
-                    .map(recipeName => recipeName)
+                    .map(
+                        recipeName =>
+                            `<a data-toggle="tooltip" data-html="true" title="${this._getProperties(
+                                recipeName
+                            )}">${recipeName}</a>`
+                    )
                     .join("<br>")}</td></tr>`
         );
     }
@@ -75,5 +108,6 @@ export default class Ingredient {
         $(this._div)
             .find("div")
             .append(this._getText());
+        $('[data-toggle="tooltip"]').tooltip();
     }
 }
