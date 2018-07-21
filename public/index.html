@@ -19,7 +19,7 @@
     <meta content="images/icons/browserconfig.xml" name="msapplication-config">
 
     <script src="https://www.googletagmanager.com/gtag/js?id=UA-109520372-1" async></script>
-<link href="na-map.min.css?4e30a9c531403d3b89fa" rel="stylesheet" crossorigin="anonymous" integrity="sha256-zQ3UsgqVmLPErVvjJzAGWvq+h60Y6mK2KyVTPkdbk9E= sha384-d8DetZo6Y5I3sZNBmc5EG6J0rOwNXbvM7Vulv/DkQ1cOgjPnGgkmzz7sE5z8Zmme"></head>
+<link href="na-map.min.css?8820588ff1fb596265eb" rel="stylesheet" crossorigin="anonymous" integrity="sha256-oNzW2P4ZR/Babh+vTQq/GOIB0ndWiVo6Gk+jzJ2rIww= sha384-7yZTPcHzP8wYYG1RlqS59aAjW3UB/wNUQhXZlS9Yehoa0hb5lC7V+PlphTBJNZ4l"></head>
 <body>
 
 <nav class="bg-light fixed-top navbar navbar-expand-lg navbar-light">
@@ -31,7 +31,7 @@
         <ul class="navbar-nav mr-auto">
 
             <li class="nav-item pr-2 dropdown">
-                <a class="dropdown-toggle nav-link" href="#" id="predictDropdown" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
+                <a class="dropdown-toggle nav-link" id="predictDropdown" href="#" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
                     Wind prediction
                 </a>
                 <div class="dropdown-menu" id="predictMenu" aria-labelledby="predictDropdown">
@@ -57,7 +57,7 @@
             </li>
 
             <li class="nav-item pr-2 dropdown">
-                <a class="dropdown-toggle nav-link" href="#" id="moveToDropdown" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
+                <a class="dropdown-toggle nav-link" id="moveToDropdown" href="#" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
                     Move to F11
                 </a>
                 <div class="dropdown-menu large-width p-2" id="moveToMenu" aria-labelledby="moveToDropdown">
@@ -95,7 +95,7 @@
             </li>
 
             <li class="nav-item pr-2 dropdown">
-                <a class="dropdown-toggle nav-link" href="#" id="propertyDropdown" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
+                <a class="dropdown-toggle nav-link" id="propertyDropdown" href="#" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
                     Select ports on
                 </a>
                 <div class="dropdown-menu" id="propertyMenu" aria-labelledby="propertyDropdown">
@@ -103,30 +103,30 @@
                     <div class="dropdown-item dropdown-submenu">
                         <a class="dropdown-item dropdown-toggle" href="#" data-toggle="dropdown">Select</a>
                         <div class="dropdown-menu">
-                            <a class="dropdown-item" href="#" id="menu-prop-deep">Deep water</a>
-                            <a class="dropdown-item" href="#" id="menu-prop-shallow">Shallow water</a>
+                            <a class="dropdown-item" id="menu-prop-deep" href="#">Deep water</a>
+                            <a class="dropdown-item" id="menu-prop-shallow" href="#">Shallow water</a>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#" id="menu-prop-all">Available to all</a>
-                            <a class="dropdown-item" href="#" id="menu-prop-green">Green zone</a>
+                            <a class="dropdown-item" id="menu-prop-all" href="#">Available to all</a>
+                            <a class="dropdown-item" id="menu-prop-green" href="#">Green zone</a>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#" id="menu-prop-large">1st rate AI</a>
-                            <a class="dropdown-item" href="#" id="menu-prop-medium">4th rate AI</a>
-                            <a class="dropdown-item" href="#" id="menu-prop-small">6th rate AI</a>
+                            <a class="dropdown-item" id="menu-prop-large" href="#">1st rate AI</a>
+                            <a class="dropdown-item" id="menu-prop-medium" href="#">4th rate AI</a>
+                            <a class="dropdown-item" id="menu-prop-small" href="#">6th rate AI</a>
                         </div>
                     </div>
 
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Conquest mark</h6>
-                    <a class="dropdown-item" href="#" id="menu-prop-cm">
+                    <a class="dropdown-item" id="menu-prop-cm" href="#">
                         <label for="prop-cm"></label><select id="prop-cm" name="prop-cm" class="select"></select>
                     </a>
 
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Port owner</h6>
-                    <a class="dropdown-item" href="#" id="menu-prop-nation">
+                    <a class="dropdown-item" id="menu-prop-nation" href="#">
                         <label for="prop-nation"></label><select id="prop-nation" name="prop-nation" class="select"></select>
                     </a>
-                    <a class="dropdown-item" href="#" id="menu-prop-clan">
+                    <a class="dropdown-item" id="menu-prop-clan" href="#">
                         <label for="prop-clan"></label><select id="prop-clan" name="prop-clan" class="select"></select>
                     </a>
 
@@ -171,10 +171,10 @@
                     <div class="dropdown-item dropdown-submenu">
                         <a class="dropdown-item dropdown-toggle" href="#" data-toggle="dropdown">Fixed date range</a>
                         <div class="dropdown-menu">
-                            <a class="dropdown-item" href="#" id="menu-prop-today">Today</a>
-                            <a class="dropdown-item" href="#" id="menu-prop-yesterday">Yesterday</a>
-                            <a class="dropdown-item" href="#" id="menu-prop-this-week">This week</a>
-                            <a class="dropdown-item" href="#" id="menu-prop-last-week">Last week</a>
+                            <a class="dropdown-item" id="menu-prop-today" href="#">Today</a>
+                            <a class="dropdown-item" id="menu-prop-yesterday" href="#">Yesterday</a>
+                            <a class="dropdown-item" id="menu-prop-this-week" href="#">This week</a>
+                            <a class="dropdown-item" id="menu-prop-last-week" href="#">Last week</a>
                         </div>
                     </div>
 
@@ -224,7 +224,7 @@
         <ul class="ml-auto navbar-nav">
 
             <li class="nav-item pr-2 dropdown">
-                <a class="dropdown-toggle nav-link" href="#" id="extraDropdown" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
+                <a class="dropdown-toggle nav-link" id="extraDropdown" href="#" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
                     Tools
                 </a>
                 <div class="dropdown-menu dropdown-menu-right" id="extraMenu" aria-labelledby="extraDropdown">
@@ -235,18 +235,19 @@
 
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">List</h6>
+                    <a class="dropdown-item" id="button-building-list">Buildings</a>
                     <a class="dropdown-item" id="button-module-list">Modules</a>
                     <a class="dropdown-item" id="button-recipe-list">Recipes</a>
-                    <a class="dropdown-item" id="button-building-list">Buildings</a>
+                    <a class="dropdown-item" id="button-ingredient-list">Recipe ingredients</a>
 
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Download</h6>
-                    <a class="dropdown-item" href="port-battle.xlsx" id="button-download-pb-calc" download="port-battle-calculator.xlsx">Port battle calculator</a>
+                    <a class="dropdown-item" id="button-download-pb-calc" href="port-battle.xlsx" download="port-battle-calculator.xlsx">Port battle calculator</a>
                 </div>
             </li>
 
             <li class="nav-item pr-2 dropdown">
-                <a class="dropdown-toggle nav-link" href="#" id="settingsDropdown" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
+                <a class="dropdown-toggle nav-link" id="settingsDropdown" href="#" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
                     Settings
                 </a>
                 <div class="dropdown-menu dropdown-menu-right extralarge-width" id="settingsMenu" aria-labelledby="settingsDropdown">
@@ -501,7 +502,23 @@
     </div>
 </section>
 
+<section class="modal" data-backdrop="static" data-keyboard="false" id="modal-ingredients" role="dialog" tabindex="-1">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <header class="modal-header">
+                <h3>Ingredients</h3>
+            </header>
+            <div class="modal-body">
+                <div class="container-fluid" id="ingredients-list"></div>
+            </div>
+            <footer class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Close</button>
+            </footer>
+        </div>
+    </div>
+</section>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.slim.min.js" crossorigin="anonymous" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"></script>
 <script src="https://unpkg.com/d3@5.4.0/dist/d3.min.js" crossorigin="anonymous" integrity="sha384-Ha//YQhNUuPzmPKgC8aYpurZcTiV3JhEvEhH5uGW0IRjBfEgDQxvo0aF1Gef+blI"></script>
-<script src="na-map.min.js?4e30a9c531403d3b89fa" crossorigin="anonymous" integrity="sha256-gqAAPk79CrdA9a3LJHvEGsqoUBKTFsbby5WId4sLB0k= sha384-DnD9+sHp1lWhUryXGYIwKM9lm2OuR862MUDsBY/tVNrJbabrc1FvVzZmbzLuutxc" type="text/javascript"></script></body>
+<script src="na-map.min.js?8820588ff1fb596265eb" crossorigin="anonymous" integrity="sha256-o8KKXF8XmyAku8vMDgKsOjNk9Hynpzx3x3ZWTsk5MtU= sha384-k+Jo16UHS9/koXZGeFBwudQjyQnRTsL3GELil+3dQCmEgvwBucG0VMNeQbzkxVYb" type="text/javascript"></script></body>
 </html>
