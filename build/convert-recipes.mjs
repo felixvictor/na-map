@@ -100,9 +100,9 @@ function convertRecipes() {
             APIingredient => {
                 const recipeName = recipe.module ? recipe.module : recipe.name.replace(" Blueprint", "");
                 if (ingredients.has(APIingredient.Template)) {
-                    const oldIngredient = ingredients.get(APIingredient.Template);
-                    oldIngredient.recipe.push(recipeName);
-                    oldIngredient.recipe.sort((a, b) => {
+                    const updatedIngredient = ingredients.get(APIingredient.Template);
+                    updatedIngredient.recipe.push(recipeName);
+                    updatedIngredient.recipe.sort((a, b) => {
                         if (a < b) {
                             return -1;
                         }
@@ -111,7 +111,7 @@ function convertRecipes() {
                         }
                         return 0;
                     });
-                    ingredients.set(APIingredient.Template, oldIngredient);
+                    ingredients.set(APIingredient.Template, updatedIngredient);
                 } else {
                     const ingredient = {
                         id: APIingredient.Template,
@@ -120,7 +120,6 @@ function convertRecipes() {
                     };
                     ingredients.set(APIingredient.Template, ingredient);
                 }
-                // data.ingredient.push(ingredient);
             }
         );
     });
