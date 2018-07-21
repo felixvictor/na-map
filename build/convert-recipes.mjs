@@ -51,9 +51,12 @@ function convertRecipes() {
             [1472, "Pirate Rig Refit Blueprint"],
             [1473, "Spanish Rig Refit Blueprint"]
         ]),
+        ingredientIds = new Map(),
+        ingredients = new Map(),
         itemNames = new Map(),
         moduleNames = new Map();
     data.recipe = [];
+    data.ingredient = [];
 
     function getItemNames() {
         APIItems.forEach(item => {
@@ -67,8 +70,17 @@ function convertRecipes() {
         });
     }
 
+    function getIngredients() {
+        APIItems.filter(
+            item => item.ItemType === "ShipUpgradeBookItem" || item.SortingGroup === "Resource.Trading"
+        ).forEach(item => {
+            ingredientIds.set(item.Id, item.Id);
+        });
+    }
+
     getItemNames();
     getModuleNames();
+    getIngredients();
 
     APIItems.filter(APIrecipe => recipes.has(APIrecipe.Id)).forEach(APIrecipe => {
         const recipe = {
@@ -84,6 +96,33 @@ function convertRecipes() {
             }))
         };
         data.recipe.push(recipe);
+        APIrecipe.FullRequirements.filter(APIingredient => ingredientIds.has(APIingredient.Template)).forEach(
+            APIingredient => {
+                const recipeName = recipe.module ? recipe.module : recipe.name.replace(" Blueprint", "");
+                if (ingredients.has(APIingredient.Template)) {
+                    const oldIngredient = ingredients.get(APIingredient.Template);
+                    oldIngredient.recipe.push(recipeName);
+                    oldIngredient.recipe.sort((a, b) => {
+                        if (a < b) {
+                            return -1;
+                        }
+                        if (a > b) {
+                            return 1;
+                        }
+                        return 0;
+                    });
+                    ingredients.set(APIingredient.Template, oldIngredient);
+                } else {
+                    const ingredient = {
+                        id: APIingredient.Template,
+                        name: itemNames.get(APIingredient.Template),
+                        recipe: [recipeName]
+                    };
+                    ingredients.set(APIingredient.Template, ingredient);
+                }
+                // data.ingredient.push(ingredient);
+            }
+        );
     });
 
     data.recipe.sort((a, b) => {
@@ -95,6 +134,18 @@ function convertRecipes() {
         }
         return 0;
     });
+
+    const result = Array.from(ingredients.values());
+    data.ingredient = result.sort((a, b) => {
+        if (a.name < b.name) {
+            return -1;
+        }
+        if (a.name > b.name) {
+            return 1;
+        }
+        return 0;
+    });
+
     saveJson(outFilename, data);
 }
 
