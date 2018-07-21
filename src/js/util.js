@@ -283,3 +283,47 @@ export const putFetchError = error => {
  * {@link https://stackoverflow.com/questions/1026069/how-do-i-make-the-first-letter-of-a-string-uppercase-in-javascript}
  */
 export const capitalizeFirstLetter = string => string.charAt(0).toUpperCase() + string.slice(1);
+
+/** Split array into n pieces
+ * {@link https://stackoverflow.com/questions/8188548/splitting-a-js-array-into-n-arrays}
+ * @param {Array} array Array to be split
+ * @param {Integer} n Number of splits
+ * @param {Boolean} balanced True if splits' lengths differ as less as possible
+ * @return {Array} Split arrays
+ */
+export function chunkify(array, n, balanced = true) {
+    if (n < 2) {
+        return [array];
+    }
+
+    const len = array.length,
+        out = [];
+    let i = 0,
+        size;
+
+    if (len % n === 0) {
+        size = Math.floor(len / n);
+        while (i < len) {
+            out.push(array.slice(i, (i += size)));
+        }
+    } else if (balanced) {
+        while (i < len) {
+            // eslint-disable-next-line no-param-reassign, no-plusplus
+            size = Math.ceil((len - i) / n--);
+            out.push(array.slice(i, (i += size)));
+        }
+    } else {
+        // eslint-disable-next-line no-param-reassign
+        n -= 1;
+        size = Math.floor(len / n);
+        if (len % size === 0) {
+            size -= 1;
+        }
+        while (i < size * n) {
+            out.push(array.slice(i, (i += size)));
+        }
+        out.push(array.slice(size * n));
+    }
+
+    return out;
+}
