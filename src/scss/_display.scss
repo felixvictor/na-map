@@ -85,6 +85,10 @@ p {
     }
 }
 
+.ingredients a {
+    border-bottom: 1px dotted $secondary-600;
+}
+
 .modules,
 .ingredients,
 .buildings .requirements {
