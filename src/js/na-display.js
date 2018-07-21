@@ -41,6 +41,7 @@ import WindPrediction from "./wind-prediction";
 import WoodCompare from "./wood-compare";
 import Module from "./module-list";
 import Recipe from "./recipe-list";
+import Ingredient from "./ingredient-list";
 import Building from "./building-list";
 import { registerEvent } from "./analytics";
 
@@ -58,6 +59,7 @@ export default function naDisplay(serverName) {
         woodCompare,
         moduleList,
         recipeList,
+        ingredientList,
         buildingList,
         windPrediction,
         f11,
@@ -68,6 +70,7 @@ export default function naDisplay(serverName) {
         woodData,
         moduleData,
         recipeData,
+        ingredientData,
         buildingData;
 
     /** Main map */
@@ -555,6 +558,7 @@ export default function naDisplay(serverName) {
         woodCompare = new WoodCompare(woodData);
         moduleList = new Module(moduleData);
         recipeList = new Recipe(recipeData, moduleData);
+        ingredientList = new Ingredient(ingredientData);
         buildingList = new Building(buildingData);
         teleport = new Teleport(map.coord.min, map.coord.max, ports);
         portSelect = new PortSelect(map, ports, pbZone);
@@ -600,6 +604,7 @@ export default function naDisplay(serverName) {
         woodData = JSON.parse(JSON.stringify(data.woods));
         moduleData = JSON.parse(JSON.stringify(data.modules));
         recipeData = JSON.parse(JSON.stringify(data.recipes.recipe));
+        ingredientData = JSON.parse(JSON.stringify(data.recipes.ingredient));
         buildingData = JSON.parse(JSON.stringify(data.buildings));
 
         setup();
