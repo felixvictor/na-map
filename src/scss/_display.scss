@@ -85,8 +85,12 @@ p {
     }
 }
 
-.ingredients a {
-    border-bottom: 1px dotted $secondary-600;
+p a,
+table a {
+  text-decoration: underline dotted $secondary-600 !important;
+  @include hover-focus {
+    text-decoration-style: solid !important;
+  }
 }
 
 .recipes,
