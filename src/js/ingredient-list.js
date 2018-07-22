@@ -44,7 +44,7 @@ export default class Ingredient {
                     .join("</td></tr><tr><td>")}</td></tr>`;
             });
         });
-        text = `<h6 class='mb-2 text-muted'>${moduleType}</h6>`;
+        text = `<h6 class='text-muted text-left'>${moduleType}</h6>`;
         text += `<table class='table table-sm'><tbody>${properties}</tbody></table>`;
 
         return text;
