@@ -89,6 +89,15 @@ p {
     border-bottom: 1px dotted $secondary-600;
 }
 
+.recipes,
+.product,
+.tooltip {
+    .table-sm th,
+    .table-sm td {
+        padding: 0.3rem 0;
+    }
+}
+
 .modules,
 .ingredients,
 .buildings .requirements {
@@ -112,34 +121,30 @@ p {
     }
 }
 
-.buildings .requirements {
-    table {
-        width: auto;
-        th,
-        td {
-            padding-right: 1rem;
-        }
-        td {
-            text-align: right;
-        }
+.buildings .requirements table {
+    width: auto;
+    th,
+    td {
+        padding-right: 1rem;
+    }
+    td {
+        text-align: right;
     }
 }
 
-.wood {
+.wood table tbody {
     td + td {
         text-align: right;
     }
-    tbody {
-        td:nth-child(1) {
-            width: 50%;
-        }
-        td:nth-child(2) {
-            width: 50%;
-        }
+    td:nth-child(1) {
+        width: 50%;
+    }
+    td:nth-child(2) {
+        width: 50%;
     }
 }
 
-.ship tbody {
+.ship table tbody {
     td:nth-child(1) {
         width: 36%;
     }
@@ -148,14 +153,6 @@ p {
     }
     td:nth-child(3) {
         width: 32%;
-    }
-}
-
-.recipes,
-.product {
-    .table-sm th,
-    .table-sm td {
-        padding: 0.3rem 0;
     }
 }
 
