@@ -321,7 +321,7 @@ export default class Grid {
      * @param {Boolean} show - True if grid is shown
      * @return {void}
      */
-    setShow(show) {
+    set show(show) {
         this._isShown = show;
     }
 
@@ -331,7 +331,7 @@ export default class Grid {
      * @return {void}
      * @public
      */
-    setZoomLevel(zoomLevel) {
+    set zoomLevel(zoomLevel) {
         this._zoomLevel = zoomLevel;
     }
 
