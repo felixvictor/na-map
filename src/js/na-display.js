@@ -338,10 +338,10 @@ export default function naDisplay(serverName) {
             const showGrid = this._showLayer === "grid",
                 showTeleport = this._showLayer === "teleport";
 
-            grid.setShow(showGrid);
+            grid.show = showGrid;
             grid.update();
 
-            teleport.setShow(showTeleport);
+            teleport.show = showTeleport;
             teleport.setData();
             teleport.update();
         }
@@ -460,9 +460,9 @@ export default function naDisplay(serverName) {
 
         _setZoomLevel(zoomLevel) {
             this._zoomLevel = zoomLevel;
-            ports.setZoomLevel(zoomLevel);
-            grid.setZoomLevel(zoomLevel);
-            teleport.setZoomLevel(zoomLevel);
+            ports.zoomLevel = zoomLevel;
+            grid.zoomLevel = zoomLevel;
+            teleport.zoomLevel = zoomLevel;
         }
 
         _updateCurrent() {
@@ -542,6 +542,7 @@ export default function naDisplay(serverName) {
         }
 
         goToPort() {
+            console.log(ports.currentPort);
             if (ports.currentPort.id !== "0") {
                 this.zoomAndPan(ports.currentPort.coord.x, ports.currentPort.coord.y, 2);
             } else {
