@@ -100,7 +100,7 @@ export default class PBZone {
     }
 
     _setData() {
-        if (this._ports._zoomLevel === "pbZone" && this._showPB !== "noShow") {
+        if (this._ports.zoomLevel === "pbZone" && this._showPB !== "noShow") {
             this._pbZoneData = {
                 type: "FeatureCollection",
                 features: this._pbZoneDataDefault.filter(
