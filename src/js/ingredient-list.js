@@ -104,7 +104,7 @@ export default class Ingredient {
         // Add new ingredient list
         d3.select(this._div)
             .append("div")
-            .classed("row ingredients mt-4", true);
+            .classed("row ingredients", true);
         $(this._div)
             .find("div")
             .append(this._getText());
