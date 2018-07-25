@@ -1,62 +1,32 @@
-import fs from "fs";
-import { convertCoordX, convertCoordY } from "./common.mjs";
+/*
+	convert-pbZones.mjs
+*/
+
+import { convertCoordX, convertCoordY, readJson, saveJson } from "./common.mjs";
 
 const infileBaseName = process.argv[2],
     outDir = process.argv[3],
     date = process.argv[4];
 
-const APIPorts = JSON.parse(fs.readFileSync(`${infileBaseName}-Ports-${date}.json`, "utf8"));
-
-function saveJson(filename, data) {
-    // eslint-disable-next-line consistent-return
-    fs.writeFile(`${filename}.geojson`, JSON.stringify(data), "utf8", err => {
-        if (err) {
-            return console.log(err);
-        }
-    });
-}
+const APIPorts = readJson(`${infileBaseName}-Ports-${date}.json`);
 
 function convertPBZones() {
     let ports = [],
-        pbZones = [],
+        pbCircles = [],
         pbForts = [],
-        pbTowers = [];
+        pbTowers = [],
+        pbJoinCircles = [];
 
-    function createAndSaveGeoJson() {
-        ["pbZones", "forts", "towers"].forEach(element => {
-            const geoJson = {};
-            geoJson.type = "FeatureCollection";
-            geoJson.features = [];
-
-            ports.forEach(port => {
-                const feature = {
-                    type: "Feature",
-                    id: port.id,
-                    geometry: {
-                        type: "MultiPoint",
-                        coordinates: port.features
-                            .filter(features => element === features.type)
-                            .map(features => features.coord)[0]
-                    }
-                };
-                if (feature.geometry.coordinates.length > 0) {
-                    geoJson.features.push(feature);
-                }
-            });
-            saveJson(`${outDir}/${element}`, geoJson);
-        });
-    }
-
-    function getPBZones(port) {
-        port.PortBattleZonePositions.forEach(pbZone => {
-            pbZones.push([
-                Math.round(convertCoordX(pbZone.x, pbZone.z)),
-                Math.round(convertCoordY(pbZone.x, pbZone.z))
+    function setPBCircles(port) {
+        port.PortBattleZonePositions.forEach(pbCircle => {
+            pbCircles.push([
+                Math.round(convertCoordX(pbCircle.x, pbCircle.z)),
+                Math.round(convertCoordY(pbCircle.x, pbCircle.z))
             ]);
         });
     }
 
-    function getPortElements(port) {
+    function setPortElements(port) {
         port.PortElementsSlotGroups.forEach(portElement => {
             if (portElement.TemplateName === "Fort2") {
                 portElement.PortElementsSlots.forEach(d => {
@@ -76,19 +46,54 @@ function convertPBZones() {
         });
     }
 
+    function setJoinCircles(port) {
+        pbJoinCircles.push([
+            Math.round(convertCoordX(port.Position.x, port.Position.z)),
+            Math.round(convertCoordY(port.Position.x, port.Position.z))
+        ]);
+    }
+
+    function createAndSaveGeoJson() {
+        ["pbCircles", "forts", "towers", "joinCircles"].forEach(element => {
+            const geoJson = {};
+            geoJson.type = "FeatureCollection";
+            geoJson.features = [];
+
+            ports.forEach(port => {
+                const feature = {
+                    type: "Feature",
+                    id: port.id,
+                    geometry: {
+                        type: "MultiPoint",
+                        coordinates: port.features
+                            .filter(features => element === features.type)
+                            .map(features => features.coord)[0]
+                    }
+                };
+                if (feature.geometry.coordinates.length > 0) {
+                    geoJson.features.push(feature);
+                }
+            });
+            saveJson(`${outDir}/${element}.geojson`, geoJson);
+        });
+    }
+
     ports = APIPorts.map(port => {
-        pbZones = [];
+        pbCircles = [];
         pbForts = [];
         pbTowers = [];
+        pbJoinCircles = [];
 
-        getPBZones(port);
-        getPortElements(port);
+        setPBCircles(port);
+        setPortElements(port);
+        setJoinCircles(port);
         return {
             id: port.Id,
             features: [
-                { type: "pbZones", coord: pbZones },
+                { type: "pbCircles", coord: pbCircles },
                 { type: "forts", coord: pbForts },
-                { type: "towers", coord: pbTowers }
+                { type: "towers", coord: pbTowers },
+                { type: "joinCircles", coord: pbJoinCircles }
             ]
         };
     });
