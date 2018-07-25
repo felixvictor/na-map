@@ -115,7 +115,8 @@ function get_port_data () {
 
         ${NODE} build/convert-pbZones.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${BUILD_DIR}" "${DATE}"
         yarn geo2topo -o "${SRC_DIR}/pb.json" \
-            "${BUILD_DIR}/pbZones.geojson" "${BUILD_DIR}/towers.geojson" "${BUILD_DIR}/forts.geojson"
+            "${BUILD_DIR}/pbCircles.geojson" "${BUILD_DIR}/forts.geojson" \
+            "${BUILD_DIR}/towers.geojson" "${BUILD_DIR}/joinCircles.geojson"
         rm "${BUILD_DIR}"/*.geojson
 
         ${NODE} build/convert-ships.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${SHIP_FILE}" "${DATE}"

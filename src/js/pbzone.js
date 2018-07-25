@@ -8,14 +8,37 @@
 import Cookies from "js-cookie";
 
 export default class PBZone {
-    constructor(pbZoneData, fortData, towerData, ports) {
-        this._pbZoneDataDefault = pbZoneData;
-        this._fortDataDefault = fortData;
-        this._towerDataDefault = towerData;
-        this._pbZoneData = pbZoneData;
-        this._fortData = fortData;
-        this._towerData = towerData;
+    constructor(pbData, ports) {
+        function getFeature(d) {
+            return {
+                type: "Feature",
+                id: d.id,
+                geometry: d.geometry
+            };
+        }
+
         this._ports = ports;
+
+        // Port ids of capturable ports
+        const portIds = this._ports.portData.filter(port => !port.properties.nonCapturable).map(port => port.id);
+console.log(pbData);
+        this._pbCircleDataDefault = pbData.pbCircles.features
+            .filter(port => portIds.includes(port.id))
+            .map(d => getFeature(d));
+        this._pbCircleData = this._pbCircleDataDefault;
+
+        this._fortDataDefault = pbData.forts.features.filter(port => portIds.includes(port.id)).map(d => getFeature(d));
+        this._fortData = this._fortDataDefault;
+
+        this._towerDataDefault = pbData.towers.features
+            .filter(port => portIds.includes(port.id))
+            .map(d => getFeature(d));
+        this._towerData = this._towerDataDefault;
+
+        this._joinCircleDataDefault = pbData.joinCircles.features
+            .filter(port => portIds.includes(port.id))
+            .map(d => getFeature(d));
+        this._joinCircleData = this._joinCircleDataDefault;
 
         /**
          * showLayer cookie name
@@ -47,9 +70,11 @@ export default class PBZone {
             .select("#na-svg")
             .append("g")
             .classed("pb", true);
-        this.pbZones = this._g.append("path").classed("pb-zone", true);
-        this.towers = this._g.append("path").classed("tower", true);
-        this.forts = this._g.append("path").classed("fort", true);
+        this._gPBCircles = this._g.append("path").classed("pb-circle", true);
+        this._gTowers = this._g.append("path").classed("tower", true);
+        this._gForts = this._g.append("path").classed("fort", true);
+        this._gJoinCirclesInner = this._g.append("path").classed("join-circle", true);
+        this._gJoinCirclesOuter = this._g.append("path").classed("join-circle", true);
     }
 
     _setupListener() {
@@ -94,39 +119,45 @@ export default class PBZone {
     }
 
     _update() {
-        this.pbZones.datum(this._pbZoneData).attr("d", d3.geoPath().pointRadius(4));
-        this.towers.datum(this._towerData).attr("d", d3.geoPath().pointRadius(1.5));
-        this.forts.datum(this._fortData).attr("d", d3.geoPath().pointRadius(2));
+        this._gPBCircles.datum(this._pbData).attr("d", d3.geoPath().pointRadius(4));
+        this._gTowers.datum(this._towerData).attr("d", d3.geoPath().pointRadius(1.5));
+        this._gForts.datum(this._fortData).attr("d", d3.geoPath().pointRadius(2));
+        this._gJoinCirclesInner.datum(this._joinCircleData).attr("d", d3.geoPath().pointRadius(8));
+        this._gJoinCirclesOuter.datum(this._joinCircleData).attr("d", d3.geoPath().pointRadius(16));
+    }
+
+    _isPortIn(d) {
+        return this._showPB === "all" || (this._showPB === "single" && d.id === this._ports.currentPort.id);
     }
 
     _setData() {
         if (this._ports.zoomLevel === "pbZone" && this._showPB !== "noShow") {
-            this._pbZoneData = {
+            this._pbCircleData = {
                 type: "FeatureCollection",
-                features: this._pbZoneDataDefault.filter(
-                    d => this._showPB === "all" || (this._showPB === "single" && d.id === this._ports.currentPort.id)
-                )
+                features: this._pbCircleDataDefault.filter(d => this._isPortIn(d))
             };
             this._fortData = {
                 type: "FeatureCollection",
-                features: this._fortDataDefault.filter(
-                    d => this._showPB === "all" || (this._showPB === "single" && d.id === this._ports.currentPort.id)
-                )
+                features: this._fortDataDefault.filter(d => this._isPortIn(d))
             };
             this._towerData = {
                 type: "FeatureCollection",
-                features: this._towerDataDefault.filter(
-                    d => this._showPB === "all" || (this._showPB === "single" && d.id === this._ports.currentPort.id)
-                )
+                features: this._towerDataDefault.filter(d => this._isPortIn(d))
+            };
+            this._joinCircleData = {
+                type: "FeatureCollection",
+                features: this._joinCircleDataDefault.filter(d => this._isPortIn(d))
             };
         } else {
-            this._pbZoneData = {};
+            this._pbCircleData = {};
             this._fortData = {};
             this._towerData = {};
+            this._joinCircleData = {};
         }
     }
 
     refresh() {
+        console.log("pbData refresh (sollte nicht zu häufig passieren");
         this._setData();
         this._update();
     }

@@ -40,7 +40,7 @@ pattern .all {
 }
 
 .bootstrap-select > .dropdown-toggle {
-    padding-left:  15px;
+    padding-left: 15px;
     padding-right: 15px;
 }
 
@@ -87,14 +87,14 @@ p {
 
 p a,
 table a {
-  text-decoration: underline dotted $secondary-600 !important;
-  @include hover-focus {
-    text-decoration-style: solid !important;
-  }
+    text-decoration: underline dotted $secondary-600 !important;
+    @include hover-focus {
+        text-decoration-style: solid !important;
+    }
 }
 
 .modal-header {
-  padding-left: calc(1rem + 15px);
+    padding-left: calc(1rem + 15px);
 }
 
 .recipes,
@@ -335,19 +335,29 @@ text {
     font-style: italic;
 }
 
-.pb-zone {
-    fill: none;
+.pb-circle {
+    fill: $primary-300;
     stroke: $primary-700;
 }
 
 .fort {
     fill: $red;
-    opacity: 0.8;
+    fill-opacity: 0.8;
+    stroke: $red;
+    stroke-width: 2px;
 }
 
 .tower {
     fill: $secondary-800;
-    opacity: 0.7;
+    fill-opacity: 0.7;
+    stroke: $secondary-800;
+    stroke-width: 1px;
+}
+
+.join-circle {
+    fill: none;
+    stroke: $secondary-500;
+    stroke-width: 3px;
 }
 
 .label-rect {
