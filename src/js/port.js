@@ -636,7 +636,8 @@ export default class PortDisplay {
             magicNumber = 5;
         let rMax = roundToThousands((this._circleSize / circleScale) * this._maxRadiusFactor),
             data = {},
-            rGreenZone;
+            rGreenZone = 0;
+
         if (this._showRadius === "tax" || this._showRadius === "net") {
             data = this._portData.filter(d => !d.properties.nonCapturable);
         } else if (this._showRadius === "attack") {
@@ -711,6 +712,40 @@ export default class PortDisplay {
         }
     }
 
+    _updateTextsX(d, circleSize) {
+        return this._zoomLevel === "pbZone" &&
+            (this._showPBZones === "all" || (this._showPBZones === "single" && d.id === this.currentPort.id))
+            ? d.geometry.coordinates[0] + Math.round(circleSize * 1.2 * Math.cos(degreesToRadians(d.properties.angle)))
+            : d.geometry.coordinates[0];
+    }
+
+    _updateTextsY(d, circleSize, fontSize) {
+        const deltaY = circleSize + fontSize * 1.2,
+            deltaY2 = circleSize * 2 + fontSize * 2;
+
+        if (this._zoomLevel !== "pbZone") {
+            return d.id === this._highlightId
+                ? d.geometry.coordinates[1] + deltaY2
+                : d.geometry.coordinates[1] + deltaY;
+        }
+        const dy = d.properties.angle > 90 && d.properties.angle < 270 ? fontSize : 0;
+        return this._showPBZones === "all" || (this._showPBZones === "single" && d.id === this.currentPort.id)
+            ? d.geometry.coordinates[1] +
+                  Math.round(circleSize * 1.2 * Math.sin(degreesToRadians(d.properties.angle))) +
+                  dy
+            : d.geometry.coordinates[1] + deltaY;
+    }
+
+    _updateTextsAnchor(d) {
+        if (
+            this._zoomLevel === "pbZone" &&
+            (this._showPBZones === "all" || (this._showPBZones === "single" && d.id === this.currentPort.id))
+        ) {
+            return d.properties.textAnchor;
+        }
+        return "middle";
+    }
+
     updateTexts() {
         if (this._zoomLevel === "initial") {
             this._gText.attr("display", "none");
@@ -737,46 +772,13 @@ export default class PortDisplay {
                 .append("text")
                 .text(d => d.properties.name);
 
-            const deltaY = circleSize + fontSize * 1.2,
-                deltaY2 = circleSize * 2 + fontSize * 2;
             // Apply to both old and new
             textUpdate
                 .merge(textEnter)
-                .attr(
-                    "x",
-                    d =>
-                        this._zoomLevel === "pbZone" &&
-                        (this._showPBZones === "all" ||
-                            (this._showPBZones === "single" && d.id === this.currentPort.id))
-                            ? d.geometry.coordinates[0] +
-                              Math.round(circleSize * 1.2 * Math.cos(degreesToRadians(d.properties.angle)))
-                            : d.geometry.coordinates[0]
-                )
-                .attr("y", d => {
-                    if (this._zoomLevel !== "pbZone") {
-                        return d.id === this._highlightId
-                            ? d.geometry.coordinates[1] + deltaY2
-                            : d.geometry.coordinates[1] + deltaY;
-                    }
-                    const dy = d.properties.angle > 90 && d.properties.angle < 270 ? fontSize : 0;
-                    return this._showPBZones === "all" ||
-                        (this._showPBZones === "single" && d.id === this.currentPort.id)
-                        ? d.geometry.coordinates[1] +
-                              Math.round(circleSize * 1.2 * Math.sin(degreesToRadians(d.properties.angle))) +
-                              dy
-                        : d.geometry.coordinates[1] + deltaY;
-                })
+                .attr("x", d => this._updateTextsX(d, circleSize))
+                .attr("y", d => this._updateTextsY(d, circleSize, fontSize))
                 .attr("font-size", d => (d.id === this._highlightId ? `${fontSize * 2}px` : `${fontSize}px`))
-                .attr("text-anchor", d => {
-                    if (
-                        this._zoomLevel === "pbZone" &&
-                        (this._showPBZones === "all" ||
-                            (this._showPBZones === "single" && d.id === this.currentPort.id))
-                    ) {
-                        return d.properties.textAnchor;
-                    }
-                    return "middle";
-                });
+                .attr("text-anchor", d => this._updateTextsAnchor(d));
         }
     }
 
