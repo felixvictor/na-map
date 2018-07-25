@@ -47,7 +47,7 @@ export default class Teleport {
     _mouseover(event) {
         this._highlightId = event.data.id;
         this.update();
-        this._ports.highlightId(this._highlightId);
+        this._ports.highlightId = this._highlightId;
         this._ports.update();
     }
 
@@ -92,7 +92,7 @@ export default class Teleport {
             this._data = {};
         }
         this._highlightId = null;
-        this._ports.setHighlightId(this._highlightId);
+        this._ports.highlightId = this._highlightId;
     }
 
     transform(transform) {
