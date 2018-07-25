@@ -65,13 +65,7 @@ export default function naDisplay(serverName) {
         f11,
         course,
         grid,
-        pbZone,
-        shipData,
-        woodData,
-        moduleData,
-        recipeData,
-        ingredientData,
-        buildingData;
+        pbZone;
 
     /** Main map */
     class NAMap {
@@ -555,19 +549,6 @@ export default function naDisplay(serverName) {
         // Set cookies defaults (expiry 365 days)
         Cookies.defaults = { expires: 365 };
 
-        shipCompare = new ShipCompare(shipData);
-        woodCompare = new WoodCompare(woodData);
-        moduleList = new Module(moduleData);
-        recipeList = new Recipe(recipeData, moduleData);
-        ingredientList = new Ingredient(ingredientData, moduleData);
-        buildingList = new Building(buildingData);
-        teleport = new Teleport(map.coord.min, map.coord.max, ports);
-        portSelect = new PortSelect(map, ports, pbZone);
-        windPrediction = new WindPrediction(map.margin.left, map.margin.top);
-        f11 = new F11(map);
-        grid = new Grid(map);
-        course = new Course(map.rem);
-
         moment.locale("en-gb");
         map.init();
         ports.clearMap(map.minScale);
@@ -575,38 +556,37 @@ export default function naDisplay(serverName) {
 
     function init(data) {
         map = new NAMap();
-        // Read map data
+
         const portData = topojsonFeature(data.ports, data.ports.objects.ports).features;
         ports = new PortDisplay(portData, data.pb, serverName, map.margin.top, map.margin.right, map.minScale);
+console.log(data.pbZones.objects);
+        const pbData = topojsonFeature(data.pbZones, data.pbZones.objects.pbCircles).features;
+        pbZone = new PBZone(pbData, ports);
 
-        let pbZoneData = topojsonFeature(data.pbZones, data.pbZones.objects.pbZones);
-        // Port ids of capturable ports
-        const portIds = portData.filter(port => !port.properties.nonCapturable).map(port => port.id);
-        pbZoneData = pbZoneData.features.filter(port => portIds.includes(port.id)).map(d => ({
-            type: "Feature",
-            id: d.id,
-            geometry: d.geometry
-        }));
-        let fortData = topojsonFeature(data.pbZones, data.pbZones.objects.forts);
-        fortData = fortData.features.map(d => ({
-            type: "Feature",
-            id: d.id,
-            geometry: d.geometry
-        }));
-        let towerData = topojsonFeature(data.pbZones, data.pbZones.objects.towers);
-        towerData = towerData.features.map(d => ({
-            type: "Feature",
-            id: d.id,
-            geometry: d.geometry
-        }));
-        pbZone = new PBZone(pbZoneData, fortData, towerData, ports);
+        const shipData = JSON.parse(JSON.stringify(data.ships.shipData));
+        shipCompare = new ShipCompare(shipData);
 
-        shipData = JSON.parse(JSON.stringify(data.ships.shipData));
-        woodData = JSON.parse(JSON.stringify(data.woods));
-        moduleData = JSON.parse(JSON.stringify(data.modules));
-        recipeData = JSON.parse(JSON.stringify(data.recipes.recipe));
-        ingredientData = JSON.parse(JSON.stringify(data.recipes.ingredient));
-        buildingData = JSON.parse(JSON.stringify(data.buildings));
+        const woodData = JSON.parse(JSON.stringify(data.woods));
+        woodCompare = new WoodCompare(woodData);
+
+        const moduleData = JSON.parse(JSON.stringify(data.modules));
+        moduleList = new Module(moduleData);
+
+        const recipeData = JSON.parse(JSON.stringify(data.recipes.recipe));
+        recipeList = new Recipe(recipeData, moduleData);
+
+        const ingredientData = JSON.parse(JSON.stringify(data.recipes.ingredient));
+        ingredientList = new Ingredient(ingredientData, moduleData);
+
+        const buildingData = JSON.parse(JSON.stringify(data.buildings));
+        buildingList = new Building(buildingData);
+
+        teleport = new Teleport(map.coord.min, map.coord.max, ports);
+        portSelect = new PortSelect(map, ports, pbZone);
+        windPrediction = new WindPrediction(map.margin.left, map.margin.top);
+        f11 = new F11(map);
+        grid = new Grid(map);
+        course = new Course(map.rem);
 
         setup();
     }
