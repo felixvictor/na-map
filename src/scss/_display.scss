@@ -344,20 +344,21 @@ text {
     fill: $red;
     fill-opacity: 0.8;
     stroke: $red;
-    stroke-width: 2px;
+    stroke-width: 1px;
 }
 
 .tower {
     fill: $secondary-800;
     fill-opacity: 0.7;
     stroke: $secondary-800;
-    stroke-width: 1px;
+    stroke-width: .5px;
 }
 
 .join-circle {
-    fill: none;
+  fill: $secondary-300;
+  fill-opacity: 0.3;
     stroke: $secondary-500;
-    stroke-width: 3px;
+    stroke-width: 1px;
 }
 
 .label-rect {
