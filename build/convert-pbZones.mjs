@@ -48,8 +48,8 @@ function convertPBZones() {
 
     function setJoinCircles(port) {
         pbJoinCircles.push([
-            Math.round(convertCoordX(port.Position.x, port.Position.z)),
-            Math.round(convertCoordY(port.Position.x, port.Position.z))
+            Math.round(convertCoordX(port.EntrancePosition.x, port.EntrancePosition.z)),
+            Math.round(convertCoordY(port.EntrancePosition.x, port.EntrancePosition.z))
         ]);
     }
 

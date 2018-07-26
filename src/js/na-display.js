@@ -555,13 +555,38 @@ export default function naDisplay(serverName) {
     }
 
     function init(data) {
+        // Port ids of capturable ports
+        let portIds = [];
+
+        function getFeature(object) {
+            return object.filter(port => portIds.includes(port.id)).map(d => ({
+                type: "Feature",
+                id: d.id,
+                geometry: d.geometry
+            }));
+        }
+
         map = new NAMap();
 
-        const portData = topojsonFeature(data.ports, data.ports.objects.ports).features;
-        ports = new PortDisplay(portData, data.pb, serverName, map.margin.top, map.margin.right, map.minScale);
-console.log(data.pbZones.objects);
-        const pbData = topojsonFeature(data.pbZones, data.pbZones.objects.pbCircles).features;
-        pbZone = new PBZone(pbData, ports);
+        const portData = topojsonFeature(data.ports, data.ports.objects.ports);
+        ports = new PortDisplay(portData.features, data.pb, serverName, map.margin.top, map.margin.right, map.minScale);
+
+        // Port ids of capturable ports
+        portIds = portData.features.filter(port => !port.properties.nonCapturable).map(port => port.id);
+
+        let pbCircles = topojsonFeature(data.pbZones, data.pbZones.objects.pbCircles);
+        pbCircles = getFeature(pbCircles.features);
+
+        let forts = topojsonFeature(data.pbZones, data.pbZones.objects.forts);
+        forts = getFeature(forts.features);
+
+        let towers = topojsonFeature(data.pbZones, data.pbZones.objects.towers);
+        towers = getFeature(towers.features);
+
+        let joinCircles = topojsonFeature(data.pbZones, data.pbZones.objects.joinCircles);
+        joinCircles = getFeature(joinCircles.features);
+
+        pbZone = new PBZone(pbCircles, forts, towers, joinCircles, ports);
 
         const shipData = JSON.parse(JSON.stringify(data.ships.shipData));
         shipCompare = new ShipCompare(shipData);
