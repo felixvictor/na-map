@@ -7,12 +7,12 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+import "bootstrap/js/dist/util";
 import "bootstrap/js/dist/button";
 import "bootstrap/js/dist/collapse";
 import "bootstrap/js/dist/dropdown";
 import "bootstrap/js/dist/modal";
 import "bootstrap/js/dist/tooltip";
-import "bootstrap/js/dist/util";
 
 import fontawesome from "@fortawesome/fontawesome";
 import { faCalendar, faCalendarCheck, faClock, faCopy } from "@fortawesome/fontawesome-free-regular";
