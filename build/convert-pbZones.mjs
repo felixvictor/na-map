@@ -47,10 +47,15 @@ function convertPBZones() {
     }
 
     function setJoinCircles(port) {
-        pbJoinCircles.push([
-            Math.round(convertCoordX(port.EntrancePosition.x, port.EntrancePosition.z)),
-            Math.round(convertCoordY(port.EntrancePosition.x, port.EntrancePosition.z))
-        ]);
+        const x0 = convertCoordX(port.Position.x, port.Position.z),
+            y0 = convertCoordY(port.Position.x, port.Position.z),
+            distance = 5,
+            degrees = 180 - port.Rotation,
+            radians = (degrees * Math.PI) / 180,
+            x1 = Math.round(x0 + distance * Math.sin(radians)),
+            y1 = Math.round(y0 + distance * Math.cos(radians));
+
+        pbJoinCircles.push([x1, y1]);
     }
 
     function createAndSaveGeoJson() {
