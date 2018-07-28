@@ -337,21 +337,24 @@ text {
 
 .pb-circle {
     fill: $primary-300;
-    stroke: $primary-700;
+    stroke: $primary-600;
+  stroke-width: 0.5px;
 }
 
 .fort {
     fill: $red;
-    fill-opacity: 0.8;
+    fill-opacity: 0.7;
     stroke: $red;
-    stroke-width: 1px;
+    stroke-width: .5px;
+  stroke-opacity: 1;
 }
 
 .tower {
-    fill: $secondary-800;
+    fill: $secondary-700;
     fill-opacity: 0.7;
-    stroke: $secondary-800;
+    stroke: $secondary-700;
     stroke-width: .5px;
+  stroke-opacity: 1;
 }
 
 .join-circle {
