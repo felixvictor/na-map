@@ -11,7 +11,6 @@ export default class PBZone {
     constructor(pbCircles, forts, towers, joinCircles, ports) {
         this._ports = ports;
 
-        console.log("constructor pbCircles", pbCircles);
         this._pbCircleDataDefault = pbCircles;
         this._pbCircleData = pbCircles;
 
@@ -103,11 +102,11 @@ export default class PBZone {
     }
 
     _update() {
-        this._gPBCircles.datum(this._pbCircleData).attr("d", d3.geoPath().pointRadius(4));
+        this._gPBCircles.datum(this._pbCircleData).attr("d", d3.geoPath().pointRadius(3.5));
         this._gTowers.datum(this._towerData).attr("d", d3.geoPath().pointRadius(1.5));
         this._gForts.datum(this._fortData).attr("d", d3.geoPath().pointRadius(2));
-        this._gJoinCirclesInner.datum(this._joinCircleData).attr("d", d3.geoPath().pointRadius(16));
-        this._gJoinCirclesOuter.datum(this._joinCircleData).attr("d", d3.geoPath().pointRadius(32));
+        this._gJoinCirclesInner.datum(this._joinCircleData).attr("d", d3.geoPath().pointRadius(14));
+        this._gJoinCirclesOuter.datum(this._joinCircleData).attr("d", d3.geoPath().pointRadius(28));
     }
 
     _isPortIn(d) {
