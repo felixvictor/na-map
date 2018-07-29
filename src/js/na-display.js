@@ -536,7 +536,6 @@ export default function naDisplay(serverName) {
         }
 
         goToPort() {
-            console.log(ports.currentPort);
             if (ports.currentPort.id !== "0") {
                 this.zoomAndPan(ports.currentPort.coord.x, ports.currentPort.coord.y, 2);
             } else {
