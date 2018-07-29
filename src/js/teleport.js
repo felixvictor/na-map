@@ -47,7 +47,7 @@ export default class Teleport {
     _mouseover(event) {
         this._highlightId = event.data.id;
         this.update();
-        this._ports.setHighlightId(this._highlightId);
+        this._ports.highlightId = this._highlightId;
         this._ports.update();
     }
 
@@ -77,8 +77,12 @@ export default class Teleport {
      * @param {Boolean} show - True if teleport areas are shown
      * @return {void}
      */
-    setShow(show) {
+    set show(show) {
         this._show = show;
+    }
+
+    set zoomLevel(zoomLevel) {
+        this._zoomLevel = zoomLevel;
     }
 
     setData() {
@@ -88,11 +92,7 @@ export default class Teleport {
             this._data = {};
         }
         this._highlightId = null;
-        this._ports.setHighlightId(this._highlightId);
-    }
-
-    setZoomLevel(zoomLevel) {
-        this._zoomLevel = zoomLevel;
+        this._ports.highlightId = this._highlightId;
     }
 
     transform(transform) {
