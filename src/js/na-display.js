@@ -40,6 +40,9 @@ import Teleport from "./teleport";
 import WindPrediction from "./wind-prediction";
 import WoodCompare from "./wood-compare";
 import Module from "./module-list";
+import Recipe from "./recipe-list";
+import Ingredient from "./ingredient-list";
+import Building from "./building-list";
 import { registerEvent } from "./analytics";
 
 /**
@@ -55,14 +58,14 @@ export default function naDisplay(serverName) {
         shipCompare,
         woodCompare,
         moduleList,
+        recipeList,
+        ingredientList,
+        buildingList,
         windPrediction,
         f11,
         course,
         grid,
-        pbZone,
-        shipData,
-        woodData,
-        moduleData;
+        pbZone;
 
     /** Main map */
     class NAMap {
@@ -329,10 +332,10 @@ export default function naDisplay(serverName) {
             const showGrid = this._showLayer === "grid",
                 showTeleport = this._showLayer === "teleport";
 
-            grid.setShow(showGrid);
+            grid.show = showGrid;
             grid.update();
 
-            teleport.setShow(showTeleport);
+            teleport.show = showTeleport;
             teleport.setData();
             teleport.update();
         }
@@ -451,9 +454,9 @@ export default function naDisplay(serverName) {
 
         _setZoomLevel(zoomLevel) {
             this._zoomLevel = zoomLevel;
-            ports.setZoomLevel(zoomLevel);
-            grid.setZoomLevel(zoomLevel);
-            teleport.setZoomLevel(zoomLevel);
+            ports.zoomLevel = zoomLevel;
+            grid.zoomLevel = zoomLevel;
+            teleport.zoomLevel = zoomLevel;
         }
 
         _updateCurrent() {
@@ -545,52 +548,69 @@ export default function naDisplay(serverName) {
         // Set cookies defaults (expiry 365 days)
         Cookies.defaults = { expires: 365 };
 
-        shipCompare = new ShipCompare(shipData);
-        woodCompare = new WoodCompare(woodData);
-        moduleList = new Module(moduleData);
-        teleport = new Teleport(map.coord.min, map.coord.max, ports);
-        portSelect = new PortSelect(map, ports, pbZone);
-        windPrediction = new WindPrediction(map.margin.left, map.margin.top);
-        f11 = new F11(map);
-        grid = new Grid(map);
-        course = new Course(map.rem);
-
         moment.locale("en-gb");
         map.init();
         ports.clearMap(map.minScale);
     }
 
     function init(data) {
-        map = new NAMap();
-        // Read map data
-        const portData = topojsonFeature(data.ports, data.ports.objects.ports).features;
-        ports = new PortDisplay(portData, data.pb, serverName, map.margin.top, map.margin.right, map.minScale);
-
-        let pbZoneData = topojsonFeature(data.pbZones, data.pbZones.objects.pbZones);
         // Port ids of capturable ports
-        const portIds = portData.filter(port => !port.properties.nonCapturable).map(port => port.id);
-        pbZoneData = pbZoneData.features.filter(port => portIds.includes(port.id)).map(d => ({
-            type: "Feature",
-            id: d.id,
-            geometry: d.geometry
-        }));
-        let fortData = topojsonFeature(data.pbZones, data.pbZones.objects.forts);
-        fortData = fortData.features.map(d => ({
-            type: "Feature",
-            id: d.id,
-            geometry: d.geometry
-        }));
-        let towerData = topojsonFeature(data.pbZones, data.pbZones.objects.towers);
-        towerData = towerData.features.map(d => ({
-            type: "Feature",
-            id: d.id,
-            geometry: d.geometry
-        }));
-        pbZone = new PBZone(pbZoneData, fortData, towerData, ports);
+        let portIds = [];
 
-        shipData = JSON.parse(JSON.stringify(data.ships.shipData));
-        woodData = JSON.parse(JSON.stringify(data.woods));
-        moduleData = JSON.parse(JSON.stringify(data.modules));
+        function getFeature(object) {
+            return object.filter(port => portIds.includes(port.id)).map(d => ({
+                type: "Feature",
+                id: d.id,
+                geometry: d.geometry
+            }));
+        }
+
+        map = new NAMap();
+
+        const portData = topojsonFeature(data.ports, data.ports.objects.ports);
+        ports = new PortDisplay(portData.features, data.pb, serverName, map.margin.top, map.margin.right, map.minScale);
+
+        // Port ids of capturable ports
+        portIds = portData.features.filter(port => !port.properties.nonCapturable).map(port => port.id);
+
+        let pbCircles = topojsonFeature(data.pbZones, data.pbZones.objects.pbCircles);
+        pbCircles = getFeature(pbCircles.features);
+
+        let forts = topojsonFeature(data.pbZones, data.pbZones.objects.forts);
+        forts = getFeature(forts.features);
+
+        let towers = topojsonFeature(data.pbZones, data.pbZones.objects.towers);
+        towers = getFeature(towers.features);
+
+        let joinCircles = topojsonFeature(data.pbZones, data.pbZones.objects.joinCircles);
+        joinCircles = getFeature(joinCircles.features);
+
+        pbZone = new PBZone(pbCircles, forts, towers, joinCircles, ports);
+
+        const shipData = JSON.parse(JSON.stringify(data.ships.shipData));
+        shipCompare = new ShipCompare(shipData);
+
+        const woodData = JSON.parse(JSON.stringify(data.woods));
+        woodCompare = new WoodCompare(woodData);
+
+        const moduleData = JSON.parse(JSON.stringify(data.modules));
+        moduleList = new Module(moduleData);
+
+        const recipeData = JSON.parse(JSON.stringify(data.recipes.recipe));
+        recipeList = new Recipe(recipeData, moduleData);
+
+        const ingredientData = JSON.parse(JSON.stringify(data.recipes.ingredient));
+        ingredientList = new Ingredient(ingredientData, moduleData);
+
+        const buildingData = JSON.parse(JSON.stringify(data.buildings));
+        buildingList = new Building(buildingData);
+
+        teleport = new Teleport(map.coord.min, map.coord.max, ports);
+        portSelect = new PortSelect(map, ports, pbZone);
+        windPrediction = new WindPrediction(map.margin.left, map.margin.top);
+        f11 = new F11(map);
+        grid = new Grid(map);
+        course = new Course(map.rem);
 
         setup();
     }
@@ -614,7 +634,22 @@ export default function naDisplay(serverName) {
         const moduleJsonData = fetch("modules.json", { cache: cacheMode })
             .then(checkFetchStatus)
             .then(getJsonFromFetch);
-        Promise.all([naMapJsonData, pbJsonData, pbZonesJsonData, shipJsonData, woodJsonData, moduleJsonData])
+        const recipeJsonData = fetch("recipes.json", { cache: cacheMode })
+            .then(checkFetchStatus)
+            .then(getJsonFromFetch);
+        const buildingJsonData = fetch("buildings.json", { cache: cacheMode })
+            .then(checkFetchStatus)
+            .then(getJsonFromFetch);
+        Promise.all([
+            naMapJsonData,
+            pbJsonData,
+            pbZonesJsonData,
+            shipJsonData,
+            woodJsonData,
+            moduleJsonData,
+            recipeJsonData,
+            buildingJsonData
+        ])
             .then(values =>
                 init({
                     ports: values[0],
@@ -622,14 +657,16 @@ export default function naDisplay(serverName) {
                     pbZones: values[2],
                     ships: values[3],
                     woods: values[4],
-                    modules: values[5]
+                    modules: values[5],
+                    recipes: values[6],
+                    buildings: values[7]
                 })
             )
             .catch(putFetchError);
     }
 
     let cacheMode = "default";
-    const lastUpdateData = fetch("update.txt", { cache: cacheMode })
+    const lastUpdateData = fetch("update.txt", { cache: "reload" })
         .then(checkFetchStatus)
         .then(getTextFromFetch);
     Promise.all([lastUpdateData])
@@ -642,8 +679,16 @@ export default function naDisplay(serverName) {
                 serverDayStart = serverDayStart.subtract(1, "day");
             }
             const lastUpdate = moment(values[0], "YYYY-MM-DD H.mm");
-            // console.log(serverDayStart.format("dddd D MMMM YYYY H:mm"), lastUpdate.format("dddd D MMMM YYYY H:mm"));
-
+            /*
+            console.log(
+                "serverDayStart",
+                serverDayStart.format("dddd D MMMM H.mm"),
+                "lastUpdate",
+                lastUpdate.format("dddd D MMMM H.mm"),
+                "lastUpdate.isBefore(serverDayStart)",
+                lastUpdate.isBefore(serverDayStart, "hour")
+            );
+            */
             if (lastUpdate.isBefore(serverDayStart, "hour")) {
                 cacheMode = "reload";
             }

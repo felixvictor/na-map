@@ -5,7 +5,7 @@
 /* global d3 : false
  */
 
-import { formatFloat, getOrdinal, isEmpty } from "./util";
+import { formatInt, formatFloat, getOrdinal, isEmpty } from "./util";
 import { registerEvent } from "./analytics";
 
 const numSegments = 24,
@@ -85,11 +85,13 @@ class Ship {
     static getText(ship) {
         let text = '<table class="table table-sm table-striped small ship"><tbody>';
 
-        text += "<tr><td></td>";
-        text += `<td>${ship.battleRating}<br><span class="des">Battle rating</span></td>`;
-        text += `<td>${ship.guns}<br><span class="des">Cannons</span></td></tr>`;
+        text += `<tr><td>${ship.shipRating}</td>`;
+        text += `<td>${ship.battleRating}<br><span class="des">Battle rating</span>`;
+        text += `<br>${ship.upgradeXP}<br><span class="des">Total knowledge XP</span></td>`;
+        text += `<td>${ship.guns}<br><span class="des">Cannons</span>`;
+        text += `<br>${ship.hostilityScore}<br><span class="des">Hostility score</span></td></tr>`;
 
-        text += `<tr><td>${ship.decks} decks</td>`;
+        text += `<tr><td>${ship.decks} deck${ship.decks > 1 ? "s" : ""}</td>`;
         text += `<td colspan="2" class="gun-decks">${
             ship.cannonsPerDeck
         }<br><span class="des">Gun decks</span><br></td></tr>`;
@@ -99,8 +101,8 @@ class Ship {
         text += `<td>${ship.carroBroadside}<br><span class="des">Carronades</span></td></tr>`;
 
         text += "<tr><td>Chasers</td>";
-        text += `<td>${ship.gunsFront}<br><span class="des">Front</span></td>`;
-        text += `<td>${ship.gunsBack}<br><span class="des">Back</span></td></tr>`;
+        text += `<td>${ship.gunsFront}<br><span class="des">Bow</span></td>`;
+        text += `<td>${ship.gunsBack}<br><span class="des">Stern</span></td></tr>`;
 
         text += "<tr><td>Speed (knots)</td>";
         text += `<td>${ship.minSpeed}<br><span class="des">Minimum</span></td>`;
@@ -111,11 +113,11 @@ class Ship {
 
         text += "<tr><td>Armor</td>";
         text += `<td>${ship.sideArmor}<br><span class="des">Sides</span>`;
-        text += `<br>${ship.frontArmor}<br><span class="des">Front</span>`;
+        text += `<br>${ship.frontArmor}<br><span class="des">Bow</span>`;
         text += `<br>${ship.pump}<br><span class="des">Pump</span>`;
         text += `<br>${ship.sails}<br><span class="des">Sails</span></td>`;
-        text += `<td>${ship.structure}<br><span class="des">Structure</span>`;
-        text += `<br>${ship.backArmor}<br><span class="des">Back</span>`;
+        text += `<td>${ship.structure}<br><span class="des">Hull</span>`;
+        text += `<br>${ship.backArmor}<br><span class="des">Stern</span>`;
         text += `<br>${ship.rudder}<br><span class="des">Rudder</span></td></tr>`;
 
         text += "<tr><td>Crew</td>";
@@ -124,7 +126,7 @@ class Ship {
 
         text += "<tr><td>Hold</td>";
         text += `<td>${ship.maxWeight}<br><span class="des">Tons</span></td>`;
-        text += `<td>${ship.holdSize}<br><span class="des">Compartments</span></td></tr>`;
+        text += `<td>${ship.holdSize}<br><span class="des">Cargo slots</span></td></tr>`;
 
         text += "</tbody></table>";
         return text;
@@ -258,6 +260,7 @@ class ShipBase extends Ship {
 
     _printText() {
         const ship = {
+            shipRating: `${getOrdinal(this._shipData.class)} rate`,
             battleRating: this._shipData.battleRating,
             guns: this._shipData.guns,
             decks: this._shipData.decks,
@@ -281,7 +284,9 @@ class ShipBase extends Ship {
             minCrew: this._shipData.minCrewRequired,
             maxCrew: this._shipData.healthInfo.Crew,
             maxWeight: this._shipData.maxWeight,
-            holdSize: this._shipData.holdSize
+            holdSize: this._shipData.holdSize,
+            upgradeXP: formatInt(this._shipData.upgradeXP),
+            hostilityScore: this._shipData.hostilityScore
         };
 
         if (ship.gunsFront) {
@@ -390,12 +395,13 @@ class ShipComparison extends Ship {
         }
 
         const ship = {
+            shipRating: `${getOrdinal(this._shipCompareData.class)} rate`,
             battleRating: `${this._shipCompareData.battleRating}\u00a0${getDiff(
                 this._shipCompareData.battleRating,
                 this._shipBaseData.battleRating
             )}`,
             guns: `${this._shipCompareData.guns}\u00a0${getDiff(this._shipCompareData.guns, this._shipBaseData.guns)}`,
-            decks: `${this._shipCompareData.decks}\u00a0${getDiff(
+            decks: `${this._shipCompareData.decks} deck${this._shipCompareData.decks > 1 ? "s" : ""}\u00a0${getDiff(
                 this._shipCompareData.decks,
                 this._shipBaseData.decks
             )}`,
@@ -473,6 +479,14 @@ class ShipComparison extends Ship {
             holdSize: `${this._shipCompareData.holdSize}\u00a0${getDiff(
                 this._shipCompareData.holdSize,
                 this._shipBaseData.holdSize
+            )}`,
+            upgradeXP: `${formatInt(this._shipCompareData.upgradeXP)}\u00a0${getDiff(
+                this._shipCompareData.upgradeXP,
+                this._shipBaseData.upgradeXP
+            )}`,
+            hostilityScore: `${this._shipCompareData.hostilityScore}\u00a0${getDiff(
+                this._shipCompareData.hostilityScore,
+                this._shipBaseData.hostilityScore
             )}`
         };
 
