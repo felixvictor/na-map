@@ -667,7 +667,7 @@ export default function naDisplay(serverName) {
     }
 
     let cacheMode = "default";
-    const lastUpdateData = fetch("update.txt", { cache: cacheMode })
+    const lastUpdateData = fetch("update.txt", { cache: "reload" })
         .then(checkFetchStatus)
         .then(getTextFromFetch);
     Promise.all([lastUpdateData])
@@ -680,8 +680,16 @@ export default function naDisplay(serverName) {
                 serverDayStart = serverDayStart.subtract(1, "day");
             }
             const lastUpdate = moment(values[0], "YYYY-MM-DD H.mm");
-            // console.log(serverDayStart.format("dddd D MMMM YYYY H:mm"), lastUpdate.format("dddd D MMMM YYYY H:mm"));
-
+            /*
+            console.log(
+                "serverDayStart",
+                serverDayStart.format("dddd D MMMM H.mm"),
+                "lastUpdate",
+                lastUpdate.format("dddd D MMMM H.mm"),
+                "lastUpdate.isBefore(serverDayStart)",
+                lastUpdate.isBefore(serverDayStart, "hour")
+            );
+            */
             if (lastUpdate.isBefore(serverDayStart, "hour")) {
                 cacheMode = "reload";
             }
