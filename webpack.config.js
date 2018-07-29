@@ -175,6 +175,9 @@ const config = {
             filename: `${libraryName}.min.css`
         }),
         new webpack.ProvidePlugin({
+            $: "jquery",
+            jQuery: "jquery",
+            "window.jQuery": "jquery",
             moment: "moment",
             "window.moment": "moment",
             Popper: ["popper.js", "default"],
