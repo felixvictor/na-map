@@ -302,12 +302,15 @@ export default class PortSelect {
         const c = port.val().split(",");
 
         if (c[0] === "0") {
-            this._ports.setPortData(this._ports.portDataDefault);
+            this._ports.portData = this._ports.portDataDefault;
+            this._ports.showCurrentGood = false;
             this._ports.update();
         } else {
-            this._ports.setCurrentPort(port.data("id").toString(), +c[0], +c[1]);
+            const currentPort = { id: port.data("id").toString(), coord: { x: +c[0], y: +c[1] } };
+            this._ports.currentPort = currentPort;
             if (this._pbZone._showPBZones) {
                 this._pbZone.refresh();
+                this._ports.showCurrentGood = false;
                 this._ports.update();
             }
             this._map.goToPort();
@@ -336,8 +339,9 @@ export default class PortSelect {
                     return port;
                 });
 
-        this._ports.setShowRadiusSetting("off");
-        this._ports.setPortData(sourcePorts.concat(consumingPorts), true);
+        this._ports.showRadiusSetting = "off";
+        this._ports.portData = sourcePorts.concat(consumingPorts);
+        this._ports.showCurrentGood = true;
         this._ports.update();
     }
 
@@ -355,7 +359,8 @@ export default class PortSelect {
             portData = this._ports.portDataDefault;
         }
         // $("#propertyDropdown").dropdown("toggle");
-        this._ports.setPortData(portData);
+        this._ports.portData = portData;
+        this._ports.showCurrentGood = false;
         this._ports.update();
         this._setupClanSelect();
     }
@@ -376,7 +381,8 @@ export default class PortSelect {
             portData = this._ports.portDataDefault;
         }
         // $("#propertyDropdown").dropdown("toggle");
-        this._ports.setPortData(portData);
+        this._ports.portData = portData;
+        this._ports.showCurrentGood = false;
         this._ports.update();
     }
 
@@ -384,13 +390,15 @@ export default class PortSelect {
         const portData = this._ports.portDataDefault.filter(
             d => (depth === "shallow" ? d.properties.shallow : !d.properties.shallow)
         );
-        this._ports.setPortData(portData);
+        this._ports.portData = portData;
+        this._ports.showCurrentGood = false;
         this._ports.update();
     }
 
     _allSelected() {
         const portData = this._ports.portDataDefault.filter(d => d.properties.availableForAll);
-        this._ports.setPortData(portData);
+        this._ports.portData = portData;
+        this._ports.showCurrentGood = false;
         this._ports.update();
     }
 
@@ -398,13 +406,15 @@ export default class PortSelect {
         const portData = this._ports.portDataDefault.filter(
             d => d.properties.nonCapturable && d.properties.nation !== "FT"
         );
-        this._ports.setPortData(portData);
+        this._ports.portData = portData;
+        this._ports.showCurrentGood = false;
         this._ports.update();
     }
 
     _portSizeSelected(size) {
         const portData = this._ports.portDataDefault.filter(d => size === d.properties.portBattleType);
-        this._ports.setPortData(portData);
+        this._ports.portData = portData;
+        this._ports.showCurrentGood = false;
         this._ports.update();
     }
 
@@ -435,7 +445,8 @@ export default class PortSelect {
                 d.properties.nation !== "FT" &&
                 startTimes.has(d.properties.portBattleStartTime)
         );
-        this._ports.setPortData(portData);
+        this._ports.portData = portData;
+        this._ports.showCurrentGood = false;
         this._ports.update();
     }
 
@@ -447,7 +458,8 @@ export default class PortSelect {
             .forEach(port => portId.add(port.id));
         const portData = this._ports.portDataDefault.filter(d => portId.has(d.id));
 
-        this._ports.setPortData(portData);
+        this._ports.portData = portData;
+        this._ports.showCurrentGood = false;
         this._ports.update();
     }
 
@@ -516,7 +528,7 @@ export default class PortSelect {
             portData = this._ports.portDataDefault;
         }
         $("#propertyDropdown").dropdown("toggle");
-        this._ports.setPortData(portData);
+        this._ports.portData = portData;
         this._ports.update();
     }
 
