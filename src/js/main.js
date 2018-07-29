@@ -7,12 +7,12 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+import "bootstrap/js/dist/util";
 import "bootstrap/js/dist/button";
 import "bootstrap/js/dist/collapse";
 import "bootstrap/js/dist/dropdown";
 import "bootstrap/js/dist/modal";
 import "bootstrap/js/dist/tooltip";
-import "bootstrap/js/dist/util";
 
 import fontawesome from "@fortawesome/fontawesome";
 import { faCalendar, faCalendarCheck, faClock, faCopy } from "@fortawesome/fontawesome-free-regular";
@@ -28,7 +28,7 @@ import {
 import Cookies from "js-cookie";
 
 import naDisplay from "./na-display";
-import initAnalytics from "./analytics";
+import { initAnalytics, registerPage } from "./analytics";
 
 /**
  * @returns {void}
@@ -125,6 +125,7 @@ function main() {
 
     initAnalytics();
     setupListener();
+    registerPage("Homepage", "/");
     naDisplay(serverName);
 }
 
