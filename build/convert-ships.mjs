@@ -1,21 +1,12 @@
-import fs from "fs";
+import { readJson, saveJson } from "./common.mjs";
 
 const inBaseFilename = process.argv[2],
     outFilename = process.argv[3],
     date = process.argv[4];
 
-const APIItems = JSON.parse(fs.readFileSync(`${inBaseFilename}-ItemTemplates-${date}.json`, "utf8")),
+const APIItems = readJson(`${inBaseFilename}-ItemTemplates-${date}.json`),
     constA = 0.076752029372859,
     constB = 0.007759512279223;
-
-function saveJson(data) {
-    // eslint-disable-next-line consistent-return
-    fs.writeFile(outFilename, JSON.stringify(data), "utf8", err => {
-        if (err) {
-            return console.log(err);
-        }
-    });
-}
 
 // https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
 // eslint-disable-next-line no-extend-native,func-names
@@ -62,9 +53,8 @@ function convertShips() {
             maxSpeed: speedDegrees.reduce((a, b) => Math.max(a, b)),
             speedDegrees,
             maxTurningSpeed: ship.Specs.MaxTurningSpeed,
-            // captureType: ship.CaptureType,
-            upgradeXP: ship.OverrideTotalXpForUpgradeSlots
-            // hostilityScore: ship.HostilityScore
+            upgradeXP: ship.OverrideTotalXpForUpgradeSlots,
+            hostilityScore: ship.HostilityScore
         };
         // Delete mortar entry
         shipData.gunsPerDeck.pop();
@@ -76,11 +66,11 @@ function convertShips() {
             if (shipData.deckClassLimit[i]) {
                 shipData.guns += shipData.gunsPerDeck[i];
                 if (shipData.deckClassLimit[i][1]) {
-                    shipData.carroBroadside += shipData.gunsPerDeck[i] * shipData.deckClassLimit[i][1] / 2;
+                    shipData.carroBroadside += (shipData.gunsPerDeck[i] * shipData.deckClassLimit[i][1]) / 2;
                 } else {
-                    shipData.carroBroadside += shipData.gunsPerDeck[i] * shipData.deckClassLimit[i][0] / 2;
+                    shipData.carroBroadside += (shipData.gunsPerDeck[i] * shipData.deckClassLimit[i][0]) / 2;
                 }
-                shipData.cannonBroadside += shipData.gunsPerDeck[i] * shipData.deckClassLimit[i][0] / 2;
+                shipData.cannonBroadside += (shipData.gunsPerDeck[i] * shipData.deckClassLimit[i][0]) / 2;
             } else {
                 shipData.deckClassLimit.push(t);
             }
@@ -120,7 +110,7 @@ function convertShips() {
         return 0;
     });
 
-    saveJson(geoJson);
+    saveJson(outFilename, geoJson);
 }
 
 convertShips();
