@@ -73,8 +73,8 @@ export default class F11 {
             match = regex.exec(F11String);
 
         if (match && !Number.isNaN(+match[1]) && !Number.isNaN(+match[2])) {
-            const x = +match[1] * 1000,
-                z = +match[2] * 1000;
+            const x = +match[1] * -1000,
+                z = +match[2] * -1000;
             if (!Number.isNaN(Number(x)) && !Number.isNaN(Number(z))) {
                 this._goToF11(x, z);
             }

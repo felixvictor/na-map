@@ -5,7 +5,7 @@
 /* global d3 : false
  */
 
-import { formatSignPercent, getOrdinal } from "./util";
+import { chunkify, formatSignPercent, getOrdinal } from "./util";
 import { registerEvent } from "./analytics";
 
 export default class Module {
@@ -127,63 +127,16 @@ export default class Module {
      * @private
      */
     _getText(moduleType) {
-        /** Split array into n pieces
-         * {@link https://stackoverflow.com/questions/8188548/splitting-a-js-array-into-n-arrays}
-         * @param {Array} array Array to be split
-         * @param {Integer} n Number of splits
-         * @param {Boolean} balanced True if splits' lengths differ as less as possible
-         * @return {Array} Split arrays
-         */
-        function chunkify(array, n, balanced = true) {
-            if (n < 2) {
-                return [array];
-            }
-
-            const len = array.length,
-                out = [];
-            let i = 0,
-                size;
-
-            if (len % n === 0) {
-                size = Math.floor(len / n);
-                while (i < len) {
-                    out.push(array.slice(i, (i += size)));
-                }
-            } else if (balanced) {
-                while (i < len) {
-                    // eslint-disable-next-line no-param-reassign, no-plusplus
-                    size = Math.ceil((len - i) / n--);
-                    out.push(array.slice(i, (i += size)));
-                }
-            } else {
-                // eslint-disable-next-line no-param-reassign
-                n -= 1;
-                size = Math.floor(len / n);
-                if (len % size === 0) {
-                    size -= 1;
-                }
-                while (i < size * n) {
-                    out.push(array.slice(i, (i += size)));
-                }
-                out.push(array.slice(size * n));
-            }
-
-            return out;
-        }
-
         const columns = 3,
             rows = this._getRows(moduleType),
             splitRows = chunkify(rows, columns);
         let text = "";
         Array.from(Array(splitRows.length).keys()).forEach(column => {
             text += `<div class="col-md-${Math.floor(12 / splitRows.length)}">`;
-            text += '<div class="row modules">';
-            text += '<div class="col-sm-11">';
-            text += '<table class="table table-sm small mt-4"><thead>';
-            text += "<tr>";
+            text += '<table class="table table-sm small"><thead>';
             text += "<tr><th>Module</th><th>Modifier</th></tr></thead><tbody>";
             text += splitRows[column].join("");
-            text += "</tbody></table></div></div></div>";
+            text += "</tbody></table></div>";
         });
 
         return text;
@@ -206,7 +159,7 @@ export default class Module {
         // Add new module list
         d3.select(this._div)
             .append("div")
-            .classed("row", true);
+            .classed("row modules mt-4", true);
         $(this._div)
             .find("div")
             .append(this._getText(moduleType));
