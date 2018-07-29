@@ -5,7 +5,7 @@
 /* global d3 : false
  */
 
-import { formatFloat, getOrdinal, isEmpty } from "./util";
+import { formatInt, formatFloat, getOrdinal, isEmpty } from "./util";
 import { registerEvent } from "./analytics";
 
 const numSegments = 24,
@@ -86,8 +86,10 @@ class Ship {
         let text = '<table class="table table-sm table-striped small ship"><tbody>';
 
         text += `<tr><td>${ship.shipRating}</td>`;
-        text += `<td>${ship.battleRating}<br><span class="des">Battle rating</span></td>`;
-        text += `<td>${ship.guns}<br><span class="des">Cannons</span></td></tr>`;
+        text += `<td>${ship.battleRating}<br><span class="des">Battle rating</span>`;
+        text += `<br>${ship.upgradeXP}<br><span class="des">Total knowledge XP</span></td>`;
+        text += `<td>${ship.guns}<br><span class="des">Cannons</span>`;
+        text += `<br>${ship.hostilityScore}<br><span class="des">Hostility score</span></td></tr>`;
 
         text += `<tr><td>${ship.decks} deck${ship.decks > 1 ? "s" : ""}</td>`;
         text += `<td colspan="2" class="gun-decks">${
@@ -282,7 +284,9 @@ class ShipBase extends Ship {
             minCrew: this._shipData.minCrewRequired,
             maxCrew: this._shipData.healthInfo.Crew,
             maxWeight: this._shipData.maxWeight,
-            holdSize: this._shipData.holdSize
+            holdSize: this._shipData.holdSize,
+            upgradeXP: formatInt(this._shipData.upgradeXP),
+            hostilityScore: this._shipData.hostilityScore
         };
 
         if (ship.gunsFront) {
@@ -475,6 +479,14 @@ class ShipComparison extends Ship {
             holdSize: `${this._shipCompareData.holdSize}\u00a0${getDiff(
                 this._shipCompareData.holdSize,
                 this._shipBaseData.holdSize
+            )}`,
+            upgradeXP: `${formatInt(this._shipCompareData.upgradeXP)}\u00a0${getDiff(
+                this._shipCompareData.upgradeXP,
+                this._shipBaseData.upgradeXP
+            )}`,
+            hostilityScore: `${this._shipCompareData.hostilityScore}\u00a0${getDiff(
+                this._shipCompareData.hostilityScore,
+                this._shipBaseData.hostilityScore
             )}`
         };
 
