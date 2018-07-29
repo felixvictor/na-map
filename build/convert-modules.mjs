@@ -117,7 +117,7 @@ function convertModules() {
     modifiers.set("NONE HANDBOOK_ATTACK_BONUS", "Boarding attack");
     modifiers.set("NONE HANDBOOK_DEFENSE_BONUS", "Boarding defense");
     modifiers.set("NONE HANDBOOK_MORALE_BONUS", "Boarding morale");
-    modifiers.set("NONE HOLE_DECREASE_RATE,RAM_DECREASE_RATE", "Hole decrease rate, ram decrease rate");
+    modifiers.set("NONE HOLE_DECREASE_RATE,RAM_DECREASE_RATE", "Hole and ram decrease rate");
     modifiers.set("NONE LADDERS_MELEE_PENALTY_REDUCE", "Boarding melee");
     modifiers.set("NONE MARINES_FIREPOWER_MODIFIER", "Boarding firepower");
     modifiers.set("NONE MARINES_LEVEL", "Marines level");

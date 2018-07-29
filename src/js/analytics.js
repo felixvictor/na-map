@@ -1,5 +1,6 @@
 // analytics.js
 
+const GA_TRACKING_ID = "UA-109520372-1";
 window.dataLayer = window.dataLayer || [];
 
 /**
@@ -26,10 +27,25 @@ export function registerEvent(category, label) {
 }
 
 /**
+ * Register page
+ * @param {string} title Page title
+ * @param {string} path The path portion of location. This value must start with a slash (/) character.
+ * @return {void}
+ */
+export function registerPage(title, path) {
+    if (typeof window.google_tag_manager !== "undefined" && window.google_tag_manager.dataLayer.gtmLoad) {
+        gtag("config", GA_TRACKING_ID, {
+            page_title: title,
+            page_path: path
+        });
+    }
+}
+
+/**
  * Init google tag manager
  * @return {void}
  */
-export default function initAnalytics() {
+export function initAnalytics() {
     gtag("js", new Date());
-    gtag("config", "UA-109520372-1");
+    gtag("config", GA_TRACKING_ID);
 }
