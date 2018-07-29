@@ -4,13 +4,13 @@ const libraryName = "na-map";
 
 const webpack = require("webpack");
 const path = require("path");
-const PACKAGE = require("./package.json");
 const CopyPlugin = require("copy-webpack-plugin"),
     HtmlPlugin = require("html-webpack-plugin"),
     MiniCssExtractPlugin = require("mini-css-extract-plugin"),
     MinifyPlugin = require("babel-minify-webpack-plugin"),
     SitemapPlugin = require("sitemap-webpack-plugin").default,
     SriPlugin = require("webpack-subresource-integrity");
+const PACKAGE = require("./package.json");
 
 const sitemapPaths = ["/fonts/", "/icons", "/images"];
 
@@ -175,6 +175,9 @@ const config = {
             filename: `${libraryName}.min.css`
         }),
         new webpack.ProvidePlugin({
+            $: "jquery",
+            jQuery: "jquery",
+            "window.jQuery": "jquery",
             moment: "moment",
             "window.moment": "moment",
             Popper: ["popper.js", "default"],
