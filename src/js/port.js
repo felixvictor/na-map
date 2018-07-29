@@ -14,15 +14,19 @@ import { formatInt, formatSiInt, formatPercent, roundToThousands, degreesToRadia
 
 export default class PortDisplay {
     constructor(portData, pbData, serverName, topMargin, rightMargin, minScale) {
-        this.portDataDefault = portData;
+        this._portDataDefault = portData;
         this._serverName = serverName;
         this._topMargin = topMargin;
         this._rightMargin = rightMargin;
         this._minScale = minScale;
         this._scale = minScale;
 
+        this._showCurrentGood = false;
+        this._portData = portData;
+        this._pbData = pbData;
+
         // Shroud Cay
-        this.currentPort = { id: "366", coord: { x: 4396, y: 2494 } };
+        this._currentPort = { id: "366", coord: { x: 4396, y: 2494 } };
 
         this._zoomLevel = "initial";
         this._showPBZones = "all";
@@ -64,8 +68,6 @@ export default class PortDisplay {
          */
         this._showRadius = this._getShowRadiusSetting();
 
-        this.setPortData(portData);
-        this._setPBData(pbData);
         this._setupListener();
         this._setupSvg();
         this._setupCounties();
@@ -126,7 +128,7 @@ export default class PortDisplay {
         /*
         ** Automatic calculation of text position
         // https://stackoverflow.com/questions/40774697/how-to-group-an-array-of-objects-by-key
-        const counties = this.portDataDefault.filter(port => port.properties.county !== "").reduce(
+        const counties = this._portDataDefault.filter(port => port.properties.county !== "").reduce(
             (r, a) =>
                 Object.assign(r, {
                     [a.properties.county]: (r[a.properties.county] || []).concat([a.geometry.coordinates])
@@ -226,7 +228,7 @@ export default class PortDisplay {
         /*
         ** Automatic calculation of text position
         // https://stackoverflow.com/questions/40774697/how-to-group-an-array-of-objects-by-key
-        const regions = this.portDataDefault.filter(port => port.properties.region !== "").reduce(
+        const regions = this._portDataDefault.filter(port => port.properties.region !== "").reduce(
             (r, a) =>
                 Object.assign(r, {
                     [a.properties.region]: (r[a.properties.region] || []).concat([a.geometry.coordinates])
@@ -431,7 +433,7 @@ export default class PortDisplay {
     }
 
     _getText(id, portProperties) {
-        const pbData = this.pbData.ports.filter(port => port.id === id)[0],
+        const pbData = this._pbData.ports.filter(port => port.id === id)[0],
             portBattleLT = moment.utc(pbData.portBattle).local(),
             portBattleST = moment.utc(pbData.portBattle),
             port = {
@@ -596,9 +598,9 @@ export default class PortDisplay {
 
         const circleScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale),
             circleSize = roundToThousands(this._circleSize / circleScale),
-            data = this.portData.filter(port => this.pbData.ports.some(d => port.id === d.id)).map(port => {
+            data = this._portData.filter(port => this._pbData.ports.some(d => port.id === d.id)).map(port => {
                 // eslint-disable-next-line prefer-destructuring,no-param-reassign
-                port.properties.nation = this.pbData.ports.filter(d => port.id === d.id).map(d => d.nation)[0];
+                port.properties.nation = this._pbData.ports.filter(d => port.id === d.id).map(d => d.nation)[0];
                 return port;
             });
 
@@ -634,14 +636,15 @@ export default class PortDisplay {
             magicNumber = 5;
         let rMax = roundToThousands((this._circleSize / circleScale) * this._maxRadiusFactor),
             data = {},
-            rGreenZone;
+            rGreenZone = 0;
+
         if (this._showRadius === "tax" || this._showRadius === "net") {
-            data = this.portData.filter(d => !d.properties.nonCapturable);
+            data = this._portData.filter(d => !d.properties.nonCapturable);
         } else if (this._showRadius === "attack") {
-            const pbData = this.pbData.ports
+            const pbData = this._pbData.ports
                 .filter(d => d.attackHostility)
                 .map(d => ({ id: d.id, attackHostility: d.attackHostility }));
-            data = this.portData.filter(port => pbData.some(d => port.id === d.id)).map(port => {
+            data = this._portData.filter(port => pbData.some(d => port.id === d.id)).map(port => {
                 // eslint-disable-next-line prefer-destructuring,no-param-reassign
                 port.properties.attackHostility = pbData.filter(d => port.id === d.id).map(d => d.attackHostility)[0];
                 return port;
@@ -654,10 +657,10 @@ export default class PortDisplay {
                         [convertCoordX(-79696, 10642), convertCoordY(-79696, 10642)]
                     )
                 ) * magicNumber;
-            const pbData = this.pbData.ports.filter(d => d.nation !== "FT").map(d => d.id);
-            data = this.portData.filter(port => pbData.some(d => port.id === d) && port.properties.nonCapturable);
+            const pbData = this._pbData.ports.filter(d => d.nation !== "FT").map(d => d.id);
+            data = this._portData.filter(port => pbData.some(d => port.id === d) && port.properties.nonCapturable);
         } else if (this._showCurrentGood) {
-            data = this.portData;
+            data = this._portData;
             rMax /= 2;
         }
 
@@ -709,6 +712,40 @@ export default class PortDisplay {
         }
     }
 
+    _updateTextsX(d, circleSize) {
+        return this._zoomLevel === "pbZone" &&
+            (this._showPBZones === "all" || (this._showPBZones === "single" && d.id === this.currentPort.id))
+            ? d.geometry.coordinates[0] + Math.round(circleSize * 1.2 * Math.cos(degreesToRadians(d.properties.angle)))
+            : d.geometry.coordinates[0];
+    }
+
+    _updateTextsY(d, circleSize, fontSize) {
+        const deltaY = circleSize + fontSize * 1.2,
+            deltaY2 = circleSize * 2 + fontSize * 2;
+
+        if (this._zoomLevel !== "pbZone") {
+            return d.id === this._highlightId
+                ? d.geometry.coordinates[1] + deltaY2
+                : d.geometry.coordinates[1] + deltaY;
+        }
+        const dy = d.properties.angle > 90 && d.properties.angle < 270 ? fontSize : 0;
+        return this._showPBZones === "all" || (this._showPBZones === "single" && d.id === this.currentPort.id)
+            ? d.geometry.coordinates[1] +
+                  Math.round(circleSize * 1.2 * Math.sin(degreesToRadians(d.properties.angle))) +
+                  dy
+            : d.geometry.coordinates[1] + deltaY;
+    }
+
+    _updateTextsAnchor(d) {
+        if (
+            this._zoomLevel === "pbZone" &&
+            (this._showPBZones === "all" || (this._showPBZones === "single" && d.id === this.currentPort.id))
+        ) {
+            return d.properties.textAnchor;
+        }
+        return "middle";
+    }
+
     updateTexts() {
         if (this._zoomLevel === "initial") {
             this._gText.attr("display", "none");
@@ -721,7 +758,7 @@ export default class PortDisplay {
                 fontSize = roundToThousands(this._fontSize / fontScale);
 
             // Data join
-            const textUpdate = this._gText.selectAll("text").data(this.portData, d => d.id);
+            const textUpdate = this._gText.selectAll("text").data(this._portData, d => d.id);
 
             // Remove old text
             textUpdate.exit().remove();
@@ -735,57 +772,24 @@ export default class PortDisplay {
                 .append("text")
                 .text(d => d.properties.name);
 
-            const deltaY = circleSize + fontSize * 1.2,
-                deltaY2 = circleSize * 2 + fontSize * 2;
             // Apply to both old and new
             textUpdate
                 .merge(textEnter)
-                .attr(
-                    "x",
-                    d =>
-                        this._zoomLevel === "pbZone" &&
-                        (this._showPBZones === "all" ||
-                            (this._showPBZones === "single" && d.id === this.currentPort.id))
-                            ? d.geometry.coordinates[0] +
-                              Math.round(circleSize * 1.2 * Math.cos(degreesToRadians(d.properties.angle)))
-                            : d.geometry.coordinates[0]
-                )
-                .attr("y", d => {
-                    if (this._zoomLevel !== "pbZone") {
-                        return d.id === this._highlightId
-                            ? d.geometry.coordinates[1] + deltaY2
-                            : d.geometry.coordinates[1] + deltaY;
-                    }
-                    const dy = d.properties.angle > 90 && d.properties.angle < 270 ? fontSize : 0;
-                    return this._showPBZones === "all" ||
-                        (this._showPBZones === "single" && d.id === this.currentPort.id)
-                        ? d.geometry.coordinates[1] +
-                              Math.round(circleSize * 1.2 * Math.sin(degreesToRadians(d.properties.angle))) +
-                              dy
-                        : d.geometry.coordinates[1] + deltaY;
-                })
+                .attr("x", d => this._updateTextsX(d, circleSize))
+                .attr("y", d => this._updateTextsY(d, circleSize, fontSize))
                 .attr("font-size", d => (d.id === this._highlightId ? `${fontSize * 2}px` : `${fontSize}px`))
-                .attr("text-anchor", d => {
-                    if (
-                        this._zoomLevel === "pbZone" &&
-                        (this._showPBZones === "all" ||
-                            (this._showPBZones === "single" && d.id === this.currentPort.id))
-                    ) {
-                        return d.properties.textAnchor;
-                    }
-                    return "middle";
-                });
+                .attr("text-anchor", d => this._updateTextsAnchor(d));
         }
     }
 
     _updateSummary() {
-        const numberPorts = Object.keys(this.portData).length;
+        const numberPorts = Object.keys(this._portData).length;
         let taxTotal = 0,
             netTotal = 0;
 
         if (numberPorts) {
-            taxTotal = this.portData.map(d => d.properties.taxIncome).reduce((a, b) => a + b);
-            netTotal = this.portData.map(d => d.properties.netIncome).reduce((a, b) => a + b);
+            taxTotal = this._portData.map(d => d.properties.taxIncome).reduce((a, b) => a + b);
+            netTotal = this._portData.map(d => d.properties.netIncome).reduce((a, b) => a + b);
         }
 
         this._portSummaryTextNumPorts.text(`${numberPorts}`);
@@ -885,35 +889,58 @@ export default class PortDisplay {
         this._updateRegions();
     }
 
-    setHighlightId(highlightId) {
+    set highlightId(highlightId) {
         this._highlightId = highlightId;
     }
 
-    setPortData(portData, showGood = false) {
-        if (showGood) {
-            this._showCurrentGood = true;
-        } else {
-            this._showCurrentGood = false;
-        }
-        this.portData = portData;
+    set portDataDefault(portDataDefault) {
+        this._portDataDefault = portDataDefault;
     }
 
-    _setPBData(pbData) {
-        this.pbData = pbData;
+    get portDataDefault() {
+        return this._portDataDefault;
     }
 
-    setShowRadiusSetting(showRadius) {
+    set portData(portData) {
+        this._portData = portData;
+    }
+
+    get portData() {
+        return this._portData;
+    }
+
+    set pbData(pbData) {
+        this._pbData = pbData;
+    }
+
+    get pbData() {
+        return this._pbData;
+    }
+
+    set showCurrentGood(showCurrentGood) {
+        this._showCurrentGood = showCurrentGood;
+    }
+
+    set showRadiusSetting(showRadius) {
         this._showRadius = showRadius;
         $(`#show-radius-${showRadius}`).prop("checked", true);
         this._storeShowRadiusSetting();
     }
 
-    setCurrentPort(id, x, y) {
-        this.currentPort = { id, coord: { x, y } };
+    set currentPort(currentPort) {
+        this._currentPort = currentPort;
     }
 
-    setZoomLevel(zoomLevel) {
+    get currentPort() {
+        return this._currentPort;
+    }
+
+    set zoomLevel(zoomLevel) {
         this._zoomLevel = zoomLevel;
+    }
+
+    get zoomLevel() {
+        return this._zoomLevel;
     }
 
     transform(transform) {
@@ -921,7 +948,7 @@ export default class PortDisplay {
     }
 
     clearMap(scale) {
-        this.portData = this.portDataDefault;
+        this._portData = this._portDataDefault;
         this._showCurrentGood = false;
         this.update(scale);
     }
