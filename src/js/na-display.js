@@ -16,9 +16,6 @@ import moment from "moment";
 import "moment/locale/en-gb";
 import Cookies from "js-cookie";
 
-import "bootstrap/js/dist/tooltip";
-import "bootstrap/js/dist/util";
-
 import { defaultFontSize } from "./common";
 import {
     nearestPow2,
@@ -613,6 +610,7 @@ export default function naDisplay(serverName) {
         course = new Course(map.rem);
 
         setup();
+        f11.checkF11Coord();
     }
 
     function readData(cacheMode) {
