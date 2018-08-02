@@ -25,6 +25,8 @@ import {
     faTimes,
     faTrash
 } from "@fortawesome/fontawesome-free-solid";
+import moment from "moment";
+import "moment/locale/en-gb";
 import Cookies from "js-cookie";
 
 import { initAnalytics, registerPage } from "./analytics";
