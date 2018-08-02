@@ -176,12 +176,6 @@ export default class Map {
         this._showLayer = this._getShowLayerSetting();
 
         this._readData(this._getCacheMode());
-        this._setupSvg();
-        this._setupListener();
-
-        this._init();
-        this._ports.clearMap(this._minScale);
-        this._f11.checkF11Coord();
     }
 
     _getCacheMode() {
@@ -218,6 +212,7 @@ export default class Map {
     }
 
     _assignData(data) {
+        console.log("execute this._assignData");
         // Port ids of capturable ports
         let portIds = [];
 
@@ -238,7 +233,7 @@ export default class Map {
             this._margin.right,
             this._minScale
         );
-
+        console.log(this._ports);
         // Port ids of capturable ports
         portIds = portData.features.filter(port => !port.properties.nonCapturable).map(port => port.id);
 
@@ -276,7 +271,7 @@ export default class Map {
 
         this._teleport = new Teleport(this._coord.min, this._coord.max, this._ports);
         this._portSelect = new PortSelect(this, this._ports, this._pbZone);
-        this._windPrediction = new WindPrediction(this._margin.left, this._margin.top);
+        this._windPrediction = new WindPrediction(this.margin.left, this.margin.top);
         this._f11 = new F11(this);
         this._grid = new Grid(this);
         this._course = new Course(this._rem);
@@ -317,7 +312,7 @@ export default class Map {
             recipeJsonData,
             buildingJsonData
         ])
-            .then(values =>
+            .then(values => {
                 this._assignData({
                     ports: values[0],
                     pb: values[1],
@@ -327,8 +322,9 @@ export default class Map {
                     modules: values[5],
                     recipes: values[6],
                     buildings: values[7]
-                })
-            )
+                });
+                this._init();
+            })
             .catch(putFetchError);
     }
 
@@ -657,9 +653,18 @@ export default class Map {
     }
 
     _init() {
+
+        this._setupSvg();
+        this._setupListener();
+
+
         this._setZoomLevel("initial");
         this._initialZoomAndPan();
         this._refreshLayer();
+
+        this._ports.clearMap(this._minScale);
+        this._f11.checkF11Coord();
+
     }
 
     zoomAndPan(x, y, scale) {
