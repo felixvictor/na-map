@@ -27,8 +27,9 @@ import {
 } from "@fortawesome/fontawesome-free-solid";
 import Cookies from "js-cookie";
 
-import naDisplay from "./na-display";
 import { initAnalytics, registerPage } from "./analytics";
+
+import Map from "./map";
 
 /**
  * @returns {void}
@@ -124,9 +125,16 @@ function main() {
     );
 
     initAnalytics();
-    setupListener();
     registerPage("Homepage", "/");
-    naDisplay(serverName);
+
+    // Set cookies defaults (expiry 365 days)
+    Cookies.defaults = {
+        expires: 365
+    };
+    moment.locale("en-gb");
+
+    setupListener();
+    const map = new Map(serverName);
 }
 
 main();
