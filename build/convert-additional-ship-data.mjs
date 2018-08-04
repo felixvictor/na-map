@@ -1,7 +1,8 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import * as fs from "fs";
+import xml2Json from "xml2json";
 
-import { saveJson } from "./common.mjs";
+import { readTextFile, saveJson } from "./common.mjs";
 
 const inDir = process.argv[2],
     outFilename = process.argv[3];
@@ -22,63 +23,63 @@ shipData.shipData.forEach(ship => {
 */
 
     const shipNames = new Map([
-        ["Agamemnon", 694],
-        ["BasicCutter", 413],
-        ["BasicLynx", 275],
-        ["BellePoule", 264],
-        ["Bellona", 265],
-        ["Bellona74", 359],
-        ["Brig", 266],
-        ["BrigMR", 267],
-        ["Bucentaure", 268],
-        ["Cerberus", 269],
-        ["Christian", 1664],
-        ["Constitution", 270],
-        ["Constitution2", 1674],
-        ["Cutter", 271],
-        ["Diana", 1665],
-        ["Endymion", 768],
-        ["Essex", 272],
-        ["Frigate", 273],
-        ["GrosVentre", 396],
-        ["GrosVentrePirate", 1561],
-        ["GunBoat", 695],
-        ["Hamburg", 970],
-        ["Hercules", 1675],
-        ["Hermione", 592],
-        ["Indefatiable", 787],
-        ["Indiaman", 425],
-        ["Ingermanland", 395],
-        ["Lhermione", 986],
-        ["Lynx", 274],
-        ["Mercury", 276],
-        ["NavyBrig", 277],
-        ["Niagara", 278],
-        ["Ocean", 650],
-        ["Pandora", 1020],
-        ["Pavel", 279],
-        ["Pickle", 280],
-        ["PirateFrigate", 281],
-        ["PrincedeNeufchatel", 1125],
-        ["Privateer", 282],
-        ["Rattlesnake", 283],
-        ["RattlesnakeHeavy", 284],
-        ["Renommee", 285],
-        ["Requin", 1676],
-        ["RookieBrig", 1535],
-        ["RookieSnow", 1536],
-        ["Santisima", 286],
-        ["Snow", 287],
-        ["Surprise", 288],
-        ["TradersBrig", 289],
-        ["TradersCutter", 290],
-        ["TradersLynx", 291],
-        ["TradersSnow", 292],
-        ["Trincomalee", 293],
-        ["Victory", 294],
-        ["Wasa", 1021],
-        ["Yacht", 295],
-        ["YachtSilver", 393]
+        ["agamemnon", 694],
+        ["basiccutter", 413],
+        ["basiclynx", 275],
+        ["bellepoule", 264],
+        ["bellona", 265],
+        ["bellona74", 359],
+        ["brig", 266],
+        ["brigmr", 267],
+        ["bucentaure", 268],
+        ["cerberus", 269],
+        ["christian", 1664],
+        ["constitution", 270],
+        ["constitution2", 1674],
+        ["cutter", 271],
+        ["diana", 1665],
+        ["endymion", 768],
+        ["essex", 272],
+        ["frigate", 273],
+        ["grosventre", 396],
+        ["grosventrepirate", 1561],
+        ["gunboat", 695],
+        ["hamburg", 970],
+        ["hercules", 1675],
+        ["hermione", 592],
+        ["indefatiable", 787],
+        ["indiaman", 425],
+        ["ingermanland", 395],
+        ["lhermione", 986],
+        ["lynx", 274],
+        ["mercury", 276],
+        ["navybrig", 277],
+        ["niagara", 278],
+        ["ocean", 650],
+        ["pandora", 1020],
+        ["pavel", 279],
+        ["pickle", 280],
+        ["piratefrigate", 281],
+        ["princedeneufchatel", 1125],
+        ["privateer", 282],
+        ["rattlesnake", 283],
+        ["rattlesnakeheavy", 284],
+        ["renommee", 285],
+        ["requin", 1676],
+        ["rookiebrig", 1535],
+        ["rookiesnow", 1536],
+        ["santisima", 286],
+        ["snow", 287],
+        ["surprise", 288],
+        ["tradersbrig", 289],
+        ["traderscutter", 290],
+        ["traderslynx", 291],
+        ["traderssnow", 292],
+        ["trincomalee", 293],
+        ["victory", 294],
+        ["wasa", 1021],
+        ["yacht", 295],
+        ["yachtsilver", 393]
     ]);
     const fileNames = new Set();
     const getFileNames = dir => {
@@ -93,7 +94,40 @@ shipData.shipData.forEach(ship => {
     const ships = {};
     ships.shipData = [];
 
-    getFileNames(inDir);
+     getFileNames(inDir);
+
+    const data = [
+        {
+            ext: "f armor",
+            elements: new Map([
+                ["ARMOR_FRONT_HP", "ARMOR_FRONT_HP"],
+                ["ARMOR_THICKNESS", "ARMOR_THICKNESS"],
+                ["MODULE_BASE_HP", "MODULE_BASE_HP"]
+            ])
+        },
+        {
+            ext: "sail",
+            elements: new Map([
+                ["SAILING_CREW_REQUIRED", "SAILING_CREW_REQUIRED"],
+                ["MODULE_BASE_HP", "MODULE_BASE_HP"],
+                ["MAST_THICKNESS", "MAST_THICKNESS"]
+            ])
+        }
+    ];
+    Array.from(fileNames).forEach(baseFileName => {
+        const id = shipNames.get(baseFileName);
+        data.forEach(file => {
+            const fileName = `${inDir}/${baseFileName} ${file.ext}.xml`,
+                xmlContent = readTextFile(fileName),
+                ship = xml2Json.toJson(xmlContent, { object: true });
+            ship.ModuleTemplate.Attributes.Pair.forEach(pair => {
+                // console.log(ship.ModuleTemplate.Attributes.Pair);
+                if (file.elements.has(pair.Key)) {
+                    console.log(baseFileName, id, file.elements.get(pair.Key), +pair.Value.Value);
+                }
+            });
+        });
+    });
 
     saveJson(outFilename, ships);
 }
