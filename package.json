@@ -56,7 +56,8 @@
         "url-loader": "^1.0.1",
         "webpack": "^4.16.3",
         "webpack-cli": "^3.1.0",
-        "webpack-subresource-integrity": "^1.1.0-rc.4"
+        "webpack-subresource-integrity": "^1.1.0-rc.4",
+        "xml2json": "^0.11.2"
     },
     "dependencies": {
         "@fortawesome/fontawesome": "^1.1.2",
@@ -94,7 +95,9 @@
         "deploy-test2": "yarn run change && yarn run deploy-netlify-test2",
         "jsdoc": "documentation build src/js/**.js -f html -o docs",
         "js-lint": "eslint -c .eslintrc.json src/js",
-        "get-additional-ship-data": "cp -u /mnt/Modules.zip build/; unzip -u build/Modules.zip -d build/; node --experimental-modules --no-warnings build/convert-additional-ship-data.mjs build/Modules src/ships-additional.json",
+        "get-modules": "cp -u /mnt/Modules.zip build/ && unzip -u build/Modules.zip -d build/ && yarn run lowercase",
+        "get-additional-ship-data": "node --experimental-modules --no-warnings build/convert-additional-ship-data.mjs build/Modules src/ships-additional.json",
+        "lowercase": "cd build/Modules/; for FILE in *.xml; do LOWER=$(echo \"${FILE}\" | tr \"[:upper:]\" \"[:lower:]\"); if [ \"${LOWER}\" != \"${FILE}\" ]; then mv \"${FILE}\" \"${LOWER}\"; fi; done",
         "make-excel": "node --experimental-modules --no-warnings build/create-xlsx.mjs src/ships.json src/eu1.json src/port-battle.xlsx",
         "make-tiles": "cp /mnt/na-map.tif src/images/map.tif && rm -rf src/images/map/ && node --experimental-modules build/make-tiles.mjs src/images/map.tif && rm src/images/map.tif",
         "prettier": "prettier --tab-width 4 --print-width 120 --write .eslintrc.json package.json *.js src/js/*.json src/scss/*.scss",
