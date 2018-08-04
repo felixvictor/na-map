@@ -2,7 +2,7 @@
 import * as fs from "fs";
 import xml2Json from "xml2json";
 
-import { readTextFile, saveJson } from "./common.mjs";
+import { readJson, readTextFile, saveJson } from "./common.mjs";
 
 const inDir = process.argv[2],
     outFilename = process.argv[3];
@@ -90,41 +90,131 @@ shipData.shipData.forEach(ship => {
             }
         });
     };
+    const ships = readJson("src/ships.json");
 
-    const ships = {};
-    ships.shipData = [];
-
-     getFileNames(inDir);
+    getFileNames(inDir);
 
     const data = [
         {
+            ext: "b armor",
+            elements: new Map([
+                ["ARMOR_REAR_HP", "backHP"],
+                ["ARMOR_THICKNESS", "backThickness"],
+                ["MODULE_BASE_HP", "backBaseHP"]
+            ])
+        },
+        {
             ext: "f armor",
             elements: new Map([
-                ["ARMOR_FRONT_HP", "ARMOR_FRONT_HP"],
-                ["ARMOR_THICKNESS", "ARMOR_THICKNESS"],
-                ["MODULE_BASE_HP", "MODULE_BASE_HP"]
+                ["ARMOR_FRONT_HP", "frontHP"],
+                ["ARMOR_THICKNESS", "frontThickness"],
+                ["MODULE_BASE_HP", "frontBaseHP"]
+            ])
+        },
+        {
+            ext: "l armor",
+            elements: new Map([
+                ["ARMOR_LEFT_HP", "leftHP"],
+                ["ARMOR_THICKNESS", "leftThickness"],
+                ["MODULE_BASE_HP", "leftBaseHP"]
+            ])
+        },
+        {
+            ext: "r armor",
+            elements: new Map([
+                ["ARMOR_RIGHT_HP", "rightHP"],
+                ["ARMOR_THICKNESS", "rightThickness"],
+                ["MODULE_BASE_HP", "rightBaseHP"]
+            ])
+        },
+        {
+            ext: "hull",
+            elements: new Map([
+                // ["FIRE_INCREASE_RATE", "FIRE_INCREASE_RATE"],
+                ["FIRE_SPREAD_DISTANCE", "FIRE_SPREAD_DISTANCE"],
+                // ["FIREZONE_HORIZONTAL_ROTATION_SPEED", "FIREZONE_HORIZONTAL_ROTATION_SPEED"],
+                ["FIREZONE_HORIZONTAL_WIDTH", "FIREZONE_HORIZONTAL_WIDTH"],
+                // ["FIREZONE_MAX_HORIZONTAL_ANGLE", "FIREZONE_MAX_HORIZONTAL_ANGLE"],
+                // ["HIT_PROBABILITY", "HIT_PROBABILITY"],
+                ["MODULE_BASE_HP", "hullBaseHP"],
+                ["SHIP_PHYSICS_ACC_COEF", "SHIP_PHYSICS_ACC_COEF"],
+                ["SHIP_PHYSICS_DEC_COEF", "SHIP_PHYSICS_DEC_COEF"],
+                ["SHIP_PHYSICS_DEC_COEF", "SHIP_PHYSICS_DEC_COEF"],
+                // ["SHIP_RHEAS_DRIFT", "SHIP_RHEAS_DRIFT"],
+                ["SHIP_ROLL_ANGLE_AIMING_MODIFIER", "SHIP_ROLL_ANGLE_AIMING_MODIFIER"],
+                ["SHIP_SPEED_DRIFT_MODIFIER", "SHIP_SPEED_DRIFT_MODIFIER"],
+                // ["SHIP_SPEED_YARD_POWER_MODIFIER", "SHIP_SPEED_YARD_POWER_MODIFIER"],
+                ["SHIP_STAYSAILS_DRIFT", "SHIP_STAYSAILS_DRIFT"],
+                ["SHIP_STRUCTURE_LEAKS_PER_SECOND", "SHIP_STRUCTURE_LEAKS_PER_SECOND"],
+                ["SHIP_TURNING_ACCELERATION_TIME", "SHIP_TURNING_ACCELERATION_TIME"],
+                ["SHIP_TURNING_ACCELERATION_TIME_RHEAS", "SHIP_TURNING_ACCELERATION_TIME_RHEAS"],
+                ["SHIP_WATERLINE_HEIGHT", "SHIP_WATERLINE_HEIGHT"]
+            ])
+        },
+        {
+            ext: "mast",
+            elements: new Map([
+                // ["HIT_PROBABILITY", "HIT_PROBABILITY"],
+                ["MAST_BOTTOM_SECTION_HP", "MAST_BOTTOM_SECTION_HP"],
+                ["MAST_MIDDLE_SECTION_HP", "MAST_MIDDLE_SECTION_HP"],
+                ["MAST_TOP_SECTION_HP", "MAST_TOP_SECTION_HP"]
+            ])
+        },
+        {
+            ext: "rudder",
+            elements: new Map([
+                ["ARMOR_THICKNESS", "rudderThickness"],
+                // ["HIT_PROBABILITY", "HIT_PROBABILITY"],
+                ["MAST_THICKNESS", "mastThickness"],
+                ["MODULE_BASE_HP", "rudderBaseHP"],
+                // ["REPAIR_MODULE_TIME", "REPAIR_MODULE_TIME"],
+                ["RUDDER_HALFTURN_TIME", "RUDDER_HALFTURN_TIME"],
+                ["SHIP_TURNING_SPEED", "SHIP_TURNING_SPEED"]
             ])
         },
         {
             ext: "sail",
             elements: new Map([
-                ["SAILING_CREW_REQUIRED", "SAILING_CREW_REQUIRED"],
-                ["MODULE_BASE_HP", "MODULE_BASE_HP"],
-                ["MAST_THICKNESS", "MAST_THICKNESS"]
+                // ["EXPLOSION_DAMAGE_ABSORB_MULTIPLIER", "EXPLOSION_DAMAGE_ABSORB_MULTIPLIER"],
+                // ["HIT_PROBABILITY", "HIT_PROBABILITY"],
+                // ["MAST_CRIT_PROBABILITY", "MAST_CRIT_PROBABILITY"],
+                ["MAST_THICKNESS", "mastThickness"],
+                ["MODULE_BASE_HP", "sailBaseHP"],
+                // ["REPAIR_MODULE_TIME", "REPAIR_MODULE_TIME"],
+                // ["RHEA_TURN_SPEED", "RHEA_TURN_SPEED"],
+                ["SAIL_CRIT_PROBABILITY", "SAIL_CRIT_PROBABILITY"],
+                ["SAIL_RISING_SPEED", "SAIL_RISING_SPEED"],
+                ["SAILING_CREW_REQUIRED", "sailingCrew"],
+                ["SHIP_MAX_SPEED", "SHIP_MAX_SPEED"],
+                ["SPANKER_TURN_SPEED", "SPANKER_TURN_SPEED"]
+            ])
+        },
+
+        {
+            ext: "structure",
+            elements: new Map([
+                // ["EXPLOSION_DAMAGE_ABSORB_MULTIPLIER", "EXPLOSION_DAMAGE_ABSORB_MULTIPLIER"],
+                ["MODULE_BASE_HP", "MODULE_BASE_HP"]
+                // ["REPAIR_MODULE_TIME", "REPAIR_MODULE_TIME"]
             ])
         }
     ];
     Array.from(fileNames).forEach(baseFileName => {
         const id = shipNames.get(baseFileName);
         data.forEach(file => {
-            const fileName = `${inDir}/${baseFileName} ${file.ext}.xml`,
+            const addData = {},
+                fileName = `${inDir}/${baseFileName} ${file.ext}.xml`,
                 xmlContent = readTextFile(fileName),
-                ship = xml2Json.toJson(xmlContent, { object: true });
-            ship.ModuleTemplate.Attributes.Pair.forEach(pair => {
+                shipData = xml2Json.toJson(xmlContent, { object: true });
+            shipData.ModuleTemplate.Attributes.Pair.forEach(pair => {
                 // console.log(ship.ModuleTemplate.Attributes.Pair);
                 if (file.elements.has(pair.Key)) {
-                    console.log(baseFileName, id, file.elements.get(pair.Key), +pair.Value.Value);
+                    // console.log(baseFileName, id, file.elements.get(pair.Key), +pair.Value.Value);
+                    addData[file.elements.get(pair.Key)] = +pair.Value.Value;
                 }
+            });
+            ships.shipData.filter(ship => ship.id === id).forEach(ship => {
+                ship[file.ext] = addData;
             });
         });
     });
