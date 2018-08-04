@@ -58,25 +58,25 @@ export default class Map {
          * Font size in px
          * @type {Number}
          */
-        this.rem = defaultFontSize;
+        this._rem = defaultFontSize;
 
         /**
          * Left padding for brand icon
          * @type {Number}
          */
-        this._navbarBrandPaddingLeft = Math.floor(1.618 * this.rem); // equals 1.618rem
+        this._navbarBrandPaddingLeft = Math.floor(1.618 * this._rem); // equals 1.618rem
 
         /**
          * Left padding for brand icon
          * @type {Number}
          */
-        this.xGridBackgroundHeight = Math.floor(3 * this.rem);
+        this._xGridBackgroundHeight = Math.floor(3 * this._rem);
 
         /**
          * Left padding for brand icon
          * @type {Number}
          */
-        this.yGridBackgroundWidth = Math.floor(4 * this.rem);
+        this._yGridBackgroundWidth = Math.floor(4 * this._rem);
 
         /**
          * Margins of the map svg
@@ -86,7 +86,7 @@ export default class Map {
          * @property {Number} bottom - Bottom margin
          * @property {Number} left - Left margin
          */
-        this.margin = {
+        this._margin = {
             top: Math.floor($(".navbar").height() + this._navbarBrandPaddingLeft),
             right: this._navbarBrandPaddingLeft,
             bottom: this._navbarBrandPaddingLeft,
@@ -99,7 +99,7 @@ export default class Map {
          * @property {Number} min - Minimum world coordinate
          * @property {Number} max - Maximum world coordinate
          */
-        this.coord = {
+        this._coord = {
             min: 0,
             max: 8192
         };
@@ -109,14 +109,14 @@ export default class Map {
          * @type {Number}
          */
         // eslint-disable-next-line no-restricted-globals
-        this._width = Math.floor(top.innerWidth - this.margin.left - this.margin.right);
+        this._width = Math.floor(top.innerWidth - this._margin.left - this._margin.right);
 
         /**
          * Height of map svg (screen coordinates)
          * @type {Number}
          */
         // eslint-disable-next-line no-restricted-globals
-        this._height = Math.floor(top.innerHeight - this.margin.top - this.margin.bottom);
+        this._height = Math.floor(top.innerHeight - this._margin.top - this._margin.bottom);
 
         this._tileSize = 256;
         this._maxScale = 2 ** 3; // power of 2
@@ -125,13 +125,13 @@ export default class Map {
         this._PBZoneZoomThreshold = 1.5;
         this._labelZoomThreshold = 0.5;
 
-        this.minScale = nearestPow2(Math.min(this._width / this.coord.max, this._height / this.coord.max));
+        this._minScale = nearestPow2(Math.min(this._width / this._coord.max, this._height / this._coord.max));
 
         /**
          * Current map scale
          * @type {Number}
          */
-        this.currentScale = this.minScale;
+        this._currentScale = this._minScale;
 
         /**
          * DoubleClickAction cookie name
@@ -152,7 +152,7 @@ export default class Map {
          * @type {string}
          * @private
          */
-        this._doubleClickAction = this._getDoubleClickActionSetting();
+        this._doubleClickAction = this._getDoubleClickAction();
 
         /**
          * showLayer cookie name
@@ -173,12 +173,32 @@ export default class Map {
          * @type {string}
          * @private
          */
-        this._showLayer = this._getShowLayerSetting();
+        this._showLayer = this._getShowLayer();
 
+        this._setupSvg();
+        this._setupListener();
+        this._setupProps();
         this._readData(this._getCacheMode());
     }
 
+    _getDoubleClickAction() {
+        let r = Cookies.get(this.doubleClickActionCookieName);
+        // Use default value if cookie is not stored
+        r = typeof r !== "undefined" ? r : this.doubleClickActionDefault;
+        console.log("_getDoubleClickAction", r);
+        return r;
+    }
+
+    _getShowLayer() {
+        let r = Cookies.get(this.showLayerCookieName);
+        // Use default value if cookie is not stored
+        r = typeof r !== "undefined" ? r : this.showLayerDefault;
+        console.log("_getShowLayer", r);
+        return r;
+    }
+
     _getCacheMode() {
+        console.log("     _getCacheMode");
         let cacheMode = "default";
         const lastUpdateData = fetch("update.txt", { cache: "reload" })
             .then(checkFetchStatus)
@@ -212,7 +232,6 @@ export default class Map {
     }
 
     _assignData(data) {
-        console.log("execute this._assignData");
         // Port ids of capturable ports
         let portIds = [];
 
@@ -228,12 +247,12 @@ export default class Map {
         this._ports = new PortDisplay(
             portData.features,
             data.pb,
-            this._serverName,
-            this._margin.top,
-            this._margin.right,
-            this._minScale
+            this.serverName,
+            this.margin.top,
+            this.margin.right,
+            this.minScale
         );
-        console.log(this._ports);
+
         // Port ids of capturable ports
         portIds = portData.features.filter(port => !port.properties.nonCapturable).map(port => port.id);
 
@@ -269,19 +288,20 @@ export default class Map {
         const buildingData = JSON.parse(JSON.stringify(data.buildings));
         this._buildingList = new Building(buildingData);
 
-        this._teleport = new Teleport(this._coord.min, this._coord.max, this._ports);
+        this._teleport = new Teleport(this.coord.min, this.coord.max, this._ports);
         this._portSelect = new PortSelect(this, this._ports, this._pbZone);
         this._windPrediction = new WindPrediction(this.margin.left, this.margin.top);
         this._f11 = new F11(this);
         this._grid = new Grid(this);
-        this._course = new Course(this._rem);
+        this._course = new Course(this.rem);
     }
 
     _readData(cacheMode) {
-        const naMapJsonData = fetch(`${this._serverName}.json`, { cache: cacheMode })
+        console.log("_readData");
+        const naMapJsonData = fetch(`${this.serverName}.json`, { cache: cacheMode })
             .then(checkFetchStatus)
             .then(getJsonFromFetch);
-        const pbJsonData = fetch(`${this._serverName}-pb.json`, { cache: cacheMode })
+        const pbJsonData = fetch(`${this.serverName}-pb.json`, { cache: cacheMode })
             .then(checkFetchStatus)
             .then(getJsonFromFetch);
         const pbZonesJsonData = fetch("pb.json", { cache: cacheMode })
@@ -329,13 +349,14 @@ export default class Map {
     }
 
     _setupListener() {
+        console.log("_setupListener");
         function stopProp() {
             if (d3.event.defaultPrevented) {
                 d3.event.stopPropagation();
             }
         }
 
-        this._svg
+        this.svg
             .on("dblclick.zoom", null)
             .on("click", stopProp, true)
             .on("dblclick", (d, i, nodes) => this._doDoubleClickAction(nodes[i]));
@@ -364,10 +385,11 @@ export default class Map {
     }
 
     _setupSvg() {
+        console.log("_setupSvg");
         // noinspection JSSuspiciousNameCombination
-        this._zoom = d3
+        this.zoom = d3
             .zoom()
-            .scaleExtent([this.minScale, this._maxScale])
+            .scaleExtent([this.minScale, this.maxScale])
             .translateExtent([
                 [
                     this.coord.min - this.yGridBackgroundWidth * this.minScale,
@@ -375,36 +397,28 @@ export default class Map {
                 ],
                 [this.coord.max, this.coord.max]
             ])
-            .wheelDelta(() => -this._wheelDelta * Math.sign(d3.event.deltaY))
+            .wheelDelta(() => -this.wheelDelta * Math.sign(d3.event.deltaY))
             .on("zoom", () => this._naZoomed());
 
-        this._svg = d3
+        this.svg = d3
             .select("#na")
             .append("svg")
             .attr("id", "na-svg")
-            .attr("width", this._width)
-            .attr("height", this._height)
+            .attr("width", this.width)
+            .attr("height", this.height)
             .style("position", "absolute")
             .style("top", `${this.margin.top}px`)
             .style("left", `${this.margin.left}px`)
-            .call(this._zoom);
+            .call(this.zoom);
 
-        this._svg.append("defs");
+        this.svg.append("defs");
 
-        this._g = this._svg.append("g").classed("map", true);
+        this.g = this.svg.append("g").classed("map", true);
     }
 
-    /**
-     * Get show setting from cookie or use default value
-     * @returns {string} - Show setting
-     * @private
-     */
-    _getDoubleClickActionSetting() {
-        let r = Cookies.get(this._doubleClickActionCookieName);
-        // Use default value if cookie is not stored
-        r = typeof r !== "undefined" ? r : this._doubleClickActionDefault;
-        $(`#doubleClick-action-${r}`).prop("checked", true);
-        return r;
+    _setupProps() {
+        $(`#doubleClick-action-${this.doubleClickAction}`).prop("checked", true);
+        $(`#show-layer-${this.showLayer}`).prop("checked", true);
     }
 
     /**
@@ -413,30 +427,17 @@ export default class Map {
      * @private
      */
     _storeDoubleClickActionSetting() {
-        if (this._doubleClickAction !== this._doubleClickActionDefault) {
-            Cookies.set(this._doubleClickActionCookieName, this._doubleClickAction);
+        if (this.doubleClickAction !== this.doubleClickActionDefault) {
+            Cookies.set(this.doubleClickActionCookieName, this.doubleClickAction);
         } else {
-            Cookies.remove(this._doubleClickActionCookieName);
+            Cookies.remove(this.doubleClickActionCookieName);
         }
     }
 
     _doubleClickSelected() {
-        this._doubleClickAction = $("input[name='doubleClickAction']:checked").val();
+        this.doubleClickAction = $("input[name='doubleClickAction']:checked").val();
         this._storeDoubleClickActionSetting();
         this._clearMap();
-    }
-
-    /**
-     * Get show setting from cookie or use default value
-     * @returns {string} - Show setting
-     * @private
-     */
-    _getShowLayerSetting() {
-        let r = Cookies.get(this._showLayerCookieName);
-        // Use default value if cookie is not stored
-        r = typeof r !== "undefined" ? r : this._showLayerDefault;
-        $(`#show-layer-${r}`).prop("checked", true);
-        return r;
     }
 
     /**
@@ -445,22 +446,22 @@ export default class Map {
      * @private
      */
     _storeShowLayerSetting() {
-        if (this._showLayer !== this._showLayerDefault) {
-            Cookies.set(this._showLayerCookieName, this._showLayer);
+        if (this.showLayer !== this.showLayerDefault) {
+            Cookies.set(this.showLayerCookieName, this.showLayer);
         } else {
-            Cookies.remove(this._showLayerCookieName);
+            Cookies.remove(this.showLayerCookieName);
         }
     }
 
     _showLayerSelected() {
-        this._showLayer = $("input[name='showLayer']:checked").val();
+        this.showLayer = $("input[name='showLayer']:checked").val();
         this._storeShowLayerSetting();
         this._refreshLayer();
     }
 
     _refreshLayer() {
-        const showGrid = this._showLayer === "grid",
-            showTeleport = this._showLayer === "teleport";
+        const showGrid = this.showLayer === "grid",
+            showTeleport = this.showLayer === "teleport";
 
         this._grid.show = showGrid;
         this._grid.update();
@@ -473,41 +474,39 @@ export default class Map {
     _displayMap(transform) {
         // Based on d3-tile v0.0.3
         // https://github.com/d3/d3-tile/blob/0f8cc9f52564d4439845f651c5fab2fcc2fdef9e/src/tile.js
-        const log2tileSize = Math.log2(this._tileSize),
+        const log2tileSize = Math.log2(this.tileSize),
             maxTileZoom = Math.log2(this.coord.max) - log2tileSize,
             x0 = 0,
             y0 = 0,
-            x1 = this._width,
-            y1 = this._height,
+            x1 = this.width,
+            y1 = this.height,
             width = Math.floor(
-                this.coord.max * transform.k < this._width
-                    ? this._width - 2 * transform.x
-                    : this.coord.max * transform.k
+                this.coord.max * transform.k < this.width ? this.width - 2 * transform.x : this.coord.max * transform.k
             ),
             height = Math.floor(
-                this.coord.max * transform.k < this._height
-                    ? this._height - 2 * transform.y
+                this.coord.max * transform.k < this.height
+                    ? this.height - 2 * transform.y
                     : this.coord.max * transform.k
             ),
             scale = Math.log2(transform.k);
 
         const tileZoom = Math.min(maxTileZoom, Math.ceil(Math.log2(Math.max(width, height))) - log2tileSize),
             p = Math.round(tileZoom * 10 - scale * 10 - maxTileZoom * 10) / 10,
-            k = this._wheelDelta ** p;
+            k = this.wheelDelta ** p;
 
         const { x } = transform,
             { y } = transform,
             // crop right side
-            dx = this.coord.max * transform.k < this._width ? transform.x : 0,
+            dx = this.coord.max * transform.k < this.width ? transform.x : 0,
             // crop bottom
-            dy = this.coord.max * transform.k < this._height ? transform.y : 0,
+            dy = this.coord.max * transform.k < this.height ? transform.y : 0,
             cols = d3.range(
-                Math.max(0, Math.floor((x0 - x) / this._tileSize / k)),
-                Math.max(0, Math.min(Math.ceil((x1 - x - dx) / this._tileSize / k), 2 ** tileZoom))
+                Math.max(0, Math.floor((x0 - x) / this.tileSize / k)),
+                Math.max(0, Math.min(Math.ceil((x1 - x - dx) / this.tileSize / k), 2 ** tileZoom))
             ),
             rows = d3.range(
-                Math.max(0, Math.floor((y0 - y) / this._tileSize / k)),
-                Math.max(0, Math.min(Math.ceil((y1 - y - dy) / this._tileSize / k), 2 ** tileZoom))
+                Math.max(0, Math.floor((y0 - y) / this.tileSize / k)),
+                Math.max(0, Math.min(Math.ceil((y1 - y - dy) / this.tileSize / k), 2 ** tileZoom))
             ),
             tiles = [];
 
@@ -529,7 +528,7 @@ export default class Map {
             .translate(Math.round(tiles.translate[0]), Math.round(tiles.translate[1]))
             .scale(Math.round(tiles.scale * 1000) / 1000);
 
-        const image = this._g
+        const image = this.g
             .attr("transform", tileTransform)
             .selectAll("image")
             .data(tiles, d => d);
@@ -540,10 +539,10 @@ export default class Map {
             .enter()
             .append("image")
             .attr("xlink:href", d => `images/map/${d[2]}/${d[1]}/${d[0]}.jpg`)
-            .attr("x", d => d[0] * this._tileSize)
-            .attr("y", d => d[1] * this._tileSize)
-            .attr("width", this._tileSize)
-            .attr("height", this._tileSize);
+            .attr("x", d => d[0] * this.tileSize)
+            .attr("y", d => d[1] * this.tileSize)
+            .attr("width", this.tileSize)
+            .attr("height", this.tileSize);
     }
 
     _clearMap() {
@@ -573,20 +572,13 @@ export default class Map {
         const x = (mx - tx) / tk,
             y = (my - ty) / tk;
 
-        if (this._doubleClickAction === "f11") {
+        if (this.doubleClickAction === "f11") {
             this._f11.printCoord(x, y);
         } else {
             this._course.plotCourse(x, y);
         }
 
         this.zoomAndPan(x, y, 1);
-    }
-
-    _setZoomLevel(zoomLevel) {
-        this._zoomLevel = zoomLevel;
-        this._ports.zoomLevel = zoomLevel;
-        this._grid.zoomLevel = zoomLevel;
-        this._teleport.zoomLevel = zoomLevel;
     }
 
     _updateCurrent() {
@@ -600,16 +592,16 @@ export default class Map {
     _setZoomLevelAndData() {
         if (d3.event.transform.k !== this.currentScale) {
             this.currentScale = d3.event.transform.k;
-            if (this.currentScale > this._PBZoneZoomThreshold) {
-                if (this._zoomLevel !== "pbZone") {
-                    this._setZoomLevel("pbZone");
+            if (this.currentScale > this.PBZoneZoomThreshold) {
+                if (this.zoomLevel !== "pbZone") {
+                    this.zoomLevel = "pbZone";
                 }
-            } else if (this.currentScale > this._labelZoomThreshold) {
-                if (this._zoomLevel !== "portLabel") {
-                    this._setZoomLevel("portLabel");
+            } else if (this.currentScale > this.labelZoomThreshold) {
+                if (this.zoomLevel !== "portLabel") {
+                    this.zoomLevel = "portLabel";
                 }
-            } else if (this._zoomLevel !== "initial") {
-                this._setZoomLevel("initial");
+            } else if (this.zoomLevel !== "initial") {
+                this.zoomLevel = "initial";
             }
             this._updateCurrent();
         }
@@ -649,29 +641,154 @@ export default class Map {
     }
 
     _initialZoomAndPan() {
-        this._svg.call(this._zoom.scaleTo, this.minScale);
+        this.svg.call(this.zoom.scaleTo, this.minScale);
     }
 
     _init() {
-
-        this._setupSvg();
-        this._setupListener();
-
-
-        this._setZoomLevel("initial");
+        this.zoomLevel = "initial";
         this._initialZoomAndPan();
         this._refreshLayer();
 
-        this._ports.clearMap(this._minScale);
+        this._ports.clearMap(this.minScale);
         this._f11.checkF11Coord();
+    }
 
+    get coord() {
+        return this._coord;
+    }
+
+    set currentScale(scale) {
+        this._currentScale = scale;
+    }
+
+    get currentScale() {
+        return this._currentScale;
+    }
+
+    get doubleClickActionCookieName() {
+        return this._doubleClickActionCookieName;
+    }
+
+    set doubleClickAction(action) {
+        this._doubleClickAction = action;
+    }
+
+    get doubleClickAction() {
+        return this._doubleClickAction;
+    }
+
+    get doubleClickActionDefault() {
+        return this._doubleClickActionDefault;
+    }
+
+    set g(g) {
+        this._g = g;
+    }
+
+    get g() {
+        return this._g;
+    }
+
+    get height() {
+        return this._height;
+    }
+
+    get margin() {
+        return this._margin;
+    }
+
+    get labelZoomThreshold() {
+        return this._labelZoomThreshold;
+    }
+
+    get maxScale() {
+        return this._maxScale;
+    }
+
+    get minScale() {
+        return this._minScale;
+    }
+
+    get PBZoneZoomThreshold() {
+        return this._PBZoneZoomThreshold;
+    }
+
+    get rem() {
+        return this._rem;
+    }
+
+    set svg(svg) {
+        this._svg = svg;
+    }
+
+    get svg() {
+        return this._svg;
+    }
+
+    get serverName() {
+        return this._serverName;
+    }
+
+    get showLayerCookieName() {
+        return this._showLayerCookieName;
+    }
+
+    get showLayer() {
+        return this._showLayer;
+    }
+
+    set showLayer(layer) {
+        this._showLayer = layer;
+    }
+
+    get showLayerDefault() {
+        return this._showLayerDefault;
+    }
+
+    get tileSize() {
+        return this._tileSize;
+    }
+
+    get width() {
+        return this._width;
+    }
+
+    get wheelDelta() {
+        return this._wheelDelta;
+    }
+
+    get xGridBackgroundHeight() {
+        return this._xGridBackgroundHeight;
+    }
+
+    get yGridBackgroundWidth() {
+        return this._yGridBackgroundWidth;
+    }
+
+    set zoom(zoom) {
+        this._zoom = zoom;
+    }
+
+    set zoomLevel(zoomLevel) {
+        this._zoomLevel = zoomLevel;
+        this._ports.zoomLevel = zoomLevel;
+        this._grid.zoomLevel = zoomLevel;
+        this._teleport.zoomLevel = zoomLevel;
+    }
+
+    get zoomLevel() {
+        return this._zoomLevel;
+    }
+
+    get zoom() {
+        return this._zoom;
     }
 
     zoomAndPan(x, y, scale) {
         const transform = d3.zoomIdentity
             .scale(scale)
-            .translate(Math.round(-x + this._width / 2 / scale), Math.round(-y + this._height / 2 / scale));
-        this._svg.call(this._zoom.transform, transform);
+            .translate(Math.round(-x + this.width / 2 / scale), Math.round(-y + this.height / 2 / scale));
+        this.svg.call(this.zoom.transform, transform);
     }
 
     goToPort() {
