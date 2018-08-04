@@ -53,14 +53,14 @@ export default class Grid {
          * @type {Number}
          * @private
          */
-        this._height = this._map._height;
+        this._height = this._map.height;
 
         /**
          * Width of map svg (screen coordinates)
          * @type {Number}
          * @private
          */
-        this._width = this._map._width;
+        this._width = this._map.width;
 
         /**
          * Top margin of screen
