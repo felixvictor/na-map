@@ -57,6 +57,10 @@ export function saveJson(fileName, data) {
 
 export const readJson = fileName => JSON.parse(fs.readFileSync(fileName, "utf8"));
 
+export const readTextFile = fileName => fs.readFileSync(fileName, "utf8");
+
+
+
 /**
  * Convert radians to degrees (see {@link http://cwestblog.com/2012/11/12/javascript-degree-and-radian-conversion/})
  * @function
