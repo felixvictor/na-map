@@ -120,6 +120,7 @@ function get_port_data () {
         rm "${BUILD_DIR}"/*.geojson
 
         ${NODE} build/convert-ships.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${SHIP_FILE}" "${DATE}"
+        ${NODE} build/convert-additional-ship-data.mjs "${BUILD_DIR}/Modules" "${SHIP_FILE}"
         ${NODE} build/convert-modules.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${SRC_DIR}" "${DATE}"
         ${NODE} build/convert-buildings.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${BUILDING_FILE}" "${DATE}"
         ${NODE} build/convert-loot.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${LOOT_FILE}" "${DATE}"
