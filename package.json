@@ -93,7 +93,7 @@
         "deploy-netlify-test2": "netlify deploy --path public --site-id 57f59c8d-a0e3-4f6e-baed-e4f48fa9c815",
         "deploy-test": "yarn run change && yarn run deploy-netlify-test",
         "deploy-test2": "yarn run change && yarn run deploy-netlify-test2",
-        "jsdoc": "documentation build src/js/**.js -f html -o docs",
+        "jsdoc": "documentation build src/js/**.js build/**.mjs -f html -o docs",
         "js-lint": "eslint -c .eslintrc.json src/js",
         "get-modules": "cp -u /mnt/Modules.zip build/ && unzip -u build/Modules.zip -d build/ && yarn run lowercase",
         "get-additional-ship-data": "node --experimental-modules --no-warnings build/convert-additional-ship-data.mjs build/Modules src/ships-additional.json",
