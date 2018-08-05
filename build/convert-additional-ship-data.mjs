@@ -5,27 +5,13 @@ import xml2Json from "xml2json";
 import { readJson, readTextFile, saveJson } from "./common.mjs";
 
 const inDir = process.argv[2],
-    outFilename = process.argv[3];
-
-// https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
-// eslint-disable-next-line no-extend-native,func-names
-String.prototype.replaceAll = function(search, replacement) {
-    const target = this;
-    return target.replace(new RegExp(search, "g"), replacement);
-};
+    filename = process.argv[3];
 
 /**
  * Retrieve additional ship data from game files and add it to existing data from API
  * @returns {void}
  */
 function convertAdditionalShipData() {
-    /* helper function
-const shipData = readJson("src/ships.json");
-shipData.shipData.forEach(ship => {
-    ships.shipData.push([ship.name, ship.id]);
-});
-*/
-
     /**
      * Maps the ship name (lower case for the file name) to the ship id
      * @type {Map<string, number>}
@@ -116,7 +102,7 @@ shipData.shipData.forEach(ship => {
      * Ship data
      * @type {object}
      */
-    const ships = readJson("src/ships.json");
+    const ships = readJson(filename);
 
     getFileNames(inDir);
 
@@ -268,7 +254,7 @@ shipData.shipData.forEach(ship => {
         });
     });
 
-    saveJson(outFilename, ships);
+    saveJson(filename, ships);
 }
 
 convertAdditionalShipData();
