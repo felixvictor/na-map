@@ -204,7 +204,6 @@ export default class Map {
         let r = Cookies.get(this.doubleClickActionCookieName);
         // Use default value if cookie is not stored
         r = typeof r !== "undefined" ? r : this.doubleClickActionDefault;
-        console.log("_getDoubleClickAction", r);
         return r;
     }
 
@@ -217,12 +216,10 @@ export default class Map {
         let r = Cookies.get(this.showLayerCookieName);
         // Use default value if cookie is not stored
         r = typeof r !== "undefined" ? r : this.showLayerDefault;
-        console.log("_getShowLayer", r);
         return r;
     }
 
     _getCacheMode() {
-        console.log("     _getCacheMode");
         let cacheMode = "default";
         const lastUpdateData = fetch("update.txt", { cache: "reload" })
             .then(checkFetchStatus)
@@ -321,7 +318,6 @@ export default class Map {
     }
 
     _readData(cacheMode) {
-        console.log("_readData");
         const naMapJsonData = fetch(`${this.serverName}.json`, { cache: cacheMode })
             .then(checkFetchStatus)
             .then(getJsonFromFetch);
@@ -373,7 +369,6 @@ export default class Map {
     }
 
     _setupListener() {
-        console.log("_setupListener");
         function stopProp() {
             if (d3.event.defaultPrevented) {
                 d3.event.stopPropagation();
@@ -409,7 +404,6 @@ export default class Map {
     }
 
     _setupSvg() {
-        console.log("_setupSvg");
         // noinspection JSSuspiciousNameCombination
         this.zoom = d3
             .zoom()
