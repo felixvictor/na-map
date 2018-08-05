@@ -1,5 +1,11 @@
-/*
-    ship-compare.js
+/**
+ * This file is part of na-map.
+ *
+ * @file      Ship comparison.
+ * @module    ship-compare
+ * @author    iB aka Felix Victor
+ * @copyright 2017, 2018
+ * @license   http://www.gnu.org/licenses/gpl.html
  */
 
 /* global d3 : false
@@ -11,10 +17,17 @@ import { registerEvent } from "./analytics";
 const numSegments = 24,
     segmentRadians = (2 * Math.PI) / numSegments;
 
+/**
+ * Ship
+ */
 class Ship {
-    constructor(compareId, shipCompare) {
-        this._id = compareId;
-        this._shipCompare = shipCompare;
+    /**
+     * @param {number} id - ship id
+     * @param {Object} shipData - ship data
+     */
+    constructor(id, shipData) {
+        this._id = id;
+        this._shipData = shipData;
 
         this._select = `#ship-${this._id}`;
 
@@ -27,12 +40,12 @@ class Ship {
         d3.select(`${this._select} svg`).remove();
         d3.select(this._select)
             .append("svg")
-            .attr("width", this._shipCompare.svgWidth)
-            .attr("height", this._shipCompare.svgHeight)
+            .attr("width", this._shipData.svgWidth)
+            .attr("height", this._shipData.svgHeight)
             .attr("class", "profile")
             .attr("fill", "none")
             .append("g")
-            .attr("transform", `translate(${this._shipCompare.svgWidth / 2}, ${this._shipCompare.svgHeight / 2})`);
+            .attr("transform", `translate(${this._shipData.svgWidth / 2}, ${this._shipData.svgHeight / 2})`);
         d3.select(`${this._select} div`).remove();
         d3.select(this._select).append("div");
     }
@@ -48,8 +61,8 @@ class Ship {
 
         const arc = d3
             .arc()
-            .outerRadius(this._shipCompare.radiusScaleAbsolute(12))
-            .innerRadius(this._shipCompare.innerRadius);
+            .outerRadius(this._shipData.radiusScaleAbsolute(12))
+            .innerRadius(this._shipData.innerRadius);
 
         const g = this._g
             .selectAll(".compass-arc")
@@ -133,12 +146,21 @@ class Ship {
     }
 }
 
+/**
+ * Base ship for comparison (displayed on the left side)
+ * @extends Ship
+ */
 class ShipBase extends Ship {
-    constructor(compareId, singleShipData, shipCompare) {
-        super(compareId, shipCompare);
+    /**
+     * @param {number} id - Ship id
+     * @param {Object} shipData - Ship data
+     * @param {Object} shipCompareData - Ship data of the ship to be compared to
+     */
+    constructor(id, shipData, shipCompareData) {
+        super(id, shipCompareData);
 
-        this._shipData = singleShipData;
-        this._shipCompare = shipCompare;
+        this._shipData = shipData;
+        this._shipCompareData = shipCompareData;
 
         this._setBackground();
         this._setBackgroundGradient();
@@ -150,8 +172,8 @@ class ShipBase extends Ship {
         // Arc for text
         const knotsArc = d3
             .arc()
-            .outerRadius(d => this._shipCompare.radiusScaleAbsolute(d) + 2)
-            .innerRadius(d => this._shipCompare.radiusScaleAbsolute(d) + 1)
+            .outerRadius(d => this._shipCompareData.radiusScaleAbsolute(d) + 2)
+            .innerRadius(d => this._shipCompareData.radiusScaleAbsolute(d) + 1)
             .startAngle(-Math.PI / 2)
             .endAngle(Math.PI / 2);
 
@@ -166,7 +188,7 @@ class ShipBase extends Ship {
             .enter()
             .append("circle")
             .attr("class", "knots-circle")
-            .attr("r", d => this._shipCompare.radiusScaleAbsolute(d));
+            .attr("r", d => this._shipCompareData.radiusScaleAbsolute(d));
 
         // Add the paths for the text
         this._g
@@ -195,7 +217,7 @@ class ShipBase extends Ship {
         const gradientScale = d3
             .scaleLinear()
             .domain([this._shipData.minSpeed, this._shipData.maxSpeed])
-            .range([0, this._shipCompare.svgWidth]);
+            .range([0, this._shipCompareData.svgWidth]);
 
         // Calculate the variables for the gradient
         const numStops = 30;
@@ -218,8 +240,8 @@ class ShipBase extends Ship {
             .data(d3.range(numStops))
             .enter()
             .append("stop")
-            .attr("offset", (d, i) => gradientScale(gradientPoint[i]) / this._shipCompare.svgWidth)
-            .attr("stop-color", (d, i) => this._shipCompare.colorScale(gradientPoint[i]));
+            .attr("offset", (d, i) => gradientScale(gradientPoint[i]) / this._shipCompareData.svgWidth)
+            .attr("stop-color", (d, i) => this._shipCompareData.colorScale(gradientPoint[i]));
     }
 
     _drawProfile() {
@@ -234,7 +256,7 @@ class ShipBase extends Ship {
             line = d3
                 .radialLine()
                 .angle((d, i) => i * segmentRadians)
-                .radius(d => this._shipCompare.radiusScaleAbsolute(d.data))
+                .radius(d => this._shipCompareData.radiusScaleAbsolute(d.data))
                 .curve(curve);
 
         const profile = this._g.append("path");
@@ -250,9 +272,9 @@ class ShipBase extends Ship {
             .enter()
             .append("circle")
             .attr("r", "5")
-            .attr("cy", (d, i) => Math.cos(i * segmentRadians) * -this._shipCompare.radiusScaleAbsolute(d.data))
-            .attr("cx", (d, i) => Math.sin(i * segmentRadians) * this._shipCompare.radiusScaleAbsolute(d.data))
-            .attr("fill", d => this._shipCompare.colorScale(d.data))
+            .attr("cy", (d, i) => Math.cos(i * segmentRadians) * -this._shipCompareData.radiusScaleAbsolute(d.data))
+            .attr("cx", (d, i) => Math.sin(i * segmentRadians) * this._shipCompareData.radiusScaleAbsolute(d.data))
+            .attr("fill", d => this._shipCompareData.colorScale(d.data))
             .style("opacity", 0.5)
             .append("title")
             .text(d => `${Math.round(d.data * 10) / 10} knots`);
@@ -306,6 +328,10 @@ class ShipBase extends Ship {
     }
 }
 
+/**
+ * ship comparison
+ * @extends Ship
+ */
 class ShipComparison extends Ship {
     constructor(compareId, shipBaseData, shipCompareData, shipCompare) {
         super(compareId, shipCompare);
