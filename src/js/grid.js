@@ -16,14 +16,17 @@ import { convertInvCoordX, convertInvCoordY } from "./common";
 
 /**
  * Display grid
- * @param {NAMap} map - The main map
  */
 export default class Grid {
-    // eslint-disable-next-line require-jsdoc
+    /**
+     *
+     * @param {map.Map} map - The main map
+     */
     constructor(map) {
         /**
          * The main map
-         * @type {NAMap}
+         * @type {map.Map}
+         * @private
          */
         this._map = map;
 
