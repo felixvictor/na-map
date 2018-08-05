@@ -44,37 +44,44 @@ import { registerEvent } from "./analytics";
 
 /**
  * Display naval action map
- * @param {string} serverName - Naval action server name
- * @returns {void}
  */
 export default class Map {
     /**
-     * Constructor
+     * @param {string} serverName - Naval action server name
      */
     constructor(serverName) {
+        /**
+         * Naval action server name
+         * @type {string}
+         * @private
+         */
         this._serverName = serverName;
 
         /**
          * Font size in px
          * @type {Number}
+         * @private
          */
         this._rem = defaultFontSize;
 
         /**
          * Left padding for brand icon
          * @type {Number}
+         * @private
          */
         this._navbarBrandPaddingLeft = Math.floor(1.618 * this._rem); // equals 1.618rem
 
         /**
          * Left padding for brand icon
          * @type {Number}
+         * @private
          */
         this._xGridBackgroundHeight = Math.floor(3 * this._rem);
 
         /**
          * Left padding for brand icon
          * @type {Number}
+         * @private
          */
         this._yGridBackgroundWidth = Math.floor(4 * this._rem);
 
@@ -85,6 +92,7 @@ export default class Map {
          * @property {Number} right - Right margin
          * @property {Number} bottom - Bottom margin
          * @property {Number} left - Left margin
+         * @private
          */
         this._margin = {
             top: Math.floor($(".navbar").height() + this._navbarBrandPaddingLeft),
@@ -98,6 +106,7 @@ export default class Map {
          * @type {Object}
          * @property {Number} min - Minimum world coordinate
          * @property {Number} max - Maximum world coordinate
+         * @private
          */
         this._coord = {
             min: 0,
@@ -107,6 +116,7 @@ export default class Map {
         /**
          * Width of map svg (screen coordinates)
          * @type {Number}
+         * @private
          */
         // eslint-disable-next-line no-restricted-globals
         this._width = Math.floor(top.innerWidth - this._margin.left - this._margin.right);
@@ -114,6 +124,7 @@ export default class Map {
         /**
          * Height of map svg (screen coordinates)
          * @type {Number}
+         * @private
          */
         // eslint-disable-next-line no-restricted-globals
         this._height = Math.floor(top.innerHeight - this._margin.top - this._margin.bottom);
@@ -130,6 +141,7 @@ export default class Map {
         /**
          * Current map scale
          * @type {Number}
+         * @private
          */
         this._currentScale = this._minScale;
 
@@ -137,12 +149,14 @@ export default class Map {
          * DoubleClickAction cookie name
          * @type {string}
          * @private
+         * @private
          */
         this._doubleClickActionCookieName = "na-map--double-click";
 
         /**
          * Default DoubleClickAction setting
          * @type {string}
+         * @private
          * @private
          */
         this._doubleClickActionDefault = "compass";
@@ -181,6 +195,11 @@ export default class Map {
         this._readData(this._getCacheMode());
     }
 
+    /**
+     * Read cookie for doubleClickAction
+     * @return {string} doubleClickAction
+     * @private
+     */
     _getDoubleClickAction() {
         let r = Cookies.get(this.doubleClickActionCookieName);
         // Use default value if cookie is not stored
@@ -189,6 +208,11 @@ export default class Map {
         return r;
     }
 
+    /**
+     * Read cookie for showLayer
+     * @return {string} showLayer
+     * @private
+     */
     _getShowLayer() {
         let r = Cookies.get(this.showLayerCookieName);
         // Use default value if cookie is not stored
