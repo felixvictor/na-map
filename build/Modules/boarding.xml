@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ModuleTemplate xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="Boarding" Type="CREW_SKILL">
+  <Attributes>
+    <Pair>
+      <Key>MODULE_DESCRIPTION</Key>
+      <Value xsi:type="StringAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value />
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>MODULE_BASE_HP</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>80</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>SHIP_BOARDING_PREPARATION_PER_SECOND</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
+        <Value>1.6667</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CREW_1_DAMAGE_RECEIVED_MULTIPLIER</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
+        <Value>0.3</Value>
+      </Value>
+    </Pair>
+  </Attributes>
+</ModuleTemplate>
