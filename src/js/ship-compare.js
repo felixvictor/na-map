@@ -129,13 +129,12 @@ class Ship {
         text += `<br>${ship.halfturnTime}<br><span class="des">Rudder half time</span></td></tr>`;
 
         text += '<tr><td>Armour <span class="badge badge-light">Thickness</span></td>';
-        text += `<td>${ship.sideArmor}<br><span class="des">Sides</span>`;
+        text += `<td>${ship.sideArmor}<br><span class="des">Sides/Sails</span>`;
         text += `<br>${ship.frontArmor}<br><span class="des">Bow</span>`;
         text += `<br>${ship.pump}<br><span class="des">Pump</span>`;
-        text += `<br>${ship.sails}<br><span class="des">Sails</span></td>`;
+        text += `<br>${ship.mastArmor}<br><span class="des">Masts</span></td>`;
         text += `<td>${ship.structure}<br><span class="des">Hull</span>`;
         text += `<br>${ship.backArmor}<br><span class="des">Stern</span>`;
-        text += `<br>${ship.mastArmor}<br><span class="des">Masts</span>`;
         text += `<br>${ship.rudder}<br><span class="des">Rudder</span></td></tr>`;
 
         text += "<tr><td>Crew</td>";
