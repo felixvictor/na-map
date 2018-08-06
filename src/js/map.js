@@ -58,6 +58,45 @@ export default class Map {
         this._serverName = serverName;
 
         /**
+         * @type {Array<fileName: string, name: string>}
+         * @private
+         */
+        this._dataSource = [
+            {
+                fileName: `${serverName}.json`,
+                name: "ports"
+            },
+            {
+                fileName: `${serverName}-pb.json`,
+                name: "pb"
+            },
+            {
+                fileName: "pb.json",
+                name: "pbZones"
+            },
+            {
+                fileName: "ships.json",
+                name: "ships"
+            },
+            {
+                fileName: "woods.json",
+                name: "woods"
+            },
+            {
+                fileName: "modules.json",
+                name: "modules"
+            },
+            {
+                fileName: "recipes.json",
+                name: "recipes"
+            },
+            {
+                fileName: "buildings.json",
+                name: "buildings"
+            }
+        ];
+
+        /**
          * Font size in px
          * @type {Number}
          * @private
@@ -252,9 +291,10 @@ export default class Map {
         return cacheMode;
     }
 
-    _assignData(data) {
+    _setupData(data) {
+        const portData = topojsonFeature(data.ports, data.ports.objects.ports);
         // Port ids of capturable ports
-        let portIds = [];
+        const portIds = portData.features.filter(port => !port.properties.nonCapturable).map(port => port.id);
 
         function getFeature(object) {
             return object.filter(port => portIds.includes(port.id)).map(d => ({
@@ -264,7 +304,6 @@ export default class Map {
             }));
         }
 
-        const portData = topojsonFeature(data.ports, data.ports.objects.ports);
         this._ports = new PortDisplay(
             portData.features,
             data.pb,
@@ -273,9 +312,6 @@ export default class Map {
             this.margin.right,
             this.minScale
         );
-
-        // Port ids of capturable ports
-        portIds = portData.features.filter(port => !port.properties.nonCapturable).map(port => port.id);
 
         let pbCircles = topojsonFeature(data.pbZones, data.pbZones.objects.pbCircles);
         pbCircles = getFeature(pbCircles.features);
@@ -315,55 +351,28 @@ export default class Map {
         this._f11 = new F11(this);
         this._grid = new Grid(this);
         this._course = new Course(this.rem);
+
+        this._init();
     }
 
     _readData(cacheMode) {
-        const naMapJsonData = fetch(`${this.serverName}.json`, { cache: cacheMode })
-            .then(checkFetchStatus)
-            .then(getJsonFromFetch);
-        const pbJsonData = fetch(`${this.serverName}-pb.json`, { cache: cacheMode })
-            .then(checkFetchStatus)
-            .then(getJsonFromFetch);
-        const pbZonesJsonData = fetch("pb.json", { cache: cacheMode })
-            .then(checkFetchStatus)
-            .then(getJsonFromFetch);
-        const shipJsonData = fetch("ships.json", { cache: cacheMode })
-            .then(checkFetchStatus)
-            .then(getJsonFromFetch);
-        const woodJsonData = fetch("woods.json", { cache: cacheMode })
-            .then(checkFetchStatus)
-            .then(getJsonFromFetch);
-        const moduleJsonData = fetch("modules.json", { cache: cacheMode })
-            .then(checkFetchStatus)
-            .then(getJsonFromFetch);
-        const recipeJsonData = fetch("recipes.json", { cache: cacheMode })
-            .then(checkFetchStatus)
-            .then(getJsonFromFetch);
-        const buildingJsonData = fetch("buildings.json", { cache: cacheMode })
-            .then(checkFetchStatus)
-            .then(getJsonFromFetch);
-        Promise.all([
-            naMapJsonData,
-            pbJsonData,
-            pbZonesJsonData,
-            shipJsonData,
-            woodJsonData,
-            moduleJsonData,
-            recipeJsonData,
-            buildingJsonData
-        ])
+        const jsonData = [],
+            readData = {};
+        this._dataSource.forEach((datum, i) => {
+            jsonData[i] = fetch(datum.fileName, {
+                cache: cacheMode
+            })
+                .then(checkFetchStatus)
+                .then(getJsonFromFetch);
+        });
+
+        Promise.all(jsonData)
             .then(values => {
-                this._assignData({
-                    ports: values[0],
-                    pb: values[1],
-                    pbZones: values[2],
-                    ships: values[3],
-                    woods: values[4],
-                    modules: values[5],
-                    recipes: values[6],
-                    buildings: values[7]
+                values.forEach((value, i) => {
+                    readData[this._dataSource[i].name] = values[i];
                 });
-                this._init();
+
+                this._setupData(readData);
             })
             .catch(putFetchError);
     }
