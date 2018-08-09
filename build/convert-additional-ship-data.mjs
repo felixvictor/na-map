@@ -1,6 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import * as fs from "fs";
 import xml2Json from "xml2json";
+import * as mergeObj from "object-merge-advanced";
 
 import { readJson, readTextFile, saveJson } from "./common.mjs";
 
@@ -17,84 +18,89 @@ function convertAdditionalShipData() {
      * @type {Map<string, number>}
      */
     const shipNames = new Map([
-        ["agamemnon", 694],
-        ["basiccutter", 413],
-        ["basiclynx", 275],
-        ["bellepoule", 264],
-        ["bellona", 265],
-        ["bellona74", 359],
-        ["brig", 266],
-        ["brigmr", 267],
-        ["bucentaure", 268],
-        ["cerberus", 269],
-        ["christian", 1664],
-        ["constitution", 270],
-        ["constitution2", 1674],
-        ["cutter", 271],
-        ["diana", 1665],
-        ["endymion", 768],
-        ["essex", 272],
-        ["frigate", 273],
-        ["grosventre", 396],
-        ["grosventrepirate", 1561],
-        ["gunboat", 695],
-        ["hamburg", 970],
-        ["hercules", 1675],
-        ["hermione", 592],
-        ["indefatiable", 787],
-        ["indiaman", 425],
-        ["ingermanland", 395],
-        ["lhermione", 986],
-        ["lynx", 274],
-        ["mercury", 276],
-        ["navybrig", 277],
-        ["niagara", 278],
-        ["ocean", 650],
-        ["pandora", 1020],
-        ["pavel", 279],
-        ["pickle", 280],
-        ["piratefrigate", 281],
-        ["princedeneufchatel", 1125],
-        ["privateer", 282],
-        ["rattlesnake", 283],
-        ["rattlesnakeheavy", 284],
-        ["renommee", 285],
-        ["requin", 1676],
-        ["rookiebrig", 1535],
-        ["rookiesnow", 1536],
-        ["santisima", 286],
-        ["snow", 287],
-        ["surprise", 288],
-        ["tradersbrig", 289],
-        ["traderscutter", 290],
-        ["traderslynx", 291],
-        ["traderssnow", 292],
-        ["trincomalee", 293],
-        ["victory", 294],
-        ["wasa", 1021],
-        ["yacht", 295],
-        ["yachtsilver", 393]
+        ["agamemnon", { id: 694, masterId: 0 }],
+        ["basiccutter", { id: 413, masterId: 271 }],
+        ["basiclynx", { id: 275, masterId: 274 }],
+        ["bellepoule", { id: 264, masterId: 0 }],
+        ["bellona", { id: 265, masterId: 0 }],
+        ["bellona74", { id: 359, masterId: 0 }],
+        ["brig", { id: 266, masterId: 0 }],
+        ["brigmr", { id: 267, masterId: 0 }],
+        ["bucentaure", { id: 268, masterId: 0 }],
+        ["cerberus", { id: 269, masterId: 0 }],
+        ["christian", { id: 1664, masterId: 0 }],
+        ["constitution", { id: 270, masterId: 0 }],
+        ["constitution2", { id: 1674, masterId: 0 }],
+        ["cutter", { id: 271, masterId: 0 }],
+        ["diana", { id: 1665, masterId: 0 }],
+        ["endymion", { id: 768, masterId: 0 }],
+        ["essex", { id: 272, masterId: 0 }],
+        ["frigate", { id: 273, masterId: 0 }],
+        ["grosventre", { id: 396, masterId: 0 }],
+        ["grosventrepirate", { id: 1561, masterId: 0 }],
+        ["gunboat", { id: 695, masterId: 0 }],
+        ["hamburg", { id: 970, masterId: 0 }],
+        ["hercules", { id: 1675, masterId: 0 }],
+        ["hermione", { id: 592, masterId: 0 }],
+        ["indefatiable", { id: 787, masterId: 0 }],
+        ["indiaman", { id: 425, masterId: 0 }],
+        ["ingermanland", { id: 395, masterId: 0 }],
+        ["lhermione", { id: 986, masterId: 0 }],
+        ["lynx", { id: 274, masterId: 0 }],
+        ["mercury", { id: 276, masterId: 0 }],
+        ["navybrig", { id: 277, masterId: 0 }],
+        ["niagara", { id: 278, masterId: 0 }],
+        ["ocean", { id: 650, masterId: 0 }],
+        ["pandora", { id: 1020, masterId: 0 }],
+        ["pavel", { id: 279, masterId: 0 }],
+        ["pickle", { id: 280, masterId: 0 }],
+        ["piratefrigate", { id: 281, masterId: 0 }],
+        ["princedeneufchatel", { id: 1125, masterId: 0 }],
+        ["privateer", { id: 282, masterId: 0 }],
+        ["rattlesnake", { id: 283, masterId: 0 }],
+        ["rattlesnakeheavy", { id: 284, masterId: 0 }],
+        ["renommee", { id: 285, masterId: 0 }],
+        ["requin", { id: 1676, masterId: 0 }],
+        ["rookie brig", { id: 1535, masterId: 266 }],
+        ["rookie snow", { id: 1536, masterId: 287 }],
+        ["santisima", { id: 286, masterId: 0 }],
+        ["snow", { id: 287, masterId: 0 }],
+        ["surprise", { id: 288, masterId: 0 }],
+        ["trader brig", { id: 289, masterId: 266 }],
+        ["trader cutter", { id: 290, masterId: 271 }],
+        ["trader lynx", { id: 291, masterId: 274 }],
+        ["trader snow", { id: 292, masterId: 287 }],
+        ["trincomalee", { id: 293, masterId: 0 }],
+        ["victory", { id: 294, masterId: 0 }],
+        ["wasa", { id: 1021, masterId: 0 }],
+        ["yacht", { id: 295, masterId: 0 }],
+        ["yachtsilver", { id: 393, masterId: 0 }]
     ]);
 
     /**
      * List of file names to be read
      * @type {Set<string>}
      */
-    const fileNames = new Set();
+    const baseFileNames = new Set();
     /**
-     * Gets all files from directory <dir> and stores vaild ship names in <fileNames>
+     * Gets all files from directory <dir> and stores valid ship names in <fileNames>
      * @param {string} dir - Directory
      * @returns {void}
      */
-    const getFileNames = dir => {
+    const getBaseFileNames = dir => {
         fs.readdirSync(dir).forEach(fileName => {
             /**
              * First part of the file name containing the ship name
              * @type {string}
              */
-            const str = fileName.substr(0, fileName.indexOf(" "));
+            let str = fileName.slice(0, fileName.indexOf(" "));
+            if (str === "rookie" || str === "trader") {
+                const shortenedFileName = fileName.replace("rookie ", "").replace("trader ", "");
+                const str2 = shortenedFileName.slice(0, shortenedFileName.indexOf(" "));
+                str = str.concat(" ").concat(str2);
+            }
             if (shipNames.has(str)) {
-                fileNames.add(str);
+                baseFileNames.add(str);
             }
         });
     };
@@ -104,10 +110,10 @@ function convertAdditionalShipData() {
      */
     const ships = readJson(filename);
 
-    getFileNames(inDir);
+    getBaseFileNames(inDir);
 
     /**
-     * @typedef FileStructure
+     * @typedef SubFileStructure
      * @type {object}
      * @property {string} ext - file name extension (base file name is a ship name).
      * @property {Map<string, {group: string, element: string}>} elements - elements to be retrieved from the file.
@@ -115,9 +121,9 @@ function convertAdditionalShipData() {
 
     /**
      * Data structure for content of the individual files.
-     * @type {FileStructure}
+     * @type {SubFileStructure}
      */
-    const fileStructure = [
+    const subFileStructure = [
         {
             ext: "b armor",
             elements: new Map([
@@ -189,7 +195,7 @@ function convertAdditionalShipData() {
                 // ["EXPLOSION_DAMAGE_ABSORB_MULTIPLIER", "EXPLOSION_DAMAGE_ABSORB_MULTIPLIER"],
                 // ["HIT_PROBABILITY", "HIT_PROBABILITY"],
                 // ["MAST_CRIT_PROBABILITY", "MAST_CRIT_PROBABILITY"],
-                ["MAST_THICKNESS", { group: "mast", element: "thickness" }],
+                ["MAST_THICKNESS", { group: "mast", element: "bottomThickness" }],
                 ["MODULE_BASE_HP", { group: "sails", element: "armour" }],
                 ["REPAIR_MODULE_TIME", { group: "repairTime", element: "sails" }],
                 // ["RHEA_TURN_SPEED", "RHEA_TURN_SPEED"],
@@ -208,51 +214,125 @@ function convertAdditionalShipData() {
             ])
         }
     ];
-    Array.from(fileNames).forEach(baseFileName => {
+
+    function getShipId(baseFileName) {
+        return shipNames.get(baseFileName).id;
+    }
+
+    function getShipMasterId(baseFileName) {
+        return shipNames.get(baseFileName).masterId;
+    }
+
+    function getAddData(elements, fileData) {
         /**
-         * @type {number} Current ship id
+         * Ship data to be added per file
+         * @type {Object.<string, Object.<string, number>>}
          */
-        const id = shipNames.get(baseFileName);
+        const addData = {};
 
-        // Retrieve and store additional data per file
-        fileStructure.forEach(file => {
-            /**
-             * Ship data to be added per file
-             * @type {Object.<string, Object.<string, number>>}
-             */
-            const addData = {};
-            const fileName = `${inDir}/${baseFileName} ${file.ext}.xml`;
-            const fileXmlData = readTextFile(fileName);
-            const fileData = xml2Json.toJson(fileXmlData, { object: true });
-
-            // Retrieve additional data per attribute pair
-            fileData.ModuleTemplate.Attributes.Pair.forEach(pair => {
-                // Check if pair is considered additional data
-                if (file.elements.has(pair.Key)) {
-                    if (typeof addData[file.elements.get(pair.Key).group] === "undefined") {
-                        addData[file.elements.get(pair.Key).group] = {};
-                    }
-                    addData[file.elements.get(pair.Key).group][file.elements.get(pair.Key).element] = +pair.Value.Value;
+        // Retrieve additional data per attribute pair
+        fileData.ModuleTemplate.Attributes.Pair.forEach(pair => {
+            // Check if pair is considered additional data
+            if (elements.has(pair.Key)) {
+                if (typeof addData[elements.get(pair.Key).group] === "undefined") {
+                    addData[elements.get(pair.Key).group] = {};
                 }
-            });
+                addData[elements.get(pair.Key).group][elements.get(pair.Key).element] = +pair.Value.Value;
+            }
 
-            // Add additional data to the existing data
-            // Find current ship
-            ships.shipData.filter(ship => ship.id === id).forEach(ship => {
-                // Get all data for each group
-                Object.entries(addData).forEach(([group, values]) => {
-                    // Get all elements per group
-                    Object.entries(values).forEach(([element, value]) => {
-                        if (typeof ship[group] === "undefined") {
-                            ship[group] = {};
-                        }
-                        // add value
-                        ship[group][element] = value;
-                    });
+            // Add calculated mast thickness
+            if (pair.Key === "MAST_THICKNESS") {
+                addData[elements.get(pair.Key).group].middleThickness = +pair.Value.Value * 0.75;
+                addData[elements.get(pair.Key).group].topThickness = +pair.Value.Value * 0.5;
+            }
+        });
+        return addData;
+    }
+
+    // Add additional data to the existing data
+    function addAddData(addData, id) {
+        // Find current ship
+        ships.shipData.filter(ship => ship.id === id).forEach(ship => {
+            // Get all data for each group
+            Object.entries(addData).forEach(([group, values]) => {
+                // Get all elements per group
+                Object.entries(values).forEach(([element, value]) => {
+                    if (typeof ship[group] === "undefined") {
+                        // eslint-disable-next-line no-param-reassign
+                        ship[group] = {};
+                    }
+                    // add value
+                    // eslint-disable-next-line no-param-reassign
+                    ship[group][element] = value;
                 });
             });
         });
-    });
+    }
+
+    function getFileData(baseFileName, ext) {
+        const fileName = `${inDir}/${baseFileName} ${ext}.xml`;
+        const fileXmlData = readTextFile(fileName);
+        return xml2Json.toJson(fileXmlData, { object: true });
+    }
+
+    // Get all files without a masterId
+    Array.from(baseFileNames)
+        .filter(baseFileName => getShipMasterId(baseFileName) === 0)
+        .forEach(baseFileName => {
+            /**
+             * @type {number} Current ship id
+             */
+            const id = getShipId(baseFileName);
+
+            // Retrieve and store additional data per file
+            subFileStructure.forEach(file => {
+                const fileData = getFileData(baseFileName, file.ext);
+                /**
+                 * Ship data to be added per file
+                 * @type {Object.<string, Object.<string, number>>}
+                 */
+                const addData = getAddData(file.elements, fileData);
+
+                addAddData(addData, id);
+            });
+        });
+
+    console.log("**********************");
+
+    // Get all files with a masterId (ship data has to be copied from master)
+    Array.from(baseFileNames)
+        .filter(baseFileName => getShipMasterId(baseFileName) !== 0)
+        .forEach(baseFileName => {
+            console.log(baseFileName);
+            /**
+             * @type {number} Current ship id
+             */
+            const id = getShipId(baseFileName);
+            /**
+             * @type {number} Current ship id
+             */
+            const masterId = getShipMasterId(baseFileName);
+
+            // Retrieve and store additional data per file
+            subFileStructure.forEach(file => {
+                const fileData = getFileData(baseFileName, file.ext);
+                const fileMasterData = getFileData(baseFileName, file.ext);
+                /**
+                 * Ship data to be added per file
+                 * @type {Object.<string, Object.<string, number>>}
+                 */
+                const addData = getAddData(file.elements, fileData),
+                    addMasterData = getAddData(file.elements, fileMasterData);
+
+                /*
+                        // https://stackoverflow.com/a/47554782
+                    const mergedData = mergeDeep(addMasterData,addData);
+                    */
+                const mergedData = mergeObj(addMasterData);
+                console.log(mergedData);
+                addAddData(mergedData);
+            });
+        });
 
     saveJson(filename, ships);
 }
