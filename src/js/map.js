@@ -231,7 +231,7 @@ export default class Map {
         this._setupSvg();
         this._setupListener();
         this._setupProps();
-        this._readData(this._getCacheMode());
+        this._readData();
     }
 
     /**
@@ -256,39 +256,6 @@ export default class Map {
         // Use default value if cookie is not stored
         r = typeof r !== "undefined" ? r : this.showLayerDefault;
         return r;
-    }
-
-    _getCacheMode() {
-        let cacheMode = "default";
-        const lastUpdateData = fetch("update.txt", { cache: "reload" })
-            .then(checkFetchStatus)
-            .then(getTextFromFetch);
-        Promise.all([lastUpdateData])
-            .then(values => {
-                let serverDayStart = moment()
-                    .utc()
-                    .hour(11)
-                    .minute(0);
-                if (serverDayStart.isAfter(moment().utc())) {
-                    serverDayStart = serverDayStart.subtract(1, "day");
-                }
-                const lastUpdate = moment(values[0], "YYYY-MM-DD H.mm");
-                /*
-                    console.log(
-                        "serverDayStart",
-                        serverDayStart.format("dddd D MMMM H.mm"),
-                        "lastUpdate",
-                        lastUpdate.format("dddd D MMMM H.mm"),
-                        "lastUpdate.isBefore(serverDayStart)",
-                        lastUpdate.isBefore(serverDayStart, "hour")
-                    );
-                    */
-                if (lastUpdate.isBefore(serverDayStart, "hour")) {
-                    cacheMode = "reload";
-                }
-            })
-            .catch(putFetchError);
-        return cacheMode;
     }
 
     _setupData(data) {
@@ -355,13 +322,11 @@ export default class Map {
         this._init();
     }
 
-    _readData(cacheMode) {
+    _readData() {
         const jsonData = [],
             readData = {};
         this._dataSource.forEach((datum, i) => {
-            jsonData[i] = fetch(datum.fileName, {
-                cache: cacheMode
-            })
+            jsonData[i] = fetch(datum.fileName)
                 .then(checkFetchStatus)
                 .then(getJsonFromFetch);
         });
