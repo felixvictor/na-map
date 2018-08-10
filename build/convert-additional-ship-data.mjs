@@ -156,7 +156,6 @@ function convertAdditionalShipData() {
                 ["FIREZONE_HORIZONTAL_WIDTH", { group: "ship", element: "firezoneHorizontalWidth" }],
                 // ["FIREZONE_MAX_HORIZONTAL_ANGLE", "FIREZONE_MAX_HORIZONTAL_ANGLE"],
                 // ["HIT_PROBABILITY", "HIT_PROBABILITY"],
-                ["MODULE_BASE_HP", { group: "hull", element: "armour" }],
                 ["SHIP_PHYSICS_ACC_COEF", { group: "ship", element: "acceleration" }],
                 ["SHIP_PHYSICS_DEC_COEF", { group: "ship", element: "deceleration" }],
                 // ["SHIP_RHEAS_DRIFT", "SHIP_RHEAS_DRIFT"],
