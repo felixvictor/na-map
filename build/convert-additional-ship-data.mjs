@@ -1,9 +1,9 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import * as fs from "fs";
 import xml2Json from "xml2json";
-import * as mergeObj from "object-merge-advanced";
+import mergeAdvanced from "object-merge-advanced";
 
-import { readJson, readTextFile, saveJson } from "./common.mjs";
+import { isEmpty, readJson, readTextFile, saveJson } from "./common.mjs";
 
 const inDir = process.argv[2],
     filename = process.argv[3];
@@ -15,66 +15,66 @@ const inDir = process.argv[2],
 function convertAdditionalShipData() {
     /**
      * Maps the ship name (lower case for the file name) to the ship id
-     * @type {Map<string, number>}
+     * @type {Map<string, {id: number, master: string}>}
      */
     const shipNames = new Map([
-        ["agamemnon", { id: 694, masterId: 0 }],
-        ["basiccutter", { id: 413, masterId: 271 }],
-        ["basiclynx", { id: 275, masterId: 274 }],
-        ["bellepoule", { id: 264, masterId: 0 }],
-        ["bellona", { id: 265, masterId: 0 }],
-        ["bellona74", { id: 359, masterId: 0 }],
-        ["brig", { id: 266, masterId: 0 }],
-        ["brigmr", { id: 267, masterId: 0 }],
-        ["bucentaure", { id: 268, masterId: 0 }],
-        ["cerberus", { id: 269, masterId: 0 }],
-        ["christian", { id: 1664, masterId: 0 }],
-        ["constitution", { id: 270, masterId: 0 }],
-        ["constitution2", { id: 1674, masterId: 0 }],
-        ["cutter", { id: 271, masterId: 0 }],
-        ["diana", { id: 1665, masterId: 0 }],
-        ["endymion", { id: 768, masterId: 0 }],
-        ["essex", { id: 272, masterId: 0 }],
-        ["frigate", { id: 273, masterId: 0 }],
-        ["grosventre", { id: 396, masterId: 0 }],
-        ["grosventrepirate", { id: 1561, masterId: 0 }],
-        ["gunboat", { id: 695, masterId: 0 }],
-        ["hamburg", { id: 970, masterId: 0 }],
-        ["hercules", { id: 1675, masterId: 0 }],
-        ["hermione", { id: 592, masterId: 0 }],
-        ["indefatiable", { id: 787, masterId: 0 }],
-        ["indiaman", { id: 425, masterId: 0 }],
-        ["ingermanland", { id: 395, masterId: 0 }],
-        ["lhermione", { id: 986, masterId: 0 }],
-        ["lynx", { id: 274, masterId: 0 }],
-        ["mercury", { id: 276, masterId: 0 }],
-        ["navybrig", { id: 277, masterId: 0 }],
-        ["niagara", { id: 278, masterId: 0 }],
-        ["ocean", { id: 650, masterId: 0 }],
-        ["pandora", { id: 1020, masterId: 0 }],
-        ["pavel", { id: 279, masterId: 0 }],
-        ["pickle", { id: 280, masterId: 0 }],
-        ["piratefrigate", { id: 281, masterId: 0 }],
-        ["princedeneufchatel", { id: 1125, masterId: 0 }],
-        ["privateer", { id: 282, masterId: 0 }],
-        ["rattlesnake", { id: 283, masterId: 0 }],
-        ["rattlesnakeheavy", { id: 284, masterId: 0 }],
-        ["renommee", { id: 285, masterId: 0 }],
-        ["requin", { id: 1676, masterId: 0 }],
-        ["rookie brig", { id: 1535, masterId: 266 }],
-        ["rookie snow", { id: 1536, masterId: 287 }],
-        ["santisima", { id: 286, masterId: 0 }],
-        ["snow", { id: 287, masterId: 0 }],
-        ["surprise", { id: 288, masterId: 0 }],
-        ["trader brig", { id: 289, masterId: 266 }],
-        ["trader cutter", { id: 290, masterId: 271 }],
-        ["trader lynx", { id: 291, masterId: 274 }],
-        ["trader snow", { id: 292, masterId: 287 }],
-        ["trincomalee", { id: 293, masterId: 0 }],
-        ["victory", { id: 294, masterId: 0 }],
-        ["wasa", { id: 1021, masterId: 0 }],
-        ["yacht", { id: 295, masterId: 0 }],
-        ["yachtsilver", { id: 393, masterId: 0 }]
+        ["agamemnon", { id: 694, master: "" }],
+        ["basiccutter", { id: 413, master: "cutter" }],
+        ["basiclynx", { id: 275, master: "lynx" }],
+        ["bellepoule", { id: 264, master: "" }],
+        ["bellona", { id: 265, master: "" }],
+        ["bellona74", { id: 359, master: "" }],
+        ["brig", { id: 266, master: "" }],
+        ["brigmr", { id: 267, master: "" }],
+        ["bucentaure", { id: 268, master: "" }],
+        ["cerberus", { id: 269, master: "" }],
+        ["christian", { id: 1664, master: "" }],
+        ["constitution", { id: 270, master: "" }],
+        ["constitution2", { id: 1674, master: "" }],
+        ["cutter", { id: 271, master: "" }],
+        ["diana", { id: 1665, master: "" }],
+        ["endymion", { id: 768, master: "" }],
+        ["essex", { id: 272, master: "" }],
+        ["frigate", { id: 273, master: "" }],
+        ["grosventre", { id: 396, master: "" }],
+        ["grosventrepirate", { id: 1561, master: "" }],
+        ["gunboat", { id: 695, master: "" }],
+        ["hamburg", { id: 970, master: "" }],
+        ["hercules", { id: 1675, master: "" }],
+        ["hermione", { id: 592, master: "" }],
+        ["indefatiable", { id: 787, master: "" }],
+        ["indiaman", { id: 425, master: "" }],
+        ["ingermanland", { id: 395, master: "" }],
+        ["lhermione", { id: 986, master: "" }],
+        ["lynx", { id: 274, master: "" }],
+        ["mercury", { id: 276, master: "" }],
+        ["navybrig", { id: 277, master: "" }],
+        ["niagara", { id: 278, master: "" }],
+        ["ocean", { id: 650, master: "" }],
+        ["pandora", { id: 1020, master: "" }],
+        ["pavel", { id: 279, master: "" }],
+        ["pickle", { id: 280, master: "" }],
+        ["piratefrigate", { id: 281, master: "" }],
+        ["princedeneufchatel", { id: 1125, master: "" }],
+        ["privateer", { id: 282, master: "" }],
+        ["rattlesnake", { id: 283, master: "" }],
+        ["rattlesnakeheavy", { id: 284, master: "" }],
+        ["renommee", { id: 285, master: "" }],
+        ["requin", { id: 1676, master: "" }],
+        ["rookie brig", { id: 1535, master: "brig" }],
+        ["rookie snow", { id: 1536, master: "snow" }],
+        ["santisima", { id: 286, master: "" }],
+        ["snow", { id: 287, master: "" }],
+        ["surprise", { id: 288, master: "" }],
+        ["trader brig", { id: 289, master: "brig" }],
+        ["trader cutter", { id: 290, master: "cutter" }],
+        ["trader lynx", { id: 291, master: "lynx" }],
+        ["trader snow", { id: 292, master: "snow" }],
+        ["trincomalee", { id: 293, master: "" }],
+        ["victory", { id: 294, master: "" }],
+        ["wasa", { id: 1021, master: "" }],
+        ["yacht", { id: 295, master: "" }],
+        ["yachtsilver", { id: 393, master: "" }]
     ]);
 
     /**
@@ -219,8 +219,8 @@ function convertAdditionalShipData() {
         return shipNames.get(baseFileName).id;
     }
 
-    function getShipMasterId(baseFileName) {
-        return shipNames.get(baseFileName).masterId;
+    function getShipMaster(baseFileName) {
+        return shipNames.get(baseFileName).master;
     }
 
     function getAddData(elements, fileData) {
@@ -275,9 +275,9 @@ function convertAdditionalShipData() {
         return xml2Json.toJson(fileXmlData, { object: true });
     }
 
-    // Get all files without a masterId
+    // Get all files without a master
     Array.from(baseFileNames)
-        .filter(baseFileName => getShipMasterId(baseFileName) === 0)
+        .filter(baseFileName => !getShipMaster(baseFileName))
         .forEach(baseFileName => {
             /**
              * @type {number} Current ship id
@@ -297,40 +297,41 @@ function convertAdditionalShipData() {
             });
         });
 
-    console.log("**********************");
-
-    // Get all files with a masterId (ship data has to be copied from master)
+    // Get all files with a master (ship data has to be copied from master)
     Array.from(baseFileNames)
-        .filter(baseFileName => getShipMasterId(baseFileName) !== 0)
+        .filter(baseFileName => getShipMaster(baseFileName))
         .forEach(baseFileName => {
+            console.log("**********************\n\n");
             console.log(baseFileName);
             /**
              * @type {number} Current ship id
              */
             const id = getShipId(baseFileName);
             /**
-             * @type {number} Current ship id
+             * @type {number} Current ship master
              */
-            const masterId = getShipMasterId(baseFileName);
+            const masterBaseFileName = getShipMaster(baseFileName);
 
             // Retrieve and store additional data per file
             subFileStructure.forEach(file => {
                 const fileData = getFileData(baseFileName, file.ext);
-                const fileMasterData = getFileData(baseFileName, file.ext);
+                const fileMasterData = getFileData(masterBaseFileName, file.ext);
                 /**
                  * Ship data to be added per file
                  * @type {Object.<string, Object.<string, number>>}
                  */
-                const addData = getAddData(file.elements, fileData),
+                const addData = !isEmpty(fileData) ? getAddData(file.elements, fileData) : {},
                     addMasterData = getAddData(file.elements, fileMasterData);
 
                 /*
                         // https://stackoverflow.com/a/47554782
                     const mergedData = mergeDeep(addMasterData,addData);
                     */
-                const mergedData = mergeObj(addMasterData);
-                console.log(mergedData);
-                addAddData(mergedData);
+                console.log("add master", addMasterData);
+                console.log("add add", addData);
+                const mergedData = mergeAdvanced(addMasterData, addData);
+                console.log("merged", mergedData);
+                addAddData(mergedData, id);
             });
         });
 
