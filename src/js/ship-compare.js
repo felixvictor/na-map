@@ -132,7 +132,9 @@ class Ship {
         text += `<td>${ship.sideArmor}<br><span class="des">Sides/Sails</span>`;
         text += `<br>${ship.frontArmor}<br><span class="des">Bow</span>`;
         text += `<br>${ship.pump}<br><span class="des">Pump</span>`;
-        text += `<br>${ship.mastArmor}<br><span class="des">Masts</span></td>`;
+        text += `<br>${
+            ship.mastArmor
+        }<br><span class="des">Masts (bottom\u200a\u2013\u200amiddle\u200a\u2013\u200atop)</span></td>`;
         text += `<td>${ship.structure}<br><span class="des">Hull</span>`;
         text += `<br>${ship.backArmor}<br><span class="des">Stern</span>`;
         text += `<br>${ship.rudder}<br><span class="des">Rudder</span></td></tr>`;
@@ -328,7 +330,7 @@ class ShipBase extends Ship {
             )}</span>`,
             pump: formatInt(this._shipData.pump.armour),
             sails: formatInt(this._shipData.sails.armour),
-            structure: formatInt(this._shipData.hull.armour),
+            structure: formatInt(this._shipData.structure.armour),
             backArmor: `${formatInt(this._shipData.stern.armour)}\u00a0<span class="badge badge-light">${formatInt(
                 this._shipData.stern.thickness
             )}</span>`,
@@ -350,11 +352,15 @@ class ShipBase extends Ship {
             hullRepair: `${formatInt(this._shipData.sides.armour / hullRepairsFactor)}`,
             rigRepair: `${formatInt(this._shipData.sails.armour / rigRepairsFactor)}`,
             rumRepair: `${formatInt(this._shipData.crew.max / rumRepairsFactor)}`,
-            mastArmor: `${formatInt(this._shipData.mast.bottomArmour)}\u200a\u2013\u200a${formatInt(
+            mastArmor: `${formatInt(this._shipData.mast.bottomArmour)}\u00a0<span class="badge badge-light">${formatInt(
+                this._shipData.mast.bottomThickness
+            )}</span>\u200a\u2013\u200a${formatInt(
                 this._shipData.mast.middleArmour
-            )}\u200a\u2013\u200a${formatInt(
+            )}\u00a0<span class="badge badge-light">${formatInt(
+                this._shipData.mast.middleThickness
+            )}</span>\u200a\u2013\u200a${formatInt(
                 this._shipData.mast.topArmour
-            )}\u00a0<span class="badge badge-light">${formatInt(this._shipData.mast.thickness)}</span>`
+            )}\u00a0<span class="badge badge-light">${formatInt(this._shipData.mast.topThickness)}</span>`
         };
 
         if (ship.gunsFront) {
@@ -551,9 +557,9 @@ class ShipComparison extends Ship {
                 this._shipCompareData.sails.armour,
                 this._shipBaseData.sails.armour
             )}`,
-            structure: `${formatInt(this._shipCompareData.hull.armour)}\u00a0${getDiff(
-                this._shipCompareData.hull.armour,
-                this._shipBaseData.hull.armour
+            structure: `${formatInt(this._shipCompareData.structure.armour)}\u00a0${getDiff(
+                this._shipCompareData.structure.armour,
+                this._shipBaseData.structure.armour
             )}`,
             backArmor: `${formatInt(
                 this._shipCompareData.stern.armour
@@ -623,11 +629,28 @@ class ShipComparison extends Ship {
                 this._shipCompareData.crew.max / rumRepairsFactor,
                 this._shipBaseData.crew.max / rumRepairsFactor
             )}`,
-            mastArmor: `${formatInt(this._shipCompareData.mast.bottomArmour)}\u200a\u2013\u200a${formatInt(
-                this._shipCompareData.mast.middleArmour
-            )}\u200a\u2013\u200a${formatInt(
-                this._shipCompareData.mast.topArmour
-            )}\u00a0<span class="badge badge-light">${formatInt(this._shipCompareData.mast.thickness)}</span>`
+            mastArmor: `${formatInt(this._shipCompareData.mast.bottomArmour)}\u00a0${getDiff(
+                this._shipCompareData.mast.bottomArmour,
+                this._shipBaseData.mast.bottomArmour
+            )}\u00a0<span class="badge badge-light">${formatInt(
+                this._shipCompareData.mast.bottomThickness
+            )}</span>\u00a0${getDiff(
+                this._shipCompareData.mast.bottomThickness,
+                this._shipBaseData.mast.bottomThickness
+            )}\u200a\u2013\u200a${formatInt(this._shipCompareData.mast.middleArmour)}\u00a0${getDiff(
+                this._shipCompareData.mast.middleArmour,
+                this._shipBaseData.mast.middleArmour
+            )}\u00a0<span class="badge badge-light">${formatInt(
+                this._shipCompareData.mast.middleThickness
+            )}</span>\u00a0${getDiff(
+                this._shipCompareData.mast.middleThickness,
+                this._shipBaseData.mast.middleThickness
+            )}\u200a\u2013\u200a${formatInt(this._shipCompareData.mast.topArmour)}\u00a0${getDiff(
+                this._shipCompareData.mast.topArmour,
+                this._shipBaseData.mast.topArmour
+            )}\u00a0<span class="badge badge-light">${formatInt(
+                this._shipCompareData.mast.topThickness
+            )}</span>\u00a0${getDiff(this._shipCompareData.mast.topThickness, this._shipBaseData.mast.topThickness)}`
         };
 
         if (ship.gunsFront) {
