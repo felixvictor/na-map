@@ -1,29 +1,29 @@
 [[headers]]
     for = "/fonts/*"
     [headers.values]
-        Cache-Control = "public, max-age=2628000"
+        Cache-Control = "max-age=2628000, must-revalidate"
 
 [[headers]]
     for = "/icons/*"
     [headers.values]
-        Cache-Control = "public, max-age=2628000"
+        Cache-Control = "max-age=2628000, must-revalidate"
 
 [[headers]]
     for = "/images/*"
     [headers.values]
-        Cache-Control = "public, max-age=2628000"
+        Cache-Control = "max-age=2628000, must-revalidate"
 
 [[headers]]
     for = "/*.json"
     [headers.values]
-        Cache-Control = "public, max-age=86400"
+        Cache-Control = "max-age=86400, must-revalidate"
 
 [[headers]]
     for = "/*-pb.json"
     [headers.values]
-        Cache-Control = "public, max-age=60"
+        Cache-Control = "max-age=120, must-revalidate"
 
 [[headers]]
     for = "/update.txt"
     [headers.values]
-        Cache-Control = "public, max-age=86400"
+        Cache-Control = "max-age=86400, must-revalidate"
