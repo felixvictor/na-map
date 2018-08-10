@@ -127,6 +127,10 @@ function get_port_data () {
         ${NODE} build/convert-recipes.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${RECIPE_FILE}" "${DATE}"
 
         ${NODE} build/create-xlsx.mjs "${SHIP_FILE}" "${SRC_DIR}/${SERVER_NAMES[0]}.json" "${BASE_DIR}/public/${MODULE}.min.css" "${EXCEL_FILE}"
+
+        return 0
+    else
+        return 1
     fi
 }
 
@@ -217,19 +221,21 @@ function update_data () {
         touch -d "$(git log -1 --format=%cI)" "${LAST_UPDATE_FILE}"
     fi
     LAST_UPDATE=$(date --reference="${LAST_UPDATE_FILE}" +%Y-%m-%d)
+    # Test if already updated today
     if [ "${LAST_UPDATE}" != "${DATE}" ]; then
         update_yarn
         get_git_update
-        get_port_data
+        # Test if new API data available
+        if get_port_data; then
+            remove_tweets
+            get_tweets
+            update_ports
 
-        remove_tweets
-        get_tweets
-        update_ports
-
-        copy_data
-        touch_update
-        push_data update
-        deploy_data
+            copy_data
+            touch_update
+            push_data update
+            deploy_data
+        fi
     fi
 }
 
