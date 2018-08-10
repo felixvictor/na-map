@@ -61,7 +61,7 @@ export function readTextFile(fileName) {
         data = fs.readFileSync(fileName, "utf8");
     } catch (err) {
         if (err.code === "ENOENT") {
-            console.log("File", fileName, "not found");
+            // console.log("File", fileName, "not found");
         } else {
             throw err;
         }
@@ -72,7 +72,6 @@ export function readTextFile(fileName) {
 export function readJson(fileName) {
     return JSON.parse(readTextFile(fileName));
 }
-
 
 /**
  * Test if object is empty

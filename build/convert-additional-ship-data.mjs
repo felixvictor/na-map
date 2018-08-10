@@ -301,8 +301,6 @@ function convertAdditionalShipData() {
     Array.from(baseFileNames)
         .filter(baseFileName => getShipMaster(baseFileName))
         .forEach(baseFileName => {
-            console.log("**********************\n\n");
-            console.log(baseFileName);
             /**
              * @type {number} Current ship id
              */
@@ -327,10 +325,8 @@ function convertAdditionalShipData() {
                         // https://stackoverflow.com/a/47554782
                     const mergedData = mergeDeep(addMasterData,addData);
                     */
-                console.log("add master", addMasterData);
-                console.log("add add", addData);
                 const mergedData = mergeAdvanced(addMasterData, addData);
-                console.log("merged", mergedData);
+
                 addAddData(mergedData, id);
             });
         });
