@@ -14,18 +14,17 @@ SERVER_NAMES=(eu1 eu2)
 SERVER_TWITTER_NAMES=(eu1)
 API_VARS=(ItemTemplates Ports Shops)
 DATE=$(date +%Y-%m-%d)
+HEADER_DATE=$(LC_TIME="en" date -u +"%a, %d %b %Y %H:%M:%S GMT")
 LAST_DATE=$(date '+%Y-%m-%d' --date "-1 day")
 
 function change_var () {
     BASE_DIR="$(pwd)"
     export BASE_DIR
-    export UPDATE_FILE="${BASE_DIR}/src/update.txt"
     common_var
 }
 
 function update_var () {
     export BASE_DIR="/home/natopo/na-topo.git"
-    export UPDATE_FILE="${BASE_DIR}/public/update.txt"
     common_var
 }
 
@@ -39,6 +38,7 @@ function common_var () {
     export LOOT_FILE="${SRC_DIR}/loot.json"
     export EXCEL_FILE="${SRC_DIR}/port-battle.xlsx"
     export TWEETS_JSON="${BUILD_DIR}/API/tweets.json"
+    export NETLIFY_TOML="netlify.toml"
 }
 
 function get_API_data () {
@@ -198,7 +198,7 @@ function change_data () {
 }
 
 function touch_update () {
-    echo "$(date --utc '+%Y-%m-%d %H.%M')" > "${UPDATE_FILE}"
+    sed -i 's|^\(        Expires = \"\).\+\(\" # bash change here\)$|\1'"${HEADER_DATE}"'\2|' "${NETLIFY_TOML}"
 }
 
 function push_data () {
