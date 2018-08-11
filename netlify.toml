@@ -16,14 +16,9 @@
 [[headers]]
     for = "/*.json"
     [headers.values]
-        Cache-Control = "max-age=86400, must-revalidate"
+        Expires = "Sat, 11 Aug 2018 13:35:37 GMT" # bash change here
 
 [[headers]]
     for = "/*-pb.json"
     [headers.values]
-        Cache-Control = "max-age=120, must-revalidate"
-
-[[headers]]
-    for = "/update.txt"
-    [headers.values]
-        Cache-Control = "max-age=86400, must-revalidate"
+        Cache-Control = "max-age=50, must-revalidate"

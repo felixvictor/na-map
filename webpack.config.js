@@ -196,7 +196,6 @@ const config = {
             { from: "images/map", to: "../public/images/map" },
             { from: "images/icons", to: "../public/images/icons" },
             { from: "*.json" },
-            { from: "*.txt" },
             { from: "*.xlsx" },
             { from: "../netlify.toml" }
         ]),
