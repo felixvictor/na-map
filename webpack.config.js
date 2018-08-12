@@ -213,7 +213,7 @@ const config = {
             brand: "images/icons/favicon-32x32.png",
             version: PACKAGE.version
         }),
-        new SitemapPlugin("https://na-map.netlify.com/", sitemapPaths, { skipGzip: false }),
+        new SitemapPlugin(`https://${process.env.TARGET}.netlify.com/`, sitemapPaths, { skipGzip: false }),
         new SriPlugin({
             hashFuncNames: ["sha256", "sha384"],
             enabled: process.env.NODE_ENV === "production"
@@ -322,8 +322,6 @@ const config = {
 };
 
 module.exports = (env, argv) => {
-    console.log(process.env.TARGET, env, argv);
-   process.exit();
     if (argv.mode === "production") {
         config.devtool = "";
         config.plugins.push(new MinifyPlugin(minifyMinifyOpt, pluginMinifyOpt));
