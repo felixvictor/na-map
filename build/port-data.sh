@@ -14,7 +14,7 @@ SERVER_NAMES=(eu1 eu2)
 SERVER_TWITTER_NAMES=(eu1)
 API_VARS=(ItemTemplates Ports Shops)
 DATE=$(date +%Y-%m-%d)
-HEADER_DATE=$(LC_TIME="en" date -u +"%a, %d %b %Y %H:%M:%S GMT")
+HEADER_DATE=$(LC_TIME="en" date -u +"%a, %d %b %Y 10:00:00 GMT" -d "+1 day")
 LAST_DATE=$(date '+%Y-%m-%d' --date "-1 day")
 
 function change_var () {
