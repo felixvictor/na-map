@@ -16,6 +16,7 @@
 [[headers]]
     for = "/*.json"
     [headers.values]
+        Cache-Control = ""
         Expires = "Mon, 13 Aug 2018 10:00:00 GMT" # bash change here
 
 [[headers]]
