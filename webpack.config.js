@@ -322,6 +322,8 @@ const config = {
 };
 
 module.exports = (env, argv) => {
+    console.log(env, argv);
+    process.exit();
     if (argv.mode === "production") {
         config.devtool = "";
         config.plugins.push(new MinifyPlugin(minifyMinifyOpt, pluginMinifyOpt));
