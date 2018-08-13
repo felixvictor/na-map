@@ -10,7 +10,7 @@
     <meta content="Yet another map with in-game map, F11 coordinates, resources. Port data is updated constantly from twitter and daily after maintenance." property="og:description">
 
     <meta content="width=device-width,initial-scale=1" name="viewport">
-    <meta content="https://na-map-test.netlify.com/images/icons/favicon-32x32.png" property="og:image">
+    <meta content="images/icons/favicon-32x32.png" property="og:image">
 
     <link href="images/icons/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png">
     <link href="images/icons/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png">
@@ -19,7 +19,7 @@
     <meta content="images/icons/browserconfig.xml" name="msapplication-config">
 
     <script src="https://www.googletagmanager.com/gtag/js?id=UA-109520372-1" async></script>
-<link href="na-map.min.css?84f31eee5a375b7e89a7" rel="stylesheet" crossorigin="anonymous" integrity="sha256-jNRquIpkWLL4SR3fLxONFWg6oSF1WJcMFK2TDpt2CtY= sha384-Si+F5a/3SXMbw8BYsFNPdC9LM7XcXEDiifu+C/rYdB3BeatCOfgAak1i/TTeWhJu"></head>
+<link href="na-map.min.css?f5f4c990843146ee8903" rel="stylesheet" crossorigin="anonymous" integrity="sha256-lJ3/ou+AMRLLv77ZxQGNvpdlfvPMa9IaLCt2/OF4ikQ= sha384-Md9PGHURDIX4ywCVmV4PLZlJqJxxSDUiuxVNi5TSJE83g6q9BJ7LYRKZsiHPtWIM"></head>
 <body>
 
 <nav class="bg-light fixed-top navbar navbar-expand-lg navbar-light">
@@ -352,7 +352,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <header class="modal-header">
-                <h3>Naval Action map <span class="small text-primary">v5.5.1</span></h3>
+                <h3>Naval Action map <span class="small text-primary">v6.0</span></h3>
             </header>
             <div class="modal-body">
                 <p>Yet another map which uses the in-game map and live data (daily updated soonish after maintenance).
@@ -381,17 +381,17 @@
                         <div class="ml-auto pt-2 col-md-4 columnA">
                             <label for="ship-Base-select"></label><select id="ship-Base-select" name="ship-Base-select">
                             </select>
-                            <div id="ship-Base"></div>
+                            <div class="ship-base" id="ship-Base"></div>
                         </div>
                         <div class="ml-auto pt-2 columnC col-md-4">
                             <label for="ship-C1-select"></label><select id="ship-C1-select" name="ship-C1-select">
                             </select>
-                            <div id="ship-C1"></div>
+                            <div class="ship-compare" id="ship-C1"></div>
                         </div>
                         <div class="ml-auto pt-2 columnC col-md-4">
                             <label for="ship-C2-select"></label><select id="ship-C2-select" name="ship-C2-select">
                             </select>
-                            <div id="ship-C2"></div>
+                            <div class="ship-compare" id="ship-C2"></div>
                         </div>
                     </div>
                 </div>
@@ -518,6 +518,6 @@
     </div>
 </section>
 
-<script src="https://unpkg.com/d3@5.4.0/dist/d3.min.js" crossorigin="anonymous" integrity="sha384-Ha//YQhNUuPzmPKgC8aYpurZcTiV3JhEvEhH5uGW0IRjBfEgDQxvo0aF1Gef+blI"></script>
-<script src="na-map.min.js?84f31eee5a375b7e89a7" crossorigin="anonymous" integrity="sha256-UO3iPcmHojGnSx0LwHv5TlGBsAbP03S8qlhyF4d6flc= sha384-twZNecZ5b8j7dCOpJBfv05BYp9bj1xzaLKRNlPJAxkl5gx+v79Z3YQ+b8msKo8OZ" type="text/javascript"></script></body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.5.0/d3.min.js" crossorigin="anonymous" integrity="sha384-xt54w7/ptFmlL1rMBfoLoM/T0iHjAzuv47CPmW5KtXrv5iphOBlJxMOSkOg0gsmF"></script>
+<script src="na-map.min.js?f5f4c990843146ee8903" crossorigin="anonymous" integrity="sha256-HWVuylvblCdiPqrHdayLdOde/EO5xxMo00t/rpfW31k= sha384-wvXjRCxY/ZDfKaXDf0mqJ4jTpSCKQ+AcFAcLWSHxeJNpMeLkpnPOH06OYJsQ+U6D" type="text/javascript"></script></body>
 </html>
