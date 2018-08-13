@@ -55,7 +55,32 @@ export function saveJson(fileName, data) {
     });
 }
 
-export const readJson = fileName => JSON.parse(fs.readFileSync(fileName, "utf8"));
+export function readTextFile(fileName) {
+    let data = "";
+    try {
+        data = fs.readFileSync(fileName, "utf8");
+    } catch (err) {
+        if (err.code === "ENOENT") {
+            // console.log("File", fileName, "not found");
+        } else {
+            throw err;
+        }
+    }
+    return data;
+}
+
+export function readJson(fileName) {
+    return JSON.parse(readTextFile(fileName));
+}
+
+/**
+ * Test if object is empty
+ * @param {Object} obj - Object
+ * @return {Boolean} True if object is empty
+ */
+export function isEmpty(obj) {
+    return Object.getOwnPropertyNames(obj).length === 0 && obj.constructor === Object;
+}
 
 /**
  * Convert radians to degrees (see {@link http://cwestblog.com/2012/11/12/javascript-degree-and-radian-conversion/})
