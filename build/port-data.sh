@@ -14,18 +14,17 @@ SERVER_NAMES=(eu1 eu2)
 SERVER_TWITTER_NAMES=(eu1)
 API_VARS=(ItemTemplates Ports Shops)
 DATE=$(date +%Y-%m-%d)
+HEADER_DATE=$(LC_TIME="en" date -u +"%a, %d %b %Y 10:00:00 GMT" -d "+1 day")
 LAST_DATE=$(date '+%Y-%m-%d' --date "-1 day")
 
 function change_var () {
     BASE_DIR="$(pwd)"
     export BASE_DIR
-    export UPDATE_FILE="${BASE_DIR}/src/update.txt"
     common_var
 }
 
 function update_var () {
     export BASE_DIR="/home/natopo/na-topo.git"
-    export UPDATE_FILE="${BASE_DIR}/public/update.txt"
     common_var
 }
 
@@ -39,6 +38,7 @@ function common_var () {
     export LOOT_FILE="${SRC_DIR}/loot.json"
     export EXCEL_FILE="${SRC_DIR}/port-battle.xlsx"
     export TWEETS_JSON="${BUILD_DIR}/API/tweets.json"
+    export NETLIFY_TOML="netlify.toml"
 }
 
 function get_API_data () {
@@ -120,12 +120,17 @@ function get_port_data () {
         rm "${BUILD_DIR}"/*.geojson
 
         ${NODE} build/convert-ships.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${SHIP_FILE}" "${DATE}"
+        ${NODE} build/convert-additional-ship-data.mjs "${BUILD_DIR}/Modules" "${SHIP_FILE}"
         ${NODE} build/convert-modules.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${SRC_DIR}" "${DATE}"
         ${NODE} build/convert-buildings.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${BUILDING_FILE}" "${DATE}"
         ${NODE} build/convert-loot.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${LOOT_FILE}" "${DATE}"
         ${NODE} build/convert-recipes.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${RECIPE_FILE}" "${DATE}"
 
         ${NODE} build/create-xlsx.mjs "${SHIP_FILE}" "${SRC_DIR}/${SERVER_NAMES[0]}.json" "${BASE_DIR}/public/${MODULE}.min.css" "${EXCEL_FILE}"
+
+        return 0
+    else
+        return 1
     fi
 }
 
@@ -193,7 +198,7 @@ function change_data () {
 }
 
 function touch_update () {
-    echo "$(date --utc '+%Y-%m-%d %H.%M')" > "${UPDATE_FILE}"
+    sed -i 's|^\(        Expires = \"\).\+\(\" # bash change here\)$|\1'"${HEADER_DATE}"'\2|' "${NETLIFY_TOML}"
 }
 
 function push_data () {
@@ -216,19 +221,21 @@ function update_data () {
         touch -d "$(git log -1 --format=%cI)" "${LAST_UPDATE_FILE}"
     fi
     LAST_UPDATE=$(date --reference="${LAST_UPDATE_FILE}" +%Y-%m-%d)
+    # Test if already updated today
     if [ "${LAST_UPDATE}" != "${DATE}" ]; then
         update_yarn
         get_git_update
-        get_port_data
+        # Test if new API data available
+        if get_port_data; then
+            remove_tweets
+            get_tweets
+            update_ports
 
-        remove_tweets
-        get_tweets
-        update_ports
-
-        copy_data
-        touch_update
-        push_data update
-        deploy_data
+            copy_data
+            touch_update
+            push_data update
+            deploy_data
+        fi
     fi
 }
 
