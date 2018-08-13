@@ -31,7 +31,7 @@ const formatPrefix = d3.formatPrefix(",.0", 1e3);
  * Format float
  * @function
  * @param {Number} x - Float
- * @param {Number} s - Signifant digits
+ * @param {Number} s - Significant digits
  * @return {String} - Formatted float
  */
 export const formatFloat = (x, s = 2) =>
