@@ -196,7 +196,6 @@ const config = {
             { from: "images/map", to: "../public/images/map" },
             { from: "images/icons", to: "../public/images/icons" },
             { from: "*.json" },
-            { from: "*.txt" },
             { from: "*.xlsx" },
             { from: "../netlify.toml" }
         ]),
@@ -211,10 +210,10 @@ const config = {
             title: "Naval Action map",
             description:
                 "Yet another map with in-game map, F11 coordinates, resources. Port data is updated constantly from twitter and daily after maintenance.",
-            brand: "https://na-map-test.netlify.com/images/icons/favicon-32x32.png",
+            brand: "images/icons/favicon-32x32.png",
             version: PACKAGE.version
         }),
-        new SitemapPlugin("https://na-map.netlify.com/", sitemapPaths, { skipGzip: false }),
+        new SitemapPlugin(`https://${process.env.TARGET}.netlify.com/`, sitemapPaths, { skipGzip: false }),
         new SriPlugin({
             hashFuncNames: ["sha256", "sha384"],
             enabled: process.env.NODE_ENV === "production"
