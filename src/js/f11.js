@@ -110,6 +110,9 @@ export default class F11 {
 
             registerEvent("Menu", "Paste F11 coordinates");
             this._goToF11(x, z);
+        } else {
+            // Remove trailing hash from URL
+            history.pushState("", "", window.location.pathname);
         }
     }
 
