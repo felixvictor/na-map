@@ -31,7 +31,7 @@ const formatPrefix = d3.formatPrefix(",.0", 1e3);
  * Format float
  * @function
  * @param {Number} x - Float
- * @param {Number} s - Signifant digits
+ * @param {Number} s - Significant digits
  * @return {String} - Formatted float
  */
 export const formatFloat = (x, s = 2) =>
@@ -188,7 +188,7 @@ export const between = (value, a, b, inclusive) => {
  * @param {Number} radians - Radians
  * @return {Number} Degrees
  */
-export const radiansToDegrees = radians => radians * 180 / Math.PI;
+export const radiansToDegrees = radians => (radians * 180) / Math.PI;
 
 /**
  * Convert degrees to radians
@@ -196,7 +196,7 @@ export const radiansToDegrees = radians => radians * 180 / Math.PI;
  * @param {Number} degrees - Degrees
  * @return {Number} Radians
  */
-export const degreesToRadians = degrees => Math.PI / 180 * (degrees - 90);
+export const degreesToRadians = degrees => (Math.PI / 180) * (degrees - 90);
 
 /**
  * @typedef {Array} Point
