@@ -1,0 +1,423 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ModuleTemplate xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="Tower Cannon 12 pd" Type="CANNON_12">
+  <Attributes>
+    <Pair>
+      <Key>MODULE_DESCRIPTION</Key>
+      <Value xsi:type="StringAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>cannon 12 pd</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_BLOW_CHANCE</Key>
+      <Value xsi:type="FloatAttribute" Action="Relative" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>0.01</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>HIT_PROBABILITY</Key>
+      <Value xsi:type="FloatAttribute" Action="Relative" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>0.015</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>DAMAGE_MULTIPLIER</Key>
+      <Value xsi:type="FloatAttribute" Action="Relative" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>1</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_SHORT_PREFAB_PATH</Key>
+      <Value xsi:type="StringAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>Assets/Resources/Client/Cannons/12p/12p_Short.prefab</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_FULL_PREFAB_PATH</Key>
+      <Value xsi:type="StringAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>Assets/Resources/Client/Cannons/12p/12p_Full.prefab</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_SHOT_PREFAB_PATH</Key>
+      <Value xsi:type="StringAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>Client/Particles/CannonShots/Prefabs/</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_BASIC_DAMAGE</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>56</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_FIREPOWER</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>700</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_MIN_ANGLE</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>6</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_MAX_ANGLE</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>20</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_DISPERSION_PER100M</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>4.4</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_DISPERSION_VERTICAL_PER100M</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>13.2</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_DISPERSION_REDUCTION_SPEED</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>1</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_RELOAD_TIME</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>25</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>DAMAGE_TYPE</Key>
+      <Value xsi:type="IntegerAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>0</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>MODULE_BASE_HP</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>6</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_SHORT_SOUND</Key>
+      <Value xsi:type="StringAttribute" Action="Relative" IsLocal="true" IsPermanent="false" IsNegative="false">
+        <Value>CANNON_MEDIUM_FIRE_GROUP_6</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_LONG_SOUND</Key>
+      <Value xsi:type="StringAttribute" Action="Relative" IsLocal="true" IsPermanent="false" IsNegative="false">
+        <Value>CANNON_MEDIUM_FIRE_GROUP_12</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_ENEMY_SHORT_SOUND</Key>
+      <Value xsi:type="StringAttribute" Action="Relative" IsLocal="true" IsPermanent="false" IsNegative="false">
+        <Value>ON_ENEMY_FIRE_SHORT</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_ENEMY_LONG_SOUND</Key>
+      <Value xsi:type="StringAttribute" Action="Relative" IsLocal="true" IsPermanent="false" IsNegative="false">
+        <Value>ON_ENEMY_FIRE_LONG</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_BASIC_PENETRATION</Key>
+      <Value xsi:type="FloatAttribute" Action="Relative" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>114</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>FIRE_PROBABILITY</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>0</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_MASS</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>3.36</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_BALL_RADIUS</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>0.21</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_SINGLE_SOUND</Key>
+      <Value xsi:type="StringAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
+        <Value>CANNON_SINGLE_MEDIUM</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_ENEMY_SINGLE_SOUND</Key>
+      <Value xsi:type="StringAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
+        <Value>ON_ENEMY_SINGLE_BIG</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_ENEMY_CANNONADE_CLOSE_SINGLE_SOUND</Key>
+      <Value xsi:type="StringAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
+        <Value>ON_ENEMY_CANNONADE_SINGLE_SMALL_CLOSE</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_ENEMY_CANNONADE_CLOSE_SHORT_SOUND</Key>
+      <Value xsi:type="StringAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
+        <Value>ON_ENEMY_CANNONADE_GROUP_SHORT_CLOSE</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_ENEMY_CANNONADE_CLOSE_LONG_SOUND</Key>
+      <Value xsi:type="StringAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
+        <Value>ON_ENEMY_CANNONADE_GROUP_LONG_CLOSE</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_ENEMY_CANNONADE_FAR_SINGLE_SOUND</Key>
+      <Value xsi:type="StringAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
+        <Value>ON_ENEMY_CANNONADE_SINGLE_SMALL_FAR</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_ENEMY_CANNONADE_FAR_SHORT_SOUND</Key>
+      <Value xsi:type="StringAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
+        <Value>ON_ENEMY_CANNONADE_GROUP_SHORT_FAR</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_ENEMY_CANNONADE_FAR_LONG_SOUND</Key>
+      <Value xsi:type="StringAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
+        <Value>ON_ENEMY_CANNONADE_GROUP_LONG_FAR</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_CANNONADE_SINGLE_SOUND</Key>
+      <Value xsi:type="StringAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
+        <Value>CANNONADE_SINGLE_SMALL</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_CANNONADE_SHORT_SOUND</Key>
+      <Value xsi:type="StringAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
+        <Value>CANNONADE_GROUP_SHORT</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_CANNONADE_LONG_SOUND</Key>
+      <Value xsi:type="StringAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
+        <Value>CANNONADE_GROUP_LONG</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_BULLET_TYPE_1</Key>
+      <Value xsi:type="StringAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
+        <Value>Ball</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_BULLET_TYPE_2</Key>
+      <Value xsi:type="StringAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
+        <Value>Chain</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_BULLET_TYPE_3</Key>
+      <Value xsi:type="StringAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
+        <Value>Double</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_BULLET_TYPE_4</Key>
+      <Value xsi:type="StringAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
+        <Value>Canister</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_FIREZONE_HORIZONTAL_ROTATION_SPEED</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
+        <Value>0</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_BULLETS_PER_SHOT</Key>
+      <Value xsi:type="IntegerAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>0</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_DISPERSION_REDUCTION_ANGLE_CHANGE_MULTIPLIER</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>0.4</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_DISPERSION_SHIP_SPEED_MODIFIER</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>0</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_DISPERSION_SHIP_PITCHING_MODIFIER</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>0</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_PRELIMINARY_SOUND</Key>
+      <Value xsi:type="StringAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
+        <Value>CANNON_SINGLE_MEDIUM_PRELIMINARY</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_FORWARD_FLY_TIME</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>0.5</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_FORWARD_FIREPOWER_LOSS</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>0.585</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_GRAVITY_MULTIPLIER</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>1</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_TYPE</Key>
+      <Value xsi:type="IntegerAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
+        <Value>5</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_CLASS</Key>
+      <Value xsi:type="IntegerAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
+        <Value>4</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>ARMOR_DAMAGE_ABSORB_MULTIPLIER</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
+        <Value>1</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_CREW_REQUIRED</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
+        <Value>6</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_PENETRATION_DEGRADATION</Key>
+      <Value xsi:type="CurveAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
+        <Value>
+          <Time>0</Time>
+          <Value>1</Value>
+          <TangentIn>-0.399999619</TangentIn>
+          <TangentOut>-0.399999619</TangentOut>
+        </Value>
+        <Value>
+          <Time>0.025</Time>
+          <Value>0.99</Value>
+          <TangentIn>-0.399999619</TangentIn>
+          <TangentOut>-0.399999619</TangentOut>
+        </Value>
+        <Value>
+          <Time>0.05</Time>
+          <Value>0.99</Value>
+          <TangentIn>0</TangentIn>
+          <TangentOut>0</TangentOut>
+        </Value>
+        <Value>
+          <Time>0.1</Time>
+          <Value>0.97</Value>
+          <TangentIn>-0.399999619</TangentIn>
+          <TangentOut>-0.399999619</TangentOut>
+        </Value>
+        <Value>
+          <Time>0.2</Time>
+          <Value>0.94</Value>
+          <TangentIn>-0.3000003</TangentIn>
+          <TangentOut>-0.3000003</TangentOut>
+        </Value>
+        <Value>
+          <Time>0.3</Time>
+          <Value>0.92</Value>
+          <TangentIn>-0.1999998</TangentIn>
+          <TangentOut>-0.1999998</TangentOut>
+        </Value>
+        <Value>
+          <Time>0.4</Time>
+          <Value>0.89</Value>
+          <TangentIn>-0.30000034</TangentIn>
+          <TangentOut>-0.30000034</TangentOut>
+        </Value>
+        <Value>
+          <Time>0.6</Time>
+          <Value>0.84</Value>
+          <TangentIn>-0.25000003</TangentIn>
+          <TangentOut>-0.25000003</TangentOut>
+        </Value>
+        <Value>
+          <Time>0.8</Time>
+          <Value>0.8</Value>
+          <TangentIn>-0.199999824</TangentIn>
+          <TangentOut>-0.199999824</TangentOut>
+        </Value>
+        <Value>
+          <Time>1</Time>
+          <Value>0.76</Value>
+          <TangentIn>-0.200000122</TangentIn>
+          <TangentOut>-0.200000122</TangentOut>
+        </Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>ARMOR_THICKNESS</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>30</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_BULLET_TYPE_5</Key>
+      <Value xsi:type="StringAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
+        <Value>DoubleCharge</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_BALL_ARMOR_SPLINTERS_DAMAGE_FOR_CREW</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>8</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_CHAIN_DAMAGE_DEGRADATION</Key>
+      <Value xsi:type="CurveAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
+        <Value>
+          <Time>0</Time>
+          <Value>1</Value>
+          <TangentIn>0</TangentIn>
+          <TangentOut>0</TangentOut>
+        </Value>
+        <Value>
+          <Time>1</Time>
+          <Value>1</Value>
+          <TangentIn>0</TangentIn>
+          <TangentOut>0</TangentOut>
+        </Value>
+      </Value>
+    </Pair>
+  </Attributes>
+</ModuleTemplate>

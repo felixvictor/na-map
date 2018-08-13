@@ -44,37 +44,83 @@ import { registerEvent } from "./analytics";
 
 /**
  * Display naval action map
- * @param {string} serverName - Naval action server name
- * @returns {void}
  */
 export default class Map {
     /**
-     * Constructor
+     * @param {string} serverName - Naval action server name
      */
     constructor(serverName) {
+        /**
+         * Naval action server name
+         * @type {string}
+         * @private
+         */
         this._serverName = serverName;
+
+        /**
+         * @type {Array<fileName: string, name: string>}
+         * @private
+         */
+        this._dataSource = [
+            {
+                fileName: `${serverName}.json`,
+                name: "ports"
+            },
+            {
+                fileName: `${serverName}-pb.json`,
+                name: "pb"
+            },
+            {
+                fileName: "pb.json",
+                name: "pbZones"
+            },
+            {
+                fileName: "ships.json",
+                name: "ships"
+            },
+            {
+                fileName: "woods.json",
+                name: "woods"
+            },
+            {
+                fileName: "modules.json",
+                name: "modules"
+            },
+            {
+                fileName: "recipes.json",
+                name: "recipes"
+            },
+            {
+                fileName: "buildings.json",
+                name: "buildings"
+            }
+        ];
 
         /**
          * Font size in px
          * @type {Number}
+         * @private
          */
         this._rem = defaultFontSize;
 
         /**
          * Left padding for brand icon
          * @type {Number}
+         * @private
          */
         this._navbarBrandPaddingLeft = Math.floor(1.618 * this._rem); // equals 1.618rem
 
         /**
          * Left padding for brand icon
          * @type {Number}
+         * @private
          */
         this._xGridBackgroundHeight = Math.floor(3 * this._rem);
 
         /**
          * Left padding for brand icon
          * @type {Number}
+         * @private
          */
         this._yGridBackgroundWidth = Math.floor(4 * this._rem);
 
@@ -85,6 +131,7 @@ export default class Map {
          * @property {Number} right - Right margin
          * @property {Number} bottom - Bottom margin
          * @property {Number} left - Left margin
+         * @private
          */
         this._margin = {
             top: Math.floor($(".navbar").height() + this._navbarBrandPaddingLeft),
@@ -98,6 +145,7 @@ export default class Map {
          * @type {Object}
          * @property {Number} min - Minimum world coordinate
          * @property {Number} max - Maximum world coordinate
+         * @private
          */
         this._coord = {
             min: 0,
@@ -107,6 +155,7 @@ export default class Map {
         /**
          * Width of map svg (screen coordinates)
          * @type {Number}
+         * @private
          */
         // eslint-disable-next-line no-restricted-globals
         this._width = Math.floor(top.innerWidth - this._margin.left - this._margin.right);
@@ -114,6 +163,7 @@ export default class Map {
         /**
          * Height of map svg (screen coordinates)
          * @type {Number}
+         * @private
          */
         // eslint-disable-next-line no-restricted-globals
         this._height = Math.floor(top.innerHeight - this._margin.top - this._margin.bottom);
@@ -130,6 +180,7 @@ export default class Map {
         /**
          * Current map scale
          * @type {Number}
+         * @private
          */
         this._currentScale = this._minScale;
 
@@ -137,12 +188,14 @@ export default class Map {
          * DoubleClickAction cookie name
          * @type {string}
          * @private
+         * @private
          */
         this._doubleClickActionCookieName = "na-map--double-click";
 
         /**
          * Default DoubleClickAction setting
          * @type {string}
+         * @private
          * @private
          */
         this._doubleClickActionDefault = "compass";
@@ -178,62 +231,37 @@ export default class Map {
         this._setupSvg();
         this._setupListener();
         this._setupProps();
-        this._readData(this._getCacheMode());
+        this._readData();
     }
 
+    /**
+     * Read cookie for doubleClickAction
+     * @return {string} doubleClickAction
+     * @private
+     */
     _getDoubleClickAction() {
         let r = Cookies.get(this.doubleClickActionCookieName);
         // Use default value if cookie is not stored
         r = typeof r !== "undefined" ? r : this.doubleClickActionDefault;
-        console.log("_getDoubleClickAction", r);
         return r;
     }
 
+    /**
+     * Read cookie for showLayer
+     * @return {string} showLayer
+     * @private
+     */
     _getShowLayer() {
         let r = Cookies.get(this.showLayerCookieName);
         // Use default value if cookie is not stored
         r = typeof r !== "undefined" ? r : this.showLayerDefault;
-        console.log("_getShowLayer", r);
         return r;
     }
 
-    _getCacheMode() {
-        console.log("     _getCacheMode");
-        let cacheMode = "default";
-        const lastUpdateData = fetch("update.txt", { cache: "reload" })
-            .then(checkFetchStatus)
-            .then(getTextFromFetch);
-        Promise.all([lastUpdateData])
-            .then(values => {
-                let serverDayStart = moment()
-                    .utc()
-                    .hour(11)
-                    .minute(0);
-                if (serverDayStart.isAfter(moment().utc())) {
-                    serverDayStart = serverDayStart.subtract(1, "day");
-                }
-                const lastUpdate = moment(values[0], "YYYY-MM-DD H.mm");
-                /*
-                    console.log(
-                        "serverDayStart",
-                        serverDayStart.format("dddd D MMMM H.mm"),
-                        "lastUpdate",
-                        lastUpdate.format("dddd D MMMM H.mm"),
-                        "lastUpdate.isBefore(serverDayStart)",
-                        lastUpdate.isBefore(serverDayStart, "hour")
-                    );
-                    */
-                if (lastUpdate.isBefore(serverDayStart, "hour")) {
-                    cacheMode = "reload";
-                }
-            })
-            .catch(putFetchError);
-        return cacheMode;
-    }
-
-    _assignData(data) {
+    _setupData(data) {
+        const portData = topojsonFeature(data.ports, data.ports.objects.ports);
         // Port ids of capturable ports
-        let portIds = [];
+        const portIds = portData.features.filter(port => !port.properties.nonCapturable).map(port => port.id);
 
         function getFeature(object) {
             return object.filter(port => portIds.includes(port.id)).map(d => ({
@@ -243,7 +271,6 @@ export default class Map {
             }));
         }
 
-        const portData = topojsonFeature(data.ports, data.ports.objects.ports);
         this._ports = new PortDisplay(
             portData.features,
             data.pb,
@@ -252,9 +279,6 @@ export default class Map {
             this.margin.right,
             this.minScale
         );
-
-        // Port ids of capturable ports
-        portIds = portData.features.filter(port => !port.properties.nonCapturable).map(port => port.id);
 
         let pbCircles = topojsonFeature(data.pbZones, data.pbZones.objects.pbCircles);
         pbCircles = getFeature(pbCircles.features);
@@ -294,62 +318,31 @@ export default class Map {
         this._f11 = new F11(this);
         this._grid = new Grid(this);
         this._course = new Course(this.rem);
+
+        this._init();
     }
 
-    _readData(cacheMode) {
-        console.log("_readData");
-        const naMapJsonData = fetch(`${this.serverName}.json`, { cache: cacheMode })
-            .then(checkFetchStatus)
-            .then(getJsonFromFetch);
-        const pbJsonData = fetch(`${this.serverName}-pb.json`, { cache: cacheMode })
-            .then(checkFetchStatus)
-            .then(getJsonFromFetch);
-        const pbZonesJsonData = fetch("pb.json", { cache: cacheMode })
-            .then(checkFetchStatus)
-            .then(getJsonFromFetch);
-        const shipJsonData = fetch("ships.json", { cache: cacheMode })
-            .then(checkFetchStatus)
-            .then(getJsonFromFetch);
-        const woodJsonData = fetch("woods.json", { cache: cacheMode })
-            .then(checkFetchStatus)
-            .then(getJsonFromFetch);
-        const moduleJsonData = fetch("modules.json", { cache: cacheMode })
-            .then(checkFetchStatus)
-            .then(getJsonFromFetch);
-        const recipeJsonData = fetch("recipes.json", { cache: cacheMode })
-            .then(checkFetchStatus)
-            .then(getJsonFromFetch);
-        const buildingJsonData = fetch("buildings.json", { cache: cacheMode })
-            .then(checkFetchStatus)
-            .then(getJsonFromFetch);
-        Promise.all([
-            naMapJsonData,
-            pbJsonData,
-            pbZonesJsonData,
-            shipJsonData,
-            woodJsonData,
-            moduleJsonData,
-            recipeJsonData,
-            buildingJsonData
-        ])
+    _readData() {
+        const jsonData = [],
+            readData = {};
+        this._dataSource.forEach((datum, i) => {
+            jsonData[i] = fetch(datum.fileName)
+                .then(checkFetchStatus)
+                .then(getJsonFromFetch);
+        });
+
+        Promise.all(jsonData)
             .then(values => {
-                this._assignData({
-                    ports: values[0],
-                    pb: values[1],
-                    pbZones: values[2],
-                    ships: values[3],
-                    woods: values[4],
-                    modules: values[5],
-                    recipes: values[6],
-                    buildings: values[7]
+                values.forEach((value, i) => {
+                    readData[this._dataSource[i].name] = values[i];
                 });
-                this._init();
+
+                this._setupData(readData);
             })
             .catch(putFetchError);
     }
 
     _setupListener() {
-        console.log("_setupListener");
         function stopProp() {
             if (d3.event.defaultPrevented) {
                 d3.event.stopPropagation();
@@ -385,7 +378,6 @@ export default class Map {
     }
 
     _setupSvg() {
-        console.log("_setupSvg");
         // noinspection JSSuspiciousNameCombination
         this.zoom = d3
             .zoom()
