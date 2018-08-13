@@ -202,8 +202,8 @@ function convertAdditionalShipData() {
                 ["REPAIR_MODULE_TIME", { group: "repairTime", element: "sails" }],
                 // ["RHEA_TURN_SPEED", "RHEA_TURN_SPEED"],
                 ["SAIL_RISING_SPEED", { group: "sails", element: "risingSpeed" }],
-                ["SAILING_CREW_REQUIRED", { group: "crew", element: "sailing" }]
-                // ["SHIP_MAX_SPEED",  { group: "sails", element: "thickness" }],
+                ["SAILING_CREW_REQUIRED", { group: "crew", element: "sailing" }],
+                ["SHIP_MAX_SPEED", { group: "ship", element: "maxSpeed" }]
                 // ["SPANKER_TURN_SPEED", { group: "sails", element: "spankerTurnSpeed" }]
             ])
         },
