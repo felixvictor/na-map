@@ -33,17 +33,23 @@ export default class F11 {
             event.preventDefault();
         });
 
-        $("#copy-coord").click(() => this._copyCoordClicked());
-
-        document.addEventListener("paste", event => {
-            this._pasteF11FromClipboard(event);
-            event.preventDefault();
+        $("#copy-coord").click(() => {
+            registerEvent("Menu", "Copy F11 coordinates");
+            this._copyCoordClicked();
         });
     }
 
+    static getXCoord() {
+        return +$("#x-coord").val();
+    }
+
+    static getZCoord() {
+        return +$("#z-coord").val();
+    }
+
     _f11Submitted() {
-        const x = +$("#x-coord").val() * -1000,
-            z = +$("#z-coord").val() * -1000;
+        const x = F11.getXCoord() * -1000,
+            z = F11.getZCoord() * -1000;
 
         this._goToF11(x, z);
     }
@@ -59,62 +65,25 @@ export default class F11 {
     }
 
     _copyCoordClicked() {
-        const x = $("#x-coord").val(),
-            z = $("#z-coord").val();
+        const x = F11.getXCoord(),
+            z = F11.getZCoord();
 
         if (!Number.isNaN(x) && !Number.isNaN(z)) {
-            const F11String = `F11 coordinates X: ${x}k Z: ${z}k`;
-            this.constructor._copyF11ToClipboard(F11String);
-        }
-    }
-
-    _addF11StringToInput(F11String) {
-        const regex = /F11 coordinates X: ([-+]?[0-9]*)k Z: ([-+]?[0-9]*)k/g,
-            match = regex.exec(F11String);
-
-        if (match && !Number.isNaN(+match[1]) && !Number.isNaN(+match[2])) {
-            const x = +match[1] * -1000,
-                z = +match[2] * -1000;
-            if (!Number.isNaN(Number(x)) && !Number.isNaN(Number(z))) {
-                this._goToF11(x, z);
-            }
-        }
-    }
-
-    _pasteF11FromClipboard(e) {
-        const F11String =
-            // eslint-disable-next-line no-nested-ternary
-            e.clipboardData && e.clipboardData.getData
-                ? e.clipboardData.getData("text/plain") // Standard
-                : window.clipboardData && window.clipboardData.getData
-                    ? window.clipboardData.getData("Text") // MS
-                    : false;
-
-        // If one of the F11 input elements is in focus
-        if (document.activeElement.id === "x-coord" || document.activeElement.id === "z-coord") {
-            // test for number
-            if (!Number.isNaN(+F11String)) {
-                // paste number in input element
-                $(`#${document.activeElement.id}`)
-                    .val(F11String)
-                    .select();
-            }
-        } else {
-            // Paste F11string
-            this._addF11StringToInput(F11String);
+            const F11Url = new URL(window.location);
+            F11Url.searchParams.set("x", x);
+            F11Url.searchParams.set("z", z);
+            this.constructor._copyF11ToClipboard(F11Url);
         }
     }
 
     _printF11Coord(x, y, F11X, F11Y) {
         const g = this._g.append("g").attr("transform", `translate(${x},${y})`);
         g.append("circle").attr("r", 10);
-        g
-            .append("text")
+        g.append("text")
             .attr("dx", "-.6em")
             .attr("dy", "-.5em")
             .text(formatF11(F11X));
-        g
-            .append("text")
+        g.append("text")
             .attr("dx", "-.6em")
             .attr("dy", ".5em")
             .text(formatF11(F11Y));
@@ -129,6 +98,21 @@ export default class F11 {
         if (between(x, this._minCoord, this._maxCoord, true) && between(y, this._minCoord, this._maxCoord, true)) {
             this._printF11Coord(x, y, F11X, F11Y);
             this._map.zoomAndPan(x, y, 1);
+        }
+    }
+
+    checkF11Coord() {
+        const urlParams = new URL(document.location).searchParams;
+
+        if (urlParams.has("x") && urlParams.has("z")) {
+            const x = +urlParams.get("x") * -1000,
+                z = +urlParams.get("z") * -1000;
+
+            registerEvent("Menu", "Paste F11 coordinates");
+            this._goToF11(x, z);
+        } else {
+            // Remove trailing hash from URL
+            history.pushState("", "", window.location.pathname);
         }
     }
 
