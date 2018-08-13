@@ -50,7 +50,9 @@ class Ship {
             .append("g")
             .attr("transform", `translate(${this._shipData.svgWidth / 2}, ${this._shipData.svgHeight / 2})`);
         d3.select(`${this._select} div`).remove();
-        d3.select(this._select).append("div");
+        d3.select(this._select)
+            .append("div")
+            .classed("block", true);
     }
 
     _setCompass() {
@@ -99,69 +101,111 @@ class Ship {
     }
 
     static getText(ship) {
-        let text = '<table class="table table-sm table-striped small ship"><tbody>';
+        let row = 0;
+        /**
+         * HTML format the first column
+         * @param {string} element - Ship element
+         * @return {string} HTML formatted column
+         */
+        function displayFirstColumn(element) {
+            row += 1;
+            return `<div class="row small ${row % 2 ? "light" : ""}"><div class="col-3">${element}</div>`;
+        }
 
-        text += `<tr><td>${ship.shipRating}</td>`;
-        text += `<td>${ship.battleRating}<br><span class="des">Battle rating</span>`;
-        text += `<br>${ship.upgradeXP}<br><span class="des">Knowledge XP</span></td>`;
-        text += `<td>${ship.guns}<br><span class="des">Cannons</span>`;
-        text += `<br>${ship.waterlineHeight}<br><span class="des">Water line</span></td></tr>`;
+        /**
+         * HTML format a single column
+         * @param {string} element - Ship element
+         * @param {string} description - Element description
+         * @param {number} col - Number of columns
+         * @return {string} HTML formatted column
+         */
+        function displayColumn(element, description, col = 6) {
+            return `<div class="col-${col}">${ship[element]}<br><span class="des">${description}</span></div>`;
+        }
 
-        text += `<tr><td>${ship.decks}</td>`;
-        text += `<td colspan="2" class="gun-decks">${ship.cannonsPerDeck}<br><span class="des">Gun decks</span><br>${
-            ship.firezoneHorizontalWidth
-        }<br><span class="des">Firezone horizontal width</span>${ship.additionalRow}</td></tr>`;
+        function displaySecondBlock() {
+            return '<div class="col-9"><div class="row no-gutters">';
+        }
 
-        text += "<tr><td>Broadside (pd)</td>";
-        text += `<td>${ship.cannonBroadside}<br><span class="des">Cannons</span></td>`;
-        text += `<td>${ship.carroBroadside}<br><span class="des">Carronades</span></td></tr>`;
+        let text = "";
 
-        text += "<tr><td>Chasers</td>";
-        text += `<td>${ship.gunsFront}<br><span class="des">Bow</span></td>`;
-        text += `<td>${ship.gunsBack}<br><span class="des">Stern</span></td></tr>`;
+        text += displayFirstColumn(ship.shipRating);
+        text += displaySecondBlock();
+        text += displayColumn("battleRating", "Battle rating");
+        text += displayColumn("guns", "Cannons");
+        text += displayColumn("upgradeXP", "Knowledge XP");
+        text += displayColumn("waterlineHeight", "Water line");
+        text += "</div></div></div>";
 
-        text += "<tr><td>Speed</td>";
-        text += `<td>${ship.minSpeed}<br><span class="des">Minimum</span>`;
-        text += `<br>${ship.acceleration}<br><span class="des">Acceleration</span>`;
-        text += `<br>${ship.maxTurningSpeed}<br><span class="des">Turn speed</span></td>`;
-        text += `<td>${ship.maxSpeed}<br><span class="des">Maximum</span>`;
-        text += `<br>${ship.deceleration}<br><span class="des">Deceleration</span>`;
-        text += `<br>${ship.halfturnTime}<br><span class="des">Rudder half time</span></td></tr>`;
+        text += displayFirstColumn(ship.decks);
+        text += displaySecondBlock();
+        text += displayColumn("cannonsPerDeck", "Gun decks");
+        text += displayColumn("firezoneHorizontalWidth", "Firezone horizontal width");
+        text += "</div></div></div>";
 
-        text += '<tr><td>Armour <span class="badge badge-light">Thickness</span></td>';
-        text += `<td>${ship.sideArmor}<br><span class="des">Sides/Sails</span>`;
-        text += `<br>${ship.frontArmor}<br><span class="des">Bow</span>`;
-        text += `<br>${ship.pump}<br><span class="des">Pump</span>`;
-        text += `<br>${
-            ship.mastArmor
-        }<br><span class="des">Masts (bottom\u200a\u2013\u200amiddle\u200a\u2013\u200atop)</span></td>`;
-        text += `<td>${ship.structure}<br><span class="des">Hull</span>`;
-        text += `<br>${ship.backArmor}<br><span class="des">Stern</span>`;
-        text += `<br>${ship.rudder}<br><span class="des">Rudder</span></td></tr>`;
+        text += displayFirstColumn("Broadside (pd)");
+        text += displaySecondBlock();
+        text += displayColumn("cannonBroadside", "Cannons");
+        text += displayColumn("carroBroadside", "Carronades");
+        text += "</div></div></div>";
 
-        text += "<tr><td>Crew</td>";
-        text += `<td>${ship.minCrew}<br><span class="des">Minimum</span>`;
-        text += `<br>${ship.sailingCrew}<br><span class="des">Sailing</span></td>`;
-        text += `<td>${ship.maxCrew}<br><span class="des">Maximum</span></td></tr>`;
+        text += displayFirstColumn("Chasers");
+        text += displaySecondBlock();
+        text += displayColumn("gunsFront", "Bow");
+        text += displayColumn("gunsBack", "Stern");
+        text += "</div></div></div>";
 
-        text += "<tr><td>Repairs needed</td>";
-        text += `<td>${ship.hullRepair}<br><span class="des">Hull</span>`;
-        text += `<br>${ship.rigRepair}<br><span class="des">Rig</span></td>`;
-        text += `<td>${ship.rumRepair}<br><span class="des">Rum</span></td></tr>`;
+        text += displayFirstColumn("Speed");
+        text += displaySecondBlock();
+        text += displayColumn("minSpeed", "Minimum");
+        text += displayColumn("acceleration", "Acceleration");
+        text += displayColumn("deceleration", "Deceleration");
+        text += displayColumn("maxTurningSpeed", "Turn speed");
+        text += displayColumn("halfturnTime", "Rudder half time");
+        text += "</div></div></div>";
 
-        text += "<tr><td>Repair time</td>";
-        text += `<td>${ship.sidesRepair}<br><span class="des">Sides</span>`;
-        text += `<br>${ship.bowRepair}<br><span class="des">Bow</span>`;
-        text += `<br>${ship.sailsRepair}<br><span class="des">Sails</span></td>`;
-        text += `<td>${ship.structureRepair}<br><span class="des">Hull</span>`;
-        text += `<br>${ship.sternRepair}<br><span class="des">Stern</span>`;
-        text += `<br>${ship.rudderRepair}<br><span class="des">Rudder</span></td></tr>`;
+        text += displayFirstColumn('Armour <span class="badge badge-light">Thickness</span>');
+        text += displaySecondBlock();
+        text += displayColumn("sideArmor", "Sides/Sails");
+        text += displayColumn("structure", "Hull");
+        text += displayColumn("frontArmor", "Bow");
+        text += displayColumn("backArmor", "Stern");
+        text += displayColumn("pump", "Pump");
+        text += displayColumn("rudder", "Rudder");
+        text += displayColumn("mastArmor", "Masts (bottom\u200a\u2013\u200amiddle\u200a\u2013\u200atop)", 12);
+        text += "</div></div></div>";
 
-        text += "<tr><td>Hold</td>";
-        text += `<td>${ship.maxWeight}<br><span class="des">Tons</span></td>`;
-        text += `<td>${ship.holdSize}<br><span class="des">Cargo slots</span></td></tr>`;
+        text += displayFirstColumn("Crew");
+        text += displaySecondBlock();
+        text += displayColumn("minCrew", "Minimum", 4);
+        text += displayColumn("sailingCrew", "Sailing", 4);
+        text += displayColumn("maxCrew", "Maximum", 4);
+        text += "</div></div></div>";
 
-        text += "</tbody></table>";
+        text += displayFirstColumn("Repairs needed");
+        text += displaySecondBlock();
+        text += displayColumn("hullRepair", "Hull", 4);
+        text += displayColumn("rigRepair", "Rig", 4);
+        text += displayColumn("rumRepair", "Rum", 4);
+        text += "</div></div></div>";
+
+        text += displayFirstColumn("Repair time");
+        text += displaySecondBlock();
+        text += displayColumn("sidesRepair", "Sides", 4);
+        text += displayColumn("structureRepair", "Hull", 4);
+        text += displayColumn("bowRepair", "Bow", 4);
+        text += displayColumn("sternRepair", "Stern", 4);
+        text += displayColumn("sailsRepair", "Sails", 4);
+        text += displayColumn("rudderRepair", "Rudder", 4);
+        text += "</div></div></div>";
+
+        text += displayFirstColumn("Hold");
+        text += displaySecondBlock();
+        text += displayColumn("maxWeight", "Tons");
+        text += displayColumn("holdSize", "Cargo slots");
+        text += "</div></div></div>";
+
+        text += "</div>";
         return text;
     }
 }
