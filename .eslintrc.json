@@ -14,7 +14,7 @@
     },
     "parser": "babel-eslint",
     "plugins": ["prettier"],
-    "extends": ["airbnb", "prettier"],
+    "extends": ["airbnb", "plugin:prettier/recommended"],
     "rules": {
         "brace-style": ["error", "1tbs"],
         "camelcase": ["error"],
