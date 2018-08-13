@@ -16,14 +16,17 @@ import { convertInvCoordX, convertInvCoordY } from "./common";
 
 /**
  * Display grid
- * @param {NAMap} map - The main map
  */
 export default class Grid {
-    // eslint-disable-next-line require-jsdoc
+    /**
+     *
+     * @param {map.Map} map - The main map
+     */
     constructor(map) {
         /**
          * The main map
-         * @type {NAMap}
+         * @type {map.Map}
+         * @private
          */
         this._map = map;
 
@@ -53,14 +56,14 @@ export default class Grid {
          * @type {Number}
          * @private
          */
-        this._height = this._map._height;
+        this._height = this._map.height;
 
         /**
          * Width of map svg (screen coordinates)
          * @type {Number}
          * @private
          */
-        this._width = this._map._width;
+        this._width = this._map.width;
 
         /**
          * Top margin of screen
