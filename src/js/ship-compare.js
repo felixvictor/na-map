@@ -91,13 +91,16 @@ class Ship {
     }
 
     static getCannonsPerDeck(deckClassLimit, gunsPerDeck) {
-        let s = `${gunsPerDeck[0]}\u00a0${Ship.pd(deckClassLimit[0])}`;
+        let s = `${gunsPerDeck[0]}\u00a0${Ship.pd(deckClassLimit[0])}`,
+            br = "";
         for (let i = 1; i < 4; i += 1) {
             if (gunsPerDeck[i]) {
-                s = `${gunsPerDeck[i]}\u00a0${Ship.pd(deckClassLimit[i])}\u202f| ${s}`;
+                s = `${gunsPerDeck[i]}\u00a0${Ship.pd(deckClassLimit[i])}\u202f<br>${s}`;
+            } else {
+                br = `${br}<br>`;
             }
         }
-        return s;
+        return [s, br];
     }
 
     static getText(ship) {
@@ -120,7 +123,16 @@ class Ship {
          * @return {string} HTML formatted column
          */
         function displayColumn(element, description, col = 6) {
-            return `<div class="col-${col}">${ship[element]}<br><span class="des">${description}</span></div>`;
+            let elementText = "",
+                br = "";
+
+            if (element === "cannonsPerDeck") {
+                [elementText, br] = ship[element];
+                br = `<br>${br}`;
+            } else {
+                elementText = element !== "" ? ship[element] : "";
+            }
+            return `<div class="col-${col}">${elementText}<br><span class="des">${description}</span>${br}</div>`;
         }
 
         function displaySecondBlock() {
@@ -157,7 +169,8 @@ class Ship {
 
         text += displayFirstColumn("Speed");
         text += displaySecondBlock();
-        text += displayColumn("minSpeed", "Minimum");
+        text += displayColumn("maxSpeed", "Maximum");
+        text += displayColumn("", "");
         text += displayColumn("acceleration", "Acceleration");
         text += displayColumn("deceleration", "Deceleration");
         text += displayColumn("maxTurningSpeed", "Turn speed");
@@ -166,13 +179,20 @@ class Ship {
 
         text += displayFirstColumn('Armour <span class="badge badge-light">Thickness</span>');
         text += displaySecondBlock();
-        text += displayColumn("sideArmor", "Sides/Sails");
+        text += displayColumn("sideArmor", "Sides");
         text += displayColumn("structure", "Hull");
         text += displayColumn("frontArmor", "Bow");
         text += displayColumn("backArmor", "Stern");
         text += displayColumn("pump", "Pump");
         text += displayColumn("rudder", "Rudder");
-        text += displayColumn("mastArmor", "Masts (bottom\u200a\u2013\u200amiddle\u200a\u2013\u200atop)", 12);
+        text += "</div></div></div>";
+
+        text += displayFirstColumn('Masts <span class="badge badge-light">Thickness</span>');
+        text += displaySecondBlock();
+        text += displayColumn("sails", "Sails");
+        text += displayColumn("mastBottomArmor", "Bottom");
+        text += displayColumn("mastMiddleArmor", "Middle");
+        text += displayColumn("mastTopArmor", "Top");
         text += "</div></div></div>";
 
         text += displayFirstColumn("Crew");
@@ -345,67 +365,67 @@ class ShipBase extends Ship {
     }
 
     _printText() {
-        const ship = {
-            shipRating: `${getOrdinal(this._shipData.class)} rate`,
-            battleRating: this._shipData.battleRating,
-            guns: this._shipData.guns,
-            decks: `${this._shipData.decks} deck${this._shipData.decks > 1 ? "s" : ""}`,
-            additionalRow: `${this._shipData.decks < 4 ? "<br>\u00a0" : ""}`,
-            cannonsPerDeck: Ship.getCannonsPerDeck(this._shipData.deckClassLimit, this._shipData.gunsPerDeck),
-            cannonBroadside: formatInt(this._shipData.broadside.cannons),
-            carroBroadside: formatInt(this._shipData.broadside.carronades),
-            gunsFront: this._shipData.gunsPerDeck[4],
-            limitFront: this._shipData.deckClassLimit[4],
-            gunsBack: this._shipData.gunsPerDeck[5],
-            limitBack: this._shipData.deckClassLimit[5],
-            firezoneHorizontalWidth: this._shipData.ship.firezoneHorizontalWidth,
-            waterlineHeight: formatFloat(this._shipData.ship.waterlineHeight),
-            minSpeed: formatFloat(this._shipData.speed.min),
-            maxSpeed: formatFloat(this._shipData.speed.max, 3),
-            acceleration: formatFloat(this._shipData.ship.acceleration),
-            deceleration: formatFloat(this._shipData.ship.deceleration),
-            maxTurningSpeed: formatFloat(this._shipData.rudder.turnSpeed),
-            halfturnTime: formatFloat(this._shipData.rudder.halfturnTime),
-            sideArmor: `${formatInt(this._shipData.sides.armour)}\u00a0<span class="badge badge-light">${formatInt(
-                this._shipData.sides.thickness
-            )}</span>`,
-            frontArmor: `${formatInt(this._shipData.bow.armour)}\u00a0<span class="badge badge-light">${formatInt(
-                this._shipData.bow.thickness
-            )}</span>`,
-            pump: formatInt(this._shipData.pump.armour),
-            sails: formatInt(this._shipData.sails.armour),
-            structure: formatInt(this._shipData.structure.armour),
-            backArmor: `${formatInt(this._shipData.stern.armour)}\u00a0<span class="badge badge-light">${formatInt(
-                this._shipData.stern.thickness
-            )}</span>`,
-            rudder: `${formatInt(this._shipData.rudder.armour)}\u00a0<span class="badge badge-light">${formatInt(
-                this._shipData.rudder.thickness
-            )}</span>`,
-            minCrew: formatInt(this._shipData.crew.min),
-            maxCrew: formatInt(this._shipData.crew.max),
-            sailingCrew: formatInt(this._shipData.crew.sailing),
-            maxWeight: formatInt(this._shipData.maxWeight),
-            holdSize: formatInt(this._shipData.holdSize),
-            upgradeXP: formatInt(this._shipData.upgradeXP),
-            sternRepair: formatInt(this._shipData.repairTime.stern),
-            bowRepair: formatInt(this._shipData.repairTime.bow),
-            sidesRepair: formatInt(this._shipData.repairTime.sides),
-            rudderRepair: formatInt(this._shipData.repairTime.rudder),
-            sailsRepair: formatInt(this._shipData.repairTime.sails),
-            structureRepair: formatInt(this._shipData.repairTime.structure),
-            hullRepair: `${formatInt(this._shipData.sides.armour / hullRepairsFactor)}`,
-            rigRepair: `${formatInt(this._shipData.sails.armour / rigRepairsFactor)}`,
-            rumRepair: `${formatInt(this._shipData.crew.max / rumRepairsFactor)}`,
-            mastArmor: `${formatInt(this._shipData.mast.bottomArmour)}\u00a0<span class="badge badge-light">${formatInt(
-                this._shipData.mast.bottomThickness
-            )}</span>\u200a\u2013\u200a${formatInt(
-                this._shipData.mast.middleArmour
-            )}\u00a0<span class="badge badge-light">${formatInt(
-                this._shipData.mast.middleThickness
-            )}</span>\u200a\u2013\u200a${formatInt(
-                this._shipData.mast.topArmour
-            )}\u00a0<span class="badge badge-light">${formatInt(this._shipData.mast.topThickness)}</span>`
-        };
+        const cannonsPerDeck = Ship.getCannonsPerDeck(this._shipData.deckClassLimit, this._shipData.gunsPerDeck),
+            ship = {
+                shipRating: `${getOrdinal(this._shipData.class)} rate`,
+                battleRating: this._shipData.battleRating,
+                guns: this._shipData.guns,
+                decks: `${this._shipData.decks} deck${this._shipData.decks > 1 ? "s" : ""}`,
+                additionalRow: `${this._shipData.decks < 4 ? "<br>\u00a0" : ""}`,
+                cannonsPerDeck,
+                cannonBroadside: formatInt(this._shipData.broadside.cannons),
+                carroBroadside: formatInt(this._shipData.broadside.carronades),
+                gunsFront: this._shipData.gunsPerDeck[4],
+                limitFront: this._shipData.deckClassLimit[4],
+                gunsBack: this._shipData.gunsPerDeck[5],
+                limitBack: this._shipData.deckClassLimit[5],
+                firezoneHorizontalWidth: this._shipData.ship.firezoneHorizontalWidth,
+                waterlineHeight: formatFloat(this._shipData.ship.waterlineHeight),
+                maxSpeed: formatFloat(this._shipData.ship.maxSpeed, 3),
+                acceleration: formatFloat(this._shipData.ship.acceleration),
+                deceleration: formatFloat(this._shipData.ship.deceleration),
+                maxTurningSpeed: formatFloat(this._shipData.rudder.turnSpeed),
+                halfturnTime: formatFloat(this._shipData.rudder.halfturnTime),
+                sideArmor: `${formatInt(this._shipData.sides.armour)}\u00a0<span class="badge badge-light">${formatInt(
+                    this._shipData.sides.thickness
+                )}</span>`,
+                frontArmor: `${formatInt(this._shipData.bow.armour)}\u00a0<span class="badge badge-light">${formatInt(
+                    this._shipData.bow.thickness
+                )}</span>`,
+                pump: formatInt(this._shipData.pump.armour),
+                sails: formatInt(this._shipData.sails.armour),
+                structure: formatInt(this._shipData.structure.armour),
+                backArmor: `${formatInt(this._shipData.stern.armour)}\u00a0<span class="badge badge-light">${formatInt(
+                    this._shipData.stern.thickness
+                )}</span>`,
+                rudder: `${formatInt(this._shipData.rudder.armour)}\u00a0<span class="badge badge-light">${formatInt(
+                    this._shipData.rudder.thickness
+                )}</span>`,
+                minCrew: formatInt(this._shipData.crew.min),
+                maxCrew: formatInt(this._shipData.crew.max),
+                sailingCrew: formatInt(this._shipData.crew.sailing),
+                maxWeight: formatInt(this._shipData.maxWeight),
+                holdSize: formatInt(this._shipData.holdSize),
+                upgradeXP: formatInt(this._shipData.upgradeXP),
+                sternRepair: formatInt(this._shipData.repairTime.stern),
+                bowRepair: formatInt(this._shipData.repairTime.bow),
+                sidesRepair: formatInt(this._shipData.repairTime.sides),
+                rudderRepair: formatInt(this._shipData.repairTime.rudder),
+                sailsRepair: formatInt(this._shipData.repairTime.sails),
+                structureRepair: formatInt(this._shipData.repairTime.structure),
+                hullRepair: `${formatInt(this._shipData.sides.armour / hullRepairsFactor)}`,
+                rigRepair: `${formatInt(this._shipData.sails.armour / rigRepairsFactor)}`,
+                rumRepair: `${formatInt(this._shipData.crew.max / rumRepairsFactor)}`,
+                mastBottomArmor: `${formatInt(
+                    this._shipData.mast.bottomArmour
+                )}\u00a0<span class="badge badge-light">${formatInt(this._shipData.mast.bottomThickness)}</span>`,
+                mastMiddleArmor: `${formatInt(
+                    this._shipData.mast.middleArmour
+                )}\u00a0<span class="badge badge-light">${formatInt(this._shipData.mast.middleThickness)}</span>`,
+                mastTopArmor: `${formatInt(
+                    this._shipData.mast.topArmour
+                )}\u00a0<span class="badge badge-light">${formatInt(this._shipData.mast.topThickness)}</span>`
+            };
 
         if (ship.gunsFront) {
             ship.gunsFront += `\u00a0${Ship.pd(ship.limitFront)}`;
@@ -549,9 +569,9 @@ class ShipComparison extends Ship {
                 this._shipBaseData.speed.min,
                 2
             )}`,
-            maxSpeed: `${formatFloat(this._shipCompareData.speed.max, 3)}\u00a0${getDiff(
-                this._shipCompareData.speed.max,
-                this._shipBaseData.speed.max,
+            maxSpeed: `${formatFloat(this._shipCompareData.ship.maxSpeed, 3)}\u00a0${getDiff(
+                this._shipCompareData.ship.maxSpeed,
+                this._shipBaseData.ship.maxSpeed,
                 2
             )}`,
             maxTurningSpeed: `${formatFloat(this._shipCompareData.rudder.turnSpeed)}\u00a0${getDiff(
@@ -673,7 +693,7 @@ class ShipComparison extends Ship {
                 this._shipCompareData.crew.max / rumRepairsFactor,
                 this._shipBaseData.crew.max / rumRepairsFactor
             )}`,
-            mastArmor: `${formatInt(this._shipCompareData.mast.bottomArmour)}\u00a0${getDiff(
+            mastBottomArmor: `${formatInt(this._shipCompareData.mast.bottomArmour)}\u00a0${getDiff(
                 this._shipCompareData.mast.bottomArmour,
                 this._shipBaseData.mast.bottomArmour
             )}\u00a0<span class="badge badge-light">${formatInt(
@@ -681,7 +701,8 @@ class ShipComparison extends Ship {
             )}</span>\u00a0${getDiff(
                 this._shipCompareData.mast.bottomThickness,
                 this._shipBaseData.mast.bottomThickness
-            )}\u200a\u2013\u200a${formatInt(this._shipCompareData.mast.middleArmour)}\u00a0${getDiff(
+            )}`,
+            mastMiddleArmor: `${formatInt(this._shipCompareData.mast.middleArmour)}\u00a0${getDiff(
                 this._shipCompareData.mast.middleArmour,
                 this._shipBaseData.mast.middleArmour
             )}\u00a0<span class="badge badge-light">${formatInt(
@@ -689,7 +710,8 @@ class ShipComparison extends Ship {
             )}</span>\u00a0${getDiff(
                 this._shipCompareData.mast.middleThickness,
                 this._shipBaseData.mast.middleThickness
-            )}\u200a\u2013\u200a${formatInt(this._shipCompareData.mast.topArmour)}\u00a0${getDiff(
+            )}`,
+            mastTopArmor: `${formatInt(this._shipCompareData.mast.topArmour)}\u00a0${getDiff(
                 this._shipCompareData.mast.topArmour,
                 this._shipBaseData.mast.topArmour
             )}\u00a0<span class="badge badge-light">${formatInt(
