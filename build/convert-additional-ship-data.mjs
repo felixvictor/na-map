@@ -103,6 +103,9 @@ function convertAdditionalShipData() {
                 baseFileNames.add(str);
             }
         });
+        // Add 'basic' ship without files
+        baseFileNames.add("basiccutter");
+        baseFileNames.add("basiclynx");
     };
     /**
      * Ship data
@@ -250,6 +253,9 @@ function convertAdditionalShipData() {
 
     // Add additional data to the existing data
     function addAddData(addData, id) {
+        if (id === 413) {
+            console.log(ships.shipData.filter(ship => ship.id === id));
+        }
         // Find current ship
         ships.shipData.filter(ship => ship.id === id).forEach(ship => {
             // Get all data for each group
@@ -266,6 +272,9 @@ function convertAdditionalShipData() {
                 });
             });
         });
+        if (id === 413) {
+            console.log(ships.shipData.filter(ship => ship.id === id));
+        }
     }
 
     function getFileData(baseFileName, ext) {
