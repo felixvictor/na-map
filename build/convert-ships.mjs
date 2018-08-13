@@ -37,7 +37,6 @@ function convertShips() {
             id: ship.Id,
             name: ship.Name.replace("L'Ocean", "L'Océan").replaceAll("'", "’"),
             class: ship.Class,
-            healthInfo: ship.HealthInfo,
             gunsPerDeck: ship.GunsPerDeck,
             deckClassLimit: ship.DeckClassLimit.map(deck => [
                 cannonWeight[deck.Limitation1.Min],
@@ -48,33 +47,36 @@ function convertShips() {
             decks: ship.Decks,
             holdSize: ship.HoldSize,
             maxWeight: ship.MaxWeight,
-            minCrewRequired: ship.MinCrewRequired,
-            minSpeed: speedDegrees.reduce((a, b) => Math.min(a, b)),
-            maxSpeed: speedDegrees.reduce((a, b) => Math.max(a, b)),
+            crew: { min: ship.MinCrewRequired, max: ship.HealthInfo.Crew },
+            speed: {
+                min: speedDegrees.reduce((a, b) => Math.min(a, b)),
+                max: speedDegrees.reduce((a, b) => Math.max(a, b))
+            },
+            pump: { armour: ship.HealthInfo.Pump },
             speedDegrees,
-            maxTurningSpeed: ship.Specs.MaxTurningSpeed,
-            upgradeXP: ship.OverrideTotalXpForUpgradeSlots,
-            hostilityScore: ship.HostilityScore
+            upgradeXP: ship.OverrideTotalXpForUpgradeSlots
+            // hostilityScore: ship.HostilityScore
         };
         // Delete mortar entry
         shipData.gunsPerDeck.pop();
         shipData.guns = 0;
-        shipData.cannonBroadside = 0;
-        shipData.carroBroadside = 0;
+        let cannonBroadside = 0,
+            carronadesBroadside = 0;
         let t = [0, 0];
         for (let i = 0; i < 4; i += 1) {
             if (shipData.deckClassLimit[i]) {
                 shipData.guns += shipData.gunsPerDeck[i];
                 if (shipData.deckClassLimit[i][1]) {
-                    shipData.carroBroadside += (shipData.gunsPerDeck[i] * shipData.deckClassLimit[i][1]) / 2;
+                    carronadesBroadside += (shipData.gunsPerDeck[i] * shipData.deckClassLimit[i][1]) / 2;
                 } else {
-                    shipData.carroBroadside += (shipData.gunsPerDeck[i] * shipData.deckClassLimit[i][0]) / 2;
+                    carronadesBroadside += (shipData.gunsPerDeck[i] * shipData.deckClassLimit[i][0]) / 2;
                 }
-                shipData.cannonBroadside += (shipData.gunsPerDeck[i] * shipData.deckClassLimit[i][0]) / 2;
+                cannonBroadside += (shipData.gunsPerDeck[i] * shipData.deckClassLimit[i][0]) / 2;
             } else {
                 shipData.deckClassLimit.push(t);
             }
         }
+        shipData.broadside = { cannons: cannonBroadside, carronades: carronadesBroadside };
 
         if (ship.FrontDecks) {
             t = ship.FrontDeckClassLimit.map(deck => [

@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ModuleTemplate xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="Survival" Type="CREW_SKILL">
+  <Attributes>
+    <Pair>
+      <Key>MODULE_DESCRIPTION</Key>
+      <Value xsi:type="StringAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value />
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>MODULE_BASE_HP</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>20</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>HOLE_DECREASE_RATE</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="false" IsNegative="false">
+        <Value>0.0155</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>FIRE_DECREASE_RATE</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="false" IsNegative="false">
+        <Value>0.07875</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>RAM_DECREASE_RATE</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="false" IsNegative="false">
+        <Value>0.01</Value>
+      </Value>
+    </Pair>
+  </Attributes>
+</ModuleTemplate>
