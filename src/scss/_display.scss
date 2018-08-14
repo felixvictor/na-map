@@ -629,12 +629,12 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
 
 .region text {
     filter: url("#drop-shadow-region");
-    fill: $white;
+    fill: $primary-600;
     font-size: 240px;
 }
 
 .county text {
-  filter: url("#drop-shadow-region");
+  filter: url("#drop-shadow-county");
     fill: $white;
     font-size: 84px;
 }
