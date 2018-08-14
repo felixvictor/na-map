@@ -623,16 +623,19 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
 .region text {
     font-family: LibreCaslonDisplay, -apple-system, blinkmacsystemfont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
         cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", arial, sans-serif;
-    fill: $white;
     opacity: 0.7;
     text-anchor: middle;
 }
 
 .region text {
+    filter: url("#drop-shadow-region");
+    fill: $white;
     font-size: 240px;
 }
 
 .county text {
+  filter: url("#drop-shadow-region");
+    fill: $white;
     font-size: 84px;
 }
 
