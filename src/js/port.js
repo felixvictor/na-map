@@ -378,57 +378,29 @@ export default class PortDisplay {
         const filter = svgDef
             .append("filter")
             .attr("id", "drop-shadow")
-            .attr("width", "200%")
-            .attr("height", "200%");
+            .attr("width", "125%")
+            .attr("height", "125%");
 
         filter
             .append("feGaussianBlur")
             .attr("in", "SourceAlpha")
-            .attr("stdDeviation", 5)
-            .attr("result", "blur");
+            .attr("stdDeviation", 5);
 
         filter
             .append("feOffset")
             .attr("dx", 2)
-            .attr("dy", 4)
-            .attr("result", "offsetblur1");
+            .attr("dy", 2);
 
-        filter
-            .append("feOffset")
-            .attr("dx", 3)
-            .attr("dy", 6)
-            .attr("result", "offsetblur2")
-            .attr("in", "blur");
-
-        const feComponentOne = filter
-            .append("feComponentTransfer")
-            .attr("result", "shadow1")
-            .attr("in", "offsetblur1");
+        const feComponentOne = filter.append("feComponentTransfer");
 
         feComponentOne
             .append("feFuncA")
             .attr("type", "linear")
-            .attr("slope", "0.1");
-
-        const feComponentTwo = filter
-            .append("feComponentTransfer")
-            .attr("result", "shadow2")
-            .attr("in", "offsetblur2");
-
-        feComponentTwo
-            .append("feFuncA")
-            .attr("type", "linear")
-            .attr("slope", "0.1");
-
-        filter
-            .append("feComposite")
-            .attr("in2", "offsetblur1")
-            .attr("operator", "in");
+            .attr("slope", "0.5");
 
         const feMerge = filter.append("feMerge");
 
-        feMerge.append("feMergeNode").attr("in", "shadow1");
-        feMerge.append("feMergeNode").attr("in", "shadow2");
+        feMerge.append("feMergeNode");
         feMerge.append("feMergeNode").attr("in", "SourceGraphic");
     }
 
