@@ -15,7 +15,7 @@
         "css-loader": "^1.0.0",
         "documentation": "^8.0.2",
         "eslint": "^5.3.0",
-      "eslint-config-airbnb-base": "^13.1.0",
+        "eslint-config-airbnb-base": "^13.1.0",
         "eslint-config-prettier": "^3.0.1",
         "eslint-plugin-import": "^2.14.0",
         "eslint-plugin-prettier": "^2.6.2",
@@ -101,6 +101,9 @@
         "dev": "yarn run clean && NODE_ENV=development webpack --mode=development --colors --config webpack.config.js"
     },
     "browserslist": [
+        ">= 1%",
+        "last 1 major version",
+        "not dead",
         "Chrome >= 62",
         "Firefox >= 56",
         "Firefox ESR",
@@ -108,7 +111,8 @@
         "Explorer >= 11",
         "iOS >= 10",
         "Safari >= 9.1",
-        "Android >= 4.4"
+        "Android >= 4.4",
+        "Opera >= 30"
     ],
     "prettier": {
         "tabWidth": 4,
