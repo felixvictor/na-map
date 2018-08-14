@@ -377,19 +377,19 @@ export default class PortDisplay {
         // create filter with id #drop-shadow
         const filter = svgDef
             .append("filter")
-            .attr("id", "drop-shadow")
+            .attr("id", "drop-shadow-region")
             .attr("width", "125%")
             .attr("height", "125%");
 
         filter
             .append("feGaussianBlur")
             .attr("in", "SourceAlpha")
-            .attr("stdDeviation", 5);
+            .attr("stdDeviation", 8);
 
         filter
             .append("feOffset")
-            .attr("dx", 2)
-            .attr("dy", 2);
+            .attr("dx", 6)
+            .attr("dy", 6);
 
         const feComponentOne = filter.append("feComponentTransfer");
 
@@ -790,7 +790,6 @@ export default class PortDisplay {
                 .enter()
                 .append("text")
                 .text(d => d.name)
-                .style("filter", "url(#drop-shadow)")
                 .attr("transform", d => `translate(${d.centroid[0]},${d.centroid[1]})rotate(${d.angle})`);
 
             /* Show polygon for test purposes
@@ -830,7 +829,6 @@ export default class PortDisplay {
             regionUpdate
                 .enter()
                 .append("text")
-                .style("filter", "url(#drop-shadow)")
                 .text(d => d.name)
                 .attr("transform", d => `translate(${d.centroid[0]},${d.centroid[1]})rotate(${d.angle})`);
 
