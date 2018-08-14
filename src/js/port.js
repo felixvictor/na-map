@@ -374,34 +374,59 @@ export default class PortDisplay {
                 .attr("class", "all");
         });
 
-        // create filter with id #drop-shadow
-        const filter = svgDef
+        // create filter with id #drop-shadow-region
+        const filterRegion = svgDef
             .append("filter")
             .attr("id", "drop-shadow-region")
             .attr("width", "125%")
             .attr("height", "125%");
-
-        filter
+        filterRegion
             .append("feGaussianBlur")
             .attr("in", "SourceAlpha")
             .attr("stdDeviation", 8);
-
-        filter
+        filterRegion
             .append("feOffset")
             .attr("dx", 6)
             .attr("dy", 6);
 
-        const feComponentOne = filter.append("feComponentTransfer");
+        const feComponentRegion = filterRegion.append("feComponentTransfer");
 
-        feComponentOne
+        feComponentRegion
             .append("feFuncA")
             .attr("type", "linear")
             .attr("slope", "0.5");
 
-        const feMerge = filter.append("feMerge");
+        const feMergeRegion = filterRegion.append("feMerge");
 
-        feMerge.append("feMergeNode");
-        feMerge.append("feMergeNode").attr("in", "SourceGraphic");
+        feMergeRegion.append("feMergeNode");
+        feMergeRegion.append("feMergeNode").attr("in", "SourceGraphic");
+
+        // create filter with id #drop-shadow-county
+        const filterCounty = svgDef
+            .append("filter")
+            .attr("id", "drop-shadow-county")
+            .attr("width", "125%")
+            .attr("height", "125%");
+        filterCounty
+            .append("feGaussianBlur")
+            .attr("in", "SourceAlpha")
+            .attr("stdDeviation", 3);
+        filterCounty
+            .append("feOffset")
+            .attr("dx", 3)
+            .attr("dy", 3);
+
+        const feComponentCounty = filterCounty.append("feComponentTransfer");
+
+        feComponentCounty
+            .append("feFuncA")
+            .attr("type", "linear")
+            .attr("slope", "0.5");
+
+        const feMergeCounty = filterCounty.append("feMerge");
+
+        feMergeCounty.append("feMergeNode");
+        feMergeCounty.append("feMergeNode").attr("in", "SourceGraphic");
     }
 
     _getText(id, portProperties) {
