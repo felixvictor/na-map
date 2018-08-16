@@ -17,7 +17,7 @@ class Wood {
     constructor(compareId, woodCompare) {
         this._id = compareId;
         this._woodCompare = woodCompare;
-        this._select = `#wood-${this._id}`;
+        this._select = `#${this._woodCompare.baseId}-${this._id}`;
 
         this._setupSvg();
         this._g = d3.select(this._select).select("g");
@@ -281,12 +281,22 @@ class WoodComparison extends Wood {
  *
  */
 export default class WoodCompare {
-    constructor(woodData) {
+    constructor(woodData, baseId) {
         this._woodData = woodData;
-        this._defaultWood = {
-            frame: "Fir",
-            trim: "Crew Space"
-        };
+        this._baseId = baseId;
+
+        if (baseId === "wood") {
+            this._defaultWood = {
+                frame: "Fir",
+                trim: "Crew Space"
+            };
+        } else {
+            this._defaultWood = {
+                frame: "Oak",
+                trim: "Oak"
+            };
+        }
+
         this._woodsSelected = [];
         this._instances = [];
         this._properties = [
@@ -388,7 +398,7 @@ export default class WoodCompare {
 
     _setupWoodSelects(compareId) {
         ["frame", "trim"].forEach(type => {
-            const select = $(`#wood-${type}-${compareId}-select`);
+            const select = $(`#${this.baseId}-${type}-${compareId}-select`);
             select.append(this.options[type]);
             if (compareId !== "Base") {
                 select.attr("disabled", "disabled");
@@ -398,15 +408,15 @@ export default class WoodCompare {
 
     _setOtherSelect(id, type) {
         const otherType = type === "frame" ? "trim" : "frame",
-            select = $(`#wood-${otherType}-${id}-select`);
+            select = $(`#${this.baseId}-${otherType}-${id}-select`);
         if (this._getWoodSelected(id)[otherType] === this.defaultWood[otherType]) {
             select.val(this.defaultWood[otherType]).selectpicker("refresh");
         }
     }
 
-    static enableSelect(id) {
+    _enableSelect(id) {
         ["frame", "trim"].forEach(typeSelect => {
-            $(`#wood-${typeSelect}-${id}-select`)
+            $(`#${this.baseId}-${typeSelect}-${id}-select`)
                 .removeAttr("disabled")
                 .selectpicker("refresh");
         });
@@ -414,7 +424,8 @@ export default class WoodCompare {
 
     _setupSetupListener(compareId) {
         ["frame", "trim"].forEach(type => {
-            const select = $(`#wood-${type}-${compareId}-select`);
+            const select = $(`#${this.baseId}-${type}-${compareId}-select`);
+            console.log("select", `#${this.baseId}-${type}-${compareId}-select`, select);
             select
                 .addClass("selectpicker")
                 .on("change", () => {
@@ -425,7 +436,7 @@ export default class WoodCompare {
                     if (compareId === "Base") {
                         this._addInstance(compareId, new WoodBase("Base", this._getWoodData("Base"), this));
                         ["C1", "C2", "C3"].forEach(id => {
-                            WoodCompare.enableSelect(id);
+                            this._enableSelect(id);
                             if (typeof this.instances[id] !== "undefined") {
                                 this._addInstance(
                                     id,
@@ -442,6 +453,10 @@ export default class WoodCompare {
                 })
                 .selectpicker({ noneSelectedText: `Select ${capitalizeFirstLetter(type)}` });
         });
+    }
+
+    get baseId() {
+        return this._baseId;
     }
 
     get properties() {
