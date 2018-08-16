@@ -294,11 +294,11 @@ export default class Map {
 
         this._pbZone = new PBZone(pbCircles, forts, towers, joinCircles, this._ports);
 
-        const shipData = JSON.parse(JSON.stringify(data.ships.shipData));
-        this._shipCompare = new ShipCompare(shipData);
-
         const woodData = JSON.parse(JSON.stringify(data.woods));
-        this._woodCompare = new WoodCompare(woodData);
+        this._woodCompare = new WoodCompare(woodData, "wood");
+
+        const shipData = JSON.parse(JSON.stringify(data.ships.shipData));
+        this._shipCompare = new ShipCompare(shipData, woodData);
 
         const moduleData = JSON.parse(JSON.stringify(data.modules));
         this._moduleList = new Module(moduleData);

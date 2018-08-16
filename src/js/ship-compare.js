@@ -11,8 +11,9 @@
 /* global d3 : false
  */
 
-import { formatInt, formatFloat, getOrdinal, isEmpty } from "./util";
+import { formatInt, formatFloat, getOrdinal, isEmpty, capitalizeFirstLetter } from "./util";
 import { registerEvent } from "./analytics";
+import WoodCompare from "./wood-compare";
 
 const numSegments = 24,
     segmentRadians = (2 * Math.PI) / numSegments,
@@ -40,8 +41,11 @@ class Ship {
     }
 
     _setupSvg() {
+        const element = d3.select(this.select);
+
         d3.select(`${this.select} svg`).remove();
-        d3.select(this.select)
+
+        element
             .append("svg")
             .attr("width", this.shipData.svgWidth)
             .attr("height", this.shipData.svgHeight)
@@ -50,9 +54,18 @@ class Ship {
             .append("g")
             .attr("transform", `translate(${this.shipData.svgWidth / 2}, ${this.shipData.svgHeight / 2})`);
         d3.select(`${this.select} div`).remove();
-        d3.select(this.select)
-            .append("div")
-            .classed("block", true);
+
+        /*
+        ["frame", "trim"].forEach(typeSelect => {
+            const id = `#ship-wood-${typeSelect}-${this.id}-select`;
+            element.append("label").attr("for", id);
+            element
+                .append("select")
+                .attr("id", id)
+                .attr("name", id);
+        });
+*/
+        element.append("div").classed("block", true);
     }
 
     _setCompass() {
@@ -771,8 +784,9 @@ class ShipComparison extends Ship {
 }
 
 export default class ShipCompare {
-    constructor(shipData) {
+    constructor(shipData, woodData) {
         this._shipData = shipData;
+
         this._ships = { Base: {}, C1: {}, C2: {} };
         this._minSpeed = d3.min(this._shipData, d => d.speed.min);
         this._maxSpeed = d3.max(this._shipData, d => d.speed.max);
@@ -788,6 +802,8 @@ export default class ShipCompare {
             this._setupShipSelect(compareId);
             this._setupSetupListener(compareId);
         });
+
+        this._woodCompare = new WoodCompare(woodData, "ship-wood");
     }
 
     _setupData() {
@@ -886,6 +902,10 @@ export default class ShipCompare {
                 }
             })
             .selectpicker({ noneSelectedText: "Select ship" });
+    }
+
+    get woodCompare() {
+        return this._woodCompare;
     }
 
     _setShip(id, ship) {
