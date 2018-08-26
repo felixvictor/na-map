@@ -20,7 +20,6 @@ export default class PortSelect {
         this._timeFormat = "HH.00";
         this._portNames = $("#port-names");
         this._buyGoods = $("#buy-goods");
-        this._sellGoods = $("#sell-goods");
         this._propNation = $("#prop-nation");
         this._propClan = $("#prop-clan");
         this._propCM = $("#prop-cm");
@@ -46,17 +45,6 @@ export default class PortSelect {
         });
         this.constructor._setupGoodSelect(goodsPerPort, this._buyGoods);
 
-        // Sell goods
-        goodsPerPort = this._ports.portDataDefault.map(port => {
-            let goods = port.properties.consumesTrading.length ? `${port.properties.consumesTrading},` : "";
-            goods += port.properties.consumesNonTrading.length ? `${port.properties.consumesNonTrading}` : "";
-
-            return {
-                id: port.id,
-                goods
-            };
-        });
-        this.constructor._setupGoodSelect(goodsPerPort, this._sellGoods);
         this.constructor._setupNationSelect();
         this._setupClanSelect();
         this._setupCMSelect();
@@ -65,7 +53,6 @@ export default class PortSelect {
     _setupListener() {
         this._portNames.addClass("selectpicker");
         this._buyGoods.addClass("selectpicker");
-        this._sellGoods.addClass("selectpicker");
         this._propNation.addClass("selectpicker");
         this._propClan.addClass("selectpicker");
         this._propCM.addClass("selectpicker");
@@ -101,13 +88,6 @@ export default class PortSelect {
         this._buyGoods
             .on("change", event => {
                 registerEvent("Menu", "Select good");
-                this._goodSelected(event);
-            })
-            .selectpicker(selectPickerLiveSearch);
-        selectPickerLiveSearch.noneSelectedText = "Select consumed good";
-        this._sellGoods
-            .on("change", event => {
-                registerEvent("Menu", "Select consumed good");
                 this._goodSelected(event);
             })
             .selectpicker(selectPickerLiveSearch);
