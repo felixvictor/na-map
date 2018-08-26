@@ -30,21 +30,7 @@ export default class PortSelect {
 
     _setupSelects() {
         this._setupPortSelect();
-
-        // Buy goods
-        let goodsPerPort = this._ports.portDataDefault.map(port => {
-            let goods = port.properties.dropsTrading.length ? port.properties.dropsTrading : "";
-            goods += port.properties.dropsNonTrading.length ? `,${port.properties.dropsNonTrading}` : "";
-            goods += port.properties.producesTrading.length ? `,${port.properties.producesTrading}` : "";
-            goods += port.properties.producesNonTrading.length ? `,${port.properties.producesNonTrading}` : "";
-
-            return {
-                id: port.id,
-                goods
-            };
-        });
-        this.constructor._setupGoodSelect(goodsPerPort, this._buyGoods);
-
+        this._setupGoodSelect();
         this.constructor._setupNationSelect();
         this._setupClanSelect();
         this._setupCMSelect();
@@ -197,29 +183,30 @@ export default class PortSelect {
         $("#port-names").append(select);
     }
 
-    static _setupGoodSelect(goodsPerPort, selectItem) {
-        let selectGoods = new Map();
-
-        goodsPerPort.forEach(port => {
-            port.goods.split(",").forEach(good => {
-                if (good) {
-                    const portIds = new Set(selectGoods.get(good)).add(port.id);
-                    selectGoods.set(good, portIds);
-                }
+    _setupGoodSelect() {
+        let selectGoods = new Set();
+        function PortsPerGood() {}
+        PortsPerGood.prototype.add = goods => {
+            goods.forEach(good => {
+                selectGoods.add(good);
             });
+        };
+        const portsPerGood = new PortsPerGood();
+
+        this._ports.portDataDefault.forEach(port => {
+            portsPerGood.add(port.properties.dropsTrading);
+            portsPerGood.add(port.properties.dropsNonTrading);
+            portsPerGood.add(port.properties.producesTrading);
+            portsPerGood.add(port.properties.producesNonTrading);
         });
-        selectGoods = new Map(Array.from(selectGoods).sort());
+
+        selectGoods = new Set(Array.from(selectGoods).sort());
         let select = "";
         // eslint-disable-next-line no-restricted-syntax
-        for (const [key, portIds] of selectGoods.entries()) {
-            let ids = "";
-            // eslint-disable-next-line no-restricted-syntax
-            for (const id of portIds) {
-                ids += `,${id}`;
-            }
-            select += `<option value="${ids.substr(1)}">${key}</option>`;
+        for (const [key] of selectGoods.entries()) {
+            select += `<option>${key}</option>`;
         }
-        selectItem.append(select);
+        this._buyGoods.append(select);
     }
 
     static _setupNationSelect() {
@@ -298,15 +285,20 @@ export default class PortSelect {
     }
 
     _goodSelected(event) {
-        const portIds = $(event.currentTarget)
-                .val()
-                .split(","),
-            good = $(event.currentTarget).find(":selected")[0].text,
-            sourcePorts = this._ports.portDataDefault.filter(d => portIds.includes(d.id)).map(port => {
-                // eslint-disable-next-line prefer-destructuring,no-param-reassign
-                port.properties.isSource = true;
-                return port;
-            }),
+        const good = $(event.currentTarget).find(":selected")[0].text,
+            sourcePorts = this._ports.portDataDefault
+                .filter(
+                    port =>
+                        port.properties.dropsTrading.includes(good) ||
+                        port.properties.dropsNonTrading.includes(good) ||
+                        port.properties.producesTrading.includes(good) ||
+                        port.properties.producesNonTrading.includes(good)
+                )
+                .map(port => {
+                    // eslint-disable-next-line prefer-destructuring,no-param-reassign
+                    port.properties.isSource = true;
+                    return port;
+                }),
             consumingPorts = this._ports.portDataDefault
                 .filter(
                     port =>
