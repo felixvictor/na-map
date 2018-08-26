@@ -31,7 +31,7 @@ export default class PortSelect {
     _setupSelects() {
         this._setupPortSelect();
         this._setupGoodSelect();
-        this.constructor._setupNationSelect();
+        this._setupNationSelect();
         this._setupClanSelect();
         this._setupCMSelect();
     }
@@ -184,7 +184,7 @@ export default class PortSelect {
     }
 
     _setupGoodSelect() {
-        let selectGoods = new Set();
+        const selectGoods = new Set();
         function PortsPerGood() {}
         PortsPerGood.prototype.add = goods => {
             goods.forEach(good => {
@@ -199,18 +199,15 @@ export default class PortSelect {
             portsPerGood.add(port.properties.producesTrading);
             portsPerGood.add(port.properties.producesNonTrading);
         });
+        const select = `${Array.from(selectGoods)
+            .sort()
+            .map(good => `<option>${good}</option>`)
+            .join("")}`;
 
-        selectGoods = new Set(Array.from(selectGoods).sort());
-        let select = "";
-        // eslint-disable-next-line no-restricted-syntax
-        for (const [key] of selectGoods.entries()) {
-            select += `<option>${key}</option>`;
-        }
         this._buyGoods.append(select);
     }
 
-    static _setupNationSelect() {
-        const propNation = $("#prop-nation");
+    _setupNationSelect() {
         const select = `${nations
             .sort((a, b) => {
                 if (a.sortName < b.sortName) {
@@ -223,13 +220,11 @@ export default class PortSelect {
             })
             .map(nation => `<option value="${nation.short}">${nation.name}</option>`)
             .join("")}`;
-        propNation.append(select);
+        this._propNation.append(select);
     }
 
     _setupClanSelect() {
-        const propClan = $("#prop-clan");
-
-        propClan.empty();
+        this._propClan.empty();
 
         const clanList = new Set(),
             portId = new Set();
@@ -241,12 +236,12 @@ export default class PortSelect {
             .join("")}`;
 
         if (select.length) {
-            propClan.append(select);
-            propClan.removeAttr("disabled");
+            this._propClan.append(select);
+            this._propClan.removeAttr("disabled");
         } else {
-            propClan.attr("disabled", "disabled");
+            this._propClan.attr("disabled", "disabled");
         }
-        propClan.val("default").selectpicker("refresh");
+        this._propClan.val("default").selectpicker("refresh");
     }
 
     _setupCMSelect() {
