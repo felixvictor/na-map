@@ -619,14 +619,18 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
     }
 }
 
-.county text,
-.region text {
-    font-family: LibreCaslonDisplay, -apple-system, blinkmacsystemfont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
-        cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", arial, sans-serif;
-    opacity: 0.7;
-    fill: $white;
+.county,
+.region {
+  g {
     filter: url("#drop-shadow");
-    text-anchor: middle;
+    text {
+      font-family: LibreCaslonDisplay, -apple-system, blinkmacsystemfont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
+      cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", arial, sans-serif;
+      opacity: 0.7;
+      fill: $white;
+      text-anchor: middle;
+    }
+  }
 }
 
 .region text {
