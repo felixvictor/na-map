@@ -18,13 +18,26 @@ export default class PortSelect {
         this._pbZone = pbZone;
         this._dateFormat = "D MMM";
         this._timeFormat = "HH.00";
+
         this._portNamesId = "port-names";
         this._portNamesSelector = document.getElementById(this._portNamesId);
         this._portNames$ = $(`#${this._portNamesId}`);
-        this._buyGoods = document.getElementById("buy-goods");
-        this._propNation = document.getElementById("prop-nation");
-        this._propClan = document.getElementById("prop-clan");
-        this._propCM = document.getElementById("prop-cm");
+
+        this._buyGoodsId = "buy-goods";
+        this._buyGoodsSelector = document.getElementById(this._buyGoodsId);
+        this._buyGoods$ = $(`#${this._buyGoodsId}`);
+
+        this._propNationId = "prop-nation";
+        this._propNationSelector = document.getElementById(this._propNationId);
+        this._propNation$ = $(`#${this._propNationId}`);
+
+        this._propClanId = "prop-clan";
+        this._propClanSelector = document.getElementById(this._propClanId);
+        this._propClan$ = $(`#${this._propClanId}`);
+
+        this._propCMId = "prop-cm";
+        this._propCMSelector = document.getElementById(this._propCMId);
+        this._propCM$ = $(`#${this._propCMId}`);
 
         this._setupSelects();
         this._setupListener();
@@ -40,10 +53,10 @@ export default class PortSelect {
 
     _setupListener() {
         this._portNamesSelector.classList.add("selectpicker");
-        this._buyGoods.classList.add("selectpicker");
-        this._propNation.classList.add("selectpicker");
-        this._propClan.classList.add("selectpicker");
-        this._propCM.classList.add("selectpicker");
+        this._buyGoodsSelector.classList.add("selectpicker");
+        this._propNationSelector.classList.add("selectpicker");
+        this._propClanSelector.classList.add("selectpicker");
+        this._propCMSelector.classList.add("selectpicker");
         const selectPickerDefaults = {
             icons: {
                 time: "far fa-clock",
@@ -71,39 +84,38 @@ export default class PortSelect {
             this._portSelected(event);
         });
         this._portNames$.selectpicker(selectPickerLiveSearch);
+
         selectPickerLiveSearch.noneSelectedText = "Select good";
-        this._buyGoods
-            .addEventListener("change", event => {
-                registerEvent("Menu", "Select good");
-                this._goodSelected(event);
-            })
-            .selectpicker(selectPickerLiveSearch);
+        this._buyGoodsSelector.addEventListener("change", event => {
+            registerEvent("Menu", "Select good");
+            this._goodSelected(event);
+        });
+        this._buyGoods$.selectpicker(selectPickerLiveSearch);
 
         selectPickerDefaults.noneSelectedText = "Select nation";
-        this._propNation
-            .addEventListener("change", event => this._nationSelected(event))
-            .selectpicker(selectPickerDefaults);
+        this._propNationSelector.addEventListener("change", event => this._nationSelected(event));
+        this._propNation$.selectpicker(selectPickerDefaults);
+
         selectPickerDefaults.noneSelectedText = "Select clan";
-        this._propClan
-            .addEventListener("change", event => this._clanSelected(event))
-            .selectpicker(selectPickerDefaults);
+        this._propClanSelector.addEventListener("change", event => this._clanSelected(event));
+        this._propClan$.selectpicker(selectPickerDefaults);
+
         selectPickerDefaults.noneSelectedText = "Select";
-        this._propCM
-            .addEventListener("change", event => {
-                event.preventDefault();
-                this._CMSelected(event);
-            })
-            .selectpicker(selectPickerDefaults);
+        this._propCMSelector.addEventListener("change", event => {
+            event.preventDefault();
+            this._CMSelected(event);
+        });
+        this._propCM$.selectpicker(selectPickerDefaults);
 
-        $("#menu-prop-deep").addEventListener("click", () => this._depthSelected("deep"));
-        $("#menu-prop-shallow").addEventListener("click", () => this._depthSelected("shallow"));
+        document.getElementById("menu-prop-deep").addEventListener("click", () => this._depthSelected("deep"));
+        document.getElementById("menu-prop-shallow").addEventListener("click", () => this._depthSelected("shallow"));
 
-        $("#menu-prop-all").addEventListener("click", () => this._allSelected());
-        $("#menu-prop-green").addEventListener("click", () => this._greenZoneSelected());
+        document.getElementById("menu-prop-all").addEventListener("click", () => this._allSelected());
+        document.getElementById("menu-prop-green").addEventListener("click", () => this._greenZoneSelected());
 
-        $("#menu-prop-large").addEventListener("click", () => this._portSizeSelected("Large"));
-        $("#menu-prop-medium").addEventListener("click", () => this._portSizeSelected("Medium"));
-        $("#menu-prop-small").addEventListener("click", () => this._portSizeSelected("Small"));
+        document.getElementById("menu-prop-large").addEventListener("click", () => this._portSizeSelected("Large"));
+        document.getElementById("menu-prop-medium").addEventListener("click", () => this._portSizeSelected("Medium"));
+        document.getElementById("menu-prop-small").addEventListener("click", () => this._portSizeSelected("Small"));
 
         $("#prop-pb-from").datetimepicker({
             format: this._timeFormat
@@ -117,10 +129,10 @@ export default class PortSelect {
             event.preventDefault();
         });
 
-        $("#menu-prop-today").addEventListener("click", () => this._capturedToday());
-        $("#menu-prop-yesterday").addEventListener("click", () => this._capturedYesterday());
-        $("#menu-prop-this-week").addEventListener("click", () => this._capturedThisWeek());
-        $("#menu-prop-last-week").addEventListener("click", () => this._capturedLastWeek());
+        document.getElementById("menu-prop-today").addEventListener("click", () => this._capturedToday());
+        document.getElementById("menu-prop-yesterday").addEventListener("click", () => this._capturedYesterday());
+        document.getElementById("menu-prop-this-week").addEventListener("click", () => this._capturedThisWeek());
+        document.getElementById("menu-prop-last-week").addEventListener("click", () => this._capturedLastWeek());
 
         const portFrom = $("#prop-from"),
             portTo = $("#prop-to");
@@ -131,8 +143,8 @@ export default class PortSelect {
             format: this._dateFormat,
             useCurrent: false
         });
-        portFrom.addEventListener("change.datetimepicker", e => portTo.datetimepicker("minDate", e.date));
-        portTo.addEventListener("change.datetimepicker", e => portFrom.datetimepicker("maxDate", e.date));
+        portFrom.on("change.datetimepicker", e => portTo.datetimepicker("minDate", e.date));
+        portTo.on("change.datetimepicker", e => portFrom.datetimepicker("maxDate", e.date));
 
         $("#prop-range").submit(event => {
             this._captureRange();
@@ -141,12 +153,12 @@ export default class PortSelect {
         });
 
         // Adapted https://github.com/bootstrapthemesco/bootstrap-4-multi-dropdown-navbar
-        $(".nav-item .dropdown-menu .bootstrap-select .dropdown-toggle").addEventListener("click", event => {
+        $(".nav-item .dropdown-menu .bootstrap-select .dropdown-toggle").on("click", event => {
             const $el = $(event.currentTarget);
 
             $el.next(".dropdown-menu").toggleClass("show");
             $el.parent("li").toggleClass("show");
-            $el.parents("li.nav-item.dropdown.show").addEventListener("hidden.bs.dropdown", event2 => {
+            $el.parents("li.nav-item.dropdown.show").on("hidden.bs.dropdown", event2 => {
                 $(event2.currentTarget)
                     .find("div.dropdown-menu.show")
                     .removeClass("show");
@@ -209,7 +221,7 @@ export default class PortSelect {
             .map(good => `<option>${good}</option>`)
             .join("")}`;
 
-        this._buyGoods.insertAdjacentHTML("beforeend", select);
+        this._buyGoodsSelector.insertAdjacentHTML("beforeend", select);
     }
 
     _setupNationSelect() {
@@ -225,11 +237,11 @@ export default class PortSelect {
             })
             .map(nation => `<option value="${nation.short}">${nation.name}</option>`)
             .join("")}`;
-        this._propNation.insertAdjacentHTML("beforeend", select);
+        this._propNationSelector.insertAdjacentHTML("beforeend", select);
     }
 
     _setupClanSelect() {
-        this._propClan.innerHTML = "";
+        this._propClanSelector.innerHTML = "";
 
         const clanList = new Set(),
             portId = new Set();
@@ -241,19 +253,19 @@ export default class PortSelect {
             .join("")}`;
 
         if (select.length) {
-            this._propClan.insertAdjacentHTML("beforeend", select);
-            this._propClan.disabled = false;
+            this._propClanSelector.insertAdjacentHTML("beforeend", select);
+            this._propClanSelector.disabled = false;
         } else {
-            this._propClan.disabled = true;
+            this._propClanSelector.disabled = true;
         }
-        // this._propClan.selectpicker("val", "default");
+        this._propClan$.val("default").selectpicker("refresh");
     }
 
     _setupCMSelect() {
         const cmList = new Set();
         this._ports.portData.forEach(d => cmList.add(d.properties.conquestMarksPension));
         cmList.forEach(cm => {
-            this._propCM.insertAdjacentHTML(
+            this._propCM$.append(
                 "beforeend",
                 $("<option>", {
                     value: cm,
@@ -329,7 +341,7 @@ export default class PortSelect {
             this._nation = "";
             portData = this._ports.portDataDefault;
         }
-        // $("#propertyDropdown").dropdown("toggle");
+        $("#propertyDropdown").dropdown("toggle");
         this._ports.portData = portData;
         this._ports.showCurrentGood = false;
         this._ports.update();
@@ -351,7 +363,7 @@ export default class PortSelect {
         } else {
             portData = this._ports.portDataDefault;
         }
-        // $("#propertyDropdown").dropdown("toggle");
+        $("#propertyDropdown").dropdown("toggle");
         this._ports.portData = portData;
         this._ports.showCurrentGood = false;
         this._ports.update();
@@ -490,7 +502,7 @@ export default class PortSelect {
     }
 
     _CMSelected() {
-        const value = parseInt(this._propCM.val(), 10);
+        const value = parseInt(this._propCM$.val(), 10);
         let portData;
 
         if (value !== 0) {
