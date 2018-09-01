@@ -11,7 +11,7 @@
 /* global d3 : false
  */
 
-import { formatInt, formatFloat, getOrdinal, isEmpty, capitalizeFirstLetter } from "./util";
+import { formatInt, formatFloat, getOrdinal, isEmpty } from "./util";
 import { registerEvent } from "./analytics";
 import WoodCompare from "./wood-compare";
 
@@ -394,6 +394,9 @@ class ShipBase extends Ship {
     }
 
     _printText() {
+        if (typeof this.shipCompareData.woodCompare.instances.Base !== "undefined") {
+            console.log(this.shipCompareData.woodCompare.instances.Base._baseData);
+        }
         const cannonsPerDeck = Ship.getCannonsPerDeck(this.shipData.deckClassLimit, this.shipData.gunsPerDeck),
             ship = {
                 shipRating: `${getOrdinal(this.shipData.class)} rate`,
@@ -875,11 +878,11 @@ export default class ShipCompare {
     }
 
     _setupSetupListener(compareId) {
-        const select = $(`#ship-${compareId}-select`);
-        select
+        const selectShip = $(`#ship-${compareId}-select`);
+        selectShip
             .addClass("selectpicker")
             .on("change", () => {
-                const shipId = +select.val();
+                const shipId = +selectShip.val();
                 const singleShipData = this.shipData.filter(ship => ship.id === shipId)[0];
                 if (compareId === "Base") {
                     this._setShip(compareId, new ShipBase(compareId, singleShipData, this));
@@ -895,6 +898,7 @@ export default class ShipCompare {
                         }
                     });
                 } else {
+                    this.woodCompare.enableSelect(compareId);
                     this._setShip(
                         compareId,
                         new ShipComparison(compareId, this.ships.Base._shipData, singleShipData, this)
