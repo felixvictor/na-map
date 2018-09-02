@@ -621,7 +621,6 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
 
 .county,
 .region {
-  g {
     filter: url("#drop-shadow");
     text {
       font-family: LibreCaslonDisplay, -apple-system, blinkmacsystemfont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
@@ -629,7 +628,6 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
       opacity: 0.7;
       fill: $white;
       text-anchor: middle;
-    }
   }
 }
 
