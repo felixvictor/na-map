@@ -215,6 +215,13 @@ class Ship {
         text += displayColumn("maxCrew", "Maximum", 4);
         text += "</div></div></div>";
 
+        text += displayFirstColumn("Resistance");
+        text += displaySecondBlock();
+        text += displayColumn("fireResistance", "Fire", 3);
+        text += displayColumn("leakResistance", "Leaks", 3);
+        text += displayColumn("crewProtection", "Crew Protection", 6);
+        text += "</div></div></div>";
+
         text += displayFirstColumn("Repairs needed");
         text += displaySecondBlock();
         text += displayColumn("hullRepair", "Hull", 4);
@@ -394,9 +401,6 @@ class ShipBase extends Ship {
     }
 
     _printText() {
-        if (typeof this.shipCompareData.woodCompare.instances.Base !== "undefined") {
-            console.log(this.shipCompareData.woodCompare.instances.Base._baseData);
-        }
         const cannonsPerDeck = Ship.getCannonsPerDeck(this.shipData.deckClassLimit, this.shipData.gunsPerDeck),
             ship = {
                 shipRating: `${getOrdinal(this.shipData.class)} rate`,
@@ -448,6 +452,9 @@ class ShipBase extends Ship {
                 hullRepair: `${formatInt(this.shipData.sides.armour / hullRepairsFactor)}`,
                 rigRepair: `${formatInt(this.shipData.sails.armour / rigRepairsFactor)}`,
                 rumRepair: `${formatInt(this.shipData.crew.max / rumRepairsFactor)}`,
+                fireResistance: formatInt(this.shipData.resistance.fire),
+                leakResistance: formatInt(this.shipData.resistance.leaks),
+                crewProtection: formatInt(this.shipData.resistance.crew),
                 mastBottomArmor: `${formatInt(
                     this.shipData.mast.bottomArmour
                 )}\u00a0<span class="badge badge-light">${formatInt(this.shipData.mast.bottomThickness)}</span>`,
@@ -642,7 +649,6 @@ class ShipComparison extends Ship {
                 this.shipCompareData.rudder.halfturnTime,
                 this.shipBaseData.rudder.halfturnTime
             )}`,
-
             sideArmor: `${formatInt(
                 this.shipCompareData.sides.armour
             )}\u00a0<span class="badge badge-light">${formatInt(
@@ -731,6 +737,18 @@ class ShipComparison extends Ship {
                 this.shipCompareData.crew.max / rumRepairsFactor,
                 this.shipBaseData.crew.max / rumRepairsFactor
             )}`,
+            fireResistance: `${formatInt(this.shipCompareData.resistance.fire)}\u00a0${getDiff(
+                this.shipCompareData.resistance.fire,
+                this.shipBaseData.resistance.fire
+            )}`,
+            leakResistance: `${formatInt(this.shipCompareData.resistance.leaks)}\u00a0${getDiff(
+                this.shipCompareData.resistance.leaks,
+                this.shipBaseData.resistance.leaks
+            )}`,
+            crewProtection: `${formatInt(this.shipCompareData.resistance.crew)}\u00a0${getDiff(
+                this.shipCompareData.resistance.crew,
+                this.shipBaseData.resistance.crew
+            )}`,
             mastBottomArmor: `${formatInt(this.shipCompareData.mast.bottomArmour)}\u00a0${getDiff(
                 this.shipCompareData.mast.bottomArmour,
                 this.shipBaseData.mast.bottomArmour
@@ -799,14 +817,29 @@ export default class ShipCompare {
             .range(["#a62e39", "#fbf8f5", "#a4dab0", "#6cc380", "#419f57"])
             .interpolate(d3.interpolateHcl);
 
+        this._woodChanges = new Map([
+            ["Hull strength", ["structure.armour"]],
+            ["Side armour", ["bow.armour", "sides.armour", "sails.armour", "structure.armour", "stern.armour"]],
+            ["Thickness", ["sides.thickness", "bow.thickness", "stern.thickness"]],
+            // ["Mast thickness", ["mast.bottomThickness", "mast.middleThickness", "mast.topThickness"]],
+            ["Ship speed", ["maxSpeed"]],
+            ["Acceleration", ["acceleration"]],
+            ["Turn speed", ["rudder.turnSpeed"]],
+            ["Rudder speed", ["rudder.halfturnTime"]],
+            ["Fire resistance", ["resistance.fire"]],
+            ["Leak resistance", ["resistance.leaks"]],
+            ["Crew protection", ["resistance.crew"]],
+            ["Crew", ["crew.max"]]
+        ]);
+
+        this._woodId = "ship-wood";
+        this._woodCompare = new WoodCompare(woodData, this._woodId);
         this._setupData();
         this._setupListener();
         ["Base", "C1", "C2"].forEach(compareId => {
             this._setupShipSelect(compareId);
             this._setupSetupListener(compareId);
         });
-
-        this._woodCompare = new WoodCompare(woodData, "ship-wood");
     }
 
     _setupData() {
@@ -815,7 +848,7 @@ export default class ShipCompare {
             .key(ship => ship.class)
             .sortKeys(d3.ascending)
             .entries(
-                this.shipData
+                this._shipData
                     .map(ship => ({
                         id: ship.id,
                         name: ship.name,
@@ -877,35 +910,105 @@ export default class ShipCompare {
         }
     }
 
+    _getShipData(id, compareId) {
+        let shipData = this._shipData.filter(ship => ship.id === id)[0];
+
+        shipData = this._addWoodData(shipData, compareId);
+
+        return shipData;
+    }
+
+    _addWoodData(shipData, compareId) {
+        //        const data = shipData;
+        const data = JSON.parse(JSON.stringify(shipData));
+
+        data.resistance = {};
+        data.resistance.fire = 0;
+        data.resistance.leaks = 0;
+        data.resistance.crew = 0;
+
+        if (typeof this.woodCompare.instances[compareId] !== "undefined") {
+            let dataLink="_baseData";
+            if (compareId !== "Base") {
+                dataLink="_compareData";
+            }
+            const modifierAmount = new Map();
+            // Add modifier amount for both frame and trim
+            ["frame", "trim"].forEach(type => {
+                this.woodCompare.instances[compareId][dataLink][type].properties.forEach(property => {
+                    if (this._woodChanges.has(property.modifier)) {
+                        modifierAmount.set(
+                            property.modifier,
+                            modifierAmount.has(property.modifier)
+                                ? modifierAmount.get(property.modifier) + property.amount
+                                : property.amount
+                        );
+                    }
+                });
+            });
+            modifierAmount.forEach((value, key) => {
+                this._woodChanges.get(key).forEach(modifier => {
+                    const index = modifier.split(".");
+                    if (index.length > 1) {
+                        data[index[0]][index[1]] *= 1 + modifierAmount.get(key) / 100;
+                    } else {
+                        data[index[0]] *= 1 + modifierAmount.get(key) / 100;
+                    }
+                });
+            });
+        }
+        return data;
+    }
+
+    _refreshShips(shipId, compareId) {
+        const singleShipData = this._getShipData(shipId, compareId);
+        if (compareId === "Base") {
+            this._setShip(compareId, new ShipBase(compareId, singleShipData, this));
+            ["C1", "C2"].forEach(id => {
+                $(`#ship-${id}-select`)
+                    .removeAttr("disabled")
+                    .selectpicker("refresh");
+                if (!isEmpty(this.ships[id])) {
+                    this._setShip(id, new ShipComparison(id, singleShipData, this.ships[id]._shipCompareData, this));
+                }
+            });
+        } else {
+            this._setShip(
+                compareId,
+                new ShipComparison(compareId, this.ships.Base._shipData, singleShipData, this)
+            );
+        }
+    }
+
+    _enableCompareSelects() {
+        ["C1", "C2"].forEach(id => {
+            $(`#ship-${id}-select`)
+                .removeAttr("disabled")
+                .selectpicker("refresh");
+        });
+    }
+
     _setupSetupListener(compareId) {
-        const selectShip = $(`#ship-${compareId}-select`);
-        selectShip
+        const selectShip$ = $(`#ship-${compareId}-select`);
+        selectShip$
             .addClass("selectpicker")
             .on("change", () => {
-                const shipId = +selectShip.val();
-                const singleShipData = this.shipData.filter(ship => ship.id === shipId)[0];
+                const shipId = +selectShip$.val();
+                this._refreshShips(shipId, compareId);
                 if (compareId === "Base") {
-                    this._setShip(compareId, new ShipBase(compareId, singleShipData, this));
-                    ["C1", "C2"].forEach(id => {
-                        $(`#ship-${id}-select`)
-                            .removeAttr("disabled")
-                            .selectpicker("refresh");
-                        if (!isEmpty(this.ships[id])) {
-                            this.setShip(
-                                id,
-                                new ShipComparison(id, singleShipData, this.ships[id]._shipCompareData, this)
-                            );
-                        }
-                    });
-                } else {
-                    this.woodCompare.enableSelect(compareId);
-                    this._setShip(
-                        compareId,
-                        new ShipComparison(compareId, this.ships.Base._shipData, singleShipData, this)
-                    );
+                    this._enableCompareSelects();
                 }
+                this.woodCompare.enableSelect(compareId);
             })
             .selectpicker({ noneSelectedText: "Select ship" });
+
+        ["frame", "trim"].forEach(type => {
+            const select = document.getElementById(`${this._woodId}-${type}-${compareId}-select`);
+            select.addEventListener("change", () => {
+                const shipId = +selectShip$.val();
+                this._refreshShips(shipId, compareId);
+            });
+        });
     }
 
     get woodCompare() {
@@ -914,10 +1017,6 @@ export default class ShipCompare {
 
     _setShip(id, ship) {
         this._ships[id] = ship;
-    }
-
-    get shipData() {
-        return this._shipData;
     }
 
     get ships() {
