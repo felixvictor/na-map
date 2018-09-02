@@ -404,7 +404,7 @@ export default class WoodCompare {
         ["frame", "trim"].forEach(type => {
             const select = $(`#${this.baseFunction}-${type}-${compareId}-select`);
             select.append(this.options[type]);
-            if (compareId !== "Base") {
+            if (this._baseFunction !== "wood" || (compareId !== "Base" && this._baseFunction === "wood")) {
                 select.attr("disabled", "disabled");
             }
         });
