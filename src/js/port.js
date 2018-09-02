@@ -816,9 +816,8 @@ export default class PortDisplay {
             // Add new texts
             countyUpdate
                 .enter()
-                .append("g")
-                .attr("transform", d => `translate(${d.centroid[0]},${d.centroid[1]})rotate(${d.angle})`)
                 .append("text")
+                .attr("transform", d => `translate(${d.centroid[0]},${d.centroid[1]})rotate(${d.angle})`)
                 .text(d => d.name);
 
             /* Show polygon for test purposes
@@ -857,9 +856,8 @@ export default class PortDisplay {
             // Add new texts
             regionUpdate
                 .enter()
-                .append("g")
-                .attr("transform", d => `translate(${d.centroid[0]},${d.centroid[1]})rotate(${d.angle})`)
                 .append("text")
+                .attr("transform", d => `translate(${d.centroid[0]},${d.centroid[1]})rotate(${d.angle})`)
                 .text(d => d.name);
 
             /* Show polygon for test purposes
