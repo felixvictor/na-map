@@ -649,14 +649,27 @@ class ShipComparison extends Ship {
                 this.shipCompareData.rudder.halfturnTime,
                 this.shipBaseData.rudder.halfturnTime
             )}`,
-            sideArmor: `${formatInt(
-                this.shipCompareData.sides.armour
-            )}\u00a0<span class="badge badge-light">${formatInt(
-                this.shipCompareData.sides.thickness
-            )}</span>\u00a0${getDiff(this.shipCompareData.sides.armour, this.shipBaseData.sides.armour)}`,
-            frontArmor: `${formatInt(this.shipCompareData.bow.armour)}\u00a0<span class="badge badge-light">${formatInt(
-                this.shipCompareData.bow.thickness
-            )}</span>\u00a0${getDiff(this.shipCompareData.bow.armour, this.shipBaseData.bow.armour)}`,
+            sideArmor: `${formatInt(this.shipCompareData.sides.armour)}\u00a0${getDiff(
+                this.shipCompareData.sides.armour,
+                this.shipBaseData.sides.armour
+            )} <span class="badge badge-light">${formatInt(this.shipCompareData.sides.thickness)}</span>${getDiff(
+                this.shipCompareData.sides.thickness,
+                this.shipBaseData.sides.thickness
+            )}`,
+            frontArmor: `${formatInt(this.shipCompareData.bow.armour)}\u00a0${getDiff(
+                this.shipCompareData.bow.armour,
+                this.shipBaseData.bow.armour
+            )} <span class="badge badge-light">${formatInt(this.shipCompareData.bow.thickness)}</span>${getDiff(
+                this.shipCompareData.bow.thickness,
+                this.shipBaseData.bow.thickness
+            )}`,
+            backArmor: `${formatInt(this.shipCompareData.stern.armour)}\u00a0${getDiff(
+                this.shipCompareData.stern.armour,
+                this.shipBaseData.stern.armour
+            )} <span class="badge badge-light">${formatInt(this.shipCompareData.stern.thickness)}</span>${getDiff(
+                this.shipCompareData.stern.thickness,
+                this.shipBaseData.stern.thickness
+            )}`,
             pump: `${formatInt(this.shipCompareData.pump.armour)}\u00a0${getDiff(
                 this.shipCompareData.pump.armour,
                 this.shipBaseData.pump.armour
@@ -669,14 +682,14 @@ class ShipComparison extends Ship {
                 this.shipCompareData.structure.armour,
                 this.shipBaseData.structure.armour
             )}`,
-            backArmor: `${formatInt(
-                this.shipCompareData.stern.armour
-            )}\u00a0<span class="badge badge-light">${formatInt(
-                this.shipCompareData.stern.thickness
-            )}</span>\u00a0${getDiff(this.shipCompareData.stern.armour, this.shipBaseData.stern.armour)}`,
-            rudder: `${formatInt(this.shipCompareData.rudder.armour)}\u00a0<span class="badge badge-light">${formatInt(
-                this.shipCompareData.rudder.thickness
-            )}</span>\u00a0${getDiff(this.shipCompareData.rudder.armour, this.shipBaseData.rudder.armour)}`,
+            rudder: `${formatInt(this.shipCompareData.rudder.armour)}\u00a0${getDiff(
+                this.shipCompareData.rudder.armour,
+                this.shipBaseData.rudder.armour
+            )} <span class="badge badge-light">${formatInt(this.shipCompareData.rudder.thickness)}</span>${getDiff(
+                this.shipCompareData.rudder.thickness,
+                this.shipBaseData.rudder.thickness
+            )}`,
+
             minCrew: `${formatInt(this.shipCompareData.crew.min)}\u00a0${getDiff(
                 this.shipCompareData.crew.min,
                 this.shipBaseData.crew.min
@@ -752,27 +765,21 @@ class ShipComparison extends Ship {
             mastBottomArmor: `${formatInt(this.shipCompareData.mast.bottomArmour)}\u00a0${getDiff(
                 this.shipCompareData.mast.bottomArmour,
                 this.shipBaseData.mast.bottomArmour
-            )}\u00a0<span class="badge badge-light">${formatInt(
+            )} <span class="badge badge-light">${formatInt(
                 this.shipCompareData.mast.bottomThickness
-            )}</span>\u00a0${getDiff(
-                this.shipCompareData.mast.bottomThickness,
-                this.shipBaseData.mast.bottomThickness
-            )}`,
+            )}</span>${getDiff(this.shipCompareData.mast.bottomThickness, this.shipBaseData.mast.bottomThickness)}`,
             mastMiddleArmor: `${formatInt(this.shipCompareData.mast.middleArmour)}\u00a0${getDiff(
                 this.shipCompareData.mast.middleArmour,
                 this.shipBaseData.mast.middleArmour
-            )}\u00a0<span class="badge badge-light">${formatInt(
+            )} <span class="badge badge-light">${formatInt(
                 this.shipCompareData.mast.middleThickness
-            )}</span>\u00a0${getDiff(
-                this.shipCompareData.mast.middleThickness,
-                this.shipBaseData.mast.middleThickness
-            )}`,
+            )}</span>${getDiff(this.shipCompareData.mast.middleThickness, this.shipBaseData.mast.middleThickness)}`,
             mastTopArmor: `${formatInt(this.shipCompareData.mast.topArmour)}\u00a0${getDiff(
                 this.shipCompareData.mast.topArmour,
                 this.shipBaseData.mast.topArmour
-            )}\u00a0<span class="badge badge-light">${formatInt(
+            )} <span class="badge badge-light">${formatInt(
                 this.shipCompareData.mast.topThickness
-            )}</span>\u00a0${getDiff(this.shipCompareData.mast.topThickness, this.shipBaseData.mast.topThickness)}`
+            )}</span>${getDiff(this.shipCompareData.mast.topThickness, this.shipBaseData.mast.topThickness)}`
         };
 
         if (ship.gunsFront) {
@@ -822,8 +829,8 @@ export default class ShipCompare {
             ["Side armour", ["bow.armour", "sides.armour", "sails.armour", "structure.armour", "stern.armour"]],
             ["Thickness", ["sides.thickness", "bow.thickness", "stern.thickness"]],
             // ["Mast thickness", ["mast.bottomThickness", "mast.middleThickness", "mast.topThickness"]],
-            ["Ship speed", ["maxSpeed"]],
-            ["Acceleration", ["acceleration"]],
+            ["Ship speed", ["ship.maxSpeed"]],
+            ["Acceleration", ["ship.acceleration"]],
             ["Turn speed", ["rudder.turnSpeed"]],
             ["Rudder speed", ["rudder.halfturnTime"]],
             ["Fire resistance", ["resistance.fire"]],
@@ -928,9 +935,9 @@ export default class ShipCompare {
         data.resistance.crew = 0;
 
         if (typeof this.woodCompare.instances[compareId] !== "undefined") {
-            let dataLink="_baseData";
+            let dataLink = "_baseData";
             if (compareId !== "Base") {
-                dataLink="_compareData";
+                dataLink = "_compareData";
             }
             const modifierAmount = new Map();
             // Add modifier amount for both frame and trim
@@ -973,10 +980,7 @@ export default class ShipCompare {
                 }
             });
         } else {
-            this._setShip(
-                compareId,
-                new ShipComparison(compareId, this.ships.Base._shipData, singleShipData, this)
-            );
+            this._setShip(compareId, new ShipComparison(compareId, this.ships.Base._shipData, singleShipData, this));
         }
     }
 
