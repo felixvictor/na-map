@@ -252,13 +252,13 @@ export default class PortSelect {
             .map(clan => `<option value="${clan}">${clan}</option>`)
             .join("")}`;
 
-        if (select.length) {
+        if (select) {
             this._propClanSelector.insertAdjacentHTML("beforeend", select);
             this._propClanSelector.disabled = false;
+            this._propClan$.val("default").selectpicker("refresh");
         } else {
-            this._propClanSelector.disabled = true;
+            this._propClanSelector.remove();
         }
-        this._propClan$.val("default").selectpicker("refresh");
     }
 
     _setupCMSelect() {
