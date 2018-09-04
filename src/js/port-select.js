@@ -276,10 +276,10 @@ export default class PortSelect {
         if (select.length) {
             propClan.append(select);
             propClan.removeAttr("disabled");
+            propClan.val("default").selectpicker("refresh");
         } else {
-            propClan.attr("disabled", "disabled");
+            propClan.remove();
         }
-        propClan.val("default").selectpicker("refresh");
     }
 
     _setupCMSelect() {
