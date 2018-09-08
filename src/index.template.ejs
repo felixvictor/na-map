@@ -20,6 +20,7 @@
 
     <script async src="<%= htmlWebpackPlugin.options.gtag %>"></script>
 </head>
+
 <body>
 
 <nav class="navbar fixed-top navbar-expand-lg navbar-light bg-light">
@@ -39,13 +40,13 @@
                 <div class="dropdown-menu" id="predictMenu" aria-labelledby="predictDropdown">
                     <form id="windPrediction" class="p-2">
                         <div class="form-group">
-                            <label for="direction">1. Set current in-game wind</label>
+                            <p class="form-text">1. Set current in-game wind</p>
                             <div id="direction" class="rslider"></div>
                         </div>
                         <div class="form-group">
-                            <label for="wind-time">2. Set predict time (server time)</label>
                             <div class="input-group">
                                 <div class="input-group date" id="wind-time" data-target-input="nearest">
+                                    <label for="wind-time-input">2. Set predict time (server time)</label>
                                     <input type="text" class="form-control datetimepicker-input"
                                            data-target="#wind-time" aria-label="wind-time"
                                            id="wind-time-input" required/>
@@ -53,6 +54,7 @@
                                          data-toggle="datetimepicker">
                                         <span class="input-group-text"><i class="far fa-clock"></i></span>
                                     </div>
+
                                 </div>
                             </div>
                         </div>
@@ -127,20 +129,18 @@
 
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Conquest mark</h6>
-                    <a class="dropdown-item" id="menu-prop-cm" href="#">
-                        <label for="prop-cm"></label><select class="select" name="prop-cm"
-                                                             id="prop-cm"></select>
-                    </a>
+                    <div class="dropdown-item">
+                        <label><select class="select" name="prop-cm" id="prop-cm"></select></label>
+                    </div>
 
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Port owner</h6>
-                    <a class="dropdown-item" id="menu-prop-nation" href="#">
-                        <label for="prop-nation"></label><select class="select" name="prop-nation"
-                                                                 id="prop-nation"></select>
-                    </a>
-                    <a class="dropdown-item" id="menu-prop-clan" href="#">
-                        <label for="prop-clan"></label><select class="select" name="prop-clan" id="prop-clan"></select>
-                    </a>
+                    <div class="dropdown-item">
+                        <label><select class="select" name="prop-nation" id="prop-nation"></select></label>
+                    </div>
+                    <div class="dropdown-item">
+                        <label><select class="select" name="prop-clan" id="prop-clan"></select></label>
+                    </div>
 
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Port battle</h6>
@@ -220,12 +220,8 @@
 
                                         <label for="prop-to-input" class="col-sm-3 col-form-label">To</label>
                                         <div class="col-sm-9 input-group date" id="prop-to" data-target-input="nearest">
-                                            <input type="text" class="form-control datetimepicker-input"
-                                                   data-target="#prop-to"
-                                                   aria-label="prop-to"
-                                                   id="prop-to-input" required/>
-                                            <div class="input-group-append" data-target="#prop-to"
-                                                 data-toggle="datetimepicker">
+                                            <input type="text" class="form-control datetimepicker-input" data-target="#prop-to" aria-label="prop-to" id="prop-to-input" required/>
+                                            <div class="input-group-append" data-target="#prop-to" data-toggle="datetimepicker">
                                                 <span class="input-group-text"><i class="far fa-calendar"></i></span>
                                             </div>
                                         </div>
@@ -247,10 +243,10 @@
         <ul class="navbar-nav ml-auto">
 
             <li class="nav-item dropdown pr-2">
-                <button class="nav-link dropdown-toggle btn btn-primary" href="#" id="extraDropdown" role="button"
-                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <a class="nav-link dropdown-toggle btn btn-primary" href="#" id="extraDropdown" role="button"
+                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Tools
-                </button>
+                </a>
                 <div class="dropdown-menu dropdown-menu-right" id="extraMenu"
                      aria-labelledby="extraDropdown">
 
@@ -427,10 +423,10 @@
                             <label for="ship-Base-select"></label><select name="ship-Base-select" id="ship-Base-select">
                             </select>
                             <label for="ship-wood-frame-Base-select"></label><select name="ship-wood-frame-Base-select"
-                                                                                id="ship-wood-frame-Base-select">
+                                                                                     id="ship-wood-frame-Base-select">
                             </select>
                             <label for="ship-wood-trim-Base-select"></label><select name="ship-wood-trim-Base-select"
-                                                                               id="ship-wood-trim-Base-select">
+                                                                                    id="ship-wood-trim-Base-select">
                             </select>
                             <div id="ship-Base" class="ship-base"></div>
                         </div>
@@ -438,10 +434,10 @@
                             <label for="ship-C1-select"></label><select name="ship-C1-select" id="ship-C1-select">
                             </select>
                             <label for="ship-wood-frame-C1-select"></label><select name="ship-wood-frame-C1-select"
-                                                                                     id="ship-wood-frame-C1-select">
+                                                                                   id="ship-wood-frame-C1-select">
                             </select>
                             <label for="ship-wood-trim-C1-select"></label><select name="ship-wood-trim-C1-select"
-                                                                                    id="ship-wood-trim-C1-select">
+                                                                                  id="ship-wood-trim-C1-select">
                             </select>
                             <div id="ship-C1" class="ship-compare"></div>
                         </div>
@@ -450,10 +446,10 @@
 
                             </select>
                             <label for="ship-wood-frame-C2-select"></label><select name="ship-wood-frame-C2-select"
-                                                                                     id="ship-wood-frame-C2-select">
+                                                                                   id="ship-wood-frame-C2-select">
                             </select>
                             <label for="ship-wood-trim-C2-select"></label><select name="ship-wood-trim-C2-select"
-                                                                                    id="ship-wood-trim-C2-select">
+                                                                                  id="ship-wood-trim-C2-select">
                             </select>
                             <div id="ship-C2" class="ship-compare"></div>
                         </div>
