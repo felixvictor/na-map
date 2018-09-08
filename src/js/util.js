@@ -36,8 +36,22 @@ const formatPrefix = d3.formatPrefix(",.0", 1e3);
  */
 export const formatFloat = (x, s = 2) =>
     formatLocale
-        .format(`,.${s}r`)(x)
+        .format(`,.${s}~r`)(x)
         .replace("-", "\u2212\u202f");
+
+/**
+ * Format float
+ * @function
+ * @param {Number} x - Float
+ * @param {Number} f - digits following decimal point
+ * @return {String} - Formatted float
+ */
+export const formatFloatFixed = (x, f = 2) =>
+    formatLocale
+        .format(`.${f}f`)(x)
+        .replace("-", "\u2212\u202f")
+        .replace(".00", '<span class="hidden">.00</span>')
+        .replace(/\.(\d)0/g, ".$1<span class=\"hidden\">0</span>");
 
 /**
  * Format F11 coordinate
