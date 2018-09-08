@@ -1,6 +1,7 @@
 {
     "name": "na-map",
     "version": "6.0",
+    "description": "Naval Action map",
     "devDependencies": {
         "@babel/core": "7.0.0",
         "@babel/highlight": "^7.0.0",
@@ -48,6 +49,7 @@
         "svg-url-loader": "^2.3.2",
         "topojson": "^3.0.2",
         "url-loader": "^1.1.1",
+        "webapp-webpack-plugin": "^2.3.0",
         "webpack": "^4.17.2",
         "webpack-cli": "^3.1.0",
         "webpack-subresource-integrity": "^1.1.0-rc.4",
