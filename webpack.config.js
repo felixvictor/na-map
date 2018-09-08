@@ -200,17 +200,18 @@ const config = {
             { from: "../netlify.toml" }
         ]),
         new HtmlPlugin({
+            brand: "images/icons/favicon-32x32.png",
+            description:
+                "Yet another map with in-game map, F11 coordinates, resources, ship and wood comparison. Port data is updated constantly from twitter and daily after maintenance.",
             filename: "index.html",
             gtag: "https://www.googletagmanager.com/gtag/js?id=UA-109520372-1",
             hash: true,
             inject: "body",
             lang: "en-GB",
+            meta: { viewport: "width=device-width, initial-scale=1, shrink-to-fit=no" },
             minify: htmlMinifyOpt,
             template: "index.template.ejs",
             title: "Naval Action map",
-            description:
-                "Yet another map with in-game map, F11 coordinates, resources. Port data is updated constantly from twitter and daily after maintenance.",
-            brand: "images/icons/favicon-32x32.png",
             version: PACKAGE.version
         }),
         new SitemapPlugin(`https://${process.env.TARGET}.netlify.com/`, sitemapPaths, { skipGzip: false }),
