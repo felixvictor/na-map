@@ -12,19 +12,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta property="og:image" content="<%= htmlWebpackPlugin.options.brand %>">
 
-    <link rel="icon" type="image/png" href="images/icons/favicon-16x16.png" sizes="16x16">
-    <link rel="icon" type="image/png" href="images/icons/favicon-32x32.png" sizes="32x32">
-    <link rel="icon" type="image/png" href="images/icons/android-192x192.png" sizes="192x192">
-    <link rel="apple-touch-icon" href="images/icons/apple-touch-icon-180x180.png" sizes="180x180">
-    <meta name="msapplication-config" content="images/icons/browserconfig.xml">
-
     <script async src="<%= htmlWebpackPlugin.options.gtag %>"></script>
 </head>
 
 <body>
 
 <nav class="navbar fixed-top navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="#"><img src="images/icons/favicon-32x32.png" width="32" height="32" alt="Brand"></a>
+    <a class="navbar-brand" href="#"><img src="<%= htmlWebpackPlugin.options.brand %>" width="32" height="32" alt="Brand"></a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
