@@ -9920,6 +9920,10 @@ table@^4.0.3:
     slice-ansi "1.0.0"
     string-width "^2.1.1"
 
+tablesort@^5.0.2:
+  version "5.0.2"
+  resolved "https://registry.yarnpkg.com/tablesort/-/tablesort-5.0.2.tgz#2c0095db94e85344134c7a04f85eec2bed0c318c"
+
 tapable@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/tapable/-/tapable-1.0.0.tgz#cbb639d9002eed9c6b5975eb20598d7936f1f9f2"
