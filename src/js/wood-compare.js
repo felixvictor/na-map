@@ -10,8 +10,8 @@
 
 /* global d3 : false
  */
-import { default as Tablesort } from "tablesort";
-import { capitalizeFirstLetter, formatFloat, formatFloatFixed } from "./util";
+
+import { capitalizeFirstLetter, formatFloat } from "./util";
 import { registerEvent } from "./analytics";
 
 class Wood {
@@ -399,11 +399,6 @@ export default class WoodCompare {
             event.stopPropagation();
             this._woodCompareSelected();
         });
-        $("#button-wood-list").on("click", event => {
-            registerEvent("Tools", "List woods");
-            event.stopPropagation();
-            this._woodListSelected();
-        });
     }
 
     _setupWoodSelects(compareId) {
@@ -467,72 +462,6 @@ export default class WoodCompare {
                 .removeAttr("disabled")
                 .selectpicker("refresh");
         });
-    }
-
-    _woodListSelected() {
-        $("#modal-wood-list").modal("show");
-        this._showList("frame");
-        this._showList("trim");
-    }
-
-    /**
-     * Show wood type
-     * @param {string} type Wood type (frame or trim)
-     * @return {void}
-     * @private
-     */
-    _showList(type) {
-        // Remove old ingredient list
-        d3.select(`#${type}-list div`).remove();
-
-        // Add new ingredient list
-        d3.select(`#${type}-list`)
-            .append("div")
-            .classed("row ingredients", true);
-        $(`#${type}-list`)
-            .find("div")
-            .append(this._getList(type));
-        const table = document.getElementById(`table-${type}-list`),
-            sortTable = new Tablesort(table);
-    }
-
-    _getModifiers(type) {
-        const modifiers = new Set();
-        this._woodData[type].forEach(wood => {
-            wood.properties.forEach(property => {
-                if(property.modifier!=="Ship material" && property.modifier!=="Boarding morale") {
-                    modifiers.add(property.modifier);
-                }
-            });
-        });
-        return Array.from(modifiers).sort();
-    }
-
-    _getList(type) {
-        const modifiers = this._getModifiers(type);
-        let text = "";
-
-        text += `<table id="table-${type}-list" class="table table-sm small tablesort"><thead><tr><th>${capitalizeFirstLetter(
-            type
-        )}</th>`;
-        modifiers.forEach(modifier => {
-            text += `<th>${modifier}</th>`;
-        });
-        text += "</tr></thead><tbody>";
-
-        this._woodData[type].forEach(wood => {
-            text += `<tr><td>${wood.name}</td>`;
-            modifiers.forEach(modifier => {
-                const amount = wood.properties
-                    .filter(property => property.modifier === modifier)
-                    .map(property => property.amount)[0];
-                text += `<td class="text-right">${amount ? formatFloatFixed(amount) : ""}</td>`;
-            });
-            text += "</tr>";
-        });
-        text += "</tbody></table>";
-
-        return text;
     }
 
     get baseFunction() {
