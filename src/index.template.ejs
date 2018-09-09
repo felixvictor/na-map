@@ -18,7 +18,8 @@
 <body>
 
 <nav class="navbar fixed-top navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="#"><img src="<%= htmlWebpackPlugin.options.brand %>" width="32" height="32" alt="Brand"></a>
+    <a class="navbar-brand" href="#"><img src="<%= htmlWebpackPlugin.options.brand %>" width="32" height="32"
+                                          alt="Brand"></a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -214,8 +215,11 @@
 
                                         <label for="prop-to-input" class="col-sm-3 col-form-label">To</label>
                                         <div class="col-sm-9 input-group date" id="prop-to" data-target-input="nearest">
-                                            <input type="text" class="form-control datetimepicker-input" data-target="#prop-to" aria-label="prop-to" id="prop-to-input" required/>
-                                            <div class="input-group-append" data-target="#prop-to" data-toggle="datetimepicker">
+                                            <input type="text" class="form-control datetimepicker-input"
+                                                   data-target="#prop-to" aria-label="prop-to" id="prop-to-input"
+                                                   required/>
+                                            <div class="input-group-append" data-target="#prop-to"
+                                                 data-toggle="datetimepicker">
                                                 <span class="input-group-text"><i class="far fa-calendar"></i></span>
                                             </div>
                                         </div>
@@ -379,8 +383,9 @@
     </div>
 </nav>
 
-<div id="na" class="na">
-</div>
+<div id="na" class="na"></div>
+
+<div id="modal-section"></div>
 
 <section id="modal-about" class="modal" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
@@ -573,25 +578,6 @@
             </header>
             <div class="modal-body">
                 <div id="ingredients-list" class="container-fluid"></div>
-            </div>
-            <footer class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </footer>
-        </div>
-    </div>
-</section>
-
-<section id="modal-wood-list" class="modal" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <header class="modal-header">
-                <h3>Woods</h3>
-            </header>
-            <div class="modal-body">
-                <h5>Frames</h5>
-                <div id="frame-list" class="container-fluid"></div>
-                <h5>Trims</h5>
-                <div id="trim-list" class="container-fluid"></div>
             </div>
             <footer class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
