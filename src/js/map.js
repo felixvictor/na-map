@@ -36,6 +36,7 @@ import ShipCompare from "./ship-compare";
 import Teleport from "./teleport";
 import WindPrediction from "./wind-prediction";
 import WoodCompare from "./wood-compare";
+import WoodList from "./wood-list";
 import Module from "./module-list";
 import Recipe from "./recipe-list";
 import Ingredient from "./ingredient-list";
@@ -296,6 +297,7 @@ export default class Map {
 
         const woodData = JSON.parse(JSON.stringify(data.woods));
         this._woodCompare = new WoodCompare(woodData, "wood");
+        this._woodList =new WoodList(woodData);
 
         const shipData = JSON.parse(JSON.stringify(data.ships.shipData));
         this._shipCompare = new ShipCompare(shipData, woodData);
