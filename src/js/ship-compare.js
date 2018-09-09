@@ -14,6 +14,7 @@
 import { formatInt, formatFloat, getOrdinal, isEmpty } from "./util";
 import { registerEvent } from "./analytics";
 import WoodCompare from "./wood-compare";
+import { insertBaseModal } from "./common";
 
 const numSegments = 24,
     segmentRadians = (2 * Math.PI) / numSegments,
@@ -33,7 +34,7 @@ class Ship {
         this._id = id;
         this._shipData = shipData;
 
-        this._select = `#ship-${this._id}`;
+        this._select = `#ship-compare-${this._id}`;
 
         this._setupSvg();
         this._g = d3.select(this._select).select("g");
@@ -55,16 +56,6 @@ class Ship {
             .attr("transform", `translate(${this.shipData.svgWidth / 2}, ${this.shipData.svgHeight / 2})`);
         d3.select(`${this.select} div`).remove();
 
-        /*
-        ["frame", "trim"].forEach(typeSelect => {
-            const id = `#ship-wood-${typeSelect}-${this.id}-select`;
-            element.append("label").attr("for", id);
-            element
-                .append("select")
-                .attr("id", id)
-                .attr("name", id);
-        });
-*/
         element.append("div").classed("block", true);
     }
 
@@ -818,6 +809,14 @@ export default class ShipCompare {
     constructor(shipData, woodData) {
         this._shipData = shipData;
 
+        this._baseId = "ship-compare";
+        this._buttonId = `button-${this._baseId}`;
+        this._modalId = `modal-${this._baseId}`;
+
+        this._columnsCompare = ["C1", "C2"];
+        this._columns = this._columnsCompare;
+        this._columns.unshift("Base");
+
         this._ships = { Base: {}, C1: {}, C2: {} };
         this._minSpeed = d3.min(this._shipData, d => d.speed.min);
         this._maxSpeed = d3.max(this._shipData, d => d.speed.max);
@@ -844,12 +843,34 @@ export default class ShipCompare {
 
         this._woodId = "ship-wood";
         this._woodCompare = new WoodCompare(woodData, this._woodId);
-        this._setupData();
         this._setupListener();
-        ["Base", "C1", "C2"].forEach(compareId => {
-            this._setupShipSelect(compareId);
-            this._setupSetupListener(compareId);
+    }
+
+    _setupListener() {
+        $(`#${this._buttonId}`).on("click", event => {
+            registerEvent("Tools", "Compare ships");
+            event.stopPropagation();
+            this._shipCompareSelected();
         });
+    }
+
+    _shipCompareSelected() {
+        // If the modal has no content yet, insert it
+        if (!document.getElementById(this._modalId)) {
+            this._initModal();
+        }
+        // Show modal
+        $(`#${this._modalId}`).modal("show");
+
+        this.svgWidth = parseInt($(`#${this._modalId} .columnA`).width(), 10);
+        // noinspection JSSuspiciousNameCombination
+        this.svgHeight = this.svgWidth;
+        this.outerRadius = Math.floor(Math.min(this.svgWidth, this.svgHeight) / 2);
+        this.innerRadius = Math.floor(this.outerRadius * 0.3);
+        this.radiusScaleAbsolute = d3
+            .scaleLinear()
+            .domain([this.minSpeed, 0, this.maxSpeed])
+            .range([10, this.innerRadius, this.outerRadius]);
     }
 
     _setupData() {
@@ -891,45 +912,74 @@ export default class ShipCompare {
             .join("</optgroup>");
     }
 
-    _shipCompareSelected() {
-        $("#modal-ships").modal("show");
-        this.svgWidth = parseInt($("#modal-ships .columnA").width(), 10);
-        // noinspection JSSuspiciousNameCombination
-        this.svgHeight = this.svgWidth;
-        this.outerRadius = Math.floor(Math.min(this.svgWidth, this.svgHeight) / 2);
-        this.innerRadius = Math.floor(this.outerRadius * 0.3);
-        this.radiusScaleAbsolute = d3
-            .scaleLinear()
-            .domain([this.minSpeed, 0, this.maxSpeed])
-            .range([10, this.innerRadius, this.outerRadius]);
-    }
+    _injectModal() {
+        insertBaseModal(this._modalId, "Compare ships");
 
-    _setupListener() {
-        $("#button-ship-compare").on("click", event => {
-            registerEvent("Tools", "Compare ships");
-            event.stopPropagation();
-            this._shipCompareSelected();
+        const row = d3
+            .select(`#${this._modalId} .modal-body`)
+            .append("div")
+            .attr("class", "container-fluid")
+            .append("div")
+            .attr("class", "row");
+        this._columns.forEach(column => {
+            const div = row
+                .append("div")
+                .attr("class", `col-md-4 ml-auto pt-2 ${column === "Base" ? "columnA" : "columnC"}`);
+
+            const shipId = `${this._baseId}-${column}-select`;
+            div.append("label").attr("for", shipId);
+            div.append("select")
+                .attr("name", shipId)
+                .attr("id", shipId);
+
+            ["frame", "trim"].forEach(type => {
+                const woodId = `${this._woodId}-${type}-${column}-select`;
+                div.append("label").attr("for", woodId);
+                div.append("select")
+                    .attr("name", woodId)
+                    .attr("id", woodId);
+            });
+
+            div.append("div")
+                .attr("id", `${this._baseId}-${column}`)
+                .attr("class", `${column === "Base" ? "ship-base" : "ship-compare"}`);
         });
     }
 
-    _setupShipSelect(compareId) {
-        const select = $(`#ship-${compareId}-select`);
-        select.append(this.options);
-        if (compareId !== "Base") {
-            select.attr("disabled", "disabled");
+    _initModal() {
+        this._setupData();
+        this.woodCompare._setupData();
+        this._injectModal();
+
+        this._columns.forEach(columnId => {
+            this._setupShipSelect(columnId);
+            this._setupSelectListener(columnId);
+
+            ["frame", "trim"].forEach(type => {
+                const select$ = $(`#${this._woodId}-${type}-${columnId}-select`);
+                this.woodCompare._setupWoodSelects(columnId, type, select$);
+                this.woodCompare._setupSelectListener(columnId, type, select$);
+            });
+        });
+    }
+
+    _setupShipSelect(columnId) {
+        const select$ = $(`#${this._baseId}-${columnId}-select`);
+        select$.append(this.options);
+        if (columnId !== "Base") {
+            select$.attr("disabled", "disabled");
         }
     }
 
-    _getShipData(id, compareId) {
-        let shipData = this._shipData.filter(ship => ship.id === id)[0];
+    _getShipData(shipId, columnId) {
+        let shipData = this._shipData.filter(ship => ship.id === shipId)[0];
 
-        shipData = this._addWoodData(shipData, compareId);
+        shipData = this._addWoodData(shipData, columnId);
 
         return shipData;
     }
 
     _addWoodData(shipData, compareId) {
-        //        const data = shipData;
         const data = JSON.parse(JSON.stringify(shipData));
 
         data.resistance = {};
@@ -937,7 +987,7 @@ export default class ShipCompare {
         data.resistance.leaks = 0;
         data.resistance.crew = 0;
 
-        if (typeof this.woodCompare.instances[compareId] !== "undefined") {
+        if (typeof this.woodCompare._instances[compareId] !== "undefined") {
             let dataLink = "_baseData";
             if (compareId !== "Base") {
                 dataLink = "_compareData";
@@ -945,7 +995,7 @@ export default class ShipCompare {
             const modifierAmount = new Map();
             // Add modifier amount for both frame and trim
             ["frame", "trim"].forEach(type => {
-                this.woodCompare.instances[compareId][dataLink][type].properties.forEach(property => {
+                this.woodCompare._instances[compareId][dataLink][type].properties.forEach(property => {
                     if (this._woodChanges.has(property.modifier)) {
                         modifierAmount.set(
                             property.modifier,
@@ -982,8 +1032,8 @@ export default class ShipCompare {
         const singleShipData = this._getShipData(shipId, compareId);
         if (compareId === "Base") {
             this._setShip(compareId, new ShipBase(compareId, singleShipData, this));
-            ["C1", "C2"].forEach(id => {
-                $(`#ship-${id}-select`)
+            this._columnsCompare.forEach(id => {
+                $(`#${this._baseId}-${id}-select`)
                     .removeAttr("disabled")
                     .selectpicker("refresh");
                 if (!isEmpty(this.ships[id])) {
@@ -996,15 +1046,15 @@ export default class ShipCompare {
     }
 
     _enableCompareSelects() {
-        ["C1", "C2"].forEach(id => {
-            $(`#ship-${id}-select`)
+        this._columnsCompare.forEach(id => {
+            $(`#${this._baseId}-${id}-select`)
                 .removeAttr("disabled")
                 .selectpicker("refresh");
         });
     }
 
-    _setupSetupListener(compareId) {
-        const selectShip$ = $(`#ship-${compareId}-select`);
+    _setupSelectListener(compareId) {
+        const selectShip$ = $(`#${this._baseId}-${compareId}-select`);
         selectShip$
             .addClass("selectpicker")
             .on("change", () => {
@@ -1013,9 +1063,11 @@ export default class ShipCompare {
                 if (compareId === "Base") {
                     this._enableCompareSelects();
                 }
-                this.woodCompare.enableSelect(compareId);
+                this.woodCompare.enableSelects(compareId);
             })
-            .selectpicker({ noneSelectedText: "Select ship" });
+            .selectpicker({ noneSelectedText: "Select ship" })
+            .val("default")
+            .selectpicker("refresh");
 
         ["frame", "trim"].forEach(type => {
             const select = document.getElementById(`${this._woodId}-${type}-${compareId}-select`);
