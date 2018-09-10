@@ -24,6 +24,7 @@ export default class WoodList {
     constructor(woodData) {
         this._woodData = woodData;
 
+        this._baseName = "List woods";
         this._baseId = "wood-list";
         this._buttonId = `button-${this._baseId}`;
         this._modalId = `modal-${this._baseId}`;
@@ -33,14 +34,14 @@ export default class WoodList {
 
     _setupListener() {
         $(`#${this._buttonId}`).on("click", event => {
-            registerEvent("Tools", "List woods");
+            registerEvent("Tools", this._baseName);
             event.stopPropagation();
             this._woodListSelected();
         });
     }
 
     _injectModal() {
-        insertBaseModal(this._modalId, "List woods");
+        insertBaseModal(this._modalId, this._baseName);
 
         const body = d3.select(`#${this._modalId} .modal-body`);
         body.append("h5").text("Frames");
