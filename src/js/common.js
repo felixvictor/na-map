@@ -76,7 +76,7 @@ export function getDistance(pt0, pt1) {
  * @param {string} title - Modal title
  * @return {void}
  */
-export function insertBaseModal(id, title) {
+export function insertBaseModal(id, title, large = true) {
     const modal = d3
         .select("#modal-section")
         .append("section")
@@ -87,13 +87,13 @@ export function insertBaseModal(id, title) {
         .attr("tabindex", "-1")
         .attr("role", "dialog")
         .append("div")
-        .attr("class", "modal-dialog modal-lg")
+        .attr("class", `modal-dialog${large ? " modal-lg" : ""}`)
         .attr("role", "document");
 
     const content = modal.append("div").attr("class", "modal-content");
 
     const header = content.append("header").attr("class", "modal-header");
-    header.append("h3").text(title);
+    header.append("h3").html(title);
 
     content.append("div").attr("class", "modal-body");
 
@@ -105,3 +105,10 @@ export function insertBaseModal(id, title) {
         .attr("class", "btn btn-secondary")
         .attr("data-dismiss", "modal");
 }
+
+// eslint-disable-next-line no-undef
+export const appDescription = DESCRIPTION;
+// eslint-disable-next-line no-undef
+export const appTitle = TITLE;
+// eslint-disable-next-line no-undef
+export const appVersion = VERSION;
