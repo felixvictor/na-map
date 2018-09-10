@@ -65,3 +65,6 @@ export function getDistance(pt0, pt1) {
 
     return distancePoints([F11X0, F11Y0], [F11X1, F11Y1]) / kFactor;
 }
+
+export const speedConstA = 0.074465523706782;
+export const speedConstB = 0.00272175949231;
