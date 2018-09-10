@@ -7,41 +7,94 @@
 
 import { chunkify, formatSignPercent, getOrdinal } from "./util";
 import { registerEvent } from "./analytics";
+import { insertBaseModal } from "./common";
 
 export default class Module {
     constructor(moduleData) {
         this._moduleData = moduleData;
 
-        this._setupData();
-        this._setupListener();
-        this._setupSelect();
-    }
+        this._baseName = "List modules";
+        this._baseId = "module-list";
+        this._buttonId = `button-${this._baseId}`;
+        this._modalId = `modal-${this._baseId}`;
 
-    _setupData() {
-        this._options = `${this._moduleData.map(type => `<option value="${type[0]}"">${type[0]}</option>;`).join("")}`;
+        this._setupListener();
     }
 
     _setupListener() {
-        $("#button-module-list").on("click", event => {
-            registerEvent("Tools", "List modules");
+        $(`#${this._buttonId}`).on("click", event => {
+            registerEvent("Tools", this._baseName);
             event.stopPropagation();
             this._moduleListSelected();
         });
     }
 
-    _moduleListSelected() {
-        $("#modal-modules").modal("show");
-        this._div = "#modules-list";
+    _injectModal() {
+        insertBaseModal(this._modalId, this._baseName);
+
+        /*
+<section id="modal-modules" class="modal" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <header class="modal-header">
+                <h3>Modules</h3>
+            </header>
+            <div class="modal-body">
+                <label for="modules-select"></label><select name="modules-select" id="modules-select"></select>
+                <div id="modules-list" class="container-fluid"></div>
+            </div>
+            <footer class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </footer>
+        </div>
+    </div>
+</section>
+         */
+        const id = `${this._baseId}-select`,
+            body = d3.select(`#${this._modalId} .modal-body`);
+        body.append("label").attr("for", id);
+        body.append("select")
+            .attr("name", id)
+            .attr("id", id);
+        body.append("div")
+            .attr("id", `${this._baseId}`)
+            .attr("class", "container-fluid");
+    }
+
+    _getOptions() {
+        return `${this._moduleData.map(type => `<option value="${type[0]}"">${type[0]}</option>;`).join("")}`;
     }
 
     _setupSelect() {
-        const select = $("#modules-select");
-        select.append(this._options);
+        const select$ = $(`#${this._baseId}-select`),
+            options = this._getOptions();
+        select$.append(options);
+    }
 
-        select
+    _setupSelectListener() {
+        const select$ = $(`#${this._baseId}-select`);
+
+        select$
             .addClass("selectpicker")
             .on("change", event => this._moduleSelected(event))
-            .selectpicker({ noneSelectedText: "Select module type" });
+            .selectpicker({ noneSelectedText: "Select module category" })
+            .val("default")
+            .selectpicker("refresh");
+    }
+
+    _initModal() {
+        this._injectModal();
+        this._setupSelect();
+        this._setupSelectListener();
+    }
+
+    _moduleListSelected() {
+        // If the modal has no content yet, insert it
+        if (!document.getElementById(this._modalId)) {
+            this._initModal();
+        }
+        // Show modal
+        $(`#${this._modalId}`).modal("show");
     }
 
     /**
@@ -153,15 +206,13 @@ export default class Module {
             .find(":selected")
             .val();
 
-        // Remove old module list
-        d3.select(`${this._div} div`).remove();
+        // Remove old recipe list
+        d3.select(`#${this._baseId} div`).remove();
 
-        // Add new module list
-        d3.select(this._div)
+        // Add new recipe list
+        d3.select(`#${this._baseId}`)
             .append("div")
             .classed("row modules mt-4", true);
-        $(this._div)
-            .find("div")
-            .append(this._getText(moduleType));
+        d3.select(`#${this._baseId} div`).html(this._getText(moduleType));
     }
 }
