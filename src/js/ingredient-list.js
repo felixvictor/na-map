@@ -6,27 +6,51 @@
 
 import { chunkify, formatSignPercent } from "./util";
 import { registerEvent } from "./analytics";
+import { insertBaseModal } from "./common";
 
 export default class Ingredient {
     constructor(ingredientData, moduleData) {
         this._ingredientData = ingredientData;
         this._moduleData = moduleData;
 
+        this._baseName = "List recipe ingredients";
+        this._baseId = "ingredient-list";
+        this._buttonId = `button-${this._baseId}`;
+        this._modalId = `modal-${this._baseId}`;
+
         this._setupListener();
     }
 
     _setupListener() {
-        $("#button-ingredient-list").on("click", event => {
-            registerEvent("Tools", "List ingredients");
+        $(`#${this._buttonId}`).on("click", event => {
+            registerEvent("Tools", this._baseName);
             event.stopPropagation();
             this._ingredientListSelected();
         });
     }
 
+    _injectModal() {
+        insertBaseModal(this._modalId, this._baseName);
+
+        const body = d3.select(`#${this._modalId} .modal-body`);
+
+        body.append("div")
+            .attr("id", `${this._baseId}`)
+            .attr("class", "container-fluid");
+    }
+
+    _initModal() {
+        this._injectModal();
+        this._injectList();
+    }
+
     _ingredientListSelected() {
-        $("#modal-ingredients").modal("show");
-        this._div = "#ingredients-list";
-        this._showIngredient();
+        // If the modal has no content yet, insert it
+        if (!document.getElementById(this._modalId)) {
+            this._initModal();
+        }
+        // Show modal
+        $(`#${this._modalId}`).modal("show");
     }
 
     _getProperties(recipeName) {
@@ -51,12 +75,6 @@ export default class Ingredient {
     }
 
     _getRows() {
-        /*
-
-        text = `<h6 class="card-subtitle mb-2 text-muted">${moduleType}</h6>`;
-        text += `<table class="table table-sm"><tbody>${properties}</tbody></table>`;
-        */
-
         return this._ingredientData.map(
             ingredient =>
                 `<tr><td>${ingredient.name}</td><td>${ingredient.recipe
@@ -97,17 +115,15 @@ export default class Ingredient {
      * @return {void}
      * @private
      */
-    _showIngredient() {
-        // Remove old ingredient list
-        d3.select(`${this._div} div`).remove();
+    _injectList() {
+        // Remove old recipe list
+        d3.select(`#${this._baseId} div`).remove();
 
-        // Add new ingredient list
-        d3.select(this._div)
+        // Add new recipe list
+        d3.select(`#${this._baseId}`)
             .append("div")
             .classed("row ingredients", true);
-        $(this._div)
-            .find("div")
-            .append(this._getText());
+        d3.select(`#${this._baseId} div`).html(this._getText());
         $('[data-toggle="tooltip"]').tooltip();
     }
 }
