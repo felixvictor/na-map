@@ -11,7 +11,7 @@
 /* global d3 : false
  */
 
-import { formatInt, formatFloat, getOrdinal, isEmpty } from "./util";
+import { formatInt, formatFloat, getOrdinal, isEmpty, capitalizeFirstLetter } from "./util";
 import { registerEvent } from "./analytics";
 import WoodCompare from "./wood-compare";
 import { insertBaseModal } from "./common";
@@ -814,7 +814,7 @@ export default class ShipCompare {
         this._modalId = `modal-${this._baseId}`;
 
         this._columnsCompare = ["C1", "C2"];
-        this._columns = this._columnsCompare;
+        this._columns = this._columnsCompare.slice();
         this._columns.unshift("Base");
 
         this._ships = { Base: {}, C1: {}, C2: {} };
@@ -854,14 +854,7 @@ export default class ShipCompare {
         });
     }
 
-    _shipCompareSelected() {
-        // If the modal has no content yet, insert it
-        if (!document.getElementById(this._modalId)) {
-            this._initModal();
-        }
-        // Show modal
-        $(`#${this._modalId}`).modal("show");
-
+    _setGraphicsParameters() {
         this.svgWidth = parseInt($(`#${this._modalId} .columnA`).width(), 10);
         // noinspection JSSuspiciousNameCombination
         this.svgHeight = this.svgWidth;
@@ -871,6 +864,16 @@ export default class ShipCompare {
             .scaleLinear()
             .domain([this.minSpeed, 0, this.maxSpeed])
             .range([10, this.innerRadius, this.outerRadius]);
+    }
+
+    _shipCompareSelected() {
+        // If the modal has no content yet, insert it
+        if (!document.getElementById(this._modalId)) {
+            this._initModal();
+        }
+        // Show modal
+        $(`#${this._modalId}`).modal("show");
+        this._setGraphicsParameters();
     }
 
     _setupData() {
@@ -953,13 +956,12 @@ export default class ShipCompare {
 
         this._columns.forEach(columnId => {
             this._setupShipSelect(columnId);
-            this._setupSelectListener(columnId);
-
             ["frame", "trim"].forEach(type => {
                 const select$ = $(`#${this._woodId}-${type}-${columnId}-select`);
                 this.woodCompare._setupWoodSelects(columnId, type, select$);
-                this.woodCompare._setupSelectListener(columnId, type, select$);
             });
+
+            this._setupSelectListener(columnId);
         });
     }
 
@@ -988,7 +990,7 @@ export default class ShipCompare {
         data.resistance.crew = 0;
 
         if (typeof this.woodCompare._instances[compareId] !== "undefined") {
-            let dataLink = "_baseData";
+            let dataLink = "_woodData";
             if (compareId !== "Base") {
                 dataLink = "_compareData";
             }
@@ -1070,11 +1072,17 @@ export default class ShipCompare {
             .selectpicker("refresh");
 
         ["frame", "trim"].forEach(type => {
-            const select = document.getElementById(`${this._woodId}-${type}-${compareId}-select`);
-            select.addEventListener("change", () => {
-                const shipId = +selectShip$.val();
-                this._refreshShips(shipId, compareId);
-            });
+            const select$ = $(`#${this._woodId}-${type}-${compareId}-select`);
+            select$
+                .addClass("selectpicker")
+                .on("change", () => {
+                    this.woodCompare._woodSelected(compareId, type, select$);
+                    const shipId = +selectShip$.val();
+                    this._refreshShips(shipId, compareId);
+                })
+                .selectpicker({ noneSelectedText: `Select ${capitalizeFirstLetter(type)}` })
+                .val("default")
+                .selectpicker("refresh");
         });
     }
 
