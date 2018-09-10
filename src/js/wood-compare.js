@@ -251,6 +251,7 @@ export default class WoodCompare {
         this._woodData = woodData;
         this._baseFunction = baseFunction;
 
+        this._baseName = "Compare woods";
         this._baseId = `${this._baseFunction}-compare`;
         this._buttonId = `button-${this._baseId}`;
         this._modalId = `modal-${this._baseId}`;
@@ -296,7 +297,7 @@ export default class WoodCompare {
 
     _setupListener() {
         $(`#${this._buttonId}`).on("click", event => {
-            registerEvent("Tools", "Compare woods");
+            registerEvent("Tools", this._baseName);
             event.stopPropagation();
             this._woodCompareSelected();
         });
@@ -365,7 +366,7 @@ export default class WoodCompare {
     }
 
     _injectModal() {
-        insertBaseModal(this._modalId, "Compare woods");
+        insertBaseModal(this._modalId, this._baseName);
 
         const row = d3
             .select(`#${this._modalId} .modal-body`)
