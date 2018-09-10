@@ -16,15 +16,8 @@ import moment from "moment";
 import "moment/locale/en-gb";
 import Cookies from "js-cookie";
 
-import { defaultFontSize } from "./common";
-import {
-    nearestPow2,
-    checkFetchStatus,
-    getJsonFromFetch,
-    getTextFromFetch,
-    putFetchError,
-    roundToThousands
-} from "./util";
+import { appDescription, appTitle, appVersion, defaultFontSize, insertBaseModal } from "./common";
+import { nearestPow2, checkFetchStatus, getJsonFromFetch, putFetchError, roundToThousands } from "./util";
 
 import Course from "./course";
 import F11 from "./f11";
@@ -297,7 +290,7 @@ export default class Map {
 
         const woodData = JSON.parse(JSON.stringify(data.woods));
         this._woodCompare = new WoodCompare(woodData, "wood");
-        this._woodList =new WoodList(woodData);
+        this._woodList = new WoodList(woodData);
 
         const shipData = JSON.parse(JSON.stringify(data.ships.shipData));
         this._shipCompare = new ShipCompare(shipData, woodData);
@@ -551,7 +544,22 @@ export default class Map {
     }
 
     _showAbout() {
-        $("#modal-about").modal("show");
+        function initModal(id) {
+            insertBaseModal(id, `${appTitle} <span class="text-primary small">v${appVersion}</span>`, false);
+
+            const body = d3.select(`#${id} .modal-body`);
+            body.html(
+                `<p>${appDescription} Please check the <a href="https://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/"> Game-Labs forum post</a> for further details. Feedback is very welcome.</p><p>Designed by iB aka Felix Victor, clan <a href="https://bccnavalaction.freeforums.net/">British Captains’ Club (BCC)</a>.</p>`
+            );
+        }
+
+        const id = "modal-about";
+        // If the modal has no content yet, insert it
+        if (!document.getElementById(id)) {
+            initModal(id);
+        }
+        // Show modal
+        $(`#${id}`).modal("show");
     }
 
     _doDoubleClickAction(self) {

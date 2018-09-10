@@ -12,9 +12,10 @@ const CopyPlugin = require("copy-webpack-plugin"),
     WebappWebpackPlugin = require("webapp-webpack-plugin");
 const PACKAGE = require("./package.json");
 
-const libraryName = PACKAGE.name;
-
-const sitemapPaths = ["/fonts/", "/icons", "/images"];
+const libraryName = PACKAGE.name,
+    description =
+        "Yet another map with in-game map, F11 coordinates, resources, ship and wood comparison. Port data is updated constantly from twitter and daily after maintenance.",
+    sitemapPaths = ["/fonts/", "/icons", "/images"];
 
 const babelOpt = {
     cacheDirectory: true,
@@ -176,6 +177,11 @@ const config = {
         new MiniCssExtractPlugin({
             filename: `${libraryName}.min.css`
         }),
+        new webpack.DefinePlugin({
+            DESCRIPTION: JSON.stringify(description),
+            TITLE: JSON.stringify(PACKAGE.description),
+            VERSION: JSON.stringify(PACKAGE.version)
+        }),
         new webpack.ProvidePlugin({
             $: "jquery",
             jQuery: "jquery",
@@ -203,8 +209,7 @@ const config = {
         ]),
         new HtmlPlugin({
             brand: "images/icons/favicon-32x32.png",
-            description:
-                "Yet another map with in-game map, F11 coordinates, resources, ship and wood comparison. Port data is updated constantly from twitter and daily after maintenance.",
+            description,
             filename: "index.html",
             gtag: "https://www.googletagmanager.com/gtag/js?id=UA-109520372-1",
             hash: true,
@@ -213,8 +218,7 @@ const config = {
             meta: { viewport: "width=device-width, initial-scale=1, shrink-to-fit=no" },
             minify: htmlMinifyOpt,
             template: "index.template.ejs",
-            title: PACKAGE.description,
-            version: PACKAGE.version
+            title: PACKAGE.description
         }),
         new SitemapPlugin(`https://${process.env.TARGET}.netlify.com/`, sitemapPaths, { skipGzip: false }),
         new SriPlugin({
