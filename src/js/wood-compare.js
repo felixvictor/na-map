@@ -269,7 +269,7 @@ export default class WoodCompare {
             this._columnsCompare = ["C1", "C2"];
         }
 
-        this._columns = this._columnsCompare;
+        this._columns = this._columnsCompare.slice();
         this._columns.unshift("Base");
         this._woodsSelected = [];
         this._instances = [];
