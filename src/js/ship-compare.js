@@ -900,19 +900,6 @@ export default class ShipCompare {
                         return 0;
                     })
             );
-        this.options = this.shipSelectData
-            .map(
-                key =>
-                    `<optgroup label="${getOrdinal(key.key)} rate">${key.values
-                        .map(
-                            ship =>
-                                `<option data-subtext="${ship.battleRating}" value="${ship.id}">${ship.name} (${
-                                    ship.guns
-                                })`
-                        )
-                        .join("</option>")}`
-            )
-            .join("</optgroup>");
     }
 
     _injectModal() {
@@ -965,9 +952,26 @@ export default class ShipCompare {
         });
     }
 
+    _getOptions() {
+        return this.shipSelectData
+            .map(
+                key =>
+                    `<optgroup label="${getOrdinal(key.key)} rate">${key.values
+                        .map(
+                            ship =>
+                                `<option data-subtext="${ship.battleRating}" value="${ship.id}">${ship.name} (${
+                                    ship.guns
+                                })`
+                        )
+                        .join("</option>")}`
+            )
+            .join("</optgroup>");
+    }
+
     _setupShipSelect(columnId) {
-        const select$ = $(`#${this._baseId}-${columnId}-select`);
-        select$.append(this.options);
+        const select$ = $(`#${this._baseId}-${columnId}-select`),
+            options = this._getOptions();
+        select$.append(options);
         if (columnId !== "Base") {
             select$.attr("disabled", "disabled");
         }
@@ -1108,14 +1112,6 @@ export default class ShipCompare {
 
     get colorScale() {
         return this._colorScale;
-    }
-
-    set options(options) {
-        this._options = options;
-    }
-
-    get options() {
-        return this._options;
     }
 
     set svgWidth(width) {
