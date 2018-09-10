@@ -809,6 +809,7 @@ export default class ShipCompare {
     constructor(shipData, woodData) {
         this._shipData = shipData;
 
+        this._baseName = "Compare ships";
         this._baseId = "ship-compare";
         this._buttonId = `button-${this._baseId}`;
         this._modalId = `modal-${this._baseId}`;
@@ -848,7 +849,7 @@ export default class ShipCompare {
 
     _setupListener() {
         $(`#${this._buttonId}`).on("click", event => {
-            registerEvent("Tools", "Compare ships");
+            registerEvent("Tools", this._baseName);
             event.stopPropagation();
             this._shipCompareSelected();
         });
@@ -903,7 +904,7 @@ export default class ShipCompare {
     }
 
     _injectModal() {
-        insertBaseModal(this._modalId, "Compare ships");
+        insertBaseModal(this._modalId, this._baseName);
 
         const row = d3
             .select(`#${this._modalId} .modal-body`)
