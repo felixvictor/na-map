@@ -408,7 +408,7 @@ class ShipBase extends Ship {
                 limitBack: this.shipData.deckClassLimit[5],
                 firezoneHorizontalWidth: this.shipData.ship.firezoneHorizontalWidth,
                 waterlineHeight: formatFloat(this.shipData.ship.waterlineHeight),
-                maxSpeed: formatFloat(this.shipData.ship.maxSpeed, 3),
+                maxSpeed: formatFloat(this.shipData.speed.max, 3),
                 acceleration: formatFloat(this.shipData.ship.acceleration),
                 deceleration: formatFloat(this.shipData.ship.deceleration),
                 maxTurningSpeed: formatFloat(this.shipData.rudder.turnSpeed),
@@ -607,9 +607,9 @@ class ShipComparison extends Ship {
                 this.shipBaseData.speed.min,
                 2
             )}`,
-            maxSpeed: `${formatFloat(this.shipCompareData.ship.maxSpeed, 3)}\u00a0${getDiff(
-                this.shipCompareData.ship.maxSpeed,
-                this.shipBaseData.ship.maxSpeed,
+            maxSpeed: `${formatFloat(this.shipCompareData.speed.max, 3)}\u00a0${getDiff(
+                this.shipCompareData.speed.max,
+                this.shipBaseData.speed.max,
                 2
             )}`,
             maxTurningSpeed: `${formatFloat(this.shipCompareData.rudder.turnSpeed)}\u00a0${getDiff(
@@ -804,7 +804,6 @@ class ShipComparison extends Ship {
         return this._shipCompare;
     }
 }
-
 export default class ShipCompare {
     constructor(shipData, woodData) {
         this._shipData = shipData;
@@ -819,8 +818,11 @@ export default class ShipCompare {
         this._columns.unshift("Base");
 
         this._ships = { Base: {}, C1: {}, C2: {} };
-        this._minSpeed = d3.min(this._shipData, d => d.speed.min);
-        this._maxSpeed = d3.max(this._shipData, d => d.speed.max);
+
+        const theoreticalMinSpeed = d3.min(this._shipData, ship => ship.speed.min) * 1.2,
+            theoreticalMaxSpeed = 15.5;
+        this._minSpeed = theoreticalMinSpeed;
+        this._maxSpeed = theoreticalMaxSpeed;
         this._colorScale = d3
             .scaleLinear()
             .domain([this._minSpeed, 0, 4, 8, 12, this._maxSpeed])
@@ -832,7 +834,7 @@ export default class ShipCompare {
             ["Side armour", ["bow.armour", "sides.armour", "sails.armour", "structure.armour", "stern.armour"]],
             ["Thickness", ["sides.thickness", "bow.thickness", "stern.thickness"]],
             // ["Mast thickness", ["mast.bottomThickness", "mast.middleThickness", "mast.topThickness"]],
-            ["Ship speed", ["ship.maxSpeed"]],
+            ["Ship speed", ["speed.max"]],
             ["Acceleration", ["ship.acceleration"]],
             ["Turn speed", ["rudder.turnSpeed"]],
             ["Rudder speed", ["rudder.halfturnTime"]],
@@ -1031,7 +1033,13 @@ export default class ShipCompare {
                     }
                 });
             });
+
+            data.speedDegrees = data.speedDegrees.map(speed => {
+                const factor = 1 + modifierAmount.get("Ship speed") / 100;
+                return Math.max(Math.min(speed * factor, this._maxSpeed), this._minSpeed);
+            });
         }
+
         return data;
     }
 
