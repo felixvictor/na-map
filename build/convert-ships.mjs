@@ -1,12 +1,10 @@
-import { readJson, saveJson } from "./common.mjs";
+import { readJson, roundToThousands, saveJson, speedConstA, speedConstB } from "./common.mjs";
 
 const inBaseFilename = process.argv[2],
     outFilename = process.argv[3],
     date = process.argv[4];
 
-const APIItems = readJson(`${inBaseFilename}-ItemTemplates-${date}.json`),
-    constA = 0.076752029372859,
-    constB = 0.007759512279223;
+const APIItems = readJson(`${inBaseFilename}-ItemTemplates-${date}.json`);
 
 // https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
 // eslint-disable-next-line no-extend-native,func-names
@@ -22,8 +20,8 @@ function convertShips() {
     geoJson.shipData = [];
 
     APIItems.filter(item => item.ItemType === "Ship").forEach(ship => {
-        const calcPortSpeed = ship.Specs.MaxSpeed * constA - constB,
-            speedDegrees = ship.Specs.SpeedToWind.map(d => Math.round(d * calcPortSpeed * 1000) / 1000);
+        const calcPortSpeed = ship.Specs.MaxSpeed * speedConstA - speedConstB,
+            speedDegrees = ship.Specs.SpeedToWind.map(speed => roundToThousands(speed * calcPortSpeed));
 
         const { length } = ship.Specs.SpeedToWind;
         // Elemente kopieren
