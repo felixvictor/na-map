@@ -503,8 +503,8 @@ class ShipComparison extends Ship {
             .pie()
             .sort(null)
             .value(1);
-        const arcsBase = pie(this.shipBaseData.speedDegrees),
-            arcsComp = pie(this.shipCompareData.speedDegrees);
+        const arcsBase = pie(this.shipCompareData.speedDegrees),
+            arcsComp = pie(this.shipBaseData.speedDegrees);
         const curve = d3.curveCatmullRomClosed,
             lineBase = d3
                 .radialLine()
@@ -523,8 +523,8 @@ class ShipComparison extends Ship {
             markersBase = this.g.append("g").attr("class", "markers");
 
         const speedDiff = [];
-        this.shipBaseData.speedDegrees.forEach((speedShipBase, i) => {
-            speedDiff.push(speedShipBase - this.shipCompareData.speedDegrees[i]);
+        this.shipCompareData.speedDegrees.forEach((speedShipCompare, i) => {
+            speedDiff.push(speedShipCompare - this.shipBaseData.speedDegrees[i]);
         });
         const colourScale = d3
             .scaleLinear()
