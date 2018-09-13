@@ -226,7 +226,7 @@ function update_data () {
         update_yarn
         get_git_update
         # Test if new API data available
-        if ! get_port_data; then
+        if get_port_data; then
             remove_tweets
             get_tweets
             update_ports
