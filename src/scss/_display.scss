@@ -219,13 +219,15 @@ table a {
 
 .profile {
     path.base {
-        opacity: 0.4;
-        fill: $secondary-500;
+        opacity: 0.5;
+        fill: none;
+      stroke-width: 5px;
+      stroke: $secondary-500;
     }
 
     path.comp,
     circle.comp {
-        opacity: 1;
+        opacity: .5;
         fill: $primary-500;
     }
 }
