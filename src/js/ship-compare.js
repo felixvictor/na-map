@@ -898,8 +898,8 @@ export default class ShipCompare {
         this._maxSpeed = theoreticalMaxSpeed;
         this._colorScale = d3
             .scaleLinear()
-            .domain([this._minSpeed, 0, 4, 8, 12, this._maxSpeed])
-            .range(["#a62e39", "#fbf8f5", "#a4dab0", "#6cc380", "#419f57"])
+            .domain([this._minSpeed, 0, 12, this._maxSpeed])
+            .range(["#a62e39", "#fbf8f5", "#419f57", "#58bb6f"])
             .interpolate(d3.interpolateHcl);
 
         this._woodChanges = new Map([
@@ -1065,7 +1065,7 @@ export default class ShipCompare {
                             ship =>
                                 `<option data-subtext="${ship.battleRating}" value="${ship.id}">${ship.name} (${
                                     ship.guns
-                                    })`
+                                })`
                         )
                         .join("</option>")}`
             )
@@ -1163,7 +1163,7 @@ export default class ShipCompare {
 
     /**
      * Refresh ship data
-     * @param {*} shipData - Ship id
+     * @param {*} shipId - Ship id
      * @param {*} compareId - Column id
      * @returns {void}
      */
