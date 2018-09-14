@@ -41,6 +41,10 @@ class Ship {
         this._setCompass();
     }
 
+    /**
+     * Setup svg
+     * @returns {void}
+     */
     _setupSvg() {
         const element = d3.select(this.select);
 
@@ -59,6 +63,10 @@ class Ship {
         element.append("div").classed("block", true);
     }
 
+    /**
+     * Set compass
+     * @returns {void}
+     */
     _setCompass() {
         // Compass
         const data = new Array(numSegments / 2);
@@ -83,6 +91,11 @@ class Ship {
         g.append("path").attr("d", arc);
     }
 
+    /**
+     * Format cannon pound value
+     * @param {number[]} limit Upper limit for [0] cannon and [1] carronades
+     * @returns {void}
+     */
     static pd(limit) {
         let s = `<span class="badge badge-light">${limit[0]}\u202f/\u202f`;
         if (limit[1]) {
@@ -94,6 +107,12 @@ class Ship {
         return s;
     }
 
+    /**
+     * Format cannon/carronade upper limit classes
+     * @param {number[]} deckClassLimit - Limit per deck
+     * @param {number[]} gunsPerDeck - Guns per deck
+     * @returns {string[]} Formatted string [0] limits and [1] possibly empty lines at the bottom
+     */
     static getCannonsPerDeck(deckClassLimit, gunsPerDeck) {
         let s = `${gunsPerDeck[0]}\u00a0${Ship.pd(deckClassLimit[0])}`,
             br = "";
@@ -107,6 +126,11 @@ class Ship {
         return [s, br];
     }
 
+    /**
+     * Get HTML formatted data for a single ship
+     * @param {Object} ship - Ship data
+     * @return {string} HTML formatted column
+     */
     static getText(ship) {
         let row = 0;
         /**
@@ -139,6 +163,10 @@ class Ship {
             return `<div class="col-${col}">${elementText}<br><span class="des">${description}</span>${br}</div>`;
         }
 
+        /**
+         * HTML format head of second block
+         * @return {string} HTML formatted block head
+         */
         function displaySecondBlock() {
             return '<div class="col-9"><div class="row no-gutters">';
         }
@@ -279,6 +307,10 @@ class ShipBase extends Ship {
         this._printText();
     }
 
+    /**
+     * Set coloroured Background
+     * @returns {void}
+     */
     _setBackground() {
         // Arc for text
         const knotsArc = d3
@@ -323,6 +355,10 @@ class ShipBase extends Ship {
             .attr("startOffset", "16%");
     }
 
+    /**
+     * Set Background gradient
+     * @returns {void}
+     */
     _setBackgroundGradient() {
         // Extra scale since the color scale is interpolated
         const gradientScale = d3
@@ -355,6 +391,10 @@ class ShipBase extends Ship {
             .attr("stop-color", (d, i) => this.shipCompareData.colorScale(gradientPoint[i]));
     }
 
+    /**
+     * Draw profile
+     * @returns {void}
+     */
     _drawProfile() {
         const pie = d3
             .pie()
@@ -391,6 +431,10 @@ class ShipBase extends Ship {
             .text(d => `${Math.round(d.data * 10) / 10} knots`);
     }
 
+    /**
+     * Print text
+     * @returns {void}
+     */
     _printText() {
         const cannonsPerDeck = Ship.getCannonsPerDeck(this.shipData.deckClassLimit, this.shipData.gunsPerDeck),
             ship = {
@@ -487,6 +531,12 @@ class ShipBase extends Ship {
  * @extends Ship
  */
 class ShipComparison extends Ship {
+    /**
+     * @param {number} compareId - Ship id
+     * @param {Object} shipBaseData - Base ship data
+     * @param {Object} shipCompareData - Ship data of the ship to be compared to
+     * @param {Class} shipCompare - Class instance of the ship to be compared to
+     */
     constructor(compareId, shipBaseData, shipCompareData, shipCompare) {
         super(compareId, shipCompare);
 
@@ -495,9 +545,13 @@ class ShipComparison extends Ship {
         this._shipCompare = shipCompare;
 
         this._drawDifferenceProfile();
-        this._printTextComparison();
+        this._injectTextComparison();
     }
 
+    /**
+     * Draw difference profile
+     * @returns {void}
+     */
     _drawDifferenceProfile() {
         const pie = d3
             .pie()
@@ -561,7 +615,18 @@ class ShipComparison extends Ship {
             .text(d => `${Math.round(d.data * 10) / 10} knots`);
     }
 
-    _printTextComparison() {
+    /**
+     * Inject text comparison
+     * @returns {void}
+     */
+    _injectTextComparison() {
+        /**
+         * HTML formatted difference
+         * @param {number} a - First value
+         * @param {number} b - Second value
+         * @param {number} decimals - Number of decimals (default 0)
+         * @returns {string} HTML formatted string
+         */
         function getDiff(a, b, decimals = 0) {
             const diff = parseFloat((a - b).toFixed(decimals));
 
@@ -804,7 +869,15 @@ class ShipComparison extends Ship {
         return this._shipCompare;
     }
 }
+
+/**
+ * Ship compare
+ */
 export default class ShipCompare {
+    /**
+     * @param {Object} shipData - Ship data
+     * @param {Object} woodData - Wood data
+     */
     constructor(shipData, woodData) {
         this._shipData = shipData;
 
@@ -849,6 +922,10 @@ export default class ShipCompare {
         this._setupListener();
     }
 
+    /**
+     * Setup menu item listener
+     * @returns {void}
+     */
     _setupListener() {
         $(`#${this._buttonId}`).on("click", event => {
             registerEvent("Tools", this._baseName);
@@ -857,6 +934,10 @@ export default class ShipCompare {
         });
     }
 
+    /**
+     * Set graphics parameter
+     * @returns {void}
+     */
     _setGraphicsParameters() {
         this.svgWidth = parseInt($(`#${this._modalId} .columnA`).width(), 10);
         // noinspection JSSuspiciousNameCombination
@@ -869,6 +950,10 @@ export default class ShipCompare {
             .range([10, this.innerRadius, this.outerRadius]);
     }
 
+    /**
+     * Action when selected
+     * @returns {void}
+     */
     _shipCompareSelected() {
         // If the modal has no content yet, insert it
         if (!document.getElementById(this._modalId)) {
@@ -879,6 +964,10 @@ export default class ShipCompare {
         this._setGraphicsParameters();
     }
 
+    /**
+     * Setup data
+     * @returns {void}
+     */
     _setupData() {
         this.shipSelectData = d3
             .nest()
@@ -905,6 +994,10 @@ export default class ShipCompare {
             );
     }
 
+    /**
+     * Inject modal
+     * @returns {void}
+     */
     _injectModal() {
         insertBaseModal(this._modalId, this._baseName);
 
@@ -939,6 +1032,10 @@ export default class ShipCompare {
         });
     }
 
+    /**
+     * Init modal
+     * @returns {void}
+     */
     _initModal() {
         this._setupData();
         this.woodCompare._setupData();
@@ -955,6 +1052,10 @@ export default class ShipCompare {
         });
     }
 
+    /**
+     * Get select options
+     * @returns {string} HTML formatted option
+     */
     _getOptions() {
         return this.shipSelectData
             .map(
@@ -964,13 +1065,18 @@ export default class ShipCompare {
                             ship =>
                                 `<option data-subtext="${ship.battleRating}" value="${ship.id}">${ship.name} (${
                                     ship.guns
-                                })`
+                                    })`
                         )
                         .join("</option>")}`
             )
             .join("</optgroup>");
     }
 
+    /**
+     * Setup ship select
+     * @param {string} columnId - Column id
+     * @returns {void}
+     */
     _setupShipSelect(columnId) {
         const select$ = $(`#${this._baseId}-${columnId}-select`),
             options = this._getOptions();
@@ -980,6 +1086,12 @@ export default class ShipCompare {
         }
     }
 
+    /**
+     * Get ship data for ship with id <id>
+     * @param {number} shipId - Ship id
+     * @param {string} columnId - Column id
+     * @returns {Object} Ship data
+     */
     _getShipData(shipId, columnId) {
         let shipData = this._shipData.filter(ship => ship.id === shipId)[0];
 
@@ -988,6 +1100,12 @@ export default class ShipCompare {
         return shipData;
     }
 
+    /**
+     * Add to ship data changes based on selected woods
+     * @param {*} shipData - Ship id
+     * @param {*} compareId - Column id
+     * @returns {Object} - Updated ship data
+     */
     _addWoodData(shipData, compareId) {
         const data = JSON.parse(JSON.stringify(shipData));
 
@@ -1043,6 +1161,12 @@ export default class ShipCompare {
         return data;
     }
 
+    /**
+     * Refresh ship data
+     * @param {*} shipData - Ship id
+     * @param {*} compareId - Column id
+     * @returns {void}
+     */
     _refreshShips(shipId, compareId) {
         const singleShipData = this._getShipData(shipId, compareId);
         if (compareId === "Base") {
@@ -1060,6 +1184,10 @@ export default class ShipCompare {
         }
     }
 
+    /**
+     * Enable compare selects
+     * @returns {void}
+     */
     _enableCompareSelects() {
         this._columnsCompare.forEach(id => {
             $(`#${this._baseId}-${id}-select`)
@@ -1068,6 +1196,11 @@ export default class ShipCompare {
         });
     }
 
+    /**
+     * Listener for the select
+     * @param {string} compareId - Column id
+     * @returns {void}
+     */
     _setupSelectListener(compareId) {
         const selectShip$ = $(`#${this._baseId}-${compareId}-select`);
         selectShip$
