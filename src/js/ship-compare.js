@@ -410,12 +410,9 @@ class ShipBase extends Ship {
                 .radius(d => this.shipCompareData.radiusScaleAbsolute(d.data))
                 .curve(curve);
 
-        const profile = this.g.append("path");
+        const profile = this.g.append("path").classed("base", true);
         const markers = this.g.append("g").classed("markers", true);
-        profile
-            .attr("d", line(arcs))
-            .attr("stroke-width", "5px")
-            .attr("stroke", "url(#gradient)");
+        profile.attr("d", line(arcs));
 
         markers
             .selectAll("circle")
@@ -572,7 +569,6 @@ class ShipComparison extends Ship {
                 .curve(curve);
 
         const pathComp = this.g.append("path"),
-            markersComp = this.g.append("g").attr("class", "markers"),
             pathBase = this.g.append("path"),
             markersBase = this.g.append("g").attr("class", "markers");
 
@@ -591,7 +587,6 @@ class ShipComparison extends Ship {
         selBase
             .enter()
             .append("circle")
-            .merge(selBase)
             .attr("r", "5")
             .attr("cy", (d, i) => Math.cos(i * segmentRadians) * -this.shipCompare.radiusScaleAbsolute(d.data))
             .attr("cx", (d, i) => Math.sin(i * segmentRadians) * this.shipCompare.radiusScaleAbsolute(d.data))
@@ -601,18 +596,6 @@ class ShipComparison extends Ship {
             .text(d => `${Math.round(d.data * 10) / 10} knots`);
 
         pathComp.attr("d", lineB(arcsComp)).classed("comp", true);
-
-        const selComp = markersComp.selectAll("circle").data(arcsComp);
-        selComp
-            .enter()
-            .append("circle")
-            .merge(selComp)
-            .attr("r", "5")
-            .attr("cy", (d, i) => Math.cos(i * segmentRadians) * -this.shipCompare.radiusScaleAbsolute(d.data))
-            .attr("cx", (d, i) => Math.sin(i * segmentRadians) * this.shipCompare.radiusScaleAbsolute(d.data))
-            .classed("comp", true)
-            .append("title")
-            .text(d => `${Math.round(d.data * 10) / 10} knots`);
     }
 
     /**
