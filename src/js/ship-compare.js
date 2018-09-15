@@ -4,15 +4,17 @@
  * @file      Ship comparison.
  * @module    ship-compare
  * @author    iB aka Felix Victor
- * @copyright 2017, 2018
+ * @copyright 2018
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
 /* global d3 : false
  */
 
-import { formatInt, formatFloat, getOrdinal, isEmpty } from "./util";
+import { formatInt, formatFloat, getOrdinal, isEmpty, capitalizeFirstLetter, roundToThousands } from "./util";
 import { registerEvent } from "./analytics";
+import WoodCompare from "./wood-compare";
+import { insertBaseModal } from "./common";
 
 const numSegments = 24,
     segmentRadians = (2 * Math.PI) / numSegments,
@@ -32,29 +34,39 @@ class Ship {
         this._id = id;
         this._shipData = shipData;
 
-        this._select = `#ship-${this._id}`;
+        this._select = `#ship-compare-${this._id}`;
 
         this._setupSvg();
         this._g = d3.select(this._select).select("g");
         this._setCompass();
     }
 
+    /**
+     * Setup svg
+     * @returns {void}
+     */
     _setupSvg() {
-        d3.select(`${this._select} svg`).remove();
-        d3.select(this._select)
+        const element = d3.select(this.select);
+
+        d3.select(`${this.select} svg`).remove();
+
+        element
             .append("svg")
-            .attr("width", this._shipData.svgWidth)
-            .attr("height", this._shipData.svgHeight)
+            .attr("width", this.shipData.svgWidth)
+            .attr("height", this.shipData.svgHeight)
             .attr("class", "profile")
             .attr("fill", "none")
             .append("g")
-            .attr("transform", `translate(${this._shipData.svgWidth / 2}, ${this._shipData.svgHeight / 2})`);
-        d3.select(`${this._select} div`).remove();
-        d3.select(this._select)
-            .append("div")
-            .classed("block", true);
+            .attr("transform", `translate(${this.shipData.svgWidth / 2}, ${this.shipData.svgHeight / 2})`);
+        d3.select(`${this.select} div`).remove();
+
+        element.append("div").classed("block", true);
     }
 
+    /**
+     * Set compass
+     * @returns {void}
+     */
     _setCompass() {
         // Compass
         const data = new Array(numSegments / 2);
@@ -66,10 +78,10 @@ class Ship {
 
         const arc = d3
             .arc()
-            .outerRadius(this._shipData.radiusScaleAbsolute(12))
-            .innerRadius(this._shipData.innerRadius);
+            .outerRadius(this.shipData.radiusScaleAbsolute(12))
+            .innerRadius(this.shipData.innerRadius);
 
-        const g = this._g
+        const g = this.g
             .selectAll(".compass-arc")
             .data(pie)
             .enter()
@@ -79,6 +91,11 @@ class Ship {
         g.append("path").attr("d", arc);
     }
 
+    /**
+     * Format cannon pound value
+     * @param {number[]} limit Upper limit for [0] cannon and [1] carronades
+     * @returns {void}
+     */
     static pd(limit) {
         let s = `<span class="badge badge-light">${limit[0]}\u202f/\u202f`;
         if (limit[1]) {
@@ -90,6 +107,12 @@ class Ship {
         return s;
     }
 
+    /**
+     * Format cannon/carronade upper limit classes
+     * @param {number[]} deckClassLimit - Limit per deck
+     * @param {number[]} gunsPerDeck - Guns per deck
+     * @returns {string[]} Formatted string [0] limits and [1] possibly empty lines at the bottom
+     */
     static getCannonsPerDeck(deckClassLimit, gunsPerDeck) {
         let s = `${gunsPerDeck[0]}\u00a0${Ship.pd(deckClassLimit[0])}`,
             br = "";
@@ -103,6 +126,11 @@ class Ship {
         return [s, br];
     }
 
+    /**
+     * Get HTML formatted data for a single ship
+     * @param {Object} ship - Ship data
+     * @return {string} HTML formatted column
+     */
     static getText(ship) {
         let row = 0;
         /**
@@ -135,6 +163,10 @@ class Ship {
             return `<div class="col-${col}">${elementText}<br><span class="des">${description}</span>${br}</div>`;
         }
 
+        /**
+         * HTML format head of second block
+         * @return {string} HTML formatted block head
+         */
         function displaySecondBlock() {
             return '<div class="col-9"><div class="row no-gutters">';
         }
@@ -202,6 +234,13 @@ class Ship {
         text += displayColumn("maxCrew", "Maximum", 4);
         text += "</div></div></div>";
 
+        text += displayFirstColumn("Resistance");
+        text += displaySecondBlock();
+        text += displayColumn("fireResistance", "Fire", 3);
+        text += displayColumn("leakResistance", "Leaks", 3);
+        text += displayColumn("crewProtection", "Crew Protection", 6);
+        text += "</div></div></div>";
+
         text += displayFirstColumn("Repairs needed");
         text += displaySecondBlock();
         text += displayColumn("hullRepair", "Hull", 4);
@@ -228,6 +267,22 @@ class Ship {
         text += "</div>";
         return text;
     }
+
+    get id() {
+        return this._id;
+    }
+
+    get shipData() {
+        return this._shipData;
+    }
+
+    get select() {
+        return this._select;
+    }
+
+    get g() {
+        return this._g;
+    }
 }
 
 /**
@@ -252,12 +307,16 @@ class ShipBase extends Ship {
         this._printText();
     }
 
+    /**
+     * Set coloroured Background
+     * @returns {void}
+     */
     _setBackground() {
         // Arc for text
         const knotsArc = d3
             .arc()
-            .outerRadius(d => this._shipCompareData.radiusScaleAbsolute(d) + 2)
-            .innerRadius(d => this._shipCompareData.radiusScaleAbsolute(d) + 1)
+            .outerRadius(d => this.shipCompareData.radiusScaleAbsolute(d) + 2)
+            .innerRadius(d => this.shipCompareData.radiusScaleAbsolute(d) + 1)
             .startAngle(-Math.PI / 2)
             .endAngle(Math.PI / 2);
 
@@ -266,16 +325,16 @@ class ShipBase extends Ship {
         const tickLabels = ["12 knots", "8 knots", "4 knots", "0 knots"];
 
         // Add the circles for each tick
-        this._g
+        this.g
             .selectAll(".circle")
             .data(ticks)
             .enter()
             .append("circle")
             .attr("class", "knots-circle")
-            .attr("r", d => this._shipCompareData.radiusScaleAbsolute(d));
+            .attr("r", d => this.shipCompareData.radiusScaleAbsolute(d));
 
         // Add the paths for the text
-        this._g
+        this.g
             .selectAll(".label")
             .data(ticks)
             .enter()
@@ -284,7 +343,7 @@ class ShipBase extends Ship {
             .attr("id", (d, i) => `tick${i}`);
 
         // And add the text
-        this._g
+        this.g
             .selectAll(".label")
             .data(ticks)
             .enter()
@@ -296,12 +355,16 @@ class ShipBase extends Ship {
             .attr("startOffset", "16%");
     }
 
+    /**
+     * Set Background gradient
+     * @returns {void}
+     */
     _setBackgroundGradient() {
         // Extra scale since the color scale is interpolated
         const gradientScale = d3
             .scaleLinear()
-            .domain([this._shipData.speed.min, this._shipData.speed.max])
-            .range([0, this._shipCompareData.svgWidth]);
+            .domain([this.shipData.speed.min, this.shipData.speed.max])
+            .range([0, this.shipCompareData.svgWidth]);
 
         // Calculate the variables for the gradient
         const numStops = 30;
@@ -313,7 +376,7 @@ class ShipBase extends Ship {
         }
 
         // Create the gradient
-        this._g
+        this.g
             .append("defs")
             .append("radialGradient")
             .attr("id", "gradient")
@@ -324,107 +387,113 @@ class ShipBase extends Ship {
             .data(d3.range(numStops))
             .enter()
             .append("stop")
-            .attr("offset", (d, i) => gradientScale(gradientPoint[i]) / this._shipCompareData.svgWidth)
-            .attr("stop-color", (d, i) => this._shipCompareData.colorScale(gradientPoint[i]));
+            .attr("offset", (d, i) => gradientScale(gradientPoint[i]) / this.shipCompareData.svgWidth)
+            .attr("stop-color", (d, i) => this.shipCompareData.colorScale(gradientPoint[i]));
     }
 
+    /**
+     * Draw profile
+     * @returns {void}
+     */
     _drawProfile() {
         const pie = d3
             .pie()
             .sort(null)
             .value(1);
 
-        const arcs = pie(this._shipData.speedDegrees);
+        const arcs = pie(this.shipData.speedDegrees);
 
         const curve = d3.curveCatmullRomClosed,
             line = d3
                 .radialLine()
                 .angle((d, i) => i * segmentRadians)
-                .radius(d => this._shipCompareData.radiusScaleAbsolute(d.data))
+                .radius(d => this.shipCompareData.radiusScaleAbsolute(d.data))
                 .curve(curve);
 
-        const profile = this._g.append("path");
-        const markers = this._g.append("g").classed("markers", true);
-        profile
-            .attr("d", line(arcs))
-            .attr("stroke-width", "5px")
-            .attr("stroke", "url(#gradient)");
+        const profile = this.g.append("path").classed("base", true);
+        const markers = this.g.append("g").classed("markers", true);
+        profile.attr("d", line(arcs));
 
         markers
             .selectAll("circle")
             .data(arcs)
             .enter()
             .append("circle")
-            .attr("r", "5")
-            .attr("cy", (d, i) => Math.cos(i * segmentRadians) * -this._shipCompareData.radiusScaleAbsolute(d.data))
-            .attr("cx", (d, i) => Math.sin(i * segmentRadians) * this._shipCompareData.radiusScaleAbsolute(d.data))
-            .attr("fill", d => this._shipCompareData.colorScale(d.data))
-            .style("opacity", 0.5)
+            .attr("cy", (d, i) => Math.cos(i * segmentRadians) * -this.shipCompareData.radiusScaleAbsolute(d.data))
+            .attr("cx", (d, i) => Math.sin(i * segmentRadians) * this.shipCompareData.radiusScaleAbsolute(d.data))
+            .attr("fill", d => this.shipCompareData.colorScale(d.data))
             .append("title")
             .text(d => `${Math.round(d.data * 10) / 10} knots`);
     }
 
+    /**
+     * Print text
+     * @returns {void}
+     */
     _printText() {
-        const cannonsPerDeck = Ship.getCannonsPerDeck(this._shipData.deckClassLimit, this._shipData.gunsPerDeck),
+        const cannonsPerDeck = Ship.getCannonsPerDeck(this.shipData.deckClassLimit, this.shipData.gunsPerDeck),
             ship = {
-                shipRating: `${getOrdinal(this._shipData.class)} rate`,
-                battleRating: this._shipData.battleRating,
-                guns: this._shipData.guns,
-                decks: `${this._shipData.decks} deck${this._shipData.decks > 1 ? "s" : ""}`,
-                additionalRow: `${this._shipData.decks < 4 ? "<br>\u00a0" : ""}`,
+                shipRating: `${getOrdinal(this.shipData.class)} rate`,
+                battleRating: this.shipData.battleRating,
+                guns: this.shipData.guns,
+                decks: `${this.shipData.decks} deck${this.shipData.decks > 1 ? "s" : ""}`,
+                additionalRow: `${this.shipData.decks < 4 ? "<br>\u00a0" : ""}`,
                 cannonsPerDeck,
-                cannonBroadside: formatInt(this._shipData.broadside.cannons),
-                carroBroadside: formatInt(this._shipData.broadside.carronades),
-                gunsFront: this._shipData.gunsPerDeck[4],
-                limitFront: this._shipData.deckClassLimit[4],
-                gunsBack: this._shipData.gunsPerDeck[5],
-                limitBack: this._shipData.deckClassLimit[5],
-                firezoneHorizontalWidth: this._shipData.ship.firezoneHorizontalWidth,
-                waterlineHeight: formatFloat(this._shipData.ship.waterlineHeight),
-                maxSpeed: formatFloat(this._shipData.ship.maxSpeed, 3),
-                acceleration: formatFloat(this._shipData.ship.acceleration),
-                deceleration: formatFloat(this._shipData.ship.deceleration),
-                maxTurningSpeed: formatFloat(this._shipData.rudder.turnSpeed),
-                halfturnTime: formatFloat(this._shipData.rudder.halfturnTime),
-                sideArmor: `${formatInt(this._shipData.sides.armour)}\u00a0<span class="badge badge-light">${formatInt(
-                    this._shipData.sides.thickness
+                cannonBroadside: formatInt(this.shipData.broadside.cannons),
+                carroBroadside: formatInt(this.shipData.broadside.carronades),
+                gunsFront: this.shipData.gunsPerDeck[4],
+                limitFront: this.shipData.deckClassLimit[4],
+                gunsBack: this.shipData.gunsPerDeck[5],
+                limitBack: this.shipData.deckClassLimit[5],
+                firezoneHorizontalWidth: this.shipData.ship.firezoneHorizontalWidth,
+                waterlineHeight: formatFloat(this.shipData.ship.waterlineHeight),
+                maxSpeed: formatFloat(this.shipData.speed.max, 3),
+                acceleration: formatFloat(this.shipData.ship.acceleration),
+                deceleration: formatFloat(this.shipData.ship.deceleration),
+                maxTurningSpeed: formatFloat(this.shipData.rudder.turnSpeed),
+                halfturnTime: formatFloat(this.shipData.rudder.halfturnTime),
+                sideArmor: `${formatInt(this.shipData.sides.armour)}\u00a0<span class="badge badge-light">${formatInt(
+                    this.shipData.sides.thickness
                 )}</span>`,
-                frontArmor: `${formatInt(this._shipData.bow.armour)}\u00a0<span class="badge badge-light">${formatInt(
-                    this._shipData.bow.thickness
+                frontArmor: `${formatInt(this.shipData.bow.armour)}\u00a0<span class="badge badge-light">${formatInt(
+                    this.shipData.bow.thickness
                 )}</span>`,
-                pump: formatInt(this._shipData.pump.armour),
-                sails: formatInt(this._shipData.sails.armour),
-                structure: formatInt(this._shipData.structure.armour),
-                backArmor: `${formatInt(this._shipData.stern.armour)}\u00a0<span class="badge badge-light">${formatInt(
-                    this._shipData.stern.thickness
+                pump: formatInt(this.shipData.pump.armour),
+                sails: formatInt(this.shipData.sails.armour),
+                structure: formatInt(this.shipData.structure.armour),
+                backArmor: `${formatInt(this.shipData.stern.armour)}\u00a0<span class="badge badge-light">${formatInt(
+                    this.shipData.stern.thickness
                 )}</span>`,
-                rudder: `${formatInt(this._shipData.rudder.armour)}\u00a0<span class="badge badge-light">${formatInt(
-                    this._shipData.rudder.thickness
+                rudder: `${formatInt(this.shipData.rudder.armour)}\u00a0<span class="badge badge-light">${formatInt(
+                    this.shipData.rudder.thickness
                 )}</span>`,
-                minCrew: formatInt(this._shipData.crew.min),
-                maxCrew: formatInt(this._shipData.crew.max),
-                sailingCrew: formatInt(this._shipData.crew.sailing),
-                maxWeight: formatInt(this._shipData.maxWeight),
-                holdSize: formatInt(this._shipData.holdSize),
-                upgradeXP: formatInt(this._shipData.upgradeXP),
-                sternRepair: formatInt(this._shipData.repairTime.stern),
-                bowRepair: formatInt(this._shipData.repairTime.bow),
-                sidesRepair: formatInt(this._shipData.repairTime.sides),
-                rudderRepair: formatInt(this._shipData.repairTime.rudder),
-                sailsRepair: formatInt(this._shipData.repairTime.sails),
-                structureRepair: formatInt(this._shipData.repairTime.structure),
-                hullRepair: `${formatInt(this._shipData.sides.armour / hullRepairsFactor)}`,
-                rigRepair: `${formatInt(this._shipData.sails.armour / rigRepairsFactor)}`,
-                rumRepair: `${formatInt(this._shipData.crew.max / rumRepairsFactor)}`,
+                minCrew: formatInt(this.shipData.crew.min),
+                maxCrew: formatInt(this.shipData.crew.max),
+                sailingCrew: formatInt(this.shipData.crew.sailing),
+                maxWeight: formatInt(this.shipData.maxWeight),
+                holdSize: formatInt(this.shipData.holdSize),
+                upgradeXP: formatInt(this.shipData.upgradeXP),
+                sternRepair: formatInt(this.shipData.repairTime.stern),
+                bowRepair: formatInt(this.shipData.repairTime.bow),
+                sidesRepair: formatInt(this.shipData.repairTime.sides),
+                rudderRepair: formatInt(this.shipData.repairTime.rudder),
+                sailsRepair: formatInt(this.shipData.repairTime.sails),
+                structureRepair: formatInt(this.shipData.repairTime.structure),
+                hullRepair: `${formatInt(this.shipData.sides.armour / hullRepairsFactor)}`,
+                rigRepair: `${formatInt(this.shipData.sails.armour / rigRepairsFactor)}`,
+                rumRepair: `${formatInt(this.shipData.crew.max / rumRepairsFactor)}`,
+                fireResistance: formatInt(this.shipData.resistance.fire),
+                leakResistance: formatInt(this.shipData.resistance.leaks),
+                crewProtection: formatInt(this.shipData.resistance.crew),
                 mastBottomArmor: `${formatInt(
-                    this._shipData.mast.bottomArmour
-                )}\u00a0<span class="badge badge-light">${formatInt(this._shipData.mast.bottomThickness)}</span>`,
+                    this.shipData.mast.bottomArmour
+                )}\u00a0<span class="badge badge-light">${formatInt(this.shipData.mast.bottomThickness)}</span>`,
                 mastMiddleArmor: `${formatInt(
-                    this._shipData.mast.middleArmour
-                )}\u00a0<span class="badge badge-light">${formatInt(this._shipData.mast.middleThickness)}</span>`,
+                    this.shipData.mast.middleArmour
+                )}\u00a0<span class="badge badge-light">${formatInt(this.shipData.mast.middleThickness)}</span>`,
                 mastTopArmor: `${formatInt(
-                    this._shipData.mast.topArmour
-                )}\u00a0<span class="badge badge-light">${formatInt(this._shipData.mast.topThickness)}</span>`
+                    this.shipData.mast.topArmour
+                )}\u00a0<span class="badge badge-light">${formatInt(this.shipData.mast.topThickness)}</span>`
             };
 
         if (ship.gunsFront) {
@@ -438,9 +507,17 @@ class ShipBase extends Ship {
             ship.gunsBack = "\u2013";
         }
 
-        $(`${this._select}`)
+        $(`${this.select}`)
             .find("div")
             .append(Ship.getText(ship));
+    }
+
+    get shipData() {
+        return this._shipData;
+    }
+
+    get shipCompareData() {
+        return this._shipCompareData;
     }
 }
 
@@ -449,6 +526,12 @@ class ShipBase extends Ship {
  * @extends Ship
  */
 class ShipComparison extends Ship {
+    /**
+     * @param {number} compareId - Ship id
+     * @param {Object} shipBaseData - Base ship data
+     * @param {Object} shipCompareData - Ship data of the ship to be compared to
+     * @param {Class} shipCompare - Class instance of the ship to be compared to
+     */
     constructor(compareId, shipBaseData, shipCompareData, shipCompare) {
         super(compareId, shipCompare);
 
@@ -457,41 +540,44 @@ class ShipComparison extends Ship {
         this._shipCompare = shipCompare;
 
         this._drawDifferenceProfile();
-        this._printTextComparison();
+        this._injectTextComparison();
     }
 
+    /**
+     * Draw difference profile
+     * @returns {void}
+     */
     _drawDifferenceProfile() {
         const pie = d3
             .pie()
             .sort(null)
             .value(1);
-        const arcsBase = pie(this._shipBaseData.speedDegrees),
-            arcsComp = pie(this._shipCompareData.speedDegrees);
+        const arcsBase = pie(this.shipCompareData.speedDegrees),
+            arcsComp = pie(this.shipBaseData.speedDegrees);
         const curve = d3.curveCatmullRomClosed,
             lineBase = d3
                 .radialLine()
                 .angle((d, i) => i * segmentRadians)
-                .radius(d => this._shipCompare.radiusScaleAbsolute(d.data))
+                .radius(d => this.shipCompare.radiusScaleAbsolute(d.data))
                 .curve(curve),
             lineB = d3
                 .radialLine()
                 .angle((d, i) => i * segmentRadians)
-                .radius(d => this._shipCompare.radiusScaleAbsolute(d.data))
+                .radius(d => this.shipCompare.radiusScaleAbsolute(d.data))
                 .curve(curve);
 
-        const pathComp = this._g.append("path"),
-            markersComp = this._g.append("g").attr("class", "markers"),
-            pathBase = this._g.append("path"),
-            markersBase = this._g.append("g").attr("class", "markers");
+        const pathComp = this.g.append("path"),
+            pathBase = this.g.append("path"),
+            markersBase = this.g.append("g").attr("class", "markers");
 
         const speedDiff = [];
-        this._shipBaseData.speedDegrees.forEach((speedShipBase, i) => {
-            speedDiff.push(speedShipBase - this._shipCompareData.speedDegrees[i]);
+        this.shipCompareData.speedDegrees.forEach((speedShipCompare, i) => {
+            speedDiff.push(roundToThousands(speedShipCompare - this.shipBaseData.speedDegrees[i]));
         });
         const colourScale = d3
             .scaleLinear()
-            .domain([Math.min(-0.01, d3.min(speedDiff)), 0, Math.max(0.01, d3.max(speedDiff))])
-            .range(["#a62e39", "#fbf8f5", "#419f57"])
+            .domain([d3.min(speedDiff), 0, 1, d3.max(speedDiff)])
+            .range(["#a62e39", "#fbf8f5", "#95d4a4", "#419f57"])
             .interpolate(d3.interpolateHcl);
 
         pathBase.attr("d", lineBase(arcsBase)).classed("base", true);
@@ -499,31 +585,27 @@ class ShipComparison extends Ship {
         selBase
             .enter()
             .append("circle")
-            .merge(selBase)
-            .attr("r", "5")
-            .attr("cy", (d, i) => Math.cos(i * segmentRadians) * -this._shipCompare.radiusScaleAbsolute(d.data))
-            .attr("cx", (d, i) => Math.sin(i * segmentRadians) * this._shipCompare.radiusScaleAbsolute(d.data))
+            .attr("cy", (d, i) => Math.cos(i * segmentRadians) * -this.shipCompare.radiusScaleAbsolute(d.data))
+            .attr("cx", (d, i) => Math.sin(i * segmentRadians) * this.shipCompare.radiusScaleAbsolute(d.data))
             .attr("fill", (d, i) => colourScale(speedDiff[i]))
-            .classed("base", true)
             .append("title")
             .text(d => `${Math.round(d.data * 10) / 10} knots`);
 
         pathComp.attr("d", lineB(arcsComp)).classed("comp", true);
-
-        const selComp = markersComp.selectAll("circle").data(arcsComp);
-        selComp
-            .enter()
-            .append("circle")
-            .merge(selComp)
-            .attr("r", "5")
-            .attr("cy", (d, i) => Math.cos(i * segmentRadians) * -this._shipCompare.radiusScaleAbsolute(d.data))
-            .attr("cx", (d, i) => Math.sin(i * segmentRadians) * this._shipCompare.radiusScaleAbsolute(d.data))
-            .classed("comp", true)
-            .append("title")
-            .text(d => `${Math.round(d.data * 10) / 10} knots`);
     }
 
-    _printTextComparison() {
+    /**
+     * Inject text comparison
+     * @returns {void}
+     */
+    _injectTextComparison() {
+        /**
+         * HTML formatted difference
+         * @param {number} a - First value
+         * @param {number} b - Second value
+         * @param {number} decimals - Number of decimals (default 0)
+         * @returns {string} HTML formatted string
+         */
         function getDiff(a, b, decimals = 0) {
             const diff = parseFloat((a - b).toFixed(decimals));
 
@@ -537,186 +619,205 @@ class ShipComparison extends Ship {
         }
 
         const ship = {
-            shipRating: `${getOrdinal(this._shipCompareData.class)} rate`,
-            battleRating: `${this._shipCompareData.battleRating}\u00a0${getDiff(
-                this._shipCompareData.battleRating,
-                this._shipBaseData.battleRating
+            shipRating: `${getOrdinal(this.shipCompareData.class)} rate`,
+            battleRating: `${this.shipCompareData.battleRating}\u00a0${getDiff(
+                this.shipCompareData.battleRating,
+                this.shipBaseData.battleRating
             )}`,
-            guns: `${this._shipCompareData.guns}\u00a0${getDiff(this._shipCompareData.guns, this._shipBaseData.guns)}`,
-            decks: `${this._shipCompareData.decks} deck${this._shipCompareData.decks > 1 ? "s" : ""}\u00a0${getDiff(
-                this._shipCompareData.decks,
-                this._shipBaseData.decks
+            guns: `${this.shipCompareData.guns}\u00a0${getDiff(this.shipCompareData.guns, this.shipBaseData.guns)}`,
+            decks: `${this.shipCompareData.decks} deck${this.shipCompareData.decks > 1 ? "s" : ""}\u00a0${getDiff(
+                this.shipCompareData.decks,
+                this.shipBaseData.decks
             )}`,
-            additionalRow: `${this._shipCompareData.decks < 4 ? "<br>\u00a0" : ""}`,
+            additionalRow: `${this.shipCompareData.decks < 4 ? "<br>\u00a0" : ""}`,
             cannonsPerDeck: Ship.getCannonsPerDeck(
-                this._shipCompareData.deckClassLimit,
-                this._shipCompareData.gunsPerDeck
+                this.shipCompareData.deckClassLimit,
+                this.shipCompareData.gunsPerDeck
             ),
-            cannonBroadside: `${this._shipCompareData.broadside.cannons}\u00a0${getDiff(
-                this._shipCompareData.broadside.cannons,
-                this._shipBaseData.broadside.cannons
+            cannonBroadside: `${this.shipCompareData.broadside.cannons}\u00a0${getDiff(
+                this.shipCompareData.broadside.cannons,
+                this.shipBaseData.broadside.cannons
             )}`,
-            carroBroadside: `${this._shipCompareData.broadside.carronades}\u00a0${getDiff(
-                this._shipCompareData.broadside.carronades,
-                this._shipBaseData.broadside.carronades
+            carroBroadside: `${this.shipCompareData.broadside.carronades}\u00a0${getDiff(
+                this.shipCompareData.broadside.carronades,
+                this.shipBaseData.broadside.carronades
             )}`,
-            gunsFront: this._shipCompareData.gunsPerDeck[4],
-            limitFront: this._shipCompareData.deckClassLimit[4],
-            gunsBack: this._shipCompareData.gunsPerDeck[5],
-            limitBack: this._shipCompareData.deckClassLimit[5],
-            minSpeed: `${formatFloat(this._shipCompareData.speed.min)}\u00a0${getDiff(
-                this._shipCompareData.speed.min,
-                this._shipBaseData.speed.min,
+            gunsFront: this.shipCompareData.gunsPerDeck[4],
+            limitFront: this.shipCompareData.deckClassLimit[4],
+            gunsBack: this.shipCompareData.gunsPerDeck[5],
+            limitBack: this.shipCompareData.deckClassLimit[5],
+            minSpeed: `${formatFloat(this.shipCompareData.speed.min)}\u00a0${getDiff(
+                this.shipCompareData.speed.min,
+                this.shipBaseData.speed.min,
                 2
             )}`,
-            maxSpeed: `${formatFloat(this._shipCompareData.ship.maxSpeed, 3)}\u00a0${getDiff(
-                this._shipCompareData.ship.maxSpeed,
-                this._shipBaseData.ship.maxSpeed,
+            maxSpeed: `${formatFloat(this.shipCompareData.speed.max, 3)}\u00a0${getDiff(
+                this.shipCompareData.speed.max,
+                this.shipBaseData.speed.max,
                 2
             )}`,
-            maxTurningSpeed: `${formatFloat(this._shipCompareData.rudder.turnSpeed)}\u00a0${getDiff(
-                this._shipCompareData.rudder.turnSpeed,
-                this._shipBaseData.rudder.turnSpeed,
+            maxTurningSpeed: `${formatFloat(this.shipCompareData.rudder.turnSpeed)}\u00a0${getDiff(
+                this.shipCompareData.rudder.turnSpeed,
+                this.shipBaseData.rudder.turnSpeed,
                 2
             )}`,
-            firezoneHorizontalWidth: `${this._shipCompareData.ship.firezoneHorizontalWidth}\u00a0${getDiff(
-                this._shipCompareData.ship.firezoneHorizontalWidth,
-                this._shipBaseData.ship.firezoneHorizontalWidth
+            firezoneHorizontalWidth: `${this.shipCompareData.ship.firezoneHorizontalWidth}\u00a0${getDiff(
+                this.shipCompareData.ship.firezoneHorizontalWidth,
+                this.shipBaseData.ship.firezoneHorizontalWidth
             )}`,
-            waterlineHeight: `${formatFloat(this._shipCompareData.ship.waterlineHeight)}\u00a0${getDiff(
-                this._shipCompareData.ship.waterlineHeight,
-                this._shipBaseData.ship.waterlineHeight,
+            waterlineHeight: `${formatFloat(this.shipCompareData.ship.waterlineHeight)}\u00a0${getDiff(
+                this.shipCompareData.ship.waterlineHeight,
+                this.shipBaseData.ship.waterlineHeight,
                 2
             )}`,
-            acceleration: `${formatFloat(this._shipCompareData.ship.acceleration)}\u00a0${getDiff(
-                this._shipCompareData.ship.acceleration,
-                this._shipBaseData.ship.acceleration,
+            acceleration: `${formatFloat(this.shipCompareData.ship.acceleration)}\u00a0${getDiff(
+                this.shipCompareData.ship.acceleration,
+                this.shipBaseData.ship.acceleration,
                 2
             )}`,
-            deceleration: `${formatFloat(this._shipCompareData.ship.deceleration)}\u00a0${getDiff(
-                this._shipCompareData.ship.deceleration,
-                this._shipBaseData.ship.deceleration,
+            deceleration: `${formatFloat(this.shipCompareData.ship.deceleration)}\u00a0${getDiff(
+                this.shipCompareData.ship.deceleration,
+                this.shipBaseData.ship.deceleration,
                 2
             )}`,
-            halfturnTime: `${formatFloat(this._shipCompareData.rudder.halfturnTime)}\u00a0${getDiff(
-                this._shipCompareData.rudder.halfturnTime,
-                this._shipBaseData.rudder.halfturnTime
+            halfturnTime: `${formatFloat(this.shipCompareData.rudder.halfturnTime)}\u00a0${getDiff(
+                this.shipCompareData.rudder.halfturnTime,
+                this.shipBaseData.rudder.halfturnTime
+            )}`,
+            sideArmor: `${formatInt(this.shipCompareData.sides.armour)}\u00a0${getDiff(
+                this.shipCompareData.sides.armour,
+                this.shipBaseData.sides.armour
+            )} <span class="badge badge-light">${formatInt(this.shipCompareData.sides.thickness)}</span>${getDiff(
+                this.shipCompareData.sides.thickness,
+                this.shipBaseData.sides.thickness
+            )}`,
+            frontArmor: `${formatInt(this.shipCompareData.bow.armour)}\u00a0${getDiff(
+                this.shipCompareData.bow.armour,
+                this.shipBaseData.bow.armour
+            )} <span class="badge badge-light">${formatInt(this.shipCompareData.bow.thickness)}</span>${getDiff(
+                this.shipCompareData.bow.thickness,
+                this.shipBaseData.bow.thickness
+            )}`,
+            backArmor: `${formatInt(this.shipCompareData.stern.armour)}\u00a0${getDiff(
+                this.shipCompareData.stern.armour,
+                this.shipBaseData.stern.armour
+            )} <span class="badge badge-light">${formatInt(this.shipCompareData.stern.thickness)}</span>${getDiff(
+                this.shipCompareData.stern.thickness,
+                this.shipBaseData.stern.thickness
+            )}`,
+            pump: `${formatInt(this.shipCompareData.pump.armour)}\u00a0${getDiff(
+                this.shipCompareData.pump.armour,
+                this.shipBaseData.pump.armour
+            )}`,
+            sails: `${formatInt(this.shipCompareData.sails.armour)}\u00a0${getDiff(
+                this.shipCompareData.sails.armour,
+                this.shipBaseData.sails.armour
+            )}`,
+            structure: `${formatInt(this.shipCompareData.structure.armour)}\u00a0${getDiff(
+                this.shipCompareData.structure.armour,
+                this.shipBaseData.structure.armour
+            )}`,
+            rudder: `${formatInt(this.shipCompareData.rudder.armour)}\u00a0${getDiff(
+                this.shipCompareData.rudder.armour,
+                this.shipBaseData.rudder.armour
+            )} <span class="badge badge-light">${formatInt(this.shipCompareData.rudder.thickness)}</span>${getDiff(
+                this.shipCompareData.rudder.thickness,
+                this.shipBaseData.rudder.thickness
             )}`,
 
-            sideArmor: `${formatInt(
-                this._shipCompareData.sides.armour
-            )}\u00a0<span class="badge badge-light">${formatInt(
-                this._shipCompareData.sides.thickness
-            )}</span>\u00a0${getDiff(this._shipCompareData.sides.armour, this._shipBaseData.sides.armour)}`,
-            frontArmor: `${formatInt(
-                this._shipCompareData.bow.armour
-            )}\u00a0<span class="badge badge-light">${formatInt(
-                this._shipCompareData.bow.thickness
-            )}</span>\u00a0${getDiff(this._shipCompareData.bow.armour, this._shipBaseData.bow.armour)}`,
-            pump: `${formatInt(this._shipCompareData.pump.armour)}\u00a0${getDiff(
-                this._shipCompareData.pump.armour,
-                this._shipBaseData.pump.armour
+            minCrew: `${formatInt(this.shipCompareData.crew.min)}\u00a0${getDiff(
+                this.shipCompareData.crew.min,
+                this.shipBaseData.crew.min
             )}`,
-            sails: `${formatInt(this._shipCompareData.sails.armour)}\u00a0${getDiff(
-                this._shipCompareData.sails.armour,
-                this._shipBaseData.sails.armour
+            maxCrew: `${formatInt(this.shipCompareData.crew.max)}\u00a0${getDiff(
+                this.shipCompareData.crew.max,
+                this.shipBaseData.crew.max
             )}`,
-            structure: `${formatInt(this._shipCompareData.structure.armour)}\u00a0${getDiff(
-                this._shipCompareData.structure.armour,
-                this._shipBaseData.structure.armour
+            sailingCrew: `${formatInt(this.shipCompareData.crew.sailing)}\u00a0${getDiff(
+                this.shipCompareData.crew.sailing,
+                this.shipBaseData.crew.sailing
             )}`,
-            backArmor: `${formatInt(
-                this._shipCompareData.stern.armour
-            )}\u00a0<span class="badge badge-light">${formatInt(
-                this._shipCompareData.stern.thickness
-            )}</span>\u00a0${getDiff(this._shipCompareData.stern.armour, this._shipBaseData.stern.armour)}`,
-            rudder: `${formatInt(this._shipCompareData.rudder.armour)}\u00a0<span class="badge badge-light">${formatInt(
-                this._shipCompareData.rudder.thickness
-            )}</span>\u00a0${getDiff(this._shipCompareData.rudder.armour, this._shipBaseData.rudder.armour)}`,
-            minCrew: `${formatInt(this._shipCompareData.crew.min)}\u00a0${getDiff(
-                this._shipCompareData.crew.min,
-                this._shipBaseData.crew.min
+            maxWeight: `${formatInt(this.shipCompareData.maxWeight)}\u00a0${getDiff(
+                this.shipCompareData.maxWeight,
+                this.shipBaseData.maxWeight
             )}`,
-            maxCrew: `${formatInt(this._shipCompareData.crew.max)}\u00a0${getDiff(
-                this._shipCompareData.crew.max,
-                this._shipBaseData.crew.max
+            holdSize: `${formatInt(this.shipCompareData.holdSize)}\u00a0${getDiff(
+                this.shipCompareData.holdSize,
+                this.shipBaseData.holdSize
             )}`,
-            sailingCrew: `${formatInt(this._shipCompareData.crew.sailing)}\u00a0${getDiff(
-                this._shipCompareData.crew.sailing,
-                this._shipBaseData.crew.sailing
+            upgradeXP: `${formatInt(this.shipCompareData.upgradeXP)}\u00a0${getDiff(
+                this.shipCompareData.upgradeXP,
+                this.shipBaseData.upgradeXP
             )}`,
-            maxWeight: `${formatInt(this._shipCompareData.maxWeight)}\u00a0${getDiff(
-                this._shipCompareData.maxWeight,
-                this._shipBaseData.maxWeight
+            sternRepair: `${formatInt(this.shipCompareData.repairTime.stern)}\u00a0${getDiff(
+                this.shipCompareData.repairTime.stern,
+                this.shipBaseData.repairTime.stern
             )}`,
-            holdSize: `${formatInt(this._shipCompareData.holdSize)}\u00a0${getDiff(
-                this._shipCompareData.holdSize,
-                this._shipBaseData.holdSize
+            bowRepair: `${formatInt(this.shipCompareData.repairTime.bow)}\u00a0${getDiff(
+                this.shipCompareData.repairTime.bow,
+                this.shipBaseData.repairTime.bow
             )}`,
-            upgradeXP: `${formatInt(this._shipCompareData.upgradeXP)}\u00a0${getDiff(
-                this._shipCompareData.upgradeXP,
-                this._shipBaseData.upgradeXP
+            sidesRepair: `${formatInt(this.shipCompareData.repairTime.sides)}\u00a0${getDiff(
+                this.shipCompareData.repairTime.sides,
+                this.shipBaseData.repairTime.sides
             )}`,
-            sternRepair: `${formatInt(this._shipCompareData.repairTime.stern)}\u00a0${getDiff(
-                this._shipCompareData.repairTime.stern,
-                this._shipBaseData.repairTime.stern
+            rudderRepair: `${formatInt(this.shipCompareData.repairTime.rudder)}\u00a0${getDiff(
+                this.shipCompareData.repairTime.rudder,
+                this.shipBaseData.repairTime.rudder
             )}`,
-            bowRepair: `${formatInt(this._shipCompareData.repairTime.bow)}\u00a0${getDiff(
-                this._shipCompareData.repairTime.bow,
-                this._shipBaseData.repairTime.bow
+            sailsRepair: `${formatInt(this.shipCompareData.repairTime.sails)}\u00a0${getDiff(
+                this.shipCompareData.repairTime.sails,
+                this.shipBaseData.repairTime.sails
             )}`,
-            sidesRepair: `${formatInt(this._shipCompareData.repairTime.sides)}\u00a0${getDiff(
-                this._shipCompareData.repairTime.sides,
-                this._shipBaseData.repairTime.sides
+            structureRepair: `${formatInt(this.shipCompareData.repairTime.structure)}\u00a0${getDiff(
+                this.shipCompareData.repairTime.structure,
+                this.shipBaseData.repairTime.structure
             )}`,
-            rudderRepair: `${formatInt(this._shipCompareData.repairTime.rudder)}\u00a0${getDiff(
-                this._shipCompareData.repairTime.rudder,
-                this._shipBaseData.repairTime.rudder
+            hullRepair: `${formatInt(this.shipCompareData.sides.armour / hullRepairsFactor)}\u00a0${getDiff(
+                this.shipCompareData.sides.armour / hullRepairsFactor,
+                this.shipBaseData.sides.armour / hullRepairsFactor
             )}`,
-            sailsRepair: `${formatInt(this._shipCompareData.repairTime.sails)}\u00a0${getDiff(
-                this._shipCompareData.repairTime.sails,
-                this._shipBaseData.repairTime.sails
+            rigRepair: `${formatInt(this.shipCompareData.sails.armour / rigRepairsFactor)}\u00a0${getDiff(
+                this.shipCompareData.sails.armour / rigRepairsFactor,
+                this.shipBaseData.sails.armour / rigRepairsFactor
             )}`,
-            structureRepair: `${formatInt(this._shipCompareData.repairTime.structure)}\u00a0${getDiff(
-                this._shipCompareData.repairTime.structure,
-                this._shipBaseData.repairTime.structure
+            rumRepair: `${formatInt(this.shipCompareData.crew.max / rumRepairsFactor)}\u00a0${getDiff(
+                this.shipCompareData.crew.max / rumRepairsFactor,
+                this.shipBaseData.crew.max / rumRepairsFactor
             )}`,
-            hullRepair: `${formatInt(this._shipCompareData.sides.armour / hullRepairsFactor)}\u00a0${getDiff(
-                this._shipCompareData.sides.armour / hullRepairsFactor,
-                this._shipBaseData.sides.armour / hullRepairsFactor
+            fireResistance: `${formatInt(this.shipCompareData.resistance.fire)}\u00a0${getDiff(
+                this.shipCompareData.resistance.fire,
+                this.shipBaseData.resistance.fire
             )}`,
-            rigRepair: `${formatInt(this._shipCompareData.sails.armour / rigRepairsFactor)}\u00a0${getDiff(
-                this._shipCompareData.sails.armour / rigRepairsFactor,
-                this._shipBaseData.sails.armour / rigRepairsFactor
+            leakResistance: `${formatInt(this.shipCompareData.resistance.leaks)}\u00a0${getDiff(
+                this.shipCompareData.resistance.leaks,
+                this.shipBaseData.resistance.leaks
             )}`,
-            rumRepair: `${formatInt(this._shipCompareData.crew.max / rumRepairsFactor)}\u00a0${getDiff(
-                this._shipCompareData.crew.max / rumRepairsFactor,
-                this._shipBaseData.crew.max / rumRepairsFactor
+            crewProtection: `${formatInt(this.shipCompareData.resistance.crew)}\u00a0${getDiff(
+                this.shipCompareData.resistance.crew,
+                this.shipBaseData.resistance.crew
             )}`,
-            mastBottomArmor: `${formatInt(this._shipCompareData.mast.bottomArmour)}\u00a0${getDiff(
-                this._shipCompareData.mast.bottomArmour,
-                this._shipBaseData.mast.bottomArmour
-            )}\u00a0<span class="badge badge-light">${formatInt(
-                this._shipCompareData.mast.bottomThickness
-            )}</span>\u00a0${getDiff(
-                this._shipCompareData.mast.bottomThickness,
-                this._shipBaseData.mast.bottomThickness
+            mastBottomArmor: `${formatInt(this.shipCompareData.mast.bottomArmour)}\u00a0${getDiff(
+                this.shipCompareData.mast.bottomArmour,
+                this.shipBaseData.mast.bottomArmour
+            )} <span class="badge badge-light">${formatInt(this.shipCompareData.mast.bottomThickness)}</span>${getDiff(
+                this.shipCompareData.mast.bottomThickness,
+                this.shipBaseData.mast.bottomThickness
             )}`,
-            mastMiddleArmor: `${formatInt(this._shipCompareData.mast.middleArmour)}\u00a0${getDiff(
-                this._shipCompareData.mast.middleArmour,
-                this._shipBaseData.mast.middleArmour
-            )}\u00a0<span class="badge badge-light">${formatInt(
-                this._shipCompareData.mast.middleThickness
-            )}</span>\u00a0${getDiff(
-                this._shipCompareData.mast.middleThickness,
-                this._shipBaseData.mast.middleThickness
+            mastMiddleArmor: `${formatInt(this.shipCompareData.mast.middleArmour)}\u00a0${getDiff(
+                this.shipCompareData.mast.middleArmour,
+                this.shipBaseData.mast.middleArmour
+            )} <span class="badge badge-light">${formatInt(this.shipCompareData.mast.middleThickness)}</span>${getDiff(
+                this.shipCompareData.mast.middleThickness,
+                this.shipBaseData.mast.middleThickness
             )}`,
-            mastTopArmor: `${formatInt(this._shipCompareData.mast.topArmour)}\u00a0${getDiff(
-                this._shipCompareData.mast.topArmour,
-                this._shipBaseData.mast.topArmour
-            )}\u00a0<span class="badge badge-light">${formatInt(
-                this._shipCompareData.mast.topThickness
-            )}</span>\u00a0${getDiff(this._shipCompareData.mast.topThickness, this._shipBaseData.mast.topThickness)}`
+            mastTopArmor: `${formatInt(this.shipCompareData.mast.topArmour)}\u00a0${getDiff(
+                this.shipCompareData.mast.topArmour,
+                this.shipBaseData.mast.topArmour
+            )} <span class="badge badge-light">${formatInt(this.shipCompareData.mast.topThickness)}</span>${getDiff(
+                this.shipCompareData.mast.topThickness,
+                this.shipBaseData.mast.topThickness
+            )}`
         };
 
         if (ship.gunsFront) {
@@ -730,34 +831,124 @@ class ShipComparison extends Ship {
             ship.gunsBack = "\u2013";
         }
 
-        $(`${this._select}`)
+        $(`${this.select}`)
             .find("div")
             .append(Ship.getText(ship));
     }
+
+    get shipBaseData() {
+        return this._shipBaseData;
+    }
+
+    get shipCompareData() {
+        return this._shipCompareData;
+    }
+
+    get shipCompare() {
+        return this._shipCompare;
+    }
 }
 
+/**
+ * Ship compare
+ */
 export default class ShipCompare {
-    constructor(shipData) {
+    /**
+     * @param {Object} shipData - Ship data
+     * @param {Object} woodData - Wood data
+     */
+    constructor(shipData, woodData) {
         this._shipData = shipData;
+
+        this._baseName = "Compare ships";
+        this._baseId = "ship-compare";
+        this._buttonId = `button-${this._baseId}`;
+        this._modalId = `modal-${this._baseId}`;
+
+        this._columnsCompare = ["C1", "C2"];
+        this._columns = this._columnsCompare.slice();
+        this._columns.unshift("Base");
+
         this._ships = { Base: {}, C1: {}, C2: {} };
-        this._minSpeed = d3.min(this._shipData, d => d.speed.min);
-        this._maxSpeed = d3.max(this._shipData, d => d.speed.max);
-        this.colorScale = d3
+
+        const theoreticalMinSpeed = d3.min(this._shipData, ship => ship.speed.min) * 1.2,
+            theoreticalMaxSpeed = 15.5;
+        this._minSpeed = theoreticalMinSpeed;
+        this._maxSpeed = theoreticalMaxSpeed;
+        this._colorScale = d3
             .scaleLinear()
-            .domain([this._minSpeed, 0, 4, 8, 12, this._maxSpeed])
-            .range(["#a62e39", "#fbf8f5", "#a4dab0", "#6cc380", "#419f57"])
+            .domain([this._minSpeed, 0, 12, this._maxSpeed])
+            .range(["#a62e39", "#fbf8f5", "#419f57", "#58bb6f"])
             .interpolate(d3.interpolateHcl);
 
-        this._setupData();
+        this._woodChanges = new Map([
+            ["Hull strength", ["structure.armour"]],
+            ["Side armour", ["bow.armour", "sides.armour", "sails.armour", "structure.armour", "stern.armour"]],
+            ["Thickness", ["sides.thickness", "bow.thickness", "stern.thickness"]],
+            // ["Mast thickness", ["mast.bottomThickness", "mast.middleThickness", "mast.topThickness"]],
+            ["Ship speed", ["speed.max"]],
+            ["Acceleration", ["ship.acceleration"]],
+            ["Turn speed", ["rudder.turnSpeed"]],
+            ["Rudder speed", ["rudder.halfturnTime"]],
+            ["Fire resistance", ["resistance.fire"]],
+            ["Leak resistance", ["resistance.leaks"]],
+            ["Crew protection", ["resistance.crew"]],
+            ["Crew", ["crew.max"]]
+        ]);
+
+        this._woodId = "ship-wood";
+        this._woodCompare = new WoodCompare(woodData, this._woodId);
         this._setupListener();
-        ["Base", "C1", "C2"].forEach(compareId => {
-            this._setupShipSelect(compareId);
-            this._setupSetupListener(compareId);
+    }
+
+    /**
+     * Setup menu item listener
+     * @returns {void}
+     */
+    _setupListener() {
+        $(`#${this._buttonId}`).on("click", event => {
+            registerEvent("Tools", this._baseName);
+            event.stopPropagation();
+            this._shipCompareSelected();
         });
     }
 
+    /**
+     * Set graphics parameter
+     * @returns {void}
+     */
+    _setGraphicsParameters() {
+        this.svgWidth = parseInt($(`#${this._modalId} .columnA`).width(), 10);
+        // noinspection JSSuspiciousNameCombination
+        this.svgHeight = this.svgWidth;
+        this.outerRadius = Math.floor(Math.min(this.svgWidth, this.svgHeight) / 2);
+        this.innerRadius = Math.floor(this.outerRadius * 0.3);
+        this.radiusScaleAbsolute = d3
+            .scaleLinear()
+            .domain([this.minSpeed, 0, this.maxSpeed])
+            .range([10, this.innerRadius, this.outerRadius]);
+    }
+
+    /**
+     * Action when selected
+     * @returns {void}
+     */
+    _shipCompareSelected() {
+        // If the modal has no content yet, insert it
+        if (!document.getElementById(this._modalId)) {
+            this._initModal();
+        }
+        // Show modal
+        $(`#${this._modalId}`).modal("show");
+        this._setGraphicsParameters();
+    }
+
+    /**
+     * Setup data
+     * @returns {void}
+     */
     _setupData() {
-        this._shipSelectData = d3
+        this.shipSelectData = d3
             .nest()
             .key(ship => ship.class)
             .sortKeys(d3.ascending)
@@ -780,7 +971,72 @@ export default class ShipCompare {
                         return 0;
                     })
             );
-        this._options = this._shipSelectData
+    }
+
+    /**
+     * Inject modal
+     * @returns {void}
+     */
+    _injectModal() {
+        insertBaseModal(this._modalId, this._baseName);
+
+        const row = d3
+            .select(`#${this._modalId} .modal-body`)
+            .append("div")
+            .attr("class", "container-fluid")
+            .append("div")
+            .attr("class", "row");
+        this._columns.forEach(column => {
+            const div = row
+                .append("div")
+                .attr("class", `col-md-4 ml-auto pt-2 ${column === "Base" ? "columnA" : "columnC"}`);
+
+            const shipId = `${this._baseId}-${column}-select`;
+            div.append("label").attr("for", shipId);
+            div.append("select")
+                .attr("name", shipId)
+                .attr("id", shipId);
+
+            ["frame", "trim"].forEach(type => {
+                const woodId = `${this._woodId}-${type}-${column}-select`;
+                div.append("label").attr("for", woodId);
+                div.append("select")
+                    .attr("name", woodId)
+                    .attr("id", woodId);
+            });
+
+            div.append("div")
+                .attr("id", `${this._baseId}-${column}`)
+                .attr("class", `${column === "Base" ? "ship-base" : "ship-compare"}`);
+        });
+    }
+
+    /**
+     * Init modal
+     * @returns {void}
+     */
+    _initModal() {
+        this._setupData();
+        this.woodCompare._setupData();
+        this._injectModal();
+
+        this._columns.forEach(columnId => {
+            this._setupShipSelect(columnId);
+            ["frame", "trim"].forEach(type => {
+                const select$ = $(`#${this._woodId}-${type}-${columnId}-select`);
+                this.woodCompare._setupWoodSelects(columnId, type, select$);
+            });
+
+            this._setupSelectListener(columnId);
+        });
+    }
+
+    /**
+     * Get select options
+     * @returns {string} HTML formatted option
+     */
+    _getOptions() {
+        return this.shipSelectData
             .map(
                 key =>
                     `<optgroup label="${getOrdinal(key.key)} rate">${key.values
@@ -795,66 +1051,227 @@ export default class ShipCompare {
             .join("</optgroup>");
     }
 
-    _shipCompareSelected() {
-        $("#modal-ships").modal("show");
-        this.svgWidth = parseInt($("#modal-ships .columnA").width(), 10);
-        // noinspection JSSuspiciousNameCombination
-        this.svgHeight = this.svgWidth;
-        this._outerRadius = Math.floor(Math.min(this.svgWidth, this.svgHeight) / 2);
-        this.innerRadius = Math.floor(this._outerRadius * 0.3);
-        this.radiusScaleAbsolute = d3
-            .scaleLinear()
-            .domain([this._minSpeed, 0, this._maxSpeed])
-            .range([10, this.innerRadius, this._outerRadius]);
-    }
-
-    _setupListener() {
-        $("#button-ship-compare").on("click", event => {
-            registerEvent("Tools", "Compare ships");
-            event.stopPropagation();
-            this._shipCompareSelected();
-        });
-    }
-
-    _setupShipSelect(compareId) {
-        const select = $(`#ship-${compareId}-select`);
-        select.append(this._options);
-        if (compareId !== "Base") {
-            select.attr("disabled", "disabled");
+    /**
+     * Setup ship select
+     * @param {string} columnId - Column id
+     * @returns {void}
+     */
+    _setupShipSelect(columnId) {
+        const select$ = $(`#${this._baseId}-${columnId}-select`),
+            options = this._getOptions();
+        select$.append(options);
+        if (columnId !== "Base") {
+            select$.attr("disabled", "disabled");
         }
     }
 
-    _setupSetupListener(compareId) {
-        const select = $(`#ship-${compareId}-select`);
-        select
+    /**
+     * Get ship data for ship with id <id>
+     * @param {number} shipId - Ship id
+     * @param {string} columnId - Column id
+     * @returns {Object} Ship data
+     */
+    _getShipData(shipId, columnId) {
+        let shipData = this._shipData.filter(ship => ship.id === shipId)[0];
+
+        shipData = this._addWoodData(shipData, columnId);
+
+        return shipData;
+    }
+
+    /**
+     * Add to ship data changes based on selected woods
+     * @param {*} shipData - Ship id
+     * @param {*} compareId - Column id
+     * @returns {Object} - Updated ship data
+     */
+    _addWoodData(shipData, compareId) {
+        const data = JSON.parse(JSON.stringify(shipData));
+
+        data.resistance = {};
+        data.resistance.fire = 0;
+        data.resistance.leaks = 0;
+        data.resistance.crew = 0;
+
+        if (typeof this.woodCompare._instances[compareId] !== "undefined") {
+            let dataLink = "_woodData";
+            if (compareId !== "Base") {
+                dataLink = "_compareData";
+            }
+            const modifierAmount = new Map();
+            // Add modifier amount for both frame and trim
+            ["frame", "trim"].forEach(type => {
+                this.woodCompare._instances[compareId][dataLink][type].properties.forEach(property => {
+                    if (this._woodChanges.has(property.modifier)) {
+                        modifierAmount.set(
+                            property.modifier,
+                            modifierAmount.has(property.modifier)
+                                ? modifierAmount.get(property.modifier) + property.amount
+                                : property.amount
+                        );
+                    }
+                });
+            });
+            modifierAmount.forEach((value, key) => {
+                this._woodChanges.get(key).forEach(modifier => {
+                    const index = modifier.split("."),
+                        factor = 1 + modifierAmount.get(key) / 100;
+
+                    if (index.length > 1) {
+                        if (data[index[0]][index[1]]) {
+                            data[index[0]][index[1]] *= factor;
+                        } else {
+                            data[index[0]][index[1]] = modifierAmount.get(key);
+                        }
+                    } else if (data[index[0]]) {
+                        data[index[0]] *= factor;
+                    } else {
+                        data[index[0]] = modifierAmount.get(key);
+                    }
+                });
+            });
+
+            data.speedDegrees = data.speedDegrees.map(speed => {
+                const factor = 1 + modifierAmount.get("Ship speed") / 100;
+                return Math.max(Math.min(speed * factor, this._maxSpeed), this._minSpeed);
+            });
+        }
+
+        return data;
+    }
+
+    /**
+     * Refresh ship data
+     * @param {*} shipId - Ship id
+     * @param {*} compareId - Column id
+     * @returns {void}
+     */
+    _refreshShips(shipId, compareId) {
+        const singleShipData = this._getShipData(shipId, compareId);
+        if (compareId === "Base") {
+            this._setShip(compareId, new ShipBase(compareId, singleShipData, this));
+            this._columnsCompare.forEach(id => {
+                $(`#${this._baseId}-${id}-select`)
+                    .removeAttr("disabled")
+                    .selectpicker("refresh");
+                if (!isEmpty(this.ships[id])) {
+                    this._setShip(id, new ShipComparison(id, singleShipData, this.ships[id]._shipCompareData, this));
+                }
+            });
+        } else {
+            this._setShip(compareId, new ShipComparison(compareId, this.ships.Base._shipData, singleShipData, this));
+        }
+    }
+
+    /**
+     * Enable compare selects
+     * @returns {void}
+     */
+    _enableCompareSelects() {
+        this._columnsCompare.forEach(id => {
+            $(`#${this._baseId}-${id}-select`)
+                .removeAttr("disabled")
+                .selectpicker("refresh");
+        });
+    }
+
+    /**
+     * Listener for the select
+     * @param {string} compareId - Column id
+     * @returns {void}
+     */
+    _setupSelectListener(compareId) {
+        const selectShip$ = $(`#${this._baseId}-${compareId}-select`);
+        selectShip$
             .addClass("selectpicker")
             .on("change", () => {
-                const shipId = +select.val();
-                const singleShipData = this._shipData.filter(ship => ship.id === shipId)[0];
+                const shipId = +selectShip$.val();
+                this._refreshShips(shipId, compareId);
                 if (compareId === "Base") {
-                    this._ships[compareId] = new ShipBase(compareId, singleShipData, this);
-                    ["C1", "C2"].forEach(id => {
-                        $(`#ship-${id}-select`)
-                            .removeAttr("disabled")
-                            .selectpicker("refresh");
-                        if (!isEmpty(this._ships[id])) {
-                            this._ships[id] = new ShipComparison(
-                                id,
-                                singleShipData,
-                                this._ships[id]._shipCompareData,
-                                this
-                            );
-                        }
-                    });
-                } else {
-                    this._ships[compareId] = new ShipComparison(
-                        compareId,
-                        this._ships.Base._shipData,
-                        singleShipData,
-                        this
-                    );
+                    this._enableCompareSelects();
                 }
+                this.woodCompare.enableSelects(compareId);
             })
-            .selectpicker({ noneSelectedText: "Select ship" });
+            .selectpicker({ noneSelectedText: "Select ship" })
+            .val("default")
+            .selectpicker("refresh");
+
+        ["frame", "trim"].forEach(type => {
+            const select$ = $(`#${this._woodId}-${type}-${compareId}-select`);
+            select$
+                .addClass("selectpicker")
+                .on("change", () => {
+                    this.woodCompare._woodSelected(compareId, type, select$);
+                    const shipId = +selectShip$.val();
+                    this._refreshShips(shipId, compareId);
+                })
+                .selectpicker({ noneSelectedText: `Select ${capitalizeFirstLetter(type)}` })
+                .val("default")
+                .selectpicker("refresh");
+        });
+    }
+
+    get woodCompare() {
+        return this._woodCompare;
+    }
+
+    _setShip(id, ship) {
+        this._ships[id] = ship;
+    }
+
+    get ships() {
+        return this._ships;
+    }
+
+    get minSpeed() {
+        return this._minSpeed;
+    }
+
+    get maxSpeed() {
+        return this._maxSpeed;
+    }
+
+    get colorScale() {
+        return this._colorScale;
+    }
+
+    set svgWidth(width) {
+        this._svgWidth = width;
+    }
+
+    get svgWidth() {
+        return this._svgWidth;
+    }
+
+    set svgHeight(height) {
+        this._svgHeight = height;
+    }
+
+    get svgHeight() {
+        return this._svgHeight;
+    }
+
+    set outerRadius(radius) {
+        this._outerRadius = radius;
+    }
+
+    get outerRadius() {
+        return this._outerRadius;
+    }
+
+    set innerRadius(radius) {
+        this._innerRadius = radius;
+    }
+
+    get innerRadius() {
+        return this._innerRadius;
+    }
+
+    set radiusScaleAbsolute(scale) {
+        this._radiusScaleAbsolute = scale;
+    }
+
+    get radiusScaleAbsolute() {
+        return this._radiusScaleAbsolute;
     }
 }

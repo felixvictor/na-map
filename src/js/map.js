@@ -16,15 +16,8 @@ import moment from "moment";
 import "moment/locale/en-gb";
 import Cookies from "js-cookie";
 
-import { defaultFontSize } from "./common";
-import {
-    nearestPow2,
-    checkFetchStatus,
-    getJsonFromFetch,
-    getTextFromFetch,
-    putFetchError,
-    roundToThousands
-} from "./util";
+import { appDescription, appTitle, appVersion, defaultFontSize, insertBaseModal } from "./common";
+import { nearestPow2, checkFetchStatus, getJsonFromFetch, putFetchError, roundToThousands } from "./util";
 
 import Course from "./course";
 import F11 from "./f11";
@@ -36,6 +29,7 @@ import ShipCompare from "./ship-compare";
 import Teleport from "./teleport";
 import WindPrediction from "./wind-prediction";
 import WoodCompare from "./wood-compare";
+import WoodList from "./wood-list";
 import Module from "./module-list";
 import Recipe from "./recipe-list";
 import Ingredient from "./ingredient-list";
@@ -294,11 +288,12 @@ export default class Map {
 
         this._pbZone = new PBZone(pbCircles, forts, towers, joinCircles, this._ports);
 
-        const shipData = JSON.parse(JSON.stringify(data.ships.shipData));
-        this._shipCompare = new ShipCompare(shipData);
-
         const woodData = JSON.parse(JSON.stringify(data.woods));
-        this._woodCompare = new WoodCompare(woodData);
+        this._woodCompare = new WoodCompare(woodData, "wood");
+        this._woodList = new WoodList(woodData);
+
+        const shipData = JSON.parse(JSON.stringify(data.ships.shipData));
+        this._shipCompare = new ShipCompare(shipData, woodData);
 
         const moduleData = JSON.parse(JSON.stringify(data.modules));
         this._moduleList = new Module(moduleData);
@@ -549,7 +544,22 @@ export default class Map {
     }
 
     _showAbout() {
-        $("#modal-about").modal("show");
+        function initModal(id) {
+            insertBaseModal(id, `${appTitle} <span class="text-primary small">v${appVersion}</span>`, false);
+
+            const body = d3.select(`#${id} .modal-body`);
+            body.html(
+                `<p>${appDescription} Please check the <a href="https://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/"> Game-Labs forum post</a> for further details. Feedback is very welcome.</p><p>Designed by iB aka Felix Victor, clan <a href="https://bccnavalaction.freeforums.net/">British Captains’ Club (BCC)</a>.</p>`
+            );
+        }
+
+        const id = "modal-about";
+        // If the modal has no content yet, insert it
+        if (!document.getElementById(id)) {
+            initModal(id);
+        }
+        // Show modal
+        $(`#${id}`).modal("show");
     }
 
     _doDoubleClickAction(self) {
