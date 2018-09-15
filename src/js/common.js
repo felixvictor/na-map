@@ -2,6 +2,9 @@
     common.js
  */
 
+/* global d3 : false
+ */
+
 import { distancePoints } from "./util";
 
 const transformMatrix = {
@@ -65,3 +68,50 @@ export function getDistance(pt0, pt1) {
 
     return distancePoints([F11X0, F11Y0], [F11X1, F11Y1]) / kFactor;
 }
+
+/**
+ * Insert bootstrap modal
+ * @function
+ * @param {string} id - Modal id
+ * @param {string} title - Modal title
+ * @return {void}
+ */
+export function insertBaseModal(id, title, large = true) {
+    const modal = d3
+        .select("#modal-section")
+        .append("section")
+        .attr("id", id)
+        .attr("class", "modal")
+        .attr("data-keyboard", "false")
+        .attr("data-backdrop", "static")
+        .attr("tabindex", "-1")
+        .attr("role", "dialog")
+        .append("div")
+        .attr("class", `modal-dialog${large ? " modal-lg" : ""}`)
+        .attr("role", "document");
+
+    const content = modal.append("div").attr("class", "modal-content");
+
+    const header = content.append("header").attr("class", "modal-header");
+    header.append("h3").html(title);
+
+    content.append("div").attr("class", "modal-body");
+
+    const footer = content.append("footer").attr("class", "modal-footer");
+    footer
+        .append("button")
+        .text("Close")
+        .attr("type", "button")
+        .attr("class", "btn btn-secondary")
+        .attr("data-dismiss", "modal");
+}
+
+// eslint-disable-next-line no-undef
+export const appDescription = DESCRIPTION;
+// eslint-disable-next-line no-undef
+export const appTitle = TITLE;
+// eslint-disable-next-line no-undef
+export const appVersion = VERSION;
+
+export const speedConstA = 0.074465523706782;
+export const speedConstB = 0.00272175949231;
