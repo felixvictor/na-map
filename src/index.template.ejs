@@ -12,18 +12,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta property="og:image" content="<%= htmlWebpackPlugin.options.brand %>">
 
-    <link rel="icon" type="image/png" href="images/icons/favicon-16x16.png" sizes="16x16">
-    <link rel="icon" type="image/png" href="images/icons/favicon-32x32.png" sizes="32x32">
-    <link rel="icon" type="image/png" href="images/icons/android-192x192.png" sizes="192x192">
-    <link rel="apple-touch-icon" href="images/icons/apple-touch-icon-180x180.png" sizes="180x180">
-    <meta name="msapplication-config" content="images/icons/browserconfig.xml">
-
     <script async src="<%= htmlWebpackPlugin.options.gtag %>"></script>
 </head>
+
 <body>
 
 <nav class="navbar fixed-top navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="#"><img src="images/icons/favicon-32x32.png" width="32" height="32" alt="Brand"></a>
+    <a class="navbar-brand" href="#"><img src="<%= htmlWebpackPlugin.options.brand %>" width="32" height="32"
+                                          alt="Brand"></a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -39,13 +35,13 @@
                 <div class="dropdown-menu" id="predictMenu" aria-labelledby="predictDropdown">
                     <form id="windPrediction" class="p-2">
                         <div class="form-group">
-                            <label for="direction">1. Set current in-game wind</label>
+                            <p class="form-text">1. Set current in-game wind</p>
                             <div id="direction" class="rslider"></div>
                         </div>
                         <div class="form-group">
-                            <label for="wind-time">2. Set predict time (server time)</label>
                             <div class="input-group">
                                 <div class="input-group date" id="wind-time" data-target-input="nearest">
+                                    <label for="wind-time-input">2. Set predict time (server time)</label>
                                     <input type="text" class="form-control datetimepicker-input"
                                            data-target="#wind-time" aria-label="wind-time"
                                            id="wind-time-input" required/>
@@ -53,6 +49,7 @@
                                          data-toggle="datetimepicker">
                                         <span class="input-group-text"><i class="far fa-clock"></i></span>
                                     </div>
+
                                 </div>
                             </div>
                         </div>
@@ -127,20 +124,18 @@
 
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Conquest mark</h6>
-                    <a class="dropdown-item" id="menu-prop-cm" href="#">
-                        <label for="prop-cm"></label><select class="select" name="prop-cm"
-                                                             id="prop-cm"></select>
-                    </a>
+                    <div class="dropdown-item">
+                        <label><select class="select" name="prop-cm" id="prop-cm"></select></label>
+                    </div>
 
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Port owner</h6>
-                    <a class="dropdown-item" id="menu-prop-nation" href="#">
-                        <label for="prop-nation"></label><select class="select" name="prop-nation"
-                                                                 id="prop-nation"></select>
-                    </a>
-                    <a class="dropdown-item" id="menu-prop-clan" href="#">
-                        <label for="prop-clan"></label><select class="select" name="prop-clan" id="prop-clan"></select>
-                    </a>
+                    <div class="dropdown-item">
+                        <label><select class="select" name="prop-nation" id="prop-nation"></select></label>
+                    </div>
+                    <div class="dropdown-item">
+                        <label><select class="select" name="prop-clan" id="prop-clan"></select></label>
+                    </div>
 
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Port battle</h6>
@@ -221,9 +216,8 @@
                                         <label for="prop-to-input" class="col-sm-3 col-form-label">To</label>
                                         <div class="col-sm-9 input-group date" id="prop-to" data-target-input="nearest">
                                             <input type="text" class="form-control datetimepicker-input"
-                                                   data-target="#prop-to"
-                                                   aria-label="prop-to"
-                                                   id="prop-to-input" required/>
+                                                   data-target="#prop-to" aria-label="prop-to" id="prop-to-input"
+                                                   required/>
                                             <div class="input-group-append" data-target="#prop-to"
                                                  data-toggle="datetimepicker">
                                                 <span class="input-group-text"><i class="far fa-calendar"></i></span>
@@ -242,20 +236,15 @@
                 <label for="buy-goods"></label><select name="buy-goods" id="buy-goods">
                 </select>
             </li>
-
-            <li class="nav-item">
-                <label for="sell-goods"></label><select name="sell-goods" id="sell-goods">
-                </select>
-            </li>
         </ul>
 
         <ul class="navbar-nav ml-auto">
 
             <li class="nav-item dropdown pr-2">
-                <button class="nav-link dropdown-toggle btn btn-primary" href="#" id="extraDropdown" role="button"
-                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <a class="nav-link dropdown-toggle btn btn-primary" href="#" id="extraDropdown" role="button"
+                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Tools
-                </button>
+                </a>
                 <div class="dropdown-menu dropdown-menu-right" id="extraMenu"
                      aria-labelledby="extraDropdown">
 
@@ -269,6 +258,7 @@
                     <a class="dropdown-item" id="button-module-list">Modules</a>
                     <a class="dropdown-item" id="button-recipe-list">Recipes</a>
                     <a class="dropdown-item" id="button-ingredient-list">Recipe ingredients</a>
+                    <a class="dropdown-item" id="button-wood-list">Woods</a>
 
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Download</h6>
@@ -393,188 +383,9 @@
     </div>
 </nav>
 
-<div id="na" class="na">
-</div>
+<div id="na" class="na"></div>
 
-<section id="modal-about" class="modal" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <header class="modal-header">
-                <h3><%= htmlWebpackPlugin.options.title %>&nbsp;<span
-                            class="text-primary small">v<%= htmlWebpackPlugin.options.version %></span></h3>
-            </header>
-            <div class="modal-body">
-                <p>Yet another map which uses the in-game map and live data (daily updated soonish after maintenance).
-                    Please check the <a
-                            href="https://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/">
-                        Game-Labs forum post</a> for further details. Feedback is very welcome.</p>
-                <p>Designed by iB aka Felix Victor, clan <a href="https://bccnavalaction.freeforums.net/">British
-                        Captains’ Club (BCC)</a>.</p>
-            </div>
-            <footer class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </footer>
-        </div>
-    </div>
-</section>
-
-<section id="modal-ships" class="modal" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <header class="modal-header">
-                <h3>Compare ships</h3>
-            </header>
-
-            <div class="modal-body">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-md-4 ml-auto pt-2 columnA">
-                            <label for="ship-Base-select"></label><select name="ship-Base-select" id="ship-Base-select">
-                            </select>
-                            <div id="ship-Base" class="ship-base"></div>
-                        </div>
-                        <div class="col-md-4 ml-auto pt-2 columnC">
-                            <label for="ship-C1-select"></label><select name="ship-C1-select" id="ship-C1-select">
-                            </select>
-                            <div id="ship-C1" class="ship-compare"></div>
-                        </div>
-                        <div class="col-md-4 ml-auto pt-2 columnC">
-                            <label for="ship-C2-select"></label><select name="ship-C2-select" id="ship-C2-select">
-                            </select>
-                            <div id="ship-C2" class="ship-compare"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <footer class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </footer>
-        </div>
-    </div>
-</section>
-
-<section id="modal-woods" class="modal" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <header class="modal-header">
-                <h3>Compare woods</h3>
-            </header>
-
-            <div class="modal-body">
-                <div class="container-fluid">
-                    <div class="row wood">
-                        <div class="col-md-3 ml-auto pt-2 columnA">
-                            <label for="wood-frame-Base-select"></label><select name="wood-frame-Base-select"
-                                                                                id="wood-frame-Base-select">
-                            </select>
-                            <label for="wood-trim-Base-select"></label><select name="wood-trim-Base-select"
-                                                                               id="wood-trim-Base-select">
-                            </select>
-                            <div id="wood-Base"></div>
-                        </div>
-                        <div class="col-md-3 ml-auto pt-2 columnC">
-                            <label for="wood-frame-C1-select"></label><select name="wood-frame-C1-select"
-                                                                              id="wood-frame-C1-select">
-                            </select>
-                            <label for="wood-trim-C1-select"></label><select name="wood-trim-C1-select"
-                                                                             id="wood-trim-C1-select">
-                            </select>
-                            <div id="wood-C1"></div>
-                        </div>
-                        <div class="col-md-3 ml-auto pt-2 columnC">
-                            <label for="wood-frame-C2-select"></label><select name="wood-frame-C2-select"
-                                                                              id="wood-frame-C2-select">
-                            </select>
-                            <label for="wood-trim-C2-select"></label><select name="wood-trim-C2-select"
-                                                                             id="wood-trim-C2-select">
-                            </select>
-                            <div id="wood-C2"></div>
-                        </div>
-                        <div class="col-md-3 ml-auto pt-2 columnC">
-                            <label for="wood-frame-C3-select"></label><select name="wood-frame-C3-select"
-                                                                              id="wood-frame-C3-select">
-                            </select>
-                            <label for="wood-trim-C3-select"></label><select name="wood-trim-C3-select"
-                                                                             id="wood-trim-C3-select">
-                            </select>
-                            <div id="wood-C3"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <footer class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </footer>
-        </div>
-    </div>
-</section>
-
-<section id="modal-modules" class="modal" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <header class="modal-header">
-                <h3>Modules</h3>
-            </header>
-            <div class="modal-body">
-                <label for="modules-select"></label><select name="modules-select" id="modules-select"></select>
-                <div id="modules-list" class="container-fluid"></div>
-            </div>
-            <footer class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </footer>
-        </div>
-    </div>
-</section>
-
-<section id="modal-buildings" class="modal" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <header class="modal-header">
-                <h3>Buildings</h3>
-            </header>
-            <div class="modal-body">
-                <label for="buildings-select"></label><select name="buildings-select" id="buildings-select"></select>
-                <div id="buildings-list" class="container-fluid"></div>
-            </div>
-            <footer class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </footer>
-        </div>
-    </div>
-</section>
-
-<section id="modal-recipes" class="modal" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <header class="modal-header">
-                <h3>Recipes</h3>
-            </header>
-            <div class="modal-body">
-                <label for="recipes-select"></label><select name="recipes-select" id="recipes-select"></select>
-                <div id="recipes-list" class="container-fluid"></div>
-            </div>
-            <footer class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </footer>
-        </div>
-    </div>
-</section>
-
-<section id="modal-ingredients" class="modal" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <header class="modal-header">
-                <h3>Ingredients</h3>
-            </header>
-            <div class="modal-body">
-                <div id="ingredients-list" class="container-fluid"></div>
-            </div>
-            <footer class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </footer>
-        </div>
-    </div>
-</section>
+<div id="modal-section"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.5.0/d3.min.js"
         integrity="sha384-xt54w7/ptFmlL1rMBfoLoM/T0iHjAzuv47CPmW5KtXrv5iphOBlJxMOSkOg0gsmF"
