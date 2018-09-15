@@ -221,7 +221,7 @@ table a {
     path.base {
         opacity: 0.5;
         fill: none;
-      stroke-width: 5px;
+      stroke-width: 3px;
       stroke: $secondary-500;
     }
 
@@ -230,6 +230,11 @@ table a {
         opacity: .5;
         fill: $primary-500;
     }
+  .markers {
+    circle {
+      r: 5;
+    }
+  }
 }
 
 .columnA {
