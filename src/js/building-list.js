@@ -6,43 +6,78 @@
 
 import { formatPercent, formatInt } from "./util";
 import { registerEvent } from "./analytics";
+import { insertBaseModal } from "./common";
 
 export default class Building {
     constructor(buildingData) {
         this._buildingData = buildingData;
 
-        this._setupData();
-        this._setupListener();
-        this._setupSelect();
-    }
+        this._baseName = "List buildings";
+        this._baseId = "building-list";
+        this._buttonId = `button-${this._baseId}`;
+        this._modalId = `modal-${this._baseId}`;
 
-    _setupData() {
-        this._options = `${this._buildingData
-            .map(building => `<option value="${building.name}">${building.name}</option>;`)
-            .join("")}`;
+        this._setupListener();
     }
 
     _setupListener() {
-        $("#button-building-list").on("click", event => {
-            registerEvent("Tools", "List buildings");
+        $(`#${this._buttonId}`).on("click", event => {
+            registerEvent("Tools", this._baseName);
             event.stopPropagation();
             this._buildingListSelected();
         });
     }
 
-    _buildingListSelected() {
-        $("#modal-buildings").modal("show");
-        this._div = "#buildings-list";
+    _injectModal() {
+        insertBaseModal(this._modalId, this._baseName);
+
+        const id = `${this._baseId}-select`,
+            body = d3.select(`#${this._modalId} .modal-body`);
+        body.append("label").attr("for", id);
+        body.append("select")
+            .attr("name", id)
+            .attr("id", id);
+        body.append("div")
+            .attr("id", `${this._baseId}`)
+            .attr("class", "container-fluid");
+    }
+
+    _getOptions() {
+        return `${this._buildingData
+            .map(building => `<option value="${building.name}">${building.name}</option>;`)
+            .join("")}`;
     }
 
     _setupSelect() {
-        const select = $("#buildings-select");
-        select.append(this._options);
+        const select$ = $(`#${this._baseId}-select`),
+            options = this._getOptions();
+        select$.append(options);
+    }
 
-        select
+    _setupSelectListener() {
+        const select$ = $(`#${this._baseId}-select`);
+
+        select$
             .addClass("selectpicker")
             .on("change", event => this._buildingSelected(event))
-            .selectpicker({ noneSelectedText: "Select building" });
+            .selectpicker({ noneSelectedText: "Select building" })
+            .val("default")
+            .selectpicker("refresh");
+    }
+
+    _initModal() {
+        this._injectModal();
+        this._setupSelect();
+        this._setupSelectListener();
+    }
+
+    _buildingListSelected() {
+        // If the modal has no content yet, insert it
+        if (!document.getElementById(this._modalId)) {
+            this._initModal();
+        }
+        // Show modal
+        $(`#${this._modalId}`).modal("show");
     }
 
     _getBuildingData(selectedBuildingName) {
@@ -152,15 +187,13 @@ export default class Building {
             .find(":selected")
             .val();
 
-        // Remove old building list
-        d3.select(`${this._div} div`).remove();
+        // Remove old recipe list
+        d3.select(`#${this._baseId} div`).remove();
 
-        // Add new building list
-        d3.select(this._div)
+        // Add new recipe list
+        d3.select(`#${this._baseId}`)
             .append("div")
             .classed("buildings mt-4", true);
-        $(this._div)
-            .find("div")
-            .append(this._getText(building));
+        d3.select(`#${this._baseId} div`).html(this._getText(building));
     }
 }
