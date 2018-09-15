@@ -1,6 +1,6 @@
 {
     "name": "na-map",
-    "version": "6.1",
+    "version": "6.1.1",
     "description": "Naval Action map",
     "devDependencies": {
         "@babel/core": "7.0.1",
