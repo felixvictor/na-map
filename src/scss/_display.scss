@@ -219,15 +219,22 @@ table a {
 
 .profile {
     path.base {
-        opacity: 0.4;
-        fill: $primary-600;
+        opacity: 0.5;
+        fill: none;
+      stroke-width: 3px;
+      stroke: $secondary-500;
     }
 
     path.comp,
     circle.comp {
-        opacity: 0.4;
-        fill: $secondary-600;
+        opacity: .5;
+        fill: $primary-500;
     }
+  .markers {
+    circle {
+      r: 5;
+    }
+  }
 }
 
 .columnA {
@@ -619,13 +626,16 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
     }
 }
 
-.county text,
-.region text {
-    font-family: LibreCaslonDisplay, -apple-system, blinkmacsystemfont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
-        cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", arial, sans-serif;
-    fill: $white;
-    opacity: 0.7;
-    text-anchor: middle;
+.county,
+.region {
+    filter: url("#drop-shadow");
+    text {
+      font-family: LibreCaslonDisplay, -apple-system, blinkmacsystemfont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
+      cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", arial, sans-serif;
+      opacity: 0.7;
+      fill: $white;
+      text-anchor: middle;
+  }
 }
 
 .region text {
@@ -646,3 +656,40 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
     left: 100%;
     margin-top: -1px;
 }
+
+ .tablesort {
+   th[role=columnheader]:not(.no-sort) {
+     cursor: pointer;
+   }
+
+   th[role=columnheader]:not(.no-sort):after {
+     content: '';
+     float: right;
+     margin-top: 7px;
+     border-width: 0 4px 4px;
+     border-style: solid;
+     border-color: $primary-600 transparent;
+     visibility: hidden;
+     opacity: 0;
+     user-select: none;
+   }
+
+   th[aria-sort=ascending]:not(.no-sort):after {
+     border-bottom: none;
+     border-width: 4px 4px 0;
+   }
+
+   th[aria-sort]:not(.no-sort):after {
+     visibility: visible;
+     opacity: 0.4;
+   }
+
+   th[role=columnheader]:not(.no-sort):hover:after {
+     visibility: visible;
+     opacity: 1;
+   }
+ }
+
+ .hidden {
+   visibility: hidden;
+ }
