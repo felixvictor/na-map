@@ -6,45 +6,81 @@
 
 import { formatInt, formatPercent, formatSignPercent } from "./util";
 import { registerEvent } from "./analytics";
+import { insertBaseModal } from "./common";
 
 export default class Recipe {
     constructor(recipeData, moduleData) {
         this._recipeData = recipeData.map(recipe => {
+            // eslint-disable-next-line no-param-reassign
             recipe.name = recipe.name.replace(" Blueprint", "");
             return recipe;
         });
         this._moduleData = moduleData;
-        this._options = this._setupOptions();
+
+        this._baseName = "List recipes";
+        this._baseId = "recipe-list";
+        this._buttonId = `button-${this._baseId}`;
+        this._modalId = `modal-${this._baseId}`;
 
         this._setupListener();
-        this._setupSelect();
-    }
-
-    _setupOptions() {
-        return `${this._recipeData.map(recipe => `<option value="${recipe.name}">${recipe.name}</option>;`).join("")}`;
     }
 
     _setupListener() {
-        $("#button-recipe-list").on("click", event => {
-            registerEvent("Tools", "List recipes");
+        $(`#${this._buttonId}`).on("click", event => {
+            registerEvent("Tools", this._baseName);
             event.stopPropagation();
             this._recipeListSelected();
         });
     }
 
-    _recipeListSelected() {
-        $("#modal-recipes").modal("show");
-        this._div = "#recipes-list";
+    _injectModal() {
+        insertBaseModal(this._modalId, this._baseName);
+
+        const id = `${this._baseId}-select`,
+            body = d3.select(`#${this._modalId} .modal-body`);
+        body.append("label").attr("for", id);
+        body.append("select")
+            .attr("name", id)
+            .attr("id", id);
+        body.append("div")
+            .attr("id", `${this._baseId}`)
+            .attr("class", "container-fluid");
+    }
+
+    _getOptions() {
+        return `${this._recipeData.map(recipe => `<option value="${recipe.name}">${recipe.name}</option>;`).join("")}`;
     }
 
     _setupSelect() {
-        const select = $("#recipes-select");
-        select.append(this._options);
+        const select$ = $(`#${this._baseId}-select`),
+            options = this._getOptions();
+        select$.append(options);
+    }
 
-        select
+    _setupSelectListener() {
+        const select$ = $(`#${this._baseId}-select`);
+
+        select$
             .addClass("selectpicker")
             .on("change", event => this._recipeSelected(event))
-            .selectpicker({ noneSelectedText: "Select recipe" });
+            .selectpicker({ noneSelectedText: "Select recipe" })
+            .val("default")
+            .selectpicker("refresh");
+    }
+
+    _initModal() {
+        this._injectModal();
+        this._setupSelect();
+        this._setupSelectListener();
+    }
+
+    _recipeListSelected() {
+        // If the modal has no content yet, insert it
+        if (!document.getElementById(this._modalId)) {
+            this._initModal();
+        }
+        // Show modal
+        $(`#${this._modalId}`).modal("show");
     }
 
     _getRecipeData(selectedRecipeName) {
@@ -128,14 +164,12 @@ export default class Recipe {
             .val();
 
         // Remove old recipe list
-        d3.select(`${this._div} div`).remove();
+        d3.select(`#${this._baseId} div`).remove();
 
         // Add new recipe list
-        d3.select(this._div)
+        d3.select(`#${this._baseId}`)
             .append("div")
             .classed("recipes mt-4", true);
-        $(this._div)
-            .find("div")
-            .append(this._getText(recipe));
+        d3.select(`#${this._baseId} div`).html(this._getText(recipe));
     }
 }

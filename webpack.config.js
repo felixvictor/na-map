@@ -1,18 +1,21 @@
 // https://github.com/shakacode/react-webpack-rails-tutorial/blob/master/client%2Fwebpack.client.base.config.js
 
-const libraryName = "na-map";
-
 const webpack = require("webpack");
+
 const path = require("path");
 const CopyPlugin = require("copy-webpack-plugin"),
     HtmlPlugin = require("html-webpack-plugin"),
     MiniCssExtractPlugin = require("mini-css-extract-plugin"),
     MinifyPlugin = require("babel-minify-webpack-plugin"),
     SitemapPlugin = require("sitemap-webpack-plugin").default,
-    SriPlugin = require("webpack-subresource-integrity");
+    SriPlugin = require("webpack-subresource-integrity"),
+    WebappWebpackPlugin = require("webapp-webpack-plugin");
 const PACKAGE = require("./package.json");
 
-const sitemapPaths = ["/fonts/", "/icons", "/images"];
+const libraryName = PACKAGE.name,
+    description =
+        "Yet another map with in-game map, F11 coordinates, resources, ship and wood comparison. Port data is updated constantly from twitter and daily after maintenance.",
+    sitemapPaths = ["/fonts/", "/icons", "/images"];
 
 const babelOpt = {
     cacheDirectory: true,
@@ -174,6 +177,11 @@ const config = {
         new MiniCssExtractPlugin({
             filename: `${libraryName}.min.css`
         }),
+        new webpack.DefinePlugin({
+            DESCRIPTION: JSON.stringify(description),
+            TITLE: JSON.stringify(PACKAGE.description),
+            VERSION: JSON.stringify(PACKAGE.version)
+        }),
         new webpack.ProvidePlugin({
             $: "jquery",
             jQuery: "jquery",
@@ -194,29 +202,51 @@ const config = {
         new CopyPlugin([
             { from: "google979f2cf3bed204d6.html", to: "google979f2cf3bed204d6.html", toType: "file" },
             { from: "images/map", to: "../public/images/map" },
-            { from: "images/icons", to: "../public/images/icons" },
+            //       { from: "images/icons", to: "../public/images/icons" },
             { from: "*.json" },
             { from: "*.xlsx" },
             { from: "../netlify.toml" }
         ]),
         new HtmlPlugin({
+            brand: "images/icons/favicon-32x32.png",
+            description,
             filename: "index.html",
             gtag: "https://www.googletagmanager.com/gtag/js?id=UA-109520372-1",
             hash: true,
             inject: "body",
             lang: "en-GB",
+            meta: { viewport: "width=device-width, initial-scale=1, shrink-to-fit=no" },
             minify: htmlMinifyOpt,
             template: "index.template.ejs",
-            title: "Naval Action map",
-            description:
-                "Yet another map with in-game map, F11 coordinates, resources. Port data is updated constantly from twitter and daily after maintenance.",
-            brand: "images/icons/favicon-32x32.png",
-            version: PACKAGE.version
+            title: PACKAGE.description
         }),
         new SitemapPlugin(`https://${process.env.TARGET}.netlify.com/`, sitemapPaths, { skipGzip: false }),
         new SriPlugin({
             hashFuncNames: ["sha256", "sha384"],
             enabled: process.env.NODE_ENV === "production"
+        }),
+        new WebappWebpackPlugin({
+            cache: true,
+            logo: "./images/icons/logo.jpg",
+            inject: true,
+            prefix: "images/icons/",
+            favicons: {
+                appDescription: PACKAGE.description,
+                appName: PACKAGE.name,
+                background: "#dcd7ca",
+                developerURL: null, // prevent retrieving from the nearest package.json
+                theme_color: "#bbc0a2",
+                icons: {
+                    android: true, // Create Android homescreen icon. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }`
+                    appleIcon: true, // Create Apple touch icons. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }`
+                    appleStartup: true, // Create Apple startup images. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }`
+                    coast: true, // Create Opera Coast icon. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }`
+                    favicons: true, // Create regular favicons. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }`
+                    firefox: true, // Create Firefox OS icons. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }`
+                    windows: true, // Create Windows 8 tile icons. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }`
+                    yandex: true
+                }
+            }
         })
     ],
 
