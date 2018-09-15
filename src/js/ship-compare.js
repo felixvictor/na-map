@@ -11,7 +11,7 @@
 /* global d3 : false
  */
 
-import { formatInt, formatFloat, getOrdinal, isEmpty, capitalizeFirstLetter } from "./util";
+import { formatInt, formatFloat, getOrdinal, isEmpty, capitalizeFirstLetter, roundToThousands } from "./util";
 import { registerEvent } from "./analytics";
 import WoodCompare from "./wood-compare";
 import { insertBaseModal } from "./common";
@@ -419,11 +419,9 @@ class ShipBase extends Ship {
             .data(arcs)
             .enter()
             .append("circle")
-            .attr("r", "5")
             .attr("cy", (d, i) => Math.cos(i * segmentRadians) * -this.shipCompareData.radiusScaleAbsolute(d.data))
             .attr("cx", (d, i) => Math.sin(i * segmentRadians) * this.shipCompareData.radiusScaleAbsolute(d.data))
             .attr("fill", d => this.shipCompareData.colorScale(d.data))
-            .style("opacity", 0.5)
             .append("title")
             .text(d => `${Math.round(d.data * 10) / 10} knots`);
     }
@@ -574,12 +572,12 @@ class ShipComparison extends Ship {
 
         const speedDiff = [];
         this.shipCompareData.speedDegrees.forEach((speedShipCompare, i) => {
-            speedDiff.push(speedShipCompare - this.shipBaseData.speedDegrees[i]);
+            speedDiff.push(roundToThousands(speedShipCompare - this.shipBaseData.speedDegrees[i]));
         });
         const colourScale = d3
             .scaleLinear()
-            .domain([Math.min(-0.01, d3.min(speedDiff)), 0, Math.max(0.01, d3.max(speedDiff))])
-            .range(["#a62e39", "#fbf8f5", "#419f57"])
+            .domain([d3.min(speedDiff), 0, 1, d3.max(speedDiff)])
+            .range(["#a62e39", "#fbf8f5", "#95d4a4", "#419f57"])
             .interpolate(d3.interpolateHcl);
 
         pathBase.attr("d", lineBase(arcsBase)).classed("base", true);
@@ -587,11 +585,9 @@ class ShipComparison extends Ship {
         selBase
             .enter()
             .append("circle")
-            .attr("r", "5")
             .attr("cy", (d, i) => Math.cos(i * segmentRadians) * -this.shipCompare.radiusScaleAbsolute(d.data))
             .attr("cx", (d, i) => Math.sin(i * segmentRadians) * this.shipCompare.radiusScaleAbsolute(d.data))
             .attr("fill", (d, i) => colourScale(speedDiff[i]))
-            .classed("base", true)
             .append("title")
             .text(d => `${Math.round(d.data * 10) / 10} knots`);
 
