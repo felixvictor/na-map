@@ -419,6 +419,7 @@ class ShipBase extends Ship {
             .data(arcs)
             .enter()
             .append("circle")
+            .attr("r", 5)
             .attr("cy", (d, i) => Math.cos(i * segmentRadians) * -this.shipCompareData.radiusScaleAbsolute(d.data))
             .attr("cx", (d, i) => Math.sin(i * segmentRadians) * this.shipCompareData.radiusScaleAbsolute(d.data))
             .attr("fill", d => this.shipCompareData.colorScale(d.data))
@@ -585,6 +586,7 @@ class ShipComparison extends Ship {
         selBase
             .enter()
             .append("circle")
+            .attr("r", 5)
             .attr("cy", (d, i) => Math.cos(i * segmentRadians) * -this.shipCompare.radiusScaleAbsolute(d.data))
             .attr("cx", (d, i) => Math.sin(i * segmentRadians) * this.shipCompare.radiusScaleAbsolute(d.data))
             .attr("fill", (d, i) => colourScale(speedDiff[i]))
