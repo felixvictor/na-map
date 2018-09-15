@@ -239,6 +239,20 @@ function convertModules() {
             wood.name = module.name.replace(" Frame", "");
             woodJson.frame.push(wood);
         }
+        // Sort by modifier
+        ["frame", "trim"].forEach(type => {
+            woodJson[type].forEach(wood => {
+                wood.properties.sort((a, b) => {
+                    if (a.modifier < b.modifier) {
+                        return -1;
+                    }
+                    if (a.modifier > b.modifier) {
+                        return 1;
+                    }
+                    return 0;
+                });
+            });
+        });
     }
 
     /**
