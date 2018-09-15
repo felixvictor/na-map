@@ -817,9 +817,8 @@ export default class PortDisplay {
             countyUpdate
                 .enter()
                 .append("text")
-                .text(d => d.name)
-                .style("filter", "url(#drop-shadow)")
-                .attr("transform", d => `translate(${d.centroid[0]},${d.centroid[1]})rotate(${d.angle})`);
+                .attr("transform", d => `translate(${d.centroid[0]},${d.centroid[1]})rotate(${d.angle})`)
+                .text(d => d.name);
 
             /* Show polygon for test purposes
             const d3line2 = d3
@@ -858,9 +857,8 @@ export default class PortDisplay {
             regionUpdate
                 .enter()
                 .append("text")
-                .style("filter", "url(#drop-shadow)")
-                .text(d => d.name)
-                .attr("transform", d => `translate(${d.centroid[0]},${d.centroid[1]})rotate(${d.angle})`);
+                .attr("transform", d => `translate(${d.centroid[0]},${d.centroid[1]})rotate(${d.angle})`)
+                .text(d => d.name);
 
             /* Show polygon for test purposes
             const d3line2 = d3
