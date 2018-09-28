@@ -29,7 +29,8 @@ const babelOpt = {
                 shippedProposals: true,
                 targets: {
                     browsers: PACKAGE.browserslist
-                }
+                },
+                useBuiltIns: "usage"
             }
         ]
     ]
