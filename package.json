@@ -109,16 +109,7 @@
     "browserslist": [
         ">= 1%",
         "last 1 major version",
-        "not dead",
-        "Chrome >= 62",
-        "Firefox >= 56",
-        "Firefox ESR",
-        "Edge >= 15",
-        "Explorer >= 11",
-        "iOS >= 10",
-        "Safari >= 9.1",
-        "Android >= 4.4",
-        "Opera >= 30"
+        "not dead"
     ],
     "prettier": {
         "tabWidth": 4,
