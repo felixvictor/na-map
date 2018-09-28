@@ -51,7 +51,10 @@ function convertCannons() {
              * @type {string}
              */
             const fileNameFirstPart = fileName.slice(0, fileName.indexOf(" "));
-            if (fileNameFirstPart === "cannon" || fileNameFirstPart === "carronade") {
+            if (
+                (fileNameFirstPart === "cannon" && fileName !== "cannon repair kit.xml") ||
+                fileNameFirstPart === "carronade"
+            ) {
                 fileNames.add(fileName);
             }
         });
@@ -72,15 +75,15 @@ function convertCannons() {
      */
     const dataMapping = new Map([
         // ["CANNON_BLOW_CHANCE", { group: "generic", element: "blow chance" }],
-        ["HIT_PROBABILITY", { group: "damage", element: "hit probability" }],
-        ["DAMAGE_MULTIPLIER", { group: "damage", element: "multiplier" }],
+        // ["HIT_PROBABILITY", { group: "damage", element: "hit probability" }],
+        // ["DAMAGE_MULTIPLIER", { group: "damage", element: "multiplier" }],
         ["CANNON_BASIC_DAMAGE", { group: "damage", element: "basic" }],
-        ["CANNON_FIREPOWER", { group: "damage", element: "firepower" }],
+        // ["CANNON_FIREPOWER", { group: "damage", element: "firepower" }],
         ["CANNON_MIN_ANGLE", { group: "dispersion", element: "min angle" }],
         ["CANNON_MAX_ANGLE", { group: "dispersion", element: "max angle" }],
         ["CANNON_DISPERSION_PER100M", { group: "dispersion", element: "per 100m" }],
         ["CANNON_DISPERSION_VERTICAL_PER100M", { group: "dispersion", element: "vertical per 100m" }],
-        ["CANNON_DISPERSION_REDUCTION_SPEED", { group: "dispersion", element: "reduction speed" }],
+        // ["CANNON_DISPERSION_REDUCTION_SPEED", { group: "dispersion", element: "reduction speed" }],
         ["CANNON_RELOAD_TIME", { group: "generic", element: "reload time" }],
         // ["DAMAGE_TYPE", { group: "damage", element: "type" }],
         ["MODULE_BASE_HP", { group: "strength", element: "base" }],
@@ -90,15 +93,17 @@ function convertCannons() {
         ["CANNON_BALL_RADIUS", { group: "generic", element: "ball radius" }],
         // ["CANNON_FIREZONE_HORIZONTAL_ROTATION_SPEED", { group: "dispersion", element: "horizontal rotation speed" }],
         // ["CANNON_BULLETS_PER_SHOT", { group: "generic", element: "bullets per shot" }],
+        /*
         [
             "CANNON_DISPERSION_REDUCTION_ANGLE_CHANGE_MULTIPLIER",
             { group: "dispersion", element: "reduction angle change modifier" }
         ],
+        */
         // ["CANNON_DISPERSION_SHIP_PITCHING_MODIFIER", { group: "dispersion", element: "shi pitching modifier" }],
         ["CANNON_FORWARD_FLY_TIME", { group: "generic", element: "forward fly time" }],
-        ["CANNON_FORWARD_FIREPOWER_LOSS", { group: "generic", element: "firepower loss" }],
-        ["CANNON_GRAVITY_MULTIPLIER", { group: "generic", element: "gravity multiplier" }],
-        ["CANNON_TYPE", { group: "generic", element: "type" }],
+        // ["CANNON_FORWARD_FIREPOWER_LOSS", { group: "generic", element: "firepower loss" }],
+        // ["CANNON_GRAVITY_MULTIPLIER", { group: "generic", element: "gravity multiplier" }],
+        // ["CANNON_TYPE", { group: "generic", element: "type" }],
         ["CANNON_CLASS", { group: "generic", element: "class" }],
         // ["ARMOR_DAMAGE_ABSORB_MULTIPLIER", { group: "strength", element: "damage absorb multiplier" }],
         ["CANNON_CREW_REQUIRED", { group: "crew", element: "required" }],
