@@ -13,9 +13,8 @@ SOURCE_BASE_URL="http://storage.googleapis.com/nacleanopenworldprodshards/"
 SERVER_NAMES=(eu1 eu2)
 SERVER_TWITTER_NAMES=(eu1)
 API_VARS=(ItemTemplates Ports Shops)
-DATE=$(date +%Y-%m-%d)
+SERVER_MAINTENANCE_HOUR=10
 HEADER_DATE=$(LC_TIME="en" date -u +"%a, %d %b %Y 10:00:00 GMT" -d "+1 day")
-LAST_DATE=$(date '+%Y-%m-%d' --date "-1 day")
 
 function change_var () {
     BASE_DIR="$(pwd)"
@@ -29,6 +28,17 @@ function update_var () {
 }
 
 function common_var () {
+    # Set server date
+    if [ "$(date -u '+%H')" -lt "${SERVER_MAINTENANCE_HOUR}" ]; then
+        DATE=$(date -u '+%Y-%m-%d' --date "-1 day")
+        LAST_DATE=$(date -u '+%Y-%m-%d' --date "-2 day")
+    else
+        DATE=$(date -u '+%Y-%m-%d')
+        LAST_DATE=$(date -u '+%Y-%m-%d' --date "-1 day")
+    fi
+
+    export DATE
+    export LAST_DATE
     export BUILD_DIR="${BASE_DIR}/build"
     export SRC_DIR="${BASE_DIR}/src"
     export LAST_UPDATE_FILE="${BUILD_DIR}/.last-port-update"
