@@ -79,8 +79,8 @@ function convertCannons() {
         // ["DAMAGE_MULTIPLIER", { group: "damage", element: "multiplier" }],
         ["CANNON_BASIC_DAMAGE", { group: "damage", element: "basic" }],
         // ["CANNON_FIREPOWER", { group: "damage", element: "firepower" }],
-        ["CANNON_MIN_ANGLE", { group: "dispersion", element: "min angle" }],
-        ["CANNON_MAX_ANGLE", { group: "dispersion", element: "max angle" }],
+        ["CANNON_MIN_ANGLE", { group: "generic", element: "min angle" }],
+        ["CANNON_MAX_ANGLE", { group: "generic", element: "max angle" }],
         ["CANNON_DISPERSION_PER100M", { group: "dispersion", element: "per 100m" }],
         ["CANNON_DISPERSION_VERTICAL_PER100M", { group: "dispersion", element: "vertical per 100m" }],
         // ["CANNON_DISPERSION_REDUCTION_SPEED", { group: "dispersion", element: "reduction speed" }],
@@ -100,7 +100,7 @@ function convertCannons() {
         ],
         */
         // ["CANNON_DISPERSION_SHIP_PITCHING_MODIFIER", { group: "dispersion", element: "shi pitching modifier" }],
-        ["CANNON_FORWARD_FLY_TIME", { group: "generic", element: "forward fly time" }],
+        // ["CANNON_FORWARD_FLY_TIME", { group: "generic", element: "forward fly time" }],
         // ["CANNON_FORWARD_FIREPOWER_LOSS", { group: "generic", element: "firepower loss" }],
         // ["CANNON_GRAVITY_MULTIPLIER", { group: "generic", element: "gravity multiplier" }],
         // ["CANNON_TYPE", { group: "generic", element: "type" }],
@@ -126,7 +126,13 @@ function convertCannons() {
         } else if (fileData.ModuleTemplate.Name.endsWith("Long")) {
             type = "long";
         }
-        const cannon = { name: fileData.ModuleTemplate.Name.replaceAll(" ", "_") };
+        const cannon = {
+            name: fileData.ModuleTemplate.Name.replace("Cannon_", "")
+                .replace("Carronade_", "")
+                .replace("_pd", "")
+                .replace("_Long", "")
+                .replaceAll("_", "_")
+        };
         // console.log(fileData.ModuleTemplate);
         dataMapping.forEach(({ group, element }, value) => {
             fileData.ModuleTemplate.Attributes.Pair.filter(pair => value === pair.Key).forEach(pair => {
