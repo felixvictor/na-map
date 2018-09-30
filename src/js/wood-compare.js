@@ -262,6 +262,12 @@ export default class WoodCompare {
                 trim: "Crew Space"
             };
             this._columnsCompare = ["C1", "C2", "C3"];
+        } else if (this._baseFunction === "journey-wood") {
+            this._defaultWood = {
+                frame: "Oak",
+                trim: "Oak"
+            };
+            this._columnsCompare = [];
         } else {
             this._defaultWood = {
                 frame: "Oak",
