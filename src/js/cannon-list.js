@@ -52,7 +52,35 @@ export default class CannonList {
         });
     }
 
+    _initTablesort() {
+        const cleanNumber = i => i.replace(/[^\-?0-9.]/g, ""),
+            compareNumber = (a, b) => {
+                let aa = parseFloat(a),
+                    bb = parseFloat(b);
+
+                aa = Number.isNaN(aa) ? 0 : aa;
+                bb = Number.isNaN(bb) ? 0 : bb;
+
+                return aa - bb;
+            };
+
+        Tablesort.extend(
+            "number",
+            item =>
+                item.match(/^[-+]?[£\x24Û¢´€]?\d+\s*([,.]\d{0,2})/) || // Prefixed currency
+                item.match(/^[-+]?\d+\s*([,.]\d{0,2})?[£\x24Û¢´€]/) || // Suffixed currency
+                item.match(/^[-+]?(\d)*-?([,.])?-?(\d)+([E,e][-+][\d]+)?%?$/), // Number
+            (a, b) => {
+                const aa = cleanNumber(a),
+                    bb = cleanNumber(b);
+
+                return compareNumber(bb, aa);
+            }
+        );
+    }
+
     _initModal() {
+        this._initTablesort();
         this._injectModal();
         ["medium", "long", "carronade"].forEach(type => {
             this._injectList(type);
@@ -114,7 +142,9 @@ export default class CannonList {
                 ["damage", "dispersion", "generic", "strength", "crew"].forEach(group => {
                     Object.entries(cannon[group]).forEach(([key, value]) => {
                         if (`${group} ${key}` === modifier) {
-                            text += `<td class="text-right">${value ? formatFloatFixed(value) : ""}</td>`;
+                            text += `<td class="text-right" data-sort="${value}">${
+                                value ? formatFloatFixed(value) : ""
+                            }</td>`;
                         }
                     });
                 });
