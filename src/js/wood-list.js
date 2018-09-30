@@ -139,7 +139,9 @@ export default class WoodList {
                 const amount = wood.properties
                     .filter(property => property.modifier === modifier)
                     .map(property => property.amount)[0];
-                text += `<td class="text-right" data-sort="${amount}">${amount ? formatFloatFixed(amount) : ""}</td>`;
+                text += `<td class="text-right" data-sort="${amount || 0}">${
+                    amount ? formatFloatFixed(amount) : ""
+                }</td>`;
             });
             text += "</tr>";
         });
