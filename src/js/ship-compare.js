@@ -568,6 +568,7 @@ class ShipComparison extends Ship {
                 .curve(curve);
 
         const pathComp = this.g.append("path"),
+            markersComp = this.g.append("g").attr("class", "markers"),
             pathBase = this.g.append("path"),
             markersBase = this.g.append("g").attr("class", "markers");
 
@@ -858,16 +859,21 @@ export default class ShipCompare {
     /**
      * @param {Object} shipData - Ship data
      * @param {Object} woodData - Wood data
+     * @param {string} baseId - Base id (default "ship-compare")
      */
-    constructor(shipData, woodData) {
+    constructor(shipData, woodData, baseId = "ship-compare") {
         this._shipData = shipData;
 
+        this._baseId = baseId;
         this._baseName = "Compare ships";
-        this._baseId = "ship-compare";
         this._buttonId = `button-${this._baseId}`;
         this._modalId = `modal-${this._baseId}`;
 
-        this._columnsCompare = ["C1", "C2"];
+        if (this._baseId === "ship-compare") {
+            this._columnsCompare = ["C1", "C2"];
+        } else {
+            this._columnsCompare = [];
+        }
         this._columns = this._columnsCompare.slice();
         this._columns.unshift("Base");
 
