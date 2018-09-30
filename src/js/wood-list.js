@@ -54,7 +54,35 @@ export default class WoodList {
             .attr("class", "modules");
     }
 
+    _initTablesort() {
+        const cleanNumber = i => i.replace(/[^\-?0-9.]/g, ""),
+            compareNumber = (a, b) => {
+                let aa = parseFloat(a),
+                    bb = parseFloat(b);
+
+                aa = Number.isNaN(aa) ? 0 : aa;
+                bb = Number.isNaN(bb) ? 0 : bb;
+
+                return aa - bb;
+            };
+
+        Tablesort.extend(
+            "number",
+            item =>
+                item.match(/^[-+]?[£\x24Û¢´€]?\d+\s*([,.]\d{0,2})/) || // Prefixed currency
+                item.match(/^[-+]?\d+\s*([,.]\d{0,2})?[£\x24Û¢´€]/) || // Suffixed currency
+                item.match(/^[-+]?(\d)*-?([,.])?-?(\d)+([E,e][-+][\d]+)?%?$/), // Number
+            (a, b) => {
+                const aa = cleanNumber(a),
+                    bb = cleanNumber(b);
+
+                return compareNumber(bb, aa);
+            }
+        );
+    }
+
     _initModal() {
+        this._initTablesort();
         this._injectModal();
         this._injectList("frame");
         this._injectList("trim");
@@ -111,7 +139,7 @@ export default class WoodList {
                 const amount = wood.properties
                     .filter(property => property.modifier === modifier)
                     .map(property => property.amount)[0];
-                text += `<td class="text-right">${amount ? formatFloatFixed(amount) : ""}</td>`;
+                text += `<td class="text-right" data-sort="${amount}">${amount ? formatFloatFixed(amount) : ""}</td>`;
             });
             text += "</tr>";
         });
