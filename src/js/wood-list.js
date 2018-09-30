@@ -125,9 +125,7 @@ export default class WoodList {
         const modifiers = this._getModifiers(type);
         let text = "";
 
-        text += `<table id="table-${type}-list" class="table table-sm small tablesort"><thead><tr><th>${capitalizeFirstLetter(
-            type
-        )}</th>`;
+        text += `<table id="table-${type}-list" class="table table-sm small tablesort"><thead><tr><th data-sort-default>Wood</thdata-sort-default>`;
         modifiers.forEach(modifier => {
             text += `<th>${modifier}</th>`;
         });
