@@ -127,11 +127,12 @@ function convertCannons() {
             type = "long";
         }
         const cannon = {
-            name: fileData.ModuleTemplate.Name.replace("Cannon_", "")
-                .replace("Carronade_", "")
-                .replace("_pd", "")
-                .replace("_Long", "")
-                .replaceAll("_", "_")
+            name: fileData.ModuleTemplate.Name
+                .replace("Cannon ", "")
+                .replace("Carronade ", "")
+                .replace(" pd", "")
+                .replace(" Long", "")
+                .replace("-", "\u2013")
         };
         // console.log(fileData.ModuleTemplate);
         dataMapping.forEach(({ group, element }, value) => {
