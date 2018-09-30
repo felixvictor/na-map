@@ -1,8 +1,8 @@
 /**
  * This file is part of na-map.
  *
- * @file      Wood list.
- * @module    wood-list
+ * @file      Cannon list.
+ * @module    cannon-list
  * @author    iB aka Felix Victor
  * @copyright 2018
  * @license   http://www.gnu.org/licenses/gpl.html
@@ -17,18 +17,25 @@ import { insertBaseModal } from "./common";
 import { capitalizeFirstLetter, formatFloatFixed } from "./util";
 import { registerEvent } from "./analytics";
 
+// https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
+// eslint-disable-next-line no-extend-native,func-names
+String.prototype.replaceAll = function(search, replacement) {
+    const target = this;
+    return target.replace(new RegExp(search, "g"), replacement);
+};
+
 /**
  *
  */
-export default class WoodList {
-    constructor(woodData) {
-        this._woodData = woodData;
+export default class CannonList {
+    constructor(cannonData) {
+        this._cannonData = cannonData;
 
-        this._baseName = "List woods";
-        this._baseId = "wood-list";
+        this._baseName = "List cannons";
+        this._baseId = "cannon-list";
         this._buttonId = `button-${this._baseId}`;
         this._modalId = `modal-${this._baseId}`;
-
+        this._groups = ["damage", "dispersion", "generic", "crew"];
         this._setupListener();
     }
 
@@ -36,7 +43,7 @@ export default class WoodList {
         $(`#${this._buttonId}`).on("click", event => {
             registerEvent("Tools", this._baseName);
             event.stopPropagation();
-            this._woodListSelected();
+            this._cannonListSelected();
         });
     }
 
@@ -44,14 +51,12 @@ export default class WoodList {
         insertBaseModal(this._modalId, this._baseName);
 
         const body = d3.select(`#${this._modalId} .modal-body`);
-        body.append("h5").text("Frames");
-        body.append("div")
-            .attr("id", "frame-list")
-            .attr("class", "modules");
-        body.append("h5").text("Trims");
-        body.append("div")
-            .attr("id", "trim-list")
-            .attr("class", "modules");
+        ["medium", "long", "carronade"].forEach(type => {
+            body.append("h5").text(capitalizeFirstLetter(type));
+            body.append("div")
+                .attr("id", `${type}-list`)
+                .attr("class", "modules");
+        });
     }
 
     _initTablesort() {
@@ -84,11 +89,12 @@ export default class WoodList {
     _initModal() {
         this._initTablesort();
         this._injectModal();
-        this._injectList("frame");
-        this._injectList("trim");
+        ["medium", "long", "carronade"].forEach(type => {
+            this._injectList(type);
+        });
     }
 
-    _woodListSelected() {
+    _cannonListSelected() {
         // If the modal has no content yet, insert it
         if (!document.getElementById(this._modalId)) {
             this._initModal();
@@ -111,11 +117,12 @@ export default class WoodList {
 
     _getModifiers(type) {
         const modifiers = new Set();
-        this._woodData[type].forEach(wood => {
-            wood.properties.forEach(property => {
-                if (property.modifier !== "Ship material" && property.modifier !== "Boarding morale") {
-                    modifiers.add(property.modifier);
-                }
+
+        this._cannonData[type].forEach(cannon => {
+            this._groups.forEach(group => {
+                Object.entries(cannon[group]).forEach(([key]) => {
+                    modifiers.add(`${group} ${key}`);
+                });
             });
         });
         return Array.from(modifiers).sort();
@@ -125,26 +132,35 @@ export default class WoodList {
         const modifiers = this._getModifiers(type);
         let text = "";
 
-        text += `<table id="table-${type}-list" class="table table-sm small tablesort"><thead><tr><th data-sort-default>Wood</thdata-sort-default>`;
+        text += `<table id="table-${type}-list" class="table table-sm tablesort"><thead><tr><th data-sort-default>Pounds</th>`;
         modifiers.forEach(modifier => {
-            text += `<th>${modifier}</th>`;
+            const name = capitalizeFirstLetter(
+                modifier
+                    .replace("generic ", "")
+                    .replace("damage basic", "damage")
+                    .replace("damage penetration", "penetration")
+            );
+            text += `<th>${name}</th>`;
         });
         text += "</tr></thead><tbody>";
 
-        this._woodData[type].forEach(wood => {
-            text += `<tr><td>${wood.name}</td>`;
+        this._cannonData[type].forEach(cannon => {
+            const name = cannon.name.replace(" (", "<br>(").replaceAll(" ", "\u00a0");
+            text += `<tr><td class="text-right" data-sort="${parseInt(cannon.name, 10)}">${name}</td>`;
             modifiers.forEach(modifier => {
-                const amount = wood.properties
-                    .filter(property => property.modifier === modifier)
-                    .map(property => property.amount)[0];
-                text += `<td class="text-right" data-sort="${amount || 0}">${
-                    amount ? formatFloatFixed(amount) : ""
-                }</td>`;
+                this._groups.forEach(group => {
+                    Object.entries(cannon[group]).forEach(([key, value]) => {
+                        if (`${group} ${key}` === modifier) {
+                            text += `<td class="text-right" data-sort="${value || 0}">${
+                                value ? formatFloatFixed(value) : ""
+                            }</td>`;
+                        }
+                    });
+                });
             });
             text += "</tr>";
         });
         text += "</tbody></table>";
-
         return text;
     }
 }
