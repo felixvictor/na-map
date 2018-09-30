@@ -26,6 +26,7 @@ import PBZone from "./pbzone";
 import PortDisplay from "./port";
 import PortSelect from "./port-select";
 import ShipCompare from "./ship-compare";
+import CannonList from "./cannon-list";
 import Teleport from "./teleport";
 import WindPrediction from "./wind-prediction";
 import WoodCompare from "./wood-compare";
@@ -71,6 +72,10 @@ export default class Map {
             {
                 fileName: "ships.json",
                 name: "ships"
+            },
+            {
+                fileName: "cannons.json",
+                name: "cannons"
             },
             {
                 fileName: "woods.json",
@@ -294,6 +299,9 @@ export default class Map {
 
         const shipData = JSON.parse(JSON.stringify(data.ships.shipData));
         this._shipCompare = new ShipCompare(shipData, woodData);
+
+        const cannonData = JSON.parse(JSON.stringify(data.cannons));
+        this._cannonList = new CannonList(cannonData);
 
         const moduleData = JSON.parse(JSON.stringify(data.modules));
         this._moduleList = new Module(moduleData);
