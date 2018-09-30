@@ -86,11 +86,11 @@ function convertCannons() {
         // ["CANNON_DISPERSION_REDUCTION_SPEED", { group: "dispersion", element: "reduction speed" }],
         ["CANNON_RELOAD_TIME", { group: "generic", element: "reload time" }],
         // ["DAMAGE_TYPE", { group: "damage", element: "type" }],
-        ["MODULE_BASE_HP", { group: "strength", element: "base" }],
+        // ["MODULE_BASE_HP", { group: "strength", element: "base" }],
         ["CANNON_BASIC_PENETRATION", { group: "damage", element: "penetration" }],
         // ["FIRE_PROBABILITY", { group: "generic", element: "fire probablity" }],
-        ["CANNON_MASS", { group: "generic", element: "mass" }],
-        ["CANNON_BALL_RADIUS", { group: "generic", element: "ball radius" }],
+        // ["CANNON_MASS", { group: "generic", element: "mass" }],
+        // ["CANNON_BALL_RADIUS", { group: "generic", element: "ball radius" }],
         // ["CANNON_FIREZONE_HORIZONTAL_ROTATION_SPEED", { group: "dispersion", element: "horizontal rotation speed" }],
         // ["CANNON_BULLETS_PER_SHOT", { group: "generic", element: "bullets per shot" }],
         /*
@@ -104,10 +104,10 @@ function convertCannons() {
         // ["CANNON_FORWARD_FIREPOWER_LOSS", { group: "generic", element: "firepower loss" }],
         // ["CANNON_GRAVITY_MULTIPLIER", { group: "generic", element: "gravity multiplier" }],
         // ["CANNON_TYPE", { group: "generic", element: "type" }],
-        ["CANNON_CLASS", { group: "generic", element: "class" }],
+        // ["CANNON_CLASS", { group: "generic", element: "class" }],
         // ["ARMOR_DAMAGE_ABSORB_MULTIPLIER", { group: "strength", element: "damage absorb multiplier" }],
         ["CANNON_CREW_REQUIRED", { group: "crew", element: "required" }],
-        ["ARMOR_THICKNESS", { group: "strength", element: "thickness" }],
+        // ["ARMOR_THICKNESS", { group: "strength", element: "thickness" }],
         ["CANNON_BALL_ARMOR_SPLINTERS_DAMAGE_FOR_CREW", { group: "crew", element: "splinter damage" }]
     ]);
 
@@ -126,13 +126,15 @@ function convertCannons() {
         } else if (fileData.ModuleTemplate.Name.endsWith("Long")) {
             type = "long";
         }
+        const name = fileData.ModuleTemplate.Name.replace("Cannon ", "")
+            .replace("Carronade ", "")
+            .replace(" pd", "")
+            .replace(" Long", "")
+            .replace("Salvaged ", "")
+            .replace("0.5 E", "E")
+            .replace(/^(\d+) - (.+)$/g, "$1 ($2)");
         const cannon = {
-            name: fileData.ModuleTemplate.Name
-                .replace("Cannon ", "")
-                .replace("Carronade ", "")
-                .replace(" pd", "")
-                .replace(" Long", "")
-                .replace("-", "\u2013")
+            name
         };
         // console.log(fileData.ModuleTemplate);
         dataMapping.forEach(({ group, element }, value) => {
