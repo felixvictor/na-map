@@ -17,6 +17,13 @@ import { insertBaseModal } from "./common";
 import { capitalizeFirstLetter, formatFloatFixed } from "./util";
 import { registerEvent } from "./analytics";
 
+// https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
+// eslint-disable-next-line no-extend-native,func-names
+String.prototype.replaceAll = function(search, replacement) {
+    const target = this;
+    return target.replace(new RegExp(search, "g"), replacement);
+};
+
 /**
  *
  */
@@ -28,7 +35,7 @@ export default class CannonList {
         this._baseId = "cannon-list";
         this._buttonId = `button-${this._baseId}`;
         this._modalId = `modal-${this._baseId}`;
-
+        this._groups = ["damage", "dispersion", "generic", "crew"];
         this._setupListener();
     }
 
@@ -112,11 +119,8 @@ export default class CannonList {
         const modifiers = new Set();
 
         this._cannonData[type].forEach(cannon => {
-            console.log(cannon);
-            ["damage", "dispersion", "generic", "strength", "crew"].forEach(group => {
-                console.log(cannon[group]);
+            this._groups.forEach(group => {
                 Object.entries(cannon[group]).forEach(([key]) => {
-                    console.log(key);
                     modifiers.add(`${group} ${key}`);
                 });
             });
@@ -128,21 +132,26 @@ export default class CannonList {
         const modifiers = this._getModifiers(type);
         let text = "";
 
-        text += `<table id="table-${type}-list" class="table table-sm small tablesort"><thead><tr><th>${capitalizeFirstLetter(
-            type
-        )}</th>`;
+        text += `<table id="table-${type}-list" class="table table-sm tablesort"><thead><tr><th data-sort-default>Pounds</th>`;
         modifiers.forEach(modifier => {
-            text += `<th>${modifier}</th>`;
+            const name = capitalizeFirstLetter(
+                modifier
+                    .replace("generic ", "")
+                    .replace("damage basic", "damage")
+                    .replace("damage penetration", "penetration")
+            );
+            text += `<th>${name}</th>`;
         });
         text += "</tr></thead><tbody>";
 
         this._cannonData[type].forEach(cannon => {
-            text += `<tr><td>${cannon.name}</td>`;
+            const name = cannon.name.replace(" (", "<br>(").replaceAll(" ", "\u00a0");
+            text += `<tr><td class="text-right" data-sort="${parseInt(cannon.name, 10)}">${name}</td>`;
             modifiers.forEach(modifier => {
-                ["damage", "dispersion", "generic", "strength", "crew"].forEach(group => {
+                this._groups.forEach(group => {
                     Object.entries(cannon[group]).forEach(([key, value]) => {
                         if (`${group} ${key}` === modifier) {
-                            text += `<td class="text-right" data-sort="${value}">${
+                            text += `<td class="text-right" data-sort="${value || 0}">${
                                 value ? formatFloatFixed(value) : ""
                             }</td>`;
                         }
@@ -152,7 +161,6 @@ export default class CannonList {
             text += "</tr>";
         });
         text += "</tbody></table>";
-        console.log(text);
         return text;
     }
 }
