@@ -48,12 +48,46 @@ export default class Journey {
      */
     _setupListener() {
         $("#journeyNavbar").on("shown.bs.dropdown", event => {
-            console.log(" journeyNavbar shown");
             registerEvent("Menu", "Journey");
             event.stopPropagation();
-                this._journeySelected();
+            this._journeySelected();
         });
+    }
 
+    _setupWindInput() {
+        // workaround from https://github.com/soundar24/roundSlider/issues/71
+        // eslint-disable-next-line func-names,no-underscore-dangle
+        const { _getTooltipPos } = $.fn.roundSlider.prototype;
+        // eslint-disable-next-line func-names,no-underscore-dangle
+        $.fn.roundSlider.prototype._getTooltipPos = function() {
+            if (!this.tooltip.is(":visible")) {
+                $("body").append(this.tooltip);
+            }
+            const pos = _getTooltipPos.call(this);
+            this.container.append(this.tooltip);
+            return pos;
+        };
+
+        window.tooltip = args => degreesToCompass(args.value);
+
+        $("#journey-wind-direction").roundSlider({
+            sliderType: "default",
+            handleSize: "+1",
+            startAngle: 90,
+            width: 20,
+            radius: 110,
+            min: 0,
+            max: 359,
+            step: 360 / compassDirections.length,
+            editableTooltip: false,
+            tooltipFormat: "tooltip",
+            create() {
+                this.control.css("display", "block");
+            },
+            change() {
+                this._currentWind = $("#journey-wind-direction").roundSlider("getValue");
+            }
+        });
     }
 
     /**
@@ -61,11 +95,8 @@ export default class Journey {
      * @returns {void}
      */
     _journeySelected() {
-        // $("#journeyMenu").dropdown("update");
-
-
         this._injectInputs();
-        $("#journeyDropdown").dropdown();
+        this._setupWindInput();
 
         this._shipCompare = new ShipCompare(this._shipData, this._woodData, this._baseId);
         this._woodCompare = new WoodCompare(this._woodData, this._woodId);
@@ -89,6 +120,7 @@ export default class Journey {
             const form = d3
                 .select("#journeyMenu")
                 .append("form")
+                .attr("id", "journey-form")
                 .attr("class", "p-2");
             const slider = form.append("div").attr("class", "form-group");
             slider
@@ -97,7 +129,7 @@ export default class Journey {
                 .text("1. Set current in-game wind");
             slider
                 .append("div")
-                .attr("id", "course-wind-direction")
+                .attr("id", "journey-wind-direction")
                 .attr("class", "rslider");
 
             const select = form.append("div").attr("class", "form-group");
@@ -121,44 +153,5 @@ export default class Journey {
                     .attr("id", woodId);
             });
         }
-    }
-
-    static _setupWindInput() {
-        // workaround from https://github.com/soundar24/roundSlider/issues/71
-        // eslint-disable-next-line func-names,no-underscore-dangle
-        const { _getTooltipPos } = $.fn.roundSlider.prototype;
-        // eslint-disable-next-line func-names,no-underscore-dangle
-        $.fn.roundSlider.prototype._getTooltipPos = function() {
-            if (!this.tooltip.is(":visible")) {
-                $("body").append(this.tooltip);
-            }
-            const pos = _getTooltipPos.call(this);
-            this.container.append(this.tooltip);
-            return pos;
-        };
-
-        window.tooltip = args => degreesToCompass(args.value);
-
-        $("#course-wind-direction").roundSlider({
-            sliderType: "default",
-            handleSize: "+1",
-            startAngle: 90,
-            width: 20,
-            radius: 110,
-            min: 0,
-            max: 359,
-            step: 360 / compassDirections.length,
-            editableTooltip: false,
-            tooltipFormat: "tooltip",
-            stop: "_getWindDirection",
-            create() {
-                this.control.css("display", "block");
-            }
-        });
-    }
-
-    static _getWindDirection(event) {
-        (this._currentWind = $("#course-wind-direction").roundSlider("option", "value")),
-            console.log(this._currentWind, event, event.type);
     }
 }
