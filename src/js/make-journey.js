@@ -38,7 +38,7 @@ export default class Journey {
         this._shipData = shipData;
         this._woodData = woodData;
         this._baseId = "ship-journey";
-        this._woodId = "journey-wood";
+        this._woodId = "wood-journey";
         this._setupListener();
     }
 
@@ -108,14 +108,6 @@ export default class Journey {
     }
 
     _injectInputs() {
-        /*
-			<form id="course" class="p-2">
-				<div class="form-group">
-					<p class="form-text">1. Set current in-game wind</p>
-					<div id="direction" class="rslider"></div>
-				</div>
-			</form>
-		*/
         if (d3.select("#journeyMenu form").empty()) {
             const form = d3
                 .select("#journeyMenu")
@@ -137,18 +129,19 @@ export default class Journey {
                 .append("p")
                 .attr("class", "form-text")
                 .text("2. Set ship");
+
+            const div1 = select.append("div").attr("class", "dropdown-item");
             const shipId = `${this._baseId}-Base-select`;
-            select.append("label").attr("for", shipId);
-            select
-                .append("select")
+            div1.append("label").attr("for", shipId);
+            div1.append("select")
                 .attr("name", shipId)
                 .attr("id", shipId);
 
             ["frame", "trim"].forEach(type => {
+                const div2 = select.append("div").attr("class", "dropdown-item");
                 const woodId = `${this._woodId}-${type}-Base-select`;
-                select.append("label").attr("for", woodId);
-                select
-                    .append("select")
+                div2.append("label").attr("for", woodId);
+                div2.append("select")
                     .attr("name", woodId)
                     .attr("id", woodId);
             });
