@@ -904,9 +904,20 @@ export default class ShipCompare {
             ["Crew", ["crew.max"]]
         ]);
 
-        this._woodId = "ship-wood";
+        if (this._baseId === "ship-journey") {
+            this._woodId = "wood-journey";
+        } else {
+            this._woodId = "wood-ship";
+        }
+
         this._woodCompare = new WoodCompare(woodData, this._woodId);
-        this._setupListener();
+
+        if (this._baseId === "ship-journey") {
+            this._initData();
+            this._initWoodSelect();
+        } else {
+            this._setupListener();
+        }
     }
 
     /**
@@ -1019,15 +1030,12 @@ export default class ShipCompare {
         });
     }
 
-    /**
-     * Init modal
-     * @returns {void}
-     */
-    _initModal() {
+    _initData() {
         this._setupData();
         this.woodCompare._setupData();
-        this._injectModal();
+    }
 
+    _initWoodSelect() {
         this._columns.forEach(columnId => {
             this._setupShipSelect(columnId);
             ["frame", "trim"].forEach(type => {
@@ -1037,6 +1045,16 @@ export default class ShipCompare {
 
             this._setupSelectListener(columnId);
         });
+    }
+
+    /**
+     * Init modal
+     * @returns {void}
+     */
+    _initModal() {
+        this._initData();
+        this._injectModal();
+        this._initWoodSelect();
     }
 
     /**
@@ -1065,6 +1083,7 @@ export default class ShipCompare {
      * @returns {void}
      */
     _setupShipSelect(columnId) {
+        console.log(columnId, `#${this._baseId}-${columnId}-select`);
         const select$ = $(`#${this._baseId}-${columnId}-select`),
             options = this._getOptions();
         select$.append(options);
@@ -1190,12 +1209,14 @@ export default class ShipCompare {
      */
     _setupSelectListener(compareId) {
         const selectShip$ = $(`#${this._baseId}-${compareId}-select`);
+        console.log(`#${this._baseId}-${compareId}-select`);
         selectShip$
             .addClass("selectpicker")
             .on("change", () => {
+                console.log("selectShip$ change");
                 const shipId = +selectShip$.val();
                 this._refreshShips(shipId, compareId);
-                if (compareId === "Base") {
+                if (compareId === "Base" && this._baseId !== "ship-journey") {
                     this._enableCompareSelects();
                 }
                 this.woodCompare.enableSelects(compareId);
@@ -1213,7 +1234,7 @@ export default class ShipCompare {
                     const shipId = +selectShip$.val();
                     this._refreshShips(shipId, compareId);
                 })
-                .selectpicker({ noneSelectedText: `Select ${capitalizeFirstLetter(type)}` })
+                .selectpicker({ noneSelectedText: `Select ${type}` })
                 .val("default")
                 .selectpicker("refresh");
         });

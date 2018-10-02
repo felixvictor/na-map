@@ -262,7 +262,7 @@ export default class WoodCompare {
                 trim: "Crew Space"
             };
             this._columnsCompare = ["C1", "C2", "C3"];
-        } else if (this._baseFunction === "journey-wood") {
+        } else if (this._baseFunction === "wood-journey") {
             this._defaultWood = {
                 frame: "Oak",
                 trim: "Oak"
@@ -474,7 +474,7 @@ export default class WoodCompare {
         select$
             .addClass("selectpicker")
             .on("change", () => this._woodSelected(compareId, type, select$))
-            .selectpicker({ noneSelectedText: `Select ${capitalizeFirstLetter(type)}` })
+            .selectpicker({ noneSelectedText: `Select ${type}` })
             .val("default")
             .selectpicker("refresh");
     }
