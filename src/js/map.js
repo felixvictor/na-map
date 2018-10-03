@@ -19,7 +19,7 @@ import Cookies from "js-cookie";
 import { appDescription, appTitle, appVersion, defaultFontSize, insertBaseModal } from "./common";
 import { nearestPow2, checkFetchStatus, getJsonFromFetch, putFetchError, roundToThousands } from "./util";
 
-import Course from "./course";
+// import Course from "./course";
 import F11 from "./f11";
 import Grid from "./grid";
 import PBZone from "./pbzone";
@@ -316,13 +316,13 @@ export default class Map {
         const buildingData = JSON.parse(JSON.stringify(data.buildings));
         this._buildingList = new Building(buildingData);
 
-        this._journey = new Journey(shipData, woodData);
+        this._journey = new Journey(shipData, woodData, this.rem);
         this._teleport = new Teleport(this.coord.min, this.coord.max, this._ports);
         this._portSelect = new PortSelect(this, this._ports, this._pbZone);
         this._windPrediction = new WindPrediction(this.margin.left, this.margin.top);
         this._f11 = new F11(this);
         this._grid = new Grid(this);
-        this._course = new Course(this.rem);
+       // this._course = new Course(this.rem);
 
         this._init();
     }
@@ -544,7 +544,7 @@ export default class Map {
 
     _clearMap() {
         this._windPrediction.clearMap();
-        this._course.clearMap();
+        this._journey.clearMap();
         this._f11.clearMap();
         this._ports.clearMap();
         this._portSelect.clearMap();
@@ -587,7 +587,7 @@ export default class Map {
         if (this.doubleClickAction === "f11") {
             this._f11.printCoord(x, y);
         } else {
-            this._course.plotCourse(x, y);
+            this._journey.plotCourse(x, y);
         }
 
         this.zoomAndPan(x, y, 1);
@@ -647,7 +647,7 @@ export default class Map {
         this._grid.transform(zoomTransform);
         this._ports.transform(zoomTransform);
         this._teleport.transform(zoomTransform);
-        this._course.transform(zoomTransform);
+        this._journey.transform(zoomTransform);
         this._pbZone.transform(zoomTransform);
         this._f11.transform(zoomTransform);
     }
