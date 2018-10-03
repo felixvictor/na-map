@@ -213,9 +213,9 @@ export const radiansToDegrees = radians => (radians * 180) / Math.PI;
 export const degreesToRadians = degrees => (Math.PI / 180) * (degrees - 90);
 
 /**
- * @typedef {Array} Point
- * @property {number} 0 - X Coordinate
- * @property {number} 1 - Y Coordinate
+ * @typedef {Object} Point
+ * @property {number} x - X Coordinate
+ * @property {number} y - Y Coordinate
  */
 
 /**
@@ -227,7 +227,7 @@ export const degreesToRadians = degrees => (Math.PI / 180) * (degrees - 90);
  * @return {Number} Degrees between centerPt and targetPt
  */
 export const rotationAngleInDegrees = (centerPt, targetPt) => {
-    let theta = Math.atan2(targetPt[1] - centerPt[1], targetPt[0] - centerPt[0]);
+    let theta = Math.atan2(targetPt.y - centerPt.y, targetPt.x - centerPt.x);
     theta -= Math.PI / 2.0;
     let degrees = radiansToDegrees(theta);
     if (degrees < 0) {
@@ -245,7 +245,7 @@ export const rotationAngleInDegrees = (centerPt, targetPt) => {
  * @return {Number} Distance between centerPt and targetPt
  */
 export const distancePoints = (centerPt, targetPt) =>
-    Math.sqrt((centerPt[0] - targetPt[0]) ** 2 + (centerPt[1] - targetPt[1]) ** 2);
+    Math.sqrt((centerPt.x - targetPt.x) ** 2 + (centerPt.y - targetPt.y) ** 2);
 
 /**
  * Calculate the closest power of 2 (see {@link https://bocoup.com/blog/find-the-closest-power-of-2-with-javascript})
