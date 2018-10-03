@@ -69,7 +69,7 @@ export function getDistance(pt0, pt1) {
             y: convertInvCoordY(pt1.x, pt1.y)
         };
 
-    return distancePoints(F11_0, F11_1) / 1000;
+    return distancePoints(F11_0, F11_1) / (2.63 * speedFactor);
 }
 
 /**

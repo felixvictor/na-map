@@ -52,15 +52,17 @@ export default class Journey {
         this._totalDistance = 0;
         this._totalMinutes = 0;
         this._degreesCurrentWind = null;
+        this._shipDefaultId = 413; // Basic cutter
         this._currentShipId = null;
 
         this._speedScale = d3.scaleLinear().domain(d3.range(0, this._fullCircle, this._degreesSegment));
 
         this._setupSvg();
+
         this._shipId = "ship-journey";
         this._woodId = "wood-journey";
         this._selected = false;
-        // this._setupListener();
+        this._setupListener();
     }
 
     /**
@@ -68,6 +70,12 @@ export default class Journey {
      * @returns {void}
      */
     _setupListener() {
+        $("#journeyNavbar").on("click", event => {
+            console.log("#journeyNavbar click");
+            event.stopPropagation();
+            $("#journeyDropdown").dropdown();
+            this._journeySelected();
+        });
         $("#journeyNavbar").on("shown.bs.dropdown", event => {
             console.log("#journeyNavbar shown.bs.dropdown");
             registerEvent("Menu", "Journey");
@@ -118,15 +126,14 @@ export default class Journey {
      */
     _journeySelected() {
         if (!this._selected) {
-            console.log("_journeySelected Anfang");
             this._selected = true;
 
             this._injectInputs();
             this._setupWindInput();
 
-            /*
             // Adapted https://github.com/bootstrapthemesco/bootstrap-4-multi-dropdown-navbar
-            $(".nav-item .dropdown-menu .bootstrap-select .dropdown-toggle").on("click", event => {
+            $(".nav-item .dropdown-menu form .form-group .bootstrap-select .dropdown-toggle").on("click", event => {
+                console.log("click");
                 const $el = $(event.currentTarget);
 
                 $el.next(".dropdown-menu").toggleClass("show");
@@ -139,16 +146,9 @@ export default class Journey {
 
                 return false;
             });
-            */
 
             this._shipCompare = new ShipCompare(this._shipData, this._woodData, this._shipId);
             this._woodCompare = new WoodCompare(this._woodData, this._woodId);
-
-            console.log(this._shipCompare);
-            console.log(this._shipCompare.ships);
-            console.log(this._shipCompare.ships.Base);
-            console.log(this._shipCompare.ships.Base._shipData);
-            console.log("_journeySelected Ende");
         }
     }
 
@@ -255,17 +255,28 @@ export default class Journey {
     }
 
     _getCurrentShipId() {
-        let id = this._shipDefualtId;
-        if (typeof this._shipCompare.ships.Base._shipData !== "undefined") {
-            id = this._shipCompare.ships.Base._shipData.id;
+        let id = this._shipDefaultId;
+        if (typeof this._shipCompare !== "undefined") {
+            console.log(this._shipCompare);
+            console.log(this._shipCompare.ships);
+            console.log(this._shipCompare.ships.Base);
+            console.log(this._shipCompare.ships.Base._shipData);
+
+            [id] = this._shipCompare.ships.Base._shipData;
         }
+        return id;
     }
 
     _setShipSpeed() {
-        const id = this._getCurrentShipId(),
+        const id = this._getCurrentShipId();
+        // Dummy ship speed of 19 knots
+        let speedDegrees = Array.from(Array(24).fill(19));
+
+        if (typeof this._shipCompare !== "undefined") {
             speedDegrees = this._shipCompare.ships.Base._shipData
                 .filter(ship => ship.id === id)
                 .map(ship => ship.speedDegrees)[0];
+        }
         this._speedScale.range(speedDegrees);
     }
 
