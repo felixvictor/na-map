@@ -653,8 +653,8 @@ export default class PortDisplay {
             rGreenZone =
                 roundToThousands(
                     getDistance(
-                        [convertCoordX(-63400, 18800), convertCoordY(-63400, 18800)],
-                        [convertCoordX(-79696, 10642), convertCoordY(-79696, 10642)]
+                        { x: convertCoordX(-63400, 18800), y: convertCoordY(-63400, 18800) },
+                        { x: convertCoordX(-79696, 10642), y: convertCoordY(-79696, 10642) }
                     )
                 ) * magicNumber;
             const pbData = this._pbData.ports.filter(d => d.nation !== "FT").map(d => d.id);
