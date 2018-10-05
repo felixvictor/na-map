@@ -86,25 +86,33 @@ export default class Building {
 
     _getProductText(currentBuilding) {
         let text = "";
-        text += `<h5 class="card-title">${currentBuilding.resource.name}</h5>`;
+        if (!Array.isArray(currentBuilding.resource)) {
+            text += `<h5 class="card-title">${currentBuilding.resource.name}</h5>`;
 
-        if (currentBuilding.resource.price) {
-            text += '<table class="table table-sm"><tbody>';
-            text += `<tr><td>${currentBuilding.resource.price} gold per unit</td></tr>`;
-            if (typeof currentBuilding.batch !== "undefined") {
-                text += `<tr><td>Batch of ${currentBuilding.batch.amount} units at ${
-                    currentBuilding.batch.price
-                } gold</td></tr>`;
+            if (currentBuilding.resource.price) {
+                text += '<table class="table table-sm"><tbody>';
+                text += `<tr><td>${currentBuilding.resource.price} gold per unit</td></tr>`;
+                if (typeof currentBuilding.batch !== "undefined") {
+                    text += `<tr><td>Batch of ${currentBuilding.batch.amount} units at ${
+                        currentBuilding.batch.price
+                    } gold</td></tr>`;
+                }
+                text += "</tbody></table>";
             }
+        } else {
+            text += '<table class="table table-sm"><tbody>';
+
+            text += `<tr><td>${currentBuilding.resource
+                .map(resource => resource.name)
+                .join("</td></tr><tr><td>")}</td></tr>`;
             text += "</tbody></table>";
         }
-
         return text;
     }
 
     _getByproductText(currentBuilding) {
         let text = '<table class="table table-sm"><tbody>';
-        if (currentBuilding.byproduct.length) {
+        if (typeof currentBuilding.byproduct !== "undefined" && currentBuilding.byproduct.length) {
             text += `<tr><td>${currentBuilding.byproduct
                 .map(
                     byproduct =>
