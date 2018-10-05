@@ -221,8 +221,8 @@ table a {
     path.base {
         opacity: 0.5;
         fill: none;
-      stroke-width: 3px;
-      stroke: $secondary-500;
+        stroke-width: 3px;
+        stroke: $secondary-500;
     }
 
     path.comp,
@@ -625,12 +625,12 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
 .region {
     filter: url("#drop-shadow");
     text {
-      font-family: LibreCaslonDisplay, -apple-system, blinkmacsystemfont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
-      cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", arial, sans-serif;
-      opacity: 0.7;
-      fill: $white;
-      text-anchor: middle;
-  }
+        font-family: LibreCaslonDisplay, -apple-system, blinkmacsystemfont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
+            cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", arial, sans-serif;
+        opacity: 0.7;
+        fill: $white;
+        text-anchor: middle;
+    }
 }
 
 .region text {
@@ -652,39 +652,39 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
     margin-top: -1px;
 }
 
- .tablesort {
-   th[role=columnheader]:not(.no-sort) {
-     cursor: pointer;
-   }
+.tablesort {
+    th[role="columnheader"]:not(.no-sort) {
+        cursor: pointer;
+    }
 
-   th[role=columnheader]:not(.no-sort):after {
-     content: '';
-     float: right;
-     margin-top: 7px;
-     border-width: 0 4px 4px;
-     border-style: solid;
-     border-color: $primary-600 transparent;
-     visibility: hidden;
-     opacity: 0;
-     user-select: none;
-   }
+    th[role="columnheader"]:not(.no-sort):after {
+        content: "";
+        float: right;
+        margin-top: 7px;
+        border-width: 0 4px 4px;
+        border-style: solid;
+        border-color: $primary-600 transparent;
+        visibility: hidden;
+        opacity: 0;
+        user-select: none;
+    }
 
-   th[aria-sort=ascending]:not(.no-sort):after {
-     border-bottom: none;
-     border-width: 4px 4px 0;
-   }
+    th[aria-sort="ascending"]:not(.no-sort):after {
+        border-bottom: none;
+        border-width: 4px 4px 0;
+    }
 
-   th[aria-sort]:not(.no-sort):after {
-     visibility: visible;
-     opacity: 0.4;
-   }
+    th[aria-sort]:not(.no-sort):after {
+        visibility: visible;
+        opacity: 0.4;
+    }
 
-   th[role=columnheader]:not(.no-sort):hover:after {
-     visibility: visible;
-     opacity: 1;
-   }
- }
+    th[role="columnheader"]:not(.no-sort):hover:after {
+        visibility: visible;
+        opacity: 1;
+    }
+}
 
- .hidden {
-   visibility: hidden;
- }
+.hidden {
+    visibility: hidden;
+}
