@@ -109,7 +109,8 @@
     "browserslist": [
         ">= 1%",
         "last 1 major version",
-        "not dead"
+        "not dead",
+        "not Explorer >= 8"
     ],
     "prettier": {
         "tabWidth": 4,
