@@ -11,6 +11,12 @@ SERVER_BASE_NAME="cleanopenworldprod"
 SOURCE_BASE_URL="http://storage.googleapis.com/nacleanopenworldprodshards/"
 # http://api.shipsofwar.net/servers?apikey=1ZptRtpXAyEaBe2SEp63To1aLmISuJj3Gxcl5ivl&callback=setActiveRealms
 SERVER_NAMES=(eu1 eu2)
+
+## testbed
+#SERVER_BASE_NAME="clean"
+#SOURCE_BASE_URL="http://storage.googleapis.com/nacleandevshards/"
+#SERVER_NAMES=(dev)
+
 SERVER_TWITTER_NAMES=(eu1)
 API_VARS=(ItemTemplates Ports Shops)
 SERVER_MAINTENANCE_HOUR=10
