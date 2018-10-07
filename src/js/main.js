@@ -30,6 +30,7 @@ import "moment/locale/en-gb";
 import Cookies from "js-cookie";
 
 import { initAnalytics, registerPage } from "./analytics";
+import { initMultiDropdownNavbar } from "./common";
 
 import Map from "./map";
 
@@ -94,22 +95,17 @@ function main() {
      * @return {void}
      */
     function setupListener() {
-        // https://stackoverflow.com/questions/44467377/bootstrap-4-multilevel-dropdown-inside-navigation/48953349#48953349
-        $(".dropdown-submenu > a").on("click", event => {
-            const submenu = $(event.currentTarget);
-            submenu.next(".dropdown-menu").addClass("show");
-            event.stopPropagation();
-        });
-        $(".dropdown").on("hidden.bs.dropdown", event => {
-            // hide any open menus when parent closes
-            const dropdown = $(event.currentTarget);
-            dropdown
-                .find(".dropdown-menu.show")
-                .not(".inner")
-                .removeClass("");
-        });
-
         $("#server-name").change(() => serverNameSelected());
+        document.addEventListener("DOMContentLoaded", () => {
+            console.log("DOMContentLoaded");
+            // https://stackoverflow.com/questions/44467377/bootstrap-4-multilevel-dropdown-inside-navigation/48953349#48953349
+            $(".dropdown-submenu > a").on("click", event => {
+                console.log("click '.dropdown-submenu > a'");
+                const submenu$ = $(event.currentTarget);
+                submenu$.next(".dropdown-menu").toggleClass("show");
+                event.stopPropagation();
+            });
+        });
     }
 
     fontawesome.library.add(
