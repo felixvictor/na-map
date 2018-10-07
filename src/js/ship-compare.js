@@ -1011,15 +1011,15 @@ export default class ShipCompare {
                 .attr("class", `col-md-4 ml-auto pt-2 ${column === "Base" ? "columnA" : "columnC"}`);
 
             const shipId = `${this._baseId}-${column}-select`;
-            div.append("label").attr("for", shipId);
-            div.append("select")
+            div.append("label")
+                .append("select")
                 .attr("name", shipId)
                 .attr("id", shipId);
 
             ["frame", "trim"].forEach(type => {
                 const woodId = `${this._woodId}-${type}-${column}-select`;
-                div.append("label").attr("for", woodId);
-                div.append("select")
+                div.append("label")
+                    .append("select")
                     .attr("name", woodId)
                     .attr("id", woodId);
             });
@@ -1083,7 +1083,7 @@ export default class ShipCompare {
      * @returns {void}
      */
     _setupShipSelect(columnId) {
-        console.log(columnId, `#${this._baseId}-${columnId}-select`);
+        console.log("_setupShipSelect", columnId, `#${this._baseId}-${columnId}-select`);
         const select$ = $(`#${this._baseId}-${columnId}-select`),
             options = this._getOptions();
         select$.append(options);
@@ -1209,11 +1209,12 @@ export default class ShipCompare {
      */
     _setupSelectListener(compareId) {
         const selectShip$ = $(`#${this._baseId}-${compareId}-select`);
-        console.log(`#${this._baseId}-${compareId}-select`);
+        console.log("_setupSelectListener", `#${this._baseId}-${compareId}-select`);
         selectShip$
             .addClass("selectpicker")
-            .on("change", () => {
+            .on("changed.bs.select", event => {
                 console.log("selectShip$ change");
+                event.preventDefault();
                 const shipId = +selectShip$.val();
                 this._refreshShips(shipId, compareId);
                 if (compareId === "Base" && this._baseId !== "ship-journey") {
@@ -1229,7 +1230,7 @@ export default class ShipCompare {
             const select$ = $(`#${this._woodId}-${type}-${compareId}-select`);
             select$
                 .addClass("selectpicker")
-                .on("change", () => {
+                .on("changed.bs.select", () => {
                     this.woodCompare._woodSelected(compareId, type, select$);
                     const shipId = +selectShip$.val();
                     this._refreshShips(shipId, compareId);

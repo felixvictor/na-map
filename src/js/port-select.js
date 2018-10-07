@@ -8,8 +8,8 @@ import "moment/locale/en-gb";
 import "tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4";
 import "tempusdominus-core/build/js/tempusdominus-core";
 
-import { nations } from "./common";
 import { registerEvent } from "./analytics";
+import { initMultiDropdownNavbar, nations } from "./common";
 
 export default class PortSelect {
     constructor(map, ports, pbZone) {
@@ -58,18 +58,6 @@ export default class PortSelect {
         this._propClanSelector.classList.add("selectpicker");
         this._propCMSelector.classList.add("selectpicker");
         const selectPickerDefaults = {
-            icons: {
-                time: "far fa-clock",
-                date: "far fa-calendar",
-                up: "fas fa-arrow-up",
-                down: "fas fa-arrow-down",
-                previous: "fas fa-chevron-left",
-                next: "fas fa-chevron-right",
-                today: "far fa-calendar-check",
-                clear: "fas fa-trash",
-                close: "fas fa-times"
-            },
-            timeZone: "UTC",
             noneSelectedText: "",
             dropupAuto: false
         };
@@ -117,6 +105,21 @@ export default class PortSelect {
         document.getElementById("menu-prop-medium").addEventListener("click", () => this._portSizeSelected("Medium"));
         document.getElementById("menu-prop-small").addEventListener("click", () => this._portSizeSelected("Small"));
 
+        $.fn.datetimepicker.Constructor.Default = $.extend({}, $.fn.datetimepicker.Constructor.Default, {
+            icons: {
+                time: "far fa-clock",
+                date: "far fa-calendar",
+                up: "fas fa-arrow-up",
+                down: "fas fa-arrow-down",
+                previous: "fas fa-chevron-left",
+                next: "fas fa-chevron-right",
+                today: "far fa-calendar-check",
+                clear: "fas fa-trash",
+                close: "fas fa-times"
+            },
+            timeZone: "UTC"
+        });
+
         $("#prop-pb-from").datetimepicker({
             format: this._timeFormat
         });
@@ -152,20 +155,7 @@ export default class PortSelect {
             event.preventDefault();
         });
 
-        // Adapted https://github.com/bootstrapthemesco/bootstrap-4-multi-dropdown-navbar
-        $(".nav-item .dropdown-menu .bootstrap-select .dropdown-toggle").on("click", event => {
-            const $el = $(event.currentTarget);
-
-            $el.next(".dropdown-menu").toggleClass("show");
-            $el.parent("li").toggleClass("show");
-            $el.parents("li.nav-item.dropdown.show").on("hidden.bs.dropdown", event2 => {
-                $(event2.currentTarget)
-                    .find("div.dropdown-menu.show")
-                    .removeClass("show");
-            });
-
-            return false;
-        });
+        initMultiDropdownNavbar();
         $(".selectpicker")
             .val("default")
             .selectpicker("refresh");
@@ -341,7 +331,6 @@ export default class PortSelect {
             this._nation = "";
             portData = this._ports.portDataDefault;
         }
-        $("#propertyDropdown").dropdown("toggle");
         this._ports.portData = portData;
         this._ports.showCurrentGood = false;
         this._ports.update();
@@ -363,7 +352,6 @@ export default class PortSelect {
         } else {
             portData = this._ports.portDataDefault;
         }
-        $("#propertyDropdown").dropdown("toggle");
         this._ports.portData = portData;
         this._ports.showCurrentGood = false;
         this._ports.update();
@@ -510,7 +498,6 @@ export default class PortSelect {
         } else {
             portData = this._ports.portDataDefault;
         }
-        $("#propertyDropdown").dropdown("toggle");
         this._ports.portData = portData;
         this._ports.update();
     }
