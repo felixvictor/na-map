@@ -145,7 +145,7 @@ export default class Journey {
             this._shipCompare = new ShipCompare(this._shipData, this._woodData, this._shipId);
             this._woodCompare = new WoodCompare(this._woodData, this._woodId);
 
-            initMultiDropdownNavbar();
+            initMultiDropdownNavbar("journeyNavbar");
         }
     }
 
