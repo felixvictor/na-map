@@ -331,6 +331,7 @@ export default class PortSelect {
             this._nation = "";
             portData = this._ports.portDataDefault;
         }
+        $("#propertyDropdown").dropdown("toggle");
         this._ports.portData = portData;
         this._ports.showCurrentGood = false;
         this._ports.update();
@@ -352,6 +353,7 @@ export default class PortSelect {
         } else {
             portData = this._ports.portDataDefault;
         }
+        $("#propertyDropdown").dropdown("toggle");
         this._ports.portData = portData;
         this._ports.showCurrentGood = false;
         this._ports.update();
@@ -498,6 +500,7 @@ export default class PortSelect {
         } else {
             portData = this._ports.portDataDefault;
         }
+        $("#propertyDropdown").dropdown("toggle");
         this._ports.portData = portData;
         this._ports.update();
     }
