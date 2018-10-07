@@ -113,10 +113,11 @@ export function insertBaseModal(id, title, large = true) {
 /**
  * Enable nested dropdowns in navbar
  * @link https://github.com/bootstrapthemesco/bootstrap-4-multi-dropdown-navbar
+ * @param {string} id - nav-item id
  * @return {void}
  */
-export function initMultiDropdownNavbar() {
-    $(".nav-item .dropdown-menu .bootstrap-select .dropdown-toggle").on("click", event => {
+export function initMultiDropdownNavbar(id) {
+    $(`#${id} .dropdown-menu .bootstrap-select .dropdown-toggle`).on("click", event => {
         console.log("click '.nav-item .dropdown-menu .bootstrap-select .dropdown-toggle'");
         const el$ = $(event.currentTarget);
 
