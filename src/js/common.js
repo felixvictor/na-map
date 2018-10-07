@@ -77,6 +77,7 @@ export function getDistance(pt0, pt1) {
  * @function
  * @param {string} id - Modal id
  * @param {string} title - Modal title
+ * @param {boolean} large - True when modal should be large (default)
  * @return {void}
  */
 export function insertBaseModal(id, title, large = true) {
@@ -107,6 +108,30 @@ export function insertBaseModal(id, title, large = true) {
         .attr("type", "button")
         .attr("class", "btn btn-secondary")
         .attr("data-dismiss", "modal");
+}
+
+/**
+ * Enable nested dropdowns in navbar
+ * @link https://github.com/bootstrapthemesco/bootstrap-4-multi-dropdown-navbar
+ * @return {void}
+ */
+export function initMultiDropdownNavbar() {
+    $(".nav-item .dropdown-menu .bootstrap-select .dropdown-toggle").on("click", event => {
+        console.log("click '.nav-item .dropdown-menu .bootstrap-select .dropdown-toggle'");
+        const el$ = $(event.currentTarget);
+
+        el$.next(".dropdown-menu").toggleClass("show");
+        el$.parent("li").toggleClass("show");
+        el$.parents("li.nav-item.dropdown.show").on("hidden.bs.dropdown", event2 => {
+            console.log("hidden.bs.dropdown 'li.nav-item.dropdown.show'");
+            $(event2.currentTarget)
+                .find(".dropdown-menu.show")
+                .not(".inner")
+                .removeClass("show");
+        });
+
+        return false;
+    });
 }
 
 // eslint-disable-next-line no-undef
