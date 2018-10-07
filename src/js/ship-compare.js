@@ -1175,18 +1175,26 @@ export default class ShipCompare {
      */
     _refreshShips(shipId, compareId) {
         const singleShipData = this._getShipData(shipId, compareId);
-        if (compareId === "Base") {
-            this._setShip(compareId, new ShipBase(compareId, singleShipData, this));
-            this._columnsCompare.forEach(id => {
-                $(`#${this._baseId}-${id}-select`)
-                    .removeAttr("disabled")
-                    .selectpicker("refresh");
-                if (!isEmpty(this.ships[id])) {
-                    this._setShip(id, new ShipComparison(id, singleShipData, this.ships[id]._shipCompareData, this));
-                }
-            });
-        } else {
-            this._setShip(compareId, new ShipComparison(compareId, this.ships.Base._shipData, singleShipData, this));
+        if (this._baseId !== "ship-journey") {
+            if (compareId === "Base") {
+                this._setShip(compareId, new ShipBase(compareId, singleShipData, this));
+                this._columnsCompare.forEach(id => {
+                    $(`#${this._baseId}-${id}-select`)
+                        .removeAttr("disabled")
+                        .selectpicker("refresh");
+                    if (!isEmpty(this.ships[id])) {
+                        this._setShip(
+                            id,
+                            new ShipComparison(id, singleShipData, this.ships[id]._shipCompareData, this)
+                        );
+                    }
+                });
+            } else {
+                this._setShip(
+                    compareId,
+                    new ShipComparison(compareId, this.ships.Base._shipData, singleShipData, this)
+                );
+            }
         }
     }
 
