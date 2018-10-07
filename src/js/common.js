@@ -123,15 +123,23 @@ export function initMultiDropdownNavbar(id) {
 
         el$.next(".dropdown-menu").toggleClass("show");
         el$.parent("li").toggleClass("show");
-        el$.parents("li.nav-item.dropdown.show").on("hidden.bs.dropdown", event2 => {
-            console.log("hidden.bs.dropdown 'li.nav-item.dropdown.show'");
+        el$.parents("li .nav-item .dropdown .show").on("hidden.bs.dropdown", event2 => {
+            console.log("hidden.bs.dropdown 'li .nav-item .dropdown .show'");
             $(event2.currentTarget)
-                .find(".dropdown-menu.show")
+                .find(".dropdown-menu .show")
                 .not(".inner")
                 .removeClass("show");
         });
 
         return false;
+    });
+    $(`#${id} .dropdown`).on("hidden.bs.dropdown", event => {
+        console.log("hidden.bs.dropdown '.dropdown'");
+        // hide any open menus when parent closes
+        $(event.currentTarget)
+            .find(".dropdown-menu .show")
+            .not(".inner")
+            .removeClass("show");
     });
 }
 
