@@ -19,7 +19,7 @@ import { compassDirections, degreesToCompass, rotationAngleInDegrees, formatF11 
 import { registerEvent } from "./analytics";
 import ShipCompare from "./ship-compare";
 import WoodCompare from "./wood-compare";
-import { convertInvCoordX, convertInvCoordY, getDistance, speedFactor } from "./common";
+import { convertInvCoordX, convertInvCoordY, getDistance, initMultiDropdownNavbar, speedFactor } from "./common";
 
 /**
  * Journey
@@ -65,23 +65,34 @@ export default class Journey {
         this._setupListener();
     }
 
+    _navbarClick(event) {
+        console.log("#journeyNavbar shown.bs.dropdown", event.target, event);
+        registerEvent("Menu", "Journey");
+        event.preventDefault();
+        // event.stopPropagation();
+        this._journeySelected();
+    }
+
     /**
      * Setup menu item listener
      * @returns {void}
      */
     _setupListener() {
-        $("#journeyNavbar").on("click", event => {
-            console.log("#journeyNavbar click");
+        /*
+        document.getElementById("journeyDropdown").addEventListener("click", event => {
+            // $("#journeyNavbar").on("click", event => {
+            console.log("#journeyDropdown click", event);
+            event.preventDefault();
             event.stopPropagation();
-            $("#journeyDropdown").dropdown();
-            this._journeySelected();
+            if (event.target.matches("a#journeyDropdown.dropdown-toggle.nav-link")) {
+                $("#journeyDropdown").dropdown();
+                this._journeySelected();
+            }
         });
-        $("#journeyNavbar").on("shown.bs.dropdown", event => {
-            console.log("#journeyNavbar shown.bs.dropdown");
-            registerEvent("Menu", "Journey");
-            event.stopPropagation();
-            this._journeySelected();
-        });
+        */
+        document
+            .getElementById("journeyNavbar")
+            .addEventListener("click", event => this._navbarClick(event), { once: true });
     }
 
     _setupWindInput() {
@@ -131,24 +142,10 @@ export default class Journey {
             this._injectInputs();
             this._setupWindInput();
 
-            // Adapted https://github.com/bootstrapthemesco/bootstrap-4-multi-dropdown-navbar
-            $(".nav-item .dropdown-menu form .form-group .bootstrap-select .dropdown-toggle").on("click", event => {
-                console.log("click");
-                const $el = $(event.currentTarget);
-
-                $el.next(".dropdown-menu").toggleClass("show");
-                $el.parent("li").toggleClass("show");
-                $el.parents("li.nav-item.dropdown.show").on("hidden.bs.dropdown", event2 => {
-                    $(event2.currentTarget)
-                        .find("div.dropdown-menu.show")
-                        .removeClass("show");
-                });
-
-                return false;
-            });
-
             this._shipCompare = new ShipCompare(this._shipData, this._woodData, this._shipId);
             this._woodCompare = new WoodCompare(this._woodData, this._woodId);
+
+            initMultiDropdownNavbar();
         }
     }
 
@@ -169,23 +166,20 @@ export default class Journey {
                 .attr("id", "journey-wind-direction")
                 .attr("class", "rslider");
 
-            const select = form.append("div").attr("class", "form-group");
-            select
-                .append("p")
+            const div = form.append("div").attr("class", "form-group");
+            div.append("p")
                 .attr("class", "form-text")
                 .text("2. Set ship");
 
-            const div1 = select.append("div").attr("class", "dropdown-item");
             const shipId = `${this._shipId}-Base-select`;
-            div1.append("label")
+            div.append("label")
                 .append("select")
                 .attr("name", shipId)
                 .attr("id", shipId);
 
             ["frame", "trim"].forEach(type => {
-                const div2 = select.append("div").attr("class", "dropdown-item");
                 const woodId = `${this._woodId}-${type}-Base-select`;
-                div2.append("label")
+                div.append("label")
                     .append("select")
                     .attr("name", woodId)
                     .attr("id", woodId);
