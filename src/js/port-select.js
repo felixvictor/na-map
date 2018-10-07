@@ -155,7 +155,7 @@ export default class PortSelect {
             event.preventDefault();
         });
 
-        initMultiDropdownNavbar();
+        initMultiDropdownNavbar("selectPortNavbar");
         $(".selectpicker")
             .val("default")
             .selectpicker("refresh");
