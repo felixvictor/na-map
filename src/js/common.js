@@ -118,26 +118,30 @@ export function insertBaseModal(id, title, large = true) {
  */
 export function initMultiDropdownNavbar(id) {
     $(`#${id} .dropdown-menu .bootstrap-select .dropdown-toggle`).on("click", event => {
-        console.log("click '.nav-item .dropdown-menu .bootstrap-select .dropdown-toggle'");
+        console.log("+++++++++++++++ click '.nav-item .dropdown-menu .bootstrap-select .dropdown-toggle'");
         const el$ = $(event.currentTarget);
 
         el$.next(".dropdown-menu").toggleClass("show");
         el$.parent("li").toggleClass("show");
-        el$.parents("li .nav-item .dropdown .show").on("hidden.bs.dropdown", event2 => {
-            console.log("hidden.bs.dropdown 'li .nav-item .dropdown .show'");
+        el$.parents("li.nav-item.dropdown.show").on("hidden.bs.dropdown", event2 => {
+            console.log(
+                "********** hidden.bs.dropdown 'li.nav-item.dropdown.show'",
+                $(event2.currentTarget).find(".dropdown.bootstrap-select > .dropdown-menu.show")
+            );
             $(event2.currentTarget)
-                .find(".dropdown-menu .show")
+                .find(".dropdown-menu.show")
                 .not(".inner")
                 .removeClass("show");
         });
 
         return false;
     });
-    $(`#${id} .dropdown`).on("hidden.bs.dropdown", event => {
-        console.log("hidden.bs.dropdown '.dropdown'");
+
+    $(`#${id} div.dropdown.bootstrap-select`).on("hidden", event => {
+        console.log("#################### hidden.bs.dropdown '.dropdown'");
         // hide any open menus when parent closes
         $(event.currentTarget)
-            .find(".dropdown-menu .show")
+            .find(".dropdown-menu.show")
             .not(".inner")
             .removeClass("show");
     });
