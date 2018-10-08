@@ -78,18 +78,6 @@ export default class Journey {
      * @returns {void}
      */
     _setupListener() {
-        /*
-        document.getElementById("journeyDropdown").addEventListener("click", event => {
-            // $("#journeyNavbar").on("click", event => {
-            console.log("#journeyDropdown click", event);
-            event.preventDefault();
-            event.stopPropagation();
-            if (event.target.matches("a#journeyDropdown.dropdown-toggle.nav-link")) {
-                $("#journeyDropdown").dropdown();
-                this._journeySelected();
-            }
-        });
-        */
         document
             .getElementById("journeyNavbar")
             .addEventListener("click", event => this._navbarClick(event), { once: true });
@@ -151,32 +139,30 @@ export default class Journey {
 
     _injectInputs() {
         if (d3.select("#journeyMenu form").empty()) {
-            const form = d3
+            const div = d3
                 .select("#journeyMenu")
-                .append("form")
-                .attr("id", "journey-form")
+                .append("div")
                 .attr("class", "p-2");
-            const slider = form.append("div").attr("class", "form-group");
+            const slider = div
+                .append("form")
+                .append("div")
+                .attr("class", "form-group");
             slider
                 .append("p")
                 .attr("class", "form-text")
                 .text("1. Set current in-game wind");
-            slider
-                .append("div")
+            slider.append("div")
                 .attr("id", "journey-wind-direction")
                 .attr("class", "rslider");
 
-            const div = form.append("div").attr("class", "form-group");
             div.append("p")
                 .attr("class", "form-text")
                 .text("2. Set ship");
-
             const shipId = `${this._shipId}-Base-select`;
             div.append("label")
                 .append("select")
                 .attr("name", shipId)
                 .attr("id", shipId);
-
             ["frame", "trim"].forEach(type => {
                 const woodId = `${this._woodId}-${type}-Base-select`;
                 div.append("label")

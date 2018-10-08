@@ -97,13 +97,21 @@ function main() {
     function setupListener() {
         $("#server-name").change(() => serverNameSelected());
         document.addEventListener("DOMContentLoaded", () => {
-            console.log("DOMContentLoaded");
             // https://stackoverflow.com/questions/44467377/bootstrap-4-multilevel-dropdown-inside-navigation/48953349#48953349
             $(".dropdown-submenu > a").on("click", event => {
-                console.log("click '.dropdown-submenu > a'");
+                console.log("=============== click '.dropdown-submenu > a'");
                 const submenu$ = $(event.currentTarget);
-                submenu$.next(".dropdown-menu").toggleClass("show");
+
+                $(".dropdown-submenu .dropdown-menu").removeClass("show");
+                submenu$.next(".dropdown-menu").addClass("show");
                 event.stopPropagation();
+            });
+
+            $(".dropdown").on("hidden.bs.dropdown", () => {
+                console.log("------------------ hidden.bs.dropdown '.dropdown'");
+                $(".dropdown-menu.show")
+                    .not(".inner")
+                    .removeClass("show");
             });
         });
     }
