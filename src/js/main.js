@@ -99,7 +99,6 @@ function main() {
         document.addEventListener("DOMContentLoaded", () => {
             // https://stackoverflow.com/questions/44467377/bootstrap-4-multilevel-dropdown-inside-navigation/48953349#48953349
             $(".dropdown-submenu > a").on("click", event => {
-                console.log("=============== click '.dropdown-submenu > a'");
                 const submenu$ = $(event.currentTarget);
 
                 $(".dropdown-submenu .dropdown-menu").removeClass("show");
@@ -108,7 +107,6 @@ function main() {
             });
 
             $(".dropdown").on("hidden.bs.dropdown", () => {
-                console.log("------------------ hidden.bs.dropdown '.dropdown'");
                 $(".dropdown-menu.show")
                     .not(".inner")
                     .removeClass("show");

@@ -1217,7 +1217,6 @@ export default class ShipCompare {
      */
     _setupSelectListener(compareId) {
         const selectShip$ = $(`#${this._baseId}-${compareId}-select`);
-        console.log("_setupSelectListener", `#${this._baseId}-${compareId}-select`);
         selectShip$
             .addClass("selectpicker")
             .on("changed.bs.select", event => {
