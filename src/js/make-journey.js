@@ -15,7 +15,7 @@ import moment from "moment";
 import "moment/locale/en-gb";
 import "round-slider/src/roundslider";
 
-import { compassDirections, degreesToCompass, rotationAngleInDegrees, formatF11 } from "./util";
+import { compassDirections, compassToDegrees, degreesToCompass, rotationAngleInDegrees, formatF11 } from "./util";
 import { registerEvent } from "./analytics";
 import ShipCompare from "./ship-compare";
 import WoodCompare from "./wood-compare";
@@ -51,9 +51,7 @@ export default class Journey {
 
         this._totalDistance = 0;
         this._totalMinutes = 0;
-        this._degreesCurrentWind = null;
-        this._shipDefaultId = 413; // Basic cutter
-        this._currentShipId = null;
+        this._currentWindDegrees = null;
 
         this._speedScale = d3.scaleLinear().domain(d3.range(0, this._fullCircle, this._degreesSegment));
 
@@ -66,7 +64,6 @@ export default class Journey {
     }
 
     _navbarClick(event) {
-        console.log("#journeyNavbar shown.bs.dropdown", event.target, event);
         registerEvent("Menu", "Journey");
         event.preventDefault();
         // event.stopPropagation();
@@ -151,7 +148,8 @@ export default class Journey {
                 .append("p")
                 .attr("class", "form-text")
                 .text("1. Set current in-game wind");
-            slider.append("div")
+            slider
+                .append("div")
                 .attr("id", "journey-wind-direction")
                 .attr("class", "rslider");
 
@@ -218,7 +216,6 @@ export default class Journey {
         const degreesForSpeedCalc = (this._fullCircle - degreesCourse + degreesCurrentWind) % this._fullCircle,
             speedCurrentSection = this._getSpeedAtDegrees(degreesForSpeedCalc) * this._owSpeedFactor,
             distanceCurrentSection = speedCurrentSection * speedFactor;
-        /*
         console.log(
             { degreesCourse },
             { degreesCurrentWind },
@@ -226,46 +223,38 @@ export default class Journey {
             { speedCurrentSection },
             { distanceCurrentSection }
         );
-*/
         return distanceCurrentSection;
     }
 
     _getStartWind() {
-        return 27;
-    }
-
-    _getCurrentShipId() {
-        let id = this._shipDefaultId;
-        if (typeof this._shipCompare !== "undefined") {
-            console.log(this._shipCompare);
-            console.log(this._shipCompare.ships);
-            console.log(this._shipCompare.ships.Base);
-            console.log(this._shipCompare.ships.Base._shipData);
-
-            [id] = this._shipCompare.ships.Base._shipData;
+        const currentUserWind = $("#journey-wind-direction").roundSlider("getValue");
+        let currentWindDegrees;
+        // Current wind in degrees
+        if (!$("#journey-wind-direction").length) {
+            currentWindDegrees = 0;
+        } else {
+            currentWindDegrees = +currentUserWind;
         }
-        return id;
+        return currentWindDegrees;
     }
 
     _setShipSpeed() {
-        const id = this._getCurrentShipId();
         // Dummy ship speed of 19 knots
-        let speedDegrees = Array.from(Array(24).fill(19));
+        let speedDegrees = Array.from(Array(24).fill(19 / 2));
 
         if (typeof this._shipCompare !== "undefined") {
-            speedDegrees = this._shipCompare.ships.Base._shipData
-                .filter(ship => ship.id === id)
-                .map(ship => ship.speedDegrees)[0];
+            ({ speedDegrees } = this._shipCompare._singleShipData);
         }
         this._speedScale.range(speedDegrees);
+        console.log(this._speedScale.range());
     }
 
-    _calculateMinutesForCourse(degreesCourse, degreesStartWind, distanceTotal) {
+    _calculateMinutesForCourse(courseDegrees, startWindDegrees, distanceTotal) {
         let distanceRemaining = distanceTotal,
-            degreesCurrentWind = degreesStartWind,
+            currentWindDegrees = startWindDegrees,
             totalMinutes = 0;
         while (distanceRemaining > 0) {
-            const distanceCurrentSection = this._calculateDistanceForSection(degreesCourse, degreesCurrentWind);
+            const distanceCurrentSection = this._calculateDistanceForSection(courseDegrees, currentWindDegrees);
             if (distanceRemaining > distanceCurrentSection) {
                 distanceRemaining -= distanceCurrentSection;
                 totalMinutes += 1;
@@ -273,13 +262,25 @@ export default class Journey {
                 totalMinutes += distanceRemaining / distanceCurrentSection;
                 distanceRemaining = 0;
             }
-            degreesCurrentWind = (this._fullCircle + degreesCurrentWind - this._degreesPerMinute) % this._fullCircle;
+            currentWindDegrees = (this._fullCircle + currentWindDegrees - this._degreesPerMinute) % this._fullCircle;
 
-            // console.log({ distanceCurrentSection }, { totalMinutes });
+            console.log({ distanceCurrentSection }, { totalMinutes });
         }
-        this._degreesCurrentWind = degreesCurrentWind;
+        this._currentWindDegrees = currentWindDegrees;
 
         return totalMinutes;
+    }
+
+    _getShipName() {
+        let text = "";
+        if (typeof this._shipCompare !== "undefined") {
+            text += ` \u2606 ${
+                this._shipCompare._woodCompare._woodsSelected.Base.frame
+            }/${this._shipCompare._woodCompare._woodsSelected.Base.trim.toLowerCase()} ${
+                this._shipCompare._singleShipData.name
+            }`;
+        }
+        return text;
     }
 
     _printLine() {
@@ -288,20 +289,21 @@ export default class Journey {
             pos2 = this._lineData.length - 2,
             pt1 = this._lineData[pos1],
             pt2 = this._lineData[pos2],
-            degreesCourse = rotationAngleInDegrees(pt1, pt2),
-            degreesStartWind = this._degreesCurrentWind || this._getStartWind(),
-            distance = getDistance(pt1, pt2),
-            compass = degreesToCompass(degreesCourse),
-            minutes = this._calculateMinutesForCourse(degreesCourse, degreesStartWind, distance * 1000);
+            courseDegrees = rotationAngleInDegrees(pt1, pt2),
+            startWindDegrees = this._currentWindDegrees || this._getStartWind(),
+            distanceK = getDistance(pt1, pt2),
+            courseCompass = degreesToCompass(courseDegrees);
+        console.log("*** start", { startWindDegrees }, { distanceK }, { courseCompass });
 
-        this._totalDistance += distance;
+        const minutes = this._calculateMinutesForCourse(courseDegrees, startWindDegrees, distanceK * 1000);
+        this._totalDistance += distanceK;
         this._totalMinutes += minutes;
         const duration = moment.duration(minutes, "minutes").humanize(true),
             totalDuration = moment.duration(this._totalMinutes, "minutes").humanize(true),
-            textDirection = `${compass} (${Math.round(degreesCourse)}°) \u2606 F11: ${formatF11(
+            textDirection = `${courseCompass} (${Math.round(courseDegrees)}°) \u2606 F11: ${formatF11(
                 convertInvCoordX(pt1.x, pt1.y)
-            )}\u202f/\u202f${formatF11(convertInvCoordY(pt1.x, pt1.y))}`;
-        let textDistance = `${Math.round(distance)}k ${duration}`;
+            )}\u202f/\u202f${formatF11(convertInvCoordY(pt1.x, pt1.y))}${this._getShipName()}`;
+        let textDistance = `${Math.round(distanceK)}k ${duration}`;
         const textLines = 2;
         if (this._lineData.length > 2) {
             textDistance += ` \u2606 total ${Math.round(this._totalDistance)}k ${totalDuration}`;
@@ -363,7 +365,9 @@ export default class Journey {
 
     clearMap() {
         this._bFirstCoord = true;
+        this._currentWindDegrees = null;
         this._totalDistance = 0;
+        this._totalMinutes = 0;
         if (typeof this._lineData !== "undefined") {
             this._lineData.splice(0, this._lineData.length);
         }
