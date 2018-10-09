@@ -1195,6 +1195,8 @@ export default class ShipCompare {
                     new ShipComparison(compareId, this.ships.Base._shipData, singleShipData, this)
                 );
             }
+        } else {
+            this._singleShipData = singleShipData;
         }
     }
 
