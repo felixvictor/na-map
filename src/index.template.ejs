@@ -30,7 +30,7 @@
             <li class="nav-item dropdown pr-2">
                 <a class="nav-link dropdown-toggle" href="#" id="predictDropdown" role="button" data-toggle="dropdown"
                    aria-haspopup="true" aria-expanded="false">
-                    Wind prediction
+                    Predict wind
                 </a>
                 <div class="dropdown-menu" id="predictMenu" aria-labelledby="predictDropdown">
                     <form id="windPrediction" class="p-2">
@@ -58,10 +58,19 @@
                 </div>
             </li>
 
+            <li class="nav-item dropdown pr-2" id="journeyNavbar">
+                <a class="nav-link dropdown-toggle" href="#" id="journeyDropdown" role="button" data-toggle="dropdown"
+                   aria-haspopup="true" aria-expanded="false">
+                    Make journey
+                </a>
+                <div class="dropdown-menu p-2" id="journeyMenu" aria-labelledby="journeyDropdown">
+                </div>
+            </li>
+
             <li class="nav-item dropdown pr-2">
                 <a class="nav-link dropdown-toggle" href="#" id="moveToDropdown" role="button" data-toggle="dropdown"
                    aria-haspopup="true" aria-expanded="false">
-                    Move to F11
+                    Go to F11
                 </a>
                 <div class="dropdown-menu large-width p-2" id="moveToMenu" aria-labelledby="moveToDropdown">
                     <form id="f11">
@@ -94,15 +103,6 @@
                 </div>
             </li>
 
-            <li class="nav-item dropdown pr-2" id="journeyNavbar">
-                <a class="nav-link dropdown-toggle" href="#" id="journeyDropdown" role="button" data-toggle="dropdown"
-                   aria-haspopup="true" aria-expanded="false">
-                    Make journey
-                </a>
-                <div class="dropdown-menu p-2" id="journeyMenu" aria-labelledby="journeyDropdown">
-                </div>
-            </li>
-
             <li class="nav-item pr-2">
                 <label><select name="port-names" id="port-names"></select></label>
             </li>
@@ -110,7 +110,7 @@
             <li id="selectPortNavbar" class="nav-item dropdown pr-2">
                 <a class="nav-link dropdown-toggle" href="#" id="propertyDropdown" role="button" data-toggle="dropdown"
                    aria-haspopup="true" aria-expanded="false">
-                    Select ports on
+                    Select ports
                 </a>
                 <div class="dropdown-menu" id="propertyMenu" aria-labelledby="propertyDropdown">
                     <h6 class="dropdown-header">Property</h6>
@@ -385,8 +385,10 @@
                 </div>
             </li>
         </ul>
-        <button id="reset" type="button" class="btn btn-outline-secondary">Clear</button>
-        <button id="about" type="button" class="btn btn-outline-secondary">About</button>
+        <div class="btn-group-vertical" role="group">
+            <button type="button" id="reset" class="btn btn-sm btn-outline-secondary">Clear</button>
+            <button type="button" id="about" class="btn btn-sm btn-outline-secondary">About</button>
+        </div>
     </div>
 </nav>
 
