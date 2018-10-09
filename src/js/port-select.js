@@ -265,6 +265,61 @@ export default class PortSelect {
         });
     }
 
+    _setTradePortPartners() {
+        const tradePortConsumedGoods = [],
+            tradePortProducedGoods = [];
+        function ConsumedGoodList() {}
+        ConsumedGoodList.prototype.add = goods => {
+            goods.forEach(good => {
+                tradePortConsumedGoods.push(good);
+            });
+        };
+        function ProducedGoodList() {}
+        ProducedGoodList.prototype.add = goods => {
+            goods.forEach(good => {
+                tradePortProducedGoods.push(good);
+            });
+        };
+        const consumedGoodList = new ConsumedGoodList(),
+            producedGoodList = new ProducedGoodList();
+
+        this._ports.portDataDefault.filter(port => port.id === this._ports.tradePortId).forEach(port => {
+            producedGoodList.add(port.properties.dropsTrading);
+            producedGoodList.add(port.properties.producesTrading);
+            consumedGoodList.add(port.properties.consumesTrading);
+        });
+
+        this._ports.portData = this._ports.portDataDefault.map(port => {
+            ["dropsTrading", "producesTrading"].forEach(type => {
+                port.properties[type].forEach(good => {
+                    if (tradePortConsumedGoods.includes(good)) {
+                        if (typeof port.properties.goodsToSellAtTradePort === "undefined") {
+                            // eslint-disable-next-line no-param-reassign
+                            port.properties.goodsToSellAtTradePort = [];
+                        }
+                        port.properties.goodsToSellAtTradePort.push(good);
+                        // eslint-disable-next-line prefer-destructuring,no-param-reassign
+                        port.properties.sellAtTradePort = true;
+                    }
+                });
+            });
+            ["consumesTrading"].forEach(type => {
+                port.properties[type].forEach(good => {
+                    if (tradePortProducedGoods.includes(good)) {
+                        if (typeof port.properties.goodsToBuyAtTradePort === "undefined") {
+                            // eslint-disable-next-line no-param-reassign
+                            port.properties.goodsToBuyAtTradePort = [];
+                        }
+                        port.properties.goodsToBuyAtTradePort.push(good);
+                        // eslint-disable-next-line prefer-destructuring,no-param-reassign
+                        port.properties.buyAtTradePort = true;
+                    }
+                });
+            });
+            return port;
+        });
+    }
+
     _portSelected(event) {
         const port = $(event.currentTarget).find(":selected");
         const c = port.val().split(",");
@@ -274,13 +329,21 @@ export default class PortSelect {
             this._ports.showCurrentGood = false;
             this._ports.update();
         } else {
-            const currentPort = { id: port.data("id").toString(), coord: { x: +c[0], y: +c[1] } };
-            this._ports.currentPort = currentPort;
+            const id = port.data("id").toString();
+            this._ports.currentPort = {
+                id,
+                coord: { x: +c[0], y: +c[1] }
+            };
+            this._ports.tradePortId = id;
+
+            this._setTradePortPartners();
+
+            console.log(this._ports.portData);
             if (this._pbZone._showPBZones) {
                 this._pbZone.refresh();
-                this._ports.showCurrentGood = false;
-                this._ports.update();
             }
+            this._ports.showCurrentGood = false;
+            this._ports.update();
             this._map.goToPort();
         }
     }
