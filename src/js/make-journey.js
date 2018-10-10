@@ -11,7 +11,7 @@
 /* global d3 : false
  */
 
-import { layoutTextLabel, layoutGreedy, layoutLabel, layoutRemoveOverlaps } from "d3fc-label-layout";
+import { layoutTextLabel, layoutAnnealing, layoutLabel } from "d3fc-label-layout";
 import moment from "moment";
 import "moment/locale/en-gb";
 import "round-slider/src/roundslider";
@@ -349,7 +349,7 @@ export default class Journey {
             });
 
         // Strategy that combines simulated annealing with removal of overlapping labels
-        const strategy = layoutRemoveOverlaps(layoutGreedy());
+        const strategy = layoutAnnealing();
 
         // Create the layout that positions the labels
         const labels = layoutLabel(strategy)
@@ -439,9 +439,8 @@ export default class Journey {
         this._currentWindDegrees = null;
         this._totalDistance = 0;
         this._totalMinutes = 0;
-        if (typeof this._lineData !== "undefined") {
-            this._lineData.splice(0, this._lineData.length);
-        }
+        this._courseLabels = [];
+        this._lineData = [];
 
         this._g.selectAll("*").remove();
     }
