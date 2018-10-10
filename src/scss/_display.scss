@@ -397,7 +397,7 @@ text {
     line-height: 1;
     background-color: transparent;
     circle {
-        fill: $secondary-700;
+        fill: $secondary-500;
         fill-opacity: 0.5;
     }
     text {
@@ -430,6 +430,9 @@ text {
     text {
         text-anchor: start;
     }
+  circle {
+    fill-opacity: 1;
+  }
 }
 
 .grid-background {
