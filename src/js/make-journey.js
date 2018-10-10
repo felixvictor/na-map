@@ -11,11 +11,12 @@
 /* global d3 : false
  */
 
+import { layoutTextLabel, layoutGreedy, layoutLabel, layoutRemoveOverlaps } from "d3fc-label-layout";
 import moment from "moment";
 import "moment/locale/en-gb";
 import "round-slider/src/roundslider";
 
-import { compassDirections, compassToDegrees, degreesToCompass, rotationAngleInDegrees, formatF11 } from "./util";
+import { compassDirections, degreesToCompass, rotationAngleInDegrees, formatF11 } from "./util";
 import { registerEvent } from "./analytics";
 import ShipCompare from "./ship-compare";
 import WoodCompare from "./wood-compare";
@@ -41,6 +42,9 @@ export default class Journey {
             .x(d => d.x)
             .y(d => d.y);
         this._lineData = [];
+
+        this._labelPadding = 20;
+        this._courseLabels = [];
 
         this._minutesForFullCircle = 48;
         this._fullCircle = 360;
@@ -194,8 +198,8 @@ export default class Journey {
 
     _printCompass() {
         const pos = this._lineData.length - 1,
-            x = this._lineData[pos].x,
-            y = this._lineData[pos].y;
+            { x } = this._lineData[pos],
+            { y } = this._lineData[pos];
         this._g
             .append("image")
             .classed("compass", true)
@@ -253,6 +257,8 @@ export default class Journey {
         let distanceRemaining = distanceTotal,
             currentWindDegrees = startWindDegrees,
             totalMinutes = 0;
+
+        this._setShipSpeed();
         while (distanceRemaining > 0) {
             const distanceCurrentSection = this._calculateDistanceForSection(courseDegrees, currentWindDegrees);
             if (distanceRemaining > distanceCurrentSection) {
@@ -274,75 +280,140 @@ export default class Journey {
     _getShipName() {
         let text = "";
         if (typeof this._shipCompare !== "undefined") {
-            text += ` \u2606 ${
+            text += `${
                 this._shipCompare._woodCompare._woodsSelected.Base.frame
             }/${this._shipCompare._woodCompare._woodsSelected.Base.trim.toLowerCase()} ${
                 this._shipCompare._singleShipData.name
-            }`;
+            }|`;
         }
         return text;
     }
 
-    _printLine() {
-        this._setShipSpeed();
-        const pos1 = this._lineData.length - 1,
-            pos2 = this._lineData.length - 2,
-            pt1 = this._lineData[pos1],
-            pt2 = this._lineData[pos2],
-            courseDegrees = rotationAngleInDegrees(pt1, pt2),
-            startWindDegrees = this._currentWindDegrees || this._getStartWind(),
-            distanceK = getDistance(pt1, pt2),
-            courseCompass = degreesToCompass(courseDegrees);
-        console.log("*** start", { startWindDegrees }, { distanceK }, { courseCompass });
+    /**
+     * Print labels
+     * @private
+     * @return {void}
+     */
+    _printLabels() {
+        /** Correct Text Box
+         *  - split text into lines
+         *  - correct box width
+         *  - enlarge circles
+         *  - remove last circle
+         * {@link https://stackoverflow.com/a/13275930}
+         * @param {object} d - Element
+         * @param {number} i - Index
+         * @param {object} nodes - Nodes
+         * @return {void}
+         */
+        const correctTextBox = (d, i, nodes) => {
+            // Split text into lines
+            const node = d3.select(nodes[i]),
+                text = node.select("text"),
+                lines = d.label.split("|"),
+                lineHeight = this._fontSize * 1.3;
 
-        const minutes = this._calculateMinutesForCourse(courseDegrees, startWindDegrees, distanceK * 1000);
-        this._totalDistance += distanceK;
-        this._totalMinutes += minutes;
-        const duration = moment.duration(minutes, "minutes").humanize(true),
-            totalDuration = moment.duration(this._totalMinutes, "minutes").humanize(true),
-            textDirection = `${courseCompass} (${Math.round(courseDegrees)}°) \u2606 F11: ${formatF11(
-                convertInvCoordX(pt1.x, pt1.y)
-            )}\u202f/\u202f${formatF11(convertInvCoordY(pt1.x, pt1.y))}${this._getShipName()}`;
-        let textDistance = `${Math.round(distanceK)}k ${duration}`;
-        const textLines = 2;
-        if (this._lineData.length > 2) {
-            textDistance += ` \u2606 total ${Math.round(this._totalDistance)}k ${totalDuration}`;
-        }
+            text.text("").attr("dy", 0);
+            lines.forEach((line, j) => {
+                const tspan = text.append("tspan").text(line);
+                if (j > 0) {
+                    tspan.attr("x", 0).attr("dy", lineHeight);
+                }
+            });
 
+            // Correct box width
+            const bbText = text.node().getBBox(),
+                rect = node.select("rect");
+            rect.attr("width", bbText.width + this._labelPadding * 2).attr(
+                "height",
+                bbText.height + this._labelPadding
+            );
+
+            // Enlarge circles
+            node.select("circle").attr("r", 10);
+
+            // Remove last circle
+            if (i === nodes.length - 1) {
+                node.select("circle").remove();
+            }
+        };
+
+        // Component used to render each label (take only single longest line)
+        const textLabel = layoutTextLabel()
+            .padding(this._labelPadding)
+            .value(d => {
+                const lines = d.label.split("|"),
+                    // Find longest line
+                    index = lines.reduce((p, c, i, a) => (a[p].length > c.length ? p : i), 0);
+                return lines[index];
+            });
+
+        // Strategy that combines simulated annealing with removal of overlapping labels
+        const strategy = layoutRemoveOverlaps(layoutGreedy());
+
+        // Create the layout that positions the labels
+        const labels = layoutLabel(strategy)
+            .size((d, i, nodes) => {
+                // measure the label and add the required padding
+                const numberLines = d.label.split("|").length,
+                    bbText = nodes[i].getElementsByTagName("text")[0].getBBox();
+                return [bbText.width + this._labelPadding * 2, bbText.height * numberLines + this._labelPadding * 2];
+            })
+            .position(d => d.position)
+            .component(textLabel);
+
+        // Render
+        this._g.datum(this._courseLabels).call(labels);
+        // Correct text boxes
+        this._g.selectAll("g.coord g.label").each(correctTextBox);
+    }
+
+    _printLines() {
         this.gCompass
             .datum(this._lineData)
-
             .attr("marker-end", "url(#course-arrow)")
             .attr("d", this._line);
+    }
 
-        const svg = this._g
-            .append("svg")
-            .attr("x", pt1.x)
-            .attr("y", pt1.y);
-        const textBackgroundBox = svg.append("rect");
-        const textDirectionBox = svg
-            .append("text")
-            .attr("x", "10%")
-            .attr("y", "33%")
-            .text(textDirection);
+    _getTextDirection(courseCompass, courseDegrees, pt1) {
+        return `${this._getShipName()}${courseCompass} (${Math.round(courseDegrees)}°) \u2606 F11: ${formatF11(
+            convertInvCoordX(pt1.x, pt1.y)
+        )}\u202f/\u202f${formatF11(convertInvCoordY(pt1.x, pt1.y))}`;
+    }
 
-        const textDistanceBox = svg
-            .append("text")
-            .attr("x", "10%")
-            .attr("y", "66%")
-            .text(textDistance);
+    _getTextDistance(distanceK, minutes) {
+        const duration = moment.duration(minutes, "minutes").humanize(true);
+        let textDistance = `${Math.round(distanceK)}k ${duration}`;
 
-        const bbTextDirectionBox = textDirectionBox.node().getBBox(),
-            bbTextDistanceBox = textDistanceBox.node().getBBox();
+        if (this._lineData.length > 2) {
+            const totalDuration = moment.duration(this._totalMinutes, "minutes").humanize(true);
+            textDistance += ` \u2606 total ${Math.round(this._totalDistance)}k ${totalDuration}`;
+        }
+        return textDistance;
+    }
 
-        const height = (bbTextDirectionBox.height + this._fontSize) * textLines * 1.1,
-            width = (Math.max(bbTextDirectionBox.width, bbTextDistanceBox.width) + this._fontSize) * 1.1;
-        textBackgroundBox
-            .attr("x", 0)
-            .attr("y", 0)
-            .attr("height", height)
-            .attr("width", width);
-        svg.attr("height", height).attr("width", width);
+    _setSegmentLabel() {
+        const pt1 = this._lineData[this._lineData.length - 1],
+            pt2 = this._lineData[this._lineData.length - 2],
+            courseDegrees = rotationAngleInDegrees(pt1, pt2),
+            distanceK = getDistance(pt1, pt2),
+            courseCompass = degreesToCompass(courseDegrees),
+            startWindDegrees = this._currentWindDegrees || this._getStartWind();
+
+        const minutes = this._calculateMinutesForCourse(courseDegrees, startWindDegrees, distanceK * 1000);
+        console.log("*** start", { startWindDegrees }, { distanceK }, { courseCompass });
+        this._totalDistance += distanceK;
+        this._totalMinutes += minutes;
+        const textDirection = this._getTextDirection(courseCompass, courseDegrees, pt1),
+            textDistance = this._getTextDistance(distanceK, minutes);
+
+        this._courseLabels.push({ label: `${textDirection}|${textDistance}`, position: [pt1.x, pt1.y] });
+    }
+
+    _printSegment() {
+        this._printLines();
+        this._setSegmentLabel();
+        this._printLabels();
     }
 
     /* public */
@@ -355,7 +426,7 @@ export default class Journey {
             this._printCompass();
             this._bFirstCoord = !this._bFirstCoord;
         } else {
-            this._printLine();
+            this._printSegment();
         }
     }
 
