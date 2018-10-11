@@ -2,9 +2,7 @@
     common.js
  */
 
-/* global d3 : false
- */
-
+import { select as d3Select } from "d3-selection";
 import { distancePoints } from "./util";
 
 const transformMatrix = {
@@ -81,8 +79,7 @@ export function getDistance(pt0, pt1) {
  * @return {void}
  */
 export function insertBaseModal(id, title, large = true) {
-    const modal = d3
-        .select("#modal-section")
+    const modal = d3Select("#modal-section")
         .append("section")
         .attr("id", id)
         .attr("class", "modal")
