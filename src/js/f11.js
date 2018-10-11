@@ -2,9 +2,7 @@
     f11.js
 */
 
-/* global d3 : false
- */
-
+import { select as d3Select } from "d3-selection";
 import { between, formatF11 } from "./util";
 import { convertCoordX, convertCoordY, convertInvCoordX, convertInvCoordY } from "./common";
 import { registerEvent } from "./analytics";
@@ -20,8 +18,7 @@ export default class F11 {
     }
 
     _setupSvg() {
-        this._g = d3
-            .select("#na-svg")
+        this._g = d3Select("#na-svg")
             .insert("g")
             .classed("f11", true);
     }

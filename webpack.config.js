@@ -152,7 +152,8 @@ const config = {
             Images: path.resolve(__dirname, "src/images/"),
             "@fortawesome/fontawesome-free-regular$": "@fortawesome/fontawesome-free-regular/shakable.es.js",
             "@fortawesome/fontawesome-free-solid$": "@fortawesome/fontawesome-free-solid/shakable.es.js"
-        }
+        },
+        mainFields: ["module", "main"]
     },
 
     optimization: {
