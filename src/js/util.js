@@ -8,13 +8,12 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-/* global d3 : false
- */
+import { formatPrefix as d3FormatPrefix, formatLocale as d3FormatLocale } from "d3-format";
 
 /**
  * Default format
  */
-const formatLocale = d3.formatLocale({
+const formatLocale = d3FormatLocale({
     decimal: ".",
     thousands: "\u202f",
     grouping: [3],
@@ -25,7 +24,7 @@ const formatLocale = d3.formatLocale({
 /**
  * format with SI suffix
  */
-const formatPrefix = d3.formatPrefix(",.0", 1e3);
+const formatPrefix = d3FormatPrefix(",.0", 1e3);
 
 /**
  * Format float
@@ -51,7 +50,7 @@ export const formatFloatFixed = (x, f = 2) =>
         .format(`.${f}f`)(x)
         .replace("-", "\u2212\u202f")
         .replace(".00", '<span class="hidden">.00</span>')
-        .replace(/\.(\d)0/g, ".$1<span class=\"hidden\">0</span>");
+        .replace(/\.(\d)0/g, '.$1<span class="hidden">0</span>');
 
 /**
  * Format F11 coordinate
