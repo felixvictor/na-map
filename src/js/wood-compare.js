@@ -8,10 +8,9 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-/* global d3 : false
- */
-
-import { capitalizeFirstLetter, formatFloat } from "./util";
+import { min as d3Min, max as d3Max } from "d3-array";
+import { select as d3Select } from "d3-selection";
+import { formatFloat } from "./util";
 import { registerEvent } from "./analytics";
 import { insertBaseModal } from "./common";
 
@@ -22,12 +21,12 @@ class Wood {
         this._select = `#${this._woodCompare._baseFunction}-${this._id}`;
 
         this._setupMainDiv();
-        this._g = d3.select(this._select).select("g");
+        this._g = d3Select(this._select).select("g");
     }
 
     _setupMainDiv() {
-        d3.select(`${this._select} div`).remove();
-        d3.select(this._select).append("div");
+        d3Select(`${this._select} div`).remove();
+        d3Select(this._select).append("div");
     }
 }
 
@@ -360,10 +359,10 @@ export default class WoodCompare {
                     )
                 ];
 
-            const minFrames = d3.min(frames) || 0,
-                maxFrames = d3.max(frames) || 0,
-                minTrims = d3.min(trims) || 0,
-                maxTrims = d3.max(trims) || 0;
+            const minFrames = d3Min(frames) || 0,
+                maxFrames = d3Max(frames) || 0,
+                minTrims = d3Min(trims) || 0,
+                maxTrims = d3Max(trims) || 0;
             this._addMinMaxProperty(property, {
                 min: minFrames + minTrims >= 0 ? 0 : minFrames + minTrims,
                 max: maxFrames + maxTrims
@@ -374,8 +373,7 @@ export default class WoodCompare {
     _injectModal() {
         insertBaseModal(this._modalId, this._baseName);
 
-        const row = d3
-            .select(`#${this._modalId} .modal-body`)
+        const row = d3Select(`#${this._modalId} .modal-body`)
             .append("div")
             .attr("class", "container-fluid")
             .append("div")

@@ -2,9 +2,9 @@
     port.js
 */
 
-/* global d3 : false
- */
-
+import { min as d3Min, max as d3Max } from "d3-array";
+import { scaleLinear as d3ScaleLinear } from "d3-scale";
+import { select as d3Select } from "d3-selection";
 import Cookies from "js-cookie";
 import moment from "moment";
 import "moment/locale/en-gb";
@@ -36,11 +36,10 @@ export default class PortDisplay {
         this._fontSize = defaultFontSize;
         this._circleSize = defaultCircleSize;
         this._showRadius = "attack";
-        this._taxIncomeRadius = d3.scaleLinear();
-        this._netIncomeRadius = d3.scaleLinear();
-        this._attackRadius = d3.scaleLinear().domain([0, 1]);
-        this._colourScale = d3
-            .scaleLinear()
+        this._taxIncomeRadius = d3ScaleLinear();
+        this._netIncomeRadius = d3ScaleLinear();
+        this._attackRadius = d3ScaleLinear().domain([0, 1]);
+        this._colourScale = d3ScaleLinear()
             .domain([0, 0.1, 0.5, 1])
             .range(["#eaeded", "#8b989c", "#6b7478", "#a62e39"]);
 
@@ -113,8 +112,7 @@ export default class PortDisplay {
     }
 
     _setupSvg() {
-        this._g = d3
-            .select("#na-svg")
+        this._g = d3Select("#na-svg")
             .append("g")
             .classed("ports", true);
         this._gPortCircle = this._g.append("g");
@@ -266,8 +264,7 @@ export default class PortDisplay {
 
     _setupSummary() {
         // Main box
-        const svgPortSummary = d3
-            .select("body")
+        const svgPortSummary = d3Select("body")
             .append("svg")
             .attr("id", "summary")
             .classed("summary", true)
@@ -336,7 +333,7 @@ export default class PortDisplay {
     }
 
     _setupFlags() {
-        const svgDef = d3.select("#na-svg defs");
+        const svgDef = d3Select("#na-svg defs");
 
         nations.map(d => d.short).forEach(nation => {
             const pattern = svgDef
@@ -572,7 +569,7 @@ export default class PortDisplay {
             return h;
         }
 
-        const port = d3.select(nodes[i]),
+        const port = d3Select(nodes[i]),
             title = tooltipData(this._getText(d.id, d.properties));
         port.attr("data-toggle", "tooltip");
         // eslint-disable-next-line no-underscore-dangle
@@ -593,7 +590,7 @@ export default class PortDisplay {
     _updateIcons() {
         function hideDetails(d, i, nodes) {
             // eslint-disable-next-line no-underscore-dangle
-            $(d3.select(nodes[i])._groups[0]).tooltip("hide");
+            $(d3Select(nodes[i])._groups[0]).tooltip("hide");
         }
 
         const circleScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale),
@@ -683,8 +680,8 @@ export default class PortDisplay {
         // Apply to both old and new
         const circleMerge = circleUpdate.merge(circleEnter);
         if (this._showRadius === "tax") {
-            const minTaxIncome = d3.min(data, d => d.properties.taxIncome),
-                maxTaxIncome = d3.max(data, d => d.properties.taxIncome);
+            const minTaxIncome = d3Min(data, d => d.properties.taxIncome),
+                maxTaxIncome = d3Max(data, d => d.properties.taxIncome);
 
             this._taxIncomeRadius.domain([minTaxIncome, maxTaxIncome]);
             this._taxIncomeRadius.range([rMin, rMax]);
@@ -692,8 +689,8 @@ export default class PortDisplay {
                 .attr("class", "bubble pos")
                 .attr("r", d => this._taxIncomeRadius(Math.abs(d.properties.taxIncome)));
         } else if (this._showRadius === "net") {
-            const minNetIncome = d3.min(data, d => d.properties.netIncome),
-                maxNetIncome = d3.max(data, d => d.properties.netIncome);
+            const minNetIncome = d3Min(data, d => d.properties.netIncome),
+                maxNetIncome = d3Max(data, d => d.properties.netIncome);
 
             this._netIncomeRadius.domain([minNetIncome, maxNetIncome]).range([rMin, rMax]);
             circleMerge

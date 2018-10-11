@@ -2,9 +2,8 @@
     pbzone.js
 */
 
-/* global d3 : false
- */
-
+import { geoPath as d3GeoPath} from "d3-geo";
+import { select as d3Select } from "d3-selection";
 import Cookies from "js-cookie";
 
 export default class PBZone {
@@ -49,8 +48,7 @@ export default class PBZone {
     }
 
     _setupSvg() {
-        this._g = d3
-            .select("#na-svg")
+        this._g = d3Select("#na-svg")
             .insert("g", "g.ports")
             .classed("pb", true);
         this._gJoinCirclesInner = this._g.append("path").classed("join-circle", true);
@@ -102,11 +100,11 @@ export default class PBZone {
     }
 
     _update() {
-        this._gPBCircles.datum(this._pbCircleData).attr("d", d3.geoPath().pointRadius(3.5));
-        this._gTowers.datum(this._towerData).attr("d", d3.geoPath().pointRadius(1.5));
-        this._gForts.datum(this._fortData).attr("d", d3.geoPath().pointRadius(2));
-        this._gJoinCirclesInner.datum(this._joinCircleData).attr("d", d3.geoPath().pointRadius(14));
-        this._gJoinCirclesOuter.datum(this._joinCircleData).attr("d", d3.geoPath().pointRadius(28));
+        this._gPBCircles.datum(this._pbCircleData).attr("d", d3GeoPath().pointRadius(3.5));
+        this._gTowers.datum(this._towerData).attr("d", d3GeoPath().pointRadius(1.5));
+        this._gForts.datum(this._fortData).attr("d", d3GeoPath().pointRadius(2));
+        this._gJoinCirclesInner.datum(this._joinCircleData).attr("d", d3GeoPath().pointRadius(14));
+        this._gJoinCirclesOuter.datum(this._joinCircleData).attr("d",d3GeoPath().pointRadius(28));
     }
 
     _isPortIn(d) {
