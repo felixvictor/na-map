@@ -8,10 +8,11 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-/* global d3 : false
- */
-
 import { layoutTextLabel, layoutAnnealing, layoutLabel } from "d3fc-label-layout";
+import { range as d3Range } from "d3-array";
+import { scaleLinear as d3ScaleLinear } from "d3-scale";
+import { select as d3Select } from "d3-selection";
+import { line as d3Line } from "d3-shape";
 import moment from "moment";
 import "moment/locale/en-gb";
 import "round-slider/src/roundslider";
@@ -37,8 +38,7 @@ export default class Journey {
 
         this._bFirstCoord = true;
         this._compassSize = 100;
-        this._line = d3
-            .line()
+        this._line = d3Line()
             .x(d => d.x)
             .y(d => d.y);
         this._lineData = [];
@@ -57,7 +57,7 @@ export default class Journey {
         this._totalMinutes = 0;
         this._currentWindDegrees = null;
 
-        this._speedScale = d3.scaleLinear().domain(d3.range(0, this._fullCircle, this._degreesSegment));
+        this._speedScale = d3ScaleLinear().domain(d3Range(0, this._fullCircle, this._degreesSegment));
 
         this._setupSvg();
 
@@ -139,9 +139,8 @@ export default class Journey {
     }
 
     _injectInputs() {
-        if (d3.select("#journeyMenu form").empty()) {
-            const div = d3
-                .select("#journeyMenu")
+        if (d3Select("#journeyMenu form").empty()) {
+            const div = d3Select("#journeyMenu")
                 .append("div")
                 .attr("class", "p-2");
             const slider = div
@@ -177,12 +176,11 @@ export default class Journey {
 
     /* private */
     _setupSvg() {
-        this._g = d3
-            .select("#na-svg")
+        this._g = d3Select("#na-svg")
             .append("g")
             .classed("coord", true);
 
-        d3.select("#na-svg defs")
+        d3Select("#na-svg defs")
             .append("marker")
             .attr("id", "course-arrow")
             .attr("viewBox", "0 -5 10 10")
@@ -308,7 +306,7 @@ export default class Journey {
          */
         const correctTextBox = (d, i, nodes) => {
             // Split text into lines
-            const node = d3.select(nodes[i]),
+            const node = d3Select(nodes[i]),
                 text = node.select("text"),
                 lines = d.label.split("|"),
                 lineHeight = this._fontSize * 1.3;
