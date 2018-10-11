@@ -8,13 +8,11 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-/* global d3 : false
- */
-
+import { select as d3Select } from "d3-selection";
 // eslint-disable-next-line import/no-named-default
 import { default as Tablesort } from "tablesort";
 import { insertBaseModal } from "./common";
-import { capitalizeFirstLetter, formatFloatFixed } from "./util";
+import { formatFloatFixed } from "./util";
 import { registerEvent } from "./analytics";
 
 /**
@@ -43,7 +41,7 @@ export default class WoodList {
     _injectModal() {
         insertBaseModal(this._modalId, this._baseName);
 
-        const body = d3.select(`#${this._modalId} .modal-body`);
+        const body = d3Select(`#${this._modalId} .modal-body`);
         body.append("h5").text("Frames");
         body.append("div")
             .attr("id", "frame-list")
