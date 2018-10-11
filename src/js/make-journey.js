@@ -36,15 +36,12 @@ export default class Journey {
         this._woodData = woodData;
         this._fontSize = fontSize;
 
-        this._bFirstCoord = true;
         this._compassSize = 100;
         this._line = d3Line()
-            .x(d => d.x)
-            .y(d => d.y);
-        this._lineData = [];
+            .x(d => d[0])
+            .y(d => d[1]);
 
         this._labelPadding = 20;
-        this._courseLabels = [];
 
         this._minutesForFullCircle = 48;
         this._fullCircle = 360;
@@ -53,10 +50,6 @@ export default class Journey {
         this._minOWSpeed = 2;
         this._owSpeedFactor = 2;
 
-        this._totalDistance = 0;
-        this._totalMinutes = 0;
-        this._currentWindDegrees = null;
-
         this._speedScale = d3ScaleLinear().domain(d3Range(0, this._fullCircle, this._degreesSegment));
 
         this._setupSvg();
@@ -64,6 +57,7 @@ export default class Journey {
         this._shipId = "ship-journey";
         this._woodId = "wood-journey";
         this._selected = false;
+        this._initJourney();
         this._setupListener();
     }
 
@@ -72,6 +66,17 @@ export default class Journey {
         event.preventDefault();
         // event.stopPropagation();
         this._journeySelected();
+    }
+
+    _initJourney() {
+        this._journey = {
+            startPosition: [null, null],
+            startWindDegrees: 0,
+            currentWindDegrees: 0,
+            totalDistance: 0,
+            totalMinutes: 0,
+            segment: []
+        };
     }
 
     /**
@@ -195,9 +200,8 @@ export default class Journey {
     }
 
     _printCompass() {
-        const pos = this._lineData.length - 1,
-            { x } = this._lineData[pos],
-            { y } = this._lineData[pos];
+        const x = this._journey.startPosition[0],
+            y = this._journey.startPosition[1];
         this._g
             .append("image")
             .classed("compass", true)
@@ -251,28 +255,36 @@ export default class Journey {
         console.log(this._speedScale.range());
     }
 
-    _calculateMinutesForCourse(courseDegrees, startWindDegrees, distanceTotal) {
-        let distanceRemaining = distanceTotal,
+    /**
+     * Segregate each segment into sections, calculate per section speed and distance (each section takes one minute)
+     * @param {number} courseDegrees - Ship course in degrees
+     * @param {number} startWindDegrees - Wind at start of segment
+     * @param {number} distanceSegment - Distance of segment
+     * @return {number} - Minutes needed to travel the segment
+     * @private
+     */
+    _calculateMinutesForSegment(courseDegrees, startWindDegrees, distanceSegment) {
+        let distanceRemaining = distanceSegment,
             currentWindDegrees = startWindDegrees,
-            totalMinutes = 0;
+            totalMinutesSegment = 0;
 
         this._setShipSpeed();
         while (distanceRemaining > 0) {
             const distanceCurrentSection = this._calculateDistanceForSection(courseDegrees, currentWindDegrees);
             if (distanceRemaining > distanceCurrentSection) {
                 distanceRemaining -= distanceCurrentSection;
-                totalMinutes += 1;
+                totalMinutesSegment += 1;
             } else {
-                totalMinutes += distanceRemaining / distanceCurrentSection;
+                totalMinutesSegment += distanceRemaining / distanceCurrentSection;
                 distanceRemaining = 0;
             }
             currentWindDegrees = (this._fullCircle + currentWindDegrees - this._degreesPerMinute) % this._fullCircle;
 
-            console.log({ distanceCurrentSection }, { totalMinutes });
+            console.log({ distanceCurrentSection }, { totalMinutesSegment });
         }
-        this._currentWindDegrees = currentWindDegrees;
+        this._journey.currentWindDegrees = currentWindDegrees;
 
-        return totalMinutes;
+        return totalMinutesSegment;
     }
 
     _getShipName() {
@@ -361,14 +373,14 @@ export default class Journey {
             .component(textLabel);
 
         // Render
-        this._g.datum(this._courseLabels).call(labels);
+        this._g.datum(this._journey.segment.map(segment => segment)).call(labels);
         // Correct text boxes
         this._g.selectAll("g.coord g.label").each(correctTextBox);
     }
 
     _printLines() {
         this.gCompass
-            .datum(this._lineData)
+            .datum([this._journey.startPosition].concat(this._journey.segment.map(segment => segment.position)))
             .attr("marker-end", "url(#course-arrow)")
             .attr("d", this._line);
     }
@@ -383,29 +395,40 @@ export default class Journey {
         const duration = moment.duration(minutes, "minutes").humanize(true);
         let textDistance = `${Math.round(distanceK)}k ${duration}`;
 
-        if (this._lineData.length > 2) {
-            const totalDuration = moment.duration(this._totalMinutes, "minutes").humanize(true);
-            textDistance += ` \u2606 total ${Math.round(this._totalDistance)}k ${totalDuration}`;
+        if (this._journey.segment.length > 1) {
+            const totalDuration = moment.duration(this._journey.totalMinutes, "minutes").humanize(true);
+            textDistance += ` \u2606 total ${Math.round(this._journey.totalDistance)}k ${totalDuration}`;
         }
         return textDistance;
     }
 
     _setSegmentLabel() {
-        const pt1 = this._lineData[this._lineData.length - 1],
-            pt2 = this._lineData[this._lineData.length - 2],
-            courseDegrees = rotationAngleInDegrees(pt1, pt2),
-            distanceK = getDistance(pt1, pt2),
-            courseCompass = degreesToCompass(courseDegrees),
-            startWindDegrees = this._currentWindDegrees || this._getStartWind();
+        const index = this._journey.segment.length - 1,
+            pt1 = { x: this._journey.segment[index].position[0], y: this._journey.segment[index].position[1] };
+        let pt2 = { x: 0, y: 0 };
+        if (index - 1 > 0) {
+            pt2 = { x: this._journey.segment[index - 1].position[0], y: this._journey.segment[index - 1].position[1] };
+        } else {
+            pt2 = { x: this._journey.startPosition[0], y: this._journey.startPosition[1] };
+        }
 
-        const minutes = this._calculateMinutesForCourse(courseDegrees, startWindDegrees, distanceK * 1000);
-        console.log("*** start", { startWindDegrees }, { distanceK }, { courseCompass });
-        this._totalDistance += distanceK;
-        this._totalMinutes += minutes;
+        const courseDegrees = rotationAngleInDegrees(pt1, pt2),
+            distanceK = getDistance(pt1, pt2),
+            courseCompass = degreesToCompass(courseDegrees);
+
+        const minutes = this._calculateMinutesForSegment(
+            courseDegrees,
+            this._journey.currentWindDegrees,
+            distanceK * 1000
+        );
+        console.log("*** start", this._journey.currentWindDegrees, { distanceK }, { courseCompass });
+        this._journey.totalDistance += distanceK;
+        this._journey.totalMinutes += minutes;
         const textDirection = this._getTextDirection(courseCompass, courseDegrees, pt1),
             textDistance = this._getTextDistance(distanceK, minutes);
 
-        this._courseLabels.push({ label: `${textDirection}|${textDistance}`, position: [pt1.x, pt1.y] });
+        this._journey.segment[index].label = `${textDirection}|${textDistance}`;
+        console.log("*** end", this._journey);
     }
 
     _printSegment() {
@@ -416,14 +439,14 @@ export default class Journey {
 
     /* public */
     plotCourse(x, y) {
-        if (this._bFirstCoord) {
+        if (!this._journey.startPosition[0]) {
             this.clearMap();
-        }
-        this._lineData.push({ x, y });
-        if (this._bFirstCoord) {
+            this._journey.startPosition = [x, y];
+            this._journey.startWindDegrees = this._getStartWind();
+            this._journey.currentWindDegrees = this._journey.startWindDegrees;
             this._printCompass();
-            this._bFirstCoord = !this._bFirstCoord;
         } else {
+            this._journey.segment.push({ position: [x, y], label: "" });
             this._printSegment();
         }
     }
@@ -433,13 +456,7 @@ export default class Journey {
     }
 
     clearMap() {
-        this._bFirstCoord = true;
-        this._currentWindDegrees = null;
-        this._totalDistance = 0;
-        this._totalMinutes = 0;
-        this._courseLabels = [];
-        this._lineData = [];
-
+        this._initJourney();
         this._g.selectAll("*").remove();
     }
 }
