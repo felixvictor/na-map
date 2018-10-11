@@ -8,18 +8,15 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-/* global d3 : false
- */
-
+import { range as d3Range } from "d3-array";
+import { event as d3Event, mouse as d3Mouse, select as d3Select } from "d3-selection";
+import { zoom as d3Zoom, zoomIdentity as d3ZoomIdentity, zoomTransform as d3ZoomTransform } from "d3-zoom";
 import { feature as topojsonFeature } from "topojson-client";
-import moment from "moment";
-import "moment/locale/en-gb";
 import Cookies from "js-cookie";
 
 import { appDescription, appTitle, appVersion, defaultFontSize, insertBaseModal } from "./common";
 import { nearestPow2, checkFetchStatus, getJsonFromFetch, putFetchError, roundToThousands } from "./util";
 
-// import Course from "./course";
 import F11 from "./f11";
 import Grid from "./grid";
 import PBZone from "./pbzone";
@@ -322,7 +319,6 @@ export default class Map {
         this._windPrediction = new WindPrediction(this.margin.left, this.margin.top);
         this._f11 = new F11(this);
         this._grid = new Grid(this);
-       // this._course = new Course(this.rem);
 
         this._init();
     }
@@ -349,8 +345,8 @@ export default class Map {
 
     _setupListener() {
         function stopProp() {
-            if (d3.event.defaultPrevented) {
-                d3.event.stopPropagation();
+            if (d3Event.defaultPrevented) {
+                d3Event.stopPropagation();
             }
         }
 
@@ -384,8 +380,7 @@ export default class Map {
 
     _setupSvg() {
         // noinspection JSSuspiciousNameCombination
-        this.zoom = d3
-            .zoom()
+        this.zoom = d3Zoom()
             .scaleExtent([this.minScale, this.maxScale])
             .translateExtent([
                 [
@@ -394,11 +389,10 @@ export default class Map {
                 ],
                 [this.coord.max, this.coord.max]
             ])
-            .wheelDelta(() => -this.wheelDelta * Math.sign(d3.event.deltaY))
+            .wheelDelta(() => -this.wheelDelta * Math.sign(d3Event.deltaY))
             .on("zoom", () => this._naZoomed());
 
-        this.svg = d3
-            .select("#na")
+        this.svg = d3Select("#na")
             .append("svg")
             .attr("id", "na-svg")
             .attr("width", this.width)
@@ -497,11 +491,11 @@ export default class Map {
             dx = this.coord.max * transform.k < this.width ? transform.x : 0,
             // crop bottom
             dy = this.coord.max * transform.k < this.height ? transform.y : 0,
-            cols = d3.range(
+            cols = d3Range(
                 Math.max(0, Math.floor((x0 - x) / this.tileSize / k)),
                 Math.max(0, Math.min(Math.ceil((x1 - x - dx) / this.tileSize / k), 2 ** tileZoom))
             ),
-            rows = d3.range(
+            rows = d3Range(
                 Math.max(0, Math.floor((y0 - y) / this.tileSize / k)),
                 Math.max(0, Math.min(Math.ceil((y1 - y - dy) / this.tileSize / k), 2 ** tileZoom))
             ),
@@ -521,7 +515,7 @@ export default class Map {
 
     _updateMap(tiles) {
         // noinspection JSSuspiciousNameCombination
-        const tileTransform = d3.zoomIdentity
+        const tileTransform = d3ZoomIdentity
             .translate(Math.round(tiles.translate[0]), Math.round(tiles.translate[1]))
             .scale(Math.round(tiles.scale * 1000) / 1000);
 
@@ -557,7 +551,7 @@ export default class Map {
         function initModal(id) {
             insertBaseModal(id, `${appTitle} <span class="text-primary small">v${appVersion}</span>`, false);
 
-            const body = d3.select(`#${id} .modal-body`);
+            const body = d3Select(`#${id} .modal-body`);
             body.html(
                 `<p>${appDescription} Please check the <a href="https://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/"> Game-Labs forum post</a> for further details. Feedback is very welcome.</p><p>Designed by iB aka Felix Victor, clan <a href="https://bccnavalaction.freeforums.net/">British Captains’ Club (BCC)</a>.</p>`
             );
@@ -573,8 +567,8 @@ export default class Map {
     }
 
     _doDoubleClickAction(self) {
-        const coord = d3.mouse(self),
-            transform = d3.zoomTransform(self);
+        const coord = d3Mouse(self),
+            transform = d3ZoomTransform(self);
         const mx = coord[0],
             my = coord[1],
             tk = transform.k,
@@ -602,8 +596,8 @@ export default class Map {
     }
 
     _setZoomLevelAndData() {
-        if (d3.event.transform.k !== this.currentScale) {
-            this.currentScale = d3.event.transform.k;
+        if (d3Event.transform.k !== this.currentScale) {
+            this.currentScale = d3Event.transform.k;
             if (this.currentScale > this.PBZoneZoomThreshold) {
                 if (this.zoomLevel !== "pbZone") {
                     this.zoomLevel = "pbZone";
@@ -639,9 +633,9 @@ export default class Map {
          * Current transform
          * @type {Transform}
          */
-        const zoomTransform = d3.zoomIdentity
-            .translate(Math.round(d3.event.transform.x), Math.round(d3.event.transform.y))
-            .scale(roundToThousands(d3.event.transform.k));
+        const zoomTransform = d3ZoomIdentity
+            .translate(Math.round(d3Event.transform.x), Math.round(d3Event.transform.y))
+            .scale(roundToThousands(d3Event.transform.k));
 
         this._displayMap(zoomTransform);
         this._grid.transform(zoomTransform);
@@ -797,7 +791,7 @@ export default class Map {
     }
 
     zoomAndPan(x, y, scale) {
-        const transform = d3.zoomIdentity
+        const transform = d3ZoomIdentity
             .scale(scale)
             .translate(Math.round(-x + this.width / 2 / scale), Math.round(-y + this.height / 2 / scale));
         this.svg.call(this.zoom.transform, transform);

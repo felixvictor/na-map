@@ -30,7 +30,6 @@ import "moment/locale/en-gb";
 import Cookies from "js-cookie";
 
 import { initAnalytics, registerPage } from "./analytics";
-import { initMultiDropdownNavbar } from "./common";
 
 import Map from "./map";
 
