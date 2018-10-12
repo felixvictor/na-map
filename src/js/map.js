@@ -549,7 +549,7 @@ export default class Map {
 
     _showAbout() {
         function initModal(id) {
-            insertBaseModal(id, `${appTitle} <span class="text-primary small">v${appVersion}</span>`, false);
+            insertBaseModal(id, `${appTitle} <span class="text-primary small">v${appVersion}</span>`, "");
 
             const body = d3Select(`#${id} .modal-body`);
             body.html(
