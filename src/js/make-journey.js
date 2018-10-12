@@ -21,7 +21,7 @@ import { compassDirections, degreesToCompass, rotationAngleInDegrees, formatF11 
 import { registerEvent } from "./analytics";
 import ShipCompare from "./ship-compare";
 import WoodCompare from "./wood-compare";
-import { convertInvCoordX, convertInvCoordY, getDistance, initMultiDropdownNavbar, speedFactor } from "./common";
+import { convertInvCoordX, convertInvCoordY, getDistance, insertBaseModal, speedFactor } from "./common";
 
 /**
  * Journey
@@ -54,18 +54,33 @@ export default class Journey {
 
         this._setupSvg();
 
+        this._baseName = "Make journey";
+        this._baseId = "make-journey";
+        this._buttonId = `button-${this._baseId}`;
+        this._modalId = `modal-${this._baseId}`;
         this._shipId = "ship-journey";
         this._woodId = "wood-journey";
-        this._selected = false;
         this._initJourney();
         this._setupListener();
     }
 
-    _navbarClick(event) {
-        registerEvent("Menu", "Journey");
-        event.preventDefault();
-        // event.stopPropagation();
-        this._journeySelected();
+    _setupSvg() {
+        this._g = d3Select("#na-svg")
+            .append("g")
+            .classed("coord", true);
+
+        d3Select("#na-svg defs")
+            .append("marker")
+            .attr("id", "course-arrow")
+            .attr("viewBox", "0 -5 10 10")
+            .attr("refX", 8)
+            .attr("refY", 0)
+            .attr("markerWidth", 5)
+            .attr("markerHeight", 5)
+            .attr("orient", "auto")
+            .append("path")
+            .attr("d", "M0,-5L10,0L0,5")
+            .attr("class", "course-head");
     }
 
     _initJourney() {
@@ -79,14 +94,18 @@ export default class Journey {
         };
     }
 
+    _navbarClick(event) {
+        registerEvent("Menu", "Journey");
+        event.stopPropagation();
+        this._journeySelected();
+    }
+
     /**
      * Setup menu item listener
      * @returns {void}
      */
     _setupListener() {
-        document
-            .getElementById("journeyNavbar")
-            .addEventListener("click", event => this._navbarClick(event), { once: true });
+        document.getElementById("journeyNavbar").addEventListener("click", event => this._navbarClick(event));
     }
 
     _setupWindInput() {
@@ -125,78 +144,63 @@ export default class Journey {
         });
     }
 
+    _injectModal() {
+        insertBaseModal(this._modalId, this._baseName, "sm");
+
+        const body = d3Select(`#${this._modalId} .modal-body`);
+        const slider = body
+            .append("form")
+            .append("div")
+            .attr("class", "form-group");
+        slider
+            .append("p")
+            .attr("class", "form-text")
+            .text("1. Set current in-game wind");
+        slider
+            .append("div")
+            .attr("id", "journey-wind-direction")
+            .attr("class", "rslider");
+
+        body.append("p")
+            .attr("class", "form-text")
+            .text("2. Set ship");
+        const shipId = `${this._shipId}-Base-select`;
+        const div = body.append("div").attr("class", "d-flex flex-column");
+        div.append("label")
+            .append("select")
+            .attr("name", shipId)
+            .attr("id", shipId);
+        ["frame", "trim"].forEach(type => {
+            const woodId = `${this._woodId}-${type}-Base-select`;
+            div.append("label")
+                .append("select")
+                .attr("name", woodId)
+                .attr("id", woodId);
+        });
+    }
+
+    /**
+     * Init modal
+     * @returns {void}
+     */
+    _initModal() {
+        this._injectModal();
+        this._setupWindInput();
+        this._shipCompare = new ShipCompare(this._shipData, this._woodData, this._shipId);
+        this._woodCompare = new WoodCompare(this._woodData, this._woodId);
+    }
+
     /**
      * Action when selected
      * @returns {void}
      */
     _journeySelected() {
-        if (!this._selected) {
-            this._selected = true;
-
-            this._injectInputs();
-            this._setupWindInput();
-
-            this._shipCompare = new ShipCompare(this._shipData, this._woodData, this._shipId);
-            this._woodCompare = new WoodCompare(this._woodData, this._woodId);
-
-            initMultiDropdownNavbar("journeyNavbar");
+        // If the modal has no content yet, insert it
+        if (!document.getElementById(this._modalId)) {
+            this._initModal();
         }
-    }
-
-    _injectInputs() {
-        if (d3Select("#journeyMenu form").empty()) {
-            const div = d3Select("#journeyMenu")
-                .append("div")
-                .attr("class", "p-2");
-            const slider = div
-                .append("form")
-                .append("div")
-                .attr("class", "form-group");
-            slider
-                .append("p")
-                .attr("class", "form-text")
-                .text("1. Set current in-game wind");
-            slider
-                .append("div")
-                .attr("id", "journey-wind-direction")
-                .attr("class", "rslider");
-
-            div.append("p")
-                .attr("class", "form-text")
-                .text("2. Set ship");
-            const shipId = `${this._shipId}-Base-select`;
-            div.append("label")
-                .append("select")
-                .attr("name", shipId)
-                .attr("id", shipId);
-            ["frame", "trim"].forEach(type => {
-                const woodId = `${this._woodId}-${type}-Base-select`;
-                div.append("label")
-                    .append("select")
-                    .attr("name", woodId)
-                    .attr("id", woodId);
-            });
-        }
-    }
-
-    /* private */
-    _setupSvg() {
-        this._g = d3Select("#na-svg")
-            .append("g")
-            .classed("coord", true);
-
-        d3Select("#na-svg defs")
-            .append("marker")
-            .attr("id", "course-arrow")
-            .attr("viewBox", "0 -5 10 10")
-            .attr("refX", 8)
-            .attr("refY", 0)
-            .attr("markerWidth", 5)
-            .attr("markerHeight", 5)
-            .attr("orient", "auto")
-            .append("path")
-            .attr("d", "M0,-5L10,0L0,5")
-            .attr("class", "course-head");
+        // Show modal
+        $(`#${this._modalId}`).modal("show");
     }
 
     _printCompass() {

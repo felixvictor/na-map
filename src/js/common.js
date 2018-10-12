@@ -75,10 +75,10 @@ export function getDistance(pt0, pt1) {
  * @function
  * @param {string} id - Modal id
  * @param {string} title - Modal title
- * @param {boolean} large - True when modal should be large (default)
+ * @param {string} size - "lg" when modal should be large (default)
  * @return {void}
  */
-export function insertBaseModal(id, title, large = true) {
+export function insertBaseModal(id, title, size = "lg") {
     const modal = d3Select("#modal-section")
         .append("section")
         .attr("id", id)
@@ -88,7 +88,7 @@ export function insertBaseModal(id, title, large = true) {
         .attr("tabindex", "-1")
         .attr("role", "dialog")
         .append("div")
-        .attr("class", `modal-dialog${large ? " modal-lg" : ""}`)
+        .attr("class", `modal-dialog${size === "lg" || size === "sm" ? ` modal-${size}` : ""}`)
         .attr("role", "document");
 
     const content = modal.append("div").attr("class", "modal-content");
