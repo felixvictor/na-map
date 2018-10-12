@@ -36,19 +36,6 @@ pattern .all {
     }
 }
 
-.bootstrap-select > .dropdown-toggle {
-    padding-left: 15px;
-    padding-right: 15px;
-}
-
-.modal-body .bootstrap-select > .dropdown-toggle {
-    width: 18rem;
-}
-
-.modal-body .wood .bootstrap-select > .dropdown-toggle {
-    width: 15rem;
-}
-
 .card {
     border: none;
 }
@@ -88,10 +75,6 @@ table a {
     @include hover-focus {
         text-decoration-style: solid !important;
     }
-}
-
-.modal-header {
-    padding-left: calc(1rem + 15px);
 }
 
 .recipes,
