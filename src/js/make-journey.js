@@ -10,8 +10,9 @@
 
 import { layoutTextLabel, layoutAnnealing, layoutLabel } from "d3fc-label-layout";
 import { range as d3Range } from "d3-array";
+import { drag as d3Drag } from "d3-drag";
 import { scaleLinear as d3ScaleLinear } from "d3-scale";
-import { select as d3Select } from "d3-selection";
+import { event as d3Event, select as d3Select } from "d3-selection";
 import { line as d3Line } from "d3-shape";
 import moment from "moment";
 import "moment/locale/en-gb";
@@ -40,6 +41,28 @@ export default class Journey {
         this._line = d3Line()
             .x(d => d[0])
             .y(d => d[1]);
+        this._drag = d3Drag()
+            .on("start", (d, i, nodes) => {
+                console.log("dragStart", { d }, { i }, { d3Event });
+                console.log("dragStart", nodes[i], d3Select(nodes[i]));
+                d3Select(nodes[i]).classed("drag-active", true);
+            })
+            .on("drag", (d, i) => {
+                console.log("drag.on", { d }, { i }, { d3Event }, d3Select(this));
+                d3Event.sourceEvent.stopPropagation();
+                // var domain = yRange.domain();
+                // d.y = Math.max(domain[0], Math.min(yRange.invert(d3.event.y), domain[1]))
+                // d3Select(this).attr("cy", yRange(d.y));
+                d.position = [d.position[0] + d3Event.dx, d.position[1] + d3Event.dy];
+                this._printLines();
+            })
+            .on("end", (d, i, nodes) => {
+                console.log("dragEnd", { d }, { i }, { d3Event }, d3Event.x, d3Event.y);
+                d3Select(nodes[i]).classed("drag-active", false);
+                this._journey.segment[i].position = [d.position[0] + d3Event.x, d.position[1] + d3Event.y];
+                this._printJourney();
+                // d.position=[,];
+            });
 
         this._labelPadding = 20;
 
@@ -92,6 +115,13 @@ export default class Journey {
             totalMinutes: 0,
             segment: []
         };
+    }
+
+    _resetJourney() {
+        this._journey.startWindDegrees = this._getStartWind();
+        this._journey.currentWindDegrees = this._journey.startWindDegrees;
+        this._journey.totalDistance = 0;
+        this._journey.totalMinutes = 0;
     }
 
     _navbarClick(event) {
@@ -215,7 +245,7 @@ export default class Journey {
             .attr("height", this._compassSize)
             .attr("width", this._compassSize)
             .attr("xlink:href", "icons/compass.svg");
-        this.gCompass = this._g.append("path");
+        this.gJourneyPath = this._g.append("path");
     }
 
     _getSpeedAtDegrees(degrees) {
@@ -226,6 +256,7 @@ export default class Journey {
         const degreesForSpeedCalc = (this._fullCircle - degreesCourse + degreesCurrentWind) % this._fullCircle,
             speedCurrentSection = this._getSpeedAtDegrees(degreesForSpeedCalc) * this._owSpeedFactor,
             distanceCurrentSection = speedCurrentSection * speedFactor;
+        /*
         console.log(
             { degreesCourse },
             { degreesCurrentWind },
@@ -233,6 +264,7 @@ export default class Journey {
             { speedCurrentSection },
             { distanceCurrentSection }
         );
+        */
         return distanceCurrentSection;
     }
 
@@ -284,7 +316,7 @@ export default class Journey {
             }
             currentWindDegrees = (this._fullCircle + currentWindDegrees - this._degreesPerMinute) % this._fullCircle;
 
-            console.log({ distanceCurrentSection }, { totalMinutesSegment });
+            // console.log({ distanceCurrentSection }, { totalMinutesSegment });
         }
         this._journey.currentWindDegrees = currentWindDegrees;
 
@@ -357,7 +389,7 @@ export default class Journey {
             .padding(this._labelPadding)
             .value(d => {
                 const lines = d.label.split("|"),
-                    // Find longest line
+                    // Find longest line (number of characters)
                     index = lines.reduce((p, c, i, a) => (a[p].length > c.length ? p : i), 0);
                 return lines[index];
             });
@@ -383,7 +415,7 @@ export default class Journey {
     }
 
     _printLines() {
-        this.gCompass
+        this.gJourneyPath
             .datum([this._journey.startPosition].concat(this._journey.segment.map(segment => segment.position)))
             .attr("marker-end", "url(#course-arrow)")
             .attr("d", this._line);
@@ -406,9 +438,8 @@ export default class Journey {
         return textDistance;
     }
 
-    _setSegmentLabel() {
-        const index = this._journey.segment.length - 1,
-            pt1 = { x: this._journey.segment[index].position[0], y: this._journey.segment[index].position[1] };
+    _setSegmentLabel(index = this._journey.segment.length - 1) {
+        const pt1 = { x: this._journey.segment[index].position[0], y: this._journey.segment[index].position[1] };
         let pt2 = { x: 0, y: 0 };
         if (index - 1 > 0) {
             pt2 = { x: this._journey.segment[index - 1].position[0], y: this._journey.segment[index - 1].position[1] };
@@ -439,6 +470,20 @@ export default class Journey {
         this._printLines();
         this._setSegmentLabel();
         this._printLabels();
+        const circles = this._g.selectAll("g.coord g.label circle").call(this._drag);
+        console.log(circles);
+        // d3Drag(circles);
+    }
+
+    _printJourney() {
+        this._printLines();
+        this._resetJourney();
+        this._journey.segment.forEach((d, i) => {
+            this._setSegmentLabel(i);
+        });
+
+        this._printLabels();
+        this._g.selectAll("g.coord g.label circle").call(this._drag);
     }
 
     /* public */
@@ -446,8 +491,7 @@ export default class Journey {
         if (!this._journey.startPosition[0]) {
             this.clearMap();
             this._journey.startPosition = [x, y];
-            this._journey.startWindDegrees = this._getStartWind();
-            this._journey.currentWindDegrees = this._journey.startWindDegrees;
+            this._resetJourney();
             this._printCompass();
         } else {
             this._journey.segment.push({ position: [x, y], label: "" });
