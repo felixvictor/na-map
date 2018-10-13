@@ -29,8 +29,9 @@ import { convertInvCoordX, convertInvCoordY, getDistance, insertBaseModal, speed
  */
 export default class Journey {
     /**
-     * @param {Object} shipData - Ship data
-     * @param {Object} woodData - Wood data
+     * @param {object} shipData - Ship data
+     * @param {object} woodData - Wood data
+     * @param {number} fontSize - Font size
      */
     constructor(shipData, woodData, fontSize) {
         this._shipData = shipData;
@@ -45,23 +46,23 @@ export default class Journey {
             .on("start", (d, i, nodes) => {
                 console.log("dragStart", { d }, { i }, { d3Event });
                 console.log("dragStart", nodes[i], d3Select(nodes[i]));
+                this._removeLabels();
                 d3Select(nodes[i]).classed("drag-active", true);
             })
-            .on("drag", (d, i) => {
+            .on("drag", (d, i, nodes) => {
                 console.log("drag.on", { d }, { i }, { d3Event }, d3Select(this));
-                d3Event.sourceEvent.stopPropagation();
-                // var domain = yRange.domain();
-                // d.y = Math.max(domain[0], Math.min(yRange.invert(d3.event.y), domain[1]))
-                // d3Select(this).attr("cy", yRange(d.y));
+                d3Select(nodes[i])
+                    .attr("cx", d3Event.x)
+                    .attr("cy", d3Event.y);
+                // eslint-disable-next-line no-param-reassign
                 d.position = [d.position[0] + d3Event.dx, d.position[1] + d3Event.dy];
                 this._printLines();
             })
             .on("end", (d, i, nodes) => {
                 console.log("dragEnd", { d }, { i }, { d3Event }, d3Event.x, d3Event.y);
                 d3Select(nodes[i]).classed("drag-active", false);
-                this._journey.segment[i].position = [d.position[0] + d3Event.x, d.position[1] + d3Event.y];
+                //  this._journey.segment[i].position = [d.position[0] + d3Event.x, d.position[1] + d3Event.y];
                 this._printJourney();
-                // d.position=[,];
             });
 
         this._labelPadding = 20;
@@ -336,6 +337,17 @@ export default class Journey {
     }
 
     /**
+     * Remove label text boxes
+     * @return {void}
+     * @private
+     */
+    _removeLabels() {
+        const label = this._g.selectAll("g.coord g.label");
+        label.select("text").remove();
+        label.select("rect").remove();
+    }
+
+    /**
      * Print labels
      * @private
      * @return {void}
@@ -376,11 +388,17 @@ export default class Journey {
             );
 
             // Enlarge circles
-            node.select("circle").attr("r", 10);
+            const circle = node
+                .select("circle")
+                .attr("r", 10)
+                .attr("class", "");
+
+            // Move circles above text box
+            node.append(() => circle.remove().node());
 
             // Remove last circle
             if (i === nodes.length - 1) {
-                node.select("circle").remove();
+                circle.attr("r", 20).attr("class", "drag-hidden");
             }
         };
 
@@ -439,9 +457,10 @@ export default class Journey {
     }
 
     _setSegmentLabel(index = this._journey.segment.length - 1) {
+        console.log("_setSegmentLabel", index);
         const pt1 = { x: this._journey.segment[index].position[0], y: this._journey.segment[index].position[1] };
         let pt2 = { x: 0, y: 0 };
-        if (index - 1 > 0) {
+        if (index > 0) {
             pt2 = { x: this._journey.segment[index - 1].position[0], y: this._journey.segment[index - 1].position[1] };
         } else {
             pt2 = { x: this._journey.startPosition[0], y: this._journey.startPosition[1] };
@@ -470,9 +489,7 @@ export default class Journey {
         this._printLines();
         this._setSegmentLabel();
         this._printLabels();
-        const circles = this._g.selectAll("g.coord g.label circle").call(this._drag);
-        console.log(circles);
-        // d3Drag(circles);
+        this._g.selectAll("g.coord g.label circle").call(this._drag);
     }
 
     _printJourney() {
