@@ -380,7 +380,7 @@ text {
   line-height: 1;
   background-color: transparent;
   circle {
-    fill: $secondary-500;
+    fill: $secondary-600;
     fill-opacity: 0.5;
   }
   text {
@@ -415,6 +415,17 @@ text {
   }
   circle {
     fill-opacity: 1;
+    cursor: pointer;
+  }
+  .drag-active {
+    stroke: $secondary-100;
+    stroke-width: 0.25rem;
+  }
+  .drag-hidden {
+    fill-opacity: 0;
+  }
+  .drag-hidden.drag-active {
+    stroke-width: 0;
   }
 }
 
@@ -668,8 +679,4 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
 
 .hidden {
   visibility: hidden;
-}
-
-.drag-active {
-  fill: $red !important;
 }
