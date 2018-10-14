@@ -55,6 +55,9 @@ export default class Journey {
             })
             .on("drag", (d, i, nodes) => {
                 console.log("drag.on", { d }, { i }, { d3Event }, d3Select(this));
+                if (i === 0) {
+                    this._compass.attr("x", d.position[0] + d3Event.dx).attr("y", d.position[1] + d3Event.dy);
+                }
                 d3Select(nodes[i])
                     .attr("cx", d3Event.x)
                     .attr("cy", d3Event.y);
@@ -119,12 +122,11 @@ export default class Journey {
         this._journey = {
             shipName: this._defaultShipName,
             woodNames: "",
-            startPosition: [null, null],
             startWindDegrees: this._defaultStartWindDegrees,
             currentWindDegrees: this._defaultStartWindDegrees,
             totalDistance: 0,
             totalMinutes: 0,
-            segment: []
+            segment: [{ position: [null, null], label: "" }]
         };
     }
 
@@ -256,9 +258,9 @@ export default class Journey {
     }
 
     _printCompass() {
-        const x = this._journey.startPosition[0],
-            y = this._journey.startPosition[1];
-        this._g
+        const x = this._journey.segment[0].position[0],
+            y = this._journey.segment[0].position[1];
+        this._compass = this._g
             .append("image")
             .classed("compass", true)
             .attr("x", x)
@@ -408,11 +410,10 @@ export default class Journey {
 
             // Correct box width
             const bbText = text.node().getBBox(),
-                rect = node.select("rect");
-            rect.attr("width", bbText.width + this._labelPadding * 2).attr(
-                "height",
-                bbText.height + this._labelPadding
-            );
+                rect = node.select("rect"),
+                width = d.label ? bbText.width + this._labelPadding * 2 : 0,
+                height = d.label ? bbText.height + this._labelPadding : 0;
+            rect.attr("width", width).attr("height", height);
 
             // Enlarge circles
             const circle = node
@@ -424,7 +425,7 @@ export default class Journey {
             node.append(() => circle.remove().node());
 
             // Remove last circle
-            if (i === nodes.length - 1) {
+            if (i === 0 || i === nodes.length - 1) {
                 circle.attr("r", 20).attr("class", "drag-hidden");
             }
         };
@@ -502,7 +503,7 @@ export default class Journey {
             secondLine = "50%",
             thirdLine = "75%",
             firstBlock = this._fontSize * 2,
-            secondBlock = Math.round(firstBlock + bboxShipDes.width * 2 + firstBlock/2);
+            secondBlock = Math.round(firstBlock + bboxShipDes.width * 2 + firstBlock / 2);
 
         this._svgJourneySummary.attr("height", height).attr("width", width);
         journeySummaryRect.attr("height", height).attr("width", width);
@@ -544,7 +545,11 @@ export default class Journey {
 
     _printLines() {
         this.gJourneyPath
-            .datum([this._journey.startPosition].concat(this._journey.segment.map(segment => segment.position)))
+            .datum(
+                this._journey.segment.length > 1
+                    ? this._journey.segment.map(segment => segment.position)
+                    : [[null, null]]
+            )
             .attr("marker-end", "url(#course-arrow)")
             .attr("d", this._line);
     }
@@ -555,11 +560,11 @@ export default class Journey {
         )}\u202f/\u202f${formatF11(convertInvCoordY(pt1.x, pt1.y))}`;
     }
 
-    _getTextDistance(distanceK, minutes) {
+    _getTextDistance(distanceK, minutes, addTotal) {
         const duration = moment.duration(minutes, "minutes").humanize(true);
         let textDistance = `${Math.round(distanceK)}k ${duration}`;
 
-        if (this._journey.segment.length > 1) {
+        if (addTotal) {
             const totalDuration = moment.duration(this._journey.totalMinutes, "minutes").humanize(true);
             textDistance += ` \u2606 total ${Math.round(this._journey.totalDistance)}k ${totalDuration}`;
         }
@@ -567,13 +572,8 @@ export default class Journey {
     }
 
     _setSegmentLabel(index = this._journey.segment.length - 1) {
-        const pt1 = { x: this._journey.segment[index].position[0], y: this._journey.segment[index].position[1] };
-        let pt2 = { x: 0, y: 0 };
-        if (index > 0) {
+        const pt1 = { x: this._journey.segment[index].position[0], y: this._journey.segment[index].position[1] },
             pt2 = { x: this._journey.segment[index - 1].position[0], y: this._journey.segment[index - 1].position[1] };
-        } else {
-            pt2 = { x: this._journey.startPosition[0], y: this._journey.startPosition[1] };
-        }
 
         const courseDegrees = rotationAngleInDegrees(pt1, pt2),
             distanceK = getDistance(pt1, pt2),
@@ -588,7 +588,7 @@ export default class Journey {
         this._journey.totalDistance += distanceK;
         this._journey.totalMinutes += minutes;
         const textDirection = this._getTextDirection(courseCompass, courseDegrees, pt1),
-            textDistance = this._getTextDistance(distanceK, minutes);
+            textDistance = this._getTextDistance(distanceK, minutes, index > 1);
 
         this._journey.segment[index].label = `${textDirection}|${textDistance}`;
         console.log("*** end", this._journey);
@@ -605,7 +605,9 @@ export default class Journey {
         this._printLines();
         this._resetJourney();
         this._journey.segment.forEach((d, i) => {
-            this._setSegmentLabel(i);
+            if (i < this._journey.segment.length - 1) {
+                this._setSegmentLabel(i + 1);
+            }
         });
 
         this._printLabels();
@@ -614,9 +616,9 @@ export default class Journey {
 
     /* public */
     plotCourse(x, y) {
-        if (!this._journey.startPosition[0]) {
+        if (!this._journey.segment[0].position[0]) {
             this.clearMap();
-            this._journey.startPosition = [x, y];
+            this._journey.segment[0] = { position: [x, y], label: "" };
             this._resetJourney();
             this._showSummary();
             this._printSummary();
