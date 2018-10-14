@@ -32,11 +32,15 @@ export default class Journey {
      * @param {object} shipData - Ship data
      * @param {object} woodData - Wood data
      * @param {number} fontSize - Font size
+     * @param {number} topMargin - Top margin
+     * @param {number} rightMargin - Right margin
      */
-    constructor(shipData, woodData, fontSize) {
+    constructor(shipData, woodData, fontSize, topMargin, rightMargin) {
         this._shipData = shipData;
         this._woodData = woodData;
         this._fontSize = fontSize;
+        this._topMargin = topMargin;
+        this._rightMargin = rightMargin;
 
         this._compassSize = 100;
         this._line = d3Line()
@@ -76,6 +80,10 @@ export default class Journey {
 
         this._speedScale = d3ScaleLinear().domain(d3Range(0, this._fullCircle, this._degreesSegment));
 
+        this._defaultShipName = "None";
+        this._defaultShipSpeed = 19;
+        this._defaultStartWindDegrees = 0;
+        this._setupSummary();
         this._setupSvg();
 
         this._baseName = "Make journey";
@@ -90,7 +98,7 @@ export default class Journey {
 
     _setupSvg() {
         this._g = d3Select("#na-svg")
-            .append("g")
+            .insert("g", "g.pb")
             .classed("coord", true);
 
         d3Select("#na-svg defs")
@@ -109,9 +117,11 @@ export default class Journey {
 
     _initJourney() {
         this._journey = {
+            shipName: this._defaultShipName,
+            woodNames: "",
             startPosition: [null, null],
-            startWindDegrees: 0,
-            currentWindDegrees: 0,
+            startWindDegrees: this._defaultStartWindDegrees,
+            currentWindDegrees: this._defaultStartWindDegrees,
             totalDistance: 0,
             totalMinutes: 0,
             segment: []
@@ -221,6 +231,13 @@ export default class Journey {
         this._woodCompare = new WoodCompare(this._woodData, this._woodId);
     }
 
+    _useUserInput() {
+        this._journey.startWindDegrees = this._getStartWind();
+        this._setShipName();
+        this._printSummary();
+        this._printJourney();
+    }
+
     /**
      * Action when selected
      * @returns {void}
@@ -231,7 +248,11 @@ export default class Journey {
             this._initModal();
         }
         // Show modal
-        $(`#${this._modalId}`).modal("show");
+        $(`#${this._modalId}`)
+            .modal("show")
+            .on("hidden.bs.modal", () => {
+                this._useUserInput();
+            });
     }
 
     _printCompass() {
@@ -282,10 +303,12 @@ export default class Journey {
     }
 
     _setShipSpeed() {
-        // Dummy ship speed of 19 knots
-        let speedDegrees = Array.from(Array(24).fill(19 / 2));
+        let speedDegrees = [];
 
-        if (typeof this._shipCompare !== "undefined") {
+        if (this._journey.shipName === this._defaultShipName) {
+            // Dummy ship speed
+            speedDegrees = Array.from(Array(24).fill(this._defaultShipSpeed / 2));
+        } else {
             ({ speedDegrees } = this._shipCompare._singleShipData);
         }
         this._speedScale.range(speedDegrees);
@@ -324,16 +347,20 @@ export default class Journey {
         return totalMinutesSegment;
     }
 
-    _getShipName() {
-        let text = "";
-        if (typeof this._shipCompare !== "undefined") {
-            text += `${
-                this._shipCompare._woodCompare._woodsSelected.Base.frame
-            }/${this._shipCompare._woodCompare._woodsSelected.Base.trim.toLowerCase()} ${
-                this._shipCompare._singleShipData.name
-            }|`;
+    _setShipName() {
+        if (
+            typeof this._shipCompare !== "undefined" &&
+            typeof this._shipCompare._singleShipData !== "undefined" &&
+            typeof this._shipCompare._singleShipData.name !== "undefined"
+        ) {
+            this._journey.shipName = `${this._shipCompare._singleShipData.name}`;
+            this._journey.woodNames = `${this._shipCompare._woodCompare._woodsSelected.Base.frame}/${
+                this._shipCompare._woodCompare._woodsSelected.Base.trim
+            }`;
+        } else {
+            this._journey.shipName = this._defaultShipName;
+            this._journey.woodNames = "";
         }
-        return text;
     }
 
     /**
@@ -432,6 +459,89 @@ export default class Journey {
         this._g.selectAll("g.coord g.label").each(correctTextBox);
     }
 
+    _setupSummary() {
+        this._svgJourneySummary = d3Select("body")
+            .append("svg")
+            .attr("id", "journey-summary")
+            .classed("summary", true)
+            .classed("hidden", true)
+            .style("position", "absolute")
+            .style("top", `${this._topMargin}px`)
+            .style("right", `${this._rightMargin}px`);
+
+        // Background
+        const journeySummaryRect = this._svgJourneySummary
+            .insert("rect")
+            .attr("x", 0)
+            .attr("y", 0);
+
+        // Wind direction
+        this._journeySummaryTextWind = this._svgJourneySummary.append("text");
+        const journeySummaryTextWindDes = this._svgJourneySummary
+            .append("text")
+            .classed("des", true)
+            .text("wind direction");
+
+        // Selected ship
+        this._journeySummaryTextShip = this._svgJourneySummary.append("text");
+        this._journeySummaryTextWoods = this._svgJourneySummary.append("text");
+        const journeySummaryTextShipDes = this._svgJourneySummary
+            .append("text")
+            .classed("des", true)
+            .text("selected ship");
+
+        const bboxShipDes = journeySummaryTextShipDes.node().getBoundingClientRect(),
+            bboxWindDes = journeySummaryTextWindDes.node().getBoundingClientRect(),
+            lineHeight = parseInt(
+                window.getComputedStyle(document.getElementById("na-svg")).getPropertyValue("line-height"),
+                10
+            );
+        const height = lineHeight * 4,
+            width = bboxShipDes.width * 2 + bboxWindDes.width + this._fontSize * 4,
+            firstLine = "25%",
+            secondLine = "50%",
+            thirdLine = "75%",
+            firstBlock = this._fontSize * 2,
+            secondBlock = Math.round(firstBlock + bboxShipDes.width * 2 + firstBlock/2);
+
+        this._svgJourneySummary.attr("height", height).attr("width", width);
+        journeySummaryRect.attr("height", height).attr("width", width);
+
+        this._journeySummaryTextWoods.attr("x", firstBlock).attr("y", firstLine);
+        this._journeySummaryTextShip.attr("x", firstBlock).attr("y", secondLine);
+        journeySummaryTextShipDes.attr("x", firstBlock).attr("y", thirdLine);
+
+        this._journeySummaryTextWind.attr("x", secondBlock).attr("y", secondLine);
+        journeySummaryTextWindDes.attr("x", secondBlock).attr("y", thirdLine);
+    }
+
+    _displaySummary(toShow) {
+        this._svgJourneySummary.classed("hidden", !toShow);
+        d3Select("#port-summary").classed("hidden", toShow);
+    }
+
+    _showSummary() {
+        this._displaySummary(true);
+    }
+
+    _hideSummary() {
+        this._displaySummary(false);
+    }
+
+    _printSummaryShip() {
+        this._journeySummaryTextWoods.text(this._journey.woodNames);
+        this._journeySummaryTextShip.text(this._journey.shipName);
+    }
+
+    _printSummaryWind() {
+        this._journeySummaryTextWind.text(`From ${degreesToCompass(this._journey.startWindDegrees)}`);
+    }
+
+    _printSummary() {
+        this._printSummaryWind();
+        this._printSummaryShip();
+    }
+
     _printLines() {
         this.gJourneyPath
             .datum([this._journey.startPosition].concat(this._journey.segment.map(segment => segment.position)))
@@ -440,7 +550,7 @@ export default class Journey {
     }
 
     _getTextDirection(courseCompass, courseDegrees, pt1) {
-        return `${this._getShipName()}${courseCompass} (${Math.round(courseDegrees)}°) \u2606 F11: ${formatF11(
+        return `${courseCompass} (${Math.round(courseDegrees)}°) \u2606 F11: ${formatF11(
             convertInvCoordX(pt1.x, pt1.y)
         )}\u202f/\u202f${formatF11(convertInvCoordY(pt1.x, pt1.y))}`;
     }
@@ -457,7 +567,6 @@ export default class Journey {
     }
 
     _setSegmentLabel(index = this._journey.segment.length - 1) {
-        console.log("_setSegmentLabel", index);
         const pt1 = { x: this._journey.segment[index].position[0], y: this._journey.segment[index].position[1] };
         let pt2 = { x: 0, y: 0 };
         if (index > 0) {
@@ -509,6 +618,8 @@ export default class Journey {
             this.clearMap();
             this._journey.startPosition = [x, y];
             this._resetJourney();
+            this._showSummary();
+            this._printSummary();
             this._printCompass();
         } else {
             this._journey.segment.push({ position: [x, y], label: "" });
@@ -522,6 +633,7 @@ export default class Journey {
 
     clearMap() {
         this._initJourney();
+        this._hideSummary();
         this._g.selectAll("*").remove();
     }
 }

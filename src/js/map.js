@@ -313,7 +313,7 @@ export default class Map {
         const buildingData = JSON.parse(JSON.stringify(data.buildings));
         this._buildingList = new Building(buildingData);
 
-        this._journey = new Journey(shipData, woodData, this.rem);
+        this._journey = new Journey(shipData, woodData, this.rem, this.margin.top, this.margin.right);
         this._teleport = new Teleport(this.coord.min, this.coord.max, this._ports);
         this._portSelect = new PortSelect(this, this._ports, this._pbZone);
         this._windPrediction = new WindPrediction(this.margin.left, this.margin.top);
