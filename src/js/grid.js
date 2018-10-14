@@ -8,7 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { axisBottom as d3AxisBottom, axisRight as d3AxisRight} from "d3-axis";
+import { axisBottom as d3AxisBottom, axisRight as d3AxisRight } from "d3-axis";
 import { event as d3Event, select as d3Select } from "d3-selection";
 import { scaleLinear as d3ScaleLinear } from "d3-scale";
 
@@ -342,17 +342,21 @@ export default class Grid {
      */
     update() {
         if (this._isShown && this._zoomLevel !== "initial") {
+            const margin = this._topMargin + 3 * 16;
             // Show axis
             this._gAxis.attr("display", "inherit");
             this._gBackground.attr("display", "inherit");
             // Move summary down
-            d3Select("#summary").style("top", `${this._topMargin + 3 * 16}px`);
+            d3Select("#port-summary").style("top", `${margin}px`);
+            d3Select("#journey-summary").style("top", `${margin}px`);
         } else {
+            const margin = this._topMargin;
             // Hide axis
             this._gAxis.attr("display", "none");
             this._gBackground.attr("display", "none");
             // Move summary up
-            d3Select("#summary").style("top", `${this._topMargin}px`);
+            d3Select("#port-summary").style("top", `${margin}px`);
+            d3Select("#journey-summary").style("top", `${margin}px`);
         }
     }
 
