@@ -264,37 +264,37 @@ export default class PortDisplay {
 
     _setupSummary() {
         // Main box
-        const svgPortSummary = d3Select("body")
+        this._svgPortSummary = d3Select("body")
             .append("svg")
-            .attr("id", "summary")
+            .attr("id", "port-summary")
             .classed("summary", true)
             .style("position", "absolute")
             .style("top", `${this._topMargin}px`)
             .style("right", `${this._rightMargin}px`);
 
         // Background
-        const portSummaryRect = svgPortSummary
+        const portSummaryRect = this._svgPortSummary
             .insert("rect")
             .attr("x", 0)
             .attr("y", 0);
 
         // Number of selected ports
-        this._portSummaryTextNumPorts = svgPortSummary.append("text");
-        const portSummaryTextNumPortsDes = svgPortSummary
+        this._portSummaryTextNumPorts = this._svgPortSummary.append("text");
+        const portSummaryTextNumPortsDes = this._svgPortSummary
             .append("text")
             .classed("des", true)
             .text("selected ports");
 
         // Total tax income
-        this._portSummaryTextTaxIncome = svgPortSummary.append("text");
-        const portSummaryTextTaxIncomeDes = svgPortSummary
+        this._portSummaryTextTaxIncome = this._svgPortSummary.append("text");
+        const portSummaryTextTaxIncomeDes = this._svgPortSummary
             .append("text")
             .classed("des", true)
             .text("tax income");
 
         // Total net income
-        this._portSummaryTextNetIncome = svgPortSummary.append("text");
-        const portSummaryTextNetIncomeDes = svgPortSummary
+        this._portSummaryTextNetIncome = this._svgPortSummary.append("text");
+        const portSummaryTextNetIncomeDes = this._svgPortSummary
             .append("text")
             .classed("des", true)
             .text("net income");
@@ -314,7 +314,7 @@ export default class PortDisplay {
             secondBlock = Math.round(firstBlock + bboxNumPortsDes.width + firstBlock),
             thirdBlock = Math.round(secondBlock + bboxTaxIncomeDes.width + firstBlock);
 
-        svgPortSummary.attr("height", height).attr("width", width);
+        this._svgPortSummary.attr("height", height).attr("width", width);
 
         // Background
         portSummaryRect.attr("height", height).attr("width", width);
@@ -938,11 +938,20 @@ export default class PortDisplay {
         return this._zoomLevel;
     }
 
+    _showSummary() {
+        this._svgPortSummary.classed("hidden", false);
+    }
+
+    hideSummary() {
+        this._svgPortSummary.classed("hidden", true);
+    }
+
     transform(transform) {
         this._g.attr("transform", transform);
     }
 
     clearMap(scale) {
+        this._showSummary();
         this._portData = this._portDataDefault;
         this._showCurrentGood = false;
         this.update(scale);
