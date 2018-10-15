@@ -563,35 +563,33 @@ class ShipComparison extends Ship {
         const pie = d3Pie()
             .sort(null)
             .value(1);
-        const arcsBase = pie(this.shipCompareData.speedDegrees),
-            arcsComp = pie(this.shipBaseData.speedDegrees);
+        const arcsComp = pie(this.shipCompareData.speedDegrees),
+            arcsBase = pie(this.shipBaseData.speedDegrees);
         const curve = d3CurveCatmullRomClosed,
-            lineBase = d3RadialLine()
-                .angle((d, i) => i * segmentRadians)
-                .radius(d => this.shipCompare.radiusScaleAbsolute(d.data))
-                .curve(curve),
-            lineB = d3RadialLine()
+            line = d3RadialLine()
                 .angle((d, i) => i * segmentRadians)
                 .radius(d => this.shipCompare.radiusScaleAbsolute(d.data))
                 .curve(curve);
 
         const pathComp = this.g.append("path"),
-            markersComp = this.g.append("g").attr("class", "markers"),
             pathBase = this.g.append("path"),
-            markersBase = this.g.append("g").attr("class", "markers");
+            pathMarkersComp = this.g.append("g").attr("class", "markers");
 
         const speedDiff = [];
         this.shipCompareData.speedDegrees.forEach((speedShipCompare, i) => {
             speedDiff.push(roundToThousands(speedShipCompare - this.shipBaseData.speedDegrees[i]));
         });
+        const min = this._shipCompare._minSpeed,
+            max = this._shipCompare._maxSpeed;
         const colourScale = d3ScaleLinear()
-            .domain([d3Min(speedDiff), 0, 1, d3Max(speedDiff)])
-            .range(["#a62e39", "#fbf8f5", "#95d4a4", "#419f57"])
+            .domain([min, -1, 0, 1, max])
+            .range(["#782129", "#a62e39", "#fbf8f5", "#419f57", "#2a6739"])
             .interpolate(d3InterpolateHcl);
 
-        pathBase.attr("d", lineBase(arcsBase)).classed("base", true);
-        const selBase = markersBase.selectAll("circle").data(arcsBase);
-        selBase
+        pathComp.attr("d", line(arcsComp)).classed("comp", true);
+
+        const markersComp = pathMarkersComp.selectAll("circle").data(arcsComp);
+        markersComp
             .enter()
             .append("circle")
             .attr("r", 5)
@@ -601,7 +599,7 @@ class ShipComparison extends Ship {
             .append("title")
             .text(d => `${Math.round(d.data * 10) / 10} knots`);
 
-        pathComp.attr("d", lineB(arcsComp)).classed("comp", true);
+        pathBase.attr("d", line(arcsBase)).classed("base", true);
     }
 
     /**
