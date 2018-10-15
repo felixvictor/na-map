@@ -463,6 +463,15 @@ text {
   text-anchor: middle !important;
 }
 
+.profile {
+  line {
+    stroke: $secondary-600;
+    stroke-width: 0.5em;
+    fill: none;
+    opacity: 0.3;
+  }
+}
+
 .rs-tooltip-text {
   font-family: inherit;
   font-size: 1.8em;
