@@ -96,6 +96,14 @@ class Ship {
             .attr("class", "compass-arc");
 
         g.append("path").attr("d", arc);
+
+        this.g
+            .append("line")
+            .attr("x1", 0)
+            .attr("y1", -160)
+            .attr("x2", 0)
+            .attr("y2", -79)
+            .attr("marker-end", "url(#course-arrow)");
     }
 
     /**
