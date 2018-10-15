@@ -196,17 +196,25 @@ table a {
 }
 
 .profile {
-  path.base {
+  path.base,
+  circle.base {
+    opacity: 0.5;
+    fill: $primary-500;
+  }
+
+  path.comp {
     opacity: 0.5;
     fill: none;
     stroke-width: 3px;
     stroke: $secondary-500;
   }
 
-  path.comp,
-  circle.comp {
-    opacity: 0.5;
-    fill: $primary-500;
+  .centroid-base {
+    fill:  $secondary-700;
+  }
+
+  .centroid-comp {
+    fill: $primary-700;
   }
 }
 
