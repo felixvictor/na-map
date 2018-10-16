@@ -15,7 +15,7 @@ export default class Teleport {
         this._data = {};
         this._highlightId = null;
         this._g = d3Select("#na-svg")
-            .insert("g", ".ports")
+            .insert("g", ".coord")
             .classed("voronoi", true);
     }
 

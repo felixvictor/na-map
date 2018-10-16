@@ -14,6 +14,7 @@ import { drag as d3Drag } from "d3-drag";
 import { scaleLinear as d3ScaleLinear } from "d3-scale";
 import { event as d3Event, select as d3Select } from "d3-selection";
 import { line as d3Line } from "d3-shape";
+import { zoomIdentity as d3ZoomIdentity, zoomTransform as d3ZoomTransform } from "d3-zoom";
 import moment from "moment";
 import "moment/locale/en-gb";
 import "round-slider/src/roundslider";
@@ -48,13 +49,11 @@ export default class Journey {
             .y(d => d[1]);
         this._drag = d3Drag()
             .on("start", (d, i, nodes) => {
-                console.log("dragStart", { d }, { i }, { d3Event });
-                console.log("dragStart", nodes[i], d3Select(nodes[i]));
                 this._removeLabels();
                 d3Select(nodes[i]).classed("drag-active", true);
             })
             .on("drag", (d, i, nodes) => {
-                console.log("drag.on", { d }, { i }, { d3Event }, d3Select(this));
+                // Set compass position
                 if (i === 0) {
                     this._compass.attr("x", d.position[0] + d3Event.dx).attr("y", d.position[1] + d3Event.dy);
                 }
@@ -66,7 +65,6 @@ export default class Journey {
                 this._printLines();
             })
             .on("end", (d, i, nodes) => {
-                console.log("dragEnd", { d }, { i }, { d3Event }, d3Event.x, d3Event.y);
                 d3Select(nodes[i]).classed("drag-active", false);
                 //  this._journey.segment[i].position = [d.position[0] + d3Event.x, d.position[1] + d3Event.y];
                 this._printJourney();
@@ -269,7 +267,7 @@ export default class Journey {
             .attr("height", this._compassSize)
             .attr("width", this._compassSize)
             .attr("xlink:href", "icons/compass.svg");
-        this.gJourneyPath = this._g.append("path");
+        this._gJourneyPath = this._g.append("path");
     }
 
     _getSpeedAtDegrees(degrees) {
@@ -376,12 +374,18 @@ export default class Journey {
         label.select("rect").remove();
     }
 
-    /**
-     * Print labels
-     * @private
-     * @return {void}
-     */
-    _printLabels() {
+    _correctJourney() {
+        const defaultTranslate = 20,
+            currentTransform = d3ZoomTransform(d3Select("#na-svg").node()),
+            // Don't scale on higher zoom level
+            scale = Math.max(1, currentTransform.k),
+            fontSize = this._fontSize / scale,
+            compassSize=this._compassSize/scale,
+            textTransform = d3ZoomIdentity.translate(defaultTranslate / scale, defaultTranslate / scale),
+            textPadding = this._labelPadding / scale,
+            circleRadius = 10 / scale,
+            pathWidth = 5 / scale;
+
         /** Correct Text Box
          *  - split text into lines
          *  - correct box width
@@ -398,9 +402,12 @@ export default class Journey {
             const node = d3Select(nodes[i]),
                 text = node.select("text"),
                 lines = d.label.split("|"),
-                lineHeight = this._fontSize * 1.3;
+                lineHeight = fontSize * 1.3;
 
-            text.text("").attr("dy", 0);
+            text.text("")
+                .attr("dy", 0)
+                .attr("transform", textTransform)
+                .style("font-size", `${fontSize}px`);
             lines.forEach((line, j) => {
                 const tspan = text.append("tspan").text(line);
                 if (j > 0) {
@@ -410,15 +417,16 @@ export default class Journey {
 
             // Correct box width
             const bbText = text.node().getBBox(),
-                rect = node.select("rect"),
-                width = d.label ? bbText.width + this._labelPadding * 2 : 0,
-                height = d.label ? bbText.height + this._labelPadding : 0;
-            rect.attr("width", width).attr("height", height);
+                width = d.label ? bbText.width + textPadding * 2 : 0,
+                height = d.label ? bbText.height + textPadding : 0;
+            node.select("rect")
+                .attr("width", width)
+                .attr("height", height);
 
             // Enlarge circles
             const circle = node
                 .select("circle")
-                .attr("r", 10)
+                .attr("r", circleRadius)
                 .attr("class", "");
 
             // Move circles above text box
@@ -430,6 +438,26 @@ export default class Journey {
             }
         };
 
+        // Correct text boxes
+        this._g.selectAll("g.coord g.label").each(correctTextBox);
+        // Correct journey stroke width
+        if (this._gJourneyPath) {
+            this._gJourneyPath.style("stroke-width", `${pathWidth}px`);
+        }
+        if(this._compass) {
+            this._compass
+            .attr("transform", `translate(${-compassSize / 2},${-compassSize / 2})`)
+                .attr("height", compassSize)
+                .attr("width", compassSize);
+        }
+    }
+
+    /**
+     * Print labels
+     * @private
+     * @return {void}
+     */
+    _printLabels() {
         // Component used to render each label (take only single longest line)
         const textLabel = layoutTextLabel()
             .padding(this._labelPadding)
@@ -456,8 +484,6 @@ export default class Journey {
 
         // Render
         this._g.datum(this._journey.segment.map(segment => segment)).call(labels);
-        // Correct text boxes
-        this._g.selectAll("g.coord g.label").each(correctTextBox);
     }
 
     _setupSummary() {
@@ -544,7 +570,7 @@ export default class Journey {
     }
 
     _printLines() {
-        this.gJourneyPath
+        this._gJourneyPath
             .datum(
                 this._journey.segment.length > 1
                     ? this._journey.segment.map(segment => segment.position)
@@ -598,6 +624,7 @@ export default class Journey {
         this._printLines();
         this._setSegmentLabel();
         this._printLabels();
+        this._correctJourney();
         this._g.selectAll("g.coord g.label circle").call(this._drag);
     }
 
@@ -611,6 +638,7 @@ export default class Journey {
         });
 
         this._printLabels();
+        this._correctJourney();
         this._g.selectAll("g.coord g.label circle").call(this._drag);
     }
 
@@ -631,6 +659,7 @@ export default class Journey {
 
     transform(transform) {
         this._g.attr("transform", transform);
+        this._correctJourney();
     }
 
     clearMap() {
