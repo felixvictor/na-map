@@ -201,6 +201,8 @@ export default class PortSelect {
         const portsPerGood = new PortsPerGood();
 
         this._ports.portDataDefault.forEach(port => {
+            portsPerGood.add(port.properties.consumesTrading);
+            portsPerGood.add(port.properties.consumesNonTrading);
             portsPerGood.add(port.properties.dropsTrading);
             portsPerGood.add(port.properties.dropsNonTrading);
             portsPerGood.add(port.properties.producesTrading);
