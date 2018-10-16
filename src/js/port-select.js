@@ -19,23 +19,23 @@ export default class PortSelect {
         this._dateFormat = "D MMM";
         this._timeFormat = "HH.00";
 
-        this._portNamesId = "port-names";
+        this._portNamesId = "port-names-select";
         this._portNamesSelector = document.getElementById(this._portNamesId);
         this._portNames$ = $(`#${this._portNamesId}`);
 
-        this._buyGoodsId = "buy-goods";
+        this._buyGoodsId = "buy-goods-select";
         this._buyGoodsSelector = document.getElementById(this._buyGoodsId);
         this._buyGoods$ = $(`#${this._buyGoodsId}`);
 
-        this._propNationId = "prop-nation";
+        this._propNationId = "prop-nation-select";
         this._propNationSelector = document.getElementById(this._propNationId);
         this._propNation$ = $(`#${this._propNationId}`);
 
-        this._propClanId = "prop-clan";
+        this._propClanId = "prop-clan-select";
         this._propClanSelector = document.getElementById(this._propClanId);
         this._propClan$ = $(`#${this._propClanId}`);
 
-        this._propCMId = "prop-cm";
+        this._propCMId = "prop-cm-select";
         this._propCMSelector = document.getElementById(this._propCMId);
         this._propCM$ = $(`#${this._propCMId}`);
 
@@ -49,6 +49,18 @@ export default class PortSelect {
         this._setupNationSelect();
         this._setupClanSelect();
         this._setupCMSelect();
+    }
+
+    _resetOtherSelects(activeSelect$) {
+        [this._portNames$, this._buyGoods$, this._propNation$, this._propClan$, this._propCM$].forEach((select$, i) => {
+            if (
+                select$ !== activeSelect$ &&
+                !(select$ === this._propClan$ && activeSelect$ === this._propNation$) &&
+                !(select$ === this._propNation$ && activeSelect$ === this._propClan$)
+            ) {
+                select$.val("default").selectpicker("refresh");
+            }
+        });
     }
 
     _setupListener() {
@@ -66,9 +78,10 @@ export default class PortSelect {
         selectPickerLiveSearch.liveSearchPlaceholder = "Search ...";
         selectPickerLiveSearch.liveSearchNormalize = true;
 
-        selectPickerLiveSearch.noneSelectedText = "Go to port";
+        selectPickerLiveSearch.noneSelectedText = "Select port";
         this._portNamesSelector.addEventListener("change", event => {
             registerEvent("Menu", "Move to port");
+            this._resetOtherSelects(this._portNames$);
             this._portSelected(event);
         });
         this._portNames$.selectpicker(selectPickerLiveSearch);
@@ -76,21 +89,28 @@ export default class PortSelect {
         selectPickerLiveSearch.noneSelectedText = "Select good";
         this._buyGoodsSelector.addEventListener("change", event => {
             registerEvent("Menu", "Select good");
+            this._resetOtherSelects(this._buyGoods$);
             this._goodSelected(event);
         });
         this._buyGoods$.selectpicker(selectPickerLiveSearch);
 
         selectPickerDefaults.noneSelectedText = "Select nation";
-        this._propNationSelector.addEventListener("change", event => this._nationSelected(event));
+        this._propNationSelector.addEventListener("change", event => {
+            this._resetOtherSelects(this._propNation$);
+            this._nationSelected(event);
+        });
         this._propNation$.selectpicker(selectPickerDefaults);
 
         selectPickerDefaults.noneSelectedText = "Select clan";
-        this._propClanSelector.addEventListener("change", event => this._clanSelected(event));
+        this._propClanSelector.addEventListener("change", event => {
+            this._resetOtherSelects(this._propClan$);
+            this._clanSelected(event);
+        });
         this._propClan$.selectpicker(selectPickerDefaults);
 
         selectPickerDefaults.noneSelectedText = "Select";
         this._propCMSelector.addEventListener("change", event => {
-            event.preventDefault();
+            this._resetOtherSelects(this._propCM$);
             this._CMSelected(event);
         });
         this._propCM$.selectpicker(selectPickerDefaults);
@@ -179,7 +199,7 @@ export default class PortSelect {
                 return 0;
             });
 
-        const select = `${selectPorts
+        const options = `${selectPorts
             .map(
                 port =>
                     `<option data-subtext="${port.nation}" value="${port.coord}" data-id="${port.id}">${
@@ -187,7 +207,7 @@ export default class PortSelect {
                     }</option>`
             )
             .join("")}`;
-        this._portNamesSelector.insertAdjacentHTML("beforeend", select);
+        this._portNamesSelector.insertAdjacentHTML("beforeend", options);
     }
 
     _setupGoodSelect() {
@@ -208,16 +228,16 @@ export default class PortSelect {
             portsPerGood.add(port.properties.producesTrading);
             portsPerGood.add(port.properties.producesNonTrading);
         });
-        const select = `${Array.from(selectGoods)
+        const options = `${Array.from(selectGoods)
             .sort()
             .map(good => `<option>${good}</option>`)
             .join("")}`;
 
-        this._buyGoodsSelector.insertAdjacentHTML("beforeend", select);
+        this._buyGoodsSelector.insertAdjacentHTML("beforeend", options);
     }
 
     _setupNationSelect() {
-        const select = `${nations
+        const options = `${nations
             .sort((a, b) => {
                 if (a.sortName < b.sortName) {
                     return -1;
@@ -229,7 +249,7 @@ export default class PortSelect {
             })
             .map(nation => `<option value="${nation.short}">${nation.name}</option>`)
             .join("")}`;
-        this._propNationSelector.insertAdjacentHTML("beforeend", select);
+        this._propNationSelector.insertAdjacentHTML("beforeend", options);
     }
 
     _setupClanSelect() {
@@ -239,17 +259,18 @@ export default class PortSelect {
             portId = new Set();
         this._ports.portData.forEach(d => portId.add(d.id));
         this._ports.pbData.ports.filter(d => d.capturer && portId.has(d.id)).forEach(d => clanList.add(d.capturer));
-        const select = `${Array.from(clanList)
+        const options = `${Array.from(clanList)
             .sort()
             .map(clan => `<option value="${clan}">${clan}</option>`)
             .join("")}`;
 
-        if (select) {
-            this._propClanSelector.insertAdjacentHTML("beforeend", select);
+        if (options) {
+            this._propClanSelector.insertAdjacentHTML("beforeend", options);
             this._propClanSelector.disabled = false;
             this._propClan$.val("default").selectpicker("refresh");
         } else {
-            this._propClanSelector.remove();
+            this._propClanSelector.disabled = true;
+            this._propClan$.append("<option></option>").selectpicker("refresh");
         }
     }
 
@@ -291,63 +312,63 @@ export default class PortSelect {
             consumedGoodList.add(port.properties.consumesTrading);
         });
 
-        this._ports.portData = this._ports.portDataDefault.map(port => {
-            ["dropsTrading", "producesTrading"].forEach(type => {
-                port.properties[type].forEach(good => {
-                    if (tradePortConsumedGoods.includes(good)) {
-                        if (typeof port.properties.goodsToSellAtTradePort === "undefined") {
+        this._ports.portData = this._ports.portDataDefault
+            .map(port => {
+                // eslint-disable-next-line no-param-reassign
+                port.properties.goodsToSellInTradePort = [];
+                // eslint-disable-next-line no-param-reassign
+                port.properties.sellInTradePort = false;
+                // eslint-disable-next-line no-param-reassign
+                port.properties.goodsToBuyInTradePort = [];
+                // eslint-disable-next-line no-param-reassign
+                port.properties.buyInTradePort = false;
+                ["dropsTrading", "producesTrading"].forEach(type => {
+                    port.properties[type].forEach(good => {
+                        if (tradePortConsumedGoods.includes(good)) {
+                            port.properties.goodsToSellInTradePort.push(good);
                             // eslint-disable-next-line no-param-reassign
-                            port.properties.goodsToSellAtTradePort = [];
+                            port.properties.sellInTradePort = true;
                         }
-                        port.properties.goodsToSellAtTradePort.push(good);
-                        // eslint-disable-next-line prefer-destructuring,no-param-reassign
-                        port.properties.sellAtTradePort = true;
-                    }
+                    });
                 });
-            });
-            ["consumesTrading"].forEach(type => {
-                port.properties[type].forEach(good => {
-                    if (tradePortProducedGoods.includes(good)) {
-                        if (typeof port.properties.goodsToBuyAtTradePort === "undefined") {
+                ["consumesTrading"].forEach(type => {
+                    port.properties[type].forEach(good => {
+                        if (tradePortProducedGoods.includes(good)) {
+                            port.properties.goodsToBuyInTradePort.push(good);
                             // eslint-disable-next-line no-param-reassign
-                            port.properties.goodsToBuyAtTradePort = [];
+                            port.properties.buyInTradePort = true;
                         }
-                        port.properties.goodsToBuyAtTradePort.push(good);
-                        // eslint-disable-next-line prefer-destructuring,no-param-reassign
-                        port.properties.buyAtTradePort = true;
-                    }
+                    });
                 });
-            });
-            return port;
-        });
+                return port;
+            })
+            .filter(
+                port =>
+                    port.id === this._ports.tradePortId ||
+                    port.properties.sellInTradePort ||
+                    port.properties.buyInTradePort
+            );
     }
 
     _portSelected(event) {
         const port = $(event.currentTarget).find(":selected");
         const c = port.val().split(",");
 
-        if (c[0] === "0") {
-            this._ports.portData = this._ports.portDataDefault;
-            this._ports.showCurrentGood = false;
-            this._ports.update();
-        } else {
-            const id = port.data("id").toString();
-            this._ports.currentPort = {
-                id,
-                coord: { x: +c[0], y: +c[1] }
-            };
-            this._ports.tradePortId = id;
+        const id = port.data("id").toString();
+        this._ports.currentPort = {
+            id,
+            coord: { x: +c[0], y: +c[1] }
+        };
+        this._ports.tradePortId = id;
 
-            this._setTradePortPartners();
+        this._setTradePortPartners();
 
-            console.log(this._ports.portData);
-            if (this._pbZone._showPBZones) {
-                this._pbZone.refresh();
-            }
-            this._ports.showCurrentGood = false;
-            this._ports.update();
-            this._map.goToPort();
+        if (this._pbZone._showPBZones) {
+            this._pbZone.refresh();
         }
+        this._ports.showTradePortPartners = true;
+        this._ports.showCurrentGood = false;
+        this._ports.update();
     }
 
     _goodSelected(event) {
@@ -379,47 +400,38 @@ export default class PortSelect {
 
         this._ports.showRadiusSetting = "off";
         this._ports.portData = sourcePorts.concat(consumingPorts);
+        console.log(this._ports.portData);
         this._ports.showCurrentGood = true;
+        this._ports.showTradePortPartners = false;
         this._ports.update();
     }
 
     _nationSelected(event) {
-        const nationId = $(event.currentTarget).val();
-        let portData;
+        const portId = new Set();
 
-        if (+nationId !== 0) {
-            this._nation = nationId;
-            const portId = new Set();
-            this._ports.pbData.ports.filter(port => port.nation === this._nation).forEach(port => portId.add(port.id));
-            portData = this._ports.portDataDefault.filter(d => portId.has(d.id));
-        } else {
-            this._nation = "";
-            portData = this._ports.portDataDefault;
-        }
+        this._nation = $(event.currentTarget).val();
         $("#propertyDropdown").dropdown("toggle");
-        this._ports.portData = portData;
+
+        this._ports.pbData.ports.filter(port => port.nation === this._nation).forEach(port => portId.add(port.id));
+        this._ports.portData = this._ports.portDataDefault.filter(d => portId.has(d.id));
         this._ports.showCurrentGood = false;
         this._ports.update();
         this._setupClanSelect();
     }
 
     _clanSelected(event) {
-        const clan = $(event.currentTarget).val();
-        let portData;
+        const portId = new Set(),
+            clan = $(event.currentTarget).val();
 
-        if (+clan !== 0) {
-            const portId = new Set();
-            this._ports.pbData.ports.filter(port => clan === port.capturer).forEach(port => portId.add(port.id));
-            portData = this._ports.portDataDefault.filter(d => portId.has(d.id));
-        } else if (this._nation) {
-            const portId = new Set();
-            this._ports.pbData.ports.filter(port => port.nation === this._nation).forEach(port => portId.add(port.id));
-            portData = this._ports.portDataDefault.filter(d => portId.has(d.id));
-        } else {
-            portData = this._ports.portDataDefault;
-        }
         $("#propertyDropdown").dropdown("toggle");
-        this._ports.portData = portData;
+
+        if (clan !== 0) {
+            this._ports.pbData.ports.filter(port => clan === port.capturer).forEach(port => portId.add(port.id));
+        } else if (this._nation) {
+            this._ports.pbData.ports.filter(port => port.nation === this._nation).forEach(port => portId.add(port.id));
+        }
+        this._ports.portData = this._ports.portDataDefault.filter(d => portId.has(d.id));
+        console.log(portId, this._ports.portData);
         this._ports.showCurrentGood = false;
         this._ports.update();
     }
