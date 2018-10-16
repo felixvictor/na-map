@@ -21,7 +21,8 @@ export default class PortDisplay {
         this._minScale = minScale;
         this._scale = minScale;
 
-        this._showCurrentGood = false;
+        this.showCurrentGood = false;
+        this.showTradePortPartners = false;
         this._portData = portData;
         this._pbData = pbData;
 
@@ -429,6 +430,10 @@ export default class PortDisplay {
         feMerge.append("feMergeNode").attr("in", "SourceGraphic");
     }
 
+    _getPortName(id) {
+        return this._portDataDefault.filter(port => port.id === id).map(port => port.properties.name)[0];
+    }
+
     _getText(id, portProperties) {
         const pbData = this._pbData.ports.filter(port => port.id === id)[0],
             portBattleLT = moment.utc(pbData.portBattle).local(),
@@ -483,7 +488,14 @@ export default class PortDisplay {
                 producesNonTrading: portProperties.producesNonTrading.join(", "),
                 dropsNonTrading: portProperties.dropsNonTrading.join(", "),
                 consumesTrading: portProperties.consumesTrading.join(", "),
-                consumesNonTrading: portProperties.consumesNonTrading.join(", ")
+                consumesNonTrading: portProperties.consumesNonTrading.join(", "),
+                tradePort: this._getPortName(this.tradePortId),
+                goodsToSellInTradePort: portProperties.goodsToSellInTradePort
+                    ? portProperties.goodsToSellInTradePort.join(", ")
+                    : "",
+                goodsToBuyInTradePort: portProperties.goodsToBuyInTradePort
+                    ? portProperties.goodsToBuyInTradePort.join(", ")
+                    : ""
             };
 
         switch (portProperties.portBattleType) {
@@ -526,7 +538,7 @@ export default class PortDisplay {
             h += "</p>";
             h += "<table class='table table-sm'>";
             if (port.producesTrading.length || port.producesNonTrading.length) {
-                h += "<tr><td>Produces</td><td>";
+                h += `<tr><td>Produces${port.producesNonTrading.length ? "\u00a0" : ""}</td><td>`;
                 if (port.producesNonTrading.length) {
                     h += `<span class="non-trading">${port.producesNonTrading}</span>`;
                     if (port.producesTrading.length) {
@@ -539,7 +551,7 @@ export default class PortDisplay {
                 h += "</td></tr>";
             }
             if (port.dropsTrading.length || port.dropsNonTrading.length) {
-                h += "<tr><td>Drops</td><td>";
+                h += `<tr><td>Drops${port.dropsNonTrading.length ? "\u00a0" : ""}</td><td>`;
                 if (port.dropsNonTrading.length) {
                     h += `<span class="non-trading">${port.dropsNonTrading}</span>`;
                     if (port.dropsTrading.length) {
@@ -552,7 +564,7 @@ export default class PortDisplay {
                 h += "</td></tr>";
             }
             if (port.consumesTrading.length || port.consumesNonTrading.length) {
-                h += "<tr><td>Consumes</td><td>";
+                h += `<tr><td>Consumes${port.consumesNonTrading.length ? "\u00a0" : ""}</td><td>`;
                 if (port.consumesNonTrading.length) {
                     h += `<span class="non-trading">${port.consumesNonTrading}</span>`;
                     if (port.consumesTrading.length) {
@@ -563,6 +575,12 @@ export default class PortDisplay {
                     h += `${port.consumesTrading}`;
                 }
                 h += "</td></tr>";
+            }
+            if (port.goodsToSellInTradePort.length) {
+                h += `<tr><td>Sell in ${port.tradePort}</td><td>${port.goodsToSellInTradePort}</td></tr>`;
+            }
+            if (port.goodsToBuyInTradePort.length) {
+                h += `<tr><td>Buy in ${port.tradePort}</td><td>${port.goodsToBuyInTradePort}</td></tr>`;
             }
             h += "</table>";
 
@@ -628,6 +646,19 @@ export default class PortDisplay {
     }
 
     _updatePortCircles() {
+        const getTradePortMarker = port => {
+            let marker = "";
+            if (port.id === this.tradePortId) {
+                marker = "here";
+            } else if (port.properties.sellInTradePort && port.properties.buyInTradePort) {
+                marker = "both";
+            } else if (port.properties.sellInTradePort) {
+                marker = "pos";
+            } else if (port.properties.buyInTradePort) {
+                marker = "neg";
+            }
+            return marker;
+        };
         const circleScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale),
             rMin = roundToThousands((this._circleSize / circleScale) * this._minRadiusFactor),
             magicNumber = 5;
@@ -637,6 +668,8 @@ export default class PortDisplay {
 
         if (this._showRadius === "tax" || this._showRadius === "net") {
             data = this._portData.filter(d => !d.properties.nonCapturable);
+        } else if (this.showTradePortPartners) {
+            data = this._portData;
         } else if (this._showRadius === "attack") {
             const pbData = this._pbData.ports
                 .filter(d => d.attackHostility)
@@ -656,7 +689,7 @@ export default class PortDisplay {
                 ) * magicNumber;
             const pbData = this._pbData.ports.filter(d => d.nation !== "FT").map(d => d.id);
             data = this._portData.filter(port => pbData.some(d => port.id === d) && port.properties.nonCapturable);
-        } else if (this._showCurrentGood) {
+        } else if (this.showCurrentGood) {
             data = this._portData;
             rMax /= 2;
         }
@@ -696,6 +729,10 @@ export default class PortDisplay {
             circleMerge
                 .attr("class", d => `bubble ${d.properties.netIncome < 0 ? "neg" : "pos"}`)
                 .attr("r", d => this._netIncomeRadius(Math.abs(d.properties.netIncome)));
+        } else if (this.showTradePortPartners) {
+            circleMerge
+                .attr("class", d => `bubble ${getTradePortMarker(d)}`)
+                .attr("r", d => (d.id === this.tradePortId ? rMax : rMax / 2));
         } else if (this._showRadius === "attack") {
             this._attackRadius.range([rMin, rMax]);
             circleMerge
@@ -704,7 +741,7 @@ export default class PortDisplay {
                 .attr("r", d => this._attackRadius(d.properties.attackHostility));
         } else if (this._showRadius === "green") {
             circleMerge.attr("class", "bubble pos").attr("r", rGreenZone);
-        } else if (this._showCurrentGood) {
+        } else if (this.showCurrentGood) {
             circleMerge.attr("class", d => `bubble ${d.properties.isSource ? "pos" : "neg"}`).attr("r", rMax);
         }
     }
@@ -912,10 +949,6 @@ export default class PortDisplay {
         return this._pbData;
     }
 
-    set showCurrentGood(showCurrentGood) {
-        this._showCurrentGood = showCurrentGood;
-    }
-
     set showRadiusSetting(showRadius) {
         this._showRadius = showRadius;
         $(`#show-radius-${showRadius}`).prop("checked", true);
@@ -953,7 +986,8 @@ export default class PortDisplay {
     clearMap(scale) {
         this._showSummary();
         this._portData = this._portDataDefault;
-        this._showCurrentGood = false;
+        this.showCurrentGood = false;
+        this.showTradePortPartners = false;
         this.update(scale);
     }
 }
