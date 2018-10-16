@@ -380,7 +380,7 @@ export default class Journey {
             // Don't scale on higher zoom level
             scale = Math.max(1, currentTransform.k),
             fontSize = this._fontSize / scale,
-            compassSize=this._compassSize/scale,
+            compassSize = this._compassSize / scale,
             textTransform = d3ZoomIdentity.translate(defaultTranslate / scale, defaultTranslate / scale),
             textPadding = this._labelPadding / scale,
             circleRadius = 10 / scale,
@@ -444,9 +444,9 @@ export default class Journey {
         if (this._gJourneyPath) {
             this._gJourneyPath.style("stroke-width", `${pathWidth}px`);
         }
-        if(this._compass) {
+        if (this._compass) {
             this._compass
-            .attr("transform", `translate(${-compassSize / 2},${-compassSize / 2})`)
+                .attr("transform", `translate(${-compassSize / 2},${-compassSize / 2})`)
                 .attr("height", compassSize)
                 .attr("width", compassSize);
         }
@@ -570,14 +570,16 @@ export default class Journey {
     }
 
     _printLines() {
-        this._gJourneyPath
-            .datum(
-                this._journey.segment.length > 1
-                    ? this._journey.segment.map(segment => segment.position)
-                    : [[null, null]]
-            )
-            .attr("marker-end", "url(#course-arrow)")
-            .attr("d", this._line);
+        if (this._gJourneyPath) {
+            this._gJourneyPath
+                .datum(
+                    this._journey.segment.length > 1
+                        ? this._journey.segment.map(segment => segment.position)
+                        : [[null, null]]
+                )
+                .attr("marker-end", "url(#course-arrow)")
+                .attr("d", this._line);
+        }
     }
 
     _getTextDirection(courseCompass, courseDegrees, pt1) {
