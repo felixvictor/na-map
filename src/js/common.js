@@ -116,7 +116,6 @@ export function insertBaseModal(id, title, size = "lg") {
 export function initMultiDropdownNavbar(id) {
     $(`#${id} .dropdown-menu .bootstrap-select .dropdown-toggle`).on("click", event => {
         const el$ = $(event.currentTarget);
-
         el$.next(".dropdown-menu").toggleClass("show");
         el$.parent("li").toggleClass("show");
         el$.parents("li.nav-item.dropdown.show").on("hidden.bs.dropdown", event2 => {
