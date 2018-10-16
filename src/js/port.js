@@ -117,7 +117,7 @@ export default class PortDisplay {
             .classed("ports", true);
         this._gPortCircle = this._g.append("g");
         this._gIcon = this._g.append("g").classed("port", true);
-        this._gText = this._g.append("g");
+        this._gText = this._g.append("g").classed("port-names", true);
         this._gCounty = this._g.append("g").classed("county", true);
         this._gRegion = this._g.append("g").classed("region", true);
     }
