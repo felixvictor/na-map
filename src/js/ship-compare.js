@@ -1084,7 +1084,7 @@ export default class ShipCompare {
      * @returns {void}
      */
     _setupShipSelect(columnId) {
-        console.log("_setupShipSelect", columnId, `#${this._baseId}-${columnId}-select`);
+        // console.log("_setupShipSelect", columnId, `#${this._baseId}-${columnId}-select`);
         const select$ = $(`#${this._baseId}-${columnId}-select`),
             options = this._getOptions();
         select$.append(options);
@@ -1223,7 +1223,6 @@ export default class ShipCompare {
         selectShip$
             .addClass("selectpicker")
             .on("changed.bs.select", event => {
-                console.log("selectShip$ change");
                 event.preventDefault();
                 const shipId = +selectShip$.val();
                 this._refreshShips(shipId, compareId);
