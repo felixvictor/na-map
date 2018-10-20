@@ -6,10 +6,10 @@ import { select as d3Select } from "d3-selection";
 import { voronoi as d3Voronoi } from "d3-voronoi";
 
 export default class Teleport {
-    constructor(minCoord, maxCoord, ports) {
+    constructor(coord, ports) {
         this._ports = ports;
         this._show = false;
-        this._voronoiCoord = [[minCoord - 1, minCoord - 1], [maxCoord + 1, maxCoord + 1]];
+        this._voronoiCoord = [[coord.min - 1, coord.min - 1], [coord.max + 1, coord.max + 1]];
         this._teleportPorts = this._getPortData();
         this._voronoiDiagram = this._getVoronoiDiagram();
         this._data = {};
