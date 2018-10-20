@@ -8,10 +8,9 @@ import { convertCoordX, convertCoordY, convertInvCoordX, convertInvCoordY } from
 import { registerEvent } from "./analytics";
 
 export default class F11 {
-    constructor(map) {
+    constructor(map, coord) {
         this._map = map;
-        this._minCoord = this._map.coord.min;
-        this._maxCoord = this._map.coord.max;
+        this._coord = coord;
 
         this._setupSvg();
         this._setupListener();
@@ -92,7 +91,7 @@ export default class F11 {
             x = convertCoordX(F11X, F11Y),
             y = convertCoordY(F11X, F11Y);
 
-        if (between(x, this._minCoord, this._maxCoord, true) && between(y, this._minCoord, this._maxCoord, true)) {
+        if (between(x, this._coord.min, this._coord.max, true) && between(y, this._coord.min, this._coord.max, true)) {
             this._printF11Coord(x, y, F11X, F11Y);
             this._map.zoomAndPan(x, y, 1);
         }
