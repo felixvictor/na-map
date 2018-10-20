@@ -168,7 +168,7 @@ export default class Grid {
             .tickSize(this._maxCoord);
 
         // svg groups
-        this._gAxis = this._map._svg
+        this._gAxis = this._map.svg
             .insert("g", "g.voronoi")
             .classed("axis", true)
             .attr("display", "none");
@@ -300,7 +300,7 @@ export default class Grid {
      * @return {void}
      */
     _setupBackground() {
-        this._gBackground = this._map._svg
+        this._gBackground = this._map.svg
             .insert("g", "g.axis")
             .classed("grid-background", true)
             .attr("display", "none");
