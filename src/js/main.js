@@ -95,21 +95,20 @@ function main() {
      */
     function setupListener() {
         $("#server-name").change(() => serverNameSelected());
-        document.addEventListener("DOMContentLoaded", () => {
-            // https://stackoverflow.com/questions/44467377/bootstrap-4-multilevel-dropdown-inside-navigation/48953349#48953349
-            $(".dropdown-submenu > a").on("click", event => {
-                const submenu$ = $(event.currentTarget);
 
-                $(".dropdown-submenu .dropdown-menu").removeClass("show");
-                submenu$.next(".dropdown-menu").addClass("show");
-                event.stopPropagation();
-            });
+        // https://stackoverflow.com/questions/44467377/bootstrap-4-multilevel-dropdown-inside-navigation/48953349#48953349
+        $(".dropdown-submenu > a").on("click", event => {
+            const submenu$ = $(event.currentTarget);
 
-            $(".dropdown").on("hidden.bs.dropdown", () => {
-                $(".dropdown-menu.show")
-                    .not(".inner")
-                    .removeClass("show");
-            });
+            $(".dropdown-submenu .dropdown-menu").removeClass("show");
+            submenu$.next(".dropdown-menu").addClass("show");
+            event.stopPropagation();
+        });
+
+        $(".dropdown").on("hidden.bs.dropdown", () => {
+            $(".dropdown-menu.show")
+                .not(".inner")
+                .removeClass("show");
         });
     }
 
@@ -138,6 +137,11 @@ function main() {
 
     setupListener();
     const map = new Map(serverName);
+
+    window.onresize = () => {
+        console.log("onresize");
+        // map.setSvgSize();
+    };
 }
 
 main();

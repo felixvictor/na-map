@@ -1,5 +1,5 @@
 /**
- * This file is part of na-map.
+ * this._file is part of na-map.
  *
  * @file      Display naval action map.
  * @module    map
@@ -98,44 +98,28 @@ export default class Map {
          * @type {Number}
          * @private
          */
-        this._rem = defaultFontSize;
+        this.rem = defaultFontSize;
 
         /**
          * Left padding for brand icon
          * @type {Number}
          * @private
          */
-        this._navbarBrandPaddingLeft = Math.floor(1.618 * this._rem); // equals 1.618rem
+        this._navbarBrandPaddingLeft = Math.floor(1.618 * this.rem); // equals 1.618rem
 
         /**
          * Left padding for brand icon
          * @type {Number}
          * @private
          */
-        this._xGridBackgroundHeight = Math.floor(3 * this._rem);
+        this.xGridBackgroundHeight = Math.floor(3 * this.rem);
 
         /**
          * Left padding for brand icon
          * @type {Number}
          * @private
          */
-        this._yGridBackgroundWidth = Math.floor(4 * this._rem);
-
-        /**
-         * Margins of the map svg
-         * @type {Object}
-         * @property {Number} top - Top margin
-         * @property {Number} right - Right margin
-         * @property {Number} bottom - Bottom margin
-         * @property {Number} left - Left margin
-         * @private
-         */
-        this._margin = {
-            top: Math.floor($(".navbar").height() + this._navbarBrandPaddingLeft),
-            right: this._navbarBrandPaddingLeft,
-            bottom: this._navbarBrandPaddingLeft,
-            left: this._navbarBrandPaddingLeft
-        };
+        this.yGridBackgroundWidth = Math.floor(4 * this.rem);
 
         /**
          * Outer bounds (world coordinates)
@@ -144,42 +128,16 @@ export default class Map {
          * @property {Number} max - Maximum world coordinate
          * @private
          */
-        this._coord = {
+        this.coord = {
             min: 0,
             max: 8192
         };
 
-        /**
-         * Width of map svg (screen coordinates)
-         * @type {Number}
-         * @private
-         */
-        // eslint-disable-next-line no-restricted-globals
-        this._width = Math.floor(top.innerWidth - this._margin.left - this._margin.right);
-
-        /**
-         * Height of map svg (screen coordinates)
-         * @type {Number}
-         * @private
-         */
-        // eslint-disable-next-line no-restricted-globals
-        this._height = Math.floor(top.innerHeight - this._margin.top - this._margin.bottom);
-
         this._tileSize = 256;
         this._maxScale = 2 ** 3; // power of 2
         this._wheelDelta = 0.5;
-        this._zoomLevel = "initial";
         this._PBZoneZoomThreshold = 1.5;
         this._labelZoomThreshold = 0.5;
-
-        this._minScale = nearestPow2(Math.min(this._width / this._coord.max, this._height / this._coord.max));
-
-        /**
-         * Current map scale
-         * @type {Number}
-         * @private
-         */
-        this._currentScale = this._minScale;
 
         /**
          * DoubleClickAction cookie name
@@ -226,6 +184,7 @@ export default class Map {
         this._showLayer = this._getShowLayer();
 
         this._setupSvg();
+        this.setSvgSize();
         this._setupListener();
         this._setupProps();
         this._readData();
@@ -237,9 +196,9 @@ export default class Map {
      * @private
      */
     _getDoubleClickAction() {
-        let r = Cookies.get(this.doubleClickActionCookieName);
+        let r = Cookies.get(this._doubleClickActionCookieName);
         // Use default value if cookie is not stored
-        r = typeof r !== "undefined" ? r : this.doubleClickActionDefault;
+        r = typeof r !== "undefined" ? r : this._doubleClickActionDefault;
         return r;
     }
 
@@ -249,13 +208,14 @@ export default class Map {
      * @private
      */
     _getShowLayer() {
-        let r = Cookies.get(this.showLayerCookieName);
+        let r = Cookies.get(this._showLayerCookieName);
         // Use default value if cookie is not stored
-        r = typeof r !== "undefined" ? r : this.showLayerDefault;
+        r = typeof r !== "undefined" ? r : this._showLayerDefault;
         return r;
     }
 
     _setupData(data) {
+        console.log("_setupData");
         const portData = topojsonFeature(data.ports, data.ports.objects.ports);
         // Port ids of capturable ports
         const portIds = portData.features.filter(port => !port.properties.nonCapturable).map(port => port.id);
@@ -271,10 +231,10 @@ export default class Map {
         this._ports = new PortDisplay(
             portData.features,
             data.pb,
-            this.serverName,
+            this._serverName,
             this.margin.top,
             this.margin.right,
-            this.minScale
+            this._minScale
         );
 
         let pbCircles = topojsonFeature(data.pbZones, data.pbZones.objects.pbCircles);
@@ -314,10 +274,10 @@ export default class Map {
         this._buildingList = new Building(buildingData);
 
         this._journey = new Journey(shipData, woodData, this.rem, this.margin.top, this.margin.right);
-        this._teleport = new Teleport(this.coord.min, this.coord.max, this._ports);
-        this._portSelect = new PortSelect(this, this._ports, this._pbZone);
+        this._teleport = new Teleport(this.coord, this._ports);
+        this._portSelect = new PortSelect(this._ports, this._pbZone);
         this._windPrediction = new WindPrediction(this.margin.left, this.margin.top);
-        this._f11 = new F11(this);
+        this._f11 = new F11(this, this.coord);
         this._grid = new Grid(this);
 
         this._init();
@@ -379,37 +339,19 @@ export default class Map {
     }
 
     _setupSvg() {
-        // noinspection JSSuspiciousNameCombination
-        this.zoom = d3Zoom()
-            .scaleExtent([this.minScale, this.maxScale])
-            .translateExtent([
-                [
-                    this.coord.min - this.yGridBackgroundWidth * this.minScale,
-                    this.coord.min - this.xGridBackgroundHeight * this.minScale
-                ],
-                [this.coord.max, this.coord.max]
-            ])
-            .wheelDelta(() => -this.wheelDelta * Math.sign(d3Event.deltaY))
-            .on("zoom", () => this._naZoomed());
-
         this.svg = d3Select("#na")
             .append("svg")
             .attr("id", "na-svg")
-            .attr("width", this.width)
-            .attr("height", this.height)
-            .style("position", "absolute")
-            .style("top", `${this.margin.top}px`)
-            .style("left", `${this.margin.left}px`)
-            .call(this.zoom);
+            .style("position", "absolute");
 
         this.svg.append("defs");
 
-        this.g = this.svg.append("g").classed("map", true);
+        this._g = this.svg.append("g").classed("map", true);
     }
 
     _setupProps() {
-        $(`#doubleClick-action-${this.doubleClickAction}`).prop("checked", true);
-        $(`#show-layer-${this.showLayer}`).prop("checked", true);
+        $(`#doubleClick-action-${this._doubleClickAction}`).prop("checked", true);
+        $(`#show-layer-${this._showLayer}`).prop("checked", true);
     }
 
     /**
@@ -418,15 +360,15 @@ export default class Map {
      * @private
      */
     _storeDoubleClickActionSetting() {
-        if (this.doubleClickAction !== this.doubleClickActionDefault) {
-            Cookies.set(this.doubleClickActionCookieName, this.doubleClickAction);
+        if (this._doubleClickAction !== this._doubleClickActionDefault) {
+            Cookies.set(this._doubleClickActionCookieName, this._doubleClickAction);
         } else {
-            Cookies.remove(this.doubleClickActionCookieName);
+            Cookies.remove(this._doubleClickActionCookieName);
         }
     }
 
     _doubleClickSelected() {
-        this.doubleClickAction = $("input[name='doubleClickAction']:checked").val();
+        this._doubleClickAction = $("input[name='doubleClickAction']:checked").val();
         this._storeDoubleClickActionSetting();
         this._clearMap();
     }
@@ -437,22 +379,22 @@ export default class Map {
      * @private
      */
     _storeShowLayerSetting() {
-        if (this.showLayer !== this.showLayerDefault) {
-            Cookies.set(this.showLayerCookieName, this.showLayer);
+        if (this._showLayer !== this._showLayerDefault) {
+            Cookies.set(this._showLayerCookieName, this._showLayer);
         } else {
-            Cookies.remove(this.showLayerCookieName);
+            Cookies.remove(this._showLayerCookieName);
         }
     }
 
     _showLayerSelected() {
-        this.showLayer = $("input[name='showLayer']:checked").val();
+        this._showLayer = $("input[name='showLayer']:checked").val();
         this._storeShowLayerSetting();
         this._refreshLayer();
     }
 
     _refreshLayer() {
-        const showGrid = this.showLayer === "grid",
-            showTeleport = this.showLayer === "teleport";
+        const showGrid = this._showLayer === "grid",
+            showTeleport = this._showLayer === "teleport";
 
         this._grid.show = showGrid;
         this._grid.update();
@@ -465,7 +407,7 @@ export default class Map {
     _displayMap(transform) {
         // Based on d3-tile v0.0.3
         // https://github.com/d3/d3-tile/blob/0f8cc9f52564d4439845f651c5fab2fcc2fdef9e/src/tile.js
-        const log2tileSize = Math.log2(this.tileSize),
+        const log2tileSize = Math.log2(this._tileSize),
             maxTileZoom = Math.log2(this.coord.max) - log2tileSize,
             x0 = 0,
             y0 = 0,
@@ -483,7 +425,7 @@ export default class Map {
 
         const tileZoom = Math.min(maxTileZoom, Math.ceil(Math.log2(Math.max(width, height))) - log2tileSize),
             p = Math.round(tileZoom * 10 - scale * 10 - maxTileZoom * 10) / 10,
-            k = this.wheelDelta ** p;
+            k = this._wheelDelta ** p;
 
         const { x } = transform,
             { y } = transform,
@@ -492,12 +434,12 @@ export default class Map {
             // crop bottom
             dy = this.coord.max * transform.k < this.height ? transform.y : 0,
             cols = d3Range(
-                Math.max(0, Math.floor((x0 - x) / this.tileSize / k)),
-                Math.max(0, Math.min(Math.ceil((x1 - x - dx) / this.tileSize / k), 2 ** tileZoom))
+                Math.max(0, Math.floor((x0 - x) / this._tileSize / k)),
+                Math.max(0, Math.min(Math.ceil((x1 - x - dx) / this._tileSize / k), 2 ** tileZoom))
             ),
             rows = d3Range(
-                Math.max(0, Math.floor((y0 - y) / this.tileSize / k)),
-                Math.max(0, Math.min(Math.ceil((y1 - y - dy) / this.tileSize / k), 2 ** tileZoom))
+                Math.max(0, Math.floor((y0 - y) / this._tileSize / k)),
+                Math.max(0, Math.min(Math.ceil((y1 - y - dy) / this._tileSize / k), 2 ** tileZoom))
             ),
             tiles = [];
 
@@ -519,7 +461,7 @@ export default class Map {
             .translate(Math.round(tiles.translate[0]), Math.round(tiles.translate[1]))
             .scale(Math.round(tiles.scale * 1000) / 1000);
 
-        const image = this.g
+        const image = this._g
             .attr("transform", tileTransform)
             .selectAll("image")
             .data(tiles, d => d);
@@ -530,10 +472,10 @@ export default class Map {
             .enter()
             .append("image")
             .attr("xlink:href", d => `images/map/${d[2]}/${d[1]}/${d[0]}.jpg`)
-            .attr("x", d => d[0] * this.tileSize)
-            .attr("y", d => d[1] * this.tileSize)
-            .attr("width", this.tileSize)
-            .attr("height", this.tileSize);
+            .attr("x", d => d[0] * this._tileSize)
+            .attr("y", d => d[1] * this._tileSize)
+            .attr("width", this._tileSize)
+            .attr("height", this._tileSize);
     }
 
     _clearMap() {
@@ -578,13 +520,13 @@ export default class Map {
         const x = (mx - tx) / tk,
             y = (my - ty) / tk;
 
-        if (this.doubleClickAction === "f11") {
+        if (this._doubleClickAction === "f11") {
             this._f11.printCoord(x, y);
         } else {
             this._journey.plotCourse(x, y);
         }
 
-        this.zoomAndPan(x, y, 1);
+        this._zoomAndPan(x, y, 1);
     }
 
     _updateCurrent() {
@@ -592,21 +534,21 @@ export default class Map {
         this._grid.update();
         this._teleport.setData();
         this._teleport.update();
-        this._ports.update(this.currentScale);
+        this._ports.update(this._currentScale);
     }
 
     _setZoomLevelAndData() {
-        if (d3Event.transform.k !== this.currentScale) {
-            this.currentScale = d3Event.transform.k;
-            if (this.currentScale > this.PBZoneZoomThreshold) {
-                if (this.zoomLevel !== "pbZone") {
+        if (d3Event.transform.k !== this._currentScale) {
+            this._currentScale = d3Event.transform.k;
+            if (this._currentScale > this._PBZoneZoomThreshold) {
+                if (this._zoomLevel !== "pbZone") {
                     this.zoomLevel = "pbZone";
                 }
-            } else if (this.currentScale > this.labelZoomThreshold) {
-                if (this.zoomLevel !== "portLabel") {
+            } else if (this._currentScale > this._labelZoomThreshold) {
+                if (this._zoomLevel !== "portLabel") {
                     this.zoomLevel = "portLabel";
                 }
-            } else if (this.zoomLevel !== "initial") {
+            } else if (this._zoomLevel !== "initial") {
                 this.zoomLevel = "initial";
             }
             this._updateCurrent();
@@ -647,132 +589,20 @@ export default class Map {
     }
 
     _initialZoomAndPan() {
-        this.svg.call(this.zoom.scaleTo, this.minScale);
+        this.svg.call(this._zoom.scaleTo, this._minScale);
     }
 
     _init() {
+        console.log("_init");
+
         this.zoomLevel = "initial";
         this._initialZoomAndPan();
         this._refreshLayer();
 
-        this._ports.clearMap(this.minScale);
+        this._ports.clearMap(this._minScale);
         this._f11.checkF11Coord();
-    }
 
-    get coord() {
-        return this._coord;
-    }
-
-    set currentScale(scale) {
-        this._currentScale = scale;
-    }
-
-    get currentScale() {
-        return this._currentScale;
-    }
-
-    get doubleClickActionCookieName() {
-        return this._doubleClickActionCookieName;
-    }
-
-    set doubleClickAction(action) {
-        this._doubleClickAction = action;
-    }
-
-    get doubleClickAction() {
-        return this._doubleClickAction;
-    }
-
-    get doubleClickActionDefault() {
-        return this._doubleClickActionDefault;
-    }
-
-    set g(g) {
-        this._g = g;
-    }
-
-    get g() {
-        return this._g;
-    }
-
-    get height() {
-        return this._height;
-    }
-
-    get margin() {
-        return this._margin;
-    }
-
-    get labelZoomThreshold() {
-        return this._labelZoomThreshold;
-    }
-
-    get maxScale() {
-        return this._maxScale;
-    }
-
-    get minScale() {
-        return this._minScale;
-    }
-
-    get PBZoneZoomThreshold() {
-        return this._PBZoneZoomThreshold;
-    }
-
-    get rem() {
-        return this._rem;
-    }
-
-    set svg(svg) {
-        this._svg = svg;
-    }
-
-    get svg() {
-        return this._svg;
-    }
-
-    get serverName() {
-        return this._serverName;
-    }
-
-    get showLayerCookieName() {
-        return this._showLayerCookieName;
-    }
-
-    get showLayer() {
-        return this._showLayer;
-    }
-
-    set showLayer(layer) {
-        this._showLayer = layer;
-    }
-
-    get showLayerDefault() {
-        return this._showLayerDefault;
-    }
-
-    get tileSize() {
-        return this._tileSize;
-    }
-
-    get width() {
-        return this._width;
-    }
-
-    get wheelDelta() {
-        return this._wheelDelta;
-    }
-
-    get xGridBackgroundHeight() {
-        return this._xGridBackgroundHeight;
-    }
-
-    get yGridBackgroundWidth() {
-        return this._yGridBackgroundWidth;
-    }
-
-    set zoom(zoom) {
-        this._zoom = zoom;
+        this.setSvgSize();
     }
 
     set zoomLevel(zoomLevel) {
@@ -782,26 +612,82 @@ export default class Map {
         this._teleport.zoomLevel = zoomLevel;
     }
 
-    get zoomLevel() {
-        return this._zoomLevel;
-    }
+    setSvgSize() {
+        console.log("setSvgSize");
 
-    get zoom() {
-        return this._zoom;
+        /**
+         * Margins of the map svg
+         * @type {Object}
+         * @property {Number} top - Top margin
+         * @property {Number} right - Right margin
+         * @property {Number} bottom - Bottom margin
+         * @property {Number} left - Left margin
+         * @private
+         */
+        this.margin = {
+            top: Math.floor($(".navbar").height() + this._navbarBrandPaddingLeft),
+            right: this._navbarBrandPaddingLeft,
+            bottom: this._navbarBrandPaddingLeft,
+            left: this._navbarBrandPaddingLeft
+        };
+
+        /**
+         * Width of map svg (screen coordinates)
+         * @type {Number}
+         * @private
+         */
+        // eslint-disable-next-line no-restricted-globals
+        this.width = Math.floor(top.innerWidth - this.margin.left - this.margin.right);
+
+        /**
+         * Height of map svg (screen coordinates)
+         * @type {Number}
+         * @private
+         */
+        // eslint-disable-next-line no-restricted-globals
+        this.height = Math.floor(top.innerHeight - this.margin.top - this.margin.bottom);
+
+        this._minScale = nearestPow2(Math.min(this.width / this.coord.max, this.height / this.coord.max));
+
+        /**
+         * Current map scale
+         * @type {Number}
+         * @private
+         */
+        this._currentScale = this._minScale;
+        this._zoomLevel = "initial";
+        this._zoom = d3Zoom()
+            .wheelDelta(() => -this._wheelDelta * Math.sign(d3Event.deltaY))
+            .translateExtent([
+                [
+                    this.coord.min - this.yGridBackgroundWidth * this._minScale,
+                    this.coord.min - this.xGridBackgroundHeight * this._minScale
+                ],
+                [this.coord.max, this.coord.max]
+            ])
+            .scaleExtent([this._minScale, this._maxScale])
+            .on("zoom", () => this._naZoomed());
+
+        this.svg
+            .attr("width", this.width)
+            .attr("height", this.height)
+            .style("top", `${this.margin.top}px`)
+            .style("left", `${this.margin.left}px`)
+            .call(this._zoom);
     }
 
     zoomAndPan(x, y, scale) {
         const transform = d3ZoomIdentity
             .scale(scale)
             .translate(Math.round(-x + this.width / 2 / scale), Math.round(-y + this.height / 2 / scale));
-        this.svg.call(this.zoom.transform, transform);
+        this.svg.call(this._zoom.transform, transform);
     }
 
     goToPort() {
         if (this._ports.currentPort.id !== "0") {
-            this.zoomAndPan(this._ports.currentPort.coord.x, this._ports.currentPort.coord.y, 2);
+            this._zoomAndPan(this._ports.currentPort.coord.x, this._ports.currentPort.coord.y, 2);
         } else {
-            this.initialZoomAndPan();
+            this._initialZoomAndPan();
         }
     }
 }
