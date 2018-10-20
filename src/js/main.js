@@ -28,6 +28,7 @@ import {
 import moment from "moment";
 import "moment/locale/en-gb";
 import Cookies from "js-cookie";
+import ResizeObserver from "resize-observer-polyfill";
 
 import { initAnalytics, registerPage } from "./analytics";
 
@@ -140,7 +141,7 @@ function main() {
 
     window.onresize = () => {
         console.log("onresize");
-        // map.setSvgSize();
+        map.resize();
     };
 }
 
