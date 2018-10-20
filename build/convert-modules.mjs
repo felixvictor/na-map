@@ -298,6 +298,11 @@ function convertModules() {
      * @returns {void}
      */
     function setModuleType(module) {
+        // Correct module type
+        if (module.name.endsWith("French Rig Refit") || module.name === "Bovenwinds Refit") {
+            module.sortingGroup = "survival";
+        }
+
         if (
             module.usageType === "All" &&
             module.sortingGroup === "speed_turn" &&
