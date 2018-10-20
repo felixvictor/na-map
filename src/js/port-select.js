@@ -12,8 +12,7 @@ import { registerEvent } from "./analytics";
 import { initMultiDropdownNavbar, nations } from "./common";
 
 export default class PortSelect {
-    constructor(map, ports, pbZone) {
-        this._map = map;
+    constructor(ports, pbZone) {
         this._ports = ports;
         this._pbZone = pbZone;
         this._dateFormat = "D MMM";
