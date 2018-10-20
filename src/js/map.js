@@ -14,6 +14,9 @@ import { zoom as d3Zoom, zoomIdentity as d3ZoomIdentity, zoomTransform as d3Zoom
 import { feature as topojsonFeature } from "topojson-client";
 import Cookies from "js-cookie";
 
+import ResizeObserver from "resize-observer-polyfill";
+import { createReadOnlyRect, getContentRect } from "resize-observer-polyfill/src/utils/geometry";
+
 import { appDescription, appTitle, appVersion, defaultFontSize, insertBaseModal } from "./common";
 import { nearestPow2, checkFetchStatus, getJsonFromFetch, putFetchError, roundToThousands } from "./util";
 
@@ -133,6 +136,8 @@ export default class Map {
             max: 8192
         };
 
+        this._navbarSelector = document.querySelector(".navbar");
+
         this._tileSize = 256;
         this._maxScale = 2 ** 3; // power of 2
         this._wheelDelta = 0.5;
@@ -184,7 +189,7 @@ export default class Map {
         this._showLayer = this._getShowLayer();
 
         this._setupSvg();
-        this.setSvgSize();
+        this._setSvgSize();
         this._setupListener();
         this._setupProps();
         this._readData();
@@ -592,6 +597,10 @@ export default class Map {
         this.svg.call(this._zoom.scaleTo, this._minScale);
     }
 
+    _getNavbarHeight() {
+        return Math.round(getContentRect(this._navbarSelector).height);
+    }
+
     _init() {
         console.log("_init");
 
@@ -602,7 +611,23 @@ export default class Map {
         this._ports.clearMap(this._minScale);
         this._f11.checkF11Coord();
 
-        this.setSvgSize();
+        const observer = new ResizeObserver(entries => {
+            entries.forEach(entry => {
+                const { left, top, width, height } = entry.contentRect;
+                console.log("Element", entry.target);
+                console.log("Element's size", width, "px x", height, "px");
+                console.log("Element's paddings", top, "px ;", left, "px");
+            });
+            console.log("observer");
+            console.log(this._navbarHeight, this._getNavbarHeight());
+
+            if (this._navbarHeight !== this._getNavbarHeight()) {
+                this.resize();
+            }
+        });
+
+        // Setup listener (size change of navbar)
+        [this._navbarSelector].forEach(element => observer.observe(element));
     }
 
     set zoomLevel(zoomLevel) {
@@ -612,8 +637,16 @@ export default class Map {
         this._teleport.zoomLevel = zoomLevel;
     }
 
-    setSvgSize() {
+    resize() {
+        console.log("resize");
+        this._setSvgSize();
+        this._ports.setSummarySize(this.margin.top,this.margin.right);
+    }
+
+    _setSvgSize() {
         console.log("setSvgSize");
+
+        this._navbarHeight = this._getNavbarHeight();
 
         /**
          * Margins of the map svg
@@ -625,7 +658,7 @@ export default class Map {
          * @private
          */
         this.margin = {
-            top: Math.floor($(".navbar").height() + this._navbarBrandPaddingLeft),
+            top: Math.floor(this._navbarHeight + this._navbarBrandPaddingLeft),
             right: this._navbarBrandPaddingLeft,
             bottom: this._navbarBrandPaddingLeft,
             left: this._navbarBrandPaddingLeft
