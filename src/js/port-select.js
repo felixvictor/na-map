@@ -78,7 +78,7 @@ export default class PortSelect {
         selectPickerLiveSearch.liveSearchPlaceholder = "Search ...";
         selectPickerLiveSearch.liveSearchNormalize = true;
 
-        selectPickerLiveSearch.noneSelectedText = "Select port";
+        selectPickerLiveSearch.noneSelectedText = "Select single port";
         this._portNamesSelector.addEventListener("change", event => {
             registerEvent("Menu", "Move to port");
             this._resetOtherSelects(this._portNames$);
