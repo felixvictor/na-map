@@ -16,8 +16,6 @@ export default class PortDisplay {
     constructor(portData, pbData, serverName, topMargin, rightMargin, minScale) {
         this._portDataDefault = portData;
         this._serverName = serverName;
-        this._topMargin = topMargin;
-        this._rightMargin = rightMargin;
         this._minScale = minScale;
         this._scale = minScale;
 
@@ -263,15 +261,17 @@ export default class PortDisplay {
         ];
     }
 
+    setSummarySize(topMargin, rightMargin) {
+        this._svgPortSummary.style("top", `${topMargin}px`).style("right", `${rightMargin}px`);
+    }
+
     _setupSummary() {
         // Main box
         this._svgPortSummary = d3Select("body")
             .append("svg")
             .attr("id", "port-summary")
             .classed("summary", true)
-            .style("position", "absolute")
-            .style("top", `${this._topMargin}px`)
-            .style("right", `${this._rightMargin}px`);
+            .style("position", "absolute");
 
         // Background
         const portSummaryRect = this._svgPortSummary
