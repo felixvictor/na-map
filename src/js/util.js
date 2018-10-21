@@ -289,7 +289,7 @@ export const getTextFromFetch = response => response.text();
  * @return {void}
  */
 export const putFetchError = error => {
-    console.log("Request failed -->", error);
+    console.error("Request failed -->", error);
 };
 
 /**
