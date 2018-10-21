@@ -74,6 +74,44 @@ export function readJson(fileName) {
 }
 
 /**
+ * Check fetch status (see {@link https://developers.google.com/web/updates/2015/03/introduction-to-fetch})
+ * @param {Object} response - fetch response
+ * @return {Promise<string>} Resolved or rejected promise
+ */
+export function checkFetchStatus(response) {
+    if (response.status >= 200 && response.status < 300) {
+        return Promise.resolve(response);
+    }
+    return Promise.reject(new Error(response.statusText));
+}
+
+/**
+ * Get json from fetch response
+ * @function
+ * @param {Object} response - fetch response
+ * @return {Object} json
+ */
+export const getJsonFromFetch = response => response.json();
+
+/**
+ * Get text from fetch response
+ * @function
+ * @param {Object} response - fetch response
+ * @return {Object} String
+ */
+export const getTextFromFetch = response => response.text();
+
+/**
+ * Write error to console
+ * @function
+ * @param {String} error - Error message
+ * @return {void}
+ */
+export const putFetchError = error => {
+    console.error("Request failed -->", error);
+};
+
+/**
  * Test if object is empty
  * @param {Object} obj - Object
  * @return {Boolean} True if object is empty

@@ -1,5 +1,5 @@
 /**
- * this._file is part of na-map.
+ * This file is part of na-map.
  *
  * @file      Display naval action map.
  * @module    map
@@ -15,7 +15,7 @@ import { feature as topojsonFeature } from "topojson-client";
 import Cookies from "js-cookie";
 
 import ResizeObserver from "resize-observer-polyfill";
-import { createReadOnlyRect, getContentRect } from "resize-observer-polyfill/src/utils/geometry";
+import { getContentRect } from "resize-observer-polyfill/src/utils/geometry";
 
 import { appDescription, appTitle, appVersion, defaultFontSize, insertBaseModal } from "./common";
 import { nearestPow2, checkFetchStatus, getJsonFromFetch, putFetchError, roundToThousands } from "./util";
