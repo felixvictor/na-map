@@ -82,6 +82,7 @@ function convertOwnership() {
             }
         });
         console.log("**** 138 -->", ports.get("138"));
+        return true;
     }
 
     /**
@@ -89,31 +90,45 @@ function convertOwnership() {
      * @param {string} fileName - File name
      * @return {void}
      */
-    const processFile = fileName => {
-        console.log("++++ processFile", fileName);
-        const compressedContent = fs.readFileSync(fileName, (errorReadFile, data) => {
-            if (errorReadFile) {
-                throw new Error(errorReadFile);
-            }
-            return data;
-        });
 
-        lzma.decompress(compressedContent, (decompressedContent, errorDecompress) => {
-            if (errorDecompress) {
-                throw new Error(errorDecompress);
+    function decompress(compressedContent) {
+        return lzma.decompress(compressedContent, (decompressedContent, error) => {
+            if (error) {
+                throw new Error(error);
             }
-            parseData(JSON.parse(decompressedContent.toString()), path.basename(fileName).match(fileBaseNameRegex)[1]);
+            return decompressedContent;
         });
-    };
+    }
+
+    function readFileContent(fileName) {
+        return new Promise((resolve, reject) => {
+            fs.readFile(fileName, (error, data) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(data);
+                }
+            });
+        });
+    }
 
     function processFiles(fileNames) {
-        let p = Promise.resolve(); // Q() in q
+        let p = Promise.resolve();
 
         fileNames.forEach(fileName => {
-            p = p.then(() => {
-                console.log(fileName);
-                processFile(fileName);
-            });
+            console.log("fileNames.forEach", fileName);
+            p = p
+                .then(() => readFileContent(fileName))
+                .then(compressedContent => {
+                    console.log("compressedContent", compressedContent);
+                    return decompress(compressedContent);
+                })
+                .then(decompressedContent =>
+                    parseData(
+                        JSON.parse(decompressedContent.toString()),
+                        path.basename(fileName).match(fileBaseNameRegex)[1]
+                    )
+                );
         });
         return p;
     }
