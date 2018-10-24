@@ -46,6 +46,7 @@ function common_var () {
     export CANNON_FILE="${SRC_DIR}/cannons.json"
     export BUILDING_FILE="${SRC_DIR}/buildings.json"
     export RECIPE_FILE="${SRC_DIR}/recipes.json"
+    export OWNERSHIP_FILE="${SRC_DIR}/ownership.json"
     export LOOT_FILE="${SRC_DIR}/loot.json"
     export EXCEL_FILE="${SRC_DIR}/port-battle.xlsx"
     export TWEETS_JSON="${BUILD_DIR}/API/tweets.json"
@@ -137,6 +138,7 @@ function get_port_data () {
         ${NODE} build/convert-buildings.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${BUILDING_FILE}" "${DATE}"
         ${NODE} build/convert-loot.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${LOOT_FILE}" "${DATE}"
         ${NODE} build/convert-recipes.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${RECIPE_FILE}" "${DATE}"
+        ${NODE} build/convert-ownership.mjs "${API_DIR}" "${OWNERSHIP_FILE}"
 
         ${NODE} build/create-xlsx.mjs "${SHIP_FILE}" "${SRC_DIR}/${SERVER_NAMES[0]}.json" "${BASE_DIR}/public/${MODULE}.min.css" "${EXCEL_FILE}"
 
