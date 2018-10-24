@@ -57,7 +57,7 @@ function convertOwnership() {
                 const data = ports.get(port.Id);
                 data.push({ timeRange: [date, date], val: nations[port.Nation].short });
                 ports.set(port.Id, data);
-                console.log("setNewNation -> ", ports.get(port.Id));
+                // console.log("setNewNation -> ", ports.get(port.Id));
             }
 
             function setNewEndDate() {
@@ -74,22 +74,15 @@ function convertOwnership() {
                 const currentNation = nations[port.Nation].short,
                     oldNation = getOldNation();
                 if (currentNation !== oldNation) {
-                    console.log("new nation", port.Id, currentNation, oldNation);
+                    // console.log("new nation", port.Id, currentNation, oldNation);
                     setNewNation();
                 } else {
                     setNewEndDate();
                 }
             }
         });
-        console.log("**** 138 -->", ports.get("138"));
-        return true;
+        // console.log("**** 138 -->", ports.get("138"));
     }
-
-    /**
-     *
-     * @param {string} fileName - File name
-     * @return {void}
-     */
 
     function decompress(compressedContent) {
         return lzma.decompress(compressedContent, (decompressedContent, error) => {
@@ -119,10 +112,7 @@ function convertOwnership() {
             console.log("fileNames.forEach", fileName);
             p = p
                 .then(() => readFileContent(fileName))
-                .then(compressedContent => {
-                    console.log("compressedContent", compressedContent);
-                    return decompress(compressedContent);
-                })
+                .then(compressedContent => decompress(compressedContent))
                 .then(decompressedContent =>
                     parseData(
                         JSON.parse(decompressedContent.toString()),
@@ -133,19 +123,6 @@ function convertOwnership() {
         return p;
     }
 
-    /*
-    async function readFiles(files) {
-        for (const file of files) {
-            await readFile(file);
-        }
-    }
-    */
-
-    /**
-     *
-     * @param fileName
-     * @return {boolean}
-     */
     function ignoreFileName(fileName, stats) {
         return !stats.isDirectory() && path.basename(fileName).match(fileBaseNameRegex) === null;
     }
@@ -165,15 +142,10 @@ function convertOwnership() {
     }
 
     function writeResult(bool) {
-        console.log("out", bool, ports, Array.from(ports.values()));
-        saveJson(outFileName, Array.from(ports.values()));
+        console.log("out", bool, ports, [...ports]);
+        saveJson(outFileName, [...ports]);
     }
 
-    /**
-     * Gets all files from directory <dir>
-     * @param {string} dir - Directory
-     * @returns {void}
-     */
     readDirRecursive(inDir, [ignoreFileName])
         .then(fileNames => sortFileNames(fileNames))
         .then(fileNames => processFiles(fileNames))
