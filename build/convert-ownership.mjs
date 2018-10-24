@@ -39,9 +39,10 @@ const fileBaseName = "api-eu1-Ports",
 function convertOwnership() {
     const ports = new Map(),
         fileBaseNameRegex = new RegExp(`${fileBaseName}-(20\\d{2}-\\d{2}-\\d{2})${fileExtension}`);
+    const apiFileNames = [];
 
     function parseData(portData, date) {
-        console.log("****", date);
+        console.log("**** new date", date);
         portData.forEach(port => {
             function initData() {
                 ports.set(port.Id, [{ timeRange: [date, date], val: nations[port.Nation].short }]);
@@ -56,7 +57,14 @@ function convertOwnership() {
                 const data = ports.get(port.Id);
                 data.push({ timeRange: [date, date], val: nations[port.Nation].short });
                 ports.set(port.Id, data);
-                console.log("data -> ", ports.get(port.Id));
+                console.log("setNewNation -> ", ports.get(port.Id));
+            }
+
+            function setNewEndDate() {
+                const data = ports.get(port.Id);
+                data[data.length - 1].timeRange[1] = date;
+                ports.set(port.Id, data);
+                // console.log("setNewEndDate -> ", ports.get(port.Id));
             }
 
             if (!ports.get(port.Id)) {
@@ -68,12 +76,12 @@ function convertOwnership() {
                 if (currentNation !== oldNation) {
                     console.log("new nation", port.Id, currentNation, oldNation);
                     setNewNation();
+                } else {
+                    setNewEndDate();
                 }
             }
-            // setNewEndDate();
-            // setNewNation();
         });
-        console.log("****", ports.get("138"));
+        console.log("**** 138 -->", ports.get("138"));
     }
 
     /**
@@ -82,27 +90,41 @@ function convertOwnership() {
      * @return {void}
      */
     const processFile = fileName => {
+        console.log("++++ processFile", fileName);
         const compressedContent = fs.readFileSync(fileName, (errorReadFile, data) => {
             if (errorReadFile) {
-                throw errorReadFile;
+                throw new Error(errorReadFile);
             }
             return data;
         });
 
         lzma.decompress(compressedContent, (decompressedContent, errorDecompress) => {
             if (errorDecompress) {
-                throw errorDecompress;
+                throw new Error(errorDecompress);
             }
             parseData(JSON.parse(decompressedContent.toString()), path.basename(fileName).match(fileBaseNameRegex)[1]);
         });
     };
 
     function processFiles(fileNames) {
+        let p = Promise.resolve(); // Q() in q
+
         fileNames.forEach(fileName => {
-            console.log(fileName);
-            processFile(fileName);
+            p = p.then(() => {
+                console.log(fileName);
+                processFile(fileName);
+            });
         });
+        return p;
     }
+
+    /*
+    async function readFiles(files) {
+        for (const file of files) {
+            await readFile(file);
+        }
+    }
+    */
 
     /**
      *
@@ -113,35 +135,37 @@ function convertOwnership() {
         return !stats.isDirectory() && path.basename(fileName).match(fileBaseNameRegex) === null;
     }
 
+    function sortFileNames(fileNames) {
+        return fileNames.sort((a, b) => {
+            const ba = path.basename(a),
+                bb = path.basename(b);
+            if (ba < bb) {
+                return -1;
+            }
+            if (ba > bb) {
+                return 1;
+            }
+            return 0;
+        });
+    }
+
+    function writeResult(bool) {
+        console.log("out", bool, ports, Array.from(ports.values()));
+        saveJson(outFileName, Array.from(ports.values()));
+    }
+
     /**
      * Gets all files from directory <dir>
      * @param {string} dir - Directory
      * @returns {void}
      */
-    const processDirRecursive = dir =>
-        readDirRecursive(dir, [ignoreFileName])
-            .then(fileNames => {
-                processFiles(
-                    fileNames.sort((a, b) => {
-                        const ba = path.basename(a),
-                            bb = path.basename(b);
-                        if (ba < bb) {
-                            return -1;
-                        }
-                        if (ba > bb) {
-                            return 1;
-                        }
-                        return 0;
-                    })
-                );
-            })
-            .catch(error => {
-                console.error(error);
-            });
-
-    processDirRecursive(inDir);
-
-    saveJson(outFileName, ports);
+    readDirRecursive(inDir, [ignoreFileName])
+        .then(fileNames => sortFileNames(fileNames))
+        .then(fileNames => processFiles(fileNames))
+        .then(bool => writeResult(bool))
+        .catch(error => {
+            throw new Error(error);
+        });
 }
 
 convertOwnership();
