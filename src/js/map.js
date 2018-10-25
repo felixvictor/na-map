@@ -20,22 +20,23 @@ import { getContentRect } from "resize-observer-polyfill/src/utils/geometry";
 import { appDescription, appTitle, appVersion, defaultFontSize, insertBaseModal } from "./common";
 import { nearestPow2, checkFetchStatus, getJsonFromFetch, putFetchError, roundToThousands } from "./util";
 
+import Building from "./building-list";
+import CannonList from "./cannon-list";
 import F11 from "./f11";
 import Grid from "./grid";
+import Ingredient from "./ingredient-list";
+import Journey from "./make-journey";
+import Module from "./module-list";
 import PBZone from "./pbzone";
+import OwnershipList from "./ownership-list";
 import PortDisplay from "./port";
 import PortSelect from "./port-select";
+import Recipe from "./recipe-list";
 import ShipCompare from "./ship-compare";
-import CannonList from "./cannon-list";
 import Teleport from "./teleport";
 import WindPrediction from "./wind-prediction";
 import WoodCompare from "./wood-compare";
 import WoodList from "./wood-list";
-import Module from "./module-list";
-import Recipe from "./recipe-list";
-import Ingredient from "./ingredient-list";
-import Building from "./building-list";
-import Journey from "./make-journey";
 import { registerEvent } from "./analytics";
 
 /**
@@ -93,6 +94,10 @@ export default class Map {
             {
                 fileName: "buildings.json",
                 name: "buildings"
+            },
+            {
+                fileName: "ownership.json",
+                name: "ownership"
             }
         ];
 
@@ -265,6 +270,9 @@ export default class Map {
 
         const cannonData = JSON.parse(JSON.stringify(data.cannons));
         this._cannonList = new CannonList(cannonData);
+
+        const ownershipData = JSON.parse(JSON.stringify(data.ownership));
+        this._ownershipList = new OwnershipList(ownershipData);
 
         const moduleData = JSON.parse(JSON.stringify(data.modules));
         this._moduleList = new Module(moduleData);
@@ -640,7 +648,7 @@ export default class Map {
     resize() {
         console.log("resize");
         this._setSvgSize();
-        this._ports.setSummarySize(this.margin.top,this.margin.right);
+        this._ports.setSummarySize(this.margin.top, this.margin.right);
     }
 
     _setSvgSize() {
