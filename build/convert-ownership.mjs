@@ -15,16 +15,15 @@ import * as path from "path";
 import { default as lzma } from "lzma-native";
 import { default as readDirRecursive } from "recursive-readdir";
 
-import { nations } from "./common.mjs";
-import {
-    isEmpty,
-    readJson,
-    readTextFile,
-    saveJson,
-    checkFetchStatus,
-    getJsonFromFetch,
-    putFetchError
-} from "./common.mjs";
+// eslint-disable-next-line import/extensions
+import { capitalToCounty, nations, saveJson } from "./common.mjs";
+
+// https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
+// eslint-disable-next-line no-extend-native,func-names
+String.prototype.replaceAll = function(search, replacement) {
+    const target = this;
+    return target.replace(new RegExp(search, "g"), replacement);
+};
 
 const inDir = process.argv[2],
     outFileName = process.argv[3];
@@ -39,27 +38,60 @@ const fileBaseName = "api-eu1-Ports",
 function convertOwnership() {
     const ports = new Map(),
         fileBaseNameRegex = new RegExp(`${fileBaseName}-(20\\d{2}-\\d{2}-\\d{2})${fileExtension}`);
-    const apiFileNames = [];
+    let currentPortData = {};
 
+    /**
+     * Parse data and construct ports Map
+     * @param {object} portData - Port data
+     * @param {string} date - current date
+     * @return {void}
+     */
     function parseData(portData, date) {
-        console.log("**** new date", date);
-        portData.forEach(port => {
-            function initData() {
-                ports.set(port.Id, [{ timeRange: [date, date], val: nations[port.Nation].short }]);
+        // console.log("**** new date", date);
+
+        // Store for later use
+        currentPortData = portData;
+        currentPortData.forEach(port => {
+            /**
+             * Get data object
+             * @return {{timeRange: string[], val: (string)}} - Object
+             */
+            function getObject() {
+                return { timeRange: [date, date], val: nations[port.Nation].short };
             }
 
-            const getOldNation = () => {
+            /**
+             * Set initial data
+             * @return {void}
+             */
+            function initData() {
+                ports.set(port.Id, [getObject()]);
+            }
+
+            /**
+             * Get previous nation short name
+             * @return {string} - nation short name
+             */
+            const getPreviousNation = () => {
                 const index = ports.get(port.Id).length - 1;
                 return ports.get(port.Id)[index].val;
             };
 
+            /**
+             * Add new nation entry
+             * @return {void}
+             */
             function setNewNation() {
                 const data = ports.get(port.Id);
-                data.push({ timeRange: [date, date], val: nations[port.Nation].short });
+                data.push(getObject());
                 ports.set(port.Id, data);
                 // console.log("setNewNation -> ", ports.get(port.Id));
             }
 
+            /**
+             * Change end date for current nation
+             * @return {void}
+             */
             function setNewEndDate() {
                 const data = ports.get(port.Id);
                 data[data.length - 1].timeRange[1] = date;
@@ -72,7 +104,7 @@ function convertOwnership() {
                 initData();
             } else {
                 const currentNation = nations[port.Nation].short,
-                    oldNation = getOldNation();
+                    oldNation = getPreviousNation();
                 if (currentNation !== oldNation) {
                     // console.log("new nation", port.Id, currentNation, oldNation);
                     setNewNation();
@@ -84,6 +116,11 @@ function convertOwnership() {
         // console.log("**** 138 -->", ports.get("138"));
     }
 
+    /**
+     * Decompress file content
+     * @param {Buffer} compressedContent - Compressed file content
+     * @return {Buffer|void} - Decompressed file content or error
+     */
     function decompress(compressedContent) {
         return lzma.decompress(compressedContent, (decompressedContent, error) => {
             if (error) {
@@ -93,6 +130,11 @@ function convertOwnership() {
         });
     }
 
+    /**
+     * Read file content
+     * @param {string} fileName - File name
+     * @return {Promise<any>} - Promise
+     */
     function readFileContent(fileName) {
         return new Promise((resolve, reject) => {
             fs.readFile(fileName, (error, data) => {
@@ -105,12 +147,14 @@ function convertOwnership() {
         });
     }
 
+    /**
+     * Process all files
+     * @param {string[]} fileNames - File names
+     * @return {*} - Resolved promise
+     */
     function processFiles(fileNames) {
-        let p = Promise.resolve();
-
-        fileNames.forEach(fileName => {
-            console.log("fileNames.forEach", fileName);
-            p = p
+        return fileNames.reduce((sequence, fileName) => {
+            return sequence
                 .then(() => readFileContent(fileName))
                 .then(compressedContent => decompress(compressedContent))
                 .then(decompressedContent =>
@@ -119,14 +163,24 @@ function convertOwnership() {
                         path.basename(fileName).match(fileBaseNameRegex)[1]
                     )
                 );
-        });
-        return p;
+        }, Promise.resolve());
     }
 
+    /**
+     * Check if file should be ignored
+     * @param {string} fileName - File name
+     * @param {*} stats - Stat
+     * @return {boolean} - True if file should be ignored
+     */
     function ignoreFileName(fileName, stats) {
         return !stats.isDirectory() && path.basename(fileName).match(fileBaseNameRegex) === null;
     }
 
+    /**
+     * Sort file names
+     * @param {string[]} fileNames - File names
+     * @return {string[]} - Sorted file names
+     */
     function sortFileNames(fileNames) {
         return fileNames.sort((a, b) => {
             const ba = path.basename(a),
@@ -141,9 +195,50 @@ function convertOwnership() {
         });
     }
 
-    function writeResult(bool) {
-        console.log("out", bool, ports, [...ports]);
-        saveJson(outFileName, [...ports]);
+    /**
+     * Write out result
+     * @return {void}
+     */
+    function writeResult() {
+        const result = [],
+            counties = new Map();
+
+        currentPortData.forEach(port => {
+            /**
+             * Get data object
+             * @return {{id: {string}, name: {string}}} - Object
+             */
+            function getObject() {
+                return {
+                    id: port.Id,
+                    name: port.Name.replaceAll("'", "’")
+                };
+            }
+
+            const county = capitalToCounty.get(port.CountyCapitalName);
+
+            if (!counties.has(county)) {
+                counties.set(county, [getObject()]);
+            } else {
+                const data = counties.get(county);
+                data.push(getObject());
+                counties.set(county, data);
+            }
+        });
+
+        counties.forEach((value, key, map) => {
+            const county = {
+                group: key,
+                data: value.map(port => ({
+                    label: port.name,
+                    data: ports.get(port.id)
+                }))
+            };
+
+            result.push(county);
+        });
+
+        saveJson(outFileName, result);
     }
 
     readDirRecursive(inDir, [ignoreFileName])
