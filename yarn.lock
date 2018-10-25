@@ -4050,20 +4050,42 @@ cyclist@~0.2.2:
   resolved "https://registry.yarnpkg.com/cyclist/-/cyclist-0.2.2.tgz#1b33792e11e914a2fd6d6ed6447464444e5fa640"
   integrity sha1-GzN5LhHpFKL9bW7WRHRkRE5fpkA=
 
-d3-array@1, d3-array@^1.0.0, d3-array@^1.2.0, d3-array@^1.2.4:
+d3-array@1, d3-array@^1.0.0, d3-array@^1.2.0, d3-array@^1.2.1, d3-array@^1.2.4:
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/d3-array/-/d3-array-1.2.4.tgz#635ce4d5eea759f6f605863dbcfc30edc737f71f"
   integrity sha512-KHW6M86R+FUPYGb3R5XiYjXPq7VzwxZ22buHhAEVG5ztoEcZZMLov530mmccaqA1GghZArjQV46fuc8kUqhhHw==
 
-d3-axis@^1.0.12:
+d3-axis@^1.0.12, d3-axis@^1.0.8:
   version "1.0.12"
   resolved "https://registry.yarnpkg.com/d3-axis/-/d3-axis-1.0.12.tgz#cdf20ba210cfbb43795af33756886fb3638daac9"
   integrity sha512-ejINPfPSNdGFKEOAtnBtdkpr24c4d4jsei6Lg98mxf424ivoDP2956/5HDpIAtmHo85lqT4pruy+zEgvRUBqaQ==
 
-d3-collection@1, d3-collection@^1.0.7:
+d3-brush@^1.0.4:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/d3-brush/-/d3-brush-1.0.6.tgz#33691f2032d9db6c5d8cb684ff255a9883629e21"
+  integrity sha512-lGSiF5SoSqO5/mYGD5FAeGKKS62JdA1EV7HPrU2b5rTX4qEJJtpjaGLJngjnkewQy7UnGstnFd3168wpf5z76w==
+  dependencies:
+    d3-dispatch "1"
+    d3-drag "1"
+    d3-interpolate "1"
+    d3-selection "1"
+    d3-transition "1"
+
+d3-collection@1, d3-collection@^1.0.4, d3-collection@^1.0.7:
   version "1.0.7"
   resolved "https://registry.yarnpkg.com/d3-collection/-/d3-collection-1.0.7.tgz#349bd2aa9977db071091c13144d5e4f16b5b310e"
   integrity sha512-ii0/r5f4sjKNTfh84Di+DpztYwqKhEyUlKoPrzUFfeSkWxjW49xU2QzO9qrPrNkpdI0XJkfzvmTu8V2Zylln6A==
+
+d3-color-legend@^1.2.4:
+  version "1.2.4"
+  resolved "https://registry.yarnpkg.com/d3-color-legend/-/d3-color-legend-1.2.4.tgz#debcb0a4e92ebc6f61f68d8a6bf311da1a38f6c1"
+  integrity sha512-2Cwe3LtRbq0A6eFLXF2gXTGpFap46+cbmtEo6EaYOI2ACCg0lsVnfCyaERYoDum9yplcNs93kD8iNXG82ImRcg==
+  dependencies:
+    d3-selection "^1.1.0"
+    kapsule "^1.7.8"
+    svg-text-fit "^1.1.4"
+    svg-utils "^1.2.5"
+    tinycolor2 "^1.4.1"
 
 d3-color@1:
   version "1.2.3"
@@ -4112,6 +4134,14 @@ d3-path@1:
   resolved "https://registry.yarnpkg.com/d3-path/-/d3-path-1.0.7.tgz#8de7cd693a75ac0b5480d3abaccd94793e58aae8"
   integrity sha512-q0cW1RpvA5c5ma2rch62mX8AYaiLX0+bdaSM2wxSU9tXjU4DNvkx9qiUvjkuWCj3p22UO/hlPivujqMiR9PDzA==
 
+d3-scale-chromatic@^1.2.0, d3-scale-chromatic@^1.3.3:
+  version "1.3.3"
+  resolved "https://registry.yarnpkg.com/d3-scale-chromatic/-/d3-scale-chromatic-1.3.3.tgz#dad4366f0edcb288f490128979c3c793583ed3c0"
+  integrity sha512-BWTipif1CimXcYfT02LKjAyItX5gKiwxuPRgr4xM58JwlLocWbjPLI7aMEjkcoOQXMkYsmNsvv3d2yl/OKuHHw==
+  dependencies:
+    d3-color "1"
+    d3-interpolate "1"
+
 d3-scale@^1.0.6:
   version "1.0.7"
   resolved "https://registry.yarnpkg.com/d3-scale/-/d3-scale-1.0.7.tgz#fa90324b3ea8a776422bd0472afab0b252a0945d"
@@ -4125,7 +4155,7 @@ d3-scale@^1.0.6:
     d3-time "1"
     d3-time-format "2"
 
-d3-scale@^2.1.2:
+d3-scale@^2.0.0, d3-scale@^2.1.2:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/d3-scale/-/d3-scale-2.1.2.tgz#4e932b7b60182aee9073ede8764c98423e5f9a94"
   integrity sha512-bESpd64ylaKzCDzvULcmHKZTlzA/6DGSVwx7QSDj/EnX9cpSevsdiwdHFYI9ouo9tNBbV3v5xztHS2uFeOzh8Q==
@@ -4137,7 +4167,7 @@ d3-scale@^2.1.2:
     d3-time "1"
     d3-time-format "2"
 
-d3-selection@1, d3-selection@^1.0.0, d3-selection@^1.1.0, d3-selection@^1.3.2:
+d3-selection@1, d3-selection@^1.0.0, d3-selection@^1.1.0, d3-selection@^1.3.0, d3-selection@^1.3.2:
   version "1.3.2"
   resolved "https://registry.yarnpkg.com/d3-selection/-/d3-selection-1.3.2.tgz#6e70a9df60801c8af28ac24d10072d82cbfdf652"
   integrity sha512-OoXdv1nZ7h2aKMVg3kaUFbLLK5jXUFAMLD/Tu5JA96mjf8f2a9ZUESGY+C36t8R1WFeWk/e55hy54Ml2I62CRQ==
@@ -4149,7 +4179,7 @@ d3-shape@^1.2.2:
   dependencies:
     d3-path "1"
 
-d3-time-format@2:
+d3-time-format@2, d3-time-format@^2.1.1:
   version "2.1.3"
   resolved "https://registry.yarnpkg.com/d3-time-format/-/d3-time-format-2.1.3.tgz#ae06f8e0126a9d60d6364eac5b1533ae1bac826b"
   integrity sha512-6k0a2rZryzGm5Ihx+aFMuO1GgelgIz+7HhB4PH4OEndD5q2zGn1mDfRdNrulspOfR6JXkb2sThhDK41CSK85QA==
@@ -4165,6 +4195,14 @@ d3-timer@1:
   version "1.0.9"
   resolved "https://registry.yarnpkg.com/d3-timer/-/d3-timer-1.0.9.tgz#f7bb8c0d597d792ff7131e1c24a36dd471a471ba"
   integrity sha512-rT34J5HnQUHhcLvhSB9GjCkN0Ddd5Y8nCwDBG2u6wQEeYxT/Lf51fTFFkldeib/sE/J0clIe0pnCfs6g/lRbyg==
+
+d3-tip@^0.9.1:
+  version "0.9.1"
+  resolved "https://registry.yarnpkg.com/d3-tip/-/d3-tip-0.9.1.tgz#84e6d331c4e6650d80c5228a07e41820609ab64b"
+  integrity sha512-EVBfG9d+HnjIoyVXfhpytWxlF59JaobwizqMX9EBXtsFmJytjwHeYiUs74ldHQjE7S9vzfKTx2LCtvUrIbuFYg==
+  dependencies:
+    d3-collection "^1.0.4"
+    d3-selection "^1.3.0"
 
 d3-transition@1, d3-transition@^1.0.0:
   version "1.1.3"
@@ -4239,6 +4277,11 @@ de-indent@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/de-indent/-/de-indent-1.0.2.tgz#b2038e846dc33baa5796128d0804b455b8c1e21d"
   integrity sha1-sgOOhG3DO6pXlhKNCAS0VbjB4h0=
+
+debounce@^1.1.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/debounce/-/debounce-1.2.0.tgz#44a540abc0ea9943018dc0eaa95cce87f65cd131"
+  integrity sha512-mYtLl1xfZLi1m4RtQYlZgJUNQjl4ZxVnHzIR8nLLgi4q1YT8o/WM+MK/f8yfcc9s5Ir5zRaPZyZU6xs1Syoocg==
 
 debug@*, debug@^3.1.0:
   version "3.1.0"
@@ -7720,6 +7763,13 @@ jszip@3.1.5:
     lie "~3.1.0"
     pako "~1.0.2"
     readable-stream "~2.0.6"
+
+kapsule@^1.7.8, kapsule@^1.9.0:
+  version "1.9.2"
+  resolved "https://registry.yarnpkg.com/kapsule/-/kapsule-1.9.2.tgz#424df7b6ace3633cfbc8a8210a2ba6d52e49c055"
+  integrity sha512-xuKhDyydMiDI7A9saP6H2lmXNHZyYulEXs70JcMO/S+vYud1Aq8t+kUyKC98olQIiekGGcozwDWjgaU36ux9kg==
+  dependencies:
+    debounce "^1.1.0"
 
 kebab-case@^1.0.0:
   version "1.0.0"
@@ -11870,6 +11920,13 @@ supports-color@^5.5.0:
   dependencies:
     has-flag "^3.0.0"
 
+svg-text-fit@^1.1.4, svg-text-fit@^1.1.5:
+  version "1.1.5"
+  resolved "https://registry.yarnpkg.com/svg-text-fit/-/svg-text-fit-1.1.5.tgz#41e85732fd5529acc13b14f5f5ee8c00f4970379"
+  integrity sha512-yaBsK1seYl4bmYnPjesvajuUcum197xAtG+ceAySrt9cofxUC2ig6gwMkX6nImkYRT9QKxsWhTVIpR4mRKEq2w==
+  dependencies:
+    kapsule "^1.7.8"
+
 svg-url-loader@^2.3.2:
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/svg-url-loader/-/svg-url-loader-2.3.2.tgz#dd86b26c19fe3b914f04ea10ef39594eade04464"
@@ -11877,6 +11934,16 @@ svg-url-loader@^2.3.2:
   dependencies:
     file-loader "1.1.11"
     loader-utils "1.1.0"
+
+svg-utils@^1.2.5, svg-utils@^1.2.6:
+  version "1.2.6"
+  resolved "https://registry.yarnpkg.com/svg-utils/-/svg-utils-1.2.6.tgz#983351a7f33a0a480b0f039c37ce36b329760837"
+  integrity sha512-jxms+429dM9otvrEnlHQFw4miMqzRy9tViOHU4nXnpp/NB3q99/HTrc4N0ZCJLj8hlRyEFw6cRESRSQvh4WRGQ==
+  dependencies:
+    d3-array "^1.2.1"
+    d3-scale "^1.0.6"
+    d3-selection "^1.1.0"
+    kapsule "^1.7.8"
 
 svg2png@^4.1.1:
   version "4.1.1"
@@ -12079,6 +12146,23 @@ timed-out@^4.0.0:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/timed-out/-/timed-out-4.0.1.tgz#f32eacac5a175bea25d7fab565ab3ed8741ef56f"
   integrity sha1-8y6srFoXW+ol1/q1Zas+2HQe9W8=
+
+"timelines-chart@https://github.com/felixvictor/timelines-chart":
+  version "2.6.4"
+  resolved "https://github.com/felixvictor/timelines-chart#2c4c718644e4d6a58e726018e0e857efca9d737f"
+  dependencies:
+    d3-array "^1.2.1"
+    d3-axis "^1.0.8"
+    d3-brush "^1.0.4"
+    d3-color-legend "^1.2.4"
+    d3-scale "^2.0.0"
+    d3-scale-chromatic "^1.2.0"
+    d3-selection "^1.3.0"
+    d3-time-format "^2.1.1"
+    d3-tip "^0.9.1"
+    kapsule "^1.9.0"
+    svg-text-fit "^1.1.5"
+    svg-utils "^1.2.6"
 
 timers-browserify@^2.0.4:
   version "2.0.10"

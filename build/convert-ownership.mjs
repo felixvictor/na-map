@@ -153,17 +153,19 @@ function convertOwnership() {
      * @return {*} - Resolved promise
      */
     function processFiles(fileNames) {
-        return fileNames.reduce((sequence, fileName) => {
-            return sequence
-                .then(() => readFileContent(fileName))
-                .then(compressedContent => decompress(compressedContent))
-                .then(decompressedContent =>
-                    parseData(
-                        JSON.parse(decompressedContent.toString()),
-                        path.basename(fileName).match(fileBaseNameRegex)[1]
-                    )
-                );
-        }, Promise.resolve());
+        return fileNames.reduce(
+            (sequence, fileName) =>
+                sequence
+                    .then(() => readFileContent(fileName))
+                    .then(compressedContent => decompress(compressedContent))
+                    .then(decompressedContent =>
+                        parseData(
+                            JSON.parse(decompressedContent.toString()),
+                            path.basename(fileName).match(fileBaseNameRegex)[1]
+                        )
+                    ),
+            Promise.resolve()
+        );
     }
 
     /**
@@ -226,10 +228,11 @@ function convertOwnership() {
             }
         });
 
-        counties.forEach((value, key, map) => {
+        counties.forEach((value, key) => {
             const county = {
                 group: key,
                 data: value.map(port => ({
+                    // label: port.name.replaceAll(" ", "_"),
                     label: port.name,
                     data: ports.get(port.id)
                 }))
