@@ -1,4 +1,5 @@
-import { readJson, saveJson, capitalizeFirstLetter } from "./common.mjs";
+// eslint-disable-next-line import/extensions
+import { groupBy, readJson, saveJson, capitalizeFirstLetter } from "./common.mjs";
 
 const itemsFilename = process.argv[2],
     outDir = process.argv[3],
@@ -12,21 +13,6 @@ String.prototype.replaceAll = function(search, replacement) {
     const target = this;
     return target.replace(new RegExp(search, "g"), replacement);
 };
-
-// https://stackoverflow.com/questions/14446511/what-is-the-most-efficient-method-to-groupby-on-a-javascript-array-of-objects
-function groupBy(list, keyGetter) {
-    const map = new Map();
-    list.forEach(item => {
-        const key = keyGetter(item);
-        const collection = map.get(key);
-        if (!collection) {
-            map.set(key, [item]);
-        } else {
-            collection.push(item);
-        }
-    });
-    return map;
-}
 
 /**
  * Convert API module data and save sorted as JSON
