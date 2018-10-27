@@ -9,8 +9,8 @@
  */
 
 import { scaleOrdinal as d3ScaleOrdinal } from "d3-scale";
-import { schemePaired as d3SchemePaired } from "d3-scale-chromatic";
 import { select as d3Select } from "d3-selection";
+import { getContentRect } from "resize-observer-polyfill/src/utils/geometry";
 import TimelinesChart from "timelines-chart";
 
 import { insertBaseModal } from "./common";
@@ -27,6 +27,9 @@ String.prototype.replaceAll = function(search, replacement) {
  *
  */
 export default class OwnershipList {
+    /**
+     * @param {object} ownershipData - Port ownership data over time
+     */
     constructor(ownershipData) {
         this._ownershipData = ownershipData;
 
@@ -38,6 +41,11 @@ export default class OwnershipList {
         this._setupListener();
     }
 
+    /**
+     * Setup listener
+     * @return {void}
+     * @private
+     */
     _setupListener() {
         $(`#${this._buttonId}`).on("click", event => {
             registerEvent("Tools", this._baseName);
@@ -46,43 +54,80 @@ export default class OwnershipList {
         });
     }
 
+    /**
+     * Inject modal
+     * @return {void}
+     * @private
+     */
     _injectModal() {
         insertBaseModal(this._modalId, this._baseName);
 
         this._div = d3Select(`#${this._modalId} .modal-body`)
             .append("div")
             .attr("id", `${this._baseId}`)
-            .attr("class", "container-fluid");
-    }
-
-    _initModal() {
-        this._injectModal();
-        this._injectChart();
-    }
-
-    _ownershipListSelected() {
-        // If the modal has no content yet, insert it
-        if (!document.getElementById(this._modalId)) {
-            this._initModal();
-        }
-        // Show modal
-        $(`#${this._modalId}`).modal("show");
+            .append("div");
     }
 
     /**
-     * Show wood type
-     * @param {string} type Wood type (frame or trim)
+     * Init modal
+     * @return {void}
+     * @private
+     */
+    _initModal() {
+        this._injectModal();
+    }
+
+    /**
+     * Action when menu item is clicked
+     * @return {void}
+     * @private
+     */
+    _ownershipListSelected() {
+        let emptyModal = false;
+
+        // If the modal has no content yet, insert it
+        if (!document.getElementById(this._modalId)) {
+            emptyModal = true;
+            this._initModal();
+        }
+        // Show modal
+        $(`#${this._modalId}`)
+            .on("shown.bs.modal", () => {
+                // Inject chart after modal is shown to calculate modal width
+                if (emptyModal) {
+                    this._injectChart();
+                    emptyModal = false;
+                }
+            })
+            .modal("show");
+    }
+
+    /**
+     * Inject chart
      * @return {void}
      * @private
      */
     _injectChart() {
-        const colourScale = d3ScaleOrdinal(d3SchemePaired),
+        // http://tools.medialab.sciences-po.fr/iwanthue/
+        const colourScale = d3ScaleOrdinal().range([
+                "#72823a",
+                "#825fc8",
+                "#78b642",
+                "#cd47a3",
+                "#50b187",
+                "#d34253",
+                "#628bcc",
+                "#cb9f3d",
+                "#cc88c9",
+                "#ca5b2b",
+                "#b55576",
+                "#c27b58"
+            ]),
             chart = TimelinesChart()
                 .data(this._ownershipData)
+                .timeFormat("%-d %B %Y")
                 .zQualitative(true)
                 .zColorScale(colourScale)
-                .width(1000)
-                (this._div.node());
-        console.log(chart.zQualitative(), chart.zColorScale().domain(), chart.zColorScale().range());
+                .width(document.getElementById(this._baseId).offsetWidth)(this._div.node());
     }
 }
