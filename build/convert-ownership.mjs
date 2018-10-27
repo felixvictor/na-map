@@ -12,6 +12,7 @@
 
 import * as fs from "fs";
 import * as path from "path";
+import d3Node from "d3-node";
 import { default as lzma } from "lzma-native";
 import { default as readDirRecursive } from "recursive-readdir";
 
@@ -31,6 +32,9 @@ const inDir = process.argv[2],
 const fileBaseName = "api-eu1-Ports",
     fileExtension = ".json.xz";
 
+const d3n = d3Node(),
+    { d3 } = d3n;
+
 /**
  * Retrieve port data for nation/clan ownership
  * @returns {void}
@@ -38,7 +42,6 @@ const fileBaseName = "api-eu1-Ports",
 function convertOwnership() {
     const ports = new Map(),
         fileBaseNameRegex = new RegExp(`${fileBaseName}-(20\\d{2}-\\d{2}-\\d{2})${fileExtension}`);
-    let currentPortData = {};
 
     /**
      * Parse data and construct ports Map
@@ -49,15 +52,16 @@ function convertOwnership() {
     function parseData(portData, date) {
         // console.log("**** new date", date);
 
-        // Store for later use
-        currentPortData = portData;
-        currentPortData.forEach(port => {
+        portData.forEach(port => {
             /**
              * Get data object
              * @return {{timeRange: string[], val: (string)}} - Object
              */
             function getObject() {
-                return { timeRange: [date, date], val: nations[port.Nation].short };
+                return {
+                    timeRange: [date, date],
+                    val: nations[port.Nation].short
+                };
             }
 
             /**
@@ -65,7 +69,12 @@ function convertOwnership() {
              * @return {void}
              */
             function initData() {
-                ports.set(port.Id, [getObject()]);
+                ports.set(port.Id, {
+                    name: port.Name.replaceAll("'", "’"),
+                    region: port.Location,
+                    county: capitalToCounty.get(port.CountyCapitalName) || "",
+                    data: [getObject()]
+                });
             }
 
             /**
@@ -73,8 +82,8 @@ function convertOwnership() {
              * @return {string} - nation short name
              */
             const getPreviousNation = () => {
-                const index = ports.get(port.Id).length - 1;
-                return ports.get(port.Id)[index].val;
+                const index = ports.get(port.Id).data.length - 1;
+                return ports.get(port.Id).data[index].val;
             };
 
             /**
@@ -82,10 +91,10 @@ function convertOwnership() {
              * @return {void}
              */
             function setNewNation() {
-                const data = ports.get(port.Id);
-                data.push(getObject());
-                ports.set(port.Id, data);
                 // console.log("setNewNation -> ", ports.get(port.Id));
+                const values = ports.get(port.Id);
+                values.data.push(getObject());
+                ports.set(port.Id, values);
             }
 
             /**
@@ -93,23 +102,26 @@ function convertOwnership() {
              * @return {void}
              */
             function setNewEndDate() {
-                const data = ports.get(port.Id);
-                data[data.length - 1].timeRange[1] = date;
-                ports.set(port.Id, data);
-                // console.log("setNewEndDate -> ", ports.get(port.Id));
+                const values = ports.get(port.Id);
+                // console.log("setNewEndDate -> ", ports.get(port.Id), values);
+                values.data[values.data.length - 1].timeRange[1] = date;
+                ports.set(port.Id, values);
             }
 
-            if (!ports.get(port.Id)) {
-                //  console.log(ports.get(port.Id));
-                initData();
-            } else {
-                const currentNation = nations[port.Nation].short,
-                    oldNation = getPreviousNation();
-                if (currentNation !== oldNation) {
-                    // console.log("new nation", port.Id, currentNation, oldNation);
-                    setNewNation();
+            // Exclude free towns
+            if (port.nation !== 9) {
+                if (!ports.get(port.Id)) {
+                    // console.log("!ports.get(port.Id)");
+                    initData();
                 } else {
-                    setNewEndDate();
+                    // console.log("ports.get(port.Id)");
+                    const currentNation = nations[port.Nation].short,
+                        oldNation = getPreviousNation();
+                    if (currentNation !== oldNation) {
+                        setNewNation();
+                    } else {
+                        setNewEndDate();
+                    }
                 }
             }
         });
@@ -202,50 +214,40 @@ function convertOwnership() {
      * @return {void}
      */
     function writeResult() {
-        let data = [];
-        const counties = new Map(),
-            result = [];
-
-        currentPortData.forEach(port => {
-            /**
-             * Get data object
-             * @return {{id: {string}, name: {string}}} - Object
-             */
-            function getObject() {
-                return {
-                    id: port.Id,
-                    name: port.Name.replaceAll("'", "’"),
-                    region: port.Location
-                };
-            }
-
-            // Exclude free towns
-            if (port.Nation !== 9) {
-                let county = capitalToCounty.get(port.CountyCapitalName);
-                county = county || "";
-
-                if (!counties.has(county)) {
-                    data = [getObject()];
-                } else {
-                    data = counties.get(county);
-                    data.push(getObject());
-                }
-
-                counties.set(county, data);
-            }
+        const portsArray = [...ports.entries()].map(([key, value]) => {
+            // eslint-disable-next-line no-param-reassign
+            value.id = key;
+            return value;
         });
 
-        counties.forEach((value, key) => {
-            const county = {
-                group: key,
-                region: value[0].region,
-                data: value.map(port => ({
-                    label: port.name,
-                    data: ports.get(port.id)
-                }))
-            };
+        // Nest by region and county
+        const nested = d3
+            .nest()
+            .key(d => d.region)
+            .sortKeys(d3.ascending)
+            .key(d => d.county)
+            .sortKeys(d3.ascending)
+            .entries(portsArray);
 
-            result.push(county);
+        // Convert to data structure needed for timelines-chart
+        // region
+        // -- group (counties)
+        //    -- label (ports)
+        const result = nested.map(region => {
+            const newRegion = {};
+            newRegion.region = region.key;
+            newRegion.data = region.values.map(county => {
+                const group = {};
+                group.group = county.key;
+                group.data = county.values.map(port => {
+                    const label = {};
+                    label.label = port.name;
+                    label.data = port.data;
+                    return label;
+                });
+                return group;
+            });
+            return newRegion;
         });
 
         saveJson(outFileName, result);
