@@ -27,7 +27,8 @@ String.prototype.replaceAll = function(search, replacement) {
 };
 
 const inDir = process.argv[2],
-    outFileName = process.argv[3];
+    outFileNameTimelinePorts = process.argv[3],
+    outFileNameTimelineDates = process.argv[4];
 
 const fileBaseName = "api-eu1-Ports",
     fileExtension = ".json.xz";
@@ -41,6 +42,7 @@ const d3n = d3Node(),
  */
 function convertOwnership() {
     const ports = new Map(),
+        numPortsDates = [],
         fileBaseNameRegex = new RegExp(`${fileBaseName}-(20\\d{2}-\\d{2}-\\d{2})${fileExtension}`);
 
     /**
@@ -51,6 +53,11 @@ function convertOwnership() {
      */
     function parseData(portData, date) {
         // console.log("**** new date", date);
+
+        const numPorts = [];
+        nations.filter(nation => nation.id !== 9).forEach(nation => {
+            numPorts[nation.short] = 0;
+        });
 
         portData.forEach(port => {
             /**
@@ -110,6 +117,7 @@ function convertOwnership() {
 
             // Exclude free towns
             if (port.nation !== 9) {
+                numPorts[nations[port.Nation].short] += 1;
                 if (!ports.get(port.Id)) {
                     // console.log("!ports.get(port.Id)");
                     initData();
@@ -125,6 +133,13 @@ function convertOwnership() {
                 }
             }
         });
+
+        const numPortsDate = {};
+        numPortsDate.date = date;
+        nations.filter(nation => nation.id !== 9).forEach(nation => {
+            numPortsDate[nation.short] = numPorts[nation.short];
+        });
+        numPortsDates.push(numPortsDate);
         // console.log("**** 138 -->", ports.get("138"));
     }
 
@@ -250,7 +265,8 @@ function convertOwnership() {
             return newRegion;
         });
 
-        saveJson(outFileName, result);
+        saveJson(outFileNameTimelinePorts, result);
+        saveJson(outFileNameTimelineDates, numPortsDates);
     }
 
     readDirRecursive(inDir, [ignoreFileName])
