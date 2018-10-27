@@ -225,7 +225,6 @@ export default class Map {
     }
 
     _setupData(data) {
-        console.log("_setupData");
         const portData = topojsonFeature(data.ports, data.ports.objects.ports);
         // Port ids of capturable ports
         const portIds = portData.features.filter(port => !port.properties.nonCapturable).map(port => port.id);
