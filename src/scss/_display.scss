@@ -715,7 +715,7 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
     .axises {
         line,
         path {
-            stroke: #808080;
+            stroke: $primary-700;
         }
 
         .x-axis {
@@ -723,7 +723,7 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
         }
 
         .x-grid line {
-            stroke: #d3d3d3;
+            stroke: $primary-200;
         }
 
         .y-axis,
@@ -733,14 +733,14 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
                 stroke: none;
             }
             text {
-                fill: #2f4f4f;
+                fill: $primary-700;
             }
         }
     }
 
     .series-group {
         fill-opacity: 0.6;
-        stroke: #808080;
+        stroke: $primary-700;
         stroke-opacity: 0.2;
     }
 
@@ -755,12 +755,12 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
 
     .legend {
         .legendText {
-            fill: #666;
+            fill: $body-color;
         }
     }
 
     .reset-zoom-btn {
-        fill: blue;
+        fill: $primary-600;
         opacity: 0.6;
         cursor: pointer;
     }
@@ -768,7 +768,7 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
 
 .brusher {
     .grid-background {
-        fill: lightgrey;
+        fill: $primary-200;
     }
 
     .axis path {
@@ -782,23 +782,23 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
     .grid {
         line,
         path {
-            stroke: #fff;
+            stroke: $primary-100;
         }
     }
 }
 
 .chart-zoom-selection,
 .brusher .brush .selection {
-    stroke: blue;
+    stroke: $primary-700;
     stroke-opacity: 0.6;
-    fill: blue;
+    fill: $primary-700;
     fill-opacity: 0.3;
     shape-rendering: crispEdges;
 }
 
 .chart-tooltip {
-    color: #eee;
-    background: rgba(0, 0, 140, 0.85);
+    color: $body-color;
+    background: $primary-200;
     padding: 5px;
     border-radius: 3px;
     font-size: 11px;
