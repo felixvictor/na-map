@@ -202,8 +202,9 @@ function convertOwnership() {
      * @return {void}
      */
     function writeResult() {
-        const result = [],
-            counties = new Map();
+        let data = [];
+        const counties = new Map(),
+            result = [];
 
         currentPortData.forEach(port => {
             /**
@@ -213,17 +214,23 @@ function convertOwnership() {
             function getObject() {
                 return {
                     id: port.Id,
-                    name: port.Name.replaceAll("'", "’")
+                    name: port.Name.replaceAll("'", "’"),
+                    region: port.Location
                 };
             }
 
-            const county = capitalToCounty.get(port.CountyCapitalName);
+            // Exclude free towns
+            if (port.Nation !== 9) {
+                let county = capitalToCounty.get(port.CountyCapitalName);
+                county = county || "";
 
-            if (!counties.has(county)) {
-                counties.set(county, [getObject()]);
-            } else {
-                const data = counties.get(county);
-                data.push(getObject());
+                if (!counties.has(county)) {
+                    data = [getObject()];
+                } else {
+                    data = counties.get(county);
+                    data.push(getObject());
+                }
+
                 counties.set(county, data);
             }
         });
@@ -231,8 +238,8 @@ function convertOwnership() {
         counties.forEach((value, key) => {
             const county = {
                 group: key,
+                region: value[0].region,
                 data: value.map(port => ({
-                    // label: port.name.replaceAll(" ", "_"),
                     label: port.name,
                     data: ports.get(port.id)
                 }))
@@ -247,7 +254,7 @@ function convertOwnership() {
     readDirRecursive(inDir, [ignoreFileName])
         .then(fileNames => sortFileNames(fileNames))
         .then(fileNames => processFiles(fileNames))
-        .then(bool => writeResult(bool))
+        .then(() => writeResult())
         .catch(error => {
             throw new Error(error);
         });
