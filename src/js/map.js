@@ -98,6 +98,10 @@ export default class Map {
             {
                 fileName: "ownership.json",
                 name: "ownership"
+            },
+            {
+                fileName: "nations.json",
+                name: "nations"
             }
         ];
 
@@ -270,8 +274,9 @@ export default class Map {
         const cannonData = JSON.parse(JSON.stringify(data.cannons));
         this._cannonList = new CannonList(cannonData);
 
-        const ownershipData = JSON.parse(JSON.stringify(data.ownership));
-        this._ownershipList = new OwnershipList(ownershipData);
+        const ownershipData = JSON.parse(JSON.stringify(data.ownership)),
+            nationData = JSON.parse(JSON.stringify(data.nations));
+        this._ownershipList = new OwnershipList(ownershipData, nationData);
 
         const moduleData = JSON.parse(JSON.stringify(data.modules));
         this._moduleList = new Module(moduleData);
