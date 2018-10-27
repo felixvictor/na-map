@@ -276,3 +276,24 @@ export const roundToThousands = x => Math.round(x * 1000) / 1000;
 
 export const speedConstA = 0.074465523706782;
 export const speedConstB = 0.00272175949231;
+
+/**
+ * Group by
+ * {@link https://stackoverflow.com/questions/14446511/what-is-the-most-efficient-method-to-groupby-on-a-javascript-array-of-objects}
+ * @param {*} list - list
+ * @param {*} keyGetter - key getter
+ * @return {Map<any, any>} Map
+ */
+export function groupBy(list, keyGetter) {
+    const map = new Map();
+    list.forEach(item => {
+        const key = keyGetter(item);
+        const collection = map.get(key);
+        if (!collection) {
+            map.set(key, [item]);
+        } else {
+            collection.push(item);
+        }
+    });
+    return map;
+}
