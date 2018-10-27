@@ -821,3 +821,13 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
         text-align: center;
     }
 }
+
+.area {
+  .area-label {
+    fill-opacity: 0.7;
+    fill: $white;
+  }
+  path {
+    fill-opacity: 0.6;
+  }
+}
