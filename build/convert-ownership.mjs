@@ -67,7 +67,8 @@ function convertOwnership() {
             function getObject() {
                 return {
                     timeRange: [date, date],
-                    val: nations[port.Nation].short
+                    val: nations[port.Nation].short,
+                    labelVal: nations[port.Nation].sortName
                 };
             }
 
