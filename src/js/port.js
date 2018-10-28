@@ -261,7 +261,7 @@ export default class PortDisplay {
         ];
     }
 
-    setSummarySize(topMargin, rightMargin) {
+    setSummaryPosition(topMargin, rightMargin) {
         this._svgPortSummary.style("top", `${topMargin}px`).style("right", `${rightMargin}px`);
     }
 
