@@ -130,11 +130,21 @@ export default class OwnershipList {
             .modal("show");
     }
 
+    /**
+     * Get <factor> height of current window
+     * @return {number} Height
+     */
     static getHeight() {
+        const factor = 0.75;
         // eslint-disable-next-line no-restricted-globals
-        return Math.floor(top.innerHeight * 0.75);
+        return Math.floor(top.innerHeight * factor);
     }
 
+    /**
+     * Get width of baseId
+     * @return {number} Width
+     * @private
+     */
     _getWidth() {
         return Math.floor(document.getElementById(this._baseId).offsetWidth);
     }
@@ -153,11 +163,16 @@ export default class OwnershipList {
             .width(this._getWidth())(this._div.node());
     }
 
+    /**
+     * Inject stacked area
+     * @return {void}
+     * @private
+     */
     _injectArea() {
         /**
          * Get x date value
          * @param {*} d - data
-         * @return {Date}
+         * @return {Date} x value
          */
         const xValue = d => new Date(d.date);
 
@@ -166,10 +181,7 @@ export default class OwnershipList {
             height = OwnershipList.getHeight(),
             margin = { top: 0, right: 32, bottom: 32, left: 32 };
 
-        const labelNames = new Map(
-                nations.filter(nation => nation.id !== 9).map(nation => [nation.short, nation.name])
-            ),
-            keys = nations.filter(nation => nation.id !== 9).map(nation => nation.short),
+        const keys = nations.filter(nation => nation.id !== 9).map(nation => nation.short),
             nationData = this._nationData;
         nationData.keys = keys;
 
@@ -178,57 +190,77 @@ export default class OwnershipList {
                 .keys(nationData.keys),
             stacked = stack(nationData);
 
-        const xScale = d3ScaleLinear()
+        /**
+         * Set x axis
+         * @param {*} g - g element
+         * @return {void}
+         */
+        const setXAxis = g => {
+            const xTimeScale = d3ScaleTime()
                 .domain(d3Extent(nationData, d => xValue(d)))
-                .range([margin.left, width - margin.right]),
-            yScale = d3ScaleLinear()
-                .domain([d3Min(stacked[0], d => d[0]), d3Max(stacked[stacked.length - 1], d => d[1])])
-                .range([height - margin.bottom, 0]);
+                .range([margin.left, width - margin.right]);
+            g.attr("transform", `translate(0,${height - margin.bottom})`).call(
+                d3AxisBottom(xTimeScale)
+                    .ticks(width / 80)
+                    .tickSizeOuter(0)
+            );
+        };
 
-        this._colourScale.domain(nationData.keys);
+        /**
+         * Get area
+         * @return {function} Area
+         */
+        const getArea = () => {
+            const xScale = d3ScaleLinear()
+                    .domain(d3Extent(nationData, d => xValue(d)))
+                    .range([margin.left, width - margin.right]),
+                yScale = d3ScaleLinear()
+                    .domain([d3Min(stacked[0], d => d[0]), d3Max(stacked[stacked.length - 1], d => d[1])])
+                    .range([height - margin.bottom, 0]);
 
-        const xTimeScale = d3ScaleTime()
-                .domain(d3Extent(nationData, d => xValue(d)))
-                .range([margin.left, width - margin.right]),
-            xAxis = g =>
-                g.attr("transform", `translate(0,${height - margin.bottom})`).call(
-                    d3AxisBottom(xTimeScale)
-                        .ticks(width / 80)
-                        .tickSizeOuter(0)
-                );
+            const area = d3Area()
+                .x(d => xScale(xValue(d.data)))
+                .y0(d => yScale(d[0]))
+                .y1(d => yScale(d[1]))
+                .curve(d3CurveBasis);
 
-        const area = d3Area()
-            .x(d => xScale(xValue(d.data)))
-            .y0(d => yScale(d[0]))
-            .y1(d => yScale(d[1]))
-            .curve(d3CurveBasis);
+            return area;
+        };
 
         /**
          * Render chart
          * @return {void}
          */
         const render = () => {
-            const paths = this._svg.selectAll("path").data(stacked);
-            paths
+            const area = getArea(),
+                labelNames = new Map(
+                    nations.filter(nation => nation.id !== 9).map(nation => [nation.short, nation.name])
+                );
+            this._colourScale.domain(nationData.keys);
+
+            // Paths
+            this._svg
+                .selectAll("path")
+                .data(stacked)
                 .enter()
                 .append("path")
-                .merge(paths)
                 .attr("fill", d => this._colourScale(d.key))
                 .attr("stroke", d => this._colourScale(d.key))
                 .attr("d", area);
 
-            const labels = this._svg.selectAll(".area-label").data(stacked);
-            labels
+            // Labels
+            this._svg
+                .selectAll(".area-label")
+                .data(stacked)
                 .enter()
                 .append("text")
                 .attr("class", "area-label")
-                .merge(labels)
                 .text(d => labelNames.get(d.key))
                 .attr("transform", d3AreaLabel(area));
         };
 
         this._svg.attr("width", width).attr("height", height);
         render();
-        this._svg.append("g").call(xAxis);
+        this._svg.append("g").call(setXAxis);
     }
 }
