@@ -285,7 +285,7 @@ table a {
 
 text {
     fill: $primary-900;
-    pointer-events: none;
+    // pointer-events: none; // needed? Conflicts with timelines-chart reset zoom
 }
 
 .profile {

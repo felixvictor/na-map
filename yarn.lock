@@ -12365,8 +12365,8 @@ timed-out@^4.0.0:
   integrity sha1-8y6srFoXW+ol1/q1Zas+2HQe9W8=
 
 "timelines-chart@https://github.com/felixvictor/timelines-chart":
-  version "2.6.4"
-  resolved "https://github.com/felixvictor/timelines-chart#2c4c718644e4d6a58e726018e0e857efca9d737f"
+  version "2.6.4-1"
+  resolved "https://github.com/felixvictor/timelines-chart#d805bebc6f9cafc0a7324a76cf5356195c88f55a"
   dependencies:
     d3-array "^1.2.1"
     d3-axis "^1.0.8"
