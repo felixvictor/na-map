@@ -116,7 +116,7 @@ function convertOwnership() {
             }
 
             // Exclude free towns
-            if (port.nation !== 9) {
+            if (port.Nation !== 9) {
                 numPorts[nations[port.Nation].short] += 1;
                 if (!ports.get(port.Id)) {
                     // console.log("!ports.get(port.Id)");
