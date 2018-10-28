@@ -708,8 +708,8 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
 }
 
 .timelines-chart {
+  padding-bottom: 3rem;
     text-align: center;
-
     user-select: none;
 
     .axises {
@@ -828,6 +828,8 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
     fill: $white;
   }
   path {
-    fill-opacity: 0.6;
+    stroke-opacity: 0.4;
+    stroke: $white !important;
+    stroke-width: 2px;
   }
 }
