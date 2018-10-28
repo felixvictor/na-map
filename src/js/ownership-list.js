@@ -154,6 +154,11 @@ export default class OwnershipList {
     }
 
     _injectArea() {
+        /**
+         * Get x date value
+         * @param {*} d - data
+         * @return {Date}
+         */
         const xValue = d => new Date(d.date);
 
         const width = this._getWidth(),
@@ -161,21 +166,33 @@ export default class OwnershipList {
             height = OwnershipList.getHeight(),
             margin = { top: 0, right: 32, bottom: 32, left: 32 };
 
-        const stack = d3Stack().offset(d3StackOffsetNone),
-            xScale = d3ScaleLinear(),
-            yScale = d3ScaleLinear(),
+        const labelNames = new Map(
+                nations.filter(nation => nation.id !== 9).map(nation => [nation.short, nation.name])
+            ),
             keys = nations.filter(nation => nation.id !== 9).map(nation => nation.short),
-            labelNames = new Map(nations.filter(nation => nation.id !== 9).map(nation => [nation.short, nation.name])),
-            data = this._nationData;
+            nationData = this._nationData;
+        nationData.keys = keys;
 
-        data.keys = keys;
+        const stack = d3Stack()
+                .offset(d3StackOffsetNone)
+                .keys(nationData.keys),
+            stacked = stack(nationData);
 
-        const x = d3ScaleTime()
-                .domain(d3Extent(data, d => xValue(d)))
+        const xScale = d3ScaleLinear()
+                .domain(d3Extent(nationData, d => xValue(d)))
+                .range([margin.left, width - margin.right]),
+            yScale = d3ScaleLinear()
+                .domain([d3Min(stacked[0], d => d[0]), d3Max(stacked[stacked.length - 1], d => d[1])])
+                .range([height - margin.bottom, 0]);
+
+        this._colourScale.domain(nationData.keys);
+
+        const xTimeScale = d3ScaleTime()
+                .domain(d3Extent(nationData, d => xValue(d)))
                 .range([margin.left, width - margin.right]),
             xAxis = g =>
                 g.attr("transform", `translate(0,${height - margin.bottom})`).call(
-                    d3AxisBottom(x)
+                    d3AxisBottom(xTimeScale)
                         .ticks(width / 80)
                         .tickSizeOuter(0)
                 );
@@ -186,17 +203,11 @@ export default class OwnershipList {
             .y1(d => yScale(d[1]))
             .curve(d3CurveBasis);
 
-        const render = data => {
-            stack.keys(data.keys);
-            this._colourScale.domain(data.keys);
-            const stacked = stack(data);
-
-            xScale.domain(d3Extent(data, d => xValue(d))).range([margin.left, width - margin.right]);
-
-            yScale
-                .domain([d3Min(stacked[0], d => d[0]), d3Max(stacked[stacked.length - 1], d => d[1])])
-                .range([height - margin.bottom, 0]);
-
+        /**
+         * Render chart
+         * @return {void}
+         */
+        const render = () => {
             const paths = this._svg.selectAll("path").data(stacked);
             paths
                 .enter()
@@ -217,7 +228,7 @@ export default class OwnershipList {
         };
 
         this._svg.attr("width", width).attr("height", height);
-        render(data);
+        render();
         this._svg.append("g").call(xAxis);
     }
 }
