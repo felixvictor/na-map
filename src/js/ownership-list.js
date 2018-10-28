@@ -17,7 +17,7 @@ import {
     area as d3Area,
     curveBasis as d3CurveBasis,
     stack as d3Stack,
-    stackOffsetWiggle as d3StackOffsetWiggle
+    stackOffsetNone as d3StackOffsetNone
 } from "d3-shape";
 import TimelinesChart from "timelines-chart";
 
@@ -161,7 +161,7 @@ export default class OwnershipList {
             height = OwnershipList.getHeight(),
             margin = { top: 0, right: 32, bottom: 32, left: 32 };
 
-        const stack = d3Stack().offset(d3StackOffsetWiggle),
+        const stack = d3Stack().offset(d3StackOffsetNone),
             xScale = d3ScaleLinear(),
             yScale = d3ScaleLinear(),
             keys = nations.filter(nation => nation.id !== 9).map(nation => nation.short),
