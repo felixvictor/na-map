@@ -88,11 +88,40 @@ export default class OwnershipList {
     _injectModal() {
         insertBaseModal(this._modalId, this._baseName);
 
-        const div = d3Select(`#${this._modalId} .modal-body`)
-            .append("div")
-            .attr("id", `${this._baseId}`);
+        const select = `${this._baseId}-select`,
+            body = d3Select(`#${this._modalId} .modal-body`);
+
+        body.append("label")
+            .append("select")
+            .attr("name", select)
+            .attr("id", select);
+
+        const div = body.append("div").attr("id", `${this._baseId}`);
         this._div = div.append("div");
         this._svg = div.append("svg").attr("class", "area");
+    }
+
+    _getOptions() {
+        return `${this._ownershipData
+            .map(region => `<option value="${region.region}">${region.region}</option>;`)
+            .join("")}`;
+    }
+
+    _setupSelect() {
+        const select$ = $(`#${this._baseId}-select`),
+            options = this._getOptions();
+        select$.append(options);
+    }
+
+    _setupSelectListener() {
+        const select$ = $(`#${this._baseId}-select`);
+
+        select$
+            .addClass("selectpicker")
+            .on("change", event => this._regionSelected(event))
+            .selectpicker({ noneSelectedText: "Select region" })
+            .val("default")
+            .selectpicker("refresh");
     }
 
     /**
@@ -102,6 +131,8 @@ export default class OwnershipList {
      */
     _initModal() {
         this._injectModal();
+        this._setupSelect();
+        this._setupSelectListener();
     }
 
     /**
@@ -122,7 +153,6 @@ export default class OwnershipList {
             .on("shown.bs.modal", () => {
                 // Inject chart after modal is shown to calculate modal width
                 if (emptyModal) {
-                    // this._injectChart();
                     this._injectArea();
                     emptyModal = false;
                 }
@@ -150,20 +180,6 @@ export default class OwnershipList {
     }
 
     /**
-     * Inject chart
-     * @return {void}
-     * @private
-     */
-    _injectChart() {
-        const chart = TimelinesChart()
-            .data(this._ownershipData)
-            .timeFormat("%-d %B %Y")
-            .zQualitative(true)
-            .zColorScale(this._colourScale)
-            .width(this._getWidth())(this._div.node());
-    }
-
-    /**
      * Inject stacked area
      * @return {void}
      * @private
@@ -177,8 +193,9 @@ export default class OwnershipList {
         const xValue = d => new Date(d.date);
 
         const width = this._getWidth(),
+            maxHeight = 1000,
             // eslint-disable-next-line no-restricted-globals
-            height = OwnershipList.getHeight(),
+            height = Math.min(maxHeight, OwnershipList.getHeight()),
             margin = { top: 0, right: 32, bottom: 32, left: 32 };
 
         const keys = nations.filter(nation => nation.id !== 9).map(nation => nation.short),
@@ -233,9 +250,7 @@ export default class OwnershipList {
          */
         const render = () => {
             const area = getArea(),
-                labelNames = new Map(
-                    nations.filter(nation => nation.id !== 9).map(nation => [nation.short, nation.name])
-                );
+                labelNames = new Map(nations.map(nation => [nation.short, nation.name]));
             this._colourScale.domain(nationData.keys);
 
             // Paths
@@ -262,5 +277,44 @@ export default class OwnershipList {
         this._svg.attr("width", width).attr("height", height);
         render();
         this._svg.append("g").call(setXAxis);
+    }
+
+    /**
+     * Inject chart
+     * @param {*} data - Data
+     * @return {void}
+     * @private
+     */
+    _injectChart(data) {
+        TimelinesChart()
+            .data(data)
+            .enableAnimations(false)
+            .onLabelClick((d1, d2) => {
+                console.log(d1, d2);
+            })
+            .timeFormat("%-d %B %Y")
+            .zQualitative(true)
+            .zColorScale(this._colourScale)
+            .width(this._getWidth())(this._div.node());
+    }
+
+    /**
+     * Show data for selected region
+     * @param {Object} event Event
+     * @return {void}
+     * @private
+     */
+    _regionSelected(event) {
+        const regionSelected = $(event.currentTarget)
+            .find(":selected")
+            .val();
+
+        // Remove current display
+        this._div.selectAll("*").remove();
+
+        const regionData = this._ownershipData
+            .filter(region => region.region === regionSelected)
+            .map(region => region.data)[0];
+        this._injectChart(regionData);
     }
 }
