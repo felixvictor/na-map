@@ -289,9 +289,6 @@ export default class OwnershipList {
         TimelinesChart()
             .data(data)
             .enableAnimations(false)
-            .onLabelClick((label, group) => {
-                console.log("onLabelClick", label, group);
-            })
             .timeFormat("%-d %B %Y")
             .zQualitative(true)
             .zColorScale(this._colourScale)
