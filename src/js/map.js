@@ -293,7 +293,7 @@ export default class Map {
         this._journey = new Journey(shipData, woodData, this.rem, this.margin.top, this.margin.right);
         this._teleport = new Teleport(this.coord, this._ports);
         this._portSelect = new PortSelect(this._ports, this._pbZone);
-        this._windPrediction = new WindPrediction(this.margin.left, this.margin.top);
+        this._windPrediction = new WindPrediction();
         this._f11 = new F11(this, this.coord);
         this._grid = new Grid(this);
 
@@ -543,7 +543,7 @@ export default class Map {
             this._journey.plotCourse(x, y);
         }
 
-        this._zoomAndPan(x, y, 1);
+        this.zoomAndPan(x, y, 1);
     }
 
     _updateCurrent() {
@@ -652,7 +652,8 @@ export default class Map {
     resize() {
         console.log("resize");
         this._setSvgSize();
-        this._ports.setSummarySize(this.margin.top, this.margin.right);
+        this._ports.setSummaryPosition(this.margin.top, this.margin.right);
+        this._windPrediction.setPosition(this.margin.top, this.margin.left);
     }
 
     _setSvgSize() {
@@ -730,7 +731,7 @@ export default class Map {
 
     goToPort() {
         if (this._ports.currentPort.id !== "0") {
-            this._zoomAndPan(this._ports.currentPort.coord.x, this._ports.currentPort.coord.y, 2);
+            this.zoomAndPan(this._ports.currentPort.coord.x, this._ports.currentPort.coord.y, 2);
         } else {
             this._initialZoomAndPan();
         }

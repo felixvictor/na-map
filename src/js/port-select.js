@@ -399,7 +399,6 @@ export default class PortSelect {
 
         this._ports.showRadiusSetting = "off";
         this._ports.portData = sourcePorts.concat(consumingPorts);
-        console.log(this._ports.portData);
         this._ports.showCurrentGood = true;
         this._ports.showTradePortPartners = false;
         this._ports.update();
@@ -430,7 +429,6 @@ export default class PortSelect {
             this._ports.pbData.ports.filter(port => port.nation === this._nation).forEach(port => portId.add(port.id));
         }
         this._ports.portData = this._ports.portDataDefault.filter(d => portId.has(d.id));
-        console.log(portId, this._ports.portData);
         this._ports.showCurrentGood = false;
         this._ports.update();
     }
