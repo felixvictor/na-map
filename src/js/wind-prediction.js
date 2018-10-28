@@ -14,9 +14,7 @@ import { compassDirections, compassToDegrees, degreesToCompass } from "./util";
 import { registerEvent } from "./analytics";
 
 export default class WindPrediction {
-    constructor(leftMargin, topMargin) {
-        this._leftMargin = leftMargin;
-        this._topMargin = topMargin;
+    constructor() {
         this._compassSize = 100;
         this._height = 300;
         this._width = 300;
@@ -34,8 +32,6 @@ export default class WindPrediction {
             .attr("id", "wind")
             .append("svg")
             .style("position", "absolute")
-            .style("left", `${this._leftMargin}px`)
-            .style("top", `${this._topMargin}px`)
             .classed("coord", true);
     }
 
@@ -224,6 +220,10 @@ export default class WindPrediction {
         this._printCompass(predictedWindDegrees);
         this._printText(predictedWindDegrees, predictTime, currentWind, currentTime);
         this._addBackground();
+    }
+
+    setPosition(topMargin, leftMargin) {
+        this._svg.style("left", `${leftMargin}px`).style("top", `${topMargin}px`);
     }
 
     clearMap() {
