@@ -17,7 +17,7 @@
 
 <body>
 
-<nav class="navbar fixed-top navbar-expand-lg navbar-light bg-light">
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
     <a class="navbar-brand" href="#"><img src="<%= htmlWebpackPlugin.options.brand %>" width="32" height="32"
                                           alt="Brand"></a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
@@ -393,9 +393,11 @@
     </div>
 </nav>
 
-<div id="na" class="na"></div>
+<main role="main" class="container-fluid">
+    <div id="na-map" class="central"></div>
 
-<div id="modal-section"></div>
+    <div id="modal-section"></div>
+</main>
 
 </body>
 </html>
