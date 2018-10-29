@@ -67,20 +67,6 @@ export default class Grid {
         this._width = this._map.width;
 
         /**
-         * Top margin of screen
-         * @type {Number}
-         * @private
-         */
-        this._topMargin = this._map.margin.top;
-
-        /**
-         * Left margin of screen
-         * @type {Number}
-         * @private
-         */
-        this._leftMargin = this._map.margin.left;
-
-        /**
          * Font size in px
          * @type {Number}
          * @private
@@ -337,27 +323,24 @@ export default class Grid {
 
     /**
      * Update grid (shown or not shown)
+     * @param {number} topMargin - Top margin
      * @return {void}
      * @public
      */
-    update() {
+    update(topMargin) {
+        let margin = topMargin,
+            display = "inherit";
         if (this._isShown && this._zoomLevel !== "initial") {
-            const margin = this._topMargin + 3 * 16;
-            // Show axis
-            this._gAxis.attr("display", "inherit");
-            this._gBackground.attr("display", "inherit");
-            // Move summary down
-            d3Select("#port-summary").style("top", `${margin}px`);
-            d3Select("#journey-summary").style("top", `${margin}px`);
+            margin = topMargin + 3 * 16;
         } else {
-            const margin = this._topMargin;
-            // Hide axis
-            this._gAxis.attr("display", "none");
-            this._gBackground.attr("display", "none");
-            // Move summary up
-            d3Select("#port-summary").style("top", `${margin}px`);
-            d3Select("#journey-summary").style("top", `${margin}px`);
+            display = "none";
         }
+        // Show or hide axis
+        this._gAxis.attr("display", display);
+        this._gBackground.attr("display", display);
+        // Move summary up or down
+        d3Select("#port-summary").style("top", `${margin}px`);
+        d3Select("#journey-summary").style("top", `${margin}px`);
     }
 
     /**
