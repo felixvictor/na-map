@@ -485,7 +485,7 @@ export default class Journey {
     }
 
     _setupSummary() {
-        this._svgJourneySummary = d3Select("body")
+        this._svgJourneySummary = d3Select("main")
             .append("svg")
             .attr("id", "journey-summary")
             .classed("summary", true)
@@ -536,6 +536,31 @@ export default class Journey {
 
         this._journeySummaryTextWind.attr("x", secondBlock).attr("y", secondLine);
         journeySummaryTextWindDes.attr("x", secondBlock).attr("y", thirdLine);
+
+        /*
+        this._buttonDelete = this._svgJourneySummary
+            .append("foreignObject")
+            .attr("x", 10)
+            .attr("y", 10)
+            .append("xhtml:button")
+            .attr("class", "btn btn-primary")
+            .attr("role", "button")
+            .text("Delete last leg");
+            */
+
+
+        this._svgJourneySummary.remove();
+        this._svgJourneySummary = d3Select("main")
+            .append("div")
+            .attr("id", "journey-summary")
+            .attr("class", "journey-summary");
+        this._svgJourneySummary
+           .append("p")
+                .text("Langer langer langer langer langer langer langer langer langer langer langer langer langer Text.")
+        this._svgJourneySummary.append("button")
+            .attr("class", "btn btn-primary")
+            .attr("role", "button")
+            .text("Delete last leg");
     }
 
     _displaySummary(toShow) {

@@ -14,9 +14,6 @@ import { zoom as d3Zoom, zoomIdentity as d3ZoomIdentity, zoomTransform as d3Zoom
 import { feature as topojsonFeature } from "topojson-client";
 import Cookies from "js-cookie";
 
-import ResizeObserver from "resize-observer-polyfill";
-import { getContentRect } from "resize-observer-polyfill/src/utils/geometry";
-
 import { appDescription, appTitle, appVersion, defaultFontSize, insertBaseModal } from "./common";
 import { nearestPow2, checkFetchStatus, getJsonFromFetch, putFetchError, roundToThousands } from "./util";
 
@@ -241,14 +238,7 @@ export default class Map {
             }));
         }
 
-        this._ports = new PortDisplay(
-            portData.features,
-            data.pb,
-            this._serverName,
-            this.margin.top,
-            this.margin.right,
-            this._minScale
-        );
+        this._ports = new PortDisplay(portData.features, data.pb, this._serverName, this._minScale);
 
         let pbCircles = topojsonFeature(data.pbZones, data.pbZones.objects.pbCircles);
         pbCircles = getFeature(pbCircles.features);
@@ -290,7 +280,7 @@ export default class Map {
         const buildingData = JSON.parse(JSON.stringify(data.buildings));
         this._buildingList = new Building(buildingData);
 
-        this._journey = new Journey(shipData, woodData, this.rem, this.margin.top, this.margin.right);
+        this._journey = new Journey(shipData, woodData, this.rem);
         this._teleport = new Teleport(this.coord, this._ports);
         this._portSelect = new PortSelect(this._ports, this._pbZone);
         this._windPrediction = new WindPrediction();
@@ -356,14 +346,13 @@ export default class Map {
     }
 
     _setupSvg() {
-        this.svg = d3Select("#na")
+        this.svg = d3Select("#na-map")
             .append("svg")
-            .attr("id", "na-svg")
-            .style("position", "absolute");
+            .attr("id", "na-svg");
 
         this.svg.append("defs");
 
-        this._g = this.svg.append("g").classed("map", true);
+        this._gMap = this.svg.append("g").classed("map", true);
     }
 
     _setupProps() {
@@ -414,7 +403,7 @@ export default class Map {
             showTeleport = this._showLayer === "teleport";
 
         this._grid.show = showGrid;
-        this._grid.update(this.margin.top);
+        this._grid.update();
 
         this._teleport.show = showTeleport;
         this._teleport.setData();
@@ -478,7 +467,7 @@ export default class Map {
             .translate(Math.round(tiles.translate[0]), Math.round(tiles.translate[1]))
             .scale(Math.round(tiles.scale * 1000) / 1000);
 
-        const image = this._g
+        const image = this._gMap
             .attr("transform", tileTransform)
             .selectAll("image")
             .data(tiles, d => d);
@@ -548,7 +537,7 @@ export default class Map {
 
     _updateCurrent() {
         this._pbZone.refresh();
-        this._grid.update(this.margin.top);
+        this._grid.update();
         this._teleport.setData();
         this._teleport.update();
         this._ports.update(this._currentScale);
@@ -609,10 +598,6 @@ export default class Map {
         this.svg.call(this._zoom.scaleTo, this._minScale);
     }
 
-    _getNavbarHeight() {
-        return Math.round(getContentRect(this._navbarSelector).height);
-    }
-
     _init() {
         this.zoomLevel = "initial";
         this._initialZoomAndPan();
@@ -620,15 +605,6 @@ export default class Map {
 
         this._ports.clearMap(this._minScale);
         this._f11.checkF11Coord();
-
-        const observer = new ResizeObserver(() => {
-            if (this._navbarHeight !== this._getNavbarHeight()) {
-                this.resize();
-            }
-        });
-
-        // Setup listener (size change of navbar)
-        [this._navbarSelector].forEach(element => observer.observe(element));
     }
 
     set zoomLevel(zoomLevel) {
@@ -640,46 +616,45 @@ export default class Map {
 
     resize() {
         this._setSvgSize();
+        this._grid.update();
+        /*
         this._ports.setSummaryPosition(this.margin.top, this.margin.right);
         this._journey.setSummaryPosition(this.margin.top, this.margin.right);
         this._windPrediction.setPosition(this.margin.top, this.margin.left);
-        this._grid.update(this.margin.top);
+        */
+    }
+
+    _getDimensions() {
+        const selector = document.getElementById("na-map");
+
+        return selector.getBoundingClientRect();
+    }
+
+    _getWidth() {
+        const { width } = this._getDimensions();
+
+        return Math.floor(width);
+    }
+
+    _getHeight() {
+        const { top } = this._getDimensions(),
+            fullHeight = document.documentElement.clientHeight - this.rem;
+
+        return Math.floor(fullHeight - top);
     }
 
     _setSvgSize() {
-        this._navbarHeight = this._getNavbarHeight();
-
-        /**
-         * Margins of the map svg
-         * @type {Object}
-         * @property {Number} top - Top margin
-         * @property {Number} right - Right margin
-         * @property {Number} bottom - Bottom margin
-         * @property {Number} left - Left margin
-         * @private
-         */
-        this.margin = {
-            top: Math.floor(this._navbarHeight + this._navbarBrandPaddingLeft),
-            right: this._navbarBrandPaddingLeft,
-            bottom: this._navbarBrandPaddingLeft,
-            left: this._navbarBrandPaddingLeft
-        };
-
         /**
          * Width of map svg (screen coordinates)
          * @type {Number}
-         * @private
          */
-        // eslint-disable-next-line no-restricted-globals
-        this.width = Math.floor(top.innerWidth - this.margin.left - this.margin.right);
+        this.width = this._getWidth();
 
         /**
          * Height of map svg (screen coordinates)
          * @type {Number}
-         * @private
          */
-        // eslint-disable-next-line no-restricted-globals
-        this.height = Math.floor(top.innerHeight - this.margin.top - this.margin.bottom);
+        this.height = this._getHeight();
 
         this._minScale = nearestPow2(Math.min(this.width / this.coord.max, this.height / this.coord.max));
 
@@ -705,8 +680,6 @@ export default class Map {
         this.svg
             .attr("width", this.width)
             .attr("height", this.height)
-            .style("top", `${this.margin.top}px`)
-            .style("left", `${this.margin.left}px`)
             .call(this._zoom);
     }
 
