@@ -140,7 +140,6 @@ function main() {
     const map = new Map(serverName);
 
     window.onresize = () => {
-        console.log("onresize");
         map.resize();
     };
 }
