@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -e
+trap on_exit EXIT
 
 JQ="$(command -v jq)"
 NODE="$(command -v node) --experimental-modules --no-warnings"
@@ -15,6 +16,10 @@ SERVER_TWITTER_NAMES=(eu1)
 API_VARS=(ItemTemplates Ports Shops)
 SERVER_MAINTENANCE_HOUR=10
 HEADER_DATE=$(LC_TIME="en" date -u +"%a, %d %b %Y 10:00:00 GMT" -d "+1 day")
+
+function on_exit () {
+    echo on_exit
+}
 
 function change_var () {
     BASE_DIR="$(pwd)"
