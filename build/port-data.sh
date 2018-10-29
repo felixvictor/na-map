@@ -16,7 +16,7 @@ SERVER_TWITTER_NAMES=(eu1)
 API_VARS=(ItemTemplates Ports Shops)
 SERVER_MAINTENANCE_HOUR=10
 HEADER_DATE=$(LC_TIME="en" date -u +"%a, %d %b %Y 10:00:00 GMT" -d "+1 day")
-LAST_COMMAND=""
+LAST_FUNCTION=""
 
 function get_current_branch() {
     git rev-parse --abbrev-ref HEAD
@@ -41,11 +41,12 @@ function pull_all () {
 
 function on_exit () {
     echo $?
-    echo "${LAST_COMMAND}"
-    if [ "${LAST_COMMAND}" == "git_push_all" ]; then
+    echo "${LAST_FUNCTION}"
+    if [ "${LAST_FUNCTION}" == "push_data" ]; then
         pull_all
+        git_push_all
+        true
     fi
-    git_push_all
 }
 
 function change_var () {
@@ -259,8 +260,9 @@ function push_data () {
         fi
     fi
     # Status for on_exit trap
-    LAST_COMMAND="git_push_all"
+    LAST_FUNCTION="push_data"
     git_push_all
+    LAST_FUNCTION=""
 }
 
 function update_data () {
