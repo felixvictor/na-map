@@ -22,19 +22,30 @@ function get_current_branch() {
     git rev-parse --abbrev-ref HEAD
 }
 
-function git_pull () {
+function git_push_all () {
+    git push --quiet gitlab --all
+}
+
+function git_pull_all () {
+    git pull --all
+}
+
+function pull_all () {
     BRANCH=$(get_current_branch)
 
+    git checkout master
+    git_pull_all
+    git checkout "${BRANCH}"
     echo "${BRANCH}"
 }
 
 function on_exit () {
     echo $?
     echo "${LAST_COMMAND}"
-    if [ "${LAST_COMMAND}" == "git push" ]; then
-        git_pull
+    if [ "${LAST_COMMAND}" == "git_push_all" ]; then
+        pull_all
     fi
-    echo on_exit
+    git_push_all
 }
 
 function change_var () {
@@ -241,14 +252,15 @@ function push_data () {
     TYPE="$1"
 
     git add --ignore-errors .
-    if [[ ! -z $(git status -s) ]]; then
+    if [[ -n $(git status -s) ]]; then
         git commit -m "squash! push"
         if [ "${TYPE}" == "update" ]; then
             touch "${LAST_UPDATE_FILE}"
         fi
     fi
-    LAST_COMMAND="git push"
-    git push --quiet gitlab --all
+    # Status for on_exit trap
+    LAST_COMMAND="git_push_all"
+    git_push_all
 }
 
 function update_data () {
