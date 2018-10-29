@@ -40,13 +40,12 @@ function pull_all () {
 }
 
 function on_exit () {
-    echo $?
-    echo "${LAST_FUNCTION}"
     if [ "${LAST_FUNCTION}" == "push_data" ]; then
         pull_all
         git_push_all
         true
     fi
+    false
 }
 
 function change_var () {
