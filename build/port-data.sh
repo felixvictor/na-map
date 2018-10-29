@@ -253,9 +253,12 @@ function push_data () {
 
     git add --ignore-errors .
     if [[ -n $(git status -s) ]]; then
-        git commit -m "squash! push"
         if [ "${TYPE}" == "update" ]; then
+            GIT_MESSAGE="squash! push update"
             touch "${LAST_UPDATE_FILE}"
+        else
+            GIT_MESSAGE="push change"
+            git commit -m "${GIT_MESSAGE}"
         fi
     fi
     # Status for on_exit trap
