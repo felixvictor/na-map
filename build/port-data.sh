@@ -16,9 +16,14 @@ SERVER_TWITTER_NAMES=(eu1)
 API_VARS=(ItemTemplates Ports Shops)
 SERVER_MAINTENANCE_HOUR=10
 HEADER_DATE=$(LC_TIME="en" date -u +"%a, %d %b %Y 10:00:00 GMT" -d "+1 day")
+LAST_COMMAND=""
 
 function on_exit () {
     echo $?
+    echo "${LAST_COMMAND}"
+    if [ "${LAST_COMMAND}" == "git push" ]; then
+        echo "if true"
+    fi
     echo on_exit
 }
 
@@ -232,6 +237,7 @@ function push_data () {
             touch "${LAST_UPDATE_FILE}"
         fi
     fi
+    LAST_COMMAND="git push"
     git push --quiet gitlab --all
 }
 
