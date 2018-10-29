@@ -13,7 +13,7 @@ import { nations, defaultFontSize, defaultCircleSize, getDistance, convertCoordX
 import { formatInt, formatSiInt, formatPercent, roundToThousands, degreesToRadians } from "./util";
 
 export default class PortDisplay {
-    constructor(portData, pbData, serverName, topMargin, rightMargin, minScale) {
+    constructor(portData, pbData, serverName, minScale) {
         this._portDataDefault = portData;
         this._serverName = serverName;
         this._minScale = minScale;
@@ -111,14 +111,14 @@ export default class PortDisplay {
     }
 
     _setupSvg() {
-        this._g = d3Select("#na-svg")
+        this._gPort = d3Select("#na-svg")
             .append("g")
             .classed("ports", true);
-        this._gPortCircle = this._g.append("g");
-        this._gIcon = this._g.append("g").classed("port", true);
-        this._gText = this._g.append("g").classed("port-names", true);
-        this._gCounty = this._g.append("g").classed("county", true);
-        this._gRegion = this._g.append("g").classed("region", true);
+        this._gPortCircle = this._gPort.append("g");
+        this._gIcon = this._gPort.append("g").classed("port", true);
+        this._gText = this._gPort.append("g").classed("port-names", true);
+        this._gCounty = this._gPort.append("g").classed("county", true);
+        this._gRegion = this._gPort.append("g").classed("region", true);
     }
 
     _setupCounties() {
@@ -261,17 +261,12 @@ export default class PortDisplay {
         ];
     }
 
-    setSummaryPosition(topMargin, rightMargin) {
-        this._svgPortSummary.style("top", `${topMargin}px`).style("right", `${rightMargin}px`);
-    }
-
     _setupSummary() {
         // Main box
-        this._svgPortSummary = d3Select("body")
-            .append("svg")
+        this._svgPortSummary = d3Select("main")
+            .append("div")
             .attr("id", "port-summary")
-            .classed("summary", true)
-            .style("position", "absolute");
+            .attr("class", "port-summary overlay");
 
         // Background
         const portSummaryRect = this._svgPortSummary
@@ -980,7 +975,7 @@ export default class PortDisplay {
     }
 
     transform(transform) {
-        this._g.attr("transform", transform);
+        this._gPort.attr("transform", transform);
     }
 
     clearMap(scale) {
