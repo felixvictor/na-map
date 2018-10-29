@@ -40,6 +40,7 @@ function pull_all () {
 }
 
 function on_exit () {
+    # If git push fails, git pull first
     if [ "${LAST_FUNCTION}" == "push_data" ]; then
         pull_all
         git_push_all
