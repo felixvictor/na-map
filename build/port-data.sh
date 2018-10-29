@@ -18,11 +18,21 @@ SERVER_MAINTENANCE_HOUR=10
 HEADER_DATE=$(LC_TIME="en" date -u +"%a, %d %b %Y 10:00:00 GMT" -d "+1 day")
 LAST_COMMAND=""
 
+function get_current_branch() {
+    git rev-parse --abbrev-ref HEAD
+}
+
+function git_pull () {
+    BRANCH=$(get_current_branch)
+
+    echo "${BRANCH}"
+}
+
 function on_exit () {
     echo $?
     echo "${LAST_COMMAND}"
     if [ "${LAST_COMMAND}" == "git push" ]; then
-        echo "if true"
+        git_pull
     fi
     echo on_exit
 }
