@@ -155,7 +155,7 @@ export default class Grid {
 
         // svg groups
         this._gAxis = this._map.svg
-            .insert("g", "g.voronoi")
+            .append("g")
             .classed("axis", true)
             .attr("display", "none");
         this._gXAxis = this._gAxis.append("g").classed("axis-x", true);
@@ -323,24 +323,17 @@ export default class Grid {
 
     /**
      * Update grid (shown or not shown)
-     * @param {number} topMargin - Top margin
      * @return {void}
      * @public
      */
-    update(topMargin) {
-        let margin = topMargin,
-            display = "inherit";
+    update() {
+        let display = "none";
         if (this._isShown && this._zoomLevel !== "initial") {
-            margin = topMargin + 3 * 16;
-        } else {
-            display = "none";
+            display = "inherit";
         }
         // Show or hide axis
         this._gAxis.attr("display", display);
         this._gBackground.attr("display", display);
-        // Move summary up or down
-        d3Select("#port-summary").style("top", `${margin}px`);
-        d3Select("#journey-summary").style("top", `${margin}px`);
     }
 
     /**
