@@ -414,7 +414,7 @@ export default class Map {
             showTeleport = this._showLayer === "teleport";
 
         this._grid.show = showGrid;
-        this._grid.update();
+        this._grid.update(this.margin.top);
 
         this._teleport.show = showTeleport;
         this._teleport.setData();
@@ -548,7 +548,7 @@ export default class Map {
 
     _updateCurrent() {
         this._pbZone.refresh();
-        this._grid.update();
+        this._grid.update(this.margin.top);
         this._teleport.setData();
         this._teleport.update();
         this._ports.update(this._currentScale);
@@ -614,8 +614,6 @@ export default class Map {
     }
 
     _init() {
-        console.log("_init");
-
         this.zoomLevel = "initial";
         this._initialZoomAndPan();
         this._refreshLayer();
@@ -623,16 +621,7 @@ export default class Map {
         this._ports.clearMap(this._minScale);
         this._f11.checkF11Coord();
 
-        const observer = new ResizeObserver(entries => {
-            entries.forEach(entry => {
-                const { left, top, width, height } = entry.contentRect;
-                console.log("Element", entry.target);
-                console.log("Element's size", width, "px x", height, "px");
-                console.log("Element's paddings", top, "px ;", left, "px");
-            });
-            console.log("observer");
-            console.log(this._navbarHeight, this._getNavbarHeight());
-
+        const observer = new ResizeObserver(() => {
             if (this._navbarHeight !== this._getNavbarHeight()) {
                 this.resize();
             }
@@ -650,15 +639,14 @@ export default class Map {
     }
 
     resize() {
-        console.log("resize");
         this._setSvgSize();
         this._ports.setSummaryPosition(this.margin.top, this.margin.right);
+        this._journey.setSummaryPosition(this.margin.top, this.margin.right);
         this._windPrediction.setPosition(this.margin.top, this.margin.left);
+        this._grid.update(this.margin.top);
     }
 
     _setSvgSize() {
-        console.log("setSvgSize");
-
         this._navbarHeight = this._getNavbarHeight();
 
         /**

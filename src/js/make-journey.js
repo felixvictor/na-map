@@ -36,12 +36,10 @@ export default class Journey {
      * @param {number} topMargin - Top margin
      * @param {number} rightMargin - Right margin
      */
-    constructor(shipData, woodData, fontSize, topMargin, rightMargin) {
+    constructor(shipData, woodData, fontSize) {
         this._shipData = shipData;
         this._woodData = woodData;
         this._fontSize = fontSize;
-        this._topMargin = topMargin;
-        this._rightMargin = rightMargin;
 
         this._compassSize = 100;
         this._line = d3Line()
@@ -492,9 +490,7 @@ export default class Journey {
             .attr("id", "journey-summary")
             .classed("summary", true)
             .classed("hidden", true)
-            .style("position", "absolute")
-            .style("top", `${this._topMargin}px`)
-            .style("right", `${this._rightMargin}px`);
+            .style("position", "absolute");
 
         // Background
         const journeySummaryRect = this._svgJourneySummary
@@ -645,6 +641,11 @@ export default class Journey {
     }
 
     /* public */
+
+    setSummaryPosition(topMargin, rightMargin) {
+        this._svgJourneySummary.style("top", `${topMargin}px`).style("right", `${rightMargin}px`);
+    }
+
     plotCourse(x, y) {
         if (!this._journey.segment[0].position[0]) {
             this.clearMap();
