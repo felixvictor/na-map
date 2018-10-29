@@ -45,7 +45,6 @@ function on_exit () {
         git_push_all
         true
     fi
-    false
 }
 
 function change_var () {
