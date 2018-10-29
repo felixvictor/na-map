@@ -19,6 +19,7 @@ HEADER_DATE=$(LC_TIME="en" date -u +"%a, %d %b %Y 10:00:00 GMT" -d "+1 day")
 
 function on_exit () {
     echo on_exit
+    echo $?
 }
 
 function change_var () {
