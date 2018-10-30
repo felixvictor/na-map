@@ -171,7 +171,9 @@ function get_port_data () {
         ${NODE} build/convert-buildings.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${BUILDING_FILE}" "${DATE}"
         ${NODE} build/convert-loot.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${LOOT_FILE}" "${DATE}"
         ${NODE} build/convert-recipes.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${RECIPE_FILE}" "${DATE}"
-        ${NODE} build/convert-ownership.mjs "${API_DIR}" "${OWNERSHIP_FILE}" "${NATION_FILE}"
+        if [ "${SCRIPT_RUN_TYPE}" == "update" ]; then
+            ${NODE} build/convert-ownership.mjs "${API_DIR}" "${OWNERSHIP_FILE}" "${NATION_FILE}"
+        fi
 
         ${NODE} build/create-xlsx.mjs "${SHIP_FILE}" "${SRC_DIR}/${SERVER_NAMES[0]}.json" "${BASE_DIR}/public/${MODULE}.min.css" "${EXCEL_FILE}"
 
@@ -229,7 +231,7 @@ function update_tweets () {
     get_tweets
     if update_ports; then
         copy_data
-        push_data tweets
+        push_data
         deploy_data
     fi
 }
@@ -249,17 +251,15 @@ function touch_update () {
 }
 
 function push_data () {
-    TYPE="$1"
-
     git add --ignore-errors .
     if [[ -n $(git status -s) ]]; then
-        if [ "${TYPE}" == "update" ]; then
-            GIT_MESSAGE="squash! push update"
+        GIT_MESSAGE=""
+        if [ "${SCRIPT_RUN_TYPE}" == "update" ]; then
+            GIT_MESSAGE+="squash! "
             touch "${LAST_UPDATE_FILE}"
-        else
-            GIT_MESSAGE="push change"
-            git commit -m "${GIT_MESSAGE}"
         fi
+        GIT_MESSAGE+="push ${SCRIPT_RUN_TYPE}"
+        git commit -m "${GIT_MESSAGE}"
     fi
     # Status for on_exit trap
     LAST_FUNCTION="push_data"
@@ -286,7 +286,7 @@ function update_data () {
 
             copy_data
             touch_update
-            push_data update
+            push_data
             deploy_data
         fi
     fi
@@ -298,13 +298,15 @@ case "$1" in
         change_data
         ;;
     push-change)
+        SCRIPT_RUN_TYPE="change"
         change_var
-        push_data change
+        push_data
         ;;
     push-update)
+        SCRIPT_RUN_TYPE="update"
         update_var
         log_date
-        push_data update
+        push_data
         ;;
     update)
         update_var
@@ -312,6 +314,7 @@ case "$1" in
         update_data
         ;;
     twitter-update)
+        SCRIPT_RUN_TYPE="update-tweets"
         update_var
         update_tweets
         ;;
