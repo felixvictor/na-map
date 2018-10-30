@@ -36,7 +36,6 @@ function pull_all () {
     git checkout master
     git_pull_all
     git checkout "${BRANCH}"
-    echo "${BRANCH}"
 }
 
 function on_exit () {
@@ -44,7 +43,7 @@ function on_exit () {
     if [ "${LAST_FUNCTION}" == "push_data" ]; then
         pull_all
         git_push_all
-        true
+        exit 0
     fi
 }
 
