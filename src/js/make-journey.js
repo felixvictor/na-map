@@ -82,8 +82,6 @@ export default class Journey {
         this._defaultShipName = "None";
         this._defaultShipSpeed = 19;
         this._defaultStartWindDegrees = 0;
-        this._setupSummary();
-        this._setupSvg();
 
         this._baseName = "Make journey";
         this._baseId = "make-journey";
@@ -91,6 +89,9 @@ export default class Journey {
         this._modalId = `modal-${this._baseId}`;
         this._shipId = "ship-journey";
         this._woodId = "wood-journey";
+
+        this._setupSummary();
+        this._setupSvg();
         this._initJourney();
         this._setupListener();
     }
@@ -145,6 +146,8 @@ export default class Journey {
      */
     _setupListener() {
         document.getElementById("journeyNavbar").addEventListener("click", event => this._navbarClick(event));
+
+        document.getElementById(this._buttonId).addEventListener("click", () => this._deleteLastLeg());
     }
 
     _setupWindInput() {
@@ -514,6 +517,7 @@ export default class Journey {
 
         mainDiv
             .append("button")
+            .attr("id", this._buttonId)
             .classed("btn btn-primary btn-sm", true)
             .attr("role", "button")
             .text("Delete last leg");
@@ -619,6 +623,15 @@ export default class Journey {
         this._printLabels();
         this._correctJourney();
         this._g.selectAll("g.coord g.label circle").call(this._drag);
+    }
+
+    _deleteLastLeg() {
+        this._journey.segment.pop();
+        if (this._journey.segment.length) {
+            this._printJourney();
+        } else {
+            this.clearMap();
+        }
     }
 
     /* public */
