@@ -154,10 +154,7 @@ export default class Grid {
             .tickSize(this._maxCoord);
 
         // svg groups
-        this._gAxis = this._map.svg
-            .append("g")
-            .classed("axis", true)
-            .attr("display", "none");
+        this._gAxis = this._map.svg.append("g").classed("axis d-none", true);
         this._gXAxis = this._gAxis.append("g").classed("axis-x", true);
         this._gYAxis = this._gAxis.append("g").classed("axis-y", true);
         this._setupBackground();
@@ -286,10 +283,7 @@ export default class Grid {
      * @return {void}
      */
     _setupBackground() {
-        this._gBackground = this._map.svg
-            .insert("g", "g.axis")
-            .classed("grid-background", true)
-            .attr("display", "none");
+        this._gBackground = this._map.svg.insert("g", "g.axis").classed("grid-background d-none", true);
         // Background for x axis legend
         this._gBackground
             .append("rect")
@@ -327,16 +321,16 @@ export default class Grid {
      * @public
      */
     update() {
-        let display = "none",
+        let show = false,
             margin = 0;
         if (this._isShown && this._zoomLevel !== "initial") {
-            display = "inherit";
+            show = true;
             margin = this._xBackgroundHeight;
         }
 
         // Show or hide axis
-        this._gAxis.attr("display", display);
-        this._gBackground.attr("display", display);
+        this._gAxis.classed("d-none", !show);
+        this._gBackground.classed("d-none", !show);
 
         // Move summary up or down
         d3Select("#port-summary").style("margin-top", `${margin}px`);
