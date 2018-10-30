@@ -263,69 +263,38 @@ export default class PortDisplay {
 
     _setupSummary() {
         // Main box
-        this._svgPortSummary = d3Select("main")
+        this._divPortSummary = d3Select("main")
             .append("div")
             .attr("id", "port-summary")
             .attr("class", "port-summary overlay");
 
-        // Background
-        const portSummaryRect = this._svgPortSummary
-            .insert("rect")
-            .attr("x", 0)
-            .attr("y", 0);
+        const mainDiv = this._divPortSummary
+            .append("div")
+            .attr("class", "d-flex justify-content-around align-items-end");
 
         // Number of selected ports
-        this._portSummaryTextNumPorts = this._svgPortSummary.append("text");
-        const portSummaryTextNumPortsDes = this._svgPortSummary
-            .append("text")
+        this._portSummaryNumPorts = mainDiv.append("div").classed("block", true);
+        this._portSummaryTextNumPorts = this._portSummaryNumPorts.append("div");
+        this._portSummaryNumPorts
+            .append("div")
             .classed("des", true)
             .text("selected ports");
 
         // Total tax income
-        this._portSummaryTextTaxIncome = this._svgPortSummary.append("text");
-        const portSummaryTextTaxIncomeDes = this._svgPortSummary
-            .append("text")
+        this._portSummaryTaxIncome = mainDiv.append("div").classed("block", true);
+        this._portSummaryTextTaxIncome = this._portSummaryTaxIncome.append("div");
+        this._portSummaryTaxIncome
+            .append("div")
             .classed("des", true)
             .text("tax income");
 
         // Total net income
-        this._portSummaryTextNetIncome = this._svgPortSummary.append("text");
-        const portSummaryTextNetIncomeDes = this._svgPortSummary
-            .append("text")
+        this._portSummaryNetIncome = mainDiv.append("div").classed("block", true);
+        this._portSummaryTextNetIncome = this._portSummaryNetIncome.append("div");
+        this._portSummaryNetIncome
+            .append("div")
             .classed("des", true)
             .text("net income");
-
-        const bboxNumPortsDes = portSummaryTextNumPortsDes.node().getBoundingClientRect(),
-            bboxTaxIncomeDes = portSummaryTextTaxIncomeDes.node().getBoundingClientRect(),
-            bboxNetIncomeDes = portSummaryTextNetIncomeDes.node().getBoundingClientRect(),
-            lineHeight = parseInt(
-                window.getComputedStyle(document.getElementById("na-svg")).getPropertyValue("line-height"),
-                10
-            );
-        const height = lineHeight * 3,
-            width = bboxNumPortsDes.width + bboxTaxIncomeDes.width * 3 + bboxNetIncomeDes.width,
-            firstLine = "35%",
-            secondLine = "60%",
-            firstBlock = Math.round(width / 10),
-            secondBlock = Math.round(firstBlock + bboxNumPortsDes.width + firstBlock),
-            thirdBlock = Math.round(secondBlock + bboxTaxIncomeDes.width + firstBlock);
-
-        this._svgPortSummary.attr("height", height).attr("width", width);
-
-        // Background
-        portSummaryRect.attr("height", height).attr("width", width);
-
-        // Number of selected ports
-        this._portSummaryTextNumPorts.attr("x", firstBlock).attr("y", firstLine);
-        portSummaryTextNumPortsDes.attr("x", firstBlock).attr("y", secondLine);
-
-        // Total tax income
-        this._portSummaryTextTaxIncome.attr("x", secondBlock).attr("y", firstLine);
-        portSummaryTextTaxIncomeDes.attr("x", secondBlock).attr("y", secondLine);
-
-        // Total net income
-        this._portSummaryTextNetIncome.attr("x", thirdBlock).attr("y", firstLine);
-        portSummaryTextNetIncomeDes.attr("x", thirdBlock).attr("y", secondLine);
     }
 
     _setupFlags() {
@@ -967,11 +936,11 @@ export default class PortDisplay {
     }
 
     _showSummary() {
-        this._svgPortSummary.classed("hidden", false);
+        this._divPortSummary.classed("hidden", false);
     }
 
     hideSummary() {
-        this._svgPortSummary.classed("hidden", true);
+        this._divPortSummary.classed("hidden", true);
     }
 
     transform(transform) {
