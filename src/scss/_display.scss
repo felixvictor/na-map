@@ -28,17 +28,17 @@ $paddingThird: 1.618/3;
 .journey-summary {
     @include float-right;
     background: rgba($primary-100, 0.8);
-    padding: $spacer/2;
+    padding: map-get($spacers, 2);
 
     .block {
-        padding: $spacer/2;
+        padding: map-get($spacers, 2);
     }
 
     .des {
         top: 0;
     }
   button{
-    margin-bottom: $spacer/2;
+    margin-bottom: map-get($spacers, 2);
   }
 }
 
