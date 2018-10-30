@@ -285,11 +285,8 @@ function convertModules() {
      */
     function setModuleType(module) {
         // Correct module types
-        if (module.name.endsWith("French Rig Refit")) {
+        if (module.name.endsWith("French Rig Refit") || module.name === "Bridgetown Frame Refit") {
             module.sortingGroup = "survival";
-        }
-        if (module.name === "Bovenwinds Refit") {
-            module.sortingGroup = "speed_turn";
         }
 
         if (
