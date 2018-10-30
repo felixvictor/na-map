@@ -15,20 +15,32 @@ $paddingThird: 1.618/3;
 }
 
 .central {
-  @include float-left;
-  height: 0;
-  width: 100%;
+    @include float-left;
+    height: 0;
+    width: 100%;
 }
 
 .overlay {
-  z-index: $zindex-sticky;
+    z-index: $zindex-sticky;
 }
 
-  .port-summary, .journey-summary {
+.port-summary,
+.journey-summary {
     @include float-right;
-    background-color: $primary-100;
-    opacity: 0.7;
+    background: rgba($primary-100, 0.8);
+    padding: $spacer/2;
+
+    .block {
+        padding: $spacer/2;
+    }
+
+    .des {
+        top: 0;
+    }
+  button{
+    margin-bottom: $spacer/2;
   }
+}
 
 // port icons (available to nation)
 pattern .nation {
@@ -723,7 +735,7 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
 }
 
 .timelines-chart {
-  padding-bottom: 3rem;
+    padding-bottom: 3rem;
     text-align: center;
     user-select: none;
 
@@ -838,13 +850,13 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
 }
 
 .area {
-  .area-label {
-    fill-opacity: 0.7;
-    fill: $white;
-  }
-  path {
-    stroke-opacity: 0.4;
-    stroke: $white !important;
-    stroke-width: 2px;
-  }
+    .area-label {
+        fill-opacity: 0.7;
+        fill: $white;
+    }
+    path {
+        stroke-opacity: 0.4;
+        stroke: $white !important;
+        stroke-width: 2px;
+    }
 }

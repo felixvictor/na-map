@@ -485,87 +485,43 @@ export default class Journey {
     }
 
     _setupSummary() {
-        this._svgJourneySummary = d3Select("main")
-            .append("svg")
+        // Main box
+        this._divJourneySummary = d3Select("main")
+            .append("div")
             .attr("id", "journey-summary")
-            .classed("summary", true)
-            .classed("hidden", true)
-            .style("position", "absolute");
+            .classed("journey-summary overlay d-none", true);
 
-        // Background
-        const journeySummaryRect = this._svgJourneySummary
-            .insert("rect")
-            .attr("x", 0)
-            .attr("y", 0);
-
-        // Wind direction
-        this._journeySummaryTextWind = this._svgJourneySummary.append("text");
-        const journeySummaryTextWindDes = this._svgJourneySummary
-            .append("text")
-            .classed("des", true)
-            .text("wind direction");
+        const mainDiv = this._divJourneySummary
+            .append("div")
+            .classed("d-flex justify-content-around align-items-end", true);
 
         // Selected ship
-        this._journeySummaryTextShip = this._svgJourneySummary.append("text");
-        this._journeySummaryTextWoods = this._svgJourneySummary.append("text");
-        const journeySummaryTextShipDes = this._svgJourneySummary
-            .append("text")
+        this._journeySummaryShip = mainDiv.append("div").classed("block", true);
+        this._journeySummaryTextWoods = this._journeySummaryShip.append("div");
+        this._journeySummaryTextShip = this._journeySummaryShip.append("div");
+        this._journeySummaryShip
+            .append("div")
             .classed("des", true)
             .text("selected ship");
 
-        const bboxShipDes = journeySummaryTextShipDes.node().getBoundingClientRect(),
-            bboxWindDes = journeySummaryTextWindDes.node().getBoundingClientRect(),
-            lineHeight = parseInt(
-                window.getComputedStyle(document.getElementById("na-svg")).getPropertyValue("line-height"),
-                10
-            );
-        const height = lineHeight * 4,
-            width = bboxShipDes.width * 2 + bboxWindDes.width + this._fontSize * 4,
-            firstLine = "25%",
-            secondLine = "50%",
-            thirdLine = "75%",
-            firstBlock = this._fontSize * 2,
-            secondBlock = Math.round(firstBlock + bboxShipDes.width * 2 + firstBlock / 2);
-
-        this._svgJourneySummary.attr("height", height).attr("width", width);
-        journeySummaryRect.attr("height", height).attr("width", width);
-
-        this._journeySummaryTextWoods.attr("x", firstBlock).attr("y", firstLine);
-        this._journeySummaryTextShip.attr("x", firstBlock).attr("y", secondLine);
-        journeySummaryTextShipDes.attr("x", firstBlock).attr("y", thirdLine);
-
-        this._journeySummaryTextWind.attr("x", secondBlock).attr("y", secondLine);
-        journeySummaryTextWindDes.attr("x", secondBlock).attr("y", thirdLine);
-
-        /*
-        this._buttonDelete = this._svgJourneySummary
-            .append("foreignObject")
-            .attr("x", 10)
-            .attr("y", 10)
-            .append("xhtml:button")
-            .attr("class", "btn btn-primary")
-            .attr("role", "button")
-            .text("Delete last leg");
-            */
-
-
-        this._svgJourneySummary.remove();
-        this._svgJourneySummary = d3Select("main")
+        // Wind direction
+        this._journeySummaryWind = mainDiv.append("div").classed("block", true);
+        this._journeySummaryTextWind = this._journeySummaryWind.append("div");
+        this._journeySummaryWind
             .append("div")
-            .attr("id", "journey-summary")
-            .attr("class", "journey-summary");
-        this._svgJourneySummary
-           .append("p")
-                .text("Langer langer langer langer langer langer langer langer langer langer langer langer langer Text.")
-        this._svgJourneySummary.append("button")
-            .attr("class", "btn btn-primary")
+            .classed("des", true)
+            .text("wind direction");
+
+        mainDiv
+            .append("button")
+            .classed("btn btn-primary btn-sm", true)
             .attr("role", "button")
             .text("Delete last leg");
     }
 
-    _displaySummary(toShow) {
-        this._svgJourneySummary.classed("hidden", !toShow);
-        d3Select("#port-summary").classed("hidden", toShow);
+    _displaySummary(showJourneySummary) {
+        this._divJourneySummary.classed("d-none", !showJourneySummary);
+        d3Select("#port-summary").classed("d-none", showJourneySummary);
     }
 
     _showSummary() {
@@ -668,7 +624,7 @@ export default class Journey {
     /* public */
 
     setSummaryPosition(topMargin, rightMargin) {
-        this._svgJourneySummary.style("top", `${topMargin}px`).style("right", `${rightMargin}px`);
+        this._divJourneySummary.style("top", `${topMargin}px`).style("right", `${rightMargin}px`);
     }
 
     plotCourse(x, y) {
