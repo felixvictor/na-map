@@ -327,13 +327,20 @@ export default class Grid {
      * @public
      */
     update() {
-        let display = "none";
+        let display = "none",
+            margin = 0;
         if (this._isShown && this._zoomLevel !== "initial") {
             display = "inherit";
+            margin = this._xBackgroundHeight;
         }
+
         // Show or hide axis
         this._gAxis.attr("display", display);
         this._gBackground.attr("display", display);
+
+        // Move summary up or down
+        d3Select("#port-summary").style("margin-top", `${margin}px`);
+        d3Select("#journey-summary").style("margin-top", `${margin}px`);
     }
 
     /**
