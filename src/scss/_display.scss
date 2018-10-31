@@ -14,9 +14,32 @@ $paddingThird: 1.618/3;
     background-color: $background-colour;
 }
 
-// min-width to allow proper calculation of the ".navbar" height for margin.top even if the window is small
-select {
-    min-width: 15em;
+.central {
+    @include float-left;
+    height: 0;
+    width: 100%;
+}
+
+.overlay {
+    z-index: $zindex-sticky;
+}
+
+.port-summary,
+.journey-summary {
+    @include float-right;
+    background: rgba($primary-100, 0.8);
+    padding: map-get($spacers, 2);
+
+    .block {
+        padding: map-get($spacers, 2);
+    }
+
+    .des {
+        top: 0;
+    }
+  button{
+    margin-bottom: map-get($spacers, 2);
+  }
 }
 
 // port icons (available to nation)
@@ -39,19 +62,6 @@ pattern .all {
     text {
         fill: $primary-700;
     }
-}
-
-.bootstrap-select > .dropdown-toggle {
-    padding-left: 15px;
-    padding-right: 15px;
-}
-
-.modal-body .bootstrap-select > .dropdown-toggle {
-    width: 18rem;
-}
-
-.modal-body .wood .bootstrap-select > .dropdown-toggle {
-    width: 15rem;
 }
 
 .card {
@@ -93,10 +103,6 @@ table a {
     @include hover-focus {
         text-decoration-style: solid !important;
     }
-}
-
-.modal-header {
-    padding-left: calc(1rem + 15px);
 }
 
 .recipes,
@@ -180,6 +186,14 @@ table a {
     fill-opacity: 0.5;
 }
 
+.here {
+    fill: $white;
+}
+
+.both {
+    fill: $blue;
+}
+
 .pos {
     fill: $green;
 }
@@ -218,17 +232,25 @@ table a {
 }
 
 .profile {
-    path.base {
+    path.base,
+    circle.base {
         opacity: 0.5;
-        fill: none;
-      stroke-width: 3px;
-      stroke: $secondary-500;
+        fill: $primary-500;
     }
 
-    path.comp,
-    circle.comp {
-        opacity: .5;
-        fill: $primary-500;
+    path.comp {
+        opacity: 0.5;
+        fill: none;
+        stroke-width: 3px;
+        stroke: $secondary-500;
+    }
+
+    .centroid-base {
+        fill: $secondary-700;
+    }
+
+    .centroid-comp {
+        fill: $primary-700;
     }
 }
 
@@ -291,7 +313,7 @@ table a {
 
 text {
     fill: $primary-900;
-    pointer-events: none;
+    // pointer-events: none; // needed? Conflicts with timelines-chart reset zoom
 }
 
 .profile {
@@ -397,12 +419,11 @@ text {
 
 .f11,
 .coord,
-.summary,
 .grid-background {
     line-height: 1;
     background-color: transparent;
     circle {
-        fill: $secondary-700;
+        fill: $secondary-600;
         fill-opacity: 0.5;
     }
     text {
@@ -433,7 +454,22 @@ text {
 
 .coord {
     text {
+        // font-size: unset;
         text-anchor: start;
+    }
+    circle {
+        fill-opacity: 1;
+        cursor: pointer;
+    }
+    .drag-active {
+        stroke: $secondary-100;
+        stroke-width: 0.25rem;
+    }
+    .drag-hidden {
+        fill-opacity: 0;
+    }
+    .drag-hidden.drag-active {
+        stroke-width: 0;
     }
 }
 
@@ -469,6 +505,15 @@ text {
 .wind-text-current {
     font-size: 1em !important;
     text-anchor: middle !important;
+}
+
+.profile {
+    line {
+        stroke: $secondary-600;
+        stroke-width: 0.5em;
+        fill: none;
+        opacity: 0.3;
+    }
 }
 
 .rs-tooltip-text {
@@ -625,12 +670,12 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
 .region {
     filter: url("#drop-shadow");
     text {
-      font-family: LibreCaslonDisplay, -apple-system, blinkmacsystemfont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
-      cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", arial, sans-serif;
-      opacity: 0.7;
-      fill: $white;
-      text-anchor: middle;
-  }
+        font-family: LibreCaslonDisplay, -apple-system, blinkmacsystemfont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
+            cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", arial, sans-serif;
+        opacity: 0.7;
+        fill: $white;
+        text-anchor: middle;
+    }
 }
 
 .region text {
@@ -652,39 +697,166 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
     margin-top: -1px;
 }
 
- .tablesort {
-   th[role=columnheader]:not(.no-sort) {
-     cursor: pointer;
-   }
+.tablesort {
+    th[role="columnheader"]:not(.no-sort) {
+        cursor: pointer;
+    }
 
-   th[role=columnheader]:not(.no-sort):after {
-     content: '';
-     float: right;
-     margin-top: 7px;
-     border-width: 0 4px 4px;
-     border-style: solid;
-     border-color: $primary-600 transparent;
-     visibility: hidden;
-     opacity: 0;
-     user-select: none;
-   }
+    th[role="columnheader"]:not(.no-sort):after {
+        content: "";
+        float: right;
+        margin-top: 7px;
+        border-width: 0 4px 4px;
+        border-style: solid;
+        border-color: $primary-600 transparent;
+        visibility: hidden;
+        opacity: 0;
+        user-select: none;
+    }
 
-   th[aria-sort=ascending]:not(.no-sort):after {
-     border-bottom: none;
-     border-width: 4px 4px 0;
-   }
+    th[aria-sort="ascending"]:not(.no-sort):after {
+        border-bottom: none;
+        border-width: 4px 4px 0;
+    }
 
-   th[aria-sort]:not(.no-sort):after {
-     visibility: visible;
-     opacity: 0.4;
-   }
+    th[aria-sort]:not(.no-sort):after {
+        visibility: visible;
+        opacity: 0.4;
+    }
 
-   th[role=columnheader]:not(.no-sort):hover:after {
-     visibility: visible;
-     opacity: 1;
-   }
- }
+    th[role="columnheader"]:not(.no-sort):hover:after {
+        visibility: visible;
+        opacity: 1;
+    }
+}
 
- .hidden {
-   visibility: hidden;
- }
+.hidden {
+    visibility: hidden;
+}
+
+.timelines-chart {
+    padding-bottom: 3rem;
+    text-align: center;
+    user-select: none;
+
+    .axises {
+        line,
+        path {
+            stroke: $primary-700;
+        }
+
+        .x-axis {
+            font-size: 12px;
+        }
+
+        .x-grid line {
+            stroke: $primary-200;
+        }
+
+        .y-axis,
+        .grp-axis {
+            line,
+            path {
+                stroke: none;
+            }
+            text {
+                fill: $primary-700;
+            }
+        }
+    }
+
+    .series-group {
+        fill-opacity: 0.6;
+        stroke: $primary-700;
+        stroke-opacity: 0.2;
+    }
+
+    .series-segment {
+        stroke: none;
+    }
+
+    .series-group,
+    .series-segment {
+        cursor: crosshair;
+    }
+
+    .legend {
+        .legendText {
+            fill: $body-color;
+        }
+    }
+
+    .reset-zoom-btn {
+        fill: $primary-600;
+        opacity: 0.6;
+        cursor: pointer;
+    }
+}
+
+.brusher {
+    .grid-background {
+        fill: $primary-200;
+    }
+
+    .axis path {
+        display: none;
+    }
+
+    .tick text {
+        text-anchor: middle;
+    }
+
+    .grid {
+        line,
+        path {
+            stroke: $primary-100;
+        }
+    }
+}
+
+.chart-zoom-selection,
+.brusher .brush .selection {
+    stroke: $primary-700;
+    stroke-opacity: 0.6;
+    fill: $primary-700;
+    fill-opacity: 0.3;
+    shape-rendering: crispEdges;
+}
+
+.chart-tooltip {
+    color: $body-color;
+    background: $primary-200;
+    padding: 5px;
+    border-radius: 3px;
+    font-size: 11px;
+    z-index: 4000;
+
+    &.group-tooltip {
+        font-size: 14px;
+    }
+
+    &.line-tooltip {
+        font-size: 13px;
+    }
+
+    &.group-tooltip,
+    &.line-tooltip {
+        font-weight: bold;
+    }
+
+    &.segment-tooltip {
+        text-align: center;
+    }
+}
+
+.area {
+    .area-label {
+        fill-opacity: 0.7;
+        fill: $white;
+    }
+    path {
+        stroke-opacity: 0.4;
+        stroke: $white !important;
+        stroke-width: 2px;
+    }
+}
