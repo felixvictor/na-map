@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -e
+trap on_exit EXIT
 
 JQ="$(command -v jq)"
 NODE="$(command -v node) --experimental-modules --no-warnings"
@@ -15,6 +16,36 @@ SERVER_TWITTER_NAMES=(eu1)
 API_VARS=(ItemTemplates Ports Shops)
 SERVER_MAINTENANCE_HOUR=10
 HEADER_DATE=$(LC_TIME="en" date -u +"%a, %d %b %Y 10:00:00 GMT" -d "+1 day")
+LAST_FUNCTION=""
+
+function get_current_branch() {
+    git rev-parse --abbrev-ref HEAD
+}
+
+function git_push_all () {
+    git push --quiet gitlab --all
+}
+
+function git_pull_all () {
+    git pull --all
+}
+
+function pull_all () {
+    BRANCH=$(get_current_branch)
+
+    git checkout master
+    git_pull_all
+    git checkout "${BRANCH}"
+}
+
+function on_exit () {
+    # If git push fails, git pull first
+    if [ "${LAST_FUNCTION}" == "push_data" ]; then
+        pull_all
+        git_push_all
+        exit 0
+    fi
+}
 
 function change_var () {
     BASE_DIR="$(pwd)"
@@ -46,6 +77,8 @@ function common_var () {
     export CANNON_FILE="${SRC_DIR}/cannons.json"
     export BUILDING_FILE="${SRC_DIR}/buildings.json"
     export RECIPE_FILE="${SRC_DIR}/recipes.json"
+    export OWNERSHIP_FILE="${SRC_DIR}/ownership.json"
+    export NATION_FILE="${SRC_DIR}/nations.json"
     export LOOT_FILE="${SRC_DIR}/loot.json"
     export EXCEL_FILE="${SRC_DIR}/port-battle.xlsx"
     export TWEETS_JSON="${BUILD_DIR}/API/tweets.json"
@@ -137,6 +170,9 @@ function get_port_data () {
         ${NODE} build/convert-buildings.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${BUILDING_FILE}" "${DATE}"
         ${NODE} build/convert-loot.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${LOOT_FILE}" "${DATE}"
         ${NODE} build/convert-recipes.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${RECIPE_FILE}" "${DATE}"
+        if [ "${SCRIPT_RUN_TYPE}" == "update" ]; then
+            ${NODE} build/convert-ownership.mjs "${API_DIR}" "${OWNERSHIP_FILE}" "${NATION_FILE}"
+        fi
 
         ${NODE} build/create-xlsx.mjs "${SHIP_FILE}" "${SRC_DIR}/${SERVER_NAMES[0]}.json" "${BASE_DIR}/public/${MODULE}.min.css" "${EXCEL_FILE}"
 
@@ -194,7 +230,7 @@ function update_tweets () {
     get_tweets
     if update_ports; then
         copy_data
-        push_data tweets
+        push_data
         deploy_data
     fi
 }
@@ -214,16 +250,20 @@ function touch_update () {
 }
 
 function push_data () {
-    TYPE="$1"
-
     git add --ignore-errors .
-    if [[ ! -z $(git status -s) ]]; then
-        git commit -m "squash! push"
-        if [ "${TYPE}" == "update" ]; then
+    if [[ -n $(git status -s) ]]; then
+        GIT_MESSAGE=""
+        if [ "${SCRIPT_RUN_TYPE}" == "update" ]; then
+            GIT_MESSAGE+="squash! "
             touch "${LAST_UPDATE_FILE}"
         fi
+        GIT_MESSAGE+="push ${SCRIPT_RUN_TYPE}"
+        git commit -m "${GIT_MESSAGE}"
     fi
-    git push --quiet gitlab --all
+    # Status for on_exit trap
+    LAST_FUNCTION="push_data"
+    git_push_all
+    LAST_FUNCTION=""
 }
 
 function update_data () {
@@ -245,7 +285,7 @@ function update_data () {
 
             copy_data
             touch_update
-            push_data update
+            push_data
             deploy_data
         fi
     fi
@@ -257,13 +297,15 @@ case "$1" in
         change_data
         ;;
     push-change)
+        SCRIPT_RUN_TYPE="change"
         change_var
-        push_data change
+        push_data
         ;;
     push-update)
+        SCRIPT_RUN_TYPE="update"
         update_var
         log_date
-        push_data update
+        push_data
         ;;
     update)
         update_var
@@ -271,6 +313,7 @@ case "$1" in
         update_data
         ;;
     twitter-update)
+        SCRIPT_RUN_TYPE="update-tweets"
         update_var
         update_tweets
         ;;

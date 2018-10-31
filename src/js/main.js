@@ -28,6 +28,7 @@ import {
 import moment from "moment";
 import "moment/locale/en-gb";
 import Cookies from "js-cookie";
+import ResizeObserver from "resize-observer-polyfill";
 
 import { initAnalytics, registerPage } from "./analytics";
 
@@ -94,22 +95,22 @@ function main() {
      * @return {void}
      */
     function setupListener() {
+        $("#server-name").change(() => serverNameSelected());
+
         // https://stackoverflow.com/questions/44467377/bootstrap-4-multilevel-dropdown-inside-navigation/48953349#48953349
         $(".dropdown-submenu > a").on("click", event => {
-            const submenu = $(event.currentTarget);
-            submenu.next(".dropdown-menu").addClass("show");
+            const submenu$ = $(event.currentTarget);
+
+            $(".dropdown-submenu .dropdown-menu").removeClass("show");
+            submenu$.next(".dropdown-menu").addClass("show");
             event.stopPropagation();
         });
-        $(".dropdown").on("hidden.bs.dropdown", event => {
-            // hide any open menus when parent closes
-            const dropdown = $(event.currentTarget);
-            dropdown
-                .find(".dropdown-menu.show")
-                .not(".inner")
-                .removeClass("");
-        });
 
-        $("#server-name").change(() => serverNameSelected());
+        $(".dropdown").on("hidden.bs.dropdown", () => {
+            $(".dropdown-menu.show")
+                .not(".inner")
+                .removeClass("show");
+        });
     }
 
     fontawesome.library.add(
@@ -137,6 +138,10 @@ function main() {
 
     setupListener();
     const map = new Map(serverName);
+
+    window.onresize = () => {
+        map.resize();
+    };
 }
 
 main();
