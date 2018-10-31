@@ -2,9 +2,7 @@
     common.js
  */
 
-/* global d3 : false
- */
-
+import { select as d3Select } from "d3-selection";
 import { distancePoints } from "./util";
 
 const transformMatrix = {
@@ -50,6 +48,7 @@ export const nations = [
 
 export const defaultFontSize = 16;
 export const defaultCircleSize = 16;
+export const speedFactor = 390;
 
 /**
  * Calculate the k distance between two svg coordinates
@@ -59,14 +58,16 @@ export const defaultCircleSize = 16;
  * @return {Number} Distance between Pt0 and Pt1 in k
  */
 export function getDistance(pt0, pt1) {
-    const F11X0 = convertInvCoordX(pt0[0], pt0[1]),
-        F11Y0 = convertInvCoordY(pt0[0], pt0[1]),
-        F11X1 = convertInvCoordX(pt1[0], pt1[1]),
-        F11Y1 = convertInvCoordY(pt1[0], pt1[1]),
-        factor = 2.56,
-        kFactor = 400 * factor;
+    const F11_0 = {
+            x: convertInvCoordX(pt0.x, pt0.y),
+            y: convertInvCoordY(pt0.x, pt0.y)
+        },
+        F11_1 = {
+            x: convertInvCoordX(pt1.x, pt1.y),
+            y: convertInvCoordY(pt1.x, pt1.y)
+        };
 
-    return distancePoints([F11X0, F11Y0], [F11X1, F11Y1]) / kFactor;
+    return distancePoints(F11_0, F11_1) / (2.63 * speedFactor);
 }
 
 /**
@@ -74,11 +75,12 @@ export function getDistance(pt0, pt1) {
  * @function
  * @param {string} id - Modal id
  * @param {string} title - Modal title
+ * @param {string} size - "lg" when modal should be large (default)
+ * @param {string} buttonText - button text (default "Close")
  * @return {void}
  */
-export function insertBaseModal(id, title, large = true) {
-    const modal = d3
-        .select("#modal-section")
+export function insertBaseModal(id, title, size = "lg", buttonText = "Close") {
+    const modal = d3Select("#modal-section")
         .append("section")
         .attr("id", id)
         .attr("class", "modal")
@@ -87,7 +89,7 @@ export function insertBaseModal(id, title, large = true) {
         .attr("tabindex", "-1")
         .attr("role", "dialog")
         .append("div")
-        .attr("class", `modal-dialog${large ? " modal-lg" : ""}`)
+        .attr("class", `modal-dialog${size === "lg" || size === "sm" ? ` modal-${size}` : ""}`)
         .attr("role", "document");
 
     const content = modal.append("div").attr("class", "modal-content");
@@ -100,10 +102,40 @@ export function insertBaseModal(id, title, large = true) {
     const footer = content.append("footer").attr("class", "modal-footer");
     footer
         .append("button")
-        .text("Close")
+        .text(buttonText)
         .attr("type", "button")
         .attr("class", "btn btn-secondary")
         .attr("data-dismiss", "modal");
+}
+
+/**
+ * Enable nested dropdowns in navbar
+ * @link https://github.com/bootstrapthemesco/bootstrap-4-multi-dropdown-navbar
+ * @param {string} id - nav-item id
+ * @return {void}
+ */
+export function initMultiDropdownNavbar(id) {
+    $(`#${id} .dropdown-menu .bootstrap-select .dropdown-toggle`).on("click", event => {
+        const el$ = $(event.currentTarget);
+        el$.next(".dropdown-menu").toggleClass("show");
+        el$.parent("li").toggleClass("show");
+        el$.parents("li.nav-item.dropdown.show").on("hidden.bs.dropdown", event2 => {
+            $(event2.currentTarget)
+                .find(".dropdown-menu.show")
+                .not(".inner")
+                .removeClass("show");
+        });
+
+        return false;
+    });
+
+    $(`#${id} div.dropdown.bootstrap-select`).on("hidden", event => {
+        // hide any open menus when parent closes
+        $(event.currentTarget)
+            .find(".dropdown-menu.show")
+            .not(".inner")
+            .removeClass("show");
+    });
 }
 
 // eslint-disable-next-line no-undef

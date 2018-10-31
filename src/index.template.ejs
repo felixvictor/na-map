@@ -17,7 +17,7 @@
 
 <body>
 
-<nav class="navbar fixed-top navbar-expand-lg navbar-light bg-light">
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
     <a class="navbar-brand" href="#"><img src="<%= htmlWebpackPlugin.options.brand %>" width="32" height="32"
                                           alt="Brand"></a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
@@ -30,7 +30,7 @@
             <li class="nav-item dropdown pr-2">
                 <a class="nav-link dropdown-toggle" href="#" id="predictDropdown" role="button" data-toggle="dropdown"
                    aria-haspopup="true" aria-expanded="false">
-                    Wind prediction
+                    Predict wind
                 </a>
                 <div class="dropdown-menu" id="predictMenu" aria-labelledby="predictDropdown">
                     <form id="windPrediction" class="p-2">
@@ -61,20 +61,20 @@
             <li class="nav-item dropdown pr-2">
                 <a class="nav-link dropdown-toggle" href="#" id="moveToDropdown" role="button" data-toggle="dropdown"
                    aria-haspopup="true" aria-expanded="false">
-                    Move to F11
+                    Go to F11
                 </a>
                 <div class="dropdown-menu large-width p-2" id="moveToMenu" aria-labelledby="moveToDropdown">
                     <form id="f11">
                         <div class="input-group">
-                            <input class="form-control" id="x-coord" type="number" required placeholder="X" max="830"
-                                   min="-816" step="1">
+                            <input class="form-control" id="x-coord" type="number" required placeholder="X" max="819"
+                                   min="-819" step="1">
                             <div class="input-group-append">
                                 <span class="input-group-text">k</span>
                             </div>
                         </div>
                         <div class="input-group">
-                            <input class="form-control" id="z-coord" type="number" required placeholder="Z" max="830"
-                                   min="-430" step="1">
+                            <input class="form-control" id="z-coord" type="number" required placeholder="Z" max="819"
+                                   min="-819" step="1">
                             <div class="input-group-append">
                                 <span class="input-group-text">k</span>
                             </div>
@@ -94,13 +94,25 @@
                 </div>
             </li>
 
-
-            <li class="nav-item pr-2">
-                <label for="port-names"></label><select name="port-names" id="port-names">
-                </select>
+            <li class="nav-item dropdown pr-2" id="positionNavbar">
+                <a class="nav-link dropdown-toggle" href="#" id="positionDropdown" role="button" data-toggle="dropdown"
+                   aria-haspopup="true" aria-expanded="false">
+                    Get position
+                </a>
             </li>
 
-            <li class="nav-item dropdown pr-2">
+            <li class="nav-item dropdown pr-2" id="journeyNavbar">
+                <a class="nav-link dropdown-toggle" href="#" id="journeyDropdown" role="button" data-toggle="dropdown"
+                   aria-haspopup="true" aria-expanded="false">
+                    Make journey
+                </a>
+            </li>
+
+            <li class="nav-item pr-2">
+                <label><select name="port-names-select" id="port-names-select"></select></label>
+            </li>
+
+            <li id="selectPortNavbar" class="nav-item dropdown pr-2">
                 <a class="nav-link dropdown-toggle" href="#" id="propertyDropdown" role="button" data-toggle="dropdown"
                    aria-haspopup="true" aria-expanded="false">
                     Select ports on
@@ -125,16 +137,16 @@
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Conquest mark</h6>
                     <div class="dropdown-item">
-                        <label><select class="select" name="prop-cm" id="prop-cm"></select></label>
+                        <label><select name="prop-cm-select" id="prop-cm-select"></select></label>
                     </div>
 
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Port owner</h6>
                     <div class="dropdown-item">
-                        <label><select class="select" name="prop-nation" id="prop-nation"></select></label>
+                        <label><select name="prop-nation-select" id="prop-nation-select"></select></label>
                     </div>
                     <div class="dropdown-item">
-                        <label><select class="select" name="prop-clan" id="prop-clan"></select></label>
+                        <label><select name="prop-clan-select" id="prop-clan-select"></select></label>
                     </div>
 
                     <div class="dropdown-divider"></div>
@@ -233,8 +245,7 @@
             </li>
 
             <li class="nav-item pr-2">
-                <label for="buy-goods"></label><select name="buy-goods" id="buy-goods">
-                </select>
+                <label><select name="buy-goods-select" id="buy-goods-select"></select></label>
             </li>
         </ul>
 
@@ -255,7 +266,9 @@
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">List</h6>
                     <a class="dropdown-item" id="button-building-list">Buildings</a>
+                    <a class="dropdown-item" id="button-cannon-list">Cannons</a>
                     <a class="dropdown-item" id="button-module-list">Modules</a>
+                    <a class="dropdown-item" id="button-ownership-list">Port ownership</a>
                     <a class="dropdown-item" id="button-recipe-list">Recipes</a>
                     <a class="dropdown-item" id="button-ingredient-list">Recipe ingredients</a>
                     <a class="dropdown-item" id="button-wood-list">Woods</a>
@@ -280,12 +293,12 @@
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" class="custom-control-input"
                                    name="serverName" id="server-name-eu1" value="eu1">
-                            <label class="custom-control-label" for="server-name-eu1">Caribbean</label>
+                            <label class="custom-control-label" for="server-name-eu1">War (Caribbean)</label>
                         </div>
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" class="custom-control-input"
                                    name="serverName" id="server-name-eu2" value="eu2">
-                            <label class="custom-control-label" for="server-name-eu2">PvE only</label>
+                            <label class="custom-control-label" for="server-name-eu2">Peace (PvE)</label>
                         </div>
                     </div>
 
@@ -296,6 +309,11 @@
                             <input type="radio" class="custom-control-input"
                                    name="showRadius" id="show-radius-attack" value="attack">
                             <label class="custom-control-label" for="show-radius-attack">Attack</label>
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input"
+                                   name="showRadius" id="show-radius-position" value="position">
+                            <label class="custom-control-label" for="show-radius-position">Position</label>
                         </div>
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" class="custom-control-input"
@@ -378,17 +396,18 @@
                 </div>
             </li>
         </ul>
-        <button id="reset" type="button" class="btn btn-outline-secondary">Clear</button>
-        <button id="about" type="button" class="btn btn-outline-secondary">About</button>
+        <div class="btn-group-vertical" role="group">
+            <button type="button" id="reset" class="btn btn-sm btn-outline-secondary">Clear</button>
+            <button type="button" id="about" class="btn btn-sm btn-outline-secondary">About</button>
+        </div>
     </div>
 </nav>
 
-<div id="na" class="na"></div>
+<main role="main" class="container-fluid">
+    <div id="na-map" class="central"></div>
 
-<div id="modal-section"></div>
+    <div id="modal-section"></div>
+</main>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.5.0/d3.min.js"
-        integrity="sha384-xt54w7/ptFmlL1rMBfoLoM/T0iHjAzuv47CPmW5KtXrv5iphOBlJxMOSkOg0gsmF"
-        crossorigin="anonymous"></script>
 </body>
 </html>
