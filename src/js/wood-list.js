@@ -8,13 +8,11 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-/* global d3 : false
- */
-
+import { select as d3Select } from "d3-selection";
 // eslint-disable-next-line import/no-named-default
 import { default as Tablesort } from "tablesort";
 import { insertBaseModal } from "./common";
-import { capitalizeFirstLetter, formatFloatFixed } from "./util";
+import { formatFloatFixed } from "./util";
 import { registerEvent } from "./analytics";
 
 /**
@@ -43,7 +41,7 @@ export default class WoodList {
     _injectModal() {
         insertBaseModal(this._modalId, this._baseName);
 
-        const body = d3.select(`#${this._modalId} .modal-body`);
+        const body = d3Select(`#${this._modalId} .modal-body`);
         body.append("h5").text("Frames");
         body.append("div")
             .attr("id", "frame-list")
@@ -54,7 +52,35 @@ export default class WoodList {
             .attr("class", "modules");
     }
 
+    _initTablesort() {
+        const cleanNumber = i => i.replace(/[^\-?0-9.]/g, ""),
+            compareNumber = (a, b) => {
+                let aa = parseFloat(a),
+                    bb = parseFloat(b);
+
+                aa = Number.isNaN(aa) ? 0 : aa;
+                bb = Number.isNaN(bb) ? 0 : bb;
+
+                return aa - bb;
+            };
+
+        Tablesort.extend(
+            "number",
+            item =>
+                item.match(/^[-+]?[£\x24Û¢´€]?\d+\s*([,.]\d{0,2})/) || // Prefixed currency
+                item.match(/^[-+]?\d+\s*([,.]\d{0,2})?[£\x24Û¢´€]/) || // Suffixed currency
+                item.match(/^[-+]?(\d)*-?([,.])?-?(\d)+([E,e][-+][\d]+)?%?$/), // Number
+            (a, b) => {
+                const aa = cleanNumber(a),
+                    bb = cleanNumber(b);
+
+                return compareNumber(bb, aa);
+            }
+        );
+    }
+
     _initModal() {
+        this._initTablesort();
         this._injectModal();
         this._injectList("frame");
         this._injectList("trim");
@@ -97,9 +123,7 @@ export default class WoodList {
         const modifiers = this._getModifiers(type);
         let text = "";
 
-        text += `<table id="table-${type}-list" class="table table-sm small tablesort"><thead><tr><th>${capitalizeFirstLetter(
-            type
-        )}</th>`;
+        text += `<table id="table-${type}-list" class="table table-sm small tablesort"><thead><tr><th data-sort-default>Wood</thdata-sort-default>`;
         modifiers.forEach(modifier => {
             text += `<th>${modifier}</th>`;
         });
@@ -111,7 +135,9 @@ export default class WoodList {
                 const amount = wood.properties
                     .filter(property => property.modifier === modifier)
                     .map(property => property.amount)[0];
-                text += `<td class="text-right">${amount ? formatFloatFixed(amount) : ""}</td>`;
+                text += `<td class="text-right" data-sort="${amount || 0}">${
+                    amount ? formatFloatFixed(amount) : ""
+                }</td>`;
             });
             text += "</tr>";
         });
