@@ -171,15 +171,13 @@ export default class TriangulatePosition {
 
         Array.from(Array(this._inputs).keys()).forEach(row => {
             const select = `${this._baseId}-${row}-select`,
-                selectSelector = document.getElementById(select),
                 selectSelector$ = $(`#${select}`),
                 input = `${this._baseId}-${row}-input`,
-                inputSelector = document.getElementById(input),
                 inputSelector$ = $(`#${input}`);
 
             const port = selectSelector$.find(":selected")[0] ? selectSelector$.find(":selected")[0].text : "",
                 distance = +inputSelector$.val();
-            console.log(row, port, distance, typeof distance);
+
             if (distance && port !== "") {
                 ports.set(port, distance * magicNumber);
             }
