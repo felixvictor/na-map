@@ -8,10 +8,19 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-/* global d3 : false
- */
+import { ascending as d3Ascending, min as d3Min, max as d3Max, range as d3Range } from "d3-array";
+import { nest as d3Nest } from "d3-collection";
+import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate";
+import { scaleLinear as d3ScaleLinear } from "d3-scale";
+import { select as d3Select } from "d3-selection";
+import {
+    arc as d3Arc,
+    curveCatmullRomClosed as d3CurveCatmullRomClosed,
+    pie as d3Pie,
+    radialLine as d3RadialLine
+} from "d3-shape";
 
-import { formatInt, formatFloat, getOrdinal, isEmpty, capitalizeFirstLetter, roundToThousands } from "./util";
+import { formatInt, formatFloat, getOrdinal, isEmpty, roundToThousands } from "./util";
 import { registerEvent } from "./analytics";
 import WoodCompare from "./wood-compare";
 import { insertBaseModal } from "./common";
@@ -37,7 +46,7 @@ class Ship {
         this._select = `#ship-compare-${this._id}`;
 
         this._setupSvg();
-        this._g = d3.select(this._select).select("g");
+        this._g = d3Select(this._select).select("g");
         this._setCompass();
     }
 
@@ -46,9 +55,9 @@ class Ship {
      * @returns {void}
      */
     _setupSvg() {
-        const element = d3.select(this.select);
+        const element = d3Select(this.select);
 
-        d3.select(`${this.select} svg`).remove();
+        d3Select(`${this.select} svg`).remove();
 
         element
             .append("svg")
@@ -58,7 +67,7 @@ class Ship {
             .attr("fill", "none")
             .append("g")
             .attr("transform", `translate(${this.shipData.svgWidth / 2}, ${this.shipData.svgHeight / 2})`);
-        d3.select(`${this.select} div`).remove();
+        d3Select(`${this.select} div`).remove();
 
         element.append("div").classed("block", true);
     }
@@ -71,13 +80,11 @@ class Ship {
         // Compass
         const data = new Array(numSegments / 2);
         data.fill(1, 0);
-        const pie = d3
-            .pie()
+        const pie = d3Pie()
             .sort(null)
             .value(1)(data);
 
-        const arc = d3
-            .arc()
+        const arc = d3Arc()
             .outerRadius(this.shipData.radiusScaleAbsolute(12))
             .innerRadius(this.shipData.innerRadius);
 
@@ -89,6 +96,14 @@ class Ship {
             .attr("class", "compass-arc");
 
         g.append("path").attr("d", arc);
+
+        this.g
+            .append("line")
+            .attr("x1", 0)
+            .attr("y1", -160)
+            .attr("x2", 0)
+            .attr("y2", -79)
+            .attr("marker-end", "url(#course-arrow)");
     }
 
     /**
@@ -313,8 +328,7 @@ class ShipBase extends Ship {
      */
     _setBackground() {
         // Arc for text
-        const knotsArc = d3
-            .arc()
+        const knotsArc = d3Arc()
             .outerRadius(d => this.shipCompareData.radiusScaleAbsolute(d) + 2)
             .innerRadius(d => this.shipCompareData.radiusScaleAbsolute(d) + 1)
             .startAngle(-Math.PI / 2)
@@ -361,8 +375,7 @@ class ShipBase extends Ship {
      */
     _setBackgroundGradient() {
         // Extra scale since the color scale is interpolated
-        const gradientScale = d3
-            .scaleLinear()
+        const gradientScale = d3ScaleLinear()
             .domain([this.shipData.speed.min, this.shipData.speed.max])
             .range([0, this.shipCompareData.svgWidth]);
 
@@ -384,7 +397,7 @@ class ShipBase extends Ship {
             .attr("cy", 0.25)
             .attr("r", 0.5)
             .selectAll("stop")
-            .data(d3.range(numStops))
+            .data(d3Range(numStops))
             .enter()
             .append("stop")
             .attr("offset", (d, i) => gradientScale(gradientPoint[i]) / this.shipCompareData.svgWidth)
@@ -396,16 +409,14 @@ class ShipBase extends Ship {
      * @returns {void}
      */
     _drawProfile() {
-        const pie = d3
-            .pie()
+        const pie = d3Pie()
             .sort(null)
             .value(1);
 
         const arcs = pie(this.shipData.speedDegrees);
 
-        const curve = d3.curveCatmullRomClosed,
-            line = d3
-                .radialLine()
+        const curve = d3CurveCatmullRomClosed,
+            line = d3RadialLine()
                 .angle((d, i) => i * segmentRadians)
                 .radius(d => this.shipCompareData.radiusScaleAbsolute(d.data))
                 .curve(curve);
@@ -549,41 +560,36 @@ class ShipComparison extends Ship {
      * @returns {void}
      */
     _drawDifferenceProfile() {
-        const pie = d3
-            .pie()
+        const pie = d3Pie()
             .sort(null)
             .value(1);
-        const arcsBase = pie(this.shipCompareData.speedDegrees),
-            arcsComp = pie(this.shipBaseData.speedDegrees);
-        const curve = d3.curveCatmullRomClosed,
-            lineBase = d3
-                .radialLine()
-                .angle((d, i) => i * segmentRadians)
-                .radius(d => this.shipCompare.radiusScaleAbsolute(d.data))
-                .curve(curve),
-            lineB = d3
-                .radialLine()
+        const arcsComp = pie(this.shipCompareData.speedDegrees),
+            arcsBase = pie(this.shipBaseData.speedDegrees);
+        const curve = d3CurveCatmullRomClosed,
+            line = d3RadialLine()
                 .angle((d, i) => i * segmentRadians)
                 .radius(d => this.shipCompare.radiusScaleAbsolute(d.data))
                 .curve(curve);
 
         const pathComp = this.g.append("path"),
             pathBase = this.g.append("path"),
-            markersBase = this.g.append("g").attr("class", "markers");
+            pathMarkersComp = this.g.append("g").attr("class", "markers");
 
         const speedDiff = [];
         this.shipCompareData.speedDegrees.forEach((speedShipCompare, i) => {
             speedDiff.push(roundToThousands(speedShipCompare - this.shipBaseData.speedDegrees[i]));
         });
-        const colourScale = d3
-            .scaleLinear()
-            .domain([d3.min(speedDiff), 0, 1, d3.max(speedDiff)])
-            .range(["#a62e39", "#fbf8f5", "#95d4a4", "#419f57"])
-            .interpolate(d3.interpolateHcl);
+        const min = this._shipCompare._minSpeed,
+            max = this._shipCompare._maxSpeed;
+        const colourScale = d3ScaleLinear()
+            .domain([min, -1, 0, 1, max])
+            .range(["#782129", "#a62e39", "#fbf8f5", "#419f57", "#2a6739"])
+            .interpolate(d3InterpolateHcl);
 
-        pathBase.attr("d", lineBase(arcsBase)).classed("base", true);
-        const selBase = markersBase.selectAll("circle").data(arcsBase);
-        selBase
+        pathComp.attr("d", line(arcsComp)).classed("comp", true);
+
+        const markersComp = pathMarkersComp.selectAll("circle").data(arcsComp);
+        markersComp
             .enter()
             .append("circle")
             .attr("r", 5)
@@ -593,7 +599,7 @@ class ShipComparison extends Ship {
             .append("title")
             .text(d => `${Math.round(d.data * 10) / 10} knots`);
 
-        pathComp.attr("d", lineB(arcsComp)).classed("comp", true);
+        pathBase.attr("d", line(arcsBase)).classed("base", true);
     }
 
     /**
@@ -858,30 +864,34 @@ export default class ShipCompare {
     /**
      * @param {Object} shipData - Ship data
      * @param {Object} woodData - Wood data
+     * @param {string} baseId - Base id (default "ship-compare")
      */
-    constructor(shipData, woodData) {
+    constructor(shipData, woodData, baseId = "ship-compare") {
         this._shipData = shipData;
 
+        this._baseId = baseId;
         this._baseName = "Compare ships";
-        this._baseId = "ship-compare";
         this._buttonId = `button-${this._baseId}`;
         this._modalId = `modal-${this._baseId}`;
 
-        this._columnsCompare = ["C1", "C2"];
+        if (this._baseId === "ship-compare") {
+            this._columnsCompare = ["C1", "C2"];
+        } else {
+            this._columnsCompare = [];
+        }
         this._columns = this._columnsCompare.slice();
         this._columns.unshift("Base");
 
         this._ships = { Base: {}, C1: {}, C2: {} };
 
-        const theoreticalMinSpeed = d3.min(this._shipData, ship => ship.speed.min) * 1.2,
+        const theoreticalMinSpeed = d3Min(this._shipData, ship => ship.speed.min) * 1.2,
             theoreticalMaxSpeed = 15.5;
         this._minSpeed = theoreticalMinSpeed;
         this._maxSpeed = theoreticalMaxSpeed;
-        this._colorScale = d3
-            .scaleLinear()
+        this._colorScale = d3ScaleLinear()
             .domain([this._minSpeed, 0, 12, this._maxSpeed])
             .range(["#a62e39", "#fbf8f5", "#419f57", "#58bb6f"])
-            .interpolate(d3.interpolateHcl);
+            .interpolate(d3InterpolateHcl);
 
         this._woodChanges = new Map([
             ["Hull strength", ["structure.armour"]],
@@ -898,9 +908,20 @@ export default class ShipCompare {
             ["Crew", ["crew.max"]]
         ]);
 
-        this._woodId = "ship-wood";
+        if (this._baseId === "ship-journey") {
+            this._woodId = "wood-journey";
+        } else {
+            this._woodId = "wood-ship";
+        }
+
         this._woodCompare = new WoodCompare(woodData, this._woodId);
-        this._setupListener();
+
+        if (this._baseId === "ship-journey") {
+            this._initData();
+            this._initWoodSelect();
+        } else {
+            this._setupListener();
+        }
     }
 
     /**
@@ -925,8 +946,7 @@ export default class ShipCompare {
         this.svgHeight = this.svgWidth;
         this.outerRadius = Math.floor(Math.min(this.svgWidth, this.svgHeight) / 2);
         this.innerRadius = Math.floor(this.outerRadius * 0.3);
-        this.radiusScaleAbsolute = d3
-            .scaleLinear()
+        this.radiusScaleAbsolute = d3ScaleLinear()
             .domain([this.minSpeed, 0, this.maxSpeed])
             .range([10, this.innerRadius, this.outerRadius]);
     }
@@ -950,10 +970,9 @@ export default class ShipCompare {
      * @returns {void}
      */
     _setupData() {
-        this.shipSelectData = d3
-            .nest()
+        this.shipSelectData = d3Nest()
             .key(ship => ship.class)
-            .sortKeys(d3.ascending)
+            .sortKeys(d3Ascending)
             .entries(
                 this._shipData
                     .map(ship => ({
@@ -982,8 +1001,7 @@ export default class ShipCompare {
     _injectModal() {
         insertBaseModal(this._modalId, this._baseName);
 
-        const row = d3
-            .select(`#${this._modalId} .modal-body`)
+        const row = d3Select(`#${this._modalId} .modal-body`)
             .append("div")
             .attr("class", "container-fluid")
             .append("div")
@@ -994,15 +1012,15 @@ export default class ShipCompare {
                 .attr("class", `col-md-4 ml-auto pt-2 ${column === "Base" ? "columnA" : "columnC"}`);
 
             const shipId = `${this._baseId}-${column}-select`;
-            div.append("label").attr("for", shipId);
-            div.append("select")
+            div.append("label")
+                .append("select")
                 .attr("name", shipId)
                 .attr("id", shipId);
 
             ["frame", "trim"].forEach(type => {
                 const woodId = `${this._woodId}-${type}-${column}-select`;
-                div.append("label").attr("for", woodId);
-                div.append("select")
+                div.append("label")
+                    .append("select")
                     .attr("name", woodId)
                     .attr("id", woodId);
             });
@@ -1013,15 +1031,12 @@ export default class ShipCompare {
         });
     }
 
-    /**
-     * Init modal
-     * @returns {void}
-     */
-    _initModal() {
+    _initData() {
         this._setupData();
         this.woodCompare._setupData();
-        this._injectModal();
+    }
 
+    _initWoodSelect() {
         this._columns.forEach(columnId => {
             this._setupShipSelect(columnId);
             ["frame", "trim"].forEach(type => {
@@ -1031,6 +1046,16 @@ export default class ShipCompare {
 
             this._setupSelectListener(columnId);
         });
+    }
+
+    /**
+     * Init modal
+     * @returns {void}
+     */
+    _initModal() {
+        this._initData();
+        this._injectModal();
+        this._initWoodSelect();
     }
 
     /**
@@ -1059,6 +1084,7 @@ export default class ShipCompare {
      * @returns {void}
      */
     _setupShipSelect(columnId) {
+        // console.log("_setupShipSelect", columnId, `#${this._baseId}-${columnId}-select`);
         const select$ = $(`#${this._baseId}-${columnId}-select`),
             options = this._getOptions();
         select$.append(options);
@@ -1150,18 +1176,28 @@ export default class ShipCompare {
      */
     _refreshShips(shipId, compareId) {
         const singleShipData = this._getShipData(shipId, compareId);
-        if (compareId === "Base") {
-            this._setShip(compareId, new ShipBase(compareId, singleShipData, this));
-            this._columnsCompare.forEach(id => {
-                $(`#${this._baseId}-${id}-select`)
-                    .removeAttr("disabled")
-                    .selectpicker("refresh");
-                if (!isEmpty(this.ships[id])) {
-                    this._setShip(id, new ShipComparison(id, singleShipData, this.ships[id]._shipCompareData, this));
-                }
-            });
+        if (this._baseId !== "ship-journey") {
+            if (compareId === "Base") {
+                this._setShip(compareId, new ShipBase(compareId, singleShipData, this));
+                this._columnsCompare.forEach(id => {
+                    $(`#${this._baseId}-${id}-select`)
+                        .removeAttr("disabled")
+                        .selectpicker("refresh");
+                    if (!isEmpty(this.ships[id])) {
+                        this._setShip(
+                            id,
+                            new ShipComparison(id, singleShipData, this.ships[id]._shipCompareData, this)
+                        );
+                    }
+                });
+            } else {
+                this._setShip(
+                    compareId,
+                    new ShipComparison(compareId, this.ships.Base._shipData, singleShipData, this)
+                );
+            }
         } else {
-            this._setShip(compareId, new ShipComparison(compareId, this.ships.Base._shipData, singleShipData, this));
+            this._singleShipData = singleShipData;
         }
     }
 
@@ -1186,10 +1222,11 @@ export default class ShipCompare {
         const selectShip$ = $(`#${this._baseId}-${compareId}-select`);
         selectShip$
             .addClass("selectpicker")
-            .on("change", () => {
+            .on("changed.bs.select", event => {
+                event.preventDefault();
                 const shipId = +selectShip$.val();
                 this._refreshShips(shipId, compareId);
-                if (compareId === "Base") {
+                if (compareId === "Base" && this._baseId !== "ship-journey") {
                     this._enableCompareSelects();
                 }
                 this.woodCompare.enableSelects(compareId);
@@ -1202,12 +1239,12 @@ export default class ShipCompare {
             const select$ = $(`#${this._woodId}-${type}-${compareId}-select`);
             select$
                 .addClass("selectpicker")
-                .on("change", () => {
+                .on("changed.bs.select", () => {
                     this.woodCompare._woodSelected(compareId, type, select$);
                     const shipId = +selectShip$.val();
                     this._refreshShips(shipId, compareId);
                 })
-                .selectpicker({ noneSelectedText: `Select ${capitalizeFirstLetter(type)}` })
+                .selectpicker({ noneSelectedText: `Select ${type}` })
                 .val("default")
                 .selectpicker("refresh");
         });
