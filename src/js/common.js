@@ -76,9 +76,10 @@ export function getDistance(pt0, pt1) {
  * @param {string} id - Modal id
  * @param {string} title - Modal title
  * @param {string} size - "lg" when modal should be large (default)
+ * @param {string} buttonText - button text (default "Close")
  * @return {void}
  */
-export function insertBaseModal(id, title, size = "lg") {
+export function insertBaseModal(id, title, size = "lg", buttonText = "Close") {
     const modal = d3Select("#modal-section")
         .append("section")
         .attr("id", id)
@@ -101,7 +102,7 @@ export function insertBaseModal(id, title, size = "lg") {
     const footer = content.append("footer").attr("class", "modal-footer");
     footer
         .append("button")
-        .text("Close")
+        .text(buttonText)
         .attr("type", "button")
         .attr("class", "btn btn-secondary")
         .attr("data-dismiss", "modal");
