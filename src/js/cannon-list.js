@@ -8,9 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-/* global d3 : false
- */
-
+import { select as d3Select } from "d3-selection";
 // eslint-disable-next-line import/no-named-default
 import { default as Tablesort } from "tablesort";
 import { insertBaseModal } from "./common";
@@ -50,7 +48,7 @@ export default class CannonList {
     _injectModal() {
         insertBaseModal(this._modalId, this._baseName);
 
-        const body = d3.select(`#${this._modalId} .modal-body`);
+        const body = d3Select(`#${this._modalId} .modal-body`);
         ["medium", "long", "carronade"].forEach(type => {
             body.append("h5").text(capitalizeFirstLetter(type));
             body.append("div")
