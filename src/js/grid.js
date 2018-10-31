@@ -8,8 +8,9 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-/* global d3 : false
- */
+import { axisBottom as d3AxisBottom, axisRight as d3AxisRight } from "d3-axis";
+import { event as d3Event, select as d3Select } from "d3-selection";
+import { scaleLinear as d3ScaleLinear } from "d3-scale";
 
 import { formatF11, roundToThousands } from "./util";
 import { convertInvCoordX, convertInvCoordY } from "./common";
@@ -66,20 +67,6 @@ export default class Grid {
         this._width = this._map.width;
 
         /**
-         * Top margin of screen
-         * @type {Number}
-         * @private
-         */
-        this._topMargin = this._map.margin.top;
-
-        /**
-         * Left margin of screen
-         * @type {Number}
-         * @private
-         */
-        this._leftMargin = this._map.margin.left;
-
-        /**
          * Font size in px
          * @type {Number}
          * @private
@@ -119,8 +106,7 @@ export default class Grid {
          * X scale
          * @type {Object}
          */
-        this._xScale = d3
-            .scaleLinear()
+        this._xScale = d3ScaleLinear()
             .clamp(true)
             .domain([
                 convertInvCoordX(this._minCoord, this._minCoord),
@@ -132,8 +118,7 @@ export default class Grid {
          * Y scale
          * @type {Object}
          */
-        this._yScale = d3
-            .scaleLinear()
+        this._yScale = d3ScaleLinear()
             .clamp(true)
             .domain([
                 convertInvCoordY(this._minCoord, this._minCoord),
@@ -154,8 +139,7 @@ export default class Grid {
          * X axis
          * @type {Object}
          */
-        this._xAxis = d3
-            .axisBottom(this._xScale)
+        this._xAxis = d3AxisBottom(this._xScale)
             .tickFormat(formatF11)
             .tickValues(ticks)
             .tickSize(this._maxCoord);
@@ -164,17 +148,13 @@ export default class Grid {
          * Y Axis
          * @type {Object}
          */
-        this._yAxis = d3
-            .axisRight(this._yScale)
+        this._yAxis = d3AxisRight(this._yScale)
             .tickFormat(formatF11)
             .tickValues(ticks)
             .tickSize(this._maxCoord);
 
         // svg groups
-        this._gAxis = this._map._svg
-            .insert("g", "g.voronoi")
-            .classed("axis", true)
-            .attr("display", "none");
+        this._gAxis = this._map.svg.append("g").classed("axis d-none", true);
         this._gXAxis = this._gAxis.append("g").classed("axis-x", true);
         this._gYAxis = this._gAxis.append("g").classed("axis-y", true);
         this._setupBackground();
@@ -272,8 +252,8 @@ export default class Grid {
      * @private
      */
     _displayXAxis() {
-        const tk = d3.event ? d3.event.transform.k : 1,
-            ty = d3.event ? d3.event.transform.y : 0,
+        const tk = d3Event ? d3Event.transform.k : 1,
+            ty = d3Event ? d3Event.transform.y : 0,
             dx = ty / tk < this._width ? ty / tk : 0;
         this._gXAxis.call(this._xAxis.tickPadding(-this._maxCoord - dx));
         this._gXAxis
@@ -288,8 +268,8 @@ export default class Grid {
      * @private
      */
     _displayYAxis() {
-        const tk = d3.event ? d3.event.transform.k : 1,
-            tx = d3.event ? d3.event.transform.x : 0,
+        const tk = d3Event ? d3Event.transform.k : 1,
+            tx = d3Event ? d3Event.transform.x : 0,
             dy = tx / tk < this._height ? tx / tk : 0;
         this._gYAxis.call(this._yAxis.tickPadding(-this._maxCoord - dy));
         this._gYAxis
@@ -303,10 +283,7 @@ export default class Grid {
      * @return {void}
      */
     _setupBackground() {
-        this._gBackground = this._map._svg
-            .insert("g", "g.axis")
-            .classed("grid-background", true)
-            .attr("display", "none");
+        this._gBackground = this._map.svg.insert("g", "g.axis").classed("grid-background d-none", true);
         // Background for x axis legend
         this._gBackground
             .append("rect")
@@ -344,19 +321,20 @@ export default class Grid {
      * @public
      */
     update() {
+        let show = false,
+            margin = 0;
         if (this._isShown && this._zoomLevel !== "initial") {
-            // Show axis
-            this._gAxis.attr("display", "inherit");
-            this._gBackground.attr("display", "inherit");
-            // Move summary down
-            d3.select("#summary").style("top", `${this._topMargin + 3 * 16}px`);
-        } else {
-            // Hide axis
-            this._gAxis.attr("display", "none");
-            this._gBackground.attr("display", "none");
-            // Move summary up
-            d3.select("#summary").style("top", `${this._topMargin}px`);
+            show = true;
+            margin = this._xBackgroundHeight;
         }
+
+        // Show or hide axis
+        this._gAxis.classed("d-none", !show);
+        this._gBackground.classed("d-none", !show);
+
+        // Move summary up or down
+        d3Select("#port-summary").style("margin-top", `${margin}px`);
+        d3Select("#journey-summary").style("margin-top", `${margin}px`);
     }
 
     /**
