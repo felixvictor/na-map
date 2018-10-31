@@ -1,9 +1,7 @@
 /*    ingredient-list.js
  */
 
-/* global d3 : false
- */
-
+import { select as d3Select } from "d3-selection";
 import { chunkify, formatSignPercent } from "./util";
 import { registerEvent } from "./analytics";
 import { insertBaseModal } from "./common";
@@ -32,7 +30,7 @@ export default class Ingredient {
     _injectModal() {
         insertBaseModal(this._modalId, this._baseName);
 
-        const body = d3.select(`#${this._modalId} .modal-body`);
+        const body = d3Select(`#${this._modalId} .modal-body`);
 
         body.append("div")
             .attr("id", `${this._baseId}`)
@@ -117,13 +115,13 @@ export default class Ingredient {
      */
     _injectList() {
         // Remove old recipe list
-        d3.select(`#${this._baseId} div`).remove();
+        d3Select(`#${this._baseId} div`).remove();
 
         // Add new recipe list
-        d3.select(`#${this._baseId}`)
+        d3Select(`#${this._baseId}`)
             .append("div")
             .classed("row ingredients", true);
-        d3.select(`#${this._baseId} div`).html(this._getText());
+        d3Select(`#${this._baseId} div`).html(this._getText());
         $('[data-toggle="tooltip"]').tooltip();
     }
 }
