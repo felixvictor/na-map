@@ -2,9 +2,9 @@
     port.js
 */
 
-/* global d3 : false
- */
-
+import { min as d3Min, max as d3Max } from "d3-array";
+import { scaleLinear as d3ScaleLinear } from "d3-scale";
+import { select as d3Select } from "d3-selection";
 import Cookies from "js-cookie";
 import moment from "moment";
 import "moment/locale/en-gb";
@@ -13,15 +13,14 @@ import { nations, defaultFontSize, defaultCircleSize, getDistance, convertCoordX
 import { formatInt, formatSiInt, formatPercent, roundToThousands, degreesToRadians } from "./util";
 
 export default class PortDisplay {
-    constructor(portData, pbData, serverName, topMargin, rightMargin, minScale) {
+    constructor(portData, pbData, serverName, minScale) {
         this._portDataDefault = portData;
         this._serverName = serverName;
-        this._topMargin = topMargin;
-        this._rightMargin = rightMargin;
         this._minScale = minScale;
         this._scale = minScale;
 
-        this._showCurrentGood = false;
+        this.showCurrentGood = false;
+        this.showTradePortPartners = false;
         this._portData = portData;
         this._pbData = pbData;
 
@@ -36,11 +35,10 @@ export default class PortDisplay {
         this._fontSize = defaultFontSize;
         this._circleSize = defaultCircleSize;
         this._showRadius = "attack";
-        this._taxIncomeRadius = d3.scaleLinear();
-        this._netIncomeRadius = d3.scaleLinear();
-        this._attackRadius = d3.scaleLinear().domain([0, 1]);
-        this._colourScale = d3
-            .scaleLinear()
+        this._taxIncomeRadius = d3ScaleLinear();
+        this._netIncomeRadius = d3ScaleLinear();
+        this._attackRadius = d3ScaleLinear().domain([0, 1]);
+        this._colourScale = d3ScaleLinear()
             .domain([0, 0.1, 0.5, 1])
             .range(["#eaeded", "#8b989c", "#6b7478", "#a62e39"]);
 
@@ -113,15 +111,14 @@ export default class PortDisplay {
     }
 
     _setupSvg() {
-        this._g = d3
-            .select("#na-svg")
+        this._gPort = d3Select("#na-svg")
             .append("g")
             .classed("ports", true);
-        this._gPortCircle = this._g.append("g");
-        this._gIcon = this._g.append("g").classed("port", true);
-        this._gText = this._g.append("g");
-        this._gCounty = this._g.append("g").classed("county", true);
-        this._gRegion = this._g.append("g").classed("region", true);
+        this._gPortCircle = this._gPort.append("g");
+        this._gIcon = this._gPort.append("g").classed("port", true);
+        this._gText = this._gPort.append("g").classed("port-names", true);
+        this._gCounty = this._gPort.append("g").classed("county", true);
+        this._gRegion = this._gPort.append("g").classed("region", true);
     }
 
     _setupCounties() {
@@ -266,77 +263,42 @@ export default class PortDisplay {
 
     _setupSummary() {
         // Main box
-        const svgPortSummary = d3
-            .select("body")
-            .append("svg")
-            .attr("id", "summary")
-            .classed("summary", true)
-            .style("position", "absolute")
-            .style("top", `${this._topMargin}px`)
-            .style("right", `${this._rightMargin}px`);
+        this._divPortSummary = d3Select("main")
+            .append("div")
+            .attr("id", "port-summary")
+            .attr("class", "port-summary overlay");
 
-        // Background
-        const portSummaryRect = svgPortSummary
-            .insert("rect")
-            .attr("x", 0)
-            .attr("y", 0);
+        const mainDiv = this._divPortSummary
+            .append("div")
+            .attr("class", "d-flex justify-content-around align-items-end");
 
         // Number of selected ports
-        this._portSummaryTextNumPorts = svgPortSummary.append("text");
-        const portSummaryTextNumPortsDes = svgPortSummary
-            .append("text")
+        this._portSummaryNumPorts = mainDiv.append("div").classed("block", true);
+        this._portSummaryTextNumPorts = this._portSummaryNumPorts.append("div");
+        this._portSummaryNumPorts
+            .append("div")
             .classed("des", true)
             .text("selected ports");
 
         // Total tax income
-        this._portSummaryTextTaxIncome = svgPortSummary.append("text");
-        const portSummaryTextTaxIncomeDes = svgPortSummary
-            .append("text")
+        this._portSummaryTaxIncome = mainDiv.append("div").classed("block", true);
+        this._portSummaryTextTaxIncome = this._portSummaryTaxIncome.append("div");
+        this._portSummaryTaxIncome
+            .append("div")
             .classed("des", true)
             .text("tax income");
 
         // Total net income
-        this._portSummaryTextNetIncome = svgPortSummary.append("text");
-        const portSummaryTextNetIncomeDes = svgPortSummary
-            .append("text")
+        this._portSummaryNetIncome = mainDiv.append("div").classed("block", true);
+        this._portSummaryTextNetIncome = this._portSummaryNetIncome.append("div");
+        this._portSummaryNetIncome
+            .append("div")
             .classed("des", true)
             .text("net income");
-
-        const bboxNumPortsDes = portSummaryTextNumPortsDes.node().getBoundingClientRect(),
-            bboxTaxIncomeDes = portSummaryTextTaxIncomeDes.node().getBoundingClientRect(),
-            bboxNetIncomeDes = portSummaryTextNetIncomeDes.node().getBoundingClientRect(),
-            lineHeight = parseInt(
-                window.getComputedStyle(document.getElementById("na-svg")).getPropertyValue("line-height"),
-                10
-            );
-        const height = lineHeight * 3,
-            width = bboxNumPortsDes.width + bboxTaxIncomeDes.width * 3 + bboxNetIncomeDes.width,
-            firstLine = "35%",
-            secondLine = "60%",
-            firstBlock = Math.round(width / 10),
-            secondBlock = Math.round(firstBlock + bboxNumPortsDes.width + firstBlock),
-            thirdBlock = Math.round(secondBlock + bboxTaxIncomeDes.width + firstBlock);
-
-        svgPortSummary.attr("height", height).attr("width", width);
-
-        // Background
-        portSummaryRect.attr("height", height).attr("width", width);
-
-        // Number of selected ports
-        this._portSummaryTextNumPorts.attr("x", firstBlock).attr("y", firstLine);
-        portSummaryTextNumPortsDes.attr("x", firstBlock).attr("y", secondLine);
-
-        // Total tax income
-        this._portSummaryTextTaxIncome.attr("x", secondBlock).attr("y", firstLine);
-        portSummaryTextTaxIncomeDes.attr("x", secondBlock).attr("y", secondLine);
-
-        // Total net income
-        this._portSummaryTextNetIncome.attr("x", thirdBlock).attr("y", firstLine);
-        portSummaryTextNetIncomeDes.attr("x", thirdBlock).attr("y", secondLine);
     }
 
     _setupFlags() {
-        const svgDef = d3.select("#na-svg defs");
+        const svgDef = d3Select("#na-svg defs");
 
         nations.map(d => d.short).forEach(nation => {
             const pattern = svgDef
@@ -432,6 +394,10 @@ export default class PortDisplay {
         feMerge.append("feMergeNode").attr("in", "SourceGraphic");
     }
 
+    _getPortName(id) {
+        return this._portDataDefault.filter(port => port.id === id).map(port => port.properties.name)[0];
+    }
+
     _getText(id, portProperties) {
         const pbData = this._pbData.ports.filter(port => port.id === id)[0],
             portBattleLT = moment.utc(pbData.portBattle).local(),
@@ -486,7 +452,14 @@ export default class PortDisplay {
                 producesNonTrading: portProperties.producesNonTrading.join(", "),
                 dropsNonTrading: portProperties.dropsNonTrading.join(", "),
                 consumesTrading: portProperties.consumesTrading.join(", "),
-                consumesNonTrading: portProperties.consumesNonTrading.join(", ")
+                consumesNonTrading: portProperties.consumesNonTrading.join(", "),
+                tradePort: this._getPortName(this.tradePortId),
+                goodsToSellInTradePort: portProperties.goodsToSellInTradePort
+                    ? portProperties.goodsToSellInTradePort.join(", ")
+                    : "",
+                goodsToBuyInTradePort: portProperties.goodsToBuyInTradePort
+                    ? portProperties.goodsToBuyInTradePort.join(", ")
+                    : ""
             };
 
         switch (portProperties.portBattleType) {
@@ -529,7 +502,7 @@ export default class PortDisplay {
             h += "</p>";
             h += "<table class='table table-sm'>";
             if (port.producesTrading.length || port.producesNonTrading.length) {
-                h += "<tr><td>Produces</td><td>";
+                h += `<tr><td>Produces${port.producesNonTrading.length ? "\u00a0" : ""}</td><td>`;
                 if (port.producesNonTrading.length) {
                     h += `<span class="non-trading">${port.producesNonTrading}</span>`;
                     if (port.producesTrading.length) {
@@ -542,7 +515,7 @@ export default class PortDisplay {
                 h += "</td></tr>";
             }
             if (port.dropsTrading.length || port.dropsNonTrading.length) {
-                h += "<tr><td>Drops</td><td>";
+                h += `<tr><td>Drops${port.dropsNonTrading.length ? "\u00a0" : ""}</td><td>`;
                 if (port.dropsNonTrading.length) {
                     h += `<span class="non-trading">${port.dropsNonTrading}</span>`;
                     if (port.dropsTrading.length) {
@@ -555,7 +528,7 @@ export default class PortDisplay {
                 h += "</td></tr>";
             }
             if (port.consumesTrading.length || port.consumesNonTrading.length) {
-                h += "<tr><td>Consumes</td><td>";
+                h += `<tr><td>Consumes${port.consumesNonTrading.length ? "\u00a0" : ""}</td><td>`;
                 if (port.consumesNonTrading.length) {
                     h += `<span class="non-trading">${port.consumesNonTrading}</span>`;
                     if (port.consumesTrading.length) {
@@ -567,12 +540,18 @@ export default class PortDisplay {
                 }
                 h += "</td></tr>";
             }
+            if (port.goodsToSellInTradePort.length) {
+                h += `<tr><td>Sell in ${port.tradePort}</td><td>${port.goodsToSellInTradePort}</td></tr>`;
+            }
+            if (port.goodsToBuyInTradePort.length) {
+                h += `<tr><td>Buy in ${port.tradePort}</td><td>${port.goodsToBuyInTradePort}</td></tr>`;
+            }
             h += "</table>";
 
             return h;
         }
 
-        const port = d3.select(nodes[i]),
+        const port = d3Select(nodes[i]),
             title = tooltipData(this._getText(d.id, d.properties));
         port.attr("data-toggle", "tooltip");
         // eslint-disable-next-line no-underscore-dangle
@@ -593,7 +572,7 @@ export default class PortDisplay {
     _updateIcons() {
         function hideDetails(d, i, nodes) {
             // eslint-disable-next-line no-underscore-dangle
-            $(d3.select(nodes[i])._groups[0]).tooltip("hide");
+            $(d3Select(nodes[i])._groups[0]).tooltip("hide");
         }
 
         const circleScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale),
@@ -631,6 +610,19 @@ export default class PortDisplay {
     }
 
     _updatePortCircles() {
+        const getTradePortMarker = port => {
+            let marker = "";
+            if (port.id === this.tradePortId) {
+                marker = "here";
+            } else if (port.properties.sellInTradePort && port.properties.buyInTradePort) {
+                marker = "both";
+            } else if (port.properties.sellInTradePort) {
+                marker = "pos";
+            } else if (port.properties.buyInTradePort) {
+                marker = "neg";
+            }
+            return marker;
+        };
         const circleScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale),
             rMin = roundToThousands((this._circleSize / circleScale) * this._minRadiusFactor),
             magicNumber = 5;
@@ -640,6 +632,8 @@ export default class PortDisplay {
 
         if (this._showRadius === "tax" || this._showRadius === "net") {
             data = this._portData.filter(d => !d.properties.nonCapturable);
+        } else if (this.showTradePortPartners) {
+            data = this._portData;
         } else if (this._showRadius === "attack") {
             const pbData = this._pbData.ports
                 .filter(d => d.attackHostility)
@@ -653,13 +647,13 @@ export default class PortDisplay {
             rGreenZone =
                 roundToThousands(
                     getDistance(
-                        [convertCoordX(-63400, 18800), convertCoordY(-63400, 18800)],
-                        [convertCoordX(-79696, 10642), convertCoordY(-79696, 10642)]
+                        { x: convertCoordX(-63400, 18800), y: convertCoordY(-63400, 18800) },
+                        { x: convertCoordX(-79696, 10642), y: convertCoordY(-79696, 10642) }
                     )
                 ) * magicNumber;
             const pbData = this._pbData.ports.filter(d => d.nation !== "FT").map(d => d.id);
             data = this._portData.filter(port => pbData.some(d => port.id === d) && port.properties.nonCapturable);
-        } else if (this._showCurrentGood) {
+        } else if (this.showCurrentGood) {
             data = this._portData;
             rMax /= 2;
         }
@@ -683,8 +677,8 @@ export default class PortDisplay {
         // Apply to both old and new
         const circleMerge = circleUpdate.merge(circleEnter);
         if (this._showRadius === "tax") {
-            const minTaxIncome = d3.min(data, d => d.properties.taxIncome),
-                maxTaxIncome = d3.max(data, d => d.properties.taxIncome);
+            const minTaxIncome = d3Min(data, d => d.properties.taxIncome),
+                maxTaxIncome = d3Max(data, d => d.properties.taxIncome);
 
             this._taxIncomeRadius.domain([minTaxIncome, maxTaxIncome]);
             this._taxIncomeRadius.range([rMin, rMax]);
@@ -692,13 +686,17 @@ export default class PortDisplay {
                 .attr("class", "bubble pos")
                 .attr("r", d => this._taxIncomeRadius(Math.abs(d.properties.taxIncome)));
         } else if (this._showRadius === "net") {
-            const minNetIncome = d3.min(data, d => d.properties.netIncome),
-                maxNetIncome = d3.max(data, d => d.properties.netIncome);
+            const minNetIncome = d3Min(data, d => d.properties.netIncome),
+                maxNetIncome = d3Max(data, d => d.properties.netIncome);
 
             this._netIncomeRadius.domain([minNetIncome, maxNetIncome]).range([rMin, rMax]);
             circleMerge
                 .attr("class", d => `bubble ${d.properties.netIncome < 0 ? "neg" : "pos"}`)
                 .attr("r", d => this._netIncomeRadius(Math.abs(d.properties.netIncome)));
+        } else if (this.showTradePortPartners) {
+            circleMerge
+                .attr("class", d => `bubble ${getTradePortMarker(d)}`)
+                .attr("r", d => (d.id === this.tradePortId ? rMax : rMax / 2));
         } else if (this._showRadius === "attack") {
             this._attackRadius.range([rMin, rMax]);
             circleMerge
@@ -707,7 +705,7 @@ export default class PortDisplay {
                 .attr("r", d => this._attackRadius(d.properties.attackHostility));
         } else if (this._showRadius === "green") {
             circleMerge.attr("class", "bubble pos").attr("r", rGreenZone);
-        } else if (this._showCurrentGood) {
+        } else if (this.showCurrentGood) {
             circleMerge.attr("class", d => `bubble ${d.properties.isSource ? "pos" : "neg"}`).attr("r", rMax);
         }
     }
@@ -915,10 +913,6 @@ export default class PortDisplay {
         return this._pbData;
     }
 
-    set showCurrentGood(showCurrentGood) {
-        this._showCurrentGood = showCurrentGood;
-    }
-
     set showRadiusSetting(showRadius) {
         this._showRadius = showRadius;
         $(`#show-radius-${showRadius}`).prop("checked", true);
@@ -941,13 +935,23 @@ export default class PortDisplay {
         return this._zoomLevel;
     }
 
+    _showSummary() {
+        this._divPortSummary.classed("hidden", false);
+    }
+
+    hideSummary() {
+        this._divPortSummary.classed("hidden", true);
+    }
+
     transform(transform) {
-        this._g.attr("transform", transform);
+        this._gPort.attr("transform", transform);
     }
 
     clearMap(scale) {
+        this._showSummary();
         this._portData = this._portDataDefault;
-        this._showCurrentGood = false;
+        this.showCurrentGood = false;
+        this.showTradePortPartners = false;
         this.update(scale);
     }
 }

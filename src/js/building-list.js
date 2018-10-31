@@ -1,9 +1,7 @@
 /*    building-list.js
  */
 
-/* global d3 : false
- */
-
+import { select as d3Select } from "d3-selection";
 import { formatPercent, formatInt } from "./util";
 import { registerEvent } from "./analytics";
 import { insertBaseModal } from "./common";
@@ -32,7 +30,7 @@ export default class Building {
         insertBaseModal(this._modalId, this._baseName);
 
         const id = `${this._baseId}-select`,
-            body = d3.select(`#${this._modalId} .modal-body`);
+            body = d3Select(`#${this._modalId} .modal-body`);
         body.append("label").attr("for", id);
         body.append("select")
             .attr("name", id)
@@ -188,12 +186,12 @@ export default class Building {
             .val();
 
         // Remove old recipe list
-        d3.select(`#${this._baseId} div`).remove();
+        d3Select(`#${this._baseId} div`).remove();
 
         // Add new recipe list
-        d3.select(`#${this._baseId}`)
+        d3Select(`#${this._baseId}`)
             .append("div")
             .classed("buildings mt-4", true);
-        d3.select(`#${this._baseId} div`).html(this._getText(building));
+        d3Select(`#${this._baseId} div`).html(this._getText(building));
     }
 }
