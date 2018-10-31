@@ -709,7 +709,6 @@ export default class PortDisplay {
                 .attr("fill", d => this._colourScale(d.properties.attackHostility))
                 .attr("r", d => this._attackRadius(d.properties.attackHostility));
         } else if (this._showRadius === "position") {
-            console.log("showRadius", this._showRadius);
             circleMerge.attr("class", "bubble here").attr("r", d => d.properties.distance);
         } else if (this._showRadius === "green") {
             circleMerge.attr("class", "bubble pos").attr("r", rGreenZone);
