@@ -413,6 +413,7 @@ export default class PortSelect {
         this._ports.pbData.ports.filter(port => port.nation === this._nation).forEach(port => portId.add(port.id));
         this._ports.portData = this._ports.portDataDefault.filter(d => portId.has(d.id));
         this._ports.showCurrentGood = false;
+        this._ports.showTradePortPartners = false;
         this._ports.update();
         this._setupClanSelect();
     }
@@ -430,6 +431,7 @@ export default class PortSelect {
         }
         this._ports.portData = this._ports.portDataDefault.filter(d => portId.has(d.id));
         this._ports.showCurrentGood = false;
+        this._ports.showTradePortPartners = false;
         this._ports.update();
     }
 
@@ -439,6 +441,7 @@ export default class PortSelect {
         );
         this._ports.portData = portData;
         this._ports.showCurrentGood = false;
+        this._ports.showTradePortPartners = false;
         this._ports.update();
     }
 
@@ -446,6 +449,7 @@ export default class PortSelect {
         const portData = this._ports.portDataDefault.filter(d => d.properties.availableForAll);
         this._ports.portData = portData;
         this._ports.showCurrentGood = false;
+        this._ports.showTradePortPartners = false;
         this._ports.update();
     }
 
@@ -455,6 +459,7 @@ export default class PortSelect {
         );
         this._ports.portData = portData;
         this._ports.showCurrentGood = false;
+        this._ports.showTradePortPartners = false;
         this._ports.update();
     }
 
@@ -462,6 +467,7 @@ export default class PortSelect {
         const portData = this._ports.portDataDefault.filter(d => size === d.properties.portBattleType);
         this._ports.portData = portData;
         this._ports.showCurrentGood = false;
+        this._ports.showTradePortPartners = false;
         this._ports.update();
     }
 
@@ -494,6 +500,7 @@ export default class PortSelect {
         );
         this._ports.portData = portData;
         this._ports.showCurrentGood = false;
+        this._ports.showTradePortPartners = false;
         this._ports.update();
     }
 
@@ -507,6 +514,7 @@ export default class PortSelect {
 
         this._ports.portData = portData;
         this._ports.showCurrentGood = false;
+        this._ports.showTradePortPartners = false;
         this._ports.update();
     }
 
@@ -576,6 +584,7 @@ export default class PortSelect {
         }
         $("#propertyDropdown").dropdown("toggle");
         this._ports.portData = portData;
+        this._ports.showTradePortPartners = false;
         this._ports.update();
     }
 
