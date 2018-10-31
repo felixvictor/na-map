@@ -124,6 +124,8 @@ function updatePorts() {
         if (typeof result[7] !== "undefined") {
             // eslint-disable-next-line prefer-destructuring
             port.attackerNation = result[7];
+        } else {
+            port.attackerNation = "n/a";
         }
         // eslint-disable-next-line prefer-destructuring
         port.attackerClan = result[6];
