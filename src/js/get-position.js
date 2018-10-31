@@ -69,7 +69,9 @@ export default class TriangulatePosition {
     _injectModal() {
         insertBaseModal(this._modalId, this._baseName, "", "Go");
 
-        const form = d3Select(`#${this._modalId} .modal-body`).append("form");
+        const body = d3Select(`#${this._modalId} .modal-body`);
+        body.append("p").text("Get distances from in-game trader tool");
+        const form = body.append("form");
 
         const dataList = form.append("datalist").attr("id", "defaultDistances");
         [5, 10, 15, 20, 30, 50, 100, 200].forEach(distance => {
@@ -82,7 +84,7 @@ export default class TriangulatePosition {
             const formRow = form.append("div").classed("form-row", true);
             formRow
                 .append("div")
-                .classed("col-md-7", true)
+                .classed("col-md-6", true)
                 .append("label")
                 .append("select")
                 .attr("name", select)
