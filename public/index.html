@@ -13,7 +13,7 @@
     <meta content="images/icons/favicon-32x32.png" property="og:image">
 
     <script src="https://www.googletagmanager.com/gtag/js?id=UA-109520372-1" async></script>
-<link href="/images/icons/favicon.ico" rel="shortcut icon"><link href="/images/icons/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"><link href="/images/icons/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"><meta content="#dcd7ca" name="msapplication-TileColor"><meta content="/images/icons/mstile-144x144.png" name="msapplication-TileImage"><meta content="/images/icons/browserconfig.xml" name="msapplication-config"><link href="/images/icons/yandex-browser-manifest.json" rel="yandex-tableau-widget"><meta content="width=device-width,initial-scale=1,shrink-to-fit=no" name="viewport"><link href="na-map.min.css?9a3b9355300e1202e9fa" rel="stylesheet" crossorigin="anonymous" integrity="sha256-oTCLdzTXfGwRWTOqaXbeR/fqx/FW0n78XsS9ZYtMZ7Q= sha384-gZVojlFwhIK6tKBgAI4AofBwFWxBbm1oXGIKhJbKLXJAOqACG0b3Ph9FR3qUMKda"></head>
+<link href="/images/icons/favicon.ico" rel="shortcut icon"><link href="/images/icons/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"><link href="/images/icons/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"><meta content="#dcd7ca" name="msapplication-TileColor"><meta content="/images/icons/mstile-144x144.png" name="msapplication-TileImage"><meta content="/images/icons/browserconfig.xml" name="msapplication-config"><link href="/images/icons/yandex-browser-manifest.json" rel="yandex-tableau-widget"><meta content="width=device-width,initial-scale=1,shrink-to-fit=no" name="viewport"><link href="na-map.min.css?65e9d1c96f6bb6ec8e9e" rel="stylesheet" crossorigin="anonymous" integrity="sha256-oTCLdzTXfGwRWTOqaXbeR/fqx/FW0n78XsS9ZYtMZ7Q= sha384-gZVojlFwhIK6tKBgAI4AofBwFWxBbm1oXGIKhJbKLXJAOqACG0b3Ph9FR3qUMKda"></head>
 
 <body>
 
@@ -56,7 +56,7 @@
                 <a class="dropdown-toggle nav-link" id="moveToDropdown" href="#" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
                     Go to F11
                 </a>
-                <div class="dropdown-menu p-2 large-width" id="moveToMenu" aria-labelledby="moveToDropdown">
+                <div class="dropdown-menu large-width p-2" id="moveToMenu" aria-labelledby="moveToDropdown">
                     <form id="f11">
                         <div class="input-group">
                             <input class="form-control" id="x-coord" type="number" required max="819" min="-819" placeholder="X" step="1">
@@ -84,12 +84,16 @@
                 </div>
             </li>
 
+            <li class="nav-item pr-2 dropdown" id="positionNavbar">
+                <a class="dropdown-toggle nav-link" id="positionDropdown" href="#" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
+                    Get position
+                </a>
+            </li>
+
             <li class="nav-item pr-2 dropdown" id="journeyNavbar">
                 <a class="dropdown-toggle nav-link" id="journeyDropdown" href="#" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
                     Make journey
                 </a>
-                <div class="dropdown-menu p-2" id="journeyMenu" aria-labelledby="journeyDropdown">
-                </div>
             </li>
 
             <li class="nav-item pr-2">
@@ -255,11 +259,11 @@
                     <div class="align-self-center col-auto radio-group ml-1" id="server-name">
                         <div class="custom-control custom-control-inline custom-radio">
                             <input class="custom-control-input" id="server-name-eu1" type="radio" name="serverName" value="eu1">
-                            <label for="server-name-eu1" class="custom-control-label">Caribbean</label>
+                            <label for="server-name-eu1" class="custom-control-label">War (Caribbean)</label>
                         </div>
                         <div class="custom-control custom-control-inline custom-radio">
                             <input class="custom-control-input" id="server-name-eu2" type="radio" name="serverName" value="eu2">
-                            <label for="server-name-eu2" class="custom-control-label">PvE only</label>
+                            <label for="server-name-eu2" class="custom-control-label">Peace (PvE)</label>
                         </div>
                     </div>
 
@@ -269,6 +273,10 @@
                         <div class="custom-control custom-control-inline custom-radio">
                             <input class="custom-control-input" id="show-radius-attack" type="radio" name="showRadius" value="attack">
                             <label for="show-radius-attack" class="custom-control-label">Attack</label>
+                        </div>
+                        <div class="custom-control custom-control-inline custom-radio">
+                            <input class="custom-control-input" id="show-radius-position" type="radio" name="showRadius" value="position">
+                            <label for="show-radius-position" class="custom-control-label">Position</label>
                         </div>
                         <div class="custom-control custom-control-inline custom-radio">
                             <input class="custom-control-input" id="show-radius-tax" type="radio" name="showRadius" value="tax">
@@ -352,5 +360,5 @@
     <div id="modal-section"></div>
 </main>
 
-<script src="na-map.min.js?9a3b9355300e1202e9fa" crossorigin="anonymous" integrity="sha256-1cnyPHY7dTqh8tmB2EqGa/XjWwvCZf1E1W8vDvfTkng= sha384-MzQQ7nnBp/pbrk4hOr4osETLTJNUzawxyFMrb9F0ig/hM1HamLp8r9589jBV8Jrz" type="text/javascript"></script></body>
+<script src="na-map.min.js?65e9d1c96f6bb6ec8e9e" crossorigin="anonymous" integrity="sha256-+oo7q51ZU+qjjZqdVhsn0VHRIWieCHl06oAkFb1HsZc= sha384-O52qNckziC5bAY7GlllwGqaubmyHF3FYpXmmfaoTbGseh7c8FJBFRjgjw88QwXvY" type="text/javascript"></script></body>
 </html>
