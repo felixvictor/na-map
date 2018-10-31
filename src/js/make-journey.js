@@ -313,7 +313,7 @@ export default class Journey {
             ({ speedDegrees } = this._shipCompare._singleShipData);
         }
         this._speedScale.range(speedDegrees);
-        console.log(this._speedScale.range());
+        //console.log(this._speedScale.range());
     }
 
     /**
@@ -593,14 +593,14 @@ export default class Journey {
             this._journey.currentWindDegrees,
             distanceK * 1000
         );
-        console.log("*** start", this._journey.currentWindDegrees, { distanceK }, { courseCompass });
+        //console.log("*** start", this._journey.currentWindDegrees, { distanceK }, { courseCompass });
         this._journey.totalDistance += distanceK;
         this._journey.totalMinutes += minutes;
         const textDirection = this._getTextDirection(courseCompass, courseDegrees, pt1),
             textDistance = this._getTextDistance(distanceK, minutes, index > 1);
 
         this._journey.segment[index].label = `${textDirection}|${textDistance}`;
-        console.log("*** end", this._journey);
+        //console.log("*** end", this._journey);
     }
 
     _printSegment() {
