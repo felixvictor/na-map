@@ -89,11 +89,11 @@ export default class Building {
 
             if (currentBuilding.resource.price) {
                 text += '<table class="table table-sm"><tbody>';
-                text += `<tr><td>${currentBuilding.resource.price} gold per unit</td></tr>`;
+                text += `<tr><td>${currentBuilding.resource.price} reals per unit</td></tr>`;
                 if (typeof currentBuilding.batch !== "undefined") {
                     text += `<tr><td>Batch of ${currentBuilding.batch.amount} units at ${
                         currentBuilding.batch.price
-                    } gold</td></tr>`;
+                    } reals</td></tr>`;
                 }
                 text += "</tbody></table>";
             }
@@ -140,7 +140,7 @@ export default class Building {
             });
         } else {
             text +=
-                "<tr><th>Level</th><th>Production (units)</th><th>Labour cost (%)</th><th>Storage (units)</th><th>Level build price (gold)</th></tr>";
+                "<tr><th>Level</th><th>Production (units)</th><th>Labour cost (%)</th><th>Storage (units)</th><th>Level build price (reals)</th></tr>";
             text += "</thead><tbody>";
             currentBuilding.levels.forEach((level, i) => {
                 text += `<tr><td>${i}</td><td>${formatInt(level.production)}</td><td>${formatInt(
