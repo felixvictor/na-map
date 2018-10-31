@@ -2,26 +2,22 @@
     f11.js
 */
 
-/* global d3 : false
- */
-
+import { select as d3Select } from "d3-selection";
 import { between, formatF11 } from "./util";
 import { convertCoordX, convertCoordY, convertInvCoordX, convertInvCoordY } from "./common";
 import { registerEvent } from "./analytics";
 
 export default class F11 {
-    constructor(map) {
+    constructor(map, coord) {
         this._map = map;
-        this._minCoord = this._map.coord.min;
-        this._maxCoord = this._map.coord.max;
+        this._coord = coord;
 
         this._setupSvg();
         this._setupListener();
     }
 
     _setupSvg() {
-        this._g = d3
-            .select("#na-svg")
+        this._g = d3Select("#na-svg")
             .insert("g")
             .classed("f11", true);
     }
@@ -95,7 +91,7 @@ export default class F11 {
             x = convertCoordX(F11X, F11Y),
             y = convertCoordY(F11X, F11Y);
 
-        if (between(x, this._minCoord, this._maxCoord, true) && between(y, this._minCoord, this._maxCoord, true)) {
+        if (between(x, this._coord.min, this._coord.max, true) && between(y, this._coord.min, this._coord.max, true)) {
             this._printF11Coord(x, y, F11X, F11Y);
             this._map.zoomAndPan(x, y, 1);
         }

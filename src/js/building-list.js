@@ -1,9 +1,7 @@
 /*    building-list.js
  */
 
-/* global d3 : false
- */
-
+import { select as d3Select } from "d3-selection";
 import { formatPercent, formatInt } from "./util";
 import { registerEvent } from "./analytics";
 import { insertBaseModal } from "./common";
@@ -32,7 +30,7 @@ export default class Building {
         insertBaseModal(this._modalId, this._baseName);
 
         const id = `${this._baseId}-select`,
-            body = d3.select(`#${this._modalId} .modal-body`);
+            body = d3Select(`#${this._modalId} .modal-body`);
         body.append("label").attr("for", id);
         body.append("select")
             .attr("name", id)
@@ -86,36 +84,27 @@ export default class Building {
 
     _getProductText(currentBuilding) {
         let text = "";
-        text += `<h5 class="card-title">${currentBuilding.resource.name}</h5>`;
+        if (!Array.isArray(currentBuilding.resource)) {
+            text += `<h5 class="card-title">${currentBuilding.resource.name}</h5>`;
 
-        if (currentBuilding.resource.price) {
-            text += '<table class="table table-sm"><tbody>';
-            text += `<tr><td>${currentBuilding.resource.price} gold per unit</td></tr>`;
-            if (typeof currentBuilding.batch !== "undefined") {
-                text += `<tr><td>Batch of ${currentBuilding.batch.amount} units at ${
-                    currentBuilding.batch.price
-                } gold</td></tr>`;
+            if (currentBuilding.resource.price) {
+                text += '<table class="table table-sm"><tbody>';
+                text += `<tr><td>${currentBuilding.resource.price} reals per unit</td></tr>`;
+                if (typeof currentBuilding.batch !== "undefined") {
+                    text += `<tr><td>Batch of ${currentBuilding.batch.amount} units at ${
+                        currentBuilding.batch.price
+                    } reals</td></tr>`;
+                }
+                text += "</tbody></table>";
             }
+        } else {
+            text += '<table class="table table-sm"><tbody>';
+
+            text += `<tr><td>${currentBuilding.resource
+                .map(resource => resource.name)
+                .join("</td></tr><tr><td>")}</td></tr>`;
             text += "</tbody></table>";
         }
-
-        return text;
-    }
-
-    _getByproductText(currentBuilding) {
-        let text = '<table class="table table-sm"><tbody>';
-        if (currentBuilding.byproduct.length) {
-            text += `<tr><td>${currentBuilding.byproduct
-                .map(
-                    byproduct =>
-                        `${byproduct.item} <span class="badge badge-primary ml-1">${formatPercent(
-                            byproduct.chance
-                        )} chance</span>`
-                )
-                .join("</td></tr><tr><td>")}</td></tr>`;
-        }
-        text += "</tbody></table>";
-
         return text;
     }
 
@@ -134,7 +123,7 @@ export default class Building {
             });
         } else {
             text +=
-                "<tr><th>Level</th><th>Production (units)</th><th>Labour cost (%)</th><th>Storage (units)</th><th>Level build price (gold)</th></tr>";
+                "<tr><th>Level</th><th>Production (units)</th><th>Labour cost (%)</th><th>Storage (units)</th><th>Level build price (reals)</th></tr>";
             text += "</thead><tbody>";
             currentBuilding.levels.forEach((level, i) => {
                 text += `<tr><td>${i}</td><td>${formatInt(level.production)}</td><td>${formatInt(
@@ -157,17 +146,12 @@ export default class Building {
 
         let text = '<div class="row no-gutters card-deck">';
 
-        text += '<div class="card col-3"><div class="card-header">Product</div>';
+        text += '<div class="card col-4"><div class="card-header">Product</div>';
         text += '<div class="card-body product">';
         text += this._getProductText(currentBuilding);
         text += "</div></div>";
 
-        text += '<div class="card col-3"><div class="card-header">Byproducts</div>';
-        text += '<div class="card-body product">';
-        text += this._getByproductText(currentBuilding);
-        text += "</div></div>";
-
-        text += '<div class="card col-6"><div class="card-header">Requirements</div>';
+        text += '<div class="card col-8"><div class="card-header">Requirements</div>';
         text += '<div class="card-body px-0 requirements">';
         text += this._getRequirementText(currentBuilding);
         text += "</div></div>";
@@ -188,12 +172,12 @@ export default class Building {
             .val();
 
         // Remove old recipe list
-        d3.select(`#${this._baseId} div`).remove();
+        d3Select(`#${this._baseId} div`).remove();
 
         // Add new recipe list
-        d3.select(`#${this._baseId}`)
+        d3Select(`#${this._baseId}`)
             .append("div")
             .classed("buildings mt-4", true);
-        d3.select(`#${this._baseId} div`).html(this._getText(building));
+        d3Select(`#${this._baseId} div`).html(this._getText(building));
     }
 }
