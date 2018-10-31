@@ -46,6 +46,86 @@ export const nations = [
     { id: 12, short: "PL", name: "Commonwealth of Poland", sortName: "Poland" }
 ];
 
+export const capitalToCounty = new Map([
+    ["Arenas", "Cayos del Golfo"],
+    ["Ays", "Costa del Fuego"],
+    ["Baracoa", "Baracoa"],
+    ["Basse-Terre", "Basse-Terre"],
+    ["Belize", "Belize"],
+    ["Black River", "North Mosquito"],
+    ["Bluefields", "South Mosquito"],
+    ["Brangman's Bluff", "Royal Mosquito"],
+    ["Bridgetown", "Windward Isles"],
+    ["Calobelo", "Portobelo"],
+    ["Campeche", "Campeche"],
+    ["Cap-Français", "Cap-Français"],
+    ["Caracas", "Caracas"],
+    ["Cartagena de Indias", "Cartagena"],
+    ["Castries", "Sainte-Lucie"],
+    ["Caymans", "George Town"],
+    ["Charleston", "South Carolina"],
+    ["Christiansted", "Vestindiske Øer"],
+    ["Cumaná", "Cumaná"],
+    ["Fort-Royal", "Martinique"],
+    ["Gasparilla", "Costa de los Calos"],
+    ["George Town", "Caymans"],
+    ["George's Town", "Exuma"],
+    ["Gibraltar", "Lago de Maracaibo"],
+    ["Grand Turk", "Turks and Caicos"],
+    ["Gustavia", "Gustavia"],
+    ["Islamorada", "Los Martires"],
+    ["Kidd's Harbour", "Kidd’s Island"],
+    ["Kingston / Port Royal", "Surrey"],
+    ["La Bahía", "Texas"],
+    ["La Habana", "La Habana"],
+    ["Les Cayes", "Les Cayes"],
+    ["Maracaibo", "Golfo de Maracaibo"],
+    ["Marsh Harbour", "Abaco"],
+    ["Matina", "Costa Rica"],
+    ["Morgan's Bluff", "Andros"],
+    ["Mortimer Town", "Inagua"],
+    ["Nassau", "New Providence"],
+    ["Nouvelle-Orléans", "Louisiane"],
+    ["Nuevitas", "Nuevitas del Principe"],
+    ["Old Providence", "Providencia"],
+    ["Omoa", "Comayaqua"],
+    ["Oranjestad", "Bovenwinds"],
+    ["Pampatar", "Margarita"],
+    ["Pedro Cay", "South Cays"],
+    ["Penzacola", "Florida Occidental"],
+    ["Pinar del Río", "Filipina"],
+    ["Pitt's Town", "Crooked"],
+    ["Pointe-à-Pitre", "Grande-Terre"],
+    ["Ponce", "Ponce"],
+    ["Port-au-Prince", "Port-au-Prince"],
+    ["Portobelo", "Portobelo"],
+    ["Puerto de España", "Trinidad"],
+    ["Puerto Plata", "La Vega"],
+    ["Remedios", "Los Llanos"],
+    ["Road Town", "Virgin Islands"],
+    ["Roseau", "Dominica"],
+    ["Saint George's Town", "Bermuda"],
+    ["Saint John's", "Leeward Islands"],
+    ["Salamanca", "Bacalar"],
+    ["San Agustín", "Timucua"],
+    ["San Juan", "San Juan"],
+    ["San Marcos", "Apalache"],
+    ["Sant Iago", "Cuidad de Cuba"],
+    ["Santa Fe", "Isla de Pinos"],
+    ["Santa Marta", "Santa Marta"],
+    ["Santo Domingo", "Santo Domingo"],
+    ["Santo Tomé de Guayana", "Orinoco"],
+    ["Savanna la Mar", "Cornwall"],
+    ["Savannah", "Georgia"],
+    ["Selam", "Mérida"],
+    ["Soto La Marina", "Nuevo Santander"],
+    ["Trinidad", "Quatro Villas"],
+    ["Vera Cruz", "Vera Cruz"],
+    ["West End", "Grand Bahama"],
+    ["Willemstad", "Benedenwinds"],
+    ["Wilmington", "North Carolina"]
+]);
+
 export function saveJson(fileName, data) {
     // eslint-disable-next-line consistent-return
     fs.writeFile(fileName, JSON.stringify(data), "utf8", err => {
@@ -72,6 +152,44 @@ export function readTextFile(fileName) {
 export function readJson(fileName) {
     return JSON.parse(readTextFile(fileName));
 }
+
+/**
+ * Check fetch status (see {@link https://developers.google.com/web/updates/2015/03/introduction-to-fetch})
+ * @param {Object} response - fetch response
+ * @return {Promise<string>} Resolved or rejected promise
+ */
+export function checkFetchStatus(response) {
+    if (response.status >= 200 && response.status < 300) {
+        return Promise.resolve(response);
+    }
+    return Promise.reject(new Error(response.statusText));
+}
+
+/**
+ * Get json from fetch response
+ * @function
+ * @param {Object} response - fetch response
+ * @return {Object} json
+ */
+export const getJsonFromFetch = response => response.json();
+
+/**
+ * Get text from fetch response
+ * @function
+ * @param {Object} response - fetch response
+ * @return {Object} String
+ */
+export const getTextFromFetch = response => response.text();
+
+/**
+ * Write error to console
+ * @function
+ * @param {String} error - Error message
+ * @return {void}
+ */
+export const putFetchError = error => {
+    console.error("Request failed -->", error);
+};
 
 /**
  * Test if object is empty
@@ -158,3 +276,24 @@ export const roundToThousands = x => Math.round(x * 1000) / 1000;
 
 export const speedConstA = 0.074465523706782;
 export const speedConstB = 0.00272175949231;
+
+/**
+ * Group by
+ * {@link https://stackoverflow.com/questions/14446511/what-is-the-most-efficient-method-to-groupby-on-a-javascript-array-of-objects}
+ * @param {*} list - list
+ * @param {*} keyGetter - key getter
+ * @return {Map<any, any>} Map
+ */
+export function groupBy(list, keyGetter) {
+    const map = new Map();
+    list.forEach(item => {
+        const key = keyGetter(item);
+        const collection = map.get(key);
+        if (!collection) {
+            map.set(key, [item]);
+        } else {
+            collection.push(item);
+        }
+    });
+    return map;
+}
