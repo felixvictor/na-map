@@ -108,23 +108,6 @@ export default class Building {
         return text;
     }
 
-    _getByproductText(currentBuilding) {
-        let text = '<table class="table table-sm"><tbody>';
-        if (typeof currentBuilding.byproduct !== "undefined" && currentBuilding.byproduct.length) {
-            text += `<tr><td>${currentBuilding.byproduct
-                .map(
-                    byproduct =>
-                        `${byproduct.item} <span class="badge badge-primary ml-1">${formatPercent(
-                            byproduct.chance
-                        )} chance</span>`
-                )
-                .join("</td></tr><tr><td>")}</td></tr>`;
-        }
-        text += "</tbody></table>";
-
-        return text;
-    }
-
     _getRequirementText(currentBuilding) {
         let text = "";
 
@@ -163,17 +146,12 @@ export default class Building {
 
         let text = '<div class="row no-gutters card-deck">';
 
-        text += '<div class="card col-3"><div class="card-header">Product</div>';
+        text += '<div class="card col-4"><div class="card-header">Product</div>';
         text += '<div class="card-body product">';
         text += this._getProductText(currentBuilding);
         text += "</div></div>";
 
-        text += '<div class="card col-3"><div class="card-header">Byproducts</div>';
-        text += '<div class="card-body product">';
-        text += this._getByproductText(currentBuilding);
-        text += "</div></div>";
-
-        text += '<div class="card col-6"><div class="card-header">Requirements</div>';
+        text += '<div class="card col-8"><div class="card-header">Requirements</div>';
         text += '<div class="card-body px-0 requirements">';
         text += this._getRequirementText(currentBuilding);
         text += "</div></div>";

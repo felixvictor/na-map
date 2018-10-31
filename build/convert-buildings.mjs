@@ -63,7 +63,6 @@ function getItemsCraftedByAcademy() {
  */
 function convertBuildings() {
     const buildings = new Map(),
-        lootTables = new Map(),
         resources = new Map(),
         resourceRecipes = new Map();
 
@@ -78,30 +77,6 @@ function convertBuildings() {
         });
     });
 
-    APIItems.filter(item => item.ItemType === "LootTableItem").forEach(APIlootTable => {
-        const loot = APIlootTable.Items.filter(item => item.Chance)
-            .map(item => ({
-                item: resources.get(item.Template).name,
-                chance: item.Chance
-            }))
-            .sort((a, b) => {
-                if (a.chance > b.chance) {
-                    return -1;
-                }
-                if (a.chance < b.chance) {
-                    return 1;
-                }
-                if (a.item < b.item) {
-                    return -1;
-                }
-                if (a.item > b.item) {
-                    return 1;
-                }
-                return 0;
-            });
-        lootTables.set(APIlootTable.Id, loot);
-    });
-
     APIItems.filter(item => item.ItemType === "Building").forEach(APIbuilding => {
         let dontSave = false;
 
@@ -111,7 +86,6 @@ function convertBuildings() {
             resource: resources.get(
                 APIbuilding.ProduceResource ? APIbuilding.ProduceResource : APIbuilding.RequiredPortResource
             ),
-            byproduct: lootTables.get(APIbuilding.LootTable),
             batch: resourceRecipes.get(APIbuilding.RequiredPortResource),
             levels: APIbuilding.Levels.map(level => ({
                 labourDiscount: level.LaborDiscount,
