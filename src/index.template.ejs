@@ -99,8 +99,13 @@
                    aria-haspopup="true" aria-expanded="false">
                     Make journey
                 </a>
-                <div class="dropdown-menu p-2" id="journeyMenu" aria-labelledby="journeyDropdown">
-                </div>
+            </li>
+            
+            <li class="nav-item dropdown pr-2" id="positionNavbar">
+                <a class="nav-link dropdown-toggle" href="#" id="positionDropdown" role="button" data-toggle="dropdown"
+                   aria-haspopup="true" aria-expanded="false">
+                    Get position
+                </a>
             </li>
 
             <li class="nav-item pr-2">
@@ -288,12 +293,12 @@
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" class="custom-control-input"
                                    name="serverName" id="server-name-eu1" value="eu1">
-                            <label class="custom-control-label" for="server-name-eu1">Caribbean</label>
+                            <label class="custom-control-label" for="server-name-eu1">War (Caribbean)</label>
                         </div>
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" class="custom-control-input"
                                    name="serverName" id="server-name-eu2" value="eu2">
-                            <label class="custom-control-label" for="server-name-eu2">PvE only</label>
+                            <label class="custom-control-label" for="server-name-eu2">Peace (PvE)</label>
                         </div>
                     </div>
 
@@ -304,6 +309,11 @@
                             <input type="radio" class="custom-control-input"
                                    name="showRadius" id="show-radius-attack" value="attack">
                             <label class="custom-control-label" for="show-radius-attack">Attack</label>
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input"
+                                   name="showRadius" id="show-radius-position" value="position">
+                            <label class="custom-control-label" for="show-radius-position">Position</label>
                         </div>
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" class="custom-control-input"
