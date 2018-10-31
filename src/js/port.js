@@ -11,6 +11,7 @@ import "moment/locale/en-gb";
 
 import { nations, defaultFontSize, defaultCircleSize, getDistance, convertCoordX, convertCoordY } from "./common";
 import { formatInt, formatSiInt, formatPercent, roundToThousands, degreesToRadians } from "./util";
+import TriangulatePosition from "./get-position";
 
 export default class PortDisplay {
     constructor(portData, pbData, serverName, minScale) {
@@ -23,6 +24,8 @@ export default class PortDisplay {
         this.showTradePortPartners = false;
         this._portData = portData;
         this._pbData = pbData;
+
+        this._triangulatePosition = new TriangulatePosition(this);
 
         // Shroud Cay
         this._currentPort = { id: "366", coord: { x: 4396, y: 2494 } };
@@ -114,7 +117,7 @@ export default class PortDisplay {
         this._gPort = d3Select("#na-svg")
             .append("g")
             .classed("ports", true);
-        this._gPortCircle = this._gPort.append("g");
+        this._gPortCircle = this._gPort.append("g").classed("port-circles", true);
         this._gIcon = this._gPort.append("g").classed("port", true);
         this._gText = this._gPort.append("g").classed("port-names", true);
         this._gCounty = this._gPort.append("g").classed("county", true);
@@ -634,6 +637,8 @@ export default class PortDisplay {
             data = this._portData.filter(d => !d.properties.nonCapturable);
         } else if (this.showTradePortPartners) {
             data = this._portData;
+        } else if (this._showRadius === "position") {
+            data = this._portData;
         } else if (this._showRadius === "attack") {
             const pbData = this._pbData.ports
                 .filter(d => d.attackHostility)
@@ -703,6 +708,9 @@ export default class PortDisplay {
                 .attr("class", "bubble")
                 .attr("fill", d => this._colourScale(d.properties.attackHostility))
                 .attr("r", d => this._attackRadius(d.properties.attackHostility));
+        } else if (this._showRadius === "position") {
+            console.log("showRadius", this._showRadius);
+            circleMerge.attr("class", "bubble here").attr("r", d => d.properties.distance);
         } else if (this._showRadius === "green") {
             circleMerge.attr("class", "bubble pos").attr("r", rGreenZone);
         } else if (this.showCurrentGood) {
@@ -948,6 +956,9 @@ export default class PortDisplay {
     }
 
     clearMap(scale) {
+        if (this._showRadius === "position") {
+            this._showRadius = "off";
+        }
         this._showSummary();
         this._portData = this._portDataDefault;
         this.showCurrentGood = false;
