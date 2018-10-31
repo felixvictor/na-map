@@ -8,13 +8,12 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-/* global d3 : false
- */
+import { formatPrefix as d3FormatPrefix, formatLocale as d3FormatLocale } from "d3-format";
 
 /**
  * Default format
  */
-const formatLocale = d3.formatLocale({
+const formatLocale = d3FormatLocale({
     decimal: ".",
     thousands: "\u202f",
     grouping: [3],
@@ -25,7 +24,7 @@ const formatLocale = d3.formatLocale({
 /**
  * format with SI suffix
  */
-const formatPrefix = d3.formatPrefix(",.0", 1e3);
+const formatPrefix = d3FormatPrefix(",.0", 1e3);
 
 /**
  * Format float
@@ -51,7 +50,7 @@ export const formatFloatFixed = (x, f = 2) =>
         .format(`.${f}f`)(x)
         .replace("-", "\u2212\u202f")
         .replace(".00", '<span class="hidden">.00</span>')
-        .replace(/\.(\d)0/g, ".$1<span class=\"hidden\">0</span>");
+        .replace(/\.(\d)0/g, '.$1<span class="hidden">0</span>');
 
 /**
  * Format F11 coordinate
@@ -213,9 +212,9 @@ export const radiansToDegrees = radians => (radians * 180) / Math.PI;
 export const degreesToRadians = degrees => (Math.PI / 180) * (degrees - 90);
 
 /**
- * @typedef {Array} Point
- * @property {number} 0 - X Coordinate
- * @property {number} 1 - Y Coordinate
+ * @typedef {Object} Point
+ * @property {number} x - X Coordinate
+ * @property {number} y - Y Coordinate
  */
 
 /**
@@ -227,7 +226,7 @@ export const degreesToRadians = degrees => (Math.PI / 180) * (degrees - 90);
  * @return {Number} Degrees between centerPt and targetPt
  */
 export const rotationAngleInDegrees = (centerPt, targetPt) => {
-    let theta = Math.atan2(targetPt[1] - centerPt[1], targetPt[0] - centerPt[0]);
+    let theta = Math.atan2(targetPt.y - centerPt.y, targetPt.x - centerPt.x);
     theta -= Math.PI / 2.0;
     let degrees = radiansToDegrees(theta);
     if (degrees < 0) {
@@ -245,7 +244,7 @@ export const rotationAngleInDegrees = (centerPt, targetPt) => {
  * @return {Number} Distance between centerPt and targetPt
  */
 export const distancePoints = (centerPt, targetPt) =>
-    Math.sqrt((centerPt[0] - targetPt[0]) ** 2 + (centerPt[1] - targetPt[1]) ** 2);
+    Math.sqrt((centerPt.x - targetPt.x) ** 2 + (centerPt.y - targetPt.y) ** 2);
 
 /**
  * Calculate the closest power of 2 (see {@link https://bocoup.com/blog/find-the-closest-power-of-2-with-javascript})
@@ -290,7 +289,7 @@ export const getTextFromFetch = response => response.text();
  * @return {void}
  */
 export const putFetchError = error => {
-    console.log("Request failed -->", error);
+    console.error("Request failed -->", error);
 };
 
 /**
