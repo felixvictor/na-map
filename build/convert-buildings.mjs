@@ -13,13 +13,56 @@ String.prototype.replaceAll = function(search, replacement) {
     return target.replace(new RegExp(search, "g"), replacement);
 };
 
+function getItemsCraftedByWorkshop() {
+    return APIItems.filter(
+        item =>
+            typeof item.BuildingRequirements !== "undefined" &&
+            typeof item.BuildingRequirements[0] !== "undefined" &&
+            item.BuildingRequirements[0].BuildingTemplate === 450
+    )
+        .map(recipe => ({
+            name: recipe.Name.replace(" Blueprint", ""),
+            price: 0
+        }))
+        .sort((a, b) => {
+            if (a.name < b.name) {
+                return -1;
+            }
+            if (a.name > b.name) {
+                return 1;
+            }
+            return 0;
+        });
+}
+
+function getItemsCraftedByAcademy() {
+    return APIItems.filter(
+        item =>
+            typeof item.BuildingRequirements !== "undefined" &&
+            typeof item.BuildingRequirements[0] !== "undefined" &&
+            item.BuildingRequirements[0].BuildingTemplate === 879
+    )
+        .map(recipe => ({
+            name: recipe.Name.replace(" Blueprint", ""),
+            price: 0
+        }))
+        .sort((a, b) => {
+            if (a.name < b.name) {
+                return -1;
+            }
+            if (a.name > b.name) {
+                return 1;
+            }
+            return 0;
+        });
+}
+
 /**
  * Convert API building data and save sorted as JSON
  * @returns {void}
  */
 function convertBuildings() {
     const buildings = new Map(),
-        lootTables = new Map(),
         resources = new Map(),
         resourceRecipes = new Map();
 
@@ -34,38 +77,15 @@ function convertBuildings() {
         });
     });
 
-    APIItems.filter(item => item.ItemType === "LootTableItem").forEach(APIlootTable => {
-        const loot = APIlootTable.Items.filter(item => item.Chance)
-            .map(item => ({
-                item: resources.get(item.Template).name,
-                chance: item.Chance
-            }))
-            .sort((a, b) => {
-                if (a.chance > b.chance) {
-                    return -1;
-                }
-                if (a.chance < b.chance) {
-                    return 1;
-                }
-                if (a.name < b.name) {
-                    return -1;
-                }
-                if (a.name > b.name) {
-                    return 1;
-                }
-                return 0;
-            });
-        lootTables.set(APIlootTable.Id, loot);
-    });
-
     APIItems.filter(item => item.ItemType === "Building").forEach(APIbuilding => {
         let dontSave = false;
 
         const building = {
             id: APIbuilding.Id,
             name: APIbuilding.Name.replaceAll("'", "’"),
-            resource: resources.get(APIbuilding.RequiredPortResource),
-            byproduct: lootTables.get(APIbuilding.LootTable),
+            resource: resources.get(
+                APIbuilding.ProduceResource ? APIbuilding.ProduceResource : APIbuilding.RequiredPortResource
+            ),
             batch: resourceRecipes.get(APIbuilding.RequiredPortResource),
             levels: APIbuilding.Levels.map(level => ({
                 labourDiscount: level.LaborDiscount,
@@ -85,15 +105,31 @@ function convertBuildings() {
                 building.resource = { name: "Ships", price: 0 };
                 building.byproduct = [];
                 building.batch = [];
-            } else if (building.name === "Workshop") {
+                building.levels[0].materials = [
+                    {
+                        item: "Doubloons",
+                        amount: 0
+                    }
+                ];
+            } else if (building.name === "Academy") {
+                building.resource = getItemsCraftedByAcademy();
+                building.byproduct = [];
+                building.batch = [];
+            } else if (building.name === "Forge") {
                 building.resource = { name: "Cannons", price: 0 };
+                building.byproduct = [];
+                building.batch = [];
+            } else if (building.name === "Workshop") {
+                building.resource = getItemsCraftedByWorkshop();
                 building.byproduct = [];
                 building.batch = [];
             }
             if (
+                building.name === "Gold Mine" ||
+                building.name === "Silver Mine" ||
+                building.name === "Bermuda Cedar Forest" ||
                 building.name === "Compass Wood Forest" ||
                 building.name === "Copper Ore Mine" ||
-                building.name === "Forge" ||
                 building.name === "Live Oak Forest" ||
                 building.name === "Mahogany Forest" ||
                 building.name === "Pine Forest" ||
@@ -102,7 +138,7 @@ function convertBuildings() {
             ) {
                 dontSave = true;
             } else {
-                // console.log(module.id, module.name);
+                // console.log(building.id, building.name);
             }
             buildings.set(building.name, dontSave ? {} : building);
         }

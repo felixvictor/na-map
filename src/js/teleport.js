@@ -2,21 +2,20 @@
 	teleport.js
 */
 
-/* global d3 : false
- */
+import { select as d3Select } from "d3-selection";
+import { voronoi as d3Voronoi } from "d3-voronoi";
 
 export default class Teleport {
-    constructor(minCoord, maxCoord, ports) {
+    constructor(coord, ports) {
         this._ports = ports;
         this._show = false;
-        this._voronoiCoord = [[minCoord - 1, minCoord - 1], [maxCoord + 1, maxCoord + 1]];
+        this._voronoiCoord = [[coord.min - 1, coord.min - 1], [coord.max + 1, coord.max + 1]];
         this._teleportPorts = this._getPortData();
         this._voronoiDiagram = this._getVoronoiDiagram();
         this._data = {};
         this._highlightId = null;
-        this._g = d3
-            .select("#na-svg")
-            .insert("g", ".ports")
+        this._g = d3Select("#na-svg")
+            .insert("g", "g.ports")
             .classed("voronoi", true);
     }
 
@@ -37,8 +36,7 @@ export default class Teleport {
     }
 
     _getVoronoiDiagram() {
-        return d3
-            .voronoi()
+        return d3Voronoi()
             .extent(this._voronoiCoord)
             .x(d => d.coord.x)
             .y(d => d.coord.y)(this._teleportPorts);
