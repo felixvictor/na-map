@@ -314,6 +314,7 @@ case "$1" in
         push_data
         ;;
     update)
+     	        SCRIPT_RUN_TYPE="update"
         update_var
         log_date
         update_data
