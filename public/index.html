@@ -13,7 +13,7 @@
     <meta content="images/icons/favicon-32x32.png" property="og:image">
 
     <script src="https://www.googletagmanager.com/gtag/js?id=UA-109520372-1" async></script>
-<link href="/images/icons/favicon.ico" rel="shortcut icon"><link href="/images/icons/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"><link href="/images/icons/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"><meta content="#dcd7ca" name="msapplication-TileColor"><meta content="/images/icons/mstile-144x144.png" name="msapplication-TileImage"><meta content="/images/icons/browserconfig.xml" name="msapplication-config"><link href="/images/icons/yandex-browser-manifest.json" rel="yandex-tableau-widget"><meta content="width=device-width,initial-scale=1,shrink-to-fit=no" name="viewport"><link href="na-map.min.css?2307db359884114331d1" rel="stylesheet" crossorigin="anonymous" integrity="sha256-oTCLdzTXfGwRWTOqaXbeR/fqx/FW0n78XsS9ZYtMZ7Q= sha384-gZVojlFwhIK6tKBgAI4AofBwFWxBbm1oXGIKhJbKLXJAOqACG0b3Ph9FR3qUMKda"></head>
+<link href="/images/icons/favicon.ico" rel="shortcut icon"><link href="/images/icons/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"><link href="/images/icons/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"><meta content="#dcd7ca" name="msapplication-TileColor"><meta content="/images/icons/mstile-144x144.png" name="msapplication-TileImage"><meta content="/images/icons/browserconfig.xml" name="msapplication-config"><link href="/images/icons/yandex-browser-manifest.json" rel="yandex-tableau-widget"><meta content="width=device-width,initial-scale=1,shrink-to-fit=no" name="viewport"><link href="na-map.min.css?d4e9c73800165b6a296d" rel="stylesheet" crossorigin="anonymous" integrity="sha256-zoBuee3jXYmmM8IcTjq5MI3LnKZccuHvZwQ6zO1snZc= sha384-+XpnFlDxvflaJt0jb/EN6jEqFSqAuP6xCyMy051kkXLozrIYnuHjafMPsNtjGOHe"></head>
 
 <body>
 
@@ -31,19 +31,20 @@
                 </a>
                 <div class="dropdown-menu" id="predictMenu" aria-labelledby="predictDropdown">
                     <form id="windPrediction" class="p-2">
-                        <div class="form-group">
-                            <p class="form-text">1. Set current in-game wind</p>
-                            <div class="rslider" id="direction"></div>
+                        <div class="form-group mb-3">
+                            <div class="alert alert-primary" role="alert">
+                                <label for="direction">Current in-game wind</label>
+                                <div class="rslider" id="direction"></div>
+                            </div>
                         </div>
                         <div class="form-group">
-                            <div class="input-group">
+                            <div class="alert alert-primary" role="alert">
+                                <label for="wind-time-input">Predict time (server time)</label>
                                 <div class="input-group date" id="wind-time" data-target-input="nearest">
-                                    <label for="wind-time-input">2. Set predict time (server time)</label>
                                     <input class="form-control datetimepicker-input" id="wind-time-input" type="text" required aria-label="wind-time" data-target="#wind-time">
                                     <div class="input-group-append" data-target="#wind-time" data-toggle="datetimepicker">
                                         <span class="input-group-text"><i class="far fa-clock"></i></span>
                                     </div>
-
                                 </div>
                             </div>
                         </div>
@@ -57,24 +58,26 @@
                     Go to F11
                 </a>
                 <div class="dropdown-menu large-width p-2" id="moveToMenu" aria-labelledby="moveToDropdown">
+                    <div class="alert alert-primary" role="alert">
+                        Use F11 in open world.
+                    </div>
                     <form id="f11">
-                        <div class="input-group">
+                        <div class="input-group mb-3">
                             <input class="form-control" id="x-coord" type="number" required max="819" min="-819" placeholder="X" step="1">
                             <div class="input-group-append">
                                 <span class="input-group-text">k</span>
                             </div>
                         </div>
-                        <div class="input-group">
+                        <div class="input-group mb-3">
                             <input class="form-control" id="z-coord" type="number" required max="819" min="-819" placeholder="Z" step="1">
                             <div class="input-group-append">
                                 <span class="input-group-text">k</span>
                             </div>
                         </div>
-                        <small class="form-text text-muted">Coordinates in k units.
-                        </small>
-                        <small class="form-text text-muted">Example: enter <em>43</em> for in-game value
-                            of <em>43,162.5</em>.
-                        </small>
+                        <div class="alert alert-primary" role="alert">
+                            <small>In k units (divide by 1,000).<br>Example: <em>43</em> for value of <em>43,162.5</em>.
+                            </small>
+                        </div>
                         <div class="float-right btn-group" role="group">
                             <button class="btn btn-outline-secondary" type="button" id="copy-coord" title="Copy to clipboard"><i class="far fa-copy"></i>
                             </button>
@@ -360,5 +363,5 @@
     <div id="modal-section"></div>
 </main>
 
-<script src="na-map.min.js?2307db359884114331d1" crossorigin="anonymous" integrity="sha256-thgpmHjjyRAYBi0olyN0sw78EdK/6JEZaXMBCh/reF8= sha384-JFdQmfkEffg5emKFOgQ7CkahNvG8xoJh2tYxAFepBdeQrh6t3AbzTZHkr/KBzzry" type="text/javascript"></script></body>
+<script src="na-map.min.js?d4e9c73800165b6a296d" crossorigin="anonymous" integrity="sha256-pqduN5+9qXCaTos1o7EVD7eR59CLL19/pyBH/WmB3mg= sha384-K8Cfyg49n530fMWw2c+d/b8JO4jt5Cj4p1pbukVPncybvj+7Fyg1OJ8XENlXTBRZ" type="text/javascript"></script></body>
 </html>
