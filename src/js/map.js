@@ -239,7 +239,7 @@ export default class Map {
         }
 
         this._f11 = new F11(this, this.coord);
-        this._ports = new PortDisplay(portData.features, data.pb, this._serverName, this._minScale, this._f11);
+        this._ports = new PortDisplay(portData.features, data.pb, this);
 
         let pbCircles = topojsonFeature(data.pbZones, data.pbZones.objects.pbCircles);
         pbCircles = getFeature(pbCircles.features);
