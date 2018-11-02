@@ -34,14 +34,16 @@
                 </a>
                 <div class="dropdown-menu" id="predictMenu" aria-labelledby="predictDropdown">
                     <form id="windPrediction" class="p-2">
-                        <div class="form-group">
-                            <p class="form-text">1. Set current in-game wind</p>
-                            <div id="direction" class="rslider"></div>
+                        <div class="form-group mb-3">
+                            <div class="alert alert-primary" role="alert">
+                                <label for="direction">Current in-game wind</label>
+                                <div id="direction" class="rslider"></div>
+                            </div>
                         </div>
                         <div class="form-group">
-                            <div class="input-group">
+                            <div class="alert alert-primary" role="alert">
+                                <label for="wind-time-input">Predict time (server time)</label>
                                 <div class="input-group date" id="wind-time" data-target-input="nearest">
-                                    <label for="wind-time-input">2. Set predict time (server time)</label>
                                     <input type="text" class="form-control datetimepicker-input"
                                            data-target="#wind-time" aria-label="wind-time"
                                            id="wind-time-input" required/>
@@ -49,7 +51,6 @@
                                          data-toggle="datetimepicker">
                                         <span class="input-group-text"><i class="far fa-clock"></i></span>
                                     </div>
-
                                 </div>
                             </div>
                         </div>
@@ -64,26 +65,28 @@
                     Go to F11
                 </a>
                 <div class="dropdown-menu large-width p-2" id="moveToMenu" aria-labelledby="moveToDropdown">
+                    <div class="alert alert-primary" role="alert">
+                        Use F11 in open world.
+                    </div>
                     <form id="f11">
-                        <div class="input-group">
+                        <div class="input-group mb-3">
                             <input class="form-control" id="x-coord" type="number" required placeholder="X" max="819"
                                    min="-819" step="1">
                             <div class="input-group-append">
                                 <span class="input-group-text">k</span>
                             </div>
                         </div>
-                        <div class="input-group">
+                        <div class="input-group mb-3">
                             <input class="form-control" id="z-coord" type="number" required placeholder="Z" max="819"
                                    min="-819" step="1">
                             <div class="input-group-append">
                                 <span class="input-group-text">k</span>
                             </div>
                         </div>
-                        <small class="form-text text-muted">Coordinates in k units.
-                        </small>
-                        <small class="form-text text-muted">Example: enter <em>43</em> for in-game value
-                            of <em>43,162.5</em>.
-                        </small>
+                        <div class="alert alert-primary" role="alert">
+                            <small>In k units (divide by 1,000).<br>Example: <em>43</em> for value of <em>43,162.5</em>.
+                            </small>
+                        </div>
                         <div class="float-right btn-group" role="group">
                             <button class="btn btn-outline-secondary" id="copy-coord" title="Copy to clipboard"
                                     type="button"><i class="far fa-copy"></i>
