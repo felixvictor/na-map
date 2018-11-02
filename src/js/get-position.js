@@ -10,12 +10,10 @@
 
 import { range as d3Range } from "d3-array";
 import { scaleLinear as d3ScaleLinear } from "d3-scale";
-import { event as d3Event, select as d3Select } from "d3-selection";
-import { line as d3Line } from "d3-shape";
-import { zoomIdentity as d3ZoomIdentity, zoomTransform as d3ZoomTransform } from "d3-zoom";
+import { select as d3Select } from "d3-selection";
 
 import { registerEvent } from "./analytics";
-import { convertInvCoordX, convertInvCoordY, getDistance, insertBaseModal, speedFactor } from "./common";
+import { circleRadiusFactor, insertBaseModal } from "./common";
 
 /**
  * Get position
@@ -166,8 +164,7 @@ export default class TriangulatePosition {
     }
 
     _useUserInput() {
-        const ports = new Map(),
-            magicNumber = 5;
+        const ports = new Map();
 
         Array.from(Array(this._inputs).keys()).forEach(row => {
             const select = `${this._baseId}-${row}-select`,
@@ -179,7 +176,7 @@ export default class TriangulatePosition {
                 distance = +inputSelector$.val();
 
             if (distance && port !== "") {
-                ports.set(port, distance * magicNumber);
+                ports.set(port, distance * circleRadiusFactor);
             }
         });
 
