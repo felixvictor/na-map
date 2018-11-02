@@ -11,7 +11,7 @@
 import { range as d3Range } from "d3-array";
 import { scaleLinear as d3ScaleLinear } from "d3-scale";
 import { select as d3Select } from "d3-selection";
-
+import { intersectionArea } from "venn.js";
 import { registerEvent } from "./analytics";
 import { circleRadiusFactor, insertBaseModal } from "./common";
 
@@ -187,6 +187,18 @@ export default class TriangulatePosition {
             return port;
         });
         this._ports.update();
+
+        const circles = [
+                { radius: 1, x: 1, y: 1, order: 0 },
+                { radius: 1, x: 2, y: 1, order: 1 },
+                { radius: 1, x: 1, y: 2, order: 2 },
+                { radius: 1, x: 2, y: 2, order: 3 }
+            ],
+            circleCount = circles.length,
+            stats = {};
+        console.log({ circles }, { stats });
+        //const t = intersectionArea(circles, stats);
+       //console.log(t);
     }
 
     /**
