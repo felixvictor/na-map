@@ -9,9 +9,22 @@
  */
 
 import { range as d3Range } from "d3-array";
+import { polygonHull as d3PolygonHull } from "d3-polygon";
 import { scaleLinear as d3ScaleLinear } from "d3-scale";
+import {
+    area as d3Area,
+    curveBasisClosed as d3CurveBasisClosed,
+    curveCardinal as d3CurveCardinal,
+    curveCatmullRom as d3CurveCatmullRom,
+    curveNatural as d3CurveNatural,
+    line as d3Line
+} from "d3-shape";
 import { select as d3Select } from "d3-selection";
-import { intersectionArea } from "venn.js";
+import {
+    containedInCircles as vennContainedInCircles,
+    getCenter as vennGetCenter,
+    intersectionArea as vennIntersectionArea
+} from "venn.js/src/circleintersection";
 import { registerEvent } from "./analytics";
 import { circleRadiusFactor, insertBaseModal } from "./common";
 
@@ -164,8 +177,14 @@ export default class TriangulatePosition {
     }
 
     _useUserInput() {
-        const ports = new Map();
+        const ports = new Map([
+            ["Les Cayes", 21 * circleRadiusFactor],
+            ["Saint-Louis", 29 * circleRadiusFactor],
+            ["Tiburon", 34 * circleRadiusFactor],
+            ["Kingston / Port Royal", 132 * circleRadiusFactor]
+        ]);
 
+        /*
         Array.from(Array(this._inputs).keys()).forEach(row => {
             const select = `${this._baseId}-${row}-select`,
                 selectSelector$ = $(`#${select}`),
@@ -179,6 +198,7 @@ export default class TriangulatePosition {
                 ports.set(port, distance * circleRadiusFactor);
             }
         });
+*/
 
         this._ports.showRadiusSetting = "position";
         this._ports.portData = this._ports.portDataDefault.filter(port => ports.has(port.properties.name)).map(port => {
@@ -188,38 +208,56 @@ export default class TriangulatePosition {
         });
         this._ports.update();
 
-        /*
-const LC = [5024, 3938],
-    SL = [5070, 3919],
-    Ti = [4876, 3903],
-    kpr = [4309, 3984];
-*/
-        /*
-        const LC = { x: 5024, y: 3938, z: 1, r: 21 },
-            SL = { x: 5070, y: 3919, z: 1, r: 29 },
-            Ti = { x: 4876, y: 3903, z: 1, r: 34 },
-            kpr = { x: 4309, y: 3984, z: 1, r: 132 };
-        // const pos = trilat([[5024, 3938, 21], [5070, 3919, 29], [4876, 3903, 34]]);
-        const pos2 = trilat2([[5024, 3938, 1], [5070, 3919, 9], [4876, 3903, 30]]);
-        console.log(pos2);
-        const pos = trilat([[5024, 3938, 1], [5070, 3919, 9], [4876, 3903, 30], [4309, 3984, 140]]);
-        console.log(pos);
-*/
-
-        const circles = [
-                { x: 5024, y: 3938, radius: 105, order: 0 },
-                { x: 5070, y: 3919, radius: 145, order: 1 },
-                { x: 4876, y: 3903, radius: 170, order: 2 },
-                { x: 4309, y: 3984, radius: 660, order: 3 }
-            ],
+        const circles = this._ports.portData.map((port, i) => ({
+                x: port.geometry.coordinates[0],
+                y: port.geometry.coordinates[1],
+                radius: port.properties.distance,
+                order: i
+            })),
             circleCount = circles.length,
             stats = {};
-        console.log({ circles }, { stats });
-        intersectionArea(circles, stats);
+        vennIntersectionArea(circles, stats);
         console.log(stats);
-        stats.intersectionPoints.forEach(point => {
-            this._ports.f11.printCoord(point.x, point.y);
-        });
+
+        const gPosition = d3Select("g.ports")
+            .append("g")
+            .classed("position", true);
+
+        const polygonPoints = [];
+        for (let i = 0; i < stats.arcs.length; i += 1) {
+            const arc = stats.arcs[i],
+                { p1 } = arc,
+                { p2 } = arc,
+                { circle } = arc;
+
+            const a1 = Math.atan2(p1.x - circle.x, p1.y - circle.y),
+                a2 = Math.atan2(p2.x - circle.x, p2.y - circle.y);
+            const samples = 3;
+
+            let angleDiff = a2 - a1;
+            if (angleDiff < 0) {
+                angleDiff += 2 * Math.PI;
+            }
+
+            const angleDelta = angleDiff / samples;
+            for (let j = 0; j < samples; j += 1) {
+                const angle = a2 - angleDelta * j;
+
+                const extended = {
+                    x: circle.x + circle.radius * Math.sin(angle),
+                    y: circle.y + circle.radius * Math.cos(angle)
+                };
+                polygonPoints.push([Math.floor(extended.x), Math.floor(extended.y)]);
+            }
+        }
+
+        const line = d3Line()
+            .curve(d3CurveCatmullRom.alpha(0.5));
+        const linePath = line(polygonPoints);
+        gPosition.append("path").attr("d", linePath);
+
+        const center = vennGetCenter(stats.innerPoints);
+        this._ports._map.zoomAndPan(center.x, center.y, 1);
     }
 
     /**
