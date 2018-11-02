@@ -194,28 +194,36 @@ export default class Journey {
             .append("form")
             .append("div")
             .attr("class", "form-group");
-        slider
-            .append("p")
-            .attr("class", "form-text")
-            .text("1. Set current in-game wind");
-        slider
+
+        const blockA = slider
+            .append("div")
+            .classed("alert alert-primary", true)
+            .attr("role", "alert");
+        blockA
+            .append("label")
+            .attr("for", "journey-wind-direction")
+            .text("Current in-game wind");
+        blockA
             .append("div")
             .attr("id", "journey-wind-direction")
             .attr("class", "rslider");
 
-        body.append("p")
-            .attr("class", "form-text")
-            .text("2. Set ship");
         const shipId = `${this._shipId}-Base-select`;
-        const div = body.append("div").attr("class", "d-flex flex-column");
+        const blockB = slider
+            .append("div")
+            .classed("alert alert-primary", true)
+            .attr("role", "alert");
+        const div = blockB.append("div").attr("class", "d-flex flex-column");
         div.append("label")
-            .append("select")
+            .attr("for", shipId)
+            .text("Ship and woods (optional)");
+        div.append("select")
             .attr("name", shipId)
             .attr("id", shipId);
         ["frame", "trim"].forEach(type => {
             const woodId = `${this._woodId}-${type}-Base-select`;
-            div.append("label")
-                .append("select")
+            div.append("label").attr("for", woodId);
+            div.append("select")
                 .attr("name", woodId)
                 .attr("id", woodId);
         });
@@ -313,7 +321,7 @@ export default class Journey {
             ({ speedDegrees } = this._shipCompare._singleShipData);
         }
         this._speedScale.range(speedDegrees);
-        //console.log(this._speedScale.range());
+        // console.log(this._speedScale.range());
     }
 
     /**
@@ -593,14 +601,14 @@ export default class Journey {
             this._journey.currentWindDegrees,
             distanceK * 1000
         );
-        //console.log("*** start", this._journey.currentWindDegrees, { distanceK }, { courseCompass });
+        // console.log("*** start", this._journey.currentWindDegrees, { distanceK }, { courseCompass });
         this._journey.totalDistance += distanceK;
         this._journey.totalMinutes += minutes;
         const textDirection = this._getTextDirection(courseCompass, courseDegrees, pt1),
             textDistance = this._getTextDistance(distanceK, minutes, index > 1);
 
         this._journey.segment[index].label = `${textDirection}|${textDistance}`;
-        //console.log("*** end", this._journey);
+        // console.log("*** end", this._journey);
     }
 
     _printSegment() {
