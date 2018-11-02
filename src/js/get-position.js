@@ -9,22 +9,10 @@
  */
 
 import { range as d3Range } from "d3-array";
-import { polygonHull as d3PolygonHull } from "d3-polygon";
 import { scaleLinear as d3ScaleLinear } from "d3-scale";
-import {
-    area as d3Area,
-    curveBasisClosed as d3CurveBasisClosed,
-    curveCardinal as d3CurveCardinal,
-    curveCatmullRom as d3CurveCatmullRom,
-    curveNatural as d3CurveNatural,
-    line as d3Line
-} from "d3-shape";
+import { curveBasis as d3CurveBasis, line as d3Line } from "d3-shape";
 import { select as d3Select } from "d3-selection";
-import {
-    containedInCircles as vennContainedInCircles,
-    getCenter as vennGetCenter,
-    intersectionArea as vennIntersectionArea
-} from "venn.js/src/circleintersection";
+import { getCenter as vennGetCenter, intersectionArea as vennIntersectionArea } from "venn.js/src/circleintersection";
 import { registerEvent } from "./analytics";
 import { circleRadiusFactor, insertBaseModal } from "./common";
 
@@ -176,15 +164,125 @@ export default class TriangulatePosition {
         this._setupSelects();
     }
 
+    /**
+     * Use user input and show position
+     * @return {void}
+     * @private
+     */
     _useUserInput() {
+        /**
+         * Show and go to Position
+         * @return {void}
+         */
+        const showAndGoToPosition = () => {
+            const gPosition = d3Select("g.ports")
+                .append("g")
+                .classed("position", true);
+
+            /**
+             * Get additional points to better represent position area
+             * Adapted from {@link https://github.com/benfred/bens-blog-code/blob/master/circle-intersection/circle-intersection-vis.js}
+             * @param {object} area - Position area
+             * @return {Array<number, number>} Points
+             */
+            const getAreaPoints = area => {
+                const points = [],
+                    samples = 32;
+
+                area.arcs.forEach(arc => {
+                    const { p1, p2, circle } = arc;
+                    const a1 = Math.atan2(p1.x - circle.x, p1.y - circle.y),
+                        a2 = Math.atan2(p2.x - circle.x, p2.y - circle.y);
+
+                    let angleDiff = a2 - a1;
+                    if (angleDiff < 0) {
+                        angleDiff += 2 * Math.PI;
+                    }
+
+                    const angleDelta = angleDiff / samples;
+                    Array.from(Array(samples).keys()).forEach(i => {
+                        const angle = a2 - angleDelta * i;
+
+                        const extended = {
+                            x: circle.x + circle.radius * Math.sin(angle),
+                            y: circle.y + circle.radius * Math.cos(angle)
+                        };
+                        points.push([Math.floor(extended.x), Math.floor(extended.y)]);
+                    });
+                });
+
+                return points;
+            };
+
+            /**
+             * @typedef {object} Area
+             * @property {number} arcArea - Arc area
+             * @property {object} arcs - Arcs
+             * @property {number} area - Area
+             * @property {Array<number, number>} innerPoints - Inner points of intersection
+             * @property {Array<number, number>} intersectionPoints - Points of all intersection circles
+             * @property {number} polygonArea - Polygon Area
+             */
+
+            /**
+             * Display position area
+             * @param {Area} area - Position area
+             * @return {void}
+             */
+            const displayArea = area => {
+                const points = getAreaPoints(area);
+
+                const line = d3Line().curve(d3CurveBasis);
+                gPosition.append("path").attr("d", line(points));
+            };
+
+            /**
+             * Get intersection Area
+             * @return {Area} Intersection data
+             */
+            const getIntersectionArea = () => {
+                const circles = this._ports.portData.map(port => ({
+                        x: port.geometry.coordinates[0],
+                        y: port.geometry.coordinates[1],
+                        radius: port.properties.distance
+                    })),
+                    stats = {};
+
+                vennIntersectionArea(circles, stats);
+                return stats;
+            };
+
+            const area = getIntersectionArea();
+
+            // If intersection is found
+            if (area.innerPoints.length) {
+                displayArea(area);
+                const center = vennGetCenter(area.innerPoints);
+                this._ports._map._f11.printCoord(center.x, center.y);
+                this._ports._map.zoomAndPan(center.x, center.y, 1);
+            } else {
+                console.error("Get position: no intersection found.");
+            }
+        };
+
+        const roundingFactor = 1.05;
+
         const ports = new Map([
             ["Les Cayes", 21 * circleRadiusFactor],
             ["Saint-Louis", 29 * circleRadiusFactor],
             ["Tiburon", 34 * circleRadiusFactor],
             ["Kingston / Port Royal", 132 * circleRadiusFactor]
         ]);
-
         /*
+        const ports = new Map([
+            ["Gracias a Dios", 52 * roundingFactor * circleRadiusFactor],
+            ["Port Morant", 296 * roundingFactor * circleRadiusFactor],
+            ["Santanillas", 82 * roundingFactor * circleRadiusFactor]
+        ]);
+
+        const ports = new Map();
+*/
+
         Array.from(Array(this._inputs).keys()).forEach(row => {
             const select = `${this._baseId}-${row}-select`,
                 selectSelector$ = $(`#${select}`),
@@ -195,69 +293,24 @@ export default class TriangulatePosition {
                 distance = +inputSelector$.val();
 
             if (distance && port !== "") {
-                ports.set(port, distance * circleRadiusFactor);
+                ports.set(port, distance * roundingFactor * circleRadiusFactor);
             }
         });
-*/
 
-        this._ports.showRadiusSetting = "position";
-        this._ports.portData = this._ports.portDataDefault.filter(port => ports.has(port.properties.name)).map(port => {
-            // eslint-disable-next-line prefer-destructuring,no-param-reassign
-            port.properties.distance = ports.get(port.properties.name);
-            return port;
-        });
-        this._ports.update();
-
-        const circles = this._ports.portData.map((port, i) => ({
-                x: port.geometry.coordinates[0],
-                y: port.geometry.coordinates[1],
-                radius: port.properties.distance,
-                order: i
-            })),
-            circleCount = circles.length,
-            stats = {};
-        vennIntersectionArea(circles, stats);
-        console.log(stats);
-
-        const gPosition = d3Select("g.ports")
-            .append("g")
-            .classed("position", true);
-
-        const polygonPoints = [];
-        for (let i = 0; i < stats.arcs.length; i += 1) {
-            const arc = stats.arcs[i],
-                { p1 } = arc,
-                { p2 } = arc,
-                { circle } = arc;
-
-            const a1 = Math.atan2(p1.x - circle.x, p1.y - circle.y),
-                a2 = Math.atan2(p2.x - circle.x, p2.y - circle.y);
-            const samples = 3;
-
-            let angleDiff = a2 - a1;
-            if (angleDiff < 0) {
-                angleDiff += 2 * Math.PI;
-            }
-
-            const angleDelta = angleDiff / samples;
-            for (let j = 0; j < samples; j += 1) {
-                const angle = a2 - angleDelta * j;
-
-                const extended = {
-                    x: circle.x + circle.radius * Math.sin(angle),
-                    y: circle.y + circle.radius * Math.cos(angle)
-                };
-                polygonPoints.push([Math.floor(extended.x), Math.floor(extended.y)]);
-            }
+        if (ports.size >= 2) {
+            this._ports.showRadiusSetting = "position";
+            this._ports.portData = this._ports.portDataDefault
+                .filter(port => ports.has(port.properties.name))
+                .map(port => {
+                    // eslint-disable-next-line prefer-destructuring,no-param-reassign
+                    port.properties.distance = ports.get(port.properties.name);
+                    return port;
+                });
+            this._ports.update();
+            showAndGoToPosition();
+        } else {
+            console.error("Get position: not enough data.");
         }
-
-        const line = d3Line()
-            .curve(d3CurveCatmullRom.alpha(0.5));
-        const linePath = line(polygonPoints);
-        gPosition.append("path").attr("d", linePath);
-
-        const center = vennGetCenter(stats.innerPoints);
-        this._ports._map.zoomAndPan(center.x, center.y, 1);
     }
 
     /**
