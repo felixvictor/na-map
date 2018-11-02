@@ -147,3 +147,5 @@ export const appVersion = VERSION;
 
 export const speedConstA = 0.074465523706782;
 export const speedConstB = 0.00272175949231;
+
+export const circleRadiusFactor = 5;
