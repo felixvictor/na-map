@@ -238,7 +238,8 @@ export default class Map {
             }));
         }
 
-        this._ports = new PortDisplay(portData.features, data.pb, this._serverName, this._minScale);
+        this._f11 = new F11(this, this.coord);
+        this._ports = new PortDisplay(portData.features, data.pb, this._serverName, this._minScale, this._f11);
 
         let pbCircles = topojsonFeature(data.pbZones, data.pbZones.objects.pbCircles);
         pbCircles = getFeature(pbCircles.features);
@@ -284,7 +285,6 @@ export default class Map {
         this._teleport = new Teleport(this.coord, this._ports);
         this._portSelect = new PortSelect(this._ports, this._pbZone);
         this._windPrediction = new WindPrediction();
-        this._f11 = new F11(this, this.coord);
         this._grid = new Grid(this);
 
         this._init();
