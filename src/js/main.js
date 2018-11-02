@@ -28,7 +28,6 @@ import {
 import moment from "moment";
 import "moment/locale/en-gb";
 import Cookies from "js-cookie";
-import ResizeObserver from "resize-observer-polyfill";
 
 import { initAnalytics, registerPage } from "./analytics";
 
@@ -139,8 +138,8 @@ function main() {
     setupListener();
     const map = new Map(serverName);
 
-    window.onresize = () => {
-        map.resize();
+    window.onresize = (d, i, nodes) => {
+        map.resize(nodes);
     };
 }
 
