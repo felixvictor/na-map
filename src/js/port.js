@@ -9,7 +9,7 @@ import Cookies from "js-cookie";
 import moment from "moment";
 import "moment/locale/en-gb";
 
-import { nations, defaultFontSize, defaultCircleSize, getDistance, convertCoordX, convertCoordY } from "./common";
+import { circleRadiusFactor, nations, defaultFontSize, defaultCircleSize, getDistance, convertCoordX, convertCoordY } from "./common";
 import { formatInt, formatSiInt, formatPercent, roundToThousands, degreesToRadians } from "./util";
 import TriangulatePosition from "./get-position";
 
@@ -627,8 +627,7 @@ export default class PortDisplay {
             return marker;
         };
         const circleScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale),
-            rMin = roundToThousands((this._circleSize / circleScale) * this._minRadiusFactor),
-            magicNumber = 5;
+            rMin = roundToThousands((this._circleSize / circleScale) * this._minRadiusFactor);
         let rMax = roundToThousands((this._circleSize / circleScale) * this._maxRadiusFactor),
             data = {},
             rGreenZone = 0;
@@ -655,7 +654,7 @@ export default class PortDisplay {
                         { x: convertCoordX(-63400, 18800), y: convertCoordY(-63400, 18800) },
                         { x: convertCoordX(-79696, 10642), y: convertCoordY(-79696, 10642) }
                     )
-                ) * magicNumber;
+                ) * circleRadiusFactor;
             const pbData = this._pbData.ports.filter(d => d.nation !== "FT").map(d => d.id);
             data = this._portData.filter(port => pbData.some(d => port.id === d) && port.properties.nonCapturable);
         } else if (this.showCurrentGood) {
