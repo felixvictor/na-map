@@ -138,8 +138,8 @@ function main() {
     setupListener();
     const map = new Map(serverName);
 
-    window.onresize = (d, i, nodes) => {
-        map.resize(nodes);
+    window.onresize = () => {
+        map.resize();
     };
 }
 
