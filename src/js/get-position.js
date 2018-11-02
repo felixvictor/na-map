@@ -12,7 +12,7 @@ import { range as d3Range } from "d3-array";
 import { scaleLinear as d3ScaleLinear } from "d3-scale";
 import { curveBasis as d3CurveBasis, line as d3Line } from "d3-shape";
 import { select as d3Select } from "d3-selection";
-import { getCenter as vennGetCenter, intersectionArea as vennIntersectionArea } from "venn.js/src/circleintersection";
+import { intersectionArea as vennIntersectionArea } from "venn.js/src/circleintersection";
 import { registerEvent } from "./analytics";
 import { circleRadiusFactor, insertBaseModal } from "./common";
 
@@ -247,9 +247,14 @@ export default class TriangulatePosition {
             // If intersection is found
             if (area.innerPoints.length) {
                 displayArea(area);
-                const center = vennGetCenter(area.innerPoints);
-                this._ports._map._f11.printCoord(center.x, center.y);
-                this._ports._map.zoomAndPan(center.x, center.y, 1);
+
+                const bbox = d3Select("g.ports path")
+                        .node()
+                        .getBBox(),
+                    centroid = { x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2 };
+
+                this._ports._map._f11.printCoord(centroid.x, centroid.y);
+                this._ports._map.zoomAndPan(centroid.x, centroid.y, 1);
             } else {
                 console.error("Get position: no intersection found.");
             }
