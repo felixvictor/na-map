@@ -37,16 +37,24 @@ $paddingThird: 1.618/3;
     .des {
         top: 0;
     }
-  button{
-    margin-bottom: map-get($spacers, 2);
-  }
+    button {
+        margin-bottom: map-get($spacers, 2);
+    }
 }
 
 .ports {
-  .position {
-    stroke: $red;
-    fill: $red;
-  }
+    .port-circles {
+        circle.position {
+          fill-opacity: 0.4;
+          fill: $white;
+
+        }
+    }
+    g.position path {
+      //    stroke: $green;
+      fill: $green;
+      fill-opacity: 0.6;
+    }
 }
 
 // port icons (available to nation)
