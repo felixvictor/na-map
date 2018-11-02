@@ -42,6 +42,13 @@ $paddingThird: 1.618/3;
   }
 }
 
+.ports {
+  .position {
+    stroke: $red;
+    fill: $red;
+  }
+}
+
 // port icons (available to nation)
 pattern .nation {
     fill: $primary-500;
