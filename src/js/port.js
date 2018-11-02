@@ -14,11 +14,12 @@ import { formatInt, formatSiInt, formatPercent, roundToThousands, degreesToRadia
 import TriangulatePosition from "./get-position";
 
 export default class PortDisplay {
-    constructor(portData, pbData, serverName, minScale) {
+    constructor(portData, pbData, serverName, minScale, f11) {
         this._portDataDefault = portData;
         this._serverName = serverName;
         this._minScale = minScale;
         this._scale = minScale;
+        this.f11 = f11;
 
         this.showCurrentGood = false;
         this.showTradePortPartners = false;

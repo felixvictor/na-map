@@ -188,17 +188,38 @@ export default class TriangulatePosition {
         });
         this._ports.update();
 
+        /*
+const LC = [5024, 3938],
+    SL = [5070, 3919],
+    Ti = [4876, 3903],
+    kpr = [4309, 3984];
+*/
+        /*
+        const LC = { x: 5024, y: 3938, z: 1, r: 21 },
+            SL = { x: 5070, y: 3919, z: 1, r: 29 },
+            Ti = { x: 4876, y: 3903, z: 1, r: 34 },
+            kpr = { x: 4309, y: 3984, z: 1, r: 132 };
+        // const pos = trilat([[5024, 3938, 21], [5070, 3919, 29], [4876, 3903, 34]]);
+        const pos2 = trilat2([[5024, 3938, 1], [5070, 3919, 9], [4876, 3903, 30]]);
+        console.log(pos2);
+        const pos = trilat([[5024, 3938, 1], [5070, 3919, 9], [4876, 3903, 30], [4309, 3984, 140]]);
+        console.log(pos);
+*/
+
         const circles = [
-                { radius: 1, x: 1, y: 1, order: 0 },
-                { radius: 1, x: 2, y: 1, order: 1 },
-                { radius: 1, x: 1, y: 2, order: 2 },
-                { radius: 1, x: 2, y: 2, order: 3 }
+                { x: 5024, y: 3938, radius: 105, order: 0 },
+                { x: 5070, y: 3919, radius: 145, order: 1 },
+                { x: 4876, y: 3903, radius: 170, order: 2 },
+                { x: 4309, y: 3984, radius: 660, order: 3 }
             ],
             circleCount = circles.length,
             stats = {};
         console.log({ circles }, { stats });
-        //const t = intersectionArea(circles, stats);
-       //console.log(t);
+        intersectionArea(circles, stats);
+        console.log(stats);
+        stats.intersectionPoints.forEach(point => {
+            this._ports.f11.printCoord(point.x, point.y);
+        });
     }
 
     /**
