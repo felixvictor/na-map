@@ -69,9 +69,12 @@ export default class TriangulatePosition {
         insertBaseModal(this._modalId, this._baseName, "", "Go");
 
         const body = d3Select(`#${this._modalId} .modal-body`);
-        body.append("p").text("Get distances from in-game trader tool");
-        const form = body.append("form");
+        body.append("div")
+            .classed("alert alert-primary", true)
+            .attr("role", "alert")
+            .text("Use in-game trader tool.");
 
+        const form = body.append("form");
         const dataList = form.append("datalist").attr("id", "defaultDistances");
         [5, 10, 15, 20, 30, 50, 100, 200].forEach(distance => {
             dataList.append("option").attr("value", distance);
@@ -90,7 +93,7 @@ export default class TriangulatePosition {
                 .attr("id", select);
             formRow
                 .append("div")
-                .classed("col-md-5", true)
+                .classed("col-md-6", true)
                 .append("input")
                 .attr("id", input)
                 .attr("name", input)
@@ -267,21 +270,21 @@ export default class TriangulatePosition {
 
         const roundingFactor = 1.05;
 
+        /*
         const ports = new Map([
             ["Les Cayes", 21 * circleRadiusFactor],
             ["Saint-Louis", 29 * circleRadiusFactor],
             ["Tiburon", 34 * circleRadiusFactor],
             ["Kingston / Port Royal", 132 * circleRadiusFactor]
         ]);
-        /*
         const ports = new Map([
             ["Gracias a Dios", 52 * roundingFactor * circleRadiusFactor],
             ["Port Morant", 296 * roundingFactor * circleRadiusFactor],
             ["Santanillas", 82 * roundingFactor * circleRadiusFactor]
         ]);
+        */
 
         const ports = new Map();
-*/
 
         Array.from(Array(this._inputs).keys()).forEach(row => {
             const select = `${this._baseId}-${row}-select`,
