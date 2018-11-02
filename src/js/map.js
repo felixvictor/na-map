@@ -142,7 +142,7 @@ export default class Map {
             max: 8192
         };
 
-        this._currentTranslate =  {};
+        this._currentTranslate = {};
 
         this._navbarSelector = document.querySelector(".navbar");
 
@@ -619,11 +619,11 @@ export default class Map {
         this._teleport.zoomLevel = zoomLevel;
     }
 
-    resize(self) {
+    resize() {
         const zoomTransform = d3ZoomIdentity
             .translate(this._currentTranslate.x, this._currentTranslate.y)
             .scale(this._currentScale);
-        console.log("resize",  zoomTransform);
+
         this._setSvgSize();
         this._displayMap(zoomTransform);
         this._grid.update();
