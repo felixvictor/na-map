@@ -126,13 +126,13 @@ export default class PortDisplay {
 
     _setupSvg() {
         this._gPort = d3Select("#na-svg")
-            .append("g")
+            .insert("g", "g.f11")
             .classed("ports", true);
+        this._gRegion = this._gPort.append("g").classed("region", true);
+        this._gCounty = this._gPort.append("g").classed("county", true);
         this._gPortCircle = this._gPort.append("g").classed("port-circles", true);
         this._gIcon = this._gPort.append("g").classed("port", true);
         this._gText = this._gPort.append("g").classed("port-names", true);
-        this._gCounty = this._gPort.append("g").classed("county", true);
-        this._gRegion = this._gPort.append("g").classed("region", true);
     }
 
     _setupCounties() {
