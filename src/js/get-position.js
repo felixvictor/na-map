@@ -25,19 +25,6 @@ export default class TriangulatePosition {
     constructor(ports) {
         this._ports = ports;
 
-        this._minutesForFullCircle = 48;
-        this._fullCircle = 360;
-        this._degreesPerMinute = this._fullCircle / this._minutesForFullCircle;
-        this._degreesSegment = 15;
-        this._minOWSpeed = 2;
-        this._owSpeedFactor = 2;
-
-        this._speedScale = d3ScaleLinear().domain(d3Range(0, this._fullCircle, this._degreesSegment));
-
-        this._defaultShipName = "None";
-        this._defaultShipSpeed = 19;
-        this._defaultStartWindDegrees = 0;
-
         // Number of input port distances
         this._inputs = 4;
         this._baseName = "Get position";
@@ -100,7 +87,7 @@ export default class TriangulatePosition {
                 .attr("type", "number")
                 .classed("form-control", true)
                 .attr("placeholder", "Distance in k")
-                .attr("step", 5)
+                .attr("step", 1)
                 .attr("list", "defaultDistances")
                 .attr("min", 0)
                 .attr("max", 1000);
