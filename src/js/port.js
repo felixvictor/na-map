@@ -9,22 +9,32 @@ import Cookies from "js-cookie";
 import moment from "moment";
 import "moment/locale/en-gb";
 
-import { circleRadiusFactor, nations, defaultFontSize, defaultCircleSize, getDistance, convertCoordX, convertCoordY } from "./common";
+import {
+    circleRadiusFactor,
+    nations,
+    defaultFontSize,
+    defaultCircleSize,
+    getDistance,
+    convertCoordX,
+    convertCoordY
+} from "./common";
 import { formatInt, formatSiInt, formatPercent, roundToThousands, degreesToRadians } from "./util";
 import TriangulatePosition from "./get-position";
 
 export default class PortDisplay {
-    constructor(portData, pbData, serverName, minScale, f11) {
+    constructor(portData, pbData, map) {
         this._portDataDefault = portData;
-        this._serverName = serverName;
-        this._minScale = minScale;
-        this._scale = minScale;
-        this.f11 = f11;
+        this._portData = portData;
+        this._pbData = pbData;
+        this._map = map;
+
+        this._serverName = this._map._serverName;
+        this._minScale = this._map._minScale;
+        this._scale = this._minScale;
+        this.f11 = this._map._f11;
 
         this.showCurrentGood = false;
         this.showTradePortPartners = false;
-        this._portData = portData;
-        this._pbData = pbData;
 
         this._triangulatePosition = new TriangulatePosition(this);
 
