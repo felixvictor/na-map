@@ -142,6 +142,8 @@ export default class Map {
             max: 8192
         };
 
+        this._currentTranslate =  {};
+
         this._navbarSelector = document.querySelector(".navbar");
 
         this._tileSize = 256;
@@ -577,12 +579,15 @@ export default class Map {
          * @property {number} k - Scale factor
          */
 
+        this._currentTranslate.x = Math.round(d3Event.transform.x);
+        this._currentTranslate.y = Math.round(d3Event.transform.y);
+
         /**
          * Current transform
          * @type {Transform}
          */
         const zoomTransform = d3ZoomIdentity
-            .translate(Math.round(d3Event.transform.x), Math.round(d3Event.transform.y))
+            .translate(this._currentTranslate.x, this._currentTranslate.y)
             .scale(roundToThousands(d3Event.transform.k));
 
         this._displayMap(zoomTransform);
@@ -614,14 +619,14 @@ export default class Map {
         this._teleport.zoomLevel = zoomLevel;
     }
 
-    resize() {
+    resize(self) {
+        const zoomTransform = d3ZoomIdentity
+            .translate(this._currentTranslate.x, this._currentTranslate.y)
+            .scale(this._currentScale);
+        console.log("resize",  zoomTransform);
         this._setSvgSize();
+        this._displayMap(zoomTransform);
         this._grid.update();
-        /*
-        this._ports.setSummaryPosition(this.margin.top, this.margin.right);
-        this._journey.setSummaryPosition(this.margin.top, this.margin.right);
-        this._windPrediction.setPosition(this.margin.top, this.margin.left);
-        */
     }
 
     _getDimensions() {
