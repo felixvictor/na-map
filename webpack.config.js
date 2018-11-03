@@ -3,7 +3,8 @@
 const webpack = require("webpack");
 
 const path = require("path");
-const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin,
+const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer"),
+    CleanWebpackPlugin = require("clean-webpack-plugin"),
     CopyPlugin = require("copy-webpack-plugin"),
     HtmlPlugin = require("html-webpack-plugin"),
     MiniCssExtractPlugin = require("mini-css-extract-plugin"),
@@ -17,6 +18,8 @@ const libraryName = PACKAGE.name,
     description =
         "Yet another map with in-game map, F11 coordinates, resources, ship and wood comparison. Port data is updated constantly from twitter and daily after maintenance.",
     sitemapPaths = ["/fonts/", "/icons", "/images"];
+
+const outputPath = path.resolve(__dirname, "public");
 
 const babelOpt = {
     cacheDirectory: true,
@@ -164,13 +167,16 @@ const config = {
     },
 
     output: {
-        path: path.resolve(__dirname, "dist"),
+        path: outputPath,
         filename: "[name].min.js",
         crossOriginLoading: "anonymous"
     },
 
     plugins: [
         new BundleAnalyzerPlugin(),
+        new CleanWebpackPlugin(outputPath, {
+            verbose: false
+        }),
         new MiniCssExtractPlugin({
             filename: `${libraryName}.min.css`
         }),
@@ -198,8 +204,7 @@ const config = {
         new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
         new CopyPlugin([
             { from: "google979f2cf3bed204d6.html", to: "google979f2cf3bed204d6.html", toType: "file" },
-            { from: "images/map", to: "../public/images/map" },
-            //       { from: "images/icons", to: "../public/images/icons" },
+            { from: "images/map", to: `${outputPath}/images/map` },
             { from: "*.json" },
             { from: "*.xlsx" },
             { from: "../netlify.toml" }
