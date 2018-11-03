@@ -15,6 +15,9 @@ const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer"),
 const PACKAGE = require("./package.json");
 
 const libraryName = PACKAGE.name,
+    gtagLink = "https://www.googletagmanager.com/gtag/js?id=UA-109520372-1",
+    { TARGET } = process.env,
+    isProd = process.env.NODE_ENV === "production",
     description =
         "Yet another map with in-game map, F11 coordinates, resources, ship and wood comparison. Port data is updated constantly from twitter and daily after maintenance.",
     sitemapPaths = ["/fonts/", "/icons", "/images"];
@@ -147,7 +150,7 @@ const svgoOpt = {
 const config = {
     context: path.resolve(__dirname, "src"),
 
-    entry: [path.resolve(__dirname, PACKAGE.main), path.resolve(__dirname, PACKAGE.sass)],
+    entry: [path.resolve(__dirname, PACKAGE.main)],
 
     resolve: {
         alias: {
@@ -161,14 +164,26 @@ const config = {
     },
 
     optimization: {
+        runtimeChunk: "single",
         splitChunks: {
-            chunks: "all"
+            cacheGroups: {
+                styles: {
+                    name: "styles",
+                    test: /\.css$/,
+                    chunks: "all",
+                    enforce: true
+                },
+                vendor: {
+                    test: /[\\/]node_modules[\\/]/,
+                    name: "vendors",
+                    chunks: "all"
+                }
+            }
         }
     },
 
     output: {
         path: outputPath,
-        filename: "[name].min.js",
         crossOriginLoading: "anonymous"
     },
 
@@ -177,9 +192,7 @@ const config = {
         new CleanWebpackPlugin(outputPath, {
             verbose: false
         }),
-        new MiniCssExtractPlugin({
-            filename: `${libraryName}.min.css`
-        }),
+        new MiniCssExtractPlugin(),
         new webpack.DefinePlugin({
             DESCRIPTION: JSON.stringify(description),
             TITLE: JSON.stringify(PACKAGE.description),
@@ -212,8 +225,7 @@ const config = {
         new HtmlPlugin({
             brand: "images/icons/favicon-32x32.png",
             description,
-            filename: "index.html",
-            gtag: "https://www.googletagmanager.com/gtag/js?id=UA-109520372-1",
+            gtag: gtagLink,
             hash: true,
             inject: "body",
             lang: "en-GB",
@@ -222,10 +234,10 @@ const config = {
             template: "index.template.ejs",
             title: PACKAGE.description
         }),
-        new SitemapPlugin(`https://${process.env.TARGET}.netlify.com/`, sitemapPaths, { skipGzip: false }),
+        new SitemapPlugin(`https://${TARGET}.netlify.com/`, sitemapPaths, { skipGzip: false }),
         new SriPlugin({
             hashFuncNames: ["sha256", "sha384"],
-            enabled: process.env.NODE_ENV === "production"
+            enabled: isProd
         }),
         new WebappWebpackPlugin({
             cache: true,
