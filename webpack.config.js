@@ -3,7 +3,8 @@
 const webpack = require("webpack");
 
 const path = require("path");
-const CopyPlugin = require("copy-webpack-plugin"),
+const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin,
+    CopyPlugin = require("copy-webpack-plugin"),
     HtmlPlugin = require("html-webpack-plugin"),
     MiniCssExtractPlugin = require("mini-css-extract-plugin"),
     MinifyPlugin = require("babel-minify-webpack-plugin"),
@@ -158,24 +159,18 @@ const config = {
 
     optimization: {
         splitChunks: {
-            cacheGroups: {
-                styles: {
-                    name: "styles",
-                    test: /\.css$/,
-                    chunks: "all",
-                    enforce: true
-                }
-            }
+            chunks: "all"
         }
     },
 
     output: {
-        path: `${__dirname}/public`,
-        filename: `${libraryName}.min.js`,
+        path: path.resolve(__dirname, "dist"),
+        filename: "[name].min.js",
         crossOriginLoading: "anonymous"
     },
 
     plugins: [
+        new BundleAnalyzerPlugin(),
         new MiniCssExtractPlugin({
             filename: `${libraryName}.min.css`
         }),
