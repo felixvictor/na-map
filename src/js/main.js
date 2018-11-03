@@ -31,6 +31,8 @@ import Cookies from "js-cookie";
 
 import { initAnalytics, registerPage } from "./analytics";
 
+import "../scss/main.scss";
+
 import Map from "./map";
 
 /**
