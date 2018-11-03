@@ -1,10 +1,11 @@
-const postcssCleanOpt = {
-    level: { 1: { specialComments: 0 } }
+const postcssCrassOpt = {
+    optimize: true,
+    pretty: false
 };
 
 module.exports = ctx => ({
     plugins: {
         autoprefixer: true,
-        "postcss-clean": ctx.env === "production" ? postcssCleanOpt : false
+        "postcss-crass": ctx.env === "production" ? postcssCrassOpt : false
     }
 });

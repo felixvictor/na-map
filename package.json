@@ -40,6 +40,7 @@
         "postcss": "^7.0.5",
         "postcss-clean": "^1.1.0",
         "postcss-cli": "^6.0.1",
+        "postcss-crass": "^0.2.1",
         "postcss-loader": "^3.0.0",
         "prettier": "^1.14.3",
         "read-css": "^0.3.0",
@@ -48,7 +49,6 @@
         "shapefile": "^0.6.6",
         "sharp": "^0.21.0",
         "sitemap-webpack-plugin": "^0.6.0",
-        "style-loader": "^0.23.1",
         "svg-url-loader": "^2.3.2",
         "topojson": "^3.0.2",
         "url-loader": "^1.1.2",
@@ -123,11 +123,11 @@
         "make-excel": "node --experimental-modules --no-warnings build/create-xlsx.mjs src/ships.json src/eu1.json src/port-battle.xlsx",
         "make-tiles": "cp /mnt/na-map.tif src/images/map.tif && rm -rf src/images/map/ && node --experimental-modules build/make-tiles.mjs src/images/map.tif && rm src/images/map.tif",
         "prettier": "prettier --tab-width 4 --print-width 120 --write .eslintrc.json package.json *.js src/js/*.json src/scss/*.scss",
-        "prod": "NODE_ENV=production webpack --mode=production --colors --config webpack.config.js",
+        "prod": "NODE_ENV=production webpack --mode=production --colors --config webpack.config.js --profile --json > webpack-stats.json",
         "push-change": "build/port-data.sh push-change",
         "stylelint-check": "stylelint-config-prettier-check",
         "watch": "NODE_ENV=development webpack --mode=development --watch --colors --config webpack.config.js",
-        "dev": "NODE_ENV=development webpack --mode=development --colors --config webpack.config.js"
+        "dev": "NODE_ENV=development webpack --mode=development --colors --config webpack.config.js --profile --json > webpack-stats.json"
     },
     "browserslist": [
         ">= 1%",
