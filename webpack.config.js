@@ -152,6 +152,11 @@ const config = {
 
     entry: [path.resolve(__dirname, PACKAGE.main)],
 
+    externals: {
+        jquery: "jQuery",
+        "popper.js": "Popper"
+    },
+
     resolve: {
         alias: {
             Fonts: path.resolve(__dirname, "src/fonts/"),
