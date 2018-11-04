@@ -7,7 +7,7 @@ JQ="$(command -v jq)"
 NODE="$(command -v node) --experimental-modules --no-warnings"
 TWURL="$(command -v twurl)"
 XZ="$(command -v xz)"
-MODULE="na-map"
+MODULE="main"
 SERVER_BASE_NAME="cleanopenworldprod"
 SOURCE_BASE_URL="http://storage.googleapis.com/nacleanopenworldprodshards/"
 # http://api.shipsofwar.net/servers?apikey=1ZptRtpXAyEaBe2SEp63To1aLmISuJj3Gxcl5ivl&callback=setActiveRealms
@@ -180,7 +180,7 @@ function get_port_data () {
             ${NODE} build/convert-ownership.mjs "${API_DIR}" "${OWNERSHIP_FILE}" "${NATION_FILE}"
         fi
 
-        ${NODE} build/create-xlsx.mjs "${SHIP_FILE}" "${SRC_DIR}/${SERVER_NAMES[0]}.json" "${BASE_DIR}/public/${MODULE}.min.css" "${EXCEL_FILE}"
+        ${NODE} build/create-xlsx.mjs "${SHIP_FILE}" "${SRC_DIR}/${SERVER_NAMES[0]}.json" "${BASE_DIR}/public/${MODULE}.css" "${EXCEL_FILE}"
 
         return 0
     else
