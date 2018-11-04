@@ -2,7 +2,7 @@
     pbzone.js
 */
 
-import { geoPath as d3GeoPath} from "d3-geo";
+import { geoPath as d3GeoPath } from "d3-geo";
 import { select as d3Select } from "d3-selection";
 import Cookies from "js-cookie";
 
@@ -104,7 +104,7 @@ export default class PBZone {
         this._gTowers.datum(this._towerData).attr("d", d3GeoPath().pointRadius(1.5));
         this._gForts.datum(this._fortData).attr("d", d3GeoPath().pointRadius(2));
         this._gJoinCirclesInner.datum(this._joinCircleData).attr("d", d3GeoPath().pointRadius(14));
-        this._gJoinCirclesOuter.datum(this._joinCircleData).attr("d",d3GeoPath().pointRadius(28));
+        this._gJoinCirclesOuter.datum(this._joinCircleData).attr("d", d3GeoPath().pointRadius(28));
     }
 
     _isPortIn(d) {
