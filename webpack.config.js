@@ -193,7 +193,13 @@ const config = {
     },
 
     plugins: [
-        new BundleAnalyzerPlugin(),
+        new BundleAnalyzerPlugin({
+            analyzerMode: "static",
+            generateStatsFile: true,
+            logLevel: "warn",
+            statsFilename: path.resolve(__dirname, "webpack-stats.json"),
+            reportFilename: path.resolve(__dirname, "report.html")
+        }),
         new CleanWebpackPlugin(outputPath, {
             verbose: false
         }),
