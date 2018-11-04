@@ -3,8 +3,8 @@
 */
 
 import "bootstrap-select/js/bootstrap-select";
-import moment from "moment/moment";
-import "moment/locale/en-gb";
+import moment from "moment";
+
 import "tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4";
 import "tempusdominus-core/build/js/tempusdominus-core";
 
@@ -15,6 +15,7 @@ export default class PortSelect {
     constructor(ports, pbZone) {
         this._ports = ports;
         this._pbZone = pbZone;
+
         this._dateFormat = "D MMM";
         this._timeFormat = "HH.00";
 

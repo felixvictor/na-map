@@ -4,7 +4,7 @@
 
 import { select as d3Select } from "d3-selection";
 import { line as d3Line } from "d3-shape";
-import moment from "moment/moment";
+import moment from "moment";
 import "moment/locale/en-gb";
 import "round-slider/src/roundslider";
 import "tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4";
@@ -51,6 +51,8 @@ export default class WindPrediction {
     }
 
     static _setupForm() {
+        moment.locale("en-gb");
+
         $("#wind-time").datetimepicker({
             defaultDate: moment.utc(),
             format: "LT"
@@ -103,6 +105,8 @@ export default class WindPrediction {
     }
 
     _predictWind(currentUserWind, predictUserTime) {
+        moment.locale("en-gb");
+
         const secondsForFullCircle = 48 * 60,
             fullCircle = 360,
             degreesPerSecond = fullCircle / secondsForFullCircle,
