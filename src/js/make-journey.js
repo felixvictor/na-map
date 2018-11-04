@@ -17,6 +17,7 @@ import { line as d3Line } from "d3-shape";
 import { zoomIdentity as d3ZoomIdentity, zoomTransform as d3ZoomTransform } from "d3-zoom";
 import moment from "moment";
 import "moment/locale/en-gb";
+
 import "round-slider/src/roundslider";
 
 import { compassDirections, degreesToCompass, rotationAngleInDegrees, formatF11 } from "./util";
@@ -578,6 +579,8 @@ export default class Journey {
     }
 
     _getTextDistance(distanceK, minutes, addTotal) {
+        moment.locale("en-gb");
+
         const duration = moment.duration(minutes, "minutes").humanize(true);
         let textDistance = `${Math.round(distanceK)}k ${duration}`;
 
