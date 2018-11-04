@@ -95,7 +95,6 @@
         "venn.js": "^0.2.20"
     },
     "peerDependencies": {
-        "jquery": "^3.3.1",
         "moment-timezone": "^0.5.14"
     },
     "engines": {
