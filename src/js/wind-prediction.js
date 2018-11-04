@@ -7,6 +7,7 @@ import { line as d3Line } from "d3-shape";
 import moment from "moment";
 import "moment/locale/en-gb";
 import "round-slider/src/roundslider";
+import "round-slider/src/roundslider.css";
 import "tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4";
 import "tempusdominus-core/build/js/tempusdominus-core";
 

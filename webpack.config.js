@@ -301,6 +301,20 @@ const config = {
                 ]
             },
             {
+                test: /\.css$/,
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    {
+                        loader: "css-loader",
+                        options: cssOpt
+                    },
+                    {
+                        loader: "postcss-loader",
+                        options: postcssOpt
+                    }
+                ]
+            },
+            {
                 test: /\.(woff2?|ttf|eot|svg)$/,
                 include: path.resolve(__dirname, "src/fonts"),
                 use: {
