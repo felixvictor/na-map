@@ -413,6 +413,8 @@ export default class PortDisplay {
     }
 
     _getText(id, portProperties) {
+        moment.locale("en-gb");
+
         const pbData = this._pbData.ports.filter(port => port.id === id)[0],
             portBattleLT = moment.utc(pbData.portBattle).local(),
             portBattleST = moment.utc(pbData.portBattle),
