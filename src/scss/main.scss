@@ -42,9 +42,8 @@
 @import "~bootstrap/scss/utilities";
 //@import "~bootstrap/scss/print";
 
-@import "~tempusdominus-bootstrap-4/build/css/tempusdominus-bootstrap-4";
+@import "~tempusdominus-bootstrap-4/src/sass/tempusdominus-bootstrap-4-build";
 @import "~bootstrap-select/sass/bootstrap-select";
-@import "~round-slider/src/roundslider";
 
 html {
     font-family: $font-family-base;
