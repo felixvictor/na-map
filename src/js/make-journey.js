@@ -19,6 +19,7 @@ import moment from "moment";
 import "moment/locale/en-gb";
 
 import "round-slider/src/roundslider";
+import "round-slider/src/roundslider.css";
 
 import { compassDirections, degreesToCompass, rotationAngleInDegrees, formatF11 } from "./util";
 import { registerEvent } from "./analytics";
