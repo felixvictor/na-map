@@ -189,7 +189,6 @@ const config = {
 
     output: {
         path: outputPath,
-        filename: "js/[name].js",
         crossOriginLoading: "anonymous"
     },
 
@@ -204,7 +203,7 @@ const config = {
         new CleanWebpackPlugin(outputPath, {
             verbose: false
         }),
-        new MiniCssExtractPlugin({ filename: "css/[name].css" }),
+        new MiniCssExtractPlugin(),
         new webpack.DefinePlugin({
             DESCRIPTION: JSON.stringify(description),
             TITLE: JSON.stringify(PACKAGE.description),
