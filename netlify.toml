@@ -14,22 +14,22 @@
         Cache-Control = "max-age=2628000, must-revalidate"
 
 [[headers]]
-    for = "/*.css"
+    for = "*.css?*"
     [headers.values]
         Cache-Control = "max-age=2628000, immutable"
 
 [[headers]]
-    for = "/*.js"
+    for = "*.js?*"
     [headers.values]
         Cache-Control = "max-age=2628000, immutable"
 
 [[headers]]
-    for = "/*.json"
+    for = "*.json"
     [headers.values]
         Cache-Control = "public"
         Expires = "Tue, 06 Nov 2018 10:00:00 GMT" # bash change here
 
 [[headers]]
-    for = "/*-pb.json"
+    for = "*-pb.json"
     [headers.values]
         Cache-Control = "max-age=50, must-revalidate"
