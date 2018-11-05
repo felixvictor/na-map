@@ -7,8 +7,8 @@
  */
 
 $background-colour: $primary-500;
-$paddingHalf: 1.618/2;
-$paddingThird: 1.618/3;
+$paddingHalf: map-get($spacers, 2);
+$paddingThird: map-get($spacers, 1);
 
 #na-svg {
     background-color: $background-colour;
@@ -28,10 +28,10 @@ $paddingThird: 1.618/3;
 .journey-summary {
     @include float-right;
     background: rgba($primary-100, 0.8);
-    padding: map-get($spacers, 2);
+    padding: $paddingHalf;
 
     .block {
-        padding: map-get($spacers, 2);
+        padding: $paddingHalf;
     }
 
     .des {
@@ -98,8 +98,8 @@ p {
 }
 
 .table-sm th {
-    padding-top: $paddingHalf * 1rem;
-    padding-bottom: $paddingHalf * 1rem;
+    padding-top: $paddingHalf;
+    padding-bottom: $paddingHalf;
 }
 
 .table {
@@ -125,17 +125,17 @@ table a {
 .tooltip {
     .table-sm th,
     .table-sm td {
-        padding: 0.3rem 0;
+        padding: $paddingThird 0;
     }
 }
 
 .ship-base,
 .ship-compare {
     .block {
-        padding: 0 $paddingThird * 1rem;
+        padding: 0 $paddingThird;
     }
     .small {
-        padding: $paddingHalf * 1rem 0;
+        padding: $paddingThird 0;
     }
 }
 
@@ -159,8 +159,8 @@ table a {
             background-color: $secondary-200;
         }
         td {
-            padding-top: $paddingHalf * 1rem;
-            padding-bottom: $paddingHalf * 1rem;
+            padding-top: $paddingHalf;
+            padding-bottom: $paddingHalf;
         }
         tbody tr:nth-of-type(odd) {
             background-color: $primary-300;
@@ -178,7 +178,7 @@ table a {
     width: auto;
     th,
     td {
-        padding-right: $paddingHalf * 1rem;
+        padding-right: $paddingHalf;
     }
     td {
         text-align: right;
