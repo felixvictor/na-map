@@ -197,6 +197,7 @@ const config = {
             analyzerMode: "static",
             generateStatsFile: true,
             logLevel: "warn",
+            openAnalyzer: isProd,
             statsFilename: path.resolve(__dirname, "webpack-stats.json"),
             reportFilename: path.resolve(__dirname, "report.html")
         }),
