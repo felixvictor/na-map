@@ -14,12 +14,12 @@
         Cache-Control = "max-age=2628000, must-revalidate"
 
 [[headers]]
-    for = "*.css\?*"
+    for = "/css/*"
     [headers.values]
         Cache-Control = "max-age=2628000, immutable"
 
 [[headers]]
-    for = "*.js\?*"
+    for = "/js/*"
     [headers.values]
         Cache-Control = "max-age=2628000, immutable"
 
