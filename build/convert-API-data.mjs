@@ -28,12 +28,14 @@ String.prototype.replaceAll = function(search, replacement) {
 };
 
 function getItemNames() {
-    APIItems.filter(item => item.ItemType === "Material" || item.ItemType === "Resource").forEach(item => {
-        ItemNames.set(item.Id, {
-            name: item.Name.replaceAll("'", "’"),
-            trading: item.SortingGroup === "Resource.Trading"
-        });
-    });
+    APIItems.filter(item => !item.NotUsed && (item.ItemType === "Material" || item.ItemType === "Resource")).forEach(
+        item => {
+            ItemNames.set(item.Id, {
+                name: item.Name.replaceAll("'", "’"),
+                trading: item.SortingGroup === "Resource.Trading"
+            });
+        }
+    );
 }
 
 function convertPorts() {
@@ -147,32 +149,32 @@ function convertPorts() {
                 tradingCompany: port.TradingCompany,
                 laborHoursDiscount: port.LaborHoursDiscount,
                 producesTrading: portShop.map(shop =>
-                    shop.ResourcesProduced.filter(good => ItemNames.get(good.Key).trading)
+                    shop.ResourcesProduced.filter(good => ItemNames.has(good.Key) && ItemNames.get(good.Key).trading)
                         .map(good => ItemNames.get(good.Key).name)
                         .sort()
                 )[0],
                 dropsTrading: portShop.map(shop =>
-                    shop.ResourcesAdded.filter(good => ItemNames.get(good.Template).trading)
+                    shop.ResourcesAdded.filter(good => ItemNames.has(good.Key) && ItemNames.get(good.Template).trading)
                         .map(good => ItemNames.get(good.Template).name)
                         .sort()
                 )[0],
                 consumesTrading: portShop.map(shop =>
-                    shop.ResourcesConsumed.filter(good => ItemNames.get(good.Key).trading)
+                    shop.ResourcesConsumed.filter(good => ItemNames.has(good.Key) && ItemNames.get(good.Key).trading)
                         .map(good => ItemNames.get(good.Key).name)
                         .sort()
                 )[0],
                 producesNonTrading: portShop.map(shop =>
-                    shop.ResourcesProduced.filter(good => !ItemNames.get(good.Key).trading)
+                    shop.ResourcesProduced.filter(good => ItemNames.has(good.Key) && !ItemNames.get(good.Key).trading)
                         .map(good => ItemNames.get(good.Key).name)
                         .sort()
                 )[0],
                 dropsNonTrading: portShop.map(shop =>
-                    shop.ResourcesAdded.filter(good => !ItemNames.get(good.Template).trading)
+                    shop.ResourcesAdded.filter(good => ItemNames.has(good.Key) && !ItemNames.get(good.Template).trading)
                         .map(good => ItemNames.get(good.Template).name)
                         .sort()
                 )[0],
                 consumesNonTrading: portShop.map(shop =>
-                    shop.ResourcesConsumed.filter(good => !ItemNames.get(good.Key).trading)
+                    shop.ResourcesConsumed.filter(good => ItemNames.has(good.Key) && !ItemNames.get(good.Key).trading)
                         .map(good => ItemNames.get(good.Key).name)
                         .sort()
                 )[0]
