@@ -8,8 +8,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { range as d3Range } from "d3-array";
-import { scaleLinear as d3ScaleLinear } from "d3-scale";
 import { curveBasis as d3CurveBasis, line as d3Line } from "d3-shape";
 import { select as d3Select } from "d3-selection";
 import { intersectionArea as vennIntersectionArea } from "venn.js/src/circleintersection";
@@ -19,7 +17,7 @@ import { circleRadiusFactor, insertBaseModal } from "./common";
 /**
  * Get position
  */
-export default class TriangulatePosition {
+export default class TrilateratePosition {
     /**
      */
     constructor(ports) {
@@ -32,11 +30,15 @@ export default class TriangulatePosition {
         this._buttonId = `button-${this._baseId}`;
         this._modalId = `modal-${this._baseId}`;
 
-        this._initData();
+        this._setupSvg();
         this._setupListener();
     }
 
-    _initData() {}
+    _setupSvg() {
+        this._gPosition = d3Select("g.ports")
+            .append("g")
+            .classed("position", true);
+    }
 
     _navbarClick(event) {
         registerEvent("Menu", "Get position");
@@ -165,10 +167,6 @@ export default class TriangulatePosition {
          * @return {void}
          */
         const showAndGoToPosition = () => {
-            const gPosition = d3Select("g.ports")
-                .append("g")
-                .classed("position", true);
-
             /**
              * Get additional points to better represent position area
              * Adapted from {@link https://github.com/benfred/bens-blog-code/blob/master/circle-intersection/circle-intersection-vis.js}
@@ -223,7 +221,7 @@ export default class TriangulatePosition {
                 const points = getAreaPoints(area);
 
                 const line = d3Line().curve(d3CurveBasis);
-                gPosition.append("path").attr("d", line(points));
+                this._gPosition.append("path").attr("d", line(points));
             };
 
             /**
@@ -248,7 +246,8 @@ export default class TriangulatePosition {
             if (area.innerPoints.length) {
                 displayArea(area);
 
-                const bbox = d3Select("g.ports path")
+                const bbox = this._gPosition
+                        .select("path")
                         .node()
                         .getBBox(),
                     centroid = { x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2 };
@@ -323,5 +322,13 @@ export default class TriangulatePosition {
             .on("hidden.bs.modal", () => {
                 this._useUserInput();
             });
+    }
+
+    /**
+     * Clear map
+     * @return {void}
+     */
+    clearMap() {
+        this._gPosition.selectAll("*").remove();
     }
 }
