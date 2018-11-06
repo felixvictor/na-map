@@ -190,7 +190,7 @@ const config = {
 
     output: {
         chunkFilename: "[name].[chunkhash].bundle.js",
-        filename: "[name].[chunkhash].js",
+        filename: "[name].[hash].js",
         path: outputPath,
         crossOriginLoading: "anonymous"
     },
