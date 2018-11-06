@@ -19,7 +19,7 @@ import {
     convertCoordY
 } from "./common";
 import { formatInt, formatSiInt, formatPercent, roundToThousands, degreesToRadians } from "./util";
-import TriangulatePosition from "./get-position";
+import TrilateratePosition from "./get-position";
 
 export default class PortDisplay {
     constructor(portData, pbData, map) {
@@ -35,8 +35,6 @@ export default class PortDisplay {
 
         this.showCurrentGood = false;
         this.showTradePortPartners = false;
-
-        this._triangulatePosition = new TriangulatePosition(this);
 
         // Shroud Cay
         this._currentPort = { id: "366", coord: { x: 4396, y: 2494 } };
@@ -86,6 +84,8 @@ export default class PortDisplay {
         this._setupRegions();
         this._setupSummary();
         this._setupFlags();
+
+        this._trilateratePosition = new TrilateratePosition(this);
     }
 
     _setupListener() {
@@ -970,6 +970,7 @@ export default class PortDisplay {
         if (this._showRadius === "position") {
             this._showRadius = "off";
         }
+        this._trilateratePosition.clearMap();
         this._showSummary();
         this._portData = this._portDataDefault;
         this.showCurrentGood = false;
