@@ -17,7 +17,7 @@ const formatLocale = d3FormatLocale({
     decimal: ".",
     thousands: "\u202f",
     grouping: [3],
-    currency: ["", "\u00a0gold"],
+    currency: ["", "\u00a0reals"],
     percent: "\u202f%"
 });
 
