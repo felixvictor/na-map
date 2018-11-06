@@ -579,15 +579,34 @@ export default class Journey {
         )}\u202f/\u202f${formatF11(convertInvCoordY(pt1.x, pt1.y))}`;
     }
 
-    _getTextDistance(distanceK, minutes, addTotal) {
-        moment.locale("en-gb");
+    _getTextDistance(distanceK, minuteString, addTotal) {
+        function getHumanisedDuration(duration) {
+            moment.locale("en-gb");
 
-        const duration = moment.duration(minutes, "minutes").humanize(true);
-        let textDistance = `${Math.round(distanceK)}k ${duration}`;
+            function pluralize(num, word) {
+                return `${num} ${word + (num === 1 ? "" : "s")}`;
+            }
+
+            const hours = Math.floor(duration / 60),
+                minutes = Math.round(duration % 60);
+            console.log(duration, hours, minutes);
+            let s = "in ";
+            if (duration < 1.0) {
+                s += "less than a minute";
+            } else {
+                const hourString = hours !== 0 ? pluralize(hours, "hour") : "",
+                    minuteString = minutes !== 0 ? pluralize(minutes, "minute") : "";
+                s += hourString + (hourString !== "" ? " " : "") + minuteString;
+            }
+            return s;
+        }
+
+        let textDistance = `${Math.round(distanceK)}k ${getHumanisedDuration(minuteString)}`;
 
         if (addTotal) {
-            const totalDuration = moment.duration(this._journey.totalMinutes, "minutes").humanize(true);
-            textDistance += ` \u2606 total ${Math.round(this._journey.totalDistance)}k ${totalDuration}`;
+            textDistance += ` \u2606 total ${Math.round(this._journey.totalDistance)}k ${getHumanisedDuration(
+                this._journey.totalMinutes
+            )}`;
         }
         return textDistance;
     }
