@@ -26,6 +26,7 @@ const outputPath = path.resolve(__dirname, "public");
 
 const babelOpt = {
     cacheDirectory: true,
+    plugins: ["@babel/plugin-syntax-dynamic-import"],
     presets: [
         [
             "@babel/preset-env",
@@ -188,6 +189,8 @@ const config = {
     },
 
     output: {
+        chunkFilename: "[name].[chunkhash].bundle.js",
+        filename: "[name].[chunkhash].js",
         path: outputPath,
         crossOriginLoading: "anonymous"
     },
@@ -204,7 +207,7 @@ const config = {
         new CleanWebpackPlugin(outputPath, {
             verbose: false
         }),
-        new MiniCssExtractPlugin(),
+        new MiniCssExtractPlugin({ filename: "[name].[chunkhash].css" }),
         new webpack.DefinePlugin({
             DESCRIPTION: JSON.stringify(description),
             TITLE: JSON.stringify(PACKAGE.description),
@@ -239,7 +242,7 @@ const config = {
             brand: "images/icons/favicon-32x32.png",
             description,
             gtag: gtagLink,
-            hash: true,
+            hash: false,
             inject: "body",
             lang: "en-GB",
             meta: { viewport: "width=device-width, initial-scale=1, shrink-to-fit=no" },
