@@ -138,6 +138,13 @@ export function initMultiDropdownNavbar(id) {
     });
 }
 
+/**
+ * Get currency
+ * @param {int|string }amount - Amount
+ * @return {string} Currency string
+ */
+export const getCurrencyAmount = amount => `${amount}\u00a0real${+amount > 1 ? "s" : ""}`;
+
 // eslint-disable-next-line no-undef
 export const appDescription = DESCRIPTION;
 // eslint-disable-next-line no-undef

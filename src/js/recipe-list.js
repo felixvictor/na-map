@@ -4,7 +4,7 @@
 import { select as d3Select } from "d3-selection";
 import { formatInt, formatPercent, formatSignPercent } from "./util";
 import { registerEvent } from "./analytics";
-import { insertBaseModal } from "./common";
+import { getCurrencyAmount, insertBaseModal } from "./common";
 
 export default class Recipe {
     constructor(recipeData, moduleData) {
@@ -91,7 +91,7 @@ export default class Recipe {
             text += `<tr><td>${currentRecipe.laborPrice} labour hours</td></tr>`;
         }
         if (currentRecipe.goldPrice) {
-            text += `<tr><td>${currentRecipe.goldPrice} gold</td></tr>`;
+            text += `<tr><td>${getCurrencyAmount(currentRecipe.goldPrice)}</td></tr>`;
         }
         if (currentRecipe.itemRequirements.length) {
             text += `<tr><td>${currentRecipe.itemRequirements
