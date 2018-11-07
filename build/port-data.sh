@@ -22,6 +22,15 @@ SERVER_TWITTER_NAMES=(eu1)
 API_VARS=(ItemTemplates Ports Shops)
 SERVER_MAINTENANCE_HOUR=10
 HEADER_DATE=$(LC_TIME="en" date -u +"%a, %d %b %Y 10:00:00 GMT" -d "+1 day")
+# Set server date
+if [[ "$(date -u '+%H')" -lt "${SERVER_MAINTENANCE_HOUR}" ]]; then
+    DATE=$(date -u '+%Y-%m-%d' --date "-1 day")
+    LAST_DATE=$(date -u '+%Y-%m-%d' --date "-2 day")
+else
+    DATE=$(date -u '+%Y-%m-%d')
+    LAST_DATE=$(date -u '+%Y-%m-%d' --date "-1 day")
+fi
+NETLIFY_TOML="netlify.toml"
 LAST_FUNCTION=""
 
 function get_current_branch() {
@@ -46,7 +55,7 @@ function pull_all () {
 
 function on_exit () {
     # If git push fails, git pull first
-    if [ "${LAST_FUNCTION}" == "push_data" ]; then
+    if [[ "${LAST_FUNCTION}" == "push_data" ]]; then
         pull_all
         git_push_all
         exit 0
@@ -65,17 +74,6 @@ function update_var () {
 }
 
 function common_var () {
-    # Set server date
-    if [ "$(date -u '+%H')" -lt "${SERVER_MAINTENANCE_HOUR}" ]; then
-        DATE=$(date -u '+%Y-%m-%d' --date "-1 day")
-        LAST_DATE=$(date -u '+%Y-%m-%d' --date "-2 day")
-    else
-        DATE=$(date -u '+%Y-%m-%d')
-        LAST_DATE=$(date -u '+%Y-%m-%d' --date "-1 day")
-    fi
-
-    export DATE
-    export LAST_DATE
     export BUILD_DIR="${BASE_DIR}/build"
     export SRC_DIR="${BASE_DIR}/src"
     export LAST_UPDATE_FILE="${BUILD_DIR}/.last-port-update"
@@ -87,8 +85,10 @@ function common_var () {
     export NATION_FILE="${SRC_DIR}/nations.json"
     export LOOT_FILE="${SRC_DIR}/loot.json"
     export EXCEL_FILE="${SRC_DIR}/port-battle.xlsx"
+    CSS_FILE=$(find "${BASE_DIR}/public/" -type f  -regextype posix-extended -regex "${BASE_DIR}/public/${MODULE}\.[[:alnum:]]+\.css$")
+    export CSS_FILE
     export TWEETS_JSON="${BUILD_DIR}/API/tweets.json"
-    export NETLIFY_TOML="netlify.toml"
+
 }
 
 function get_API_data () {
@@ -96,7 +96,7 @@ function get_API_data () {
     OUT_FILE="$2"
     API_VAR="$3"
     URL="${SOURCE_BASE_URL}${API_VAR}_${SERVER_BASE_NAME}${SERVER_NAME}.json"
-    if [ ! -f "${OUT_FILE}" ]; then
+    if [[ ! -f "${OUT_FILE}" ]]; then
         curl --silent --output "${OUT_FILE}" "${URL}"
         sed -i -e "s/^var $API_VAR = //; s/\\;$//" "${OUT_FILE}"
     fi
@@ -109,7 +109,7 @@ function get_git_update () {
     LOCAL=$(git rev-parse @)
     BASE=$(git merge-base @ "@{u}")
 
-    if [ "${LOCAL}" == "${BASE}" ]; then
+    if [[ "${LOCAL}" == "${BASE}" ]]; then
         git pull
     fi
 }
@@ -141,7 +141,7 @@ function get_port_data () {
     mkdir -p "${API_DIR}"
     if test_for_update "${API_BASE_FILE}"; then
         for JSON in "${API_DIR}"/*.json; do
-            if [ "${JSON}" != "${TWEETS_JSON}" ]; then
+            if [[ "${JSON}" != "${TWEETS_JSON}" ]]; then
                 ${XZ} -9ef "${JSON}"
             fi
         done
@@ -176,11 +176,11 @@ function get_port_data () {
         ${NODE} build/convert-buildings.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${BUILDING_FILE}" "${DATE}"
         ${NODE} build/convert-loot.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${LOOT_FILE}" "${DATE}"
         ${NODE} build/convert-recipes.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${RECIPE_FILE}" "${DATE}"
-        if [ "${SCRIPT_RUN_TYPE}" == "update" ]; then
+        if [[ "${SCRIPT_RUN_TYPE}" == "update" ]]; then
             ${NODE} build/convert-ownership.mjs "${API_DIR}" "${OWNERSHIP_FILE}" "${NATION_FILE}"
         fi
 
-        ${NODE} build/create-xlsx.mjs "${SHIP_FILE}" "${SRC_DIR}/${SERVER_NAMES[0]}.json" "${BASE_DIR}/public/${MODULE}.css" "${EXCEL_FILE}"
+        ${NODE} build/create-xlsx.mjs "${SHIP_FILE}" "${SRC_DIR}/${SERVER_NAMES[0]}.json" "${CSS_FILE}" "${EXCEL_FILE}"
 
         return 0
     else
@@ -206,7 +206,7 @@ function get_tweets () {
     QUERY="/1.1/search/tweets.json?q=from:zz569k&tweet_mode=extended&count=100&result_type=recent"
     JQ_FORMAT="{ tweets: [ .statuses[] | { id: .id_str, text: .full_text } ], refresh: .search_metadata.max_id_str }"
 
-    if [ -f "${TWEETS_JSON}" ]; then
+    if [[ -f "${TWEETS_JSON}" ]]; then
         SINCE=$(${NODE} -pe 'JSON.parse(process.argv[1]).refresh' "$(cat "${TWEETS_JSON}")")
         QUERY+="&since_id=${SINCE}"
     fi
@@ -259,7 +259,7 @@ function push_data () {
     git add --ignore-errors .
     if [[ -n $(git status -s) ]]; then
         GIT_MESSAGE=""
-        if [ "${SCRIPT_RUN_TYPE}" == "update" ]; then
+        if [[ "${SCRIPT_RUN_TYPE}" == "update" ]]; then
             GIT_MESSAGE+="squash! "
             touch "${LAST_UPDATE_FILE}"
         fi
@@ -280,7 +280,7 @@ function update_data () {
     fi
     LAST_UPDATE=$(date --reference="${LAST_UPDATE_FILE}" +%Y-%m-%d)
     # Test if already updated today
-    if [ "${LAST_UPDATE}" != "${DATE}" ]; then
+    if [[ "${LAST_UPDATE}" != "${DATE}" ]]; then
         update_yarn
         get_git_update
         # Test if new API data available
@@ -314,7 +314,7 @@ case "$1" in
         push_data
         ;;
     update)
-     	        SCRIPT_RUN_TYPE="update"
+        SCRIPT_RUN_TYPE="update"
         update_var
         log_date
         update_data
