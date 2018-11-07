@@ -272,7 +272,7 @@ export const defaultCircleSize = 16;
  * @param {Number} x - Integer
  * @return {Number} Rounded input
  */
-export const roundToThousands = x => Math.round(x * 1000) / 1000;
+export const roundToThousands = x => Math.round(x * 1e4) / 1e4;
 
 export const speedConstA = 0.074465523706782;
 export const speedConstB = 0.00272175949231;
