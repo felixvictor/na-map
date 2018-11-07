@@ -170,7 +170,9 @@ const config = {
     },
 
     optimization: {
-        runtimeChunk: "single",
+        runtimeChunk: {
+            name: "manifest"
+        },
         splitChunks: {
             cacheGroups: {
                 styles: {
@@ -189,8 +191,8 @@ const config = {
     },
 
     output: {
-        chunkFilename: "[name].[chunkhash].bundle.js",
-        filename: "[name].[hash].js",
+        chunkFilename: isProd ? "[name].[chunkhash].bundle.js" : "[name].bundle.js",
+        filename: isProd ? "[name].[hash].js" : "[name].js",
         path: outputPath,
         crossOriginLoading: "anonymous"
     },
@@ -207,7 +209,7 @@ const config = {
         new CleanWebpackPlugin(outputPath, {
             verbose: false
         }),
-        new MiniCssExtractPlugin({ filename: "[name].[chunkhash].css" }),
+        new MiniCssExtractPlugin({ filename: isProd ? "[name].[contenthash].css" : "[name].css" }),
         new webpack.DefinePlugin({
             DESCRIPTION: JSON.stringify(description),
             TITLE: JSON.stringify(PACKAGE.description),
