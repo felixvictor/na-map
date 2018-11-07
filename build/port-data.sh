@@ -85,7 +85,7 @@ function common_var () {
     export NATION_FILE="${SRC_DIR}/nations.json"
     export LOOT_FILE="${SRC_DIR}/loot.json"
     export EXCEL_FILE="${SRC_DIR}/port-battle.xlsx"
-    CSS_FILE=$(find "${BASE_DIR}/public/" -type f  -regextype posix-extended -regex "${BASE_DIR}/public/${MODULE}\.[[:alnum:]]+\.css$")
+    CSS_FILE=$(find "${BASE_DIR}/public/" -type f  -regextype posix-extended -regex "${BASE_DIR}/public/${MODULE}(\.[[:alnum:]]+)?\.css$")
     export CSS_FILE
     export TWEETS_JSON="${BUILD_DIR}/API/tweets.json"
 
