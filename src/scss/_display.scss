@@ -45,15 +45,14 @@ $paddingThird: map-get($spacers, 1);
 .ports {
     .port-circles {
         circle.position {
-          fill-opacity: 0.4;
-          fill: $white;
-
+            fill-opacity: 0.4;
+            fill: $white;
         }
     }
     g.position path {
-      //    stroke: $green;
-      fill: $green;
-      fill-opacity: 0.6;
+        //    stroke: $green;
+        fill: $green;
+        fill-opacity: 0.6;
     }
 }
 
@@ -92,14 +91,13 @@ pattern .all {
     background-color: $primary-100;
 }
 
+.table .table {
+    background-color: $primary-200;
+}
+
 table tr,
 p {
     text-align: left;
-}
-
-.table-sm th {
-    padding-top: $paddingHalf;
-    padding-bottom: $paddingHalf;
 }
 
 .table {
@@ -120,13 +118,9 @@ table a {
     }
 }
 
-.recipes,
-.product,
-.tooltip {
-    .table-sm th,
-    .table-sm td {
-        padding: $paddingThird 0;
-    }
+.table-sm th,
+.table-sm td {
+    padding: $paddingThird/2;
 }
 
 .ship-base,

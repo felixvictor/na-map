@@ -18,7 +18,7 @@ import {
     convertCoordX,
     convertCoordY
 } from "./common";
-import { formatInt, formatSiInt, formatPercent, roundToThousands, degreesToRadians } from "./util";
+import { formatInt, formatSiInt, formatPercent, roundToThousands, degreesToRadians, formatFloatFixed } from "./util";
 import TrilateratePosition from "./get-position";
 
 export default class PortDisplay {
@@ -463,12 +463,42 @@ export default class PortDisplay {
                 laborHoursDiscount: portProperties.laborHoursDiscount
                     ? `, labor hours discount level\u202f${portProperties.laborHoursDiscount}`
                     : "",
-                producesTrading: portProperties.producesTrading.join(", "),
-                dropsTrading: portProperties.dropsTrading.join(", "),
-                producesNonTrading: portProperties.producesNonTrading.join(", "),
-                dropsNonTrading: portProperties.dropsNonTrading.join(", "),
-                consumesTrading: portProperties.consumesTrading.join(", "),
-                consumesNonTrading: portProperties.consumesNonTrading.join(", "),
+                dropsTrading: portProperties.dropsTrading
+                    ? portProperties.dropsTrading
+                          .map(
+                              good =>
+                                  `<tr><td>${good.name}</td><td class="text-right">${
+                                      good.amount
+                                  }</td><td class="text-right">${formatFloatFixed(
+                                      roundToThousands(good.chance * 100)
+                                  )}</td></tr>`
+                          )
+                          .join("")
+                    : "",
+                consumesTrading: portProperties.consumesTrading
+                    ? portProperties.consumesTrading
+                          .map(good => good.name)
+                          .sort()
+                          .join(", ")
+                    : "",
+                producesNonTrading: portProperties.producesNonTrading
+                    ? portProperties.producesNonTrading
+                          .map(good => good.name)
+                          .sort()
+                          .join(", ")
+                    : "",
+                dropsNonTrading: portProperties.dropsNonTrading
+                    ? portProperties.dropsNonTrading
+                          .map(
+                              good =>
+                                  `<tr><td><span class="non-trading">${good.name}</span></td><td class="text-right">${
+                                      good.amount
+                                  }</td><td class="text-right">${formatFloatFixed(
+                                      roundToThousands(good.chance * 100)
+                                  )}</td></tr>`
+                          )
+                          .join("")
+                    : "",
                 tradePort: this._getPortName(this.tradePortId),
                 goodsToSellInTradePort: portProperties.goodsToSellInTradePort
                     ? portProperties.goodsToSellInTradePort.join(", ")
@@ -495,7 +525,7 @@ export default class PortDisplay {
 
     _showDetails(d, i, nodes) {
         function tooltipData(port) {
-            let h = `<table><tbody<tr><td><i class="flag-icon ${port.icon}"></i></td>`;
+            let h = `<table><tbody><tr><td><i class="flag-icon ${port.icon}"></i></td>`;
             h += `<td><span class="port-name">${port.name}</span>`;
             h += `\u2001${port.county} ${port.availableForAll}`;
             h += "</td></tr></tbody></table>";
@@ -517,44 +547,27 @@ export default class PortDisplay {
             }
             h += "</p>";
             h += "<table class='table table-sm'>";
-            if (port.producesTrading.length || port.producesNonTrading.length) {
-                h += `<tr><td>Produces${port.producesNonTrading.length ? "\u00a0" : ""}</td><td>`;
-                if (port.producesNonTrading.length) {
-                    h += `<span class="non-trading">${port.producesNonTrading}</span>`;
-                    if (port.producesTrading.length) {
-                        h += "<br>";
-                    }
-                }
-                if (port.producesTrading.length) {
-                    h += `${port.producesTrading}`;
-                }
+            if (port.producesNonTrading.length) {
+                h += "<tr><td>Produces\u00a0</td><td>";
+                h += `<span class="non-trading">${port.producesNonTrading}</span>`;
+                h += "</td></tr>";
+            }
+            if (port.consumesTrading.length) {
+                h += "<tr><td>Consumes\u00a0</td><td>";
+                h += port.consumesTrading;
                 h += "</td></tr>";
             }
             if (port.dropsTrading.length || port.dropsNonTrading.length) {
-                h += `<tr><td>Drops${port.dropsNonTrading.length ? "\u00a0" : ""}</td><td>`;
+                h += "<tr><td>Drops\u00a0</td><td>";
+                h +=
+                    '<table class="table table-sm"><thead><tr><th></th><th class="text-right">Amount</th><th class="text-right">Chance (%)</th></tr></thead><tbody>';
                 if (port.dropsNonTrading.length) {
-                    h += `<span class="non-trading">${port.dropsNonTrading}</span>`;
-                    if (port.dropsTrading.length) {
-                        h += "<br>";
-                    }
+                    h += `${port.dropsNonTrading}`;
                 }
                 if (port.dropsTrading.length) {
                     h += `${port.dropsTrading}`;
                 }
-                h += "</td></tr>";
-            }
-            if (port.consumesTrading.length || port.consumesNonTrading.length) {
-                h += `<tr><td>Consumes${port.consumesNonTrading.length ? "\u00a0" : ""}</td><td>`;
-                if (port.consumesNonTrading.length) {
-                    h += `<span class="non-trading">${port.consumesNonTrading}</span>`;
-                    if (port.consumesTrading.length) {
-                        h += "<br>";
-                    }
-                }
-                if (port.consumesTrading.length) {
-                    h += `${port.consumesTrading}`;
-                }
-                h += "</td></tr>";
+                h += "</tbody></table></td></tr>";
             }
             if (port.goodsToSellInTradePort.length) {
                 h += `<tr><td>Sell in ${port.tradePort}</td><td>${port.goodsToSellInTradePort}</td></tr>`;
@@ -563,7 +576,7 @@ export default class PortDisplay {
                 h += `<tr><td>Buy in ${port.tradePort}</td><td>${port.goodsToBuyInTradePort}</td></tr>`;
             }
             h += "</table>";
-
+            console.log(h);
             return h;
         }
 
