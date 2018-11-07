@@ -4,6 +4,7 @@ import {
     capitalToCounty,
     convertCoordX,
     convertCoordY,
+    isEmpty,
     rotationAngleInDegrees,
     readJson,
     saveJson
@@ -154,7 +155,9 @@ function convertPorts() {
                         .sort()
                 )[0],
                 dropsTrading: portShop.map(shop =>
-                    shop.ResourcesAdded.filter(good => ItemNames.has(good.Key) && ItemNames.get(good.Template).trading)
+                    shop.ResourcesAdded.filter(
+                        good => ItemNames.has(good.Template) && ItemNames.get(good.Template).trading
+                    )
                         .map(good => ItemNames.get(good.Template).name)
                         .sort()
                 )[0],
@@ -169,7 +172,9 @@ function convertPorts() {
                         .sort()
                 )[0],
                 dropsNonTrading: portShop.map(shop =>
-                    shop.ResourcesAdded.filter(good => ItemNames.has(good.Key) && !ItemNames.get(good.Template).trading)
+                    shop.ResourcesAdded.filter(
+                        good => ItemNames.has(good.Template) && !ItemNames.get(good.Template).trading
+                    )
                         .map(good => ItemNames.get(good.Template).name)
                         .sort()
                 )[0],
