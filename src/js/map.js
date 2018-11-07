@@ -30,7 +30,6 @@ import PortDisplay from "./port";
 import PortSelect from "./port-select";
 import Recipe from "./recipe-list";
 import ShipCompare from "./ship-compare";
-import Teleport from "./teleport";
 import WindPrediction from "./wind-prediction";
 import WoodCompare from "./wood-compare";
 import WoodList from "./wood-list";
@@ -284,7 +283,6 @@ export default class Map {
         this._buildingList = new Building(buildingData);
 
         this._journey = new Journey(shipData, woodData, this.rem);
-        this._teleport = new Teleport(this.coord, this._ports);
         this._portSelect = new PortSelect(this._ports, this._pbZone);
         this._windPrediction = new WindPrediction();
         this._grid = new Grid(this);
@@ -401,15 +399,10 @@ export default class Map {
     }
 
     _refreshLayer() {
-        const showGrid = this._showLayer === "grid",
-            showTeleport = this._showLayer === "teleport";
+        const showGrid = this._showLayer === "grid";
 
         this._grid.show = showGrid;
         this._grid.update();
-
-        this._teleport.show = showTeleport;
-        this._teleport.setData();
-        this._teleport.update();
     }
 
     _displayMap(transform) {
@@ -540,8 +533,6 @@ export default class Map {
     _updateCurrent() {
         this._pbZone.refresh();
         this._grid.update();
-        this._teleport.setData();
-        this._teleport.update();
         this._ports.update(this._currentScale);
     }
 
@@ -593,7 +584,6 @@ export default class Map {
         this._displayMap(zoomTransform);
         this._grid.transform(zoomTransform);
         this._ports.transform(zoomTransform);
-        this._teleport.transform(zoomTransform);
         this._journey.transform(zoomTransform);
         this._pbZone.transform(zoomTransform);
         this._f11.transform(zoomTransform);
@@ -616,7 +606,6 @@ export default class Map {
         this._zoomLevel = zoomLevel;
         this._ports.zoomLevel = zoomLevel;
         this._grid.zoomLevel = zoomLevel;
-        this._teleport.zoomLevel = zoomLevel;
     }
 
     resize() {
