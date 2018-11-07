@@ -87,11 +87,12 @@ export const formatSiInt = x =>
  * Format percent value
  * @function
  * @param {Number} x - Percent
+ * @param {Number} f - digits following decimal point
  * @return {String} Formatted percent value
  */
-export const formatPercent = x =>
+export const formatPercent = (x, f = 1) =>
     formatLocale
-        .format(".1%")(x)
+        .format(`.${f}%`)(x)
         .replace(".0", "")
         .replace("-", "\u2212\u202f");
 
