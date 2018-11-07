@@ -7,6 +7,7 @@
         "@babel/highlight": "^7.0.0",
         "@babel/plugin-syntax-dynamic-import": "^7.0.0",
         "@babel/preset-env": "7.1.0",
+        "angular-html-parser": "^1.0.0",
         "autoprefixer": "^9.3.1",
         "babel-eslint": "^10.0.1",
         "babel-loader": "^8.0.4",
@@ -43,9 +44,11 @@
         "postcss-cli": "^6.0.1",
         "postcss-crass": "^0.2.1",
         "postcss-loader": "^3.0.0",
+        "postcss-scss": "^2.0.0",
         "prettier": "^1.14.3",
         "read-css": "^0.3.0",
         "recursive-readdir": "^2.2.2",
+        "remark-parse": "^6.0.1",
         "sass-loader": "^7.0.2",
         "shapefile": "^0.6.6",
         "sharp": "^0.21.0",
@@ -58,7 +61,9 @@
         "webpack-bundle-analyzer": "^3.0.3",
         "webpack-cli": "^3.1.2",
         "webpack-subresource-integrity": "^1.2.0",
-        "xml2json": "^0.11.2"
+        "xml2json": "^0.11.2",
+        "yaml": "^1.0.0",
+        "yaml-unist-parser": "^1.0.0-rc.4"
     },
     "dependencies": {
         "@fortawesome/fontawesome": "^1.1.2",
