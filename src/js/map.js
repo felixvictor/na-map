@@ -408,73 +408,66 @@ export default class Map {
     _displayMap(transform) {
         // Based on d3-tile v0.0.3
         // https://github.com/d3/d3-tile/blob/0f8cc9f52564d4439845f651c5fab2fcc2fdef9e/src/tile.js
-        const log2tileSize = Math.log2(this._tileSize),
+        const { x: tx, y: ty, k: tk } = transform,
+            log2tileSize = Math.log2(this._tileSize),
             maxTileZoom = Math.log2(this.coord.max) - log2tileSize,
+            maxCoordScaled = this.coord.max * tk,
             x0 = 0,
             y0 = 0,
             x1 = this.width,
             y1 = this.height,
-            width = Math.floor(
-                this.coord.max * transform.k < this.width ? this.width - 2 * transform.x : this.coord.max * transform.k
-            ),
-            height = Math.floor(
-                this.coord.max * transform.k < this.height
-                    ? this.height - 2 * transform.y
-                    : this.coord.max * transform.k
-            ),
-            scale = Math.log2(transform.k);
+            width = Math.floor(maxCoordScaled < this.width ? this.width - 2 * tx : maxCoordScaled),
+            height = Math.floor(maxCoordScaled < this.height ? this.height - 2 * ty : maxCoordScaled),
+            scale = Math.log2(tk);
 
         const tileZoom = Math.min(maxTileZoom, Math.ceil(Math.log2(Math.max(width, height))) - log2tileSize),
-            p = Math.round(tileZoom * 10 - scale * 10 - maxTileZoom * 10) / 10,
-            k = this._wheelDelta ** p;
+            p = Math.round((tileZoom - scale - maxTileZoom) * 10) / 10,
+            k = this._wheelDelta ** p,
+            tileSizeScaled = this._tileSize * k;
 
-        const { x } = transform,
-            { y } = transform,
-            // crop right side
-            dx = this.coord.max * transform.k < this.width ? transform.x : 0,
+        const // crop right side
+            dx = maxCoordScaled < this.width ? tx : 0,
             // crop bottom
-            dy = this.coord.max * transform.k < this.height ? transform.y : 0,
+            dy = maxCoordScaled < this.height ? ty : 0,
             cols = d3Range(
-                Math.max(0, Math.floor((x0 - x) / this._tileSize / k)),
-                Math.max(0, Math.min(Math.ceil((x1 - x - dx) / this._tileSize / k), 2 ** tileZoom))
+                Math.max(0, Math.floor((x0 - tx) / tileSizeScaled)),
+                Math.max(0, Math.min(Math.ceil((x1 - tx - dx) / tileSizeScaled), 2 ** tileZoom))
             ),
             rows = d3Range(
-                Math.max(0, Math.floor((y0 - y) / this._tileSize / k)),
-                Math.max(0, Math.min(Math.ceil((y1 - y - dy) / this._tileSize / k), 2 ** tileZoom))
+                Math.max(0, Math.floor((y0 - ty) / tileSizeScaled)),
+                Math.max(0, Math.min(Math.ceil((y1 - ty - dy) / tileSizeScaled), 2 ** tileZoom))
             ),
             tiles = [];
 
         rows.forEach(row => {
             cols.forEach(col => {
-                tiles.push([col, row, tileZoom]);
+                tiles.push({
+                    z: tileZoom,
+                    row,
+                    col,
+                    id: `${tileZoom.toString()}-${row.toString()}-${col.toString()}`
+                });
             });
         });
-
-        tiles.translate = [x, y];
-        tiles.scale = k;
+        tiles.transform = d3ZoomIdentity.translate(tx, ty).scale(roundToThousands(k));
 
         this._updateMap(tiles);
     }
 
     _updateMap(tiles) {
-        // noinspection JSSuspiciousNameCombination
-        const tileTransform = d3ZoomIdentity
-            .translate(Math.round(tiles.translate[0]), Math.round(tiles.translate[1]))
-            .scale(Math.round(tiles.scale * 1000) / 1000);
-
         const image = this._gMap
-            .attr("transform", tileTransform)
+            .attr("transform", tiles.transform)
             .selectAll("image")
-            .data(tiles, d => d);
+            .data(tiles, d => d.id);
 
         image.exit().remove();
 
         image
             .enter()
             .append("image")
-            .attr("xlink:href", d => `images/map/${d[2]}/${d[1]}/${d[0]}.jpg`)
-            .attr("x", d => d[0] * this._tileSize)
-            .attr("y", d => d[1] * this._tileSize)
+            .attr("xlink:href", d => `images/map/${d.z}/${d.row}/${d.col}.jpg`)
+            .attr("x", d => d.col * this._tileSize)
+            .attr("y", d => d.row * this._tileSize)
             .attr("width", this._tileSize)
             .attr("height", this._tileSize);
     }
@@ -570,8 +563,8 @@ export default class Map {
          * @property {number} k - Scale factor
          */
 
-        this._currentTranslate.x = Math.round(d3Event.transform.x);
-        this._currentTranslate.y = Math.round(d3Event.transform.y);
+        this._currentTranslate.x = Math.floor(d3Event.transform.x);
+        this._currentTranslate.y = Math.floor(d3Event.transform.y);
 
         /**
          * Current transform
