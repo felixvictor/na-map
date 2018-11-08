@@ -268,11 +268,19 @@ export const defaultFontSize = 16;
 export const defaultCircleSize = 16;
 
 /**
+ * {@link https://github.com/30-seconds/30-seconds-of-code#round}
+ * @param {number} n - number
+ * @param {number} decimals - decimals
+ * @return {number} Rounded number
+ */
+const round = (n, decimals = 0) => Number(`${Math.round(`${n}e${decimals}`)}e-${decimals}`);
+
+/**
  * Round to thousands
  * @param {Number} x - Integer
  * @return {Number} Rounded input
  */
-export const roundToThousands = x => Math.round(x * 1e4) / 1e4;
+export const roundToThousands = x => round(x, 3);
 
 export const speedConstA = 0.074465523706782;
 export const speedConstB = 0.00272175949231;

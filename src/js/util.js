@@ -121,11 +121,19 @@ export function getOrdinal(n) {
 }
 
 /**
+ * {@link https://github.com/30-seconds/30-seconds-of-code#round}
+ * @param {number} n - number
+ * @param {number} decimals - decimals
+ * @return {number} Rounded number
+ */
+const round = (n, decimals = 0) => Number(`${Math.round(`${n}e${decimals}`)}e-${decimals}`);
+
+/**
  * Round to thousands
  * @param {Number} x - Integer
  * @return {Number} Rounded input
  */
-export const roundToThousands = x => Math.round(x * 1000) / 1000;
+export const roundToThousands = x => round(x, 3);
 
 /**
  * Test if object is empty
