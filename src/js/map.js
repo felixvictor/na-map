@@ -195,6 +195,7 @@ export default class Map {
          */
         this._showLayer = this._getShowLayer();
 
+        this._setHeightWidth();
         this._setupSvg();
         this._setSvgSize();
         this._setupListener();
@@ -346,9 +347,31 @@ export default class Map {
     }
 
     _setupSvg() {
+        this._minScale = nearestPow2(Math.min(this.width / this.coord.max, this.height / this.coord.max));
+
+        /**
+         * Current map scale
+         * @type {Number}
+         * @private
+         */
+        this._currentScale = this._minScale;
+        this._zoomLevel = "initial";
+        this._zoom = d3Zoom()
+            .wheelDelta(() => -this._wheelDelta * Math.sign(d3Event.deltaY))
+            .translateExtent([
+                [
+                    this.coord.min - this.yGridBackgroundWidth * this._minScale,
+                    this.coord.min - this.xGridBackgroundHeight * this._minScale
+                ],
+                [this.coord.max, this.coord.max]
+            ])
+            .scaleExtent([this._minScale, this._maxScale])
+            .on("zoom", () => this._naZoomed());
+
         this.svg = d3Select("#na-map")
             .append("svg")
-            .attr("id", "na-svg");
+            .attr("id", "na-svg")
+            .call(this._zoom);
 
         this.svg.append("defs");
 
@@ -606,6 +629,7 @@ export default class Map {
             .translate(this._currentTranslate.x, this._currentTranslate.y)
             .scale(this._currentScale);
 
+        this._setHeightWidth();
         this._setSvgSize();
         this._displayMap(zoomTransform);
         this._grid.update();
@@ -619,6 +643,7 @@ export default class Map {
 
     _getWidth() {
         const { width } = this._getDimensions();
+        console.log({ dim: this._getDimensions() }, { width });
 
         return Math.floor(width);
     }
@@ -626,11 +651,11 @@ export default class Map {
     _getHeight() {
         const { top } = this._getDimensions(),
             fullHeight = document.documentElement.clientHeight - this.rem;
-
+        console.log({ fullHeight }, { dim: this._getDimensions() }, { top }, { height: Math.floor(fullHeight - top) });
         return Math.floor(fullHeight - top);
     }
 
-    _setSvgSize() {
+    _setHeightWidth() {
         /**
          * Width of map svg (screen coordinates)
          * @type {Number}
@@ -642,32 +667,10 @@ export default class Map {
          * @type {Number}
          */
         this.height = this._getHeight();
+    }
 
-        this._minScale = nearestPow2(Math.min(this.width / this.coord.max, this.height / this.coord.max));
-
-        /**
-         * Current map scale
-         * @type {Number}
-         * @private
-         */
-        this._currentScale = this._minScale;
-        this._zoomLevel = "initial";
-        this._zoom = d3Zoom()
-            .wheelDelta(() => -this._wheelDelta * Math.sign(d3Event.deltaY))
-            .translateExtent([
-                [
-                    this.coord.min - this.yGridBackgroundWidth * this._minScale,
-                    this.coord.min - this.xGridBackgroundHeight * this._minScale
-                ],
-                [this.coord.max, this.coord.max]
-            ])
-            .scaleExtent([this._minScale, this._maxScale])
-            .on("zoom", () => this._naZoomed());
-
-        this.svg
-            .attr("width", this.width)
-            .attr("height", this.height)
-            .call(this._zoom);
+    _setSvgSize() {
+        this.svg.attr("width", this.width).attr("height", this.height);
     }
 
     zoomAndPan(x, y, scale) {
