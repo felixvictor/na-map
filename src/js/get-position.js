@@ -51,7 +51,7 @@ export default class TrilateratePosition {
      * @returns {void}
      */
     _setupListener() {
-        document.getElementById("positionNavbar").addEventListener("click", event => this._navbarClick(event));
+        document.getElementById(`${this._buttonId}`).addEventListener("click", event => this._navbarClick(event));
     }
 
     _injectModal() {
