@@ -229,7 +229,7 @@ export default class F11 {
             F11Y = Number(F11YIn),
             x = convertCoordX(F11X, F11Y),
             y = convertCoordY(F11X, F11Y);
-        console.log(x, y, F11X, F11Y);
+
         if (between(x, this._coord.min, this._coord.max, true) && between(y, this._coord.min, this._coord.max, true)) {
             this._printF11Coord(x, y, F11X, F11Y);
             this._map.zoomAndPan(x, y, 1);
