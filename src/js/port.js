@@ -569,11 +569,13 @@ export default class PortDisplay {
                 }
                 h += "</tbody></table></td></tr>";
             }
-            if (port.goodsToSellInTradePort.length) {
-                h += `<tr><td>Sell in ${port.tradePort}</td><td>${port.goodsToSellInTradePort}</td></tr>`;
-            }
-            if (port.goodsToBuyInTradePort.length) {
-                h += `<tr><td>Buy in ${port.tradePort}</td><td>${port.goodsToBuyInTradePort}</td></tr>`;
+            if (this.showTradePortPartners) {
+                if (port.goodsToSellInTradePort.length) {
+                    h += `<tr><td>Sell in ${port.tradePort}</td><td>${port.goodsToSellInTradePort}</td></tr>`;
+                }
+                if (port.goodsToBuyInTradePort.length) {
+                    h += `<tr><td>Buy in ${port.tradePort}</td><td>${port.goodsToBuyInTradePort}</td></tr>`;
+                }
             }
             h += "</table>";
             console.log(h);
