@@ -24,6 +24,11 @@ $paddingThird: map-get($spacers, 1);
     z-index: $zindex-sticky;
 }
 
+text,
+.overlay {
+    cursor: default;
+}
+
 .port-summary,
 .journey-summary {
     @include float-right;
