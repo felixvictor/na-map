@@ -4,13 +4,23 @@
 
 import { select as d3Select } from "d3-selection";
 import { between, formatF11 } from "./util";
-import { convertCoordX, convertCoordY, convertInvCoordX, convertInvCoordY } from "./common";
+import { convertCoordX, convertCoordY, convertInvCoordX, convertInvCoordY, insertBaseModal } from "./common";
 import { registerEvent } from "./analytics";
+import ShipCompare from "./ship-compare";
+import WoodCompare from "./wood-compare";
 
+/**
+ * F11
+ */
 export default class F11 {
     constructor(map, coord) {
         this._map = map;
         this._coord = coord;
+
+        this._baseName = "Go to F11";
+        this._baseId = "go-to-f11";
+        this._buttonId = `button-${this._baseId}`;
+        this._modalId = `modal-${this._baseId}`;
 
         this._setupSvg();
         this._setupListener();
@@ -22,17 +32,90 @@ export default class F11 {
             .classed("f11", true);
     }
 
+    _navbarClick(event) {
+        registerEvent("Menu", "Go to F11");
+        event.stopPropagation();
+        this._f11Selected();
+    }
+
     _setupListener() {
-        $("#f11").submit(event => {
-            registerEvent("Menu", "Move to F11");
-            this._f11Submitted();
-            event.preventDefault();
-        });
+        document.getElementById(`${this._buttonId}`).addEventListener("click", event => this._navbarClick(event));
+    }
+
+    _injectModal() {
+        insertBaseModal(this._modalId, this._baseName, "sm");
+        /*
+
+           <div class="dropdown-menu large-width p-2" id="moveToMenu" aria-labelledby="moveToDropdown">
+                <div class="alert alert-primary" role="alert">
+                    Use F11 in open world.
+                </div>
+                <form id="f11">
+                    <div class="input-group mb-3">
+                        <input class="form-control" id="x-coord" type="number" required placeholder="X" max="819"
+                               min="-819" step="1">
+                        <div class="input-group-append">
+                            <span class="input-group-text">k</span>
+                        </div>
+                    </div>
+                    <div class="input-group mb-3">
+                        <input class="form-control" id="z-coord" type="number" required placeholder="Z" max="819"
+                               min="-819" step="1">
+                        <div class="input-group-append">
+                            <span class="input-group-text">k</span>
+                        </div>
+                    </div>
+                    <div class="alert alert-primary" role="alert">
+                        <small>In k units (divide by 1,000).<br>Example: <em>43</em> for value of <em>43,162.5</em>.
+                        </small>
+                    </div>
+                    <div class="float-right btn-group" role="group">
+                        <button class="btn btn-outline-secondary" id="copy-coord" title="Copy to clipboard"
+                                type="button"><i class="far fa-copy"></i>
+                        </button>
+                        <button class="btn btn-outline-secondary" type="submit">Move to</button>
+                    </div>
+                </form>
+            </div>
+
+ */
+        const body = d3Select(`#${this._modalId} .modal-body`);
+        const slider = body
+            .append("form")
+            .append("div")
+            .attr("class", "form-group");
 
         $("#copy-coord").click(() => {
             registerEvent("Menu", "Copy F11 coordinates");
             this._copyCoordClicked();
         });
+    }
+
+    /**
+     * Init modal
+     * @returns {void}
+     */
+    _initModal() {
+        this._injectModal();
+    }
+
+    _useUserInput() {}
+
+    /**
+     * Action when selected
+     * @returns {void}
+     */
+    _f11Selected() {
+        // If the modal has no content yet, insert it
+        if (!document.getElementById(this._modalId)) {
+            this._initModal();
+        }
+        // Show modal
+        $(`#${this._modalId}`)
+            .modal("show")
+            .on("hidden.bs.modal", () => {
+                this._useUserInput();
+            });
     }
 
     static getXCoord() {
@@ -43,7 +126,7 @@ export default class F11 {
         return +$("#z-coord").val();
     }
 
-    _f11Submitted() {
+    _useUserInput() {
         const x = F11.getXCoord() * -1000,
             z = F11.getZCoord() * -1000;
 

@@ -27,90 +27,6 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
 
-            <li class="nav-item dropdown pr-2">
-                <a class="nav-link dropdown-toggle" href="#" id="predictDropdown" role="button" data-toggle="dropdown"
-                   aria-haspopup="true" aria-expanded="false">
-                    Predict wind
-                </a>
-                <div class="dropdown-menu" id="predictMenu" aria-labelledby="predictDropdown">
-                    <form id="windPrediction" class="p-2">
-                        <div class="form-group mb-3">
-                            <div class="alert alert-primary" role="alert">
-                                <label for="direction">Current in-game wind</label>
-                                <div id="direction" class="rslider"></div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="alert alert-primary" role="alert">
-                                <label for="wind-time-input">Predict time (server time)</label>
-                                <div class="input-group date" id="wind-time" data-target-input="nearest">
-                                    <input type="text" class="form-control datetimepicker-input"
-                                           data-target="#wind-time" aria-label="wind-time"
-                                           id="wind-time-input" required/>
-                                    <div class="input-group-append" data-target="#wind-time"
-                                         data-toggle="datetimepicker">
-                                        <span class="input-group-text"><i class="far fa-clock"></i></span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <button type="submit" class="float-right btn btn-outline-secondary">Predict</button>
-                    </form>
-                </div>
-            </li>
-
-            <li class="nav-item dropdown pr-2">
-                <a class="nav-link dropdown-toggle" href="#" id="moveToDropdown" role="button" data-toggle="dropdown"
-                   aria-haspopup="true" aria-expanded="false">
-                    Go to F11
-                </a>
-                <div class="dropdown-menu large-width p-2" id="moveToMenu" aria-labelledby="moveToDropdown">
-                    <div class="alert alert-primary" role="alert">
-                        Use F11 in open world.
-                    </div>
-                    <form id="f11">
-                        <div class="input-group mb-3">
-                            <input class="form-control" id="x-coord" type="number" required placeholder="X" max="819"
-                                   min="-819" step="1">
-                            <div class="input-group-append">
-                                <span class="input-group-text">k</span>
-                            </div>
-                        </div>
-                        <div class="input-group mb-3">
-                            <input class="form-control" id="z-coord" type="number" required placeholder="Z" max="819"
-                                   min="-819" step="1">
-                            <div class="input-group-append">
-                                <span class="input-group-text">k</span>
-                            </div>
-                        </div>
-                        <div class="alert alert-primary" role="alert">
-                            <small>In k units (divide by 1,000).<br>Example: <em>43</em> for value of <em>43,162.5</em>.
-                            </small>
-                        </div>
-                        <div class="float-right btn-group" role="group">
-                            <button class="btn btn-outline-secondary" id="copy-coord" title="Copy to clipboard"
-                                    type="button"><i class="far fa-copy"></i>
-                            </button>
-                            <button class="btn btn-outline-secondary" type="submit">Move to</button>
-                        </div>
-                    </form>
-                </div>
-            </li>
-
-            <li class="nav-item dropdown pr-2" id="positionNavbar">
-                <a class="nav-link dropdown-toggle" href="#" id="positionDropdown" role="button" data-toggle="dropdown"
-                   aria-haspopup="true" aria-expanded="false">
-                    Get position
-                </a>
-            </li>
-
-            <li class="nav-item dropdown pr-2" id="journeyNavbar">
-                <a class="nav-link dropdown-toggle" href="#" id="journeyDropdown" role="button" data-toggle="dropdown"
-                   aria-haspopup="true" aria-expanded="false">
-                    Make journey
-                </a>
-            </li>
-
             <li class="nav-item pr-2">
                 <label><select name="port-names-select" id="port-names-select"></select></label>
             </li>
@@ -255,12 +171,27 @@
         <ul class="navbar-nav ml-auto">
 
             <li class="nav-item dropdown pr-2">
-                <a class="nav-link dropdown-toggle btn btn-primary" href="#" id="extraDropdown" role="button"
+                <a class="nav-link dropdown-toggle btn btn-primary" href="#" id="map-tools-dropdown" role="button"
                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Tools
+                    Map tools
                 </a>
-                <div class="dropdown-menu dropdown-menu-right" id="extraMenu"
-                     aria-labelledby="extraDropdown">
+                <div class="dropdown-menu dropdown-menu-right" id="map-tools-menu"
+                     aria-labelledby="map-tools-dropdown">
+
+                    <a class="dropdown-item" id="button-predict-wind">Predict wind</a>
+                    <a class="dropdown-item" id="button-go-to-f11">Go to F11</a>
+                    <a class="dropdown-item" id="button-get-position">Get position</a>
+                    <a class="dropdown-item" id="button-make-journey"> Make journey</a>
+                </div>
+            </li>
+
+            <li class="nav-item dropdown pr-2">
+                <a class="nav-link dropdown-toggle btn btn-primary" href="#" id="game-tools-dropdown" role="button"
+                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Game tools
+                </a>
+                <div class="dropdown-menu dropdown-menu-right" id="game-tools-menu"
+                     aria-labelledby="game-tools-dropdown">
 
                     <h6 class="dropdown-header">Compare</h6>
                     <a class="dropdown-item" id="button-ship-compare">Ships</a>
