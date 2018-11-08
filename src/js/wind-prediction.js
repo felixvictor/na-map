@@ -13,6 +13,9 @@ import "tempusdominus-core/build/js/tempusdominus-core";
 
 import { compassDirections, compassToDegrees, degreesToCompass } from "./util";
 import { registerEvent } from "./analytics";
+import ShipCompare from "./ship-compare";
+import WoodCompare from "./wood-compare";
+import { insertBaseModal } from "./common";
 
 export default class WindPrediction {
     constructor() {
@@ -20,6 +23,11 @@ export default class WindPrediction {
         this._height = 300;
         this._width = 300;
         this._line = d3Line();
+
+        this._baseName = "Predict wind";
+        this._baseId = "predict-wind";
+        this._buttonId = `button-${this._baseId}`;
+        this._modalId = `modal-${this._baseId}`;
 
         this._setupSvg();
         this.constructor._setupArrow();
@@ -91,17 +99,87 @@ export default class WindPrediction {
         });
     }
 
+    _navbarClick(event) {
+        registerEvent("Menu", "Predict wind");
+        event.stopPropagation();
+        this._windSelected();
+    }
+
     _setupListener() {
+        document.getElementById(`${this._buttonId}`).addEventListener("click", event => this._navbarClick(event));
+    }
+
+    _injectModal() {
+        insertBaseModal(this._modalId, this._baseName, "sm");
+
+        /*
+                    <li class="nav-item dropdown pr-2">
+            <a class="nav-link dropdown-toggle" href="#" id="predictDropdown" role="button" data-toggle="dropdown"
+               aria-haspopup="true" aria-expanded="false">
+                Predict wind
+            </a>
+            <div class="dropdown-menu" id="predictMenu" aria-labelledby="predictDropdown">
+                <form id="windPrediction" class="p-2">
+                    <div class="form-group mb-3">
+                        <div class="alert alert-primary" role="alert">
+                            <label for="direction">Current in-game wind</label>
+                            <div id="direction" class="rslider"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="alert alert-primary" role="alert">
+                            <label for="wind-time-input">Predict time (server time)</label>
+                            <div class="input-group date" id="wind-time" data-target-input="nearest">
+                                <input type="text" class="form-control datetimepicker-input"
+                                       data-target="#wind-time" aria-label="wind-time"
+                                       id="wind-time-input" required/>
+                                <div class="input-group-append" data-target="#wind-time"
+                                     data-toggle="datetimepicker">
+                                    <span class="input-group-text"><i class="far fa-clock"></i></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="float-right btn btn-outline-secondary">Predict</button>
+                </form>
+            </div>
+        </li>
+         */
+    }
+
+    /**
+     * Init modal
+     * @returns {void}
+     */
+    _initModal() {
+        this._injectModal();
+    }
+
+    /**
+     * Action when selected
+     * @returns {void}
+     */
+    _windSelected() {
+        // If the modal has no content yet, insert it
+        if (!document.getElementById(this._modalId)) {
+            this._initModal();
+        }
+        // Show modal
+        $(`#${this._modalId}`)
+            .modal("show")
+            .on("hidden.bs.modal", () => {
+                this._useUserInput();
+            });
+    }
+
+    _useUserInput() {
         $("#windPrediction").submit(event => {
             const currentWind = $("#direction").roundSlider("option", "value"),
                 time = $("#wind-time-input")
                     .val()
                     .trim();
 
-            registerEvent("Menu", "Wind prediction");
             this._predictWind(currentWind, time);
-            $("#predictDropdown").dropdown("toggle");
-            event.preventDefault();
         });
     }
 
