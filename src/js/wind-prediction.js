@@ -13,8 +13,6 @@ import "tempusdominus-core/build/js/tempusdominus-core";
 
 import { compassDirections, compassToDegrees, degreesToCompass } from "./util";
 import { registerEvent } from "./analytics";
-import ShipCompare from "./ship-compare";
-import WoodCompare from "./wood-compare";
 import { insertBaseModal } from "./common";
 
 export default class WindPrediction {
@@ -28,10 +26,13 @@ export default class WindPrediction {
         this._baseId = "predict-wind";
         this._buttonId = `button-${this._baseId}`;
         this._modalId = `modal-${this._baseId}`;
+        this._formId = `form-${this._baseId}`;
+        this._sliderId = `slider-${this._baseId}`;
+        this._timeGroupId = `input-group-${this._baseId}`;
+        this._timeInputId = `input-${this._baseId}`;
 
         this._setupSvg();
         this.constructor._setupArrow();
-        this.constructor._setupForm();
         this._setupListener();
     }
 
@@ -59,14 +60,17 @@ export default class WindPrediction {
             .classed("wind-head", true);
     }
 
-    static _setupForm() {
-        moment.locale("en-gb");
+    _navbarClick(event) {
+        registerEvent("Menu", "Predict wind");
+        event.stopPropagation();
+        this._windSelected();
+    }
 
-        $("#wind-time").datetimepicker({
-            defaultDate: moment.utc(),
-            format: "LT"
-        });
+    _setupListener() {
+        document.getElementById(`${this._buttonId}`).addEventListener("click", event => this._navbarClick(event));
+    }
 
+    _setupWindInput() {
         // workaround from https://github.com/soundar24/roundSlider/issues/71
         // eslint-disable-next-line func-names,no-underscore-dangle
         const { _getTooltipPos } = $.fn.roundSlider.prototype;
@@ -82,7 +86,7 @@ export default class WindPrediction {
 
         window.tooltip = args => degreesToCompass(args.value);
 
-        $("#direction").roundSlider({
+        $(`#${this._sliderId}`).roundSlider({
             sliderType: "default",
             handleSize: "+1",
             startAngle: 90,
@@ -95,56 +99,66 @@ export default class WindPrediction {
             tooltipFormat: "tooltip",
             create() {
                 this.control.css("display", "block");
+            },
+            change() {
+                this._currentWind = $(`#${this._sliderId}`).roundSlider("getValue");
             }
         });
     }
 
-    _navbarClick(event) {
-        registerEvent("Menu", "Predict wind");
-        event.stopPropagation();
-        this._windSelected();
-    }
-
-    _setupListener() {
-        document.getElementById(`${this._buttonId}`).addEventListener("click", event => this._navbarClick(event));
-    }
-
     _injectModal() {
+        moment.locale("en-gb");
+
         insertBaseModal(this._modalId, this._baseName, "sm");
 
-        /*
-                    <li class="nav-item dropdown pr-2">
-            <a class="nav-link dropdown-toggle" href="#" id="predictDropdown" role="button" data-toggle="dropdown"
-               aria-haspopup="true" aria-expanded="false">
-                Predict wind
-            </a>
-            <div class="dropdown-menu" id="predictMenu" aria-labelledby="predictDropdown">
-                <form id="windPrediction" class="p-2">
-                    <div class="form-group mb-3">
-                        <div class="alert alert-primary" role="alert">
-                            <label for="direction">Current in-game wind</label>
-                            <div id="direction" class="rslider"></div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="alert alert-primary" role="alert">
-                            <label for="wind-time-input">Predict time (server time)</label>
-                            <div class="input-group date" id="wind-time" data-target-input="nearest">
-                                <input type="text" class="form-control datetimepicker-input"
-                                       data-target="#wind-time" aria-label="wind-time"
-                                       id="wind-time-input" required/>
-                                <div class="input-group-append" data-target="#wind-time"
-                                     data-toggle="datetimepicker">
-                                    <span class="input-group-text"><i class="far fa-clock"></i></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <button type="submit" class="float-right btn btn-outline-secondary">Predict</button>
-                </form>
-            </div>
-        </li>
-         */
+        const body = d3Select(`#${this._modalId} .modal-body`);
+        const form = body.append("form").attr("id", this._formId);
+
+        const formGroupA = form.append("div").attr("class", "form-group");
+        const slider = formGroupA.append("div").classed("alert alert-primary", true);
+        slider
+            .append("label")
+            .attr("for", this._sliderId)
+            .text("Current in-game wind");
+        slider
+            .append("div")
+            .attr("id", this._sliderId)
+            .attr("class", "rslider");
+
+        const formGroupB = form.append("div").attr("class", "form-group");
+        const block = formGroupB.append("div").classed("alert alert-primary", true);
+        block
+            .append("label")
+            .attr("for", this._timeInputId)
+            .text("Predict time (server time)");
+
+        const inputGroup = block
+            .append("div")
+            .classed("input-group date", true)
+            .attr("id", this._timeGroupId)
+            .attr("data-target-input", "nearest");
+        inputGroup
+            .append("input")
+            .classed("form-control datetimepicker-input", true)
+            .attr("type", "text")
+            .attr("id", this._timeInputId)
+            .attr("data-target", `#${this._timeGroupId}`)
+            .attr("aria-label", this._timeGroupId)
+            .attr("required", "");
+        inputGroup
+            .append("div")
+            .classed("input-group-append", true)
+            .attr("data-target", `#${this._timeGroupId}`)
+            .attr("data-toggle", "datetimepicker")
+            .append("span")
+            .classed("input-group-text", true)
+            .append("i")
+            .classed("far fa-clock", true);
+
+        $(`#${this._timeGroupId}`).datetimepicker({
+            defaultDate: moment.utc(),
+            format: "LT"
+        });
     }
 
     /**
@@ -153,6 +167,7 @@ export default class WindPrediction {
      */
     _initModal() {
         this._injectModal();
+        this._setupWindInput();
     }
 
     /**
@@ -173,14 +188,12 @@ export default class WindPrediction {
     }
 
     _useUserInput() {
-        $("#windPrediction").submit(event => {
-            const currentWind = $("#direction").roundSlider("option", "value"),
-                time = $("#wind-time-input")
-                    .val()
-                    .trim();
+        const currentWind = $(`#${this._sliderId}`).roundSlider("getValue"),
+            time = $(`#${this._timeInputId}`)
+                .val()
+                .trim();
 
-            this._predictWind(currentWind, time);
-        });
+        this._predictWind(currentWind, time);
     }
 
     _predictWind(currentUserWind, predictUserTime) {
