@@ -88,6 +88,7 @@ export default class Journey {
         this._baseName = "Make journey";
         this._baseId = "make-journey";
         this._buttonId = `button-${this._baseId}`;
+        this._deleteLastLegButtonId = `button-delete-leg-${this._baseId}`;
         this._modalId = `modal-${this._baseId}`;
         this._shipId = "ship-journey";
         this._woodId = "wood-journey";
@@ -147,9 +148,9 @@ export default class Journey {
      * @returns {void}
      */
     _setupListener() {
-        document.getElementById("journeyNavbar").addEventListener("click", event => this._navbarClick(event));
+        document.getElementById(`${this._buttonId}`).addEventListener("click", event => this._navbarClick(event));
 
-        document.getElementById(this._buttonId).addEventListener("click", () => this._deleteLastLeg());
+        document.getElementById(this._deleteLastLegButtonId).addEventListener("click", () => this._deleteLastLeg());
     }
 
     _setupWindInput() {
@@ -527,7 +528,7 @@ export default class Journey {
 
         mainDiv
             .append("button")
-            .attr("id", this._buttonId)
+            .attr("id", this._deleteLastLegButtonId)
             .classed("btn btn-primary btn-sm", true)
             .attr("role", "button")
             .text("Delete last leg");
