@@ -90,6 +90,7 @@ export default class Journey {
         this._buttonId = `button-${this._baseId}`;
         this._deleteLastLegButtonId = `button-delete-leg-${this._baseId}`;
         this._modalId = `modal-${this._baseId}`;
+        this._sliderId = `slider-${this._baseId}`;
         this._shipId = "ship-journey";
         this._woodId = "wood-journey";
 
@@ -169,7 +170,7 @@ export default class Journey {
 
         window.tooltip = args => degreesToCompass(args.value);
 
-        $("#journey-wind-direction").roundSlider({
+        $(`#${this._sliderId}`).roundSlider({
             sliderType: "default",
             handleSize: "+1",
             startAngle: 90,
@@ -184,7 +185,7 @@ export default class Journey {
                 this.control.css("display", "block");
             },
             change() {
-                this._currentWind = $("#journey-wind-direction").roundSlider("getValue");
+                this._currentWind = $(`#${this._sliderId}`).roundSlider("getValue");
             }
         });
     }
@@ -193,30 +194,30 @@ export default class Journey {
         insertBaseModal(this._modalId, this._baseName, "sm");
 
         const body = d3Select(`#${this._modalId} .modal-body`);
-        const slider = body
+        const formGroup = body
             .append("form")
             .append("div")
             .attr("class", "form-group");
 
-        const blockA = slider
+        const slider = formGroup
             .append("div")
             .classed("alert alert-primary", true)
             .attr("role", "alert");
-        blockA
+        slider
             .append("label")
-            .attr("for", "journey-wind-direction")
+            .attr("for", this._sliderId)
             .text("Current in-game wind");
-        blockA
+        slider
             .append("div")
-            .attr("id", "journey-wind-direction")
+            .attr("id", this._sliderId)
             .attr("class", "rslider");
 
         const shipId = `${this._shipId}-Base-select`;
-        const blockB = slider
+        const shipAndWood = formGroup
             .append("div")
             .classed("alert alert-primary", true)
             .attr("role", "alert");
-        const div = blockB.append("div").attr("class", "d-flex flex-column");
+        const div = shipAndWood.append("div").attr("class", "d-flex flex-column");
         div.append("label")
             .attr("for", shipId)
             .text("Ship and woods (optional)");
@@ -303,10 +304,10 @@ export default class Journey {
     }
 
     _getStartWind() {
-        const currentUserWind = $("#journey-wind-direction").roundSlider("getValue");
+        const currentUserWind = $(`#${this._sliderId}`).roundSlider("getValue");
         let currentWindDegrees;
         // Current wind in degrees
-        if (!$("#journey-wind-direction").length) {
+        if (!$(`#${this._sliderId}`).length) {
             currentWindDegrees = 0;
         } else {
             currentWindDegrees = +currentUserWind;
