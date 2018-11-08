@@ -3,7 +3,7 @@
 const webpack = require("webpack");
 
 const path = require("path");
-const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer"),
+const // { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer"),
     CleanWebpackPlugin = require("clean-webpack-plugin"),
     CopyPlugin = require("copy-webpack-plugin"),
     HtmlPlugin = require("html-webpack-plugin"),
@@ -198,14 +198,16 @@ const config = {
     },
 
     plugins: [
+        /*
         new BundleAnalyzerPlugin({
-            analyzerMode: "static",
+            analyzerMode: isProd ? "static" : "disabled",
             generateStatsFile: true,
             logLevel: "warn",
             openAnalyzer: isProd,
             statsFilename: path.resolve(__dirname, "webpack-stats.json"),
             reportFilename: path.resolve(__dirname, "report.html")
         }),
+        */
         new CleanWebpackPlugin(outputPath, {
             verbose: false
         }),
