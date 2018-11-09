@@ -33,7 +33,7 @@ export default class F11 {
 
     _setupSvg() {
         this._g = d3Select("#na-svg")
-            .insert("g")
+            .append("g")
             .classed("f11", true);
     }
 
@@ -76,7 +76,9 @@ export default class F11 {
             .attr("placeholder", "X coordinate")
             .attr("min", "-819")
             .attr("max", "819")
-            .attr("step", "1");
+            .attr("step", "1")
+            .attr("tabindex", "1")
+            .attr("autofocus", "");
         inputGroup1
             .append("div")
             .classed("input-group-append", true)
@@ -98,7 +100,8 @@ export default class F11 {
             .attr("placeholder", "Z coordinate")
             .attr("min", "-819")
             .attr("max", "819")
-            .attr("step", "1");
+            .attr("step", "1")
+            .attr("tabindex", "2");
         inputGroup2
             .append("div")
             .classed("input-group-append", true)
@@ -111,31 +114,34 @@ export default class F11 {
             .append("small")
             .html("In k units (divide by 1,000).<br>Example: <em>43</em> for value of <em>43,162.5</em>.");
 
-        const footer = d3Select(`#${this._modalId} .modal-footer`);
-        footer.selectAll("*").remove();
-        footer
+        const buttonGroup = form
             .append("div")
             .classed("float-right btn-group", true)
             .attr("role", "group");
 
-        const button = footer
+        const copyButton = buttonGroup
             .append("button")
             .classed("btn btn-outline-secondary", true)
             .attr("id", this._copyButtonId)
             .attr("title", "Copy to clipboard")
             .attr("type", "button");
-        button.append("i").classed("far fa-copy", true);
-        footer
+        copyButton.append("i").classed("far fa-copy", true);
+
+        buttonGroup
             .append("button")
             .classed("btn btn-outline-secondary", true)
             .attr("id", this._submitButtonId)
             .attr("title", "Go to")
-            .attr("data-dismiss", "modal")
+            //.attr("data-dismiss", "modal")
             .attr("type", "submit")
             .text("Go to");
 
+        // Remove footer
+        d3Select(`#${this._modalId} .modal-footer`).remove();
+
         document.getElementById(`${this._copyButtonId}`).addEventListener("click", () => {
             registerEvent("Menu", "Copy F11 coordinates");
+            console.log("Copy clicked");
             this._copyCoordClicked();
         });
     }
@@ -157,27 +163,52 @@ export default class F11 {
         if (!document.getElementById(this._modalId)) {
             this._initModal();
         }
+
+        const form = document.getElementById(`${this._formId}`);
+
         // Show modal
         $(`#${this._modalId}`)
             .modal("show")
-            .on("hidden.bs.modal", () => {
-                this._useUserInput();
-            });
+            /*
+            .keypress(event => {
+                if (event.which === 13) {
+                    if (form.reportValidity()) {
+                        console.log("enter submit");
+                        this._useUserInput();
+                    }
+                }
+            })
+            */
+            ;
+
+      //  form.onsubmit = () => {console.log("form submit");this._useUserInput();};
+    }
+
+    _getInputValue(id) {
+        let { value } = document.getElementById(id);
+        if (value === "") {
+            value = Infinity;
+        } else {
+            value = +value;
+        }
+        return value;
     }
 
     _getXCoord() {
-        return +document.getElementById(this._xInputId).value;
+        return this._getInputValue(this._xInputId);
     }
 
     _getZCoord() {
-        return +document.getElementById(this._zInputId).value;
+        return this._getInputValue(this._zInputId);
     }
 
     _useUserInput() {
         const x = this._getXCoord() * -1000,
             z = this._getZCoord() * -1000;
 
-        this._goToF11(x, z);
+        if (x !== -Infinity && z !== -Infinity) {
+            this._goToF11(x, z);
+        }
     }
 
     _copyCoordClicked() {
@@ -218,6 +249,7 @@ export default class F11 {
 
     _printF11Coord(x, y, F11X, F11Y) {
         const g = this._g.append("g").attr("transform", `translate(${x},${y})`);
+
         g.append("circle").attr("r", 10);
         g.append("text")
             .attr("dx", "-.6em")
@@ -237,12 +269,14 @@ export default class F11 {
 
         if (between(x, this._coord.min, this._coord.max, true) && between(y, this._coord.min, this._coord.max, true)) {
             this._printF11Coord(x, y, F11X, F11Y);
-            this._map.zoomAndPan(x, y, 1);
+             this._map.zoomAndPan(x, y, 1);
         }
     }
 
     checkF11Coord() {
         const urlParams = new URL(document.location).searchParams;
+
+        console.log("checkF11Coord", { urlParams }, urlParams.has("x") && urlParams.has("z"));
 
         if (urlParams.has("x") && urlParams.has("z")) {
             const x = +urlParams.get("x") * -1000,
