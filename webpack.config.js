@@ -151,7 +151,7 @@ const svgoOpt = {
 const config = {
     context: path.resolve(__dirname, "src"),
 
-    entry: [path.resolve(__dirname, PACKAGE.main)],
+    entry: [path.resolve(__dirname, PACKAGE.main), path.resolve(__dirname, PACKAGE.sass)],
 
     externals: {
         jquery: "jQuery",
