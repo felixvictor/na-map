@@ -605,13 +605,9 @@ export default class Map {
         this._f11.transform(zoomTransform);
     }
 
-    _initialZoomAndPan() {
-        this.svg.call(this._zoom.scaleTo, this._minScale);
-    }
-
     _init() {
         this.zoomLevel = "initial";
-        this._initialZoomAndPan();
+        this.initialZoomAndPan();
         this._refreshLayer();
 
         this._ports.clearMap(this._minScale);
@@ -673,6 +669,10 @@ export default class Map {
         this.svg.attr("width", this.width).attr("height", this.height);
     }
 
+    initialZoomAndPan() {
+        this.svg.call(this._zoom.scaleTo, this._minScale);
+    }
+
     zoomAndPan(x, y, scale) {
         const transform = d3ZoomIdentity
             .scale(scale)
@@ -684,7 +684,7 @@ export default class Map {
         if (this._ports.currentPort.id !== "0") {
             this.zoomAndPan(this._ports.currentPort.coord.x, this._ports.currentPort.coord.y, 2);
         } else {
-            this._initialZoomAndPan();
+            this.initialZoomAndPan();
         }
     }
 }
