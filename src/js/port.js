@@ -567,7 +567,7 @@ export default class PortDisplay {
                 }
             }
             h += "</table>";
-            console.log(h);
+
             return h;
         };
 
