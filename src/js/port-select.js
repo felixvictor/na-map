@@ -351,6 +351,7 @@ export default class PortSelect {
         this._ports.showTradePortPartners = true;
         this._ports.showCurrentGood = false;
         this._ports.update();
+        this._ports._map.initialZoomAndPan();
     }
 
     _goodSelected(event) {
