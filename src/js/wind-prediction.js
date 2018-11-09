@@ -17,7 +17,7 @@ import { insertBaseModal } from "./common";
 
 export default class WindPrediction {
     constructor() {
-        this._compassSize = 100;
+        this._compassSize = 180;
         this._height = 300;
         this._width = 300;
         this._line = d3Line();
@@ -243,7 +243,7 @@ export default class WindPrediction {
         const xCompass = this._width / 2,
             yCompass = this._height / 3,
             radians = (Math.PI / 180) * (predictedWindDegrees - 90),
-            length = this._compassSize * 1.3,
+            length = this._compassSize * 1,
             dx = length * Math.cos(radians),
             dy = length * Math.sin(radians),
             lineData = [
@@ -297,7 +297,7 @@ export default class WindPrediction {
 
         textSvg
             .attr("x", (this._width - textWidth) / 2)
-            .attr("y", "60%")
+            .attr("y", "66%")
             .attr("height", textHeight)
             .attr("width", textWidth);
     }
