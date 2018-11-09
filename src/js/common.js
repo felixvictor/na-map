@@ -84,7 +84,7 @@ export function insertBaseModal(id, title, size = "lg", buttonText = "Close") {
         .append("section")
         .attr("id", id)
         .attr("class", "modal")
-        .attr("data-keyboard", "false")
+        .attr("data-keyboard", "true")
         .attr("data-backdrop", "static")
         .attr("tabindex", "-1")
         .attr("role", "dialog")
