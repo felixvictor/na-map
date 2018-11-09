@@ -84,10 +84,10 @@ export function insertBaseModal(id, title, size = "lg", buttonText = "Close") {
         .append("section")
         .attr("id", id)
         .attr("class", "modal")
-        .attr("data-keyboard", "true")
-        .attr("data-backdrop", "static")
         .attr("tabindex", "-1")
         .attr("role", "dialog")
+        .attr("aria-labelledby", `title-${id}`)
+        .attr("aria-hidden", "true")
         .append("div")
         .attr("class", `modal-dialog${size === "lg" || size === "sm" ? ` modal-${size}` : ""}`)
         .attr("role", "document");
@@ -95,7 +95,11 @@ export function insertBaseModal(id, title, size = "lg", buttonText = "Close") {
     const content = modal.append("div").attr("class", "modal-content");
 
     const header = content.append("header").attr("class", "modal-header");
-    header.append("h3").html(title);
+    header
+        .append("h5")
+        .attr("class", "modal-title")
+        .attr("id", `title-${id}`)
+        .html(title);
 
     content.append("div").attr("class", "modal-body");
 
