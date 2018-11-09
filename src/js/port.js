@@ -465,15 +465,9 @@ export default class PortDisplay {
                     : "",
                 dropsTrading: portProperties.dropsTrading
                     ? portProperties.dropsTrading
-                          .map(
-                              good =>
-                                  `<tr><td>${good.name}</td><td class="text-right">${
-                                      good.amount
-                                  }</td><td class="text-right">${formatFloatFixed(
-                                      roundToThousands(good.chance * 100)
-                                  )}</td></tr>`
-                          )
-                          .join("")
+                          .map(good => good.name)
+                          .sort()
+                          .join(", ")
                     : "",
                 consumesTrading: portProperties.consumesTrading
                     ? portProperties.consumesTrading
@@ -489,15 +483,9 @@ export default class PortDisplay {
                     : "",
                 dropsNonTrading: portProperties.dropsNonTrading
                     ? portProperties.dropsNonTrading
-                          .map(
-                              good =>
-                                  `<tr><td><span class="non-trading">${good.name}</span></td><td class="text-right">${
-                                      good.amount
-                                  }</td><td class="text-right">${formatFloatFixed(
-                                      roundToThousands(good.chance * 100)
-                                  )}</td></tr>`
-                          )
-                          .join("")
+                          .map(good => good.name)
+                          .sort()
+                          .join(", ")
                     : "",
                 tradePort: this._getPortName(this.tradePortId),
                 goodsToSellInTradePort: portProperties.goodsToSellInTradePort
@@ -524,7 +512,7 @@ export default class PortDisplay {
     }
 
     _showDetails(d, i, nodes) {
-        function tooltipData(port) {
+        const tooltipData = port => {
             let h = `<table><tbody><tr><td><i class="flag-icon ${port.icon}"></i></td>`;
             h += `<td><span class="port-name">${port.name}</span>`;
             h += `\u2001${port.county} ${port.availableForAll}`;
@@ -558,16 +546,17 @@ export default class PortDisplay {
                 h += "</td></tr>";
             }
             if (port.dropsTrading.length || port.dropsNonTrading.length) {
-                h += "<tr><td>Drops\u00a0</td><td>";
-                h +=
-                    '<table class="table table-sm"><thead><tr><th></th><th class="text-right">Amount</th><th class="text-right">Chance (%)</th></tr></thead><tbody>';
+                h += `<tr><td>Drops\u00a0${port.dropsNonTrading.length ? "\u00a0" : ""}</td><td>`;
                 if (port.dropsNonTrading.length) {
-                    h += `${port.dropsNonTrading}`;
+                    h += `<span class="non-trading">${port.dropsNonTrading}</span>`;
+                    if (port.dropsTrading.length) {
+                        h += "<br>";
+                    }
                 }
                 if (port.dropsTrading.length) {
                     h += `${port.dropsTrading}`;
                 }
-                h += "</tbody></table></td></tr>";
+                h += "</td></tr>";
             }
             if (this.showTradePortPartners) {
                 if (port.goodsToSellInTradePort.length) {
@@ -580,7 +569,7 @@ export default class PortDisplay {
             h += "</table>";
             console.log(h);
             return h;
-        }
+        };
 
         const port = d3Select(nodes[i]),
             title = tooltipData(this._getText(d.id, d.properties));
