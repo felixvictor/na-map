@@ -8,7 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { ascending as d3Ascending, min as d3Min, max as d3Max, range as d3Range } from "d3-array";
+import { ascending as d3Ascending, min as d3Min, range as d3Range } from "d3-array";
 import { nest as d3Nest } from "d3-collection";
 import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate";
 import { scaleLinear as d3ScaleLinear } from "d3-scale";
@@ -16,6 +16,7 @@ import { select as d3Select } from "d3-selection";
 import {
     arc as d3Arc,
     curveCatmullRomClosed as d3CurveCatmullRomClosed,
+    curveLinear as d3CurveLinear,
     pie as d3Pie,
     radialLine as d3RadialLine
 } from "d3-shape";
@@ -402,6 +403,116 @@ class ShipBase extends Ship {
             .append("stop")
             .attr("offset", (d, i) => gradientScale(gradientPoint[i]) / this.shipCompareData.svgWidth)
             .attr("stop-color", (d, i) => this.shipCompareData.colorScale(gradientPoint[i]));
+    }
+
+    /**
+     * Dummy function to draw compass
+     * 1. Use function to draw path and circle
+     * 2. Use Pathfinder exclude in Illustrator
+     * @return {void}
+     * @private
+     */
+    _drawCompassHelperFunction() {
+        const compassSize = 350,
+            outerRadius = Math.floor(compassSize / 2);
+        const compassScale = d3ScaleLinear()
+            .domain([0, 1, 2, 3])
+            .range([outerRadius * 0.4, outerRadius * 0.6, outerRadius * 0.8, outerRadius]);
+
+        const data = [
+            3,
+            0,
+            0,
+            1,
+            0,
+            0,
+            1,
+            0,
+            0,
+            2,
+            0,
+            0,
+            1,
+            0,
+            0,
+            1,
+            0,
+            0,
+            3,
+            0,
+            0,
+            1,
+            0,
+            0,
+            1,
+            0,
+            0,
+            2,
+            0,
+            0,
+            1,
+            0,
+            0,
+            1,
+            0,
+            0,
+            3,
+            0,
+            0,
+            1,
+            0,
+            0,
+            1,
+            0,
+            0,
+            2,
+            0,
+            0,
+            1,
+            0,
+            0,
+            1,
+            0,
+            0,
+            3,
+            0,
+            0,
+            1,
+            0,
+            0,
+            1,
+            0,
+            0,
+            2,
+            0,
+            0,
+            1,
+            0,
+            0,
+            1,
+            0,
+            0
+        ];
+        const compassTeeth = data.length,
+            segments = (2 * Math.PI) / compassTeeth;
+
+        const compassPie = d3Pie()
+            .sort(null)
+            .value(1);
+        // const compassCurve = d3CurveCatmullRomClosed;
+        const compassCurve = d3CurveLinear;
+        const compassArcs = compassPie(data),
+            compassLine = d3RadialLine()
+                .angle((d, i) => i * segments)
+                .radius(d => compassScale(d.data))
+                .curve(compassCurve);
+        console.log(compassArcs, compassLine);
+        const compass = this.g.append("path").style("fill", "blueviolet");
+        compass.attr("d", compassLine(compassArcs));
+        this.g
+            .append("circle")
+            .attr("r", outerRadius * 0.35)
+            .style("fill", "red");
     }
 
     /**
