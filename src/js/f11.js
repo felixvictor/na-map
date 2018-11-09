@@ -45,6 +45,11 @@ export default class F11 {
 
     _setupListener() {
         document.getElementById(`${this._buttonId}`).addEventListener("click", event => this._navbarClick(event));
+        window.onkeydown = event => {
+            if (event.code === "F11" && event.shiftKey) {
+                this._navbarClick(event);
+            }
+        };
     }
 
     _injectModal() {
