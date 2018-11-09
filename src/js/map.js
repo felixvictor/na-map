@@ -196,6 +196,7 @@ export default class Map {
         this._showLayer = this._getShowLayer();
 
         this._setHeightWidth();
+        this._setupScale();
         this._setupSvg();
         this._setSvgSize();
         this._setupListener();
@@ -346,7 +347,7 @@ export default class Map {
         });
     }
 
-    _setupSvg() {
+    _setupScale() {
         this._minScale = nearestPow2(Math.min(this.width / this.coord.max, this.height / this.coord.max));
 
         /**
@@ -355,7 +356,9 @@ export default class Map {
          * @private
          */
         this._currentScale = this._minScale;
-        this._zoomLevel = "initial";
+    }
+
+    _setupSvg() {
         this._zoom = d3Zoom()
             .wheelDelta(() => -this._wheelDelta * Math.sign(d3Event.deltaY))
             .translateExtent([
@@ -665,7 +668,10 @@ export default class Map {
     }
 
     _setSvgSize() {
-        this.svg.attr("width", this.width).attr("height", this.height);
+        this.svg
+            .attr("width", this.width)
+            .attr("height", this.height)
+            .call(this._zoom);
     }
 
     initialZoomAndPan() {
@@ -673,10 +679,10 @@ export default class Map {
     }
 
     zoomAndPan(x, y, scale) {
-        console.log("zoomAndPan",{x}, {y}, {scale});
         const transform = d3ZoomIdentity
             .scale(scale)
             .translate(Math.round(-x + this.width / 2 / scale), Math.round(-y + this.height / 2 / scale));
+
         this.svg.call(this._zoom.transform, transform);
     }
 
