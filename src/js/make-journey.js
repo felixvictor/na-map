@@ -43,7 +43,7 @@ export default class Journey {
         this._woodData = woodData;
         this._fontSize = fontSize;
 
-        this._compassSize = 100;
+        this._compassSize = 200;
         this._line = d3Line()
             .x(d => d[0])
             .y(d => d[1]);
