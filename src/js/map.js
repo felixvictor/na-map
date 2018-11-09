@@ -639,7 +639,6 @@ export default class Map {
 
     _getWidth() {
         const { width } = this._getDimensions();
-        console.log({ dim: this._getDimensions() }, { width });
 
         return Math.floor(width);
     }
@@ -647,7 +646,7 @@ export default class Map {
     _getHeight() {
         const { top } = this._getDimensions(),
             fullHeight = document.documentElement.clientHeight - this.rem;
-        console.log({ fullHeight }, { dim: this._getDimensions() }, { top }, { height: Math.floor(fullHeight - top) });
+
         return Math.floor(fullHeight - top);
     }
 
