@@ -673,6 +673,7 @@ export default class Map {
     }
 
     zoomAndPan(x, y, scale) {
+        console.log("zoomAndPan",{x}, {y}, {scale});
         const transform = d3ZoomIdentity
             .scale(scale)
             .translate(Math.round(-x + this.width / 2 / scale), Math.round(-y + this.height / 2 / scale));
