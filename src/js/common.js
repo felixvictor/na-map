@@ -81,7 +81,7 @@ export function getDistance(pt0, pt1) {
  */
 export function insertBaseModal(id, title, size = "lg", buttonText = "Close") {
     const modal = d3Select("#modal-section")
-        .append("section")
+        .append("div")
         .attr("id", id)
         .attr("class", "modal")
         .attr("tabindex", "-1")
