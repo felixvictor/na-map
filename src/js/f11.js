@@ -128,7 +128,7 @@ export default class F11 {
             .append("button")
             .classed("btn btn-outline-secondary", true)
             .attr("id", this._copyButtonId)
-            .attr("title", "Copy to clipboard")
+            .attr("title", "Copy to clipboard (ctrl-c)")
             .attr("type", "button");
         button.append("i").classed("far fa-copy", true);
         buttonGroup
@@ -159,22 +159,31 @@ export default class F11 {
         // If the modal has no content yet, insert it
         if (!document.getElementById(this._modalId)) {
             this._initModal();
+
+            // Submit handler
             document.getElementById(this._formId).onsubmit = event => {
                 $(`#${this._modalId}`).modal("hide");
                 event.preventDefault();
                 this._useUserInput();
             };
-            document.getElementById(`${this._copyButtonId}`).addEventListener("click", () => {
-                registerEvent("Menu", "Copy F11 coordinates");
+
+            // Copy coordinates to clipboard (ctrl-c key event)
+            document.getElementById(this._modalId).onkeydown = event => {
+                if (event.code === "KeyC" && event.ctrlKey) {
+                    this._copyCoordClicked();
+                }
+            };
+            // Copy coordinates to clipboard (click event)
+            document.getElementById(this._copyButtonId).addEventListener("click", event => {
                 this._copyCoordClicked();
             });
         }
 
         // Show modal
         $(`#${this._modalId}`).modal("show");
-        d3Select(`#${this._xInputId}`)
-            .node()
-            .focus();
+        const input = document.getElementById(this._xInputId);
+        input.focus();
+        input.select();
     }
 
     _getInputValue(id) {
@@ -206,33 +215,31 @@ export default class F11 {
 
     _copyCoordClicked() {
         /**
-         * {@link https://stackoverflow.com/questions/400212/how-do-i-copy-to-the-clipboard-in-javascript}
+         * {@link https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Interact_with_the_clipboard}
          * @param {string} text - String
          * @return {void}
          */
         const copyToClipboard = text => {
-            const textArea = document.createElement("textarea");
-            textArea.value = text;
-            document.body.appendChild(textArea);
-            textArea.focus();
-            textArea.select();
-
-            try {
-                const successful = document.execCommand("copy"),
-                    msg = successful ? "successful" : "unsuccessful";
-                console.log(`Copying text to clipboard was ${msg}`);
-            } catch (err) {
-                console.error("Cannot copy text to clipboard", err);
-            }
-
-            document.body.removeChild(textArea);
+            navigator.permissions.query({ name: "clipboard-write" }).then(result => {
+                if (result.state == "granted" || result.state == "prompt") {
+                    navigator.clipboard.writeText(text).then(
+                        () => {
+                        },
+                        () => {
+                            console.error(`Cannot copy ${text} to clipboard`, err);
+                        }
+                    );
+                }
+            });
         };
 
-        console.log("_copyCoordClicked");
+        registerEvent("Menu", "Copy F11 coordinates");
+        event.preventDefault();
+
         const x = this._getXCoord(),
             z = this._getZCoord();
 
-        if (!Number.isNaN(x) && !Number.isNaN(z)) {
+        if (!Number.isNaN(x) && x !== Infinity && !Number.isNaN(z) && z !== Infinity) {
             const F11Url = new URL(window.location);
 
             F11Url.searchParams.set("x", x);
@@ -269,8 +276,6 @@ export default class F11 {
 
     checkF11Coord() {
         const urlParams = new URL(document.location).searchParams;
-
-        console.log("checkF11Coord", { urlParams }, urlParams.has("x") && urlParams.has("z"));
 
         if (urlParams.has("x") && urlParams.has("z")) {
             const x = +urlParams.get("x") * -1000,
