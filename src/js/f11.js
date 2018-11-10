@@ -81,8 +81,8 @@ export default class F11 {
             .attr("min", "-819")
             .attr("max", "819")
             .attr("step", "1")
-            .attr("tabindex", "1")
-            .attr("autofocus", "");
+            .attr("tabindex", "1");
+
         inputGroup1
             .append("div")
             .classed("input-group-append", true)
@@ -172,6 +172,9 @@ export default class F11 {
 
         // Show modal
         $(`#${this._modalId}`).modal("show");
+        d3Select(`#${this._xInputId}`)
+            .node()
+            .focus();
     }
 
     _getInputValue(id) {
