@@ -45,13 +45,11 @@ export default class F11 {
 
     _setupListener() {
         document.getElementById(`${this._buttonId}`).addEventListener("click", event => this._navbarClick(event));
-        /*
         window.onkeydown = event => {
             if (event.code === "F11" && event.shiftKey) {
                 this._navbarClick(event);
             }
         };
-        */
     }
 
     _injectModal() {
@@ -61,7 +59,7 @@ export default class F11 {
         const form = body
             .append("form")
             .attr("id", this._formId)
-            .attr("novalidate", "");
+            .attr("role", "form");
 
         form.append("div")
             .classed("alert alert-primary", true)
@@ -71,15 +69,17 @@ export default class F11 {
             .append("div")
             .classed("form-group", true)
             .append("div")
-            .classed("input-group mb-3", true);
+            .classed("input-group", true);
         inputGroup1.append("label").attr("for", this._xInputId);
         inputGroup1
             .append("input")
-            .classed("form-control needs-validation", true)
+            .classed("form-control", true)
             .attr("id", this._xInputId)
             .attr("type", "number")
             .attr("required", "")
             .attr("placeholder", "X coordinate")
+            .attr("min", "-819")
+            .attr("max", "819")
             .attr("step", "1")
             .attr("tabindex", "1")
             .attr("autofocus", "");
@@ -89,25 +89,23 @@ export default class F11 {
             .append("span")
             .classed("input-group-text", true)
             .text("k");
-        inputGroup1
-            .append("div")
-            .classed("invalid-feedback", true)
-            .text("Please enter a number between -819 and 819");
 
         const inputGroup2 = form
             .append("div")
             .classed("form-group", true)
             .append("div")
-            .classed("input-group mb-3", true);
+            .classed("input-group", true);
         inputGroup2.append("label").attr("for", this._zInputId);
         inputGroup2
             .append("input")
-            .classed("form-control needs-validation", true)
+            .classed("form-control", true)
             .attr("id", this._zInputId)
             .attr("type", "number")
             .attr("required", "")
             .attr("placeholder", "Z coordinate")
             .attr("step", "1")
+            .attr("min", "-819")
+            .attr("max", "819")
             .attr("tabindex", "2");
         inputGroup2
             .append("div")
@@ -115,10 +113,6 @@ export default class F11 {
             .append("span")
             .classed("input-group-text", true)
             .text("k");
-        inputGroup2
-            .append("div")
-            .classed("invalid-feedback", true)
-            .text("Please enter a number between -819 and 819");
 
         form.append("div")
             .classed("alert alert-primary", true)
@@ -130,31 +124,23 @@ export default class F11 {
             .classed("float-right btn-group", true)
             .attr("role", "group");
 
-        const copyButton = buttonGroup
+        const button = buttonGroup
             .append("button")
             .classed("btn btn-outline-secondary", true)
             .attr("id", this._copyButtonId)
             .attr("title", "Copy to clipboard")
             .attr("type", "button");
-        copyButton.append("i").classed("far fa-copy", true);
-
+        button.append("i").classed("far fa-copy", true);
         buttonGroup
             .append("button")
             .classed("btn btn-outline-secondary", true)
             .attr("id", this._submitButtonId)
             .attr("title", "Go to")
-            // .attr("data-dismiss", "modal")
             .attr("type", "submit")
             .text("Go to");
 
-        // Remove footer
-        // d3Select(`#${this._modalId} .modal-footer`).remove();
-
-        document.getElementById(`${this._copyButtonId}`).addEventListener("click", () => {
-            registerEvent("Menu", "Copy F11 coordinates");
-            console.log("Copy clicked");
-            this._copyCoordClicked();
-        });
+        const footer = d3Select(`#${this._modalId} .modal-footer`);
+        footer.remove();
     }
 
     /**
@@ -173,41 +159,18 @@ export default class F11 {
         // If the modal has no content yet, insert it
         if (!document.getElementById(this._modalId)) {
             this._initModal();
-        }
-        /*
-        const form = document.getElementById(`${this._formId}`);
-
-        const onFormSubmit = event => {
-            console.log("form submit");
-            if (form.checkValidity() === false) {
+            document.getElementById(this._formId).onsubmit = event => {
+                $(`#${this._modalId}`).modal("hide");
                 event.preventDefault();
-                event.stopPropagation();
-            }
-            // $(`#${this._modalId}`).modal("hide");
-            this._useUserInput();
-        };
-
-        form.addEventListener("submit", event => onFormSubmit(event));
-*/
-        // Show modal
-        $(`#${this._modalId}`).on("shown.bs.modal", () => {
-            // Fetch all the forms we want to apply custom Bootstrap validation styles to
-            const inputs = document.getElementsByClassName("needs-validation");
-            console.log("shown", inputs);
-            // Loop over them and prevent submission
-            const validation = Array.prototype.filter.call(inputs, input => {
-                console.log("check", input);
-                input.addEventListener("submit", event => {
-                    console.log("submit check", input);
-                    if (input.checkValidity() === false) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                    }
-                    input.classList.add("was-validated");
-                });
+                this._useUserInput();
+            };
+            document.getElementById(`${this._copyButtonId}`).addEventListener("click", () => {
+                registerEvent("Menu", "Copy F11 coordinates");
+                this._copyCoordClicked();
             });
-        });
+        }
 
+        // Show modal
         $(`#${this._modalId}`).modal("show");
     }
 
