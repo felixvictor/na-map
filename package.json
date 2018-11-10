@@ -137,7 +137,7 @@
         "last 1 major version",
         "not dead",
         "not ie >= 1",
-        "not android >= 1"
+        "not edge >= 1"
     ],
     "prettier": {
         "tabWidth": 4,
