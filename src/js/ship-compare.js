@@ -16,7 +16,6 @@ import { select as d3Select } from "d3-selection";
 import {
     arc as d3Arc,
     curveCatmullRomClosed as d3CurveCatmullRomClosed,
-    curveLinear as d3CurveLinear,
     pie as d3Pie,
     radialLine as d3RadialLine
 } from "d3-shape";
@@ -320,6 +319,7 @@ class ShipBase extends Ship {
         this._setBackground();
         this._setBackgroundGradient();
         this._drawProfile();
+        // this._drawCompassHelperFunction();
         this._printText();
     }
 
@@ -408,110 +408,45 @@ class ShipBase extends Ship {
     /**
      * Dummy function to draw compass
      * 1. Use function to draw path and circle
-     * 2. Use Pathfinder exclude in Illustrator
+     * 2. Use Pathfinder exclude for each block in Illustrator (copy circle first)
      * @return {void}
      * @private
      */
     _drawCompassHelperFunction() {
-        const compassSize = 350,
-            outerRadius = Math.floor(compassSize / 2);
+        const steps = 6,
+            compassSize = Math.min(this.shipCompareData.svgWidth / 2, this.shipCompareData.svgHeight / 2),
+            outerRadius = Math.floor(compassSize / (2 * Math.PI)),
+            innerRadius = outerRadius / steps;
         const compassScale = d3ScaleLinear()
-            .domain([0, 1, 2, 3])
-            .range([outerRadius * 0.4, outerRadius * 0.6, outerRadius * 0.8, outerRadius]);
+            .domain(Array.from(Array(steps).keys()))
+            .range([innerRadius, outerRadius]);
 
-        const data = [
-            3,
-            0,
-            0,
-            1,
-            0,
-            0,
-            1,
-            0,
-            0,
-            2,
-            0,
-            0,
-            1,
-            0,
-            0,
-            1,
-            0,
-            0,
-            3,
-            0,
-            0,
-            1,
-            0,
-            0,
-            1,
-            0,
-            0,
-            2,
-            0,
-            0,
-            1,
-            0,
-            0,
-            1,
-            0,
-            0,
-            3,
-            0,
-            0,
-            1,
-            0,
-            0,
-            1,
-            0,
-            0,
-            2,
-            0,
-            0,
-            1,
-            0,
-            0,
-            1,
-            0,
-            0,
-            3,
-            0,
-            0,
-            1,
-            0,
-            0,
-            1,
-            0,
-            0,
-            2,
-            0,
-            0,
-            1,
-            0,
-            0,
-            1,
-            0,
-            0
-        ];
-        const compassTeeth = data.length,
-            segments = (2 * Math.PI) / compassTeeth;
+        const classList = ["compass-extra", "compass-intercardinal", "compass-cardinal"];
+        [
+            [1, 1, 3, 1, 3, 1, 1, 1, 3, 1, 3, 1],
+            [1, 1, 1, 1, 1, 2, 4, 2, 1, 1, 1, 1],
+            [5, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2]
+        ].forEach((quarter, type) => {
+            const data = quarter
+                .concat(quarter)
+                .concat(quarter)
+                .concat(quarter);
+            const compassTeeth = data.length,
+                segments = (2 * Math.PI) / compassTeeth;
 
-        const compassPie = d3Pie()
-            .sort(null)
-            .value(1);
-        // const compassCurve = d3CurveCatmullRomClosed;
-        const compassCurve = d3CurveLinear;
-        const compassArcs = compassPie(data),
-            compassLine = d3RadialLine()
-                .angle((d, i) => i * segments)
-                .radius(d => compassScale(d.data))
+            const compassCurve = d3CurveCatmullRomClosed;
+            const compassLine = d3RadialLine()
+                .angle((d, j) => j * segments)
+                .radius(d => compassScale(d))
                 .curve(compassCurve);
-        console.log(compassArcs, compassLine);
-        const compass = this.g.append("path").style("fill", "blueviolet");
-        compass.attr("d", compassLine(compassArcs));
+            this.g
+                .append("path")
+                .classed(classList[type], true)
+                .attr("d", compassLine(data));
+        });
         this.g
             .append("circle")
-            .attr("r", outerRadius * 0.35)
+            .attr("r", compassScale(1) * 0.9)
             .style("fill", "red");
     }
 
