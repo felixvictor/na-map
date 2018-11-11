@@ -130,7 +130,7 @@ export default class CannonList {
         const modifiers = this._getModifiers(type);
         let text = "";
 
-        text += `<table id="table-${type}-list" class="table table-sm tablesort"><thead><tr><th data-sort-default>Pounds</th>`;
+        text += `<table id="table-${type}-list" class="table table-sm small tablesort"><thead><tr><th data-sort-default>Pounds</th>`;
         modifiers.forEach(modifier => {
             const name = capitalizeFirstLetter(
                 modifier

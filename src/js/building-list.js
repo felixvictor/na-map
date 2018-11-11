@@ -2,9 +2,9 @@
  */
 
 import { select as d3Select } from "d3-selection";
-import { formatPercent, formatInt } from "./util";
+import { formatInt } from "./util";
 import { registerEvent } from "./analytics";
-import { insertBaseModal } from "./common";
+import { getCurrencyAmount, insertBaseModal } from "./common";
 
 export default class Building {
     constructor(buildingData) {
@@ -89,11 +89,9 @@ export default class Building {
 
             if (currentBuilding.resource.price) {
                 text += '<table class="table table-sm"><tbody>';
-                text += `<tr><td>${currentBuilding.resource.price} reals per unit</td></tr>`;
+                text += `<tr><td>${getCurrencyAmount(currentBuilding.resource.price)} per unit</td></tr>`;
                 if (typeof currentBuilding.batch !== "undefined") {
-                    text += `<tr><td>Batch of ${currentBuilding.batch.amount} units at ${
-                        currentBuilding.batch.price
-                    } reals</td></tr>`;
+                    text += `<tr><td>Batch of ${currentBuilding.batch.amount} units at ${getCurrencyAmount(currentBuilding.batch.price)}</td></tr>`;
                 }
                 text += "</tbody></table>";
             }
@@ -123,7 +121,7 @@ export default class Building {
             });
         } else {
             text +=
-                "<tr><th>Level</th><th>Production (units)</th><th>Labour cost (%)</th><th>Storage (units)</th><th>Level build price (reals)</th></tr>";
+                "<tr><th>Level</th><th>Production (units)</th><th>Labour cost (%)</th><th>Storage (units)</th><th>Build price (reals)</th></tr>";
             text += "</thead><tbody>";
             currentBuilding.levels.forEach((level, i) => {
                 text += `<tr><td>${i}</td><td>${formatInt(level.production)}</td><td>${formatInt(
