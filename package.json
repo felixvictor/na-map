@@ -60,6 +60,7 @@
         "webpack": "^4.25.1",
         "webpack-bundle-analyzer": "^3.0.3",
         "webpack-cli": "^3.1.2",
+        "webpack-dev-server": "^3.1.10",
         "webpack-subresource-integrity": "^1.2.0",
         "xml2json": "^0.11.2",
         "yaml": "^1.0.0",
@@ -130,7 +131,8 @@
         "push-change": "build/port-data.sh push-change",
         "stylelint-check": "stylelint-config-prettier-check",
         "watch": "NODE_ENV=development webpack --mode=development --watch --colors --config webpack.config.js",
-        "dev": "NODE_ENV=development webpack --mode=development --colors --config webpack.config.js"
+        "dev": "NODE_ENV=development webpack --mode=development --colors --config webpack.config.js",
+        "start": "NODE_ENV=development webpack-dev-server --open --mode=development --colors --config webpack.config.js"
     },
     "browserslist": [
         ">= 1%",
