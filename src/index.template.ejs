@@ -27,87 +27,6 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
 
-            <li class="nav-item dropdown pr-2">
-                <a class="nav-link dropdown-toggle" href="#" id="predictDropdown" role="button" data-toggle="dropdown"
-                   aria-haspopup="true" aria-expanded="false">
-                    Predict wind
-                </a>
-                <div class="dropdown-menu" id="predictMenu" aria-labelledby="predictDropdown">
-                    <form id="windPrediction" class="p-2">
-                        <div class="form-group">
-                            <p class="form-text">1. Set current in-game wind</p>
-                            <div id="direction" class="rslider"></div>
-                        </div>
-                        <div class="form-group">
-                            <div class="input-group">
-                                <div class="input-group date" id="wind-time" data-target-input="nearest">
-                                    <label for="wind-time-input">2. Set predict time (server time)</label>
-                                    <input type="text" class="form-control datetimepicker-input"
-                                           data-target="#wind-time" aria-label="wind-time"
-                                           id="wind-time-input" required/>
-                                    <div class="input-group-append" data-target="#wind-time"
-                                         data-toggle="datetimepicker">
-                                        <span class="input-group-text"><i class="far fa-clock"></i></span>
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
-                        <button type="submit" class="float-right btn btn-outline-secondary">Predict</button>
-                    </form>
-                </div>
-            </li>
-
-            <li class="nav-item dropdown pr-2">
-                <a class="nav-link dropdown-toggle" href="#" id="moveToDropdown" role="button" data-toggle="dropdown"
-                   aria-haspopup="true" aria-expanded="false">
-                    Go to F11
-                </a>
-                <div class="dropdown-menu large-width p-2" id="moveToMenu" aria-labelledby="moveToDropdown">
-                    <form id="f11">
-                        <div class="input-group">
-                            <input class="form-control" id="x-coord" type="number" required placeholder="X" max="819"
-                                   min="-819" step="1">
-                            <div class="input-group-append">
-                                <span class="input-group-text">k</span>
-                            </div>
-                        </div>
-                        <div class="input-group">
-                            <input class="form-control" id="z-coord" type="number" required placeholder="Z" max="819"
-                                   min="-819" step="1">
-                            <div class="input-group-append">
-                                <span class="input-group-text">k</span>
-                            </div>
-                        </div>
-                        <small class="form-text text-muted">Coordinates in k units.
-                        </small>
-                        <small class="form-text text-muted">Example: enter <em>43</em> for in-game value
-                            of <em>43,162.5</em>.
-                        </small>
-                        <div class="float-right btn-group" role="group">
-                            <button class="btn btn-outline-secondary" id="copy-coord" title="Copy to clipboard"
-                                    type="button"><i class="far fa-copy"></i>
-                            </button>
-                            <button class="btn btn-outline-secondary" type="submit">Move to</button>
-                        </div>
-                    </form>
-                </div>
-            </li>
-
-            <li class="nav-item dropdown pr-2" id="positionNavbar">
-                <a class="nav-link dropdown-toggle" href="#" id="positionDropdown" role="button" data-toggle="dropdown"
-                   aria-haspopup="true" aria-expanded="false">
-                    Get position
-                </a>
-            </li>
-
-            <li class="nav-item dropdown pr-2" id="journeyNavbar">
-                <a class="nav-link dropdown-toggle" href="#" id="journeyDropdown" role="button" data-toggle="dropdown"
-                   aria-haspopup="true" aria-expanded="false">
-                    Make journey
-                </a>
-            </li>
-
             <li class="nav-item pr-2">
                 <label><select name="port-names-select" id="port-names-select"></select></label>
             </li>
@@ -252,12 +171,27 @@
         <ul class="navbar-nav ml-auto">
 
             <li class="nav-item dropdown pr-2">
-                <a class="nav-link dropdown-toggle btn btn-primary" href="#" id="extraDropdown" role="button"
+                <a class="nav-link dropdown-toggle btn-primary" href="#" id="map-tools-dropdown" role="button"
                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Tools
+                    Map tools
                 </a>
-                <div class="dropdown-menu dropdown-menu-right" id="extraMenu"
-                     aria-labelledby="extraDropdown">
+                <div class="dropdown-menu dropdown-menu-right" id="map-tools-menu"
+                     aria-labelledby="map-tools-dropdown">
+
+                    <a class="dropdown-item" id="button-predict-wind" href="#">Predict wind</a>
+                    <a class="dropdown-item" id="button-go-to-f11" href="#">Go to F11 <span class="small text-right badge badge-pill badge-primary">shift+F11</span></a>
+                    <a class="dropdown-item" id="button-get-position" href="#">Get position</a>
+                    <a class="dropdown-item" id="button-make-journey" href="#"> Make journey</a>
+                </div>
+            </li>
+
+            <li class="nav-item dropdown pr-2">
+                <a class="nav-link dropdown-toggle btn btn-primary" href="#" id="game-tools-dropdown" role="button"
+                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Game tools
+                </a>
+                <div class="dropdown-menu dropdown-menu-right" id="game-tools-menu"
+                     aria-labelledby="game-tools-dropdown">
 
                     <h6 class="dropdown-header">Compare</h6>
                     <a class="dropdown-item" id="button-ship-compare">Ships</a>
@@ -368,11 +302,6 @@
                         </div>
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" class="custom-control-input"
-                                   name="showLayer" id="show-layer-teleport" value="teleport">
-                            <label class="custom-control-label" for="show-layer-teleport">Teleport areas</label>
-                        </div>
-                        <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input"
                                    name="showLayer" id="show-layer-off" value="off">
                             <label class="custom-control-label" for="show-layer-off">Off</label>
                         </div>
@@ -409,5 +338,11 @@
     <div id="modal-section"></div>
 </main>
 
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
 </body>
 </html>
