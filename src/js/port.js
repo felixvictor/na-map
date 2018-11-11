@@ -314,41 +314,43 @@ export default class PortDisplay {
     _setupFlags() {
         const svgDef = d3Select("#na-svg defs");
 
-        nations.map(d => d.short).forEach(nation => {
-            const pattern = svgDef
-                .append("pattern")
-                .attr("id", nation)
-                .attr("width", "133%")
-                .attr("height", "100%")
-                .attr("viewBox", `6 6 ${this._iconSize} ${this._iconSize * 0.75}`);
-            pattern
-                .append("image")
-                .attr("height", this._iconSize)
-                .attr("width", this._iconSize)
-                .attr("href", `icons/${nation}.svg`);
-            pattern
-                .append("rect")
-                .attr("height", this._iconSize)
-                .attr("width", this._iconSize)
-                .attr("class", "nation");
+        nations
+            .map(d => d.short)
+            .forEach(nation => {
+                const pattern = svgDef
+                    .append("pattern")
+                    .attr("id", nation)
+                    .attr("width", "133%")
+                    .attr("height", "100%")
+                    .attr("viewBox", `6 6 ${this._iconSize} ${this._iconSize * 0.75}`);
+                pattern
+                    .append("image")
+                    .attr("height", this._iconSize)
+                    .attr("width", this._iconSize)
+                    .attr("href", `icons/${nation}.svg`);
+                pattern
+                    .append("rect")
+                    .attr("height", this._iconSize)
+                    .attr("width", this._iconSize)
+                    .attr("class", "nation");
 
-            const patternA = svgDef
-                .append("pattern")
-                .attr("id", `${nation}a`)
-                .attr("width", "133%")
-                .attr("height", "100%")
-                .attr("viewBox", `6 6 ${this._iconSize} ${this._iconSize * 0.75}`);
-            patternA
-                .append("image")
-                .attr("height", this._iconSize)
-                .attr("width", this._iconSize)
-                .attr("href", `icons/${nation}.svg`);
-            patternA
-                .append("rect")
-                .attr("height", this._iconSize)
-                .attr("width", this._iconSize)
-                .attr("class", "all");
-        });
+                const patternA = svgDef
+                    .append("pattern")
+                    .attr("id", `${nation}a`)
+                    .attr("width", "133%")
+                    .attr("height", "100%")
+                    .attr("viewBox", `6 6 ${this._iconSize} ${this._iconSize * 0.75}`);
+                patternA
+                    .append("image")
+                    .attr("height", this._iconSize)
+                    .attr("width", this._iconSize)
+                    .attr("href", `icons/${nation}.svg`);
+                patternA
+                    .append("rect")
+                    .attr("height", this._iconSize)
+                    .attr("width", this._iconSize)
+                    .attr("class", "all");
+            });
 
         // create filter with id #drop-shadow
         const filter = svgDef
@@ -449,9 +451,9 @@ export default class PortDisplay {
                 pbTimeRange: portProperties.nonCapturable
                     ? ""
                     : !portProperties.portBattleStartTime
-                        ? "11.00\u202f–\u202f8.00"
-                        : `${(portProperties.portBattleStartTime + 10) %
-                              24}.00\u202f–\u202f${(portProperties.portBattleStartTime + 13) % 24}.00`,
+                    ? "11.00\u202f–\u202f8.00"
+                    : `${(portProperties.portBattleStartTime + 10) %
+                          24}.00\u202f–\u202f${(portProperties.portBattleStartTime + 13) % 24}.00`,
                 brLimit: formatInt(portProperties.brLimit),
                 conquestMarksPension: portProperties.conquestMarksPension,
                 taxIncome: formatSiInt(portProperties.taxIncome),
@@ -597,11 +599,13 @@ export default class PortDisplay {
 
         const circleScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale),
             circleSize = roundToThousands(this._circleSize / circleScale),
-            data = this._portData.filter(port => this._pbData.ports.some(d => port.id === d.id)).map(port => {
-                // eslint-disable-next-line prefer-destructuring,no-param-reassign
-                port.properties.nation = this._pbData.ports.filter(d => port.id === d.id).map(d => d.nation)[0];
-                return port;
-            });
+            data = this._portData
+                .filter(port => this._pbData.ports.some(d => port.id === d.id))
+                .map(port => {
+                    // eslint-disable-next-line prefer-destructuring,no-param-reassign
+                    port.properties.nation = this._pbData.ports.filter(d => port.id === d.id).map(d => d.nation)[0];
+                    return port;
+                });
 
         // Data join
         const circleUpdate = this._gIcon.selectAll("circle").data(data, d => d.id);
@@ -659,11 +663,15 @@ export default class PortDisplay {
             const pbData = this._pbData.ports
                 .filter(d => d.attackHostility)
                 .map(d => ({ id: d.id, attackHostility: d.attackHostility }));
-            data = this._portData.filter(port => pbData.some(d => port.id === d.id)).map(port => {
-                // eslint-disable-next-line prefer-destructuring,no-param-reassign
-                port.properties.attackHostility = pbData.filter(d => port.id === d.id).map(d => d.attackHostility)[0];
-                return port;
-            });
+            data = this._portData
+                .filter(port => pbData.some(d => port.id === d.id))
+                .map(port => {
+                    // eslint-disable-next-line prefer-destructuring,no-param-reassign
+                    port.properties.attackHostility = pbData
+                        .filter(d => port.id === d.id)
+                        .map(d => d.attackHostility)[0];
+                    return port;
+                });
         } else if (this._showRadius === "green") {
             rGreenZone =
                 roundToThousands(
@@ -769,10 +777,8 @@ export default class PortDisplay {
 
     updateTexts() {
         if (this._zoomLevel === "initial") {
-            this._gText.attr("display", "none");
+            this._gText.classed("d-none", true);
         } else {
-            this._gText.attr("display", "inherit");
-
             const circleScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale),
                 circleSize = roundToThousands(this._circleSize / circleScale),
                 fontScale = 2 ** Math.log2((Math.abs(this._minScale) + this._scale) * 0.9),
@@ -800,6 +806,7 @@ export default class PortDisplay {
                 .attr("y", d => this._updateTextsY(d, circleSize, fontSize))
                 .attr("font-size", d => (d.id === this._highlightId ? `${fontSize * 2}px` : `${fontSize}px`))
                 .attr("text-anchor", d => this._updateTextsAnchor(d));
+            this._gText.classed("d-none", false);
         }
     }
 
@@ -820,9 +827,8 @@ export default class PortDisplay {
 
     _updateCounties() {
         if (this._zoomLevel !== "portLabel") {
-            this._gCounty.attr("display", "none");
+            this._gCounty.classed("d-none", true);
         } else {
-            this._gCounty.attr("display", "inherit");
             const data = this._countyPolygon;
 
             // Data join
@@ -855,14 +861,15 @@ export default class PortDisplay {
                 .attr("d", d => d3line2(d.polygon))
                 .attr("fill", "#373");
                 */
+
+            this._gCounty.classed("d-none", false);
         }
     }
 
     _updateRegions() {
         if (this._zoomLevel !== "initial") {
-            this._gRegion.attr("display", "none");
+            this._gRegion.classed("d-none", true);
         } else {
-            this._gRegion.attr("display", "inherit");
             const data = this._regionPolygon;
 
             // Data join
@@ -895,6 +902,7 @@ export default class PortDisplay {
                 .attr("d", d => d3line2(d.polygon))
                 .attr("fill", "#999");
                 */
+            this._gRegion.classed("d-none", false);
         }
     }
 
