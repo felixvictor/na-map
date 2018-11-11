@@ -25,12 +25,11 @@ import {
     faTimes,
     faTrash
 } from "@fortawesome/fontawesome-free-solid";
-import moment from "moment";
-import "moment/locale/en-gb";
 import Cookies from "js-cookie";
-import ResizeObserver from "resize-observer-polyfill";
 
 import { initAnalytics, registerPage } from "./analytics";
+
+import "../scss/main.scss";
 
 import Map from "./map";
 
@@ -134,7 +133,6 @@ function main() {
     Cookies.defaults = {
         expires: 365
     };
-    moment.locale("en-gb");
 
     setupListener();
     const map = new Map(serverName);
