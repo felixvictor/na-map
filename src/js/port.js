@@ -41,8 +41,7 @@ export default class PortDisplay {
 
         this._zoomLevel = "initial";
         this._showPBZones = "all";
-        this._highlightId = null;
-        this._highlightDuration = 200;
+        this._tooltipDuration = 200;
         this._iconSize = 48;
         this._fontSize = defaultFontSize;
         this._circleSize = defaultCircleSize;
@@ -580,8 +579,8 @@ export default class PortDisplay {
         $(port._groups[0])
             .tooltip({
                 delay: {
-                    show: this._highlightDuration,
-                    hide: this._highlightDuration
+                    show: this._tooltipDuration,
+                    hide: this._tooltipDuration
                 },
                 html: true,
                 placement: "auto",
@@ -630,7 +629,7 @@ export default class PortDisplay {
             .on("mouseout", hideDetails);
 
         // Apply to both old and new
-        circleUpdate.merge(circleEnter).attr("r", d => (d.id === this._highlightId ? circleSize * 2 : circleSize));
+        circleUpdate.merge(circleEnter).attr("r", d => circleSize);
     }
 
     _updatePortCircles() {
@@ -749,13 +748,10 @@ export default class PortDisplay {
     }
 
     _updateTextsY(d, circleSize, fontSize) {
-        const deltaY = circleSize + fontSize * 1.2,
-            deltaY2 = circleSize * 2 + fontSize * 2;
+        const deltaY = circleSize + fontSize * 1.2;
 
         if (this._zoomLevel !== "pbZone") {
-            return d.id === this._highlightId
-                ? d.geometry.coordinates[1] + deltaY2
-                : d.geometry.coordinates[1] + deltaY;
+            return d.geometry.coordinates[1] + deltaY;
         }
         const dy = d.properties.angle > 90 && d.properties.angle < 270 ? fontSize : 0;
         return this._showPBZones === "all" || (this._showPBZones === "single" && d.id === this.currentPort.id)
@@ -784,6 +780,8 @@ export default class PortDisplay {
                 fontScale = 2 ** Math.log2((Math.abs(this._minScale) + this._scale) * 0.9),
                 fontSize = roundToThousands(this._fontSize / fontScale);
 
+            this._gText.attr("font-size", `${fontSize}px`);
+
             // Data join
             const textUpdate = this._gText.selectAll("text").data(this._portData, d => d.id);
 
@@ -804,7 +802,6 @@ export default class PortDisplay {
                 .merge(textEnter)
                 .attr("x", d => this._updateTextsX(d, circleSize))
                 .attr("y", d => this._updateTextsY(d, circleSize, fontSize))
-                .attr("font-size", d => (d.id === this._highlightId ? `${fontSize * 2}px` : `${fontSize}px`))
                 .attr("text-anchor", d => this._updateTextsAnchor(d));
             this._gText.classed("d-none", false);
         }
@@ -914,10 +911,6 @@ export default class PortDisplay {
         this._updateSummary();
         this._updateCounties();
         this._updateRegions();
-    }
-
-    set highlightId(highlightId) {
-        this._highlightId = highlightId;
     }
 
     set portDataDefault(portDataDefault) {
