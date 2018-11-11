@@ -11,6 +11,7 @@ const // { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer"),
     MinifyPlugin = require("babel-minify-webpack-plugin"),
     SitemapPlugin = require("sitemap-webpack-plugin").default,
     SriPlugin = require("webpack-subresource-integrity"),
+    WebpackDeepScopeAnalysisPlugin = require('webpack-deep-scope-plugin').default,
     WebappWebpackPlugin = require("webapp-webpack-plugin");
 const PACKAGE = require("./package.json");
 
@@ -173,7 +174,16 @@ const config = {
         mainFields: ["module", "main"]
     },
 
+    stats: {
+        // Examine all modules
+        maxModules: Infinity,
+        // Display bailout reasons
+        optimizationBailout: true
+    },
+
     optimization: {
+        noEmitOnErrors: true,
+        concatenateModules: true,
         runtimeChunk: {
             name: "manifest"
         },
@@ -263,6 +273,7 @@ const config = {
             hashFuncNames: ["sha256", "sha384"],
             enabled: isProd
         }),
+        new WebpackDeepScopeAnalysisPlugin(),
         new WebappWebpackPlugin({
             cache: true,
             logo: "./images/icons/logo.jpg",
@@ -410,7 +421,7 @@ module.exports = (env, argv) => {
         config.plugins.push(new MinifyPlugin(minifyMinifyOpt, pluginMinifyOpt));
     } else {
         config.devtool = "eval-source-map";
-        config.plugins.push(new webpack.HotModuleReplacementPlugin(), new webpack.NoEmitOnErrorsPlugin());
+        config.plugins.push(new webpack.HotModuleReplacementPlugin());
     }
 
     return config;
