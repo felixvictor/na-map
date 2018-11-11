@@ -6,6 +6,7 @@ import {
     convertCoordY,
     rotationAngleInDegrees,
     readJson,
+    roundToThousands,
     saveJson
     // eslint-disable-next-line import/extensions
 } from "./common.mjs";
@@ -28,12 +29,17 @@ String.prototype.replaceAll = function(search, replacement) {
 };
 
 function getItemNames() {
-    APIItems.filter(item => item.ItemType === "Material" || item.ItemType === "Resource").forEach(item => {
-        ItemNames.set(item.Id, {
-            name: item.Name.replaceAll("'", "’"),
-            trading: item.SortingGroup === "Resource.Trading"
-        });
-    });
+    APIItems.filter(item => !item.NotUsed && (item.ItemType === "Material" || item.ItemType === "Resource")).forEach(
+        item => {
+            ItemNames.set(item.Id, {
+                name: item.Name.replaceAll("'", "’"),
+                trading:
+                    item.SortingGroup === "Resource.Trading" ||
+                    item.Name === "American Cotton" ||
+                    item.Name === "Tobacco"
+            });
+        }
+    );
 }
 
 function convertPorts() {
@@ -146,38 +152,42 @@ function convertPorts() {
                 netIncome: port.LastTax - port.LastCost,
                 tradingCompany: port.TradingCompany,
                 laborHoursDiscount: port.LaborHoursDiscount,
-                producesTrading: portShop.map(shop =>
-                    shop.ResourcesProduced.filter(good => ItemNames.get(good.Key).trading)
-                        .map(good => ItemNames.get(good.Key).name)
-                        .sort()
-                )[0],
                 dropsTrading: portShop.map(shop =>
-                    shop.ResourcesAdded.filter(good => ItemNames.get(good.Template).trading)
-                        .map(good => ItemNames.get(good.Template).name)
-                        .sort()
+                    shop.ResourcesAdded.filter(
+                        good => ItemNames.has(good.Template) && ItemNames.get(good.Template).trading
+                    ).map(good => ({
+                        name: ItemNames.get(good.Template).name,
+                        amount: good.Amount,
+                        chance: roundToThousands(good.Chance * 100)
+                    }))
                 )[0],
                 consumesTrading: portShop.map(shop =>
-                    shop.ResourcesConsumed.filter(good => ItemNames.get(good.Key).trading)
-                        .map(good => ItemNames.get(good.Key).name)
-                        .sort()
+                    shop.ResourcesConsumed.filter(
+                        good => ItemNames.has(good.Key) && ItemNames.get(good.Key).trading
+                    ).map(good => ({ name: ItemNames.get(good.Key).name }))
                 )[0],
                 producesNonTrading: portShop.map(shop =>
-                    shop.ResourcesProduced.filter(good => !ItemNames.get(good.Key).trading)
-                        .map(good => ItemNames.get(good.Key).name)
-                        .sort()
+                    shop.ResourcesProduced.filter(
+                        good => ItemNames.has(good.Key) && !ItemNames.get(good.Key).trading
+                    ).map(good => ({ name: ItemNames.get(good.Key).name }))
                 )[0],
                 dropsNonTrading: portShop.map(shop =>
-                    shop.ResourcesAdded.filter(good => !ItemNames.get(good.Template).trading)
-                        .map(good => ItemNames.get(good.Template).name)
-                        .sort()
-                )[0],
-                consumesNonTrading: portShop.map(shop =>
-                    shop.ResourcesConsumed.filter(good => !ItemNames.get(good.Key).trading)
-                        .map(good => ItemNames.get(good.Key).name)
-                        .sort()
+                    shop.ResourcesAdded.filter(
+                        good => ItemNames.has(good.Template) && !ItemNames.get(good.Template).trading
+                    ).map(good => ({
+                        name: ItemNames.get(good.Template).name,
+                        amount: good.Amount,
+                        chance: roundToThousands(good.Chance * 100)
+                    }))
                 )[0]
             }
         };
+        // Delete empty entries
+        ["dropsTrading", "consumesTrading", "producesNonTrading", "dropsNonTrading"].forEach(type => {
+            if (!feature.properties[type].length) {
+                delete feature.properties[type];
+            }
+        });
         geoJsonPort.features.push(feature);
     }
 
