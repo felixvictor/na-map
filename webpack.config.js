@@ -151,6 +151,10 @@ const svgoOpt = {
 const config = {
     context: path.resolve(__dirname, "src"),
 
+    devServer: {
+        contentBase: outputPath
+    },
+
     entry: [path.resolve(__dirname, PACKAGE.main), path.resolve(__dirname, PACKAGE.sass)],
 
     externals: {
