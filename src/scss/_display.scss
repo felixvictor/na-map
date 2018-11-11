@@ -7,8 +7,8 @@
  */
 
 $background-colour: $primary-500;
-$paddingHalf: 1.618/2;
-$paddingThird: 1.618/3;
+$paddingHalf: map-get($spacers, 2);
+$paddingThird: map-get($spacers, 1);
 
 #na-svg {
     background-color: $background-colour;
@@ -24,22 +24,41 @@ $paddingThird: 1.618/3;
     z-index: $zindex-sticky;
 }
 
+text,
+.overlay {
+    cursor: default;
+}
+
 .port-summary,
 .journey-summary {
     @include float-right;
     background: rgba($primary-100, 0.8);
-    padding: map-get($spacers, 2);
+    padding: $paddingHalf;
 
     .block {
-        padding: map-get($spacers, 2);
+        padding: $paddingHalf;
     }
 
     .des {
         top: 0;
     }
-  button{
-    margin-bottom: map-get($spacers, 2);
-  }
+    button {
+        margin-bottom: map-get($spacers, 2);
+    }
+}
+
+.ports {
+    .port-circles {
+        circle.position {
+            fill-opacity: 0.4;
+            fill: $white;
+        }
+    }
+    g.position path {
+        //    stroke: $green;
+        fill: $green;
+        fill-opacity: 0.6;
+    }
 }
 
 // port icons (available to nation)
@@ -77,14 +96,13 @@ pattern .all {
     background-color: $primary-100;
 }
 
+.table .table {
+    background-color: $primary-200;
+}
+
 table tr,
 p {
     text-align: left;
-}
-
-.table-sm th {
-    padding-top: $paddingHalf * 1rem;
-    padding-bottom: $paddingHalf * 1rem;
 }
 
 .table {
@@ -105,34 +123,30 @@ table a {
     }
 }
 
-.recipes,
-.product,
-.tooltip {
-    .table-sm th,
-    .table-sm td {
-        padding: 0.3rem 0;
-    }
+.table-sm th,
+.table-sm td {
+    padding: $paddingThird/2;
 }
 
 .ship-base,
 .ship-compare {
     .block {
-        padding: 0 $paddingThird * 1rem;
+        padding: 0 $paddingThird;
     }
     .small {
-        padding: $paddingHalf * 1rem 0;
+        padding: $paddingThird 0;
     }
 }
 
 .ship-base {
     .light {
-        background-color: $primary-300;
+        background-color: $primary-200;
     }
 }
 
 .ship-compare {
     .light {
-        background-color: $secondary-300;
+        background-color: $secondary-200;
     }
 }
 
@@ -144,8 +158,8 @@ table a {
             background-color: $secondary-200;
         }
         td {
-            padding-top: $paddingHalf * 1rem;
-            padding-bottom: $paddingHalf * 1rem;
+            padding-top: $paddingHalf;
+            padding-bottom: $paddingHalf;
         }
         tbody tr:nth-of-type(odd) {
             background-color: $primary-300;
@@ -163,7 +177,7 @@ table a {
     width: auto;
     th,
     td {
-        padding-right: $paddingHalf * 1rem;
+        padding-right: $paddingHalf;
     }
     td {
         text-align: right;
@@ -489,11 +503,11 @@ text {
 }
 
 .wind-head {
-    fill: $primary-900 !important;
+    fill: $secondary-600 !important;
 }
 
 .wind {
-    stroke: $primary-900 !important;
+    stroke: $secondary-600 !important;
 }
 
 .wind,
@@ -554,7 +568,7 @@ text {
 }
 
 .rs-control .rs-path-color {
-    background-color: $primary-200;
+    background-color: $primary-300;
 }
 
 .rs-control .rs-handle {
