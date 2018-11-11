@@ -20,7 +20,7 @@ import {
     radialLine as d3RadialLine
 } from "d3-shape";
 
-import { formatInt, formatFloat, getOrdinal, isEmpty, roundToThousands } from "./util";
+import { degreesToCompass, formatInt, formatFloat, getOrdinal, isEmpty, roundToThousands } from "./util";
 import { registerEvent } from "./analytics";
 import WoodCompare from "./wood-compare";
 import { insertBaseModal } from "./common";
@@ -47,7 +47,7 @@ class Ship {
 
         this._setupSvg();
         this._g = d3Select(this._select).select("g");
-        this._setCompass();
+        //  this._setCompass();
     }
 
     /**
@@ -316,10 +316,10 @@ class ShipBase extends Ship {
         this._shipData = shipData;
         this._shipCompareData = shipCompareData;
 
-        this._setBackground();
-        this._setBackgroundGradient();
-        this._drawProfile();
-        // this._drawCompassHelperFunction();
+        //    this._setBackground();
+        //    this._setBackgroundGradient();
+        //    this._drawProfile();
+        this._drawCompassHelperFunction();
         this._printText();
     }
 
@@ -413,41 +413,88 @@ class ShipBase extends Ship {
      * @private
      */
     _drawCompassHelperFunction() {
-        const steps = 6,
-            compassSize = Math.min(this.shipCompareData.svgWidth / 2, this.shipCompareData.svgHeight / 2),
-            outerRadius = Math.floor(compassSize / (2 * Math.PI)),
-            innerRadius = outerRadius / steps;
-        const compassScale = d3ScaleLinear()
-            .domain(Array.from(Array(steps).keys()))
-            .range([innerRadius, outerRadius]);
+        const steps = 24,
+            stepRadians = (2 * Math.PI) / steps,
+            radius = Math.min(this.shipCompareData.svgWidth, this.shipCompareData.svgHeight) / 2,
+            outerRadius = radius - 1,
+            innerRadius = radius * 0.8;
+        const textArc = d3Arc()
+            .outerRadius(outerRadius)
+            .innerRadius(innerRadius);
+        const marksArc = d3Arc()
+            .outerRadius(innerRadius)
+            .innerRadius(innerRadius);
+        const data = Array.from(new Array(steps), () => 1);
+        const marksPie = d3Pie()
+                .startAngle(0)
+                .endAngle(2 * Math.PI)
+                .sort(null)
+                .value(d => d),
+            textPie = d3Pie()
+                .startAngle(0 - stepRadians / 2)
+                .endAngle(2 * Math.PI - stepRadians / 2)
+                .sort(null)
+                .value(d => d),
+            textArcs = textPie(data),
+            marksArcs = marksPie(data);
 
-        const classList = ["compass-extra", "compass-intercardinal", "compass-cardinal"];
-        [
-            [1, 1, 3, 1, 3, 1, 1, 1, 3, 1, 3, 1],
-            [1, 1, 1, 1, 1, 2, 4, 2, 1, 1, 1, 1],
-            [5, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2]
-        ].forEach((quarter, type) => {
-            const data = quarter
-                .concat(quarter)
-                .concat(quarter)
-                .concat(quarter);
-            const compassTeeth = data.length,
-                segments = (2 * Math.PI) / compassTeeth;
+        this.g.attr("text-anchor", "middle");
 
-            const compassCurve = d3CurveCatmullRomClosed;
-            const compassLine = d3RadialLine()
-                .angle((d, j) => j * segments)
-                .radius(d => compassScale(d))
-                .curve(compassCurve);
-            this.g
-                .append("path")
-                .classed(classList[type], true)
-                .attr("d", compassLine(data));
-        });
+        /*
+        this.g
+            .selectAll(".mark-arc")
+            .data(textArcs)
+            .enter()
+            .append("path")
+            .attr("class", ".mark-arc")
+            .attr("stroke", "gray")
+            //.attr("stroke-width", (d, i) => (i % 3 === 0 ? 0 : "3px"))
+            .attr("stroke-width",  "3px")
+            .attr("d", marksArc);
+        */
+
         this.g
             .append("circle")
-            .attr("r", compassScale(1) * 0.9)
-            .style("fill", "red");
+            .attr("r", innerRadius)
+            .attr("stroke-width", "5px")
+            .attr("stroke", "grey");
+
+        this.g
+            .selectAll(".text-arc")
+            .data(textArcs)
+            .enter()
+            .append("path")
+            .attr("class", ".text-arc")
+            .attr("d", textArc);
+        const texts = this.g
+            .selectAll("text")
+            .data(textArcs)
+            .enter()
+            .append("text")
+            .attr("transform", d => `translate(${textArc.centroid(d)})`)
+            .attr("dy", "0rem");
+        // text.filter((d,i) => data[i].name && d.endAngle - d.startAngle > 0.25)
+        texts
+            .filter((d, i) => i % 3 === 0)
+            .append("tspan")
+            .attr("x", 0)
+            .attr("y", "0.5rem")
+            .text(d => degreesToCompass((360 / steps) * d.index));
+
+        const ticks = this.g
+            .selectAll("line")
+            .data(textArcs)
+            .enter()
+            .append("line");
+        ticks
+            .filter((d, i) => i % 3 !== 0)
+            .attr("x1", 0)
+            .attr("x2", 0)
+            .attr("y1", -outerRadius * 0.95)
+            .attr("y2", -innerRadius)
+            .attr("stroke", "grey")
+            .attr("stroke-width", "3px")
+            .attr("transform", d => `rotate(${((d.startAngle + d.endAngle) / 2) * (180 / Math.PI)})`);
     }
 
     /**
