@@ -17,7 +17,7 @@ const formatLocale = d3FormatLocale({
     decimal: ".",
     thousands: "\u202f",
     grouping: [3],
-    currency: ["", "\u00a0gold"],
+    currency: ["", "\u00a0reals"],
     percent: "\u202f%"
 });
 
@@ -87,11 +87,12 @@ export const formatSiInt = x =>
  * Format percent value
  * @function
  * @param {Number} x - Percent
+ * @param {Number} f - digits following decimal point
  * @return {String} Formatted percent value
  */
-export const formatPercent = x =>
+export const formatPercent = (x, f = 1) =>
     formatLocale
-        .format(".1%")(x)
+        .format(`.${f}%`)(x)
         .replace(".0", "")
         .replace("-", "\u2212\u202f");
 
@@ -120,11 +121,19 @@ export function getOrdinal(n) {
 }
 
 /**
+ * {@link https://github.com/30-seconds/30-seconds-of-code#round}
+ * @param {number} n - number
+ * @param {number} decimals - decimals
+ * @return {number} Rounded number
+ */
+const round = (n, decimals = 0) => Number(`${Math.round(`${n}e${decimals}`)}e-${decimals}`);
+
+/**
  * Round to thousands
  * @param {Number} x - Integer
  * @return {Number} Rounded input
  */
-export const roundToThousands = x => Math.round(x * 1000) / 1000;
+export const roundToThousands = x => round(x, 3);
 
 /**
  * Test if object is empty

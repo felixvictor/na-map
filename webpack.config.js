@@ -3,22 +3,31 @@
 const webpack = require("webpack");
 
 const path = require("path");
-const CopyPlugin = require("copy-webpack-plugin"),
+const // { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer"),
+    CleanWebpackPlugin = require("clean-webpack-plugin"),
+    CopyPlugin = require("copy-webpack-plugin"),
     HtmlPlugin = require("html-webpack-plugin"),
     MiniCssExtractPlugin = require("mini-css-extract-plugin"),
     MinifyPlugin = require("babel-minify-webpack-plugin"),
     SitemapPlugin = require("sitemap-webpack-plugin").default,
     SriPlugin = require("webpack-subresource-integrity"),
+    WebpackDeepScopeAnalysisPlugin = require('webpack-deep-scope-plugin').default,
     WebappWebpackPlugin = require("webapp-webpack-plugin");
 const PACKAGE = require("./package.json");
 
 const libraryName = PACKAGE.name,
+    gtagLink = "https://www.googletagmanager.com/gtag/js?id=UA-109520372-1",
+    { TARGET } = process.env,
+    isProd = process.env.NODE_ENV === "production",
     description =
         "Yet another map with in-game map, F11 coordinates, resources, ship and wood comparison. Port data is updated constantly from twitter and daily after maintenance.",
     sitemapPaths = ["/fonts/", "/icons", "/images"];
 
+const outputPath = path.resolve(__dirname, "public");
+
 const babelOpt = {
     cacheDirectory: true,
+    plugins: ["@babel/plugin-syntax-dynamic-import"],
     presets: [
         [
             "@babel/preset-env",
@@ -143,7 +152,16 @@ const svgoOpt = {
 const config = {
     context: path.resolve(__dirname, "src"),
 
+    devServer: {
+        contentBase: outputPath
+    },
+
     entry: [path.resolve(__dirname, PACKAGE.main), path.resolve(__dirname, PACKAGE.sass)],
+
+    externals: {
+        jquery: "jQuery",
+        "popper.js": "Popper"
+    },
 
     resolve: {
         alias: {
@@ -157,6 +175,11 @@ const config = {
     },
 
     optimization: {
+        noEmitOnErrors: true,
+        concatenateModules: true,
+        runtimeChunk: {
+            name: "manifest"
+        },
         splitChunks: {
             cacheGroups: {
                 styles: {
@@ -164,21 +187,38 @@ const config = {
                     test: /\.css$/,
                     chunks: "all",
                     enforce: true
+                },
+                vendor: {
+                    test: /[\\/]node_modules[\\/]/,
+                    name: "vendors",
+                    chunks: "all"
                 }
             }
         }
     },
 
     output: {
-        path: `${__dirname}/public`,
-        filename: `${libraryName}.min.js`,
+        chunkFilename: isProd ? "[name].[chunkhash].bundle.js" : "[name].bundle.js",
+        filename: isProd ? "[name].[hash].js" : "[name].js",
+        path: outputPath,
         crossOriginLoading: "anonymous"
     },
 
     plugins: [
-        new MiniCssExtractPlugin({
-            filename: `${libraryName}.min.css`
+        /*
+        new BundleAnalyzerPlugin({
+            analyzerMode: isProd ? "static" : "disabled",
+            generateStatsFile: true,
+            logLevel: "warn",
+            openAnalyzer: isProd,
+            statsFilename: path.resolve(__dirname, "webpack-stats.json"),
+            reportFilename: path.resolve(__dirname, "report.html")
         }),
+        */
+        new CleanWebpackPlugin(outputPath, {
+            verbose: false
+        }),
+        new MiniCssExtractPlugin({ filename: isProd ? "[name].[contenthash].css" : "[name].css" }),
         new webpack.DefinePlugin({
             DESCRIPTION: JSON.stringify(description),
             TITLE: JSON.stringify(PACKAGE.description),
@@ -200,11 +240,11 @@ const config = {
             Tooltip: "exports-loader?Tooltip!bootstrap/js/dist/tooltip",
             Util: "exports-loader?Util!bootstrap/js/dist/util"
         }),
+        // Do not include all moment locale files, certain locales are loaded by import
         new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
         new CopyPlugin([
             { from: "google979f2cf3bed204d6.html", to: "google979f2cf3bed204d6.html", toType: "file" },
-            { from: "images/map", to: "../public/images/map" },
-            //       { from: "images/icons", to: "../public/images/icons" },
+            { from: "images/map", to: `${outputPath}/images/map` },
             { from: "*.json" },
             { from: "*.xlsx" },
             { from: "../netlify.toml" }
@@ -212,9 +252,8 @@ const config = {
         new HtmlPlugin({
             brand: "images/icons/favicon-32x32.png",
             description,
-            filename: "index.html",
-            gtag: "https://www.googletagmanager.com/gtag/js?id=UA-109520372-1",
-            hash: true,
+            gtag: gtagLink,
+            hash: false,
             inject: "body",
             lang: "en-GB",
             meta: { viewport: "width=device-width, initial-scale=1, shrink-to-fit=no" },
@@ -222,11 +261,12 @@ const config = {
             template: "index.template.ejs",
             title: PACKAGE.description
         }),
-        new SitemapPlugin(`https://${process.env.TARGET}.netlify.com/`, sitemapPaths, { skipGzip: false }),
+        new SitemapPlugin(`https://${TARGET}.netlify.com/`, sitemapPaths, { skipGzip: false }),
         new SriPlugin({
             hashFuncNames: ["sha256", "sha384"],
-            enabled: process.env.NODE_ENV === "production"
+            enabled: isProd
         }),
+        new WebpackDeepScopeAnalysisPlugin(),
         new WebappWebpackPlugin({
             cache: true,
             logo: "./images/icons/logo.jpg",
@@ -279,6 +319,20 @@ const config = {
                     {
                         loader: "sass-loader",
                         options: sassOpt
+                    }
+                ]
+            },
+            {
+                test: /\.css$/,
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    {
+                        loader: "css-loader",
+                        options: cssOpt
+                    },
+                    {
+                        loader: "postcss-loader",
+                        options: postcssOpt
                     }
                 ]
             },
@@ -360,7 +414,7 @@ module.exports = (env, argv) => {
         config.plugins.push(new MinifyPlugin(minifyMinifyOpt, pluginMinifyOpt));
     } else {
         config.devtool = "eval-source-map";
-        config.plugins.push(new webpack.HotModuleReplacementPlugin(), new webpack.NoEmitOnErrorsPlugin());
+        config.plugins.push(new webpack.HotModuleReplacementPlugin());
     }
 
     return config;
