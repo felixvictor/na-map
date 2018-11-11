@@ -9,31 +9,39 @@ import Cookies from "js-cookie";
 import moment from "moment";
 import "moment/locale/en-gb";
 
-import { nations, defaultFontSize, defaultCircleSize, getDistance, convertCoordX, convertCoordY } from "./common";
-import { formatInt, formatSiInt, formatPercent, roundToThousands, degreesToRadians } from "./util";
-import TriangulatePosition from "./get-position";
+import {
+    circleRadiusFactor,
+    nations,
+    defaultFontSize,
+    defaultCircleSize,
+    getDistance,
+    convertCoordX,
+    convertCoordY
+} from "./common";
+import { formatInt, formatSiInt, formatPercent, roundToThousands, degreesToRadians, formatFloatFixed } from "./util";
+import TrilateratePosition from "./get-position";
 
 export default class PortDisplay {
-    constructor(portData, pbData, serverName, minScale) {
+    constructor(portData, pbData, map) {
         this._portDataDefault = portData;
-        this._serverName = serverName;
-        this._minScale = minScale;
-        this._scale = minScale;
+        this._portData = portData;
+        this._pbData = pbData;
+        this._map = map;
+
+        this._serverName = this._map._serverName;
+        this._minScale = this._map._minScale;
+        this._scale = this._minScale;
+        this.f11 = this._map._f11;
 
         this.showCurrentGood = false;
         this.showTradePortPartners = false;
-        this._portData = portData;
-        this._pbData = pbData;
-
-        this._triangulatePosition = new TriangulatePosition(this);
 
         // Shroud Cay
         this._currentPort = { id: "366", coord: { x: 4396, y: 2494 } };
 
         this._zoomLevel = "initial";
         this._showPBZones = "all";
-        this._highlightId = null;
-        this._highlightDuration = 200;
+        this._tooltipDuration = 200;
         this._iconSize = 48;
         this._fontSize = defaultFontSize;
         this._circleSize = defaultCircleSize;
@@ -75,6 +83,8 @@ export default class PortDisplay {
         this._setupRegions();
         this._setupSummary();
         this._setupFlags();
+
+        this._trilateratePosition = new TrilateratePosition(this);
     }
 
     _setupListener() {
@@ -115,13 +125,13 @@ export default class PortDisplay {
 
     _setupSvg() {
         this._gPort = d3Select("#na-svg")
-            .append("g")
+            .insert("g", "g.f11")
             .classed("ports", true);
+        this._gRegion = this._gPort.append("g").classed("region", true);
+        this._gCounty = this._gPort.append("g").classed("county", true);
         this._gPortCircle = this._gPort.append("g").classed("port-circles", true);
         this._gIcon = this._gPort.append("g").classed("port", true);
         this._gText = this._gPort.append("g").classed("port-names", true);
-        this._gCounty = this._gPort.append("g").classed("county", true);
-        this._gRegion = this._gPort.append("g").classed("region", true);
     }
 
     _setupCounties() {
@@ -303,41 +313,43 @@ export default class PortDisplay {
     _setupFlags() {
         const svgDef = d3Select("#na-svg defs");
 
-        nations.map(d => d.short).forEach(nation => {
-            const pattern = svgDef
-                .append("pattern")
-                .attr("id", nation)
-                .attr("width", "133%")
-                .attr("height", "100%")
-                .attr("viewBox", `6 6 ${this._iconSize} ${this._iconSize * 0.75}`);
-            pattern
-                .append("image")
-                .attr("height", this._iconSize)
-                .attr("width", this._iconSize)
-                .attr("href", `icons/${nation}.svg`);
-            pattern
-                .append("rect")
-                .attr("height", this._iconSize)
-                .attr("width", this._iconSize)
-                .attr("class", "nation");
+        nations
+            .map(d => d.short)
+            .forEach(nation => {
+                const pattern = svgDef
+                    .append("pattern")
+                    .attr("id", nation)
+                    .attr("width", "133%")
+                    .attr("height", "100%")
+                    .attr("viewBox", `6 6 ${this._iconSize} ${this._iconSize * 0.75}`);
+                pattern
+                    .append("image")
+                    .attr("height", this._iconSize)
+                    .attr("width", this._iconSize)
+                    .attr("href", `icons/${nation}.svg`);
+                pattern
+                    .append("rect")
+                    .attr("height", this._iconSize)
+                    .attr("width", this._iconSize)
+                    .attr("class", "nation");
 
-            const patternA = svgDef
-                .append("pattern")
-                .attr("id", `${nation}a`)
-                .attr("width", "133%")
-                .attr("height", "100%")
-                .attr("viewBox", `6 6 ${this._iconSize} ${this._iconSize * 0.75}`);
-            patternA
-                .append("image")
-                .attr("height", this._iconSize)
-                .attr("width", this._iconSize)
-                .attr("href", `icons/${nation}.svg`);
-            patternA
-                .append("rect")
-                .attr("height", this._iconSize)
-                .attr("width", this._iconSize)
-                .attr("class", "all");
-        });
+                const patternA = svgDef
+                    .append("pattern")
+                    .attr("id", `${nation}a`)
+                    .attr("width", "133%")
+                    .attr("height", "100%")
+                    .attr("viewBox", `6 6 ${this._iconSize} ${this._iconSize * 0.75}`);
+                patternA
+                    .append("image")
+                    .attr("height", this._iconSize)
+                    .attr("width", this._iconSize)
+                    .attr("href", `icons/${nation}.svg`);
+                patternA
+                    .append("rect")
+                    .attr("height", this._iconSize)
+                    .attr("width", this._iconSize)
+                    .attr("class", "all");
+            });
 
         // create filter with id #drop-shadow
         const filter = svgDef
@@ -402,6 +414,8 @@ export default class PortDisplay {
     }
 
     _getText(id, portProperties) {
+        moment.locale("en-gb");
+
         const pbData = this._pbData.ports.filter(port => port.id === id)[0],
             portBattleLT = moment.utc(pbData.portBattle).local(),
             portBattleST = moment.utc(pbData.portBattle),
@@ -436,9 +450,9 @@ export default class PortDisplay {
                 pbTimeRange: portProperties.nonCapturable
                     ? ""
                     : !portProperties.portBattleStartTime
-                        ? "11.00\u202f–\u202f8.00"
-                        : `${(portProperties.portBattleStartTime + 10) %
-                              24}.00\u202f–\u202f${(portProperties.portBattleStartTime + 13) % 24}.00`,
+                    ? "11.00\u202f–\u202f8.00"
+                    : `${(portProperties.portBattleStartTime + 10) %
+                          24}.00\u202f–\u202f${(portProperties.portBattleStartTime + 13) % 24}.00`,
                 brLimit: formatInt(portProperties.brLimit),
                 conquestMarksPension: portProperties.conquestMarksPension,
                 taxIncome: formatSiInt(portProperties.taxIncome),
@@ -450,12 +464,30 @@ export default class PortDisplay {
                 laborHoursDiscount: portProperties.laborHoursDiscount
                     ? `, labor hours discount level\u202f${portProperties.laborHoursDiscount}`
                     : "",
-                producesTrading: portProperties.producesTrading.join(", "),
-                dropsTrading: portProperties.dropsTrading.join(", "),
-                producesNonTrading: portProperties.producesNonTrading.join(", "),
-                dropsNonTrading: portProperties.dropsNonTrading.join(", "),
-                consumesTrading: portProperties.consumesTrading.join(", "),
-                consumesNonTrading: portProperties.consumesNonTrading.join(", "),
+                dropsTrading: portProperties.dropsTrading
+                    ? portProperties.dropsTrading
+                          .map(good => good.name)
+                          .sort()
+                          .join(", ")
+                    : "",
+                consumesTrading: portProperties.consumesTrading
+                    ? portProperties.consumesTrading
+                          .map(good => good.name)
+                          .sort()
+                          .join(", ")
+                    : "",
+                producesNonTrading: portProperties.producesNonTrading
+                    ? portProperties.producesNonTrading
+                          .map(good => good.name)
+                          .sort()
+                          .join(", ")
+                    : "",
+                dropsNonTrading: portProperties.dropsNonTrading
+                    ? portProperties.dropsNonTrading
+                          .map(good => good.name)
+                          .sort()
+                          .join(", ")
+                    : "",
                 tradePort: this._getPortName(this.tradePortId),
                 goodsToSellInTradePort: portProperties.goodsToSellInTradePort
                     ? portProperties.goodsToSellInTradePort.join(", ")
@@ -481,8 +513,8 @@ export default class PortDisplay {
     }
 
     _showDetails(d, i, nodes) {
-        function tooltipData(port) {
-            let h = `<table><tbody<tr><td><i class="flag-icon ${port.icon}"></i></td>`;
+        const tooltipData = port => {
+            let h = `<table><tbody><tr><td><i class="flag-icon ${port.icon}"></i></td>`;
             h += `<td><span class="port-name">${port.name}</span>`;
             h += `\u2001${port.county} ${port.availableForAll}`;
             h += "</td></tr></tbody></table>";
@@ -504,21 +536,18 @@ export default class PortDisplay {
             }
             h += "</p>";
             h += "<table class='table table-sm'>";
-            if (port.producesTrading.length || port.producesNonTrading.length) {
-                h += `<tr><td>Produces${port.producesNonTrading.length ? "\u00a0" : ""}</td><td>`;
-                if (port.producesNonTrading.length) {
-                    h += `<span class="non-trading">${port.producesNonTrading}</span>`;
-                    if (port.producesTrading.length) {
-                        h += "<br>";
-                    }
-                }
-                if (port.producesTrading.length) {
-                    h += `${port.producesTrading}`;
-                }
+            if (port.producesNonTrading.length) {
+                h += "<tr><td>Produces\u00a0</td><td>";
+                h += `<span class="non-trading">${port.producesNonTrading}</span>`;
+                h += "</td></tr>";
+            }
+            if (port.consumesTrading.length) {
+                h += "<tr><td>Consumes\u00a0</td><td>";
+                h += port.consumesTrading;
                 h += "</td></tr>";
             }
             if (port.dropsTrading.length || port.dropsNonTrading.length) {
-                h += `<tr><td>Drops${port.dropsNonTrading.length ? "\u00a0" : ""}</td><td>`;
+                h += `<tr><td>Drops\u00a0${port.dropsNonTrading.length ? "\u00a0" : ""}</td><td>`;
                 if (port.dropsNonTrading.length) {
                     h += `<span class="non-trading">${port.dropsNonTrading}</span>`;
                     if (port.dropsTrading.length) {
@@ -530,29 +559,18 @@ export default class PortDisplay {
                 }
                 h += "</td></tr>";
             }
-            if (port.consumesTrading.length || port.consumesNonTrading.length) {
-                h += `<tr><td>Consumes${port.consumesNonTrading.length ? "\u00a0" : ""}</td><td>`;
-                if (port.consumesNonTrading.length) {
-                    h += `<span class="non-trading">${port.consumesNonTrading}</span>`;
-                    if (port.consumesTrading.length) {
-                        h += "<br>";
-                    }
+            if (this.showTradePortPartners) {
+                if (port.goodsToSellInTradePort.length) {
+                    h += `<tr><td>Sell in ${port.tradePort}</td><td>${port.goodsToSellInTradePort}</td></tr>`;
                 }
-                if (port.consumesTrading.length) {
-                    h += `${port.consumesTrading}`;
+                if (port.goodsToBuyInTradePort.length) {
+                    h += `<tr><td>Buy in ${port.tradePort}</td><td>${port.goodsToBuyInTradePort}</td></tr>`;
                 }
-                h += "</td></tr>";
-            }
-            if (port.goodsToSellInTradePort.length) {
-                h += `<tr><td>Sell in ${port.tradePort}</td><td>${port.goodsToSellInTradePort}</td></tr>`;
-            }
-            if (port.goodsToBuyInTradePort.length) {
-                h += `<tr><td>Buy in ${port.tradePort}</td><td>${port.goodsToBuyInTradePort}</td></tr>`;
             }
             h += "</table>";
 
             return h;
-        }
+        };
 
         const port = d3Select(nodes[i]),
             title = tooltipData(this._getText(d.id, d.properties));
@@ -561,8 +579,8 @@ export default class PortDisplay {
         $(port._groups[0])
             .tooltip({
                 delay: {
-                    show: this._highlightDuration,
-                    hide: this._highlightDuration
+                    show: this._tooltipDuration,
+                    hide: this._tooltipDuration
                 },
                 html: true,
                 placement: "auto",
@@ -580,11 +598,13 @@ export default class PortDisplay {
 
         const circleScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale),
             circleSize = roundToThousands(this._circleSize / circleScale),
-            data = this._portData.filter(port => this._pbData.ports.some(d => port.id === d.id)).map(port => {
-                // eslint-disable-next-line prefer-destructuring,no-param-reassign
-                port.properties.nation = this._pbData.ports.filter(d => port.id === d.id).map(d => d.nation)[0];
-                return port;
-            });
+            data = this._portData
+                .filter(port => this._pbData.ports.some(d => port.id === d.id))
+                .map(port => {
+                    // eslint-disable-next-line prefer-destructuring,no-param-reassign
+                    port.properties.nation = this._pbData.ports.filter(d => port.id === d.id).map(d => d.nation)[0];
+                    return port;
+                });
 
         // Data join
         const circleUpdate = this._gIcon.selectAll("circle").data(data, d => d.id);
@@ -609,7 +629,7 @@ export default class PortDisplay {
             .on("mouseout", hideDetails);
 
         // Apply to both old and new
-        circleUpdate.merge(circleEnter).attr("r", d => (d.id === this._highlightId ? circleSize * 2 : circleSize));
+        circleUpdate.merge(circleEnter).attr("r", d => circleSize);
     }
 
     _updatePortCircles() {
@@ -627,8 +647,7 @@ export default class PortDisplay {
             return marker;
         };
         const circleScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale),
-            rMin = roundToThousands((this._circleSize / circleScale) * this._minRadiusFactor),
-            magicNumber = 5;
+            rMin = roundToThousands((this._circleSize / circleScale) * this._minRadiusFactor);
         let rMax = roundToThousands((this._circleSize / circleScale) * this._maxRadiusFactor),
             data = {},
             rGreenZone = 0;
@@ -643,11 +662,15 @@ export default class PortDisplay {
             const pbData = this._pbData.ports
                 .filter(d => d.attackHostility)
                 .map(d => ({ id: d.id, attackHostility: d.attackHostility }));
-            data = this._portData.filter(port => pbData.some(d => port.id === d.id)).map(port => {
-                // eslint-disable-next-line prefer-destructuring,no-param-reassign
-                port.properties.attackHostility = pbData.filter(d => port.id === d.id).map(d => d.attackHostility)[0];
-                return port;
-            });
+            data = this._portData
+                .filter(port => pbData.some(d => port.id === d.id))
+                .map(port => {
+                    // eslint-disable-next-line prefer-destructuring,no-param-reassign
+                    port.properties.attackHostility = pbData
+                        .filter(d => port.id === d.id)
+                        .map(d => d.attackHostility)[0];
+                    return port;
+                });
         } else if (this._showRadius === "green") {
             rGreenZone =
                 roundToThousands(
@@ -655,7 +678,7 @@ export default class PortDisplay {
                         { x: convertCoordX(-63400, 18800), y: convertCoordY(-63400, 18800) },
                         { x: convertCoordX(-79696, 10642), y: convertCoordY(-79696, 10642) }
                     )
-                ) * magicNumber;
+                ) * circleRadiusFactor;
             const pbData = this._pbData.ports.filter(d => d.nation !== "FT").map(d => d.id);
             data = this._portData.filter(port => pbData.some(d => port.id === d) && port.properties.nonCapturable);
         } else if (this.showCurrentGood) {
@@ -709,7 +732,7 @@ export default class PortDisplay {
                 .attr("fill", d => this._colourScale(d.properties.attackHostility))
                 .attr("r", d => this._attackRadius(d.properties.attackHostility));
         } else if (this._showRadius === "position") {
-            circleMerge.attr("class", "bubble here").attr("r", d => d.properties.distance);
+            circleMerge.attr("class", "position").attr("r", d => d.properties.distance);
         } else if (this._showRadius === "green") {
             circleMerge.attr("class", "bubble pos").attr("r", rGreenZone);
         } else if (this.showCurrentGood) {
@@ -725,13 +748,10 @@ export default class PortDisplay {
     }
 
     _updateTextsY(d, circleSize, fontSize) {
-        const deltaY = circleSize + fontSize * 1.2,
-            deltaY2 = circleSize * 2 + fontSize * 2;
+        const deltaY = circleSize + fontSize * 1.2;
 
         if (this._zoomLevel !== "pbZone") {
-            return d.id === this._highlightId
-                ? d.geometry.coordinates[1] + deltaY2
-                : d.geometry.coordinates[1] + deltaY;
+            return d.geometry.coordinates[1] + deltaY;
         }
         const dy = d.properties.angle > 90 && d.properties.angle < 270 ? fontSize : 0;
         return this._showPBZones === "all" || (this._showPBZones === "single" && d.id === this.currentPort.id)
@@ -753,14 +773,14 @@ export default class PortDisplay {
 
     updateTexts() {
         if (this._zoomLevel === "initial") {
-            this._gText.attr("display", "none");
+            this._gText.classed("d-none", true);
         } else {
-            this._gText.attr("display", "inherit");
-
             const circleScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale),
                 circleSize = roundToThousands(this._circleSize / circleScale),
                 fontScale = 2 ** Math.log2((Math.abs(this._minScale) + this._scale) * 0.9),
                 fontSize = roundToThousands(this._fontSize / fontScale);
+
+            this._gText.attr("font-size", `${fontSize}px`);
 
             // Data join
             const textUpdate = this._gText.selectAll("text").data(this._portData, d => d.id);
@@ -782,8 +802,8 @@ export default class PortDisplay {
                 .merge(textEnter)
                 .attr("x", d => this._updateTextsX(d, circleSize))
                 .attr("y", d => this._updateTextsY(d, circleSize, fontSize))
-                .attr("font-size", d => (d.id === this._highlightId ? `${fontSize * 2}px` : `${fontSize}px`))
                 .attr("text-anchor", d => this._updateTextsAnchor(d));
+            this._gText.classed("d-none", false);
         }
     }
 
@@ -804,9 +824,8 @@ export default class PortDisplay {
 
     _updateCounties() {
         if (this._zoomLevel !== "portLabel") {
-            this._gCounty.attr("display", "none");
+            this._gCounty.classed("d-none", true);
         } else {
-            this._gCounty.attr("display", "inherit");
             const data = this._countyPolygon;
 
             // Data join
@@ -839,14 +858,15 @@ export default class PortDisplay {
                 .attr("d", d => d3line2(d.polygon))
                 .attr("fill", "#373");
                 */
+
+            this._gCounty.classed("d-none", false);
         }
     }
 
     _updateRegions() {
         if (this._zoomLevel !== "initial") {
-            this._gRegion.attr("display", "none");
+            this._gRegion.classed("d-none", true);
         } else {
-            this._gRegion.attr("display", "inherit");
             const data = this._regionPolygon;
 
             // Data join
@@ -879,6 +899,7 @@ export default class PortDisplay {
                 .attr("d", d => d3line2(d.polygon))
                 .attr("fill", "#999");
                 */
+            this._gRegion.classed("d-none", false);
         }
     }
 
@@ -890,10 +911,6 @@ export default class PortDisplay {
         this._updateSummary();
         this._updateCounties();
         this._updateRegions();
-    }
-
-    set highlightId(highlightId) {
-        this._highlightId = highlightId;
     }
 
     set portDataDefault(portDataDefault) {
@@ -958,6 +975,7 @@ export default class PortDisplay {
         if (this._showRadius === "position") {
             this._showRadius = "off";
         }
+        this._trilateratePosition.clearMap();
         this._showSummary();
         this._portData = this._portDataDefault;
         this.showCurrentGood = false;
