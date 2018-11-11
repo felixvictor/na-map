@@ -174,13 +174,6 @@ const config = {
         mainFields: ["module", "main"]
     },
 
-    stats: {
-        // Examine all modules
-        maxModules: Infinity,
-        // Display bailout reasons
-        optimizationBailout: true
-    },
-
     optimization: {
         noEmitOnErrors: true,
         concatenateModules: true,
