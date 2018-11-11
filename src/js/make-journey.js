@@ -17,7 +17,9 @@ import { line as d3Line } from "d3-shape";
 import { zoomIdentity as d3ZoomIdentity, zoomTransform as d3ZoomTransform } from "d3-zoom";
 import moment from "moment";
 import "moment/locale/en-gb";
+
 import "round-slider/src/roundslider";
+import "round-slider/src/roundslider.css";
 
 import { compassDirections, degreesToCompass, rotationAngleInDegrees, formatF11 } from "./util";
 import { registerEvent } from "./analytics";
@@ -41,7 +43,7 @@ export default class Journey {
         this._woodData = woodData;
         this._fontSize = fontSize;
 
-        this._compassSize = 100;
+        this._compassSize = 200;
         this._line = d3Line()
             .x(d => d[0])
             .y(d => d[1]);
@@ -86,7 +88,9 @@ export default class Journey {
         this._baseName = "Make journey";
         this._baseId = "make-journey";
         this._buttonId = `button-${this._baseId}`;
+        this._deleteLastLegButtonId = `button-delete-leg-${this._baseId}`;
         this._modalId = `modal-${this._baseId}`;
+        this._sliderId = `slider-${this._baseId}`;
         this._shipId = "ship-journey";
         this._woodId = "wood-journey";
 
@@ -145,9 +149,9 @@ export default class Journey {
      * @returns {void}
      */
     _setupListener() {
-        document.getElementById("journeyNavbar").addEventListener("click", event => this._navbarClick(event));
+        document.getElementById(`${this._buttonId}`).addEventListener("click", event => this._navbarClick(event));
 
-        document.getElementById(this._buttonId).addEventListener("click", () => this._deleteLastLeg());
+        document.getElementById(this._deleteLastLegButtonId).addEventListener("click", () => this._deleteLastLeg());
     }
 
     _setupWindInput() {
@@ -166,7 +170,7 @@ export default class Journey {
 
         window.tooltip = args => degreesToCompass(args.value);
 
-        $("#journey-wind-direction").roundSlider({
+        $(`#${this._sliderId}`).roundSlider({
             sliderType: "default",
             handleSize: "+1",
             startAngle: 90,
@@ -181,7 +185,7 @@ export default class Journey {
                 this.control.css("display", "block");
             },
             change() {
-                this._currentWind = $("#journey-wind-direction").roundSlider("getValue");
+                this._currentWind = $(`#${this._sliderId}`).roundSlider("getValue");
             }
         });
     }
@@ -190,32 +194,40 @@ export default class Journey {
         insertBaseModal(this._modalId, this._baseName, "sm");
 
         const body = d3Select(`#${this._modalId} .modal-body`);
-        const slider = body
+        const formGroup = body
             .append("form")
             .append("div")
             .attr("class", "form-group");
+
+        const slider = formGroup
+            .append("div")
+            .classed("alert alert-primary", true)
+            .attr("role", "alert");
         slider
-            .append("p")
-            .attr("class", "form-text")
-            .text("1. Set current in-game wind");
+            .append("label")
+            .attr("for", this._sliderId)
+            .text("Current in-game wind");
         slider
             .append("div")
-            .attr("id", "journey-wind-direction")
+            .attr("id", this._sliderId)
             .attr("class", "rslider");
 
-        body.append("p")
-            .attr("class", "form-text")
-            .text("2. Set ship");
         const shipId = `${this._shipId}-Base-select`;
-        const div = body.append("div").attr("class", "d-flex flex-column");
+        const shipAndWood = formGroup
+            .append("div")
+            .classed("alert alert-primary", true)
+            .attr("role", "alert");
+        const div = shipAndWood.append("div").attr("class", "d-flex flex-column");
         div.append("label")
-            .append("select")
+            .attr("for", shipId)
+            .text("Ship and woods (optional)");
+        div.append("select")
             .attr("name", shipId)
             .attr("id", shipId);
         ["frame", "trim"].forEach(type => {
             const woodId = `${this._woodId}-${type}-Base-select`;
-            div.append("label")
-                .append("select")
+            div.append("label").attr("for", woodId);
+            div.append("select")
                 .attr("name", woodId)
                 .attr("id", woodId);
         });
@@ -292,10 +304,10 @@ export default class Journey {
     }
 
     _getStartWind() {
-        const currentUserWind = $("#journey-wind-direction").roundSlider("getValue");
+        const currentUserWind = $(`#${this._sliderId}`).roundSlider("getValue");
         let currentWindDegrees;
         // Current wind in degrees
-        if (!$("#journey-wind-direction").length) {
+        if (!$(`#${this._sliderId}`).length) {
             currentWindDegrees = 0;
         } else {
             currentWindDegrees = +currentUserWind;
@@ -313,7 +325,7 @@ export default class Journey {
             ({ speedDegrees } = this._shipCompare._singleShipData);
         }
         this._speedScale.range(speedDegrees);
-        //console.log(this._speedScale.range());
+        // console.log(this._speedScale.range());
     }
 
     /**
@@ -517,7 +529,7 @@ export default class Journey {
 
         mainDiv
             .append("button")
-            .attr("id", this._buttonId)
+            .attr("id", this._deleteLastLegButtonId)
             .classed("btn btn-primary btn-sm", true)
             .attr("role", "button")
             .text("Delete last leg");
@@ -570,12 +582,33 @@ export default class Journey {
     }
 
     _getTextDistance(distanceK, minutes, addTotal) {
-        const duration = moment.duration(minutes, "minutes").humanize(true);
-        let textDistance = `${Math.round(distanceK)}k ${duration}`;
+        function getHumanisedDuration(duration) {
+            moment.locale("en-gb");
+
+            function pluralize(num, word) {
+                return `${num} ${word + (num === 1 ? "" : "s")}`;
+            }
+
+            const durationHours = Math.floor(duration / 60),
+                durationMinutes = Math.round(duration % 60);
+
+            let s = "in ";
+            if (duration < 1.0) {
+                s += "less than a minute";
+            } else {
+                const hourString = durationHours !== 0 ? pluralize(durationHours, "hour") : "",
+                    minuteString = durationMinutes !== 0 ? pluralize(durationMinutes, "minute") : "";
+                s += hourString + (hourString !== "" ? " " : "") + minuteString;
+            }
+            return s;
+        }
+
+        let textDistance = `${Math.round(distanceK)}k ${getHumanisedDuration(minutes)}`;
 
         if (addTotal) {
-            const totalDuration = moment.duration(this._journey.totalMinutes, "minutes").humanize(true);
-            textDistance += ` \u2606 total ${Math.round(this._journey.totalDistance)}k ${totalDuration}`;
+            textDistance += ` \u2606 total ${Math.round(this._journey.totalDistance)}k ${getHumanisedDuration(
+                this._journey.totalMinutes
+            )}`;
         }
         return textDistance;
     }
@@ -593,14 +626,14 @@ export default class Journey {
             this._journey.currentWindDegrees,
             distanceK * 1000
         );
-        //console.log("*** start", this._journey.currentWindDegrees, { distanceK }, { courseCompass });
+        // console.log("*** start", this._journey.currentWindDegrees, { distanceK }, { courseCompass });
         this._journey.totalDistance += distanceK;
         this._journey.totalMinutes += minutes;
         const textDirection = this._getTextDirection(courseCompass, courseDegrees, pt1),
             textDistance = this._getTextDistance(distanceK, minutes, index > 1);
 
         this._journey.segment[index].label = `${textDirection}|${textDistance}`;
-        //console.log("*** end", this._journey);
+        // console.log("*** end", this._journey);
     }
 
     _printSegment() {

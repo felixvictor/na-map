@@ -3,18 +3,20 @@
 */
 
 import "bootstrap-select/js/bootstrap-select";
-import moment from "moment/moment";
-import "moment/locale/en-gb";
+import moment from "moment";
+
 import "tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4";
 import "tempusdominus-core/build/js/tempusdominus-core";
 
 import { registerEvent } from "./analytics";
 import { initMultiDropdownNavbar, nations } from "./common";
+import { formatFloatFixed, roundToThousands } from "./util";
 
 export default class PortSelect {
     constructor(ports, pbZone) {
         this._ports = ports;
         this._pbZone = pbZone;
+
         this._dateFormat = "D MMM";
         this._timeFormat = "HH.00";
 
@@ -211,21 +213,13 @@ export default class PortSelect {
 
     _setupGoodSelect() {
         const selectGoods = new Set();
-        function PortsPerGood() {}
-        PortsPerGood.prototype.add = goods => {
-            goods.forEach(good => {
-                selectGoods.add(good);
-            });
-        };
-        const portsPerGood = new PortsPerGood();
 
         this._ports.portDataDefault.forEach(port => {
-            portsPerGood.add(port.properties.consumesTrading);
-            portsPerGood.add(port.properties.consumesNonTrading);
-            portsPerGood.add(port.properties.dropsTrading);
-            portsPerGood.add(port.properties.dropsNonTrading);
-            portsPerGood.add(port.properties.producesTrading);
-            portsPerGood.add(port.properties.producesNonTrading);
+            ["consumesTrading", "dropsTrading", "dropsNonTrading", "producesNonTrading"].forEach(type => {
+                if (port.properties[type]) {
+                    port.properties[type].forEach(good => selectGoods.add(good.name));
+                }
+            });
         });
         const options = `${Array.from(selectGoods)
             .sort()
@@ -290,25 +284,14 @@ export default class PortSelect {
     _setTradePortPartners() {
         const tradePortConsumedGoods = [],
             tradePortProducedGoods = [];
-        function ConsumedGoodList() {}
-        ConsumedGoodList.prototype.add = goods => {
-            goods.forEach(good => {
-                tradePortConsumedGoods.push(good);
-            });
-        };
-        function ProducedGoodList() {}
-        ProducedGoodList.prototype.add = goods => {
-            goods.forEach(good => {
-                tradePortProducedGoods.push(good);
-            });
-        };
-        const consumedGoodList = new ConsumedGoodList(),
-            producedGoodList = new ProducedGoodList();
 
         this._ports.portDataDefault.filter(port => port.id === this._ports.tradePortId).forEach(port => {
-            producedGoodList.add(port.properties.dropsTrading);
-            producedGoodList.add(port.properties.producesTrading);
-            consumedGoodList.add(port.properties.consumesTrading);
+            if (port.properties.consumesTrading) {
+                port.properties.consumesTrading.forEach(good => tradePortConsumedGoods.push(good.name));
+            }
+            if (port.properties.dropsTrading) {
+                port.properties.dropsTrading.forEach(good => tradePortProducedGoods.push(good.name));
+            }
         });
 
         this._ports.portData = this._ports.portDataDefault
@@ -321,24 +304,24 @@ export default class PortSelect {
                 port.properties.goodsToBuyInTradePort = [];
                 // eslint-disable-next-line no-param-reassign
                 port.properties.buyInTradePort = false;
-                ["dropsTrading", "producesTrading"].forEach(type => {
-                    port.properties[type].forEach(good => {
-                        if (tradePortConsumedGoods.includes(good)) {
-                            port.properties.goodsToSellInTradePort.push(good);
-                            // eslint-disable-next-line no-param-reassign
-                            port.properties.sellInTradePort = true;
-                        }
-                    });
-                });
-                ["consumesTrading"].forEach(type => {
-                    port.properties[type].forEach(good => {
-                        if (tradePortProducedGoods.includes(good)) {
-                            port.properties.goodsToBuyInTradePort.push(good);
+                if (port.properties.consumesTrading) {
+                    port.properties.consumesTrading.forEach(good => {
+                        if (tradePortProducedGoods.includes(good.name)) {
+                            port.properties.goodsToBuyInTradePort.push(good.name);
                             // eslint-disable-next-line no-param-reassign
                             port.properties.buyInTradePort = true;
                         }
                     });
-                });
+                }
+                if (port.properties.dropsTrading) {
+                    port.properties.dropsTrading.forEach(good => {
+                        if (tradePortConsumedGoods.includes(good.name)) {
+                            port.properties.goodsToSellInTradePort.push(good.name);
+                            // eslint-disable-next-line no-param-reassign
+                            port.properties.sellInTradePort = true;
+                        }
+                    });
+                }
                 return port;
             })
             .filter(
@@ -368,17 +351,20 @@ export default class PortSelect {
         this._ports.showTradePortPartners = true;
         this._ports.showCurrentGood = false;
         this._ports.update();
+        this._ports._map.initialZoomAndPan();
     }
 
     _goodSelected(event) {
-        const good = $(event.currentTarget).find(":selected")[0].text,
+        const goodSelected = $(event.currentTarget).find(":selected")[0].text,
             sourcePorts = this._ports.portDataDefault
                 .filter(
                     port =>
-                        port.properties.dropsTrading.includes(good) ||
-                        port.properties.dropsNonTrading.includes(good) ||
-                        port.properties.producesTrading.includes(good) ||
-                        port.properties.producesNonTrading.includes(good)
+                        (port.properties.dropsTrading &&
+                            port.properties.dropsTrading.some(good => good.name === goodSelected)) ||
+                        (port.properties.dropsNonTrading &&
+                            port.properties.dropsNonTrading.some(good => good.name === goodSelected)) ||
+                        (port.properties.producesNonTrading &&
+                            port.properties.producesNonTrading.some(good => good.name === goodSelected))
                 )
                 .map(port => {
                     // eslint-disable-next-line prefer-destructuring,no-param-reassign
@@ -388,8 +374,8 @@ export default class PortSelect {
             consumingPorts = this._ports.portDataDefault
                 .filter(
                     port =>
-                        port.properties.consumesTrading.includes(good) ||
-                        port.properties.consumesNonTrading.includes(good)
+                        port.properties.consumesTrading &&
+                        port.properties.consumesTrading.some(good => good.name === goodSelected)
                 )
                 .map(port => {
                     // eslint-disable-next-line prefer-destructuring,no-param-reassign
