@@ -60,6 +60,7 @@
         "webpack": "^4.25.1",
         "webpack-bundle-analyzer": "^3.0.3",
         "webpack-cli": "^3.1.2",
+        "webpack-deep-scope-plugin": "^1.6.0",
         "webpack-dev-server": "^3.1.10",
         "webpack-subresource-integrity": "^1.3.0",
         "xml2json": "^0.11.2",
@@ -138,8 +139,8 @@
         ">= 1%",
         "last 1 major version",
         "not dead",
-        "not ie >= 1",
-        "not edge >= 1"
+        "not ie > 0",
+        "not android > 0"
     ],
     "prettier": {
         "tabWidth": 4,
