@@ -7,7 +7,7 @@ JQ="$(command -v jq)"
 NODE="$(command -v node) --experimental-modules --no-warnings"
 TWURL="$(command -v twurl)"
 XZ="$(command -v xz)"
-MODULE="na-map"
+MODULE="main"
 SERVER_BASE_NAME="cleanopenworldprod"
 SOURCE_BASE_URL="http://storage.googleapis.com/nacleanopenworldprodshards/"
 # http://api.shipsofwar.net/servers?apikey=1ZptRtpXAyEaBe2SEp63To1aLmISuJj3Gxcl5ivl&callback=setActiveRealms
@@ -22,6 +22,15 @@ SERVER_TWITTER_NAMES=(eu1)
 API_VARS=(ItemTemplates Ports Shops)
 SERVER_MAINTENANCE_HOUR=10
 HEADER_DATE=$(LC_TIME="en" date -u +"%a, %d %b %Y 10:00:00 GMT" -d "+1 day")
+# Set server date
+if [ "$(date -u '+%H')" -lt "${SERVER_MAINTENANCE_HOUR}" ]; then
+    DATE=$(date -u '+%Y-%m-%d' --date "-1 day")
+    LAST_DATE=$(date -u '+%Y-%m-%d' --date "-2 day")
+else
+    DATE=$(date -u '+%Y-%m-%d')
+    LAST_DATE=$(date -u '+%Y-%m-%d' --date "-1 day")
+fi
+NETLIFY_TOML="netlify.toml"
 LAST_FUNCTION=""
 
 function get_current_branch() {
@@ -65,17 +74,6 @@ function update_var () {
 }
 
 function common_var () {
-    # Set server date
-    if [ "$(date -u '+%H')" -lt "${SERVER_MAINTENANCE_HOUR}" ]; then
-        DATE=$(date -u '+%Y-%m-%d' --date "-1 day")
-        LAST_DATE=$(date -u '+%Y-%m-%d' --date "-2 day")
-    else
-        DATE=$(date -u '+%Y-%m-%d')
-        LAST_DATE=$(date -u '+%Y-%m-%d' --date "-1 day")
-    fi
-
-    export DATE
-    export LAST_DATE
     export BUILD_DIR="${BASE_DIR}/build"
     export SRC_DIR="${BASE_DIR}/src"
     export LAST_UPDATE_FILE="${BUILD_DIR}/.last-port-update"
@@ -87,8 +85,10 @@ function common_var () {
     export NATION_FILE="${SRC_DIR}/nations.json"
     export LOOT_FILE="${SRC_DIR}/loot.json"
     export EXCEL_FILE="${SRC_DIR}/port-battle.xlsx"
+    CSS_FILE=$(find "${BASE_DIR}/public/" -type f  -regextype posix-extended -regex "${BASE_DIR}/public/${MODULE}(\.[[:alnum:]]+)?\.css$")
+    export CSS_FILE
     export TWEETS_JSON="${BUILD_DIR}/API/tweets.json"
-    export NETLIFY_TOML="netlify.toml"
+
 }
 
 function get_API_data () {
@@ -96,7 +96,7 @@ function get_API_data () {
     OUT_FILE="$2"
     API_VAR="$3"
     URL="${SOURCE_BASE_URL}${API_VAR}_${SERVER_BASE_NAME}${SERVER_NAME}.json"
-    if [ ! -f "${OUT_FILE}" ]; then
+    if [[ ! -f "${OUT_FILE}" ]]; then
         curl --silent --output "${OUT_FILE}" "${URL}"
         sed -i -e "s/^var $API_VAR = //; s/\\;$//" "${OUT_FILE}"
     fi
@@ -180,7 +180,7 @@ function get_port_data () {
             ${NODE} build/convert-ownership.mjs "${API_DIR}" "${OWNERSHIP_FILE}" "${NATION_FILE}"
         fi
 
-        ${NODE} build/create-xlsx.mjs "${SHIP_FILE}" "${SRC_DIR}/${SERVER_NAMES[0]}.json" "${BASE_DIR}/public/${MODULE}.min.css" "${EXCEL_FILE}"
+        ${NODE} build/create-xlsx.mjs "${SHIP_FILE}" "${SRC_DIR}/${SERVER_NAMES[0]}.json" "${CSS_FILE}" "${EXCEL_FILE}"
 
         return 0
     else
@@ -206,7 +206,7 @@ function get_tweets () {
     QUERY="/1.1/search/tweets.json?q=from:zz569k&tweet_mode=extended&count=100&result_type=recent"
     JQ_FORMAT="{ tweets: [ .statuses[] | { id: .id_str, text: .full_text } ], refresh: .search_metadata.max_id_str }"
 
-    if [ -f "${TWEETS_JSON}" ]; then
+    if [[ -f "${TWEETS_JSON}" ]]; then
         SINCE=$(${NODE} -pe 'JSON.parse(process.argv[1]).refresh' "$(cat "${TWEETS_JSON}")")
         QUERY+="&since_id=${SINCE}"
     fi

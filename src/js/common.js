@@ -81,13 +81,13 @@ export function getDistance(pt0, pt1) {
  */
 export function insertBaseModal(id, title, size = "lg", buttonText = "Close") {
     const modal = d3Select("#modal-section")
-        .append("section")
+        .append("div")
         .attr("id", id)
         .attr("class", "modal")
-        .attr("data-keyboard", "false")
-        .attr("data-backdrop", "static")
         .attr("tabindex", "-1")
         .attr("role", "dialog")
+        .attr("aria-labelledby", `title-${id}`)
+        .attr("aria-hidden", "true")
         .append("div")
         .attr("class", `modal-dialog${size === "lg" || size === "sm" ? ` modal-${size}` : ""}`)
         .attr("role", "document");
@@ -95,7 +95,11 @@ export function insertBaseModal(id, title, size = "lg", buttonText = "Close") {
     const content = modal.append("div").attr("class", "modal-content");
 
     const header = content.append("header").attr("class", "modal-header");
-    header.append("h3").html(title);
+    header
+        .append("h5")
+        .attr("class", "modal-title")
+        .attr("id", `title-${id}`)
+        .html(title);
 
     content.append("div").attr("class", "modal-body");
 
@@ -138,6 +142,13 @@ export function initMultiDropdownNavbar(id) {
     });
 }
 
+/**
+ * Get currency
+ * @param {int|string }amount - Amount
+ * @return {string} Currency string
+ */
+export const getCurrencyAmount = amount => `${amount}\u00a0real${+amount > 1 ? "s" : ""}`;
+
 // eslint-disable-next-line no-undef
 export const appDescription = DESCRIPTION;
 // eslint-disable-next-line no-undef
@@ -147,3 +158,5 @@ export const appVersion = VERSION;
 
 export const speedConstA = 0.074465523706782;
 export const speedConstB = 0.00272175949231;
+
+export const circleRadiusFactor = 5;
