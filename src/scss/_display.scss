@@ -369,7 +369,6 @@ text {
 }
 
 .compass {
-    //opacity: 0.8;
     circle,
     line {
         stroke: $secondary-600;
@@ -378,6 +377,8 @@ text {
     text {
         fill: $secondary-600;
         font-weight: bold;
+        text-anchor: middle;
+        dominant-baseline: central;
     }
 }
 
