@@ -418,80 +418,53 @@ class ShipBase extends Ship {
             radius = Math.min(this.shipCompareData.svgWidth, this.shipCompareData.svgHeight) / 3,
             outerRadius = radius - 1,
             innerRadius = radius * 0.8;
-        const textArc = d3Arc()
-            .outerRadius(outerRadius)
-            .innerRadius(innerRadius);
-        const marksArc = d3Arc()
-            .outerRadius(innerRadius)
-            .innerRadius(innerRadius);
         const data = Array.from(new Array(steps), () => 1);
-        const marksPie = d3Pie()
-                .startAngle(0)
-                .endAngle(2 * Math.PI)
-                .sort(null)
-                .value(d => d),
+        const textArc = d3Arc()
+                .outerRadius(outerRadius)
+                .innerRadius(innerRadius),
             textPie = d3Pie()
                 .startAngle(0 - stepRadians / 2)
                 .endAngle(2 * Math.PI - stepRadians / 2)
                 .sort(null)
                 .value(d => d),
-            textArcs = textPie(data),
-            marksArcs = marksPie(data);
+            textArcs = textPie(data);
 
-        this.g.attr("text-anchor", "middle").attr("class", "compass");
+        this.g.attr("class", "compass");
+        this.g.append("circle").attr("r", Math.floor(innerRadius));
 
-        /*
+        // Cardinal and intercardinal winds
         this.g
-            .selectAll(".mark-arc")
-            .data(textArcs)
-            .enter()
-            .append("path")
-            .attr("class", ".mark-arc")
-            .attr("stroke", "gray")
-            //.attr("stroke-width", (d, i) => (i % 3 === 0 ? 0 : "3px"))
-            .attr("stroke-width",  "3px")
-            .attr("d", marksArc);
-        */
-
-        this.g
-            .append("circle")
-            .attr("r", innerRadius);
-
-        this.g
-            .selectAll(".text-arc")
-            .data(textArcs)
-            .enter()
-            .append("path")
-            .attr("class", ".text-arc")
-            .attr("d", textArc);
-        const texts = this.g
             .selectAll("text")
-            .data(textArcs)
+            .data(textArcs.filter((d, i) => i % 3 === 0))
             .enter()
             .append("text")
-            .attr("transform", d => `translate(${textArc.centroid(d)})`)
-            .attr("x", outerRadius + 3)
-            .attr("y", "0.4rem");
-        // text.filter((d,i) => data[i].name && d.endAngle - d.startAngle > 0.25)
-        texts
-            .filter((d, i) => i % 3 === 0)
-            .append("tspan")
-            .attr("x", 0)
-            .attr("y", "0.5rem")
+            .attr("transform", d => {
+                const [x, y] = textArc.centroid(d),
+                    translate = [Math.round(x), Math.round(y)];
+                let rotate = Math.round(((d.startAngle + d.endAngle) / 2) * (180 / Math.PI));
+                if (rotate === 90 || rotate === 270) {
+                    rotate = 0;
+                } else if (rotate > 90 && rotate < 270) {
+                    rotate -= 180;
+                }
+                return `rotate(${rotate}, ${translate}) translate(${translate})`;
+            })
+            .attr("dx", d => (degreesToCompass((360 / steps) * d.index) === "E" ? "-.2rem" : "0"))
             .text(d => degreesToCompass((360 / steps) * d.index));
 
-        const ticks = this.g
+        // Ticks
+        const y1 = Math.floor(-outerRadius * 0.95),
+            y2 = Math.floor(-innerRadius);
+        this.g
             .selectAll("line")
-            .data(textArcs)
+            .data(textArcs.filter((d, i) => i % 3 !== 0))
             .enter()
-            .append("line");
-        ticks
-            .filter((d, i) => i % 3 !== 0)
+            .append("line")
             .attr("x1", 0)
             .attr("x2", 0)
-            .attr("y1", -outerRadius * 0.95)
-            .attr("y2", -innerRadius)
-            .attr("transform", d => `rotate(${((d.startAngle + d.endAngle) / 2) * (180 / Math.PI)})`);
+            .attr("y1", y1)
+            .attr("y2", y2)
+            .attr("transform", d => `rotate(${Math.round(((d.startAngle + d.endAngle) / 2) * (180 / Math.PI))})`);
     }
 
     /**
