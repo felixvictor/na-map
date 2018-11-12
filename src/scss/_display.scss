@@ -369,7 +369,16 @@ text {
 }
 
 .compass {
-    opacity: 0.8;
+    //opacity: 0.8;
+    circle,
+    line {
+        stroke: $secondary-600;
+        stroke-width: 3px;
+    }
+    text {
+        fill: $secondary-600;
+        font-weight: bold;
+    }
 }
 
 .port-name {
