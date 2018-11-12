@@ -415,7 +415,7 @@ class ShipBase extends Ship {
     _drawCompassHelperFunction() {
         const steps = 24,
             stepRadians = (2 * Math.PI) / steps,
-            radius = Math.min(this.shipCompareData.svgWidth, this.shipCompareData.svgHeight) / 2,
+            radius = Math.min(this.shipCompareData.svgWidth, this.shipCompareData.svgHeight) / 3,
             outerRadius = radius - 1,
             innerRadius = radius * 0.8;
         const textArc = d3Arc()
@@ -438,7 +438,7 @@ class ShipBase extends Ship {
             textArcs = textPie(data),
             marksArcs = marksPie(data);
 
-        this.g.attr("text-anchor", "middle");
+        this.g.attr("text-anchor", "middle").attr("class", "compass");
 
         /*
         this.g
@@ -455,9 +455,7 @@ class ShipBase extends Ship {
 
         this.g
             .append("circle")
-            .attr("r", innerRadius)
-            .attr("stroke-width", "5px")
-            .attr("stroke", "grey");
+            .attr("r", innerRadius);
 
         this.g
             .selectAll(".text-arc")
@@ -472,7 +470,8 @@ class ShipBase extends Ship {
             .enter()
             .append("text")
             .attr("transform", d => `translate(${textArc.centroid(d)})`)
-            .attr("dy", "0rem");
+            .attr("x", outerRadius + 3)
+            .attr("y", "0.4rem");
         // text.filter((d,i) => data[i].name && d.endAngle - d.startAngle > 0.25)
         texts
             .filter((d, i) => i % 3 === 0)
@@ -492,8 +491,6 @@ class ShipBase extends Ship {
             .attr("x2", 0)
             .attr("y1", -outerRadius * 0.95)
             .attr("y2", -innerRadius)
-            .attr("stroke", "grey")
-            .attr("stroke-width", "3px")
             .attr("transform", d => `rotate(${((d.startAngle + d.endAngle) / 2) * (180 / Math.PI)})`);
     }
 
