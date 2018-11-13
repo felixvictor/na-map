@@ -20,7 +20,7 @@ import {
     radialLine as d3RadialLine
 } from "d3-shape";
 
-import { degreesToCompass, formatInt, formatFloat, getOrdinal, isEmpty, roundToThousands } from "./util";
+import { formatInt, formatFloat, getOrdinal, isEmpty, roundToThousands } from "./util";
 import { registerEvent } from "./analytics";
 import WoodCompare from "./wood-compare";
 import { insertBaseModal } from "./common";
@@ -47,7 +47,7 @@ class Ship {
 
         this._setupSvg();
         this._g = d3Select(this._select).select("g");
-        //  this._setCompass();
+        this._setCompass();
     }
 
     /**
@@ -316,9 +316,9 @@ class ShipBase extends Ship {
         this._shipData = shipData;
         this._shipCompareData = shipCompareData;
 
-        //    this._setBackground();
-        //    this._setBackgroundGradient();
-        //    this._drawProfile();
+        this._setBackground();
+        this._setBackgroundGradient();
+        this._drawProfile();
         this._drawCompassHelperFunction();
         this._printText();
     }
@@ -403,68 +403,6 @@ class ShipBase extends Ship {
             .append("stop")
             .attr("offset", (d, i) => gradientScale(gradientPoint[i]) / this.shipCompareData.svgWidth)
             .attr("stop-color", (d, i) => this.shipCompareData.colorScale(gradientPoint[i]));
-    }
-
-    /**
-     * Dummy function to draw compass
-     * 1. Use function to draw path and circle
-     * 2. Use Pathfinder exclude for each block in Illustrator (copy circle first)
-     * @return {void}
-     * @private
-     */
-    _drawCompassHelperFunction() {
-        const steps = 24,
-            stepRadians = (2 * Math.PI) / steps,
-            radius = Math.min(this.shipCompareData.svgWidth, this.shipCompareData.svgHeight) / 3,
-            outerRadius = radius - 1,
-            innerRadius = radius * 0.8;
-        const data = Array.from(new Array(steps), () => 1);
-        const textArc = d3Arc()
-                .outerRadius(outerRadius)
-                .innerRadius(innerRadius),
-            textPie = d3Pie()
-                .startAngle(0 - stepRadians / 2)
-                .endAngle(2 * Math.PI - stepRadians / 2)
-                .sort(null)
-                .value(d => d),
-            textArcs = textPie(data);
-
-        this.g.attr("class", "compass");
-        this.g.append("circle").attr("r", Math.floor(innerRadius));
-
-        // Cardinal and intercardinal winds
-        this.g
-            .selectAll("text")
-            .data(textArcs.filter((d, i) => i % 3 === 0))
-            .enter()
-            .append("text")
-            .attr("transform", d => {
-                const [x, y] = textArc.centroid(d),
-                    translate = [Math.round(x), Math.round(y)];
-                let rotate = Math.round(((d.startAngle + d.endAngle) / 2) * (180 / Math.PI));
-                if (rotate === 90 || rotate === 270) {
-                    rotate = 0;
-                } else if (rotate > 90 && rotate < 270) {
-                    rotate -= 180;
-                }
-                return `rotate(${rotate}, ${translate}) translate(${translate})`;
-            })
-            .attr("dx", d => (degreesToCompass((360 / steps) * d.index) === "E" ? "-.2rem" : "0"))
-            .text(d => degreesToCompass((360 / steps) * d.index));
-
-        // Ticks
-        const y1 = Math.floor(-outerRadius * 0.95),
-            y2 = Math.floor(-innerRadius);
-        this.g
-            .selectAll("line")
-            .data(textArcs.filter((d, i) => i % 3 !== 0))
-            .enter()
-            .append("line")
-            .attr("x1", 0)
-            .attr("x2", 0)
-            .attr("y1", y1)
-            .attr("y2", y2)
-            .attr("transform", d => `rotate(${Math.round(((d.startAngle + d.endAngle) / 2) * (180 / Math.PI))})`);
     }
 
     /**
