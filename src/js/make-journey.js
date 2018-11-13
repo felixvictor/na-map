@@ -13,7 +13,7 @@ import { range as d3Range } from "d3-array";
 import { drag as d3Drag } from "d3-drag";
 import { scaleLinear as d3ScaleLinear } from "d3-scale";
 import { event as d3Event, select as d3Select } from "d3-selection";
-import { line as d3Line } from "d3-shape";
+import { arc as d3Arc, line as d3Line, pie as d3Pie } from "d3-shape";
 import { zoomIdentity as d3ZoomIdentity, zoomTransform as d3ZoomTransform } from "d3-zoom";
 import moment from "moment";
 import "moment/locale/en-gb";
@@ -43,7 +43,7 @@ export default class Journey {
         this._woodData = woodData;
         this._fontSize = fontSize;
 
-        this._compassSize = 200;
+        this._compassSize = 600;
         this._line = d3Line()
             .x(d => d[0])
             .y(d => d[1]);
@@ -271,15 +271,66 @@ export default class Journey {
     _printCompass() {
         const x = this._journey.segment[0].position[0],
             y = this._journey.segment[0].position[1];
+        const steps = 24,
+            stepRadians = (2 * Math.PI) / steps,
+            radius = this._compassSize / (2 * Math.PI),
+            outerRadius = radius - 1,
+            innerRadius = radius * 0.8;
+        const data = Array.from(new Array(steps), () => 1);
+        const textArc = d3Arc()
+                .outerRadius(outerRadius)
+                .innerRadius(innerRadius),
+            textPie = d3Pie()
+                .startAngle(0 - stepRadians / 2)
+                .endAngle(2 * Math.PI - stepRadians / 2)
+                .sort(null)
+                .value(d => d),
+            textArcs = textPie(data);
+
         this._compass = this._g
-            .append("image")
-            .classed("compass", true)
+            .append("svg")
+            .attr("class", "compass")
             .attr("x", x)
-            .attr("y", y)
-            .attr("transform", `translate(${-this._compassSize / 2},${-this._compassSize / 2})`)
-            .attr("height", this._compassSize)
-            .attr("width", this._compassSize)
-            .attr("xlink:href", "icons/compass.svg");
+            .attr("y", y);
+
+        this._compassG = this._compass.append("g");
+
+        this._compassG.append("circle").attr("r", Math.floor(innerRadius));
+
+        // Cardinal and intercardinal winds
+        this._compassG
+            .selectAll("text")
+            .data(textArcs.filter((d, i) => i % 3 === 0))
+            .enter()
+            .append("text")
+            .attr("transform", d => {
+                const [tx, ty] = textArc.centroid(d),
+                    translate = [Math.round(tx), Math.round(ty)];
+                let rotate = Math.round(((d.startAngle + d.endAngle) / 2) * (180 / Math.PI));
+                if (rotate === 90 || rotate === 270) {
+                    rotate = 0;
+                } else if (rotate > 90 && rotate < 270) {
+                    rotate -= 180;
+                }
+                return `rotate(${rotate}, ${translate}) translate(${translate})`;
+            })
+            .attr("dx", d => (degreesToCompass((360 / steps) * d.index) === "E" ? "-.2rem" : "0"))
+            .text(d => degreesToCompass((360 / steps) * d.index));
+
+        // Ticks
+        const y1 = Math.floor(-outerRadius * 0.95),
+            y2 = Math.floor(-innerRadius);
+        this._compassG
+            .selectAll("line")
+            .data(textArcs.filter((d, i) => i % 3 !== 0))
+            .enter()
+            .append("line")
+            .attr("x1", 0)
+            .attr("x2", 0)
+            .attr("y1", y1)
+            .attr("y2", y2)
+            .attr("transform", d => `rotate(${Math.round(((d.startAngle + d.endAngle) / 2) * (180 / Math.PI))})`);
+
         this._gJourneyPath = this._g.append("path");
     }
 
@@ -393,7 +444,6 @@ export default class Journey {
             // Don't scale on higher zoom level
             scale = Math.max(1, currentTransform.k),
             fontSize = this._fontSize / scale,
-            compassSize = this._compassSize / scale,
             textTransform = d3ZoomIdentity.translate(defaultTranslate / scale, defaultTranslate / scale),
             textPadding = this._labelPadding / scale,
             circleRadius = 10 / scale,
@@ -457,11 +507,8 @@ export default class Journey {
         if (this._gJourneyPath) {
             this._gJourneyPath.style("stroke-width", `${pathWidth}px`);
         }
-        if (this._compass) {
-            this._compass
-                .attr("transform", `translate(${-compassSize / 2},${-compassSize / 2})`)
-                .attr("height", compassSize)
-                .attr("width", compassSize);
+        if (this._compassG) {
+            this._compassG.attr("transform", `scale(${1 / scale})`);
         }
     }
 
