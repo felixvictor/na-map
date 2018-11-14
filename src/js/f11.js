@@ -170,12 +170,12 @@ export default class F11 {
             // Copy coordinates to clipboard (ctrl-c key event)
             document.getElementById(this._modalId).onkeydown = event => {
                 if (event.code === "KeyC" && event.ctrlKey) {
-                    this._copyCoordClicked();
+                    this._copyCoordClicked(event);
                 }
             };
             // Copy coordinates to clipboard (click event)
             document.getElementById(this._copyButtonId).addEventListener("click", event => {
-                this._copyCoordClicked();
+                this._copyCoordClicked(event);
             });
         }
 
@@ -213,20 +213,19 @@ export default class F11 {
         }
     }
 
-    _copyCoordClicked() {
+    _copyCoordClicked(event) {
         /**
          * {@link https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Interact_with_the_clipboard}
          * @param {string} text - String
          * @return {void}
          */
         const copyToClipboard = text => {
-            navigator.permissions.query({ name: "clipboard-write" }).then(result => {
-                if (result.state == "granted" || result.state == "prompt") {
+            navigator.permissions.query({ name: "clipboard-write" }).then((result, error) => {
+                if (result.state === "granted" || result.state === "prompt") {
                     navigator.clipboard.writeText(text).then(
+                        () => {},
                         () => {
-                        },
-                        () => {
-                            console.error(`Cannot copy ${text} to clipboard`, err);
+                            console.error(`Cannot copy ${text} to clipboard`, error);
                         }
                     );
                 }
