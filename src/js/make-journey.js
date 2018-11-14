@@ -131,7 +131,7 @@ export default class Journey {
         };
     }
 
-    _resetJourney() {
+    _resetJourneyData() {
         this._journey.startWindDegrees = this._getStartWind();
         this._journey.currentWindDegrees = this._journey.startWindDegrees;
         this._journey.totalDistance = 0;
@@ -245,6 +245,7 @@ export default class Journey {
     }
 
     _useUserInput() {
+        this._resetJourneyData();
         this._journey.startWindDegrees = this._getStartWind();
         this._setShipName();
         this._printSummary();
@@ -291,7 +292,8 @@ export default class Journey {
             .append("svg")
             .attr("class", "compass")
             .attr("x", x)
-            .attr("y", y);
+            .attr("y", y)
+            .call(this._drag);
 
         this._compassG = this._compass.append("g");
 
@@ -330,8 +332,6 @@ export default class Journey {
             .attr("y1", y1)
             .attr("y2", y2)
             .attr("transform", d => `rotate(${Math.round(((d.startAngle + d.endAngle) / 2) * (180 / Math.PI))})`);
-
-        this._gJourneyPath = this._g.append("path");
     }
 
     _getSpeedAtDegrees(degrees) {
@@ -693,7 +693,7 @@ export default class Journey {
 
     _printJourney() {
         this._printLines();
-        this._resetJourney();
+        this._resetJourneyData();
         this._journey.segment.forEach((d, i) => {
             if (i < this._journey.segment.length - 1) {
                 this._setSegmentLabel(i + 1);
@@ -714,6 +714,14 @@ export default class Journey {
         }
     }
 
+    _resetJourney() {
+        this._resetJourneyData();
+        this._showSummary();
+        this._printSummary();
+        this._printCompass();
+        this._gJourneyPath = this._g.append("path");
+    }
+
     /* public */
 
     setSummaryPosition(topMargin, rightMargin) {
@@ -722,12 +730,8 @@ export default class Journey {
 
     plotCourse(x, y) {
         if (!this._journey.segment[0].position[0]) {
-            this.clearMap();
             this._journey.segment[0] = { position: [x, y], label: "" };
             this._resetJourney();
-            this._showSummary();
-            this._printSummary();
-            this._printCompass();
         } else {
             this._journey.segment.push({ position: [x, y], label: "" });
             this._printSegment();
@@ -737,11 +741,5 @@ export default class Journey {
     transform(transform) {
         this._g.attr("transform", transform);
         this._correctJourney();
-    }
-
-    clearMap() {
-        this._initJourney();
-        this._hideSummary();
-        this._g.selectAll("*").remove();
     }
 }
