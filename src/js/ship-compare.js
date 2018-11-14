@@ -319,7 +319,6 @@ class ShipBase extends Ship {
         this._setBackground();
         this._setBackgroundGradient();
         this._drawProfile();
-        this._drawCompassHelperFunction();
         this._printText();
     }
 
