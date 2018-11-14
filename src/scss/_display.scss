@@ -369,14 +369,12 @@ text {
 }
 
 .coord {
-   // line-height: 1;
-  //  background-color: transparent;
     svg {
         overflow: auto;
     }
     circle {
         fill: $secondary-600;
-        fill-opacity: 0.5;
+        fill-opacity: 0.2;
     }
     text {
         font-size: 1em;
