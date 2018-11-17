@@ -47,6 +47,40 @@ export default class Journey {
         this._line = d3Line()
             .x(d => d[0])
             .y(d => d[1]);
+
+        this._labelPadding = 20;
+
+        this._minutesForFullCircle = 48;
+        this._fullCircle = 360;
+        this._degreesPerMinute = this._fullCircle / this._minutesForFullCircle;
+        this._degreesSegment = 15;
+        this._minOWSpeed = 2;
+        this._owSpeedFactor = 2;
+
+        this._speedScale = d3ScaleLinear().domain(d3Range(0, this._fullCircle, this._degreesSegment));
+
+        this._defaultShipName = "None";
+        this._defaultShipSpeed = 19;
+        this._defaultStartWindDegrees = 0;
+
+        this._baseName = "Make journey";
+        this._baseId = "make-journey";
+        this._buttonId = `button-${this._baseId}`;
+        this._compassId = `compass-${this._baseId}`;
+        this._deleteLastLegButtonId = `button-delete-leg-${this._baseId}`;
+        this._modalId = `modal-${this._baseId}`;
+        this._sliderId = `slider-${this._baseId}`;
+        this._shipId = "ship-journey";
+        this._woodId = "wood-journey";
+
+        this._setupSummary();
+        this._setupDrag();
+        this._setupSvg();
+        this._initJourney();
+        this._setupListener();
+    }
+
+    _setupDrag() {
         this._drag = d3Drag()
             .on("start", (d, i, nodes) => {
                 this._removeLabels();
@@ -69,35 +103,6 @@ export default class Journey {
                 //  this._journey.segment[i].position = [d.position[0] + d3Event.x, d.position[1] + d3Event.y];
                 this._printJourney();
             });
-
-        this._labelPadding = 20;
-
-        this._minutesForFullCircle = 48;
-        this._fullCircle = 360;
-        this._degreesPerMinute = this._fullCircle / this._minutesForFullCircle;
-        this._degreesSegment = 15;
-        this._minOWSpeed = 2;
-        this._owSpeedFactor = 2;
-
-        this._speedScale = d3ScaleLinear().domain(d3Range(0, this._fullCircle, this._degreesSegment));
-
-        this._defaultShipName = "None";
-        this._defaultShipSpeed = 19;
-        this._defaultStartWindDegrees = 0;
-
-        this._baseName = "Make journey";
-        this._baseId = "make-journey";
-        this._buttonId = `button-${this._baseId}`;
-        this._deleteLastLegButtonId = `button-delete-leg-${this._baseId}`;
-        this._modalId = `modal-${this._baseId}`;
-        this._sliderId = `slider-${this._baseId}`;
-        this._shipId = "ship-journey";
-        this._woodId = "wood-journey";
-
-        this._setupSummary();
-        this._setupSvg();
-        this._initJourney();
-        this._setupListener();
     }
 
     _setupSvg() {
@@ -149,9 +154,8 @@ export default class Journey {
      * @returns {void}
      */
     _setupListener() {
-        document.getElementById(`${this._buttonId}`).addEventListener("click", event => this._navbarClick(event));
-
-        document.getElementById(this._deleteLastLegButtonId).addEventListener("click", () => this._deleteLastLeg());
+        document.getElementById(`${this._buttonId}`).addEventListener("mouseup", event => this._navbarClick(event));
+        document.getElementById(this._deleteLastLegButtonId).addEventListener("mouseup", () => this._deleteLastLeg());
     }
 
     _setupWindInput() {
@@ -290,6 +294,7 @@ export default class Journey {
 
         this._compass = this._g
             .append("svg")
+            .attr("id", this._compassId)
             .attr("class", "compass")
             .attr("x", x)
             .attr("y", y)
@@ -497,7 +502,7 @@ export default class Journey {
 
             // Remove last circle
             if (i === 0 || i === nodes.length - 1) {
-                circle.attr("r", 20).attr("class", "drag-hidden");
+                circle.attr("r", circleRadius * 4).attr("class", "drag-hidden");
             }
         };
 
@@ -710,7 +715,7 @@ export default class Journey {
         if (this._journey.segment.length) {
             this._printJourney();
         } else {
-            this.clearMap();
+            this._resetJourneyData();
         }
     }
 
