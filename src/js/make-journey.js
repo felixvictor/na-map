@@ -76,7 +76,7 @@ export default class Journey {
         this._setupSummary();
         this._setupDrag();
         this._setupSvg();
-        this._initJourney();
+        this._initJourneyData();
         this._setupListener();
     }
 
@@ -124,7 +124,7 @@ export default class Journey {
             .attr("class", "course-head");
     }
 
-    _initJourney() {
+    _initJourneyData() {
         this._journey = {
             shipName: this._defaultShipName,
             woodNames: "",
@@ -337,6 +337,10 @@ export default class Journey {
             .attr("y1", y1)
             .attr("y2", y2)
             .attr("transform", d => `rotate(${Math.round(((d.startAngle + d.endAngle) / 2) * (180 / Math.PI))})`);
+    }
+
+    _removeCompass() {
+        this._compass.remove();
     }
 
     _getSpeedAtDegrees(degrees) {
@@ -719,12 +723,12 @@ export default class Journey {
         if (this._journey.segment.length) {
             this._printJourney();
         } else {
-            this._resetJourneyData();
+            this._removeCompass();
+            this._initJourneyData();
         }
     }
 
-    _resetJourney() {
-        this._resetJourneyData();
+    _initJourney() {
         this._showSummary();
         this._printSummary();
         this._printCompass();
@@ -740,7 +744,7 @@ export default class Journey {
     plotCourse(x, y) {
         if (!this._journey.segment[0].position[0]) {
             this._journey.segment[0] = { position: [x, y], label: "" };
-            this._resetJourney();
+            this._initJourney();
         } else {
             this._journey.segment.push({ position: [x, y], label: "" });
             this._printSegment();
