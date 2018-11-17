@@ -12293,10 +12293,10 @@ remark-parse@^5.0.0:
     vfile-location "^2.0.0"
     xtend "^4.0.1"
 
-remark-parse@^6.0.2:
-  version "6.0.2"
-  resolved "https://registry.yarnpkg.com/remark-parse/-/remark-parse-6.0.2.tgz#e1e1f987c5a406875757fcb4ebbca86b7c1e110d"
-  integrity sha512-cBbst7OG/pH+VHYggWRabpVn9EP6CUb2hAtSg9cPysRvf+NE1v2cRdXC+TfXumJCar/wpPDK833zPu1fwVanZw==
+remark-parse@^6.0.3:
+  version "6.0.3"
+  resolved "https://registry.yarnpkg.com/remark-parse/-/remark-parse-6.0.3.tgz#c99131052809da482108413f87b0ee7f52180a3a"
+  integrity sha512-QbDXWN4HfKTUC0hHa4teU463KclLAnwpn/FBn87j9cKYJWWawbiLgMfP2Q4XwhxxuuuOxHlw+pSN0OKuJwyVvg==
   dependencies:
     collapse-white-space "^1.0.2"
     is-alphabetical "^1.0.0"
@@ -15311,18 +15311,18 @@ yallist@^3.0.0, yallist@^3.0.2:
   resolved "https://registry.yarnpkg.com/yallist/-/yallist-3.0.2.tgz#8452b4bb7e83c7c188d8041c1a837c773d6d8bb9"
   integrity sha1-hFK0u36Dx8GI2AQcGoN8dz1ti7k=
 
-yaml-unist-parser@^1.0.0-rc.4:
-  version "1.0.0-rc.4"
-  resolved "https://registry.yarnpkg.com/yaml-unist-parser/-/yaml-unist-parser-1.0.0-rc.4.tgz#d8fb9c673d59a4f7d532840b120abd6400237014"
-  integrity sha512-y09JF17+/tMqr5fF5vP9hQsDy434LTNtpoBPj8pNssnGAnB1susUtTFkM8Cum0N0Gb8yqzp8TorKwrPMEFLP9Q==
+yaml-unist-parser@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/yaml-unist-parser/-/yaml-unist-parser-1.0.0.tgz#060def481d2319a8def3b6a06cb8ae3848b0aed3"
+  integrity sha512-DwXEmBpyopgf8YT8uOB7ry+7kuv4ECXDw2+1DipfHK29zwuUUskW+rFO7sgKULK0ddCi6TY09tFFxBc6Vftg5w==
   dependencies:
     lines-and-columns "^1.1.6"
     tslib "^1.9.1"
 
-yaml@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/yaml/-/yaml-1.0.1.tgz#3a8b01e4dda66445904ee743a95951d67a47a0c5"
-  integrity sha512-ysU56qumPH0tEML2hiFVAo+rCnG/0+oO2Ye3fN4c40GBN7kX1fYhDqSoX7OohimcI/Xkkr1DdaUlg5+afinRqA==
+yaml@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/yaml/-/yaml-1.0.2.tgz#77941a457090e17b8ca65b53322e68a050e090d4"
+  integrity sha512-vPmXtExk6AV7F5l2N5jW4LhbhZZPPN+xOK8x/+EgSXsXoawuo19Iqa+9nYMwrltsi6nl0rMKiROA/SAfG2OgUw==
 
 yargs-parser@^10.1.0:
   version "10.1.0"
