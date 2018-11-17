@@ -48,7 +48,7 @@
         "prettier": "^1.15.2",
         "read-css": "^0.3.0",
         "recursive-readdir": "^2.2.2",
-        "remark-parse": "^6.0.2",
+        "remark-parse": "^6.0.3",
         "sass-loader": "^7.0.2",
         "shapefile": "^0.6.6",
         "sharp": "^0.21.0",
@@ -64,8 +64,8 @@
         "webpack-dev-server": "^3.1.10",
         "webpack-subresource-integrity": "^1.3.0",
         "xml2json": "^0.11.2",
-        "yaml": "^1.0.1",
-        "yaml-unist-parser": "^1.0.0-rc.4"
+        "yaml": "^1.0.2",
+        "yaml-unist-parser": "^1.0.0"
     },
     "dependencies": {
         "@fortawesome/fontawesome": "^1.1.2",
