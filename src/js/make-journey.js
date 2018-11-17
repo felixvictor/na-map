@@ -273,9 +273,7 @@ export default class Journey {
             });
     }
 
-    _printCompass() {
-        const x = this._journey.segment[0].position[0],
-            y = this._journey.segment[0].position[1];
+    _printCompassRose() {
         const steps = 24,
             stepRadians = (2 * Math.PI) / steps,
             radius = this._compassSize / (2 * Math.PI),
@@ -291,16 +289,6 @@ export default class Journey {
                 .sort(null)
                 .value(d => d),
             textArcs = textPie(data);
-
-        this._compass = this._g
-            .append("svg")
-            .attr("id", this._compassId)
-            .attr("class", "compass")
-            .attr("x", x)
-            .attr("y", y)
-            .call(this._drag);
-
-        this._compassG = this._compass.append("g");
 
         this._compassG.append("circle").attr("r", Math.floor(innerRadius));
 
@@ -337,6 +325,22 @@ export default class Journey {
             .attr("y1", y1)
             .attr("y2", y2)
             .attr("transform", d => `rotate(${Math.round(((d.startAngle + d.endAngle) / 2) * (180 / Math.PI))})`);
+    }
+
+    _printCompass() {
+        const x = this._journey.segment[0].position[0],
+            y = this._journey.segment[0].position[1];
+
+        this._compass = this._g
+            .append("svg")
+            .attr("id", this._compassId)
+            .attr("class", "compass")
+            .attr("x", x)
+            .attr("y", y)
+            .call(this._drag);
+
+        this._compassG = this._compass.append("g");
+        this._printCompassRose();
     }
 
     _removeCompass() {
@@ -501,7 +505,7 @@ export default class Journey {
                 .attr("r", circleRadius)
                 .attr("class", "");
 
-            // Move circles above text box
+            // Move circles down and visually above text box
             node.append(() => circle.remove().node());
 
             // Enlarge and hide first circle
