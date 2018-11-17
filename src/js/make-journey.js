@@ -500,9 +500,13 @@ export default class Journey {
             // Move circles above text box
             node.append(() => circle.remove().node());
 
-            // Remove last circle
-            if (i === 0 || i === nodes.length - 1) {
+            // Enlarge and hide first circle
+            if (i === 0) {
                 circle.attr("r", circleRadius * 4).attr("class", "drag-hidden");
+            }
+            // Hide last circle
+            if (i === nodes.length - 1) {
+                circle.attr("r", circleRadius).attr("class", "drag-hidden");
             }
         };
 
