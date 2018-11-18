@@ -65,6 +65,8 @@ export default class PortSelect {
     }
 
     _setupListener() {
+        $.fn.selectpicker.Constructor.DEFAULTS.virtualScroll = true;
+        $.fn.selectpicker.Constructor.DEFAULTS.width = "fit";
         $.fn.selectpicker.Constructor.DEFAULTS.dropupAuto = false;
         $.fn.selectpicker.Constructor.DEFAULTS.liveSearch = true;
         $.fn.selectpicker.Constructor.DEFAULTS.liveSearchPlaceholder = "Search ...";
@@ -162,6 +164,11 @@ export default class PortSelect {
             event.preventDefault();
         });
 
+        this._portNamesSelector.classList.add("selectpicker");
+        this._buyGoodsSelector.classList.add("selectpicker");
+        this._propNationSelector.classList.add("selectpicker");
+        this._propClanSelector.classList.add("selectpicker");
+        this._propCMSelector.classList.add("selectpicker");
         $(".selectpicker").selectpicker();
         initMultiDropdownNavbar("selectPortNavbar");
     }
@@ -249,7 +256,6 @@ export default class PortSelect {
         }
 
         this._propClanSelector.insertAdjacentHTML("beforeend", options);
-        this._propClan$.selectpicker("refresh");
     }
 
     _setupCMSelect() {
@@ -389,6 +395,7 @@ export default class PortSelect {
         this._ports.showTradePortPartners = false;
         this._ports.update();
         this._setupClanSelect();
+        this._propClan$.selectpicker("refresh");
     }
 
     _clanSelected(event) {
@@ -563,5 +570,6 @@ export default class PortSelect {
 
     clearMap() {
         this._setupClanSelect();
+        this._propClan$.selectpicker("refresh");
     }
 }
