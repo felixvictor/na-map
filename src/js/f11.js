@@ -224,11 +224,11 @@ export default class F11 {
             if (document.queryCommandSupported && document.queryCommandSupported("copy")) {
                 const input = document.createElement("input");
 
+                input.type = "text";
                 input.value = text;
                 input.style = "position: absolute; left: -1000px; top: -1000px";
                 document.body.appendChild(input);
                 console.log("'<input>' element", input.value);
-                input.focus();
                 input.select();
                 try {
                     return document.execCommand("copy");
