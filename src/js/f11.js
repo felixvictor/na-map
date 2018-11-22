@@ -245,22 +245,20 @@ export default class F11 {
 
         const copyToClipboard = text => {
             navigator.permissions.query({ name: "clipboard-write" }).then(
-                // Permission to copy to clipboard
+                // Permission "clipboard-write"
                 result => {
                     console.log("Permission", result);
 
                     if (result.state === "granted" || result.state === "prompt") {
                         navigator.clipboard.writeText(text).then(
-                            () => {
-                                console.log(`Copied ${text} to clipboard`);
-                            },
+                            () => {},
                             () => {
                                 console.error(`Cannot copy ${text} to clipboard`);
                             }
                         );
                     }
                 },
-                // No permission
+                // No permission "clipboard-write"
                 () => {
                     copyToClipboardFallback(text);
                 }
