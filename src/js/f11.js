@@ -224,9 +224,11 @@ export default class F11 {
             if (document.queryCommandSupported && document.queryCommandSupported("copy")) {
                 const input = document.createElement("input");
 
-                document.body.appendChild(input);
                 input.value = text;
+                input.style = "position: absolute; left: -1000px; top: -1000px";
+                document.body.appendChild(input);
                 console.log("'<input>' element", input.value);
+                input.focus();
                 input.select();
                 try {
                     return document.execCommand("copy");
@@ -237,13 +239,14 @@ export default class F11 {
                     document.body.removeChild(input);
                 }
             } else {
-                console.error(`Insufficient right to copy ${text} to clipboard`);
+                console.error(`Insufficient rights to copy ${text} to clipboard`);
             }
         };
 
         const copyToClipboard = text => {
             console.log("copyToClipboard");
             navigator.permissions.query({ name: "clipboard-write" }).then(
+                // Permission to copy to clipboard
                 result => {
                     console.log("Permission", result);
 
@@ -258,8 +261,8 @@ export default class F11 {
                         );
                     }
                 },
-                reason => {
-                    console.log("Permission rejected", reason);
+                // No permission
+                () => {
                     copyToClipboardFallback(text);
                 }
             );
