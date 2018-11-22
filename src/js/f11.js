@@ -215,34 +215,58 @@ export default class F11 {
 
     _copyCoordClicked(event) {
         /**
-         * {@link https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Interact_with_the_clipboard}
+         * {@link https://stackoverflow.com/questions/400212/how-do-i-copy-to-the-clipboard-in-javascript}
          * @param {string} text - String
          * @return {void}
          */
-        const copyToClipboard = text => {
-            navigator.permissions.query({ name: "clipboard-write" }).then((result, error) => {
-                console.log("Permission", result, error);
-                if (error) {
-                    console.error(`Cannot copy ${text} to clipboard`, error);
-                }
+        const copyToClipboardFallback = text => {
+            console.log("copyToClipboardFallback");
+            if (document.queryCommandSupported && document.queryCommandSupported("copy")) {
+                const input = document.createElement("input");
 
-                if (result.state === "granted" || result.state === "prompt") {
-                    navigator.clipboard.writeText(text).then(
-                        () => {
-                            console.log(`Copied ${text} to clipboard`);
-                        },
-                        () => {
-                            console.error(`Cannot copy ${text} to clipboard`, error);
-                        }
-                    );
-                } else {
-                    console.log(`Insufficient rights to copy ${text} to clipboard`);
+                document.body.appendChild(input);
+                input.value = text;
+                console.log("'<input>' element", input.value);
+                input.select();
+                try {
+                    return document.execCommand("copy");
+                } catch (error) {
+                    console.error("Copy to clipboard failed.", error);
+                    return false;
+                } finally {
+                    document.body.removeChild(input);
                 }
-            });
+            } else {
+                console.error(`Insufficient right to copy ${text} to clipboard`);
+            }
+        };
+
+        const copyToClipboard = text => {
+            console.log("copyToClipboard");
+            navigator.permissions.query({ name: "clipboard-write" }).then(
+                result => {
+                    console.log("Permission", result);
+
+                    if (result.state === "granted" || result.state === "prompt") {
+                        navigator.clipboard.writeText(text).then(
+                            () => {
+                                console.log(`Copied ${text} to clipboard`);
+                            },
+                            () => {
+                                console.error(`Cannot copy ${text} to clipboard`);
+                            }
+                        );
+                    }
+                },
+                reason => {
+                    console.log("Permission rejected", reason);
+                    copyToClipboardFallback(text);
+                }
+            );
         };
 
         registerEvent("Menu", "Copy F11 coordinates");
-        event.preventDefault();
+        // event.preventDefault();
 
         const x = this._getXCoord(),
             z = this._getZCoord();
@@ -252,7 +276,8 @@ export default class F11 {
 
             F11Url.searchParams.set("x", x);
             F11Url.searchParams.set("z", z);
-            copyToClipboard(F11Url);
+
+            copyToClipboard(F11Url.href);
         }
     }
 
