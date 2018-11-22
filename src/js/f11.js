@@ -220,23 +220,22 @@ export default class F11 {
          * @return {void}
          */
         const copyToClipboardFallback = text => {
-            console.log("copyToClipboardFallback");
             if (document.queryCommandSupported && document.queryCommandSupported("copy")) {
                 const input = document.createElement("input");
 
                 input.type = "text";
                 input.value = text;
                 input.style = "position: absolute; left: -1000px; top: -1000px";
-                document.body.appendChild(input);
-                console.log("'<input>' element", input.value);
+                document.getElementById(this._modalId).appendChild(input);
                 input.select();
+
                 try {
                     return document.execCommand("copy");
                 } catch (error) {
                     console.error("Copy to clipboard failed.", error);
                     return false;
                 } finally {
-                   // document.body.removeChild(input);
+                    document.body.removeChild(input);
                 }
             } else {
                 console.error(`Insufficient rights to copy ${text} to clipboard`);
@@ -244,7 +243,6 @@ export default class F11 {
         };
 
         const copyToClipboard = text => {
-            console.log("copyToClipboard");
             navigator.permissions.query({ name: "clipboard-write" }).then(
                 // Permission to copy to clipboard
                 result => {
