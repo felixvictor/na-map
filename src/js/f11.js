@@ -215,9 +215,9 @@ export default class F11 {
 
     _copyCoordClicked(event) {
         /**
-         * {@link https://stackoverflow.com/questions/400212/how-do-i-copy-to-the-clipboard-in-javascript}
+         * Copy to clipboard (fallback solution)
          * @param {string} text - String
-         * @return {void}
+         * @return {bool} Success
          */
         const copyToClipboardFallback = text => {
             if (document.queryCommandSupported && document.queryCommandSupported("copy")) {
@@ -243,6 +243,11 @@ export default class F11 {
             }
         };
 
+        /**
+         * Copy to clipboard (clipboard API)
+         * @param {string} text - String
+         * @return {void}
+         */
         const copyToClipboard = text => {
             navigator.permissions.query({ name: "clipboard-write" }).then(
                 // Permission "clipboard-write"
