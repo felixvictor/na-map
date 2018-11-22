@@ -221,6 +221,7 @@ export default class F11 {
          */
         const copyToClipboardFallback = text => {
             console.log("copyToClipboardFallback");
+            debugger;
             if (document.queryCommandSupported && document.queryCommandSupported("copy")) {
                 const input = document.createElement("input");
 
