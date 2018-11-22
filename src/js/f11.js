@@ -221,12 +221,13 @@ export default class F11 {
          */
         const copyToClipboardFallback = text => {
             if (document.queryCommandSupported && document.queryCommandSupported("copy")) {
+                const modalSel = document.getElementById(this._modalId);
                 const input = document.createElement("input");
 
                 input.type = "text";
                 input.value = text;
                 input.style = "position: absolute; left: -1000px; top: -1000px";
-                document.getElementById(this._modalId).appendChild(input);
+                modalSel.appendChild(input);
                 input.select();
 
                 try {
@@ -235,7 +236,7 @@ export default class F11 {
                     console.error("Copy to clipboard failed.", error);
                     return false;
                 } finally {
-                    document.body.removeChild(input);
+                    modalSel.removeChild(input);
                 }
             } else {
                 console.error(`Insufficient rights to copy ${text} to clipboard`);
