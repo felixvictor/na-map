@@ -208,7 +208,7 @@ export default class F11 {
         const x = this._getXCoord() * -1000,
             z = this._getZCoord() * -1000;
 
-        if (x !== -Infinity && z !== -Infinity) {
+        if (Number.isFinite(x) && Number.isFinite(z)) {
             this._goToF11(x, z);
         }
     }
@@ -221,13 +221,22 @@ export default class F11 {
          */
         const copyToClipboard = text => {
             navigator.permissions.query({ name: "clipboard-write" }).then((result, error) => {
+                console.log("Permission", result, error);
+                if (error) {
+                    console.error(`Cannot copy ${text} to clipboard`, error);
+                }
+
                 if (result.state === "granted" || result.state === "prompt") {
                     navigator.clipboard.writeText(text).then(
-                        () => {},
+                        () => {
+                            console.log(`Copied ${text} to clipboard`);
+                        },
                         () => {
                             console.error(`Cannot copy ${text} to clipboard`, error);
                         }
                     );
+                } else {
+                    console.log(`Insufficient rights to copy ${text} to clipboard`);
                 }
             });
         };
@@ -238,7 +247,7 @@ export default class F11 {
         const x = this._getXCoord(),
             z = this._getZCoord();
 
-        if (!Number.isNaN(x) && x !== Infinity && !Number.isNaN(z) && z !== Infinity) {
+        if (!Number.isNaN(x) && Number.isFinite(x) && !Number.isNaN(z) && Number.isFinite(z)) {
             const F11Url = new URL(window.location);
 
             F11Url.searchParams.set("x", x);
