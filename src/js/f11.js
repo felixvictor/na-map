@@ -221,7 +221,6 @@ export default class F11 {
          */
         const copyToClipboardFallback = text => {
             console.log("copyToClipboardFallback");
-            debugger;
             if (document.queryCommandSupported && document.queryCommandSupported("copy")) {
                 const input = document.createElement("input");
 
@@ -237,7 +236,7 @@ export default class F11 {
                     console.error("Copy to clipboard failed.", error);
                     return false;
                 } finally {
-                    document.body.removeChild(input);
+                   // document.body.removeChild(input);
                 }
             } else {
                 console.error(`Insufficient rights to copy ${text} to clipboard`);
