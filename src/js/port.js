@@ -541,11 +541,6 @@ export default class PortDisplay {
                 h += `<span class="non-trading">${port.producesNonTrading}</span>`;
                 h += "</td></tr>";
             }
-            if (port.consumesTrading.length) {
-                h += "<tr><td>Consumes\u00a0</td><td>";
-                h += port.consumesTrading;
-                h += "</td></tr>";
-            }
             if (port.dropsTrading.length || port.dropsNonTrading.length) {
                 h += `<tr><td>Drops\u00a0${port.dropsNonTrading.length ? "\u00a0" : ""}</td><td>`;
                 if (port.dropsNonTrading.length) {
@@ -557,6 +552,11 @@ export default class PortDisplay {
                 if (port.dropsTrading.length) {
                     h += `${port.dropsTrading}`;
                 }
+                h += "</td></tr>";
+            }
+            if (port.consumesTrading.length) {
+                h += "<tr><td>Consumes\u00a0</td><td>";
+                h += port.consumesTrading;
                 h += "</td></tr>";
             }
             if (this.showTradePortPartners) {

@@ -229,19 +229,27 @@ export default class Map {
     }
 
     _setupData(data) {
+        //        const marks = [];
+
+        //        marks.push("setupData");
+        //        performance.mark(`${marks[marks.length - 1]}-start`);
         const portData = topojsonFeature(data.ports, data.ports.objects.ports);
         // Port ids of capturable ports
         const portIds = portData.features.filter(port => !port.properties.nonCapturable).map(port => port.id);
+        //        performance.mark(`${marks[marks.length - 1]}-end`);
 
         function getFeature(object) {
-            return object.filter(port => portIds.includes(port.id)).map(d => ({
-                type: "Feature",
-                id: d.id,
-                geometry: d.geometry
-            }));
+            return object
+                .filter(port => portIds.includes(port.id))
+                .map(d => ({
+                    type: "Feature",
+                    id: d.id,
+                    geometry: d.geometry
+                }));
         }
 
         this._f11 = new F11(this, this.coord);
+
         this._ports = new PortDisplay(portData.features, data.pb, this);
 
         let pbCircles = topojsonFeature(data.pbZones, data.pbZones.objects.pbCircles);
@@ -290,6 +298,13 @@ export default class Map {
         this._grid = new Grid(this);
 
         this._init();
+
+        /*
+        marks.forEach(mark => {
+            performance.measure(mark, `${mark}-start`, `${mark}-end`);
+        });
+        console.log(performance.getEntriesByType("measure"));
+        */
     }
 
     _readData() {
@@ -500,7 +515,6 @@ export default class Map {
 
     _clearMap() {
         this._windPrediction.clearMap();
-        this._journey.clearMap();
         this._f11.clearMap();
         this._ports.clearMap();
         this._portSelect.clearMap();
