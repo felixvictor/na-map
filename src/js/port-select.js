@@ -65,56 +65,44 @@ export default class PortSelect {
     }
 
     _setupListener() {
-        this._portNamesSelector.classList.add("selectpicker");
-        this._buyGoodsSelector.classList.add("selectpicker");
-        this._propNationSelector.classList.add("selectpicker");
-        this._propClanSelector.classList.add("selectpicker");
-        this._propCMSelector.classList.add("selectpicker");
-        const selectPickerDefaults = {
-            noneSelectedText: "",
-            dropupAuto: false
-        };
-        const selectPickerLiveSearch = JSON.parse(JSON.stringify(selectPickerDefaults));
-        selectPickerLiveSearch.liveSearch = true;
-        selectPickerLiveSearch.liveSearchPlaceholder = "Search ...";
-        selectPickerLiveSearch.liveSearchNormalize = true;
+        $.fn.selectpicker.Constructor.DEFAULTS.virtualScroll = true;
+        $.fn.selectpicker.Constructor.DEFAULTS.width = "fit";
+        $.fn.selectpicker.Constructor.DEFAULTS.dropupAuto = false;
+        $.fn.selectpicker.Constructor.DEFAULTS.liveSearch = true;
+        $.fn.selectpicker.Constructor.DEFAULTS.liveSearchPlaceholder = "Search ...";
+        $.fn.selectpicker.Constructor.DEFAULTS.liveSearchNormalize = true;
 
-        selectPickerLiveSearch.noneSelectedText = "Select single port";
         this._portNamesSelector.addEventListener("change", event => {
             registerEvent("Menu", "Move to port");
             this._resetOtherSelects(this._portNames$);
             this._portSelected(event);
+            event.preventDefault();
         });
-        this._portNames$.selectpicker(selectPickerLiveSearch);
 
-        selectPickerLiveSearch.noneSelectedText = "Select good";
         this._buyGoodsSelector.addEventListener("change", event => {
             registerEvent("Menu", "Select good");
             this._resetOtherSelects(this._buyGoods$);
             this._goodSelected(event);
+            event.preventDefault();
         });
-        this._buyGoods$.selectpicker(selectPickerLiveSearch);
 
-        selectPickerDefaults.noneSelectedText = "Select nation";
         this._propNationSelector.addEventListener("change", event => {
             this._resetOtherSelects(this._propNation$);
             this._nationSelected(event);
+            event.preventDefault();
         });
-        this._propNation$.selectpicker(selectPickerDefaults);
 
-        selectPickerDefaults.noneSelectedText = "Select clan";
         this._propClanSelector.addEventListener("change", event => {
             this._resetOtherSelects(this._propClan$);
             this._clanSelected(event);
+            event.preventDefault();
         });
-        this._propClan$.selectpicker(selectPickerDefaults);
 
-        selectPickerDefaults.noneSelectedText = "Select";
         this._propCMSelector.addEventListener("change", event => {
             this._resetOtherSelects(this._propCM$);
             this._CMSelected(event);
+            event.preventDefault();
         });
-        this._propCM$.selectpicker(selectPickerDefaults);
 
         document.getElementById("menu-prop-deep").addEventListener("click", () => this._depthSelected("deep"));
         document.getElementById("menu-prop-shallow").addEventListener("click", () => this._depthSelected("shallow"));
@@ -176,10 +164,13 @@ export default class PortSelect {
             event.preventDefault();
         });
 
+        this._portNamesSelector.classList.add("selectpicker");
+        this._buyGoodsSelector.classList.add("selectpicker");
+        this._propNationSelector.classList.add("selectpicker");
+        this._propClanSelector.classList.add("selectpicker");
+        this._propCMSelector.classList.add("selectpicker");
+        $(".selectpicker").selectpicker();
         initMultiDropdownNavbar("selectPortNavbar");
-        $(".selectpicker")
-            .val("default")
-            .selectpicker("refresh");
     }
 
     _setupPortSelect() {
@@ -252,19 +243,19 @@ export default class PortSelect {
             portId = new Set();
         this._ports.portData.forEach(d => portId.add(d.id));
         this._ports.pbData.ports.filter(d => d.capturer && portId.has(d.id)).forEach(d => clanList.add(d.capturer));
-        const options = `${Array.from(clanList)
-            .sort()
-            .map(clan => `<option value="${clan}">${clan}</option>`)
-            .join("")}`;
 
-        if (options) {
-            this._propClanSelector.insertAdjacentHTML("beforeend", options);
+        let options = "";
+        if (clanList.size !== 0) {
             this._propClanSelector.disabled = false;
-            this._propClan$.val("default").selectpicker("refresh");
+            options = `${Array.from(clanList)
+                .sort()
+                .map(clan => `<option value="${clan}">${clan}</option>`)
+                .join("")}`;
         } else {
             this._propClanSelector.disabled = true;
-            this._propClan$.append("<option></option>").selectpicker("refresh");
         }
+
+        this._propClanSelector.insertAdjacentHTML("beforeend", options);
     }
 
     _setupCMSelect() {
@@ -285,14 +276,16 @@ export default class PortSelect {
         const tradePortConsumedGoods = [],
             tradePortProducedGoods = [];
 
-        this._ports.portDataDefault.filter(port => port.id === this._ports.tradePortId).forEach(port => {
-            if (port.properties.consumesTrading) {
-                port.properties.consumesTrading.forEach(good => tradePortConsumedGoods.push(good.name));
-            }
-            if (port.properties.dropsTrading) {
-                port.properties.dropsTrading.forEach(good => tradePortProducedGoods.push(good.name));
-            }
-        });
+        this._ports.portDataDefault
+            .filter(port => port.id === this._ports.tradePortId)
+            .forEach(port => {
+                if (port.properties.consumesTrading) {
+                    port.properties.consumesTrading.forEach(good => tradePortConsumedGoods.push(good.name));
+                }
+                if (port.properties.dropsTrading) {
+                    port.properties.dropsTrading.forEach(good => tradePortProducedGoods.push(good.name));
+                }
+            });
 
         this._ports.portData = this._ports.portDataDefault
             .map(port => {
@@ -402,6 +395,7 @@ export default class PortSelect {
         this._ports.showTradePortPartners = false;
         this._ports.update();
         this._setupClanSelect();
+        this._propClan$.selectpicker("refresh");
     }
 
     _clanSelected(event) {
@@ -422,8 +416,8 @@ export default class PortSelect {
     }
 
     _depthSelected(depth) {
-        const portData = this._ports.portDataDefault.filter(
-            d => (depth === "shallow" ? d.properties.shallow : !d.properties.shallow)
+        const portData = this._ports.portDataDefault.filter(d =>
+            depth === "shallow" ? d.properties.shallow : !d.properties.shallow
         );
         this._ports.portData = portData;
         this._ports.showCurrentGood = false;
@@ -576,5 +570,6 @@ export default class PortSelect {
 
     clearMap() {
         this._setupClanSelect();
+        this._propClan$.selectpicker("refresh");
     }
 }
