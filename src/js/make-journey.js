@@ -13,7 +13,7 @@ import { range as d3Range } from "d3-array";
 import { drag as d3Drag } from "d3-drag";
 import { scaleLinear as d3ScaleLinear } from "d3-scale";
 import { event as d3Event, select as d3Select } from "d3-selection";
-import { line as d3Line } from "d3-shape";
+import { arc as d3Arc, line as d3Line, pie as d3Pie } from "d3-shape";
 import { zoomIdentity as d3ZoomIdentity, zoomTransform as d3ZoomTransform } from "d3-zoom";
 import moment from "moment";
 import "moment/locale/en-gb";
@@ -43,10 +43,44 @@ export default class Journey {
         this._woodData = woodData;
         this._fontSize = fontSize;
 
-        this._compassSize = 200;
+        this._compassSize = 600;
         this._line = d3Line()
             .x(d => d[0])
             .y(d => d[1]);
+
+        this._labelPadding = 20;
+
+        this._minutesForFullCircle = 48;
+        this._fullCircle = 360;
+        this._degreesPerMinute = this._fullCircle / this._minutesForFullCircle;
+        this._degreesSegment = 15;
+        this._minOWSpeed = 2;
+        this._owSpeedFactor = 2;
+
+        this._speedScale = d3ScaleLinear().domain(d3Range(0, this._fullCircle, this._degreesSegment));
+
+        this._defaultShipName = "None";
+        this._defaultShipSpeed = 19;
+        this._defaultStartWindDegrees = 0;
+
+        this._baseName = "Make journey";
+        this._baseId = "make-journey";
+        this._buttonId = `button-${this._baseId}`;
+        this._compassId = `compass-${this._baseId}`;
+        this._deleteLastLegButtonId = `button-delete-leg-${this._baseId}`;
+        this._modalId = `modal-${this._baseId}`;
+        this._sliderId = `slider-${this._baseId}`;
+        this._shipId = "ship-journey";
+        this._woodId = "wood-journey";
+
+        this._setupSummary();
+        this._setupDrag();
+        this._setupSvg();
+        this._initJourneyData();
+        this._setupListener();
+    }
+
+    _setupDrag() {
         this._drag = d3Drag()
             .on("start", (d, i, nodes) => {
                 this._removeLabels();
@@ -69,35 +103,6 @@ export default class Journey {
                 //  this._journey.segment[i].position = [d.position[0] + d3Event.x, d.position[1] + d3Event.y];
                 this._printJourney();
             });
-
-        this._labelPadding = 20;
-
-        this._minutesForFullCircle = 48;
-        this._fullCircle = 360;
-        this._degreesPerMinute = this._fullCircle / this._minutesForFullCircle;
-        this._degreesSegment = 15;
-        this._minOWSpeed = 2;
-        this._owSpeedFactor = 2;
-
-        this._speedScale = d3ScaleLinear().domain(d3Range(0, this._fullCircle, this._degreesSegment));
-
-        this._defaultShipName = "None";
-        this._defaultShipSpeed = 19;
-        this._defaultStartWindDegrees = 0;
-
-        this._baseName = "Make journey";
-        this._baseId = "make-journey";
-        this._buttonId = `button-${this._baseId}`;
-        this._deleteLastLegButtonId = `button-delete-leg-${this._baseId}`;
-        this._modalId = `modal-${this._baseId}`;
-        this._sliderId = `slider-${this._baseId}`;
-        this._shipId = "ship-journey";
-        this._woodId = "wood-journey";
-
-        this._setupSummary();
-        this._setupSvg();
-        this._initJourney();
-        this._setupListener();
     }
 
     _setupSvg() {
@@ -119,7 +124,7 @@ export default class Journey {
             .attr("class", "course-head");
     }
 
-    _initJourney() {
+    _initJourneyData() {
         this._journey = {
             shipName: this._defaultShipName,
             woodNames: "",
@@ -131,7 +136,7 @@ export default class Journey {
         };
     }
 
-    _resetJourney() {
+    _resetJourneyData() {
         this._journey.startWindDegrees = this._getStartWind();
         this._journey.currentWindDegrees = this._journey.startWindDegrees;
         this._journey.totalDistance = 0;
@@ -149,9 +154,8 @@ export default class Journey {
      * @returns {void}
      */
     _setupListener() {
-        document.getElementById(`${this._buttonId}`).addEventListener("click", event => this._navbarClick(event));
-
-        document.getElementById(this._deleteLastLegButtonId).addEventListener("click", () => this._deleteLastLeg());
+        document.getElementById(`${this._buttonId}`).addEventListener("mouseup", event => this._navbarClick(event));
+        document.getElementById(this._deleteLastLegButtonId).addEventListener("mouseup", () => this._deleteLastLeg());
     }
 
     _setupWindInput() {
@@ -245,6 +249,7 @@ export default class Journey {
     }
 
     _useUserInput() {
+        this._resetJourneyData();
         this._journey.startWindDegrees = this._getStartWind();
         this._setShipName();
         this._printSummary();
@@ -268,19 +273,78 @@ export default class Journey {
             });
     }
 
+    _printCompassRose() {
+        const steps = 24,
+            stepRadians = (2 * Math.PI) / steps,
+            radius = this._compassSize / (2 * Math.PI),
+            outerRadius = radius - 1,
+            innerRadius = radius * 0.8;
+        const data = Array.from(new Array(steps), () => 1);
+        const textArc = d3Arc()
+                .outerRadius(outerRadius)
+                .innerRadius(innerRadius),
+            textPie = d3Pie()
+                .startAngle(0 - stepRadians / 2)
+                .endAngle(2 * Math.PI - stepRadians / 2)
+                .sort(null)
+                .value(d => d),
+            textArcs = textPie(data);
+
+        this._compassG.append("circle").attr("r", Math.floor(innerRadius));
+
+        // Cardinal and intercardinal winds
+        this._compassG
+            .selectAll("text")
+            .data(textArcs.filter((d, i) => i % 3 === 0))
+            .enter()
+            .append("text")
+            .attr("transform", d => {
+                const [tx, ty] = textArc.centroid(d),
+                    translate = [Math.round(tx), Math.round(ty)];
+                let rotate = Math.round(((d.startAngle + d.endAngle) / 2) * (180 / Math.PI));
+                if (rotate === 90 || rotate === 270) {
+                    rotate = 0;
+                } else if (rotate > 90 && rotate < 270) {
+                    rotate -= 180;
+                }
+                return `rotate(${rotate}, ${translate}) translate(${translate})`;
+            })
+            .attr("dx", d => (degreesToCompass((360 / steps) * d.index) === "E" ? "-.2rem" : "0"))
+            .text(d => degreesToCompass((360 / steps) * d.index));
+
+        // Ticks
+        const y1 = Math.floor(-outerRadius * 0.95),
+            y2 = Math.floor(-innerRadius);
+        this._compassG
+            .selectAll("line")
+            .data(textArcs.filter((d, i) => i % 3 !== 0))
+            .enter()
+            .append("line")
+            .attr("x1", 0)
+            .attr("x2", 0)
+            .attr("y1", y1)
+            .attr("y2", y2)
+            .attr("transform", d => `rotate(${Math.round(((d.startAngle + d.endAngle) / 2) * (180 / Math.PI))})`);
+    }
+
     _printCompass() {
         const x = this._journey.segment[0].position[0],
             y = this._journey.segment[0].position[1];
+
         this._compass = this._g
-            .append("image")
-            .classed("compass", true)
+            .append("svg")
+            .attr("id", this._compassId)
+            .attr("class", "compass")
             .attr("x", x)
             .attr("y", y)
-            .attr("transform", `translate(${-this._compassSize / 2},${-this._compassSize / 2})`)
-            .attr("height", this._compassSize)
-            .attr("width", this._compassSize)
-            .attr("xlink:href", "icons/compass.svg");
-        this._gJourneyPath = this._g.append("path");
+            .call(this._drag);
+
+        this._compassG = this._compass.append("g");
+        this._printCompassRose();
+    }
+
+    _removeCompass() {
+        this._compass.remove();
     }
 
     _getSpeedAtDegrees(degrees) {
@@ -393,7 +457,6 @@ export default class Journey {
             // Don't scale on higher zoom level
             scale = Math.max(1, currentTransform.k),
             fontSize = this._fontSize / scale,
-            compassSize = this._compassSize / scale,
             textTransform = d3ZoomIdentity.translate(defaultTranslate / scale, defaultTranslate / scale),
             textPadding = this._labelPadding / scale,
             circleRadius = 10 / scale,
@@ -442,12 +505,16 @@ export default class Journey {
                 .attr("r", circleRadius)
                 .attr("class", "");
 
-            // Move circles above text box
+            // Move circles down and visually above text box
             node.append(() => circle.remove().node());
 
-            // Remove last circle
-            if (i === 0 || i === nodes.length - 1) {
-                circle.attr("r", 20).attr("class", "drag-hidden");
+            // Enlarge and hide first circle
+            if (i === 0) {
+                circle.attr("r", circleRadius * 4).attr("class", "drag-hidden");
+            }
+            // Hide last circle
+            if (i === nodes.length - 1) {
+                circle.attr("r", circleRadius).attr("class", "drag-hidden");
             }
         };
 
@@ -457,11 +524,8 @@ export default class Journey {
         if (this._gJourneyPath) {
             this._gJourneyPath.style("stroke-width", `${pathWidth}px`);
         }
-        if (this._compass) {
-            this._compass
-                .attr("transform", `translate(${-compassSize / 2},${-compassSize / 2})`)
-                .attr("height", compassSize)
-                .attr("width", compassSize);
+        if (this._compassG) {
+            this._compassG.attr("transform", `scale(${1 / scale})`);
         }
     }
 
@@ -646,7 +710,7 @@ export default class Journey {
 
     _printJourney() {
         this._printLines();
-        this._resetJourney();
+        this._resetJourneyData();
         this._journey.segment.forEach((d, i) => {
             if (i < this._journey.segment.length - 1) {
                 this._setSegmentLabel(i + 1);
@@ -663,8 +727,16 @@ export default class Journey {
         if (this._journey.segment.length) {
             this._printJourney();
         } else {
-            this.clearMap();
+            this._removeCompass();
+            this._initJourneyData();
         }
+    }
+
+    _initJourney() {
+        this._showSummary();
+        this._printSummary();
+        this._printCompass();
+        this._gJourneyPath = this._g.append("path");
     }
 
     /* public */
@@ -675,12 +747,8 @@ export default class Journey {
 
     plotCourse(x, y) {
         if (!this._journey.segment[0].position[0]) {
-            this.clearMap();
             this._journey.segment[0] = { position: [x, y], label: "" };
-            this._resetJourney();
-            this._showSummary();
-            this._printSummary();
-            this._printCompass();
+            this._initJourney();
         } else {
             this._journey.segment.push({ position: [x, y], label: "" });
             this._printSegment();
@@ -690,11 +758,5 @@ export default class Journey {
     transform(transform) {
         this._g.attr("transform", transform);
         this._correctJourney();
-    }
-
-    clearMap() {
-        this._initJourney();
-        this._hideSummary();
-        this._g.selectAll("*").remove();
     }
 }

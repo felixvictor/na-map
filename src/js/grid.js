@@ -154,7 +154,7 @@ export default class Grid {
             .tickSize(this._maxCoord);
 
         // svg groups
-        this._gAxis = this._map.svg.append("g").classed("axis d-none", true);
+        this._gAxis = this._map.svg.insert("g", "g.pb").classed("axis d-none", true);
         this._gXAxis = this._gAxis.append("g").classed("axis-x", true);
         this._gYAxis = this._gAxis.append("g").classed("axis-y", true);
         this._setupBackground();
@@ -254,11 +254,15 @@ export default class Grid {
     _displayXAxis() {
         const tk = d3Event ? d3Event.transform.k : 1,
             ty = d3Event ? d3Event.transform.y : 0,
-            dx = ty / tk < this._width ? ty / tk : 0;
-        this._gXAxis.call(this._xAxis.tickPadding(-this._maxCoord - dx));
+            dx = ty / tk < this._width ? ty / tk : 0,
+            padding = -this._maxCoord - dx,
+            fontSize = roundToThousands(this._defaultFontSize / tk),
+            strokeWidth = roundToThousands(1 / tk);
+
         this._gXAxis
-            .attr("font-size", roundToThousands(this._defaultFontSize / tk))
-            .attr("stroke-width", roundToThousands(1 / tk));
+            .attr("font-size", fontSize)
+            .attr("stroke-width", strokeWidth)
+            .call(this._xAxis.tickPadding(padding));
         this._gXAxis.select(".domain").remove();
     }
 
@@ -270,11 +274,15 @@ export default class Grid {
     _displayYAxis() {
         const tk = d3Event ? d3Event.transform.k : 1,
             tx = d3Event ? d3Event.transform.x : 0,
-            dy = tx / tk < this._height ? tx / tk : 0;
-        this._gYAxis.call(this._yAxis.tickPadding(-this._maxCoord - dy));
+            dy = tx / tk < this._height ? tx / tk : 0,
+            padding = -this._maxCoord - dy,
+            fontSize = roundToThousands(this._defaultFontSize / tk),
+            strokeWidth = roundToThousands(1 / tk);
+
         this._gYAxis
-            .attr("font-size", roundToThousands(this._defaultFontSize / tk))
-            .attr("stroke-width", roundToThousands(1 / tk));
+            .attr("font-size", fontSize)
+            .attr("stroke-width", strokeWidth)
+            .call(this._yAxis.tickPadding(padding));
         this._gYAxis.select(".domain").remove();
     }
 
