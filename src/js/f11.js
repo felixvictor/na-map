@@ -252,8 +252,6 @@ export default class F11 {
             navigator.permissions.query({ name: "clipboard-write" }).then(
                 // Permission "clipboard-write"
                 result => {
-                    console.log("Permission", result);
-
                     if (result.state === "granted" || result.state === "prompt") {
                         navigator.clipboard.writeText(text).then(
                             () => {},
@@ -271,7 +269,7 @@ export default class F11 {
         };
 
         registerEvent("Menu", "Copy F11 coordinates");
-        // event.preventDefault();
+        event.preventDefault();
 
         const x = this._getXCoord(),
             z = this._getZCoord();
