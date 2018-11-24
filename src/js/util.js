@@ -9,6 +9,7 @@
  */
 
 import { formatPrefix as d3FormatPrefix, formatLocale as d3FormatLocale } from "d3-format";
+import { arc as d3Arc, pie as d3Pie } from "d3-shape";
 
 /**
  * Default format
@@ -348,4 +349,61 @@ export function chunkify(array, n, balanced = true) {
     }
 
     return out;
+}
+
+/**
+ * Print compass
+ * @param {object} elem - Element to append compass
+ * @return {void}
+ */
+export function printCompassRose({ elem, compassSize }) {
+    const steps = 24,
+        stepRadians = (2 * Math.PI) / steps,
+        radius = compassSize / (2 * Math.PI),
+        outerRadius = radius - 1,
+        innerRadius = radius * 0.8;
+    const data = Array.from(new Array(steps), () => 1);
+    const textArc = d3Arc()
+            .outerRadius(outerRadius)
+            .innerRadius(innerRadius),
+        textPie = d3Pie()
+            .startAngle(0 - stepRadians / 2)
+            .endAngle(2 * Math.PI - stepRadians / 2)
+            .sort(null)
+            .value(d => d),
+        textArcs = textPie(data);
+
+    elem.append("circle").attr("r", Math.floor(innerRadius));
+
+    // Cardinal and intercardinal winds
+    elem.selectAll("text")
+        .data(textArcs.filter((d, i) => i % 3 === 0))
+        .enter()
+        .append("text")
+        .attr("transform", d => {
+            const [tx, ty] = textArc.centroid(d),
+                translate = [Math.round(tx), Math.round(ty)];
+            let rotate = Math.round(((d.startAngle + d.endAngle) / 2) * (180 / Math.PI));
+            if (rotate === 90 || rotate === 270) {
+                rotate = 0;
+            } else if (rotate > 90 && rotate < 270) {
+                rotate -= 180;
+            }
+            return `rotate(${rotate}, ${translate}) translate(${translate})`;
+        })
+        .attr("dx", d => (degreesToCompass((360 / steps) * d.index) === "E" ? "-.2rem" : "0"))
+        .text(d => degreesToCompass((360 / steps) * d.index));
+
+    // Ticks
+    const y1 = Math.floor(-outerRadius * 0.95),
+        y2 = Math.floor(-innerRadius);
+    elem.selectAll("line")
+        .data(textArcs.filter((d, i) => i % 3 !== 0))
+        .enter()
+        .append("line")
+        .attr("x1", 0)
+        .attr("x2", 0)
+        .attr("y1", y1)
+        .attr("y2", y2)
+        .attr("transform", d => `rotate(${Math.round(((d.startAngle + d.endAngle) / 2) * (180 / Math.PI))})`);
 }
