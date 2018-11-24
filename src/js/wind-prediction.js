@@ -11,16 +11,15 @@ import "round-slider/src/roundslider.css";
 import "tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4";
 import "tempusdominus-core/build/js/tempusdominus-core";
 
-import { compassDirections, compassToDegrees, degreesToCompass } from "./util";
+import { compassDirections, compassToDegrees, degreesToCompass, printCompassRose } from "./util";
 import { registerEvent } from "./analytics";
 import { insertBaseModal } from "./common";
 
 export default class WindPrediction {
     constructor() {
-        this._compassSize = 180;
         this._height = 300;
         this._width = 300;
-        this._line = d3Line();
+        this._windArrowWidth = 4;
 
         this._baseName = "Predict wind";
         this._baseId = "predict-wind";
@@ -32,7 +31,7 @@ export default class WindPrediction {
         this._timeInputId = `input-${this._baseId}`;
 
         this._setupSvg();
-        this.constructor._setupArrow();
+        this._setupArrow();
         this._setupListener();
     }
 
@@ -45,18 +44,21 @@ export default class WindPrediction {
             .classed("coord", true);
     }
 
-    static _setupArrow() {
+    _setupArrow() {
+        const width = this._windArrowWidth;
+        const doubleWidth = this._windArrowWidth * 2;
+
         d3Select("#na-svg defs")
             .append("marker")
             .attr("id", "wind-arrow")
-            .attr("viewBox", "0 -5 10 10")
-            .attr("refX", 5)
+            .attr("viewBox", `0 -${width} ${doubleWidth} ${doubleWidth}`)
+            .attr("refX", width)
             .attr("refY", 0)
-            .attr("markerWidth", 4)
-            .attr("markerHeight", 4)
+            .attr("markerWidth", width)
+            .attr("markerHeight", width)
             .attr("orient", "auto")
             .append("path")
-            .attr("d", "M0,-5L10,0L0,5")
+            .attr("d", `M0,-${width}L${doubleWidth},0L0,${width}`)
             .classed("wind-head", true);
     }
 
@@ -240,30 +242,35 @@ export default class WindPrediction {
     }
 
     _printCompass(predictedWindDegrees) {
-        const xCompass = this._width / 2,
-            yCompass = this._height / 3,
-            radians = (Math.PI / 180) * (predictedWindDegrees - 90),
-            length = this._compassSize * 1,
-            dx = length * Math.cos(radians),
-            dy = length * Math.sin(radians),
-            lineData = [
-                [Math.round(xCompass + dx / 2), Math.round(yCompass + dy / 2)],
-                [Math.round(xCompass - dx / 2), Math.round(yCompass - dy / 2)]
-            ];
+        const line = d3Line();
+        const compassSize = 600;
+        const xCompass = this._width / 2;
+        const yCompass = this._height / 3;
+        const radians = (Math.PI / 180) * (predictedWindDegrees - 90);
+        const length = (compassSize / Math.PI) * 0.6;
+        const dx = length * Math.cos(radians);
+        const dy = length * Math.sin(radians);
+        const lineData = [
+            [Math.round(xCompass + dx / 2), Math.round(yCompass + dy / 2)],
+            [Math.round(xCompass - dx / 2), Math.round(yCompass - dy / 2)]
+        ];
 
         this._svg.attr("height", this._height).attr("width", this._width);
-        this._svg
-            .append("image")
+
+        // Compass rose
+        const compassElem = this._svg
+            .append("svg")
+            .attr("class", "compass")
             .classed("compass", true)
-            .attr("x", xCompass - this._compassSize / 2)
-            .attr("y", yCompass - this._compassSize / 2)
-            .attr("height", this._compassSize)
-            .attr("width", this._compassSize)
-            .attr("xlink:href", "icons/compass.svg");
+            .attr("x", xCompass)
+            .attr("y", yCompass);
+        printCompassRose({ elem: compassElem, compassSize });
+
+        // Wind direction
         this._svg
             .append("path")
             .datum(lineData)
-            .attr("d", this._line)
+            .attr("d", line)
             .classed("wind", true)
             .attr("marker-end", "url(#wind-arrow)");
     }
