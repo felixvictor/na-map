@@ -170,12 +170,12 @@ export default class F11 {
             // Copy coordinates to clipboard (ctrl-c key event)
             document.getElementById(this._modalId).onkeydown = event => {
                 if (event.code === "KeyC" && event.ctrlKey) {
-                    this._copyCoordClicked();
+                    this._copyCoordClicked(event);
                 }
             };
             // Copy coordinates to clipboard (click event)
             document.getElementById(this._copyButtonId).addEventListener("click", event => {
-                this._copyCoordClicked();
+                this._copyCoordClicked(event);
             });
         }
 
@@ -208,29 +208,64 @@ export default class F11 {
         const x = this._getXCoord() * -1000,
             z = this._getZCoord() * -1000;
 
-        if (x !== -Infinity && z !== -Infinity) {
+        if (Number.isFinite(x) && Number.isFinite(z)) {
             this._goToF11(x, z);
         }
     }
 
-    _copyCoordClicked() {
+    _copyCoordClicked(event) {
         /**
-         * {@link https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Interact_with_the_clipboard}
+         * Copy to clipboard (fallback solution)
+         * @param {string} text - String
+         * @return {bool} Success
+         */
+        const copyToClipboardFallback = text => {
+            if (document.queryCommandSupported && document.queryCommandSupported("copy")) {
+                const modalSel = document.getElementById(this._modalId);
+                const input = document.createElement("input");
+
+                input.type = "text";
+                input.value = text;
+                input.style = "position: absolute; left: -1000px; top: -1000px";
+                modalSel.appendChild(input);
+                input.select();
+
+                try {
+                    return document.execCommand("copy");
+                } catch (error) {
+                    console.error("Copy to clipboard failed.", error);
+                    return false;
+                } finally {
+                    modalSel.removeChild(input);
+                }
+            } else {
+                console.error(`Insufficient rights to copy ${text} to clipboard`);
+            }
+        };
+
+        /**
+         * Copy to clipboard (clipboard API)
          * @param {string} text - String
          * @return {void}
          */
         const copyToClipboard = text => {
-            navigator.permissions.query({ name: "clipboard-write" }).then(result => {
-                if (result.state == "granted" || result.state == "prompt") {
-                    navigator.clipboard.writeText(text).then(
-                        () => {
-                        },
-                        () => {
-                            console.error(`Cannot copy ${text} to clipboard`, err);
-                        }
-                    );
+            navigator.permissions.query({ name: "clipboard-write" }).then(
+                // Permission "clipboard-write"
+                result => {
+                    if (result.state === "granted" || result.state === "prompt") {
+                        navigator.clipboard.writeText(text).then(
+                            () => {},
+                            () => {
+                                console.error(`Cannot copy ${text} to clipboard`);
+                            }
+                        );
+                    }
+                },
+                // No permission "clipboard-write"
+                () => {
+                    copyToClipboardFallback(text);
                 }
-            });
+            );
         };
 
         registerEvent("Menu", "Copy F11 coordinates");
@@ -239,12 +274,13 @@ export default class F11 {
         const x = this._getXCoord(),
             z = this._getZCoord();
 
-        if (!Number.isNaN(x) && x !== Infinity && !Number.isNaN(z) && z !== Infinity) {
+        if (!Number.isNaN(x) && Number.isFinite(x) && !Number.isNaN(z) && Number.isFinite(z)) {
             const F11Url = new URL(window.location);
 
             F11Url.searchParams.set("x", x);
             F11Url.searchParams.set("z", z);
-            copyToClipboard(F11Url);
+
+            copyToClipboard(F11Url.href);
         }
     }
 
