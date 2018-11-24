@@ -241,10 +241,6 @@ table a {
     color: $green;
 }
 
-.compass-arc path {
-    stroke: $primary-500;
-}
-
 .profile {
     path.base,
     circle.base {
@@ -368,8 +364,69 @@ text {
     background-color: $primary-100;
 }
 
-.compass {
-    opacity: 0.8;
+.compass-arc path {
+    stroke: $primary-500;
+}
+
+.coord {
+    svg {
+        overflow: auto;
+    }
+    circle {
+        fill: $secondary-600;
+        fill-opacity: 0.2;
+    }
+    text {
+        font-size: 1em;
+        fill: $secondary-800;
+        text-anchor: middle;
+        dominant-baseline: central;
+        &.des {
+            fill: $secondary-700 !important;
+        }
+    }
+    rect {
+        fill: $primary-100;
+        fill-opacity: 0.7;
+    }
+    path {
+        stroke: $secondary-600;
+        stroke-width: 0.3em;
+        fill: none;
+    }
+    .label {
+        text {
+            // font-size: unset;
+            text-anchor: start;
+        }
+        circle {
+            fill-opacity: 1;
+            cursor: pointer;
+        }
+        .drag-active {
+            stroke: $secondary-100;
+            stroke-width: 0.25rem;
+        }
+        .drag-hidden {
+            fill-opacity: 0;
+        }
+        .drag-hidden.drag-active {
+            stroke-width: 0;
+        }
+    }
+    .compass {
+        circle,
+        line {
+            stroke: $secondary-600;
+            stroke-width: 0.1rem;
+        }
+        text {
+            fill: $secondary-600;
+            font-weight: bold;
+            text-anchor: middle;
+            dominant-baseline: central;
+        }
+    }
 }
 
 .port-name {
@@ -432,7 +489,6 @@ text {
 }
 
 .f11,
-.coord,
 .grid-background {
     line-height: 1;
     background-color: transparent;
@@ -463,27 +519,6 @@ text {
 .f11 {
     text {
         text-anchor: end;
-    }
-}
-
-.coord {
-    text {
-        // font-size: unset;
-        text-anchor: start;
-    }
-    circle {
-        fill-opacity: 1;
-        cursor: pointer;
-    }
-    .drag-active {
-        stroke: $secondary-100;
-        stroke-width: 0.25rem;
-    }
-    .drag-hidden {
-        fill-opacity: 0;
-    }
-    .drag-hidden.drag-active {
-        stroke-width: 0;
     }
 }
 
@@ -602,10 +637,6 @@ text {
     &::before {
         content: "\00a0";
     }
-}
-
-.dummy-svg {
-    background-image: url("~Icons/compass.svg");
 }
 
 $flags-dir: "~Icons";
