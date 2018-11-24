@@ -13,7 +13,7 @@
     <meta content="images/icons/favicon-32x32.png" property="og:image">
 
     <script src="https://www.googletagmanager.com/gtag/js?id=UA-109520372-1" async></script>
-<link href="/images/icons/favicon.ico" rel="shortcut icon"><link href="/images/icons/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"><link href="/images/icons/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"><meta content="#dcd7ca" name="msapplication-TileColor"><meta content="/images/icons/mstile-144x144.png" name="msapplication-TileImage"><meta content="/images/icons/browserconfig.xml" name="msapplication-config"><link href="/images/icons/yandex-browser-manifest.json" rel="yandex-tableau-widget"><meta content="width=device-width,initial-scale=1,shrink-to-fit=no" name="viewport"><link href="vendors.f61b3aaa165f4b6a6a7e.css" rel="stylesheet" crossorigin="anonymous" integrity="sha256-bDl7KH8L1eWrS6+cPiKk/WPI4DYvNrYch6rviOY+iOY= sha384-UjI9fyPTgHc+lVEnqCyn4lnYNpYXepOx/U/G6+Ry8YVmZfNtxflZM9oqxXMUEhVz"><link href="main.f4062ebe65b02b6b7dda.css" rel="stylesheet" crossorigin="anonymous" integrity="sha256-wyDNuB/KYKp9XNtj2R8VndIR8PesT2FxmDFlNQR6dfU= sha384-tOckSjwToMIG4PSosZVS95YHNvqK3+obsUP7ITyAdC6G4y8FKVS36GApRPO7jZsu"></head>
+<link href="/images/icons/favicon.ico" rel="shortcut icon"><link href="/images/icons/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"><link href="/images/icons/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"><meta content="#dcd7ca" name="msapplication-TileColor"><meta content="/images/icons/mstile-144x144.png" name="msapplication-TileImage"><meta content="/images/icons/browserconfig.xml" name="msapplication-config"><link href="/images/icons/yandex-browser-manifest.json" rel="yandex-tableau-widget"><meta content="width=device-width,initial-scale=1,shrink-to-fit=no" name="viewport"><link href="vendors.f61b3aaa165f4b6a6a7e.css" rel="stylesheet" crossorigin="anonymous" integrity="sha256-bDl7KH8L1eWrS6+cPiKk/WPI4DYvNrYch6rviOY+iOY= sha384-UjI9fyPTgHc+lVEnqCyn4lnYNpYXepOx/U/G6+Ry8YVmZfNtxflZM9oqxXMUEhVz"><link href="main.75e8a270d58748a10527.css" rel="stylesheet" crossorigin="anonymous" integrity="sha256-PXuJIPHYuIL//bomr8btU4Rgub3UAOVe9DSlznsqBLM= sha384-1Ipqo9M+ZFjtN1MyBwevUTEP1T8A6kIy1Jfu5y+O5kSMPryeX+M5aZnZVCJgR2Il"></head>
 
 <body>
 
@@ -26,7 +26,7 @@
         <ul class="navbar-nav mr-auto">
 
             <li class="nav-item pr-2">
-                <label><select id="port-names-select" name="port-names-select"></select></label>
+                <label><select id="port-names-select" name="port-names-select" title="Select single port"></select></label>
             </li>
 
             <li class="nav-item pr-2 dropdown" id="selectPortNavbar">
@@ -53,16 +53,16 @@
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Conquest mark</h6>
                     <div class="dropdown-item">
-                        <label><select id="prop-cm-select" name="prop-cm-select"></select></label>
+                        <label><select id="prop-cm-select" name="prop-cm-select" title="Select" data-live-search="false"></select></label>
                     </div>
 
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Port owner</h6>
                     <div class="dropdown-item">
-                        <label><select id="prop-nation-select" name="prop-nation-select"></select></label>
+                        <label><select id="prop-nation-select" name="prop-nation-select" title="Select nation" data-live-search="false"></select></label>
                     </div>
                     <div class="dropdown-item">
-                        <label><select id="prop-clan-select" name="prop-clan-select"></select></label>
+                        <label><select id="prop-clan-select" name="prop-clan-select" title="Select clan" data-live-search="false"></select></label>
                     </div>
 
                     <div class="dropdown-divider"></div>
@@ -146,14 +146,14 @@
             </li>
 
             <li class="nav-item pr-2">
-                <label><select id="buy-goods-select" name="buy-goods-select"></select></label>
+                <label><select id="buy-goods-select" name="buy-goods-select" title="Select good"></select></label>
             </li>
         </ul>
 
         <ul class="navbar-nav ml-auto">
 
             <li class="nav-item pr-2 dropdown">
-                <a class="dropdown-toggle nav-link btn-primary" id="map-tools-dropdown" href="#" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
+                <a class="dropdown-toggle nav-link btn btn-primary" id="map-tools-dropdown" href="#" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
                     Map tools
                 </a>
                 <div class="dropdown-menu dropdown-menu-right" id="map-tools-menu" aria-labelledby="map-tools-dropdown">
@@ -166,7 +166,7 @@
             </li>
 
             <li class="nav-item pr-2 dropdown">
-                <a class="dropdown-toggle nav-link btn-primary btn" id="game-tools-dropdown" href="#" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
+                <a class="dropdown-toggle nav-link btn btn-primary" id="game-tools-dropdown" href="#" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
                     Game tools
                 </a>
                 <div class="dropdown-menu dropdown-menu-right" id="game-tools-menu" aria-labelledby="game-tools-dropdown">
@@ -298,7 +298,7 @@
     <div id="modal-section"></div>
 </main>
 
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" crossorigin="anonymous" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.slim.min.js" crossorigin="anonymous" integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E="></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" crossorigin="anonymous" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"></script>
-<script src="manifest.df7060f7a33eea35cdd1.js" crossorigin="anonymous" integrity="sha256-A+4XW34HWzCX9SFRwlU3xE9bFkuU1IVeiSX9nO7FTfY= sha384-NXMmqtBQS35Rg39zpoSqlJZWfoAuiURLct7RAkI4YhB2Ax+J4ssgp+d1RBasRVgX" type="text/javascript"></script><script src="vendors.2dc351b86dbaea4f803e.bundle.js" crossorigin="anonymous" integrity="sha256-w4Cx1LgWi5Kewdu5pNpHmyoNiCpr8jYXwPQ3w8ttggY= sha384-0Bz5X8Q5iRUzuY3BPIUktvV9Z8N8z1vWdb+SocZNgKS2nIv0JPf3ONjJPAEej1w9" type="text/javascript"></script><script src="main.409926d6be7ad6374221.bundle.js" crossorigin="anonymous" integrity="sha256-NOKO889C2QR/DhYYDr/38+UBGlc1NYNG5eoDPuxULWc= sha384-TXRvWmFviBBUJeEw1nsiGLY+cTAvl9EQHd6CkQITvlNChOYj7f21Mvk0wVc/cLZD" type="text/javascript"></script></body>
+<script src="runtime.25ce4e077d7da31cfc0d.js" crossorigin="anonymous" integrity="sha256-A+4XW34HWzCX9SFRwlU3xE9bFkuU1IVeiSX9nO7FTfY= sha384-NXMmqtBQS35Rg39zpoSqlJZWfoAuiURLct7RAkI4YhB2Ax+J4ssgp+d1RBasRVgX" type="text/javascript"></script><script src="vendors.374d62128cd12f685da4.bundle.js" crossorigin="anonymous" integrity="sha256-ml7hT4K3NtV5X9oQ7SMdHqISG8HKGRy+47YFW46vFEI= sha384-D+vuO2g7rtgmjIaUVH5UYfKhKrxSAP38k2b11F0hnzZWltQiYvjSk4T+EYcGM3Zb" type="text/javascript"></script><script src="main.98fc5649cafce95f4458.bundle.js" crossorigin="anonymous" integrity="sha256-HVARTMvr3GPsu+lroHKSyxW3iJeJnrcLT8vzUpgGLjw= sha384-AWViNKH8puNuEsWandyjZ7Ms3zO2OyL7aVy8vOKf9LiF+w3hgcLkc03htnm8KPjD" type="text/javascript"></script></body>
 </html>
