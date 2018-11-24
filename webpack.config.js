@@ -11,7 +11,7 @@ const // { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer"),
     MinifyPlugin = require("babel-minify-webpack-plugin"),
     SitemapPlugin = require("sitemap-webpack-plugin").default,
     SriPlugin = require("webpack-subresource-integrity"),
-    WebpackDeepScopeAnalysisPlugin = require('webpack-deep-scope-plugin').default,
+    WebpackDeepScopeAnalysisPlugin = require("webpack-deep-scope-plugin").default,
     WebappWebpackPlugin = require("webapp-webpack-plugin");
 const PACKAGE = require("./package.json");
 
@@ -177,9 +177,7 @@ const config = {
     optimization: {
         noEmitOnErrors: true,
         concatenateModules: true,
-        runtimeChunk: {
-            name: "manifest"
-        },
+        runtimeChunk: "single",
         splitChunks: {
             cacheGroups: {
                 styles: {
@@ -199,7 +197,7 @@ const config = {
 
     output: {
         chunkFilename: isProd ? "[name].[chunkhash].bundle.js" : "[name].bundle.js",
-        filename: isProd ? "[name].[hash].js" : "[name].js",
+        filename: isProd ? "[name].[contenthash].js" : "[name].js",
         path: outputPath,
         crossOriginLoading: "anonymous"
     },
@@ -224,6 +222,7 @@ const config = {
             TITLE: JSON.stringify(PACKAGE.description),
             VERSION: JSON.stringify(PACKAGE.version)
         }),
+        new webpack.HashedModuleIdsPlugin(),
         new webpack.ProvidePlugin({
             $: "jquery",
             jQuery: "jquery",
