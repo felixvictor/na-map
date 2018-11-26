@@ -110,8 +110,7 @@ function get_git_update () {
     BASE=$(git merge-base @ "@{u}")
 
     if [ "${LOCAL}" == "${BASE}" ]; then
-	echo 'command git pull'
-        git pull
+        git pull --quiet
     fi
 }
 
