@@ -410,13 +410,13 @@ export default class PortDisplay {
     }
 
     _getPortName(id) {
-        return this._portDataDefault.filter(port => port.id === id).map(port => port.properties.name)[0];
+        return id ? this._portDataDefault.find(port => port.id === id).properties.name : "";
     }
 
     _getText(id, portProperties) {
         moment.locale("en-gb");
 
-        const pbData = this._pbData.ports.filter(port => port.id === id)[0],
+        const pbData = this._pbData.ports.find(port => port.id === id),
             portBattleLT = moment.utc(pbData.portBattle).local(),
             portBattleST = moment.utc(pbData.portBattle),
             port = {
@@ -574,9 +574,8 @@ export default class PortDisplay {
 
         const port = d3Select(nodes[i]),
             title = tooltipData(this._getText(d.id, d.properties));
-        port.attr("data-toggle", "tooltip");
         // eslint-disable-next-line no-underscore-dangle
-        $(port._groups[0])
+        $(port.node())
             .tooltip({
                 delay: {
                     show: this._tooltipDuration,
@@ -592,8 +591,7 @@ export default class PortDisplay {
 
     _updateIcons() {
         function hideDetails(d, i, nodes) {
-            // eslint-disable-next-line no-underscore-dangle
-            $(d3Select(nodes[i])._groups[0]).tooltip("hide");
+            $(d3Select(nodes[i]).node()).tooltip("dispose");
         }
 
         const circleScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale),
@@ -602,7 +600,7 @@ export default class PortDisplay {
                 .filter(port => this._pbData.ports.some(d => port.id === d.id))
                 .map(port => {
                     // eslint-disable-next-line prefer-destructuring,no-param-reassign
-                    port.properties.nation = this._pbData.ports.filter(d => port.id === d.id).map(d => d.nation)[0];
+                    port.properties.nation = this._pbData.ports.find(d => port.id === d.id).nation;
                     return port;
                 });
 
@@ -666,9 +664,7 @@ export default class PortDisplay {
                 .filter(port => pbData.some(d => port.id === d.id))
                 .map(port => {
                     // eslint-disable-next-line prefer-destructuring,no-param-reassign
-                    port.properties.attackHostility = pbData
-                        .filter(d => port.id === d.id)
-                        .map(d => d.attackHostility)[0];
+                    port.properties.attackHostility = pbData.find(d => port.id === d.id).attackHostility;
                     return port;
                 });
         } else if (this._showRadius === "green") {
