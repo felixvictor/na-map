@@ -252,11 +252,6 @@ function change_tweets () {
 
 function change_data () {
     get_port_data
-    touch_update
-}
-
-function touch_update () {
-    sed -i 's|^\(        Expires = \"\).\+\(\" # bash change here\)$|\1'"${HEADER_DATE}"'\2|' "${NETLIFY_TOML}"
 }
 
 function push_data () {
@@ -294,7 +289,6 @@ function update_data () {
             update_ports
 
             copy_data
-            touch_update
             push_data
             deploy_data
         fi
