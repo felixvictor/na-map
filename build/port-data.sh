@@ -38,7 +38,7 @@ function get_current_branch() {
 }
 
 function git_push_all () {
-    git push --quiet gitlab --all
+    git pull --quiet gitlab --all
 }
 
 function git_pull_all () {
@@ -121,18 +121,22 @@ function update_yarn () {
 function test_for_update () {
     API_BASE_FILE="$1"
 
-    NEW_FILE="${API_BASE_FILE}-${SERVER_NAMES[0]}-Shops-${DATE}.json"
-    OLD_FILE="${API_BASE_FILE}-${SERVER_NAMES[0]}-Shops-${LAST_DATE}.json"
+	for API_VAR in "${API_VARS[@]}"; do
+		NEW_FILE="${API_BASE_FILE}-${SERVER_NAMES[0]}-${API_VAR}-${DATE}.json"
+		OLD_FILE="${API_BASE_FILE}-${SERVER_NAMES[0]}-${API_VAR}-${LAST_DATE}.json"
 
-    get_API_data "${SERVER_NAMES[0]}" "${NEW_FILE}" Shops
+		# If old file does not exist create it
+		[[ ! -f "${OLD_FILE}" ]] && touch "${OLD_FILE}"
 
-    # If old file not exists create it
-    [[ ! -f "${OLD_FILE}" ]] && touch "${OLD_FILE}"
+		# Get new file
+		get_API_data "${SERVER_NAMES[0]}" "${NEW_FILE}" "${API_VAR}"
 
-    # Exit if API has not been updated yet
-    cmp --silent "${NEW_FILE}" "${OLD_FILE}" && { rm "${NEW_FILE}"; return 1; }
+		# Exit if $API_VAR file has not been updated yet
+		cmp --silent "${NEW_FILE}" "${OLD_FILE}" && { rm "${NEW_FILE}"; return 1; }
+	done
     return 0
 }
+
 
 function get_port_data () {
     API_DIR="${BUILD_DIR}/API"
