@@ -27,6 +27,8 @@ export default class F11 {
         this._copyButtonId = `copy-coord-${this._baseId}`;
         this._submitButtonId = `submit-${this._baseId}`;
 
+        this._modal$ = null;
+
         this._setupSvg();
         this._setupListener();
     }
@@ -60,6 +62,7 @@ export default class F11 {
             .append("form")
             .attr("id", this._formId)
             .attr("role", "form");
+        this._formSel = form.node();
 
         form.append("div")
             .classed("alert alert-primary", true)
@@ -157,22 +160,24 @@ export default class F11 {
      */
     _f11Selected() {
         // If the modal has no content yet, insert it
-        if (!document.getElementById(this._modalId)) {
+        if (!this._modal$) {
             this._initModal();
-
+            this._modal$ = $(`#${this._modalId}`);
+            this._xInputSel = document.getElementById(this._xInputId);
+            this._zInputSel = document.getElementById(this._zInputId);
             // Submit handler
-            document.getElementById(this._formId).onsubmit = event => {
-                $(`#${this._modalId}`).modal("hide");
+            this._formSel.onsubmit = event => {
+                this._modal$.modal("hide");
                 event.preventDefault();
                 this._useUserInput();
             };
 
             // Copy coordinates to clipboard (ctrl-c key event)
-            document.getElementById(this._modalId).onkeydown = event => {
+            this._modal$.on("keydown", event => {
                 if (event.code === "KeyC" && event.ctrlKey) {
                     this._copyCoordClicked(event);
                 }
-            };
+            });
             // Copy coordinates to clipboard (click event)
             document.getElementById(this._copyButtonId).addEventListener("click", event => {
                 this._copyCoordClicked(event);
@@ -180,33 +185,27 @@ export default class F11 {
         }
 
         // Show modal
-        $(`#${this._modalId}`).modal("show");
-        const input = document.getElementById(this._xInputId);
-        input.focus();
-        input.select();
+        this._modal$.modal("show");
+        this._xInputSel.focus();
+        this._xInputSel.select();
     }
 
-    _getInputValue(id) {
-        let { value } = document.getElementById(id);
-        if (value === "") {
-            value = Infinity;
-        } else {
-            value = +value;
-        }
-        return value;
+    _getInputValue(elem) {
+        const { value } = elem;
+        return value === "" ? Infinity : +value;
     }
 
     _getXCoord() {
-        return this._getInputValue(this._xInputId);
+        return this._getInputValue(this._xInputSel);
     }
 
     _getZCoord() {
-        return this._getInputValue(this._zInputId);
+        return this._getInputValue(this._zInputSel);
     }
 
     _useUserInput() {
-        const x = this._getXCoord() * -1000,
-            z = this._getZCoord() * -1000;
+        const x = this._getXCoord() * -1000;
+        const z = this._getZCoord() * -1000;
 
         if (Number.isFinite(x) && Number.isFinite(z)) {
             this._goToF11(x, z);
@@ -221,13 +220,12 @@ export default class F11 {
          */
         const copyToClipboardFallback = text => {
             if (document.queryCommandSupported && document.queryCommandSupported("copy")) {
-                const modalSel = document.getElementById(this._modalId);
                 const input = document.createElement("input");
 
                 input.type = "text";
                 input.value = text;
                 input.style = "position: absolute; left: -1000px; top: -1000px";
-                modalSel.appendChild(input);
+                this._modal$.append(input);
                 input.select();
 
                 try {
@@ -236,10 +234,11 @@ export default class F11 {
                     console.error("Copy to clipboard failed.", error);
                     return false;
                 } finally {
-                    modalSel.removeChild(input);
+                    input.remove();
                 }
             } else {
                 console.error(`Insufficient rights to copy ${text} to clipboard`);
+                return false;
             }
         };
 
@@ -248,33 +247,31 @@ export default class F11 {
          * @param {string} text - String
          * @return {void}
          */
-        const copyToClipboard = text => {
+        const copyToClipboard = text =>
             navigator.permissions.query({ name: "clipboard-write" }).then(
                 // Permission "clipboard-write"
                 result => {
                     if (result.state === "granted" || result.state === "prompt") {
-                        navigator.clipboard.writeText(text).then(
-                            () => {},
+                        return navigator.clipboard.writeText(text).then(
+                            () => true,
                             () => {
                                 console.error(`Cannot copy ${text} to clipboard`);
+                                return false;
                             }
                         );
                     }
                 },
                 // No permission "clipboard-write"
-                () => {
-                    copyToClipboardFallback(text);
-                }
+                () => copyToClipboardFallback(text)
             );
-        };
 
         registerEvent("Menu", "Copy F11 coordinates");
         event.preventDefault();
 
-        const x = this._getXCoord(),
-            z = this._getZCoord();
+        const x = this._getXCoord();
+        const z = this._getZCoord();
 
-        if (!Number.isNaN(x) && Number.isFinite(x) && !Number.isNaN(z) && Number.isFinite(z)) {
+        if (Number.isFinite(x) && Number.isFinite(z)) {
             const F11Url = new URL(window.location);
 
             F11Url.searchParams.set("x", x);
@@ -299,10 +296,10 @@ export default class F11 {
     }
 
     _goToF11(F11XIn, F11YIn) {
-        const F11X = Number(F11XIn),
-            F11Y = Number(F11YIn),
-            x = convertCoordX(F11X, F11Y),
-            y = convertCoordY(F11X, F11Y);
+        const F11X = +F11XIn;
+        const F11Y = +F11YIn;
+        const x = convertCoordX(F11X, F11Y);
+        const y = convertCoordY(F11X, F11Y);
 
         if (between(x, this._coord.min, this._coord.max, true) && between(y, this._coord.min, this._coord.max, true)) {
             this._printF11Coord(x, y, F11X, F11Y);
@@ -314,8 +311,8 @@ export default class F11 {
         const urlParams = new URL(document.location).searchParams;
 
         if (urlParams.has("x") && urlParams.has("z")) {
-            const x = +urlParams.get("x") * -1000,
-                z = +urlParams.get("z") * -1000;
+            const x = +urlParams.get("x") * -1000;
+            const z = +urlParams.get("z") * -1000;
 
             registerEvent("Menu", "Paste F11 coordinates");
             this._goToF11(x, z);
@@ -326,8 +323,8 @@ export default class F11 {
     }
 
     printCoord(x, y) {
-        const F11X = convertInvCoordX(x, y),
-            F11Y = convertInvCoordY(x, y);
+        const F11X = convertInvCoordX(x, y);
+        const F11Y = convertInvCoordY(x, y);
 
         this._printF11Coord(x, y, F11X, F11Y);
     }
