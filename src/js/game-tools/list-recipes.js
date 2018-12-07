@@ -1,12 +1,19 @@
-/*    recipe-list.js
+/**
+ * This file is part of na-map.
+ *
+ * @file      List recipes.
+ * @module    game-tools/list-recipes
+ * @author    iB aka Felix Victor
+ * @copyright 2018
+ * @license   http://www.gnu.org/licenses/gpl.html
  */
 
 import { select as d3Select } from "d3-selection";
-import { formatInt, formatPercent, formatSignPercent } from "./util";
-import { registerEvent } from "./analytics";
-import { getCurrencyAmount, insertBaseModal } from "./common";
+import { formatSignPercent } from "../util";
+import { registerEvent } from "../analytics";
+import { getCurrencyAmount, insertBaseModal } from "../common";
 
-export default class Recipe {
+export default class ListRecipes {
     constructor(recipeData, moduleData) {
         this._recipeData = recipeData.map(recipe => {
             // eslint-disable-next-line no-param-reassign
@@ -35,7 +42,7 @@ export default class Recipe {
         insertBaseModal(this._modalId, this._baseName);
 
         const id = `${this._baseId}-select`,
-            body =d3Select(`#${this._modalId} .modal-body`);
+            body = d3Select(`#${this._modalId} .modal-body`);
         body.append("label").attr("for", id);
         body.append("select")
             .attr("name", id)
@@ -108,15 +115,19 @@ export default class Recipe {
             moduleType = "",
             properties = "";
         this._moduleData.forEach(type => {
-            type[1].filter(module => module.name === moduleName).forEach(module => {
-                moduleType = type[0];
-                properties = `<tr><td>${module.properties
-                    .map(property => {
-                        const amount = property.absolute ? property.amount : formatSignPercent(property.amount / 100);
-                        return `${property.modifier} ${amount}`;
-                    })
-                    .join("</td></tr><tr><td>")}</td></tr>`;
-            });
+            type[1]
+                .filter(module => module.name === moduleName)
+                .forEach(module => {
+                    moduleType = type[0];
+                    properties = `<tr><td>${module.properties
+                        .map(property => {
+                            const amount = property.absolute
+                                ? property.amount
+                                : formatSignPercent(property.amount / 100);
+                            return `${property.modifier} ${amount}`;
+                        })
+                        .join("</td></tr><tr><td>")}</td></tr>`;
+                });
         });
         text = `<h6 class="card-subtitle mb-2 text-muted">${moduleType}</h6>`;
         text += `<table class="table table-sm"><tbody>${properties}</tbody></table>`;
@@ -136,7 +147,7 @@ export default class Recipe {
 
         let text = '<div class="row no-gutters card-deck">';
 
-        text += '<div class="card col-4"><div class="card-header">Recipe</div>';
+        text += '<div class="card col-4"><div class="card-header">ListRecipes</div>';
         text += '<div class="card-body"><h5 class="card-title">Requirements</h5>';
         text += this._getRequirementText(currentRecipe);
         text += "</div></div>";

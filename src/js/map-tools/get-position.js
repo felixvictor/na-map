@@ -11,8 +11,8 @@
 import { curveBasis as d3CurveBasis, line as d3Line } from "d3-shape";
 import { select as d3Select } from "d3-selection";
 import { intersectionArea as vennIntersectionArea } from "venn.js/src/circleintersection";
-import { registerEvent } from "./analytics";
-import { circleRadiusFactor, insertBaseModal } from "./common";
+import { registerEvent } from "../analytics";
+import { circleRadiusFactor, insertBaseModal } from "../common";
 
 /**
  * Get position
