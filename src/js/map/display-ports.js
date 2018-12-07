@@ -1,6 +1,12 @@
-/*
-    port.js
-*/
+/**
+ * This file is part of na-map.
+ *
+ * @file      Display ports.
+ * @module    map/display-ports
+ * @author    iB aka Felix Victor
+ * @copyright 2018
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
 
 import { min as d3Min, max as d3Max } from "d3-array";
 import { scaleLinear as d3ScaleLinear } from "d3-scale";
@@ -17,11 +23,11 @@ import {
     getDistance,
     convertCoordX,
     convertCoordY
-} from "./common";
-import { formatInt, formatSiInt, formatPercent, roundToThousands, degreesToRadians, formatFloatFixed } from "./util";
-import TrilateratePosition from "./get-position";
+} from "../common";
+import { formatInt, formatSiInt, formatPercent, roundToThousands, degreesToRadians, formatFloatFixed } from "../util";
+import TrilateratePosition from "../map-tools/get-position";
 
-export default class PortDisplay {
+export default class DisplayPorts {
     constructor(portData, pbData, map) {
         this._portDataDefault = portData;
         this._portData = portData;

@@ -1,8 +1,8 @@
 /**
  * This file is part of na-map.
  *
- * @file      Ship comparison.
- * @module    ship-compare
+ * @file      Compare ships.
+ * @module    game-tools/compare-ships
  * @author    iB aka Felix Victor
  * @copyright 2018
  * @license   http://www.gnu.org/licenses/gpl.html
@@ -20,10 +20,10 @@ import {
     radialLine as d3RadialLine
 } from "d3-shape";
 
-import { formatInt, formatFloat, getOrdinal, isEmpty, roundToThousands } from "./util";
-import { registerEvent } from "./analytics";
-import WoodCompare from "./wood-compare";
-import { insertBaseModal } from "./common";
+import { formatInt, formatFloat, getOrdinal, isEmpty, roundToThousands } from "../util";
+import { registerEvent } from "../analytics";
+import CompareWoods from "./compare-woods";
+import { insertBaseModal } from "../common";
 
 const numSegments = 24,
     segmentRadians = (2 * Math.PI) / numSegments,
@@ -334,7 +334,7 @@ class ShipBase extends Ship {
             .startAngle(-Math.PI / 2)
             .endAngle(Math.PI / 2);
 
-        // Tick/Grid data
+        // Tick/DisplayGrid data
         const ticks = [12, 8, 4, 0];
         const tickLabels = ["12 knots", "8 knots", "4 knots", "0 knots"];
 
@@ -860,7 +860,7 @@ class ShipComparison extends Ship {
 /**
  * Ship compare
  */
-export default class ShipCompare {
+export default class CompareShips {
     /**
      * @param {Object} shipData - Ship data
      * @param {Object} woodData - Wood data
@@ -914,7 +914,7 @@ export default class ShipCompare {
             this._woodId = "wood-ship";
         }
 
-        this._woodCompare = new WoodCompare(woodData, this._woodId);
+        this._woodCompare = new CompareWoods(woodData, this._woodId);
 
         if (this._baseId === "ship-journey") {
             this._initData();
