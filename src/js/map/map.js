@@ -1,8 +1,8 @@
 /**
  * This file is part of na-map.
  *
- * @file      Display naval action map.
- * @module    map
+ * @file      Display map.
+ * @module    map/map
  * @author    iB aka Felix Victor
  * @copyright 2017, 2018
  * @license   http://www.gnu.org/licenses/gpl.html
@@ -14,26 +14,26 @@ import { zoom as d3Zoom, zoomIdentity as d3ZoomIdentity, zoomTransform as d3Zoom
 import { feature as topojsonFeature } from "topojson-client";
 import Cookies from "js-cookie";
 
-import { appDescription, appTitle, appVersion, defaultFontSize, insertBaseModal } from "./common";
-import { nearestPow2, checkFetchStatus, getJsonFromFetch, putFetchError, roundToThousands } from "./util";
+import { appDescription, appTitle, appVersion, defaultFontSize, insertBaseModal } from "../common";
+import { nearestPow2, checkFetchStatus, getJsonFromFetch, putFetchError, roundToThousands } from "../util";
 
-import Building from "./building-list";
-import CannonList from "./cannon-list";
-import F11 from "./f11";
-import Grid from "./grid";
-import Ingredient from "./ingredient-list";
-import Journey from "./make-journey";
-import Module from "./module-list";
-import PBZone from "./pbzone";
-import OwnershipList from "./ownership-list";
-import PortDisplay from "./port";
-import PortSelect from "./port-select";
-import Recipe from "./recipe-list";
-import ShipCompare from "./ship-compare";
-import WindPrediction from "./wind-prediction";
-import WoodCompare from "./wood-compare";
-import WoodList from "./wood-list";
-import { registerEvent } from "./analytics";
+import { registerEvent } from "../analytics";
+import CompareShips from "../game-tools/compare-ships";
+import CompareWoods from "../game-tools/compare-woods";
+import DisplayPbZones from "./display-pb-zones";
+import DisplayPorts from "./display-ports";
+import ShowF11 from "../map-tools/show-f11";
+import DisplayGrid from "../map-tools/display-grid";
+import Journey from "../map-tools/make-journey";
+import ListBuildings from "../game-tools/list-buildings";
+import ListCannons from "../game-tools/list-cannons";
+import ListIngredients from "../game-tools/list-ingredients";
+import ListModules from "../game-tools/list-modules";
+import ListPortOwnerships from "../game-tools/list-port-ownerships";
+import ListRecipes from "../game-tools/list-recipes";
+import ListWoods from "../game-tools/list-woods";
+import SelectPorts from "./select-ports";
+import PredictWind from "../map-tools/predict-wind";
 
 /**
  * Display naval action map
@@ -248,9 +248,9 @@ export default class Map {
                 }));
         }
 
-        this._f11 = new F11(this, this.coord);
+        this._f11 = new ShowF11(this, this.coord);
 
-        this._ports = new PortDisplay(portData.features, data.pb, this);
+        this._ports = new DisplayPorts(portData.features, data.pb, this);
 
         let pbCircles = topojsonFeature(data.pbZones, data.pbZones.objects.pbCircles);
         pbCircles = getFeature(pbCircles.features);
@@ -264,38 +264,38 @@ export default class Map {
         let joinCircles = topojsonFeature(data.pbZones, data.pbZones.objects.joinCircles);
         joinCircles = getFeature(joinCircles.features);
 
-        this._pbZone = new PBZone(pbCircles, forts, towers, joinCircles, this._ports);
+        this._pbZone = new DisplayPbZones(pbCircles, forts, towers, joinCircles, this._ports);
 
         const woodData = JSON.parse(JSON.stringify(data.woods));
-        this._woodCompare = new WoodCompare(woodData, "wood");
-        this._woodList = new WoodList(woodData);
+        this._woodCompare = new CompareWoods(woodData, "wood");
+        this._woodList = new ListWoods(woodData);
 
         const shipData = JSON.parse(JSON.stringify(data.ships.shipData));
-        this._shipCompare = new ShipCompare(shipData, woodData);
+        this._shipCompare = new CompareShips(shipData, woodData);
 
         const cannonData = JSON.parse(JSON.stringify(data.cannons));
-        this._cannonList = new CannonList(cannonData);
+        this._cannonList = new ListCannons(cannonData);
 
         const ownershipData = JSON.parse(JSON.stringify(data.ownership)),
             nationData = JSON.parse(JSON.stringify(data.nations));
-        this._ownershipList = new OwnershipList(ownershipData, nationData);
+        this._ownershipList = new ListPortOwnerships(ownershipData, nationData);
 
         const moduleData = JSON.parse(JSON.stringify(data.modules));
-        this._moduleList = new Module(moduleData);
+        this._moduleList = new ListModules(moduleData);
 
         const recipeData = JSON.parse(JSON.stringify(data.recipes.recipe));
-        this._recipeList = new Recipe(recipeData, moduleData);
+        this._recipeList = new ListRecipes(recipeData, moduleData);
 
         const ingredientData = JSON.parse(JSON.stringify(data.recipes.ingredient));
-        this._ingredientList = new Ingredient(ingredientData, moduleData);
+        this._ingredientList = new ListIngredients(ingredientData, moduleData);
 
         const buildingData = JSON.parse(JSON.stringify(data.buildings));
-        this._buildingList = new Building(buildingData);
+        this._buildingList = new ListBuildings(buildingData);
 
         this._journey = new Journey(shipData, woodData, this.rem);
-        this._portSelect = new PortSelect(this._ports, this._pbZone);
-        this._windPrediction = new WindPrediction();
-        this._grid = new Grid(this);
+        this._portSelect = new SelectPorts(this._ports, this._pbZone);
+        this._windPrediction = new PredictWind();
+        this._grid = new DisplayGrid(this);
 
         this._init();
 

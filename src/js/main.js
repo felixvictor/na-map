@@ -31,7 +31,7 @@ import { initAnalytics, registerPage } from "./analytics";
 
 import "../scss/main.scss";
 
-import Map from "./map";
+import Map from "./map/map";
 
 /**
  * @returns {void}

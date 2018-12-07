@@ -2,7 +2,7 @@
  * This file is part of na-map.
  *
  * @file      Port ownership list.
- * @module    ownership-list
+ * @module    game-tools/list-port-ownerships
  * @author    iB aka Felix Victor
  * @copyright 2018
  * @license   http://www.gnu.org/licenses/gpl.html
@@ -21,8 +21,8 @@ import {
 } from "d3-shape";
 import TimelinesChart from "timelines-chart";
 
-import { registerEvent } from "./analytics";
-import { insertBaseModal, nations } from "./common";
+import { registerEvent } from "../analytics";
+import { insertBaseModal, nations } from "../common";
 
 // https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
 // eslint-disable-next-line no-extend-native,func-names
@@ -34,7 +34,7 @@ String.prototype.replaceAll = function(search, replacement) {
 /**
  *
  */
-export default class OwnershipList {
+export default class ListPortOwnerships {
     /**
      * @param {object} ownershipData - Port ownership data over time
      * @param {object} nationData - Nation data over time
@@ -195,7 +195,7 @@ export default class OwnershipList {
         const width = this._getWidth(),
             maxHeight = 1000,
             // eslint-disable-next-line no-restricted-globals
-            height = Math.min(maxHeight, OwnershipList.getHeight()),
+            height = Math.min(maxHeight, ListPortOwnerships.getHeight()),
             margin = { top: 0, right: 32, bottom: 32, left: 32 };
 
         const keys = nations.filter(nation => nation.id !== 9).map(nation => nation.short),

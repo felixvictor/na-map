@@ -54,10 +54,10 @@ export const formatFloatFixed = (x, f = 2) =>
         .replace(/\.(\d)0/g, '.$1<span class="hidden">0</span>');
 
 /**
- * Format F11 coordinate
+ * Format ShowF11 coordinate
  * @function
- * @param {Number} x - F11 coordinate
- * @return {String} Formatted F11 coordinate
+ * @param {Number} x - ShowF11 coordinate
+ * @return {String} Formatted ShowF11 coordinate
  */
 export const formatF11 = x => formatPrefix(x * -1).replace("-", "\u2212\u202f");
 

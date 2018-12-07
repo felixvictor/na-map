@@ -1,5 +1,11 @@
-/*
-    wind-prediction.js
+/**
+ * This file is part of na-map.
+ *
+ * @file      Predict wind.
+ * @module    map-tools/predict-wind
+ * @author    iB aka Felix Victor
+ * @copyright 2018
+ * @license   http://www.gnu.org/licenses/gpl.html
  */
 
 import { select as d3Select } from "d3-selection";
@@ -11,11 +17,11 @@ import "round-slider/src/roundslider.css";
 import "tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4";
 import "tempusdominus-core/build/js/tempusdominus-core";
 
-import { compassDirections, compassToDegrees, degreesToCompass, printCompassRose } from "./util";
-import { registerEvent } from "./analytics";
-import { insertBaseModal } from "./common";
+import { compassDirections, compassToDegrees, degreesToCompass, printCompassRose } from "../util";
+import { registerEvent } from "../analytics";
+import { insertBaseModal } from "../common";
 
-export default class WindPrediction {
+export default class PredictWind {
     constructor() {
         this._height = 300;
         this._width = 300;
