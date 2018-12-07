@@ -2,7 +2,7 @@
  * This file is part of na-map.
  *
  * @file      Make a journey.
- * @module    make-journey
+ * @module    map-tools/make-journey
  * @author    iB aka Felix Victor
  * @copyright 2018
  * @license   http://www.gnu.org/licenses/gpl.html
@@ -21,11 +21,11 @@ import "moment/locale/en-gb";
 import "round-slider/src/roundslider";
 import "round-slider/src/roundslider.css";
 
-import { compassDirections, degreesToCompass, formatF11, printCompassRose, rotationAngleInDegrees } from "./util";
-import { registerEvent } from "./analytics";
-import ShipCompare from "./ship-compare";
-import WoodCompare from "./wood-compare";
-import { convertInvCoordX, convertInvCoordY, getDistance, insertBaseModal, speedFactor } from "./common";
+import { compassDirections, degreesToCompass, formatF11, printCompassRose, rotationAngleInDegrees } from "../util";
+import { registerEvent } from "../analytics";
+import { convertInvCoordX, convertInvCoordY, getDistance, insertBaseModal, speedFactor } from "../common";
+import CompareShips from "../game-tools/compare-ships";
+import CompareWoods from "../game-tools/compare-woods";
 
 /**
  * Journey
@@ -248,8 +248,8 @@ export default class Journey {
     _initModal() {
         this._injectModal();
         this._setupWindInput();
-        this._shipCompare = new ShipCompare(this._shipData, this._woodData, this._shipId);
-        this._woodCompare = new WoodCompare(this._woodData, this._woodId);
+        this._shipCompare = new CompareShips(this._shipData, this._woodData, this._shipId);
+        this._woodCompare = new CompareWoods(this._woodData, this._woodId);
     }
 
     _useUserInput() {

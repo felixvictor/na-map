@@ -1,8 +1,8 @@
 /**
  * This file is part of na-map.
  *
- * @file      Cannon list.
- * @module    cannon-list
+ * @file      List cannons.
+ * @module    game-tools/list-cannons
  * @author    iB aka Felix Victor
  * @copyright 2018
  * @license   http://www.gnu.org/licenses/gpl.html
@@ -11,9 +11,9 @@
 import { select as d3Select } from "d3-selection";
 // eslint-disable-next-line import/no-named-default
 import { default as Tablesort } from "tablesort";
-import { insertBaseModal } from "./common";
-import { capitalizeFirstLetter, formatFloatFixed } from "./util";
-import { registerEvent } from "./analytics";
+import { insertBaseModal } from "../common";
+import { capitalizeFirstLetter, formatFloatFixed } from "../util";
+import { registerEvent } from "../analytics";
 
 // https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
 // eslint-disable-next-line no-extend-native,func-names
@@ -25,7 +25,7 @@ String.prototype.replaceAll = function(search, replacement) {
 /**
  *
  */
-export default class CannonList {
+export default class ListCannons {
     constructor(cannonData) {
         this._cannonData = cannonData;
 
