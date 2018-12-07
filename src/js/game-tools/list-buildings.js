@@ -1,12 +1,19 @@
-/*    building-list.js
+/**
+ * This file is part of na-map.
+ *
+ * @file      List buildings.
+ * @module    game-tools/list-buildings
+ * @author    iB aka Felix Victor
+ * @copyright 2018
+ * @license   http://www.gnu.org/licenses/gpl.html
  */
 
 import { select as d3Select } from "d3-selection";
-import { formatInt } from "./util";
-import { registerEvent } from "./analytics";
-import { getCurrencyAmount, insertBaseModal } from "./common";
+import { formatInt } from "../util";
+import { registerEvent } from "../analytics";
+import { getCurrencyAmount, insertBaseModal } from "../common";
 
-export default class Building {
+export default class ListBuildings {
     constructor(buildingData) {
         this._buildingData = buildingData;
 
