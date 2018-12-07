@@ -1,6 +1,12 @@
-/*
-	port-select.js
-*/
+/**
+ * This file is part of na-map.
+ *
+ * @file      Select ports.
+ * @module    map/select-ports
+ * @author    iB aka Felix Victor
+ * @copyright 2018
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
 
 import "bootstrap-select/js/bootstrap-select";
 import moment from "moment";
@@ -8,11 +14,10 @@ import moment from "moment";
 import "tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4";
 import "tempusdominus-core/build/js/tempusdominus-core";
 
-import { registerEvent } from "./analytics";
-import { initMultiDropdownNavbar, nations } from "./common";
-import { formatFloatFixed, roundToThousands } from "./util";
+import { registerEvent } from "../analytics";
+import { initMultiDropdownNavbar, nations } from "../common";
 
-export default class PortSelect {
+export default class SelectPorts {
     constructor(ports, pbZone) {
         this._ports = ports;
         this._pbZone = pbZone;

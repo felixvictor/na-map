@@ -12,13 +12,13 @@ import { axisBottom as d3AxisBottom, axisRight as d3AxisRight } from "d3-axis";
 import { event as d3Event, select as d3Select } from "d3-selection";
 import { scaleLinear as d3ScaleLinear } from "d3-scale";
 
-import { formatF11, roundToThousands } from "./util";
-import { convertInvCoordX, convertInvCoordY } from "./common";
+import { formatF11, roundToThousands } from "../util";
+import { convertInvCoordX, convertInvCoordY } from "../common";
 
 /**
  * Display grid
  */
-export default class Grid {
+export default class DisplayGrid {
     /**
      *
      * @param {map.Map} map - The main map
