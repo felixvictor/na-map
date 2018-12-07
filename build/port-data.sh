@@ -3,35 +3,34 @@
 set -e
 trap on_exit EXIT
 
-JQ="$(command -v jq)"
-NODE="$(command -v node) --experimental-modules --no-warnings"
-TWURL="$(command -v twurl)"
-XZ="$(command -v xz)"
-MODULE="main"
-SERVER_BASE_NAME="cleanopenworldprod"
-SOURCE_BASE_URL="http://storage.googleapis.com/nacleanopenworldprodshards/"
+command_jq="$(command -v jq)"
+command_nodejs="$(command -v node) --experimental-modules --no-warnings"
+command_twurl="$(command -v twurl)"
+command_xz="$(command -v xz)"
+module="main"
+server_base_name="cleanopenworldprod"
+source_base_url="http://storage.googleapis.com/nacleanopenworldprodshards/"
 # http://api.shipsofwar.net/servers?apikey=1ZptRtpXAyEaBe2SEp63To1aLmISuJj3Gxcl5ivl&callback=setActiveRealms
-SERVER_NAMES=(eu1 eu2)
+server_names=(eu1 eu2)
 
 ## testbed
 #SERVER_BASE_NAME="clean"
 #SOURCE_BASE_URL="http://storage.googleapis.com/nacleandevshards/"
 #SERVER_NAMES=(dev)
 
-SERVER_TWITTER_NAMES=(eu1)
-API_VARS=(ItemTemplates Ports Shops)
-SERVER_MAINTENANCE_HOUR=10
-HEADER_DATE=$(LC_TIME="en" date -u +"%a, %d %b %Y 10:00:00 GMT" -d "+1 day")
+server_twiter_names=(eu1)
+api_vars=(ItemTemplates Ports Shops)
+server_maintenance_hour=10
+#header_date=$(LC_TIME="en" date -u +"%a, %d %b %Y 10:00:00 GMT" -d "+1 day")
 # Set server date
-if [ "$(date -u '+%H')" -lt "${SERVER_MAINTENANCE_HOUR}" ]; then
-    DATE=$(date -u '+%Y-%m-%d' --date "-1 day")
-    LAST_DATE=$(date -u '+%Y-%m-%d' --date "-2 day")
+if [ "$(date -u '+%H')" -lt "${server_maintenance_hour}" ]; then
+    date=$(date -u '+%Y-%m-%d' --date "-1 day")
+    last_date=$(date -u '+%Y-%m-%d' --date "-2 day")
 else
-    DATE=$(date -u '+%Y-%m-%d')
-    LAST_DATE=$(date -u '+%Y-%m-%d' --date "-1 day")
+    date=$(date -u '+%Y-%m-%d')
+    last_date=$(date -u '+%Y-%m-%d' --date "-1 day")
 fi
-NETLIFY_TOML="netlify.toml"
-LAST_FUNCTION=""
+last_function=""
 
 function get_current_branch() {
     git rev-parse --abbrev-ref HEAD
@@ -46,16 +45,17 @@ function git_pull_all () {
 }
 
 function pull_all () {
-    BRANCH=$(get_current_branch)
+    local branch
+    branch=$(get_current_branch)
 
     git checkout master
     git_pull_all
-    git checkout "${BRANCH}"
+    git checkout "${branch}"
 }
 
 function on_exit () {
     # If git push fails, git pull first
-    if [ "${LAST_FUNCTION}" == "push_data" ]; then
+    if [ "${last_function}" == "push_data" ]; then
         pull_all
         git_push_all
         exit 0
@@ -63,42 +63,47 @@ function on_exit () {
 }
 
 function change_var () {
-    BASE_DIR="$(pwd)"
-    export BASE_DIR
+    base_dir="$(pwd)"
     common_var
 }
 
 function update_var () {
-    export BASE_DIR="/home/natopo/na-topo.git"
+    base_dir="/home/natopo/na-topo.git"
     common_var
 }
 
 function common_var () {
-    export BUILD_DIR="${BASE_DIR}/build"
-    export SRC_DIR="${BASE_DIR}/src"
-    export LAST_UPDATE_FILE="${BUILD_DIR}/.last-port-update"
-    export SHIP_FILE="${SRC_DIR}/ships.json"
-    export CANNON_FILE="${SRC_DIR}/cannons.json"
-    export BUILDING_FILE="${SRC_DIR}/buildings.json"
-    export RECIPE_FILE="${SRC_DIR}/recipes.json"
-    export OWNERSHIP_FILE="${SRC_DIR}/ownership.json"
-    export NATION_FILE="${SRC_DIR}/nations.json"
-    export LOOT_FILE="${SRC_DIR}/loot.json"
-    export EXCEL_FILE="${SRC_DIR}/port-battle.xlsx"
-    CSS_FILE=$(find "${BASE_DIR}/public/" -type f  -regextype posix-extended -regex "${BASE_DIR}/public/${MODULE}(\.[[:alnum:]]+)?\.css$")
-    export CSS_FILE
-    export TWEETS_JSON="${BUILD_DIR}/API/tweets.json"
+    build_dir="${base_dir}/build"
+    tweets_json="${build_dir}/API/tweets.json"
+    last_update_file="${build_dir}/.last-port-update"
+    [[ ! -d "${base_dir}/public" ]] && yarn run prod
+    css_file=$(find "${base_dir}/public/" -type f -regextype posix-extended -regex "${base_dir}/public/${module}(\.[[:alnum:]]+)?\.css$")
 
+    src_dir="${base_dir}/src"
+    src_gen_dir="${base_dir}/src/gen"
+    ship_file="${src_gen_dir}/ships.json"
+    cannon_file="${src_gen_dir}/cannons.json"
+    building_file="${src_gen_dir}/buildings.json"
+    recipe_file="${src_gen_dir}/recipes.json"
+    ownership_json="${src_gen_dir}/ownership.json"
+    nation_file="${src_gen_dir}/nations.json"
+    loot_file="${src_gen_dir}/loot.json"
+    excel_file="${src_gen_dir}/port-battle.xlsx"
 }
 
 function get_API_data () {
-    SERVER_NAME="$1"
-    OUT_FILE="$2"
-    API_VAR="$3"
-    URL="${SOURCE_BASE_URL}${API_VAR}_${SERVER_BASE_NAME}${SERVER_NAME}.json"
-    if [[ ! -f "${OUT_FILE}" ]]; then
-        curl --silent --output "${OUT_FILE}" "${URL}"
-        sed -i -e "s/^var $API_VAR = //; s/\\;$//" "${OUT_FILE}"
+    local server_name
+    server_name="$1"
+    local out_file
+    out_file="$2"
+    local api_var
+    api_var="$3"
+    local url
+    url="${source_base_url}${api_var}_${server_base_name}${server_name}.json"
+
+    if [[ ! -f "${out_file}" ]]; then
+        curl --silent --output "${out_file}" "${url}"
+        sed -i -e "s/^var $api_var = //; s/\\;$//" "${out_file}"
     fi
 }
 
@@ -106,10 +111,13 @@ function get_git_update () {
     # pull if needed
     # https://stackoverflow.com/questions/3258243/check-if-pull-needed-in-git/25109122
     git remote update &> /dev/null
-    LOCAL=$(git rev-parse @)
-    BASE=$(git merge-base @ "@{u}")
 
-    if [ "${LOCAL}" == "${BASE}" ]; then
+    local local
+    local=$(git rev-parse @)
+    local base
+    base=$(git merge-base @ "@{u}")
+
+    if [ "${local}" == "${base}" ]; then
         git pull
     fi
 }
@@ -119,72 +127,81 @@ function update_yarn () {
 }
 
 function test_for_update () {
-    API_BASE_FILE="$1"
+    local api_base_file
+    api_base_file="$1"
 
-	for API_VAR in "${API_VARS[@]}"; do
-		NEW_FILE="${API_BASE_FILE}-${SERVER_NAMES[0]}-${API_VAR}-${DATE}.json"
-		OLD_FILE="${API_BASE_FILE}-${SERVER_NAMES[0]}-${API_VAR}-${LAST_DATE}.json"
+	for api_var in "${api_vars[@]}"; do
+        local new_file
+	    new_file="${api_base_file}-${server_names[0]}-${api_var}-${date}.json"
+	    local old_file
+		old_file="${api_base_file}-${server_names[0]}-${api_var}-${last_date}.json"
 
 		# If old file does not exist create it
-		[[ ! -f "${OLD_FILE}" ]] && touch "${OLD_FILE}"
+		[[ ! -f "${old_file}" ]] && touch "${old_file}"
 
 		# Get new file
-		get_API_data "${SERVER_NAMES[0]}" "${NEW_FILE}" "${API_VAR}"
+		get_API_data "${server_names[0]}" "${new_file}" "${api_var}"
 
 		# Exit if $API_VAR file has not been updated yet
-		cmp --silent "${NEW_FILE}" "${OLD_FILE}" && { rm "${NEW_FILE}"; return 1; }
+		cmp --silent "${new_file}" "${old_file}" && { rm "${new_file}"; return 1; }
 	done
     return 0
 }
 
 
 function get_port_data () {
-    API_DIR="${BUILD_DIR}/API"
-    API_BASE_FILE="${API_DIR}/api"
+    local api_dir
+    local api_base_file
+    api_dir="${build_dir}/API"
+    api_base_file="${api_dir}/api"
 
-    mkdir -p "${API_DIR}"
-    if test_for_update "${API_BASE_FILE}"; then
-        for JSON in "${API_DIR}"/*.json; do
-            if [ "${JSON}" != "${TWEETS_JSON}" ]; then
-                ${XZ} -9ef "${JSON}"
+    mkdir -p "${api_dir}"
+    if test_for_update "${api_base_file}"; then
+        for JSON in "${api_dir}"/*.json; do
+            if [ "${JSON}" != "${tweets_json}" ]; then
+                ${command_xz} -9ef "${JSON}"
             fi
         done
 
-        for SERVER_NAME in "${SERVER_NAMES[@]}"; do
-            PORT_FILE="${SRC_DIR}/${SERVER_NAME}.json"
-            PB_FILE="${SRC_DIR}/${SERVER_NAME}-pb.json"
-            TEMP_PORT_FILE="${BUILD_DIR}/ports.geojson"
-            for API_VAR in "${API_VARS[@]}"; do
-                API_FILE="${API_BASE_FILE}-${SERVER_NAME}-${API_VAR}-${DATE}.json"
-                get_API_data "${SERVER_NAME}" "${API_FILE}" "${API_VAR}"
+        for server_name in "${server_names[@]}"; do
+            local port_file
+            port_file="${src_dir}/${server_name}.json"
+            local pb_file
+            pb_file="${src_dir}/${server_name}-pb.json"
+            local temp_port_file
+            temp_port_file="${build_dir}/ports.geojson"
+            for api_var in "${api_vars[@]}"; do
+                local API_FILE
+                API_FILE="${api_base_file}-${server_name}-${api_var}-${date}.json"
+                get_API_data "${server_name}" "${API_FILE}" "${api_var}"
             done
 
-            ${NODE} build/convert-API-data.mjs "${API_BASE_FILE}-${SERVER_NAME}" "${TEMP_PORT_FILE}" "${SRC_DIR}" "${DATE}"
-            yarn geo2topo -o "${PORT_FILE}" "${TEMP_PORT_FILE}"
-            rm "${TEMP_PORT_FILE}"
+            ${command_nodejs} build/convert-API-data.mjs "${api_base_file}-${server_name}" "${temp_port_file}" "${src_dir}" "${date}"
+            yarn geo2topo -o "${port_file}" "${temp_port_file}"
+            rm "${temp_port_file}"
 
-            ${NODE} build/convert-API-pb-data.mjs "${API_BASE_FILE}-${SERVER_NAME}" "${PB_FILE}" "${DATE}"
+            ${command_nodejs} build/convert-API-pb-data.mjs "${api_base_file}-${server_name}" "${pb_file}" "${date}"
         done
 
 
-        ${NODE} build/convert-pbZones.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${BUILD_DIR}" "${DATE}"
-        yarn geo2topo -o "${SRC_DIR}/pb.json" \
-            "${BUILD_DIR}/pbCircles.geojson" "${BUILD_DIR}/forts.geojson" \
-            "${BUILD_DIR}/towers.geojson" "${BUILD_DIR}/joinCircles.geojson"
-        rm "${BUILD_DIR}"/*.geojson
+        ${command_nodejs} build/convert-pbZones.mjs "${api_base_file}-${server_names[0]}" "${build_dir}" "${date}"
+        yarn geo2topo -o "${src_dir}/pb.json" \
+            "${build_dir}/pbCircles.geojson" "${build_dir}/forts.geojson" \
+            "${build_dir}/towers.geojson" "${build_dir}/joinCircles.geojson"
+        rm "${build_dir}"/*.geojson
 
-        ${NODE} build/convert-ships.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${SHIP_FILE}" "${DATE}"
-        ${NODE} build/convert-additional-ship-data.mjs "${BUILD_DIR}/Modules" "${SHIP_FILE}"
-        ${NODE} build/convert-cannons.mjs "${BUILD_DIR}/Modules" "${CANNON_FILE}"
-        ${NODE} build/convert-modules.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${SRC_DIR}" "${DATE}"
-        ${NODE} build/convert-buildings.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${BUILDING_FILE}" "${DATE}"
-        ${NODE} build/convert-loot.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${LOOT_FILE}" "${DATE}"
-        ${NODE} build/convert-recipes.mjs "${API_BASE_FILE}-${SERVER_NAMES[0]}" "${RECIPE_FILE}" "${DATE}"
-        if [ "${SCRIPT_RUN_TYPE}" == "update" ]; then
-            ${NODE} build/convert-ownership.mjs "${API_DIR}" "${OWNERSHIP_FILE}" "${NATION_FILE}"
+        ${command_nodejs} build/convert-ships.mjs "${api_base_file}-${server_names[0]}" "${ship_file}" "${date}"
+        ${command_nodejs} build/convert-additional-ship-data.mjs "${build_dir}/Modules" "${ship_file}"
+        ${command_nodejs} build/convert-cannons.mjs "${build_dir}/Modules" "${cannon_file}"
+        ${command_nodejs} build/convert-modules.mjs "${api_base_file}-${server_names[0]}" "${src_dir}" "${date}"
+        ${command_nodejs} build/convert-buildings.mjs "${api_base_file}-${server_names[0]}" "${building_file}" "${date}"
+        ${command_nodejs} build/convert-loot.mjs "${api_base_file}-${server_names[0]}" "${loot_file}" "${date}"
+        ${command_nodejs} build/convert-recipes.mjs "${api_base_file}-${server_names[0]}" "${recipe_file}" "${date}"
+        if [ "${script_run_type}" == "update" ]; then
+            ${command_nodejs} build/convert-ownership.mjs "${api_dir}" "${ownership_json}" "${nation_file}"
         fi
 
-        ${NODE} build/create-xlsx.mjs "${SHIP_FILE}" "${SRC_DIR}/${SERVER_NAMES[0]}.json" "${CSS_FILE}" "${EXCEL_FILE}"
+        ${command_nodejs} build/create-xlsx.mjs "${ship_file}" "${src_dir}/${server_names[0]}.json" "${css_file}" "${excel_file}"
 
         return 0
     else
@@ -193,9 +210,9 @@ function get_port_data () {
 }
 
 function copy_data () {
-    PUBLIC_DIR="${BASE_DIR}/public"
+    public_dir="${base_dir}/public"
 
-    cp --update "${SRC_DIR}"/*.json "${EXCEL_FILE}" "${PUBLIC_DIR}"/
+    cp --update "${src_dir}"/*.json "${excel_file}" "${public_dir}"/
 }
 
 function deploy_data () {
@@ -203,24 +220,24 @@ function deploy_data () {
 }
 
 function remove_tweets () {
-    rm -f "${TWEETS_JSON}"
+    rm -f "${tweets_json}"
 }
 
 function get_tweets () {
     QUERY="/1.1/search/tweets.json?q=from:zz569k&tweet_mode=extended&count=100&result_type=recent"
     JQ_FORMAT="{ tweets: [ .statuses[] | { id: .id_str, text: .full_text } ], refresh: .search_metadata.max_id_str }"
 
-    if [[ -f "${TWEETS_JSON}" ]]; then
-        SINCE=$(${NODE} -pe 'JSON.parse(process.argv[1]).refresh' "$(cat "${TWEETS_JSON}")")
+    if [[ -f "${tweets_json}" ]]; then
+        SINCE=$(${command_nodejs} -pe 'JSON.parse(process.argv[1]).refresh' "$(cat "${tweets_json}")")
         QUERY+="&since_id=${SINCE}"
     fi
-    ${TWURL} "${QUERY}" | ${JQ} "${JQ_FORMAT}" > "${TWEETS_JSON}"
+    ${command_twurl} "${QUERY}" | ${command_jq} "${JQ_FORMAT}" > "${tweets_json}"
 }
 
 function update_ports () {
-    for SERVER_NAME in "${SERVER_TWITTER_NAMES[@]}"; do
-        PB_FILE="${SRC_DIR}/${SERVER_NAME}-pb.json"
-        ${NODE} build/update-ports.mjs "${PB_FILE}" "${TWEETS_JSON}"
+    for server_name in "${server_twiter_names[@]}"; do
+        pb_file="${src_dir}/${server_name}-pb.json"
+        ${command_nodejs} build/update-ports.mjs "${pb_file}" "${tweets_json}"
     done
 
     return $?
@@ -231,11 +248,11 @@ function update_ports () {
 # Main functions
 
 function log_date () {
-    echo -e "\n\n*****************************\n${DATE}\n"
+    echo -e "\n\n*****************************\n${date}\n"
 }
 
 function update_tweets () {
-    cd ${BASE_DIR}
+    cd ${base_dir}
     get_git_update
     get_tweets
     if update_ports; then
@@ -257,29 +274,32 @@ function change_data () {
 function push_data () {
     git add --ignore-errors .
     if [[ -n $(git status -s) ]]; then
-        GIT_MESSAGE=""
-        if [ "${SCRIPT_RUN_TYPE}" == "update" ]; then
-            GIT_MESSAGE+="squash! "
-            touch "${LAST_UPDATE_FILE}"
+        local git_message
+        git_message=""
+
+        if [ "${script_run_type}" == "update" ]; then
+            git_message+="squash! "
+            touch "${last_update_file}"
         fi
-        GIT_MESSAGE+="push ${SCRIPT_RUN_TYPE}"
-        git commit -m "${GIT_MESSAGE}"
+        git_message+="push ${script_run_type}"
+        git commit -m "${git_message}"
     fi
     # Status for on_exit trap
-    LAST_FUNCTION="push_data"
+    last_function="push_data"
     git_push_all
-    LAST_FUNCTION=""
+    last_function=""
 }
 
 function update_data () {
-    cd ${BASE_DIR}
+    cd ${base_dir}
     # If file not exists create it with date of last commit
-    if [[ ! -f "${LAST_UPDATE_FILE}" ]]; then
-        touch -d "$(git log -1 --format=%cI)" "${LAST_UPDATE_FILE}"
+    if [[ ! -f "${last_update_file}" ]]; then
+        touch -d "$(git log -1 --format=%cI)" "${last_update_file}"
     fi
-    LAST_UPDATE=$(date --reference="${LAST_UPDATE_FILE}" +%Y-%m-%d)
+    local last_update_date
+    last_update_date=$(date --reference="${last_update_file}" +%Y-%m-%d)
     # Test if already updated today
-    if [ "${LAST_UPDATE}" != "${DATE}" ]; then
+    if [ "${last_update_date}" != "${date}" ]; then
         update_yarn
         get_git_update
         # Test if new API data available
@@ -301,24 +321,24 @@ case "$1" in
         change_data
         ;;
     push-change)
-        SCRIPT_RUN_TYPE="change"
+        script_run_type="change"
         change_var
         push_data
         ;;
     push-update)
-        SCRIPT_RUN_TYPE="update"
+        script_run_type="update"
         update_var
         log_date
         push_data
         ;;
     update)
-        SCRIPT_RUN_TYPE="update"
+        script_run_type="update"
         update_var
         log_date
         update_data
         ;;
     twitter-update)
-        SCRIPT_RUN_TYPE="update-tweets"
+        script_run_type="update-tweets"
         update_var
         update_tweets
         ;;
