@@ -1,8 +1,8 @@
 /**
  * This file is part of na-map.
  *
- * @file      Wood list.
- * @module    wood-list
+ * @file      List woods.
+ * @module    game-tools/list-woods
  * @author    iB aka Felix Victor
  * @copyright 2018
  * @license   http://www.gnu.org/licenses/gpl.html
@@ -11,14 +11,14 @@
 import { select as d3Select } from "d3-selection";
 // eslint-disable-next-line import/no-named-default
 import { default as Tablesort } from "tablesort";
-import { insertBaseModal } from "./common";
-import { formatFloatFixed } from "./util";
-import { registerEvent } from "./analytics";
+import { insertBaseModal } from "../common";
+import { formatFloatFixed } from "../util";
+import { registerEvent } from "../analytics";
 
 /**
  *
  */
-export default class WoodList {
+export default class ListWoods {
     constructor(woodData) {
         this._woodData = woodData;
 
