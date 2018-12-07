@@ -1,18 +1,22 @@
-/*
-    f11.js
-*/
+/**
+ * This file is part of na-map.
+ *
+ * @file      Show F11 coordinates.
+ * @module    map-tools/show-f11
+ * @author    iB aka Felix Victor
+ * @copyright 2018
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
 
 import { select as d3Select } from "d3-selection";
-import { between, formatF11 } from "./util";
-import { convertCoordX, convertCoordY, convertInvCoordX, convertInvCoordY, insertBaseModal } from "./common";
-import { registerEvent } from "./analytics";
-import ShipCompare from "./ship-compare";
-import WoodCompare from "./wood-compare";
+import { between, formatF11 } from "../util";
+import { convertCoordX, convertCoordY, convertInvCoordX, convertInvCoordY, insertBaseModal } from "../common";
+import { registerEvent } from "../analytics";
 
 /**
- * F11
+ * ShowF11
  */
-export default class F11 {
+export default class ShowF11 {
     constructor(map, coord) {
         this._map = map;
         this._coord = coord;

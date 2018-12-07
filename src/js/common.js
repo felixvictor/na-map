@@ -18,16 +18,16 @@ const transformMatrix = {
         D: -819563.745651571
     };
 
-// F11 coord to svg coord
+// ShowF11 coord to svg coord
 export const convertCoordX = (x, y) => transformMatrix.A * x + transformMatrix.B * y + transformMatrix.C;
 
-// F11 coord to svg coord
+// ShowF11 coord to svg coord
 export const convertCoordY = (x, y) => transformMatrix.B * x - transformMatrix.A * y + transformMatrix.D;
 
-// svg coord to F11 coord
+// svg coord to ShowF11 coord
 export const convertInvCoordX = (x, y) => transformMatrixInv.A * x + transformMatrixInv.B * y + transformMatrixInv.C;
 
-// svg coord to F11 coord
+// svg coord to ShowF11 coord
 export const convertInvCoordY = (x, y) => transformMatrixInv.B * x - transformMatrixInv.A * y + transformMatrixInv.D;
 
 export const nations = [
