@@ -1,13 +1,19 @@
-/*
-    module-list.js
+/**
+ * This file is part of na-map.
+ *
+ * @file      List modules.
+ * @module    game-tools/list-modules
+ * @author    iB aka Felix Victor
+ * @copyright 2018
+ * @license   http://www.gnu.org/licenses/gpl.html
  */
 
 import { select as d3Select } from "d3-selection";
-import { chunkify, formatSignPercent, getOrdinal } from "./util";
-import { registerEvent } from "./analytics";
-import { insertBaseModal } from "./common";
+import { chunkify, formatSignPercent, getOrdinal } from "../util";
+import { registerEvent } from "../analytics";
+import { insertBaseModal } from "../common";
 
-export default class Module {
+export default class ListModules {
     constructor(moduleData) {
         this._moduleData = moduleData;
 

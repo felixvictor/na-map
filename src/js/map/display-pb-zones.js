@@ -1,12 +1,18 @@
-/*
-    pbzone.js
-*/
+/**
+ * This file is part of na-map.
+ *
+ * @file      Display port battle zones.
+ * @module    map/display-pb-zones
+ * @author    iB aka Felix Victor
+ * @copyright 2018
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
 
 import { geoPath as d3GeoPath } from "d3-geo";
 import { select as d3Select } from "d3-selection";
 import Cookies from "js-cookie";
 
-export default class PBZone {
+export default class DisplayPbZones {
     constructor(pbCircles, forts, towers, joinCircles, ports) {
         this._ports = ports;
 

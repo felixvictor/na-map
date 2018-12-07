@@ -1,12 +1,19 @@
-/*    ingredient-list.js
+/**
+ * This file is part of na-map.
+ *
+ * @file      List ingredients.
+ * @module    game-tools/list-ingredients
+ * @author    iB aka Felix Victor
+ * @copyright 2018
+ * @license   http://www.gnu.org/licenses/gpl.html
  */
 
 import { select as d3Select } from "d3-selection";
-import { chunkify, formatSignPercent } from "./util";
-import { registerEvent } from "./analytics";
-import { insertBaseModal } from "./common";
+import { chunkify, formatSignPercent } from "../util";
+import { registerEvent } from "../analytics";
+import { insertBaseModal } from "../common";
 
-export default class Ingredient {
+export default class ListIngredients {
     constructor(ingredientData, moduleData) {
         this._ingredientData = ingredientData;
         this._moduleData = moduleData;
@@ -56,15 +63,19 @@ export default class Ingredient {
             moduleType = "",
             properties = "";
         this._moduleData.forEach(type => {
-            type[1].filter(module => module.name === recipeName).forEach(module => {
-                moduleType = type[0];
-                properties = `<tr><td>${module.properties
-                    .map(property => {
-                        const amount = property.absolute ? property.amount : formatSignPercent(property.amount / 100);
-                        return `${property.modifier} ${amount}`;
-                    })
-                    .join("</td></tr><tr><td>")}</td></tr>`;
-            });
+            type[1]
+                .filter(module => module.name === recipeName)
+                .forEach(module => {
+                    moduleType = type[0];
+                    properties = `<tr><td>${module.properties
+                        .map(property => {
+                            const amount = property.absolute
+                                ? property.amount
+                                : formatSignPercent(property.amount / 100);
+                            return `${property.modifier} ${amount}`;
+                        })
+                        .join("</td></tr><tr><td>")}</td></tr>`;
+                });
         });
         text = `<h6 class='text-muted text-left'>${moduleType}</h6>`;
         text += `<table class='table table-sm'><tbody>${properties}</tbody></table>`;
@@ -100,7 +111,7 @@ export default class Ingredient {
         Array.from(Array(splitRows.length).keys()).forEach(column => {
             text += `<div class="col-md-${Math.floor(12 / splitRows.length)}">`;
             text += '<table class="table table-sm"><thead>';
-            text += "<tr><th>Ingredient</th><th>Recipe</th></tr></thead><tbody>";
+            text += "<tr><th>Ingredient</th><th>ListRecipes</th></tr></thead><tbody>";
             text += splitRows[column].join("");
             text += "</tbody></table></div>";
         });
