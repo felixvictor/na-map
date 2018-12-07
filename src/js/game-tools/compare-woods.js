@@ -1,8 +1,8 @@
 /**
  * This file is part of na-map.
  *
- * @file      Wood comparison.
- * @module    wood-compare
+ * @file      Compare woods.
+ * @module    game-tools/compare-woods
  * @author    iB aka Felix Victor
  * @copyright 2018
  * @license   http://www.gnu.org/licenses/gpl.html
@@ -10,9 +10,9 @@
 
 import { min as d3Min, max as d3Max } from "d3-array";
 import { select as d3Select } from "d3-selection";
-import { formatFloat } from "./util";
-import { registerEvent } from "./analytics";
-import { insertBaseModal } from "./common";
+import { formatFloat } from "../util";
+import { registerEvent } from "../analytics";
+import { insertBaseModal } from "../common";
 
 class Wood {
     constructor(compareId, woodCompare) {
@@ -245,7 +245,7 @@ class WoodComparison extends Wood {
 /**
  *
  */
-export default class WoodCompare {
+export default class CompareWoods {
     constructor(woodData, baseFunction) {
         this._woodData = woodData;
         this._baseFunction = baseFunction;
