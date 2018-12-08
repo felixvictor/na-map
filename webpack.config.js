@@ -175,28 +175,14 @@ const config = {
     },
 
     optimization: {
-        noEmitOnErrors: true,
-        concatenateModules: true,
         runtimeChunk: "single",
         splitChunks: {
-            cacheGroups: {
-                styles: {
-                    name: "styles",
-                    test: /\.css$/,
-                    chunks: "all",
-                    enforce: true
-                },
-                vendor: {
-                    test: /[\\/]node_modules[\\/]/,
-                    name: "vendors",
-                    chunks: "all"
-                }
-            }
+            chunks: "all"
         }
     },
 
     output: {
-        chunkFilename: isProd ? "[name].[chunkhash].bundle.js" : "[name].bundle.js",
+        chunkFilename: isProd ? "[name].[chunkhash].js" : "[name].js",
         filename: isProd ? "[name].[contenthash].js" : "[name].js",
         path: outputPath,
         crossOriginLoading: "anonymous"
