@@ -31,8 +31,6 @@ import { initAnalytics, registerPage } from "./analytics";
 
 import "../scss/main.scss";
 
-import Map from "./map/map";
-
 /**
  * @returns {void}
  */
@@ -135,11 +133,26 @@ function main() {
     };
 
     setupListener();
-    const map = new Map(serverName);
 
-    window.onresize = () => {
-        map.resize();
-    };
+    let map;
+    import(/* webpackPreload: true, webpackChunkName: "map" */ "./map/map")
+        .then(({ Map }) => {
+            map = new Map(serverName);
+            window.onresize = () => {
+                map.resize();
+            };
+        })
+        .catch(error => {
+            console.error(error);
+        });
+
+    import(/* webpackPrefetch: true, webpackChunkName: "game-tools" */ "./game-tools")
+        .then(gameTools => {
+            gameTools.init(map);
+        })
+        .catch(error => {
+            console.error(error);
+        });
 }
 
 main();
