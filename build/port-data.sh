@@ -36,11 +36,11 @@ function get_current_branch() {
 }
 
 function git_push_all () {
-    git pull --quiet gitlab --all
+    git push --quiet gitlab --all
 }
 
 function git_pull_all () {
-    git pull --all
+    git pull --quiet --all
 }
 
 function pull_all () {
