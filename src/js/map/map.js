@@ -18,21 +18,14 @@ import { appDescription, appTitle, appVersion, defaultFontSize, insertBaseModal 
 import { nearestPow2, checkFetchStatus, getJsonFromFetch, putFetchError, roundToThousands } from "../util";
 
 import { registerEvent } from "../analytics";
-import CompareShips from "../game-tools/compare-ships";
-import CompareWoods from "../game-tools/compare-woods";
+
 import DisplayPbZones from "./display-pb-zones";
 import DisplayPorts from "./display-ports";
+import SelectPorts from "./select-ports";
+
 import ShowF11 from "../map-tools/show-f11";
 import DisplayGrid from "../map-tools/display-grid";
 import Journey from "../map-tools/make-journey";
-import ListBuildings from "../game-tools/list-buildings";
-import ListCannons from "../game-tools/list-cannons";
-import ListIngredients from "../game-tools/list-ingredients";
-import ListModules from "../game-tools/list-modules";
-import ListPortOwnerships from "../game-tools/list-port-ownerships";
-import ListRecipes from "../game-tools/list-recipes";
-import ListWoods from "../game-tools/list-woods";
-import SelectPorts from "./select-ports";
 import PredictWind from "../map-tools/predict-wind";
 
 /**
@@ -61,7 +54,7 @@ class Map {
          * @type {Array<fileName: string, name: string>}
          * @private
          */
-        this._dataSource = [
+        this._dataSources = [
             {
                 fileName: `${serverName}.json`,
                 name: "ports"
@@ -79,32 +72,8 @@ class Map {
                 name: "ships"
             },
             {
-                fileName: "cannons.json",
-                name: "cannons"
-            },
-            {
                 fileName: "woods.json",
                 name: "woods"
-            },
-            {
-                fileName: "modules.json",
-                name: "modules"
-            },
-            {
-                fileName: "recipes.json",
-                name: "recipes"
-            },
-            {
-                fileName: "buildings.json",
-                name: "buildings"
-            },
-            {
-                fileName: "ownership.json",
-                name: "ownership"
-            },
-            {
-                fileName: "nations.json",
-                name: "nations"
             }
         ];
 
@@ -256,7 +225,6 @@ class Map {
         }
 
         this._f11 = new ShowF11(this, this.coord);
-
         this._ports = new DisplayPorts(portData.features, data.pb, this);
 
         let pbCircles = topojsonFeature(data.pbZones, data.pbZones.objects.pbCircles);
@@ -273,33 +241,10 @@ class Map {
 
         this._pbZone = new DisplayPbZones(pbCircles, forts, towers, joinCircles, this._ports);
 
-        const woodData = JSON.parse(JSON.stringify(data.woods));
-        this._woodCompare = new CompareWoods(woodData, "wood");
-        this._woodList = new ListWoods(woodData);
+        this._woodData = JSON.parse(JSON.stringify(data.woods));
+        this._shipData = JSON.parse(JSON.stringify(data.ships.shipData));
 
-        const shipData = JSON.parse(JSON.stringify(data.ships.shipData));
-        this._shipCompare = new CompareShips(shipData, woodData);
-
-        const cannonData = JSON.parse(JSON.stringify(data.cannons));
-        this._cannonList = new ListCannons(cannonData);
-
-        const ownershipData = JSON.parse(JSON.stringify(data.ownership)),
-            nationData = JSON.parse(JSON.stringify(data.nations));
-        this._ownershipList = new ListPortOwnerships(ownershipData, nationData);
-
-        const moduleData = JSON.parse(JSON.stringify(data.modules));
-        this._moduleList = new ListModules(moduleData);
-
-        const recipeData = JSON.parse(JSON.stringify(data.recipes.recipe));
-        this._recipeList = new ListRecipes(recipeData, moduleData);
-
-        const ingredientData = JSON.parse(JSON.stringify(data.recipes.ingredient));
-        this._ingredientList = new ListIngredients(ingredientData, moduleData);
-
-        const buildingData = JSON.parse(JSON.stringify(data.buildings));
-        this._buildingList = new ListBuildings(buildingData);
-
-        this._journey = new Journey(shipData, woodData, this.rem);
+        this._journey = new Journey(this._shipData, this._woodData, this.rem);
         this._portSelect = new SelectPorts(this._ports, this._pbZone);
         this._windPrediction = new PredictWind();
         this._grid = new DisplayGrid(this);
@@ -317,7 +262,7 @@ class Map {
     _readData() {
         const jsonData = [],
             readData = {};
-        this._dataSource.forEach((datum, i) => {
+        this._dataSources.forEach((datum, i) => {
             jsonData[i] = fetch(`${this._dataDir}/${datum.fileName}`)
                 .then(checkFetchStatus)
                 .then(getJsonFromFetch);
@@ -326,7 +271,7 @@ class Map {
         Promise.all(jsonData)
             .then(values => {
                 values.forEach((value, i) => {
-                    readData[this._dataSource[i].name] = values[i];
+                    readData[this._dataSources[i].name] = values[i];
                 });
 
                 this._setupData(readData);
