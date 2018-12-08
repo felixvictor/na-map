@@ -244,8 +244,8 @@ const config = {
         new CopyPlugin([
             { from: "google979f2cf3bed204d6.html", to: "google979f2cf3bed204d6.html", toType: "file" },
             { from: "images/map", to: `${outputPath}/images/map` },
-            { from: "*.json" },
-            { from: "*.xlsx" },
+            { from: "gen/*.json", to: `${outputPath}/data` },
+            { from: "gen/*.xlsx" },
             { from: "../netlify.toml" }
         ]),
         new HtmlPlugin({
