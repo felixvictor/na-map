@@ -134,21 +134,18 @@ function main() {
 
     setupListener();
 
-    let map;
     import(/* webpackPreload: true, webpackChunkName: "map" */ "./map/map")
-        .then(({ Map }) => {
-            map = new Map(serverName);
+        .then(({ Map }) => new Map(serverName))
+        .then(map => {
             window.onresize = () => {
                 map.resize();
             };
+            return map;
         })
-        .catch(error => {
-            console.error(error);
-        });
-
-    import(/* webpackPrefetch: true, webpackChunkName: "game-tools" */ "./game-tools")
-        .then(gameTools => {
-            gameTools.init(map);
+        .then(map => {
+            import(/* webpackPrefetch: true, webpackChunkName: "game-tools" */ "./game-tools").then(gameTools => {
+                gameTools.init(map);
+            });
         })
         .catch(error => {
             console.error(error);
