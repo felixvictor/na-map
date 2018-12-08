@@ -38,7 +38,7 @@ import PredictWind from "../map-tools/predict-wind";
 /**
  * Display naval action map
  */
-export default class Map {
+class Map {
     /**
      * @param {string} serverName - Naval action server name
      */
@@ -49,6 +49,13 @@ export default class Map {
          * @private
          */
         this._serverName = serverName;
+
+        /**
+         * Data directory
+         * @type {string}
+         * @private
+         */
+        this._dataDir = "data";
 
         /**
          * @type {Array<fileName: string, name: string>}
@@ -311,7 +318,7 @@ export default class Map {
         const jsonData = [],
             readData = {};
         this._dataSource.forEach((datum, i) => {
-            jsonData[i] = fetch(datum.fileName)
+            jsonData[i] = fetch(`${this._dataDir}/${datum.fileName}`)
                 .then(checkFetchStatus)
                 .then(getJsonFromFetch);
         });
@@ -708,3 +715,6 @@ export default class Map {
         }
     }
 }
+
+// eslint-disable-next-line import/prefer-default-export
+export { Map };
