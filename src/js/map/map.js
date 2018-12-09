@@ -14,8 +14,16 @@ import { zoom as d3Zoom, zoomIdentity as d3ZoomIdentity, zoomTransform as d3Zoom
 import { feature as topojsonFeature } from "topojson-client";
 import Cookies from "js-cookie";
 
+import moment from "moment";
 import { appDescription, appTitle, appVersion, defaultFontSize, insertBaseModal } from "../common";
-import { nearestPow2, checkFetchStatus, getJsonFromFetch, putFetchError, roundToThousands } from "../util";
+import {
+    nearestPow2,
+    checkFetchStatus,
+    getJsonFromFetch,
+    putFetchError,
+    roundToThousands,
+    formatPercent
+} from "../util";
 
 import { registerEvent } from "../analytics";
 
@@ -210,11 +218,11 @@ class Map {
         //        marks.push("setupData");
         //        performance.mark(`${marks[marks.length - 1]}-start`);
         const portData = topojsonFeature(data.ports, data.ports.objects.ports);
-        // Port ids of capturable ports
-        const portIds = portData.features.filter(port => !port.properties.nonCapturable).map(port => port.id);
         //        performance.mark(`${marks[marks.length - 1]}-end`);
 
-        function getFeature(object) {
+        const getFeature = object => {
+            // Port ids of capturable ports
+            const portIds = portData.features.filter(port => !port.properties.nonCapturable).map(port => port.id);
             return object
                 .filter(port => portIds.includes(port.id))
                 .map(d => ({
@@ -222,10 +230,26 @@ class Map {
                     id: d.id,
                     geometry: d.geometry
                 }));
-        }
+        };
+
+        // Combine port data with port battle data
+        portData.features = portData.features.map(port => {
+            const combinedData = port;
+            const pbData = data.pb.ports.find(d => d.id === combinedData.id);
+
+            combinedData.properties.nation = pbData.nation;
+            combinedData.properties.capturer = pbData.capturer;
+            combinedData.properties.lastPortBattle = pbData.lastPortBattle;
+            combinedData.properties.attackHostility = pbData.attackHostility;
+            combinedData.properties.attackerClan = pbData.attackerClan;
+            combinedData.properties.attackerNation = pbData.attackerNation;
+            combinedData.properties.portBattle = pbData.portBattle;
+
+            return combinedData;
+        });
 
         this._f11 = new ShowF11(this, this.coord);
-        this._ports = new DisplayPorts(portData.features, data.pb, this);
+        this._ports = new DisplayPorts(portData.features, this);
 
         let pbCircles = topojsonFeature(data.pbZones, data.pbZones.objects.pbCircles);
         pbCircles = getFeature(pbCircles.features);
@@ -240,16 +264,17 @@ class Map {
         joinCircles = getFeature(joinCircles.features);
 
         this._pbZone = new DisplayPbZones(pbCircles, forts, towers, joinCircles, this._ports);
+        this._grid = new DisplayGrid(this);
 
         this._woodData = JSON.parse(JSON.stringify(data.woods));
         this._shipData = JSON.parse(JSON.stringify(data.ships.shipData));
 
         this._journey = new Journey(this._shipData, this._woodData, this.rem);
-        this._portSelect = new SelectPorts(this._ports, this._pbZone);
-        this._windPrediction = new PredictWind();
-        this._grid = new DisplayGrid(this);
 
         this._init();
+
+        this._windPrediction = new PredictWind();
+        this._portSelect = new SelectPorts(this._ports, this._pbZone);
 
         /*
         marks.forEach(mark => {
@@ -577,8 +602,6 @@ class Map {
     _init() {
         this.zoomLevel = "initial";
         this.initialZoomAndPan();
-        this._refreshLayer();
-
         this._ports.clearMap(this._minScale);
         this._f11.checkF11Coord();
     }

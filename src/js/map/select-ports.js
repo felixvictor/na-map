@@ -184,7 +184,7 @@ export default class SelectPorts {
                 id: d.id,
                 coord: [d.geometry.coordinates[0], d.geometry.coordinates[1]],
                 name: d.properties.name,
-                nation: this._ports.pbData.ports.filter(port => port.id === d.id).map(port => port.nation)
+                nation: d.properties.nation
             }))
             .sort((a, b) => {
                 if (a.name < b.name) {
@@ -242,13 +242,10 @@ export default class SelectPorts {
     }
 
     _setupClanSelect() {
+        const clanList = new Set();
+        this._ports.portData.filter(d => d.properties.capturer).forEach(d => clanList.add(d.properties.capturer));
+
         this._propClanSelector.innerHTML = "";
-
-        const clanList = new Set(),
-            portId = new Set();
-        this._ports.portData.forEach(d => portId.add(d.id));
-        this._ports.pbData.ports.filter(d => d.capturer && portId.has(d.id)).forEach(d => clanList.add(d.capturer));
-
         let options = "";
         if (clanList.size !== 0) {
             this._propClanSelector.disabled = false;
@@ -389,13 +386,10 @@ export default class SelectPorts {
     }
 
     _nationSelected(event) {
-        const portId = new Set();
-
         this._nation = $(event.currentTarget).val();
         $("#propertyDropdown").dropdown("toggle");
 
-        this._ports.pbData.ports.filter(port => port.nation === this._nation).forEach(port => portId.add(port.id));
-        this._ports.portData = this._ports.portDataDefault.filter(d => portId.has(d.id));
+        this._ports.portData = this._ports.portDataDefault.filter(port => port.properties.nation === this._nation);
         this._ports.showCurrentGood = false;
         this._ports.showTradePortPartners = false;
         this._ports.update();
@@ -404,17 +398,15 @@ export default class SelectPorts {
     }
 
     _clanSelected(event) {
-        const portId = new Set(),
-            clan = $(event.currentTarget).val();
+        const clan = $(event.currentTarget).val();
 
         $("#propertyDropdown").dropdown("toggle");
 
         if (clan !== 0) {
-            this._ports.pbData.ports.filter(port => clan === port.capturer).forEach(port => portId.add(port.id));
+            this._ports.portData = this._ports.portDataDefault.filter(port => port.properties.capturer === clan);
         } else if (this._nation) {
-            this._ports.pbData.ports.filter(port => port.nation === this._nation).forEach(port => portId.add(port.id));
+            this._ports.portData = this._ports.portDataDefault.filter(port => port.properties.nation === this._nation);
         }
-        this._ports.portData = this._ports.portDataDefault.filter(d => portId.has(d.id));
         this._ports.showCurrentGood = false;
         this._ports.showTradePortPartners = false;
         this._ports.update();
@@ -491,11 +483,9 @@ export default class SelectPorts {
 
     _filterCaptured(begin, end) {
         // console.log("Between %s and %s", begin.format("dddd D MMMM YYYY H:mm"), end.format("dddd D MMMM YYYY H:mm"));
-        const portId = new Set();
-        this._ports.pbData.ports
-            .filter(port => moment(port.lastPortBattle).isBetween(begin, end, null, "(]"))
-            .forEach(port => portId.add(port.id));
-        const portData = this._ports.portDataDefault.filter(d => portId.has(d.id));
+        const portData = this._ports.portDataDefault.filter(port =>
+            moment(port.lastPortBattle).isBetween(begin, end, null, "(]")
+        );
 
         this._ports.portData = portData;
         this._ports.showCurrentGood = false;
