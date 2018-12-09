@@ -27,23 +27,18 @@ export default class SelectPorts {
 
         this._portNamesId = "port-names-select";
         this._portNamesSelector = document.getElementById(this._portNamesId);
-        this._portNames$ = $(`#${this._portNamesId}`);
 
         this._buyGoodsId = "buy-goods-select";
         this._buyGoodsSelector = document.getElementById(this._buyGoodsId);
-        this._buyGoods$ = $(`#${this._buyGoodsId}`);
 
         this._propNationId = "prop-nation-select";
         this._propNationSelector = document.getElementById(this._propNationId);
-        this._propNation$ = $(`#${this._propNationId}`);
 
         this._propClanId = "prop-clan-select";
         this._propClanSelector = document.getElementById(this._propClanId);
-        this._propClan$ = $(`#${this._propClanId}`);
 
         this._propCMId = "prop-cm-select";
         this._propCMSelector = document.getElementById(this._propCMId);
-        this._propCM$ = $(`#${this._propCMId}`);
 
         this._setupSelects();
         this._setupListener();
@@ -57,14 +52,22 @@ export default class SelectPorts {
         this._setupCMSelect();
     }
 
-    _resetOtherSelects(activeSelect$) {
-        [this._portNames$, this._buyGoods$, this._propNation$, this._propClan$, this._propCM$].forEach((select$, i) => {
+    _resetOtherSelects(activeSelectSelector) {
+        [
+            this._portNamesSelector,
+            this._buyGoodsSelector,
+            this._propNationSelector,
+            this._propClanSelector,
+            this._propCMSelector
+        ].forEach(selectSelector => {
             if (
-                select$ !== activeSelect$ &&
-                !(select$ === this._propClan$ && activeSelect$ === this._propNation$) &&
-                !(select$ === this._propNation$ && activeSelect$ === this._propClan$)
+                selectSelector !== activeSelectSelector &&
+                !(selectSelector === this._propClanSelector && activeSelectSelector === this._propNationSelector) &&
+                !(selectSelector === this._propNationSelector && activeSelectSelector === this._propClanSelector)
             ) {
-                select$.val("default").selectpicker("refresh");
+                $(selectSelector)
+                    .val("default")
+                    .selectpicker("refresh");
             }
         });
     }
@@ -79,33 +82,33 @@ export default class SelectPorts {
 
         this._portNamesSelector.addEventListener("change", event => {
             registerEvent("Menu", "Move to port");
-            this._resetOtherSelects(this._portNames$);
-            this._portSelected(event);
+            this._resetOtherSelects(this._portNamesSelector);
+            this._portSelected();
             event.preventDefault();
         });
 
         this._buyGoodsSelector.addEventListener("change", event => {
             registerEvent("Menu", "Select good");
-            this._resetOtherSelects(this._buyGoods$);
-            this._goodSelected(event);
+            this._resetOtherSelects(this._buyGoodsSelector);
+            this._goodSelected();
             event.preventDefault();
         });
 
         this._propNationSelector.addEventListener("change", event => {
-            this._resetOtherSelects(this._propNation$);
-            this._nationSelected(event);
+            this._resetOtherSelects(this._propNationSelector);
+            this._nationSelected();
             event.preventDefault();
         });
 
         this._propClanSelector.addEventListener("change", event => {
-            this._resetOtherSelects(this._propClan$);
-            this._clanSelected(event);
+            this._resetOtherSelects(this._propClanSelector);
+            this._clanSelected();
             event.preventDefault();
         });
 
         this._propCMSelector.addEventListener("change", event => {
-            this._resetOtherSelects(this._propCM$);
-            this._CMSelected(event);
+            this._resetOtherSelects(this._propCMSelector);
+            this._CMSelected();
             event.preventDefault();
         });
 
@@ -142,7 +145,7 @@ export default class SelectPorts {
         });
         $("#prop-pb-range").submit(event => {
             this._capturePBRange();
-            $("#propertyDropdown").dropdown("toggle");
+            this._toggleMenuDropdown();
             event.preventDefault();
         });
 
@@ -165,7 +168,7 @@ export default class SelectPorts {
 
         $("#prop-range").submit(event => {
             this._captureRange();
-            $("#propertyDropdown").dropdown("toggle");
+            this._toggleMenuDropdown();
             event.preventDefault();
         });
 
@@ -174,6 +177,7 @@ export default class SelectPorts {
         this._propNationSelector.classList.add("selectpicker");
         this._propClanSelector.classList.add("selectpicker");
         this._propCMSelector.classList.add("selectpicker");
+
         $(".selectpicker").selectpicker();
         initMultiDropdownNavbar("selectPortNavbar");
     }
@@ -195,7 +199,6 @@ export default class SelectPorts {
                 }
                 return 0;
             });
-
         const options = `${selectPorts
             .map(
                 port =>
@@ -204,6 +207,7 @@ export default class SelectPorts {
                     }</option>`
             )
             .join("")}`;
+
         this._portNamesSelector.insertAdjacentHTML("beforeend", options);
     }
 
@@ -238,6 +242,7 @@ export default class SelectPorts {
             })
             .map(nation => `<option value="${nation.short}">${nation.name}</option>`)
             .join("")}`;
+
         this._propNationSelector.insertAdjacentHTML("beforeend", options);
     }
 
@@ -247,6 +252,7 @@ export default class SelectPorts {
 
         this._propClanSelector.innerHTML = "";
         let options = "";
+
         if (clanList.size !== 0) {
             this._propClanSelector.disabled = false;
             options = `${Array.from(clanList)
@@ -262,16 +268,13 @@ export default class SelectPorts {
 
     _setupCMSelect() {
         const cmList = new Set();
+
         this._ports.portData.forEach(d => cmList.add(d.properties.conquestMarksPension));
-        cmList.forEach(cm => {
-            this._propCM$.append(
-                "beforeend",
-                $("<option>", {
-                    value: cm,
-                    text: cm
-                })
-            );
-        });
+        const options = `${Array.from(cmList)
+            .sort()
+            .map(cm => `<option value="${cm}">${cm}</option>`)
+            .join("")}`;
+        this._propCMSelector.insertAdjacentHTML("beforeend", options);
     }
 
     _setTradePortPartners() {
@@ -288,7 +291,6 @@ export default class SelectPorts {
                     port.properties.dropsTrading.forEach(good => tradePortProducedGoods.push(good.name));
                 }
             });
-
         this._ports.portData = this._ports.portDataDefault
             .map(port => {
                 // eslint-disable-next-line no-param-reassign
@@ -327,11 +329,15 @@ export default class SelectPorts {
             );
     }
 
-    _portSelected(event) {
-        const port = $(event.currentTarget).find(":selected");
-        const c = port.val().split(",");
+    _toggleMenuDropdown() {
+        $("#propertyDropdown").dropdown("toggle");
+    }
 
-        const id = port.data("id").toString();
+    _portSelected() {
+        const port = this._portNamesSelector.options[this._portNamesSelector.selectedIndex];
+        const c = port.value.split(",");
+        const id = port.getAttribute("data-id").toString();
+
         this._ports.currentPort = {
             id,
             coord: { x: +c[0], y: +c[1] }
@@ -349,34 +355,34 @@ export default class SelectPorts {
         this._ports._map.initialZoomAndPan();
     }
 
-    _goodSelected(event) {
-        const goodSelected = $(event.currentTarget).find(":selected")[0].text,
-            sourcePorts = this._ports.portDataDefault
-                .filter(
-                    port =>
-                        (port.properties.dropsTrading &&
-                            port.properties.dropsTrading.some(good => good.name === goodSelected)) ||
-                        (port.properties.dropsNonTrading &&
-                            port.properties.dropsNonTrading.some(good => good.name === goodSelected)) ||
-                        (port.properties.producesNonTrading &&
-                            port.properties.producesNonTrading.some(good => good.name === goodSelected))
-                )
-                .map(port => {
-                    // eslint-disable-next-line prefer-destructuring,no-param-reassign
-                    port.properties.isSource = true;
-                    return port;
-                }),
-            consumingPorts = this._ports.portDataDefault
-                .filter(
-                    port =>
-                        port.properties.consumesTrading &&
-                        port.properties.consumesTrading.some(good => good.name === goodSelected)
-                )
-                .map(port => {
-                    // eslint-disable-next-line prefer-destructuring,no-param-reassign
-                    port.properties.isSource = false;
-                    return port;
-                });
+    _goodSelected() {
+        const goodSelected = this._buyGoodsSelector.options[this._buyGoodsSelector.selectedIndex].value;
+        const sourcePorts = this._ports.portDataDefault
+            .filter(
+                port =>
+                    (port.properties.dropsTrading &&
+                        port.properties.dropsTrading.some(good => good.name === goodSelected)) ||
+                    (port.properties.dropsNonTrading &&
+                        port.properties.dropsNonTrading.some(good => good.name === goodSelected)) ||
+                    (port.properties.producesNonTrading &&
+                        port.properties.producesNonTrading.some(good => good.name === goodSelected))
+            )
+            .map(port => {
+                // eslint-disable-next-line no-param-reassign
+                port.properties.isSource = true;
+                return port;
+            });
+        const consumingPorts = this._ports.portDataDefault
+            .filter(
+                port =>
+                    port.properties.consumesTrading &&
+                    port.properties.consumesTrading.some(good => good.name === goodSelected)
+            )
+            .map(port => {
+                // eslint-disable-next-line prefer-destructuring,no-param-reassign
+                port.properties.isSource = false;
+                return port;
+            });
 
         this._ports.showRadiusSetting = "off";
         this._ports.portData = sourcePorts.concat(consumingPorts);
@@ -385,22 +391,22 @@ export default class SelectPorts {
         this._ports.update();
     }
 
-    _nationSelected(event) {
-        this._nation = $(event.currentTarget).val();
-        $("#propertyDropdown").dropdown("toggle");
+    _nationSelected() {
+        this._nation = this._propNationSelector.options[this._propNationSelector.selectedIndex].value;
+        this._toggleMenuDropdown();
 
         this._ports.portData = this._ports.portDataDefault.filter(port => port.properties.nation === this._nation);
         this._ports.showCurrentGood = false;
         this._ports.showTradePortPartners = false;
         this._ports.update();
         this._setupClanSelect();
-        this._propClan$.selectpicker("refresh");
+        $(this._propClanSelector).selectpicker("refresh");
     }
 
-    _clanSelected(event) {
-        const clan = $(event.currentTarget).val();
+    _clanSelected() {
+        const clan = this._propClanSelector.options[this._propClanSelector.selectedIndex].value;
 
-        $("#propertyDropdown").dropdown("toggle");
+        this._toggleMenuDropdown();
 
         if (clan !== 0) {
             this._ports.portData = this._ports.portDataDefault.filter(port => port.properties.capturer === clan);
@@ -416,6 +422,7 @@ export default class SelectPorts {
         const portData = this._ports.portDataDefault.filter(d =>
             depth === "shallow" ? d.properties.shallow : !d.properties.shallow
         );
+
         this._ports.portData = portData;
         this._ports.showCurrentGood = false;
         this._ports.showTradePortPartners = false;
@@ -424,6 +431,7 @@ export default class SelectPorts {
 
     _allSelected() {
         const portData = this._ports.portDataDefault.filter(d => d.properties.availableForAll);
+
         this._ports.portData = portData;
         this._ports.showCurrentGood = false;
         this._ports.showTradePortPartners = false;
@@ -434,6 +442,7 @@ export default class SelectPorts {
         const portData = this._ports.portDataDefault.filter(
             d => d.properties.nonCapturable && d.properties.nation !== "FT"
         );
+
         this._ports.portData = portData;
         this._ports.showCurrentGood = false;
         this._ports.showTradePortPartners = false;
@@ -442,19 +451,35 @@ export default class SelectPorts {
 
     _portSizeSelected(size) {
         const portData = this._ports.portDataDefault.filter(d => size === d.properties.portBattleType);
+
         this._ports.portData = portData;
         this._ports.showCurrentGood = false;
         this._ports.showTradePortPartners = false;
         this._ports.update();
     }
 
+    _CMSelected() {
+        const value = +this._propCMSelector.options[this._propCMSelector.selectedIndex].value;
+        let portData;
+
+        if (value !== 0) {
+            portData = this._ports.portDataDefault.filter(d => value === d.properties.conquestMarksPension);
+        } else {
+            portData = this._ports.portDataDefault;
+        }
+        this._toggleMenuDropdown();
+        this._ports.portData = portData;
+        this._ports.showTradePortPartners = false;
+        this._ports.update();
+    }
+
     _capturePBRange() {
-        const blackOutTimes = [8, 9, 10],
-            // 24 hours minus black-out hours
-            maxStartTime = 24 - (blackOutTimes.length + 1);
+        const blackOutTimes = [8, 9, 10];
+        // 24 hours minus black-out hours
+        const maxStartTime = 24 - (blackOutTimes.length + 1);
         const startTimes = new Set();
-        const begin = moment($("#prop-pb-from-input").val(), this._timeFormat).hour();
-        let end = moment($("#prop-pb-to-input").val(), this._timeFormat).hour();
+        const begin = moment(document.getElementById("#prop-pb-from-input").value, this._timeFormat).hour();
+        let end = moment(document.getElementById("#prop-pb-to-input").value, this._timeFormat).hour();
 
         // console.log("Between %d and %d", begin, end);
 
@@ -484,7 +509,7 @@ export default class SelectPorts {
     _filterCaptured(begin, end) {
         // console.log("Between %s and %s", begin.format("dddd D MMMM YYYY H:mm"), end.format("dddd D MMMM YYYY H:mm"));
         const portData = this._ports.portDataDefault.filter(port =>
-            moment(port.lastPortBattle).isBetween(begin, end, null, "(]")
+            moment(port.properties.lastPortBattle).isBetween(begin, end, null, "(]")
         );
 
         this._ports.portData = portData;
@@ -502,6 +527,7 @@ export default class SelectPorts {
         if (now.hour() < begin.hour()) {
             begin = begin.subtract(1, "day");
         }
+
         this._filterCaptured(begin, moment.utc(begin).add(1, "day"));
     }
 
@@ -515,6 +541,7 @@ export default class SelectPorts {
         if (now.hour() < begin.hour()) {
             begin = begin.subtract(1, "day");
         }
+
         this._filterCaptured(begin, moment.utc(begin).add(1, "day"));
     }
 
@@ -522,10 +549,13 @@ export default class SelectPorts {
         const currentMondayOfWeek = moment()
             .utc()
             .startOf("week");
-        const begin = currentMondayOfWeek.hour(11), // this Monday
-            end = moment(currentMondayOfWeek)
-                .add(7, "day")
-                .hour(11); // next Monday
+        // This Monday
+        const begin = currentMondayOfWeek.hour(11);
+        // Next Monday
+        const end = moment(currentMondayOfWeek)
+            .add(7, "day")
+            .hour(11);
+
         this._filterCaptured(begin, end);
     }
 
@@ -533,38 +563,29 @@ export default class SelectPorts {
         const currentMondayOfWeek = moment()
             .utc()
             .startOf("week");
+        // Monday last week
         const begin = moment(currentMondayOfWeek)
-                .subtract(7, "day")
-                .hour(11), // Monday last week
-            end = currentMondayOfWeek.hour(11); // this Monday
+            .subtract(7, "day")
+            .hour(11);
+        // This Monday
+        const end = currentMondayOfWeek.hour(11);
+
         this._filterCaptured(begin, end);
     }
 
     _captureRange() {
-        const begin = moment($("#prop-from-input").val(), this._dateFormat).hour(11),
-            end = moment($("#prop-to-input").val(), this._dateFormat)
-                .add(1, "day")
-                .hour(11);
+        const from = document.getElementById("prop-from-input").value;
+        const to = document.getElementById("prop-to-input").value;
+        const begin = moment(from, this._dateFormat).hour(11);
+        const end = moment(to, this._dateFormat)
+            .add(1, "day")
+            .hour(11);
+
         this._filterCaptured(begin, end);
-    }
-
-    _CMSelected() {
-        const value = parseInt(this._propCM$.val(), 10);
-        let portData;
-
-        if (value !== 0) {
-            portData = this._ports.portDataDefault.filter(d => value === d.properties.conquestMarksPension);
-        } else {
-            portData = this._ports.portDataDefault;
-        }
-        $("#propertyDropdown").dropdown("toggle");
-        this._ports.portData = portData;
-        this._ports.showTradePortPartners = false;
-        this._ports.update();
     }
 
     clearMap() {
         this._setupClanSelect();
-        this._propClan$.selectpicker("refresh");
+        $(this._propClanSelector).selectpicker("refresh");
     }
 }
