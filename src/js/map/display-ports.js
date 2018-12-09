@@ -653,16 +653,7 @@ export default class DisplayPorts {
         } else if (this._showRadius === "position") {
             data = this._portData;
         } else if (this._showRadius === "attack") {
-            const pbData = this._pbData.ports
-                .filter(d => d.attackHostility)
-                .map(d => ({ id: d.id, attackHostility: d.attackHostility }));
-            data = this._portData
-                .filter(port => pbData.some(d => port.id === d.id))
-                .map(port => {
-                    // eslint-disable-next-line prefer-destructuring,no-param-reassign
-                    port.properties.attackHostility = pbData.find(d => port.id === d.id).attackHostility;
-                    return port;
-                });
+            data = this._portData.filter(port => port.properties.attackHostility);
         } else if (this._showRadius === "green") {
             rGreenZone =
                 roundToThousands(
@@ -671,8 +662,7 @@ export default class DisplayPorts {
                         { x: convertCoordX(-79696, 10642), y: convertCoordY(-79696, 10642) }
                     )
                 ) * circleRadiusFactor;
-            const pbData = this._pbData.ports.filter(d => d.nation !== "FT").map(d => d.id);
-            data = this._portData.filter(port => pbData.some(d => port.id === d) && port.properties.nonCapturable);
+            data = this._portData.filter(port => port.properties.nonCapturable && port.properties.nation !== "FT");
         } else if (this.showCurrentGood) {
             data = this._portData;
             rMax /= 2;
