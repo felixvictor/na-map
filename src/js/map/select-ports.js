@@ -172,13 +172,6 @@ export default class SelectPorts {
             event.preventDefault();
         });
 
-        this._portNamesSelector.classList.add("selectpicker");
-        this._buyGoodsSelector.classList.add("selectpicker");
-        this._propNationSelector.classList.add("selectpicker");
-        this._propClanSelector.classList.add("selectpicker");
-        this._propCMSelector.classList.add("selectpicker");
-
-        $(".selectpicker").selectpicker();
         initMultiDropdownNavbar("selectPortNavbar");
     }
 
@@ -209,6 +202,8 @@ export default class SelectPorts {
             .join("")}`;
 
         this._portNamesSelector.insertAdjacentHTML("beforeend", options);
+        this._portNamesSelector.classList.add("selectpicker");
+        $(this._portNamesSelector).selectpicker();
     }
 
     _setupGoodSelect() {
@@ -227,6 +222,8 @@ export default class SelectPorts {
             .join("")}`;
 
         this._buyGoodsSelector.insertAdjacentHTML("beforeend", options);
+        this._buyGoodsSelector.classList.add("selectpicker");
+        $(this._buyGoodsSelector).selectpicker();
     }
 
     _setupNationSelect() {
@@ -244,6 +241,8 @@ export default class SelectPorts {
             .join("")}`;
 
         this._propNationSelector.insertAdjacentHTML("beforeend", options);
+        this._propNationSelector.classList.add("selectpicker");
+        $(this._propNationSelector).selectpicker();
     }
 
     _setupClanSelect() {
@@ -264,6 +263,8 @@ export default class SelectPorts {
         }
 
         this._propClanSelector.insertAdjacentHTML("beforeend", options);
+        this._propClanSelector.classList.add("selectpicker");
+        $(this._propClanSelector).selectpicker();
     }
 
     _setupCMSelect() {
@@ -275,6 +276,8 @@ export default class SelectPorts {
             .map(cm => `<option value="${cm}">${cm}</option>`)
             .join("")}`;
         this._propCMSelector.insertAdjacentHTML("beforeend", options);
+        this._propCMSelector.classList.add("selectpicker");
+        $(this._propCMSelector).selectpicker();
     }
 
     _setTradePortPartners() {
