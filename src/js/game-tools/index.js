@@ -25,7 +25,7 @@ let map;
  * Data directory
  * @type {string}
  */
-const dataDir = "../data";
+const dataDir = "data";
 
 /**
  * @type {Array<fileName: string, name: string>}
