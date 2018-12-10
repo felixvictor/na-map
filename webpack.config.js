@@ -273,7 +273,7 @@ const config = {
         new PreloadWebpackPlugin({
             include: "allAssets",
             // fileWhitelist: [/\.css$/, /\.js$/, /\.svg$/, /\.woff2$/]
-            fileWhitelist: [/\.woff2$/]
+            fileWhitelist: [/\.css$/, /\.js$/, /\.woff2$/]
         }),
         new SitemapPlugin(`https://${TARGET}.netlify.com/`, sitemapPaths, { skipGzip: false }),
         new SriPlugin({
