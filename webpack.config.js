@@ -9,6 +9,7 @@ const // { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer"),
     HtmlPlugin = require("html-webpack-plugin"),
     MiniCssExtractPlugin = require("mini-css-extract-plugin"),
     MinifyPlugin = require("babel-minify-webpack-plugin"),
+    PreloadWebpackPlugin = require("preload-webpack-plugin"),
     SitemapPlugin = require("sitemap-webpack-plugin").default,
     SriPlugin = require("webpack-subresource-integrity"),
     WebpackDeepScopeAnalysisPlugin = require("webpack-deep-scope-plugin").default,
@@ -245,6 +246,10 @@ const config = {
             minify: htmlMinifyOpt,
             template: "index.template.ejs",
             title: PACKAGE.description
+        }),
+        new PreloadWebpackPlugin({
+            include: "allAssets",
+            fileWhitelist: [/\.css/, /\.js/, /\.svg/, /\.woff2/]
         }),
         new SitemapPlugin(`https://${TARGET}.netlify.com/`, sitemapPaths, { skipGzip: false }),
         new SriPlugin({
