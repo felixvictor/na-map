@@ -13,7 +13,8 @@ const // { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer"),
     SitemapPlugin = require("sitemap-webpack-plugin").default,
     SriPlugin = require("webpack-subresource-integrity"),
     WebpackDeepScopeAnalysisPlugin = require("webpack-deep-scope-plugin").default,
-    WebpackPwaManifest = require("webpack-pwa-manifest");
+    WebpackPwaManifest = require("webpack-pwa-manifest"),
+    WorkboxPlugin = require("workbox-webpack-plugin");
 const PACKAGE = require("./package.json");
 
 const libraryName = PACKAGE.name,
@@ -281,7 +282,14 @@ const config = {
             enabled: isProd
         }),
         new WebpackDeepScopeAnalysisPlugin(),
-        new WebpackPwaManifest(manifestOpt)
+        new WebpackPwaManifest(manifestOpt),
+        // Service Worker
+        new WorkboxPlugin.GenerateSW({
+            importWorkboxFrom: "local",
+            globPatterns: ["*.json", "*.xlsx"],
+            clientsClaim: true,
+            skipWaiting: true
+        })
     ],
 
     stats: "normal",
