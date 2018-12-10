@@ -7,7 +7,7 @@ const inFilename = process.argv[2],
 
 sharp(inFilename)
     .jpeg({
-        quality: 95,
+        quality: 70,
         trellisQuantisation: true,
         overshootDeringing: true,
         optimiseScans: true
