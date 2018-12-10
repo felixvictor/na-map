@@ -64,6 +64,7 @@
         "webpack-dev-server": "^3.1.10",
         "webpack-pwa-manifest": "^4.0.0",
         "webpack-subresource-integrity": "^1.3.0",
+        "workbox-webpack-plugin": "^3.6.3",
         "xml2json": "^0.11.2",
         "yaml": "^1.0.3",
         "yaml-unist-parser": "^1.0.0"
