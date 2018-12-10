@@ -13,7 +13,7 @@ const // { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer"),
     SitemapPlugin = require("sitemap-webpack-plugin").default,
     SriPlugin = require("webpack-subresource-integrity"),
     WebpackDeepScopeAnalysisPlugin = require("webpack-deep-scope-plugin").default,
-    WebappWebpackPlugin = require("webapp-webpack-plugin");
+    WebpackPwaManifest = require("webpack-pwa-manifest");
 const PACKAGE = require("./package.json");
 
 const libraryName = PACKAGE.name,
@@ -23,6 +23,8 @@ const libraryName = PACKAGE.name,
     description =
         "Yet another map with in-game map, F11 coordinates, resources, ship and wood comparison. Port data is updated constantly from twitter and daily after maintenance.",
     sitemapPaths = ["/fonts/", "/icons", "/images"];
+const backgroundColour = "#dcd7ca";
+const themeColour = "#bbc0a2";
 
 const outputPath = path.resolve(__dirname, "public");
 
@@ -150,6 +152,38 @@ const svgoOpt = {
     ]
 };
 
+const htmlOpt = {
+    brand: "images/icons/icon_32x32.png",
+    description,
+    gtag: gtagLink,
+    hash: false,
+    inject: "body",
+    lang: "en-GB",
+    meta: { viewport: "width=device-width, initial-scale=1, shrink-to-fit=no" },
+    minify: htmlMinifyOpt,
+    template: "index.template.ejs",
+    title: PACKAGE.description
+};
+
+const manifestOpt = {
+    background_color: backgroundColour,
+    description: PACKAGE.description,
+    display: "standalone",
+    fingerprints: false,
+    icons: [
+        {
+            src: path.resolve("src/images/icons/logo.png"),
+            sizes: [32, 96, 128, 192, 256, 384, 512, 1024],
+            destination: path.join("images", "icons")
+        }
+    ],
+    ios: false,
+    lang: "en-GB",
+    name: PACKAGE.name,
+    short_name: PACKAGE.name,
+    theme_color: themeColour
+};
+
 const config = {
     context: path.resolve(__dirname, "src"),
 
@@ -235,21 +269,11 @@ const config = {
             { from: "gen/*.xlsx", flatten: true },
             { from: "../netlify.toml" }
         ]),
-        new HtmlPlugin({
-            brand: "images/icons/favicon-32x32.png",
-            description,
-            gtag: gtagLink,
-            hash: false,
-            inject: "body",
-            lang: "en-GB",
-            meta: { viewport: "width=device-width, initial-scale=1, shrink-to-fit=no" },
-            minify: htmlMinifyOpt,
-            template: "index.template.ejs",
-            title: PACKAGE.description
-        }),
+        new HtmlPlugin(htmlOpt),
         new PreloadWebpackPlugin({
             include: "allAssets",
-            fileWhitelist: [/\.css/, /\.js/, /\.svg/, /\.woff2/]
+            // fileWhitelist: [/\.css$/, /\.js$/, /\.svg$/, /\.woff2$/]
+            fileWhitelist: [/\.woff2$/]
         }),
         new SitemapPlugin(`https://${TARGET}.netlify.com/`, sitemapPaths, { skipGzip: false }),
         new SriPlugin({
@@ -257,30 +281,7 @@ const config = {
             enabled: isProd
         }),
         new WebpackDeepScopeAnalysisPlugin(),
-        new WebappWebpackPlugin({
-            cache: true,
-            logo: "./images/icons/logo.jpg",
-            inject: true,
-            prefix: "images/icons/",
-            favicons: {
-                appDescription: PACKAGE.description,
-                appName: PACKAGE.name,
-                background: "#dcd7ca",
-                lang: "en-GB",
-                developerURL: null, // prevent retrieving from the nearest package.json
-                theme_color: "#bbc0a2",
-                icons: {
-                    android: false, // Create Android homescreen icon. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }`
-                    appleIcon: false, // Create Apple touch icons. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }`
-                    appleStartup: false, // Create Apple startup images. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }`
-                    coast: false, // Create Opera Coast icon. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }`
-                    favicons: true, // Create regular favicons. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }`
-                    firefox: false, // Create Firefox OS icons. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }`
-                    windows: true, // Create Windows 8 tile icons. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }`
-                    yandex: true
-                }
-            }
-        })
+        new WebpackPwaManifest(manifestOpt)
     ],
 
     stats: "normal",
