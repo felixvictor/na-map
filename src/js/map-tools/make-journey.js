@@ -82,28 +82,32 @@ export default class Journey {
     }
 
     _setupDrag() {
+        const dragStart = (d, i, nodes) => {
+            this._removeLabels();
+            d3Select(nodes[i]).classed("drag-active", true);
+        };
+        const dragged = (d, i, nodes) => {
+            // Set compass position
+            if (i === 0) {
+                this._compass.attr("x", d.position[0] + d3Event.dx).attr("y", d.position[1] + d3Event.dy);
+            }
+            d3Select(nodes[i])
+                .attr("cx", d3Event.x)
+                .attr("cy", d3Event.y);
+            // eslint-disable-next-line no-param-reassign
+            d.position = [d.position[0] + d3Event.dx, d.position[1] + d3Event.dy];
+            this._printLines();
+        };
+        const dragEnd = (d, i, nodes) => {
+            d3Select(nodes[i]).classed("drag-active", false);
+            //  this._journey.segment[i].position = [d.position[0] + d3Event.x, d.position[1] + d3Event.y];
+            this._printJourney();
+        };
+
         this._drag = d3Drag()
-            .on("start", (d, i, nodes) => {
-                this._removeLabels();
-                d3Select(nodes[i]).classed("drag-active", true);
-            })
-            .on("drag", (d, i, nodes) => {
-                // Set compass position
-                if (i === 0) {
-                    this._compass.attr("x", d.position[0] + d3Event.dx).attr("y", d.position[1] + d3Event.dy);
-                }
-                d3Select(nodes[i])
-                    .attr("cx", d3Event.x)
-                    .attr("cy", d3Event.y);
-                // eslint-disable-next-line no-param-reassign
-                d.position = [d.position[0] + d3Event.dx, d.position[1] + d3Event.dy];
-                this._printLines();
-            })
-            .on("end", (d, i, nodes) => {
-                d3Select(nodes[i]).classed("drag-active", false);
-                //  this._journey.segment[i].position = [d.position[0] + d3Event.x, d.position[1] + d3Event.y];
-                this._printJourney();
-            });
+            .on("start", dragStart)
+            .on("drag", dragged)
+            .on("end", dragEnd);
     }
 
     _setupSvg() {
