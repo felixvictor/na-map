@@ -14,7 +14,7 @@ const // { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer"),
     SriPlugin = require("webpack-subresource-integrity"),
     WebpackDeepScopeAnalysisPlugin = require("webpack-deep-scope-plugin").default,
     WebpackPwaManifest = require("webpack-pwa-manifest"),
-    WorkboxPlugin = require("workbox-webpack-plugin");
+    { InjectManifest } = require("workbox-webpack-plugin");
 const PACKAGE = require("./package.json");
 
 const libraryName = PACKAGE.name,
@@ -174,7 +174,7 @@ const manifestOpt = {
     icons: [
         {
             src: path.resolve("src/images/icons/logo.png"),
-            sizes: [32, 96, 128, 192, 256, 384, 512, 1024],
+            sizes: [32, 72, 96, 128, 144, 168, 192, 256, 384, 512, 1024],
             destination: path.join("images", "icons")
         }
     ],
@@ -273,7 +273,6 @@ const config = {
         new HtmlPlugin(htmlOpt),
         new PreloadWebpackPlugin({
             include: "allAssets",
-            // fileWhitelist: [/\.css$/, /\.js$/, /\.svg$/, /\.woff2$/]
             fileWhitelist: [/\.woff2$/]
         }),
         new SitemapPlugin(`https://${TARGET}.netlify.com/`, sitemapPaths, { skipGzip: false }),
@@ -283,12 +282,13 @@ const config = {
         }),
         new WebpackDeepScopeAnalysisPlugin(),
         new WebpackPwaManifest(manifestOpt),
-        // Service Worker
-        new WorkboxPlugin.GenerateSW({
+        // Service Worker (call last)
+        new InjectManifest({
             importWorkboxFrom: "local",
-            globPatterns: ["*.json", "*.xlsx"],
-            clientsClaim: true,
-            skipWaiting: true
+            importsDirectory: "workbox",
+            swSrc: path.join("src", "js", "service-worker.js"),
+            //   swDest: path.join(outputPath, "sw.js"),
+            globPatterns: ["*.json", "*.xlsx"]
         })
     ],
 
