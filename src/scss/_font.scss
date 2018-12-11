@@ -2,11 +2,11 @@
  * scss definitions: font
  *
  * @author    Ingo Beyritz
- * @copyright Copyright (c) 2017, Ingo Beyritz
+ * @copyright Copyright (c) 2017-18, Ingo Beyritz
  * @license   http://www.gnu.org/licenses/gpl.html
  */
+
 @import "caslon";
 
-$font-family-sans-serif: librecaslon, -apple-system, blinkmacsystemfont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
-    cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", arial, sans-serif;
-$font-family-base: $font-family-sans-serif;
+$font-family-serif: librecaslon, Big Caslon, Hoefler Text, Palatino, Cambria, Georgia, serif;
+$font-family-base: $font-family-serif;
