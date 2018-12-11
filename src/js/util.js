@@ -112,13 +112,15 @@ export const formatSignPercent = x =>
 
 /**
  * Format ordinal
- * @param {Number} n - Integer
+ * @param {number} n - Integer
+ * @param {bool} sup - True if superscript tags needed
  * @return {String} Formatted Ordinal
  */
-export function getOrdinal(n) {
+export function getOrdinal(n, sup = true) {
     const s = ["th", "st", "nd", "rd"],
-        v = n % 100;
-    return n + (s[(v - 20) % 10] || s[v] || s[0]);
+        v = n % 100,
+        text = s[(v - 20) % 10] || s[v] || s[0];
+    return n + (sup ? `<sup>${text}</sup>` : `${text}`);
 }
 
 /**
