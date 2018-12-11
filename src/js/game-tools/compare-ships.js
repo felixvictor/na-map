@@ -1066,7 +1066,7 @@ export default class CompareShips {
         return this.shipSelectData
             .map(
                 key =>
-                    `<optgroup label="${getOrdinal(key.key)} rate">${key.values
+                    `<optgroup label="${getOrdinal(key.key, false)} rate">${key.values
                         .map(
                             ship =>
                                 `<option data-subtext="${ship.battleRating}" value="${ship.id}">${ship.name} (${
