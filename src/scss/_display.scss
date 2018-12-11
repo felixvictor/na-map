@@ -2,13 +2,43 @@
  * scss definitions: display
  *
  * @author    Ingo Beyritz
- * @copyright Copyright (c) 2017, Ingo Beyritz
+ * @copyright Copyright (c) 2017-18, Ingo Beyritz
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
 $background-colour: $primary-500;
 $paddingHalf: map-get($spacers, 2);
 $paddingThird: map-get($spacers, 1);
+
+
+//////////////////////////////////////////
+// opentype
+
+body {
+    font-kerning: normal; // kern
+    font-variant-caps: normal;
+    font-variant-ligatures: common-ligatures; // liga
+    font-variant-numeric: oldstyle-nums; // onum
+}
+
+table,
+.page-link {
+    font-variant-numeric: tabular-nums; // tnum
+}
+
+.caps,
+.des {
+    letter-spacing: 0.06rem;
+}
+
+.des {
+    position: relative;
+    top: -0.4em;
+    font-size: smaller;
+    color: $primary-700;
+}
+
+//////////////////////////////////////////
 
 #na-svg {
     background-color: $background-colour;
@@ -42,6 +72,7 @@ text,
     .des {
         top: 0;
     }
+
     button {
         margin-bottom: map-get($spacers, 2);
     }
@@ -54,6 +85,7 @@ text,
             fill: $white;
         }
     }
+
     g.position path {
         //    stroke: $green;
         fill: $green;
@@ -78,6 +110,7 @@ pattern .all {
         stroke: $primary-600;
         opacity: 0.5;
     }
+
     text {
         fill: $primary-700;
     }
@@ -109,6 +142,7 @@ p {
     thead th {
         font-weight: normal;
     }
+
     td {
         vertical-align: top;
         border-top: none;
@@ -133,6 +167,7 @@ table a {
     .block {
         padding: 0 $paddingThird;
     }
+
     .small {
         padding: $paddingThird 0;
     }
@@ -157,16 +192,20 @@ table a {
         thead {
             background-color: $secondary-200;
         }
+
         td {
             padding-top: $paddingHalf;
             padding-bottom: $paddingHalf;
         }
+
         tbody tr:nth-of-type(odd) {
             background-color: $primary-300;
         }
+
         tbody tr:nth-of-type(even) {
             background-color: $primary-100;
         }
+
         .name {
             font-style: italic;
         }
@@ -175,10 +214,12 @@ table a {
 
 .buildings .requirements table {
     width: auto;
+
     th,
     td {
         padding-right: $paddingHalf;
     }
+
     td {
         text-align: right;
     }
@@ -188,9 +229,11 @@ table a {
     td + td {
         text-align: right;
     }
+
     td:nth-child(1) {
         width: 50%;
     }
+
     td:nth-child(2) {
         width: 50%;
     }
@@ -266,13 +309,16 @@ table a {
 
 .columnA {
     background-color: $primary-100;
+
     table {
         thead {
             background-color: $primary-050;
         }
+
         th {
             border-top: none;
         }
+
         tbody tr:nth-of-type(odd) {
             background-color: $primary-200;
         }
@@ -281,13 +327,16 @@ table a {
 
 .columnC {
     background-color: $secondary-100;
+
     table {
         thead {
             background-color: $secondary-050;
         }
+
         th {
             border-top: none;
         }
+
         tbody tr:nth-of-type(odd) {
             background-color: $secondary-200;
         }
@@ -305,6 +354,7 @@ table a {
 
 .solidArc {
     transition: all 0.3s;
+
     &:hover {
         fill: orangered;
     }
@@ -335,6 +385,7 @@ text {
 
 #input-toggle {
     display: flex;
+
     .item {
         padding-right: 1em;
     }
@@ -372,54 +423,66 @@ text {
     svg {
         overflow: auto;
     }
+
     circle {
         fill: $secondary-600;
         fill-opacity: 0.2;
     }
+
     text {
         font-size: 1em;
         fill: $secondary-800;
         text-anchor: middle;
         dominant-baseline: central;
+
         &.des {
             fill: $secondary-700 !important;
         }
     }
+
     rect {
         fill: $primary-100;
         fill-opacity: 0.7;
     }
+
     path {
         stroke: $secondary-600;
         stroke-width: 0.3em;
         fill: none;
     }
+
     .label {
         text {
             // font-size: unset;
             text-anchor: start;
         }
+
         circle {
             fill-opacity: 1;
             cursor: pointer;
         }
+
         .drag-active {
             stroke: $secondary-100;
             stroke-width: 0.25rem;
         }
+
         .drag-hidden {
             fill-opacity: 0;
         }
+
         .drag-hidden.drag-active {
             stroke-width: 0;
         }
     }
+
     .compass {
         circle,
         line {
             stroke: $secondary-600;
             stroke-width: 0.1rem;
         }
+
         text {
             fill: $secondary-600;
             font-weight: bold;
@@ -478,6 +541,7 @@ text {
     fill: transparent;
     stroke: $primary-700;
     stroke-width: 0.5px;
+
     path {
         pointer-events: visibleFill;
     }
@@ -492,23 +556,28 @@ text {
 .grid-background {
     line-height: 1;
     background-color: transparent;
+
     circle {
         fill: $secondary-600;
         fill-opacity: 0.5;
     }
+
     text {
         font-size: 1em;
         fill: $secondary-800;
         text-anchor: middle;
         dominant-baseline: central;
+
         &.des {
             fill: $secondary-700 !important;
         }
     }
+
     rect {
         fill: $primary-100;
         fill-opacity: 0.7;
     }
+
     path {
         stroke: $secondary-600;
         stroke-width: 0.3em;
@@ -577,6 +646,7 @@ text {
     background: $primary-900;
     border: 3px solid $primary-400;
     border-radius: 0;
+
     &::after,
     &::before {
         position: absolute;
@@ -618,6 +688,7 @@ text {
     font-size: smaller;
     text-align: left;
     box-shadow: 0 14px 28px rgba($primary-900, 0.25), 0 10px 10px rgba($primary-900, 0.22);
+
     table {
         margin-bottom: 0;
     }
@@ -714,9 +785,10 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
 .county,
 .region {
     filter: url("#drop-shadow");
+
     text {
         font-family: LibreCaslonDisplay, -apple-system, blinkmacsystemfont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
-            cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", arial, sans-serif;
+        cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", arial, sans-serif;
         opacity: 0.7;
         fill: $white;
         text-anchor: middle;
@@ -804,6 +876,7 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
             path {
                 stroke: none;
             }
+
             text {
                 fill: $primary-700;
             }
@@ -899,6 +972,7 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
         fill-opacity: 0.7;
         fill: $white;
     }
+
     path {
         stroke-opacity: 0.4;
         stroke: $white !important;
