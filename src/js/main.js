@@ -132,9 +132,11 @@ function main() {
         window.addEventListener("load", () => {
             navigator.serviceWorker
                 .register("./service-worker.js")
-                .then(() => {})
-                .catch(registrationError => {
-                    console.error("SW registration failed: ", registrationError);
+                .then(registration => {
+                    console.log(`Service Worker registered! Scope: ${registration.scope}`);
+                })
+                .catch(error => {
+                    console.error("SW registration failed: ", error);
                 });
         });
     }
