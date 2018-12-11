@@ -24,7 +24,7 @@ import {
     convertCoordX,
     convertCoordY
 } from "../common";
-import { formatInt, formatSiInt, formatPercent, roundToThousands, degreesToRadians, formatFloatFixed } from "../util";
+import { formatInt, formatSiInt, formatPercent, getOrdinal, roundToThousands, degreesToRadians } from "../util";
 import TrilateratePosition from "../map-tools/get-position";
 
 export default class DisplayPorts {
@@ -502,13 +502,13 @@ export default class DisplayPorts {
 
         switch (portProperties.portBattleType) {
             case "Large":
-                port.pbType = "1<sup>st</sup>";
+                port.pbType = getOrdinal(1);
                 break;
             case "Medium":
-                port.pbType = "4<sup>th</sup>";
+                port.pbType = getOrdinal(4);
                 break;
             default:
-                port.pbType = "6<sup>th</sup>";
+                port.pbType = getOrdinal(6);
                 break;
         }
 
