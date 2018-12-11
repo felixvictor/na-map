@@ -2,7 +2,7 @@
  * scss definitions: main
  *
  * @author    Ingo Beyritz
- * @copyright Copyright (c) 2017, Ingo Beyritz
+ * @copyright Copyright (c) 2017-18, Ingo Beyritz
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 @import "pre-bootstrap";
@@ -44,29 +44,5 @@
 
 @import "~tempusdominus-bootstrap-4/src/sass/tempusdominus-bootstrap-4-build";
 @import "~bootstrap-select/sass/bootstrap-select";
-
-html {
-    font-family: $font-family-base;
-    font-size: 16px;
-    line-height: 1.618rem;
-}
-
-//////////////////////////////////////////
-// opentype
-
-$opentype-features: "liga", "kern", "onum" off;
-$opentype-features-tnum: "liga", "kern", "tnum", "onum" off;
-
-body,
-html,
-button {
-    font-family: $font-family-base;
-    font-feature-settings: $opentype-features;
-}
-
-table,
-.page-link {
-    font-feature-settings: $opentype-features-tnum;
-}
 
 @import "display";
