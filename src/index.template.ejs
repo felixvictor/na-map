@@ -11,7 +11,7 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta property="og:image" content="<%= htmlWebpackPlugin.options.brand %>">
-    <link rel="icon" type="image/png" href="/<%= htmlWebpackPlugin.options.brand %>">
+    <link rel="icon" type="image/x-icon" sizes="16x16 32x32 48x48 64x64 128x128 256x256" href="favicon.ico">
 
     <script async src="<%= htmlWebpackPlugin.options.gtag %>"></script>
 </head>
@@ -19,8 +19,9 @@
 <body>
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="#"><img src="<%= htmlWebpackPlugin.options.brand %>" width="32" height="32"
-                                          alt="Brand"></a>
+    <a class="navbar-brand" href="#">
+        <img src="<%= htmlWebpackPlugin.options.brand %>" width="32" height="32" alt="Brand">
+    </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
