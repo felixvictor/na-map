@@ -13,8 +13,7 @@ const // { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer"),
     SitemapPlugin = require("sitemap-webpack-plugin").default,
     SriPlugin = require("webpack-subresource-integrity"),
     WebpackDeepScopeAnalysisPlugin = require("webpack-deep-scope-plugin").default,
-    WebpackPwaManifest = require("webpack-pwa-manifest"),
-    { InjectManifest } = require("workbox-webpack-plugin");
+    WebpackPwaManifest = require("webpack-pwa-manifest");
 const PACKAGE = require("./package.json");
 
 const libraryName = PACKAGE.name,
@@ -282,14 +281,7 @@ const config = {
             enabled: isProd
         }),
         new WebpackDeepScopeAnalysisPlugin(),
-        new WebpackPwaManifest(manifestOpt),
-        // Service Worker (call last)
-        new InjectManifest({
-            importWorkboxFrom: "local",
-            importsDirectory: "workbox",
-            swSrc: path.join("src", "js", "service-worker.js"),
-            globPatterns: ["*.ico", "*.json", "*.xlsx"] // additional files
-        })
+        new WebpackPwaManifest(manifestOpt)
     ],
 
     stats: "normal",
