@@ -11,7 +11,7 @@ const inFilename = process.argv[2],
     icoFile = `${iconsPath}/favicon.ico`;
 
 sharp(inFilename)
-    .jpeg({ quality: 70, trellisQuantisation: true, overshootDeringing: true, progressive: false })
+    .jpeg({ quality: 100, trellisQuantisation: true, overshootDeringing: true, progressive: false })
     .sharpen()
     .tile({ size: tileSize, layout: "google" })
     .toFile(mapPath)
