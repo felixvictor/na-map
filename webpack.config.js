@@ -268,7 +268,8 @@ const config = {
             { from: "images/map", to: `${outputPath}/images/map` },
             { from: "gen/*.json", to: `${outputPath}/data`, flatten: true },
             { from: "gen/*.xlsx", flatten: true },
-            { from: "../netlify.toml" }
+            { from: "../netlify.toml" },
+            { from: "images/icons/favicon.ico", flatten: true }
         ]),
         new HtmlPlugin(htmlOpt),
         new PreloadWebpackPlugin({
@@ -287,8 +288,7 @@ const config = {
             importWorkboxFrom: "local",
             importsDirectory: "workbox",
             swSrc: path.join("src", "js", "service-worker.js"),
-            //   swDest: path.join(outputPath, "sw.js"),
-            globPatterns: ["*.json", "*.xlsx"]
+            globPatterns: ["*.ico", "*.json", "*.xlsx"] // additional files
         })
     ],
 
