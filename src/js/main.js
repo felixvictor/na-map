@@ -127,20 +127,6 @@ function main() {
     initAnalytics();
     registerPage("Homepage", "/");
 
-    // Check that service workers are registered
-    if ("serviceWorker" in navigator) {
-        window.addEventListener("load", () => {
-            navigator.serviceWorker
-                .register("./service-worker.js")
-                .then(registration => {
-                    console.log(`Service Worker registered! Scope: ${registration.scope}`);
-                })
-                .catch(error => {
-                    console.error("SW registration failed: ", error);
-                });
-        });
-    }
-
     // Set cookies defaults (expiry 365 days)
     Cookies.defaults = {
         expires: 365
