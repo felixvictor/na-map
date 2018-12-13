@@ -2654,10 +2654,10 @@ boolbase@^1.0.0, boolbase@~1.0.0:
   resolved "https://registry.yarnpkg.com/boolbase/-/boolbase-1.0.0.tgz#68dff5fbe60c51eb37725ea9e3ed310dcc1e776e"
   integrity sha1-aN/1++YMUes3cl6p4+0xDcwed24=
 
-bootstrap-select@^1.13.3:
-  version "1.13.3"
-  resolved "https://registry.yarnpkg.com/bootstrap-select/-/bootstrap-select-1.13.3.tgz#77f62b72c69339227753b3879cec036039dcb4d9"
-  integrity sha512-XzMwLFqRJQb142zR3ev57bZl66/h/RRguMODVfH0w2YTcJrqU+VCO6CserMxsVF4JE6hX9O99MQGZxgWZiitfg==
+bootstrap-select@^1.13.5:
+  version "1.13.5"
+  resolved "https://registry.yarnpkg.com/bootstrap-select/-/bootstrap-select-1.13.5.tgz#12f000b25a95ed642fe371ae9e311d3afbb8c53f"
+  integrity sha512-1uYsYLB4FvGdwM6qzIfTxp6sP5gDqjPgWNHJztBfYUTIo1GUYG5zzmMVWiJvdxJlsvBXZ9AObmeZdzi0eg2jaA==
 
 bootstrap@>=4.1.2, bootstrap@^4.1.3:
   version "4.1.3"
@@ -9639,6 +9639,11 @@ moment-timezone@^0.5.23:
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.22.2.tgz#3c257f9839fc0e93ff53149632239eb90783ff66"
   integrity sha1-PCV/mDn8DpP/UxSWMiOeuQeD/2Y=
 
+moment@^2.23.0:
+  version "2.23.0"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.23.0.tgz#759ea491ac97d54bac5ad776996e2a58cc1bc225"
+  integrity sha512-3IE39bHVqFbWWaPOMHZF98Q9c3LDKGTmypMiTM2QygGXXElkFWIH7GxfmlwmY2vwa+wmNsoYZmG2iusf1ZjJoA==
+
 morgan@^1.8.0:
   version "1.9.0"
   resolved "https://registry.yarnpkg.com/morgan/-/morgan-1.9.0.tgz#d01fa6c65859b76fcf31b3cb53a3821a311d8051"
@@ -14777,10 +14782,10 @@ webpack-sources@^1.3.0:
     source-list-map "^2.0.0"
     source-map "~0.6.1"
 
-webpack-subresource-integrity@^1.3.0:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/webpack-subresource-integrity/-/webpack-subresource-integrity-1.3.0.tgz#5cc0729a78593ad7e2088cd72d4a8d42ba3bfa9c"
-  integrity sha512-qR2AwKMOjqOSsk4cTuZlRjYXfvAo7/FreL44AG5R5Vn7qHAE78BOdbPPVk9fZonMIiSKYQsIO2aC61JVJC60AQ==
+webpack-subresource-integrity@^1.3.1:
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/webpack-subresource-integrity/-/webpack-subresource-integrity-1.3.1.tgz#f12a83758702f8571063885c649bbe920d582181"
+  integrity sha512-NDI2gZ2RD2C58AltjxSg2XsltFE1+n8g09aJH8elbCI8bBQ91shAOmPbgo9VcwdXg0StfePFgW9p6FgdPjD6nQ==
   dependencies:
     webpack-sources "^1.3.0"
 
@@ -15206,10 +15211,10 @@ yaml-unist-parser@^1.0.0:
     lines-and-columns "^1.1.6"
     tslib "^1.9.1"
 
-yaml@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/yaml/-/yaml-1.0.3.tgz#6eed55f60edb3ac1402283fba94c91b6a0a026f7"
-  integrity sha512-GDYiMkQRa1894pgIQTIK5CGEpcjbozJb0IcSJ3WYoGyA9kZupfpRQxpSYFYfFHFKxlkaN4GgnhEF88J/VelC5A==
+yaml@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/yaml/-/yaml-1.1.0.tgz#6168f2beb28e80ee88f82efcb6da01d8e496ba30"
+  integrity sha512-MD5Ptelnnjfj/w4UqdNguD9Ipzm3ws6bNiYkGkl4lkfGMU1V7QYyHkRh28EiHPdprSvV+xAhvLJ6ifyALYw7wA==
 
 yargs-parser@^10.1.0:
   version "10.1.0"
