@@ -23,8 +23,8 @@ const libraryName = PACKAGE.name,
     description =
         "Yet another map with in-game map, F11 coordinates, resources, ship and wood comparison. Port data is updated constantly from twitter and daily after maintenance.",
     sitemapPaths = ["/fonts/", "/icons", "/images"];
-const backgroundColour = "#dcd7ca";
-const themeColour = "#bbc0a2";
+const backgroundColour = "#c9c0ab";
+const themeColour = "#767a49";
 
 const outputPath = path.resolve(__dirname, "public");
 
@@ -152,8 +152,18 @@ const svgoOpt = {
     ]
 };
 
+const chunkSort = (chunk1, chunk2) => {
+    // [].forEach(chunk=> {console.log(chunk.id,chunk.);
+    console.log(chunk1.names, chunk2.names);
+    const orders = ["runtime", "vendors~main", "main"];
+    const order1 = orders.indexOf(chunk1.names[0]);
+    const order2 = orders.indexOf(chunk2.names[0]);
+    return order1 - order2;
+};
+
 const htmlOpt = {
     brand: "images/icons/icon_32x32.png",
+    // chunksSortMode: chunkSort,
     description,
     gtag: gtagLink,
     hash: false,
@@ -284,7 +294,21 @@ const config = {
         new WebpackPwaManifest(manifestOpt)
     ],
 
-    stats: "normal",
+    stats: {
+        // Add chunk information (setting this to `false` allows for a less verbose output)
+        chunks: true,
+
+        // Add namedChunkGroups information
+        chunkGroups: true,
+
+        // Add built modules information to chunk information
+        chunkModules: true,
+
+        // Add the origins of chunks and chunk merging info
+        chunkOrigins: true,
+
+        excludeAssets: [/images\/map\/*/]
+    },
 
     module: {
         rules: [
