@@ -152,18 +152,8 @@ const svgoOpt = {
     ]
 };
 
-const chunkSort = (chunk1, chunk2) => {
-    // [].forEach(chunk=> {console.log(chunk.id,chunk.);
-    console.log(chunk1.names, chunk2.names);
-    const orders = ["runtime", "vendors~main", "main"];
-    const order1 = orders.indexOf(chunk1.names[0]);
-    const order2 = orders.indexOf(chunk2.names[0]);
-    return order1 - order2;
-};
-
 const htmlOpt = {
     brand: "images/icons/icon_32x32.png",
-    // chunksSortMode: chunkSort,
     description,
     gtag: gtagLink,
     hash: false,
