@@ -517,10 +517,11 @@ export default class DisplayPorts {
 
     _showDetails(d, i, nodes) {
         const tooltipData = port => {
-            let h = `<table><tbody><tr><td><i class="flag-icon ${port.icon}"></i></td>`;
-            h += `<td><span class="port-name">${port.name}</span>`;
-            h += `\u2001${port.county} ${port.availableForAll}`;
-            h += "</td></tr></tbody></table>";
+            let h = '<div class="d-flex align-items-baseline">';
+            h += `<i class="flag-icon align-self-stretch ${port.icon}"></i>`;
+            h += `<div class="port-name">${port.name}</div>`;
+            h += `<div class="">\u2000${port.county} ${port.availableForAll}</div>`;
+            h += "</div>";
             if (port.attack.length) {
                 h += `<div class="alert alert-danger mt-2" role="alert">${port.attack}</div>`;
             }
