@@ -804,6 +804,13 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
     user-select: none;
 
     .axises {
+        .x-axis,
+        .x-grid,
+        .y-axis,
+        .grp-axis {
+            font-family: $font-family-base !important;
+        }
+
         line,
         path {
             stroke: $primary-700;
@@ -863,8 +870,11 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
         fill: $primary-200;
     }
 
-    .axis path {
-        display: none;
+    .axis {
+        font-family: $font-family-base !important;
+        path {
+            display: none;
+        }
     }
 
     .tick text {
