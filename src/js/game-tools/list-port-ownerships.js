@@ -221,6 +221,7 @@ export default class ListPortOwnerships {
                     .ticks(width / 80)
                     .tickSizeOuter(0)
             );
+            g.attr("font-size", ".8rem").attr("font-family", "");
         };
 
         /**
