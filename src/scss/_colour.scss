@@ -9,6 +9,9 @@
 ////
 
 // Colour scheme
+$primary-colour: rgb(201, 192, 171);
+$secondary-colour: rgb(118, 122, 73);
+
 $sat: saturation($primary-colour);
 $lit: lightness($primary-colour);
 $hue: hue($primary-colour);
