@@ -195,7 +195,10 @@ function convertOwnership() {
                             JSON.parse(decompressedContent.toString()),
                             path.basename(fileName).match(fileBaseNameRegex)[1]
                         )
-                    ),
+                    )
+                    .catch(error => {
+                        throw new Error(error);
+                    }),
             Promise.resolve()
         );
     }

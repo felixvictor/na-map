@@ -197,7 +197,7 @@ function get_port_data () {
         ${command_nodejs} build/convert-loot.mjs "${api_base_file}-${server_names[0]}" "${loot_file}" "${date}"
         ${command_nodejs} build/convert-recipes.mjs "${api_base_file}-${server_names[0]}" "${recipe_file}" "${date}"
         if [ "${script_run_type}" == "update" ]; then
-            ${command_nodejs} build/convert-ownership.mjs "${api_dir}" "${api_base_file}-${server_names[0]}-Ports" "${ownership_json}" "${nation_file}"
+            ${command_nodejs} build/convert-ownership.mjs "${api_dir}" "api-${server_names[0]}-Ports" "${ownership_json}" "${nation_file}"
         fi
 
         ${command_nodejs} build/create-xlsx.mjs "${ship_file}" "${gen_dir}/${server_names[0]}.json" "${css_file}" "${excel_file}"
