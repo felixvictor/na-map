@@ -1,16 +1,17 @@
-/*
- * scss definitions: display
- *
- * @author    Ingo Beyritz
- * @copyright Copyright (c) 2017-18, Ingo Beyritz
- * @license   http://www.gnu.org/licenses/gpl.html
- */
+////
+/// This file is part of na-map.
+/// Display.
+///
+/// copyright 2017-18
+/// license   http://www.gnu.org/licenses/gpl.html
+/// @group    main
+/// @author   iB aka Felix Victor
+////
 
 $background-colour: $primary-500;
 $paddingHalf: map-get($spacers, 2);
 $paddingThird: map-get($spacers, 1);
 
-//////////////////////////////////////////
 // opentype
 
 body {
@@ -36,8 +37,6 @@ table,
     font-size: smaller;
     color: $primary-700;
 }
-
-//////////////////////////////////////////
 
 #na-svg {
     background-color: $background-colour;
@@ -633,56 +632,6 @@ text {
     }
 }
 
-.rs-tooltip-text {
-    font-family: inherit;
-    font-size: 1.8em;
-    color: $primary-700;
-}
-
-.rs-handle {
-    position: relative;
-    width: 48px !important;
-    background: $primary-900;
-    border: 3px solid $primary-400;
-    border-radius: 0;
-
-    &::after,
-    &::before {
-        position: absolute;
-        top: 50%;
-        left: 100%;
-        width: 0;
-        height: 0;
-        pointer-events: none;
-        content: " ";
-        border: solid transparent;
-    }
-
-    &::after {
-        margin-top: -20px;
-        border-width: 20px;
-        border-left-color: $primary-900;
-    }
-
-    &::before {
-        margin-top: -24px;
-        border-width: 24px;
-        border-left-color: $primary-400;
-    }
-}
-
-.rs-control .rs-path-color {
-    background-color: $primary-300;
-}
-
-.rs-control .rs-handle {
-    background-color: $primary-900;
-}
-
-.rs-border {
-    border-color: $primary-400;
-}
-
 .tooltip {
     font-size: smaller;
     text-align: left;
@@ -722,7 +671,6 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
 
 @include flags;
 
-//////////////////////////////////////////
 // contrast function
 // https://lnikki.la/articles/sass-better-colour-based-on-brightness/
 
