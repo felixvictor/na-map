@@ -52,9 +52,8 @@ function main() {
      * @returns {string} - server name
      */
     function getServerName() {
-        let r = Cookies.get(serverNameCookieName);
         // Use default value if cookie is not stored
-        r = typeof r !== "undefined" ? r : serverNameDefault;
+        const r = Cookies.get(serverNameCookieName) || serverNameDefault;
         $(`#server-name-${r}`).prop("checked", true);
         return r;
     }
