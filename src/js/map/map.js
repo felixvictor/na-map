@@ -434,8 +434,8 @@ class Map {
             y0 = 0,
             x1 = this.width,
             y1 = this.height,
-            width = Math.floor(maxCoordScaled < this.width ? this.width - 2 * tx : maxCoordScaled),
-            height = Math.floor(maxCoordScaled < this.height ? this.height - 2 * ty : maxCoordScaled),
+            width = Math.floor(maxCoordScaled < x1 ? x1 - 2 * tx : maxCoordScaled),
+            height = Math.floor(maxCoordScaled < y1 ? y1 - 2 * ty : maxCoordScaled),
             scale = Math.log2(tk);
 
         const tileZoom = Math.min(maxTileZoom, Math.ceil(Math.log2(Math.max(width, height))) - log2tileSize),
@@ -444,9 +444,9 @@ class Map {
             tileSizeScaled = this._tileSize * k;
 
         const // crop right side
-            dx = maxCoordScaled < this.width ? tx : 0,
+            dx = maxCoordScaled < x1 ? tx : 0,
             // crop bottom
-            dy = maxCoordScaled < this.height ? ty : 0,
+            dy = maxCoordScaled < y1 ? ty : 0,
             cols = d3Range(
                 Math.max(0, Math.floor((x0 - tx) / tileSizeScaled)),
                 Math.max(0, Math.min(Math.ceil((x1 - tx - dx) / tileSizeScaled), 2 ** tileZoom))
@@ -486,8 +486,8 @@ class Map {
             .attr("xlink:href", d => `images/map/${d.z}/${d.row}/${d.col}.jpg`)
             .attr("x", d => d.col * this._tileSize)
             .attr("y", d => d.row * this._tileSize)
-            .attr("width", this._tileSize)
-            .attr("height", this._tileSize);
+            .attr("width", this._tileSize + 1)
+            .attr("height", this._tileSize + 1);
     }
 
     _clearMap() {
