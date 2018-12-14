@@ -14,16 +14,8 @@ import { zoom as d3Zoom, zoomIdentity as d3ZoomIdentity, zoomTransform as d3Zoom
 import { feature as topojsonFeature } from "topojson-client";
 import Cookies from "js-cookie";
 
-import moment from "moment";
 import { appDescription, appTitle, appVersion, defaultFontSize, insertBaseModal } from "../common";
-import {
-    nearestPow2,
-    checkFetchStatus,
-    getJsonFromFetch,
-    putFetchError,
-    roundToThousands,
-    formatPercent
-} from "../util";
+import { nearestPow2, checkFetchStatus, getJsonFromFetch, putFetchError, roundToThousands } from "../util";
 
 import { registerEvent } from "../analytics";
 
@@ -194,10 +186,8 @@ class Map {
      * @private
      */
     _getDoubleClickAction() {
-        let r = Cookies.get(this._doubleClickActionCookieName);
         // Use default value if cookie is not stored
-        r = typeof r !== "undefined" ? r : this._doubleClickActionDefault;
-        return r;
+        return Cookies.get(this._doubleClickActionCookieName) || this._doubleClickActionDefault;
     }
 
     /**
@@ -206,10 +196,8 @@ class Map {
      * @private
      */
     _getShowLayer() {
-        let r = Cookies.get(this._showLayerCookieName);
         // Use default value if cookie is not stored
-        r = typeof r !== "undefined" ? r : this._showLayerDefault;
-        return r;
+        return Cookies.get(this._showLayerCookieName) || this._showLayerDefault;
     }
 
     _setupData(data) {
