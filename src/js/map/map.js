@@ -400,14 +400,12 @@ class Map {
 
     _showLayerSelected() {
         this._showLayer = $("input[name='showLayer']:checked").val();
+        this._grid.show = this._showLayer === "grid";
         this._storeShowLayerSetting();
         this._refreshLayer();
     }
 
     _refreshLayer() {
-        const showGrid = this._showLayer === "grid";
-
-        this._grid.show = showGrid;
         this._grid.update();
     }
 
