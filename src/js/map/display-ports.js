@@ -102,9 +102,8 @@ export default class DisplayPorts {
      * @private
      */
     _getShowRadiusSetting() {
-        let r = Cookies.get(this._showRadiusCookieName);
         // Use default value if cookie is not stored
-        r = typeof r !== "undefined" ? r : this._showRadiusDefault;
+        const r = Cookies.get(this._showRadiusCookieName) || this._showRadiusDefault;
         $(`#show-radius-${r}`).prop("checked", true);
         return r;
     }
