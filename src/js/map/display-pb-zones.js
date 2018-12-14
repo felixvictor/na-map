@@ -74,9 +74,8 @@ export default class DisplayPbZones {
      * @private
      */
     _getShowPBSetting() {
-        let r = Cookies.get(this._showPBCookieName);
         // Use default value if cookie is not stored
-        r = typeof r !== "undefined" ? r : this._showPBDefault;
+        const r = Cookies.get(this._showPBCookieName) || this._showPBDefault;
         $(`#show-pb-${r}`).prop("checked", true);
         return r;
     }
