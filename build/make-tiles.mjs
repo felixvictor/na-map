@@ -43,4 +43,7 @@ sharp(inFilename)
                 }
             }
         )
-    );
+    )
+    .catch(error => {
+        throw new Error(error);
+    });
