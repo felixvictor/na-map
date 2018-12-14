@@ -32,11 +32,11 @@ export default class DisplayGrid {
         this._map = map;
 
         /**
-         * Show status (grid shown by default)
+         * Show status
          * @type {Boolean}
          * @private
          */
-        this._isShown = true;
+        this._isShown = this._map._showLayer === "grid";
 
         /**
          * Minimum world coordinate
