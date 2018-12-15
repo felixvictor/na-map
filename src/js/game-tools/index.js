@@ -19,8 +19,6 @@ import ListRecipes from "./list-recipes";
 import ListWoods from "./list-woods";
 import { checkFetchStatus, getJsonFromFetch, putFetchError } from "../util";
 
-let map;
-
 /**
  * Data directory
  * @type {string}
@@ -57,7 +55,7 @@ const dataSources = [
     }
 ];
 
-function setupData(data) {
+function setupData(data, map) {
     const cannonData = JSON.parse(JSON.stringify(data.cannons));
     const cannonList = new ListCannons(cannonData);
 
@@ -76,9 +74,14 @@ function setupData(data) {
 
     const buildingData = JSON.parse(JSON.stringify(data.buildings));
     const buildingList = new ListBuildings(buildingData);
+
+    console.log("init map", map);
+    const shipCompare = new CompareShips(map._shipData, map._woodData);
+    const woodCompare = new CompareWoods(map._woodData, "wood");
+    const woodList = new ListWoods(map._woodData);
 }
 
-function readData() {
+function readData(map) {
     const jsonData = [];
     const fileData = {};
 
@@ -93,18 +96,13 @@ function readData() {
             values.forEach((value, i) => {
                 fileData[dataSources[i].name] = value;
             });
-            setupData(fileData);
+            setupData(fileData, map);
         })
         .catch(putFetchError);
 }
 
 function init(mapInstance) {
-    map = mapInstance;
-    readData();
-    console.log("init map", map);
-    const shipCompare = new CompareShips(map._shipData, map._woodData);
-    const woodCompare = new CompareWoods(map._woodData, "wood");
-    const woodList = new ListWoods(map._woodData);
+    readData(mapInstance);
 }
 
 // eslint-disable-next-line import/prefer-default-export
