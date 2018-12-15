@@ -88,7 +88,7 @@ function readData() {
 
     console.log("dataSources", dataSources);
     dataSources.forEach((datum, i) => {
-        console.log("dataSources.forEach", datum, i);
+        console.log("dataSources.forEach", datum, i, `${dataDir}/${datum.fileName}`);
         jsonData[i] = fetch(`${dataDir}/${datum.fileName}`)
             .then(checkFetchStatus)
             .then(getJsonFromFetch);
@@ -96,7 +96,9 @@ function readData() {
 
     Promise.all(jsonData)
         .then(values => {
+            console.log("promise values", values);
             values.forEach((value, i) => {
+                console.log(value, i);
                 fileData[dataSources[i].name] = values[i];
             });
 
