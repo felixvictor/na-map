@@ -50,4 +50,19 @@ export const initAnalytics = () => {
     gtag("config", GA_TRACKING_ID, {
         anonymize_ip: true
     });
+    window.onerror = (message, file, line, column) => {
+        const link = href => {
+            const a = window.document.createElement("a");
+            a.href = href;
+            return a;
+        };
+        const host = link(file).hostname;
+        gtag("event", "click", {
+            event_category: `${
+                host === window.location.hostname || host === undefined || host === "" ? "" : "external "
+            }error`,
+            value: `${file} LINE: ${line}${column ? ` COLUMN: ${column}` : ""}`.trim(),
+            event_action: message
+        });
+    };
 };
