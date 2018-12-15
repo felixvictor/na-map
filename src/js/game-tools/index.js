@@ -59,6 +59,7 @@ const dataSources = [
 
 function setupData(data) {
     console.log("data", data);
+    console.log(map._shipData, map._woodData);
     const shipCompare = new CompareShips(map._shipData, map._woodData);
     const woodCompare = new CompareWoods(map._woodData, "wood");
     const woodList = new ListWoods(map._woodData);
@@ -87,9 +88,7 @@ function readData() {
     const jsonData = [];
     const fileData = {};
 
-    console.log("dataSources", dataSources);
     dataSources.forEach((datum, i) => {
-        console.log("dataSources.forEach", datum, i, `${dataDir}/${datum.fileName}`);
         jsonData[i] = fetch(`${dataDir}/${datum.fileName}`)
             .then(checkFetchStatus)
             .then(getJsonFromFetch);
@@ -97,13 +96,9 @@ function readData() {
 
     Promise.all(jsonData)
         .then(values => {
-            console.log("promise values", values);
             values.forEach((value, i) => {
-                console.log(value, i);
                 fileData[dataSources[i].name] = value;
             });
-            console.log("fileData", fileData);
-
             setupData(fileData);
         })
         .catch(putFetchError);
