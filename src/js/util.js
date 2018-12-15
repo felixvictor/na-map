@@ -301,7 +301,7 @@ export const getTextFromFetch = response => response.text();
  * @return {void}
  */
 export const putFetchError = error => {
-    console.error("Request failed -->", error);
+    console.error("Fetch request failed -->", error);
 };
 
 /**
