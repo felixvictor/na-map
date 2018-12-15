@@ -86,7 +86,9 @@ function readData() {
     const jsonData = [];
     const fileData = {};
 
+    console.log("dataSources", dataSources);
     dataSources.forEach((datum, i) => {
+        console.log("dataSources.forEach", datum, i);
         jsonData[i] = fetch(`${dataDir}/${datum.fileName}`)
             .then(checkFetchStatus)
             .then(getJsonFromFetch);
