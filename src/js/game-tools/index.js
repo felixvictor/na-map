@@ -58,11 +58,6 @@ const dataSources = [
 ];
 
 function setupData(data) {
-    console.log("setupData map", map);
-    const shipCompare = new CompareShips(map._shipData, map._woodData);
-    const woodCompare = new CompareWoods(map._woodData, "wood");
-    const woodList = new ListWoods(map._woodData);
-
     const cannonData = JSON.parse(JSON.stringify(data.cannons));
     const cannonList = new ListCannons(cannonData);
 
@@ -106,6 +101,10 @@ function readData() {
 function init(mapInstance) {
     map = mapInstance;
     readData();
+    console.log("init map", map);
+    const shipCompare = new CompareShips(map._shipData, map._woodData);
+    const woodCompare = new CompareWoods(map._woodData, "wood");
+    const woodList = new ListWoods(map._woodData);
 }
 
 // eslint-disable-next-line import/prefer-default-export
