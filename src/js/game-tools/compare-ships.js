@@ -884,7 +884,7 @@ export default class CompareShips {
 
         this._ships = { Base: {}, C1: {}, C2: {} };
 
-        const theoreticalMinSpeed = d3Min(this._shipData, ship => {console.log("ship", ship.name, ship.speed.min); return ship.speed.min}) * 1.2,
+        const theoreticalMinSpeed = d3Min(this._shipData, ship => ship.speed.min) * 1.2,
             theoreticalMaxSpeed = 15.5;
         this._minSpeed = theoreticalMinSpeed;
         this._maxSpeed = theoreticalMaxSpeed;
