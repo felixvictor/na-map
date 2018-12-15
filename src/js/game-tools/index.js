@@ -56,6 +56,11 @@ const dataSources = [
 ];
 
 function setupData(data, map) {
+    console.log("setupData map", map);
+    const shipCompare = new CompareShips(map._shipData, map._woodData);
+    const woodCompare = new CompareWoods(map._woodData, "wood");
+    const woodList = new ListWoods(map._woodData);
+
     const cannonData = JSON.parse(JSON.stringify(data.cannons));
     const cannonList = new ListCannons(cannonData);
 
@@ -74,11 +79,6 @@ function setupData(data, map) {
 
     const buildingData = JSON.parse(JSON.stringify(data.buildings));
     const buildingList = new ListBuildings(buildingData);
-
-    console.log("setupData map", map);
-    const shipCompare = new CompareShips(map._shipData, map._woodData);
-    const woodCompare = new CompareWoods(map._woodData, "wood");
-    const woodList = new ListWoods(map._woodData);
 }
 
 function readData(map) {
