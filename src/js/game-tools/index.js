@@ -75,7 +75,7 @@ function setupData(data, map) {
     const buildingData = JSON.parse(JSON.stringify(data.buildings));
     const buildingList = new ListBuildings(buildingData);
 
-    console.log("init map", map);
+    console.log("setupData map", map);
     const shipCompare = new CompareShips(map._shipData, map._woodData);
     const woodCompare = new CompareWoods(map._woodData, "wood");
     const woodList = new ListWoods(map._woodData);
@@ -96,12 +96,14 @@ function readData(map) {
             values.forEach((value, i) => {
                 fileData[dataSources[i].name] = value;
             });
+            console.log("readData map", map);
             setupData(fileData, map);
         })
         .catch(putFetchError);
 }
 
 function init(mapInstance) {
+    console.log("init map", mapInstance);
     readData(mapInstance);
 }
 
