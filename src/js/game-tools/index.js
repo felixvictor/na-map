@@ -105,7 +105,6 @@ function readData() {
 
 function init(mapInstance) {
     map = mapInstance;
-    console.log("init map", map);
     readData();
 }
 

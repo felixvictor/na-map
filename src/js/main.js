@@ -119,7 +119,6 @@ function main() {
         try {
             const { Map } = await import(/* webpackPreload: true, webpackChunkName: "map" */ "./map/map");
             map = new Map(serverName);
-            console.log("init", map);
         } catch (error) {
             throw new Error(error);
         }
@@ -130,7 +129,6 @@ function main() {
 
         try {
             gameTools = await import(/* webpackPrefetch: true, webpackChunkName: "game-tools" */ "./game-tools");
-            console.log("import gametools", map);
             gameTools.init(map);
         } catch (error) {
             throw new Error(error);
