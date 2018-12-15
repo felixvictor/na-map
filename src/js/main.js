@@ -130,11 +130,11 @@ function main() {
 
         try {
             gameTools = await import(/* webpackPrefetch: true, webpackChunkName: "game-tools" */ "./game-tools");
+            console.log("import gametools", map);
+            gameTools.init(map);
         } catch (error) {
             throw new Error(error);
         }
-        console.log("import gametools", map);
-        gameTools.init(map);
     };
 
     fontawesome.library.add(
