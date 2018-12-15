@@ -3,6 +3,7 @@
 const webpack = require("webpack");
 
 const path = require("path");
+
 const // { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer"),
     CleanWebpackPlugin = require("clean-webpack-plugin"),
     CopyPlugin = require("copy-webpack-plugin"),
@@ -16,13 +17,15 @@ const // { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer"),
     WebpackPwaManifest = require("webpack-pwa-manifest");
 const PACKAGE = require("./package.json");
 
-const libraryName = PACKAGE.name,
-    gtagLink = "https://www.googletagmanager.com/gtag/js?id=UA-109520372-1",
-    { TARGET } = process.env,
-    isProd = process.env.NODE_ENV === "production",
-    description =
-        "Yet another map with in-game map, F11 coordinates, resources, ship and wood comparison. Port data is updated constantly from twitter and daily after maintenance.",
-    sitemapPaths = ["/fonts/", "/icons", "/images"];
+const gtagLink = "https://www.googletagmanager.com/gtag/js?id=UA-109520372-1";
+const libraryName = PACKAGE.name;
+const { TARGET } = process.env;
+const target = `https://${TARGET}.netlify.com/`;
+const isProd = process.env.NODE_ENV === "production";
+
+const description =
+    "Yet another map with in-game map, F11 coordinates, resources, ship and wood comparison. Port data is updated constantly from twitter and daily after maintenance.";
+const sitemapPaths = ["/fonts/", "/icons", "/images"];
 const backgroundColour = "#c9c0ab";
 const themeColour = "#767a49";
 
@@ -153,7 +156,10 @@ const svgoOpt = {
 };
 
 const htmlOpt = {
-    brand: "images/icons/icon_32x32.png",
+    iconSmall: "images/icons/icon_32x32.png",
+    iconLarge: "images/icons/icon_1024x1024.png",
+    canonicalUrl: TARGET === "na-map" ? target : "",
+    name: libraryName,
     description,
     gtag: gtagLink,
     hash: false,
@@ -263,19 +269,19 @@ const config = {
         // Do not include all moment locale files, certain locales are loaded by import
         new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
         new CopyPlugin([
-            { from: "google979f2cf3bed204d6.html", to: "google979f2cf3bed204d6.html", toType: "file" },
-            { from: "images/map", to: `${outputPath}/images/map` },
+            { from: "../netlify.toml" },
             { from: "gen/*.json", to: `${outputPath}/data`, flatten: true },
             { from: "gen/*.xlsx", flatten: true },
-            { from: "../netlify.toml" },
-            { from: "images/icons/favicon.ico", flatten: true }
+            { from: "google979f2cf3bed204d6.html", to: "google979f2cf3bed204d6.html", toType: "file" },
+            { from: "images/icons/favicon.ico", flatten: true },
+            { from: "images/map", to: `${outputPath}/images/map` }
         ]),
         new HtmlPlugin(htmlOpt),
         new PreloadWebpackPlugin({
             include: "allAssets",
             fileWhitelist: [/\.woff2$/]
         }),
-        new SitemapPlugin(`https://${TARGET}.netlify.com/`, sitemapPaths, { skipGzip: false }),
+        new SitemapPlugin(target, sitemapPaths, { skipGzip: false }),
         new SriPlugin({
             hashFuncNames: ["sha256", "sha384"],
             enabled: isProd
