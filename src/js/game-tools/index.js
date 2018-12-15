@@ -58,6 +58,7 @@ const dataSources = [
 ];
 
 function setupData(data) {
+    console.log("data", data);
     const shipCompare = new CompareShips(map._shipData, map._woodData);
     const woodCompare = new CompareWoods(map._woodData, "wood");
     const woodList = new ListWoods(map._woodData);
@@ -99,8 +100,9 @@ function readData() {
             console.log("promise values", values);
             values.forEach((value, i) => {
                 console.log(value, i);
-                fileData[dataSources[i].name] = values[i];
+                fileData[dataSources[i].name] = value;
             });
+            console.log("fileData", fileData);
 
             setupData(fileData);
         })

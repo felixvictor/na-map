@@ -284,7 +284,7 @@ class Map {
         Promise.all(jsonData)
             .then(values => {
                 values.forEach((value, i) => {
-                    readData[this._dataSources[i].name] = values[i];
+                    readData[this._dataSources[i].name] = value;
                 });
 
                 this._setupData(readData);
