@@ -56,7 +56,8 @@ const dataSources = [
 ];
 
 function setupData(data, map) {
-    console.log("setupData map", map, map._shipData, map._woodData);
+    console.log("setupData map", map._shipData, map._woodData);
+    debugger;
     const shipCompare = new CompareShips(map._shipData, map._woodData);
     const woodCompare = new CompareWoods(map._woodData, "wood");
     const woodList = new ListWoods(map._woodData);
