@@ -119,6 +119,9 @@ function main() {
         try {
             const { Map } = await import(/* webpackPreload: true, webpackChunkName: "map" */ "./map/map");
             map = new Map(serverName);
+            if (!map._serverName) {
+                throw new Error("no map!");
+            }
             console.log("import map", map);
         } catch (error) {
             throw new Error(error);
