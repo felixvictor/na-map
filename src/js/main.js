@@ -68,29 +68,29 @@ function main() {
      * Store server name in cookie
      * @return {void}
      */
-    function storeServerName() {
+    const storeServerName = () => {
         if (serverName !== serverNameDefault) {
             Cookies.set(serverNameCookieName, serverName);
         } else {
             Cookies.remove(serverNameCookieName);
         }
-    }
+    };
 
     /**
      * Change server name
      * @return {void}
      */
-    function serverNameSelected() {
+    const serverNameSelected = () => {
         serverName = $("input[name='serverName']:checked").val();
         storeServerName();
         document.location.reload();
-    }
+    };
 
     /**
      * Setup listeners
      * @return {void}
      */
-    function setupListener() {
+    const setupListener = () => {
         $("#server-name").change(() => serverNameSelected());
 
         // https://stackoverflow.com/questions/44467377/bootstrap-4-multilevel-dropdown-inside-navigation/48953349#48953349
@@ -107,6 +107,34 @@ function main() {
                 .not(".inner")
                 .removeClass("show");
         });
+    };
+
+    /**
+     * Load initial imports
+     * @return {Promise<void>} Return
+     */
+    async function initLoad() {
+        let map;
+
+        try {
+            const { Map } = await import(/* webpackPreload: true, webpackChunkName: "map" */ "./map/map");
+            map = new Map(serverName);
+            console.log("import map", map);
+        } catch (error) {
+            throw new Error(error);
+        }
+
+        window.onresize = () => {
+            map.resize();
+        };
+
+        try {
+            const gameTools = await import(/* webpackPrefetch: true, webpackChunkName: "game-tools" */ "./game-tools");
+            console.log("import gametools", map);
+            gameTools.init(map);
+        } catch (error) {
+            throw new Error(error);
+        }
     }
 
     fontawesome.library.add(
@@ -132,23 +160,7 @@ function main() {
     };
 
     setupListener();
-
-    import(/* webpackPreload: true, webpackChunkName: "map" */ "./map/map")
-        .then(({ Map }) => new Map(serverName))
-        .then(map => {
-            window.onresize = () => {
-                map.resize();
-            };
-            return map;
-        })
-        .then(map => {
-            import(/* webpackPrefetch: true, webpackChunkName: "game-tools" */ "./game-tools").then(gameTools => {
-                gameTools.init(map);
-            });
-        })
-        .catch(error => {
-            console.error(error);
-        });
+    initLoad();
 }
 
 main();
