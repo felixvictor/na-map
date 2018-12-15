@@ -867,8 +867,8 @@ export default class CompareShips {
      * @param {string} baseId - Base id (default "ship-compare")
      */
     constructor(shipData, woodData, baseId = "ship-compare") {
-        this._shipData = shipData;
 console.log("constructor",shipData, woodData);
+        this._shipData = shipData;
         this._baseId = baseId;
         this._baseName = "Compare ships";
         this._buttonId = `button-${this._baseId}`;
