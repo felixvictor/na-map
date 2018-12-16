@@ -45,5 +45,5 @@
           transform="translate(-1 0)" fill="#fff"/>
     <path d="M164.6,214.09l4-8.11-4.13-8,7.64,2.1,5.05-7.22,0.7,9.41,7.26,3.57-7.21,3.71L177.38,219l-5.17-7.12Z"
           transform="translate(-1 0)" fill="#fff"/>
-    <rect width="640" height="480" fill="#fff" fill-opacity="0"/>
+    <rect width="640" height="480" fill="#fff" fill-opacity=".7"/>
 </svg>
