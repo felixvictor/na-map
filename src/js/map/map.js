@@ -304,27 +304,24 @@ class Map {
             .on("click", stopProp, true)
             .on("dblclick", (d, i, nodes) => this._doDoubleClickAction(nodes[i]));
 
-        $("#reset").on("click", () => {
-            this._clearMap();
-        });
-
-        $("#propertyDropdown").on("click", () => {
+        document.getElementById("propertyDropdown").addEventListener("click", () => {
             registerEvent("Menu", "Select port on property");
         });
-        $("#settingsDropdown").on("click", () => {
+        document.getElementById("settingsDropdown").addEventListener("click", () => {
             registerEvent("Menu", "Settings");
         });
-        $("#button-download-pb-calc").on("click", () => {
+        document.getElementById("button-download-pb-calc").addEventListener("click", () => {
             registerEvent("Tools", "Download pb calculator");
         });
-
-        $("#doubleClick-action").change(() => this._doubleClickSelected());
-
-        $("#show-layer").change(() => this._showLayerSelected());
-
-        $("#about").on("click", () => {
+        document.getElementById("reset").addEventListener("click", () => {
+            this._clearMap();
+        });
+        document.getElementById("about").addEventListener("click", () => {
             this._showAbout();
         });
+
+        document.getElementById("doubleClick-action").addEventListener("change", () => this._doubleClickSelected());
+        document.getElementById("show-layer").addEventListener("change", () => this._showLayerSelected());
     }
 
     _setupScale() {
@@ -362,8 +359,8 @@ class Map {
     }
 
     _setupProps() {
-        $(`#doubleClick-action-${this._doubleClickAction}`).prop("checked", true);
-        $(`#show-layer-${this._showLayer}`).prop("checked", true);
+        document.getElementById(`doubleClick-action-${this._doubleClickAction}`).checked = true;
+        document.getElementById(`show-layer-${this._showLayer}`).checked = true;
     }
 
     /**
@@ -380,7 +377,7 @@ class Map {
     }
 
     _doubleClickSelected() {
-        this._doubleClickAction = $("input[name='doubleClickAction']:checked").val();
+        this._doubleClickAction = document.querySelector('input[name="doubleClickAction"]:checked').value;
         this._storeDoubleClickActionSetting();
         this._clearMap();
     }
@@ -399,7 +396,7 @@ class Map {
     }
 
     _showLayerSelected() {
-        this._showLayer = $("input[name='showLayer']:checked").val();
+        this._showLayer = document.querySelector("input[name='showLayer']:checked").value;
         this._grid.show = this._showLayer === "grid";
         this._storeShowLayerSetting();
         this._refreshLayer();
@@ -496,13 +493,13 @@ class Map {
             );
         }
 
-        const id = "modal-about";
+        const modalId = "modal-about";
         // If the modal has no content yet, insert it
-        if (!document.getElementById(id)) {
-            initModal(id);
+        if (!$(`#${modalId}`)) {
+            initModal(modalId);
         }
         // Show modal
-        $(`#${id}`).modal("show");
+        $(`#${modalId}`).modal("show");
     }
 
     _doDoubleClickAction(self) {
