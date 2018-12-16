@@ -110,11 +110,11 @@ function main() {
     };
 
     /**
-     * Load map and game tools
+     * Load map and set resize event
      * @return {void}
      */
-    const loadInit = async () => {
-        let map, gameTools;
+    const loadMap = async () => {
+        let map;
 
         try {
             const { Map } = await import(/* webpackChunkName: "map" */ "./map/map");
@@ -126,10 +126,16 @@ function main() {
         window.onresize = () => {
             map.resize();
         };
+    };
 
+    /**
+     * Load game tools
+     * @return {void}
+     */
+    const loadGameTools = async () => {
         try {
-            gameTools = await import(/* webpackChunkName: "game-tools" */ "./game-tools");
-            gameTools.init(map);
+            const gameTools = await import(/* webpackChunkName: "game-tools" */ "./game-tools");
+            gameTools.init();
         } catch (error) {
             throw new Error(error);
         }
@@ -158,7 +164,8 @@ function main() {
     };
 
     setupListener();
-    loadInit();
+    loadMap();
+    loadGameTools();
 }
 
 main();
