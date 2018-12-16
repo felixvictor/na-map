@@ -120,3 +120,7 @@ $badge-padding-y: 0.2rem;
 // Use a higher than normal value to ensure completely rounded edges when
 // customizing padding or font-size on labels.
 //$badge-pill-border-radius:          10rem !default;
+
+// Work-around to avoid mangling from postcss-crass
+$custom-radio-indicator-icon-checked: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9Ii00IC00IDggOCI+PGNpcmNsZSByPSIzIiBmaWxsPSIjZjlmN2Y3Ii8+PC9zdmc+);
+
