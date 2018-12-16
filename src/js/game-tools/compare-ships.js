@@ -867,7 +867,6 @@ export default class CompareShips {
      * @param {string} baseId - Base id (default "ship-compare")
      */
     constructor(shipData, woodData, baseId = "ship-compare") {
-console.log("constructor", shipData, woodData);
         this._shipData = shipData;
         this._baseId = baseId;
         this._baseName = "Compare ships";
@@ -888,7 +887,6 @@ console.log("constructor", shipData, woodData);
             theoreticalMaxSpeed = 15.5;
         this._minSpeed = theoreticalMinSpeed;
         this._maxSpeed = theoreticalMaxSpeed;
-console.log(this._minSpeed, this._maxSpeed);
         this._colorScale = d3ScaleLinear()
             .domain([this._minSpeed, 0, 12, this._maxSpeed])
             .range(["#a62e39", "#fbf8f5", "#419f57", "#58bb6f"])
