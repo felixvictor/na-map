@@ -91,18 +91,6 @@ text,
     }
 }
 
-// port icons (available to nation)
-pattern .nation {
-    fill: $primary-700;
-    fill-opacity: 0.3;
-}
-
-// port icons (available to all)
-pattern .all {
-    fill: $primary-300;
-    fill-opacity: 0.7;
-}
-
 .axis {
     line {
         stroke: $primary-600;
@@ -659,7 +647,21 @@ text {
 }
 
 $flags-dir: "~Icons";
-$flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", "PL";
+$flags: "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "RU", "DE", "PL";
+
+@mixin flags-norm {
+    @each $flag in $flags {
+        .flag-icon.#{$flag} {
+            background-image: url("#{$flags-dir}/#{$flag}.svg");
+        }
+        .flag-icon.#{$flag}a {
+            background-image: url("#{$flags-dir}/#{$flag}a.svg");
+        }
+    }
+}
+@include flags-norm;
+
+$flags: "NT", "FT";
 
 @mixin flags {
     @each $flag in $flags {
@@ -668,7 +670,6 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
         }
     }
 }
-
 @include flags;
 
 // contrast function
