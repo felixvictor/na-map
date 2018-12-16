@@ -93,7 +93,7 @@ export default class DisplayPorts {
     }
 
     _setupListener() {
-        $("#show-radius").change(() => this._showRadiusSelected());
+        document.getElementById("show-radius").addEventListener("change", () => this._showRadiusSelected());
     }
 
     /**
@@ -122,7 +122,7 @@ export default class DisplayPorts {
     }
 
     _showRadiusSelected() {
-        this._showRadius = $("input[name='showRadius']:checked").val();
+        this._showRadius = document.querySelector("input[name='showRadius']:checked").value;
         this._storeShowRadiusSetting();
         this.update();
     }
@@ -921,7 +921,7 @@ export default class DisplayPorts {
 
     set showRadiusSetting(showRadius) {
         this._showRadius = showRadius;
-        $(`#show-radius-${showRadius}`).prop("checked", true);
+        document.getElementById(`show-radius-${showRadius}`).checked = true;
         this._storeShowRadiusSetting();
     }
 
