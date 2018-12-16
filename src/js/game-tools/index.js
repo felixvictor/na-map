@@ -30,6 +30,14 @@ const dataDir = "data";
  */
 const dataSources = [
     {
+        fileName: "ships.json",
+        name: "ships"
+    },
+    {
+        fileName: "woods.json",
+        name: "woods"
+    },
+    {
         fileName: "cannons.json",
         name: "cannons"
     },
@@ -55,12 +63,15 @@ const dataSources = [
     }
 ];
 
-function setupData(data, map) {
-    console.log("setupData map", map._shipData, map._woodData);
-    debugger;
-    const shipCompare = new CompareShips(map._shipData, map._woodData);
-    const woodCompare = new CompareWoods(map._woodData, "wood");
-    const woodList = new ListWoods(map._woodData);
+/**
+ * Setup all game tool modules
+ * @param {object} data - Data
+ * @return {void}
+ */
+const setupData = data => {
+    const shipCompare = new CompareShips(data.ships.shipData, data.woods);
+    const woodCompare = new CompareWoods(data.woods, "wood");
+    const woodList = new ListWoods(data.woods);
 
     const cannonData = JSON.parse(JSON.stringify(data.cannons));
     const cannonList = new ListCannons(cannonData);
@@ -80,9 +91,13 @@ function setupData(data, map) {
 
     const buildingData = JSON.parse(JSON.stringify(data.buildings));
     const buildingList = new ListBuildings(buildingData);
-}
+};
 
-function readData(map) {
+/**
+ * Fetch json data
+ * @return {void}
+ */
+const readData = () => {
     const jsonData = [];
     const fileData = {};
 
@@ -97,16 +112,18 @@ function readData(map) {
             values.forEach((value, i) => {
                 fileData[dataSources[i].name] = value;
             });
-            console.log("readData map", map);
-            setupData(fileData, map);
+            setupData(fileData);
         })
         .catch(putFetchError);
-}
+};
 
-function init(mapInstance) {
-    console.log("init map", mapInstance);
-    readData(mapInstance);
-}
+/**
+ * Init
+ * @return {void}
+ */
+const init = () => {
+    readData();
+};
 
 // eslint-disable-next-line import/prefer-default-export
 export { init };
