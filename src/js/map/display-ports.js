@@ -317,44 +317,6 @@ export default class DisplayPorts {
     _setupFlags() {
         const svgDef = d3Select("#na-svg defs");
 
-        nations
-            .map(d => d.short)
-            .forEach(nation => {
-                const pattern = svgDef
-                    .append("pattern")
-                    .attr("id", nation)
-                    .attr("width", "133%")
-                    .attr("height", "100%")
-                    .attr("viewBox", `6 6 ${this._iconSize} ${this._iconSize * 0.75}`);
-                pattern
-                    .append("image")
-                    .attr("height", this._iconSize)
-                    .attr("width", this._iconSize)
-                    .attr("href", `icons/${nation}.svg`);
-                pattern
-                    .append("rect")
-                    .attr("height", this._iconSize)
-                    .attr("width", this._iconSize)
-                    .attr("class", "nation");
-
-                const patternA = svgDef
-                    .append("pattern")
-                    .attr("id", `${nation}a`)
-                    .attr("width", "133%")
-                    .attr("height", "100%")
-                    .attr("viewBox", `6 6 ${this._iconSize} ${this._iconSize * 0.75}`);
-                patternA
-                    .append("image")
-                    .attr("height", this._iconSize)
-                    .attr("width", this._iconSize)
-                    .attr("href", `icons/${nation}.svg`);
-                patternA
-                    .append("rect")
-                    .attr("height", this._iconSize)
-                    .attr("width", this._iconSize)
-                    .attr("class", "all");
-            });
-
         // create filter with id #drop-shadow
         const filter = svgDef
             .append("filter")
@@ -411,6 +373,13 @@ export default class DisplayPorts {
         feMerge.append("feMergeNode").attr("in", "shadow1");
         feMerge.append("feMergeNode").attr("in", "shadow2");
         feMerge.append("feMergeNode").attr("in", "SourceGraphic");
+
+        const svg = d3Select("#na-svg");
+
+        this._clipPath = svg
+            .append("clipPath")
+            .attr("id", "clipObj")
+            .append("circle");
     }
 
     _getPortName(id) {
@@ -597,11 +566,15 @@ export default class DisplayPorts {
             $(d3Select(nodes[i]).node()).tooltip("dispose");
         };
         const circleScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale);
-        const circleSize = roundToThousands(this._circleSize / circleScale);
+        const circleSize = Math.round(this._circleSize / circleScale) * 2;
         const data = this._portData;
+        this._clipPath
+            .attr("cx", circleSize / 2)
+            .attr("cy", circleSize / 2)
+            .attr("r", circleSize / 2);
 
         // Data join
-        const circleUpdate = this._gIcon.selectAll("circle").data(data, d => d.id);
+        const circleUpdate = this._gIcon.selectAll("image").data(data, d => d.id);
 
         // Remove old circles
         circleUpdate.exit().remove();
@@ -612,18 +585,23 @@ export default class DisplayPorts {
         // Add new circles
         const circleEnter = circleUpdate
             .enter()
-            .append("circle")
-            .attr(
-                "fill",
-                d => `url(#${d.properties.availableForAll ? `${d.properties.nation}a` : d.properties.nation})`
-            )
-            .attr("cx", d => d.geometry.coordinates[0])
-            .attr("cy", d => d.geometry.coordinates[1])
+            .append("image")
+            .attr("xlink:href", d => `icons/${d.properties.nation}${d.properties.availableForAll ? "a" : ""}.svg`)
+            .attr("clip-path", "url(#clipObj)")
             .on("click", (d, i, nodes) => this._showDetails(d, i, nodes))
             .on("mouseout", hideDetails);
 
         // Apply to both old and new
-        circleUpdate.merge(circleEnter).attr("r", circleSize);
+        circleUpdate
+            .merge(circleEnter)
+            .attr("width", circleSize)
+            .attr("height", circleSize)
+            .attr(
+                "transform",
+                d =>
+                    `translate(${d.geometry.coordinates[0] - circleSize / 2},${d.geometry.coordinates[1] -
+                        circleSize / 2})`
+            );
     }
 
     _updatePortCircles() {

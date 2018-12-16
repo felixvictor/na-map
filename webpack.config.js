@@ -26,8 +26,11 @@ const isProd = process.env.NODE_ENV === "production";
 const description =
     "Yet another map with in-game map, F11 coordinates, resources, ship and wood comparison. Port data is updated constantly from twitter and daily after maintenance.";
 const sitemapPaths = ["/fonts/", "/icons", "/images"];
-const backgroundColour = "#c9c0ab";
-const themeColour = "#767a49";
+const backgroundColour = "#c9c0ab"; // primary-500
+const themeColour = "#767a49"; // secondary-500
+const primary700 = "#898374";
+const primary200 = "#e3ded3";
+const primary300 = "#dad4c6";
 
 const outputPath = path.resolve(__dirname, "public");
 
@@ -411,6 +414,27 @@ const config = {
                         loader: "image-webpack-loader",
                         options: {
                             svgo: svgoOpt
+                        }
+                    },
+                    {
+                        loader: "string-replace-loader",
+                        options: {
+                            search: 'fill="#fff" fill-opacity="0"/>',
+                            replace: `fill="${primary700}" fill-opacity="0.3"/>`
+                        }
+                    },
+                    {
+                        loader: "string-replace-loader",
+                        options: {
+                            search: 'fill="#fff" fill-opacity="1"/>',
+                            replace: `fill="${primary200}" fill-opacity="1"/>`
+                        }
+                    },
+                    {
+                        loader: "string-replace-loader",
+                        options: {
+                            search: 'fill="#fff" fill-opacity=".7"/>',
+                            replace: `fill="${primary300}" fill-opacity=".7"/>`
                         }
                     }
                 ]
