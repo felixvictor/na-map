@@ -374,9 +374,7 @@ export default class DisplayPorts {
         feMerge.append("feMergeNode").attr("in", "shadow2");
         feMerge.append("feMergeNode").attr("in", "SourceGraphic");
 
-        const svg = d3Select("#na-svg");
-
-        this._clipPath = svg
+        this._clipPath = svgDef
             .append("clipPath")
             .attr("id", "clipObj")
             .append("circle");
@@ -566,12 +564,12 @@ export default class DisplayPorts {
             $(d3Select(nodes[i]).node()).tooltip("dispose");
         };
         const circleScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale);
-        const circleSize = Math.round(this._circleSize / circleScale) * 2;
+        const circleSize = Math.round(this._circleSize / circleScale) * 3;
         const data = this._portData;
         this._clipPath
             .attr("cx", circleSize / 2)
             .attr("cy", circleSize / 2)
-            .attr("r", circleSize / 2);
+            .attr("r", circleSize / 3);
 
         // Data join
         const circleUpdate = this._gIcon.selectAll("image").data(data, d => d.id);
