@@ -357,11 +357,6 @@ table a {
     stroke: $primary-200;
 }
 
-text {
-    fill: $primary-900;
-    // pointer-events: none; // needed? Conflicts with timelines-chart reset zoom
-}
-
 .profile {
     text {
         fill: $primary-900;
@@ -478,6 +473,10 @@ text {
     }
 }
 
+.port-names {
+    fill: $white;
+}
+
 .port-name {
     font-size: large;
     font-style: italic;
@@ -521,21 +520,6 @@ text {
 
 .label-rect {
     fill: transparent;
-}
-
-.voronoi {
-    fill: transparent;
-    stroke: $primary-700;
-    stroke-width: 0.5px;
-
-    path {
-        pointer-events: visibleFill;
-    }
-}
-
-.highlight-voronoi {
-    fill: $primary-400;
-    fill-opacity: 0.5;
 }
 
 .f11,
@@ -734,20 +718,18 @@ $flags: "NT", "FT";
 .region {
     filter: url("#drop-shadow");
 
-    text {
         font-family: LibreCaslonDisplay, -apple-system, blinkmacsystemfont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
             cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", arial, sans-serif;
         opacity: 0.7;
-        fill: $white;
+        fill: $primary-200;
         text-anchor: middle;
-    }
 }
 
-.region text {
+.region  {
     font-size: 240px;
 }
 
-.county text {
+.county {
     font-size: 84px;
 }
 
