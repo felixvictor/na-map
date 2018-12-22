@@ -76,7 +76,6 @@ function common_var () {
     tweets_json="${build_dir}/API/tweets.json"
     last_update_file="${build_dir}/.last-port-update"
     [[ ! -d "${base_dir}/public" ]] && yarn run prod
-    css_file=$(find "${base_dir}/public/" -type f -regextype posix-extended -regex "${base_dir}/public/${module}(\.[[:alnum:]]+)?\.css$")
 
     src_dir="${base_dir}/src"
     gen_dir="${src_dir}/gen"
@@ -200,7 +199,7 @@ function get_port_data () {
             ${command_nodejs} build/convert-ownership.mjs "${api_dir}" "api-${server_names[0]}-Ports" "${ownership_json}" "${nation_file}"
         fi
 
-        ${command_nodejs} build/create-xlsx.mjs "${ship_file}" "${gen_dir}/${server_names[0]}.json" "${css_file}" "${excel_file}"
+        ${command_nodejs} build/create-xlsx.mjs "${ship_file}" "${gen_dir}/${server_names[0]}.json" "${excel_file}"
 
         return 0
     else

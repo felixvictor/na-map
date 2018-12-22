@@ -1,9 +1,12 @@
-// https://github.com/shakacode/react-webpack-rails-tutorial/blob/master/client%2Fwebpack.client.base.config.js
+/**
+ * webpack.config.js
+ */
 
 const webpack = require("webpack");
 
 const path = require("path");
-
+const sass = require("node-sass");
+const parseCss = require("css");
 const // { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer"),
     CleanWebpackPlugin = require("clean-webpack-plugin"),
     CopyPlugin = require("copy-webpack-plugin"),
@@ -26,11 +29,33 @@ const isProd = process.env.NODE_ENV === "production";
 const description =
     "Yet another map with in-game map, F11 coordinates, resources, ship and wood comparison. Port data is updated constantly from twitter and daily after maintenance.";
 const sitemapPaths = ["/fonts/", "/icons", "/images"];
-const backgroundColour = "#c9c0ab"; // primary-500
-const themeColour = "#767a49"; // secondary-500
-const primary700 = "#898374";
-const primary200 = "#e3ded3";
-const primary300 = "#dad4c6";
+
+/** Set colours
+ * @returns {Map} Colours
+ */
+function setColours() {
+    const css = sass
+        .renderSync({
+            file: path.resolve("src", "scss", "pre-compile.scss")
+        })
+        .css.toString();
+    const parsedCss = parseCss.parse(css);
+    return new Map(
+        parsedCss.stylesheet.rules
+            .filter(rule => rule.selectors !== undefined && rule.selectors[0].startsWith(".colour-palette "))
+            .map(rule => {
+                const d = rule.declarations.find(declaration => declaration.property === "background-color");
+                return [rule.selectors[0].replace(".colour-palette .", ""), d ? d.value : ""];
+            })
+    );
+}
+
+const colours = setColours();
+const backgroundColour = colours.get("primary-500");
+const themeColour = colours.get("secondary-500");
+const primary700 = colours.get("primary-700");
+const primary200 = colours.get("primary-200");
+const primary300 = colours.get("primary-300");
 
 const outputPath = path.resolve(__dirname, "public");
 
@@ -181,7 +206,7 @@ const manifestOpt = {
     fingerprints: false,
     icons: [
         {
-            src: path.resolve("src/images/icons/logo.png"),
+            src: path.resolve("src", "images", "icons", "logo.png"),
             sizes: [32, 72, 96, 128, 144, 168, 192, 256, 384, 512, 1024],
             destination: path.join("images", "icons")
         }
