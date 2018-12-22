@@ -2,18 +2,19 @@
 
 // eslint-disable-next-line import/no-extraneous-dependencies
 import Excel4Node from "excel4node";
-// eslint-disable-next-line import/no-extraneous-dependencies
-import { default as readCss } from "read-css";
 
+// eslint-disable-next-line import/no-extraneous-dependencies
+// import { sass.renderSync as sassRenderSync } from "node-sass";
+import sass from "node-sass";
+// eslint-disable-next-line import/no-extraneous-dependencies
+import css from "css";
 import { readJson } from "./common.mjs";
 
 const shipFilename = process.argv[2],
     portFilename = process.argv[3],
-    cssFilename = process.argv[4],
-    outFilename = process.argv[5],
+    outFilename = process.argv[4],
     shipsOrig = readJson(shipFilename).shipData,
-    portData = readJson(portFilename),
-    css = readCss(cssFilename);
+    portData = readJson(portFilename);
 
 let colours;
 
@@ -94,18 +95,22 @@ const swPorts = portData.objects.ports.geometries
     .sort(sortPort);
 
 /** Set colours
- * @returns {Map}
+ * @returns {Map} Colours
  */
 function setColours() {
+    const compiledCss = sass
+        .renderSync({
+            file: "src/scss/pre-compile.scss"
+        })
+        .css.toString();
+    const parsedCss = css.parse(compiledCss);
     return new Map(
-        css.stylesheet.rules
+        parsedCss.stylesheet.rules
             .filter(rule => rule.selectors !== undefined && rule.selectors[0].startsWith(".colour-palette "))
-            .map(rule => [
-                rule.selectors[0].replace(".colour-palette .", ""),
-                rule.declarations
-                    .filter(declaration => declaration.property === "background-color")
-                    .map(declaration => declaration.value.replace("#", ""))[0]
-            ])
+            .map(rule => {
+                const d = rule.declarations.find(declaration => declaration.property === "background-color");
+                return [rule.selectors[0].replace(".colour-palette .", ""), d ? d.value : ""];
+            })
     );
 }
 
