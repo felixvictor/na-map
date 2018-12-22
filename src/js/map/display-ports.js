@@ -699,34 +699,18 @@ export default class DisplayPorts {
     }
 
     _updateTextsX(d, circleSize) {
-        return this._zoomLevel === "pbZone" &&
-            (this._showPBZones === "all" || (this._showPBZones === "single" && d.id === this.currentPort.id))
-            ? d.geometry.coordinates[0] + Math.round(circleSize * 1.2 * Math.cos(degreesToRadians(d.properties.angle)))
-            : d.geometry.coordinates[0];
+        return (
+            d.geometry.coordinates[0] + Math.round(circleSize * 1.2 * Math.cos(degreesToRadians(d.properties.angle)))
+        );
     }
 
     _updateTextsY(d, circleSize, fontSize) {
-        const deltaY = circleSize + fontSize * 1.2;
-
-        if (this._zoomLevel !== "pbZone") {
-            return d.geometry.coordinates[1] + deltaY;
-        }
         const dy = d.properties.angle > 90 && d.properties.angle < 270 ? fontSize : 0;
-        return this._showPBZones === "all" || (this._showPBZones === "single" && d.id === this.currentPort.id)
-            ? d.geometry.coordinates[1] +
-                  Math.round(circleSize * 1.2 * Math.sin(degreesToRadians(d.properties.angle))) +
-                  dy
-            : d.geometry.coordinates[1] + deltaY;
-    }
-
-    _updateTextsAnchor(d) {
-        if (
-            this._zoomLevel === "pbZone" &&
-            (this._showPBZones === "all" || (this._showPBZones === "single" && d.id === this.currentPort.id))
-        ) {
-            return d.properties.textAnchor;
-        }
-        return "middle";
+        return (
+            d.geometry.coordinates[1] +
+            Math.round(circleSize * 1.2 * Math.sin(degreesToRadians(d.properties.angle))) +
+            dy
+        );
     }
 
     updateTexts() {
@@ -760,7 +744,7 @@ export default class DisplayPorts {
                 .merge(textEnter)
                 .attr("x", d => this._updateTextsX(d, circleSize))
                 .attr("y", d => this._updateTextsY(d, circleSize, fontSize))
-                .attr("text-anchor", d => this._updateTextsAnchor(d));
+                .attr("text-anchor", d => d.properties.textAnchor);
             this._gText.classed("d-none", false);
         }
     }
