@@ -22,14 +22,14 @@ import { insertBaseModal } from "../common";
 
 export default class WindRose {
     constructor() {
-        const { height, left } = document.getElementById("port-summary").getBoundingClientRect();
+        const { height, left } = this._getPortSummaryDimensions();
         this._height = height;
         this._yCompass = this._height / 2;
-        this._width = this._height * 1.1;
+        this._width = this._height;
         this._xCompass = this._width / 2;
         this._left = left - this._width;
         this._line = d3Line();
-        const compassRadius = Math.floor(Math.min(this._height, this._width) / 2);
+        const compassRadius = Math.min(this._height, this._width) / 2.5;
         this._compassSize = Math.floor(compassRadius * Math.PI * 2);
         this._length = Math.floor((this._compassSize / Math.PI) * 0.6);
 
@@ -49,6 +49,10 @@ export default class WindRose {
 
         this._setupSvg();
         this._setupListener();
+    }
+
+    _getPortSummaryDimensions() {
+        return document.getElementById("port-summary").getBoundingClientRect();
     }
 
     _setupSvg() {
@@ -220,5 +224,7 @@ export default class WindRose {
 
     setPosition(topMargin) {
         this._svg.style("margin-top", `${topMargin}px`);
+        this._left = this._getPortSummaryDimensions().left - this._width;
+        this._svg.style("left", this._left);
     }
 }
