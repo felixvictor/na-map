@@ -393,7 +393,7 @@ export function printCompassRose({ elem, compassSize }) {
             }
             return `rotate(${rotate}, ${translate}) translate(${translate})`;
         })
-        .attr("dx", d => (degreesToCompass((360 / steps) * d.index) === "E" ? "-.2rem" : "0"))
+        .attr("dx", d => (degreesToCompass((360 / steps) * d.index) === "E" ? "-.2em" : "0"))
         .text(d => degreesToCompass((360 / steps) * d.index));
 
     // Ticks
