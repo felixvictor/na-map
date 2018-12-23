@@ -22,10 +22,11 @@ import { insertBaseModal } from "../common";
 
 export default class WindRose {
     constructor() {
-        this._height = 120;
-        this._width = 120;
+        this._height = Math.floor(document.getElementById("port-summary").getBoundingClientRect().height);
+        this._width = this._height;
         this._line = d3Line();
-        this._compassSize = 300;
+        const compassRadius = Math.floor(Math.min(this._height, this._width) / 2);
+        this._compassSize = Math.floor(compassRadius * Math.PI * 2);
         this._xCompass = this._width / 2;
         this._yCompass = this._height / 2;
         this._length = (this._compassSize / Math.PI) * 0.6;
@@ -55,7 +56,7 @@ export default class WindRose {
             .append("svg")
             .style("position", "absolute")
             .style("left", this._width * 1.3)
-            .classed("coord", true);
+            .classed("coord small", true);
     }
 
     _navbarClick(event) {
@@ -189,7 +190,7 @@ export default class WindRose {
         // Compass rose
         const compassElem = this._svg
             .append("svg")
-            .classed("compass-small", true)
+            .classed("compass", true)
             .attr("x", this._xCompass)
             .attr("y", this._yCompass);
         printSmallCompassRose({ elem: compassElem, compassSize: this._compassSize });
