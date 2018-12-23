@@ -471,6 +471,14 @@ table a {
             dominant-baseline: central;
         }
     }
+
+    .compass-small {
+        circle,
+        line {
+            stroke: $secondary-500;
+            stroke-width: 0.05rem;
+        }
+    }
 }
 
 .port-names {
