@@ -29,7 +29,7 @@ export default class WindRose {
         this._xCompass = this._width / 2;
         this._left = left - this._width;
         this._line = d3Line();
-        const compassRadius = Math.min(this._height, this._width) / 2.5;
+        const compassRadius = Math.min(this._height, this._width) / 3;
         this._compassSize = Math.floor(compassRadius * Math.PI * 2);
         this._length = Math.floor((this._compassSize / Math.PI) * 0.6);
 
