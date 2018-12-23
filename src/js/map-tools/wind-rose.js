@@ -80,7 +80,10 @@ export default class WindRose {
     }
 
     _getPortSummaryDimensions() {
-        return document.getElementById("port-summary").getBoundingClientRect();
+        const dim = document.getElementById("port-summary").getBoundingClientRect();
+        console.log({ dim });
+        return dim;
+        // return document.getElementById("port-summary").getBoundingClientRect();
     }
 
     _getCurrentWindCookie() {
