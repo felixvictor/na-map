@@ -131,7 +131,7 @@ export default class WindRose {
             .attr("id", this._baseId)
             .append("svg")
             .style("position", "absolute")
-            .style("left", this._left)
+            .style("left", `${this._left}px`)
             .classed("coord small", true);
     }
 
@@ -300,7 +300,7 @@ export default class WindRose {
     setPosition(topMargin) {
         this._svg.style("margin-top", `${topMargin}px`);
         this._left = this._getPortSummaryDimensions().left - this._width;
-        this._svg.style("left", this._left);
+        this._svg.style("left", `${this._left}px`);
     }
 
     clearMap() {
