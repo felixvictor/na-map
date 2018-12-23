@@ -50,11 +50,18 @@ export default class WindRose {
         this._sliderId = `slider-${this._baseId}`;
 
         /**
-         * Cookie name
+         * Wind degrees cookie name
          * @type {string}
          * @private
          */
-        this._cookieName = `na-map--${this._baseId}`;
+        this._cookieDegrees = `na-map--${this._baseId}-degrees`;
+
+        /**
+         * Wind degrees time cookie name
+         * @type {string}
+         * @private
+         */
+        this._cookieTime = `na-map--${this._baseId}-time`;
 
         this._cookieExpire = this._getExpire();
 
@@ -64,7 +71,6 @@ export default class WindRose {
          * @private
          */
         this._currentWindDegrees = this._getCurrentWindCookie();
-        console.log("constructor this._currentWindDegrees", this._currentWindDegrees, this._cookieExpire);
 
         this._setupSvg();
         this._setupListener();
@@ -79,7 +85,14 @@ export default class WindRose {
 
     _getCurrentWindCookie() {
         // Use default value if cookie is not stored
-        return Cookies.get(this._cookieName) || null;
+        const wind = Cookies.get(this._cookieDegrees) || null;
+        if (wind) {
+            const time = Cookies.get(this._cookieTime);
+            // Difference in seconds since wind has been stored
+            const diffSeconds = Math.round((Date.now() - time) / 1000);
+            this._currentWindDegrees = 360 + (Math.floor(wind - this._degreesPerSecond * diffSeconds) % 360);
+        }
+        return wind;
     }
 
     _getExpire() {
@@ -103,9 +116,10 @@ export default class WindRose {
      * @private
      */
     _storeCurrentWindCookie() {
-        Cookies.set(this._cookieName, this._currentWindDegrees, {
+        Cookies.set(this._cookieDegrees, this._currentWindDegrees, {
             expires: this._cookieExpire
         });
+        Cookies.set(this._cookieTime, Date.now());
     }
 
     _setupSvg() {
@@ -289,6 +303,6 @@ export default class WindRose {
 
     clearMap() {
         this._svg.selectAll("*").remove();
-        Cookies.remove(this._cookieName);
+        Cookies.remove(this._cookieDegrees);
     }
 }
