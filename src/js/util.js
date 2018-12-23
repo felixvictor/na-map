@@ -409,3 +409,40 @@ export function printCompassRose({ elem, compassSize }) {
         .attr("y2", y2)
         .attr("transform", d => `rotate(${Math.round(((d.startAngle + d.endAngle) / 2) * (180 / Math.PI))})`);
 }
+
+/**
+ * Print small compass
+ * @param {object} elem - Element to append compass
+ * @return {void}
+ */
+export function printSmallCompassRose({ elem, compassSize }) {
+    const steps = 24,
+        stepRadians = (2 * Math.PI) / steps,
+        radius = compassSize / (2 * Math.PI),
+        outerRadius = radius - 1,
+        innerRadius = radius * 0.8;
+    const data = Array.from(new Array(steps), () => 1);
+    const textPie = d3Pie()
+        .startAngle(0 - stepRadians / 2)
+        .endAngle(2 * Math.PI - stepRadians / 2)
+        .sort(null)
+        .value(d => d);
+    const textArcs = textPie(data);
+
+    elem.append("circle").attr("r", Math.floor(innerRadius));
+
+    // Ticks
+    const y1Card = Math.floor(-outerRadius * 0.85);
+    const y1InterCard = Math.floor(-outerRadius * 0.9);
+    const y1 = Math.floor(-outerRadius);
+    const y2 = Math.floor(-innerRadius);
+    elem.selectAll("line")
+        .data(textArcs)
+        .enter()
+        .append("line")
+        .attr("x1", 0)
+        .attr("x2", 0)
+        .attr("y1", (d, i) => (i % 3 !== 0 ? y1Card : i % 6 !== 0 ? y1InterCard : y1))
+        .attr("y2", y2)
+        .attr("transform", d => `rotate(${Math.round(((d.startAngle + d.endAngle) / 2) * (180 / Math.PI))})`);
+}

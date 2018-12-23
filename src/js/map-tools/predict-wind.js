@@ -43,7 +43,7 @@ export default class PredictWind {
     }
 
     _setupSvg() {
-        this._svg = d3Select("body")
+        this._svg = d3Select("main")
             .append("div")
             .attr("id", "wind")
             .append("svg")
@@ -70,7 +70,7 @@ export default class PredictWind {
     }
 
     _navbarClick(event) {
-        registerEvent("Menu", "Predict wind");
+        registerEvent("Menu", this._baseName);
         event.stopPropagation();
         this._windSelected();
     }
@@ -333,7 +333,7 @@ export default class PredictWind {
     }
 
     setPosition(topMargin, leftMargin) {
-        this._svg.style("left", `${leftMargin}px`).style("top", `${topMargin}px`);
+        this._svg.style("margin-left", `${leftMargin}px`).style("margin-top", `${topMargin}px`);
     }
 
     clearMap() {
