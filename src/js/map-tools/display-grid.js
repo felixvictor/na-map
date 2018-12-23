@@ -329,11 +329,14 @@ export default class DisplayGrid {
      * @public
      */
     update() {
-        let show = false,
-            margin = 0;
+        let show = false;
+        let topMargin = 0;
+        let leftMargin = 0;
+
         if (this._isShown && this._zoomLevel !== "initial") {
             show = true;
-            margin = this._xBackgroundHeight;
+            topMargin = this._xBackgroundHeight;
+            leftMargin = this._yBackgroundWidth;
         }
 
         // Show or hide axis
@@ -341,8 +344,10 @@ export default class DisplayGrid {
         this._gBackground.classed("d-none", !show);
 
         // Move summary up or down
-        d3Select("#port-summary").style("margin-top", `${margin}px`);
-        d3Select("#journey-summary").style("margin-top", `${margin}px`);
+        d3Select("#port-summary").style("margin-top", `${topMargin}px`);
+        d3Select("#journey-summary").style("margin-top", `${topMargin}px`);
+        this._map._windPrediction.setPosition(topMargin, leftMargin);
+        this._map._windRose.setPosition(topMargin);
     }
 
     /**
