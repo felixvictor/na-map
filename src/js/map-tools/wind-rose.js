@@ -1,0 +1,221 @@
+/**
+ * This file is part of na-map.
+ *
+ * @file      Show wind rose continuously.
+ * @module    map-tools/wind-rose
+ * @author    iB aka Felix Victor
+ * @copyright 2018
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
+import { select as d3Select } from "d3-selection";
+import { line as d3Line } from "d3-shape";
+import moment from "moment";
+import "moment/locale/en-gb";
+import "round-slider/src/roundslider";
+import "round-slider/src/roundslider.css";
+import "../../scss/roundslider.scss";
+
+import { compassDirections, compassToDegrees, degreesToCompass, printSmallCompassRose } from "../util";
+import { registerEvent } from "../analytics";
+import { insertBaseModal } from "../common";
+
+export default class WindRose {
+    constructor() {
+        this._height = 120;
+        this._width = 120;
+        this._line = d3Line();
+        this._compassSize = 300;
+        this._xCompass = this._width / 2;
+        this._yCompass = this._height / 2;
+        this._length = (this._compassSize / Math.PI) * 0.6;
+
+        this._windArrowWidth = 4;
+
+        this._intervalSeconds = 10;
+        const secondsForFullCircle = 48 * 60;
+        const fullCircle = 360;
+        this._degreesPerSecond = fullCircle / secondsForFullCircle;
+
+        this._baseName = "Wind rose";
+        this._baseId = "wind-rose";
+        this._buttonId = `button-${this._baseId}`;
+        this._modalId = `modal-${this._baseId}`;
+        this._formId = `form-${this._baseId}`;
+        this._sliderId = `slider-${this._baseId}`;
+
+        this._setupSvg();
+        this._setupListener();
+    }
+
+    _setupSvg() {
+        this._svg = d3Select("main")
+            .append("div")
+            .attr("id", this._baseId)
+            .append("svg")
+            .style("position", "absolute")
+            .style("left", this._width * 1.3)
+            .classed("coord", true);
+    }
+
+    _navbarClick(event) {
+        registerEvent("Menu", this._baseName);
+        event.stopPropagation();
+        this._windRoseSelected();
+    }
+
+    _setupListener() {
+        document.getElementById(`${this._buttonId}`).addEventListener("click", event => this._navbarClick(event));
+    }
+
+    _setupWindInput() {
+        // workaround from https://github.com/soundar24/roundSlider/issues/71
+        // eslint-disable-next-line func-names,no-underscore-dangle
+        const { _getTooltipPos } = $.fn.roundSlider.prototype;
+        // eslint-disable-next-line func-names,no-underscore-dangle
+        $.fn.roundSlider.prototype._getTooltipPos = function() {
+            if (!this.tooltip.is(":visible")) {
+                $("body").append(this.tooltip);
+            }
+            const pos = _getTooltipPos.call(this);
+            this.container.append(this.tooltip);
+            return pos;
+        };
+
+        window.tooltip = args => degreesToCompass(args.value);
+
+        $(`#${this._sliderId}`).roundSlider({
+            sliderType: "default",
+            handleSize: "+1",
+            startAngle: 90,
+            width: 20,
+            radius: 110,
+            min: 0,
+            max: 359,
+            step: 360 / compassDirections.length,
+            editableTooltip: false,
+            tooltipFormat: "tooltip",
+            create() {
+                this.control.css("display", "block");
+            },
+            change() {
+                this._currentWind = $(`#${this._sliderId}`).roundSlider("getValue");
+            }
+        });
+    }
+
+    _injectModal() {
+        moment.locale("en-gb");
+
+        insertBaseModal(this._modalId, this._baseName, "sm");
+
+        const body = d3Select(`#${this._modalId} .modal-body`);
+        const form = body.append("form").attr("id", this._formId);
+
+        const formGroupA = form.append("div").attr("class", "form-group");
+        const slider = formGroupA.append("div").classed("alert alert-primary", true);
+        slider
+            .append("label")
+            .attr("for", this._sliderId)
+            .text("Current in-game wind");
+        slider
+            .append("div")
+            .attr("id", this._sliderId)
+            .attr("class", "rslider");
+    }
+
+    /**
+     * Init modal
+     * @returns {void}
+     */
+    _initModal() {
+        this._injectModal();
+        this._setupWindInput();
+    }
+
+    /**
+     * Action when selected
+     * @returns {void}
+     */
+    _windRoseSelected() {
+        // If the modal has no content yet, insert it
+        if (!document.getElementById(this._modalId)) {
+            this._initModal();
+        }
+        // Show modal
+        $(`#${this._modalId}`)
+            .modal("show")
+            .on("hidden.bs.modal", () => {
+                this._useUserInput();
+            });
+    }
+
+    _windChange() {
+        this._currentWindDegrees =
+            360 + (Math.floor(this._currentWindDegrees - this._degreesPerSecond * this._intervalSeconds) % 360);
+
+        this._updateWindDirection();
+    }
+
+    _useUserInput() {
+        const currentUserWind = degreesToCompass($(`#${this._sliderId}`).roundSlider("getValue"));
+        if (Number.isNaN(Number(currentUserWind))) {
+            this._currentWindDegrees = compassToDegrees(currentUserWind);
+        } else {
+            this._currentWindDegrees = +currentUserWind;
+        }
+
+        this._printCurrentWind();
+        this._intervalId = window.setInterval(() => {
+            this._windChange();
+        }, this._intervalSeconds * 1000);
+    }
+
+    _updateWindDirection() {
+        const radians = (Math.PI / 180) * (this._currentWindDegrees - 90);
+        const dx = this._length * Math.cos(radians);
+        const dy = this._length * Math.sin(radians);
+        const lineData = [
+            [Math.round(this._xCompass + dx / 2), Math.round(this._yCompass + dy / 2)],
+            [Math.round(this._xCompass - dx / 2), Math.round(this._yCompass - dy / 2)]
+        ];
+
+        this._windPath.datum(lineData).attr("d", this._line);
+    }
+
+    _printCompassRose() {
+        this._svg.attr("height", this._height).attr("width", this._width);
+
+        // Compass rose
+        const compassElem = this._svg
+            .append("svg")
+            .classed("compass-small", true)
+            .attr("x", this._xCompass)
+            .attr("y", this._yCompass);
+        printSmallCompassRose({ elem: compassElem, compassSize: this._compassSize });
+
+        this._windPath = this._svg
+            .append("path")
+            .classed("wind", true)
+            .attr("marker-end", "url(#wind-arrow)");
+        this._updateWindDirection();
+    }
+
+    _addBackground() {
+        this._svg
+            .insert("rect", ":first-child")
+            .attr("x", 0)
+            .attr("y", 0)
+            .attr("height", this._height)
+            .attr("width", this._width);
+    }
+
+    _printCurrentWind(currentWindDegrees) {
+        this._printCompassRose(currentWindDegrees);
+        this._addBackground();
+    }
+
+    setPosition(topMargin) {
+        this._svg.style("margin-top", `${topMargin}px`);
+    }
+}
