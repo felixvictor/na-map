@@ -253,7 +253,6 @@ export default class WindRose {
         this._intervalId = window.setInterval(() => {
             this._windChange();
         }, this._intervalSeconds * 1000);
-        console.log("_initShowCurrentWind() this._intervalId", this._intervalId);
     }
 
     _updateWindDirection() {
