@@ -16,6 +16,7 @@ import "round-slider/src/roundslider";
 import "round-slider/src/roundslider.css";
 import "../../scss/roundslider.scss";
 
+import Cookies from "js-cookie";
 import { compassDirections, compassToDegrees, degreesToCompass, printSmallCompassRose } from "../util";
 import { registerEvent } from "../analytics";
 import { insertBaseModal } from "../common";
@@ -32,6 +33,7 @@ export default class WindRose {
         const compassRadius = Math.min(this._height, this._width) / 3;
         this._compassSize = Math.floor(compassRadius * Math.PI * 2);
         this._length = Math.floor((this._compassSize / Math.PI) * 0.6);
+        this._windPath = null;
 
         this._windArrowWidth = 4;
 
@@ -47,12 +49,63 @@ export default class WindRose {
         this._formId = `form-${this._baseId}`;
         this._sliderId = `slider-${this._baseId}`;
 
+        /**
+         * Cookie name
+         * @type {string}
+         * @private
+         */
+        this._cookieName = `na-map--${this._baseId}`;
+
+        this._cookieExpire = this._getExpire();
+
+        /**
+         * Get current wind from cookie or use default value
+         * @type {number}
+         * @private
+         */
+        this._currentWindDegrees = this._getCurrentWindCookie();
+        console.log("constructor this._currentWindDegrees", this._currentWindDegrees, this._cookieExpire);
+
         this._setupSvg();
         this._setupListener();
+        if (this._currentWindDegrees) {
+            this._initShowCurrentWind();
+        }
     }
 
     _getPortSummaryDimensions() {
         return document.getElementById("port-summary").getBoundingClientRect();
+    }
+
+    _getCurrentWindCookie() {
+        // Use default value if cookie is not stored
+        return Cookies.get(this._cookieName) || null;
+    }
+
+    _getExpire() {
+        const now = moment.utc();
+        let end = moment()
+            .utc()
+            .hour(10)
+            .minute(0)
+            .second(0);
+
+        if (now.hour() > end.hour()) {
+            end = end.add(1, "day");
+        }
+
+        return end.local().toDate();
+    }
+
+    /**
+     * Store current wind in cookie
+     * @return {void}
+     * @private
+     */
+    _storeCurrentWindCookie() {
+        Cookies.set(this._cookieName, this._currentWindDegrees, {
+            expires: this._cookieExpire
+        });
     }
 
     _setupSvg() {
@@ -172,10 +225,21 @@ export default class WindRose {
             this._currentWindDegrees = +currentUserWind;
         }
 
-        this._printCurrentWind();
+        if (!this._windPath) {
+            this._initShowCurrentWind();
+        } else {
+            this._updateWindDirection();
+        }
+    }
+
+    _initShowCurrentWind() {
+        this._printCompassRose();
+        this._addBackground();
+        this._updateWindDirection();
         this._intervalId = window.setInterval(() => {
             this._windChange();
         }, this._intervalSeconds * 1000);
+        console.log("_initShowCurrentWind() this._intervalId", this._intervalId);
     }
 
     _updateWindDirection() {
@@ -188,6 +252,7 @@ export default class WindRose {
         ];
 
         this._windPath.datum(lineData).attr("d", this._line);
+        this._storeCurrentWindCookie();
     }
 
     _printCompassRose() {
@@ -205,7 +270,6 @@ export default class WindRose {
             .append("path")
             .classed("wind", true)
             .attr("marker-end", "url(#wind-arrow)");
-        this._updateWindDirection();
     }
 
     _addBackground() {
@@ -217,14 +281,14 @@ export default class WindRose {
             .attr("width", this._width);
     }
 
-    _printCurrentWind(currentWindDegrees) {
-        this._printCompassRose(currentWindDegrees);
-        this._addBackground();
-    }
-
     setPosition(topMargin) {
         this._svg.style("margin-top", `${topMargin}px`);
         this._left = this._getPortSummaryDimensions().left - this._width;
         this._svg.style("left", this._left);
+    }
+
+    clearMap() {
+        this._svg.selectAll("*").remove();
+        Cookies.remove(this._cookieName);
     }
 }
