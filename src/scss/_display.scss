@@ -411,7 +411,7 @@ table a {
     }
 
     text {
-        font-size: 1em;
+        font-size: 1rem;
         fill: $secondary-800;
         text-anchor: middle;
         dominant-baseline: central;
@@ -428,7 +428,7 @@ table a {
 
     path {
         stroke: $secondary-600;
-        stroke-width: 0.3em;
+        stroke-width: 0.3rem;
         fill: none;
     }
 
@@ -456,28 +456,31 @@ table a {
             stroke-width: 0;
         }
     }
+}
 
-    .compass {
-        circle,
-        line {
-            stroke: $secondary-600;
-            stroke-width: 0.1rem;
-        }
-
-        text {
-            fill: $secondary-600;
-            font-weight: bold;
-            text-anchor: middle;
-            dominant-baseline: central;
-        }
+.compass {
+    circle,
+    line {
+        stroke: $secondary-600;
+        stroke-width: 0.1rem;
     }
 
-    .compass-small {
-        circle,
-        line {
-            stroke: $secondary-500;
-            stroke-width: 0.05rem;
-        }
+    text {
+        fill: $secondary-600;
+        font-weight: bold;
+        text-anchor: middle;
+        dominant-baseline: central;
+    }
+}
+
+.small {
+    circle,
+    line {
+        stroke: $secondary-500;
+        stroke-width: 0.05rem;
+    }
+    path {
+        stroke-width: 0.15rem;
     }
 }
 
@@ -726,14 +729,14 @@ $flags: "NT", "FT";
 .region {
     filter: url("#drop-shadow");
 
-        font-family: LibreCaslonDisplay, -apple-system, blinkmacsystemfont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
-            cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", arial, sans-serif;
-        opacity: 0.7;
-        fill: $primary-200;
-        text-anchor: middle;
+    font-family: LibreCaslonDisplay, -apple-system, blinkmacsystemfont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
+        cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", arial, sans-serif;
+    opacity: 0.7;
+    fill: $primary-200;
+    text-anchor: middle;
 }
 
-.region  {
+.region {
     font-size: 240px;
 }
 
