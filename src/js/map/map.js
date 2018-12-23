@@ -27,6 +27,7 @@ import ShowF11 from "../map-tools/show-f11";
 import DisplayGrid from "../map-tools/display-grid";
 import Journey from "../map-tools/make-journey";
 import PredictWind from "../map-tools/predict-wind";
+import WindRose from "../map-tools/wind-rose";
 
 /**
  * Display naval action map
@@ -262,6 +263,7 @@ class Map {
         this._init();
 
         this._windPrediction = new PredictWind();
+        this._windRose = new WindRose();
         this._portSelect = new SelectPorts(this._ports, this._pbZone);
 
         /*
