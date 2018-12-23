@@ -295,7 +295,7 @@ export default class DisplayPorts {
         this._portSummaryNumPorts
             .append("div")
             .classed("des", true)
-            .text("selected ports");
+            .html("selected<br>ports");
 
         // Total tax income
         this._portSummaryTaxIncome = mainDiv.append("div").classed("block", true);
@@ -303,7 +303,7 @@ export default class DisplayPorts {
         this._portSummaryTaxIncome
             .append("div")
             .classed("des", true)
-            .text("tax income");
+            .html("tax<br>income");
 
         // Total net income
         this._portSummaryNetIncome = mainDiv.append("div").classed("block", true);
@@ -311,7 +311,7 @@ export default class DisplayPorts {
         this._portSummaryNetIncome
             .append("div")
             .classed("des", true)
-            .text("net income");
+            .html("net<br>income");
     }
 
     _setupFlags() {
