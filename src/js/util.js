@@ -419,7 +419,7 @@ export function printSmallCompassRose({ elem, compassSize }) {
     const steps = 24,
         stepRadians = (2 * Math.PI) / steps,
         radius = compassSize / (2 * Math.PI),
-        outerRadius = radius - 1,
+        outerRadius = radius,
         innerRadius = radius * 0.8;
     const data = Array.from(new Array(steps), () => 1);
     const textPie = d3Pie()
