@@ -422,8 +422,7 @@ table a {
     }
 
     rect {
-        fill: $primary-100;
-        fill-opacity: 0.7;
+        fill: rgba($primary-100, 0.8);
     }
 
     path {
