@@ -222,7 +222,8 @@ const config = {
     context: path.resolve(__dirname, "src"),
 
     devServer: {
-        contentBase: outputPath
+        contentBase: outputPath,
+        disableHostCheck: true
     },
 
     entry: [path.resolve(__dirname, PACKAGE.main), path.resolve(__dirname, PACKAGE.sass)],
