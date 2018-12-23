@@ -477,6 +477,7 @@ class Map {
 
     _clearMap() {
         this._windPrediction.clearMap();
+        this._windRose.clearMap();
         this._f11.clearMap();
         this._ports.clearMap();
         this._portSelect.clearMap();
