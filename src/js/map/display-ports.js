@@ -17,14 +17,21 @@ import "moment/locale/en-gb";
 
 import {
     circleRadiusFactor,
-    nations,
     defaultFontSize,
     defaultCircleSize,
     getDistance,
     convertCoordX,
     convertCoordY
 } from "../common";
-import { formatInt, formatSiInt, formatPercent, getOrdinal, roundToThousands, degreesToRadians } from "../util";
+import {
+    displayClan,
+    formatInt,
+    formatSiInt,
+    formatPercent,
+    getOrdinal,
+    roundToThousands,
+    degreesToRadians
+} from "../util";
 import TrilateratePosition from "../map-tools/get-position";
 
 export default class DisplayPorts {
@@ -273,7 +280,7 @@ export default class DisplayPorts {
             { name: "Puerto Rico", centroid: [6900, 3750], angle: 0 },
             { name: "South America", centroid: [6400, 6100], angle: 0 },
             { name: "Upper Antilles", centroid: [6850, 4250], angle: 0 },
-            { name: "West Cuba", centroid: [3300, 3100], angle: 20 },
+            { name: "West Cuba", centroid: [3700, 3000], angle: 20 },
             { name: "Yucatan", centroid: [1462, 3550], angle: 0 }
         ];
     }
@@ -317,63 +324,6 @@ export default class DisplayPorts {
     _setupFlags() {
         const svgDef = d3Select("#na-svg defs");
 
-        // create filter with id #drop-shadow
-        const filter = svgDef
-            .append("filter")
-            .attr("id", "drop-shadow")
-            .attr("width", "200%")
-            .attr("height", "200%");
-
-        filter
-            .append("feGaussianBlur")
-            .attr("in", "SourceAlpha")
-            .attr("stdDeviation", 5)
-            .attr("result", "blur");
-
-        filter
-            .append("feOffset")
-            .attr("dx", 2)
-            .attr("dy", 4)
-            .attr("result", "offsetblur1");
-
-        filter
-            .append("feOffset")
-            .attr("dx", 3)
-            .attr("dy", 6)
-            .attr("result", "offsetblur2")
-            .attr("in", "blur");
-
-        const feComponentOne = filter
-            .append("feComponentTransfer")
-            .attr("result", "shadow1")
-            .attr("in", "offsetblur1");
-
-        feComponentOne
-            .append("feFuncA")
-            .attr("type", "linear")
-            .attr("slope", "0.1");
-
-        const feComponentTwo = filter
-            .append("feComponentTransfer")
-            .attr("result", "shadow2")
-            .attr("in", "offsetblur2");
-
-        feComponentTwo
-            .append("feFuncA")
-            .attr("type", "linear")
-            .attr("slope", "0.1");
-
-        filter
-            .append("feComposite")
-            .attr("in2", "offsetblur1")
-            .attr("operator", "in");
-
-        const feMerge = filter.append("feMerge");
-
-        feMerge.append("feMergeNode").attr("in", "shadow1");
-        feMerge.append("feMergeNode").attr("in", "shadow2");
-        feMerge.append("feMergeNode").attr("in", "SourceGraphic");
-
         this._clipPath = svgDef
             .append("clipPath")
             .attr("id", "clipObj")
@@ -399,12 +349,14 @@ export default class DisplayPorts {
             countyCapital: portProperties.countyCapital ? " (county capital)" : "",
             nonCapturable: portProperties.nonCapturable,
             captured: portProperties.capturer
-                ? ` captured by ${portProperties.capturer} ${moment.utc(portProperties.lastPortBattle).fromNow()}`
+                ? ` captured by ${displayClan(portProperties.capturer)} ${moment
+                      .utc(portProperties.lastPortBattle)
+                      .fromNow()}`
                 : "",
             lastPortBattle: portProperties.lastPortBattle,
             // eslint-disable-next-line no-nested-ternary
             attack: portProperties.attackHostility
-                ? `${portProperties.attackerClan} (${portProperties.attackerNation}) attack${
+                ? `${displayClan(portProperties.attackerClan)} (${portProperties.attackerNation}) attack${
                       // eslint-disable-next-line no-nested-ternary
                       portProperties.portBattle.length
                           ? `${
@@ -493,8 +445,8 @@ export default class DisplayPorts {
             }
             h += `<p>${port.depth} water port ${port.countyCapital}${port.captured}<br>`;
             if (!port.nonCapturable) {
-                h += `Port battle ${port.pbTimeRange}, ${port.brLimit} BR, `;
-                h += `${port.pbType}\u202frate AI, `;
+                h += `Port battle ${port.pbTimeRange}, ${port.brLimit} <span class="caps">BR</span>, `;
+                h += `${port.pbType}\u202frate <span class="caps">AI</span>, `;
                 h += `${port.conquestMarksPension}\u202fconquest point`;
                 h += port.conquestMarksPension > 1 ? "s" : "";
                 h += `<br>Tax income ${port.taxIncome} (${port.portTax}), net income ${port.netIncome}`;
@@ -699,18 +651,35 @@ export default class DisplayPorts {
     }
 
     _updateTextsX(d, circleSize) {
-        return (
-            d.geometry.coordinates[0] + Math.round(circleSize * 1.2 * Math.cos(degreesToRadians(d.properties.angle)))
-        );
+        return this._zoomLevel === "pbZone" &&
+            (this._showPBZones === "all" || (this._showPBZones === "single" && d.id === this.currentPort.id))
+            ? d.geometry.coordinates[0] + Math.round(circleSize * 1.2 * Math.cos(degreesToRadians(d.properties.angle)))
+            : d.geometry.coordinates[0];
     }
 
     _updateTextsY(d, circleSize, fontSize) {
+        const deltaY = circleSize + fontSize * 1.2;
+
+        if (this._zoomLevel !== "pbZone") {
+            return d.geometry.coordinates[1] + deltaY;
+        }
+
         const dy = d.properties.angle > 90 && d.properties.angle < 270 ? fontSize : 0;
-        return (
-            d.geometry.coordinates[1] +
-            Math.round(circleSize * 1.2 * Math.sin(degreesToRadians(d.properties.angle))) +
-            dy
-        );
+        return this._showPBZones === "all" || (this._showPBZones === "single" && d.id === this.currentPort.id)
+            ? d.geometry.coordinates[1] +
+                  Math.round(circleSize * 1.2 * Math.sin(degreesToRadians(d.properties.angle))) +
+                  dy
+            : d.geometry.coordinates[1] + deltaY;
+    }
+
+    _updateTextsAnchor(d) {
+        if (
+            this._zoomLevel === "pbZone" &&
+            (this._showPBZones === "all" || (this._showPBZones === "single" && d.id === this.currentPort.id))
+        ) {
+            return d.properties.textAnchor;
+        }
+        return "middle";
     }
 
     updateTexts() {
@@ -744,7 +713,8 @@ export default class DisplayPorts {
                 .merge(textEnter)
                 .attr("x", d => this._updateTextsX(d, circleSize))
                 .attr("y", d => this._updateTextsY(d, circleSize, fontSize))
-                .attr("text-anchor", d => d.properties.textAnchor);
+                .attr("text-anchor", d => this._updateTextsAnchor(d));
+
             this._gText.classed("d-none", false);
         }
     }
