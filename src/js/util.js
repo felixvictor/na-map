@@ -511,3 +511,10 @@ export function printSmallCompassRose({ elem, compassSize }) {
         .attr("y2", y2)
         .attr("transform", d => `rotate(${Math.round(((d.startAngle + d.endAngle) / 2) * (180 / Math.PI))})`);
 }
+
+/**
+ * Format clan name
+ * @param {string} clan - Clan name
+ * @return {string} Formatted clan name
+ */
+export const displayClan = clan => `<span class="caps">${clan}</span>`;
