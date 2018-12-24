@@ -21,7 +21,15 @@ import "moment/locale/en-gb";
 import "round-slider/src/roundslider";
 import "round-slider/src/roundslider.css";
 
-import { compassDirections, degreesToCompass, formatF11, printCompassRose, rotationAngleInDegrees } from "../util";
+import {
+    compassDirections,
+    degreesToCompass,
+    displayCompass,
+    displayCompassAndDegrees,
+    formatF11,
+    printCompassRose,
+    rotationAngleInDegrees
+} from "../util";
 import { registerEvent } from "../analytics";
 import { convertInvCoordX, convertInvCoordY, getDistance, insertBaseModal, speedFactor } from "../common";
 import CompareShips from "../game-tools/compare-ships";
@@ -180,7 +188,7 @@ export default class Journey {
             return pos;
         };
 
-        window.tooltip = args => degreesToCompass(args.value);
+        window.tooltip = args => `${displayCompass(args.value)}<br>${args.value}°`;
 
         $(`#${this._sliderId}`).roundSlider({
             sliderType: "default",
@@ -439,7 +447,7 @@ export default class Journey {
                 .attr("transform", textTransform)
                 .style("font-size", `${fontSize}px`);
             lines.forEach((line, j) => {
-                const tspan = text.append("tspan").text(line);
+                const tspan = text.append("tspan").html(line);
                 if (j > 0) {
                     tspan.attr("x", 0).attr("dy", lineHeight);
                 }
@@ -572,7 +580,7 @@ export default class Journey {
     }
 
     _printSummaryWind() {
-        this._journeySummaryTextWind.text(`From ${degreesToCompass(this._journey.startWindDegrees)}`);
+        this._journeySummaryTextWind.html(`From ${displayCompassAndDegrees(this._journey.startWindDegrees)}`);
     }
 
     _printSummary() {
@@ -594,7 +602,7 @@ export default class Journey {
     }
 
     _getTextDirection(courseCompass, courseDegrees, pt1) {
-        return `${courseCompass} (${Math.round(courseDegrees)}°) \u2606 F11: ${formatF11(
+        return `${displayCompassAndDegrees(courseCompass, true)} \u2606 F11: ${formatF11(
             convertInvCoordX(pt1.x, pt1.y)
         )}\u202f/\u202f${formatF11(convertInvCoordY(pt1.x, pt1.y))}`;
     }
