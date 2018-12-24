@@ -17,7 +17,7 @@ import "round-slider/src/roundslider.css";
 import "../../scss/roundslider.scss";
 
 import Cookies from "js-cookie";
-import { compassDirections, compassToDegrees, degreesToCompass, printSmallCompassRose } from "../util";
+import { compassDirections, displayCompass, getUserWind, printSmallCompassRose } from "../util";
 import { registerEvent } from "../analytics";
 import { insertBaseModal } from "../common";
 
@@ -156,7 +156,7 @@ export default class WindRose {
             return pos;
         };
 
-        window.tooltip = args => `<span class="fraction">${degreesToCompass(args.value)}</span><br>${args.value}`;
+        window.tooltip = args => `${displayCompass(args.value)}<br>${args.value}°`;
 
         $(`#${this._sliderId}`).roundSlider({
             sliderType: "default",
@@ -232,12 +232,7 @@ export default class WindRose {
     }
 
     _useUserInput() {
-        const currentUserWind = degreesToCompass($(`#${this._sliderId}`).roundSlider("getValue"));
-        if (Number.isNaN(Number(currentUserWind))) {
-            this._currentWindDegrees = compassToDegrees(currentUserWind);
-        } else {
-            this._currentWindDegrees = +currentUserWind;
-        }
+        this._currentWindDegrees = getUserWind(this._sliderId);
 
         if (!this._windPath) {
             this._initShowCurrentWind();
