@@ -18,7 +18,15 @@ import "../../scss/roundslider.scss";
 import "tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4";
 import "tempusdominus-core/build/js/tempusdominus-core";
 
-import { compassDirections, compassToDegrees, degreesToCompass, printCompassRose } from "../util";
+import {
+    compassDirections,
+    compassToDegrees,
+    degreesToCompass,
+    displayCompass,
+    displayCompassAndDegrees,
+    getUserWind,
+    printCompassRose
+} from "../util";
 import { registerEvent } from "../analytics";
 import { insertBaseModal } from "../common";
 
@@ -93,7 +101,7 @@ export default class PredictWind {
             return pos;
         };
 
-        window.tooltip = args => `<span class="fraction">${degreesToCompass(args.value)}</span><br>${args.value}`;
+        window.tooltip = args => `${displayCompass(args.value)}<br>${args.value}°`;
 
         $(`#${this._sliderId}`).roundSlider({
             sliderType: "default",
@@ -197,10 +205,10 @@ export default class PredictWind {
     }
 
     _useUserInput() {
-        const currentWind = $(`#${this._sliderId}`).roundSlider("getValue"),
-            time = $(`#${this._timeInputId}`)
-                .val()
-                .trim();
+        const currentWind = getUserWind(this._sliderId);
+        const time = $(`#${this._timeInputId}`)
+            .val()
+            .trim();
 
         this._predictWind(currentWind, time);
     }
@@ -295,18 +303,14 @@ export default class PredictWind {
             .attr("x", "50%")
             .attr("y", "33%")
             .attr("class", "wind-text")
-            .html(`From <tspan class="fraction">${compass}</tspan> (${predictedWindDegrees}°) at ${predictTime}`);
+            .html(`From ${displayCompassAndDegrees(compass, true)} at ${predictTime}`);
 
         const text2 = textSvg
             .append("text")
             .attr("x", "50%")
             .attr("y", "66%")
             .attr("class", "wind-text-current")
-            .html(
-                `Currently at ${currentTime} from <tspan class="fraction">${currentWind}</tspan> (${compassToDegrees(
-                    currentWind
-                )}°)`
-            );
+            .html(`Currently at ${currentTime} from ${displayCompassAndDegrees(currentWind, true)}`);
 
         const bbox1 = text1.node().getBoundingClientRect(),
             bbox2 = text2.node().getBoundingClientRect(),
