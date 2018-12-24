@@ -16,6 +16,7 @@ import "tempusdominus-core/build/js/tempusdominus-core";
 
 import { registerEvent } from "../analytics";
 import { initMultiDropdownNavbar, nations } from "../common";
+import { displayClan } from "../util";
 
 export default class SelectPorts {
     constructor(ports, pbZone) {
@@ -256,7 +257,7 @@ export default class SelectPorts {
             this._propClanSelector.disabled = false;
             options = `${Array.from(clanList)
                 .sort()
-                .map(clan => `<option value="${clan}">${clan}</option>`)
+                .map(clan => `<option value="${clan}" class="caps">${clan}</option>`)
                 .join("")}`;
         } else {
             this._propClanSelector.disabled = true;
