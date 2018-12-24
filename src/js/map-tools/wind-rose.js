@@ -156,7 +156,7 @@ export default class WindRose {
             return pos;
         };
 
-        window.tooltip = args => degreesToCompass(args.value);
+        window.tooltip = args => `<span class="fraction">${degreesToCompass(args.value)}</span><br>${args.value}`;
 
         $(`#${this._sliderId}`).roundSlider({
             sliderType: "default",

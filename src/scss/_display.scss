@@ -26,6 +26,17 @@ table,
     font-variant-numeric: tabular-nums; // tnum
 }
 
+.fraction {
+    font-feature-settings: "frac";
+}
+
+@supports (font-variant-numeric: diagonal-fractions) {
+    .fraction {
+        font-feature-settings: normal;
+        font-variant-numeric: diagonal-fractions;
+    }
+}
+
 .caps,
 .des {
     letter-spacing: 0.06rem;
