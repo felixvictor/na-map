@@ -23,14 +23,12 @@ import { insertBaseModal } from "../common";
 
 export default class WindRose {
     constructor() {
-        const { height, left } = this._getPortSummaryDimensions();
-        this._height = height;
+        this._height = this._getHeight();
         this._yCompass = this._height / 2;
         this._width = this._height;
         this._xCompass = this._width / 2;
-        this._left = left - this._width;
         this._line = d3Line();
-        const compassRadius = Math.min(this._height, this._width) / 3;
+        const compassRadius = Math.min(this._height, this._width) / 2;
         this._compassSize = Math.floor(compassRadius * Math.PI * 2);
         this._length = Math.floor((this._compassSize / Math.PI) * 0.6);
         this._windPath = null;
@@ -72,15 +70,20 @@ export default class WindRose {
          */
         this._currentWindDegrees = this._getCurrentWindCookie();
 
-        this._setupSvg();
+
         this._setupListener();
         if (this._currentWindDegrees) {
             this._initShowCurrentWind();
         }
     }
 
-    _getPortSummaryDimensions() {
-        return document.getElementById("port-summary").getBoundingClientRect();
+    _getHeight() {
+        const div = document.querySelector("#port-summary div.d-flex div.block");
+        const { height } = div.getBoundingClientRect();
+        const paddingTop = parseFloat(window.getComputedStyle(div).getPropertyValue("padding-top"));
+        const paddingBottom = parseFloat(window.getComputedStyle(div).getPropertyValue("padding-bottom"));
+
+        return height - paddingTop - paddingBottom;
     }
 
     _getCurrentWindCookie() {
@@ -123,13 +126,11 @@ export default class WindRose {
     }
 
     _setupSvg() {
-        this._svg = d3Select("main")
-            .append("div")
+        this._div = d3Select("#port-summary div.d-flex")
+            .insert("div", ":first-child")
             .attr("id", this._baseId)
-            .append("svg")
-            .style("position", "absolute")
-            .style("left", `${this._left}px`)
-            .classed("coord small", true);
+            .classed("block", true);
+        this._svg = this._div.append("svg").classed("coord small", true);
     }
 
     _navbarClick(event) {
@@ -242,8 +243,8 @@ export default class WindRose {
     }
 
     _initShowCurrentWind() {
+        this._setupSvg();
         this._printCompassRose();
-        this._addBackground();
         this._updateWindDirection();
         this._intervalId = window.setInterval(() => {
             this._windChange();
@@ -280,23 +281,9 @@ export default class WindRose {
             .attr("marker-end", "url(#wind-arrow)");
     }
 
-    _addBackground() {
-        this._svg
-            .insert("rect", ":first-child")
-            .attr("x", 0)
-            .attr("y", 0)
-            .attr("height", this._height)
-            .attr("width", this._width);
-    }
-
-    setPosition(topMargin) {
-        this._svg.style("margin-top", `${topMargin}px`);
-        this._left = this._getPortSummaryDimensions().left - this._width;
-        this._svg.style("left", `${this._left}px`);
-    }
-
     clearMap() {
-        this._svg.selectAll("*").remove();
+        this._div.remove();
+        this._windPath=null;
         Cookies.remove(this._cookieDegrees);
     }
 }

@@ -347,7 +347,6 @@ export default class DisplayGrid {
         d3Select("#port-summary").style("margin-top", `${topMargin}px`);
         d3Select("#journey-summary").style("margin-top", `${topMargin}px`);
         this._map._windPrediction.setPosition(topMargin, leftMargin);
-        this._map._windRose.setPosition(topMargin);
     }
 
     /**
