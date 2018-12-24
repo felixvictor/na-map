@@ -52,11 +52,11 @@ $input-border-color: $primary-400;
 $input-border-radius: 0;
 
 // Fonts
-$font-size-base: 1rem;
+$font-size-base: 1.2rem;
 $font-size-lg: map-get($spacers, 4);
 $font-size-sm: map-get($spacers, 2) * 1.2;
 
-$line-height-base: 1.618;
+$line-height-base: map-get($spacers, 4) / $font-size-base;
 
 $h6-font-size: $font-size-base;
 $h5-font-size: $h6-font-size + $font-size-base/$font-size-lg/2;
@@ -123,4 +123,3 @@ $badge-padding-y: 0.2rem;
 
 // Work-around to avoid mangling from postcss-crass
 $custom-radio-indicator-icon-checked: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9Ii00IC00IDggOCI+PGNpcmNsZSByPSIzIiBmaWxsPSIjZjlmN2Y3Ii8+PC9zdmc+);
-

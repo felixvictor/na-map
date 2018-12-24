@@ -15,7 +15,7 @@ import { feature as topojsonFeature } from "topojson-client";
 import Cookies from "js-cookie";
 
 import { appDescription, appTitle, appVersion, defaultFontSize, insertBaseModal } from "../common";
-import { nearestPow2, checkFetchStatus, getJsonFromFetch, putFetchError, roundToThousands } from "../util";
+import { displayClan, nearestPow2, checkFetchStatus, getJsonFromFetch, putFetchError, roundToThousands } from "../util";
 
 import { registerEvent } from "../analytics";
 
@@ -492,7 +492,7 @@ class Map {
 
             const body = d3Select(`#${id} .modal-body`);
             body.html(
-                `<p>${appDescription} Please check the <a href="https://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/"> Game-Labs forum post</a> for further details. Feedback is very welcome.</p><p>Designed by iB aka Felix Victor, clan <a href="https://bccnavalaction.freeforums.net/">British Captains’ Club (BCC)</a>.</p>`
+                `<p>${appDescription} Please check the <a href="https://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/"> Game-Labs forum post</a> for further details. Feedback is very welcome.</p><p>Designed by iB aka Felix Victor, clan <a href="https://bccnavalaction.freeforums.net/">British Captains’ Club ${displayClan("(BCC)")}</a>.</p>`
             );
         }
 
