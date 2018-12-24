@@ -93,7 +93,7 @@ export default class PredictWind {
             return pos;
         };
 
-        window.tooltip = args => degreesToCompass(args.value);
+        window.tooltip = args => `<span class="fraction">${degreesToCompass(args.value)}</span><br>${args.value}`;
 
         $(`#${this._sliderId}`).roundSlider({
             sliderType: "default",
@@ -295,14 +295,18 @@ export default class PredictWind {
             .attr("x", "50%")
             .attr("y", "33%")
             .attr("class", "wind-text")
-            .text(`From ${compass} at ${predictTime}`);
+            .html(`From <tspan class="fraction">${compass}</tspan> (${predictedWindDegrees}°) at ${predictTime}`);
 
         const text2 = textSvg
             .append("text")
             .attr("x", "50%")
             .attr("y", "66%")
             .attr("class", "wind-text-current")
-            .text(`Currently at ${currentTime} from ${currentWind}`);
+            .html(
+                `Currently at ${currentTime} from <tspan class="fraction">${currentWind}</tspan> (${compassToDegrees(
+                    currentWind
+                )}°)`
+            );
 
         const bbox1 = text1.node().getBoundingClientRect(),
             bbox2 = text2.node().getBoundingClientRect(),
