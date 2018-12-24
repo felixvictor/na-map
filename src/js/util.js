@@ -202,6 +202,62 @@ export const degreesToCompass = degrees => {
 };
 
 /**
+ * Display formatted compass
+ * @param {string} wind - Wind direction in compass or degrees
+ * @param {bool} svg - True to use 'tspan' instead of 'span'
+ * @return {string} HTML formatted compass
+ */
+export const displayCompass = (wind, svg = false) => {
+    let compass;
+
+    if (Number.isNaN(Number(wind))) {
+        compass = wind;
+    } else {
+        compass = degreesToCompass(+wind);
+    }
+
+    return `<${svg ? "tspan" : "span"} class="fraction">${compass}</${svg ? "tspan" : "span"}>`;
+};
+
+/**
+ * Display formatted compass and degrees
+ * @param {string} wind - Wind direction in compass or degrees
+ * @param {bool} svg - True to use 'tspan' instead of 'span'
+ * @return {string} HTML formatted compass and degrees
+ */
+export const displayCompassAndDegrees = (wind, svg = false) => {
+    let compass;
+    let degrees;
+
+    if (Number.isNaN(Number(wind))) {
+        compass = wind;
+        degrees = compassToDegrees(compass) % 360;
+    } else {
+        degrees = +wind;
+        compass = degreesToCompass(degrees);
+    }
+
+    return `<${svg ? "tspan" : "span"} class="fraction">${compass}</${svg ? "tspan" : "span"}> (${degrees}°)`;
+};
+
+/**
+ * Get wind in degrees from user input (rs-slider)
+ * @param {string} sliderId - Slider id
+ * @return {number} Wind in degrees
+ */
+export const getUserWind = sliderId => {
+    const currentUserWind = degreesToCompass($(`#${sliderId}`).roundSlider("getValue"));
+    let windDegrees;
+
+    if (Number.isNaN(Number(currentUserWind))) {
+        windDegrees = compassToDegrees(currentUserWind);
+    } else {
+        windDegrees = +currentUserWind;
+    }
+    return windDegrees;
+};
+
+/**
  * Test if Number is between two unordered Numbers (see {@link https://stackoverflow.com/questions/14718561/how-to-check-if-a-number-is-between-two-values})
  * @function
  * @param {Number} value - Value to be tested
