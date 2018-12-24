@@ -153,21 +153,29 @@ export function isEmpty(obj) {
  */
 export const compassDirections = [
     "N",
-    "NNE",
+    "N1/3NE",
+    "N2/3NE",
     "NE",
-    "ENE",
+    "E2/3NE",
+    "E1/3NE",
     "E",
-    "ESE",
+    "E1/3SE",
+    "E2/3SE",
     "SE",
-    "SSE",
+    "S2/3SE",
+    "S1/3SE",
     "S",
-    "SSW",
+    "S1/3SW",
+    "S2/3SW",
     "SW",
-    "WSW",
+    "W2/3SW",
+    "W1/3SW",
     "W",
-    "WNW",
+    "W1/3NW",
+    "W2/3NW",
     "NW",
-    "NNW"
+    "N2/3NW",
+    "N1/3NW"
 ];
 
 /**
@@ -188,8 +196,9 @@ export const compassToDegrees = compass => {
  * @return {String} Compass direction
  */
 export const degreesToCompass = degrees => {
-    const val = Math.floor(degrees / 22.5 + 0.5);
-    return compassDirections[val % 16];
+    const ticks = 360 / compassDirections.length;
+    const val = Math.floor(degrees / ticks + 0.5);
+    return compassDirections[val % compassDirections.length];
 };
 
 /**
