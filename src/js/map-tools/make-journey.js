@@ -690,6 +690,7 @@ export default class Journey {
             this._printJourney();
         } else {
             this._removeCompass();
+            this._hideSummary();
             this._initJourneyData();
         }
     }
