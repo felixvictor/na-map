@@ -75,7 +75,6 @@ export default class SelectPorts {
 
     _setupListener() {
         $.fn.selectpicker.Constructor.DEFAULTS.virtualScroll = true;
-        $.fn.selectpicker.Constructor.DEFAULTS.width = "auto";
         $.fn.selectpicker.Constructor.DEFAULTS.dropupAuto = false;
         $.fn.selectpicker.Constructor.DEFAULTS.liveSearch = true;
         $.fn.selectpicker.Constructor.DEFAULTS.liveSearchPlaceholder = "Search ...";
