@@ -217,7 +217,7 @@ export const displayCompass = (wind, svg = false) => {
         compass = degreesToCompass(+wind);
     }
 
-    return `<${svg ? "tspan" : "span"} class="fraction caps">${compass}</${svg ? "tspan" : "span"}>`;
+    return `<${svg ? "tspan" : "span"} class="fraction ${svg ? "" : "caps"}">${compass}</${svg ? "tspan" : "span"}>`;
 };
 
 /**
@@ -238,7 +238,9 @@ export const displayCompassAndDegrees = (wind, svg = false) => {
         compass = degreesToCompass(degrees);
     }
 
-    return `<${svg ? "tspan" : "span"} class="fraction caps">${compass}</${svg ? "tspan" : "span"}> (${degrees}°)`;
+    return `<${svg ? "tspan" : "span"} class="fraction ${svg ? "" : "caps"}">${compass}</${
+        svg ? "tspan" : "span"
+    }> (${degrees}°)`;
 };
 
 /**
