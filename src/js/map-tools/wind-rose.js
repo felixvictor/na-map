@@ -70,7 +70,6 @@ export default class WindRose {
          */
         this._currentWindDegrees = this._getCurrentWindCookie();
 
-
         this._setupListener();
         if (this._currentWindDegrees) {
             this._initShowCurrentWind();
@@ -282,8 +281,10 @@ export default class WindRose {
     }
 
     clearMap() {
-        this._div.remove();
-        this._windPath=null;
+        if (this._div) {
+            this._div.remove();
+        }
+        this._windPath = null;
         Cookies.remove(this._cookieDegrees);
     }
 }
