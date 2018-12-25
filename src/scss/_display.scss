@@ -36,10 +36,14 @@ table,
     font-feature-settings: "sups";
 }
 
-.caps,
-.des {
+@mixin caps {
     font-variant-caps: all-small-caps;
     letter-spacing: 0.06em;
+}
+
+.caps,
+.des {
+    @include caps;
 }
 
 .des {
@@ -497,8 +501,8 @@ table a {
 }
 
 .port-name {
-    font-size: large;
-    font-style: italic;
+    font-size: x-large;
+    @include caps;
 }
 
 .port image {
