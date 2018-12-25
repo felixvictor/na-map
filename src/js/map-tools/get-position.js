@@ -113,7 +113,7 @@ export default class TrilateratePosition {
                 id: d.id,
                 coord: [d.geometry.coordinates[0], d.geometry.coordinates[1]],
                 name: d.properties.name,
-                nation: this._ports.pbData.ports.filter(port => port.id === d.id).map(port => port.nation)
+                nation: d.properties.nation
             }))
             .sort((a, b) => {
                 if (a.name < b.name) {
