@@ -75,7 +75,7 @@ export default class SelectPorts {
 
     _setupListener() {
         $.fn.selectpicker.Constructor.DEFAULTS.virtualScroll = true;
-        $.fn.selectpicker.Constructor.DEFAULTS.width = "fit";
+        $.fn.selectpicker.Constructor.DEFAULTS.width = "auto";
         $.fn.selectpicker.Constructor.DEFAULTS.dropupAuto = false;
         $.fn.selectpicker.Constructor.DEFAULTS.liveSearch = true;
         $.fn.selectpicker.Constructor.DEFAULTS.liveSearchPlaceholder = "Search ...";
@@ -203,6 +203,7 @@ export default class SelectPorts {
             .join("")}`;
 
         this._portNamesSelector.insertAdjacentHTML("beforeend", options);
+        this._portNamesSelector.setAttribute("data-width", "fit");
         this._portNamesSelector.classList.add("selectpicker");
         $(this._portNamesSelector).selectpicker();
     }
@@ -223,6 +224,7 @@ export default class SelectPorts {
             .join("")}`;
 
         this._buyGoodsSelector.insertAdjacentHTML("beforeend", options);
+        this._buyGoodsSelector.setAttribute("data-width", "fit");
         this._buyGoodsSelector.classList.add("selectpicker");
         $(this._buyGoodsSelector).selectpicker();
     }
