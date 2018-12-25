@@ -15,18 +15,11 @@ $paddingThird: map-get($spacers, 1);
 // opentype
 
 body {
-    font-feature-settings: "ss18"; // (needs also calt)
+    font-variant-alternates: styleset(ss18); // (needs also calt)
     font-kerning: normal;
     font-variant-caps: normal;
     font-variant-ligatures: common-ligatures contextual; // liga calt
     font-variant-numeric: oldstyle-nums; // onum
-}
-
-@supports (font-variant-alternates: styleset(ss18)) {
-    body {
-        font-feature-settings: normal;
-        font-variant-alternates: styleset(ss18); // (needs also calt)
-    }
 }
 
 table,
@@ -35,25 +28,23 @@ table,
 }
 
 .fraction {
-    font-feature-settings: "frac";
+    font-variant-numeric: diagonal-fractions;
 }
 
-@supports (font-variant-numeric: diagonal-fractions) {
-    .fraction {
-        font-feature-settings: normal;
-        font-variant-numeric: diagonal-fractions;
-    }
+.super {
+    font-variant-position: super;
+    font-feature-settings: "sups";
 }
 
 .caps,
 .des {
-    font-feature-settings: "c2sc", "smcp";
-    letter-spacing: 0.06rem;
+    font-variant-caps: all-small-caps;
+    letter-spacing: 0.06em;
 }
 
 .des {
     position: relative;
-    top: -0.4em;
+    top: -0.4rem;
     font-size: small;
     color: $primary-700;
 }
@@ -431,7 +422,6 @@ table a {
     }
 
     text {
-        font-size: 1rem;
         fill: $secondary-800;
         text-anchor: middle;
         dominant-baseline: central;
@@ -453,7 +443,6 @@ table a {
 
     .label {
         text {
-            // font-size: unset;
             text-anchor: start;
         }
 
@@ -563,7 +552,6 @@ table a {
     }
 
     text {
-        font-size: 1em;
         fill: $secondary-800;
         text-anchor: middle;
         dominant-baseline: central;
@@ -616,12 +604,11 @@ table a {
 
 .wind,
 .wind-text {
-    font-size: 1.2em !important;
     text-anchor: middle !important;
 }
 
 .wind-text-current {
-    font-size: 1em !important;
+    font-size: smaller !important;
     text-anchor: middle !important;
 }
 
@@ -759,7 +746,7 @@ $flags: "NT", "FT";
 }
 
 .county {
-    letter-spacing: .6rem;
+    letter-spacing: 0.6rem;
     font-size: 60px;
 }
 
