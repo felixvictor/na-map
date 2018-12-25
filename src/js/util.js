@@ -120,7 +120,7 @@ export function getOrdinal(n, sup = true) {
     const s = ["th", "st", "nd", "rd"],
         v = n % 100,
         text = s[(v - 20) % 10] || s[v] || s[0];
-    return n + (sup ? `<sup>${text}</sup>` : `${text}`);
+    return n + (sup ? `<span class="super">${text}</span>` : `${text}`);
 }
 
 /**
@@ -216,7 +216,7 @@ export const displayCompass = (wind, svg = false) => {
         compass = degreesToCompass(+wind);
     }
 
-    return `<${svg ? "tspan" : "span"} class="fraction">${compass}</${svg ? "tspan" : "span"}>`;
+    return `<${svg ? "tspan" : "span"} class="fraction caps">${compass}</${svg ? "tspan" : "span"}>`;
 };
 
 /**
@@ -237,7 +237,7 @@ export const displayCompassAndDegrees = (wind, svg = false) => {
         compass = degreesToCompass(degrees);
     }
 
-    return `<${svg ? "tspan" : "span"} class="fraction">${compass}</${svg ? "tspan" : "span"}> (${degrees}°)`;
+    return `<${svg ? "tspan" : "span"} class="fraction caps">${compass}</${svg ? "tspan" : "span"}> (${degrees}°)`;
 };
 
 /**
