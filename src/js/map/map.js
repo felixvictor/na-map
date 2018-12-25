@@ -492,15 +492,19 @@ class Map {
 
             const body = d3Select(`#${id} .modal-body`);
             body.html(
-                `<p>${appDescription} Please check the <a href="https://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/"> Game-Labs forum post</a> for further details. Feedback is very welcome.</p><p>Designed by iB aka Felix Victor, clan <a href="https://bccnavalaction.freeforums.net/">British Captains’ Club ${displayClan("(BCC)")}</a>.</p>`
+                `<p>${appDescription} Please check the <a href="https://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/"> Game-Labs forum post</a> for further details. Feedback is very welcome.</p><p>Designed by iB aka Felix Victor, clan <a href="https://bccnavalaction.freeforums.net/">British Captains’ Club ${displayClan(
+                    "(BCC)"
+                )}</a>.</p>`
             );
         }
 
         const modalId = "modal-about";
+
         // If the modal has no content yet, insert it
-        if (!$(`#${modalId}`)) {
+        if (!$(`#${modalId}`).length) {
             initModal(modalId);
         }
+
         // Show modal
         $(`#${modalId}`).modal("show");
     }
