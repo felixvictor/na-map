@@ -286,6 +286,11 @@ export default class DisplayGrid {
         this._gYAxis.select(".domain").remove();
     }
 
+    _setBackgroundHeightAndWidth() {
+        this._xBackground.attr("height", this._xBackgroundHeight).attr("width", this._width);
+        this._yBackground.attr("height", this._height).attr("width", this._yBackgroundWidth);
+    }
+
     /**
      * Setup background
      * @return {void}
@@ -293,15 +298,11 @@ export default class DisplayGrid {
     _setupBackground() {
         this._gBackground = this._map.svg.insert("g", "g.axis").classed("grid-background d-none", true);
         // Background for x axis legend
-        this._gBackground
-            .append("rect")
-            .attr("height", this._xBackgroundHeight)
-            .attr("width", this._width);
+        this._xBackground = this._gBackground.append("rect");
         // Background for y axis legend
-        this._gBackground
-            .append("rect")
-            .attr("height", this._height)
-            .attr("width", this._yBackgroundWidth);
+        this._yBackground = this._gBackground.append("rect");
+
+        this._setBackgroundHeightAndWidth();
     }
 
     /**
@@ -328,7 +329,7 @@ export default class DisplayGrid {
      * @return {void}
      * @public
      */
-    update() {
+    update(height = null, width = null) {
         let show = false;
         let topMargin = 0;
         let leftMargin = 0;
@@ -337,6 +338,12 @@ export default class DisplayGrid {
             show = true;
             topMargin = this._xBackgroundHeight;
             leftMargin = this._yBackgroundWidth;
+
+            if (height && width) {
+                this._height = height;
+                this._width = width;
+                this._setBackgroundHeightAndWidth();
+            }
         }
 
         // Show or hide axis
