@@ -83,6 +83,7 @@ export const formatSiInt = x =>
         .format(",.2s")(x)
         .replace(".0", "")
         .replace("M", "\u2009\u1d0d") // LATIN LETTER SMALL CAPITAL M
+        .replace("k", "\u2009k")
         .replace("-", "\u2212\u202f");
 
 /**
