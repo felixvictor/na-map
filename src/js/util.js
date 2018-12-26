@@ -9,6 +9,7 @@
  */
 
 import { formatPrefix as d3FormatPrefix, formatLocale as d3FormatLocale } from "d3-format";
+import { scaleBand as d3ScaleBand } from "d3-scale";
 import { arc as d3Arc, pie as d3Pie } from "d3-shape";
 
 /**
@@ -427,54 +428,69 @@ export function chunkify(array, n, balanced = true) {
  */
 export function printCompassRose({ elem, compassSize }) {
     const steps = 24,
-        stepRadians = (2 * Math.PI) / steps,
+        degreesPerStep = 360 / steps,
         radius = compassSize / (2 * Math.PI),
-        outerRadius = radius - 1,
-        innerRadius = radius * 0.8;
-    const data = Array.from(new Array(steps), () => 1);
-    const textArc = d3Arc()
-            .outerRadius(outerRadius)
-            .innerRadius(innerRadius),
-        textPie = d3Pie()
-            .startAngle(0 - stepRadians / 2)
-            .endAngle(2 * Math.PI - stepRadians / 2)
-            .sort(null)
-            .value(d => d),
-        textArcs = textPie(data);
+        innerRadius = Math.round(radius * 0.8);
+    const strokeWidth = 3;
+    const data = Array(steps)
+        .fill()
+        .map((e, i) => degreesToCompass(i * degreesPerStep));
+    const xScale = d3ScaleBand()
+        .range([0 - degreesPerStep / 2, 360 - degreesPerStep / 2])
+        .domain(data)
+        .align(0);
 
-    elem.append("circle").attr("r", Math.floor(innerRadius));
+    elem.append("circle")
+        .attr("r", innerRadius)
+        .style("stroke-width", `${strokeWidth}px`);
+
+    const dummy = elem.append("text");
 
     // Cardinal and intercardinal winds
-    elem.selectAll("text")
-        .data(textArcs.filter((d, i) => i % 3 === 0))
+    const label = elem
+        .selectAll("g")
+        .data(data)
         .enter()
+        .append("g")
+        .attr(
+            "transform",
+            d => `rotate(${Math.round(xScale(d) + xScale.bandwidth() / 2 - 90)})translate(${innerRadius},0)`
+        );
+
+    label
+        .filter((d, i) => i % 3 !== 0)
+        .append("line")
+        .attr("x2", 9);
+
+    label
+        .filter((d, i) => i % 3 === 0)
         .append("text")
         .attr("transform", d => {
-            const [tx, ty] = textArc.centroid(d),
-                translate = [Math.round(tx), Math.round(ty)];
-            let rotate = Math.round(((d.startAngle + d.endAngle) / 2) * (180 / Math.PI));
-            if (rotate === 90 || rotate === 270) {
-                rotate = 0;
-            } else if (rotate > 90 && rotate < 270) {
-                rotate -= 180;
-            }
-            return `rotate(${rotate}, ${translate}) translate(${translate})`;
-        })
-        .attr("dx", d => (degreesToCompass((360 / steps) * d.index) === "E" ? "-.2em" : "0"))
-        .text(d => degreesToCompass((360 / steps) * d.index));
+            let rotate = Math.round(xScale(d) + xScale.bandwidth() / 2);
+            let translate = "";
 
-    // Ticks
-    const y1 = Math.floor(-outerRadius * 0.95),
-        y2 = Math.floor(-innerRadius);
-    elem.selectAll("line")
-        .data(textArcs.filter((d, i) => i % 3 !== 0))
-        .enter()
-        .append("line")
-        .attr("x1", 0)
-        .attr("x2", 0)
-        .attr("y1", y1)
-        .attr("y2", y2)
-        .attr("transform", d => `rotate(${Math.round(((d.startAngle + d.endAngle) / 2) * (180 / Math.PI))})`);
+            dummy.text(d);
+            const { height: textHeight, width: textWidth } = dummy.node().getBBox();
+
+            if ((rotate >= 0 && rotate <= 45) || rotate === 315) {
+                rotate = 90;
+                translate = `0,-${textHeight / 2}`;
+            } else if (rotate === 90) {
+                rotate = 0;
+                translate = `${textWidth / 2 + strokeWidth},0`;
+            } else if (rotate === 270) {
+                rotate = 180;
+                translate = `-${textWidth / 2 + strokeWidth},0`;
+            } else {
+                rotate = -90;
+                translate = `0,${textHeight / 2 + strokeWidth + 2}`;
+            }
+
+            return `rotate(${rotate})translate(${translate})`;
+        })
+        .text(d => d);
+
+    dummy.remove();
 }
 
 /**
@@ -484,34 +500,32 @@ export function printCompassRose({ elem, compassSize }) {
  */
 export function printSmallCompassRose({ elem, compassSize }) {
     const steps = 24,
-        stepRadians = (2 * Math.PI) / steps,
+        degreesPerStep = 360 / steps,
         radius = compassSize / (2 * Math.PI),
-        outerRadius = radius,
-        innerRadius = radius * 0.8;
-    const data = Array.from(new Array(steps), () => 1);
-    const textPie = d3Pie()
-        .startAngle(0 - stepRadians / 2)
-        .endAngle(2 * Math.PI - stepRadians / 2)
-        .sort(null)
-        .value(d => d);
-    const textArcs = textPie(data);
+        innerRadius = Math.round(radius * 0.8);
+    const strokeWidth = 1.5;
+    const data = Array(steps)
+        .fill()
+        .map((e, i) => degreesToCompass(i * degreesPerStep));
+    const xScale = d3ScaleBand()
+        .range([0 - degreesPerStep / 2, 360 - degreesPerStep / 2])
+        .domain(data)
+        .align(0);
 
-    elem.append("circle").attr("r", Math.floor(innerRadius));
+    elem.append("circle")
+        .attr("r", innerRadius)
+        .style("stroke-width", `${strokeWidth}px`);
 
     // Ticks
-    const y1Card = Math.floor(-outerRadius * 0.85);
-    const y1InterCard = Math.floor(-outerRadius * 0.9);
-    const y1 = Math.floor(-outerRadius);
-    const y2 = Math.floor(-innerRadius);
+    const x1 = 2;
+    const x1InterCard = 4;
+    const x1Card = 6;
     elem.selectAll("line")
-        .data(textArcs)
+        .data(data)
         .enter()
         .append("line")
-        .attr("x1", 0)
-        .attr("x2", 0)
-        .attr("y1", (d, i) => (i % 3 !== 0 ? y1Card : i % 6 !== 0 ? y1InterCard : y1))
-        .attr("y2", y2)
-        .attr("transform", d => `rotate(${Math.round(((d.startAngle + d.endAngle) / 2) * (180 / Math.PI))})`);
+        .attr("x2", (d, i) => (i % 3 !== 0 ? x1 : i % 6 !== 0 ? x1InterCard : x1Card))
+        .attr("transform", d => `rotate(${Math.round(xScale(d) + xScale.bandwidth() / 2)})translate(${innerRadius},0)`);
 }
 
 /**
