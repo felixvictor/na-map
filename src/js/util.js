@@ -154,29 +154,29 @@ export function isEmpty(obj) {
  */
 export const compassDirections = [
     "N",
-    "N1/3NE",
-    "N2/3NE",
+    "N⅓NE",
+    "N⅔NE",
     "NE",
-    "E2/3NE",
-    "E1/3NE",
+    "E⅔NE",
+    "E⅓NE",
     "E",
-    "E1/3SE",
-    "E2/3SE",
+    "E⅓SE",
+    "E⅔SE",
     "SE",
-    "S2/3SE",
-    "S1/3SE",
+    "S⅔SE",
+    "S⅓SE",
     "S",
-    "S1/3SW",
-    "S2/3SW",
+    "S⅓SW",
+    "S⅔SW",
     "SW",
-    "W2/3SW",
-    "W1/3SW",
+    "W⅔SW",
+    "W⅓SW",
     "W",
-    "W1/3NW",
-    "W2/3NW",
+    "W⅓NW",
+    "W⅔NW",
     "NW",
-    "N2/3NW",
-    "N1/3NW"
+    "N⅔NW",
+    "N⅓NW"
 ];
 
 /**
@@ -217,7 +217,7 @@ export const displayCompass = (wind, svg = false) => {
         compass = degreesToCompass(+wind);
     }
 
-    return `<${svg ? "tspan" : "span"} class="fraction ${svg ? "" : "caps"}">${compass}</${svg ? "tspan" : "span"}>`;
+    return `<${svg ? "tspan" : "span"} class="caps">${compass}</${svg ? "tspan" : "span"}>`;
 };
 
 /**
@@ -238,9 +238,7 @@ export const displayCompassAndDegrees = (wind, svg = false) => {
         compass = degreesToCompass(degrees);
     }
 
-    return `<${svg ? "tspan" : "span"} class="fraction ${svg ? "" : "caps"}">${compass}</${
-        svg ? "tspan" : "span"
-    }> (${degrees}°)`;
+    return `<${svg ? "tspan" : "span"} class="caps">${compass}</${svg ? "tspan" : "span"}> (${degrees}°)`;
 };
 
 /**
