@@ -268,15 +268,6 @@ table a {
     display: inline;
 }
 
-.des {
-    position: relative;
-    top: -0.4em;
-    font-size: small !important;
-    color: $primary-700;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-}
-
 .mm {
     color: $red;
 }
@@ -612,8 +603,8 @@ table a {
 }
 
 .wind-text-current {
-    font-size: smaller !important;
-    text-anchor: middle !important;
+    font-size: smaller;
+    fill: $secondary-600 !important;
 }
 
 .profile {
