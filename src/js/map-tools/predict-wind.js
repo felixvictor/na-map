@@ -22,6 +22,7 @@ import {
     compassDirections,
     compassToDegrees,
     degreesToCompass,
+    degreesToRadians,
     displayCompass,
     displayCompassAndDegrees,
     getUserWind,
@@ -33,8 +34,8 @@ import { insertBaseModal } from "../common";
 export default class PredictWind {
     constructor() {
         this._height = 300;
-        this._width = 300;
-        this._windArrowWidth = 4;
+        this._width = 260;
+        this._windArrowWidth = 3;
 
         this._baseName = "Predict wind";
         this._baseId = "predict-wind";
@@ -258,16 +259,16 @@ export default class PredictWind {
 
     _printCompass(predictedWindDegrees) {
         const line = d3Line();
-        const compassSize = 600;
+        const radius = Math.min(this._height / 1.4, this._width / 1.4) / 2;
         const xCompass = this._width / 2;
-        const yCompass = this._height / 3;
-        const radians = (Math.PI / 180) * (predictedWindDegrees - 90);
-        const length = (compassSize / Math.PI) * 0.6;
+        const yCompass = this._height / 2.8;
+        const radians = degreesToRadians(predictedWindDegrees);
+        const length = radius * 0.6;
         const dx = length * Math.cos(radians);
         const dy = length * Math.sin(radians);
         const lineData = [
-            [Math.round(xCompass + dx / 2), Math.round(yCompass + dy / 2)],
-            [Math.round(xCompass - dx / 2), Math.round(yCompass - dy / 2)]
+            [Math.round(xCompass + dx), Math.round(yCompass + dy)],
+            [Math.round(xCompass - dx), Math.round(yCompass - dy)]
         ];
 
         this._svg.attr("height", this._height).attr("width", this._width);
@@ -279,7 +280,7 @@ export default class PredictWind {
             .classed("compass", true)
             .attr("x", xCompass)
             .attr("y", yCompass);
-        printCompassRose({ elem: compassElem, compassSize });
+        printCompassRose({ elem: compassElem, radius });
 
         // Wind direction
         this._svg
@@ -319,7 +320,7 @@ export default class PredictWind {
 
         textSvg
             .attr("x", (this._width - textWidth) / 2)
-            .attr("y", "66%")
+            .attr("y", "72%")
             .attr("height", textHeight)
             .attr("width", textWidth);
     }
