@@ -291,6 +291,7 @@ export default class WindRose {
     }
 
     clearMap() {
+        window.clearInterval(this._intervalId);
         if (this._div) {
             this._div.remove();
         }
