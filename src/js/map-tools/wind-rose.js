@@ -225,8 +225,18 @@ export default class WindRose {
     }
 
     _windChange() {
-        this._currentWindDegrees =
-            360 + (Math.floor(this._currentWindDegrees - this._degreesPerSecond * this._intervalSeconds) % 360);
+        const now = moment();
+        const timeDiff = this._windChange.lastTime ? Math.round(now.diff(this._windChange.lastTime) / 1000) : "-";
+        const newWind = Math.floor(
+            (360 + this._currentWindDegrees - this._degreesPerSecond * this._intervalSeconds) % 360
+        );
+        console.log(
+            `*** Wind change at ${now.local().format("HH.mm.ss")} (${timeDiff} seconds difference): from ${
+                this._currentWindDegrees
+            }° to ${newWind}° (${this._currentWindDegrees - newWind}° difference)`
+        );
+        this._currentWindDegrees = newWind;
+        this._windChange.lastTime = now;
 
         this._updateWindDirection();
     }
