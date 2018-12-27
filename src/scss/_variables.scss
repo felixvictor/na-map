@@ -35,8 +35,14 @@ $spacers: (
 // Body
 $body-bg: $background-100;
 $body-color: $primary-800;
-$yiq-text-dark: $primary-900;
+$yiq-text-dark: $primary-800;
 //$yiq-text-light: $white !default;
+
+// Navbar
+$navbar-light-color:                $primary-700; // rgba($black, .5) !default;
+$navbar-light-hover-color:          $primary-800; // rgba($black, .7) !default;
+$navbar-light-active-color:         $primary-900; // rgba($black, .9) !default;
+$navbar-light-disabled-color:       $primary-800; // rgba($black, .3) !default;
 
 // Links
 $link-color: $secondary-700;
