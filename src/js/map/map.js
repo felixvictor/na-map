@@ -610,7 +610,6 @@ class Map {
         this._setHeightWidth();
         this._setSvgSize();
         this._displayMap(zoomTransform);
-        console.log(this.height, this.width);
         this._grid.update(this.height, this.width);
     }
 
