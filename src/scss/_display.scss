@@ -935,3 +935,7 @@ $flags: "NT", "FT";
 .bootstrap-select > .dropdown-toggle.bs-placeholder {
     color: $navbar-light-color;
 }
+
+.dropdown-header {
+    font-size: smaller;
+}
