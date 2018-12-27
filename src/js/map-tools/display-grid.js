@@ -154,7 +154,7 @@ export default class DisplayGrid {
             .tickSize(this._maxCoord);
 
         // svg groups
-        this._gAxis = this._map.svg.insert("g", "g.pb").classed("axis d-none", true);
+        this._gAxis = this._map.svg.append("g").classed("axis d-none", true);
         this._gXAxis = this._gAxis.append("g").classed("axis-x", true);
         this._gYAxis = this._gAxis.append("g").classed("axis-y", true);
         this._setupBackground();
