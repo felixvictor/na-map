@@ -17,7 +17,7 @@ import "round-slider/src/roundslider.css";
 import "../../scss/roundslider.scss";
 
 import Cookies from "js-cookie";
-import { compassDirections, displayCompass, getUserWind, printSmallCompassRose } from "../util";
+import { compassDirections, degreesToRadians, displayCompass, getUserWind, printSmallCompassRose } from "../util";
 import { registerEvent } from "../analytics";
 import { insertBaseModal } from "../common";
 
@@ -28,14 +28,13 @@ export default class WindRose {
         this._width = this._height;
         this._xCompass = this._width / 2;
         this._line = d3Line();
-        const compassRadius = Math.min(this._height, this._width) / 2;
-        this._compassSize = Math.floor(compassRadius * Math.PI * 2);
-        this._length = Math.floor((this._compassSize / Math.PI) * 0.6);
+        this._compassRadius = Math.min(this._height, this._width) / 2;
+        this._length = this._compassRadius * 0.6;
         this._windPath = null;
 
         this._windArrowWidth = 4;
 
-        this._intervalSeconds = 10;
+        this._intervalSeconds = 40;
         const secondsForFullCircle = 48 * 60;
         const fullCircle = 360;
         this._degreesPerSecond = fullCircle / secondsForFullCircle;
@@ -225,18 +224,8 @@ export default class WindRose {
     }
 
     _windChange() {
-        const now = moment();
-        const timeDiff = this._windChange.lastTime ? Math.round(now.diff(this._windChange.lastTime) / 1000) : "-";
-        const newWind = Math.floor(
-            (360 + this._currentWindDegrees - this._degreesPerSecond * this._intervalSeconds) % 360
-        );
-        console.log(
-            `*** Wind change at ${now.local().format("HH.mm.ss")} (${timeDiff} seconds difference): from ${
-                this._currentWindDegrees
-            }° to ${newWind}° (${this._currentWindDegrees - newWind}° difference)`
-        );
-        this._currentWindDegrees = newWind;
-        this._windChange.lastTime = now;
+        this._currentWindDegrees =
+            360 + ((this._currentWindDegrees - this._degreesPerSecond * this._intervalSeconds) % 360);
 
         this._updateWindDirection();
     }
@@ -261,12 +250,12 @@ export default class WindRose {
     }
 
     _updateWindDirection() {
-        const radians = (Math.PI / 180) * (this._currentWindDegrees - 90);
+        const radians = degreesToRadians(this._currentWindDegrees);
         const dx = this._length * Math.cos(radians);
         const dy = this._length * Math.sin(radians);
         const lineData = [
-            [Math.round(this._xCompass + dx / 2), Math.round(this._yCompass + dy / 2)],
-            [Math.round(this._xCompass - dx / 2), Math.round(this._yCompass - dy / 2)]
+            [Math.round(this._xCompass + dx), Math.round(this._yCompass + dy)],
+            [Math.round(this._xCompass - dx), Math.round(this._yCompass - dy)]
         ];
 
         this._windPath.datum(lineData).attr("d", this._line);
@@ -282,7 +271,7 @@ export default class WindRose {
             .classed("compass", true)
             .attr("x", this._xCompass)
             .attr("y", this._yCompass);
-        printSmallCompassRose({ elem: compassElem, compassSize: this._compassSize });
+        printSmallCompassRose({ elem: compassElem, radius: this._compassRadius });
 
         this._windPath = this._svg
             .append("path")
