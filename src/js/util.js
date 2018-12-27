@@ -426,10 +426,9 @@ export function chunkify(array, n, balanced = true) {
  * @param {object} elem - Element to append compass
  * @return {void}
  */
-export function printCompassRose({ elem, compassSize }) {
+export function printCompassRose({ elem, radius }) {
     const steps = 24,
         degreesPerStep = 360 / steps,
-        radius = compassSize / (2 * Math.PI),
         innerRadius = Math.round(radius * 0.8);
     const strokeWidth = 3;
     const data = Array(steps)
@@ -498,10 +497,9 @@ export function printCompassRose({ elem, compassSize }) {
  * @param {object} elem - Element to append compass
  * @return {void}
  */
-export function printSmallCompassRose({ elem, compassSize }) {
+export function printSmallCompassRose({ elem, radius }) {
     const steps = 24,
         degreesPerStep = 360 / steps,
-        radius = compassSize / (2 * Math.PI),
         innerRadius = Math.round(radius * 0.8);
     const strokeWidth = 1.5;
     const data = Array(steps)
@@ -517,14 +515,14 @@ export function printSmallCompassRose({ elem, compassSize }) {
         .style("stroke-width", `${strokeWidth}px`);
 
     // Ticks
-    const x1 = 2;
-    const x1InterCard = 4;
-    const x1Card = 6;
+    const x2 = 2;
+    const x2InterCard = 4;
+    const x2Card = 6;
     elem.selectAll("line")
         .data(data)
         .enter()
         .append("line")
-        .attr("x2", (d, i) => (i % 3 !== 0 ? x1 : i % 6 !== 0 ? x1InterCard : x1Card))
+        .attr("x2", (d, i) => (i % 3 !== 0 ? x2 : i % 6 !== 0 ? x2InterCard : x2Card))
         .attr("transform", d => `rotate(${Math.round(xScale(d) + xScale.bandwidth() / 2)})translate(${innerRadius},0)`);
 }
 
