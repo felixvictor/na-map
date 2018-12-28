@@ -496,7 +496,7 @@ table a {
     @include caps;
 }
 
-.port image {
+.port circle {
     cursor: pointer;
 }
 
@@ -631,42 +631,10 @@ table a {
 }
 
 .flag-icon {
-    display: inline-block;
     width: 2rem;
+    height: 100%;
     margin-right: 0.4rem;
-    background-repeat: no-repeat;
-    background-size: contain;
-
-    &::before {
-        content: "\00a0";
-    }
 }
-
-$flags-dir: "~Icons";
-$flags: "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "RU", "DE", "PL";
-
-@mixin flags-norm {
-    @each $flag in $flags {
-        .flag-icon.#{$flag} {
-            background-image: url("#{$flags-dir}/#{$flag}.svg");
-        }
-        .flag-icon.#{$flag}a {
-            background-image: url("#{$flags-dir}/#{$flag}a.svg");
-        }
-    }
-}
-@include flags-norm;
-
-$flags: "NT", "FT";
-
-@mixin flags {
-    @each $flag in $flags {
-        .flag-icon.#{$flag} {
-            background-image: url("#{$flags-dir}/#{$flag}.svg");
-        }
-    }
-}
-@include flags;
 
 // contrast function
 // https://lnikki.la/articles/sass-better-colour-based-on-brightness/

@@ -431,7 +431,7 @@ const config = {
                     {
                         loader: "svg-url-loader",
                         options: {
-                            limit: 1,
+                            limit: 1000,
                             name: "[name].[ext]",
                             outputPath: "icons/"
                         }
