@@ -17,22 +17,39 @@ import "moment/locale/en-gb";
 
 import {
     circleRadiusFactor,
-    defaultFontSize,
-    defaultCircleSize,
-    getDistance,
     convertCoordX,
-    convertCoordY
+    convertCoordY,
+    defaultCircleSize,
+    defaultFontSize,
+    getDistance,
+    nations
 } from "../common";
 import {
+    degreesToRadians,
     displayClan,
     formatInt,
-    formatSiInt,
     formatPercent,
+    formatSiInt,
     getOrdinal,
-    roundToThousands,
-    degreesToRadians
+    roundToThousands
 } from "../util";
 import TrilateratePosition from "../map-tools/get-position";
+
+/**
+ * @link https://stackoverflow.com/questions/42118296/dynamically-import-images-from-a-directory-using-webpack
+ * @param {object} r - webpack require.context
+ * @return {object} Images
+ */
+const importAll = r => {
+    const images = {};
+    r.keys().forEach(item => {
+        images[item.replace("./", "").replace(".svg", "")] = r(item);
+    });
+    return images;
+};
+
+const nationIcons = importAll(require.context("../../icons", false, /\.svg$/));
+console.log(nationIcons);
 
 export default class DisplayPorts {
     constructor(portData, map) {
@@ -324,10 +341,35 @@ export default class DisplayPorts {
     _setupFlags() {
         const svgDef = d3Select("#na-svg defs");
 
-        this._clipPath = svgDef
-            .append("clipPath")
-            .attr("id", "clipObj")
-            .append("circle");
+        nations
+            .map(d => d.short)
+            .forEach(nation => {
+                const pattern = svgDef
+                    .append("pattern")
+                    .attr("id", nation)
+                    .attr("width", "133%")
+                    .attr("height", "100%")
+                    .attr("viewBox", `6 6 ${this._iconSize} ${this._iconSize * 0.75}`);
+                pattern
+                    .append("image")
+                    .attr("height", this._iconSize)
+                    .attr("width", this._iconSize)
+                    .attr("href", nationIcons[nation].replace('"', "").replace('"', ""));
+
+                if (nation !== "NT" && nation !== "FT") {
+                    const patternA = svgDef
+                        .append("pattern")
+                        .attr("id", `${nation}a`)
+                        .attr("width", "133%")
+                        .attr("height", "100%")
+                        .attr("viewBox", `6 6 ${this._iconSize} ${this._iconSize * 0.75}`);
+                    patternA
+                        .append("image")
+                        .attr("height", this._iconSize)
+                        .attr("width", this._iconSize)
+                        .attr("href", nationIcons[`${nation}a`].replace('"', "").replace('"', ""));
+                }
+            });
     }
 
     _getPortName(id) {
@@ -436,7 +478,9 @@ export default class DisplayPorts {
     _showDetails(d, i, nodes) {
         const tooltipData = port => {
             let h = '<div class="d-flex align-items-baseline">';
-            h += `<i class="flag-icon align-self-stretch ${port.icon}"></i>`;
+            h += `<img alt="${port.icon}" class="flag-icon align-self-stretch" src="${nationIcons[port.icon]
+                .replace('"', "")
+                .replace('"', "")}"/>`;
             h += `<div class="port-name">${port.name}</div>`;
             h += `<div class="">\u2000${port.county} ${port.availableForAll}</div>`;
             h += "</div>";
@@ -516,15 +560,11 @@ export default class DisplayPorts {
             $(d3Select(nodes[i]).node()).tooltip("dispose");
         };
         const circleScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale);
-        const circleSize = Math.round(this._circleSize / circleScale) * 3;
+        const circleSize = roundToThousands(this._circleSize / circleScale);
         const data = this._portData;
-        this._clipPath
-            .attr("cx", circleSize / 2)
-            .attr("cy", circleSize / 2)
-            .attr("r", circleSize / 3);
 
         // Data join
-        const circleUpdate = this._gIcon.selectAll("image").data(data, d => d.id);
+        const circleUpdate = this._gIcon.selectAll("circle").data(data, d => d.id);
 
         // Remove old circles
         circleUpdate.exit().remove();
@@ -535,23 +575,15 @@ export default class DisplayPorts {
         // Add new circles
         const circleEnter = circleUpdate
             .enter()
-            .append("image")
-            .attr("xlink:href", d => `icons/${d.properties.nation}${d.properties.availableForAll ? "a" : ""}.svg`)
-            .attr("clip-path", "url(#clipObj)")
+            .append("circle")
+            .attr("fill", d => `url(#${d.properties.nation}${d.properties.availableForAll ? "a" : ""})`)
+            .attr("cx", d => d.geometry.coordinates[0])
+            .attr("cy", d => d.geometry.coordinates[1])
             .on("click", (d, i, nodes) => this._showDetails(d, i, nodes))
             .on("mouseout", hideDetails);
 
         // Apply to both old and new
-        circleUpdate
-            .merge(circleEnter)
-            .attr("width", circleSize)
-            .attr("height", circleSize)
-            .attr(
-                "transform",
-                d =>
-                    `translate(${d.geometry.coordinates[0] - circleSize / 2},${d.geometry.coordinates[1] -
-                        circleSize / 2})`
-            );
+        circleUpdate.merge(circleEnter).attr("r", circleSize);
     }
 
     _updatePortCircles() {
