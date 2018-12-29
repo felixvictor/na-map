@@ -12,10 +12,10 @@ const // { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer"),
     CopyPlugin = require("copy-webpack-plugin"),
     HtmlPlugin = require("html-webpack-plugin"),
     MiniCssExtractPlugin = require("mini-css-extract-plugin"),
-    MinifyPlugin = require("babel-minify-webpack-plugin"),
     PreloadWebpackPlugin = require("preload-webpack-plugin"),
     SitemapPlugin = require("sitemap-webpack-plugin").default,
     SriPlugin = require("webpack-subresource-integrity"),
+    TerserPlugin = require("terser-webpack-plugin"),
     WebpackDeepScopeAnalysisPlugin = require("webpack-deep-scope-plugin").default,
     WebpackPwaManifest = require("webpack-pwa-manifest");
 const PACKAGE = require("./package.json");
@@ -488,7 +488,15 @@ const config = {
 module.exports = (env, argv) => {
     if (argv.mode === "production") {
         config.devtool = "";
-        config.plugins.push(new MinifyPlugin(minifyMinifyOpt, pluginMinifyOpt));
+        config.optimization.minimizer = [
+            new TerserPlugin({
+                cache: true,
+                parallel: true,
+                terserOptions: {
+                    output: { comments: false }
+                }
+            })
+        ];
     } else {
         config.devtool = "eval-source-map";
         config.plugins.push(new webpack.HotModuleReplacementPlugin());
