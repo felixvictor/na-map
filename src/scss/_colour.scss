@@ -29,9 +29,11 @@ $indigo: colour-mixin(#6610f2);
 $purple: colour-mixin(#6f42c1);
 $pink: colour-mixin(#e83e8c);
 $red: colour-mixin(#dc3545);
+$red-dark: colour-mixin(saturate(darken(#dc3545, 40%), 60%));
 $orange: colour-mixin(#fd7e14);
 $yellow: colour-mixin(#ffc107);
 $green: colour-mixin(#28a745);
+$green-dark: colour-mixin(saturate(darken(#28a745, 40%), 60%));
 $teal: colour-mixin(#20c997);
 $cyan: colour-mixin(#17a2b8);
 
