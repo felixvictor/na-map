@@ -23,7 +23,7 @@ import {
 import { formatInt, formatFloat, getOrdinal, isEmpty, roundToThousands } from "../util";
 import { registerEvent } from "../analytics";
 import CompareWoods from "./compare-woods";
-import { insertBaseModal } from "../common";
+import { colourRed, colourRedDark, colourWhite, colourGreen, colourGreenDark, insertBaseModal } from "../common";
 
 const numSegments = 24,
     segmentRadians = (2 * Math.PI) / numSegments,
@@ -583,7 +583,7 @@ class ShipComparison extends Ship {
             max = this._shipCompare._maxSpeed;
         const colourScale = d3ScaleLinear()
             .domain([min, -1, 0, 1, max])
-            .range(["#782129", "#a62e39", "#fbf8f5", "#419f57", "#2a6739"])
+            .range([colourRedDark, colourRed, colourWhite, colourGreen, colourGreenDark])
             .interpolate(d3InterpolateHcl);
 
         pathComp.attr("d", line(arcsComp)).classed("comp", true);
@@ -889,7 +889,7 @@ export default class CompareShips {
         this._maxSpeed = theoreticalMaxSpeed;
         this._colorScale = d3ScaleLinear()
             .domain([this._minSpeed, 0, 12, this._maxSpeed])
-            .range(["#a62e39", "#fbf8f5", "#419f57", "#58bb6f"])
+            .range([colourRed, colourWhite, colourGreen, colourGreenDark])
             .interpolate(d3InterpolateHcl);
 
         this._woodChanges = new Map([
