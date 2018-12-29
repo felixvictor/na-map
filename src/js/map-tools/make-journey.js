@@ -629,10 +629,10 @@ export default class Journey {
             return s;
         }
 
-        let textDistance = `${Math.round(distanceK)}k ${getHumanisedDuration(minutes)}`;
+        let textDistance = `${Math.round(distanceK)}\u2009k ${getHumanisedDuration(minutes)}`;
 
         if (addTotal) {
-            textDistance += ` \u2056 total ${Math.round(this._journey.totalDistance)}k ${getHumanisedDuration(
+            textDistance += ` \u2056 total ${Math.round(this._journey.totalDistance)}\u2009k ${getHumanisedDuration(
                 this._journey.totalMinutes
             )}`;
         }
