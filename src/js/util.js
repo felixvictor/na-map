@@ -59,7 +59,7 @@ export const formatFloatFixed = (x, f = 2) =>
  * @param {Number} x - ShowF11 coordinate
  * @return {String} Formatted ShowF11 coordinate
  */
-export const formatF11 = x => formatPrefix(x * -1).replace("-", "\u2212\u202f");
+export const formatF11 = x => formatPrefix(x * -1).replace("-", "\u2212\u202f").replace("k", "\u2009k");
 
 /**
  * Format integer
