@@ -8,7 +8,6 @@
 /// @author   iB aka Felix Victor
 ////
 
-
 .colour-palette {
     margin-bottom: 1.5rem;
 
@@ -217,6 +216,9 @@
     .red {
         background-color: $red;
     }
+    .red-dark {
+        background-color: $red-dark;
+    }
     .orange {
         background-color: $orange;
     }
@@ -225,6 +227,9 @@
     }
     .green {
         background-color: $green;
+    }
+    .green-dark {
+        background-color: $green-dark;
     }
     .teal {
         background-color: $teal;

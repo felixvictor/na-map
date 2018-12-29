@@ -15,8 +15,13 @@ import Cookies from "js-cookie";
 import moment from "moment";
 import "moment/locale/en-gb";
 
+import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate";
 import {
     circleRadiusFactor,
+    colourGray200,
+    colourGray500,
+    colourGray700,
+    colourRedDark,
     convertCoordX,
     convertCoordY,
     defaultCircleSize,
@@ -64,7 +69,8 @@ export default class DisplayPorts {
         this._attackRadius = d3ScaleLinear().domain([0, 1]);
         this._colourScale = d3ScaleLinear()
             .domain([0, 0.1, 0.5, 1])
-            .range(["#eaeded", "#8b989c", "#6b7478", "#a62e39"]);
+            .range([colourGray200, colourGray500, colourGray700, colourRedDark])
+            .interpolate(d3InterpolateHcl);
 
         this._minRadiusFactor = 1;
         this._maxRadiusFactor = 6;
