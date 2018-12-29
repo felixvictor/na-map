@@ -507,12 +507,12 @@ export default class DisplayPorts {
             h += "</p>";
             h += "<table class='table table-sm'>";
             if (port.producesNonTrading.length) {
-                h += "<tr><td>Produces\u00a0</td><td>";
+                h += "<tr><td class='pl-0'>Produces\u00a0</td><td>";
                 h += `<span class="non-trading">${port.producesNonTrading}</span>`;
                 h += "</td></tr>";
             }
             if (port.dropsTrading.length || port.dropsNonTrading.length) {
-                h += `<tr><td>Drops\u00a0${port.dropsNonTrading.length ? "\u00a0" : ""}</td><td>`;
+                h += `<tr><td class='pl-0'>Drops\u00a0${port.dropsNonTrading.length ? "\u00a0" : ""}</td><td>`;
                 if (port.dropsNonTrading.length) {
                     h += `<span class="non-trading">${port.dropsNonTrading}</span>`;
                     if (port.dropsTrading.length) {
@@ -525,16 +525,16 @@ export default class DisplayPorts {
                 h += "</td></tr>";
             }
             if (port.consumesTrading.length) {
-                h += "<tr><td>Consumes\u00a0</td><td>";
+                h += "<tr><td class='pl-0'>Consumes\u00a0</td><td>";
                 h += port.consumesTrading;
                 h += "</td></tr>";
             }
             if (this.showTradePortPartners) {
                 if (port.goodsToSellInTradePort.length) {
-                    h += `<tr><td>Sell in ${port.tradePort}</td><td>${port.goodsToSellInTradePort}</td></tr>`;
+                    h += `<tr><td class='pl-0'>Sell in ${port.tradePort}</td><td>${port.goodsToSellInTradePort}</td></tr>`;
                 }
                 if (port.goodsToBuyInTradePort.length) {
-                    h += `<tr><td>Buy in ${port.tradePort}</td><td>${port.goodsToBuyInTradePort}</td></tr>`;
+                    h += `<tr><td class='pl-0'>Buy in ${port.tradePort}</td><td>${port.goodsToBuyInTradePort}</td></tr>`;
                 }
             }
             h += "</table>";
