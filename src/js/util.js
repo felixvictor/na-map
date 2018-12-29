@@ -10,7 +10,6 @@
 
 import { formatPrefix as d3FormatPrefix, formatLocale as d3FormatLocale } from "d3-format";
 import { scaleBand as d3ScaleBand } from "d3-scale";
-import { arc as d3Arc, pie as d3Pie } from "d3-shape";
 
 /**
  * Default format
