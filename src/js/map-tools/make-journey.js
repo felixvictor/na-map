@@ -51,7 +51,7 @@ export default class Journey {
         this._woodData = woodData;
         this._fontSize = fontSize;
 
-        this._compassSize = 600;
+        this._compassRadius = 90;
         this._courseArrowWidth = 5;
         this._line = d3Line()
             .x(d => d[0])
@@ -302,7 +302,7 @@ export default class Journey {
             .call(this._drag);
 
         this._compassG = this._compass.append("g");
-        printCompassRose({ elem: this._compassG, compassSize: this._compassSize });
+        printCompassRose({ elem: this._compassG, radius: this._compassRadius });
     }
 
     _removeCompass() {
