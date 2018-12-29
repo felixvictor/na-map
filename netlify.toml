@@ -27,7 +27,7 @@
     for = "*.json"
     [headers.values]
         Cache-Control = "public"
-        Expires = "Sat, 29 Dec 2018 10:00:00 GMT" # bash change here
+        Expires = "Sun, 30 Dec 2018 10:00:00 GMT" # bash change here
 
 [[headers]]
     for = "*-pb.json"
