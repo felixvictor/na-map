@@ -602,7 +602,7 @@ export default class Journey {
     }
 
     _getTextDirection(courseCompass, courseDegrees, pt1) {
-        return `${displayCompassAndDegrees(courseCompass, true)} \u2606 F11: ${formatF11(
+        return `${displayCompassAndDegrees(courseCompass, true)} \u2056 F11: ${formatF11(
             convertInvCoordX(pt1.x, pt1.y)
         )}\u202f/\u202f${formatF11(convertInvCoordY(pt1.x, pt1.y))}`;
     }
@@ -632,7 +632,7 @@ export default class Journey {
         let textDistance = `${Math.round(distanceK)}k ${getHumanisedDuration(minutes)}`;
 
         if (addTotal) {
-            textDistance += ` \u2606 total ${Math.round(this._journey.totalDistance)}k ${getHumanisedDuration(
+            textDistance += ` \u2056 total ${Math.round(this._journey.totalDistance)}k ${getHumanisedDuration(
                 this._journey.totalMinutes
             )}`;
         }
