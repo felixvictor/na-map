@@ -302,38 +302,12 @@ table a {
 
 .columnA {
     background-color: $primary-100;
-
-    table {
-        thead {
-            background-color: $primary-050;
-        }
-
-        th {
-            border-top: none;
-        }
-
-        tbody tr:nth-of-type(odd) {
-            background-color: $primary-200;
-        }
-    }
+    font-variant-numeric: normal; // onum off
 }
 
 .columnC {
     background-color: $secondary-100;
-
-    table {
-        thead {
-            background-color: $secondary-050;
-        }
-
-        th {
-            border-top: none;
-        }
-
-        tbody tr:nth-of-type(odd) {
-            background-color: $secondary-200;
-        }
-    }
+    font-variant-numeric: normal; // onum off
 }
 
 .knots-circle {
