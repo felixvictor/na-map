@@ -35,22 +35,6 @@ import {
 } from "../util";
 import TrilateratePosition from "../map-tools/get-position";
 
-/**
- * @link https://stackoverflow.com/questions/42118296/dynamically-import-images-from-a-directory-using-webpack
- * @param {object} r - webpack require.context
- * @return {object} Images
- */
-const importAll = r => {
-    const images = {};
-    r.keys().forEach(item => {
-        images[item.replace("./", "").replace(".svg", "")] = r(item);
-    });
-    return images;
-};
-
-const nationIcons = importAll(require.context("../../icons", false, /\.svg$/));
-console.log(nationIcons);
-
 export default class DisplayPorts {
     constructor(portData, map) {
         this._portDataDefault = portData;
@@ -339,6 +323,20 @@ export default class DisplayPorts {
     }
 
     _setupFlags() {
+        /**
+         * @link https://stackoverflow.com/questions/42118296/dynamically-import-images-from-a-directory-using-webpack
+         * @param {object} r - webpack require.context
+         * @return {object} Images
+         */
+        const importAll = r => {
+            const images = {};
+            r.keys().forEach(item => {
+                images[item.replace("./", "").replace(".svg", "")] = r(item);
+            });
+            return images;
+        };
+
+        this._nationIcons = importAll(require.context("../../icons", false, /\.svg$/));
         const svgDef = d3Select("#na-svg defs");
 
         nations
@@ -354,7 +352,7 @@ export default class DisplayPorts {
                     .append("image")
                     .attr("height", this._iconSize)
                     .attr("width", this._iconSize)
-                    .attr("href", nationIcons[nation].replace('"', "").replace('"', ""));
+                    .attr("href", this._nationIcons[nation].replace('"', "").replace('"', ""));
 
                 if (nation !== "NT" && nation !== "FT") {
                     const patternA = svgDef
@@ -367,7 +365,7 @@ export default class DisplayPorts {
                         .append("image")
                         .attr("height", this._iconSize)
                         .attr("width", this._iconSize)
-                        .attr("href", nationIcons[`${nation}a`].replace('"', "").replace('"', ""));
+                        .attr("href", this._nationIcons[`${nation}a`].replace('"', "").replace('"', ""));
                 }
             });
     }
@@ -478,7 +476,7 @@ export default class DisplayPorts {
     _showDetails(d, i, nodes) {
         const tooltipData = port => {
             let h = '<div class="d-flex align-items-baseline mb-1">';
-            h += `<img alt="${port.icon}" class="flag-icon align-self-stretch" src="${nationIcons[port.icon]
+            h += `<img alt="${port.icon}" class="flag-icon align-self-stretch" src="${this._nationIcons[port.icon]
                 .replace('"', "")
                 .replace('"', "")}"/>`;
             h += `<div class="port-name">${port.name}</div>`;
