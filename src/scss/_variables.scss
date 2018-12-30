@@ -34,15 +34,15 @@ $spacers: (
 
 // Body
 $body-bg: $primary-050;
-$body-color: $primary-900;
-$yiq-text-dark: $primary-900;
+$body-color: $secondary-900;
+$yiq-text-dark: $body-color;
 //$yiq-text-light: $white !default;
 
 // Navbar
-$navbar-light-color:                $primary-700; // rgba($black, .5) !default;
-$navbar-light-hover-color:          $primary-800; // rgba($black, .7) !default;
-$navbar-light-active-color:         $primary-900; // rgba($black, .9) !default;
-$navbar-light-disabled-color:       $primary-800; // rgba($black, .3) !default;
+$navbar-light-color:                $secondary-700; // rgba($black, .5) !default;
+$navbar-light-hover-color:          $secondary-800; // rgba($black, .7) !default;
+$navbar-light-active-color:         $secondary-900; // rgba($black, .9) !default;
+$navbar-light-disabled-color:       $secondary-700; // rgba($black, .3) !default;
 
 // Links
 $link-color: $secondary-700;
