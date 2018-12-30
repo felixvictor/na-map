@@ -1,11 +1,10 @@
 # Created by .ignore support plugin (hsz.mobi)
 .idea/
 /build/API/
-/docs/
-/node_modules/
-/yarn-error.log
-/ItemTemplates-2018-06-18.json
-/ItemTemplates-2018-06-23.json
 /build/Modules.zip
-/webpack-stats.json
+/doc-sass/
+/doc-js/
+/node_modules/
 /report.html
+/webpack-stats.json
+/yarn-error.log
