@@ -34,15 +34,19 @@ $spacers: (
 
 // Body
 $body-bg: $primary-050;
-$body-color: $secondary-900;
-$yiq-text-dark: $body-color;
-//$yiq-text-light: $white !default;
+//$body-color: $secondary-900;
+//$yiq-text-dark: $body-color;
+//$yiq-text-light: $white;
+$yiq-contrasted-threshold: 127;
+
+$body-bg:                   $white !default;
+$body-color:                $gray-900 !default;
 
 // Navbar
-$navbar-light-color:                $secondary-700; // rgba($black, .5) !default;
-$navbar-light-hover-color:          $secondary-800; // rgba($black, .7) !default;
-$navbar-light-active-color:         $secondary-900; // rgba($black, .9) !default;
-$navbar-light-disabled-color:       $secondary-700; // rgba($black, .3) !default;
+//$navbar-light-color:                $secondary-700; // rgba($black, .5) !default;
+//$navbar-light-hover-color:          $secondary-800; // rgba($black, .7) !default;
+//$navbar-light-active-color:         $secondary-900; // rgba($black, .9) !default;
+//$navbar-light-disabled-color:       $secondary-700; // rgba($black, .3) !default;
 
 // Links
 $link-color: $secondary-700;
@@ -52,10 +56,10 @@ $link-hover-color: $secondary-800;
 //$grid-columns: 12 !default;
 //$grid-gutter-width: 30px !default;
 
-$input-color: $body-color;
-$input-group-addon-bg: $primary-100;
-$input-border-color: $primary-400;
-$input-border-radius: 0;
+//$input-color: $body-color;
+//$input-group-addon-bg: $primary-100;
+//$input-border-color: $primary-400;
+//$input-border-radius: 0;
 
 // Fonts
 $font-size-base: 1.2rem;
@@ -109,7 +113,7 @@ $pagination-active-color: $pagination-hover-color;
 $pagination-active-bg: $pagination-hover-bg;
 $pagination-active-border-color: $pagination-active-bg;
 
-$pagination-disabled-color: $foreground-500;
+$pagination-disabled-color: $gray-500;
 $pagination-disabled-bg: $pagination-bg;
 $pagination-disabled-border-color: $pagination-bg;
 
