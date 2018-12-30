@@ -1,0 +1,31 @@
+////
+/// This file is part of na-map.
+/// Junicode font definitions.
+///
+/// copyright 2018
+/// license   http://www.gnu.org/licenses/gpl.html
+/// @group    main
+/// @author   iB aka Felix Victor
+////
+
+$font-name: "Junicode";
+$font-path: "~Fonts/#{$font-name}/";
+
+$font-weight: 400;
+$font-weight-name: "regular";
+
+@font-face {
+    font-display: swap;
+    font-family: "#{$font-name}";
+    src: url("#{$font-path}#{$font-name}-#{$font-weight-name}.woff2") format("woff2");
+    font-style: normal;
+    font-weight: $font-weight;
+}
+
+@font-face {
+    font-display: swap;
+    font-family: "#{$font-name}";
+    src: url("#{$font-path}#{$font-name}-#{$font-weight-name}-italic.woff2") format("woff2");
+    font-style: italic;
+    font-weight: $font-weight;
+}
