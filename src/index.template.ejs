@@ -185,7 +185,8 @@
         <ul class="navbar-nav ml-auto">
 
             <li class="nav-item dropdown pr-2">
-                <a class="nav-link dropdown-toggle btn btn-outline-primary" href="#" id="map-tools-dropdown" role="button"
+                <a class="nav-link dropdown-toggle btn btn-outline-secondary" href="#" id="map-tools-dropdown"
+                   role="button"
                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Map tools
                 </a>
@@ -195,14 +196,16 @@
                     <a class="dropdown-item" id="button-predict-wind" href="#">Predict wind</a>
                     <a class="dropdown-item" id="button-wind-rose" href="#">Wind rose</a>
                     <a class="dropdown-item" id="button-go-to-f11" href="#">Go to <span class="caps">F11</span> <span
-                                class="small text-right badge badge-pill badge-primary">shift+<span class="caps">F11</span></span></a>
+                                class="small text-right badge badge-pill badge-primary">shift+<span
+                                    class="caps">F11</span></span></a>
                     <a class="dropdown-item" id="button-get-position" href="#">Get position</a>
                     <a class="dropdown-item" id="button-make-journey" href="#"> Make journey</a>
                 </div>
             </li>
 
             <li class="nav-item dropdown pr-2">
-                <a class="nav-link dropdown-toggle btn btn-outline-primary" href="#" id="game-tools-dropdown" role="button"
+                <a class="nav-link dropdown-toggle btn btn-outline-secondary" href="#" id="game-tools-dropdown"
+                   role="button"
                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Game tools
                 </a>
@@ -334,7 +337,8 @@
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" class="custom-control-input" name="doubleClickAction"
                                    id="doubleClick-action-f11" value="f11">
-                            <label class="custom-control-label" for="doubleClick-action-f11">Show <span class="caps">F11</span>
+                            <label class="custom-control-label" for="doubleClick-action-f11">Show <span
+                                        class="caps">F11</span>
                                 coordinates</label>
                         </div>
                     </div>
@@ -342,13 +346,160 @@
             </li>
         </ul>
         <div class="btn-group-vertical btn-group-sm" role="group">
-            <button type="button" id="reset" class="btn btn-outline-primary">Clear</button>
-            <button type="button" id="about" class="btn btn-outline-primary">About</button>
+            <button type="button" id="reset" class="btn btn-outline-secondary">Clear</button>
+            <button type="button" id="about" class="btn btn-outline-secondary">About</button>
         </div>
     </div>
 </nav>
 
 <main role="main" class="container-fluid">
+
+    <div class="row">
+        <div class="col-2 colour-palette">
+            <div class="colour-slab colour-slab-base foreground">foreground</div>
+            <div class="colour-slab foreground-050">50</div>
+            <div class="colour-slab foreground-100">100</div>
+            <div class="colour-slab foreground-200">200</div>
+            <div class="colour-slab foreground-300">300</div>
+            <div class="colour-slab foreground-400">400</div>
+            <div class="colour-slab foreground">500</div>
+            <div class="colour-slab foreground-600">600</div>
+            <div class="colour-slab foreground-700">700</div>
+            <div class="colour-slab foreground-800">800</div>
+            <div class="colour-slab foreground-900">900</div>
+        </div>
+
+        <div class="col-2 colour-palette">
+            <div class="colour-slab colour-slab-base background">background</div>
+            <div class="colour-slab background-050">50</div>
+            <div class="colour-slab background-100">100</div>
+            <div class="colour-slab background-200">200</div>
+            <div class="colour-slab background-300">300</div>
+            <div class="colour-slab background-400">400</div>
+            <div class="colour-slab background">500</div>
+            <div class="colour-slab background-600">600</div>
+            <div class="colour-slab background-700">700</div>
+            <div class="colour-slab background-800">800</div>
+            <div class="colour-slab background-900">900</div>
+        </div>
+
+        <div class="col-2 colour-palette">
+            <div class="colour-slab colour-slab-base primary">primary</div>
+            <div class="colour-slab primary-050">50</div>
+            <div class="colour-slab primary-100">100</div>
+            <div class="colour-slab primary-200">200</div>
+            <div class="colour-slab primary-300">300</div>
+            <div class="colour-slab primary-400">400</div>
+            <div class="colour-slab primary">500</div>
+            <div class="colour-slab primary-600">600</div>
+            <div class="colour-slab primary-700">700</div>
+            <div class="colour-slab primary-800">800</div>
+            <div class="colour-slab primary-900">900</div>
+        </div>
+
+        <div class="col-2 colour-palette">
+            <div class="colour-slab colour-slab-base secondary">secondary</div>
+            <div class="colour-slab secondary-050">50</div>
+            <div class="colour-slab secondary-100">100</div>
+            <div class="colour-slab secondary-200">200</div>
+            <div class="colour-slab secondary-300">300</div>
+            <div class="colour-slab secondary-400">400</div>
+            <div class="colour-slab secondary">500</div>
+            <div class="colour-slab secondary-600">600</div>
+            <div class="colour-slab secondary-700">700</div>
+            <div class="colour-slab secondary-800">800</div>
+            <div class="colour-slab secondary-900">900</div>
+        </div>
+
+        <div class="col-2 colour-palette">
+            <div class="colour-slab colour-slab-base gray">gray</div>
+            <div class="colour-slab gray-050">50</div>
+            <div class="colour-slab gray-100">100</div>
+            <div class="colour-slab gray-200">200</div>
+            <div class="colour-slab gray-300">300</div>
+            <div class="colour-slab gray-400">400</div>
+            <div class="colour-slab gray">500</div>
+            <div class="colour-slab gray-600">600</div>
+            <div class="colour-slab gray-700">700</div>
+            <div class="colour-slab gray-800">800</div>
+            <div class="colour-slab gray-900">900</div>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div class="col-2 colour-palette">
+            <div class="colour-slab colour-slab-base success">success</div>
+        </div>
+
+        <div class="col-2 colour-palette">
+            <div class="colour-slab colour-slab-base info">info</div>
+        </div>
+
+        <div class="col-2 colour-palette">
+            <div class="colour-slab colour-slab-base warning">warning</div>
+        </div>
+
+        <div class="col-2 colour-palette">
+            <div class="colour-slab colour-slab-base danger">danger</div>
+        </div>
+        <div class="col-2 colour-palette">
+            <div class="colour-slab colour-slab-base light">light</div>
+        </div>
+        <div class="col-2 colour-palette">
+            <div class="colour-slab colour-slab-base dark">dark</div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-2 colour-palette">
+            <div class="colour-slab colour-slab-base blue">blue</div>
+        </div>
+        <div class="col-2 colour-palette">
+            <div class="colour-slab colour-slab-base indigo">indigo</div>
+        </div>
+        <div class="col-2 colour-palette">
+            <div class="colour-slab colour-slab-base purple">purple</div>
+        </div>
+        <div class="col-2 colour-palette">
+            <div class="colour-slab colour-slab-base pink">pink</div>
+        </div>
+        <div class="col-2 colour-palette">
+            <div class="colour-slab colour-slab-base red">red</div>
+        </div>
+        <div class="col-2 colour-palette">
+            <div class="colour-slab colour-slab-base red-light">red-light</div>
+        </div>
+        <div class="col-2 colour-palette">
+            <div class="colour-slab colour-slab-base red-dark">red-dark</div>
+        </div>
+        <div class="col-2 colour-palette">
+            <div class="colour-slab colour-slab-base orange">orange</div>
+        </div>
+        <div class="col-2 colour-palette">
+            <div class="colour-slab colour-slab-base yellow">yellow</div>
+        </div>
+        <div class="col-2 colour-palette">
+            <div class="colour-slab colour-slab-base green">green</div>
+        </div>
+        <div class="col-2 colour-palette">
+            <div class="colour-slab colour-slab-base green-light">green-light</div>
+        </div>
+        <div class="col-2 colour-palette">
+            <div class="colour-slab colour-slab-base green-dark">green-dark</div>
+        </div>
+        <div class="col-2 colour-palette">
+            <div class="colour-slab colour-slab-base teal">teal</div>
+        </div>
+        <div class="col-2 colour-palette">
+            <div class="colour-slab colour-slab-base cyan">cyan</div>
+        </div>
+        <div class="col-2 colour-palette">
+            <div class="colour-slab colour-slab-base white">white</div>
+        </div>
+    </div>
+
+
     <div id="na-map" class="central"></div>
 
     <div id="modal-section"></div>
