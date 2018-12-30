@@ -18,16 +18,16 @@ const transformMatrix = {
         D: -819563.745651571
     };
 
-// F11 coord to svg coord
+// ShowF11 coord to svg coord
 export const convertCoordX = (x, y) => transformMatrix.A * x + transformMatrix.B * y + transformMatrix.C;
 
-// F11 coord to svg coord
+// ShowF11 coord to svg coord
 export const convertCoordY = (x, y) => transformMatrix.B * x - transformMatrix.A * y + transformMatrix.D;
 
-// svg coord to F11 coord
+// svg coord to ShowF11 coord
 export const convertInvCoordX = (x, y) => transformMatrixInv.A * x + transformMatrixInv.B * y + transformMatrixInv.C;
 
-// svg coord to F11 coord
+// svg coord to ShowF11 coord
 export const convertInvCoordY = (x, y) => transformMatrixInv.B * x - transformMatrixInv.A * y + transformMatrixInv.D;
 
 export const nations = [
@@ -160,3 +160,12 @@ export const speedConstA = 0.074465523706782;
 export const speedConstB = 0.00272175949231;
 
 export const circleRadiusFactor = 5;
+
+export const colourGray200 = CGRAY200;
+export const colourGray500 = CGRAY500;
+export const colourGray700 = CGRAY700;
+export const colourGreen = CGREEN;
+export const colourGreenDark = CGREENDARK;
+export const colourRed = CRED;
+export const colourRedDark = CREDDARK;
+export const colourWhite = CWHITE;

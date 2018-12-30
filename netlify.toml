@@ -1,26 +1,12 @@
 [[headers]]
-    for = "/fonts/*"
-    [headers.values]
-        Cache-Control = "max-age=2628000, must-revalidate"
-
-[[headers]]
-    for = "/icons/*"
-    [headers.values]
-        Cache-Control = "max-age=2628000, must-revalidate"
-
-[[headers]]
-    for = "/images/*"
-    [headers.values]
-        Cache-Control = "max-age=2628000, must-revalidate"
-
-[[headers]]
     for = "*.css"
     [headers.values]
-        Cache-Control = "max-age=2628000, immutable"
+        Cache-Control = "public, max-age=2628000, immutable"
 
 [[headers]]
     for = "*.js"
     [headers.values]
+<<<<<<< HEAD
         Cache-Control = "max-age=2628000, immutable"
 
 [[headers]]
@@ -33,3 +19,6 @@
     for = "*-pb.json"
     [headers.values]
         Cache-Control = "max-age=50, must-revalidate"
+=======
+        Cache-Control = "public, max-age=2628000, immutable"
+>>>>>>> release-8

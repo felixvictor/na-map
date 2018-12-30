@@ -1,25 +1,34 @@
 <!doctype html>
-<html lang="<%= htmlWebpackPlugin.options.lang %>">
+<html lang="<%= htmlWebpackPlugin.options.lang %>" itemscope itemtype="http://schema.org/Map">
 <head>
     <meta charset="utf-8">
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title><%= htmlWebpackPlugin.options.title %></title>
-    <meta property="og:title" content="<%= htmlWebpackPlugin.options.title %>">
-    <meta name="twitter:title" content="<%= htmlWebpackPlugin.options.title %>">
-    <meta name="description" content="<%= htmlWebpackPlugin.options.description %>">
-    <meta property="og:description" content="<%= htmlWebpackPlugin.options.description %>">
-
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta property="og:image" content="<%= htmlWebpackPlugin.options.brand %>">
+    <title><%= htmlWebpackPlugin.options.title %></title>
+    <meta name="description" content="<%= htmlWebpackPlugin.options.description %>">
+    <% if(htmlWebpackPlugin.options.canonicalUrl){ %>
+        <link rel="canonical" href="<%= htmlWebpackPlugin.options.canonicalUrl %>">
+    <% } else{ %>
+        <meta name="robots" content="noindex">
+    <% } %>
+    <meta itemprop="name" property="og:title" content="<%= htmlWebpackPlugin.options.title %>">
+    <meta itemprop="description" property="og:description" content="<%= htmlWebpackPlugin.options.description %>">
+    <meta itemprop="image" property="og:image" content="<%= htmlWebpackPlugin.options.iconLarge %>">
+    <meta itemprop="url" property="og:url" content="<%= htmlWebpackPlugin.options.canonicalUrl %>">
+
+    <meta property="og:locale" content="<%= htmlWebpackPlugin.options.lang.toLowerCase().replace("-", "_") %>">
+    <meta property="og:type" content="website">
+
+    <meta name="twitter:card" content="summary_large_image">
 
     <script async src="<%= htmlWebpackPlugin.options.gtag %>"></script>
 </head>
 
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="#"><img src="<%= htmlWebpackPlugin.options.brand %>" width="32" height="32"
-                                          alt="Brand"></a>
+<nav class="navbar navbar-expand-lg navbar-light">
+    <a class="navbar-brand" href="#">
+        <img src="<%= htmlWebpackPlugin.options.iconSmall %>" width="32" height="32" alt="Brand">
+    </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -176,7 +185,8 @@
         <ul class="navbar-nav ml-auto">
 
             <li class="nav-item dropdown pr-2">
-                <a class="nav-link dropdown-toggle btn btn-primary" href="#" id="map-tools-dropdown" role="button"
+                <a class="nav-link dropdown-toggle btn btn-outline-secondary" href="#" id="map-tools-dropdown"
+                   role="button"
                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Map tools
                 </a>
@@ -184,15 +194,18 @@
                      aria-labelledby="map-tools-dropdown">
 
                     <a class="dropdown-item" id="button-predict-wind" href="#">Predict wind</a>
-                    <a class="dropdown-item" id="button-go-to-f11" href="#">Go to F11 <span
-                                class="small text-right badge badge-pill badge-primary">shift+F11</span></a>
+                    <a class="dropdown-item" id="button-ingame-wind" href="#">In-game wind</a>
+                    <a class="dropdown-item" id="button-go-to-f11" href="#">Go to <span class="caps">F11</span> <span
+                                class="small text-right badge badge-pill badge-primary">shift+<span
+                                    class="caps">F11</span></span></a>
                     <a class="dropdown-item" id="button-get-position" href="#">Get position</a>
                     <a class="dropdown-item" id="button-make-journey" href="#"> Make journey</a>
                 </div>
             </li>
 
             <li class="nav-item dropdown pr-2">
-                <a class="nav-link dropdown-toggle btn btn-primary" href="#" id="game-tools-dropdown" role="button"
+                <a class="nav-link dropdown-toggle btn btn-outline-secondary" href="#" id="game-tools-dropdown"
+                   role="button"
                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Game tools
                 </a>
@@ -324,30 +337,30 @@
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" class="custom-control-input" name="doubleClickAction"
                                    id="doubleClick-action-f11" value="f11">
-                            <label class="custom-control-label" for="doubleClick-action-f11">Show F11
+                            <label class="custom-control-label" for="doubleClick-action-f11">Show <span
+                                        class="caps">F11</span>
                                 coordinates</label>
                         </div>
                     </div>
                 </div>
             </li>
         </ul>
-        <div class="btn-group-vertical" role="group">
-            <button type="button" id="reset" class="btn btn-sm btn-outline-secondary">Clear</button>
-            <button type="button" id="about" class="btn btn-sm btn-outline-secondary">About</button>
+        <div class="btn-group-vertical btn-group-sm" role="group">
+            <button type="button" id="reset" class="btn btn-outline-secondary">Clear</button>
+            <button type="button" id="about" class="btn btn-outline-secondary">About</button>
         </div>
     </div>
 </nav>
 
 <main role="main" class="container-fluid">
     <div id="na-map" class="central"></div>
-
     <div id="modal-section"></div>
 </main>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.slim.min.js"
         integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
-        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
+        integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
         crossorigin="anonymous"></script>
 </body>
 </html>
