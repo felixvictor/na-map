@@ -35,12 +35,10 @@ $spacers: (
 // Body
 $body-bg: $primary-050;
 //$body-color: $secondary-900;
+$body-color: $gray-900;
 //$yiq-text-dark: $body-color;
 //$yiq-text-light: $white;
 $yiq-contrasted-threshold: 127;
-
-$body-bg:                   $white !default;
-$body-color:                $gray-900 !default;
 
 // Navbar
 //$navbar-light-color:                $secondary-700; // rgba($black, .5) !default;
@@ -88,7 +86,7 @@ $input-focus-box-shadow: $primary-200;
 // Tooltip
 $tooltip-max-width: 40em;
 $tooltip-color: $body-color;
-$tooltip-bg: $primary-100;
+$tooltip-bg: $primary-050;
 $tooltip-opacity: 1;
 $tooltip-padding-y: 1rem;
 $tooltip-padding-x: 1rem;
@@ -121,10 +119,10 @@ $pagination-disabled-border-color: $pagination-bg;
 $modal-lg: 1200px;
 
 // Badges
-//$badge-font-size:                   90%;
+$badge-font-size: 90%;
 $badge-font-weight: 400;
-$badge-padding-y: 0.2rem;
-//$badge-padding-x:                   .4rem !default;
+$badge-padding-y: 0rem;
+$badge-padding-x: 0.2rem;
 //$badge-border-radius:               $border-radius !default;
 //$badge-pill-padding-x:              .6em !default;
 // Use a higher than normal value to ensure completely rounded edges when
