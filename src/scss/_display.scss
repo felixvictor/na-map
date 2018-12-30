@@ -1,14 +1,57 @@
-/*
- * scss definitions: display
- *
- * @author    Ingo Beyritz
- * @copyright Copyright (c) 2017, Ingo Beyritz
- * @license   http://www.gnu.org/licenses/gpl.html
- */
+////
+/// This file is part of na-map.
+/// Display.
+///
+/// copyright 2017-18
+/// license   http://www.gnu.org/licenses/gpl.html
+/// @group    main
+/// @author   iB aka Felix Victor
+////
 
 $background-colour: $primary-500;
 $paddingHalf: map-get($spacers, 2);
 $paddingThird: map-get($spacers, 1);
+
+// opentype
+
+body {
+    font-variant-alternates: styleset(ss18); // (needs also calt)
+    font-kerning: normal;
+    font-variant-caps: normal;
+    font-variant-ligatures: common-ligatures contextual; // liga calt
+    font-variant-numeric: oldstyle-nums; // onum
+}
+
+table,
+.page-link {
+    font-variant-numeric: normal; // onum off
+}
+
+.fraction {
+    font-variant-numeric: diagonal-fractions;
+}
+
+.super {
+    font-variant-position: super;
+    font-feature-settings: "sups";
+}
+
+@mixin caps {
+    font-variant-caps: all-small-caps;
+    letter-spacing: 0.06em;
+}
+
+.caps,
+.des {
+    @include caps;
+}
+
+.des {
+    position: relative;
+    top: -0.4rem;
+    font-size: small;
+    color: $secondary-700;
+}
 
 #na-svg {
     background-color: $background-colour;
@@ -32,7 +75,7 @@ text,
 .port-summary,
 .journey-summary {
     @include float-right;
-    background: rgba($primary-100, 0.8);
+    background: rgba($primary-200, 0.8);
     padding: $paddingHalf;
 
     .block {
@@ -42,6 +85,7 @@ text,
     .des {
         top: 0;
     }
+
     button {
         margin-bottom: map-get($spacers, 2);
     }
@@ -54,23 +98,11 @@ text,
             fill: $white;
         }
     }
+
     g.position path {
-        //    stroke: $green;
         fill: $green;
         fill-opacity: 0.6;
     }
-}
-
-// port icons (available to nation)
-pattern .nation {
-    fill: $primary-500;
-    fill-opacity: 0.3;
-}
-
-// port icons (available to all)
-pattern .all {
-    fill: $primary-200;
-    fill-opacity: 0.8;
 }
 
 .axis {
@@ -78,8 +110,10 @@ pattern .all {
         stroke: $primary-600;
         opacity: 0.5;
     }
+
     text {
-        fill: $primary-700;
+        font-style: italic;
+        fill: $secondary-700;
     }
 }
 
@@ -88,16 +122,16 @@ pattern .all {
 }
 
 .card-header {
-    background-color: $secondary-200;
+    background-color: $secondary-100;
     border-bottom: none;
 }
 
 .card-body {
-    background-color: $primary-100;
+    background-color: $secondary-050;
 }
 
 .table .table {
-    background-color: $primary-200;
+    background-color: $primary-100;
 }
 
 table tr,
@@ -109,6 +143,7 @@ p {
     thead th {
         font-weight: normal;
     }
+
     td {
         vertical-align: top;
         border-top: none;
@@ -125,7 +160,7 @@ table a {
 
 .table-sm th,
 .table-sm td {
-    padding: $paddingThird/2;
+    padding: $paddingThird;
 }
 
 .ship-base,
@@ -133,6 +168,7 @@ table a {
     .block {
         padding: 0 $paddingThird;
     }
+
     .small {
         padding: $paddingThird 0;
     }
@@ -140,13 +176,13 @@ table a {
 
 .ship-base {
     .light {
-        background-color: $primary-200;
+        background-color: $primary-100;
     }
 }
 
 .ship-compare {
     .light {
-        background-color: $secondary-200;
+        background-color: $secondary-100;
     }
 }
 
@@ -155,18 +191,22 @@ table a {
 .buildings .requirements {
     table {
         thead {
-            background-color: $secondary-200;
+            background-color: $secondary-100;
         }
+
         td {
             padding-top: $paddingHalf;
             padding-bottom: $paddingHalf;
         }
+
         tbody tr:nth-of-type(odd) {
-            background-color: $primary-300;
-        }
-        tbody tr:nth-of-type(even) {
             background-color: $primary-100;
         }
+
+        tbody tr:nth-of-type(even) {
+            background-color: $primary-050;
+        }
+
         .name {
             font-style: italic;
         }
@@ -175,10 +215,12 @@ table a {
 
 .buildings .requirements table {
     width: auto;
+
     th,
     td {
         padding-right: $paddingHalf;
     }
+
     td {
         text-align: right;
     }
@@ -188,16 +230,18 @@ table a {
     td + td {
         text-align: right;
     }
+
     td:nth-child(1) {
         width: 50%;
     }
+
     td:nth-child(2) {
         width: 50%;
     }
 }
 
 .bubble {
-    fill-opacity: 0.5;
+    fill-opacity: 0.7;
 }
 
 .here {
@@ -221,16 +265,7 @@ table a {
 }
 
 .badge {
-    display: inline;
-}
-
-.des {
-    position: relative;
-    top: -0.4em;
-    font-size: xx-small !important;
-    color: $primary-700;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
+    padding-top: 0.15rem;
 }
 
 .mm {
@@ -265,33 +300,13 @@ table a {
 }
 
 .columnA {
-    background-color: $primary-100;
-    table {
-        thead {
-            background-color: $primary-050;
-        }
-        th {
-            border-top: none;
-        }
-        tbody tr:nth-of-type(odd) {
-            background-color: $primary-200;
-        }
-    }
+    background-color: $primary-050;
+    font-variant-numeric: normal; // onum off
 }
 
 .columnC {
-    background-color: $secondary-100;
-    table {
-        thead {
-            background-color: $secondary-050;
-        }
-        th {
-            border-top: none;
-        }
-        tbody tr:nth-of-type(odd) {
-            background-color: $secondary-200;
-        }
-    }
+    background-color: $secondary-050;
+    font-variant-numeric: normal; // onum off
 }
 
 .knots-circle {
@@ -305,6 +320,7 @@ table a {
 
 .solidArc {
     transition: all 0.3s;
+
     &:hover {
         fill: orangered;
     }
@@ -321,11 +337,6 @@ table a {
     stroke: $primary-200;
 }
 
-text {
-    fill: $primary-900;
-    // pointer-events: none; // needed? Conflicts with timelines-chart reset zoom
-}
-
 .profile {
     text {
         fill: $primary-900;
@@ -335,6 +346,7 @@ text {
 
 #input-toggle {
     display: flex;
+
     .item {
         padding-right: 1em;
     }
@@ -352,14 +364,6 @@ text {
     margin-left: 15px;
 }
 
-.btn-outline-primary {
-    color: $primary-600;
-}
-
-.btn-outline-secondary {
-    color: $secondary-600;
-}
-
 .box {
     background-color: $primary-100;
 }
@@ -372,66 +376,90 @@ text {
     svg {
         overflow: auto;
     }
+
     circle {
         fill: $secondary-600;
         fill-opacity: 0.2;
     }
+
     text {
-        font-size: 1em;
-        fill: $secondary-800;
+        fill: $secondary-900;
         text-anchor: middle;
         dominant-baseline: central;
+
         &.des {
-            fill: $secondary-700 !important;
+            fill: $secondary-800 !important;
         }
     }
+
     rect {
-        fill: $primary-100;
-        fill-opacity: 0.7;
+        fill: rgba($primary-100, 0.8);
     }
+
     path {
         stroke: $secondary-600;
-        stroke-width: 0.3em;
+        stroke-width: 0.3rem;
         fill: none;
     }
+
     .label {
         text {
-            // font-size: unset;
             text-anchor: start;
         }
+
         circle {
             fill-opacity: 1;
             cursor: pointer;
         }
+
         .drag-active {
             stroke: $secondary-100;
             stroke-width: 0.25rem;
         }
+
         .drag-hidden {
             fill-opacity: 0;
         }
+
         .drag-hidden.drag-active {
             stroke-width: 0;
         }
     }
-    .compass {
-        circle,
-        line {
-            stroke: $secondary-600;
-            stroke-width: 0.1rem;
-        }
-        text {
-            fill: $secondary-600;
-            font-weight: bold;
-            text-anchor: middle;
-            dominant-baseline: central;
-        }
+}
+
+.compass {
+    circle,
+    line {
+        stroke: $secondary-400;
+        stroke-width: 0.1rem;
+    }
+
+    text {
+        fill: $secondary-600;
+        font-weight: bold;
+        text-anchor: middle;
+        dominant-baseline: central;
     }
 }
 
+.small {
+    circle,
+    line {
+        stroke: $secondary-400;
+        stroke-width: 0.05rem;
+    }
+    path {
+        stroke-width: 0.15rem;
+    }
+}
+
+.port-names {
+    fill: $white;
+}
+
 .port-name {
-    font-size: large;
-    font-style: italic;
+    font-size: x-large;
+    @include caps;
 }
 
 .port circle {
@@ -474,41 +502,31 @@ text {
     fill: transparent;
 }
 
-.voronoi {
-    fill: transparent;
-    stroke: $primary-700;
-    stroke-width: 0.5px;
-    path {
-        pointer-events: visibleFill;
-    }
-}
-
-.highlight-voronoi {
-    fill: $primary-400;
-    fill-opacity: 0.5;
-}
-
 .f11,
 .grid-background {
     line-height: 1;
     background-color: transparent;
+
     circle {
         fill: $secondary-600;
         fill-opacity: 0.5;
     }
+
     text {
-        font-size: 1em;
         fill: $secondary-800;
         text-anchor: middle;
         dominant-baseline: central;
+
         &.des {
             fill: $secondary-700 !important;
         }
     }
+
     rect {
         fill: $primary-100;
         fill-opacity: 0.7;
     }
+
     path {
         stroke: $secondary-600;
         stroke-width: 0.3em;
@@ -517,7 +535,11 @@ text {
 }
 
 .f11 {
+    circle {
+        fill: $secondary-100;
+    }
     text {
+        fill: $white;
         text-anchor: end;
     }
 }
@@ -525,7 +547,6 @@ text {
 .grid-background {
     rect {
         fill: $primary-200;
-        fill-opacity: 0.7;
     }
 }
 
@@ -547,13 +568,12 @@ text {
 
 .wind,
 .wind-text {
-    font-size: 1.2em !important;
     text-anchor: middle !important;
 }
 
 .wind-text-current {
-    font-size: 1em !important;
-    text-anchor: middle !important;
+    font-size: smaller;
+    fill: $secondary-600 !important;
 }
 
 .profile {
@@ -565,59 +585,11 @@ text {
     }
 }
 
-.rs-tooltip-text {
-    font-family: inherit;
-    font-size: 1.8em;
-    color: $primary-700;
-}
-
-.rs-handle {
-    position: relative;
-    width: 48px !important;
-    background: $primary-900;
-    border: 3px solid $primary-400;
-    border-radius: 0;
-    &::after,
-    &::before {
-        position: absolute;
-        top: 50%;
-        left: 100%;
-        width: 0;
-        height: 0;
-        pointer-events: none;
-        content: " ";
-        border: solid transparent;
-    }
-
-    &::after {
-        margin-top: -20px;
-        border-width: 20px;
-        border-left-color: $primary-900;
-    }
-
-    &::before {
-        margin-top: -24px;
-        border-width: 24px;
-        border-left-color: $primary-400;
-    }
-}
-
-.rs-control .rs-path-color {
-    background-color: $primary-300;
-}
-
-.rs-control .rs-handle {
-    background-color: $primary-900;
-}
-
-.rs-border {
-    border-color: $primary-400;
-}
-
 .tooltip {
     font-size: smaller;
     text-align: left;
     box-shadow: 0 14px 28px rgba($primary-900, 0.25), 0 10px 10px rgba($primary-900, 0.22);
+
     table {
         margin-bottom: 0;
     }
@@ -628,31 +600,11 @@ text {
 }
 
 .flag-icon {
-    display: inline-block;
     width: 2rem;
+    height: 100%;
     margin-right: 0.4rem;
-    background-repeat: no-repeat;
-    background-size: contain;
-
-    &::before {
-        content: "\00a0";
-    }
 }
 
-$flags-dir: "~Icons";
-$flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", "PL";
-
-@mixin flags {
-    @each $flag in $flags {
-        .flag-icon.#{$flag} {
-            background-image: url("#{$flags-dir}/#{$flag}.svg");
-        }
-    }
-}
-
-@include flags;
-
-//////////////////////////////////////////
 // contrast function
 // https://lnikki.la/articles/sass-better-colour-based-on-brightness/
 
@@ -713,22 +665,20 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
 
 .county,
 .region {
-    filter: url("#drop-shadow");
-    text {
-        font-family: LibreCaslonDisplay, -apple-system, blinkmacsystemfont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
-            cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", arial, sans-serif;
-        opacity: 0.7;
-        fill: $white;
-        text-anchor: middle;
-    }
+    font-feature-settings: "c2sc", "smcp";
+
+    fill: $secondary-900;
+    text-anchor: middle;
 }
 
-.region text {
-    font-size: 240px;
+.region {
+    letter-spacing: 1rem;
+    font-size: 160px;
 }
 
-.county text {
-    font-size: 84px;
+.county {
+    letter-spacing: 0.6rem;
+    font-size: 60px;
 }
 
 // https://stackoverflow.com/questions/44467377/bootstrap-4-multilevel-dropdown-inside-navigation/48953349#48953349
@@ -785,6 +735,13 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
     user-select: none;
 
     .axises {
+        .x-axis,
+        .x-grid,
+        .y-axis,
+        .grp-axis {
+            font-family: $font-family-base !important;
+        }
+
         line,
         path {
             stroke: $primary-700;
@@ -804,6 +761,7 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
             path {
                 stroke: none;
             }
+
             text {
                 fill: $primary-700;
             }
@@ -843,8 +801,11 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
         fill: $primary-200;
     }
 
-    .axis path {
-        display: none;
+    .axis {
+        font-family: $font-family-base !important;
+        path {
+            display: none;
+        }
     }
 
     .tick text {
@@ -899,9 +860,18 @@ $flags: "NT", "PR", "ES", "FR", "GB", "VP", "DK", "SE", "US", "FT", "RU", "DE", 
         fill-opacity: 0.7;
         fill: $white;
     }
+
     path {
         stroke-opacity: 0.4;
         stroke: $white !important;
         stroke-width: 2px;
     }
+}
+
+.bootstrap-select > .dropdown-toggle.bs-placeholder {
+    color: $navbar-light-color;
+}
+
+.dropdown-header {
+    font-size: smaller;
 }

@@ -1,31 +1,52 @@
-/*
- * scss definitions: mixin
- *
- * @author    Ingo Beyritz
- * @copyright Copyright (c) 2017, Ingo Beyritz
- * @license   http://www.gnu.org/licenses/gpl.html
- */
+////
+/// This file is part of na-map.
+/// Mixins.
+///
+/// copyright 2017-18
+/// license   http://www.gnu.org/licenses/gpl.html
+/// @group    main/mixins
+/// @author   iB aka Felix Victor
+////
 
+/// Defines background colour with opacity
+/// @param {color} $colour - Colour
+/// @param {number} $opac [0.4] - Opacity
+/// @output `background-color`
 @mixin background-opac($colour, $opac: 0.4) {
     background-color: rgba(red($colour), green($colour), blue($colour), $opac) !important;
 }
 
+/// Defines light background colour ($primary-300) with opacity
+/// @param {number} $opac [0.4] - Opacity
+/// @output `background-color`
 @mixin background-primary-light-opac($opac: 0.4) {
     @include background-opac($primary-300, $opac);
 }
 
+/// Defines light background colour ($primary) with opacity
+/// @param {number} $opac [0.4] - Opacity
+/// @output `background-color`
 @mixin background-primary-opac($opac: 0.4) {
     @include background-opac($primary, $opac);
 }
 
+/// Defines dark background colour ($primary-800) with opacity
+/// @param {number} $opac [0.4] - Opacity
+/// @output `background-color`
 @mixin background-primary-dark-opac($opac: 0.4) {
     @include background-opac($primary-800, $opac);
 }
 
+/// Defines light background colour ($secondary) with opacity
+/// @param {number} $opac [0.4] - Opacity
+/// @output `background-color`
 @mixin background-secondary-opac($opac: 0.4) {
     @include background-opac($secondary, $opac);
 }
 
+/// Defines background colour and a contrasting text colour
+/// @param {color} $colour - Colour
+/// @output `color` and `background-color`
 @mixin colour($colour) {
     color: contrast-color($colour);
     background-color: $colour;
