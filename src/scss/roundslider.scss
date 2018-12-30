@@ -1,0 +1,61 @@
+////
+/// This file is part of na-map.
+/// Roundslider overrides.
+///
+/// copyright 2018
+/// license   http://www.gnu.org/licenses/gpl.html
+/// @group    map-tools/predict-wind
+/// @author   iB aka Felix Victor
+////
+
+@import "colour";
+
+.rs-tooltip-text {
+    font-family: inherit;
+    font-size: 1.8em;
+    color: $primary-700;
+}
+
+.rs-handle {
+    position: relative;
+    width: 48px !important;
+    background: $primary-900;
+    border: 3px solid $primary-400;
+    border-radius: 0;
+
+    &::after,
+    &::before {
+        position: absolute;
+        top: 50%;
+        left: 100%;
+        width: 0;
+        height: 0;
+        pointer-events: none;
+        content: " ";
+        border: solid transparent;
+    }
+
+    &::after {
+        margin-top: -20px;
+        border-width: 20px;
+        border-left-color: $primary-900;
+    }
+
+    &::before {
+        margin-top: -24px;
+        border-width: 24px;
+        border-left-color: $primary-400;
+    }
+}
+
+.rs-control .rs-path-color {
+    background-color: $primary-300;
+}
+
+.rs-control .rs-handle {
+    background-color: $primary-900;
+}
+
+.rs-border {
+    border-color: $primary-400;
+}

@@ -2,4 +2,5 @@
     <rect fill="#ac0234" height="480" width="640"/>
     <rect fill="#fff" height="480" width="69.19" x="207.57"/>
     <rect fill="#fff" height="68.57" width="640" y="207.57"/>
+    <rect width="640" height="480" fill="#fff" fill-opacity="0"/>
 </svg>
