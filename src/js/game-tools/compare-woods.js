@@ -138,10 +138,10 @@ class WoodComparison extends Wood {
         function getDiff(a, b, decimals = 1) {
             const diff = parseFloat(((a - b) * 100).toFixed(decimals));
             if (diff < 0) {
-                return `${formatFloat(a * 100)} <span class="badge badge-light">${formatFloat(diff)}</span>`;
+                return `${formatFloat(a * 100)} <span class="badge badge-white">${formatFloat(diff)}</span>`;
             }
             if (diff > 0) {
-                return `${formatFloat(a * 100)} <span class="badge badge-light">+\u202f${formatFloat(diff)}</span>`;
+                return `${formatFloat(a * 100)} <span class="badge badge-white">+\u202f${formatFloat(diff)}</span>`;
             }
             return formatFloat(a * 100);
         }
