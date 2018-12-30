@@ -75,7 +75,7 @@ text,
 .port-summary,
 .journey-summary {
     @include float-right;
-    background: rgba($primary-100, 0.8);
+    background: rgba($primary-200, 0.8);
     padding: $paddingHalf;
 
     .block {
@@ -122,16 +122,16 @@ text,
 }
 
 .card-header {
-    background-color: $secondary-200;
+    background-color: $secondary-100;
     border-bottom: none;
 }
 
 .card-body {
-    background-color: $primary-100;
+    background-color: $secondary-050;
 }
 
 .table .table {
-    background-color: $primary-200;
+    background-color: $primary-100;
 }
 
 table tr,
@@ -176,13 +176,13 @@ table a {
 
 .ship-base {
     .light {
-        background-color: $primary-200;
+        background-color: $primary-100;
     }
 }
 
 .ship-compare {
     .light {
-        background-color: $secondary-200;
+        background-color: $secondary-100;
     }
 }
 
@@ -191,7 +191,7 @@ table a {
 .buildings .requirements {
     table {
         thead {
-            background-color: $secondary-200;
+            background-color: $secondary-100;
         }
 
         td {
@@ -200,11 +200,11 @@ table a {
         }
 
         tbody tr:nth-of-type(odd) {
-            background-color: $primary-300;
+            background-color: $primary-100;
         }
 
         tbody tr:nth-of-type(even) {
-            background-color: $primary-100;
+            background-color: $primary-050;
         }
 
         .name {
@@ -300,12 +300,12 @@ table a {
 }
 
 .columnA {
-    background-color: $primary-100;
+    background-color: $primary-050;
     font-variant-numeric: normal; // onum off
 }
 
 .columnC {
-    background-color: $secondary-100;
+    background-color: $secondary-050;
     font-variant-numeric: normal; // onum off
 }
 
@@ -362,14 +362,6 @@ table a {
 
 .left-margin {
     margin-left: 15px;
-}
-
-.btn-outline-primary {
-    color: $primary-600;
-}
-
-.btn-outline-secondary {
-    color: $secondary-600;
 }
 
 .box {
