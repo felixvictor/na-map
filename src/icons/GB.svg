@@ -5,4 +5,5 @@
     <path d="M145,0 v210 M0,105 h290" stroke="#fff" stroke-width="68"/>
     <path d="M145,0 v210 M0,105 h290" stroke="#cf142b" stroke-width="40"/>
     <path d="M0,240H640M320,0V480" stroke="#cf142b" stroke-width="60"/>
+    <rect width="640" height="480" fill="#fff" fill-opacity="0"/>
 </svg>

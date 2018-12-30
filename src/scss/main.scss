@@ -1,10 +1,13 @@
-/*
- * scss definitions: main
- *
- * @author    Ingo Beyritz
- * @copyright Copyright (c) 2017, Ingo Beyritz
- * @license   http://www.gnu.org/licenses/gpl.html
- */
+////
+/// This file is part of na-map.
+/// Main.
+///
+/// copyright 2017-18
+/// license   http://www.gnu.org/licenses/gpl.html
+/// @group    main
+/// @author   iB aka Felix Victor
+////
+
 @import "pre-bootstrap";
 @import "~bootstrap/scss/functions";
 @import "~bootstrap/scss/variables";
@@ -20,7 +23,7 @@
 @import "~bootstrap/scss/buttons";
 @import "~bootstrap/scss/transitions";
 @import "~bootstrap/scss/dropdown";
-//@import "~bootstrap/scss/button-group";
+@import "~bootstrap/scss/button-group";
 @import "~bootstrap/scss/input-group";
 @import "~bootstrap/scss/custom-forms";
 @import "~bootstrap/scss/nav";
@@ -45,28 +48,5 @@
 @import "~tempusdominus-bootstrap-4/src/sass/tempusdominus-bootstrap-4-build";
 @import "~bootstrap-select/sass/bootstrap-select";
 
-html {
-    font-family: $font-family-base;
-    font-size: 16px;
-    line-height: 1.618rem;
-}
-
-//////////////////////////////////////////
-// opentype
-
-$opentype-features: "liga", "kern", "onum" off;
-$opentype-features-tnum: "liga", "kern", "tnum", "onum" off;
-
-body,
-html,
-button {
-    font-family: $font-family-base;
-    font-feature-settings: $opentype-features;
-}
-
-table,
-.page-link {
-    font-feature-settings: $opentype-features-tnum;
-}
-
+@import "palettes";
 @import "display";
