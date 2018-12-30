@@ -1,4 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="640" height="480" viewBox="0 0 640 480">
-    <path d="M0,0H640V480H0V0Z" style="fill: #aa151b"/>
-    <path d="M0,120H640V360H0V120Z" style="fill: #f1bf00"/>
+    <path d="M0,0H640V480H0V0Z" fill="#aa151b"/>
+    <path d="M0,120H640V360H0V120Z" fill="#f1bf00"/>
+    <rect width="640" height="480" fill="#fff" fill-opacity="0"/>
 </svg>

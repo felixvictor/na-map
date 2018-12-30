@@ -1,12 +1,14 @@
-/**
- * scss definitions: font
- *
- * @author    Ingo Beyritz
- * @copyright Copyright (c) 2017, Ingo Beyritz
- * @license   http://www.gnu.org/licenses/gpl.html
- */
-@import "caslon";
+////
+/// This file is part of na-map.
+/// Font definitions.
+///
+/// copyright 2018
+/// license   http://www.gnu.org/licenses/gpl.html
+/// @group    main
+/// @author   iB aka Felix Victor
+////
 
-$font-family-sans-serif: librecaslon, -apple-system, blinkmacsystemfont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
-    cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", arial, sans-serif;
-$font-family-base: $font-family-sans-serif;
+@import "junicode";
+
+$font-family-serif: junicode, Big Caslon, Hoefler Text, Palatino, Cambria, Georgia, serif;
+$font-family-base: $font-family-serif;
