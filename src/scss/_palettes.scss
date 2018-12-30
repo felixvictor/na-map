@@ -35,20 +35,6 @@
         }
     }
 
-    @each $color, $value in $foregrounds {
-        .foreground-#{$color} {
-            color: color-yiq($value);
-            background-color: $value;
-        }
-    }
-
-    @each $color, $value in $backgrounds {
-        .background-#{$color} {
-            color: color-yiq($value);
-            background-color: $value;
-        }
-    }
-
     @each $color, $value in $primarys {
         .primary-#{$color} {
             color: color-yiq($value);
