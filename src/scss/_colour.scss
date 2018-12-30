@@ -61,10 +61,10 @@ $black: mix(#000, colour-mixin(#000), 95);
 $theme-colors: (
     "primary": $primary-colour,
     "secondary": $secondary-colour,
-    "success": $green,
+    "success": $green-dark,
     "info": $blue,
     "warning": $orange,
-    "danger": $red,
+    "danger": $red-dark,
     "foreground": $gray-light,
     "background": $betty-white
 );
