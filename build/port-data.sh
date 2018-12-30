@@ -110,10 +110,6 @@ function get_git_update () {
     # https://stackoverflow.com/questions/3258243/check-if-pull-needed-in-git/25109122
     git remote update &> /dev/null
 
-<<<<<<< HEAD
-    if [ "${LOCAL}" == "${BASE}" ]; then
-        git pull --quiet
-=======
     local local
     local=$(git rev-parse @)
     local base
@@ -121,7 +117,6 @@ function get_git_update () {
 
     if [ "${local}" == "${base}" ]; then
         git pull
->>>>>>> release-8
     fi
 }
 
