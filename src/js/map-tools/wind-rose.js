@@ -39,8 +39,8 @@ export default class WindRose {
         const fullCircle = 360;
         this._degreesPerSecond = fullCircle / secondsForFullCircle;
 
-        this._baseName = "Wind rose";
-        this._baseId = "wind-rose";
+        this._baseName = "In-game wind";
+        this._baseId = "ingame-wind";
         this._buttonId = `button-${this._baseId}`;
         this._modalId = `modal-${this._baseId}`;
         this._formId = `form-${this._baseId}`;
