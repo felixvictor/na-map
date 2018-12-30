@@ -70,9 +70,7 @@ function convertPBZones() {
                     id: port.id,
                     geometry: {
                         type: "MultiPoint",
-                        coordinates: port.features
-                            .filter(features => element === features.type)
-                            .map(features => features.coord)[0]
+                        coordinates: port.features.find(features => element === features.type).coord
                     }
                 };
                 if (feature.geometry.coordinates.length > 0) {
