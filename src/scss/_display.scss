@@ -50,7 +50,7 @@ table,
     position: relative;
     top: -0.4rem;
     font-size: small;
-    color: $primary-700;
+    color: $secondary-700;
 }
 
 #na-svg {
@@ -113,7 +113,7 @@ text,
 
     text {
         font-style: italic;
-        fill: $primary-700;
+        fill: $secondary-700;
     }
 }
 
@@ -265,7 +265,7 @@ table a {
 }
 
 .badge {
-    display: inline;
+    padding-top: 0.15rem;
 }
 
 .mm {
@@ -383,12 +383,12 @@ table a {
     }
 
     text {
-        fill: $secondary-800;
+        fill: $secondary-900;
         text-anchor: middle;
         dominant-baseline: central;
 
         &.des {
-            fill: $secondary-700 !important;
+            fill: $secondary-800 !important;
         }
     }
 
@@ -535,7 +535,11 @@ table a {
 }
 
 .f11 {
+    circle {
+        fill: $secondary-100;
+    }
     text {
+        fill: $white;
         text-anchor: end;
     }
 }
@@ -543,7 +547,6 @@ table a {
 .grid-background {
     rect {
         fill: $primary-200;
-        fill-opacity: 0.7;
     }
 }
 
@@ -664,8 +667,7 @@ table a {
 .region {
     font-feature-settings: "c2sc", "smcp";
 
-    opacity: 0.7;
-    fill: $primary-900;
+    fill: $secondary-900;
     text-anchor: middle;
 }
 
