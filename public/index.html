@@ -1,24 +1,32 @@
 <!doctype html>
-<html lang="en-GB">
+<html itemscope itemtype="http://schema.org/Map" lang="en-GB">
 <head>
     <meta charset="utf-8">
-    <meta content="ie=edge" http-equiv="x-ua-compatible">
-    <title>Naval Action map</title>
-    <meta content="Naval Action map" property="og:title">
-    <meta content="Naval Action map" name="twitter:title">
-    <meta content="Yet another map with in-game map, F11 coordinates, resources, ship and wood comparison. Port data is updated constantly from twitter and daily after maintenance." name="description">
-    <meta content="Yet another map with in-game map, F11 coordinates, resources, ship and wood comparison. Port data is updated constantly from twitter and daily after maintenance." property="og:description">
-
     <meta content="width=device-width,initial-scale=1" name="viewport">
-    <meta content="images/icons/favicon-32x32.png" property="og:image">
+    <title>Naval Action map</title>
+    <meta content="Yet another map with in-game map, F11 coordinates, resources, ship and wood comparison. Port data is updated constantly from twitter and daily after maintenance." name="description">
+    
+        <meta content="noindex" name="robots">
+    
+    <meta content="Naval Action map" property="og:title" itemprop="name">
+    <meta content="Yet another map with in-game map, F11 coordinates, resources, ship and wood comparison. Port data is updated constantly from twitter and daily after maintenance." property="og:description" itemprop="description">
+    <meta content="images/icons/icon_1024x1024.png" property="og:image" itemprop="image">
+    <meta content="" property="og:url" itemprop="url">
+
+    <meta content="en_gb" property="og:locale">
+    <meta content="website" property="og:type">
+
+    <meta content="summary_large_image" name="twitter:card">
 
     <script src="https://www.googletagmanager.com/gtag/js?id=UA-109520372-1" async></script>
-<link href="/images/icons/favicon.ico" rel="shortcut icon"><link href="/images/icons/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"><link href="/images/icons/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"><meta content="#dcd7ca" name="msapplication-TileColor"><meta content="/images/icons/mstile-144x144.png" name="msapplication-TileImage"><meta content="/images/icons/browserconfig.xml" name="msapplication-config"><link href="/images/icons/yandex-browser-manifest.json" rel="yandex-tableau-widget"><meta content="width=device-width,initial-scale=1,shrink-to-fit=no" name="viewport"><link href="vendors.f61b3aaa165f4b6a6a7e.css" rel="stylesheet" crossorigin="anonymous" integrity="sha256-bDl7KH8L1eWrS6+cPiKk/WPI4DYvNrYch6rviOY+iOY= sha384-UjI9fyPTgHc+lVEnqCyn4lnYNpYXepOx/U/G6+Ry8YVmZfNtxflZM9oqxXMUEhVz"><link href="main.75e8a270d58748a10527.css" rel="stylesheet" crossorigin="anonymous" integrity="sha256-PXuJIPHYuIL//bomr8btU4Rgub3UAOVe9DSlznsqBLM= sha384-1Ipqo9M+ZFjtN1MyBwevUTEP1T8A6kIy1Jfu5y+O5kSMPryeX+M5aZnZVCJgR2Il"></head>
+<meta content="width=device-width,initial-scale=1,shrink-to-fit=no" name="viewport"><link crossorigin="anonymous" href="main.766dfc7c5bf8d75a111e.css" integrity="sha256-f6lF/6h6VCjdm+AX3XeqHpLhb61SwdoS1WWNs+b4seg= sha384-6vyf6a08tMnsvQVWB9LJqOwfep2Bm77Y9fWOwnUByZ672fpwa7I7C3CvA2IlhQHE" rel="stylesheet"><link as="font" crossorigin="anonymous" href="fonts/Junicode-regular-italic.woff2" rel="preload"><link as="font" crossorigin="anonymous" href="fonts/Junicode-regular.woff2" rel="preload"></head>
 
 <body>
 
-<nav class="bg-light navbar navbar-expand-lg navbar-light">
-    <a class="navbar-brand" href="#"><img alt="Brand" height="32" src="images/icons/favicon-32x32.png" width="32"></a>
+<nav class="navbar navbar-expand-lg navbar-light">
+    <a class="navbar-brand" href="#">
+        <img alt="Brand" height="32" src="images/icons/icon_32x32.png" width="32">
+    </a>
     <button class="navbar-toggler" type="button" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation" data-target="#navbarSupportedContent" data-toggle="collapse">
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -153,20 +161,21 @@
         <ul class="navbar-nav ml-auto">
 
             <li class="nav-item pr-2 dropdown">
-                <a class="dropdown-toggle nav-link btn btn-primary" id="map-tools-dropdown" href="#" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
+                <a class="dropdown-toggle nav-link btn btn-outline-secondary" id="map-tools-dropdown" href="#" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
                     Map tools
                 </a>
                 <div class="dropdown-menu dropdown-menu-right" id="map-tools-menu" aria-labelledby="map-tools-dropdown">
 
                     <a class="dropdown-item" id="button-predict-wind" href="#">Predict wind</a>
-                    <a class="dropdown-item" id="button-go-to-f11" href="#">Go to F11 <span class="badge badge-pill badge-primary small text-right">shift+F11</span></a>
+                    <a class="dropdown-item" id="button-wind-rose" href="#">Wind rose</a>
+                    <a class="dropdown-item" id="button-go-to-f11" href="#">Go to <span class="caps">F11</span> <span class="badge badge-pill badge-primary small text-right">shift+<span class="caps">F11</span></span></a>
                     <a class="dropdown-item" id="button-get-position" href="#">Get position</a>
                     <a class="dropdown-item" id="button-make-journey" href="#"> Make journey</a>
                 </div>
             </li>
 
             <li class="nav-item pr-2 dropdown">
-                <a class="dropdown-toggle nav-link btn btn-primary" id="game-tools-dropdown" href="#" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
+                <a class="dropdown-toggle nav-link btn btn-outline-secondary" id="game-tools-dropdown" href="#" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
                     Game tools
                 </a>
                 <div class="dropdown-menu dropdown-menu-right" id="game-tools-menu" aria-labelledby="game-tools-dropdown">
@@ -278,27 +287,26 @@
                         </div>
                         <div class="custom-control custom-control-inline custom-radio">
                             <input class="custom-control-input" id="doubleClick-action-f11" type="radio" name="doubleClickAction" value="f11">
-                            <label class="custom-control-label" for="doubleClick-action-f11">Show F11
+                            <label class="custom-control-label" for="doubleClick-action-f11">Show <span class="caps">F11</span>
                                 coordinates</label>
                         </div>
                     </div>
                 </div>
             </li>
         </ul>
-        <div class="btn-group-vertical" role="group">
-            <button class="btn btn-outline-secondary btn-sm" type="button" id="reset">Clear</button>
-            <button class="btn btn-outline-secondary btn-sm" type="button" id="about">About</button>
+        <div class="btn-group-sm btn-group-vertical" role="group">
+            <button class="btn btn-outline-secondary" type="button" id="reset">Clear</button>
+            <button class="btn btn-outline-secondary" type="button" id="about">About</button>
         </div>
     </div>
 </nav>
 
 <main class="container-fluid" role="main">
     <div class="central" id="na-map"></div>
-
     <div id="modal-section"></div>
 </main>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.slim.min.js" crossorigin="anonymous" integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E="></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" crossorigin="anonymous" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"></script>
-<script src="runtime.25ce4e077d7da31cfc0d.js" crossorigin="anonymous" integrity="sha256-A+4XW34HWzCX9SFRwlU3xE9bFkuU1IVeiSX9nO7FTfY= sha384-NXMmqtBQS35Rg39zpoSqlJZWfoAuiURLct7RAkI4YhB2Ax+J4ssgp+d1RBasRVgX" type="text/javascript"></script><script src="vendors.374d62128cd12f685da4.bundle.js" crossorigin="anonymous" integrity="sha256-ml7hT4K3NtV5X9oQ7SMdHqISG8HKGRy+47YFW46vFEI= sha384-D+vuO2g7rtgmjIaUVH5UYfKhKrxSAP38k2b11F0hnzZWltQiYvjSk4T+EYcGM3Zb" type="text/javascript"></script><script src="main.e4b69fd2fd9afcae3ce7.bundle.js" crossorigin="anonymous" integrity="sha256-zInKa4+gy4sjuPfQbfElebQg0O8zHuIchw/Xyk7vPL8= sha384-9DalS/0CX7+6AEJEFYUNM5QCG9BuNThxFWdtojXuQwJV0TQGLLfRQhIJDcel+6Xu" type="text/javascript"></script></body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" crossorigin="anonymous" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"></script>
+<script src="runtime.cd9bd234ece9727a8bba.js" crossorigin="anonymous" integrity="sha256-BREmbNx2xcvAKnoUd6rUPNyHdoOEcv8Vl47kLWcBuZY= sha384-LgbvwEtR1FNuCyegXs0qN832UycV9LL3uU/wSlClHxI5+wHb6aQsfVEdXbqVAPv7"></script><script src="vendors~main.4945e756b0f2c56899e1.js" crossorigin="anonymous" integrity="sha256-skvs6CoeOTsNUvS7QfJlf6GlPI8hEoufEC7yrNvOYao= sha384-aO75L0ouwdKJznM43S+JW2ZUkiN4NCgiNkXbDIcqe7xiIsuhpvbwZkgen1sJdCil"></script><script src="main.aa8d3a3f524b774e79b8.js" crossorigin="anonymous" integrity="sha256-Rv7OzmrrEIss91xpIzZzoZRgYM7NWblFUFXVRPWCWUk= sha384-3KDJoMEsaVPfgyCfO6amLw15tuNQrR9htMx+nrRDx68MDF6PXJmV89szPMFOX6v3"></script></body>
 </html>

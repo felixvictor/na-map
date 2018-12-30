@@ -1,232 +1,58 @@
-/**
- * scss definitions: palettes
- *
- * @author    Ingo Beyritz
- * @copyright Copyright (c) 2018, Ingo Beyritz
- * @license   http://www.gnu.org/licenses/gpl.html
- */
+////
+/// This file is part of na-map.
+/// Colour palettes.
+///
+/// copyright 2017-18
+/// license   http://www.gnu.org/licenses/gpl.html
+/// @group    main
+/// @author   iB aka Felix Victor
+////
 
 .colour-palette {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
 
     .colour-slab {
         padding: 0.5rem 0.75rem;
-        color: rgba(0, 0, 0, 0.85);
-
-        &[class*="-500"],
-        &[class*="-600"],
-        &[class*="-700"],
-        &[class*="-800"],
-        &[class*="-900"] {
-            color: rgba(255, 255, 255, 0.875);
-        }
     }
 
     .colour-slab-base {
-        padding-top: 2rem;
-        padding-bottom: 2rem;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
         margin-bottom: 0.25rem;
     }
 
-    .background-050 {
-        background-color: $background-050;
-    }
-    .background-100 {
-        background-color: $background-100;
-    }
-    .background-200 {
-        background-color: $background-200;
-    }
-    .background-300 {
-        background-color: $background-300;
-    }
-    .background-400 {
-        background-color: $background-400;
-    }
-    .background-500 {
-        background-color: $background-500;
-    }
-    .background-600 {
-        background-color: $background-600;
-    }
-    .background-700 {
-        background-color: $background-700;
-    }
-    .background-800 {
-        background-color: $background-800;
-    }
-    .background-900 {
-        background-color: $background-900;
+    @each $color, $value in $theme-colors {
+        .#{$color} {
+            color: color-yiq($value);
+            background-color: $value;
+        }
     }
 
-    .foreground-050 {
-        background-color: $foreground-050;
-    }
-    .foreground-100 {
-        background-color: $foreground-100;
-    }
-    .foreground-200 {
-        background-color: $foreground-200;
-    }
-    .foreground-300 {
-        background-color: $foreground-300;
-    }
-    .foreground-400 {
-        background-color: $foreground-400;
-    }
-    .foreground-500 {
-        background-color: $foreground-500;
-    }
-    .foreground-600 {
-        background-color: $foreground-600;
-    }
-    .foreground-700 {
-        background-color: $foreground-700;
-    }
-    .foreground-800 {
-        background-color: $foreground-800;
-    }
-    .foreground-900 {
-        background-color: $foreground-900;
+    @each $color, $value in $colors {
+        .#{$color} {
+            color: color-yiq($value);
+            background-color: $value;
+        }
     }
 
-    .primary-050 {
-        background-color: $primary-050;
-    }
-    .primary-100 {
-        background-color: $primary-100;
-    }
-    .primary-200 {
-        background-color: $primary-200;
-    }
-    .primary-300 {
-        background-color: $primary-300;
-    }
-    .primary-400 {
-        background-color: $primary-400;
-    }
-    .primary-500 {
-        background-color: $primary-500;
-    }
-    .primary-600 {
-        background-color: $primary-600;
-    }
-    .primary-700 {
-        background-color: $primary-700;
-    }
-    .primary-800 {
-        background-color: $primary-800;
-    }
-    .primary-900 {
-        background-color: $primary-900;
+    @each $color, $value in $primarys {
+        .primary-#{$color} {
+            color: color-yiq($value);
+            background-color: $value;
+        }
     }
 
-    .secondary-050 {
-        background-color: $secondary-050;
-    }
-    .secondary-100 {
-        background-color: $secondary-100;
-    }
-    .secondary-200 {
-        background-color: $secondary-200;
-    }
-    .secondary-300 {
-        background-color: $secondary-300;
-    }
-    .secondary-400 {
-        background-color: $secondary-400;
-    }
-    .secondary-500 {
-        background-color: $secondary-500;
-    }
-    .secondary-600 {
-        background-color: $secondary-600;
-    }
-    .secondary-700 {
-        background-color: $secondary-700;
-    }
-    .secondary-800 {
-        background-color: $secondary-800;
-    }
-    .secondary-900 {
-        background-color: $secondary-900;
+    @each $color, $value in $secondarys {
+        .secondary-#{$color} {
+            color: color-yiq($value);
+            background-color: $value;
+        }
     }
 
-    .white {
-        background-color: $white;
-    }
-    .gray-100 {
-        background-color: $gray-100;
-    }
-    .gray-200 {
-        background-color: $gray-200;
-    }
-    .gray-300 {
-        background-color: $gray-300;
-    }
-    .gray-400 {
-        background-color: $gray-400;
-    }
-    .gray-500 {
-        background-color: $gray-500;
-    }
-    .gray-600 {
-        background-color: $gray-600;
-    }
-    .gray-700 {
-        background-color: $gray-700;
-    }
-    .gray-800 {
-        background-color: $gray-800;
-    }
-    .gray-900 {
-        background-color: $gray-900;
-    }
-
-    .success {
-        background-color: $success;
-    }
-    .info {
-        background-color: $info;
-    }
-    .warning {
-        background-color: $warning;
-    }
-    .danger {
-        background-color: $danger;
-    }
-
-    .betty-white {
-        background-color: $betty-white;
-    }
-    .blue {
-        background-color: $blue;
-    }
-    .indigo {
-        background-color: $indigo;
-    }
-    .purple {
-        background-color: $purple;
-    }
-    .pink {
-        background-color: $pink;
-    }
-    .red {
-        background-color: $red;
-    }
-    .orange {
-        background-color: $orange;
-    }
-    .yellow {
-        background-color: $yellow;
-    }
-    .green {
-        background-color: $green;
-    }
-    .teal {
-        background-color: $teal;
-    }
-    .cyan {
-        background-color: $cyan;
+    @each $color, $value in $grays {
+        .gray-#{$color} {
+            color: color-yiq($value);
+            background-color: $value;
+        }
     }
 }
