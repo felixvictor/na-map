@@ -27,11 +27,11 @@ String.prototype.replaceAll = function(search, replacement) {
 };
 
 const inDir = process.argv[2],
-    outFileNameTimelinePorts = process.argv[3],
-    outFileNameTimelineDates = process.argv[4];
+    fileBaseName = process.argv[3],
+    outFileNameTimelinePorts = process.argv[4],
+    outFileNameTimelineDates = process.argv[5];
 
-const fileBaseName = "api-eu1-Ports",
-    fileExtension = ".json.xz";
+const fileExtension = ".json.xz";
 
 const d3n = d3Node(),
     { d3 } = d3n;
@@ -55,9 +55,11 @@ function convertOwnership() {
         // console.log("**** new date", date);
 
         const numPorts = [];
-        nations.filter(nation => nation.id !== 9).forEach(nation => {
-            numPorts[nation.short] = 0;
-        });
+        nations
+            .filter(nation => nation.id !== 9)
+            .forEach(nation => {
+                numPorts[nation.short] = 0;
+            });
 
         portData.forEach(port => {
             /**
@@ -137,9 +139,11 @@ function convertOwnership() {
 
         const numPortsDate = {};
         numPortsDate.date = date;
-        nations.filter(nation => nation.id !== 9).forEach(nation => {
-            numPortsDate[nation.short] = numPorts[nation.short];
-        });
+        nations
+            .filter(nation => nation.id !== 9)
+            .forEach(nation => {
+                numPortsDate[nation.short] = numPorts[nation.short];
+            });
         numPortsDates.push(numPortsDate);
         // console.log("**** 138 -->", ports.get("138"));
     }
@@ -191,7 +195,10 @@ function convertOwnership() {
                             JSON.parse(decompressedContent.toString()),
                             path.basename(fileName).match(fileBaseNameRegex)[1]
                         )
-                    ),
+                    )
+                    .catch(error => {
+                        throw new Error(error);
+                    }),
             Promise.resolve()
         );
     }
