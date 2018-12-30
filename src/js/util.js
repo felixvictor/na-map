@@ -9,7 +9,7 @@
  */
 
 import { formatPrefix as d3FormatPrefix, formatLocale as d3FormatLocale } from "d3-format";
-import { arc as d3Arc, pie as d3Pie } from "d3-shape";
+import { scaleBand as d3ScaleBand } from "d3-scale";
 
 /**
  * Default format
@@ -54,12 +54,12 @@ export const formatFloatFixed = (x, f = 2) =>
         .replace(/\.(\d)0/g, '.$1<span class="hidden">0</span>');
 
 /**
- * Format F11 coordinate
+ * Format ShowF11 coordinate
  * @function
- * @param {Number} x - F11 coordinate
- * @return {String} Formatted F11 coordinate
+ * @param {Number} x - ShowF11 coordinate
+ * @return {String} Formatted ShowF11 coordinate
  */
-export const formatF11 = x => formatPrefix(x * -1).replace("-", "\u2212\u202f");
+export const formatF11 = x => formatPrefix(x * -1).replace("-", "\u2212\u202f").replace("k", "\u2009k");
 
 /**
  * Format integer
@@ -82,6 +82,8 @@ export const formatSiInt = x =>
     formatLocale
         .format(",.2s")(x)
         .replace(".0", "")
+        .replace("M", "\u2009\u1d0d") // LATIN LETTER SMALL CAPITAL M
+        .replace("k", "\u2009k")
         .replace("-", "\u2212\u202f");
 
 /**
@@ -112,13 +114,15 @@ export const formatSignPercent = x =>
 
 /**
  * Format ordinal
- * @param {Number} n - Integer
+ * @param {number} n - Integer
+ * @param {bool} sup - True if superscript tags needed
  * @return {String} Formatted Ordinal
  */
-export function getOrdinal(n) {
+export function getOrdinal(n, sup = true) {
     const s = ["th", "st", "nd", "rd"],
-        v = n % 100;
-    return n + (s[(v - 20) % 10] || s[v] || s[0]);
+        v = n % 100,
+        text = s[(v - 20) % 10] || s[v] || s[0];
+    return n + (sup ? `<span class="super">${text}</span>` : `${text}`);
 }
 
 /**
@@ -151,21 +155,29 @@ export function isEmpty(obj) {
  */
 export const compassDirections = [
     "N",
-    "NNE",
+    "N⅓NE",
+    "N⅔NE",
     "NE",
-    "ENE",
+    "E⅔NE",
+    "E⅓NE",
     "E",
-    "ESE",
+    "E⅓SE",
+    "E⅔SE",
     "SE",
-    "SSE",
+    "S⅔SE",
+    "S⅓SE",
     "S",
-    "SSW",
+    "S⅓SW",
+    "S⅔SW",
     "SW",
-    "WSW",
+    "W⅔SW",
+    "W⅓SW",
     "W",
-    "WNW",
+    "W⅓NW",
+    "W⅔NW",
     "NW",
-    "NNW"
+    "N⅔NW",
+    "N⅓NW"
 ];
 
 /**
@@ -186,8 +198,65 @@ export const compassToDegrees = compass => {
  * @return {String} Compass direction
  */
 export const degreesToCompass = degrees => {
-    const val = Math.floor(degrees / 22.5 + 0.5);
-    return compassDirections[val % 16];
+    const ticks = 360 / compassDirections.length;
+    const val = Math.floor(degrees / ticks + 0.5);
+    return compassDirections[val % compassDirections.length];
+};
+
+/**
+ * Display formatted compass
+ * @param {string} wind - Wind direction in compass or degrees
+ * @param {bool} svg - True to use 'tspan' instead of 'span'
+ * @return {string} HTML formatted compass
+ */
+export const displayCompass = (wind, svg = false) => {
+    let compass;
+
+    if (Number.isNaN(Number(wind))) {
+        compass = wind;
+    } else {
+        compass = degreesToCompass(+wind);
+    }
+
+    return `<${svg ? "tspan" : "span"} class="caps">${compass}</${svg ? "tspan" : "span"}>`;
+};
+
+/**
+ * Display formatted compass and degrees
+ * @param {string} wind - Wind direction in compass or degrees
+ * @param {bool} svg - True to use 'tspan' instead of 'span'
+ * @return {string} HTML formatted compass and degrees
+ */
+export const displayCompassAndDegrees = (wind, svg = false) => {
+    let compass;
+    let degrees;
+
+    if (Number.isNaN(Number(wind))) {
+        compass = wind;
+        degrees = compassToDegrees(compass) % 360;
+    } else {
+        degrees = +wind;
+        compass = degreesToCompass(degrees);
+    }
+
+    return `<${svg ? "tspan" : "span"} class="caps">${compass}</${svg ? "tspan" : "span"}> (${degrees}°)`;
+};
+
+/**
+ * Get wind in degrees from user input (rs-slider)
+ * @param {string} sliderId - Slider id
+ * @return {number} Wind in degrees
+ */
+export const getUserWind = sliderId => {
+    const currentUserWind = degreesToCompass($(`#${sliderId}`).roundSlider("getValue"));
+    let windDegrees;
+
+    if (Number.isNaN(Number(currentUserWind))) {
+        windDegrees = compassToDegrees(currentUserWind);
+    } else {
+        windDegrees = +currentUserWind;
+    }
+    return windDegrees;
 };
 
 /**
@@ -299,7 +368,7 @@ export const getTextFromFetch = response => response.text();
  * @return {void}
  */
 export const putFetchError = error => {
-    console.error("Request failed -->", error);
+    console.error("Fetch request failed -->", error);
 };
 
 /**
@@ -356,54 +425,109 @@ export function chunkify(array, n, balanced = true) {
  * @param {object} elem - Element to append compass
  * @return {void}
  */
-export function printCompassRose({ elem, compassSize }) {
+export function printCompassRose({ elem, radius }) {
     const steps = 24,
-        stepRadians = (2 * Math.PI) / steps,
-        radius = compassSize / (2 * Math.PI),
-        outerRadius = radius - 1,
-        innerRadius = radius * 0.8;
-    const data = Array.from(new Array(steps), () => 1);
-    const textArc = d3Arc()
-            .outerRadius(outerRadius)
-            .innerRadius(innerRadius),
-        textPie = d3Pie()
-            .startAngle(0 - stepRadians / 2)
-            .endAngle(2 * Math.PI - stepRadians / 2)
-            .sort(null)
-            .value(d => d),
-        textArcs = textPie(data);
+        degreesPerStep = 360 / steps,
+        innerRadius = Math.round(radius * 0.8);
+    const strokeWidth = 3;
+    const data = Array(steps)
+        .fill()
+        .map((e, i) => degreesToCompass(i * degreesPerStep));
+    const xScale = d3ScaleBand()
+        .range([0 - degreesPerStep / 2, 360 - degreesPerStep / 2])
+        .domain(data)
+        .align(0);
 
-    elem.append("circle").attr("r", Math.floor(innerRadius));
+    elem.append("circle")
+        .attr("r", innerRadius)
+        .style("stroke-width", `${strokeWidth}px`);
+
+    const dummy = elem.append("text");
 
     // Cardinal and intercardinal winds
-    elem.selectAll("text")
-        .data(textArcs.filter((d, i) => i % 3 === 0))
+    const label = elem
+        .selectAll("g")
+        .data(data)
         .enter()
+        .append("g")
+        .attr(
+            "transform",
+            d => `rotate(${Math.round(xScale(d) + xScale.bandwidth() / 2 - 90)})translate(${innerRadius},0)`
+        );
+
+    label
+        .filter((d, i) => i % 3 !== 0)
+        .append("line")
+        .attr("x2", 9);
+
+    label
+        .filter((d, i) => i % 3 === 0)
         .append("text")
         .attr("transform", d => {
-            const [tx, ty] = textArc.centroid(d),
-                translate = [Math.round(tx), Math.round(ty)];
-            let rotate = Math.round(((d.startAngle + d.endAngle) / 2) * (180 / Math.PI));
-            if (rotate === 90 || rotate === 270) {
+            let rotate = Math.round(xScale(d) + xScale.bandwidth() / 2);
+            let translate = "";
+
+            dummy.text(d);
+            const { height: textHeight, width: textWidth } = dummy.node().getBBox();
+
+            if ((rotate >= 0 && rotate <= 45) || rotate === 315) {
+                rotate = 90;
+                translate = `0,-${textHeight / 2}`;
+            } else if (rotate === 90) {
                 rotate = 0;
-            } else if (rotate > 90 && rotate < 270) {
-                rotate -= 180;
+                translate = `${textWidth / 2 + strokeWidth},0`;
+            } else if (rotate === 270) {
+                rotate = 180;
+                translate = `-${textWidth / 2 + strokeWidth},0`;
+            } else {
+                rotate = -90;
+                translate = `0,${textHeight / 2 + strokeWidth + 2}`;
             }
-            return `rotate(${rotate}, ${translate}) translate(${translate})`;
+
+            return `rotate(${rotate})translate(${translate})`;
         })
-        .attr("dx", d => (degreesToCompass((360 / steps) * d.index) === "E" ? "-.2rem" : "0"))
-        .text(d => degreesToCompass((360 / steps) * d.index));
+        .text(d => d);
+
+    dummy.remove();
+}
+
+/**
+ * Print small compass
+ * @param {object} elem - Element to append compass
+ * @return {void}
+ */
+export function printSmallCompassRose({ elem, radius }) {
+    const steps = 24,
+        degreesPerStep = 360 / steps,
+        innerRadius = Math.round(radius * 0.8);
+    const strokeWidth = 1.5;
+    const data = Array(steps)
+        .fill()
+        .map((e, i) => degreesToCompass(i * degreesPerStep));
+    const xScale = d3ScaleBand()
+        .range([0 - degreesPerStep / 2, 360 - degreesPerStep / 2])
+        .domain(data)
+        .align(0);
+
+    elem.append("circle")
+        .attr("r", innerRadius)
+        .style("stroke-width", `${strokeWidth}px`);
 
     // Ticks
-    const y1 = Math.floor(-outerRadius * 0.95),
-        y2 = Math.floor(-innerRadius);
+    const x2 = 2;
+    const x2InterCard = 4;
+    const x2Card = 6;
     elem.selectAll("line")
-        .data(textArcs.filter((d, i) => i % 3 !== 0))
+        .data(data)
         .enter()
         .append("line")
-        .attr("x1", 0)
-        .attr("x2", 0)
-        .attr("y1", y1)
-        .attr("y2", y2)
-        .attr("transform", d => `rotate(${Math.round(((d.startAngle + d.endAngle) / 2) * (180 / Math.PI))})`);
+        .attr("x2", (d, i) => (i % 3 !== 0 ? x2 : i % 6 !== 0 ? x2InterCard : x2Card))
+        .attr("transform", d => `rotate(${Math.round(xScale(d) + xScale.bandwidth() / 2)})translate(${innerRadius},0)`);
 }
+
+/**
+ * Format clan name
+ * @param {string} clan - Clan name
+ * @return {string} Formatted clan name
+ */
+export const displayClan = clan => `<span class="caps">${clan}</span>`;
