@@ -31,8 +31,6 @@ import { initAnalytics, registerPage } from "./analytics";
 
 import "../scss/main.scss";
 
-import Map from "./map";
-
 /**
  * @returns {void}
  */
@@ -54,9 +52,8 @@ function main() {
      * @returns {string} - server name
      */
     function getServerName() {
-        let r = Cookies.get(serverNameCookieName);
         // Use default value if cookie is not stored
-        r = typeof r !== "undefined" ? r : serverNameDefault;
+        const r = Cookies.get(serverNameCookieName) || serverNameDefault;
         $(`#server-name-${r}`).prop("checked", true);
         return r;
     }
@@ -71,29 +68,29 @@ function main() {
      * Store server name in cookie
      * @return {void}
      */
-    function storeServerName() {
+    const storeServerName = () => {
         if (serverName !== serverNameDefault) {
             Cookies.set(serverNameCookieName, serverName);
         } else {
             Cookies.remove(serverNameCookieName);
         }
-    }
+    };
 
     /**
      * Change server name
      * @return {void}
      */
-    function serverNameSelected() {
+    const serverNameSelected = () => {
         serverName = $("input[name='serverName']:checked").val();
         storeServerName();
         document.location.reload();
-    }
+    };
 
     /**
      * Setup listeners
      * @return {void}
      */
-    function setupListener() {
+    const setupListener = () => {
         $("#server-name").change(() => serverNameSelected());
 
         // https://stackoverflow.com/questions/44467377/bootstrap-4-multilevel-dropdown-inside-navigation/48953349#48953349
@@ -110,7 +107,39 @@ function main() {
                 .not(".inner")
                 .removeClass("show");
         });
-    }
+    };
+
+    /**
+     * Load map and set resize event
+     * @return {void}
+     */
+    const loadMap = async () => {
+        let map;
+
+        try {
+            const { Map } = await import(/* webpackChunkName: "map" */ "./map/map");
+            map = new Map(serverName);
+        } catch (error) {
+            throw new Error(error);
+        }
+
+        window.onresize = () => {
+            map.resize();
+        };
+    };
+
+    /**
+     * Load game tools
+     * @return {void}
+     */
+    const loadGameTools = async () => {
+        try {
+            const gameTools = await import(/* webpackChunkName: "game-tools" */ "./game-tools");
+            gameTools.init();
+        } catch (error) {
+            throw new Error(error);
+        }
+    };
 
     fontawesome.library.add(
         faCalendar,
@@ -135,11 +164,8 @@ function main() {
     };
 
     setupListener();
-    const map = new Map(serverName);
-
-    window.onresize = () => {
-        map.resize();
-    };
+    loadMap();
+    loadGameTools();
 }
 
 main();

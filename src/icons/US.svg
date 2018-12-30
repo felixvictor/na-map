@@ -1,48 +1,49 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="640" height="480" viewBox="0 0 640 480">
-    <rect y="384" width="640" height="32" style="fill: #bf0a30"/>
-    <rect y="320" width="640" height="32" style="fill: #bf0a30"/>
-    <rect y="256" width="640" height="32" style="fill: #bf0a30"/>
-    <rect y="192" width="640" height="32" style="fill: #bf0a30"/>
-    <rect y="128" width="640" height="32" style="fill: #bf0a30"/>
-    <rect y="64" width="640" height="32" style="fill: #bf0a30"/>
-    <rect y="448" width="640" height="32" style="fill: #bf0a30"/>
-    <rect width="640" height="32" style="fill: #bf0a30"/>
-    <rect y="416" width="640" height="32" style="fill: #fff"/>
-    <rect y="352" width="640" height="32" style="fill: #fff"/>
-    <rect y="288" width="640" height="32" style="fill: #fff"/>
-    <rect y="224" width="640" height="32" style="fill: #fff"/>
-    <rect y="160" width="640" height="32" style="fill: #fff"/>
-    <rect y="96" width="640" height="32" style="fill: #fff"/>
-    <rect y="32" width="640" height="32" style="fill: #fff"/>
-    <rect width="256" height="256" style="fill: #000067"/>
+    <rect y="384" width="640" height="32" fill="#bf0a30"/>
+    <rect y="320" width="640" height="32" fill="#bf0a30"/>
+    <rect y="256" width="640" height="32" fill="#bf0a30"/>
+    <rect y="192" width="640" height="32" fill="#bf0a30"/>
+    <rect y="128" width="640" height="32" fill="#bf0a30"/>
+    <rect y="64" width="640" height="32" fill="#bf0a30"/>
+    <rect y="448" width="640" height="32" fill="#bf0a30"/>
+    <rect width="640" height="32" fill="#bf0a30"/>
+    <rect y="416" width="640" height="32" fill="#fff"/>
+    <rect y="352" width="640" height="32" fill="#fff"/>
+    <rect y="288" width="640" height="32" fill="#fff"/>
+    <rect y="224" width="640" height="32" fill="#fff"/>
+    <rect y="160" width="640" height="32" fill="#fff"/>
+    <rect y="96" width="640" height="32" fill="#fff"/>
+    <rect y="32" width="640" height="32" fill="#fff"/>
+    <rect width="256" height="256" fill="#000067"/>
     <path d="M77.41,69.32l-4,8.11,4.13,8-7.64-2.1-5.05,7.22-0.7-9.41L56.87,77.6l7.21-3.71,0.57-9.42,5.17,7.12Z"
-          transform="translate(-1 0)" style="fill: #fff"/>
+          transform="translate(-1 0)" fill="#fff"/>
     <path d="M77.41,155.23l-4,8.11,4.13,8-7.64-2.1-5.05,7.22-0.7-9.41-7.26-3.6,7.21-3.71,0.57-9.42,5.17,7.12Z"
-          transform="translate(-1 0)" style="fill: #fff"/>
+          transform="translate(-1 0)" fill="#fff"/>
     <path d="M149.15,69.32l-4,8.11,4.13,8-7.64-2.1-5.05,7.22-0.7-9.41-7.26-3.57,7.21-3.71,0.57-9.42,5.17,7.12Z"
-          transform="translate(-1 0)" style="fill: #fff"/>
+          transform="translate(-1 0)" fill="#fff"/>
     <path d="M149.15,155.23l-4,8.11,4.13,8-7.64-2.1-5.05,7.22-0.7-9.41-7.26-3.6,7.21-3.71,0.57-9.42,5.17,7.12Z"
-          transform="translate(-1 0)" style="fill: #fff"/>
+          transform="translate(-1 0)" fill="#fff"/>
     <path d="M220.89,69.32l-4,8.11,4.13,8-7.64-2.1-5.05,7.22-0.7-9.41-7.26-3.57,7.21-3.71,0.57-9.42,5.17,7.12Z"
-          transform="translate(-1 0)" style="fill: #fff"/>
+          transform="translate(-1 0)" fill="#fff"/>
     <path d="M220.89,155.23l-4,8.11,4.13,8-7.64-2.1-5.05,7.22-0.7-9.41-7.26-3.6,7.21-3.71,0.57-9.42,5.17,7.12Z"
-          transform="translate(-1 0)" style="fill: #fff"/>
+          transform="translate(-1 0)" fill="#fff"/>
     <path d="M21.13,42.08l4-8.11-4.14-8L28.64,28l5.05-7.22,0.7,9.41,7.26,3.57-7.21,3.71-0.57,9.42-5.17-7.12Z"
-          transform="translate(-1 0)" style="fill: #fff"/>
+          transform="translate(-1 0)" fill="#fff"/>
     <path d="M21.13,128l4-8.11-4.14-8,7.64,2.1,5.05-7.22,0.7,9.41,7.26,3.57-7.21,3.71-0.57,9.42-5.17-7.12Z"
-          transform="translate(-1 0)" style="fill: #fff"/>
+          transform="translate(-1 0)" fill="#fff"/>
     <path d="M21.13,215.05l4-8.11-4.15-8,7.64,2.1,5.05-7.22,0.71,9.4,7.26,3.57-7.21,3.71-0.57,9.42-5.17-7.12Z"
-          transform="translate(-1 0)" style="fill: #fff"/>
+          transform="translate(-1 0)" fill="#fff"/>
     <path d="M92.87,42l4-8.11-4.15-8,7.64,2.1,5.05-7.22,0.7,9.41,7.26,3.57-7.21,3.71-0.57,9.42-5.17-7.12Z"
-          transform="translate(-1 0)" style="fill: #fff"/>
+          transform="translate(-1 0)" fill="#fff"/>
     <path d="M92.87,127.86l4-8.11-4.13-8,7.64,2.1,5.05-7.22,0.7,9.41,7.26,3.57-7.21,3.71-0.57,9.42-5.17-7.12Z"
-          transform="translate(-1 0)" style="fill: #fff"/>
+          transform="translate(-1 0)" fill="#fff"/>
     <path d="M92.87,214.93l4-8.11-4.13-8,7.64,2.1,5.05-7.22,0.7,9.41,7.26,3.57-7.21,3.71-0.57,9.42-5.17-7.12Z"
-          transform="translate(-1 0)" style="fill: #fff"/>
+          transform="translate(-1 0)" fill="#fff"/>
     <path d="M164.6,41.15l4-8.11-4.15-8,7.64,2.1,5.05-7.22,0.7,9.41,7.26,3.57-7.21,3.68L177.36,46l-5.17-7.12Z"
-          transform="translate(-1 0)" style="fill: #fff"/>
+          transform="translate(-1 0)" fill="#fff"/>
     <path d="M164.6,127.05l4-8.11-4.15-8,7.64,2.1,5.05-7.22,0.71,9.4,7.26,3.57-7.21,3.71-0.57,9.42-5.17-7.12Z"
-          transform="translate(-1 0)" style="fill: #fff"/>
+          transform="translate(-1 0)" fill="#fff"/>
     <path d="M164.6,214.09l4-8.11-4.13-8,7.64,2.1,5.05-7.22,0.7,9.41,7.26,3.57-7.21,3.71L177.38,219l-5.17-7.12Z"
-          transform="translate(-1 0)" style="fill: #fff"/>
+          transform="translate(-1 0)" fill="#fff"/>
+    <rect width="640" height="480" fill="#fff" fill-opacity="0"/>
 </svg>
