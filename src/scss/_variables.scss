@@ -1,10 +1,12 @@
-/**
- * scss definitions: bootstrap variables
- *
- * @author    Ingo Beyritz
- * @copyright Copyright (c) 2017, Ingo Beyritz
- * @license   http://www.gnu.org/licenses/gpl.html
- */
+////
+/// This file is part of na-map.
+/// Bootstrap variables.
+///
+/// copyright 2017-18
+/// license   http://www.gnu.org/licenses/gpl.html
+/// @group    main
+/// @author   iB aka Felix Victor
+////
 
 // Options
 $enable-rounded: false;
@@ -31,10 +33,18 @@ $spacers: (
 );
 
 // Body
-$body-bg: $background-100;
-$body-color: $primary-800;
-$yiq-text-dark: $primary-900;
-//$yiq-text-light: $white !default;
+$body-bg: $primary-050;
+//$body-color: $secondary-900;
+$body-color: $gray-900;
+//$yiq-text-dark: $body-color;
+//$yiq-text-light: $white;
+$yiq-contrasted-threshold: 127;
+
+// Navbar
+//$navbar-light-color:                $secondary-700; // rgba($black, .5) !default;
+//$navbar-light-hover-color:          $secondary-800; // rgba($black, .7) !default;
+//$navbar-light-active-color:         $secondary-900; // rgba($black, .9) !default;
+//$navbar-light-disabled-color:       $secondary-700; // rgba($black, .3) !default;
 
 // Links
 $link-color: $secondary-700;
@@ -44,17 +54,17 @@ $link-hover-color: $secondary-800;
 //$grid-columns: 12 !default;
 //$grid-gutter-width: 30px !default;
 
-$input-color: $body-color;
-$input-group-addon-bg: $primary-100;
-$input-border-color: $primary-400;
-$input-border-radius: 0;
+//$input-color: $body-color;
+//$input-group-addon-bg: $primary-100;
+//$input-border-color: $primary-400;
+//$input-border-radius: 0;
 
 // Fonts
-$font-size-base: 1rem;
+$font-size-base: 1.2rem;
 $font-size-lg: map-get($spacers, 4);
 $font-size-sm: map-get($spacers, 2) * 1.2;
 
-$line-height-base: 1.618;
+$line-height-base: map-get($spacers, 4) / $font-size-base;
 
 $h6-font-size: $font-size-base;
 $h5-font-size: $h6-font-size + $font-size-base/$font-size-lg/2;
@@ -76,7 +86,7 @@ $input-focus-box-shadow: $primary-200;
 // Tooltip
 $tooltip-max-width: 40em;
 $tooltip-color: $body-color;
-$tooltip-bg: $primary-100;
+$tooltip-bg: $primary-050;
 $tooltip-opacity: 1;
 $tooltip-padding-y: 1rem;
 $tooltip-padding-x: 1rem;
@@ -101,7 +111,7 @@ $pagination-active-color: $pagination-hover-color;
 $pagination-active-bg: $pagination-hover-bg;
 $pagination-active-border-color: $pagination-active-bg;
 
-$pagination-disabled-color: $foreground-500;
+$pagination-disabled-color: $gray-500;
 $pagination-disabled-bg: $pagination-bg;
 $pagination-disabled-border-color: $pagination-bg;
 
@@ -109,12 +119,15 @@ $pagination-disabled-border-color: $pagination-bg;
 $modal-lg: 1200px;
 
 // Badges
-//$badge-font-size:                   90%;
+$badge-font-size: 90%;
 $badge-font-weight: 400;
-$badge-padding-y: 0.2rem;
-//$badge-padding-x:                   .4rem !default;
+$badge-padding-y: 0rem;
+$badge-padding-x: 0.2rem;
 //$badge-border-radius:               $border-radius !default;
 //$badge-pill-padding-x:              .6em !default;
 // Use a higher than normal value to ensure completely rounded edges when
 // customizing padding or font-size on labels.
 //$badge-pill-border-radius:          10rem !default;
+
+// Work-around to avoid mangling from postcss-crass
+$custom-radio-indicator-icon-checked: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9Ii00IC00IDggOCI+PGNpcmNsZSByPSIzIiBmaWxsPSIjZjlmN2Y3Ii8+PC9zdmc+);

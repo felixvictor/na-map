@@ -1,16 +1,14 @@
-/*
- * scss definitions: pre-bootstrap
- *
- * @author    Ingo Beyritz
- * @copyright Copyright (c) 2017, Ingo Beyritz
- * @license   http://www.gnu.org/licenses/gpl.html
- */
-
-$primary-colour: #dcd7ca;
-$secondary-colour: #bbc0a2;
+////
+/// This file is part of na-map.
+/// Pre-bootstrap definitions.
+///
+/// copyright 2017-18
+/// license   http://www.gnu.org/licenses/gpl.html
+/// @group    main
+/// @author   iB aka Felix Victor
+////
 
 @import "mixins";
 @import "colour";
 @import "variables";
-@import "palettes";
 @import "font";
