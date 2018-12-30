@@ -124,16 +124,17 @@ $secondarys: (
     "900": $secondary-900
 );
 
-$gray-050: theme-color-level("gray", 50);
-$gray-100: theme-color-level("gray", 100);
-$gray-200: theme-color-level("gray", 200);
-$gray-300: theme-color-level("gray", 300);
-$gray-400: theme-color-level("gray", 400);
-$gray-500: theme-color-level("gray", 500);
-$gray-600: theme-color-level("gray", 600);
-$gray-700: theme-color-level("gray", 700);
-$gray-800: theme-color-level("gray", 800);
-$gray-900: theme-color-level("gray", 900);
+// gray maps to secondary!
+$gray-050: theme-color-level("secondary", 50);
+$gray-100: theme-color-level("secondary", 100);
+$gray-200: theme-color-level("secondary", 200);
+$gray-300: theme-color-level("secondary", 300);
+$gray-400: theme-color-level("secondary", 400);
+$gray-500: theme-color-level("secondary", 500);
+$gray-600: theme-color-level("secondary", 600);
+$gray-700: theme-color-level("secondary", 700);
+$gray-800: theme-color-level("secondary", 800);
+$gray-900: theme-color-level("secondary", 900);
 
 $grays: (
     "050": $gray-050,
@@ -168,28 +169,27 @@ $colors: (
     "green-dark": $green-dark,
     "teal": $teal,
     "cyan": $cyan,
-    "white": $white,
     "gray": $gray-500,
     "gray-dark": $gray-800,
     "black": $black
 );
 
-$success: $green;
+$success: $green-dark;
 $info: $blue;
 $warning: $orange;
 $danger: $red-dark;
 
-$light: $gray-100;
-$dark: $gray-800;
+$light: $primary-100;
+$dark: $primary-900;
 
 $theme-colors: (
     "primary": $primary-colour,
     "secondary": $secondary-colour,
-    "gray": $gray,
     "success": $success,
     "info": $info,
     "warning": $warning,
     "danger": $danger,
+    "white": $white,
     "light": $light,
     "dark": $dark
 );
