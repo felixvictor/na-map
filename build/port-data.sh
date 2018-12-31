@@ -78,6 +78,7 @@ function common_var () {
     [[ ! -d "${base_dir}/public" ]] && yarn run prod
 
     src_dir="${base_dir}/src"
+    out_dir="${base_dir}/public/data"
     gen_dir="${src_dir}/gen"
     ship_file="${gen_dir}/ships.json"
     cannon_file="${gen_dir}/cannons.json"
@@ -208,9 +209,7 @@ function get_port_data () {
 }
 
 function copy_data () {
-    public_dir="${base_dir}/public"
-
-    cp --update "${gen_dir}"/*.json "${excel_file}" "${public_dir}"/
+    cp --update "${gen_dir}"/*.json "${excel_file}" "${out_dir}"/
 }
 
 function deploy_data () {
