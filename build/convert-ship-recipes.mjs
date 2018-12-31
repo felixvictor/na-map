@@ -64,9 +64,10 @@ const convertShipRecipes = () => {
                 name: itemNames.get(APIrecipe.Results[0].Template)
             },
             // qualities: APIrecipe.Qualities,
-            shipyardLevel: APIrecipe.BuildingRequirements[0].Level,
+            shipyardLevel: APIrecipe.BuildingRequirements[0].Level + 1,
             craftLevel: APIrecipe.RequiresLevel,
-            craftXP: APIrecipe.GivesXP
+            craftXP: APIrecipe.GivesXP,
+            labourHours: APIrecipe.LaborPrice
         };
         if (permit.needed) {
             recipe.permit = true;
