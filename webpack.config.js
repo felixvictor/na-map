@@ -56,13 +56,11 @@ const themeColour = colours.get("secondary-500");
 const primary700 = colours.get("primary-700");
 const primary200 = colours.get("primary-200");
 const primary300 = colours.get("primary-300");
-const colourGray200 = colours.get("gray-200");
-const colourGray500 = colours.get("gray-500");
-const colourGray700 = colours.get("gray-700");
 const colourGreen = colours.get("green");
 const colourGreenDark = colours.get("green-dark");
 const colourRed = colours.get("red");
 const colourRedDark = colours.get("red-dark");
+const colourRedLight = colours.get("red-light");
 const colourWhite = colours.get("white");
 
 const outputPath = path.resolve(__dirname, "public");
@@ -282,12 +280,11 @@ const config = {
         }),
         new MiniCssExtractPlugin({ filename: isProd ? "[name].[contenthash].css" : "[name].css" }),
         new webpack.DefinePlugin({
-            CGRAY200: JSON.stringify(colourGray200),
-            CGRAY500: JSON.stringify(colourGray500),
-            CGRAY700: JSON.stringify(colourGray700),
+            CPRIMARY300: JSON.stringify(primary300),
             CGREEN: JSON.stringify(colourGreen),
             CGREENDARK: JSON.stringify(colourGreenDark),
             CRED: JSON.stringify(colourRed),
+            CREDLIGHT: JSON.stringify(colourRedLight),
             CREDDARK: JSON.stringify(colourRedDark),
             CWHITE: JSON.stringify(colourWhite),
             DESCRIPTION: JSON.stringify(description),
