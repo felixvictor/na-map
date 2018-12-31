@@ -26,7 +26,7 @@ String.prototype.replaceAll = function(search, replacement) {
 const convertShipRecipes = () => {
     const data = {};
     const itemNames = new Map();
-    data.recipe = [];
+    data.shipRecipes = [];
 
     const getItemNames = () => {
         APIItems.forEach(item => {
@@ -43,12 +43,10 @@ const convertShipRecipes = () => {
             id: APIrecipe.Id,
             name: APIrecipe.Name.replaceAll("'", "’"),
             woods: APIrecipe.WoodTypeDescs.map(wood => ({
-                wood: itemNames.get(wood.Requirements[0].Template),
+                name: itemNames.get(wood.Requirements[0].Template).replace(" Log", ""),
                 amount: wood.Requirements[0].Amount
             })),
-            // qualities: APIrecipe.Qualities,
-            shipyardLevel: APIrecipe.BuildingRequirements[0].Level,
-            fullRequirements: APIrecipe.FullRequirements.map((requirement, i) => {
+            resources: APIrecipe.FullRequirements.map((requirement, i) => {
                 if (itemNames.get(requirement.Template).endsWith(" Permit")) {
                     permit = { needed: true, index: i };
                 }
@@ -56,35 +54,40 @@ const convertShipRecipes = () => {
                     doubloons = { needed: requirement.Amount, index: i };
                 }
                 return {
-                    item: itemNames.get(requirement.Template),
+                    name: itemNames.get(requirement.Template),
                     amount: requirement.Amount
                 };
             }),
             // gold: APIrecipe.GoldRequirements,
-            result: itemNames.get(APIrecipe.Results[0].Template),
+            ship: {
+                id: APIrecipe.Results[0].Template,
+                name: itemNames.get(APIrecipe.Results[0].Template)
+            },
+            // qualities: APIrecipe.Qualities,
+            shipyardLevel: APIrecipe.BuildingRequirements[0].Level,
             craftLevel: APIrecipe.RequiresLevel,
             craftXP: APIrecipe.GivesXP
         };
         if (permit.needed) {
             recipe.permit = true;
-            // Remove permit from fullRequirements
-            recipe.fullRequirements.splice(permit.index, 1);
+            // Remove permit from resources
+            recipe.resources.splice(permit.index, 1);
         } else {
             recipe.permit = false;
         }
         if (doubloons.needed) {
             recipe.doubloons = doubloons.needed;
-            // Remove permit from fullRequirements
-            recipe.fullRequirements.splice(doubloons.index - (permit.needed === true ? 1 : 0), 1);
+            // Remove permit from resources
+            recipe.resources.splice(doubloons.index - (permit.needed === true ? 1 : 0), 1);
         } else {
             recipe.doubloons = doubloons.needed;
         }
-        data.recipe.push(recipe);
+        data.shipRecipes.push(recipe);
         permit = { needed: false };
         doubloons = { needed: 0 };
     });
 
-    data.recipe.sort((a, b) => {
+    data.shipRecipes.sort((a, b) => {
         if (a.name < b.name) {
             return -1;
         }
