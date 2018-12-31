@@ -161,11 +161,10 @@ export const speedConstB = 0.00272175949231;
 
 export const circleRadiusFactor = 5;
 
-export const colourGray200 = CGRAY200;
-export const colourGray500 = CGRAY500;
-export const colourGray700 = CGRAY700;
+export const primary300 = CPRIMARY300;
 export const colourGreen = CGREEN;
 export const colourGreenDark = CGREENDARK;
 export const colourRed = CRED;
+export const colourRedLight = CREDLIGHT;
 export const colourRedDark = CREDDARK;
 export const colourWhite = CWHITE;
