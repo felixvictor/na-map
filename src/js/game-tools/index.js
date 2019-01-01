@@ -97,7 +97,7 @@ const setupData = data => {
     const buildingData = JSON.parse(JSON.stringify(data.buildings));
     const buildingList = new ListBuildings(buildingData);
 
-    const blueprintData = JSON.parse(JSON.stringify(data.blueprints));
+    const blueprintData = JSON.parse(JSON.stringify(data.blueprints.shipBlueprints));
     const blueprintList = new ListShipBlueprints(blueprintData);
 };
 
