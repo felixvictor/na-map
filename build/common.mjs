@@ -273,7 +273,7 @@ export const defaultCircleSize = 16;
  * @param {number} decimals - decimals
  * @return {number} Rounded number
  */
-const round = (n, decimals = 0) => Number(`${Math.round(`${n}e${decimals}`)}e-${decimals}`);
+export const round = (n, decimals = 0) => Number(`${Math.round(`${n}e${decimals}`)}e-${decimals}`);
 
 /**
  * Round to thousands
