@@ -130,10 +130,6 @@ text,
     background-color: $secondary-050;
 }
 
-.table .table {
-    background-color: $primary-100;
-}
-
 table tr,
 p {
     text-align: left;
@@ -148,6 +144,14 @@ p {
         vertical-align: top;
         border-top: none;
     }
+
+    td:first-child {
+        padding-left: 0;
+    }
+
+    td:last-child {
+        padding-right: 0;
+    }
 }
 
 p a,
@@ -156,11 +160,6 @@ table a {
     @include hover-focus {
         text-decoration-style: solid !important;
     }
-}
-
-.table-sm th,
-.table-sm td {
-    padding: $paddingThird;
 }
 
 .ship-base,
@@ -183,6 +182,15 @@ table a {
 .ship-compare {
     .light {
         background-color: $secondary-100;
+    }
+}
+
+.blueprint {
+    table {
+        width: auto;
+        td + td {
+            text-align: right;
+        }
     }
 }
 
