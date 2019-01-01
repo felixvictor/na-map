@@ -1,10 +1,10 @@
 /**
  * This file is part of na-map.
  *
- * @file      Convert ship recipes.
- * @module    build/convert-ship-recipes
+ * @file      Convert ship blueprints.
+ * @module    build/convert-ship-blueprints
  * @author    iB aka Felix Victor
- * @copyright 2018
+ * @copyright 2018, 2019
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -63,23 +63,23 @@ const getShipRate = id => apiItems.find(apiItem => id === apiItem.Id).Class;
 const getMaxCrew = id => apiItems.find(apiItem => id === apiItem.Id).HealthInfo.Crew;
 
 /**
- * Convert ship recipes
+ * Convert ship blueprints
  * @return {void}
  */
-const convertShipRecipes = () => {
+const convertShipBlueprints = () => {
     /**
-     * Get ratios (ship mass and crew) for the ship recipes requirements.
-     * As the ratios are the same for all ships, get the ratio from the first ship recipe in list
-     * @return {object} Ship recipe ratios
+     * Get ratios (ship mass and crew) for the ship blueprints requirements.
+     * As the ratios are the same for all ships, get the ratio from the first ship blueprint in list
+     * @return {object} Ship blueprint ratios
      */
     const getRatios = () => {
-        // Get first ship recipe
-        const recipe = apiItems.find(apiItem => !apiItem.NotUsed && apiItem.ItemType === "RecipeShip");
-        const shipMass = getShipMass(recipe.Results[0].Template);
-        const maxCrew = getMaxCrew(recipe.Results[0].Template);
+        // Get first ship blueprint
+        const blueprint = apiItems.find(apiItem => !apiItem.NotUsed && apiItem.ItemType === "RecipeShip");
+        const shipMass = getShipMass(blueprint.Results[0].Template);
+        const maxCrew = getMaxCrew(blueprint.Results[0].Template);
 
         return {
-            frames: recipe.WoodTypeDescs.map(wood => ({
+            frames: blueprint.WoodTypeDescs.map(wood => ({
                 name: itemNames.get(wood.Requirements[0].Template).replace(" Log", ""),
                 massRatio: round(wood.Requirements[0].Amount / shipMass, 2)
             })),
@@ -93,7 +93,7 @@ const convertShipRecipes = () => {
                     massRatio: crewSpaceRatio
                 }
             ],
-            resources: recipe.FullRequirements.filter(
+            resources: blueprint.FullRequirements.filter(
                 requirement =>
                     !(
                         itemNames.get(requirement.Template).endsWith(" Permit") ||
@@ -107,45 +107,45 @@ const convertShipRecipes = () => {
             provisions: {
                 name: "Provisions",
                 crewRatio:
-                    recipe.FullRequirements.find(requirement => itemNames.get(requirement.Template) === "Provisions")
+                    blueprint.FullRequirements.find(requirement => itemNames.get(requirement.Template) === "Provisions")
                         .Amount / maxCrew
             }
         };
     };
 
     /**
-     * Get ship recipes
-     * @return {object} Ship recipes
+     * Get ship blueprints
+     * @return {object} Ship blueprints
      */
-    const getShipRecipes = () =>
+    const getShipBlueprints = () =>
         apiItems
             .filter(apiItem => !apiItem.NotUsed && apiItem.ItemType === "RecipeShip")
-            .map(apiRecipe => ({
-                id: apiRecipe.Id,
-                name: apiRecipe.Name.replaceAll("'", "’"),
+            .map(apiBlueprint => ({
+                id: apiBlueprint.Id,
+                name: apiBlueprint.Name.replaceAll(" Blueprint", "").replaceAll("'", "’"),
                 ship: {
-                    id: apiRecipe.Results[0].Template,
-                    name: itemNames.get(apiRecipe.Results[0].Template),
-                    rate: getShipRate(apiRecipe.Results[0].Template),
-                    shipMass: getShipMass(apiRecipe.Results[0].Template),
-                    maxCrew: getMaxCrew(apiRecipe.Results[0].Template)
+                    id: apiBlueprint.Results[0].Template,
+                    name: itemNames.get(apiBlueprint.Results[0].Template),
+                    rate: getShipRate(apiBlueprint.Results[0].Template),
+                    shipMass: getShipMass(apiBlueprint.Results[0].Template),
+                    maxCrew: getMaxCrew(apiBlueprint.Results[0].Template)
                 },
                 doubloons:
                     (
-                        apiRecipe.FullRequirements.find(
+                        apiBlueprint.FullRequirements.find(
                             requirement => itemNames.get(requirement.Template) === "Doubloons"
                         ) || {}
                     ).Amount || 0,
                 permit:
                     (
-                        apiRecipe.FullRequirements.find(requirement =>
+                        apiBlueprint.FullRequirements.find(requirement =>
                             itemNames.get(requirement.Template).endsWith(" Permit")
                         ) || {}
                     ).Amount || 0,
-                shipyardLevel: apiRecipe.BuildingRequirements[0].Level + 1,
-                craftLevel: apiRecipe.RequiresLevel,
-                craftXP: apiRecipe.GivesXP,
-                labourHours: apiRecipe.LaborPrice
+                shipyardLevel: apiBlueprint.BuildingRequirements[0].Level + 1,
+                craftLevel: apiBlueprint.RequiresLevel,
+                craftXP: apiBlueprint.GivesXP,
+                labourHours: apiBlueprint.LaborPrice
             }))
             // Sort by name
             .sort((a, b) => {
@@ -161,9 +161,9 @@ const convertShipRecipes = () => {
     const data = {};
 
     data.ratios = getRatios();
-    data.shipRecipes = getShipRecipes();
+    data.shipBlueprints = getShipBlueprints();
 
     saveJson(outFilename, data);
 };
 
-convertShipRecipes();
+convertShipBlueprints();

@@ -15,6 +15,7 @@ import ListCannons from "./list-cannons";
 import ListIngredients from "./list-ingredients";
 import ListModules from "./list-modules";
 import ListPortOwnerships from "./list-port-ownerships";
+import ListShipBlueprints from "./list-ship-blueprints";
 import ListRecipes from "./list-recipes";
 import ListWoods from "./list-woods";
 import { checkFetchStatus, getJsonFromFetch, putFetchError } from "../util";
@@ -60,6 +61,10 @@ const dataSources = [
     {
         fileName: "nations.json",
         name: "nations"
+    },
+    {
+        fileName: "ship-blueprints.json",
+        name: "blueprints"
     }
 ];
 
@@ -91,6 +96,9 @@ const setupData = data => {
 
     const buildingData = JSON.parse(JSON.stringify(data.buildings));
     const buildingList = new ListBuildings(buildingData);
+
+    const blueprintData = JSON.parse(JSON.stringify(data.blueprints));
+    const blueprintList = new ListShipBlueprints(blueprintData);
 };
 
 /**
