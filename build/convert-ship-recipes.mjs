@@ -8,7 +8,8 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { readJson, saveJson } from "./common.mjs";
+// eslint-disable-next-line
+import { readJson, round, saveJson } from "./common.mjs";
 
 const inBaseFilename = process.argv[2],
     outFilename = process.argv[3],
@@ -23,9 +24,28 @@ String.prototype.replaceAll = function(search, replacement) {
     return target.replace(new RegExp(search, "g"), replacement);
 };
 
+/**
+ * Convert ship recipes
+ * @return {void}
+ */
 const convertShipRecipes = () => {
+    /**
+     * Get item names
+     * @return {Map<number, string>} Item names<id, name>
+     */
     const getItemNames = () => new Map(apiItems.map(item => [item.Id, item.Name.replaceAll("'", "’")]));
+    /**
+     * Get ship mass
+     * @param {number} id - Ship id
+     * @return {number} Ship mass
+     */
     const getShipMass = id => apiItems.find(apiItem => id === apiItem.Id).ShipMass;
+    /**
+     * Get maximum crew
+     * @param {number} id - Ship id
+     * @return {number} Crew
+     */
+    const getMaxCrew = id => apiItems.find(apiItem => id === apiItem.Id).HealthInfo.Crew;
 
     const plankingFactor = 0.13;
     const hempFactor = 0.025;
@@ -37,12 +57,14 @@ const convertShipRecipes = () => {
         .filter(apiItem => !apiItem.NotUsed && apiItem.ItemType === "RecipeShip")
         .map(apiRecipe => {
             const shipMass = getShipMass(apiRecipe.Results[0].Template);
+            const maxCrew = getMaxCrew(apiRecipe.Results[0].Template);
             const recipe = {
                 id: apiRecipe.Id,
                 name: apiRecipe.Name.replaceAll("'", "’"),
                 frames: apiRecipe.WoodTypeDescs.map(wood => ({
                     name: itemNames.get(wood.Requirements[0].Template).replace(" Log", ""),
-                    amount: wood.Requirements[0].Amount
+                    amount: wood.Requirements[0].Amount,
+                    ratio: round(wood.Requirements[0].Amount / shipMass, 2)
                 })),
                 trims: { planking: Math.round(shipMass * plankingFactor), hemp: Math.round(shipMass * hempFactor) },
                 resources: apiRecipe.FullRequirements.filter(
@@ -53,8 +75,14 @@ const convertShipRecipes = () => {
                         )
                 ).map(requirement => ({
                     name: itemNames.get(requirement.Template),
-                    amount: requirement.Amount
+                    amount: requirement.Amount,
+                    ratio: round(
+                        requirement.Amount /
+                            (itemNames.get(requirement.Template) === "Provisions" ? maxCrew : shipMass),
+                        2
+                    )
                 })),
+                // gold: apiRecipe.GoldRequirements,
                 doubloons:
                     (
                         apiRecipe.FullRequirements.find(
@@ -67,12 +95,12 @@ const convertShipRecipes = () => {
                             itemNames.get(requirement.Template).endsWith(" Permit")
                         ) || {}
                     ).Amount || 0,
-                // gold: apiRecipe.GoldRequirements,
                 ship: {
                     id: apiRecipe.Results[0].Template,
-                    name: itemNames.get(apiRecipe.Results[0].Template)
+                    name: itemNames.get(apiRecipe.Results[0].Template),
+                    shipMass,
+                    maxCrew
                 },
-                // qualities: apiRecipe.Qualities,
                 shipyardLevel: apiRecipe.BuildingRequirements[0].Level + 1,
                 craftLevel: apiRecipe.RequiresLevel,
                 craftXP: apiRecipe.GivesXP,
@@ -81,6 +109,7 @@ const convertShipRecipes = () => {
 
             return recipe;
         })
+        // Sort by name
         .sort((a, b) => {
             if (a.name < b.name) {
                 return -1;
