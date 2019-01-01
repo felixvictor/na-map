@@ -27,12 +27,12 @@ const convertShipRecipes = () => {
     const getItemNames = () => new Map(apiItems.map(item => [item.Id, item.Name.replaceAll("'", "’")]));
     const getShipMass = id => apiItems.find(apiItem => id === apiItem.Id).ShipMass;
 
+    const plankingFactor = 0.13;
+    const hempFactor = 0.025;
     const data = {};
     const itemNames = getItemNames();
     data.shipRecipes = [];
 
-    let permit = { needed: false };
-    let doubloons = { needed: 0 };
     data.shipRecipes = apiItems
         .filter(apiItem => !apiItem.NotUsed && apiItem.ItemType === "RecipeShip")
         .map(apiRecipe => {
@@ -44,19 +44,29 @@ const convertShipRecipes = () => {
                     name: itemNames.get(wood.Requirements[0].Template).replace(" Log", ""),
                     amount: wood.Requirements[0].Amount
                 })),
-                trims: { planking: Math.round(shipMass * 0.13), hemp: Math.round(shipMass * 0.025) },
-                resources: apiRecipe.FullRequirements.map((requirement, i) => {
-                    if (itemNames.get(requirement.Template).endsWith(" Permit")) {
-                        permit = { needed: true, index: i };
-                    }
-                    if (itemNames.get(requirement.Template) === "Doubloons") {
-                        doubloons = { needed: requirement.Amount, index: i };
-                    }
-                    return {
-                        name: itemNames.get(requirement.Template),
-                        amount: requirement.Amount
-                    };
-                }),
+                trims: { planking: Math.round(shipMass * plankingFactor), hemp: Math.round(shipMass * hempFactor) },
+                resources: apiRecipe.FullRequirements.filter(
+                    requirement =>
+                        !(
+                            itemNames.get(requirement.Template).endsWith(" Permit") ||
+                            itemNames.get(requirement.Template) === "Doubloons"
+                        )
+                ).map(requirement => ({
+                    name: itemNames.get(requirement.Template),
+                    amount: requirement.Amount
+                })),
+                doubloons:
+                    (
+                        apiRecipe.FullRequirements.find(
+                            requirement => itemNames.get(requirement.Template) === "Doubloons"
+                        ) || {}
+                    ).Amount || 0,
+                permit:
+                    (
+                        apiRecipe.FullRequirements.find(requirement =>
+                            itemNames.get(requirement.Template).endsWith(" Permit")
+                        ) || {}
+                    ).Amount || 0,
                 // gold: apiRecipe.GoldRequirements,
                 ship: {
                     id: apiRecipe.Results[0].Template,
@@ -68,22 +78,6 @@ const convertShipRecipes = () => {
                 craftXP: apiRecipe.GivesXP,
                 labourHours: apiRecipe.LaborPrice
             };
-            if (permit.needed) {
-                recipe.permit = true;
-                // Remove permit from resources
-                recipe.resources.splice(permit.index, 1);
-            } else {
-                recipe.permit = false;
-            }
-            if (doubloons.needed) {
-                recipe.doubloons = doubloons.needed;
-                // Remove permit from resources
-                recipe.resources.splice(doubloons.index - (permit.needed === true ? 1 : 0), 1);
-            } else {
-                recipe.doubloons = doubloons.needed;
-            }
-            permit = { needed: false };
-            doubloons = { needed: 0 };
 
             return recipe;
         })
