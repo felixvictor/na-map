@@ -1,0 +1,1869 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="a2532f17-11e8-4b7a-8928-89e13c06c970" name="Revert: Bugfix: Flipped F11 coordinates corrected" comment="convert ship recipes">
+      <change beforePath="$PROJECT_DIR$/build/convert-ship-blueprints.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/build/convert-ship-blueprints.mjs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/data/buildings.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/data/buildings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/data/eu1-pb.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/data/eu1-pb.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/data/eu1.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/data/eu1.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/data/eu2.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/data/eu2.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/data/modules.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/data/modules.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/data/recipes.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/data/recipes.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/data/ship-recipes.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/data/ships.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/data/ships.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/data/woods.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/data/woods.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/game-tools.a7fbb4797efced47d52b.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/game-tools~map.7d139ece0db84fc7da5f.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/public/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/main.766dfc7c5bf8d75a111e.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/main.aa8d3a3f524b774e79b8.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/map.0e730ba8c842309069f0.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/map.798ca2b6f132569938e9.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/netlify.toml" beforeDir="false" afterPath="$PROJECT_DIR$/public/netlify.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/port-battle.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/public/port-battle.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/runtime.5c14c09c73ca367943c1.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/sitemap.xml" beforeDir="false" afterPath="$PROJECT_DIR$/public/sitemap.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/sitemap.xml.gz" beforeDir="false" afterPath="$PROJECT_DIR$/public/sitemap.xml.gz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/vendors~game-tools.c696474c053f873aa37c.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/vendors~game-tools~map.1751a80f1ea24a5df24a.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/vendors~main.4945e756b0f2c56899e1.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/vendors~map.7039321e03d681cbcc3f.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/vendors~map.b944477430ad8a0f7ec0.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gen/buildings.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/gen/buildings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gen/eu1-pb.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/gen/eu1-pb.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gen/eu1.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/gen/eu1.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gen/eu2.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/gen/eu2.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gen/modules.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/gen/modules.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gen/port-battle.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/gen/port-battle.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gen/recipes.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/gen/recipes.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gen/ship-blueprints.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/gen/ship-blueprints.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gen/ship-recipes.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gen/ships.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/gen/ships.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gen/woods.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/gen/woods.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/js/game-tools/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/js/game-tools/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/js/game-tools/list-ship-blueprints.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/js/game-tools/list-ship-blueprints.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/scss/_display.scss" beforeDir="false" afterPath="$PROJECT_DIR$/src/scss/_display.scss" afterDir="false" />
+    </list>
+    <list id="2d757174-5797-452e-ab72-96a1c5e8663d" name="#1 Add scheduled port battles" comment="" />
+    <list id="5e95a166-b62f-48bd-8a55-5ba5c72344dc" name="#12 Native es6" comment="timepicker tempusdominus-bootstrap-4" />
+    <list id="42a52c50-5d9e-47da-ae59-9dd6348cfb38" name="#14 Add port property selection" comment="yarn" />
+    <list id="d6ddb63e-8fd8-4c4a-818c-3a592f6b926b" name="#6 Add ship comparison" comment="debug messages off" />
+    <list id="1ecb4638-7996-41f8-814e-5df94f56670e" name="Default" comment="" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="DatabaseView">
+    <option name="SHOW_INTERMEDIATE" value="true" />
+    <option name="GROUP_DATA_SOURCES" value="true" />
+    <option name="GROUP_SCHEMA" value="true" />
+    <option name="GROUP_CONTENTS" value="false" />
+    <option name="SORT_POSITIONED" value="false" />
+    <option name="SHOW_EMPTY_GROUPS" value="false" />
+    <option name="AUTO_SCROLL_FROM_SOURCE" value="false" />
+    <option name="HIDDEN_KINDS">
+      <set />
+    </option>
+    <expand />
+    <select />
+  </component>
+  <component name="FileEditorManager">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/gen/ship-blueprints.json">
+          <provider selected="true" editor-type-id="text-editor">
+            <state>
+              <caret column="40956" selection-start-column="40956" selection-end-column="40956" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/js/game-tools/list-ship-blueprints.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="288">
+              <caret line="132" column="35" selection-start-line="132" selection-start-column="35" selection-end-line="132" selection-end-column="35" />
+              <folding>
+                <element signature="e#230#280#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/build/convert-ship-blueprints.mjs">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="4752">
+              <caret line="132" column="28" selection-start-line="132" selection-start-column="28" selection-end-line="132" selection-end-column="28" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/gen/recipes.json">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="3060">
+              <caret line="85" column="9" selection-start-line="85" selection-start-column="9" selection-end-line="85" selection-end-column="9" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/js/util.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="2124">
+              <caret line="60" column="3" selection-start-line="60" selection-start-column="3" selection-end-line="60" selection-end-column="3" />
+              <folding>
+                <element signature="e#206#297#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/scss/_display.scss">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="3960">
+              <caret line="110" column="21" selection-start-line="110" selection-start-column="21" selection-end-line="110" selection-end-column="21" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/js/game-tools/index.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="2340">
+              <caret line="75" column="27" selection-start-line="75" selection-start-column="27" selection-end-line="75" selection-end-column="27" />
+              <folding>
+                <element signature="e#221#264#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/gen/buildings.json">
+          <provider selected="true" editor-type-id="text-editor">
+            <state>
+              <caret column="1" selection-start-column="1" selection-end-column="1" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="HTML File" />
+        <option value="JavaScript File" />
+      </list>
+    </option>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>:</find>
+      <find>agamemn</find>
+      <find>crew space</find>
+      <find>planking</find>
+      <find>agam</find>
+      <find>&quot;1296&quot;,</find>
+      <find>&quot;358&quot;,</find>
+      <find>&quot;332&quot;,</find>
+      <find>&quot;26&quot;,</find>
+      <find>39,</find>
+      <find>44,</find>
+      <find>1336,</find>
+      <find>299,</find>
+      <find>296,</find>
+      <find>385</find>
+      <find>26</find>
+      <find>358,</find>
+      <find>359,</find>
+      <find>level</find>
+      <find>buildings</find>
+      <find>building</find>
+      <find>ship_recipe</find>
+      <find>Recipe</find>
+      <find>recipe</find>
+      <find>shipBlueprint</find>
+      <find>ShipRecipe</find>
+      <find>requi</find>
+      <find>table-</find>
+      <find>table-sm</find>
+      <find>class=&quot;text-right&quot;</find>
+    </findStrings>
+    <replaceStrings>
+      <replace>./</replace>
+      <replace>const</replace>
+      <replace>Selector</replace>
+      <replace>this._toggleMenuDropdown();</replace>
+      <replace>;</replace>
+      <replace>y1</replace>
+      <replace>iconSmall</replace>
+      <replace>&quot;</replace>
+      <replace>'</replace>
+      <replace>fill=&quot;#$1&quot;</replace>
+      <replace>../../node_modules/</replace>
+      <replace>padding</replace>
+      <replace>⅔</replace>
+      <replace>parseInt(</replace>
+      <replace>dark</replace>
+      <replace>$1: $2</replace>
+      <replace>primary</replace>
+      <replace>background</replace>
+      <replace>col-2</replace>
+      <replace>foreground</replace>
+      <replace>secondary</replace>
+      <replace>gray</replace>
+      <replace>my-palette</replace>
+      <replace>badge-white</replace>
+      <replace>secondary&quot;</replace>
+      <replace>: APIrecipe.</replace>
+      <replace>shipRecipe</replace>
+      <replace>ship_blueprint</replace>
+      <replace>blueprint</replace>
+      <replace>Blueprint</replace>
+    </replaceStrings>
+    <dirStrings>
+      <dir>$PROJECT_DIR$/src/js/map</dir>
+      <dir>$PROJECT_DIR$/src/js</dir>
+      <dir>$PROJECT_DIR$/build</dir>
+    </dirStrings>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="triliteration" />
+      </map>
+    </option>
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/src/icons/USa.svg" />
+        <option value="$PROJECT_DIR$/src/icons/VPa.svg" />
+        <option value="$PROJECT_DIR$/.gitignore" />
+        <option value="$PROJECT_DIR$/src/scss/pre-compile.scss" />
+        <option value="$PROJECT_DIR$/build/create-xlsx.mjs" />
+        <option value="$PROJECT_DIR$/src/scss/_junicode.scss" />
+        <option value="$PROJECT_DIR$/src/scss/_font.scss" />
+        <option value="$PROJECT_DIR$/src/js/map-tools/get-position.js" />
+        <option value="$PROJECT_DIR$/src/js/map/select-ports.js" />
+        <option value="$PROJECT_DIR$/src/js/map/map.js" />
+        <option value="$PROJECT_DIR$/src/js/map-tools/display-grid.js" />
+        <option value="$PROJECT_DIR$/src/js/map-tools/wind-rose.js" />
+        <option value="$PROJECT_DIR$/src/js/map-tools/predict-wind.js" />
+        <option value="$PROJECT_DIR$/src/gen/eu1-pb.json" />
+        <option value="$PROJECT_DIR$/src/js/map-tools/make-journey.js" />
+        <option value="$PROJECT_DIR$/src/js/util.js" />
+        <option value="$PROJECT_DIR$/src/scss/_pre-bootstrap.scss" />
+        <option value="$PROJECT_DIR$/src/scss/main.scss" />
+        <option value="$PROJECT_DIR$/src/scss/_palettes.scss" />
+        <option value="$PROJECT_DIR$/src/js/game-tools/compare-woods.js" />
+        <option value="$PROJECT_DIR$/src/js/game-tools/compare-ships.js" />
+        <option value="$PROJECT_DIR$/src/scss/_colour.scss" />
+        <option value="$PROJECT_DIR$/src/scss/_variables.scss" />
+        <option value="$APPLICATION_CONFIG_DIR$/scratches/scratch_12.json" />
+        <option value="$PROJECT_DIR$/package.json" />
+        <option value="$PROJECT_DIR$/src/js/common.js" />
+        <option value="$PROJECT_DIR$/webpack.config.js" />
+        <option value="$PROJECT_DIR$/src/js/map/display-ports.js" />
+        <option value="$PROJECT_DIR$/build/API/api-eu1-ItemTemplates-2018-12-30.json" />
+        <option value="$PROJECT_DIR$/src/gen/modules.json" />
+        <option value="$PROJECT_DIR$/build/convert-modules.mjs" />
+        <option value="$PROJECT_DIR$/src/gen/woods.json" />
+        <option value="$PROJECT_DIR$/build/API/api-eu1-ItemTemplates-2018-12-31.json" />
+        <option value="$PROJECT_DIR$/src/gen/ships.json" />
+        <option value="$APPLICATION_CONFIG_DIR$/scratches/scratch_14.json" />
+        <option value="$APPLICATION_CONFIG_DIR$/scratches/scratch_13.json" />
+        <option value="$APPLICATION_CONFIG_DIR$/scratches/scratch_15.json" />
+        <option value="$PROJECT_DIR$/build/common.mjs" />
+        <option value="$PROJECT_DIR$/src/gen/ship-recipes.json" />
+        <option value="$PROJECT_DIR$/build/convert-ship-recipes.mjs" />
+        <option value="$PROJECT_DIR$/src/gen/buildings.json" />
+        <option value="$PROJECT_DIR$/src/gen/recipes.json" />
+        <option value="$PROJECT_DIR$/src/js/game-tools/list-buildings.js" />
+        <option value="$PROJECT_DIR$/src/js/game-tools/list-ship-recipes.js" />
+        <option value="$PROJECT_DIR$/build/port-data.sh" />
+        <option value="$PROJECT_DIR$/src/index.template.ejs" />
+        <option value="$PROJECT_DIR$/src/gen/ship-blueprints.json" />
+        <option value="$PROJECT_DIR$/src/js/game-tools/index.js" />
+        <option value="$PROJECT_DIR$/src/scss/_display.scss" />
+        <option value="$PROJECT_DIR$/build/convert-ship-blueprints.mjs" />
+        <option value="$PROJECT_DIR$/src/js/game-tools/list-ship-blueprints.js" />
+      </list>
+    </option>
+  </component>
+  <component name="JsBowerSettings">
+    <node-interpreter value="project" />
+    <bower-package value="" />
+    <bower.json value="" />
+  </component>
+  <component name="JsFlowSettings">
+    <service-enabled>true</service-enabled>
+    <exe-path />
+    <other-services-enabled>true</other-services-enabled>
+    <auto-save>true</auto-save>
+  </component>
+  <component name="NamedScopeManager">
+    <scope name="js" pattern="file[na-topo]:src/js//*" />
+  </component>
+  <component name="PackageJsonUpdateNotifier">
+    <dismissed value="$PROJECT_DIR$/package.json" />
+  </component>
+  <component name="ProjectFrameBounds">
+    <option name="x" value="1455" />
+    <option name="y" value="41" />
+    <option name="width" value="2380" />
+    <option name="height" value="1989" />
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectView">
+    <navigator proportions="" version="1">
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="na-topo" type="b2602c69:ProjectViewProjectNode" />
+              <item name="na-topo" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="na-topo" type="b2602c69:ProjectViewProjectNode" />
+              <item name="na-topo" type="462c0819:PsiDirectoryNode" />
+              <item name="build" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="na-topo" type="b2602c69:ProjectViewProjectNode" />
+              <item name="na-topo" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="na-topo" type="b2602c69:ProjectViewProjectNode" />
+              <item name="na-topo" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="gen" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="na-topo" type="b2602c69:ProjectViewProjectNode" />
+              <item name="na-topo" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="js" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="na-topo" type="b2602c69:ProjectViewProjectNode" />
+              <item name="na-topo" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="js" type="462c0819:PsiDirectoryNode" />
+              <item name="game-tools" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="na-topo" type="b2602c69:ProjectViewProjectNode" />
+              <item name="na-topo" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="js" type="462c0819:PsiDirectoryNode" />
+              <item name="map" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="na-topo" type="b2602c69:ProjectViewProjectNode" />
+              <item name="na-topo" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="scss" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+      <pane id="Scope" />
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="DefaultHtmlFileTemplate" value="HTML File" />
+    <property name="Git.Branch.Popup.ShowAllRemotes" value="true" />
+    <property name="JavaScriptWeakerCompletionTypeGuess" value="false" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="add_unversioned_files" value="$PROJECT_DIR$/build/API/api-eu1-ItemTemplates-2018-10-31.json&#10;/home/ibey/src/na-topo/build/API/api-eu1-ItemTemplates-2018-12-30.json&#10;/home/ibey/src/na-topo/build/API/api-eu1-ItemTemplates-2018-12-31.json&#10;true&#10;/home/ibey/src/na-topo/build/API/api-dev-ItemTemplates-2018-10-05.json" />
+    <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/Change Language" value="JSON" />
+    <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/New Scratch File" value="HTML&#10;JavaScript 1.6&#10;GenericSQL&#10;JSON" />
+    <property name="com.intellij.ide.scratch.LRUPopupBuilder$2/Languages" value="JavaScript&#10;TEXT&#10;Ignore" />
+    <property name="javascript.nodejs.core.library.configured.version" value="10.14.2" />
+    <property name="js.last.introduce.type" value="CONST" />
+    <property name="jsx.switch.disabled" value="true" />
+    <property name="last.edited.regexp" value="[28-03-2018 03:31 UTC]" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.jscs" value="true" />
+    <property name="node.js.detected.package.prettier" value="true" />
+    <property name="node.js.detected.package.standard" value="true" />
+    <property name="node.js.detected.package.stylelint" value="true" />
+    <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="node.js.path.for.package.jscs" value="project" />
+    <property name="node.js.path.for.package.prettier" value="project" />
+    <property name="node.js.path.for.package.standard" value="project" />
+    <property name="node.js.path.for.package.stylelint" value="project" />
+    <property name="node.js.selected.package.eslint" value="$PROJECT_DIR$/node_modules/eslint" />
+    <property name="node.js.selected.package.jscs" value="" />
+    <property name="node.js.selected.package.prettier" value="$PROJECT_DIR$/node_modules/prettier" />
+    <property name="node.js.selected.package.standard" value="$PROJECT_DIR$/node_modules/eslint" />
+    <property name="node.js.selected.package.stylelint" value="$PROJECT_DIR$/node_modules/stylelint" />
+    <property name="nodejs_interpreter_path" value="/usr/bin/node" />
+    <property name="nodejs_package_manager_path" value="yarn" />
+    <property name="options.lastSelected" value="editor.preferences.import" />
+    <property name="options.searchVisible" value="true" />
+    <property name="options.splitter.details.proportions" value="0.2" />
+    <property name="options.splitter.main.proportions" value="0.3" />
+    <property name="prettierjs.PrettierConfiguration.Package" value="$PROJECT_DIR$/node_modules/prettier" />
+    <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
+    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors" />
+    <property name="start.from.branch" value="develop" />
+    <property name="two.files.diff.last.used.file" value="$PROJECT_DIR$/public/ships.json" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/js/game-tools" />
+      <recent name="$PROJECT_DIR$/build" />
+      <recent name="$PROJECT_DIR$/src/scss" />
+      <recent name="$PROJECT_DIR$/src/icons" />
+      <recent name="$PROJECT_DIR$/src/js/map-tools" />
+    </key>
+    <key name="es6.move.members.recent.items">
+      <recent name="$PROJECT_DIR$/src/js/map.js" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/js/game-tools" />
+      <recent name="$PROJECT_DIR$/src/js/map-tools" />
+      <recent name="$PROJECT_DIR$/src/js/map" />
+      <recent name="$PROJECT_DIR$/public" />
+      <recent name="$PROJECT_DIR$" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager" selected="Node.js.map.js">
+    <configuration name="change-server-port-data.sh" type="BashConfigurationType" factoryName="Bash" temporary="true">
+      <module name="na-topo" />
+      <option name="INTERPRETER_OPTIONS" value="bash" />
+      <option name="INTERPRETER_PATH" value="/usr/bin/env" />
+      <option name="PROJECT_INTERPRETER" value="false" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/build" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/build/change-server-port-data.sh" />
+      <option name="PARAMETERS" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="generate-na.sh" type="BashConfigurationType" factoryName="Bash" temporary="true">
+      <module name="na-topo" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="INTERPRETER_PATH" value="/bin/bash" />
+      <option name="PROJECT_INTERPRETER" value="false" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/topojson" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/topojson/generate-na.sh" />
+      <option name="PARAMETERS" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="get-server-port-data.sh" type="BashConfigurationType" factoryName="Bash" temporary="true">
+      <module name="na-topo" />
+      <option name="INTERPRETER_OPTIONS" value="bash" />
+      <option name="INTERPRETER_PATH" value="/usr/bin/env" />
+      <option name="PROJECT_INTERPRETER" value="false" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/build" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/build/get-server-port-data.sh" />
+      <option name="PARAMETERS" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="JavascriptDebugType" engineId="98ca6316-2f89-46d9-a9e5-fa9e2b0625b3" uri="http://localhost/na/public/">
+      <method v="2" />
+    </configuration>
+    <configuration name="debug na-map" type="JavascriptDebugType" engineId="98ca6316-2f89-46d9-a9e5-fa9e2b0625b3" uri="http://localhost/na/public/">
+      <method v="2" />
+    </configuration>
+    <configuration name="convert-API-data.js" type="NodeJSConfigurationType" temporary="true" path-to-js-file="convert-API-data.js" working-dir="$PROJECT_DIR$/build">
+      <method v="2" />
+    </configuration>
+    <configuration name="map.js" type="NodeJSConfigurationType" temporary="true" nameIsGenerated="true" path-to-js-file="$PROJECT_DIR$/src/js/map/map.js" working-dir="$PROJECT_DIR$/src/js">
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Bash.change-server-port-data.sh" />
+      <item itemvalue="Bash.generate-na.sh" />
+      <item itemvalue="Bash.get-server-port-data.sh" />
+      <item itemvalue="JavaScript Debug.debug na-map" />
+      <item itemvalue="Node.js.convert-API-data.js" />
+      <item itemvalue="Node.js.map.js" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Node.js.map.js" />
+        <item itemvalue="Node.js.convert-API-data.js" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <branch name="master" repository="$PROJECT_DIR$" original="true" />
+      <branch name="master" repository="$PROJECT_DIR$" original="true" />
+      <changelist id="1ecb4638-7996-41f8-814e-5df94f56670e" name="Default" comment="" />
+      <changelist id="a2532f17-11e8-4b7a-8928-89e13c06c970" name="Revert: Bugfix: Flipped F11 coordinates corrected" comment="" />
+      <created>1506845006013</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1515414327725</updated>
+      <workItem from="1506845008681" duration="1855000" />
+      <workItem from="1507013767894" duration="7047000" />
+      <workItem from="1507046698152" duration="7291000" />
+      <workItem from="1507136095964" duration="12575000" />
+      <workItem from="1507306039520" duration="10785000" />
+      <workItem from="1507318826158" duration="4302000" />
+      <workItem from="1507373107653" duration="2625000" />
+      <workItem from="1507392120761" duration="6000" />
+      <workItem from="1507392185654" duration="1050000" />
+      <workItem from="1507459440284" duration="5870000" />
+      <workItem from="1507568812276" duration="3797000" />
+      <workItem from="1507971491390" duration="13021000" />
+      <workItem from="1507997454720" duration="1237000" />
+      <workItem from="1508056360054" duration="17184000" />
+      <workItem from="1508081187041" duration="1495000" />
+      <workItem from="1508171798893" duration="2957000" />
+      <workItem from="1508256254849" duration="1897000" />
+      <workItem from="1508344838586" duration="4718000" />
+      <workItem from="1508509318776" duration="9048000" />
+      <workItem from="1508587606460" duration="2401000" />
+      <workItem from="1508659757095" duration="32487000" />
+      <workItem from="1508773188747" duration="3264000" />
+      <workItem from="1509035970072" duration="2102000" />
+      <workItem from="1509113015642" duration="6718000" />
+      <workItem from="1509183595621" duration="5404000" />
+      <workItem from="1509261880836" duration="14686000" />
+      <workItem from="1509374679761" duration="6171000" />
+      <workItem from="1509440751062" duration="14108000" />
+      <workItem from="1509454908563" duration="7000" />
+      <workItem from="1509455170357" duration="3747000" />
+      <workItem from="1509555223159" duration="4505000" />
+      <workItem from="1509640118745" duration="6925000" />
+      <workItem from="1509721111688" duration="1949000" />
+      <workItem from="1509801339660" duration="7628000" />
+      <workItem from="1509879161656" duration="12818000" />
+      <workItem from="1509898871073" duration="10164000" />
+      <workItem from="1509988084730" duration="2865000" />
+      <workItem from="1510071644346" duration="3310000" />
+      <workItem from="1510161128642" duration="3005000" />
+      <workItem from="1510323002690" duration="8915000" />
+      <workItem from="1510394834258" duration="11346000" />
+      <workItem from="1510409576611" duration="10894000" />
+      <workItem from="1510491178525" duration="4006000" />
+      <workItem from="1510495559486" duration="11032000" />
+      <workItem from="1510590079430" duration="11127000" />
+      <workItem from="1510679915993" duration="5745000" />
+      <workItem from="1510994640962" duration="13901000" />
+      <workItem from="1511083199885" duration="12492000" />
+      <workItem from="1511371460423" duration="11062000" />
+      <workItem from="1511601129280" duration="1705000" />
+      <workItem from="1511618384920" duration="11020000" />
+      <workItem from="1511697007718" duration="3946000" />
+      <workItem from="1511701049881" duration="1830000" />
+      <workItem from="1511805110215" duration="3379000" />
+      <workItem from="1511885458506" duration="9469000" />
+      <workItem from="1513011797478" duration="971000" />
+      <workItem from="1513098661176" duration="6283000" />
+      <workItem from="1513200923920" duration="960000" />
+      <workItem from="1513271070668" duration="6892000" />
+      <workItem from="1513345254156" duration="16087000" />
+      <workItem from="1513423819713" duration="14642000" />
+      <workItem from="1513442811898" duration="7991000" />
+      <workItem from="1513507802752" duration="3118000" />
+      <workItem from="1513510942278" duration="15047000" />
+      <workItem from="1513625561271" duration="1659000" />
+      <workItem from="1513704601639" duration="4376000" />
+      <workItem from="1513709006716" duration="7511000" />
+      <workItem from="1513792773504" duration="2508000" />
+      <workItem from="1513795311550" duration="54000" />
+      <workItem from="1513795387405" duration="3461000" />
+      <workItem from="1513847818884" duration="264000" />
+      <workItem from="1513848180822" duration="176000" />
+      <workItem from="1513848375436" duration="4029000" />
+      <workItem from="1513852640260" duration="2368000" />
+      <workItem from="1513855078897" duration="4018000" />
+      <workItem from="1513938656054" duration="16121000" />
+      <workItem from="1514036241815" duration="18271000" />
+      <workItem from="1514111240392" duration="13557000" />
+      <workItem from="1514127154230" duration="32000" />
+      <workItem from="1514209925476" duration="15378000" />
+      <workItem from="1514282192957" duration="4750000" />
+      <workItem from="1514288633967" duration="10038000" />
+      <workItem from="1514368139390" duration="17480000" />
+      <workItem from="1514392223138" duration="5200000" />
+      <workItem from="1514491072461" duration="2393000" />
+      <workItem from="1514538483684" duration="19049000" />
+      <workItem from="1514590117062" duration="735000" />
+      <workItem from="1514623396394" duration="21658000" />
+      <workItem from="1514649665106" duration="13692000" />
+      <workItem from="1514715623922" duration="2530000" />
+      <workItem from="1514718429246" duration="23840000" />
+      <workItem from="1514813856918" duration="15209000" />
+      <workItem from="1514926128140" duration="2073000" />
+      <workItem from="1515061469750" duration="174000" />
+      <workItem from="1515061659413" duration="277000" />
+      <workItem from="1515232940616" duration="18557000" />
+      <workItem from="1515327020349" duration="172000" />
+      <workItem from="1515327206617" duration="16036000" />
+      <workItem from="1515411530605" duration="2159000" />
+      <workItem from="1516389448035" duration="1039000" />
+      <workItem from="1516439340536" duration="11901000" />
+      <workItem from="1516453867699" duration="4506000" />
+      <workItem from="1516527524984" duration="17327000" />
+      <workItem from="1516560314663" duration="6369000" />
+      <workItem from="1516641402477" duration="5800000" />
+      <workItem from="1516981748646" duration="15014000" />
+      <workItem from="1517045977475" duration="14925000" />
+      <workItem from="1517131081983" duration="19377000" />
+      <workItem from="1517162855125" duration="1472000" />
+      <workItem from="1517245217335" duration="2664000" />
+      <workItem from="1517334086887" duration="4311000" />
+      <workItem from="1517499406280" duration="8072000" />
+      <workItem from="1517645753449" duration="13534000" />
+      <workItem from="1517734812315" duration="11478000" />
+      <workItem from="1517938189509" duration="851000" />
+      <workItem from="1518247301015" duration="5473000" />
+      <workItem from="1518263962105" duration="8431000" />
+      <workItem from="1518337608746" duration="20899000" />
+      <workItem from="1518452545012" duration="6313000" />
+      <workItem from="1518541998254" duration="6184000" />
+      <workItem from="1518629220441" duration="1331000" />
+      <workItem from="1518712466885" duration="2314000" />
+      <workItem from="1518853630849" duration="21040000" />
+      <workItem from="1518885859861" duration="5092000" />
+      <workItem from="1518946819049" duration="7568000" />
+      <workItem from="1519144173259" duration="3599000" />
+      <workItem from="1519148561798" duration="185000" />
+      <workItem from="1519458781076" duration="4173000" />
+      <workItem from="1519467610269" duration="7602000" />
+      <workItem from="1519555842236" duration="22772000" />
+      <workItem from="1519663105121" duration="12071000" />
+      <workItem from="1520154730348" duration="7251000" />
+      <workItem from="1520164315898" duration="3814000" />
+      <workItem from="1520179696400" duration="10394000" />
+      <workItem from="1520269522451" duration="4974000" />
+      <workItem from="1520354962949" duration="749000" />
+      <workItem from="1520686477430" duration="4859000" />
+      <workItem from="1520757262241" duration="16830000" />
+      <workItem from="1520874573764" duration="7088000" />
+      <workItem from="1520959089608" duration="9408000" />
+      <workItem from="1521132364723" duration="12021000" />
+      <workItem from="1521213989195" duration="8952000" />
+      <workItem from="1521279067549" duration="11666000" />
+      <workItem from="1521367688369" duration="24835000" />
+      <workItem from="1521396405063" duration="388000" />
+      <workItem from="1521396821438" duration="528000" />
+      <workItem from="1521479813490" duration="171000" />
+      <workItem from="1521480129411" duration="1645000" />
+      <workItem from="1521483301530" duration="37000" />
+      <workItem from="1521483617919" duration="2121000" />
+      <workItem from="1521567835182" duration="6270000" />
+      <workItem from="1521647389889" duration="3295000" />
+      <workItem from="1521815825102" duration="11050000" />
+      <workItem from="1521877574553" duration="5278000" />
+      <workItem from="1521891286916" duration="13333000" />
+      <workItem from="1521915944466" duration="2230000" />
+      <workItem from="1521968355453" duration="98000" />
+      <workItem from="1521968478775" duration="195000" />
+      <workItem from="1521969195289" duration="12000" />
+      <workItem from="1521969363614" duration="127000" />
+      <workItem from="1521969520137" duration="10740000" />
+      <workItem from="1522079343029" duration="6770000" />
+      <workItem from="1522165362100" duration="2769000" />
+      <workItem from="1522250321536" duration="777000" />
+      <workItem from="1522334320032" duration="88000" />
+      <workItem from="1522334431153" duration="5220000" />
+      <workItem from="1522394328386" duration="3067000" />
+      <workItem from="1522479712159" duration="5331000" />
+      <workItem from="1522567621619" duration="27862000" />
+      <workItem from="1522656495709" duration="32736000" />
+      <workItem from="1522770140660" duration="8741000" />
+      <workItem from="1522861816140" duration="2544000" />
+      <workItem from="1522864450468" duration="3989000" />
+      <workItem from="1522944944160" duration="4805000" />
+      <workItem from="1523095309831" duration="16351000" />
+      <workItem from="1523173382779" duration="22271000" />
+      <workItem from="1523260240000" duration="44195000" />
+      <workItem from="1523429388541" duration="18471000" />
+      <workItem from="1523516111151" duration="25460000" />
+      <workItem from="1523604163397" duration="1647000" />
+      <workItem from="1523605940220" duration="292000" />
+      <workItem from="1523606263090" duration="379000" />
+      <workItem from="1523606721662" duration="108000" />
+      <workItem from="1523606852817" duration="493000" />
+      <workItem from="1523607463473" duration="3183000" />
+      <workItem from="1523610668747" duration="7716000" />
+      <workItem from="1523621982758" duration="11212000" />
+      <workItem from="1523709281746" duration="998000" />
+      <workItem from="1523778428092" duration="13310000" />
+      <workItem from="1524296903747" duration="4341000" />
+      <workItem from="1524301271202" duration="4410000" />
+      <workItem from="1524390772297" duration="24548000" />
+      <workItem from="1524500953756" duration="1992000" />
+      <workItem from="1524758053595" duration="148000" />
+      <workItem from="1524841952071" duration="4870000" />
+      <workItem from="1525277740006" duration="7026000" />
+      <workItem from="1525440313507" duration="8905000" />
+      <workItem from="1525520053763" duration="5922000" />
+      <workItem from="1525592253852" duration="15389000" />
+      <workItem from="1525708500544" duration="3062000" />
+      <workItem from="1525938690523" duration="24704000" />
+      <workItem from="1526029091220" duration="13953000" />
+      <workItem from="1526123253553" duration="897000" />
+      <workItem from="1526201541518" duration="14900000" />
+      <workItem from="1526233135728" duration="837000" />
+      <workItem from="1526308201603" duration="3562000" />
+      <workItem from="1526807136193" duration="5843000" />
+      <workItem from="1526813362462" duration="3718000" />
+      <workItem from="1526821031596" duration="7443000" />
+      <workItem from="1526828509025" duration="3928000" />
+      <workItem from="1526890659646" duration="16491000" />
+      <workItem from="1526971157626" duration="14000" />
+      <workItem from="1526971228535" duration="2230000" />
+      <workItem from="1527060363011" duration="18761000" />
+      <workItem from="1527079613495" duration="9639000" />
+      <workItem from="1527260426979" duration="11735000" />
+      <workItem from="1527314572871" duration="26471000" />
+      <workItem from="1527415215952" duration="25500000" />
+      <workItem from="1527522545518" duration="3945000" />
+      <workItem from="1527781272803" duration="1219000" />
+      <workItem from="1527945688318" duration="74000" />
+      <workItem from="1527946001181" duration="3909000" />
+      <workItem from="1528025125079" duration="3532000" />
+      <workItem from="1528129408423" duration="3798000" />
+      <workItem from="1528222464424" duration="1070000" />
+      <workItem from="1528474893083" duration="58000" />
+      <workItem from="1528474971475" duration="7066000" />
+      <workItem from="1528535286051" duration="1271000" />
+      <workItem from="1528641000038" duration="1469000" />
+      <workItem from="1528994485071" duration="624000" />
+      <workItem from="1529147930991" duration="11558000" />
+      <workItem from="1529221065923" duration="17700000" />
+      <workItem from="1529340822802" duration="5176000" />
+      <workItem from="1529743993736" duration="28367000" />
+      <workItem from="1529834271249" duration="6789000" />
+      <workItem from="1530027525240" duration="599000" />
+      <workItem from="1530291756391" duration="2776000" />
+      <workItem from="1530349550148" duration="9116000" />
+      <workItem from="1530432949317" duration="10279000" />
+      <workItem from="1530466895383" duration="5574000" />
+      <workItem from="1530636577344" duration="4734000" />
+      <workItem from="1530958538462" duration="7661000" />
+      <workItem from="1531041265927" duration="4731000" />
+      <workItem from="1531059465120" duration="6711000" />
+      <workItem from="1531148436468" duration="4010000" />
+      <workItem from="1531238851295" duration="5516000" />
+      <workItem from="1531325699006" duration="3166000" />
+      <workItem from="1531411343699" duration="5013000" />
+      <workItem from="1531495431986" duration="835000" />
+      <workItem from="1531496311768" duration="3810000" />
+      <workItem from="1531930266227" duration="4022000" />
+      <workItem from="1532017700683" duration="6417000" />
+      <workItem from="1532095843679" duration="5912000" />
+      <workItem from="1532169331582" duration="14510000" />
+      <workItem from="1532253607382" duration="5401000" />
+      <workItem from="1532346704743" duration="11001000" />
+      <workItem from="1532534612212" duration="2187000" />
+      <workItem from="1532619199253" duration="5124000" />
+      <workItem from="1532766830237" duration="12476000" />
+      <workItem from="1532852688055" duration="625000" />
+      <workItem from="1532853333372" duration="9111000" />
+      <workItem from="1532964427947" duration="1261000" />
+      <workItem from="1533050278911" duration="2676000" />
+      <workItem from="1533229737043" duration="4314000" />
+      <workItem from="1533364076695" duration="29606000" />
+      <workItem from="1533457115426" duration="23681000" />
+      <workItem from="1533575440398" duration="3637000" />
+      <workItem from="1533831516141" duration="6942000" />
+      <workItem from="1533910736954" duration="6823000" />
+      <workItem from="1533988543858" duration="93000" />
+      <workItem from="1533988670177" duration="5176000" />
+      <workItem from="1534070518901" duration="4307000" />
+      <workItem from="1534144795925" duration="21243000" />
+      <workItem from="1534236583459" duration="5306000" />
+      <workItem from="1534336333010" duration="592000" />
+      <workItem from="1534411051680" duration="11952000" />
+      <workItem from="1535302152561" duration="8980000" />
+      <workItem from="1535386153545" duration="5234000" />
+      <workItem from="1535645135953" duration="6173000" />
+      <workItem from="1535787272186" duration="5548000" />
+      <workItem from="1535880129415" duration="18781000" />
+      <workItem from="1535996457040" duration="2802000" />
+      <workItem from="1536082853189" duration="2821000" />
+      <workItem from="1536335686483" duration="213000" />
+      <workItem from="1536405642706" duration="4830000" />
+      <workItem from="1536417915093" duration="5925000" />
+      <workItem from="1536424224985" duration="5707000" />
+      <workItem from="1536486894779" duration="18244000" />
+      <workItem from="1536565981229" duration="16971000" />
+      <workItem from="1536609771743" duration="3055000" />
+      <workItem from="1536679038485" duration="65000" />
+      <workItem from="1536679122729" duration="2342000" />
+      <workItem from="1536928641876" duration="7517000" />
+      <workItem from="1536992899707" duration="3496000" />
+      <workItem from="1538142245747" duration="59000" />
+      <workItem from="1538144186596" duration="8788000" />
+      <workItem from="1538573185246" duration="5139000" />
+      <workItem from="1538743424585" duration="1021000" />
+      <workItem from="1538745297358" duration="5638000" />
+      <workItem from="1538751606495" duration="2347000" />
+      <workItem from="1538892748416" duration="22382000" />
+      <workItem from="1539013418818" duration="6258000" />
+      <workItem from="1539100544777" duration="7058000" />
+      <workItem from="1539183272061" duration="8700000" />
+      <workItem from="1539273997349" duration="7975000" />
+      <workItem from="1539352641139" duration="4767000" />
+      <workItem from="1539418016883" duration="3800000" />
+      <workItem from="1539422925746" duration="9246000" />
+      <workItem from="1539443720738" duration="8054000" />
+      <workItem from="1539503196730" duration="16932000" />
+      <workItem from="1539588281305" duration="5703000" />
+      <workItem from="1539600169858" duration="8370000" />
+      <workItem from="1539675268683" duration="27284000" />
+      <workItem from="1539765811620" duration="598000" />
+      <workItem from="1540033244031" duration="564000" />
+      <workItem from="1540033881333" duration="14363000" />
+      <workItem from="1540108112583" duration="23858000" />
+      <workItem from="1540308756690" duration="598000" />
+      <workItem from="1540395777587" duration="7301000" />
+      <workItem from="1540454417509" duration="14991000" />
+      <workItem from="1540542497028" duration="8545000" />
+      <workItem from="1540630219412" duration="29255000" />
+      <workItem from="1540720318202" duration="13336000" />
+      <workItem from="1540803396060" duration="9990000" />
+      <workItem from="1540815926648" duration="8242000" />
+      <workItem from="1540893379579" duration="16014000" />
+      <workItem from="1540979884321" duration="18813000" />
+      <workItem from="1541061961950" duration="20107000" />
+      <workItem from="1541145614590" duration="24830000" />
+      <workItem from="1541174227705" duration="271000" />
+      <workItem from="1541174809960" duration="670000" />
+      <workItem from="1541176887836" duration="1158000" />
+      <workItem from="1541238998965" duration="16191000" />
+      <workItem from="1541323430820" duration="9176000" />
+      <workItem from="1541418936179" duration="5908000" />
+      <workItem from="1541425055404" duration="4899000" />
+      <workItem from="1541491419574" duration="6588000" />
+      <workItem from="1541507059862" duration="5889000" />
+      <workItem from="1541578533891" duration="13587000" />
+      <workItem from="1541600255167" duration="15182000" />
+      <workItem from="1541662566426" duration="18107000" />
+      <workItem from="1541751623285" duration="21831000" />
+      <workItem from="1541775105535" duration="9389000" />
+      <workItem from="1541835345191" duration="5539000" />
+      <workItem from="1541850197456" duration="8010000" />
+      <workItem from="1541923037669" duration="5573000" />
+      <workItem from="1541929749037" duration="14520000" />
+      <workItem from="1541954201634" duration="8407000" />
+      <workItem from="1541971559459" duration="3043000" />
+      <workItem from="1542042731765" duration="7219000" />
+      <workItem from="1542128041397" duration="4544000" />
+      <workItem from="1542213434549" duration="2615000" />
+      <workItem from="1542442438030" duration="11000" />
+      <workItem from="1542442489259" duration="20216000" />
+      <workItem from="1542549255955" duration="4465000" />
+      <workItem from="1542910849117" duration="35000" />
+      <workItem from="1542910917310" duration="7558000" />
+      <workItem from="1543048942724" duration="72000" />
+      <workItem from="1543049031061" duration="10536000" />
+      <workItem from="1543647213785" duration="894000" />
+      <workItem from="1543665099686" duration="937000" />
+      <workItem from="1543674533685" duration="2776000" />
+      <workItem from="1543681626376" duration="10888000" />
+      <workItem from="1543764303652" duration="395000" />
+      <workItem from="1543764811421" duration="5146000" />
+      <workItem from="1543943189031" duration="413000" />
+      <workItem from="1543943640394" duration="7216000" />
+      <workItem from="1544106199293" duration="10881000" />
+      <workItem from="1544187619185" duration="3869000" />
+      <workItem from="1544200449244" duration="3325000" />
+      <workItem from="1544257091123" duration="1657000" />
+      <workItem from="1544259482331" duration="735000" />
+      <workItem from="1544269254412" duration="3357000" />
+      <workItem from="1544272910624" duration="6479000" />
+      <workItem from="1544280198207" duration="7186000" />
+      <workItem from="1544293641453" duration="4575000" />
+      <workItem from="1544357828122" duration="618000" />
+      <workItem from="1544358467738" duration="68000" />
+      <workItem from="1544358566706" duration="481000" />
+      <workItem from="1544359071864" duration="37000" />
+      <workItem from="1544359189402" duration="173000" />
+      <workItem from="1544359387806" duration="130000" />
+      <workItem from="1544359550109" duration="4525000" />
+      <workItem from="1544365627482" duration="7106000" />
+      <workItem from="1544377063203" duration="9287000" />
+      <workItem from="1544448202172" duration="1979000" />
+      <workItem from="1544455485332" duration="16938000" />
+      <workItem from="1544530652548" duration="7072000" />
+      <workItem from="1544547238342" duration="11934000" />
+      <workItem from="1544604653326" duration="16097000" />
+      <workItem from="1544689345002" duration="7436000" />
+      <workItem from="1544721826240" duration="8536000" />
+      <workItem from="1544787043558" duration="7655000" />
+      <workItem from="1544874239296" duration="12944000" />
+      <workItem from="1544888747915" duration="13000" />
+      <workItem from="1544888923308" duration="1090000" />
+      <workItem from="1544896137750" duration="8445000" />
+      <workItem from="1544966272262" duration="25649000" />
+      <workItem from="1545058131657" duration="1163000" />
+      <workItem from="1545480792970" duration="2375000" />
+      <workItem from="1545484784378" duration="9298000" />
+      <workItem from="1545511903988" duration="11760000" />
+      <workItem from="1545561513581" duration="5432000" />
+      <workItem from="1545575674318" duration="9654000" />
+      <workItem from="1545635834659" duration="1860000" />
+      <workItem from="1545651192701" duration="9715000" />
+      <workItem from="1545664966222" duration="3906000" />
+      <workItem from="1545740359363" duration="12968000" />
+      <workItem from="1545829101247" duration="13852000" />
+      <workItem from="1545844147358" duration="9251000" />
+      <workItem from="1545929492466" duration="4282000" />
+      <workItem from="1545936537075" duration="3685000" />
+      <workItem from="1546011360511" duration="7079000" />
+      <workItem from="1546085271158" duration="14762000" />
+      <workItem from="1546141294339" duration="3793000" />
+      <workItem from="1546165086491" duration="7754000" />
+      <workItem from="1546180317020" duration="15399000" />
+      <workItem from="1546214563374" duration="574000" />
+      <workItem from="1546241813413" duration="11160000" />
+      <workItem from="1546305193776" duration="4461000" />
+      <workItem from="1546348622543" duration="13294000" />
+      <workItem from="1546362107348" duration="854000" />
+      <workItem from="1546362997562" duration="93000" />
+      <workItem from="1546363129031" duration="2500000" />
+      <workItem from="1546368274374" duration="694000" />
+      <workItem from="1546369129954" duration="51000" />
+      <workItem from="1546369219129" duration="208000" />
+      <workItem from="1546369466924" duration="38000" />
+    </task>
+    <task id="LOCAL-01218" summary="Axis ticks in italics">
+      <created>1545655423254</created>
+      <option name="number" value="01218" />
+      <option name="presentableId" value="LOCAL-01218" />
+      <option name="project" value="LOCAL" />
+      <updated>1545655423255</updated>
+    </task>
+    <task id="LOCAL-01219" summary="junicode: subs and super">
+      <created>1545747225517</created>
+      <option name="number" value="01219" />
+      <option name="presentableId" value="LOCAL-01219" />
+      <option name="project" value="LOCAL" />
+      <updated>1545747225518</updated>
+    </task>
+    <task id="LOCAL-01220" summary="typography">
+      <created>1545748878160</created>
+      <option name="number" value="01220" />
+      <option name="presentableId" value="LOCAL-01220" />
+      <option name="project" value="LOCAL" />
+      <updated>1545748878160</updated>
+    </task>
+    <task id="LOCAL-01221" summary="clear map corrected">
+      <created>1545748982670</created>
+      <option name="number" value="01221" />
+      <option name="presentableId" value="LOCAL-01221" />
+      <option name="project" value="LOCAL" />
+      <updated>1545748982670</updated>
+    </task>
+    <task id="LOCAL-01222" summary="about modal bugfix">
+      <created>1545750385207</created>
+      <option name="number" value="01222" />
+      <option name="presentableId" value="LOCAL-01222" />
+      <option name="project" value="LOCAL" />
+      <updated>1545750385208</updated>
+    </task>
+    <task id="LOCAL-01223" summary="get position bugfix">
+      <created>1545750740328</created>
+      <option name="number" value="01223" />
+      <option name="presentableId" value="LOCAL-01223" />
+      <option name="project" value="LOCAL" />
+      <updated>1545750740328</updated>
+    </task>
+    <task id="LOCAL-01224" summary="grid resize bugfix">
+      <created>1545752821680</created>
+      <option name="number" value="01224" />
+      <option name="presentableId" value="LOCAL-01224" />
+      <option name="project" value="LOCAL" />
+      <updated>1545752821681</updated>
+    </task>
+    <task id="LOCAL-01225" summary="chrome work-around: .caps and .fraction doesnt work in tspan">
+      <created>1545753026897</created>
+      <option name="number" value="01225" />
+      <option name="presentableId" value="LOCAL-01225" />
+      <option name="project" value="LOCAL" />
+      <updated>1545753026897</updated>
+    </task>
+    <task id="LOCAL-01226" summary="selectpicker: default width auto">
+      <created>1545753999641</created>
+      <option name="number" value="01226" />
+      <option name="presentableId" value="LOCAL-01226" />
+      <option name="project" value="LOCAL" />
+      <updated>1545753999641</updated>
+    </task>
+    <task id="LOCAL-01227" summary="selectpicker: default width removed">
+      <created>1545754102234</created>
+      <option name="number" value="01227" />
+      <option name="presentableId" value="LOCAL-01227" />
+      <option name="project" value="LOCAL" />
+      <updated>1545754102234</updated>
+    </task>
+    <task id="LOCAL-01228" summary="1/3 and 2/3 as single characters">
+      <created>1545831303896</created>
+      <option name="number" value="01228" />
+      <option name="presentableId" value="LOCAL-01228" />
+      <option name="project" value="LOCAL" />
+      <updated>1545831303902</updated>
+    </task>
+    <task id="LOCAL-01229" summary="typography">
+      <created>1545831819737</created>
+      <option name="number" value="01229" />
+      <option name="presentableId" value="LOCAL-01229" />
+      <option name="project" value="LOCAL" />
+      <updated>1545831819737</updated>
+    </task>
+    <task id="LOCAL-01230" summary="compass layout improved and code simplified">
+      <created>1545854305231</created>
+      <option name="number" value="01230" />
+      <option name="presentableId" value="LOCAL-01230" />
+      <option name="project" value="LOCAL" />
+      <updated>1545854305232</updated>
+    </task>
+    <task id="LOCAL-01231" summary="debug wind change">
+      <created>1545931848000</created>
+      <option name="number" value="01231" />
+      <option name="presentableId" value="LOCAL-01231" />
+      <option name="project" value="LOCAL" />
+      <updated>1545931848000</updated>
+    </task>
+    <task id="LOCAL-01232" summary="debug wind change">
+      <created>1545932197189</created>
+      <option name="number" value="01232" />
+      <option name="presentableId" value="LOCAL-01232" />
+      <option name="project" value="LOCAL" />
+      <updated>1545932197189</updated>
+    </task>
+    <task id="LOCAL-01233" summary="debug wind change">
+      <created>1545932275638</created>
+      <option name="number" value="01233" />
+      <option name="presentableId" value="LOCAL-01233" />
+      <option name="project" value="LOCAL" />
+      <updated>1545932275638</updated>
+    </task>
+    <task id="LOCAL-01234" summary="grid on top of all">
+      <created>1545933248374</created>
+      <option name="number" value="01234" />
+      <option name="presentableId" value="LOCAL-01234" />
+      <option name="project" value="LOCAL" />
+      <updated>1545933248374</updated>
+    </task>
+    <task id="LOCAL-01235" summary="navbar colours">
+      <created>1545936917445</created>
+      <option name="number" value="01235" />
+      <option name="presentableId" value="LOCAL-01235" />
+      <option name="project" value="LOCAL" />
+      <updated>1545936917445</updated>
+    </task>
+    <task id="LOCAL-01236" summary="- wind rose calculation corrected&#10;- compass layout">
+      <created>1545939666862</created>
+      <option name="number" value="01236" />
+      <option name="presentableId" value="LOCAL-01236" />
+      <option name="project" value="LOCAL" />
+      <updated>1545939666862</updated>
+    </task>
+    <task id="LOCAL-01237" summary=".dropdown-header">
+      <created>1545940112130</created>
+      <option name="number" value="01237" />
+      <option name="presentableId" value="LOCAL-01237" />
+      <option name="project" value="LOCAL" />
+      <updated>1545940112130</updated>
+    </task>
+    <task id="LOCAL-01238" summary="yarn">
+      <created>1546011537020</created>
+      <option name="number" value="01238" />
+      <option name="presentableId" value="LOCAL-01238" />
+      <option name="project" value="LOCAL" />
+      <updated>1546011537021</updated>
+    </task>
+    <task id="LOCAL-01239" summary="port icons as data-uri">
+      <created>1546018088199</created>
+      <option name="number" value="01239" />
+      <option name="presentableId" value="LOCAL-01239" />
+      <option name="project" value="LOCAL" />
+      <updated>1546018088200</updated>
+    </task>
+    <task id="LOCAL-01240" summary="port tooltip layout">
+      <created>1546018516794</created>
+      <option name="number" value="01240" />
+      <option name="presentableId" value="LOCAL-01240" />
+      <option name="project" value="LOCAL" />
+      <updated>1546018516794</updated>
+    </task>
+    <task id="LOCAL-01241" summary="port icons as data-uri">
+      <created>1546085465629</created>
+      <option name="number" value="01241" />
+      <option name="presentableId" value="LOCAL-01241" />
+      <option name="project" value="LOCAL" />
+      <updated>1546085465630</updated>
+    </task>
+    <task id="LOCAL-01242" summary="port icons as data-uri">
+      <created>1546085586967</created>
+      <option name="number" value="01242" />
+      <option name="presentableId" value="LOCAL-01242" />
+      <option name="project" value="LOCAL" />
+      <updated>1546085586967</updated>
+    </task>
+    <task id="LOCAL-01243" summary="colours: vars instead hex values">
+      <created>1546103129895</created>
+      <option name="number" value="01243" />
+      <option name="presentableId" value="LOCAL-01243" />
+      <option name="project" value="LOCAL" />
+      <updated>1546103129896</updated>
+    </task>
+    <task id="LOCAL-01244" summary="babel-minify -&gt; terser">
+      <created>1546105406034</created>
+      <option name="number" value="01244" />
+      <option name="presentableId" value="LOCAL-01244" />
+      <option name="project" value="LOCAL" />
+      <updated>1546105406036</updated>
+    </task>
+    <task id="LOCAL-01245" summary="yarn">
+      <created>1546105654714</created>
+      <option name="number" value="01245" />
+      <option name="presentableId" value="LOCAL-01245" />
+      <option name="project" value="LOCAL" />
+      <updated>1546105654714</updated>
+    </task>
+    <task id="LOCAL-01246" summary="compass fixed">
+      <created>1546107088171</created>
+      <option name="number" value="01246" />
+      <option name="presentableId" value="LOCAL-01246" />
+      <option name="project" value="LOCAL" />
+      <updated>1546107088171</updated>
+    </task>
+    <task id="LOCAL-01247" summary="removed unused imports">
+      <created>1546107665362</created>
+      <option name="number" value="01247" />
+      <option name="presentableId" value="LOCAL-01247" />
+      <option name="project" value="LOCAL" />
+      <updated>1546107665362</updated>
+    </task>
+    <task id="LOCAL-01248" summary="journey leg tooltip separator">
+      <created>1546108788764</created>
+      <option name="number" value="01248" />
+      <option name="presentableId" value="LOCAL-01248" />
+      <option name="project" value="LOCAL" />
+      <updated>1546108788764</updated>
+    </task>
+    <task id="LOCAL-01249" summary="format k with space">
+      <created>1546109390136</created>
+      <option name="number" value="01249" />
+      <option name="presentableId" value="LOCAL-01249" />
+      <option name="project" value="LOCAL" />
+      <updated>1546109390136</updated>
+    </task>
+    <task id="LOCAL-01250" summary="ship-compare: onum off">
+      <created>1546109551652</created>
+      <option name="number" value="01250" />
+      <option name="presentableId" value="LOCAL-01250" />
+      <option name="project" value="LOCAL" />
+      <updated>1546109551652</updated>
+    </task>
+    <task id="LOCAL-01251" summary="table padding left">
+      <created>1546110019534</created>
+      <option name="number" value="01251" />
+      <option name="presentableId" value="LOCAL-01251" />
+      <option name="project" value="LOCAL" />
+      <updated>1546110019534</updated>
+    </task>
+    <task id="LOCAL-01252" summary="colour contrast">
+      <created>1546143036023</created>
+      <option name="number" value="01252" />
+      <option name="presentableId" value="LOCAL-01252" />
+      <option name="project" value="LOCAL" />
+      <updated>1546143036024</updated>
+    </task>
+    <task id="LOCAL-01253" summary="colour contrast">
+      <created>1546185488001</created>
+      <option name="number" value="01253" />
+      <option name="presentableId" value="LOCAL-01253" />
+      <option name="project" value="LOCAL" />
+      <updated>1546185488002</updated>
+    </task>
+    <task id="LOCAL-01254" summary="colour contrast">
+      <created>1546185594833</created>
+      <option name="number" value="01254" />
+      <option name="presentableId" value="LOCAL-01254" />
+      <option name="project" value="LOCAL" />
+      <updated>1546185594833</updated>
+    </task>
+    <task id="LOCAL-01255" summary="colour contrast">
+      <created>1546189048464</created>
+      <option name="number" value="01255" />
+      <option name="presentableId" value="LOCAL-01255" />
+      <option name="project" value="LOCAL" />
+      <updated>1546189048464</updated>
+    </task>
+    <task id="LOCAL-01256" summary="yarn">
+      <created>1546193438068</created>
+      <option name="number" value="01256" />
+      <option name="presentableId" value="LOCAL-01256" />
+      <option name="project" value="LOCAL" />
+      <updated>1546193438068</updated>
+    </task>
+    <task id="LOCAL-01257" summary="convert ship recipes">
+      <created>1546198965780</created>
+      <option name="number" value="01257" />
+      <option name="presentableId" value="LOCAL-01257" />
+      <option name="project" value="LOCAL" />
+      <updated>1546198965780</updated>
+    </task>
+    <task id="LOCAL-01258" summary="display ports: attack colours">
+      <created>1546243304801</created>
+      <option name="number" value="01258" />
+      <option name="presentableId" value="LOCAL-01258" />
+      <option name="project" value="LOCAL" />
+      <updated>1546243304802</updated>
+    </task>
+    <task id="LOCAL-01259" summary="convert ship recipes">
+      <created>1546247734223</created>
+      <option name="number" value="01259" />
+      <option name="presentableId" value="LOCAL-01259" />
+      <option name="project" value="LOCAL" />
+      <updated>1546247734223</updated>
+    </task>
+    <task id="LOCAL-01260" summary="convert ship recipes">
+      <created>1546247997300</created>
+      <option name="number" value="01260" />
+      <option name="presentableId" value="LOCAL-01260" />
+      <option name="project" value="LOCAL" />
+      <updated>1546247997300</updated>
+    </task>
+    <task id="LOCAL-01261" summary="convert ship recipes">
+      <created>1546272784475</created>
+      <option name="number" value="01261" />
+      <option name="presentableId" value="LOCAL-01261" />
+      <option name="project" value="LOCAL" />
+      <updated>1546272784475</updated>
+    </task>
+    <task id="LOCAL-01262" summary="convert ship recipes">
+      <created>1546307402980</created>
+      <option name="number" value="01262" />
+      <option name="presentableId" value="LOCAL-01262" />
+      <option name="project" value="LOCAL" />
+      <updated>1546307402981</updated>
+    </task>
+    <task id="LOCAL-01263" summary="convert ship recipes">
+      <created>1546351326894</created>
+      <option name="number" value="01263" />
+      <option name="presentableId" value="LOCAL-01263" />
+      <option name="project" value="LOCAL" />
+      <updated>1546351326894</updated>
+    </task>
+    <task id="LOCAL-01264" summary="convert ship recipes">
+      <created>1546354270600</created>
+      <option name="number" value="01264" />
+      <option name="presentableId" value="LOCAL-01264" />
+      <option name="project" value="LOCAL" />
+      <updated>1546354270600</updated>
+    </task>
+    <task id="LOCAL-01265" summary="list buildings: level starting at 1 not 0">
+      <created>1546355075905</created>
+      <option name="number" value="01265" />
+      <option name="presentableId" value="LOCAL-01265" />
+      <option name="project" value="LOCAL" />
+      <updated>1546355075905</updated>
+    </task>
+    <task id="LOCAL-01266" summary="ship recipe -&gt; ship blueprint">
+      <created>1546361406346</created>
+      <option name="number" value="01266" />
+      <option name="presentableId" value="LOCAL-01266" />
+      <option name="project" value="LOCAL" />
+      <updated>1546361406346</updated>
+    </task>
+    <option name="localTasksCounter" value="1267" />
+    <option name="createBranch" value="false" />
+    <option name="useBranch" value="true" />
+    <servers>
+      <Gitlab url="https://gl.byrtz.de">
+        <option name="currentProject">
+          <GitlabProject />
+        </option>
+        <password>dfd9dffbdf98dfc7dfd9dff5dfe2dfcfdf9ddffcdfdcdfdcdfd3dfd9dfc0dfdcdfc4dfc5dfe7dfe9</password>
+      </Gitlab>
+    </servers>
+  </component>
+  <component name="TimeTrackingManager">
+    <option name="totallyTimeSpent" value="3515526000" />
+  </component>
+  <component name="TodoView">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="1455" y="41" width="2380" height="1989" extended-state="0" />
+    <layout>
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.21626298" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info id="npm" order="3" side_tool="true" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.2967277" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.32713348" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.39935932" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="Terminal" order="6" weight="0.32889628" />
+      <window_info anchor="bottom" id="TODO" order="7" weight="0.32958803" />
+      <window_info anchor="bottom" id="Docker" order="8" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Version Control" order="9" weight="0.32612312" />
+      <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" weight="0.32166302" />
+      <window_info anchor="bottom" id="Messages" order="11" weight="0.32996812" />
+      <window_info anchor="bottom" id="Database Changes" order="12" show_stripe_button="false" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.32831812" />
+      <window_info anchor="right" id="Database" order="3" weight="0.32993016" />
+    </layout>
+    <layout-to-restore>
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.21823205" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.29674572" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.32713348" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.39935932" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" weight="0.32958803" />
+      <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Terminal" order="8" weight="0.32932165" />
+      <window_info anchor="bottom" id="Version Control" order="9" weight="0.3263925" />
+      <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" weight="0.32166302" />
+      <window_info anchor="bottom" id="Messages" order="11" weight="0.32996812" />
+      <window_info anchor="bottom" id="Database Changes" order="12" show_stripe_button="false" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.32831812" />
+      <window_info anchor="right" id="Database" order="3" weight="0.32993016" />
+    </layout-to-restore>
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="Vcs.Log.History.Properties">
+    <option name="COLUMN_ORDER">
+      <list>
+        <option value="0" />
+        <option value="2" />
+        <option value="3" />
+        <option value="1" />
+      </list>
+    </option>
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="RECENTLY_FILTERED_USER_GROUPS">
+                <collection />
+              </option>
+              <option name="RECENTLY_FILTERED_BRANCH_GROUPS">
+                <collection />
+              </option>
+              <option name="COLUMN_ORDER">
+                <list>
+                  <option value="0" />
+                  <option value="2" />
+                  <option value="3" />
+                  <option value="1" />
+                </list>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="RECENT_FILTERS">
+      <map>
+        <entry key="Branch">
+          <value>
+            <list />
+          </value>
+        </entry>
+        <entry key="User">
+          <value>
+            <list />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
+    <option name="CHECK_NEW_TODO" value="false" />
+    <MESSAGE value="typography" />
+    <MESSAGE value="compass layout improved and code simplified" />
+    <MESSAGE value="debug removed" />
+    <MESSAGE value="debug wind change" />
+    <MESSAGE value="grid on top of all" />
+    <MESSAGE value="navbar colours" />
+    <MESSAGE value="- wind rose calculation corrected&#10;- compass layout" />
+    <MESSAGE value=".dropdown-header" />
+    <MESSAGE value="port tooltip layout" />
+    <MESSAGE value="port icons as data-uri" />
+    <MESSAGE value="colours: vars instead hex values" />
+    <MESSAGE value="babel-minify -&gt; terser" />
+    <MESSAGE value="compass fixed" />
+    <MESSAGE value="removed unused imports" />
+    <MESSAGE value="journey leg tooltip separator" />
+    <MESSAGE value="format k with space" />
+    <MESSAGE value="ship-compare: onum off" />
+    <MESSAGE value="table padding left" />
+    <MESSAGE value="colour contrast" />
+    <MESSAGE value="yarn" />
+    <MESSAGE value="port-data: json out-dir corrected" />
+    <MESSAGE value="display ports: attack colours" />
+    <MESSAGE value="convert ship recipes" />
+    <MESSAGE value="list buildings: level starting at 1 not 0" />
+    <MESSAGE value="ship recipe -&gt; ship blueprint" />
+    <option name="LAST_COMMIT_MESSAGE" value="ship recipe -&gt; ship blueprint" />
+    <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
+  </component>
+  <component name="XDebuggerManager">
+    <watches-manager>
+      <configuration name="JavascriptDebugType">
+        <watch expression="_ports" />
+      </configuration>
+    </watches-manager>
+  </component>
+  <component name="debuggerHistoryManager">
+    <expressions id="evaluateExpression">
+      <expression>
+        <expression-string>_ports</expression-string>
+        <language-id>JavaScript</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+    </expressions>
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/src/js/map/select-ports.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1872">
+          <caret line="60" column="13" selection-start-line="60" selection-start-column="13" selection-end-line="60" selection-end-column="13" />
+          <folding>
+            <element signature="e#207#253#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/js/map-tools/predict-wind.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="9144">
+          <caret line="275" column="23" selection-start-line="275" selection-start-column="23" selection-end-line="275" selection-end-column="23" />
+          <folding>
+            <element signature="e#213#263#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/js/map/map.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="773">
+          <caret line="494" column="34" selection-start-line="494" selection-start-column="34" selection-end-line="494" selection-end-column="34" />
+          <folding>
+            <element signature="e#203#247#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/gen/eu1.json">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/gen/eu1-pb.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="36703" lean-forward="true" selection-start-column="36703" selection-end-column="36703" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/js/map-tools/wind-rose.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="982">
+          <caret line="30" column="70" lean-forward="true" selection-start-line="30" selection-start-column="8" selection-end-line="30" selection-end-column="70" />
+          <folding>
+            <element signature="e#225#275#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/js/map-tools/make-journey.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="20844">
+          <caret line="604" column="86" selection-start-line="604" selection-start-column="86" selection-end-line="604" selection-end-column="86" />
+          <folding>
+            <element signature="e#215#297#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../wordpress-3.9.1/wp-content/plugins/betty/betty-start.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="118">
+          <caret line="551" column="93" lean-forward="true" selection-start-line="551" selection-start-column="93" selection-end-line="551" selection-end-column="93" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/scss/main.scss">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="972">
+          <caret line="27" column="39" selection-start-line="27" selection-start-column="39" selection-end-line="27" selection-end-column="39" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/scss/_pre-bootstrap.scss">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="468">
+          <caret line="13" selection-start-line="13" selection-end-line="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/scss/_palettes.scss">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="643">
+          <caret line="31" column="20" selection-start-line="31" selection-start-column="20" selection-end-line="31" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/scss/_variables.scss">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="144">
+          <caret line="94" column="8" selection-start-line="94" selection-start-column="8" selection-end-line="94" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build/convert-pbZones.mjs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <folding>
+            <element signature="n#!!doc" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build/convert-API-pb-data.mjs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <folding>
+            <element signature="e#0#20#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build/convert-additional-ship-data.mjs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <folding>
+            <element signature="n#!!doc" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build/convert-recipes.mjs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <folding>
+            <element signature="n#!!doc" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_12.json" />
+    <entry file="file://$PROJECT_DIR$/src/js/game-tools/compare-ships.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="864">
+          <caret line="24" column="43" selection-start-line="24" selection-start-column="43" selection-end-line="24" selection-end-column="43" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/js/game-tools/compare-woods.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="5148">
+          <caret line="143" column="78" selection-start-line="143" selection-start-column="78" selection-end-line="143" selection-end-column="78" />
+          <folding>
+            <element signature="e#216#270#0" expanded="true" />
+            <element signature="n#style#0;n#span#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#span#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#span#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#span#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#span#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#span#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#span#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#span#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#span#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#span#0;n#!!top" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/package.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="288">
+          <caret line="113" column="63" selection-start-line="113" selection-start-column="63" selection-end-line="113" selection-end-column="63" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/scss/_colour.scss">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="283">
+          <caret line="161" column="16" selection-start-line="161" selection-start-column="16" selection-end-line="161" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/js/common.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="535">
+          <caret line="142" column="1" selection-start-line="142" selection-start-column="1" selection-end-line="142" selection-end-column="1" />
+          <folding>
+            <element signature="n#!!doc" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/js/map/display-ports.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="504">
+          <caret line="510" column="60" selection-start-line="510" selection-start-column="60" selection-end-line="510" selection-end-column="60" />
+          <folding>
+            <element signature="e#209#263#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build/API/api-eu1-ItemTemplates-2018-12-30.json" />
+    <entry file="file://$PROJECT_DIR$/build/convert-modules.mjs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="6912">
+          <caret line="192" column="42" selection-start-line="192" selection-start-column="42" selection-end-line="192" selection-end-column="42" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/gen/modules.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="37" selection-start-column="37" selection-end-column="37" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_15.json" />
+    <entry file="file://$PROJECT_DIR$/build/convert-cannons.mjs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <folding>
+            <element signature="e#260#285#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/gen/woods.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="108">
+          <caret line="3" column="21" selection-start-line="3" selection-start-column="21" selection-end-line="3" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build/convert-API-data.mjs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="648">
+          <caret line="29" selection-start-line="29" selection-end-line="29" />
+          <folding>
+            <element signature="e#0#34#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build/common.mjs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="463">
+          <caret line="275" column="7" selection-start-line="275" selection-start-column="7" selection-end-line="275" selection-end-column="7" />
+          <folding>
+            <element signature="n#!!doc" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build/convert-ships.mjs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="828">
+          <caret line="47" column="72" selection-start-line="47" selection-start-column="56" selection-end-line="47" selection-end-column="72" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/gen/pb.json">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/gen/ships.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="1" selection-start-column="1" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_14.json" />
+    <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_13.json" />
+    <entry file="file://$PROJECT_DIR$/build/API/api-eu1-ItemTemplates-2018-12-31.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3387">
+          <caret line="227331" column="36" selection-start-line="227331" selection-start-column="36" selection-end-line="227331" selection-end-column="36" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build/convert-buildings.mjs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="574">
+          <caret line="91" column="28" selection-start-line="91" selection-start-column="28" selection-end-line="91" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/js/game-tools/list-buildings.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="756">
+          <caret line="24" column="30" lean-forward="true" selection-start-line="24" selection-start-column="30" selection-end-line="24" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webpack.config.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1764">
+          <caret line="49" column="6" selection-start-line="49" selection-start-column="6" selection-end-line="49" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build/port-data.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="5190">
+          <caret line="198" column="115" selection-start-line="198" selection-start-column="115" selection-end-line="198" selection-end-column="115" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/gen/ship-recipes.json" />
+    <entry file="file://$PROJECT_DIR$/src/index.template.ejs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="406">
+          <caret line="218" column="56" lean-forward="true" selection-start-line="218" selection-start-column="56" selection-end-line="218" selection-end-column="56" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/gen/ship-blueprints.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="40956" selection-start-column="40956" selection-end-column="40956" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build/convert-ship-blueprints.mjs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="4752">
+          <caret line="132" column="28" selection-start-line="132" selection-start-column="28" selection-end-line="132" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/gen/recipes.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3060">
+          <caret line="85" column="9" selection-start-line="85" selection-start-column="9" selection-end-line="85" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/js/util.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2124">
+          <caret line="60" column="3" selection-start-line="60" selection-start-column="3" selection-end-line="60" selection-end-column="3" />
+          <folding>
+            <element signature="e#206#297#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/scss/_display.scss">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3960">
+          <caret line="110" column="21" selection-start-line="110" selection-start-column="21" selection-end-line="110" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/js/game-tools/index.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2340">
+          <caret line="75" column="27" selection-start-line="75" selection-start-column="27" selection-end-line="75" selection-end-column="27" />
+          <folding>
+            <element signature="e#221#264#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/gen/buildings.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="1" selection-start-column="1" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/js/game-tools/list-ship-blueprints.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="288">
+          <caret line="132" column="35" selection-start-line="132" selection-start-column="35" selection-end-line="132" selection-end-column="35" />
+          <folding>
+            <element signature="e#230#280#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+  </component>
+  <component name="masterDetails">
+    <states>
+      <state key="ScopeChooserConfigurable.UI">
+        <settings>
+          <last-edited>js</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2835821" />
+              </list>
+            </option>
+          </splitter-proportions>
+          <order>
+            <scope name="js" />
+          </order>
+        </settings>
+      </state>
+    </states>
+  </component>
+</project>
