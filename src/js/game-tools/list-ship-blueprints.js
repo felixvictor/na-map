@@ -43,8 +43,7 @@ export default class ListShipBlueprints {
             .attr("name", id)
             .attr("id", id);
         body.append("div")
-            .attr("id", `${this._baseId}`)
-            .attr("class", "container-fluid");
+            .attr("id", `${this._baseId}`);
     }
 
     _getOptions() {
