@@ -97,27 +97,26 @@ export default class ListShipBlueprints {
      * @private
      */
     _addText(elem, selectedBlueprintName) {
-        const addTable = (card, data) => {
+        const addTable = (card, dataBody, dataHead = []) => {
             const table = card.append("table").classed("table table-sm", true);
 
-            /*
             // Append table head
-            table
-                .append("thead")
-                .append("tr")
-                .selectAll("th")
-                // Table column headers (here constant, but could be made dynamic)
-                .data(["Table Name", "Row Number", "Data Contents"])
-                .enter()
-                .append("th")
-                .text(d => d);
-*/
+            if (dataHead) {
+                table
+                    .append("thead")
+                    .append("tr")
+                    .selectAll("th")
+                    .data(dataHead)
+                    .enter()
+                    .append("th")
+                    .text(d => d);
+            }
 
             // Data join rows
             const tableRowUpdate = table
                 .append("tbody")
                 .selectAll("tr")
-                .data(data, d => d[0]);
+                .data(dataBody, d => d[0]);
 
             // Remove old rows
             tableRowUpdate.exit().remove();
