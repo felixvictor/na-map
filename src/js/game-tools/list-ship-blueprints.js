@@ -89,86 +89,99 @@ export default class ListShipBlueprints {
         return this._blueprintData.find(blueprint => blueprint.name === selectedBlueprint);
     }
 
-    // noinspection JSMethodCanBeStatic
-    _getShipText(currentBlueprint) {
-        let text = "";
-
-        text += '<table class="table table-sm"><tbody>';
-
-        text += `<tr><td>Ship rate</td><td>${getOrdinal(currentBlueprint.ship.rate)}</td></tr>`;
-
-        text += `<tr><td>Craft level</td><td>${formatInt(currentBlueprint.craftLevel)}</td></tr>`;
-        text += `<tr><td>Shipyard level</td><td>${formatInt(currentBlueprint.shipyardLevel)}</td></tr>`;
-        text += `<tr><td>Labour hours</td><td>${formatInt(currentBlueprint.labourHours)}</td></tr>`;
-        text += `<tr><td>Craft experience gained</td><td>${formatInt(currentBlueprint.craftXP)}</td></tr>`;
-        if (currentBlueprint.doubloons) {
-            text += `<tr><td>Doubloons</td><td>${formatInt(currentBlueprint.doubloons)}</td></tr>`;
-        }
-        text += `<tr><td>Provisions</td><td>${formatInt(currentBlueprint.provisions)}</td></tr>`;
-        if (currentBlueprint.permit) {
-            text += `<tr><td>Permit</td><td>${formatInt(currentBlueprint.permit)}</td></tr>`;
-        }
-
-        text += "</tbody></table>";
-        return text;
-    }
-
-    _getResourcesText(currentBlueprint) {
-        let text = "";
-
-        text += '<table class="table table-sm"><tbody>';
-        currentBlueprint.resources.forEach(resource => {
-            text += `<tr><td>${resource.name}</td><td>${formatInt(resource.amount)}</td></tr>`;
-        });
-        text += "</tbody></table>";
-        return text;
-    }
-
-    _getPlankingText(currentBlueprint) {
-        let text = "";
-
-        text += '<table class="table table-sm"><tbody>';
-        currentBlueprint.frames.forEach(frame => {
-            text += `<tr><td>${frame.name}</td><td>${formatInt(frame.amount)}</td></tr>`;
-        });
-        currentBlueprint.trims.forEach(trim => {
-            text += `<tr><td>${trim.name}</td><td>+ ${formatInt(trim.amount)} ${
-                trim.name === "Planking" ? "logs" : "Hemp"
-            }</td></tr>`;
-        });
-        text += "</tbody></table>";
-
-        return text;
-    }
-
     /**
      * Construct ship blueprint tables
-     * @param {string} selectedBlueprintName Selected building.
-     * @return {string} html string
+     * @param {object} elem - Element to add table to
+     * @param {string} selectedBlueprintName - Selected blueprint
+     * @return {void}
      * @private
      */
-    _getText(selectedBlueprintName) {
+    _addText(elem, selectedBlueprintName) {
+        const addTable = (card, data) => {
+            const table = card.append("table").classed("table table-sm", true);
+
+            /*
+            // Append table head
+            table
+                .append("thead")
+                .append("tr")
+                .selectAll("th")
+                // Table column headers (here constant, but could be made dynamic)
+                .data(["Table Name", "Row Number", "Data Contents"])
+                .enter()
+                .append("th")
+                .text(d => d);
+*/
+
+            // Data join rows
+            const tableRowUpdate = table
+                .append("tbody")
+                .selectAll("tr")
+                .data(data, d => d[0]);
+
+            // Remove old rows
+            tableRowUpdate.exit().remove();
+
+            // Add new rows
+            const tableRowEnter = tableRowUpdate.enter().append("tr");
+
+            // Merge rows
+            const row = tableRowUpdate.merge(tableRowEnter);
+
+            // Data join cells
+            const tableCellUpdate = row.selectAll("td").data(d => d);
+
+            // Remove old cells
+            tableCellUpdate.exit().remove();
+
+            // Add new cells
+            const tableCellEnter = tableCellUpdate.enter().append("td");
+
+            // Merge cells
+            tableCellUpdate.merge(tableCellEnter).html(d => d);
+        };
+
         const currentBlueprint = this._getBlueprintData(selectedBlueprintName);
 
-        let text = '<div class="row no-gutters card-deck">';
+        const cardDeck = elem.append("div").classed("row no-gutters card-deck", true);
 
-        text += '<div class="card col-4"><div class="card-header">Ship</div>';
-        text += '<div class="card-body">';
-        text += this._getShipText(currentBlueprint);
-        text += "</div></div>";
+        const addCard = (title, data) => {
+            const card = cardDeck.append("div").classed("card col-3", true);
+            card.append("div")
+                .classed("card-header", true)
+                .text(title);
+            const cardBody = card.append("div").classed("card-body", true);
+            addTable(cardBody, data);
+        };
 
-        text += '<div class="card col-4"><div class="card-header">Resources</div>';
-        text += '<div class="card-body">';
-        text += this._getResourcesText(currentBlueprint);
-        text += "</div></div>";
+        const shipData = [
+            ["Ship rate", getOrdinal(currentBlueprint.ship.rate)],
+            ["Craft level", formatInt(currentBlueprint.craftLevel)],
+            ["Shipyard level", formatInt(currentBlueprint.shipyardLevel)],
+            ["Labour hours", formatInt(currentBlueprint.labourHours)],
+            ["Craft experience gained", formatInt(currentBlueprint.craftXP)]
+        ];
+        if (currentBlueprint.doubloons) {
+            shipData.push(["Doubloons", formatInt(currentBlueprint.doubloons)]);
+        }
+        shipData.push(["Provisions", formatInt(currentBlueprint.provisions)]);
+        if (currentBlueprint.permit) {
+            shipData.push(["Permit", formatInt(currentBlueprint.permit)]);
+        }
+        addCard("Ship", shipData);
 
-        text += '<div class="card col-4"><div class="card-header">Woods</div>';
-        text += '<div class="card-body">';
-        text += this._getPlankingText(currentBlueprint);
-        text += "</div></div>";
+        const resourcesData = currentBlueprint.resources.map(resource => [resource.name, formatInt(resource.amount)]);
+        addCard("Resources", resourcesData);
 
-        text += "</div>";
-        return text;
+        let woodsData = currentBlueprint.frames.map(frame => [frame.name, formatInt(frame.amount)]);
+        woodsData = [
+            ...woodsData,
+            ...currentBlueprint.trims.map(trim => [
+                trim.name,
+                `+ ${formatInt(trim.amount)} ${trim.name === "Planking" ? "Logs" : "Hemp"}`
+            ])
+        ];
+        addCard("Woods", woodsData);
     }
 
     /**
@@ -186,9 +199,9 @@ export default class ListShipBlueprints {
         d3Select(`#${this._baseId} div`).remove();
 
         // Add new blueprint list
-        d3Select(`#${this._baseId}`)
+        const div = d3Select(`#${this._baseId}`)
             .append("div")
             .classed("blueprint mt-4", true);
-        d3Select(`#${this._baseId} div`).html(this._getText(blueprint));
+        this._addText(div, blueprint);
     }
 }
