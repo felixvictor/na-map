@@ -42,8 +42,7 @@ export default class ListShipBlueprints {
         body.append("select")
             .attr("name", id)
             .attr("id", id);
-        body.append("div")
-            .attr("id", `${this._baseId}`);
+        body.append("div").attr("id", `${this._baseId}`);
     }
 
     _getOptions() {
@@ -88,28 +87,11 @@ export default class ListShipBlueprints {
         return this._blueprintData.find(blueprint => blueprint.name === selectedBlueprint);
     }
 
-    /**
-     * Construct ship blueprint tables
-     * @param {object} elem - Element to add table to
-     * @param {string} selectedBlueprintName - Selected blueprint
-     * @return {void}
-     * @private
-     */
-    _addText(elem, selectedBlueprintName) {
-        const addTable = (card, dataBody, dataHead = []) => {
-            const table = card.append("table").classed("table table-sm", true);
+    _addTable(elem, dataBody, dataHead = []) {
+        const table = elem.append("table").classed("table table-sm", true);
 
-            // Append table head
-            if (dataHead) {
-                table
-                    .append("thead")
-                    .append("tr")
-                    .selectAll("th")
-                    .data(dataHead)
-                    .enter()
-                    .append("th")
-                    .text(d => d);
-            }
+        const addHead = () => {
+            let sortAscending = true;
 
             // Data join rows
             const tableRowUpdate = table
@@ -118,27 +100,150 @@ export default class ListShipBlueprints {
                 .data(dataBody, d => d[0]);
 
             // Remove old rows
-            tableRowUpdate.exit().remove();
+            tableRowUpdate
+                .exit()
+                .attr("class", "exit")
+                .transition()
+                .delay(2000)
+                .duration(5000)
+                .style("opacity", 0.0)
+                .remove();
 
             // Add new rows
-            const tableRowEnter = tableRowUpdate.enter().append("tr");
+            const tableRowEnter = tableRowUpdate
+                .enter()
+                .append("tr")
+                .style("opacity", 0.0)
+                .attr("class", "enter")
+                .transition()
+                .delay(9000)
+                .duration(5000)
+                .style("opacity", 1.0);
+
+            // Merge rows
+            const row = tableRowUpdate.merge(tableRowEnter);
+
+            // Data join cells
+            const tableCellUpdate = row.selectAll("th").data(d);
+            tableCellUpdate.attr("class", "update");
+            // Remove old cells
+            tableCellUpdate
+                .exit()
+                .attr("class", "exit")
+                .transition()
+                .delay(2000)
+                .duration(5000)
+                .style("opacity", 0.0)
+                .remove();
+
+            // Add new cells
+            const tableCellEnter = tableCellUpdate
+                .enter()
+                .append("th")
+                .style("opacity", 0.0)
+                .attr("class", "enter")
+                .transition()
+                .delay(9000)
+                .duration(5000)
+                .style("opacity", 1.0);
+
+            // Merge cells
+            const cell = tableCellUpdate
+                .merge(tableCellEnter)
+                .html(d => d)
+                .append("i")
+                .classed("fas fa-sort", true)
+                .on("click", (d, i, nodes) => {
+                    if (sortAscending) {
+                        row.sort((a, b) => b[d] < a[d]);
+                        sortAscending = false;
+                        console.log(nodes[i]);
+                        nodes[i].classed("fa-sort-down", false);
+                        nodes[i].classed("fa-sort-up", true);
+                    } else {
+                        row.sort((a, b) => b[d] > a[d]);
+                        sortAscending = true;
+                        console.log(nodes[i]);
+                        nodes[i].classed("fa-sort-up", false);
+                        nodes[i].classed("fa-sort-down", true);
+                    }
+                });
+        };
+
+        const addBody = () => {
+            // Data join rows
+            const tableRowUpdate = table
+                .append("tbody")
+                .selectAll("tr")
+                .data(dataBody, d => d[0]);
+
+            // Remove old rows
+            tableRowUpdate
+                .exit()
+                .attr("class", "exit")
+                .transition()
+                .delay(200)
+                .duration(1000)
+                .style("opacity", 0.0)
+                .remove();
+
+            // Add new rows
+            const tableRowEnter = tableRowUpdate
+                .enter()
+                .append("tr")
+                .style("opacity", 0.0)
+                .attr("class", "enter")
+                .transition()
+                .delay(1200)
+                .duration(1000)
+                .style("opacity", 1.0);
 
             // Merge rows
             const row = tableRowUpdate.merge(tableRowEnter);
 
             // Data join cells
             const tableCellUpdate = row.selectAll("td").data(d => d);
-
+            tableCellUpdate.attr("class", "update");
             // Remove old cells
-            tableCellUpdate.exit().remove();
+            tableCellUpdate
+                .exit()
+                .attr("class", "exit")
+                .transition()
+                .delay(200)
+                .duration(1000)
+                .style("opacity", 0.0)
+                .remove();
 
             // Add new cells
-            const tableCellEnter = tableCellUpdate.enter().append("td");
+            const tableCellEnter = tableCellUpdate
+                .enter()
+                .append("td")
+
+                .style("opacity", 0.0)
+                .attr("class", "enter")
+                .transition()
+                .delay(1200)
+                .duration(1000)
+                .style("opacity", 1.0);
 
             // Merge cells
             tableCellUpdate.merge(tableCellEnter).html(d => d);
         };
 
+        if (dataHead.length) {
+            addHead();
+        }
+        addBody();
+    }
+
+    /**
+     * Construct ship blueprint tables
+     * @param {object} elem - Element to add table to
+     * @param {string} selectedBlueprintName - Selected blueprint
+     * @return {void}
+     * @private
+     */
+    _addText(elem, selectedBlueprintName) {
         const currentBlueprint = this._getBlueprintData(selectedBlueprintName);
 
         const cardDeck = elem.append("div").classed("row no-gutters card-deck", true);
@@ -149,7 +254,7 @@ export default class ListShipBlueprints {
                 .classed("card-header", true)
                 .text(title);
             const cardBody = card.append("div").classed("card-body", true);
-            addTable(cardBody, data);
+            this._addTable(cardBody, data);
         };
 
         const shipData = [
