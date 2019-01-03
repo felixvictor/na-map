@@ -78,27 +78,19 @@ const setupData = data => {
     const woodCompare = new CompareWoods(data.woods, "wood");
     const woodList = new ListWoods(data.woods);
 
-    const cannonData = JSON.parse(JSON.stringify(data.cannons));
-    const cannonList = new ListCannons(cannonData);
+    const cannonList = new ListCannons(data.cannons);
 
-    const ownershipData = JSON.parse(JSON.stringify(data.ownership)),
-        nationData = JSON.parse(JSON.stringify(data.nations));
-    const ownershipList = new ListPortOwnerships(ownershipData, nationData);
+    const ownershipList = new ListPortOwnerships(data.ownership, data.nations);
 
-    const moduleData = JSON.parse(JSON.stringify(data.modules));
-    const moduleList = new ListModules(moduleData);
+    const moduleList = new ListModules(data.modules);
 
-    const recipeData = JSON.parse(JSON.stringify(data.recipes.recipe));
-    const recipeList = new ListRecipes(recipeData, moduleData);
+    const recipeList = new ListRecipes(data.recipes.recipe, data.modules);
 
-    const ingredientData = JSON.parse(JSON.stringify(data.recipes.ingredient));
-    const ingredientList = new ListIngredients(ingredientData, moduleData);
+    const ingredientList = new ListIngredients(data.recipes.ingredient, data.modules);
 
-    const buildingData = JSON.parse(JSON.stringify(data.buildings));
-    const buildingList = new ListBuildings(buildingData);
+    const buildingList = new ListBuildings(data.buildings);
 
-    const blueprintData = JSON.parse(JSON.stringify(data.blueprints.shipBlueprints));
-    const blueprintList = new ListShipBlueprints(blueprintData);
+    const blueprintList = new ListShipBlueprints(data.blueprints.shipBlueprints, data.woods);
 };
 
 /**
