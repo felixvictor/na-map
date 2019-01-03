@@ -22,6 +22,9 @@ import {
     faChevronLeft,
     faChevronRight,
     faPaste,
+    faSort,
+    faSortDown,
+    faSortUp,
     faTimes,
     faTrash
 } from "@fortawesome/fontawesome-free-solid";
@@ -142,15 +145,18 @@ function main() {
     };
 
     fontawesome.library.add(
-        faCalendar,
-        faCalendarCheck,
-        faClock,
-        faCopy,
         faArrowDown,
         faArrowUp,
+        faCalendar,
+        faCalendarCheck,
         faChevronLeft,
         faChevronRight,
+        faClock,
+        faCopy,
         faPaste,
+        faSort,
+        faSortDown,
+        faSortUp,
         faTimes,
         faTrash
     );
