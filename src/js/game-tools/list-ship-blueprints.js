@@ -14,13 +14,21 @@ import { registerEvent } from "../analytics";
 import { insertBaseModal } from "../common";
 
 export default class ListShipBlueprints {
-    constructor(blueprintData) {
+    constructor(blueprintData, woodData) {
         this._blueprintData = blueprintData;
+        this._woodData = woodData;
 
         this._baseName = "List ship blueprint";
         this._baseId = "ship-blueprint-list";
         this._buttonId = `button-${this._baseId}`;
         this._modalId = `modal-${this._baseId}`;
+
+        this._defaultWood = {
+            frame: "Fir",
+            trim: "Crew Space"
+        };
+        this._woodsSelected = [];
+        this._options = {};
 
         this._setupListener();
     }
@@ -33,32 +41,66 @@ export default class ListShipBlueprints {
         });
     }
 
+    _setupData() {
+        this._frameSelectData = this._woodData.frame.sort((a, b) => {
+            if (a.name < b.name) {
+                return -1;
+            }
+            if (a.name > b.name) {
+                return 1;
+            }
+            return 0;
+        });
+        this._trimSelectData = this._woodData.trim.sort((a, b) => {
+            if (a.name < b.name) {
+                return -1;
+            }
+            if (a.name > b.name) {
+                return 1;
+            }
+            return 0;
+        });
+        this._setOption(
+            this._frameSelectData.map(wood => `<option value="${wood.name}">${wood.name}</option>`),
+            this._trimSelectData.map(wood => `<option value="${wood.name}">${wood.name}</option>`)
+        );
+    }
+
     _injectModal() {
         insertBaseModal(this._modalId, this._baseName);
 
-        const id = `${this._baseId}-select`,
-            body = d3Select(`#${this._modalId} .modal-body`);
+        const id = `${this._baseId}-ship-select`;
+        const body = d3Select(`#${this._modalId} .modal-body`);
         body.append("label").attr("for", id);
         body.append("select")
             .attr("name", id)
             .attr("id", id);
+
+        ["frame", "trim"].forEach(type => {
+            const selectId = `${this._baseId}-${type}-select`;
+            body.append("label").attr("for", selectId);
+            body.append("select")
+                .attr("name", selectId)
+                .attr("id", selectId);
+        });
+
         body.append("div").attr("id", `${this._baseId}`);
     }
 
-    _getOptions() {
+    _getShipOptions() {
         return `${this._blueprintData
             .map(blueprint => `<option value="${blueprint.name}">${blueprint.name}</option>;`)
             .join("")}`;
     }
 
-    _setupSelect() {
-        const select$ = $(`#${this._baseId}-select`),
-            options = this._getOptions();
+    _setupShipSelect() {
+        const select$ = $(`#${this._baseId}-ship-select`),
+            options = this._getShipOptions();
         select$.append(options);
     }
 
-    _setupSelectListener() {
-        const select$ = $(`#${this._baseId}-select`);
+    _setupShipSelectListener() {
+        const select$ = $(`#${this._baseId}-ship-select`);
 
         select$
             .addClass("selectpicker")
@@ -69,9 +111,74 @@ export default class ListShipBlueprints {
     }
 
     _initModal() {
+        this._setupData();
         this._injectModal();
-        this._setupSelect();
-        this._setupSelectListener();
+        this._setupShipSelect();
+        this._setupShipSelectListener();
+        ["frame", "trim"].forEach(type => {
+            const select$ = $(`#${this._baseId}-${type}-select`);
+            this._setupWoodSelect(type, select$);
+            this._setupWoodSelectListener(type, select$);
+        });
+    }
+
+    _setWoodsSelected(type, woodName) {
+        this._woodsSelected[type] = woodName;
+    }
+
+    _setupWoodSelect(type, select$) {
+        this._setWoodsSelected(type, this._defaultWood[type]);
+        select$.append(this._options[type]);
+        select$.attr("disabled", "disabled");
+    }
+
+    _setOtherSelect(type) {
+        const otherType = type === "frame" ? "trim" : "frame";
+        if (this._woodsSelected[otherType] === this._defaultWood[otherType]) {
+            $(`#${this._baseId}-${otherType}-select`)
+                .val(this._defaultWood[otherType])
+                .selectpicker("refresh");
+        }
+    }
+
+    _enableSelects() {
+        ["frame", "trim"].forEach(type => {
+            $(`#${this._baseId}-${type}-select`)
+                .removeAttr("disabled")
+                .selectpicker("refresh");
+        });
+    }
+
+    _woodSelected(type, select$) {
+        const woodName = select$.val();
+
+        this._setWoodsSelected(type, woodName);
+        this._setOtherSelect(type);
+    }
+
+    _setupWoodSelectListener(type, select$) {
+        select$
+            .addClass("selectpicker")
+            .on("change", () => this._woodSelected(type, select$))
+            .selectpicker({ noneSelectedText: `Select ${type}` })
+            .val("default")
+            .selectpicker("refresh");
+    }
+
+    _getWoodTypeData(type, name) {
+        return this._woodData[type].find(wood => wood.name === name);
+    }
+
+    _getWoodData(id) {
+        return {
+            frame: this._getWoodTypeData("frame", this._getWoodSelected(id).frame),
+            trim: this._getWoodTypeData("trim", this._getWoodSelected(id).trim)
+        };
+    }
+
+    _setOption(frame, trim) {
+        this._options.frame = frame;
+        this._options.trim = trim;
     }
 
     _blueprintListSelected() {
@@ -148,7 +255,7 @@ export default class ListShipBlueprints {
                 .style("opacity", 1.0);
 
             // Merge cells
-            const cell = tableCellUpdate
+            tableCellUpdate
                 .merge(tableCellEnter)
                 .html(d => d)
                 .append("i")
@@ -297,6 +404,8 @@ export default class ListShipBlueprints {
         const blueprint = $(event.currentTarget)
             .find(":selected")
             .val();
+
+        this._enableSelects();
 
         // Remove old blueprint list
         d3Select(`#${this._baseId} div`).remove();
