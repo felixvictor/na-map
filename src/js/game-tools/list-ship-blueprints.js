@@ -202,9 +202,9 @@ export default class ListShipBlueprints {
 
             // Data join rows
             const tableRowUpdate = table
-                .append("tbody")
+                .append("thead")
                 .selectAll("tr")
-                .data(dataBody, d => d[0]);
+                .data(dataHead, d => d[0]);
 
             // Remove old rows
             tableRowUpdate
@@ -231,7 +231,7 @@ export default class ListShipBlueprints {
             const row = tableRowUpdate.merge(tableRowEnter);
 
             // Data join cells
-            const tableCellUpdate = row.selectAll("th").data(d);
+            const tableCellUpdate = row.selectAll("th").data(d => d);
             tableCellUpdate.attr("class", "update");
             // Remove old cells
             tableCellUpdate
@@ -355,13 +355,13 @@ export default class ListShipBlueprints {
 
         const cardDeck = elem.append("div").classed("row no-gutters card-deck", true);
 
-        const addCard = (title, data) => {
+        const addCard = (title, dataBody, dataHead = []) => {
             const card = cardDeck.append("div").classed("card col-3", true);
             card.append("div")
                 .classed("card-header", true)
                 .text(title);
             const cardBody = card.append("div").classed("card-body", true);
-            this._addTable(cardBody, data);
+            this._addTable(cardBody, dataBody, dataHead);
         };
 
         const shipData = [
@@ -378,7 +378,7 @@ export default class ListShipBlueprints {
         if (currentBlueprint.permit) {
             shipData.push(["Permit", formatInt(currentBlueprint.permit)]);
         }
-        addCard("Ship", shipData);
+        addCard("Ship", shipData, ["item", "data"]);
 
         const resourcesData = currentBlueprint.resources.map(resource => [resource.name, formatInt(resource.amount)]);
         addCard("Resources", resourcesData);
