@@ -130,6 +130,19 @@ text,
     background-color: $secondary-100;
 }
 
+td.update {
+    color: $blue;
+}
+
+td.enter {
+    color: $green;
+}
+
+td.exit,
+tr.exit td {
+    color: $red;
+}
+
 table tr,
 p {
     text-align: left;
