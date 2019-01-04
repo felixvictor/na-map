@@ -92,7 +92,7 @@ const convertShipBlueprints = () => {
                             amount: Math.round(shipMass * plankingRatio)
                         },
                         {
-                            name: "Crew space",
+                            name: "Crew Space",
                             amount: Math.round(shipMass * crewSpaceRatio)
                         }
                     ],
