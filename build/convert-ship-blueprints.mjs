@@ -49,12 +49,6 @@ const itemNames = getItemNames();
  * @return {number} Ship mass
  */
 const getShipMass = id => apiItems.find(apiItem => id === apiItem.Id).ShipMass;
-/**
- * Get ship rate
- * @param {number} id - Ship id
- * @return {number} Ship rate
- */
-const getShipRate = id => apiItems.find(apiItem => id === apiItem.Id).Class;
 
 /**
  * Convert ship blueprints
@@ -75,7 +69,7 @@ const convertShipBlueprints = () => {
                     id: apiBlueprint.Id,
                     name: apiBlueprint.Name.replaceAll(" Blueprint", "").replaceAll("'", "’"),
                     frames: apiBlueprint.WoodTypeDescs.map(wood => ({
-                        name: itemNames.get(wood.Requirements[0].Template).replace(" Log", ""),
+                        name: itemNames.get(wood.Requirements[0].Template),
                         amount: wood.Requirements[0].Amount
                     })).sort((a, b) => {
                         if (a.name < b.name) {
@@ -124,8 +118,7 @@ const convertShipBlueprints = () => {
                         ).Amount || 0,
                     ship: {
                         id: apiBlueprint.Results[0].Template,
-                        name: itemNames.get(apiBlueprint.Results[0].Template),
-                        rate: getShipRate(apiBlueprint.Results[0].Template)
+                        name: itemNames.get(apiBlueprint.Results[0].Template)
                     },
                     shipyardLevel: apiBlueprint.BuildingRequirements[0].Level + 1,
                     craftLevel: apiBlueprint.RequiresLevel,
