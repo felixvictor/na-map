@@ -267,57 +267,49 @@ export default class ListShipBlueprints {
 
         const addBody = () => {
             // Data join rows
-            const tableRowUpdate = elem
+            const row = elem
                 .select("tbody")
                 .selectAll("tr")
-                .data(dataBody, d => d[0]);
-
-            // Remove old rows
-            tableRowUpdate
-                .exit()
-                .attr("class", "exit")
-                .transition()
-                .delay(200)
-                .duration(1000)
-                .style("opacity", 0.0)
-                .remove();
+                .data(dataBody);
 
             // Add new rows
-            const tableRowEnter = tableRowUpdate.enter().append("tr");
+            row.enter().append("tr");
 
-            // Merge rows
-            const row = tableRowUpdate.merge(tableRowEnter);
-
-            // Data join cells
-            const tableCellUpdate = row
-                .selectAll("td")
-                .attr("class", "lala")
-                .data(d => d, d => d[0]);
-            tableCellUpdate.attr("class", "cell update");
-            // Remove old cells
-            tableCellUpdate
-                .exit()
-                .attr("class", "cell exit")
+            // Remove old rows
+            row.exit()
+                .attr("class", "row exit")
                 .transition()
                 .delay(200)
                 .duration(1000)
                 .style("opacity", 0.0)
                 .remove();
 
-            // Add new cells
-            const tableCellEnter = tableCellUpdate
-                .enter()
-                .append("td")
+            // Data join cells
+            const cell = row.selectAll("td").data(d => {
+                console.log("cell data", d);
+                return d;
+            });
+            console.log("cell", row, cell);
+            cell.html(d => {
+                console.log("cell html", d);
+                return d[0];
+            });
 
+            // Add new cells
+            cell.enter()
+                .append("td")
+                /*
                 .style("opacity", 0.0)
                 .attr("class", "cell enter")
                 .transition()
                 .delay(1200)
                 .duration(1000)
-                .style("opacity", 1.0);
-
-            // Merge cells
-            tableCellUpdate.merge(tableCellEnter).html(d => d);
+                .style("opacity", 1.0)
+                */
+                .html(d => {
+                    console.log("enter html", d);
+                    return d[0];
+                });
         };
 
         if (dataHead.length) {
