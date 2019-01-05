@@ -551,6 +551,8 @@ class Map {
                 this.zoomLevel = "initial";
             }
             this._updateCurrent();
+        } else {
+            this._ports.update();
         }
     }
 
@@ -560,8 +562,6 @@ class Map {
      * @private
      */
     _naZoomed() {
-        this._setZoomLevelAndData();
-
         /**
          * D3 transform ({@link https://github.com/d3/d3-zoom/blob/master/src/transform.js})
          * @external Transform
@@ -581,12 +581,16 @@ class Map {
             .translate(this._currentTranslate.x, this._currentTranslate.y)
             .scale(roundToThousands(d3Event.transform.k));
 
+        this._ports.filterVisible(zoomTransform);
+
         this._displayMap(zoomTransform);
         this._grid.transform(zoomTransform);
         this._ports.transform(zoomTransform);
         this._journey.transform(zoomTransform);
         this._pbZone.transform(zoomTransform);
         this._f11.transform(zoomTransform);
+
+        this._setZoomLevelAndData();
     }
 
     _init() {
