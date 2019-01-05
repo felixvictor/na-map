@@ -24,7 +24,7 @@ export default class ListShipBlueprints {
         this._modalId = `modal-${this._baseId}`;
 
         this._defaultWood = {
-            frame: "Fir",
+            frame: "Fir Log",
             trim: "Crew Space"
         };
         this._woodsSelected = [];
@@ -44,21 +44,25 @@ export default class ListShipBlueprints {
     }
 
     _injectModal() {
-        insertBaseModal(this._modalId, this._baseName);
+        insertBaseModal(this._modalId, this._baseName, "md");
 
         const id = `${this._baseId}-ship-select`;
         const body = d3Select(`#${this._modalId} .modal-body`);
-        body.append("label").attr("for", id);
-        body.append("select")
+        let row = body.append("div").classed("row no-gutters mb-2", true);
+        row.append("label").attr("for", id);
+        row.append("select")
             .attr("name", id)
             .attr("id", id);
 
+        row = body.append("div").classed("row no-gutters", true);
+
         ["frame", "trim"].forEach(type => {
             const selectId = `${this._baseId}-${type}-select`;
-            body.append("label").attr("for", selectId);
-            body.append("select")
+            row.append("label").attr("for", selectId);
+            row.append("select")
                 .attr("name", selectId)
-                .attr("id", selectId);
+                .attr("id", selectId)
+                .classed("pr-2", true);
         });
 
         this._blueprintList = body
@@ -89,15 +93,17 @@ export default class ListShipBlueprints {
             }
             return 0;
         });
-        const trimSelectData = this._woodData.trim.sort((a, b) => {
-            if (a.name < b.name) {
-                return -1;
-            }
-            if (a.name > b.name) {
-                return 1;
-            }
-            return 0;
-        });
+        const trimSelectData = this._woodData.trim
+            .filter(trim => trim.name !== "Light")
+            .sort((a, b) => {
+                if (a.name < b.name) {
+                    return -1;
+                }
+                if (a.name > b.name) {
+                    return 1;
+                }
+                return 0;
+            });
 
         this._woodOptions.frame = frameSelectData.map(wood => `<option value="${wood.name}">${wood.name}</option>`);
         this._woodOptions.trim = trimSelectData.map(wood => `<option value="${wood.name}">${wood.name}</option>`);
@@ -124,7 +130,7 @@ export default class ListShipBlueprints {
         select$
             .addClass("selectpicker")
             .on("change", event => this._blueprintSelected(event))
-            .selectpicker({ noneSelectedText: "Select blueprint" })
+            .selectpicker({ noneSelectedText: "Select blueprint", width: "fit" })
             .val("default")
             .selectpicker("refresh");
     }
@@ -133,7 +139,7 @@ export default class ListShipBlueprints {
         select$
             .addClass("selectpicker")
             .on("change", () => this._woodSelected(type, select$))
-            .selectpicker({ noneSelectedText: `Select ${type}` })
+            .selectpicker({ noneSelectedText: `Select ${type}`, width: "fit" })
             .val("default")
             .selectpicker("refresh");
     }
@@ -152,18 +158,21 @@ export default class ListShipBlueprints {
         this._setupSelectListener();
     }
 
-    _setOtherSelect(type) {
-        const otherType = type === "frame" ? "trim" : "frame";
-        if (this._woodsSelected[otherType] === this._defaultWood[otherType]) {
-            $(`#${this._baseId}-${otherType}-select`)
-                .val(this._defaultWood[otherType])
-                .selectpicker("refresh");
-        }
+    _setWoodSelect(type) {
+        $(`#${this._baseId}-${type}-select`)
+            .removeAttr("disabled")
+            .val(this._defaultWood[type].replace(" Log", ""))
+            .selectpicker("refresh");
     }
 
     _woodSelected(type, select$) {
         this._woodsSelected[type] = select$.val();
-        this._setOtherSelect(type);
+        this._woodsSelected[type] += !(
+            this._woodsSelected[type] === "Bermuda Cedar" || this._woodsSelected[type] === "Crew Space"
+        )
+            ? " Log"
+            : "";
+        this._updateText();
     }
 
     _listSelected() {
@@ -274,26 +283,21 @@ export default class ListShipBlueprints {
                 .remove();
 
             // Add new rows
-            const tableRowEnter = tableRowUpdate
-                .enter()
-                .append("tr")
-                .style("opacity", 0.0)
-                .attr("class", "enter")
-                .transition()
-                .delay(1200)
-                .duration(1000)
-                .style("opacity", 1.0);
+            const tableRowEnter = tableRowUpdate.enter().append("tr");
 
             // Merge rows
             const row = tableRowUpdate.merge(tableRowEnter);
 
             // Data join cells
-            const tableCellUpdate = row.selectAll("td").data(d => d);
-            tableCellUpdate.attr("class", "update");
+            const tableCellUpdate = row
+                .selectAll("td")
+                .attr("class", "lala")
+                .data(d => d, d => d[0]);
+            tableCellUpdate.attr("class", "cell update");
             // Remove old cells
             tableCellUpdate
                 .exit()
-                .attr("class", "exit")
+                .attr("class", "cell exit")
                 .transition()
                 .delay(200)
                 .duration(1000)
@@ -306,7 +310,7 @@ export default class ListShipBlueprints {
                 .append("td")
 
                 .style("opacity", 0.0)
-                .attr("class", "center")
+                .attr("class", "cell enter")
                 .transition()
                 .delay(1200)
                 .duration(1000)
@@ -328,30 +332,27 @@ export default class ListShipBlueprints {
      * @private
      */
     _updateText() {
-        const shipData = [
-            ["Ship rate", getOrdinal(this._currentBlueprintData.ship.rate)],
-            ["Craft level", formatInt(this._currentBlueprintData.craftLevel)],
-            ["Shipyard level", formatInt(this._currentBlueprintData.shipyardLevel)],
-            ["Labour hours", formatInt(this._currentBlueprintData.labourHours)],
-            ["Craft experience gained", formatInt(this._currentBlueprintData.craftXP)]
-        ];
+        const extraData = [];
         if (this._currentBlueprintData.doubloons) {
-            shipData.push(["Doubloons", formatInt(this._currentBlueprintData.doubloons)]);
+            extraData.push(["Doubloons", formatInt(this._currentBlueprintData.doubloons)]);
         }
-        shipData.push(["Provisions", formatInt(this._currentBlueprintData.provisions)]);
+        extraData.push(["Provisions", formatInt(this._currentBlueprintData.provisions)]);
         if (this._currentBlueprintData.permit) {
-            shipData.push(["Permit", formatInt(this._currentBlueprintData.permit)]);
+            extraData.push(["Permit", formatInt(this._currentBlueprintData.permit)]);
         }
+        extraData.push(["Craft level", formatInt(this._currentBlueprintData.craftLevel)]);
+        extraData.push(["Shipyard level", formatInt(this._currentBlueprintData.shipyardLevel)]);
+        extraData.push(["Labour hours", formatInt(this._currentBlueprintData.labourHours)]);
+        extraData.push(["Craft experience", formatInt(this._currentBlueprintData.craftXP)]);
 
         const resourcesData = this._currentBlueprintData.resources.map(resource => [
             resource.name,
             formatInt(resource.amount)
         ]);
 
-        const woodsData = this._currentBlueprintData.frames
-            .filter(frame => frame.name === this._woodsSelected.frame)
-            .map(frame => [frame.name, formatInt(frame.amount)]);
-        console.log("vorher", resourcesData, woodsData, this._woodsSelected);
+        let frameAmount = 0;
+        let trimAmount = 0;
+        console.log("vorher", resourcesData, this._woodsSelected);
         if (this._woodsSelected.trim === "Crew Space") {
             const index = resourcesData.findIndex(resource => resource[0] === "Hemp");
             resourcesData[index][1] = formatInt(
@@ -359,26 +360,36 @@ export default class ListShipBlueprints {
                     this._currentBlueprintData.trims.find(trim => trim.name === "Crew Space").amount
             );
         } else {
-            const { amount } = this._currentBlueprintData.trims.find(trim => trim.name === "Planking");
-            if (this._woodsSelected.frame === this._woodsSelected.trim) {
-                woodsData[0][1] = formatInt(+woodsData[0][1] + amount);
+            trimAmount = this._currentBlueprintData.trims.find(trim => trim.name === "Planking").amount;
+            if (this._woodsSelected.trim === this._woodsSelected.frame) {
+                frameAmount += trimAmount;
             } else {
-                woodsData.push(this._woodsSelected.trim, formatInt(amount));
+                const index = resourcesData.findIndex(resource => resource[0] === this._woodsSelected.trim);
+                if (index >= 0) {
+                    resourcesData[index][1] = formatInt(+resourcesData[index][1] + frameAmount);
+                } else {
+                    resourcesData.push([this._woodsSelected.trim, formatInt(trimAmount)]);
+                }
             }
         }
-        console.log("nachher", resourcesData, woodsData);
 
-        this._updateTable(this._tables.Ship, shipData);
+        frameAmount += this._currentBlueprintData.frames.find(frame => {
+            console.log(frame);
+            return frame.name === this._woodsSelected.frame;
+        }).amount;
+
+        const index = resourcesData.findIndex(resource => resource[0] === this._woodsSelected.frame);
+        console.log("Amount", frameAmount, trimAmount, index);
+        if (index >= 0) {
+            resourcesData[index][1] = formatInt(+resourcesData[index][1] + frameAmount);
+        } else {
+            resourcesData.push([this._woodsSelected.frame, formatInt(frameAmount)]);
+        }
+
+        console.log("nachher", resourcesData);
+
+        this._updateTable(this._tables.Extra, extraData);
         this._updateTable(this._tables.Resources, resourcesData);
-        this._updateTable(this._tables.Woods, woodsData);
-    }
-
-    _enableSelects() {
-        ["frame", "trim"].forEach(type => {
-            $(`#${this._baseId}-${type}-select`)
-                .removeAttr("disabled")
-                .selectpicker("refresh");
-        });
     }
 
     /**
@@ -389,10 +400,16 @@ export default class ListShipBlueprints {
      */
     _blueprintSelected(event) {
         if (this._init) {
-            const cardDeck = this._blueprintList.append("div").classed("row no-gutters card-deck", true);
+            this._init = false;
+
+            ["frame", "trim"].forEach(type => {
+                this._setWoodSelect(type);
+            });
+
+            const cardDeck = this._blueprintList.append("div").classed("card-deck", true);
 
             const addCard = title => {
-                const card = cardDeck.append("div").classed("card col-3", true);
+                const card = cardDeck.append("div").classed("card", true);
                 card.append("div")
                     .classed("card-header", true)
                     .text(title);
@@ -402,18 +419,14 @@ export default class ListShipBlueprints {
                 this._tables[title].append("tbody");
             };
 
-            this._init = false;
-            addCard("Ship");
             addCard("Resources");
-            addCard("Woods");
+            addCard("Extra");
         }
 
         this._blueprint = $(event.currentTarget)
             .find(":selected")
             .val();
         this._currentBlueprintData = this._getBlueprintData(this._blueprint);
-
-        this._enableSelects();
 
         this._updateText();
     }
