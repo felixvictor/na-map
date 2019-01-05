@@ -128,6 +128,9 @@ text,
 
 .card-body {
     background-color: $secondary-100;
+    .table {
+        margin-bottom: 0;
+    }
 }
 
 td.update {
@@ -202,7 +205,6 @@ table a {
 
 .blueprint {
     table {
-        width: auto;
         td + td {
             text-align: right;
         }
