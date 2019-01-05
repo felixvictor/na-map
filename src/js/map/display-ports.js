@@ -859,6 +859,8 @@ export default class DisplayPorts {
 
     update(scale = null) {
         this._scale = scale || this._scale;
+
+        this._filterVisible();
         this._updateIcons();
         this._updatePortCircles();
         this.updateTexts();
@@ -867,31 +869,33 @@ export default class DisplayPorts {
         this._updateRegions();
     }
 
-    filterVisible(zoomTransform) {
-        const lowerBound = zoomTransform.invert([this._map.coord.min, this._map.coord.min]),
-            upperBound = zoomTransform.invert([this._map.width, this._map.height]);
-
+    _filterVisible() {
         this._portDataFiltered = this._portData.filter(
             port =>
-                port.geometry.coordinates[0] >= lowerBound[0] &&
-                port.geometry.coordinates[0] <= upperBound[0] &&
-                port.geometry.coordinates[1] >= lowerBound[1] &&
-                port.geometry.coordinates[1] <= upperBound[1]
+                port.geometry.coordinates[0] >= this._lowerBound[0] &&
+                port.geometry.coordinates[0] <= this._upperBound[0] &&
+                port.geometry.coordinates[1] >= this._lowerBound[1] &&
+                port.geometry.coordinates[1] <= this._upperBound[1]
         );
         this._countyPolygonFiltered = this._countyPolygon.filter(
             county =>
-                county.centroid[0] >= lowerBound[0] &&
-                county.centroid[0] <= upperBound[0] &&
-                county.centroid[1] >= lowerBound[1] &&
-                county.centroid[1] <= upperBound[1]
+                county.centroid[0] >= this._lowerBound[0] &&
+                county.centroid[0] <= this._upperBound[0] &&
+                county.centroid[1] >= this._lowerBound[1] &&
+                county.centroid[1] <= this._upperBound[1]
         );
         this._regionPolygonFiltered = this._regionPolygon.filter(
             region =>
-                region.centroid[0] >= lowerBound[0] &&
-                region.centroid[0] <= upperBound[0] &&
-                region.centroid[1] >= lowerBound[1] &&
-                region.centroid[1] <= upperBound[1]
+                region.centroid[0] >= this._lowerBound[0] &&
+                region.centroid[0] <= this._upperBound[0] &&
+                region.centroid[1] >= this._lowerBound[1] &&
+                region.centroid[1] <= this._upperBound[1]
         );
+    }
+
+    setBounds(lowerBound, upperBound) {
+        this._lowerBound = lowerBound;
+        this._upperBound = upperBound;
     }
 
     set portDataDefault(portDataDefault) {

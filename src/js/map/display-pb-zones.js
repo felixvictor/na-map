@@ -118,21 +118,22 @@ export default class DisplayPbZones {
 
     _setData() {
         if (this._ports.zoomLevel === "pbZone" && this._showPB !== "noShow") {
+            this._filterVisible();
             this._pbCircleData = {
                 type: "FeatureCollection",
-                features: this._pbCircleDataDefault.filter(d => this._isPortIn(d))
+                features: this._pbCircleDataFiltered.filter(d => this._isPortIn(d))
             };
             this._fortData = {
                 type: "FeatureCollection",
-                features: this._fortDataDefault.filter(d => this._isPortIn(d))
+                features: this._fortDataFiltered.filter(d => this._isPortIn(d))
             };
             this._towerData = {
                 type: "FeatureCollection",
-                features: this._towerDataDefault.filter(d => this._isPortIn(d))
+                features: this._towerDataFiltered.filter(d => this._isPortIn(d))
             };
             this._joinCircleData = {
                 type: "FeatureCollection",
-                features: this._joinCircleDataDefault.filter(d => this._isPortIn(d))
+                features: this._joinCircleDataFiltered.filter(d => this._isPortIn(d))
             };
         } else {
             this._pbCircleData = {};
@@ -142,6 +143,44 @@ export default class DisplayPbZones {
         }
     }
 
+    _filterVisible() {
+        this._pbCircleDataFiltered = this._pbCircleDataDefault.filter(port => {
+            return (
+                port.position[0] >= this._lowerBound[0] &&
+                port.position[0] <= this._upperBound[0] &&
+                port.position[1] >= this._lowerBound[1] &&
+                port.position[1] <= this._upperBound[1]
+            );
+        });
+        this._fortDataFiltered = this._fortDataDefault.filter(
+            port =>
+                port.position[0] >= this._lowerBound[0] &&
+                port.position[0] <= this._upperBound[0] &&
+                port.position[1] >= this._lowerBound[1] &&
+                port.position[1] <= this._upperBound[1]
+        );
+        this._towerDataFiltered = this._towerDataDefault.filter(
+            port =>
+                port.position[0] >= this._lowerBound[0] &&
+                port.position[0] <= this._upperBound[0] &&
+                port.position[1] >= this._lowerBound[1] &&
+                port.position[1] <= this._upperBound[1]
+        );
+        this._joinCircleDataFiltered = this._joinCircleDataDefault.filter(
+            port =>
+                port.position[0] >= this._lowerBound[0] &&
+                port.position[0] <= this._upperBound[0] &&
+                port.position[1] >= this._lowerBound[1] &&
+                port.position[1] <= this._upperBound[1]
+        );
+    }
+
+
+    setBounds(lowerBound, upperBound) {
+        this._lowerBound = lowerBound;
+        this._upperBound = upperBound;
+    }
+    
     refresh() {
         this._setData();
         this._update();
