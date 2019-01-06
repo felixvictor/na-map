@@ -9,13 +9,13 @@
  */
 
 import { min as d3Min, max as d3Max } from "d3-array";
+import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate";
 import { scaleLinear as d3ScaleLinear } from "d3-scale";
 import { select as d3Select } from "d3-selection";
 import Cookies from "js-cookie";
 import moment from "moment";
 import "moment/locale/en-gb";
 
-import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate";
 import {
     circleRadiusFactor,
     primary300,
@@ -530,10 +530,14 @@ export default class DisplayPorts {
             }
             if (this.showTradePortPartners) {
                 if (port.goodsToSellInTradePort.length) {
-                    h += `<tr><td class='pl-0'>Sell in ${port.tradePort}</td><td>${port.goodsToSellInTradePort}</td></tr>`;
+                    h += `<tr><td class='pl-0'>Sell in ${port.tradePort}</td><td>${
+                        port.goodsToSellInTradePort
+                    }</td></tr>`;
                 }
                 if (port.goodsToBuyInTradePort.length) {
-                    h += `<tr><td class='pl-0'>Buy in ${port.tradePort}</td><td>${port.goodsToBuyInTradePort}</td></tr>`;
+                    h += `<tr><td class='pl-0'>Buy in ${port.tradePort}</td><td>${
+                        port.goodsToBuyInTradePort
+                    }</td></tr>`;
                 }
             }
             h += "</table>";
@@ -564,7 +568,7 @@ export default class DisplayPorts {
         };
         const circleScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale);
         const circleSize = roundToThousands(this._circleSize / circleScale);
-        const data = this._portData;
+        const data = this._portDataFiltered;
 
         // Data join
         const circleUpdate = this._gIcon.selectAll("circle").data(data, d => d.id);
@@ -610,13 +614,13 @@ export default class DisplayPorts {
             rGreenZone = 0;
 
         if (this._showRadius === "tax" || this._showRadius === "net") {
-            data = this._portData.filter(d => !d.properties.nonCapturable);
+            data = this._portDataFiltered.filter(d => !d.properties.nonCapturable);
         } else if (this.showTradePortPartners) {
-            data = this._portData;
+            data = this._portDataFiltered;
         } else if (this._showRadius === "position") {
-            data = this._portData;
+            data = this._portDataFiltered;
         } else if (this._showRadius === "attack") {
-            data = this._portData.filter(port => port.properties.attackHostility);
+            data = this._portDataFiltered.filter(port => port.properties.attackHostility);
         } else if (this._showRadius === "green") {
             rGreenZone =
                 roundToThousands(
@@ -625,9 +629,11 @@ export default class DisplayPorts {
                         { x: convertCoordX(-79696, 10642), y: convertCoordY(-79696, 10642) }
                     )
                 ) * circleRadiusFactor;
-            data = this._portData.filter(port => port.properties.nonCapturable && port.properties.nation !== "FT");
+            data = this._portDataFiltered.filter(
+                port => port.properties.nonCapturable && port.properties.nation !== "FT"
+            );
         } else if (this.showCurrentGood) {
-            data = this._portData;
+            data = this._portDataFiltered;
             rMax /= 2;
         }
 
@@ -729,7 +735,7 @@ export default class DisplayPorts {
             this._gText.attr("font-size", `${fontSize}px`);
 
             // Data join
-            const textUpdate = this._gText.selectAll("text").data(this._portData, d => d.id);
+            const textUpdate = this._gText.selectAll("text").data(this._portDataFiltered, d => d.id);
 
             // Remove old text
             textUpdate.exit().remove();
@@ -773,7 +779,7 @@ export default class DisplayPorts {
         if (this._zoomLevel !== "portLabel") {
             this._gCounty.classed("d-none", true);
         } else {
-            const data = this._countyPolygon;
+            const data = this._countyPolygonFiltered;
 
             // Data join
             const countyUpdate = this._gCounty.selectAll("text").data(data);
@@ -814,7 +820,7 @@ export default class DisplayPorts {
         if (this._zoomLevel !== "initial") {
             this._gRegion.classed("d-none", true);
         } else {
-            const data = this._regionPolygon;
+            const data = this._regionPolygonFiltered;
 
             // Data join
             const regionUpdate = this._gRegion.selectAll("text").data(data);
@@ -852,12 +858,43 @@ export default class DisplayPorts {
 
     update(scale = null) {
         this._scale = scale || this._scale;
+
+        this._filterVisible();
         this._updateIcons();
         this._updatePortCircles();
         this.updateTexts();
         this._updateSummary();
         this._updateCounties();
         this._updateRegions();
+    }
+
+    _filterVisible() {
+        this._portDataFiltered = this._portData.filter(
+            port =>
+                port.geometry.coordinates[0] >= this._lowerBound[0] &&
+                port.geometry.coordinates[0] <= this._upperBound[0] &&
+                port.geometry.coordinates[1] >= this._lowerBound[1] &&
+                port.geometry.coordinates[1] <= this._upperBound[1]
+        );
+        this._countyPolygonFiltered = this._countyPolygon.filter(
+            county =>
+                county.centroid[0] >= this._lowerBound[0] &&
+                county.centroid[0] <= this._upperBound[0] &&
+                county.centroid[1] >= this._lowerBound[1] &&
+                county.centroid[1] <= this._upperBound[1]
+        );
+        this._regionPolygonFiltered = this._regionPolygon.filter(
+            region =>
+                region.centroid[0] >= this._lowerBound[0] &&
+                region.centroid[0] <= this._upperBound[0] &&
+                region.centroid[1] >= this._lowerBound[1] &&
+                region.centroid[1] <= this._upperBound[1]
+        );
+    }
+
+    setBounds(lowerBound, upperBound) {
+        this._lowerBound = lowerBound;
+        this._upperBound = upperBound;
     }
 
     set portDataDefault(portDataDefault) {
