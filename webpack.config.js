@@ -258,8 +258,8 @@ const config = {
     },
 
     output: {
-        chunkFilename: isProd ? "[name].[chunkhash:8].js" : "[name].js",
-        filename: isProd ? "[name].[contenthash:8].js" : "[name].js",
+        chunkFilename: isProd ? "[name].[chunkhash].js" : "[name].js",
+        filename: isProd ? "[name].[contenthash].js" : "[name].js",
         path: outputPath,
         crossOriginLoading: "anonymous"
     },
@@ -278,7 +278,7 @@ const config = {
         new CleanWebpackPlugin(outputPath, {
             verbose: false
         }),
-        new MiniCssExtractPlugin({ filename: isProd ? "[name].[contenthash:8].css" : "[name].css" }),
+        new MiniCssExtractPlugin({ filename: isProd ? "[name].[contenthash].css" : "[name].css" }),
         new webpack.DefinePlugin({
             CPRIMARY300: JSON.stringify(primary300),
             CGREEN: JSON.stringify(colourGreen),
