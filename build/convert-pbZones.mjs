@@ -68,6 +68,7 @@ function convertPBZones() {
                 const feature = {
                     type: "Feature",
                     id: port.id,
+                    properties: {position: port.position},
                     geometry: {
                         type: "MultiPoint",
                         coordinates: port.features.find(features => element === features.type).coord
@@ -92,6 +93,10 @@ function convertPBZones() {
         setJoinCircles(port);
         return {
             id: port.Id,
+            position: [
+                Math.round(convertCoordX(port.Position.x, port.Position.z)),
+                Math.round(convertCoordY(port.Position.x, port.Position.z))
+            ],
             features: [
                 { type: "pbCircles", coord: pbCircles },
                 { type: "forts", coord: pbForts },
