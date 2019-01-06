@@ -19,7 +19,7 @@ import "../../scss/roundslider.scss";
 import Cookies from "js-cookie";
 import { compassDirections, degreesToRadians, displayCompass, getUserWind, printSmallCompassRose } from "../util";
 import { registerEvent } from "../analytics";
-import { insertBaseModal } from "../common";
+import { degreesPerSecond, insertBaseModal } from "../common";
 
 export default class WindRose {
     constructor() {
@@ -35,9 +35,6 @@ export default class WindRose {
         this._windArrowWidth = 4;
 
         this._intervalSeconds = 40;
-        const secondsForFullCircle = 48 * 60;
-        const fullCircle = 360;
-        this._degreesPerSecond = fullCircle / secondsForFullCircle;
 
         this._baseName = "In-game wind";
         this._baseId = "ingame-wind";
@@ -91,7 +88,7 @@ export default class WindRose {
             const time = Cookies.get(this._cookieTime);
             // Difference in seconds since wind has been stored
             const diffSeconds = Math.round((Date.now() - time) / 1000);
-            this._currentWindDegrees = 360 + (Math.floor(wind - this._degreesPerSecond * diffSeconds) % 360);
+            this._currentWindDegrees = 360 + (Math.floor(wind - degreesPerSecond * diffSeconds) % 360);
         }
         return wind;
     }
@@ -224,8 +221,7 @@ export default class WindRose {
     }
 
     _windChange() {
-        this._currentWindDegrees =
-            360 + ((this._currentWindDegrees - this._degreesPerSecond * this._intervalSeconds) % 360);
+        this._currentWindDegrees = 360 + ((this._currentWindDegrees - degreesPerSecond * this._intervalSeconds) % 360);
 
         this._updateWindDirection();
     }
