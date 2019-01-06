@@ -22,6 +22,9 @@ import {
     faChevronLeft,
     faChevronRight,
     faPaste,
+    faSort,
+    faSortDown,
+    faSortUp,
     faTimes,
     faTrash
 } from "@fortawesome/fontawesome-free-solid";
@@ -54,7 +57,9 @@ function main() {
     function getServerName() {
         // Use default value if cookie is not stored
         const r = Cookies.get(serverNameCookieName) || serverNameDefault;
-        $(`#server-name-${r}`).prop("checked", true);
+
+        document.getElementById(`server-name-${r}`).checked = true;
+
         return r;
     }
 
@@ -81,7 +86,7 @@ function main() {
      * @return {void}
      */
     const serverNameSelected = () => {
-        serverName = $("input[name='serverName']:checked").val();
+        serverName = document.querySelector("input[name='serverName']:checked").value;
         storeServerName();
         document.location.reload();
     };
@@ -91,7 +96,7 @@ function main() {
      * @return {void}
      */
     const setupListener = () => {
-        $("#server-name").change(() => serverNameSelected());
+        document.getElementById("server-name").addEventListener("change", () => serverNameSelected());
 
         // https://stackoverflow.com/questions/44467377/bootstrap-4-multilevel-dropdown-inside-navigation/48953349#48953349
         $(".dropdown-submenu > a").on("click", event => {
@@ -142,15 +147,18 @@ function main() {
     };
 
     fontawesome.library.add(
-        faCalendar,
-        faCalendarCheck,
-        faClock,
-        faCopy,
         faArrowDown,
         faArrowUp,
+        faCalendar,
+        faCalendarCheck,
         faChevronLeft,
         faChevronRight,
+        faClock,
+        faCopy,
         faPaste,
+        faSort,
+        faSortDown,
+        faSortUp,
         faTimes,
         faTrash
     );
