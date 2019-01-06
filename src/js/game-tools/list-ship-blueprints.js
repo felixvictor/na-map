@@ -267,49 +267,29 @@ export default class ListShipBlueprints {
 
         const addBody = () => {
             // Data join rows
-            const row = elem
+            const rows = elem
                 .select("tbody")
                 .selectAll("tr")
                 .data(dataBody);
 
-            // Add new rows
-            row.enter().append("tr");
-
             // Remove old rows
-            row.exit()
-                .attr("class", "row exit")
-                .transition()
-                .delay(200)
-                .duration(1000)
-                .style("opacity", 0.0)
-                .remove();
+            rows.exit().remove();
+
+            // Add new rows
+            const rowsEnter = rows.enter().append("tr");
+            rowsEnter
+                .selectAll("td")
+                .data(d => d)
+                .enter()
+                .append("td")
+                .html(d => d);
 
             // Data join cells
-            const cell = row.selectAll("td").data(d => {
-                console.log("cell data", d);
-                return d;
-            });
-            console.log("cell", row, cell);
-            cell.html(d => {
-                console.log("cell html", d);
-                return d[0];
-            });
+            const cells = rows.selectAll("td").data(d => d);
 
             // Add new cells
-            cell.enter()
-                .append("td")
-                /*
-                .style("opacity", 0.0)
-                .attr("class", "cell enter")
-                .transition()
-                .delay(1200)
-                .duration(1000)
-                .style("opacity", 1.0)
-                */
-                .html(d => {
-                    console.log("enter html", d);
-                    return d[0];
-                });
+            cells.enter().append("td");
+            cells.html(d => d);
         };
 
         if (dataHead.length) {
@@ -342,17 +322,15 @@ export default class ListShipBlueprints {
             formatInt(resource.amount)
         ]);
 
+        let frameAdded = false;
+        let trimAdded = false;
         let frameAmount = 0;
-        let trimAmount = 0;
-        console.log("vorher", resourcesData, this._woodsSelected);
         if (this._woodsSelected.trim === "Crew Space") {
+            const hempAmount = this._currentBlueprintData.trims.find(trim => trim.name === "Crew Space").amount;
             const index = resourcesData.findIndex(resource => resource[0] === "Hemp");
-            resourcesData[index][1] = formatInt(
-                +resourcesData[index][1] +
-                    this._currentBlueprintData.trims.find(trim => trim.name === "Crew Space").amount
-            );
+            resourcesData[index][1] = formatInt(+resourcesData[index][1] + hempAmount);
         } else {
-            trimAmount = this._currentBlueprintData.trims.find(trim => trim.name === "Planking").amount;
+            const trimAmount = this._currentBlueprintData.trims.find(trim => trim.name === "Planking").amount;
             if (this._woodsSelected.trim === this._woodsSelected.frame) {
                 frameAmount += trimAmount;
             } else {
@@ -360,25 +338,30 @@ export default class ListShipBlueprints {
                 if (index >= 0) {
                     resourcesData[index][1] = formatInt(+resourcesData[index][1] + frameAmount);
                 } else {
+                    trimAdded = true;
                     resourcesData.push([this._woodsSelected.trim, formatInt(trimAmount)]);
                 }
             }
         }
 
-        frameAmount += this._currentBlueprintData.frames.find(frame => {
-            console.log(frame);
-            return frame.name === this._woodsSelected.frame;
-        }).amount;
-
+        frameAmount += this._currentBlueprintData.frames.find(frame => frame.name === this._woodsSelected.frame).amount;
         const index = resourcesData.findIndex(resource => resource[0] === this._woodsSelected.frame);
-        console.log("Amount", frameAmount, trimAmount, index);
         if (index >= 0) {
             resourcesData[index][1] = formatInt(+resourcesData[index][1] + frameAmount);
         } else {
+            frameAdded = true;
             resourcesData.push([this._woodsSelected.frame, formatInt(frameAmount)]);
         }
 
-        console.log("nachher", resourcesData);
+        // Order frame before trim
+        if (frameAdded && trimAdded) {
+            const frameIndex = resourcesData.length - 1;
+            console.log(frameIndex);
+            [resourcesData[frameIndex], resourcesData[frameIndex - 1]] = [
+                resourcesData[frameIndex - 1],
+                resourcesData[frameIndex]
+            ];
+        }
 
         this._updateTable(this._tables.Extra, extraData);
         this._updateTable(this._tables.Resources, resourcesData);
