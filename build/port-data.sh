@@ -84,6 +84,7 @@ function common_var () {
     cannon_file="${gen_dir}/cannons.json"
     building_file="${gen_dir}/buildings.json"
     recipe_file="${gen_dir}/recipes.json"
+    ship_blueprint_file="${gen_dir}/ship-blueprints.json"
     ownership_json="${gen_dir}/ownership.json"
     nation_file="${gen_dir}/nations.json"
     loot_file="${gen_dir}/loot.json"
@@ -196,6 +197,7 @@ function get_port_data () {
         ${command_nodejs} build/convert-buildings.mjs "${api_base_file}-${server_names[0]}" "${building_file}" "${date}"
         ${command_nodejs} build/convert-loot.mjs "${api_base_file}-${server_names[0]}" "${loot_file}" "${date}"
         ${command_nodejs} build/convert-recipes.mjs "${api_base_file}-${server_names[0]}" "${recipe_file}" "${date}"
+        ${command_nodejs} build/convert-ship-blueprints.mjs "${api_base_file}-${server_names[0]}" "${ship_blueprint_file}" "${date}"
         if [ "${script_run_type}" == "update" ]; then
             ${command_nodejs} build/convert-ownership.mjs "${api_dir}" "api-${server_names[0]}-Ports" "${ownership_json}" "${nation_file}"
         fi

@@ -15,6 +15,7 @@ import ListCannons from "./list-cannons";
 import ListIngredients from "./list-ingredients";
 import ListModules from "./list-modules";
 import ListPortOwnerships from "./list-port-ownerships";
+import ListShipBlueprints from "./list-ship-blueprints";
 import ListRecipes from "./list-recipes";
 import ListWoods from "./list-woods";
 import { checkFetchStatus, getJsonFromFetch, putFetchError } from "../util";
@@ -60,6 +61,10 @@ const dataSources = [
     {
         fileName: "nations.json",
         name: "nations"
+    },
+    {
+        fileName: "ship-blueprints.json",
+        name: "blueprints"
     }
 ];
 
@@ -73,24 +78,19 @@ const setupData = data => {
     const woodCompare = new CompareWoods(data.woods, "wood");
     const woodList = new ListWoods(data.woods);
 
-    const cannonData = JSON.parse(JSON.stringify(data.cannons));
-    const cannonList = new ListCannons(cannonData);
+    const cannonList = new ListCannons(data.cannons);
 
-    const ownershipData = JSON.parse(JSON.stringify(data.ownership)),
-        nationData = JSON.parse(JSON.stringify(data.nations));
-    const ownershipList = new ListPortOwnerships(ownershipData, nationData);
+    const ownershipList = new ListPortOwnerships(data.ownership, data.nations);
 
-    const moduleData = JSON.parse(JSON.stringify(data.modules));
-    const moduleList = new ListModules(moduleData);
+    const moduleList = new ListModules(data.modules);
 
-    const recipeData = JSON.parse(JSON.stringify(data.recipes.recipe));
-    const recipeList = new ListRecipes(recipeData, moduleData);
+    const recipeList = new ListRecipes(data.recipes.recipe, data.modules);
 
-    const ingredientData = JSON.parse(JSON.stringify(data.recipes.ingredient));
-    const ingredientList = new ListIngredients(ingredientData, moduleData);
+    const ingredientList = new ListIngredients(data.recipes.ingredient, data.modules);
 
-    const buildingData = JSON.parse(JSON.stringify(data.buildings));
-    const buildingList = new ListBuildings(buildingData);
+    const buildingList = new ListBuildings(data.buildings);
+
+    const blueprintList = new ListShipBlueprints(data.blueprints.shipBlueprints, data.woods);
 };
 
 /**
