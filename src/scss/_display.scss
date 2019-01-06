@@ -122,16 +122,15 @@ text,
 }
 
 .card-header {
-    background-color: $secondary-100;
+    background-color: $secondary-200;
     border-bottom: none;
 }
 
 .card-body {
-    background-color: $secondary-050;
-}
-
-.table .table {
-    background-color: $primary-100;
+    background-color: $secondary-100;
+    .table {
+        margin-bottom: 0;
+    }
 }
 
 table tr,
@@ -148,6 +147,16 @@ p {
         vertical-align: top;
         border-top: none;
     }
+
+    td:first-child,
+    th:first-child {
+        padding-left: 0;
+    }
+
+    td:last-child,
+    th:last-child {
+        padding-right: 0;
+    }
 }
 
 p a,
@@ -156,11 +165,6 @@ table a {
     @include hover-focus {
         text-decoration-style: solid !important;
     }
-}
-
-.table-sm th,
-.table-sm td {
-    padding: $paddingThird;
 }
 
 .ship-base,
@@ -183,6 +187,14 @@ table a {
 .ship-compare {
     .light {
         background-color: $secondary-100;
+    }
+}
+
+.blueprint {
+    table {
+        td + td {
+            text-align: right;
+        }
     }
 }
 
@@ -536,10 +548,11 @@ table a {
 
 .f11 {
     circle {
-        fill: $secondary-100;
+        fill: $secondary-900;
+        fill-opacity: 1;
     }
     text {
-        fill: $white;
+        fill: $secondary-900;
         text-anchor: end;
     }
 }
