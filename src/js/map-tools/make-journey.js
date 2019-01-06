@@ -31,7 +31,15 @@ import {
     rotationAngleInDegrees
 } from "../util";
 import { registerEvent } from "../analytics";
-import { convertInvCoordX, convertInvCoordY, getDistance, insertBaseModal, speedFactor } from "../common";
+import {
+    convertInvCoordX,
+    convertInvCoordY,
+    degreesPerSecond,
+    fullCircle,
+    getDistance,
+    insertBaseModal,
+    speedFactor
+} from "../common";
 import CompareShips from "../game-tools/compare-ships";
 import CompareWoods from "../game-tools/compare-woods";
 
@@ -43,8 +51,6 @@ export default class Journey {
      * @param {object} shipData - Ship data
      * @param {object} woodData - Wood data
      * @param {number} fontSize - Font size
-     * @param {number} topMargin - Top margin
-     * @param {number} rightMargin - Right margin
      */
     constructor(shipData, woodData, fontSize) {
         this._shipData = shipData;
@@ -59,14 +65,12 @@ export default class Journey {
 
         this._labelPadding = 20;
 
-        this._minutesForFullCircle = 48;
-        this._fullCircle = 360;
-        this._degreesPerMinute = this._fullCircle / this._minutesForFullCircle;
+        this._degreesPerMinute = degreesPerSecond / 60;
         this._degreesSegment = 15;
         this._minOWSpeed = 2;
         this._owSpeedFactor = 2;
 
-        this._speedScale = d3ScaleLinear().domain(d3Range(0, this._fullCircle, this._degreesSegment));
+        this._speedScale = d3ScaleLinear().domain(d3Range(0, fullCircle, this._degreesSegment));
 
         this._defaultShipName = "None";
         this._defaultShipSpeed = 19;
@@ -314,7 +318,7 @@ export default class Journey {
     }
 
     _calculateDistanceForSection(degreesCourse, degreesCurrentWind) {
-        const degreesForSpeedCalc = (this._fullCircle - degreesCourse + degreesCurrentWind) % this._fullCircle,
+        const degreesForSpeedCalc = (fullCircle - degreesCourse + degreesCurrentWind) % fullCircle,
             speedCurrentSection = this._getSpeedAtDegrees(degreesForSpeedCalc) * this._owSpeedFactor,
             distanceCurrentSection = speedCurrentSection * speedFactor;
         /*
@@ -377,7 +381,7 @@ export default class Journey {
                 totalMinutesSegment += distanceRemaining / distanceCurrentSection;
                 distanceRemaining = 0;
             }
-            currentWindDegrees = (this._fullCircle + currentWindDegrees - this._degreesPerMinute) % this._fullCircle;
+            currentWindDegrees = (fullCircle + currentWindDegrees - this._degreesPerMinute) % fullCircle;
 
             // console.log({ distanceCurrentSection }, { totalMinutesSegment });
         }
