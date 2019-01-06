@@ -29,7 +29,7 @@ import {
     printCompassRose
 } from "../util";
 import { registerEvent } from "../analytics";
-import { insertBaseModal } from "../common";
+import { degreesPerSecond, insertBaseModal } from "../common";
 
 export default class PredictWind {
     constructor() {
@@ -217,10 +217,7 @@ export default class PredictWind {
     _predictWind(currentUserWind, predictUserTime) {
         moment.locale("en-gb");
 
-        const secondsForFullCircle = 48 * 60,
-            fullCircle = 360,
-            degreesPerSecond = fullCircle / secondsForFullCircle,
-            timeFormat = "H.mm";
+        const timeFormat = "H.mm";
         let currentWindDegrees;
 
         const regex = /(\d+)[\s:.](\d+)/,
