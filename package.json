@@ -1,6 +1,6 @@
 {
     "name": "na-map",
-    "version": "8.1",
+    "version": "8.1.1",
     "description": "Naval Action map",
     "devDependencies": {
         "@babel/core": "7.2.2",
@@ -116,7 +116,7 @@
         "data-change": "build/port-data.sh change",
         "data-change-tweets": "build/port-data.sh twitter-change",
         "deploy-change": "TARGET=na-map yarn run change && yarn run deploy-netlify",
-        "deploy-netlify": "netlify deploy --prod --dir public --site 473eea6a-ae7f-4ba3-8c1f-8eab69d012e2",
+        "deploy-netlify": "netlify deploy --prod --dir public --site a0923d1d-8ced-450e-b105-6d2a6368a5fa",
         "deploy-netlify-test": "netlify deploy --prod --dir public --site d3473b20-38e5-4229-8e1c-e288f0ea455e",
         "deploy-netlify-test2": "netlify deploy --prod --dir public --site 57f59c8d-a0e3-4f6e-baed-e4f48fa9c815",
         "deploy-test": "TARGET=na-map-test yarn run change && yarn run deploy-netlify-test",
