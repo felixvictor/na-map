@@ -260,10 +260,10 @@ class Map {
         this._shipData = JSON.parse(JSON.stringify(data.ships.shipData));
 
         this._journey = new Journey(this._shipData, this._woodData, this.rem);
+        this._windPrediction = new PredictWind();
 
         this._init();
 
-        this._windPrediction = new PredictWind();
         this._windRose = new WindRose();
         this._portSelect = new SelectPorts(this._ports, this._pbZone);
 
