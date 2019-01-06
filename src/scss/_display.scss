@@ -561,10 +561,11 @@ table a {
 
 .f11 {
     circle {
-        fill: $secondary-100;
+        fill: $secondary-900;
+        fill-opacity: 1;
     }
     text {
-        fill: $white;
+        fill: $secondary-900;
         text-anchor: end;
     }
 }
