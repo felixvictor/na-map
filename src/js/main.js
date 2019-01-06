@@ -57,10 +57,7 @@ function main() {
     function getServerName() {
         // Use default value if cookie is not stored
         const r = Cookies.get(serverNameCookieName) || serverNameDefault;
-        console.log("getServerName");
-        console.log({ r }, { serverNameCookieName }, Cookies.get(serverNameCookieName), { serverNameDefault });
-        console.log(document.getElementById("navbarSupportedContent"));
-        console.log(document.getElementById(`server-name-${r}`));
+        
         document.getElementById(`server-name-${r}`).checked = true;
 
         return r;
