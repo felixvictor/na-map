@@ -214,10 +214,11 @@ class Map {
             const portIds = portData.features.filter(port => !port.properties.nonCapturable).map(port => port.id);
             return object
                 .filter(port => portIds.includes(port.id))
-                .map(d => ({
+                .map(port => ({
                     type: "Feature",
-                    id: d.id,
-                    geometry: d.geometry
+                    id: port.id,
+                    position: port.properties.position,
+                    geometry: port.geometry
                 }));
         };
 
@@ -530,12 +531,6 @@ class Map {
         this.zoomAndPan(x, y, 1);
     }
 
-    _updateCurrent() {
-        this._pbZone.refresh();
-        this._grid.update();
-        this._ports.update(this._currentScale);
-    }
-
     _setZoomLevelAndData() {
         if (d3Event.transform.k !== this._currentScale) {
             this._currentScale = d3Event.transform.k;
@@ -550,8 +545,10 @@ class Map {
             } else if (this._zoomLevel !== "initial") {
                 this.zoomLevel = "initial";
             }
-            this._updateCurrent();
+            this._grid.update();
         }
+        this._pbZone.refresh();
+        this._ports.update(this._currentScale);
     }
 
     /**
@@ -560,8 +557,6 @@ class Map {
      * @private
      */
     _naZoomed() {
-        this._setZoomLevelAndData();
-
         /**
          * D3 transform ({@link https://github.com/d3/d3-zoom/blob/master/src/transform.js})
          * @external Transform
@@ -569,7 +564,6 @@ class Map {
          * @property {number} y - Y Coordinate
          * @property {number} k - Scale factor
          */
-
         this._currentTranslate.x = Math.floor(d3Event.transform.x);
         this._currentTranslate.y = Math.floor(d3Event.transform.y);
 
@@ -581,12 +575,19 @@ class Map {
             .translate(this._currentTranslate.x, this._currentTranslate.y)
             .scale(roundToThousands(d3Event.transform.k));
 
+        const lowerBound = zoomTransform.invert([this.coord.min, this.coord.min]),
+            upperBound = zoomTransform.invert([this.width, this.height]);
+        this._ports.setBounds(lowerBound, upperBound);
+        this._pbZone.setBounds(lowerBound, upperBound);
+
         this._displayMap(zoomTransform);
         this._grid.transform(zoomTransform);
         this._ports.transform(zoomTransform);
         this._journey.transform(zoomTransform);
         this._pbZone.transform(zoomTransform);
         this._f11.transform(zoomTransform);
+
+        this._setZoomLevelAndData();
     }
 
     _init() {
