@@ -356,7 +356,6 @@ export default class ListShipBlueprints {
         // Order frame before trim
         if (frameAdded && trimAdded) {
             const frameIndex = resourcesData.length - 1;
-            console.log(frameIndex);
             [resourcesData[frameIndex], resourcesData[frameIndex - 1]] = [
                 resourcesData[frameIndex - 1],
                 resourcesData[frameIndex]
