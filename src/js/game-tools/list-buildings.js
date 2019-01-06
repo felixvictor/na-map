@@ -98,7 +98,9 @@ export default class ListBuildings {
                 text += '<table class="table table-sm"><tbody>';
                 text += `<tr><td>${getCurrencyAmount(currentBuilding.resource.price)} per unit</td></tr>`;
                 if (typeof currentBuilding.batch !== "undefined") {
-                    text += `<tr><td>Batch of ${currentBuilding.batch.amount} units at ${getCurrencyAmount(currentBuilding.batch.price)}</td></tr>`;
+                    text += `<tr><td>Batch of ${currentBuilding.batch.amount} units at ${getCurrencyAmount(
+                        currentBuilding.batch.price
+                    )}</td></tr>`;
                 }
                 text += "</tbody></table>";
             }
@@ -122,7 +124,7 @@ export default class ListBuildings {
             text += "<tr><th>Level</th><th>Level build materials</th></tr>";
             text += "</thead><tbody>";
             currentBuilding.levels.forEach((level, i) => {
-                text += `<tr><td>${i}</td><td class="text-left">`;
+                text += `<tr><td>${i + 1}</td><td class="text-left">`;
                 text += level.materials.map(material => `${formatInt(material.amount)} ${material.item}`).join("<br>");
                 text += "</td></tr>";
             });
@@ -131,7 +133,7 @@ export default class ListBuildings {
                 "<tr><th>Level</th><th>Production (units)</th><th>Labour cost (%)</th><th>Storage (units)</th><th>Build price (reals)</th></tr>";
             text += "</thead><tbody>";
             currentBuilding.levels.forEach((level, i) => {
-                text += `<tr><td>${i}</td><td>${formatInt(level.production)}</td><td>${formatInt(
+                text += `<tr><td>${i + 1}</td><td>${formatInt(level.production)}</td><td>${formatInt(
                     level.labourDiscount * -100
                 )}</td><td>${formatInt(level.maxStorage)}</td><td>${formatInt(level.price)}</td></tr>`;
             });
