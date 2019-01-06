@@ -5,7 +5,7 @@ const itemsFilename = process.argv[2],
     outDir = process.argv[3],
     date = process.argv[4];
 
-const APIItems = readJson(`${itemsFilename}-ItemTemplates-${date}.json`);
+const apiItems = readJson(`${itemsFilename}-ItemTemplates-${date}.json`);
 
 // https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
 // eslint-disable-next-line no-extend-native,func-names
@@ -195,6 +195,7 @@ function convertModules() {
      */
     function setWood(module) {
         const wood = {};
+        wood.id = module.id;
         wood.properties = [];
         module.APImodifiers.forEach(modifier => {
             // Add modifier if in modifier map
@@ -215,7 +216,6 @@ function convertModules() {
                 });
             }
         });
-
         if (module.name.endsWith(" Planking") || module.name === "Crew Space") {
             wood.type = "Trim";
             wood.name = module.name.replace(" Planking", "");
@@ -227,8 +227,8 @@ function convertModules() {
         }
         // Sort by modifier
         ["frame", "trim"].forEach(type => {
-            woodJson[type].forEach(wood => {
-                wood.properties.sort((a, b) => {
+            woodJson[type].forEach(APIwood => {
+                APIwood.properties.sort((a, b) => {
                     if (a.modifier < b.modifier) {
                         return -1;
                     }
@@ -333,23 +333,23 @@ function convertModules() {
         delete module.sortingGroup;
     }
 
-    APIItems.filter(item => item.ItemType === "Module").forEach(APImodule => {
+    apiItems.filter(item => item.ItemType === "Module").forEach(apiMpdule => {
         let dontSave = false;
         const module = {
-            id: APImodule.Id,
-            name: APImodule.Name.replaceAll("'", "’").replace("Bow figure - ", ""),
-            usageType: APImodule.UsageType,
-            APImodifiers: APImodule.Modifiers,
-            sortingGroup: APImodule.SortingGroup.replace("module:", ""),
-            isBowFigure: APImodule.bIsBowFigure,
-            isStackable: APImodule.bCanBeSetWithSameType,
+            id: apiMpdule.Id,
+            name: apiMpdule.Name.replaceAll("'", "’").replace("Bow figure - ", ""),
+            usageType: apiMpdule.UsageType,
+            APImodifiers: apiMpdule.Modifiers,
+            sortingGroup: apiMpdule.SortingGroup.replace("module:", ""),
+            isBowFigure: apiMpdule.bIsBowFigure,
+            isStackable: apiMpdule.bCanBeSetWithSameType,
             // minResourcesAmount: APImodule.MinResourcesAmount,
             // maxResourcesAmount: APImodule.MaxResourcesAmount,
             // breakUpItemsAmount: APImodule.BreakUpItemsAmount,
             // canBeBreakedUp: APImodule.CanBeBreakedUp,
             // bCanBeBreakedUp: APImodule.bCanBeBreakedUp,
-            moduleType: APImodule.ModuleType,
-            moduleLevel: levels.get(APImodule.ModuleLevel)
+            moduleType: apiMpdule.ModuleType,
+            moduleLevel: levels.get(apiMpdule.ModuleLevel)
         };
 
         // Ignore double entries

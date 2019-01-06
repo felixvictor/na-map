@@ -286,24 +286,39 @@ export default class ShowF11 {
     }
 
     _printF11Coord(x, y, F11X, F11Y) {
+        let circleSize = 10;
         const g = this._g.append("g").attr("transform", `translate(${x},${y})`);
+        const rect = g.append("rect");
+        g.append("circle").attr("r", circleSize);
 
-        g.append("circle").attr("r", 10);
-        g.append("text")
-            .attr("dx", "-.6em")
-            .attr("dy", "-.5em")
+        // Include padding
+        circleSize *= 1.6;
+        const F11Xtext = g
+            .append("text")
+            .attr("dx", `${-circleSize}px`)
+            .attr("dy", `${-circleSize / 2}px`)
             .text(formatF11(F11X));
-        g.append("text")
-            .attr("dx", "-.6em")
-            .attr("dy", ".5em")
+        const F11Ytext = g
+            .append("text")
+            .attr("dx", `${-circleSize}px`)
+            .attr("dy", `${circleSize / 2}px`)
             .text(formatF11(F11Y));
+
+        const F11Xdim = F11Xtext.node().getBBox();
+        const F11Ydim = F11Ytext.node().getBBox();
+        const height = Math.round(F11Xdim.height + F11Ydim.height);
+        const width = Math.round(Math.max(F11Xdim.width, F11Ydim.width) + 5);
+        rect.attr("x", -width - circleSize)
+            .attr("y", -height / 2)
+            .attr("height", height)
+            .attr("width", width + circleSize);
     }
 
     _goToF11(F11XIn, F11YIn) {
         const F11X = +F11XIn;
         const F11Y = +F11YIn;
-        const x = convertCoordX(F11X, F11Y);
-        const y = convertCoordY(F11X, F11Y);
+        const x = Math.floor(convertCoordX(F11X, F11Y));
+        const y = Math.floor(convertCoordY(F11X, F11Y));
 
         if (between(x, this._coord.min, this._coord.max, true) && between(y, this._coord.min, this._coord.max, true)) {
             this._printF11Coord(x, y, F11X, F11Y);
