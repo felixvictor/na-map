@@ -161,6 +161,10 @@ export const speedConstB = 0.00272175949231;
 
 export const circleRadiusFactor = 5;
 
+const secondsForFullCircle = 48 * 60 + 55;
+export const fullCircle = 360;
+export const degreesPerSecond = fullCircle / secondsForFullCircle;
+
 export const colourGray200 = CGRAY200;
 export const colourGray500 = CGRAY500;
 export const colourGray700 = CGRAY700;
