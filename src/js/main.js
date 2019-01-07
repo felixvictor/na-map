@@ -28,9 +28,10 @@ import {
     faTimes,
     faTrash
 } from "@fortawesome/fontawesome-free-solid";
-import Cookies from "js-cookie";
 
 import { initAnalytics, registerPage } from "./analytics";
+import { appName } from "./common";
+import { getCookie, setCookie } from "./util";
 
 import "../scss/main.scss";
 
@@ -39,35 +40,28 @@ import "../scss/main.scss";
  */
 function main() {
     /**
-     * server name cookie name
+     * Base Id
      * @type {string}
      */
-    const serverNameCookieName = "na-map--server-name";
+    const baseId = "server-name";
 
     /**
-     * Default server name
-     * @type {string}
+     * Server name cookie
+     * @type {cookieData}
      */
-    const serverNameDefault = "eu1";
+    const serverNameCookie = { name: `${appName}--${baseId}`, values: ["eu1", "eu2"], default: "eu1" };
 
     /**
      * Get server name from cookie or use default value
      * @returns {string} - server name
      */
-    function getServerName() {
-        // Use default value if cookie is not stored
-        const r = Cookies.get(serverNameCookieName) || serverNameDefault;
+    const getServerName = () => {
+        const serverName = getCookie(serverNameCookie);
 
-        console.log("Debug messages: getServerName");
-        console.log(Cookies.get());
-        console.log({ r }, { serverNameCookieName }, Cookies.get(serverNameCookieName), { serverNameDefault });
-        console.log(document.getElementById("navbarSupportedContent"));
-        console.log(document.getElementById(`server-name-${r}`));
+        document.getElementById(`${baseId}-${serverName}`).checked = true;
 
-        document.getElementById(`server-name-${r}`).checked = true;
-
-        return r;
-    }
+        return serverName;
+    };
 
     /**
      * Get server name from cookie or use default value
@@ -80,11 +74,7 @@ function main() {
      * @return {void}
      */
     const storeServerName = () => {
-        if (serverName !== serverNameDefault) {
-            Cookies.set(serverNameCookieName, serverName);
-        } else {
-            Cookies.remove(serverNameCookieName);
-        }
+        setCookie(serverNameCookie, serverName);
     };
 
     /**
@@ -93,6 +83,11 @@ function main() {
      */
     const serverNameSelected = () => {
         serverName = document.querySelector("input[name='serverName']:checked").value;
+        // If data is invalid
+        if (!serverNameCookie.values.includes(serverName)) {
+            serverName = serverNameCookie.default;
+            document.getElementById(`${baseId}-${serverName}`).checked = true;
+        }
         storeServerName();
         document.location.reload();
     };
@@ -102,7 +97,7 @@ function main() {
      * @return {void}
      */
     const setupListener = () => {
-        document.getElementById("server-name").addEventListener("change", () => serverNameSelected());
+        document.getElementById(baseId).addEventListener("change", () => serverNameSelected());
 
         // https://stackoverflow.com/questions/44467377/bootstrap-4-multilevel-dropdown-inside-navigation/48953349#48953349
         $(".dropdown-submenu > a").on("click", event => {
@@ -171,11 +166,6 @@ function main() {
 
     initAnalytics();
     registerPage("Homepage", "/");
-
-    // Set cookies defaults (expiry 365 days)
-    Cookies.defaults = {
-        expires: 365
-    };
 
     setupListener();
     loadMap();
