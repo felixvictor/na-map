@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ModuleTemplate xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="Cannon 4 pd - 0.5 Edinorog" Type="CANNON_4">
+<ModuleTemplate xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="Cannon 4 pd - 0.5 Edinorog" Type="CANNON_12">
   <Attributes>
     <Pair>
       <Key>MODULE_DESCRIPTION</Key>
@@ -22,13 +22,13 @@
     <Pair>
       <Key>CANNON_SHORT_PREFAB_PATH</Key>
       <Value xsi:type="StringAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>Assets/Resources/Client/Cannons/4p/4p_Short.prefab</Value>
+        <Value>Assets/Resources/Client/Cannons/Unicorn/unicorn_1pudHalf_Short.prefab</Value>
       </Value>
     </Pair>
     <Pair>
       <Key>CANNON_FULL_PREFAB_PATH</Key>
       <Value xsi:type="StringAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>Assets/Resources/Client/Cannons/4p/4p_Full.prefab</Value>
+        <Value>Assets/Resources/Client/Cannons/Unicorn/unicorn_1pudHalf.prefab</Value>
       </Value>
     </Pair>
     <Pair>
