@@ -10,6 +10,8 @@
 
 import { formatPrefix as d3FormatPrefix, formatLocale as d3FormatLocale } from "d3-format";
 import { scaleBand as d3ScaleBand } from "d3-scale";
+import Cookies from "js-cookie";
+import { appTitle } from "./common";
 
 /**
  * Default format
@@ -59,7 +61,10 @@ export const formatFloatFixed = (x, f = 2) =>
  * @param {Number} x - ShowF11 coordinate
  * @return {String} Formatted ShowF11 coordinate
  */
-export const formatF11 = x => formatPrefix(x * -1).replace("-", "\u2212\u202f").replace("k", "\u2009k");
+export const formatF11 = x =>
+    formatPrefix(x * -1)
+        .replace("-", "\u2212\u202f")
+        .replace("k", "\u2009k");
 
 /**
  * Format integer
@@ -531,3 +536,49 @@ export function printSmallCompassRose({ elem, radius }) {
  * @return {string} Formatted clan name
  */
 export const displayClan = clan => `<span class="caps">${clan}</span>`;
+
+/**
+ * @typedef {object} cookieData
+ * @property {string } name - Cookie name
+ * @property {string[]} values - Possible cookie values
+ * @property {string} default - Default cookie value
+ */
+
+// Set cookies defaults (expiry 365 days)
+Cookies.defaults = {
+    expires: 365
+};
+
+/**
+ * Get cookie
+ * @param {cookieData} cookieData - Cookie data
+ * @returns {string} Cookie
+ */
+export const getCookie = cookieData => {
+    let cookie = Cookies.get(cookieData.name);
+
+    if (typeof cookie === "undefined") {
+        // Use default value if cookie is not stored
+        cookie = cookieData.default;
+    } else if (!cookieData.values.includes(cookie)) {
+        // Use default value if cookie has invalid data and remove cookie
+        cookie = cookieData.default;
+        Cookies.remove(cookieData.name);
+    }
+
+    return cookie;
+};
+
+/**
+ * Set cookie
+ * @param {cookieData} cookieData - Cookie data
+ * @param {string} cookie - Cookie value
+ * @return {void}
+ */
+export const setCookie = (cookieData, cookie) => {
+    if (cookie !== cookieData.default) {
+        Cookies.set(cookieData.name, cookie);
+    } else {
+        Cookies.remove(cookieData.name);
+    }
+};
