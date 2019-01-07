@@ -89,13 +89,6 @@ const cssOpt = {
     sourceMap: true
 };
 
-const minifyMinifyOpt = {
-    numericLiterals: false,
-    removeDebugger: true
-};
-
-const pluginMinifyOpt = { comments: false };
-
 const htmlMinifyOpt = {
     collapseBooleanAttributes: true,
     collapseWhitespace: false,
@@ -287,6 +280,7 @@ const config = {
             CREDLIGHT: JSON.stringify(colourRedLight),
             CREDDARK: JSON.stringify(colourRedDark),
             CWHITE: JSON.stringify(colourWhite),
+            NAME: JSON.stringify(libraryName),
             DESCRIPTION: JSON.stringify(description),
             TITLE: JSON.stringify(PACKAGE.description),
             VERSION: JSON.stringify(PACKAGE.version)
