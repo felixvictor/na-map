@@ -150,6 +150,8 @@ export function initMultiDropdownNavbar(id) {
 export const getCurrencyAmount = amount => `${amount}\u00a0real${+amount > 1 ? "s" : ""}`;
 
 // eslint-disable-next-line no-undef
+export const appName = NAME;
+// eslint-disable-next-line no-undef
 export const appDescription = DESCRIPTION;
 // eslint-disable-next-line no-undef
 export const appTitle = TITLE;
