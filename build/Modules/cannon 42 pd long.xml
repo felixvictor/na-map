@@ -142,7 +142,7 @@
     <Pair>
       <Key>CANNON_MASS</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>4.16</Value>
+        <Value>5.79</Value>
       </Value>
     </Pair>
     <Pair>
