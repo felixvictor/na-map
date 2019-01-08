@@ -267,29 +267,27 @@ export default class ListShipBlueprints {
 
         const addBody = () => {
             // Data join rows
-            const rows = elem
+            const rowsUpdate = elem
                 .select("tbody")
                 .selectAll("tr")
                 .data(dataBody);
 
             // Remove old rows
-            rows.exit().remove();
+            rowsUpdate.exit().remove();
 
             // Add new rows
-            const rowsEnter = rows.enter().append("tr");
-            rowsEnter
-                .selectAll("td")
-                .data(d => d)
-                .enter()
-                .append("td")
-                .html(d => d);
+            const rowsEnter = rowsUpdate.enter().append("tr");
+
+            const rows = rowsEnter.merge(rowsUpdate);
 
             // Data join cells
-            const cells = rows.selectAll("td").data(d => d);
+            const cellsUpdate = rows.selectAll("td").data(d => d);
+
+            cellsUpdate.exit().remove();
 
             // Add new cells
-            cells.enter().append("td");
-            cells.html(d => d);
+            const cellsEnter = cellsUpdate.enter().append("td");
+            cellsEnter.merge(cellsUpdate).html(d => d);
         };
 
         if (dataHead.length) {
