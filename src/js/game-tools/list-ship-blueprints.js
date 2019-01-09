@@ -9,7 +9,7 @@
  */
 
 import { select as d3Select } from "d3-selection";
-import { formatInt, getOrdinal } from "../util";
+import { formatInt } from "../util";
 import { registerEvent } from "../analytics";
 import { insertBaseModal } from "../common";
 
@@ -287,6 +287,7 @@ export default class ListShipBlueprints {
 
             // Add new cells
             const cellsEnter = cellsUpdate.enter().append("td");
+
             cellsEnter.merge(cellsUpdate).html(d => d);
         };
 
