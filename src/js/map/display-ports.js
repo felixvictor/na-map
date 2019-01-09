@@ -607,34 +607,68 @@ export default class DisplayPorts {
             }
             return marker;
         };
-        const circleScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale),
-            rMin = roundToThousands((this._circleSize / circleScale) * this._minRadiusFactor);
-        let rMax = roundToThousands((this._circleSize / circleScale) * this._maxRadiusFactor),
-            data = {},
-            rGreenZone = 0;
+        const circleScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale);
+        const rMin = roundToThousands((this._circleSize / circleScale) * this._minRadiusFactor);
+        const rMax = roundToThousands((this._circleSize / circleScale) * this._maxRadiusFactor);
+        let data = this._portDataFiltered;
+        let cssClass = d => d;
+        let r = d => d;
+        let fill = d => d;
 
-        if (this._showRadius === "tax" || this._showRadius === "net") {
+        if (this._showRadius === "tax") {
             data = this._portDataFiltered.filter(d => !d.properties.nonCapturable);
+
+            const minTaxIncome = d3Min(data, d => d.properties.taxIncome);
+            const maxTaxIncome = d3Max(data, d => d.properties.taxIncome);
+            this._taxIncomeRadius.domain([minTaxIncome, maxTaxIncome]);
+            this._taxIncomeRadius.range([rMin, rMax]);
+
+            cssClass = () => "bubble pos";
+            r = d => this._taxIncomeRadius(Math.abs(d.properties.taxIncome));
+        } else if (this._showRadius === "net") {
+            data = this._portDataFiltered.filter(d => !d.properties.nonCapturable);
+
+            const minNetIncome = d3Min(data, d => d.properties.netIncome);
+            const maxNetIncome = d3Max(data, d => d.properties.netIncome);
+            this._netIncomeRadius.domain([minNetIncome, maxNetIncome]).range([rMin, rMax]);
+
+            cssClass = d => `bubble ${d.properties.netIncome < 0 ? "neg" : "pos"}`;
+            r = d => this._netIncomeRadius(Math.abs(d.properties.netIncome));
         } else if (this.showTradePortPartners) {
-            data = this._portDataFiltered;
+            cssClass = d => `bubble ${getTradePortMarker(d)}`;
+            r = d => (d.id === this.tradePortId ? rMax : rMax / 2);
         } else if (this._showRadius === "position") {
-            data = this._portDataFiltered;
+            cssClass = () => "position";
+            r = d => d.properties.distance;
         } else if (this._showRadius === "attack") {
             data = this._portDataFiltered.filter(port => port.properties.attackHostility);
+            this._attackRadius.range([rMin, rMax]);
+
+            cssClass = () => "bubble";
+            fill = d => this._colourScale(d.properties.attackHostility);
+            r = d => this._attackRadius(d.properties.attackHostility);
         } else if (this._showRadius === "green") {
-            rGreenZone =
-                roundToThousands(
-                    getDistance(
-                        { x: convertCoordX(-63400, 18800), y: convertCoordY(-63400, 18800) },
-                        { x: convertCoordX(-79696, 10642), y: convertCoordY(-79696, 10642) }
-                    )
-                ) * circleRadiusFactor;
             data = this._portDataFiltered.filter(
                 port => port.properties.nonCapturable && port.properties.nation !== "FT"
             );
+
+            cssClass = () => "bubble pos";
+            r = () =>
+                roundToThousands(
+                    getDistance(
+                        {
+                            x: convertCoordX(-63400, 18800),
+                            y: convertCoordY(-63400, 18800)
+                        },
+                        {
+                            x: convertCoordX(-79696, 10642),
+                            y: convertCoordY(-79696, 10642)
+                        }
+                    )
+                ) * circleRadiusFactor;
         } else if (this.showCurrentGood) {
-            data = this._portDataFiltered;
-            rMax /= 2;
+            cssClass = d => `bubble ${d.properties.isSource ? "pos" : "neg"}`;
+            r = () => rMax / 2;
         }
 
         // Data join
@@ -654,40 +688,12 @@ export default class DisplayPorts {
             .attr("cy", d => d.geometry.coordinates[1]);
 
         // Apply to both old and new
-        const circleMerge = circleUpdate.merge(circleEnter);
-        if (this._showRadius === "tax") {
-            const minTaxIncome = d3Min(data, d => d.properties.taxIncome),
-                maxTaxIncome = d3Max(data, d => d.properties.taxIncome);
-
-            this._taxIncomeRadius.domain([minTaxIncome, maxTaxIncome]);
-            this._taxIncomeRadius.range([rMin, rMax]);
-            circleMerge
-                .attr("class", "bubble pos")
-                .attr("r", d => this._taxIncomeRadius(Math.abs(d.properties.taxIncome)));
-        } else if (this._showRadius === "net") {
-            const minNetIncome = d3Min(data, d => d.properties.netIncome),
-                maxNetIncome = d3Max(data, d => d.properties.netIncome);
-
-            this._netIncomeRadius.domain([minNetIncome, maxNetIncome]).range([rMin, rMax]);
-            circleMerge
-                .attr("class", d => `bubble ${d.properties.netIncome < 0 ? "neg" : "pos"}`)
-                .attr("r", d => this._netIncomeRadius(Math.abs(d.properties.netIncome)));
-        } else if (this.showTradePortPartners) {
-            circleMerge
-                .attr("class", d => `bubble ${getTradePortMarker(d)}`)
-                .attr("r", d => (d.id === this.tradePortId ? rMax : rMax / 2));
-        } else if (this._showRadius === "attack") {
-            this._attackRadius.range([rMin, rMax]);
-            circleMerge
-                .attr("class", "bubble")
-                .attr("fill", d => this._colourScale(d.properties.attackHostility))
-                .attr("r", d => this._attackRadius(d.properties.attackHostility));
-        } else if (this._showRadius === "position") {
-            circleMerge.attr("class", "position").attr("r", d => d.properties.distance);
-        } else if (this._showRadius === "green") {
-            circleMerge.attr("class", "bubble pos").attr("r", rGreenZone);
-        } else if (this.showCurrentGood) {
-            circleMerge.attr("class", d => `bubble ${d.properties.isSource ? "pos" : "neg"}`).attr("r", rMax);
+        const circleMerge = circleUpdate
+            .merge(circleEnter)
+            .attr("class", d => cssClass(d))
+            .attr("r", d => r(d));
+        if (fill) {
+            circleMerge.attr("fill", d => fill(d));
         }
     }
 
