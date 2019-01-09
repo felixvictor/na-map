@@ -316,43 +316,52 @@ export default class ListShipBlueprints {
         extraData.push(["Labour hours", formatInt(this._currentBlueprintData.labourHours)]);
         extraData.push(["Craft experience", formatInt(this._currentBlueprintData.craftXP)]);
 
+        // Add default resources
         const resourcesData = this._currentBlueprintData.resources.map(resource => [
             resource.name,
             formatInt(resource.amount)
         ]);
 
+        // Add trim
         let frameAdded = false;
         let trimAdded = false;
         let frameAmount = 0;
+        // Crew space means additional hemp
         if (this._woodsSelected.trim === "Crew Space") {
             const hempAmount = this._currentBlueprintData.trims.find(trim => trim.name === "Crew Space").amount;
             const index = resourcesData.findIndex(resource => resource[0] === "Hemp");
             resourcesData[index][1] = formatInt(+resourcesData[index][1] + hempAmount);
         } else {
             const trimAmount = this._currentBlueprintData.trims.find(trim => trim.name === "Planking").amount;
+            // Frame and trim have same wood: add trim to frame
             if (this._woodsSelected.trim === this._woodsSelected.frame) {
                 frameAmount += trimAmount;
             } else {
                 const index = resourcesData.findIndex(resource => resource[0] === this._woodsSelected.trim);
+                // Trim wood is already part of default resources (fir and oak log)
                 if (index >= 0) {
                     resourcesData[index][1] = formatInt(+resourcesData[index][1] + frameAmount);
                 } else {
+                    // Trim is an additional resource
                     trimAdded = true;
                     resourcesData.push([this._woodsSelected.trim, formatInt(trimAmount)]);
                 }
             }
         }
 
+        // Add frame
         frameAmount += this._currentBlueprintData.frames.find(frame => frame.name === this._woodsSelected.frame).amount;
         const index = resourcesData.findIndex(resource => resource[0] === this._woodsSelected.frame);
         if (index >= 0) {
+            // Frame wood is already part of default resources (fir and oak log)
             resourcesData[index][1] = formatInt(+resourcesData[index][1] + frameAmount);
         } else {
+            // Frame is an additional resource
             frameAdded = true;
             resourcesData.push([this._woodsSelected.frame, formatInt(frameAmount)]);
         }
 
-        // Order frame before trim
+        // Order frame before trim if both are added
         if (frameAdded && trimAdded) {
             const frameIndex = resourcesData.length - 1;
             [resourcesData[frameIndex], resourcesData[frameIndex - 1]] = [
