@@ -79,7 +79,7 @@ export function getDistance(pt0, pt1) {
  * @param {string} buttonText - button text (default "Close")
  * @return {void}
  */
-export function insertBaseModal(id, title, size = "lg", buttonText = "Close") {
+export function insertBaseModal(id, title, size = "xl", buttonText = "Close") {
     const modal = d3Select("#modal-section")
         .append("div")
         .attr("id", id)
@@ -89,7 +89,7 @@ export function insertBaseModal(id, title, size = "lg", buttonText = "Close") {
         .attr("aria-labelledby", `title-${id}`)
         .attr("aria-hidden", "true")
         .append("div")
-        .attr("class", `modal-dialog${size === "lg" || size === "sm" ? ` modal-${size}` : ""}`)
+        .attr("class", `modal-dialog${size === "xl" || size === "lg" || size === "sm" ? ` modal-${size}` : ""}`)
         .attr("role", "document");
 
     const content = modal.append("div").attr("class", "modal-content");
