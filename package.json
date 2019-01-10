@@ -62,7 +62,7 @@
         "terser-webpack-plugin": "^1.2.1",
         "topojson": "^3.0.2",
         "url-loader": "^1.1.2",
-        "webpack": "^4.28.3",
+        "webpack": "^4.28.4",
         "webpack-bundle-analyzer": "^3.0.3",
         "webpack-cli": "^3.2.1",
         "webpack-deep-scope-plugin": "^1.6.0",
