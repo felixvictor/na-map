@@ -614,7 +614,8 @@ export default class DisplayPorts {
         let cssClass = d => d;
         let r = d => d;
         let fill = d => d;
-
+        let hasFill = false;
+console.log(this._showRadius);
         if (this._showRadius === "tax") {
             data = this._portDataFiltered.filter(d => !d.properties.nonCapturable);
 
@@ -638,7 +639,7 @@ export default class DisplayPorts {
             cssClass = d => `bubble ${getTradePortMarker(d)}`;
             r = d => (d.id === this.tradePortId ? rMax : rMax / 2);
         } else if (this._showRadius === "position") {
-            cssClass = () => "position";
+            cssClass = () => "position-circle";
             r = d => d.properties.distance;
         } else if (this._showRadius === "attack") {
             data = this._portDataFiltered.filter(port => port.properties.attackHostility);
@@ -646,6 +647,7 @@ export default class DisplayPorts {
 
             cssClass = () => "bubble";
             fill = d => this._colourScale(d.properties.attackHostility);
+            hasFill = true;
             r = d => this._attackRadius(d.properties.attackHostility);
         } else if (this._showRadius === "green") {
             data = this._portDataFiltered.filter(
@@ -692,7 +694,7 @@ export default class DisplayPorts {
             .merge(circleEnter)
             .attr("class", d => cssClass(d))
             .attr("r", d => r(d));
-        if (fill) {
+        if (hasFill) {
             circleMerge.attr("fill", d => fill(d));
         }
     }
@@ -875,13 +877,17 @@ export default class DisplayPorts {
     }
 
     _filterVisible() {
-        this._portDataFiltered = this._portData.filter(
-            port =>
-                port.geometry.coordinates[0] >= this._lowerBound[0] &&
-                port.geometry.coordinates[0] <= this._upperBound[0] &&
-                port.geometry.coordinates[1] >= this._lowerBound[1] &&
-                port.geometry.coordinates[1] <= this._upperBound[1]
-        );
+        if (this._showRadius !== "position") {
+            this._portDataFiltered = this._portData.filter(
+                port =>
+                    port.geometry.coordinates[0] >= this._lowerBound[0] &&
+                    port.geometry.coordinates[0] <= this._upperBound[0] &&
+                    port.geometry.coordinates[1] >= this._lowerBound[1] &&
+                    port.geometry.coordinates[1] <= this._upperBound[1]
+            );
+        } else {
+            this._portDataFiltered = this._portData;
+        }
         this._countyPolygonFiltered = this._countyPolygon.filter(
             county =>
                 county.centroid[0] >= this._lowerBound[0] &&
