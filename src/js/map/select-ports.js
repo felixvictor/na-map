@@ -483,8 +483,8 @@ export default class SelectPorts {
         // 24 hours minus black-out hours
         const maxStartTime = 24 - (blackOutTimes.length + 1);
         const startTimes = new Set();
-        const begin = moment(document.getElementById("#prop-pb-from-input").value, this._timeFormat).hour();
-        let end = moment(document.getElementById("#prop-pb-to-input").value, this._timeFormat).hour();
+        const begin = moment(document.getElementById("prop-pb-from-input").value, this._timeFormat).hour();
+        let end = moment(document.getElementById("prop-pb-to-input").value, this._timeFormat).hour();
 
         // console.log("Between %d and %d", begin, end);
 
