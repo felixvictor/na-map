@@ -91,18 +91,14 @@ text,
     }
 }
 
-.ports {
-    .port-circles {
-        circle .position {
-            fill-opacity: .4;
-            fill: $white;
-        }
-    }
+.position-circle {
+    fill-opacity: .4;
+    fill: $white;
+}
 
-    g .position path {
-        fill: $green;
-        fill-opacity: .6;
-    }
+.position-path {
+    fill: $green;
+    fill-opacity: .6;
 }
 
 .axis {
