@@ -10,8 +10,9 @@
 
 import { formatPrefix as d3FormatPrefix, formatLocale as d3FormatLocale } from "d3-format";
 import { scaleBand as d3ScaleBand } from "d3-scale";
+import { select as d3Select } from "d3-selection";
 import Cookies from "js-cookie";
-import { appTitle } from "./common";
+import { iconSmallSrc } from "./common";
 
 /**
  * Default format
@@ -581,4 +582,46 @@ export const setCookie = (cookieData, cookie) => {
     } else {
         Cookies.remove(cookieData.name);
     }
+};
+
+export const showToast = (title, text) => {
+    const elem = d3Select("#toast-section");
+    const toast = elem
+        .append("div")
+        .attr("class", "toast")
+        .attr("role", "alert")
+        .attr("aria-live", "assertive")
+        .attr("aria-atomic", "true");
+
+    const header = toast.append("div").attr("class", "toast-header");
+    header
+        .append("img")
+        .attr("class", "rounded mr-2")
+        .attr("src", iconSmallSrc)
+        .attr("alt", "logo");
+    header
+        .append("em")
+        .attr("class", "mr-auto")
+        .html(title);
+    header
+        .append("button")
+        .attr("type", "button")
+        .attr("class", "ml-2 mb-1 close")
+        .attr("data-dismiss", "toast")
+        .attr("aria-label", "Close")
+        .append("span")
+        .attr("aria-hidden", "true")
+        .html("&times;");
+
+    toast
+        .append("div")
+        .attr("class", "toast-body")
+        .html(text);
+
+    console.log(toast);
+    console.log(toast.node());
+    console.log($(".toast"));
+    $(".toast")
+        .toast({ delay: 10000 })
+        .toast("show");
 };
