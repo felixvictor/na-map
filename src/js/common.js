@@ -174,3 +174,4 @@ export const colourRedLight = CREDLIGHT;
 export const colourRedDark = CREDDARK;
 export const colourWhite = CWHITE;
 export const primary300 = CPRIMARY300;
+export const iconSmallSrc = ICONSMALL;

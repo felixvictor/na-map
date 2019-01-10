@@ -283,7 +283,8 @@ const config = {
             NAME: JSON.stringify(libraryName),
             DESCRIPTION: JSON.stringify(description),
             TITLE: JSON.stringify(PACKAGE.description),
-            VERSION: JSON.stringify(PACKAGE.version)
+            VERSION: JSON.stringify(PACKAGE.version),
+            ICONSMALL: JSON.stringify("images/icons/icon_32x32.png")
         }),
         new webpack.HashedModuleIdsPlugin(),
         new webpack.ProvidePlugin({
@@ -299,6 +300,7 @@ const config = {
             Dropdown: "exports-loader?Dropdown!bootstrap/js/dist/dropdown",
             Modal: "exports-loader?Modal!bootstrap/js/dist/modal",
             // Popover: "exports-loader?Popover!bootstrap/js/dist/popover",
+            Toast: "exports-loader?Tooltip!bootstrap/js/dist/toast",
             Tooltip: "exports-loader?Tooltip!bootstrap/js/dist/tooltip",
             Util: "exports-loader?Util!bootstrap/js/dist/util"
         }),
