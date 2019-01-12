@@ -173,6 +173,7 @@ class Map {
         this._showLayer = this._getShowLayer();
 
         this._setHeightWidth();
+        this._setupToasts();
         this._setupScale();
         this._setupSvg();
         this._setSvgSize();
@@ -593,7 +594,6 @@ class Map {
     _init() {
         this.zoomLevel = "initial";
         this.initialZoomAndPan();
-        this._ports.clearMap(this._minScale);
         this._f11.checkF11Coord();
     }
 
@@ -645,6 +645,10 @@ class Map {
          * @type {Number}
          */
         this.height = this._getHeight();
+    }
+
+    _setupToasts() {
+        d3Select("#toast-section").style("height", `${this.height}px`);
     }
 
     _setSvgSize() {
