@@ -173,6 +173,7 @@ class Map {
         this._showLayer = this._getShowLayer();
 
         this._setHeightWidth();
+        this._setupToasts();
         this._setupScale();
         this._setupSvg();
         this._setSvgSize();
@@ -644,6 +645,10 @@ class Map {
          * @type {Number}
          */
         this.height = this._getHeight();
+    }
+
+    _setupToasts() {
+        d3Select("#toast-section").style("height", `${this.height}px`);
     }
 
     _setSvgSize() {
