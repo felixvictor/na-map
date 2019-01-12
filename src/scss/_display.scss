@@ -599,6 +599,12 @@ table a {
     justify-content: flex-start !important;
 }
 
+.trades {
+    .link {
+        fill: none;
+    }
+}
+
 .profile {
     line {
         opacity: .3;
