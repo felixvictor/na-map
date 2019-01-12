@@ -585,39 +585,43 @@ export const setCookie = (cookieData, cookie) => {
 };
 
 export const showToast = (title, text) => {
-    const elem = d3Select("#toast-section");
-    const toast = elem
-        .append("div")
-        .attr("class", "toast")
-        .attr("role", "alert")
-        .attr("aria-live", "assertive")
-        .attr("aria-atomic", "true");
+    function setToast() {
+        const elem = d3Select("#toast-section");
+        const toast = elem
+            .append("div")
+            .attr("class", "toast")
+            .attr("role", "alert")
+            .attr("aria-live", "assertive")
+            .attr("aria-atomic", "true");
 
-    const header = toast.append("div").attr("class", "toast-header");
-    header
-        .append("img")
-        .attr("class", "rounded mr-2")
-        .attr("src", iconSmallSrc)
-        .attr("alt", "logo");
-    header
-        .append("em")
-        .attr("class", "mr-auto")
-        .html(title);
-    header
-        .append("button")
-        .attr("type", "button")
-        .attr("class", "ml-2 mb-1 close")
-        .attr("data-dismiss", "toast")
-        .attr("aria-label", "Close")
-        .append("span")
-        .attr("aria-hidden", "true")
-        .html("&times;");
+        const header = toast.append("div").attr("class", "toast-header");
+        header
+            .append("img")
+            .attr("class", "rounded mr-2")
+            .attr("src", iconSmallSrc)
+            .attr("alt", "logo");
+        header
+            .append("em")
+            .attr("class", "mr-auto")
+            .html(title);
+        header
+            .append("button")
+            .attr("type", "button")
+            .attr("class", "ml-2 mb-1 close")
+            .attr("data-dismiss", "toast")
+            .attr("aria-label", "Close")
+            .append("span")
+            .attr("aria-hidden", "true")
+            .html("&times;");
 
-    toast
-        .append("div")
-        .attr("class", "toast-body")
-        .html(text);
+        toast
+            .append("div")
+            .attr("class", "toast-body")
+            .html(text);
+        return toast;
+    }
 
+    const toast = setToast();
     console.log(toast);
     console.log(toast.node());
     console.log($(".toast"));
