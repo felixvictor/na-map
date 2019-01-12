@@ -758,40 +758,40 @@ class ShipComparison extends Ship {
                 this.shipBaseData.upgradeXP
             )}`,
             sternRepair: `${formatInt(this.shipCompareData.repairTime.stern)}\u00a0${getDiff(
-                this.shipCompareData.repairTime.stern,
-                this.shipBaseData.repairTime.stern
+                this.shipBaseData.repairTime.stern,
+                this.shipCompareData.repairTime.stern
             )}`,
             bowRepair: `${formatInt(this.shipCompareData.repairTime.bow)}\u00a0${getDiff(
-                this.shipCompareData.repairTime.bow,
-                this.shipBaseData.repairTime.bow
+                this.shipBaseData.repairTime.bow,
+                this.shipCompareData.repairTime.bow
             )}`,
             sidesRepair: `${formatInt(this.shipCompareData.repairTime.sides)}\u00a0${getDiff(
-                this.shipCompareData.repairTime.sides,
-                this.shipBaseData.repairTime.sides
+                this.shipBaseData.repairTime.sides,
+                this.shipCompareData.repairTime.sides
             )}`,
             rudderRepair: `${formatInt(this.shipCompareData.repairTime.rudder)}\u00a0${getDiff(
-                this.shipCompareData.repairTime.rudder,
-                this.shipBaseData.repairTime.rudder
+                this.shipBaseData.repairTime.rudder,
+                this.shipCompareData.repairTime.rudder
             )}`,
             sailsRepair: `${formatInt(this.shipCompareData.repairTime.sails)}\u00a0${getDiff(
-                this.shipCompareData.repairTime.sails,
-                this.shipBaseData.repairTime.sails
+                this.shipBaseData.repairTime.sails,
+                this.shipCompareData.repairTime.sails
             )}`,
             structureRepair: `${formatInt(this.shipCompareData.repairTime.structure)}\u00a0${getDiff(
-                this.shipCompareData.repairTime.structure,
-                this.shipBaseData.repairTime.structure
+                this.shipBaseData.repairTime.structure,
+                this.shipCompareData.repairTime.structure
             )}`,
             hullRepair: `${formatInt(this.shipCompareData.sides.armour / hullRepairsFactor)}\u00a0${getDiff(
-                this.shipCompareData.sides.armour / hullRepairsFactor,
-                this.shipBaseData.sides.armour / hullRepairsFactor
+                this.shipBaseData.sides.armour / hullRepairsFactor,
+                this.shipCompareData.sides.armour / hullRepairsFactor
             )}`,
             rigRepair: `${formatInt(this.shipCompareData.sails.armour / rigRepairsFactor)}\u00a0${getDiff(
-                this.shipCompareData.sails.armour / rigRepairsFactor,
-                this.shipBaseData.sails.armour / rigRepairsFactor
+                this.shipBaseData.sails.armour / rigRepairsFactor,
+                this.shipCompareData.sails.armour / rigRepairsFactor
             )}`,
             rumRepair: `${formatInt(this.shipCompareData.crew.max / rumRepairsFactor)}\u00a0${getDiff(
-                this.shipCompareData.crew.max / rumRepairsFactor,
-                this.shipBaseData.crew.max / rumRepairsFactor
+                this.shipBaseData.crew.max / rumRepairsFactor,
+                this.shipCompareData.crew.max / rumRepairsFactor
             )}`,
             fireResistance: `${formatInt(this.shipCompareData.resistance.fire)}\u00a0${getDiff(
                 this.shipCompareData.resistance.fire,
