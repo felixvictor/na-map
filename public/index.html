@@ -19,7 +19,7 @@
     <meta content="summary_large_image" name="twitter:card">
 
     <script src="https://www.googletagmanager.com/gtag/js?id=UA-109520372-1" async></script>
-<meta content="width=device-width,initial-scale=1,shrink-to-fit=no" name="viewport"><link crossorigin="anonymous" href="main.be3b94f32536efe7a9f7.css" integrity="sha256-PvtF/Pmx8pQnyRhII3VZoqcpDjgw9YbEVJ7dDCZu6NE= sha384-jEY8Qu22ln4PlO5jBMzgBDMZ7XJD2Vz4wIu+6sbac+n6he7npxsYjbAsZR2qgBlM" rel="stylesheet"><link as="font" crossorigin="anonymous" href="fonts/Junicode-regular-italic.woff2" rel="preload"><link as="font" crossorigin="anonymous" href="fonts/Junicode-regular.woff2" rel="preload"></head>
+<meta content="width=device-width,initial-scale=1,shrink-to-fit=no" name="viewport"><link crossorigin="anonymous" href="main.437dd620a5ddae886d8c.css" integrity="sha256-oDDX3zfpDs/NdaHMnSJPDC3kwgoXdkFybRBbGxtiY/I= sha384-fuHpfgXy+mJbHz13c7A0KS7Ssy/ZDIYALtoLjVgNNBvglvLD34fjOPFZq2oIguL6" rel="stylesheet"><link as="font" crossorigin="anonymous" href="fonts/Junicode-regular-italic.woff2" rel="preload"><link as="font" crossorigin="anonymous" href="fonts/Junicode-regular.woff2" rel="preload"></head>
 
 <body>
 
@@ -210,11 +210,11 @@
                     <h6 class="dropdown-header">Game server</h6>
                     <div class="align-self-center col-auto radio-group ml-1" id="server-name">
                         <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="server-name-eu1" type="radio" name="serverName" value="eu1">
+                            <input class="custom-control-input" id="server-name-eu1" type="radio" name="server-name" value="eu1">
                             <label class="custom-control-label" for="server-name-eu1">War (Caribbean)</label>
                         </div>
                         <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="server-name-eu2" type="radio" name="serverName" value="eu2">
+                            <input class="custom-control-input" id="server-name-eu2" type="radio" name="server-name" value="eu2">
                             <label class="custom-control-label" for="server-name-eu2">Peace (PvE)</label>
                         </div>
                     </div>
@@ -223,27 +223,27 @@
                     <h6 class="dropdown-header">Show per port</h6>
                     <div class="align-self-center col-auto radio-group ml-1" id="show-radius">
                         <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="show-radius-attack" type="radio" name="showRadius" value="attack">
+                            <input class="custom-control-input" id="show-radius-attack" type="radio" name="show-radius" value="attack">
                             <label class="custom-control-label" for="show-radius-attack">Attack</label>
                         </div>
                         <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="show-radius-position" type="radio" name="showRadius" value="position">
+                            <input class="custom-control-input" id="show-radius-position" type="radio" name="show-radius" value="position">
                             <label class="custom-control-label" for="show-radius-position">Position</label>
                         </div>
                         <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="show-radius-tax" type="radio" name="showRadius" value="tax">
+                            <input class="custom-control-input" id="show-radius-tax" type="radio" name="show-radius" value="tax">
                             <label class="custom-control-label" for="show-radius-tax">Tax income</label>
                         </div>
                         <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="show-radius-net" type="radio" name="showRadius" value="net">
+                            <input class="custom-control-input" id="show-radius-net" type="radio" name="show-radius" value="net">
                             <label class="custom-control-label" for="show-radius-net">Net income</label>
                         </div>
                         <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="show-radius-green" type="radio" name="showRadius" value="green">
+                            <input class="custom-control-input" id="show-radius-green" type="radio" name="show-radius" value="green">
                             <label class="custom-control-label" for="show-radius-green">Reinforcement zones</label>
                         </div>
                         <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="show-radius-off" type="radio" name="showRadius" value="off">
+                            <input class="custom-control-input" id="show-radius-off" type="radio" name="show-radius" value="off">
                             <label class="custom-control-label" for="show-radius-off">Off</label>
                         </div>
                     </div>
@@ -305,9 +305,11 @@
 <main class="container-fluid" role="main">
     <div class="central" id="na-map"></div>
     <div id="modal-section"></div>
+    <div class="toasts" id="toast-section" aria-atomic="true" aria-live="polite"></div>
+
 </main>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.slim.min.js" crossorigin="anonymous" integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E="></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" crossorigin="anonymous" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"></script>
-<script src="runtime.390a11b0917de6d61622.js" crossorigin="anonymous" integrity="sha256-ziKzTETo6HyoNJ/9PuLblfwaW11ydHn/f5XMLDXTeyU= sha384-ggqL3HTx7+GGI8JK98ED8aH3PAf9uOFi04XOpolTR3Tu+Xa6Z5HO99jv2wqdhiww"></script><script src="vendors~main.1403a0572b8f1519f4c2.js" crossorigin="anonymous" integrity="sha256-36rZly70o0FQUE/M69nnlYRx9lCnBBD0BlP4xsBZvz8= sha384-skxJUQyqkHV5wFdS1FUqx8bPK31MHug8G6TVHm7urLn9pC49Tiu3vKjJhCqLZ8SU"></script><script src="main.da6db3a117d2c4bc1877.js" crossorigin="anonymous" integrity="sha256-NzMDw7aTWBFnS02mFLLgirP1f/sPmtqFBepDBMYqIzs= sha384-oqmaNEzmg38exFQzPvkhfCa/Lq2FctJ9RznM052zWK/4JGv/GFvCj8LnIUGjR+wa"></script></body>
+<script src="runtime.d75abfa294f79eee2844.js" crossorigin="anonymous" integrity="sha256-f6nCrMn3r46LtDh/yMI4QPWxCmtuszXpEnxrednwb90= sha384-T5/OsROWEuEvHmctvl8BJtAzBkcll32ssifPKC3Frp1mfSP58wPcF8nAVQVS0vmg"></script><script src="vendors~main.c0306119298fbc9552d1.js" crossorigin="anonymous" integrity="sha256-sDtUeAV1hSlx67dufvBQm39jZgC5AIrQMq8kVr50xfE= sha384-AOthg6c163/PIL03cPOQUKDlUOlK8NDPrMOu5HIW7AtB7HAX27mQK9gLaafroI1w"></script><script src="main.ddbf156693470024ed56.js" crossorigin="anonymous" integrity="sha256-bzFWKEUb/L0JS8J4s+2OAiq7mvu9fDrITX8/4Bf/qLo= sha384-d2zM6hHmL2tvXTlLZDhuHifwAPwaVT0NTKAOgouJoKHfPC+zMNfeM79urtbHvB6U"></script></body>
 </html>
