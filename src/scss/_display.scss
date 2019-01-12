@@ -587,6 +587,18 @@ table a {
     fill: $secondary-600 !important;
 }
 
+.wind-predict {
+    float: left;
+}
+
+.toasts {
+    display: flex !important;
+    flex-direction: column !important;
+    flex-wrap: wrap-reverse !important;
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+}
+
 .profile {
     line {
         opacity: .3;
