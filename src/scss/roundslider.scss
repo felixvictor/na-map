@@ -21,6 +21,7 @@
     width: 48px !important;
     background: $primary-900;
     border: 3px solid $primary-400;
+    //noinspection Stylelint
     border-radius: 0;
 
     &::after,

@@ -13,6 +13,7 @@ import { select as d3Select } from "d3-selection";
 import { intersectionArea as vennIntersectionArea } from "venn.js/src/circleintersection";
 import { registerEvent } from "../analytics";
 import { circleRadiusFactor, insertBaseModal } from "../common";
+import Toast from "../util/toast";
 
 /**
  * Get position
@@ -35,9 +36,7 @@ export default class TrilateratePosition {
     }
 
     _setupSvg() {
-        this._gPosition = d3Select("g.ports")
-            .append("g")
-            .classed("position", true);
+        this._gPosition = d3Select("g.ports").append("g");
     }
 
     _navbarClick(event) {
@@ -221,7 +220,10 @@ export default class TrilateratePosition {
                 const points = getAreaPoints(area);
 
                 const line = d3Line().curve(d3CurveBasis);
-                this._gPosition.append("path").attr("d", line(points));
+                this._gPosition
+                    .append("path")
+                    .attr("class", "position-path")
+                    .attr("d", line(points));
             };
 
             /**
@@ -255,7 +257,7 @@ export default class TrilateratePosition {
                 this._ports._map._f11.printCoord(centroid.x, centroid.y);
                 this._ports._map.zoomAndPan(centroid.x, centroid.y, 1);
             } else {
-                console.error("Get position: no intersection found.");
+                new Toast("Get position", "No intersection found.");
             }
         };
 
@@ -283,8 +285,8 @@ export default class TrilateratePosition {
                 input = `${this._baseId}-${row}-input`,
                 inputSelector$ = $(`#${input}`);
 
-            const port = selectSelector$.find(":selected")[0] ? selectSelector$.find(":selected")[0].text : "",
-                distance = +inputSelector$.val();
+            const port = selectSelector$.find(":selected")[0] ? selectSelector$.find(":selected")[0].text : "";
+            const distance = +inputSelector$.val();
 
             if (distance && port !== "") {
                 ports.set(port, distance * roundingFactor * circleRadiusFactor);
@@ -303,7 +305,7 @@ export default class TrilateratePosition {
             this._ports.update();
             showAndGoToPosition();
         } else {
-            console.error("Get position: not enough data.");
+            new Toast("Get position", "Not enough data.");
         }
     }
 
@@ -319,7 +321,7 @@ export default class TrilateratePosition {
         // Show modal
         $(`#${this._modalId}`)
             .modal("show")
-            .on("hidden.bs.modal", () => {
+            .one("hidden.bs.modal", () => {
                 this._useUserInput();
             });
     }
