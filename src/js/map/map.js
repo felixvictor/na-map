@@ -28,6 +28,7 @@ import DisplayGrid from "../map-tools/display-grid";
 import Journey from "../map-tools/make-journey";
 import PredictWind from "../map-tools/predict-wind";
 import WindRose from "../map-tools/wind-rose";
+import ShowTrades from "../map-tools/show-trades";
 
 /**
  * Display naval action map
@@ -262,6 +263,7 @@ class Map {
 
         this._journey = new Journey(this._shipData, this._woodData, this.rem);
         this._windPrediction = new PredictWind();
+        this._showTrades = new ShowTrades(portData.features, this);
 
         this._init();
 
@@ -483,6 +485,7 @@ class Map {
         this._f11.clearMap();
         this._ports.clearMap();
         this._portSelect.clearMap();
+        this._showTrades.clearMap();
         $(".selectpicker")
             .val("default")
             .selectpicker("refresh");
@@ -587,6 +590,7 @@ class Map {
         this._journey.transform(zoomTransform);
         this._pbZone.transform(zoomTransform);
         this._f11.transform(zoomTransform);
+        this._showTrades.transform(zoomTransform);
 
         this._setZoomLevelAndData();
     }
