@@ -200,7 +200,7 @@ export default class PredictWind {
         // Show modal
         $(`#${this._modalId}`)
             .modal("show")
-            .on("hidden.bs.modal", () => {
+            .one("hidden.bs.modal", () => {
                 this._useUserInput();
             });
     }
