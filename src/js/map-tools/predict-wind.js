@@ -53,10 +53,10 @@ export default class PredictWind {
 
     _setupSvg() {
         this._svg = d3Select("main")
-            .append("div")
+            .insert("div", ".toasts")
             .attr("id", "wind")
+            .attr("class", "wind-predict")
             .append("svg")
-            .style("position", "absolute")
             .classed("coord", true);
     }
 
