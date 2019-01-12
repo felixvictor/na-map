@@ -12,11 +12,11 @@ import { min as d3Min, max as d3Max } from "d3-array";
 import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate";
 import { scaleLinear as d3ScaleLinear } from "d3-scale";
 import { select as d3Select } from "d3-selection";
-import Cookies from "js-cookie";
 import moment from "moment";
 import "moment/locale/en-gb";
 
 import {
+    appName,
     circleRadiusFactor,
     primary300,
     colourRed,
@@ -34,8 +34,10 @@ import {
     formatInt,
     formatPercent,
     formatSiInt,
+    getCookie,
     getOrdinal,
-    roundToThousands
+    roundToThousands,
+    setCookie
 } from "../util";
 import TrilateratePosition from "../map-tools/get-position";
 
@@ -62,7 +64,6 @@ export default class DisplayPorts {
         this._iconSize = 48;
         this._fontSize = defaultFontSize;
         this._circleSize = defaultCircleSize;
-        this._showRadius = "attack";
         this._taxIncomeRadius = d3ScaleLinear();
         this._netIncomeRadius = d3ScaleLinear();
         this._attackRadius = d3ScaleLinear().domain([0, 1]);
@@ -75,18 +76,20 @@ export default class DisplayPorts {
         this._maxRadiusFactor = 6;
 
         /**
-         * showRadius cookie name
+         * Base Id
          * @type {string}
-         * @private
          */
-        this._showRadiusCookieName = "na-map--show-radius";
+        this._baseId = "show-radius";
 
         /**
-         * Default showRadius setting
-         * @type {string}
-         * @private
+         * Server name cookie
+         * @type {cookieData}
          */
-        this._showRadiusDefault = "attack";
+        this._showRadiusCookie = {
+            name: `${appName}--${this._baseId}`,
+            values: ["attack", "position", "tax", "net", "green", "off"],
+            default: "attack"
+        };
 
         /**
          * Get showRadius setting from cookie or use default value
@@ -115,9 +118,10 @@ export default class DisplayPorts {
      * @private
      */
     _getShowRadiusSetting() {
-        // Use default value if cookie is not stored
-        const r = Cookies.get(this._showRadiusCookieName) || this._showRadiusDefault;
-        $(`#show-radius-${r}`).prop("checked", true);
+        const r = getCookie(this._showRadiusCookie);
+
+        document.getElementById(`${this._baseId}-${r}`).checked = true;
+
         return r;
     }
 
@@ -127,15 +131,17 @@ export default class DisplayPorts {
      * @private
      */
     _storeShowRadiusSetting() {
-        if (this._showRadius !== this._showRadiusDefault) {
-            Cookies.set(this._showRadiusCookieName, this._showRadius);
-        } else {
-            Cookies.remove(this._showRadiusCookieName);
-        }
+        setCookie(this._showRadiusCookie, this._showRadius);
     }
 
     _showRadiusSelected() {
-        this._showRadius = document.querySelector("input[name='showRadius']:checked").value;
+        this._showRadius = document.querySelector(`input[name='${this._baseId}']:checked`).value;
+
+        // If data is invalid
+        if (!this._showRadiusCookie.values.includes(this._showRadius)) {
+            this._showRadius = this._showRadiusCookie.default;
+            document.getElementById(`${this._baseId}-${this._showRadius}`).checked = true;
+        }
         this._storeShowRadiusSetting();
         this.update();
     }
@@ -294,7 +300,7 @@ export default class DisplayPorts {
     _setupSummary() {
         // Main box
         this._divPortSummary = d3Select("main")
-            .append("div")
+            .insert("div", ".toasts")
             .attr("id", "port-summary")
             .attr("class", "port-summary overlay");
 
@@ -614,6 +620,7 @@ export default class DisplayPorts {
         let cssClass = d => d;
         let r = d => d;
         let fill = d => d;
+        let hasFill = false;
 
         if (this._showRadius === "tax") {
             data = this._portDataFiltered.filter(d => !d.properties.nonCapturable);
@@ -638,7 +645,7 @@ export default class DisplayPorts {
             cssClass = d => `bubble ${getTradePortMarker(d)}`;
             r = d => (d.id === this.tradePortId ? rMax : rMax / 2);
         } else if (this._showRadius === "position") {
-            cssClass = () => "position";
+            cssClass = () => "position-circle";
             r = d => d.properties.distance;
         } else if (this._showRadius === "attack") {
             data = this._portDataFiltered.filter(port => port.properties.attackHostility);
@@ -646,6 +653,7 @@ export default class DisplayPorts {
 
             cssClass = () => "bubble";
             fill = d => this._colourScale(d.properties.attackHostility);
+            hasFill = true;
             r = d => this._attackRadius(d.properties.attackHostility);
         } else if (this._showRadius === "green") {
             data = this._portDataFiltered.filter(
@@ -669,6 +677,8 @@ export default class DisplayPorts {
         } else if (this.showCurrentGood) {
             cssClass = d => `bubble ${d.properties.isSource ? "pos" : "neg"}`;
             r = () => rMax / 2;
+        } else if (this._showRadius === "off") {
+            data = {};
         }
 
         // Data join
@@ -692,7 +702,7 @@ export default class DisplayPorts {
             .merge(circleEnter)
             .attr("class", d => cssClass(d))
             .attr("r", d => r(d));
-        if (fill) {
+        if (hasFill) {
             circleMerge.attr("fill", d => fill(d));
         }
     }
@@ -875,13 +885,17 @@ export default class DisplayPorts {
     }
 
     _filterVisible() {
-        this._portDataFiltered = this._portData.filter(
-            port =>
-                port.geometry.coordinates[0] >= this._lowerBound[0] &&
-                port.geometry.coordinates[0] <= this._upperBound[0] &&
-                port.geometry.coordinates[1] >= this._lowerBound[1] &&
-                port.geometry.coordinates[1] <= this._upperBound[1]
-        );
+        if (this._showRadius !== "position") {
+            this._portDataFiltered = this._portData.filter(
+                port =>
+                    port.geometry.coordinates[0] >= this._lowerBound[0] &&
+                    port.geometry.coordinates[0] <= this._upperBound[0] &&
+                    port.geometry.coordinates[1] >= this._lowerBound[1] &&
+                    port.geometry.coordinates[1] <= this._upperBound[1]
+            );
+        } else {
+            this._portDataFiltered = this._portData;
+        }
         this._countyPolygonFiltered = this._countyPolygon.filter(
             county =>
                 county.centroid[0] >= this._lowerBound[0] &&
@@ -964,6 +978,8 @@ export default class DisplayPorts {
     clearMap(scale) {
         if (this._showRadius === "position") {
             this._showRadius = "off";
+            document.getElementById(`${this._baseId}-${this._showRadius}`).checked = true;
+            this._storeShowRadiusSetting();
         }
         this._trilateratePosition.clearMap();
         this._showSummary();
