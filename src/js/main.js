@@ -83,7 +83,7 @@ function main() {
      * @return {void}
      */
     const serverNameSelected = () => {
-        serverName = document.querySelector("input[name='serverName']:checked").value;
+        serverName = document.querySelector(`input[name='${baseId}']:checked`).value;
         // If data is invalid
         if (!serverNameCookie.values.includes(serverName)) {
             serverName = serverNameCookie.default;

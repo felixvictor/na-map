@@ -593,7 +593,6 @@ class Map {
     _init() {
         this.zoomLevel = "initial";
         this.initialZoomAndPan();
-        this._ports.clearMap(this._minScale);
         this._f11.checkF11Coord();
     }
 
