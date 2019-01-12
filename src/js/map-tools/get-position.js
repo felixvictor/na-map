@@ -13,7 +13,7 @@ import { select as d3Select } from "d3-selection";
 import { intersectionArea as vennIntersectionArea } from "venn.js/src/circleintersection";
 import { registerEvent } from "../analytics";
 import { circleRadiusFactor, insertBaseModal } from "../common";
-import { showToast } from "../util";
+import Toast from "../util/toast";
 
 /**
  * Get position
@@ -257,7 +257,7 @@ export default class TrilateratePosition {
                 this._ports._map._f11.printCoord(centroid.x, centroid.y);
                 this._ports._map.zoomAndPan(centroid.x, centroid.y, 1);
             } else {
-                showToast("Get position", "No intersection found.");
+                new Toast("Get position", "No intersection found.");
             }
         };
 
@@ -305,7 +305,7 @@ export default class TrilateratePosition {
             this._ports.update();
             showAndGoToPosition();
         } else {
-            showToast("Get position", "Not enough data.");
+            new Toast("Get position", "Not enough data.");
         }
     }
 
@@ -321,8 +321,7 @@ export default class TrilateratePosition {
         // Show modal
         $(`#${this._modalId}`)
             .modal("show")
-            .on("hidden.bs.modal", () => {
-                console.log("hidden");
+            .one("hidden.bs.modal", () => {
                 this._useUserInput();
             });
     }
