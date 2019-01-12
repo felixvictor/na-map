@@ -12,6 +12,7 @@ import "bootstrap/js/dist/button";
 import "bootstrap/js/dist/collapse";
 import "bootstrap/js/dist/dropdown";
 import "bootstrap/js/dist/modal";
+import "bootstrap/js/dist/toast";
 import "bootstrap/js/dist/tooltip";
 
 import fontawesome from "@fortawesome/fontawesome";
@@ -82,7 +83,7 @@ function main() {
      * @return {void}
      */
     const serverNameSelected = () => {
-        serverName = document.querySelector("input[name='serverName']:checked").value;
+        serverName = document.querySelector(`input[name='${baseId}']:checked`).value;
         // If data is invalid
         if (!serverNameCookie.values.includes(serverName)) {
             serverName = serverNameCookie.default;
