@@ -30,9 +30,9 @@ import {
     faTrash
 } from "@fortawesome/fontawesome-free-solid";
 
+import Cookie from "./util/cookie";
 import { initAnalytics, registerPage } from "./analytics";
-import { appName } from "./common";
-import { getCookie, setCookie } from "./util";
+import { getRadioButton, setRadioButton } from "./util";
 
 import "../scss/main.scss";
 
@@ -47,21 +47,28 @@ function main() {
     const baseId = "server-name";
 
     /**
-     * Server name cookie
-     * @type {cookieData}
+     * Possible values for server names (first is default value)
+     * @type {string[]}
+     * @private
      */
-    const serverNameCookie = { name: `${appName}--${baseId}`, values: ["eu1", "eu2"], default: "eu1" };
+    const radioButtonValues = ["eu1", "eu2"];
+
+    /**
+     * Server name cookie
+     * @type {Cookie}
+     */
+    const cookie = new Cookie(baseId, radioButtonValues);
 
     /**
      * Get server name from cookie or use default value
      * @returns {string} - server name
      */
     const getServerName = () => {
-        const serverName = getCookie(serverNameCookie);
+        const r = cookie.get();
 
-        document.getElementById(`${baseId}-${serverName}`).checked = true;
+        setRadioButton(`${baseId}-${r}`);
 
-        return serverName;
+        return r;
     };
 
     /**
@@ -75,7 +82,7 @@ function main() {
      * @return {void}
      */
     const storeServerName = () => {
-        setCookie(serverNameCookie, serverName);
+        cookie.set(serverName);
     };
 
     /**
@@ -83,11 +90,11 @@ function main() {
      * @return {void}
      */
     const serverNameSelected = () => {
-        serverName = document.querySelector(`input[name='${baseId}']:checked`).value;
+        serverName = getRadioButton(baseId);
         // If data is invalid
-        if (!serverNameCookie.values.includes(serverName)) {
-            serverName = serverNameCookie.default;
-            document.getElementById(`${baseId}-${serverName}`).checked = true;
+        if (!radioButtonValues.includes(serverName)) {
+            [serverName] = radioButtonValues;
+            setRadioButton(`${baseId}-${serverName}`);
         }
         storeServerName();
         document.location.reload();
