@@ -16,7 +16,6 @@ import moment from "moment";
 import "moment/locale/en-gb";
 
 import {
-    appName,
     circleRadiusFactor,
     primary300,
     colourRed,
@@ -34,11 +33,12 @@ import {
     formatInt,
     formatPercent,
     formatSiInt,
-    getCookie,
     getOrdinal,
+    getRadioButton,
     roundToThousands,
-    setCookie
+    setRadioButton
 } from "../util";
+import Cookie from "../util/cookie";
 import TrilateratePosition from "../map-tools/get-position";
 
 export default class DisplayPorts {
@@ -82,14 +82,17 @@ export default class DisplayPorts {
         this._baseId = "show-radius";
 
         /**
-         * Server name cookie
-         * @type {cookieData}
+         * Possible values for show radius (first is default value)
+         * @type {string[]}
+         * @private
          */
-        this._showRadiusCookie = {
-            name: `${appName}--${this._baseId}`,
-            values: ["attack", "position", "tax", "net", "green", "off"],
-            default: "attack"
-        };
+        this._radioButtonValues = ["attack", "position", "tax", "net", "green", "off"];
+
+        /**
+         * Server name cookie
+         * @type {Cookie}
+         */
+        this._cookie = new Cookie(this._baseId, this._radioButtonValues);
 
         /**
          * Get showRadius setting from cookie or use default value
@@ -118,9 +121,9 @@ export default class DisplayPorts {
      * @private
      */
     _getShowRadiusSetting() {
-        const r = getCookie(this._showRadiusCookie);
+        const r = this._cookie.get();
 
-        document.getElementById(`${this._baseId}-${r}`).checked = true;
+        setRadioButton(`${this._baseId}-${r}`);
 
         return r;
     }
@@ -131,16 +134,16 @@ export default class DisplayPorts {
      * @private
      */
     _storeShowRadiusSetting() {
-        setCookie(this._showRadiusCookie, this._showRadius);
+        this._cookie.set(this._showRadius);
     }
 
     _showRadiusSelected() {
-        this._showRadius = document.querySelector(`input[name='${this._baseId}']:checked`).value;
+        this._showRadius = getRadioButton(this._baseId);
 
         // If data is invalid
-        if (!this._showRadiusCookie.values.includes(this._showRadius)) {
-            this._showRadius = this._showRadiusCookie.default;
-            document.getElementById(`${this._baseId}-${this._showRadius}`).checked = true;
+        if (!this._radioButtonValues.includes(this._showRadius)) {
+            this._showRadius = this._radioButtonValues[0];
+            setRadioButton(`${this._baseId}-${this._showRadius}`);
         }
         this._storeShowRadiusSetting();
         this.update();
