@@ -121,8 +121,13 @@ export default class DisplayPorts {
      * @private
      */
     _getShowRadiusSetting() {
-        const r = this._cookie.get();
+        let r = this._cookie.get();
 
+        // Radius "position" after reload is useless
+        if (r === "position") {
+            [r] = this._radioButtonValues;
+            this._cookie.set(r);
+        }
         setRadioButton(`${this._baseId}-${r}`);
 
         return r;
@@ -142,7 +147,7 @@ export default class DisplayPorts {
 
         // If data is invalid
         if (!this._radioButtonValues.includes(this._showRadius)) {
-            this._showRadius = this._radioButtonValues[0];
+            [this._showRadius] = this._radioButtonValues;
             setRadioButton(`${this._baseId}-${this._showRadius}`);
         }
         this._storeShowRadiusSetting();
