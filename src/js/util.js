@@ -10,9 +10,6 @@
 
 import { formatPrefix as d3FormatPrefix, formatLocale as d3FormatLocale } from "d3-format";
 import { scaleBand as d3ScaleBand } from "d3-scale";
-import { select as d3Select } from "d3-selection";
-import Cookies from "js-cookie";
-import { iconSmallSrc } from "./common";
 
 /**
  * Default format
@@ -539,47 +536,17 @@ export function printSmallCompassRose({ elem, radius }) {
 export const displayClan = clan => `<span class="caps">${clan}</span>`;
 
 /**
- * @typedef {object} cookieData
- * @property {string } name - Cookie name
- * @property {string[]} values - Possible cookie values
- * @property {string} default - Default cookie value
+ * Get radio button value
+ * @param {string} name - Radio button name
+ * @returns {string} Radio button value
  */
-
-// Set cookies defaults (expiry 365 days)
-Cookies.defaults = {
-    expires: 365
-};
+export const getRadioButton = name => document.querySelector(`input[name='${name}']:checked`).value;
 
 /**
- * Get cookie
- * @param {cookieData} cookieData - Cookie data
- * @returns {string} Cookie
+ * Set radio button value
+ * @param {string} name - Radio button name
+ * @returns {void}
  */
-export const getCookie = cookieData => {
-    let cookie = Cookies.get(cookieData.name);
-
-    if (typeof cookie === "undefined") {
-        // Use default value if cookie is not stored
-        cookie = cookieData.default;
-    } else if (!cookieData.values.includes(cookie)) {
-        // Use default value if cookie has invalid data and remove cookie
-        cookie = cookieData.default;
-        Cookies.remove(cookieData.name);
-    }
-
-    return cookie;
-};
-
-/**
- * Set cookie
- * @param {cookieData} cookieData - Cookie data
- * @param {string} cookie - Cookie value
- * @return {void}
- */
-export const setCookie = (cookieData, cookie) => {
-    if (cookie !== cookieData.default) {
-        Cookies.set(cookieData.name, cookie);
-    } else {
-        Cookies.remove(cookieData.name);
-    }
+export const setRadioButton = name => {
+    document.getElementById(name).checked = true;
 };
