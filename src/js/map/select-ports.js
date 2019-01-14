@@ -283,19 +283,17 @@ export default class SelectPorts {
     }
 
     _setTradePortPartners() {
-        const tradePortConsumedGoods = [],
-            tradePortProducedGoods = [];
+        let tradePortConsumedGoods = [];
+        let tradePortProducedGoods = [];
 
-        this._ports.portDataDefault
-            .filter(port => port.id === this._ports.tradePortId)
-            .forEach(port => {
-                if (port.consumesTrading) {
-                    port.consumesTrading.forEach(good => tradePortConsumedGoods.push(good.name));
-                }
-                if (port.dropsTrading) {
-                    port.dropsTrading.forEach(good => tradePortProducedGoods.push(good.name));
-                }
-            });
+        const tradePort = this._ports.portDataDefault.find(port => port.id === this._ports.tradePortId);
+        if (tradePort.consumesTrading) {
+            tradePortConsumedGoods = tradePort.consumesTrading.map(good => good);
+        }
+        if (tradePort.dropsTrading) {
+            tradePortProducedGoods = tradePort.dropsTrading.map(good => good);
+        }
+
         this._ports.portData = this._ports.portDataDefault
             .map(port => {
                 // eslint-disable-next-line no-param-reassign
@@ -308,8 +306,8 @@ export default class SelectPorts {
                 port.buyInTradePort = false;
                 if (port.consumesTrading) {
                     port.consumesTrading.forEach(good => {
-                        if (tradePortProducedGoods.includes(good.name)) {
-                            port.goodsToBuyInTradePort.push(good.name);
+                        if (tradePortProducedGoods.includes(good)) {
+                            port.goodsToBuyInTradePort.push(good);
                             // eslint-disable-next-line no-param-reassign
                             port.buyInTradePort = true;
                         }
@@ -317,8 +315,8 @@ export default class SelectPorts {
                 }
                 if (port.dropsTrading) {
                     port.dropsTrading.forEach(good => {
-                        if (tradePortConsumedGoods.includes(good.name)) {
-                            port.goodsToSellInTradePort.push(good.name);
+                        if (tradePortConsumedGoods.includes(good)) {
+                            port.goodsToSellInTradePort.push(good);
                             // eslint-disable-next-line no-param-reassign
                             port.sellInTradePort = true;
                         }
@@ -336,7 +334,7 @@ export default class SelectPorts {
     _portSelected() {
         const port = this._portNamesSelector.options[this._portNamesSelector.selectedIndex];
         const c = port.value.split(",");
-        const id = port.getAttribute("data-id").toString();
+        const id = +port.getAttribute("data-id");
 
         this._ports.currentPort = {
             id,
@@ -360,9 +358,9 @@ export default class SelectPorts {
         const sourcePorts = this._ports.portDataDefault
             .filter(
                 port =>
-                    (port.dropsTrading && port.dropsTrading.some(good => good.name === goodSelected)) ||
-                    (port.dropsNonTrading && port.dropsNonTrading.some(good => good.name === goodSelected)) ||
-                    (port.producesNonTrading && port.producesNonTrading.some(good => good.name === goodSelected))
+                    (port.dropsTrading && port.dropsTrading.some(good => good === goodSelected)) ||
+                    (port.dropsNonTrading && port.dropsNonTrading.some(good => good === goodSelected)) ||
+                    (port.producesNonTrading && port.producesNonTrading.some(good => good === goodSelected))
             )
             .map(port => {
                 // eslint-disable-next-line no-param-reassign
@@ -370,7 +368,7 @@ export default class SelectPorts {
                 return port;
             });
         const consumingPorts = this._ports.portDataDefault
-            .filter(port => port.consumesTrading && port.consumesTrading.some(good => good.name === goodSelected))
+            .filter(port => port.consumesTrading && port.consumesTrading.some(good => good === goodSelected))
             .map(port => {
                 // eslint-disable-next-line prefer-destructuring,no-param-reassign
                 port.isSource = false;
