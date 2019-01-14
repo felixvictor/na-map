@@ -54,6 +54,7 @@
         "sassdoc": "^2.5.1",
         "shapefile": "^0.6.6",
         "sharp": "^0.21.1",
+        "shellcheck": "^0.1.0",
         "sitemap-webpack-plugin": "^0.6.0",
         "string-replace-loader": "^2.1.1",
         "stylelint": "^9.9.0",

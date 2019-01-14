@@ -161,10 +161,10 @@ export default class DisplayPorts {
         /*
         ** Automatic calculation of text position
         // https://stackoverflow.com/questions/40774697/how-to-group-an-array-of-objects-by-key
-        const counties = this._portDataDefault.filter(port => port.properties.county !== "").reduce(
+        const counties = this._portDataDefault.filter(port => port.county !== "").reduce(
             (r, a) =>
                 Object.assign(r, {
-                    [a.properties.county]: (r[a.properties.county] || []).concat([a.geometry.coordinates])
+                    [a.properties.county]: (r[a.properties.county] || []).concat([a.coordinates])
                 }),
             {}
         );
@@ -261,10 +261,10 @@ export default class DisplayPorts {
         /*
         ** Automatic calculation of text position
         // https://stackoverflow.com/questions/40774697/how-to-group-an-array-of-objects-by-key
-        const regions = this._portDataDefault.filter(port => port.properties.region !== "").reduce(
+        const regions = this._portDataDefault.filter(port => port.region !== "").reduce(
             (r, a) =>
                 Object.assign(r, {
-                    [a.properties.region]: (r[a.properties.region] || []).concat([a.geometry.coordinates])
+                    [a.properties.region]: (r[a.properties.region] || []).concat([a.coordinates])
                 }),
             {}
         );
@@ -552,7 +552,7 @@ export default class DisplayPorts {
         };
 
         const port = d3Select(nodes[i]),
-            title = tooltipData(this._getText(d.id, d.properties));
+            title = tooltipData(this._getText(d.id, d));
         // eslint-disable-next-line no-underscore-dangle
         $(port.node())
             .tooltip({
@@ -589,9 +589,9 @@ export default class DisplayPorts {
         const circleEnter = circleUpdate
             .enter()
             .append("circle")
-            .attr("fill", d => `url(#${d.properties.nation}${d.properties.availableForAll ? "a" : ""})`)
-            .attr("cx", d => d.geometry.coordinates[0])
-            .attr("cy", d => d.geometry.coordinates[1])
+            .attr("fill", d => `url(#${d.nation}${d.availableForAll ? "a" : ""})`)
+            .attr("cx", d => d.coordinates[0])
+            .attr("cy", d => d.coordinates[1])
             .on("click", (d, i, nodes) => this._showDetails(d, i, nodes))
             .on("mouseout", hideDetails);
 
@@ -604,11 +604,11 @@ export default class DisplayPorts {
             let marker = "";
             if (port.id === this.tradePortId) {
                 marker = "here";
-            } else if (port.properties.sellInTradePort && port.properties.buyInTradePort) {
+            } else if (port.sellInTradePort && port.buyInTradePort) {
                 marker = "both";
-            } else if (port.properties.sellInTradePort) {
+            } else if (port.sellInTradePort) {
                 marker = "pos";
-            } else if (port.properties.buyInTradePort) {
+            } else if (port.buyInTradePort) {
                 marker = "neg";
             }
             return marker;
@@ -623,42 +623,40 @@ export default class DisplayPorts {
         let hasFill = false;
 
         if (this._showRadius === "tax") {
-            data = this._portDataFiltered.filter(d => !d.properties.nonCapturable);
+            data = this._portDataFiltered.filter(d => !d.nonCapturable);
 
-            const minTaxIncome = d3Min(data, d => d.properties.taxIncome);
-            const maxTaxIncome = d3Max(data, d => d.properties.taxIncome);
+            const minTaxIncome = d3Min(data, d => d.taxIncome);
+            const maxTaxIncome = d3Max(data, d => d.taxIncome);
             this._taxIncomeRadius.domain([minTaxIncome, maxTaxIncome]);
             this._taxIncomeRadius.range([rMin, rMax]);
 
             cssClass = () => "bubble pos";
-            r = d => this._taxIncomeRadius(Math.abs(d.properties.taxIncome));
+            r = d => this._taxIncomeRadius(Math.abs(d.taxIncome));
         } else if (this._showRadius === "net") {
-            data = this._portDataFiltered.filter(d => !d.properties.nonCapturable);
+            data = this._portDataFiltered.filter(d => !d.nonCapturable);
 
-            const minNetIncome = d3Min(data, d => d.properties.netIncome);
-            const maxNetIncome = d3Max(data, d => d.properties.netIncome);
+            const minNetIncome = d3Min(data, d => d.netIncome);
+            const maxNetIncome = d3Max(data, d => d.netIncome);
             this._netIncomeRadius.domain([minNetIncome, maxNetIncome]).range([rMin, rMax]);
 
-            cssClass = d => `bubble ${d.properties.netIncome < 0 ? "neg" : "pos"}`;
-            r = d => this._netIncomeRadius(Math.abs(d.properties.netIncome));
+            cssClass = d => `bubble ${d.netIncome < 0 ? "neg" : "pos"}`;
+            r = d => this._netIncomeRadius(Math.abs(d.netIncome));
         } else if (this.showTradePortPartners) {
             cssClass = d => `bubble ${getTradePortMarker(d)}`;
             r = d => (d.id === this.tradePortId ? rMax : rMax / 2);
         } else if (this._showRadius === "position") {
             cssClass = () => "position-circle";
-            r = d => d.properties.distance;
+            r = d => d.distance;
         } else if (this._showRadius === "attack") {
-            data = this._portDataFiltered.filter(port => port.properties.attackHostility);
+            data = this._portDataFiltered.filter(port => port.attackHostility);
             this._attackRadius.range([rMin, rMax]);
 
             cssClass = () => "bubble";
-            fill = d => this._colourScale(d.properties.attackHostility);
+            fill = d => this._colourScale(d.attackHostility);
             hasFill = true;
-            r = d => this._attackRadius(d.properties.attackHostility);
+            r = d => this._attackRadius(d.attackHostility);
         } else if (this._showRadius === "green") {
-            data = this._portDataFiltered.filter(
-                port => port.properties.nonCapturable && port.properties.nation !== "FT"
-            );
+            data = this._portDataFiltered.filter(port => port.nonCapturable && port.nation !== "FT");
 
             cssClass = () => "bubble pos";
             r = () =>
@@ -675,7 +673,7 @@ export default class DisplayPorts {
                     )
                 ) * circleRadiusFactor;
         } else if (this.showCurrentGood) {
-            cssClass = d => `bubble ${d.properties.isSource ? "pos" : "neg"}`;
+            cssClass = d => `bubble ${d.isSource ? "pos" : "neg"}`;
             r = () => rMax / 2;
         } else if (this._showRadius === "off") {
             data = {};
@@ -694,8 +692,8 @@ export default class DisplayPorts {
         const circleEnter = circleUpdate
             .enter()
             .append("circle")
-            .attr("cx", d => d.geometry.coordinates[0])
-            .attr("cy", d => d.geometry.coordinates[1]);
+            .attr("cx", d => d.coordinates[0])
+            .attr("cy", d => d.coordinates[1]);
 
         // Apply to both old and new
         const circleMerge = circleUpdate
@@ -710,23 +708,21 @@ export default class DisplayPorts {
     _updateTextsX(d, circleSize) {
         return this._zoomLevel === "pbZone" &&
             (this._showPBZones === "all" || (this._showPBZones === "single" && d.id === this.currentPort.id))
-            ? d.geometry.coordinates[0] + Math.round(circleSize * 1.2 * Math.cos(degreesToRadians(d.properties.angle)))
-            : d.geometry.coordinates[0];
+            ? d.coordinates[0] + Math.round(circleSize * 1.2 * Math.cos(degreesToRadians(d.angle)))
+            : d.coordinates[0];
     }
 
     _updateTextsY(d, circleSize, fontSize) {
         const deltaY = circleSize + fontSize * 1.2;
 
         if (this._zoomLevel !== "pbZone") {
-            return d.geometry.coordinates[1] + deltaY;
+            return d.coordinates[1] + deltaY;
         }
 
-        const dy = d.properties.angle > 90 && d.properties.angle < 270 ? fontSize : 0;
+        const dy = d.angle > 90 && d.angle < 270 ? fontSize : 0;
         return this._showPBZones === "all" || (this._showPBZones === "single" && d.id === this.currentPort.id)
-            ? d.geometry.coordinates[1] +
-                  Math.round(circleSize * 1.2 * Math.sin(degreesToRadians(d.properties.angle))) +
-                  dy
-            : d.geometry.coordinates[1] + deltaY;
+            ? d.coordinates[1] + Math.round(circleSize * 1.2 * Math.sin(degreesToRadians(d.angle))) + dy
+            : d.coordinates[1] + deltaY;
     }
 
     _updateTextsAnchor(d) {
@@ -734,7 +730,7 @@ export default class DisplayPorts {
             this._zoomLevel === "pbZone" &&
             (this._showPBZones === "all" || (this._showPBZones === "single" && d.id === this.currentPort.id))
         ) {
-            return d.properties.textAnchor;
+            return d.textAnchor;
         }
         return "middle";
     }
@@ -763,7 +759,7 @@ export default class DisplayPorts {
             const textEnter = textUpdate
                 .enter()
                 .append("text")
-                .text(d => d.properties.name);
+                .text(d => d.name);
 
             // Apply to both old and new
             textUpdate
@@ -782,8 +778,8 @@ export default class DisplayPorts {
             netTotal = 0;
 
         if (numberPorts) {
-            taxTotal = this._portData.map(d => d.properties.taxIncome).reduce((a, b) => a + b);
-            netTotal = this._portData.map(d => d.properties.netIncome).reduce((a, b) => a + b);
+            taxTotal = this._portData.map(d => d.taxIncome).reduce((a, b) => a + b);
+            netTotal = this._portData.map(d => d.netIncome).reduce((a, b) => a + b);
         }
 
         this._portSummaryTextNumPorts.text(`${numberPorts}`);
@@ -888,10 +884,10 @@ export default class DisplayPorts {
         if (this._showRadius !== "position") {
             this._portDataFiltered = this._portData.filter(
                 port =>
-                    port.geometry.coordinates[0] >= this._lowerBound[0] &&
-                    port.geometry.coordinates[0] <= this._upperBound[0] &&
-                    port.geometry.coordinates[1] >= this._lowerBound[1] &&
-                    port.geometry.coordinates[1] <= this._upperBound[1]
+                    port.coordinates[0] >= this._lowerBound[0] &&
+                    port.coordinates[0] <= this._upperBound[0] &&
+                    port.coordinates[1] >= this._lowerBound[1] &&
+                    port.coordinates[1] <= this._upperBound[1]
             );
         } else {
             this._portDataFiltered = this._portData;
