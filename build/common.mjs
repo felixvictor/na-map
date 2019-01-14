@@ -19,6 +19,12 @@ const transformMatrix = {
     };
 
 // F11 coord to svg coord
+/**
+ * Convert x coordinate
+ * @param {number} x - X position
+ * @param {number} y - Y position
+ * @returns {number} Coordinate
+ */
 export const convertCoordX = (x, y) => transformMatrix.A * x + transformMatrix.B * y + transformMatrix.C;
 
 // F11 coord to svg coord
@@ -209,9 +215,9 @@ export function isEmpty(obj) {
 Math.radiansToDegrees = radians => (radians * 180) / Math.PI;
 
 /**
- * @typedef {Array} Point
- * @property {number} 0 - X Coordinate
- * @property {number} 1 - Y Coordinate
+ * @typedef {number[]} Point
+ * @property {number} 0 - X coordinate
+ * @property {number} 1 - Y coordinate
  */
 
 /**

@@ -6,7 +6,6 @@ import {
     convertCoordY,
     rotationAngleInDegrees,
     readJson,
-    roundToThousands,
     saveJson
     // eslint-disable-next-line import/extensions
 } from "./common.mjs";
@@ -16,10 +15,11 @@ const inBaseFilename = process.argv[2],
     outDir = process.argv[4],
     date = process.argv[5];
 
-const APIItems = readJson(`${inBaseFilename}-ItemTemplates-${date}.json`),
-    APIPorts = readJson(`${inBaseFilename}-Ports-${date}.json`),
-    APIShops = readJson(`${inBaseFilename}-Shops-${date}.json`),
-    ItemNames = new Map();
+const apiItems = readJson(`${inBaseFilename}-ItemTemplates-${date}.json`);
+const apiPorts = readJson(`${inBaseFilename}-Ports-${date}.json`);
+const apiShops = readJson(`${inBaseFilename}-Shops-${date}.json`);
+
+const minProfit = 3e4;
 
 // https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
 // eslint-disable-next-line no-extend-native,func-names
@@ -28,31 +28,38 @@ String.prototype.replaceAll = function(search, replacement) {
     return target.replace(new RegExp(search, "g"), replacement);
 };
 
-function getItemNames() {
-    APIItems.filter(item => !item.NotUsed && (item.ItemType === "Material" || item.ItemType === "Resource")).forEach(
-        item => {
-            ItemNames.set(item.Id, {
+/**
+ * Get item names
+ * @return {Map<number, string>} Item names<id, name>
+ */
+const getItemNames = () =>
+    new Map(
+        apiItems.map(item => [
+            item.Id,
+            {
                 name: item.Name.replaceAll("'", "’"),
+                weight: item.ItemWeight,
+                itemType: item.ItemType,
                 trading:
                     item.SortingGroup === "Resource.Trading" ||
                     item.Name === "American Cotton" ||
                     item.Name === "Tobacco"
-            });
-        }
+            }
+        ])
     );
-}
+
+const itemNames = getItemNames();
 
 function convertPorts() {
-    const counties = new Map(),
-        regions = new Map();
-    const geoJsonPort = {},
-        geoJsonRegions = {},
-        geoJsonCounties = {};
+    const counties = new Map();
+    const regions = new Map();
+    const portData = [];
+    const geoJsonRegions = {};
+    const geoJsonCounties = {};
+    const trades = [];
 
-    geoJsonPort.type = "FeatureCollection";
     geoJsonRegions.type = "FeatureCollection";
     geoJsonCounties.type = "FeatureCollection";
-    geoJsonPort.features = [];
     geoJsonRegions.features = [];
     geoJsonCounties.features = [];
 
@@ -113,94 +120,103 @@ function convertPorts() {
 
     /**
      *
-     * @param {Object} port Port data.
-     * @param {Array} portPos Port screen x/y coordinates.
+     * @param {Object} apiPort Port data.
      * @return {void}
      */
-    function setPortFeature(port, portPos) {
-        const portShop = APIShops.filter(shop => shop.Id === port.Id),
-            circleAPos = [
-                Math.round(convertCoordX(port.PortBattleZonePositions[0].x, port.PortBattleZonePositions[0].z)),
-                Math.round(convertCoordY(port.PortBattleZonePositions[0].x, port.PortBattleZonePositions[0].z))
-            ],
-            angle = Math.round(rotationAngleInDegrees(portPos, circleAPos));
+    const setPortFeature = apiPort => {
+        const portShop = apiShops.find(shop => shop.Id === apiPort.Id);
 
-        const feature = {
-            type: "Feature",
-            id: port.Id,
-            geometry: {
-                type: "Point",
-                coordinates: portPos
-            },
-            properties: {
-                name: port.Name.replaceAll("'", "’"),
-                angle,
-                textAnchor: angle > 0 && angle < 180 ? "start" : "end",
-                region: port.Location,
-                countyCapitalName: port.CountyCapitalName,
-                county: capitalToCounty.has(port.CountyCapitalName) ? capitalToCounty.get(port.CountyCapitalName) : "",
-                countyCapital: port.Name === port.CountyCapitalName,
-                shallow: port.Depth,
-                availableForAll: port.AvailableForAll,
-                brLimit: port.PortBattleBRLimit,
-                portBattleStartTime: port.PortBattleStartTime,
-                portBattleType: port.PortBattleType,
-                nonCapturable: port.NonCapturable,
-                conquestMarksPension: port.ConquestMarksPension,
-                portTax: Math.round(port.PortTax * 100) / 100,
-                taxIncome: port.LastTax,
-                netIncome: port.LastTax - port.LastCost,
-                tradingCompany: port.TradingCompany,
-                laborHoursDiscount: port.LaborHoursDiscount,
-                dropsTrading: portShop.map(shop =>
-                    shop.ResourcesAdded.filter(
-                        good => ItemNames.has(good.Template) && ItemNames.get(good.Template).trading
-                    ).map(good => ({
-                        name: ItemNames.get(good.Template).name,
-                        amount: good.Amount,
-                        chance: roundToThousands(good.Chance * 100)
-                    }))
-                )[0],
-                consumesTrading: portShop.map(shop =>
-                    shop.ResourcesConsumed.filter(
-                        good => ItemNames.has(good.Key) && ItemNames.get(good.Key).trading
-                    ).map(good => ({ name: ItemNames.get(good.Key).name }))
-                )[0],
-                producesNonTrading: portShop.map(shop =>
-                    shop.ResourcesProduced.filter(
-                        good => ItemNames.has(good.Key) && !ItemNames.get(good.Key).trading
-                    ).map(good => ({ name: ItemNames.get(good.Key).name }))
-                )[0],
-                dropsNonTrading: portShop.map(shop =>
-                    shop.ResourcesAdded.filter(
-                        good => ItemNames.has(good.Template) && !ItemNames.get(good.Template).trading
-                    ).map(good => ({
-                        name: ItemNames.get(good.Template).name,
-                        amount: good.Amount,
-                        chance: roundToThousands(good.Chance * 100)
-                    }))
-                )[0]
-            }
+        const port = {
+            id: +apiPort.Id,
+            portBattleStartTime: apiPort.PortBattleStartTime,
+            portBattleType: apiPort.PortBattleType,
+            nonCapturable: apiPort.NonCapturable,
+            conquestMarksPension: apiPort.ConquestMarksPension,
+            portTax: Math.round(apiPort.PortTax * 100) / 100,
+            taxIncome: apiPort.LastTax,
+            netIncome: apiPort.LastTax - apiPort.LastCost,
+            tradingCompany: apiPort.TradingCompany,
+            laborHoursDiscount: apiPort.LaborHoursDiscount,
+            dropsTrading: portShop.ResourcesAdded.filter(
+                good => itemNames.has(good.Template) && itemNames.get(good.Template).trading
+            )
+                .map(good => good.Template)
+                .sort((a, b) => a - b),
+            consumesTrading: portShop.ResourcesConsumed.filter(
+                good => itemNames.has(good.Key) && itemNames.get(good.Key).trading
+            )
+                .map(good => good.Key)
+                .sort((a, b) => a - b),
+            producesNonTrading: portShop.ResourcesProduced.filter(
+                good => itemNames.has(good.Key) && !itemNames.get(good.Key).trading
+            )
+                .map(good => good.Key)
+                .sort((a, b) => a - b),
+            dropsNonTrading: portShop.ResourcesAdded.filter(
+                good => itemNames.has(good.Template) && !itemNames.get(good.Template).trading
+            )
+                .map(good => good.Template)
+                .sort((a, b) => a - b),
+            inventory: portShop.RegularItems.filter(good => itemNames.get(good.TemplateId).itemType !== "Cannon").map(
+                good => ({
+                    id: +good.TemplateId,
+                    buyQuantity: good.Quantity !== -1 ? good.Quantity : good.BuyContractQuantity,
+                    buyPrice: Math.round(good.BuyPrice * (1 + apiPort.PortTax)),
+                    sellPrice: Math.round(good.SellPrice / (1 + apiPort.PortTax)),
+                    sellQuantity: good.SellContractQuantity
+                })
+            )
         };
         // Delete empty entries
         ["dropsTrading", "consumesTrading", "producesNonTrading", "dropsNonTrading"].forEach(type => {
-            if (!feature.properties[type].length) {
-                delete feature.properties[type];
+            if (!port[type].length) {
+                delete port[type];
             }
         });
-        geoJsonPort.features.push(feature);
-    }
+        portData.push(port);
+    };
 
-    APIPorts.forEach(port => {
+    apiPorts.forEach(port => {
         const portPos = [
             Math.round(convertCoordX(port.Position.x, port.Position.z)),
             Math.round(convertCoordY(port.Position.x, port.Position.z))
         ];
         setCountyFeature(port, portPos);
         setRegionFeature(port, portPos);
-        setPortFeature(port, portPos);
+        setPortFeature(port);
     });
-    saveJson(outFilename, geoJsonPort);
+    saveJson(outFilename, portData);
+
+    portData.forEach(buyPort => {
+        buyPort.inventory.forEach(buyGood => {
+            const { buyPrice, buyQuantity } = buyGood;
+            portData.forEach(sellPort => {
+                const sellGood = sellPort.inventory.find(good => good.id === buyGood.id);
+                if (sellPort.id !== buyPort.id && sellGood) {
+                    const { sellPrice, sellQuantity } = sellGood;
+                    // Limit known to sell at sellPrice?
+                    const quantity = sellQuantity === -1 ? buyQuantity : sellQuantity;
+                    const profitPerItem = sellPrice - buyPrice;
+                    const profit = profitPerItem * quantity;
+                    if (profit >= minProfit) {
+                        trades.push({
+                            good: buyGood.id,
+                            buyPort: { id: +buyPort.id, grossPrice: buyPrice },
+                            sellPort: { id: +sellPort.id, grossPrice: sellPrice },
+                            quantity,
+                            profit,
+                            profitPerItem,
+                            totalWeight: Math.round(itemNames.get(buyGood.id).weight * quantity)
+                        });
+                    }
+                }
+            });
+        });
+    });
+    trades.sort((a, b) => a.buyPort.id - b.buyPort.id || a.sellPort.id - b.sellPort.id);
+
+    saveJson(`${outDir}/trades.json`, trades);
+
     saveJson(`${outDir}/regions.json`, geoJsonRegions);
     saveJson(`${outDir}/counties.json`, geoJsonCounties);
 
@@ -225,5 +241,4 @@ function convertPorts() {
     saveJson(`${outDir}/county-labels.json`, geoJsonCounties);
 }
 
-getItemNames();
 convertPorts();

@@ -80,6 +80,7 @@ function common_var () {
     src_dir="${base_dir}/src"
     out_dir="${base_dir}/public/data"
     gen_dir="${src_dir}/gen"
+    port_file="${gen_dir}/ports.json"
     ship_file="${gen_dir}/ships.json"
     cannon_file="${gen_dir}/cannons.json"
     building_file="${gen_dir}/buildings.json"
@@ -163,23 +164,18 @@ function get_port_data () {
             fi
         done
 
-        local port_file
+        local server_file
         local pb_file
-        local port_geojson_file
         local api_file
         for server_name in "${server_names[@]}"; do
-            port_file="${gen_dir}/${server_name}.json"
+            server_file="${gen_dir}/${server_name}.json"
             pb_file="${gen_dir}/${server_name}-pb.json"
-            port_geojson_file="${gen_dir}/ports.geojson"
             for api_var in "${api_vars[@]}"; do
                 api_file="${api_base_file}-${server_name}-${api_var}-${date}.json"
                 get_API_data "${server_name}" "${api_file}" "${api_var}"
             done
 
-            ${command_nodejs} build/convert-API-data.mjs "${api_base_file}-${server_name}" "${port_geojson_file}" "${gen_dir}" "${date}"
-            yarn geo2topo -o "${port_file}" "${port_geojson_file}"
-            rm "${port_geojson_file}"
-
+            ${command_nodejs} build/convert-API-data.mjs "${api_base_file}-${server_name}" "${server_file}" "${gen_dir}" "${date}"
             ${command_nodejs} build/convert-API-pb-data.mjs "${api_base_file}-${server_name}" "${pb_file}" "${date}"
         done
 
@@ -190,6 +186,7 @@ function get_port_data () {
             "${build_dir}/towers.geojson" "${build_dir}/joinCircles.geojson"
         rm "${build_dir}"/*.geojson
 
+        ${command_nodejs} build/convert-ports.mjs "${api_base_file}-${server_names[0]}" "${port_file}" "${date}"
         ${command_nodejs} build/convert-ships.mjs "${api_base_file}-${server_names[0]}" "${ship_file}" "${date}"
         ${command_nodejs} build/convert-additional-ship-data.mjs "${build_dir}/Modules" "${ship_file}"
         ${command_nodejs} build/convert-cannons.mjs "${build_dir}/Modules" "${cannon_file}"
@@ -202,7 +199,7 @@ function get_port_data () {
             ${command_nodejs} build/convert-ownership.mjs "${api_dir}" "api-${server_names[0]}-Ports" "${ownership_json}" "${nation_file}"
         fi
 
-        ${command_nodejs} build/create-xlsx.mjs "${ship_file}" "${gen_dir}/${server_names[0]}.json" "${excel_file}"
+        ${command_nodejs} build/create-xlsx.mjs "${ship_file}" "${port_file}" "${excel_file}"
 
         return 0
     else
