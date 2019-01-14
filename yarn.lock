@@ -13127,6 +13127,11 @@ shebang-regex@^1.0.0:
   resolved "https://registry.yarnpkg.com/shebang-regex/-/shebang-regex-1.0.0.tgz#da42f49740c0b42db2ca9728571cb190c98efea3"
   integrity sha1-2kL0l0DAtC2yypcoVxyxkMmO/qM=
 
+shellcheck@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/shellcheck/-/shellcheck-0.1.0.tgz#2f573383214b0f24d44fa4e61cfadb6183066815"
+  integrity sha512-/ACVouhFqVnwU2x1GxVicxvplOu9QeWihJIMApkVbdYmvbl1iTf2rSo/dXzDDadF8n+zbqYn3v981LUvMj86OA==
+
 signal-exit@^3.0.0, signal-exit@^3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/signal-exit/-/signal-exit-3.0.2.tgz#b5fdc08f1287ea1178628e415e25132b73646c6d"

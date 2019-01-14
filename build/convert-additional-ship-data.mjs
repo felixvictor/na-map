@@ -254,21 +254,23 @@ function convertAdditionalShipData() {
     // Add additional data to the existing data
     function addAddData(addData, id) {
         // Find current ship
-        ships.shipData.filter(ship => ship.id === id).forEach(ship => {
-            // Get all data for each group
-            Object.entries(addData).forEach(([group, values]) => {
-                // Get all elements per group
-                Object.entries(values).forEach(([element, value]) => {
-                    if (typeof ship[group] === "undefined") {
+        ships
+            .filter(ship => ship.id === id)
+            .forEach(ship => {
+                // Get all data for each group
+                Object.entries(addData).forEach(([group, values]) => {
+                    // Get all elements per group
+                    Object.entries(values).forEach(([element, value]) => {
+                        if (typeof ship[group] === "undefined") {
+                            // eslint-disable-next-line no-param-reassign
+                            ship[group] = {};
+                        }
+                        // add value
                         // eslint-disable-next-line no-param-reassign
-                        ship[group] = {};
-                    }
-                    // add value
-                    // eslint-disable-next-line no-param-reassign
-                    ship[group][element] = value;
+                        ship[group][element] = value;
+                    });
                 });
             });
-        });
     }
 
     function getFileData(baseFileName, ext) {
