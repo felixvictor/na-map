@@ -58,8 +58,12 @@ class Map {
          */
         this._dataSources = [
             {
-                fileName: `${serverName}.json`,
+                fileName: "ports.json",
                 name: "ports"
+            },
+            {
+                fileName: `${serverName}.json`,
+                name: "server"
             },
             {
                 fileName: `${serverName}-pb.json`,
@@ -208,40 +212,64 @@ class Map {
 
         //        marks.push("setupData");
         //        performance.mark(`${marks[marks.length - 1]}-start`);
-        const portData = topojsonFeature(data.ports, data.ports.objects.ports);
+        // function();
         //        performance.mark(`${marks[marks.length - 1]}-end`);
 
-        const getFeature = object => {
-            // Port ids of capturable ports
-            const portIds = portData.features.filter(port => !port.properties.nonCapturable).map(port => port.id);
-            return object
+        // Port ids of capturable ports
+        const portIds = data.ports.filter(port => !port.nonCapturable).map(port => port.id);
+        const getFeature = object =>
+            object
                 .filter(port => portIds.includes(port.id))
                 .map(port => ({
                     type: "Feature",
                     id: port.id,
-                    position: port.properties.position,
+                    position: port.position,
                     geometry: port.geometry
                 }));
-        };
 
         // Combine port data with port battle data
-        portData.features = portData.features.map(port => {
+        const portData = data.ports.map(port => {
             const combinedData = port;
+
+            const serverData = data.server.find(d => d.id === combinedData.id);
+
+            combinedData.portBattleStartTime = serverData.portBattleStartTime;
+            combinedData.portBattleType = serverData.portBattleType;
+            combinedData.nonCapturable = serverData.nonCapturable;
+            combinedData.conquestMarksPension = serverData.conquestMarksPension;
+            combinedData.portTax = serverData.portTax;
+            combinedData.taxIncome = serverData.taxIncome;
+            combinedData.netIncome = serverData.netIncome;
+            combinedData.tradingCompany = serverData.tradingCompany;
+            combinedData.laborHoursDiscount = serverData.laborHoursDiscount;
+            combinedData.dropsTrading = serverData.dropsTrading;
+            combinedData.consumesTrading = serverData.consumesTrading;
+            combinedData.producesNonTrading = serverData.producesNonTrading;
+            combinedData.dropsNonTrading = serverData.dropsNonTrading;
+            combinedData.inventory = serverData.inventory;
+
+            // Delete empty entries
+            ["dropsTrading", "consumesTrading", "producesNonTrading", "dropsNonTrading"].forEach(type => {
+                if (!combinedData[type]) {
+                    delete combinedData[type];
+                }
+            });
+
             const pbData = data.pb.ports.find(d => d.id === combinedData.id);
 
-            combinedData.properties.nation = pbData.nation;
-            combinedData.properties.capturer = pbData.capturer;
-            combinedData.properties.lastPortBattle = pbData.lastPortBattle;
-            combinedData.properties.attackHostility = pbData.attackHostility;
-            combinedData.properties.attackerClan = pbData.attackerClan;
-            combinedData.properties.attackerNation = pbData.attackerNation;
-            combinedData.properties.portBattle = pbData.portBattle;
+            combinedData.nation = pbData.nation;
+            combinedData.capturer = pbData.capturer;
+            combinedData.lastPortBattle = pbData.lastPortBattle;
+            combinedData.attackHostility = pbData.attackHostility;
+            combinedData.attackerClan = pbData.attackerClan;
+            combinedData.attackerNation = pbData.attackerNation;
+            combinedData.portBattle = pbData.portBattle;
 
             return combinedData;
         });
 
         this._f11 = new ShowF11(this, this.coord);
-        this._ports = new DisplayPorts(portData.features, this);
+        this._ports = new DisplayPorts(portData, this);
 
         let pbCircles = topojsonFeature(data.pbZones, data.pbZones.objects.pbCircles);
         pbCircles = getFeature(pbCircles.features);
@@ -259,11 +287,11 @@ class Map {
         this._grid = new DisplayGrid(this);
 
         this._woodData = JSON.parse(JSON.stringify(data.woods));
-        this._shipData = JSON.parse(JSON.stringify(data.ships.shipData));
+        this._shipData = JSON.parse(JSON.stringify(data.ships));
 
         this._journey = new Journey(this._shipData, this._woodData, this.rem);
         this._windPrediction = new PredictWind();
-        this._showTrades = new ShowTrades(portData.features, this);
+        this._showTrades = new ShowTrades(portData, this);
 
         this._init();
 

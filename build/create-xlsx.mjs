@@ -13,7 +13,7 @@ import { readJson } from "./common.mjs";
 const shipFilename = process.argv[2],
     portFilename = process.argv[3],
     outFilename = process.argv[4],
-    shipsOrig = readJson(shipFilename).shipData,
+    shipsOrig = readJson(shipFilename),
     portData = readJson(portFilename);
 
 let colours;
@@ -78,19 +78,19 @@ function sortPort(a, b) {
     return 0;
 }
 
-const dwPorts = portData.objects.ports.geometries
-    .filter(port => !port.properties.shallow)
+const dwPorts = portData
+    .filter(port => !port.shallow)
     .map(port => ({
-        name: port.properties.name,
-        br: port.properties.brLimit
+        name: port.name,
+        br: port.brLimit
     }))
     .sort(sortPort);
 
-const swPorts = portData.objects.ports.geometries
-    .filter(port => port.properties.shallow)
+const swPorts = portData
+    .filter(port => port.shallow)
     .map(port => ({
-        name: port.properties.name,
-        br: port.properties.brLimit
+        name: port.name,
+        br: port.brLimit
     }))
     .sort(sortPort);
 
