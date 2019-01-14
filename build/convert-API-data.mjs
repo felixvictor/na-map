@@ -4,7 +4,6 @@ import {
     capitalToCounty,
     convertCoordX,
     convertCoordY,
-    rotationAngleInDegrees,
     readJson,
     saveJson
     // eslint-disable-next-line import/extensions
@@ -124,6 +123,15 @@ function convertPorts() {
      * @return {void}
      */
     const setPortFeature = apiPort => {
+        const sort = (a, b) => {
+            if (a < b) {
+                return -1;
+            }
+            if (a > b) {
+                return 1;
+            }
+            return 0;
+        };
         const portShop = apiShops.find(shop => shop.Id === apiPort.Id);
 
         const port = {
@@ -140,26 +148,26 @@ function convertPorts() {
             dropsTrading: portShop.ResourcesAdded.filter(
                 good => itemNames.has(good.Template) && itemNames.get(good.Template).trading
             )
-                .map(good => good.Template)
-                .sort((a, b) => a - b),
+                .map(good => itemNames.get(good.Template).name)
+                .sort(sort),
             consumesTrading: portShop.ResourcesConsumed.filter(
                 good => itemNames.has(good.Key) && itemNames.get(good.Key).trading
             )
-                .map(good => good.Key)
-                .sort((a, b) => a - b),
+                .map(good => itemNames.get(good.Key).name)
+                .sort(sort),
             producesNonTrading: portShop.ResourcesProduced.filter(
                 good => itemNames.has(good.Key) && !itemNames.get(good.Key).trading
             )
-                .map(good => good.Key)
-                .sort((a, b) => a - b),
+                .map(good => itemNames.get(good.Key).name)
+                .sort(sort),
             dropsNonTrading: portShop.ResourcesAdded.filter(
                 good => itemNames.has(good.Template) && !itemNames.get(good.Template).trading
             )
-                .map(good => good.Template)
-                .sort((a, b) => a - b),
+                .map(good => itemNames.get(good.Template).name)
+                .sort(sort),
             inventory: portShop.RegularItems.filter(good => itemNames.get(good.TemplateId).itemType !== "Cannon").map(
                 good => ({
-                    id: +good.TemplateId,
+                    name: itemNames.get(good.TemplateId).name,
                     buyQuantity: good.Quantity !== -1 ? good.Quantity : good.BuyContractQuantity,
                     buyPrice: Math.round(good.BuyPrice * (1 + apiPort.PortTax)),
                     sellPrice: Math.round(good.SellPrice / (1 + apiPort.PortTax)),
@@ -191,7 +199,7 @@ function convertPorts() {
         buyPort.inventory.forEach(buyGood => {
             const { buyPrice, buyQuantity } = buyGood;
             portData.forEach(sellPort => {
-                const sellGood = sellPort.inventory.find(good => good.id === buyGood.id);
+                const sellGood = sellPort.inventory.find(good => good.name === buyGood.name);
                 if (sellPort.id !== buyPort.id && sellGood) {
                     const { sellPrice, sellQuantity } = sellGood;
                     // Limit known to sell at sellPrice?
@@ -200,13 +208,16 @@ function convertPorts() {
                     const profit = profitPerItem * quantity;
                     if (profit >= minProfit) {
                         trades.push({
-                            good: buyGood.id,
+                            good: buyGood.name,
                             buyPort: { id: +buyPort.id, grossPrice: buyPrice },
                             sellPort: { id: +sellPort.id, grossPrice: sellPrice },
                             quantity,
                             profit,
                             profitPerItem,
-                            totalWeight: Math.round(itemNames.get(buyGood.id).weight * quantity)
+                            totalWeight: Math.round(
+                                apiItems.find(apiItem => apiItem.Name.replaceAll("'", "’") === buyGood.name)
+                                    .ItemWeight * quantity
+                            )
                         });
                     }
                 }
