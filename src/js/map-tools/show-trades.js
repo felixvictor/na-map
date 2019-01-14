@@ -60,10 +60,10 @@ export default class ShowTrades {
             this._portData
                 .filter(port => ids.includes(+port.id))
                 .map(port => [
-                    +port.id,
+                    port.id,
                     {
-                        x: +port.geometry.coordinates[0],
-                        y: +port.geometry.coordinates[1]
+                        x: port.coordinates[0],
+                        y: port.coordinates[1]
                     }
                 ])
         );
