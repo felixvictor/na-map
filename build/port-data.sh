@@ -18,7 +18,7 @@ server_names=(eu1 eu2)
 #source_base_url="http://storage.googleapis.com/nacleandevshards/"
 #server_names=(dev)
 
-server_twiter_names=(eu1)
+server_twitter_names=(eu1)
 api_vars=(ItemTemplates Ports Shops)
 server_maintenance_hour=10
 # Set server date
@@ -236,7 +236,7 @@ function get_tweets () {
 function update_ports () {
     local pb_file
 
-    for server_name in "${server_twiter_names[@]}"; do
+    for server_name in "${server_twitter_names[@]}"; do
         pb_file="${gen_dir}/${server_name}-pb.json"
         ${command_nodejs} build/update-ports.mjs "${pb_file}" "${tweets_json}"
     done
