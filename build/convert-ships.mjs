@@ -14,10 +14,9 @@ String.prototype.replaceAll = function(search, replacement) {
 };
 
 function convertShips() {
-    const geoJson = {},
-        cannonWeight = [0, 42, 32, 24, 18, 12, 9, 0, 6, 4, 4, 2],
+    const cannonWeight = [0, 42, 32, 24, 18, 12, 9, 0, 6, 4, 4, 2],
         carroWeight = [0, 0, 68, 42, 32, 24, 0, 18, 12];
-    geoJson.shipData = [];
+    const ships = [];
 
     APIItems.filter(item => item.ItemType === "Ship").forEach(ship => {
         const calcPortSpeed = ship.Specs.MaxSpeed * speedConstA - speedConstB,
@@ -91,10 +90,10 @@ function convertShips() {
             ])[0];
         }
         shipData.deckClassLimit.push(t);
-        geoJson.shipData.push(shipData);
+        ships.push(shipData);
     });
 
-    geoJson.shipData.sort((a, b) => {
+    ships.sort((a, b) => {
         if (a.class < b.class) {
             return -1;
         }
@@ -110,7 +109,7 @@ function convertShips() {
         return 0;
     });
 
-    saveJson(outFilename, geoJson);
+    saveJson(outFilename, ships);
 }
 
 convertShips();
