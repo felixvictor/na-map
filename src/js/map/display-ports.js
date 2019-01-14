@@ -164,7 +164,7 @@ export default class DisplayPorts {
         const counties = this._portDataDefault.filter(port => port.county !== "").reduce(
             (r, a) =>
                 Object.assign(r, {
-                    [a.properties.county]: (r[a.properties.county] || []).concat([a.coordinates])
+                    [a.county]: (r[a.county] || []).concat([a.coordinates])
                 }),
             {}
         );
@@ -264,7 +264,7 @@ export default class DisplayPorts {
         const regions = this._portDataDefault.filter(port => port.region !== "").reduce(
             (r, a) =>
                 Object.assign(r, {
-                    [a.properties.region]: (r[a.properties.region] || []).concat([a.coordinates])
+                    [a.region]: (r[a.region] || []).concat([a.coordinates])
                 }),
             {}
         );
@@ -382,7 +382,7 @@ export default class DisplayPorts {
     }
 
     _getPortName(id) {
-        return id ? this._portDataDefault.find(port => port.id === id).properties.name : "";
+        return id ? this._portDataDefault.find(port => port.id === id).name : "";
     }
 
     _getText(id, portProperties) {
@@ -436,30 +436,10 @@ export default class DisplayPorts {
             laborHoursDiscount: portProperties.laborHoursDiscount
                 ? `, labor hours discount level\u202f${portProperties.laborHoursDiscount}`
                 : "",
-            dropsTrading: portProperties.dropsTrading
-                ? portProperties.dropsTrading
-                      .map(good => good.name)
-                      .sort()
-                      .join(", ")
-                : "",
-            consumesTrading: portProperties.consumesTrading
-                ? portProperties.consumesTrading
-                      .map(good => good.name)
-                      .sort()
-                      .join(", ")
-                : "",
-            producesNonTrading: portProperties.producesNonTrading
-                ? portProperties.producesNonTrading
-                      .map(good => good.name)
-                      .sort()
-                      .join(", ")
-                : "",
-            dropsNonTrading: portProperties.dropsNonTrading
-                ? portProperties.dropsNonTrading
-                      .map(good => good.name)
-                      .sort()
-                      .join(", ")
-                : "",
+            dropsTrading: portProperties.dropsTrading ? portProperties.dropsTrading.join(", ") : "",
+            consumesTrading: portProperties.consumesTrading ? portProperties.consumesTrading.join(", ") : "",
+            producesNonTrading: portProperties.producesNonTrading ? portProperties.producesNonTrading.join(", ") : "",
+            dropsNonTrading: portProperties.dropsNonTrading ? portProperties.dropsNonTrading.join(", ") : "",
             tradePort: this._getPortName(this.tradePortId),
             goodsToSellInTradePort: portProperties.goodsToSellInTradePort
                 ? portProperties.goodsToSellInTradePort.join(", ")
