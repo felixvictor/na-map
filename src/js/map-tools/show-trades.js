@@ -9,7 +9,7 @@
  */
 
 import { extent as d3Extent } from "d3-array";
-import { scaleLinear as d3ScaleLinear } from "d3-scale";
+import { scaleLinear as d3ScaleLinear, scalePoint as d3ScalePoint } from "d3-scale";
 import { select as d3Select } from "d3-selection";
 
 import { defaultCircleSize } from "../common";
@@ -26,7 +26,7 @@ export default class ShowTrades {
         this._portData = portData;
         this._map = map;
 
-        this._arrowWidth = 10;
+        this._arrowWidth = 5;
 
         this._setupSvg();
         this._test();
@@ -34,8 +34,8 @@ export default class ShowTrades {
 
     _setupSvg() {
         this._g = d3Select("#na-svg")
-            .append("g")
-            .classed("trades", true);
+            .insert("g", "g.pb")
+            .attr("class", "trades");
 
         const width = this._arrowWidth;
         const doubleWidth = this._arrowWidth * 2;
@@ -44,11 +44,13 @@ export default class ShowTrades {
             .append("marker")
             .attr("id", "trade-arrow")
             .attr("viewBox", `0 -${width} ${doubleWidth} ${doubleWidth}`)
-            .attr("refX", doubleWidth)
+            .attr("refX", 16)
             .attr("refY", 0)
-            .attr("markerWidth", width + 1)
-            .attr("markerHeight", width + 1)
+            .attr("markerWidth", 20)
+            .attr("markerHeight", 20)
+            .attr("markerUnits", "strokeWidth")
             .attr("orient", "auto")
+            .attr("xoverflow", "visible")
             .append("path")
             .attr("d", `M0,-${width}L${doubleWidth},0L0,${width}`)
             .attr("class", "trade-head");
@@ -77,34 +79,7 @@ export default class ShowTrades {
         ];
 
         // sort links by source, then target
-        linkData.sort((a, b) => {
-            if (a.source > b.source) {
-                return 1;
-            }
-            if (a.source < b.source) {
-                return -1;
-            }
-
-            if (a.target > b.target) {
-                return 1;
-            }
-            if (a.target < b.target) {
-                return -1;
-            }
-            return 0;
-        });
-
-        // any links with duplicate source and target get an incremented 'linknum'
-        linkData.forEach((link, i) => {
-            if (i !== 0 && link.source === linkData[i - 1].source && link.target === linkData[i - 1].target) {
-                // eslint-disable-next-line no-param-reassign
-                link.linknum = linkData[i - 1].linknum + 1;
-            } else {
-                // eslint-disable-next-line no-param-reassign
-                link.linknum = 1;
-            }
-        });
-
+        linkData.sort((a, b) => a.source - b.source || a.target - b.target || a.value - b.value);
         console.log(linkData);
 
         // http://bl.ocks.org/martinjc/af943be09a748aa747ba3a622b7ff132
@@ -112,31 +87,66 @@ export default class ShowTrades {
             .range([0, 0.45])
             .domain(d3Extent(linkData, d => d.value));
 
-        this._links = this._g
-            .selectAll(".trade-link")
-            .data(linkData)
+        const arcPath = (leftHand, d) => {
+            const getSiblingLinks = (source, target) =>
+                linkData
+                    .filter(
+                        link =>
+                            (link.source === source && link.target === target) ||
+                            (link.source === target && link.target === source)
+                    )
+                    .map(link => link.value);
+
+            const x1 = leftHand ? nodeData.get(d.source).x : nodeData.get(d.target).x;
+            const y1 = leftHand ? nodeData.get(d.source).y : nodeData.get(d.target).y;
+            const x2 = leftHand ? nodeData.get(d.target).x : nodeData.get(d.source).x;
+            const y2 = leftHand ? nodeData.get(d.target).y : nodeData.get(d.source).y;
+            let dr = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+            const xRotation = 0;
+            const largeArc = 0;
+            const sweep = leftHand ? 0 : 1;
+            const siblings = getSiblingLinks(d.source, d.target);
+
+            if (siblings.length > 1) {
+                const arcScale = d3ScalePoint()
+                    .domain(siblings)
+                    .range([1, siblings.length]);
+                dr = Math.round(dr / (1 + (1 / siblings.length) * (arcScale(d.value) - 1)));
+            }
+
+            return `M${x1},${y1}A${dr},${dr} ${xRotation},${largeArc},${sweep} ${x2},${y2}`;
+        };
+
+        this._links = this._g.selectAll(".trade-link").data(linkData);
+        this._links
             .enter()
             .append("path")
             .attr("class", "trade-link")
-            .attr("stroke-width", "4")
             .attr("marker-end", "url(#trade-arrow)")
-            .attr("d", d => {
-                // Total difference in x and y from source to target
-                const diffX = nodeData.get(d.target).x - nodeData.get(d.source).x;
-                const diffY = nodeData.get(d.target).y - nodeData.get(d.source).y;
+            .attr("d", d => arcPath(true, d));
 
-                // Length of path from center of source node to center of target node
-                const pathLength = Math.sqrt(diffX * diffX + diffY * diffY);
+        this._links.exit().remove();
 
-                // x and y distances from center to outside edge of target node
-                const offsetX = (diffX * defaultCircleSize) / pathLength;
-                const offsetY = (diffY * defaultCircleSize) / pathLength;
+        this._labelPath = this._g.selectAll(".trade-label-path").data(linkData);
+        this._labelPath
+            .enter()
+            .append("path")
+            .attr("class", "trade-link")
+            .attr("id", d => `invis_${d.source}-${d.value}-${d.target}`)
+            .attr("d", d => arcPath(nodeData.get(d.source).x < nodeData.get(d.target).x, d));
+        this._labelPath.exit().remove();
 
-                const dr = 75 / d.linknum; // linknum is defined above
-                return `M${nodeData.get(d.source).x},${nodeData.get(d.source).y}A${dr},${dr} 0 0,1 ${nodeData.get(
-                    d.target
-                ).x - offsetX},${nodeData.get(d.target).y - offsetY}`;
-            });
+        this._label = this._g.selectAll(".trade-label").data(linkData);
+        this._label
+            .enter()
+            .append("g")
+            .append("text")
+            .attr("class", "trade-label")
+            .append("textPath")
+            .attr("startOffset", "50%")
+            .attr("xlink:href", d => `#invis_${d.source}-${d.value}-${d.target}`)
+            .text(d => d.value);
+        this._label.exit().remove();
     }
 
     transform(transform) {
