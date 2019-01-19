@@ -52,12 +52,12 @@ export default class PredictWind {
     }
 
     _setupSvg() {
-        this._svg = d3Select("main")
-            .insert("div", ".toasts")
+        this._svg = d3Select("main .overlay-main")
+            .append("div")
             .attr("id", "wind")
             .attr("class", "wind-predict")
             .append("svg")
-            .classed("coord", true);
+            .attr("class", "coord d-none");
     }
 
     _setupArrow() {
@@ -333,6 +333,8 @@ export default class PredictWind {
 
     _printPredictedWind(predictedWindDegrees, predictTime, currentWind, currentTime) {
         this.clearMap();
+        this._svg.classed("d-none", false);
+
         this._printCompass(predictedWindDegrees);
         this._printText(predictedWindDegrees, predictTime, currentWind, currentTime);
         this._addBackground();
@@ -344,5 +346,6 @@ export default class PredictWind {
 
     clearMap() {
         this._svg.selectAll("*").remove();
+        this._svg.classed("d-none", true);
     }
 }
