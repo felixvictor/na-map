@@ -299,8 +299,8 @@ export default class DisplayPorts {
 
     _setupSummary() {
         // Main box
-        this._divPortSummary = d3Select("main")
-            .insert("div", ".toasts")
+        this._divPortSummary = d3Select("main .overlay-main")
+            .append("div")
             .attr("id", "port-summary")
             .attr("class", "port-summary overlay");
 
