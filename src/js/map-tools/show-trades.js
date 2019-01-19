@@ -10,10 +10,10 @@
 
 import { extent as d3Extent } from "d3-array";
 import { scaleLinear as d3ScaleLinear, scalePoint as d3ScalePoint } from "d3-scale";
-import { event as d3Event, select as d3Select } from "d3-selection";
+import { select as d3Select } from "d3-selection";
 
-import { defaultCircleSize, defaultFontSize } from "../common";
-import { roundToThousands } from "../util";
+import { defaultFontSize } from "../common";
+import { formatInt, roundToThousands } from "../util";
 
 /**
  * Show trades
@@ -21,25 +21,25 @@ import { roundToThousands } from "../util";
 export default class ShowTrades {
     /**
      * @param {object} portData - Port data
-     * @param {Map} map - Map
+     * @param {number} minScale - Minimal scale
      */
-    constructor(portData, map) {
+    constructor(portData, minScale) {
         this._portData = portData;
-        this._map = map;
 
-        this._scale = this._map._scale;
+        this._minScale = minScale;
+        this._scale = this._minScale;
         this._fontSize = defaultFontSize;
         this._arrowWidth = 5;
 
         this._setupSvg();
         this._setupData();
-        this._updateTrades();
     }
 
     _setupSvg() {
         this._g = d3Select("#na-svg")
             .insert("g", "g.pb")
             .attr("class", "trades");
+        this._labelG = this._g.append("g");
 
         const width = this._arrowWidth;
         const doubleWidth = this._arrowWidth * 2;
@@ -139,10 +139,10 @@ export default class ShowTrades {
      */
     _updateTrades() {
         const linkWidthScale = d3ScaleLinear()
-            .range([1 / this._scale, 15 / this._scale])
+            .range([1 / this._scale, 10 / this._scale])
             .domain(d3Extent(this._linkData, d => d.profit));
-        //  const fontScale = 2 ** Math.log2((Math.abs(this._minScale) + this._scale) * 0.9);
-        const fontSize = roundToThousands(this._fontSize / this._scale);
+        const fontScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale);
+        const fontSize = roundToThousands(this._fontSize / fontScale);
 
         const arcPath = (leftHand, d) => {
             const getSiblingLinks = (sourceId, targetId) =>
@@ -174,52 +174,33 @@ export default class ShowTrades {
             return `M${x1},${y1}A${dr},${dr} ${xRotation},${largeArc},${sweep} ${x2},${y2}`;
         };
 
-        // Data join links
-        const linksUpdate = this._g.selectAll(".trade-link").data(this._linkData);
+        const getId = link => `${link.source.id}-${link.good.replace(/ /g, "")}-${link.target.id}`;
 
-        // Remove old links
+        const linksUpdate = this._g.selectAll(".trade-link").data(this._linkData, d => getId(d));
         linksUpdate.exit().remove();
-
-        // Update kept links
-        //  linksUpdate; // not needed
-
-        // Add new links
         const linksEnter = linksUpdate
             .enter()
             .append("path")
             .attr("class", "trade-link")
             .attr("marker-end", "url(#trade-arrow)")
-            .attr("d", d => arcPath(true, d));
-
-        // Apply to both old and new links
+            .attr("id", d => getId(d))
+            .attr("d", d => arcPath(this._nodeData.get(d.source.id).x < this._nodeData.get(d.target.id).x, d));
         linksUpdate.merge(linksEnter).attr("stroke-width", d => `${linkWidthScale(d.profit)}px`);
 
-        const labelPathUpdate = this._g.selectAll(".trade-label-path").data(this._linkData);
-        labelPathUpdate.exit().remove();
-        const labelPathEnter = labelPathUpdate
-            .enter()
-            .append("path")
-            .attr("class", "trade-link")
-            .attr("id", d => `invis_${d.source.id}-${d.good}-${d.target.id}`)
-            .attr("d", d => arcPath(this._nodeData.get(d.source.id).x < this._nodeData.get(d.target.id).x, d));
-        labelPathUpdate.merge(labelPathEnter).attr("stroke-width", d => `${linkWidthScale(d.profit)}px`);
+        this._labelG.attr("font-size", `${fontSize}px`);
 
-        const labelUpdate = this._g.selectAll(".trade-label").data(this._linkData);
+        const labelUpdate = this._labelG.selectAll(".trade-label").data(this._linkData, d => getId(d));
         labelUpdate.exit().remove();
         const labelEnter = labelUpdate
             .enter()
-            .append("g")
             .append("text")
             .attr("class", "trade-label");
         labelEnter
             .append("textPath")
             .attr("startOffset", "50%")
-            .attr("xlink:href", d => `#invis_${d.source.id}-${d.good}-${d.target.id}`)
-            .text(d => `${d.quantity} ${d.good}`);
-        labelUpdate
-            .merge(labelEnter)
-            .attr("dy", d => `-${linkWidthScale(d.profit) / 2}px`)
-            .attr("font-size", `${fontSize}px`);
+            .attr("xlink:href", d => `#${getId(d)}`)
+            .text(d => `${formatInt(d.quantity)} ${d.good}`);
+        labelUpdate.merge(labelEnter).attr("dy", d => `-${linkWidthScale(d.profit) / 2}px`);
     }
 
     transform(transform) {
