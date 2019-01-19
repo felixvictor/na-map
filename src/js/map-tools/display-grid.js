@@ -326,6 +326,8 @@ export default class DisplayGrid {
 
     /**
      * Update grid (shown or not shown)
+     * @param {number} height - Height
+     * @param {number} width - Width
      * @return {void}
      * @public
      */
@@ -353,6 +355,7 @@ export default class DisplayGrid {
         // Move summary up or down
         d3Select("#port-summary").style("margin-top", `${topMargin}px`);
         d3Select("#journey-summary").style("margin-top", `${topMargin}px`);
+        d3Select("#toast-section").style("margin-top", `${topMargin}px`);
         this._map._windPrediction.setPosition(topMargin, leftMargin);
     }
 
