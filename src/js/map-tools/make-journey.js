@@ -531,8 +531,8 @@ export default class Journey {
 
     _setupSummary() {
         // Main box
-        this._divJourneySummary = d3Select("main")
-            .insert("div", ".toasts")
+        this._divJourneySummary = d3Select("main .overlay-main")
+            .append("div")
             .attr("id", "journey-summary")
             .classed("journey-summary overlay d-none", true);
 
