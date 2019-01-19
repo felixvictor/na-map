@@ -58,7 +58,7 @@ export default class DisplayPorts {
         // Shroud Cay
         this._currentPort = { id: "366", coord: { x: 4396, y: 2494 } };
 
-        this._zoomLevel = "initial";
+        this.zoomLevel = "initial";
         this._showPBZones = "all";
         this._tooltipDuration = 200;
         this._iconSize = 48;
@@ -686,7 +686,7 @@ export default class DisplayPorts {
     }
 
     _updateTextsX(d, circleSize) {
-        return this._zoomLevel === "pbZone" &&
+        return this.zoomLevel === "pbZone" &&
             (this._showPBZones === "all" || (this._showPBZones === "single" && d.id === this.currentPort.id))
             ? d.coordinates[0] + Math.round(circleSize * 1.2 * Math.cos(degreesToRadians(d.angle)))
             : d.coordinates[0];
@@ -695,7 +695,7 @@ export default class DisplayPorts {
     _updateTextsY(d, circleSize, fontSize) {
         const deltaY = circleSize + fontSize * 1.2;
 
-        if (this._zoomLevel !== "pbZone") {
+        if (this.zoomLevel !== "pbZone") {
             return d.coordinates[1] + deltaY;
         }
 
@@ -707,7 +707,7 @@ export default class DisplayPorts {
 
     _updateTextsAnchor(d) {
         if (
-            this._zoomLevel === "pbZone" &&
+            this.zoomLevel === "pbZone" &&
             (this._showPBZones === "all" || (this._showPBZones === "single" && d.id === this.currentPort.id))
         ) {
             return d.textAnchor;
@@ -716,7 +716,7 @@ export default class DisplayPorts {
     }
 
     updateTexts() {
-        if (this._zoomLevel === "initial") {
+        if (this.zoomLevel === "initial") {
             this._gText.classed("d-none", true);
         } else {
             const circleScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale),
@@ -768,7 +768,7 @@ export default class DisplayPorts {
     }
 
     _updateCounties() {
-        if (this._zoomLevel !== "portLabel") {
+        if (this.zoomLevel !== "portLabel") {
             this._gCounty.classed("d-none", true);
         } else {
             const data = this._countyPolygonFiltered;
@@ -809,7 +809,7 @@ export default class DisplayPorts {
     }
 
     _updateRegions() {
-        if (this._zoomLevel !== "initial") {
+        if (this.zoomLevel !== "initial") {
             this._gRegion.classed("d-none", true);
         } else {
             const data = this._regionPolygonFiltered;
@@ -909,14 +909,6 @@ export default class DisplayPorts {
         return this._portData;
     }
 
-    set pbData(pbData) {
-        this._pbData = pbData;
-    }
-
-    get pbData() {
-        return this._pbData;
-    }
-
     set showRadiusSetting(showRadius) {
         this._showRadius = showRadius;
         document.getElementById(`show-radius-${showRadius}`).checked = true;
@@ -941,10 +933,6 @@ export default class DisplayPorts {
 
     _showSummary() {
         this._divPortSummary.classed("hidden", false);
-    }
-
-    hideSummary() {
-        this._divPortSummary.classed("hidden", true);
     }
 
     transform(transform) {
