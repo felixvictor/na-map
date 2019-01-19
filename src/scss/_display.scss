@@ -558,12 +558,10 @@ table a {
 .trade-label,
 .trade-label.textpath {
     fill: none;
-    stroke-width: .5px;
     stroke: $white;
 }
 
 .trade-label {
-    start-offset: "50%";
     fill: $white;
     text-anchor: middle;
 }
@@ -574,6 +572,7 @@ table a {
 
 .trade-head {
     fill: $white;
+    stroke-width: 5px;
 }
 
 .wind {
