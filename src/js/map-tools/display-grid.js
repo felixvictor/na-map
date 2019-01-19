@@ -324,6 +324,10 @@ export default class DisplayGrid {
         this._zoomLevel = zoomLevel;
     }
 
+    get zoomLevel() {
+        return this._zoomLevel;
+    }
+
     /**
      * Update grid (shown or not shown)
      * @param {number} height - Height
@@ -336,7 +340,7 @@ export default class DisplayGrid {
         let topMargin = 0;
         let leftMargin = 0;
 
-        if (this._isShown && this._zoomLevel !== "initial") {
+        if (this._isShown && this.zoomLevel !== "initial") {
             show = true;
             topMargin = this._xBackgroundHeight;
             leftMargin = this._yBackgroundWidth;
