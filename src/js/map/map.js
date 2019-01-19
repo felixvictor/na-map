@@ -223,7 +223,7 @@ class Map {
                 .map(port => ({
                     type: "Feature",
                     id: port.id,
-                    position: port.position,
+                    position: port.properties.position,
                     geometry: port.geometry
                 }));
 
@@ -273,7 +273,6 @@ class Map {
 
         let pbCircles = topojsonFeature(data.pbZones, data.pbZones.objects.pbCircles);
         pbCircles = getFeature(pbCircles.features);
-
         let forts = topojsonFeature(data.pbZones, data.pbZones.objects.forts);
         forts = getFeature(forts.features);
 
@@ -567,18 +566,19 @@ class Map {
         if (d3Event.transform.k !== this._currentScale) {
             this._currentScale = d3Event.transform.k;
             if (this._currentScale > this._PBZoneZoomThreshold) {
-                if (this._zoomLevel !== "pbZone") {
+                if (this.zoomLevel !== "pbZone") {
                     this.zoomLevel = "pbZone";
                 }
             } else if (this._currentScale > this._labelZoomThreshold) {
-                if (this._zoomLevel !== "portLabel") {
+                if (this.zoomLevel !== "portLabel") {
                     this.zoomLevel = "portLabel";
                 }
-            } else if (this._zoomLevel !== "initial") {
+            } else if (this.zoomLevel !== "initial") {
                 this.zoomLevel = "initial";
             }
             this._grid.update();
         }
+
         this._pbZone.refresh();
         this._ports.update(this._currentScale);
     }
@@ -633,6 +633,10 @@ class Map {
         this._zoomLevel = zoomLevel;
         this._ports.zoomLevel = zoomLevel;
         this._grid.zoomLevel = zoomLevel;
+    }
+
+    get zoomLevel() {
+        return this._zoomLevel;
     }
 
     resize() {
