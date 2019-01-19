@@ -209,8 +209,8 @@ function convertPorts() {
                     if (profit >= minProfit) {
                         trades.push({
                             good: buyGood.name,
-                            buyPort: { id: +buyPort.id, grossPrice: buyPrice },
-                            sellPort: { id: +sellPort.id, grossPrice: sellPrice },
+                            source: { id: +buyPort.id, grossPrice: buyPrice },
+                            target: { id: +sellPort.id, grossPrice: sellPrice },
                             quantity,
                             profit,
                             profitPerItem,
@@ -224,7 +224,7 @@ function convertPorts() {
             });
         });
     });
-    trades.sort((a, b) => a.buyPort.id - b.buyPort.id || a.sellPort.id - b.sellPort.id);
+    trades.sort((a, b) => a.source.id - b.source.id || a.target.id - b.target.id || a.profit - b.profit);
 
     saveJson(`${outDir}/trades.json`, trades);
 
