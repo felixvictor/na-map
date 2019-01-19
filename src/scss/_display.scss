@@ -554,9 +554,7 @@ table a {
     fill: $secondary-600 !important;
 }
 
-.trade-link,
-.trade-label,
-.trade-label.textpath {
+.trade-link {
     fill: none;
     stroke: $white;
 }
@@ -566,13 +564,8 @@ table a {
     text-anchor: middle;
 }
 
-.trade-label-path {
-    stroke-width: 0;
-}
-
 .trade-head {
     fill: $white;
-    stroke-width: 5px;
 }
 
 .wind {
