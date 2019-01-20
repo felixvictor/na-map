@@ -32,6 +32,8 @@ export default class ShowTrades {
         this._scale = this._minScale;
         this._fontSize = defaultFontSize;
 
+        this._numTrades = 30;
+
         this._arrowX = 18;
         this._arrowY = 18;
 
@@ -151,13 +153,13 @@ export default class ShowTrades {
     _updateTrades() {
         const linkWidthScale = d3ScaleLinear()
             .range([1 / this._scale, 10 / this._scale])
-            .domain(d3Extent(this._linkData, d => d.profit));
+            .domain(d3Extent(this._linkDataFiltered, d => d.profit));
         const fontScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale);
         const fontSize = roundToThousands(this._fontSize / fontScale);
 
         const arcPath = (leftHand, d) => {
             const getSiblingLinks = (sourceId, targetId) =>
-                this._linkData
+                this._linkDataFiltered
                     .filter(
                         link =>
                             (link.source.id === sourceId && link.target.id === targetId) ||
@@ -190,7 +192,7 @@ export default class ShowTrades {
 
         const getId = link => `${link.source.id}-${link.good.replace(/ /g, "")}-${link.target.id}`;
 
-        const linksUpdate = this._g.selectAll(".trade-link").data(this._linkData, d => getId(d));
+        const linksUpdate = this._g.selectAll(".trade-link").data(this._linkDataFiltered, d => getId(d));
         linksUpdate.exit().remove();
         const linksEnter = linksUpdate
             .enter()
@@ -205,7 +207,7 @@ export default class ShowTrades {
 
         this._labelG.attr("font-size", `${fontSize}px`);
 
-        const labelUpdate = this._labelG.selectAll(".trade-label").data(this._linkData, d => getId(d));
+        const labelUpdate = this._labelG.selectAll(".trade-label").data(this._linkDataFiltered, d => getId(d));
         labelUpdate.exit().remove();
         const labelEnter = labelUpdate
             .enter()
@@ -219,9 +221,35 @@ export default class ShowTrades {
         labelUpdate.merge(labelEnter).attr("dy", d => `-${linkWidthScale(d.profit) / 1.5}px`);
     }
 
+    _filterVisible() {
+        const portDataFiltered = new Set(
+            this._portData
+                .filter(
+                    port =>
+                        port.coordinates[0] >= this._lowerBound[0] &&
+                        port.coordinates[0] <= this._upperBound[0] &&
+                        port.coordinates[1] >= this._lowerBound[1] &&
+                        port.coordinates[1] <= this._upperBound[1]
+                )
+                .map(port => port.id)
+        );
+
+        this._linkDataFiltered = this._linkData
+            .filter(trade => portDataFiltered.has(trade.source.id) || portDataFiltered.has(trade.target.id))
+            .sort((a, b) => b.profit - a.profit)
+            .slice(0, this._numTrades);
+        console.log(this._linkDataFiltered);
+    }
+
+    setBounds(lowerBound, upperBound) {
+        this._lowerBound = lowerBound;
+        this._upperBound = upperBound;
+    }
+
     transform(transform) {
         this._g.attr("transform", transform);
         this._scale = transform.k;
+        this._filterVisible();
         this._updateTrades();
     }
 
