@@ -60,6 +60,9 @@ class Map {
             {
                 fileName: "ports.json",
                 name: "ports"
+            },            {
+                fileName: "trades.json",
+                name: "trades"
             },
             {
                 fileName: `${serverName}.json`,
@@ -290,7 +293,7 @@ class Map {
 
         this._journey = new Journey(this._shipData, this._woodData, this.rem);
         this._windPrediction = new PredictWind();
-        this._showTrades = new ShowTrades(portData, this._minScale);
+        this._showTrades = new ShowTrades(portData, data.trades, this._minScale);
 
         this._init();
 
