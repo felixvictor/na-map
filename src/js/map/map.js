@@ -614,6 +614,7 @@ class Map {
             upperBound = zoomTransform.invert([this.width, this.height]);
         this._ports.setBounds(lowerBound, upperBound);
         this._pbZone.setBounds(lowerBound, upperBound);
+        this._showTrades.setBounds(lowerBound, upperBound);
 
         this._displayMap(zoomTransform);
         this._grid.transform(zoomTransform);
