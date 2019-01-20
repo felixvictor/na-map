@@ -450,6 +450,7 @@ table a {
 .port-name {
     font-size: x-large;
     @include caps;
+    font-variant-numeric: normal;
 }
 
 .port circle {
