@@ -536,10 +536,6 @@ export default class DisplayPorts {
         // eslint-disable-next-line no-underscore-dangle
         $(port.node())
             .tooltip({
-                delay: {
-                    show: this._tooltipDuration,
-                    hide: this._tooltipDuration
-                },
                 html: true,
                 placement: "auto",
                 title,
