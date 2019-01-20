@@ -208,7 +208,7 @@ function convertPorts() {
                     const profitTotal = profitPerItem * quantity;
                     const weightPerItem = apiItems.find(apiItem => apiItem.Name.replaceAll("'", "’") === buyGood.name)
                         .ItemWeight;
-                    const profitPerTon = weightPerItem ? profitTotal / weightPerItem : profitTotal;
+                    const profitPerTon = weightPerItem ? Math.round(profitTotal / weightPerItem) : profitTotal;
                     if (profitTotal >= minProfit) {
                         trades.push({
                             good: buyGood.name,
