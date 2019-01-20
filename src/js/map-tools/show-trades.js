@@ -21,10 +21,12 @@ import { formatInt, roundToThousands } from "../util";
 export default class ShowTrades {
     /**
      * @param {object} portData - Port data
+     * @param {object} tradeData - Trade data
      * @param {number} minScale - Minimal scale
      */
-    constructor(portData, minScale) {
+    constructor(portData, tradeData, minScale) {
         this._portData = portData;
+        this._linkData = tradeData;
 
         this._minScale = minScale;
         this._scale = this._minScale;
@@ -58,6 +60,17 @@ export default class ShowTrades {
     }
 
     _setupData() {
+        this._nodeData = new Map(
+            this._portData.map(port => [
+                port.id,
+                {
+                    x: port.coordinates[0],
+                    y: port.coordinates[1]
+                }
+            ])
+        );
+
+        /*
         const ids = [231, 234, 238];
         this._nodeData = new Map(
             this._portData
@@ -127,6 +140,7 @@ export default class ShowTrades {
                 totalWeight: 257800
             }
         ];
+        */
     }
 
     /**
