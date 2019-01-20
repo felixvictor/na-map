@@ -17,7 +17,7 @@ import Cookies from "js-cookie";
  */
 const formatLocale = d3FormatLocale({
     decimal: ".",
-    thousands: "\u202f",
+    thousands: "\u2009",
     grouping: [3],
     currency: ["", "\u00a0reals"],
     percent: "\u202f%"
@@ -85,6 +85,21 @@ export const formatInt = x =>
 export const formatSiInt = x =>
     formatLocale
         .format(",.2s")(x)
+        .replace(".0", "")
+        .replace("M", "\u2009\u1d0d") // LATIN LETTER SMALL CAPITAL M
+        .replace("k", "\u2009k")
+        .replace("m", "\u2009m")
+        .replace("-", "\u2212\u202f");
+
+/**
+ * Format currency with SI suffix
+ * @function
+ * @param {Number} x - Integer
+ * @return {String} Formatted Integer
+ */
+export const formatSiCurrency = x =>
+    formatLocale
+        .format("$,.2s")(x)
         .replace(".0", "")
         .replace("M", "\u2009\u1d0d") // LATIN LETTER SMALL CAPITAL M
         .replace("k", "\u2009k")
