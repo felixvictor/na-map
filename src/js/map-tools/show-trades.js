@@ -38,6 +38,7 @@ export default class ShowTrades {
         this._arrowY = 18;
 
         this._setupSvg();
+        this._setupList();
         this._setupData();
     }
 
@@ -59,6 +60,15 @@ export default class ShowTrades {
             .append("path")
             .attr("d", `M0,0L0,${this._arrowY}L${this._arrowX},${this._arrowY / 2}z`)
             .attr("class", "trade-head");
+    }
+
+    _setupList() {
+        this._list = d3Select("main #summary-column")
+            .insert("div")
+            .attr("class", "trade-list")
+            .append("table")
+            .attr("class", "table table-sm small mb-0")
+            .append("tbody");
     }
 
     _setupData() {
@@ -185,7 +195,7 @@ export default class ShowTrades {
      * @return {void}
      * @private
      */
-    _updateTrades() {
+    _updateGraph() {
         const hideDetails = (d, i, nodes) => {
             $(d3Select(nodes[i]).node()).tooltip("dispose");
         };
@@ -262,6 +272,36 @@ export default class ShowTrades {
         labelUpdate.merge(labelEnter).attr("dy", d => `-${linkWidthScale(d.profitPerTon) / 1.5}px`);
     }
 
+    _updateList() {
+        // Data join rows
+        const rowsUpdate = this._list
+            .selectAll("tr")
+            .data(
+                this._linkDataFiltered.map(link => [
+                    `${formatInt(link.quantity)} ${link.good}`,
+                    formatSiInt(link.profitPerTon)
+                ])
+            );
+
+        // Remove old rows
+        rowsUpdate.exit().remove();
+
+        // Add new rows
+        const rowsEnter = rowsUpdate.enter().append("tr");
+
+        const rows = rowsEnter.merge(rowsUpdate);
+
+        // Data join cells
+        const cellsUpdate = rows.selectAll("td").data(d => d);
+
+        cellsUpdate.exit().remove();
+
+        // Add new cells
+        const cellsEnter = cellsUpdate.enter().append("td");
+
+        cellsEnter.merge(cellsUpdate).html(d => d);
+    }
+
     _filterVisible() {
         const portDataFiltered = new Set(
             this._portData
@@ -290,7 +330,8 @@ export default class ShowTrades {
         this._g.attr("transform", transform);
         this._scale = transform.k;
         this._filterVisible();
-        this._updateTrades();
+        this._updateGraph();
+        this._updateList();
     }
 
     clearMap() {

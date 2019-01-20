@@ -299,17 +299,13 @@ export default class DisplayPorts {
 
     _setupSummary() {
         // Main box
-        this._divPortSummary = d3Select("main .overlay-main")
+        this._divPortSummary = d3Select("main #summary-column")
             .append("div")
             .attr("id", "port-summary")
             .attr("class", "port-summary overlay");
 
-        const mainDiv = this._divPortSummary
-            .append("div")
-            .attr("class", "d-flex justify-content-around align-items-end");
-
         // Number of selected ports
-        this._portSummaryNumPorts = mainDiv.append("div").classed("block", true);
+        this._portSummaryNumPorts = this._divPortSummary.append("div").classed("block", true);
         this._portSummaryTextNumPorts = this._portSummaryNumPorts.append("div");
         this._portSummaryNumPorts
             .append("div")
@@ -317,7 +313,7 @@ export default class DisplayPorts {
             .html("selected<br>ports");
 
         // Total tax income
-        this._portSummaryTaxIncome = mainDiv.append("div").classed("block", true);
+        this._portSummaryTaxIncome = this._divPortSummary.append("div").classed("block", true);
         this._portSummaryTextTaxIncome = this._portSummaryTaxIncome.append("div");
         this._portSummaryTaxIncome
             .append("div")
@@ -325,7 +321,7 @@ export default class DisplayPorts {
             .html("tax<br>income");
 
         // Total net income
-        this._portSummaryNetIncome = mainDiv.append("div").classed("block", true);
+        this._portSummaryNetIncome = this._divPortSummary.append("div").classed("block", true);
         this._portSummaryTextNetIncome = this._portSummaryNetIncome.append("div");
         this._portSummaryNetIncome
             .append("div")
