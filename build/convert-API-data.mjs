@@ -205,26 +205,25 @@ function convertPorts() {
                     // Limit known to sell at sellPrice?
                     const quantity = sellQuantity === -1 ? buyQuantity : sellQuantity;
                     const profitPerItem = sellPrice - buyPrice;
-                    const profit = profitPerItem * quantity;
-                    if (profit >= minProfit) {
+                    const profitTotal = profitPerItem * quantity;
+                    const weightPerItem = apiItems.find(apiItem => apiItem.Name.replaceAll("'", "’") === buyGood.name)
+                        .ItemWeight;
+                    const profitPerTon = weightPerItem ? profitTotal / weightPerItem : profitTotal;
+                    if (profitTotal >= minProfit) {
                         trades.push({
                             good: buyGood.name,
                             source: { id: +buyPort.id, grossPrice: buyPrice },
                             target: { id: +sellPort.id, grossPrice: sellPrice },
                             quantity,
-                            profit,
-                            profitPerItem,
-                            totalWeight: Math.round(
-                                apiItems.find(apiItem => apiItem.Name.replaceAll("'", "’") === buyGood.name)
-                                    .ItemWeight * quantity
-                            )
+                            profitPerTon,
+                            weightPerItem
                         });
                     }
                 }
             });
         });
     });
-    trades.sort((a, b) => a.source.id - b.source.id || a.target.id - b.target.id || a.profit - b.profit);
+    trades.sort((a, b) => b.profitPerTon - a.profitPerTon);
 
     saveJson(`${outDir}/trades.json`, trades);
 

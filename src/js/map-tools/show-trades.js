@@ -13,7 +13,7 @@ import { scaleLinear as d3ScaleLinear, scalePoint as d3ScalePoint } from "d3-sca
 import { select as d3Select } from "d3-selection";
 
 import { defaultFontSize } from "../common";
-import { formatInt, roundToThousands } from "../util";
+import { formatInt, formatSiCurrency, formatSiInt, roundToThousands } from "../util";
 
 /**
  * Show trades
@@ -66,6 +66,7 @@ export default class ShowTrades {
             this._portData.map(port => [
                 port.id,
                 {
+                    name: port.name,
                     x: port.coordinates[0],
                     y: port.coordinates[1]
                 }
@@ -145,15 +146,53 @@ export default class ShowTrades {
         */
     }
 
+    _showDetails(d, i, nodes) {
+        const tooltipData = trade => {
+            const profitPerItem = trade.target.grossPrice - trade.source.grossPrice;
+            const profitTotal = profitPerItem * trade.quantity;
+            let h = `<p><span class="port-name">${formatInt(trade.quantity)} ${trade.good}</span><br>`;
+            h += `Buy in ${this._nodeData.get(trade.source.id).name} for ${formatSiCurrency(
+                trade.source.grossPrice
+            )}<br>`;
+            h += `Sell in ${this._nodeData.get(trade.target.id).name} for ${formatSiCurrency(
+                trade.target.grossPrice
+            )}<br>`;
+            h += `Profit: ${formatSiCurrency(profitTotal)} total, ${formatSiCurrency(
+                profitPerItem
+            )} per item, ${formatSiCurrency(trade.profitPerTon)} per ton<br>`;
+            h += `Weight: ${formatSiInt(trade.weightPerItem * trade.quantity)} tons total, ${formatSiInt(
+                trade.weightPerItem
+            )} tons per item</p>`;
+
+            return h;
+        };
+
+        const trade = d3Select(nodes[i]);
+        const title = tooltipData(d);
+        // eslint-disable-next-line no-underscore-dangle
+        $(trade.node())
+            .tooltip({
+                html: true,
+                placement: "auto",
+                title,
+                trigger: "manual"
+            })
+            .tooltip("show");
+    }
+
     /**
      * @link https://bl.ocks.org/mattkohl/146d301c0fc20d89d85880df537de7b0
      * @return {void}
      * @private
      */
     _updateTrades() {
+        const hideDetails = (d, i, nodes) => {
+            $(d3Select(nodes[i]).node()).tooltip("dispose");
+        };
+
         const linkWidthScale = d3ScaleLinear()
-            .range([1 / this._scale, 10 / this._scale])
-            .domain(d3Extent(this._linkDataFiltered, d => d.profit));
+            .range([5 / this._scale, 15 / this._scale])
+            .domain(d3Extent(this._linkDataFiltered, d => d.profitPerTon));
         const fontScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale);
         const fontSize = roundToThousands(this._fontSize / fontScale);
 
@@ -165,7 +204,7 @@ export default class ShowTrades {
                             (link.source.id === sourceId && link.target.id === targetId) ||
                             (link.source.id === targetId && link.target.id === sourceId)
                     )
-                    .map(link => link.profit);
+                    .map(link => link.profitPerTon);
 
             const source = { x: this._nodeData.get(d.source.id).x, y: this._nodeData.get(d.source.id).y };
             const target = { x: this._nodeData.get(d.target.id).x, y: this._nodeData.get(d.target.id).y };
@@ -183,7 +222,7 @@ export default class ShowTrades {
                 const arcScale = d3ScalePoint()
                     .domain(siblings)
                     .range([1, siblings.length]);
-                dr /= 1 + (1 / siblings.length) * (arcScale(d.profit) - 1);
+                dr /= 1 + (1 / siblings.length) * (arcScale(d.profitPerTon) - 1);
             }
             dr = Math.round(dr);
 
@@ -203,7 +242,9 @@ export default class ShowTrades {
         linksUpdate
             .merge(linksEnter)
             .attr("d", d => arcPath(this._nodeData.get(d.source.id).x < this._nodeData.get(d.target.id).x, d))
-            .attr("stroke-width", d => `${linkWidthScale(d.profit)}px`);
+            .attr("stroke-width", d => `${linkWidthScale(d.profitPerTon)}px`)
+            .on("click", (d, i, nodes) => this._showDetails(d, i, nodes))
+            .on("mouseout", hideDetails);
 
         this._labelG.attr("font-size", `${fontSize}px`);
 
@@ -218,7 +259,7 @@ export default class ShowTrades {
             .attr("startOffset", "50%")
             .attr("xlink:href", d => `#${getId(d)}`)
             .text(d => `${formatInt(d.quantity)} ${d.good}`);
-        labelUpdate.merge(labelEnter).attr("dy", d => `-${linkWidthScale(d.profit) / 1.5}px`);
+        labelUpdate.merge(labelEnter).attr("dy", d => `-${linkWidthScale(d.profitPerTon) / 1.5}px`);
     }
 
     _filterVisible() {
@@ -236,7 +277,6 @@ export default class ShowTrades {
 
         this._linkDataFiltered = this._linkData
             .filter(trade => portDataFiltered.has(trade.source.id) || portDataFiltered.has(trade.target.id))
-            .sort((a, b) => b.profit - a.profit)
             .slice(0, this._numTrades);
         console.log(this._linkDataFiltered);
     }
