@@ -12,7 +12,7 @@ import { extent as d3Extent } from "d3-array";
 import { scaleLinear as d3ScaleLinear, scalePoint as d3ScalePoint } from "d3-scale";
 import { select as d3Select } from "d3-selection";
 
-import { defaultCircleSize, defaultFontSize } from "../common";
+import { defaultFontSize } from "../common";
 import { formatInt, roundToThousands } from "../util";
 
 /**
@@ -28,11 +28,10 @@ export default class ShowTrades {
 
         this._minScale = minScale;
         this._scale = this._minScale;
-        this._circleSize = defaultCircleSize;
         this._fontSize = defaultFontSize;
 
-        this._arrowX = 9;
-        this._arrowY = 6;
+        this._arrowX = 18;
+        this._arrowY = 18;
 
         this._setupSvg();
         this._setupData();
@@ -47,10 +46,10 @@ export default class ShowTrades {
         d3Select("#na-svg defs")
             .append("marker")
             .attr("id", "trade-arrow")
-            .attr("refX", this._arrowX / 1.2)
+            .attr("refX", this._arrowX)
             .attr("refY", this._arrowY / 2)
-            .attr("markerWidth", 10)
-            .attr("markerHeight", 10)
+            .attr("markerWidth", 20)
+            .attr("markerHeight", 20)
             .attr("markerUnits", "userSpaceOnUse")
             .attr("orient", "auto-start-reverse")
             .append("path")
@@ -139,8 +138,6 @@ export default class ShowTrades {
         const linkWidthScale = d3ScaleLinear()
             .range([1 / this._scale, 10 / this._scale])
             .domain(d3Extent(this._linkData, d => d.profit));
-        const circleScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale);
-        const circleSize = roundToThousands(this._circleSize / circleScale);
         const fontScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale);
         const fontSize = roundToThousands(this._fontSize / fontScale);
 
@@ -158,21 +155,8 @@ export default class ShowTrades {
             const target = { x: this._nodeData.get(d.target.id).x, y: this._nodeData.get(d.target.id).y };
             const x1 = leftHand ? source.x : target.x;
             const y1 = leftHand ? source.y : target.y;
-            let x2 = leftHand ? target.x : source.x;
-            let y2 = leftHand ? target.y : source.y;
-
-            // Calculate the angle of the arrow in radian
-            const rad = Math.atan2(y2 - y1, x2 - x1);
-
-            // Calculate the radius (the length of the arrow)
-            // Note: Your arrow size depends on the the 'strokeWidth' attribute of your line
-            //  const r = circleSize /2;
-            const r = 0;
-
-            console.log({ r }, { rad });
-            // Calculate the position of the point
-            x2 -= Math.round(r * Math.cos(rad));
-            y2 -= Math.round(r * Math.sin(rad));
+            const x2 = leftHand ? target.x : source.x;
+            const y2 = leftHand ? target.y : source.y;
 
             let dr = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
             const xRotation = 0;
@@ -218,7 +202,7 @@ export default class ShowTrades {
             .attr("startOffset", "50%")
             .attr("xlink:href", d => `#${getId(d)}`)
             .text(d => `${formatInt(d.quantity)} ${d.good}`);
-        labelUpdate.merge(labelEnter).attr("dy", d => `-${linkWidthScale(d.profit) / 2}px`);
+        labelUpdate.merge(labelEnter).attr("dy", d => `-${linkWidthScale(d.profit) / 1.5}px`);
     }
 
     transform(transform) {
