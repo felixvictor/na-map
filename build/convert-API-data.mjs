@@ -4,6 +4,11 @@ import {
     capitalToCounty,
     convertCoordX,
     convertCoordY,
+    convertInvCoordX,
+    convertInvCoordY,
+    getDistance,
+    distancePoints,
+    speedFactor,
     readJson,
     saveJson
     // eslint-disable-next-line import/extensions
@@ -195,7 +200,20 @@ function convertPorts() {
     });
     saveJson(outFilename, portData);
 
+    const apiPortPos = new Map(
+        apiPorts.map(apiPort => [
+            +apiPort.Id,
+            {
+                x: apiPort.Position.x,
+                y: apiPort.Position.z
+            }
+        ])
+    );
+
+    const apiItemWeight = new Map(apiItems.map(apiItem => [apiItem.Name.replaceAll("'", "’"), apiItem.ItemWeight]));
+
     portData.forEach(buyPort => {
+        const buyPortPos = apiPortPos.get(buyPort.id);
         buyPort.inventory.forEach(buyGood => {
             const { buyPrice, buyQuantity } = buyGood;
             portData.forEach(sellPort => {
@@ -206,14 +224,16 @@ function convertPorts() {
                     const quantity = sellQuantity === -1 ? buyQuantity : sellQuantity;
                     const profitPerItem = sellPrice - buyPrice;
                     const profitTotal = profitPerItem * quantity;
-                    const weightPerItem = apiItems.find(apiItem => apiItem.Name.replaceAll("'", "’") === buyGood.name)
-                        .ItemWeight;
-                    const profitPerTon = weightPerItem ? Math.round(profitTotal / weightPerItem) : profitTotal;
                     if (profitTotal >= minProfit) {
+                        const sellPortPos = apiPortPos.get(sellPort.id);
+                        const weightPerItem = apiItemWeight.get(buyGood.name);
+                        const profitPerTon =
+                            weightPerItem !== 0 ? Math.round(profitTotal / (weightPerItem * quantity)) : profitTotal;
                         trades.push({
                             good: buyGood.name,
                             source: { id: +buyPort.id, grossPrice: buyPrice },
                             target: { id: +sellPort.id, grossPrice: sellPrice },
+                            distance: Math.round(distancePoints(buyPortPos, sellPortPos) / (2.63 * speedFactor)),
                             quantity,
                             profitPerTon,
                             weightPerItem
