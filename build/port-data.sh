@@ -168,14 +168,13 @@ function get_port_data () {
         local pb_file
         local api_file
         for server_name in "${server_names[@]}"; do
-            server_file="${gen_dir}/${server_name}.json"
             pb_file="${gen_dir}/${server_name}-pb.json"
             for api_var in "${api_vars[@]}"; do
                 api_file="${api_base_file}-${server_name}-${api_var}-${date}.json"
                 get_API_data "${server_name}" "${api_file}" "${api_var}"
             done
 
-            ${command_nodejs} build/convert-API-data.mjs "${api_base_file}-${server_name}" "${server_file}" "${gen_dir}" "${date}"
+            ${command_nodejs} build/convert-API-data.mjs "${api_base_file}-${server_name}" "${server_name}" "${gen_dir}" "${date}"
             ${command_nodejs} build/convert-API-pb-data.mjs "${api_base_file}-${server_name}" "${pb_file}" "${date}"
         done
 
