@@ -15,7 +15,7 @@ import {
 } from "./common.mjs";
 
 const inBaseFilename = process.argv[2],
-    outFilename = process.argv[3],
+    serverName = process.argv[3],
     outDir = process.argv[4],
     date = process.argv[5];
 
@@ -170,15 +170,18 @@ function convertPorts() {
             )
                 .map(good => itemNames.get(good.Template).name)
                 .sort(sort),
-            inventory: portShop.RegularItems.filter(good => itemNames.get(good.TemplateId).itemType !== "Cannon").map(
-                good => ({
-                    name: itemNames.get(good.TemplateId).name,
-                    buyQuantity: good.Quantity !== -1 ? good.Quantity : good.BuyContractQuantity,
-                    buyPrice: Math.round(good.BuyPrice * (1 + apiPort.PortTax)),
-                    sellPrice: Math.round(good.SellPrice / (1 + apiPort.PortTax)),
-                    sellQuantity: good.SellContractQuantity
-                })
-            )
+            inventory: portShop.RegularItems.filter(
+                good =>
+                    itemNames.get(good.TemplateId).itemType !== "Cannon" &&
+                    itemNames.get(good.TemplateId).itemType !== "ShipUpgradeBookItem" &&
+                    itemNames.get(good.TemplateId).itemType !== "Module"
+            ).map(good => ({
+                name: itemNames.get(good.TemplateId).name,
+                buyQuantity: good.Quantity !== -1 ? good.Quantity : good.BuyContractQuantity,
+                buyPrice: Math.round(good.BuyPrice * (1 + apiPort.PortTax)),
+                sellPrice: Math.round(good.SellPrice / (1 + apiPort.PortTax)),
+                sellQuantity: good.SellContractQuantity
+            }))
         };
         // Delete empty entries
         ["dropsTrading", "consumesTrading", "producesNonTrading", "dropsNonTrading"].forEach(type => {
@@ -198,7 +201,7 @@ function convertPorts() {
         setRegionFeature(port, portPos);
         setPortFeature(port);
     });
-    saveJson(outFilename, portData);
+    saveJson(`${outDir}/${serverName}.json`, portData);
 
     const apiPortPos = new Map(
         apiPorts.map(apiPort => [
@@ -210,7 +213,11 @@ function convertPorts() {
         ])
     );
 
-    const apiItemWeight = new Map(apiItems.map(apiItem => [apiItem.Name.replaceAll("'", "’"), apiItem.ItemWeight]));
+    const apiItemWeight = new Map(
+        apiItems
+            .filter(apiItem => !apiItem.NotUsed && !apiItem.NotTradeable && apiItem.ItemType !== "RecipeResource")
+            .map(apiItem => [apiItem.Name.replaceAll("'", "’"), apiItem.ItemWeight])
+    );
 
     portData.forEach(buyPort => {
         const buyPortPos = apiPortPos.get(buyPort.id);
@@ -245,7 +252,7 @@ function convertPorts() {
     });
     trades.sort((a, b) => b.profitPerTon - a.profitPerTon);
 
-    saveJson(`${outDir}/trades.json`, trades);
+    saveJson(`${outDir}/${serverName}-trades.json`, trades);
 
     saveJson(`${outDir}/regions.json`, geoJsonRegions);
     saveJson(`${outDir}/counties.json`, geoJsonCounties);
