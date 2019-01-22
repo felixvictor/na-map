@@ -60,8 +60,9 @@ class Map {
             {
                 fileName: "ports.json",
                 name: "ports"
-            },            {
-                fileName: "trades.json",
+            },
+            {
+                fileName: `${serverName}-trades.json`,
                 name: "trades"
             },
             {
