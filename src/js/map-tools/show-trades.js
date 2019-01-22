@@ -77,6 +77,7 @@ export default class ShowTrades {
                 port.id,
                 {
                     name: port.name,
+                    nation: port.nation,
                     x: port.coordinates[0],
                     y: port.coordinates[1]
                 }
@@ -190,6 +191,10 @@ export default class ShowTrades {
             .tooltip("show");
     }
 
+    _getId(link) {
+        return `${link.source.id}-${link.good.replace(/ /g, "")}-${link.target.id}`;
+    }
+
     /**
      * @link https://bl.ocks.org/mattkohl/146d301c0fc20d89d85880df537de7b0
      * @return {void}
@@ -239,16 +244,14 @@ export default class ShowTrades {
             return `M${x1},${y1}A${dr},${dr} ${xRotation},${largeArc},${sweep} ${x2},${y2}`;
         };
 
-        const getId = link => `${link.source.id}-${link.good.replace(/ /g, "")}-${link.target.id}`;
-
-        const linksUpdate = this._g.selectAll(".trade-link").data(this._linkDataFiltered, d => getId(d));
+        const linksUpdate = this._g.selectAll(".trade-link").data(this._linkDataFiltered, d => this._getId(d));
         linksUpdate.exit().remove();
         const linksEnter = linksUpdate
             .enter()
             .append("path")
             .attr("class", "trade-link")
             .attr("marker-end", "url(#trade-arrow)")
-            .attr("id", d => getId(d));
+            .attr("id", d => this._getId(d));
         linksUpdate
             .merge(linksEnter)
             .attr("d", d => arcPath(this._nodeData.get(d.source.id).x < this._nodeData.get(d.target.id).x, d))
@@ -258,7 +261,7 @@ export default class ShowTrades {
 
         this._labelG.attr("font-size", `${fontSize}px`);
 
-        const labelUpdate = this._labelG.selectAll(".trade-label").data(this._linkDataFiltered, d => getId(d));
+        const labelUpdate = this._labelG.selectAll(".trade-label").data(this._linkDataFiltered, d => this._getId(d));
         labelUpdate.exit().remove();
         const labelEnter = labelUpdate
             .enter()
@@ -267,39 +270,32 @@ export default class ShowTrades {
         labelEnter
             .append("textPath")
             .attr("startOffset", "50%")
-            .attr("xlink:href", d => `#${getId(d)}`)
+            .attr("xlink:href", d => `#${this._getId(d)}`)
             .text(d => `${formatInt(d.quantity)} ${d.good}`);
         labelUpdate.merge(labelEnter).attr("dy", d => `-${linkWidthScale(d.profitPerTon) / 1.5}px`);
     }
 
     _updateList() {
-        // Data join rows
-        const rowsUpdate = this._list
-            .selectAll("tr")
-            .data(
-                this._linkDataFiltered.map(link => [
-                    `${formatInt(link.quantity)} ${link.good}`,
-                    formatSiInt(link.profitPerTon)
-                ])
-            );
+        const getList = trade => {
+            let h = `${formatInt(trade.quantity)} ${trade.good}<br>`;
+            h += `${formatSiCurrency(trade.profitPerTon)} profit/ton<br>`;
+            h += `From ${this._nodeData.get(trade.source.id).name} <span class="caps">${
+                this._nodeData.get(trade.source.id).nation
+            }</span><br>`;
+            h += `To ${this._nodeData.get(trade.target.id).name} <span class="caps">${
+                this._nodeData.get(trade.target.id).nation
+            }</span>`;
 
-        // Remove old rows
+            return h;
+        };
+
+        const rowsUpdate = this._list.selectAll("div").data(this._linkDataFiltered, d => this._getId(d));
         rowsUpdate.exit().remove();
-
-        // Add new rows
-        const rowsEnter = rowsUpdate.enter().append("tr");
-
-        const rows = rowsEnter.merge(rowsUpdate);
-
-        // Data join cells
-        const cellsUpdate = rows.selectAll("td").data(d => d);
-
-        cellsUpdate.exit().remove();
-
-        // Add new cells
-        const cellsEnter = cellsUpdate.enter().append("td");
-
-        cellsEnter.merge(cellsUpdate).html(d => d);
+        rowsUpdate
+            .enter()
+            .append("div")
+            .attr("class", "block")
+            .html(d => getList(d));
     }
 
     _filterVisible() {
@@ -318,7 +314,6 @@ export default class ShowTrades {
         this._linkDataFiltered = this._linkData
             .filter(trade => portDataFiltered.has(trade.source.id) || portDataFiltered.has(trade.target.id))
             .slice(0, this._numTrades);
-        console.log(this._linkDataFiltered);
     }
 
     setBounds(lowerBound, upperBound) {
