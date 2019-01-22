@@ -218,20 +218,6 @@ table a {
     }
 }
 
-.trade-list {
-    overflow-y: auto;
-    table {
-        th,
-        td {
-            padding: 0;
-        }
-
-        td + td {
-            text-align: right;
-        }
-    }
-}
-
 .wood table tbody {
     td + td {
         text-align: right;
@@ -914,8 +900,14 @@ table a {
 .summary-column {
     display: flex;
     flex-direction: column;
+    flex-grow: 1;
     align-items: flex-end;
     order: 3;
+    min-height: 0;
+}
+
+.block {
+    padding: $paddingHalf;
 }
 
 .port-summary,
@@ -927,9 +919,7 @@ table a {
     padding: $paddingHalf;
     background: rgba($primary-200, .8);
 
-    .block {
-        padding: $paddingHalf;
-    }
+
 
     .des {
         top: 0;
@@ -937,6 +927,26 @@ table a {
 
     button {
         margin-bottom: map-get($spacers, 2);
+    }
+}
+
+.trade-list {
+    display: flex;
+    flex-basis: 60vh;
+    flex-direction: column;
+    min-height: 0;
+    padding: $paddingHalf;
+    overflow: auto;
+    background: rgba($primary-200, .8);
+    table {
+        th,
+        td {
+            padding: 0;
+        }
+
+        td + td {
+            text-align: right;
+        }
     }
 }
 
