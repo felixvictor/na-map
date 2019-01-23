@@ -651,7 +651,7 @@ class Map {
         this._setHeightWidth();
         this._setSvgSize();
         this._displayMap(zoomTransform);
-        this._grid.update(this.height, this.width);
+        this._grid.update();
     }
 
     _getDimensions() {
@@ -661,12 +661,6 @@ class Map {
     }
 
     _getWidth() {
-        console.log(
-            this.rem,
-            this._getDimensions(),
-            document.documentElement.clientWidth,
-            document.documentElement.offsetWidth
-        );
         const { width } = this._getDimensions();
 
         return width - this.rem * 2;

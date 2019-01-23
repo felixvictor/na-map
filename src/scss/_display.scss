@@ -71,18 +71,6 @@ text {
     fill-opacity: .6;
 }
 
-.axis {
-    line {
-        opacity: .5;
-        stroke: $primary-600;
-    }
-
-    text {
-        font-style: italic;
-        fill: $secondary-700;
-    }
-}
-
 .card {
     border: none;
 }
@@ -482,8 +470,7 @@ table a {
     fill: transparent;
 }
 
-.f11,
-.grid-background {
+.f11 {
     line-height: 1;
     background-color: transparent;
 
@@ -523,12 +510,6 @@ table a {
     text {
         fill: $secondary-900;
         text-anchor: end;
-    }
-}
-
-.grid-background {
-    rect {
-        fill: $primary-200;
     }
 }
 
@@ -882,12 +863,38 @@ body {
 .central {
     width: 0;
     height: 0;
+    padding: 0 1rem;
 }
 
 main {
     display: flex;
     flex-direction: row;
     height: 100%;
+}
+
+.axis {
+    line {
+        opacity: .5;
+        stroke: $primary-600;
+    }
+
+    text {
+        font-style: italic;
+        fill: $secondary-700;
+    }
+
+    rect {
+        fill: $primary-100;
+        fill-opacity: .7;
+    }
+}
+
+.axis-x {
+    padding-left: 1rem;
+}
+
+.axis-y {
+    padding-bottom: 1rem;
 }
 
 .toasts {
