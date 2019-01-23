@@ -52,7 +52,7 @@ export default class PredictWind {
     }
 
     _setupSvg() {
-        this._svg = d3Select("main .overlay-main")
+        this._svg = d3Select("main")
             .append("div")
             .attr("id", "wind")
             .attr("class", "wind-predict")

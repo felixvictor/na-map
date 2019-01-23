@@ -52,7 +52,7 @@ $link-hover-color: $secondary-800;
 
 // Grid columns
 //$grid-columns: 12 !default;
-//$grid-gutter-width: 30px !default;
+$grid-gutter-width: $spacer*2;
 
 //$input-color: $body-color;
 //$input-group-addon-bg: $primary-100;
