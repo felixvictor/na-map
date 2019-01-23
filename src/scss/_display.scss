@@ -57,18 +57,7 @@ table,
     background-color: $background-colour;
 }
 
-.central {
-    @include float-left;
-    width: 100%;
-    height: 0;
-}
-
-.overlay {
-    z-index: $zindex-sticky;
-}
-
-text,
-.overlay {
+text {
     cursor: default;
 }
 
@@ -880,11 +869,25 @@ table a {
     font-size: smaller;
 }
 
-.overlay-main {
+html,
+body {
+    height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+.central {
+    width: 0;
+    height: 0;
+}
+
+main {
     display: flex;
     flex-direction: row;
-    align-items: flex-start;
-    justify-content: flex-start;
+    height: 100%;
 }
 
 .toasts {
@@ -919,8 +922,6 @@ table a {
     padding: $paddingHalf;
     background: rgba($primary-200, .8);
 
-
-
     .des {
         top: 0;
     }
@@ -938,16 +939,6 @@ table a {
     padding: $paddingHalf;
     overflow: auto;
     background: rgba($primary-200, .8);
-    table {
-        th,
-        td {
-            padding: 0;
-        }
-
-        td + td {
-            text-align: right;
-        }
-    }
 }
 
 .wind-predict {
