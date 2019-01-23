@@ -182,7 +182,6 @@ class Map {
         this._showLayer = this._getShowLayer();
 
         this._setHeightWidth();
-        this._setupToasts();
         this._setupScale();
         this._setupSvg();
         this._setSvgSize();
@@ -656,22 +655,28 @@ class Map {
     }
 
     _getDimensions() {
-        const selector = document.getElementById("na-map");
+        const selector = document.getElementsByTagName("main")[0];
 
         return selector.getBoundingClientRect();
     }
 
     _getWidth() {
+        console.log(
+            this.rem,
+            this._getDimensions(),
+            document.documentElement.clientWidth,
+            document.documentElement.offsetWidth
+        );
         const { width } = this._getDimensions();
 
-        return Math.floor(width);
+        return width - this.rem * 2;
     }
 
     _getHeight() {
         const { top } = this._getDimensions(),
             fullHeight = document.documentElement.clientHeight - this.rem;
 
-        return Math.floor(fullHeight - top);
+        return fullHeight - top;
     }
 
     _setHeightWidth() {
@@ -686,10 +691,6 @@ class Map {
          * @type {Number}
          */
         this.height = this._getHeight();
-    }
-
-    _setupToasts() {
-        d3Select("#toast-section").style("height", `${this.height}px`);
     }
 
     _setSvgSize() {
