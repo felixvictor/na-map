@@ -73,12 +73,6 @@ export default class SelectPorts {
     }
 
     _setupListener() {
-        $.fn.selectpicker.Constructor.DEFAULTS.virtualScroll = true;
-        $.fn.selectpicker.Constructor.DEFAULTS.dropupAuto = false;
-        $.fn.selectpicker.Constructor.DEFAULTS.liveSearch = true;
-        $.fn.selectpicker.Constructor.DEFAULTS.liveSearchPlaceholder = "Search ...";
-        $.fn.selectpicker.Constructor.DEFAULTS.liveSearchNormalize = true;
-
         this._portNamesSelector.addEventListener("change", event => {
             registerEvent("Menu", "Move to port");
             this._resetOtherSelects(this._portNamesSelector);
@@ -201,9 +195,17 @@ export default class SelectPorts {
             .join("")}`;
 
         this._portNamesSelector.insertAdjacentHTML("beforeend", options);
-        this._portNamesSelector.setAttribute("data-width", "fit");
         this._portNamesSelector.classList.add("selectpicker");
-        $(this._portNamesSelector).selectpicker();
+        $(this._portNamesSelector).selectpicker({
+            dropupAuto: false,
+            liveSearch: true,
+            liveSearchNormalize: true,
+            liveSearchPlaceholder: "Search ...",
+            title: "Select single port",
+            virtualScroll: true
+        });
+        this._portNamesSelector.classList.remove("d-none");
+        this._portNamesSelector.parentNode.classList.remove("d-none");
     }
 
     _setupGoodSelect() {
@@ -223,9 +225,17 @@ export default class SelectPorts {
             .join("")}`;
 
         this._buyGoodsSelector.insertAdjacentHTML("beforeend", options);
-        this._buyGoodsSelector.setAttribute("data-width", "fit");
         this._buyGoodsSelector.classList.add("selectpicker");
-        $(this._buyGoodsSelector).selectpicker();
+        $(this._buyGoodsSelector).selectpicker({
+            dropupAuto: false,
+            liveSearch: true,
+            liveSearchNormalize: true,
+            liveSearchPlaceholder: "Search ...",
+            title: "Select good",
+            virtualScroll: true
+        });
+        this._buyGoodsSelector.classList.remove("d-none");
+        this._buyGoodsSelector.parentNode.classList.remove("d-none");
     }
 
     _setupNationSelect() {
