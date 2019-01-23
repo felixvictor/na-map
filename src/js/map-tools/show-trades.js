@@ -156,7 +156,7 @@ export default class ShowTrades {
     }
 
     _setupList() {
-        this._list = this._summaryColumn.append("div").attr("class", "trade-list");
+        this._list = this._summaryColumn.append("div").attr("class", "trade-list small");
     }
 
     _setupData() {
@@ -225,6 +225,7 @@ export default class ShowTrades {
     }
 
     _getId(link) {
+        //  console.log("link", link);
         return `${link.source.id}-${link.good.replace(/ /g, "")}-${link.target.id}`;
     }
 
@@ -310,7 +311,7 @@ export default class ShowTrades {
 
     _updateList() {
         const getTrade = trade => {
-            const addInfo = text => `<div">${text}</div>`;
+            const addInfo = text => `<div>${text}</div>`;
             const addDes = text => `<div class="des">${text}</div>`;
 
             let h = addInfo(`${formatInt(trade.quantity)} ${trade.good}`) + addDes("trade");
@@ -331,7 +332,7 @@ export default class ShowTrades {
             return h;
         };
 
-        const rowsUpdate = this._list.selectAll("div").data(this._linkDataFiltered, d => this._getId(d));
+        const rowsUpdate = this._list.selectAll("div.block").data(this._linkDataFiltered, d => this._getId(d));
         rowsUpdate.exit().remove();
         rowsUpdate
             .enter()
@@ -356,6 +357,8 @@ export default class ShowTrades {
         this._linkDataFiltered = this._linkData
             .filter(trade => portDataFiltered.has(trade.source.id) || portDataFiltered.has(trade.target.id))
             .slice(0, this._numTrades);
+
+        console.log("_filterVisible", this._linkDataFiltered);
     }
 
     /**
