@@ -555,7 +555,7 @@ export const displayClan = clan => `<span class="caps">${clan}</span>`;
  * @param {string} name - Radio button name
  * @returns {string} Radio button value
  */
-export const getRadioButton = name => document.querySelector(`input[name='${name}']:checked`).value;
+export const getRadioButton = name => document.querySelector(`input[name='${name.replace(/ /g, "")}']:checked`).value;
 
 /**
  * Set radio button value
@@ -563,5 +563,5 @@ export const getRadioButton = name => document.querySelector(`input[name='${name
  * @returns {void}
  */
 export const setRadioButton = name => {
-    document.getElementById(name).checked = true;
+    document.getElementById(name.replace(/ /g, "")).checked = true;
 };
