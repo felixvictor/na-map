@@ -13,7 +13,8 @@ import { scaleLinear as d3ScaleLinear, scalePoint as d3ScalePoint } from "d3-sca
 import { select as d3Select } from "d3-selection";
 
 import { defaultFontSize } from "../common";
-import { formatInt, formatSiCurrency, formatSiInt, roundToThousands } from "../util";
+import { formatInt, formatSiCurrency, formatSiInt, getRadioButton, setRadioButton, roundToThousands } from "../util";
+import Cookie from "../util/cookie";
 
 /**
  * Show trades
@@ -37,9 +38,33 @@ export default class ShowTrades {
         this._arrowX = 18;
         this._arrowY = 18;
 
+        this._baseId = "show-trades";
+        this._nationSelectId = `${this._baseId}-nation-select`;
+
+        /**
+         * Possible values for profit radio buttons (first is default value)
+         * @type {string[]}
+         * @private
+         */
+        this._radioButtonValues = ["profit per weight", "profit per distance", "total profit"];
+
+        /**
+         * Server name cookie
+         * @type {Cookie}
+         */
+        this._cookie = new Cookie(this._baseId, this._radioButtonValues);
+
         this._setupSvg();
+        this._setupSelects();
+        this._setupRadios();
+        this._setupListener();
         this._setupList();
         this._setupData();
+        /**
+         * Get profit value from cookie or use default value
+         * @type {string}
+         */
+        this._profitValue = getServerName();
     }
 
     _setupSvg() {
@@ -62,13 +87,70 @@ export default class ShowTrades {
             .attr("class", "trade-head");
     }
 
+    _setupSelects() {
+        const summaryColumn = d3Select("main #summary-column");
+        const options = `${nations
+            .sort((a, b) => {
+                if (a.sortName < b.sortName) {
+                    return -1;
+                }
+                if (a.sortName > b.sortName) {
+                    return 1;
+                }
+                return 0;
+            })
+            .map(nation => `<option value="${nation.short}">${nation.name}</option>`)
+            .join("")}`;
+
+        const select = summaryColumn
+            .append("label")
+            .append("select")
+            .attr("name", this._nationSelectId)
+            .attr("id", this._nationSelectId)
+            .attr("multiple", true)
+            .attr("class", "selectpicker");
+
+        this._nationSelector = select.node();
+        this._nationSelector.insertAdjacentHTML("beforeend", options);
+        $(this._nationSelector).selectpicker({
+            actionsBox: true,
+            selectedTextFormat: "count > 1",
+            title: "Select nations"
+        });
+    }
+
+    _setupRadios() {
+        this._radioGroup = this._summaryColumn
+            .append("div")
+            .attr("id", this._baseId)
+            .attr("class", "col-auto align-self-center radio-group ml-1");
+        this._radioButtonValues.forEach(button => {
+            const div = this._radioGroup.append("div").attr("class", "custom-control custom-radio custom-control-inline");
+            div.append("input")
+                .attr("id", this._baseId + button)
+                .attr("id", this._baseId + button)
+                .attr("name", this._baseId)
+                .attr("type", "radio")
+                .attr("class", "custom-control-input")
+                .attr("value", button);
+
+            div.append("label")
+                .attr("for", this._baseId + button)
+                .attr("class", "custom-control-label")
+                .text(button);
+        });
+    }
+
+    _setupListener() {
+        this._radioGroup.node().addEventListener("change", () => this._profitValueSelected());
+        this._nationSelector.addEventListener("change", event => {
+            this._nationSelected();
+            event.preventDefault();
+        });
+    }
+
     _setupList() {
-        this._list = d3Select("main #summary-column")
-            .insert("div")
-            .attr("class", "trade-list")
-            .append("table")
-            .attr("class", "table table-sm small mb-0")
-            .append("tbody");
+        this._list = this._summaryColumn.append("div").attr("class", "trade-list");
     }
 
     _setupData() {
@@ -83,78 +165,23 @@ export default class ShowTrades {
                 }
             ])
         );
+    }
 
-        /*
-        const ids = [231, 234, 238];
-        this._nodeData = new Map(
-            this._portData
-                .filter(port => ids.includes(+port.id))
-                .map(port => [
-                    +port.id,
-                    {
-                        x: port.coordinates[0],
-                        y: port.coordinates[1]
-                    }
-                ])
-        );
+    _nationSelected() {
+        console.log("nation select", this._nationSelector.options[this._nationSelector.selectedIndex].value);
+        this._update();
+    }
 
-        this._linkData = [
-            {
-                good: "Live Oak Log",
-                source: { id: 234, grossPrice: 10 },
-                target: { id: 238, grossPrice: 105 },
-                quantity: 1500,
-                profit: 142500,
-                profitPerItem: 95,
-                totalWeight: 4650
-            },
-            {
-                good: "Cuban Tobacco",
-                source: { id: 234, grossPrice: 482 },
-                target: { id: 238, grossPrice: 912 },
-                quantity: 336,
-                profit: 144480,
-                profitPerItem: 430,
-                totalWeight: 33600
-            },
-            {
-                good: "Copper Ingots",
-                source: { id: 234, grossPrice: 9 },
-                target: { id: 238, grossPrice: 318 },
-                quantity: 850,
-                profit: 262650,
-                profitPerItem: 309,
-                totalWeight: 570
-            },
-            {
-                good: "Spanish Almonds",
-                source: { id: 234, grossPrice: 485 },
-                target: { id: 238, grossPrice: 914 },
-                quantity: 2578,
-                profit: 1105962,
-                profitPerItem: 429,
-                totalWeight: 257800
-            },
-            {
-                good: "Spanish Almonds",
-                source: { id: 234, grossPrice: 485 },
-                target: { id: 231, grossPrice: 914 },
-                quantity: 2578,
-                profit: 1105962,
-                profitPerItem: 429,
-                totalWeight: 257800
-            },
-            {
-                good: "Spanish Almonds",
-                source: { id: 238, grossPrice: 485 },
-                target: { id: 234, grossPrice: 914 },
-                quantity: 2578,
-                profit: 1105962,
-                profitPerItem: 429,
-                totalWeight: 257800
-            }
-        ];
-        */
+    _profitValueSelected() {
+        this._profitValue = getRadioButton( this._baseId);
+        // If data is invalid
+        if (! this._radioButtonValues.includes(this._profitValue)) {
+            [this._profitValue] =  this._radioButtonValues;
+            setRadioButton(`${ this._baseId}-${this._profitValue}`);
+        }
+        this._storeProfitValue();
+        console.log("_profitValueSelected", this._profitValue);
+        this._update();
     }
 
     _showDetails(d, i, nodes) {
@@ -276,17 +303,24 @@ export default class ShowTrades {
     }
 
     _updateList() {
-        const getList = trade => {
-            let h = `${formatInt(trade.quantity)} ${trade.good}<br>`;
-            h += `${formatSiCurrency(trade.profitPerTon)} profit/ton<br>`;
-            h += `From ${this._nodeData.get(trade.source.id).name} <span class="caps">${
-                this._nodeData.get(trade.source.id).nation
-            }</span><br>`;
-            h += `To ${this._nodeData.get(trade.target.id).name} <span class="caps">${
-                this._nodeData.get(trade.target.id).nation
-            }</span>`;
+        const getTrade = trade => {
+            const addInfo = text => `<div">${text}</div>`;
+            const addDes = text => `<div class="des">${text}</div>`;
 
-            return h;
+            let h = addInfo(`${formatInt(trade.quantity)} ${trade.good}`) + addDes("trade");
+            h += addInfo(`${formatSiCurrency(trade.profitPerTon)}`) + addDes("profit/ton");
+            h +=
+                addInfo(
+                    `${this._nodeData.get(trade.source.id).name} <span class="caps">${
+                        this._nodeData.get(trade.source.id).nation
+                    }</span>`
+                ) + addDes("from");
+            h +=
+                addInfo(
+                    `To ${this._nodeData.get(trade.target.id).name} <span class="caps">${
+                        this._nodeData.get(trade.target.id).nation
+                    }</span>`
+                ) + addDes("to");
         };
 
         const rowsUpdate = this._list.selectAll("div").data(this._linkDataFiltered, d => this._getId(d));
@@ -295,7 +329,7 @@ export default class ShowTrades {
             .enter()
             .append("div")
             .attr("class", "block")
-            .html(d => getList(d));
+            .html(d => getTrade(d));
     }
 
     _filterVisible() {
@@ -316,6 +350,32 @@ export default class ShowTrades {
             .slice(0, this._numTrades);
     }
 
+    /**
+     * Get profit value from cookie or use default value
+     * @returns {string} - profit value
+     */
+    _getProfitValue() {
+        const r = cookie.get();
+
+        setRadioButton(`${this._baseId}-${r}`);
+
+        return r;
+    }
+
+    /**
+     * Store profit value in cookie
+     * @return {void}
+     */
+    _storeProfitValue() {
+        cookie.set(this._profitValue);
+    }
+
+    _update() {
+        this._filterVisible();
+        this._updateGraph();
+        this._updateList();
+    }
+
     setBounds(lowerBound, upperBound) {
         this._lowerBound = lowerBound;
         this._upperBound = upperBound;
@@ -324,9 +384,8 @@ export default class ShowTrades {
     transform(transform) {
         this._g.attr("transform", transform);
         this._scale = transform.k;
-        this._filterVisible();
-        this._updateGraph();
-        this._updateList();
+
+        this._update();
     }
 
     clearMap() {
