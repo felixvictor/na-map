@@ -73,13 +73,6 @@ export default class DisplayGrid {
          */
         this._defaultFontSize = this._map.rem;
 
-        /**
-         * Text padding in px
-         * @type {Number}
-         * @private
-         */
-        this._textPadding = this._defaultFontSize / 2;
-
         this._xBackgroundHeight = this._map.xGridBackgroundHeight;
         this._yBackgroundWidth = this._map.yGridBackgroundWidth;
 
@@ -154,10 +147,25 @@ export default class DisplayGrid {
             .tickSize(this._maxCoord);
 
         // svg groups
-        this._gAxis = this._map.svg.append("g").classed("axis d-none", true);
-        this._gXAxis = this._gAxis.append("g").classed("axis-x", true);
-        this._gYAxis = this._gAxis.append("g").classed("axis-y", true);
-        this._setupBackground();
+        this._divXAxis = d3Select("#axis-x");
+        this._svgXAxis = d3Select("#axis-x svg");
+        this._svgXAxis
+            .attr("height", this._xBackgroundHeight)
+            .attr("width", this._width)
+            .append("rect")
+            .attr("height", this._xBackgroundHeight)
+            .attr("width", this._width);
+        this._gXAxis = this._svgXAxis.append("g");
+
+        this._divYAxis = d3Select("#axis-y");
+        this._svgYAxis = d3Select("#axis-y svg");
+        this._svgYAxis
+            .attr("height", this._height)
+            .attr("width", this._yBackgroundWidth)
+            .append("rect")
+            .attr("height", this._height)
+            .attr("width", this._yBackgroundWidth);
+        this._gYAxis = this._svgYAxis.append("g");
 
         // Initialise both axis first
         this._displayAxis();
@@ -286,25 +294,6 @@ export default class DisplayGrid {
         this._gYAxis.select(".domain").remove();
     }
 
-    _setBackgroundHeightAndWidth() {
-        this._xBackground.attr("height", this._xBackgroundHeight).attr("width", this._width);
-        this._yBackground.attr("height", this._height).attr("width", this._yBackgroundWidth);
-    }
-
-    /**
-     * Setup background
-     * @return {void}
-     */
-    _setupBackground() {
-        this._gBackground = this._map.svg.insert("g", "g.axis").classed("grid-background d-none", true);
-        // Background for x axis legend
-        this._xBackground = this._gBackground.append("rect");
-        // Background for y axis legend
-        this._yBackground = this._gBackground.append("rect");
-
-        this._setBackgroundHeightAndWidth();
-    }
-
     /**
      * Set show status
      * @param {Boolean} show - True if grid is shown
@@ -330,37 +319,19 @@ export default class DisplayGrid {
 
     /**
      * Update grid (shown or not shown)
-     * @param {number} height - Height
-     * @param {number} width - Width
      * @return {void}
      * @public
      */
-    update(height = null, width = null) {
+    update() {
         let show = false;
-        let topMargin = 0;
-        let leftMargin = 0;
 
         if (this._isShown && this.zoomLevel !== "initial") {
             show = true;
-            topMargin = this._xBackgroundHeight;
-            leftMargin = this._yBackgroundWidth;
-
-            if (height && width) {
-                this._height = height;
-                this._width = width;
-                this._setBackgroundHeightAndWidth();
-            }
         }
 
         // Show or hide axis
-        this._gAxis.classed("d-none", !show);
-        this._gBackground.classed("d-none", !show);
-
-        // Move summary up or down
-        d3Select("#port-summary").style("margin-top", `${topMargin}px`);
-        d3Select("#journey-summary").style("margin-top", `${topMargin}px`);
-        d3Select("#toast-section").style("margin-top", `${topMargin}px`);
-        this._map._windPrediction.setPosition(topMargin, leftMargin);
+        this._divXAxis.classed("d-none", !show);
+        this._divYAxis.classed("d-none", !show);
     }
 
     /**
@@ -370,7 +341,8 @@ export default class DisplayGrid {
      * @public
      */
     transform(transform) {
-        this._gAxis.attr("transform", transform);
+        this._gXAxis.attr("transform", transform);
+        this._gYAxis.attr("transform", transform);
         this._displayAxis();
     }
 }
