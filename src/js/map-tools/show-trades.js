@@ -323,10 +323,12 @@ export default class ShowTrades {
                 ) + addDes("from");
             h +=
                 addInfo(
-                    `To ${this._nodeData.get(trade.target.id).name} <span class="caps">${
+                    `${this._nodeData.get(trade.target.id).name} <span class="caps">${
                         this._nodeData.get(trade.target.id).nation
                     }</span>`
                 ) + addDes("to");
+
+            return h;
         };
 
         const rowsUpdate = this._list.selectAll("div").data(this._linkDataFiltered, d => this._getId(d));
@@ -362,7 +364,7 @@ export default class ShowTrades {
      */
     _getProfitValue() {
         const r = this._cookie.get();
-        console.log("setRadioButton", `${this._baseId}-${r}`);
+
         setRadioButton(`${this._baseId}-${r}`);
 
         return r;
