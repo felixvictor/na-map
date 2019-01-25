@@ -99,13 +99,6 @@ class Map {
          * @type {Number}
          * @private
          */
-        this._navbarBrandPaddingLeft = Math.floor(1.618 * this.rem); // equals 1.618rem
-
-        /**
-         * Left padding for brand icon
-         * @type {Number}
-         * @private
-         */
         this.xGridBackgroundHeight = Math.floor(3 * this.rem);
 
         /**
@@ -128,8 +121,6 @@ class Map {
         };
 
         this._currentTranslate = {};
-
-        this._navbarSelector = document.querySelector(".navbar");
 
         this._tileSize = 256;
         this._maxScale = 2 ** 3; // power of 2
@@ -286,14 +277,14 @@ class Map {
         joinCircles = getFeature(joinCircles.features);
 
         this._pbZone = new DisplayPbZones(pbCircles, forts, towers, joinCircles, this._ports);
-      //  this._grid = new DisplayGrid(this);
+        this._grid = new DisplayGrid(this);
 
         this._woodData = JSON.parse(JSON.stringify(data.woods));
         this._shipData = JSON.parse(JSON.stringify(data.ships));
 
         this._journey = new Journey(this._shipData, this._woodData, this.rem);
         this._windPrediction = new PredictWind();
-        //this._showTrades = new ShowTrades(portData, data.trades, this._minScale);
+        this._showTrades = new ShowTrades(portData, data.trades, this._minScale);
 
         this._init();
 
@@ -386,8 +377,7 @@ class Map {
 
         this.svg = d3Select("#na-map")
             .append("svg")
-            .attr("id", "na-svg")
-            .call(this._zoom);
+            .attr("id", "na-svg");
 
         this.svg.append("defs");
 
@@ -637,7 +627,7 @@ class Map {
     set zoomLevel(zoomLevel) {
         this._zoomLevel = zoomLevel;
         this._ports.zoomLevel = zoomLevel;
-//        this._grid.zoomLevel = zoomLevel;
+        this._grid.zoomLevel = zoomLevel;
     }
 
     get zoomLevel() {
@@ -689,14 +679,11 @@ class Map {
     }
 
     _setSvgSize() {
-        this.svg
-            .attr("width", this.width)
-            .attr("height", this.height)
-            .call(this._zoom);
+        this.svg.attr("width", this.width).attr("height", this.height);
     }
 
     initialZoomAndPan() {
-        console.log("initialZoomAndPan", this._zoom, this._minScale);
+        console.log("initialZoomAndPan", this._zoom.scaleTo, this._minScale);
         this.svg.call(this._zoom.scaleTo, this._minScale);
         console.log("ende initialZoomAndPan", this._zoom, this._minScale);
     }
