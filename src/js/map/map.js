@@ -286,14 +286,14 @@ class Map {
         joinCircles = getFeature(joinCircles.features);
 
         this._pbZone = new DisplayPbZones(pbCircles, forts, towers, joinCircles, this._ports);
-        this._grid = new DisplayGrid(this);
+      //  this._grid = new DisplayGrid(this);
 
         this._woodData = JSON.parse(JSON.stringify(data.woods));
         this._shipData = JSON.parse(JSON.stringify(data.ships));
 
         this._journey = new Journey(this._shipData, this._woodData, this.rem);
         this._windPrediction = new PredictWind();
-        this._showTrades = new ShowTrades(portData, data.trades, this._minScale);
+        //this._showTrades = new ShowTrades(portData, data.trades, this._minScale);
 
         this._init();
 
@@ -612,6 +612,7 @@ class Map {
 
         const lowerBound = zoomTransform.invert([this.coord.min, this.coord.min]),
             upperBound = zoomTransform.invert([this.width, this.height]);
+        console.log("_naZoomed", zoomTransform, lowerBound, upperBound);
         this._ports.setBounds(lowerBound, upperBound);
         this._pbZone.setBounds(lowerBound, upperBound);
         this._showTrades.setBounds(lowerBound, upperBound);
@@ -636,7 +637,7 @@ class Map {
     set zoomLevel(zoomLevel) {
         this._zoomLevel = zoomLevel;
         this._ports.zoomLevel = zoomLevel;
-        this._grid.zoomLevel = zoomLevel;
+//        this._grid.zoomLevel = zoomLevel;
     }
 
     get zoomLevel() {
@@ -695,7 +696,9 @@ class Map {
     }
 
     initialZoomAndPan() {
+        console.log("initialZoomAndPan", this._zoom, this._minScale);
         this.svg.call(this._zoom.scaleTo, this._minScale);
+        console.log("ende initialZoomAndPan", this._zoom, this._minScale);
     }
 
     zoomAndPan(x, y, scale) {
