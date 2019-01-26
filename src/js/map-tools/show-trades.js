@@ -245,12 +245,6 @@ export default class ShowTrades {
             $(d3Select(nodes[i]).node()).tooltip("dispose");
         };
 
-        const linkWidthScale = d3ScaleLinear()
-            .range([5 / this._scale, 15 / this._scale])
-            .domain(d3Extent(this._linkDataFiltered, d => d.profitPerTon));
-        const fontScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale);
-        const fontSize = roundToThousands(this._fontSize / fontScale);
-
         const arcPath = (leftHand, d) => {
             const getSiblingLinks = (sourceId, targetId) =>
                 this._linkDataFiltered
@@ -284,17 +278,35 @@ export default class ShowTrades {
             return `M${x1},${y1}A${dr},${dr} ${xRotation},${largeArc},${sweep} ${x2},${y2}`;
         };
 
+        const linkWidthScale = d3ScaleLinear()
+            .range([5 / this._scale, 15 / this._scale])
+            .domain(d3Extent(this._linkDataFiltered, d => d.profitPerTon));
+        const fontScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale);
+        const fontSize = roundToThousands(this._fontSize / fontScale);
+        const transition = this._g.transition().duration(500);
+
         this._g
             .selectAll(".trade-link")
             .data(this._linkDataFiltered, d => this._getId(d))
-            .join(enter =>
-                enter
-                    .append("path")
-                    .attr("class", "trade-link")
-                    .attr("marker-end", "url(#trade-arrow)")
-                    .attr("id", d => this._getId(d))
-                    .on("click", (d, i, nodes) => this._showDetails(d, i, nodes))
-                    .on("mouseout", hideDetails)
+            .join(
+                enter =>
+                    enter
+                        .append("path")
+                        .attr("class", "trade-link")
+                        .attr("marker-end", "url(#trade-arrow)")
+                        .attr("id", d => this._getId(d))
+                        .attr("opacity", 0)
+                        .on("click", (d, i, nodes) => this._showDetails(d, i, nodes))
+                        .on("mouseout", hideDetails)
+                        .call(enterCall => enterCall.transition(transition).attr("opacity", 1)),
+                update => update.attr("opacity", 1),
+                exit =>
+                    exit.call(exitCall =>
+                        exitCall
+                            .transition(transition)
+                            .attr("opacity", 0)
+                            .remove()
+                    )
             )
             .attr("d", d => arcPath(this._nodeData.get(d.source.id).x < this._nodeData.get(d.target.id).x, d))
             .attr("stroke-width", d => `${linkWidthScale(d.profitPerTon)}px`);
@@ -304,14 +316,25 @@ export default class ShowTrades {
         this._labelG
             .selectAll(".trade-label")
             .data(this._linkDataFiltered, d => this._getId(d))
-            .join(enter =>
-                enter
-                    .append("text")
-                    .attr("class", "trade-label")
-                    .append("textPath")
-                    .attr("startOffset", "50%")
-                    .attr("xlink:href", d => `#${this._getId(d)}`)
-                    .text(d => `${formatInt(d.quantity)} ${d.good}`)
+            .join(
+                enter =>
+                    enter
+                        .append("text")
+                        .attr("class", "trade-label")
+                        .append("textPath")
+                        .attr("startOffset", "50%")
+                        .attr("xlink:href", d => `#${this._getId(d)}`)
+                        .text(d => `${formatInt(d.quantity)} ${d.good}`)
+                        .attr("opacity", 0)
+                        .call(enterCall => enterCall.transition(transition).attr("opacity", 1)),
+                update => update.attr("opacity", 1),
+                exit =>
+                    exit.call(exitCall =>
+                        exitCall
+                            .transition(transition)
+                            .attr("opacity", 0)
+                            .remove()
+                    )
             )
             .attr("dy", d => `-${linkWidthScale(d.profitPerTon) / 1.5}px`);
     }
