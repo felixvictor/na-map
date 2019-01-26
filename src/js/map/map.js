@@ -603,7 +603,7 @@ class Map {
 
         const lowerBound = zoomTransform.invert([this.coord.min, this.coord.min]),
             upperBound = zoomTransform.invert([this.width, this.height]);
-        console.log("_naZoomed", zoomTransform, lowerBound, upperBound);
+
         this._ports.setBounds(lowerBound, upperBound);
         this._pbZone.setBounds(lowerBound, upperBound);
         this._showTrades.setBounds(lowerBound, upperBound);
