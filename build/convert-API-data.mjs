@@ -4,9 +4,6 @@ import {
     capitalToCounty,
     convertCoordX,
     convertCoordY,
-    convertInvCoordX,
-    convertInvCoordY,
-    getDistance,
     distancePoints,
     speedFactor,
     readJson,
@@ -236,7 +233,7 @@ function convertPorts() {
                         const weightPerItem = apiItemWeight.get(buyGood.name);
                         const profitPerTon =
                             weightPerItem !== 0 ? Math.round(profitTotal / (weightPerItem * quantity)) : profitTotal;
-                        trades.push({
+                        const trade = {
                             good: buyGood.name,
                             source: { id: +buyPort.id, grossPrice: buyPrice },
                             target: { id: +sellPort.id, grossPrice: sellPrice },
@@ -244,7 +241,8 @@ function convertPorts() {
                             quantity,
                             profitPerTon,
                             weightPerItem
-                        });
+                        };
+                        trades.push(trade);
                     }
                 }
             });
