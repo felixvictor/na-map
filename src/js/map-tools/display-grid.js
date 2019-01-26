@@ -160,10 +160,10 @@ export default class DisplayGrid {
         this._divYAxis = d3Select("#axis-y");
         this._svgYAxis = d3Select("#axis-y svg");
         this._svgYAxis
-            .attr("height", this._height)
+            .attr("height", this._height - this._xBackgroundHeight)
             .attr("width", this._yBackgroundWidth)
             .append("rect")
-            .attr("height", this._height)
+            .attr("height", this._height - this._xBackgroundHeight)
             .attr("width", this._yBackgroundWidth);
         this._gYAxis = this._svgYAxis.append("g");
 
