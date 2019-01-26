@@ -850,11 +850,6 @@ table a {
     font-size: smaller;
 }
 
-html,
-body {
-    height: 100%;
-}
-
 .central {
     width: 0;
     height: 0;
@@ -863,7 +858,6 @@ body {
 .flex-overlay {
     display: flex;
     flex-direction: row;
-    height: 100%;
 }
 
 .axis {
@@ -887,6 +881,11 @@ body {
     order: 1;
 }
 
+.wind-predict {
+    order: 2;
+    margin-right: auto;
+}
+
 .toasts {
     display: flex;
     flex-direction: column;
@@ -900,9 +899,7 @@ body {
 .summary-column {
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
     order: 4;
-    min-height: 0;
 }
 
 .block {
@@ -912,9 +909,7 @@ body {
 .port-summary,
 .journey-summary {
     display: flex;
-    align-items: flex-end;
     justify-content: space-around;
-
     padding: $paddingHalf;
     background: rgba($primary-200, .8);
 
@@ -927,17 +922,12 @@ body {
     }
 }
 
-.trade-list {
+.trade-block {
     display: flex;
-    flex-basis: 40vh;
+    flex: auto;
     flex-direction: column;
-    min-height: 0;
+    height: 50vh;
     padding: $paddingHalf;
     overflow: auto;
     background: rgba($primary-200, .8);
-}
-
-.wind-predict {
-    order: 2;
-    margin-right: auto;
 }
