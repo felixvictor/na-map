@@ -52,12 +52,7 @@ export default class PredictWind {
     }
 
     _setupSvg() {
-        this._svg = d3Select("main")
-            .append("div")
-            .attr("id", "wind")
-            .attr("class", "wind-predict")
-            .append("svg")
-            .attr("class", "coord d-none");
+        this._svg = d3Select("#wind svg");
     }
 
     _setupArrow() {
