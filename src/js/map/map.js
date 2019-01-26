@@ -284,7 +284,7 @@ class Map {
 
         this._journey = new Journey(this._shipData, this._woodData, this.rem);
         this._windPrediction = new PredictWind();
-        this._showTrades = new ShowTrades(portData, data.trades, this._minScale);
+        this._showTrades = new ShowTrades(portData, data.trades, this._minScale, this.coord.min, this.coord.max);
 
         this._init();
 
