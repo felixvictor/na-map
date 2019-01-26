@@ -230,17 +230,14 @@ function convertPorts() {
                     const profitTotal = profitPerItem * quantity;
                     if (profitTotal >= minProfit) {
                         const sellPortPos = apiPortPos.get(sellPort.id);
-                        const weightPerItem = apiItemWeight.get(buyGood.name);
-                        const profitPerTon =
-                            weightPerItem !== 0 ? Math.round(profitTotal / (weightPerItem * quantity)) : profitTotal;
                         const trade = {
                             good: buyGood.name,
                             source: { id: +buyPort.id, grossPrice: buyPrice },
                             target: { id: +sellPort.id, grossPrice: sellPrice },
                             distance: Math.round(distancePoints(buyPortPos, sellPortPos) / (2.63 * speedFactor)),
+                            profitTotal,
                             quantity,
-                            profitPerTon,
-                            weightPerItem
+                            weightPerItem: apiItemWeight.get(buyGood.name)
                         };
                         trades.push(trade);
                     }
@@ -248,7 +245,7 @@ function convertPorts() {
             });
         });
     });
-    trades.sort((a, b) => b.profitPerTon - a.profitPerTon);
+    trades.sort((a, b) => b.profitTotal - a.profitTotal);
 
     saveJson(`${outDir}/${serverName}-trades.json`, trades);
 
