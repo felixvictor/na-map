@@ -351,14 +351,17 @@
     </div>
 </nav>
 
-<div id="na-map" class="central"></div>
-<div id="axis-x" class="axis-x d-none"><svg class="axis"></svg></div>
 <main role="main" class="container-fluid">
-    <div id="axis-y" class="axis-y d-none"><svg class="axis"></svg></div>
-    <div id="toast-section" aria-live="polite" aria-atomic="true" class="toasts"></div>
-    <div id="summary-column" class="summary-column"></div>
+    <div id="na-map" class="central"></div>
+    <div id="axis-x" class="axis-x d-none"><svg class="axis"></svg></div>
+    <div class="flex-overlay">
+        <div id="axis-y" class="axis-y d-none"><svg class="axis"></svg></div>
+        <div id="wind" class="wind-predict"><svg class="coord d-none"></svg></div>
+        <div id="toast-section" aria-live="polite" aria-atomic="true" class="toasts"></div>
+        <div id="summary-column" class="summary-column"></div>
+    </div>
+    <div id="modal-section"></div>
 </main>
-<div id="modal-section"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.slim.min.js"
         integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E=" crossorigin="anonymous"></script>
