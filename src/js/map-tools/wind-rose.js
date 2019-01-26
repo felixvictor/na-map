@@ -68,11 +68,11 @@ export default class WindRose {
 
     _getHeight() {
         const div = document.querySelector("#port-summary .block");
-        const { height } = div.getBoundingClientRect();
+        const { height, top } = div.getBoundingClientRect();
         const paddingTop = parseFloat(window.getComputedStyle(div).getPropertyValue("padding-top"));
         const paddingBottom = parseFloat(window.getComputedStyle(div).getPropertyValue("padding-bottom"));
 
-        return height - paddingTop - paddingBottom;
+        return height - top - paddingTop - paddingBottom;
     }
 
     _getCurrentWindCookie() {
