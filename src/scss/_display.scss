@@ -855,18 +855,12 @@ body {
     height: 100%;
 }
 
-body {
-    display: flex;
-    flex-direction: column;
-}
-
 .central {
     width: 0;
     height: 0;
-    padding: 0 1rem;
 }
 
-main {
+.flex-overlay {
     display: flex;
     flex-direction: row;
     height: 100%;
@@ -889,12 +883,8 @@ main {
     }
 }
 
-.axis-x {
-    padding-left: 1rem;
-}
-
 .axis-y {
-    padding-bottom: 1rem;
+    order: 1;
 }
 
 .toasts {
@@ -903,7 +893,7 @@ main {
     flex-wrap: wrap-reverse;
     align-items: flex-start;
     justify-content: flex-start;
-    order: 2;
+    order: 3;
     margin: 0 1rem;
 }
 
@@ -911,7 +901,7 @@ main {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    order: 3;
+    order: 4;
     min-height: 0;
 }
 
@@ -939,7 +929,7 @@ main {
 
 .trade-list {
     display: flex;
-    flex-basis: 60vh;
+    flex-basis: 40vh;
     flex-direction: column;
     min-height: 0;
     padding: $paddingHalf;
@@ -948,6 +938,6 @@ main {
 }
 
 .wind-predict {
-    order: 1;
+    order: 2;
     margin-right: auto;
 }
