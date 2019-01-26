@@ -284,35 +284,36 @@ export default class ShowTrades {
             return `M${x1},${y1}A${dr},${dr} ${xRotation},${largeArc},${sweep} ${x2},${y2}`;
         };
 
-        const linksUpdate = this._g.selectAll(".trade-link").data(this._linkDataFiltered, d => this._getId(d));
-        linksUpdate.exit().remove();
-        const linksEnter = linksUpdate
-            .enter()
-            .append("path")
-            .attr("class", "trade-link")
-            .attr("marker-end", "url(#trade-arrow)")
-            .attr("id", d => this._getId(d));
-        linksUpdate
-            .merge(linksEnter)
+        this._g
+            .selectAll(".trade-link")
+            .data(this._linkDataFiltered, d => this._getId(d))
+            .join(enter =>
+                enter
+                    .append("path")
+                    .attr("class", "trade-link")
+                    .attr("marker-end", "url(#trade-arrow)")
+                    .attr("id", d => this._getId(d))
+                    .on("click", (d, i, nodes) => this._showDetails(d, i, nodes))
+                    .on("mouseout", hideDetails)
+            )
             .attr("d", d => arcPath(this._nodeData.get(d.source.id).x < this._nodeData.get(d.target.id).x, d))
-            .attr("stroke-width", d => `${linkWidthScale(d.profitPerTon)}px`)
-            .on("click", (d, i, nodes) => this._showDetails(d, i, nodes))
-            .on("mouseout", hideDetails);
+            .attr("stroke-width", d => `${linkWidthScale(d.profitPerTon)}px`);
 
         this._labelG.attr("font-size", `${fontSize}px`);
 
-        const labelUpdate = this._labelG.selectAll(".trade-label").data(this._linkDataFiltered, d => this._getId(d));
-        labelUpdate.exit().remove();
-        const labelEnter = labelUpdate
-            .enter()
-            .append("text")
-            .attr("class", "trade-label");
-        labelEnter
-            .append("textPath")
-            .attr("startOffset", "50%")
-            .attr("xlink:href", d => `#${this._getId(d)}`)
-            .text(d => `${formatInt(d.quantity)} ${d.good}`);
-        labelUpdate.merge(labelEnter).attr("dy", d => `-${linkWidthScale(d.profitPerTon) / 1.5}px`);
+        this._labelG
+            .selectAll(".trade-label")
+            .data(this._linkDataFiltered, d => this._getId(d))
+            .join(enter =>
+                enter
+                    .append("text")
+                    .attr("class", "trade-label")
+                    .append("textPath")
+                    .attr("startOffset", "50%")
+                    .attr("xlink:href", d => `#${this._getId(d)}`)
+                    .text(d => `${formatInt(d.quantity)} ${d.good}`)
+            )
+            .attr("dy", d => `-${linkWidthScale(d.profitPerTon) / 1.5}px`);
     }
 
     _updateList() {
@@ -338,13 +339,15 @@ export default class ShowTrades {
             return h;
         };
 
-        const rowsUpdate = this._list.selectAll("div.block").data(this._linkDataFiltered, d => this._getId(d));
-        rowsUpdate.exit().remove();
-        rowsUpdate
-            .enter()
-            .append("div")
-            .attr("class", "block")
-            .html(d => getTrade(d));
+        this._list
+            .selectAll("div.block")
+            .data(this._linkDataFiltered, d => this._getId(d))
+            .join(enter =>
+                enter
+                    .append("div")
+                    .attr("class", "block")
+                    .html(d => getTrade(d))
+            );
     }
 
     _filterVisible() {
