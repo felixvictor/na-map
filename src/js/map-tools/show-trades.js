@@ -94,16 +94,7 @@ export default class ShowTrades {
 
     _setupSelects() {
         const options = `${nations
-            .sort((a, b) => {
-                if (a.sortName < b.sortName) {
-                    return -1;
-                }
-                if (a.sortName > b.sortName) {
-                    return 1;
-                }
-                return 0;
-            })
-            .map(nation => `<option value="${nation.short}">${nation.name}</option>`)
+                       .map(nation => `<option value="${nation.short}" selected>${nation.name}</option>`)
             .join("")}`;
 
         const select = this._mainDiv
@@ -156,7 +147,7 @@ export default class ShowTrades {
     _setupListener() {
         this._radioGroup.node().addEventListener("change", () => this._profitValueSelected());
         this._nationSelector.addEventListener("change", event => {
-            this._nationSelected();
+            this._filterBySelectedNations();
             event.preventDefault();
         });
     }
@@ -177,11 +168,6 @@ export default class ShowTrades {
                 }
             ])
         );
-    }
-
-    _nationSelected() {
-        console.log("nation select", this._nationSelector.options[this._nationSelector.selectedIndex].value);
-        this._update();
     }
 
     _profitValueSelected() {
@@ -231,7 +217,6 @@ export default class ShowTrades {
     }
 
     _getId(link) {
-        //  console.log("link", link);
         return `${link.source.id}-${link.good.replace(/ /g, "")}-${link.target.id}`;
     }
 
@@ -382,7 +367,7 @@ export default class ShowTrades {
             );
     }
 
-    _filterVisible() {
+    _filterByVisiblePorts(linkData) {
         const portDataFiltered = new Set(
             this._portData
                 .filter(
@@ -394,12 +379,22 @@ export default class ShowTrades {
                 )
                 .map(port => port.id)
         );
-        console.log("portDataFiltered", portDataFiltered);
-        this._linkDataFiltered = this._linkData
+        this._linkDataFiltered = linkData
             .filter(trade => portDataFiltered.has(trade.source.id) || portDataFiltered.has(trade.target.id))
             .slice(0, this._numTrades);
+        console.log("_filterByVisiblePorts", this._linkDataFiltered);
+    }
 
-        console.log("_filterVisible", this._linkDataFiltered);
+    _filterBySelectedNations() {
+        const selectedNations = new Set(Array.from(this._nationSelector.selectedOptions).map(option => option.value));
+        const portDataFiltered = new Set(
+            this._portData.filter(port => selectedNations.has(port.nation)).map(port => port.id)
+        );
+        const linkData = this._linkData
+            .filter(trade => portDataFiltered.has(trade.source.id) && portDataFiltered.has(trade.target.id))
+            .slice(0, this._numTrades);
+
+        this._update(linkData);
     }
 
     /**
@@ -422,8 +417,8 @@ export default class ShowTrades {
         this._cookie.set(this._profitValue);
     }
 
-    _update() {
-        this._filterVisible();
+    _update(linkData) {
+        this._filterByVisiblePorts(linkData);
         this._updateGraph();
         this._updateList();
     }
@@ -437,10 +432,11 @@ export default class ShowTrades {
         this._g.attr("transform", transform);
         this._scale = transform.k;
 
-        this._update();
+        this._update(this._linkData);
     }
 
     clearMap() {
         this._g.selectAll("*").remove();
+        this._update(this._linkData);
     }
 }
