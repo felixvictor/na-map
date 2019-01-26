@@ -111,7 +111,7 @@ export default class ShowTrades {
             .append("select")
             .attr("name", this._nationSelectId)
             .attr("id", this._nationSelectId)
-            .attr("multiple", true)
+            .property("multiple", true)
             .attr("class", "selectpicker");
 
         this._nationSelector = select.node();
@@ -293,7 +293,16 @@ export default class ShowTrades {
                     enter
                         .append("path")
                         .attr("class", "trade-link")
-                        .attr("marker-end", "url(#trade-arrow)")
+                        .attr("marker-start", d =>
+                            this._nodeData.get(d.source.id).x < this._nodeData.get(d.target.id).x
+                                ? ""
+                                : "url(#trade-arrow)"
+                        )
+                        .attr("marker-end", d =>
+                            this._nodeData.get(d.source.id).x < this._nodeData.get(d.target.id).x
+                                ? "url(#trade-arrow)"
+                                : ""
+                        )
                         .attr("id", d => this._getId(d))
                         .attr("opacity", 0)
                         .on("click", (d, i, nodes) => this._showDetails(d, i, nodes))
@@ -385,7 +394,7 @@ export default class ShowTrades {
                 )
                 .map(port => port.id)
         );
-
+        console.log("portDataFiltered", portDataFiltered);
         this._linkDataFiltered = this._linkData
             .filter(trade => portDataFiltered.has(trade.source.id) || portDataFiltered.has(trade.target.id))
             .slice(0, this._numTrades);
