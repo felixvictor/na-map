@@ -25,7 +25,7 @@ export default class ShowTrades {
      * @param {object} tradeData - Trade data
      * @param {number} minScale - Minimal scale
      */
-    constructor(portData, tradeData, minScale) {
+    constructor(portData, tradeData, minScale, lowerBound, upperBound) {
         this._portData = portData;
         this._linkData = tradeData;
 
@@ -60,12 +60,14 @@ export default class ShowTrades {
         this._setupListener();
         this._setupList();
         this._setupData();
+        this.setBounds(lowerBound, upperBound);
 
         /**
          * Get profit value from cookie or use default value
          * @type {string}
          */
         this._profitValue = this._getProfitValue();
+        this._profitValueSelected();
     }
 
     _setupSvg() {
@@ -94,7 +96,7 @@ export default class ShowTrades {
 
     _setupSelects() {
         const options = `${nations
-                       .map(nation => `<option value="${nation.short}" selected>${nation.name}</option>`)
+            .map(nation => `<option value="${nation.short}" selected>${nation.name}</option>`)
             .join("")}`;
 
         const select = this._mainDiv
@@ -122,7 +124,7 @@ export default class ShowTrades {
         this._radioGroup
             .append("legend")
             .attr("class", "col-form-label")
-            .text("Profit");
+            .text("Sort profit by");
 
         this._radioButtonValues.forEach(button => {
             const id = `${this._baseId}-${button.replace(/ /g, "")}`;
@@ -171,15 +173,40 @@ export default class ShowTrades {
     }
 
     _profitValueSelected() {
-        this._profitValue = getRadioButton(this._baseId);
+        const sortLinkData = () =>
+            this._linkData
+                .map(trade => {
+                    let profit = 0;
+                    switch (this._profitValue) {
+                        case "weight":
+                            profit =
+                                trade.weightPerItem !== 0
+                                    ? Math.round(trade.profitTotal / (trade.weightPerItem * trade.quantity))
+                                    : trade.profitTotal;
+                            break;
+                        case "distance":
+                            profit = trade.profitTotal / trade.distance;
+                            break;
+                        case "total":
+                            profit = trade.profitTotal;
+                            break;
+                        default:
+                            throw Error("Wrong profit value");
+                    }
+                    trade.profit = profit;
+                    return trade;
+                })
+                .sort((a, b) => b.profit - a.profit);
 
+        this._profitValue = getRadioButton(this._baseId);
         // If data is invalid
         if (!this._radioButtonValues.includes(this._profitValue)) {
             [this._profitValue] = this._radioButtonValues;
             setRadioButton(`${this._baseId}-${this._profitValue.replace(/ /g, "")}`);
         }
         this._storeProfitValue();
-        this._update();
+
+        this._update(sortLinkData());
     }
 
     _showDetails(d, i, nodes) {
@@ -334,12 +361,24 @@ export default class ShowTrades {
     }
 
     _updateList() {
+        let profitText = "";
+        switch (this._profitValue) {
+            case "weight":
+                profitText = "profit per ton";
+                break;
+            case "distance":
+                profitText = "profit per distance";
+                break;
+            case "total":
+                profitText = "total profit";
+                break;
+        }
         const getTrade = trade => {
             const addInfo = text => `<div>${text}</div>`;
             const addDes = text => `<div class="des">${text}</div>`;
 
             let h = addInfo(`${formatInt(trade.quantity)} ${trade.good}`) + addDes("trade");
-            h += addInfo(`${formatSiCurrency(trade.profitPerTon)}`) + addDes("profit/ton");
+            h += addInfo(`${formatSiCurrency(trade.profit)}`) + addDes(profitText);
             h +=
                 addInfo(
                     `${this._nodeData.get(trade.source.id).name} <span class="caps">${
@@ -368,6 +407,7 @@ export default class ShowTrades {
     }
 
     _filterByVisiblePorts(linkData) {
+        console.log("_filterByVisiblePorts anfang", linkData);
         const portDataFiltered = new Set(
             this._portData
                 .filter(
@@ -382,7 +422,7 @@ export default class ShowTrades {
         this._linkDataFiltered = linkData
             .filter(trade => portDataFiltered.has(trade.source.id) || portDataFiltered.has(trade.target.id))
             .slice(0, this._numTrades);
-        console.log("_filterByVisiblePorts", this._linkDataFiltered);
+        console.log("_filterByVisiblePorts ende", this._linkDataFiltered);
     }
 
     _filterBySelectedNations() {
