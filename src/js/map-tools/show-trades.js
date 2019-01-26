@@ -46,7 +46,7 @@ export default class ShowTrades {
          * @type {string[]}
          * @private
          */
-        this._radioButtonValues = ["profit per weight", "profit per distance", "total profit"];
+        this._radioButtonValues = ["weight", "distance", "total"];
 
         /**
          * Server name cookie
@@ -87,7 +87,9 @@ export default class ShowTrades {
             .attr("d", `M0,0L0,${this._arrowY}L${this._arrowX},${this._arrowY / 2}z`)
             .attr("class", "trade-head");
 
-        this._summaryColumn = d3Select("main #summary-column");
+        this._mainDiv = d3Select("main #summary-column")
+            .append("div")
+            .attr("class", "trade-block");
     }
 
     _setupSelects() {
@@ -104,7 +106,7 @@ export default class ShowTrades {
             .map(nation => `<option value="${nation.short}">${nation.name}</option>`)
             .join("")}`;
 
-        const select = this._summaryColumn
+        const select = this._mainDiv
             .append("label")
             .append("select")
             .attr("name", this._nationSelectId)
@@ -122,10 +124,14 @@ export default class ShowTrades {
     }
 
     _setupRadios() {
-        this._radioGroup = this._summaryColumn
+        this._radioGroup = this._mainDiv
             .append("div")
             .attr("id", this._baseId)
-            .attr("class", "col-auto align-self-center radio-group ml-1");
+            .attr("class", "col-auto align-self-center radio-group");
+        this._radioGroup
+            .append("legend")
+            .attr("class", "col-form-label")
+            .text("Profit");
 
         this._radioButtonValues.forEach(button => {
             const id = `${this._baseId}-${button.replace(/ /g, "")}`;
@@ -156,7 +162,7 @@ export default class ShowTrades {
     }
 
     _setupList() {
-        this._list = this._summaryColumn.append("div").attr("class", "trade-list small");
+        this._list = this._mainDiv.append("div").attr("class", "trade-list small");
     }
 
     _setupData() {
