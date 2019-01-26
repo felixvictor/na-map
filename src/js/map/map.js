@@ -326,7 +326,7 @@ class Map {
             }
         }
 
-        this.svg
+        this._svg
             .on("dblclick.zoom", null)
             .on("click", stopProp, true)
             .on("dblclick", (d, i, nodes) => this._doDoubleClickAction(nodes[i]));
@@ -375,13 +375,14 @@ class Map {
             .scaleExtent([this._minScale, this._maxScale])
             .on("zoom", () => this._naZoomed());
 
-        this.svg = d3Select("#na-map")
+        this._svg = d3Select("#na-map")
             .append("svg")
-            .attr("id", "na-svg");
+            .attr("id", "na-svg")
+            .call(this._zoom);
 
-        this.svg.append("defs");
+        this._svg.append("defs");
 
-        this._gMap = this.svg.append("g").classed("map", true);
+        this._gMap = this._svg.append("g").classed("map", true);
     }
 
     _setupProps() {
@@ -646,7 +647,7 @@ class Map {
     }
 
     _getDimensions() {
-        const selector = document.getElementsByTagName("main")[0];
+        const selector = document.getElementsByClassName("flex-overlay")[0];
 
         return selector.getBoundingClientRect();
     }
@@ -654,7 +655,7 @@ class Map {
     _getWidth() {
         const { width } = this._getDimensions();
 
-        return width - this.rem * 2;
+        return width;
     }
 
     _getHeight() {
@@ -679,13 +680,11 @@ class Map {
     }
 
     _setSvgSize() {
-        this.svg.attr("width", this.width).attr("height", this.height);
+        this._svg.attr("width", this.width).attr("height", this.height);
     }
 
     initialZoomAndPan() {
-        console.log("initialZoomAndPan", this._zoom.scaleTo, this._minScale);
-        this.svg.call(this._zoom.scaleTo, this._minScale);
-        console.log("ende initialZoomAndPan", this._zoom, this._minScale);
+        this._svg.call(this._zoom.scaleTo, this._minScale);
     }
 
     zoomAndPan(x, y, scale) {
@@ -693,7 +692,7 @@ class Map {
             .scale(scale)
             .translate(Math.round(-x + this.width / 2 / scale), Math.round(-y + this.height / 2 / scale));
 
-        this.svg.call(this._zoom.transform, transform);
+        this._svg.call(this._zoom.transform, transform);
     }
 
     goToPort() {
