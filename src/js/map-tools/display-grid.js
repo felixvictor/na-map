@@ -304,6 +304,14 @@ export default class DisplayGrid {
     }
 
     /**
+     * Get show status
+     * @return {Boolean} True if grid is shown
+     */
+    get show() {
+        return this._isShown;
+    }
+
+    /**
      * Set zoom level
      * @param {String} zoomLevel - Zoom level
      * @return {void}
