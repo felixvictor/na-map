@@ -174,6 +174,12 @@ export default class DisplayPbZones {
         );
     }
 
+    /**
+     * Set bounds of current viewport
+     * @param {Bound} lowerBound - Top left coordinates of current viewport
+     * @param {Bound} upperBound - Bottom right coordinates of current viewport
+     * @return {void}
+     */
     setBounds(lowerBound, upperBound) {
         this._lowerBound = lowerBound;
         this._upperBound = upperBound;
