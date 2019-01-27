@@ -484,21 +484,19 @@ class Map {
     }
 
     _updateMap(tiles) {
-        const image = this._gMap
+        this._gMap
             .attr("transform", tiles.transform)
             .selectAll("image")
-            .data(tiles, d => d.id);
-
-        image.exit().remove();
-
-        image
-            .enter()
-            .append("image")
-            .attr("xlink:href", d => `images/map/${d.z}/${d.row}/${d.col}.jpg`)
-            .attr("x", d => d.col * this._tileSize)
-            .attr("y", d => d.row * this._tileSize)
-            .attr("width", this._tileSize + 1)
-            .attr("height", this._tileSize + 1);
+            .data(tiles, d => d.id)
+            .join(enter =>
+                enter
+                    .append("image")
+                    .attr("xlink:href", d => `images/map/${d.z}/${d.row}/${d.col}.jpg`)
+                    .attr("x", d => d.col * this._tileSize)
+                    .attr("y", d => d.row * this._tileSize)
+                    .attr("width", this._tileSize + 1)
+                    .attr("height", this._tileSize + 1)
+            );
     }
 
     _clearMap() {
