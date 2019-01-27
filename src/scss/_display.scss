@@ -909,6 +909,7 @@ table a {
 .port-summary,
 .journey-summary {
     display: flex;
+    flex: 0 0 auto;
     justify-content: space-around;
     padding: $paddingHalf;
     background: rgba($primary-200, .8);
@@ -924,9 +925,8 @@ table a {
 
 .trade-block {
     display: flex;
-    flex: auto;
+    flex: 1 1 auto;
     flex-direction: column;
-    height: 50vh;
     padding: $paddingHalf;
     overflow: auto;
     background: rgba($primary-200, .8);
