@@ -172,9 +172,11 @@ class Map {
          */
         this._showLayer = this._getShowLayer();
 
+        this._flexOverlay = document.getElementsByClassName("flex-overlay")[0];
         this._setHeightWidth();
         this._setupScale();
         this._setupSvg();
+        this._setFlexOverlayHeight();
         this._setSvgSize();
         this._setupListener();
         this._setupProps();
@@ -642,6 +644,7 @@ class Map {
 
         this._setHeightWidth();
         this._setSvgSize();
+        this._setFlexOverlayHeight();
         this._displayMap(zoomTransform);
         this._grid.update();
     }
@@ -681,6 +684,10 @@ class Map {
 
     _setSvgSize() {
         this._svg.attr("width", this.width).attr("height", this.height);
+    }
+
+    _setFlexOverlayHeight() {
+        this._flexOverlay.setAttribute("style", `height:${this.height}px`);
     }
 
     initialZoomAndPan() {
