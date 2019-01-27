@@ -91,9 +91,7 @@ class Ship {
         const g = this.g
             .selectAll(".compass-arc")
             .data(pie)
-            .enter()
-            .append("g")
-            .attr("class", "compass-arc");
+            .join(enter => enter.append("g").attr("class", "compass-arc"));
 
         g.append("path").attr("d", arc);
 
@@ -109,7 +107,6 @@ class Ship {
     /**
      * Format cannon pound value
      * @param {number[]} limit Upper limit for [0] cannon and [1] carronades
-     * @returns {void}
      */
     static pd(limit) {
         let s = `<span class="badge badge-white">${limit[0]}\u202f/\u202f`;
@@ -342,31 +339,37 @@ class ShipBase extends Ship {
         this.g
             .selectAll(".circle")
             .data(ticks)
-            .enter()
-            .append("circle")
-            .attr("class", "knots-circle")
-            .attr("r", d => this.shipCompareData.radiusScaleAbsolute(d));
+            .join(enter =>
+                enter
+                    .append("circle")
+                    .attr("class", "knots-circle")
+                    .attr("r", d => this.shipCompareData.radiusScaleAbsolute(d))
+            );
 
         // Add the paths for the text
         this.g
             .selectAll(".label")
             .data(ticks)
-            .enter()
-            .append("path")
-            .attr("d", knotsArc)
-            .attr("id", (d, i) => `tick${i}`);
+            .join(enter =>
+                enter
+                    .append("path")
+                    .attr("d", knotsArc)
+                    .attr("id", (d, i) => `tick${i}`)
+            );
 
         // And add the text
         this.g
             .selectAll(".label")
             .data(ticks)
-            .enter()
-            .append("text")
-            .attr("class", "knots-text")
-            .append("textPath")
-            .attr("href", (d, i) => `#tick${i}`)
-            .text((d, i) => tickLabels[i])
-            .attr("startOffset", "16%");
+            .join(enter =>
+                enter
+                    .append("text")
+                    .attr("class", "knots-text")
+                    .append("textPath")
+                    .attr("href", (d, i) => `#tick${i}`)
+                    .text((d, i) => tickLabels[i])
+                    .attr("startOffset", "16%")
+            );
     }
 
     /**
@@ -398,10 +401,12 @@ class ShipBase extends Ship {
             .attr("r", 0.5)
             .selectAll("stop")
             .data(d3Range(numStops))
-            .enter()
-            .append("stop")
-            .attr("offset", (d, i) => gradientScale(gradientPoint[i]) / this.shipCompareData.svgWidth)
-            .attr("stop-color", (d, i) => this.shipCompareData.colorScale(gradientPoint[i]));
+            .join(enter =>
+                enter
+                    .append("stop")
+                    .attr("offset", (d, i) => gradientScale(gradientPoint[i]) / this.shipCompareData.svgWidth)
+                    .attr("stop-color", (d, i) => this.shipCompareData.colorScale(gradientPoint[i]))
+            );
     }
 
     /**
@@ -428,14 +433,22 @@ class ShipBase extends Ship {
         markers
             .selectAll("circle")
             .data(arcs)
-            .enter()
-            .append("circle")
-            .attr("r", 5)
-            .attr("cy", (d, i) => Math.cos(i * segmentRadians) * -this.shipCompareData.radiusScaleAbsolute(d.data))
-            .attr("cx", (d, i) => Math.sin(i * segmentRadians) * this.shipCompareData.radiusScaleAbsolute(d.data))
-            .attr("fill", d => this.shipCompareData.colorScale(d.data))
-            .append("title")
-            .text(d => `${Math.round(d.data * 10) / 10} knots`);
+            .join(enter =>
+                enter
+                    .append("circle")
+                    .attr("r", 5)
+                    .attr(
+                        "cy",
+                        (d, i) => Math.cos(i * segmentRadians) * -this.shipCompareData.radiusScaleAbsolute(d.data)
+                    )
+                    .attr(
+                        "cx",
+                        (d, i) => Math.sin(i * segmentRadians) * this.shipCompareData.radiusScaleAbsolute(d.data)
+                    )
+                    .attr("fill", d => this.shipCompareData.colorScale(d.data))
+                    .append("title")
+                    .text(d => `${Math.round(d.data * 10) / 10} knots`)
+            );
     }
 
     /**
@@ -588,16 +601,19 @@ class ShipComparison extends Ship {
 
         pathComp.attr("d", line(arcsComp)).classed("comp", true);
 
-        const markersComp = pathMarkersComp.selectAll("circle").data(arcsComp);
-        markersComp
-            .enter()
-            .append("circle")
-            .attr("r", 5)
-            .attr("cy", (d, i) => Math.cos(i * segmentRadians) * -this.shipCompare.radiusScaleAbsolute(d.data))
-            .attr("cx", (d, i) => Math.sin(i * segmentRadians) * this.shipCompare.radiusScaleAbsolute(d.data))
-            .attr("fill", (d, i) => colourScale(speedDiff[i]))
-            .append("title")
-            .text(d => `${Math.round(d.data * 10) / 10} knots`);
+        pathMarkersComp
+            .selectAll("circle")
+            .data(arcsComp)
+            .join(enter =>
+                enter
+                    .append("circle")
+                    .attr("r", 5)
+                    .attr("cy", (d, i) => Math.cos(i * segmentRadians) * -this.shipCompare.radiusScaleAbsolute(d.data))
+                    .attr("cx", (d, i) => Math.sin(i * segmentRadians) * this.shipCompare.radiusScaleAbsolute(d.data))
+                    .attr("fill", (d, i) => colourScale(speedDiff[i]))
+                    .append("title")
+                    .text(d => `${Math.round(d.data * 10) / 10} knots`)
+            );
 
         pathBase.attr("d", line(arcsBase)).classed("base", true);
     }
