@@ -148,7 +148,7 @@ function updatePorts() {
             "u"
         ),
         defendedRegex = new RegExp(
-            `\\[(${timeR}) UTC\\] (${portR}) defended by (${clanR})( \\(${nationR}\\))? against (${clanR}) \\((${nationR})\\) #PBCaribbean #PBCaribbean${portHashR}`,
+            `\\[(${timeR}) UTC\\] (${portR}) defended by (${clanR})( \\(${nationR}\\))? against (${clanR}) ?\\(?(${nationR})?\\)? #PBCaribbean #PBCaribbean${portHashR}`,
             "u"
         ),
         hostilityLevelUpRegex = new RegExp(
