@@ -56,7 +56,7 @@ class WoodBase extends Wood {
         let text = '<table class="table table-sm table-striped small mt-4"><thead>';
         text += "<tr>";
         text += "<tr><th><em>Property</em></th><th><em>Change in %</em></th></tr></thead><tbody>";
-        wood.forEach((value, key) => {
+        wood.properties.forEach((value, key) => {
             text += `<tr><td>${key}</td><td>${formatFloat(value * 100)}`;
             text += '<span class="rate">';
             if (value > 0) {
@@ -92,7 +92,7 @@ class WoodBase extends Wood {
         };
         wood.properties = new Map();
         this._woodCompare._properties.forEach(property => {
-            wood.set(property, this._getPropertySum(property));
+            wood.properties.set(property, this._getPropertySum(property));
         });
 
         $(`${this._select}`)
@@ -154,7 +154,7 @@ class WoodComparison extends Wood {
         let text = '<table class="table table-sm table-striped small wood mt-4"><thead>';
         text += "<tr>";
         text += "<tr><th><em>Property</em></th><th><em>Change in %</em></th></tr></thead><tbody>";
-        wood.forEach((value, key) => {
+        wood.properties.forEach((value, key) => {
             text += `<tr><td>${key}</td><td>${getDiff(value.compare, value.base)}`;
             text += '<span class="rate">';
             if (value.compare >= 0) {
@@ -230,7 +230,7 @@ class WoodComparison extends Wood {
         };
         wood.properties = new Map();
         this._woodCompare._properties.forEach(property => {
-            wood.set(property, {
+            wood.properties.set(property, {
                 base: this._getBasePropertySum(property),
                 compare: this._getComparePropertySum(property)
             });
