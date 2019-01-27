@@ -69,7 +69,7 @@ export default class ShowTrades {
          * @type {string}
          */
         this._profitValue = this._getProfitValue();
-        this._profitValueSelected();
+        this._sortLinkData();
     }
 
     _setupSvg() {
@@ -114,6 +114,15 @@ export default class ShowTrades {
         $(this._nationSelector).selectpicker({
             actionsBox: true,
             selectedTextFormat: "count > 1",
+            countSelectedText(amount) {
+                let text = "";
+                if (amount === nations.length) {
+                    text = "All";
+                } else {
+                    text = amount;
+                }
+                return `${text} nations selected`;
+            },
             title: "Select nations"
         });
     }
@@ -122,7 +131,7 @@ export default class ShowTrades {
         this._radioGroup = this._mainDiv
             .append("div")
             .attr("id", this._baseId)
-            .attr("class", "col-auto align-self-center radio-group");
+            .attr("class", "align-self-center radio-group");
         this._radioGroup
             .append("legend")
             .attr("class", "col-form-label")
@@ -174,32 +183,34 @@ export default class ShowTrades {
         );
     }
 
-    _profitValueSelected() {
-        const sortLinkData = () =>
-            this._linkData
-                .map(trade => {
-                    let profit = 0;
-                    switch (this._profitValue) {
-                        case "weight":
-                            profit =
-                                trade.weightPerItem !== 0
-                                    ? Math.round(trade.profitTotal / (trade.weightPerItem * trade.quantity))
-                                    : trade.profitTotal;
-                            break;
-                        case "distance":
-                            profit = trade.profitTotal / trade.distance;
-                            break;
-                        case "total":
-                            profit = trade.profitTotal;
-                            break;
-                        default:
-                            throw Error("Wrong profit value");
-                    }
-                    trade.profit = profit;
-                    return trade;
-                })
-                .sort((a, b) => b.profit - a.profit);
+    _sortLinkData() {
+        this._linkData = this._linkData
+            .map(trade => {
+                let profit = 0;
+                switch (this._profitValue) {
+                    case "weight":
+                        profit =
+                            trade.weightPerItem !== 0
+                                ? Math.round(trade.profitTotal / (trade.weightPerItem * trade.quantity))
+                                : trade.profitTotal;
+                        break;
+                    case "distance":
+                        profit = trade.profitTotal / trade.distance;
+                        break;
+                    case "total":
+                        profit = trade.profitTotal;
+                        break;
+                    default:
+                        throw Error("Wrong profit value");
+                }
+                // eslint-disable-next-line
+                trade.profit = profit;
+                return trade;
+            })
+            .sort((a, b) => b.profit - a.profit);
+    }
 
+    _profitValueSelected() {
         this._profitValue = getRadioButton(this._baseId);
         // If data is invalid
         if (!this._radioButtonValues.includes(this._profitValue)) {
@@ -207,8 +218,8 @@ export default class ShowTrades {
             setRadioButton(`${this._baseId}-${this._profitValue.replace(/ /g, "")}`);
         }
         this._storeProfitValue();
-
-        this._update(sortLinkData());
+        this._sortLinkData();
+        this._update(this._linkData);
     }
 
     _showDetails(d, i, nodes) {
@@ -224,7 +235,11 @@ export default class ShowTrades {
             )}<br>`;
             h += `Profit: ${formatSiCurrency(profitTotal)} total, ${formatSiCurrency(
                 profitPerItem
-            )} per item, ${formatSiCurrency(trade.profitPerTon)} per ton<br>`;
+            )} per item, ${formatSiCurrency(
+                trade.weightPerItem !== 0
+                    ? Math.round(trade.profitTotal / (trade.weightPerItem * trade.quantity))
+                    : trade.profitTota
+            )} per ton<br>`;
             h += `Weight: ${formatSiInt(trade.weightPerItem * trade.quantity)} tons total, ${formatSiInt(
                 trade.weightPerItem
             )} tons per item</p>`;
@@ -267,7 +282,7 @@ export default class ShowTrades {
                             (link.source.id === sourceId && link.target.id === targetId) ||
                             (link.source.id === targetId && link.target.id === sourceId)
                     )
-                    .map(link => link.profitPerTon);
+                    .map(link => link.profit);
 
             const source = { x: this._nodeData.get(d.source.id).x, y: this._nodeData.get(d.source.id).y };
             const target = { x: this._nodeData.get(d.target.id).x, y: this._nodeData.get(d.target.id).y };
@@ -285,7 +300,7 @@ export default class ShowTrades {
                 const arcScale = d3ScalePoint()
                     .domain(siblings)
                     .range([1, siblings.length]);
-                dr /= 1 + (1 / siblings.length) * (arcScale(d.profitPerTon) - 1);
+                dr /= 1 + (1 / siblings.length) * (arcScale(d.profit) - 1);
             }
             dr = Math.round(dr);
 
@@ -294,7 +309,7 @@ export default class ShowTrades {
 
         const linkWidthScale = d3ScaleLinear()
             .range([5 / this._scale, 15 / this._scale])
-            .domain(d3Extent(this._linkDataFiltered, d => d.profitPerTon));
+            .domain(d3Extent(this._linkDataFiltered, d => d.profit));
         const fontScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale);
         const fontSize = roundToThousands(this._fontSize / fontScale);
         const transition = this._g.transition().duration(500);
@@ -332,7 +347,7 @@ export default class ShowTrades {
                     )
             )
             .attr("d", d => arcPath(this._nodeData.get(d.source.id).x < this._nodeData.get(d.target.id).x, d))
-            .attr("stroke-width", d => `${linkWidthScale(d.profitPerTon)}px`);
+            .attr("stroke-width", d => `${linkWidthScale(d.profit)}px`);
 
         this._labelG.attr("font-size", `${fontSize}px`);
 
@@ -359,7 +374,7 @@ export default class ShowTrades {
                             .remove()
                     )
             )
-            .attr("dy", d => `-${linkWidthScale(d.profitPerTon) / 1.5}px`);
+            .attr("dy", d => `-${linkWidthScale(d.profit) / 1.5}px`);
     }
 
     _updateList() {
@@ -374,13 +389,19 @@ export default class ShowTrades {
             case "total":
                 profitText = "total profit";
                 break;
+            default:
+                throw Error("Wrong profit value");
         }
+
         const getTrade = trade => {
-            const addInfo = text => `<div>${text}</div>`;
-            const addDes = text => `<div class="des">${text}</div>`;
+            const addInfo = text => `<div><div>${text}</div>`;
+            const addDes = text => `<div class="des">${text}</div></div>`;
+
+            const weight = trade.weightPerItem * trade.quantity;
 
             let h = addInfo(`${formatInt(trade.quantity)} ${trade.good}`) + addDes("trade");
             h += addInfo(`${formatSiCurrency(trade.profit)}`) + addDes(profitText);
+            h += addInfo(`${formatSiInt(weight)}`) + addDes(weight === 1 ? "ton" : "tons");
             h +=
                 addInfo(
                     `${this._nodeData.get(trade.source.id).name} <span class="caps">${
@@ -400,12 +421,8 @@ export default class ShowTrades {
         this._list
             .selectAll("div.block")
             .data(this._linkDataFiltered, d => this._getId(d))
-            .join(enter =>
-                enter
-                    .append("div")
-                    .attr("class", "block")
-                    .html(d => getTrade(d))
-            );
+            .join(enter => enter.append("div").attr("class", "block"))
+            .html(d => getTrade(d));
     }
 
     _filterByVisiblePorts(linkData) {
