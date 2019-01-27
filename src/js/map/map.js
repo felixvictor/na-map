@@ -173,10 +173,10 @@ class Map {
         this._showLayer = this._getShowLayer();
 
         this._flexOverlay = document.getElementsByClassName("flex-overlay")[0];
+
         this._setHeightWidth();
         this._setupScale();
         this._setupSvg();
-        this._setFlexOverlayHeight();
         this._setSvgSize();
         this._setupListener();
         this._setupProps();
@@ -572,6 +572,7 @@ class Map {
             } else if (this.zoomLevel !== "initial") {
                 this.zoomLevel = "initial";
             }
+            this._setFlexOverlayHeight();
             this._grid.update();
         }
 
@@ -625,6 +626,7 @@ class Map {
         this.zoomLevel = "initial";
         this.initialZoomAndPan();
         this._f11.checkF11Coord();
+        this._setFlexOverlayHeight();
     }
 
     set zoomLevel(zoomLevel) {
@@ -687,7 +689,8 @@ class Map {
     }
 
     _setFlexOverlayHeight() {
-        this._flexOverlay.setAttribute("style", `height:${this.height}px`);
+        const height = this.height - (this._grid.show && this.zoomLevel !== "initial" ? this.xGridBackgroundHeight : 0);
+        this._flexOverlay.setAttribute("style", `height:${height}px`);
     }
 
     initialZoomAndPan() {

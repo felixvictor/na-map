@@ -928,6 +928,6 @@ table a {
     flex: 1 1 auto;
     flex-direction: column;
     padding: $paddingHalf;
-    overflow: auto;
+    overflow-y: scroll;
     background: rgba($primary-200, .8);
 }
