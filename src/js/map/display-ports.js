@@ -16,16 +16,13 @@ import moment from "moment";
 import "moment/locale/en-gb";
 
 import {
-    circleRadiusFactor,
-    primary300,
     colourRed,
     colourRedDark,
-    convertCoordX,
-    convertCoordY,
     defaultCircleSize,
     defaultFontSize,
-    getDistance,
-    nations
+    greenZoneRadius,
+    nations,
+    primary300
 } from "../common";
 import {
     degreesToRadians,
@@ -631,19 +628,7 @@ export default class DisplayPorts {
             data = this._portDataFiltered.filter(port => port.nonCapturable && port.nation !== "FT");
 
             cssClass = () => "bubble pos";
-            r = () =>
-                roundToThousands(
-                    getDistance(
-                        {
-                            x: convertCoordX(-63400, 18800),
-                            y: convertCoordY(-63400, 18800)
-                        },
-                        {
-                            x: convertCoordX(-79696, 10642),
-                            y: convertCoordY(-79696, 10642)
-                        }
-                    )
-                ) * circleRadiusFactor;
+            r = () => greenZoneRadius;
         } else if (this.showCurrentGood) {
             cssClass = d => `bubble ${d.isSource ? "pos" : "neg"}`;
             r = () => rMax / 2;
