@@ -381,10 +381,10 @@ export default class ShowTrades {
         let profitText = "";
         switch (this._profitValue) {
             case "weight":
-                profitText = "profit per ton";
+                profitText = "profit/ton";
                 break;
             case "distance":
-                profitText = "profit per distance";
+                profitText = "profit/distance";
                 break;
             case "total":
                 profitText = "total profit";
@@ -426,7 +426,6 @@ export default class ShowTrades {
     }
 
     _filterByVisiblePorts(linkData) {
-        console.log("_filterByVisiblePorts anfang", linkData);
         const portDataFiltered = new Set(
             this._portData
                 .filter(
@@ -441,7 +440,6 @@ export default class ShowTrades {
         this._linkDataFiltered = linkData
             .filter(trade => portDataFiltered.has(trade.source.id) || portDataFiltered.has(trade.target.id))
             .slice(0, this._numTrades);
-        console.log("_filterByVisiblePorts ende", this._linkDataFiltered);
     }
 
     _filterBySelectedNations() {
