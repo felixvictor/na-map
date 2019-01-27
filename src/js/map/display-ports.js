@@ -559,7 +559,7 @@ export default class DisplayPorts {
             .join(enter =>
                 enter
                     .append("circle")
-                    .attr("fill", d => `url(#${d.nation}${d.availableForAll ? "a" : ""})`)
+                    .attr("fill", d => `url(#${d.nation}${d.availableForAll && d.nation !== "NT" ? "a" : ""})`)
                     .attr("cx", d => d.coordinates[0])
                     .attr("cy", d => d.coordinates[1])
                     .on("click", (d, i, nodes) => this._showDetails(d, i, nodes))
