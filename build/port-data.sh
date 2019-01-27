@@ -137,8 +137,8 @@ function test_for_update () {
 	    new_file="${api_base_file}-${server_names[0]}-${api_var}-${date}.json"
 		old_file="${api_base_file}-${server_names[0]}-${api_var}-${last_date}.json"
 
-		# If old file does not exist create it
-		[[ ! -f "${old_file}" ]] && touch "${old_file}"
+		# If old file does not exist test succeeded
+		[[ ! -f "${old_file}" ]] && return 0;
 
 		# Get new file
 		get_API_data "${server_names[0]}" "${new_file}" "${api_var}"
@@ -160,7 +160,7 @@ function get_port_data () {
     if test_for_update "${api_base_file}"; then
         for JSON in "${api_dir}"/*.json; do
             if [ "${JSON}" != "${tweets_json}" ]; then
-                ${command_xz} -9ef "${JSON}"
+                ${command_xz} -9e "${JSON}"
             fi
         done
 
