@@ -556,27 +556,19 @@ export default class DisplayPorts {
         const circleSize = roundToThousands(this._circleSize / circleScale);
         const data = this._portDataFiltered;
 
-        // Data join
-        const circleUpdate = this._gIcon.selectAll("circle").data(data, d => d.id);
-
-        // Remove old circles
-        circleUpdate.exit().remove();
-
-        // Update kept circles
-        // circleUpdate; // not needed
-
-        // Add new circles
-        const circleEnter = circleUpdate
-            .enter()
-            .append("circle")
-            .attr("fill", d => `url(#${d.nation}${d.availableForAll ? "a" : ""})`)
-            .attr("cx", d => d.coordinates[0])
-            .attr("cy", d => d.coordinates[1])
-            .on("click", (d, i, nodes) => this._showDetails(d, i, nodes))
-            .on("mouseout", hideDetails);
-
-        // Apply to both old and new
-        circleUpdate.merge(circleEnter).attr("r", circleSize);
+        this._gIcon
+            .selectAll("circle")
+            .data(data, d => d.id)
+            .join(enter =>
+                enter
+                    .append("circle")
+                    .attr("fill", d => `url(#${d.nation}${d.availableForAll ? "a" : ""})`)
+                    .attr("cx", d => d.coordinates[0])
+                    .attr("cy", d => d.coordinates[1])
+                    .on("click", (d, i, nodes) => this._showDetails(d, i, nodes))
+                    .on("mouseout", hideDetails)
+            )
+            .attr("r", circleSize);
     }
 
     _updatePortCircles() {
@@ -659,30 +651,18 @@ export default class DisplayPorts {
             data = {};
         }
 
-        // Data join
-        const circleUpdate = this._gPortCircle.selectAll("circle").data(data, d => d.id);
-
-        // Remove old circles
-        circleUpdate.exit().remove();
-
-        // Update kept circles
-        // circleUpdate; // not needed
-
-        // Add new circles
-        const circleEnter = circleUpdate
-            .enter()
-            .append("circle")
-            .attr("cx", d => d.coordinates[0])
-            .attr("cy", d => d.coordinates[1]);
-
-        // Apply to both old and new
-        const circleMerge = circleUpdate
-            .merge(circleEnter)
+        this._gPortCircle
+            .selectAll("circle")
+            .data(data, d => d.id)
+            .join(enter =>
+                enter
+                    .append("circle")
+                    .attr("cx", d => d.coordinates[0])
+                    .attr("cy", d => d.coordinates[1])
+            )
             .attr("class", d => cssClass(d))
-            .attr("r", d => r(d));
-        if (hasFill) {
-            circleMerge.attr("fill", d => fill(d));
-        }
+            .attr("r", d => r(d))
+            .attr("fill", d => (hasFill ? fill(d) : ""));
     }
 
     _updateTextsX(d, circleSize) {
@@ -724,31 +704,15 @@ export default class DisplayPorts {
                 fontScale = 2 ** Math.log2((Math.abs(this._minScale) + this._scale) * 0.9),
                 fontSize = roundToThousands(this._fontSize / fontScale);
 
-            this._gText.attr("font-size", `${fontSize}px`);
-
-            // Data join
-            const textUpdate = this._gText.selectAll("text").data(this._portDataFiltered, d => d.id);
-
-            // Remove old text
-            textUpdate.exit().remove();
-
-            // Update kept texts
-            // textUpdate; // not needed
-
-            // Add new texts
-            const textEnter = textUpdate
-                .enter()
-                .append("text")
-                .text(d => d.name);
-
-            // Apply to both old and new
-            textUpdate
-                .merge(textEnter)
+            this._gText
+                .selectAll("text")
+                .data(this._portDataFiltered, d => d.id)
+                .join(enter => enter.append("text").text(d => d.name))
                 .attr("x", d => this._updateTextsX(d, circleSize))
                 .attr("y", d => this._updateTextsY(d, circleSize, fontSize))
                 .attr("text-anchor", d => this._updateTextsAnchor(d));
 
-            this._gText.classed("d-none", false);
+            this._gText.attr("font-size", `${fontSize}px`).classed("d-none", false);
         }
     }
 
@@ -773,21 +737,15 @@ export default class DisplayPorts {
         } else {
             const data = this._countyPolygonFiltered;
 
-            // Data join
-            const countyUpdate = this._gCounty.selectAll("text").data(data);
-
-            // Remove old
-            countyUpdate.exit().remove();
-
-            // Update kept texts
-            // countyUpdate; // not needed
-
-            // Add new texts
-            countyUpdate
-                .enter()
-                .append("text")
-                .attr("transform", d => `translate(${d.centroid[0]},${d.centroid[1]})rotate(${d.angle})`)
-                .text(d => d.name);
+            this._gCounty
+                .selectAll("text")
+                .data(data)
+                .join(enter =>
+                    enter
+                        .append("text")
+                        .attr("transform", d => `translate(${d.centroid[0]},${d.centroid[1]})rotate(${d.angle})`)
+                        .text(d => d.name)
+                );
 
             /* Show polygon for test purposes
             const d3line2 = d3
@@ -814,21 +772,15 @@ export default class DisplayPorts {
         } else {
             const data = this._regionPolygonFiltered;
 
-            // Data join
-            const regionUpdate = this._gRegion.selectAll("text").data(data);
-
-            // Remove old
-            regionUpdate.exit().remove();
-
-            // Update kept texts
-            // regionUpdate; // not needed
-
-            // Add new texts
-            regionUpdate
-                .enter()
-                .append("text")
-                .attr("transform", d => `translate(${d.centroid[0]},${d.centroid[1]})rotate(${d.angle})`)
-                .text(d => d.name);
+            this._gRegion
+                .selectAll("text")
+                .data(data)
+                .join(enter =>
+                    enter
+                        .append("text")
+                        .attr("transform", d => `translate(${d.centroid[0]},${d.centroid[1]})rotate(${d.angle})`)
+                        .text(d => d.name)
+                );
 
             /* Show polygon for test purposes
             const d3line2 = d3

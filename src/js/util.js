@@ -466,11 +466,13 @@ export function printCompassRose({ elem, radius }) {
     const label = elem
         .selectAll("g")
         .data(data)
-        .enter()
-        .append("g")
-        .attr(
-            "transform",
-            d => `rotate(${Math.round(xScale(d) + xScale.bandwidth() / 2 - 90)})translate(${innerRadius},0)`
+        .join(enter =>
+            enter
+                .append("g")
+                .attr(
+                    "transform",
+                    d => `rotate(${Math.round(xScale(d) + xScale.bandwidth() / 2 - 90)})translate(${innerRadius},0)`
+                )
         );
 
     label
@@ -537,10 +539,15 @@ export function printSmallCompassRose({ elem, radius }) {
     const x2Card = 6;
     elem.selectAll("line")
         .data(data)
-        .enter()
-        .append("line")
-        .attr("x2", (d, i) => (i % 3 !== 0 ? x2 : i % 6 !== 0 ? x2InterCard : x2Card))
-        .attr("transform", d => `rotate(${Math.round(xScale(d) + xScale.bandwidth() / 2)})translate(${innerRadius},0)`);
+        .join(enter =>
+            enter
+                .append("line")
+                .attr("x2", (d, i) => (i % 3 !== 0 ? x2 : i % 6 !== 0 ? x2InterCard : x2Card))
+                .attr(
+                    "transform",
+                    d => `rotate(${Math.round(xScale(d) + xScale.bandwidth() / 2)})translate(${innerRadius},0)`
+                )
+        );
 }
 
 /**
