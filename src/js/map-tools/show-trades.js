@@ -24,6 +24,8 @@ export default class ShowTrades {
      * @param {object} portData - Port data
      * @param {object} tradeData - Trade data
      * @param {number} minScale - Minimal scale
+     * @param {Bound} lowerBound - Top left coordinates of current viewport
+     * @param {Bound} upperBound - Bottom right coordinates of current viewport
      */
     constructor(portData, tradeData, minScale, lowerBound, upperBound) {
         this._portData = portData;
@@ -463,6 +465,12 @@ export default class ShowTrades {
         this._updateList();
     }
 
+    /**
+     * Set bounds of current viewport
+     * @param {Bound} lowerBound - Top left coordinates of current viewport
+     * @param {Bound} upperBound - Bottom right coordinates of current viewport
+     * @return {void}
+     */
     setBounds(lowerBound, upperBound) {
         this._lowerBound = lowerBound;
         this._upperBound = upperBound;
