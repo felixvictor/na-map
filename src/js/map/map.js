@@ -140,7 +140,6 @@ class Map {
          * Default DoubleClickAction setting
          * @type {string}
          * @private
-         * @private
          */
         this._doubleClickActionDefault = "compass";
 
@@ -604,8 +603,23 @@ class Map {
             .translate(this._currentTranslate.x, this._currentTranslate.y)
             .scale(roundToThousands(d3Event.transform.k));
 
-        const lowerBound = zoomTransform.invert([this.coord.min, this.coord.min]),
-            upperBound = zoomTransform.invert([this.width, this.height]);
+        /**
+         * lower or upper bound coordinates
+         * @typedef {Bound}
+         * @property {number[]} Coordinates
+         */
+
+        /**
+         * Top left coordinates of current viewport
+         * @type{Bound}
+         */
+        const lowerBound = zoomTransform.invert([this.coord.min, this.coord.min]);
+
+        /**
+         * Bottom right coordinates of current viewport
+         * @type{Bound}
+         */
+        const upperBound = zoomTransform.invert([this.width, this.height]);
 
         this._ports.setBounds(lowerBound, upperBound);
         this._pbZone.setBounds(lowerBound, upperBound);
