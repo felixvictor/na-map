@@ -160,7 +160,7 @@ function get_port_data () {
     if test_for_update "${api_base_file}"; then
         for JSON in "${api_dir}"/*.json; do
             if [ "${JSON}" != "${tweets_json}" ]; then
-                ${command_xz} -9e "${JSON}"
+                ${command_xz} --extreme --force "${JSON}"
             fi
         done
 
