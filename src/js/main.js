@@ -31,8 +31,8 @@ import {
 } from "@fortawesome/fontawesome-free-solid";
 
 import Cookie from "./util/cookie";
+import RadioButton from "./util/radio-button";
 import { initAnalytics, registerPage } from "./analytics";
-import { getRadioButton, setRadioButton } from "./util";
 
 import "../scss/main.scss";
 
@@ -60,13 +60,19 @@ function main() {
     const cookie = new Cookie(baseId, radioButtonValues);
 
     /**
+     * Server name radio buttons
+     * @type {RadioButton}
+     */
+    const radios = new RadioButton(baseId, radioButtonValues);
+
+    /**
      * Get server name from cookie or use default value
      * @returns {string} - server name
      */
     const getServerName = () => {
         const r = cookie.get();
 
-        setRadioButton(`${baseId}-${r}`);
+        radios.set(r);
 
         return r;
     };
@@ -78,25 +84,12 @@ function main() {
     let serverName = getServerName();
 
     /**
-     * Store server name in cookie
-     * @return {void}
-     */
-    const storeServerName = () => {
-        cookie.set(serverName);
-    };
-
-    /**
      * Change server name
      * @return {void}
      */
     const serverNameSelected = () => {
-        serverName = getRadioButton(baseId);
-        // If data is invalid
-        if (!radioButtonValues.includes(serverName)) {
-            [serverName] = radioButtonValues;
-            setRadioButton(`${baseId}-${serverName}`);
-        }
-        storeServerName();
+        serverName = radios.get();
+        cookie.set(serverName);
         document.location.reload();
     };
 
@@ -130,12 +123,8 @@ function main() {
     const loadMap = async () => {
         let map;
 
-        try {
-            const { Map } = await import(/* webpackChunkName: "map" */ "./map/map");
-            map = new Map(serverName);
-        } catch (error) {
-            throw new Error(error);
-        }
+        const { Map } = await import(/* webpackChunkName: "map" */ "./map/map");
+        map = new Map(serverName);
 
         window.onresize = () => {
             map.resize();
