@@ -155,14 +155,14 @@ class Map {
          * @type {string}
          * @private
          */
-        this._showLayerCookieName = "na-map--show-layer";
+        this._showLayerCookieName = "na-map--show-grid";
 
         /**
          * Default showLayer setting
          * @type {string}
          * @private
          */
-        this._showLayerDefault = "grid";
+        this._showLayerDefault = "on";
 
         /**
          * Get showLayer setting from cookie or use default value
@@ -171,7 +171,7 @@ class Map {
          */
         this._showLayer = this._getShowLayer();
 
-        this._flexOverlay = document.getElementsByClassName("flex-overlay")[0];
+        [this._flexOverlay] = document.getElementsByClassName("flex-overlay");
 
         this._setHeightWidth();
         this._setupScale();
@@ -348,8 +348,8 @@ class Map {
             this._showAbout();
         });
 
-        document.getElementById("doubleClick-action").addEventListener("change", () => this._doubleClickSelected());
-        document.getElementById("show-layer").addEventListener("change", () => this._showLayerSelected());
+        document.getElementById("double-click-action").addEventListener("change", () => this._doubleClickSelected());
+        document.getElementById("show-grid").addEventListener("change", () => this._showLayerSelected());
     }
 
     _setupScale() {
@@ -387,8 +387,8 @@ class Map {
     }
 
     _setupProps() {
-        document.getElementById(`doubleClick-action-${this._doubleClickAction}`).checked = true;
-        document.getElementById(`show-layer-${this._showLayer}`).checked = true;
+        document.getElementById(`double-click-action-${this._doubleClickAction}`).checked = true;
+        document.getElementById(`show-grid-${this._showLayer}`).checked = true;
     }
 
     /**
@@ -405,7 +405,7 @@ class Map {
     }
 
     _doubleClickSelected() {
-        this._doubleClickAction = document.querySelector('input[name="doubleClickAction"]:checked').value;
+        this._doubleClickAction = document.querySelector('input[name="double-click-action"]:checked').value;
         this._storeDoubleClickActionSetting();
         this._clearMap();
     }
@@ -424,8 +424,8 @@ class Map {
     }
 
     _showLayerSelected() {
-        this._showLayer = document.querySelector("input[name='showLayer']:checked").value;
-        this._grid.show = this._showLayer === "grid";
+        this._showLayer = document.querySelector("input[name='show-grid']:checked").value;
+        this._grid.show = this._showLayer === "on";
         this._storeShowLayerSetting();
         this._refreshLayer();
     }
