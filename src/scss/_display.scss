@@ -932,7 +932,7 @@ table a {
     flex-direction: column;
     padding: $paddingHalf;
     overflow-y: scroll;
-    background: rgba($primary-200, .8);
+    background: rgba($primary-100, .8);
 }
 
 .trade-list {
@@ -950,6 +950,6 @@ table a {
         }
     }
     .block:nth-of-type(odd) {
-        background: rgba($primary-050, .3);
+        background: rgba($primary-400, .3);
     }
 }
