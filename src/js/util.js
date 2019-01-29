@@ -556,19 +556,3 @@ export function printSmallCompassRose({ elem, radius }) {
  * @return {string} Formatted clan name
  */
 export const displayClan = clan => `<span class="caps">${clan}</span>`;
-
-/**
- * Get radio button value
- * @param {string} name - Radio button name
- * @returns {string} Radio button value
- */
-export const getRadioButton = name => document.querySelector(`input[name='${name.replace(/ /g, "")}']:checked`).value;
-
-/**
- * Set radio button value
- * @param {string} name - Radio button name
- * @returns {void}
- */
-export const setRadioButton = name => {
-    document.getElementById(name.replace(/ /g, "")).checked = true;
-};
