@@ -31,11 +31,10 @@ import {
     formatPercent,
     formatSiInt,
     getOrdinal,
-    getRadioButton,
-    roundToThousands,
-    setRadioButton
+    roundToThousands
 } from "../util";
 import Cookie from "../util/cookie";
+import RadioButton from "../util/radio-button";
 import TrilateratePosition from "../map-tools/get-position";
 
 export default class DisplayPorts {
@@ -86,10 +85,16 @@ export default class DisplayPorts {
         this._radioButtonValues = ["attack", "position", "tax", "net", "green", "off"];
 
         /**
-         * Server name cookie
+         * Show radius cookie
          * @type {Cookie}
          */
         this._cookie = new Cookie(this._baseId, this._radioButtonValues);
+
+        /**
+         * Show radius radio buttons
+         * @type {RadioButton}
+         */
+        this._radios = new RadioButton(this._baseId, this._radioButtonValues);
 
         /**
          * Get showRadius setting from cookie or use default value
@@ -125,29 +130,14 @@ export default class DisplayPorts {
             [r] = this._radioButtonValues;
             this._cookie.set(r);
         }
-        setRadioButton(`${this._baseId}-${r}`);
+        this._radios.set(r);
 
         return r;
     }
 
-    /**
-     * Store show setting in cookie
-     * @return {void}
-     * @private
-     */
-    _storeShowRadiusSetting() {
-        this._cookie.set(this._showRadius);
-    }
-
     _showRadiusSelected() {
-        this._showRadius = getRadioButton(this._baseId);
-
-        // If data is invalid
-        if (!this._radioButtonValues.includes(this._showRadius)) {
-            [this._showRadius] = this._radioButtonValues;
-            setRadioButton(`${this._baseId}-${this._showRadius}`);
-        }
-        this._storeShowRadiusSetting();
+        this._showRadius = this._radios.get();
+        this._cookie.set(this._showRadius);
         this.update();
     }
 
