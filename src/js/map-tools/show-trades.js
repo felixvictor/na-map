@@ -13,8 +13,9 @@ import { scaleLinear as d3ScaleLinear, scalePoint as d3ScalePoint } from "d3-sca
 import { select as d3Select } from "d3-selection";
 
 import { defaultFontSize, nations } from "../common";
-import { formatInt, formatSiCurrency, formatSiInt, getRadioButton, setRadioButton, roundToThousands } from "../util";
+import { formatInt, formatSiCurrency, formatSiInt, roundToThousands } from "../util";
 import Cookie from "../util/cookie";
+import RadioButton from "../util/radio-button";
 
 /**
  * Show trades
@@ -43,32 +44,54 @@ export default class ShowTrades {
         this._baseId = "show-trades";
         this._nationSelectId = `${this._baseId}-nation-select`;
 
+        this._showId = "show-trades-show";
+
+        /**
+         * Possible values for show trade radio buttons (first is default value)
+         * @type {string[]}
+         * @private
+         */
+        this._showRadioValues = ["on", "off"];
+
+        /**
+         * Show trade cookie
+         * @type {Cookie}
+         */
+        this._showCookie = new Cookie(this._showId, this._showRadioValues);
+
+        /**
+         * Show trade radio buttons
+         * @type {RadioButton}
+         */
+        this._showRadios = new RadioButton(this._showId, this._showRadioValues);
+
+        this._profitId = "show-trades-profit";
+
         /**
          * Possible values for profit radio buttons (first is default value)
          * @type {string[]}
          * @private
          */
-        this._radioButtonValues = ["weight", "distance", "total"];
-
-        /**
-         * Server name cookie
-         * @type {Cookie}
-         */
-        this._cookie = new Cookie(this._baseId, this._radioButtonValues);
+        this._profitRadioValues = ["weight", "distance", "total"];
+        this._profitCookie = new Cookie(this._profitId, this._profitRadioValues);
+        this._profitRadios = new RadioButton(this._profitId, this._profitRadioValues);
 
         this._setupSvg();
         this._setupSelects();
-        this._setupRadios();
+        this._setupProfitRadios();
         this._setupListener();
         this._setupList();
         this._setupData();
         this.setBounds(lowerBound, upperBound);
+
+        this._show = this._getShowValue();
 
         /**
          * Get profit value from cookie or use default value
          * @type {string}
          */
         this._profitValue = this._getProfitValue();
+
         this._sortLinkData();
     }
 
@@ -127,25 +150,25 @@ export default class ShowTrades {
         });
     }
 
-    _setupRadios() {
-        this._radioGroup = this._mainDiv
+    _setupProfitRadios() {
+        const profitRadioGroup = this._mainDiv
             .append("div")
-            .attr("id", this._baseId)
+            .attr("id", this._profitId)
             .attr("class", "align-self-center radio-group");
-        this._radioGroup
+        profitRadioGroup
             .append("legend")
             .attr("class", "col-form-label")
             .text("Sort profit by");
 
-        this._radioButtonValues.forEach(button => {
-            const id = `${this._baseId}-${button.replace(/ /g, "")}`;
+        this._profitRadioValues.forEach(button => {
+            const id = `${this._profitId}-${button.replace(/ /g, "")}`;
 
-            const div = this._radioGroup
+            const div = profitRadioGroup
                 .append("div")
                 .attr("class", "custom-control custom-radio custom-control-inline");
             div.append("input")
                 .attr("id", id)
-                .attr("name", this._baseId)
+                .attr("name", this._profitId)
                 .attr("type", "radio")
                 .attr("class", "custom-control-input")
                 .attr("value", button);
@@ -158,7 +181,8 @@ export default class ShowTrades {
     }
 
     _setupListener() {
-        this._radioGroup.node().addEventListener("change", () => this._profitValueSelected());
+        document.getElementById(this._showId).addEventListener("change", () => this._showSelected());
+        document.getElementById(this._profitId).addEventListener("change", () => this._profitValueSelected());
         this._nationSelector.addEventListener("change", event => {
             this._filterBySelectedNations();
             event.preventDefault();
@@ -201,7 +225,7 @@ export default class ShowTrades {
                         profit = trade.profitTotal;
                         break;
                     default:
-                        throw Error("Wrong profit value");
+                        throw Error(`Wrong profit value ${this._profitValue}`);
                 }
                 // eslint-disable-next-line
                 trade.profit = profit;
@@ -210,14 +234,19 @@ export default class ShowTrades {
             .sort((a, b) => b.profit - a.profit);
     }
 
+    _showSelected() {
+        const show = this._showRadios.get();
+        this._show = show === "on";
+        this._showCookie.set(show);
+
+        this._mainDiv.classed("flex", this._show).classed("d-none", !this._show);
+        this._update(this._show ? this._linkData : []);
+    }
+
     _profitValueSelected() {
-        this._profitValue = getRadioButton(this._baseId);
-        // If data is invalid
-        if (!this._radioButtonValues.includes(this._profitValue)) {
-            [this._profitValue] = this._radioButtonValues;
-            setRadioButton(`${this._baseId}-${this._profitValue.replace(/ /g, "")}`);
-        }
-        this._storeProfitValue();
+        this._profitValue = this._profitRadios.get();
+        this._profitCookie.set(this._profitValue);
+
         this._sortLinkData();
         this._update(this._linkData);
     }
@@ -458,20 +487,24 @@ export default class ShowTrades {
      * Get profit value from cookie or use default value
      * @returns {string} - profit value
      */
-    _getProfitValue() {
-        const r = this._cookie.get();
+    _getShowValue() {
+        const r = this._showCookie.get();
 
-        setRadioButton(`${this._baseId}-${r}`);
+        this._showRadios.set(r);
 
         return r;
     }
 
     /**
-     * Store profit value in cookie
-     * @return {void}
+     * Get profit value from cookie or use default value
+     * @returns {string} - profit value
      */
-    _storeProfitValue() {
-        this._cookie.set(this._profitValue);
+    _getProfitValue() {
+        const r = this._profitCookie.get();
+
+        this._profitRadios.set(r);
+
+        return r;
     }
 
     _update(linkData) {
