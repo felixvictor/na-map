@@ -660,7 +660,7 @@ class Map {
         this._setSvgSize();
         this._setFlexOverlayHeight();
         this._displayMap(zoomTransform);
-        this._grid.update();
+        this._grid.update(true);
     }
 
     _getDimensions() {
