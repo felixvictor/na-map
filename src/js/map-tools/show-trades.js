@@ -97,6 +97,7 @@ export default class ShowTrades {
          */
         this._profitValue = this._getProfitValue();
 
+        this._filterPortsBySelectedNations();
         this._sortLinkData();
     }
 
@@ -246,7 +247,7 @@ export default class ShowTrades {
         this._showCookie.set(show);
         this._mainDiv.classed("flex", this._show).classed("d-none", !this._show);
         this._linkData = this._show ? this._linkDataDefault : [];
-        this._filterBySelectedNations();
+        this._filterTradesBySelectedNations();
         this._sortLinkData();
         this._update();
     }
@@ -261,13 +262,9 @@ export default class ShowTrades {
     }
 
     _nationChanged() {
-        const selectedNations = new Set(Array.from(this._nationSelector.selectedOptions).map(option => option.value));
-        this._portDataFiltered = new Set(
-            this._portData.filter(port => selectedNations.has(port.nation)).map(port => port.id)
-        );
-
         this._linkData = this._linkDataDefault;
-        this._filterBySelectedNations();
+        this._filterPortsBySelectedNations();
+        this._filterTradesBySelectedNations();
         this._update();
     }
 
@@ -474,7 +471,7 @@ export default class ShowTrades {
             .html(d => getTrade(d));
     }
 
-    _filterByVisiblePorts() {
+    _filterTradesByVisiblePorts() {
         const portDataFiltered = new Set(
             this._portData
                 .filter(
@@ -491,10 +488,18 @@ export default class ShowTrades {
             .slice(0, this._numTrades);
     }
 
-    _filterBySelectedNations() {
+    _filterTradesBySelectedNations() {
+        console.log(this._portDataFiltered);
         this._linkData = this._linkData
             .filter(trade => this._portDataFiltered.has(trade.source.id) && this._portDataFiltered.has(trade.target.id))
             .slice(0, this._numTrades);
+    }
+
+    _filterPortsBySelectedNations() {
+        const selectedNations = new Set(Array.from(this._nationSelector.selectedOptions).map(option => option.value));
+        this._portDataFiltered = new Set(
+            this._portData.filter(port => selectedNations.has(port.nation)).map(port => port.id)
+        );
     }
 
     /**
@@ -522,7 +527,7 @@ export default class ShowTrades {
     }
 
     _update() {
-        this._filterByVisiblePorts();
+        this._filterTradesByVisiblePorts();
         this._updateGraph();
         this._updateList();
     }
