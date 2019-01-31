@@ -149,9 +149,8 @@ export default class DisplayGrid {
         // svg groups
         this._divXAxis = d3Select("#axis-x");
         this._svgXAxis = d3Select("#axis-x svg");
-        this._svgXAxis
-            .attr("height", this._xBackgroundHeight)
-            .attr("width", this._width)
+        this._svgXAxis.attr("height", this._xBackgroundHeight).attr("width", this._width);
+        this._svgXAxisRect = this._svgXAxis
             .append("rect")
             .attr("height", this._xBackgroundHeight)
             .attr("width", this._width);
@@ -159,9 +158,8 @@ export default class DisplayGrid {
 
         this._divYAxis = d3Select("#axis-y");
         this._svgYAxis = d3Select("#axis-y svg");
-        this._svgYAxis
-            .attr("height", this._height - this._xBackgroundHeight)
-            .attr("width", this._yBackgroundWidth)
+        this._svgYAxis.attr("height", this._height - this._xBackgroundHeight).attr("width", this._yBackgroundWidth);
+        this._svgYAxisRect = this._svgYAxis
             .append("rect")
             .attr("height", this._height - this._xBackgroundHeight)
             .attr("width", this._yBackgroundWidth);
@@ -327,14 +325,26 @@ export default class DisplayGrid {
 
     /**
      * Update grid (shown or not shown)
+     * @param{boolean} resize - True if size needs to be changed
      * @return {void}
      * @public
      */
-    update() {
+    update(resize = false) {
         let show = false;
 
         if (this._isShown && this.zoomLevel !== "initial") {
             show = true;
+        }
+
+        if (resize) {
+            this._height = this._map.height;
+            this._width = this._map.width;
+
+            this._svgXAxis.attr("width", this._width);
+            this._svgXAxisRect.attr("width", this._width);
+
+            this._svgYAxis.attr("height", this._height - this._xBackgroundHeight);
+            this._svgYAxisRect.attr("height", this._height - this._xBackgroundHeight);
         }
 
         // Show or hide axis
