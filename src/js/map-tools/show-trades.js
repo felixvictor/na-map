@@ -30,6 +30,7 @@ export default class ShowTrades {
      */
     constructor(portData, tradeData, minScale, lowerBound, upperBound) {
         this._portData = portData;
+        this._linkDataDefault = tradeData;
         this._linkData = tradeData;
 
         this._minScale = minScale;
@@ -84,6 +85,10 @@ export default class ShowTrades {
         this._setupData();
         this.setBounds(lowerBound, upperBound);
 
+        /**
+         * Get show value from cookie or use default value
+         * @type {string}
+         */
         this._show = this._getShowValue();
 
         /**
@@ -184,7 +189,7 @@ export default class ShowTrades {
         document.getElementById(this._showId).addEventListener("change", () => this._showSelected());
         document.getElementById(this._profitId).addEventListener("change", () => this._profitValueSelected());
         this._nationSelector.addEventListener("change", event => {
-            this._filterBySelectedNations();
+            this._nationChanged();
             event.preventDefault();
         });
     }
@@ -237,18 +242,33 @@ export default class ShowTrades {
     _showSelected() {
         const show = this._showRadios.get();
         this._show = show === "on";
-        this._showCookie.set(show);
 
+        this._showCookie.set(show);
         this._mainDiv.classed("flex", this._show).classed("d-none", !this._show);
-        this._update(this._show ? this._linkData : []);
+        this._linkData = this._show ? this._linkDataDefault : [];
+        this._filterBySelectedNations();
+        this._sortLinkData();
+        this._update();
     }
 
     _profitValueSelected() {
         this._profitValue = this._profitRadios.get();
+
         this._profitCookie.set(this._profitValue);
 
         this._sortLinkData();
-        this._update(this._linkData);
+        this._update();
+    }
+
+    _nationChanged() {
+        const selectedNations = new Set(Array.from(this._nationSelector.selectedOptions).map(option => option.value));
+        this._portDataFiltered = new Set(
+            this._portData.filter(port => selectedNations.has(port.nation)).map(port => port.id)
+        );
+
+        this._linkData = this._linkDataDefault;
+        this._filterBySelectedNations();
+        this._update();
     }
 
     _showDetails(d, i, nodes) {
@@ -289,7 +309,7 @@ export default class ShowTrades {
             .tooltip("show");
     }
 
-    _getId(link) {
+    static _getId(link) {
         return `${link.source.id}-${link.good.replace(/ /g, "")}-${link.target.id}`;
     }
 
@@ -345,7 +365,7 @@ export default class ShowTrades {
 
         this._g
             .selectAll(".trade-link")
-            .data(this._linkDataFiltered, d => this._getId(d))
+            .data(this._linkDataFiltered, d => ShowTrades._getId(d))
             .join(
                 enter =>
                     enter
@@ -361,7 +381,7 @@ export default class ShowTrades {
                                 ? "url(#trade-arrow)"
                                 : ""
                         )
-                        .attr("id", d => this._getId(d))
+                        .attr("id", d => ShowTrades._getId(d))
                         .attr("opacity", 0)
                         .on("click", (d, i, nodes) => this._showDetails(d, i, nodes))
                         .on("mouseout", hideDetails)
@@ -382,7 +402,7 @@ export default class ShowTrades {
 
         this._labelG
             .selectAll(".trade-label")
-            .data(this._linkDataFiltered, d => this._getId(d))
+            .data(this._linkDataFiltered, d => ShowTrades._getId(d))
             .join(
                 enter =>
                     enter
@@ -390,7 +410,7 @@ export default class ShowTrades {
                         .attr("class", "trade-label")
                         .append("textPath")
                         .attr("startOffset", "50%")
-                        .attr("xlink:href", d => `#${this._getId(d)}`)
+                        .attr("xlink:href", d => `#${ShowTrades._getId(d)}`)
                         .text(d => `${formatInt(d.quantity)} ${d.good}`)
                         .attr("opacity", 0)
                         .call(enterCall => enterCall.transition(transition).attr("opacity", 1)),
@@ -449,12 +469,12 @@ export default class ShowTrades {
 
         this._list
             .selectAll("div.block")
-            .data(this._linkDataFiltered, d => this._getId(d))
+            .data(this._linkDataFiltered, d => ShowTrades._getId(d))
             .join(enter => enter.append("div").attr("class", "block"))
             .html(d => getTrade(d));
     }
 
-    _filterByVisiblePorts(linkData) {
+    _filterByVisiblePorts() {
         const portDataFiltered = new Set(
             this._portData
                 .filter(
@@ -466,21 +486,15 @@ export default class ShowTrades {
                 )
                 .map(port => port.id)
         );
-        this._linkDataFiltered = linkData
+        this._linkDataFiltered = this._linkData
             .filter(trade => portDataFiltered.has(trade.source.id) || portDataFiltered.has(trade.target.id))
             .slice(0, this._numTrades);
     }
 
     _filterBySelectedNations() {
-        const selectedNations = new Set(Array.from(this._nationSelector.selectedOptions).map(option => option.value));
-        const portDataFiltered = new Set(
-            this._portData.filter(port => selectedNations.has(port.nation)).map(port => port.id)
-        );
-        const linkData = this._linkData
-            .filter(trade => portDataFiltered.has(trade.source.id) && portDataFiltered.has(trade.target.id))
+        this._linkData = this._linkData
+            .filter(trade => this._portDataFiltered.has(trade.source.id) && this._portDataFiltered.has(trade.target.id))
             .slice(0, this._numTrades);
-
-        this._update(linkData);
     }
 
     /**
@@ -507,8 +521,8 @@ export default class ShowTrades {
         return r;
     }
 
-    _update(linkData) {
-        this._filterByVisiblePorts(linkData);
+    _update() {
+        this._filterByVisiblePorts();
         this._updateGraph();
         this._updateList();
     }
@@ -528,11 +542,12 @@ export default class ShowTrades {
         this._g.attr("transform", transform);
         this._scale = transform.k;
 
-        this._update(this._linkData);
+        this._update();
     }
 
     clearMap() {
         this._g.selectAll("*").remove();
-        this._update(this._linkData);
+        this._linkData = this._linkDataDefault;
+        this._update();
     }
 }
