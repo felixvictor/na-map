@@ -121,10 +121,8 @@ function main() {
      * @return {void}
      */
     const loadMap = async () => {
-        let map;
-
-        const { Map } = await import(/* webpackChunkName: "map" */ "./map/map");
-        map = new Map(serverName);
+        const { Map } = await import(/*  webpackPreload: true, webpackChunkName: "map" */ "./map/map");
+        const map = new Map(serverName);
 
         window.onresize = () => {
             map.resize();
