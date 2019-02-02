@@ -335,23 +335,23 @@ function convertModules() {
 
     apiItems
         .filter(item => item.ItemType === "Module")
-        .forEach(apiMpdule => {
+        .forEach(apiModule => {
             let dontSave = false;
             const module = {
-                id: apiMpdule.Id,
-                name: apiMpdule.Name.replaceAll("'", "’").replace("Bow figure - ", ""),
-                usageType: apiMpdule.UsageType,
-                APImodifiers: apiMpdule.Modifiers,
-                sortingGroup: apiMpdule.SortingGroup.replace("module:", ""),
-                isBowFigure: apiMpdule.bIsBowFigure,
-                isStackable: apiMpdule.bCanBeSetWithSameType,
+                id: apiModule.Id,
+                name: apiModule.Name.replaceAll("'", "’").replace("Bow figure - ", ""),
+                usageType: apiModule.UsageType,
+                APImodifiers: apiModule.Modifiers,
+                sortingGroup: apiModule.SortingGroup.replace("module:", ""),
+                isBowFigure: apiModule.bIsBowFigure,
+                isStackable: apiModule.bCanBeSetWithSameType,
                 // minResourcesAmount: APImodule.MinResourcesAmount,
                 // maxResourcesAmount: APImodule.MaxResourcesAmount,
                 // breakUpItemsAmount: APImodule.BreakUpItemsAmount,
                 // canBeBreakedUp: APImodule.CanBeBreakedUp,
                 // bCanBeBreakedUp: APImodule.bCanBeBreakedUp,
-                moduleType: apiMpdule.ModuleType,
-                moduleLevel: levels.get(apiMpdule.ModuleLevel)
+                moduleType: apiModule.ModuleType,
+                moduleLevel: levels.get(apiModule.ModuleLevel)
             };
 
             // Ignore double entries
