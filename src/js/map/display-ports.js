@@ -12,6 +12,10 @@ import { min as d3Min, max as d3Max } from "d3-array";
 import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate";
 import { scaleLinear as d3ScaleLinear } from "d3-scale";
 import { select as d3Select } from "d3-selection";
+
+import "bootstrap/js/dist/util";
+import "bootstrap/js/dist/tooltip";
+
 import moment from "moment";
 import "moment/locale/en-gb";
 
