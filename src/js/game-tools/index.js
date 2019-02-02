@@ -8,6 +8,9 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+import "bootstrap/js/dist/util";
+import "bootstrap/js/dist/modal";
+
 import CompareShips from "./compare-ships";
 import CompareWoods from "./compare-woods";
 import ListBuildings from "./list-buildings";
