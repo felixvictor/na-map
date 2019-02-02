@@ -530,6 +530,10 @@ table a {
     stroke: $white;
 }
 
+.highlight {
+    stroke: $green;
+}
+
 .trade-label {
     fill: $white;
     text-anchor: middle;
@@ -580,6 +584,10 @@ table a {
 
 .tooltip-inner {
     min-width: 30rem;
+}
+
+.tooltip-small {
+    min-width: inherit !important;
 }
 
 .flag-icon {
@@ -928,7 +936,6 @@ table a {
 }
 
 .trade-block {
-    display: flex;
     flex: 1 1 auto;
     flex-direction: column;
     padding: $paddingHalf;
