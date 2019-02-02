@@ -14,7 +14,7 @@ const // { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer"),
     ExtractCssChunks = require("extract-css-chunks-webpack-plugin"),
     PreloadWebpackPlugin = require("preload-webpack-plugin"),
     SitemapPlugin = require("sitemap-webpack-plugin").default,
-    SriPlugin = require("webpack-subresource-integrity"),
+    // SriPlugin = require("webpack-subresource-integrity"),
     TerserPlugin = require("terser-webpack-plugin"),
     WebpackDeepScopeAnalysisPlugin = require("webpack-deep-scope-plugin").default,
     WebpackPwaManifest = require("webpack-pwa-manifest");
@@ -316,14 +316,16 @@ const config = {
         ]),
         new HtmlPlugin(htmlOpt),
         new PreloadWebpackPlugin({
-            rel: "preload",
-            include: "initial"
+            include: "allAssets",
+            fileWhitelist: [/^(fonts|main|map|vendors~main|vendors~map)/]
         }),
-        new SitemapPlugin(target, sitemapPaths, { skipGzip: false }),
+        /*
         new SriPlugin({
             hashFuncNames: ["sha256", "sha384"],
             enabled: isProd
         }),
+        */
+        new SitemapPlugin(target, sitemapPaths, { skipGzip: false }),
         new WebpackDeepScopeAnalysisPlugin(),
         new WebpackPwaManifest(manifestOpt),
         new webpack.HashedModuleIdsPlugin()
