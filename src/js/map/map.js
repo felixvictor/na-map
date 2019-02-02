@@ -14,6 +14,9 @@ import { zoom as d3Zoom, zoomIdentity as d3ZoomIdentity, zoomTransform as d3Zoom
 import { feature as topojsonFeature } from "topojson-client";
 import Cookies from "js-cookie";
 
+import "bootstrap/js/dist/util";
+import "bootstrap/js/dist/modal";
+
 import { appDescription, appTitle, appVersion, defaultFontSize, insertBaseModal } from "../common";
 import { displayClan, nearestPow2, checkFetchStatus, getJsonFromFetch, putFetchError, roundToThousands } from "../util";
 
