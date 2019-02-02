@@ -31,7 +31,6 @@ export default class ShowTrades {
     constructor(portData, tradeData, minScale, lowerBound, upperBound) {
         this._portData = portData;
         this._linkDataDefault = tradeData;
-        this._linkData = tradeData;
 
         this._minScale = minScale;
         this._scale = this._minScale;
@@ -52,7 +51,7 @@ export default class ShowTrades {
          * @type {string[]}
          * @private
          */
-        this._showRadioValues = ["on", "off"];
+        this._showRadioValues = ["off", "on"];
 
         /**
          * Show trade cookie
@@ -77,6 +76,13 @@ export default class ShowTrades {
         this._profitCookie = new Cookie(this._profitId, this._profitRadioValues);
         this._profitRadios = new RadioButton(this._profitId, this._profitRadioValues);
 
+        /**
+         * Get show value from cookie or use default value
+         * @type {string}
+         */
+        this._show = this._getShowValue();
+        this._linkData = this._show ? this._linkDataDefault : [];
+
         this._setupSvg();
         this._setupSelects();
         this._setupProfitRadios();
@@ -84,12 +90,6 @@ export default class ShowTrades {
         this._setupList();
         this._setupData();
         this.setBounds(lowerBound, upperBound);
-
-        /**
-         * Get show value from cookie or use default value
-         * @type {string}
-         */
-        this._show = this._getShowValue();
 
         /**
          * Get profit value from cookie or use default value
@@ -122,7 +122,9 @@ export default class ShowTrades {
 
         this._mainDiv = d3Select("main #summary-column")
             .append("div")
-            .attr("class", "trade-block");
+            .attr("class", "trade-block")
+            .classed("flex", this._show)
+            .classed("d-none", !this._show);
     }
 
     _setupSelects() {
@@ -489,7 +491,6 @@ export default class ShowTrades {
     }
 
     _filterTradesBySelectedNations() {
-        console.log(this._portDataFiltered);
         this._linkData = this._linkData
             .filter(trade => this._portDataFiltered.has(trade.source.id) && this._portDataFiltered.has(trade.target.id))
             .slice(0, this._numTrades);
@@ -511,7 +512,7 @@ export default class ShowTrades {
 
         this._showRadios.set(r);
 
-        return r;
+        return r === "on";
     }
 
     /**
