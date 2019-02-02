@@ -123,7 +123,7 @@ export default class ShowTrades {
         this._mainDiv = d3Select("main #summary-column")
             .append("div")
             .attr("class", "trade-block")
-            .classed("flex", this._show)
+            .classed("d-flex", this._show)
             .classed("d-none", !this._show);
     }
 
@@ -208,6 +208,7 @@ export default class ShowTrades {
                 {
                     name: port.name,
                     nation: port.nation,
+                    isShallow: port.shallow,
                     x: port.coordinates[0],
                     y: port.coordinates[1]
                 }
@@ -247,7 +248,7 @@ export default class ShowTrades {
         this._show = show === "on";
 
         this._showCookie.set(show);
-        this._mainDiv.classed("flex", this._show).classed("d-none", !this._show);
+        this._mainDiv.classed("d-flex", this._show).classed("d-none", !this._show);
         this._linkData = this._show ? this._linkDataDefault : [];
         this._filterTradesBySelectedNations();
         this._sortLinkData();
@@ -270,46 +271,35 @@ export default class ShowTrades {
         this._update();
     }
 
-    _showDetails(d, i, nodes) {
-        const tooltipData = trade => {
-            const profitPerItem = trade.target.grossPrice - trade.source.grossPrice;
-            const profitTotal = profitPerItem * trade.quantity;
-            let h = `<p><span class="port-name">${formatInt(trade.quantity)} ${trade.good}</span><br>`;
-            h += `Buy in ${this._nodeData.get(trade.source.id).name} for ${formatSiCurrency(
-                trade.source.grossPrice
-            )}<br>`;
-            h += `Sell in ${this._nodeData.get(trade.target.id).name} for ${formatSiCurrency(
-                trade.target.grossPrice
-            )}<br>`;
-            h += `Profit: ${formatSiCurrency(profitTotal)} total, ${formatSiCurrency(
-                profitPerItem
-            )} per item, ${formatSiCurrency(
-                trade.weightPerItem !== 0
-                    ? Math.round(trade.profitTotal / (trade.weightPerItem * trade.quantity))
-                    : trade.profitTota
-            )} per ton<br>`;
-            h += `Weight: ${formatSiInt(trade.weightPerItem * trade.quantity)} tons total, ${formatSiInt(
-                trade.weightPerItem
-            )} tons per item</p>`;
-
-            return h;
-        };
-
-        const trade = d3Select(nodes[i]);
-        const title = tooltipData(d);
-        // eslint-disable-next-line no-underscore-dangle
-        $(trade.node())
-            .tooltip({
-                html: true,
-                placement: "auto",
-                title,
-                trigger: "manual"
-            })
-            .tooltip("show");
+    static _getId(link) {
+        return `trade-${link.source.id}-${link.good.replace(/ /g, "")}-${link.target.id}`;
     }
 
-    static _getId(link) {
-        return `${link.source.id}-${link.good.replace(/ /g, "")}-${link.target.id}`;
+    _getTrade(trade) {
+        const addInfo = text => `<div><div>${text}</div>`;
+        const addDes = text => `<div class="des">${text}</div></div>`;
+        const getDepth = isShallow => (isShallow ? "(shallow)" : "(deep)");
+
+        const weight = trade.weightPerItem * trade.quantity;
+
+        let h = "";
+        h += addInfo(`${formatInt(trade.quantity)} ${trade.good}`) + addDes("trade");
+        h += addInfo(`${formatSiCurrency(trade.profit)}`) + addDes(this._profitText);
+        h += addInfo(`${formatSiInt(weight)} ${weight === 1 ? "ton" : "tons"}`) + addDes("weight");
+        h +=
+            addInfo(
+                `${this._nodeData.get(trade.source.id).name} <span class="caps">${
+                    this._nodeData.get(trade.source.id).nation
+                }</span>`
+            ) + addDes(`from ${getDepth(this._nodeData.get(trade.source.id).isShallow)}`);
+        h +=
+            addInfo(
+                `${this._nodeData.get(trade.target.id).name} <span class="caps">${
+                    this._nodeData.get(trade.target.id).nation
+                }</span>`
+            ) + addDes(`to ${getDepth(this._nodeData.get(trade.source.id).isShallow)}`);
+
+        return h;
     }
 
     /**
@@ -318,6 +308,25 @@ export default class ShowTrades {
      * @private
      */
     _updateGraph() {
+        const showDetails = (d, i, nodes) => {
+            const trade = d3Select(nodes[i]);
+            const title = this._getTrade(d);
+
+            $(trade.node())
+                .tooltip({
+                    html: true,
+                    placement: "auto",
+                    template:
+                        '<div class="tooltip" role="tooltip">' +
+                        '<div class="d-flex flex-wrap justify-content-start"></div>' +
+                        '<div class="block">' +
+                        '<div class="tooltip-inner tooltip-small"></div></div></div>',
+                    title,
+                    trigger: "manual"
+                })
+                .tooltip("show");
+        };
+
         const hideDetails = (d, i, nodes) => {
             $(d3Select(nodes[i]).node()).tooltip("dispose");
         };
@@ -382,7 +391,7 @@ export default class ShowTrades {
                         )
                         .attr("id", d => ShowTrades._getId(d))
                         .attr("opacity", 0)
-                        .on("click", (d, i, nodes) => this._showDetails(d, i, nodes))
+                        .on("click", showDetails)
                         .on("mouseout", hideDetails)
                         .call(enterCall => enterCall.transition(transition).attr("opacity", 1)),
                 update => update.attr("opacity", 1),
@@ -426,51 +435,27 @@ export default class ShowTrades {
     }
 
     _updateList() {
-        let profitText = "";
-        switch (this._profitValue) {
-            case "weight":
-                profitText = "profit/ton";
-                break;
-            case "distance":
-                profitText = "profit/distance";
-                break;
-            case "total":
-                profitText = "total profit";
-                break;
-            default:
-                throw Error("Wrong profit value");
-        }
+        let highlightLink;
 
-        const getTrade = trade => {
-            const addInfo = text => `<div><div>${text}</div>`;
-            const addDes = text => `<div class="des">${text}</div></div>`;
+        const highlightOn = d => {
+            highlightLink = d3Select(`path#${ShowTrades._getId(d)}`).classed("highlight", true);
+        };
 
-            const weight = trade.weightPerItem * trade.quantity;
-
-            let h = addInfo(`${formatInt(trade.quantity)} ${trade.good}`) + addDes("trade");
-            h += addInfo(`${formatSiCurrency(trade.profit)}`) + addDes(profitText);
-            h += addInfo(`${formatSiInt(weight)}`) + addDes(weight === 1 ? "ton" : "tons");
-            h +=
-                addInfo(
-                    `${this._nodeData.get(trade.source.id).name} <span class="caps">${
-                        this._nodeData.get(trade.source.id).nation
-                    }</span>`
-                ) + addDes("from");
-            h +=
-                addInfo(
-                    `${this._nodeData.get(trade.target.id).name} <span class="caps">${
-                        this._nodeData.get(trade.target.id).nation
-                    }</span>`
-                ) + addDes("to");
-
-            return h;
+        const highlightOff = () => {
+            highlightLink.classed("highlight", false);
         };
 
         this._list
             .selectAll("div.block")
             .data(this._linkDataFiltered, d => ShowTrades._getId(d))
-            .join(enter => enter.append("div").attr("class", "block"))
-            .html(d => getTrade(d));
+            .join(enter =>
+                enter
+                    .append("div")
+                    .attr("class", "block")
+                    .on("mouseenter", highlightOn)
+                    .on("mouseleave", highlightOff)
+            )
+            .html(d => this._getTrade(d));
     }
 
     _filterTradesByVisiblePorts() {
@@ -523,6 +508,20 @@ export default class ShowTrades {
         const r = this._profitCookie.get();
 
         this._profitRadios.set(r);
+
+        switch (r) {
+            case "weight":
+                this._profitText = "profit/ton";
+                break;
+            case "distance":
+                this._profitText = "profit/distance";
+                break;
+            case "total":
+                this._profitText = "total";
+                break;
+            default:
+                throw Error("Wrong profit value");
+        }
 
         return r;
     }
