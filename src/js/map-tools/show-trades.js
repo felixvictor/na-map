@@ -162,7 +162,7 @@ export default class ShowTrades {
         const profitRadioGroup = this._mainDiv
             .append("div")
             .attr("id", this._profitId)
-            .attr("class", "align-self-center radio-group");
+            .attr("class", "align-self-center radio-group pl-2");
         profitRadioGroup
             .append("legend")
             .attr("class", "col-form-label")
@@ -222,13 +222,10 @@ export default class ShowTrades {
                 let profit = 0;
                 switch (this._profitValue) {
                     case "weight":
-                        profit =
-                            trade.weightPerItem !== 0
-                                ? Math.round(trade.profitTotal / (trade.weightPerItem * trade.quantity))
-                                : trade.profitTotal;
+                        profit = ShowTrades._getProfitPerWeight(trade);
                         break;
                     case "distance":
-                        profit = trade.profitTotal / trade.distance;
+                        profit = ShowTrades._getProfitPerDistance(trade);
                         break;
                     case "total":
                         profit = trade.profitTotal;
@@ -303,24 +300,42 @@ export default class ShowTrades {
         return h;
     }
 
+    static _getProfitPerWeight(trade) {
+        return trade.weightPerItem !== 0
+            ? Math.round(trade.profitTotal / (trade.weightPerItem * trade.quantity))
+            : trade.profitTotal;
+    }
+
+    static _getProfitPerDistance(trade) {
+        return trade.profitTotal / trade.distance;
+    }
+
     _getTradeFullData(trade) {
         const addInfo = text => `<div>${text}</div>`;
         const addDes = text => `<div class="des">${text}</div>`;
-        const startBlock = text => `<div>${text}`;
+        const startBlock = text => `<div class="block-block"><span>${text}</span>`;
         const endBlock = () => "</div>";
         const getDepth = isShallow => (isShallow ? "(shallow)" : "(deep)");
 
         const weight = trade.weightPerItem * trade.quantity;
+        const profitPerItem = trade.target.grossPrice - trade.source.grossPrice;
+        const profitPerDistance = ShowTrades._getProfitPerDistance(trade);
+        const profitPerWeight = ShowTrades._getProfitPerWeight(trade);
 
         let h = "";
 
         h += startBlock("Trade");
         h += addInfo(`${formatInt(trade.quantity)} ${trade.good}`) + addDes("good");
+        h += addInfo(`${formatSiCurrency(trade.source.grossPrice)}`) + addDes("gross buy price");
+        h += addInfo(`${formatSiCurrency(trade.target.grossPrice)}`) + addDes("gross sell price");
         h += addInfo(`${formatSiInt(weight)} ${weight === 1 ? "ton" : "tons"}`) + addDes("weight");
         h += endBlock();
 
         h += startBlock("Profit");
-        h += addInfo(`${formatSiCurrency(trade.profit)}`) + addDes(this._profitText);
+        h += addInfo(`${formatSiCurrency(trade.profitTotal)}`) + addDes("total");
+        h += addInfo(`${formatSiCurrency(profitPerItem)}`) + addDes("profit/item");
+        h += addInfo(`${formatSiCurrency(profitPerDistance)}`) + addDes("profit/distance");
+        h += addInfo(`${formatSiCurrency(profitPerWeight)}`) + addDes("profit/weight");
         h += endBlock();
 
         h += startBlock("Route");
@@ -456,7 +471,7 @@ export default class ShowTrades {
                         .append("text")
                         .attr("class", "trade-label")
                         .append("textPath")
-                        .attr("startOffset", "50%")
+                        .attr("startOffset", "10%")
                         .attr("xlink:href", d => `#${ShowTrades._getId(d)}`)
                         .text(d => `${formatInt(d.quantity)} ${d.good}`)
                         .attr("opacity", 0)
@@ -550,7 +565,7 @@ export default class ShowTrades {
 
         switch (r) {
             case "weight":
-                this._profitText = "profit/ton";
+                this._profitText = "profit/weight";
                 break;
             case "distance":
                 this._profitText = "profit/distance";
