@@ -166,7 +166,7 @@ export default class ShowTrades {
         profitRadioGroup
             .append("legend")
             .attr("class", "col-form-label")
-            .text("Sort profit by");
+            .text("Sort net profit by");
 
         this._profitRadioValues.forEach(button => {
             const id = `${this._profitId}-${button.replace(/ /g, "")}`;
@@ -298,6 +298,7 @@ export default class ShowTrades {
                     this._nodeData.get(trade.target.id).nation
                 }</span>`
             ) + addDes(`to ${getDepth(this._nodeData.get(trade.source.id).isShallow)}`);
+        h += addInfo(`${formatSiInt(trade.distance)}\u2009k`) + addDes("distance");
 
         return h;
     }
@@ -318,9 +319,8 @@ export default class ShowTrades {
                     placement: "auto",
                     template:
                         '<div class="tooltip" role="tooltip">' +
-                        '<div class="d-flex flex-wrap justify-content-start"></div>' +
-                        '<div class="block">' +
-                        '<div class="tooltip-inner tooltip-small"></div></div></div>',
+                        '<div class="tooltip-block tooltip-inner tooltip-small">' +
+                        '</div></div>',
                     title,
                     trigger: "manual"
                 })
