@@ -3,7 +3,7 @@
  */
 
 import { select as d3Select } from "d3-selection";
-import { distancePoints } from "./util";
+import { distancePoints, roundToThousands } from "./util";
 
 const transformMatrix = {
         A: -0.00499866779363828,
@@ -18,16 +18,16 @@ const transformMatrix = {
         D: -819563.745651571
     };
 
-// ShowF11 coord to svg coord
+// F11 coord to svg coord
 export const convertCoordX = (x, y) => transformMatrix.A * x + transformMatrix.B * y + transformMatrix.C;
 
-// ShowF11 coord to svg coord
+// F11 coord to svg coord
 export const convertCoordY = (x, y) => transformMatrix.B * x - transformMatrix.A * y + transformMatrix.D;
 
-// svg coord to ShowF11 coord
+// svg coord to F11 coord
 export const convertInvCoordX = (x, y) => transformMatrixInv.A * x + transformMatrixInv.B * y + transformMatrixInv.C;
 
-// svg coord to ShowF11 coord
+// svg coord to F11 coord
 export const convertInvCoordY = (x, y) => transformMatrixInv.B * x - transformMatrixInv.A * y + transformMatrixInv.D;
 
 export const nations = [
@@ -44,7 +44,15 @@ export const nations = [
     { id: 10, short: "RU", name: "Russian Empire", sortName: "Russian Empire" },
     { id: 11, short: "DE", name: "Kingdom of Prussia", sortName: "Prussia" },
     { id: 12, short: "PL", name: "Commonwealth of Poland", sortName: "Poland" }
-];
+].sort((a, b) => {
+    if (a.sortName < b.sortName) {
+        return -1;
+    }
+    if (a.sortName > b.sortName) {
+        return 1;
+    }
+    return 0;
+});
 
 export const defaultFontSize = 16;
 export const defaultCircleSize = 16;
@@ -162,6 +170,19 @@ export const speedConstA = 0.074465523706782;
 export const speedConstB = 0.00272175949231;
 
 export const circleRadiusFactor = 5;
+export const greenZoneRadius =
+    roundToThousands(
+        getDistance(
+            {
+                x: convertCoordX(-63400, 18800),
+                y: convertCoordY(-63400, 18800)
+            },
+            {
+                x: convertCoordX(-79696, 10642),
+                y: convertCoordY(-79696, 10642)
+            }
+        )
+    ) * circleRadiusFactor;
 
 const secondsForFullCircle = 48 * 60 + 55;
 export const fullCircle = 360;
