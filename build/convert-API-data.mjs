@@ -167,15 +167,23 @@ function convertPorts() {
             )
                 .map(good => itemNames.get(good.Template).name)
                 .sort(sort),
-            inventory: portShop.RegularItems.filter(good => itemNames.get(good.TemplateId).itemType !== "Cannon").map(
-                good => ({
+            inventory: portShop.RegularItems.filter(good => itemNames.get(good.TemplateId).itemType !== "Cannon")
+                .map(good => ({
                     name: itemNames.get(good.TemplateId).name,
                     buyQuantity: good.Quantity !== -1 ? good.Quantity : good.BuyContractQuantity,
                     buyPrice: Math.round(good.BuyPrice * (1 + apiPort.PortTax)),
                     sellPrice: Math.round(good.SellPrice / (1 + apiPort.PortTax)),
                     sellQuantity: good.SellContractQuantity !== -1 ? good.SellContractQuantity : good.PriceTierQuantity
+                }))
+                .sort((a, b) => {
+                    if (a.name < b.name) {
+                        return -1;
+                    }
+                    if (a.name > b.name) {
+                        return 1;
+                    }
+                    return 0;
                 })
-            )
         };
         // Delete empty entries
         ["dropsTrading", "consumesTrading", "producesNonTrading", "dropsNonTrading"].forEach(type => {
