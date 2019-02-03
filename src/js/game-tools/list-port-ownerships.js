@@ -258,21 +258,25 @@ export default class ListPortOwnerships {
             this._svg
                 .selectAll("path")
                 .data(stacked)
-                .enter()
-                .append("path")
-                .attr("fill", d => this._colourScale(d.key))
-                .attr("stroke", d => this._colourScale(d.key))
-                .attr("d", area);
+                .join(enter =>
+                    enter
+                        .append("path")
+                        .attr("fill", d => this._colourScale(d.key))
+                        .attr("stroke", d => this._colourScale(d.key))
+                        .attr("d", area)
+                );
 
             // Labels
             this._svg
                 .selectAll(".area-label")
                 .data(stacked)
-                .enter()
-                .append("text")
-                .attr("class", "area-label")
-                .text(d => labelNames.get(d.key))
-                .attr("transform", d3AreaLabel(area));
+                .join(enter =>
+                    enter
+                        .append("text")
+                        .attr("class", "area-label")
+                        .text(d => labelNames.get(d.key))
+                        .attr("transform", d3AreaLabel(area))
+                );
         };
 
         this._svg.attr("width", width).attr("height", height);

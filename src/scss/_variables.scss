@@ -52,7 +52,7 @@ $link-hover-color: $secondary-800;
 
 // Grid columns
 //$grid-columns: 12 !default;
-//$grid-gutter-width: 30px !default;
+$grid-gutter-width: $spacer*2;
 
 //$input-color: $body-color;
 //$input-group-addon-bg: $primary-100;
@@ -91,7 +91,7 @@ $toast-border-radius: 0;
 // Tooltip
 $tooltip-max-width: 40em;
 $tooltip-color: $body-color;
-$tooltip-bg: $primary-050;
+$tooltip-bg: $primary-100;
 $tooltip-opacity: 1;
 $tooltip-padding-y: 1rem;
 $tooltip-padding-x: 1rem;
