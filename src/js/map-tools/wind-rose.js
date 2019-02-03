@@ -67,12 +67,12 @@ export default class WindRose {
     }
 
     _getHeight() {
-        const div = document.querySelector("#port-summary div.d-flex div.block");
-        const { height } = div.getBoundingClientRect();
+        const div = document.querySelector("#port-summary .block");
+        const { height, top } = div.getBoundingClientRect();
         const paddingTop = parseFloat(window.getComputedStyle(div).getPropertyValue("padding-top"));
         const paddingBottom = parseFloat(window.getComputedStyle(div).getPropertyValue("padding-bottom"));
 
-        return height - paddingTop - paddingBottom;
+        return height - top - paddingTop - paddingBottom;
     }
 
     _getCurrentWindCookie() {
@@ -115,7 +115,7 @@ export default class WindRose {
     }
 
     _setupSvg() {
-        this._div = d3Select("#port-summary div.d-flex")
+        this._div = d3Select("#port-summary")
             .insert("div", ":first-child")
             .attr("id", this._baseId)
             .classed("block", true);
@@ -209,7 +209,7 @@ export default class WindRose {
         // Show modal
         $(`#${this._modalId}`)
             .modal("show")
-            .on("hidden.bs.modal", () => {
+            .one("hidden.bs.modal", () => {
                 this._useUserInput();
             });
     }

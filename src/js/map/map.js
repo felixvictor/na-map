@@ -14,6 +14,9 @@ import { zoom as d3Zoom, zoomIdentity as d3ZoomIdentity, zoomTransform as d3Zoom
 import { feature as topojsonFeature } from "topojson-client";
 import Cookies from "js-cookie";
 
+import "bootstrap/js/dist/util";
+import "bootstrap/js/dist/modal";
+
 import { appDescription, appTitle, appVersion, defaultFontSize, insertBaseModal } from "../common";
 import { displayClan, nearestPow2, checkFetchStatus, getJsonFromFetch, putFetchError, roundToThousands } from "../util";
 
@@ -28,6 +31,7 @@ import DisplayGrid from "../map-tools/display-grid";
 import Journey from "../map-tools/make-journey";
 import PredictWind from "../map-tools/predict-wind";
 import WindRose from "../map-tools/wind-rose";
+import ShowTrades from "../map-tools/show-trades";
 
 /**
  * Display naval action map
@@ -57,8 +61,16 @@ class Map {
          */
         this._dataSources = [
             {
-                fileName: `${serverName}.json`,
+                fileName: "ports.json",
                 name: "ports"
+            },
+            {
+                fileName: `${serverName}-trades.json`,
+                name: "trades"
+            },
+            {
+                fileName: `${serverName}.json`,
+                name: "server"
             },
             {
                 fileName: `${serverName}-pb.json`,
@@ -90,13 +102,6 @@ class Map {
          * @type {Number}
          * @private
          */
-        this._navbarBrandPaddingLeft = Math.floor(1.618 * this.rem); // equals 1.618rem
-
-        /**
-         * Left padding for brand icon
-         * @type {Number}
-         * @private
-         */
         this.xGridBackgroundHeight = Math.floor(3 * this.rem);
 
         /**
@@ -120,8 +125,6 @@ class Map {
 
         this._currentTranslate = {};
 
-        this._navbarSelector = document.querySelector(".navbar");
-
         this._tileSize = 256;
         this._maxScale = 2 ** 3; // power of 2
         this._wheelDelta = 0.5;
@@ -140,7 +143,6 @@ class Map {
          * Default DoubleClickAction setting
          * @type {string}
          * @private
-         * @private
          */
         this._doubleClickActionDefault = "compass";
 
@@ -156,14 +158,14 @@ class Map {
          * @type {string}
          * @private
          */
-        this._showLayerCookieName = "na-map--show-layer";
+        this._showLayerCookieName = "na-map--show-grid";
 
         /**
          * Default showLayer setting
          * @type {string}
          * @private
          */
-        this._showLayerDefault = "grid";
+        this._showLayerDefault = "on";
 
         /**
          * Get showLayer setting from cookie or use default value
@@ -172,8 +174,9 @@ class Map {
          */
         this._showLayer = this._getShowLayer();
 
+        [this._flexOverlay] = document.getElementsByClassName("flex-overlay");
+
         this._setHeightWidth();
-        this._setupToasts();
         this._setupScale();
         this._setupSvg();
         this._setSvgSize();
@@ -207,13 +210,13 @@ class Map {
 
         //        marks.push("setupData");
         //        performance.mark(`${marks[marks.length - 1]}-start`);
-        const portData = topojsonFeature(data.ports, data.ports.objects.ports);
+        // function();
         //        performance.mark(`${marks[marks.length - 1]}-end`);
 
-        const getFeature = object => {
-            // Port ids of capturable ports
-            const portIds = portData.features.filter(port => !port.properties.nonCapturable).map(port => port.id);
-            return object
+        // Port ids of capturable ports
+        const portIds = data.ports.filter(port => !port.nonCapturable).map(port => port.id);
+        const getFeature = object =>
+            object
                 .filter(port => portIds.includes(port.id))
                 .map(port => ({
                     type: "Feature",
@@ -221,30 +224,53 @@ class Map {
                     position: port.properties.position,
                     geometry: port.geometry
                 }));
-        };
 
         // Combine port data with port battle data
-        portData.features = portData.features.map(port => {
+        const portData = data.ports.map(port => {
             const combinedData = port;
+
+            const serverData = data.server.find(d => d.id === combinedData.id);
+
+            combinedData.portBattleStartTime = serverData.portBattleStartTime;
+            combinedData.portBattleType = serverData.portBattleType;
+            combinedData.nonCapturable = serverData.nonCapturable;
+            combinedData.conquestMarksPension = serverData.conquestMarksPension;
+            combinedData.portTax = serverData.portTax;
+            combinedData.taxIncome = serverData.taxIncome;
+            combinedData.netIncome = serverData.netIncome;
+            combinedData.tradingCompany = serverData.tradingCompany;
+            combinedData.laborHoursDiscount = serverData.laborHoursDiscount;
+            combinedData.dropsTrading = serverData.dropsTrading;
+            combinedData.consumesTrading = serverData.consumesTrading;
+            combinedData.producesNonTrading = serverData.producesNonTrading;
+            combinedData.dropsNonTrading = serverData.dropsNonTrading;
+            combinedData.inventory = serverData.inventory;
+
+            // Delete empty entries
+            ["dropsTrading", "consumesTrading", "producesNonTrading", "dropsNonTrading"].forEach(type => {
+                if (!combinedData[type]) {
+                    delete combinedData[type];
+                }
+            });
+
             const pbData = data.pb.ports.find(d => d.id === combinedData.id);
 
-            combinedData.properties.nation = pbData.nation;
-            combinedData.properties.capturer = pbData.capturer;
-            combinedData.properties.lastPortBattle = pbData.lastPortBattle;
-            combinedData.properties.attackHostility = pbData.attackHostility;
-            combinedData.properties.attackerClan = pbData.attackerClan;
-            combinedData.properties.attackerNation = pbData.attackerNation;
-            combinedData.properties.portBattle = pbData.portBattle;
+            combinedData.nation = pbData.nation;
+            combinedData.capturer = pbData.capturer;
+            combinedData.lastPortBattle = pbData.lastPortBattle;
+            combinedData.attackHostility = pbData.attackHostility;
+            combinedData.attackerClan = pbData.attackerClan;
+            combinedData.attackerNation = pbData.attackerNation;
+            combinedData.portBattle = pbData.portBattle;
 
             return combinedData;
         });
 
         this._f11 = new ShowF11(this, this.coord);
-        this._ports = new DisplayPorts(portData.features, this);
+        this._ports = new DisplayPorts(portData, this);
 
         let pbCircles = topojsonFeature(data.pbZones, data.pbZones.objects.pbCircles);
         pbCircles = getFeature(pbCircles.features);
-
         let forts = topojsonFeature(data.pbZones, data.pbZones.objects.forts);
         forts = getFeature(forts.features);
 
@@ -258,10 +284,11 @@ class Map {
         this._grid = new DisplayGrid(this);
 
         this._woodData = JSON.parse(JSON.stringify(data.woods));
-        this._shipData = JSON.parse(JSON.stringify(data.ships.shipData));
+        this._shipData = JSON.parse(JSON.stringify(data.ships));
 
         this._journey = new Journey(this._shipData, this._woodData, this.rem);
         this._windPrediction = new PredictWind();
+        this.showTrades = new ShowTrades(portData, data.trades, this._minScale, this.coord.min, this.coord.max);
 
         this._init();
 
@@ -303,7 +330,7 @@ class Map {
             }
         }
 
-        this.svg
+        this._svg
             .on("dblclick.zoom", null)
             .on("click", stopProp, true)
             .on("dblclick", (d, i, nodes) => this._doDoubleClickAction(nodes[i]));
@@ -324,8 +351,8 @@ class Map {
             this._showAbout();
         });
 
-        document.getElementById("doubleClick-action").addEventListener("change", () => this._doubleClickSelected());
-        document.getElementById("show-layer").addEventListener("change", () => this._showLayerSelected());
+        document.getElementById("double-click-action").addEventListener("change", () => this._doubleClickSelected());
+        document.getElementById("show-grid").addEventListener("change", () => this._showLayerSelected());
     }
 
     _setupScale() {
@@ -352,19 +379,19 @@ class Map {
             .scaleExtent([this._minScale, this._maxScale])
             .on("zoom", () => this._naZoomed());
 
-        this.svg = d3Select("#na-map")
+        this._svg = d3Select("#na-map")
             .append("svg")
             .attr("id", "na-svg")
             .call(this._zoom);
 
-        this.svg.append("defs");
+        this._svg.append("defs");
 
-        this._gMap = this.svg.append("g").classed("map", true);
+        this._gMap = this._svg.append("g").classed("map", true);
     }
 
     _setupProps() {
-        document.getElementById(`doubleClick-action-${this._doubleClickAction}`).checked = true;
-        document.getElementById(`show-layer-${this._showLayer}`).checked = true;
+        document.getElementById(`double-click-action-${this._doubleClickAction}`).checked = true;
+        document.getElementById(`show-grid-${this._showLayer}`).checked = true;
     }
 
     /**
@@ -381,7 +408,7 @@ class Map {
     }
 
     _doubleClickSelected() {
-        this._doubleClickAction = document.querySelector('input[name="doubleClickAction"]:checked').value;
+        this._doubleClickAction = document.querySelector('input[name="double-click-action"]:checked').value;
         this._storeDoubleClickActionSetting();
         this._clearMap();
     }
@@ -400,8 +427,8 @@ class Map {
     }
 
     _showLayerSelected() {
-        this._showLayer = document.querySelector("input[name='showLayer']:checked").value;
-        this._grid.show = this._showLayer === "grid";
+        this._showLayer = document.querySelector("input[name='show-grid']:checked").value;
+        this._grid.show = this._showLayer === "on";
         this._storeShowLayerSetting();
         this._refreshLayer();
     }
@@ -460,21 +487,19 @@ class Map {
     }
 
     _updateMap(tiles) {
-        const image = this._gMap
+        this._gMap
             .attr("transform", tiles.transform)
             .selectAll("image")
-            .data(tiles, d => d.id);
-
-        image.exit().remove();
-
-        image
-            .enter()
-            .append("image")
-            .attr("xlink:href", d => `images/map/${d.z}/${d.row}/${d.col}.jpg`)
-            .attr("x", d => d.col * this._tileSize)
-            .attr("y", d => d.row * this._tileSize)
-            .attr("width", this._tileSize + 1)
-            .attr("height", this._tileSize + 1);
+            .data(tiles, d => d.id)
+            .join(enter =>
+                enter
+                    .append("image")
+                    .attr("xlink:href", d => `images/map/${d.z}/${d.row}/${d.col}.jpg`)
+                    .attr("x", d => d.col * this._tileSize)
+                    .attr("y", d => d.row * this._tileSize)
+                    .attr("width", this._tileSize + 1)
+                    .attr("height", this._tileSize + 1)
+            );
     }
 
     _clearMap() {
@@ -483,6 +508,7 @@ class Map {
         this._f11.clearMap();
         this._ports.clearMap();
         this._portSelect.clearMap();
+        this.showTrades.clearMap();
         $(".selectpicker")
             .val("default")
             .selectpicker("refresh");
@@ -536,18 +562,20 @@ class Map {
         if (d3Event.transform.k !== this._currentScale) {
             this._currentScale = d3Event.transform.k;
             if (this._currentScale > this._PBZoneZoomThreshold) {
-                if (this._zoomLevel !== "pbZone") {
+                if (this.zoomLevel !== "pbZone") {
                     this.zoomLevel = "pbZone";
                 }
             } else if (this._currentScale > this._labelZoomThreshold) {
-                if (this._zoomLevel !== "portLabel") {
+                if (this.zoomLevel !== "portLabel") {
                     this.zoomLevel = "portLabel";
                 }
-            } else if (this._zoomLevel !== "initial") {
+            } else if (this.zoomLevel !== "initial") {
                 this.zoomLevel = "initial";
             }
+            this._setFlexOverlayHeight();
             this._grid.update();
         }
+
         this._pbZone.refresh();
         this._ports.update(this._currentScale);
     }
@@ -576,10 +604,27 @@ class Map {
             .translate(this._currentTranslate.x, this._currentTranslate.y)
             .scale(roundToThousands(d3Event.transform.k));
 
-        const lowerBound = zoomTransform.invert([this.coord.min, this.coord.min]),
-            upperBound = zoomTransform.invert([this.width, this.height]);
+        /**
+         * lower or upper bound coordinates
+         * @typedef {Bound}
+         * @property {number[]} Coordinates
+         */
+
+        /**
+         * Top left coordinates of current viewport
+         * @type{Bound}
+         */
+        const lowerBound = zoomTransform.invert([this.coord.min, this.coord.min]);
+
+        /**
+         * Bottom right coordinates of current viewport
+         * @type{Bound}
+         */
+        const upperBound = zoomTransform.invert([this.width, this.height]);
+
         this._ports.setBounds(lowerBound, upperBound);
         this._pbZone.setBounds(lowerBound, upperBound);
+        this.showTrades.setBounds(lowerBound, upperBound);
 
         this._displayMap(zoomTransform);
         this._grid.transform(zoomTransform);
@@ -587,6 +632,7 @@ class Map {
         this._journey.transform(zoomTransform);
         this._pbZone.transform(zoomTransform);
         this._f11.transform(zoomTransform);
+        this.showTrades.transform(zoomTransform);
 
         this._setZoomLevelAndData();
     }
@@ -595,12 +641,17 @@ class Map {
         this.zoomLevel = "initial";
         this.initialZoomAndPan();
         this._f11.checkF11Coord();
+        this._setFlexOverlayHeight();
     }
 
     set zoomLevel(zoomLevel) {
         this._zoomLevel = zoomLevel;
         this._ports.zoomLevel = zoomLevel;
         this._grid.zoomLevel = zoomLevel;
+    }
+
+    get zoomLevel() {
+        return this._zoomLevel;
     }
 
     resize() {
@@ -610,12 +661,13 @@ class Map {
 
         this._setHeightWidth();
         this._setSvgSize();
+        this._setFlexOverlayHeight();
         this._displayMap(zoomTransform);
-        this._grid.update(this.height, this.width);
+        this._grid.update(true);
     }
 
     _getDimensions() {
-        const selector = document.getElementById("na-map");
+        const selector = document.getElementsByClassName("flex-overlay")[0];
 
         return selector.getBoundingClientRect();
     }
@@ -623,14 +675,14 @@ class Map {
     _getWidth() {
         const { width } = this._getDimensions();
 
-        return Math.floor(width);
+        return width;
     }
 
     _getHeight() {
         const { top } = this._getDimensions(),
             fullHeight = document.documentElement.clientHeight - this.rem;
 
-        return Math.floor(fullHeight - top);
+        return fullHeight - top;
     }
 
     _setHeightWidth() {
@@ -647,19 +699,17 @@ class Map {
         this.height = this._getHeight();
     }
 
-    _setupToasts() {
-        d3Select("#toast-section").style("height", `${this.height}px`);
+    _setSvgSize() {
+        this._svg.attr("width", this.width).attr("height", this.height);
     }
 
-    _setSvgSize() {
-        this.svg
-            .attr("width", this.width)
-            .attr("height", this.height)
-            .call(this._zoom);
+    _setFlexOverlayHeight() {
+        const height = this.height - (this._grid.show && this.zoomLevel !== "initial" ? this.xGridBackgroundHeight : 0);
+        this._flexOverlay.setAttribute("style", `height:${height}px`);
     }
 
     initialZoomAndPan() {
-        this.svg.call(this._zoom.scaleTo, this._minScale);
+        this._svg.call(this._zoom.scaleTo, this._minScale);
     }
 
     zoomAndPan(x, y, scale) {
@@ -667,7 +717,7 @@ class Map {
             .scale(scale)
             .translate(Math.round(-x + this.width / 2 / scale), Math.round(-y + this.height / 2 / scale));
 
-        this.svg.call(this._zoom.transform, transform);
+        this._svg.call(this._zoom.transform, transform);
     }
 
     goToPort() {
