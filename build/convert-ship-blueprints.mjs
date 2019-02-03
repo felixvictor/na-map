@@ -137,8 +137,7 @@ const convertShipBlueprints = () => {
                 return 0;
             });
 
-    const data = {};
-    data.shipBlueprints = getShipBlueprints();
+    const data = getShipBlueprints();
 
     saveJson(outFilename, data);
 };
