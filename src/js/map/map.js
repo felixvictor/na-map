@@ -288,7 +288,7 @@ class Map {
 
         this._journey = new Journey(this._shipData, this._woodData, this.rem);
         this._windPrediction = new PredictWind();
-        this._showTrades = new ShowTrades(portData, data.trades, this._minScale, this.coord.min, this.coord.max);
+        this.showTrades = new ShowTrades(portData, data.trades, this._minScale, this.coord.min, this.coord.max);
 
         this._init();
 
@@ -508,7 +508,7 @@ class Map {
         this._f11.clearMap();
         this._ports.clearMap();
         this._portSelect.clearMap();
-        this._showTrades.clearMap();
+        this.showTrades.clearMap();
         $(".selectpicker")
             .val("default")
             .selectpicker("refresh");
@@ -624,7 +624,7 @@ class Map {
 
         this._ports.setBounds(lowerBound, upperBound);
         this._pbZone.setBounds(lowerBound, upperBound);
-        this._showTrades.setBounds(lowerBound, upperBound);
+        this.showTrades.setBounds(lowerBound, upperBound);
 
         this._displayMap(zoomTransform);
         this._grid.transform(zoomTransform);
@@ -632,7 +632,7 @@ class Map {
         this._journey.transform(zoomTransform);
         this._pbZone.transform(zoomTransform);
         this._f11.transform(zoomTransform);
-        this._showTrades.transform(zoomTransform);
+        this.showTrades.transform(zoomTransform);
 
         this._setZoomLevelAndData();
     }
