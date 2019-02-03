@@ -1,0 +1,20 @@
+[
+    {
+        "good": "Doubloons",
+        "source": { "id": 189, "grossPrice": 17 },
+        "target": { "id": 79, "grossPrice": 91 },
+        "distance": 671,
+        "profitTotal": 325600,
+        "quantity": 4400,
+        "weightPerItem": 0.01
+    },
+    {
+        "good": "Doubloons",
+        "source": { "id": 189, "grossPrice": 17 },
+        "target": { "id": 333, "grossPrice": 91 },
+        "distance": 1250,
+        "profitTotal": 325600,
+        "quantity": 4400,
+        "weightPerItem": 0.01
+    }
+]
