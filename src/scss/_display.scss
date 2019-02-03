@@ -38,7 +38,7 @@ table,
 
 @mixin caps {
     font-variant-caps: all-small-caps;
-    letter-spacing: 0.06em;
+    letter-spacing: .08em;
 }
 
 .caps,
@@ -48,7 +48,7 @@ table,
 
 .des {
     position: relative;
-    top: -0.4rem;
+    top: -.4rem;
     font-size: small;
     color: $secondary-700;
 }
@@ -62,13 +62,13 @@ text {
 }
 
 .position-circle {
-    fill-opacity: 0.4;
+    fill-opacity: .4;
     fill: $white;
 }
 
 .position-path {
     fill: $green;
-    fill-opacity: 0.6;
+    fill-opacity: .6;
 }
 
 .card {
@@ -210,7 +210,7 @@ table a {
 }
 
 .bubble {
-    fill-opacity: 0.7;
+    fill-opacity: .7;
 }
 
 .here {
@@ -234,7 +234,7 @@ table a {
 }
 
 .badge {
-    padding-top: 0.15rem;
+    padding-top: .15rem;
 }
 
 .mm {
@@ -253,12 +253,12 @@ table a {
 
     path .base,
     circle .base {
-        opacity: 0.5;
+        opacity: .5;
         fill: $primary-500;
     }
 
     path .comp {
-        opacity: 0.5;
+        opacity: .5;
         fill: none;
         stroke-width: 3px;
         stroke: $secondary-500;
@@ -293,7 +293,7 @@ table a {
 }
 
 .solidArc {
-    transition: all 0.3s;
+    transition: all .3s;
 
     &:hover {
         fill: orangered;
@@ -346,7 +346,7 @@ table a {
 
     circle {
         fill: $secondary-600;
-        fill-opacity: 0.2;
+        fill-opacity: .2;
     }
 
     text {
@@ -360,13 +360,13 @@ table a {
     }
 
     rect {
-        fill: rgba($primary-100, 0.8);
+        fill: rgba($primary-100, .8);
     }
 
     path {
         fill: none;
         stroke: $secondary-600;
-        stroke-width: 0.3rem;
+        stroke-width: .3rem;
     }
 
     .label {
@@ -381,7 +381,7 @@ table a {
 
         .drag-active {
             stroke: $secondary-100;
-            stroke-width: 0.25rem;
+            stroke-width: .25rem;
         }
 
         .drag-hidden {
@@ -398,7 +398,7 @@ table a {
     circle,
     line {
         stroke: $secondary-400;
-        stroke-width: 0.1rem;
+        stroke-width: .1rem;
     }
 
     text {
@@ -412,11 +412,11 @@ table a {
     circle,
     line {
         stroke: $secondary-400;
-        stroke-width: 0.05rem;
+        stroke-width: .05rem;
     }
 
     path {
-        stroke-width: 0.15rem;
+        stroke-width: .15rem;
     }
 }
 
@@ -439,8 +439,8 @@ table a {
 }
 
 .pb {
-    fill-opacity: 0.6;
-    stroke-width: 0.5px;
+    fill-opacity: .6;
+    stroke-width: .5px;
     stroke-opacity: 1;
 }
 
@@ -461,7 +461,7 @@ table a {
 
 .join-circle {
     fill: $secondary-300;
-    fill-opacity: 0.4;
+    fill-opacity: .4;
     stroke: $secondary-500;
     stroke-width: 1px;
 }
@@ -476,7 +476,7 @@ table a {
 
     circle {
         fill: $secondary-600;
-        fill-opacity: 0.5;
+        fill-opacity: .5;
     }
 
     text {
@@ -491,13 +491,13 @@ table a {
 
     rect {
         fill: $primary-100;
-        fill-opacity: 0.7;
+        fill-opacity: .7;
     }
 
     path {
         fill: none;
         stroke: $secondary-600;
-        stroke-width: 0.3em;
+        stroke-width: .3em;
     }
 }
 
@@ -565,17 +565,17 @@ table a {
 
 .profile {
     line {
-        opacity: 0.3;
+        opacity: .3;
         fill: none;
         stroke: $secondary-600;
-        stroke-width: 0.5em;
+        stroke-width: .5em;
     }
 }
 
 .tooltip {
     font-size: smaller;
     text-align: left;
-    box-shadow: 0 14px 28px rgba($primary-900, 0.25), 0 10px 10px rgba($primary-900, 0.22);
+    box-shadow: 0 14px 28px rgba($primary-900, .25), 0 10px 10px rgba($primary-900, .22);
 
     table {
         margin-bottom: 0;
@@ -593,7 +593,7 @@ table a {
 .flag-icon {
     width: 2rem;
     height: 100%;
-    margin-right: 0.4rem;
+    margin-right: .4rem;
 }
 
 // contrast function
@@ -604,7 +604,7 @@ table a {
     $-local-green: green(rgba($c, 1));
     $-local-blue: blue(rgba($c, 1));
 
-    @return (0.2126 * $-local-red + 0.7152 * $-local-green + 0.0722 * $-local-blue) / 255;
+    @return (.2126 * $-local-red + .7152 * $-local-green + .0722 * $-local-blue) / 255;
 }
 
 @function contrast-color($bg, $c1: $white, $c2: $primary-900) {
@@ -645,7 +645,7 @@ table a {
     }
 
     .diff {
-        opacity: 0.4;
+        opacity: .4;
     }
 }
 
@@ -664,7 +664,7 @@ table a {
 
 .county {
     font-size: 60px;
-    letter-spacing: 0.6rem;
+    letter-spacing: .6rem;
 }
 
 // https://stackoverflow.com/questions/44467377/bootstrap-4-multilevel-dropdown-inside-navigation/48953349#48953349
@@ -702,7 +702,7 @@ table a {
 
     th [aria-sort]:not(.no-sort)::after {
         visibility: visible;
-        opacity: 0.4;
+        opacity: .4;
     }
 
     th [role="columnheader"]:not(.no-sort):hover::after {
@@ -755,9 +755,9 @@ table a {
     }
 
     .series-group {
-        fill-opacity: 0.6;
+        fill-opacity: .6;
         stroke: $primary-700;
-        stroke-opacity: 0.2;
+        stroke-opacity: .2;
     }
 
     .series-segment {
@@ -777,7 +777,7 @@ table a {
 
     .reset-zoom-btn {
         cursor: pointer;
-        opacity: 0.6;
+        opacity: .6;
         fill: $primary-600;
     }
 }
@@ -811,8 +811,8 @@ table a {
 .brusher .brush .selection {
     fill: $primary-700;
     stroke: $primary-700;
-    stroke-opacity: 0.6;
-    fill-opacity: 0.3;
+    stroke-opacity: .6;
+    fill-opacity: .3;
     shape-rendering: crispEdges;
 }
 
@@ -839,12 +839,12 @@ table a {
 
 .area {
     .area-label {
-        fill-opacity: 0.7;
+        fill-opacity: .7;
         fill: $white;
     }
 
     path {
-        stroke-opacity: 0.4;
+        stroke-opacity: .4;
         stroke: $white !important;
         stroke-width: 2px;
     }
@@ -870,7 +870,7 @@ table a {
 
 .axis {
     line {
-        opacity: 0.5;
+        opacity: .5;
         stroke: $primary-600;
     }
 
@@ -881,7 +881,7 @@ table a {
 
     rect {
         fill: $primary-100;
-        fill-opacity: 0.7;
+        fill-opacity: .7;
     }
 }
 
@@ -924,7 +924,7 @@ table a {
     align-items: center;
     justify-content: space-around;
     padding: $paddingHalf;
-    background: rgba($primary-200, 0.8);
+    background: rgba($primary-200, .8);
 
     .des {
         top: 0;
@@ -939,7 +939,7 @@ table a {
     flex: 1 1 auto;
     flex-direction: column;
     overflow-y: scroll;
-    background: rgba($primary-100, 0.8);
+    background: rgba($primary-100, .8);
     .bootstrap-select {
         padding: $paddingHalf;
     }
@@ -950,7 +950,7 @@ table a {
     flex-wrap: wrap;
     padding-top: $spacer;
     .block:nth-of-type(odd) {
-        background: rgba($primary-400, 0.3);
+        background: rgba($primary-400, .3);
     }
 }
 
@@ -969,4 +969,13 @@ table a {
 .tooltip-block {
     max-width: 30rem;
     text-align: left;
+}
+
+.block-block {
+    display: flex;
+    flex-direction: column;
+    span {
+        padding-bottom: $paddingThird;
+        font-style: italic;
+    }
 }
