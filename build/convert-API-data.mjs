@@ -167,18 +167,15 @@ function convertPorts() {
             )
                 .map(good => itemNames.get(good.Template).name)
                 .sort(sort),
-            inventory: portShop.RegularItems.filter(
-                good =>
-                    itemNames.get(good.TemplateId).itemType !== "Cannon" &&
-                    itemNames.get(good.TemplateId).itemType !== "ShipUpgradeBookItem" &&
-                    itemNames.get(good.TemplateId).itemType !== "Module"
-            ).map(good => ({
-                name: itemNames.get(good.TemplateId).name,
-                buyQuantity: good.Quantity !== -1 ? good.Quantity : good.BuyContractQuantity,
-                buyPrice: Math.round(good.BuyPrice * (1 + apiPort.PortTax)),
-                sellPrice: Math.round(good.SellPrice / (1 + apiPort.PortTax)),
-                sellQuantity: good.SellContractQuantity
-            }))
+            inventory: portShop.RegularItems.filter(good => itemNames.get(good.TemplateId).itemType !== "Cannon").map(
+                good => ({
+                    name: itemNames.get(good.TemplateId).name,
+                    buyQuantity: good.Quantity !== -1 ? good.Quantity : good.BuyContractQuantity,
+                    buyPrice: Math.round(good.BuyPrice * (1 + apiPort.PortTax)),
+                    sellPrice: Math.round(good.SellPrice / (1 + apiPort.PortTax)),
+                    sellQuantity: good.SellContractQuantity !== -1 ? good.SellContractQuantity : good.PriceTierQuantity
+                })
+            )
         };
         // Delete empty entries
         ["dropsTrading", "consumesTrading", "producesNonTrading", "dropsNonTrading"].forEach(type => {
@@ -218,32 +215,33 @@ function convertPorts() {
 
     portData.forEach(buyPort => {
         const buyPortPos = apiPortPos.get(buyPort.id);
-        buyPort.inventory.forEach(buyGood => {
-            const { buyPrice, buyQuantity } = buyGood;
-            portData.forEach(sellPort => {
-                const sellGood = sellPort.inventory.find(good => good.name === buyGood.name);
-                if (sellPort.id !== buyPort.id && sellGood) {
-                    const { sellPrice, sellQuantity } = sellGood;
-                    // Limit known to sell at sellPrice?
-                    const quantity = sellQuantity === -1 ? buyQuantity : sellQuantity;
-                    const profitPerItem = sellPrice - buyPrice;
-                    const profitTotal = profitPerItem * quantity;
-                    if (profitTotal >= minProfit) {
-                        const sellPortPos = apiPortPos.get(sellPort.id);
-                        const trade = {
-                            good: buyGood.name,
-                            source: { id: +buyPort.id, grossPrice: buyPrice },
-                            target: { id: +sellPort.id, grossPrice: sellPrice },
-                            distance: Math.round(distancePoints(buyPortPos, sellPortPos) / (2.63 * speedFactor)),
-                            profitTotal,
-                            quantity,
-                            weightPerItem: apiItemWeight.get(buyGood.name)
-                        };
-                        trades.push(trade);
+        buyPort.inventory
+            .filter(buyGood => buyGood.buyQuantity > 0)
+            .forEach(buyGood => {
+                const { buyPrice, buyQuantity } = buyGood;
+                portData.forEach(sellPort => {
+                    const sellGood = sellPort.inventory.find(good => good.name === buyGood.name);
+                    if (sellPort.id !== buyPort.id && sellGood) {
+                        const { sellPrice, sellQuantity } = sellGood;
+                        const quantity = Math.min(buyQuantity, sellQuantity);
+                        const profitPerItem = sellPrice - buyPrice;
+                        const profitTotal = profitPerItem * quantity;
+                        if (profitTotal >= minProfit) {
+                            const sellPortPos = apiPortPos.get(sellPort.id);
+                            const trade = {
+                                good: buyGood.name,
+                                source: { id: +buyPort.id, grossPrice: buyPrice },
+                                target: { id: +sellPort.id, grossPrice: sellPrice },
+                                distance: Math.round(distancePoints(buyPortPos, sellPortPos) / (2.63 * speedFactor)),
+                                profitTotal,
+                                quantity,
+                                weightPerItem: apiItemWeight.get(buyGood.name)
+                            };
+                            trades.push(trade);
+                        }
                     }
-                }
+                });
             });
-        });
     });
     trades.sort((a, b) => b.profitTotal - a.profitTotal);
 
