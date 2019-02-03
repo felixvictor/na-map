@@ -80,8 +80,8 @@ export default class ShowTrades {
          * Get show value from cookie or use default value
          * @type {string}
          */
-        this._show = this._getShowValue();
-        this._linkData = this._show ? this._linkDataDefault : [];
+        this.show = this._getShowValue();
+        this._linkData = this.show ? this._linkDataDefault : [];
 
         this._setupSvg();
         this._setupSelects();
@@ -122,9 +122,9 @@ export default class ShowTrades {
 
         this._mainDiv = d3Select("main #summary-column")
             .append("div")
-            .attr("class", "trade-block")
-            .classed("d-flex", this._show)
-            .classed("d-none", !this._show);
+            .attr("id", "trade-block")
+            .attr("class", "trade-block");
+        this._showTradeBlock(this.show);
     }
 
     _setupSelects() {
@@ -242,11 +242,11 @@ export default class ShowTrades {
 
     _showSelected() {
         const show = this._showRadios.get();
-        this._show = show === "on";
+        this.show = show === "on";
 
         this._showCookie.set(show);
-        this._mainDiv.classed("d-flex", this._show).classed("d-none", !this._show);
-        this._linkData = this._show ? this._linkDataDefault : [];
+        this._showTradeBlock(this.show);
+        this._linkData = this.show ? this._linkDataDefault : [];
         this._filterTradesBySelectedNations();
         this._sortLinkData();
         this._update();
@@ -471,7 +471,7 @@ export default class ShowTrades {
                         .append("text")
                         .attr("class", "trade-label")
                         .append("textPath")
-                        .attr("startOffset", "10%")
+                        .attr("startOffset", "15%")
                         .attr("xlink:href", d => `#${ShowTrades._getId(d)}`)
                         .text(d => `${formatInt(d.quantity)} ${d.good}`)
                         .attr("opacity", 0)
@@ -580,10 +580,24 @@ export default class ShowTrades {
         return r;
     }
 
+    _showTradeBlock(show) {
+        this._mainDiv.classed("d-none", !show).classed("d-flex", show);
+    }
+
     _update() {
         this._filterTradesByVisiblePorts();
         this._updateGraph();
         this._updateList();
+    }
+
+    showInventory(inventory) {
+        if (!this._inventoryDiv) {
+            this._showTradeBlock(false);
+            this._inventoryDiv = d3Select("main #summary-column")
+                .append("div")
+                .attr("class", "inventory small p-2");
+        }
+        this._inventoryDiv.html(inventory);
     }
 
     /**
@@ -606,6 +620,13 @@ export default class ShowTrades {
 
     clearMap() {
         this._g.selectAll("*").remove();
+        if (this.show) {
+            this._showTradeBlock(true);
+            if (this._inventoryDiv) {
+                this._inventoryDiv.remove();
+                this._inventoryDiv = null;
+            }
+        }
         this._linkData = this._linkDataDefault;
         this._update();
     }
