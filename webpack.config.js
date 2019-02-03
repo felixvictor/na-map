@@ -11,10 +11,10 @@ const // { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer"),
     CleanWebpackPlugin = require("clean-webpack-plugin"),
     CopyPlugin = require("copy-webpack-plugin"),
     HtmlPlugin = require("html-webpack-plugin"),
-    MiniCssExtractPlugin = require("mini-css-extract-plugin"),
+    ExtractCssChunks = require("extract-css-chunks-webpack-plugin"),
     PreloadWebpackPlugin = require("preload-webpack-plugin"),
     SitemapPlugin = require("sitemap-webpack-plugin").default,
-    SriPlugin = require("webpack-subresource-integrity"),
+    // SriPlugin = require("webpack-subresource-integrity"),
     TerserPlugin = require("terser-webpack-plugin"),
     WebpackDeepScopeAnalysisPlugin = require("webpack-deep-scope-plugin").default,
     WebpackPwaManifest = require("webpack-pwa-manifest");
@@ -271,7 +271,7 @@ const config = {
         new CleanWebpackPlugin(outputPath, {
             verbose: false
         }),
-        new MiniCssExtractPlugin({ filename: isProd ? "[name].[contenthash].css" : "[name].css" }),
+        new ExtractCssChunks({ filename: isProd ? "[name].[contenthash].css" : "[name].css", orderWarning: true }),
         new webpack.DefinePlugin({
             CPRIMARY300: JSON.stringify(primary300),
             CGREEN: JSON.stringify(colourGreen),
@@ -317,15 +317,18 @@ const config = {
         new HtmlPlugin(htmlOpt),
         new PreloadWebpackPlugin({
             include: "allAssets",
-            fileWhitelist: [/\.woff2$/]
+            fileWhitelist: [/^(fonts|main|map|vendors~main|vendors~map)/]
         }),
-        new SitemapPlugin(target, sitemapPaths, { skipGzip: false }),
+        /*
         new SriPlugin({
             hashFuncNames: ["sha256", "sha384"],
             enabled: isProd
         }),
+        */
+        new SitemapPlugin(target, sitemapPaths, { skipGzip: false }),
         new WebpackDeepScopeAnalysisPlugin(),
-        new WebpackPwaManifest(manifestOpt)
+        new WebpackPwaManifest(manifestOpt),
+        new webpack.HashedModuleIdsPlugin()
     ],
 
     stats: {
@@ -356,7 +359,7 @@ const config = {
                 test: /\.scss$/,
                 include: path.resolve(__dirname, "src/scss"),
                 use: [
-                    MiniCssExtractPlugin.loader,
+                    ExtractCssChunks.loader,
                     {
                         loader: "css-loader",
                         options: cssOpt
@@ -374,7 +377,7 @@ const config = {
             {
                 test: /\.css$/,
                 use: [
-                    MiniCssExtractPlugin.loader,
+                    ExtractCssChunks.loader,
                     {
                         loader: "css-loader",
                         options: cssOpt

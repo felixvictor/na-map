@@ -16,7 +16,7 @@ import { scaleBand as d3ScaleBand } from "d3-scale";
  */
 const formatLocale = d3FormatLocale({
     decimal: ".",
-    thousands: "\u202f",
+    thousands: "\u2009",
     grouping: [3],
     currency: ["", "\u00a0reals"],
     percent: "\u202f%"
@@ -84,6 +84,21 @@ export const formatInt = x =>
 export const formatSiInt = x =>
     formatLocale
         .format(",.2s")(x)
+        .replace(".0", "")
+        .replace("M", "\u2009\u1d0d") // LATIN LETTER SMALL CAPITAL M
+        .replace("k", "\u2009k")
+        .replace("m", "\u2009m")
+        .replace("-", "\u2212\u202f");
+
+/**
+ * Format currency with SI suffix
+ * @function
+ * @param {Number} x - Integer
+ * @return {String} Formatted Integer
+ */
+export const formatSiCurrency = x =>
+    formatLocale
+        .format("$,.2s")(x)
         .replace(".0", "")
         .replace("M", "\u2009\u1d0d") // LATIN LETTER SMALL CAPITAL M
         .replace("k", "\u2009k")
@@ -451,11 +466,13 @@ export function printCompassRose({ elem, radius }) {
     const label = elem
         .selectAll("g")
         .data(data)
-        .enter()
-        .append("g")
-        .attr(
-            "transform",
-            d => `rotate(${Math.round(xScale(d) + xScale.bandwidth() / 2 - 90)})translate(${innerRadius},0)`
+        .join(enter =>
+            enter
+                .append("g")
+                .attr(
+                    "transform",
+                    d => `rotate(${Math.round(xScale(d) + xScale.bandwidth() / 2 - 90)})translate(${innerRadius},0)`
+                )
         );
 
     label
@@ -522,10 +539,15 @@ export function printSmallCompassRose({ elem, radius }) {
     const x2Card = 6;
     elem.selectAll("line")
         .data(data)
-        .enter()
-        .append("line")
-        .attr("x2", (d, i) => (i % 3 !== 0 ? x2 : i % 6 !== 0 ? x2InterCard : x2Card))
-        .attr("transform", d => `rotate(${Math.round(xScale(d) + xScale.bandwidth() / 2)})translate(${innerRadius},0)`);
+        .join(enter =>
+            enter
+                .append("line")
+                .attr("x2", (d, i) => (i % 3 !== 0 ? x2 : i % 6 !== 0 ? x2InterCard : x2Card))
+                .attr(
+                    "transform",
+                    d => `rotate(${Math.round(xScale(d) + xScale.bandwidth() / 2)})translate(${innerRadius},0)`
+                )
+        );
 }
 
 /**
@@ -534,19 +556,3 @@ export function printSmallCompassRose({ elem, radius }) {
  * @return {string} Formatted clan name
  */
 export const displayClan = clan => `<span class="caps">${clan}</span>`;
-
-/**
- * Get radio button value
- * @param {string} name - Radio button name
- * @returns {string} Radio button value
- */
-export const getRadioButton = name => document.querySelector(`input[name='${name}']:checked`).value;
-
-/**
- * Set radio button value
- * @param {string} name - Radio button name
- * @returns {void}
- */
-export const setRadioButton = name => {
-    document.getElementById(name).checked = true;
-};

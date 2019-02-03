@@ -110,9 +110,9 @@ export default class TrilateratePosition {
         const selectPorts = this._ports.portDataDefault
             .map(d => ({
                 id: d.id,
-                coord: [d.geometry.coordinates[0], d.geometry.coordinates[1]],
-                name: d.properties.name,
-                nation: d.properties.nation
+                coord: [d.coordinates[0], d.coordinates[1]],
+                name: d.name,
+                nation: d.nation
             }))
             .sort((a, b) => {
                 if (a.name < b.name) {
@@ -232,9 +232,9 @@ export default class TrilateratePosition {
              */
             const getIntersectionArea = () => {
                 const circles = this._ports.portData.map(port => ({
-                        x: port.geometry.coordinates[0],
-                        y: port.geometry.coordinates[1],
-                        radius: port.properties.distance
+                        x: port.coordinates[0],
+                        y: port.coordinates[1],
+                        radius: port.distance
                     })),
                     stats = {};
 
@@ -296,10 +296,10 @@ export default class TrilateratePosition {
         if (ports.size >= 2) {
             this._ports.showRadiusSetting = "position";
             this._ports.portData = this._ports.portDataDefault
-                .filter(port => ports.has(port.properties.name))
+                .filter(port => ports.has(port.name))
                 .map(port => {
                     // eslint-disable-next-line prefer-destructuring,no-param-reassign
-                    port.properties.distance = ports.get(port.properties.name);
+                    port.distance = ports.get(port.name);
                     return port;
                 });
             this._ports.update();
