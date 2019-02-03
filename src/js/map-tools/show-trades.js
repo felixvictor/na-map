@@ -275,7 +275,7 @@ export default class ShowTrades {
         return `trade-${link.source.id}-${link.good.replace(/ /g, "")}-${link.target.id}`;
     }
 
-    _getTrade(trade) {
+    _getTradeLimitedData(trade) {
         const addInfo = text => `<div><div>${text}</div>`;
         const addDes = text => `<div class="des">${text}</div></div>`;
         const getDepth = isShallow => (isShallow ? "(shallow)" : "(deep)");
@@ -303,6 +303,45 @@ export default class ShowTrades {
         return h;
     }
 
+    _getTradeFullData(trade) {
+        const addInfo = text => `<div>${text}</div>`;
+        const addDes = text => `<div class="des">${text}</div>`;
+        const startBlock = text => `<div>${text}`;
+        const endBlock = () => "</div>";
+        const getDepth = isShallow => (isShallow ? "(shallow)" : "(deep)");
+
+        const weight = trade.weightPerItem * trade.quantity;
+
+        let h = "";
+
+        h += startBlock("Trade");
+        h += addInfo(`${formatInt(trade.quantity)} ${trade.good}`) + addDes("good");
+        h += addInfo(`${formatSiInt(weight)} ${weight === 1 ? "ton" : "tons"}`) + addDes("weight");
+        h += endBlock();
+
+        h += startBlock("Profit");
+        h += addInfo(`${formatSiCurrency(trade.profit)}`) + addDes(this._profitText);
+        h += endBlock();
+
+        h += startBlock("Route");
+        h +=
+            addInfo(
+                `${this._nodeData.get(trade.source.id).name} <span class="caps">${
+                    this._nodeData.get(trade.source.id).nation
+                }</span>`
+            ) + addDes(`from ${getDepth(this._nodeData.get(trade.source.id).isShallow)}`);
+        h +=
+            addInfo(
+                `${this._nodeData.get(trade.target.id).name} <span class="caps">${
+                    this._nodeData.get(trade.target.id).nation
+                }</span>`
+            ) + addDes(`to ${getDepth(this._nodeData.get(trade.source.id).isShallow)}`);
+        h += addInfo(`${formatSiInt(trade.distance)}\u2009k`) + addDes("distance");
+        h += endBlock();
+
+        return h;
+    }
+
     /**
      * @link https://bl.ocks.org/mattkohl/146d301c0fc20d89d85880df537de7b0
      * @return {void}
@@ -311,7 +350,7 @@ export default class ShowTrades {
     _updateGraph() {
         const showDetails = (d, i, nodes) => {
             const trade = d3Select(nodes[i]);
-            const title = this._getTrade(d);
+            const title = this._getTradeFullData(d);
 
             $(trade.node())
                 .tooltip({
@@ -320,7 +359,7 @@ export default class ShowTrades {
                     template:
                         '<div class="tooltip" role="tooltip">' +
                         '<div class="tooltip-block tooltip-inner tooltip-small">' +
-                        '</div></div>',
+                        "</div></div>",
                     title,
                     trigger: "manual"
                 })
@@ -455,7 +494,7 @@ export default class ShowTrades {
                     .on("mouseenter", highlightOn)
                     .on("mouseleave", highlightOff)
             )
-            .html(d => this._getTrade(d));
+            .html(d => this._getTradeLimitedData(d));
     }
 
     _filterTradesByVisiblePorts() {
