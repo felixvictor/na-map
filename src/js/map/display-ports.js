@@ -12,33 +12,34 @@ import { min as d3Min, max as d3Max } from "d3-array";
 import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate";
 import { scaleLinear as d3ScaleLinear } from "d3-scale";
 import { select as d3Select } from "d3-selection";
+
+import "bootstrap/js/dist/util";
+import "bootstrap/js/dist/tooltip";
+
 import moment from "moment";
 import "moment/locale/en-gb";
 
 import {
-    circleRadiusFactor,
-    primary300,
     colourRed,
     colourRedDark,
-    convertCoordX,
-    convertCoordY,
     defaultCircleSize,
     defaultFontSize,
-    getDistance,
-    nations
+    greenZoneRadius,
+    nations,
+    primary300
 } from "../common";
 import {
     degreesToRadians,
     displayClan,
     formatInt,
     formatPercent,
+    formatSiCurrency,
     formatSiInt,
     getOrdinal,
-    getRadioButton,
-    roundToThousands,
-    setRadioButton
+    roundToThousands
 } from "../util";
 import Cookie from "../util/cookie";
+import RadioButton from "../util/radio-button";
 import TrilateratePosition from "../map-tools/get-position";
 
 export default class DisplayPorts {
@@ -58,7 +59,7 @@ export default class DisplayPorts {
         // Shroud Cay
         this._currentPort = { id: "366", coord: { x: 4396, y: 2494 } };
 
-        this._zoomLevel = "initial";
+        this.zoomLevel = "initial";
         this._showPBZones = "all";
         this._tooltipDuration = 200;
         this._iconSize = 48;
@@ -89,10 +90,16 @@ export default class DisplayPorts {
         this._radioButtonValues = ["attack", "position", "tax", "net", "green", "off"];
 
         /**
-         * Server name cookie
+         * Show radius cookie
          * @type {Cookie}
          */
         this._cookie = new Cookie(this._baseId, this._radioButtonValues);
+
+        /**
+         * Show radius radio buttons
+         * @type {RadioButton}
+         */
+        this._radios = new RadioButton(this._baseId, this._radioButtonValues);
 
         /**
          * Get showRadius setting from cookie or use default value
@@ -128,29 +135,14 @@ export default class DisplayPorts {
             [r] = this._radioButtonValues;
             this._cookie.set(r);
         }
-        setRadioButton(`${this._baseId}-${r}`);
+        this._radios.set(r);
 
         return r;
     }
 
-    /**
-     * Store show setting in cookie
-     * @return {void}
-     * @private
-     */
-    _storeShowRadiusSetting() {
-        this._cookie.set(this._showRadius);
-    }
-
     _showRadiusSelected() {
-        this._showRadius = getRadioButton(this._baseId);
-
-        // If data is invalid
-        if (!this._radioButtonValues.includes(this._showRadius)) {
-            [this._showRadius] = this._radioButtonValues;
-            setRadioButton(`${this._baseId}-${this._showRadius}`);
-        }
-        this._storeShowRadiusSetting();
+        this._showRadius = this._radios.get();
+        this._cookie.set(this._showRadius);
         this.update();
     }
 
@@ -169,10 +161,10 @@ export default class DisplayPorts {
         /*
         ** Automatic calculation of text position
         // https://stackoverflow.com/questions/40774697/how-to-group-an-array-of-objects-by-key
-        const counties = this._portDataDefault.filter(port => port.properties.county !== "").reduce(
+        const counties = this._portDataDefault.filter(port => port.county !== "").reduce(
             (r, a) =>
                 Object.assign(r, {
-                    [a.properties.county]: (r[a.properties.county] || []).concat([a.geometry.coordinates])
+                    [a.county]: (r[a.county] || []).concat([a.coordinates])
                 }),
             {}
         );
@@ -269,10 +261,10 @@ export default class DisplayPorts {
         /*
         ** Automatic calculation of text position
         // https://stackoverflow.com/questions/40774697/how-to-group-an-array-of-objects-by-key
-        const regions = this._portDataDefault.filter(port => port.properties.region !== "").reduce(
+        const regions = this._portDataDefault.filter(port => port.region !== "").reduce(
             (r, a) =>
                 Object.assign(r, {
-                    [a.properties.region]: (r[a.properties.region] || []).concat([a.geometry.coordinates])
+                    [a.region]: (r[a.region] || []).concat([a.coordinates])
                 }),
             {}
         );
@@ -307,17 +299,13 @@ export default class DisplayPorts {
 
     _setupSummary() {
         // Main box
-        this._divPortSummary = d3Select("main")
-            .insert("div", ".toasts")
-            .attr("id", "port-summary")
-            .attr("class", "port-summary overlay");
-
-        const mainDiv = this._divPortSummary
+        this._divPortSummary = d3Select("main #summary-column")
             .append("div")
-            .attr("class", "d-flex justify-content-around align-items-end");
+            .attr("id", "port-summary")
+            .attr("class", "port-summary");
 
         // Number of selected ports
-        this._portSummaryNumPorts = mainDiv.append("div").classed("block", true);
+        this._portSummaryNumPorts = this._divPortSummary.append("div").classed("block", true);
         this._portSummaryTextNumPorts = this._portSummaryNumPorts.append("div");
         this._portSummaryNumPorts
             .append("div")
@@ -325,7 +313,7 @@ export default class DisplayPorts {
             .html("selected<br>ports");
 
         // Total tax income
-        this._portSummaryTaxIncome = mainDiv.append("div").classed("block", true);
+        this._portSummaryTaxIncome = this._divPortSummary.append("div").classed("block", true);
         this._portSummaryTextTaxIncome = this._portSummaryTaxIncome.append("div");
         this._portSummaryTaxIncome
             .append("div")
@@ -333,7 +321,7 @@ export default class DisplayPorts {
             .html("tax<br>income");
 
         // Total net income
-        this._portSummaryNetIncome = mainDiv.append("div").classed("block", true);
+        this._portSummaryNetIncome = this._divPortSummary.append("div").classed("block", true);
         this._portSummaryTextNetIncome = this._portSummaryNetIncome.append("div");
         this._portSummaryNetIncome
             .append("div")
@@ -390,7 +378,7 @@ export default class DisplayPorts {
     }
 
     _getPortName(id) {
-        return id ? this._portDataDefault.find(port => port.id === id).properties.name : "";
+        return id ? this._portDataDefault.find(port => port.id === id).name : "";
     }
 
     _getText(id, portProperties) {
@@ -444,30 +432,10 @@ export default class DisplayPorts {
             laborHoursDiscount: portProperties.laborHoursDiscount
                 ? `, labor hours discount level\u202f${portProperties.laborHoursDiscount}`
                 : "",
-            dropsTrading: portProperties.dropsTrading
-                ? portProperties.dropsTrading
-                      .map(good => good.name)
-                      .sort()
-                      .join(", ")
-                : "",
-            consumesTrading: portProperties.consumesTrading
-                ? portProperties.consumesTrading
-                      .map(good => good.name)
-                      .sort()
-                      .join(", ")
-                : "",
-            producesNonTrading: portProperties.producesNonTrading
-                ? portProperties.producesNonTrading
-                      .map(good => good.name)
-                      .sort()
-                      .join(", ")
-                : "",
-            dropsNonTrading: portProperties.dropsNonTrading
-                ? portProperties.dropsNonTrading
-                      .map(good => good.name)
-                      .sort()
-                      .join(", ")
-                : "",
+            dropsTrading: portProperties.dropsTrading ? portProperties.dropsTrading.join(", ") : "",
+            consumesTrading: portProperties.consumesTrading ? portProperties.consumesTrading.join(", ") : "",
+            producesNonTrading: portProperties.producesNonTrading ? portProperties.producesNonTrading.join(", ") : "",
+            dropsNonTrading: portProperties.dropsNonTrading ? portProperties.dropsNonTrading.join(", ") : "",
             tradePort: this._getPortName(this.tradePortId),
             goodsToSellInTradePort: portProperties.goodsToSellInTradePort
                 ? portProperties.goodsToSellInTradePort.join(", ")
@@ -544,12 +512,12 @@ export default class DisplayPorts {
             }
             if (this.showTradePortPartners) {
                 if (port.goodsToSellInTradePort.length) {
-                    h += `<tr><td class='pl-0'>Sell in ${port.tradePort}</td><td>${
+                    h += `<tr><td class='pl-0'>Sell in ${port.tradePort}\u00a0</td><td>${
                         port.goodsToSellInTradePort
                     }</td></tr>`;
                 }
                 if (port.goodsToBuyInTradePort.length) {
-                    h += `<tr><td class='pl-0'>Buy in ${port.tradePort}</td><td>${
+                    h += `<tr><td class='pl-0'>Buy in ${port.tradePort}\u00a0</td><td>${
                         port.goodsToBuyInTradePort
                     }</td></tr>`;
                 }
@@ -558,22 +526,50 @@ export default class DisplayPorts {
 
             return h;
         };
+        const getInventory = port => {
+            let h = "";
 
-        const port = d3Select(nodes[i]),
-            title = tooltipData(this._getText(d.id, d.properties));
-        // eslint-disable-next-line no-underscore-dangle
-        $(port.node())
+            const buy = port.inventory
+                .filter(good => good.buyQuantity > 0)
+                .map(good => {
+                    return `${formatInt(good.buyQuantity)} ${good.name} @ ${formatSiCurrency(good.buyPrice)}`;
+                })
+                .join("<br>");
+            const sell = port.inventory
+                .filter(good => good.sellQuantity > 0)
+                .map(good => {
+                    return `${formatInt(good.sellQuantity)} ${good.name} @ ${formatSiCurrency(good.buyPrice)}`;
+                })
+                .join("<br>");
+
+            h += `<h5 class="caps">${port.name}</h5>`;
+            if (buy.length) {
+                h += "<h6>Buy</h6>";
+                h += buy;
+            }
+            if (buy.length && sell.length) {
+                h += "<p></p>";
+            }
+            if (sell.length) {
+                h += "<h6>Sell</h6>";
+                h += sell;
+            }
+
+            return h;
+        };
+
+        $(d3Select(nodes[i]).node())
             .tooltip({
-                delay: {
-                    show: this._tooltipDuration,
-                    hide: this._tooltipDuration
-                },
                 html: true,
                 placement: "auto",
-                title,
+                title: tooltipData(this._getText(d.id, d)),
                 trigger: "manual"
             })
             .tooltip("show");
+
+        if (this._map.showTrades.show) {
+            this._map.showTrades.showInventory(getInventory(d));
+        }
     }
 
     _updateIcons() {
@@ -584,27 +580,19 @@ export default class DisplayPorts {
         const circleSize = roundToThousands(this._circleSize / circleScale);
         const data = this._portDataFiltered;
 
-        // Data join
-        const circleUpdate = this._gIcon.selectAll("circle").data(data, d => d.id);
-
-        // Remove old circles
-        circleUpdate.exit().remove();
-
-        // Update kept circles
-        // circleUpdate; // not needed
-
-        // Add new circles
-        const circleEnter = circleUpdate
-            .enter()
-            .append("circle")
-            .attr("fill", d => `url(#${d.properties.nation}${d.properties.availableForAll ? "a" : ""})`)
-            .attr("cx", d => d.geometry.coordinates[0])
-            .attr("cy", d => d.geometry.coordinates[1])
-            .on("click", (d, i, nodes) => this._showDetails(d, i, nodes))
-            .on("mouseout", hideDetails);
-
-        // Apply to both old and new
-        circleUpdate.merge(circleEnter).attr("r", circleSize);
+        this._gIcon
+            .selectAll("circle")
+            .data(data, d => d.id)
+            .join(enter =>
+                enter
+                    .append("circle")
+                    .attr("fill", d => `url(#${d.nation}${d.availableForAll && d.nation !== "NT" ? "a" : ""})`)
+                    .attr("cx", d => d.coordinates[0])
+                    .attr("cy", d => d.coordinates[1])
+                    .on("click", (d, i, nodes) => this._showDetails(d, i, nodes))
+                    .on("mouseleave", hideDetails)
+            )
+            .attr("r", circleSize);
     }
 
     _updatePortCircles() {
@@ -612,11 +600,11 @@ export default class DisplayPorts {
             let marker = "";
             if (port.id === this.tradePortId) {
                 marker = "here";
-            } else if (port.properties.sellInTradePort && port.properties.buyInTradePort) {
+            } else if (port.sellInTradePort && port.buyInTradePort) {
                 marker = "both";
-            } else if (port.properties.sellInTradePort) {
+            } else if (port.sellInTradePort) {
                 marker = "pos";
-            } else if (port.properties.buyInTradePort) {
+            } else if (port.buyInTradePort) {
                 marker = "neg";
             }
             return marker;
@@ -631,124 +619,96 @@ export default class DisplayPorts {
         let hasFill = false;
 
         if (this._showRadius === "tax") {
-            data = this._portDataFiltered.filter(d => !d.properties.nonCapturable);
+            data = this._portDataFiltered.filter(d => !d.nonCapturable);
 
-            const minTaxIncome = d3Min(data, d => d.properties.taxIncome);
-            const maxTaxIncome = d3Max(data, d => d.properties.taxIncome);
+            const minTaxIncome = d3Min(data, d => d.taxIncome);
+            const maxTaxIncome = d3Max(data, d => d.taxIncome);
             this._taxIncomeRadius.domain([minTaxIncome, maxTaxIncome]);
             this._taxIncomeRadius.range([rMin, rMax]);
 
             cssClass = () => "bubble pos";
-            r = d => this._taxIncomeRadius(Math.abs(d.properties.taxIncome));
+            r = d => this._taxIncomeRadius(Math.abs(d.taxIncome));
         } else if (this._showRadius === "net") {
-            data = this._portDataFiltered.filter(d => !d.properties.nonCapturable);
+            data = this._portDataFiltered.filter(d => !d.nonCapturable);
 
-            const minNetIncome = d3Min(data, d => d.properties.netIncome);
-            const maxNetIncome = d3Max(data, d => d.properties.netIncome);
+            const minNetIncome = d3Min(data, d => d.netIncome);
+            const maxNetIncome = d3Max(data, d => d.netIncome);
             this._netIncomeRadius.domain([minNetIncome, maxNetIncome]).range([rMin, rMax]);
 
-            cssClass = d => `bubble ${d.properties.netIncome < 0 ? "neg" : "pos"}`;
-            r = d => this._netIncomeRadius(Math.abs(d.properties.netIncome));
+            cssClass = d => `bubble ${d.netIncome < 0 ? "neg" : "pos"}`;
+            r = d => this._netIncomeRadius(Math.abs(d.netIncome));
         } else if (this.showTradePortPartners) {
             cssClass = d => `bubble ${getTradePortMarker(d)}`;
             r = d => (d.id === this.tradePortId ? rMax : rMax / 2);
         } else if (this._showRadius === "position") {
             cssClass = () => "position-circle";
-            r = d => d.properties.distance;
+            r = d => d.distance;
         } else if (this._showRadius === "attack") {
-            data = this._portDataFiltered.filter(port => port.properties.attackHostility);
+            data = this._portDataFiltered.filter(port => port.attackHostility);
             this._attackRadius.range([rMin, rMax]);
 
             cssClass = () => "bubble";
-            fill = d => this._colourScale(d.properties.attackHostility);
+            fill = d => this._colourScale(d.attackHostility);
             hasFill = true;
-            r = d => this._attackRadius(d.properties.attackHostility);
+            r = d => this._attackRadius(d.attackHostility);
         } else if (this._showRadius === "green") {
-            data = this._portDataFiltered.filter(
-                port => port.properties.nonCapturable && port.properties.nation !== "FT"
-            );
+            data = this._portDataFiltered.filter(port => port.nonCapturable && port.nation !== "FT");
 
             cssClass = () => "bubble pos";
-            r = () =>
-                roundToThousands(
-                    getDistance(
-                        {
-                            x: convertCoordX(-63400, 18800),
-                            y: convertCoordY(-63400, 18800)
-                        },
-                        {
-                            x: convertCoordX(-79696, 10642),
-                            y: convertCoordY(-79696, 10642)
-                        }
-                    )
-                ) * circleRadiusFactor;
+            r = () => greenZoneRadius;
         } else if (this.showCurrentGood) {
-            cssClass = d => `bubble ${d.properties.isSource ? "pos" : "neg"}`;
+            cssClass = d => `bubble ${d.isSource ? "pos" : "neg"}`;
             r = () => rMax / 2;
         } else if (this._showRadius === "off") {
             data = {};
         }
 
-        // Data join
-        const circleUpdate = this._gPortCircle.selectAll("circle").data(data, d => d.id);
-
-        // Remove old circles
-        circleUpdate.exit().remove();
-
-        // Update kept circles
-        // circleUpdate; // not needed
-
-        // Add new circles
-        const circleEnter = circleUpdate
-            .enter()
-            .append("circle")
-            .attr("cx", d => d.geometry.coordinates[0])
-            .attr("cy", d => d.geometry.coordinates[1]);
-
-        // Apply to both old and new
-        const circleMerge = circleUpdate
-            .merge(circleEnter)
+        this._gPortCircle
+            .selectAll("circle")
+            .data(data, d => d.id)
+            .join(enter =>
+                enter
+                    .append("circle")
+                    .attr("cx", d => d.coordinates[0])
+                    .attr("cy", d => d.coordinates[1])
+            )
             .attr("class", d => cssClass(d))
-            .attr("r", d => r(d));
-        if (hasFill) {
-            circleMerge.attr("fill", d => fill(d));
-        }
+            .attr("r", d => r(d))
+            .attr("fill", d => (hasFill ? fill(d) : ""));
     }
 
     _updateTextsX(d, circleSize) {
-        return this._zoomLevel === "pbZone" &&
+        return this.zoomLevel === "pbZone" &&
             (this._showPBZones === "all" || (this._showPBZones === "single" && d.id === this.currentPort.id))
-            ? d.geometry.coordinates[0] + Math.round(circleSize * 1.2 * Math.cos(degreesToRadians(d.properties.angle)))
-            : d.geometry.coordinates[0];
+            ? d.coordinates[0] + Math.round(circleSize * 1.2 * Math.cos(degreesToRadians(d.angle)))
+            : d.coordinates[0];
     }
 
     _updateTextsY(d, circleSize, fontSize) {
         const deltaY = circleSize + fontSize * 1.2;
 
-        if (this._zoomLevel !== "pbZone") {
-            return d.geometry.coordinates[1] + deltaY;
+        if (this.zoomLevel !== "pbZone") {
+            return d.coordinates[1] + deltaY;
         }
 
-        const dy = d.properties.angle > 90 && d.properties.angle < 270 ? fontSize : 0;
+        const dy = d.angle > 90 && d.angle < 270 ? fontSize : 0;
         return this._showPBZones === "all" || (this._showPBZones === "single" && d.id === this.currentPort.id)
-            ? d.geometry.coordinates[1] +
-                  Math.round(circleSize * 1.2 * Math.sin(degreesToRadians(d.properties.angle))) +
-                  dy
-            : d.geometry.coordinates[1] + deltaY;
+            ? d.coordinates[1] + Math.round(circleSize * 1.2 * Math.sin(degreesToRadians(d.angle))) + dy
+            : d.coordinates[1] + deltaY;
     }
 
     _updateTextsAnchor(d) {
         if (
-            this._zoomLevel === "pbZone" &&
+            this.zoomLevel === "pbZone" &&
             (this._showPBZones === "all" || (this._showPBZones === "single" && d.id === this.currentPort.id))
         ) {
-            return d.properties.textAnchor;
+            return d.textAnchor;
         }
         return "middle";
     }
 
     updateTexts() {
-        if (this._zoomLevel === "initial") {
+        if (this.zoomLevel === "initial") {
             this._gText.classed("d-none", true);
         } else {
             const circleScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale),
@@ -756,31 +716,15 @@ export default class DisplayPorts {
                 fontScale = 2 ** Math.log2((Math.abs(this._minScale) + this._scale) * 0.9),
                 fontSize = roundToThousands(this._fontSize / fontScale);
 
-            this._gText.attr("font-size", `${fontSize}px`);
-
-            // Data join
-            const textUpdate = this._gText.selectAll("text").data(this._portDataFiltered, d => d.id);
-
-            // Remove old text
-            textUpdate.exit().remove();
-
-            // Update kept texts
-            // textUpdate; // not needed
-
-            // Add new texts
-            const textEnter = textUpdate
-                .enter()
-                .append("text")
-                .text(d => d.properties.name);
-
-            // Apply to both old and new
-            textUpdate
-                .merge(textEnter)
+            this._gText
+                .selectAll("text")
+                .data(this._portDataFiltered, d => d.id)
+                .join(enter => enter.append("text").text(d => d.name))
                 .attr("x", d => this._updateTextsX(d, circleSize))
                 .attr("y", d => this._updateTextsY(d, circleSize, fontSize))
                 .attr("text-anchor", d => this._updateTextsAnchor(d));
 
-            this._gText.classed("d-none", false);
+            this._gText.attr("font-size", `${fontSize}px`).classed("d-none", false);
         }
     }
 
@@ -790,8 +734,8 @@ export default class DisplayPorts {
             netTotal = 0;
 
         if (numberPorts) {
-            taxTotal = this._portData.map(d => d.properties.taxIncome).reduce((a, b) => a + b);
-            netTotal = this._portData.map(d => d.properties.netIncome).reduce((a, b) => a + b);
+            taxTotal = this._portData.map(d => d.taxIncome).reduce((a, b) => a + b);
+            netTotal = this._portData.map(d => d.netIncome).reduce((a, b) => a + b);
         }
 
         this._portSummaryTextNumPorts.text(`${numberPorts}`);
@@ -800,26 +744,20 @@ export default class DisplayPorts {
     }
 
     _updateCounties() {
-        if (this._zoomLevel !== "portLabel") {
+        if (this.zoomLevel !== "portLabel") {
             this._gCounty.classed("d-none", true);
         } else {
             const data = this._countyPolygonFiltered;
 
-            // Data join
-            const countyUpdate = this._gCounty.selectAll("text").data(data);
-
-            // Remove old
-            countyUpdate.exit().remove();
-
-            // Update kept texts
-            // countyUpdate; // not needed
-
-            // Add new texts
-            countyUpdate
-                .enter()
-                .append("text")
-                .attr("transform", d => `translate(${d.centroid[0]},${d.centroid[1]})rotate(${d.angle})`)
-                .text(d => d.name);
+            this._gCounty
+                .selectAll("text")
+                .data(data)
+                .join(enter =>
+                    enter
+                        .append("text")
+                        .attr("transform", d => `translate(${d.centroid[0]},${d.centroid[1]})rotate(${d.angle})`)
+                        .text(d => d.name)
+                );
 
             /* Show polygon for test purposes
             const d3line2 = d3
@@ -841,26 +779,20 @@ export default class DisplayPorts {
     }
 
     _updateRegions() {
-        if (this._zoomLevel !== "initial") {
+        if (this.zoomLevel !== "initial") {
             this._gRegion.classed("d-none", true);
         } else {
             const data = this._regionPolygonFiltered;
 
-            // Data join
-            const regionUpdate = this._gRegion.selectAll("text").data(data);
-
-            // Remove old
-            regionUpdate.exit().remove();
-
-            // Update kept texts
-            // regionUpdate; // not needed
-
-            // Add new texts
-            regionUpdate
-                .enter()
-                .append("text")
-                .attr("transform", d => `translate(${d.centroid[0]},${d.centroid[1]})rotate(${d.angle})`)
-                .text(d => d.name);
+            this._gRegion
+                .selectAll("text")
+                .data(data)
+                .join(enter =>
+                    enter
+                        .append("text")
+                        .attr("transform", d => `translate(${d.centroid[0]},${d.centroid[1]})rotate(${d.angle})`)
+                        .text(d => d.name)
+                );
 
             /* Show polygon for test purposes
             const d3line2 = d3
@@ -896,30 +828,41 @@ export default class DisplayPorts {
         if (this._showRadius !== "position") {
             this._portDataFiltered = this._portData.filter(
                 port =>
-                    port.geometry.coordinates[0] >= this._lowerBound[0] &&
-                    port.geometry.coordinates[0] <= this._upperBound[0] &&
-                    port.geometry.coordinates[1] >= this._lowerBound[1] &&
-                    port.geometry.coordinates[1] <= this._upperBound[1]
+                    port.coordinates[0] >= this._lowerBound[0] &&
+                    port.coordinates[0] <= this._upperBound[0] &&
+                    port.coordinates[1] >= this._lowerBound[1] &&
+                    port.coordinates[1] <= this._upperBound[1]
             );
         } else {
             this._portDataFiltered = this._portData;
         }
+        const lb = [
+            this._lowerBound[0] !== 0 ? this._lowerBound[0] / 1.5 : 0,
+            this._lowerBound[1] !== 0 ? this._lowerBound[1] / 1.5 : 0
+        ];
+        const ub = [this._upperBound[0] * 1.5, this._upperBound[1] * 1.5];
         this._countyPolygonFiltered = this._countyPolygon.filter(
             county =>
-                county.centroid[0] >= this._lowerBound[0] &&
-                county.centroid[0] <= this._upperBound[0] &&
-                county.centroid[1] >= this._lowerBound[1] &&
-                county.centroid[1] <= this._upperBound[1]
+                county.centroid[0] >= lb[0] &&
+                county.centroid[0] <= ub[0] &&
+                county.centroid[1] >= lb[1] &&
+                county.centroid[1] <= ub[1]
         );
         this._regionPolygonFiltered = this._regionPolygon.filter(
             region =>
-                region.centroid[0] >= this._lowerBound[0] &&
-                region.centroid[0] <= this._upperBound[0] &&
-                region.centroid[1] >= this._lowerBound[1] &&
-                region.centroid[1] <= this._upperBound[1]
+                region.centroid[0] >= lb[0] &&
+                region.centroid[0] <= ub[0] &&
+                region.centroid[1] >= lb[1] &&
+                region.centroid[1] <= ub[1]
         );
     }
 
+    /**
+     * Set bounds of current viewport
+     * @param {Bound} lowerBound - Top left coordinates of current viewport
+     * @param {Bound} upperBound - Bottom right coordinates of current viewport
+     * @return {void}
+     */
     setBounds(lowerBound, upperBound) {
         this._lowerBound = lowerBound;
         this._upperBound = upperBound;
@@ -939,14 +882,6 @@ export default class DisplayPorts {
 
     get portData() {
         return this._portData;
-    }
-
-    set pbData(pbData) {
-        this._pbData = pbData;
-    }
-
-    get pbData() {
-        return this._pbData;
     }
 
     set showRadiusSetting(showRadius) {
@@ -975,20 +910,17 @@ export default class DisplayPorts {
         this._divPortSummary.classed("hidden", false);
     }
 
-    hideSummary() {
-        this._divPortSummary.classed("hidden", true);
-    }
-
     transform(transform) {
         this._gPort.attr("transform", transform);
     }
 
     clearMap(scale) {
         if (this._showRadius === "position") {
-            this._showRadius = "off";
-            document.getElementById(`${this._baseId}-${this._showRadius}`).checked = true;
-            this._storeShowRadiusSetting();
+            [this._showRadius] = this._radioButtonValues;
+            this._radios.set(this._showRadius);
+            this._cookie.set(this._showRadius);
         }
+
         this._trilateratePosition.clearMap();
         this._showSummary();
         this._portData = this._portDataDefault;
