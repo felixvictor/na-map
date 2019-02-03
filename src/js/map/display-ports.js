@@ -33,6 +33,7 @@ import {
     displayClan,
     formatInt,
     formatPercent,
+    formatSiCurrency,
     formatSiInt,
     getOrdinal,
     roundToThousands
@@ -511,12 +512,12 @@ export default class DisplayPorts {
             }
             if (this.showTradePortPartners) {
                 if (port.goodsToSellInTradePort.length) {
-                    h += `<tr><td class='pl-0'>Sell in ${port.tradePort}</td><td>${
+                    h += `<tr><td class='pl-0'>Sell in ${port.tradePort}\u00a0</td><td>${
                         port.goodsToSellInTradePort
                     }</td></tr>`;
                 }
                 if (port.goodsToBuyInTradePort.length) {
-                    h += `<tr><td class='pl-0'>Buy in ${port.tradePort}</td><td>${
+                    h += `<tr><td class='pl-0'>Buy in ${port.tradePort}\u00a0</td><td>${
                         port.goodsToBuyInTradePort
                     }</td></tr>`;
                 }
@@ -525,18 +526,50 @@ export default class DisplayPorts {
 
             return h;
         };
+        const getInventory = port => {
+            let h = "";
 
-        const port = d3Select(nodes[i]),
-            title = tooltipData(this._getText(d.id, d));
-        // eslint-disable-next-line no-underscore-dangle
-        $(port.node())
+            const buy = port.inventory
+                .filter(good => good.buyQuantity > 0)
+                .map(good => {
+                    return `${formatInt(good.buyQuantity)} ${good.name} @ ${formatSiCurrency(good.buyPrice)}`;
+                })
+                .join("<br>");
+            const sell = port.inventory
+                .filter(good => good.sellQuantity > 0)
+                .map(good => {
+                    return `${formatInt(good.sellQuantity)} ${good.name} @ ${formatSiCurrency(good.buyPrice)}`;
+                })
+                .join("<br>");
+
+            h += `<h5 class="caps">${port.name}</h5>`;
+            if (buy.length) {
+                h += "<h6>Buy</h6>";
+                h += buy;
+            }
+            if (buy.length && sell.length) {
+                h += "<p></p>";
+            }
+            if (sell.length) {
+                h += "<h6>Sell</h6>";
+                h += sell;
+            }
+
+            return h;
+        };
+
+        $(d3Select(nodes[i]).node())
             .tooltip({
                 html: true,
                 placement: "auto",
-                title,
+                title: tooltipData(this._getText(d.id, d)),
                 trigger: "manual"
             })
             .tooltip("show");
+
+        if (this._map.showTrades.show) {
+            this._map.showTrades.showInventory(getInventory(d));
+        }
     }
 
     _updateIcons() {
@@ -557,7 +590,7 @@ export default class DisplayPorts {
                     .attr("cx", d => d.coordinates[0])
                     .attr("cy", d => d.coordinates[1])
                     .on("click", (d, i, nodes) => this._showDetails(d, i, nodes))
-                    .on("mouseout", hideDetails)
+                    .on("mouseleave", hideDetails)
             )
             .attr("r", circleSize);
     }
@@ -883,10 +916,11 @@ export default class DisplayPorts {
 
     clearMap(scale) {
         if (this._showRadius === "position") {
-            this._showRadius = "off";
-            document.getElementById(`${this._baseId}-${this._showRadius}`).checked = true;
-            this._storeShowRadiusSetting();
+            [this._showRadius] = this._radioButtonValues;
+            this._radios.set(this._showRadius);
+            this._cookie.set(this._showRadius);
         }
+
         this._trilateratePosition.clearMap();
         this._showSummary();
         this._portData = this._portDataDefault;
