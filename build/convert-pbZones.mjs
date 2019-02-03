@@ -67,8 +67,8 @@ function convertPBZones() {
             ports.forEach(port => {
                 const feature = {
                     type: "Feature",
-                    id: port.id,
-                    properties: {position: port.position},
+                    id: +port.id,
+                    properties: { position: port.position },
                     geometry: {
                         type: "MultiPoint",
                         coordinates: port.features.find(features => element === features.type).coord

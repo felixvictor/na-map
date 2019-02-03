@@ -31,7 +31,7 @@ function convertPorts() {
     json.ports = [];
     APIPorts.forEach(port => {
         const portData = {
-            id: port.Id,
+            id: +port.Id,
             name: port.Name.replaceAll("'", "’"),
 
             nation: nations[port.Nation].short,
