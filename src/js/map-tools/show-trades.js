@@ -22,13 +22,15 @@ import RadioButton from "../util/radio-button";
  */
 export default class ShowTrades {
     /**
+     * @param {object} portSelect - portSelect
      * @param {object} portData - Port data
      * @param {object} tradeData - Trade data
      * @param {number} minScale - Minimal scale
      * @param {Bound} lowerBound - Top left coordinates of current viewport
      * @param {Bound} upperBound - Bottom right coordinates of current viewport
      */
-    constructor(portData, tradeData, minScale, lowerBound, upperBound) {
+    constructor(portSelect, portData, tradeData, minScale, lowerBound, upperBound) {
+        this._portSelect = portSelect;
         this._portData = portData;
         this._linkDataDefault = tradeData;
 
@@ -82,6 +84,9 @@ export default class ShowTrades {
          * @type {string}
          */
         this.show = this._getShowValue();
+        if (this.show) {
+            this._portSelect.setupInventorySelect(this.show);
+        }
         this._linkData = this.show ? this._linkDataDefault : [];
 
         this._setupSvg();
@@ -185,7 +190,7 @@ export default class ShowTrades {
         const profitRadioGroup = this._mainDiv
             .append("div")
             .attr("id", this._profitId)
-            .attr("class", "align-self-center radio-group pl-2");
+            .attr("class", "align-self-center radio-group");
         profitRadioGroup
             .append("legend")
             .attr("class", "col-form-label")
@@ -268,11 +273,13 @@ export default class ShowTrades {
         this.show = show === "on";
 
         this._showCookie.set(show);
+
+        this._portSelect.setupInventorySelect(this.show);
         this._showTradeBlock(this.show);
         this._linkData = this.show ? this._linkDataDefault : [];
         this._filterTradesBySelectedNations();
         this._sortLinkData();
-        this._update();
+        this.update();
     }
 
     _profitValueSelected() {
@@ -281,14 +288,14 @@ export default class ShowTrades {
         this._profitCookie.set(this._profitValue);
 
         this._sortLinkData();
-        this._update();
+        this.update();
     }
 
     _nationChanged() {
         this._linkData = this._linkDataDefault;
         this._filterPortsBySelectedNations();
         this._filterTradesBySelectedNations();
-        this._update();
+        this.update();
     }
 
     static _getId(link) {
@@ -380,8 +387,6 @@ export default class ShowTrades {
         return h;
     }
 
-    _displayTradeTooltip(elem, trade) {}
-
     /**
      * @link https://bl.ocks.org/mattkohl/146d301c0fc20d89d85880df537de7b0
      * @return {void}
@@ -443,6 +448,7 @@ export default class ShowTrades {
             return `M${x1},${y1}A${dr},${dr} ${xRotation},${largeArc},${sweep} ${x2},${y2}`;
         };
 
+        const data = this._portSelect.isInventorySelected ? [] : this._linkDataFiltered;
         const linkWidthScale = d3ScaleLinear()
             .range([5 / this._scale, 15 / this._scale])
             .domain(d3Extent(this._linkDataFiltered, d => d.profit));
@@ -452,7 +458,7 @@ export default class ShowTrades {
 
         this._g
             .selectAll(".trade-link")
-            .data(this._linkDataFiltered, d => ShowTrades._getId(d))
+            .data(data, d => ShowTrades._getId(d))
             .join(
                 enter =>
                     enter
@@ -611,7 +617,7 @@ export default class ShowTrades {
         this._mainDiv.classed("d-none", !show).classed("d-flex", show);
     }
 
-    _update() {
+    update() {
         this._filterTradesByVisiblePorts();
         this._updateGraph();
         this._updateList();
@@ -642,7 +648,7 @@ export default class ShowTrades {
         this._g.attr("transform", transform);
         this._scale = transform.k;
 
-        this._update();
+        this.update();
     }
 
     clearMap() {
@@ -653,8 +659,10 @@ export default class ShowTrades {
                 this._inventoryDiv.remove();
                 this._inventoryDiv = null;
             }
+            this._linkData = this._linkDataDefault;
+        } else {
+            this._linkData = [];
         }
-        this._linkData = this._linkDataDefault;
-        this._update();
+        this.update();
     }
 }
