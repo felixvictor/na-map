@@ -385,7 +385,7 @@ export default class SelectPorts {
                 return port;
             });
 
-        this._ports.showRadiusSetting = "off";
+        this._ports.setShowRadiusSetting("off");
         this._ports.portData = sourcePorts.concat(consumingPorts);
         this._ports.showCurrentGood = true;
         this._ports.showTradePortPartners = false;

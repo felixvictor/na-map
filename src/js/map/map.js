@@ -12,7 +12,6 @@ import { range as d3Range } from "d3-array";
 import { event as d3Event, mouse as d3Mouse, select as d3Select } from "d3-selection";
 import { zoom as d3Zoom, zoomIdentity as d3ZoomIdentity, zoomTransform as d3ZoomTransform } from "d3-zoom";
 import { feature as topojsonFeature } from "topojson-client";
-import Cookies from "js-cookie";
 
 import "bootstrap/js/dist/util";
 import "bootstrap/js/dist/collapse";
@@ -22,6 +21,9 @@ import { appDescription, appTitle, appVersion, defaultFontSize, insertBaseModal 
 import { displayClan, nearestPow2, checkFetchStatus, getJsonFromFetch, putFetchError, roundToThousands } from "../util";
 
 import { registerEvent } from "../analytics";
+
+import Cookie from "../util/cookie";
+import RadioButton from "../util/radio-button";
 
 import DisplayPbZones from "./display-pb-zones";
 import DisplayPorts from "./display-ports";
@@ -138,14 +140,17 @@ class Map {
          * @private
          * @private
          */
-        this._doubleClickActionCookieName = "na-map--double-click";
+        this._doubleClickActionId = "double-click-action";
 
         /**
-         * Default DoubleClickAction setting
-         * @type {string}
+         * DoubleClickAction settings
+         * @type {string[]}
          * @private
          */
-        this._doubleClickActionDefault = "compass";
+        this._doubleClickActionValues = ["compass", "f11"];
+
+        this._doubleClickActionCookie = new Cookie(this._doubleClickActionId, this._doubleClickActionValues);
+        this._doubleClickActionRadios = new RadioButton(this._doubleClickActionId, this._doubleClickActionValues);
 
         /**
          * Get DoubleClickAction setting from cookie or use default value
@@ -155,25 +160,28 @@ class Map {
         this._doubleClickAction = this._getDoubleClickAction();
 
         /**
-         * showLayer cookie name
+         * showGrid cookie name
          * @type {string}
          * @private
          */
-        this._showLayerCookieName = "na-map--show-grid";
+        this._showGridId = "show-grid";
 
         /**
-         * Default showLayer setting
-         * @type {string}
+         * showGrid settings
+         * @type {string[]}
          * @private
          */
-        this._showLayerDefault = "on";
+        this._showGridValues = ["on", "off"];
+
+        this._showGridCookie = new Cookie(this._showGridId, this._showGridValues);
+        this._showGridRadios = new RadioButton(this._showGridId, this._showGridValues);
 
         /**
-         * Get showLayer setting from cookie or use default value
+         * Get showGrid setting from cookie or use default value
          * @type {string}
          * @private
          */
-        this._showLayer = this._getShowLayer();
+        this._showGrid = this._getShowGridValue();
 
         [this._flexOverlay] = document.getElementsByClassName("flex-overlay");
 
@@ -182,7 +190,6 @@ class Map {
         this._setupSvg();
         this._setSvgSize();
         this._setupListener();
-        this._setupProps();
         this._readData();
     }
 
@@ -192,18 +199,24 @@ class Map {
      * @private
      */
     _getDoubleClickAction() {
-        // Use default value if cookie is not stored
-        return Cookies.get(this._doubleClickActionCookieName) || this._doubleClickActionDefault;
+        const r = this._doubleClickActionCookie.get();
+
+        this._doubleClickActionRadios.set(r);
+
+        return r;
     }
 
     /**
-     * Read cookie for showLayer
-     * @return {string} showLayer
+     * Read cookie for showGrid
+     * @return {string} showGrid
      * @private
      */
-    _getShowLayer() {
-        // Use default value if cookie is not stored
-        return Cookies.get(this._showLayerCookieName) || this._showLayerDefault;
+    _getShowGridValue() {
+        const r = this._showGridCookie.get();
+
+        this._showGridRadios.set(r);
+
+        return r;
     }
 
     _setupData(data) {
@@ -353,7 +366,7 @@ class Map {
         });
 
         document.getElementById("double-click-action").addEventListener("change", () => this._doubleClickSelected());
-        document.getElementById("show-grid").addEventListener("change", () => this._showLayerSelected());
+        document.getElementById("show-grid").addEventListener("change", () => this._showGridSelected());
     }
 
     _setupScale() {
@@ -390,47 +403,20 @@ class Map {
         this._gMap = this._svg.append("g").classed("map", true);
     }
 
-    _setupProps() {
-        document.getElementById(`double-click-action-${this._doubleClickAction}`).checked = true;
-        document.getElementById(`show-grid-${this._showLayer}`).checked = true;
-    }
-
-    /**
-     * Store show setting in cookie
-     * @return {void}
-     * @private
-     */
-    _storeDoubleClickActionSetting() {
-        if (this._doubleClickAction !== this._doubleClickActionDefault) {
-            Cookies.set(this._doubleClickActionCookieName, this._doubleClickAction);
-        } else {
-            Cookies.remove(this._doubleClickActionCookieName);
-        }
-    }
-
     _doubleClickSelected() {
-        this._doubleClickAction = document.querySelector('input[name="double-click-action"]:checked').value;
-        this._storeDoubleClickActionSetting();
+        this._doubleClickAction = this._doubleClickActionRadios.get();
+
+        this._doubleClickActionCookie.set(this._profitValue);
+
         this._clearMap();
     }
 
-    /**
-     * Store show setting in cookie
-     * @return {void}
-     * @private
-     */
-    _storeShowLayerSetting() {
-        if (this._showLayer !== this._showLayerDefault) {
-            Cookies.set(this._showLayerCookieName, this._showLayer);
-        } else {
-            Cookies.remove(this._showLayerCookieName);
-        }
-    }
+    _showGridSelected() {
+        this._showGrid = this._showGridRadios.get();
+        this._grid.show = this._showGrid === "on";
 
-    _showLayerSelected() {
-        this._showLayer = document.querySelector("input[name='show-grid']:checked").value;
-        this._grid.show = this._showLayer === "on";
-        this._storeShowLayerSetting();
+        this._showGridCookie.set(this._showGrid);
+
         this._refreshLayer();
     }
 
