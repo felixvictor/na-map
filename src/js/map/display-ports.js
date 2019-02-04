@@ -538,7 +538,7 @@ export default class DisplayPorts {
             const sell = port.inventory
                 .filter(good => good.sellQuantity > 0)
                 .map(good => {
-                    return `${formatInt(good.sellQuantity)} ${good.name} @ ${formatSiCurrency(good.buyPrice)}`;
+                    return `${formatInt(good.sellQuantity)} ${good.name} @ ${formatSiCurrency(good.sellPrice)}`;
                 })
                 .join("<br>");
 
