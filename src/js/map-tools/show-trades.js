@@ -171,7 +171,12 @@ export default class ShowTrades {
             .append("div")
             .attr("class", "card card-body small")
             .text(
-                "Trade data is static (snapshot during maintenance). Data is limited as buy and sell prices for a good at a certain port are only available when this port has this good in its inventory or has a buy/sell contract. Price and/or quantity may therefore not be available anymore. And better sell ports may be found with the in-game trader tool."
+                "Trade data is static (snapshot taken during maintenance). " +
+                    "Therefore, price and/or quantity may not be available anymore. " +
+                    "Data is limited as buy and sell prices at a certain port are " +
+                    "only known when this port has this good in its inventory or " +
+                    "a buy/sell contract. " +
+                    "Better sell ports may be found using the in-game trader tool."
             );
     }
 
