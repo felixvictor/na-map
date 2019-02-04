@@ -131,9 +131,10 @@ export default class ShowTrades {
         const options = `${nations
             .map(nation => `<option value="${nation.short}" selected>${nation.name}</option>`)
             .join("")}`;
+        const cardId = `${this._baseId}-card`;
 
-        const select = this._mainDiv
-            .append("label")
+        const label = this._mainDiv.append("label");
+        const select = label
             .append("select")
             .attr("name", this._nationSelectId)
             .attr("id", this._nationSelectId)
@@ -156,6 +157,22 @@ export default class ShowTrades {
             },
             title: "Select nations"
         });
+
+        label
+            .append("button")
+            .attr("class", "btn btn-small btn-outline-primary")
+            .attr("data-toggle", "collapse")
+            .attr("data-target", `#${cardId}`)
+            .text("Info");
+        this._mainDiv
+            .append("div")
+            .attr("id", cardId)
+            .attr("class", "collapse")
+            .append("div")
+            .attr("class", "card card-body small")
+            .text(
+                "Trade data is static (snapshot during maintenance). Data is limited as buy and sell prices for a good at a certain port are only available when this port has this good in its inventory or has a buy/sell contract. Price and/or quantity may therefore not be available anymore. And better sell ports may be found with the in-game trader tool."
+            );
     }
 
     _setupProfitRadios() {
