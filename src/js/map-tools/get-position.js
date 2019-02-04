@@ -294,7 +294,7 @@ export default class TrilateratePosition {
         });
 
         if (ports.size >= 2) {
-            this._ports.showRadiusSetting = "position";
+            this._ports.setShowRadiusSetting = "position";
             this._ports.portData = this._ports.portDataDefault
                 .filter(port => ports.has(port.name))
                 .map(port => {
