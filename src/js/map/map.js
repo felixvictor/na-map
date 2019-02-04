@@ -299,15 +299,22 @@ class Map {
 
         this._woodData = JSON.parse(JSON.stringify(data.woods));
         this._shipData = JSON.parse(JSON.stringify(data.ships));
-
         this._journey = new Journey(this._shipData, this._woodData, this.rem);
-        this._windPrediction = new PredictWind();
-        this.showTrades = new ShowTrades(portData, data.trades, this._minScale, this.coord.min, this.coord.max);
+
+        this._portSelect = new SelectPorts(this._ports, this._pbZone, this);
+        this.showTrades = new ShowTrades(
+            this._portSelect,
+            portData,
+            data.trades,
+            this._minScale,
+            this.coord.min,
+            this.coord.max
+        );
 
         this._init();
 
+        this._windPrediction = new PredictWind();
         this._windRose = new WindRose();
-        this._portSelect = new SelectPorts(this._ports, this._pbZone);
 
         /*
         marks.forEach(mark => {
