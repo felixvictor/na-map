@@ -379,6 +379,8 @@ export default class ShowTrades {
         return h;
     }
 
+    _displayTradeTooltip(elem, trade) {}
+
     /**
      * @link https://bl.ocks.org/mattkohl/146d301c0fc20d89d85880df537de7b0
      * @return {void}
@@ -468,7 +470,7 @@ export default class ShowTrades {
                         .attr("id", d => ShowTrades._getId(d))
                         .attr("opacity", 0)
                         .on("click", showDetails)
-                        .on("mouseout", hideDetails)
+                        .on("mouseleave", hideDetails)
                         .call(enterCall => enterCall.transition(transition).attr("opacity", 1)),
                 update => update.attr("opacity", 1),
                 exit =>
@@ -515,10 +517,12 @@ export default class ShowTrades {
 
         const highlightOn = d => {
             highlightLink = d3Select(`path#${ShowTrades._getId(d)}`).classed("highlight", true);
+            highlightLink.dispatch("click");
         };
 
         const highlightOff = () => {
             highlightLink.classed("highlight", false);
+            highlightLink.dispatch("mouseleave");
         };
 
         this._list
