@@ -884,11 +884,6 @@ export default class DisplayPorts {
         return this._portData;
     }
 
-    set showRadiusSetting(showRadius) {
-        this._showRadius = showRadius;
-        document.getElementById(`show-radius-${showRadius}`).checked = true;
-        this._storeShowRadiusSetting();
-    }
 
     set currentPort(currentPort) {
         this._currentPort = currentPort;
@@ -910,6 +905,12 @@ export default class DisplayPorts {
         this._divPortSummary.classed("hidden", false);
     }
 
+    setShowRadiusSetting(showRadius = this._radioButtonValues[0]) {
+        this._showRadius = showRadius;
+        this._radios.set(this._showRadius);
+        this._cookie.set(this._showRadius);
+    }
+
     transform(transform) {
         this._gPort.attr("transform", transform);
     }
@@ -926,6 +927,7 @@ export default class DisplayPorts {
         this._portData = this._portDataDefault;
         this.showCurrentGood = false;
         this.showTradePortPartners = false;
+        this.setShowRadiusSetting();
         this.update(scale);
     }
 }

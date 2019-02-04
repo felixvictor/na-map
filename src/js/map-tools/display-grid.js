@@ -36,7 +36,7 @@ export default class DisplayGrid {
          * @type {Boolean}
          * @private
          */
-        this._isShown = this._map._showLayer === "on";
+        this._isShown = this._map._showGrid === "on";
 
         /**
          * Minimum world coordinate

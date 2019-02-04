@@ -73,6 +73,7 @@ export default class ShowTrades {
          * @private
          */
         this._profitRadioValues = ["weight", "distance", "total"];
+
         this._profitCookie = new Cookie(this._profitId, this._profitRadioValues);
         this._profitRadios = new RadioButton(this._profitId, this._profitRadioValues);
 
