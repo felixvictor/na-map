@@ -526,6 +526,7 @@ export default class DisplayPorts {
 
             return h;
         };
+
         const getInventory = port => {
             let h = "";
 
@@ -568,7 +569,10 @@ export default class DisplayPorts {
             .tooltip("show");
 
         if (this._map.showTrades.show) {
-            this._map.showTrades.showInventory(getInventory(d));
+            if (this._map.showTrades.listType !== "inventory") {
+                this._map.showTrades.listType = "inventory";
+            }
+            this._map.showTrades.updateInventory(getInventory(d));
         }
     }
 
@@ -883,7 +887,6 @@ export default class DisplayPorts {
     get portData() {
         return this._portData;
     }
-
 
     set currentPort(currentPort) {
         this._currentPort = currentPort;

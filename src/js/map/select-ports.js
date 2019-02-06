@@ -16,12 +16,13 @@ import "tempusdominus-core/build/js/tempusdominus-core";
 
 import { registerEvent } from "../analytics";
 import { initMultiDropdownNavbar, nations } from "../common";
+import { formatInt, formatSiCurrency, sortByName } from "../util";
 
 export default class SelectPorts {
     constructor(ports, pbZone, map) {
         this._ports = ports;
         this._pbZone = pbZone;
-        this._map=map;
+        this._map = map;
 
         this._dateFormat = "D MMM";
         this._timeFormat = "HH.00";
@@ -445,32 +446,77 @@ export default class SelectPorts {
         this.isInventorySelected = true;
 
         const goodSelected = this._inventorySelector.options[this._inventorySelector.selectedIndex].value;
-        const buyPorts = this._ports.portDataDefault
-            .filter(
-                port =>
-                    port.inventory && port.inventory.some(good => good.name === goodSelected && good.buyQuantity > 0)
-            )
-            .map(port => {
-                // eslint-disable-next-line no-param-reassign
-                port.isSource = true;
-                return port;
-            });
-        const sellPorts = this._ports.portDataDefault
-            .filter(
-                port =>
-                    port.inventory && port.inventory.some(good => good.name === goodSelected && good.sellQuantity > 0)
-            )
-            .map(port => {
-                // eslint-disable-next-line prefer-destructuring,no-param-reassign
-                port.isSource = false;
-                return port;
-            });
+        const buyPortsFiltered = this._ports.portDataDefault.filter(
+            port => port.inventory && port.inventory.some(good => good.name === goodSelected && good.buyQuantity > 0)
+        );
+        const buyPorts = buyPortsFiltered.map(port => {
+            // eslint-disable-next-line no-param-reassign
+            port.isSource = true;
+            return port;
+        });
+        const buyPortAvail = buyPortsFiltered
+            .map(port => ({
+                name: port.name,
+                good: port.inventory.find(good => good.name === goodSelected)
+            }))
+            .sort(sortByName);
 
+        const sellPortsFiltered = this._ports.portDataDefault.filter(
+            port => port.inventory && port.inventory.some(good => good.name === goodSelected && good.sellQuantity > 0)
+        );
+        const sellPorts = sellPortsFiltered.map(port => {
+            // eslint-disable-next-line prefer-destructuring,no-param-reassign
+            port.isSource = false;
+            return port;
+        });
+        const sellPortAvail = sellPortsFiltered
+            .map(port => ({
+                name: port.name,
+                good: port.inventory.find(good => good.name === goodSelected)
+            }))
+            .sort(sortByName);
+
+        const getPortList = () => {
+            let h = "";
+
+            h += `<h5>${goodSelected}</h5>`;
+            if (buyPortAvail.length) {
+                h += "<h6>Buy</h6>";
+                h += buyPortAvail
+                    .map(
+                        port =>
+                            `${port.name}: ${formatInt(port.good.buyQuantity)} @ ${formatSiCurrency(
+                                port.good.buyPrice
+                            )}`
+                    )
+                    .join("<br>");
+            }
+            if (buyPortAvail.length && sellPortAvail.length) {
+                h += "<p></p>";
+            }
+            if (sellPortAvail.length) {
+                h += "<h6>Sell</h6>";
+                h += sellPortAvail
+                    .map(
+                        port =>
+                            `${port.name}: ${formatInt(port.good.sellQuantity)} @ ${formatSiCurrency(
+                                port.good.sellPrice
+                            )}`
+                    )
+                    .join("<br>");
+            }
+
+            return h;
+        };
+        console.log(buyPortAvail);
         this._ports.setShowRadiusSetting("off");
         this._ports.portData = buyPorts.concat(sellPorts);
         this._ports.showCurrentGood = true;
         this._ports.showTradePortPartners = false;
-        this._map.showTrades.update();
+        if (this._map.showTrades.listType !== "portList") {
+            this._map.showTrades.listType = "portList";
+        }
+        this._map.showTrades.updatePortList(getPortList());
         this._ports.update();
     }
 
