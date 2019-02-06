@@ -45,6 +45,7 @@ export default class ShowTrades {
 
         this._baseId = "show-trades";
         this._nationSelectId = `${this._baseId}-nation-select`;
+        this._listType = "tradeList";
 
         this._showId = "show-trades-show";
 
@@ -126,11 +127,10 @@ export default class ShowTrades {
             .attr("d", `M0,0L0,${this._arrowY}L${this._arrowX},${this._arrowY / 2}z`)
             .attr("class", "trade-head");
 
-        this._mainDiv = d3Select("main #summary-column")
+        this._tradeDetailsDiv = d3Select("main #summary-column")
             .append("div")
-            .attr("id", "trade-block")
-            .attr("class", "trade-block");
-        this._showTradeBlock(this.show);
+            .attr("id", "trade-details")
+            .attr("class", "trade-details");
     }
 
     _setupSelects() {
@@ -139,7 +139,8 @@ export default class ShowTrades {
             .join("")}`;
         const cardId = `${this._baseId}-card`;
 
-        const label = this._mainDiv.append("label");
+        this._tradeDetailsHead = this._tradeDetailsDiv.append("div");
+        const label = this._tradeDetailsHead.append("label");
         const select = label
             .append("select")
             .attr("name", this._nationSelectId)
@@ -170,7 +171,7 @@ export default class ShowTrades {
             .attr("data-toggle", "collapse")
             .attr("data-target", `#${cardId}`)
             .text("Info");
-        this._mainDiv
+        this._tradeDetailsHead
             .append("div")
             .attr("id", cardId)
             .attr("class", "collapse")
@@ -187,10 +188,10 @@ export default class ShowTrades {
     }
 
     _setupProfitRadios() {
-        const profitRadioGroup = this._mainDiv
+        const profitRadioGroup = this._tradeDetailsHead
             .append("div")
             .attr("id", this._profitId)
-            .attr("class", "align-self-center radio-group");
+            .attr("class", "align-self-center radio-group pl-2");
         profitRadioGroup
             .append("legend")
             .attr("class", "col-form-label")
@@ -226,7 +227,7 @@ export default class ShowTrades {
     }
 
     _setupList() {
-        this._list = this._mainDiv.append("div").attr("class", "trade-list small");
+        this._list = this._tradeDetailsDiv.append("div").attr("class", "trade-list small");
     }
 
     _setupData() {
@@ -275,7 +276,6 @@ export default class ShowTrades {
         this._showCookie.set(show);
 
         this._portSelect.setupInventorySelect(this.show);
-        this._showTradeBlock(this.show);
         this._linkData = this.show ? this._linkDataDefault : [];
         this._filterTradesBySelectedNations();
         this._sortLinkData();
@@ -519,7 +519,40 @@ export default class ShowTrades {
             .attr("dy", d => `-${linkWidthScale(d.profit) / 1.5}px`);
     }
 
-    _updateList() {
+    set listType(type) {
+        this._listType = type;
+        switch (this._listType) {
+            case "inventory":
+                ShowTrades._hideElem(this._tradeDetailsHead);
+                this._list.remove();
+                this._list = this._tradeDetailsDiv.append("div").attr("class", "inventory small p-2");
+                break;
+            case "portList":
+                ShowTrades._hideElem(this._tradeDetailsHead);
+                this._list.remove();
+                this._list = this._tradeDetailsDiv.append("div").attr("class", "port-list small p-2");
+                break;
+            default:
+                ShowTrades._showElem(this._tradeDetailsHead);
+                this._list.remove();
+                this._list = this._tradeDetailsDiv.append("div").attr("class", "trade-list small");
+                break;
+        }
+    }
+
+    get listType() {
+        return this._listType;
+    }
+
+    updateInventory(inventory) {
+        this._list.html(inventory);
+    }
+
+    updatePortList(portList) {
+        this._list.html(portList);
+    }
+
+    _updateTradeList() {
         let highlightLink;
 
         const highlightOn = d => {
@@ -613,24 +646,18 @@ export default class ShowTrades {
         return r;
     }
 
-    _showTradeBlock(show) {
-        this._mainDiv.classed("d-none", !show).classed("d-flex", show);
+    static _showElem(elem) {
+        elem.classed("d-none", false);
+    }
+
+    static _hideElem(elem) {
+        elem.classed("d-none", true);
     }
 
     update() {
         this._filterTradesByVisiblePorts();
         this._updateGraph();
-        this._updateList();
-    }
-
-    showInventory(inventory) {
-        if (!this._inventoryDiv) {
-            this._showTradeBlock(false);
-            this._inventoryDiv = d3Select("main #summary-column")
-                .append("div")
-                .attr("class", "inventory small p-2");
-        }
-        this._inventoryDiv.html(inventory);
+        this._updateTradeList();
     }
 
     /**
@@ -652,17 +679,14 @@ export default class ShowTrades {
     }
 
     clearMap() {
-        this._g.selectAll("*").remove();
+        this.listType = "tradeList";
+
         if (this.show) {
-            this._showTradeBlock(true);
-            if (this._inventoryDiv) {
-                this._inventoryDiv.remove();
-                this._inventoryDiv = null;
-            }
             this._linkData = this._linkDataDefault;
         } else {
             this._linkData = [];
         }
+
         this.update();
     }
 }
