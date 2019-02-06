@@ -85,10 +85,6 @@ export default class ShowTrades {
          * @type {string}
          */
         this.show = this._getShowValue();
-        if (this.show) {
-            this._portSelect.setupInventorySelect(this.show);
-        }
-        this._linkData = this.show ? this._linkDataDefault : [];
 
         this._setupSvg();
         this._setupSelects();
@@ -97,6 +93,11 @@ export default class ShowTrades {
         this._setupList();
         this._setupData();
         this.setBounds(lowerBound, upperBound);
+
+        if (this.show) {
+            this._portSelect.setupInventorySelect(this.show);
+        }
+        this._showOrHide();
 
         /**
          * Get profit value from cookie or use default value
@@ -275,11 +276,21 @@ export default class ShowTrades {
 
         this._showCookie.set(show);
 
+        this._showOrHide();
         this._portSelect.setupInventorySelect(this.show);
-        this._linkData = this.show ? this._linkDataDefault : [];
         this._filterTradesBySelectedNations();
         this._sortLinkData();
         this.update();
+    }
+
+    _showOrHide() {
+        if (this.show) {
+            ShowTrades._showElem(this._tradeDetailsDiv);
+            this._linkData = this._linkDataDefault;
+        } else {
+            ShowTrades._hideElem(this._tradeDetailsDiv);
+            this._linkData = [];
+        }
     }
 
     _profitValueSelected() {
