@@ -523,16 +523,19 @@ export default class ShowTrades {
         this._listType = type;
         switch (this._listType) {
             case "inventory":
+                this._linkData = [];
                 ShowTrades._hideElem(this._tradeDetailsHead);
                 this._list.remove();
-                this._list = this._tradeDetailsDiv.append("div").attr("class", "inventory small p-2");
+                this._list = this._tradeDetailsDiv.append("div").attr("class", "small p-2");
                 break;
             case "portList":
+                this._linkData = [];
                 ShowTrades._hideElem(this._tradeDetailsHead);
                 this._list.remove();
-                this._list = this._tradeDetailsDiv.append("div").attr("class", "port-list small p-2");
+                this._list = this._tradeDetailsDiv.append("div").attr("class", "small p-2");
                 break;
             default:
+                this._linkData = this._linkDataDefault;
                 ShowTrades._showElem(this._tradeDetailsHead);
                 this._list.remove();
                 this._list = this._tradeDetailsDiv.append("div").attr("class", "trade-list small");
@@ -544,11 +547,25 @@ export default class ShowTrades {
         return this._listType;
     }
 
-    updateInventory(inventory) {
+    _updateList(data = null) {
+        switch (this._listType) {
+            case "inventory":
+                this._updateInventory(data);
+                break;
+            case "portList":
+                this._updatePortList(data);
+                break;
+            default:
+                this._updateTradeList();
+                break;
+        }
+    }
+
+    _updateInventory(inventory) {
         this._list.html(inventory);
     }
 
-    updatePortList(portList) {
+    _updatePortList(portList) {
         this._list.html(portList);
     }
 
@@ -654,10 +671,10 @@ export default class ShowTrades {
         elem.classed("d-none", true);
     }
 
-    update() {
+    update(data = null) {
         this._filterTradesByVisiblePorts();
         this._updateGraph();
-        this._updateTradeList();
+        this._updateList(data);
     }
 
     /**

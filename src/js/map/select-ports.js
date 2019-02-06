@@ -457,6 +457,7 @@ export default class SelectPorts {
         const buyPortAvail = buyPortsFiltered
             .map(port => ({
                 name: port.name,
+                nation: port.nation,
                 good: port.inventory.find(good => good.name === goodSelected)
             }))
             .sort(sortByName);
@@ -472,6 +473,7 @@ export default class SelectPorts {
         const sellPortAvail = sellPortsFiltered
             .map(port => ({
                 name: port.name,
+                nation: port.nation,
                 good: port.inventory.find(good => good.name === goodSelected)
             }))
             .sort(sortByName);
@@ -485,9 +487,9 @@ export default class SelectPorts {
                 h += buyPortAvail
                     .map(
                         port =>
-                            `${port.name}: ${formatInt(port.good.buyQuantity)} @ ${formatSiCurrency(
-                                port.good.buyPrice
-                            )}`
+                            `${port.name} <span class="caps">${port.nation}</span>: ${formatInt(
+                                port.good.buyQuantity
+                            )} @ ${formatSiCurrency(port.good.buyPrice)}`
                     )
                     .join("<br>");
             }
@@ -499,16 +501,16 @@ export default class SelectPorts {
                 h += sellPortAvail
                     .map(
                         port =>
-                            `${port.name}: ${formatInt(port.good.sellQuantity)} @ ${formatSiCurrency(
-                                port.good.sellPrice
-                            )}`
+                            `${port.name} <span class="caps">${port.nation}</span>: ${formatInt(
+                                port.good.sellQuantity
+                            )} @ ${formatSiCurrency(port.good.sellPrice)}`
                     )
                     .join("<br>");
             }
 
             return h;
         };
-        console.log(buyPortAvail);
+
         this._ports.setShowRadiusSetting("off");
         this._ports.portData = buyPorts.concat(sellPorts);
         this._ports.showCurrentGood = true;
@@ -516,7 +518,7 @@ export default class SelectPorts {
         if (this._map.showTrades.listType !== "portList") {
             this._map.showTrades.listType = "portList";
         }
-        this._map.showTrades.updatePortList(getPortList());
+        this._map.showTrades.update(getPortList());
         this._ports.update();
     }
 
