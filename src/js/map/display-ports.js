@@ -543,7 +543,7 @@ export default class DisplayPorts {
                 })
                 .join("<br>");
 
-            h += `<h5 class="caps">${port.name}</h5>`;
+            h += `<h5 class="caps">${port.name} <span class="small">${port.nation}</span></h5>`;
             if (buy.length) {
                 h += "<h6>Buy</h6>";
                 h += buy;
@@ -572,7 +572,7 @@ export default class DisplayPorts {
             if (this._map.showTrades.listType !== "inventory") {
                 this._map.showTrades.listType = "inventory";
             }
-            this._map.showTrades.updateInventory(getInventory(d));
+            this._map.showTrades.update(getInventory(d));
         }
     }
 
