@@ -451,7 +451,7 @@ export default class SelectPorts {
         );
         const buyPorts = buyPortsFiltered.map(port => {
             // eslint-disable-next-line no-param-reassign
-            port.isSource = true;
+            port.buyInTradePort = true;
             return port;
         });
         const buyPortAvail = buyPortsFiltered
@@ -467,7 +467,7 @@ export default class SelectPorts {
         );
         const sellPorts = sellPortsFiltered.map(port => {
             // eslint-disable-next-line prefer-destructuring,no-param-reassign
-            port.isSource = false;
+            port.sellInTradePort = true;
             return port;
         });
         const sellPortAvail = sellPortsFiltered
@@ -513,8 +513,8 @@ export default class SelectPorts {
 
         this._ports.setShowRadiusSetting("off");
         this._ports.portData = buyPorts.concat(sellPorts);
-        this._ports.showCurrentGood = true;
-        this._ports.showTradePortPartners = false;
+        this._ports.showTradePortPartners = true;
+        this._ports.showCurrentGood = false;
         if (this._map.showTrades.listType !== "portList") {
             this._map.showTrades.listType = "portList";
         }
