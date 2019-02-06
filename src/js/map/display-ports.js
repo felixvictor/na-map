@@ -755,7 +755,7 @@ export default class DisplayPorts {
 
             this._gCounty
                 .selectAll("text")
-                .data(data)
+                .data(data, d => d.name)
                 .join(enter =>
                     enter
                         .append("text")
@@ -790,7 +790,7 @@ export default class DisplayPorts {
 
             this._gRegion
                 .selectAll("text")
-                .data(data)
+                .data(data, d => d.name)
                 .join(enter =>
                     enter
                         .append("text")
@@ -840,24 +840,21 @@ export default class DisplayPorts {
         } else {
             this._portDataFiltered = this._portData;
         }
-        const lb = [
-            this._lowerBound[0] !== 0 ? this._lowerBound[0] / 1.5 : 0,
-            this._lowerBound[1] !== 0 ? this._lowerBound[1] / 1.5 : 0
-        ];
-        const ub = [this._upperBound[0] * 1.5, this._upperBound[1] * 1.5];
+
         this._countyPolygonFiltered = this._countyPolygon.filter(
             county =>
-                county.centroid[0] >= lb[0] &&
-                county.centroid[0] <= ub[0] &&
-                county.centroid[1] >= lb[1] &&
-                county.centroid[1] <= ub[1]
+                county.centroid[0] >= this._lowerBound[0] &&
+                county.centroid[0] <= this._upperBound[0] &&
+                county.centroid[1] >= this._lowerBound[1] &&
+                county.centroid[1] <= this._upperBound[1]
         );
+
         this._regionPolygonFiltered = this._regionPolygon.filter(
             region =>
-                region.centroid[0] >= lb[0] &&
-                region.centroid[0] <= ub[0] &&
-                region.centroid[1] >= lb[1] &&
-                region.centroid[1] <= ub[1]
+                region.centroid[0] >= this._lowerBound[0] &&
+                region.centroid[0] <= this._upperBound[0] &&
+                region.centroid[1] >= this._lowerBound[1] &&
+                region.centroid[1] <= this._upperBound[1]
         );
     }
 
