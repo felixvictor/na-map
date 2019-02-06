@@ -556,3 +556,23 @@ export function printSmallCompassRose({ elem, radius }) {
  * @return {string} Formatted clan name
  */
 export const displayClan = clan => `<span class="caps">${clan}</span>`;
+
+export const sort = (a, b) => {
+    if (a < b) {
+        return -1;
+    }
+    if (a > b) {
+        return 1;
+    }
+    return 0;
+};
+
+export const sortByName = (a, b) => {
+    if (a.name < b.name) {
+        return -1;
+    }
+    if (a.name > b.name) {
+        return 1;
+    }
+    return 0;
+};
