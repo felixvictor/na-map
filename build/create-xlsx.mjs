@@ -9,6 +9,7 @@ import sass from "node-sass";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import css from "css";
 import { readJson } from "./common.mjs";
+import { sortBy } from "./common";
 
 const shipFilename = process.argv[2],
     portFilename = process.argv[3],
@@ -34,57 +35,13 @@ String.prototype.replaceAll = function(search, replacement) {
     return target.replace(new RegExp(search, "g"), replacement);
 };
 
-/**
- * Sort ships
- * @param {Object} a - Ship a
- * @param {Object} b - Ship b
- * @returns {Number} Sort
- */
-function sortShip(a, b) {
-    if (a.class < b.class) {
-        return -1;
-    }
-    if (a.class > b.class) {
-        return 1;
-    }
-    if (a.battleRating > b.battleRating) {
-        return -1;
-    }
-    if (a.battleRating < b.battleRating) {
-        return 1;
-    }
-    if (a.name < b.name) {
-        return -1;
-    }
-    if (a.name > b.name) {
-        return 1;
-    }
-    return 0;
-}
-
-/**
- * Sort ports
- * @param {Object} a - Ship a
- * @param {Object} b - Ship b
- * @returns {Number} Sort
- */
-function sortPort(a, b) {
-    if (a.name < b.name) {
-        return -1;
-    }
-    if (a.name > b.name) {
-        return 1;
-    }
-    return 0;
-}
-
 const dwPorts = portData
     .filter(port => !port.shallow)
     .map(port => ({
         name: port.name,
         br: port.brLimit
     }))
-    .sort(sortPort);
+    .sort(sortBy(["name"]));
 
 const swPorts = portData
     .filter(port => port.shallow)
@@ -92,7 +49,7 @@ const swPorts = portData
         name: port.name,
         br: port.brLimit
     }))
-    .sort(sortPort);
+    .sort(sortBy(["name"]));
 
 /** Set colours
  * @returns {Map} Colours
@@ -439,23 +396,19 @@ function createExcel() {
     }
 
     const dwShips = shipsOrig
-            .filter(
-                ship =>
-                    !(
-                        ship.name.startsWith("Basic") ||
-                        ship.name.startsWith("Rookie") ||
-                        ship.name.startsWith("Trader")
-                    ) &&
-                    (ship.battleRating >= 80 || ship.name === "Mortar Brig")
-            )
-            .sort((a, b) => sortShip(a, b)),
-        swShips = shipsOrig
-            .filter(
-                ship =>
-                    ship.class >= 6 &&
-                    !(ship.name.startsWith("Basic") || ship.name.startsWith("Rookie") || ship.name.startsWith("Trader"))
-            )
-            .sort((a, b) => sortShip(a, b));
+        .filter(
+            ship =>
+                !(ship.name.startsWith("Basic") || ship.name.startsWith("Rookie") || ship.name.startsWith("Trader")) &&
+                (ship.battleRating >= 80 || ship.name === "Mortar Brig")
+        )
+        .sort(sortBy(["class", "battleRating", "name"]));
+    const swShips = shipsOrig
+        .filter(
+            ship =>
+                ship.class >= 6 &&
+                !(ship.name.startsWith("Basic") || ship.name.startsWith("Rookie") || ship.name.startsWith("Trader"))
+        )
+        .sort(sortBy(["class", "battleRating", "name"]));
 
     /*
     const dwSheet = workbook.addWorksheet("Deep water port", {
