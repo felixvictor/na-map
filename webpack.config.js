@@ -11,10 +11,10 @@ const // { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer"),
     CleanWebpackPlugin = require("clean-webpack-plugin"),
     CopyPlugin = require("copy-webpack-plugin"),
     HtmlPlugin = require("html-webpack-plugin"),
-    MiniCssExtractPlugin = require("mini-css-extract-plugin"),
+    ExtractCssChunks = require("extract-css-chunks-webpack-plugin"),
     PreloadWebpackPlugin = require("preload-webpack-plugin"),
     SitemapPlugin = require("sitemap-webpack-plugin").default,
-    SriPlugin = require("webpack-subresource-integrity"),
+    // SriPlugin = require("webpack-subresource-integrity"),
     TerserPlugin = require("terser-webpack-plugin"),
     WebpackDeepScopeAnalysisPlugin = require("webpack-deep-scope-plugin").default,
     WebpackPwaManifest = require("webpack-pwa-manifest");
@@ -271,7 +271,7 @@ const config = {
         new CleanWebpackPlugin(outputPath, {
             verbose: false
         }),
-        new MiniCssExtractPlugin({ filename: isProd ? "[name].[contenthash].css" : "[name].css" }),
+        new ExtractCssChunks({ filename: isProd ? "[name].[contenthash].css" : "[name].css", orderWarning: true }),
         new webpack.DefinePlugin({
             CPRIMARY300: JSON.stringify(primary300),
             CGREEN: JSON.stringify(colourGreen),
@@ -283,7 +283,8 @@ const config = {
             NAME: JSON.stringify(libraryName),
             DESCRIPTION: JSON.stringify(description),
             TITLE: JSON.stringify(PACKAGE.description),
-            VERSION: JSON.stringify(PACKAGE.version)
+            VERSION: JSON.stringify(PACKAGE.version),
+            ICONSMALL: JSON.stringify("images/icons/icon_32x32.png")
         }),
         new webpack.HashedModuleIdsPlugin(),
         new webpack.ProvidePlugin({
@@ -299,6 +300,7 @@ const config = {
             Dropdown: "exports-loader?Dropdown!bootstrap/js/dist/dropdown",
             Modal: "exports-loader?Modal!bootstrap/js/dist/modal",
             // Popover: "exports-loader?Popover!bootstrap/js/dist/popover",
+            Toast: "exports-loader?Tooltip!bootstrap/js/dist/toast",
             Tooltip: "exports-loader?Tooltip!bootstrap/js/dist/tooltip",
             Util: "exports-loader?Util!bootstrap/js/dist/util"
         }),
@@ -315,15 +317,18 @@ const config = {
         new HtmlPlugin(htmlOpt),
         new PreloadWebpackPlugin({
             include: "allAssets",
-            fileWhitelist: [/\.woff2$/]
+            fileWhitelist: [/^(fonts|main|map|vendors~main|vendors~map)/]
         }),
-        new SitemapPlugin(target, sitemapPaths, { skipGzip: false }),
+        /*
         new SriPlugin({
             hashFuncNames: ["sha256", "sha384"],
             enabled: isProd
         }),
+        */
+        new SitemapPlugin(target, sitemapPaths, { skipGzip: false }),
         new WebpackDeepScopeAnalysisPlugin(),
-        new WebpackPwaManifest(manifestOpt)
+        new WebpackPwaManifest(manifestOpt),
+        new webpack.HashedModuleIdsPlugin()
     ],
 
     stats: {
@@ -354,7 +359,7 @@ const config = {
                 test: /\.scss$/,
                 include: path.resolve(__dirname, "src/scss"),
                 use: [
-                    MiniCssExtractPlugin.loader,
+                    ExtractCssChunks.loader,
                     {
                         loader: "css-loader",
                         options: cssOpt
@@ -372,7 +377,7 @@ const config = {
             {
                 test: /\.css$/,
                 use: [
-                    MiniCssExtractPlugin.loader,
+                    ExtractCssChunks.loader,
                     {
                         loader: "css-loader",
                         options: cssOpt

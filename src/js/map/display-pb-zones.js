@@ -144,14 +144,13 @@ export default class DisplayPbZones {
     }
 
     _filterVisible() {
-        this._pbCircleDataFiltered = this._pbCircleDataDefault.filter(port => {
-            return (
+        this._pbCircleDataFiltered = this._pbCircleDataDefault.filter(
+            port =>
                 port.position[0] >= this._lowerBound[0] &&
                 port.position[0] <= this._upperBound[0] &&
                 port.position[1] >= this._lowerBound[1] &&
                 port.position[1] <= this._upperBound[1]
-            );
-        });
+        );
         this._fortDataFiltered = this._fortDataDefault.filter(
             port =>
                 port.position[0] >= this._lowerBound[0] &&
@@ -175,12 +174,17 @@ export default class DisplayPbZones {
         );
     }
 
-
+    /**
+     * Set bounds of current viewport
+     * @param {Bound} lowerBound - Top left coordinates of current viewport
+     * @param {Bound} upperBound - Bottom right coordinates of current viewport
+     * @return {void}
+     */
     setBounds(lowerBound, upperBound) {
         this._lowerBound = lowerBound;
         this._upperBound = upperBound;
     }
-    
+
     refresh() {
         this._setData();
         this._update();
