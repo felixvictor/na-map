@@ -3,6 +3,7 @@
  */
 
 import { readJson, saveJson } from "./common.mjs";
+import { sortBy } from "./common";
 
 const inBaseFilename = process.argv[2],
     outFilename = process.argv[3],
@@ -47,38 +48,10 @@ function convertLoot() {
                 amount: { min: dropItem.Stack.Min, max: dropItem.Stack.Max }
             }))
         };
-        loot.items.sort((a, b) => {
-            if (a.chance < b.chance) {
-                return -1;
-            }
-            if (a.chance > b.chance) {
-                return 1;
-            }
-            if (a.name < b.name) {
-                return -1;
-            }
-            if (a.name > b.name) {
-                return 1;
-            }
-            return 0;
-        });
+        loot.items.sort(sortBy(["chance", "name"]));
         data.loot.push(loot);
     });
-    data.loot.sort((a, b) => {
-        if (a.class < b.class) {
-            return -1;
-        }
-        if (a.class > b.class) {
-            return 1;
-        }
-        if (a.name < b.name) {
-            return -1;
-        }
-        if (a.name > b.name) {
-            return 1;
-        }
-        return 0;
-    });
+    data.loot.sort(sortBy(["class", "name"]));
     saveJson(outFilename, data);
 }
 
