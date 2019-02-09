@@ -405,8 +405,17 @@ function createExcel() {
     const swShips = shipsOrig
         .filter(
             ship =>
-                ship.class >= 6 &&
-                !(ship.name.startsWith("Basic") || ship.name.startsWith("Rookie") || ship.name.startsWith("Trader"))
+                ship.name === "Cerberus" ||
+                ship.name === "Hercules" ||
+                ship.name === "L’Hermione" ||
+                ship.name === "Renommee" ||
+                ship.name === "Surprise" ||
+                (ship.class >= 6 &&
+                    !(
+                        ship.name.startsWith("Basic") ||
+                        ship.name.startsWith("Rookie") ||
+                        ship.name.startsWith("Trader")
+                    ))
         )
         .sort(sortBy(["class", "battleRating", "name"]));
 
