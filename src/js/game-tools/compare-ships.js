@@ -881,14 +881,17 @@ export default class CompareShips {
     /**
      * @param {Object} shipData - Ship data
      * @param {Object} woodData - Wood data
-     * @param {string} baseId - Base id (default "ship-compare")
+     * @param {Object} upgradeData - Module data
+     * @param {string} id - Base id (default "ship-compare")
      */
-    constructor(shipData, woodData, baseId = "ship-compare") {
+    constructor({ shipData, woodData, moduleData: upgradeData, id = "ship-compare" }) {
         this._shipData = shipData;
-        this._baseId = baseId;
+        this._upgradeDataDefault = upgradeData;
+        this._baseId = id;
         this._baseName = "Compare ships";
         this._buttonId = `button-${this._baseId}`;
         this._modalId = `modal-${this._baseId}`;
+        this._upgradeId = `${this._baseId}-upgrade`;
 
         if (this._baseId === "ship-compare") {
             this._columnsCompare = ["C1", "C2"];
@@ -910,18 +913,46 @@ export default class CompareShips {
             .interpolate(d3InterpolateHcl);
 
         this._woodChanges = new Map([
+            // ["Mast thickness", ["mast.bottomThickness", "mast.middleThickness", "mast.topThickness"]],
+            ["Acceleration", ["ship.acceleration"]],
+            ["Crew protection", ["resistance.crew"]],
+            ["Crew", ["crew.max"]],
+            ["Fire resistance", ["resistance.fire"]],
             ["Hull strength", ["structure.armour"]],
+            ["Leak resistance", ["resistance.leaks"]],
+            ["Rudder speed", ["rudder.halfturnTime"]],
+            ["Ship speed", ["speed.max"]],
             ["Side armour", ["bow.armour", "sides.armour", "sails.armour", "structure.armour", "stern.armour"]],
             ["Thickness", ["sides.thickness", "bow.thickness", "stern.thickness"]],
-            // ["Mast thickness", ["mast.bottomThickness", "mast.middleThickness", "mast.topThickness"]],
-            ["Ship speed", ["speed.max"]],
+            ["Turn speed", ["rudder.turnSpeed"]]
+        ]);
+
+        this._upgradeChanges = new Map([
             ["Acceleration", ["ship.acceleration"]],
-            ["Turn speed", ["rudder.turnSpeed"]],
-            ["Rudder speed", ["rudder.halfturnTime"]],
-            ["Fire resistance", ["resistance.fire"]],
-            ["Leak resistance", ["resistance.leaks"]],
+            ["Back armour thickness", ["stern.thickness"]],
             ["Crew protection", ["resistance.crew"]],
-            ["Crew", ["crew.max"]]
+            ["Crew", ["crew.max"]],
+            ["Fire resistance", ["resistance.fire"]],
+            ["Front armour thickness", ["bow.thickness"]],
+            ["Hold weight", ["maxWeight"]],
+            ["Hull strength", ["structure.armour"]],
+            ["Leak resistance", ["resistance.leaks"]],
+            ["Mast health", ["mast.bottomArmour", "mast.middleArmour", "mast.topArmour"]],
+            ["Mast thickness", ["mast.bottomThickness", "mast.middleThickness", "mast.topThickness"]],
+            ["Rudder health", ["rudder.armour"]],
+            ["Rudder repair time", ["repairTime.rudder"]],
+            ["Rudder speed", ["rudder.halfturnTime"]],
+            // ["Sail damage", [  ]],
+            // ["Sail health", [  ]],
+            ["Sail repair time", ["repairTime.sails"]],
+            ["Sailing crew", ["crew.sailing"]],
+            ["Ship speed", ["speed.max"]],
+            ["Side armour repair time", ["repairTime.sides"]],
+            ["Side armour", ["bow.armour", "sides.armour", "sails.armour", "structure.armour", "stern.armour"]],
+            ["Speed decrease", ["ship.deceleration"]],
+            ["Thickness", ["sides.thickness", "bow.thickness", "stern.thickness"]],
+            ["Turn speed", ["rudder.turnSpeed"]],
+            ["Water pump health", ["pump.armour"]]
         ]);
 
         if (this._baseId === "ship-journey") {
@@ -934,7 +965,7 @@ export default class CompareShips {
 
         if (this._baseId === "ship-journey") {
             this._initData();
-            this._initWoodSelect();
+            this._initSelects();
         } else {
             this._setupListener();
         }
@@ -1023,19 +1054,28 @@ export default class CompareShips {
             div.append("label")
                 .append("select")
                 .attr("name", shipId)
-                .attr("id", shipId);
+                .attr("id", shipId)
+                .attr("class", "selectpicker");
 
             ["frame", "trim"].forEach(type => {
                 const woodId = `${this._woodId}-${type}-${column}-select`;
                 div.append("label")
                     .append("select")
                     .attr("name", woodId)
-                    .attr("id", woodId);
+                    .attr("id", woodId)
+                    .attr("class", "selectpicker");
             });
 
             div.append("div")
                 .attr("id", `${this._baseId}-${column}`)
                 .attr("class", `${column === "Base" ? "ship-base" : "ship-compare"}`);
+
+            div.append("label")
+                .append("select")
+                .attr("name", `${this._upgradeId}-${column}-select`)
+                .attr("id", `${this._upgradeId}-${column}-select`)
+                .property("multiple", true)
+                .attr("class", "selectpicker");
         });
     }
 
@@ -1044,14 +1084,14 @@ export default class CompareShips {
         this.woodCompare._setupData();
     }
 
-    _initWoodSelect() {
+    _initSelects() {
         this._columns.forEach(columnId => {
             this._setupShipSelect(columnId);
             ["frame", "trim"].forEach(type => {
                 const select$ = $(`#${this._woodId}-${type}-${columnId}-select`);
                 this.woodCompare._setupWoodSelects(columnId, type, select$);
             });
-
+            this._setupUpgradesSelect(columnId);
             this._setupSelectListener(columnId);
         });
     }
@@ -1063,14 +1103,14 @@ export default class CompareShips {
     _initModal() {
         this._initData();
         this._injectModal();
-        this._initWoodSelect();
+        this._initSelects();
     }
 
     /**
      * Get select options
      * @returns {string} HTML formatted option
      */
-    _getOptions() {
+    _getShipOptions() {
         return this.shipSelectData
             .map(
                 key =>
@@ -1092,9 +1132,39 @@ export default class CompareShips {
      * @returns {void}
      */
     _setupShipSelect(columnId) {
-        // console.log("_setupShipSelect", columnId, `#${this._baseId}-${columnId}-select`);
-        const select$ = $(`#${this._baseId}-${columnId}-select`),
-            options = this._getOptions();
+        const select$ = $(`#${this._baseId}-${columnId}-select`);
+        const options = this._getShipOptions();
+
+        select$.append(options);
+        if (columnId !== "Base") {
+            select$.attr("disabled", "disabled");
+        }
+    }
+
+    /**
+     * Get select options
+     * @returns {string} HTML formatted option
+     */
+    _getUpgradesOptions() {
+        return this._upgradeDataDefault
+            .map(
+                type =>
+                    `<optgroup label="${type[0]}">${type[1]
+                        .map(module => `<option value="${module.id}">${module.name}`)
+                        .join("</option>")}`
+            )
+            .join("</optgroup>");
+    }
+
+    /**
+     * Setup upgrades select
+     * @param {string} columnId - Column id
+     * @returns {void}
+     */
+    _setupUpgradesSelect(columnId) {
+        const select$ = $(`#${this._upgradeId}-${columnId}-select`);
+        const options = this._getUpgradesOptions();
+
         select$.append(options);
         if (columnId !== "Base") {
             select$.attr("disabled", "disabled");
@@ -1111,6 +1181,7 @@ export default class CompareShips {
         let shipData = this._shipData.filter(ship => ship.id === shipId)[0];
 
         shipData = this._addWoodData(shipData, columnId);
+        shipData = this._addUpgradesData(shipData, columnId);
 
         return shipData;
     }
@@ -1177,6 +1248,55 @@ export default class CompareShips {
     }
 
     /**
+     * Add upgrade changes to ship data
+     * @param {*} shipData - Ship id
+     * @param {*} compareId - Column id
+     * @returns {Object} - Updated ship data
+     */
+    _addUpgradesData(shipData, compareId) {
+        const data = JSON.parse(JSON.stringify(shipData));
+        const modifierAmount = new Map();
+
+        // Add modifier amount
+        this.woodCompare._instances[compareId][dataLink][type].properties.forEach(property => {
+            if (this._upgradeChanges.has(property.modifier)) {
+                modifierAmount.set(
+                    property.modifier,
+                    modifierAmount.has(property.modifier)
+                        ? modifierAmount.get(property.modifier) + property.amount
+                        : property.amount
+                );
+            }
+        });
+
+        modifierAmount.forEach((value, key) => {
+            this._upgradeChanges.get(key).forEach(modifier => {
+                const index = modifier.split("."),
+                    factor = 1 + modifierAmount.get(key) / 100;
+
+                if (index.length > 1) {
+                    if (data[index[0]][index[1]]) {
+                        data[index[0]][index[1]] *= factor;
+                    } else {
+                        data[index[0]][index[1]] = modifierAmount.get(key);
+                    }
+                } else if (data[index[0]]) {
+                    data[index[0]] *= factor;
+                } else {
+                    data[index[0]] = modifierAmount.get(key);
+                }
+            });
+        });
+
+        data.speedDegrees = data.speedDegrees.map(speed => {
+            const factor = 1 + modifierAmount.get("Ship speed") / 100;
+            return Math.max(Math.min(speed * factor, this._maxSpeed), this._minSpeed);
+        });
+
+        return data;
+    }
+
+    /**
      * Refresh ship data
      * @param {*} shipId - Ship id
      * @param {*} compareId - Column id
@@ -1221,6 +1341,17 @@ export default class CompareShips {
         });
     }
 
+    _upgradeSelected(compareId, selectUpgrades$) {
+        const selectedUpgradeIds = Array.from(selectUpgrades$.selectedOptions).map(option => +option.value);
+        console.log(selectedUpgradeIds);
+
+        this._selectedUpgrades = this._upgradeDataDefault.forEach(type =>
+            type[1].filter(module => selectedUpgradeIds.includes(module.id)).map(module => module.properties)
+        );
+        //    .filter(type => type)
+        console.log(this._selectedUpgrades);
+    }
+
     /**
      * Listener for the select
      * @param {string} compareId - Column id
@@ -1229,7 +1360,6 @@ export default class CompareShips {
     _setupSelectListener(compareId) {
         const selectShip$ = $(`#${this._baseId}-${compareId}-select`);
         selectShip$
-            .addClass("selectpicker")
             .on("changed.bs.select", event => {
                 event.preventDefault();
                 const shipId = +selectShip$.val();
@@ -1246,9 +1376,8 @@ export default class CompareShips {
         ["frame", "trim"].forEach(type => {
             const select$ = $(`#${this._woodId}-${type}-${compareId}-select`);
             select$
-                .addClass("selectpicker")
                 .on("changed.bs.select", () => {
-                    this.woodCompare._woodSelected(compareId, type, select$);
+                    this._woodSelected(compareId, type, select$);
                     const shipId = +selectShip$.val();
                     this._refreshShips(shipId, compareId);
                 })
@@ -1256,6 +1385,21 @@ export default class CompareShips {
                 .val("default")
                 .selectpicker("refresh");
         });
+
+        const selectUpgrades = document.getElementById(`${this._upgradeId}-${compareId}-select`);
+        $(selectUpgrades)
+            .on("changed.bs.select", () => {
+                this._upgradeSelected(compareId, selectUpgrades);
+                const shipId = +selectShip$.val();
+                this._refreshShips(shipId, compareId);
+            })
+            .selectpicker({
+                selectedTextFormat: "count > 1",
+                countSelectedText(amount) {
+                    return `${amount} upgrades selected`;
+                },
+                title: "Select upgrades"
+            });
     }
 
     get woodCompare() {
