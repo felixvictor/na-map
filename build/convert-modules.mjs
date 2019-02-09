@@ -289,9 +289,7 @@ function convertModules() {
             module.moduleType === "Hidden"
         ) {
             module.type = "Ship trim";
-        } else if (module.isBowFigure) {
-            module.type = "Bow figure";
-        } else if (module.moduleType === "Permanent" && !module.name.endsWith(" Bonus") && !module.isBowFigure) {
+        } else if (module.moduleType === "Permanent" && !module.name.endsWith(" Bonus")) {
             module.type = "Permanent";
         } else if (
             module.usageType === "All" &&
@@ -321,23 +319,25 @@ function convertModules() {
             });
         });
 
-        delete module.isBowFigure;
         delete module.moduleType;
         delete module.sortingGroup;
     }
 
     apiItems
-        .filter(item => item.ItemType === "Module")
+        .filter(
+            item =>
+                item.ItemType === "Module" &&
+                ((item.ModuleType === "Permanent" && !item.NotUsed) || item.ModuleType !== "Permanent")
+        )
         .forEach(apiModule => {
             let dontSave = false;
             const module = {
                 id: apiModule.Id,
-                name: apiModule.Name.replaceAll("'", "’").replace("Bow figure - ", ""),
+                name: apiModule.Name.replaceAll("'", "’"),
                 usageType: apiModule.UsageType,
                 APImodifiers: apiModule.Modifiers,
                 sortingGroup: apiModule.SortingGroup.replace("module:", ""),
-                isBowFigure: apiModule.bIsBowFigure,
-                isStackable: apiModule.bCanBeSetWithSameType,
+                // isStackable: !!apiModule.bCanBeSetWithSameType,
                 // minResourcesAmount: APImodule.MinResourcesAmount,
                 // maxResourcesAmount: APImodule.MaxResourcesAmount,
                 // breakUpItemsAmount: APImodule.BreakUpItemsAmount,
@@ -347,6 +347,10 @@ function convertModules() {
                 moduleLevel: levels.get(apiModule.ModuleLevel)
             };
 
+            if (module.name.startsWith("Bow figure - ")) {
+                module.name = module.name.replace("Bow figure - ", "");
+                module.moduleLevel = "U";
+            }
             // Ignore double entries
             if (!modules.has(module.name + module.moduleLevel)) {
                 // Check for wood module
