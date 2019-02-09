@@ -1016,7 +1016,7 @@
                 "type": "Permanent – Gunnery"
             },
             {
-                "id": 1024,
+                "id": 1026,
                 "name": "Notched Angles",
                 "usageType": "All",
                 "moduleLevel": "U",
@@ -1155,7 +1155,7 @@
                 "type": "Permanent – Gunnery"
             },
             {
-                "id": 1149,
+                "id": 1148,
                 "name": "Swing bed and elevating screw",
                 "usageType": "All",
                 "moduleLevel": "U",
@@ -1294,7 +1294,7 @@
                 "type": "Permanent – Speed/turn"
             },
             {
-                "id": 200,
+                "id": 198,
                 "name": "Copper Plating",
                 "usageType": "All",
                 "moduleLevel": "U",
@@ -1384,14 +1384,13 @@
                 "type": "Permanent – Speed/turn"
             },
             {
-                "id": 1154,
+                "id": 1153,
                 "name": "Lead Sheathing",
                 "usageType": "All",
                 "moduleLevel": "U",
                 "properties": [
-                    { "modifier": "Side armour", "amount": -2, "absolute": false },
-                    { "modifier": "Ship speed", "amount": 3.5, "absolute": false },
-                    { "modifier": "Rudder health", "amount": -5, "absolute": false }
+                    { "modifier": "Side armour", "amount": -5, "absolute": false },
+                    { "modifier": "Ship speed", "amount": 1.5, "absolute": false }
                 ],
                 "type": "Permanent – Speed/turn"
             },
@@ -1579,14 +1578,6 @@
                 "type": "Permanent – Survival"
             },
             {
-                "id": 228,
-                "name": "Additional workforce TEST",
-                "usageType": "All",
-                "moduleLevel": "U",
-                "properties": [{ "modifier": "Double shot", "amount": 1, "absolute": true }],
-                "type": "Permanent – Survival"
-            },
-            {
                 "id": 1798,
                 "name": "Apprentice Carpenters",
                 "usageType": "All",
@@ -1655,7 +1646,7 @@
                 "type": "Permanent – Survival"
             },
             {
-                "id": 1129,
+                "id": 1131,
                 "name": "Coles-Bentinck Pump",
                 "usageType": "All",
                 "moduleLevel": "U",
@@ -2338,7 +2329,7 @@
                 "type": "Ship knowledge – Boarding"
             },
             {
-                "id": 124,
+                "id": 126,
                 "name": "Drinking",
                 "usageType": "All",
                 "moduleLevel": "U",
@@ -2693,7 +2684,7 @@
         "Ship knowledge – Gunnery",
         [
             {
-                "id": 188,
+                "id": 192,
                 "name": "Aiming",
                 "usageType": "All",
                 "moduleLevel": "U",
@@ -2735,7 +2726,7 @@
                 "type": "Ship knowledge – Gunnery"
             },
             {
-                "id": 1143,
+                "id": 1141,
                 "name": "Instructions aux Canonniers",
                 "usageType": "All",
                 "moduleLevel": "U",
@@ -2783,7 +2774,7 @@
                 "type": "Ship knowledge – Gunnery"
             },
             {
-                "id": 543,
+                "id": 545,
                 "name": "Mortar Handbook",
                 "usageType": "All",
                 "moduleLevel": "U",
@@ -2858,7 +2849,7 @@
                 "type": "Ship knowledge – Gunnery"
             },
             {
-                "id": 1137,
+                "id": 1136,
                 "name": "Sur le Canonnage a Bord",
                 "usageType": "All",
                 "moduleLevel": "U",
@@ -2873,7 +2864,7 @@
                 "type": "Ship knowledge – Gunnery"
             },
             {
-                "id": 1138,
+                "id": 1139,
                 "name": "Table of Parts of Ships of War",
                 "usageType": "All",
                 "moduleLevel": "U",
@@ -2881,7 +2872,7 @@
                 "type": "Ship knowledge – Gunnery"
             },
             {
-                "id": 1151,
+                "id": 1150,
                 "name": "The old Flag Officer",
                 "usageType": "All",
                 "moduleLevel": "U",
@@ -2962,7 +2953,7 @@
                 "type": "Ship knowledge – Speed/turn"
             },
             {
-                "id": 1216,
+                "id": 1217,
                 "name": "Art of Steering by Rudder",
                 "usageType": "All",
                 "moduleLevel": "U",
@@ -3364,7 +3355,7 @@
                 "type": "Ship knowledge – Survival"
             },
             {
-                "id": 165,
+                "id": 163,
                 "name": "Pump Training",
                 "usageType": "All",
                 "moduleLevel": "U",
@@ -3692,7 +3683,7 @@
                 "type": "Ship trim"
             },
             {
-                "id": 341,
+                "id": 338,
                 "name": "Planking hidden",
                 "usageType": "All",
                 "moduleLevel": "U",
@@ -3734,7 +3725,7 @@
                 "type": "Ship trim"
             },
             {
-                "id": 352,
+                "id": 349,
                 "name": "Speed",
                 "usageType": "All",
                 "moduleLevel": "U",
@@ -3742,7 +3733,7 @@
                 "type": "Ship trim"
             },
             {
-                "id": 354,
+                "id": 355,
                 "name": "Stiffness",
                 "usageType": "All",
                 "moduleLevel": "U",
