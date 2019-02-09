@@ -20,10 +20,11 @@ import {
     radialLine as d3RadialLine
 } from "d3-shape";
 
-import { formatInt, formatFloat, getOrdinal, isEmpty, roundToThousands } from "../util";
 import { registerEvent } from "../analytics";
-import CompareWoods from "./compare-woods";
 import { colourRed, colourRedDark, colourWhite, colourGreen, colourGreenDark, insertBaseModal } from "../common";
+import { formatInt, formatFloat, getOrdinal, isEmpty, roundToThousands, sortBy } from "../util";
+
+import CompareWoods from "./compare-woods";
 
 const numSegments = 24,
     segmentRadians = (2 * Math.PI) / numSegments,
@@ -997,15 +998,7 @@ export default class CompareShips {
                         battleRating: ship.battleRating,
                         guns: ship.guns
                     }))
-                    .sort((a, b) => {
-                        if (a.name < b.name) {
-                            return -1;
-                        }
-                        if (a.name > b.name) {
-                            return 1;
-                        }
-                        return 0;
-                    })
+                    .sort(sortBy(["name"]))
             );
     }
 
