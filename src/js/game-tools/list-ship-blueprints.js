@@ -9,9 +9,10 @@
  */
 
 import { select as d3Select } from "d3-selection";
-import { formatInt } from "../util";
+
 import { registerEvent } from "../analytics";
 import { insertBaseModal } from "../common";
+import { formatInt, sortBy } from "../util";
 
 export default class ListShipBlueprints {
     constructor(blueprintData, woodData) {
@@ -84,26 +85,8 @@ export default class ListShipBlueprints {
     }
 
     _setupWoodOptions() {
-        const frameSelectData = this._woodData.frame.sort((a, b) => {
-            if (a.name < b.name) {
-                return -1;
-            }
-            if (a.name > b.name) {
-                return 1;
-            }
-            return 0;
-        });
-        const trimSelectData = this._woodData.trim
-            .filter(trim => trim.name !== "Light")
-            .sort((a, b) => {
-                if (a.name < b.name) {
-                    return -1;
-                }
-                if (a.name > b.name) {
-                    return 1;
-                }
-                return 0;
-            });
+        const frameSelectData = this._woodData.frame.sort(sortBy(["name"]));
+        const trimSelectData = this._woodData.trim.filter(trim => trim.name !== "Light").sort(sortBy(["name"]));
 
         this._woodOptions.frame = frameSelectData.map(wood => `<option value="${wood.name}">${wood.name}</option>`);
         this._woodOptions.trim = trimSelectData.map(wood => `<option value="${wood.name}">${wood.name}</option>`);
