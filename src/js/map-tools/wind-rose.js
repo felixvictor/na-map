@@ -23,13 +23,7 @@ import { degreesPerSecond, insertBaseModal } from "../common";
 
 export default class WindRose {
     constructor() {
-        this._height = this._getHeight();
-        this._yCompass = this._height / 2;
-        this._width = this._height;
-        this._xCompass = this._width / 2;
         this._line = d3Line();
-        this._compassRadius = Math.min(this._height, this._width) / 2;
-        this._length = this._compassRadius * 0.6;
         this._windPath = null;
 
         this._windArrowWidth = 4;
@@ -73,12 +67,12 @@ export default class WindRose {
     }
 
     _getHeight() {
-        const div = document.querySelector("#port-summary div.d-flex div.block");
-        const { height } = div.getBoundingClientRect();
+        const div = document.querySelector("#port-summary .block");
+        const { height, top } = div.getBoundingClientRect();
         const paddingTop = parseFloat(window.getComputedStyle(div).getPropertyValue("padding-top"));
         const paddingBottom = parseFloat(window.getComputedStyle(div).getPropertyValue("padding-bottom"));
 
-        return height - paddingTop - paddingBottom;
+        return height - top - paddingTop - paddingBottom;
     }
 
     _getCurrentWindCookie() {
@@ -121,7 +115,7 @@ export default class WindRose {
     }
 
     _setupSvg() {
-        this._div = d3Select("#port-summary div.d-flex")
+        this._div = d3Select("#port-summary")
             .insert("div", ":first-child")
             .attr("id", this._baseId)
             .classed("block", true);
@@ -215,7 +209,7 @@ export default class WindRose {
         // Show modal
         $(`#${this._modalId}`)
             .modal("show")
-            .on("hidden.bs.modal", () => {
+            .one("hidden.bs.modal", () => {
                 this._useUserInput();
             });
     }
@@ -238,7 +232,7 @@ export default class WindRose {
 
     _initShowCurrentWind() {
         this._setupSvg();
-        this._printCompassRose();
+        this._initPrintCompassRose();
         this._updateWindDirection();
         this._intervalId = window.setInterval(() => {
             this._windChange();
@@ -258,7 +252,14 @@ export default class WindRose {
         this._storeCurrentWindCookie();
     }
 
-    _printCompassRose() {
+    _initPrintCompassRose() {
+        this._height = this._getHeight();
+        this._yCompass = this._height / 2;
+        this._width = this._height;
+        this._xCompass = this._width / 2;
+        this._compassRadius = Math.min(this._height, this._width) / 2;
+        this._length = this._compassRadius * 0.6;
+
         this._svg.attr("height", this._height).attr("width", this._width);
 
         // Compass rose
