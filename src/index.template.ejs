@@ -36,11 +36,6 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
 
-            <li class="nav-item pr-2">
-                <label><select title="Select single port" name="port-names-select"
-                               id="port-names-select"></select></label>
-            </li>
-
             <li id="selectPortNavbar" class="nav-item dropdown pr-2">
                 <a class="nav-link dropdown-toggle" href="#" id="propertyDropdown" role="button" data-toggle="dropdown"
                    aria-haspopup="true" aria-expanded="false">
@@ -177,8 +172,15 @@
             </li>
 
             <li class="nav-item pr-2">
-                <label><select title="Select good" name="buy-goods-select"
-                               id="buy-goods-select"></select></label>
+                <label><select name="port-names-select" id="port-names-select" class="d-none"></select></label>
+            </li>
+
+            <li class="nav-item pr-2">
+                <label><select name="buy-goods-select" id="buy-goods-select" class="d-none"></select></label>
+            </li>
+
+            <li class="nav-item pr-2">
+                <label><select name="inventory-select" id="inventory-select" class="d-none"></select></label>
             </li>
         </ul>
 
@@ -246,12 +248,12 @@
                     <div class="col-auto align-self-center radio-group ml-1" id="server-name">
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" class="custom-control-input"
-                                   name="serverName" id="server-name-eu1" value="eu1">
+                                   name="server-name" id="server-name-eu1" value="eu1">
                             <label class="custom-control-label" for="server-name-eu1">War (Caribbean)</label>
                         </div>
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" class="custom-control-input"
-                                   name="serverName" id="server-name-eu2" value="eu2">
+                                   name="server-name" id="server-name-eu2" value="eu2">
                             <label class="custom-control-label" for="server-name-eu2">Peace (PvE)</label>
                         </div>
                     </div>
@@ -261,32 +263,32 @@
                     <div class="col-auto align-self-center radio-group ml-1" id="show-radius">
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" class="custom-control-input"
-                                   name="showRadius" id="show-radius-attack" value="attack">
+                                   name="show-radius" id="show-radius-attack" value="attack">
                             <label class="custom-control-label" for="show-radius-attack">Attack</label>
                         </div>
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" class="custom-control-input"
-                                   name="showRadius" id="show-radius-position" value="position">
+                                   name="show-radius" id="show-radius-position" value="position">
                             <label class="custom-control-label" for="show-radius-position">Position</label>
                         </div>
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" class="custom-control-input"
-                                   name="showRadius" id="show-radius-tax" value="tax">
+                                   name="show-radius" id="show-radius-tax" value="tax">
                             <label class="custom-control-label" for="show-radius-tax">Tax income</label>
                         </div>
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" class="custom-control-input"
-                                   name="showRadius" id="show-radius-net" value="net">
+                                   name="show-radius" id="show-radius-net" value="net">
                             <label class="custom-control-label" for="show-radius-net">Net income</label>
                         </div>
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" class="custom-control-input"
-                                   name="showRadius" id="show-radius-green" value="green">
+                                   name="show-radius" id="show-radius-green" value="green">
                             <label class="custom-control-label" for="show-radius-green">Reinforcement zones</label>
                         </div>
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" class="custom-control-input"
-                                   name="showRadius" id="show-radius-off" value="off">
+                                   name="show-radius" id="show-radius-off" value="off">
                             <label class="custom-control-label" for="show-radius-off">Off</label>
                         </div>
                     </div>
@@ -296,49 +298,64 @@
                     <div class="col-auto align-self-center radio-group ml-1" id="show-pb">
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" class="custom-control-input"
-                                   name="showPB" id="show-pb-all" value="all" checked>
+                                   name="show-pb" id="show-pb-all" value="all" checked>
                             <label class="custom-control-label" for="show-pb-all">All ports</label>
                         </div>
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" class="custom-control-input"
-                                   name="showPB" id="show-pb-single" value="single">
+                                   name="show-pb" id="show-pb-single" value="single">
                             <label class="custom-control-label" for="show-pb-single">Single port</label>
                         </div>
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" class="custom-control-input"
-                                   name="showPB" id="show-pb-off" value="off">
+                                   name="show-pb" id="show-pb-off" value="off">
                             <label class="custom-control-label" for="show-pb-off">Off</label>
                         </div>
 
                     </div>
 
                     <div class="dropdown-divider"></div>
-                    <h6 class="dropdown-header">Show layer</h6>
-                    <div class="col-auto align-self-center radio-group ml-1" id="show-layer">
+                    <h6 class="dropdown-header">Show trades</h6>
+                    <div class="col-auto align-self-center radio-group ml-1" id="show-trades-show">
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" class="custom-control-input"
-                                   name="showLayer" id="show-layer-grid" value="grid">
-                            <label class="custom-control-label" for="show-layer-grid">Grid</label>
+                                   name="show-trades-show" id="show-trades-show-on" value="on">
+                            <label class="custom-control-label" for="show-trades-show-on">On</label>
                         </div>
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" class="custom-control-input"
-                                   name="showLayer" id="show-layer-off" value="off">
-                            <label class="custom-control-label" for="show-layer-off">Off</label>
+                                   name="show-trades-show" id="show-trades-show-off" value="off">
+                            <label class="custom-control-label" for="show-trades-show-off">Off</label>
+                        </div>
+                    </div>
+
+                    <div class="dropdown-divider"></div>
+                    <h6 class="dropdown-header">Show grid</h6>
+                    <div class="col-auto align-self-center radio-group ml-1" id="show-grid">
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input"
+                                   name="show-grid" id="show-grid-on" value="on">
+                            <label class="custom-control-label" for="show-grid-on">On</label>
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input"
+                                   name="show-grid" id="show-grid-off" value="off">
+                            <label class="custom-control-label" for="show-grid-off">Off</label>
                         </div>
                     </div>
 
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Double click to</h6>
-                    <div class="col-auto align-self-center radio-group m-1" id="doubleClick-action">
+                    <div class="col-auto align-self-center radio-group ml-1" id="double-click-action">
                         <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input" name="doubleClickAction"
-                                   id="doubleClick-action-compass" value="compass">
-                            <label class="custom-control-label" for="doubleClick-action-compass">Plot a course</label>
+                            <input type="radio" class="custom-control-input" name="double-click-action"
+                                   id="double-click-action-compass" value="compass">
+                            <label class="custom-control-label" for="double-click-action-compass">Plot a course</label>
                         </div>
                         <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input" name="doubleClickAction"
-                                   id="doubleClick-action-f11" value="f11">
-                            <label class="custom-control-label" for="doubleClick-action-f11">Show <span
+                            <input type="radio" class="custom-control-input" name="double-click-action"
+                                   id="double-click-action-f11" value="f11">
+                            <label class="custom-control-label" for="double-click-action-f11">Show <span
                                         class="caps">F11</span>
                                 coordinates</label>
                         </div>
@@ -355,6 +372,13 @@
 
 <main role="main" class="container-fluid">
     <div id="na-map" class="central"></div>
+    <div id="axis-x" class="axis-x d-none"><svg class="axis"></svg></div>
+    <div class="flex-overlay">
+        <div id="axis-y" class="axis-y d-none"><svg class="axis"></svg></div>
+        <div id="wind" class="wind-predict"><svg class="coord d-none"></svg></div>
+        <div id="toast-section" aria-live="polite" aria-atomic="true" class="toasts"></div>
+        <div id="summary-column" class="summary-column"></div>
+    </div>
     <div id="modal-section"></div>
 </main>
 

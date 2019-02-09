@@ -5,6 +5,8 @@
 
 import fs from "fs";
 
+export const speedFactor = 390;
+
 const transformMatrix = {
         A: -0.00499866779363828,
         B: -0.00000021464254980645,
@@ -25,10 +27,10 @@ export const convertCoordX = (x, y) => transformMatrix.A * x + transformMatrix.B
 export const convertCoordY = (x, y) => transformMatrix.B * x - transformMatrix.A * y + transformMatrix.D;
 
 // svg coord to F11 coord
-export const convertInvCoordX = () => transformMatrixInv.A * x + transformMatrixInv.B * y + transformMatrixInv.C;
+export const convertInvCoordX = (x, y) => transformMatrixInv.A * x + transformMatrixInv.B * y + transformMatrixInv.C;
 
 // svg coord to F11 coord
-export const convertInvCoordY = () => transformMatrixInv.B * x - transformMatrixInv.A * y + transformMatrixInv.D;
+export const convertInvCoordY = (x, y) => transformMatrixInv.B * x - transformMatrixInv.A * y + transformMatrixInv.D;
 
 export const nations = [
     { id: 0, short: "NT", name: "Neutral", sortName: "Neutral" },
@@ -209,9 +211,9 @@ export function isEmpty(obj) {
 Math.radiansToDegrees = radians => (radians * 180) / Math.PI;
 
 /**
- * @typedef {Array} Point
- * @property {number} 0 - X Coordinate
- * @property {number} 1 - Y Coordinate
+ * @typedef {number[]} Point
+ * @property {number} 0 - X coordinate
+ * @property {number} 1 - Y coordinate
  */
 
 /**
@@ -249,7 +251,7 @@ export const rotationAngleInRadians = (centerPt, targetPt) =>
  * @return {Number} Distance between centerPt and targetPt
  */
 export const distancePoints = (centerPt, targetPt) =>
-    Math.sqrt((centerPt[0] - targetPt[0]) ** 2 + (centerPt[1] - targetPt[1]) ** 2);
+    Math.sqrt((centerPt.x - targetPt.x) ** 2 + (centerPt.y - targetPt.y) ** 2);
 
 /**
  * Convert degrees to radians
@@ -304,4 +306,24 @@ export function groupBy(list, keyGetter) {
         }
     });
     return map;
+}
+
+/**
+ * Calculate the k distance between two svg coordinates
+ * @function
+ * @param {Point} pt0 - First point
+ * @param {Point} pt1 - Second point
+ * @return {Number} Distance between Pt0 and Pt1 in k
+ */
+export function getDistance(pt0, pt1) {
+    const F11_0 = {
+            x: convertInvCoordX(pt0.x, pt0.y),
+            y: convertInvCoordY(pt0.x, pt0.y)
+        },
+        F11_1 = {
+            x: convertInvCoordX(pt1.x, pt1.y),
+            y: convertInvCoordY(pt1.x, pt1.y)
+        };
+
+    return distancePoints(F11_0, F11_1) / (2.63 * speedFactor);
 }

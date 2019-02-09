@@ -333,61 +333,67 @@ function convertModules() {
         delete module.sortingGroup;
     }
 
-    apiItems.filter(item => item.ItemType === "Module").forEach(apiMpdule => {
-        let dontSave = false;
-        const module = {
-            id: apiMpdule.Id,
-            name: apiMpdule.Name.replaceAll("'", "’").replace("Bow figure - ", ""),
-            usageType: apiMpdule.UsageType,
-            APImodifiers: apiMpdule.Modifiers,
-            sortingGroup: apiMpdule.SortingGroup.replace("module:", ""),
-            isBowFigure: apiMpdule.bIsBowFigure,
-            isStackable: apiMpdule.bCanBeSetWithSameType,
-            // minResourcesAmount: APImodule.MinResourcesAmount,
-            // maxResourcesAmount: APImodule.MaxResourcesAmount,
-            // breakUpItemsAmount: APImodule.BreakUpItemsAmount,
-            // canBeBreakedUp: APImodule.CanBeBreakedUp,
-            // bCanBeBreakedUp: APImodule.bCanBeBreakedUp,
-            moduleType: apiMpdule.ModuleType,
-            moduleLevel: levels.get(apiMpdule.ModuleLevel)
-        };
+    apiItems
+        .filter(item => item.ItemType === "Module")
+        .forEach(apiModule => {
+            let dontSave = false;
+            const module = {
+                id: apiModule.Id,
+                name: apiModule.Name.replaceAll("'", "’").replace("Bow figure - ", ""),
+                usageType: apiModule.UsageType,
+                APImodifiers: apiModule.Modifiers,
+                sortingGroup: apiModule.SortingGroup.replace("module:", ""),
+                isBowFigure: apiModule.bIsBowFigure,
+                isStackable: apiModule.bCanBeSetWithSameType,
+                // minResourcesAmount: APImodule.MinResourcesAmount,
+                // maxResourcesAmount: APImodule.MaxResourcesAmount,
+                // breakUpItemsAmount: APImodule.BreakUpItemsAmount,
+                // canBeBreakedUp: APImodule.CanBeBreakedUp,
+                // bCanBeBreakedUp: APImodule.bCanBeBreakedUp,
+                moduleType: apiModule.ModuleType,
+                moduleLevel: levels.get(apiModule.ModuleLevel)
+            };
 
-        // Ignore double entries
-        if (!modules.has(module.name + module.moduleLevel)) {
-            // Check for wood module
-            if (module.name.endsWith(" Planking") || module.name.endsWith(" Frame") || module.name === "Crew Space") {
-                setWood(module);
-                dontSave = true;
-            } else {
-                setModuleModifier(module);
-                setModuleType(module);
+            // Ignore double entries
+            if (!modules.has(module.name + module.moduleLevel)) {
+                // Check for wood module
                 if (
-                    module.type.startsWith("Not used") ||
-                    module.name === "Gifted" ||
-                    module.name === "Coward" ||
-                    module.name === "Doctor" ||
-                    module.name === "Dreadful" ||
-                    module.name === "Expert Surgeon" ||
-                    module.name === "Frigate Master" ||
-                    module.name === "Gifted" ||
-                    module.name === "Light Ship Master" ||
-                    module.name === "Lineship Master" ||
-                    module.name === "Press Gang" ||
-                    module.name === "Signaling" ||
-                    module.name === "Thrifty" ||
-                    module.name === "Lead Sheating" ||
-                    module.name === "TEST MODULE SPEED IN OW" ||
-                    module.name === "Cannon nation module - France" ||
-                    module.name.endsWith(" - OLD")
+                    module.name.endsWith(" Planking") ||
+                    module.name.endsWith(" Frame") ||
+                    module.name === "Crew Space"
                 ) {
+                    setWood(module);
                     dontSave = true;
                 } else {
-                    // console.log(module.id, module.name);
+                    setModuleModifier(module);
+                    setModuleType(module);
+                    if (
+                        module.type.startsWith("Not used") ||
+                        module.name === "Gifted" ||
+                        module.name === "Coward" ||
+                        module.name === "Doctor" ||
+                        module.name === "Dreadful" ||
+                        module.name === "Expert Surgeon" ||
+                        module.name === "Frigate Master" ||
+                        module.name === "Gifted" ||
+                        module.name === "Light Ship Master" ||
+                        module.name === "Lineship Master" ||
+                        module.name === "Press Gang" ||
+                        module.name === "Signaling" ||
+                        module.name === "Thrifty" ||
+                        module.name === "Lead Sheating" ||
+                        module.name === "TEST MODULE SPEED IN OW" ||
+                        module.name === "Cannon nation module - France" ||
+                        module.name.endsWith(" - OLD")
+                    ) {
+                        dontSave = true;
+                    } else {
+                        // console.log(module.id, module.name);
+                    }
                 }
+                modules.set(module.name + module.moduleLevel, dontSave ? {} : module);
             }
-            modules.set(module.name + module.moduleLevel, dontSave ? {} : module);
-        }
-    });
+        });
 
     let result = Array.from(modules.values());
     result = result
