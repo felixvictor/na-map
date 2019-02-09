@@ -12,13 +12,13 @@
     margin-bottom: 1rem;
 
     .colour-slab {
-        padding: 0.5rem 0.75rem;
+        padding: .5rem .75rem;
     }
 
     .colour-slab-base {
         padding-top: 1rem;
         padding-bottom: 1rem;
-        margin-bottom: 0.25rem;
+        margin-bottom: .25rem;
     }
 
     @each $color, $value in $theme-colors {
