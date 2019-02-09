@@ -16,7 +16,7 @@ import "tempusdominus-core/build/js/tempusdominus-core";
 
 import { registerEvent } from "../analytics";
 import { initMultiDropdownNavbar, nations } from "../common";
-import { formatInt, formatSiCurrency, sortByName } from "../util";
+import { formatInt, formatSiCurrency, sortBy } from "../util";
 
 export default class SelectPorts {
     constructor(ports, pbZone, map) {
@@ -191,15 +191,7 @@ export default class SelectPorts {
                 name: d.name,
                 nation: d.nation
             }))
-            .sort((a, b) => {
-                if (a.name < b.name) {
-                    return -1;
-                }
-                if (a.name > b.name) {
-                    return 1;
-                }
-                return 0;
-            });
+            .sort(sortBy(["name"]));
         const options = `${selectPorts
             .map(
                 port =>
@@ -290,15 +282,7 @@ export default class SelectPorts {
 
     _setupNationSelect() {
         const options = `${nations
-            .sort((a, b) => {
-                if (a.sortName < b.sortName) {
-                    return -1;
-                }
-                if (a.sortName > b.sortName) {
-                    return 1;
-                }
-                return 0;
-            })
+            .sort(sortBy(["name"]))
             .map(nation => `<option value="${nation.short}">${nation.name}</option>`)
             .join("")}`;
 
@@ -457,7 +441,7 @@ export default class SelectPorts {
                 )
             )
         )
-            .sort(sortByName)
+            .sort(sortBy(["name"]))
             .map(port => {
                 const item = port.inventory.find(good => good.name === goodSelected);
 

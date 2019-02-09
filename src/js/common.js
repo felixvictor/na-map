@@ -3,8 +3,7 @@
  */
 
 import { select as d3Select } from "d3-selection";
-import { distancePoints, roundToThousands } from "./util";
-import { sortBy } from "../../build/common";
+import { distancePoints, roundToThousands, sortBy } from "./util";
 
 const transformMatrix = {
         A: -0.00499866779363828,
