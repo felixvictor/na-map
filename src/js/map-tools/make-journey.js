@@ -288,7 +288,7 @@ export default class Journey {
         // Show modal
         $(`#${this._modalId}`)
             .modal("show")
-            .on("hidden.bs.modal", () => {
+            .one("hidden.bs.modal", () => {
                 this._useUserInput();
             });
     }
@@ -531,17 +531,13 @@ export default class Journey {
 
     _setupSummary() {
         // Main box
-        this._divJourneySummary = d3Select("main")
+        this._divJourneySummary = d3Select("main #summary-column")
             .append("div")
             .attr("id", "journey-summary")
             .classed("journey-summary overlay d-none", true);
 
-        const mainDiv = this._divJourneySummary
-            .append("div")
-            .classed("d-flex justify-content-around align-items-end", true);
-
         // Selected ship
-        this._journeySummaryShip = mainDiv.append("div").classed("block", true);
+        this._journeySummaryShip = this._divJourneySummary.append("div").classed("block", true);
         this._journeySummaryTextWoods = this._journeySummaryShip.append("div");
         this._journeySummaryTextShip = this._journeySummaryShip.append("div");
         this._journeySummaryShip
@@ -550,14 +546,16 @@ export default class Journey {
             .text("selected ship");
 
         // Wind direction
-        this._journeySummaryWind = mainDiv.append("div").classed("block", true);
+        this._journeySummaryWind = this._divJourneySummary.append("div").classed("block", true);
         this._journeySummaryTextWind = this._journeySummaryWind.append("div");
         this._journeySummaryWind
             .append("div")
             .classed("des", true)
             .text("wind direction");
 
-        mainDiv
+        this._divJourneySummary
+            .append("div")
+            .classed("block", true)
             .append("button")
             .attr("id", this._deleteLastLegButtonId)
             .classed("btn btn-primary btn-sm", true)

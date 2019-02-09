@@ -10,15 +10,13 @@
 
 import { formatPrefix as d3FormatPrefix, formatLocale as d3FormatLocale } from "d3-format";
 import { scaleBand as d3ScaleBand } from "d3-scale";
-import Cookies from "js-cookie";
-import { appTitle } from "./common";
 
 /**
  * Default format
  */
 const formatLocale = d3FormatLocale({
     decimal: ".",
-    thousands: "\u202f",
+    thousands: "\u2009",
     grouping: [3],
     currency: ["", "\u00a0reals"],
     percent: "\u202f%"
@@ -86,6 +84,21 @@ export const formatInt = x =>
 export const formatSiInt = x =>
     formatLocale
         .format(",.2s")(x)
+        .replace(".0", "")
+        .replace("M", "\u2009\u1d0d") // LATIN LETTER SMALL CAPITAL M
+        .replace("k", "\u2009k")
+        .replace("m", "\u2009m")
+        .replace("-", "\u2212\u202f");
+
+/**
+ * Format currency with SI suffix
+ * @function
+ * @param {Number} x - Integer
+ * @return {String} Formatted Integer
+ */
+export const formatSiCurrency = x =>
+    formatLocale
+        .format("$,.2s")(x)
         .replace(".0", "")
         .replace("M", "\u2009\u1d0d") // LATIN LETTER SMALL CAPITAL M
         .replace("k", "\u2009k")
@@ -453,11 +466,13 @@ export function printCompassRose({ elem, radius }) {
     const label = elem
         .selectAll("g")
         .data(data)
-        .enter()
-        .append("g")
-        .attr(
-            "transform",
-            d => `rotate(${Math.round(xScale(d) + xScale.bandwidth() / 2 - 90)})translate(${innerRadius},0)`
+        .join(enter =>
+            enter
+                .append("g")
+                .attr(
+                    "transform",
+                    d => `rotate(${Math.round(xScale(d) + xScale.bandwidth() / 2 - 90)})translate(${innerRadius},0)`
+                )
         );
 
     label
@@ -524,10 +539,15 @@ export function printSmallCompassRose({ elem, radius }) {
     const x2Card = 6;
     elem.selectAll("line")
         .data(data)
-        .enter()
-        .append("line")
-        .attr("x2", (d, i) => (i % 3 !== 0 ? x2 : i % 6 !== 0 ? x2InterCard : x2Card))
-        .attr("transform", d => `rotate(${Math.round(xScale(d) + xScale.bandwidth() / 2)})translate(${innerRadius},0)`);
+        .join(enter =>
+            enter
+                .append("line")
+                .attr("x2", (d, i) => (i % 3 !== 0 ? x2 : i % 6 !== 0 ? x2InterCard : x2Card))
+                .attr(
+                    "transform",
+                    d => `rotate(${Math.round(xScale(d) + xScale.bandwidth() / 2)})translate(${innerRadius},0)`
+                )
+        );
 }
 
 /**
@@ -537,48 +557,22 @@ export function printSmallCompassRose({ elem, radius }) {
  */
 export const displayClan = clan => `<span class="caps">${clan}</span>`;
 
-/**
- * @typedef {object} cookieData
- * @property {string } name - Cookie name
- * @property {string[]} values - Possible cookie values
- * @property {string} default - Default cookie value
- */
-
-// Set cookies defaults (expiry 365 days)
-Cookies.defaults = {
-    expires: 365
+export const sort = (a, b) => {
+    if (a < b) {
+        return -1;
+    }
+    if (a > b) {
+        return 1;
+    }
+    return 0;
 };
 
-/**
- * Get cookie
- * @param {cookieData} cookieData - Cookie data
- * @returns {string} Cookie
- */
-export const getCookie = cookieData => {
-    let cookie = Cookies.get(cookieData.name);
-
-    if (typeof cookie === "undefined") {
-        // Use default value if cookie is not stored
-        cookie = cookieData.default;
-    } else if (!cookieData.values.includes(cookie)) {
-        // Use default value if cookie has invalid data and remove cookie
-        cookie = cookieData.default;
-        Cookies.remove(cookieData.name);
+export const sortByName = (a, b) => {
+    if (a.name < b.name) {
+        return -1;
     }
-
-    return cookie;
-};
-
-/**
- * Set cookie
- * @param {cookieData} cookieData - Cookie data
- * @param {string} cookie - Cookie value
- * @return {void}
- */
-export const setCookie = (cookieData, cookie) => {
-    if (cookie !== cookieData.default) {
-        Cookies.set(cookieData.name, cookie);
-    } else {
-        Cookies.remove(cookieData.name);
+    if (a.name > b.name) {
+        return 1;
     }
+    return 0;
 };
