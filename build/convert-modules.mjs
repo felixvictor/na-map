@@ -384,7 +384,8 @@ function convertModules() {
                         module.name === "Lead Sheating" ||
                         module.name === "TEST MODULE SPEED IN OW" ||
                         module.name === "Cannon nation module - France" ||
-                        module.name.endsWith(" - OLD")
+                        module.name.endsWith(" - OLD") ||
+                        module.name.endsWith("TEST")
                     ) {
                         dontSave = true;
                     } else {
