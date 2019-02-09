@@ -446,85 +446,62 @@ export default class SelectPorts {
         this.isInventorySelected = true;
 
         const goodSelected = this._inventorySelector.options[this._inventorySelector.selectedIndex].value;
-        const buyPortsFiltered = JSON.parse(
+        const buyGoods = new Map();
+        const sellGoods = new Map();
+        const portsFiltered = JSON.parse(
             JSON.stringify(
                 this._ports.portDataDefault.filter(
-                    port =>
-                        port.inventory &&
-                        port.inventory.some(good => good.name === goodSelected && good.buyQuantity > 0)
+                    port => port.inventory && port.inventory.some(good => good.name === goodSelected)
                 )
             )
-        );
-        const buyPorts = buyPortsFiltered.map(port => {
-            // eslint-disable-next-line no-param-reassign
-            port.sellInTradePort = true;
-            return port;
-        });
-        const buyPortsAvail = buyPortsFiltered
-            .map(port => ({
-                name: port.name,
-                nation: port.nation,
-                good: port.inventory.find(good => good.name === goodSelected)
-            }))
-            .sort(sortByName);
+        )
+            .sort(sortByName)
+            .map(port => {
+                const item = port.inventory.find(good => good.name === goodSelected);
 
-        const sellPortsFiltered = JSON.parse(
-            JSON.stringify(
-                this._ports.portDataDefault.filter(
-                    port =>
-                        port.inventory &&
-                        port.inventory.some(good => good.name === goodSelected && good.sellQuantity > 0)
-                )
-            )
-        );
-        const sellPorts = sellPortsFiltered.map(port => {
-            // eslint-disable-next-line prefer-destructuring,no-param-reassign
-            port.buyInTradePort = true;
-            return port;
-        });
-        const sellPortsAvail = sellPortsFiltered
-            .map(port => ({
-                name: port.name,
-                nation: port.nation,
-                good: port.inventory.find(good => good.name === goodSelected)
-            }))
-            .sort(sortByName);
+                if (item.buyQuantity > 0) {
+                    // eslint-disable-next-line no-param-reassign
+                    port.sellInTradePort = item.buyQuantity > 0;
+                    buyGoods.set(port.name, { name: port.name, nation: port.nation, good: item });
+                }
+                if (item.sellQuantity > 0) {
+                    // eslint-disable-next-line no-param-reassign
+                    port.buyInTradePort = item.sellQuantity > 0;
+                    sellGoods.set(port.name, { name: port.name, nation: port.nation, good: item });
+                }
+
+                return port;
+            });
 
         const getPortList = () => {
             let h = "";
 
             h += `<h5>${goodSelected}</h5>`;
-            if (buyPortsAvail.length) {
+            if (buyGoods.size) {
                 h += "<h6>Buy</h6>";
-                h += buyPortsAvail
-                    .map(
-                        port =>
-                            `${port.name} <span class="caps">${port.nation}</span>: ${formatInt(
-                                port.good.buyQuantity
-                            )} @ ${formatSiCurrency(port.good.buyPrice)}`
-                    )
-                    .join("<br>");
+                buyGoods.forEach(value => {
+                    h += `${value.name} <span class="caps">${value.nation}</span>: ${formatInt(
+                        value.good.buyQuantity
+                    )} @ ${formatSiCurrency(value.good.buyPrice)}<br>`;
+                });
             }
-            if (buyPortsAvail.length && sellPortsAvail.length) {
+            if (buyGoods && sellGoods) {
                 h += "<p></p>";
             }
-            if (sellPortsAvail.length) {
+            if (sellGoods.size) {
                 h += "<h6>Sell</h6>";
-                h += sellPortsAvail
-                    .map(
-                        port =>
-                            `${port.name} <span class="caps">${port.nation}</span>: ${formatInt(
-                                port.good.sellQuantity
-                            )} @ ${formatSiCurrency(port.good.sellPrice)}`
-                    )
-                    .join("<br>");
+                sellGoods.forEach(value => {
+                    h += `${value.name} <span class="caps">${value.nation}</span>: ${formatInt(
+                        value.good.sellQuantity
+                    )} @ ${formatSiCurrency(value.good.sellPrice)}<br>`;
+                });
             }
 
             return h;
         };
 
         this._ports.setShowRadiusSetting("off");
-        this._ports.portData = buyPorts.concat(sellPorts);
+        this._ports.portData = portsFiltered;
         this._ports.showTradePortPartners = true;
         this._ports.showCurrentGood = false;
         if (this._map.showTrades.listType !== "portList") {
