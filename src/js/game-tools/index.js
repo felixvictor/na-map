@@ -8,6 +8,9 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+import "bootstrap/js/dist/util";
+import "bootstrap/js/dist/modal";
+
 import CompareShips from "./compare-ships";
 import CompareWoods from "./compare-woods";
 import ListBuildings from "./list-buildings";
@@ -64,7 +67,7 @@ const dataSources = [
     },
     {
         fileName: "ship-blueprints.json",
-        name: "blueprints"
+        name: "shipBlueprints"
     }
 ];
 
@@ -74,7 +77,7 @@ const dataSources = [
  * @return {void}
  */
 const setupData = data => {
-    const shipCompare = new CompareShips(data.ships.shipData, data.woods);
+    const shipCompare = new CompareShips(data.ships, data.woods);
     const woodCompare = new CompareWoods(data.woods, "wood");
     const woodList = new ListWoods(data.woods);
 
@@ -90,7 +93,7 @@ const setupData = data => {
 
     const buildingList = new ListBuildings(data.buildings);
 
-    const blueprintList = new ListShipBlueprints(data.blueprints.shipBlueprints, data.woods);
+    const blueprintList = new ListShipBlueprints(data.shipBlueprints, data.woods);
 };
 
 /**
