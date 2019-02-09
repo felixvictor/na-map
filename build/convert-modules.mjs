@@ -1,5 +1,6 @@
 // eslint-disable-next-line import/extensions
 import { groupBy, readJson, saveJson, capitalizeFirstLetter } from "./common.mjs";
+import { sortBy } from "./common";
 
 const itemsFilename = process.argv[2],
     outDir = process.argv[3],
@@ -228,15 +229,7 @@ function convertModules() {
         // Sort by modifier
         ["frame", "trim"].forEach(type => {
             woodJson[type].forEach(APIwood => {
-                APIwood.properties.sort((a, b) => {
-                    if (a.modifier < b.modifier) {
-                        return -1;
-                    }
-                    if (a.modifier > b.modifier) {
-                        return 1;
-                    }
-                    return 0;
-                });
+                APIwood.properties.sort(sortBy(["modifier"]));
             });
         });
     }
@@ -397,29 +390,7 @@ function convertModules() {
         });
 
     let result = Array.from(modules.values());
-    result = result
-        .filter(module => Object.keys(module).length)
-        .sort((a, b) => {
-            if (a.type < b.type) {
-                return -1;
-            }
-            if (a.type > b.type) {
-                return 1;
-            }
-            if (a.name < b.name) {
-                return -1;
-            }
-            if (a.name > b.name) {
-                return 1;
-            }
-            if (a.moduleLevel < b.moduleLevel) {
-                return -1;
-            }
-            if (a.moduleLevel > b.moduleLevel) {
-                return 1;
-            }
-            return 0;
-        });
+    result = result.filter(module => Object.keys(module).length).sort(sortBy(["type", "name", "moduleLevel"]));
     const grouped = Array.from(groupBy(result, module => module.type));
 
     saveJson(`${outDir}/modules.json`, grouped);
