@@ -10,6 +10,7 @@
 
 // eslint-disable-next-line
 import { readJson, round, saveJson } from "./common.mjs";
+import { sortBy } from "./common";
 
 const inBaseFilename = process.argv[2],
     outFilename = process.argv[3],
@@ -71,15 +72,7 @@ const convertShipBlueprints = () => {
                     frames: apiBlueprint.WoodTypeDescs.map(wood => ({
                         name: itemNames.get(wood.Requirements[0].Template),
                         amount: wood.Requirements[0].Amount
-                    })).sort((a, b) => {
-                        if (a.name < b.name) {
-                            return -1;
-                        }
-                        if (a.name > b.name) {
-                            return 1;
-                        }
-                        return 0;
-                    }),
+                    })).sort(sortBy(["name"])),
                     trims: [
                         {
                             name: "Planking",
@@ -127,15 +120,7 @@ const convertShipBlueprints = () => {
                 };
             })
             // Sort by name
-            .sort((a, b) => {
-                if (a.name < b.name) {
-                    return -1;
-                }
-                if (a.name > b.name) {
-                    return 1;
-                }
-                return 0;
-            });
+            .sort(sortBy(["name"]));
 
     const data = getShipBlueprints();
 
