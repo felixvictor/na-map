@@ -9,9 +9,9 @@
 
 import "bootstrap/js/dist/util";
 import "bootstrap/js/dist/button";
-import "bootstrap/js/dist/collapse";
 import "bootstrap/js/dist/dropdown";
 import "bootstrap/js/dist/modal";
+import "bootstrap/js/dist/toast";
 import "bootstrap/js/dist/tooltip";
 
 import fontawesome from "@fortawesome/fontawesome";
@@ -29,9 +29,9 @@ import {
     faTrash
 } from "@fortawesome/fontawesome-free-solid";
 
+import Cookie from "./util/cookie";
+import RadioButton from "./util/radio-button";
 import { initAnalytics, registerPage } from "./analytics";
-import { appName } from "./common";
-import { getCookie, setCookie } from "./util";
 
 import "../scss/main.scss";
 
@@ -46,21 +46,34 @@ function main() {
     const baseId = "server-name";
 
     /**
-     * Server name cookie
-     * @type {cookieData}
+     * Possible values for server names (first is default value)
+     * @type {string[]}
+     * @private
      */
-    const serverNameCookie = { name: `${appName}--${baseId}`, values: ["eu1", "eu2"], default: "eu1" };
+    const radioButtonValues = ["eu1", "eu2"];
+
+    /**
+     * Server name cookie
+     * @type {Cookie}
+     */
+    const cookie = new Cookie(baseId, radioButtonValues);
+
+    /**
+     * Server name radio buttons
+     * @type {RadioButton}
+     */
+    const radios = new RadioButton(baseId, radioButtonValues);
 
     /**
      * Get server name from cookie or use default value
      * @returns {string} - server name
      */
     const getServerName = () => {
-        const serverName = getCookie(serverNameCookie);
+        const r = cookie.get();
 
-        document.getElementById(`${baseId}-${serverName}`).checked = true;
+        radios.set(r);
 
-        return serverName;
+        return r;
     };
 
     /**
@@ -70,25 +83,12 @@ function main() {
     let serverName = getServerName();
 
     /**
-     * Store server name in cookie
-     * @return {void}
-     */
-    const storeServerName = () => {
-        setCookie(serverNameCookie, serverName);
-    };
-
-    /**
      * Change server name
      * @return {void}
      */
     const serverNameSelected = () => {
-        serverName = document.querySelector("input[name='serverName']:checked").value;
-        // If data is invalid
-        if (!serverNameCookie.values.includes(serverName)) {
-            serverName = serverNameCookie.default;
-            document.getElementById(`${baseId}-${serverName}`).checked = true;
-        }
-        storeServerName();
+        serverName = radios.get();
+        cookie.set(serverName);
         document.location.reload();
     };
 
@@ -120,14 +120,8 @@ function main() {
      * @return {void}
      */
     const loadMap = async () => {
-        let map;
-
-        try {
-            const { Map } = await import(/* webpackChunkName: "map" */ "./map/map");
-            map = new Map(serverName);
-        } catch (error) {
-            throw new Error(error);
-        }
+        const { Map } = await import(/*  webpackPreload: true, webpackChunkName: "map" */ "./map/map");
+        const map = new Map(serverName);
 
         window.onresize = () => {
             map.resize();

@@ -12,12 +12,18 @@ import { range as d3Range } from "d3-array";
 import { event as d3Event, mouse as d3Mouse, select as d3Select } from "d3-selection";
 import { zoom as d3Zoom, zoomIdentity as d3ZoomIdentity, zoomTransform as d3ZoomTransform } from "d3-zoom";
 import { feature as topojsonFeature } from "topojson-client";
-import Cookies from "js-cookie";
+
+import "bootstrap/js/dist/util";
+import "bootstrap/js/dist/collapse";
+import "bootstrap/js/dist/modal";
 
 import { appDescription, appTitle, appVersion, defaultFontSize, insertBaseModal } from "../common";
 import { displayClan, nearestPow2, checkFetchStatus, getJsonFromFetch, putFetchError, roundToThousands } from "../util";
 
 import { registerEvent } from "../analytics";
+
+import Cookie from "../util/cookie";
+import RadioButton from "../util/radio-button";
 
 import DisplayPbZones from "./display-pb-zones";
 import DisplayPorts from "./display-ports";
@@ -28,6 +34,7 @@ import DisplayGrid from "../map-tools/display-grid";
 import Journey from "../map-tools/make-journey";
 import PredictWind from "../map-tools/predict-wind";
 import WindRose from "../map-tools/wind-rose";
+import ShowTrades from "../map-tools/show-trades";
 
 /**
  * Display naval action map
@@ -57,8 +64,16 @@ class Map {
          */
         this._dataSources = [
             {
-                fileName: `${serverName}.json`,
+                fileName: "ports.json",
                 name: "ports"
+            },
+            {
+                fileName: `${serverName}-trades.json`,
+                name: "trades"
+            },
+            {
+                fileName: `${serverName}.json`,
+                name: "server"
             },
             {
                 fileName: `${serverName}-pb.json`,
@@ -90,13 +105,6 @@ class Map {
          * @type {Number}
          * @private
          */
-        this._navbarBrandPaddingLeft = Math.floor(1.618 * this.rem); // equals 1.618rem
-
-        /**
-         * Left padding for brand icon
-         * @type {Number}
-         * @private
-         */
         this.xGridBackgroundHeight = Math.floor(3 * this.rem);
 
         /**
@@ -120,8 +128,6 @@ class Map {
 
         this._currentTranslate = {};
 
-        this._navbarSelector = document.querySelector(".navbar");
-
         this._tileSize = 256;
         this._maxScale = 2 ** 3; // power of 2
         this._wheelDelta = 0.5;
@@ -134,15 +140,17 @@ class Map {
          * @private
          * @private
          */
-        this._doubleClickActionCookieName = "na-map--double-click";
+        this._doubleClickActionId = "double-click-action";
 
         /**
-         * Default DoubleClickAction setting
-         * @type {string}
-         * @private
+         * DoubleClickAction settings
+         * @type {string[]}
          * @private
          */
-        this._doubleClickActionDefault = "compass";
+        this._doubleClickActionValues = ["compass", "f11"];
+
+        this._doubleClickActionCookie = new Cookie(this._doubleClickActionId, this._doubleClickActionValues);
+        this._doubleClickActionRadios = new RadioButton(this._doubleClickActionId, this._doubleClickActionValues);
 
         /**
          * Get DoubleClickAction setting from cookie or use default value
@@ -152,32 +160,36 @@ class Map {
         this._doubleClickAction = this._getDoubleClickAction();
 
         /**
-         * showLayer cookie name
+         * showGrid cookie name
          * @type {string}
          * @private
          */
-        this._showLayerCookieName = "na-map--show-layer";
+        this._showGridId = "show-grid";
 
         /**
-         * Default showLayer setting
-         * @type {string}
+         * showGrid settings
+         * @type {string[]}
          * @private
          */
-        this._showLayerDefault = "grid";
+        this._showGridValues = ["on", "off"];
+
+        this._showGridCookie = new Cookie(this._showGridId, this._showGridValues);
+        this._showGridRadios = new RadioButton(this._showGridId, this._showGridValues);
 
         /**
-         * Get showLayer setting from cookie or use default value
+         * Get showGrid setting from cookie or use default value
          * @type {string}
          * @private
          */
-        this._showLayer = this._getShowLayer();
+        this._showGrid = this._getShowGridValue();
+
+        [this._flexOverlay] = document.getElementsByClassName("flex-overlay");
 
         this._setHeightWidth();
         this._setupScale();
         this._setupSvg();
         this._setSvgSize();
         this._setupListener();
-        this._setupProps();
         this._readData();
     }
 
@@ -187,18 +199,24 @@ class Map {
      * @private
      */
     _getDoubleClickAction() {
-        // Use default value if cookie is not stored
-        return Cookies.get(this._doubleClickActionCookieName) || this._doubleClickActionDefault;
+        const r = this._doubleClickActionCookie.get();
+
+        this._doubleClickActionRadios.set(r);
+
+        return r;
     }
 
     /**
-     * Read cookie for showLayer
-     * @return {string} showLayer
+     * Read cookie for showGrid
+     * @return {string} showGrid
      * @private
      */
-    _getShowLayer() {
-        // Use default value if cookie is not stored
-        return Cookies.get(this._showLayerCookieName) || this._showLayerDefault;
+    _getShowGridValue() {
+        const r = this._showGridCookie.get();
+
+        this._showGridRadios.set(r);
+
+        return r;
     }
 
     _setupData(data) {
@@ -206,13 +224,13 @@ class Map {
 
         //        marks.push("setupData");
         //        performance.mark(`${marks[marks.length - 1]}-start`);
-        const portData = topojsonFeature(data.ports, data.ports.objects.ports);
+        // function();
         //        performance.mark(`${marks[marks.length - 1]}-end`);
 
-        const getFeature = object => {
-            // Port ids of capturable ports
-            const portIds = portData.features.filter(port => !port.properties.nonCapturable).map(port => port.id);
-            return object
+        // Port ids of capturable ports
+        const portIds = data.ports.filter(port => !port.nonCapturable).map(port => port.id);
+        const getFeature = object =>
+            object
                 .filter(port => portIds.includes(port.id))
                 .map(port => ({
                     type: "Feature",
@@ -220,30 +238,53 @@ class Map {
                     position: port.properties.position,
                     geometry: port.geometry
                 }));
-        };
 
         // Combine port data with port battle data
-        portData.features = portData.features.map(port => {
+        const portData = data.ports.map(port => {
             const combinedData = port;
+
+            const serverData = data.server.find(d => d.id === combinedData.id);
+
+            combinedData.portBattleStartTime = serverData.portBattleStartTime;
+            combinedData.portBattleType = serverData.portBattleType;
+            combinedData.nonCapturable = serverData.nonCapturable;
+            combinedData.conquestMarksPension = serverData.conquestMarksPension;
+            combinedData.portTax = serverData.portTax;
+            combinedData.taxIncome = serverData.taxIncome;
+            combinedData.netIncome = serverData.netIncome;
+            combinedData.tradingCompany = serverData.tradingCompany;
+            combinedData.laborHoursDiscount = serverData.laborHoursDiscount;
+            combinedData.dropsTrading = serverData.dropsTrading;
+            combinedData.consumesTrading = serverData.consumesTrading;
+            combinedData.producesNonTrading = serverData.producesNonTrading;
+            combinedData.dropsNonTrading = serverData.dropsNonTrading;
+            combinedData.inventory = serverData.inventory;
+
+            // Delete empty entries
+            ["dropsTrading", "consumesTrading", "producesNonTrading", "dropsNonTrading"].forEach(type => {
+                if (!combinedData[type]) {
+                    delete combinedData[type];
+                }
+            });
+
             const pbData = data.pb.ports.find(d => d.id === combinedData.id);
 
-            combinedData.properties.nation = pbData.nation;
-            combinedData.properties.capturer = pbData.capturer;
-            combinedData.properties.lastPortBattle = pbData.lastPortBattle;
-            combinedData.properties.attackHostility = pbData.attackHostility;
-            combinedData.properties.attackerClan = pbData.attackerClan;
-            combinedData.properties.attackerNation = pbData.attackerNation;
-            combinedData.properties.portBattle = pbData.portBattle;
+            combinedData.nation = pbData.nation;
+            combinedData.capturer = pbData.capturer;
+            combinedData.lastPortBattle = pbData.lastPortBattle;
+            combinedData.attackHostility = pbData.attackHostility;
+            combinedData.attackerClan = pbData.attackerClan;
+            combinedData.attackerNation = pbData.attackerNation;
+            combinedData.portBattle = pbData.portBattle;
 
             return combinedData;
         });
 
         this._f11 = new ShowF11(this, this.coord);
-        this._ports = new DisplayPorts(portData.features, this);
+        this._ports = new DisplayPorts(portData, this);
 
         let pbCircles = topojsonFeature(data.pbZones, data.pbZones.objects.pbCircles);
         pbCircles = getFeature(pbCircles.features);
-
         let forts = topojsonFeature(data.pbZones, data.pbZones.objects.forts);
         forts = getFeature(forts.features);
 
@@ -257,15 +298,23 @@ class Map {
         this._grid = new DisplayGrid(this);
 
         this._woodData = JSON.parse(JSON.stringify(data.woods));
-        this._shipData = JSON.parse(JSON.stringify(data.ships.shipData));
-
+        this._shipData = JSON.parse(JSON.stringify(data.ships));
         this._journey = new Journey(this._shipData, this._woodData, this.rem);
-        this._windPrediction = new PredictWind();
+
+        this._portSelect = new SelectPorts(this._ports, this._pbZone, this);
+        this.showTrades = new ShowTrades(
+            this._portSelect,
+            portData,
+            data.trades,
+            this._minScale,
+            this.coord.min,
+            this.coord.max
+        );
 
         this._init();
 
+        this._windPrediction = new PredictWind();
         this._windRose = new WindRose();
-        this._portSelect = new SelectPorts(this._ports, this._pbZone);
 
         /*
         marks.forEach(mark => {
@@ -302,7 +351,7 @@ class Map {
             }
         }
 
-        this.svg
+        this._svg
             .on("dblclick.zoom", null)
             .on("click", stopProp, true)
             .on("dblclick", (d, i, nodes) => this._doDoubleClickAction(nodes[i]));
@@ -323,8 +372,8 @@ class Map {
             this._showAbout();
         });
 
-        document.getElementById("doubleClick-action").addEventListener("change", () => this._doubleClickSelected());
-        document.getElementById("show-layer").addEventListener("change", () => this._showLayerSelected());
+        document.getElementById("double-click-action").addEventListener("change", () => this._doubleClickSelected());
+        document.getElementById("show-grid").addEventListener("change", () => this._showGridSelected());
     }
 
     _setupScale() {
@@ -351,57 +400,30 @@ class Map {
             .scaleExtent([this._minScale, this._maxScale])
             .on("zoom", () => this._naZoomed());
 
-        this.svg = d3Select("#na-map")
+        this._svg = d3Select("#na-map")
             .append("svg")
             .attr("id", "na-svg")
             .call(this._zoom);
 
-        this.svg.append("defs");
+        this._svg.append("defs");
 
-        this._gMap = this.svg.append("g").classed("map", true);
-    }
-
-    _setupProps() {
-        document.getElementById(`doubleClick-action-${this._doubleClickAction}`).checked = true;
-        document.getElementById(`show-layer-${this._showLayer}`).checked = true;
-    }
-
-    /**
-     * Store show setting in cookie
-     * @return {void}
-     * @private
-     */
-    _storeDoubleClickActionSetting() {
-        if (this._doubleClickAction !== this._doubleClickActionDefault) {
-            Cookies.set(this._doubleClickActionCookieName, this._doubleClickAction);
-        } else {
-            Cookies.remove(this._doubleClickActionCookieName);
-        }
+        this._gMap = this._svg.append("g").classed("map", true);
     }
 
     _doubleClickSelected() {
-        this._doubleClickAction = document.querySelector('input[name="doubleClickAction"]:checked').value;
-        this._storeDoubleClickActionSetting();
+        this._doubleClickAction = this._doubleClickActionRadios.get();
+
+        this._doubleClickActionCookie.set(this._profitValue);
+
         this._clearMap();
     }
 
-    /**
-     * Store show setting in cookie
-     * @return {void}
-     * @private
-     */
-    _storeShowLayerSetting() {
-        if (this._showLayer !== this._showLayerDefault) {
-            Cookies.set(this._showLayerCookieName, this._showLayer);
-        } else {
-            Cookies.remove(this._showLayerCookieName);
-        }
-    }
+    _showGridSelected() {
+        this._showGrid = this._showGridRadios.get();
+        this._grid.show = this._showGrid === "on";
 
-    _showLayerSelected() {
-        this._showLayer = document.querySelector("input[name='showLayer']:checked").value;
-        this._grid.show = this._showLayer === "grid";
-        this._storeShowLayerSetting();
+        this._showGridCookie.set(this._showGrid);
+
         this._refreshLayer();
     }
 
@@ -459,21 +481,19 @@ class Map {
     }
 
     _updateMap(tiles) {
-        const image = this._gMap
+        this._gMap
             .attr("transform", tiles.transform)
             .selectAll("image")
-            .data(tiles, d => d.id);
-
-        image.exit().remove();
-
-        image
-            .enter()
-            .append("image")
-            .attr("xlink:href", d => `images/map/${d.z}/${d.row}/${d.col}.jpg`)
-            .attr("x", d => d.col * this._tileSize)
-            .attr("y", d => d.row * this._tileSize)
-            .attr("width", this._tileSize + 1)
-            .attr("height", this._tileSize + 1);
+            .data(tiles, d => d.id)
+            .join(enter =>
+                enter
+                    .append("image")
+                    .attr("xlink:href", d => `images/map/${d.z}/${d.row}/${d.col}.jpg`)
+                    .attr("x", d => d.col * this._tileSize)
+                    .attr("y", d => d.row * this._tileSize)
+                    .attr("width", this._tileSize + 1)
+                    .attr("height", this._tileSize + 1)
+            );
     }
 
     _clearMap() {
@@ -482,6 +502,7 @@ class Map {
         this._f11.clearMap();
         this._ports.clearMap();
         this._portSelect.clearMap();
+        this.showTrades.clearMap();
         $(".selectpicker")
             .val("default")
             .selectpicker("refresh");
@@ -535,18 +556,20 @@ class Map {
         if (d3Event.transform.k !== this._currentScale) {
             this._currentScale = d3Event.transform.k;
             if (this._currentScale > this._PBZoneZoomThreshold) {
-                if (this._zoomLevel !== "pbZone") {
+                if (this.zoomLevel !== "pbZone") {
                     this.zoomLevel = "pbZone";
                 }
             } else if (this._currentScale > this._labelZoomThreshold) {
-                if (this._zoomLevel !== "portLabel") {
+                if (this.zoomLevel !== "portLabel") {
                     this.zoomLevel = "portLabel";
                 }
-            } else if (this._zoomLevel !== "initial") {
+            } else if (this.zoomLevel !== "initial") {
                 this.zoomLevel = "initial";
             }
+            this._setFlexOverlayHeight();
             this._grid.update();
         }
+
         this._pbZone.refresh();
         this._ports.update(this._currentScale);
     }
@@ -575,10 +598,27 @@ class Map {
             .translate(this._currentTranslate.x, this._currentTranslate.y)
             .scale(roundToThousands(d3Event.transform.k));
 
-        const lowerBound = zoomTransform.invert([this.coord.min, this.coord.min]),
-            upperBound = zoomTransform.invert([this.width, this.height]);
+        /**
+         * lower or upper bound coordinates
+         * @typedef {Bound}
+         * @property {number[]} Coordinates
+         */
+
+        /**
+         * Top left coordinates of current viewport
+         * @type{Bound}
+         */
+        const lowerBound = zoomTransform.invert([this.coord.min, this.coord.min]);
+
+        /**
+         * Bottom right coordinates of current viewport
+         * @type{Bound}
+         */
+        const upperBound = zoomTransform.invert([this.width, this.height]);
+
         this._ports.setBounds(lowerBound, upperBound);
         this._pbZone.setBounds(lowerBound, upperBound);
+        this.showTrades.setBounds(lowerBound, upperBound);
 
         this._displayMap(zoomTransform);
         this._grid.transform(zoomTransform);
@@ -586,6 +626,7 @@ class Map {
         this._journey.transform(zoomTransform);
         this._pbZone.transform(zoomTransform);
         this._f11.transform(zoomTransform);
+        this.showTrades.transform(zoomTransform);
 
         this._setZoomLevelAndData();
     }
@@ -593,14 +634,18 @@ class Map {
     _init() {
         this.zoomLevel = "initial";
         this.initialZoomAndPan();
-        this._ports.clearMap(this._minScale);
         this._f11.checkF11Coord();
+        this._setFlexOverlayHeight();
     }
 
     set zoomLevel(zoomLevel) {
         this._zoomLevel = zoomLevel;
         this._ports.zoomLevel = zoomLevel;
         this._grid.zoomLevel = zoomLevel;
+    }
+
+    get zoomLevel() {
+        return this._zoomLevel;
     }
 
     resize() {
@@ -610,12 +655,13 @@ class Map {
 
         this._setHeightWidth();
         this._setSvgSize();
+        this._setFlexOverlayHeight();
         this._displayMap(zoomTransform);
-        this._grid.update(this.height, this.width);
+        this._grid.update(true);
     }
 
     _getDimensions() {
-        const selector = document.getElementById("na-map");
+        const selector = document.getElementsByClassName("flex-overlay")[0];
 
         return selector.getBoundingClientRect();
     }
@@ -623,14 +669,14 @@ class Map {
     _getWidth() {
         const { width } = this._getDimensions();
 
-        return Math.floor(width);
+        return width;
     }
 
     _getHeight() {
         const { top } = this._getDimensions(),
             fullHeight = document.documentElement.clientHeight - this.rem;
 
-        return Math.floor(fullHeight - top);
+        return fullHeight - top;
     }
 
     _setHeightWidth() {
@@ -648,14 +694,16 @@ class Map {
     }
 
     _setSvgSize() {
-        this.svg
-            .attr("width", this.width)
-            .attr("height", this.height)
-            .call(this._zoom);
+        this._svg.attr("width", this.width).attr("height", this.height);
+    }
+
+    _setFlexOverlayHeight() {
+        const height = this.height - (this._grid.show && this.zoomLevel !== "initial" ? this.xGridBackgroundHeight : 0);
+        this._flexOverlay.setAttribute("style", `height:${height}px`);
     }
 
     initialZoomAndPan() {
-        this.svg.call(this._zoom.scaleTo, this._minScale);
+        this._svg.call(this._zoom.scaleTo, this._minScale);
     }
 
     zoomAndPan(x, y, scale) {
@@ -663,7 +711,7 @@ class Map {
             .scale(scale)
             .translate(Math.round(-x + this.width / 2 / scale), Math.round(-y + this.height / 2 / scale));
 
-        this.svg.call(this._zoom.transform, transform);
+        this._svg.call(this._zoom.transform, transform);
     }
 
     goToPort() {
