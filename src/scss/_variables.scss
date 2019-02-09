@@ -18,10 +18,10 @@ $spacer: 1rem;
 $spacers: (
     0: 0,
     1: (
-        $spacer * 0.382
+        $spacer * .382
     ),
     2: (
-        $spacer * 0.618
+        $spacer * .618
     ),
     3: $spacer,
     4: (
@@ -52,7 +52,7 @@ $link-hover-color: $secondary-800;
 
 // Grid columns
 //$grid-columns: 12 !default;
-//$grid-gutter-width: 30px !default;
+$grid-gutter-width: $spacer*2;
 
 //$input-color: $body-color;
 //$input-group-addon-bg: $primary-100;
@@ -67,11 +67,11 @@ $font-size-sm: map-get($spacers, 2) * 1.2;
 $line-height-base: map-get($spacers, 4) / $font-size-base;
 
 $h6-font-size: $font-size-base;
-$h5-font-size: $h6-font-size + $font-size-base/$font-size-lg/2;
+$h5-font-size: $h6-font-size + $font-size-base / $font-size-lg / 2;
 $h4-font-size: $font-size-lg;
-$h3-font-size: $h4-font-size + $h6-font-size/2;
-$h2-font-size: $h3-font-size + $h5-font-size/2;
-$h1-font-size: $h2-font-size + $h4-font-size/2;
+$h3-font-size: $h4-font-size + $h6-font-size / 2;
+$h2-font-size: $h3-font-size + $h5-font-size / 2;
+$h1-font-size: $h2-font-size + $h4-font-size / 2;
 
 $lead-font-size: $font-size-lg;
 
@@ -83,10 +83,15 @@ $table-border-color: $primary-200;
 $input-focus-border-color: $primary-200;
 $input-focus-box-shadow: $primary-200;
 
+// Toast
+$toast-font-size: $font-size-base;
+$toast-border-width: 0;
+$toast-border-radius: 0;
+
 // Tooltip
 $tooltip-max-width: 40em;
 $tooltip-color: $body-color;
-$tooltip-bg: $primary-050;
+$tooltip-bg: $primary-100;
 $tooltip-opacity: 1;
 $tooltip-padding-y: 1rem;
 $tooltip-padding-x: 1rem;
@@ -115,14 +120,11 @@ $pagination-disabled-color: $gray-500;
 $pagination-disabled-bg: $pagination-bg;
 $pagination-disabled-border-color: $pagination-bg;
 
-// Modal
-$modal-lg: 1200px;
-
 // Badges
 $badge-font-size: 90%;
 $badge-font-weight: 400;
-$badge-padding-y: 0rem;
-$badge-padding-x: 0.2rem;
+$badge-padding-y: 0;
+$badge-padding-x: .2rem;
 //$badge-border-radius:               $border-radius !default;
 //$badge-pill-padding-x:              .6em !default;
 // Use a higher than normal value to ensure completely rounded edges when
