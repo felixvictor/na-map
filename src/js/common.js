@@ -4,6 +4,7 @@
 
 import { select as d3Select } from "d3-selection";
 import { distancePoints, roundToThousands } from "./util";
+import { sortBy } from "../../build/common";
 
 const transformMatrix = {
         A: -0.00499866779363828,
@@ -44,15 +45,7 @@ export const nations = [
     { id: 10, short: "RU", name: "Russian Empire", sortName: "Russian Empire" },
     { id: 11, short: "DE", name: "Kingdom of Prussia", sortName: "Prussia" },
     { id: 12, short: "PL", name: "Commonwealth of Poland", sortName: "Poland" }
-].sort((a, b) => {
-    if (a.sortName < b.sortName) {
-        return -1;
-    }
-    if (a.sortName > b.sortName) {
-        return 1;
-    }
-    return 0;
-});
+].sort(sortBy(["sortName"]));
 
 export const defaultFontSize = 16;
 export const defaultCircleSize = 16;
