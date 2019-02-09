@@ -354,7 +354,7 @@ export default class SelectPorts {
             tradePortProducedGoods = tradePort.dropsTrading.map(good => good);
         }
 
-        this._ports.portData = this._ports.portDataDefault
+        this._ports.portData = JSON.parse(JSON.stringify(this._ports.portDataDefault))
             .map(port => {
                 // eslint-disable-next-line no-param-reassign
                 port.goodsToSellInTradePort = [];
@@ -415,25 +415,27 @@ export default class SelectPorts {
 
     _goodSelected() {
         const goodSelected = this._buyGoodsSelector.options[this._buyGoodsSelector.selectedIndex].value;
-        const sourcePorts = this._ports.portDataDefault
-            .filter(
+        const sourcePorts = JSON.parse(
+            JSON.stringify(this._ports.portDataDefault).filter(
                 port =>
                     (port.dropsTrading && port.dropsTrading.some(good => good === goodSelected)) ||
                     (port.dropsNonTrading && port.dropsNonTrading.some(good => good === goodSelected)) ||
                     (port.producesNonTrading && port.producesNonTrading.some(good => good === goodSelected))
             )
-            .map(port => {
-                // eslint-disable-next-line no-param-reassign
-                port.isSource = true;
-                return port;
-            });
-        const consumingPorts = this._ports.portDataDefault
-            .filter(port => port.consumesTrading && port.consumesTrading.some(good => good === goodSelected))
-            .map(port => {
-                // eslint-disable-next-line prefer-destructuring,no-param-reassign
-                port.isSource = false;
-                return port;
-            });
+        ).map(port => {
+            // eslint-disable-next-line no-param-reassign
+            port.isSource = true;
+            return port;
+        });
+        const consumingPorts = JSON.parse(
+            JSON.stringify(this._ports.portDataDefault).filter(
+                port => port.consumesTrading && port.consumesTrading.some(good => good === goodSelected)
+            )
+        ).map(port => {
+            // eslint-disable-next-line prefer-destructuring,no-param-reassign
+            port.isSource = false;
+            return port;
+        });
 
         this._ports.setShowRadiusSetting("off");
         this._ports.portData = sourcePorts.concat(consumingPorts);
