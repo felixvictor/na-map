@@ -77,7 +77,11 @@ const dataSources = [
  * @return {void}
  */
 const setupData = data => {
-    const shipCompare = new CompareShips(data.ships, data.woods);
+    const shipCompare = new CompareShips({
+        shipData: data.ships,
+        woodData: data.woods,
+        moduleData: data.modules
+    });
     const woodCompare = new CompareWoods(data.woods, "wood");
     const woodList = new ListWoods(data.woods);
 
