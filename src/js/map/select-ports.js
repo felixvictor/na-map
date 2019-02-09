@@ -446,15 +446,21 @@ export default class SelectPorts {
         this.isInventorySelected = true;
 
         const goodSelected = this._inventorySelector.options[this._inventorySelector.selectedIndex].value;
-        const buyPortsFiltered = this._ports.portDataDefault.filter(
-            port => port.inventory && port.inventory.some(good => good.name === goodSelected && good.buyQuantity > 0)
+        const buyPortsFiltered = JSON.parse(
+            JSON.stringify(
+                this._ports.portDataDefault.filter(
+                    port =>
+                        port.inventory &&
+                        port.inventory.some(good => good.name === goodSelected && good.buyQuantity > 0)
+                )
+            )
         );
         const buyPorts = buyPortsFiltered.map(port => {
             // eslint-disable-next-line no-param-reassign
-            port.buyInTradePort = true;
+            port.sellInTradePort = true;
             return port;
         });
-        const buyPortAvail = buyPortsFiltered
+        const buyPortsAvail = buyPortsFiltered
             .map(port => ({
                 name: port.name,
                 nation: port.nation,
@@ -462,15 +468,21 @@ export default class SelectPorts {
             }))
             .sort(sortByName);
 
-        const sellPortsFiltered = this._ports.portDataDefault.filter(
-            port => port.inventory && port.inventory.some(good => good.name === goodSelected && good.sellQuantity > 0)
+        const sellPortsFiltered = JSON.parse(
+            JSON.stringify(
+                this._ports.portDataDefault.filter(
+                    port =>
+                        port.inventory &&
+                        port.inventory.some(good => good.name === goodSelected && good.sellQuantity > 0)
+                )
+            )
         );
         const sellPorts = sellPortsFiltered.map(port => {
             // eslint-disable-next-line prefer-destructuring,no-param-reassign
-            port.sellInTradePort = true;
+            port.buyInTradePort = true;
             return port;
         });
-        const sellPortAvail = sellPortsFiltered
+        const sellPortsAvail = sellPortsFiltered
             .map(port => ({
                 name: port.name,
                 nation: port.nation,
@@ -482,9 +494,9 @@ export default class SelectPorts {
             let h = "";
 
             h += `<h5>${goodSelected}</h5>`;
-            if (buyPortAvail.length) {
+            if (buyPortsAvail.length) {
                 h += "<h6>Buy</h6>";
-                h += buyPortAvail
+                h += buyPortsAvail
                     .map(
                         port =>
                             `${port.name} <span class="caps">${port.nation}</span>: ${formatInt(
@@ -493,12 +505,12 @@ export default class SelectPorts {
                     )
                     .join("<br>");
             }
-            if (buyPortAvail.length && sellPortAvail.length) {
+            if (buyPortsAvail.length && sellPortsAvail.length) {
                 h += "<p></p>";
             }
-            if (sellPortAvail.length) {
+            if (sellPortsAvail.length) {
                 h += "<h6>Sell</h6>";
-                h += sellPortAvail
+                h += sellPortsAvail
                     .map(
                         port =>
                             `${port.name} <span class="caps">${port.nation}</span>: ${formatInt(
