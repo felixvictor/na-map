@@ -335,7 +335,7 @@ export default class ShowTrades {
                 `${this._nodeData.get(trade.target.id).name} <span class="caps">${
                     this._nodeData.get(trade.target.id).nation
                 }</span>`
-            ) + addDes(`to ${getDepth(this._nodeData.get(trade.source.id).isShallow)}`);
+            ) + addDes(`to ${getDepth(this._nodeData.get(trade.target.id).isShallow)}`);
         h += addInfo(`${formatSiInt(trade.distance)}\u2009k`) + addDes("distance");
 
         return h;
