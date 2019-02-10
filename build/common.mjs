@@ -327,3 +327,38 @@ export function getDistance(pt0, pt1) {
 
     return distancePoints(F11_0, F11_1) / (2.63 * speedFactor);
 }
+
+/**
+ * Simple sort of strings a and b
+ * @param {string} a - String a
+ * @param {string} b - String b
+ * @return {number} Sort result
+ */
+export const simpleSort = (a, b) => {
+    if (a < b) {
+        return -1;
+    }
+    if (a > b) {
+        return 1;
+    }
+    return 0;
+};
+
+/**
+ * Sort by a list of properties (in left-to-right order)
+ * @param {string[]} properties - Sort properties
+ * @return {function(*, *): number} Sort function
+ */
+export const sortBy = properties => (a, b) => {
+    let r = 0;
+    properties.some(property => {
+        if (a[property] < b[property]) {
+            r = -1;
+        } else if (a[property] > b[property]) {
+            r = 1;
+        }
+        return r !== 0;
+    });
+
+    return r;
+};

@@ -1,4 +1,5 @@
 import { readJson, saveJson } from "./common.mjs";
+import { sortBy } from "./common";
 
 const itemsFilename = process.argv[2],
     outFilename = process.argv[3],
@@ -24,15 +25,7 @@ function getItemsCraftedByWorkshop() {
             name: recipe.Name.replace(" Blueprint", ""),
             price: 0
         }))
-        .sort((a, b) => {
-            if (a.name < b.name) {
-                return -1;
-            }
-            if (a.name > b.name) {
-                return 1;
-            }
-            return 0;
-        });
+        .sort(sortBy(["name"]));
 }
 
 function getItemsCraftedByAcademy() {
@@ -46,15 +39,7 @@ function getItemsCraftedByAcademy() {
             name: recipe.Name.replace(" Blueprint", ""),
             price: 0
         }))
-        .sort((a, b) => {
-            if (a.name < b.name) {
-                return -1;
-            }
-            if (a.name > b.name) {
-                return 1;
-            }
-            return 0;
-        });
+        .sort(sortBy(["name"]));
 }
 
 /**
@@ -145,17 +130,7 @@ function convertBuildings() {
     });
 
     let result = Array.from(buildings.values());
-    result = result
-        .filter(building => Object.keys(building).length)
-        .sort((a, b) => {
-            if (a.name < b.name) {
-                return -1;
-            }
-            if (a.name > b.name) {
-                return 1;
-            }
-            return 0;
-        });
+    result = result.filter(building => Object.keys(building).length).sort(sortBy(["name"]));
     saveJson(outFilename, result);
 }
 
