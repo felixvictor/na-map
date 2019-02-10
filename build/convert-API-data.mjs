@@ -10,6 +10,7 @@ import {
     saveJson
     // eslint-disable-next-line import/extensions
 } from "./common.mjs";
+import { sortBy } from "./common";
 
 const inBaseFilename = process.argv[2],
     serverName = process.argv[3],
@@ -175,15 +176,7 @@ function convertPorts() {
                     sellPrice: Math.round(good.SellPrice / (1 + apiPort.PortTax)),
                     sellQuantity: good.SellContractQuantity !== -1 ? good.SellContractQuantity : good.PriceTierQuantity
                 }))
-                .sort((a, b) => {
-                    if (a.name < b.name) {
-                        return -1;
-                    }
-                    if (a.name > b.name) {
-                        return 1;
-                    }
-                    return 0;
-                })
+                .sort(sortBy(["name"]))
         };
         // Delete empty entries
         ["dropsTrading", "consumesTrading", "producesNonTrading", "dropsNonTrading"].forEach(type => {
