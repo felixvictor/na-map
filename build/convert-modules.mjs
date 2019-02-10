@@ -348,7 +348,7 @@ function convertModules() {
             };
 
             if (module.name.startsWith("Bow figure - ")) {
-                module.name = module.name.replace("Bow figure - ", "");
+                module.name = `${module.name.replace("Bow figure - ", "")} bow figure`;
                 module.moduleLevel = "U";
             }
             // Ignore double entries
@@ -366,7 +366,7 @@ function convertModules() {
                     setModuleType(module);
                     if (
                         module.type.startsWith("Not used") ||
-                        module.name === "Gifted" ||
+                        module.name === "Cannon nation module - France" ||
                         module.name === "Coward" ||
                         module.name === "Doctor" ||
                         module.name === "Dreadful" ||
@@ -377,10 +377,8 @@ function convertModules() {
                         module.name === "Lineship Master" ||
                         module.name === "Press Gang" ||
                         module.name === "Signaling" ||
-                        module.name === "Thrifty" ||
-                        module.name === "Lead Sheating" ||
                         module.name === "TEST MODULE SPEED IN OW" ||
-                        module.name === "Cannon nation module - France" ||
+                        module.name === "Thrifty" ||
                         module.name.endsWith(" - OLD") ||
                         module.name.endsWith("TEST")
                     ) {
