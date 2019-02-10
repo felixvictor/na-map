@@ -932,7 +932,7 @@ export default class CompareShips {
             ["Turn speed", ["rudder.turnSpeed"]]
         ]);
 
-        this._upgradeChanges = new Map([
+        this._moduleChanges = new Map([
             ["Acceleration", ["ship.acceleration"]],
             ["Back armour thickness", ["stern.thickness"]],
             ["Crew protection", ["resistance.crew"]],
@@ -1291,7 +1291,7 @@ export default class CompareShips {
             this._selectedUpgradeIds[compareId].forEach(id => {
                 const properties = this._moduleProperties.get(id);
                 properties.forEach(property => {
-                    if (this._upgradeChanges.has(property.modifier)) {
+                    if (this._moduleChanges.has(property.modifier)) {
                         modifierAmount.set(
                             property.modifier,
                             modifierAmount.has(property.modifier)
@@ -1303,7 +1303,7 @@ export default class CompareShips {
             });
 
             modifierAmount.forEach((value, key) => {
-                this._upgradeChanges.get(key).forEach(modifier => {
+                this._moduleChanges.get(key).forEach(modifier => {
                     const index = modifier.split("."),
                         factor = 1 + modifierAmount.get(key) / 100;
 
