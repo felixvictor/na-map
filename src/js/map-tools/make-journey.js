@@ -542,7 +542,7 @@ export default class Journey {
         this._divJourneySummary = d3Select("main #summary-column")
             .append("div")
             .attr("id", "journey-summary")
-            .classed("journey-summary overlay d-none", true);
+            .classed("journey-summary d-none", true);
 
         // Selected ship
         this._journeySummaryShip = this._divJourneySummary.append("div").classed("block", true);
