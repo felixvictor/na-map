@@ -11,8 +11,11 @@
 import { curveBasis as d3CurveBasis, line as d3Line } from "d3-shape";
 import { select as d3Select } from "d3-selection";
 import { intersectionArea as vennIntersectionArea } from "venn.js/src/circleintersection";
+
 import { registerEvent } from "../analytics";
 import { circleRadiusFactor, insertBaseModal } from "../common";
+import { sortBy } from "../util";
+
 import Toast from "../util/toast";
 
 /**
@@ -37,6 +40,7 @@ export default class TrilateratePosition {
 
     _setupSvg() {
         this._gPosition = d3Select("g.ports").append("g");
+        this._path = this._gPosition.append("path").attr("class", "position-path");
     }
 
     _navbarClick(event) {
@@ -114,15 +118,7 @@ export default class TrilateratePosition {
                 name: d.name,
                 nation: d.nation
             }))
-            .sort((a, b) => {
-                if (a.name < b.name) {
-                    return -1;
-                }
-                if (a.name > b.name) {
-                    return 1;
-                }
-                return 0;
-            });
+            .sort(sortBy(["name"]));
 
         const options = `${selectPorts
             .map(
@@ -220,10 +216,7 @@ export default class TrilateratePosition {
                 const points = getAreaPoints(area);
 
                 const line = d3Line().curve(d3CurveBasis);
-                this._gPosition
-                    .append("path")
-                    .attr("class", "position-path")
-                    .attr("d", line(points));
+                this._path.attr("d", line(points));
             };
 
             /**
@@ -294,14 +287,18 @@ export default class TrilateratePosition {
         });
 
         if (ports.size >= 2) {
-            this._ports.setShowRadiusSetting = "position";
-            this._ports.portData = this._ports.portDataDefault
-                .filter(port => ports.has(port.name))
-                .map(port => {
-                    // eslint-disable-next-line prefer-destructuring,no-param-reassign
-                    port.distance = ports.get(port.name);
-                    return port;
-                });
+            this._ports.setShowRadiusSetting("position");
+            this._ports.portData = JSON.parse(
+                JSON.stringify(
+                    this._ports.portDataDefault
+                        .filter(port => ports.has(port.name))
+                        .map(port => {
+                            // eslint-disable-next-line prefer-destructuring,no-param-reassign
+                            port.distance = ports.get(port.name);
+                            return port;
+                        })
+                )
+            );
             this._ports.update();
             showAndGoToPosition();
         } else {
