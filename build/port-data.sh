@@ -20,7 +20,7 @@ server_names=(eu1 eu2)
 
 server_twitter_names=(eu1)
 api_vars=(ItemTemplates Ports Shops)
-server_maintenance_hour=10
+server_maintenance_hour=11
 # Set server date
 if [ "$(date -u '+%H')" -lt "${server_maintenance_hour}" ]; then
     date=$(date -u '+%Y-%m-%d' --date "-1 day")
@@ -164,7 +164,6 @@ function get_port_data () {
             fi
         done
 
-        local server_file
         local pb_file
         local api_file
         for server_name in "${server_names[@]}"; do

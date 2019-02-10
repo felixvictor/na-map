@@ -916,12 +916,6 @@ export default class DisplayPorts {
     }
 
     clearMap(scale) {
-        if (this._showRadius === "position") {
-            [this._showRadius] = this._radioButtonValues;
-            this._radios.set(this._showRadius);
-            this._cookie.set(this._showRadius);
-        }
-
         this._trilateratePosition.clearMap();
         this._showSummary();
         this._portData = this._portDataDefault;
