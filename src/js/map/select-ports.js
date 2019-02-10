@@ -400,11 +400,13 @@ export default class SelectPorts {
     _goodSelected() {
         const goodSelected = this._buyGoodsSelector.options[this._buyGoodsSelector.selectedIndex].value;
         const sourcePorts = JSON.parse(
-            JSON.stringify(this._ports.portDataDefault).filter(
-                port =>
-                    (port.dropsTrading && port.dropsTrading.some(good => good === goodSelected)) ||
-                    (port.dropsNonTrading && port.dropsNonTrading.some(good => good === goodSelected)) ||
-                    (port.producesNonTrading && port.producesNonTrading.some(good => good === goodSelected))
+            JSON.stringify(
+                this._ports.portDataDefault.filter(
+                    port =>
+                        (port.dropsTrading && port.dropsTrading.some(good => good === goodSelected)) ||
+                        (port.dropsNonTrading && port.dropsNonTrading.some(good => good === goodSelected)) ||
+                        (port.producesNonTrading && port.producesNonTrading.some(good => good === goodSelected))
+                )
             )
         ).map(port => {
             // eslint-disable-next-line no-param-reassign
@@ -412,8 +414,10 @@ export default class SelectPorts {
             return port;
         });
         const consumingPorts = JSON.parse(
-            JSON.stringify(this._ports.portDataDefault).filter(
-                port => port.consumesTrading && port.consumesTrading.some(good => good === goodSelected)
+            JSON.stringify(
+                this._ports.portDataDefault.filter(
+                    port => port.consumesTrading && port.consumesTrading.some(good => good === goodSelected)
+                )
             )
         ).map(port => {
             // eslint-disable-next-line prefer-destructuring,no-param-reassign
