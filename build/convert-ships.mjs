@@ -1,4 +1,4 @@
-import { readJson, roundToThousands, saveJson, speedConstA, speedConstB } from "./common.mjs";
+import { sortBy, readJson, roundToThousands, saveJson, speedConstA, speedConstB } from "./common.mjs";
 
 const inBaseFilename = process.argv[2],
     outFilename = process.argv[3],
@@ -93,22 +93,7 @@ function convertShips() {
         ships.push(shipData);
     });
 
-    ships.sort((a, b) => {
-        if (a.class < b.class) {
-            return -1;
-        }
-        if (a.class > b.class) {
-            return 1;
-        }
-        if (a.name < b.name) {
-            return -1;
-        }
-        if (a.name > b.name) {
-            return 1;
-        }
-        return 0;
-    });
-
+    ships.sort(sortBy(["class", "name"]));
     saveJson(outFilename, ships);
 }
 

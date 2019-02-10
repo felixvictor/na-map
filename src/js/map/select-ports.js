@@ -16,7 +16,7 @@ import "tempusdominus-core/build/js/tempusdominus-core";
 
 import { registerEvent } from "../analytics";
 import { initMultiDropdownNavbar, nations } from "../common";
-import { formatInt, formatSiCurrency, sortByName } from "../util";
+import { formatInt, formatSiCurrency, sortBy } from "../util";
 
 export default class SelectPorts {
     constructor(ports, pbZone, map) {
@@ -89,7 +89,7 @@ export default class SelectPorts {
         });
 
         this._buyGoodsSelector.addEventListener("change", event => {
-            registerEvent("Menu", "Good relations");
+            registerEvent("Menu", "Goods’ relations");
             this._resetOtherSelects(this._buyGoodsSelector);
             this._goodSelected();
             event.preventDefault();
@@ -191,15 +191,7 @@ export default class SelectPorts {
                 name: d.name,
                 nation: d.nation
             }))
-            .sort((a, b) => {
-                if (a.name < b.name) {
-                    return -1;
-                }
-                if (a.name > b.name) {
-                    return 1;
-                }
-                return 0;
-            });
+            .sort(sortBy(["name"]));
         const options = `${selectPorts
             .map(
                 port =>
@@ -246,7 +238,7 @@ export default class SelectPorts {
             liveSearch: true,
             liveSearchNormalize: true,
             liveSearchPlaceholder: "Search ...",
-            title: "Show good relations",
+            title: "Show goods’ relations",
             virtualScroll: true
         });
         this._buyGoodsSelector.classList.remove("d-none");
@@ -290,15 +282,7 @@ export default class SelectPorts {
 
     _setupNationSelect() {
         const options = `${nations
-            .sort((a, b) => {
-                if (a.sortName < b.sortName) {
-                    return -1;
-                }
-                if (a.sortName > b.sortName) {
-                    return 1;
-                }
-                return 0;
-            })
+            .sort(sortBy(["name"]))
             .map(nation => `<option value="${nation.short}">${nation.name}</option>`)
             .join("")}`;
 
@@ -416,11 +400,13 @@ export default class SelectPorts {
     _goodSelected() {
         const goodSelected = this._buyGoodsSelector.options[this._buyGoodsSelector.selectedIndex].value;
         const sourcePorts = JSON.parse(
-            JSON.stringify(this._ports.portDataDefault).filter(
-                port =>
-                    (port.dropsTrading && port.dropsTrading.some(good => good === goodSelected)) ||
-                    (port.dropsNonTrading && port.dropsNonTrading.some(good => good === goodSelected)) ||
-                    (port.producesNonTrading && port.producesNonTrading.some(good => good === goodSelected))
+            JSON.stringify(
+                this._ports.portDataDefault.filter(
+                    port =>
+                        (port.dropsTrading && port.dropsTrading.some(good => good === goodSelected)) ||
+                        (port.dropsNonTrading && port.dropsNonTrading.some(good => good === goodSelected)) ||
+                        (port.producesNonTrading && port.producesNonTrading.some(good => good === goodSelected))
+                )
             )
         ).map(port => {
             // eslint-disable-next-line no-param-reassign
@@ -428,8 +414,10 @@ export default class SelectPorts {
             return port;
         });
         const consumingPorts = JSON.parse(
-            JSON.stringify(this._ports.portDataDefault).filter(
-                port => port.consumesTrading && port.consumesTrading.some(good => good === goodSelected)
+            JSON.stringify(
+                this._ports.portDataDefault.filter(
+                    port => port.consumesTrading && port.consumesTrading.some(good => good === goodSelected)
+                )
             )
         ).map(port => {
             // eslint-disable-next-line prefer-destructuring,no-param-reassign
@@ -457,7 +445,7 @@ export default class SelectPorts {
                 )
             )
         )
-            .sort(sortByName)
+            .sort(sortBy(["name"]))
             .map(port => {
                 const item = port.inventory.find(good => good.name === goodSelected);
 

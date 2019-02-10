@@ -1,5 +1,6 @@
 // eslint-disable-next-line import/extensions
 import { groupBy, readJson, saveJson, capitalizeFirstLetter } from "./common.mjs";
+import { sortBy } from "./common";
 
 const itemsFilename = process.argv[2],
     outDir = process.argv[3],
@@ -228,15 +229,7 @@ function convertModules() {
         // Sort by modifier
         ["frame", "trim"].forEach(type => {
             woodJson[type].forEach(APIwood => {
-                APIwood.properties.sort((a, b) => {
-                    if (a.modifier < b.modifier) {
-                        return -1;
-                    }
-                    if (a.modifier > b.modifier) {
-                        return 1;
-                    }
-                    return 0;
-                });
+                APIwood.properties.sort(sortBy(["modifier"]));
             });
         });
     }
@@ -296,9 +289,7 @@ function convertModules() {
             module.moduleType === "Hidden"
         ) {
             module.type = "Ship trim";
-        } else if (module.isBowFigure) {
-            module.type = "Bow figure";
-        } else if (module.moduleType === "Permanent" && !module.name.endsWith(" Bonus") && !module.isBowFigure) {
+        } else if (module.moduleType === "Permanent" && !module.name.endsWith(" Bonus")) {
             module.type = "Permanent";
         } else if (
             module.usageType === "All" &&
@@ -328,23 +319,25 @@ function convertModules() {
             });
         });
 
-        delete module.isBowFigure;
         delete module.moduleType;
         delete module.sortingGroup;
     }
 
     apiItems
-        .filter(item => item.ItemType === "Module")
+        .filter(
+            item =>
+                item.ItemType === "Module" &&
+                ((item.ModuleType === "Permanent" && !item.NotUsed) || item.ModuleType !== "Permanent")
+        )
         .forEach(apiModule => {
             let dontSave = false;
             const module = {
                 id: apiModule.Id,
-                name: apiModule.Name.replaceAll("'", "’").replace("Bow figure - ", ""),
+                name: apiModule.Name.replaceAll("'", "’"),
                 usageType: apiModule.UsageType,
                 APImodifiers: apiModule.Modifiers,
                 sortingGroup: apiModule.SortingGroup.replace("module:", ""),
-                isBowFigure: apiModule.bIsBowFigure,
-                isStackable: apiModule.bCanBeSetWithSameType,
+                // isStackable: !!apiModule.bCanBeSetWithSameType,
                 // minResourcesAmount: APImodule.MinResourcesAmount,
                 // maxResourcesAmount: APImodule.MaxResourcesAmount,
                 // breakUpItemsAmount: APImodule.BreakUpItemsAmount,
@@ -354,6 +347,10 @@ function convertModules() {
                 moduleLevel: levels.get(apiModule.ModuleLevel)
             };
 
+            if (module.name.startsWith("Bow figure - ")) {
+                module.name = `${module.name.replace("Bow figure - ", "")} bow figure`;
+                module.moduleLevel = "U";
+            }
             // Ignore double entries
             if (!modules.has(module.name + module.moduleLevel)) {
                 // Check for wood module
@@ -369,7 +366,7 @@ function convertModules() {
                     setModuleType(module);
                     if (
                         module.type.startsWith("Not used") ||
-                        module.name === "Gifted" ||
+                        module.name === "Cannon nation module - France" ||
                         module.name === "Coward" ||
                         module.name === "Doctor" ||
                         module.name === "Dreadful" ||
@@ -380,11 +377,10 @@ function convertModules() {
                         module.name === "Lineship Master" ||
                         module.name === "Press Gang" ||
                         module.name === "Signaling" ||
-                        module.name === "Thrifty" ||
-                        module.name === "Lead Sheating" ||
                         module.name === "TEST MODULE SPEED IN OW" ||
-                        module.name === "Cannon nation module - France" ||
-                        module.name.endsWith(" - OLD")
+                        module.name === "Thrifty" ||
+                        module.name.endsWith(" - OLD") ||
+                        module.name.endsWith("TEST")
                     ) {
                         dontSave = true;
                     } else {
@@ -396,29 +392,7 @@ function convertModules() {
         });
 
     let result = Array.from(modules.values());
-    result = result
-        .filter(module => Object.keys(module).length)
-        .sort((a, b) => {
-            if (a.type < b.type) {
-                return -1;
-            }
-            if (a.type > b.type) {
-                return 1;
-            }
-            if (a.name < b.name) {
-                return -1;
-            }
-            if (a.name > b.name) {
-                return 1;
-            }
-            if (a.moduleLevel < b.moduleLevel) {
-                return -1;
-            }
-            if (a.moduleLevel > b.moduleLevel) {
-                return 1;
-            }
-            return 0;
-        });
+    result = result.filter(module => Object.keys(module).length).sort(sortBy(["type", "name", "moduleLevel"]));
     const grouped = Array.from(groupBy(result, module => module.type));
 
     saveJson(`${outDir}/modules.json`, grouped);
