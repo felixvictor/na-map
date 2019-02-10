@@ -1090,6 +1090,7 @@ export default class CompareShips {
                     .attr("name", moduleId)
                     .attr("id", moduleId)
                     .property("multiple", type !== "Ship trim")
+                    .property("disabled", true)
                     .attr("class", "selectpicker");
             });
 
@@ -1368,8 +1369,8 @@ export default class CompareShips {
      * @returns {void}
      */
     _enableCompareSelects() {
-        this._columnsCompare.forEach(id => {
-            this._selectShip$[id].removeAttr("disabled").selectpicker("refresh");
+        this._columnsCompare.forEach(compareId => {
+            this._selectShip$[compareId].removeAttr("disabled").selectpicker("refresh");
         });
     }
 
@@ -1409,8 +1410,11 @@ export default class CompareShips {
                     this._enableCompareSelects();
                 }
                 this.woodCompare.enableSelects(compareId);
+                this._moduleTypes.forEach(type => {
+                    this._selectModule$[compareId][type].removeAttr("disabled").selectpicker("refresh");
+                });
             })
-            .selectpicker({ title: "Select ship" });
+            .selectpicker({ title: "Ship" });
 
         ["frame", "trim"].forEach(type => {
             this._selectWood$[compareId][type]
@@ -1419,7 +1423,7 @@ export default class CompareShips {
                     const shipId = +this._selectShip$[compareId].val();
                     this._refreshShips(shipId, compareId);
                 })
-                .selectpicker({ title: `Select wood ${type}` });
+                .selectpicker({ title: `Wood ${type}`, width: "150px" });
         });
 
         this._moduleTypes.forEach(type => {
@@ -1434,7 +1438,8 @@ export default class CompareShips {
                     countSelectedText(amount) {
                         return `${amount} ${type.toLowerCase()}s selected`;
                     },
-                    title: `Select ${type}`
+                    title: `${type}`,
+                    width: "150px"
                 });
         });
     }
