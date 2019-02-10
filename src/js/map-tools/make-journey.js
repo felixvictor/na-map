@@ -48,13 +48,15 @@ import CompareWoods from "../game-tools/compare-woods";
  */
 export default class Journey {
     /**
+     * @param {Map} map - map instance
      * @param {object} shipData - Ship data
      * @param {object} woodData - Wood data
      * @param {number} fontSize - Font size
      */
-    constructor(shipData, woodData, fontSize) {
+    constructor(shipData, woodData, moduleData, fontSize) {
         this._shipData = shipData;
         this._woodData = woodData;
+        this._moduleData = moduleData;
         this._fontSize = fontSize;
 
         this._compassRadius = 90;
@@ -264,9 +266,11 @@ export default class Journey {
     _initModal() {
         this._injectModal();
         this._setupWindInput();
+
         this._shipCompare = new CompareShips({
             shipData: this._shipData,
             woodData: this._woodData,
+            moduleData: this._moduleData,
             id: this._shipId
         });
         this._woodCompare = new CompareWoods(this._woodData, this._woodId);
