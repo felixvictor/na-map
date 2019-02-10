@@ -1043,10 +1043,26 @@ export default class CompareShips {
      * @returns {void}
      */
     _setupModuleData() {
-        this._moduleTypes = new Set(this._moduleDataDefault.map(type => type[0].replace(/\s–\s[a-zA-Z/]+/, "")));
+        // Get all modules where change modifier (moduleChanges) exists
         this._moduleProperties = new Map(
-            this._moduleDataDefault.map(type => type[1].map(module => [module.id, module.properties])).flat()
+            this._moduleDataDefault
+                .map(type =>
+                    type[1]
+                        .filter(module =>
+                            module.properties.some(property => {
+                                return this._moduleChanges.has(property.modifier);
+                            })
+                        )
+                        .map(module => [module.id, module])
+                )
+                .flat()
         );
+
+        // Get types from moduleProperties list
+        this._moduleTypes = new Set(
+            Array.from(this._moduleProperties).map(module => module[1].type.replace(/\s–\s[a-zA-Z/]+/, ""))
+        );
+        console.log(this._moduleProperties, this._moduleTypes);
     }
 
     /**
@@ -1090,7 +1106,6 @@ export default class CompareShips {
                     .attr("name", moduleId)
                     .attr("id", moduleId)
                     .property("multiple", type !== "Ship trim")
-                    .property("disabled", true)
                     .attr("class", "selectpicker");
             });
 
@@ -1114,7 +1129,6 @@ export default class CompareShips {
                 this._selectWood$[columnId][type] = $(`#${this._getWoodSelectId(type, columnId)}`);
                 this.woodCompare._setupWoodSelects(columnId, type, this._selectWood$[columnId][type]);
             });
-            this._setupModulesSelect(columnId);
             this._setupSelectListener(columnId);
         });
     }
@@ -1167,36 +1181,75 @@ export default class CompareShips {
     /**
      * Get select options
      * @param {string} moduleType - Module type
+     * @param {number} shipClass - Ship class
      * @returns {string} HTML formatted option
      */
-    _getUpgradesOptions(moduleType) {
-        return this._moduleDataDefault
-            .filter(type => type[0].startsWith(moduleType))
-            .map(
-                type =>
-                    `<optgroup label="${type[0]}">${type[1]
-                        .map(module => `<option value="${module.id}">${module.name}`)
-                        .join("</option>")}`
-            )
-            .join("</optgroup>");
+    _getUpgradesOptions(moduleType, shipClass) {
+        const getModuleLevel = rate => (rate <= 3 ? "L" : rate <= 5 ? "M" : "S");
+
+        // Nest module data by sub type (e.g. "Gunnery")
+        const modules = d3Nest()
+            .key(module => module[1].type.replace(/[a-zA-Z\s]+\s–\s/, ""))
+            .sortKeys(d3Ascending)
+            .entries(
+                Array.from(this._moduleProperties).filter(
+                    module =>
+                        module[1].type.replace(/\s–\s[a-zA-Z/]+/, "") === moduleType &&
+                        (module[1].moduleLevel === "U" || module[1].moduleLevel === getModuleLevel(shipClass))
+                )
+            );
+
+        let options = "";
+        if (modules.length > 1) {
+            // Get options with sub types as optgroups
+            options = modules
+                .map(
+                    group =>
+                        `<optgroup label="${group.key}">${group.values
+                            .map(module => `<option value="${module[0]}">${module[1].name}`)
+                            .join("</option>")}`
+                )
+                .join("</optgroup>");
+        } else {
+            // Get options without optgroups
+            options = modules.map(
+                group =>
+                    `${group.values.map(module => `<option value="${module[0]}">${module[1].name}`).join("</option>")}`
+            );
+        }
+
+        return options;
     }
 
     /**
      * Setup upgrades select
+     * @param {number} shipId - Ship id
      * @param {string} columnId - Column id
      * @returns {void}
      */
-    _setupModulesSelect(columnId) {
+    _setupModulesSelect(shipId, columnId) {
+        const getShipClass = () => this._shipData.find(ship => ship.id === shipId).class;
+
         this._selectModule$[columnId] = {};
 
         this._moduleTypes.forEach(type => {
             this._selectModule$[columnId][type] = $(`#${this._getModuleSelectId(type, columnId)}`);
-            const options = this._getUpgradesOptions(type);
+            const options = this._getUpgradesOptions(type, getShipClass());
 
             this._selectModule$[columnId][type].append(options);
-            if (columnId !== "Base") {
-                this._selectModule$[columnId][type].attr("disabled", "disabled");
-            }
+            this._selectModule$[columnId][type]
+                .on("changed.bs.select", () => {
+                    this._upgradeSelected(columnId);
+                    this._refreshShips(shipId, columnId);
+                })
+                .selectpicker({
+                    selectedTextFormat: "count > 1",
+                    countSelectedText(amount) {
+                        return `${amount} ${type.toLowerCase()}s selected`;
+                    },
+                    title: `${type}`,
+                    width: "150px"
+                });
         });
     }
 
@@ -1290,8 +1343,9 @@ export default class CompareShips {
 
             // Add modifier amount
             this._selectedUpgradeIds[compareId].forEach(id => {
-                const properties = this._moduleProperties.get(id);
-                properties.forEach(property => {
+                const module = this._moduleProperties.get(id);
+
+                module.properties.forEach(property => {
                     if (this._moduleChanges.has(property.modifier)) {
                         modifierAmount.set(
                             property.modifier,
@@ -1393,7 +1447,7 @@ export default class CompareShips {
             }
         });
 
-        console.log("selectedUpgradeIds", this._selectedUpgradeIds, compareId, this._selectedUpgradeIds[compareId]);
+        // console.log("selectedUpgradeIds", this._selectedUpgradeIds, compareId, this._selectedUpgradeIds[compareId]);
     }
 
     /**
@@ -1410,9 +1464,7 @@ export default class CompareShips {
                     this._enableCompareSelects();
                 }
                 this.woodCompare.enableSelects(compareId);
-                this._moduleTypes.forEach(type => {
-                    this._selectModule$[compareId][type].removeAttr("disabled").selectpicker("refresh");
-                });
+                this._setupModulesSelect(shipId, compareId);
             })
             .selectpicker({ title: "Ship" });
 
@@ -1424,23 +1476,6 @@ export default class CompareShips {
                     this._refreshShips(shipId, compareId);
                 })
                 .selectpicker({ title: `Wood ${type}`, width: "150px" });
-        });
-
-        this._moduleTypes.forEach(type => {
-            this._selectModule$[compareId][type]
-                .on("changed.bs.select", () => {
-                    this._upgradeSelected(compareId);
-                    const shipId = +this._selectShip$[compareId].val();
-                    this._refreshShips(shipId, compareId);
-                })
-                .selectpicker({
-                    selectedTextFormat: "count > 1",
-                    countSelectedText(amount) {
-                        return `${amount} ${type.toLowerCase()}s selected`;
-                    },
-                    title: `${type}`,
-                    width: "150px"
-                });
         });
     }
 
