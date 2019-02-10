@@ -891,7 +891,7 @@ export default class CompareShips {
         this._baseName = "Compare ships";
         this._buttonId = `button-${this._baseId}`;
         this._modalId = `modal-${this._baseId}`;
-        this._upgradeId = `${this._baseId}-upgrade`;
+        this._moduleId = `${this._baseId}-module`;
 
         this._selectedUpgradeIds = [];
 
@@ -1040,6 +1040,7 @@ export default class CompareShips {
      * @returns {void}
      */
     _setupModuleData() {
+        this._moduleTypes = new Set(this._moduleDataDefault.map(type => type[0].replace(/\s–\s[a-zA-Z/]+/, "")));
         this._moduleProperties = new Map(
             this._moduleDataDefault.map(type => type[1].map(module => [module.id, module.properties])).flat()
         );
@@ -1057,12 +1058,12 @@ export default class CompareShips {
             .attr("class", "container-fluid")
             .append("div")
             .attr("class", "row");
-        this._columns.forEach(column => {
+        this._columns.forEach(columnId => {
             const div = row
                 .append("div")
-                .attr("class", `col-md-4 ml-auto pt-2 ${column === "Base" ? "columnA" : "columnC"}`);
+                .attr("class", `col-md-4 ml-auto pt-2 ${columnId === "Base" ? "columnA" : "columnC"}`);
 
-            const shipId = `${this._baseId}-${column}-select`;
+            const shipId = `${this._baseId}-${columnId}-select`;
             div.append("label")
                 .append("select")
                 .attr("name", shipId)
@@ -1070,7 +1071,7 @@ export default class CompareShips {
                 .attr("class", "selectpicker");
 
             ["frame", "trim"].forEach(type => {
-                const woodId = `${this._woodId}-${type}-${column}-select`;
+                const woodId = `${this._woodId}-${type}-${columnId}-select`;
                 div.append("label")
                     .append("select")
                     .attr("name", woodId)
@@ -1079,15 +1080,17 @@ export default class CompareShips {
             });
 
             div.append("div")
-                .attr("id", `${this._baseId}-${column}`)
-                .attr("class", `${column === "Base" ? "ship-base" : "ship-compare"}`);
+                .attr("id", `${this._baseId}-${columnId}`)
+                .attr("class", `${columnId === "Base" ? "ship-base" : "ship-compare"}`);
 
-            div.append("label")
-                .append("select")
-                .attr("name", `${this._upgradeId}-${column}-select`)
-                .attr("id", `${this._upgradeId}-${column}-select`)
-                .property("multiple", true)
-                .attr("class", "selectpicker");
+            this._moduleTypes.forEach(type => {
+                div.append("label")
+                    .append("select")
+                    .attr("name", this._getModuleId(type, columnId))
+                    .attr("id", this._getModuleId(type, columnId))
+                    .property("multiple", true)
+                    .attr("class", "selectpicker");
+            });
         });
     }
 
@@ -1104,7 +1107,7 @@ export default class CompareShips {
                 const select$ = $(`#${this._woodId}-${type}-${columnId}-select`);
                 this.woodCompare._setupWoodSelects(columnId, type, select$);
             });
-            this._setupUpgradesSelect(columnId);
+            this._setupModulesSelect(columnId);
             this._setupSelectListener(columnId);
         });
     }
@@ -1156,10 +1159,12 @@ export default class CompareShips {
 
     /**
      * Get select options
+     * @param {string} moduleType - Module type
      * @returns {string} HTML formatted option
      */
-    _getUpgradesOptions() {
+    _getUpgradesOptions(moduleType) {
         return this._moduleDataDefault
+            .filter(type => type[0].startsWith(moduleType))
             .map(
                 type =>
                     `<optgroup label="${type[0]}">${type[1]
@@ -1169,19 +1174,25 @@ export default class CompareShips {
             .join("</optgroup>");
     }
 
+    _getModuleId(type, columnId) {
+        return `${this._moduleId}-${type.replace(/\s/, "")}-${columnId}-select`;
+    }
+
     /**
      * Setup upgrades select
      * @param {string} columnId - Column id
      * @returns {void}
      */
-    _setupUpgradesSelect(columnId) {
-        const select$ = $(`#${this._upgradeId}-${columnId}-select`);
-        const options = this._getUpgradesOptions();
+    _setupModulesSelect(columnId) {
+        this._moduleTypes.forEach(type => {
+            const select$ = $(`#${this._getModuleId(type, columnId)}`);
+            const options = this._getUpgradesOptions(type);
 
-        select$.append(options);
-        if (columnId !== "Base") {
-            select$.attr("disabled", "disabled");
-        }
+            select$.append(options);
+            if (columnId !== "Base") {
+                select$.attr("disabled", "disabled");
+            }
+        });
     }
 
     /**
@@ -1359,8 +1370,17 @@ export default class CompareShips {
         });
     }
 
-    _upgradeSelected(compareId, selectUpgrades$) {
-        this._selectedUpgradeIds[compareId] = Array.from(selectUpgrades$.selectedOptions).map(option => +option.value);
+    _upgradeSelected(compareId) {
+        this._selectedUpgradeIds[compareId] = [];
+
+        this._moduleTypes.forEach(type => {
+            const { selectedOptions } = document.getElementById(this._getModuleId(type, compareId));
+            if (selectedOptions.length) {
+                const values = Array.from(selectedOptions).map(option => +option.value);
+                this._selectedUpgradeIds[compareId] = this._selectedUpgradeIds[compareId].concat(values);
+            }
+        });
+        // ship-compare-module-Shiptrim-Base-select
         console.log("selectedUpgradeIds", this._selectedUpgradeIds[compareId]);
     }
 
@@ -1381,9 +1401,7 @@ export default class CompareShips {
                 }
                 this.woodCompare.enableSelects(compareId);
             })
-            .selectpicker({ noneSelectedText: "Select ship" })
-            .val("default")
-            .selectpicker("refresh");
+            .selectpicker({ title: "Select ship" });
 
         ["frame", "trim"].forEach(type => {
             const select$ = $(`#${this._woodId}-${type}-${compareId}-select`);
@@ -1393,25 +1411,24 @@ export default class CompareShips {
                     const shipId = +selectShip$.val();
                     this._refreshShips(shipId, compareId);
                 })
-                .selectpicker({ noneSelectedText: `Select ${type}` })
-                .val("default")
-                .selectpicker("refresh");
+                .selectpicker({ title: `Select wood ${type}` });
         });
 
-        const selectUpgrades = document.getElementById(`${this._upgradeId}-${compareId}-select`);
-        $(selectUpgrades)
-            .on("changed.bs.select", () => {
-                this._upgradeSelected(compareId, selectUpgrades);
-                const shipId = +selectShip$.val();
-                this._refreshShips(shipId, compareId);
-            })
-            .selectpicker({
-                selectedTextFormat: "count > 1",
-                countSelectedText(amount) {
-                    return `${amount} upgrades selected`;
-                },
-                title: "Select upgrades"
-            });
+        this._moduleTypes.forEach(type => {
+            $(`#${this._getModuleId(type, compareId)}`)
+                .on("changed.bs.select", () => {
+                    this._upgradeSelected(compareId);
+                    const shipId = +selectShip$.val();
+                    this._refreshShips(shipId, compareId);
+                })
+                .selectpicker({
+                    selectedTextFormat: "count > 1",
+                    countSelectedText(amount) {
+                        return `${amount} ${type.toLowerCase()}s selected`;
+                    },
+                    title: `Select ${type}`
+                });
+        });
     }
 
     get woodCompare() {
