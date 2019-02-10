@@ -89,7 +89,7 @@ export default class SelectPorts {
         });
 
         this._buyGoodsSelector.addEventListener("change", event => {
-            registerEvent("Menu", "Good relations");
+            registerEvent("Menu", "Goods’ relations");
             this._resetOtherSelects(this._buyGoodsSelector);
             this._goodSelected();
             event.preventDefault();
@@ -238,7 +238,7 @@ export default class SelectPorts {
             liveSearch: true,
             liveSearchNormalize: true,
             liveSearchPlaceholder: "Search ...",
-            title: "Show good relations",
+            title: "Show goods’ relations",
             virtualScroll: true
         });
         this._buyGoodsSelector.classList.remove("d-none");
