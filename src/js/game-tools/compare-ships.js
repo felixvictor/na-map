@@ -884,14 +884,16 @@ export default class CompareShips {
      * @param {Object} upgradeData - Module data
      * @param {string} id - Base id (default "ship-compare")
      */
-    constructor({ shipData, woodData, moduleData: upgradeData, id = "ship-compare" }) {
+    constructor({ shipData, woodData, moduleData, id = "ship-compare" }) {
         this._shipData = shipData;
-        this._upgradeDataDefault = upgradeData;
+        this._moduleDataDefault = moduleData;
         this._baseId = id;
         this._baseName = "Compare ships";
         this._buttonId = `button-${this._baseId}`;
         this._modalId = `modal-${this._baseId}`;
         this._upgradeId = `${this._baseId}-upgrade`;
+
+        this._selectedUpgradeIds = [];
 
         if (this._baseId === "ship-compare") {
             this._columnsCompare = ["C1", "C2"];
@@ -1013,10 +1015,10 @@ export default class CompareShips {
     }
 
     /**
-     * Setup data
+     * Setup ship data
      * @returns {void}
      */
-    _setupData() {
+    _setupShipData() {
         this.shipSelectData = d3Nest()
             .key(ship => ship.class)
             .sortKeys(d3Ascending)
@@ -1031,6 +1033,16 @@ export default class CompareShips {
                     }))
                     .sort(sortBy(["name"]))
             );
+    }
+
+    /**
+     * Setup module data
+     * @returns {void}
+     */
+    _setupModuleData() {
+        this._moduleProperties = new Map(
+            this._moduleDataDefault.map(type => type[1].map(module => [module.id, module.properties])).flat()
+        );
     }
 
     /**
@@ -1080,7 +1092,8 @@ export default class CompareShips {
     }
 
     _initData() {
-        this._setupData();
+        this._setupShipData();
+        this._setupModuleData();
         this.woodCompare._setupData();
     }
 
@@ -1146,7 +1159,7 @@ export default class CompareShips {
      * @returns {string} HTML formatted option
      */
     _getUpgradesOptions() {
-        return this._upgradeDataDefault
+        return this._moduleDataDefault
             .map(
                 type =>
                     `<optgroup label="${type[0]}">${type[1]
@@ -1181,7 +1194,7 @@ export default class CompareShips {
         let shipData = this._shipData.filter(ship => ship.id === shipId)[0];
 
         shipData = this._addWoodData(shipData, columnId);
-        shipData = this._addUpgradesData(shipData, columnId);
+        shipData = this._addModulesData(shipData, columnId);
 
         return shipData;
     }
@@ -1253,46 +1266,51 @@ export default class CompareShips {
      * @param {*} compareId - Column id
      * @returns {Object} - Updated ship data
      */
-    _addUpgradesData(shipData, compareId) {
+    _addModulesData(shipData, compareId) {
         const data = JSON.parse(JSON.stringify(shipData));
-        const modifierAmount = new Map();
 
-        // Add modifier amount
-        this.woodCompare._instances[compareId][dataLink][type].properties.forEach(property => {
-            if (this._upgradeChanges.has(property.modifier)) {
-                modifierAmount.set(
-                    property.modifier,
-                    modifierAmount.has(property.modifier)
-                        ? modifierAmount.get(property.modifier) + property.amount
-                        : property.amount
-                );
-            }
-        });
+        if (typeof this._selectedUpgradeIds[compareId] !== "undefined") {
+            const modifierAmount = new Map();
 
-        modifierAmount.forEach((value, key) => {
-            this._upgradeChanges.get(key).forEach(modifier => {
-                const index = modifier.split("."),
-                    factor = 1 + modifierAmount.get(key) / 100;
-
-                if (index.length > 1) {
-                    if (data[index[0]][index[1]]) {
-                        data[index[0]][index[1]] *= factor;
-                    } else {
-                        data[index[0]][index[1]] = modifierAmount.get(key);
+            // Add modifier amount
+            this._selectedUpgradeIds[compareId].forEach(id => {
+                const properties = this._moduleProperties.get(id);
+                properties.forEach(property => {
+                    if (this._upgradeChanges.has(property.modifier)) {
+                        modifierAmount.set(
+                            property.modifier,
+                            modifierAmount.has(property.modifier)
+                                ? modifierAmount.get(property.modifier) + property.amount
+                                : property.amount
+                        );
                     }
-                } else if (data[index[0]]) {
-                    data[index[0]] *= factor;
-                } else {
-                    data[index[0]] = modifierAmount.get(key);
-                }
+                });
             });
-        });
 
-        data.speedDegrees = data.speedDegrees.map(speed => {
-            const factor = 1 + modifierAmount.get("Ship speed") / 100;
-            return Math.max(Math.min(speed * factor, this._maxSpeed), this._minSpeed);
-        });
+            modifierAmount.forEach((value, key) => {
+                this._upgradeChanges.get(key).forEach(modifier => {
+                    const index = modifier.split("."),
+                        factor = 1 + modifierAmount.get(key) / 100;
 
+                    if (index.length > 1) {
+                        if (data[index[0]][index[1]]) {
+                            data[index[0]][index[1]] *= factor;
+                        } else {
+                            data[index[0]][index[1]] = modifierAmount.get(key);
+                        }
+                    } else if (data[index[0]]) {
+                        data[index[0]] *= factor;
+                    } else {
+                        data[index[0]] = modifierAmount.get(key);
+                    }
+                });
+            });
+
+            data.speedDegrees = data.speedDegrees.map(speed => {
+                const factor = 1 + modifierAmount.get("Ship speed") / 100;
+                return Math.max(Math.min(speed * factor, this._maxSpeed), this._minSpeed);
+            });
+        }
         return data;
     }
 
@@ -1342,14 +1360,8 @@ export default class CompareShips {
     }
 
     _upgradeSelected(compareId, selectUpgrades$) {
-        const selectedUpgradeIds = Array.from(selectUpgrades$.selectedOptions).map(option => +option.value);
-        console.log(selectedUpgradeIds);
-
-        this._selectedUpgrades = this._upgradeDataDefault.forEach(type =>
-            type[1].filter(module => selectedUpgradeIds.includes(module.id)).map(module => module.properties)
-        );
-        //    .filter(type => type)
-        console.log(this._selectedUpgrades);
+        this._selectedUpgradeIds[compareId] = Array.from(selectUpgrades$.selectedOptions).map(option => +option.value);
+        console.log("selectedUpgradeIds", this._selectedUpgradeIds[compareId]);
     }
 
     /**
