@@ -90,6 +90,10 @@ class Map {
             {
                 fileName: "woods.json",
                 name: "woods"
+            },
+            {
+                fileName: "modules.json",
+                name: "modules"
             }
         ];
 
@@ -299,7 +303,8 @@ class Map {
 
         this._woodData = JSON.parse(JSON.stringify(data.woods));
         this._shipData = JSON.parse(JSON.stringify(data.ships));
-        this._journey = new Journey(this._shipData, this._woodData, this.rem);
+        const moduleData = JSON.parse(JSON.stringify(data.modules));
+        this._journey = new Journey(this._shipData, this._woodData, moduleData, this.rem);
 
         this._portSelect = new SelectPorts(this._ports, this._pbZone, this);
         this.showTrades = new ShowTrades(
