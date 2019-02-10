@@ -110,7 +110,7 @@ export default class ListWoods {
     _getModifiers(type) {
         const modifiers = new Set();
         this._woodData[type].forEach(wood => {
-            wood.forEach(property => {
+            wood.properties.forEach(property => {
                 if (property.modifier !== "Ship material" && property.modifier !== "Boarding morale") {
                     modifiers.add(property.modifier);
                 }
