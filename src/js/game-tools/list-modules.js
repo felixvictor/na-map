@@ -36,24 +36,6 @@ export default class ListModules {
     _injectModal() {
         insertBaseModal(this._modalId, this._baseName);
 
-        /*
-<section id="modal-modules" class="modal" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <header class="modal-header">
-                <h3>Modules</h3>
-            </header>
-            <div class="modal-body">
-                <label for="modules-select"></label><select name="modules-select" id="modules-select"></select>
-                <div id="modules-list" class="container-fluid"></div>
-            </div>
-            <footer class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </footer>
-        </div>
-    </div>
-</section>
-         */
         const id = `${this._baseId}-select`,
             body = d3Select(`#${this._modalId} .modal-body`);
         body.append("label").attr("for", id);
@@ -137,13 +119,10 @@ export default class ListModules {
                      * @param {integer} index Position
                      * @return {boolean} True if same
                      */
-                    function hasSameProperties(index) {
-                        return (
-                            index < type[1].length &&
-                            module.name === type[1][index].name &&
-                            JSON.stringify(module.properties) === JSON.stringify(type[1][index].properties)
-                        );
-                    }
+                    const hasSameProperties = index =>
+                        index < type[1].length &&
+                        module.name === type[1][index].name &&
+                        JSON.stringify(module.properties) === JSON.stringify(type[1][index].properties);
 
                     rate = getRate(module.moduleLevel);
                     if (hasSameProperties(i + 1)) {

@@ -10,8 +10,9 @@
 
 import { min as d3Min, max as d3Max } from "d3-array";
 import { select as d3Select } from "d3-selection";
-import { formatFloat } from "../util";
+
 import { registerEvent } from "../analytics";
+import { formatFloat, sortBy } from "../util";
 import { insertBaseModal } from "../common";
 
 class Wood {
@@ -318,24 +319,8 @@ export default class CompareWoods {
     }
 
     _setupData() {
-        this._frameSelectData = this._woodData.frame.sort((a, b) => {
-            if (a.name < b.name) {
-                return -1;
-            }
-            if (a.name > b.name) {
-                return 1;
-            }
-            return 0;
-        });
-        this._trimSelectData = this._woodData.trim.sort((a, b) => {
-            if (a.name < b.name) {
-                return -1;
-            }
-            if (a.name > b.name) {
-                return 1;
-            }
-            return 0;
-        });
+        this._frameSelectData = this._woodData.frame.sort(sortBy(["name"]));
+        this._trimSelectData = this._woodData.trim.sort(sortBy(["name"]));
         this._setOption(
             this._frameSelectData.map(wood => `<option value="${wood.name}">${wood.name}</option>`),
             this._trimSelectData.map(wood => `<option value="${wood.name}">${wood.name}</option>`)
