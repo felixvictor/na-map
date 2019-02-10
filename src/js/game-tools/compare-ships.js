@@ -1062,7 +1062,7 @@ export default class CompareShips {
         this._moduleTypes = new Set(
             Array.from(this._moduleProperties).map(module => module[1].type.replace(/\s–\s[a-zA-Z/]+/, ""))
         );
-        console.log(this._moduleProperties, this._moduleTypes);
+        // console.log(this._moduleProperties, this._moduleTypes);
     }
 
     /**
