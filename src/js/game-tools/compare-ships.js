@@ -894,6 +894,8 @@ export default class CompareShips {
         this._moduleId = `${this._baseId}-module`;
 
         this._selectedUpgradeIds = [];
+        this._selectShip$ = {};
+        this._selectModule$ = {};
 
         if (this._baseId === "ship-compare") {
             this._columnsCompare = ["C1", "C2"];
@@ -1086,8 +1088,8 @@ export default class CompareShips {
             this._moduleTypes.forEach(type => {
                 div.append("label")
                     .append("select")
-                    .attr("name", this._getModuleId(type, columnId))
-                    .attr("id", this._getModuleId(type, columnId))
+                    .attr("name", this._getModuleSelectId(type, columnId))
+                    .attr("id", this._getModuleSelectId(type, columnId))
                     .property("multiple", true)
                     .attr("class", "selectpicker");
             });
@@ -1148,12 +1150,12 @@ export default class CompareShips {
      * @returns {void}
      */
     _setupShipSelect(columnId) {
-        const select$ = $(`#${this._baseId}-${columnId}-select`);
+        this._selectShip$[columnId] = $(`#${this._getShipSelectId(columnId)}`);
         const options = this._getShipOptions();
 
-        select$.append(options);
+        this._selectShip$[columnId].append(options);
         if (columnId !== "Base") {
-            select$.attr("disabled", "disabled");
+            this._selectShip$[columnId].attr("disabled", "disabled");
         }
     }
 
@@ -1174,23 +1176,21 @@ export default class CompareShips {
             .join("</optgroup>");
     }
 
-    _getModuleId(type, columnId) {
-        return `${this._moduleId}-${type.replace(/\s/, "")}-${columnId}-select`;
-    }
-
     /**
      * Setup upgrades select
      * @param {string} columnId - Column id
      * @returns {void}
      */
     _setupModulesSelect(columnId) {
+        this._selectModule$[columnId] = {};
+
         this._moduleTypes.forEach(type => {
-            const select$ = $(`#${this._getModuleId(type, columnId)}`);
+            this._selectModule$[columnId][type] = $(`#${this._getModuleSelectId(type, columnId)}`);
             const options = this._getUpgradesOptions(type);
 
-            select$.append(options);
+            this._selectModule$[columnId][type].append(options);
             if (columnId !== "Base") {
-                select$.attr("disabled", "disabled");
+                this._selectModule$[columnId][type].attr("disabled", "disabled");
             }
         });
     }
@@ -1317,11 +1317,14 @@ export default class CompareShips {
                 });
             });
 
-            data.speedDegrees = data.speedDegrees.map(speed => {
-                const factor = 1 + modifierAmount.get("Ship speed") / 100;
-                return Math.max(Math.min(speed * factor, this._maxSpeed), this._minSpeed);
-            });
+            if (modifierAmount.has("Ship speed")) {
+                data.speedDegrees = data.speedDegrees.map(speed => {
+                    const factor = 1 + modifierAmount.get("Ship speed") / 100;
+                    return Math.max(Math.min(speed * factor, this._maxSpeed), this._minSpeed);
+                });
+            }
         }
+
         return data;
     }
 
@@ -1374,14 +1377,14 @@ export default class CompareShips {
         this._selectedUpgradeIds[compareId] = [];
 
         this._moduleTypes.forEach(type => {
-            const { selectedOptions } = document.getElementById(this._getModuleId(type, compareId));
+            const selectedOptions = this._selectModule$[compareId][type].val().map(Number);
+            console.log({ selectedOptions });
             if (selectedOptions.length) {
-                const values = Array.from(selectedOptions).map(option => +option.value);
-                this._selectedUpgradeIds[compareId] = this._selectedUpgradeIds[compareId].concat(values);
+                this._selectedUpgradeIds[compareId] = this._selectedUpgradeIds[compareId].concat(selectedOptions);
             }
         });
         // ship-compare-module-Shiptrim-Base-select
-        console.log("selectedUpgradeIds", this._selectedUpgradeIds[compareId]);
+        console.log("selectedUpgradeIds", this._selectedUpgradeIds, compareId, this._selectedUpgradeIds[compareId]);
     }
 
     /**
@@ -1390,11 +1393,9 @@ export default class CompareShips {
      * @returns {void}
      */
     _setupSelectListener(compareId) {
-        const selectShip$ = $(`#${this._baseId}-${compareId}-select`);
-        selectShip$
-            .on("changed.bs.select", event => {
-                event.preventDefault();
-                const shipId = +selectShip$.val();
+        this._selectShip$[compareId]
+            .on("changed.bs.select", () => {
+                const shipId = +this._selectShip$[compareId].val();
                 this._refreshShips(shipId, compareId);
                 if (compareId === "Base" && this._baseId !== "ship-journey") {
                     this._enableCompareSelects();
@@ -1407,18 +1408,18 @@ export default class CompareShips {
             const select$ = $(`#${this._woodId}-${type}-${compareId}-select`);
             select$
                 .on("changed.bs.select", () => {
-                    this._woodSelected(compareId, type, select$);
-                    const shipId = +selectShip$.val();
+                    this.woodCompare._woodSelected(compareId, type, select$);
+                    const shipId = +this._selectShip$[compareId].val();
                     this._refreshShips(shipId, compareId);
                 })
                 .selectpicker({ title: `Select wood ${type}` });
         });
 
         this._moduleTypes.forEach(type => {
-            $(`#${this._getModuleId(type, compareId)}`)
+            this._selectModule$[compareId][type]
                 .on("changed.bs.select", () => {
                     this._upgradeSelected(compareId);
-                    const shipId = +selectShip$.val();
+                    const shipId = +this._selectShip$[compareId].val();
                     this._refreshShips(shipId, compareId);
                 })
                 .selectpicker({
@@ -1429,6 +1430,18 @@ export default class CompareShips {
                     title: `Select ${type}`
                 });
         });
+    }
+
+    _getShipSelectId(columnId) {
+        return `${this._baseId}-${columnId}-select`;
+    }
+
+    _getWoodSelectId(type, columnId) {
+        return `${this._woodId}-${type}-${columnId}-select`;
+    }
+
+    _getModuleSelectId(type, columnId) {
+        return `${this._moduleId}-${type.replace(/\s/, "")}-${columnId}-select`;
     }
 
     get woodCompare() {
