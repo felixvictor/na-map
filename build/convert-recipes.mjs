@@ -2,7 +2,7 @@
     convert-recipes.mjs
  */
 
-import { readJson, saveJson } from "./common.mjs";
+import { readJson, saveJson, simpleSort, sortBy } from "./common.mjs";
 
 const inBaseFilename = process.argv[2],
     outFilename = process.argv[3],
@@ -102,15 +102,7 @@ function convertRecipes() {
                 if (ingredients.has(APIingredient.Template)) {
                     const updatedIngredient = ingredients.get(APIingredient.Template);
                     updatedIngredient.recipe.push(recipeName);
-                    updatedIngredient.recipe.sort((a, b) => {
-                        if (a < b) {
-                            return -1;
-                        }
-                        if (a > b) {
-                            return 1;
-                        }
-                        return 0;
-                    });
+                    updatedIngredient.recipe.sort(simpleSort);
                     ingredients.set(APIingredient.Template, updatedIngredient);
                 } else {
                     const ingredient = {
@@ -124,26 +116,10 @@ function convertRecipes() {
         );
     });
 
-    data.recipe.sort((a, b) => {
-        if (a.name < b.name) {
-            return -1;
-        }
-        if (a.name > b.name) {
-            return 1;
-        }
-        return 0;
-    });
+    data.recipe.sort(sortBy(["name"]));
 
     const result = Array.from(ingredients.values());
-    data.ingredient = result.sort((a, b) => {
-        if (a.name < b.name) {
-            return -1;
-        }
-        if (a.name > b.name) {
-            return 1;
-        }
-        return 0;
-    });
+    data.ingredient = result.sort(sortBy(["name"]));
 
     saveJson(outFilename, data);
 }
