@@ -149,20 +149,33 @@ export default class DisplayGrid {
         // svg groups
         this._divXAxis = d3Select("#axis-x");
         this._svgXAxis = d3Select("#axis-x svg");
-        this._svgXAxis.attr("height", this._xBackgroundHeight).attr("width", this._width);
-        this._svgXAxisRect = this._svgXAxis
+        this._divXAxisRect = d3Select("#axis-rect-x");
+
+        this._svgXAxis.attr("height", `${this._height}px`).attr("width", `${this._width}px`);
+        this._svgXAxisRect = this._divXAxisRect
+            .append("svg")
+            .attr("class", "axis")
+            .attr("height", `${this._xBackgroundHeight}px`)
+            .attr("width", `${this._width}px`)
             .append("rect")
-            .attr("height", this._xBackgroundHeight)
-            .attr("width", this._width);
+            .attr("height", `${this._xBackgroundHeight}px`)
+            .attr("width", `${this._width}px`);
         this._gXAxis = this._svgXAxis.append("g");
 
+        const yHeight = this._height - this._xBackgroundHeight;
         this._divYAxis = d3Select("#axis-y");
         this._svgYAxis = d3Select("#axis-y svg");
-        this._svgYAxis.attr("height", this._height - this._xBackgroundHeight).attr("width", this._yBackgroundWidth);
-        this._svgYAxisRect = this._svgYAxis
+        this._divYAxisRect = d3Select("#axis-rect-y");
+
+        this._svgYAxis.attr("height", `${yHeight}px`).attr("width", `${this._width}px`);
+        this._svgYAxisRect = this._divYAxisRect
+            .append("svg")
+            .attr("class", "axis")
+            .attr("height", `${yHeight}px`)
+            .attr("width", `${this._yBackgroundWidth}px`)
             .append("rect")
-            .attr("height", this._height - this._xBackgroundHeight)
-            .attr("width", this._yBackgroundWidth);
+            .attr("height", `${yHeight}px`)
+            .attr("width", `${this._yBackgroundWidth}px`);
         this._gYAxis = this._svgYAxis.append("g");
 
         // Initialise both axis first
@@ -343,13 +356,16 @@ export default class DisplayGrid {
             this._svgXAxis.attr("width", this._width);
             this._svgXAxisRect.attr("width", this._width);
 
-            this._svgYAxis.attr("height", this._height - this._xBackgroundHeight);
-            this._svgYAxisRect.attr("height", this._height - this._xBackgroundHeight);
+            const yHeight = this._height - this._xBackgroundHeight;
+            this._svgYAxis.attr("height", yHeight);
+            this._svgYAxisRect.attr("height", yHeight);
         }
 
         // Show or hide axis
         this._divXAxis.classed("d-none", !show);
+        this._divXAxisRect.classed("d-none", !show);
         this._divYAxis.classed("d-none", !show);
+        this._divYAxisRect.classed("d-none", !show);
     }
 
     /**
