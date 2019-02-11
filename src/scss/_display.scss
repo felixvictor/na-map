@@ -868,27 +868,6 @@ table a {
     flex-direction: row;
 }
 
-.axis {
-    line {
-        opacity: 0.5;
-        stroke: $primary-600;
-    }
-
-    text {
-        font-style: italic;
-        fill: $secondary-700;
-    }
-
-    rect {
-        fill: $primary-100;
-        fill-opacity: 0.7;
-    }
-}
-
-.axis-y {
-    order: 1;
-}
-
 .wind-predict {
     order: 2;
     margin-right: auto;
@@ -986,4 +965,33 @@ table a {
         padding-bottom: $paddingThird;
         font-style: italic;
     }
+}
+
+svg.axis {
+    pointer-events: none;
+}
+
+.axis {
+    line {
+        opacity: 0.5;
+        stroke: $primary-600;
+    }
+
+    text {
+        font-style: italic;
+        fill: $secondary-700;
+    }
+
+    rect {
+        fill: $primary-100;
+        fill-opacity: 0.7;
+    }
+}
+
+.axis-y {
+    order: 1;
+}
+
+.axis-x,.axis-y {
+    position: absolute;
 }
