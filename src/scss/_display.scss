@@ -984,12 +984,11 @@ svg {
 
     text {
         font-style: italic;
-        fill: $secondary-700;
     }
 
     rect {
         fill: $primary-100;
-        fill-opacity: .7;
+        fill-opacity: .2;
     }
 }
 
@@ -1001,7 +1000,5 @@ svg {
 .axis-y {
     position: absolute;
     pointer-events: none;
-}
-
-path {
+    user-select: none;
 }
