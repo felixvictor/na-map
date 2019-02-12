@@ -868,27 +868,6 @@ table a {
     flex-direction: row;
 }
 
-.axis {
-    line {
-        opacity: .5;
-        stroke: $primary-600;
-    }
-
-    text {
-        font-style: italic;
-        fill: $secondary-700;
-    }
-
-    rect {
-        fill: $primary-100;
-        fill-opacity: .7;
-    }
-}
-
-.axis-y {
-    order: 1;
-}
-
 .wind-predict {
     order: 2;
     margin-right: auto;
@@ -911,6 +890,7 @@ table a {
     width: 23vw;
     min-width: 240px;
     max-width: 320px;
+    pointer-events: none;
 }
 
 .block {
@@ -924,6 +904,7 @@ table a {
     align-items: center;
     justify-content: space-around;
     padding: $paddingHalf;
+    pointer-events: all;
     background: rgba($primary-200, .8);
 
     .des {
@@ -940,7 +921,9 @@ table a {
     flex: 1 1 auto;
     flex-direction: column;
     overflow-y: scroll;
+    pointer-events: all;
     background: rgba($primary-100, .8);
+
     .bootstrap-select {
         padding: $paddingHalf;
     }
@@ -950,6 +933,7 @@ table a {
     display: flex;
     flex-wrap: wrap;
     padding-top: $spacer;
+
     .block:nth-of-type(odd) {
         background: rgba($primary-400, .3);
     }
@@ -962,6 +946,7 @@ table a {
     align-items: stretch;
     justify-content: flex-start;
     white-space: nowrap;
+
     & > div {
         padding: 0 $paddingThird;
     }
@@ -975,8 +960,45 @@ table a {
 .block-block {
     display: flex;
     flex-direction: column;
+
     span {
         padding-bottom: $paddingThird;
         font-style: italic;
     }
+}
+
+svg {
+    .axis {
+        pointer-events: none;
+    }
+}
+
+.axis {
+    .domain {
+        display: none;
+    }
+
+    line {
+        stroke: $primary-600;
+    }
+
+    text {
+        font-style: italic;
+    }
+
+    rect {
+        fill: $primary-100;
+        fill-opacity: .2;
+    }
+}
+
+.axis-y {
+    order: 1;
+}
+
+.axis-x,
+.axis-y {
+    position: absolute;
+    pointer-events: none;
+    user-select: none;
 }
