@@ -147,22 +147,45 @@ export default class DisplayGrid {
             .tickSize(this._maxCoord);
 
         // svg groups
-        this._divXAxis = d3Select("#axis-x");
-        this._svgXAxis = d3Select("#axis-x svg");
-        this._svgXAxis.attr("height", this._xBackgroundHeight).attr("width", this._width);
-        this._svgXAxisRect = this._svgXAxis
+        this._svgMap = d3Select("#na-svg");
+        this._divXAxisRect = d3Select("#axis-rect-x");
+
+        const xLeft = this._yBackgroundWidth + this._defaultFontSize;
+        this._svgXAxis = this._svgMap
+            .insert("svg", "g.pb")
+            .attr("class", "axis d-none")
+            .attr("left", `${xLeft}px`)
+            .attr("height", `${this._height}px`)
+            .attr("width", `${this._width}px`);
+        this._svgXAxisRect = this._divXAxisRect
+            .append("svg")
+            .attr("class", "axis")
+            .attr("height", `${this._xBackgroundHeight}px`)
+            .attr("width", `${this._width}px`)
             .append("rect")
-            .attr("height", this._xBackgroundHeight)
-            .attr("width", this._width);
+            .attr("height", `${this._xBackgroundHeight}px`)
+            .attr("width", `${this._width}px`);
         this._gXAxis = this._svgXAxis.append("g");
 
-        this._divYAxis = d3Select("#axis-y");
-        this._svgYAxis = d3Select("#axis-y svg");
-        this._svgYAxis.attr("height", this._height - this._xBackgroundHeight).attr("width", this._yBackgroundWidth);
-        this._svgYAxisRect = this._svgYAxis
+        const yTop = this._xBackgroundHeight + this._map.getDimensions().top;
+        const yHeight = this._height - this._xBackgroundHeight;
+        this._svgYAxis = d3Select("#axis-y");
+        this._divYAxisRect = d3Select("#axis-rect-y");
+
+        this._svgYAxis = this._svgMap
+            .insert("svg", "g.pb")
+            .attr("class", "axis d-none")
+            .attr("top", `${yTop}px`)
+            .attr("height", `${yHeight}px`)
+            .attr("width", `${this._width}px`);
+        this._svgYAxisRect = this._divYAxisRect
+            .append("svg")
+            .attr("class", "axis")
+            .attr("height", `${yHeight}px`)
+            .attr("width", `${this._yBackgroundWidth}px`)
             .append("rect")
-            .attr("height", this._height - this._xBackgroundHeight)
-            .attr("width", this._yBackgroundWidth);
+            .attr("height", `${yHeight}px`)
+            .attr("width", `${this._yBackgroundWidth}px`);
         this._gYAxis = this._svgYAxis.append("g");
 
         // Initialise both axis first
@@ -269,7 +292,6 @@ export default class DisplayGrid {
             .attr("font-size", fontSize)
             .attr("stroke-width", strokeWidth)
             .call(this._xAxis.tickPadding(padding));
-        this._gXAxis.select(".domain").remove();
     }
 
     /**
@@ -289,7 +311,6 @@ export default class DisplayGrid {
             .attr("font-size", fontSize)
             .attr("stroke-width", strokeWidth)
             .call(this._yAxis.tickPadding(padding));
-        this._gYAxis.select(".domain").remove();
     }
 
     /**
@@ -343,13 +364,16 @@ export default class DisplayGrid {
             this._svgXAxis.attr("width", this._width);
             this._svgXAxisRect.attr("width", this._width);
 
-            this._svgYAxis.attr("height", this._height - this._xBackgroundHeight);
-            this._svgYAxisRect.attr("height", this._height - this._xBackgroundHeight);
+            const yHeight = this._height - this._xBackgroundHeight;
+            this._svgYAxis.attr("height", yHeight);
+            this._svgYAxisRect.attr("height", yHeight);
         }
 
         // Show or hide axis
-        this._divXAxis.classed("d-none", !show);
-        this._divYAxis.classed("d-none", !show);
+        this._svgXAxis.classed("d-none", !show);
+        this._divXAxisRect.classed("d-none", !show);
+        this._svgYAxis.classed("d-none", !show);
+        this._divYAxisRect.classed("d-none", !show);
     }
 
     /**
