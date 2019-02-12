@@ -147,13 +147,16 @@ export default class DisplayGrid {
             .tickSize(this._maxCoord);
 
         // svg groups
-        this._divXAxis = d3Select("#axis-x");
-        this._svgXAxis = d3Select("#axis-x svg");
+        this._svgMap = d3Select("#na-svg");
         this._divXAxisRect = d3Select("#axis-rect-x");
 
         const xLeft = this._yBackgroundWidth + this._defaultFontSize;
-        this._divXAxis.attr("left", `${xLeft}px`);
-        this._svgXAxis.attr("height", `${this._height}px`).attr("width", `${this._width}px`);
+        this._svgXAxis = this._svgMap
+            .insert("svg", "g.pb")
+            .attr("class", "axis d-none")
+            .attr("left", `${xLeft}px`)
+            .attr("height", `${this._height}px`)
+            .attr("width", `${this._width}px`);
         this._svgXAxisRect = this._divXAxisRect
             .append("svg")
             .attr("class", "axis")
@@ -166,11 +169,15 @@ export default class DisplayGrid {
 
         const yTop = this._xBackgroundHeight + this._map.getDimensions().top;
         const yHeight = this._height - this._xBackgroundHeight;
-        this._divYAxis = d3Select("#axis-y").attr("top", `${yTop}px`);
-        this._svgYAxis = d3Select("#axis-y svg");
+        this._svgYAxis = d3Select("#axis-y");
         this._divYAxisRect = d3Select("#axis-rect-y");
 
-        this._svgYAxis.attr("height", `${yHeight}px`).attr("width", `${this._width}px`);
+        this._svgYAxis = this._svgMap
+            .insert("svg", "g.pb")
+            .attr("class", "axis d-none")
+            .attr("top", `${yTop}px`)
+            .attr("height", `${yHeight}px`)
+            .attr("width", `${this._width}px`);
         this._svgYAxisRect = this._divYAxisRect
             .append("svg")
             .attr("class", "axis")
@@ -363,9 +370,9 @@ export default class DisplayGrid {
         }
 
         // Show or hide axis
-        this._divXAxis.classed("d-none", !show);
+        this._svgXAxis.classed("d-none", !show);
         this._divXAxisRect.classed("d-none", !show);
-        this._divYAxis.classed("d-none", !show);
+        this._svgYAxis.classed("d-none", !show);
         this._divYAxisRect.classed("d-none", !show);
     }
 
