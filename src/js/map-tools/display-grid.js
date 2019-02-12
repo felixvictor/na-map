@@ -151,6 +151,8 @@ export default class DisplayGrid {
         this._svgXAxis = d3Select("#axis-x svg");
         this._divXAxisRect = d3Select("#axis-rect-x");
 
+        const xLeft = this._yBackgroundWidth + this._defaultFontSize;
+        this._divXAxis.attr("left", `${xLeft}px`);
         this._svgXAxis.attr("height", `${this._height}px`).attr("width", `${this._width}px`);
         this._svgXAxisRect = this._divXAxisRect
             .append("svg")
@@ -162,8 +164,9 @@ export default class DisplayGrid {
             .attr("width", `${this._width}px`);
         this._gXAxis = this._svgXAxis.append("g");
 
+        const yTop = this._xBackgroundHeight + this._map.getDimensions().top;
         const yHeight = this._height - this._xBackgroundHeight;
-        this._divYAxis = d3Select("#axis-y");
+        this._divYAxis = d3Select("#axis-y").attr("top", `${yTop}px`);
         this._svgYAxis = d3Select("#axis-y svg");
         this._divYAxisRect = d3Select("#axis-rect-y");
 
@@ -282,7 +285,6 @@ export default class DisplayGrid {
             .attr("font-size", fontSize)
             .attr("stroke-width", strokeWidth)
             .call(this._xAxis.tickPadding(padding));
-        this._gXAxis.select(".domain").remove();
     }
 
     /**
@@ -302,7 +304,6 @@ export default class DisplayGrid {
             .attr("font-size", fontSize)
             .attr("stroke-width", strokeWidth)
             .call(this._yAxis.tickPadding(padding));
-        this._gYAxis.select(".domain").remove();
     }
 
     /**

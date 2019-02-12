@@ -665,20 +665,20 @@ class Map {
         this._grid.update(true);
     }
 
-    _getDimensions() {
+    getDimensions() {
         const selector = document.getElementsByClassName("flex-overlay")[0];
 
         return selector.getBoundingClientRect();
     }
 
     _getWidth() {
-        const { width } = this._getDimensions();
+        const { width } = this.getDimensions();
 
         return width;
     }
 
     _getHeight() {
-        const { top } = this._getDimensions(),
+        const { top } = this.getDimensions(),
             fullHeight = document.documentElement.clientHeight - this.rem;
 
         return fullHeight - top;
