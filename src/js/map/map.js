@@ -175,7 +175,7 @@ class Map {
          * @type {string[]}
          * @private
          */
-        this._showGridValues = ["on", "off"];
+        this._showGridValues = ["off", "on"];
 
         this._showGridCookie = new Cookie(this._showGridId, this._showGridValues);
         this._showGridRadios = new RadioButton(this._showGridId, this._showGridValues);
