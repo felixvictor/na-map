@@ -19,9 +19,11 @@ export default class Cookie {
      * Constructor
      * @param {string} baseId - Cookie base id
      * @param {string[]} values - Cookie values
+     * @param {number|Date} expire - Expire (number=days or Date)
      */
-    constructor(baseId, values) {
+    constructor({ id: baseId, values = [], expire = 365 }) {
         this._baseId = baseId;
+        this._expire = expire;
 
         /**
          * Cookie name
@@ -39,12 +41,9 @@ export default class Cookie {
          * Default cookie value
          * @type {string}
          */
-        [this._default] = values;
+        this._default = this._values.length ? values[0] : null;
 
-        // Set cookies defaults (expiry 365 days)
-        Cookies.defaults = {
-            expires: 365
-        };
+        console.log(this._baseId, this._values, this._expire);
     }
 
     /**
@@ -53,16 +52,20 @@ export default class Cookie {
      * @return {void}
      */
     set(cookieValue) {
+        // Set cookie if not default value
         if (cookieValue !== this._default) {
-            Cookies.set(this._name, cookieValue);
+            Cookies.set(this._name, cookieValue, {
+                expires: this._expire
+            });
         } else {
-            Cookies.remove(this._name);
+            // Else remove cookie
+            this.remove();
         }
     }
 
     /**
      * Get cookie
-     * @returns {string} Cookie
+     * @return {string} Cookie
      */
     get() {
         let cookieValue = Cookies.get(this._name);
@@ -70,12 +73,20 @@ export default class Cookie {
         if (typeof cookieValue === "undefined") {
             // Use default value if cookie is not stored
             cookieValue = this._default;
-        } else if (!this._values.includes(cookieValue)) {
+        } else if (this._values.length && !this._values.includes(cookieValue)) {
             // Use default value if cookie has invalid data and remove cookie
             cookieValue = this._default;
-            Cookies.remove(this._name);
+            this.remove();
         }
 
         return cookieValue;
+    }
+
+    /**
+     * Remove cookie
+     * @return {void}
+     */
+    remove() {
+        Cookies.remove(this._name);
     }
 }
