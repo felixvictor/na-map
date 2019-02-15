@@ -93,7 +93,7 @@ export default class DisplayPorts {
          * Show radius cookie
          * @type {Cookie}
          */
-        this._cookie = new Cookie(this._baseId, this._radioButtonValues);
+        this._cookie = new Cookie({ id: this._baseId, values: this._radioButtonValues});
 
         /**
          * Show radius radio buttons
