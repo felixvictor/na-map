@@ -21,6 +21,9 @@ import ListPortOwnerships from "./list-port-ownerships";
 import ListShipBlueprints from "./list-ship-blueprints";
 import ListRecipes from "./list-recipes";
 import ListWoods from "./list-woods";
+
+import { registerEvent } from "../analytics";
+import { appVersion } from "../common";
 import { checkFetchStatus, getJsonFromFetch, putFetchError } from "../util";
 
 /**
@@ -82,6 +85,30 @@ const setupData = data => {
         woodData: data.woods,
         moduleData: data.modules
     });
+
+    const checkShipCompareData = () => {
+        const urlParams = new URL(document.location).searchParams;
+
+        if (urlParams.has("cmp")) {
+            if (urlParams.get("v") !== appVersion) {
+                throw new Error("Can't decode ship compare data: version mismatch!");
+            }
+
+            registerEvent("Menu", "Paste ship compare");
+            let encodedData = {};
+            try {
+                encodedData = decodeURIComponent(urlParams.get("cmp"));
+            } catch (e) {
+                throw new Error("Can't decode ship compare data");
+            }
+            const decodedData = JSON.parse(encodedData).map(Number);
+            shipCompare.init(decodedData);
+        } else {
+            // Remove trailing hash from URL
+            history.pushState("", "", window.location.pathname);
+        }
+    };
+
     const woodCompare = new CompareWoods(data.woods, "wood");
     const woodList = new ListWoods(data.woods);
 
@@ -98,6 +125,8 @@ const setupData = data => {
     const buildingList = new ListBuildings(data.buildings);
 
     const blueprintList = new ListShipBlueprints(data.shipBlueprints, data.woods);
+
+    checkShipCompareData();
 };
 
 /**
