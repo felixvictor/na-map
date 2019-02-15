@@ -60,7 +60,7 @@ export default class ShowTrades {
          * Show trade cookie
          * @type {Cookie}
          */
-        this._showCookie = new Cookie(this._showId, this._showRadioValues);
+        this._showCookie = new Cookie({ id: this._showId, values: this._showRadioValues });
 
         /**
          * Show trade radio buttons
@@ -77,7 +77,7 @@ export default class ShowTrades {
          */
         this._profitRadioValues = ["weight", "distance", "total"];
 
-        this._profitCookie = new Cookie(this._profitId, this._profitRadioValues);
+        this._profitCookie = new Cookie({ id: this._profitId, values: this._profitRadioValues});
         this._profitRadios = new RadioButton(this._profitId, this._profitRadioValues);
 
         /**
