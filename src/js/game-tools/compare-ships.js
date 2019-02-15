@@ -21,8 +21,16 @@ import {
 } from "d3-shape";
 
 import { registerEvent } from "../analytics";
-import { colourRed, colourRedDark, colourWhite, colourGreen, colourGreenDark, insertBaseModal } from "../common";
-import { formatInt, formatFloat, getOrdinal, isEmpty, roundToThousands, sortBy } from "../util";
+import {
+    appVersion,
+    colourRed,
+    colourRedDark,
+    colourWhite,
+    colourGreen,
+    colourGreenDark,
+    insertBaseModal
+} from "../common";
+import { copyToClipboard, formatInt, formatFloat, getOrdinal, isEmpty, roundToThousands, sortBy } from "../util";
 
 import CompareWoods from "./compare-woods";
 
@@ -892,11 +900,14 @@ export default class CompareShips {
         this._buttonId = `button-${this._baseId}`;
         this._modalId = `modal-${this._baseId}`;
         this._moduleId = `${this._baseId}-module`;
+        this._copyButtonId = `button-copy-${this._baseId}`;
 
+        this._shipIds = [];
         this._selectedUpgradeIds = [];
         this._selectShip$ = {};
         this._selectWood$ = {};
         this._selectModule$ = {};
+        this._modal$ = null;
 
         if (this._baseId === "ship-compare") {
             this._columnsCompare = ["C1", "C2"];
@@ -1009,12 +1020,59 @@ export default class CompareShips {
      */
     _shipCompareSelected() {
         // If the modal has no content yet, insert it
-        if (!document.getElementById(this._modalId)) {
+        if (!this._modal$) {
             this._initModal();
+            this._modal$ = $(`#${this._modalId}`);
+
+            // Copy data to clipboard (ctrl-c key event)
+            this._modal$.one("keydown", event => {
+                if (event.code === "KeyC" && event.ctrlKey) {
+                    this._copyDataClicked(event);
+                }
+            });
+            // Copy data to clipboard (click event)
+            document.getElementById(this._copyButtonId).addEventListener("click", event => {
+                this._copyDataClicked(event);
+            });
         }
         // Show modal
         $(`#${this._modalId}`).modal("show");
         this._setGraphicsParameters();
+    }
+
+    _getCompareData() {
+        const data = [];
+
+        this._columns.forEach(columnId => {
+            if (this._shipIds[columnId] !== undefined) {
+                data.push(this._shipIds[columnId]);
+
+                ["frame", "trim"].forEach(type => {
+                    data.push(this._selectWood$[columnId][type].val());
+                });
+
+                data.push(this._selectedUpgradeIds[columnId]);
+                console.log("data", columnId, data);
+            }
+        });
+
+        return data;
+    }
+
+    _copyDataClicked(event) {
+        registerEvent("Menu", "Copy ship compare");
+        event.preventDefault();
+
+        const data = this._getCompareData();
+
+        if (data.length) {
+            const F11Url = new URL(window.location);
+
+            F11Url.searchParams.set("cmp", encodeURIComponent(JSON.stringify(data)));
+            F11Url.searchParams.set("v", encodeURIComponent(appVersion));
+
+            copyToClipboard(F11Url.href);
+        }
     }
 
     /**
@@ -1083,11 +1141,11 @@ export default class CompareShips {
                 .append("div")
                 .attr("class", `col-md-4 ml-auto pt-2 ${columnId === "Base" ? "columnA" : "columnC"}`);
 
-            const shipId = this._getShipSelectId(columnId);
+            const shipSelectId = this._getShipSelectId(columnId);
             div.append("label")
                 .append("select")
-                .attr("name", shipId)
-                .attr("id", shipId)
+                .attr("name", shipSelectId)
+                .attr("id", shipSelectId)
                 .attr("class", "selectpicker");
 
             ["frame", "trim"].forEach(type => {
@@ -1113,6 +1171,16 @@ export default class CompareShips {
                 .attr("id", `${this._baseId}-${columnId}`)
                 .attr("class", `${columnId === "Base" ? "ship-base" : "ship-compare"}`);
         });
+
+        const footer = d3Select(`#${this._modalId} .modal-footer`);
+        footer
+            .insert("button", "button")
+            .classed("btn btn-outline-secondary", true)
+            .attr("id", this._copyButtonId)
+            .attr("title", "Copy to clipboard (ctrl-c)")
+            .attr("type", "button")
+            .append("i")
+            .classed("far fa-copy", true);
     }
 
     _initData() {
@@ -1223,12 +1291,11 @@ export default class CompareShips {
 
     /**
      * Setup upgrades select
-     * @param {number} shipId - Ship id
      * @param {string} columnId - Column id
      * @returns {void}
      */
-    _setupModulesSelect(shipId, columnId) {
-        const getShipClass = () => this._shipData.find(ship => ship.id === shipId).class;
+    _setupModulesSelect(columnId) {
+        const getShipClass = () => this._shipData.find(ship => ship.id === this._shipIds[columnId]).class;
 
         this._selectModule$[columnId] = {};
 
@@ -1240,7 +1307,7 @@ export default class CompareShips {
             this._selectModule$[columnId][type]
                 .on("changed.bs.select", () => {
                     this._upgradeSelected(columnId);
-                    this._refreshShips(shipId, columnId);
+                    this._refreshShips(columnId);
                 })
                 .selectpicker({
                     selectedTextFormat: "count > 1",
@@ -1255,12 +1322,11 @@ export default class CompareShips {
 
     /**
      * Get ship data for ship with id <id>
-     * @param {number} shipId - Ship id
      * @param {string} columnId - Column id
      * @returns {Object} Ship data
      */
-    _getShipData(shipId, columnId) {
-        let shipData = this._shipData.find(ship => ship.id === shipId);
+    _getShipData(columnId) {
+        let shipData = this._shipData.find(ship => ship.id === this._shipIds[columnId]);
 
         shipData = this._addWoodData(shipData, columnId);
         shipData = this._addModulesData(shipData, columnId);
@@ -1389,12 +1455,11 @@ export default class CompareShips {
 
     /**
      * Refresh ship data
-     * @param {*} shipId - Ship id
      * @param {*} compareId - Column id
      * @returns {void}
      */
-    _refreshShips(shipId, compareId) {
-        const singleShipData = this._getShipData(shipId, compareId);
+    _refreshShips(compareId) {
+        const singleShipData = this._getShipData(compareId);
         if (this._baseId !== "ship-journey") {
             if (compareId === "Base") {
                 this._setShip(compareId, new ShipBase(compareId, singleShipData, this));
@@ -1458,13 +1523,13 @@ export default class CompareShips {
     _setupSelectListener(compareId) {
         this._selectShip$[compareId]
             .on("changed.bs.select", () => {
-                const shipId = +this._selectShip$[compareId].val();
-                this._refreshShips(shipId, compareId);
+                this._shipIds[compareId] = +this._selectShip$[compareId].val();
+                this._refreshShips(compareId);
                 if (compareId === "Base" && this._baseId !== "ship-journey") {
                     this._enableCompareSelects();
                 }
                 this.woodCompare.enableSelects(compareId);
-                this._setupModulesSelect(shipId, compareId);
+                this._setupModulesSelect(compareId);
             })
             .selectpicker({ title: "Ship" });
 
@@ -1472,11 +1537,21 @@ export default class CompareShips {
             this._selectWood$[compareId][type]
                 .on("changed.bs.select", () => {
                     this.woodCompare._woodSelected(compareId, type, this._selectWood$[compareId][type]);
-                    const shipId = +this._selectShip$[compareId].val();
-                    this._refreshShips(shipId, compareId);
+                    this._refreshShips(compareId);
                 })
                 .selectpicker({ title: `Wood ${type}`, width: "150px" });
         });
+    }
+
+    init(data) {
+        const setData = () => {};
+
+        console.log("init", data);
+        this._initData();
+        this._injectModal();
+        this._initSelects();
+
+        setData();
     }
 
     _getShipSelectId(columnId) {
