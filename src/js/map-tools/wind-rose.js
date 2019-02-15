@@ -16,10 +16,10 @@ import "round-slider/src/roundslider";
 import "round-slider/src/roundslider.css";
 import "../../scss/roundslider.scss";
 
-import Cookies from "js-cookie";
-import { compassDirections, degreesToRadians, displayCompass, getUserWind, printSmallCompassRose } from "../util";
 import { registerEvent } from "../analytics";
 import { degreesPerSecond, insertBaseModal } from "../common";
+import Cookie from "../util/cookie";
+import { compassDirections, degreesToRadians, displayCompass, getUserWind, printSmallCompassRose } from "../util";
 
 export default class WindRose {
     constructor() {
@@ -37,21 +37,24 @@ export default class WindRose {
         this._formId = `form-${this._baseId}`;
         this._sliderId = `slider-${this._baseId}`;
 
-        /**
-         * Wind degrees cookie name
-         * @type {string}
-         * @private
-         */
-        this._cookieDegrees = `na-map--${this._baseId}-degrees`;
-
-        /**
-         * Wind degrees time cookie name
-         * @type {string}
-         * @private
-         */
-        this._cookieTime = `na-map--${this._baseId}-time`;
-
         this._cookieExpire = this._getExpire();
+
+        /**
+         * Wind degrees cookie
+         * @type {string}
+         * @private
+         */
+        this._cookieWindDegrees = new Cookie({
+            id: `${this._baseId}-degrees`,
+            expire: this._cookieExpire
+        });
+
+        /**
+         * Wind degrees time cookie
+         * @type {string}
+         * @private
+         */
+        this._cookieTime = new Cookie({ id: `${this._baseId}-time` });
 
         /**
          * Get current wind from cookie or use default value
@@ -77,9 +80,9 @@ export default class WindRose {
 
     _getCurrentWindCookie() {
         // Use default value if cookie is not stored
-        const wind = Cookies.get(this._cookieDegrees) || null;
+        const wind = this._cookieWindDegrees.get();
         if (wind) {
-            const time = Cookies.get(this._cookieTime);
+            const time = this._cookieTime.get();
             // Difference in seconds since wind has been stored
             const diffSeconds = Math.round((Date.now() - time) / 1000);
             this._currentWindDegrees = 360 + (Math.floor(wind - degreesPerSecond * diffSeconds) % 360);
@@ -95,7 +98,7 @@ export default class WindRose {
             .minute(0)
             .second(0);
 
-        if (now.hour() > end.hour()) {
+        if (now.hour() >= end.hour()) {
             end = end.add(1, "day");
         }
 
@@ -108,10 +111,8 @@ export default class WindRose {
      * @private
      */
     _storeCurrentWindCookie() {
-        Cookies.set(this._cookieDegrees, this._currentWindDegrees, {
-            expires: this._cookieExpire
-        });
-        Cookies.set(this._cookieTime, Date.now());
+        this._cookieWindDegrees.set(this._currentWindDegrees);
+        this._cookieTime.set(Date.now());
     }
 
     _setupSvg() {
@@ -282,6 +283,6 @@ export default class WindRose {
             this._div.remove();
         }
         this._windPath = null;
-        Cookies.remove(this._cookieDegrees);
+        this._cookieWindDegrees.remove();
     }
 }
