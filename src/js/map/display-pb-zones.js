@@ -10,7 +10,9 @@
 
 import { geoPath as d3GeoPath } from "d3-geo";
 import { select as d3Select } from "d3-selection";
-import Cookies from "js-cookie";
+
+import Cookie from "../util/cookie";
+import RadioButton from "../util/radio-button";
 
 export default class DisplayPbZones {
     constructor(pbCircles, forts, towers, joinCircles, ports) {
@@ -28,19 +30,26 @@ export default class DisplayPbZones {
         this._joinCircleDataDefault = joinCircles;
         this._joinCircleData = joinCircles;
 
-        /**
-         * showLayer cookie name
-         * @type {string}
-         * @private
-         */
-        this._showPBCookieName = "na-map--show-pb";
+        this._showId = "show-pb";
 
         /**
-         * Default showLayer setting
-         * @type {string}
+         * Possible values for show port battle zones radio buttons (first is default value)
+         * @type {string[]}
          * @private
          */
-        this._showPBDefault = "all";
+        this._showValues = ["all", "single", "off"];
+
+        /**
+         * Show port battle zones cookie
+         * @type {Cookie}
+         */
+        this._showCookie = new Cookie({ id: this._showId, values: this._showValues });
+
+        /**
+         * Show port battle zones radio buttons
+         * @type {RadioButton}
+         */
+        this._showRadios = new RadioButton(this._showId, this._showValues);
 
         /**
          * Get showLayer setting from cookie or use default value
@@ -74,23 +83,11 @@ export default class DisplayPbZones {
      * @private
      */
     _getShowPBSetting() {
-        // Use default value if cookie is not stored
-        const r = Cookies.get(this._showPBCookieName) || this._showPBDefault;
-        $(`#show-pb-${r}`).prop("checked", true);
-        return r;
-    }
+        const r = this._showCookie.get();
 
-    /**
-     * Store show setting in cookie
-     * @return {void}
-     * @private
-     */
-    _storeShowPBSetting() {
-        if (this._showPB !== this._showPBDefault) {
-            Cookies.set(this._showPBCookieName, this._showPB);
-        } else {
-            Cookies.remove(this._showPBCookieName);
-        }
+        this._showRadios.set(r);
+
+        return r;
     }
 
     _refreshPBZones() {
@@ -99,8 +96,9 @@ export default class DisplayPbZones {
     }
 
     _showPBZonesSelected() {
-        this._showPB = $("input[name='showPB']:checked").val();
-        this._storeShowPBSetting();
+        this._showPB = this._showRadios.get();
+
+        this._showCookie.set(this._showPB);
         this._refreshPBZones();
     }
 
