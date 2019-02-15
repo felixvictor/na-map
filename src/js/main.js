@@ -56,7 +56,7 @@ function main() {
      * Server name cookie
      * @type {Cookie}
      */
-    const cookie = new Cookie(baseId, radioButtonValues);
+    const cookie = new Cookie({ id: baseId, values: radioButtonValues });
 
     /**
      * Server name radio buttons
