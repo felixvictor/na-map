@@ -42,8 +42,6 @@ export default class Cookie {
          * @type {string}
          */
         this._default = this._values.length ? values[0] : null;
-
-        console.log(this._baseId, this._values, this._expire);
     }
 
     /**
