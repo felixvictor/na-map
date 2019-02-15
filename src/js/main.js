@@ -99,17 +99,6 @@ function main() {
     const setupListener = () => {
         document.getElementById(baseId).addEventListener("change", () => serverNameSelected());
 
-        /*
-        // https://stackoverflow.com/questions/44467377/bootstrap-4-multilevel-dropdown-inside-navigation/48953349#48953349
-        $(".dropdown-submenu > a").on("click", event => {
-            const submenu$ = $(event.currentTarget);
-
-            $(".dropdown-submenu .dropdown-menu").removeClass("show");
-            submenu$.next(".dropdown-menu").addClass("show");
-            event.stopPropagation();
-        });
-        */
-
         // https://www.codeply.com/go/1Iz3DxS60l
         $(".dropdown-menu a.dropdown-toggle").on("click", event => {
             const menu$ = $(event.currentTarget);
