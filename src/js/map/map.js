@@ -153,7 +153,7 @@ class Map {
          */
         this._doubleClickActionValues = ["compass", "f11"];
 
-        this._doubleClickActionCookie = new Cookie(this._doubleClickActionId, this._doubleClickActionValues);
+        this._doubleClickActionCookie = new Cookie({ id: this._doubleClickActionId, values: this._doubleClickActionValues});
         this._doubleClickActionRadios = new RadioButton(this._doubleClickActionId, this._doubleClickActionValues);
 
         /**
@@ -177,7 +177,7 @@ class Map {
          */
         this._showGridValues = ["off", "on"];
 
-        this._showGridCookie = new Cookie(this._showGridId, this._showGridValues);
+        this._showGridCookie = new Cookie({ id: this._showGridId, values: this._showGridValues});
         this._showGridRadios = new RadioButton(this._showGridId, this._showGridValues);
 
         /**
