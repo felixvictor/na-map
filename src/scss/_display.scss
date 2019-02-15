@@ -667,15 +667,14 @@ table a {
     letter-spacing: .6rem;
 }
 
-// https://stackoverflow.com/questions/44467377/bootstrap-4-multilevel-dropdown-inside-navigation/48953349#48953349
 .dropdown-submenu {
     position: relative;
 }
 
-.dropdown-submenu .dropdown-menu {
+.dropdown-submenu > .dropdown-menu {
     top: 0;
     left: 100%;
-    margin-top: -1px;
+    margin-top: -$dropdown-spacer;
 }
 
 .tablesort {
