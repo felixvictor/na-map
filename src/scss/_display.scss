@@ -61,14 +61,18 @@ text {
     cursor: default;
 }
 
-.position-circle {
-    fill-opacity: .4;
-    fill: $white;
+.position {
+    path {
+        fill: $green;
+        fill-opacity: .6;
+    }
 }
 
-.position-path {
-    fill: $green;
-    fill-opacity: .6;
+.port-circles {
+    circle {
+        fill-opacity: .4;
+        fill: $white;
+    }
 }
 
 .card {
