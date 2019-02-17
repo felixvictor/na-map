@@ -28,6 +28,7 @@ import {
     colourWhite,
     colourGreen,
     colourGreenDark,
+    hashids,
     insertBaseModal
 } from "../common";
 import { copyToClipboard, formatInt, formatFloat, getOrdinal, isEmpty, roundToThousands, sortBy } from "../util";
@@ -938,8 +939,8 @@ export default class CompareShips {
             ["Leak resistance", ["resistance.leaks"]],
             ["Rudder speed", ["rudder.halfturnTime"]],
             ["Ship speed", ["speed.max"]],
-            ["Side armour", ["bow.armour", "sides.armour", "sails.armour", "structure.armour", "stern.armour"]],
-            ["Thickness", ["sides.thickness", "bow.thickness", "stern.thickness"]],
+            ["Armour strength", ["bow.armour", "sides.armour", "sails.armour", "structure.armour", "stern.armour"]],
+            ["Armor thickness", ["sides.thickness", "bow.thickness", "stern.thickness"]],
             ["Turn speed", ["rudder.turnSpeed"]]
         ]);
 
@@ -964,9 +965,9 @@ export default class CompareShips {
             ["Sailing crew", ["crew.sailing"]],
             ["Ship speed", ["speed.max"]],
             ["Side armour repair time", ["repairTime.sides"]],
-            ["Side armour", ["bow.armour", "sides.armour", "sails.armour", "structure.armour", "stern.armour"]],
+            ["Armour strength", ["bow.armour", "sides.armour", "sails.armour", "structure.armour", "stern.armour"]],
             ["Speed decrease", ["ship.deceleration"]],
-            ["Thickness", ["sides.thickness", "bow.thickness", "stern.thickness"]],
+            ["Armor thickness", ["sides.thickness", "bow.thickness", "stern.thickness"]],
             ["Turn speed", ["rudder.turnSpeed"]],
             ["Water pump health", ["pump.armour"]]
         ]);
@@ -1048,10 +1049,10 @@ export default class CompareShips {
                 data.push(this._shipIds[columnId]);
 
                 ["frame", "trim"].forEach(type => {
-                    data.push(this._selectWood$[columnId][type].val());
+                    data.push(+this._selectWood$[columnId][type].val());
                 });
 
-                data.push(this._selectedUpgradeIds[columnId]);
+                data.push(this._selectedUpgradeIds[columnId] ? this._selectedUpgradeIds[columnId] : 0);
                 console.log("data", columnId, data);
             }
         });
@@ -1067,8 +1068,8 @@ export default class CompareShips {
 
         if (data.length) {
             const F11Url = new URL(window.location);
-
-            F11Url.searchParams.set("cmp", encodeURIComponent(JSON.stringify(data)));
+            console.log("data", data, hashids.encode(data));
+            F11Url.searchParams.set("cmp", hashids.encode(data));
             F11Url.searchParams.set("v", encodeURIComponent(appVersion));
 
             copyToClipboard(F11Url.href);
