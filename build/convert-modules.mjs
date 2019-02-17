@@ -49,13 +49,14 @@ function convertModules() {
     levels.set("LineShips", "L");
 
     // Woods
-    modifiers.set("ARMOR_ALL_SIDES ARMOR_THICKNESS", "Thickness");
-    modifiers.set("ARMOR_ALL_SIDES MODULE_BASE_HP", "Side armour");
+    modifiers.set("ARMOR_ALL_SIDES ARMOR_THICKNESS", "Armor thickness");
+    modifiers.set("ARMOR_ALL_SIDES MODULE_BASE_HP", "Armour strength");
     modifiers.set("CREW MODULE_BASE_HP", "Crew");
     modifiers.set("INTERNAL_STRUCTURE MODULE_BASE_HP", "Hull strength");
     modifiers.set("NONE CREW_DAMAGE_RECEIVED_DECREASE_PERCENT", "Crew protection");
     modifiers.set("NONE GROG_MORALE_BONUS", "Boarding morale");
     modifiers.set("NONE RUDDER_HALFTURN_TIME", "Rudder speed");
+    modifiers.set("NONE SHIP_MATERIAL", "Ship material");
     modifiers.set("NONE SHIP_MAX_SPEED", "Ship speed");
     modifiers.set("NONE SHIP_PHYSICS_ACC_COEF", "Acceleration");
     modifiers.set("NONE SHIP_TURNING_SPEED", "Turn speed");
@@ -168,7 +169,6 @@ function convertModules() {
     modifiers.set("NONE SHIP_EXTRA_DOBULE_CHARGE_UNITS", "Additional double charges"); // typo
     modifiers.set("NONE SHIP_EXTRA_DOUBLE_CHARGE_UNITS", "Additional double charges");
     modifiers.set("NONE SHIP_EXTRA_DOUBLE_SHOT_UNITS", "Additional double shots");
-    modifiers.set("NONE SHIP_MATERIAL", "Ship material");
     modifiers.set("NONE SHIP_MAX_ROLL_ANGLE", "Max roll angle");
     modifiers.set("NONE SHIP_PHYSICS_DEC_COEF", "Speed decrease");
     modifiers.set("NONE SHIP_REPAIR_SAIL_CREW_REQUIREMENT,SHIP_REPAIR_ARMOR_CREW_REQUIREMENT", "Repair crew needed");
@@ -201,19 +201,39 @@ function convertModules() {
         module.APImodifiers.forEach(modifier => {
             // Add modifier if in modifier map
             if (modifiers.has(`${modifier.Slot} ${modifier.MappingIds}`)) {
+                const modifierName = modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`);
+
                 let amount = modifier.Percentage;
+                let isPercentage = true;
+                if (modifier.Absolute) {
+                    amount = modifier.Absolute;
+                    isPercentage = false;
+                }
+                // Some modifiers are wrongly indicated as a percentage
                 if (
-                    modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`) === "Fire resistance" ||
-                    modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`) === "Leak resistance" ||
-                    modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`) === "Rudder speed"
+                    modifierName === "Armor thickness" ||
+                    modifierName === "Crew protection" ||
+                    modifierName === "Boarding morale" ||
+                    modifierName === "Mast thickness" ||
+                    modifierName === "Fire resistance" ||
+                    modifierName === "Leak resistance"
+                ) {
+                    isPercentage = false;
+                }
+                if (
+                    modifierName === "Fire resistance" ||
+                    modifierName === "Leak resistance" ||
+                    modifierName === "Rudder speed"
                 ) {
                     amount = -amount;
-                } else if (modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`) === "Crew protection") {
-                    amount = modifier.Absolute * 100;
+                }
+                if (modifierName === "Crew protection") {
+                    amount *= 100;
                 }
                 wood.properties.push({
-                    modifier: modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`),
-                    amount
+                    modifier: modifierName,
+                    amount,
+                    isPercentage
                 });
             }
         });

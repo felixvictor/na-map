@@ -12,7 +12,7 @@ import { min as d3Min, max as d3Max } from "d3-array";
 import { select as d3Select } from "d3-selection";
 
 import { registerEvent } from "../analytics";
-import { formatFloat, sortBy } from "../util";
+import { formatFloat, formatPercent, sortBy } from "../util";
 import { insertBaseModal } from "../common";
 
 class Wood {
@@ -56,7 +56,7 @@ class WoodBase extends Wood {
         const middle = 100 / 2;
         let text = '<table class="table table-sm table-striped small mt-4"><thead>';
         text += "<tr>";
-        text += "<tr><th><em>Property</em></th><th><em>Change in %</em></th></tr></thead><tbody>";
+        text += "<tr><th><em>Property</em></th><th><em>Change</em></th></tr></thead><tbody>";
         wood.properties.forEach((value, key) => {
             text += `<tr><td>${key}</td><td>${formatFloat(value * 100)}`;
             text += '<span class="rate">';
@@ -92,7 +92,7 @@ class WoodBase extends Wood {
             trim: this._woodData.trim.name
         };
         wood.properties = new Map();
-        this._woodCompare._properties.forEach(property => {
+        this._woodCompare._propertyNames.forEach(property => {
             wood.properties.set(property, this._getPropertySum(property));
         });
 
@@ -113,38 +113,66 @@ class WoodComparison extends Wood {
         this._printTextComparison();
     }
 
-    _getBaseProperty(property, type) {
-        const amount = this._baseData[type].properties
-            .filter(prop => prop.modifier === property)
-            .map(prop => prop.amount)[0];
-        return typeof amount === "undefined" ? 0 : amount / 100;
+    _getBaseProperty(propertyName, type) {
+        const property = this._baseData[type].properties.find(prop => prop.modifier === propertyName);
+        let amount = 0;
+        let isPercentage = false;
+
+        if (typeof property !== "undefined" && typeof property.amount !== "undefined") {
+            amount = property.isPercentage ? property.amount / 100 : property.amount;
+            // eslint-disable-next-line prefer-destructuring
+            isPercentage = property.isPercentage;
+        }
+
+        return { amount, isPercentage };
     }
 
-    _getBasePropertySum(property) {
-        return this._getBaseProperty(property, "frame") + this._getBaseProperty(property, "trim");
+    _getBasePropertySum(propertyName) {
+        const basePropertyFrame = this._getBaseProperty(propertyName, "frame");
+        const basePropertyTrim = this._getBaseProperty(propertyName, "trim");
+
+        return {
+            amount: basePropertyFrame.amount + basePropertyTrim.amount,
+            isPercentage: basePropertyFrame.isPercentage && basePropertyTrim.isPercentage
+        };
     }
 
-    _getCompareProperty(property, type) {
-        const amount = this._compareData[type].properties
-            .filter(prop => prop.modifier === property)
-            .map(prop => prop.amount)[0];
-        return typeof amount === "undefined" ? 0 : amount / 100;
+    _getCompareProperty(propertyName, type) {
+        const property = this._compareData[type].properties.find(prop => prop.modifier === propertyName);
+        let amount = 0;
+        let isPercentage = false;
+
+        if (typeof property !== "undefined" && typeof property.amount !== "undefined") {
+            amount = property.isPercentage ? property.amount / 100 : property.amount;
+            // eslint-disable-next-line prefer-destructuring
+            isPercentage = property.isPercentage;
+        }
+
+        return { amount, isPercentage };
     }
 
-    _getComparePropertySum(property) {
-        return this._getCompareProperty(property, "frame") + this._getCompareProperty(property, "trim");
+    _getComparePropertySum(propertyName) {
+        const comparePropertyFrame = this._getCompareProperty(propertyName, "frame");
+        const comparePropertyTrim = this._getCompareProperty(propertyName, "trim");
+
+        return {
+            amount: comparePropertyFrame.amount + comparePropertyTrim.amount,
+            isPercentage: comparePropertyFrame.isPercentage && comparePropertyTrim.isPercentage
+        };
     }
 
     _getText(wood) {
-        function getDiff(a, b, decimals = 1) {
+        function getDiff(a, b, isPercentage, decimals = 1) {
+            console.log(a, b, isPercentage, decimals);
             const diff = parseFloat(((a - b) * 100).toFixed(decimals));
+            const value = isPercentage ? formatPercent(a * 100, decimals) : formatFloat(a * 100);
             if (diff < 0) {
-                return `${formatFloat(a * 100)} <span class="badge badge-white">${formatFloat(diff)}</span>`;
+                return `${value} <span class="badge badge-white">${formatFloat(diff)}</span>`;
             }
             if (diff > 0) {
-                return `${formatFloat(a * 100)} <span class="badge badge-white">+\u202f${formatFloat(diff)}</span>`;
+                return `${value} <span class="badge badge-white">+\u202f${formatFloat(diff)}</span>`;
             }
-            return formatFloat(a * 100);
+            return value;
         }
 
         const middle = 100 / 2;
@@ -154,9 +182,10 @@ class WoodComparison extends Wood {
             diffColour = "";
         let text = '<table class="table table-sm table-striped small wood mt-4"><thead>';
         text += "<tr>";
-        text += "<tr><th><em>Property</em></th><th><em>Change in %</em></th></tr></thead><tbody>";
+        text += "<tr><th><em>Property</em></th><th><em>Change</em></th></tr></thead><tbody>";
         wood.properties.forEach((value, key) => {
-            text += `<tr><td>${key}</td><td>${getDiff(value.compare, value.base)}`;
+            console.log(value);
+            text += `<tr><td>${key}</td><td>${getDiff(value.compare, value.base, value.isPercentage)}`;
             text += '<span class="rate">';
             if (value.compare >= 0) {
                 if (value.base >= 0) {
@@ -230,13 +259,16 @@ class WoodComparison extends Wood {
             trim: this._compareData.trim.name
         };
         wood.properties = new Map();
-        this._woodCompare._properties.forEach(property => {
-            wood.properties.set(property, {
-                base: this._getBasePropertySum(property),
-                compare: this._getComparePropertySum(property)
+        this._woodCompare._propertyNames.forEach(propertyName => {
+            const basePropertySum = this._getBasePropertySum(propertyName);
+            const comparePropertySum = this._getComparePropertySum(propertyName);
+            wood.properties.set(propertyName, {
+                base: basePropertySum.amount,
+                compare: comparePropertySum.amount,
+                isPercentage: basePropertySum.isPercentage
             });
         });
-
+        console.log(wood);
         $(`${this._select}`)
             .find("div")
             .append(this._getText(wood));
@@ -280,21 +312,11 @@ export default class CompareWoods {
         this._columns.unshift("Base");
         this._woodsSelected = [];
         this._instances = [];
-        this._properties = [
-            "Thickness",
-            "Hull strength",
-            "Side armour",
-            "Mast thickness",
-            "Ship speed",
-            "Acceleration",
-            "Rudder speed",
-            "Turn speed",
-            "Crew",
-            "Crew protection",
-            "Grog morale bonus",
-            "Fire resistance",
-            "Leak resistance"
-        ];
+        this._propertyNames = new Set([
+            ...this._woodData.frame.map(frame => frame.properties.map(property => property.modifier)).flat(),
+            ...this._woodData.trim.map(trim => trim.properties.map(property => property.modifier)).flat()
+        ]);
+
         this._options = {};
         this._minMaxProperty = new Map();
 
@@ -326,7 +348,7 @@ export default class CompareWoods {
             this._trimSelectData.map(wood => `<option value="${wood.name}">${wood.name}</option>`)
         );
 
-        this._properties.forEach(property => {
+        this._propertyNames.forEach(property => {
             const frames = [
                     ...this._woodData.frame.map(
                         frame =>
