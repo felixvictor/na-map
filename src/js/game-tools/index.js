@@ -23,7 +23,7 @@ import ListRecipes from "./list-recipes";
 import ListWoods from "./list-woods";
 
 import { registerEvent } from "../analytics";
-import { appVersion } from "../common";
+import { appVersion, hashids } from "../common";
 import { checkFetchStatus, getJsonFromFetch, putFetchError } from "../util";
 
 /**
@@ -95,13 +95,8 @@ const setupData = data => {
             }
 
             registerEvent("Menu", "Paste ship compare");
-            let encodedData = {};
-            try {
-                encodedData = decodeURIComponent(urlParams.get("cmp"));
-            } catch (e) {
-                throw new Error("Can't decode ship compare data");
-            }
-            const decodedData = JSON.parse(encodedData).map(Number);
+            const decodedData = hashids.decode(urlParams.get("cmp"));
+            console.log(decodedData);
             shipCompare.init(decodedData);
         } else {
             // Remove trailing hash from URL
