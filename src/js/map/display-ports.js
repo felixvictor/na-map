@@ -617,10 +617,9 @@ export default class DisplayPorts {
         const rMin = roundToThousands((this._circleSize / circleScale) * this._minRadiusFactor);
         const rMax = roundToThousands((this._circleSize / circleScale) * this._maxRadiusFactor);
         let data = this._portDataFiltered;
-        let cssClass = d => d;
-        let r = d => d;
-        let fill = d => d;
-        let hasFill = false;
+        let cssClass = () => {};
+        let r = () => {};
+        let fill = () => null;
 
         if (this._showRadius === "tax") {
             data = this._portDataFiltered.filter(d => !d.nonCapturable);
@@ -645,7 +644,7 @@ export default class DisplayPorts {
             cssClass = d => `bubble ${getTradePortMarker(d)}`;
             r = d => (d.id === this.tradePortId ? rMax : rMax / 2);
         } else if (this._showRadius === "position") {
-            cssClass = () => "position-circle";
+            cssClass = () => null;
             r = d => d.distance;
         } else if (this._showRadius === "attack") {
             data = this._portDataFiltered.filter(port => port.attackHostility);
@@ -653,7 +652,6 @@ export default class DisplayPorts {
 
             cssClass = () => "bubble";
             fill = d => this._colourScale(d.attackHostility);
-            hasFill = true;
             r = d => this._attackRadius(d.attackHostility);
         } else if (this._showRadius === "green") {
             data = this._portDataFiltered.filter(port => port.nonCapturable && port.nation !== "FT");
@@ -678,7 +676,7 @@ export default class DisplayPorts {
             )
             .attr("class", d => cssClass(d))
             .attr("r", d => r(d))
-            .attr("fill", d => (hasFill ? fill(d) : ""));
+            .attr("fill", d => fill(d));
     }
 
     _updateTextsX(d, circleSize) {
