@@ -40,6 +40,19 @@ export const formatFloat = (x, s = 2) =>
         .replace("-", "\u2212\u202f");
 
 /**
+ * Format float with +/- sign
+ * @function
+ * @param {Number} x - Float
+ * @param {Number} s - Significant digits
+ * @return {String} - Formatted signed float
+ */
+export const formatSignFloat = (x, s = 2) =>
+    formatLocale
+        .format(`+,.${s}~r`)(x)
+        .replace("-", "\u2212\u202f")
+        .replace("+", "\uff0b\u202f");
+
+/**
  * Format float
  * @function
  * @param {Number} x - Float
