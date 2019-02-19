@@ -96,8 +96,7 @@ const setupData = data => {
 
             registerEvent("Menu", "Paste ship compare");
             const decodedData = hashids.decode(urlParams.get("cmp"));
-            console.log(decodedData);
-            shipCompare.init(decodedData);
+            shipCompare.initFromClipboard(decodedData);
         } else {
             // Remove trailing hash from URL
             history.pushState("", "", window.location.pathname);

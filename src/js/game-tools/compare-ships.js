@@ -904,7 +904,8 @@ export default class CompareShips {
         this._copyButtonId = `button-copy-${this._baseId}`;
 
         this._shipIds = [];
-        this._selectedUpgradeIds = [];
+        this._selectedUpgradeIdsPerType = [];
+        this._selectedUpgradeIdsList = [];
         this._selectShip$ = {};
         this._selectWood$ = {};
         this._selectModule$ = {};
@@ -1052,7 +1053,14 @@ export default class CompareShips {
                     data.push(+this._selectWood$[columnId][type].val());
                 });
 
-                data.push(this._selectedUpgradeIds[columnId] ? this._selectedUpgradeIds[columnId] : 0);
+                this._moduleTypes.forEach(type => {
+                    data.push(
+                        this._selectedUpgradeIdsPerType[columnId][type]
+                            ? this._selectedUpgradeIdsPerType[columnId][type]
+                            : 0
+                    );
+                });
+
                 console.log("data", columnId, data);
             }
         });
@@ -1405,11 +1413,11 @@ export default class CompareShips {
     _addModulesData(shipData, compareId) {
         const data = JSON.parse(JSON.stringify(shipData));
 
-        if (typeof this._selectedUpgradeIds[compareId] !== "undefined") {
+        if (typeof this._selectedUpgradeIdsList[compareId] !== "undefined") {
             const modifierAmount = new Map();
 
             // Add modifier amount
-            this._selectedUpgradeIds[compareId].forEach(id => {
+            this._selectedUpgradeIdsList[compareId].forEach(id => {
                 const module = this._moduleProperties.get(id);
 
                 module.properties.forEach(property => {
@@ -1495,25 +1503,38 @@ export default class CompareShips {
     }
 
     _upgradeSelected(compareId) {
-        this._selectedUpgradeIds[compareId] = [];
+        this._selectedUpgradeIdsList[compareId] = [];
+        this._selectedUpgradeIdsPerType[compareId] = [];
 
         this._moduleTypes.forEach(type => {
-            let selectedOptions = this._selectModule$[compareId][type].val();
+            this._selectedUpgradeIdsPerType[compareId][type] = this._selectModule$[compareId][type].val();
 
-            if (Array.isArray(selectedOptions)) {
+            if (Array.isArray(this._selectedUpgradeIdsPerType[compareId][type])) {
                 // Multiple selects
-                selectedOptions = selectedOptions.map(Number);
+                this._selectedUpgradeIdsPerType[compareId][type] = this._selectedUpgradeIdsPerType[compareId][type].map(
+                    Number
+                );
             } else {
                 // Single select
-                selectedOptions = selectedOptions !== "" ? [+selectedOptions] : [];
+                this._selectedUpgradeIdsPerType[compareId][type] =
+                    this._selectedUpgradeIdsPerType[compareId][type] !== ""
+                        ? [+this._selectedUpgradeIdsPerType[compareId][type]]
+                        : [];
             }
 
-            if (selectedOptions.length) {
-                this._selectedUpgradeIds[compareId] = this._selectedUpgradeIds[compareId].concat(selectedOptions);
+            if (this._selectedUpgradeIdsPerType[compareId][type].length) {
+                this._selectedUpgradeIdsList[compareId] = this._selectedUpgradeIdsList[compareId].concat(
+                    this._selectedUpgradeIdsPerType[compareId][type]
+                );
             }
         });
 
-        // console.log("selectedUpgradeIds", this._selectedUpgradeIds, compareId, this._selectedUpgradeIds[compareId]);
+        console.log(
+            "selectedUpgradeIds",
+            compareId,
+            this._selectedUpgradeIdsPerType[compareId],
+            this._selectedUpgradeIdsList[compareId]
+        );
     }
 
     /**
@@ -1544,15 +1565,45 @@ export default class CompareShips {
         });
     }
 
-    init(data) {
-        const setData = () => {};
+    initFromClipboard(data) {
+        const setSelects = () => {
+            let i = 0;
+            let id = 0;
 
-        console.log("init", data);
-        this._initData();
-        this._injectModal();
-        this._initSelects();
+            const setSelect = select$ => {
+                id = data[i];
+                i += 1;
+                if (id) {
+                    select$.selectpicker("val", id);
+                } else {
+                    select$.selectpicker("refresh");
+                }
+            };
 
-        setData();
+            this._columns.some(columnId => {
+                setSelect(this._selectShip$[columnId]);
+                ["frame", "trim"].forEach(type => {
+                    setSelect(this._selectWood$[columnId][type]);
+                });
+                /*
+            this._moduleTypes.forEach(type => {
+               setSelect(this._selectModule$[columnId][type]);
+            });
+            */
+                i++;
+
+                console.log(i, data.length);
+                return i >= data.length;
+            });
+        };
+
+        console.log("initFromClipboard", data);
+
+        this._shipCompareSelected();
+        if (data.length > 4) {
+            this._enableCompareSelects();
+        }
+        setSelects();
     }
 
     _getShipSelectId(columnId) {
