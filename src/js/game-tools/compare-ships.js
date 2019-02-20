@@ -1053,14 +1053,6 @@ export default class CompareShips {
                     data.push(+this._selectWood$[columnId][type].val());
                 });
 
-                this._moduleTypes.forEach(type => {
-                    data.push(
-                        this._selectedUpgradeIdsPerType[columnId][type]
-                            ? this._selectedUpgradeIdsPerType[columnId][type]
-                            : 0
-                    );
-                });
-
                 console.log("data", columnId, data);
             }
         });
@@ -1075,12 +1067,27 @@ export default class CompareShips {
         const data = this._getCompareData();
 
         if (data.length) {
-            const F11Url = new URL(window.location);
+            const ShipCompareUrl = new URL(window.location);
             console.log("data", data, hashids.encode(data));
-            F11Url.searchParams.set("cmp", hashids.encode(data));
-            F11Url.searchParams.set("v", encodeURIComponent(appVersion));
+            ShipCompareUrl.searchParams.set("v", encodeURIComponent(appVersion));
+            ShipCompareUrl.searchParams.set("cmp", hashids.encode(data));
 
-            copyToClipboard(F11Url.href);
+            this._columns.forEach((columnId, columnIndex) => {
+                if (this._selectedUpgradeIdsPerType[columnId]) {
+                    console.log(this._selectedUpgradeIdsPerType[columnId]);
+                    [...this._moduleTypes].forEach((type, typeIndex) => {
+                        const modules = this._selectedUpgradeIdsPerType[columnId][type];
+                        console.log("data", columnId, type, modules);
+                        if (modules.length) {
+                            const param = `${columnIndex}${typeIndex}`;
+
+                            ShipCompareUrl.searchParams.set(param, hashids.encode(modules));
+                        }
+                    });
+                }
+            });
+
+            copyToClipboard(ShipCompareUrl.href);
         }
     }
 
@@ -1527,6 +1534,7 @@ export default class CompareShips {
                     this._selectedUpgradeIdsPerType[compareId][type]
                 );
             }
+            console.log("_upgradeSelected", compareId, type, this._selectedUpgradeIdsPerType[compareId][type]);
         });
 
         console.log(
@@ -1565,45 +1573,45 @@ export default class CompareShips {
         });
     }
 
-    initFromClipboard(data) {
-        const setSelects = () => {
+    initFromClipboard(urlParams) {
+        const setSelects = data => {
             let i = 0;
-            let id = 0;
 
-            const setSelect = select$ => {
-                id = data[i];
-                i += 1;
+            const setSelect = (select$, id) => {
                 if (id) {
                     select$.selectpicker("val", id);
                 } else {
                     select$.selectpicker("refresh");
                 }
             };
-
+            console.log("setSelects", data);
             this._columns.some(columnId => {
-                setSelect(this._selectShip$[columnId]);
+                this._shipIds[columnId] = data[i];
+                i += 1;
+                this._shipIds[columnId] = +this._selectShip$[columnId].val();
+                setSelect(this._selectShip$[columnId], this._shipIds[columnId]);
+
                 ["frame", "trim"].forEach(type => {
                     setSelect(this._selectWood$[columnId][type]);
                 });
-                /*
-            this._moduleTypes.forEach(type => {
-               setSelect(this._selectModule$[columnId][type]);
-            });
-            */
-                i++;
 
                 console.log(i, data.length);
                 return i >= data.length;
             });
         };
 
-        console.log("initFromClipboard", data);
+        console.log(
+            "initFromClipboard urlParams",
+            urlParams.get("cmp"),
+            hashids.decode(urlParams.get("cmp"))
+        );
 
+        const decodedData = hashids.decode(urlParams.get("cmp"));
         this._shipCompareSelected();
-        if (data.length > 4) {
+        if (decodedData.length > 3) {
             this._enableCompareSelects();
         }
-        setSelects();
+        setSelects(decodedData);
     }
 
     _getShipSelectId(columnId) {
