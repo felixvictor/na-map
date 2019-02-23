@@ -608,9 +608,10 @@ export const sortBy = properties => (a, b) => {
 /**
  * Copy to clipboard (fallback solution)
  * @param {string} text - String
- * @return {bool} Success
+ * @return {boolean} Success
  */
 const copyToClipboardFallback = text => {
+    console.log("copyToClipboardFallback");
     if (document.queryCommandSupported && document.queryCommandSupported("copy")) {
         const input = document.createElement("input");
 
@@ -634,25 +635,27 @@ const copyToClipboardFallback = text => {
     }
 };
 
+const writeClipboard = text => {
+    return navigator.clipboard
+        .writeText(text)
+        .then(() => {
+            // console.log(`Copied ${text} to clipboard.`);
+            return true;
+        })
+        .catch(error => {
+            console.error(`Cannot copy ${text} to clipboard`, error);
+            return false;
+        });
+};
+
 /**
  * Copy to clipboard (clipboard API)
  * @param {string} text - String
  * @return {void}
  */
-export const copyToClipboard = text =>
-    navigator.permissions.query({ name: "clipboard-write" }).then(
-        // Permission "clipboard-write"
-        result => {
-            if (result.state === "granted" || result.state === "prompt") {
-                return navigator.clipboard.writeText(text).then(
-                    () => true,
-                    () => {
-                        console.error(`Cannot copy ${text} to clipboard`);
-                        return false;
-                    }
-                );
-            }
-        },
-        // No permission "clipboard-write"
-        () => copyToClipboardFallback(text)
-    );
+export const copyToClipboard = text => {
+    if (!navigator.clipboard) {
+        copyToClipboardFallback(text);
+    }
+    writeClipboard(text);
+};
