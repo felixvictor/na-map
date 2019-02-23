@@ -1186,7 +1186,6 @@ export default class CompareShips {
                     .append("select")
                     .attr("name", moduleId)
                     .attr("id", moduleId)
-                    .property("multiple", type !== "Ship trim")
                     .attr("class", "selectpicker");
             });
 
@@ -1326,7 +1325,9 @@ export default class CompareShips {
             this._selectModule$[columnId][type] = $(`#${this._getModuleSelectId(type, columnId)}`);
             const options = this._getUpgradesOptions(type, getShipClass());
 
-            this._selectModule$[columnId][type].append(options);
+            this._selectModule$[columnId][type]
+                .prop("multiple", type !== "Ship trim" && options.length > 1 ? "multiple" : "")
+                .append(options);
             this._selectModule$[columnId][type]
                 .on("changed.bs.select", () => {
                     this._upgradeSelected(columnId);
