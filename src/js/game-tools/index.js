@@ -89,7 +89,7 @@ const setupData = data => {
     });
 
     const checkShipCompareData = () => {
-        console.log("checkShipCompareData", urlParams, urlParams.has("cmp"));
+        console.log("checkShipCompareData", urlParams.has("cmp"));
         if (urlParams.has("cmp") && urlParams.has("v") && urlParams.get("v") === appVersion) {
             registerEvent("Menu", "Paste ship compare");
             shipCompare.initFromClipboard(urlParams);
