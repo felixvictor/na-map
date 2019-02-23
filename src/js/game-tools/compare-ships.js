@@ -1027,7 +1027,7 @@ export default class CompareShips {
             this._modal$ = $(`#${this._modalId}`);
 
             // Copy data to clipboard (ctrl-c key event)
-            this._modal$.one("keydown", event => {
+            this._modal$.on("keydown", event => {
                 if (event.code === "KeyC" && event.ctrlKey) {
                     this._copyDataClicked(event);
                 }
@@ -1053,7 +1053,7 @@ export default class CompareShips {
                     data.push(+this._selectWood$[columnId][type].val());
                 });
 
-                console.log("data", columnId, data);
+                console.log("_getShipAndWoodIds", columnId, data);
             }
         });
 
@@ -1085,7 +1085,7 @@ export default class CompareShips {
                     [...this._moduleTypes].forEach((type, typeIndex) => {
                         const moduleIds = this._selectedUpgradeIdsPerType[columnId][type];
                         console.log("moduleIds", columnId, type, moduleIds);
-                        if (moduleIds.length) {
+                        if (moduleIds && moduleIds.length) {
                             const param = `${columnIndex}${typeIndex}`;
 
                             ShipCompareUrl.searchParams.set(param, hashids.encode(moduleIds));
@@ -1329,7 +1329,7 @@ export default class CompareShips {
             this._selectModule$[columnId][type].append(options);
             this._selectModule$[columnId][type]
                 .on("changed.bs.select", () => {
-                    this._upgradeSelected(columnId);
+                    this._modulesSelected(columnId);
                     this._refreshShips(columnId);
                 })
                 .on("show.bs.select", () => {
@@ -1360,7 +1360,7 @@ export default class CompareShips {
      */
     _getShipData(columnId) {
         let shipData = this._shipData.find(ship => ship.id === this._shipIds[columnId]);
-
+        console.log("_getShipData this._selectedUpgradeIdsList[columnId]", this._selectedUpgradeIdsList[columnId]);
         shipData = this._addWoodData(shipData, columnId);
         shipData = this._addModulesData(shipData, columnId);
 
@@ -1531,13 +1531,12 @@ export default class CompareShips {
         });
     }
 
-    _upgradeSelected(compareId) {
+    _modulesSelected(compareId) {
         this._selectedUpgradeIdsList[compareId] = [];
-        this._selectedUpgradeIdsPerType[compareId] = [];
+        this._selectedUpgradeIdsPerType[compareId] = {};
 
         this._moduleTypes.forEach(type => {
             this._selectedUpgradeIdsPerType[compareId][type] = this._selectModule$[compareId][type].val();
-
             if (Array.isArray(this._selectedUpgradeIdsPerType[compareId][type])) {
                 // Multiple selects
                 this._selectedUpgradeIdsPerType[compareId][type] = this._selectedUpgradeIdsPerType[compareId][type].map(
@@ -1556,11 +1555,11 @@ export default class CompareShips {
                     this._selectedUpgradeIdsPerType[compareId][type]
                 );
             }
-            console.log("_upgradeSelected", compareId, type, this._selectedUpgradeIdsPerType[compareId][type]);
+            // console.log("_modulesSelected", compareId, type, this._selectedUpgradeIdsPerType[compareId][type]);
         });
 
         console.log(
-            "selectedUpgradeIds",
+            "nach selectedUpgradeIds",
             compareId,
             this._selectedUpgradeIdsPerType[compareId],
             this._selectedUpgradeIdsList[compareId]
@@ -1598,18 +1597,14 @@ export default class CompareShips {
     initFromClipboard(urlParams) {
         const setSelect = (select$, id) => {
             if (id) {
-                select$.selectpicker("val", id);
-            } else {
-                select$.selectpicker("refresh");
+                select$.val(id);
             }
+            select$.selectpicker("render");
         };
 
         const setShipAndWoodsSelects = data => {
             let i = 0;
 
-            console.log("setSelects", data);
-            this._shipIds = [];
-            this._selectedShips = {};
             this._columns.some(columnId => {
                 this._shipIds[columnId] = data[i];
                 i += 1;
@@ -1626,12 +1621,43 @@ export default class CompareShips {
                         i += 1;
                         this.woodCompare._woodSelected(columnId, type, this._selectWood$[columnId][type]);
                     });
-                    this._refreshShips(columnId);
                 } else {
                     i += 2;
                 }
-                console.log(i, data.length);
+
+                this._refreshShips(columnId);
                 return i >= data.length;
+            });
+        };
+
+        /**
+         * Get selected modules, new searchParam per module
+         * @return {void}
+         */
+        const setModuleSelects = () => {
+            this._columns.forEach((columnId, columnIndex) => {
+                let needRefresh = false;
+                [...this._moduleTypes].forEach((type, typeIndex) => {
+                    if (urlParams.has(`${columnIndex}${typeIndex}`)) {
+                        const moduleIds = hashids.decode(urlParams.get(`${columnIndex}${typeIndex}`));
+                        if (!this._selectedUpgradeIdsPerType[columnId]) {
+                            this._selectedUpgradeIdsPerType[columnId] = {};
+                        }
+                        if (!this._selectedUpgradeIdsList[columnId]) {
+                            this._selectedUpgradeIdsList[columnId] = [];
+                        }
+                        console.log("moduleIds", { columnId }, { type }, { moduleIds });
+                        this._selectedUpgradeIdsPerType[columnId][type] = moduleIds.map(Number);
+                        setSelect(this._selectModule$[columnId][type], this._selectedUpgradeIdsPerType[columnId][type]);
+                        this._selectedUpgradeIdsList[columnId] = this._selectedUpgradeIdsList[columnId].concat(
+                            this._selectedUpgradeIdsPerType[columnId][type]
+                        );
+                        needRefresh = true;
+                    }
+                });
+                if (needRefresh) {
+                    this._refreshShips(columnId);
+                }
             });
         };
 
@@ -1642,31 +1668,7 @@ export default class CompareShips {
             this._enableCompareSelects();
         }
         setShipAndWoodsSelects(ShipAndWoodsIds);
-
-        // Get selected modules, new searchParam per module
-        this._selectedUpgradeIdsList = [];
-        this._selectedUpgradeIdsPerType = [];
-        this._columns.forEach((columnId, columnIndex) => {
-            let needRefresh = false;
-            [...this._moduleTypes].forEach((type, typeIndex) => {
-                if (urlParams.has(`${columnIndex}${typeIndex}`)) {
-                    const moduleIds = hashids.decode(urlParams.get(`${columnIndex}${typeIndex}`));
-                    if (!this._selectedUpgradeIdsPerType[columnId]) {
-                        this._selectedUpgradeIdsPerType[columnId] = [];
-                    }
-                    console.log("moduleIds", { columnId }, { type }, { moduleIds });
-                    this._selectedUpgradeIdsPerType[columnId][type] = moduleIds.map(Number);
-                    setSelect(this._selectModule$[columnId][type], this._selectedUpgradeIdsPerType[columnId][type]);
-                    this._selectedUpgradeIdsList[columnId] = this._selectedUpgradeIdsList[columnId].concat(
-                        this._selectedUpgradeIdsPerType[columnId][type]
-                    );
-                    needRefresh = true;
-                }
-            });
-            if (needRefresh) {
-                this._refreshShips(columnId);
-            }
-        });
+        setModuleSelects();
     }
 
     _getShipSelectId(columnId) {
