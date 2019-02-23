@@ -7,7 +7,6 @@ command_jq="$(command -v jq)"
 command_nodejs="$(command -v node) --experimental-modules --no-warnings"
 command_twurl="$(command -v twurl)"
 command_xz="$(command -v xz)"
-module="main"
 server_base_name="cleanopenworldprod"
 source_base_url="http://storage.googleapis.com/nacleanopenworldprodshards/"
 # http://api.shipsofwar.net/servers?apikey=1ZptRtpXAyEaBe2SEp63To1aLmISuJj3Gxcl5ivl&callback=setActiveRealms
