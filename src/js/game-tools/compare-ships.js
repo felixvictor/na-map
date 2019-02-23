@@ -919,7 +919,7 @@ export default class CompareShips {
         this._columns = this._columnsCompare.slice();
         this._columns.unshift("Base");
 
-        this._ships = { Base: {}, C1: {}, C2: {} };
+        this._selectedShips = { Base: {}, C1: {}, C2: {} };
 
         const theoreticalMinSpeed = d3Min(this._shipData, ship => ship.speed.min) * 1.2,
             theoreticalMaxSpeed = 15.5;
@@ -1495,20 +1495,25 @@ export default class CompareShips {
         const singleShipData = this._getShipData(compareId);
         if (this._baseId !== "ship-journey") {
             if (compareId === "Base") {
-                this._setShip(compareId, new ShipBase(compareId, singleShipData, this));
-                this._columnsCompare.forEach(id => {
-                    this._selectShip$[id].removeAttr("disabled").selectpicker("refresh");
-                    if (!isEmpty(this.ships[id])) {
-                        this._setShip(
-                            id,
-                            new ShipComparison(id, singleShipData, this.ships[id]._shipCompareData, this)
+                this._setSelectedShip(compareId, new ShipBase(compareId, singleShipData, this));
+                this._columnsCompare.forEach(otherCompareId => {
+                    this._selectShip$[otherCompareId].removeAttr("disabled").selectpicker("refresh");
+                    if (!isEmpty(this.selectedShips[otherCompareId])) {
+                        this._setSelectedShip(
+                            otherCompareId,
+                            new ShipComparison(
+                                otherCompareId,
+                                singleShipData,
+                                this.selectedShips[otherCompareId]._shipCompareData,
+                                this
+                            )
                         );
                     }
                 });
             } else {
-                this._setShip(
+                this._setSelectedShip(
                     compareId,
-                    new ShipComparison(compareId, this.ships.Base._shipData, singleShipData, this)
+                    new ShipComparison(compareId, this.selectedShips.Base._shipData, singleShipData, this)
                 );
             }
         } else {
@@ -1604,11 +1609,11 @@ export default class CompareShips {
 
             console.log("setSelects", data);
             this._shipIds = [];
+            this._selectedShips = {};
             this._columns.some(columnId => {
                 this._shipIds[columnId] = data[i];
                 i += 1;
                 setSelect(this._selectShip$[columnId], this._shipIds[columnId]);
-                // this._refreshShips(columnId);
                 if (columnId === "Base" && this._baseId !== "ship-journey") {
                     this._enableCompareSelects();
                 }
@@ -1680,12 +1685,12 @@ export default class CompareShips {
         return this._woodCompare;
     }
 
-    _setShip(id, ship) {
-        this._ships[id] = ship;
+    _setSelectedShip(columnId, ship) {
+        this._selectedShips[columnId] = ship;
     }
 
-    get ships() {
-        return this._ships;
+    get selectedShips() {
+        return this._selectedShips;
     }
 
     get minSpeed() {
