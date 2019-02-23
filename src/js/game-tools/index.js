@@ -32,7 +32,7 @@ import { checkFetchStatus, getJsonFromFetch, putFetchError } from "../util";
  */
 const dataDir = "data";
 
-const urlParams = "";
+let urlParams = "";
 
 /**
  * @type {Array<fileName: string, name: string>}
