@@ -23,7 +23,7 @@ import ListRecipes from "./list-recipes";
 import ListWoods from "./list-woods";
 
 import { registerEvent } from "../analytics";
-import { appVersion, hashids } from "../common";
+import { appVersion } from "../common";
 import { checkFetchStatus, getJsonFromFetch, putFetchError } from "../util";
 
 /**
