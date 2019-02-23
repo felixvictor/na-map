@@ -172,6 +172,8 @@ function main() {
     initAnalytics();
     registerPage("Homepage", "/");
 
+    console.log("main", document.location);
+
     setupListener();
     loadMap();
     loadGameTools();
