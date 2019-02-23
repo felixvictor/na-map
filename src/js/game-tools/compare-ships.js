@@ -1186,6 +1186,7 @@ export default class CompareShips {
                     .append("select")
                     .attr("name", moduleId)
                     .attr("id", moduleId)
+                    .property("multiple", true)
                     .attr("class", "selectpicker");
             });
 
@@ -1325,19 +1326,27 @@ export default class CompareShips {
             this._selectModule$[columnId][type] = $(`#${this._getModuleSelectId(type, columnId)}`);
             const options = this._getUpgradesOptions(type, getShipClass());
 
-            this._selectModule$[columnId][type]
-                .prop("multiple", type !== "Ship trim" && options.length > 1 ? "multiple" : "")
-                .append(options);
+            this._selectModule$[columnId][type].append(options);
             this._selectModule$[columnId][type]
                 .on("changed.bs.select", () => {
                     this._upgradeSelected(columnId);
                     this._refreshShips(columnId);
                 })
+                .on("show.bs.select", () => {
+                    // Remove 'select all' button
+                    this._selectModule$[columnId][type]
+                        .parent()
+                        .find("button.bs-select-all")
+                        .remove();
+                })
                 .selectpicker({
-                    selectedTextFormat: "count > 1",
+                    actionsBox: true,
                     countSelectedText(amount) {
                         return `${amount} ${type.toLowerCase()}s selected`;
                     },
+                    deselectAllText: "Clear",
+                    maxOptions: type !== "Ship trim" && options.length > 1 ? 5 : 1,
+                    selectedTextFormat: "count > 1",
                     title: `${type}`,
                     width: "150px"
                 });
