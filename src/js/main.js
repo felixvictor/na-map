@@ -141,9 +141,10 @@ function main() {
 
     /**
      * Load game tools
+     * @param {URLSearchParams} searchParams - Search Parameters
      * @return {void}
      */
-    const loadGameTools = async (searchParams) => {
+    const loadGameTools = async searchParams => {
         try {
             const gameTools = await import(/* webpackChunkName: "game-tools" */ "./game-tools");
             gameTools.init(searchParams);
@@ -172,8 +173,8 @@ function main() {
     initAnalytics();
     registerPage("Homepage", "/");
 
-    const searchParams=(new URL(document.location)).searchParams;
-console.log("searchParams", searchParams, searchParams.has("v"));
+    const { searchParams } = new URL(document.location);
+
     setupListener();
     loadMap();
     loadGameTools(searchParams);
