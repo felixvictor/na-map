@@ -143,10 +143,10 @@ function main() {
      * Load game tools
      * @return {void}
      */
-    const loadGameTools = async () => {
+    const loadGameTools = async (searchParams) => {
         try {
             const gameTools = await import(/* webpackChunkName: "game-tools" */ "./game-tools");
-            gameTools.init();
+            gameTools.init(searchParams);
         } catch (error) {
             throw new Error(error);
         }
@@ -172,11 +172,11 @@ function main() {
     initAnalytics();
     registerPage("Homepage", "/");
 
-    console.log("main", document.location);
-
+    const searchParams=(new URL(document.location)).searchParams;
+console.log("searchParams", searchParams, searchParams.has("v"));
     setupListener();
     loadMap();
-    loadGameTools();
+    loadGameTools(searchParams);
 }
 
 main();
