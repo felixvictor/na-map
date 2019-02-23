@@ -89,13 +89,8 @@ const setupData = data => {
     const checkShipCompareData = () => {
         const urlParams = new URL(document.location).searchParams;
         console.log("checkShipCompareData", urlParams.has("cmp"));
-        if (urlParams.has("cmp")) {
-            if (urlParams.get("v") !== appVersion) {
-                throw new Error("Can't decode ship compare data: version mismatch!");
-            }
-
+        if (urlParams.has("cmp") && urlParams.has("v") && urlParams.get("v") === appVersion) {
             registerEvent("Menu", "Paste ship compare");
-
             shipCompare.initFromClipboard(urlParams);
         } else {
             // Remove trailing hash from URL
