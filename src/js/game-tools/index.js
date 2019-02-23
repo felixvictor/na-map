@@ -32,6 +32,8 @@ import { checkFetchStatus, getJsonFromFetch, putFetchError } from "../util";
  */
 const dataDir = "data";
 
+const urlParams = "";
+
 /**
  * @type {Array<fileName: string, name: string>}
  */
@@ -87,8 +89,7 @@ const setupData = data => {
     });
 
     const checkShipCompareData = () => {
-        const urlParams = new URL(document.location).searchParams;
-        console.log("checkShipCompareData", document.location, urlParams.has("cmp"));
+        console.log("checkShipCompareData", urlParams, urlParams.has("cmp"));
         if (urlParams.has("cmp") && urlParams.has("v") && urlParams.get("v") === appVersion) {
             registerEvent("Menu", "Paste ship compare");
             shipCompare.initFromClipboard(urlParams);
@@ -144,9 +145,11 @@ const readData = () => {
 
 /**
  * Init
+ * @param {URLSearchParams} searchParams - Search Parameters
  * @return {void}
  */
-const init = () => {
+const init = searchParams => {
+    urlParams = searchParams;
     readData();
 };
 
