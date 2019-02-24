@@ -400,7 +400,7 @@ export default class CompareWoods {
         this._columns.forEach(column => {
             const div = row
                 .append("div")
-                .attr("class", `col-md-3 ml-auto pt-2 ${column === "Base" ? "columnA" : "columnC"}`);
+                .attr("class", `col-md-3 ml-auto pt-2 ${column === "Base" ? "column-base" : "column-comp"}`);
             ["frame", "trim"].forEach(type => {
                 const id = `${this._baseFunction}-${type}-${column}-select`;
                 div.append("label").attr("for", id);

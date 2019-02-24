@@ -368,7 +368,7 @@ export default class ListShipBlueprints {
                     .classed("card-header", true)
                     .text(title);
                 const cardBody = card.append("div").classed("card-body", true);
-                this._tables[title] = cardBody.append("table").classed("table table-sm", true);
+                this._tables[title] = cardBody.append("table").classed("table table-sm card-table", true);
                 this._tables[title].append("thead");
                 this._tables[title].append("tbody");
             };
