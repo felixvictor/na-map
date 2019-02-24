@@ -95,7 +95,7 @@ export default class ListBuildings {
             text += `<h5 class="card-title">${currentBuilding.resource.name}</h5>`;
 
             if (currentBuilding.resource.price) {
-                text += '<table class="table table-sm"><tbody>';
+                text += '<table class="table table-sm card-table"><tbody>';
                 text += `<tr><td>${getCurrencyAmount(currentBuilding.resource.price)} per unit</td></tr>`;
                 if (typeof currentBuilding.batch !== "undefined") {
                     text += `<tr><td>Batch of ${currentBuilding.batch.amount} units at ${getCurrencyAmount(
@@ -118,7 +118,7 @@ export default class ListBuildings {
     _getRequirementText(currentBuilding) {
         let text = "";
 
-        text += '<table class="table table-sm"><thead>';
+        text += '<table class="table table-sm card-table"><thead>';
 
         if (currentBuilding.levels[0].materials.length) {
             text += "<tr><th>Level</th><th>Level build materials</th></tr>";
