@@ -3,6 +3,7 @@
  */
 
 import { select as d3Select } from "d3-selection";
+import Hashids from "hashids";
 import { distancePoints, roundToThousands, sortBy } from "./util";
 
 const transformMatrix = {
@@ -148,6 +149,8 @@ export function initMultiDropdownNavbar(id) {
  * @return {string} Currency string
  */
 export const getCurrencyAmount = amount => `${amount}\u00a0real${+amount > 1 ? "s" : ""}`;
+
+export const hashids = new Hashids("My salt: Yet another Naval Action map");
 
 // eslint-disable-next-line no-undef
 export const appName = NAME;
