@@ -587,17 +587,25 @@ export const simpleSort = (a, b) => {
 };
 
 /**
- * Sort by a list of properties (in left-to-right order)
+ * Sort by a list of properties (in left-to-right order, "-" as first character for descending sort)
  * @param {string[]} properties - Sort properties
  * @return {function(*, *): number} Sort function
  */
 export const sortBy = properties => (a, b) => {
     let r = 0;
+    let desc;
     properties.some(property => {
+        if (property.startsWith("-")) {
+            // eslint-disable-next-line no-param-reassign
+            property = property.substring(1);
+            desc = -1;
+        } else {
+            desc = 1;
+        }
         if (a[property] < b[property]) {
-            r = -1;
+            r = -1 * desc;
         } else if (a[property] > b[property]) {
-            r = 1;
+            r = 1 * desc;
         }
         return r !== 0;
     });
