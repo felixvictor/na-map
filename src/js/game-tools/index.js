@@ -20,6 +20,7 @@ import ListModules from "./list-modules";
 import ListPortOwnerships from "./list-port-ownerships";
 import ListShipBlueprints from "./list-ship-blueprints";
 import ListRecipes from "./list-recipes";
+import ListShips from "./list-ships";
 import ListWoods from "./list-woods";
 
 import { registerEvent } from "../analytics";
@@ -89,7 +90,6 @@ const setupData = data => {
     });
 
     const checkShipCompareData = () => {
-        console.log("checkShipCompareData", urlParams.has("cmp"));
         if (urlParams.has("cmp") && urlParams.has("v") && urlParams.get("v") === appVersion) {
             registerEvent("Menu", "Paste ship compare");
             shipCompare.initFromClipboard(urlParams);
@@ -109,6 +109,8 @@ const setupData = data => {
     const moduleList = new ListModules(data.modules);
 
     const recipeList = new ListRecipes(data.recipes.recipe, data.modules);
+
+    const shipList = new ListShips(data.ships);
 
     const ingredientList = new ListIngredients(data.recipes.ingredient, data.modules);
 
