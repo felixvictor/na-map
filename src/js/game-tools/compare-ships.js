@@ -1052,8 +1052,6 @@ export default class CompareShips {
                 ["frame", "trim"].forEach(type => {
                     data.push(+this._selectWood$[columnId][type].val());
                 });
-
-                console.log("_getShipAndWoodIds", columnId, data);
             }
         });
 
@@ -1068,7 +1066,7 @@ export default class CompareShips {
 
         if (ShipAndWoodIds.length) {
             const ShipCompareUrl = new URL(window.location);
-            console.log("ShipAndWoodIds", ShipAndWoodIds, hashids.encode(ShipAndWoodIds));
+
             // Add app version
             ShipCompareUrl.searchParams.set("v", encodeURIComponent(appVersion));
             // Add selected ships and woods, triple (shipId, frameId, trimId) per column, flat array
@@ -1077,14 +1075,9 @@ export default class CompareShips {
             // Add selected modules, new searchParam per module
             this._columns.forEach((columnId, columnIndex) => {
                 if (this._selectedUpgradeIdsPerType[columnId]) {
-                    console.log(
-                        "this._selectedUpgradeIdsPerType[columnId]",
-                        columnId,
-                        this._selectedUpgradeIdsPerType[columnId]
-                    );
                     [...this._moduleTypes].forEach((type, typeIndex) => {
                         const moduleIds = this._selectedUpgradeIdsPerType[columnId][type];
-                        console.log("moduleIds", columnId, type, moduleIds);
+
                         if (moduleIds && moduleIds.length) {
                             const param = `${columnIndex}${typeIndex}`;
 
@@ -1360,7 +1353,7 @@ export default class CompareShips {
      */
     _getShipData(columnId) {
         let shipData = this._shipData.find(ship => ship.id === this._shipIds[columnId]);
-        console.log("_getShipData this._selectedUpgradeIdsList[columnId]", this._selectedUpgradeIdsList[columnId]);
+
         shipData = this._addWoodData(shipData, columnId);
         shipData = this._addModulesData(shipData, columnId);
 
@@ -1557,13 +1550,6 @@ export default class CompareShips {
             }
             // console.log("_modulesSelected", compareId, type, this._selectedUpgradeIdsPerType[compareId][type]);
         });
-
-        console.log(
-            "nach selectedUpgradeIds",
-            compareId,
-            this._selectedUpgradeIdsPerType[compareId],
-            this._selectedUpgradeIdsList[compareId]
-        );
     }
 
     /**
@@ -1646,7 +1632,7 @@ export default class CompareShips {
                         if (!this._selectedUpgradeIdsList[columnId]) {
                             this._selectedUpgradeIdsList[columnId] = [];
                         }
-                        console.log("moduleIds", { columnId }, { type }, { moduleIds });
+                        // console.log("moduleIds", { columnId }, { type }, { moduleIds });
                         this._selectedUpgradeIdsPerType[columnId][type] = moduleIds.map(Number);
                         setSelect(this._selectModule$[columnId][type], this._selectedUpgradeIdsPerType[columnId][type]);
                         this._selectedUpgradeIdsList[columnId] = this._selectedUpgradeIdsList[columnId].concat(
@@ -1662,7 +1648,7 @@ export default class CompareShips {
         };
 
         const ShipAndWoodsIds = hashids.decode(urlParams.get("cmp"));
-        console.log("initFromClipboard urlParams", { ShipAndWoodsIds });
+
         this._shipCompareSelected();
         if (ShipAndWoodsIds.length > 3) {
             this._enableCompareSelects();
