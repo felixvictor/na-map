@@ -9,7 +9,7 @@
  */
 
 import { select as d3Select } from "d3-selection";
-import { between, formatF11 } from "../util";
+import { between, copyToClipboard, formatF11 } from "../util";
 import { convertCoordX, convertCoordY, convertInvCoordX, convertInvCoordY, insertBaseModal } from "../common";
 import { registerEvent } from "../analytics";
 
@@ -217,58 +217,6 @@ export default class ShowF11 {
     }
 
     _copyCoordClicked(event) {
-        /**
-         * Copy to clipboard (fallback solution)
-         * @param {string} text - String
-         * @return {bool} Success
-         */
-        const copyToClipboardFallback = text => {
-            if (document.queryCommandSupported && document.queryCommandSupported("copy")) {
-                const input = document.createElement("input");
-
-                input.type = "text";
-                input.value = text;
-                input.style = "position: absolute; left: -1000px; top: -1000px";
-                this._modal$.append(input);
-                input.select();
-
-                try {
-                    return document.execCommand("copy");
-                } catch (error) {
-                    console.error("Copy to clipboard failed.", error);
-                    return false;
-                } finally {
-                    input.remove();
-                }
-            } else {
-                console.error(`Insufficient rights to copy ${text} to clipboard`);
-                return false;
-            }
-        };
-
-        /**
-         * Copy to clipboard (clipboard API)
-         * @param {string} text - String
-         * @return {void}
-         */
-        const copyToClipboard = text =>
-            navigator.permissions.query({ name: "clipboard-write" }).then(
-                // Permission "clipboard-write"
-                result => {
-                    if (result.state === "granted" || result.state === "prompt") {
-                        return navigator.clipboard.writeText(text).then(
-                            () => true,
-                            () => {
-                                console.error(`Cannot copy ${text} to clipboard`);
-                                return false;
-                            }
-                        );
-                    }
-                },
-                // No permission "clipboard-write"
-                () => copyToClipboardFallback(text)
-            );
-
         registerEvent("Menu", "Copy F11 coordinates");
         event.preventDefault();
 
