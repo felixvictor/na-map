@@ -44,6 +44,10 @@ class Ship {
         this._id = id;
         this._shipData = shipData;
 
+        // Speed ticks
+        this._ticksSpeed = [12, 8, 4, 0];
+        this._ticksSpeedLabels = ["12 knots", "8 knots", "4 knots", "0 knots"];
+
         this._select = `#ship-compare-${this._id}`;
 
         this._setupSvg();
@@ -64,7 +68,7 @@ class Ship {
             .append("svg")
             .attr("width", this.shipData.svgWidth)
             .attr("height", this.shipData.svgHeight)
-            .attr("class", "profile")
+            .attr("data-ui-component", "sailing-profile")
             .attr("fill", "none")
             .append("g")
             .attr("transform", `translate(${this.shipData.svgWidth / 2}, ${this.shipData.svgHeight / 2})`);
@@ -89,25 +93,43 @@ class Ship {
             .outerRadius(this.shipData.radiusScaleAbsolute(12))
             .innerRadius(this.shipData.innerRadius);
 
-        const g = this.g
+        // Add compass arcs
+        this.g
             .selectAll(".compass-arc")
             .data(pie)
-            .join(enter => enter.append("g").attr("class", "compass-arc"));
+            .join(enter =>
+                enter
+                    .append("path")
+                    .attr("class", "compass-arc")
+                    .attr("d", arc)
+            );
 
-        g.append("path").attr("d", arc);
+        // Add the circles for each speed tick
+        this.g
+            .selectAll(".speed-circle")
+            .data(this._ticksSpeed)
+            .join(enter =>
+                enter
+                    .append("circle")
+                    .attr("class", "speed-circle")
+                    .attr("r", d => this.shipData.radiusScaleAbsolute(d))
+            );
 
+        // Add big wind arrow
         this.g
             .append("line")
             .attr("x1", 0)
             .attr("y1", -160)
             .attr("x2", 0)
             .attr("y2", -79)
+            .attr("class", "wind-arrow")
             .attr("marker-end", "url(#course-arrow)");
     }
 
     /**
      * Format cannon pound value
      * @param {number[]} limit Upper limit for [0] cannon and [1] carronades
+     * @return {void}
      */
     static pd(limit) {
         let s = `<span class="badge badge-white">${limit[0]}\u202f/\u202f`;
@@ -326,50 +348,36 @@ class ShipBase extends Ship {
      */
     _setBackground() {
         // Arc for text
-        const knotsArc = d3Arc()
+        const speedArc = d3Arc()
             .outerRadius(d => this.shipCompareData.radiusScaleAbsolute(d) + 2)
             .innerRadius(d => this.shipCompareData.radiusScaleAbsolute(d) + 1)
             .startAngle(-Math.PI / 2)
             .endAngle(Math.PI / 2);
 
-        // Tick/DisplayGrid data
-        const ticks = [12, 8, 4, 0];
-        const tickLabels = ["12 knots", "8 knots", "4 knots", "0 knots"];
-
-        // Add the circles for each tick
-        this.g
-            .selectAll(".circle")
-            .data(ticks)
-            .join(enter =>
-                enter
-                    .append("circle")
-                    .attr("class", "knots-circle")
-                    .attr("r", d => this.shipCompareData.radiusScaleAbsolute(d))
-            );
-
         // Add the paths for the text
         this.g
-            .selectAll(".label")
-            .data(ticks)
+            .selectAll(".speed-textpath")
+            .data(this._ticksSpeed)
             .join(enter =>
                 enter
                     .append("path")
-                    .attr("d", knotsArc)
+                    .attr("class", "speed-textpath")
+                    .attr("d", speedArc)
                     .attr("id", (d, i) => `tick${i}`)
             );
 
         // And add the text
         this.g
-            .selectAll(".label")
-            .data(ticks)
+            .selectAll(".speed-text")
+            .data(this._ticksSpeed)
             .join(enter =>
                 enter
                     .append("text")
-                    .attr("class", "knots-text")
+                    .attr("class", "speed-text")
                     .append("textPath")
                     .attr("href", (d, i) => `#tick${i}`)
-                    .text((d, i) => tickLabels[i])
-                    .attr("startOffset", "16%")
+                    .text((d, i) => this._ticksSpeedLabels[i])
+                    .attr("startOffset", "10%")
             );
     }
 
@@ -419,7 +427,7 @@ class ShipBase extends Ship {
             .sort(null)
             .value(1);
 
-        const arcs = pie(this.shipData.speedDegrees);
+        const arcsBase = pie(this.shipData.speedDegrees);
 
         const curve = d3CurveCatmullRomClosed,
             line = d3RadialLine()
@@ -427,16 +435,20 @@ class ShipBase extends Ship {
                 .radius(d => this.shipCompareData.radiusScaleAbsolute(d.data))
                 .curve(curve);
 
-        const profile = this.g.append("path").classed("base", true);
-        const markers = this.g.append("g").classed("markers", true);
-        profile.attr("d", line(arcs));
+        // Profile shape
+        this.g
+            .append("path")
+            .attr("class", "base-profile")
+            .attr("d", line(arcsBase));
 
-        markers
-            .selectAll("circle")
-            .data(arcs)
+        // Speed marker
+        this.g
+            .selectAll(".speed-markers")
+            .data(arcsBase)
             .join(enter =>
                 enter
                     .append("circle")
+                    .attr("class", "speed-markers")
                     .attr("r", 5)
                     .attr(
                         "cy",
@@ -584,30 +596,36 @@ class ShipComparison extends Ship {
                 .angle((d, i) => i * segmentRadians)
                 .radius(d => this.shipCompare.radiusScaleAbsolute(d.data))
                 .curve(curve);
-
-        const pathComp = this.g.append("path"),
-            pathBase = this.g.append("path"),
-            pathMarkersComp = this.g.append("g").attr("class", "markers");
-
         const speedDiff = [];
         this.shipCompareData.speedDegrees.forEach((speedShipCompare, i) => {
             speedDiff.push(roundToThousands(speedShipCompare - this.shipBaseData.speedDegrees[i]));
         });
-        const min = this._shipCompare._minSpeed,
-            max = this._shipCompare._maxSpeed;
+        const min = this._shipCompare._minSpeed;
+        const max = this._shipCompare._maxSpeed;
         const colourScale = d3ScaleLinear()
             .domain([min, -1, 0, 1, max])
             .range([colourRedDark, colourRed, colourWhite, colourGreen, colourGreenDark])
             .interpolate(d3InterpolateHcl);
 
-        pathComp.attr("d", line(arcsComp)).classed("comp", true);
+        // Base profile shape
+        this.g
+            .append("path")
+            .attr("class", "base-profile")
+            .attr("d", line(arcsBase));
 
-        pathMarkersComp
-            .selectAll("circle")
+        // Comp profile lines
+        this.g
+            .append("path")
+            .attr("class", "comp-profile")
+            .attr("d", line(arcsComp));
+
+        this.g
+            .selectAll(".speed-markers")
             .data(arcsComp)
             .join(enter =>
                 enter
                     .append("circle")
+                    .attr("class", "speed-markers")
                     .attr("r", 5)
                     .attr("cy", (d, i) => Math.cos(i * segmentRadians) * -this.shipCompare.radiusScaleAbsolute(d.data))
                     .attr("cx", (d, i) => Math.sin(i * segmentRadians) * this.shipCompare.radiusScaleAbsolute(d.data))
@@ -616,7 +634,7 @@ class ShipComparison extends Ship {
                     .text(d => `${Math.round(d.data * 10) / 10} knots`)
             );
 
-        pathBase.attr("d", line(arcsBase)).classed("base", true);
+
     }
 
     /**
@@ -993,7 +1011,7 @@ export default class CompareShips {
      * @returns {void}
      */
     _setGraphicsParameters() {
-        this.svgWidth = parseInt($(`#${this._modalId} .columnA`).width(), 10);
+        this.svgWidth = parseInt($(`#${this._modalId} .column-base`).width(), 10);
         // noinspection JSSuspiciousNameCombination
         this.svgHeight = this.svgWidth;
         this.outerRadius = Math.floor(Math.min(this.svgWidth, this.svgHeight) / 2);
@@ -1081,7 +1099,7 @@ export default class CompareShips {
         this._columns.forEach(columnId => {
             const div = row
                 .append("div")
-                .attr("class", `col-md-4 ml-auto pt-2 ${columnId === "Base" ? "columnA" : "columnC"}`);
+                .attr("class", `col-md-4 ml-auto pt-2 ${columnId === "Base" ? "column-base" : "column-comp"}`);
 
             const shipId = this._getShipSelectId(columnId);
             div.append("label")
