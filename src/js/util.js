@@ -40,6 +40,19 @@ export const formatFloat = (x, s = 2) =>
         .replace("-", "\u2212\u202f");
 
 /**
+ * Format float with +/- sign
+ * @function
+ * @param {Number} x - Float
+ * @param {Number} s - Significant digits
+ * @return {String} - Formatted signed float
+ */
+export const formatSignFloat = (x, s = 2) =>
+    formatLocale
+        .format(`+,.${s}~r`)(x)
+        .replace("-", "\u2212\u202f")
+        .replace("+", "\uff0b\u202f");
+
+/**
  * Format float
  * @function
  * @param {Number} x - Float
@@ -590,4 +603,64 @@ export const sortBy = properties => (a, b) => {
     });
 
     return r;
+};
+
+/**
+ * Copy to clipboard (fallback solution)
+ * @param {string} text - String
+ * @return {boolean} Success
+ */
+const copyToClipboardFallback = text => {
+    console.log("copyToClipboardFallback");
+    if (document.queryCommandSupported && document.queryCommandSupported("copy")) {
+        const input = document.createElement("input");
+
+        input.type = "text";
+        input.value = text;
+        input.style = "position: absolute; left: -1000px; top: -1000px";
+        this._modal$.append(input);
+        input.select();
+
+        try {
+            return document.execCommand("copy");
+        } catch (error) {
+            console.error("Copy to clipboard failed.", error);
+            return false;
+        } finally {
+            input.remove();
+        }
+    } else {
+        console.error(`Insufficient rights to copy ${text} to clipboard`);
+        return false;
+    }
+};
+
+/**
+ * Copy to clipboard (API)
+ * @param {string} text - String
+ * @return {Promise} Clipboard promise
+ */
+const writeClipboard = text => {
+    return navigator.clipboard
+        .writeText(text)
+        .then(() => {
+            // console.log(`Copied ${text} to clipboard.`);
+            return true;
+        })
+        .catch(error => {
+            console.error(`Cannot copy ${text} to clipboard`, error);
+            return false;
+        });
+};
+
+/**
+ * Copy to clipboard (clipboard API)
+ * @param {string} text - String
+ * @return {void}
+ */
+export const copyToClipboard = text => {
+    if (!navigator.clipboard) {
+        copyToClipboardFallback(text);
+    }
+    writeClipboard(text);
 };
