@@ -93,7 +93,7 @@ export default class ListRecipes {
     }
 
     _getRequirementText(currentRecipe) {
-        let text = '<table class="table table-sm"><tbody>';
+        let text = '<table class="table table-sm card-table"><tbody>';
         if (currentRecipe.laborPrice) {
             text += `<tr><td>${currentRecipe.laborPrice} labour hours</td></tr>`;
         }
@@ -130,7 +130,7 @@ export default class ListRecipes {
                 });
         });
         text = `<h6 class="card-subtitle mb-2 text-muted">${moduleType}</h6>`;
-        text += `<table class="table table-sm"><tbody>${properties}</tbody></table>`;
+        text += `<table class="table table-sm card-table"><tbody>${properties}</tbody></table>`;
 
         return text;
     }
