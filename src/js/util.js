@@ -635,6 +635,11 @@ const copyToClipboardFallback = text => {
     }
 };
 
+/**
+ * Copy to clipboard (API)
+ * @param {string} text - String
+ * @return {Promise} Clipboard promise
+ */
 const writeClipboard = text => {
     return navigator.clipboard
         .writeText(text)
