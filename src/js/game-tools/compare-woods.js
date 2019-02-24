@@ -12,7 +12,7 @@ import { min as d3Min, max as d3Max } from "d3-array";
 import { select as d3Select } from "d3-selection";
 
 import { registerEvent } from "../analytics";
-import { formatFloat, sortBy } from "../util";
+import { formatFloat, formatSignFloat, formatPercent, sortBy } from "../util";
 import { insertBaseModal } from "../common";
 
 class Wood {
@@ -41,32 +41,48 @@ class WoodBase extends Wood {
         this._printText();
     }
 
-    _getProperty(property, type) {
-        const amount = this._woodData[type].properties
-            .filter(prop => prop.modifier === property)
-            .map(prop => prop.amount)[0];
-        return typeof amount === "undefined" ? 0 : amount / 100;
+    _getProperty(propertyName, type) {
+        const property = this._woodData[type].properties.find(prop => prop.modifier === propertyName);
+        let amount = 0;
+        let isPercentage = false;
+
+        if (typeof property !== "undefined" && typeof property.amount !== "undefined") {
+            // eslint-disable-next-line prefer-destructuring
+            amount = property.amount;
+            // eslint-disable-next-line prefer-destructuring
+            isPercentage = property.isPercentage;
+        }
+
+        return { amount, isPercentage };
     }
 
-    _getPropertySum(property) {
-        return this._getProperty(property, "frame") + this._getProperty(property, "trim");
+    _getPropertySum(propertyName) {
+        const propertyFrame = this._getProperty(propertyName, "frame");
+        const propertyTrim = this._getProperty(propertyName, "trim");
+
+        return {
+            amount: propertyFrame.amount + propertyTrim.amount,
+            isPercentage: propertyTrim.isPercentage
+        };
     }
 
     _getText(wood) {
         const middle = 100 / 2;
         let text = '<table class="table table-sm table-striped small mt-4"><thead>';
         text += "<tr>";
-        text += "<tr><th><em>Property</em></th><th><em>Change in %</em></th></tr></thead><tbody>";
+        text += "<tr><th><em>Property</em></th><th><em>Change</em></th></tr></thead><tbody>";
         wood.properties.forEach((value, key) => {
-            text += `<tr><td>${key}</td><td>${formatFloat(value * 100)}`;
+            text += `<tr><td>${key}</td><td>${
+                value.isPercentage ? formatPercent(value.amount / 100) : formatFloat(value.amount)
+            }`;
             text += '<span class="rate">';
-            if (value > 0) {
-                const right = (value / this._woodCompare._minMaxProperty.get(key).max) * 100 * middle;
+            if (value.amount > 0) {
+                const right = (value.amount / this._woodCompare._minMaxProperty.get(key).max) * middle;
                 text += `<span class="bar neutral" style="width:${middle}%;"></span>`;
                 text += `<span class="bar pos diff" style="width:${right}%;"></span>`;
-            } else if (value < 0) {
-                const right = (value / this._woodCompare._minMaxProperty.get(key).min) * 100 * middle,
-                    left = middle - right;
+            } else if (value.amount < 0) {
+                const right = (value.amount / this._woodCompare._minMaxProperty.get(key).min) * middle;
+                const left = middle - right;
                 text += `<span class="bar neutral" style="width:${left}%;"></span>`;
                 text += `<span class="bar neg diff" style="width:${right}%;"></span>`;
             } else {
@@ -88,12 +104,16 @@ class WoodBase extends Wood {
 
     _printText() {
         const wood = {
-            frame: this._woodData.frame.name,
-            trim: this._woodData.trim.name
+            frame: this._woodData.frame.id,
+            trim: this._woodData.trim.id
         };
         wood.properties = new Map();
-        this._woodCompare._properties.forEach(property => {
-            wood.properties.set(property, this._getPropertySum(property));
+        this._woodCompare.propertyNames.forEach(propertyName => {
+            const property = this._getPropertySum(propertyName);
+            wood.properties.set(propertyName, {
+                amount: property.amount,
+                isPercentage: property.isPercentage
+            });
         });
 
         $(`${this._select}`)
@@ -113,38 +133,62 @@ class WoodComparison extends Wood {
         this._printTextComparison();
     }
 
-    _getBaseProperty(property, type) {
-        const amount = this._baseData[type].properties
-            .filter(prop => prop.modifier === property)
-            .map(prop => prop.amount)[0];
-        return typeof amount === "undefined" ? 0 : amount / 100;
+    _getBaseProperty(propertyName, type) {
+        const property = this._baseData[type].properties.find(prop => prop.modifier === propertyName);
+        let amount = 0;
+        let isPercentage = false;
+
+        if (typeof property !== "undefined" && typeof property.amount !== "undefined") {
+            // eslint-disable-next-line prefer-destructuring
+            amount = property.amount;
+            // eslint-disable-next-line prefer-destructuring
+            isPercentage = property.isPercentage;
+        }
+
+        return { amount, isPercentage };
     }
 
-    _getBasePropertySum(property) {
-        return this._getBaseProperty(property, "frame") + this._getBaseProperty(property, "trim");
+    _getBasePropertySum(propertyName) {
+        const basePropertyFrame = this._getBaseProperty(propertyName, "frame");
+        const basePropertyTrim = this._getBaseProperty(propertyName, "trim");
+
+        return {
+            amount: basePropertyFrame.amount + basePropertyTrim.amount,
+            isPercentage: basePropertyTrim.isPercentage
+        };
     }
 
-    _getCompareProperty(property, type) {
-        const amount = this._compareData[type].properties
-            .filter(prop => prop.modifier === property)
-            .map(prop => prop.amount)[0];
-        return typeof amount === "undefined" ? 0 : amount / 100;
+    _getCompareProperty(propertyName, type) {
+        const property = this._compareData[type].properties.find(prop => prop.modifier === propertyName);
+        let amount = 0;
+        let isPercentage = false;
+
+        if (typeof property !== "undefined" && typeof property.amount !== "undefined") {
+            // eslint-disable-next-line prefer-destructuring
+            amount = property.amount;
+            // eslint-disable-next-line prefer-destructuring
+            isPercentage = property.isPercentage;
+        }
+
+        return { amount, isPercentage };
     }
 
-    _getComparePropertySum(property) {
-        return this._getCompareProperty(property, "frame") + this._getCompareProperty(property, "trim");
+    _getComparePropertySum(propertyName) {
+        const comparePropertyFrame = this._getCompareProperty(propertyName, "frame");
+        const comparePropertyTrim = this._getCompareProperty(propertyName, "trim");
+
+        return {
+            amount: comparePropertyFrame.amount + comparePropertyTrim.amount,
+            isPercentage: comparePropertyFrame.isPercentage && comparePropertyTrim.isPercentage
+        };
     }
 
     _getText(wood) {
-        function getDiff(a, b, decimals = 1) {
-            const diff = parseFloat(((a - b) * 100).toFixed(decimals));
-            if (diff < 0) {
-                return `${formatFloat(a * 100)} <span class="badge badge-white">${formatFloat(diff)}</span>`;
-            }
-            if (diff > 0) {
-                return `${formatFloat(a * 100)} <span class="badge badge-white">+\u202f${formatFloat(diff)}</span>`;
-            }
-            return formatFloat(a * 100);
+        function getDiff(a, b, isPercentage, decimals = 1) {
+            const diff = parseFloat((a - b).toFixed(decimals));
+            const value = isPercentage ? formatPercent(a / 100, decimals) : formatFloat(a);
+
+            return `${value} <span class="badge badge-white">${formatSignFloat(diff)}</span>`;
         }
 
         const middle = 100 / 2;
@@ -154,9 +198,9 @@ class WoodComparison extends Wood {
             diffColour = "";
         let text = '<table class="table table-sm table-striped small wood mt-4"><thead>';
         text += "<tr>";
-        text += "<tr><th><em>Property</em></th><th><em>Change in %</em></th></tr></thead><tbody>";
+        text += "<tr><th><em>Property</em></th><th><em>Change</em></th></tr></thead><tbody>";
         wood.properties.forEach((value, key) => {
-            text += `<tr><td>${key}</td><td>${getDiff(value.compare, value.base)}`;
+            text += `<tr><td>${key}</td><td>${getDiff(value.compare, value.base, value.isPercentage)}`;
             text += '<span class="rate">';
             if (value.compare >= 0) {
                 if (value.base >= 0) {
@@ -178,11 +222,9 @@ class WoodComparison extends Wood {
                 text += `<span class="bar neutral" style="width:${middle}%;"></span>`;
                 text += `<span class="bar pos diff" style="width:${(base /
                     this._woodCompare._minMaxProperty.get(key).max) *
-                    100 *
                     middle}%;"></span>`;
                 text += `<span class="bar ${diffColour}" style="width:${(diff /
                     this._woodCompare._minMaxProperty.get(key).max) *
-                    100 *
                     middle}%;"></span>`;
             } else if (value.compare < 0) {
                 if (value.base < 0) {
@@ -205,14 +247,12 @@ class WoodComparison extends Wood {
                     diffColour = "neg";
                 }
                 text += `<span class="bar neutral" style="width:${middle +
-                    (neutral / this._woodCompare._minMaxProperty.get(key).min) * 100 * middle}%;"></span>`;
+                    (neutral / this._woodCompare._minMaxProperty.get(key).min) * middle}%;"></span>`;
                 text += `<span class="bar ${diffColour}" style="width:${(diff /
                     this._woodCompare._minMaxProperty.get(key).min) *
-                    100 *
                     middle}%;"></span>`;
                 text += `<span class="bar neg diff" style="width:${(base /
                     this._woodCompare._minMaxProperty.get(key).min) *
-                    100 *
                     middle}%;"></span>`;
             } else {
                 text += '<span class="bar neutral"></span>';
@@ -230,13 +270,15 @@ class WoodComparison extends Wood {
             trim: this._compareData.trim.name
         };
         wood.properties = new Map();
-        this._woodCompare._properties.forEach(property => {
-            wood.properties.set(property, {
-                base: this._getBasePropertySum(property),
-                compare: this._getComparePropertySum(property)
+        this._woodCompare.propertyNames.forEach(propertyName => {
+            const basePropertySum = this._getBasePropertySum(propertyName);
+            const comparePropertySum = this._getComparePropertySum(propertyName);
+            wood.properties.set(propertyName, {
+                base: basePropertySum.amount,
+                compare: comparePropertySum.amount,
+                isPercentage: basePropertySum.isPercentage
             });
         });
-
         $(`${this._select}`)
             .find("div")
             .append(this._getText(wood));
@@ -258,20 +300,20 @@ export default class CompareWoods {
 
         if (this._baseFunction === "wood") {
             this._defaultWood = {
-                frame: "Fir",
-                trim: "Crew Space"
+                frame: 45, // Fir
+                trim: 334 // Crew Space
             };
             this._columnsCompare = ["C1", "C2", "C3"];
         } else if (this._baseFunction === "wood-journey") {
             this._defaultWood = {
-                frame: "Oak",
-                trim: "Oak"
+                frame: 47, // Oak
+                trim: 1328 // Oak
             };
             this._columnsCompare = [];
         } else {
             this._defaultWood = {
-                frame: "Oak",
-                trim: "Oak"
+                frame: 47, // Oak
+                trim: 1328 // Oak
             };
             this._columnsCompare = ["C1", "C2"];
         }
@@ -280,21 +322,13 @@ export default class CompareWoods {
         this._columns.unshift("Base");
         this._woodsSelected = [];
         this._instances = [];
-        this._properties = [
-            "Thickness",
-            "Hull strength",
-            "Side armour",
-            "Mast thickness",
-            "Ship speed",
-            "Acceleration",
-            "Rudder speed",
-            "Turn speed",
-            "Crew",
-            "Crew protection",
-            "Grog morale bonus",
-            "Fire resistance",
-            "Leak resistance"
-        ];
+        this.propertyNames = new Set(
+            [
+                ...this._woodData.frame.map(frame => frame.properties.map(property => property.modifier)).flat(),
+                ...this._woodData.trim.map(trim => trim.properties.map(property => property.modifier)).flat()
+            ].sort()
+        );
+
         this._options = {};
         this._minMaxProperty = new Map();
 
@@ -322,16 +356,16 @@ export default class CompareWoods {
         this._frameSelectData = this._woodData.frame.sort(sortBy(["name"]));
         this._trimSelectData = this._woodData.trim.sort(sortBy(["name"]));
         this._setOption(
-            this._frameSelectData.map(wood => `<option value="${wood.name}">${wood.name}</option>`),
-            this._trimSelectData.map(wood => `<option value="${wood.name}">${wood.name}</option>`)
+            this._frameSelectData.map(wood => `<option value="${wood.id}">${wood.name}</option>`),
+            this._trimSelectData.map(wood => `<option value="${wood.id}">${wood.name}</option>`)
         );
 
-        this._properties.forEach(property => {
+        this.propertyNames.forEach(propertyName => {
             const frames = [
                     ...this._woodData.frame.map(
                         frame =>
                             frame.properties
-                                .filter(modifier => modifier.modifier === property)
+                                .filter(modifier => modifier.modifier === propertyName)
                                 .map(modifier => modifier.amount)[0]
                     )
                 ],
@@ -339,7 +373,7 @@ export default class CompareWoods {
                     ...this._woodData.trim.map(
                         trim =>
                             trim.properties
-                                .filter(modifier => modifier.modifier === property)
+                                .filter(modifier => modifier.modifier === propertyName)
                                 .map(modifier => modifier.amount)[0]
                     )
                 ];
@@ -348,7 +382,7 @@ export default class CompareWoods {
                 maxFrames = d3Max(frames) || 0,
                 minTrims = d3Min(trims) || 0,
                 maxTrims = d3Max(trims) || 0;
-            this._addMinMaxProperty(property, {
+            this._addMinMaxProperty(propertyName, {
                 min: minFrames + minTrims >= 0 ? 0 : minFrames + minTrims,
                 max: maxFrames + maxTrims
             });
@@ -391,11 +425,11 @@ export default class CompareWoods {
         });
     }
 
-    _setWoodsSelected(compareId, type, woodName) {
+    _setWoodsSelected(compareId, type, woodId) {
         if (typeof this._woodsSelected[compareId] === "undefined") {
             this._woodsSelected[compareId] = {};
         }
-        this._woodsSelected[compareId][type] = woodName;
+        this._woodsSelected[compareId][type] = woodId;
     }
 
     _setupWoodSelects(compareId, type, select$) {
@@ -424,9 +458,9 @@ export default class CompareWoods {
     }
 
     _woodSelected(compareId, type, select$) {
-        const woodName = select$.val();
+        const woodId = +select$.val();
 
-        this._setWoodsSelected(compareId, type, woodName);
+        this._setWoodsSelected(compareId, type, woodId);
         this._setOtherSelect(compareId, type);
 
         if (compareId === "Base") {
@@ -462,8 +496,8 @@ export default class CompareWoods {
             .selectpicker("refresh");
     }
 
-    _getWoodTypeData(type, name) {
-        return this._woodData[type].filter(wood => wood.name === name)[0];
+    _getWoodTypeData(type, id) {
+        return this._woodData[type].find(wood => wood.id === id);
     }
 
     _getWoodData(id) {

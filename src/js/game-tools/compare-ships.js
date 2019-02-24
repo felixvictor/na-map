@@ -21,8 +21,17 @@ import {
 } from "d3-shape";
 
 import { registerEvent } from "../analytics";
-import { colourRed, colourRedDark, colourWhite, colourGreen, colourGreenDark, insertBaseModal } from "../common";
-import { formatInt, formatFloat, getOrdinal, isEmpty, roundToThousands, sortBy } from "../util";
+import {
+    appVersion,
+    colourRed,
+    colourRedDark,
+    colourWhite,
+    colourGreen,
+    colourGreenDark,
+    hashids,
+    insertBaseModal
+} from "../common";
+import { copyToClipboard, formatInt, formatFloat, getOrdinal, isEmpty, roundToThousands, sortBy } from "../util";
 
 import CompareWoods from "./compare-woods";
 
@@ -892,11 +901,15 @@ export default class CompareShips {
         this._buttonId = `button-${this._baseId}`;
         this._modalId = `modal-${this._baseId}`;
         this._moduleId = `${this._baseId}-module`;
+        this._copyButtonId = `button-copy-${this._baseId}`;
 
-        this._selectedUpgradeIds = [];
+        this._shipIds = [];
+        this._selectedUpgradeIdsPerType = [];
+        this._selectedUpgradeIdsList = [];
         this._selectShip$ = {};
         this._selectWood$ = {};
         this._selectModule$ = {};
+        this._modal$ = null;
 
         if (this._baseId === "ship-compare") {
             this._columnsCompare = ["C1", "C2"];
@@ -906,7 +919,7 @@ export default class CompareShips {
         this._columns = this._columnsCompare.slice();
         this._columns.unshift("Base");
 
-        this._ships = { Base: {}, C1: {}, C2: {} };
+        this._selectedShips = { Base: {}, C1: {}, C2: {} };
 
         const theoreticalMinSpeed = d3Min(this._shipData, ship => ship.speed.min) * 1.2,
             theoreticalMaxSpeed = 15.5;
@@ -927,8 +940,8 @@ export default class CompareShips {
             ["Leak resistance", ["resistance.leaks"]],
             ["Rudder speed", ["rudder.halfturnTime"]],
             ["Ship speed", ["speed.max"]],
-            ["Side armour", ["bow.armour", "sides.armour", "sails.armour", "structure.armour", "stern.armour"]],
-            ["Thickness", ["sides.thickness", "bow.thickness", "stern.thickness"]],
+            ["Armour strength", ["bow.armour", "sides.armour", "sails.armour", "structure.armour", "stern.armour"]],
+            ["Armor thickness", ["sides.thickness", "bow.thickness", "stern.thickness"]],
             ["Turn speed", ["rudder.turnSpeed"]]
         ]);
 
@@ -953,9 +966,9 @@ export default class CompareShips {
             ["Sailing crew", ["crew.sailing"]],
             ["Ship speed", ["speed.max"]],
             ["Side armour repair time", ["repairTime.sides"]],
-            ["Side armour", ["bow.armour", "sides.armour", "sails.armour", "structure.armour", "stern.armour"]],
+            ["Armour strength", ["bow.armour", "sides.armour", "sails.armour", "structure.armour", "stern.armour"]],
             ["Speed decrease", ["ship.deceleration"]],
-            ["Thickness", ["sides.thickness", "bow.thickness", "stern.thickness"]],
+            ["Armor thickness", ["sides.thickness", "bow.thickness", "stern.thickness"]],
             ["Turn speed", ["rudder.turnSpeed"]],
             ["Water pump health", ["pump.armour"]]
         ]);
@@ -1009,12 +1022,73 @@ export default class CompareShips {
      */
     _shipCompareSelected() {
         // If the modal has no content yet, insert it
-        if (!document.getElementById(this._modalId)) {
+        if (!this._modal$) {
             this._initModal();
+            this._modal$ = $(`#${this._modalId}`);
+
+            // Copy data to clipboard (ctrl-c key event)
+            this._modal$.on("keydown", event => {
+                if (event.code === "KeyC" && event.ctrlKey) {
+                    this._copyDataClicked(event);
+                }
+            });
+            // Copy data to clipboard (click event)
+            document.getElementById(this._copyButtonId).addEventListener("click", event => {
+                this._copyDataClicked(event);
+            });
         }
         // Show modal
         $(`#${this._modalId}`).modal("show");
         this._setGraphicsParameters();
+    }
+
+    _getShipAndWoodIds() {
+        const data = [];
+
+        this._columns.forEach(columnId => {
+            if (this._shipIds[columnId] !== undefined) {
+                data.push(this._shipIds[columnId]);
+
+                ["frame", "trim"].forEach(type => {
+                    data.push(+this._selectWood$[columnId][type].val());
+                });
+            }
+        });
+
+        return data;
+    }
+
+    _copyDataClicked(event) {
+        registerEvent("Menu", "Copy ship compare");
+        event.preventDefault();
+
+        const ShipAndWoodIds = this._getShipAndWoodIds();
+
+        if (ShipAndWoodIds.length) {
+            const ShipCompareUrl = new URL(window.location);
+
+            // Add app version
+            ShipCompareUrl.searchParams.set("v", encodeURIComponent(appVersion));
+            // Add selected ships and woods, triple (shipId, frameId, trimId) per column, flat array
+            ShipCompareUrl.searchParams.set("cmp", hashids.encode(ShipAndWoodIds));
+
+            // Add selected modules, new searchParam per module
+            this._columns.forEach((columnId, columnIndex) => {
+                if (this._selectedUpgradeIdsPerType[columnId]) {
+                    [...this._moduleTypes].forEach((type, typeIndex) => {
+                        const moduleIds = this._selectedUpgradeIdsPerType[columnId][type];
+
+                        if (moduleIds && moduleIds.length) {
+                            const param = `${columnIndex}${typeIndex}`;
+
+                            ShipCompareUrl.searchParams.set(param, hashids.encode(moduleIds));
+                        }
+                    });
+                }
+            });
+
+            copyToClipboard(ShipCompareUrl.href);
+        }
     }
 
     /**
@@ -1083,11 +1157,11 @@ export default class CompareShips {
                 .append("div")
                 .attr("class", `col-md-4 ml-auto pt-2 ${columnId === "Base" ? "columnA" : "columnC"}`);
 
-            const shipId = this._getShipSelectId(columnId);
+            const shipSelectId = this._getShipSelectId(columnId);
             div.append("label")
                 .append("select")
-                .attr("name", shipId)
-                .attr("id", shipId)
+                .attr("name", shipSelectId)
+                .attr("id", shipSelectId)
                 .attr("class", "selectpicker");
 
             ["frame", "trim"].forEach(type => {
@@ -1105,7 +1179,7 @@ export default class CompareShips {
                     .append("select")
                     .attr("name", moduleId)
                     .attr("id", moduleId)
-                    .property("multiple", type !== "Ship trim")
+                    .property("multiple", true)
                     .attr("class", "selectpicker");
             });
 
@@ -1113,6 +1187,16 @@ export default class CompareShips {
                 .attr("id", `${this._baseId}-${columnId}`)
                 .attr("class", `${columnId === "Base" ? "ship-base" : "ship-compare"}`);
         });
+
+        const footer = d3Select(`#${this._modalId} .modal-footer`);
+        footer
+            .insert("button", "button")
+            .classed("btn btn-outline-secondary", true)
+            .attr("id", this._copyButtonId)
+            .attr("title", "Copy to clipboard (ctrl-c)")
+            .attr("type", "button")
+            .append("i")
+            .classed("far fa-copy", true);
     }
 
     _initData() {
@@ -1223,12 +1307,11 @@ export default class CompareShips {
 
     /**
      * Setup upgrades select
-     * @param {number} shipId - Ship id
      * @param {string} columnId - Column id
      * @returns {void}
      */
-    _setupModulesSelect(shipId, columnId) {
-        const getShipClass = () => this._shipData.find(ship => ship.id === shipId).class;
+    _setupModulesSelect(columnId) {
+        const getShipClass = () => this._shipData.find(ship => ship.id === this._shipIds[columnId]).class;
 
         this._selectModule$[columnId] = {};
 
@@ -1239,14 +1322,24 @@ export default class CompareShips {
             this._selectModule$[columnId][type].append(options);
             this._selectModule$[columnId][type]
                 .on("changed.bs.select", () => {
-                    this._upgradeSelected(columnId);
-                    this._refreshShips(shipId, columnId);
+                    this._modulesSelected(columnId);
+                    this._refreshShips(columnId);
+                })
+                .on("show.bs.select", () => {
+                    // Remove 'select all' button
+                    this._selectModule$[columnId][type]
+                        .parent()
+                        .find("button.bs-select-all")
+                        .remove();
                 })
                 .selectpicker({
-                    selectedTextFormat: "count > 1",
+                    actionsBox: true,
                     countSelectedText(amount) {
                         return `${amount} ${type.toLowerCase()}s selected`;
                     },
+                    deselectAllText: "Clear",
+                    maxOptions: type !== "Ship trim" && options.length > 1 ? 5 : 1,
+                    selectedTextFormat: "count > 1",
                     title: `${type}`,
                     width: "150px"
                 });
@@ -1255,12 +1348,11 @@ export default class CompareShips {
 
     /**
      * Get ship data for ship with id <id>
-     * @param {number} shipId - Ship id
      * @param {string} columnId - Column id
      * @returns {Object} Ship data
      */
-    _getShipData(shipId, columnId) {
-        let shipData = this._shipData.find(ship => ship.id === shipId);
+    _getShipData(columnId) {
+        let shipData = this._shipData.find(ship => ship.id === this._shipIds[columnId]);
 
         shipData = this._addWoodData(shipData, columnId);
         shipData = this._addModulesData(shipData, columnId);
@@ -1338,11 +1430,11 @@ export default class CompareShips {
     _addModulesData(shipData, compareId) {
         const data = JSON.parse(JSON.stringify(shipData));
 
-        if (typeof this._selectedUpgradeIds[compareId] !== "undefined") {
+        if (typeof this._selectedUpgradeIdsList[compareId] !== "undefined") {
             const modifierAmount = new Map();
 
             // Add modifier amount
-            this._selectedUpgradeIds[compareId].forEach(id => {
+            this._selectedUpgradeIdsList[compareId].forEach(id => {
                 const module = this._moduleProperties.get(id);
 
                 module.properties.forEach(property => {
@@ -1389,28 +1481,32 @@ export default class CompareShips {
 
     /**
      * Refresh ship data
-     * @param {*} shipId - Ship id
      * @param {*} compareId - Column id
      * @returns {void}
      */
-    _refreshShips(shipId, compareId) {
-        const singleShipData = this._getShipData(shipId, compareId);
+    _refreshShips(compareId) {
+        const singleShipData = this._getShipData(compareId);
         if (this._baseId !== "ship-journey") {
             if (compareId === "Base") {
-                this._setShip(compareId, new ShipBase(compareId, singleShipData, this));
-                this._columnsCompare.forEach(id => {
-                    this._selectShip$[id].removeAttr("disabled").selectpicker("refresh");
-                    if (!isEmpty(this.ships[id])) {
-                        this._setShip(
-                            id,
-                            new ShipComparison(id, singleShipData, this.ships[id]._shipCompareData, this)
+                this._setSelectedShip(compareId, new ShipBase(compareId, singleShipData, this));
+                this._columnsCompare.forEach(otherCompareId => {
+                    this._selectShip$[otherCompareId].removeAttr("disabled").selectpicker("refresh");
+                    if (!isEmpty(this.selectedShips[otherCompareId])) {
+                        this._setSelectedShip(
+                            otherCompareId,
+                            new ShipComparison(
+                                otherCompareId,
+                                singleShipData,
+                                this.selectedShips[otherCompareId]._shipCompareData,
+                                this
+                            )
                         );
                     }
                 });
             } else {
-                this._setShip(
+                this._setSelectedShip(
                     compareId,
-                    new ShipComparison(compareId, this.ships.Base._shipData, singleShipData, this)
+                    new ShipComparison(compareId, this.selectedShips.Base._shipData, singleShipData, this)
                 );
             }
         } else {
@@ -1428,26 +1524,32 @@ export default class CompareShips {
         });
     }
 
-    _upgradeSelected(compareId) {
-        this._selectedUpgradeIds[compareId] = [];
+    _modulesSelected(compareId) {
+        this._selectedUpgradeIdsList[compareId] = [];
+        this._selectedUpgradeIdsPerType[compareId] = {};
 
         this._moduleTypes.forEach(type => {
-            let selectedOptions = this._selectModule$[compareId][type].val();
-
-            if (Array.isArray(selectedOptions)) {
+            this._selectedUpgradeIdsPerType[compareId][type] = this._selectModule$[compareId][type].val();
+            if (Array.isArray(this._selectedUpgradeIdsPerType[compareId][type])) {
                 // Multiple selects
-                selectedOptions = selectedOptions.map(Number);
+                this._selectedUpgradeIdsPerType[compareId][type] = this._selectedUpgradeIdsPerType[compareId][type].map(
+                    Number
+                );
             } else {
                 // Single select
-                selectedOptions = selectedOptions !== "" ? [+selectedOptions] : [];
+                this._selectedUpgradeIdsPerType[compareId][type] =
+                    this._selectedUpgradeIdsPerType[compareId][type] !== ""
+                        ? [+this._selectedUpgradeIdsPerType[compareId][type]]
+                        : [];
             }
 
-            if (selectedOptions.length) {
-                this._selectedUpgradeIds[compareId] = this._selectedUpgradeIds[compareId].concat(selectedOptions);
+            if (this._selectedUpgradeIdsPerType[compareId][type].length) {
+                this._selectedUpgradeIdsList[compareId] = this._selectedUpgradeIdsList[compareId].concat(
+                    this._selectedUpgradeIdsPerType[compareId][type]
+                );
             }
+            // console.log("_modulesSelected", compareId, type, this._selectedUpgradeIdsPerType[compareId][type]);
         });
-
-        // console.log("selectedUpgradeIds", this._selectedUpgradeIds, compareId, this._selectedUpgradeIds[compareId]);
     }
 
     /**
@@ -1458,13 +1560,13 @@ export default class CompareShips {
     _setupSelectListener(compareId) {
         this._selectShip$[compareId]
             .on("changed.bs.select", () => {
-                const shipId = +this._selectShip$[compareId].val();
-                this._refreshShips(shipId, compareId);
+                this._shipIds[compareId] = +this._selectShip$[compareId].val();
+                this._refreshShips(compareId);
                 if (compareId === "Base" && this._baseId !== "ship-journey") {
                     this._enableCompareSelects();
                 }
                 this.woodCompare.enableSelects(compareId);
-                this._setupModulesSelect(shipId, compareId);
+                this._setupModulesSelect(compareId);
             })
             .selectpicker({ title: "Ship" });
 
@@ -1472,11 +1574,87 @@ export default class CompareShips {
             this._selectWood$[compareId][type]
                 .on("changed.bs.select", () => {
                     this.woodCompare._woodSelected(compareId, type, this._selectWood$[compareId][type]);
-                    const shipId = +this._selectShip$[compareId].val();
-                    this._refreshShips(shipId, compareId);
+                    this._refreshShips(compareId);
                 })
                 .selectpicker({ title: `Wood ${type}`, width: "150px" });
         });
+    }
+
+    initFromClipboard(urlParams) {
+        const setSelect = (select$, id) => {
+            if (id) {
+                select$.val(id);
+            }
+            select$.selectpicker("render");
+        };
+
+        const setShipAndWoodsSelects = data => {
+            let i = 0;
+
+            this._columns.some(columnId => {
+                this._shipIds[columnId] = data[i];
+                i += 1;
+                setSelect(this._selectShip$[columnId], this._shipIds[columnId]);
+                if (columnId === "Base" && this._baseId !== "ship-journey") {
+                    this._enableCompareSelects();
+                }
+                this.woodCompare.enableSelects(columnId);
+                this._setupModulesSelect(columnId);
+
+                if (data[i]) {
+                    ["frame", "trim"].forEach(type => {
+                        setSelect(this._selectWood$[columnId][type], data[i]);
+                        i += 1;
+                        this.woodCompare._woodSelected(columnId, type, this._selectWood$[columnId][type]);
+                    });
+                } else {
+                    i += 2;
+                }
+
+                this._refreshShips(columnId);
+                return i >= data.length;
+            });
+        };
+
+        /**
+         * Get selected modules, new searchParam per module
+         * @return {void}
+         */
+        const setModuleSelects = () => {
+            this._columns.forEach((columnId, columnIndex) => {
+                let needRefresh = false;
+                [...this._moduleTypes].forEach((type, typeIndex) => {
+                    if (urlParams.has(`${columnIndex}${typeIndex}`)) {
+                        const moduleIds = hashids.decode(urlParams.get(`${columnIndex}${typeIndex}`));
+                        if (!this._selectedUpgradeIdsPerType[columnId]) {
+                            this._selectedUpgradeIdsPerType[columnId] = {};
+                        }
+                        if (!this._selectedUpgradeIdsList[columnId]) {
+                            this._selectedUpgradeIdsList[columnId] = [];
+                        }
+                        // console.log("moduleIds", { columnId }, { type }, { moduleIds });
+                        this._selectedUpgradeIdsPerType[columnId][type] = moduleIds.map(Number);
+                        setSelect(this._selectModule$[columnId][type], this._selectedUpgradeIdsPerType[columnId][type]);
+                        this._selectedUpgradeIdsList[columnId] = this._selectedUpgradeIdsList[columnId].concat(
+                            this._selectedUpgradeIdsPerType[columnId][type]
+                        );
+                        needRefresh = true;
+                    }
+                });
+                if (needRefresh) {
+                    this._refreshShips(columnId);
+                }
+            });
+        };
+
+        const ShipAndWoodsIds = hashids.decode(urlParams.get("cmp"));
+
+        this._shipCompareSelected();
+        if (ShipAndWoodsIds.length > 3) {
+            this._enableCompareSelects();
+        }
+        setShipAndWoodsSelects(ShipAndWoodsIds);
+        setModuleSelects();
     }
 
     _getShipSelectId(columnId) {
@@ -1495,12 +1673,12 @@ export default class CompareShips {
         return this._woodCompare;
     }
 
-    _setShip(id, ship) {
-        this._ships[id] = ship;
+    _setSelectedShip(columnId, ship) {
+        this._selectedShips[columnId] = ship;
     }
 
-    get ships() {
-        return this._ships;
+    get selectedShips() {
+        return this._selectedShips;
     }
 
     get minSpeed() {
