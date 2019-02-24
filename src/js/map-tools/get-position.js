@@ -34,13 +34,17 @@ export default class TrilateratePosition {
         this._buttonId = `button-${this._baseId}`;
         this._modalId = `modal-${this._baseId}`;
 
+        this._modal$ = null;
+
         this._setupSvg();
         this._setupListener();
     }
 
     _setupSvg() {
-        this._gPosition = d3Select("g.ports").append("g");
-        this._path = this._gPosition.append("path").attr("class", "position-path");
+        this._gPosition = d3Select("g.ports")
+            .append("g")
+            .attr("class", "position");
+        this._path = this._gPosition.append("path");
     }
 
     _navbarClick(event) {
@@ -241,10 +245,7 @@ export default class TrilateratePosition {
             if (area.innerPoints.length) {
                 displayArea(area);
 
-                const bbox = this._gPosition
-                        .select("path")
-                        .node()
-                        .getBBox(),
+                const bbox = this._path.node().getBBox(),
                     centroid = { x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2 };
 
                 this._ports._map._f11.printCoord(centroid.x, centroid.y);
@@ -312,15 +313,14 @@ export default class TrilateratePosition {
      */
     _positionSelected() {
         // If the modal has no content yet, insert it
-        if (!document.getElementById(this._modalId)) {
+        if (!this._modal$) {
             this._initModal();
+            this._modal$ = $(`#${this._modalId}`);
         }
         // Show modal
-        $(`#${this._modalId}`)
-            .modal("show")
-            .one("hidden.bs.modal", () => {
-                this._useUserInput();
-            });
+        this._modal$.modal("show").one("hidden.bs.modal", () => {
+            this._useUserInput();
+        });
     }
 
     /**
@@ -328,6 +328,6 @@ export default class TrilateratePosition {
      * @return {void}
      */
     clearMap() {
-        this._gPosition.selectAll("*").remove();
+        this._path.attr("d", null);
     }
 }
