@@ -56,7 +56,7 @@ function main() {
      * Server name cookie
      * @type {Cookie}
      */
-    const cookie = new Cookie(baseId, radioButtonValues);
+    const cookie = new Cookie({ id: baseId, values: radioButtonValues });
 
     /**
      * Server name radio buttons
@@ -99,13 +99,24 @@ function main() {
     const setupListener = () => {
         document.getElementById(baseId).addEventListener("change", () => serverNameSelected());
 
-        // https://stackoverflow.com/questions/44467377/bootstrap-4-multilevel-dropdown-inside-navigation/48953349#48953349
-        $(".dropdown-submenu > a").on("click", event => {
-            const submenu$ = $(event.currentTarget);
-
-            $(".dropdown-submenu .dropdown-menu").removeClass("show");
-            submenu$.next(".dropdown-menu").addClass("show");
-            event.stopPropagation();
+        // https://www.codeply.com/go/1Iz3DxS60l
+        $(".dropdown-menu a.dropdown-toggle").on("click", event => {
+            const menu$ = $(event.currentTarget);
+            if (!menu$.next().hasClass("show")) {
+                menu$
+                    .parents(".dropdown-menu")
+                    .first()
+                    .find(".show")
+                    .removeClass("show");
+            }
+            const subMenu$ = menu$.next(".dropdown-menu");
+            subMenu$.toggleClass("show");
+            $(this)
+                .parents("li.nav-item.dropdown.show")
+                .on("hidden.bs.dropdown", () => {
+                    $(".dropdown-submenu .show").removeClass("show");
+                });
+            return false;
         });
 
         $(".dropdown").on("hidden.bs.dropdown", () => {
@@ -130,12 +141,13 @@ function main() {
 
     /**
      * Load game tools
+     * @param {URLSearchParams} searchParams - Search Parameters
      * @return {void}
      */
-    const loadGameTools = async () => {
+    const loadGameTools = async searchParams => {
         try {
             const gameTools = await import(/* webpackChunkName: "game-tools" */ "./game-tools");
-            gameTools.init();
+            gameTools.init(searchParams);
         } catch (error) {
             throw new Error(error);
         }
@@ -161,9 +173,11 @@ function main() {
     initAnalytics();
     registerPage("Homepage", "/");
 
+    const { searchParams } = new URL(document.location);
+
     setupListener();
     loadMap();
-    loadGameTools();
+    loadGameTools(searchParams);
 }
 
 main();
