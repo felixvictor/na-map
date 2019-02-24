@@ -53,6 +53,10 @@ table,
     color: $secondary-700;
 }
 
+.card-table {
+    margin-bottom: 0;
+}
+
 #na-svg {
     background-color: $background-colour;
 }
@@ -61,64 +65,17 @@ text {
     cursor: default;
 }
 
-.position-circle {
-    fill-opacity: .4;
-    fill: $white;
-}
-
-.position-path {
-    fill: $green;
-    fill-opacity: .6;
-}
-
-.card {
-    border: none;
-}
-
-.card-header {
-    background-color: $secondary-200;
-    border-bottom: none;
-}
-
-.card-body {
-    background-color: $secondary-100;
-
-    .table {
-        margin-bottom: 0;
+.position {
+    path {
+        fill: $green;
+        fill-opacity: .6;
     }
 }
 
-table tr,
-p {
-    text-align: left;
-}
-
-.table {
-    thead th {
-        font-weight: 400;
-    }
-
-    td {
-        vertical-align: top;
-        border-top: none;
-    }
-
-    td:first-child,
-    th:first-child {
-        padding-left: 0;
-    }
-
-    td:last-child,
-    th:last-child {
-        padding-right: 0;
-    }
-}
-
-p a,
-table a {
-    text-decoration: underline dotted $secondary-600 !important;
-    @include hover-focus {
-        text-decoration-style: solid !important;
+.port-circles {
+    circle {
+        fill-opacity: .4;
+        fill: $white;
     }
 }
 
@@ -245,72 +202,6 @@ table a {
     color: $green;
 }
 
-.profile {
-    text {
-        fill: $primary-900;
-        text-anchor: middle;
-    }
-
-    path .base,
-    circle .base {
-        opacity: .5;
-        fill: $primary-500;
-    }
-
-    path .comp {
-        opacity: .5;
-        fill: none;
-        stroke-width: 3px;
-        stroke: $secondary-500;
-    }
-
-    .centroid-base {
-        fill: $secondary-700;
-    }
-
-    .centroid-comp {
-        fill: $primary-700;
-    }
-}
-
-.columnA {
-    background-color: $primary-050;
-    font-variant-numeric: normal; // onum off
-}
-
-.columnC {
-    background-color: $secondary-050;
-    font-variant-numeric: normal; // onum off
-}
-
-.knots-circle {
-    fill: none;
-    stroke: $primary-500;
-}
-
-.knots-text {
-    fill: $primary-600 !important;
-}
-
-.solidArc {
-    transition: all .3s;
-
-    &:hover {
-        fill: orangered;
-    }
-}
-
-.aster-score {
-    line-height: 1em;
-    text-anchor: middle;
-    dominant-baseline: central;
-}
-
-.outlineArc {
-    fill: none;
-    stroke: $primary-200;
-}
-
 #input-toggle {
     display: flex;
 
@@ -333,10 +224,6 @@ table a {
 
 .box {
     background-color: $primary-100;
-}
-
-.compass-arc path {
-    stroke: $primary-500;
 }
 
 .coord {
@@ -563,33 +450,6 @@ table a {
     }
 }
 
-.profile {
-    line {
-        opacity: .3;
-        fill: none;
-        stroke: $secondary-600;
-        stroke-width: .5em;
-    }
-}
-
-.tooltip {
-    font-size: smaller;
-    text-align: left;
-    box-shadow: 0 14px 28px rgba($primary-900, .25), 0 10px 10px rgba($primary-900, .22);
-
-    table {
-        margin-bottom: 0;
-    }
-}
-
-.tooltip-inner {
-    min-width: 30rem;
-}
-
-.tooltip-small {
-    min-width: 20rem !important;
-}
-
 .flag-icon {
     width: 2rem;
     height: 100%;
@@ -667,174 +527,18 @@ table a {
     letter-spacing: .6rem;
 }
 
-// https://stackoverflow.com/questions/44467377/bootstrap-4-multilevel-dropdown-inside-navigation/48953349#48953349
 .dropdown-submenu {
     position: relative;
 }
 
-.dropdown-submenu .dropdown-menu {
+.dropdown-submenu > .dropdown-menu {
     top: 0;
     left: 100%;
-    margin-top: -1px;
-}
-
-.tablesort {
-    th [role="columnheader"]:not(.no-sort) {
-        cursor: pointer;
-    }
-
-    th [role="columnheader"]:not(.no-sort)::after {
-        float: right;
-        margin-top: 7px;
-        visibility: hidden;
-        content: "";
-        user-select: none;
-        border-color: $primary-600 transparent;
-        border-style: solid;
-        border-width: 0 4px 4px;
-        opacity: 0;
-    }
-
-    th [aria-sort="ascending"]:not(.no-sort)::after {
-        border-width: 4px 4px 0;
-        border-bottom: none;
-    }
-
-    th [aria-sort]:not(.no-sort)::after {
-        visibility: visible;
-        opacity: .4;
-    }
-
-    th [role="columnheader"]:not(.no-sort):hover::after {
-        visibility: visible;
-        opacity: 1;
-    }
+    margin-top: -$dropdown-spacer;
 }
 
 .hidden {
     visibility: hidden;
-}
-
-.timelines-chart {
-    padding-bottom: 3rem;
-    text-align: center;
-    user-select: none;
-
-    .axises {
-        .x-axis,
-        .x-grid,
-        .y-axis,
-        .grp-axis {
-            font-family: $font-family-base !important;
-        }
-
-        line,
-        path {
-            stroke: $primary-700;
-        }
-
-        .x-axis {
-            font-size: 12px;
-        }
-
-        .x-grid line {
-            stroke: $primary-200;
-        }
-
-        .y-axis,
-        .grp-axis {
-            line,
-            path {
-                stroke: none;
-            }
-
-            text {
-                fill: $primary-700;
-            }
-        }
-    }
-
-    .series-group {
-        fill-opacity: .6;
-        stroke: $primary-700;
-        stroke-opacity: .2;
-    }
-
-    .series-segment {
-        stroke: none;
-    }
-
-    .series-group,
-    .series-segment {
-        cursor: crosshair;
-    }
-
-    .legend {
-        .legendText {
-            fill: $body-color;
-        }
-    }
-
-    .reset-zoom-btn {
-        cursor: pointer;
-        opacity: .6;
-        fill: $primary-600;
-    }
-}
-
-.brusher {
-    .grid-background {
-        fill: $primary-200;
-    }
-
-    .axis {
-        font-family: $font-family-base !important;
-
-        path {
-            display: none;
-        }
-    }
-
-    .tick text {
-        text-anchor: middle;
-    }
-
-    .grid {
-        line,
-        path {
-            stroke: $primary-100;
-        }
-    }
-}
-
-.chart-zoom-selection,
-.brusher .brush .selection {
-    fill: $primary-700;
-    stroke: $primary-700;
-    stroke-opacity: .6;
-    fill-opacity: .3;
-    shape-rendering: crispEdges;
-}
-
-.chart-tooltip {
-    z-index: 4000;
-    padding: 5px;
-    font-size: 11px;
-    color: $body-color;
-    background: $primary-200;
-    @include border-radius(3px);
-
-    &.group-tooltip {
-        font-size: 14px;
-    }
-
-    &.line-tooltip {
-        font-size: 13px;
-    }
-
-    &.segment-tooltip {
-        text-align: center;
-    }
 }
 
 .area {
@@ -848,14 +552,6 @@ table a {
         stroke: $white !important;
         stroke-width: 2px;
     }
-}
-
-.bootstrap-select > .dropdown-toggle.bs-placeholder {
-    color: $navbar-light-color;
-}
-
-.dropdown-header {
-    font-size: smaller;
 }
 
 .central {
@@ -1002,3 +698,49 @@ svg {
     pointer-events: none;
     user-select: none;
 }
+
+////
+//// Ship compare
+////
+
+.compass-arc,
+.speed-circle {
+    fill: none;
+    stroke: $primary-200;
+}
+
+.speed-text {
+    fill: $primary-300;
+}
+
+.wind-arrow {
+    opacity: .3;
+    fill: none;
+    stroke: $secondary-600;
+    stroke-width: .5em;
+}
+
+.base-profile,
+.comp-profile {
+    opacity: .5;
+}
+
+.base-profile {
+    fill: $primary-500;
+}
+
+.comp-profile {
+    stroke-width: 3px;
+    stroke: $secondary-800;
+}
+
+.column-base {
+    background-color: $primary-050;
+    font-variant-numeric: normal; // onum off
+}
+
+.column-comp {
+    background-color: $secondary-050;
+    font-variant-numeric: normal; // onum off
+}
+
