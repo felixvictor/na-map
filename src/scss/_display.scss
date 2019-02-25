@@ -41,16 +41,20 @@ table,
     letter-spacing: .08em;
 }
 
-.caps,
-.des {
-    @include caps;
-}
-
-.des {
+@mixin des {
     position: relative;
     top: -.4rem;
     font-size: small;
     color: $secondary-700;
+}
+
+.des {
+    @include des;
+}
+
+.caps,
+.des {
+    @include caps;
 }
 
 .card-table {
@@ -69,36 +73,6 @@ text {
     path {
         fill: $green;
         fill-opacity: .6;
-    }
-}
-
-.port-circles {
-    circle {
-        fill-opacity: .4;
-        fill: $white;
-    }
-}
-
-.ship-base,
-.ship-compare {
-    .block {
-        padding: 0 $paddingThird;
-    }
-
-    .small {
-        padding: $paddingThird 0;
-    }
-}
-
-.ship-base {
-    .light {
-        background-color: $primary-100;
-    }
-}
-
-.ship-compare {
-    .light {
-        background-color: $secondary-100;
     }
 }
 
@@ -164,26 +138,6 @@ text {
     td:nth-child(2) {
         width: 50%;
     }
-}
-
-.bubble {
-    fill-opacity: .7;
-}
-
-.here {
-    fill: $white;
-}
-
-.both {
-    fill: $blue;
-}
-
-.pos {
-    fill: $green;
-}
-
-.neg {
-    fill: $red;
 }
 
 .gun-decks {
@@ -307,52 +261,6 @@ text {
     }
 }
 
-.port-names {
-    fill: $white;
-}
-
-.port-name {
-    font-size: x-large;
-    @include caps;
-    font-variant-numeric: normal;
-}
-
-.port circle {
-    cursor: pointer;
-}
-
-.non-trading {
-    font-style: italic;
-}
-
-.pb {
-    fill-opacity: .6;
-    stroke-width: .5px;
-    stroke-opacity: 1;
-}
-
-.pb-circle {
-    fill: $primary-300;
-    stroke: $primary-600;
-}
-
-.fort {
-    fill: darken($red, 20);
-    stroke: darken($red, 20);
-}
-
-.tower {
-    fill: $secondary-600;
-    stroke: $secondary-600;
-}
-
-.join-circle {
-    fill: $secondary-300;
-    fill-opacity: .4;
-    stroke: $secondary-500;
-    stroke-width: 1px;
-}
-
 .label-rect {
     fill: transparent;
 }
@@ -456,32 +364,6 @@ text {
     margin-right: .4rem;
 }
 
-// contrast function
-// https://lnikki.la/articles/sass-better-colour-based-on-brightness/
-
-@function contrast-luma($c) {
-    $-local-red: red(rgba($c, 1));
-    $-local-green: green(rgba($c, 1));
-    $-local-blue: blue(rgba($c, 1));
-
-    @return (.2126 * $-local-red + .7152 * $-local-green + .0722 * $-local-blue) / 255;
-}
-
-@function contrast-color($bg, $c1: $white, $c2: $primary-900) {
-    $bg-luma: contrast-luma($bg);
-    $c1-luma: contrast-luma($c1);
-    $c2-luma: contrast-luma($c2);
-
-    $c1-diff: abs($bg-luma - $c1-luma);
-    $c2-diff: abs($bg-luma - $c2-luma);
-
-    @if $c1-diff > $c2-diff {
-        @return $c1;
-    } @else {
-        @return $c2;
-    }
-}
-
 .rate {
     display: flex;
 
@@ -509,24 +391,6 @@ text {
     }
 }
 
-.county,
-.region {
-    font-feature-settings: "c2sc", "smcp";
-
-    fill: $secondary-900;
-    text-anchor: middle;
-}
-
-.region {
-    font-size: 160px;
-    letter-spacing: 1rem;
-}
-
-.county {
-    font-size: 60px;
-    letter-spacing: .6rem;
-}
-
 .dropdown-submenu {
     position: relative;
 }
@@ -535,10 +399,6 @@ text {
     top: 0;
     left: 100%;
     margin-top: -$dropdown-spacer;
-}
-
-.hidden {
-    visibility: hidden;
 }
 
 .area {
@@ -602,10 +462,6 @@ text {
     padding: $paddingHalf;
     pointer-events: all;
     background: rgba($primary-200, .8);
-
-    .des {
-        top: 0;
-    }
 
     button {
         margin-bottom: map-get($spacers, 2);
@@ -744,3 +600,123 @@ svg {
     font-variant-numeric: normal; // onum off
 }
 
+.block-small {
+    padding: 0 $paddingThird;
+}
+
+.row-small {
+    @extend .small;
+    padding: $paddingThird 0;
+}
+
+.ship-base {
+    .row-light {
+        background-color: $primary-100;
+    }
+}
+
+.ship-compare {
+    .row-light {
+        background-color: $secondary-100;
+    }
+}
+
+////
+//// Display ports
+////
+
+.port-name {
+    font-size: x-large;
+    @include caps;
+    font-variant-numeric: normal;
+}
+
+.non-trading {
+    font-style: italic;
+}
+
+.summary-des {
+    @include des;
+    top: 0;
+}
+
+.bubble {
+    fill-opacity: .7;
+}
+
+.both {
+    fill: $blue;
+}
+
+.here {
+    fill: $white;
+}
+
+.neg {
+    fill: $red;
+}
+
+.pos {
+    fill: $green;
+}
+
+.hidden {
+    visibility: hidden;
+}
+
+.county,
+.region {
+    font-feature-settings: "c2sc", "smcp";
+    fill: $secondary-900;
+    text-anchor: middle;
+}
+
+.region {
+    font-size: 160px;
+    letter-spacing: 1rem;
+}
+
+.county {
+    font-size: 60px;
+    letter-spacing: .6rem;
+}
+
+.port-names {
+    fill: $white;
+}
+
+.port {
+    cursor: pointer;
+}
+
+////
+//// Display pb zones
+////
+
+.pb {
+    fill-opacity: .6;
+    stroke-width: .5px;
+    stroke-opacity: 1;
+}
+
+.pb-circle {
+    fill: $primary-300;
+    stroke: $primary-600;
+}
+
+.fort {
+    fill: darken($red, 20);
+    stroke: darken($red, 20);
+}
+
+.tower {
+    fill: $secondary-600;
+    stroke: $secondary-600;
+}
+
+.join-circle {
+    fill: $secondary-300;
+    fill-opacity: .4;
+    stroke: $secondary-500;
+    stroke-width: 1px;
+}
