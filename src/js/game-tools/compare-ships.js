@@ -83,7 +83,7 @@ class Ship {
             .attr("transform", `translate(${this.shipData.svgWidth / 2}, ${this.shipData.svgHeight / 2})`);
         d3Select(`${this.select} div`).remove();
 
-        element.append("div").classed("block", true);
+        element.append("div").attr("class", "block-small");
     }
 
     /**
@@ -184,7 +184,7 @@ class Ship {
          */
         function displayFirstColumn(element) {
             row += 1;
-            return `<div class="row small ${row % 2 ? "light" : ""}"><div class="col-3">${element}</div>`;
+            return `<div class="row row-small ${row % 2 ? "row-light" : ""}"><div class="col-3">${element}</div>`;
         }
 
         /**

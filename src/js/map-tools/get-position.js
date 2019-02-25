@@ -41,10 +41,10 @@ export default class TrilateratePosition {
     }
 
     _setupSvg() {
-        this._gPosition = d3Select("g.ports")
+        this._gPosition = d3Select("#ports")
             .append("g")
-            .attr("class", "position");
-        this._path = this._gPosition.append("path");
+            .attr("data-ui-component", "position");
+        this._path = this._gPosition.append("path").attr("class", "bubble pos");
     }
 
     _navbarClick(event) {
@@ -66,7 +66,7 @@ export default class TrilateratePosition {
 
         const body = d3Select(`#${this._modalId} .modal-body`);
         body.append("div")
-            .classed("alert alert-primary", true)
+            .attr("class", "alert alert-primary")
             .attr("role", "alert")
             .text("Use in-game trader tool.");
 
@@ -79,22 +79,22 @@ export default class TrilateratePosition {
         Array.from(Array(this._inputs).keys()).forEach(row => {
             const select = `${this._baseId}-${row}-select`,
                 input = `${this._baseId}-${row}-input`;
-            const formRow = form.append("div").classed("form-row", true);
+            const formRow = form.append("div").attr("class", "form-row");
             formRow
                 .append("div")
-                .classed("col-md-6", true)
+                .attr("class", "col-md-6")
                 .append("label")
                 .append("select")
                 .attr("name", select)
                 .attr("id", select);
             formRow
                 .append("div")
-                .classed("col-md-6", true)
+                .attr("class", "col-md-6")
                 .append("input")
                 .attr("id", input)
                 .attr("name", input)
                 .attr("type", "number")
-                .classed("form-control", true)
+                .attr("class", "form-control")
                 .attr("placeholder", "Distance in k")
                 .attr("step", 1)
                 .attr("list", "defaultDistances")
@@ -245,8 +245,8 @@ export default class TrilateratePosition {
             if (area.innerPoints.length) {
                 displayArea(area);
 
-                const bbox = this._path.node().getBBox(),
-                    centroid = { x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2 };
+                const bbox = this._path.node().getBBox();
+                const centroid = { x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2 };
 
                 this._ports._map._f11.printCoord(centroid.x, centroid.y);
                 this._ports._map.zoomAndPan(centroid.x, centroid.y, 1);
