@@ -93,7 +93,7 @@ export default class DisplayPorts {
          * Show radius cookie
          * @type {Cookie}
          */
-        this._cookie = new Cookie({ id: this._baseId, values: this._radioButtonValues});
+        this._cookie = new Cookie({ id: this._baseId, values: this._radioButtonValues });
 
         /**
          * Show radius radio buttons
@@ -149,12 +149,13 @@ export default class DisplayPorts {
     _setupSvg() {
         this._gPort = d3Select("#na-svg")
             .insert("g", "g.f11")
-            .classed("ports", true);
-        this._gRegion = this._gPort.append("g").classed("region", true);
-        this._gCounty = this._gPort.append("g").classed("county", true);
-        this._gPortCircle = this._gPort.append("g").classed("port-circles", true);
-        this._gIcon = this._gPort.append("g").classed("port", true);
-        this._gText = this._gPort.append("g").classed("port-names", true);
+            .attr("data-ui-component", "ports")
+            .attr("id", "ports");
+        this._gRegion = this._gPort.append("g").attr("class", "region");
+        this._gCounty = this._gPort.append("g").attr("class", "county");
+        this._gPortCircle = this._gPort.append("g").attr("data-ui-component", "port-circles");
+        this._gIcon = this._gPort.append("g").attr("class", "port");
+        this._gText = this._gPort.append("g").attr("class", "port-names");
     }
 
     _setupCounties() {
@@ -305,27 +306,27 @@ export default class DisplayPorts {
             .attr("class", "port-summary");
 
         // Number of selected ports
-        this._portSummaryNumPorts = this._divPortSummary.append("div").classed("block", true);
+        this._portSummaryNumPorts = this._divPortSummary.append("div").attr("class", "block");
         this._portSummaryTextNumPorts = this._portSummaryNumPorts.append("div");
         this._portSummaryNumPorts
             .append("div")
-            .classed("des", true)
+            .attr("class", "summary-des")
             .html("selected<br>ports");
 
         // Total tax income
-        this._portSummaryTaxIncome = this._divPortSummary.append("div").classed("block", true);
+        this._portSummaryTaxIncome = this._divPortSummary.append("div").attr("class", "block");
         this._portSummaryTextTaxIncome = this._portSummaryTaxIncome.append("div");
         this._portSummaryTaxIncome
             .append("div")
-            .classed("des", true)
+            .attr("class", "summary-des")
             .html("tax<br>income");
 
         // Total net income
-        this._portSummaryNetIncome = this._divPortSummary.append("div").classed("block", true);
+        this._portSummaryNetIncome = this._divPortSummary.append("div").attr("class", "block");
         this._portSummaryTextNetIncome = this._portSummaryNetIncome.append("div");
         this._portSummaryNetIncome
             .append("div")
-            .classed("des", true)
+            .attr("class", "summary-des")
             .html("net<br>income");
     }
 
@@ -467,7 +468,7 @@ export default class DisplayPorts {
                 .replace('"', "")
                 .replace('"', "")}"/>`;
             h += `<div class="port-name">${port.name}</div>`;
-            h += `<div class="">\u2000${port.county} ${port.availableForAll}</div>`;
+            h += `<div>\u2000${port.county} ${port.availableForAll}</div>`;
             h += "</div>";
             if (port.attack.length) {
                 h += `<div class="alert alert-danger mt-2" role="alert">${port.attack}</div>`;
@@ -644,7 +645,7 @@ export default class DisplayPorts {
             cssClass = d => `bubble ${getTradePortMarker(d)}`;
             r = d => (d.id === this.tradePortId ? rMax : rMax / 2);
         } else if (this._showRadius === "position") {
-            cssClass = () => null;
+            cssClass = () => "bubble here";
             r = d => d.distance;
         } else if (this._showRadius === "attack") {
             data = this._portDataFiltered.filter(port => port.attackHostility);
