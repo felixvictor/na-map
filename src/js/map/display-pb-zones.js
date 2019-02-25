@@ -64,13 +64,13 @@ export default class DisplayPbZones {
 
     _setupSvg() {
         this._g = d3Select("#na-svg")
-            .insert("g", "g.ports")
-            .classed("pb", true);
-        this._gJoinCirclesInner = this._g.append("path").classed("join-circle", true);
-        this._gJoinCirclesOuter = this._g.append("path").classed("join-circle", true);
-        this._gPBCircles = this._g.append("path").classed("pb-circle", true);
-        this._gTowers = this._g.append("path").classed("tower", true);
-        this._gForts = this._g.append("path").classed("fort", true);
+            .insert("g", "#ports")
+            .attr("class", "pb");
+        this._gJoinCirclesInner = this._g.append("path").attr("class", "join-circle");
+        this._gJoinCirclesOuter = this._g.append("path").attr("class", "join-circle");
+        this._gPBCircles = this._g.append("path").attr("class", "pb-circle");
+        this._gTowers = this._g.append("path").attr("class", "tower");
+        this._gForts = this._g.append("path").attr("class", "fort");
     }
 
     _setupListener() {
