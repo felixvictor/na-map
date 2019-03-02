@@ -254,20 +254,20 @@
         <Value>
           <Time>0</Time>
           <Value>0</Value>
-          <TangentIn>2.954283</TangentIn>
-          <TangentOut>2.954283</TangentOut>
+          <TangentIn>2</TangentIn>
+          <TangentOut>2</TangentOut>
         </Value>
         <Value>
-          <Time>0.09965274</Time>
-          <Value>0.250287235</Value>
-          <TangentIn>0.523909569</TangentIn>
-          <TangentOut>0.523909569</TangentOut>
+          <Time>0.100099877</Time>
+          <Value>0.132990927</Value>
+          <TangentIn>0.5187243</TangentIn>
+          <TangentOut>0.5187243</TangentOut>
         </Value>
         <Value>
-          <Time>1.00176215</Time>
-          <Value>0.40030697</Value>
-          <TangentIn>0.0144337583</TangentIn>
-          <TangentOut>0.0144337583</TangentOut>
+          <Time>1</Time>
+          <Value>0.27</Value>
+          <TangentIn>0</TangentIn>
+          <TangentOut>0</TangentOut>
         </Value>
       </Value>
     </Pair>
