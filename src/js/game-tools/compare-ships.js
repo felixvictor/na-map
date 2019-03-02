@@ -532,13 +532,16 @@ class ShipBase extends Ship {
                 fireResistance: formatInt(this.shipData.resistance.fire),
                 leakResistance: formatInt(this.shipData.resistance.leaks),
                 crewProtection: formatInt(this.shipData.resistance.crew),
-                mastBottomArmor: `<span class="badge badge-white">${formatInt(
-                    this.shipData.mast.bottomThickness
-                )}</span>`,
-                mastMiddleArmor: `<span class="badge badge-white">${formatInt(
-                    this.shipData.mast.middleThickness
-                )}</span>`,
-                mastTopArmor: `<span class="badge badge-white">${formatInt(this.shipData.mast.topThickness)}</span>`
+                mastBottomArmor: `${formatInt(
+                    this.shipData.mast.bottomArmour
+                )}\u00a0<span class="badge badge-white">${formatInt(this.shipData.mast.bottomThickness)}</span>`,
+                mastMiddleArmor: `${formatInt(
+                    this.shipData.mast.middleArmour
+                )}\u00a0<span class="badge badge-white">${formatInt(this.shipData.mast.middleThickness)}</span>`,
+                mastTopArmor: `${formatInt(
+                    this.shipData.mast.topArmour
+                )}\u00a0<span class="badge badge-white">${formatInt(this.shipData.mast.topThickness)}</span>`
+
             };
 
         if (ship.gunsFront) {
@@ -845,15 +848,27 @@ class ShipComparison extends Ship {
                 this.shipCompareData.resistance.crew,
                 this.shipBaseData.resistance.crew
             )}`,
-            mastBottomArmor: `<span class="badge badge-white">${formatInt(
-                this.shipCompareData.mast.bottomThickness
-            )}</span>${getDiff(this.shipCompareData.mast.bottomThickness, this.shipBaseData.mast.bottomThickness)}`,
-            mastMiddleArmor: `<span class="badge badge-white">${formatInt(
-                this.shipCompareData.mast.middleThickness
-            )}</span>${getDiff(this.shipCompareData.mast.middleThickness, this.shipBaseData.mast.middleThickness)}`,
-            mastTopArmor: `<span class="badge badge-white">${formatInt(
-                this.shipCompareData.mast.topThickness
-            )}</span>${getDiff(this.shipCompareData.mast.topThickness, this.shipBaseData.mast.topThickness)}`
+            mastBottomArmor: `${formatInt(this.shipCompareData.mast.bottomArmour)}\u00a0${getDiff(
+                this.shipCompareData.mast.bottomArmour,
+                this.shipBaseData.mast.bottomArmour
+            )} <span class="badge badge-white">${formatInt(this.shipCompareData.mast.bottomThickness)}</span>${getDiff(
+                this.shipCompareData.mast.bottomThickness,
+                this.shipBaseData.mast.bottomThickness
+            )}`,
+            mastMiddleArmor: `${formatInt(this.shipCompareData.mast.middleArmour)}\u00a0${getDiff(
+                this.shipCompareData.mast.middleArmour,
+                this.shipBaseData.mast.middleArmour
+            )} <span class="badge badge-white">${formatInt(this.shipCompareData.mast.middleThickness)}</span>${getDiff(
+                this.shipCompareData.mast.middleThickness,
+                this.shipBaseData.mast.middleThickness
+            )}`,
+            mastTopArmor: `${formatInt(this.shipCompareData.mast.topArmour)}\u00a0${getDiff(
+                this.shipCompareData.mast.topArmour,
+                this.shipBaseData.mast.topArmour
+            )} <span class="badge badge-white">${formatInt(this.shipCompareData.mast.topThickness)}</span>${getDiff(
+                this.shipCompareData.mast.topThickness,
+                this.shipBaseData.mast.topThickness
+            )}`
         };
 
         if (ship.gunsFront) {
@@ -933,22 +948,26 @@ export default class CompareShips {
             .interpolate(d3InterpolateHcl);
 
         this._woodChanges = new Map([
-            // ["Mast thickness", ["mast.bottomThickness", "mast.middleThickness", "mast.topThickness"]],
             ["Acceleration", ["ship.acceleration"]],
+            ["Armor thickness", ["sides.thickness", "bow.thickness", "stern.thickness"]],
+            ["Armour strength", ["bow.armour", "sides.armour", "stern.armour"]],
             ["Crew protection", ["resistance.crew"]],
             ["Crew", ["crew.max"]],
             ["Fire resistance", ["resistance.fire"]],
             ["Hull strength", ["structure.armour"]],
             ["Leak resistance", ["resistance.leaks"]],
+            ["Mast thickness", ["mast.bottomThickness", "mast.middleThickness", "mast.topThickness"]],
             ["Rudder speed", ["rudder.halfturnTime"]],
             ["Ship speed", ["speed.max"]],
-            ["Armour strength", ["bow.armour", "sides.armour", "stern.armour"]],
-            ["Armor thickness", ["sides.thickness", "bow.thickness", "stern.thickness"]],
             ["Turn speed", ["rudder.turnSpeed"]]
         ]);
 
         this._moduleChanges = new Map([
+            // ["Sail damage", [  ]],
+            // ["Sail health", [  ]],
             ["Acceleration", ["ship.acceleration"]],
+            ["Armor thickness", ["sides.thickness", "bow.thickness", "stern.thickness"]],
+            ["Armour strength", ["bow.armour", "sides.armour", "stern.armour"]],
             ["Back armour thickness", ["stern.thickness"]],
             ["Crew protection", ["resistance.crew"]],
             ["Crew", ["crew.max"]],
@@ -962,15 +981,11 @@ export default class CompareShips {
             ["Rudder health", ["rudder.armour"]],
             ["Rudder repair time", ["repairTime.rudder"]],
             ["Rudder speed", ["rudder.halfturnTime"]],
-            // ["Sail damage", [  ]],
-            // ["Sail health", [  ]],
             ["Sail repair time", ["repairTime.sails"]],
             ["Sailing crew", ["crew.sailing"]],
             ["Ship speed", ["speed.max"]],
             ["Side armour repair time", ["repairTime.sides"]],
-            ["Armour strength", ["bow.armour", "sides.armour", "stern.armour"]],
             ["Speed decrease", ["ship.deceleration"]],
-            ["Armor thickness", ["sides.thickness", "bow.thickness", "stern.thickness"]],
             ["Turn speed", ["rudder.turnSpeed"]],
             ["Water pump health", ["pump.armour"]]
         ]);
