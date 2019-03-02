@@ -176,9 +176,9 @@ function convertAdditionalShipData() {
             ext: "mast",
             elements: new Map([
                 // ["HIT_PROBABILITY", "HIT_PROBABILITY"],
-                // ["MAST_BOTTOM_SECTION_HP", { group: "mast", element: "bottomArmour" }], // removed patch 30
-                // ["MAST_MIDDLE_SECTION_HP", { group: "mast", element: "middleArmour" }], // removed patch 30
-                // ["MAST_TOP_SECTION_HP", { group: "mast", element: "topArmour" }] // removed patch 30
+                ["MAST_BOTTOM_SECTION_HP", { group: "mast", element: "bottomArmour" }],
+                ["MAST_MIDDLE_SECTION_HP", { group: "mast", element: "middleArmour" }],
+                ["MAST_TOP_SECTION_HP", { group: "mast", element: "topArmour" }]
             ])
         },
         {
