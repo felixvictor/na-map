@@ -10,7 +10,7 @@
     <Pair>
       <Key>MODULE_BASE_HP</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>2325</Value>
+        <Value>2797</Value>
       </Value>
     </Pair>
     <Pair>
@@ -159,7 +159,7 @@
     <Pair>
       <Key>MAST_THICKNESS</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>75</Value>
+        <Value>77</Value>
       </Value>
     </Pair>
   </Attributes>
