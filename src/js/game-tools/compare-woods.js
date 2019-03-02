@@ -301,7 +301,7 @@ export default class CompareWoods {
         if (this._baseFunction === "wood") {
             this._defaultWood = {
                 frame: 45, // Fir
-                trim: 334 // Crew Space
+                trim: 332 // Crew Space
             };
             this._columnsCompare = ["C1", "C2", "C3"];
         } else if (this._baseFunction === "wood-journey") {
@@ -406,7 +406,8 @@ export default class CompareWoods {
                 div.append("label").attr("for", id);
                 div.append("select")
                     .attr("name", id)
-                    .attr("id", id);
+                    .attr("id", id)
+                    .attr("class", "selectpicker");
             });
             div.append("div").attr("id", `${this._baseFunction}-${column}`);
         });
@@ -442,7 +443,8 @@ export default class CompareWoods {
 
     _setOtherSelect(id, type) {
         const otherType = type === "frame" ? "trim" : "frame";
-        if (this._getWoodSelected(id)[otherType] === this._defaultWood[otherType]) {
+
+        if (this._woodsSelected[id][otherType] === this._defaultWood[otherType]) {
             $(`#${this._baseFunction}-${otherType}-${id}-select`)
                 .val(this._defaultWood[otherType])
                 .selectpicker("refresh");
@@ -489,11 +491,8 @@ export default class CompareWoods {
 
     _setupSelectListener(compareId, type, select$) {
         select$
-            .addClass("selectpicker")
             .on("change", () => this._woodSelected(compareId, type, select$))
-            .selectpicker({ noneSelectedText: `Select ${type}` })
-            .val("default")
-            .selectpicker("refresh");
+            .selectpicker({ title: `Select ${type}` });
     }
 
     _getWoodTypeData(type, id) {
@@ -502,13 +501,9 @@ export default class CompareWoods {
 
     _getWoodData(id) {
         return {
-            frame: this._getWoodTypeData("frame", this._getWoodSelected(id).frame),
-            trim: this._getWoodTypeData("trim", this._getWoodSelected(id).trim)
+            frame: this._getWoodTypeData("frame", this._woodsSelected[id].frame),
+            trim: this._getWoodTypeData("trim", this._woodsSelected[id].trim)
         };
-    }
-
-    _getWoodSelected(id) {
-        return this._woodsSelected[id];
     }
 
     _addMinMaxProperty(property, minMax) {
