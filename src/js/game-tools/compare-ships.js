@@ -1386,36 +1386,48 @@ export default class CompareShips {
             ["frame", "trim"].forEach(type => {
                 this.woodCompare._instances[compareId][dataLink][type].properties.forEach(property => {
                     if (this._woodChanges.has(property.modifier)) {
-                        modifierAmount.set(
-                            property.modifier,
-                            modifierAmount.has(property.modifier)
-                                ? modifierAmount.get(property.modifier) + property.amount
-                                : property.amount
-                        );
+                        let absolute = property.isPercentage ? 0 : property.amount;
+                        let percentage = property.isPercentage ? property.amount : 0;
+
+                        // If modifier has been in the Map add the amount
+                        if (modifierAmount.has(property.modifier)) {
+                            absolute += modifierAmount.get(property.modifier).absolute;
+                            percentage += modifierAmount.get(property.modifier).percentage;
+                        }
+                        modifierAmount.set(property.modifier, {
+                            absolute,
+                            percentage
+                        });
                     }
                 });
             });
             modifierAmount.forEach((value, key) => {
                 this._woodChanges.get(key).forEach(modifier => {
-                    const index = modifier.split("."),
-                        factor = 1 + modifierAmount.get(key) / 100;
+                    const index = modifier.split(".");
+                    const { absolute } = modifierAmount.get(key);
+                    let factor = 1;
+                    if (modifierAmount.get(key).percentage) {
+                        factor = 1 + modifierAmount.get(key).percentage / 100;
+                    }
 
                     if (index.length > 1) {
                         if (data[index[0]][index[1]]) {
                             data[index[0]][index[1]] *= factor;
+                            data[index[0]][index[1]] += absolute;
                         } else {
-                            data[index[0]][index[1]] = modifierAmount.get(key);
+                            data[index[0]][index[1]] = absolute;
                         }
                     } else if (data[index[0]]) {
                         data[index[0]] *= factor;
+                        data[index[0]] += absolute;
                     } else {
-                        data[index[0]] = modifierAmount.get(key);
+                        data[index[0]] = absolute;
                     }
                 });
             });
 
             data.speedDegrees = data.speedDegrees.map(speed => {
-                const factor = 1 + modifierAmount.get("Ship speed") / 100;
+                const factor = 1 + modifierAmount.get("Ship speed").percentage / 100;
                 return Math.max(Math.min(speed * factor, this._maxSpeed), this._minSpeed);
             });
         }
@@ -1457,7 +1469,7 @@ export default class CompareShips {
                     }
                 });
             });
-            console.log(modifierAmount);
+
             modifierAmount.forEach((value, key) => {
                 this._moduleChanges.get(key).forEach(modifier => {
                     const index = modifier.split(".");
