@@ -46,7 +46,7 @@
     <Pair>
       <Key>CANNON_BASIC_DAMAGE</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>49</Value>
+        <Value>73</Value>
       </Value>
     </Pair>
     <Pair>
@@ -130,7 +130,7 @@
     <Pair>
       <Key>CANNON_BASIC_PENETRATION</Key>
       <Value xsi:type="FloatAttribute" Action="Relative" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>109</Value>
+        <Value>128</Value>
       </Value>
     </Pair>
     <Pair>
@@ -354,33 +354,33 @@
         </Value>
         <Value>
           <Time>0.3</Time>
-          <Value>0.76</Value>
-          <TangentIn>-0.7999998</TangentIn>
-          <TangentOut>-0.7999998</TangentOut>
+          <Value>0.77</Value>
+          <TangentIn>-0.699999869</TangentIn>
+          <TangentOut>-0.699999869</TangentOut>
         </Value>
         <Value>
           <Time>0.4</Time>
-          <Value>0.69</Value>
+          <Value>0.7</Value>
           <TangentIn>-0.7</TangentIn>
           <TangentOut>-0.7</TangentOut>
         </Value>
         <Value>
           <Time>0.6</Time>
-          <Value>0.55</Value>
-          <TangentIn>-0.699999869</TangentIn>
-          <TangentOut>-0.699999869</TangentOut>
+          <Value>0.57</Value>
+          <TangentIn>-0.6499999</TangentIn>
+          <TangentOut>-0.6499999</TangentOut>
         </Value>
         <Value>
           <Time>0.8</Time>
-          <Value>0.43</Value>
+          <Value>0.45</Value>
           <TangentIn>-0.6000001</TangentIn>
           <TangentOut>-0.6000001</TangentOut>
         </Value>
         <Value>
           <Time>1</Time>
-          <Value>0.32</Value>
-          <TangentIn>-0.550000131</TangentIn>
-          <TangentOut>-0.550000131</TangentOut>
+          <Value>0.35</Value>
+          <TangentIn>-0.5</TangentIn>
+          <TangentOut>-0.5</TangentOut>
         </Value>
       </Value>
     </Pair>
