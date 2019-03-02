@@ -494,7 +494,7 @@ class ShipBase extends Ship {
                 limitBack: this.shipData.deckClassLimit[5],
                 firezoneHorizontalWidth: this.shipData.ship.firezoneHorizontalWidth,
                 waterlineHeight: formatFloat(this.shipData.ship.waterlineHeight),
-                maxSpeed: formatFloat(this.shipData.speed.max, 3),
+                maxSpeed: formatFloat(this.shipData.speed.max, 4),
                 acceleration: formatFloat(this.shipData.ship.acceleration),
                 deceleration: formatFloat(this.shipData.ship.deceleration),
                 maxTurningSpeed: formatFloat(this.shipData.rudder.turnSpeed),
@@ -532,15 +532,13 @@ class ShipBase extends Ship {
                 fireResistance: formatInt(this.shipData.resistance.fire),
                 leakResistance: formatInt(this.shipData.resistance.leaks),
                 crewProtection: formatInt(this.shipData.resistance.crew),
-                mastBottomArmor: `${formatInt(
-                    this.shipData.mast.bottomArmour
-                )}\u00a0<span class="badge badge-white">${formatInt(this.shipData.mast.bottomThickness)}</span>`,
-                mastMiddleArmor: `${formatInt(
-                    this.shipData.mast.middleArmour
-                )}\u00a0<span class="badge badge-white">${formatInt(this.shipData.mast.middleThickness)}</span>`,
-                mastTopArmor: `${formatInt(
-                    this.shipData.mast.topArmour
-                )}\u00a0<span class="badge badge-white">${formatInt(this.shipData.mast.topThickness)}</span>`
+                mastBottomArmor: `<span class="badge badge-white">${formatInt(
+                    this.shipData.mast.bottomThickness
+                )}</span>`,
+                mastMiddleArmor: `<span class="badge badge-white">${formatInt(
+                    this.shipData.mast.middleThickness
+                )}</span>`,
+                mastTopArmor: `<span class="badge badge-white">${formatInt(this.shipData.mast.topThickness)}</span>`
             };
 
         if (ship.gunsFront) {
@@ -642,8 +640,6 @@ class ShipComparison extends Ship {
                     .append("title")
                     .text(d => `${Math.round(d.data * 10) / 10} knots`)
             );
-
-
     }
 
     /**
@@ -849,27 +845,15 @@ class ShipComparison extends Ship {
                 this.shipCompareData.resistance.crew,
                 this.shipBaseData.resistance.crew
             )}`,
-            mastBottomArmor: `${formatInt(this.shipCompareData.mast.bottomArmour)}\u00a0${getDiff(
-                this.shipCompareData.mast.bottomArmour,
-                this.shipBaseData.mast.bottomArmour
-            )} <span class="badge badge-white">${formatInt(this.shipCompareData.mast.bottomThickness)}</span>${getDiff(
-                this.shipCompareData.mast.bottomThickness,
-                this.shipBaseData.mast.bottomThickness
-            )}`,
-            mastMiddleArmor: `${formatInt(this.shipCompareData.mast.middleArmour)}\u00a0${getDiff(
-                this.shipCompareData.mast.middleArmour,
-                this.shipBaseData.mast.middleArmour
-            )} <span class="badge badge-white">${formatInt(this.shipCompareData.mast.middleThickness)}</span>${getDiff(
-                this.shipCompareData.mast.middleThickness,
-                this.shipBaseData.mast.middleThickness
-            )}`,
-            mastTopArmor: `${formatInt(this.shipCompareData.mast.topArmour)}\u00a0${getDiff(
-                this.shipCompareData.mast.topArmour,
-                this.shipBaseData.mast.topArmour
-            )} <span class="badge badge-white">${formatInt(this.shipCompareData.mast.topThickness)}</span>${getDiff(
-                this.shipCompareData.mast.topThickness,
-                this.shipBaseData.mast.topThickness
-            )}`
+            mastBottomArmor: `<span class="badge badge-white">${formatInt(
+                this.shipCompareData.mast.bottomThickness
+            )}</span>${getDiff(this.shipCompareData.mast.bottomThickness, this.shipBaseData.mast.bottomThickness)}`,
+            mastMiddleArmor: `<span class="badge badge-white">${formatInt(
+                this.shipCompareData.mast.middleThickness
+            )}</span>${getDiff(this.shipCompareData.mast.middleThickness, this.shipBaseData.mast.middleThickness)}`,
+            mastTopArmor: `<span class="badge badge-white">${formatInt(
+                this.shipCompareData.mast.topThickness
+            )}</span>${getDiff(this.shipCompareData.mast.topThickness, this.shipBaseData.mast.topThickness)}`
         };
 
         if (ship.gunsFront) {
@@ -958,7 +942,7 @@ export default class CompareShips {
             ["Leak resistance", ["resistance.leaks"]],
             ["Rudder speed", ["rudder.halfturnTime"]],
             ["Ship speed", ["speed.max"]],
-            ["Armour strength", ["bow.armour", "sides.armour", "sails.armour", "structure.armour", "stern.armour"]],
+            ["Armour strength", ["bow.armour", "sides.armour", "stern.armour"]],
             ["Armor thickness", ["sides.thickness", "bow.thickness", "stern.thickness"]],
             ["Turn speed", ["rudder.turnSpeed"]]
         ]);
@@ -984,7 +968,7 @@ export default class CompareShips {
             ["Sailing crew", ["crew.sailing"]],
             ["Ship speed", ["speed.max"]],
             ["Side armour repair time", ["repairTime.sides"]],
-            ["Armour strength", ["bow.armour", "sides.armour", "sails.armour", "structure.armour", "stern.armour"]],
+            ["Armour strength", ["bow.armour", "sides.armour", "stern.armour"]],
             ["Speed decrease", ["ship.deceleration"]],
             ["Armor thickness", ["sides.thickness", "bow.thickness", "stern.thickness"]],
             ["Turn speed", ["rudder.turnSpeed"]],
@@ -1457,38 +1441,51 @@ export default class CompareShips {
 
                 module.properties.forEach(property => {
                     if (this._moduleChanges.has(property.modifier)) {
-                        modifierAmount.set(
-                            property.modifier,
-                            modifierAmount.has(property.modifier)
-                                ? modifierAmount.get(property.modifier) + property.amount
-                                : property.amount
-                        );
+                        let absolute = property.isPercentage ? 0 : property.amount;
+                        let percentage = property.isPercentage ? property.amount : 0;
+
+                        // If modifier has been in the Map add the amount
+                        if (modifierAmount.has(property.modifier)) {
+                            absolute += modifierAmount.get(property.modifier).absolute;
+                            percentage += modifierAmount.get(property.modifier).percentage;
+                        }
+
+                        modifierAmount.set(property.modifier, {
+                            absolute,
+                            percentage
+                        });
                     }
                 });
             });
-
+            console.log(modifierAmount);
             modifierAmount.forEach((value, key) => {
                 this._moduleChanges.get(key).forEach(modifier => {
-                    const index = modifier.split("."),
-                        factor = 1 + modifierAmount.get(key) / 100;
+                    const index = modifier.split(".");
+                    let factor = 1;
+                    if (modifierAmount.get(key).percentage) {
+                        factor = 1 + modifierAmount.get(key).percentage / 100;
+                    }
+                    const { absolute } = modifierAmount.get(key);
 
                     if (index.length > 1) {
                         if (data[index[0]][index[1]]) {
                             data[index[0]][index[1]] *= factor;
+                            data[index[0]][index[1]] += absolute;
                         } else {
-                            data[index[0]][index[1]] = modifierAmount.get(key);
+                            data[index[0]][index[1]] = absolute;
                         }
                     } else if (data[index[0]]) {
                         data[index[0]] *= factor;
+                        data[index[0]] += absolute;
                     } else {
-                        data[index[0]] = modifierAmount.get(key);
+                        data[index[0]] = absolute;
                     }
                 });
             });
 
             if (modifierAmount.has("Ship speed")) {
                 data.speedDegrees = data.speedDegrees.map(speed => {
-                    const factor = 1 + modifierAmount.get("Ship speed") / 100;
+                    const factor = 1 + modifierAmount.get("Ship speed").percentage / 100;
                     return Math.max(Math.min(speed * factor, this._maxSpeed), this._minSpeed);
                 });
             }
