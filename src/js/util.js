@@ -89,6 +89,18 @@ export const formatInt = x =>
         .replace("-", "\u2212\u202f");
 
 /**
+ * Format integer with +/- sign
+ * @function
+ * @param {Number} x - Integer
+ * @return {String} Formatted Integer
+ */
+export const formatSignInt = x =>
+    formatLocale
+        .format("+,d")(x)
+        .replace("-", "\u2212\u202f")
+        .replace("+", "\uff0b\u202f");
+
+/**
  * Format integer with SI suffix
  * @function
  * @param {Number} x - Integer
