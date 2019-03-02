@@ -255,23 +255,22 @@ function convertModules() {
     }
 
     /**
-     * Set module modifier properties
-     * @param {Object} module Module data.
-     * @returns {void}
+     * Get module modifier properties
+     * @param {Object} APImodifiers Module modifier data.
+     * @returns {Object} module modifier properties
      */
-    function setModuleModifier(module) {
-        // eslint-disable-next-line no-param-reassign
-        module.properties = [];
-        module.APImodifiers.forEach(modifier => {
+    function getModuleProperties(APImodifiers) {
+        return APImodifiers.map(modifier => {
             if (!modifiers.has(`${modifier.Slot} ${modifier.MappingIds}`)) {
                 console.log(`${modifier.Slot} ${modifier.MappingIds} modifier undefined`);
             }
-            let amount =
-                modifier.Absolute !== 0
-                    ? Math.abs(modifier.Absolute) >= 1
-                        ? modifier.Absolute
-                        : Math.round(modifier.Absolute * 10000) / 100
-                    : modifier.Percentage;
+            let amount = modifier.Percentage;
+            let isPercentage = true;
+            if (modifier.Percentage === 0) {
+                amount =
+                    Math.abs(modifier.Absolute) >= 1 ? modifier.Absolute : Math.round(modifier.Absolute * 10000) / 100;
+                isPercentage = false;
+            }
             if (
                 modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`) === "Fire resistance" ||
                 modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`) === "Leak resistance" ||
@@ -281,26 +280,22 @@ function convertModules() {
             } else if (modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`) === "Crew protection") {
                 amount = Math.round(modifier.Absolute * 10000) / 100;
             }
-            module.properties.push({
+            return {
                 modifier: modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`),
                 amount,
-                absolute: modifier.Absolute !== 0 && modifier.Absolute >= 1
-            });
+                isPercentage
+            };
         });
-        // eslint-disable-next-line no-param-reassign
-        delete module.APImodifiers;
     }
 
     /**
-     * Set module type
+     * Get module type
      * @param {Object} module Module data.
-     * @returns {void}
+     * @returns {string} Module type
      */
-    function setModuleType(module) {
-        // Correct module types
-        if (module.name.endsWith("French Rig Refit") || module.name === "Bridgetown Frame Refit") {
-            module.sortingGroup = "survival";
-        }
+    function getModuleType(module) {
+        let type = "";
+        let { sortingGroup } = module;
 
         if (
             module.usageType === "All" &&
@@ -308,39 +303,32 @@ function convertModules() {
             module.moduleLevel === "U" &&
             module.moduleType === "Hidden"
         ) {
-            module.type = "Ship trim";
+            type = "Ship trim";
         } else if (module.moduleType === "Permanent" && !module.name.endsWith(" Bonus")) {
-            module.type = "Permanent";
+            type = "Permanent";
         } else if (
             module.usageType === "All" &&
             module.sortingGroup === "" &&
             module.moduleLevel === "U" &&
             module.moduleType === "Hidden"
         ) {
-            module.type = "Perk";
+            type = "Perk";
         } else if (module.moduleType === "Regular") {
-            module.type = "Ship knowledge";
+            type = "Ship knowledge";
         } else {
-            module.type = "Not used";
+            type = "Not used";
         }
 
-        module.sortingGroup =
-            module.sortingGroup && module.type !== "Ship trim"
+        // Correct sorting group
+        if (module.name.endsWith("French Rig Refit") || module.name === "Bridgetown Frame Refit") {
+            sortingGroup = "survival";
+        }
+        sortingGroup =
+            sortingGroup && type !== "Ship trim"
                 ? `\u202f\u2013\u202f${capitalizeFirstLetter(module.sortingGroup).replace("_", "/")}`
                 : "";
-        module.type = `${module.type}${module.sortingGroup}`;
 
-        moduleRate.forEach(rate => {
-            rate.names.forEach(name => {
-                if (module.name.endsWith(name)) {
-                    module.name = module.name.replace(name, "");
-                    module.moduleLevel = rate.level;
-                }
-            });
-        });
-
-        delete module.moduleType;
-        delete module.sortingGroup;
+        return `${type}${sortingGroup}`;
     }
 
     apiItems
@@ -382,8 +370,22 @@ function convertModules() {
                     setWood(module);
                     dontSave = true;
                 } else {
-                    setModuleModifier(module);
-                    setModuleType(module);
+                    module.properties = getModuleProperties(module.APImodifiers);
+                    delete module.APImodifiers;
+
+                    module.type = getModuleType(module);
+                    delete module.moduleType;
+                    delete module.sortingGroup;
+
+                    moduleRate.forEach(rate => {
+                        rate.names.forEach(name => {
+                            if (module.name.endsWith(name)) {
+                                module.name = module.name.replace(name, "");
+                                module.moduleLevel = rate.level;
+                            }
+                        });
+                    });
+
                     if (
                         module.type.startsWith("Not used") ||
                         module.name === "Cannon nation module - France" ||

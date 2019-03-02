@@ -73,6 +73,7 @@ function convertAdditionalShipData() {
         ["trincomalee", { id: 293, master: "" }],
         ["victory", { id: 294, master: "" }],
         ["wasa", { id: 1021, master: "" }],
+        ["wasa_prototype", { id: 1938, master: "" }],
         ["yacht", { id: 295, master: "" }],
         ["yachtsilver", { id: 393, master: "" }]
     ]);
@@ -130,7 +131,7 @@ function convertAdditionalShipData() {
         {
             ext: "b armor",
             elements: new Map([
-                ["ARMOR_REAR_HP", { group: "stern", element: "armour" }],
+                // ["ARMOR_REAR_HP", { group: "stern", element: "armour" }], // removed patch 30
                 ["ARMOR_THICKNESS", { group: "stern", element: "thickness" }],
                 ["REPAIR_MODULE_TIME", { group: "repairTime", element: "stern" }]
             ])
@@ -138,7 +139,7 @@ function convertAdditionalShipData() {
         {
             ext: "f armor",
             elements: new Map([
-                ["ARMOR_FRONT_HP", { group: "bow", element: "armour" }],
+                // ["ARMOR_FRONT_HP", { group: "bow", element: "armour" }], // removed patch 30
                 ["ARMOR_THICKNESS", { group: "bow", element: "thickness" }],
                 ["REPAIR_MODULE_TIME", { group: "repairTime", element: "bow" }]
             ])
@@ -146,7 +147,7 @@ function convertAdditionalShipData() {
         {
             ext: "l armor",
             elements: new Map([
-                ["ARMOR_LEFT_HP", { group: "sides", element: "armour" }],
+                // ["ARMOR_LEFT_HP", { group: "sides", element: "armour" }], // removed patch 30
                 ["ARMOR_THICKNESS", { group: "sides", element: "thickness" }],
                 ["REPAIR_MODULE_TIME", { group: "repairTime", element: "sides" }]
             ])
@@ -175,9 +176,9 @@ function convertAdditionalShipData() {
             ext: "mast",
             elements: new Map([
                 // ["HIT_PROBABILITY", "HIT_PROBABILITY"],
-                ["MAST_BOTTOM_SECTION_HP", { group: "mast", element: "bottomArmour" }],
-                ["MAST_MIDDLE_SECTION_HP", { group: "mast", element: "middleArmour" }],
-                ["MAST_TOP_SECTION_HP", { group: "mast", element: "topArmour" }]
+                // ["MAST_BOTTOM_SECTION_HP", { group: "mast", element: "bottomArmour" }], // removed patch 30
+                // ["MAST_MIDDLE_SECTION_HP", { group: "mast", element: "middleArmour" }], // removed patch 30
+                // ["MAST_TOP_SECTION_HP", { group: "mast", element: "topArmour" }] // removed patch 30
             ])
         },
         {
@@ -185,7 +186,7 @@ function convertAdditionalShipData() {
             elements: new Map([
                 ["ARMOR_THICKNESS", { group: "rudder", element: "thickness" }],
                 // ["HIT_PROBABILITY", "HIT_PROBABILITY"],
-                ["MODULE_BASE_HP", { group: "rudder", element: "armour" }],
+                // ["MODULE_BASE_HP", { group: "rudder", element: "armour" }], // removed patch 30
                 ["REPAIR_MODULE_TIME", { group: "repairTime", element: "rudder" }],
                 ["RUDDER_HALFTURN_TIME", { group: "rudder", element: "halfturnTime" }],
                 ["SHIP_TURNING_SPEED", { group: "rudder", element: "turnSpeed" }]
@@ -198,12 +199,12 @@ function convertAdditionalShipData() {
                 // ["HIT_PROBABILITY", "HIT_PROBABILITY"],
                 // ["MAST_CRIT_PROBABILITY", "MAST_CRIT_PROBABILITY"],
                 ["MAST_THICKNESS", { group: "mast", element: "bottomThickness" }],
-                ["MODULE_BASE_HP", { group: "sails", element: "armour" }],
+                // ["MODULE_BASE_HP", { group: "sails", element: "armour" }], // removed patch 30
                 ["REPAIR_MODULE_TIME", { group: "repairTime", element: "sails" }],
                 // ["RHEA_TURN_SPEED", "RHEA_TURN_SPEED"],
                 ["SAIL_RISING_SPEED", { group: "sails", element: "risingSpeed" }],
-                ["SAILING_CREW_REQUIRED", { group: "crew", element: "sailing" }],
-                ["SHIP_MAX_SPEED", { group: "ship", element: "maxSpeed" }]
+                ["SAILING_CREW_REQUIRED", { group: "crew", element: "sailing" }]
+                // ["SHIP_MAX_SPEED", { group: "ship", element: "maxSpeed" }] // removed patch 30
                 // ["SPANKER_TURN_SPEED", { group: "sails", element: "spankerTurnSpeed" }]
             ])
         },
@@ -211,7 +212,7 @@ function convertAdditionalShipData() {
             ext: "structure",
             elements: new Map([
                 // ["EXPLOSION_DAMAGE_ABSORB_MULTIPLIER", "EXPLOSION_DAMAGE_ABSORB_MULTIPLIER"],
-                ["MODULE_BASE_HP", { group: "structure", element: "armour" }],
+                // ["MODULE_BASE_HP", { group: "structure", element: "armour" }], // removed patch 30
                 ["REPAIR_MODULE_TIME", { group: "repairTime", element: "structure" }]
             ])
         }
