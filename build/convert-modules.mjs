@@ -202,19 +202,17 @@ function convertModules() {
             // Add modifier if in modifier map
             if (modifiers.has(`${modifier.Slot} ${modifier.MappingIds}`)) {
                 const modifierName = modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`);
-
                 let amount = modifier.Percentage;
                 let isPercentage = true;
+
                 if (modifier.Absolute) {
                     amount = modifier.Absolute;
                     isPercentage = false;
                 }
                 // Some modifiers are wrongly indicated as a percentage
                 if (
-                    modifierName === "Armor thickness" ||
                     modifierName === "Crew protection" ||
                     modifierName === "Boarding morale" ||
-                    modifierName === "Mast thickness" ||
                     modifierName === "Fire resistance" ||
                     modifierName === "Leak resistance"
                 ) {
@@ -266,7 +264,8 @@ function convertModules() {
             }
             let amount = modifier.Percentage;
             let isPercentage = true;
-            if (modifier.Percentage === 0) {
+
+            if (modifier.Absolute) {
                 amount =
                     Math.abs(modifier.Absolute) >= 1 ? modifier.Absolute : Math.round(modifier.Absolute * 10000) / 100;
                 isPercentage = false;
