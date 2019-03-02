@@ -272,10 +272,10 @@ export const defaultCircleSize = 16;
 /**
  * {@link https://github.com/30-seconds/30-seconds-of-code#round}
  * @param {number} n - number
- * @param {number} decimals - decimals
+ * @param {number} d - decimals
  * @return {number} Rounded number
  */
-export const round = (n, decimals = 0) => Number(`${Math.round(`${n}e${decimals}`)}e-${decimals}`);
+export const round = (n, d = 0) => Number(Math.round(n * 10 ** d) / 10 ** d);
 
 /**
  * Round to thousands
