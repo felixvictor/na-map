@@ -46,7 +46,7 @@
     <Pair>
       <Key>CANNON_BASIC_DAMAGE</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>101</Value>
+        <Value>190</Value>
       </Value>
     </Pair>
     <Pair>
@@ -130,7 +130,7 @@
     <Pair>
       <Key>CANNON_BASIC_PENETRATION</Key>
       <Value xsi:type="FloatAttribute" Action="Relative" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>148</Value>
+        <Value>175</Value>
       </Value>
     </Pair>
     <Pair>
@@ -339,6 +339,48 @@
           <Value>1</Value>
           <TangentIn>0</TangentIn>
           <TangentOut>0</TangentOut>
+        </Value>
+        <Value>
+          <Time>0.05</Time>
+          <Value>0.99</Value>
+          <TangentIn>-0.399999619</TangentIn>
+          <TangentOut>-0.399999619</TangentOut>
+        </Value>
+        <Value>
+          <Time>0.1</Time>
+          <Value>0.98</Value>
+          <TangentIn>-0.199999809</TangentIn>
+          <TangentOut>-0.199999809</TangentOut>
+        </Value>
+        <Value>
+          <Time>0.2</Time>
+          <Value>0.96</Value>
+          <TangentIn>-0.2000004</TangentIn>
+          <TangentOut>-0.2000004</TangentOut>
+        </Value>
+        <Value>
+          <Time>0.3</Time>
+          <Value>0.94</Value>
+          <TangentIn>-0.1999998</TangentIn>
+          <TangentOut>-0.1999998</TangentOut>
+        </Value>
+        <Value>
+          <Time>0.4</Time>
+          <Value>0.92</Value>
+          <TangentIn>-0.199999824</TangentIn>
+          <TangentOut>-0.199999824</TangentOut>
+        </Value>
+        <Value>
+          <Time>0.6</Time>
+          <Value>0.89</Value>
+          <TangentIn>-0.15000014</TangentIn>
+          <TangentOut>-0.15000014</TangentOut>
+        </Value>
+        <Value>
+          <Time>0.8</Time>
+          <Value>0.86</Value>
+          <TangentIn>-0.149999872</TangentIn>
+          <TangentOut>-0.149999872</TangentOut>
         </Value>
         <Value>
           <Time>1</Time>
