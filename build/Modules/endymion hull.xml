@@ -264,14 +264,14 @@
           <TangentOut>2</TangentOut>
         </Value>
         <Value>
-          <Time>0.100772157</Time>
-          <Value>0.2490906</Value>
-          <TangentIn>0.475232482</TangentIn>
-          <TangentOut>0.475232482</TangentOut>
+          <Time>0.100099877</Time>
+          <Value>0.132990927</Value>
+          <TangentIn>0.5187243</TangentIn>
+          <TangentOut>0.5187243</TangentOut>
         </Value>
         <Value>
           <Time>1</Time>
-          <Value>0.400195867</Value>
+          <Value>0.27</Value>
           <TangentIn>0</TangentIn>
           <TangentOut>0</TangentOut>
         </Value>
