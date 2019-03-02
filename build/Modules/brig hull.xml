@@ -252,20 +252,20 @@
       <Key>SHIP_TURNING_SPEED_INFLUENCE_EFFECT_CURVE</Key>
       <Value xsi:type="CurveAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
         <Value>
-          <Time>0.00105820107</Time>
-          <Value>1.1920929E-07</Value>
-          <TangentIn>3.42383313</TangentIn>
-          <TangentOut>3.42383313</TangentOut>
+          <Time>0</Time>
+          <Value>0</Value>
+          <TangentIn>2</TangentIn>
+          <TangentOut>2</TangentOut>
         </Value>
         <Value>
-          <Time>0.100169659</Time>
-          <Value>0.2509101</Value>
-          <TangentIn>0.495649874</TangentIn>
-          <TangentOut>0.495649874</TangentOut>
+          <Time>0.100099877</Time>
+          <Value>0.132990927</Value>
+          <TangentIn>0.5187243</TangentIn>
+          <TangentOut>0.5187243</TangentOut>
         </Value>
         <Value>
           <Time>1</Time>
-          <Value>0.401069582</Value>
+          <Value>0.27</Value>
           <TangentIn>0</TangentIn>
           <TangentOut>0</TangentOut>
         </Value>
