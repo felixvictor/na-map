@@ -19,10 +19,10 @@ function convertShips() {
     const ships = [];
 
     APIItems.filter(item => item.ItemType === "Ship").forEach(ship => {
-        const calcPortSpeed = ship.Specs.MaxSpeed * speedConstA - speedConstB,
-            speedDegrees = ship.Specs.SpeedToWind.map(speed => roundToThousands(speed * calcPortSpeed));
-
+        const calcPortSpeed = ship.Specs.MaxSpeed * speedConstA - speedConstB;
+        const speedDegrees = ship.Specs.SpeedToWind.map(speed => roundToThousands(speed * calcPortSpeed));
         const { length } = ship.Specs.SpeedToWind;
+
         // Elemente kopieren
         for (let i = 1; i < (length - 1) * 2; i += 2) {
             speedDegrees.unshift(speedDegrees[i]);
@@ -32,7 +32,9 @@ function convertShips() {
 
         const shipData = {
             id: ship.Id,
-            name: ship.Name.replace("L'Ocean", "L'Océan").replaceAll("'", "’"),
+            name: ship.Name.replace("00E4", "ä")
+                .replace("L'Ocean", "L'Océan")
+                .replaceAll("'", "’"),
             class: ship.Class,
             gunsPerDeck: ship.GunsPerDeck,
             deckClassLimit: ship.DeckClassLimit.map(deck => [
@@ -45,12 +47,20 @@ function convertShips() {
             holdSize: ship.HoldSize,
             maxWeight: ship.MaxWeight,
             crew: { min: ship.MinCrewRequired, max: ship.HealthInfo.Crew },
+            speedDegrees,
             speed: {
                 min: speedDegrees.reduce((a, b) => Math.min(a, b)),
-                max: speedDegrees.reduce((a, b) => Math.max(a, b))
+                max: calcPortSpeed
             },
+            sides: { armour: ship.HealthInfo.LeftArmor },
+            bow: { armour: ship.HealthInfo.FrontArmor },
+            stern: { armour: ship.HealthInfo.BackArmor },
+            structure: { armour: ship.HealthInfo.InternalStructure },
+            sails: { armour: ship.HealthInfo.Sails },
             pump: { armour: ship.HealthInfo.Pump },
-            speedDegrees,
+            rudder: {
+                armour: ship.HealthInfo.Rudder
+            },
             upgradeXP: ship.OverrideTotalXpForUpgradeSlots
             // hostilityScore: ship.HostilityScore
         };
