@@ -57,10 +57,11 @@ const primary700 = colours.get("primary-700");
 const primary200 = colours.get("primary-200");
 const primary300 = colours.get("primary-300");
 const colourGreen = colours.get("green");
+const colourGreenLight = colours.get("green-light");
 const colourGreenDark = colours.get("green-dark");
 const colourRed = colours.get("red");
-const colourRedDark = colours.get("red-dark");
 const colourRedLight = colours.get("red-light");
+const colourRedDark = colours.get("red-dark");
 const colourWhite = colours.get("white");
 
 const outputPath = path.resolve(__dirname, "public");
@@ -275,6 +276,7 @@ const config = {
         new webpack.DefinePlugin({
             CPRIMARY300: JSON.stringify(primary300),
             CGREEN: JSON.stringify(colourGreen),
+            CGREENLIGHT: JSON.stringify(colourGreenLight),
             CGREENDARK: JSON.stringify(colourGreenDark),
             CRED: JSON.stringify(colourRed),
             CREDLIGHT: JSON.stringify(colourRedLight),
