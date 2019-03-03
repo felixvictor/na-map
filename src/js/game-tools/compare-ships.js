@@ -11,7 +11,7 @@
 import { ascending as d3Ascending, min as d3Min, range as d3Range } from "d3-array";
 import { nest as d3Nest } from "d3-collection";
 import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate";
-import { scaleLinear as d3ScaleLinear } from "d3-scale";
+import { scaleThreshold as d3ScaleThreshold, scaleLinear as d3ScaleLinear } from "d3-scale";
 import { select as d3Select } from "d3-selection";
 import {
     arc as d3Arc,
@@ -24,9 +24,11 @@ import { registerEvent } from "../analytics";
 import {
     appVersion,
     colourRed,
+    colourRedLight,
     colourRedDark,
     colourWhite,
     colourGreen,
+    colourGreenLight,
     colourGreenDark,
     hashids,
     insertBaseModal
@@ -494,7 +496,7 @@ class ShipBase extends Ship {
                 limitBack: this.shipData.deckClassLimit[5],
                 firezoneHorizontalWidth: this.shipData.ship.firezoneHorizontalWidth,
                 waterlineHeight: formatFloat(this.shipData.ship.waterlineHeight),
-                maxSpeed: formatFloat(this.shipData.speed.max, 4),
+                maxSpeed: formatFloat(this.shipData.speed.max, 3),
                 acceleration: formatFloat(this.shipData.ship.acceleration),
                 deceleration: formatFloat(this.shipData.ship.deceleration),
                 maxTurningSpeed: formatFloat(this.shipData.rudder.turnSpeed),
@@ -541,7 +543,6 @@ class ShipBase extends Ship {
                 mastTopArmor: `${formatInt(
                     this.shipData.mast.topArmour
                 )}\u00a0<span class="badge badge-white">${formatInt(this.shipData.mast.topThickness)}</span>`
-
             };
 
         if (ship.gunsFront) {
@@ -606,15 +607,14 @@ class ShipComparison extends Ship {
                 .angle((d, i) => i * segmentRadians)
                 .radius(d => this.shipCompare.radiusScaleAbsolute(d.data))
                 .curve(curve);
-        const speedDiff = [];
-        this.shipCompareData.speedDegrees.forEach((speedShipCompare, i) => {
-            speedDiff.push(roundToThousands(speedShipCompare - this.shipBaseData.speedDegrees[i]));
-        });
+        const speedDiff = this.shipCompareData.speedDegrees.map((speedShipCompare, i) =>
+            roundToThousands(speedShipCompare - this.shipBaseData.speedDegrees[i])
+        );
         const min = this._shipCompare._minSpeed;
         const max = this._shipCompare._maxSpeed;
         const colourScale = d3ScaleLinear()
-            .domain([min, -1, 0, 1, max])
-            .range([colourRedDark, colourRed, colourWhite, colourGreen, colourGreenDark])
+            .domain([min, -1, -0.1, 0, 0.1, 1, max])
+            .range([colourRedDark, colourRed, colourRedLight, "#fff", colourGreenLight, colourGreen, colourGreenDark])
             .interpolate(d3InterpolateHcl);
 
         // Base profile shape
@@ -943,8 +943,8 @@ export default class CompareShips {
         this._minSpeed = theoreticalMinSpeed;
         this._maxSpeed = theoreticalMaxSpeed;
         this._colorScale = d3ScaleLinear()
-            .domain([this._minSpeed, 0, 12, this._maxSpeed])
-            .range([colourRed, colourWhite, colourGreen, colourGreenDark])
+            .domain([this._minSpeed, 0, 8, 12, this._maxSpeed])
+            .range([colourRed, "#fff", colourGreenLight, colourGreen, colourGreenDark])
             .interpolate(d3InterpolateHcl);
 
         this._woodChanges = new Map([
