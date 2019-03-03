@@ -494,7 +494,7 @@ class ShipBase extends Ship {
                 limitBack: this.shipData.deckClassLimit[5],
                 firezoneHorizontalWidth: this.shipData.ship.firezoneHorizontalWidth,
                 waterlineHeight: formatFloat(this.shipData.ship.waterlineHeight),
-                maxSpeed: formatFloat(this.shipData.speed.max, 4),
+                maxSpeed: formatFloat(this.shipData.speed.max, 3),
                 acceleration: formatFloat(this.shipData.ship.acceleration),
                 deceleration: formatFloat(this.shipData.ship.deceleration),
                 maxTurningSpeed: formatFloat(this.shipData.rudder.turnSpeed),
