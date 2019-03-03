@@ -34,7 +34,7 @@ $green: colour-mixin(#28a745) !default;
 $teal: colour-mixin(#20c997) !default;
 $cyan: colour-mixin(#17a2b8) !default;
 
-$white: mix(#fff, colour-mixin(#fff), 80) !default;
+$white: mix(#fff, colour-mixin(#fff), 90) !default;
 $gray: mix(#495057, colour-mixin(#495057), 80) !default;
 $black: mix(#000, colour-mixin(#000), 80) !default;
 
