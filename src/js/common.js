@@ -184,6 +184,7 @@ export const fullCircle = 360;
 export const degreesPerSecond = fullCircle / secondsForFullCircle;
 
 export const colourGreen = CGREEN;
+export const colourGreenLight = CGREENLIGHT;
 export const colourGreenDark = CGREENDARK;
 export const colourRed = CRED;
 export const colourRedLight = CREDLIGHT;
