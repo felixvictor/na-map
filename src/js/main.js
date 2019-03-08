@@ -101,6 +101,7 @@ function main() {
 
         // https://www.codeply.com/go/1Iz3DxS60l
         $(".dropdown-menu a.dropdown-toggle").on("click", event => {
+            console.log(".dropdown-menu a.dropdown-toggle click");
             const menu$ = $(event.currentTarget);
             if (!menu$.next().hasClass("show")) {
                 menu$
@@ -120,6 +121,7 @@ function main() {
         });
 
         $(".dropdown").on("hidden.bs.dropdown", () => {
+            console.log("hidden.bs.dropdown");
             $(".dropdown-menu.show")
                 .not(".inner")
                 .removeClass("show");
