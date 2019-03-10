@@ -269,7 +269,7 @@ const config = {
             reportFilename: path.resolve(__dirname, "report.html")
         }),
         */
-        new CleanWebpackPlugin(outputPath, {
+        new CleanWebpackPlugin({
             verbose: false
         }),
         new ExtractCssChunks({ filename: isProd ? "[name].[contenthash].css" : "[name].css", orderWarning: true }),
