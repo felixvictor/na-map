@@ -288,7 +288,11 @@ export default class SelectPorts {
 
         this._propNationSelector.insertAdjacentHTML("beforeend", options);
         this._propNationSelector.classList.add("selectpicker");
-        $(this._propNationSelector).selectpicker();
+        $(this._propNationSelector).selectpicker({
+            dropupAuto: false,
+            liveSearch: false,
+            virtualScroll: true
+        });
     }
 
     _setupClanSelect() {
@@ -310,7 +314,11 @@ export default class SelectPorts {
 
         this._propClanSelector.insertAdjacentHTML("beforeend", options);
         this._propClanSelector.classList.add("selectpicker");
-        $(this._propClanSelector).selectpicker();
+        $(this._propClanSelector).selectpicker({
+            dropupAuto: false,
+            liveSearch: false,
+            virtualScroll: true
+        });
     }
 
     _setupCMSelect() {
