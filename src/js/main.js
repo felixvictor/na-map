@@ -101,7 +101,6 @@ function main() {
 
         // https://www.codeply.com/go/1Iz3DxS60l
         $(".dropdown-menu a.dropdown-toggle").on("click", event => {
-            console.log(".dropdown-menu a.dropdown-toggle click");
             const menu$ = $(event.currentTarget);
             if (!menu$.next().hasClass("show")) {
                 menu$
@@ -120,8 +119,20 @@ function main() {
             return false;
         });
 
+        /*
+        $(".dropdown-menu").on("click.bs.dropdown.data-api", event => {
+            const menu$ = $(event.currentTarget);
+            console.log("click.bs.dropdown.data-api", menu$);
+            //event.preventDefault();
+            //event.stopPropagation();
+           // debugger;
+            $(".dropdown-menu.show")
+                .not(".inner")
+                .removeClass("show");
+        });
+        */
+
         $(".dropdown").on("hidden.bs.dropdown", () => {
-            console.log("hidden.bs.dropdown");
             $(".dropdown-menu.show")
                 .not(".inner")
                 .removeClass("show");
