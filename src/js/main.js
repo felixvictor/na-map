@@ -29,9 +29,10 @@ import {
     faTrash
 } from "@fortawesome/fontawesome-free-solid";
 
+import { initAnalytics, registerPage } from "./analytics";
+import { servers } from "./servers";
 import Cookie from "./util/cookie";
 import RadioButton from "./util/radio-button";
-import { initAnalytics, registerPage } from "./analytics";
 
 import "../scss/main.scss";
 
@@ -50,7 +51,7 @@ function main() {
      * @type {string[]}
      * @private
      */
-    const radioButtonValues = ["eu1", "eu2"];
+    const radioButtonValues = servers.map(server => server.id);
 
     /**
      * Server name cookie
