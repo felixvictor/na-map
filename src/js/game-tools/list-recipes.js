@@ -14,7 +14,9 @@ import { ascending as d3Ascending } from "d3-array";
 import { registerEvent } from "../analytics";
 import { getCurrencyAmount, insertBaseModal } from "../common";
 import { servers } from "../servers";
-import { formatSignPercent } from "../util";
+import { formatInt, formatSignPercent, getOrdinal } from "../util";
+
+const replacer = (match, p1, p2) => `${getOrdinal(p1)}\u202f\u2013\u202f${getOrdinal(p2)}`;
 
 export default class ListRecipes {
     constructor(recipeData, moduleData, serverId) {
@@ -64,7 +66,10 @@ export default class ListRecipes {
             .map(
                 key =>
                     `<optgroup label="${key.key}">${key.values
-                        .map(recipe => `<option value="${recipe.id}">${recipe.name}`)
+                        .map(
+                            recipe =>
+                                `<option value="${recipe.id}">${recipe.name.replace(/(\d)-(\d)(st|rd|th)/, replacer)}`
+                        )
                         .join("</option>")}`
             )
             .join("</optgroup>");
@@ -130,25 +135,35 @@ export default class ListRecipes {
         return text;
     }
 
-    _getModuleText(moduleName) {
+    _getPropertiesText(currentRecipe) {
         let text = "",
             moduleType = "",
             properties = "";
+
+        console.log("_getPropertiesText", currentRecipe);
+
         this._moduleData.forEach(type => {
             type[1]
-                .filter(module => module.name === moduleName)
+                .filter(module => module.id === currentRecipe.result.id)
                 .forEach(module => {
                     [moduleType] = type;
                     properties = `<tr><td>${module.properties
                         .map(property => {
-                            const amount = property.isPercentage ? formatSignPercent(property.amount) : property.amount;
+                            const amount = property.isPercentage
+                                ? formatSignPercent(property.amount / 100)
+                                : property.amount;
                             return `${property.modifier} ${amount}`;
                         })
                         .join("</td></tr><tr><td>")}</td></tr>`;
                 });
         });
-        text = `<h6 class="card-subtitle mb-2 text-muted">${moduleType}</h6>`;
-        text += `<table class="table table-sm card-table"><tbody>${properties}</tbody></table>`;
+        if (properties) {
+            text += '<h5 class="card-title">Properties</h5>';
+            text += `<h6 class="card-subtitle mb-2 text-muted">${moduleType}</h6>`;
+            text += `<table class="table table-sm card-table"><tbody>${properties}</tbody></table>`;
+        } else {
+            text += `<p>${formatInt(currentRecipe.result.amount)} ${currentRecipe.result.name}</p>`;
+        }
 
         return text;
     }
@@ -161,18 +176,19 @@ export default class ListRecipes {
      */
     _getText(selectedRecipeId) {
         const currentRecipe = this._getRecipeData(selectedRecipeId);
-        const moduleName = currentRecipe.module ? currentRecipe.module : currentRecipe.name;
+
+        console.log("_getText", currentRecipe);
 
         let text = '<div class="row no-gutters card-deck">';
 
-        text += '<div class="card col-4"><div class="card-header">ListRecipes</div>';
+        text += '<div class="card col-6"><div class="card-header">Recipe</div>';
         text += '<div class="card-body"><h5 class="card-title">Requirements</h5>';
         text += this._getRequirementText(currentRecipe);
         text += "</div></div>";
 
-        text += '<div class="card col-4"><div class="card-header">Resulting module</div>';
-        text += '<div class="card-body"><h5 class="card-title">Properties</h5>';
-        text += this._getModuleText(moduleName);
+        text += '<div class="card col-6"><div class="card-header">Result</div>';
+        text += '<div class="card-body">';
+        text += this._getPropertiesText(currentRecipe);
         text += "</div></div>";
 
         text += "</div></div>";
