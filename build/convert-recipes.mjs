@@ -2,8 +2,7 @@
     convert-recipes.mjs
  */
 
-import { readJson, saveJson, simpleSort, sortBy } from "./common.mjs";
-import { groupBy } from "./common";
+import { groupBy, readJson, saveJson, simpleSort, sortBy } from "./common.mjs";
 
 const inBaseFilename = process.argv[2],
     outFilename = process.argv[3],
@@ -17,6 +16,19 @@ String.prototype.replaceAll = function(search, replacement) {
     const target = this;
     return target.replace(new RegExp(search, "g"), replacement);
 };
+
+const groups = new Map([
+    ["AdmiralityShips", "Admirality permits"],
+    ["AdmiraltyBooks", "Admirality books"],
+    ["AdmiraltyModules", "Admirality modules"],
+    ["AdmiraltyRecipes", "Admirality recipes"],
+    ["AdmiraltyResourcesAndMaterials", "Admirality resources"],
+    ["AdmiraltyRewards", "Admirality rewards"],
+    ["Cannons", "Repairs"],
+    ["Exchange", "Exchange"],
+    ["Manufacturing", "Manufacturing"],
+    ["WoodWorking", "Cannons"]
+]);
 
 function convertRecipes() {
     const data = {};
@@ -53,13 +65,21 @@ function convertRecipes() {
 
     const ingredientIds = getIngredients();
 
+    const getUpgradeIds = () =>
+        new Map(APIItems.filter(item => !item.NotUsed && item.Upgrade).map(item => [item.Id, item.Upgrade]));
+
+    const upgradeIds = getUpgradeIds();
+
     APIItems.filter(
         APIrecipe =>
             APIrecipe.ItemType === "Recipe" && !APIrecipe.NotUsed && itemNames.has(APIrecipe.Results[0].Template)
     ).forEach(APIrecipe => {
         const recipe = {
             id: APIrecipe.Id,
-            name: APIrecipe.Name.replace(" Blueprint", "").replace(/ $/, ""),
+            name: APIrecipe.Name.replace(" Blueprint", "")
+                .replace(" - ", " – ")
+                .replace("u2013", "–")
+                .replace(/ $/, ""),
             module: typeof APIrecipe.Results[0] !== "undefined" ? moduleNames.get(APIrecipe.Results[0].Template) : "",
             labourPrice: APIrecipe.LaborPrice,
             goldPrice: APIrecipe.GoldRequirements,
@@ -67,7 +87,14 @@ function convertRecipes() {
                 name: itemNames.get(requirement.Template),
                 amount: requirement.Amount
             })),
-            craftGroup: APIrecipe.CraftGroup,
+            result: {
+                id: upgradeIds.has(APIrecipe.Results[0].Template)
+                    ? upgradeIds.get(APIrecipe.Results[0].Template)
+                    : APIrecipe.Results[0].Template,
+                name: itemNames.get(APIrecipe.Results[0].Template),
+                amount: APIrecipe.Results[0].Amount
+            },
+            craftGroup: groups.has(APIrecipe.CraftGroup) ? groups.get(APIrecipe.CraftGroup) : APIrecipe.CraftGroup,
             serverType: APIrecipe.ServerType
         };
         data.recipe.push(recipe);
@@ -82,7 +109,7 @@ function convertRecipes() {
                 } else {
                     const ingredient = {
                         id: APIingredient.Template,
-                        name: itemNames.get(APIingredient.Template),
+                        name: upgradeIds.get(APIingredient.Template),
                         recipe: [recipeName]
                     };
                     ingredients.set(APIingredient.Template, ingredient);
@@ -92,7 +119,6 @@ function convertRecipes() {
     });
 
     data.recipe.sort(sortBy(["craftGroup", "name"]));
-    //data.recipe = Array.from(groupBy(data.recipe, recipe => recipe.craftGroup));
 
     const result = Array.from(ingredients.values());
     data.ingredient = result.sort(sortBy(["name"]));
