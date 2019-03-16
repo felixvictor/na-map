@@ -34,6 +34,7 @@ import { checkFetchStatus, getJsonFromFetch, putFetchError } from "../util";
 const dataDir = "data";
 
 let urlParams = "";
+let serverId = "";
 
 /**
  * @type {Array<fileName: string, name: string>}
@@ -108,7 +109,7 @@ const setupData = data => {
 
     const moduleList = new ListModules(data.modules);
 
-    const recipeList = new ListRecipes(data.recipes.recipe, data.modules);
+    const recipeList = new ListRecipes(data.recipes.recipe, data.modules, serverId);
 
     const shipList = new ListShips(data.ships);
 
@@ -148,10 +149,12 @@ const readData = () => {
 /**
  * Init
  * @param {URLSearchParams} searchParams - Search Parameters
+ * @param {string} id - Server id
  * @return {void}
  */
-const init = searchParams => {
+const init = (searchParams, id) => {
     urlParams = searchParams;
+    serverId = id;
     readData();
 };
 
