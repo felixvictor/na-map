@@ -81,15 +81,15 @@ function main() {
      * Get server name from cookie or use default value
      * @type {string}
      */
-    let serverName = getServerName();
+    let serverId = getServerName();
 
     /**
      * Change server name
      * @return {void}
      */
     const serverNameSelected = () => {
-        serverName = radios.get();
-        cookie.set(serverName);
+        serverId = radios.get();
+        cookie.set(serverId);
         document.location.reload();
     };
 
@@ -146,7 +146,7 @@ function main() {
      */
     const loadMap = async () => {
         const { Map } = await import(/*  webpackPreload: true, webpackChunkName: "map" */ "./map/map");
-        const map = new Map(serverName);
+        const map = new Map(serverId);
 
         window.onresize = () => {
             map.resize();
@@ -161,7 +161,7 @@ function main() {
     const loadGameTools = async searchParams => {
         try {
             const gameTools = await import(/* webpackChunkName: "game-tools" */ "./game-tools");
-            gameTools.init(searchParams);
+            gameTools.init(searchParams, serverId);
         } catch (error) {
             throw new Error(error);
         }
