@@ -261,7 +261,7 @@
                                 <label class="custom-control-label"
                                        for="server-name-<%= htmlWebpackPlugin.options.servers[i].id %>">
                                     <%= htmlWebpackPlugin.options.servers[i].name %>
-                                    (<%= htmlWebpackPlugin.options.servers[i].type %>)
+                                    <span class="caps">(<%= htmlWebpackPlugin.options.servers[i].type %>)</span>
                                 </label>
                             </div>
                         <% } %>
