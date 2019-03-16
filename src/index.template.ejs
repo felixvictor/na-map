@@ -250,16 +250,21 @@
 
                     <h6 class="dropdown-header">Game server</h6>
                     <div class="col-auto align-self-center radio-group ml-1" id="server-name">
-                        <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input"
-                                   name="server-name" id="server-name-eu1" value="eu1">
-                            <label class="custom-control-label" for="server-name-eu1">War (Caribbean)</label>
-                        </div>
-                        <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input"
-                                   name="server-name" id="server-name-eu2" value="eu2">
-                            <label class="custom-control-label" for="server-name-eu2">Peace (PvE)</label>
-                        </div>
+                        <% htmlWebpackPlugin.options.servers %>
+                        <% htmlWebpackPlugin.options.servers.length %>
+                        <% for(var i = 0; i < htmlWebpackPlugin.options.servers.length; i++) { %>
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" class="custom-control-input"
+                                       name="server-name"
+                                       id="server-name-<%= htmlWebpackPlugin.options.servers[i].id %>"
+                                       value="<%= htmlWebpackPlugin.options.servers[i].id %>">
+                                <label class="custom-control-label"
+                                       for="server-name-<%= htmlWebpackPlugin.options.servers[i].id %>">
+                                    <%= htmlWebpackPlugin.options.servers[i].name %>
+                                    (<%= htmlWebpackPlugin.options.servers[i].type %>)
+                                </label>
+                            </div>
+                        <% } %>
                     </div>
 
                     <div class="dropdown-divider"></div>
