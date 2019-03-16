@@ -9,18 +9,18 @@
  */
 
 import { select as d3Select } from "d3-selection";
-import { formatSignPercent } from "../util";
+import { nest as d3Nest } from "d3-collection";
+import { ascending as d3Ascending } from "d3-array";
 import { registerEvent } from "../analytics";
 import { getCurrencyAmount, insertBaseModal } from "../common";
+import { servers } from "../servers";
+import { formatSignPercent } from "../util";
 
 export default class ListRecipes {
-    constructor(recipeData, moduleData) {
-        this._recipeData = recipeData.map(recipe => {
-            // eslint-disable-next-line no-param-reassign
-            recipe.name = recipe.name.replace(" Blueprint", "");
-            return recipe;
-        });
+    constructor(recipeData, moduleData, serverId) {
+        this._recipeData = recipeData;
         this._moduleData = moduleData;
+        this._serverType = servers.find(server => server.id === serverId).type;
 
         this._baseName = "List recipes";
         this._baseId = "recipe-list";
@@ -53,7 +53,21 @@ export default class ListRecipes {
     }
 
     _getOptions() {
-        return `${this._recipeData.map(recipe => `<option value="${recipe.name}">${recipe.name}</option>;`).join("")}`;
+        const recipeData = d3Nest()
+            .key(recipe => recipe.craftGroup)
+            .sortKeys(d3Ascending)
+            .entries(
+                this._recipeData.filter(recipe => recipe.serverType === "Any" || recipe.serverType === this._serverType)
+            );
+
+        return recipeData
+            .map(
+                key =>
+                    `<optgroup label="${key.key}">${key.values
+                        .map(recipe => `<option value="${recipe.id}">${recipe.name}`)
+                        .join("</option>")}`
+            )
+            .join("</optgroup>");
     }
 
     _setupSelect() {
@@ -88,14 +102,20 @@ export default class ListRecipes {
         $(`#${this._modalId}`).modal("show");
     }
 
-    _getRecipeData(selectedRecipeName) {
-        return this._recipeData.filter(recipe => recipe.name === selectedRecipeName)[0];
+    /**
+     * Get recipe data by id
+     * @param {number} selectedRecipeId Selected recipe.
+     * @return {object} Recipe data
+     * @private
+     */
+    _getRecipeData(selectedRecipeId) {
+        return this._recipeData.find(recipe => recipe.id === selectedRecipeId);
     }
 
     _getRequirementText(currentRecipe) {
         let text = '<table class="table table-sm card-table"><tbody>';
-        if (currentRecipe.laborPrice) {
-            text += `<tr><td>${currentRecipe.laborPrice} labour hours</td></tr>`;
+        if (currentRecipe.labourPrice) {
+            text += `<tr><td>${currentRecipe.labourPrice} labour hours</td></tr>`;
         }
         if (currentRecipe.goldPrice) {
             text += `<tr><td>${getCurrencyAmount(currentRecipe.goldPrice)}</td></tr>`;
@@ -118,12 +138,10 @@ export default class ListRecipes {
             type[1]
                 .filter(module => module.name === moduleName)
                 .forEach(module => {
-                    moduleType = type[0];
+                    [moduleType] = type;
                     properties = `<tr><td>${module.properties
                         .map(property => {
-                            const amount = property.absolute
-                                ? property.amount
-                                : formatSignPercent(property.amount / 100);
+                            const amount = property.isPercentage ? formatSignPercent(property.amount) : property.amount;
                             return `${property.modifier} ${amount}`;
                         })
                         .join("</td></tr><tr><td>")}</td></tr>`;
@@ -137,13 +155,13 @@ export default class ListRecipes {
 
     /**
      * Construct recipe tables
-     * @param {string} selectedRecipeName Selected recipe.
+     * @param {number} selectedRecipeId Selected recipe.
      * @return {string} html string
      * @private
      */
-    _getText(selectedRecipeName) {
-        const currentRecipe = this._getRecipeData(selectedRecipeName),
-            moduleName = currentRecipe.module ? currentRecipe.module : currentRecipe.name;
+    _getText(selectedRecipeId) {
+        const currentRecipe = this._getRecipeData(selectedRecipeId);
+        const moduleName = currentRecipe.module ? currentRecipe.module : currentRecipe.name;
 
         let text = '<div class="row no-gutters card-deck">';
 
@@ -168,10 +186,10 @@ export default class ListRecipes {
      * @private
      */
     _recipeSelected(event) {
-        const recipe = $(event.currentTarget)
+        const recipeId = +$(event.currentTarget)
             .find(":selected")
             .val();
-
+        console.log("_recipeSelected", recipeId, this._getRecipeData(recipeId));
         // Remove old recipe list
         d3Select(`#${this._baseId} div`).remove();
 
@@ -179,6 +197,6 @@ export default class ListRecipes {
         d3Select(`#${this._baseId}`)
             .append("div")
             .classed("recipes mt-4", true);
-        d3Select(`#${this._baseId} div`).html(this._getText(recipe));
+        d3Select(`#${this._baseId} div`).html(this._getText(recipeId));
     }
 }
