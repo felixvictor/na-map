@@ -16,7 +16,7 @@ import { getCurrencyAmount, insertBaseModal } from "../common";
 import { servers } from "../servers";
 import { formatInt, formatSignPercent, getOrdinal } from "../util";
 
-const replacer = (match, p1, p2) => `${getOrdinal(p1)}\u202f\u2013\u202f${getOrdinal(p2)}`;
+const replacer = (match, p1, p2) => `${getOrdinal(p1)}\u202F\u2013\u202f${getOrdinal(p2)}`;
 
 export default class ListRecipes {
     constructor(recipeData, moduleData, serverId) {
@@ -43,14 +43,14 @@ export default class ListRecipes {
     _injectModal() {
         insertBaseModal(this._modalId, this._baseName);
 
-        const id = `${this._baseId}-select`,
-            body = d3Select(`#${this._modalId} .modal-body`);
+        const id = `${this._baseId}-select`;
+        const body = d3Select(`#${this._modalId} .modal-body`);
         body.append("select")
             .attr("name", id)
             .attr("id", id);
         body.append("label")
             .attr("for", id)
-            .attr("class","text-muted pl-2")
+            .attr("class", "text-muted pl-2")
             .text("Items listed here may not be available in the game (yet).");
 
         body.append("div")
@@ -80,8 +80,8 @@ export default class ListRecipes {
     }
 
     _setupSelect() {
-        const select$ = $(`#${this._baseId}-select`),
-            options = this._getOptions();
+        const select$ = $(`#${this._baseId}-select`);
+        const options = this._getOptions();
         select$.append(options);
     }
 
@@ -112,6 +112,7 @@ export default class ListRecipes {
         if (!document.getElementById(this._modalId)) {
             this._initModal();
         }
+
         // Show modal
         $(`#${this._modalId}`).modal("show");
     }
@@ -131,23 +132,26 @@ export default class ListRecipes {
         if (currentRecipe.labourPrice) {
             text += `<tr><td>${currentRecipe.labourPrice} labour hours</td></tr>`;
         }
+
         if (currentRecipe.goldPrice) {
             text += `<tr><td>${getCurrencyAmount(currentRecipe.goldPrice)}</td></tr>`;
         }
+
         if (currentRecipe.itemRequirements.length) {
             text += `<tr><td>${currentRecipe.itemRequirements
                 .map(requirement => `${requirement.amount} ${requirement.name}`)
                 .join("</td></tr><tr><td>")}</td></tr>`;
         }
+
         text += "</tbody></table>";
 
         return text;
     }
 
     _getPropertiesText(currentRecipe) {
-        let text = "",
-            moduleType = "",
-            properties = "";
+        let text = "";
+        let moduleType = "";
+        let properties = "";
 
         console.log("_getPropertiesText", currentRecipe);
 
@@ -210,9 +214,11 @@ export default class ListRecipes {
      * @private
      */
     _recipeSelected(event) {
-        const recipeId = +$(event.currentTarget)
-            .find(":selected")
-            .val();
+        const recipeId = Number(
+            $(event.currentTarget)
+                .find(":selected")
+                .val()
+        );
         console.log("_recipeSelected", recipeId, this._getRecipeData(recipeId));
         // Remove old recipe list
         d3Select(`#${this._baseId} div`).remove();
