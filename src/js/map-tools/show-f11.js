@@ -9,6 +9,9 @@
  */
 
 import { select as d3Select } from "d3-selection";
+import moment from "moment";
+import "moment/locale/en-gb";
+
 import { between, copyToClipboard, formatF11 } from "../util";
 import { convertCoordX, convertCoordY, convertInvCoordX, convertInvCoordY, insertBaseModal } from "../common";
 import { registerEvent } from "../analytics";
@@ -236,30 +239,59 @@ export default class ShowF11 {
     _printF11Coord(x, y, F11X, F11Y) {
         let circleSize = 10;
         const g = this._g.append("g").attr("transform", `translate(${x},${y})`);
-        const rect = g.append("rect");
+        const coordRect = g.append("rect");
+        const timeRect = g.append("rect");
         g.append("circle").attr("r", circleSize);
 
         // Include padding
         circleSize *= 1.6;
-        const F11Xtext = g
+        const F11XText = g
             .append("text")
             .attr("dx", `${-circleSize}px`)
-            .attr("dy", `${-circleSize / 2}px`)
+            .attr("dy", `${-circleSize / 2 - 2}px`)
+            .attr("class", "f11-coord")
             .text(formatF11(F11X));
-        const F11Ytext = g
+        const F11YText = g
             .append("text")
             .attr("dx", `${-circleSize}px`)
-            .attr("dy", `${circleSize / 2}px`)
+            .attr("dy", `${circleSize / 2 + 2}px`)
+            .attr("class", "f11-coord")
             .text(formatF11(F11Y));
+        const F11XDim = F11XText.node().getBBox();
+        const F11YDim = F11YText.node().getBBox();
 
-        const F11Xdim = F11Xtext.node().getBBox();
-        const F11Ydim = F11Ytext.node().getBBox();
-        const height = Math.round(F11Xdim.height + F11Ydim.height);
-        const width = Math.round(Math.max(F11Xdim.width, F11Ydim.width) + 5);
-        rect.attr("x", -width - circleSize)
+        const timeStamp = moment().utc();
+        const timeStampLocal = moment();
+        const timeStampText = g
+            .append("text")
+            .attr("dx", `${circleSize}px`)
+            .attr("dy", `${-circleSize / 2 - 2}px`)
+            .attr("class", "f11-time")
+            .text(timeStamp.format("H.mm"));
+        const timeStampLocalText = g
+            .append("text")
+            .attr("dx", `${circleSize}px`)
+            .attr("dy", `${circleSize / 2 + 2}px`)
+            .attr("class", "f11-time")
+            .text("(" + timeStampLocal.format("H.mm") + " local)");
+        const timeStampDim = timeStampText.node().getBBox();
+        const timeStampLocalDim = timeStampLocalText.node().getBBox();
+
+        const coordHeight = Math.round(F11XDim.height + F11YDim.height) * 1.2;
+        const coordWidth = Math.round(Math.max(F11XDim.width, F11YDim.width) + 5);
+        const timeHeight = Math.round(timeStampDim.height + timeStampLocalDim.height) * 1.2;
+        const timeWidth = Math.round(Math.max(timeStampDim.width, timeStampLocalDim.width) + 5);
+        const height = Math.max(coordHeight, timeHeight);
+        coordRect
+            .attr("x", -coordWidth - circleSize)
             .attr("y", -height / 2)
             .attr("height", height)
-            .attr("width", width + circleSize);
+            .attr("width", coordWidth + circleSize);
+        timeRect
+            .attr("x", 0)
+            .attr("y", -height / 2)
+            .attr("height", height)
+            .attr("width", timeWidth + circleSize);
     }
 
     _goToF11(F11XIn, F11YIn) {
