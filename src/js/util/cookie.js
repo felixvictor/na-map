@@ -51,13 +51,13 @@ export default class Cookie {
      */
     set(cookieValue) {
         // Set cookie if not default value
-        if (cookieValue !== this._default) {
+        if (cookieValue === this._default) {
+            // Else remove cookie
+            this.remove();
+        } else {
             Cookies.set(this._name, cookieValue, {
                 expires: this._expire
             });
-        } else {
-            // Else remove cookie
-            this.remove();
         }
     }
 

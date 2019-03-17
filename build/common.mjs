@@ -8,17 +8,17 @@ import fs from "fs";
 export const speedFactor = 390;
 
 const transformMatrix = {
-        A: -0.00499866779363828,
-        B: -0.00000021464254980645,
-        C: 4096.88635151897,
-        D: 4096.90282787469
-    },
-    transformMatrixInv = {
-        A: -200.053302087577,
-        B: -0.00859027897636011,
-        C: 819630.836437126,
-        D: -819563.745651571
-    };
+    A: -0.00499866779363828,
+    B: -0.00000021464254980645,
+    C: 4096.88635151897,
+    D: 4096.90282787469
+};
+const transformMatrixInv = {
+    A: -200.053302087577,
+    B: -0.00859027897636011,
+    C: 819630.836437126,
+    D: -819563.745651571
+};
 
 // F11 coord to svg coord
 export const convertCoordX = (x, y) => transformMatrix.A * x + transformMatrix.B * y + transformMatrix.C;
@@ -141,13 +141,14 @@ export function readTextFile(fileName) {
     let data = "";
     try {
         data = fs.readFileSync(fileName, "utf8");
-    } catch (err) {
-        if (err.code === "ENOENT") {
+    } catch (error) {
+        if (error.code === "ENOENT") {
             // console.log("File", fileName, "not found");
         } else {
-            throw err;
+            throw error;
         }
     }
+
     return data;
 }
 
@@ -164,6 +165,7 @@ export function checkFetchStatus(response) {
     if (response.status >= 200 && response.status < 300) {
         return Promise.resolve(response);
     }
+
     return Promise.reject(new Error(response.statusText));
 }
 
@@ -263,6 +265,8 @@ export const degreesToRadians = degrees => (Math.PI / 180) * (degrees - 90);
 
 /**
  * {@link https://stackoverflow.com/questions/1026069/how-do-i-make-the-first-letter-of-a-string-uppercase-in-javascript}
+ * @param {string} string - String
+ * @return {string} Uppercased string
  */
 export const capitalizeFirstLetter = string => string.charAt(0).toUpperCase() + string.slice(1);
 
@@ -299,10 +303,10 @@ export function groupBy(list, keyGetter) {
     list.forEach(item => {
         const key = keyGetter(item);
         const collection = map.get(key);
-        if (!collection) {
-            map.set(key, [item]);
-        } else {
+        if (collection) {
             collection.push(item);
+        } else {
+            map.set(key, [item]);
         }
     });
     return map;
@@ -317,13 +321,13 @@ export function groupBy(list, keyGetter) {
  */
 export function getDistance(pt0, pt1) {
     const F11_0 = {
-            x: convertInvCoordX(pt0.x, pt0.y),
-            y: convertInvCoordY(pt0.x, pt0.y)
-        },
-        F11_1 = {
-            x: convertInvCoordX(pt1.x, pt1.y),
-            y: convertInvCoordY(pt1.x, pt1.y)
-        };
+        x: convertInvCoordX(pt0.x, pt0.y),
+        y: convertInvCoordY(pt0.x, pt0.y)
+    };
+    const F11_1 = {
+        x: convertInvCoordX(pt1.x, pt1.y),
+        y: convertInvCoordY(pt1.x, pt1.y)
+    };
 
     return distancePoints(F11_0, F11_1) / (2.63 * speedFactor);
 }
@@ -338,9 +342,11 @@ export const simpleSort = (a, b) => {
     if (a < b) {
         return -1;
     }
+
     if (a > b) {
         return 1;
     }
+
     return 0;
 };
 
@@ -357,6 +363,7 @@ export const sortBy = properties => (a, b) => {
         } else if (a[property] > b[property]) {
             r = 1;
         }
+
         return r !== 0;
     });
 
