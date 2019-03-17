@@ -421,7 +421,7 @@ class Map {
     _doubleClickSelected() {
         this._doubleClickAction = this._doubleClickActionRadios.get();
 
-        this._doubleClickActionCookie.set(this._profitValue);
+        this._doubleClickActionCookie.set(this._doubleClickAction);
 
         this._clearMap();
     }
