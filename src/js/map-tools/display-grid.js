@@ -202,9 +202,9 @@ export default class DisplayGrid {
      * @private
      */
     _getTicks(items) {
-        const min = Math.round(convertInvCoordY(this._minCoord, this._minCoord)),
-            max = Math.round(convertInvCoordY(this._maxCoord, this._maxCoord)),
-            increment = (max - min) / (items - 1);
+        const min = Math.round(convertInvCoordY(this._minCoord, this._minCoord));
+        const max = Math.round(convertInvCoordY(this._maxCoord, this._maxCoord));
+        const increment = (max - min) / (items - 1);
 
         /**
          * List of ticks (positive values [increment .. max])
@@ -214,6 +214,7 @@ export default class DisplayGrid {
         for (let i = increment; i < max; i += increment) {
             tPos.push(Math.round(i));
         }
+
         tPos.push(max);
 
         /**
@@ -281,12 +282,12 @@ export default class DisplayGrid {
      * @private
      */
     _displayXAxis() {
-        const tk = d3Event ? d3Event.transform.k : 1,
-            ty = d3Event ? d3Event.transform.y : 0,
-            dx = ty / tk < this._width ? ty / tk : 0,
-            padding = -this._maxCoord - dx,
-            fontSize = roundToThousands(this._defaultFontSize / tk),
-            strokeWidth = roundToThousands(1 / tk);
+        const tk = d3Event ? d3Event.transform.k : 1;
+        const ty = d3Event ? d3Event.transform.y : 0;
+        const dx = ty / tk < this._width ? ty / tk : 0;
+        const padding = -this._maxCoord - dx;
+        const fontSize = roundToThousands(this._defaultFontSize / tk);
+        const strokeWidth = roundToThousands(1 / tk);
 
         this._gXAxis
             .attr("font-size", fontSize)
@@ -300,12 +301,12 @@ export default class DisplayGrid {
      * @private
      */
     _displayYAxis() {
-        const tk = d3Event ? d3Event.transform.k : 1,
-            tx = d3Event ? d3Event.transform.x : 0,
-            dy = tx / tk < this._height ? tx / tk : 0,
-            padding = -this._maxCoord - dy,
-            fontSize = roundToThousands(this._defaultFontSize / tk),
-            strokeWidth = roundToThousands(1 / tk);
+        const tk = d3Event ? d3Event.transform.k : 1;
+        const tx = d3Event ? d3Event.transform.x : 0;
+        const dy = tx / tk < this._height ? tx / tk : 0;
+        const padding = -this._maxCoord - dy;
+        const fontSize = roundToThousands(this._defaultFontSize / tk);
+        const strokeWidth = roundToThousands(1 / tk);
 
         this._gYAxis
             .attr("font-size", fontSize)
