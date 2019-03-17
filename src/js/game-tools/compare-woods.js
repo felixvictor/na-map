@@ -88,6 +88,7 @@ class WoodBase extends Wood {
             } else {
                 text += '<span class="bar neutral"></span>';
             }
+
             text += "</span></td></tr>";
             /*
             console.log(
@@ -192,10 +193,10 @@ class WoodComparison extends Wood {
         }
 
         const middle = 100 / 2;
-        let base = 0,
-            diff = 0,
-            neutral = 0,
-            diffColour = "";
+        let base = 0;
+        let diff = 0;
+        let neutral = 0;
+        let diffColour = "";
         let text = '<table class="table table-sm table-striped small wood mt-4"><thead>';
         text += "<tr>";
         text += "<tr><th><em>Property</em></th><th><em>Change</em></th></tr></thead><tbody>";
@@ -219,6 +220,7 @@ class WoodComparison extends Wood {
                     diff = value.compare;
                     diffColour = "pos";
                 }
+
                 text += `<span class="bar neutral" style="width:${middle}%;"></span>`;
                 text += `<span class="bar pos diff" style="width:${(base /
                     this._woodCompare._minMaxProperty.get(key).max) *
@@ -246,6 +248,7 @@ class WoodComparison extends Wood {
                     neutral = -value.compare;
                     diffColour = "neg";
                 }
+
                 text += `<span class="bar neutral" style="width:${middle +
                     (neutral / this._woodCompare._minMaxProperty.get(key).min) * middle}%;"></span>`;
                 text += `<span class="bar ${diffColour}" style="width:${(diff /
@@ -348,6 +351,7 @@ export default class CompareWoods {
         if (!document.getElementById(this._modalId)) {
             this._initModal();
         }
+
         // Show modal
         $(`#${this._modalId}`).modal("show");
     }
@@ -362,26 +366,26 @@ export default class CompareWoods {
 
         this.propertyNames.forEach(propertyName => {
             const frames = [
-                    ...this._woodData.frame.map(
-                        frame =>
-                            frame.properties
-                                .filter(modifier => modifier.modifier === propertyName)
-                                .map(modifier => modifier.amount)[0]
-                    )
-                ],
-                trims = [
-                    ...this._woodData.trim.map(
-                        trim =>
-                            trim.properties
-                                .filter(modifier => modifier.modifier === propertyName)
-                                .map(modifier => modifier.amount)[0]
-                    )
-                ];
+                ...this._woodData.frame.map(
+                    frame =>
+                        frame.properties
+                            .filter(modifier => modifier.modifier === propertyName)
+                            .map(modifier => modifier.amount)[0]
+                )
+            ];
+            const trims = [
+                ...this._woodData.trim.map(
+                    trim =>
+                        trim.properties
+                            .filter(modifier => modifier.modifier === propertyName)
+                            .map(modifier => modifier.amount)[0]
+                )
+            ];
 
-            const minFrames = d3Min(frames) || 0,
-                maxFrames = d3Max(frames) || 0,
-                minTrims = d3Min(trims) || 0,
-                maxTrims = d3Max(trims) || 0;
+            const minFrames = d3Min(frames) || 0;
+            const maxFrames = d3Max(frames) || 0;
+            const minTrims = d3Min(trims) || 0;
+            const maxTrims = d3Max(trims) || 0;
             this._addMinMaxProperty(propertyName, {
                 min: minFrames + minTrims >= 0 ? 0 : minFrames + minTrims,
                 max: maxFrames + maxTrims
@@ -430,6 +434,7 @@ export default class CompareWoods {
         if (typeof this._woodsSelected[compareId] === "undefined") {
             this._woodsSelected[compareId] = {};
         }
+
         this._woodsSelected[compareId][type] = woodId;
     }
 
@@ -460,7 +465,7 @@ export default class CompareWoods {
     }
 
     _woodSelected(compareId, type, select$) {
-        const woodId = +select$.val();
+        const woodId = Number(select$.val());
 
         this._setWoodsSelected(compareId, type, woodId);
         this._setOtherSelect(compareId, type);
@@ -474,6 +479,7 @@ export default class CompareWoods {
                 if (this._baseFunction === "wood") {
                     this.enableSelects(id);
                 }
+
                 if (typeof this._instances[id] !== "undefined") {
                     this._addInstance(
                         id,
