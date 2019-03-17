@@ -26,24 +26,24 @@ String.prototype.replaceAll = function(search, replacement) {
     return target.replace(new RegExp(search, "g"), replacement);
 };
 
-const inDir = process.argv[2],
-    fileBaseName = process.argv[3],
-    outFileNameTimelinePorts = process.argv[4],
-    outFileNameTimelineDates = process.argv[5];
+const inDir = process.argv[2];
+const fileBaseName = process.argv[3];
+const outFileNameTimelinePorts = process.argv[4];
+const outFileNameTimelineDates = process.argv[5];
 
 const fileExtension = ".json.xz";
 
-const d3n = d3Node(),
-    { d3 } = d3n;
+const d3n = d3Node();
+const { d3 } = d3n;
 
 /**
  * Retrieve port data for nation/clan ownership
  * @returns {void}
  */
 function convertOwnership() {
-    const ports = new Map(),
-        numPortsDates = [],
-        fileBaseNameRegex = new RegExp(`${fileBaseName}-(20\\d{2}-\\d{2}-\\d{2})${fileExtension}`);
+    const ports = new Map();
+    const numPortsDates = [];
+    const fileBaseNameRegex = new RegExp(`${fileBaseName}-(20\\d{2}-\\d{2}-\\d{2})${fileExtension}`);
 
     /**
      * Parse data and construct ports Map
@@ -121,18 +121,18 @@ function convertOwnership() {
             // Exclude free towns
             if (port.Nation !== 9) {
                 numPorts[nations[port.Nation].short] += 1;
-                if (!ports.get(port.Id)) {
+                if (ports.get(port.Id)) {
+                    // console.log("ports.get(port.Id)");
+                    const currentNation = nations[port.Nation].short;
+                    const oldNation = getPreviousNation();
+                    if (currentNation === oldNation) {
+                        setNewEndDate();
+                    } else {
+                        setNewNation();
+                    }
+                } else {
                     // console.log("!ports.get(port.Id)");
                     initData();
-                } else {
-                    // console.log("ports.get(port.Id)");
-                    const currentNation = nations[port.Nation].short,
-                        oldNation = getPreviousNation();
-                    if (currentNation !== oldNation) {
-                        setNewNation();
-                    } else {
-                        setNewEndDate();
-                    }
                 }
             }
         });
@@ -158,6 +158,7 @@ function convertOwnership() {
             if (error) {
                 throw new Error(error);
             }
+
             return decompressedContent;
         });
     }
@@ -220,14 +221,16 @@ function convertOwnership() {
      */
     function sortFileNames(fileNames) {
         return fileNames.sort((a, b) => {
-            const ba = path.basename(a),
-                bb = path.basename(b);
+            const ba = path.basename(a);
+            const bb = path.basename(b);
             if (ba < bb) {
                 return -1;
             }
+
             if (ba > bb) {
                 return 1;
             }
+
             return 0;
         });
     }

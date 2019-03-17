@@ -54,14 +54,15 @@ export default class ListIngredients {
         if (!document.getElementById(this._modalId)) {
             this._initModal();
         }
+
         // Show modal
         $(`#${this._modalId}`).modal("show");
     }
 
     _getProperties(recipeName) {
-        let text = "",
-            moduleType = "",
-            properties = "";
+        let text = "";
+        let moduleType = "";
+        let properties = "";
         this._moduleData.forEach(type => {
             type[1]
                 .filter(module => module.name === recipeName)
@@ -104,11 +105,11 @@ export default class ListIngredients {
      * @private
      */
     _getText() {
-        const columns = 2,
-            rows = this._getRows(),
-            splitRows = chunkify(rows, columns);
+        const columns = 2;
+        const rows = this._getRows();
+        const splitRows = chunkify(rows, columns);
         let text = "";
-        Array.from(Array(splitRows.length).keys()).forEach(column => {
+        [...new Array(splitRows.length).keys()].forEach(column => {
             text += `<div class="col-md-${Math.floor(12 / splitRows.length)}">`;
             text += '<table class="table table-sm"><thead>';
             text += "<tr><th>Ingredient</th><th>ListRecipes</th></tr></thead><tbody>";
