@@ -5,8 +5,8 @@ import mergeAdvanced from "object-merge-advanced";
 
 import { isEmpty, readJson, readTextFile, saveJson } from "./common.mjs";
 
-const inDir = process.argv[2],
-    filename = process.argv[3];
+const inDir = process.argv[2];
+const filename = process.argv[3];
 
 /**
  * Retrieve additional ship data from game files and add it to existing data from API
@@ -100,6 +100,7 @@ function convertAdditionalShipData() {
                 const str2 = shortenedFileName.slice(0, shortenedFileName.indexOf(" "));
                 str = str.concat(" ").concat(str2);
             }
+
             if (shipNames.has(str)) {
                 baseFileNames.add(str);
             }
@@ -108,6 +109,7 @@ function convertAdditionalShipData() {
         baseFileNames.add("basiccutter");
         baseFileNames.add("basiclynx");
     };
+
     /**
      * Ship data
      * @type {object}
@@ -240,13 +242,14 @@ function convertAdditionalShipData() {
                 if (typeof addData[elements.get(pair.Key).group] === "undefined") {
                     addData[elements.get(pair.Key).group] = {};
                 }
-                addData[elements.get(pair.Key).group][elements.get(pair.Key).element] = +pair.Value.Value;
+
+                addData[elements.get(pair.Key).group][elements.get(pair.Key).element] = Number(pair.Value.Value);
             }
 
             // Add calculated mast thickness
             if (pair.Key === "MAST_THICKNESS") {
-                addData[elements.get(pair.Key).group].middleThickness = +pair.Value.Value * 0.75;
-                addData[elements.get(pair.Key).group].topThickness = +pair.Value.Value * 0.5;
+                addData[elements.get(pair.Key).group].middleThickness = Number(pair.Value.Value) * 0.75;
+                addData[elements.get(pair.Key).group].topThickness = Number(pair.Value.Value) * 0.5;
             }
         });
         return addData;
@@ -266,6 +269,7 @@ function convertAdditionalShipData() {
                             // eslint-disable-next-line no-param-reassign
                             ship[group] = {};
                         }
+
                         // add value
                         // eslint-disable-next-line no-param-reassign
                         ship[group][element] = value;
@@ -281,7 +285,7 @@ function convertAdditionalShipData() {
     }
 
     // Get all files without a master
-    Array.from(baseFileNames)
+    [...baseFileNames]
         .filter(baseFileName => !getShipMaster(baseFileName))
         .forEach(baseFileName => {
             /**
@@ -303,7 +307,7 @@ function convertAdditionalShipData() {
         });
 
     // Get all files with a master (ship data has to be copied from master)
-    Array.from(baseFileNames)
+    [...baseFileNames]
         .filter(baseFileName => getShipMaster(baseFileName))
         .forEach(baseFileName => {
             /**
@@ -323,8 +327,8 @@ function convertAdditionalShipData() {
                  * Ship data to be added per file
                  * @type {Object.<string, Object.<string, number>>}
                  */
-                const addData = !isEmpty(fileData) ? getAddData(file.elements, fileData) : {},
-                    addMasterData = getAddData(file.elements, fileMasterData);
+                const addData = isEmpty(fileData) ? {} : getAddData(file.elements, fileData);
+                const addMasterData = getAddData(file.elements, fileMasterData);
 
                 /*
                         // https://stackoverflow.com/a/47554782

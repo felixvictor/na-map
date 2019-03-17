@@ -1,5 +1,11 @@
-/*
-    common.js
+/**
+ * This file is part of na-map.
+ *
+ * @file      Common data and functions.
+ * @module    common
+ * @author    iB aka Felix Victor
+ * @copyright 2017, 2018
+ * @license   http://www.gnu.org/licenses/gpl.html
  */
 
 import { select as d3Select } from "d3-selection";
@@ -7,17 +13,17 @@ import Hashids from "hashids";
 import { distancePoints, roundToThousands, sortBy } from "./util";
 
 const transformMatrix = {
-        A: -0.00499866779363828,
-        B: -0.00000021464254980645,
-        C: 4096.88635151897,
-        D: 4096.90282787469
-    },
-    transformMatrixInv = {
-        A: -200.053302087577,
-        B: -0.00859027897636011,
-        C: 819630.836437126,
-        D: -819563.745651571
-    };
+    A: -0.00499866779363828,
+    B: -0.00000021464254980645,
+    C: 4096.88635151897,
+    D: 4096.90282787469
+};
+const transformMatrixInv = {
+    A: -200.053302087577,
+    B: -0.00859027897636011,
+    C: 819630.836437126,
+    D: -819563.745651571
+};
 
 // F11 coord to svg coord
 export const convertCoordX = (x, y) => transformMatrix.A * x + transformMatrix.B * y + transformMatrix.C;
@@ -60,13 +66,13 @@ export const speedFactor = 390;
  */
 export function getDistance(pt0, pt1) {
     const F11_0 = {
-            x: convertInvCoordX(pt0.x, pt0.y),
-            y: convertInvCoordY(pt0.x, pt0.y)
-        },
-        F11_1 = {
-            x: convertInvCoordX(pt1.x, pt1.y),
-            y: convertInvCoordY(pt1.x, pt1.y)
-        };
+        x: convertInvCoordX(pt0.x, pt0.y),
+        y: convertInvCoordY(pt0.x, pt0.y)
+    };
+    const F11_1 = {
+        x: convertInvCoordX(pt1.x, pt1.y),
+        y: convertInvCoordY(pt1.x, pt1.y)
+    };
 
     return distancePoints(F11_0, F11_1) / (2.63 * speedFactor);
 }
@@ -145,10 +151,10 @@ export function initMultiDropdownNavbar(id) {
 
 /**
  * Get currency
- * @param {int|string }amount - Amount
+ * @param {int|string} amount - Amount
  * @return {string} Currency string
  */
-export const getCurrencyAmount = amount => `${amount}\u00a0real${+amount > 1 ? "s" : ""}`;
+export const getCurrencyAmount = amount => `${amount}\u00A0real${Number(amount) > 1 ? "s" : ""}`;
 
 export const hashids = new Hashids("My salt: Yet another Naval Action map");
 
@@ -183,12 +189,21 @@ const secondsForFullCircle = 48 * 60 + 55;
 export const fullCircle = 360;
 export const degreesPerSecond = fullCircle / secondsForFullCircle;
 
+// eslint-disable-next-line no-undef
 export const colourGreen = CGREEN;
+// eslint-disable-next-line no-undef
 export const colourGreenLight = CGREENLIGHT;
+// eslint-disable-next-line no-undef
 export const colourGreenDark = CGREENDARK;
+// eslint-disable-next-line no-undef
 export const colourRed = CRED;
+// eslint-disable-next-line no-undef
 export const colourRedLight = CREDLIGHT;
+// eslint-disable-next-line no-undef
 export const colourRedDark = CREDDARK;
+// eslint-disable-next-line no-undef
 export const colourWhite = CWHITE;
+// eslint-disable-next-line no-undef
 export const primary300 = CPRIMARY300;
+// eslint-disable-next-line no-undef
 export const iconSmallSrc = ICONSMALL;

@@ -87,6 +87,7 @@ export default class WindRose {
             const diffSeconds = Math.round((Date.now() - time) / 1000);
             this._currentWindDegrees = 360 + (Math.floor(wind - degreesPerSecond * diffSeconds) % 360);
         }
+
         return wind;
     }
 
@@ -142,6 +143,7 @@ export default class WindRose {
             if (!this.tooltip.is(":visible")) {
                 $("body").append(this.tooltip);
             }
+
             const pos = _getTooltipPos.call(this);
             this.container.append(this.tooltip);
             return pos;
@@ -207,6 +209,7 @@ export default class WindRose {
         if (!document.getElementById(this._modalId)) {
             this._initModal();
         }
+
         // Show modal
         $(`#${this._modalId}`)
             .modal("show")
@@ -224,10 +227,10 @@ export default class WindRose {
     _useUserInput() {
         this._currentWindDegrees = getUserWind(this._sliderId);
 
-        if (!this._windPath) {
-            this._initShowCurrentWind();
-        } else {
+        if (this._windPath) {
             this._updateWindDirection();
+        } else {
+            this._initShowCurrentWind();
         }
     }
 
@@ -282,6 +285,7 @@ export default class WindRose {
         if (this._div) {
             this._div.remove();
         }
+
         this._windPath = null;
         this._cookieWindDegrees.remove();
     }

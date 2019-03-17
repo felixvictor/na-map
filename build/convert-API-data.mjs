@@ -7,15 +7,14 @@ import {
     distancePoints,
     speedFactor,
     readJson,
-    saveJson
-    // eslint-disable-next-line import/extensions
+    saveJson,
+    sortBy
 } from "./common.mjs";
-import { sortBy } from "./common";
 
-const inBaseFilename = process.argv[2],
-    serverName = process.argv[3],
-    outDir = process.argv[4],
-    date = process.argv[5];
+const inBaseFilename = process.argv[2];
+const serverName = process.argv[3];
+const outDir = process.argv[4];
+const date = process.argv[5];
 
 const apiItems = readJson(`${inBaseFilename}-ItemTemplates-${date}.json`);
 const apiPorts = readJson(`${inBaseFilename}-Ports-${date}.json`);
@@ -74,7 +73,11 @@ function convertPorts() {
     function setCountyFeature(port, portPos) {
         const county = capitalToCounty.has(port.CountyCapitalName) ? capitalToCounty.get(port.CountyCapitalName) : "";
         if (county !== "") {
-            if (!counties.has(county)) {
+            if (counties.has(county)) {
+                geoJsonCounties.features
+                    .filter(countyFeature => countyFeature.id === county)
+                    .some(countyFeature => countyFeature.geometry.coordinates.push(portPos));
+            } else {
                 counties.set(county, county);
 
                 const feature = {
@@ -86,10 +89,6 @@ function convertPorts() {
                     }
                 };
                 geoJsonCounties.features.push(feature);
-            } else {
-                geoJsonCounties.features
-                    .filter(countyFeature => countyFeature.id === county)
-                    .some(countyFeature => countyFeature.geometry.coordinates.push(portPos));
             }
         }
     }
@@ -101,7 +100,11 @@ function convertPorts() {
      * @return {void}
      */
     function setRegionFeature(port, portPos) {
-        if (!regions.has(port.Location)) {
+        if (regions.has(port.Location)) {
+            geoJsonRegions.features
+                .filter(region => region.id === port.Location)
+                .some(region => region.geometry.coordinates.push(portPos));
+        } else {
             regions.set(port.Location, port.Location);
 
             const feature = {
@@ -113,10 +116,6 @@ function convertPorts() {
                 }
             };
             geoJsonRegions.features.push(feature);
-        } else {
-            geoJsonRegions.features
-                .filter(region => region.id === port.Location)
-                .some(region => region.geometry.coordinates.push(portPos));
         }
     }
 
@@ -130,15 +129,18 @@ function convertPorts() {
             if (a < b) {
                 return -1;
             }
+
             if (a > b) {
                 return 1;
             }
+
             return 0;
         };
+
         const portShop = apiShops.find(shop => shop.Id === apiPort.Id);
 
         const port = {
-            id: +apiPort.Id,
+            id: Number(apiPort.Id),
             portBattleStartTime: apiPort.PortBattleStartTime,
             portBattleType: apiPort.PortBattleType,
             nonCapturable: apiPort.NonCapturable,
@@ -171,10 +173,10 @@ function convertPorts() {
             inventory: portShop.RegularItems.filter(good => itemNames.get(good.TemplateId).itemType !== "Cannon")
                 .map(good => ({
                     name: itemNames.get(good.TemplateId).name,
-                    buyQuantity: good.Quantity !== -1 ? good.Quantity : good.BuyContractQuantity,
+                    buyQuantity: good.Quantity === -1 ? good.BuyContractQuantity : good.Quantity,
                     buyPrice: Math.round(good.BuyPrice * (1 + apiPort.PortTax)),
                     sellPrice: Math.round(good.SellPrice / (1 + apiPort.PortTax)),
-                    sellQuantity: good.SellContractQuantity !== -1 ? good.SellContractQuantity : good.PriceTierQuantity
+                    sellQuantity: good.SellContractQuantity === -1 ? good.PriceTierQuantity : good.SellContractQuantity
                 }))
                 .sort(sortBy(["name"]))
         };
@@ -200,7 +202,7 @@ function convertPorts() {
 
     const apiPortPos = new Map(
         apiPorts.map(apiPort => [
-            +apiPort.Id,
+            Number(apiPort.Id),
             {
                 x: apiPort.Position.x,
                 y: apiPort.Position.z
@@ -231,8 +233,8 @@ function convertPorts() {
                             const sellPortPos = apiPortPos.get(sellPort.id);
                             const trade = {
                                 good: buyGood.name,
-                                source: { id: +buyPort.id, grossPrice: buyPrice },
-                                target: { id: +sellPort.id, grossPrice: sellPrice },
+                                source: { id: Number(buyPort.id), grossPrice: buyPrice },
+                                target: { id: Number(sellPort.id), grossPrice: sellPrice },
                                 distance: Math.round(distancePoints(buyPortPos, sellPortPos) / (2.63 * speedFactor)),
                                 profitTotal,
                                 quantity,
