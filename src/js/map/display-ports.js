@@ -570,7 +570,8 @@ export default class DisplayPorts {
                 html: true,
                 placement: "auto",
                 title: tooltipData(this._getText(d.id, d)),
-                trigger: "manual"
+                trigger: "manual",
+                sanitize: false
             })
             .tooltip("show");
 
