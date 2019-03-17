@@ -5,11 +5,11 @@
 import moment from "moment";
 import { nations, readJson, saveJson } from "./common.mjs";
 
-const portFilename = process.argv[2],
-    tweetsFileName = process.argv[3];
+const portFilename = process.argv[2];
+const tweetsFileName = process.argv[3];
 
-const ports = readJson(portFilename),
-    tweets = readJson(tweetsFileName);
+const ports = readJson(portFilename);
+const tweets = readJson(tweetsFileName);
 
 /**
  * Update port data from tweets
@@ -121,64 +121,65 @@ function updatePorts() {
         const port = ports.ports[i];
 
         console.log("      --- portBattleScheduled", i);
-        if (typeof result[7] !== "undefined") {
+        if (typeof result[7] === "undefined") {
+            port.attackerNation = "n/a";
+        } else {
             // eslint-disable-next-line prefer-destructuring
             port.attackerNation = result[7];
-        } else {
-            port.attackerNation = "n/a";
         }
+
         // eslint-disable-next-line prefer-destructuring
         port.attackerClan = result[6];
         port.attackHostility = 1;
         port.portBattle = moment(result[4], "DD MMM YYYY HH:mm").format("YYYY-MM-DD HH:mm");
     }
 
-    const portR = "[A-zÀ-ÿ’ -]+",
-        portHashR = "[A-zÀ-ÿ]+",
-        nationR = "[A-zÀ-ÿ -]+",
-        clanR = "\\w+",
-        defenderR = "[\\w ]+",
-        timeR = "\\d{2}-\\d{2}-\\d{4} \\d{2}:\\d{2}",
-        pbTimeR = "\\d{1,2} \\w{3} \\d{4} \\d{2}:\\d{2}",
-        percentageR = "\\d*\\.?\\d";
+    const portR = "[A-zÀ-ÿ’ -]+";
+    const portHashR = "[A-zÀ-ÿ]+";
+    const nationR = "[A-zÀ-ÿ -]+";
+    const clanR = "\\w+";
+    const defenderR = "[\\w ]+";
+    const timeR = "\\d{2}-\\d{2}-\\d{4} \\d{2}:\\d{2}";
+    const pbTimeR = "\\d{1,2} \\w{3} \\d{4} \\d{2}:\\d{2}";
+    const percentageR = "\\d*\\.?\\d";
 
     // noinspection RegExpRedundantEscape
     const capturedRegex = new RegExp(
-            `\\[(${timeR}) UTC\\] (${portR}) captured by (${clanR}) ?\\(?(${nationR})?\\)?\\. Previous owner: (${clanR}) ?\\(?(${nationR})?\\)? #PBCaribbean #PBCaribbean${portHashR}`,
-            "u"
-        ),
-        defendedRegex = new RegExp(
-            `\\[(${timeR}) UTC\\] (${portR}) defended by (${clanR})( \\(${nationR}\\))? against (${clanR}) ?\\(?(${nationR})?\\)? #PBCaribbean #PBCaribbean${portHashR}`,
-            "u"
-        ),
-        hostilityLevelUpRegex = new RegExp(
-            `\\[(${timeR}) UTC\\] The hostility level of the clan (${clanR}) \\((${nationR})\\) on the port (${portR}) \\((${nationR})\\) increased to (${percentageR})%\\. The previous value was (${percentageR})% #HOCaribbean${portHashR}`,
-            "u"
-        ),
-        hostilityLevelDownRegex = new RegExp(
-            `\\[(${timeR}) UTC\\] The hostility level of the clan (${clanR}) \\((${nationR})\\) on the port (${portR}) \\((${nationR})\\) decreased to (${percentageR})%\\. The previous value was (${percentageR})% #HOCaribbean${portHashR}`,
-            "u"
-        ),
-        portBattleRegex = new RegExp(
-            `\\[(${timeR}) UTC\\] The port battle for (${portR}) \\((${nationR})\\) is scheduled for (${pbTimeR}) UTC\\. Defender: (${defenderR})\\. Attacker: (${clanR}) ?\\(?(${nationR})?\\)?\\. BR: \\d+ #PBCaribbean #PBCaribbean${portHashR} #NavalAction`,
-            "u"
-        ),
-        rumorRegex = new RegExp(
-            `\\[(${timeR}) UTC\\] Rumour has it that a great storm has destroyed a large fleet in the West Indies`,
-            "u"
-        ),
-        gainHostilityRegex = new RegExp(
-            `\\[(${timeR}) UTC\\] The port (${portR}) \\((${nationR})\\) can gain hostility`,
-            "u"
-        ),
-        checkDateRegex = new RegExp(`\\[(${timeR}) UTC\\]`, "u");
-    let result,
-        tweetTime,
-        isPortDataChanged = false,
-        serverStart = moment()
-            .hour(11)
-            .minute(0)
-            .format("YYYY-MM-DD HH:mm");
+        `\\[(${timeR}) UTC\\] (${portR}) captured by (${clanR}) ?\\(?(${nationR})?\\)?\\. Previous owner: (${clanR}) ?\\(?(${nationR})?\\)? #PBCaribbean #PBCaribbean${portHashR}`,
+        "u"
+    );
+    const defendedRegex = new RegExp(
+        `\\[(${timeR}) UTC\\] (${portR}) defended by (${clanR})( \\(${nationR}\\))? against (${clanR}) ?\\(?(${nationR})?\\)? #PBCaribbean #PBCaribbean${portHashR}`,
+        "u"
+    );
+    const hostilityLevelUpRegex = new RegExp(
+        `\\[(${timeR}) UTC\\] The hostility level of the clan (${clanR}) \\((${nationR})\\) on the port (${portR}) \\((${nationR})\\) increased to (${percentageR})%\\. The previous value was (${percentageR})% #HOCaribbean${portHashR}`,
+        "u"
+    );
+    const hostilityLevelDownRegex = new RegExp(
+        `\\[(${timeR}) UTC\\] The hostility level of the clan (${clanR}) \\((${nationR})\\) on the port (${portR}) \\((${nationR})\\) decreased to (${percentageR})%\\. The previous value was (${percentageR})% #HOCaribbean${portHashR}`,
+        "u"
+    );
+    const portBattleRegex = new RegExp(
+        `\\[(${timeR}) UTC\\] The port battle for (${portR}) \\((${nationR})\\) is scheduled for (${pbTimeR}) UTC\\. Defender: (${defenderR})\\. Attacker: (${clanR}) ?\\(?(${nationR})?\\)?\\. BR: \\d+ #PBCaribbean #PBCaribbean${portHashR} #NavalAction`,
+        "u"
+    );
+    const rumorRegex = new RegExp(
+        `\\[(${timeR}) UTC\\] Rumour has it that a great storm has destroyed a large fleet in the West Indies`,
+        "u"
+    );
+    const gainHostilityRegex = new RegExp(
+        `\\[(${timeR}) UTC\\] The port (${portR}) \\((${nationR})\\) can gain hostility`,
+        "u"
+    );
+    const checkDateRegex = new RegExp(`\\[(${timeR}) UTC\\]`, "u");
+    let result;
+    let tweetTime;
+    let isPortDataChanged = false;
+    let serverStart = moment()
+        .hour(11)
+        .minute(0)
+        .format("YYYY-MM-DD HH:mm");
     // adjust reference server time is needed
     if (moment.utc().isBefore(serverStart)) {
         serverStart = moment(serverStart).subtract(1, "day");
@@ -218,12 +219,12 @@ function updatePorts() {
                 // eslint-disable-next-line no-unused-expressions
                 () => {};
                 // eslint-disable-next-line no-cond-assign
-            } else if ((result = rumorRegex.exec(tweet.text)) !== null) {
+            } else if ((result = rumorRegex.exec(tweet.text)) === null) {
+                console.log(`\n\n***************************************\nUnmatched tweet: ${tweet.text}\n`);
+            } else {
                 // noop
                 // eslint-disable-next-line no-unused-expressions
                 () => {};
-            } else {
-                console.log(`\n\n***************************************\nUnmatched tweet: ${tweet.text}\n`);
             }
         } else if (tweetTime.isAfter(moment(serverStart).subtract(1, "day"))) {
             // Add scheduled port battles
@@ -243,6 +244,7 @@ function updatePorts() {
     if (isPortDataChanged) {
         saveJson(portFilename, ports);
     }
+
     return !isPortDataChanged;
 }
 

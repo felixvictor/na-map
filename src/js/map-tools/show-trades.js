@@ -29,6 +29,7 @@ export default class ShowTrades {
      * @param {Bound} lowerBound - Top left coordinates of current viewport
      * @param {Bound} upperBound - Bottom right coordinates of current viewport
      */
+    // eslint-disable-next-line max-params
     constructor(portSelect, portData, tradeData, minScale, lowerBound, upperBound) {
         this._portSelect = portSelect;
         this._portData = portData;
@@ -77,7 +78,7 @@ export default class ShowTrades {
          */
         this._profitRadioValues = ["weight", "distance", "total"];
 
-        this._profitCookie = new Cookie({ id: this._profitId, values: this._profitRadioValues});
+        this._profitCookie = new Cookie({ id: this._profitId, values: this._profitRadioValues });
         this._profitRadios = new RadioButton(this._profitId, this._profitRadioValues);
 
         /**
@@ -97,6 +98,7 @@ export default class ShowTrades {
         if (this.show) {
             this._portSelect.setupInventorySelect(this.show);
         }
+
         this._showOrHide();
 
         /**
@@ -161,6 +163,7 @@ export default class ShowTrades {
                 } else {
                     text = amount;
                 }
+
                 return `${text} nations selected`;
             },
             title: "Select nations"
@@ -261,9 +264,9 @@ export default class ShowTrades {
                         profit = trade.profitTotal;
                         break;
                     default:
-                        throw Error(`Wrong profit value ${this._profitValue}`);
+                        throw new Error(`Wrong profit value ${this._profitValue}`);
                 }
-                // eslint-disable-next-line
+
                 trade.profit = profit;
                 return trade;
             })
@@ -342,9 +345,9 @@ export default class ShowTrades {
     }
 
     static _getProfitPerWeight(trade) {
-        return trade.weightPerItem !== 0
-            ? Math.round(trade.profitTotal / (trade.weightPerItem * trade.quantity))
-            : trade.profitTotal;
+        return trade.weightPerItem === 0
+            ? trade.profitTotal
+            : Math.round(trade.profitTotal / (trade.weightPerItem * trade.quantity));
     }
 
     static _getProfitPerDistance(trade) {
@@ -454,6 +457,7 @@ export default class ShowTrades {
                     .range([1, siblings.length]);
                 dr /= 1 + (1 / siblings.length) * (arcScale(d.profit) - 1);
             }
+
             dr = Math.round(dr);
 
             return `M${x1},${y1}A${dr},${dr} ${xRotation},${largeArc},${sweep} ${x2},${y2}`;
@@ -630,7 +634,7 @@ export default class ShowTrades {
     }
 
     _filterPortsBySelectedNations() {
-        const selectedNations = new Set(Array.from(this._nationSelector.selectedOptions).map(option => option.value));
+        const selectedNations = new Set([...this._nationSelector.selectedOptions].map(option => option.value));
         this._portDataFiltered = new Set(
             this._portData.filter(port => selectedNations.has(port.nation)).map(port => port.id)
         );
@@ -668,7 +672,7 @@ export default class ShowTrades {
                 this._profitText = "total";
                 break;
             default:
-                throw Error("Wrong profit value");
+                throw new Error("Wrong profit value");
         }
 
         return r;
