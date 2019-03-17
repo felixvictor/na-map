@@ -23,6 +23,7 @@ import Toast from "../util/toast";
  */
 export default class TrilateratePosition {
     /**
+     * @param {object} ports - Port data
      */
     constructor(ports) {
         this._ports = ports;
@@ -76,9 +77,9 @@ export default class TrilateratePosition {
             dataList.append("option").attr("value", distance);
         });
 
-        Array.from(Array(this._inputs).keys()).forEach(row => {
-            const select = `${this._baseId}-${row}-select`,
-                input = `${this._baseId}-${row}-input`;
+        [...new Array(this._inputs).keys()].forEach(row => {
+            const select = `${this._baseId}-${row}-select`;
+            const input = `${this._baseId}-${row}-input`;
             const formRow = form.append("div").attr("class", "form-row");
             formRow
                 .append("div")
@@ -133,10 +134,10 @@ export default class TrilateratePosition {
             )
             .join("")}`;
 
-        Array.from(Array(this._inputs).keys()).forEach(row => {
-            const select = `${this._baseId}-${row}-select`,
-                selector = document.getElementById(select),
-                selector$ = $(`#${select}`);
+        [...new Array(this._inputs).keys()].forEach(row => {
+            const select = `${this._baseId}-${row}-select`;
+            const selector = document.getElementById(select);
+            const selector$ = $(`#${select}`);
 
             selector.insertAdjacentHTML("beforeend", options);
             selector$
@@ -173,13 +174,13 @@ export default class TrilateratePosition {
              * @return {Array<number, number>} Points
              */
             const getAreaPoints = area => {
-                const points = [],
-                    samples = 32;
+                const points = [];
+                const samples = 32;
 
                 area.arcs.forEach(arc => {
                     const { p1, p2, circle } = arc;
-                    const a1 = Math.atan2(p1.x - circle.x, p1.y - circle.y),
-                        a2 = Math.atan2(p2.x - circle.x, p2.y - circle.y);
+                    const a1 = Math.atan2(p1.x - circle.x, p1.y - circle.y);
+                    const a2 = Math.atan2(p2.x - circle.x, p2.y - circle.y);
 
                     let angleDiff = a2 - a1;
                     if (angleDiff < 0) {
@@ -187,7 +188,7 @@ export default class TrilateratePosition {
                     }
 
                     const angleDelta = angleDiff / samples;
-                    Array.from(Array(samples).keys()).forEach(i => {
+                    [...new Array(samples).keys()].forEach(i => {
                         const angle = a2 - angleDelta * i;
 
                         const extended = {
@@ -229,11 +230,11 @@ export default class TrilateratePosition {
              */
             const getIntersectionArea = () => {
                 const circles = this._ports.portData.map(port => ({
-                        x: port.coordinates[0],
-                        y: port.coordinates[1],
-                        radius: port.distance
-                    })),
-                    stats = {};
+                    x: port.coordinates[0],
+                    y: port.coordinates[1],
+                    radius: port.distance
+                }));
+                const stats = {};
 
                 vennIntersectionArea(circles, stats);
                 return stats;
@@ -251,6 +252,7 @@ export default class TrilateratePosition {
                 this._ports._map._f11.printCoord(centroid.x, centroid.y);
                 this._ports._map.zoomAndPan(centroid.x, centroid.y, 1);
             } else {
+                // eslint-disable-next-line no-new
                 new Toast("Get position", "No intersection found.");
             }
         };
@@ -273,14 +275,14 @@ export default class TrilateratePosition {
 
         const ports = new Map();
 
-        Array.from(Array(this._inputs).keys()).forEach(row => {
-            const select = `${this._baseId}-${row}-select`,
-                selectSelector$ = $(`#${select}`),
-                input = `${this._baseId}-${row}-input`,
-                inputSelector$ = $(`#${input}`);
+        [...new Array(this._inputs).keys()].forEach(row => {
+            const select = `${this._baseId}-${row}-select`;
+            const selectSelector$ = $(`#${select}`);
+            const input = `${this._baseId}-${row}-input`;
+            const inputSelector$ = $(`#${input}`);
 
             const port = selectSelector$.find(":selected")[0] ? selectSelector$.find(":selected")[0].text : "";
-            const distance = +inputSelector$.val();
+            const distance = Number(inputSelector$.val());
 
             if (distance && port !== "") {
                 ports.set(port, distance * roundingFactor * circleRadiusFactor);
@@ -303,6 +305,7 @@ export default class TrilateratePosition {
             this._ports.update();
             showAndGoToPosition();
         } else {
+            // eslint-disable-next-line no-new
             new Toast("Get position", "Not enough data.");
         }
     }
@@ -317,6 +320,7 @@ export default class TrilateratePosition {
             this._initModal();
             this._modal$ = $(`#${this._modalId}`);
         }
+
         // Show modal
         this._modal$.modal("show").one("hidden.bs.modal", () => {
             this._useUserInput();

@@ -36,8 +36,8 @@ export default class ListModules {
     _injectModal() {
         insertBaseModal(this._modalId, this._baseName);
 
-        const id = `${this._baseId}-select`,
-            body = d3Select(`#${this._modalId} .modal-body`);
+        const id = `${this._baseId}-select`;
+        const body = d3Select(`#${this._modalId} .modal-body`);
         body.append("label").attr("for", id);
         body.append("select")
             .attr("name", id)
@@ -52,8 +52,8 @@ export default class ListModules {
     }
 
     _setupSelect() {
-        const select$ = $(`#${this._baseId}-select`),
-            options = this._getOptions();
+        const select$ = $(`#${this._baseId}-select`);
+        const options = this._getOptions();
         select$.append(options);
     }
 
@@ -79,6 +79,7 @@ export default class ListModules {
         if (!document.getElementById(this._modalId)) {
             this._initModal();
         }
+
         // Show modal
         $(`#${this._modalId}`).modal("show");
     }
@@ -95,9 +96,9 @@ export default class ListModules {
          * @type {Map<String, String>}
          */
         const rates = new Map([
-            ["L", `${getOrdinal(1)}\u202f\u2013\u202f${getOrdinal(3)}`],
-            ["M", `${getOrdinal(4)}\u202f\u2013\u202f${getOrdinal(5)}`],
-            ["S", `${getOrdinal(6)}\u202f\u2013\u202f${getOrdinal(7)}`]
+            ["L", `${getOrdinal(1)}\u202F\u2013\u202f${getOrdinal(3)}`],
+            ["M", `${getOrdinal(4)}\u202F\u2013\u202f${getOrdinal(5)}`],
+            ["S", `${getOrdinal(6)}\u202F\u2013\u202f${getOrdinal(7)}`]
         ]);
 
         /**
@@ -106,7 +107,7 @@ export default class ListModules {
          * @return {string} Ship rate
          */
         function getRate(moduleLevel) {
-            return moduleLevel !== "U" ? ` ${rates.get(moduleLevel)}` : "";
+            return moduleLevel === "U" ? "" : ` ${rates.get(moduleLevel)}`;
         }
 
         let rate = "";
@@ -130,11 +131,13 @@ export default class ListModules {
                         type[1][i + 1].hasSamePropertiesAsPrevious = true;
                         rate += `<br>${getRate(type[1][i + 1].moduleLevel)}`;
                     }
+
                     if (hasSameProperties(i + 2)) {
                         // eslint-disable-next-line no-param-reassign
                         type[1][i + 2].hasSamePropertiesAsPrevious = true;
                         rate = "";
                     }
+
                     if (
                         typeof module.hasSamePropertiesAsPrevious === "undefined" ||
                         !module.hasSamePropertiesAsPrevious
@@ -163,11 +166,11 @@ export default class ListModules {
      * @private
      */
     _getText(moduleType) {
-        const columns = 3,
-            rows = this._getRows(moduleType),
-            splitRows = chunkify(rows, columns);
+        const columns = 3;
+        const rows = this._getRows(moduleType);
+        const splitRows = chunkify(rows, columns);
         let text = "";
-        Array.from(Array(splitRows.length).keys()).forEach(column => {
+        [...new Array(splitRows.length).keys()].forEach(column => {
             text += `<div class="col-md-${Math.floor(12 / splitRows.length)}">`;
             text += '<table class="table table-sm small"><thead>';
             text += "<tr><th>Module</th><th>Modifier</th></tr></thead><tbody>";
