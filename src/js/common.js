@@ -1,5 +1,11 @@
-/*
-    common.js
+/**
+ * This file is part of na-map.
+ *
+ * @file      Common data and functions.
+ * @module    common
+ * @author    iB aka Felix Victor
+ * @copyright 2017, 2018
+ * @license   http://www.gnu.org/licenses/gpl.html
  */
 
 import { select as d3Select } from "d3-selection";
