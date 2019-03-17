@@ -1,10 +1,9 @@
 // eslint-disable-next-line import/extensions
-import { groupBy, readJson, saveJson, capitalizeFirstLetter } from "./common.mjs";
-import { sortBy } from "./common";
+import { capitalizeFirstLetter, groupBy, readJson, saveJson, sortBy } from "./common.mjs";
 
-const itemsFilename = process.argv[2],
-    outDir = process.argv[3],
-    date = process.argv[4];
+const itemsFilename = process.argv[2];
+const outDir = process.argv[3];
+const date = process.argv[4];
 
 const apiItems = readJson(`${itemsFilename}-ItemTemplates-${date}.json`);
 
@@ -20,24 +19,24 @@ String.prototype.replaceAll = function(search, replacement) {
  * @returns {void}
  */
 function convertModules() {
-    const modules = new Map(),
-        levels = new Map(),
-        modifiers = new Map(),
-        woodJson = {},
-        moduleRate = [
-            {
-                level: "L",
-                names: [" (1-3 rates)", "1-3rd"]
-            },
-            {
-                level: "M",
-                names: [" (4-5 rates)", "4-5th"]
-            },
-            {
-                level: "S",
-                names: [" (6-7 rates)", "6-7th"]
-            }
-        ];
+    const modules = new Map();
+    const levels = new Map();
+    const modifiers = new Map();
+    const woodJson = {};
+    const moduleRate = [
+        {
+            level: "L",
+            names: [" (1-3 rates)", "1-3rd"]
+        },
+        {
+            level: "M",
+            names: [" (4-5 rates)", "4-5th"]
+        },
+        {
+            level: "S",
+            names: [" (6-7 rates)", "6-7th"]
+        }
+    ];
 
     woodJson.trim = [];
     woodJson.frame = [];
@@ -209,6 +208,7 @@ function convertModules() {
                     amount = modifier.Absolute;
                     isPercentage = false;
                 }
+
                 // Some modifiers are wrongly indicated as a percentage
                 if (
                     modifierName === "Crew protection" ||
@@ -218,6 +218,7 @@ function convertModules() {
                 ) {
                     isPercentage = false;
                 }
+
                 if (
                     modifierName === "Fire resistance" ||
                     modifierName === "Leak resistance" ||
@@ -225,9 +226,11 @@ function convertModules() {
                 ) {
                     amount = -amount;
                 }
+
                 if (modifierName === "Crew protection") {
                     amount *= 100;
                 }
+
                 wood.properties.push({
                     modifier: modifierName,
                     amount,
@@ -244,6 +247,7 @@ function convertModules() {
             wood.name = module.name.replace(" Frame", "");
             woodJson.frame.push(wood);
         }
+
         // Sort by modifier
         ["frame", "trim"].forEach(type => {
             woodJson[type].forEach(APIwood => {
@@ -262,6 +266,7 @@ function convertModules() {
             if (!modifiers.has(`${modifier.Slot} ${modifier.MappingIds}`)) {
                 console.log(`${modifier.Slot} ${modifier.MappingIds} modifier undefined`);
             }
+
             let amount = modifier.Percentage;
             let isPercentage = true;
 
@@ -270,6 +275,7 @@ function convertModules() {
                     Math.abs(modifier.Absolute) >= 1 ? modifier.Absolute : Math.round(modifier.Absolute * 10000) / 100;
                 isPercentage = false;
             }
+
             if (
                 modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`) === "Fire resistance" ||
                 modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`) === "Leak resistance" ||
@@ -279,6 +285,7 @@ function convertModules() {
             } else if (modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`) === "Crew protection") {
                 amount = Math.round(modifier.Absolute * 10000) / 100;
             }
+
             return {
                 modifier: modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`),
                 amount,
@@ -322,9 +329,10 @@ function convertModules() {
         if (module.name.endsWith("French Rig Refit") || module.name === "Bridgetown Frame Refit") {
             sortingGroup = "survival";
         }
+
         sortingGroup =
             sortingGroup && type !== "Ship trim"
-                ? `\u202f\u2013\u202f${capitalizeFirstLetter(module.sortingGroup).replace("_", "/")}`
+                ? `\u202F\u2013\u202f${capitalizeFirstLetter(module.sortingGroup).replace("_", "/")}`
                 : "";
 
         return `${type}${sortingGroup}`;
@@ -358,6 +366,7 @@ function convertModules() {
                 module.name = `${module.name.replace("Bow figure - ", "")} bow figure`;
                 module.moduleLevel = "U";
             }
+
             // Ignore double entries
             if (!modules.has(module.name + module.moduleLevel)) {
                 // Check for wood module
@@ -408,13 +417,14 @@ function convertModules() {
                         // console.log(module.id, module.name);
                     }
                 }
+
                 modules.set(module.name + module.moduleLevel, dontSave ? {} : module);
             }
         });
 
-    let result = Array.from(modules.values());
+    let result = [...modules.values()];
     result = result.filter(module => Object.keys(module).length).sort(sortBy(["type", "name", "moduleLevel"]));
-    const grouped = Array.from(groupBy(result, module => module.type));
+    const grouped = [...groupBy(result, module => module.type)];
 
     saveJson(`${outDir}/modules.json`, grouped);
     saveJson(`${outDir}/woods.json`, woodJson);

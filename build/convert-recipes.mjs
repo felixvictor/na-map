@@ -2,11 +2,11 @@
     convert-recipes.mjs
  */
 
-import { groupBy, readJson, saveJson, simpleSort, sortBy } from "./common.mjs";
+import { readJson, saveJson, simpleSort, sortBy } from "./common.mjs";
 
-const inBaseFilename = process.argv[2],
-    outFilename = process.argv[3],
-    date = process.argv[4];
+const inBaseFilename = process.argv[2];
+const outFilename = process.argv[3];
+const date = process.argv[4];
 
 const APIItems = readJson(`${inBaseFilename}-ItemTemplates-${date}.json`);
 
@@ -80,7 +80,7 @@ function convertRecipes() {
                 .replace(" - ", " – ")
                 .replace("u2013", "–")
                 .replace(/ $/, ""),
-            module: typeof APIrecipe.Results[0] !== "undefined" ? moduleNames.get(APIrecipe.Results[0].Template) : "",
+            module: typeof APIrecipe.Results[0] === "undefined" ? "" : moduleNames.get(APIrecipe.Results[0].Template),
             labourPrice: APIrecipe.LaborPrice,
             goldPrice: APIrecipe.GoldRequirements,
             itemRequirements: APIrecipe.FullRequirements.map(requirement => ({
@@ -120,7 +120,7 @@ function convertRecipes() {
 
     data.recipe.sort(sortBy(["craftGroup", "name"]));
 
-    const result = Array.from(ingredients.values());
+    const result = [...ingredients.values()];
     data.ingredient = result.sort(sortBy(["name"]));
 
     saveJson(outFilename, data);

@@ -110,6 +110,7 @@ function main() {
                     .find(".show")
                     .removeClass("show");
             }
+
             const subMenu$ = menu$.next(".dropdown-menu");
             subMenu$.toggleClass("show");
             $(this)
@@ -144,13 +145,14 @@ function main() {
      * Load map and set resize event
      * @return {void}
      */
+    // eslint-disable-next-line space-before-function-paren
     const loadMap = async () => {
         const { Map } = await import(/*  webpackPreload: true, webpackChunkName: "map" */ "./map/map");
         const map = new Map(serverId);
 
-        window.onresize = () => {
+        window.addEventListener("resize", () => {
             map.resize();
-        };
+        });
     };
 
     /**

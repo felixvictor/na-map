@@ -2,15 +2,14 @@
     convert-loot.mjs
  */
 
-import { readJson, saveJson } from "./common.mjs";
-import { sortBy } from "./common";
+import { readJson, saveJson, sortBy } from "./common.mjs";
 
-const inBaseFilename = process.argv[2],
-    outFilename = process.argv[3],
-    date = process.argv[4];
+const inBaseFilename = process.argv[2];
+const outFilename = process.argv[3];
+const date = process.argv[4];
 
-const APIItems = readJson(`${inBaseFilename}-ItemTemplates-${date}.json`),
-    ItemNames = new Map();
+const APIItems = readJson(`${inBaseFilename}-ItemTemplates-${date}.json`);
+const ItemNames = new Map();
 
 // https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
 // eslint-disable-next-line no-extend-native,func-names
