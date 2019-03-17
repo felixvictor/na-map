@@ -100,23 +100,33 @@ const setupData = data => {
         }
     };
 
+    // eslint-disable-next-line no-unused-vars
     const woodCompare = new CompareWoods(data.woods, "wood");
+    // eslint-disable-next-line no-unused-vars
     const woodList = new ListWoods(data.woods);
 
+    // eslint-disable-next-line no-unused-vars
     const cannonList = new ListCannons(data.cannons);
 
+    // eslint-disable-next-line no-unused-vars
     const ownershipList = new ListPortOwnerships(data.ownership, data.nations);
 
+    // eslint-disable-next-line no-unused-vars
     const moduleList = new ListModules(data.modules);
 
+    // eslint-disable-next-line no-unused-vars
     const recipeList = new ListRecipes(data.recipes.recipe, data.modules, serverId);
 
+    // eslint-disable-next-line no-unused-vars
     const shipList = new ListShips(data.ships);
 
+    // eslint-disable-next-line no-unused-vars
     const ingredientList = new ListIngredients(data.recipes.ingredient, data.modules);
 
+    // eslint-disable-next-line no-unused-vars
     const buildingList = new ListBuildings(data.buildings);
 
+    // eslint-disable-next-line no-unused-vars
     const blueprintList = new ListShipBlueprints(data.shipBlueprints, data.woods);
 
     checkShipCompareData();
