@@ -36,8 +36,8 @@ export default class ListBuildings {
     _injectModal() {
         insertBaseModal(this._modalId, this._baseName);
 
-        const id = `${this._baseId}-select`,
-            body = d3Select(`#${this._modalId} .modal-body`);
+        const id = `${this._baseId}-select`;
+        const body = d3Select(`#${this._modalId} .modal-body`);
         body.append("label").attr("for", id);
         body.append("select")
             .attr("name", id)
@@ -54,8 +54,8 @@ export default class ListBuildings {
     }
 
     _setupSelect() {
-        const select$ = $(`#${this._baseId}-select`),
-            options = this._getOptions();
+        const select$ = $(`#${this._baseId}-select`);
+        const options = this._getOptions();
         select$.append(options);
     }
 
@@ -81,6 +81,7 @@ export default class ListBuildings {
         if (!document.getElementById(this._modalId)) {
             this._initModal();
         }
+
         // Show modal
         $(`#${this._modalId}`).modal("show");
     }
@@ -91,7 +92,14 @@ export default class ListBuildings {
 
     _getProductText(currentBuilding) {
         let text = "";
-        if (!Array.isArray(currentBuilding.resource)) {
+        if (Array.isArray(currentBuilding.resource)) {
+            text += '<table class="table table-sm"><tbody>';
+
+            text += `<tr><td>${currentBuilding.resource
+                .map(resource => resource.name)
+                .join("</td></tr><tr><td>")}</td></tr>`;
+            text += "</tbody></table>";
+        } else {
             text += `<h5 class="card-title">${currentBuilding.resource.name}</h5>`;
 
             if (currentBuilding.resource.price) {
@@ -102,16 +110,11 @@ export default class ListBuildings {
                         currentBuilding.batch.price
                     )}</td></tr>`;
                 }
+
                 text += "</tbody></table>";
             }
-        } else {
-            text += '<table class="table table-sm"><tbody>';
-
-            text += `<tr><td>${currentBuilding.resource
-                .map(resource => resource.name)
-                .join("</td></tr><tr><td>")}</td></tr>`;
-            text += "</tbody></table>";
         }
+
         return text;
     }
 
@@ -138,6 +141,7 @@ export default class ListBuildings {
                 )}</td><td>${formatInt(level.maxStorage)}</td><td>${formatInt(level.price)}</td></tr>`;
             });
         }
+
         text += "</tbody></table>";
         return text;
     }

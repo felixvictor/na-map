@@ -8,16 +8,13 @@ import Excel4Node from "excel4node";
 import sass from "node-sass";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import css from "css";
-import { readJson } from "./common.mjs";
-import { sortBy } from "./common";
+import { readJson, sortBy } from "./common.mjs";
 
-const shipFilename = process.argv[2],
-    portFilename = process.argv[3],
-    outFilename = process.argv[4],
-    shipsOrig = readJson(shipFilename),
-    portData = readJson(portFilename);
-
-let colours;
+const shipFilename = process.argv[2];
+const portFilename = process.argv[3];
+const outFilename = process.argv[4];
+const shipsOrig = readJson(shipFilename);
+const portData = readJson(portFilename);
 
 /**
  * Create array with numbers ranging from start to end
@@ -26,7 +23,7 @@ let colours;
  * @param {Number} end - End index
  * @returns {Number[]} Result
  */
-const range = (start, end) => [...Array(1 + end - start).keys()].map(v => start + v);
+const range = (start, end) => [...new Array(1 + end - start).keys()].map(v => start + v);
 
 // https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
 // eslint-disable-next-line no-extend-native,func-names
@@ -76,18 +73,19 @@ function setColours() {
  * @returns {void}
  */
 function createExcel() {
-    const primary050 = colours.get("primary-050"),
-        primary200 = colours.get("primary-200"),
-        primary800 = colours.get("primary-800"),
-        secondary050 = colours.get("secondary-050"),
-        secondary100 = colours.get("secondary-100"),
-        secondary200 = colours.get("secondary-200"),
-        secondary400 = colours.get("secondary-400"),
-        secondary600 = colours.get("secondary-600"),
-        secondary800 = colours.get("secondary-800"),
-        background600 = colours.get("background-600"),
-        highlight = colours.get("info"),
-        red = colours.get("pink");
+    const colours = setColours();
+    const primary050 = colours.get("primary-050");
+    const primary200 = colours.get("primary-200");
+    const primary800 = colours.get("primary-800");
+    const secondary050 = colours.get("secondary-050");
+    const secondary100 = colours.get("secondary-100");
+    const secondary200 = colours.get("secondary-200");
+    const secondary400 = colours.get("secondary-400");
+    const secondary600 = colours.get("secondary-600");
+    const secondary800 = colours.get("secondary-800");
+    const background600 = colours.get("background-600");
+    const highlight = colours.get("info");
+    const red = colours.get("pink");
 
     const wsOptions = {
         sheetView: {
@@ -158,33 +156,33 @@ function createExcel() {
      * @returns {void}
      */
     function fillSheet(sheet, ships, ports) {
-        const headerRows = 4,
-            headerColumns = 5,
-            numPlayers = 24,
-            numRows = headerRows + ships.length,
-            numColumns = headerColumns + numPlayers,
-            rowHeight = 40;
+        const headerRows = 4;
+        const headerColumns = 5;
+        const numPlayers = 24;
+        const numRows = headerRows + ships.length;
+        const numColumns = headerColumns + numPlayers;
+        const rowHeight = 40;
 
         const numberStyle = {
-                alignment: {
-                    // §18.8.1
-                    horizontal: "right",
-                    indent: 1, // Number of spaces to indent = indent value * 3
-                    //                relativeIndent: integer, // number of additional spaces to indent
-                    vertical: "center"
-                },
-                numberFormat: "#" // §18.8.30 numFmt (Number Format)
+            alignment: {
+                // §18.8.1
+                horizontal: "right",
+                indent: 1, // Number of spaces to indent = indent value * 3
+                //                relativeIndent: integer, // number of additional spaces to indent
+                vertical: "center"
             },
-            textStyle = {
-                alignment: {
-                    // §18.8.1
-                    horizontal: "left",
-                    indent: 1, // Number of spaces to indent = indent value * 3
-                    //                relativeIndent: integer, // number of additional spaces to indent
-                    vertical: "center"
-                },
-                numberFormat: "@" // §18.8.30 numFmt (Number Format)
-            };
+            numberFormat: "#" // §18.8.30 numFmt (Number Format)
+        };
+        const textStyle = {
+            alignment: {
+                // §18.8.1
+                horizontal: "left",
+                indent: 1, // Number of spaces to indent = indent value * 3
+                //                relativeIndent: integer, // number of additional spaces to indent
+                vertical: "center"
+            },
+            numberFormat: "@" // §18.8.30 numFmt (Number Format)
+        };
 
         sheet.column(headerColumns).freeze(); // Freezes the first two columns and scrolls the right view to column D
         sheet.row(headerRows).freeze();
@@ -303,8 +301,8 @@ function createExcel() {
             .style(fontColourBold(highlight));
 
         // Ship rows
-        const fgColourShip = [secondary050, secondary200],
-            fgColourPlayer = [primary050, primary200];
+        const fgColourShip = [secondary050, secondary200];
+        const fgColourPlayer = [primary050, primary200];
         ships.forEach(ship => {
             currentRow += 1;
 
@@ -427,8 +425,8 @@ function createExcel() {
             properties: { tabColor: { argb: secondary500 } }
         });
         */
-    const dwSheet = workbook.addWorksheet("Deep water port", wsOptions),
-        swSheet = workbook.addWorksheet("Shallow water port", wsOptions);
+    const dwSheet = workbook.addWorksheet("Deep water port", wsOptions);
+    const swSheet = workbook.addWorksheet("Shallow water port", wsOptions);
 
     fillSheet(dwSheet, dwShips, dwPorts);
     fillSheet(swSheet, swShips, swPorts);
@@ -440,5 +438,4 @@ function createExcel() {
     });
 }
 
-colours = setColours();
 createExcel();
