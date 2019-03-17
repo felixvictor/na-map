@@ -46,7 +46,7 @@
     <Pair>
       <Key>CANNON_BASIC_DAMAGE</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>104</Value>
+        <Value>72</Value>
       </Value>
     </Pair>
     <Pair>
@@ -130,7 +130,7 @@
     <Pair>
       <Key>CANNON_BASIC_PENETRATION</Key>
       <Value xsi:type="FloatAttribute" Action="Relative" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>119</Value>
+        <Value>121</Value>
       </Value>
     </Pair>
     <Pair>
