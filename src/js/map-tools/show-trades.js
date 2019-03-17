@@ -420,7 +420,8 @@ export default class ShowTrades {
                         '<div class="tooltip-block tooltip-inner tooltip-small">' +
                         "</div></div>",
                     title,
-                    trigger: "manual"
+                    trigger: "manual",
+                    sanitize: false
                 })
                 .tooltip("show");
         };
