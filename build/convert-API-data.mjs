@@ -150,26 +150,42 @@ function convertPorts() {
             netIncome: apiPort.LastTax - apiPort.LastCost,
             tradingCompany: apiPort.TradingCompany,
             laborHoursDiscount: apiPort.LaborHoursDiscount,
-            dropsTrading: portShop.ResourcesAdded.filter(
-                good => itemNames.has(good.Template) && itemNames.get(good.Template).trading
-            )
-                .map(good => itemNames.get(good.Template).name)
-                .sort(sort),
-            consumesTrading: portShop.ResourcesConsumed.filter(
-                good => itemNames.has(good.Key) && itemNames.get(good.Key).trading
-            )
-                .map(good => itemNames.get(good.Key).name)
-                .sort(sort),
-            producesNonTrading: portShop.ResourcesProduced.filter(
-                good => itemNames.has(good.Key) && !itemNames.get(good.Key).trading
-            )
-                .map(good => itemNames.get(good.Key).name)
-                .sort(sort),
-            dropsNonTrading: portShop.ResourcesAdded.filter(
-                good => itemNames.has(good.Template) && !itemNames.get(good.Template).trading
-            )
-                .map(good => itemNames.get(good.Template).name)
-                .sort(sort),
+            dropsTrading: [
+                ...new Set(
+                    portShop.ResourcesAdded.filter(
+                        good => itemNames.has(good.Template) && itemNames.get(good.Template).trading
+                    )
+                        .map(good => itemNames.get(good.Template).name)
+                        .sort(sort)
+                )
+            ],
+            consumesTrading: [
+                ...new Set(
+                    portShop.ResourcesConsumed.filter(
+                        good => itemNames.has(good.Key) && itemNames.get(good.Key).trading
+                    )
+                        .map(good => itemNames.get(good.Key).name)
+                        .sort(sort)
+                )
+            ],
+            producesNonTrading: [
+                ...new Set(
+                    portShop.ResourcesProduced.filter(
+                        good => itemNames.has(good.Key) && !itemNames.get(good.Key).trading
+                    )
+                        .map(good => itemNames.get(good.Key).name)
+                        .sort(sort)
+                )
+            ],
+            dropsNonTrading: [
+                ...new Set(
+                    portShop.ResourcesAdded.filter(
+                        good => itemNames.has(good.Template) && !itemNames.get(good.Template).trading
+                    )
+                        .map(good => itemNames.get(good.Template).name)
+                        .sort(sort)
+                )
+            ],
             inventory: portShop.RegularItems.filter(good => itemNames.get(good.TemplateId).itemType !== "Cannon")
                 .map(good => ({
                     name: itemNames.get(good.TemplateId).name,
