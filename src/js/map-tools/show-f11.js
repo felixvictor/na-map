@@ -51,11 +51,11 @@ export default class ShowF11 {
 
     _setupListener() {
         document.getElementById(`${this._buttonId}`).addEventListener("click", event => this._navbarClick(event));
-        window.onkeydown = event => {
+        window.addEventListener("keydown", event => {
             if (event.code === "F11" && event.shiftKey) {
                 this._navbarClick(event);
             }
-        };
+        });
     }
 
     _injectModal() {
@@ -170,11 +170,11 @@ export default class ShowF11 {
             this._xInputSel = document.getElementById(this._xInputId);
             this._zInputSel = document.getElementById(this._zInputId);
             // Submit handler
-            this._formSel.onsubmit = event => {
+            this._formSel.addEventListener("submit", event => {
                 this._modal$.modal("hide");
                 event.preventDefault();
                 this._useUserInput();
-            };
+            });
 
             // Copy coordinates to clipboard (ctrl-c key event)
             this._modal$.on("keydown", event => {
@@ -196,7 +196,7 @@ export default class ShowF11 {
 
     _getInputValue(elem) {
         const { value } = elem;
-        return value === "" ? Infinity : +value;
+        return value === "" ? Infinity : Number(value);
     }
 
     _getXCoord() {
@@ -263,8 +263,8 @@ export default class ShowF11 {
     }
 
     _goToF11(F11XIn, F11YIn) {
-        const F11X = +F11XIn;
-        const F11Y = +F11YIn;
+        const F11X = Number(F11XIn);
+        const F11Y = Number(F11YIn);
         const x = Math.floor(convertCoordX(F11X, F11Y));
         const y = Math.floor(convertCoordY(F11X, F11Y));
 
@@ -278,8 +278,8 @@ export default class ShowF11 {
         const urlParams = new URL(document.location).searchParams;
 
         if (urlParams.has("x") && urlParams.has("z")) {
-            const x = +urlParams.get("x") * -1000;
-            const z = +urlParams.get("z") * -1000;
+            const x = Number(urlParams.get("x")) * -1000;
+            const z = Number(urlParams.get("z")) * -1000;
 
             registerEvent("Menu", "Paste F11 coordinates");
             this._goToF11(x, z);

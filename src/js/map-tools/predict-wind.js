@@ -92,6 +92,7 @@ export default class PredictWind {
             if (!this.tooltip.is(":visible")) {
                 $("body").append(this.tooltip);
             }
+
             const pos = _getTooltipPos.call(this);
             this.container.append(this.tooltip);
             return pos;
@@ -192,6 +193,7 @@ export default class PredictWind {
         if (!document.getElementById(this._modalId)) {
             this._initModal();
         }
+
         // Show modal
         $(`#${this._modalId}`)
             .modal("show")
@@ -215,25 +217,25 @@ export default class PredictWind {
         const timeFormat = "H.mm";
         let currentWindDegrees;
 
-        const regex = /(\d+)[\s:.](\d+)/,
-            match = regex.exec(predictUserTime),
-            predictHours = parseInt(match[1], 10),
-            predictMinutes = parseInt(match[2], 10);
+        const regex = /(\d+)[\s:.](\d+)/;
+        const match = regex.exec(predictUserTime);
+        const predictHours = parseInt(match[1], 10);
+        const predictMinutes = parseInt(match[2], 10);
 
         // Set current wind in degrees
         if (Number.isNaN(Number(currentUserWind))) {
             currentWindDegrees = compassToDegrees(currentUserWind);
         } else {
-            currentWindDegrees = +currentUserWind;
+            currentWindDegrees = Number(currentUserWind);
         }
 
         const currentTime = moment()
-                .utc()
-                .seconds(0)
-                .milliseconds(0),
-            predictTime = moment(currentTime)
-                .hour(predictHours)
-                .minutes(predictMinutes);
+            .utc()
+            .seconds(0)
+            .milliseconds(0);
+        const predictTime = moment(currentTime)
+            .hour(predictHours)
+            .minutes(predictMinutes);
         if (predictTime.isBefore(currentTime)) {
             predictTime.add(1, "day");
         }
@@ -284,11 +286,11 @@ export default class PredictWind {
     }
 
     _printText(predictedWindDegrees, predictTime, currentWind, currentTime) {
-        const compass = degreesToCompass(predictedWindDegrees),
-            lineHeight = parseInt(
-                window.getComputedStyle(document.getElementById("wind")).getPropertyValue("line-height"),
-                10
-            );
+        const compass = degreesToCompass(predictedWindDegrees);
+        const lineHeight = parseInt(
+            window.getComputedStyle(document.getElementById("wind")).getPropertyValue("line-height"),
+            10
+        );
         const textSvg = this._svg.append("svg");
 
         const text1 = textSvg
@@ -305,10 +307,10 @@ export default class PredictWind {
             .attr("class", "wind-text-current")
             .html(`Currently at ${currentTime} from ${displayCompassAndDegrees(currentWind, true)}`);
 
-        const bbox1 = text1.node().getBoundingClientRect(),
-            bbox2 = text2.node().getBoundingClientRect(),
-            textHeight = Math.max(bbox1.height, bbox2.height) * 2 + lineHeight,
-            textWidth = Math.max(bbox1.width, bbox2.width) + lineHeight;
+        const bbox1 = text1.node().getBoundingClientRect();
+        const bbox2 = text2.node().getBoundingClientRect();
+        const textHeight = Math.max(bbox1.height, bbox2.height) * 2 + lineHeight;
+        const textWidth = Math.max(bbox1.width, bbox2.width) + lineHeight;
 
         textSvg
             .attr("x", (this._width - textWidth) / 2)

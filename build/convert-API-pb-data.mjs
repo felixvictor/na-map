@@ -2,9 +2,9 @@ import fs from "fs";
 import moment from "moment";
 import { nations } from "./common.mjs";
 
-const inBaseFilename = process.argv[2],
-    outFilename = process.argv[3],
-    date = process.argv[4];
+const inBaseFilename = process.argv[2];
+const outFilename = process.argv[3];
+const date = process.argv[4];
 
 const APIPorts = JSON.parse(fs.readFileSync(`${inBaseFilename}-Ports-${date}.json`, "utf8"));
 
@@ -31,7 +31,7 @@ function convertPorts() {
     json.ports = [];
     APIPorts.forEach(port => {
         const portData = {
-            id: +port.Id,
+            id: Number(port.Id),
             name: port.Name.replaceAll("'", "’"),
 
             nation: nations[port.Nation].short,

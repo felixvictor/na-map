@@ -1,9 +1,8 @@
-import { readJson, saveJson } from "./common.mjs";
-import { sortBy } from "./common";
+import { readJson, saveJson, sortBy } from "./common.mjs";
 
-const itemsFilename = process.argv[2],
-    outFilename = process.argv[3],
-    date = process.argv[4];
+const itemsFilename = process.argv[2];
+const outFilename = process.argv[3];
+const date = process.argv[4];
 
 const APIItems = readJson(`${itemsFilename}-ItemTemplates-${date}.json`);
 
@@ -47,9 +46,9 @@ function getItemsCraftedByAcademy() {
  * @returns {void}
  */
 function convertBuildings() {
-    const buildings = new Map(),
-        resources = new Map(),
-        resourceRecipes = new Map();
+    const buildings = new Map();
+    const resources = new Map();
+    const resourceRecipes = new Map();
 
     APIItems.forEach(APIresource => {
         resources.set(APIresource.Id, { name: APIresource.Name.replaceAll("'", "’"), price: APIresource.BasePrice });
@@ -109,6 +108,7 @@ function convertBuildings() {
                 building.byproduct = [];
                 building.batch = [];
             }
+
             if (
                 building.name === "Gold Mine" ||
                 building.name === "Silver Mine" ||
@@ -125,11 +125,12 @@ function convertBuildings() {
             } else {
                 // console.log(building.id, building.name);
             }
+
             buildings.set(building.name, dontSave ? {} : building);
         }
     });
 
-    let result = Array.from(buildings.values());
+    let result = [...buildings.values()];
     result = result.filter(building => Object.keys(building).length).sort(sortBy(["name"]));
     saveJson(outFilename, result);
 }
