@@ -14,8 +14,8 @@ import xml2Json from "xml2json";
 
 import { readTextFile, saveJson } from "./common.mjs";
 
-const inDir = process.argv[2],
-    filename = process.argv[3];
+const inDir = process.argv[2];
+const filename = process.argv[3];
 
 // https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
 // eslint-disable-next-line no-extend-native,func-names
@@ -126,6 +126,7 @@ function convertCannons() {
         } else if (fileData.ModuleTemplate.Name.endsWith("Long")) {
             type = "long";
         }
+
         const name = fileData.ModuleTemplate.Name.replace("Cannon ", "")
             .replace("Carronade ", "")
             .replace(" pd", "")
@@ -143,6 +144,7 @@ function convertCannons() {
                     // eslint-disable-next-line no-param-reassign
                     cannon[group] = {};
                 }
+
                 cannon[group][element] = pair.Value.Value;
             });
         });
@@ -161,7 +163,7 @@ function convertCannons() {
     }
 
     // Get all files without a master
-    Array.from(fileNames).forEach(baseFileName => {
+    [...fileNames].forEach(baseFileName => {
         const fileData = getFileData(baseFileName);
         addData(fileData);
     });
