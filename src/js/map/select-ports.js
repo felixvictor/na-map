@@ -162,8 +162,8 @@ export default class SelectPorts {
         document.getElementById("menu-prop-this-week").addEventListener("click", () => this._capturedThisWeek());
         document.getElementById("menu-prop-last-week").addEventListener("click", () => this._capturedLastWeek());
 
-        const portFrom = $("#prop-from"),
-            portTo = $("#prop-to");
+        const portFrom = $("#prop-from");
+        const portTo = $("#prop-to");
         portFrom.datetimepicker({
             format: this._dateFormat
         });
@@ -226,7 +226,7 @@ export default class SelectPorts {
             });
         });
 
-        const options = `${Array.from(selectGoods)
+        const options = `${[...selectGoods]
             .sort()
             .map(good => `<option>${good}</option>`)
             .join("")}`;
@@ -255,7 +255,7 @@ export default class SelectPorts {
                 }
             });
 
-            const options = `${Array.from(selectGoods)
+            const options = `${[...selectGoods]
                 .sort()
                 .map(good => `<option>${good}</option>`)
                 .join("")}`;
@@ -271,6 +271,7 @@ export default class SelectPorts {
                 virtualScroll: true
             });
         }
+
         if (show) {
             this._inventorySelector.classList.remove("d-none");
             this._inventorySelector.parentNode.classList.remove("d-none");
@@ -302,14 +303,14 @@ export default class SelectPorts {
         this._propClanSelector.innerHTML = "";
         let options = "";
 
-        if (clanList.size !== 0) {
+        if (clanList.size === 0) {
+            this._propClanSelector.disabled = true;
+        } else {
             this._propClanSelector.disabled = false;
-            options = `${Array.from(clanList)
+            options = `${[...clanList]
                 .sort()
                 .map(clan => `<option value="${clan}" class="caps">${clan}</option>`)
                 .join("")}`;
-        } else {
-            this._propClanSelector.disabled = true;
         }
 
         this._propClanSelector.insertAdjacentHTML("beforeend", options);
@@ -325,7 +326,7 @@ export default class SelectPorts {
         const cmList = new Set();
 
         this._ports.portData.forEach(d => cmList.add(d.conquestMarksPension));
-        const options = `${Array.from(cmList)
+        const options = `${[...cmList]
             .sort()
             .map(cm => `<option value="${cm}">${cm}</option>`)
             .join("")}`;
@@ -342,6 +343,7 @@ export default class SelectPorts {
         if (tradePort.consumesTrading) {
             tradePortConsumedGoods = tradePort.consumesTrading.map(good => good);
         }
+
         if (tradePort.dropsTrading) {
             tradePortProducedGoods = tradePort.dropsTrading.map(good => good);
         }
@@ -365,6 +367,7 @@ export default class SelectPorts {
                         }
                     });
                 }
+
                 if (port.dropsTrading) {
                     port.dropsTrading.forEach(good => {
                         if (tradePortConsumedGoods.includes(good)) {
@@ -374,6 +377,7 @@ export default class SelectPorts {
                         }
                     });
                 }
+
                 return port;
             })
             .filter(port => port.id === this._ports.tradePortId || port.sellInTradePort || port.buyInTradePort);
@@ -386,11 +390,11 @@ export default class SelectPorts {
     _portSelected() {
         const port = this._portNamesSelector.options[this._portNamesSelector.selectedIndex];
         const c = port.value.split(",");
-        const id = +port.getAttribute("data-id");
+        const id = Number(port.getAttribute("data-id"));
 
         this._ports.currentPort = {
             id,
-            coord: { x: +c[0], y: +c[1] }
+            coord: { x: Number(c[0]), y: Number(c[1]) }
         };
         this._ports.tradePortId = id;
 
@@ -399,6 +403,7 @@ export default class SelectPorts {
         if (this._pbZone._showPBZones) {
             this._pbZone.refresh();
         }
+
         this._ports.showTradePortPartners = true;
         this._ports.showCurrentGood = false;
         this._ports.update();
@@ -462,6 +467,7 @@ export default class SelectPorts {
                     port.sellInTradePort = item.buyQuantity > 0;
                     buyGoods.set(port.name, { name: port.name, nation: port.nation, good: item });
                 }
+
                 if (item.sellQuantity > 0) {
                     // eslint-disable-next-line no-param-reassign
                     port.buyInTradePort = item.sellQuantity > 0;
@@ -483,9 +489,11 @@ export default class SelectPorts {
                     )} @ ${formatSiCurrency(value.good.buyPrice)}<br>`;
                 });
             }
+
             if (buyGoods && sellGoods) {
                 h += "<p></p>";
             }
+
             if (sellGoods.size) {
                 h += "<h6>Sell</h6>";
                 sellGoods.forEach(value => {
@@ -505,6 +513,7 @@ export default class SelectPorts {
         if (this._map.showTrades.listType !== "portList") {
             this._map.showTrades.listType = "portList";
         }
+
         this._map.showTrades.update(getPortList());
         this._ports.update();
     }
@@ -531,6 +540,7 @@ export default class SelectPorts {
         } else if (this._nation) {
             this._ports.portData = this._ports.portDataDefault.filter(port => port.nation === this._nation);
         }
+
         this._ports.showCurrentGood = false;
         this._ports.showTradePortPartners = false;
         this._ports.update();
@@ -573,14 +583,15 @@ export default class SelectPorts {
     }
 
     _CMSelected() {
-        const value = +this._propCMSelector.options[this._propCMSelector.selectedIndex].value;
+        const value = Number(this._propCMSelector.options[this._propCMSelector.selectedIndex].value);
         let portData;
 
-        if (value !== 0) {
-            portData = this._ports.portDataDefault.filter(d => value === d.conquestMarksPension);
-        } else {
+        if (value === 0) {
             portData = this._ports.portDataDefault;
+        } else {
+            portData = this._ports.portDataDefault.filter(d => value === d.conquestMarksPension);
         }
+
         this._toggleMenuDropdown();
         this._ports.portData = portData;
         this._ports.showTradePortPartners = false;
@@ -603,6 +614,7 @@ export default class SelectPorts {
             if (end < begin) {
                 end += 24;
             }
+
             for (let i = begin - 2; i <= end - 3; i += 1) {
                 startTimes.add((i - 10) % maxStartTime);
             }
