@@ -8,13 +8,11 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-// eslint-disable-next-line
-import { readJson, round, saveJson } from "./common.mjs";
-import { sortBy } from "./common";
+import { readJson, saveJson, sortBy } from "./common.mjs";
 
-const inBaseFilename = process.argv[2],
-    outFilename = process.argv[3],
-    date = process.argv[4];
+const inBaseFilename = process.argv[2];
+const outFilename = process.argv[3];
+const date = process.argv[4];
 
 /**
  * Logs needed for planking as a ratio of ship mass

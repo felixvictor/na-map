@@ -135,6 +135,7 @@ export default class DisplayPorts {
             [r] = this._radioButtonValues;
             this._cookie.set(r);
         }
+
         this._radios.set(r);
 
         return r;
@@ -384,16 +385,27 @@ export default class DisplayPorts {
 
     _getText(id, portProperties) {
         moment.locale("en-gb");
-
         const portBattleLT = moment.utc(portProperties.portBattle).local();
         const portBattleST = moment.utc(portProperties.portBattle);
+        const localTime = portBattleST === portBattleLT ? "" : ` (${portBattleLT.format("H.mm")} local)`;
+        const portBattleStartTime = portProperties.portBattleStartTime
+            ? `${(portProperties.portBattleStartTime + 10) % 24}.00\u202F–\u202F${(portProperties.portBattleStartTime +
+                  13) %
+                  24}.00`
+            : "11.00\u202F–\u202F8.00";
+        const endSyllable = portBattleST.isAfter(moment.utc()) ? "s" : "ed";
+        const attackHostility = `${displayClan(portProperties.attackerClan)} (${portProperties.attackerNation}) attack${
+            portProperties.portBattle.length
+                ? `${endSyllable} ${portBattleST.fromNow()} at ${portBattleST.format("H.mm")}${localTime}`
+                : `s: ${formatPercent(portProperties.attackHostility)} hostility`
+        }`;
         const port = {
             name: portProperties.name,
             icon: portProperties.nation,
             availableForAll: portProperties.availableForAll ? "(accessible to all nations)" : "",
             depth: portProperties.shallow ? "Shallow" : "Deep",
             county:
-                (portProperties.county !== "" ? `${portProperties.county}\u200a/\u200a` : "") + portProperties.region,
+                (portProperties.county === "" ? "" : `${portProperties.county}\u200A/\u200A`) + portProperties.region,
             countyCapital: portProperties.countyCapital ? " (county capital)" : "",
             nonCapturable: portProperties.nonCapturable,
             captured: portProperties.capturer
@@ -402,36 +414,18 @@ export default class DisplayPorts {
                       .fromNow()}`
                 : "",
             lastPortBattle: portProperties.lastPortBattle,
-            // eslint-disable-next-line no-nested-ternary
-            attack: portProperties.attackHostility
-                ? `${displayClan(portProperties.attackerClan)} (${portProperties.attackerNation}) attack${
-                      // eslint-disable-next-line no-nested-ternary
-                      portProperties.portBattle.length
-                          ? `${
-                                portBattleST.isAfter(moment.utc()) ? "s" : "ed"
-                            } ${portBattleST.fromNow()} at ${portBattleST.format("H.mm")}${
-                                portBattleST !== portBattleLT ? ` (${portBattleLT.format("H.mm")} local)` : ""
-                            }`
-                          : `s: ${formatPercent(portProperties.attackHostility)} hostility`
-                  }`
-                : "",
-            // eslint-disable-next-line no-nested-ternary
-            pbTimeRange: portProperties.nonCapturable
-                ? ""
-                : !portProperties.portBattleStartTime
-                ? "11.00\u202f–\u202f8.00"
-                : `${(portProperties.portBattleStartTime + 10) %
-                      24}.00\u202f–\u202f${(portProperties.portBattleStartTime + 13) % 24}.00`,
+            attack: portProperties.attackHostility ? attackHostility : "",
+            pbTimeRange: portProperties.nonCapturable ? "" : portBattleStartTime,
             brLimit: formatInt(portProperties.brLimit),
             conquestMarksPension: portProperties.conquestMarksPension,
             taxIncome: formatSiInt(portProperties.taxIncome),
             portTax: formatPercent(portProperties.portTax),
             netIncome: formatSiInt(portProperties.netIncome),
             tradingCompany: portProperties.tradingCompany
-                ? `, trading company level\u202f${portProperties.tradingCompany}`
+                ? `, trading company level\u202F${portProperties.tradingCompany}`
                 : "",
             laborHoursDiscount: portProperties.laborHoursDiscount
-                ? `, labor hours discount level\u202f${portProperties.laborHoursDiscount}`
+                ? `, labor hours discount level\u202F${portProperties.laborHoursDiscount}`
                 : "",
             dropsTrading: portProperties.dropsTrading ? portProperties.dropsTrading.join(", ") : "",
             consumesTrading: portProperties.consumesTrading ? portProperties.consumesTrading.join(", ") : "",
@@ -473,56 +467,65 @@ export default class DisplayPorts {
             if (port.attack.length) {
                 h += `<div class="alert alert-danger mt-2" role="alert">${port.attack}</div>`;
             }
+
             h += `<p>${port.depth} water port ${port.countyCapital}${port.captured}<br>`;
-            if (!port.nonCapturable) {
+            if (port.nonCapturable) {
+                h += "Not capturable";
+                h += `<br>${port.portTax} tax`;
+            } else {
                 h += `Port battle ${port.pbTimeRange}, ${port.brLimit} <span class="caps">BR</span>, `;
-                h += `${port.pbType}\u202frate <span class="caps">AI</span>, `;
-                h += `${port.conquestMarksPension}\u202fconquest point`;
+                h += `${port.pbType}\u202Frate <span class="caps">AI</span>, `;
+                h += `${port.conquestMarksPension}\u202Fconquest point`;
                 h += port.conquestMarksPension > 1 ? "s" : "";
                 h += `<br>Tax income ${port.taxIncome} (${port.portTax}), net income ${port.netIncome}`;
                 h += port.tradingCompany;
                 h += port.laborHoursDiscount;
-            } else {
-                h += "Not capturable";
-                h += `<br>${port.portTax} tax`;
             }
+
             h += "</p>";
             h += "<table class='table table-sm'>";
             if (port.producesNonTrading.length) {
-                h += "<tr><td class='pl-0'>Produces\u00a0</td><td>";
+                h += "<tr><td class='pl-0'>Produces\u00A0</td><td>";
                 h += `<span class="non-trading">${port.producesNonTrading}</span>`;
                 h += "</td></tr>";
             }
+
             if (port.dropsTrading.length || port.dropsNonTrading.length) {
-                h += `<tr><td class='pl-0'>Drops\u00a0${port.dropsNonTrading.length ? "\u00a0" : ""}</td><td>`;
+                h += `<tr><td class='pl-0'>Drops\u00A0${port.dropsNonTrading.length ? "\u00A0" : ""}</td><td>`;
                 if (port.dropsNonTrading.length) {
                     h += `<span class="non-trading">${port.dropsNonTrading}</span>`;
                     if (port.dropsTrading.length) {
                         h += "<br>";
                     }
                 }
+
                 if (port.dropsTrading.length) {
                     h += `${port.dropsTrading}`;
                 }
+
                 h += "</td></tr>";
             }
+
             if (port.consumesTrading.length) {
-                h += "<tr><td class='pl-0'>Consumes\u00a0</td><td>";
+                h += "<tr><td class='pl-0'>Consumes\u00A0</td><td>";
                 h += port.consumesTrading;
                 h += "</td></tr>";
             }
+
             if (this.showTradePortPartners) {
                 if (port.goodsToSellInTradePort.length) {
-                    h += `<tr><td class='pl-0'>Sell in ${port.tradePort}\u00a0</td><td>${
+                    h += `<tr><td class='pl-0'>Sell in ${port.tradePort}\u00A0</td><td>${
                         port.goodsToSellInTradePort
                     }</td></tr>`;
                 }
+
                 if (port.goodsToBuyInTradePort.length) {
-                    h += `<tr><td class='pl-0'>Buy in ${port.tradePort}\u00a0</td><td>${
+                    h += `<tr><td class='pl-0'>Buy in ${port.tradePort}\u00A0</td><td>${
                         port.goodsToBuyInTradePort
                     }</td></tr>`;
                 }
             }
+
             h += "</table>";
 
             return h;
@@ -549,9 +552,11 @@ export default class DisplayPorts {
                 h += "<h6>Buy</h6>";
                 h += buy;
             }
+
             if (buy.length && sell.length) {
                 h += "<p></p>";
             }
+
             if (sell.length) {
                 h += "<h6>Sell</h6>";
                 h += sell;
@@ -573,6 +578,7 @@ export default class DisplayPorts {
             if (this._map.showTrades.listType !== "inventory") {
                 this._map.showTrades.listType = "inventory";
             }
+
             this._map.showTrades.update(getInventory(d));
         }
     }
@@ -581,6 +587,7 @@ export default class DisplayPorts {
         const hideDetails = (d, i, nodes) => {
             $(d3Select(nodes[i]).node()).tooltip("dispose");
         };
+
         const circleScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale);
         const circleSize = roundToThousands(this._circleSize / circleScale);
         const data = this._portDataFiltered;
@@ -612,8 +619,10 @@ export default class DisplayPorts {
             } else if (port.buyInTradePort) {
                 marker = "neg";
             }
+
             return marker;
         };
+
         const circleScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale);
         const rMin = roundToThousands((this._circleSize / circleScale) * this._minRadiusFactor);
         const rMax = roundToThousands((this._circleSize / circleScale) * this._maxRadiusFactor);
@@ -707,6 +716,7 @@ export default class DisplayPorts {
         ) {
             return d.textAnchor;
         }
+
         return "middle";
     }
 
@@ -714,10 +724,10 @@ export default class DisplayPorts {
         if (this.zoomLevel === "initial") {
             this._gText.classed("d-none", true);
         } else {
-            const circleScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale),
-                circleSize = roundToThousands(this._circleSize / circleScale),
-                fontScale = 2 ** Math.log2((Math.abs(this._minScale) + this._scale) * 0.9),
-                fontSize = roundToThousands(this._fontSize / fontScale);
+            const circleScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale);
+            const circleSize = roundToThousands(this._circleSize / circleScale);
+            const fontScale = 2 ** Math.log2((Math.abs(this._minScale) + this._scale) * 0.9);
+            const fontSize = roundToThousands(this._fontSize / fontScale);
 
             this._gText
                 .selectAll("text")
@@ -733,8 +743,8 @@ export default class DisplayPorts {
 
     _updateSummary() {
         const numberPorts = Object.keys(this._portData).length;
-        let taxTotal = 0,
-            netTotal = 0;
+        let taxTotal = 0;
+        let netTotal = 0;
 
         if (numberPorts) {
             taxTotal = this._portData.map(d => d.taxIncome).reduce((a, b) => a + b);
@@ -747,9 +757,7 @@ export default class DisplayPorts {
     }
 
     _updateCounties() {
-        if (this.zoomLevel !== "portLabel") {
-            this._gCounty.classed("d-none", true);
-        } else {
+        if (this.zoomLevel === "portLabel") {
             const data = this._countyPolygonFiltered;
 
             this._gCounty
@@ -778,13 +786,13 @@ export default class DisplayPorts {
                 */
 
             this._gCounty.classed("d-none", false);
+        } else {
+            this._gCounty.classed("d-none", true);
         }
     }
 
     _updateRegions() {
-        if (this.zoomLevel !== "initial") {
-            this._gRegion.classed("d-none", true);
-        } else {
+        if (this.zoomLevel === "initial") {
             const data = this._regionPolygonFiltered;
 
             this._gRegion
@@ -812,6 +820,8 @@ export default class DisplayPorts {
                 .attr("fill", "#999");
                 */
             this._gRegion.classed("d-none", false);
+        } else {
+            this._gRegion.classed("d-none", true);
         }
     }
 
@@ -828,7 +838,9 @@ export default class DisplayPorts {
     }
 
     _filterVisible() {
-        if (this._showRadius !== "position") {
+        if (this._showRadius === "position") {
+            this._portDataFiltered = this._portData;
+        } else {
             this._portDataFiltered = this._portData.filter(
                 port =>
                     port.coordinates[0] >= this._lowerBound[0] &&
@@ -836,8 +848,6 @@ export default class DisplayPorts {
                     port.coordinates[1] >= this._lowerBound[1] &&
                     port.coordinates[1] <= this._upperBound[1]
             );
-        } else {
-            this._portDataFiltered = this._portData;
         }
 
         this._countyPolygonFiltered = this._countyPolygon.filter(
