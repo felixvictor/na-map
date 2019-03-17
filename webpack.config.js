@@ -18,6 +18,7 @@ const // { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer"),
     TerserPlugin = require("terser-webpack-plugin"),
     WebpackDeepScopeAnalysisPlugin = require("webpack-deep-scope-plugin").default,
     WebpackPwaManifest = require("webpack-pwa-manifest");
+const servers = require("./src/js/servers");
 const PACKAGE = require("./package.json");
 
 const gtagLink = "https://www.googletagmanager.com/gtag/js?id=UA-109520372-1";
@@ -195,6 +196,7 @@ const htmlOpt = {
     lang: "en-GB",
     meta: { viewport: "width=device-width, initial-scale=1, shrink-to-fit=no" },
     minify: htmlMinifyOpt,
+    servers: servers.servers,
     template: "index.template.ejs",
     title: PACKAGE.description
 };
@@ -269,7 +271,7 @@ const config = {
             reportFilename: path.resolve(__dirname, "report.html")
         }),
         */
-        new CleanWebpackPlugin(outputPath, {
+        new CleanWebpackPlugin({
             verbose: false
         }),
         new ExtractCssChunks({ filename: isProd ? "[name].[contenthash].css" : "[name].css", orderWarning: true }),
