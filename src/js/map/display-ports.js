@@ -457,6 +457,7 @@ export default class DisplayPorts {
 
     _showDetails(d, i, nodes) {
         const tooltipData = port => {
+            console.log(port, port.icon, this._nationIcons[port.icon].replace('"', "").replace('"', ""));
             let h = '<div class="d-flex align-items-baseline mb-1">';
             h += `<img alt="${port.icon}" class="flag-icon align-self-stretch" src="${this._nationIcons[port.icon]
                 .replace('"', "")
