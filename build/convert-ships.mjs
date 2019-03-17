@@ -1,8 +1,8 @@
 import { sortBy, readJson, roundToThousands, saveJson, speedConstA, speedConstB } from "./common.mjs";
 
-const inBaseFilename = process.argv[2],
-    outFilename = process.argv[3],
-    date = process.argv[4];
+const inBaseFilename = process.argv[2];
+const outFilename = process.argv[3];
+const date = process.argv[4];
 
 const APIItems = readJson(`${inBaseFilename}-ItemTemplates-${date}.json`);
 
@@ -14,8 +14,8 @@ String.prototype.replaceAll = function(search, replacement) {
 };
 
 function convertShips() {
-    const cannonWeight = [0, 42, 32, 24, 18, 12, 9, 0, 6, 4, 4, 2],
-        carroWeight = [0, 0, 68, 42, 32, 24, 0, 18, 12];
+    const cannonWeight = [0, 42, 32, 24, 18, 12, 9, 0, 6, 4, 4, 2];
+    const carroWeight = [0, 0, 68, 42, 32, 24, 0, 18, 12];
     const ships = [];
 
     APIItems.filter(item => item.ItemType === "Ship").forEach(ship => {
@@ -27,6 +27,7 @@ function convertShips() {
         for (let i = 1; i < (length - 1) * 2; i += 2) {
             speedDegrees.unshift(speedDegrees[i]);
         }
+
         // Dann letztes Element löschen
         speedDegrees.pop();
 
@@ -67,8 +68,8 @@ function convertShips() {
         // Delete mortar entry
         shipData.gunsPerDeck.pop();
         shipData.guns = 0;
-        let cannonBroadside = 0,
-            carronadesBroadside = 0;
+        let cannonBroadside = 0;
+        let carronadesBroadside = 0;
         let t = [0, 0];
         for (let i = 0; i < 4; i += 1) {
             if (shipData.deckClassLimit[i]) {
@@ -78,11 +79,13 @@ function convertShips() {
                 } else {
                     carronadesBroadside += (shipData.gunsPerDeck[i] * shipData.deckClassLimit[i][0]) / 2;
                 }
+
                 cannonBroadside += (shipData.gunsPerDeck[i] * shipData.deckClassLimit[i][0]) / 2;
             } else {
                 shipData.deckClassLimit.push(t);
             }
         }
+
         shipData.broadside = { cannons: cannonBroadside, carronades: carronadesBroadside };
 
         if (ship.FrontDecks) {
@@ -91,6 +94,7 @@ function convertShips() {
                 carroWeight[deck.Limitation2.Min]
             ])[0];
         }
+
         shipData.deckClassLimit.push(t);
         t = [0, 0];
         if (ship.BackDecks) {
@@ -99,6 +103,7 @@ function convertShips() {
                 carroWeight[deck.Limitation2.Min]
             ])[0];
         }
+
         shipData.deckClassLimit.push(t);
         ships.push(shipData);
     });
