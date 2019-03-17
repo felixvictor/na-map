@@ -88,8 +88,8 @@ export default class ListPortOwnerships {
     _injectModal() {
         insertBaseModal(this._modalId, this._baseName);
 
-        const select = `${this._baseId}-select`,
-            body = d3Select(`#${this._modalId} .modal-body`);
+        const select = `${this._baseId}-select`;
+        const body = d3Select(`#${this._modalId} .modal-body`);
 
         body.append("label")
             .append("select")
@@ -108,8 +108,8 @@ export default class ListPortOwnerships {
     }
 
     _setupSelect() {
-        const select$ = $(`#${this._baseId}-select`),
-            options = this._getOptions();
+        const select$ = $(`#${this._baseId}-select`);
+        const options = this._getOptions();
         select$.append(options);
     }
 
@@ -148,6 +148,7 @@ export default class ListPortOwnerships {
             emptyModal = true;
             this._initModal();
         }
+
         // Show modal
         $(`#${this._modalId}`)
             .on("shown.bs.modal", () => {
@@ -192,20 +193,20 @@ export default class ListPortOwnerships {
          */
         const xValue = d => new Date(d.date);
 
-        const width = this._getWidth(),
-            maxHeight = 1000,
-            // eslint-disable-next-line no-restricted-globals
-            height = Math.min(maxHeight, ListPortOwnerships.getHeight()),
-            margin = { top: 0, right: 32, bottom: 32, left: 32 };
+        const width = this._getWidth();
+        const maxHeight = 1000;
+        // eslint-disable-next-line no-restricted-globals
+        const height = Math.min(maxHeight, ListPortOwnerships.getHeight());
+        const margin = { right: 32, bottom: 32, left: 32 };
 
-        const keys = nations.filter(nation => nation.id !== 9).map(nation => nation.short),
-            nationData = this._nationData;
+        const keys = nations.filter(nation => nation.id !== 9).map(nation => nation.short);
+        const nationData = this._nationData;
         nationData.keys = keys;
 
         const stack = d3Stack()
-                .offset(d3StackOffsetNone)
-                .keys(nationData.keys),
-            stacked = stack(nationData);
+            .offset(d3StackOffsetNone)
+            .keys(nationData.keys);
+        const stacked = stack(nationData);
 
         /**
          * Set x axis
@@ -230,11 +231,11 @@ export default class ListPortOwnerships {
          */
         const getArea = () => {
             const xScale = d3ScaleLinear()
-                    .domain(d3Extent(nationData, d => xValue(d)))
-                    .range([margin.left, width - margin.right]),
-                yScale = d3ScaleLinear()
-                    .domain([d3Min(stacked[0], d => d[0]), d3Max(stacked[stacked.length - 1], d => d[1])])
-                    .range([height - margin.bottom, 0]);
+                .domain(d3Extent(nationData, d => xValue(d)))
+                .range([margin.left, width - margin.right]);
+            const yScale = d3ScaleLinear()
+                .domain([d3Min(stacked[0], d => d[0]), d3Max(stacked[stacked.length - 1], d => d[1])])
+                .range([height - margin.bottom, 0]);
 
             const area = d3Area()
                 .x(d => xScale(xValue(d.data)))
@@ -250,8 +251,8 @@ export default class ListPortOwnerships {
          * @return {void}
          */
         const render = () => {
-            const area = getArea(),
-                labelNames = new Map(nations.map(nation => [nation.short, nation.name]));
+            const area = getArea();
+            const labelNames = new Map(nations.map(nation => [nation.short, nation.name]));
             this._colourScale.domain(nationData.keys);
 
             // Paths

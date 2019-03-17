@@ -1,4 +1,14 @@
-// analytics.js
+/**
+ * This file is part of na-map.
+ *
+ * @file      Google analytics.
+ * @module    analytics
+ * @author    iB aka Felix Victor
+ * @copyright 2017, 2018
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
+/* eslint-disable camelcase */
 
 const GA_TRACKING_ID = "UA-109520372-1";
 window.dataLayer = window.dataLayer || [];
@@ -8,6 +18,7 @@ window.dataLayer = window.dataLayer || [];
  * @return {void}
  */
 function gtag() {
+    // eslint-disable-next-line prefer-rest-params
     window.dataLayer.push(arguments);
 }
 
@@ -50,12 +61,13 @@ export const initAnalytics = () => {
     gtag("config", GA_TRACKING_ID, {
         anonymize_ip: true
     });
-    window.onerror = (message, file, line, column) => {
+    window.addEventListener("error", (message, file, line, column) => {
         const link = href => {
             const a = window.document.createElement("a");
             a.href = href;
             return a;
         };
+
         const host = link(file).hostname;
         gtag("event", "click", {
             event_category: `${
@@ -64,5 +76,5 @@ export const initAnalytics = () => {
             value: `${file} LINE: ${line}${column ? ` COLUMN: ${column}` : ""}`.trim(),
             event_action: message
         });
-    };
+    });
 };

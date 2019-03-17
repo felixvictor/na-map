@@ -118,7 +118,7 @@
     <Pair>
       <Key>CANNON_BASIC_PENETRATION</Key>
       <Value xsi:type="FloatAttribute" Action="Relative" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>78</Value>
+        <Value>83</Value>
       </Value>
     </Pair>
     <Pair>
