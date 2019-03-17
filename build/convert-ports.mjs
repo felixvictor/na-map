@@ -18,9 +18,9 @@ import {
     // eslint-disable-next-line import/extensions
 } from "./common.mjs";
 
-const inBaseFilename = process.argv[2],
-    outFilename = process.argv[3],
-    date = process.argv[4];
+const inBaseFilename = process.argv[2];
+const outFilename = process.argv[3];
+const date = process.argv[4];
 
 const apiPorts = readJson(`${inBaseFilename}-Ports-${date}.json`);
 
@@ -34,7 +34,7 @@ String.prototype.replaceAll = function(search, replacement) {
 function convertPorts() {
     /**
      * Get ports
-     * @return {object}
+     * @return {object} Port data
      */
     const getPorts = () =>
         apiPorts.map(apiPort => {
@@ -57,7 +57,7 @@ function convertPorts() {
             ];
             const angle = Math.round(rotationAngleInDegrees(portPos, circleAPos));
             return {
-                id: +apiPort.Id,
+                id: Number(apiPort.Id),
                 name: apiPort.Name.replaceAll("'", "’"),
                 coordinates: portPos,
                 angle,
