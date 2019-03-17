@@ -2,7 +2,7 @@
     convert-recipes.mjs
  */
 
-import { readJson, saveJson, simpleSort, sortBy } from "./common.mjs";
+import { groupBy, readJson, saveJson, simpleSort, sortBy } from "./common.mjs";
 
 const inBaseFilename = process.argv[2],
     outFilename = process.argv[3],
@@ -17,83 +17,85 @@ String.prototype.replaceAll = function(search, replacement) {
     return target.replace(new RegExp(search, "g"), replacement);
 };
 
+const groups = new Map([
+    ["AdmiralityShips", "Admirality permits"],
+    ["AdmiraltyBooks", "Admirality books"],
+    ["AdmiraltyModules", "Admirality modules"],
+    ["AdmiraltyRecipes", "Admirality blueprints"],
+    ["AdmiraltyResourcesAndMaterials", "Admirality resources"],
+    ["AdmiraltyRewards", "PVP rewards"],
+    ["Cannons", "Repairs"],
+    ["Exchange", "Exchange"],
+    ["Manufacturing", "Manufacturing"],
+    ["WoodWorking", "Cannons"]
+]);
+
 function convertRecipes() {
-    const data = {},
-        recipes = new Map([
-            [1446, "Almeria Gunpowder Blueprint"],
-            [1447, "Almeria Superior Gunpowder Blueprint"],
-            [1442, "Art of Ship Handling Blueprint"],
-            [1443, "Book of Five Rings Blueprint"],
-            [1448, "Bovenwinds Refit Blueprint"],
-            [1449, "Bridgetown Frame Refit Blueprint"],
-            [1450, "British Gunners Blueprint"],
-            [1451, "British Gunnery Sergeant Blueprint"],
-            [1452, "British Rig Refit Blueprint"],
-            [1453, "Cartagena Caulking Refit Blueprint"],
-            [373, "Copper Plating Blueprint"],
-            [1454, "Crooked Hull Refit Blueprint"],
-            [1456, "Elite British Rig Refit Blueprint"],
-            [1457, "Elite French Rig Refit Blueprint"],
-            [1458, "Elite Pirate Rig Refit Blueprint"],
-            [1459, "Elite Spanish Rig Refit Blueprint"],
-            [1577, "French Gunners Blueprint"],
-            [1578, "French Gunnery Sergeant Blueprint"],
-            [1463, "French Rig Refit Blueprint"],
-            [1464, "Guacata Gunpowder Blueprint"],
-            [1465, "Guacata Superior Gunpowder Blueprint"],
-            [1444, "Gunnery Encyclopedia Blueprint"],
-            [1714, "Longleaf Pine Yards Blueprint"],
-            [1467, "Nassau Boarders Blueprint"],
-            [1468, "Nassau Fencing Masters Blueprint"],
-            [1469, "Northern Carpenters Blueprint"],
-            [1470, "Northern Master Carpenters Blueprint"],
-            [1471, "Pino Ocote Masts Blueprint"],
-            [1472, "Pirate Rig Refit Blueprint"],
-            [1473, "Spanish Rig Refit Blueprint"]
-        ]),
-        ingredientIds = new Map(),
-        ingredients = new Map(),
-        itemNames = new Map(),
-        moduleNames = new Map();
+    const data = {};
+    const ingredients = new Map();
+
     data.recipe = [];
     data.ingredient = [];
 
-    function getItemNames() {
-        APIItems.forEach(item => {
-            itemNames.set(item.Id, item.Name.replaceAll("'", "’"));
-        });
-    }
+    /**
+     * Get item names
+     * @return {Map<number, string>} Item names<id, name>
+     */
+    const getItemNames = () =>
+        new Map(APIItems.filter(item => !item.NotUsed).map(item => [item.Id, item.Name.replaceAll("'", "’")]));
 
-    function getModuleNames() {
-        APIItems.filter(item => item.ItemType === "ShipUpgradeBookItem").forEach(item => {
-            moduleNames.set(item.Id, itemNames.get(item.Upgrade));
-        });
-    }
+    const itemNames = getItemNames();
 
-    function getIngredients() {
-        APIItems.filter(
-            item => item.ItemType === "ShipUpgradeBookItem" || item.SortingGroup === "Resource.Trading"
-        ).forEach(item => {
-            ingredientIds.set(item.Id, item.Id);
-        });
-    }
+    const getModuleNames = () =>
+        new Map(
+            APIItems.filter(item => item.ItemType === "ShipUpgradeBookItem").map(item => [
+                item.Id,
+                itemNames.get(item.Upgrade)
+            ])
+        );
 
-    getItemNames();
-    getModuleNames();
-    getIngredients();
+    const moduleNames = getModuleNames();
 
-    APIItems.filter(APIrecipe => recipes.has(APIrecipe.Id)).forEach(APIrecipe => {
+    const getIngredients = () =>
+        new Map(
+            APIItems.filter(
+                item => item.ItemType === "ShipUpgradeBookItem" || item.SortingGroup === "Resource.Trading"
+            ).map(item => [item.Id, item.Id])
+        );
+
+    const ingredientIds = getIngredients();
+
+    const getUpgradeIds = () =>
+        new Map(APIItems.filter(item => !item.NotUsed && item.Upgrade).map(item => [item.Id, item.Upgrade]));
+
+    const upgradeIds = getUpgradeIds();
+
+    APIItems.filter(
+        APIrecipe =>
+            APIrecipe.ItemType === "Recipe" && !APIrecipe.NotUsed && itemNames.has(APIrecipe.Results[0].Template)
+    ).forEach(APIrecipe => {
         const recipe = {
             id: APIrecipe.Id,
-            name: APIrecipe.Name,
+            name: APIrecipe.Name.replace(" Blueprint", "")
+                .replace(" - ", " – ")
+                .replace("u2013", "–")
+                .replace(/ $/, ""),
             module: typeof APIrecipe.Results[0] !== "undefined" ? moduleNames.get(APIrecipe.Results[0].Template) : "",
-            laborPrice: APIrecipe.LaborPrice,
+            labourPrice: APIrecipe.LaborPrice,
             goldPrice: APIrecipe.GoldRequirements,
             itemRequirements: APIrecipe.FullRequirements.map(requirement => ({
                 name: itemNames.get(requirement.Template),
-                chance: requirement.Chance,
                 amount: requirement.Amount
-            }))
+            })),
+            result: {
+                id: upgradeIds.has(APIrecipe.Results[0].Template)
+                    ? upgradeIds.get(APIrecipe.Results[0].Template)
+                    : APIrecipe.Results[0].Template,
+                name: itemNames.get(APIrecipe.Results[0].Template),
+                amount: APIrecipe.Results[0].Amount
+            },
+            craftGroup: groups.has(APIrecipe.CraftGroup) ? groups.get(APIrecipe.CraftGroup) : APIrecipe.CraftGroup,
+            serverType: APIrecipe.ServerType
         };
         data.recipe.push(recipe);
         APIrecipe.FullRequirements.filter(APIingredient => ingredientIds.has(APIingredient.Template)).forEach(
@@ -107,7 +109,7 @@ function convertRecipes() {
                 } else {
                     const ingredient = {
                         id: APIingredient.Template,
-                        name: itemNames.get(APIingredient.Template),
+                        name: upgradeIds.get(APIingredient.Template),
                         recipe: [recipeName]
                     };
                     ingredients.set(APIingredient.Template, ingredient);
@@ -116,7 +118,7 @@ function convertRecipes() {
         );
     });
 
-    data.recipe.sort(sortBy(["name"]));
+    data.recipe.sort(sortBy(["craftGroup", "name"]));
 
     const result = Array.from(ingredients.values());
     data.ingredient = result.sort(sortBy(["name"]));
