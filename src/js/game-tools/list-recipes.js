@@ -153,8 +153,6 @@ export default class ListRecipes {
         let moduleType = "";
         let properties = "";
 
-        console.log("_getPropertiesText", currentRecipe);
-
         this._moduleData.forEach(type => {
             type[1]
                 .filter(module => module.id === currentRecipe.result.id)
@@ -189,8 +187,6 @@ export default class ListRecipes {
     _getText(selectedRecipeId) {
         const currentRecipe = this._getRecipeData(selectedRecipeId);
 
-        console.log("_getText", currentRecipe);
-
         let text = '<div class="row no-gutters card-deck">';
 
         text += '<div class="card col-6"><div class="card-header">Item</div>';
@@ -219,7 +215,7 @@ export default class ListRecipes {
                 .find(":selected")
                 .val()
         );
-        console.log("_recipeSelected", recipeId, this._getRecipeData(recipeId));
+
         // Remove old recipe list
         d3Select(`#${this._baseId} div`).remove();
 
