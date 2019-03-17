@@ -153,7 +153,10 @@ class Map {
          */
         this._doubleClickActionValues = ["compass", "f11"];
 
-        this._doubleClickActionCookie = new Cookie({ id: this._doubleClickActionId, values: this._doubleClickActionValues});
+        this._doubleClickActionCookie = new Cookie({
+            id: this._doubleClickActionId,
+            values: this._doubleClickActionValues
+        });
         this._doubleClickActionRadios = new RadioButton(this._doubleClickActionId, this._doubleClickActionValues);
 
         /**
@@ -177,7 +180,7 @@ class Map {
          */
         this._showGridValues = ["off", "on"];
 
-        this._showGridCookie = new Cookie({ id: this._showGridId, values: this._showGridValues});
+        this._showGridCookie = new Cookie({ id: this._showGridId, values: this._showGridValues });
         this._showGridRadios = new RadioButton(this._showGridId, this._showGridValues);
 
         /**
@@ -330,8 +333,8 @@ class Map {
     }
 
     _readData() {
-        const jsonData = [],
-            readData = {};
+        const jsonData = [];
+        const readData = {};
         this._dataSources.forEach((datum, i) => {
             jsonData[i] = fetch(`${this._dataDir}/${datum.fileName}`)
                 .then(checkFetchStatus)
@@ -439,36 +442,36 @@ class Map {
     _displayMap(transform) {
         // Based on d3-tile v0.0.3
         // https://github.com/d3/d3-tile/blob/0f8cc9f52564d4439845f651c5fab2fcc2fdef9e/src/tile.js
-        const { x: tx, y: ty, k: tk } = transform,
-            log2tileSize = Math.log2(this._tileSize),
-            maxTileZoom = Math.log2(this.coord.max) - log2tileSize,
-            maxCoordScaled = this.coord.max * tk,
-            x0 = 0,
-            y0 = 0,
-            x1 = this.width,
-            y1 = this.height,
-            width = Math.floor(maxCoordScaled < x1 ? x1 - 2 * tx : maxCoordScaled),
-            height = Math.floor(maxCoordScaled < y1 ? y1 - 2 * ty : maxCoordScaled),
-            scale = Math.log2(tk);
+        const { x: tx, y: ty, k: tk } = transform;
+        const log2tileSize = Math.log2(this._tileSize);
+        const maxTileZoom = Math.log2(this.coord.max) - log2tileSize;
+        const maxCoordScaled = this.coord.max * tk;
+        const x0 = 0;
+        const y0 = 0;
+        const x1 = this.width;
+        const y1 = this.height;
+        const width = Math.floor(maxCoordScaled < x1 ? x1 - 2 * tx : maxCoordScaled);
+        const height = Math.floor(maxCoordScaled < y1 ? y1 - 2 * ty : maxCoordScaled);
+        const scale = Math.log2(tk);
 
-        const tileZoom = Math.min(maxTileZoom, Math.ceil(Math.log2(Math.max(width, height))) - log2tileSize),
-            p = Math.round((tileZoom - scale - maxTileZoom) * 10) / 10,
-            k = this._wheelDelta ** p,
-            tileSizeScaled = this._tileSize * k;
+        const tileZoom = Math.min(maxTileZoom, Math.ceil(Math.log2(Math.max(width, height))) - log2tileSize);
+        const p = Math.round((tileZoom - scale - maxTileZoom) * 10) / 10;
+        const k = this._wheelDelta ** p;
+        const tileSizeScaled = this._tileSize * k;
 
         const // crop right side
-            dx = maxCoordScaled < x1 ? tx : 0,
-            // crop bottom
-            dy = maxCoordScaled < y1 ? ty : 0,
-            cols = d3Range(
-                Math.max(0, Math.floor((x0 - tx) / tileSizeScaled)),
-                Math.max(0, Math.min(Math.ceil((x1 - tx - dx) / tileSizeScaled), 2 ** tileZoom))
-            ),
-            rows = d3Range(
-                Math.max(0, Math.floor((y0 - ty) / tileSizeScaled)),
-                Math.max(0, Math.min(Math.ceil((y1 - ty - dy) / tileSizeScaled), 2 ** tileZoom))
-            ),
-            tiles = [];
+            dx = maxCoordScaled < x1 ? tx : 0;
+        // crop bottom
+        const dy = maxCoordScaled < y1 ? ty : 0;
+        const cols = d3Range(
+            Math.max(0, Math.floor((x0 - tx) / tileSizeScaled)),
+            Math.max(0, Math.min(Math.ceil((x1 - tx - dx) / tileSizeScaled), 2 ** tileZoom))
+        );
+        const rows = d3Range(
+            Math.max(0, Math.floor((y0 - ty) / tileSizeScaled)),
+            Math.max(0, Math.min(Math.ceil((y1 - ty - dy) / tileSizeScaled), 2 ** tileZoom))
+        );
+        const tiles = [];
 
         rows.forEach(row => {
             cols.forEach(col => {
@@ -537,16 +540,16 @@ class Map {
     }
 
     _doDoubleClickAction(self) {
-        const coord = d3Mouse(self),
-            transform = d3ZoomTransform(self);
-        const mx = coord[0],
-            my = coord[1],
-            tk = transform.k,
-            tx = transform.x,
-            ty = transform.y;
+        const coord = d3Mouse(self);
+        const transform = d3ZoomTransform(self);
+        const mx = coord[0];
+        const my = coord[1];
+        const tk = transform.k;
+        const tx = transform.x;
+        const ty = transform.y;
 
-        const x = (mx - tx) / tk,
-            y = (my - ty) / tk;
+        const x = (mx - tx) / tk;
+        const y = (my - ty) / tk;
 
         if (this._doubleClickAction === "f11") {
             this._f11.printCoord(x, y);
@@ -571,6 +574,7 @@ class Map {
             } else if (this.zoomLevel !== "initial") {
                 this.zoomLevel = "initial";
             }
+
             this._setFlexOverlayHeight();
             this._grid.update();
         }
@@ -678,8 +682,8 @@ class Map {
     }
 
     _getHeight() {
-        const { top } = this.getDimensions(),
-            fullHeight = document.documentElement.clientHeight - this.rem;
+        const { top } = this.getDimensions();
+        const fullHeight = document.documentElement.clientHeight - this.rem;
 
         return fullHeight - top;
     }
@@ -720,10 +724,10 @@ class Map {
     }
 
     goToPort() {
-        if (this._ports.currentPort.id !== "0") {
-            this.zoomAndPan(this._ports.currentPort.coord.x, this._ports.currentPort.coord.y, 2);
-        } else {
+        if (this._ports.currentPort.id === "0") {
             this.initialZoomAndPan();
+        } else {
+            this.zoomAndPan(this._ports.currentPort.coord.x, this._ports.currentPort.coord.y, 2);
         }
     }
 }

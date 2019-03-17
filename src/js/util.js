@@ -18,8 +18,8 @@ const formatLocale = d3FormatLocale({
     decimal: ".",
     thousands: "\u2009",
     grouping: [3],
-    currency: ["", "\u00a0reals"],
-    percent: "\u202f%"
+    currency: ["", "\u00A0reals"],
+    percent: "\u202F%"
 });
 
 /**
@@ -50,7 +50,7 @@ export const formatSignFloat = (x, s = 2) =>
     formatLocale
         .format(`+,.${s}~r`)(x)
         .replace("-", "\u2212\u202f")
-        .replace("+", "\uff0b\u202f");
+        .replace("+", "\uFF0B\u202F");
 
 /**
  * Format float
@@ -98,7 +98,7 @@ export const formatSignInt = x =>
     formatLocale
         .format("+,d")(x)
         .replace("-", "\u2212\u202f")
-        .replace("+", "\uff0b\u202f");
+        .replace("+", "\uFF0B\u202F");
 
 /**
  * Format integer with SI suffix
@@ -153,7 +153,7 @@ export const formatSignPercent = x =>
         .format("+.1%")(x)
         .replace(".0", "")
         .replace("-", "\u2212\u202f")
-        .replace("+", "\uff0b\u202f");
+        .replace("+", "\uFF0B\u202F");
 
 /**
  * Format ordinal
@@ -162,9 +162,9 @@ export const formatSignPercent = x =>
  * @return {String} Formatted Ordinal
  */
 export function getOrdinal(n, sup = true) {
-    const s = ["th", "st", "nd", "rd"],
-        v = n % 100,
-        text = s[(v - 20) % 10] || s[v] || s[0];
+    const s = ["th", "st", "nd", "rd"];
+    const v = n % 100;
+    const text = s[(v - 20) % 10] || s[v] || s[0];
     return n + (sup ? `<span class="super">${text}</span>` : `${text}`);
 }
 
@@ -258,7 +258,7 @@ export const displayCompass = (wind, svg = false) => {
     if (Number.isNaN(Number(wind))) {
         compass = wind;
     } else {
-        compass = degreesToCompass(+wind);
+        compass = degreesToCompass(Number(wind));
     }
 
     return `<${svg ? "tspan" : "span"} class="caps">${compass}</${svg ? "tspan" : "span"}>`;
@@ -278,7 +278,7 @@ export const displayCompassAndDegrees = (wind, svg = false) => {
         compass = wind;
         degrees = compassToDegrees(compass) % 360;
     } else {
-        degrees = +wind;
+        degrees = Number(wind);
         compass = degreesToCompass(degrees);
     }
 
@@ -297,8 +297,9 @@ export const getUserWind = sliderId => {
     if (Number.isNaN(Number(currentUserWind))) {
         windDegrees = compassToDegrees(currentUserWind);
     } else {
-        windDegrees = +currentUserWind;
+        windDegrees = Number(currentUserWind);
     }
+
     return windDegrees;
 };
 
@@ -312,8 +313,11 @@ export const getUserWind = sliderId => {
  * @return {Boolean} True if value is between a and b
  */
 export const between = (value, a, b, inclusive) => {
-    const min = Math.min.apply(Math, [a, b]),
-        max = Math.max.apply(Math, [a, b]);
+    // eslint-disable-next-line no-useless-call
+    const min = Math.min.apply(Math, [a, b]);
+    // eslint-disable-next-line no-useless-call
+    const max = Math.max.apply(Math, [a, b]);
+
     return inclusive ? value >= min && value <= max : value > min && value < max;
 };
 
@@ -354,6 +358,7 @@ export const rotationAngleInDegrees = (centerPt, targetPt) => {
     if (degrees < 0) {
         degrees += 360;
     }
+
     return degrees;
 };
 
@@ -385,6 +390,7 @@ export function checkFetchStatus(response) {
     if (response.status >= 200 && response.status < 300) {
         return Promise.resolve(response);
     }
+
     return Promise.reject(new Error(response.statusText));
 }
 
@@ -416,6 +422,8 @@ export const putFetchError = error => {
 
 /**
  * {@link https://stackoverflow.com/questions/1026069/how-do-i-make-the-first-letter-of-a-string-uppercase-in-javascript}
+ * @param {string} string - String
+ * @return {string} Uppercased string
  */
 export const capitalizeFirstLetter = string => string.charAt(0).toUpperCase() + string.slice(1);
 
@@ -431,10 +439,10 @@ export function chunkify(array, n, balanced = true) {
         return [array];
     }
 
-    const len = array.length,
-        out = [];
-    let i = 0,
-        size;
+    const len = array.length;
+    const out = [];
+    let i = 0;
+    let size;
 
     if (len % n === 0) {
         size = Math.floor(len / n);
@@ -454,9 +462,11 @@ export function chunkify(array, n, balanced = true) {
         if (len % size === 0) {
             size -= 1;
         }
+
         while (i < size * n) {
             out.push(array.slice(i, (i += size)));
         }
+
         out.push(array.slice(size * n));
     }
 
@@ -469,13 +479,11 @@ export function chunkify(array, n, balanced = true) {
  * @return {void}
  */
 export function printCompassRose({ elem, radius }) {
-    const steps = 24,
-        degreesPerStep = 360 / steps,
-        innerRadius = Math.round(radius * 0.8);
+    const steps = 24;
+    const degreesPerStep = 360 / steps;
+    const innerRadius = Math.round(radius * 0.8);
     const strokeWidth = 3;
-    const data = Array(steps)
-        .fill()
-        .map((e, i) => degreesToCompass(i * degreesPerStep));
+    const data = new Array(steps).fill().map((e, i) => degreesToCompass(i * degreesPerStep));
     const xScale = d3ScaleBand()
         .range([0 - degreesPerStep / 2, 360 - degreesPerStep / 2])
         .domain(data)
@@ -542,13 +550,11 @@ export function printCompassRose({ elem, radius }) {
  * @return {void}
  */
 export function printSmallCompassRose({ elem, radius }) {
-    const steps = 24,
-        degreesPerStep = 360 / steps,
-        innerRadius = Math.round(radius * 0.8);
+    const steps = 24;
+    const degreesPerStep = 360 / steps;
+    const innerRadius = Math.round(radius * 0.8);
     const strokeWidth = 1.5;
-    const data = Array(steps)
-        .fill()
-        .map((e, i) => degreesToCompass(i * degreesPerStep));
+    const data = new Array(steps).fill().map((e, i) => degreesToCompass(i * degreesPerStep));
     const xScale = d3ScaleBand()
         .range([0 - degreesPerStep / 2, 360 - degreesPerStep / 2])
         .domain(data)
@@ -567,6 +573,7 @@ export function printSmallCompassRose({ elem, radius }) {
         .join(enter =>
             enter
                 .append("line")
+                // eslint-disable-next-line no-negated-condition
                 .attr("x2", (d, i) => (i % 3 !== 0 ? x2 : i % 6 !== 0 ? x2InterCard : x2Card))
                 .attr(
                     "transform",
@@ -592,9 +599,11 @@ export const simpleSort = (a, b) => {
     if (a < b) {
         return -1;
     }
+
     if (a > b) {
         return 1;
     }
+
     return 0;
 };
 
@@ -614,11 +623,13 @@ export const sortBy = properties => (a, b) => {
         } else {
             desc = 1;
         }
+
         if (a[property] < b[property]) {
             r = -1 * desc;
         } else if (a[property] > b[property]) {
-            r = 1 * desc;
+            r = Number(desc);
         }
+
         return r !== 0;
     });
 
@@ -682,5 +693,6 @@ export const copyToClipboard = text => {
     if (!navigator.clipboard) {
         copyToClipboardFallback(text);
     }
+
     writeClipboard(text);
 };

@@ -1,4 +1,6 @@
 {
+    "root": true,
+    "parser": "babel-eslint",
     "parserOptions": {
         "ecmaVersion": 6,
         "sourceType": "module",
@@ -12,20 +14,46 @@
         "node": true,
         "jquery": true
     },
-    "parser": "babel-eslint",
+    "extends": [
+        "plugin:import/errors",
+        "plugin:import/warnings",
+        "plugin:prettier/recommended",
+        "plugin:unicorn/recommended",
+        "xo/esnext",
+        "xo/browser"
+    ],
     "plugins": ["prettier"],
-    "extends": ["airbnb-base", "plugin:prettier/recommended"],
     "rules": {
-        "brace-style": ["error", "1tbs"],
-        "camelcase": ["error"],
-        "curly": ["error", "all"],
-        "eqeqeq": ["error", "smart"],
-        "no-console": 0,
-        "no-underscore-dangle": "off",
-        "one-var": ["off"],
-        "prefer-template": ["error"],
+        "capitalized-comments": "off",
+        "indent": [
+            "error",
+            4,
+            {
+                "MemberExpression": "off",
+                "SwitchCase": 1
+            }
+        ],
+        "max-params": ["warn", 5],
+        "multiline-ternary": ["error", "always-multiline"],
+        "new-cap": "off",
+        "no-mixed-operators": "off",
+        "object-curly-spacing": ["error", "always"],
         "prettier/prettier": ["error", { "tabWidth": 4, "printWidth": 120 }],
-        "quotes": ["error", "double", { "avoidEscape": true }],
-        "valid-jsdoc": ["error"]
+        "prefer-destructuring": [
+            "error",
+            {
+                "object": true,
+                "array": false
+            }
+        ],
+        "operator-linebreak": ["error", "after", { "overrides": { "?": "before", ":": "before" } }],
+        "quotes": ["error", "double", { "allowTemplateLiterals": true, "avoidEscape": true }],
+        "space-before-function-paren": ["error", "never"],
+        "unicorn/explicit-length-check": "off",
+        "unicorn/filename-case": "off",
+        "unicorn/import-index": "off",
+        "unicorn/no-unused-properties": "error",
+        "unicorn/prefer-node-append": "off",
+        "unicorn/prefer-query-selector": "off"
     }
 }

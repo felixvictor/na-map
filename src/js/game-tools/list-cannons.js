@@ -58,26 +58,26 @@ export default class ListCannons {
     }
 
     _initTablesort() {
-        const cleanNumber = i => i.replace(/[^\-?0-9.]/g, ""),
-            compareNumber = (a, b) => {
-                let aa = parseFloat(a),
-                    bb = parseFloat(b);
+        const cleanNumber = i => i.replace(/[^\-?0-9.]/g, "");
+        const compareNumber = (a, b) => {
+            let aa = parseFloat(a);
+            let bb = parseFloat(b);
 
-                aa = Number.isNaN(aa) ? 0 : aa;
-                bb = Number.isNaN(bb) ? 0 : bb;
+            aa = Number.isNaN(aa) ? 0 : aa;
+            bb = Number.isNaN(bb) ? 0 : bb;
 
-                return aa - bb;
-            };
+            return aa - bb;
+        };
 
         Tablesort.extend(
             "number",
             item =>
-                item.match(/^[-+]?[£\x24Û¢´€]?\d+\s*([,.]\d{0,2})/) || // Prefixed currency
-                item.match(/^[-+]?\d+\s*([,.]\d{0,2})?[£\x24Û¢´€]/) || // Suffixed currency
+                item.match(/^[-+]?[£\u0024Û¢´€]?\d+\s*([,.]\d{0,2})/) || // Prefixed currency
+                item.match(/^[-+]?\d+\s*([,.]\d{0,2})?[£\u0024Û¢´€]/) || // Suffixed currency
                 item.match(/^[-+]?(\d)*-?([,.])?-?(\d)+([E,e][-+][\d]+)?%?$/), // Number
             (a, b) => {
-                const aa = cleanNumber(a),
-                    bb = cleanNumber(b);
+                const aa = cleanNumber(a);
+                const bb = cleanNumber(b);
 
                 return compareNumber(bb, aa);
             }
@@ -97,6 +97,7 @@ export default class ListCannons {
         if (!document.getElementById(this._modalId)) {
             this._initModal();
         }
+
         // Show modal
         $(`#${this._modalId}`).modal("show");
     }
@@ -109,8 +110,9 @@ export default class ListCannons {
      */
     _injectList(type) {
         $(`#${type}-list`).append(this._getList(type));
-        const table = document.getElementById(`table-${type}-list`),
-            sortTable = new Tablesort(table);
+        const table = document.getElementById(`table-${type}-list`);
+        // eslint-disable-next-line no-unused-vars
+        const sortTable = new Tablesort(table);
     }
 
     _getModifiers(type) {
@@ -123,7 +125,7 @@ export default class ListCannons {
                 });
             });
         });
-        return Array.from(modifiers).sort();
+        return [...modifiers].sort();
     }
 
     _getList(type) {
@@ -143,7 +145,7 @@ export default class ListCannons {
         text += "</tr></thead><tbody>";
 
         this._cannonData[type].forEach(cannon => {
-            const name = cannon.name.replace(" (", "<br>(").replaceAll(" ", "\u00a0");
+            const name = cannon.name.replace(" (", "<br>(").replaceAll(" ", "\u00A0");
             text += `<tr><td class="text-right" data-sort="${parseInt(cannon.name, 10)}">${name}</td>`;
             modifiers.forEach(modifier => {
                 this._groups.forEach(group => {
