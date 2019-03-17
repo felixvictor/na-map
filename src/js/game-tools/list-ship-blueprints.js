@@ -79,8 +79,8 @@ export default class ListShipBlueprints {
     }
 
     _setupShipSelect() {
-        const select$ = $(`#${this._baseId}-ship-select`),
-            options = this._getShipOptions();
+        const select$ = $(`#${this._baseId}-ship-select`);
+        const options = this._getShipOptions();
         select$.append(options);
     }
 
@@ -150,11 +150,8 @@ export default class ListShipBlueprints {
 
     _woodSelected(type, select$) {
         this._woodsSelected[type] = select$.val();
-        this._woodsSelected[type] += !(
-            this._woodsSelected[type] === "Bermuda Cedar" || this._woodsSelected[type] === "Crew Space"
-        )
-            ? " Log"
-            : "";
+        this._woodsSelected[type] +=
+            this._woodsSelected[type] === "Bermuda Cedar" || this._woodsSelected[type] === "Crew Space" ? "" : " Log";
         this._updateText();
     }
 
@@ -163,6 +160,7 @@ export default class ListShipBlueprints {
         if (!document.getElementById(this._modalId)) {
             this._initModal();
         }
+
         // Show modal
         $(`#${this._modalId}`).modal("show");
     }
@@ -266,6 +264,7 @@ export default class ListShipBlueprints {
         if (dataHead.length) {
             addHead();
         }
+
         addBody();
     }
 
@@ -279,10 +278,12 @@ export default class ListShipBlueprints {
         if (this._currentBlueprintData.doubloons) {
             extraData.push(["Doubloons", formatInt(this._currentBlueprintData.doubloons)]);
         }
+
         extraData.push(["Provisions", formatInt(this._currentBlueprintData.provisions)]);
         if (this._currentBlueprintData.permit) {
             extraData.push(["Permit", formatInt(this._currentBlueprintData.permit)]);
         }
+
         extraData.push(["Craft level", formatInt(this._currentBlueprintData.craftLevel)]);
         extraData.push(["Shipyard level", formatInt(this._currentBlueprintData.shipyardLevel)]);
         extraData.push(["Labour hours", formatInt(this._currentBlueprintData.labourHours)]);
@@ -302,7 +303,7 @@ export default class ListShipBlueprints {
         if (this._woodsSelected.trim === "Crew Space") {
             const hempAmount = this._currentBlueprintData.trims.find(trim => trim.name === "Crew Space").amount;
             const index = resourcesData.findIndex(resource => resource[0] === "Hemp");
-            resourcesData[index][1] = formatInt(+resourcesData[index][1] + hempAmount);
+            resourcesData[index][1] = formatInt(Number(resourcesData[index][1]) + hempAmount);
         } else {
             const trimAmount = this._currentBlueprintData.trims.find(trim => trim.name === "Planking").amount;
             // Frame and trim have same wood: add trim to frame
@@ -312,7 +313,7 @@ export default class ListShipBlueprints {
                 const index = resourcesData.findIndex(resource => resource[0] === this._woodsSelected.trim);
                 // Trim wood is already part of default resources (fir and oak log)
                 if (index >= 0) {
-                    resourcesData[index][1] = formatInt(+resourcesData[index][1] + frameAmount);
+                    resourcesData[index][1] = formatInt(Number(resourcesData[index][1]) + frameAmount);
                 } else {
                     // Trim is an additional resource
                     trimAdded = true;
@@ -326,7 +327,7 @@ export default class ListShipBlueprints {
         const index = resourcesData.findIndex(resource => resource[0] === this._woodsSelected.frame);
         if (index >= 0) {
             // Frame wood is already part of default resources (fir and oak log)
-            resourcesData[index][1] = formatInt(+resourcesData[index][1] + frameAmount);
+            resourcesData[index][1] = formatInt(Number(resourcesData[index][1]) + frameAmount);
         } else {
             // Frame is an additional resource
             frameAdded = true;
