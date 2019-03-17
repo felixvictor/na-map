@@ -48,9 +48,9 @@ import CompareWoods from "../game-tools/compare-woods";
  */
 export default class Journey {
     /**
-     * @param {Map} map - map instance
      * @param {object} shipData - Ship data
      * @param {object} woodData - Wood data
+     * @param {object} moduleData - Module data
      * @param {number} fontSize - Font size
      */
     constructor(shipData, woodData, moduleData, fontSize) {
@@ -100,11 +100,13 @@ export default class Journey {
             this._removeLabels();
             d3Select(nodes[i]).classed("drag-active", true);
         };
+
         const dragged = (d, i, nodes) => {
             // Set compass position
             if (i === 0) {
                 this._compass.attr("x", d.position[0] + d3Event.dx).attr("y", d.position[1] + d3Event.dy);
             }
+
             d3Select(nodes[i])
                 .attr("cx", d3Event.x)
                 .attr("cy", d3Event.y);
@@ -112,6 +114,7 @@ export default class Journey {
             d.position = [d.position[0] + d3Event.dx, d.position[1] + d3Event.dy];
             this._printLines();
         };
+
         const dragEnd = (d, i, nodes) => {
             d3Select(nodes[i]).classed("drag-active", false);
             //  this._journey.segment[i].position = [d.position[0] + d3Event.x, d.position[1] + d3Event.y];
@@ -189,6 +192,7 @@ export default class Journey {
             if (!this.tooltip.is(":visible")) {
                 $("body").append(this.tooltip);
             }
+
             const pos = _getTooltipPos.call(this);
             this.container.append(this.tooltip);
             return pos;
@@ -293,6 +297,7 @@ export default class Journey {
         if (!document.getElementById(this._modalId)) {
             this._initModal();
         }
+
         // Show modal
         $(`#${this._modalId}`)
             .modal("show")
@@ -302,8 +307,8 @@ export default class Journey {
     }
 
     _printCompass() {
-        const x = this._journey.segment[0].position[0],
-            y = this._journey.segment[0].position[1];
+        const x = this._journey.segment[0].position[0];
+        const y = this._journey.segment[0].position[1];
 
         this._compass = this._g
             .append("svg")
@@ -326,9 +331,9 @@ export default class Journey {
     }
 
     _calculateDistanceForSection(degreesCourse, degreesCurrentWind) {
-        const degreesForSpeedCalc = (fullCircle - degreesCourse + degreesCurrentWind) % fullCircle,
-            speedCurrentSection = this._getSpeedAtDegrees(degreesForSpeedCalc) * this._owSpeedFactor,
-            distanceCurrentSection = speedCurrentSection * speedFactor;
+        const degreesForSpeedCalc = (fullCircle - degreesCourse + degreesCurrentWind) % fullCircle;
+        const speedCurrentSection = this._getSpeedAtDegrees(degreesForSpeedCalc) * this._owSpeedFactor;
+        const distanceCurrentSection = speedCurrentSection * speedFactor;
         /*
         console.log(
             { degreesCourse },
@@ -343,13 +348,9 @@ export default class Journey {
 
     _getStartWind() {
         const currentUserWind = $(`#${this._sliderId}`).roundSlider("getValue");
-        let currentWindDegrees;
         // Current wind in degrees
-        if (!$(`#${this._sliderId}`).length) {
-            currentWindDegrees = 0;
-        } else {
-            currentWindDegrees = +currentUserWind;
-        }
+        const currentWindDegrees = $(`#${this._sliderId}`).length ? Number(currentUserWind) : 0;
+
         return currentWindDegrees;
     }
 
@@ -358,10 +359,11 @@ export default class Journey {
 
         if (this._journey.shipName === this._defaultShipName) {
             // Dummy ship speed
-            speedDegrees = Array.from(Array(24).fill(this._defaultShipSpeed / 2));
+            speedDegrees = [...new Array(24).fill(this._defaultShipSpeed / 2)];
         } else {
             ({ speedDegrees } = this._shipCompare._singleShipData);
         }
+
         this._speedScale.range(speedDegrees);
         // console.log(this._speedScale.range());
     }
@@ -375,9 +377,9 @@ export default class Journey {
      * @private
      */
     _calculateMinutesForSegment(courseDegrees, startWindDegrees, distanceSegment) {
-        let distanceRemaining = distanceSegment,
-            currentWindDegrees = startWindDegrees,
-            totalMinutesSegment = 0;
+        let distanceRemaining = distanceSegment;
+        let currentWindDegrees = startWindDegrees;
+        let totalMinutesSegment = 0;
 
         this._setShipSpeed();
         while (distanceRemaining > 0) {
@@ -389,10 +391,12 @@ export default class Journey {
                 totalMinutesSegment += distanceRemaining / distanceCurrentSection;
                 distanceRemaining = 0;
             }
+
             currentWindDegrees = (fullCircle + currentWindDegrees - this._degreesPerMinute) % fullCircle;
 
             // console.log({ distanceCurrentSection }, { totalMinutesSegment });
         }
+
         this._journey.currentWindDegrees = currentWindDegrees;
 
         return totalMinutesSegment;
@@ -426,15 +430,15 @@ export default class Journey {
     }
 
     _correctJourney() {
-        const defaultTranslate = 20,
-            currentTransform = d3ZoomTransform(d3Select("#na-svg").node()),
-            // Don't scale on higher zoom level
-            scale = Math.max(1, currentTransform.k),
-            fontSize = this._fontSize / scale,
-            textTransform = d3ZoomIdentity.translate(defaultTranslate / scale, defaultTranslate / scale),
-            textPadding = this._labelPadding / scale,
-            circleRadius = 10 / scale,
-            pathWidth = 5 / scale;
+        const defaultTranslate = 20;
+        const currentTransform = d3ZoomTransform(d3Select("#na-svg").node());
+        // Don't scale on higher zoom level
+        const scale = Math.max(1, currentTransform.k);
+        const fontSize = this._fontSize / scale;
+        const textTransform = d3ZoomIdentity.translate(defaultTranslate / scale, defaultTranslate / scale);
+        const textPadding = this._labelPadding / scale;
+        const circleRadius = 10 / scale;
+        const pathWidth = 5 / scale;
 
         /** Correct Text Box
          *  - split text into lines
@@ -449,10 +453,10 @@ export default class Journey {
          */
         const correctTextBox = (d, i, nodes) => {
             // Split text into lines
-            const node = d3Select(nodes[i]),
-                text = node.select("text"),
-                lines = d.label.split("|"),
-                lineHeight = fontSize * 1.3;
+            const node = d3Select(nodes[i]);
+            const text = node.select("text");
+            const lines = d.label.split("|");
+            const lineHeight = fontSize * 1.3;
 
             text.text("")
                 .attr("dy", 0)
@@ -466,9 +470,9 @@ export default class Journey {
             });
 
             // Correct box width
-            const bbText = text.node().getBBox(),
-                width = d.label ? bbText.width + textPadding * 2 : 0,
-                height = d.label ? bbText.height + textPadding : 0;
+            const bbText = text.node().getBBox();
+            const width = d.label ? bbText.width + textPadding * 2 : 0;
+            const height = d.label ? bbText.height + textPadding : 0;
             node.select("rect")
                 .attr("width", width)
                 .attr("height", height);
@@ -486,6 +490,7 @@ export default class Journey {
             if (i === 0) {
                 circle.attr("r", circleRadius * 4).attr("class", "drag-hidden");
             }
+
             // Hide last circle
             if (i === nodes.length - 1) {
                 circle.attr("r", circleRadius).attr("class", "drag-hidden");
@@ -498,6 +503,7 @@ export default class Journey {
         if (this._gJourneyPath) {
             this._gJourneyPath.style("stroke-width", `${pathWidth}px`);
         }
+
         if (this._compassG) {
             this._compassG.attr("transform", `scale(${1 / scale})`);
         }
@@ -513,9 +519,9 @@ export default class Journey {
         const textLabel = layoutTextLabel()
             .padding(this._labelPadding)
             .value(d => {
-                const lines = d.label.split("|"),
-                    // Find longest line (number of characters)
-                    index = lines.reduce((p, c, i, a) => (a[p].length > c.length ? p : i), 0);
+                const lines = d.label.split("|");
+                // Find longest line (number of characters)
+                const index = lines.reduce((p, c, i, a) => (a[p].length > c.length ? p : i), 0);
                 return lines[index];
             });
 
@@ -526,8 +532,8 @@ export default class Journey {
         const labels = layoutLabel(strategy)
             .size((d, i, nodes) => {
                 // measure the label and add the required padding
-                const numberLines = d.label.split("|").length,
-                    bbText = nodes[i].getElementsByTagName("text")[0].getBBox();
+                const numberLines = d.label.split("|").length;
+                const bbText = nodes[i].getElementsByTagName("text")[0].getBBox();
                 return [bbText.width + this._labelPadding * 2, bbText.height * numberLines + this._labelPadding * 2];
             })
             .position(d => d.position)
@@ -614,7 +620,7 @@ export default class Journey {
     _getTextDirection(courseCompass, courseDegrees, pt1) {
         return `${displayCompassAndDegrees(courseCompass, true)} \u2056 F11: ${formatF11(
             convertInvCoordX(pt1.x, pt1.y)
-        )}\u202f/\u202f${formatF11(convertInvCoordY(pt1.x, pt1.y))}`;
+        )}\u202F/\u202F${formatF11(convertInvCoordY(pt1.x, pt1.y))}`;
     }
 
     _getTextDistance(distanceK, minutes, addTotal) {
@@ -625,17 +631,18 @@ export default class Journey {
                 return `${num} ${word + (num === 1 ? "" : "s")}`;
             }
 
-            const durationHours = Math.floor(duration / 60),
-                durationMinutes = Math.round(duration % 60);
+            const durationHours = Math.floor(duration / 60);
+            const durationMinutes = Math.round(duration % 60);
 
             let s = "in ";
             if (duration < 1.0) {
                 s += "less than a minute";
             } else {
-                const hourString = durationHours !== 0 ? pluralize(durationHours, "hour") : "",
-                    minuteString = durationMinutes !== 0 ? pluralize(durationMinutes, "minute") : "";
-                s += hourString + (hourString !== "" ? " " : "") + minuteString;
+                const hourString = durationHours === 0 ? "" : pluralize(durationHours, "hour");
+                const minuteString = durationMinutes === 0 ? "" : pluralize(durationMinutes, "minute");
+                s += hourString + (hourString === "" ? "" : " ") + minuteString;
             }
+
             return s;
         }
 
@@ -646,16 +653,20 @@ export default class Journey {
                 this._journey.totalMinutes
             )}`;
         }
+
         return textDistance;
     }
 
     _setSegmentLabel(index = this._journey.segment.length - 1) {
-        const pt1 = { x: this._journey.segment[index].position[0], y: this._journey.segment[index].position[1] },
-            pt2 = { x: this._journey.segment[index - 1].position[0], y: this._journey.segment[index - 1].position[1] };
+        const pt1 = { x: this._journey.segment[index].position[0], y: this._journey.segment[index].position[1] };
+        const pt2 = {
+            x: this._journey.segment[index - 1].position[0],
+            y: this._journey.segment[index - 1].position[1]
+        };
 
-        const courseDegrees = rotationAngleInDegrees(pt1, pt2),
-            distanceK = getDistance(pt1, pt2),
-            courseCompass = degreesToCompass(courseDegrees);
+        const courseDegrees = rotationAngleInDegrees(pt1, pt2);
+        const distanceK = getDistance(pt1, pt2);
+        const courseCompass = degreesToCompass(courseDegrees);
 
         const minutes = this._calculateMinutesForSegment(
             courseDegrees,
@@ -665,8 +676,8 @@ export default class Journey {
         // console.log("*** start", this._journey.currentWindDegrees, { distanceK }, { courseCompass });
         this._journey.totalDistance += distanceK;
         this._journey.totalMinutes += minutes;
-        const textDirection = this._getTextDirection(courseCompass, courseDegrees, pt1),
-            textDistance = this._getTextDistance(distanceK, minutes, index > 1);
+        const textDirection = this._getTextDirection(courseCompass, courseDegrees, pt1);
+        const textDistance = this._getTextDistance(distanceK, minutes, index > 1);
 
         this._journey.segment[index].label = `${textDirection}|${textDistance}`;
         // console.log("*** end", this._journey);
@@ -719,12 +730,12 @@ export default class Journey {
     }
 
     plotCourse(x, y) {
-        if (!this._journey.segment[0].position[0]) {
-            this._journey.segment[0] = { position: [x, y], label: "" };
-            this._initJourney();
-        } else {
+        if (this._journey.segment[0].position[0]) {
             this._journey.segment.push({ position: [x, y], label: "" });
             this._printSegment();
+        } else {
+            this._journey.segment[0] = { position: [x, y], label: "" };
+            this._initJourney();
         }
     }
 

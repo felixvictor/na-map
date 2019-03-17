@@ -4,18 +4,18 @@
 
 import { convertCoordX, convertCoordY, readJson, saveJson } from "./common.mjs";
 
-const infileBaseName = process.argv[2],
-    outDir = process.argv[3],
-    date = process.argv[4];
+const infileBaseName = process.argv[2];
+const outDir = process.argv[3];
+const date = process.argv[4];
 
 const APIPorts = readJson(`${infileBaseName}-Ports-${date}.json`);
 
 function convertPBZones() {
-    let ports = [],
-        pbCircles = [],
-        pbForts = [],
-        pbTowers = [],
-        pbJoinCircles = [];
+    let ports = [];
+    let pbCircles = [];
+    let pbForts = [];
+    let pbTowers = [];
+    let pbJoinCircles = [];
 
     function setPBCircles(port) {
         port.PortBattleZonePositions.forEach(pbCircle => {
@@ -47,13 +47,13 @@ function convertPBZones() {
     }
 
     function setJoinCircles(port) {
-        const x0 = convertCoordX(port.Position.x, port.Position.z),
-            y0 = convertCoordY(port.Position.x, port.Position.z),
-            distance = 5,
-            degrees = 180 - port.Rotation,
-            radians = (degrees * Math.PI) / 180,
-            x1 = Math.round(x0 + distance * Math.sin(radians)),
-            y1 = Math.round(y0 + distance * Math.cos(radians));
+        const x0 = convertCoordX(port.Position.x, port.Position.z);
+        const y0 = convertCoordY(port.Position.x, port.Position.z);
+        const distance = 5;
+        const degrees = 180 - port.Rotation;
+        const radians = (degrees * Math.PI) / 180;
+        const x1 = Math.round(x0 + distance * Math.sin(radians));
+        const y1 = Math.round(y0 + distance * Math.cos(radians));
 
         pbJoinCircles.push([x1, y1]);
     }
@@ -67,7 +67,7 @@ function convertPBZones() {
             ports.forEach(port => {
                 const feature = {
                     type: "Feature",
-                    id: +port.id,
+                    id: Number(port.id),
                     properties: { position: port.position },
                     geometry: {
                         type: "MultiPoint",
