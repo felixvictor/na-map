@@ -24,7 +24,7 @@ export default class ListRecipes {
         this._moduleData = moduleData;
         this._serverType = servers.find(server => server.id === serverId).type;
 
-        this._baseName = "List recipes";
+        this._baseName = "List admiralty items and recipes";
         this._baseId = "recipe-list";
         this._buttonId = `button-${this._baseId}`;
         this._modalId = `modal-${this._baseId}`;
@@ -45,10 +45,14 @@ export default class ListRecipes {
 
         const id = `${this._baseId}-select`,
             body = d3Select(`#${this._modalId} .modal-body`);
-        body.append("label").attr("for", id);
         body.append("select")
             .attr("name", id)
             .attr("id", id);
+        body.append("label")
+            .attr("for", id)
+            .attr("class","text-muted pl-2")
+            .text("Items listed here may not be available in the game (yet).");
+
         body.append("div")
             .attr("id", `${this._baseId}`)
             .attr("class", "container-fluid");
@@ -87,9 +91,14 @@ export default class ListRecipes {
         select$
             .addClass("selectpicker")
             .on("change", event => this._recipeSelected(event))
-            .selectpicker({ noneSelectedText: "Select recipe" })
-            .val("default")
-            .selectpicker("refresh");
+            .selectpicker({
+                dropupAuto: false,
+                liveSearch: true,
+                liveSearchNormalize: true,
+                liveSearchPlaceholder: "Search ...",
+                title: "Select item",
+                virtualScroll: true
+            });
     }
 
     _initModal() {
@@ -158,7 +167,6 @@ export default class ListRecipes {
                 });
         });
         if (properties) {
-            text += '<h5 class="card-title">Properties</h5>';
             text += `<h6 class="card-subtitle mb-2 text-muted">${moduleType}</h6>`;
             text += `<table class="table table-sm card-table"><tbody>${properties}</tbody></table>`;
         } else {
@@ -181,8 +189,8 @@ export default class ListRecipes {
 
         let text = '<div class="row no-gutters card-deck">';
 
-        text += '<div class="card col-6"><div class="card-header">Recipe</div>';
-        text += '<div class="card-body"><h5 class="card-title">Requirements</h5>';
+        text += '<div class="card col-6"><div class="card-header">Item</div>';
+        text += '<div class="card-body">';
         text += this._getRequirementText(currentRecipe);
         text += "</div></div>";
 
