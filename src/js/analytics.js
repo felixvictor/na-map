@@ -1,3 +1,4 @@
+/* eslint-disable prefer-rest-params */
 /**
  * This file is part of na-map.
  *
@@ -8,73 +9,99 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-/* eslint-disable camelcase */
+/* global ga */
+
+import { appName, appVersion } from "./common";
 
 const GA_TRACKING_ID = "UA-109520372-1";
-window.dataLayer = window.dataLayer || [];
+window.ga = function() {
+    ga.q.push(arguments);
+};
 
-/**
- * Google tag manager
- * @return {void}
- */
-function gtag() {
-    // eslint-disable-next-line prefer-rest-params
-    window.dataLayer.push(arguments);
-}
+ga.q = [];
 
 /**
  * Register event
  * @param {string} category Event category
  * @param {string} label Event label
+ * @param {string} value Event value
  * @return {void}
  */
-export const registerEvent = (category, label) => {
-    if (typeof window.google_tag_manager !== "undefined" && window.google_tag_manager.dataLayer.gtmLoad) {
-        gtag("event", "click", {
-            event_category: category,
-            event_label: label
-        });
-    }
+export const registerEvent = (category, label, value = 1) => {
+    ga("send", {
+        hitType: "event",
+        eventCategory: category,
+        eventLabel: label,
+        eventValue: value
+    });
 };
 
 /**
  * Register page
  * @param {string} title Page title
- * @param {string} path The path portion of location. This value must start with a slash (/) character.
  * @return {void}
  */
-export const registerPage = (title, path) => {
-    if (typeof window.google_tag_manager !== "undefined" && window.google_tag_manager.dataLayer.gtmLoad) {
-        gtag("config", GA_TRACKING_ID, {
-            page_title: title,
-            page_path: path
-        });
-    }
+export const registerPage = title => {
+    ga("send", {
+        hitType: "pageview",
+        title
+    });
 };
 
 /**
  * Init google tag manager
+ * {@link https://stackoverflow.com/a/29552301}
  * @return {void}
  */
 export const initAnalytics = () => {
-    gtag("js", new Date());
-    gtag("config", GA_TRACKING_ID, {
-        anonymize_ip: true
-    });
-    window.addEventListener("error", (message, file, line, column) => {
-        const link = href => {
-            const a = window.document.createElement("a");
-            a.href = href;
-            return a;
-        };
+    const originalWindowErrorCallback = window.onerror;
 
-        const host = link(file).hostname;
-        gtag("event", "click", {
-            event_category: `${
-                host === window.location.hostname || host === undefined || host === "" ? "" : "external "
-            }error`,
-            value: `${file} LINE: ${line}${column ? ` COLUMN: ${column}` : ""}`.trim(),
-            event_action: message
-        });
+    ga.l = Number(new Date());
+    ga("create", GA_TRACKING_ID, "auto");
+    ga("set", "anonymizeIp", true);
+    ga("set", "transport", "beacon");
+    ga("send", "pageview");
+
+    /**
+     * Log any script error to Google Analytics.
+     *
+     * Third-party scripts without CORS will only provide "Script Error." as an error message.
+     *
+     * @param  {String}           errorMessage Error message.
+     * @param  {String}           url          URL where error was raised.
+     * @param  {Number}           lineNumber   Line number where error was raised.
+     * @param  {Number|undefined} columnNumber Column number for the line where the error occurred.
+     * @param  {Object|undefined} errorObject  Error Object.
+     * @return {Boolean}                       When the function returns true, this prevents the
+     *                                         firing of the default event handler.
+     */
+    window.addEventListener("error", (errorMessage, url, lineNumber, columnNumber, errorObject) => {
+        // Send error details to Google Analytics, if the library is already available:
+        if (typeof ga === "function") {
+            // In case the "errorObject" is available, use its data, else fallback
+            // on the default "errorMessage" provided:
+            let exceptionDescription = errorMessage;
+            if (typeof errorObject !== "undefined" && typeof errorObject.message !== "undefined") {
+                exceptionDescription = errorObject.message;
+            }
+
+            // Format the message to log to Analytics (might also use "errorObject.stack" if defined):
+            exceptionDescription += " @ " + url + ":" + lineNumber + ":" + columnNumber;
+
+            ga("send", "exception", {
+                exDescription: exceptionDescription,
+                exFatal: false, // Some Error types might be considered as fatal.
+                appName,
+                appVersion
+            });
+        }
+
+        // If the previous "window.onerror" callback can be called, pass it the data:
+        if (typeof originalWindowErrorCallback === "function") {
+            return originalWindowErrorCallback(errorMessage, url, lineNumber, columnNumber, errorObject);
+        }
+
+        // Otherwise, Let the default handler run:
+        return false;
     });
 };
