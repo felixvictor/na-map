@@ -21,7 +21,6 @@ const // { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer"),
 const servers = require("./src/js/servers");
 const PACKAGE = require("./package.json");
 
-const gtagLink = "https://www.googletagmanager.com/gtag/js?id=UA-109520372-1";
 const libraryName = PACKAGE.name;
 const { TARGET } = process.env;
 const target = `https://${TARGET}.netlify.com/`;
@@ -190,7 +189,6 @@ const htmlOpt = {
     canonicalUrl: TARGET === "na-map" ? target : "",
     name: libraryName,
     description,
-    gtag: gtagLink,
     hash: false,
     inject: "body",
     lang: "en-GB",
