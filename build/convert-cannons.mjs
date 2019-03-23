@@ -12,7 +12,7 @@
 import * as fs from "fs";
 import xml2Json from "xml2json";
 
-import { readTextFile, saveJson } from "./common.mjs";
+import { readTextFile, roundToThousands, saveJson } from "./common.mjs";
 
 const inDir = process.argv[2];
 const filename = process.argv[3];
@@ -140,15 +140,18 @@ function convertCannons() {
         // console.log(fileData.ModuleTemplate);
         dataMapping.forEach(({ group, element }, value) => {
             fileData.ModuleTemplate.Attributes.Pair.filter(pair => value === pair.Key).forEach(pair => {
-                if (typeof cannon[group] === "undefined") {
+                if (!cannon[group]) {
                     // eslint-disable-next-line no-param-reassign
                     cannon[group] = {};
                 }
 
-                cannon[group][element] = pair.Value.Value;
+                cannon[group][element] = Number(pair.Value.Value);
             });
         });
-        cannons[type].push(cannon);
+        cannon.damage["per second"] = roundToThousands(cannon.damage.basic / cannon.generic["reload time"]);
+        cannons[type].push(Object.keys(cannon)
+            .sort()
+            .reduce((r, k) => ((r[k] = cannon[k]), r), {}));
     }
 
     /**

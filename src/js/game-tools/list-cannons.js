@@ -12,7 +12,7 @@ import { select as d3Select } from "d3-selection";
 // eslint-disable-next-line import/no-named-default
 import { default as Tablesort } from "tablesort";
 import { insertBaseModal } from "../common";
-import { capitalizeFirstLetter, formatFloatFixed } from "../util";
+import { capitalizeFirstLetter, formatFloatFixed, formatInt } from "../util";
 import { registerEvent } from "../analytics";
 
 // https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
@@ -33,7 +33,16 @@ export default class ListCannons {
         this._baseId = "cannon-list";
         this._buttonId = `button-${this._baseId}`;
         this._modalId = `modal-${this._baseId}`;
-        this._groups = ["damage", "dispersion", "generic", "crew"];
+        this._groups = new Map();
+        this._cannonData.long.forEach(group => {
+            for (const [key, value] of Object.entries(group)) {
+                if (key !== "name") {
+                    this._groups.set(key, { values: value, count: Object.entries(value).length });
+                }
+            }
+        });
+        this._groups = new Map([...this._groups.entries()].sort());
+
         this._setupListener();
     }
 
@@ -115,48 +124,37 @@ export default class ListCannons {
         const sortTable = new Tablesort(table);
     }
 
-    _getModifiers(type) {
-        const modifiers = new Set();
-
-        this._cannonData[type].forEach(cannon => {
-            this._groups.forEach(group => {
-                Object.entries(cannon[group]).forEach(([key]) => {
-                    modifiers.add(`${group} ${key}`);
-                });
-            });
-        });
-        return [...modifiers].sort();
-    }
-
     _getList(type) {
-        const modifiers = this._getModifiers(type);
         let text = "";
 
-        text += `<table id="table-${type}-list" class="table table-sm small tablesort"><thead><tr><th data-sort-default>Pounds</th>`;
-        modifiers.forEach(modifier => {
-            const name = capitalizeFirstLetter(
-                modifier
-                    .replace("generic ", "")
-                    .replace("damage basic", "damage")
-                    .replace("damage penetration", "penetration")
-            );
-            text += `<th>${name}</th>`;
+        text += `<table id="table-${type}-list" class="table table-sm small tablesort">`;
+        text += '<thead><tr><th scope="col"></th>';
+        this._groups.forEach((groupValue, groupKey) => {
+            text += `<th scope="col" class="text-center" colspan="${groupValue.count}">${capitalizeFirstLetter(
+                groupKey
+            )}</th>`;
+        });
+        text += "</tr>";
+        text += '<tr><th scope="col" class="text-right" data-sort-default>Pd</th>';
+        this._groups.forEach(groupValue => {
+            Object.entries(groupValue.values).forEach(modifierValue => {
+                text += `<th class="text-right">${capitalizeFirstLetter(modifierValue[0])}</th>`;
+            });
         });
         text += "</tr></thead><tbody>";
 
         this._cannonData[type].forEach(cannon => {
             const name = cannon.name.replace(" (", "<br>(").replaceAll(" ", "\u00A0");
-            text += `<tr><td class="text-right" data-sort="${parseInt(cannon.name, 10)}">${name}</td>`;
-            modifiers.forEach(modifier => {
-                this._groups.forEach(group => {
-                    Object.entries(cannon[group]).forEach(([key, value]) => {
-                        if (`${group} ${key}` === modifier) {
-                            text += `<td class="text-right" data-sort="${value || 0}">${
-                                value ? formatFloatFixed(value) : ""
-                            }</td>`;
-                        }
+            text += `<tr><th scope="row" class="text-right" data-sort="${parseInt(cannon.name, 10)}">${name}</th>`;
+
+            Object.entries(cannon).forEach((groupValue, groupKey) => {
+                if (groupValue[0] !== "name") {
+                    Object.entries(groupValue[1]).forEach(modifierValue => {
+                        text += `<td class="text-right" data-sort="${modifierValue[1] || 0}">${
+                            modifierValue[1] ? formatFloatFixed(modifierValue[1]) : ""
+                        }</td>`;
                     });
-                });
+                }
             });
             text += "</tr>";
         });
