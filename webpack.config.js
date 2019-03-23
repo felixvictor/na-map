@@ -8,16 +8,16 @@ const path = require("path");
 const sass = require("node-sass");
 const parseCss = require("css");
 const // { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer"),
-    CleanWebpackPlugin = require("clean-webpack-plugin"),
-    CopyPlugin = require("copy-webpack-plugin"),
-    HtmlPlugin = require("html-webpack-plugin"),
-    ExtractCssChunks = require("extract-css-chunks-webpack-plugin"),
-    PreloadWebpackPlugin = require("preload-webpack-plugin"),
-    SitemapPlugin = require("sitemap-webpack-plugin").default,
-    // SriPlugin = require("webpack-subresource-integrity"),
-    TerserPlugin = require("terser-webpack-plugin"),
-    WebpackDeepScopeAnalysisPlugin = require("webpack-deep-scope-plugin").default,
-    WebpackPwaManifest = require("webpack-pwa-manifest");
+    CleanWebpackPlugin = require("clean-webpack-plugin");
+const CopyPlugin = require("copy-webpack-plugin");
+const HtmlPlugin = require("html-webpack-plugin");
+const ExtractCssChunks = require("extract-css-chunks-webpack-plugin");
+const PreloadWebpackPlugin = require("preload-webpack-plugin");
+const SitemapPlugin = require("sitemap-webpack-plugin").default;
+// SriPlugin = require("webpack-subresource-integrity"),
+const TerserPlugin = require("terser-webpack-plugin");
+const WebpackDeepScopeAnalysisPlugin = require("webpack-deep-scope-plugin").default;
+const WebpackPwaManifest = require("webpack-pwa-manifest");
 const servers = require("./src/js/servers");
 const PACKAGE = require("./package.json");
 
@@ -74,6 +74,7 @@ const babelOpt = {
             "@babel/preset-env",
             {
                 // debug: true,
+                corejs: 3,
                 loose: true,
                 modules: false,
                 shippedProposals: true,
