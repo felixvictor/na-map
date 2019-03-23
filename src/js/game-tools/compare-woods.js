@@ -74,7 +74,7 @@ class WoodBase extends Wood {
         wood.properties.forEach((value, key) => {
             text += `<tr><td>${key}</td><td>${
                 value.isPercentage ? formatPercent(value.amount / 100) : formatFloat(value.amount)
-                }`;
+            }`;
             text += '<span class="rate">';
             if (value.amount > 0) {
                 const right = (value.amount / this._woodCompare._minMaxProperty.get(key).max) * middle;
@@ -224,10 +224,10 @@ class WoodComparison extends Wood {
                 text += `<span class="bar neutral" style="width:${middle}%;"></span>`;
                 text += `<span class="bar pos diff" style="width:${(base /
                     this._woodCompare._minMaxProperty.get(key).max) *
-                middle}%;"></span>`;
+                    middle}%;"></span>`;
                 text += `<span class="bar ${diffColour}" style="width:${(diff /
                     this._woodCompare._minMaxProperty.get(key).max) *
-                middle}%;"></span>`;
+                    middle}%;"></span>`;
             } else if (value.compare < 0) {
                 if (value.base < 0) {
                     if (value.compare >= value.base) {
@@ -250,13 +250,13 @@ class WoodComparison extends Wood {
                 }
 
                 text += `<span class="bar neutral" style="width:${middle +
-                (neutral / this._woodCompare._minMaxProperty.get(key).min) * middle}%;"></span>`;
+                    (neutral / this._woodCompare._minMaxProperty.get(key).min) * middle}%;"></span>`;
                 text += `<span class="bar ${diffColour}" style="width:${(diff /
                     this._woodCompare._minMaxProperty.get(key).min) *
-                middle}%;"></span>`;
+                    middle}%;"></span>`;
                 text += `<span class="bar neg diff" style="width:${(base /
                     this._woodCompare._minMaxProperty.get(key).min) *
-                middle}%;"></span>`;
+                    middle}%;"></span>`;
             } else {
                 text += '<span class="bar neutral"></span>';
             }
@@ -301,22 +301,24 @@ export default class CompareWoods {
         this._buttonId = `button-${this._baseId}`;
         this._modalId = `modal-${this._baseId}`;
 
+        const findWoodId = (type, woodName) => this._woodData[type].find(wood => wood.name === woodName).id;
+
         if (this._baseFunction === "wood") {
             this._defaultWood = {
-                frame: 45, // Fir
-                trim: 333 // Crew Space
+                frame: findWoodId("frame", "Fir"),
+                trim: findWoodId("trim", "Crew Space")
             };
             this._columnsCompare = ["C1", "C2", "C3"];
         } else if (this._baseFunction === "wood-journey") {
             this._defaultWood = {
-                frame: 47, // Oak
-                trim: 1328 // Oak
+                frame: findWoodId("frame", "Oak"),
+                trim: findWoodId("trim", "Oak")
             };
             this._columnsCompare = [];
         } else {
             this._defaultWood = {
-                frame: 47, // Oak
-                trim: 1328 // Oak
+                frame: findWoodId("frame", "Oak"),
+                trim: findWoodId("trim", "Oak")
             };
             this._columnsCompare = ["C1", "C2"];
         }
