@@ -46,7 +46,7 @@ class WoodBase extends Wood {
         let amount = 0;
         let isPercentage = false;
 
-        if (typeof property !== "undefined" && typeof property.amount !== "undefined") {
+        if (property && property.amount) {
             // eslint-disable-next-line prefer-destructuring
             amount = property.amount;
             // eslint-disable-next-line prefer-destructuring
@@ -139,7 +139,7 @@ class WoodComparison extends Wood {
         let amount = 0;
         let isPercentage = false;
 
-        if (typeof property !== "undefined" && typeof property.amount !== "undefined") {
+        if (property && property.amount) {
             // eslint-disable-next-line prefer-destructuring
             amount = property.amount;
             // eslint-disable-next-line prefer-destructuring
@@ -164,7 +164,7 @@ class WoodComparison extends Wood {
         let amount = 0;
         let isPercentage = false;
 
-        if (typeof property !== "undefined" && typeof property.amount !== "undefined") {
+        if (property && property.amount) {
             // eslint-disable-next-line prefer-destructuring
             amount = property.amount;
             // eslint-disable-next-line prefer-destructuring
@@ -301,22 +301,24 @@ export default class CompareWoods {
         this._buttonId = `button-${this._baseId}`;
         this._modalId = `modal-${this._baseId}`;
 
+        const findWoodId = (type, woodName) => this._woodData[type].find(wood => wood.name === woodName).id;
+
         if (this._baseFunction === "wood") {
             this._defaultWood = {
-                frame: 45, // Fir
-                trim: 332 // Crew Space
+                frame: findWoodId("frame", "Fir"),
+                trim: findWoodId("trim", "Crew Space")
             };
             this._columnsCompare = ["C1", "C2", "C3"];
         } else if (this._baseFunction === "wood-journey") {
             this._defaultWood = {
-                frame: 47, // Oak
-                trim: 1328 // Oak
+                frame: findWoodId("frame", "Oak"),
+                trim: findWoodId("trim", "Oak")
             };
             this._columnsCompare = [];
         } else {
             this._defaultWood = {
-                frame: 47, // Oak
-                trim: 1328 // Oak
+                frame: findWoodId("frame", "Oak"),
+                trim: findWoodId("trim", "Oak")
             };
             this._columnsCompare = ["C1", "C2"];
         }
@@ -431,7 +433,7 @@ export default class CompareWoods {
     }
 
     _setWoodsSelected(compareId, type, woodId) {
-        if (typeof this._woodsSelected[compareId] === "undefined") {
+        if (!this._woodsSelected[compareId]) {
             this._woodsSelected[compareId] = {};
         }
 
@@ -446,13 +448,14 @@ export default class CompareWoods {
         }
     }
 
-    _setOtherSelect(id, type) {
+    _setOtherSelect(columnId, type) {
         const otherType = type === "frame" ? "trim" : "frame";
 
-        if (this._woodsSelected[id][otherType] === this._defaultWood[otherType]) {
-            $(`#${this._baseFunction}-${otherType}-${id}-select`)
-                .val(this._defaultWood[otherType])
-                .selectpicker("refresh");
+        if (this._woodsSelected[columnId][otherType] === this._defaultWood[otherType]) {
+            $(`#${this._baseFunction}-${otherType}-${columnId}-select`).selectpicker(
+                "val",
+                this._defaultWood[otherType]
+            );
         }
     }
 
@@ -473,17 +476,17 @@ export default class CompareWoods {
         if (compareId === "Base") {
             this._addInstance(compareId, new WoodBase("Base", this._getWoodData("Base"), this));
 
-            this._columnsCompare.forEach(id => {
+            this._columnsCompare.forEach(columnId => {
                 // For wood-compare: add instances with enabling selects
                 // For ship-compare: add instances without enabling selects
                 if (this._baseFunction === "wood") {
-                    this.enableSelects(id);
+                    this.enableSelects(columnId);
                 }
 
-                if (typeof this._instances[id] !== "undefined") {
+                if (this._instances[columnId]) {
                     this._addInstance(
-                        id,
-                        new WoodComparison(id, this._getWoodData("Base"), this._getWoodData(id), this)
+                        columnId,
+                        new WoodComparison(columnId, this._getWoodData("Base"), this._getWoodData(columnId), this)
                     );
                 }
             });
@@ -501,8 +504,8 @@ export default class CompareWoods {
             .selectpicker({ title: `Select ${type}` });
     }
 
-    _getWoodTypeData(type, id) {
-        return this._woodData[type].find(wood => wood.id === id);
+    _getWoodTypeData(type, woodId) {
+        return this._woodData[type].find(wood => wood.id === woodId);
     }
 
     _getWoodData(id) {
