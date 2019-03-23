@@ -14,7 +14,7 @@ import "bootstrap/js/dist/modal";
 import "bootstrap/js/dist/toast";
 import "bootstrap/js/dist/tooltip";
 
-import fontawesome from "@fortawesome/fontawesome";
+import { library as faLibrary } from "@fortawesome/fontawesome";
 import { faCalendar, faCalendarCheck, faClock, faCopy } from "@fortawesome/fontawesome-free-regular";
 import {
     faArrowDown,
@@ -169,7 +169,7 @@ function main() {
         }
     };
 
-    fontawesome.library.add(
+    faLibrary.add(
         faArrowDown,
         faArrowUp,
         faCalendar,
