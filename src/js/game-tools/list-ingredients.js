@@ -9,7 +9,7 @@
  */
 
 import { select as d3Select } from "d3-selection";
-import { chunkify, formatSignPercent } from "../util";
+import { chunkify, formatSignInt, formatSignPercent } from "../util";
 import { registerEvent } from "../analytics";
 import { insertBaseModal } from "../common";
 
@@ -68,11 +68,12 @@ export default class ListIngredients {
                 .filter(module => module.name === recipeName)
                 .forEach(module => {
                     moduleType = type[0];
+
                     properties = `<tr><td>${module.properties
                         .map(property => {
-                            const amount = property.absolute
-                                ? property.amount
-                                : formatSignPercent(property.amount / 100);
+                            const amount = property.isPercentage
+                                ? formatSignPercent(property.amount / 100)
+                                : formatSignInt(property.amount);
                             return `${property.modifier} ${amount}`;
                         })
                         .join("</td></tr><tr><td>")}</td></tr>`;
@@ -81,19 +82,20 @@ export default class ListIngredients {
         text = `<h6 class='text-muted text-left'>${moduleType}</h6>`;
         text += `<table class='table table-sm'><tbody>${properties}</tbody></table>`;
 
-        return text;
+        return properties?text:"";
     }
 
     _getRows() {
         return this._ingredientData.map(
             ingredient =>
-                `<tr><td>${ingredient.name}</td><td>${ingredient.recipe
-                    .map(
-                        recipeName =>
-                            `<a data-toggle="tooltip" data-html="true" title="${this._getProperties(
-                                recipeName
-                            )}">${recipeName}</a>`
-                    )
+                `<tr><td>${ingredient.name}</td><td>${ingredient.recipeNames
+                    .map(recipeName => {
+                        const properties = this._getProperties(recipeName);
+                        console.log(recipeName, properties);
+                        return properties
+                            ? `<a data-toggle="tooltip" title="${properties}">${recipeName}</a>`
+                            : recipeName;
+                    })
                     .join("<br>")}</td></tr>`
         );
     }
@@ -112,7 +114,7 @@ export default class ListIngredients {
         [...new Array(splitRows.length).keys()].forEach(column => {
             text += `<div class="col-md-${Math.floor(12 / splitRows.length)}">`;
             text += '<table class="table table-sm"><thead>';
-            text += "<tr><th>Ingredient</th><th>ListRecipes</th></tr></thead><tbody>";
+            text += "<tr><th>Ingredient</th><th>Recipes</th></tr></thead><tbody>";
             text += splitRows[column].join("");
             text += "</tbody></table></div>";
         });
@@ -134,6 +136,10 @@ export default class ListIngredients {
             .append("div")
             .classed("row ingredients", true);
         d3Select(`#${this._baseId} div`).html(this._getText());
-        $('[data-toggle="tooltip"]').tooltip();
+        $('[data-toggle="tooltip"]').tooltip({
+            html: true,
+            placement: "auto",
+            sanitize: false
+        });
     }
 }
