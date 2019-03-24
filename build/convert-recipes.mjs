@@ -59,7 +59,9 @@ function convertRecipes() {
     const getIngredients = () =>
         new Map(
             APIItems.filter(
-                item => item.ItemType === "ShipUpgradeBookItem" || item.SortingGroup === "Resource.Trading"
+                item =>
+                    !item.NotUsed &&
+                    (item.ItemType === "ShipUpgradeBookItem" || item.SortingGroup === "Resource.Trading")
             ).map(item => [item.Id, item.Id])
         );
 
@@ -71,9 +73,10 @@ function convertRecipes() {
     const upgradeIds = getUpgradeIds();
 
     APIItems.filter(
-        APIrecipe =>
-            APIrecipe.ItemType === "Recipe" && !APIrecipe.NotUsed && itemNames.has(APIrecipe.Results[0].Template)
+        APIrecipe => (APIrecipe.ItemType === "Recipe" || APIrecipe.ItemType === "RecipeModule") && !APIrecipe.NotUsed
     ).forEach(APIrecipe => {
+        const resultReference =
+            APIrecipe.ItemType === "Recipe" ? APIrecipe.Results[0] : APIrecipe.Qualities[0].Results[0];
         const recipe = {
             id: APIrecipe.Id,
             name: APIrecipe.Name.replace(" Blueprint", "")
@@ -88,29 +91,30 @@ function convertRecipes() {
                 amount: requirement.Amount
             })),
             result: {
-                id: upgradeIds.has(APIrecipe.Results[0].Template)
-                    ? upgradeIds.get(APIrecipe.Results[0].Template)
-                    : APIrecipe.Results[0].Template,
-                name: itemNames.get(APIrecipe.Results[0].Template),
-                amount: APIrecipe.Results[0].Amount
+                id: upgradeIds.has(resultReference.Template)
+                    ? upgradeIds.get(resultReference.Template)
+                    : resultReference.Template,
+                name: itemNames.get(resultReference.Template),
+                amount: resultReference.Amount
             },
             craftGroup: groups.has(APIrecipe.CraftGroup) ? groups.get(APIrecipe.CraftGroup) : APIrecipe.CraftGroup,
             serverType: APIrecipe.ServerType
         };
         data.recipe.push(recipe);
+
         APIrecipe.FullRequirements.filter(APIingredient => ingredientIds.has(APIingredient.Template)).forEach(
             APIingredient => {
                 const recipeName = recipe.module ? recipe.module : recipe.name.replace(" Blueprint", "");
                 if (ingredients.has(APIingredient.Template)) {
                     const updatedIngredient = ingredients.get(APIingredient.Template);
-                    updatedIngredient.recipe.push(recipeName);
-                    updatedIngredient.recipe.sort(simpleSort);
+                    updatedIngredient.recipeNames.push(recipeName);
+                    updatedIngredient.recipeNames.sort(simpleSort);
                     ingredients.set(APIingredient.Template, updatedIngredient);
                 } else {
                     const ingredient = {
                         id: APIingredient.Template,
-                        name: upgradeIds.get(APIingredient.Template),
-                        recipe: [recipeName]
+                        name: itemNames.get(APIingredient.Template),
+                        recipeNames: [recipeName]
                     };
                     ingredients.set(APIingredient.Template, ingredient);
                 }
