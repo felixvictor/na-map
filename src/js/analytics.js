@@ -76,8 +76,7 @@ export const initAnalytics = () => {
      *                                         firing of the default event handler.
      */
     window.addEventListener("error", (errorMessage, url, lineNumber, columnNumber, errorObject) => {
-        // Send error details to Google Analytics, if the library is already available:
-        if (typeof ga === "function") {
+      
             // In case the "errorObject" is available, use its data, else fallback
             // on the default "errorMessage" provided:
             let exceptionDescription = errorMessage;
@@ -94,7 +93,7 @@ export const initAnalytics = () => {
                 appName,
                 appVersion
             });
-        }
+       
 
         // If the previous "window.onerror" callback can be called, pass it the data:
         if (typeof originalWindowErrorCallback === "function") {
