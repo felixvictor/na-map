@@ -642,7 +642,7 @@ export const sortBy = properties => (a, b) => {
  * @return {boolean} Success
  */
 const copyToClipboardFallback = text => {
-    console.log("copyToClipboardFallback");
+    // console.log("copyToClipboardFallback");
     if (document.queryCommandSupported && document.queryCommandSupported("copy")) {
         const input = document.createElement("input");
 
