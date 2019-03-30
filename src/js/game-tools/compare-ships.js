@@ -30,6 +30,9 @@ import {
     colourGreenLight,
     colourGreenDark,
     hashids,
+    hullRepairsFactor,
+    rigRepairsFactor,
+    rumRepairsFactor,
     insertBaseModal
 } from "../common";
 import { copyToClipboard, formatInt, formatFloat, getOrdinal, isEmpty, roundToThousands, sortBy } from "../util";
@@ -38,9 +41,6 @@ import CompareWoods from "./compare-woods";
 
 const numSegments = 24;
 const segmentRadians = (2 * Math.PI) / numSegments;
-const hullRepairsFactor = 500 * 3;
-const rigRepairsFactor = 400 * 3;
-const rumRepairsFactor = 4;
 
 /**
  * Ship
