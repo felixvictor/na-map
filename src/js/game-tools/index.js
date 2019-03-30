@@ -16,6 +16,7 @@ import CompareWoods from "./compare-woods";
 import ListBuildings from "./list-buildings";
 import ListCannons from "./list-cannons";
 import ListIngredients from "./list-ingredients";
+import ListLoot from "./list-loot";
 import ListModules from "./list-modules";
 import ListPortOwnerships from "./list-port-ownerships";
 import ListShipBlueprints from "./list-ship-blueprints";
@@ -51,6 +52,10 @@ const dataSources = [
     {
         fileName: "cannons.json",
         name: "cannons"
+    },
+    {
+        fileName: "loot.json",
+        name: "loot"
     },
     {
         fileName: "modules.json",
@@ -110,6 +115,9 @@ const setupData = data => {
 
     // eslint-disable-next-line no-unused-vars
     const ownershipList = new ListPortOwnerships(data.ownership, data.nations);
+
+    // eslint-disable-next-line no-unused-vars
+    const lootList = new ListLoot(data.loot);
 
     // eslint-disable-next-line no-unused-vars
     const moduleList = new ListModules(data.modules);
