@@ -9,9 +9,9 @@
  */
 
 import { select as d3Select } from "d3-selection";
-import { formatInt } from "../util";
+import { formatInt, formatPercent, getOrdinal } from "../util";
 import { registerEvent } from "../analytics";
-import { getCurrencyAmount, insertBaseModal } from "../common";
+import { insertBaseModal } from "../common";
 
 export default class ListLoot {
     constructor(lootData) {
@@ -25,6 +25,8 @@ export default class ListLoot {
         this._lootSelectId = `${this._baseId}-loot-select`;
         this._chestSelectId = `${this._baseId}-chest-select`;
 
+        this._type = "";
+
         this._setupListener();
     }
 
@@ -37,7 +39,7 @@ export default class ListLoot {
     }
 
     _injectModal() {
-        insertBaseModal(this._modalId, this._baseName);
+        insertBaseModal(this._modalId, this._baseName, "md");
 
         const body = d3Select(`#${this._modalId} .modal-body`);
 
@@ -46,30 +48,26 @@ export default class ListLoot {
             body.append("select")
                 .attr("name", id)
                 .attr("id", id)
-                .attr("class", "selectpicker");
+                .attr("class", "selectpicker")
+                .classed("pl-3", id === this._chestSelectId);
         });
 
-        body.append("div")
-            .attr("id", `${this._baseId}`)
-            .attr("class", "container-fluid");
+        body.append("div").attr("id", `${this._baseId}`);
     }
 
-    _getLootOptions() {
-        return `${this._lootData.loot.map(item => `<option value="${item.id}">${item.name}</option>`).join("")}`;
-    }
-
-    _getChestOptions() {
-        return `${this._lootData.chests.map(item => `<option value="${item.id}">${item.name}</option>`).join("")}`;
+    _getOptions(type) {
+        return `${this._lootData[type].map(item => `<option value="${item.id}">${item.name}</option>`).join("")}`;
     }
 
     _setupLootSelect() {
-        const options = this._getLootOptions();
-        console.log(options);
+        const options = this._getOptions("loot");
+
         this._lootSelect$.append(options);
     }
 
     _setupChestSelect() {
-        const options = this._getChestOptions();
+        const options = this._getOptions("chests");
+
         this._chestSelect$.append(options);
     }
 
@@ -80,7 +78,11 @@ export default class ListLoot {
 
     _setupLootSelectListener() {
         this._lootSelect$
-            .on("change", () => this._itemSelected(this._lootSelect$, "loot"))
+            .on("change", () => {
+                this._type = "loot";
+                this._select$ = this._lootSelect$;
+                this._itemSelected();
+            })
             .selectpicker({
                 dropupAuto: false,
                 liveSearch: true,
@@ -93,7 +95,11 @@ export default class ListLoot {
 
     _setupChestSelectListener() {
         this._chestSelect$
-            .on("change", () => this._itemSelected(this._chestSelect$, "chests"))
+            .on("change", () => {
+                this._type = "chests";
+                this._select$ = this._chestSelect$;
+                this._itemSelected();
+            })
             .selectpicker({
                 dropupAuto: false,
                 liveSearch: true,
@@ -127,28 +133,50 @@ export default class ListLoot {
         $(`#${this._modalId}`).modal("show");
     }
 
-    _getItemData(selectedItemId, type) {
-        return this._lootData[type].find(item => item.id === selectedItemId);
+    _getItemData(selectedItemId) {
+        return this._lootData[this._type].find(item => item.id === selectedItemId);
     }
 
-    _getItemsText(items) {
+    _getItemsText(items, itemProbability) {
+        const getAmount = amount => {
+            if (amount.min === amount.max) {
+                return `${formatInt(amount.min)}`;
+            }
+
+            return `${formatInt(amount.min)} to ${formatInt(amount.max)}`;
+        };
+
+        const getChance = chance => {
+            if (this._type === "chests") {
+                return formatInt((1 - chance) * 100);
+            }
+
+            return formatInt((1 - itemProbability[chance]) * 100);
+        };
+
         let text = "";
-        text += '<table class="table table-sm"><tbody>';
-        text += `<tr><td>${items
-            .map(item => `${item.name}</td><td>${item.chance}</td><td>${item.amount.min} to ${item.amount.max}`)
-            .join("</td></tr><tr><td>")}</td></tr>`;
+
+        text += '<table class="table table-striped table-sm"><thead>';
+        text +=
+            '<tr><th scope="col">Item</th><th scope="col" class="text-right">Chance (%)</th><th scope="col" class="text-right">Amount</th></tr>';
+        text += "</thead><tbody>";
+        text += `<tr>${items
+            .map(
+                item =>
+                    `<td>${item.name}</td><td class="text-right">${getChance(
+                        item.chance
+                    )}</td><td class="text-right">${getAmount(item.amount)}</td>`
+            )
+            .join("</tr><tr>")}</tr>`;
         text += "</tbody></table>";
+
         return text;
     }
 
     _getLootText(currentItem) {
         let text = "";
 
-        text += `<p> Name ${currentItem.name}<br> Class ${currentItem.class}<br> lootprop ${
-            currentItem.lootProbability
-        }<br> itemprop ${currentItem.itemProbability}<br> quantityprop ${currentItem.quantityProbability}<br> </p>`;
-
-        text += this._getItemsText(currentItem.items);
+        text += this._getItemsText(currentItem.items, currentItem.itemProbability);
 
         return text;
     }
@@ -156,9 +184,9 @@ export default class ListLoot {
     _getChestText(currentItem) {
         let text = "";
 
-        text += `<p> Name ${currentItem.name}<br> Weight ${currentItem.weight} tons<br> lifetime ${
+        text += `<p>Weight ${formatInt(currentItem.weight)} tons<br>Lifetime ${formatInt(
             currentItem.lifetime
-        } hours<br> </p>`;
+        )} hours</p>`;
 
         text += this._getItemsText(currentItem.items);
 
@@ -168,41 +196,40 @@ export default class ListLoot {
     /**
      * Construct building tables
      * @param {string} selectedItemId Id of selected item.
-     * @param {string} type Type (loot or chests).
      * @return {string} html string
      * @private
      */
-    _getText(selectedItemId, type) {
-        const currentItem = this._getItemData(selectedItemId, type);
-        console.log(selectedItemId, type, currentItem);
-        let text = '<div class="row no-gutters card-deck">';
+    _getText(selectedItemId) {
+        const currentItem = this._getItemData(selectedItemId);
 
-        text += '<div class="card col"><div class="card-header">Items</div>';
-        text += '<div class="card-body">';
-        text += type === "loot" ? this._getLootText(currentItem) : this._getChestText(currentItem);
-        text += "</div></div>";
+        const text = this._type === "loot" ? this._getLootText(currentItem) : this._getChestText(currentItem);
 
-        text += "</div>";
         return text;
+    }
+
+    _resetOtherSelect() {
+        const otherSelect$ = this._type === "loot" ? this._chestSelect$ : this._lootSelect$;
+
+        otherSelect$.val("default").selectpicker("refresh");
     }
 
     /**
      * Show buildings for selected building type
-     * @param {Object} select$ jQuery select
-     * @param {string} type Type (loot or chests).
      * @return {void}
      * @private
      */
-    _itemSelected(select$, type) {
-        const selectedItemId = Number(select$.find(":selected").val());
+    _itemSelected() {
+        const selectedItemId = Number(this._select$.find(":selected").val());
 
-        // Remove old recipe list
+        this._resetOtherSelect();
+
+        // Remove old list
         d3Select(`#${this._baseId} div`).remove();
 
-        // Add new recipe list
+        // Add new list
         d3Select(`#${this._baseId}`)
             .append("div")
-            .classed("buildings mt-4", true);
-        d3Select(`#${this._baseId} div`).html(this._getText(selectedItemId, type));
+            .attr("class", "mt-4")
+            .html(this._getText(selectedItemId));
     }
 }
