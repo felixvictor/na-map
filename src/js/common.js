@@ -171,19 +171,6 @@ export const speedConstA = 0.074465523706782;
 export const speedConstB = 0.00272175949231;
 
 export const circleRadiusFactor = 5;
-export const greenZoneRadius =
-    roundToThousands(
-        getDistance(
-            {
-                x: convertCoordX(-63400, 18800),
-                y: convertCoordY(-63400, 18800)
-            },
-            {
-                x: convertCoordX(-79696, 10642),
-                y: convertCoordY(-79696, 10642)
-            }
-        )
-    ) * circleRadiusFactor;
 
 const secondsForFullCircle = 48 * 60 + 55;
 export const fullCircle = 360;
@@ -207,3 +194,16 @@ export const colourWhite = CWHITE;
 export const primary300 = CPRIMARY300;
 // eslint-disable-next-line no-undef
 export const iconSmallSrc = ICONSMALL;
+
+// eslint-disable-next-line no-undef
+export const hullRepairsFactor = REPAIR_ARMOR_VOLUME / REPAIR_ARMOR_PERCENT;
+// eslint-disable-next-line no-undef
+export const hullRepairsPercent = REPAIR_ARMOR_PERCENT;
+// eslint-disable-next-line no-undef
+export const rigRepairsFactor = REPAIR_SAIL_VOLUME / REPAIR_SAIL_PERCENT;
+// eslint-disable-next-line no-undef
+export const rigRepairsPercent = REPAIR_SAIL_PERCENT;
+// eslint-disable-next-line no-undef
+export const rumRepairsFactor = REPAIR_CREW_VOLUME / REPAIR_CREW_PERCENT;
+// eslint-disable-next-line no-undef
+export const rumRepairsPercent = REPAIR_CREW_PERCENT;
