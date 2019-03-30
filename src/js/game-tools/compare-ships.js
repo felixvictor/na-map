@@ -30,6 +30,9 @@ import {
     colourGreenLight,
     colourGreenDark,
     hashids,
+    hullRepairsFactor,
+    rigRepairsFactor,
+    rumRepairsFactor,
     insertBaseModal
 } from "../common";
 import { copyToClipboard, formatInt, formatFloat, getOrdinal, isEmpty, roundToThousands, sortBy } from "../util";
@@ -38,9 +41,6 @@ import CompareWoods from "./compare-woods";
 
 const numSegments = 24;
 const segmentRadians = (2 * Math.PI) / numSegments;
-const hullRepairsFactor = 500 * 3;
-const rigRepairsFactor = 400 * 3;
-const rumRepairsFactor = 4;
 
 /**
  * Ship
@@ -945,15 +945,6 @@ export default class CompareShips {
 
         this._selectedShips = { Base: {}, C1: {}, C2: {} };
 
-        const theoreticalMinSpeed = d3Min(this._shipData, ship => ship.speed.min) * 1.2;
-        const theoreticalMaxSpeed = 15.5;
-        this._minSpeed = theoreticalMinSpeed;
-        this._maxSpeed = theoreticalMaxSpeed;
-        this._colorScale = d3ScaleLinear()
-            .domain([this._minSpeed, 0, 8, 12, this._maxSpeed])
-            .range([colourRed, "#fff", colourGreenLight, colourGreen, colourGreenDark])
-            .interpolate(d3InterpolateHcl);
-
         this._woodChanges = new Map([
             ["Acceleration", ["ship.acceleration"]],
             ["Armor thickness", ["sides.thickness", "bow.thickness", "stern.thickness"]],
@@ -996,6 +987,47 @@ export default class CompareShips {
             ["Turn speed", ["rudder.turnSpeed"]],
             ["Water pump health", ["pump.armour"]]
         ]);
+
+        this._moduleCaps = new Map([
+            [
+                "Armor thickness",
+                {
+                    properties: ["sides.thickness", "bow.thickness", "stern.thickness"],
+                    cap: { amount: 0.3, isPercentage: true }
+                }
+            ],
+            [
+                "Armour strength",
+                { properties: ["bow.armour", "sides.armour", "stern.armour"], cap: { amount: 0.3, isPercentage: true } }
+            ],
+            ["Back armour thickness", { properties: ["stern.thickness"], cap: { amount: 0.3, isPercentage: true } }],
+            ["Front armour thickness", { properties: ["bow.thickness"], cap: { amount: 0.3, isPercentage: true } }],
+            [
+                "Mast health",
+                {
+                    properties: ["mast.bottomArmour", "mast.middleArmour", "mast.topArmour"],
+                    cap: { amount: 0.3, isPercentage: true }
+                }
+            ],
+            [
+                "Mast thickness",
+                {
+                    properties: ["mast.bottomThickness", "mast.middleThickness", "mast.topThickness"],
+                    cap: { amount: 0.3, isPercentage: true }
+                }
+            ],
+            ["Ship speed", { properties: ["speed.max"], cap: { amount: 15.5, isPercentage: false } }],
+            ["Turn speed", { properties: ["rudder.turnSpeed"], cap: { amount: 0.25, isPercentage: true } }]
+        ]);
+
+        const theoreticalMinSpeed = d3Min(this._shipData, ship => ship.speed.min) * 1.2;
+        const theoreticalMaxSpeed = this._moduleCaps.get("Ship speed").cap.amount;
+        this._minSpeed = theoreticalMinSpeed;
+        this._maxSpeed = theoreticalMaxSpeed;
+        this._colorScale = d3ScaleLinear()
+            .domain([this._minSpeed, 0, 8, 12, this._maxSpeed])
+            .range([colourRed, "#fff", colourGreenLight, colourGreen, colourGreenDark])
+            .interpolate(d3InterpolateHcl);
 
         if (this._baseId === "ship-journey") {
             this._woodId = "wood-journey";
@@ -1377,12 +1409,13 @@ export default class CompareShips {
      * @returns {Object} Ship data
      */
     _getShipData(columnId) {
-        let shipData = this._shipData.find(ship => ship.id === this._shipIds[columnId]);
+        const shipDataDefault = this._shipData.find(ship => ship.id === this._shipIds[columnId]);
+        let shipDataUpdated = shipDataDefault;
 
-        shipData = this._addWoodData(shipData, columnId);
-        shipData = this._addModulesData(shipData, columnId);
+        shipDataUpdated = this._addWoodData(shipDataDefault, columnId);
+        shipDataUpdated = this._addModulesData(shipDataDefault, shipDataUpdated, columnId);
 
-        return shipData;
+        return shipDataUpdated;
     }
 
     /**
@@ -1462,12 +1495,13 @@ export default class CompareShips {
 
     /**
      * Add upgrade changes to ship data
-     * @param {*} shipData - Ship id
+     * @param {*} shipDataBase - Base ship data
+     * @param {*} shipDataUpdated - Updated ship data
      * @param {*} compareId - Column id
      * @returns {Object} - Updated ship data
      */
-    _addModulesData(shipData, compareId) {
-        const data = JSON.parse(JSON.stringify(shipData));
+    _addModulesData(shipDataBase, shipDataUpdated, compareId) {
+        const data = JSON.parse(JSON.stringify(shipDataUpdated));
 
         if (typeof this._selectedUpgradeIdsList[compareId] !== "undefined") {
             const modifierAmount = new Map();
@@ -1519,6 +1553,28 @@ export default class CompareShips {
                         data[index[0]] = absolute;
                     }
                 });
+            });
+
+            modifierAmount.forEach((value, key) => {
+                if (this._moduleCaps.has(key)) {
+                    const { cap } = this._moduleCaps.get(key);
+                    this._moduleCaps.get(key).properties.forEach(property => {
+                        const index = property.split(".");
+                        if (index.length > 1) {
+                            if (data[index[0]][index[1]]) {
+                                data[index[0]][index[1]] = Math.min(
+                                    data[index[0]][index[1]],
+                                    cap.isPercentage ? shipDataBase[index[0]][index[1]] * (1 + cap.amount) : cap.amount
+                                );
+                            }
+                        } else if (data[index[0]]) {
+                            data[index[0]] = Math.min(
+                                data[index[0]],
+                                cap.isPercentage ? shipDataBase[index[0]] * (1 + cap.amount) : cap.amount
+                            );
+                        }
+                    });
+                }
             });
 
             if (modifierAmount.has("Ship speed")) {
