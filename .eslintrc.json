@@ -46,8 +46,9 @@
                 "array": false
             }
         ],
+        "prefer-template": "error",
         "operator-linebreak": ["error", "after", { "overrides": { "?": "before", ":": "before" } }],
-        "quotes": ["error", "double", { "allowTemplateLiterals": true, "avoidEscape": true }],
+        "quotes": ["error", "double", { "allowTemplateLiterals": false, "avoidEscape": true }],
         "space-before-function-paren": ["error", "never"],
         "unicorn/explicit-length-check": "off",
         "unicorn/filename-case": "off",
