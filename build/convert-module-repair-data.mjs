@@ -39,9 +39,9 @@ const baseFileNames = ["armor repair", "sail repair", "crew repair"];
  */
 function convertRepairData() {
     function getFileData(baseFileName, ext) {
-        console.log(`${inDir}/${baseFileName} ${ext}.xml`);
         const fileName = `${inDir}/${baseFileName} ${ext}.xml`;
         const fileXmlData = readTextFile(fileName);
+
         return xml2Json.toJson(fileXmlData, { object: true });
     }
 
