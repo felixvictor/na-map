@@ -45,7 +45,7 @@
     <Pair>
       <Key>SHIP_MAX_SPEED</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>13.07</Value>
+        <Value>14.05</Value>
       </Value>
     </Pair>
     <Pair>
@@ -141,7 +141,7 @@
     <Pair>
       <Key>MAST_THICKNESS</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>92</Value>
+        <Value>97</Value>
       </Value>
     </Pair>
   </Attributes>
