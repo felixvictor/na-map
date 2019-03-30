@@ -33,7 +33,7 @@ function convertShips() {
 
         const shipData = {
             id: ship.Id,
-            name: ship.Name.replace("00E4", "ä")
+            name: ship.Name.replace("u00E4", "ä")
                 .replace("L'Ocean", "L'Océan")
                 .replaceAll("'", "’"),
             class: ship.Class,
