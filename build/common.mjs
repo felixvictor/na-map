@@ -282,8 +282,7 @@ export const defaultCircleSize = 16;
 export const round = (n, d = 0) => Number(Math.round(n * 10 ** d) / 10 ** d);
 
 /**
- * Round to thousands
- * @param {Number} x - Integer
+ * Round to thousands* @param {Number} x - Integer
  * @return {Number} Rounded input
  */
 export const roundToThousands = x => round(x, 3);
@@ -369,3 +368,16 @@ export const sortBy = properties => (a, b) => {
 
     return r;
 };
+
+/**
+ * Format ordinal
+ * @param {number} n - Integer
+ * @param {bool} sup - True if superscript tags needed
+ * @return {String} Formatted Ordinal
+ */
+export function getOrdinal(n, sup = true) {
+    const s = ["th", "st", "nd", "rd"];
+    const v = n % 100;
+    const text = s[(v - 20) % 10] || s[v] || s[0];
+    return n + (sup ? `<span class="super">${text}</span>` : `${text}`);
+}
