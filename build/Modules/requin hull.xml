@@ -162,7 +162,7 @@
     <Pair>
       <Key>FIRE_INCREASE_RATE</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>0.03</Value>
+        <Value>0.04</Value>
       </Value>
     </Pair>
     <Pair>
