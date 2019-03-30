@@ -194,3 +194,16 @@ export const colourWhite = CWHITE;
 export const primary300 = CPRIMARY300;
 // eslint-disable-next-line no-undef
 export const iconSmallSrc = ICONSMALL;
+
+// eslint-disable-next-line no-undef
+export const hullRepairsFactor = REPAIR_ARMOR_VOLUME / REPAIR_ARMOR_PERCENT;
+// eslint-disable-next-line no-undef
+export const hullRepairsPercent = REPAIR_ARMOR_PERCENT;
+// eslint-disable-next-line no-undef
+export const rigRepairsFactor = REPAIR_SAIL_VOLUME / REPAIR_SAIL_PERCENT;
+// eslint-disable-next-line no-undef
+export const rigRepairsPercent = REPAIR_SAIL_PERCENT;
+// eslint-disable-next-line no-undef
+export const rumRepairsFactor = REPAIR_CREW_VOLUME / REPAIR_CREW_PERCENT;
+// eslint-disable-next-line no-undef
+export const rumRepairsPercent = REPAIR_CREW_PERCENT;
