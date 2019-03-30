@@ -24,7 +24,6 @@ import {
     colourRedDark,
     defaultCircleSize,
     defaultFontSize,
-    greenZoneRadius,
     nations,
     primary300
 } from "../common";
@@ -87,7 +86,7 @@ export default class DisplayPorts {
          * @type {string[]}
          * @private
          */
-        this._radioButtonValues = ["attack", "position", "tax", "net", "green", "off"];
+        this._radioButtonValues = ["attack", "position", "tax", "net", "off"];
 
         /**
          * Show radius cookie
@@ -664,11 +663,6 @@ export default class DisplayPorts {
             cssClass = () => "bubble";
             fill = d => this._colourScale(d.attackHostility);
             r = d => this._attackRadius(d.attackHostility);
-        } else if (this._showRadius === "green") {
-            data = this._portDataFiltered.filter(port => port.nonCapturable && port.nation !== "FT");
-
-            cssClass = () => "bubble pos";
-            r = () => greenZoneRadius;
         } else if (this.showCurrentGood) {
             cssClass = d => `bubble ${d.isSource ? "pos" : "neg"}`;
             r = () => rMax / 2;
