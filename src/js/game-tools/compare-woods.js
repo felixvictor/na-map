@@ -452,10 +452,9 @@ export default class CompareWoods {
         const otherType = type === "frame" ? "trim" : "frame";
 
         if (this._woodsSelected[columnId][otherType] === this._defaultWood[otherType]) {
-            $(`#${this._baseFunction}-${otherType}-${columnId}-select`).selectpicker(
-                "val",
-                this._defaultWood[otherType]
-            );
+            $(`#${this._baseFunction}-${otherType}-${columnId}-select`)
+                .val(this._defaultWood[otherType])
+                .selectpicker("refresh");
         }
     }
 
