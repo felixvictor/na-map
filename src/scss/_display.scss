@@ -620,6 +620,7 @@ svg {
 }
 
 .summary-des {
+    @include caps;
     @include des;
     top: 0;
 }
