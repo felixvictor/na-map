@@ -20,6 +20,7 @@ const WebpackDeepScopeAnalysisPlugin = require("webpack-deep-scope-plugin").defa
 const WebpackPwaManifest = require("webpack-pwa-manifest");
 const servers = require("./src/js/servers");
 const PACKAGE = require("./package.json");
+const repairs = require("./src/gen/repairs.json");
 
 const libraryName = PACKAGE.name;
 const { TARGET } = process.env;
@@ -287,7 +288,13 @@ const config = {
             DESCRIPTION: JSON.stringify(description),
             TITLE: JSON.stringify(PACKAGE.description),
             VERSION: JSON.stringify(PACKAGE.version),
-            ICONSMALL: JSON.stringify("images/icons/icon_32x32.png")
+            ICONSMALL: JSON.stringify("images/icons/icon_32x32.png"),
+            REPAIR_ARMOR_VOLUME: JSON.stringify(repairs.armorRepair.volume),
+            REPAIR_ARMOR_PERCENT: JSON.stringify(repairs.armorRepair.percent),
+            REPAIR_SAIL_VOLUME: JSON.stringify(repairs.sailRepair.volume),
+            REPAIR_SAIL_PERCENT: JSON.stringify(repairs.sailRepair.percent),
+            REPAIR_CREW_VOLUME: JSON.stringify(repairs.crewRepair.volume),
+            REPAIR_CREW_PERCENT: JSON.stringify(repairs.crewRepair.percent)
         }),
         new webpack.HashedModuleIdsPlugin(),
         new webpack.ProvidePlugin({
@@ -311,7 +318,7 @@ const config = {
         new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
         new CopyPlugin([
             { from: "../netlify.toml" },
-            { from: "gen/*.json", to: `${outputPath}/data`, flatten: true },
+            { from: "gen/*.json", ignore: "gen/repairs.json", to: `${outputPath}/data`, flatten: true },
             { from: "gen/*.xlsx", flatten: true },
             { from: "google979f2cf3bed204d6.html", to: "google979f2cf3bed204d6.html", toType: "file" },
             { from: "images/icons/favicon.ico", flatten: true },
