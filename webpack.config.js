@@ -25,7 +25,7 @@ const repairs = require("./src/gen/repairs.json");
 const libraryName = PACKAGE.name;
 const { TARGET } = process.env;
 const target = `https://${TARGET}.netlify.com/`;
-const isProd = process.env.NODE_ENV === "production";
+const isProduction = process.env.NODE_ENV === "production";
 
 const description =
     "Yet another map with in-game map, F11 coordinates, resources, ship and wood comparison. Port data is updated constantly from twitter and daily after maintenance.";
@@ -254,8 +254,8 @@ const config = {
     },
 
     output: {
-        chunkFilename: isProd ? "[name].[chunkhash].js" : "[name].js",
-        filename: isProd ? "[name].[contenthash].js" : "[name].js",
+        chunkFilename: isProduction ? "[name].[chunkhash].js" : "[name].js",
+        filename: isProduction ? "[name].[contenthash].js" : "[name].js",
         path: outputPath,
         crossOriginLoading: "anonymous"
     },
@@ -274,7 +274,10 @@ const config = {
         new CleanWebpackPlugin({
             verbose: false
         }),
-        new ExtractCssChunks({ filename: isProd ? "[name].[contenthash].css" : "[name].css", orderWarning: true }),
+        new ExtractCssChunks({
+            filename: isProduction ? "[name].[contenthash].css" : "[name].css",
+            orderWarning: true
+        }),
         new webpack.DefinePlugin({
             CPRIMARY300: JSON.stringify(primary300),
             CGREEN: JSON.stringify(colourGreen),
@@ -318,7 +321,7 @@ const config = {
         new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
         new CopyPlugin([
             { from: "../netlify.toml" },
-            { from: "gen/*.json", ignore: "gen/repairs.json", to: `${outputPath}/data`, flatten: true },
+            { from: "gen/*.json", ignore: ["gen/repairs.json"], to: `${outputPath}/data`, flatten: true },
             { from: "gen/*.xlsx", flatten: true },
             { from: "google979f2cf3bed204d6.html", to: "google979f2cf3bed204d6.html", toType: "file" },
             { from: "images/icons/favicon.ico", flatten: true },
@@ -491,7 +494,7 @@ const config = {
     }
 };
 
-module.exports = (env, argv) => {
+module.exports = (environment, argv) => {
     if (argv.mode === "production") {
         config.devtool = "";
         config.optimization.minimizer = [
