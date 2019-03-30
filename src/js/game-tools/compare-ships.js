@@ -1557,7 +1557,6 @@ export default class CompareShips {
 
             modifierAmount.forEach((value, key) => {
                 if (this._moduleCaps.has(key)) {
-                    console.log(shipDataBase, { value }, { key }, this._moduleCaps.get(key));
                     const { cap } = this._moduleCaps.get(key);
                     this._moduleCaps.get(key).properties.forEach(property => {
                         const index = property.split(".");
