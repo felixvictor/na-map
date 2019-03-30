@@ -321,7 +321,7 @@ const config = {
         new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
         new CopyPlugin([
             { from: "../netlify.toml" },
-            { from: "gen/*.json", ignore: ["gen/repairs.json"], to: `${outputPath}/data`, flatten: true },
+            { from: "gen/*.json", ignore: ["**/repairs.json"], to: `${outputPath}/data`, flatten: true },
             { from: "gen/*.xlsx", flatten: true },
             { from: "google979f2cf3bed204d6.html", to: "google979f2cf3bed204d6.html", toType: "file" },
             { from: "images/icons/favicon.ico", flatten: true },
