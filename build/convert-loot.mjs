@@ -8,7 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { readJson, saveJson, sortBy } from "./common.mjs";
+import { getOrdinal, readJson, saveJson, sortBy } from "./common.mjs";
 
 const inBaseFilename = process.argv[2];
 const outFilename = process.argv[3];
@@ -47,12 +47,8 @@ function convertLoot() {
     data.loot = APIItems.filter(item => !item.NotUsed && item.ItemType === "ShipLootTableItem")
         .map(item => ({
             id: item.Id,
-            name: item.Name,
-            class: item.Class,
-            lootProbability: item.lootProbability,
+            name: `${getOrdinal(item.Class, false)} rate AI${item.EventLootTable ? " (mission)" : ""}`,
             itemProbability: item.itemProbability,
-            quantityProbability: item.quantityProbability,
-            eventLootTable: item.EventLootTable,
             items: getLootItems(item.Items).sort(sortBy(["chance", "name"]))
         }))
         .sort(sortBy(["class", "name"]));
