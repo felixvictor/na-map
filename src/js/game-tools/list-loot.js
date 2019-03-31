@@ -25,9 +25,12 @@ export default class ListLoot {
         this._buttonId = `button-${this._baseId}`;
         this._modalId = `modal-${this._baseId}`;
 
-        this._lootSelectId = `${this._baseId}-loot-select`;
-        this._chestSelectId = `${this._baseId}-chest-select`;
-
+        this._types = ["loot", "chests", "items"];
+        this._select$ = {};
+        this._selectId = {};
+        this._types.forEach(type => {
+            this._selectId[type] = `${this._baseId}-${type}-select`;
+        });
         this._type = "";
 
         this._setupListener();
@@ -41,88 +44,92 @@ export default class ListLoot {
         });
     }
 
-    _injectModal() {
-        insertBaseModal(this._modalId, this._baseName, "md");
-
-        const body = d3Select(`#${this._modalId} .modal-body`);
-
-        [this._lootSelectId, this._chestSelectId].forEach(id => {
-            body.append("label").attr("for", id);
-            body.append("select")
-                .attr("name", id)
-                .attr("id", id)
-                .attr("class", "selectpicker")
-                .classed("pl-3", id === this._chestSelectId);
-        });
-
-        body.append("div").attr("id", `${this._baseId}`);
-    }
-
     _getOptions(type) {
-        return `${this._lootData[type].map(item => `<option value="${item.id}">${item.name}</option>`).join("")}`;
+        if (type !== "items") {
+            /* eslint-disable indent */
+            return html`
+                ${repeat(
+                    this._lootData[type],
+                    item => item.id,
+                    item =>
+                        html`
+                            <option value="${item.id}">${item.name}</option>
+                        `
+                )}
+            `;
+        }
+
+        return html`
+            <option value="1">hallo</option>
+        `;
     }
 
-    _setupLootSelect() {
-        const options = this._getOptions("loot");
-
-        this._lootSelect$.append(options);
+    _getModalBody() {
+        return html`
+            ${repeat(
+                this._types,
+                type => type,
+                type =>
+                    html`
+                        <label>
+                            <select id="${this._selectId[type]}" class="selectpicker">
+                                ${this._getOptions(type)}
+                            </select>
+                        </label>
+                    `
+            )}
+            <div id="${this._baseId}"></div>
+        `;
     }
 
-    _setupChestSelect() {
-        const options = this._getOptions("chests");
+    _insertBaseModal(id, title, size = "xl", buttonText = "Close") {
+        const modalSize = size === "xl" || size === "lg" || size === "sm" ? ` modal-${size}` : "";
 
-        this._chestSelect$.append(options);
+        return html`
+            <div id="${id}" class="modal" tabindex="-1" role="dialog" aria-labelledby="title-${id}" aria-hidden="true">
+                <div class="modal-dialog${modalSize}" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 id="title-${id}" class="modal-title">${title}</h5>
+                        </div>
+                        <div class="modal-body">${this._getModalBody()}</div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">${buttonText}</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
     }
 
-    _setupSelects() {
-        this._setupLootSelect();
-        this._setupChestSelect();
-    }
-
-    _setupLootSelectListener() {
-        this._lootSelect$
-            .on("change", () => {
-                this._type = "loot";
-                this._select$ = this._lootSelect$;
-                this._itemSelected();
-            })
-            .selectpicker({
-                dropupAuto: false,
-                liveSearch: true,
-                liveSearchNormalize: true,
-                liveSearchPlaceholder: "Search ...",
-                title: "Select loot",
-                virtualScroll: true
-            });
-    }
-
-    _setupChestSelectListener() {
-        this._chestSelect$
-            .on("change", () => {
-                this._type = "chests";
-                this._select$ = this._chestSelect$;
-                this._itemSelected();
-            })
-            .selectpicker({
-                dropupAuto: false,
-                liveSearch: true,
-                liveSearchNormalize: true,
-                liveSearchPlaceholder: "Search ...",
-                title: "Select chest",
-                virtualScroll: true
-            });
+    _injectModal() {
+        render(this._insertBaseModal(this._modalId, this._baseName, "md"), document.getElementById("modal-section"));
     }
 
     _setupSelectListeners() {
-        this._setupLootSelectListener();
-        this._setupChestSelectListener();
+        this._types.forEach(type => {
+            this._select$[type]
+                .on("change", () => {
+                    this._type = type;
+                    this._itemSelected();
+                })
+                .selectpicker({
+                    dropupAuto: false,
+                    liveSearch: true,
+                    liveSearchNormalize: true,
+                    liveSearchPlaceholder: "Search ...",
+                    title: `Select ${type}`,
+                    virtualScroll: true
+                });
+        });
     }
 
     _initModal() {
         this._injectModal();
-        this._lootSelect$ = $(`#${this._lootSelectId}`);
-        this._chestSelect$ = $(`#${this._chestSelectId}`);
-        this._setupSelects();
+        this._mainDiv = document.getElementById(this._baseId);
+        this._types.forEach(type => {
+            this._select$[type] = $(`#${this._selectId[type]}`);
+        });
         this._setupSelectListeners();
     }
 
@@ -188,10 +195,12 @@ export default class ListLoot {
         `;
     }
 
-    _resetOtherSelect() {
-        const otherSelect$ = this._type === "loot" ? this._chestSelect$ : this._lootSelect$;
-
-        otherSelect$.val("default").selectpicker("refresh");
+    _resetOtherSelects() {
+        this._types
+            .filter(type => type !== this._type)
+            .forEach(type => {
+                this._select$[type].val("default").selectpicker("refresh");
+            });
     }
 
     /**
@@ -216,12 +225,11 @@ export default class ListLoot {
      * @private
      */
     _itemSelected() {
-        const selectedItemId = Number(this._select$.find(":selected").val());
-        const container = document.getElementById(this._baseId);
+        const selectedItemId = Number(this._select$[this._type].find(":selected").val());
 
-        this._resetOtherSelect();
+        this._resetOtherSelects();
 
         // Add new list
-        render(this._getTable(selectedItemId), container);
+        render(this._getTable(selectedItemId), this._mainDiv);
     }
 }
