@@ -148,7 +148,7 @@ export default class ListLoot {
             itemProbability.length ? formatInt((1 - itemProbability[chance]) * 100) : formatInt((1 - chance) * 100);
 
         return html`
-            <table class="table table-striped table-sm">
+            <table class="table table-sm">
                 <thead>
                     <tr>
                         <th scope="col">Item</th>
@@ -204,7 +204,7 @@ export default class ListLoot {
         const currentItem = this._getItemData(selectedItemId);
 
         return html`
-            <div class="mt-4">
+            <div class="modules mt-4">
                 ${this._type === "loot" ? this._getLootText(currentItem) : this._getChestText(currentItem)}
             </div>
         `;
