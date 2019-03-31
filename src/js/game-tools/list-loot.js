@@ -8,13 +8,11 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { select as d3Select } from "d3-selection";
 import { html, render } from "lit-html";
 import { repeat } from "lit-html/directives/repeat";
 
-import { formatInt } from "../util";
+import { formatInt, simpleSort } from "../util";
 import { registerEvent } from "../analytics";
-import { insertBaseModal } from "../common";
 
 export default class ListLoot {
     constructor(lootData) {
@@ -59,8 +57,49 @@ export default class ListLoot {
             `;
         }
 
+        let items = new Map();
+        this._types
+            .filter(type => type !== "items")
+            .forEach(type => {
+                this._lootData[type].forEach(loot => {
+                    loot.items.forEach(item => {
+                        if (items.has(item.id)) {
+                            const updatedSourceIds = items.get(item.id).sourceIds;
+                            updatedSourceIds.add(item.id);
+                            items.set(item.id, { name: item.name, sourceIds: updatedSourceIds });
+                        } else {
+                            items.set(item.id, { name: item.name, sourceIds: new Set([loot.id]) });
+                        }
+                    });
+                });
+            });
+
+        // Sort by name
+        items = new Map(
+            [...items.entries()].sort((a, b) => {
+                if (a[1].name < b[1].name) {
+                    return -1;
+                }
+
+                if (a[1].name > b[1].name) {
+                    return 1;
+                }
+
+                return 0;
+            })
+        );
+
+        /* eslint-disable indent */
         return html`
-            <option value="1">hallo</option>
+            ${repeat(
+                items,
+                (value, key) => key,
+                (value, key) => {
+                    return html`
+                        <option data-ids="${[...value[1].sourceIds].join(",")}" value="${key}">${value[1].name}</option>
+                    `;
+                }
+            )};
         `;
     }
 
@@ -203,6 +242,15 @@ export default class ListLoot {
             });
     }
 
+    _getText(currentItem) {
+        if (this._type === "items") {
+            /* TODO */
+            return "";
+        }
+
+        return this._type === "loot" ? this._getLootText(currentItem) : this._getChestText(currentItem);
+    }
+
     /**
      * Construct item table
      * @param {string} selectedItemId Id of selected item.
@@ -214,7 +262,7 @@ export default class ListLoot {
 
         return html`
             <div class="modules mt-4">
-                ${this._type === "loot" ? this._getLootText(currentItem) : this._getChestText(currentItem)}
+                ${this._getText(currentItem)}
             </div>
         `;
     }
@@ -225,7 +273,15 @@ export default class ListLoot {
      * @private
      */
     _itemSelected() {
-        const selectedItemId = Number(this._select$[this._type].find(":selected").val());
+        const currentItem$ = this._select$[this._type].find(":selected");
+        const selectedItemId = Number(currentItem$.val());
+        this._selectedIds =
+            this._type === "items"
+                ? currentItem$
+                      .data("ids")
+                      .split(",")
+                      .map(Number)
+                : [];
 
         this._resetOtherSelects();
 
