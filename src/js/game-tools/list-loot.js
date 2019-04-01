@@ -63,13 +63,14 @@ export default class ListLoot {
             .forEach(type => {
                 this._lootData[type].forEach(loot => {
                     loot.items.forEach(item => {
+                        let sourceIds = {};
                         if (items.has(item.id)) {
-                            const updatedSourceIds = items.get(item.id).sourceIds;
-                            updatedSourceIds.add(item.id);
-                            items.set(item.id, { name: item.name, sourceIds: updatedSourceIds });
+                            sourceIds = new Set([...items.get(item.id).sourceIds, loot.id]);
                         } else {
-                            items.set(item.id, { name: item.name, sourceIds: new Set([loot.id]) });
+                            sourceIds = new Set([loot.id]);
                         }
+
+                        items.set(item.id, { name: item.name, sourceIds });
                     });
                 });
             });
@@ -129,11 +130,15 @@ export default class ListLoot {
                 <div class="modal-dialog${modalSize}" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 id="title-${id}" class="modal-title">${title}</h5>
+                            <h5 id="title-${id}" class="modal-title">
+                                ${title}
+                            </h5>
                         </div>
                         <div class="modal-body">${this._getModalBody()}</div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">${buttonText}</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                ${buttonText}
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -211,8 +216,12 @@ export default class ListLoot {
                             html`
                                 <tr>
                                     <td>${item.name}</td>
-                                    <td class="text-right">${getChance(item.chance)}</td>
-                                    <td class="text-right">${getAmount(item.amount)}</td>
+                                    <td class="text-right">
+                                        ${getChance(item.chance)}
+                                    </td>
+                                    <td class="text-right">
+                                        ${getAmount(item.amount)}
+                                    </td>
                                 </tr>
                             `
                     )}
@@ -234,6 +243,43 @@ export default class ListLoot {
         `;
     }
 
+    _getSourceText() {
+        const getSources = () =>
+            this._types
+                .filter(type => type !== "items")
+                .map(type =>
+                    this._lootData[type]
+                        .filter(source => this._sourceIds.includes(source.id))
+                        .map(source => ({ id: source.id, name: source.name }))
+                )
+                .flat();
+
+        const sources = getSources();
+
+        return html`
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th scope="col">Source</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${/* eslint-disable indent */
+                    repeat(
+                        sources,
+                        source => source.id,
+                        source =>
+                            html`
+                                <tr>
+                                    <td>${source.name}</td>
+                                </tr>
+                            `
+                    )}
+                </tbody>
+            </table>
+        `;
+    }
+
     _resetOtherSelects() {
         this._types
             .filter(type => type !== this._type)
@@ -244,8 +290,7 @@ export default class ListLoot {
 
     _getText(currentItem) {
         if (this._type === "items") {
-            /* TODO */
-            return "";
+            return this._getSourceText();
         }
 
         return this._type === "loot" ? this._getLootText(currentItem) : this._getChestText(currentItem);
@@ -258,7 +303,7 @@ export default class ListLoot {
      * @private
      */
     _getTable(selectedItemId) {
-        const currentItem = this._getItemData(selectedItemId);
+        const currentItem = this._type === "items" ? {} : this._getItemData(selectedItemId);
 
         return html`
             <div class="modules mt-4">
@@ -275,7 +320,7 @@ export default class ListLoot {
     _itemSelected() {
         const currentItem$ = this._select$[this._type].find(":selected");
         const selectedItemId = Number(currentItem$.val());
-        this._selectedIds =
+        this._sourceIds =
             this._type === "items"
                 ? currentItem$
                       .data("ids")
