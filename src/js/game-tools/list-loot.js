@@ -11,12 +11,12 @@
 import { html, render } from "lit-html";
 import { repeat } from "lit-html/directives/repeat";
 
-import { formatInt, simpleSort } from "../util";
 import { registerEvent } from "../analytics";
+import { formatInt, simpleSort } from "../util";
 
 export default class ListLoot {
-    constructor(lootData) {
-        this._lootData = lootData;
+    constructor(sourceData) {
+        this._sourceData = sourceData;
 
         this._baseName = "List loot and chests";
         this._baseId = "loot-list";
@@ -38,7 +38,7 @@ export default class ListLoot {
         $(`#${this._buttonId}`).on("click", event => {
             registerEvent("Tools", this._baseName);
             event.stopPropagation();
-            this._lootListSelected();
+            this._sourceListSelected();
         });
     }
 
@@ -47,7 +47,7 @@ export default class ListLoot {
             /* eslint-disable indent */
             return html`
                 ${repeat(
-                    this._lootData[type],
+                    this._sourceData[type],
                     item => item.id,
                     item =>
                         html`
@@ -57,17 +57,17 @@ export default class ListLoot {
             `;
         }
 
-        let items = new Map();
+        const items = new Map();
         this._types
             .filter(type => type !== "items")
             .forEach(type => {
-                this._lootData[type].forEach(loot => {
-                    loot.items.forEach(item => {
+                this._sourceData[type].forEach(source => {
+                    source.items.forEach(item => {
                         let sourceIds = {};
                         if (items.has(item.id)) {
-                            sourceIds = new Set([...items.get(item.id).sourceIds, loot.id]);
+                            sourceIds = new Set([...items.get(item.id).sourceIds, source.id]);
                         } else {
-                            sourceIds = new Set([loot.id]);
+                            sourceIds = new Set([source.id]);
                         }
 
                         items.set(item.id, { name: item.name, sourceIds });
@@ -76,7 +76,7 @@ export default class ListLoot {
             });
 
         // Sort by name
-        items = new Map(
+        this._items = new Map(
             [...items.entries()].sort((a, b) => {
                 if (a[1].name < b[1].name) {
                     return -1;
@@ -97,7 +97,7 @@ export default class ListLoot {
                 (value, key) => key,
                 (value, key) => {
                     return html`
-                        <option data-ids="${[...value[1].sourceIds].join(",")}" value="${key}">${value[1].name}</option>
+                        <option value="${value[0]}">${value[1].name}</option>
                     `;
                 }
             )};
@@ -177,7 +177,7 @@ export default class ListLoot {
         this._setupSelectListeners();
     }
 
-    _lootListSelected() {
+    _sourceListSelected() {
         // If the modal has no content yet, insert it
         if (!document.getElementById(this._modalId)) {
             this._initModal();
@@ -188,15 +188,14 @@ export default class ListLoot {
     }
 
     _getItemData(selectedItemId) {
-        return this._lootData[this._type].find(item => item.id === selectedItemId);
+        return this._sourceData[this._type].find(item => item.id === selectedItemId);
     }
 
-    _getItemsText(items, itemProbability = []) {
+    _getItemsText(items) {
         const getAmount = amount =>
             amount.min === amount.max ? formatInt(amount.min) : `${formatInt(amount.min)} to ${formatInt(amount.max)}`;
 
-        const getChance = chance =>
-            itemProbability.length ? formatInt((1 - itemProbability[chance]) * 100) : formatInt((1 - chance) * 100);
+        const getChance = chance => formatInt((1 - chance) * 100);
 
         return html`
             <table class="table table-sm">
@@ -232,7 +231,7 @@ export default class ListLoot {
 
     _getLootText(currentItem) {
         return html`
-            ${this._getItemsText(currentItem.items, currentItem.itemProbability)}
+            ${this._getItemsText(currentItem.items)}
         `;
     }
 
@@ -244,39 +243,22 @@ export default class ListLoot {
     }
 
     _getSourceText() {
-        const getSources = () =>
-            this._types
-                .filter(type => type !== "items")
-                .map(type =>
-                    this._lootData[type]
-                        .filter(source => this._sourceIds.includes(source.id))
-                        .map(source => ({ id: source.id, name: source.name }))
-                )
-                .flat();
-
-        const sources = getSources();
-
+        console.log(this._items, this._selectedItemId);
+        const items = [];
+        this._types
+            .filter(type => type !== "items")
+            .forEach(type => {
+                this._sourceData[type]
+                    .filter(source => {console.log(source, source.id, this._items.has(source.id)); return this._items.has(source.id);})
+                    .forEach(source => {
+                        const item = source.items.find(item => item.id === this._selectedItemId);
+                        console.log(item);
+                        items.push({ name: source.name, chance: item.chance, amount: item.amount });
+                    });
+            });
+        console.log(items);
         return html`
-            <table class="table table-sm">
-                <thead>
-                    <tr>
-                        <th scope="col">Source</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${/* eslint-disable indent */
-                    repeat(
-                        sources,
-                        source => source.id,
-                        source =>
-                            html`
-                                <tr>
-                                    <td>${source.name}</td>
-                                </tr>
-                            `
-                    )}
-                </tbody>
-            </table>
+            ${this._getItemsText(items)}
         `;
     }
 
@@ -288,26 +270,25 @@ export default class ListLoot {
             });
     }
 
-    _getText(currentItem) {
+    _getText() {
         if (this._type === "items") {
             return this._getSourceText();
         }
+
+        const currentItem = this._getItemData(this._selectedItemId);
 
         return this._type === "loot" ? this._getLootText(currentItem) : this._getChestText(currentItem);
     }
 
     /**
      * Construct item table
-     * @param {string} selectedItemId Id of selected item.
      * @return {string} html string
      * @private
      */
-    _getTable(selectedItemId) {
-        const currentItem = this._type === "items" ? {} : this._getItemData(selectedItemId);
-
+    _getTable() {
         return html`
             <div class="modules mt-4">
-                ${this._getText(currentItem)}
+                ${this._getText()}
             </div>
         `;
     }
@@ -319,18 +300,11 @@ export default class ListLoot {
      */
     _itemSelected() {
         const currentItem$ = this._select$[this._type].find(":selected");
-        const selectedItemId = Number(currentItem$.val());
-        this._sourceIds =
-            this._type === "items"
-                ? currentItem$
-                      .data("ids")
-                      .split(",")
-                      .map(Number)
-                : [];
+        this._selectedItemId = Number(currentItem$.val());
 
         this._resetOtherSelects();
 
         // Add new list
-        render(this._getTable(selectedItemId), this._mainDiv);
+        render(this._getTable(), this._mainDiv);
     }
 }
