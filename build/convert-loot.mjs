@@ -39,7 +39,7 @@ function convertLoot() {
         lootItems.map(item => ({
             id: item.Template,
             name: itemNames.has(item.Template) ? itemNames.get(item.Template) : item.Template,
-            chance: item.Chance,
+            chance: item.itemProbability[item.Chance],
             amount: { min: item.Stack.Min, max: item.Stack.Max }
         }));
     const data = {};
@@ -48,7 +48,6 @@ function convertLoot() {
         .map(item => ({
             id: item.Id,
             name: `${getOrdinal(item.Class, false)} rate AI${item.EventLootTable ? " (mission)" : ""}`,
-            itemProbability: item.itemProbability,
             items: getLootItems(item.Items).sort(sortBy(["chance", "name"]))
         }))
         .sort(sortBy(["class", "name"]));
