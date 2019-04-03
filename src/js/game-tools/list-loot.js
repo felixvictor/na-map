@@ -12,7 +12,7 @@ import { html, render } from "lit-html";
 import { repeat } from "lit-html/directives/repeat";
 
 import { registerEvent } from "../analytics";
-import { formatInt, simpleSort } from "../util";
+import { formatInt } from "../util";
 
 export default class ListLoot {
     constructor(sourceData) {
@@ -29,7 +29,7 @@ export default class ListLoot {
         this._types.forEach(type => {
             this._selectId[type] = `${this._baseId}-${type}-select`;
         });
-        this._type = "";
+        this._selectedType = "";
 
         this._setupListener();
     }
@@ -63,14 +63,16 @@ export default class ListLoot {
             .forEach(type => {
                 this._sourceData[type].forEach(source => {
                     source.items.forEach(item => {
-                        let sourceIds = {};
-                        if (items.has(item.id)) {
-                            sourceIds = new Set([...items.get(item.id).sourceIds, source.id]);
-                        } else {
-                            sourceIds = new Set([source.id]);
-                        }
+                        const sourceDetail = new Map([
+                            [source.id, { id: source.id, name: source.name, chance: item.chance, amount: item.amount }]
+                        ]);
 
-                        items.set(item.id, { name: item.name, sourceIds });
+                        items.set(item.id, {
+                            name: item.name,
+                            sources: items.has(item.id)
+                                ? new Map([...items.get(item.id).sources, ...sourceDetail])
+                                : sourceDetail
+                        });
                     });
                 });
             });
@@ -93,9 +95,9 @@ export default class ListLoot {
         /* eslint-disable indent */
         return html`
             ${repeat(
-                items,
+                this._items,
                 (value, key) => key,
-                (value, key) => {
+                value => {
                     return html`
                         <option value="${value[0]}">${value[1].name}</option>
                     `;
@@ -154,7 +156,7 @@ export default class ListLoot {
         this._types.forEach(type => {
             this._select$[type]
                 .on("change", () => {
-                    this._type = type;
+                    this._selectedType = type;
                     this._itemSelected();
                 })
                 .selectpicker({
@@ -188,7 +190,7 @@ export default class ListLoot {
     }
 
     _getItemData(selectedItemId) {
-        return this._sourceData[this._type].find(item => item.id === selectedItemId);
+        return this._sourceData[this._selectedType].find(item => item.id === selectedItemId);
     }
 
     _getItemsText(items) {
@@ -243,20 +245,8 @@ export default class ListLoot {
     }
 
     _getSourceText() {
-        console.log(this._items, this._selectedItemId);
-        const items = [];
-        this._types
-            .filter(type => type !== "items")
-            .forEach(type => {
-                this._sourceData[type]
-                    .filter(source => {console.log(source, source.id, this._items.has(source.id)); return this._items.has(source.id);})
-                    .forEach(source => {
-                        const item = source.items.find(item => item.id === this._selectedItemId);
-                        console.log(item);
-                        items.push({ name: source.name, chance: item.chance, amount: item.amount });
-                    });
-            });
-        console.log(items);
+        const items = [...this._items.get(this._selectedItemId).sources].map(value => value[1]);
+
         return html`
             ${this._getItemsText(items)}
         `;
@@ -264,20 +254,20 @@ export default class ListLoot {
 
     _resetOtherSelects() {
         this._types
-            .filter(type => type !== this._type)
+            .filter(type => type !== this._selectedType)
             .forEach(type => {
                 this._select$[type].val("default").selectpicker("refresh");
             });
     }
 
     _getText() {
-        if (this._type === "items") {
+        if (this._selectedType === "items") {
             return this._getSourceText();
         }
 
         const currentItem = this._getItemData(this._selectedItemId);
 
-        return this._type === "loot" ? this._getLootText(currentItem) : this._getChestText(currentItem);
+        return this._selectedType === "loot" ? this._getLootText(currentItem) : this._getChestText(currentItem);
     }
 
     /**
@@ -299,7 +289,7 @@ export default class ListLoot {
      * @private
      */
     _itemSelected() {
-        const currentItem$ = this._select$[this._type].find(":selected");
+        const currentItem$ = this._select$[this._selectedType].find(":selected");
         this._selectedItemId = Number(currentItem$.val());
 
         this._resetOtherSelects();
