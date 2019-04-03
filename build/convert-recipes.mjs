@@ -79,7 +79,8 @@ function convertRecipes() {
             APIrecipe.ItemType === "Recipe" ? APIrecipe.Results[0] : APIrecipe.Qualities[0].Results[0];
         const recipe = {
             id: APIrecipe.Id,
-            name: APIrecipe.Name.replace(" Blueprint", "")
+            name: APIrecipe.Name.replaceAll("'", "’")
+                .replace(" Blueprint", "")
                 .replace(" - ", " – ")
                 .replace("u2013", "–")
                 .replace(/ $/, ""),
@@ -100,7 +101,10 @@ function convertRecipes() {
             craftGroup: groups.has(APIrecipe.CraftGroup) ? groups.get(APIrecipe.CraftGroup) : APIrecipe.CraftGroup,
             serverType: APIrecipe.ServerType
         };
-        data.recipe.push(recipe);
+        // if result exists
+        if (recipe.result.name) {
+            data.recipe.push(recipe);
+        }
 
         APIrecipe.FullRequirements.filter(APIingredient => ingredientIds.has(APIingredient.Template)).forEach(
             APIingredient => {
