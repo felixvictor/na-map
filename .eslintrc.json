@@ -17,12 +17,13 @@
     "extends": [
         "plugin:import/errors",
         "plugin:import/warnings",
+        "plugin:lit/recommended",
         "plugin:prettier/recommended",
         "plugin:unicorn/recommended",
         "xo/esnext",
         "xo/browser"
     ],
-    "plugins": ["prettier"],
+    "plugins": ["lit", "prettier"],
     "rules": {
         "capitalized-comments": "off",
         "indent": [
