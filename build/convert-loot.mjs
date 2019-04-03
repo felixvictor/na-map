@@ -28,41 +28,49 @@ function convertLoot() {
      * Get item names
      * @return {Map<number, string>} Item names<id, name>
      */
-    const getItemNames = () => new Map(APIItems.map(item => [item.Id, item.Name.replaceAll("'", "’")]));
+    const getItemNames = () => new Map(APIItems.map(item => [Number(item.Id), item.Name.replaceAll("'", "’")]));
 
     const itemNames = getItemNames();
 
     const getLootItemsFromChestLootTable = chestLootTableId =>
-        APIItems.filter(item => item.Id === chestLootTableId).flatMap(item => getLootItems(item.Items));
+        APIItems.filter(item => Number(item.Id) === chestLootTableId).flatMap(item => getLootItems(item.Items));
 
-    const getLootItems = lootItems =>
+    const getLootItems = (lootItems, itemProbability = []) =>
         lootItems.map(item => ({
-            id: item.Template,
-            name: itemNames.has(item.Template) ? itemNames.get(item.Template) : item.Template,
-            chance: item.Chance,
-            amount: { min: item.Stack.Min, max: item.Stack.Max }
+            id: Number(item.Template),
+            name: itemNames.has(Number(item.Template)) ? itemNames.get(Number(item.Template)) : Number(item.Template),
+            chance: itemProbability.length ? Number(itemProbability[Number(item.Chance)]) : Number(item.Chance),
+            amount: { min: Number(item.Stack.Min), max: Number(item.Stack.Max) }
         }));
+
+    const getLootName = (classId, isMission) => {
+        if (classId === -1) {
+            return "Trader bot (open world)";
+        }
+
+        return `${getOrdinal(classId, false)} rate bot (${isMission ? "mission" : "open world"})`;
+    };
+
     const data = {};
 
     data.loot = APIItems.filter(item => !item.NotUsed && item.ItemType === "ShipLootTableItem")
         .map(item => ({
-            id: item.Id,
-            name: `${getOrdinal(item.Class, false)} rate AI${item.EventLootTable ? " (mission)" : ""}`,
-            itemProbability: item.itemProbability,
-            items: getLootItems(item.Items).sort(sortBy(["chance", "name"]))
+            id: Number(item.Id),
+            name: getLootName(Number(item.Class), item.EventLootTable),
+            items: getLootItems(item.Items, item.itemProbability).sort(sortBy(["chance", "name"]))
         }))
         .sort(sortBy(["class", "name"]));
 
     data.chests = APIItems.filter(item => !item.NotUsed && item.ItemType === "TimeBasedConvertibleItem")
         .map(item => ({
-            id: item.Id,
+            id: Number(item.Id),
             name: item.Name,
-            weight: item.ItemWeight,
-            lifetime: item.LifetimeSeconds / (60 * 60),
+            weight: Number(item.ItemWeight),
+            lifetime: Number(item.LifetimeSeconds) / (60 * 60),
             items: item.ExtendedLootTable.map(lootChestLootTableId =>
                 getLootItemsFromChestLootTable(lootChestLootTableId)
             )
-                .reduce((acc, val) => acc.concat(val), [])
+                .reduce((acc, value) => acc.concat(value), [])
                 .sort(sortBy(["chance", "name"]))
         }))
         .sort(sortBy(["name"]));
