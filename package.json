@@ -3,10 +3,10 @@
     "version": "8.7.0",
     "description": "Naval Action map",
     "devDependencies": {
-        "@babel/core": "7.4.0",
+        "@babel/core": "7.4.3",
         "@babel/highlight": "^7.0.0",
         "@babel/plugin-syntax-dynamic-import": "^7.2.0",
-        "@babel/preset-env": "7.4.2",
+        "@babel/preset-env": "7.4.3",
         "angular-html-parser": "^1.2.0",
         "autoprefixer": "^9.5.0",
         "babel-eslint": "^10.0.1",
@@ -75,7 +75,7 @@
         "webpack-dev-server": "^3.2.1",
         "webpack-pwa-manifest": "^4.0.0",
         "webpack-subresource-integrity": "^1.3.2",
-        "workbox-webpack-plugin": "^4.1.1",
+        "workbox-webpack-plugin": "^4.2.0",
         "xml2json": "^0.11.2",
         "yaml": "^1.4.0",
         "yaml-unist-parser": "^1.0.0"
