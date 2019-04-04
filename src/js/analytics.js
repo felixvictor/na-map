@@ -1,4 +1,3 @@
-/* eslint-disable prefer-rest-params */
 /**
  * This file is part of na-map.
  *
@@ -79,14 +78,19 @@ export const initAnalytics = () => {
       
             // In case the "errorObject" is available, use its data, else fallback
             // on the default "errorMessage" provided:
-            let exceptionDescription = errorMessage;
-            if (typeof errorObject !== "undefined" && typeof errorObject.message !== "undefined") {
-                exceptionDescription = errorObject.message;
+            let exceptionDescription = "";
+            if (errorMessage) {
+                exceptionDescription = [
+      'Message: ' + errorMessage,
+      'URL: ' + url,
+      'line: ' + lineNumber,
+      'column: ' + columnNumber,
+      'error object: ' + JSON.stringify(errorObject)
+    ].join(' - ');
+                } else if (errorObject) {
+                exceptionDescription = JSON.stringify(errorObject);
             }
-
-            // Format the message to log to Analytics (might also use "errorObject.stack" if defined):
-            exceptionDescription += " @ " + url + ":" + lineNumber + ":" + columnNumber;
-
+            
             ga("send", "exception", {
                 exDescription: exceptionDescription,
                 exFatal: false, // Some Error types might be considered as fatal.
