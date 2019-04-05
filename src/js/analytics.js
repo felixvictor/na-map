@@ -75,29 +75,20 @@ export const initAnalytics = () => {
      *                                         firing of the default event handler.
      */
     window.addEventListener("error", (errorMessage, url, lineNumber, columnNumber, errorObject) => {
-      
-            // In case the "errorObject" is available, use its data, else fallback
-            // on the default "errorMessage" provided:
-            let exceptionDescription = "";
-            if (errorMessage) {
-                exceptionDescription = [
-      'Message: ' + errorMessage,
-      'URL: ' + url,
-      'line: ' + lineNumber,
-      'column: ' + columnNumber,
-      'error object: ' + JSON.stringify(errorObject)
-    ].join(' - ');
-                } else if (errorObject) {
-                exceptionDescription = JSON.stringify(errorObject);
-            }
-            
-            ga("send", "exception", {
-                exDescription: exceptionDescription,
-                exFatal: false, // Some Error types might be considered as fatal.
-                appName,
-                appVersion
-            });
-       
+        const exceptionDescription = [
+            `Message: ${errorMessage}`,
+            `URL: ${url}`,
+            `Line: ${lineNumber}`,
+            `Column: ${columnNumber}`,
+            `Error object: ${JSON.stringify(errorObject)}`
+        ].join(" - ");
+
+        ga("send", "exception", {
+            exDescription: exceptionDescription,
+            exFatal: false, // Some Error types might be considered as fatal.
+            appName,
+            appVersion
+        });
 
         // If the previous "window.onerror" callback can be called, pass it the data:
         if (typeof originalWindowErrorCallback === "function") {
