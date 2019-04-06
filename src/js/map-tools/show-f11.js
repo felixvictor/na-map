@@ -197,8 +197,8 @@ export default class ShowF11 {
         this._xInputSel.select();
     }
 
-    _getInputValue(elem) {
-        const { value } = elem;
+    _getInputValue(element) {
+        const { value } = element;
         return value === "" ? Infinity : Number(value);
     }
 
@@ -273,7 +273,7 @@ export default class ShowF11 {
             .attr("dx", `${circleSize}px`)
             .attr("dy", `${circleSize / 2 + 2}px`)
             .attr("class", "f11-time")
-            .text("(" + timeStampLocal.format("H.mm") + " local)");
+            .text(`(${timeStampLocal.format("H.mm")} local)`);
         const timeStampDim = timeStampText.node().getBBox();
         const timeStampLocalDim = timeStampLocalText.node().getBBox();
 
@@ -306,18 +306,18 @@ export default class ShowF11 {
         }
     }
 
-    checkF11Coord() {
-        const urlParams = new URL(document.location).searchParams;
+    /**
+     * Get F11 coordinates from url query arguments and display position
+     * @param {URLSearchParams} urlParams - Query arguments
+     * @return {void}
+     */
+    goToF11FromParam(urlParams) {
+        const x = Number(urlParams.get("x")) * -1000;
+        const z = Number(urlParams.get("z")) * -1000;
 
-        if (urlParams.has("x") && urlParams.has("z")) {
-            const x = Number(urlParams.get("x")) * -1000;
-            const z = Number(urlParams.get("z")) * -1000;
-
+        if (Number.isFinite(x) && Number.isFinite(z)) {
             registerEvent("Menu", "Paste F11 coordinates");
             this._goToF11(x, z);
-        } else {
-            // Remove trailing hash from URL
-            history.pushState("", "", window.location.pathname);
         }
     }
 
