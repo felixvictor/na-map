@@ -42,8 +42,9 @@ import ShowTrades from "../map-tools/show-trades";
 class Map {
     /**
      * @param {string} serverName - Naval action server name
+     * @param {URLSearchParams} searchParams - Query arguments
      */
-    constructor(serverName) {
+    constructor(serverName, searchParams) {
         /**
          * Naval action server name
          * @type {string}
@@ -51,12 +52,14 @@ class Map {
          */
         this._serverName = serverName;
 
+        this._searchParams = searchParams;
+
         /**
          * Data directory
          * @type {string}
          * @private
          */
-        this._dataDir = "data";
+        this._dataDirectory = "data";
 
         /**
          * @type {Array<fileName: string, name: string>}
@@ -336,7 +339,7 @@ class Map {
         const jsonData = [];
         const readData = {};
         this._dataSources.forEach((datum, i) => {
-            jsonData[i] = fetch(`${this._dataDir}/${datum.fileName}`)
+            jsonData[i] = fetch(`${this._dataDirectory}/${datum.fileName}`)
                 .then(checkFetchStatus)
                 .then(getJsonFromFetch);
         });
@@ -353,7 +356,7 @@ class Map {
     }
 
     _setupListener() {
-        function stopProp() {
+        function stopProperty() {
             if (d3Event.defaultPrevented) {
                 d3Event.stopPropagation();
             }
@@ -361,7 +364,7 @@ class Map {
 
         this._svg
             .on("dblclick.zoom", null)
-            .on("click", stopProp, true)
+            .on("click", stopProperty, true)
             .on("dblclick", (d, i, nodes) => this._doDoubleClickAction(nodes[i]));
 
         document.getElementById("propertyDropdown").addEventListener("click", () => {
@@ -640,10 +643,16 @@ class Map {
         this._setZoomLevelAndData();
     }
 
+    _checkF11Coord() {
+        if (this._searchParams.has("x") && this._searchParams.has("z")) {
+            this._f11.goToF11FromParam(this._searchParams);
+        }
+    }
+
     _init() {
         this.zoomLevel = "initial";
         this.initialZoomAndPan();
-        this._f11.checkF11Coord();
+        this._checkF11Coord();
         this._setFlexOverlayHeight();
     }
 
