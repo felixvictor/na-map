@@ -32,7 +32,7 @@ import { checkFetchStatus, getJsonFromFetch, putFetchError } from "../util";
  * Data directory
  * @type {string}
  */
-const dataDir = "data";
+const dataDirectory = "data";
 
 let urlParams = "";
 let serverId = "";
@@ -99,9 +99,6 @@ const setupData = data => {
         if (urlParams.has("cmp") && urlParams.has("v") && urlParams.get("v") === appVersion) {
             registerEvent("Menu", "Paste ship compare");
             shipCompare.initFromClipboard(urlParams);
-        } else {
-            // Remove trailing hash from URL
-            history.pushState("", "", window.location.pathname);
         }
     };
 
@@ -149,7 +146,7 @@ const readData = () => {
     const fileData = {};
 
     dataSources.forEach((datum, i) => {
-        jsonData[i] = fetch(`${dataDir}/${datum.fileName}`)
+        jsonData[i] = fetch(`${dataDirectory}/${datum.fileName}`)
             .then(checkFetchStatus)
             .then(getJsonFromFetch);
     });
@@ -166,13 +163,14 @@ const readData = () => {
 
 /**
  * Init
- * @param {URLSearchParams} searchParams - Search Parameters
  * @param {string} id - Server id
+ * @param {URLSearchParams} searchParams - Search Parameters
  * @return {void}
  */
-const init = (searchParams, id) => {
-    urlParams = searchParams;
+const init = (id, searchParams) => {
     serverId = id;
+    urlParams = searchParams;
+
     readData();
 };
 
