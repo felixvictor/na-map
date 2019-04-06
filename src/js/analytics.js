@@ -76,7 +76,7 @@ export const initAnalytics = () => {
      */
     window.addEventListener("error", (errorMessage, url, lineNumber, columnNumber, errorObject) => {
         const exceptionDescription = [
-            `Message: ${errorMessage}`,
+            `Message: ${JSON.stringify(errorMessage)}`,
             `URL: ${url}`,
             `Line: ${lineNumber}`,
             `Column: ${columnNumber}`,
