@@ -1,4 +1,3 @@
-/* eslint-disable prefer-rest-params */
 /**
  * This file is part of na-map.
  *
