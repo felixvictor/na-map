@@ -69,7 +69,8 @@ function main() {
      * Get server name from cookie or use default value
      * @returns {string} - server name
      */
-    const getServerName = () => {
+    // eslint-disable-next-line space-before-function-paren
+    const getServerName = async () => {
         const r = cookie.get();
 
         radios.set(r);
@@ -77,18 +78,15 @@ function main() {
         return r;
     };
 
-    /**
-     * Get server name from cookie or use default value
-     * @type {string}
-     */
-    let serverId = getServerName();
+    // eslint-disable-next-line space-before-function-paren
+    const getSearchParams = async () => new URL(document.location).searchParams;
 
     /**
      * Change server name
      * @return {void}
      */
     const serverNameSelected = () => {
-        serverId = radios.get();
+        const serverId = radios.get();
         cookie.set(serverId);
         document.location.reload();
     };
@@ -143,12 +141,14 @@ function main() {
 
     /**
      * Load map and set resize event
+     * @param {string} serverId - Server id
+     * @param {URLSearchParams} searchParams - Query arguments
      * @return {void}
      */
     // eslint-disable-next-line space-before-function-paren
-    const loadMap = async () => {
+    const loadMap = async (serverId, searchParams) => {
         const { Map } = await import(/*  webpackPreload: true, webpackChunkName: "map" */ "./map/map");
-        const map = new Map(serverId);
+        const map = new Map(serverId, searchParams);
 
         window.addEventListener("resize", () => {
             map.resize();
@@ -157,16 +157,30 @@ function main() {
 
     /**
      * Load game tools
-     * @param {URLSearchParams} searchParams - Search Parameters
+     * @param {string} serverId - Server id
+     * @param {URLSearchParams} searchParams - Query arguments
      * @return {void}
      */
-    const loadGameTools = async searchParams => {
+    // eslint-disable-next-line space-before-function-paren
+    const loadGameTools = async (serverId, searchParams) => {
         try {
             const gameTools = await import(/* webpackChunkName: "game-tools" */ "./game-tools");
-            gameTools.init(searchParams, serverId);
+            gameTools.init(serverId, searchParams);
         } catch (error) {
             throw new Error(error);
         }
+    };
+
+    // eslint-disable-next-line space-before-function-paren
+    const load = async () => {
+        await Promise.all([getServerName(), getSearchParams()]).then(([serverId, searchParams]) => {
+            // Remove search string from URL
+            // {@link https://stackoverflow.com/a/5298684}
+            history.replaceState("", document.title, window.location.origin + window.location.pathname);
+
+            loadMap(serverId, searchParams);
+            loadGameTools(serverId, searchParams);
+        });
     };
 
     faLibrary.add(
@@ -189,11 +203,8 @@ function main() {
     initAnalytics();
     registerPage("Homepage", "/");
 
-    const { searchParams } = new URL(document.location);
-
     setupListener();
-    loadMap();
-    loadGameTools(searchParams);
+    load();
 }
 
 main();
