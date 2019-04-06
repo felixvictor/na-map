@@ -39,8 +39,8 @@ import { copyToClipboard, formatInt, formatFloat, getOrdinal, isEmpty, roundToTh
 
 import CompareWoods from "./compare-woods";
 
-const numSegments = 24;
-const segmentRadians = (2 * Math.PI) / numSegments;
+const numberSegments = 24;
+const segmentRadians = (2 * Math.PI) / numberSegments;
 
 /**
  * Ship
@@ -93,7 +93,7 @@ class Ship {
      */
     _setCompass() {
         // Compass
-        const data = new Array(numSegments / 2);
+        const data = new Array(numberSegments / 2);
         data.fill(1, 0);
         const pie = d3Pie()
             .sort(null)
@@ -405,12 +405,12 @@ class ShipBase extends Ship {
             .range([0, this.shipCompareData.svgWidth]);
 
         // Calculate the variables for the gradient
-        const numStops = 30;
+        const numberStops = 30;
         const gradientDomain = gradientScale.domain();
         gradientDomain[2] = gradientDomain[1] - gradientDomain[0];
         const gradientPoint = [];
-        for (let i = 0; i < numStops; i += 1) {
-            gradientPoint.push((i * gradientDomain[2]) / (numStops - 1) + gradientDomain[0]);
+        for (let i = 0; i < numberStops; i += 1) {
+            gradientPoint.push((i * gradientDomain[2]) / (numberStops - 1) + gradientDomain[0]);
         }
 
         // Create the gradient
@@ -422,7 +422,7 @@ class ShipBase extends Ship {
             .attr("cy", 0.25)
             .attr("r", 0.5)
             .selectAll("stop")
-            .data(d3Range(numStops))
+            .data(d3Range(numberStops))
             .join(enter =>
                 enter
                     .append("stop")
@@ -1697,11 +1697,15 @@ export default class CompareShips {
             select$.selectpicker("render");
         };
 
-        const setShipAndWoodsSelects = data => {
+        const setShipAndWoodsSelects = ids => {
             let i = 0;
 
             this._columns.some(columnId => {
-                this._shipIds[columnId] = data[i];
+                if (this._shipData.find(ship => ship.id === ids[i])) {
+                    return false;
+                }
+
+                this._shipIds[columnId] = ids[i];
                 i += 1;
                 setSelect(this._selectShip$[columnId], this._shipIds[columnId]);
                 if (columnId === "Base" && this._baseId !== "ship-journey") {
@@ -1711,9 +1715,9 @@ export default class CompareShips {
                 this.woodCompare.enableSelects(columnId);
                 this._setupModulesSelect(columnId);
 
-                if (data[i]) {
+                if (ids[i]) {
                     ["frame", "trim"].forEach(type => {
-                        setSelect(this._selectWood$[columnId][type], data[i]);
+                        setSelect(this._selectWood$[columnId][type], ids[i]);
                         i += 1;
                         this.woodCompare._woodSelected(columnId, type, this._selectWood$[columnId][type]);
                     });
@@ -1722,7 +1726,7 @@ export default class CompareShips {
                 }
 
                 this._refreshShips(columnId);
-                return i >= data.length;
+                return i >= ids.length;
             });
         };
 
@@ -1761,13 +1765,15 @@ export default class CompareShips {
 
         const ShipAndWoodsIds = hashids.decode(urlParams.get("cmp"));
 
-        this._shipCompareSelected();
-        if (ShipAndWoodsIds.length > 3) {
-            this._enableCompareSelects();
-        }
+        if (ShipAndWoodsIds.length) {
+            this._shipCompareSelected();
+            if (ShipAndWoodsIds.length > 3) {
+                this._enableCompareSelects();
+            }
 
-        setShipAndWoodsSelects(ShipAndWoodsIds);
-        setModuleSelects();
+            setShipAndWoodsSelects(ShipAndWoodsIds);
+            setModuleSelects();
+        }
     }
 
     _getShipSelectId(columnId) {
