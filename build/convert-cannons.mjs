@@ -14,7 +14,7 @@ import xml2Json from "xml2json";
 
 import { readTextFile, roundToThousands, saveJson } from "./common.mjs";
 
-const inDir = process.argv[2];
+const inDirectory = process.argv[2];
 const filename = process.argv[3];
 
 // https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
@@ -41,11 +41,11 @@ function convertCannons() {
     const fileNames = new Set();
     /**
      * Gets all files from directory <dir> and stores valid cannon/carronade file names in <fileNames>
-     * @param {string} dir - Directory
+     * @param {string} directory - Directory
      * @returns {void}
      */
-    const getBaseFileNames = dir => {
-        fs.readdirSync(dir).forEach(fileName => {
+    const getBaseFileNames = directory => {
+        fs.readdirSync(directory).forEach(fileName => {
             /**
              * First part of the file name containing the type
              * @type {string}
@@ -60,7 +60,7 @@ function convertCannons() {
         });
     };
 
-    getBaseFileNames(inDir);
+    getBaseFileNames(inDirectory);
 
     /**
      * @typedef SubFileStructure
@@ -149,9 +149,12 @@ function convertCannons() {
             });
         });
         cannon.damage["per second"] = roundToThousands(cannon.damage.basic / cannon.generic["reload time"]);
-        cannons[type].push(Object.keys(cannon)
-            .sort()
-            .reduce((r, k) => ((r[k] = cannon[k]), r), {}));
+        cannons[type].push(
+            Object.keys(cannon)
+                .sort()
+                // eslint-disable-next-line no-return-assign,no-sequences
+                .reduce((r, k) => ((r[k] = cannon[k]), r), {})
+        );
     }
 
     /**
@@ -160,7 +163,7 @@ function convertCannons() {
      * @returns {Object} File content in json format
      */
     function getFileData(baseFileName) {
-        const fileName = `${inDir}/${baseFileName}`;
+        const fileName = `${inDirectory}/${baseFileName}`;
         const fileXmlData = readTextFile(fileName);
         return xml2Json.toJson(fileXmlData, { object: true });
     }
