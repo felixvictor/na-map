@@ -10,6 +10,7 @@
 
 import { formatPrefix as d3FormatPrefix, formatLocale as d3FormatLocale } from "d3-format";
 import { scaleBand as d3ScaleBand } from "d3-scale";
+import { html } from "lit-html";
 
 /**
  * Default format
@@ -65,6 +66,54 @@ export const formatFloatFixed = (x, f = 2) =>
         .replace("-", "\u2212\u202f")
         .replace(".00", '<span class="hidden">.00</span>')
         .replace(/\.(\d)0/g, '.$1<span class="hidden">0</span>');
+
+/**
+ * Format float
+ * @function
+ * @param {Number} x - Float
+ * @param {Number} f - digits following decimal point
+ * @return {String} - Formatted float
+ */
+export const formatFloatFixedHTML = (x, f = 2) => {
+    let [number, decimals] = formatLocale
+        .format(`.${f}f`)(x)
+        .split(".");
+
+    console.log(number, decimals, typeof number, typeof decimals);
+
+    number = number.replace("-", "\u2212\u202f");
+
+    if (decimals === "00") {
+        // eslint-disable-next-line prettier/prettier
+        decimals = html`<span class="hidden">.${decimals}</span>`;
+    } else if (decimals.endsWith("0")) {
+        // eslint-disable-next-line prettier/prettier
+        decimals = html`.${decimals.replace("0", "")}<span class="hidden">0</span>`;
+    } else {
+        // eslint-disable-next-line prettier/prettier
+        decimals = html`.${decimals}`;
+    }
+
+    console.log(number, decimals, typeof number, typeof decimals);
+
+    return html`
+        ${number}${decimals}
+    `;
+};
+
+/*
+    .replace(
+        ".00",
+        html`
+            <span class="hidden">.00</span>
+        `
+    )
+    .replace(
+        /\.(\d)0/g,
+        html`
+            .$1<span class="hidden">0</span>
+        `
+    )} */
 
 /**
  * Format ShowF11 coordinate
@@ -188,8 +237,8 @@ export const roundToThousands = x => round(x, 3);
  * @param {Object} obj - Object
  * @return {Boolean} True if object is empty
  */
-export function isEmpty(obj) {
-    return Object.getOwnPropertyNames(obj).length === 0 && obj.constructor === Object;
+export function isEmpty(object) {
+    return Object.getOwnPropertyNames(object).length === 0 && object.constructor === Object;
 }
 
 /**
@@ -242,8 +291,8 @@ export const compassToDegrees = compass => {
  */
 export const degreesToCompass = degrees => {
     const ticks = 360 / compassDirections.length;
-    const val = Math.floor(degrees / ticks + 0.5);
-    return compassDirections[val % compassDirections.length];
+    const value = Math.floor(degrees / ticks + 0.5);
+    return compassDirections[value % compassDirections.length];
 };
 
 /**
@@ -353,7 +402,7 @@ export const degreesToRadians = degrees => (Math.PI / 180) * (degrees - 90);
  */
 export const rotationAngleInDegrees = (centerPt, targetPt) => {
     let theta = Math.atan2(targetPt.y - centerPt.y, targetPt.x - centerPt.x);
-    theta -= Math.PI / 2.0;
+    theta -= Math.PI / 2;
     let degrees = radiansToDegrees(theta);
     if (degrees < 0) {
         degrees += 360;
@@ -439,27 +488,27 @@ export function chunkify(array, n, balanced = true) {
         return [array];
     }
 
-    const len = array.length;
+    const length_ = array.length;
     const out = [];
     let i = 0;
     let size;
 
-    if (len % n === 0) {
-        size = Math.floor(len / n);
-        while (i < len) {
+    if (length_ % n === 0) {
+        size = Math.floor(length_ / n);
+        while (i < length_) {
             out.push(array.slice(i, (i += size)));
         }
     } else if (balanced) {
-        while (i < len) {
+        while (i < length_) {
             // eslint-disable-next-line no-param-reassign, no-plusplus
-            size = Math.ceil((len - i) / n--);
+            size = Math.ceil((length_ - i) / n--);
             out.push(array.slice(i, (i += size)));
         }
     } else {
         // eslint-disable-next-line no-param-reassign
         n -= 1;
-        size = Math.floor(len / n);
-        if (len % size === 0) {
+        size = Math.floor(length_ / n);
+        if (length_ % size === 0) {
             size -= 1;
         }
 
@@ -478,7 +527,7 @@ export function chunkify(array, n, balanced = true) {
  * @param {object} elem - Element to append compass
  * @return {void}
  */
-export function printCompassRose({ elem, radius }) {
+export function printCompassRose({ element, radius }) {
     const steps = 24;
     const degreesPerStep = 360 / steps;
     const innerRadius = Math.round(radius * 0.8);
@@ -489,14 +538,15 @@ export function printCompassRose({ elem, radius }) {
         .domain(data)
         .align(0);
 
-    elem.append("circle")
+    element
+        .append("circle")
         .attr("r", innerRadius)
         .style("stroke-width", `${strokeWidth}px`);
 
-    const dummy = elem.append("text");
+    const dummy = element.append("text");
 
     // Cardinal and intercardinal winds
-    const label = elem
+    const label = element
         .selectAll("g")
         .data(data)
         .join(enter =>
@@ -549,7 +599,7 @@ export function printCompassRose({ elem, radius }) {
  * @param {object} elem - Element to append compass
  * @return {void}
  */
-export function printSmallCompassRose({ elem, radius }) {
+export function printSmallCompassRose({ element, radius }) {
     const steps = 24;
     const degreesPerStep = 360 / steps;
     const innerRadius = Math.round(radius * 0.8);
@@ -560,7 +610,8 @@ export function printSmallCompassRose({ elem, radius }) {
         .domain(data)
         .align(0);
 
-    elem.append("circle")
+    element
+        .append("circle")
         .attr("r", innerRadius)
         .style("stroke-width", `${strokeWidth}px`);
 
@@ -568,7 +619,8 @@ export function printSmallCompassRose({ elem, radius }) {
     const x2 = 2;
     const x2InterCard = 4;
     const x2Card = 6;
-    elem.selectAll("line")
+    element
+        .selectAll("line")
         .data(data)
         .join(enter =>
             enter
