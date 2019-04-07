@@ -12,6 +12,7 @@ import { html, render } from "lit-html";
 import { repeat } from "lit-html/directives/repeat";
 
 import { registerEvent } from "../analytics";
+import { insertBaseModalHTML } from "../common";
 import { formatInt } from "../util";
 
 export default class ListLoot {
@@ -124,32 +125,11 @@ export default class ListLoot {
         `;
     }
 
-    _insertBaseModal(id, title, size = "xl", buttonText = "Close") {
-        const modalSize = size === "xl" || size === "lg" || size === "sm" ? ` modal-${size}` : "";
-
-        return html`
-            <div id="${id}" class="modal" tabindex="-1" role="dialog" aria-labelledby="title-${id}" aria-hidden="true">
-                <div class="modal-dialog${modalSize}" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 id="title-${id}" class="modal-title">
-                                ${title}
-                            </h5>
-                        </div>
-                        <div class="modal-body">${this._getModalBody()}</div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                                ${buttonText}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-
     _injectModal() {
-        render(this._insertBaseModal(this._modalId, this._baseName, "md"), document.getElementById("modal-section"));
+        render(
+            insertBaseModalHTML(this._modalId, this._baseName, this._getModalBody.bind(this), "md"),
+            document.getElementById("modal-section")
+        );
     }
 
     _setupSelectListeners() {
