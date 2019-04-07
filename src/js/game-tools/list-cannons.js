@@ -4,16 +4,18 @@
  * @file      List cannons.
  * @module    game-tools/list-cannons
  * @author    iB aka Felix Victor
- * @copyright 2018
+ * @copyright 2018, 2019
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { select as d3Select } from "d3-selection";
+import { html, render } from "lit-html";
+import { repeat } from "lit-html/directives/repeat";
 // eslint-disable-next-line import/no-named-default
 import { default as Tablesort } from "tablesort";
-import { insertBaseModal } from "../common";
-import { capitalizeFirstLetter, formatFloatFixed, formatInt } from "../util";
+
 import { registerEvent } from "../analytics";
+import { initTablesort, insertBaseModalHTML } from "../common";
+import { capitalizeFirstLetter, formatFloatFixedHTML } from "../util";
 
 // https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
 // eslint-disable-next-line no-extend-native,func-names
@@ -33,6 +35,8 @@ export default class ListCannons {
         this._baseId = "cannon-list";
         this._buttonId = `button-${this._baseId}`;
         this._modalId = `modal-${this._baseId}`;
+
+        this._cannonTypes = ["medium", "long", "carronade"];
         this._groups = new Map();
         this._cannonData.long.forEach(group => {
             for (const [key, value] of Object.entries(group)) {
@@ -54,51 +58,120 @@ export default class ListCannons {
         });
     }
 
-    _injectModal() {
-        insertBaseModal(this._modalId, this._baseName);
+    _getList(type) {
+        const getColumnGroupHeads = groupValue => html`
+            <th scope="col" class="text-center" colspan="${groupValue[1].count}">
+                ${capitalizeFirstLetter(groupValue[0])}
+            </th>
+        `;
 
-        const body = d3Select(`#${this._modalId} .modal-body`);
-        ["medium", "long", "carronade"].forEach(type => {
-            body.append("h5").text(capitalizeFirstLetter(type));
-            body.append("div")
-                .attr("id", `${type}-list`)
-                .attr("class", "modules");
-        });
+        const getColumnHeads = groupValue => html`
+            ${/* eslint-disable indent */
+            Object.entries(groupValue[1].values).map(
+                modifierValue =>
+                    html`
+                        <th class="text-right">${capitalizeFirstLetter(modifierValue[0])}</th>
+                    `
+            )}
+        `;
+
+        const getRowHead = name => html`
+            <th scope="row" class="text-right" data-sort="${parseInt(name, 10)}">
+                ${name}
+            </th>
+        `;
+
+        const getRow = cannon => html`
+            ${Object.entries(cannon).map(groupValue => {
+                if (groupValue[0] === "name") {
+                    return "";
+                }
+
+                return Object.entries(groupValue[1]).map(
+                    modifierValue =>
+                        html`
+                            <td class="text-right" data-sort="${modifierValue[1] || 0}">
+                                ${modifierValue[1] ? formatFloatFixedHTML(modifierValue[1]) : ""}
+                            </td>
+                        `
+                );
+            })}
+        `;
+
+        return html`
+            <table id="table-${type}-list" class="table table-sm small tablesort">
+                <thead>
+                    <tr>
+                        <th scope="col"></th>
+
+                        ${/* eslint-disable indent */
+                        repeat(
+                            this._groups,
+                            (groupValue, groupKey) => groupKey,
+                            groupValue => getColumnGroupHeads(groupValue)
+                        )}
+                    </tr>
+                    <tr>
+                        <th scope="col" class="text-right" data-sort-default>Lb</th>
+
+                        ${repeat(
+                            this._groups,
+                            (groupValue, groupKey) => groupKey,
+                            groupValue => getColumnHeads(groupValue)
+                        )}
+                    </tr>
+                </thead>
+                <tbody>
+                    ${/* eslint-disable indent */
+                    repeat(
+                        this._cannonData[type],
+                        cannon => cannon.id,
+                        cannon => {
+                            return html`
+                                <tr>
+                                    ${getRowHead(cannon.name)}${getRow(cannon)}
+                                </tr>
+                            `;
+                        }
+                    )}
+                </tbody>
+            </table>
+        `;
     }
 
-    _initTablesort() {
-        const cleanNumber = i => i.replace(/[^\-?0-9.]/g, "");
-        const compareNumber = (a, b) => {
-            let aa = parseFloat(a);
-            let bb = parseFloat(b);
+    _getModalBody() {
+        return html`
+            ${/* eslint-disable indent */
+            repeat(
+                this._cannonTypes,
+                type => type,
+                type =>
+                    html`
+                        <h5>${capitalizeFirstLetter(type)}</h5>
+                        <div id="${type}-list" class="modules">
+                            ${this._getList(type)}
+                        </div>
+                    `
+            )}
+        `;
+    }
 
-            aa = Number.isNaN(aa) ? 0 : aa;
-            bb = Number.isNaN(bb) ? 0 : bb;
-
-            return aa - bb;
-        };
-
-        Tablesort.extend(
-            "number",
-            item =>
-                item.match(/^[-+]?[£\u0024Û¢´€]?\d+\s*([,.]\d{0,2})/) || // Prefixed currency
-                item.match(/^[-+]?\d+\s*([,.]\d{0,2})?[£\u0024Û¢´€]/) || // Suffixed currency
-                item.match(/^[-+]?(\d)*-?([,.])?-?(\d)+([E,e][-+][\d]+)?%?$/), // Number
-            (a, b) => {
-                const aa = cleanNumber(a);
-                const bb = cleanNumber(b);
-
-                return compareNumber(bb, aa);
-            }
+    _injectModal() {
+        render(
+            insertBaseModalHTML(this._modalId, this._baseName, this._getModalBody.bind(this)),
+            document.getElementById("modal-section")
         );
+
+        this._cannonTypes.forEach(type => {
+            const table = document.getElementById(`table-${type}-list`);
+            // eslint-disable-next-line no-unused-vars
+            const sortTable = new Tablesort(table);
+        });
     }
 
     _initModal() {
-        this._initTablesort();
+        initTablesort();
         this._injectModal();
-        ["medium", "long", "carronade"].forEach(type => {
-            this._injectList(type);
-        });
     }
 
     _cannonListSelected() {
@@ -109,56 +182,5 @@ export default class ListCannons {
 
         // Show modal
         $(`#${this._modalId}`).modal("show");
-    }
-
-    /**
-     * Show wood type
-     * @param {string} type Wood type (frame or trim)
-     * @return {void}
-     * @private
-     */
-    _injectList(type) {
-        $(`#${type}-list`).append(this._getList(type));
-        const table = document.getElementById(`table-${type}-list`);
-        // eslint-disable-next-line no-unused-vars
-        const sortTable = new Tablesort(table);
-    }
-
-    _getList(type) {
-        let text = "";
-
-        text += `<table id="table-${type}-list" class="table table-sm small tablesort">`;
-        text += '<thead><tr><th scope="col"></th>';
-        this._groups.forEach((groupValue, groupKey) => {
-            text += `<th scope="col" class="text-center" colspan="${groupValue.count}">${capitalizeFirstLetter(
-                groupKey
-            )}</th>`;
-        });
-        text += "</tr>";
-        text += '<tr><th scope="col" class="text-right" data-sort-default>Pd</th>';
-        this._groups.forEach(groupValue => {
-            Object.entries(groupValue.values).forEach(modifierValue => {
-                text += `<th class="text-right">${capitalizeFirstLetter(modifierValue[0])}</th>`;
-            });
-        });
-        text += "</tr></thead><tbody>";
-
-        this._cannonData[type].forEach(cannon => {
-            const name = cannon.name.replace(" (", "<br>(").replaceAll(" ", "\u00A0");
-            text += `<tr><th scope="row" class="text-right" data-sort="${parseInt(cannon.name, 10)}">${name}</th>`;
-
-            Object.entries(cannon).forEach((groupValue, groupKey) => {
-                if (groupValue[0] !== "name") {
-                    Object.entries(groupValue[1]).forEach(modifierValue => {
-                        text += `<td class="text-right" data-sort="${modifierValue[1] || 0}">${
-                            modifierValue[1] ? formatFloatFixed(modifierValue[1]) : ""
-                        }</td>`;
-                    });
-                }
-            });
-            text += "</tr>";
-        });
-        text += "</tbody></table>";
-        return text;
     }
 }
