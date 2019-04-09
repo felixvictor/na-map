@@ -68,18 +68,16 @@ export const formatFloatFixed = (x, f = 2) =>
         .replace(/\.(\d)0/g, '.$1<span class="hidden">0</span>');
 
 /**
- * Format float
+ * Format float for lit-html
  * @function
  * @param {Number} x - Float
  * @param {Number} f - digits following decimal point
- * @return {String} - Formatted float
+ * @return {TemplateResult} - Formatted float
  */
 export const formatFloatFixedHTML = (x, f = 2) => {
     let [number, decimals] = formatLocale
         .format(`.${f}f`)(x)
         .split(".");
-
-    console.log(number, decimals, typeof number, typeof decimals);
 
     number = number.replace("-", "\u2212\u202f");
 
@@ -94,26 +92,10 @@ export const formatFloatFixedHTML = (x, f = 2) => {
         decimals = html`.${decimals}`;
     }
 
-    console.log(number, decimals, typeof number, typeof decimals);
-
     return html`
         ${number}${decimals}
     `;
 };
-
-/*
-    .replace(
-        ".00",
-        html`
-            <span class="hidden">.00</span>
-        `
-    )
-    .replace(
-        /\.(\d)0/g,
-        html`
-            .$1<span class="hidden">0</span>
-        `
-    )} */
 
 /**
  * Format ShowF11 coordinate
