@@ -149,7 +149,7 @@ class Ship {
             s += "\u2013";
         }
 
-        s += "\u202Fpd</span>";
+        s += "\u202Flb</span>";
         return s;
     }
 
@@ -235,7 +235,7 @@ class Ship {
         text += displayColumn("firezoneHorizontalWidth", "Firezone horizontal width");
         text += "</div></div></div>";
 
-        text += displayFirstColumn("Broadside (pd)");
+        text += displayFirstColumn("Broadside (lb)");
         text += displaySecondBlock();
         text += displayColumn("cannonBroadside", "Cannons");
         text += displayColumn("carroBroadside", "Carronades");
