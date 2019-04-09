@@ -10,6 +10,7 @@
 
 import "bootstrap/js/dist/util";
 import "bootstrap/js/dist/modal";
+import "bootstrap/js/dist/tab";
 
 import CompareShips from "./compare-ships";
 import CompareWoods from "./compare-woods";
