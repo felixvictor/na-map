@@ -9,8 +9,11 @@
  */
 
 import { select as d3Select } from "d3-selection";
+import { html } from "lit-html";
 import Hashids from "hashids";
-import { distancePoints, roundToThousands, sortBy } from "./util";
+import { default as Tablesort } from "tablesort";
+
+import { distancePoints, sortBy } from "./util";
 
 const transformMatrix = {
     A: -0.00499866779363828,
@@ -127,10 +130,10 @@ export function insertBaseModal(id, title, size = "xl", buttonText = "Close") {
  */
 export function initMultiDropdownNavbar(id) {
     $(`#${id} .dropdown-menu .bootstrap-select .dropdown-toggle`).on("click", event => {
-        const el$ = $(event.currentTarget);
-        el$.next(".dropdown-menu").toggleClass("show");
-        el$.parent("li").toggleClass("show");
-        el$.parents("li.nav-item.dropdown.show").on("hidden.bs.dropdown", event2 => {
+        const element = $(event.currentTarget);
+        element.next(".dropdown-menu").toggleClass("show");
+        element.parent("li").toggleClass("show");
+        element.parents("li.nav-item.dropdown.show").on("hidden.bs.dropdown", event2 => {
             $(event2.currentTarget)
                 .find(".dropdown-menu.show")
                 .not(".inner")
@@ -148,6 +151,57 @@ export function initMultiDropdownNavbar(id) {
             .removeClass("show");
     });
 }
+
+export const initTablesort = () => {
+    const cleanNumber = i => i.replace(/[^\-?0-9.]/g, "");
+    const compareNumber = (a, b) => {
+        let aa = parseFloat(a);
+        let bb = parseFloat(b);
+
+        aa = Number.isNaN(aa) ? 0 : aa;
+        bb = Number.isNaN(bb) ? 0 : bb;
+
+        return aa - bb;
+    };
+
+    Tablesort.extend(
+        "number",
+        item =>
+            item.match(/^[-+]?[£\u0024Û¢´€]?\d+\s*([,.]\d{0,2})/) || // Prefixed currency
+            item.match(/^[-+]?\d+\s*([,.]\d{0,2})?[£\u0024Û¢´€]/) || // Suffixed currency
+            item.match(/^[-+]?(\d)*-?([,.])?-?(\d)+([E,e][-+][\d]+)?%?$/), // Number
+        (a, b) => {
+            const aa = cleanNumber(a);
+            const bb = cleanNumber(b);
+
+            return compareNumber(bb, aa);
+        }
+    );
+};
+
+export const insertBaseModalHTML = (id, title, getModalBody, size = "xl", buttonText = "Close") => {
+    const modalSize = size === "xl" || size === "lg" || size === "sm" ? ` modal-${size}` : "";
+
+    return html`
+        <div id="${id}" class="modal" tabindex="-1" role="dialog" aria-labelledby="title-${id}" aria-hidden="true">
+            <div class="modal-dialog${modalSize}" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 id="title-${id}" class="modal-title">
+                            ${title}
+                        </h5>
+                    </div>
+                    <div class="modal-body">${getModalBody()}</div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                            ${buttonText}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+};
 
 /**
  * Get currency
