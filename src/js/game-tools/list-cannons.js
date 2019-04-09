@@ -141,18 +141,48 @@ export default class ListCannons {
 
     _getModalBody() {
         return html`
-            ${/* eslint-disable indent */
-            repeat(
-                this._cannonTypes,
-                type => type,
-                type =>
-                    html`
-                        <h5>${capitalizeFirstLetter(type)}</h5>
-                        <div id="${type}-list" class="modules">
-                            ${this._getList(type)}
-                        </div>
-                    `
-            )}
+            <ul class="nav nav-pills" role="tablist">
+                ${/* eslint-disable indent */
+                repeat(
+                    this._cannonTypes,
+                    type => type,
+                    (type, index) =>
+                        html`
+                            <li class="nav-item">
+                                <a
+                                    class="nav-link${index === 0 ? " active" : ""}"
+                                    id="tab-${this._baseId}-${type}"
+                                    data-toggle="tab"
+                                    href="#tab-content-${this._baseId}-${type}"
+                                    role="tab"
+                                    aria-controls="home"
+                                    aria-selected="true"
+                                    >${capitalizeFirstLetter(type)}</a
+                                >
+                            </li>
+                        `
+                )}
+            </ul>
+            <div class="tab-content pt-2">
+                ${/* eslint-disable indent */
+                repeat(
+                    this._cannonTypes,
+                    type => type,
+                    (type, index) =>
+                        html`
+                            <div
+                                class="tab-pane fade${index === 0 ? " show active" : ""}"
+                                id="tab-content-${this._baseId}-${type}"
+                                role="tabpanel"
+                                aria-labelledby="tab-${this._baseId}-${type}"
+                            >
+                                <div id="${type}-list" class="modules">
+                                    ${this._getList(type)}
+                                </div>
+                            </div>
+                        `
+                )}
+            </div>
         `;
     }
 
