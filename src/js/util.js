@@ -579,7 +579,8 @@ export function printCompassRose({ element, radius }) {
 
 /**
  * Print small compass
- * @param {object} elem - Element to append compass
+ * @param {object} element - Element to append compass
+ * @param {object} radius - Radius
  * @return {void}
  */
 export function printSmallCompassRose({ element, radius }) {
