@@ -189,7 +189,7 @@ export const formatSignPercent = x =>
 /**
  * Format ordinal
  * @param {number} n - Integer
- * @param {bool} sup - True if superscript tags needed
+ * @param {boolean} sup - True if superscript tags needed
  * @return {String} Formatted Ordinal
  */
 export function getOrdinal(n, sup = true) {
@@ -216,8 +216,8 @@ export const roundToThousands = x => round(x, 3);
 
 /**
  * Test if object is empty
- * @param {Object} obj - Object
- * @return {Boolean} True if object is empty
+ * @param {object} object - Object
+ * @return {boolean} True if object is empty
  */
 export function isEmpty(object) {
     return Object.getOwnPropertyNames(object).length === 0 && object.constructor === Object;
@@ -280,7 +280,7 @@ export const degreesToCompass = degrees => {
 /**
  * Display formatted compass
  * @param {string} wind - Wind direction in compass or degrees
- * @param {bool} svg - True to use 'tspan' instead of 'span'
+ * @param {boolean} svg - True to use 'tspan' instead of 'span'
  * @return {string} HTML formatted compass
  */
 export const displayCompass = (wind, svg = false) => {
@@ -298,7 +298,7 @@ export const displayCompass = (wind, svg = false) => {
 /**
  * Display formatted compass and degrees
  * @param {string} wind - Wind direction in compass or degrees
- * @param {bool} svg - True to use 'tspan' instead of 'span'
+ * @param {boolean} svg - True to use 'tspan' instead of 'span'
  * @return {string} HTML formatted compass and degrees
  */
 export const displayCompassAndDegrees = (wind, svg = false) => {
@@ -461,7 +461,7 @@ export const capitalizeFirstLetter = string => string.charAt(0).toUpperCase() + 
 /** Split array into n pieces
  * {@link https://stackoverflow.com/questions/8188548/splitting-a-js-array-into-n-arrays}
  * @param {Array} array Array to be split
- * @param {Integer} n Number of splits
+ * @param {Number} n Number of splits
  * @param {Boolean} balanced True if splits' lengths differ as less as possible
  * @return {Array} Split arrays
  */
@@ -506,7 +506,8 @@ export function chunkify(array, n, balanced = true) {
 
 /**
  * Print compass
- * @param {object} elem - Element to append compass
+ * @param {object} element - Element to append compass
+ * @param {object} radius - Radius
  * @return {void}
  */
 export function printCompassRose({ element, radius }) {
