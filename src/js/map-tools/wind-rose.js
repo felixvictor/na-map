@@ -149,7 +149,7 @@ export default class WindRose {
             return pos;
         };
 
-        window.tooltip = args => `${displayCompass(args.value)}<br>${args.value}°`;
+        window.tooltip = arguments_ => `${displayCompass(arguments_.value)}<br>${arguments_.value}°`;
 
         $(`#${this._sliderId}`).roundSlider({
             sliderType: "default",
@@ -267,12 +267,12 @@ export default class WindRose {
         this._svg.attr("height", this._height).attr("width", this._width);
 
         // Compass rose
-        const compassElem = this._svg
+        const compassElement = this._svg
             .append("svg")
             .classed("compass", true)
             .attr("x", this._xCompass)
             .attr("y", this._yCompass);
-        printSmallCompassRose({ elem: compassElem, radius: this._compassRadius });
+        printSmallCompassRose({ element: compassElement, radius: this._compassRadius });
 
         this._windPath = this._svg
             .append("path")
