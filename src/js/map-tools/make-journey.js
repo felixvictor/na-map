@@ -21,15 +21,6 @@ import "moment/locale/en-gb";
 import "round-slider/src/roundslider";
 import "round-slider/src/roundslider.css";
 
-import {
-    compassDirections,
-    degreesToCompass,
-    displayCompass,
-    displayCompassAndDegrees,
-    formatF11,
-    printCompassRose,
-    rotationAngleInDegrees
-} from "../util";
 import { registerEvent } from "../analytics";
 import {
     convertInvCoordX,
@@ -40,6 +31,15 @@ import {
     insertBaseModal,
     speedFactor
 } from "../common";
+import {
+    compassDirections,
+    degreesToCompass,
+    displayCompass,
+    displayCompassAndDegrees,
+    formatF11,
+    printCompassRose,
+    rotationAngleInDegrees
+} from "../util";
 import CompareShips from "../game-tools/compare-ships";
 import CompareWoods from "../game-tools/compare-woods";
 
@@ -198,7 +198,7 @@ export default class Journey {
             return pos;
         };
 
-        window.tooltip = args => `${displayCompass(args.value)}<br>${args.value}°`;
+        window.tooltip = arguments_ => `${displayCompass(arguments_.value)}<br>${arguments_.value}°`;
 
         $(`#${this._sliderId}`).roundSlider({
             sliderType: "default",
@@ -319,7 +319,7 @@ export default class Journey {
             .call(this._drag);
 
         this._compassG = this._compass.append("g");
-        printCompassRose({ elem: this._compassG, radius: this._compassRadius });
+        printCompassRose({ element: this._compassG, radius: this._compassRadius });
     }
 
     _removeCompass() {
@@ -333,25 +333,23 @@ export default class Journey {
     _calculateDistanceForSection(degreesCourse, degreesCurrentWind) {
         const degreesForSpeedCalc = (fullCircle - degreesCourse + degreesCurrentWind) % fullCircle;
         const speedCurrentSection = this._getSpeedAtDegrees(degreesForSpeedCalc) * this._owSpeedFactor;
-        const distanceCurrentSection = speedCurrentSection * speedFactor;
         /*
         console.log(
             { degreesCourse },
             { degreesCurrentWind },
             { degreesForSpeedCalc },
             { speedCurrentSection },
-            { distanceCurrentSection }
+            { speedCurrentSection * speedFactor }
         );
         */
-        return distanceCurrentSection;
+        return speedCurrentSection * speedFactor;
     }
 
     _getStartWind() {
-        const currentUserWind = $(`#${this._sliderId}`).roundSlider("getValue");
+        const select$ = $(`#${this._sliderId}`);
+        const currentUserWind = Number(select$.roundSlider("getValue"));
         // Current wind in degrees
-        const currentWindDegrees = $(`#${this._sliderId}`).length ? Number(currentUserWind) : 0;
-
-        return currentWindDegrees;
+        return select$.length ? currentUserWind : 0;
     }
 
     _setShipSpeed() {
@@ -403,15 +401,17 @@ export default class Journey {
     }
 
     _setShipName() {
-        if (
-            typeof this._shipCompare !== "undefined" &&
-            typeof this._shipCompare._singleShipData !== "undefined" &&
-            typeof this._shipCompare._singleShipData.name !== "undefined"
-        ) {
-            this._journey.shipName = `${this._shipCompare._singleShipData.name}`;
-            this._journey.woodNames = `${this._shipCompare._woodCompare._woodsSelected.Base.frame}/${
+        if (this._shipCompare && this._shipCompare._singleShipData && this._shipCompare._singleShipData.name) {
+            const frameName = this._shipCompare._woodCompare.getWoodTypeData(
+                "frame",
+                this._shipCompare._woodCompare._woodsSelected.Base.frame
+            ).name;
+            const trimName = this._shipCompare._woodCompare.getWoodTypeData(
+                "trim",
                 this._shipCompare._woodCompare._woodsSelected.Base.trim
-            }`;
+            ).name;
+            this._journey.shipName = `${this._shipCompare._singleShipData.name}`;
+            this._journey.woodNames = `${frameName}/${trimName}`;
         } else {
             this._journey.shipName = this._defaultShipName;
             this._journey.woodNames = "";
@@ -627,15 +627,15 @@ export default class Journey {
         function getHumanisedDuration(duration) {
             moment.locale("en-gb");
 
-            function pluralize(num, word) {
-                return `${num} ${word + (num === 1 ? "" : "s")}`;
+            function pluralize(number, word) {
+                return `${number} ${word + (number === 1 ? "" : "s")}`;
             }
 
             const durationHours = Math.floor(duration / 60);
             const durationMinutes = Math.round(duration % 60);
 
             let s = "in ";
-            if (duration < 1.0) {
+            if (duration < 1) {
                 s += "less than a minute";
             } else {
                 const hourString = durationHours === 0 ? "" : pluralize(durationHours, "hour");

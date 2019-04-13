@@ -82,7 +82,7 @@ export default class ListIngredients {
         text = `<h6 class='text-muted text-left'>${moduleType}</h6>`;
         text += `<table class='table table-sm'><tbody>${properties}</tbody></table>`;
 
-        return properties?text:"";
+        return properties ? text : "";
     }
 
     _getRows() {
@@ -91,7 +91,7 @@ export default class ListIngredients {
                 `<tr><td>${ingredient.name}</td><td>${ingredient.recipeNames
                     .map(recipeName => {
                         const properties = this._getProperties(recipeName);
-                        console.log(recipeName, properties);
+
                         return properties
                             ? `<a data-toggle="tooltip" title="${properties}">${recipeName}</a>`
                             : recipeName;
