@@ -21,15 +21,6 @@ import "moment/locale/en-gb";
 import "round-slider/src/roundslider";
 import "round-slider/src/roundslider.css";
 
-import {
-    compassDirections,
-    degreesToCompass,
-    displayCompass,
-    displayCompassAndDegrees,
-    formatF11,
-    printCompassRose,
-    rotationAngleInDegrees
-} from "../util";
 import { registerEvent } from "../analytics";
 import {
     convertInvCoordX,
@@ -40,6 +31,15 @@ import {
     insertBaseModal,
     speedFactor
 } from "../common";
+import {
+    compassDirections,
+    degreesToCompass,
+    displayCompass,
+    displayCompassAndDegrees,
+    formatF11,
+    printCompassRose,
+    rotationAngleInDegrees
+} from "../util";
 import CompareShips from "../game-tools/compare-ships";
 import CompareWoods from "../game-tools/compare-woods";
 
@@ -406,10 +406,16 @@ export default class Journey {
             typeof this._shipCompare._singleShipData !== "undefined" &&
             typeof this._shipCompare._singleShipData.name !== "undefined"
         ) {
-            this._journey.shipName = `${this._shipCompare._singleShipData.name}`;
-            this._journey.woodNames = `${this._shipCompare._woodCompare._woodsSelected.Base.frame}/${
+            const frameName = this._shipCompare._woodCompare.getWoodTypeData(
+                "frame",
+                this._shipCompare._woodCompare._woodsSelected.Base.frame
+            ).name;
+            const trimName = this._shipCompare._woodCompare.getWoodTypeData(
+                "trim",
                 this._shipCompare._woodCompare._woodsSelected.Base.trim
-            }`;
+            ).name;
+            this._journey.shipName = `${this._shipCompare._singleShipData.name}`;
+            this._journey.woodNames = `${frameName}/${trimName}`;
         } else {
             this._journey.shipName = this._defaultShipName;
             this._journey.woodNames = "";
