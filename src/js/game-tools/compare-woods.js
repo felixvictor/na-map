@@ -503,14 +503,10 @@ export default class CompareWoods {
             .selectpicker({ title: `Select ${type}` });
     }
 
-    _getWoodTypeData(type, woodId) {
-        return this._woodData[type].find(wood => wood.id === woodId);
-    }
-
     _getWoodData(id) {
         return {
-            frame: this._getWoodTypeData("frame", this._woodsSelected[id].frame),
-            trim: this._getWoodTypeData("trim", this._woodsSelected[id].trim)
+            frame: this.getWoodTypeData("frame", this._woodsSelected[id].frame),
+            trim: this.getWoodTypeData("trim", this._woodsSelected[id].trim)
         };
     }
 
@@ -525,5 +521,9 @@ export default class CompareWoods {
 
     _addInstance(id, woodInstance) {
         this._instances[id] = woodInstance;
+    }
+
+    getWoodTypeData(type, woodId) {
+        return this._woodData[type].find(wood => wood.id === woodId);
     }
 }
