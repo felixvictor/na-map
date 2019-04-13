@@ -401,11 +401,7 @@ export default class Journey {
     }
 
     _setShipName() {
-        if (
-            typeof this._shipCompare !== "undefined" &&
-            typeof this._shipCompare._singleShipData !== "undefined" &&
-            typeof this._shipCompare._singleShipData.name !== "undefined"
-        ) {
+        if (this._shipCompare && this._shipCompare._singleShipData && this._shipCompare._singleShipData.name) {
             const frameName = this._shipCompare._woodCompare.getWoodTypeData(
                 "frame",
                 this._shipCompare._woodCompare._woodsSelected.Base.frame
