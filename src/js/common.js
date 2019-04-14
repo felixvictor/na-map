@@ -179,7 +179,7 @@ export const initTablesort = () => {
     );
 };
 
-export const insertBaseModalHTML = (id, title, getModalBody, size = "xl", buttonText = "Close") => {
+export const insertBaseModalHTML = ({ id, title, size = "xl", body, footer }) => {
     const modalSize = size === "xl" || size === "lg" || size === "sm" ? ` modal-${size}` : "";
 
     return html`
@@ -191,11 +191,9 @@ export const insertBaseModalHTML = (id, title, getModalBody, size = "xl", button
                             ${title}
                         </h5>
                     </div>
-                    <div class="modal-body">${getModalBody()}</div>
+                    <div class="modal-body">${body()}</div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                            ${buttonText}
-                        </button>
+                        ${footer()}
                     </div>
                 </div>
             </div>
