@@ -4,7 +4,7 @@
  * @file      Compare ships.
  * @module    game-tools/compare-ships
  * @author    iB aka Felix Victor
- * @copyright 2018
+ * @copyright 2018, 2019
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -19,6 +19,8 @@ import {
     pie as d3Pie,
     radialLine as d3RadialLine
 } from "d3-shape";
+import { html, render } from "lit-html";
+import { repeat } from "lit-html/directives/repeat";
 
 import { registerEvent } from "../analytics";
 import {
@@ -33,7 +35,8 @@ import {
     hullRepairsFactor,
     rigRepairsFactor,
     rumRepairsFactor,
-    insertBaseModal
+    insertBaseModal,
+    insertBaseModalHTML
 } from "../common";
 import { copyToClipboard, formatInt, formatFloat, getOrdinal, isEmpty, roundToThousands, sortBy } from "../util";
 
@@ -920,6 +923,7 @@ export default class CompareShips {
         this._shipData = shipData;
         this._moduleDataDefault = moduleData;
         this._baseId = id;
+
         this._baseName = "Compare ships";
         this._buttonId = `button-${this._baseId}`;
         this._modalId = `modal-${this._baseId}`;
@@ -1095,7 +1099,7 @@ export default class CompareShips {
         }
 
         // Show modal
-        $(`#${this._modalId}`).modal("show");
+        this._modal$.modal("show");
         this._setGraphicsParameters();
     }
 
@@ -1149,24 +1153,32 @@ export default class CompareShips {
     }
 
     /**
-     * Setup ship data
+     * Setup ship data (group by class)
      * @returns {void}
      */
     _setupShipData() {
-        this.shipSelectData = d3Nest()
-            .key(ship => ship.class)
-            .sortKeys(d3Ascending)
-            .entries(
-                this._shipData
-                    .map(ship => ({
+        this.shipSelectData = new Map();
+        this._shipData.forEach(ship => {
+            const shipDetail = new Map([
+                [
+                    ship.id,
+                    {
                         id: ship.id,
                         name: ship.name,
                         class: ship.class,
                         battleRating: ship.battleRating,
                         guns: ship.guns
-                    }))
-                    .sort(sortBy(["name"]))
+                    }
+                ]
+            ]);
+
+            this.shipSelectData.set(
+                ship.class,
+                this.shipSelectData.has(ship.class)
+                    ? new Map([...this.shipSelectData.get(ship.class), ...shipDetail])
+                    : shipDetail
             );
+        });
     }
 
     /**
@@ -1196,76 +1208,156 @@ export default class CompareShips {
         // console.log(this._moduleProperties, this._moduleTypes);
     }
 
-    /**
-     * Inject modal
-     * @returns {void}
-     */
-    _injectModal() {
-        insertBaseModal(this._modalId, this._baseName);
-
-        const row = d3Select(`#${this._modalId} .modal-body`)
-            .append("div")
-            .attr("class", "container-fluid")
-            .append("div")
-            .attr("class", "row");
-
-        this._columns.forEach(columnId => {
-            const div = row
-                .append("div")
-                .attr("class", `col-md-4 ml-auto pt-2 ${columnId === "Base" ? "column-base" : "column-comp"}`);
-
-            const shipSelectId = this._getShipSelectId(columnId);
-            div.append("label")
-                .append("select")
-                .attr("name", shipSelectId)
-                .attr("id", shipSelectId)
-                .attr("class", "selectpicker");
-
-            ["frame", "trim"].forEach(type => {
-                const woodId = this._getWoodSelectId(type, columnId);
-                div.append("label")
-                    .append("select")
-                    .attr("name", woodId)
-                    .attr("id", woodId)
-                    .attr("class", "selectpicker");
-            });
-
-            this._moduleTypes.forEach(type => {
-                const moduleId = this._getModuleSelectId(type, columnId);
-                div.append("label")
-                    .append("select")
-                    .attr("name", moduleId)
-                    .attr("id", moduleId)
-                    .property("multiple", true)
-                    .attr("class", "selectpicker");
-            });
-
-            div.append("div")
-                .attr("id", `${this._baseId}-${columnId}`)
-                .attr("class", `${columnId === "Base" ? "ship-base" : "ship-compare"}`);
-        });
-
-        const footer = d3Select(`#${this._modalId} .modal-footer`);
-        footer
-            .insert("button", "button")
-            .classed("btn btn-outline-secondary", true)
-            .attr("id", this._copyButtonId)
-            .attr("title", "Copy to clipboard (ctrl-c)")
-            .attr("type", "button")
-            .append("i")
-            .classed("far fa-copy", true);
-    }
-
     _initData() {
         this._setupShipData();
         this._setupModuleData();
         this.woodCompare._setupData();
     }
 
+    /**
+     * Get select options
+     * @returns {string} HTML formatted option
+     */
+    _getShipOptions() {
+        /* eslint-disable indent */
+        const getOptions = ships => html`
+            ${Object.entries(ships[1].values).map(
+                ([, value]) =>
+                    html`
+                        <option data-subtext="${value.battleRating}" value="${value.id}">
+                            ${value.name} (${value.guns})
+                        </option>
+                    `
+            )}
+        `;
+
+        /* eslint-disable indent */
+        return html`
+            ${repeat(
+                this.shipSelectData,
+                (groupValue, groupKey) => groupValue,
+                (groupValue, groupKey) => {
+                    console.log(groupValue, groupKey);
+                    return html`
+                        <optgroup label="${getOrdinal(groupKey, false)} rate">
+                            ${getOptions(groupValue)}
+                        </optgroup>
+                    `;
+                }
+            )}
+        `;
+    }
+
+    _getShipSelect(columnId) {
+        const shipSelectId = this._getShipSelectId(columnId);
+        console.log("shipSelectId", shipSelectId, this.shipSelectData);
+        return html`
+            <label>
+                <select id="${shipSelectId}" class="selectpicker" ${columnId === "Base" ? "" : "disabled"}>
+                    ${this._getShipOptions()}
+                </select>
+            </label>
+        `;
+    }
+
+    _getWoodSelect(columnId) {
+        return html`
+            ${/* eslint-disable indent */
+            repeat(
+                ["frame", "trim"],
+                type => type,
+                type => {
+                    const woodId = this._getWoodSelectId(type, columnId);
+                    return html`
+                        <label>
+                            <select id="${woodId}" class="selectpicker"></select>
+                        </label>
+                    `;
+                }
+            )}
+        `;
+    }
+
+    _getModuleSelect(columnId) {
+        return html`
+            ${/* eslint-disable indent */
+            repeat(
+                this._moduleTypes,
+                type => type,
+                type => {
+                    const moduleId = this._getModuleSelectId(type, columnId);
+                    return html`
+                        <label>
+                            <select id="${moduleId}" class="selectpicker" multiple></select>
+                        </label>
+                    `;
+                }
+            )}
+        `;
+    }
+
+    _getModalBody() {
+        return html`
+            <div class="container-fluid">
+                <div class="row">
+                    ${/* eslint-disable indent */
+                    repeat(
+                        this._columns,
+                        columnId => columnId,
+                        columnId => html`
+                            <div class="col-md-4 ml-auto pt-2 ${columnId === "Base" ? "column-base" : "column-comp"}">
+                                ${this._getShipSelect(columnId)}${this._getWoodSelect(columnId)}${this._getModuleSelect(
+                                    columnId
+                                )}
+                            </div>
+                            <div
+                                id="${this._baseId}-${columnId}"
+                                class="${columnId === "Base" ? "ship-base" : "ship-compare"}"
+                            ></div>
+                        `
+                    )}
+                </div>
+            </div>
+        `;
+    }
+
+    _getModalFooter() {
+        return html`
+            <button
+                type="button"
+                id="${this._copyButtonId}"
+                title="Copy to clipboard (ctrl-c)"
+                class="btn btn-outline-secondary"
+                data-dismiss="modal"
+            >
+                <i class="far fa-copy"></i>
+            </button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                Close
+            </button>
+        `;
+    }
+
+    /**
+     * Inject modal
+     * @returns {void}
+     */
+    _injectModal() {
+        render(
+            insertBaseModalHTML({
+                id: this._modalId,
+                title: this._baseName,
+                body: this._getModalBody.bind(this),
+                footer: this._getModalFooter.bind(this)
+            }),
+            document.getElementById("modal-section")
+        );
+    }
+
     _initSelects() {
         this._columns.forEach(columnId => {
+            this._selectShip$[columnId] = $(`#${this._getShipSelectId(columnId)}`);
             this._selectWood$[columnId] = {};
-            this._setupShipSelect(columnId);
             ["frame", "trim"].forEach(type => {
                 this._selectWood$[columnId][type] = $(`#${this._getWoodSelectId(type, columnId)}`);
                 this.woodCompare._setupWoodSelects(columnId, type, this._selectWood$[columnId][type]);
@@ -1282,41 +1374,6 @@ export default class CompareShips {
         this._initData();
         this._injectModal();
         this._initSelects();
-    }
-
-    /**
-     * Get select options
-     * @returns {string} HTML formatted option
-     */
-    _getShipOptions() {
-        return this.shipSelectData
-            .map(
-                key =>
-                    `<optgroup label="${getOrdinal(key.key, false)} rate">${key.values
-                        .map(
-                            ship =>
-                                `<option data-subtext="${ship.battleRating}" value="${ship.id}">${ship.name} (${
-                                    ship.guns
-                                })`
-                        )
-                        .join("</option>")}`
-            )
-            .join("</optgroup>");
-    }
-
-    /**
-     * Setup ship select
-     * @param {string} columnId - Column id
-     * @returns {void}
-     */
-    _setupShipSelect(columnId) {
-        this._selectShip$[columnId] = $(`#${this._getShipSelectId(columnId)}`);
-        const options = this._getShipOptions();
-
-        this._selectShip$[columnId].append(options);
-        if (columnId !== "Base") {
-            this._selectShip$[columnId].attr("disabled", "disabled");
-        }
     }
 
     /**
