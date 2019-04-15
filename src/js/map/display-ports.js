@@ -10,8 +10,10 @@
 
 import { min as d3Min, max as d3Max } from "d3-array";
 import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate";
+import { polygonCentroid as d3PolygonCentroid, polygonHull as d3PolygonHull } from "d3-polygon";
 import { scaleLinear as d3ScaleLinear } from "d3-scale";
 import { select as d3Select } from "d3-selection";
+import { curveCatmullRomClosed as d3CurveCatmullRomClosed, line as d3Line } from "d3-shape";
 
 import "bootstrap/js/dist/util";
 import "bootstrap/js/dist/tooltip";
@@ -19,14 +21,7 @@ import "bootstrap/js/dist/tooltip";
 import moment from "moment";
 import "moment/locale/en-gb";
 
-import {
-    colourRed,
-    colourRedDark,
-    defaultCircleSize,
-    defaultFontSize,
-    nations,
-    primary300
-} from "../common";
+import { colourRed, colourRedDark, defaultCircleSize, defaultFontSize, nations, primary300 } from "../common";
 import {
     degreesToRadians,
     displayClan,
@@ -159,26 +154,28 @@ export default class DisplayPorts {
     }
 
     _setupCounties() {
-        /*
-        ** Automatic calculation of text position
+        // Automatic calculation of text position
         // https://stackoverflow.com/questions/40774697/how-to-group-an-array-of-objects-by-key
-        const counties = this._portDataDefault.filter(port => port.county !== "").reduce(
-            (r, a) =>
-                Object.assign(r, {
-                    [a.county]: (r[a.county] || []).concat([a.coordinates])
-                }),
-            {}
-        );
+        const counties = this._portDataDefault
+            .filter(port => port.county !== "")
+            .reduce(
+                (r, a) =>
+                    Object.assign(r, {
+                        [a.county]: (r[a.county] || []).concat([a.coordinates])
+                    }),
+                {}
+            );
         this._countyPolygon = [];
         Object.entries(counties).forEach(([key, value]) => {
             this._countyPolygon.push({
                 name: key,
-                // polygon: d3.polygonHull(value),
-                centroid: d3.polygonCentroid(d3.polygonHull(value))
+                polygon: d3PolygonHull(value),
+                centroid: d3PolygonCentroid(d3PolygonHull(value)),
+                angle: 0
             });
         });
-        */
 
+        /*
         this._countyPolygon = [
             { name: "Abaco", centroid: [4500, 1953], angle: 0 },
             { name: "Andros", centroid: [3870, 2350], angle: 0 },
@@ -256,6 +253,7 @@ export default class DisplayPorts {
             { name: "Virgin Islands", centroid: [7220, 3840], angle: 350 },
             { name: "Windward Isles", centroid: [7800, 5244], angle: 0 }
         ];
+         */
     }
 
     _setupRegions() {
@@ -754,6 +752,8 @@ export default class DisplayPorts {
     _updateCounties() {
         if (this.zoomLevel === "portLabel") {
             const data = this._countyPolygonFiltered;
+            const curve = d3CurveCatmullRomClosed;
+            const line = d3Line().curve(curve);
 
             this._gCounty
                 .selectAll("text")
@@ -765,20 +765,15 @@ export default class DisplayPorts {
                         .text(d => d.name)
                 );
 
-            /* Show polygon for test purposes
-            const d3line2 = d3
-                .line()
-                .x(d => d[0])
-                .y(d => d[1]);
-
             this._gCounty
                 .selectAll("path")
-                .data(data)
-                .enter()
-                .append("path")
-                .attr("d", d => d3line2(d.polygon))
-                .attr("fill", "#373");
-                */
+                .data(data, d => d.name)
+                .join(enter =>
+                    enter
+                        .append("path")
+                        .attr("d", d => line(d.polygon))
+                        .attr("fill", "#373")
+                );
 
             this._gCounty.classed("d-none", false);
         } else {
