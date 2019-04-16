@@ -645,6 +645,18 @@ svg {
     fill: $green;
 }
 
+.non-capturable {
+    fill: gray;
+    opacity: 0.8;
+}
+
+.capital {
+    opacity: 1;
+}
+
+.non-capital {
+    opacity: 0.4;
+}
 .hidden {
     visibility: hidden;
 }
