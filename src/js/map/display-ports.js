@@ -10,8 +10,10 @@
 
 import { min as d3Min, max as d3Max } from "d3-array";
 import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate";
-import { scaleLinear as d3ScaleLinear } from "d3-scale";
+// import { polygonCentroid as d3PolygonCentroid, polygonHull as d3PolygonHull } from "d3-polygon";
+import { scaleLinear as d3ScaleLinear, scaleOrdinal as d3ScaleOrdinal } from "d3-scale";
 import { select as d3Select } from "d3-selection";
+// import { curveCatmullRomClosed as d3CurveCatmullRomClosed, line as d3Line } from "d3-shape";
 
 import "bootstrap/js/dist/util";
 import "bootstrap/js/dist/tooltip";
@@ -19,17 +21,11 @@ import "bootstrap/js/dist/tooltip";
 import moment from "moment";
 import "moment/locale/en-gb";
 
-import {
-    colourRed,
-    colourRedDark,
-    defaultCircleSize,
-    defaultFontSize,
-    nations,
-    primary300
-} from "../common";
+import { colourRed, colourRedDark, defaultCircleSize, defaultFontSize, nations, primary300 } from "../common";
 import {
     degreesToRadians,
     displayClan,
+    distancePoints,
     formatInt,
     formatPercent,
     formatSiCurrency,
@@ -67,10 +63,28 @@ export default class DisplayPorts {
         this._taxIncomeRadius = d3ScaleLinear();
         this._netIncomeRadius = d3ScaleLinear();
         this._attackRadius = d3ScaleLinear().domain([0, 1]);
-        this._colourScale = d3ScaleLinear()
+        this._colourScaleHostility = d3ScaleLinear()
             .domain([0, 0.5, 1])
             .range([primary300, colourRed, colourRedDark])
             .interpolate(d3InterpolateHcl);
+        this._colourScaleCounty = d3ScaleOrdinal().range([
+            "#e7a800",
+            "#e621dd",
+            "#d3e700",
+            "#de78ff",
+            "#01d36b",
+            "#ff3205",
+            "#4df3ff",
+            "#910016",
+            "#01caf0",
+            "#ad0054",
+            "#c8ff9f",
+            "#0143a8",
+            "#00a97f",
+            "#70a4ff",
+            "#312800",
+            "#ffa29f"
+        ]);
 
         this._minRadiusFactor = 1;
         this._maxRadiusFactor = 6;
@@ -86,7 +100,7 @@ export default class DisplayPorts {
          * @type {string[]}
          * @private
          */
-        this._radioButtonValues = ["attack", "position", "tax", "net", "off"];
+        this._radioButtonValues = ["attack", "county", "position", "tax", "net", "off"];
 
         /**
          * Show radius cookie
@@ -160,24 +174,27 @@ export default class DisplayPorts {
 
     _setupCounties() {
         /*
-        ** Automatic calculation of text position
+        // Automatic calculation of text position
         // https://stackoverflow.com/questions/40774697/how-to-group-an-array-of-objects-by-key
-        const counties = this._portDataDefault.filter(port => port.county !== "").reduce(
-            (r, a) =>
-                Object.assign(r, {
-                    [a.county]: (r[a.county] || []).concat([a.coordinates])
-                }),
-            {}
-        );
+        const counties = this._portDataDefault
+            .filter(port => port.county !== "")
+            .reduce(
+                (r, a) =>
+                    Object.assign(r, {
+                        [a.county]: (r[a.county] || []).concat([a.coordinates])
+                    }),
+                {}
+            );
         this._countyPolygon = [];
         Object.entries(counties).forEach(([key, value]) => {
             this._countyPolygon.push({
                 name: key,
-                // polygon: d3.polygonHull(value),
-                centroid: d3.polygonCentroid(d3.polygonHull(value))
+                polygon: d3PolygonHull(value),
+                centroid: d3PolygonCentroid(d3PolygonHull(value)),
+                angle: 0
             });
         });
-        */
+         */
 
         this._countyPolygon = [
             { name: "Abaco", centroid: [4500, 1953], angle: 0 },
@@ -256,6 +273,16 @@ export default class DisplayPorts {
             { name: "Virgin Islands", centroid: [7220, 3840], angle: 350 },
             { name: "Windward Isles", centroid: [7800, 5244], angle: 0 }
         ];
+
+        // Sort by distance, origin is top left corner
+        const origin = { x: this._map.coord.max / 2, y: this._map.coord.max / 2 };
+        this._countyPolygon = this._countyPolygon.sort((a, b) => {
+            const pointA = { x: a.centroid[0], y: a.centroid[1] };
+            const pointB = { x: b.centroid[0], y: b.centroid[1] };
+
+            return distancePoints(origin, pointA) - distancePoints(origin, pointB);
+        });
+        this._colourScaleCounty.domain(this._countyPolygon.map(county => county.name));
     }
 
     _setupRegions() {
@@ -629,7 +656,7 @@ export default class DisplayPorts {
         let data = this._portDataFiltered;
         let cssClass = () => {};
         let r = () => {};
-        let fill = () => null;
+        let fill = () => {};
 
         if (this._showRadius === "tax") {
             data = this._portDataFiltered.filter(d => !d.nonCapturable);
@@ -661,11 +688,16 @@ export default class DisplayPorts {
             this._attackRadius.range([rMin, rMax]);
 
             cssClass = () => "bubble";
-            fill = d => this._colourScale(d.attackHostility);
+            fill = d => this._colourScaleHostility(d.attackHostility);
             r = d => this._attackRadius(d.attackHostility);
         } else if (this.showCurrentGood) {
             cssClass = d => `bubble ${d.isSource ? "pos" : "neg"}`;
             r = () => rMax / 2;
+        } else if (this._showRadius === "county") {
+            cssClass = d =>
+                d.nonCapturable ? "bubble non-capturable" : d.countyCapital ? "bubble capital" : "bubble non-capital";
+            fill = d => (d.nonCapturable ? "" : this._colourScaleCounty(d.county));
+            r = d => (d.nonCapturable ? rMax / 3 : rMax / 2);
         } else if (this._showRadius === "off") {
             data = {};
         }
@@ -758,27 +790,29 @@ export default class DisplayPorts {
             this._gCounty
                 .selectAll("text")
                 .data(data, d => d.name)
-                .join(enter =>
-                    enter
-                        .append("text")
-                        .attr("transform", d => `translate(${d.centroid[0]},${d.centroid[1]})rotate(${d.angle})`)
-                        .text(d => d.name)
+                .join(
+                    enter =>
+                        enter
+                            .append("text")
+                            .attr("transform", d => `translate(${d.centroid[0]},${d.centroid[1]})rotate(${d.angle})`)
+                            .text(d => d.name),
+                    update =>
+                        update.attr("fill", d => (this._showRadius === "county" ? this._colourScaleCounty(d.name) : ""))
                 );
 
-            /* Show polygon for test purposes
-            const d3line2 = d3
-                .line()
-                .x(d => d[0])
-                .y(d => d[1]);
-
+            /*
+            const curve = d3CurveCatmullRomClosed;
+            const line = d3Line().curve(curve);
             this._gCounty
                 .selectAll("path")
-                .data(data)
-                .enter()
-                .append("path")
-                .attr("d", d => d3line2(d.polygon))
-                .attr("fill", "#373");
-                */
+                .data(data, d => d.name)
+                .join(enter =>
+                    enter
+                        .append("path")
+                        .attr("d", d => line(d.polygon))
+                        .attr("fill", "#373")
+                );
+            */
 
             this._gCounty.classed("d-none", false);
         } else {
