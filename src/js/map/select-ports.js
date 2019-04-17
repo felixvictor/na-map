@@ -124,6 +124,7 @@ export default class SelectPorts {
         document.getElementById("menu-prop-shallow").addEventListener("click", () => this._depthSelected("shallow"));
 
         document.getElementById("menu-prop-all").addEventListener("click", () => this._allSelected());
+        document.getElementById("menu-prop-non-capturable").addEventListener("click", () => this._nonCapSelected());
 
         document.getElementById("menu-prop-large").addEventListener("click", () => this._portSizeSelected("Large"));
         document.getElementById("menu-prop-medium").addEventListener("click", () => this._portSizeSelected("Medium"));
@@ -556,6 +557,15 @@ export default class SelectPorts {
 
     _allSelected() {
         const portData = this._ports.portDataDefault.filter(d => d.availableForAll);
+
+        this._ports.portData = portData;
+        this._ports.showCurrentGood = false;
+        this._ports.showTradePortPartners = false;
+        this._ports.update();
+    }
+
+    _nonCapSelected() {
+        const portData = this._ports.portDataDefault.filter(d => d.nonCapturable);
 
         this._ports.portData = portData;
         this._ports.showCurrentGood = false;
