@@ -274,7 +274,7 @@ export default class PredictWind {
             .classed("compass", true)
             .attr("x", xCompass)
             .attr("y", yCompass);
-        printCompassRose({ elem: compassElem, radius });
+        printCompassRose({ element: compassElem, radius });
 
         // Wind direction
         this._svg
