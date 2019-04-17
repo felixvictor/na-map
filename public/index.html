@@ -6,18 +6,20 @@
     <title>Naval Action map</title>
     <meta content="Yet another map with in-game map, F11 coordinates, resources, ship and wood comparison. Port data is updated constantly from twitter and daily after maintenance." name="description">
     
-        <meta content="noindex" name="robots">
+        <link href="https://na-map.netlify.com/" rel="canonical">
     
     <meta content="Naval Action map" property="og:title" itemprop="name">
     <meta content="Yet another map with in-game map, F11 coordinates, resources, ship and wood comparison. Port data is updated constantly from twitter and daily after maintenance." property="og:description" itemprop="description">
     <meta content="images/icons/icon_1024x1024.png" property="og:image" itemprop="image">
-    <meta content="" property="og:url" itemprop="url">
+    <meta content="https://na-map.netlify.com/" property="og:url" itemprop="url">
 
     <meta content="en_gb" property="og:locale">
     <meta content="website" property="og:type">
 
     <meta content="summary_large_image" name="twitter:card">
-<meta content="width=device-width,initial-scale=1,shrink-to-fit=no" name="viewport"><link href="main.863f7e116998a3c89ccc.css" rel="stylesheet"><link as="font" crossorigin="anonymous" href="fonts/Junicode-regular-italic.woff2" rel="preload"><link as="font" crossorigin="anonymous" href="fonts/Junicode-regular.woff2" rel="preload"><link as="style" href="main.863f7e116998a3c89ccc.css" rel="preload"><link as="script" href="main.f19e51ad0a3ae15159b4.js" rel="preload"><link as="style" href="map.793492626d0fe7f5cd3b.css" rel="preload"><link as="script" href="map.ae442e6bb4b5622c7d1c.js" rel="preload"><link as="script" href="vendors~main.bf92adbf03c6e5aa1a7d.js" rel="preload"><link as="script" href="vendors~map.15b015a40555dcfcbedd.js" rel="preload"><link as="style" href="vendors~map.c1a66c456a8b06a4f0e0.css" rel="preload"></head>
+
+    <script src="https://www.google-analytics.com/analytics.js" async></script>
+<meta content="width=device-width,initial-scale=1,shrink-to-fit=no" name="viewport"><link href="main.a1d6f6a86981dc6be731.css" rel="stylesheet"><link as="font" crossorigin="anonymous" href="fonts/Junicode-regular-italic.woff2" rel="preload"><link as="font" crossorigin="anonymous" href="fonts/Junicode-regular.woff2" rel="preload"><link as="script" href="main.94aef1ad14798050a942.js" rel="preload"><link as="style" href="main.a1d6f6a86981dc6be731.css" rel="preload"><link as="script" href="map.1335d3b1cbcca1086a6d.js" rel="preload"><link as="style" href="map.793492626d0fe7f5cd3b.css" rel="preload"><link as="script" href="vendors~main.bf92adbf03c6e5aa1a7d.js" rel="preload"><link as="script" href="vendors~map.15b015a40555dcfcbedd.js" rel="preload"><link as="style" href="vendors~map.c1a66c456a8b06a4f0e0.css" rel="preload"></head>
 
 <body>
 
@@ -44,6 +46,7 @@
                             <a class="dropdown-item" id="menu-prop-shallow" href="#">Shallow water</a>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" id="menu-prop-all" href="#">Available to all</a>
+                            <a class="dropdown-item" id="menu-prop-non-capturable" href="#">Non-capturable</a>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" id="menu-prop-large" href="#">1st rate AI</a>
                             <a class="dropdown-item" id="menu-prop-medium" href="#">4th rate AI</a>
@@ -247,6 +250,10 @@
                             <label class="custom-control-label" for="show-radius-attack">Attack</label>
                         </div>
                         <div class="custom-control custom-control-inline custom-radio">
+                            <input class="custom-control-input" id="show-radius-county" type="radio" name="show-radius" value="county">
+                            <label class="custom-control-label" for="show-radius-county">County</label>
+                        </div>
+                        <div class="custom-control custom-control-inline custom-radio">
                             <input class="custom-control-input" id="show-radius-position" type="radio" name="show-radius" value="position">
                             <label class="custom-control-label" for="show-radius-position">Position</label>
                         </div>
@@ -348,5 +355,5 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.0/jquery.slim.min.js" crossorigin="anonymous" integrity="sha384-7WBfQYubrFpye+dGHEeA3fHaTy/wpTFhxdjxqvK04e4orV3z+X4XC4qOX3qnkVC6"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.15.0/umd/popper.min.js" crossorigin="anonymous" integrity="sha384-L2pyEeut/H3mtgCBaUNw7KWzp5n9+4pDQiExs933/5QfaTh8YStYFFkOzSoXjlTb"></script>
-<script src="runtime.d6d7fbcf9a14cf5812be.js"></script><script src="vendors~main.bf92adbf03c6e5aa1a7d.js"></script><script src="main.f19e51ad0a3ae15159b4.js"></script></body>
+<script src="runtime.01924ca185b12b3b2149.js"></script><script src="vendors~main.bf92adbf03c6e5aa1a7d.js"></script><script src="main.94aef1ad14798050a942.js"></script></body>
 </html>
