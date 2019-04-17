@@ -100,7 +100,7 @@ export default class DisplayPorts {
          * @type {string[]}
          * @private
          */
-        this._radioButtonValues = ["attack", "position", "tax", "net", "off"];
+        this._radioButtonValues = ["attack", "county", "position", "tax", "net", "off"];
 
         /**
          * Show radius cookie
@@ -693,12 +693,13 @@ export default class DisplayPorts {
         } else if (this.showCurrentGood) {
             cssClass = d => `bubble ${d.isSource ? "pos" : "neg"}`;
             r = () => rMax / 2;
-        } else if (this._showRadius === "off") {
-            //  data = {};
+        } else if (this._showRadius === "county") {
             cssClass = d =>
                 d.nonCapturable ? "bubble non-capturable" : d.countyCapital ? "bubble capital" : "bubble non-capital";
             fill = d => (d.nonCapturable ? "" : this._colourScaleCounty(d.county));
             r = d => (d.nonCapturable ? rMax / 3 : rMax / 2);
+        } else if (this._showRadius === "off") {
+            data = {};
         }
 
         this._gPortCircle
