@@ -25,6 +25,7 @@ import { colourRed, colourRedDark, defaultCircleSize, defaultFontSize, nations, 
 import {
     degreesToRadians,
     displayClan,
+    distancePoints,
     formatInt,
     formatPercent,
     formatSiCurrency,
@@ -67,18 +68,18 @@ export default class DisplayPorts {
             .range([primary300, colourRed, colourRedDark])
             .interpolate(d3InterpolateHcl);
         this._colourScaleCounty = d3ScaleOrdinal().range([
-            "#72823a",
-            "#825fc8",
-            "#78b642",
-            "#cd47a3",
-            "#50b187",
-            "#d34253",
-            "#628bcc",
-            "#cb9f3d",
-            "#cc88c9",
-            "#ca5b2b",
-            "#b55576",
-            "#c27b58"
+            "#7f3b33",
+            "#d44e3a",
+            "#c5964a",
+            "#4f632d",
+            "#73b643",
+            "#63ae86",
+            "#5d94bb",
+            "#8679d3",
+            "#873fc6",
+            "#5d3970",
+            "#d04799",
+            "#cf859d"
         ]);
 
         this._minRadiusFactor = 1;
@@ -269,7 +270,15 @@ export default class DisplayPorts {
             { name: "Windward Isles", centroid: [7800, 5244], angle: 0 }
         ];
 
-        this._colourScaleCounty.domain([...this._countyPolygon].map(county => county.name));
+        // Sort by distance, origin is top left corner
+        const origin = { x: this._map.coord.max/2, y: this._map.coord.max/2 };
+        this._countyPolygon = this._countyPolygon.sort((a, b) => {
+            const pointA = { x: a.centroid[0], y: a.centroid[1] };
+            const pointB = { x: b.centroid[0], y: b.centroid[1] };
+
+            return distancePoints(origin, pointA) - distancePoints(origin, pointB);
+        });
+        this._colourScaleCounty.domain(this._countyPolygon.map(county => county.name));
     }
 
     _setupRegions() {
