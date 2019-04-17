@@ -790,11 +790,14 @@ export default class DisplayPorts {
             this._gCounty
                 .selectAll("text")
                 .data(data, d => d.name)
-                .join(enter =>
-                    enter
-                        .append("text")
-                        .attr("transform", d => `translate(${d.centroid[0]},${d.centroid[1]})rotate(${d.angle})`)
-                        .text(d => d.name)
+                .join(
+                    enter =>
+                        enter
+                            .append("text")
+                            .attr("transform", d => `translate(${d.centroid[0]},${d.centroid[1]})rotate(${d.angle})`)
+                            .text(d => d.name),
+                    update =>
+                        update.attr("fill", d => (this._showRadius === "county" ? this._colourScaleCounty(d.name) : ""))
                 );
 
             /*
