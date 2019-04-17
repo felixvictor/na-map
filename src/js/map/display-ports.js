@@ -68,18 +68,22 @@ export default class DisplayPorts {
             .range([primary300, colourRed, colourRedDark])
             .interpolate(d3InterpolateHcl);
         this._colourScaleCounty = d3ScaleOrdinal().range([
-            "#7f3b33",
-            "#d44e3a",
-            "#c5964a",
-            "#4f632d",
-            "#73b643",
-            "#63ae86",
-            "#5d94bb",
-            "#8679d3",
-            "#873fc6",
-            "#5d3970",
-            "#d04799",
-            "#cf859d"
+            "#e7a800",
+            "#e621dd",
+            "#d3e700",
+            "#de78ff",
+            "#01d36b",
+            "#ff3205",
+            "#4df3ff",
+            "#910016",
+            "#01caf0",
+            "#ad0054",
+            "#c8ff9f",
+            "#0143a8",
+            "#00a97f",
+            "#70a4ff",
+            "#312800",
+            "#ffa29f"
         ]);
 
         this._minRadiusFactor = 1;
@@ -271,7 +275,7 @@ export default class DisplayPorts {
         ];
 
         // Sort by distance, origin is top left corner
-        const origin = { x: this._map.coord.max/2, y: this._map.coord.max/2 };
+        const origin = { x: this._map.coord.max / 2, y: this._map.coord.max / 2 };
         this._countyPolygon = this._countyPolygon.sort((a, b) => {
             const pointA = { x: a.centroid[0], y: a.centroid[1] };
             const pointB = { x: b.centroid[0], y: b.centroid[1] };
