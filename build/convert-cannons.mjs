@@ -24,6 +24,8 @@ String.prototype.replaceAll = function(search, replacement) {
     return target.replace(new RegExp(search, "g"), replacement);
 };
 
+const peneDistances = [25, 50, 100, 250, 500, 750, 1000];
+
 /**
  * Retrieve cannon data from game files and store it
  * @returns {void}
@@ -137,18 +139,37 @@ function convertCannons() {
         const cannon = {
             name
         };
+
         // console.log(fileData.ModuleTemplate);
         dataMapping.forEach(({ group, element }, value) => {
-            fileData.ModuleTemplate.Attributes.Pair.filter(pair => value === pair.Key).forEach(pair => {
-                if (!cannon[group]) {
-                    // eslint-disable-next-line no-param-reassign
-                    cannon[group] = {};
-                }
+            if (!cannon[group]) {
+                // eslint-disable-next-line no-param-reassign
+                cannon[group] = {};
+            }
 
-                cannon[group][element] = Number(pair.Value.Value);
-            });
+            cannon[group][element] = Number(
+                fileData.ModuleTemplate.Attributes.Pair.find(pair => value === pair.Key).Value.Value
+            );
         });
+
+        // Calculate penetrations
+        const penetrations = new Map(
+            fileData.ModuleTemplate.Attributes.Pair.find(pair => pair.Key === "CANNON_PENETRATION_DEGRADATION")
+                .Value.Value.filter(pene => Number(pene.Time) > 0)
+                .map(pene => [pene.Time * 1000, Number(pene.Value)])
+        );
+        penetrations.set(250, (penetrations.get(200) + penetrations.get(300)) / 2);
+        penetrations.set(500, (penetrations.get(400) + penetrations.get(600)) / 2);
+        penetrations.set(750, penetrations.get(800) + (penetrations.get(600) - penetrations.get(800)) * 0.25);
+        cannon["penetration (m)"] = {};
+        peneDistances.forEach(distance => {
+            cannon["penetration (m)"][distance] = Math.trunc(penetrations.get(distance) * cannon.damage.penetration);
+        });
+        delete cannon.damage.penetration;
+
+        // Calculate damage per second
         cannon.damage["per second"] = roundToThousands(cannon.damage.basic / cannon.generic["reload time"]);
+
         cannons[type].push(
             Object.keys(cannon)
                 .sort()
