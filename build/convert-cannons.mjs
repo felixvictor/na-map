@@ -24,7 +24,16 @@ String.prototype.replaceAll = function(search, replacement) {
     return target.replace(new RegExp(search, "g"), replacement);
 };
 
-const peneDistances = [25, 50, 100, 250, 500, 750, 1000];
+const countDecimals = value => {
+    if (Math.floor(value) === value) {
+        return 0;
+    }
+
+    return value.toString().split(".")[1].length || 0;
+};
+
+const peneDistances = [50, 100, 250, 500, 750, 1000];
+const cannonTypes = ["medium", "long", "carronade"];
 
 /**
  * Retrieve cannon data from game files and store it
@@ -32,9 +41,9 @@ const peneDistances = [25, 50, 100, 250, 500, 750, 1000];
  */
 function convertCannons() {
     const cannons = {};
-    cannons.medium = [];
-    cannons.long = [];
-    cannons.carronade = [];
+    cannonTypes.forEach(type => {
+        cannons[type] = [];
+    });
 
     /**
      * List of file names to be read
@@ -145,11 +154,13 @@ function convertCannons() {
             if (!cannon[group]) {
                 // eslint-disable-next-line no-param-reassign
                 cannon[group] = {};
+                cannon[group][element] = {};
             }
 
-            cannon[group][element] = Number(
-                fileData.ModuleTemplate.Attributes.Pair.find(pair => value === pair.Key).Value.Value
-            );
+            cannon[group][element] = {
+                value: Number(fileData.ModuleTemplate.Attributes.Pair.find(pair => value === pair.Key).Value.Value),
+                digits: 0
+            };
         });
 
         // Calculate penetrations
@@ -163,12 +174,18 @@ function convertCannons() {
         penetrations.set(750, penetrations.get(800) + (penetrations.get(600) - penetrations.get(800)) * 0.25);
         cannon["penetration (m)"] = {};
         peneDistances.forEach(distance => {
-            cannon["penetration (m)"][distance] = Math.trunc(penetrations.get(distance) * cannon.damage.penetration);
+            cannon["penetration (m)"][distance] = {
+                value: Math.trunc(penetrations.get(distance) * cannon.damage.penetration.value) | 0,
+                digits: 0
+            };
         });
         delete cannon.damage.penetration;
 
         // Calculate damage per second
-        cannon.damage["per second"] = roundToThousands(cannon.damage.basic / cannon.generic["reload time"]);
+        cannon.damage["per second"] = {
+            value: roundToThousands(cannon.damage.basic.value / cannon.generic["reload time"].value),
+            digits: 0
+        };
 
         cannons[type].push(
             Object.keys(cannon)
@@ -193,6 +210,23 @@ function convertCannons() {
     [...fileNames].forEach(baseFileName => {
         const fileData = getFileData(baseFileName);
         addData(fileData);
+    });
+
+    // Set maximum digits after decimal point
+    cannonTypes.forEach(type => {
+        cannons[type].forEach(cannon => {
+            Object.entries(cannon).forEach(([, groupValue]) => {
+                let maxDigits = 0;
+                if (typeof groupValue === "object") {
+                    Object.entries(groupValue).forEach(([, elementValue]) => {
+                        maxDigits = Math.max(maxDigits, countDecimals(elementValue.value));
+                    });
+                    Object.entries(groupValue).forEach(([, elementValue]) => {
+                        elementValue.digits = maxDigits;
+                    });
+                }
+            });
+        });
     });
 
     saveJson(filename, cannons);
