@@ -91,7 +91,7 @@ export default class ListCannons {
                     modifierValue =>
                         html`
                             <td class="text-right" data-sort="${modifierValue[1] || 0}">
-                                ${modifierValue[1] ? formatFloatFixedHTML(modifierValue[1]) : ""}
+                                ${modifierValue[1] ? formatFloatFixedHTML(modifierValue[1].value, modifierValue[1].digits) : ""}
                             </td>
                         `
                 );
