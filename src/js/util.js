@@ -81,15 +81,17 @@ export const formatFloatFixedHTML = (x, f = 2) => {
 
     number = number.replace("-", "\u2212\u202f");
 
-    if (decimals === "00") {
-        // eslint-disable-next-line prettier/prettier
-        decimals = html`<span class="hidden">.${decimals}</span>`;
-    } else if (decimals.endsWith("0")) {
-        // eslint-disable-next-line prettier/prettier
-        decimals = html`.${decimals.replace("0", "")}<span class="hidden">0</span>`;
-    } else {
-        // eslint-disable-next-line prettier/prettier
-        decimals = html`.${decimals}`;
+    if (decimals) {
+        if (decimals === "00") {
+            // eslint-disable-next-line prettier/prettier
+            decimals = html`<span class="hidden">.${decimals}</span>`;
+        } else if (decimals.endsWith("0")) {
+            // eslint-disable-next-line prettier/prettier
+            decimals = html`.${decimals.replace("0", "")}<span class="hidden">0</span>`;
+        } else {
+            // eslint-disable-next-line prettier/prettier
+            decimals = html`.${decimals}`;
+        }
     }
 
     return html`
