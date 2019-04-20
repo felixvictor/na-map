@@ -1,4 +1,13 @@
-// eslint-disable-next-line import/extensions
+/**
+ * This file is part of na-map.
+ *
+ * @file      Convert modules.
+ * @module    build/convert-modules
+ * @author    iB aka Felix Victor
+ * @copyright 2017, 2018, 2019
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
 import { capitalizeFirstLetter, groupBy, readJson, saveJson, sortBy } from "./common.mjs";
 
 const itemsFilename = process.argv[2];
@@ -274,6 +283,10 @@ function convertModules() {
                 amount =
                     Math.abs(modifier.Absolute) >= 1 ? modifier.Absolute : Math.round(modifier.Absolute * 10000) / 100;
                 isPercentage = false;
+            }
+
+            if (modifier.MappingIds[0].endsWith("PERCENT_MODIFIER")) {
+                isPercentage = true;
             }
 
             if (
