@@ -90,8 +90,10 @@ export default class ListCannons {
                 return Object.entries(groupValue[1]).map(
                     modifierValue =>
                         html`
-                            <td class="text-right" data-sort="${modifierValue[1] || 0}">
-                                ${modifierValue[1] ? formatFloatFixedHTML(modifierValue[1].value, modifierValue[1].digits) : ""}
+                            <td class="text-right" data-sort="${modifierValue[1].value || 0}">
+                                ${modifierValue[1]
+                                    ? formatFloatFixedHTML(modifierValue[1].value, modifierValue[1].digits)
+                                    : ""}
                             </td>
                         `
                 );
