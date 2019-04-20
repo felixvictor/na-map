@@ -228,34 +228,21 @@ const secondsForFullCircle = 48 * 60 + 55;
 export const fullCircle = 360;
 export const degreesPerSecond = fullCircle / secondsForFullCircle;
 
-// eslint-disable-next-line no-undef
+/* eslint-disable-next-line no-undef */
 export const colourGreen = CGREEN;
-// eslint-disable-next-line no-undef
 export const colourGreenLight = CGREENLIGHT;
-// eslint-disable-next-line no-undef
 export const colourGreenDark = CGREENDARK;
-// eslint-disable-next-line no-undef
 export const colourRed = CRED;
-// eslint-disable-next-line no-undef
 export const colourRedLight = CREDLIGHT;
-// eslint-disable-next-line no-undef
 export const colourRedDark = CREDDARK;
-// eslint-disable-next-line no-undef
 export const colourWhite = CWHITE;
-// eslint-disable-next-line no-undef
 export const primary300 = CPRIMARY300;
-// eslint-disable-next-line no-undef
 export const iconSmallSrc = ICONSMALL;
 
-// eslint-disable-next-line no-undef
-export const hullRepairsFactor = REPAIR_ARMOR_VOLUME / REPAIR_ARMOR_PERCENT;
-// eslint-disable-next-line no-undef
+/* eslint-disable-next-line no-undef */
+export const hullRepairsVolume = REPAIR_ARMOR_VOLUME;
 export const hullRepairsPercent = REPAIR_ARMOR_PERCENT;
-// eslint-disable-next-line no-undef
-export const rigRepairsFactor = REPAIR_SAIL_VOLUME / REPAIR_SAIL_PERCENT;
-// eslint-disable-next-line no-undef
+export const rigRepairsVolume = REPAIR_SAIL_VOLUME;
 export const rigRepairsPercent = REPAIR_SAIL_PERCENT;
-// eslint-disable-next-line no-undef
-export const rumRepairsFactor = REPAIR_CREW_VOLUME / REPAIR_CREW_PERCENT;
-// eslint-disable-next-line no-undef
+export const rumRepairsVolume = REPAIR_CREW_VOLUME;
 export const rumRepairsPercent = REPAIR_CREW_PERCENT;
