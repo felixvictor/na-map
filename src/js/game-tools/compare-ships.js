@@ -19,8 +19,6 @@ import {
     pie as d3Pie,
     radialLine as d3RadialLine
 } from "d3-shape";
-import { html, render } from "lit-html";
-import { repeat } from "lit-html/directives/repeat";
 
 import { registerEvent } from "../analytics";
 import {
@@ -32,11 +30,13 @@ import {
     colourGreenLight,
     colourGreenDark,
     hashids,
-    hullRepairsFactor,
-    rigRepairsFactor,
-    rumRepairsFactor,
-    insertBaseModal,
-    insertBaseModalHTML
+    hullRepairsVolume,
+    hullRepairsPercent,
+    rigRepairsVolume,
+    rigRepairsPercent,
+    rumRepairsVolume,
+    rumRepairsPercent,
+    insertBaseModal
 } from "../common";
 import { copyToClipboard, formatInt, formatFloat, getOrdinal, isEmpty, roundToThousands, sortBy } from "../util";
 
@@ -44,6 +44,10 @@ import CompareWoods from "./compare-woods";
 
 const numberSegments = 24;
 const segmentRadians = (2 * Math.PI) / numberSegments;
+
+const hullRepairsFactor = hullRepairsVolume / hullRepairsPercent;
+const rigRepairsFactor = rigRepairsVolume / rigRepairsPercent;
+const rumRepairsFactor = rumRepairsVolume / rumRepairsPercent;
 
 /**
  * Ship
@@ -989,7 +993,14 @@ export default class CompareShips {
             ["Side armour repair time", ["repairTime.sides"]],
             ["Speed decrease", ["ship.deceleration"]],
             ["Turn speed", ["rudder.turnSpeed"]],
-            ["Water pump health", ["pump.armour"]]
+            ["Water pump health", ["pump.armour"]],
+            ["Water repair time", ["repairTime.pump"]]
+        ]);
+
+        this._genericChanges = new Map([
+            ["Hull repair amount", ["repairAmount.armour"]],
+            ["Armour repair", ["repairAmount.armour"]],
+            ["Sail repair amount", ["repairAmount.sails"]]
         ]);
 
         this._moduleCaps = new Map([
@@ -1157,28 +1168,20 @@ export default class CompareShips {
      * @returns {void}
      */
     _setupShipData() {
-        this.shipSelectData = new Map();
-        this._shipData.forEach(ship => {
-            const shipDetail = new Map([
-                [
-                    ship.id,
-                    {
+        this.shipSelectData = d3Nest()
+            .key(ship => ship.class)
+            .sortKeys(d3Ascending)
+            .entries(
+                this._shipData
+                    .map(ship => ({
                         id: ship.id,
                         name: ship.name,
                         class: ship.class,
                         battleRating: ship.battleRating,
                         guns: ship.guns
-                    }
-                ]
-            ]);
-
-            this.shipSelectData.set(
-                ship.class,
-                this.shipSelectData.has(ship.class)
-                    ? new Map([...this.shipSelectData.get(ship.class), ...shipDetail])
-                    : shipDetail
+                    }))
+                    .sort(sortBy(["name"]))
             );
-        });
     }
 
     /**
@@ -1208,156 +1211,76 @@ export default class CompareShips {
         // console.log(this._moduleProperties, this._moduleTypes);
     }
 
+    /**
+     * Inject modal
+     * @returns {void}
+     */
+    _injectModal() {
+        insertBaseModal(this._modalId, this._baseName);
+
+        const row = d3Select(`#${this._modalId} .modal-body`)
+            .append("div")
+            .attr("class", "container-fluid")
+            .append("div")
+            .attr("class", "row");
+
+        this._columns.forEach(columnId => {
+            const div = row
+                .append("div")
+                .attr("class", `col-md-4 ml-auto pt-2 ${columnId === "Base" ? "column-base" : "column-comp"}`);
+
+            const shipSelectId = this._getShipSelectId(columnId);
+            div.append("label")
+                .append("select")
+                .attr("name", shipSelectId)
+                .attr("id", shipSelectId)
+                .attr("class", "selectpicker");
+
+            ["frame", "trim"].forEach(type => {
+                const woodId = this._getWoodSelectId(type, columnId);
+                div.append("label")
+                    .append("select")
+                    .attr("name", woodId)
+                    .attr("id", woodId)
+                    .attr("class", "selectpicker");
+            });
+
+            this._moduleTypes.forEach(type => {
+                const moduleId = this._getModuleSelectId(type, columnId);
+                div.append("label")
+                    .append("select")
+                    .attr("name", moduleId)
+                    .attr("id", moduleId)
+                    .property("multiple", true)
+                    .attr("class", "selectpicker");
+            });
+
+            div.append("div")
+                .attr("id", `${this._baseId}-${columnId}`)
+                .attr("class", `${columnId === "Base" ? "ship-base" : "ship-compare"}`);
+        });
+
+        const footer = d3Select(`#${this._modalId} .modal-footer`);
+        footer
+            .insert("button", "button")
+            .classed("btn btn-outline-secondary", true)
+            .attr("id", this._copyButtonId)
+            .attr("title", "Copy to clipboard (ctrl-c)")
+            .attr("type", "button")
+            .append("i")
+            .classed("far fa-copy", true);
+    }
+
     _initData() {
         this._setupShipData();
         this._setupModuleData();
         this.woodCompare._setupData();
     }
 
-    /**
-     * Get select options
-     * @returns {string} HTML formatted option
-     */
-    _getShipOptions() {
-        /* eslint-disable indent */
-        const getOptions = ships => html`
-            ${Object.entries(ships[1].values).map(
-                ([, value]) =>
-                    html`
-                        <option data-subtext="${value.battleRating}" value="${value.id}">
-                            ${value.name} (${value.guns})
-                        </option>
-                    `
-            )}
-        `;
-
-        /* eslint-disable indent */
-        return html`
-            ${repeat(
-                this.shipSelectData,
-                (groupValue, groupKey) => groupValue,
-                (groupValue, groupKey) => {
-                    console.log(groupValue, groupKey);
-                    return html`
-                        <optgroup label="${getOrdinal(groupKey, false)} rate">
-                            ${getOptions(groupValue)}
-                        </optgroup>
-                    `;
-                }
-            )}
-        `;
-    }
-
-    _getShipSelect(columnId) {
-        const shipSelectId = this._getShipSelectId(columnId);
-        console.log("shipSelectId", shipSelectId, this.shipSelectData);
-        return html`
-            <label>
-                <select id="${shipSelectId}" class="selectpicker" ${columnId === "Base" ? "" : "disabled"}>
-                    ${this._getShipOptions()}
-                </select>
-            </label>
-        `;
-    }
-
-    _getWoodSelect(columnId) {
-        return html`
-            ${/* eslint-disable indent */
-            repeat(
-                ["frame", "trim"],
-                type => type,
-                type => {
-                    const woodId = this._getWoodSelectId(type, columnId);
-                    return html`
-                        <label>
-                            <select id="${woodId}" class="selectpicker"></select>
-                        </label>
-                    `;
-                }
-            )}
-        `;
-    }
-
-    _getModuleSelect(columnId) {
-        return html`
-            ${/* eslint-disable indent */
-            repeat(
-                this._moduleTypes,
-                type => type,
-                type => {
-                    const moduleId = this._getModuleSelectId(type, columnId);
-                    return html`
-                        <label>
-                            <select id="${moduleId}" class="selectpicker" multiple></select>
-                        </label>
-                    `;
-                }
-            )}
-        `;
-    }
-
-    _getModalBody() {
-        return html`
-            <div class="container-fluid">
-                <div class="row">
-                    ${/* eslint-disable indent */
-                    repeat(
-                        this._columns,
-                        columnId => columnId,
-                        columnId => html`
-                            <div class="col-md-4 ml-auto pt-2 ${columnId === "Base" ? "column-base" : "column-comp"}">
-                                ${this._getShipSelect(columnId)}${this._getWoodSelect(columnId)}${this._getModuleSelect(
-                                    columnId
-                                )}
-                            </div>
-                            <div
-                                id="${this._baseId}-${columnId}"
-                                class="${columnId === "Base" ? "ship-base" : "ship-compare"}"
-                            ></div>
-                        `
-                    )}
-                </div>
-            </div>
-        `;
-    }
-
-    _getModalFooter() {
-        return html`
-            <button
-                type="button"
-                id="${this._copyButtonId}"
-                title="Copy to clipboard (ctrl-c)"
-                class="btn btn-outline-secondary"
-                data-dismiss="modal"
-            >
-                <i class="far fa-copy"></i>
-            </button>
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                Close
-            </button>
-        `;
-    }
-
-    /**
-     * Inject modal
-     * @returns {void}
-     */
-    _injectModal() {
-        render(
-            insertBaseModalHTML({
-                id: this._modalId,
-                title: this._baseName,
-                body: this._getModalBody.bind(this),
-                footer: this._getModalFooter.bind(this)
-            }),
-            document.getElementById("modal-section")
-        );
-    }
-
     _initSelects() {
         this._columns.forEach(columnId => {
-            this._selectShip$[columnId] = $(`#${this._getShipSelectId(columnId)}`);
             this._selectWood$[columnId] = {};
+            this._setupShipSelect(columnId);
             ["frame", "trim"].forEach(type => {
                 this._selectWood$[columnId][type] = $(`#${this._getWoodSelectId(type, columnId)}`);
                 this.woodCompare._setupWoodSelects(columnId, type, this._selectWood$[columnId][type]);
@@ -1374,6 +1297,41 @@ export default class CompareShips {
         this._initData();
         this._injectModal();
         this._initSelects();
+    }
+
+    /**
+     * Get select options
+     * @returns {string} HTML formatted option
+     */
+    _getShipOptions() {
+        return this.shipSelectData
+            .map(
+                key =>
+                    `<optgroup label="${getOrdinal(key.key, false)} rate">${key.values
+                        .map(
+                            ship =>
+                                `<option data-subtext="${ship.battleRating}" value="${ship.id}">${ship.name} (${
+                                    ship.guns
+                                })`
+                        )
+                        .join("</option>")}`
+            )
+            .join("</optgroup>");
+    }
+
+    /**
+     * Setup ship select
+     * @param {string} columnId - Column id
+     * @returns {void}
+     */
+    _setupShipSelect(columnId) {
+        this._selectShip$[columnId] = $(`#${this._getShipSelectId(columnId)}`);
+        const options = this._getShipOptions();
+
+        this._selectShip$[columnId].append(options);
+        if (columnId !== "Base") {
+            this._selectShip$[columnId].attr("disabled", "disabled");
+        }
     }
 
     /**
@@ -1559,11 +1517,16 @@ export default class CompareShips {
      */
     _addModulesData(shipDataBase, shipDataUpdated, compareId) {
         const data = JSON.parse(JSON.stringify(shipDataUpdated));
+        const modifierAmounts = new Map();
 
-        if (typeof this._selectedUpgradeIdsList[compareId] !== "undefined") {
-            const modifierAmount = new Map();
+        const setSpeedDegrees = () => {
+            data.speedDegrees = data.speedDegrees.map(speed => {
+                const factor = 1 + modifierAmounts.get("Ship speed").percentage / 100;
+                return Math.max(Math.min(speed * factor, this._maxSpeed), this._minSpeed);
+            });
+        };
 
-            // Add modifier amount
+        const setmodifierAmounts = () => {
             this._selectedUpgradeIdsList[compareId].forEach(id => {
                 const module = this._moduleProperties.get(id);
 
@@ -1573,46 +1536,62 @@ export default class CompareShips {
                         let percentage = property.isPercentage ? property.amount : 0;
 
                         // If modifier has been in the Map add the amount
-                        if (modifierAmount.has(property.modifier)) {
-                            absolute += modifierAmount.get(property.modifier).absolute;
-                            percentage += modifierAmount.get(property.modifier).percentage;
+                        if (modifierAmounts.has(property.modifier)) {
+                            absolute += modifierAmounts.get(property.modifier).absolute;
+                            percentage += modifierAmounts.get(property.modifier).percentage;
                         }
 
-                        modifierAmount.set(property.modifier, {
+                        modifierAmounts.set(property.modifier, {
                             absolute,
                             percentage
                         });
                     }
                 });
             });
+        };
 
-            modifierAmount.forEach((value, key) => {
-                this._moduleChanges.get(key).forEach(modifier => {
-                    const index = modifier.split(".");
-                    let factor = 1;
-                    if (modifierAmount.get(key).percentage) {
-                        factor = 1 + modifierAmount.get(key).percentage / 100;
-                    }
+        const adjustDataByModifiers = () => {
+            const adjustData = (key, modifier) => {
+                const index = modifier.split(".");
+                let factor = 1;
+                if (modifierAmounts.get(key).percentage) {
+                    factor = 1 + modifierAmounts.get(key).percentage / 100;
+                }
 
-                    const { absolute } = modifierAmount.get(key);
+                const { absolute } = modifierAmounts.get(key);
 
-                    if (index.length > 1) {
-                        if (data[index[0]][index[1]]) {
-                            data[index[0]][index[1]] *= factor;
-                            data[index[0]][index[1]] += absolute;
-                        } else {
-                            data[index[0]][index[1]] = absolute;
-                        }
-                    } else if (data[index[0]]) {
-                        data[index[0]] *= factor;
-                        data[index[0]] += absolute;
+                if (index.length > 1) {
+                    if (data[index[0]][index[1]]) {
+                        data[index[0]][index[1]] *= factor;
+                        data[index[0]][index[1]] += absolute;
                     } else {
-                        data[index[0]] = absolute;
+                        data[index[0]][index[1]] = absolute;
                     }
-                });
-            });
+                } else if (data[index[0]]) {
+                    data[index[0]] *= factor;
+                    data[index[0]] += absolute;
+                } else {
+                    data[index[0]] = absolute;
+                }
+            };
 
-            modifierAmount.forEach((value, key) => {
+            modifierAmounts.forEach((value, key) => {
+                if (this._moduleChanges.get(key)) {
+                    this._moduleChanges.get(key).forEach(modifier => {
+                        adjustData(key, modifier);
+                    });
+                }
+
+                if (this._genericChanges.get(key)) {
+                    this._genericChanges.get(key).forEach(modifier => {
+                        adjustData(key, modifier);
+                    });
+                }
+            });
+        };
+
+        const adjustDataByCaps = () => {
+            modifierAmounts.forEach((value, key) => {
                 if (this._moduleCaps.has(key)) {
                     const { cap } = this._moduleCaps.get(key);
                     this._moduleCaps.get(key).properties.forEach(property => {
@@ -1633,13 +1612,17 @@ export default class CompareShips {
                     });
                 }
             });
+        };
 
-            if (modifierAmount.has("Ship speed")) {
-                data.speedDegrees = data.speedDegrees.map(speed => {
-                    const factor = 1 + modifierAmount.get("Ship speed").percentage / 100;
-                    return Math.max(Math.min(speed * factor, this._maxSpeed), this._minSpeed);
-                });
-            }
+        if (!this._selectedUpgradeIdsList[compareId]) {
+            return data;
+        }
+
+        setmodifierAmounts();
+        adjustDataByModifiers();
+        adjustDataByCaps();
+        if (modifierAmounts.has("Ship speed")) {
+            setSpeedDegrees();
         }
 
         return data;
