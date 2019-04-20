@@ -12,7 +12,7 @@
 import * as fs from "fs";
 import xml2Json from "xml2json";
 
-import { readTextFile, roundToThousands, saveJson } from "./common.mjs";
+import { readTextFile, round, saveJson } from "./common.mjs";
 
 const inDirectory = process.argv[2];
 const filename = process.argv[3];
@@ -183,7 +183,7 @@ function convertCannons() {
 
         // Calculate damage per second
         cannon.damage["per second"] = {
-            value: roundToThousands(cannon.damage.basic.value / cannon.generic["reload time"].value),
+            value: round(cannon.damage.basic.value / cannon.generic["reload time"].value, 2),
             digits: 0
         };
 
@@ -213,22 +213,39 @@ function convertCannons() {
     });
 
     // Set maximum digits after decimal point
+    const maxDigits = {};
     cannonTypes.forEach(type => {
+        maxDigits[type] = {};
+
         cannons[type].forEach(cannon => {
-            Object.entries(cannon).forEach(([, groupValue]) => {
-                let maxDigits = 0;
+            Object.entries(cannon).forEach(([groupKey, groupValue]) => {
                 if (typeof groupValue === "object") {
-                    Object.entries(groupValue).forEach(([, elementValue]) => {
-                        maxDigits = Math.max(maxDigits, countDecimals(elementValue.value));
-                    });
-                    Object.entries(groupValue).forEach(([, elementValue]) => {
-                        elementValue.digits = maxDigits;
+                    if (!maxDigits[type][groupKey]) {
+                        maxDigits[type][groupKey] = {};
+                    }
+
+                    Object.entries(groupValue).forEach(([elementKey, elementValue]) => {
+                        maxDigits[type][groupKey][elementKey] = Math.max(
+                            maxDigits[type][groupKey][elementKey] | 0,
+                            countDecimals(elementValue.value)
+                        );
                     });
                 }
             });
         });
     });
-
+    cannonTypes.forEach(type => {
+        cannons[type].forEach(cannon => {
+            Object.entries(cannon).forEach(([groupKey, groupValue]) => {
+                if (typeof groupValue === "object") {
+                    Object.entries(groupValue).forEach(([elementKey]) => {
+                        cannon[groupKey][elementKey].digits = maxDigits[type][groupKey][elementKey];
+                    });
+                }
+            });
+        });
+    });
+    console.log(maxDigits);
     saveJson(filename, cannons);
 }
 
