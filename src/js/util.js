@@ -82,7 +82,7 @@ export const formatFloatFixedHTML = (x, f = 2) => {
     number = number.replace("-", "\u2212\u202f");
 
     if (decimals) {
-        if (decimals === "00") {
+        if (decimals === "0" || decimals === "00") {
             // eslint-disable-next-line prettier/prettier
             decimals = html`<span class="hidden">.${decimals}</span>`;
         } else if (decimals.endsWith("0")) {
