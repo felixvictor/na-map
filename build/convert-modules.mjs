@@ -137,7 +137,7 @@ function convertModules() {
     modifiers.set("NONE PERK_CRAFT_LIGHT_SHIP_LABOR_PRICE_MODIFIER", "Labour hours to craft unrated ship");
     modifiers.set("NONE PERK_CRAFT_LINE_SHIP_LABOR_PRICE_MODIFIER", "Labour hours to craft ship of the line");
     modifiers.set("NONE PERK_CRAFT_SHIP_LABOR_PRICE_MODIFIER", "Labour hours to craft any ship");
-    modifiers.set("NONE PERK_CREW_REPAIR_PERCENT_MODIFIER", "Crew repair");
+    modifiers.set("NONE PERK_CREW_REPAIR_PERCENT_MODIFIER", "Crew repair amount");
     modifiers.set("NONE PERK_DONT_CONSUME_BATTLE_REPAIRS", "DONT_CONSUME_BATTLE_REPAIRS");
     modifiers.set("NONE PERK_EMERGENCY_REPAIR_COOLDOWN_MODIFIER", "Emergency repair cooldown");
     modifiers.set("NONE PERK_ENABLE_DOUBLE_CHARGE", "Double charge");
@@ -184,9 +184,9 @@ function convertModules() {
     modifiers.set("NONE WATER_PUMP_BAILING", "Water pump bailing");
     modifiers.set("POWDER POWDER_RADIUS", "Powder radius");
     modifiers.set("POWDER REPAIR_MODULE_TIME", "Powder repair module time");
-    modifiers.set("REPAIR_ARMOR REPAIR_PERCENT", "Armour repair");
+    modifiers.set("REPAIR_ARMOR REPAIR_PERCENT", "Armour repair amount");
     modifiers.set("REPAIR_GENERIC REPAIR_PERCENT", "Generic repair amount");
-    modifiers.set("REPAIR_SAIL REPAIR_PERCENT", "Sail repair");
+    modifiers.set("REPAIR_SAIL REPAIR_PERCENT", "Sail repair amount");
     modifiers.set("RUDDER MODULE_BASE_HP", "Rudder health");
     modifiers.set("RUDDER REPAIR_MODULE_TIME", "Rudder repair time");
     modifiers.set("SAIL MODULE_BASE_HP", "Sail health");
@@ -285,7 +285,7 @@ function convertModules() {
                 isPercentage = false;
             }
 
-            if (modifier.MappingIds[0].endsWith("PERCENT_MODIFIER")) {
+            if (modifier.MappingIds[0].endsWith("PERCENT_MODIFIER") || modifier.MappingIds[0] === "REPAIR_PERCENT") {
                 isPercentage = true;
             }
 
