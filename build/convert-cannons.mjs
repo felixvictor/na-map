@@ -12,7 +12,7 @@
 import * as fs from "fs";
 import xml2Json from "xml2json";
 
-import { readTextFile, roundToThousands, saveJson } from "./common.mjs";
+import { readTextFile, round, saveJson } from "./common.mjs";
 
 const inDirectory = process.argv[2];
 const filename = process.argv[3];
@@ -24,15 +24,26 @@ String.prototype.replaceAll = function(search, replacement) {
     return target.replace(new RegExp(search, "g"), replacement);
 };
 
+const countDecimals = value => {
+    if (Math.floor(value) === value) {
+        return 0;
+    }
+
+    return value.toString().split(".")[1].length || 0;
+};
+
+const peneDistances = [50, 100, 250, 500, 750, 1000];
+const cannonTypes = ["medium", "long", "carronade"];
+
 /**
  * Retrieve cannon data from game files and store it
  * @returns {void}
  */
 function convertCannons() {
     const cannons = {};
-    cannons.medium = [];
-    cannons.long = [];
-    cannons.carronade = [];
+    cannonTypes.forEach(type => {
+        cannons[type] = [];
+    });
 
     /**
      * List of file names to be read
@@ -137,18 +148,45 @@ function convertCannons() {
         const cannon = {
             name
         };
+
         // console.log(fileData.ModuleTemplate);
         dataMapping.forEach(({ group, element }, value) => {
-            fileData.ModuleTemplate.Attributes.Pair.filter(pair => value === pair.Key).forEach(pair => {
-                if (!cannon[group]) {
-                    // eslint-disable-next-line no-param-reassign
-                    cannon[group] = {};
-                }
+            if (!cannon[group]) {
+                // eslint-disable-next-line no-param-reassign
+                cannon[group] = {};
+                cannon[group][element] = {};
+            }
 
-                cannon[group][element] = Number(pair.Value.Value);
-            });
+            cannon[group][element] = {
+                value: Number(fileData.ModuleTemplate.Attributes.Pair.find(pair => value === pair.Key).Value.Value),
+                digits: 0
+            };
         });
-        cannon.damage["per second"] = roundToThousands(cannon.damage.basic / cannon.generic["reload time"]);
+
+        // Calculate penetrations
+        const penetrations = new Map(
+            fileData.ModuleTemplate.Attributes.Pair.find(pair => pair.Key === "CANNON_PENETRATION_DEGRADATION")
+                .Value.Value.filter(pene => Number(pene.Time) > 0)
+                .map(pene => [pene.Time * 1000, Number(pene.Value)])
+        );
+        penetrations.set(250, (penetrations.get(200) + penetrations.get(300)) / 2);
+        penetrations.set(500, (penetrations.get(400) + penetrations.get(600)) / 2);
+        penetrations.set(750, penetrations.get(800) + (penetrations.get(600) - penetrations.get(800)) * 0.25);
+        cannon["penetration (m)"] = {};
+        peneDistances.forEach(distance => {
+            cannon["penetration (m)"][distance] = {
+                value: Math.trunc(penetrations.get(distance) * cannon.damage.penetration.value) | 0,
+                digits: 0
+            };
+        });
+        delete cannon.damage.penetration;
+
+        // Calculate damage per second
+        cannon.damage["per second"] = {
+            value: round(cannon.damage.basic.value / cannon.generic["reload time"].value, 2),
+            digits: 0
+        };
+
         cannons[type].push(
             Object.keys(cannon)
                 .sort()
@@ -174,6 +212,40 @@ function convertCannons() {
         addData(fileData);
     });
 
+    // Set maximum digits after decimal point
+    const maxDigits = {};
+    cannonTypes.forEach(type => {
+        maxDigits[type] = {};
+
+        cannons[type].forEach(cannon => {
+            Object.entries(cannon).forEach(([groupKey, groupValue]) => {
+                if (typeof groupValue === "object") {
+                    if (!maxDigits[type][groupKey]) {
+                        maxDigits[type][groupKey] = {};
+                    }
+
+                    Object.entries(groupValue).forEach(([elementKey, elementValue]) => {
+                        maxDigits[type][groupKey][elementKey] = Math.max(
+                            maxDigits[type][groupKey][elementKey] | 0,
+                            countDecimals(elementValue.value)
+                        );
+                    });
+                }
+            });
+        });
+    });
+    cannonTypes.forEach(type => {
+        cannons[type].forEach(cannon => {
+            Object.entries(cannon).forEach(([groupKey, groupValue]) => {
+                if (typeof groupValue === "object") {
+                    Object.entries(groupValue).forEach(([elementKey]) => {
+                        cannon[groupKey][elementKey].digits = maxDigits[type][groupKey][elementKey];
+                    });
+                }
+            });
+        });
+    });
+    console.log(maxDigits);
     saveJson(filename, cannons);
 }
 
