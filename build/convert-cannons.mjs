@@ -245,7 +245,7 @@ function convertCannons() {
             });
         });
     });
-    console.log(maxDigits);
+
     saveJson(filename, cannons);
 }
 
