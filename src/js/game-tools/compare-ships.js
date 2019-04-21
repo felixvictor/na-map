@@ -38,7 +38,16 @@ import {
     rumRepairsPercent,
     insertBaseModal
 } from "../common";
-import { copyToClipboard, formatInt, formatFloat, getOrdinal, isEmpty, roundToThousands, sortBy } from "../util";
+import {
+    copyToClipboard,
+    formatInt,
+    formatFloat,
+    getOrdinal,
+    isEmpty,
+    roundToThousands,
+    sortBy,
+    formatPercent
+} from "../util";
 
 import CompareWoods from "./compare-woods";
 
@@ -531,19 +540,23 @@ class ShipBase extends Ship {
             maxWeight: formatInt(this.shipData.maxWeight),
             holdSize: formatInt(this.shipData.holdSize),
             upgradeXP: formatInt(this.shipData.upgradeXP),
-            sternRepair: formatInt(this.shipData.repairTime.stern),
-            bowRepair: formatInt(this.shipData.repairTime.bow),
-            sidesRepair: formatInt(this.shipData.repairTime.sides),
-            rudderRepair: formatInt(this.shipData.repairTime.rudder),
-            sailsRepair: formatInt(this.shipData.repairTime.sails),
-            structureRepair: formatInt(this.shipData.repairTime.structure),
+            sternRepair: `${formatInt(this.shipData.repairTime.stern)}`,
+            bowRepair: `${formatInt(this.shipData.repairTime.bow)}`,
+            sidesRepair: `${formatInt(this.shipData.repairTime.sides)}\u00A0<span class="badge badge-white">${formatPercent(
+                (this.shipData.repairAmount.armour - hullRepairsVolume)/100
+            )}</span>`,
+            rudderRepair: `${formatInt(this.shipData.repairTime.rudder)}`,
+            sailsRepair: `${formatInt(this.shipData.repairTime.sails)}`,
+            structureRepair: `${formatInt(this.shipData.repairTime.structure)}`,
             hullRepair: `${formatInt(
-                this.shipData.sides.armour / this.shipData.repairAmount.armour / hullRepairsPercent
+                (this.shipData.sides.armour / this.shipData.repairAmount.armour) * hullRepairsPercent
             )}`,
             rigRepair: `${formatInt(
-                this.shipData.sails.armour / this.shipData.repairAmount.sails / rigRepairsPercent
+                (this.shipData.sails.armour / this.shipData.repairAmount.sails) * rigRepairsPercent
             )}`,
             rumRepair: `${formatInt(this.shipData.crew.max / rumRepairsFactor)}`,
+            rigRepairAmount: `${formatInt(this.shipData.repairAmount.sails - rigRepairsVolume)}`,
+            rumRepairAmount: `${formatInt(rumRepairsVolume)}`,
             fireResistance: formatInt(this.shipData.resistance.fire),
             leakResistance: formatInt(this.shipData.resistance.leaks),
             crewProtection: formatInt(this.shipData.resistance.crew),
@@ -557,7 +570,6 @@ class ShipBase extends Ship {
                 this.shipData.mast.topThickness
             )}</span>`
         };
-
         if (ship.gunsFront) {
             ship.gunsFront += `\u00A0${Ship.pd(ship.limitFront)}`;
         } else {
@@ -840,22 +852,33 @@ class ShipComparison extends Ship {
                 this.shipBaseData.repairTime.structure,
                 this.shipCompareData.repairTime.structure
             )}`,
-            hullRepair: `${formatInt(
-                this.shipCompareData.sides.armour / this.shipCompareData.repairAmount.armour / hullRepairsPercent
+            hullRepairs: `${formatInt(
+                (this.shipCompareData.sides.armour / this.shipCompareData.repairAmount.armour) * hullRepairsPercent
             )}\u00A0${getDiff(
-                this.shipBaseData.sides.armour / this.shipBaseData.repairAmount.armour / hullRepairsPercent,
-                this.shipCompareData.sides.armour / this.shipCompareData.repairAmount.armour / hullRepairsPercent
+                (this.shipBaseData.sides.armour / this.shipBaseData.repairAmount.armour) * hullRepairsPercent,
+                (this.shipCompareData.sides.armour / this.shipCompareData.repairAmount.armour) * hullRepairsPercent
             )}`,
-            rigRepair: `${formatInt(
-                this.shipCompareData.sails.armour / this.shipCompareData.repairAmount.sails / rigRepairsPercent
+            rigRepairs: `${formatInt(
+                (this.shipCompareData.sails.armour / this.shipCompareData.repairAmount.sails) * rigRepairsPercent
             )}\u00A0${getDiff(
-                this.shipBaseData.sails.armour / this.shipBaseData.repairAmount.sails / rigRepairsPercent,
-                this.shipCompareData.sails.armour / this.shipCompareData.repairAmount.sails / rigRepairsPercent
+                (this.shipBaseData.sails.armour / this.shipBaseData.repairAmount.sails) * rigRepairsPercent,
+                (this.shipCompareData.sails.armour / this.shipCompareData.repairAmount.sails) * rigRepairsPercent
             )}`,
-            rumRepair: `${formatInt(this.shipCompareData.crew.max / rumRepairsFactor)}\u00A0${getDiff(
+            rumRepairs: `${formatInt(this.shipCompareData.crew.max / rumRepairsFactor)}\u00A0${getDiff(
                 this.shipBaseData.crew.max / rumRepairsFactor,
                 this.shipCompareData.crew.max / rumRepairsFactor
             )}`,
+            hullRepairAmount: `${formatInt(
+                this.shipCompareData.repairAmount.armour - hullRepairsVolume
+            )}\u00A0${getDiff(
+                this.shipBaseData.repairAmount.armour - hullRepairsVolume,
+                this.shipCompareData.repairAmount.armour - hullRepairsVolume
+            )}`,
+            rigRepairAmount: `${formatInt(this.shipCompareData.repairAmount.sails - rigRepairsVolume)}\u00A0${getDiff(
+                this.shipBaseData.repairAmount.sails - rigRepairsVolume,
+                this.shipCompareData.repairAmount.sails - rigRepairsVolume
+            )}`,
+            rumRepairAmount: `${formatInt(rumRepairsVolume)}`,
             fireResistance: `${formatInt(this.shipCompareData.resistance.fire)}\u00A0${getDiff(
                 this.shipCompareData.resistance.fire,
                 this.shipBaseData.resistance.fire
@@ -1006,7 +1029,6 @@ export default class CompareShips {
         ]);
 
         this._genericChanges = new Map([
-            ["Hull repair amount", ["repairAmount.armour"]],
             ["Armour repair amount", ["repairAmount.armour"]],
             ["Sail repair amount", ["repairAmount.sails"]]
         ]);
