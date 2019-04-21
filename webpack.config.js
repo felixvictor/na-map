@@ -12,9 +12,8 @@ const // { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer"),
 const CopyPlugin = require("copy-webpack-plugin");
 const HtmlPlugin = require("html-webpack-plugin");
 const ExtractCssChunks = require("extract-css-chunks-webpack-plugin");
-const PreloadWebpackPlugin = require("preload-webpack-plugin");
 const SitemapPlugin = require("sitemap-webpack-plugin").default;
-// SriPlugin = require("webpack-subresource-integrity"),
+const SriPlugin = require("webpack-subresource-integrity");
 const TerserPlugin = require("terser-webpack-plugin");
 const WebpackDeepScopeAnalysisPlugin = require("webpack-deep-scope-plugin").default;
 const WebpackPwaManifest = require("webpack-pwa-manifest");
@@ -328,20 +327,14 @@ const config = {
             { from: "images/map", to: `${outputPath}/images/map` }
         ]),
         new HtmlPlugin(htmlOpt),
-        new PreloadWebpackPlugin({
-            include: "allAssets",
-            fileWhitelist: [/^(fonts|main|map|vendors~main|vendors~map)/]
-        }),
-        /*
-        new SriPlugin({
-            hashFuncNames: ["sha256", "sha384"],
-            enabled: isProd
-        }),
-        */
         new SitemapPlugin(target, sitemapPaths, { skipGzip: false }),
         new WebpackDeepScopeAnalysisPlugin(),
         new WebpackPwaManifest(manifestOpt),
-        new webpack.HashedModuleIdsPlugin()
+        new webpack.HashedModuleIdsPlugin(),
+        new SriPlugin({
+            hashFuncNames: ["sha256", "sha384"],
+            enabled: isProduction
+        })
     ],
 
     stats: {
