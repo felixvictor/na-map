@@ -145,7 +145,7 @@ function convertModules() {
     modifiers.set("NONE PERK_FISHING_DROP_CHANCE_MODIFIER", "Fish");
     modifiers.set("NONE PERK_HEEL_DEGREES_MODIFIER", "Heel degrees");
     modifiers.set("NONE PERK_HOLD_MAX_WEIGHT_MODIFIER", "Hold weight");
-    modifiers.set("NONE PERK_HULL_REPAIR_PERCENT_MODIFIER", "Hull repair amount");
+    modifiers.set("NONE PERK_HULL_REPAIR_PERCENT_MODIFIER", "Armour repair amount");
     modifiers.set("NONE PERK_LABOR_HOURS_GENERATION_MODIFIER", "Labour hour generation");
     modifiers.set("NONE PERK_LABOR_HOURS_WALLET_MODIFIER", "Labour hour wallet");
     modifiers.set("NONE PERK_MAX_FLEET_SIZE_MODIFIER", "Fleet ships");
