@@ -1408,45 +1408,60 @@ export default class CompareShips {
         return options;
     }
 
+    _fillModuleSelect(columnId, type) {
+        const getShipClass = () => this._shipData.find(ship => ship.id === this._shipIds[columnId]).class;
+
+        const options = this._getUpgradesOptions(type, getShipClass());
+
+        this._selectModule$[columnId][type].find("option").remove();
+        this._selectModule$[columnId][type].append(options);
+    }
+
+    _resetModuleSelects(columnId) {
+        this._moduleTypes.forEach(type => {
+            this._fillModuleSelect(columnId, type);
+            this._selectModule$[columnId][type].selectpicker("refresh");
+        });
+    }
+
     /**
      * Setup upgrades select
      * @param {string} columnId - Column id
      * @returns {void}
      */
     _setupModulesSelect(columnId) {
-        const getShipClass = () => this._shipData.find(ship => ship.id === this._shipIds[columnId]).class;
+        if (!this._selectModule$[columnId]) {
+            this._selectModule$[columnId] = {};
 
-        this._selectModule$[columnId] = {};
+            this._moduleTypes.forEach(type => {
+                this._selectModule$[columnId][type] = $(`#${this._getModuleSelectId(type, columnId)}`);
+                this._selectModule$[columnId][type]
+                    .on("changed.bs.select", () => {
+                        this._modulesSelected(columnId);
+                        this._refreshShips(columnId);
+                    })
+                    .on("show.bs.select", () => {
+                        // Remove 'select all' button
+                        this._selectModule$[columnId][type]
+                            .parent()
+                            .find("button.bs-select-all")
+                            .remove();
+                    })
+                    .selectpicker({
+                        actionsBox: true,
+                        countSelectedText(amount) {
+                            return `${amount} ${type.toLowerCase()}s selected`;
+                        },
+                        deselectAllText: "Clear",
+                        maxOptions: type === "Ship trim" ? 1 : 5,
+                        selectedTextFormat: "count > 1",
+                        title: `${type}`,
+                        width: "150px"
+                    });
+            });
+        }
 
-        this._moduleTypes.forEach(type => {
-            this._selectModule$[columnId][type] = $(`#${this._getModuleSelectId(type, columnId)}`);
-            const options = this._getUpgradesOptions(type, getShipClass());
-
-            this._selectModule$[columnId][type].append(options);
-            this._selectModule$[columnId][type]
-                .on("changed.bs.select", () => {
-                    this._modulesSelected(columnId);
-                    this._refreshShips(columnId);
-                })
-                .on("show.bs.select", () => {
-                    // Remove 'select all' button
-                    this._selectModule$[columnId][type]
-                        .parent()
-                        .find("button.bs-select-all")
-                        .remove();
-                })
-                .selectpicker({
-                    actionsBox: true,
-                    countSelectedText(amount) {
-                        return `${amount} ${type.toLowerCase()}s selected`;
-                    },
-                    deselectAllText: "Clear",
-                    maxOptions: type !== "Ship trim" && options.length > 1 ? 5 : 1,
-                    selectedTextFormat: "count > 1",
-                    title: `${type}`,
-                    width: "150px"
-                });
-        });
+        this._resetModuleSelects(columnId);
     }
 
     /**
@@ -1665,7 +1680,9 @@ export default class CompareShips {
      * @returns {void}
      */
     _refreshShips(compareId) {
+        this._modulesSelected(compareId);
         const singleShipData = this._getShipData(compareId);
+
         if (this._baseId === "ship-journey") {
             this._singleShipData = singleShipData;
         } else if (compareId === "Base") {
@@ -1739,13 +1756,13 @@ export default class CompareShips {
         this._selectShip$[compareId]
             .on("changed.bs.select", () => {
                 this._shipIds[compareId] = Number(this._selectShip$[compareId].val());
+                this._setupModulesSelect(compareId);
                 this._refreshShips(compareId);
                 if (compareId === "Base" && this._baseId !== "ship-journey") {
                     this._enableCompareSelects();
                 }
 
                 this.woodCompare.enableSelects(compareId);
-                this._setupModulesSelect(compareId);
             })
             .selectpicker({ title: "Ship" });
 
