@@ -280,13 +280,17 @@ function convertModules() {
             let isPercentage = true;
 
             if (modifier.Absolute) {
-                amount =
-                    Math.abs(modifier.Absolute) >= 1 ? modifier.Absolute : Math.round(modifier.Absolute * 10000) / 100;
-                isPercentage = false;
-            }
+                if (
+                    Math.abs(modifier.Absolute) >= 1 ||
+                    modifier.MappingIds[0].endsWith("PERCENT_MODIFIER") ||
+                    modifier.MappingIds[0] === "REPAIR_PERCENT"
+                ) {
+                    amount = modifier.Absolute;
+                } else {
+                    amount = Math.round(modifier.Absolute * 10000) / 100;
+                }
 
-            if (modifier.MappingIds[0].endsWith("PERCENT_MODIFIER") || modifier.MappingIds[0] === "REPAIR_PERCENT") {
-                isPercentage = true;
+                isPercentage = false;
             }
 
             if (
