@@ -23,30 +23,30 @@ import {
 import { registerEvent } from "../analytics";
 import {
     appVersion,
-    colourRed,
-    colourRedLight,
-    colourRedDark,
     colourGreen,
-    colourGreenLight,
     colourGreenDark,
+    colourGreenLight,
+    colourRed,
+    colourRedDark,
+    colourRedLight,
     hashids,
-    hullRepairsVolume,
     hullRepairsPercent,
-    rigRepairsVolume,
+    hullRepairsVolume,
     rigRepairsPercent,
-    rumRepairsVolume,
+    rigRepairsVolume,
     rumRepairsPercent,
+    rumRepairsVolume,
     insertBaseModal
 } from "../common";
 import {
     copyToClipboard,
-    formatInt,
     formatFloat,
+    formatInt,
+    formatPercent,
     getOrdinal,
     isEmpty,
     roundToThousands,
-    sortBy,
-    formatPercent
+    sortBy
 } from "../util";
 
 import CompareWoods from "./compare-woods";
@@ -54,7 +54,7 @@ import CompareWoods from "./compare-woods";
 const numberSegments = 24;
 const segmentRadians = (2 * Math.PI) / numberSegments;
 
-const rumRepairsFactor = rumRepairsVolume / rumRepairsPercent;
+const rumRepairsFactor = rumRepairsPercent / rumRepairsVolume;
 const repairsSetSize = 5;
 
 /**
@@ -313,8 +313,9 @@ class Ship {
 
         text += displayFirstColumn("Repair");
         text += displaySecondBlock();
-        text += displayColumn("repairAmount", "Amount");
-        text += displayColumn("repairTime", "Time");
+        text += displayColumn("hullRepairAmount", "Hull amount", 4);
+        text += displayColumn("rigRepairAmount", "Rig amount", 4);
+        text += displayColumn("repairTime", "Time", 4);
         text += "</div></div></div>";
 
         text += displayFirstColumn("Hold");
@@ -494,9 +495,13 @@ class ShipBase extends Ship {
      */
     _printText() {
         const cannonsPerDeck = Ship.getCannonsPerDeck(this.shipData.deckClassLimit, this.shipData.gunsPerDeck);
-        const hullRepairsNeeded = (this.shipData.sides.armour / this.shipData.repairAmount.armour) * hullRepairsPercent;
-        const rigRepairsNeeded = (this.shipData.sails.armour / this.shipData.repairAmount.sails) * rigRepairsPercent;
-        const rumRepairsNeeded = this.shipData.crew.max / rumRepairsFactor;
+        const hullRepairsNeeded = Math.round(
+            (this.shipData.sides.armour * this.shipData.repairAmount.armour) / hullRepairsVolume
+        );
+        const rigRepairsNeeded = Math.round(
+            (this.shipData.sails.armour * this.shipData.repairAmount.sails) / rigRepairsVolume
+        );
+        const rumRepairsNeeded = Math.round(this.shipData.crew.max * rumRepairsFactor);
 
         const ship = {
             shipRating: `${getOrdinal(this.shipData.class)} rate`,
@@ -541,7 +546,8 @@ class ShipBase extends Ship {
             upgradeXP: formatInt(this.shipData.upgradeXP),
             sternRepair: `${formatInt(this.shipData.repairTime.stern)}`,
             bowRepair: `${formatInt(this.shipData.repairTime.bow)}`,
-            repairAmount: `${formatPercent((this.shipData.repairAmount.armour - hullRepairsVolume) / 100 + 1)}`,
+            hullRepairAmount: `${formatPercent(this.shipData.repairAmount.armour)}`,
+            rigRepairAmount: `${formatPercent(this.shipData.repairAmount.sails)}`,
             repairTime: `${formatPercent(
                 (this.shipData.repairTime.sides - this.shipData.repairTime.default) / 100 + 1
             )}`,
@@ -699,6 +705,21 @@ class ShipComparison extends Ship {
             return "";
         }
 
+        const hullRepairsNeededBase = Math.round(
+            (this.shipBaseData.sides.armour * this.shipBaseData.repairAmount.armour) / hullRepairsVolume
+        );
+        const rigRepairsNeededBase = Math.round(
+            (this.shipBaseData.sails.armour * this.shipBaseData.repairAmount.sails) / rigRepairsVolume
+        );
+        const rumRepairsNeededBase = Math.round(this.shipBaseData.crew.max * rumRepairsFactor);
+        const hullRepairsNeededCompare = Math.round(
+            (this.shipCompareData.sides.armour * this.shipCompareData.repairAmount.armour) / hullRepairsVolume
+        );
+        const rigRepairsNeededCompare = Math.round(
+            (this.shipCompareData.sails.armour * this.shipCompareData.repairAmount.sails) / rigRepairsVolume
+        );
+        const rumRepairsNeededCompare = Math.round(this.shipCompareData.crew.max * rumRepairsFactor);
+
         const ship = {
             shipRating: `${getOrdinal(this.shipCompareData.class)} rate`,
             battleRating: `${this.shipCompareData.battleRating}\u00A0${getDiff(
@@ -830,11 +851,15 @@ class ShipComparison extends Ship {
                 this.shipCompareData.upgradeXP,
                 this.shipBaseData.upgradeXP
             )}`,
-            repairAmount: `${formatPercent(
-                (this.shipCompareData.repairAmount.armour - hullRepairsVolume) / 100 + 1
-            )}\u00A0${getDiff(
-                (this.shipCompareData.repairAmount.armour - hullRepairsVolume) / 100 + 1,
-                (this.shipBaseData.repairAmount.armour - hullRepairsVolume) / 100 + 1,
+            hullRepairAmount: `${formatPercent(this.shipCompareData.repairAmount.armour)}\u00A0${getDiff(
+                this.shipCompareData.repairAmount.armour,
+                this.shipBaseData.repairAmount.armour,
+                3,
+                true
+            )}`,
+            rigRepairAmount: `${formatPercent(this.shipCompareData.repairAmount.sails)}\u00A0${getDiff(
+                this.shipCompareData.repairAmount.sails,
+                this.shipBaseData.repairAmount.sails,
                 3,
                 true
             )}`,
@@ -846,21 +871,17 @@ class ShipComparison extends Ship {
                 3,
                 true
             )}`,
-            hullRepairsNeeded: `${formatInt(
-                (this.shipCompareData.sides.armour / this.shipCompareData.repairAmount.armour) * hullRepairsPercent
-            )}\u00A0${getDiff(
-                (this.shipCompareData.sides.armour / this.shipCompareData.repairAmount.armour) * hullRepairsPercent,
-                (this.shipBaseData.sides.armour / this.shipBaseData.repairAmount.armour) * hullRepairsPercent
+            hullRepairsNeeded: `${formatInt(hullRepairsNeededCompare)}\u00A0${getDiff(
+                hullRepairsNeededCompare,
+                hullRepairsNeededBase
             )}`,
-            rigRepairsNeeded: `${formatInt(
-                (this.shipCompareData.sails.armour / this.shipCompareData.repairAmount.sails) * rigRepairsPercent
-            )}\u00A0${getDiff(
-                (this.shipCompareData.sails.armour / this.shipCompareData.repairAmount.sails) * rigRepairsPercent,
-                (this.shipBaseData.sails.armour / this.shipBaseData.repairAmount.sails) * rigRepairsPercent
+            rigRepairsNeeded: `${formatInt(rigRepairsNeededCompare)}\u00A0${getDiff(
+                rigRepairsNeededCompare,
+                rigRepairsNeededBase
             )}`,
-            rumRepairsNeeded: `${formatInt(this.shipCompareData.crew.max / rumRepairsFactor)}\u00A0${getDiff(
-                this.shipCompareData.crew.max / rumRepairsFactor,
-                this.shipBaseData.crew.max / rumRepairsFactor
+            rumRepairsNeeded: `${formatInt(rumRepairsNeededCompare)}\u00A0${getDiff(
+                rumRepairsNeededCompare,
+                rumRepairsNeededBase
             )}`,
             fireResistance: `${formatInt(this.shipCompareData.resistance.fire)}\u00A0${getDiff(
                 this.shipCompareData.resistance.fire,
@@ -985,6 +1006,7 @@ export default class CompareShips {
         this._moduleChanges = new Map([
             // ["Sail damage", [  ]],
             // ["Sail health", [  ]],
+            ["Armour repair amount", ["repairAmount.armour"]],
             ["Acceleration", ["ship.acceleration"]],
             ["Armor thickness", ["sides.thickness", "bow.thickness", "stern.thickness"]],
             ["Armour strength", ["bow.armour", "sides.armour", "stern.armour"]],
@@ -1001,6 +1023,7 @@ export default class CompareShips {
             ["Rudder health", ["rudder.armour"]],
             ["Rudder repair time", ["repairTime.rudder"]],
             ["Rudder speed", ["rudder.halfturnTime"]],
+            ["Sail repair amount", ["repairAmount.sails"]],
             ["Sail repair time", ["repairTime.sails"]],
             ["Sailing crew", ["crew.sailing"]],
             ["Ship speed", ["speed.max"]],
@@ -1009,11 +1032,6 @@ export default class CompareShips {
             ["Turn speed", ["rudder.turnSpeed"]],
             ["Water pump health", ["pump.armour"]],
             ["Water repair time", ["repairTime.pump"]]
-        ]);
-
-        this._genericChanges = new Map([
-            ["Armour repair amount", ["repairAmount.armour"]],
-            ["Sail repair amount", ["repairAmount.sails"]]
         ]);
 
         this._moduleCaps = new Map([
@@ -1209,10 +1227,7 @@ export default class CompareShips {
                     type[1]
                         .filter(module =>
                             module.properties.some(property => {
-                                return (
-                                    this._moduleChanges.has(property.modifier) ||
-                                    this._genericChanges.has(property.modifier)
-                                );
+                                return this._moduleChanges.has(property.modifier);
                             })
                         )
                         .map(module => [module.id, module])
@@ -1444,8 +1459,8 @@ export default class CompareShips {
         let shipDataUpdated = shipDataDefault;
 
         shipDataUpdated.repairAmount = {};
-        shipDataUpdated.repairAmount.armour = hullRepairsVolume;
-        shipDataUpdated.repairAmount.sails = rigRepairsVolume;
+        shipDataUpdated.repairAmount.armour = hullRepairsPercent;
+        shipDataUpdated.repairAmount.sails = rigRepairsPercent;
 
         shipDataUpdated.repairTime.default = shipDataUpdated.repairTime.sides;
 
@@ -1553,7 +1568,7 @@ export default class CompareShips {
                 const module = this._moduleProperties.get(id);
 
                 module.properties.forEach(property => {
-                    if (this._moduleChanges.has(property.modifier) || this._genericChanges.has(property.modifier)) {
+                    if (this._moduleChanges.has(property.modifier)) {
                         let absolute = property.isPercentage ? 0 : property.amount;
                         let percentage = property.isPercentage ? property.amount : 0;
 
@@ -1600,12 +1615,6 @@ export default class CompareShips {
             modifierAmounts.forEach((value, key) => {
                 if (this._moduleChanges.get(key)) {
                     this._moduleChanges.get(key).forEach(modifier => {
-                        adjustData(key, modifier);
-                    });
-                }
-
-                if (this._genericChanges.get(key)) {
-                    this._genericChanges.get(key).forEach(modifier => {
                         adjustData(key, modifier);
                     });
                 }
