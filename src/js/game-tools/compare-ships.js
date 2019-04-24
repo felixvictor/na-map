@@ -36,6 +36,7 @@ import {
     rigRepairsVolume,
     rumRepairsPercent,
     rumRepairsVolume,
+    repairTime,
     insertBaseModal
 } from "../common";
 import {
@@ -315,7 +316,7 @@ class Ship {
         text += displaySecondBlock();
         text += displayColumn("hullRepairAmount", "Hull %", 4);
         text += displayColumn("rigRepairAmount", "Rig %", 4);
-        text += displayColumn("repairTime", "Time", 4);
+        text += displayColumn("repairTime", "Time (sec)", 4);
         text += "</div></div></div>";
 
         text += displayFirstColumn("Hold");
@@ -548,9 +549,7 @@ class ShipBase extends Ship {
             bowRepair: `${formatInt(this.shipData.repairTime.bow)}`,
             hullRepairAmount: `${formatInt(this.shipData.repairAmount.armour * 100)}`,
             rigRepairAmount: `${formatInt(this.shipData.repairAmount.sails * 100)}`,
-            repairTime: `${formatPercent(
-                (this.shipData.repairTime.sides - this.shipData.repairTime.default) / 100 + 1
-            )}`,
+            repairTime: `${formatInt(this.shipData.repairTime.sides)}`,
             hullRepairsNeeded: `${formatInt(hullRepairsNeeded)}\u00A0<span class="badge badge-white">${formatInt(
                 hullRepairsNeeded * repairsSetSize
             )}</span>`,
@@ -863,26 +862,22 @@ class ShipComparison extends Ship {
                 3,
                 true
             )}`,
-            repairTime: `${formatPercent(
-                (this.shipCompareData.repairTime.sides - this.shipCompareData.repairTime.default) / 100 + 1
-            )}\u00A0${getDiff(
-                (this.shipBaseData.repairTime.sides - this.shipCompareData.repairTime.default) / 100 + 1,
-                (this.shipCompareData.repairTime.sides - this.shipCompareData.repairTime.default) / 100 + 1,
-                3,
-                true
+            repairTime: `${formatInt(this.shipCompareData.repairTime.sides)}\u00A0${getDiff(
+                this.shipBaseData.repairTime.sides,
+                this.shipCompareData.repairTime.sides
             )}`,
             hullRepairsNeeded: `${formatInt(hullRepairsNeededCompare)}\u00A0${getDiff(
                 hullRepairsNeededCompare,
                 hullRepairsNeededBase
-            )}`,
+            )} <span class="badge badge-white">${formatInt(hullRepairsNeededCompare * repairsSetSize)}</span>`,
             rigRepairsNeeded: `${formatInt(rigRepairsNeededCompare)}\u00A0${getDiff(
                 rigRepairsNeededCompare,
                 rigRepairsNeededBase
-            )}`,
+            )} <span class="badge badge-white">${formatInt(rigRepairsNeededCompare * repairsSetSize)}</span>`,
             rumRepairsNeeded: `${formatInt(rumRepairsNeededCompare)}\u00A0${getDiff(
                 rumRepairsNeededCompare,
                 rumRepairsNeededBase
-            )}`,
+            )} <span class="badge badge-white">${formatInt(rumRepairsNeededCompare * repairsSetSize)}</span>`,
             fireResistance: `${formatInt(this.shipCompareData.resistance.fire)}\u00A0${getDiff(
                 this.shipCompareData.resistance.fire,
                 this.shipBaseData.resistance.fire
@@ -1477,7 +1472,8 @@ export default class CompareShips {
         shipDataUpdated.repairAmount.armour = hullRepairsPercent;
         shipDataUpdated.repairAmount.sails = rigRepairsPercent;
 
-        shipDataUpdated.repairTime.default = shipDataUpdated.repairTime.sides;
+        shipDataUpdated.repairTime.sides = repairTime;
+        shipDataUpdated.repairTime.default = repairTime;
 
         shipDataUpdated = this._addWoodData(shipDataDefault, columnId);
         shipDataUpdated = this._addModulesData(shipDataDefault, shipDataUpdated, columnId);
