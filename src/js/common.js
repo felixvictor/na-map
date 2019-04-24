@@ -242,6 +242,7 @@ export const iconSmallSrc = ICONSMALL;
 /* eslint-disable-next-line no-undef */
 export const hullRepairsVolume = REPAIR_ARMOR_VOLUME;
 export const hullRepairsPercent = REPAIR_ARMOR_PERCENT;
+export const repairTime = REPAIR_ARMOR_TIME;
 export const rigRepairsVolume = REPAIR_SAIL_VOLUME;
 export const rigRepairsPercent = REPAIR_SAIL_PERCENT;
 export const rumRepairsVolume = REPAIR_CREW_VOLUME;
