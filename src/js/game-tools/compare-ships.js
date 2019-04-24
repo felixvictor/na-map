@@ -313,8 +313,8 @@ class Ship {
 
         text += displayFirstColumn("Repair");
         text += displaySecondBlock();
-        text += displayColumn("hullRepairAmount", "Hull amount", 4);
-        text += displayColumn("rigRepairAmount", "Rig amount", 4);
+        text += displayColumn("hullRepairAmount", "Hull %", 4);
+        text += displayColumn("rigRepairAmount", "Rig %", 4);
         text += displayColumn("repairTime", "Time", 4);
         text += "</div></div></div>";
 
@@ -546,8 +546,8 @@ class ShipBase extends Ship {
             upgradeXP: formatInt(this.shipData.upgradeXP),
             sternRepair: `${formatInt(this.shipData.repairTime.stern)}`,
             bowRepair: `${formatInt(this.shipData.repairTime.bow)}`,
-            hullRepairAmount: `${formatPercent(this.shipData.repairAmount.armour)}`,
-            rigRepairAmount: `${formatPercent(this.shipData.repairAmount.sails)}`,
+            hullRepairAmount: `${formatInt(this.shipData.repairAmount.armour * 100)}`,
+            rigRepairAmount: `${formatInt(this.shipData.repairAmount.sails * 100)}`,
             repairTime: `${formatPercent(
                 (this.shipData.repairTime.sides - this.shipData.repairTime.default) / 100 + 1
             )}`,
@@ -851,13 +851,13 @@ class ShipComparison extends Ship {
                 this.shipCompareData.upgradeXP,
                 this.shipBaseData.upgradeXP
             )}`,
-            hullRepairAmount: `${formatPercent(this.shipCompareData.repairAmount.armour)}\u00A0${getDiff(
+            hullRepairAmount: `${formatInt(this.shipCompareData.repairAmount.armour * 100)}\u00A0${getDiff(
                 this.shipCompareData.repairAmount.armour,
                 this.shipBaseData.repairAmount.armour,
                 3,
                 true
             )}`,
-            rigRepairAmount: `${formatPercent(this.shipCompareData.repairAmount.sails)}\u00A0${getDiff(
+            rigRepairAmount: `${formatInt(this.shipCompareData.repairAmount.sails * 100)}\u00A0${getDiff(
                 this.shipCompareData.repairAmount.sails,
                 this.shipBaseData.repairAmount.sails,
                 3,
