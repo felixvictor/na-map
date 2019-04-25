@@ -21,7 +21,16 @@ import "bootstrap/js/dist/tooltip";
 import moment from "moment";
 import "moment/locale/en-gb";
 
-import { colourRed, colourRedDark, defaultCircleSize, defaultFontSize, nations, primary300 } from "../common";
+import {
+    colourGreenDark,
+    colourRed,
+    colourRedDark,
+    colourWhite,
+    defaultCircleSize,
+    defaultFontSize,
+    nations,
+    primary300
+} from "../common";
 import {
     degreesToRadians,
     displayClan,
@@ -60,12 +69,14 @@ export default class DisplayPorts {
         this._iconSize = 48;
         this._fontSize = defaultFontSize;
         this._circleSize = defaultCircleSize;
-        this._taxIncomeRadius = d3ScaleLinear();
-        this._netIncomeRadius = d3ScaleLinear();
+        this._portRadius = d3ScaleLinear();
         this._attackRadius = d3ScaleLinear().domain([0, 1]);
         this._colourScaleHostility = d3ScaleLinear()
             .domain([0, 0.5, 1])
             .range([primary300, colourRed, colourRedDark])
+            .interpolate(d3InterpolateHcl);
+        this._colourScalePort = d3ScaleLinear()
+            .range([colourRedDark, colourWhite, colourGreenDark])
             .interpolate(d3InterpolateHcl);
         this._colourScaleCounty = d3ScaleOrdinal().range([
             "#e7a800",
@@ -100,7 +111,7 @@ export default class DisplayPorts {
          * @type {string[]}
          * @private
          */
-        this._radioButtonValues = ["attack", "county", "position", "tax", "net", "off"];
+        this._radioButtonValues = ["attack", "county", "points", "position", "tax", "net", "off"];
 
         /**
          * Show radius cookie
@@ -443,6 +454,7 @@ export default class DisplayPorts {
             attack: portProperties.attackHostility ? attackHostility : "",
             pbTimeRange: portProperties.nonCapturable ? "" : portBattleStartTime,
             brLimit: formatInt(portProperties.brLimit),
+            portPoints: formatInt(portProperties.portPoints),
             conquestMarksPension: portProperties.conquestMarksPension,
             taxIncome: formatSiInt(portProperties.taxIncome),
             portTax: formatPercent(portProperties.portTax),
@@ -503,6 +515,7 @@ export default class DisplayPorts {
                 h += `${port.pbType}\u202Frate <span class="caps">AI</span>, `;
                 h += `${port.conquestMarksPension}\u202Fconquest point`;
                 h += port.conquestMarksPension > 1 ? "s" : "";
+                h += `, ${port.portPoints}\u202Fport points`;
                 h += `<br>Tax income ${port.taxIncome} (${port.portTax}), net income ${port.netIncome}`;
                 h += port.tradingCompany;
                 h += port.laborHoursDiscount;
@@ -660,33 +673,40 @@ export default class DisplayPorts {
 
         if (this._showRadius === "tax") {
             data = this._portDataFiltered.filter(d => !d.nonCapturable);
-
             const minTaxIncome = d3Min(data, d => d.taxIncome);
             const maxTaxIncome = d3Max(data, d => d.taxIncome);
-            this._taxIncomeRadius.domain([minTaxIncome, maxTaxIncome]);
-            this._taxIncomeRadius.range([rMin, rMax]);
-
-            cssClass = () => "bubble pos";
-            r = d => this._taxIncomeRadius(Math.abs(d.taxIncome));
+            this._portRadius.domain([minTaxIncome, maxTaxIncome]).range([rMin, rMax]);
+            this._colourScalePort.domain([minTaxIncome, 0, maxTaxIncome]);
+            cssClass = () => "bubble";
+            fill = d => this._colourScalePort(Math.abs(d.taxIncome));
+            r = d => this._portRadius(Math.abs(d.taxIncome));
         } else if (this._showRadius === "net") {
             data = this._portDataFiltered.filter(d => !d.nonCapturable);
-
             const minNetIncome = d3Min(data, d => d.netIncome);
             const maxNetIncome = d3Max(data, d => d.netIncome);
-            this._netIncomeRadius.domain([minNetIncome, maxNetIncome]).range([rMin, rMax]);
-
-            cssClass = d => `bubble ${d.netIncome < 0 ? "neg" : "pos"}`;
-            r = d => this._netIncomeRadius(Math.abs(d.netIncome));
+            this._portRadius.domain([minNetIncome, maxNetIncome]).range([rMin, rMax]);
+            this._colourScalePort.domain([0, minNetIncome, maxNetIncome]);
+            cssClass = () => "bubble";
+            fill = d => this._colourScalePort(Math.abs(d.netIncome));
+            r = d => this._portRadius(Math.abs(d.netIncome));
         } else if (this.showTradePortPartners) {
             cssClass = d => `bubble ${getTradePortMarker(d)}`;
             r = d => (d.id === this.tradePortId ? rMax : rMax / 2);
+        } else if (this._showRadius === "points") {
+            data = this._portDataFiltered.filter(d => !d.nonCapturable);
+            const minPortPoints = d3Min(data, d => d.portPoints);
+            const maxPortPoints = d3Max(data, d => d.portPoints);
+            this._portRadius.domain([minPortPoints, maxPortPoints]).range([rMin, rMax / 2]);
+            this._colourScalePort.domain([0, minPortPoints, maxPortPoints]);
+            cssClass = () => "bubble";
+            fill = d => this._colourScalePort(d.portPoints);
+            r = d => this._portRadius(d.portPoints);
         } else if (this._showRadius === "position") {
             cssClass = () => "bubble here";
             r = d => d.distance;
         } else if (this._showRadius === "attack") {
             data = this._portDataFiltered.filter(port => port.attackHostility);
             this._attackRadius.range([rMin, rMax]);
-
             cssClass = () => "bubble";
             fill = d => this._colourScaleHostility(d.attackHostility);
             r = d => this._attackRadius(d.attackHostility);
