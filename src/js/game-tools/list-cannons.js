@@ -45,7 +45,12 @@ export default class ListCannons {
                 }
             }
         });
-        this._groups = new Map([...this._groups.entries()].sort());
+
+        const groupOrder = ["damage", "penetration (m)", "crew", "dispersion", "generic"];
+
+        this._groups = new Map(
+            [...this._groups.entries()].sort((a, b) => groupOrder.indexOf(a[0]) - groupOrder.indexOf(b[0]))
+        );
 
         this._setupListener();
     }
