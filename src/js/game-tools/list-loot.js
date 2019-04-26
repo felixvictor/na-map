@@ -184,7 +184,7 @@ export default class ListLoot {
                 <thead>
                     <tr>
                         <th scope="col">Item</th>
-                        <th scope="col" class="text-right">Chance (%)</th>
+                        <th scope="col" class="text-right">Chance (0\u202F\u2212\u202F100)</th>
                         <th scope="col" class="text-right">Amount</th>
                     </tr>
                 </thead>
