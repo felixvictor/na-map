@@ -23,6 +23,7 @@ import "moment/locale/en-gb";
 
 import {
     colourGreenDark,
+    colourList,
     colourRed,
     colourRedDark,
     colourWhite,
@@ -78,24 +79,7 @@ export default class DisplayPorts {
         this._colourScalePort = d3ScaleLinear()
             .range([colourRedDark, colourWhite, colourGreenDark])
             .interpolate(d3InterpolateHcl);
-        this._colourScaleCounty = d3ScaleOrdinal().range([
-            "#e7a800",
-            "#e621dd",
-            "#d3e700",
-            "#de78ff",
-            "#01d36b",
-            "#ff3205",
-            "#4df3ff",
-            "#910016",
-            "#01caf0",
-            "#ad0054",
-            "#c8ff9f",
-            "#0143a8",
-            "#00a97f",
-            "#70a4ff",
-            "#312800",
-            "#ffa29f"
-        ]);
+        this._colourScaleCounty = d3ScaleOrdinal().range(colourList);
 
         this._minRadiusFactor = 1;
         this._maxRadiusFactor = 6;
