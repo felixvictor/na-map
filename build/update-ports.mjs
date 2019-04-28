@@ -39,11 +39,11 @@ function updatePorts() {
     function captured(result) {
         const i = ports.ports.findIndex(findIndex, result[2]);
         const port = ports.ports[i];
+        const nationName = port.attackerNation ? port.attackerNation : result[4];
+        const capturedNation = nations.find(nation => nation.name === nationName);
 
         console.log("      --- captured", i);
-        port.nation = port.attackerNation
-            ? nations.find(nation => nation.name === port.attackerNation).short
-            : result[4];
+        port.nation = capturedNation ? capturedNation.short : "";
         port.capturer = result[3];
         port.lastPortBattle = moment(result[1], "DD-MM-YYYY HH:mm").format("YYYY-MM-DD HH:mm");
         port.attackerNation = "";
