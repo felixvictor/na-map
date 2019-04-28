@@ -1,6 +1,12 @@
-/*
-    update-ports.mjs
-*/
+/**
+ * This file is part of na-map.
+ *
+ * @file      Convert ports based on tweets.
+ * @module    build/update-ports
+ * @author    iB aka Felix Victor
+ * @copyright 2017, 2018, 2019
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
 
 import moment from "moment";
 import { nations, readJson, saveJson } from "./common.mjs";
@@ -35,8 +41,9 @@ function updatePorts() {
         const port = ports.ports[i];
 
         console.log("      --- captured", i);
-        port.nation = nations.filter(nation => nation.name === port.attackerNation).map(nation => nation.short);
-        // eslint-disable-next-line prefer-destructuring
+        port.nation = port.attackerNation
+            ? nations.find(nation => nation.name === port.attackerNation).short
+            : result[4];
         port.capturer = result[3];
         port.lastPortBattle = moment(result[1], "DD-MM-YYYY HH:mm").format("YYYY-MM-DD HH:mm");
         port.attackerNation = "";
@@ -71,9 +78,7 @@ function updatePorts() {
         const port = ports.ports[i];
 
         console.log("      --- hostilityLevelUp", i);
-        // eslint-disable-next-line prefer-destructuring
         port.attackerNation = result[3];
-        // eslint-disable-next-line prefer-destructuring
         port.attackerClan = result[2];
         port.attackHostility = result[6] / 100;
     }
@@ -88,9 +93,7 @@ function updatePorts() {
         const port = ports.ports[i];
 
         console.log("      --- hostilityLevelDown", i);
-        // eslint-disable-next-line prefer-destructuring
         port.attackerNation = result[3];
-        // eslint-disable-next-line prefer-destructuring
         port.attackerClan = result[2];
         port.attackHostility = result[6] / 100;
     }
@@ -105,7 +108,6 @@ function updatePorts() {
         const port = ports.ports[i];
 
         console.log("      --- getNation", i);
-        // eslint-disable-next-line prefer-destructuring
         port.attackerNation = result[3];
         port.attackerClan = "";
         port.attackHostility = 0;
@@ -124,11 +126,9 @@ function updatePorts() {
         if (typeof result[7] === "undefined") {
             port.attackerNation = "n/a";
         } else {
-            // eslint-disable-next-line prefer-destructuring
             port.attackerNation = result[7];
         }
 
-        // eslint-disable-next-line prefer-destructuring
         port.attackerClan = result[6];
         port.attackHostility = 1;
         port.portBattle = moment(result[4], "DD MMM YYYY HH:mm").format("YYYY-MM-DD HH:mm");
@@ -193,32 +193,25 @@ function updatePorts() {
         result = checkDateRegex.exec(tweet.text);
         tweetTime = moment(result[1], "DD-MM-YYYY HH:mm");
         if (tweetTime.isAfter(serverStart)) {
-            // eslint-disable-next-line no-cond-assign
             if ((result = capturedRegex.exec(tweet.text)) !== null) {
                 isPortDataChanged = true;
                 captured(result);
-                // eslint-disable-next-line no-cond-assign
             } else if ((result = defendedRegex.exec(tweet.text)) !== null) {
                 isPortDataChanged = true;
                 defended(result);
-                // eslint-disable-next-line no-cond-assign
             } else if ((result = hostilityLevelUpRegex.exec(tweet.text)) !== null) {
                 isPortDataChanged = true;
                 hostilityLevelUp(result);
-                // eslint-disable-next-line no-cond-assign
             } else if ((result = hostilityLevelDownRegex.exec(tweet.text)) !== null) {
                 isPortDataChanged = true;
                 hostilityLevelDown(result);
-                // eslint-disable-next-line no-cond-assign
             } else if ((result = portBattleRegex.exec(tweet.text)) !== null) {
                 isPortDataChanged = true;
                 portBattleScheduled(result);
-                // eslint-disable-next-line no-cond-assign
             } else if ((result = gainHostilityRegex.exec(tweet.text)) !== null) {
                 // noop
                 // eslint-disable-next-line no-unused-expressions
                 () => {};
-                // eslint-disable-next-line no-cond-assign
             } else if ((result = rumorRegex.exec(tweet.text)) === null) {
                 console.log(`\n\n***************************************\nUnmatched tweet: ${tweet.text}\n`);
             } else {
@@ -228,16 +221,13 @@ function updatePorts() {
             }
         } else if (tweetTime.isAfter(moment(serverStart).subtract(1, "day"))) {
             // Add scheduled port battles
-            // eslint-disable-next-line no-cond-assign
             if ((result = portBattleRegex.exec(tweet.text)) !== null) {
                 isPortDataChanged = true;
                 portBattleScheduled(result);
                 // get nation names
-                // eslint-disable-next-line no-cond-assign
             } else if ((result = hostilityLevelUpRegex.exec(tweet.text)) !== null) {
                 isPortDataChanged = true;
                 getNation(result);
-                // eslint-disable-next-line no-cond-assign
             }
         }
     });
