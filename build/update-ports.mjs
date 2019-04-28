@@ -148,36 +148,44 @@ function updatePorts() {
         `\\[(${timeR}) UTC\\] (${portR}) captured by (${clanR}) ?\\(?(${nationR})?\\)?\\. Previous owner: (${clanR}) ?\\(?(${nationR})?\\)? #PBCaribbean #PBCaribbean${portHashR}`,
         "u"
     );
+    // noinspection RegExpRedundantEscape
     const defendedRegex = new RegExp(
         `\\[(${timeR}) UTC\\] (${portR}) defended by (${clanR})( \\(${nationR}\\))? against (${clanR}) ?\\(?(${nationR})?\\)? #PBCaribbean #PBCaribbean${portHashR}`,
         "u"
     );
+    // noinspection RegExpRedundantEscape
     const hostilityLevelUpRegex = new RegExp(
         `\\[(${timeR}) UTC\\] The hostility level of the clan (${clanR}) \\((${nationR})\\) on the port (${portR}) \\((${nationR})\\) increased to (${percentageR})%\\. The previous value was (${percentageR})% #HOCaribbean${portHashR}`,
         "u"
     );
+    // noinspection RegExpRedundantEscape
     const hostilityLevelDownRegex = new RegExp(
         `\\[(${timeR}) UTC\\] The hostility level of the clan (${clanR}) \\((${nationR})\\) on the port (${portR}) \\((${nationR})\\) decreased to (${percentageR})%\\. The previous value was (${percentageR})% #HOCaribbean${portHashR}`,
         "u"
     );
+    // noinspection RegExpRedundantEscape
     const portBattleRegex = new RegExp(
         `\\[(${timeR}) UTC\\] The port battle for (${portR}) \\((${nationR})\\) is scheduled for (${pbTimeR}) UTC\\. Defender: (${defenderR})\\. Attacker: (${clanR}) ?\\(?(${nationR})?\\)?\\. BR: \\d+ #PBCaribbean #PBCaribbean${portHashR} #NavalAction`,
         "u"
     );
+    // noinspection RegExpRedundantEscape
     const rumorRegex = new RegExp(
         `\\[(${timeR}) UTC\\] Rumour has it that a great storm has destroyed a large fleet in the West Indies`,
         "u"
     );
+    // noinspection RegExpRedundantEscape
     const gainHostilityRegex = new RegExp(
         `\\[(${timeR}) UTC\\] The port (${portR}) \\((${nationR})\\) can gain hostility`,
         "u"
     );
+    // noinspection RegExpRedundantEscape
     const checkDateRegex = new RegExp(`\\[(${timeR}) UTC\\]`, "u");
     let result;
     let tweetTime;
     let isPortDataChanged = false;
     let serverStart = moment()
-        .hour(11)
+        .utc()
+        .hour(10)
         .minute(0)
         .format("YYYY-MM-DD HH:mm");
     // adjust reference server time is needed
@@ -186,10 +194,8 @@ function updatePorts() {
     }
 
     tweets.tweets.reverse().forEach(tweet => {
-        // eslint-disable-next-line no-param-reassign
         tweet.text = tweet.text.replace("'", "’");
-        console.log("\n\ntweet", tweet.text);
-
+        console.log("\ntweet", tweet.text);
         result = checkDateRegex.exec(tweet.text);
         tweetTime = moment(result[1], "DD-MM-YYYY HH:mm");
         if (tweetTime.isAfter(serverStart)) {
