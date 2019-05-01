@@ -195,7 +195,22 @@ function updatePorts() {
 
     // When twitter-update has been used, reformat tweets.tweets
     if (!tweets.refresh) {
-        tweets.tweets = tweets.map(tweet => tweet.tweets).flat();
+        tweets.tweets = tweets
+            .map(tweet => tweet.tweets)
+            .flat()
+            .sort((a, b) => {
+                const timeA=moment(a.text.slice(1,17), "DD-MM-YYYY HH:mm");
+                const timeB=moment(b.text.slice(1,17), "DD-MM-YYYY HH:mm");
+                if (timeA.isAfter(timeB)) {
+                    return -1;
+                }
+
+                if (timeB.isAfter(timeA)) {
+                    return 1;
+                }
+
+                return 0;
+            });
     }
 
     tweets.tweets.reverse().forEach(tweet => {
