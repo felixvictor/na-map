@@ -193,6 +193,11 @@ function updatePorts() {
         serverStart = moment(serverStart).subtract(1, "day");
     }
 
+    // When twitter-update has been used, reformat tweets.tweets
+    if (!tweets.refresh) {
+        tweets.tweets = tweets.map(tweet => tweet.tweets).flat();
+    }
+
     tweets.tweets.reverse().forEach(tweet => {
         tweet.text = tweet.text.replace("'", "’");
         console.log("\ntweet", tweet.text);
