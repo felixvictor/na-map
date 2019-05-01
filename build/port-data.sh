@@ -22,11 +22,11 @@ api_vars=(ItemTemplates Ports Shops)
 server_maintenance_hour=11
 # Set server date
 if [ "$(date -u '+%H')" -lt "${server_maintenance_hour}" ]; then
-    date=$(date -u '+%Y-%m-%d' --date "-1 day")
-    last_date=$(date -u '+%Y-%m-%d' --date "-2 day")
+    server_date=$(date -u '+%Y-%m-%d' --date "- 1 day")
+    server_last_date=$(date -u '+%Y-%m-%d' --date "- 2 days")
 else
-    date=$(date -u '+%Y-%m-%d')
-    last_date=$(date -u '+%Y-%m-%d' --date "-1 day")
+    server_date=$(date -u '+%Y-%m-%d')
+    server_last_date=$(date -u '+%Y-%m-%d' --date "- 1 day")
 fi
 last_function=""
 
@@ -135,8 +135,8 @@ function test_for_update () {
     local new_file
     local old_file
 	for api_var in "${api_vars[@]}"; do
-	    new_file="${api_base_file}-${server_names[0]}-${api_var}-${date}.json"
-		old_file="${api_base_file}-${server_names[0]}-${api_var}-${last_date}.json"
+	    new_file="${api_base_file}-${server_names[0]}-${api_var}-${server_date}.json"
+		old_file="${api_base_file}-${server_names[0]}-${api_var}-${server_last_date}.json"
 
 		# If old file does not exist test succeeded
 		[[ ! -f "${old_file}" ]] && return 0;
@@ -170,31 +170,31 @@ function get_port_data () {
         for server_name in "${server_names[@]}"; do
             pb_file="${gen_dir}/${server_name}-pb.json"
             for api_var in "${api_vars[@]}"; do
-                api_file="${api_base_file}-${server_name}-${api_var}-${date}.json"
+                api_file="${api_base_file}-${server_name}-${api_var}-${server_date}.json"
                 get_API_data "${server_name}" "${api_file}" "${api_var}"
             done
 
-            ${command_nodejs} build/convert-API-data.mjs "${api_base_file}-${server_name}" "${server_name}" "${gen_dir}" "${date}"
-            ${command_nodejs} build/convert-API-pb-data.mjs "${api_base_file}-${server_name}" "${pb_file}" "${date}"
+            ${command_nodejs} build/convert-API-data.mjs "${api_base_file}-${server_name}" "${server_name}" "${gen_dir}" "${server_date}"
+            ${command_nodejs} build/convert-API-pb-data.mjs "${api_base_file}-${server_name}" "${pb_file}" "${server_date}"
         done
 
 
-        ${command_nodejs} build/convert-pbZones.mjs "${api_base_file}-${server_names[0]}" "${build_dir}" "${date}"
+        ${command_nodejs} build/convert-pbZones.mjs "${api_base_file}-${server_names[0]}" "${build_dir}" "${server_date}"
         yarn geo2topo -o "${gen_dir}/pb.json" \
             "${build_dir}/pbCircles.geojson" "${build_dir}/forts.geojson" \
             "${build_dir}/towers.geojson" "${build_dir}/joinCircles.geojson"
         rm "${build_dir}"/*.geojson
 
-        ${command_nodejs} build/convert-ports.mjs "${api_base_file}-${server_names[0]}" "${port_file}" "${date}"
-        ${command_nodejs} build/convert-ships.mjs "${api_base_file}-${server_names[0]}" "${ship_file}" "${date}"
+        ${command_nodejs} build/convert-ports.mjs "${api_base_file}-${server_names[0]}" "${port_file}" "${server_date}"
+        ${command_nodejs} build/convert-ships.mjs "${api_base_file}-${server_names[0]}" "${ship_file}" "${server_date}"
         ${command_nodejs} build/convert-additional-ship-data.mjs "${build_dir}/Modules" "${ship_file}"
         ${command_nodejs} build/convert-cannons.mjs "${build_dir}/Modules" "${cannon_file}"
         ${command_nodejs} build/convert-module-repair-data.mjs "${build_dir}/Modules" "${repair_file}"
-        ${command_nodejs} build/convert-modules.mjs "${api_base_file}-${server_names[0]}" "${gen_dir}" "${date}"
-        ${command_nodejs} build/convert-buildings.mjs "${api_base_file}-${server_names[0]}" "${building_file}" "${date}"
-        ${command_nodejs} build/convert-loot.mjs "${api_base_file}-${server_names[0]}" "${loot_file}" "${date}"
-        ${command_nodejs} build/convert-recipes.mjs "${api_base_file}-${server_names[0]}" "${recipe_file}" "${date}"
-        ${command_nodejs} build/convert-ship-blueprints.mjs "${api_base_file}-${server_names[0]}" "${ship_blueprint_file}" "${date}"
+        ${command_nodejs} build/convert-modules.mjs "${api_base_file}-${server_names[0]}" "${gen_dir}" "${server_date}"
+        ${command_nodejs} build/convert-buildings.mjs "${api_base_file}-${server_names[0]}" "${building_file}" "${server_date}"
+        ${command_nodejs} build/convert-loot.mjs "${api_base_file}-${server_names[0]}" "${loot_file}" "${server_date}"
+        ${command_nodejs} build/convert-recipes.mjs "${api_base_file}-${server_names[0]}" "${recipe_file}" "${server_date}"
+        ${command_nodejs} build/convert-ship-blueprints.mjs "${api_base_file}-${server_names[0]}" "${ship_blueprint_file}" "${server_date}"
         if [ "${script_run_type}" == "update" ]; then
             ${command_nodejs} build/convert-ownership.mjs "${api_dir}" "api-${server_names[0]}-Ports" "${ownership_json}" "${nation_file}"
         fi
@@ -219,7 +219,47 @@ function remove_tweets () {
     rm -f "${tweets_json}"
 }
 
-function get_tweets () {
+function get_tweets_in_range () {
+    local query_date
+    query_date="$1"
+    local query_hour
+    query_hour="$2"
+
+    local url_start
+    url_start="/1.1/search/tweets.json?tweet_mode=extended&count=100&result_type=recent"
+    local query_end
+    query_end=":\"%20from:zz569k"
+    local jq_format
+    jq_format="{ tweets: [ .statuses[] | { id: .id_str, text: .full_text } ], refresh: .search_metadata.max_id_str }"
+    local query_start
+    query_start="&q=\"[${query_date} ${query_hour}"
+
+    ${command_twurl} "${url_start}${query_start}${query_end}" | ${command_jq} "${jq_format}" >> "${tweets_json}"
+    echo "," >> "${tweets_json}"
+}
+
+function get_tweets_change () {
+    local time_of_day
+
+    # Empty file
+   echo "[" > "${tweets_json}"
+
+    time_of_day=$(date '+%d-%m-%Y' -d "${server_date} - 1 day")
+    for query_hour in $(seq ${server_maintenance_hour} 23); do
+        get_tweets_in_range "${time_of_day}" "$(printf "%02d\n" ${query_hour})"
+    done
+
+    time_of_day=$(date '+%d-%m-%Y' -d "${server_date}")
+    for query_hour in $(seq 0 ${server_maintenance_hour}); do
+        get_tweets_in_range "${time_of_day}" "$(printf "%02d\n" ${query_hour})"
+    done
+
+    # Remove trailing comma
+    sed -i '$s/,$//' "${tweets_json}"
+    echo "]" >> "${tweets_json}"
+}
+
+function get_tweets_update () {
     local query
     query="/1.1/search/tweets.json?q=from:zz569k&tweet_mode=extended&count=100&result_type=recent"
     local jq_format
@@ -232,6 +272,7 @@ function get_tweets () {
     fi
     ${command_twurl} "${query}" | ${command_jq} "${jq_format}" > "${tweets_json}"
 }
+
 
 function update_ports () {
     local pb_file
@@ -249,13 +290,13 @@ function update_ports () {
 # Main functions
 
 function log_date () {
-    echo -e "\n\n*****************************\n${date}\n"
+    echo -e "\n\n*****************************\n${server_date}\n"
 }
 
 function update_tweets () {
     cd ${base_dir}
     get_git_update
-    get_tweets
+    get_tweets_update
     if update_ports; then
         copy_data
         push_data
@@ -264,7 +305,7 @@ function update_tweets () {
 }
 
 function change_tweets () {
-    get_tweets
+    get_tweets_change
     update_ports
 }
 
@@ -300,7 +341,7 @@ function update_data () {
     local last_update_date
     last_update_date=$(date --reference="${last_update_file}" +%Y-%m-%d)
     # Test if already updated today
-    if [ "${last_update_date}" != "${date}" ]; then
+    if [ "${last_update_date}" != "${server_date}" ]; then
         update_yarn
         get_git_update
         # Test if new API data available
