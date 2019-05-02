@@ -347,7 +347,7 @@ function update_data () {
         # Test if new API data available
         if get_port_data; then
             remove_tweets
-            get_tweets
+            get_tweets_update
             update_ports
 
             copy_data
