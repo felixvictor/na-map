@@ -203,6 +203,25 @@ export const insertBaseModalHTML = (id, title, getModalBody, size = "xl", button
     `;
 };
 
+export const colourList = [
+    "#e7a800",
+    "#e621dd",
+    "#d3e700",
+    "#de78ff",
+    "#01d36b",
+    "#ff3205",
+    "#4df3ff",
+    "#910016",
+    "#01caf0",
+    "#ad0054",
+    "#c8ff9f",
+    "#0143a8",
+    "#00a97f",
+    "#70a4ff",
+    "#312800",
+    "#ffa29f"
+];
+
 /**
  * Get currency
  * @param {int|string} amount - Amount
