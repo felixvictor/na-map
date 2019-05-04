@@ -38,6 +38,8 @@ function convertModules() {
         }
     ];
 
+    const bonusRegex = new RegExp("(.+\\sBonus)\\s(\\d)", "u");
+
     woodJson.trim = [];
     woodJson.frame = [];
 
@@ -330,9 +332,14 @@ function convertModules() {
             sortingGroup = "survival";
         }
 
-        sortingGroup = sortingGroup
-            ? `\u202F\u2013\u202f${capitalizeFirstLetter(module.sortingGroup).replace("_", "/")}`
-            : "";
+        if (type === "Ship trim") {
+            const result = bonusRegex.exec(module.name);
+            sortingGroup = result ? `\u202F\u2013\u202f${result[1]}` : "";
+        } else {
+            sortingGroup = sortingGroup
+                ? `\u202F\u2013\u202f${capitalizeFirstLetter(module.sortingGroup).replace("_", "/")}`
+                : "";
+        }
 
         return `${type}${sortingGroup}`;
     }
