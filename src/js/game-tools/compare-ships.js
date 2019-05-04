@@ -1191,7 +1191,7 @@ export default class CompareShips {
 
         // Get types from moduleProperties list
         this._moduleTypes = new Set(
-            [...this._moduleProperties].map(module => module[1].type.replace(/\s–\s[a-zA-Z/]+/, ""))
+            [...this._moduleProperties].map(module => module[1].type.replace(/\s–\s[a-zA-Z/\s]+/, ""))
         );
         // console.log(this._moduleProperties, this._moduleTypes);
     }
@@ -1335,7 +1335,7 @@ export default class CompareShips {
             .entries(
                 [...this._moduleProperties].filter(
                     module =>
-                        module[1].type.replace(/\s–\s[a-zA-Z/]+/, "") === moduleType &&
+                        module[1].type.replace(/\s–\s[a-zA-Z/\s]+/, "") === moduleType &&
                         (module[1].moduleLevel === "U" || module[1].moduleLevel === getModuleLevel(shipClass))
                 )
             );
@@ -1346,7 +1346,9 @@ export default class CompareShips {
             options = modules
                 .map(
                     group =>
-                        `<optgroup label="${group.key}">${group.values
+                        `<optgroup label="${group.key}" data-max-options="${
+                            moduleType.startsWith("Ship trim") ? 1 : 5
+                        }">${group.values
                             .map(module => `<option value="${module[0]}">${module[1].name}`)
                             .join("</option>")}`
                 )
@@ -1395,7 +1397,7 @@ export default class CompareShips {
                         return `${amount} ${type.toLowerCase()}s selected`;
                     },
                     deselectAllText: "Clear",
-                    maxOptions: type !== "Ship trim" && options.length > 1 ? 5 : 1,
+                    maxOptions: !type.startsWith("Ship trim") && options.length > 1 ? 5 : 6,
                     selectedTextFormat: "count > 1",
                     title: `${type}`,
                     width: "150px"
