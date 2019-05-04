@@ -330,10 +330,9 @@ function convertModules() {
             sortingGroup = "survival";
         }
 
-        sortingGroup =
-            sortingGroup && type !== "Ship trim"
-                ? `\u202F\u2013\u202f${capitalizeFirstLetter(module.sortingGroup).replace("_", "/")}`
-                : "";
+        sortingGroup = sortingGroup
+            ? `\u202F\u2013\u202f${capitalizeFirstLetter(module.sortingGroup).replace("_", "/")}`
+            : "";
 
         return `${type}${sortingGroup}`;
     }
