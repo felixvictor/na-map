@@ -305,7 +305,7 @@ function convertModules() {
 
         if (
             module.usageType === "All" &&
-            module.sortingGroup === "speed_turn" &&
+            module.sortingGroup &&
             module.moduleLevel === "U" &&
             module.moduleType === "Hidden"
         ) {
@@ -314,7 +314,7 @@ function convertModules() {
             type = "Permanent";
         } else if (
             module.usageType === "All" &&
-            module.sortingGroup === "" &&
+            !module.sortingGroup &&
             module.moduleLevel === "U" &&
             module.moduleType === "Hidden"
         ) {
