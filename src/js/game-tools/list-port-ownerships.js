@@ -22,7 +22,7 @@ import {
 import TimelinesChart from "timelines-chart";
 
 import { registerEvent } from "../analytics";
-import { insertBaseModal, nations } from "../common";
+import { colourList, insertBaseModal, nations } from "../common";
 
 // https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
 // eslint-disable-next-line no-extend-native,func-names
@@ -49,20 +49,7 @@ export default class ListPortOwnerships {
         this._modalId = `modal-${this._baseId}`;
 
         // http://tools.medialab.sciences-po.fr/iwanthue/
-        this._colourScale = d3ScaleOrdinal().range([
-            "#72823a",
-            "#825fc8",
-            "#78b642",
-            "#cd47a3",
-            "#50b187",
-            "#d34253",
-            "#628bcc",
-            "#cb9f3d",
-            "#cc88c9",
-            "#ca5b2b",
-            "#b55576",
-            "#c27b58"
-        ]);
+        this._colourScale = d3ScaleOrdinal().range(colourList);
 
         this._setupListener();
     }

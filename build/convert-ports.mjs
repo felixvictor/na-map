@@ -71,6 +71,7 @@ function convertPorts() {
                 shallow: apiPort.Depth === 1,
                 availableForAll: apiPort.AvailableForAll,
                 brLimit: apiPort.PortBattleBRLimit,
+                portPoints: apiPort.PortPoints,
                 portBattleStartTime: apiPort.PortBattleStartTime,
                 portBattleType: apiPort.PortBattleType,
                 nonCapturable: apiPort.NonCapturable,
