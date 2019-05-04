@@ -38,6 +38,8 @@ function convertModules() {
         }
     ];
 
+    const bonusRegex = new RegExp("(.+\\sBonus)\\s(\\d)", "u");
+
     woodJson.trim = [];
     woodJson.frame = [];
 
@@ -305,7 +307,7 @@ function convertModules() {
 
         if (
             module.usageType === "All" &&
-            module.sortingGroup === "speed_turn" &&
+            module.sortingGroup &&
             module.moduleLevel === "U" &&
             module.moduleType === "Hidden"
         ) {
@@ -314,7 +316,7 @@ function convertModules() {
             type = "Permanent";
         } else if (
             module.usageType === "All" &&
-            module.sortingGroup === "" &&
+            !module.sortingGroup &&
             module.moduleLevel === "U" &&
             module.moduleType === "Hidden"
         ) {
@@ -330,10 +332,14 @@ function convertModules() {
             sortingGroup = "survival";
         }
 
-        sortingGroup =
-            sortingGroup && type !== "Ship trim"
+        if (type === "Ship trim") {
+            const result = bonusRegex.exec(module.name);
+            sortingGroup = result ? `\u202F\u2013\u202f${result[1]}` : "";
+        } else {
+            sortingGroup = sortingGroup
                 ? `\u202F\u2013\u202f${capitalizeFirstLetter(module.sortingGroup).replace("_", "/")}`
                 : "";
+        }
 
         return `${type}${sortingGroup}`;
     }
