@@ -112,14 +112,10 @@ function convertBuildings() {
             if (
                 building.name === "Gold Mine" ||
                 building.name === "Silver Mine" ||
-                building.name === "Bermuda Cedar Forest" ||
                 building.name === "Compass Wood Forest" ||
                 building.name === "Copper Ore Mine" ||
-                building.name === "Live Oak Forest" ||
-                building.name === "Mahogany Forest" ||
                 building.name === "Pine Forest" ||
-                building.name === "Red Wood Forest" ||
-                building.name === "Teak Forest"
+                building.name === "Red Wood Forest"
             ) {
                 dontSave = true;
             } else {
