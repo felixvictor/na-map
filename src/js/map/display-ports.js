@@ -408,17 +408,57 @@ export default class DisplayPorts {
                     .attr("href", this._nationIcons[nation].replace('"', "").replace('"', ""));
 
                 if (nation !== "NT" && nation !== "FT") {
-                    const patternA = svgDef
+                    const patternAvail = svgDef
                         .append("pattern")
                         .attr("id", `${nation}a`)
                         .attr("width", "133%")
                         .attr("height", "100%")
                         .attr("viewBox", `6 6 ${this._iconSize} ${this._iconSize * 0.75}`);
-                    patternA
+                    patternAvail
                         .append("image")
                         .attr("height", this._iconSize)
                         .attr("width", this._iconSize)
                         .attr("href", this._nationIcons[`${nation}a`].replace('"', "").replace('"', ""));
+
+                    const patternCapital = svgDef
+                        .append("pattern")
+                        .attr("id", `${nation}c`)
+                        .attr("width", "133%")
+                        .attr("height", "100%")
+                        .attr("viewBox", `6 6 ${this._iconSize} ${this._iconSize * 0.75}`);
+                    patternCapital
+                        .append("image")
+                        .attr("height", this._iconSize)
+                        .attr("width", this._iconSize)
+                        .attr("href", this._nationIcons[`${nation}`].replace('"', "").replace('"', ""));
+                    patternCapital
+                        .append("circle")
+                        .attr("cx", this._iconSize / 2)
+                        .attr("cy", this._iconSize / 2)
+                        .attr("r", 16)
+                        .attr("fill", "none")
+                        .attr("stroke-width", "4")
+                        .attr("stroke", colourWhite);
+
+                    const patternCapitalAvail = svgDef
+                        .append("pattern")
+                        .attr("id", `${nation}ca`)
+                        .attr("width", "133%")
+                        .attr("height", "100%")
+                        .attr("viewBox", `6 6 ${this._iconSize} ${this._iconSize * 0.75}`);
+                    patternCapitalAvail
+                        .append("image")
+                        .attr("height", this._iconSize)
+                        .attr("width", this._iconSize)
+                        .attr("href", this._nationIcons[`${nation}a`].replace('"', "").replace('"', ""));
+                    patternCapitalAvail
+                        .append("circle")
+                        .attr("cx", this._iconSize / 2)
+                        .attr("cy", this._iconSize / 2)
+                        .attr("r", 16)
+                        .attr("fill", "none")
+                        .attr("stroke-width", "4")
+                        .attr("stroke", colourWhite);
                 }
             });
     }
@@ -645,7 +685,12 @@ export default class DisplayPorts {
             .join(enter =>
                 enter
                     .append("circle")
-                    .attr("fill", d => `url(#${d.nation}${d.availableForAll && d.nation !== "NT" ? "a" : ""})`)
+                    .attr("fill", d => {
+                        const appendix = `${d.countyCapital && !d.nonCapturable ? "c" : ""}${
+                            d.availableForAll && d.nation !== "NT" ? "a" : ""
+                        }`;
+                        return `url(#${d.nation}${appendix})`;
+                    })
                     .attr("cx", d => d.coordinates[0])
                     .attr("cy", d => d.coordinates[1])
                     .on("click", (d, i, nodes) => this._showDetails(d, i, nodes))
