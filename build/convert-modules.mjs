@@ -63,7 +63,7 @@ function convertModules() {
     modifiers.set("ARMOR_ALL_SIDES MODULE_BASE_HP", "Armour strength");
     modifiers.set("CREW MODULE_BASE_HP", "Crew");
     modifiers.set("INTERNAL_STRUCTURE MODULE_BASE_HP", "Hull strength");
-    modifiers.set("NONE CREW_DAMAGE_RECEIVED_DECREASE_PERCENT", "Crew protection");
+    modifiers.set("NONE CREW_DAMAGE_RECEIVED_DECREASE_PERCENT", "Splinter resistance");
     modifiers.set("NONE GROG_MORALE_BONUS", "Boarding morale");
     modifiers.set("NONE RUDDER_HALFTURN_TIME", "Rudder speed");
     modifiers.set("NONE SHIP_MATERIAL", "Ship material");
@@ -222,7 +222,7 @@ function convertModules() {
 
                 // Some modifiers are wrongly indicated as a percentage
                 if (
-                    modifierName === "Crew protection" ||
+                    modifierName === "Splinter resistance" ||
                     modifierName === "Boarding morale" ||
                     modifierName === "Fire resistance" ||
                     modifierName === "Leak resistance"
@@ -238,7 +238,7 @@ function convertModules() {
                     amount = -amount;
                 }
 
-                if (modifierName === "Crew protection") {
+                if (modifierName === "Splinter resistance") {
                     amount *= 100;
                 }
 
@@ -301,7 +301,7 @@ function convertModules() {
                 modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`) === "Rudder speed"
             ) {
                 amount = -amount;
-            } else if (modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`) === "Crew protection") {
+            } else if (modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`) === "Splinter resistance") {
                 amount = Math.round(modifier.Absolute * 10000) / 100;
             }
 
