@@ -145,7 +145,7 @@ function convertModules() {
     modifiers.set("NONE PERK_FISHING_DROP_CHANCE_MODIFIER", "Fish");
     modifiers.set("NONE PERK_HEEL_DEGREES_MODIFIER", "Heel degrees");
     modifiers.set("NONE PERK_HOLD_MAX_WEIGHT_MODIFIER", "Hold weight");
-    modifiers.set("NONE PERK_HULL_REPAIR_PERCENT_MODIFIER", "Armour repair amount");
+    modifiers.set("NONE PERK_HULL_REPAIR_PERCENT_MODIFIER", "Armour repair amount (perk)");
     modifiers.set("NONE PERK_LABOR_HOURS_GENERATION_MODIFIER", "Labour hour generation");
     modifiers.set("NONE PERK_LABOR_HOURS_WALLET_MODIFIER", "Labour hour wallet");
     modifiers.set("NONE PERK_MAX_FLEET_SIZE_MODIFIER", "Fleet ships");
@@ -158,7 +158,7 @@ function convertModules() {
     modifiers.set("NONE PERK_PUMP_WATER_BAILING_MODIFIER", "Pump water bailing");
     modifiers.set("NONE PERK_RECOVER_LOST_CREW_PERCENT", "Recover lost crew");
     modifiers.set("NONE PERK_SAIL_DAMAGE_MODIFIER", "Sail damage");
-    modifiers.set("NONE PERK_SAIL_REPAIR_PERCENT_MODIFIER", "Sail repair amount");
+    modifiers.set("NONE PERK_SAIL_REPAIR_PERCENT_MODIFIER", "Sail repair amount (perk)");
     modifiers.set("NONE PERK_SHIP_EXTRA_CHAIN_UNITS", "Additional chains");
     modifiers.set("NONE PERK_SHIP_EXTRA_DOBULE_CHARGE_UNITS", "Additional double charges"); // typo
     modifiers.set("NONE PERK_SHIP_EXTRA_DOUBLE_CHARGE_UNITS", "Additional double charges");
