@@ -124,12 +124,14 @@ export default class ListBuildings {
         text += '<table class="table table-sm card-table"><thead>';
 
         if (currentBuilding.levels[0].materials.length) {
-            text += "<tr><th>Level</th><th>Level build materials</th></tr>";
+            text += "<tr><th>Level</th><th>Level build materials</th><th>Build price (reals)</th></tr>";
             text += "</thead><tbody>";
             currentBuilding.levels.forEach((level, i) => {
                 text += `<tr><td>${i + 1}</td><td class="text-left">`;
                 text += level.materials.map(material => `${formatInt(material.amount)} ${material.item}`).join("<br>");
-                text += "</td></tr>";
+                text += "</td>";
+                text += `<td>${formatInt(level.price)}</td>`;
+                text += "</tr>";
             });
         } else {
             text +=
