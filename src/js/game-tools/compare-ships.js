@@ -4,7 +4,7 @@
  * @file      Compare ships.
  * @module    game-tools/compare-ships
  * @author    iB aka Felix Victor
- * @copyright 2018
+ * @copyright 2018, 2019
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -23,24 +23,40 @@ import {
 import { registerEvent } from "../analytics";
 import {
     appVersion,
-    colourRed,
-    colourRedLight,
-    colourRedDark,
     colourGreen,
-    colourGreenLight,
     colourGreenDark,
+    colourGreenLight,
+    colourRed,
+    colourRedDark,
+    colourRedLight,
     hashids,
-    hullRepairsFactor,
-    rigRepairsFactor,
-    rumRepairsFactor,
+    hullRepairsPercent,
+    hullRepairsVolume,
+    rigRepairsPercent,
+    rigRepairsVolume,
+    rumRepairsPercent,
+    rumRepairsVolume,
+    repairTime,
     insertBaseModal
 } from "../common";
-import { copyToClipboard, formatInt, formatFloat, getOrdinal, isEmpty, roundToThousands, sortBy } from "../util";
+import {
+    copyToClipboard,
+    formatFloat,
+    formatInt,
+    formatPercent,
+    getOrdinal,
+    isEmpty,
+    roundToThousands,
+    sortBy
+} from "../util";
 
 import CompareWoods from "./compare-woods";
 
 const numberSegments = 24;
 const segmentRadians = (2 * Math.PI) / numberSegments;
+
+const rumRepairsFactor = rumRepairsPercent / rumRepairsVolume;
+const repairsSetSize = 5;
 
 /**
  * Ship
@@ -289,21 +305,18 @@ class Ship {
         text += displayColumn("crewProtection", "Crew Protection", 6);
         text += "</div></div></div>";
 
-        text += displayFirstColumn("Repairs needed");
+        text += displayFirstColumn('Repairs needed <span class="badge badge-white">Set of 5</span>');
         text += displaySecondBlock();
-        text += displayColumn("hullRepair", "Hull", 4);
-        text += displayColumn("rigRepair", "Rig", 4);
-        text += displayColumn("rumRepair", "Rum", 4);
+        text += displayColumn("hullRepairsNeeded", "Hull", 4);
+        text += displayColumn("rigRepairsNeeded", "Rig", 4);
+        text += displayColumn("rumRepairsNeeded", "Rum", 4);
         text += "</div></div></div>";
 
-        text += displayFirstColumn("Repair time");
+        text += displayFirstColumn("Repair");
         text += displaySecondBlock();
-        text += displayColumn("sidesRepair", "Sides", 4);
-        text += displayColumn("structureRepair", "Hull", 4);
-        text += displayColumn("bowRepair", "Bow", 4);
-        text += displayColumn("sternRepair", "Stern", 4);
-        text += displayColumn("sailsRepair", "Sails", 4);
-        text += displayColumn("rudderRepair", "Rudder", 4);
+        text += displayColumn("hullRepairAmount", "Hull %", 4);
+        text += displayColumn("rigRepairAmount", "Rig %", 4);
+        text += displayColumn("repairTime", "Time (sec)", 4);
         text += "</div></div></div>";
 
         text += displayFirstColumn("Hold");
@@ -483,6 +496,14 @@ class ShipBase extends Ship {
      */
     _printText() {
         const cannonsPerDeck = Ship.getCannonsPerDeck(this.shipData.deckClassLimit, this.shipData.gunsPerDeck);
+        const hullRepairsNeeded = Math.round(
+            (this.shipData.sides.armour * this.shipData.repairAmount.armour) / hullRepairsVolume
+        );
+        const rigRepairsNeeded = Math.round(
+            (this.shipData.sails.armour * this.shipData.repairAmount.sails) / rigRepairsVolume
+        );
+        const rumRepairsNeeded = Math.round(this.shipData.crew.max * rumRepairsFactor);
+
         const ship = {
             shipRating: `${getOrdinal(this.shipData.class)} rate`,
             battleRating: this.shipData.battleRating,
@@ -524,15 +545,24 @@ class ShipBase extends Ship {
             maxWeight: formatInt(this.shipData.maxWeight),
             holdSize: formatInt(this.shipData.holdSize),
             upgradeXP: formatInt(this.shipData.upgradeXP),
-            sternRepair: formatInt(this.shipData.repairTime.stern),
-            bowRepair: formatInt(this.shipData.repairTime.bow),
-            sidesRepair: formatInt(this.shipData.repairTime.sides),
-            rudderRepair: formatInt(this.shipData.repairTime.rudder),
-            sailsRepair: formatInt(this.shipData.repairTime.sails),
-            structureRepair: formatInt(this.shipData.repairTime.structure),
-            hullRepair: `${formatInt(this.shipData.sides.armour / hullRepairsFactor)}`,
-            rigRepair: `${formatInt(this.shipData.sails.armour / rigRepairsFactor)}`,
-            rumRepair: `${formatInt(this.shipData.crew.max / rumRepairsFactor)}`,
+            sternRepair: `${formatInt(this.shipData.repairTime.stern)}`,
+            bowRepair: `${formatInt(this.shipData.repairTime.bow)}`,
+            hullRepairAmount: `${formatInt(
+                (this.shipData.repairAmount.armour + this.shipData.repairAmount.armourPerk) * 100
+            )}`,
+            rigRepairAmount: `${formatInt(
+                (this.shipData.repairAmount.sails + this.shipData.repairAmount.sailsPerk) * 100
+            )}`,
+            repairTime: `${formatInt(this.shipData.repairTime.sides)}`,
+            hullRepairsNeeded: `${formatInt(hullRepairsNeeded)}\u00A0<span class="badge badge-white">${formatInt(
+                hullRepairsNeeded * repairsSetSize
+            )}</span>`,
+            rigRepairsNeeded: `${formatInt(rigRepairsNeeded)}\u00A0<span class="badge badge-white">${formatInt(
+                rigRepairsNeeded * repairsSetSize
+            )}</span>`,
+            rumRepairsNeeded: `${formatInt(rumRepairsNeeded)}\u00A0<span class="badge badge-white">${formatInt(
+                rumRepairsNeeded * repairsSetSize
+            )}</span>`,
             fireResistance: formatInt(this.shipData.resistance.fire),
             leakResistance: formatInt(this.shipData.resistance.leaks),
             crewProtection: formatInt(this.shipData.resistance.crew),
@@ -546,7 +576,6 @@ class ShipBase extends Ship {
                 this.shipData.mast.topThickness
             )}</span>`
         };
-
         if (ship.gunsFront) {
             ship.gunsFront += `\u00A0${Ship.pd(ship.limitFront)}`;
         } else {
@@ -658,10 +687,15 @@ class ShipComparison extends Ship {
          * @param {number} a - First value
          * @param {number} b - Second value
          * @param {number} decimals - Number of decimals (default 0)
+         * @param {boolean} isPercentage - True if be to be formatted as percentage
          * @returns {string} HTML formatted string
          */
-        function getDiff(a, b, decimals = 0) {
-            const diff = parseFloat((a - b).toFixed(decimals));
+        function getDiff(a, b, decimals = 0, isPercentage = false) {
+            let diff = parseFloat((a - b).toFixed(decimals));
+
+            if (isPercentage) {
+                diff *= 100;
+            }
 
             if (diff < 0) {
                 return `<span class="badge badge-danger">${formatFloat(Math.abs(diff))}</span>`;
@@ -673,6 +707,22 @@ class ShipComparison extends Ship {
 
             return "";
         }
+
+        console.log(this.shipBaseData.repairAmount, this.shipCompareData.repairAmount);
+        const hullRepairsNeededBase = Math.round(
+            (this.shipBaseData.sides.armour * this.shipBaseData.repairAmount.armour) / hullRepairsVolume
+        );
+        const rigRepairsNeededBase = Math.round(
+            (this.shipBaseData.sails.armour * this.shipBaseData.repairAmount.sails) / rigRepairsVolume
+        );
+        const rumRepairsNeededBase = Math.round(this.shipBaseData.crew.max * rumRepairsFactor);
+        const hullRepairsNeededCompare = Math.round(
+            (this.shipCompareData.sides.armour * this.shipCompareData.repairAmount.armour) / hullRepairsVolume
+        );
+        const rigRepairsNeededCompare = Math.round(
+            (this.shipCompareData.sails.armour * this.shipCompareData.repairAmount.sails) / rigRepairsVolume
+        );
+        const rumRepairsNeededCompare = Math.round(this.shipCompareData.crew.max * rumRepairsFactor);
 
         const ship = {
             shipRating: `${getOrdinal(this.shipCompareData.class)} rate`,
@@ -805,42 +855,38 @@ class ShipComparison extends Ship {
                 this.shipCompareData.upgradeXP,
                 this.shipBaseData.upgradeXP
             )}`,
-            sternRepair: `${formatInt(this.shipCompareData.repairTime.stern)}\u00A0${getDiff(
-                this.shipBaseData.repairTime.stern,
-                this.shipCompareData.repairTime.stern
+            hullRepairAmount: `${formatInt(
+                (this.shipCompareData.repairAmount.armour + this.shipCompareData.repairAmount.armourPerk) * 100
+            )}\u00A0${getDiff(
+                this.shipCompareData.repairAmount.armour + this.shipCompareData.repairAmount.armourPerk,
+                this.shipBaseData.repairAmount.armour + this.shipBaseData.repairAmount.armourPerk,
+                3,
+                true
             )}`,
-            bowRepair: `${formatInt(this.shipCompareData.repairTime.bow)}\u00A0${getDiff(
-                this.shipBaseData.repairTime.bow,
-                this.shipCompareData.repairTime.bow
+            rigRepairAmount: `${formatInt(
+                (this.shipCompareData.repairAmount.sails + this.shipCompareData.repairAmount.sailsPerk) * 100
+            )}\u00A0${getDiff(
+                this.shipCompareData.repairAmount.sails + this.shipCompareData.repairAmount.sailsPerk,
+                this.shipBaseData.repairAmount.sails + this.shipBaseData.repairAmount.sailsPerk,
+                3,
+                true
             )}`,
-            sidesRepair: `${formatInt(this.shipCompareData.repairTime.sides)}\u00A0${getDiff(
+            repairTime: `${formatInt(this.shipCompareData.repairTime.sides)}\u00A0${getDiff(
                 this.shipBaseData.repairTime.sides,
                 this.shipCompareData.repairTime.sides
             )}`,
-            rudderRepair: `${formatInt(this.shipCompareData.repairTime.rudder)}\u00A0${getDiff(
-                this.shipBaseData.repairTime.rudder,
-                this.shipCompareData.repairTime.rudder
-            )}`,
-            sailsRepair: `${formatInt(this.shipCompareData.repairTime.sails)}\u00A0${getDiff(
-                this.shipBaseData.repairTime.sails,
-                this.shipCompareData.repairTime.sails
-            )}`,
-            structureRepair: `${formatInt(this.shipCompareData.repairTime.structure)}\u00A0${getDiff(
-                this.shipBaseData.repairTime.structure,
-                this.shipCompareData.repairTime.structure
-            )}`,
-            hullRepair: `${formatInt(this.shipCompareData.sides.armour / hullRepairsFactor)}\u00A0${getDiff(
-                this.shipBaseData.sides.armour / hullRepairsFactor,
-                this.shipCompareData.sides.armour / hullRepairsFactor
-            )}`,
-            rigRepair: `${formatInt(this.shipCompareData.sails.armour / rigRepairsFactor)}\u00A0${getDiff(
-                this.shipBaseData.sails.armour / rigRepairsFactor,
-                this.shipCompareData.sails.armour / rigRepairsFactor
-            )}`,
-            rumRepair: `${formatInt(this.shipCompareData.crew.max / rumRepairsFactor)}\u00A0${getDiff(
-                this.shipBaseData.crew.max / rumRepairsFactor,
-                this.shipCompareData.crew.max / rumRepairsFactor
-            )}`,
+            hullRepairsNeeded: `${formatInt(hullRepairsNeededCompare)}\u00A0${getDiff(
+                hullRepairsNeededCompare,
+                hullRepairsNeededBase
+            )} <span class="badge badge-white">${formatInt(hullRepairsNeededCompare * repairsSetSize)}</span>`,
+            rigRepairsNeeded: `${formatInt(rigRepairsNeededCompare)}\u00A0${getDiff(
+                rigRepairsNeededCompare,
+                rigRepairsNeededBase
+            )} <span class="badge badge-white">${formatInt(rigRepairsNeededCompare * repairsSetSize)}</span>`,
+            rumRepairsNeeded: `${formatInt(rumRepairsNeededCompare)}\u00A0${getDiff(
+                rumRepairsNeededCompare,
+                rumRepairsNeededBase
+            )} <span class="badge badge-white">${formatInt(rumRepairsNeededCompare * repairsSetSize)}</span>`,
             fireResistance: `${formatInt(this.shipCompareData.resistance.fire)}\u00A0${getDiff(
                 this.shipCompareData.resistance.fire,
                 this.shipBaseData.resistance.fire
@@ -920,6 +966,7 @@ export default class CompareShips {
         this._shipData = shipData;
         this._moduleDataDefault = moduleData;
         this._baseId = id;
+
         this._baseName = "Compare ships";
         this._buttonId = `button-${this._baseId}`;
         this._modalId = `modal-${this._baseId}`;
@@ -965,6 +1012,8 @@ export default class CompareShips {
             // ["Sail health", [  ]],
             ["Acceleration", ["ship.acceleration"]],
             ["Armor thickness", ["sides.thickness", "bow.thickness", "stern.thickness"]],
+            ["Armour repair amount (perk)", ["repairAmount.armourPerk"]],
+            ["Armour repair amount", ["repairAmount.armour"]],
             ["Armour strength", ["bow.armour", "sides.armour", "stern.armour"]],
             ["Back armour thickness", ["stern.thickness"]],
             ["Crew protection", ["resistance.crew"]],
@@ -979,13 +1028,16 @@ export default class CompareShips {
             ["Rudder health", ["rudder.armour"]],
             ["Rudder repair time", ["repairTime.rudder"]],
             ["Rudder speed", ["rudder.halfturnTime"]],
+            ["Sail repair amount (perk)", ["repairAmount.sailsPerk"]],
+            ["Sail repair amount", ["repairAmount.sails"]],
             ["Sail repair time", ["repairTime.sails"]],
             ["Sailing crew", ["crew.sailing"]],
             ["Ship speed", ["speed.max"]],
             ["Side armour repair time", ["repairTime.sides"]],
             ["Speed decrease", ["ship.deceleration"]],
             ["Turn speed", ["rudder.turnSpeed"]],
-            ["Water pump health", ["pump.armour"]]
+            ["Water pump health", ["pump.armour"]],
+            ["Water repair time", ["repairTime.pump"]]
         ]);
 
         this._moduleCaps = new Map([
@@ -1095,7 +1147,7 @@ export default class CompareShips {
         }
 
         // Show modal
-        $(`#${this._modalId}`).modal("show");
+        this._modal$.modal("show");
         this._setGraphicsParameters();
     }
 
@@ -1149,7 +1201,7 @@ export default class CompareShips {
     }
 
     /**
-     * Setup ship data
+     * Setup ship data (group by class)
      * @returns {void}
      */
     _setupShipData() {
@@ -1364,45 +1416,62 @@ export default class CompareShips {
         return options;
     }
 
+    _fillModuleSelect(columnId, type) {
+        const getShipClass = () => this._shipData.find(ship => ship.id === this._shipIds[columnId]).class;
+
+        const options = this._getUpgradesOptions(type, getShipClass());
+
+        this._selectModule$[columnId][type].find("option").remove();
+        this._selectModule$[columnId][type].append(options);
+    }
+
+    _resetModuleSelects(columnId) {
+        this._moduleTypes.forEach(type => {
+            this._fillModuleSelect(columnId, type);
+            this._selectModule$[columnId][type].selectpicker("refresh");
+        });
+    }
+
     /**
      * Setup upgrades select
      * @param {string} columnId - Column id
      * @returns {void}
      */
     _setupModulesSelect(columnId) {
-        const getShipClass = () => this._shipData.find(ship => ship.id === this._shipIds[columnId]).class;
+        if (!this._selectModule$[columnId]) {
+            this._selectModule$[columnId] = {};
 
-        this._selectModule$[columnId] = {};
+            this._moduleTypes.forEach(type => {
+                this._selectModule$[columnId][type] = $(`#${this._getModuleSelectId(type, columnId)}`);
+                this._selectModule$[columnId][type].append(options);
 
-        this._moduleTypes.forEach(type => {
-            this._selectModule$[columnId][type] = $(`#${this._getModuleSelectId(type, columnId)}`);
-            const options = this._getUpgradesOptions(type, getShipClass());
+                this._selectModule$[columnId][type]
+                    .on("changed.bs.select", () => {
+                        this._modulesSelected(columnId);
+                        this._refreshShips(columnId);
+                    })
+                    .on("show.bs.select", () => {
+                        // Remove 'select all' button
+                        this._selectModule$[columnId][type]
+                            .parent()
+                            .find("button.bs-select-all")
+                            .remove();
+                    })
+                    .selectpicker({
+                        actionsBox: true,
+                        countSelectedText(amount) {
+                            return `${amount} ${type.toLowerCase()}s selected`;
+                        },
+                        deselectAllText: "Clear",
+                        maxOptions: !type.startsWith("Ship trim") && options.length > 1 ? 5 : 6,
+                        selectedTextFormat: "count > 1",
+                        title: `${type}`,
+                        width: "150px"
+                    });
+            });
+        }
 
-            this._selectModule$[columnId][type].append(options);
-            this._selectModule$[columnId][type]
-                .on("changed.bs.select", () => {
-                    this._modulesSelected(columnId);
-                    this._refreshShips(columnId);
-                })
-                .on("show.bs.select", () => {
-                    // Remove 'select all' button
-                    this._selectModule$[columnId][type]
-                        .parent()
-                        .find("button.bs-select-all")
-                        .remove();
-                })
-                .selectpicker({
-                    actionsBox: true,
-                    countSelectedText(amount) {
-                        return `${amount} ${type.toLowerCase()}s selected`;
-                    },
-                    deselectAllText: "Clear",
-                    maxOptions: !type.startsWith("Ship trim") && options.length > 1 ? 5 : 6,
-                    selectedTextFormat: "count > 1",
-                    title: `${type}`,
-                    width: "150px"
-                });
-        });
+        this._resetModuleSelects(columnId);
     }
 
     /**
@@ -1413,6 +1482,15 @@ export default class CompareShips {
     _getShipData(columnId) {
         const shipDataDefault = this._shipData.find(ship => ship.id === this._shipIds[columnId]);
         let shipDataUpdated = shipDataDefault;
+
+        shipDataUpdated.repairAmount = {};
+        shipDataUpdated.repairAmount.armour = hullRepairsPercent;
+        shipDataUpdated.repairAmount.armourPerk = 0;
+        shipDataUpdated.repairAmount.sails = rigRepairsPercent;
+        shipDataUpdated.repairAmount.sailsPerk = 0;
+
+        shipDataUpdated.repairTime.sides = repairTime;
+        shipDataUpdated.repairTime.default = repairTime;
 
         shipDataUpdated = this._addWoodData(shipDataDefault, columnId);
         shipDataUpdated = this._addModulesData(shipDataDefault, shipDataUpdated, columnId);
@@ -1504,11 +1582,16 @@ export default class CompareShips {
      */
     _addModulesData(shipDataBase, shipDataUpdated, compareId) {
         const data = JSON.parse(JSON.stringify(shipDataUpdated));
+        const modifierAmounts = new Map();
 
-        if (typeof this._selectedUpgradeIdsList[compareId] !== "undefined") {
-            const modifierAmount = new Map();
+        const setSpeedDegrees = () => {
+            data.speedDegrees = data.speedDegrees.map(speed => {
+                const factor = 1 + modifierAmounts.get("Ship speed").percentage / 100;
+                return Math.max(Math.min(speed * factor, this._maxSpeed), this._minSpeed);
+            });
+        };
 
-            // Add modifier amount
+        const setmodifierAmounts = () => {
             this._selectedUpgradeIdsList[compareId].forEach(id => {
                 const module = this._moduleProperties.get(id);
 
@@ -1518,46 +1601,56 @@ export default class CompareShips {
                         let percentage = property.isPercentage ? property.amount : 0;
 
                         // If modifier has been in the Map add the amount
-                        if (modifierAmount.has(property.modifier)) {
-                            absolute += modifierAmount.get(property.modifier).absolute;
-                            percentage += modifierAmount.get(property.modifier).percentage;
+                        if (modifierAmounts.has(property.modifier)) {
+                            absolute += modifierAmounts.get(property.modifier).absolute;
+                            percentage += modifierAmounts.get(property.modifier).percentage;
                         }
 
-                        modifierAmount.set(property.modifier, {
+                        modifierAmounts.set(property.modifier, {
                             absolute,
                             percentage
                         });
                     }
                 });
             });
+        };
 
-            modifierAmount.forEach((value, key) => {
-                this._moduleChanges.get(key).forEach(modifier => {
-                    const index = modifier.split(".");
-                    let factor = 1;
-                    if (modifierAmount.get(key).percentage) {
-                        factor = 1 + modifierAmount.get(key).percentage / 100;
-                    }
+        const adjustDataByModifiers = () => {
+            const adjustData = (key, modifier) => {
+                const index = modifier.split(".");
+                let factor = 1;
+                if (modifierAmounts.get(key).percentage) {
+                    factor = 1 + modifierAmounts.get(key).percentage / 100;
+                }
 
-                    const { absolute } = modifierAmount.get(key);
+                const { absolute } = modifierAmounts.get(key);
 
-                    if (index.length > 1) {
-                        if (data[index[0]][index[1]]) {
-                            data[index[0]][index[1]] *= factor;
-                            data[index[0]][index[1]] += absolute;
-                        } else {
-                            data[index[0]][index[1]] = absolute;
-                        }
-                    } else if (data[index[0]]) {
-                        data[index[0]] *= factor;
-                        data[index[0]] += absolute;
+                if (index.length > 1) {
+                    if (data[index[0]][index[1]]) {
+                        data[index[0]][index[1]] *= factor;
+                        data[index[0]][index[1]] += absolute;
                     } else {
-                        data[index[0]] = absolute;
+                        data[index[0]][index[1]] = absolute;
                     }
-                });
-            });
+                } else if (data[index[0]]) {
+                    data[index[0]] *= factor;
+                    data[index[0]] += absolute;
+                } else {
+                    data[index[0]] = absolute;
+                }
+            };
 
-            modifierAmount.forEach((value, key) => {
+            modifierAmounts.forEach((value, key) => {
+                if (this._moduleChanges.get(key)) {
+                    this._moduleChanges.get(key).forEach(modifier => {
+                        adjustData(key, modifier);
+                    });
+                }
+            });
+        };
+
+        const adjustDataByCaps = () => {
+            modifierAmounts.forEach((value, key) => {
                 if (this._moduleCaps.has(key)) {
                     const { cap } = this._moduleCaps.get(key);
                     this._moduleCaps.get(key).properties.forEach(property => {
@@ -1578,13 +1671,17 @@ export default class CompareShips {
                     });
                 }
             });
+        };
 
-            if (modifierAmount.has("Ship speed")) {
-                data.speedDegrees = data.speedDegrees.map(speed => {
-                    const factor = 1 + modifierAmount.get("Ship speed").percentage / 100;
-                    return Math.max(Math.min(speed * factor, this._maxSpeed), this._minSpeed);
-                });
-            }
+        if (!this._selectedUpgradeIdsList[compareId]) {
+            return data;
+        }
+
+        setmodifierAmounts();
+        adjustDataByModifiers();
+        adjustDataByCaps();
+        if (modifierAmounts.has("Ship speed")) {
+            setSpeedDegrees();
         }
 
         return data;
@@ -1596,7 +1693,9 @@ export default class CompareShips {
      * @returns {void}
      */
     _refreshShips(compareId) {
+        this._modulesSelected(compareId);
         const singleShipData = this._getShipData(compareId);
+
         if (this._baseId === "ship-journey") {
             this._singleShipData = singleShipData;
         } else if (compareId === "Base") {
@@ -1670,13 +1769,13 @@ export default class CompareShips {
         this._selectShip$[compareId]
             .on("changed.bs.select", () => {
                 this._shipIds[compareId] = Number(this._selectShip$[compareId].val());
+                this._setupModulesSelect(compareId);
                 this._refreshShips(compareId);
                 if (compareId === "Base" && this._baseId !== "ship-journey") {
                     this._enableCompareSelects();
                 }
 
                 this.woodCompare.enableSelects(compareId);
-                this._setupModulesSelect(compareId);
             })
             .selectpicker({ title: "Ship" });
 
