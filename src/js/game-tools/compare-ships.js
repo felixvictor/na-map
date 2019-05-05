@@ -547,8 +547,12 @@ class ShipBase extends Ship {
             upgradeXP: formatInt(this.shipData.upgradeXP),
             sternRepair: `${formatInt(this.shipData.repairTime.stern)}`,
             bowRepair: `${formatInt(this.shipData.repairTime.bow)}`,
-            hullRepairAmount: `${formatInt(this.shipData.repairAmount.armour * 100)}`,
-            rigRepairAmount: `${formatInt(this.shipData.repairAmount.sails * 100)}`,
+            hullRepairAmount: `${formatInt(
+                (this.shipData.repairAmount.armour + this.shipData.repairAmount.armourPerk) * 100
+            )}`,
+            rigRepairAmount: `${formatInt(
+                (this.shipData.repairAmount.sails + this.shipData.repairAmount.sailsPerk) * 100
+            )}`,
             repairTime: `${formatInt(this.shipData.repairTime.sides)}`,
             hullRepairsNeeded: `${formatInt(hullRepairsNeeded)}\u00A0<span class="badge badge-white">${formatInt(
                 hullRepairsNeeded * repairsSetSize
@@ -704,6 +708,7 @@ class ShipComparison extends Ship {
             return "";
         }
 
+        console.log(this.shipBaseData.repairAmount, this.shipCompareData.repairAmount);
         const hullRepairsNeededBase = Math.round(
             (this.shipBaseData.sides.armour * this.shipBaseData.repairAmount.armour) / hullRepairsVolume
         );
@@ -850,15 +855,19 @@ class ShipComparison extends Ship {
                 this.shipCompareData.upgradeXP,
                 this.shipBaseData.upgradeXP
             )}`,
-            hullRepairAmount: `${formatInt(this.shipCompareData.repairAmount.armour * 100)}\u00A0${getDiff(
-                this.shipCompareData.repairAmount.armour,
-                this.shipBaseData.repairAmount.armour,
+            hullRepairAmount: `${formatInt(
+                (this.shipCompareData.repairAmount.armour + this.shipCompareData.repairAmount.armourPerk) * 100
+            )}\u00A0${getDiff(
+                this.shipCompareData.repairAmount.armour + this.shipCompareData.repairAmount.armourPerk,
+                this.shipBaseData.repairAmount.armour + this.shipBaseData.repairAmount.armourPerk,
                 3,
                 true
             )}`,
-            rigRepairAmount: `${formatInt(this.shipCompareData.repairAmount.sails * 100)}\u00A0${getDiff(
-                this.shipCompareData.repairAmount.sails,
-                this.shipBaseData.repairAmount.sails,
+            rigRepairAmount: `${formatInt(
+                (this.shipCompareData.repairAmount.sails + this.shipCompareData.repairAmount.sailsPerk) * 100
+            )}\u00A0${getDiff(
+                this.shipCompareData.repairAmount.sails + this.shipCompareData.repairAmount.sailsPerk,
+                this.shipBaseData.repairAmount.sails + this.shipBaseData.repairAmount.sailsPerk,
                 3,
                 true
             )}`,
@@ -1001,9 +1010,10 @@ export default class CompareShips {
         this._moduleChanges = new Map([
             // ["Sail damage", [  ]],
             // ["Sail health", [  ]],
-            ["Armour repair amount", ["repairAmount.armour"]],
             ["Acceleration", ["ship.acceleration"]],
             ["Armor thickness", ["sides.thickness", "bow.thickness", "stern.thickness"]],
+            ["Armour repair amount (perk)", ["repairAmount.armourPerk"]],
+            ["Armour repair amount", ["repairAmount.armour"]],
             ["Armour strength", ["bow.armour", "sides.armour", "stern.armour"]],
             ["Back armour thickness", ["stern.thickness"]],
             ["Crew protection", ["resistance.crew"]],
@@ -1018,6 +1028,7 @@ export default class CompareShips {
             ["Rudder health", ["rudder.armour"]],
             ["Rudder repair time", ["repairTime.rudder"]],
             ["Rudder speed", ["rudder.halfturnTime"]],
+            ["Sail repair amount (perk)", ["repairAmount.sailsPerk"]],
             ["Sail repair amount", ["repairAmount.sails"]],
             ["Sail repair time", ["repairTime.sails"]],
             ["Sailing crew", ["crew.sailing"]],
@@ -1470,7 +1481,9 @@ export default class CompareShips {
 
         shipDataUpdated.repairAmount = {};
         shipDataUpdated.repairAmount.armour = hullRepairsPercent;
+        shipDataUpdated.repairAmount.armourPerk = 0;
         shipDataUpdated.repairAmount.sails = rigRepairsPercent;
+        shipDataUpdated.repairAmount.sailsPerk = 0;
 
         shipDataUpdated.repairTime.sides = repairTime;
         shipDataUpdated.repairTime.default = repairTime;
