@@ -52,20 +52,23 @@ function convertRepairData() {
     // Get all files without a master
     [...baseFileNames].forEach(baseFileName => {
         const fileData = getFileData(baseFileName, "kit");
-        let volume = 1;
-        let percent = 1;
+        const data = {};
 
         fileData.ModuleTemplate.Attributes.Pair.forEach(pair => {
             if (pair.Key === "REPAIR_VOLUME_PER_ITEM") {
-                volume = Number(pair.Value.Value);
+                data.volume = Number(pair.Value.Value);
             }
 
             if (pair.Key === "REPAIR_PERCENT") {
-                percent = Number(pair.Value.Value);
+                data.percent = Number(pair.Value.Value);
+            }
+
+            if (pair.Key === "REPAIR_MODULE_TIME") {
+                data.time = Number(pair.Value.Value);
             }
         });
 
-        repairs[toCamelCase(baseFileName)] = { volume, percent };
+        repairs[toCamelCase(baseFileName)] = data;
     });
 
     saveJson(filename, repairs);
