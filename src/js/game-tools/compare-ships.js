@@ -302,7 +302,7 @@ class Ship {
         text += displaySecondBlock();
         text += displayColumn("fireResistance", "Fire", 3);
         text += displayColumn("leakResistance", "Leaks", 3);
-        text += displayColumn("crewProtection", "Crew Protection", 6);
+        text += displayColumn("splinterResistance", "Splinter", 6);
         text += "</div></div></div>";
 
         text += displayFirstColumn('Repairs needed <span class="badge badge-white">Set of 5</span>');
@@ -565,7 +565,7 @@ class ShipBase extends Ship {
             )}</span>`,
             fireResistance: formatInt(this.shipData.resistance.fire),
             leakResistance: formatInt(this.shipData.resistance.leaks),
-            crewProtection: formatInt(this.shipData.resistance.crew),
+            splinterResistance: formatInt(this.shipData.resistance.splinter),
             mastBottomArmor: `${formatInt(
                 this.shipData.mast.bottomArmour
             )}\u00A0<span class="badge badge-white">${formatInt(this.shipData.mast.bottomThickness)}</span>`,
@@ -708,7 +708,6 @@ class ShipComparison extends Ship {
             return "";
         }
 
-        console.log(this.shipBaseData.repairAmount, this.shipCompareData.repairAmount);
         const hullRepairsNeededBase = Math.round(
             (this.shipBaseData.sides.armour * this.shipBaseData.repairAmount.armour) / hullRepairsVolume
         );
@@ -895,9 +894,9 @@ class ShipComparison extends Ship {
                 this.shipCompareData.resistance.leaks,
                 this.shipBaseData.resistance.leaks
             )}`,
-            crewProtection: `${formatInt(this.shipCompareData.resistance.crew)}\u00A0${getDiff(
-                this.shipCompareData.resistance.crew,
-                this.shipBaseData.resistance.crew
+            splinterResistance: `${formatInt(this.shipCompareData.resistance.splinter)}\u00A0${getDiff(
+                this.shipCompareData.resistance.splinter,
+                this.shipBaseData.resistance.splinter
             )}`,
             mastBottomArmor: `${formatInt(this.shipCompareData.mast.bottomArmour)}\u00A0${getDiff(
                 this.shipCompareData.mast.bottomArmour,
@@ -996,7 +995,7 @@ export default class CompareShips {
             ["Acceleration", ["ship.acceleration"]],
             ["Armor thickness", ["sides.thickness", "bow.thickness", "stern.thickness"]],
             ["Armour strength", ["bow.armour", "sides.armour", "stern.armour"]],
-            ["Crew protection", ["resistance.crew"]],
+            ["Splinter resistance", ["resistance.splinter"]],
             ["Crew", ["crew.max"]],
             ["Fire resistance", ["resistance.fire"]],
             ["Hull strength", ["structure.armour"]],
@@ -1016,7 +1015,7 @@ export default class CompareShips {
             ["Armour repair amount", ["repairAmount.armour"]],
             ["Armour strength", ["bow.armour", "sides.armour", "stern.armour"]],
             ["Back armour thickness", ["stern.thickness"]],
-            ["Crew protection", ["resistance.crew"]],
+            ["Splinter resistance", ["resistance.splinter"]],
             ["Crew", ["crew.max"]],
             ["Fire resistance", ["resistance.fire"]],
             ["Front armour thickness", ["bow.thickness"]],
@@ -1443,8 +1442,6 @@ export default class CompareShips {
 
             this._moduleTypes.forEach(type => {
                 this._selectModule$[columnId][type] = $(`#${this._getModuleSelectId(type, columnId)}`);
-                this._selectModule$[columnId][type].append(options);
-
                 this._selectModule$[columnId][type]
                     .on("changed.bs.select", () => {
                         this._modulesSelected(columnId);
@@ -1463,7 +1460,7 @@ export default class CompareShips {
                             return `${amount} ${type.toLowerCase()}s selected`;
                         },
                         deselectAllText: "Clear",
-                        maxOptions: !type.startsWith("Ship trim") && options.length > 1 ? 5 : 6,
+                        maxOptions: type.startsWith("Ship trim") ? 6 : 5,
                         selectedTextFormat: "count > 1",
                         title: `${type}`,
                         width: "150px"
@@ -1510,7 +1507,7 @@ export default class CompareShips {
         data.resistance = {};
         data.resistance.fire = 0;
         data.resistance.leaks = 0;
-        data.resistance.crew = 0;
+        data.resistance.splinter = 0;
 
         if (typeof this.woodCompare._instances[compareId] !== "undefined") {
             let dataLink = "_woodData";
