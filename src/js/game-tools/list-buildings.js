@@ -108,7 +108,7 @@ export default class ListBuildings {
                 if (typeof currentBuilding.batch !== "undefined") {
                     text += `<tr><td>Batch of ${currentBuilding.batch.amount} units at ${getCurrencyAmount(
                         currentBuilding.batch.price
-                    )}</td></tr>`;
+                    )} and ${currentBuilding.batch.labour} labour hours</td></tr>`;
                 }
 
                 text += "</tbody></table>";
@@ -133,7 +133,7 @@ export default class ListBuildings {
             });
         } else {
             text +=
-                "<tr><th>Level</th><th>Production (units)</th><th>Labour cost (%)</th><th>Storage (units)</th><th>Build price (reals)</th></tr>";
+                "<tr><th>Level</th><th>Production</th><th>Labour cost (%)</th><th>Storage</th><th>Build price (reals)</th></tr>";
             text += "</thead><tbody>";
             currentBuilding.levels.forEach((level, i) => {
                 text += `<tr><td>${i + 1}</td><td>${formatInt(level.production)}</td><td>${formatInt(
@@ -157,12 +157,12 @@ export default class ListBuildings {
 
         let text = '<div class="row no-gutters card-deck">';
 
-        text += '<div class="card col-4"><div class="card-header">Product</div>';
+        text += '<div class="card col-5"><div class="card-header">Product</div>';
         text += '<div class="card-body product">';
         text += this._getProductText(currentBuilding);
         text += "</div></div>";
 
-        text += '<div class="card col-8"><div class="card-header">Requirements</div>';
+        text += '<div class="card col-7"><div class="card-header">Requirements</div>';
         text += '<div class="card-body px-0 requirements">';
         text += this._getRequirementText(currentBuilding);
         text += "</div></div>";
