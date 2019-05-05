@@ -47,19 +47,24 @@ function getItemsCraftedByAcademy() {
  */
 function convertBuildings() {
     const buildings = new Map();
-    const resources = new Map();
-    const resourceRecipes = new Map();
 
-    APIItems.forEach(APIresource => {
-        resources.set(APIresource.Id, { name: APIresource.Name.replaceAll("'", "’"), price: APIresource.BasePrice });
-    });
+    const resources = new Map(
+        APIItems.map(APIresource => [
+            APIresource.Id,
+            { name: APIresource.Name.replaceAll("'", "’"), price: APIresource.BasePrice }
+        ])
+    );
 
-    APIItems.filter(item => item.ItemType === "RecipeResource").forEach(recipe => {
-        resourceRecipes.set(recipe.Results[0].Template, {
-            price: recipe.GoldRequirements,
-            amount: recipe.Results[0].Amount
-        });
-    });
+    const resourceRecipes = new Map(
+        APIItems.filter(item => item.ItemType === "RecipeResource").map(recipe => [
+            recipe.Results[0].Template,
+            {
+                price: recipe.GoldRequirements,
+                amount: recipe.Results[0].Amount,
+                labour: recipe.LaborPrice
+            }
+        ])
+    );
 
     APIItems.filter(item => item.ItemType === "Building").forEach(APIbuilding => {
         let dontSave = false;
