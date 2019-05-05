@@ -193,9 +193,22 @@ export default class ListCannons {
         `;
     }
 
+    _getModalFooter() {
+        return html`
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                Close
+            </button>
+        `;
+    }
+
     _injectModal() {
         render(
-            insertBaseModalHTML(this._modalId, this._baseName, this._getModalBody.bind(this)),
+            insertBaseModalHTML({
+                id: this._modalId,
+                title: this._baseName,
+                body: this._getModalBody.bind(this),
+                footer: this._getModalFooter
+            }),
             document.getElementById("modal-section")
         );
 
