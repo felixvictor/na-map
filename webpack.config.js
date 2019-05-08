@@ -293,6 +293,7 @@ const config = {
             ICONSMALL: JSON.stringify("images/icons/icon_32x32.png"),
             REPAIR_ARMOR_VOLUME: JSON.stringify(repairs.armorRepair.volume),
             REPAIR_ARMOR_PERCENT: JSON.stringify(repairs.armorRepair.percent),
+            REPAIR_ARMOR_TIME: JSON.stringify(repairs.armorRepair.time),
             REPAIR_SAIL_VOLUME: JSON.stringify(repairs.sailRepair.volume),
             REPAIR_SAIL_PERCENT: JSON.stringify(repairs.sailRepair.percent),
             REPAIR_CREW_VOLUME: JSON.stringify(repairs.crewRepair.volume),
