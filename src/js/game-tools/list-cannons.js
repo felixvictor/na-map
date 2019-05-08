@@ -45,7 +45,12 @@ export default class ListCannons {
                 }
             }
         });
-        this._groups = new Map([...this._groups.entries()].sort());
+
+        const groupOrder = ["damage", "penetration (m)", "crew", "dispersion", "generic"];
+
+        this._groups = new Map(
+            [...this._groups.entries()].sort((a, b) => groupOrder.indexOf(a[0]) - groupOrder.indexOf(b[0]))
+        );
 
         this._setupListener();
     }
@@ -188,9 +193,22 @@ export default class ListCannons {
         `;
     }
 
+    _getModalFooter() {
+        return html`
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                Close
+            </button>
+        `;
+    }
+
     _injectModal() {
         render(
-            insertBaseModalHTML(this._modalId, this._baseName, this._getModalBody.bind(this)),
+            insertBaseModalHTML({
+                id: this._modalId,
+                title: this._baseName,
+                body: this._getModalBody.bind(this),
+                footer: this._getModalFooter
+            }),
             document.getElementById("modal-section")
         );
 
