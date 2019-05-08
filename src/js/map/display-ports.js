@@ -435,10 +435,7 @@ export default class DisplayPorts {
                         .append("circle")
                         .attr("cx", this._iconSize / 2)
                         .attr("cy", this._iconSize / 2)
-                        .attr("r", 16)
-                        .attr("fill", "none")
-                        .attr("stroke-width", "4")
-                        .attr("stroke", colourWhite);
+                        .attr("r", 16);
 
                     const patternCapitalAvail = svgDef
                         .append("pattern")
@@ -455,10 +452,7 @@ export default class DisplayPorts {
                         .append("circle")
                         .attr("cx", this._iconSize / 2)
                         .attr("cy", this._iconSize / 2)
-                        .attr("r", 16)
-                        .attr("fill", "none")
-                        .attr("stroke-width", "4")
-                        .attr("stroke", colourWhite);
+                        .attr("r", 16);
                 }
             });
     }
