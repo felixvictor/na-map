@@ -407,7 +407,7 @@ export default class DisplayPorts {
                     .attr("width", this._iconSize)
                     .attr("href", this._nationIcons[nation].replace('"', "").replace('"', ""));
 
-                if (nation !== "NT" && nation !== "FT") {
+                if (nation !== "FT") {
                     const patternAvail = svgDef
                         .append("pattern")
                         .attr("id", `${nation}a`)
@@ -436,7 +436,9 @@ export default class DisplayPorts {
                         .attr("cx", this._iconSize / 2)
                         .attr("cy", this._iconSize / 2)
                         .attr("r", 16);
+                }
 
+                if (nation !== "NT" && nation !== "FT") {
                     const patternCapitalAvail = svgDef
                         .append("pattern")
                         .attr("id", `${nation}ca`)
