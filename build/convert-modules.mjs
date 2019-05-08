@@ -1,4 +1,13 @@
-// eslint-disable-next-line import/extensions
+/**
+ * This file is part of na-map.
+ *
+ * @file      Convert modules.
+ * @module    build/convert-modules
+ * @author    iB aka Felix Victor
+ * @copyright 2017, 2018, 2019
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
 import { capitalizeFirstLetter, groupBy, readJson, saveJson, sortBy } from "./common.mjs";
 
 const itemsFilename = process.argv[2];
@@ -38,6 +47,8 @@ function convertModules() {
         }
     ];
 
+    const bonusRegex = new RegExp("(.+\\sBonus)\\s(\\d)", "u");
+
     woodJson.trim = [];
     woodJson.frame = [];
 
@@ -52,7 +63,7 @@ function convertModules() {
     modifiers.set("ARMOR_ALL_SIDES MODULE_BASE_HP", "Armour strength");
     modifiers.set("CREW MODULE_BASE_HP", "Crew");
     modifiers.set("INTERNAL_STRUCTURE MODULE_BASE_HP", "Hull strength");
-    modifiers.set("NONE CREW_DAMAGE_RECEIVED_DECREASE_PERCENT", "Crew protection");
+    modifiers.set("NONE CREW_DAMAGE_RECEIVED_DECREASE_PERCENT", "Splinter resistance");
     modifiers.set("NONE GROG_MORALE_BONUS", "Boarding morale");
     modifiers.set("NONE RUDDER_HALFTURN_TIME", "Rudder speed");
     modifiers.set("NONE SHIP_MATERIAL", "Ship material");
@@ -128,7 +139,7 @@ function convertModules() {
     modifiers.set("NONE PERK_CRAFT_LIGHT_SHIP_LABOR_PRICE_MODIFIER", "Labour hours to craft unrated ship");
     modifiers.set("NONE PERK_CRAFT_LINE_SHIP_LABOR_PRICE_MODIFIER", "Labour hours to craft ship of the line");
     modifiers.set("NONE PERK_CRAFT_SHIP_LABOR_PRICE_MODIFIER", "Labour hours to craft any ship");
-    modifiers.set("NONE PERK_CREW_REPAIR_PERCENT_MODIFIER", "Crew repair");
+    modifiers.set("NONE PERK_CREW_REPAIR_PERCENT_MODIFIER", "Crew repair amount");
     modifiers.set("NONE PERK_DONT_CONSUME_BATTLE_REPAIRS", "DONT_CONSUME_BATTLE_REPAIRS");
     modifiers.set("NONE PERK_EMERGENCY_REPAIR_COOLDOWN_MODIFIER", "Emergency repair cooldown");
     modifiers.set("NONE PERK_ENABLE_DOUBLE_CHARGE", "Double charge");
@@ -136,7 +147,7 @@ function convertModules() {
     modifiers.set("NONE PERK_FISHING_DROP_CHANCE_MODIFIER", "Fish");
     modifiers.set("NONE PERK_HEEL_DEGREES_MODIFIER", "Heel degrees");
     modifiers.set("NONE PERK_HOLD_MAX_WEIGHT_MODIFIER", "Hold weight");
-    modifiers.set("NONE PERK_HULL_REPAIR_PERCENT_MODIFIER", "Hull repair amount");
+    modifiers.set("NONE PERK_HULL_REPAIR_PERCENT_MODIFIER", "Armour repair amount (perk)");
     modifiers.set("NONE PERK_LABOR_HOURS_GENERATION_MODIFIER", "Labour hour generation");
     modifiers.set("NONE PERK_LABOR_HOURS_WALLET_MODIFIER", "Labour hour wallet");
     modifiers.set("NONE PERK_MAX_FLEET_SIZE_MODIFIER", "Fleet ships");
@@ -149,7 +160,7 @@ function convertModules() {
     modifiers.set("NONE PERK_PUMP_WATER_BAILING_MODIFIER", "Pump water bailing");
     modifiers.set("NONE PERK_RECOVER_LOST_CREW_PERCENT", "Recover lost crew");
     modifiers.set("NONE PERK_SAIL_DAMAGE_MODIFIER", "Sail damage");
-    modifiers.set("NONE PERK_SAIL_REPAIR_PERCENT_MODIFIER", "Sail repair amount");
+    modifiers.set("NONE PERK_SAIL_REPAIR_PERCENT_MODIFIER", "Sail repair amount (perk)");
     modifiers.set("NONE PERK_SHIP_EXTRA_CHAIN_UNITS", "Additional chains");
     modifiers.set("NONE PERK_SHIP_EXTRA_DOBULE_CHARGE_UNITS", "Additional double charges"); // typo
     modifiers.set("NONE PERK_SHIP_EXTRA_DOUBLE_CHARGE_UNITS", "Additional double charges");
@@ -175,9 +186,9 @@ function convertModules() {
     modifiers.set("NONE WATER_PUMP_BAILING", "Water pump bailing");
     modifiers.set("POWDER POWDER_RADIUS", "Powder radius");
     modifiers.set("POWDER REPAIR_MODULE_TIME", "Powder repair module time");
-    modifiers.set("REPAIR_ARMOR REPAIR_PERCENT", "Armour repair");
+    modifiers.set("REPAIR_ARMOR REPAIR_PERCENT", "Armour repair amount");
     modifiers.set("REPAIR_GENERIC REPAIR_PERCENT", "Generic repair amount");
-    modifiers.set("REPAIR_SAIL REPAIR_PERCENT", "Sail repair");
+    modifiers.set("REPAIR_SAIL REPAIR_PERCENT", "Sail repair amount");
     modifiers.set("RUDDER MODULE_BASE_HP", "Rudder health");
     modifiers.set("RUDDER REPAIR_MODULE_TIME", "Rudder repair time");
     modifiers.set("SAIL MODULE_BASE_HP", "Sail health");
@@ -211,7 +222,7 @@ function convertModules() {
 
                 // Some modifiers are wrongly indicated as a percentage
                 if (
-                    modifierName === "Crew protection" ||
+                    modifierName === "Splinter resistance" ||
                     modifierName === "Boarding morale" ||
                     modifierName === "Fire resistance" ||
                     modifierName === "Leak resistance"
@@ -227,7 +238,7 @@ function convertModules() {
                     amount = -amount;
                 }
 
-                if (modifierName === "Crew protection") {
+                if (modifierName === "Splinter resistance") {
                     amount *= 100;
                 }
 
@@ -271,8 +282,16 @@ function convertModules() {
             let isPercentage = true;
 
             if (modifier.Absolute) {
-                amount =
-                    Math.abs(modifier.Absolute) >= 1 ? modifier.Absolute : Math.round(modifier.Absolute * 10000) / 100;
+                if (
+                    Math.abs(modifier.Absolute) >= 1 ||
+                    modifier.MappingIds[0].endsWith("PERCENT_MODIFIER") ||
+                    modifier.MappingIds[0] === "REPAIR_PERCENT"
+                ) {
+                    amount = modifier.Absolute;
+                } else {
+                    amount = Math.round(modifier.Absolute * 10000) / 100;
+                }
+
                 isPercentage = false;
             }
 
@@ -282,7 +301,7 @@ function convertModules() {
                 modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`) === "Rudder speed"
             ) {
                 amount = -amount;
-            } else if (modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`) === "Crew protection") {
+            } else if (modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`) === "Splinter resistance") {
                 amount = Math.round(modifier.Absolute * 10000) / 100;
             }
 
@@ -305,7 +324,7 @@ function convertModules() {
 
         if (
             module.usageType === "All" &&
-            module.sortingGroup === "speed_turn" &&
+            module.sortingGroup &&
             module.moduleLevel === "U" &&
             module.moduleType === "Hidden"
         ) {
@@ -314,7 +333,7 @@ function convertModules() {
             type = "Permanent";
         } else if (
             module.usageType === "All" &&
-            module.sortingGroup === "" &&
+            !module.sortingGroup &&
             module.moduleLevel === "U" &&
             module.moduleType === "Hidden"
         ) {
@@ -330,10 +349,14 @@ function convertModules() {
             sortingGroup = "survival";
         }
 
-        sortingGroup =
-            sortingGroup && type !== "Ship trim"
+        if (type === "Ship trim") {
+            const result = bonusRegex.exec(module.name);
+            sortingGroup = result ? `\u202F\u2013\u202f${result[1]}` : "";
+        } else {
+            sortingGroup = sortingGroup
                 ? `\u202F\u2013\u202f${capitalizeFirstLetter(module.sortingGroup).replace("_", "/")}`
                 : "";
+        }
 
         return `${type}${sortingGroup}`;
     }

@@ -12,7 +12,7 @@
 import * as fs from "fs";
 import xml2Json from "xml2json";
 
-import { readTextFile, round, saveJson } from "./common.mjs";
+import { readTextFile, round, saveJson, sortBy } from "./common.mjs";
 
 const inDirectory = process.argv[2];
 const filename = process.argv[3];
@@ -64,7 +64,8 @@ function convertCannons() {
             const fileNameFirstPart = fileName.slice(0, fileName.indexOf(" "));
             if (
                 (fileNameFirstPart === "cannon" && fileName !== "cannon repair kit.xml") ||
-                fileNameFirstPart === "carronade"
+                fileNameFirstPart === "carronade" ||
+                fileName.startsWith("tower cannon")
             ) {
                 fileNames.add(fileName);
             }
@@ -95,7 +96,8 @@ function convertCannons() {
         ["CANNON_DISPERSION_PER100M", { group: "dispersion", element: "per 100m" }],
         ["CANNON_DISPERSION_VERTICAL_PER100M", { group: "dispersion", element: "vertical per 100m" }],
         // ["CANNON_DISPERSION_REDUCTION_SPEED", { group: "dispersion", element: "reduction speed" }],
-        ["CANNON_RELOAD_TIME", { group: "generic", element: "reload time" }],
+        ["CANNON_RELOAD_TIME", { group: "damage", element: "reload time" }],
+        ["CANNON_MASS", { group: "generic", element: "weight" }],
         // ["DAMAGE_TYPE", { group: "damage", element: "type" }],
         // ["MODULE_BASE_HP", { group: "strength", element: "base" }],
         ["CANNON_BASIC_PENETRATION", { group: "damage", element: "penetration" }],
@@ -104,12 +106,7 @@ function convertCannons() {
         // ["CANNON_BALL_RADIUS", { group: "generic", element: "ball radius" }],
         // ["CANNON_FIREZONE_HORIZONTAL_ROTATION_SPEED", { group: "dispersion", element: "horizontal rotation speed" }],
         // ["CANNON_BULLETS_PER_SHOT", { group: "generic", element: "bullets per shot" }],
-        /*
-        [
-            "CANNON_DISPERSION_REDUCTION_ANGLE_CHANGE_MULTIPLIER",
-            { group: "dispersion", element: "reduction angle change modifier" }
-        ],
-        */
+        // ["CANNON_DISPERSION_REDUCTION_ANGLE_CHANGE_MULTIPLIER", { group: "dispersion", element: "reduction angle change modifier" }],
         // ["CANNON_DISPERSION_SHIP_PITCHING_MODIFIER", { group: "dispersion", element: "shi pitching modifier" }],
         // ["CANNON_FORWARD_FLY_TIME", { group: "generic", element: "forward fly time" }],
         // ["CANNON_FORWARD_FIREPOWER_LOSS", { group: "generic", element: "firepower loss" }],
@@ -144,7 +141,9 @@ function convertCannons() {
             .replace(" Long", "")
             .replace("Salvaged ", "")
             .replace("0.5 E", "E")
-            .replace(/^(\d+) - (.+)$/g, "$1 ($2)");
+            .replace(/^(\d+) - (.+)$/g, "$1 ($2)")
+            .replace(/^Tower (\d+)$/g, "$1 (Tower)")
+            .replace(" Gun", "");
         const cannon = {
             name
         };
@@ -166,8 +165,8 @@ function convertCannons() {
         // Calculate penetrations
         const penetrations = new Map(
             fileData.ModuleTemplate.Attributes.Pair.find(pair => pair.Key === "CANNON_PENETRATION_DEGRADATION")
-                .Value.Value.filter(pene => Number(pene.Time) > 0)
-                .map(pene => [pene.Time * 1000, Number(pene.Value)])
+                .Value.Value.filter(penetration => Number(penetration.Time) > 0)
+                .map(penetration => [penetration.Time * 1000, Number(penetration.Value)])
         );
         penetrations.set(250, (penetrations.get(200) + penetrations.get(300)) / 2);
         penetrations.set(500, (penetrations.get(400) + penetrations.get(600)) / 2);
@@ -183,16 +182,11 @@ function convertCannons() {
 
         // Calculate damage per second
         cannon.damage["per second"] = {
-            value: round(cannon.damage.basic.value / cannon.generic["reload time"].value, 2),
+            value: round(cannon.damage.basic.value / cannon.damage["reload time"].value, 2),
             digits: 0
         };
 
-        cannons[type].push(
-            Object.keys(cannon)
-                .sort()
-                // eslint-disable-next-line no-return-assign,no-sequences
-                .reduce((r, k) => ((r[k] = cannon[k]), r), {})
-        );
+        cannons[type].push(cannon);
     }
 
     /**

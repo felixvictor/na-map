@@ -4,7 +4,7 @@
  * @file      List buildings.
  * @module    game-tools/list-buildings
  * @author    iB aka Felix Victor
- * @copyright 2018
+ * @copyright 2018, 2019
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -105,10 +105,10 @@ export default class ListBuildings {
             if (currentBuilding.resource.price) {
                 text += '<table class="table table-sm card-table"><tbody>';
                 text += `<tr><td>${getCurrencyAmount(currentBuilding.resource.price)} per unit</td></tr>`;
-                if (typeof currentBuilding.batch !== "undefined") {
-                    text += `<tr><td>Batch of ${currentBuilding.batch.amount} units at ${getCurrencyAmount(
-                        currentBuilding.batch.price
-                    )}</td></tr>`;
+                if (currentBuilding.batch) {
+                    text += `<tr><td>${currentBuilding.batch.labour} labour hour${
+                        currentBuilding.batch.labour > 1 ? "s" : ""
+                    } per unit</td></tr>`;
                 }
 
                 text += "</tbody></table>";
@@ -124,16 +124,18 @@ export default class ListBuildings {
         text += '<table class="table table-sm card-table"><thead>';
 
         if (currentBuilding.levels[0].materials.length) {
-            text += "<tr><th>Level</th><th>Level build materials</th></tr>";
+            text += "<tr><th>Level</th><th>Level build materials</th><th>Build price (reals)</th></tr>";
             text += "</thead><tbody>";
             currentBuilding.levels.forEach((level, i) => {
                 text += `<tr><td>${i + 1}</td><td class="text-left">`;
                 text += level.materials.map(material => `${formatInt(material.amount)} ${material.item}`).join("<br>");
-                text += "</td></tr>";
+                text += "</td>";
+                text += `<td>${formatInt(level.price)}</td>`;
+                text += "</tr>";
             });
         } else {
             text +=
-                "<tr><th>Level</th><th>Production (units)</th><th>Labour cost (%)</th><th>Storage (units)</th><th>Build price (reals)</th></tr>";
+                "<tr><th>Level</th><th>Production</th><th>Labour cost (%)</th><th>Storage</th><th>Build price (reals)</th></tr>";
             text += "</thead><tbody>";
             currentBuilding.levels.forEach((level, i) => {
                 text += `<tr><td>${i + 1}</td><td>${formatInt(level.production)}</td><td>${formatInt(
@@ -157,12 +159,12 @@ export default class ListBuildings {
 
         let text = '<div class="row no-gutters card-deck">';
 
-        text += '<div class="card col-4"><div class="card-header">Product</div>';
+        text += '<div class="card col-5"><div class="card-header">Product</div>';
         text += '<div class="card-body product">';
         text += this._getProductText(currentBuilding);
         text += "</div></div>";
 
-        text += '<div class="card col-8"><div class="card-header">Requirements</div>';
+        text += '<div class="card col-7"><div class="card-header">Requirements</div>';
         text += '<div class="card-body px-0 requirements">';
         text += this._getRequirementText(currentBuilding);
         text += "</div></div>";
