@@ -6,6 +6,18 @@ const date = process.argv[4];
 
 const APIItems = readJson(`${itemsFilename}-ItemTemplates-${date}.json`);
 
+const obsoleteBuildings = [
+    "Compass Wood Forest",
+    "Copper Ore Mine",
+    "Gold Mine",
+    "Pine Forest",
+    "Red Wood Forest",
+    "Saltpeter Cave",
+    "Silver Mine",
+    "Sulphur Mine",
+    "Tobacco Plantation"
+];
+
 // https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
 // eslint-disable-next-line no-extend-native,func-names
 String.prototype.replaceAll = function(search, replacement) {
@@ -114,14 +126,7 @@ function convertBuildings() {
                 building.batch = [];
             }
 
-            if (
-                building.name === "Gold Mine" ||
-                building.name === "Silver Mine" ||
-                building.name === "Compass Wood Forest" ||
-                building.name === "Copper Ore Mine" ||
-                building.name === "Pine Forest" ||
-                building.name === "Red Wood Forest"
-            ) {
+            if (obsoleteBuildings.includes(building.name)) {
                 dontSave = true;
             } else {
                 // console.log(building.id, building.name);
