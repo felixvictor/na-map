@@ -23,6 +23,7 @@ export default class ListLoot {
         this._baseId = "loot-list";
         this._buttonId = `button-${this._baseId}`;
         this._modalId = `modal-${this._baseId}`;
+        this._modal$ = null;
 
         this._types = ["loot", "chests", "items"];
         this._select$ = {};
@@ -125,9 +126,23 @@ export default class ListLoot {
         `;
     }
 
+    _getModalFooter() {
+        return html`
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                Close
+            </button>
+        `;
+    }
+
     _injectModal() {
         render(
-            insertBaseModalHTML(this._modalId, this._baseName, this._getModalBody.bind(this), "md"),
+            insertBaseModalHTML({
+                id: this._modalId,
+                title: this._baseName,
+                size: "md",
+                body: this._getModalBody.bind(this),
+                footer: this._getModalFooter
+            }),
             document.getElementById("modal-section")
         );
     }
@@ -161,12 +176,13 @@ export default class ListLoot {
 
     _sourceListSelected() {
         // If the modal has no content yet, insert it
-        if (!document.getElementById(this._modalId)) {
+        if (!this._modal$) {
             this._initModal();
+            this._modal$ = $(`#${this._modalId}`);
         }
 
         // Show modal
-        $(`#${this._modalId}`).modal("show");
+        this._modal$.modal("show");
     }
 
     _getItemData(selectedItemId) {
@@ -184,7 +200,7 @@ export default class ListLoot {
                 <thead>
                     <tr>
                         <th scope="col">Item</th>
-                        <th scope="col" class="text-right">Chance (%)</th>
+                        <th scope="col" class="text-right">Chance (0\u202F\u2212\u202F100)</th>
                         <th scope="col" class="text-right">Amount</th>
                     </tr>
                 </thead>

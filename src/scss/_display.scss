@@ -718,3 +718,11 @@ svg {
     stroke: $secondary-500;
     stroke-width: 1px;
 }
+
+// capital ports
+pattern > circle {
+    stroke-opacity: 0.8;
+    stroke-width: 4;
+    stroke: $white;
+    fill: none;
+}
