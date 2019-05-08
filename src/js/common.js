@@ -179,7 +179,7 @@ export const initTablesort = () => {
     );
 };
 
-export const insertBaseModalHTML = (id, title, getModalBody, size = "xl", buttonText = "Close") => {
+export const insertBaseModalHTML = ({ id, title, size = "xl", body, footer }) => {
     const modalSize = size === "xl" || size === "lg" || size === "sm" ? ` modal-${size}` : "";
 
     return html`
@@ -191,17 +191,34 @@ export const insertBaseModalHTML = (id, title, getModalBody, size = "xl", button
                             ${title}
                         </h5>
                     </div>
-                    <div class="modal-body">${getModalBody()}</div>
+                    <div class="modal-body">${body()}</div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                            ${buttonText}
-                        </button>
+                        ${footer()}
                     </div>
                 </div>
             </div>
         </div>
     `;
 };
+
+export const colourList = [
+    "#e7a800",
+    "#e621dd",
+    "#d3e700",
+    "#de78ff",
+    "#01d36b",
+    "#ff3205",
+    "#4df3ff",
+    "#910016",
+    "#01caf0",
+    "#ad0054",
+    "#c8ff9f",
+    "#0143a8",
+    "#00a97f",
+    "#70a4ff",
+    "#312800",
+    "#ffa29f"
+];
 
 /**
  * Get currency
@@ -230,34 +247,22 @@ const secondsForFullCircle = 48 * 60 + 55;
 export const fullCircle = 360;
 export const degreesPerSecond = fullCircle / secondsForFullCircle;
 
-// eslint-disable-next-line no-undef
+/* eslint-disable-next-line no-undef */
 export const colourGreen = CGREEN;
-// eslint-disable-next-line no-undef
 export const colourGreenLight = CGREENLIGHT;
-// eslint-disable-next-line no-undef
 export const colourGreenDark = CGREENDARK;
-// eslint-disable-next-line no-undef
 export const colourRed = CRED;
-// eslint-disable-next-line no-undef
 export const colourRedLight = CREDLIGHT;
-// eslint-disable-next-line no-undef
 export const colourRedDark = CREDDARK;
-// eslint-disable-next-line no-undef
 export const colourWhite = CWHITE;
-// eslint-disable-next-line no-undef
 export const primary300 = CPRIMARY300;
-// eslint-disable-next-line no-undef
 export const iconSmallSrc = ICONSMALL;
 
-// eslint-disable-next-line no-undef
-export const hullRepairsFactor = REPAIR_ARMOR_VOLUME / REPAIR_ARMOR_PERCENT;
-// eslint-disable-next-line no-undef
+/* eslint-disable-next-line no-undef */
+export const hullRepairsVolume = REPAIR_ARMOR_VOLUME;
 export const hullRepairsPercent = REPAIR_ARMOR_PERCENT;
-// eslint-disable-next-line no-undef
-export const rigRepairsFactor = REPAIR_SAIL_VOLUME / REPAIR_SAIL_PERCENT;
-// eslint-disable-next-line no-undef
+export const repairTime = REPAIR_ARMOR_TIME;
+export const rigRepairsVolume = REPAIR_SAIL_VOLUME;
 export const rigRepairsPercent = REPAIR_SAIL_PERCENT;
-// eslint-disable-next-line no-undef
-export const rumRepairsFactor = REPAIR_CREW_VOLUME / REPAIR_CREW_PERCENT;
-// eslint-disable-next-line no-undef
+export const rumRepairsVolume = REPAIR_CREW_VOLUME;
 export const rumRepairsPercent = REPAIR_CREW_PERCENT;
