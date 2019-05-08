@@ -80,6 +80,7 @@ function convertRecipes() {
         const recipe = {
             id: APIrecipe.Id,
             name: APIrecipe.Name.replaceAll("'", "’")
+                .replace("u00E4", "ä")
                 .replace(" Blueprint", "")
                 .replace(" - ", " – ")
                 .replace("u2013", "–")
