@@ -1588,7 +1588,7 @@ export default class CompareShips {
             });
         };
 
-        const setmodifierAmounts = () => {
+        const setModifierAmounts = () => {
             this._selectedUpgradeIdsList[compareId].forEach(id => {
                 const module = this._moduleProperties.get(id);
 
@@ -1674,7 +1674,7 @@ export default class CompareShips {
             return data;
         }
 
-        setmodifierAmounts();
+        setModifierAmounts();
         adjustDataByModifiers();
         adjustDataByCaps();
         if (modifierAmounts.has("Ship speed")) {
@@ -1690,7 +1690,10 @@ export default class CompareShips {
      * @returns {void}
      */
     _refreshShips(compareId) {
-        this._modulesSelected(compareId);
+        if (this._baseId !== "ship-journey") {
+            this._modulesSelected(compareId);
+        }
+
         const singleShipData = this._getShipData(compareId);
 
         if (this._baseId === "ship-journey") {
@@ -1766,7 +1769,10 @@ export default class CompareShips {
         this._selectShip$[compareId]
             .on("changed.bs.select", () => {
                 this._shipIds[compareId] = Number(this._selectShip$[compareId].val());
-                this._setupModulesSelect(compareId);
+                if (this._baseId !== "ship-journey") {
+                    this._setupModulesSelect(compareId);
+                }
+
                 this._refreshShips(compareId);
                 if (compareId === "Base" && this._baseId !== "ship-journey") {
                     this._enableCompareSelects();
