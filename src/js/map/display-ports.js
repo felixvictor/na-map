@@ -408,18 +408,6 @@ export default class DisplayPorts {
                     .attr("href", this._nationIcons[nation].replace('"', "").replace('"', ""));
 
                 if (nation !== "FT") {
-                    const patternAvail = svgDef
-                        .append("pattern")
-                        .attr("id", `${nation}a`)
-                        .attr("width", "133%")
-                        .attr("height", "100%")
-                        .attr("viewBox", `6 6 ${this._iconSize} ${this._iconSize * 0.75}`);
-                    patternAvail
-                        .append("image")
-                        .attr("height", this._iconSize)
-                        .attr("width", this._iconSize)
-                        .attr("href", this._nationIcons[`${nation}a`].replace('"', "").replace('"', ""));
-
                     const patternCapital = svgDef
                         .append("pattern")
                         .attr("id", `${nation}c`)
@@ -439,6 +427,18 @@ export default class DisplayPorts {
                 }
 
                 if (nation !== "NT" && nation !== "FT") {
+                    const patternAvail = svgDef
+                        .append("pattern")
+                        .attr("id", `${nation}a`)
+                        .attr("width", "133%")
+                        .attr("height", "100%")
+                        .attr("viewBox", `6 6 ${this._iconSize} ${this._iconSize * 0.75}`);
+                    patternAvail
+                        .append("image")
+                        .attr("height", this._iconSize)
+                        .attr("width", this._iconSize)
+                        .attr("href", this._nationIcons[`${nation}a`].replace('"', "").replace('"', ""));
+
                     const patternCapitalAvail = svgDef
                         .append("pattern")
                         .attr("id", `${nation}ca`)
