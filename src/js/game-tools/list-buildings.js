@@ -4,7 +4,7 @@
  * @file      List buildings.
  * @module    game-tools/list-buildings
  * @author    iB aka Felix Victor
- * @copyright 2018
+ * @copyright 2018, 2019
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -105,10 +105,10 @@ export default class ListBuildings {
             if (currentBuilding.resource.price) {
                 text += '<table class="table table-sm card-table"><tbody>';
                 text += `<tr><td>${getCurrencyAmount(currentBuilding.resource.price)} per unit</td></tr>`;
-                if (typeof currentBuilding.batch !== "undefined") {
-                    text += `<tr><td>Batch of ${currentBuilding.batch.amount} units at ${getCurrencyAmount(
-                        currentBuilding.batch.price
-                    )} and ${currentBuilding.batch.labour} labour hours</td></tr>`;
+                if (currentBuilding.batch) {
+                    text += `<tr><td>${currentBuilding.batch.labour} labour hour${
+                        currentBuilding.batch.labour > 1 ? "s" : ""
+                    } per unit</td></tr>`;
                 }
 
                 text += "</tbody></table>";
