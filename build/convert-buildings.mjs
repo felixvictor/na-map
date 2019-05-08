@@ -6,6 +6,18 @@ const date = process.argv[4];
 
 const APIItems = readJson(`${itemsFilename}-ItemTemplates-${date}.json`);
 
+const obsoleteBuildings = [
+    "Compass Wood Forest",
+    "Copper Ore Mine",
+    "Gold Mine",
+    "Pine Forest",
+    "Red Wood Forest",
+    "Saltpeter Cave",
+    "Silver Mine",
+    "Sulphur Mine",
+    "Tobacco Plantation"
+];
+
 // https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
 // eslint-disable-next-line no-extend-native,func-names
 String.prototype.replaceAll = function(search, replacement) {
@@ -47,19 +59,24 @@ function getItemsCraftedByAcademy() {
  */
 function convertBuildings() {
     const buildings = new Map();
-    const resources = new Map();
-    const resourceRecipes = new Map();
 
-    APIItems.forEach(APIresource => {
-        resources.set(APIresource.Id, { name: APIresource.Name.replaceAll("'", "’"), price: APIresource.BasePrice });
-    });
+    const resources = new Map(
+        APIItems.map(APIresource => [
+            APIresource.Id,
+            { name: APIresource.Name.replaceAll("'", "’"), price: APIresource.BasePrice }
+        ])
+    );
 
-    APIItems.filter(item => item.ItemType === "RecipeResource").forEach(recipe => {
-        resourceRecipes.set(recipe.Results[0].Template, {
-            price: recipe.GoldRequirements,
-            amount: recipe.Results[0].Amount
-        });
-    });
+    const resourceRecipes = new Map(
+        APIItems.filter(item => item.ItemType === "RecipeResource").map(recipe => [
+            recipe.Results[0].Template,
+            {
+                price: recipe.GoldRequirements,
+                amount: recipe.Results[0].Amount,
+                labour: recipe.LaborPrice
+            }
+        ])
+    );
 
     APIItems.filter(item => item.ItemType === "Building").forEach(APIbuilding => {
         let dontSave = false;
@@ -109,18 +126,7 @@ function convertBuildings() {
                 building.batch = [];
             }
 
-            if (
-                building.name === "Gold Mine" ||
-                building.name === "Silver Mine" ||
-                building.name === "Bermuda Cedar Forest" ||
-                building.name === "Compass Wood Forest" ||
-                building.name === "Copper Ore Mine" ||
-                building.name === "Live Oak Forest" ||
-                building.name === "Mahogany Forest" ||
-                building.name === "Pine Forest" ||
-                building.name === "Red Wood Forest" ||
-                building.name === "Teak Forest"
-            ) {
+            if (obsoleteBuildings.includes(building.name)) {
                 dontSave = true;
             } else {
                 // console.log(building.id, building.name);
