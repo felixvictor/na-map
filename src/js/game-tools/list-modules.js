@@ -9,7 +9,7 @@
  */
 
 import { select as d3Select } from "d3-selection";
-import { chunkify, formatSignInt, formatSignPercent, getOrdinal } from "../util";
+import { chunkify, formatPP, formatSignInt, formatSignPercent, getOrdinal } from "../util";
 import { registerEvent } from "../analytics";
 import { insertBaseModal } from "../common";
 
@@ -147,7 +147,7 @@ export default class ListModules {
                                 .map(property => {
                                     const amount = property.isPercentage
                                         ? formatSignPercent(property.amount / 100)
-                                        : formatSignInt(property.amount);
+                                        : property.amount<1?formatPP(property.amount):formatSignInt(property.amount);
                                     return `${property.modifier} ${amount}`;
                                 })
                                 .join("<br>")}</td></tr>`
