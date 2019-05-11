@@ -29,8 +29,7 @@ String.prototype.replaceAll = function(search, replacement) {
  */
 function convertModules() {
     const modules = new Map();
-    const levels = new Map();
-    const modifiers = new Map();
+
     const woodJson = {};
     const moduleRate = [
         {
@@ -52,152 +51,157 @@ function convertModules() {
     woodJson.trim = [];
     woodJson.frame = [];
 
-    levels.set("Universal", "U");
-    levels.set("Regular", "R");
-    levels.set("LightShips", "S");
-    levels.set("Medium", "M");
-    levels.set("LineShips", "L");
+    const levels = new Map([
+        ["Universal", "U"],
+        ["Regular", "R"],
+        ["LightShips", "S"],
+        ["Medium", "M"],
+        ["LineShips", "L"]
+    ]);
 
     // Woods
-    modifiers.set("ARMOR_ALL_SIDES ARMOR_THICKNESS", "Armor thickness");
-    modifiers.set("ARMOR_ALL_SIDES MODULE_BASE_HP", "Armour strength");
-    modifiers.set("CREW MODULE_BASE_HP", "Crew");
-    modifiers.set("INTERNAL_STRUCTURE MODULE_BASE_HP", "Hull strength");
-    modifiers.set("NONE CREW_DAMAGE_RECEIVED_DECREASE_PERCENT", "Splinter resistance");
-    modifiers.set("NONE GROG_MORALE_BONUS", "Boarding morale");
-    modifiers.set("NONE RUDDER_HALFTURN_TIME", "Rudder speed");
-    modifiers.set("NONE SHIP_MATERIAL", "Ship material");
-    modifiers.set("NONE SHIP_MAX_SPEED", "Ship speed");
-    modifiers.set("NONE SHIP_PHYSICS_ACC_COEF", "Acceleration");
-    modifiers.set("NONE SHIP_TURNING_SPEED", "Turn speed");
-    modifiers.set("SAIL MAST_THICKNESS", "Mast thickness");
-    modifiers.set("STRUCTURE FIRE_INCREASE_RATE", "Fire resistance");
-    modifiers.set("STRUCTURE SHIP_PHYSICS_ACC_COEF", "Acceleration");
-    modifiers.set("STRUCTURE SHIP_STRUCTURE_LEAKS_PER_SECOND", "Leak resistance");
+    const modifiers = new Map([
+        ["ARMOR_ALL_SIDES ARMOR_THICKNESS", "Armor thickness"],
+        ["ARMOR_ALL_SIDES MODULE_BASE_HP", "Armour strength"],
+        ["CREW MODULE_BASE_HP", "Crew"],
+        ["INTERNAL_STRUCTURE MODULE_BASE_HP", "Hull strength"],
+        ["NONE CREW_DAMAGE_RECEIVED_DECREASE_PERCENT", "Splinter resistance"],
+        ["NONE GROG_MORALE_BONUS", "Boarding morale"],
+        ["NONE RUDDER_HALFTURN_TIME", "Rudder speed"],
+        ["NONE SHIP_MATERIAL", "Ship material"],
+        ["NONE SHIP_MAX_SPEED", "Ship speed"],
+        ["NONE SHIP_PHYSICS_ACC_COEF", "Acceleration"],
+        ["NONE SHIP_TURNING_SPEED", "Turn speed"],
+        ["SAIL MAST_THICKNESS", "Mast thickness"],
+        ["STRUCTURE FIRE_INCREASE_RATE", "Fire resistance"],
+        ["STRUCTURE SHIP_PHYSICS_ACC_COEF", "Acceleration"],
+        ["STRUCTURE SHIP_STRUCTURE_LEAKS_PER_SECOND", "Leak resistance"],
 
-    // Modules
-    modifiers.set("ARMOR_ALL_SIDES REPAIR_MODULE_TIME", "Side armour repair time");
-    modifiers.set("ARMOR_BACK ARMOR_THICKNESS", "Back armour thickness");
-    modifiers.set("ARMOR_FRONT ARMOR_THICKNESS", "Front armour thickness");
-    modifiers.set("DECK_ALL CANNON_BASIC_PENETRATION", "Cannon ball penetration");
-    modifiers.set("DECK_ALL CANNON_CREW_REQUIRED", "Cannon crew required");
-    modifiers.set("DECK_ALL CANNON_DISPERSION_PER100M", "Cannon dispersion per 100m");
-    modifiers.set(
-        "DECK_ALL CANNON_DISPERSION_PER100M,CANNON_DISPERSION_VERTICAL_PER100M",
-        "Cannon dispersion per 100m, cannon vertical dispersion per 100m"
-    );
-    modifiers.set("DECK_ALL CANNON_DISPERSION_REDUCTION_SPEED", "Cannon dispersion reduction speed");
-    modifiers.set("DECK_ALL CANNON_DISPERSION_VERTICAL_PER100M", "Cannon vertical dispersion per 100m");
-    modifiers.set("DECK_ALL CANNON_MIN_ANGLE,CANNON_MAX_ANGLE", "Cannon min/max angle");
-    modifiers.set("DECK_ALL CANNON_RELOAD_TIME", "Cannon reload time");
-    modifiers.set("DECK_ALL FIRE_PROBABILITY", "Fire probability");
-    modifiers.set(
-        "DECK_CENTRAL CANNON_DISPERSION_PER100M,CANNON_DISPERSION_VERTICAL_PER100M",
-        "Mortar dispersion per 100m, Mortar vertical dispersion per 100m"
-    );
-    modifiers.set("DECK_CENTRAL CANNON_DISPERSION_REDUCTION_SPEED", "Mortar dispersion reduction speed");
-    modifiers.set("MAST MAST_BOTTOM_SECTION_HP,MAST_MIDDLE_SECTION_HP,MAST_TOP_SECTION_HP", "Mast health");
-    modifiers.set("MAST MAST_TOP_SECTION_HP,MAST_MIDDLE_SECTION_HP,MAST_BOTTOM_SECTION_HP", "Mast health");
-    modifiers.set("NONE AXES_ATTACK_BONUS", "Boarding attack");
-    modifiers.set("NONE AXES_DISENGAGE_DURATION", "Boarding disengage time");
-    modifiers.set("NONE BARRICADES_FIREPOWER_BONUS", "Boarding firepower");
-    modifiers.set("NONE BARRICADES_MELEE_BONUS", "Boarding melee");
-    modifiers.set("NONE BOARDING_ATTACK_BONUS", "Boarding attack");
-    modifiers.set("NONE BOARDING_DEFENSE_BONUS", "Boarding defense");
-    modifiers.set("NONE CREW_TRANSFER_SPEED", "Crew transfer speed");
-    modifiers.set("NONE DECK_GUNS_ACCURACY_BONUS", "Deck guns accuracy");
-    modifiers.set("NONE FIRE_DECREASE_RATE", "Fire resistance");
-    modifiers.set("NONE FIREZONE_MAX_HORIZONTAL_ANGLE", "Firezone max horizontal angle");
-    modifiers.set("NONE GLOBAL_SIDEBOARD_WATER_FLOW", "Sideboard water flow");
-    modifiers.set("NONE GRENADES_BONUS", "Grenades");
-    modifiers.set("NONE GROG_ACCURACY_PENALTY", "Accuracy");
-    modifiers.set("NONE GROG_ATTACK_BONUS", "Boarding attack");
-    modifiers.set("NONE HANDBOOK_ATTACK_BONUS", "Boarding attack");
-    modifiers.set("NONE HANDBOOK_DEFENSE_BONUS", "Boarding defense");
-    modifiers.set("NONE HANDBOOK_MORALE_BONUS", "Boarding morale");
-    modifiers.set("NONE HOLE_DECREASE_RATE,RAM_DECREASE_RATE", "Hole and ram decrease rate");
-    modifiers.set("NONE LADDERS_MELEE_PENALTY_REDUCE", "Boarding melee");
-    modifiers.set("NONE MARINES_FIREPOWER_MODIFIER", "Boarding firepower");
-    modifiers.set("NONE MARINES_LEVEL", "Marines level");
-    modifiers.set("NONE MARINES_MELEE_MODIFIER", "Boarding melee");
-    modifiers.set("NONE MARINES_PERCENTAGE", "Marines");
-    modifiers.set("NONE MAST_PHYSICS_JIB_SAIL_FORCE_BONUS", "Jib force");
-    modifiers.set("NONE MAST_PHYSICS_MAIN_SAIL_FORCE_BONUS", "Main sail force");
-    modifiers.set("NONE MAST_PHYSICS_MAIN_SAIL_TORQUE_BONUS", "Main sail torque");
-    modifiers.set("NONE MAST_PHYSICS_SPANKER_SAIL_FORCE_BONUS", "Spanker sail force");
-    modifiers.set("NONE MUSKETS_ACCURACY_BONUS", "Muskets accuracy");
-    modifiers.set("NONE MUSKETS_PERCENTAGE_OF_CREW", "Crew with muskets");
-    modifiers.set("NONE PERK_BOARDING_ATTACK_COST_MODIFIER", "Boarding attack cost");
-    modifiers.set("NONE PERK_BOARDING_DEFEND_COST_MODIFIER", "Boarding defend cost");
-    modifiers.set("NONE PERK_BOARDING_ENEMY_EXTRA_CREW_REQUIREMENT", "Enemy boarding crew needed");
-    modifiers.set("NONE PERK_BOARDING_ENEMY_MORALE_LOSS_MODIFIER", "Enemy boarding morale loss");
-    modifiers.set("NONE PERK_CARRONADE_DISPERSION_MODIFIER", "Carronade dispersion");
-    modifiers.set("NONE PERK_CONTROL_EXIT_TIMER_OVERRIDE_DISTANCE", "Control distance");
-    modifiers.set("NONE PERK_CRAFT_CREW_HIRE_COST_MODIFIER", "Crew hire cost");
-    modifiers.set("NONE PERK_CRAFT_DROP_RECIPE_CHANCE_MODIFIER", "CRAFT_DROP_RECIPE_CHANCE_MODIFIER");
-    modifiers.set("NONE PERK_CRAFT_FRIGATE_SHIP_LABOR_PRICE_MODIFIER", "Labour hours to craft frigate");
-    modifiers.set("NONE PERK_CRAFT_LIGHT_SHIP_LABOR_PRICE_MODIFIER", "Labour hours to craft unrated ship");
-    modifiers.set("NONE PERK_CRAFT_LINE_SHIP_LABOR_PRICE_MODIFIER", "Labour hours to craft ship of the line");
-    modifiers.set("NONE PERK_CRAFT_SHIP_LABOR_PRICE_MODIFIER", "Labour hours to craft any ship");
-    modifiers.set("NONE PERK_CREW_REPAIR_PERCENT_MODIFIER", "Crew repair amount");
-    modifiers.set("NONE PERK_DONT_CONSUME_BATTLE_REPAIRS", "DONT_CONSUME_BATTLE_REPAIRS");
-    modifiers.set("NONE PERK_EMERGENCY_REPAIR_COOLDOWN_MODIFIER", "Emergency repair cooldown");
-    modifiers.set("NONE PERK_ENABLE_DOUBLE_CHARGE", "Double charge");
-    modifiers.set("NONE PERK_ENABLE_DOUBLE_SHOT", "Double shot");
-    modifiers.set("NONE PERK_FISHING_DROP_CHANCE_MODIFIER", "Fish");
-    modifiers.set("NONE PERK_HEEL_DEGREES_MODIFIER", "Heel degrees");
-    modifiers.set("NONE PERK_HOLD_MAX_WEIGHT_MODIFIER", "Hold weight");
-    modifiers.set("NONE PERK_HULL_REPAIR_PERCENT_MODIFIER", "Armour repair amount (perk)");
-    modifiers.set("NONE PERK_LABOR_HOURS_GENERATION_MODIFIER", "Labour hour generation");
-    modifiers.set("NONE PERK_LABOR_HOURS_WALLET_MODIFIER", "Labour hour wallet");
-    modifiers.set("NONE PERK_MAX_FLEET_SIZE_MODIFIER", "Fleet ships");
-    modifiers.set("NONE PERK_MORTAR_BALL_COUNT_MODIFIER", "Additional mortar balls");
-    modifiers.set("NONE PERK_MORTAR_DISPERSION_MODIFIER", "Mortar dispension");
-    modifiers.set("NONE PERK_MORTAR_RELOAD_TIME_MODIFIER", "Mortar reload time");
-    modifiers.set("NONE PERK_NATIONAL_HUNTER_SPEED_ADD_MODIFIER", "National hunter speed modifier");
-    modifiers.set("NONE PERK_PIRATE_HUNTER_RELOAD_TIME_MODIFIER", "Pirate hunter reload time");
-    modifiers.set("NONE PERK_PRESS_GANG", "Press gang");
-    modifiers.set("NONE PERK_PUMP_WATER_BAILING_MODIFIER", "Pump water bailing");
-    modifiers.set("NONE PERK_RECOVER_LOST_CREW_PERCENT", "Recover lost crew");
-    modifiers.set("NONE PERK_SAIL_DAMAGE_MODIFIER", "Sail damage");
-    modifiers.set("NONE PERK_SAIL_REPAIR_PERCENT_MODIFIER", "Sail repair amount (perk)");
-    modifiers.set("NONE PERK_SHIP_EXTRA_CHAIN_UNITS", "Additional chains");
-    modifiers.set("NONE PERK_SHIP_EXTRA_DOBULE_CHARGE_UNITS", "Additional double charges"); // typo
-    modifiers.set("NONE PERK_SHIP_EXTRA_DOUBLE_CHARGE_UNITS", "Additional double charges");
-    modifiers.set("NONE PERK_SHIP_EXTRA_DOUBLE_SHOT_UNITS", "Additional double shots");
-    modifiers.set("NONE PERK_SHIP_MASTER_CLASS_TYPE", "Ship master class type");
-    modifiers.set("NONE PERK_SHIP_MASTER_RELOAD_TIME_MODIFIER", "Ship master reload time modifier");
-    modifiers.set("NONE PERK_SHIP_MASTER_REPAIR_COUNT_ADD_MODIFIER", "Additional repairs");
-    modifiers.set("NONE PERK_SHIP_MASTER_SPEED_ADD_MODIFIER", "Ship master speed add modifier");
-    modifiers.set("NONE PERK_SOLD_SHIP_PRICE_MODIFIER", "Ship sell price");
-    modifiers.set("NONE PERK_START_ALL_GUNS_LOADED", "Guns loaded at start");
-    modifiers.set("NONE PREPARATION_BONUS_PER_ROUND", "Preparation bonus per round");
-    modifiers.set("NONE RHEA_TURN_SPEED", "Yard turn speed");
-    modifiers.set("NONE SAIL_RISING_SPEED", "Sail rising speed");
-    modifiers.set("NONE SHIP_BOARDING_PREPARATION_BONUS", "Boarding preparation bonus");
-    modifiers.set("NONE SHIP_EXTRA_CHAIN_UNITS", "Additional chains");
-    modifiers.set("NONE SHIP_EXTRA_DOBULE_CHARGE_UNITS", "Additional double charges"); // typo
-    modifiers.set("NONE SHIP_EXTRA_DOUBLE_CHARGE_UNITS", "Additional double charges");
-    modifiers.set("NONE SHIP_EXTRA_DOUBLE_SHOT_UNITS", "Additional double shots");
-    modifiers.set("NONE SHIP_MAX_ROLL_ANGLE", "Max roll angle");
-    modifiers.set("NONE SHIP_PHYSICS_DEC_COEF", "Speed decrease");
-    modifiers.set("NONE SHIP_REPAIR_SAIL_CREW_REQUIREMENT,SHIP_REPAIR_ARMOR_CREW_REQUIREMENT", "Repair crew needed");
-    modifiers.set("NONE SHIP_TURNING_SPEED_RHEAS", "Yard turn speed");
-    modifiers.set("NONE WATER_PUMP_BAILING", "Water pump bailing");
-    modifiers.set("POWDER POWDER_RADIUS", "Powder radius");
-    modifiers.set("POWDER REPAIR_MODULE_TIME", "Powder repair module time");
-    modifiers.set("REPAIR_ARMOR REPAIR_PERCENT", "Armour repair amount");
-    modifiers.set("REPAIR_GENERIC REPAIR_PERCENT", "Generic repair amount");
-    modifiers.set("REPAIR_SAIL REPAIR_PERCENT", "Sail repair amount");
-    modifiers.set("RUDDER MODULE_BASE_HP", "Rudder health");
-    modifiers.set("RUDDER REPAIR_MODULE_TIME", "Rudder repair time");
-    modifiers.set("SAIL MODULE_BASE_HP", "Sail health");
-    modifiers.set("SAIL REPAIR_MODULE_TIME", "Sail repair time");
-    modifiers.set("SAIL SAILING_CREW_REQUIRED", "Sailing crew");
-    modifiers.set("STRUCTURE CANNON_MASS", "Cannon mass");
-    modifiers.set("STRUCTURE SHIP_CANNON_DESTROY_PROBABILITY", "Cannon destroy probability");
-    modifiers.set("WATER_PUMP MODULE_BASE_HP", "Water pump health");
-    modifiers.set("WATER_PUMP REPAIR_MODULE_TIME", "Water pump repair time");
+        // Modules
+        ["ARMOR_ALL_SIDES REPAIR_MODULE_TIME", "Side armour repair time"],
+        ["ARMOR_BACK ARMOR_THICKNESS", "Back armour thickness"],
+        ["ARMOR_FRONT ARMOR_THICKNESS", "Front armour thickness"],
+        ["DECK_ALL CANNON_BASIC_PENETRATION", "Cannon ball penetration"],
+        ["DECK_ALL CANNON_CREW_REQUIRED", "Cannon crew required"],
+        ["DECK_ALL CANNON_DISPERSION_PER100M", "Cannon dispersion per 100m"],
+        [
+            "DECK_ALL CANNON_DISPERSION_PER100M,CANNON_DISPERSION_VERTICAL_PER100M",
+            "Cannon dispersion per 100m, cannon vertical dispersion per 100m"
+        ],
+        ["DECK_ALL CANNON_DISPERSION_REDUCTION_SPEED", "Cannon dispersion reduction speed"],
+        ["DECK_ALL CANNON_DISPERSION_VERTICAL_PER100M", "Cannon vertical dispersion per 100m"],
+        ["DECK_ALL CANNON_MIN_ANGLE,CANNON_MAX_ANGLE", "Cannon min/max angle"],
+        ["DECK_ALL CANNON_RELOAD_TIME", "Cannon reload time"],
+        ["DECK_ALL FIRE_PROBABILITY", "Fire probability"],
+        [
+            "DECK_CENTRAL CANNON_DISPERSION_PER100M,CANNON_DISPERSION_VERTICAL_PER100M",
+            "Mortar dispersion per 100m, Mortar vertical dispersion per 100m"
+        ],
+        ["DECK_CENTRAL CANNON_DISPERSION_REDUCTION_SPEED", "Mortar dispersion reduction speed"],
+        ["MAST MAST_BOTTOM_SECTION_HP,MAST_MIDDLE_SECTION_HP,MAST_TOP_SECTION_HP", "Mast health"],
+        ["MAST MAST_TOP_SECTION_HP,MAST_MIDDLE_SECTION_HP,MAST_BOTTOM_SECTION_HP", "Mast health"],
+        ["NONE AXES_ATTACK_BONUS", "Boarding attack"],
+        ["NONE AXES_DISENGAGE_DURATION", "Boarding disengage time"],
+        ["NONE BARRICADES_FIREPOWER_BONUS", "Boarding firepower"],
+        ["NONE BARRICADES_MELEE_BONUS", "Boarding melee"],
+        ["NONE BOARDING_ATTACK_BONUS", "Boarding attack"],
+        ["NONE BOARDING_DEFENSE_BONUS", "Boarding defense"],
+        ["NONE CREW_TRANSFER_SPEED", "Crew transfer speed"],
+        ["NONE DECK_GUNS_ACCURACY_BONUS", "Deck guns accuracy"],
+        ["NONE FIRE_DECREASE_RATE", "Fire resistance"],
+        ["NONE FIRE_INCREASE_RATE", "Fire resistance"],
+        ["NONE FIREZONE_MAX_HORIZONTAL_ANGLE", "Firezone max horizontal angle"],
+        ["NONE GLOBAL_SIDEBOARD_WATER_FLOW", "Sideboard water flow"],
+        ["NONE GRENADES_BONUS", "Grenades"],
+        ["NONE GROG_ACCURACY_PENALTY", "Accuracy"],
+        ["NONE GROG_ATTACK_BONUS", "Boarding attack"],
+        ["NONE HANDBOOK_ATTACK_BONUS", "Boarding attack"],
+        ["NONE HANDBOOK_DEFENSE_BONUS", "Boarding defense"],
+        ["NONE HANDBOOK_MORALE_BONUS", "Boarding morale"],
+        ["NONE HOLE_DECREASE_RATE,RAM_DECREASE_RATE", "Hole and ram decrease rate"],
+        ["NONE LADDERS_MELEE_PENALTY_REDUCE", "Boarding melee"],
+        ["NONE MARINES_FIREPOWER_MODIFIER", "Boarding firepower"],
+        ["NONE MARINES_LEVEL", "Marines level"],
+        ["NONE MARINES_MELEE_MODIFIER", "Boarding melee"],
+        ["NONE MARINES_PERCENTAGE", "Marines"],
+        ["NONE MAST_PHYSICS_JIB_SAIL_FORCE_BONUS", "Jib force"],
+        ["NONE MAST_PHYSICS_MAIN_SAIL_FORCE_BONUS", "Main sail force"],
+        ["NONE MAST_PHYSICS_MAIN_SAIL_TORQUE_BONUS", "Main sail torque"],
+        ["NONE MAST_PHYSICS_SPANKER_SAIL_FORCE_BONUS", "Spanker sail force"],
+        ["NONE MUSKETS_ACCURACY_BONUS", "Muskets accuracy"],
+        ["NONE MUSKETS_PERCENTAGE_OF_CREW", "Additional crew with muskets"],
+        ["NONE PERK_BOARDING_ATTACK_COST_MODIFIER", "Boarding attack cost"],
+        ["NONE PERK_BOARDING_DEFEND_COST_MODIFIER", "Boarding defend cost"],
+        ["NONE PERK_BOARDING_ENEMY_EXTRA_CREW_REQUIREMENT", "Enemy boarding crew needed"],
+        ["NONE PERK_BOARDING_ENEMY_MORALE_LOSS_MODIFIER", "Enemy boarding morale loss"],
+        ["NONE PERK_CARRONADE_DISPERSION_MODIFIER", "Carronade dispersion"],
+        ["NONE PERK_CONTROL_EXIT_TIMER_OVERRIDE_DISTANCE", "Control distance"],
+        ["NONE PERK_CRAFT_CREW_HIRE_COST_MODIFIER", "Crew hire cost"],
+        ["NONE PERK_CRAFT_DROP_RECIPE_CHANCE_MODIFIER", "CRAFT_DROP_RECIPE_CHANCE_MODIFIER"],
+        ["NONE PERK_CRAFT_FRIGATE_SHIP_LABOR_PRICE_MODIFIER", "Labour hours to craft frigate"],
+        ["NONE PERK_CRAFT_LIGHT_SHIP_LABOR_PRICE_MODIFIER", "Labour hours to craft unrated ship"],
+        ["NONE PERK_CRAFT_LINE_SHIP_LABOR_PRICE_MODIFIER", "Labour hours to craft ship of the line"],
+        ["NONE PERK_CRAFT_SHIP_LABOR_PRICE_MODIFIER", "Labour hours to craft any ship"],
+        ["NONE PERK_CREW_REPAIR_PERCENT_MODIFIER", "Crew repair amount"],
+        ["NONE PERK_DONT_CONSUME_BATTLE_REPAIRS", "DONT_CONSUME_BATTLE_REPAIRS"],
+        ["NONE PERK_EMERGENCY_REPAIR_COOLDOWN_MODIFIER", "Emergency repair cooldown"],
+        ["NONE PERK_ENABLE_DOUBLE_CHARGE", "Double charge"],
+        ["NONE PERK_ENABLE_DOUBLE_SHOT", "Double shot"],
+        ["NONE PERK_FISHING_DROP_CHANCE_MODIFIER", "Fish"],
+        ["NONE PERK_HEEL_DEGREES_MODIFIER", "Heel degrees"],
+        ["NONE PERK_HOLD_MAX_WEIGHT_MODIFIER", "Hold weight"],
+        ["NONE PERK_HULL_REPAIR_PERCENT_MODIFIER", "Armour repair amount (perk)"],
+        ["NONE PERK_LABOR_HOURS_GENERATION_MODIFIER", "Labour hour generation"],
+        ["NONE PERK_LABOR_HOURS_WALLET_MODIFIER", "Labour hour wallet"],
+        ["NONE PERK_MAX_FLEET_SIZE_MODIFIER", "Fleet ships"],
+        ["NONE PERK_MORTAR_BALL_COUNT_MODIFIER", "Additional mortar balls"],
+        ["NONE PERK_MORTAR_DISPERSION_MODIFIER", "Mortar dispension"],
+        ["NONE PERK_MORTAR_RELOAD_TIME_MODIFIER", "Mortar reload time"],
+        ["NONE PERK_NATIONAL_HUNTER_SPEED_ADD_MODIFIER", "National hunter speed modifier"],
+        ["NONE PERK_PIRATE_HUNTER_RELOAD_TIME_MODIFIER", "Pirate hunter reload time"],
+        ["NONE PERK_PRESS_GANG", "Press gang"],
+        ["NONE PERK_PUMP_WATER_BAILING_MODIFIER", "Pump water bailing"],
+        ["NONE PERK_RECOVER_LOST_CREW_PERCENT", "Recover lost crew"],
+        ["NONE PERK_SAIL_DAMAGE_MODIFIER", "Sail damage"],
+        ["NONE PERK_SAIL_REPAIR_PERCENT_MODIFIER", "Sail repair amount (perk)"],
+        ["NONE PERK_SHIP_EXTRA_CHAIN_UNITS", "Additional chains"],
+        ["NONE PERK_SHIP_EXTRA_DOBULE_CHARGE_UNITS", "Additional double charges"], // typo
+        ["NONE PERK_SHIP_EXTRA_DOUBLE_CHARGE_UNITS", "Additional double charges"],
+        ["NONE PERK_SHIP_EXTRA_DOUBLE_SHOT_UNITS", "Additional double shots"],
+        ["NONE PERK_SHIP_MASTER_CLASS_TYPE", "Ship master class type"],
+        ["NONE PERK_SHIP_MASTER_RELOAD_TIME_MODIFIER", "Ship master reload time modifier"],
+        ["NONE PERK_SHIP_MASTER_REPAIR_COUNT_ADD_MODIFIER", "Additional repairs"],
+        ["NONE PERK_SHIP_MASTER_SPEED_ADD_MODIFIER", "Ship master speed add modifier"],
+        ["NONE PERK_SOLD_SHIP_PRICE_MODIFIER", "Ship sell price"],
+        ["NONE PERK_START_ALL_GUNS_LOADED", "Guns loaded at start"],
+        ["NONE PREPARATION_BONUS_PER_ROUND", "Preparation bonus per round"],
+        ["NONE RHEA_TURN_SPEED", "Yard turn speed"],
+        ["NONE SAIL_RISING_SPEED", "Sail rising speed"],
+        ["NONE SHIP_BOARDING_PREPARATION_BONUS", "Boarding preparation bonus"],
+        ["NONE SHIP_EXTRA_CHAIN_UNITS", "Additional chains"],
+        ["NONE SHIP_EXTRA_DOBULE_CHARGE_UNITS", "Additional double charges"], // typo
+        ["NONE SHIP_EXTRA_DOUBLE_CHARGE_UNITS", "Additional double charges"],
+        ["NONE SHIP_EXTRA_DOUBLE_SHOT_UNITS", "Additional double shots"],
+        ["NONE SHIP_MAX_ROLL_ANGLE", "Max roll angle"],
+        ["NONE SHIP_PHYSICS_DEC_COEF", "Speed decrease"],
+        ["NONE SHIP_REPAIR_SAIL_CREW_REQUIREMENT,SHIP_REPAIR_ARMOR_CREW_REQUIREMENT", "Repair crew needed"],
+        ["NONE SHIP_TURNING_SPEED_RHEAS", "Yard turn speed"],
+        ["NONE WATER_PUMP_BAILING", "Water pump bailing"],
+        ["POWDER POWDER_RADIUS", "Powder radius"],
+        ["POWDER REPAIR_MODULE_TIME", "Powder repair module time"],
+        ["REPAIR_ARMOR REPAIR_PERCENT", "Armour repair amount"],
+        ["REPAIR_GENERIC REPAIR_PERCENT", "Generic repair amount"],
+        ["REPAIR_SAIL REPAIR_PERCENT", "Sail repair amount"],
+        ["RUDDER MODULE_BASE_HP", "Rudder health"],
+        ["RUDDER REPAIR_MODULE_TIME", "Rudder repair time"],
+        ["SAIL MODULE_BASE_HP", "Sail health"],
+        ["SAIL REPAIR_MODULE_TIME", "Sail repair time"],
+        ["SAIL SAILING_CREW_REQUIRED", "Sailing crew"],
+        ["STRUCTURE CANNON_MASS", "Cannon mass"],
+        ["STRUCTURE SHIP_CANNON_DESTROY_PROBABILITY", "Cannon destroy probability"],
+        ["WATER_PUMP MODULE_BASE_HP", "Water pump health"],
+        ["WATER_PUMP REPAIR_MODULE_TIME", "Water pump repair time"]
+    ]);
 
     /**
      * Set wood properties
@@ -221,12 +225,7 @@ function convertModules() {
                 }
 
                 // Some modifiers are wrongly indicated as a percentage
-                if (
-                    modifierName === "Splinter resistance" ||
-                    modifierName === "Boarding morale" ||
-                    modifierName === "Fire resistance" ||
-                    modifierName === "Leak resistance"
-                ) {
+                if (modifierName === "Boarding morale" || modifierName === "Leak resistance") {
                     isPercentage = false;
                 }
 
@@ -235,11 +234,12 @@ function convertModules() {
                     modifierName === "Leak resistance" ||
                     modifierName === "Rudder speed"
                 ) {
-                    amount = -amount;
+                    amount *= -1;
                 }
 
                 if (modifierName === "Splinter resistance") {
                     amount *= 100;
+                    isPercentage = true;
                 }
 
                 wood.properties.push({
@@ -278,6 +278,7 @@ function convertModules() {
                 console.log(`${modifier.Slot} ${modifier.MappingIds} modifier undefined`);
             }
 
+            const modifierName = modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`);
             let amount = modifier.Percentage;
             let isPercentage = true;
 
@@ -288,25 +289,25 @@ function convertModules() {
                     modifier.MappingIds[0] === "REPAIR_PERCENT"
                 ) {
                     amount = modifier.Absolute;
+                    isPercentage = false;
                 } else {
                     amount = Math.round(modifier.Absolute * 10000) / 100;
                 }
-
-                isPercentage = false;
             }
 
             if (
-                modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`) === "Fire resistance" ||
-                modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`) === "Leak resistance" ||
-                modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`) === "Rudder speed"
+                modifierName === "Fire resistance" ||
+                modifierName === "Leak resistance" ||
+                modifierName === "Rudder speed"
             ) {
-                amount = -amount;
-            } else if (modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`) === "Splinter resistance") {
+                amount *= -1;
+            } else if (modifierName === "Splinter resistance") {
                 amount = Math.round(modifier.Absolute * 10000) / 100;
+                isPercentage = true;
             }
 
             return {
-                modifier: modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`),
+                modifier: modifierName,
                 amount,
                 isPercentage
             };
