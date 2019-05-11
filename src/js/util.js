@@ -134,6 +134,18 @@ export const formatSignInt = x =>
         .replace("+", "\uFF0B\u202F");
 
 /**
+ * Format percentage point
+ * @function
+ * @param {number} x - Integer
+ * @return {string} Formatted percentage point
+ */
+export const formatPP = x =>
+    formatLocale
+        .format(",.0%")(x)
+        .replace("-", "\u2212\u202f")
+        .replace("%", "pp");
+
+/**
  * Format integer with SI suffix
  * @function
  * @param {Number} x - Integer
