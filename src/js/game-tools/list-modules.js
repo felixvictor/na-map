@@ -147,7 +147,9 @@ export default class ListModules {
                                 .map(property => {
                                     const amount = property.isPercentage
                                         ? formatSignPercent(property.amount / 100)
-                                        : property.amount<1?formatPP(property.amount):formatSignInt(property.amount);
+                                        : property.amount < 1 && property.amount > 0
+                                        ? formatPP(property.amount)
+                                        : formatSignInt(property.amount);
                                     return `${property.modifier} ${amount}`;
                                 })
                                 .join("<br>")}</td></tr>`

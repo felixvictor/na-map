@@ -289,11 +289,10 @@ function convertModules() {
                     modifier.MappingIds[0] === "REPAIR_PERCENT"
                 ) {
                     amount = modifier.Absolute;
+                    isPercentage = false;
                 } else {
                     amount = Math.round(modifier.Absolute * 10000) / 100;
                 }
-
-                isPercentage = Boolean(modifier.MappingIds[0].includes("PERCENTAGE"));
             }
 
             if (
