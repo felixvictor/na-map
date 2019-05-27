@@ -1584,7 +1584,9 @@ export default class CompareShips {
         const setSpeedDegrees = () => {
             data.speedDegrees = data.speedDegrees.map(speed => {
                 const factor = 1 + modifierAmounts.get("Ship speed").percentage / 100;
-                return Math.max(Math.min(speed * factor, this._maxSpeed), this._minSpeed);
+                const newSpeed = speed > 0 ? speed * factor : speed / factor;
+                // Correct speed by caps
+                return Math.max(Math.min(newSpeed, this._maxSpeed), this._minSpeed);
             });
         };
 
