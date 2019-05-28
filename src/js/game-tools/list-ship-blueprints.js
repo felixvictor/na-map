@@ -182,19 +182,19 @@ export default class ListShipBlueprints {
                 .transition()
                 .delay(2000)
                 .duration(5000)
-                .style("opacity", 0.0)
+                .style("opacity", 0)
                 .remove();
 
             // Add new rows
             const tableRowEnter = tableRowUpdate
                 .enter()
                 .append("tr")
-                .style("opacity", 0.0)
+                .style("opacity", 0)
                 .attr("class", "enter")
                 .transition()
                 .delay(9000)
                 .duration(5000)
-                .style("opacity", 1.0);
+                .style("opacity", 1);
 
             // Merge rows
             const row = tableRowUpdate.merge(tableRowEnter);
@@ -209,19 +209,19 @@ export default class ListShipBlueprints {
                 .transition()
                 .delay(2000)
                 .duration(5000)
-                .style("opacity", 0.0)
+                .style("opacity", 0)
                 .remove();
 
             // Add new cells
             const tableCellEnter = tableCellUpdate
                 .enter()
                 .append("th")
-                .style("opacity", 0.0)
+                .style("opacity", 0)
                 .attr("class", "enter")
                 .transition()
                 .delay(9000)
                 .duration(5000)
-                .style("opacity", 1.0);
+                .style("opacity", 1);
 
             // Merge cells
             tableCellUpdate
@@ -290,10 +290,7 @@ export default class ListShipBlueprints {
         extraData.push(["Craft experience", formatInt(this._currentBlueprintData.craftXP)]);
 
         // Add default resources
-        const resourcesData = this._currentBlueprintData.resources.map(resource => [
-            resource.name,
-            formatInt(resource.amount)
-        ]);
+        const resourcesData = this._currentBlueprintData.resources.map(resource => [resource.name, resource.amount]);
 
         // Add trim
         let frameAdded = false;
@@ -303,7 +300,7 @@ export default class ListShipBlueprints {
         if (this._woodsSelected.trim === "Crew Space") {
             const hempAmount = this._currentBlueprintData.trims.find(trim => trim.name === "Crew Space").amount;
             const index = resourcesData.findIndex(resource => resource[0] === "Hemp");
-            resourcesData[index][1] = formatInt(Number(resourcesData[index][1]) + hempAmount);
+            resourcesData[index][1] += hempAmount;
         } else {
             const trimAmount = this._currentBlueprintData.trims.find(trim => trim.name === "Planking").amount;
             // Frame and trim have same wood: add trim to frame
@@ -313,11 +310,11 @@ export default class ListShipBlueprints {
                 const index = resourcesData.findIndex(resource => resource[0] === this._woodsSelected.trim);
                 // Trim wood is already part of default resources (fir and oak log)
                 if (index >= 0) {
-                    resourcesData[index][1] = formatInt(Number(resourcesData[index][1]) + frameAmount);
+                    resourcesData[index][1] += frameAmount;
                 } else {
                     // Trim is an additional resource
                     trimAdded = true;
-                    resourcesData.push([this._woodsSelected.trim, formatInt(trimAmount)]);
+                    resourcesData.push([this._woodsSelected.trim, trimAmount]);
                 }
             }
         }
@@ -327,11 +324,11 @@ export default class ListShipBlueprints {
         const index = resourcesData.findIndex(resource => resource[0] === this._woodsSelected.frame);
         if (index >= 0) {
             // Frame wood is already part of default resources (fir and oak log)
-            resourcesData[index][1] = formatInt(Number(resourcesData[index][1]) + frameAmount);
+            resourcesData[index][1] += frameAmount;
         } else {
             // Frame is an additional resource
             frameAdded = true;
-            resourcesData.push([this._woodsSelected.frame, formatInt(frameAmount)]);
+            resourcesData.push([this._woodsSelected.frame, frameAmount]);
         }
 
         // Order frame before trim if both are added
@@ -342,6 +339,11 @@ export default class ListShipBlueprints {
                 resourcesData[frameIndex]
             ];
         }
+
+        // Format amount
+        resourcesData.forEach(data => {
+            data[1] = formatInt(data[1]);
+        });
 
         this._updateTable(this._tables.Extra, extraData);
         this._updateTable(this._tables.Resources, resourcesData);
