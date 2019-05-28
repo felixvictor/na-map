@@ -8,6 +8,10 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+import d3Node from "d3-node";
+const d3n = d3Node();
+const { d3 } = d3n;
+
 import { readJson, saveJson, sortBy } from "./common.mjs";
 
 const inBaseFilename = process.argv[2];
@@ -121,6 +125,32 @@ const convertShipBlueprints = () => {
             .sort(sortBy(["name"]));
 
     const data = getShipBlueprints();
+
+    /*
+     * Get resource ratios
+
+    const getShipClass = id => apiItems.find(apiItem => id === apiItem.Id).Class;
+    const resourceRatios = new Map(data[0].resources.map(resource => [resource.name, []]));
+    resourceRatios.set("Frame", []);
+    resourceRatios.set("Trim", []);
+    data.filter(shipBP => shipBP.name !== "Le Gros Ventre Refit")
+        // .filter(shipBP => getShipClass(shipBP.ship.id) === 1)
+        .forEach(shipBP => {
+            const lignum = shipBP.resources.find(resource => resource.name === "Lignum Vitae Log").amount;
+            shipBP.resources.forEach(resource => {
+                const value = Math.round((resource.amount / lignum) * 100) / 100;
+                resourceRatios.set(resource.name, resourceRatios.get(resource.name).concat(value));
+            });
+            let value = Math.round((shipBP.frames[0].amount / lignum) * 100) / 100;
+            resourceRatios.set("Frame", resourceRatios.get("Frame").concat(value));
+            value = Math.round((shipBP.trims[0].amount / lignum) * 100) / 100;
+            resourceRatios.set("Trim", resourceRatios.get("Trim").concat(value));
+            // console.log(`"${shipBP.name}";${lignum}`);
+        });
+    resourceRatios.forEach((value, key) => {
+        console.log(`"${key}";${d3.max(value)};${d3.median(value)}`);
+    });
+    */
 
     saveJson(outFilename, data);
 };
