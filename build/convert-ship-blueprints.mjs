@@ -12,7 +12,7 @@ import d3Node from "d3-node";
 const d3n = d3Node();
 const { d3 } = d3n;
 
-import { readJson, saveJson, sortBy } from "./common.mjs";
+import { readJson, round, saveJson, sortBy } from "./common.mjs";
 
 const inBaseFilename = process.argv[2];
 const outFilename = process.argv[3];
@@ -115,7 +115,8 @@ const convertShipBlueprints = () => {
                         ).Amount || 0,
                     ship: {
                         id: apiBlueprint.Results[0].Template,
-                        name: itemNames.get(apiBlueprint.Results[0].Template)
+                        name: itemNames.get(apiBlueprint.Results[0].Template),
+                        mass: shipMass
                     },
                     shipyardLevel: apiBlueprint.BuildingRequirements[0].Level + 1,
                     craftLevel: apiBlueprint.RequiresLevel,
@@ -130,27 +131,32 @@ const convertShipBlueprints = () => {
 
     /*
      * Get resource ratios
-
+     */
+    /*
     const getShipClass = id => apiItems.find(apiItem => id === apiItem.Id).Class;
     const resourceRatios = new Map(data[0].resources.map(resource => [resource.name, []]));
     resourceRatios.set("Frame", []);
     resourceRatios.set("Trim", []);
-    data.filter(shipBP => shipBP.name !== "Le Gros Ventre Refit")
-        // .filter(shipBP => getShipClass(shipBP.ship.id) === 1)
+    const excludedShips = ["GunBoat", "Le Gros Ventre Refit"];
+    data.filter(shipBP => !excludedShips.includes(shipBP.name))
+        // .filter(shipBP => getShipClass(shipBP.ship.id) === 5)
         .forEach(shipBP => {
-            const lignum = shipBP.resources.find(resource => resource.name === "Lignum Vitae Log").amount;
+            const ratio = shipBP.ship.mass;
             shipBP.resources.forEach(resource => {
-                const value = Math.round((resource.amount / lignum) * 100) / 100;
+                const value = round(resource.amount / ratio, 4);
                 resourceRatios.set(resource.name, resourceRatios.get(resource.name).concat(value));
             });
-            let value = Math.round((shipBP.frames[0].amount / lignum) * 100) / 100;
+            let value = round(shipBP.frames[0].amount / ratio, 4);
             resourceRatios.set("Frame", resourceRatios.get("Frame").concat(value));
-            value = Math.round((shipBP.trims[0].amount / lignum) * 100) / 100;
+            value = round(shipBP.trims[0].amount / ratio, 4);
             resourceRatios.set("Trim", resourceRatios.get("Trim").concat(value));
-            // console.log(`"${shipBP.name}";${lignum}`);
+            // console.log(`"${shipBP.name}";${ratio}`);
+            console.log(
+                `"${shipBP.name}";${shipBP.resources.map(resource => round(resource.amount / ratio, 4)).join(";")}`
+            );
         });
     resourceRatios.forEach((value, key) => {
-        console.log(`"${key}";${d3.max(value)};${d3.median(value)}`);
+        console.log(`"${key}";${d3.max(value, d => d)};${d3.median(value)}`);
     });
     */
 
