@@ -70,7 +70,9 @@ const convertShipBlueprints = () => {
 
                 return {
                     id: apiBlueprint.Id,
-                    name: apiBlueprint.Name.replaceAll(" Blueprint", "").replaceAll("'", "’"),
+                    name: apiBlueprint.Name.replaceAll(" Blueprint", "")
+                        .replaceAll("'", "’")
+                        .replace("u00E4", "ä"),
                     frames: apiBlueprint.WoodTypeDescs.map(wood => ({
                         name: itemNames.get(wood.Requirements[0].Template),
                         amount: wood.Requirements[0].Amount
