@@ -126,12 +126,10 @@ function convertCannons() {
      */
     function addData(fileData) {
         let type = "medium";
-        if (
-            fileData.ModuleTemplate.Name.slice(0, fileData.ModuleTemplate.Name.indexOf(" ")).toLowerCase() ===
-            "carronade"
-        ) {
+
+        if (fileData.ModuleTemplate.Name.includes("Carronade")) {
             type = "carronade";
-        } else if (fileData.ModuleTemplate.Name.endsWith("Long")) {
+        } else if (fileData.ModuleTemplate.Name.includes("Long")) {
             type = "long";
         }
 
