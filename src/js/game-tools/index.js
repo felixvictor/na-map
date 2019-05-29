@@ -12,6 +12,8 @@ import "bootstrap/js/dist/util";
 import "bootstrap/js/dist/modal";
 import "bootstrap/js/dist/tab";
 
+import { default as semver } from "semver";
+
 import CompareShips from "./compare-ships";
 import CompareWoods from "./compare-woods";
 import ListBuildings from "./list-buildings";
@@ -97,7 +99,11 @@ const setupData = data => {
     });
 
     const checkShipCompareData = () => {
-        if (urlParams.has("cmp") && urlParams.has("v") && urlParams.get("v") === appVersion) {
+        if (
+            urlParams.has("cmp") &&
+            urlParams.has("v") &&
+            semver.lte(urlParams.get("v"), appVersion)
+        ) {
             registerEvent("Menu", "Paste ship compare");
             shipCompare.initFromClipboard(urlParams);
         }

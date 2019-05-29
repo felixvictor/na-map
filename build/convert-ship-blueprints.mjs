@@ -8,7 +8,11 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { readJson, saveJson, sortBy } from "./common.mjs";
+import d3Node from "d3-node";
+const d3n = d3Node();
+const { d3 } = d3n;
+
+import { readJson, round, saveJson, sortBy } from "./common.mjs";
 
 const inBaseFilename = process.argv[2];
 const outFilename = process.argv[3];
@@ -66,7 +70,9 @@ const convertShipBlueprints = () => {
 
                 return {
                     id: apiBlueprint.Id,
-                    name: apiBlueprint.Name.replaceAll(" Blueprint", "").replaceAll("'", "’"),
+                    name: apiBlueprint.Name.replaceAll(" Blueprint", "")
+                        .replaceAll("'", "’")
+                        .replace("u00E4", "ä"),
                     frames: apiBlueprint.WoodTypeDescs.map(wood => ({
                         name: itemNames.get(wood.Requirements[0].Template),
                         amount: wood.Requirements[0].Amount
@@ -109,7 +115,8 @@ const convertShipBlueprints = () => {
                         ).Amount || 0,
                     ship: {
                         id: apiBlueprint.Results[0].Template,
-                        name: itemNames.get(apiBlueprint.Results[0].Template)
+                        name: itemNames.get(apiBlueprint.Results[0].Template),
+                        mass: shipMass
                     },
                     shipyardLevel: apiBlueprint.BuildingRequirements[0].Level + 1,
                     craftLevel: apiBlueprint.RequiresLevel,
@@ -121,6 +128,37 @@ const convertShipBlueprints = () => {
             .sort(sortBy(["name"]));
 
     const data = getShipBlueprints();
+
+    /*
+     * Get resource ratios
+     */
+    /*
+    const getShipClass = id => apiItems.find(apiItem => id === apiItem.Id).Class;
+    const resourceRatios = new Map(data[0].resources.map(resource => [resource.name, []]));
+    resourceRatios.set("Frame", []);
+    resourceRatios.set("Trim", []);
+    const excludedShips = ["GunBoat", "Le Gros Ventre Refit"];
+    data.filter(shipBP => !excludedShips.includes(shipBP.name))
+        // .filter(shipBP => getShipClass(shipBP.ship.id) === 5)
+        .forEach(shipBP => {
+            const ratio = shipBP.ship.mass;
+            shipBP.resources.forEach(resource => {
+                const value = round(resource.amount / ratio, 4);
+                resourceRatios.set(resource.name, resourceRatios.get(resource.name).concat(value));
+            });
+            let value = round(shipBP.frames[0].amount / ratio, 4);
+            resourceRatios.set("Frame", resourceRatios.get("Frame").concat(value));
+            value = round(shipBP.trims[0].amount / ratio, 4);
+            resourceRatios.set("Trim", resourceRatios.get("Trim").concat(value));
+            // console.log(`"${shipBP.name}";${ratio}`);
+            console.log(
+                `"${shipBP.name}";${shipBP.resources.map(resource => round(resource.amount / ratio, 4)).join(";")}`
+            );
+        });
+    resourceRatios.forEach((value, key) => {
+        console.log(`"${key}";${d3.max(value, d => d)};${d3.median(value)}`);
+    });
+    */
 
     saveJson(outFilename, data);
 };
