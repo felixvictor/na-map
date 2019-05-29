@@ -80,11 +80,22 @@ export default class ListCannons {
             )}
         `;
 
-        const getRowHead = name => html`
-            <th scope="row" class="text-right" data-sort="${parseInt(name, 10)}">
-                ${name}
-            </th>
-        `;
+        const getRowHead = name => {
+            let nameConverted = name;
+            const nameSplit = name.split(" (");
+
+            if (nameSplit.length > 1) {
+                nameConverted = html`
+                    ${nameSplit[0]}<br /><em>${nameSplit[1].replace(")", "")}</em>
+                `;
+            }
+
+            return html`
+                <th scope="row" class="text-right" data-sort="${parseInt(name, 10)}">
+                    ${nameConverted}
+                </th>
+            `;
+        };
 
         const getRow = cannon => html`
             ${Object.entries(cannon).map(groupValue => {
