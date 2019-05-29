@@ -39,16 +39,7 @@ import {
     repairTime,
     insertBaseModal
 } from "../common";
-import {
-    copyToClipboard,
-    formatFloat,
-    formatInt,
-    formatPercent,
-    getOrdinal,
-    isEmpty,
-    roundToThousands,
-    sortBy
-} from "../util";
+import { copyToClipboard, formatFloat, formatInt, getOrdinal, isEmpty, roundToThousands, sortBy } from "../util";
 
 import CompareWoods from "./compare-woods";
 
@@ -1584,7 +1575,9 @@ export default class CompareShips {
         const setSpeedDegrees = () => {
             data.speedDegrees = data.speedDegrees.map(speed => {
                 const factor = 1 + modifierAmounts.get("Ship speed").percentage / 100;
-                return Math.max(Math.min(speed * factor, this._maxSpeed), this._minSpeed);
+                const newSpeed = speed > 0 ? speed * factor : speed / factor;
+                // Correct speed by caps
+                return Math.max(Math.min(newSpeed, this._maxSpeed), this._minSpeed);
             });
         };
 
@@ -1695,7 +1688,6 @@ export default class CompareShips {
         }
 
         const singleShipData = this._getShipData(compareId);
-
         if (this._baseId === "ship-journey") {
             this._singleShipData = singleShipData;
         } else if (compareId === "Base") {
@@ -1766,21 +1758,19 @@ export default class CompareShips {
      * @returns {void}
      */
     _setupSelectListener(compareId) {
-        this._selectShip$[compareId]
-            .on("changed.bs.select", () => {
-                this._shipIds[compareId] = Number(this._selectShip$[compareId].val());
-                if (this._baseId !== "ship-journey") {
-                    this._setupModulesSelect(compareId);
-                }
+        this._selectShip$[compareId].selectpicker({ title: "Ship" }).on("changed.bs.select", () => {
+            this._shipIds[compareId] = Number(this._selectShip$[compareId].val());
+            if (this._baseId !== "ship-journey") {
+                this._setupModulesSelect(compareId);
+            }
 
-                this._refreshShips(compareId);
-                if (compareId === "Base" && this._baseId !== "ship-journey") {
-                    this._enableCompareSelects();
-                }
+            this._refreshShips(compareId);
+            if (compareId === "Base" && this._baseId !== "ship-journey") {
+                this._enableCompareSelects();
+            }
 
-                this.woodCompare.enableSelects(compareId);
-            })
-            .selectpicker({ title: "Ship" });
+            this.woodCompare.enableSelects(compareId);
+        });
 
         ["frame", "trim"].forEach(type => {
             this._selectWood$[compareId][type]
@@ -1805,7 +1795,7 @@ export default class CompareShips {
             let i = 0;
 
             this._columns.some(columnId => {
-                if (this._shipData.find(ship => ship.id === ids[i])) {
+                if (!this._shipData.find(ship => ship.id === ids[i])) {
                     return false;
                 }
 
@@ -1867,15 +1857,14 @@ export default class CompareShips {
             });
         };
 
-        const ShipAndWoodsIds = hashids.decode(urlParams.get("cmp"));
-
-        if (ShipAndWoodsIds.length) {
+        const shipAndWoodsIds = hashids.decode(urlParams.get("cmp"));
+        if (shipAndWoodsIds.length) {
             this._shipCompareSelected();
-            if (ShipAndWoodsIds.length > 3) {
+            if (shipAndWoodsIds.length > 3) {
                 this._enableCompareSelects();
             }
 
-            setShipAndWoodsSelects(ShipAndWoodsIds);
+            setShipAndWoodsSelects(shipAndWoodsIds);
             setModuleSelects();
         }
     }
