@@ -9,7 +9,7 @@
  */
 
 import { min as d3Min, max as d3Max } from "d3-array";
-import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate";
+import { interpolateHcl as d3InterpolateHcl, interpolateHclLong as d3InterpolateHclLong } from "d3-interpolate";
 // import { polygonCentroid as d3PolygonCentroid, polygonHull as d3PolygonHull } from "d3-polygon";
 import { scaleLinear as d3ScaleLinear, scaleOrdinal as d3ScaleOrdinal } from "d3-scale";
 import { select as d3Select } from "d3-selection";
@@ -23,14 +23,14 @@ import "moment/locale/en-gb";
 
 import {
     colourGreenDark,
+    colourGreenLight,
     colourList,
-    colourRed,
     colourRedDark,
+    colourRedLight,
     colourWhite,
     defaultCircleSize,
     defaultFontSize,
-    nations,
-    primary300
+    nations
 } from "../common";
 import {
     degreesToRadians,
@@ -123,23 +123,23 @@ export default class DisplayPorts {
 
         this._colourScaleHostility = d3ScaleLinear()
             .domain([0, 0.5, 1])
-            .range([primary300, colourRed, colourRedDark])
+            .range([colourWhite, colourRedLight, colourRedDark])
             .interpolate(d3InterpolateHcl);
         this._colourScaleCounty = d3ScaleOrdinal().range(colourList);
 
         this._minTaxIncome = d3Min(this._portData, d => d.taxIncome);
         this._maxTaxIncome = d3Max(this._portData, d => d.taxIncome);
         this._colourScaleTax = d3ScaleLinear()
-            .domain([this._minTaxIncome, 0, this._maxTaxIncome])
-            .range([colourRedDark, colourWhite, colourGreenDark])
+            .domain([this._minTaxIncome, this._maxTaxIncome / 10, this._maxTaxIncome])
+            .range([colourWhite, colourGreenLight, colourGreenDark])
             .interpolate(d3InterpolateHcl);
 
         this._minNetIncome = d3Min(this._portData, d => d.netIncome);
         this._maxNetIncome = d3Max(this._portData, d => d.netIncome);
         this._colourScaleNet = d3ScaleLinear()
-            .domain([this._minNetIncome, this._maxNetIncome])
-            .range([colourWhite, colourGreenDark])
-            .interpolate(d3InterpolateHcl);
+            .domain([this._minNetIncome, this._minNetIncome / 100, 0, this._maxNetIncome / 100, this._maxNetIncome])
+            .range([colourRedDark, colourRedLight, colourWhite, colourGreenLight, colourGreenDark])
+            .interpolate(d3InterpolateHclLong);
 
         this._minPortPoints = d3Min(this._portData, d => d.portPoints);
         this._maxPortPoints = d3Max(this._portData, d => d.portPoints);
@@ -723,13 +723,13 @@ export default class DisplayPorts {
             data = this._portDataFiltered.filter(d => !d.nonCapturable);
             this._portRadius.domain([this._minTaxIncome, this._maxTaxIncome]).range([rMin, rMax]);
             cssClass = () => "bubble";
-            fill = d => this._colourScaleTax(Math.abs(d.taxIncome));
-            r = d => this._portRadius(Math.abs(d.taxIncome));
+            fill = d => this._colourScaleTax(d.taxIncome);
+            r = d => this._portRadius(d.taxIncome);
         } else if (this._showRadius === "net") {
             data = this._portDataFiltered.filter(d => !d.nonCapturable);
             this._portRadius.domain([this._minNetIncome, this._maxNetIncome]).range([rMin, rMax]);
             cssClass = () => "bubble";
-            fill = d => this._colourScaleNet(Math.abs(d.netIncome));
+            fill = d => this._colourScaleNet(d.netIncome);
             r = d => this._portRadius(Math.abs(d.netIncome));
         } else if (this.showTradePortPartners) {
             cssClass = d => `bubble ${getTradePortMarker(d)}`;
