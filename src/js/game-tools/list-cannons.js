@@ -29,7 +29,7 @@ String.prototype.replaceAll = function(search, replacement) {
  */
 export default class ListCannons {
     constructor(cannonData) {
-        this._cannonData = cannonData;
+        this._cannonData = {};
 
         this._baseName = "List cannons";
         this._baseId = "cannon-list";
@@ -38,7 +38,7 @@ export default class ListCannons {
 
         this._cannonTypes = ["medium", "long", "carronade"];
         this._groups = new Map();
-        this._cannonData.long.forEach(group => {
+        cannonData.long.forEach(group => {
             for (const [key, value] of Object.entries(group)) {
                 if (key !== "name") {
                     this._groups.set(key, { values: value, count: Object.entries(value).length });
@@ -46,8 +46,16 @@ export default class ListCannons {
             }
         });
 
-        const groupOrder = ["damage", "penetration (m)", "crew", "dispersion", "generic"];
-
+        // Sort data and groups (for table header)
+        const groupOrder = ["name", "damage", "penetration (m)", "crew", "dispersion", "generic"];
+        this._cannonTypes.forEach(type => {
+            this._cannonData[type] = cannonData[type].map(cannon =>
+                Object.keys(cannon)
+                    .sort((a, b) => groupOrder.indexOf(a) - groupOrder.indexOf(b))
+                    // eslint-disable-next-line no-return-assign,no-sequences
+                    .reduce((r, k) => ((r[k] = cannon[k]), r), {})
+            );
+        });
         this._groups = new Map(
             [...this._groups.entries()].sort((a, b) => groupOrder.indexOf(a[0]) - groupOrder.indexOf(b[0]))
         );
