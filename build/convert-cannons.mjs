@@ -12,7 +12,7 @@
 import * as fs from "fs";
 import xml2Json from "xml2json";
 
-import { readTextFile, round, saveJson, sortBy } from "./common.mjs";
+import { readTextFile, round, saveJson } from "./common.mjs";
 
 const inDirectory = process.argv[2];
 const filename = process.argv[3];
