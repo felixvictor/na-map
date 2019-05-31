@@ -12,7 +12,7 @@ import d3Node from "d3-node";
 const d3n = d3Node();
 const { d3 } = d3n;
 
-import { readJson, round, saveJson, sortBy } from "./common.mjs";
+import { cleanName, readJson, round, saveJson, sortBy } from "./common.mjs";
 
 const inBaseFilename = process.argv[2];
 const outFilename = process.argv[3];
@@ -31,18 +31,11 @@ const crewSpaceRatio = 0.025;
 
 const apiItems = readJson(`${inBaseFilename}-ItemTemplates-${date}.json`);
 
-// https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
-// eslint-disable-next-line no-extend-native,func-names
-String.prototype.replaceAll = function(search, replacement) {
-    const target = this;
-    return target.replace(new RegExp(search, "g"), replacement);
-};
-
 /**
  * Get item names
  * @return {Map<number, string>} Item names<id, name>
  */
-const getItemNames = () => new Map(apiItems.map(item => [item.Id, item.Name.replaceAll("'", "’")]));
+const getItemNames = () => new Map(apiItems.map(item => [item.Id, cleanName(item.Name)]));
 
 const itemNames = getItemNames();
 
@@ -70,9 +63,7 @@ const convertShipBlueprints = () => {
 
                 return {
                     id: apiBlueprint.Id,
-                    name: apiBlueprint.Name.replaceAll(" Blueprint", "")
-                        .replaceAll("'", "’")
-                        .replace("u00E4", "ä"),
+                    name: cleanName(apiBlueprint.Name).replace(" Blueprint", ""),
                     frames: apiBlueprint.WoodTypeDescs.map(wood => ({
                         name: itemNames.get(wood.Requirements[0].Template),
                         amount: wood.Requirements[0].Amount
