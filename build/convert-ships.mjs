@@ -1,17 +1,10 @@
-import { sortBy, readJson, roundToThousands, saveJson, speedConstA, speedConstB } from "./common.mjs";
+import { cleanName, sortBy, readJson, roundToThousands, saveJson, speedConstA, speedConstB } from "./common.mjs";
 
 const inBaseFilename = process.argv[2];
 const outFilename = process.argv[3];
 const date = process.argv[4];
 
 const APIItems = readJson(`${inBaseFilename}-ItemTemplates-${date}.json`);
-
-// https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
-// eslint-disable-next-line no-extend-native,func-names
-String.prototype.replaceAll = function(search, replacement) {
-    const target = this;
-    return target.replace(new RegExp(search, "g"), replacement);
-};
 
 function convertShips() {
     const cannonWeight = [0, 42, 32, 24, 18, 12, 9, 0, 6, 4, 4, 2];
@@ -33,9 +26,7 @@ function convertShips() {
 
         const shipData = {
             id: ship.Id,
-            name: ship.Name.replace("u00E4", "ä")
-                .replace("L'Ocean", "L'Océan")
-                .replaceAll("'", "’"),
+            name: cleanName(ship.Name),
             class: ship.Class,
             gunsPerDeck: ship.GunsPerDeck,
             deckClassLimit: ship.DeckClassLimit.map(deck => [
