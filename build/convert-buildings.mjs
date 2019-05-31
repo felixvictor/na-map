@@ -1,4 +1,4 @@
-import { readJson, saveJson, sortBy } from "./common.mjs";
+import { cleanName, readJson, saveJson, sortBy } from "./common.mjs";
 
 const itemsFilename = process.argv[2];
 const outFilename = process.argv[3];
@@ -18,13 +18,6 @@ const obsoleteBuildings = [
     "Tobacco Plantation"
 ];
 
-// https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
-// eslint-disable-next-line no-extend-native,func-names
-String.prototype.replaceAll = function(search, replacement) {
-    const target = this;
-    return target.replace(new RegExp(search, "g"), replacement);
-};
-
 function getItemsCraftedByWorkshop() {
     return APIItems.filter(
         item =>
@@ -33,7 +26,7 @@ function getItemsCraftedByWorkshop() {
             item.BuildingRequirements[0].BuildingTemplate === 450
     )
         .map(recipe => ({
-            name: recipe.Name.replace(" Blueprint", ""),
+            name: cleanName(recipe.Name).replace(" Blueprint", ""),
             price: 0
         }))
         .sort(sortBy(["name"]));
@@ -47,7 +40,7 @@ function getItemsCraftedByAcademy() {
             item.BuildingRequirements[0].BuildingTemplate === 879
     )
         .map(recipe => ({
-            name: recipe.Name.replace(" Blueprint", ""),
+            name: cleanName(recipe.Name).replace(" Blueprint", ""),
             price: 0
         }))
         .sort(sortBy(["name"]));
@@ -63,7 +56,7 @@ function convertBuildings() {
     const resources = new Map(
         APIItems.map(APIresource => [
             APIresource.Id,
-            { name: APIresource.Name.replaceAll("'", "’"), price: APIresource.BasePrice }
+            { name: cleanName(APIresource.Name), price: APIresource.BasePrice }
         ])
     );
 
@@ -83,7 +76,7 @@ function convertBuildings() {
 
         const building = {
             id: APIbuilding.Id,
-            name: APIbuilding.Name.replaceAll("'", "’"),
+            name: cleanName(APIbuilding.Name),
             resource: resources.get(
                 APIbuilding.ProduceResource ? APIbuilding.ProduceResource : APIbuilding.RequiredPortResource
             ),
