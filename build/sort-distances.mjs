@@ -1,4 +1,4 @@
-import { readJson, saveJson, distancePoints, sortBy, nations } from "./common.mjs";
+import { cleanName, readJson, saveJson, distancePoints, sortBy, nations } from "./common.mjs";
 
 const date = "2019-04-28";
 const numPorts = 3;
@@ -26,8 +26,8 @@ const portDistances = nations
                     )
                     .map(toPort => ({
                         fromNation: fromNation.name,
-                        fromPort: fromPort.Name,
-                        toPort: toPort.Name,
+                        fromPort: cleanName(fromPort.Name),
+                        toPort: cleanName(toPort.Name),
                         toNation: nations.find(nation => nation.id === toPort.Nation).name,
                         distance: Math.round(
                             distancePoints(
