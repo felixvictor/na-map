@@ -228,7 +228,7 @@ Math.radiansToDegrees = radians => (radians * 180) / Math.PI;
  */
 export const rotationAngleInDegrees = (centerPt, targetPt) => {
     let theta = Math.atan2(targetPt[1] - centerPt[1], targetPt[0] - centerPt[0]);
-    theta -= Math.PI / 2.0;
+    theta -= Math.PI / 2;
     const degrees = Math.radiansToDegrees(theta);
     return (degrees + 360) % 360;
 };
@@ -381,3 +381,14 @@ export function getOrdinal(n, sup = true) {
     const text = s[(v - 20) % 10] || s[v] || s[0];
     return n + (sup ? `<span class="super">${text}</span>` : `${text}`);
 }
+
+/**
+ * Clean API name
+ * @param {string} name - Name
+ * @return {string} Cleaned name
+ */
+export const cleanName = name =>
+    name
+        .replace(/u([\dA-F]{4})/gi, match => String.fromCharCode(parseInt(match.replace(/u/g, ""), 16)))
+        .replace("L'Ocean", "L'Océan")
+        .replace(/'/g, "’");
