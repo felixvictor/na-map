@@ -1013,7 +1013,6 @@ export default class DisplayPorts {
     }
 
     clearMap(scale) {
-        this._trilateratePosition.clearMap();
         this._showSummary();
         this._portData = this._portDataDefault;
         this.showCurrentGood = false;
