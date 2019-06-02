@@ -17,14 +17,14 @@ const SriPlugin = require("webpack-subresource-integrity");
 const TerserPlugin = require("terser-webpack-plugin");
 const WebpackDeepScopeAnalysisPlugin = require("webpack-deep-scope-plugin").default;
 const WebpackPwaManifest = require("webpack-pwa-manifest");
+const { isProduction } = require("webpack-mode");
 const servers = require("./src/js/servers");
 const PACKAGE = require("./package.json");
-const repairs = require("./src/gen/repairs.json");
 
+const repairs = require("./src/gen/repairs.json");
 const libraryName = PACKAGE.name;
 const { TARGET } = process.env;
 const target = `https://${TARGET}.netlify.com/`;
-const isProduction = process.env.NODE_ENV === "production";
 
 const description =
     "Yet another map with in-game map, F11 coordinates, resources, ship and wood comparison. Port data is updated constantly from twitter and daily after maintenance.";
@@ -488,8 +488,8 @@ const config = {
     }
 };
 
-module.exports = (environment, argv) => {
-    if (argv.mode === "production") {
+module.exports = () => {
+    if (isProduction) {
         config.devtool = "";
         config.optimization.minimizer = [
             new TerserPlugin({
