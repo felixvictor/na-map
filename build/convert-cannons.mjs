@@ -17,13 +17,6 @@ import { readTextFile, round, saveJson } from "./common.mjs";
 const inDirectory = process.argv[2];
 const filename = process.argv[3];
 
-// https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
-// eslint-disable-next-line no-extend-native,func-names
-String.prototype.replaceAll = function(search, replacement) {
-    const target = this;
-    return target.replace(new RegExp(search, "g"), replacement);
-};
-
 const countDecimals = value => {
     if (Math.floor(value) === value) {
         return 0;
