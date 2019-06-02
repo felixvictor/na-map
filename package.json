@@ -72,6 +72,7 @@
         "webpack-cli": "^3.3.2",
         "webpack-deep-scope-plugin": "^1.6.0",
         "webpack-dev-server": "^3.4.1",
+        "webpack-mode": "^1.0.2",
         "webpack-pwa-manifest": "^4.0.0",
         "webpack-subresource-integrity": "^1.3.2",
         "workbox-webpack-plugin": "^4.3.1",
