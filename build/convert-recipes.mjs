@@ -2,20 +2,13 @@
     convert-recipes.mjs
  */
 
-import { readJson, saveJson, simpleSort, sortBy } from "./common.mjs";
+import { cleanName, readJson, saveJson, simpleSort, sortBy } from "./common.mjs";
 
 const inBaseFilename = process.argv[2];
 const outFilename = process.argv[3];
 const date = process.argv[4];
 
 const APIItems = readJson(`${inBaseFilename}-ItemTemplates-${date}.json`);
-
-// https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
-// eslint-disable-next-line no-extend-native,func-names
-String.prototype.replaceAll = function(search, replacement) {
-    const target = this;
-    return target.replace(new RegExp(search, "g"), replacement);
-};
 
 const groups = new Map([
     ["AdmiralityShips", "Admirality permits"],
@@ -42,7 +35,7 @@ function convertRecipes() {
      * @return {Map<number, string>} Item names<id, name>
      */
     const getItemNames = () =>
-        new Map(APIItems.filter(item => !item.NotUsed).map(item => [item.Id, item.Name.replaceAll("'", "’")]));
+        new Map(APIItems.filter(item => !item.NotUsed).map(item => [item.Id, cleanName(item.Name)]));
 
     const itemNames = getItemNames();
 
@@ -79,8 +72,7 @@ function convertRecipes() {
             APIrecipe.ItemType === "Recipe" ? APIrecipe.Results[0] : APIrecipe.Qualities[0].Results[0];
         const recipe = {
             id: APIrecipe.Id,
-            name: APIrecipe.Name.replaceAll("'", "’")
-                .replace("u00E4", "ä")
+            name: cleanName(APIrecipe.Name)
                 .replace(" Blueprint", "")
                 .replace(" - ", " – ")
                 .replace("u2013", "–")

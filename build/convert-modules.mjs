@@ -8,20 +8,13 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { capitalizeFirstLetter, groupBy, readJson, saveJson, sortBy } from "./common.mjs";
+import { capitalizeFirstLetter, cleanName, groupBy, readJson, saveJson, sortBy } from "./common.mjs";
 
 const itemsFilename = process.argv[2];
 const outDir = process.argv[3];
 const date = process.argv[4];
 
 const apiItems = readJson(`${itemsFilename}-ItemTemplates-${date}.json`);
-
-// https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
-// eslint-disable-next-line no-extend-native,func-names
-String.prototype.replaceAll = function(search, replacement) {
-    const target = this;
-    return target.replace(new RegExp(search, "g"), replacement);
-};
 
 /**
  * Convert API module data and save sorted as JSON
@@ -372,7 +365,7 @@ function convertModules() {
             let dontSave = false;
             const module = {
                 id: apiModule.Id,
-                name: apiModule.Name.replaceAll("'", "’"),
+                name: cleanName(apiModule.Name),
                 usageType: apiModule.UsageType,
                 APImodifiers: apiModule.Modifiers,
                 sortingGroup: apiModule.SortingGroup.replace("module:", ""),
