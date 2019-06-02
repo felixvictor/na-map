@@ -17,14 +17,7 @@ import { default as lzma } from "lzma-native";
 import { default as readDirRecursive } from "recursive-readdir";
 
 // eslint-disable-next-line import/extensions
-import { capitalToCounty, nations, saveJson } from "./common.mjs";
-
-// https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
-// eslint-disable-next-line no-extend-native,func-names
-String.prototype.replaceAll = function(search, replacement) {
-    const target = this;
-    return target.replace(new RegExp(search, "g"), replacement);
-};
+import { capitalToCounty, cleanName, nations, saveJson } from "./common.mjs";
 
 const inDir = process.argv[2];
 const fileBaseName = process.argv[3];
@@ -80,7 +73,7 @@ function convertOwnership() {
              */
             function initData() {
                 ports.set(port.Id, {
-                    name: port.Name.replaceAll("'", "’"),
+                    name: cleanName(port.Name),
                     region: port.Location,
                     county: capitalToCounty.get(port.CountyCapitalName) || "",
                     data: [getObject()]
