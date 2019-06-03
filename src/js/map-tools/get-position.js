@@ -11,8 +11,8 @@
 import { select as d3Select } from "d3-selection";
 
 import { registerEvent } from "../analytics";
-import { circleRadiusFactor, insertBaseModal } from "../common";
-import { sortBy } from "../util";
+import { circleRadiusFactor, convertInvCoordX, convertInvCoordY, insertBaseModal } from "../common";
+import { copyF11ToClipboard, sortBy } from "../util";
 import Toast from "../util/toast";
 
 /**
@@ -263,13 +263,23 @@ export default class TrilateratePosition {
                 z: 0,
                 r: port.distance
             }));
+
             const position = trilaterate(circles[0], circles[1], circles[2], true);
-            console.log(position);
 
             // If intersection is found
             if (position) {
+                position.x = Math.round(position.x);
+                position.y = Math.round(position.y);
+
                 this._ports._map._f11.printCoord(position.x, position.y);
                 this._ports._map.zoomAndPan(position.x, position.y, 1);
+
+                const coordX = Math.round(convertInvCoordX(position.x, position.y) / -1000);
+                const coordY = Math.round(convertInvCoordY(position.x, position.y) / -1000);
+                copyF11ToClipboard(coordX, coordY);
+
+                // eslint-disable-next-line no-new
+                new Toast("Get position", "Coordinates copied to clipboard.");
             } else {
                 // eslint-disable-next-line no-new
                 new Toast("Get position", "No intersection found.");
