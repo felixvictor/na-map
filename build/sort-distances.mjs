@@ -1,6 +1,6 @@
 import { cleanName, readJson, saveJson, distancePoints, sortBy, nations } from "./common.mjs";
 
-const date = "2019-04-28";
+const date = "2019-04-24";
 const numPorts = 3;
 const inFilename = `build/API/api-eu1-Ports-${date}.json`;
 const outFilename = "port-distances.json";
@@ -9,14 +9,14 @@ const ports = readJson(inFilename);
 
 const portDistances = nations
     .filter(fromNation => !["NT"].includes(fromNation.short))
-    .map(fromNation =>
+    .flatMap(fromNation =>
         ports
             .filter(fromPort =>
                 fromNation.short === "FT"
                     ? fromPort.Nation === 9
                     : fromPort.Name === fromPort.CountyCapitalName && fromPort.Nation === fromNation.id
             )
-            .map(fromPort =>
+            .flatMap(fromPort =>
                 ports
                     .filter(
                         toPort =>
@@ -27,8 +27,8 @@ const portDistances = nations
                     .map(toPort => ({
                         fromNation: fromNation.name,
                         fromPort: cleanName(fromPort.Name),
-                        toPort: cleanName(toPort.Name),
                         toNation: nations.find(nation => nation.id === toPort.Nation).name,
+                        toPort: cleanName(toPort.Name),
                         distance: Math.round(
                             distancePoints(
                                 { x: fromPort.Position.x, y: fromPort.Position.z },
@@ -39,9 +39,7 @@ const portDistances = nations
                     .sort(sortBy(["distance"]))
                     .slice(0, numPorts)
             )
-            .flat()
-            .sort(sortBy(["nation", "from", "distance"]))
     )
-    .flat();
+    .sort(sortBy(["fromNation", "fromPort", "distance"]));
 
 saveJson(outFilename, portDistances);
