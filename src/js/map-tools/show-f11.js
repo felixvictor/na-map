@@ -12,7 +12,7 @@ import { select as d3Select } from "d3-selection";
 import moment from "moment";
 import "moment/locale/en-gb";
 
-import { between, copyToClipboard, formatF11 } from "../util";
+import { between, copyF11ToClipboard, formatF11 } from "../util";
 import { convertCoordX, convertCoordY, convertInvCoordX, convertInvCoordY, insertBaseModal } from "../common";
 import { registerEvent } from "../analytics";
 
@@ -226,14 +226,7 @@ export default class ShowF11 {
         const x = this._getXCoord();
         const z = this._getZCoord();
 
-        if (Number.isFinite(x) && Number.isFinite(z)) {
-            const F11Url = new URL(window.location);
-
-            F11Url.searchParams.set("x", x);
-            F11Url.searchParams.set("z", z);
-
-            copyToClipboard(F11Url.href);
-        }
+        copyF11ToClipboard(x, z);
     }
 
     _printF11Coord(x, y, F11X, F11Y) {
