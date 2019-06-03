@@ -110,8 +110,7 @@
         "tablesort": "^5.1.0",
         "tempusdominus-bootstrap-4": "^5.1.2",
         "tempusdominus-core": "^5.0.3",
-        "timelines-chart": "https://github.com/felixvictor/timelines-chart",
-        "venn.js": "^0.2.20"
+        "timelines-chart": "https://github.com/felixvictor/timelines-chart"
     },
     "peerDependencies": {
         "moment-timezone": "^0.5.14"
