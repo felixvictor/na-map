@@ -357,10 +357,18 @@ export const simpleSort = (a, b) => {
 export const sortBy = properties => (a, b) => {
     let r = 0;
     properties.some(property => {
+        let sign = 1;
+
+        // property starts with '-' when sort is descending
+        if (property.startsWith("-")) {
+            sign = -1;
+            property = property.substr(1);
+        }
+
         if (a[property] < b[property]) {
-            r = -1;
+            r = -sign;
         } else if (a[property] > b[property]) {
-            r = 1;
+            r = sign;
         }
 
         return r !== 0;
