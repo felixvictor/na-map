@@ -390,14 +390,14 @@ function createExcel() {
                 !(ship.name.startsWith("Basic") || ship.name.startsWith("Rookie") || ship.name.startsWith("Trader")) &&
                 (ship.battleRating >= minDeepWaterBR || ship.name === "Mortar Brig")
         )
-        .sort(sortBy(["class", "battleRating", "name"]));
+        .sort(sortBy(["class", "-battleRating", "name"]));
     const swShips = shipsOrig
         .filter(
             ship =>
                 shallowWaterFrigates.includes(ship.name) ||
                 (ship.class >= 6 && !["Basic", "Rooki", "Trade"].includes(ship.name.substring(0, 5)))
         )
-        .sort(sortBy(["class", "battleRating", "name"]));
+        .sort(sortBy(["class", "-battleRating", "name"]));
 
     /*
     const dwSheet = workbook.addWorksheet("Deep water port", {
