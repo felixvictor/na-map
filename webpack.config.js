@@ -7,8 +7,8 @@ const webpack = require("webpack");
 const path = require("path");
 const sass = require("node-sass");
 const parseCss = require("css");
-const // { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer"),
-    CleanWebpackPlugin = require("clean-webpack-plugin");
+// const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
 const HtmlPlugin = require("html-webpack-plugin");
 const ExtractCssChunks = require("extract-css-chunks-webpack-plugin");
@@ -17,14 +17,14 @@ const SriPlugin = require("webpack-subresource-integrity");
 const TerserPlugin = require("terser-webpack-plugin");
 const WebpackDeepScopeAnalysisPlugin = require("webpack-deep-scope-plugin").default;
 const WebpackPwaManifest = require("webpack-pwa-manifest");
+const { isProduction } = require("webpack-mode");
 const servers = require("./src/js/servers");
 const PACKAGE = require("./package.json");
-const repairs = require("./src/gen/repairs.json");
 
+const repairs = require("./src/gen/repairs.json");
 const libraryName = PACKAGE.name;
 const { TARGET } = process.env;
 const target = `https://${TARGET}.netlify.com/`;
-const isProduction = process.env.NODE_ENV === "production";
 
 const description =
     "Yet another map with in-game map, F11 coordinates, resources, ship and wood comparison. Port data is updated constantly from twitter and daily after maintenance.";
@@ -488,8 +488,8 @@ const config = {
     }
 };
 
-module.exports = (environment, argv) => {
-    if (argv.mode === "production") {
+module.exports = () => {
+    if (isProduction) {
         config.devtool = "";
         config.optimization.minimizer = [
             new TerserPlugin({
