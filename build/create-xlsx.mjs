@@ -14,7 +14,7 @@ import sass from "node-sass";
 import css from "css";
 import { readJson, sortBy } from "./common.mjs";
 
-const shallowWaterFrigates = ["Cerberus", "Hercules", "L’Hermione", "Renommee", "Surprise"];
+const shallowWaterFrigates = ["Cerberus", "Hercules", "L’Hermione", "La Renommée", "Surprise"];
 const minDeepWaterBR = 80;
 const maxNumPlayers = 25;
 
