@@ -79,9 +79,11 @@ function setColours() {
  */
 function createExcel() {
     const colours = setColours();
+    const colourWhite = colours.get("white");
     const colourPrimaryWhite = colours.get("primary-050");
+    const colourPrimaryNearWhite = colours.get("primary-100");
     const colourPrimaryLight = colours.get("primary-200");
-    const colourPrimaryDark = colours.get("primary-800");
+    const colourPrimaryDark = colours.get("primary-600");
     const colourContrastWhite = colours.get("secondary-050");
     const colourContrastNearWhite = colours.get("secondary-100");
     const colourContrastLight = colours.get("secondary-200");
@@ -137,11 +139,11 @@ function createExcel() {
         border: {
             top: {
                 style: "thin",
-                color: colourBackground
+                color: colourContrastLight
             },
             bottom: {
                 style: "thin",
-                color: colourBackground
+                color: colourContrastLight
             }
         }
     });
@@ -221,8 +223,7 @@ function createExcel() {
         sheet
             .cell(currentRow, 1, currentRow, numColumnsTotal)
             .style(textStyle)
-            .style(fontColour(colourText))
-            .style(fillPattern(colourContrastLight));
+            .style(fillPattern("white"));
         sheet.cell(currentRow, 1, currentRow, 3, true).string("Port battle calculator by Felix Victor");
         sheet
             .cell(currentRow, 4, currentRow, 5, true)
@@ -233,8 +234,7 @@ function createExcel() {
         sheet
             .cell(currentRow, 1, currentRow, numColumnsTotal)
             .style(textStyle)
-            .style(fontColour(colourText))
-            .style(fillPattern(colourContrastLight));
+            .style(fillPattern(colourContrastNearWhite));
         sheet.cell(currentRow, 1).string("Port");
         sheet
             .cell(currentRow, 2)
@@ -249,7 +249,7 @@ function createExcel() {
             .cell(currentRow, 1, currentRow, numColumnsTotal)
             .style(textStyle)
             .style(fontColourBold(colourContrastNearWhite))
-            .style(fillPattern(colourContrastDark));
+            .style(fillPattern(colourContrastMiddle));
         sheet.cell(currentRow, 1).string("Rate");
         sheet.cell(currentRow, 2).string("Ship");
         sheet.cell(currentRow, 3).string("BR");
@@ -264,13 +264,13 @@ function createExcel() {
             .cell(currentRow, 1, currentRow, numColumnsTotal)
             .style(textStyle)
             .style(fontColourBold(colourContrastNearWhite))
-            .style(fillPattern(colourContrastDark));
+            .style(fillPattern(colourContrastMiddle));
 
         sheet
             .cell(currentRow, numColumnsHeader - 1, currentRow, numColumnsHeader)
             .style(numberStyle)
             .style(fontColourBold(colourText))
-            .style(fillPattern(colourContrastMiddle));
+            .style(fillPattern(colourContrastLight));
         sheet
             .cell(currentRow, numColumnsHeader - 1)
             .formula(
@@ -292,15 +292,14 @@ function createExcel() {
             .style(fontColourBold(colourHighlight));
 
         // Ship rows
-        const fgColourShip = [colourContrastWhite, colourContrastLight];
-        const fgColourPlayer = [colourPrimaryWhite, colourPrimaryLight];
+        const fgColourShip = ["white", colourContrastWhite];
+        const fgColourPlayer = ["white", colourPrimaryWhite];
         ships.forEach(ship => {
             currentRow += 1;
 
             sheet
                 .cell(currentRow, 1, currentRow, numColumnsHeader)
                 .style(textStyle)
-                .style(fontColour(colourPrimaryDark))
                 .style(border)
                 .style(fillPattern(fgColourShip[ship.class % 2]));
 
@@ -333,11 +332,11 @@ function createExcel() {
             sheet
                 .cell(currentRow, numColumnsHeader + 1, currentRow, numColumnsTotal)
                 .style(textStyle)
-                .style(fontColour(colourPrimaryDark))
                 .style(border)
                 .style(fillPattern(fgColourPlayer[ship.class % 2]));
         });
 
+        // BR too high colour
         sheet.addConditionalFormattingRule(`${Excel4Node.getExcelAlpha(numColumnsHeader)}${numRowsHeader}`, {
             type: "expression",
             priority: 1,
