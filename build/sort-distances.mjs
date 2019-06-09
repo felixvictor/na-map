@@ -1,3 +1,7 @@
+import d3Node from "d3-node";
+const d3n = d3Node();
+const { d3 } = d3n;
+
 import { cleanName, readJson, saveJson, distancePoints, sortBy, nations } from "./common.mjs";
 
 const date = "2019-06-08";
@@ -10,6 +14,54 @@ const outNations = ["NT"];
 const ports = readJson(inFilename);
 
 const findNationName = nationId => nations.find(nation => nation.id === nationId).name;
+
+const getName = port => (port.CountyCapitalName ? port.CountyCapitalName : port.Name);
+
+// Group port coordinates by county
+// https://stackoverflow.com/questions/40774697/how-to-group-an-array-of-objects-by-key
+const counties = ports.reduce(
+    (r, a) =>
+        Object.assign(r, {
+            [getName(a)]: (r[getName(a)] || []).concat([[a.Position.x, a.Position.z]])
+        }),
+    {}
+);
+// console.log(counties);
+const countyCentroids = new Map(
+    Object.entries(counties).map(([key, value]) => {
+        const polygon = d3.polygonHull(value);
+        return [key, polygon ? d3.polygonCentroid(polygon) : value.flat()];
+    })
+);
+// console.log(countyPolygons);
+
+/*
+console.log(
+    JSON.stringify(
+        ports
+            .filter(fromPort => fromPort.Nation === 9 || fromPort.Name === fromPort.CountyCapitalName)
+            .reduce(
+                (r, a) =>
+                    Object.assign(r, {
+                        [getName(a)]: (r[getName(a)] || []).concat([
+                            Math.round(a.Position.x / 1000),
+                            Math.round(a.Position.z / 1000)
+                        ])
+                    }),
+                {}
+            )
+    )
+);
+console.log(
+    JSON.stringify(
+        ports.map(port => ({
+            name: cleanName(port.Name),
+            county: cleanName(getName(port)),
+            coord: [Math.round(port.Position.x), Math.round(port.Position.z)]
+        }))
+    )
+);
+*/
 
 const portDistancesNations = nations
     .filter(fromNation => !outNations.includes(fromNation.short))
@@ -38,8 +90,12 @@ const portDistancesNations = nations
                         toPort: cleanName(toPort.Name),
                         distance: Math.round(
                             distancePoints(
+                                /*
                                 { x: fromPort.Position.x, y: fromPort.Position.z },
                                 { x: toPort.Position.x, y: toPort.Position.z }
+                                 */
+                                { x: countyCentroids.get(fromPort.Name)[0], y: countyCentroids.get(fromPort.Name)[1] },
+                                { x: countyCentroids.get(toPort.Name)[0], y: countyCentroids.get(toPort.Name)[1] }
                             ) / 1000
                         )
                     }))
@@ -70,8 +126,12 @@ const portDistancesFreeTowns = nations
                         toPort: cleanName(toPort.Name),
                         distance: Math.round(
                             distancePoints(
+                                /*
                                 { x: fromPort.Position.x, y: fromPort.Position.z },
                                 { x: toPort.Position.x, y: toPort.Position.z }
+                                 */
+                                { x: countyCentroids.get(fromPort.Name)[0], y: countyCentroids.get(fromPort.Name)[1] },
+                                { x: countyCentroids.get(toPort.Name)[0], y: countyCentroids.get(toPort.Name)[1] }
                             ) / 1000
                         )
                     }))
