@@ -398,5 +398,5 @@ export function getOrdinal(n, sup = true) {
 export const cleanName = name =>
     name
         .replace(/u([\dA-F]{4})/gi, match => String.fromCharCode(parseInt(match.replace(/u/g, ""), 16)))
-        .replace("L'Ocean", "L'Océan")
-        .replace(/'/g, "’");
+        .replace(/'/g, "’")
+        .trim();
