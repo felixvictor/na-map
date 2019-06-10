@@ -35,34 +35,6 @@ const countyCentroids = new Map(
 );
 // console.log(countyPolygons);
 
-/*
-console.log(
-    JSON.stringify(
-        ports
-            .filter(fromPort => fromPort.Nation === 9 || fromPort.Name === fromPort.CountyCapitalName)
-            .reduce(
-                (r, a) =>
-                    Object.assign(r, {
-                        [getName(a)]: (r[getName(a)] || []).concat([
-                            Math.round(a.Position.x / 1000),
-                            Math.round(a.Position.z / 1000)
-                        ])
-                    }),
-                {}
-            )
-    )
-);
-console.log(
-    JSON.stringify(
-        ports.map(port => ({
-            name: cleanName(port.Name),
-            county: cleanName(getName(port)),
-            coord: [Math.round(port.Position.x), Math.round(port.Position.z)]
-        }))
-    )
-);
-*/
-
 const portDistancesNations = nations
     .filter(fromNation => !outNations.includes(fromNation.short))
     .flatMap(fromNation =>
@@ -90,12 +62,14 @@ const portDistancesNations = nations
                         toPort: cleanName(toPort.Name),
                         distance: Math.round(
                             distancePoints(
-                                /*
+                                // Distance based on county capital positions
                                 { x: fromPort.Position.x, y: fromPort.Position.z },
                                 { x: toPort.Position.x, y: toPort.Position.z }
-                                 */
+                                /*
+                                // Distance based on county centroids
                                 { x: countyCentroids.get(fromPort.Name)[0], y: countyCentroids.get(fromPort.Name)[1] },
                                 { x: countyCentroids.get(toPort.Name)[0], y: countyCentroids.get(toPort.Name)[1] }
+                                 */
                             ) / 1000
                         )
                     }))
@@ -126,12 +100,14 @@ const portDistancesFreeTowns = nations
                         toPort: cleanName(toPort.Name),
                         distance: Math.round(
                             distancePoints(
-                                /*
+                                // Distance based on county capital positions
                                 { x: fromPort.Position.x, y: fromPort.Position.z },
                                 { x: toPort.Position.x, y: toPort.Position.z }
-                                 */
+                                /*
+                                // Distance based on county centroids
                                 { x: countyCentroids.get(fromPort.Name)[0], y: countyCentroids.get(fromPort.Name)[1] },
                                 { x: countyCentroids.get(toPort.Name)[0], y: countyCentroids.get(toPort.Name)[1] }
+                                 */
                             ) / 1000
                         )
                     }))
