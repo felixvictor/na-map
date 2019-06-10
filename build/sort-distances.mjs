@@ -2,9 +2,9 @@ import d3Node from "d3-node";
 const d3n = d3Node();
 const { d3 } = d3n;
 
-import { cleanName, readJson, saveJson, distancePoints, sortBy, nations } from "./common.mjs";
+import { cleanName, readJson, saveJson, distancePoints, sortBy, nations, speedFactor } from "./common.mjs";
 
-const date = "2019-06-08";
+const date = "2019-04-24";
 const numPorts = 3;
 const inFilename = `build/API/api-eu1-Ports-${date}.json`;
 const outFilename = "port-distances.json";
@@ -16,6 +16,8 @@ const ports = readJson(inFilename);
 const findNationName = nationId => nations.find(nation => nation.id === nationId).name;
 
 const getName = port => (port.CountyCapitalName ? port.CountyCapitalName : port.Name);
+
+const getKDistanceFromF11 = (Pt1, Pt2) => Math.round(distancePoints(Pt1, Pt2) / (2.63 * speedFactor));
 
 // Group port coordinates by county
 // https://stackoverflow.com/questions/40774697/how-to-group-an-array-of-objects-by-key
@@ -60,17 +62,15 @@ const portDistancesNations = nations
                         fromPort: cleanName(fromPort.Name),
                         toNation: findNationName(toPort.Nation),
                         toPort: cleanName(toPort.Name),
-                        distance: Math.round(
-                            distancePoints(
-                                // Distance based on county capital positions
-                                { x: fromPort.Position.x, y: fromPort.Position.z },
-                                { x: toPort.Position.x, y: toPort.Position.z }
-                                /*
+                        distance: getKDistanceFromF11(
+                            // Distance based on county capital positions
+                            { x: fromPort.Position.x, y: fromPort.Position.z },
+                            { x: toPort.Position.x, y: toPort.Position.z }
+                            /*
                                 // Distance based on county centroids
                                 { x: countyCentroids.get(fromPort.Name)[0], y: countyCentroids.get(fromPort.Name)[1] },
                                 { x: countyCentroids.get(toPort.Name)[0], y: countyCentroids.get(toPort.Name)[1] }
                                  */
-                            ) / 1000
                         )
                     }))
                     .sort(sortBy(["distance"]))
@@ -98,17 +98,15 @@ const portDistancesFreeTowns = nations
                         fromPort: cleanName(fromPort.Name),
                         toNation: findNationName(toPort.Nation),
                         toPort: cleanName(toPort.Name),
-                        distance: Math.round(
-                            distancePoints(
-                                // Distance based on county capital positions
-                                { x: fromPort.Position.x, y: fromPort.Position.z },
-                                { x: toPort.Position.x, y: toPort.Position.z }
-                                /*
+                        distance: getKDistanceFromF11(
+                            // Distance based on county capital positions
+                            { x: fromPort.Position.x, y: fromPort.Position.z },
+                            { x: toPort.Position.x, y: toPort.Position.z }
+                            /*
                                 // Distance based on county centroids
                                 { x: countyCentroids.get(fromPort.Name)[0], y: countyCentroids.get(fromPort.Name)[1] },
                                 { x: countyCentroids.get(toPort.Name)[0], y: countyCentroids.get(toPort.Name)[1] }
                                  */
-                            ) / 1000
                         )
                     }))
                     .sort(sortBy(["distance"]))
