@@ -1,1 +1,1 @@
-[]
+[{"good":"Grietje van Dijk","source":{"id":269,"grossPrice":440},"target":{"id":85,"grossPrice":1818},"distance":675,"profitTotal":44096,"quantity":32,"weightPerItem":20},{"good":"Coal","source":{"id":331,"grossPrice":8},"target":{"id":80,"grossPrice":68},"distance":676,"profitTotal":30000,"quantity":500,"weightPerItem":1}]
