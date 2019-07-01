@@ -486,6 +486,7 @@ class ShipBase extends Ship {
      * @returns {void}
      */
     _printText() {
+        console.log(this.shipData.resistance);
         const cannonsPerDeck = Ship.getCannonsPerDeck(this.shipData.deckClassLimit, this.shipData.gunsPerDeck);
         const hullRepairsNeeded = Math.round(
             (this.shipData.sides.armour * this.shipData.repairAmount.armour) / hullRepairsVolume
