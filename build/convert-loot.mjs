@@ -8,7 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { getOrdinal, readJson, saveJson, sortBy } from "./common.mjs";
+import { cleanName, getOrdinal, readJson, saveJson, sortBy } from "./common.mjs";
 
 const inBaseFilename = process.argv[2];
 const outFilename = process.argv[3];
@@ -16,19 +16,12 @@ const date = process.argv[4];
 
 const APIItems = readJson(`${inBaseFilename}-ItemTemplates-${date}.json`);
 
-// https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
-// eslint-disable-next-line no-extend-native,func-names
-String.prototype.replaceAll = function(search, replacement) {
-    const target = this;
-    return target.replace(new RegExp(search, "g"), replacement);
-};
-
 function convertLoot() {
     /**
      * Get item names
      * @return {Map<number, string>} Item names<id, name>
      */
-    const getItemNames = () => new Map(APIItems.map(item => [Number(item.Id), item.Name.replaceAll("'", "’")]));
+    const getItemNames = () => new Map(APIItems.map(item => [Number(item.Id), cleanName(item.Name)]));
 
     const itemNames = getItemNames();
 
@@ -64,7 +57,7 @@ function convertLoot() {
     data.chests = APIItems.filter(item => !item.NotUsed && item.ItemType === "TimeBasedConvertibleItem")
         .map(item => ({
             id: Number(item.Id),
-            name: item.Name,
+            name: cleanName(item.Name),
             weight: Number(item.ItemWeight),
             lifetime: Number(item.LifetimeSeconds) / (60 * 60),
             items: item.ExtendedLootTable.map(lootChestLootTableId =>

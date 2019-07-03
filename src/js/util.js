@@ -746,3 +746,20 @@ export const copyToClipboard = text => {
 
     writeClipboard(text);
 };
+
+/**
+ * Copy F11 coordinates to clipboard
+ * @param {number|null} x - X Coordinate
+ * @param {number|null} z - Z Coordinate
+ * @return {void}
+ */
+export const copyF11ToClipboard = (x, z) => {
+    if (Number.isFinite(x) && Number.isFinite(z)) {
+        const F11Url = new URL(window.location);
+
+        F11Url.searchParams.set("x", x);
+        F11Url.searchParams.set("z", z);
+
+        copyToClipboard(F11Url.href);
+    }
+};
