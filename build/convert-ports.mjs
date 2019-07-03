@@ -10,12 +10,12 @@
 
 import {
     capitalToCounty,
+    cleanName,
     convertCoordX,
     convertCoordY,
     rotationAngleInDegrees,
     readJson,
     saveJson
-    // eslint-disable-next-line import/extensions
 } from "./common.mjs";
 
 const inBaseFilename = process.argv[2];
@@ -23,13 +23,6 @@ const outFilename = process.argv[3];
 const date = process.argv[4];
 
 const apiPorts = readJson(`${inBaseFilename}-Ports-${date}.json`);
-
-// https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
-// eslint-disable-next-line no-extend-native,func-names
-String.prototype.replaceAll = function(search, replacement) {
-    const target = this;
-    return target.replace(new RegExp(search, "g"), replacement);
-};
 
 function convertPorts() {
     /**
@@ -58,7 +51,7 @@ function convertPorts() {
             const angle = Math.round(rotationAngleInDegrees(portPos, circleAPos));
             return {
                 id: Number(apiPort.Id),
-                name: apiPort.Name.replaceAll("'", "’"),
+                name: cleanName(apiPort.Name),
                 coordinates: portPos,
                 angle,
                 textAnchor: angle > 0 && angle < 180 ? "start" : "end",
