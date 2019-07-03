@@ -8,15 +8,121 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { curveBasis as d3CurveBasis, line as d3Line } from "d3-shape";
 import { select as d3Select } from "d3-selection";
-import { intersectionArea as vennIntersectionArea } from "venn.js/src/circleintersection";
 
 import { registerEvent } from "../analytics";
-import { circleRadiusFactor, insertBaseModal } from "../common";
-import { sortBy } from "../util";
-
+import { circleRadiusFactor, convertInvCoordX, convertInvCoordY, insertBaseModal } from "../common";
+import { copyF11ToClipboard, sortBy } from "../util";
 import Toast from "../util/toast";
+
+/**
+ * JavaScript implementation of Trilateration to find the position of a
+ * point (P4) from three known points in 3D space (P1, P2, P3) and their
+ * distance from the point in question.
+ *
+ * The solution used here is based on the derivation found on the Wikipedia
+ * page of Trilateration: https://en.wikipedia.org/wiki/Trilateration
+ *
+ * This library does not need any 3rd party tools as all the non-basic
+ * geometric functions needed are declared inside the trilaterate() function.
+ *
+ * See the GitHub page: https://github.com/gheja/trilateration.js
+ */
+
+/**
+ * Calculates the coordinates of a point in 3D space from three known points
+ * and the distances between those points and the point in question.
+ *
+ * If no solution found then null will be returned.
+ *
+ * If two solutions found then both will be returned, unless the fourth
+ * parameter (return_middle) is set to true when the middle of the two solution
+ * will be returned.
+ *
+ * @param {object} p1 Point and distance: { x, y, z, r }
+ * @param {object} p2 Point and distance: { x, y, z, r }
+ * @param {object} p3 Point and distance: { x, y, z, r }
+ * @param {boolean} returnMiddle If two solutions found then return the center of them
+ * @return {object|Array|null} { x, y, z } or [ { x, y, z }, { x, y, z } ] or null
+ */
+function trilaterate(p1, p2, p3, returnMiddle = false) {
+    // based on: https://en.wikipedia.org/wiki/Trilateration
+
+    // some additional local functions declared here for
+    // scalar and vector operations
+
+    const sqr = a => a * a;
+
+    const norm = a => Math.sqrt(sqr(a.x) + sqr(a.y) + sqr(a.z));
+
+    const dot = (a, b) => a.x * b.x + a.y * b.y + a.z * b.z;
+
+    const vectorSubtract = (a, b) => ({
+        x: a.x - b.x,
+        y: a.y - b.y,
+        z: a.z - b.z
+    });
+
+    const vectorAdd = (a, b) => ({
+        x: a.x + b.x,
+        y: a.y + b.y,
+        z: a.z + b.z
+    });
+
+    const vectorDivide = (a, b) => ({
+        x: a.x / b,
+        y: a.y / b,
+        z: a.z / b
+    });
+
+    const vectorMultiply = (a, b) => ({
+        x: a.x * b,
+        y: a.y * b,
+        z: a.z * b
+    });
+
+    const vectorCross = (a, b) => ({
+        x: a.y * b.z - a.z * b.y,
+        y: a.z * b.x - a.x * b.z,
+        z: a.x * b.y - a.y * b.x
+    });
+
+    const ex = vectorDivide(vectorSubtract(p2, p1), norm(vectorSubtract(p2, p1)));
+    const i = dot(ex, vectorSubtract(p3, p1));
+    let a = vectorSubtract(vectorSubtract(p3, p1), vectorMultiply(ex, i));
+    const ey = vectorDivide(a, norm(a));
+    const ez = vectorCross(ex, ey);
+    const d = norm(vectorSubtract(p2, p1));
+    const j = dot(ey, vectorSubtract(p3, p1));
+
+    const x = (sqr(p1.r) - sqr(p2.r) + sqr(d)) / (2 * d);
+    const y = (sqr(p1.r) - sqr(p3.r) + sqr(i) + sqr(j)) / (2 * j) - (i / j) * x;
+
+    let b = sqr(p1.r) - sqr(x) - sqr(y);
+
+    // floating point math flaw in IEEE 754 standard
+    // see https://github.com/gheja/trilateration.js/issues/2
+    if (Math.abs(b) < 0.0000000001) {
+        b = 0;
+    }
+
+    const z = Math.sqrt(b);
+
+    // no solution found
+    if (isNaN(z)) {
+        return null;
+    }
+
+    a = vectorAdd(p1, vectorAdd(vectorMultiply(ex, x), vectorMultiply(ey, y)));
+    const p4a = vectorAdd(a, vectorMultiply(ez, z));
+    const p4b = vectorSubtract(a, vectorMultiply(ez, z));
+
+    if (z === 0 || returnMiddle) {
+        return a;
+    }
+
+    return [p4a, p4b];
+}
 
 /**
  * Get position
@@ -29,23 +135,22 @@ export default class TrilateratePosition {
         this._ports = ports;
 
         // Number of input port distances
-        this._inputs = 4;
+        this._NumberOfInputs = 3;
         this._baseName = "Get position";
         this._baseId = "get-position";
         this._buttonId = `button-${this._baseId}`;
         this._modalId = `modal-${this._baseId}`;
-
         this._modal$ = null;
 
-        this._setupSvg();
-        this._setupListener();
-    }
+        this._select = [];
+        this._input = [];
+        this._selector = [];
+        [...new Array(this._NumberOfInputs).keys()].forEach(inputNumber => {
+            this._select[inputNumber] = `${this._baseId}-${inputNumber}-select`;
+            this._input[inputNumber] = `${this._baseId}-${inputNumber}-input`;
+        });
 
-    _setupSvg() {
-        this._gPosition = d3Select("#ports")
-            .append("g")
-            .attr("data-ui-component", "position");
-        this._path = this._gPosition.append("path").attr("class", "bubble pos");
+        this._setupListener();
     }
 
     _navbarClick(event) {
@@ -77,23 +182,22 @@ export default class TrilateratePosition {
             dataList.append("option").attr("value", distance);
         });
 
-        [...new Array(this._inputs).keys()].forEach(row => {
-            const select = `${this._baseId}-${row}-select`;
-            const input = `${this._baseId}-${row}-input`;
+        [...new Array(this._NumberOfInputs).keys()].forEach(inputNumber => {
             const formRow = form.append("div").attr("class", "form-row");
             formRow
                 .append("div")
                 .attr("class", "col-md-6")
                 .append("label")
                 .append("select")
-                .attr("name", select)
-                .attr("id", select);
+                .attr("name", this._select[inputNumber])
+                .attr("id", this._select[inputNumber])
+                .attr("class", "selectpicker");
             formRow
                 .append("div")
                 .attr("class", "col-md-6")
                 .append("input")
-                .attr("id", input)
-                .attr("name", input)
+                .attr("id", this._input[inputNumber])
+                .attr("name", this._input[inputNumber])
                 .attr("type", "number")
                 .attr("class", "form-control")
                 .attr("placeholder", "Distance in k")
@@ -105,17 +209,6 @@ export default class TrilateratePosition {
     }
 
     _setupSelects() {
-        const selectPickerDefaults = {
-            noneSelectedText: "",
-            dropupAuto: false
-        };
-        const selectPickerLiveSearch = JSON.parse(JSON.stringify(selectPickerDefaults));
-        selectPickerLiveSearch.liveSearch = true;
-        selectPickerLiveSearch.liveSearchPlaceholder = "Search ...";
-        selectPickerLiveSearch.liveSearchNormalize = true;
-
-        selectPickerLiveSearch.noneSelectedText = "Select port";
-
         const selectPorts = this._ports.portDataDefault
             .map(d => ({
                 id: d.id,
@@ -126,24 +219,21 @@ export default class TrilateratePosition {
             .sort(sortBy(["name"]));
 
         const options = `${selectPorts
-            .map(
-                port =>
-                    `<option data-subtext="${port.nation}" value="${port.coord}" data-id="${port.id}">${
-                        port.name
-                    }</option>`
-            )
+            .map(port => `<option data-subtext="${port.nation}">${port.name}</option>`)
             .join("")}`;
 
-        [...new Array(this._inputs).keys()].forEach(row => {
-            const select = `${this._baseId}-${row}-select`;
-            const selector = document.getElementById(select);
-            const selector$ = $(`#${select}`);
+        [...new Array(this._NumberOfInputs).keys()].forEach(inputNumber => {
+            this._selector[inputNumber] = document.getElementById(this._select[inputNumber]);
 
-            selector.insertAdjacentHTML("beforeend", options);
-            selector$
-                .selectpicker(selectPickerLiveSearch)
-                .val("default")
-                .selectpicker("refresh");
+            this._selector[inputNumber].insertAdjacentHTML("beforeend", options);
+            $(this._selector[inputNumber]).selectpicker({
+                dropupAuto: false,
+                liveSearch: true,
+                liveSearchNormalize: true,
+                liveSearchPlaceholder: "Search ...",
+                title: "Select port",
+                virtualScroll: true
+            });
         });
     }
 
@@ -167,97 +257,36 @@ export default class TrilateratePosition {
          * @return {void}
          */
         const showAndGoToPosition = () => {
-            /**
-             * Get additional points to better represent position area
-             * Adapted from {@link https://github.com/benfred/bens-blog-code/blob/master/circle-intersection/circle-intersection-vis.js}
-             * @param {object} area - Position area
-             * @return {Array<number, number>} Points
-             */
-            const getAreaPoints = area => {
-                const points = [];
-                const samples = 32;
+            const circles = this._ports.portData.map(port => ({
+                x: port.coordinates[0],
+                y: port.coordinates[1],
+                z: 0,
+                r: port.distance
+            }));
 
-                area.arcs.forEach(arc => {
-                    const { p1, p2, circle } = arc;
-                    const a1 = Math.atan2(p1.x - circle.x, p1.y - circle.y);
-                    const a2 = Math.atan2(p2.x - circle.x, p2.y - circle.y);
-
-                    let angleDiff = a2 - a1;
-                    if (angleDiff < 0) {
-                        angleDiff += 2 * Math.PI;
-                    }
-
-                    const angleDelta = angleDiff / samples;
-                    [...new Array(samples).keys()].forEach(i => {
-                        const angle = a2 - angleDelta * i;
-
-                        const extended = {
-                            x: circle.x + circle.radius * Math.sin(angle),
-                            y: circle.y + circle.radius * Math.cos(angle)
-                        };
-                        points.push([Math.floor(extended.x), Math.floor(extended.y)]);
-                    });
-                });
-
-                return points;
-            };
-
-            /**
-             * @typedef {object} Area
-             * @property {number} arcArea - Arc area
-             * @property {object} arcs - Arcs
-             * @property {number} area - Area
-             * @property {Array<number, number>} innerPoints - Inner points of intersection
-             * @property {Array<number, number>} intersectionPoints - Points of all intersection circles
-             * @property {number} polygonArea - Polygon Area
-             */
-
-            /**
-             * Display position area
-             * @param {Area} area - Position area
-             * @return {void}
-             */
-            const displayArea = area => {
-                const points = getAreaPoints(area);
-
-                const line = d3Line().curve(d3CurveBasis);
-                this._path.attr("d", line(points));
-            };
-
-            /**
-             * Get intersection Area
-             * @return {Area} Intersection data
-             */
-            const getIntersectionArea = () => {
-                const circles = this._ports.portData.map(port => ({
-                    x: port.coordinates[0],
-                    y: port.coordinates[1],
-                    radius: port.distance
-                }));
-                const stats = {};
-
-                vennIntersectionArea(circles, stats);
-                return stats;
-            };
-
-            const area = getIntersectionArea();
+            const position = trilaterate(circles[0], circles[1], circles[2], true);
 
             // If intersection is found
-            if (area.innerPoints.length) {
-                displayArea(area);
+            if (position) {
+                position.x = Math.round(position.x);
+                position.y = Math.round(position.y);
 
-                const bbox = this._path.node().getBBox();
-                const centroid = { x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2 };
+                this._ports._map._f11.printCoord(position.x, position.y);
+                this._ports._map.zoomAndPan(position.x, position.y, 1);
 
-                this._ports._map._f11.printCoord(centroid.x, centroid.y);
-                this._ports._map.zoomAndPan(centroid.x, centroid.y, 1);
+                const coordX = Math.round(convertInvCoordX(position.x, position.y) / -1000);
+                const coordY = Math.round(convertInvCoordY(position.x, position.y) / -1000);
+                copyF11ToClipboard(coordX, coordY);
+
+                // eslint-disable-next-line no-new
+                new Toast("Get position", "Coordinates copied to clipboard.");
             } else {
                 // eslint-disable-next-line no-new
                 new Toast("Get position", "No intersection found.");
             }
         };
 
-        const roundingFactor = 1.05;
+        const roundingFactor = 1.04;
 
         /*
         const ports = new Map([
@@ -275,21 +304,18 @@ export default class TrilateratePosition {
 
         const ports = new Map();
 
-        [...new Array(this._inputs).keys()].forEach(row => {
-            const select = `${this._baseId}-${row}-select`;
-            const selectSelector$ = $(`#${select}`);
-            const input = `${this._baseId}-${row}-input`;
-            const inputSelector$ = $(`#${input}`);
-
-            const port = selectSelector$.find(":selected")[0] ? selectSelector$.find(":selected")[0].text : "";
-            const distance = Number(inputSelector$.val());
+        [...new Array(this._NumberOfInputs).keys()].forEach(inputNumber => {
+            const port = this._selector[inputNumber].selectedIndex
+                ? this._selector[inputNumber].options[this._selector[inputNumber].selectedIndex].text
+                : "";
+            const distance = Number(document.getElementById(this._input[inputNumber]).value);
 
             if (distance && port !== "") {
                 ports.set(port, distance * roundingFactor * circleRadiusFactor);
             }
         });
 
-        if (ports.size >= 2) {
+        if (ports.size === this._NumberOfInputs) {
             this._ports.setShowRadiusSetting("position");
             this._ports.portData = JSON.parse(
                 JSON.stringify(
@@ -325,13 +351,5 @@ export default class TrilateratePosition {
         this._modal$.modal("show").one("hidden.bs.modal", () => {
             this._useUserInput();
         });
-    }
-
-    /**
-     * Clear map
-     * @return {void}
-     */
-    clearMap() {
-        this._path.attr("d", null);
     }
 }

@@ -710,6 +710,8 @@ export default class Journey {
         if (this._journey.segment.length) {
             this._printJourney();
         } else {
+            this._g.selectAll("g.coord g.label").remove();
+            this._gJourneyPath.remove();
             this._removeCompass();
             this._hideSummary();
             this._initJourneyData();
