@@ -39,7 +39,16 @@ import {
     repairTime,
     insertBaseModal
 } from "../common";
-import { copyToClipboard, formatFloat, formatInt, getOrdinal, isEmpty, roundToThousands, sortBy } from "../util";
+import {
+    copyToClipboard,
+    formatFloat,
+    formatInt,
+    formatPercent,
+    getOrdinal,
+    isEmpty,
+    roundToThousands,
+    sortBy
+} from "../util";
 
 import CompareWoods from "./compare-woods";
 
@@ -291,9 +300,9 @@ class Ship {
 
         text += displayFirstColumn("Resistance");
         text += displaySecondBlock();
-        text += displayColumn("fireResistance", "Fire", 3);
-        text += displayColumn("leakResistance", "Leaks", 3);
-        text += displayColumn("splinterResistance", "Splinter", 6);
+        text += displayColumn("fireResistance", "Fire", 4);
+        text += displayColumn("leakResistance", "Leaks", 4);
+        text += displayColumn("splinterResistance", "Splinter", 4);
         text += "</div></div></div>";
 
         text += displayFirstColumn('Repairs needed <span class="badge badge-white">Set of 5</span>');
@@ -486,7 +495,6 @@ class ShipBase extends Ship {
      * @returns {void}
      */
     _printText() {
-        console.log(this.shipData.resistance);
         const cannonsPerDeck = Ship.getCannonsPerDeck(this.shipData.deckClassLimit, this.shipData.gunsPerDeck);
         const hullRepairsNeeded = Math.round(
             (this.shipData.sides.armour * this.shipData.repairAmount.armour) / hullRepairsVolume
@@ -555,9 +563,9 @@ class ShipBase extends Ship {
             rumRepairsNeeded: `${formatInt(rumRepairsNeeded)}\u00A0<span class="badge badge-white">${formatInt(
                 rumRepairsNeeded * repairsSetSize
             )}</span>`,
-            fireResistance: formatInt(this.shipData.resistance.fire),
-            leakResistance: formatInt(this.shipData.resistance.leaks),
-            splinterResistance: formatInt(this.shipData.resistance.splinter),
+            fireResistance: formatPercent(this.shipData.resistance.fire, 0),
+            leakResistance: formatPercent(this.shipData.resistance.leaks, 0),
+            splinterResistance: formatPercent(this.shipData.resistance.splinter, 0),
             mastBottomArmor: `${formatInt(
                 this.shipData.mast.bottomArmour
             )}\u00A0<span class="badge badge-white">${formatInt(this.shipData.mast.bottomThickness)}</span>`,
@@ -878,17 +886,23 @@ class ShipComparison extends Ship {
                 rumRepairsNeededCompare,
                 rumRepairsNeededBase
             )} <span class="badge badge-white">${formatInt(rumRepairsNeededCompare * repairsSetSize)}</span>`,
-            fireResistance: `${formatInt(this.shipCompareData.resistance.fire)}\u00A0${getDiff(
+            fireResistance: `${formatPercent(this.shipCompareData.resistance.fire, 0)}\u00A0${getDiff(
                 this.shipCompareData.resistance.fire,
-                this.shipBaseData.resistance.fire
+                this.shipBaseData.resistance.fire,
+                2,
+                true
             )}`,
-            leakResistance: `${formatInt(this.shipCompareData.resistance.leaks)}\u00A0${getDiff(
+            leakResistance: `${formatPercent(this.shipCompareData.resistance.leaks, 0)}\u00A0${getDiff(
                 this.shipCompareData.resistance.leaks,
-                this.shipBaseData.resistance.leaks
+                this.shipBaseData.resistance.leaks,
+                2,
+                true
             )}`,
-            splinterResistance: `${formatInt(this.shipCompareData.resistance.splinter)}\u00A0${getDiff(
+            splinterResistance: `${formatPercent(this.shipCompareData.resistance.splinter, 0)}\u00A0${getDiff(
                 this.shipCompareData.resistance.splinter,
-                this.shipBaseData.resistance.splinter
+                this.shipBaseData.resistance.splinter,
+                2,
+                true
             )}`,
             mastBottomArmor: `${formatInt(this.shipCompareData.mast.bottomArmour)}\u00A0${getDiff(
                 this.shipCompareData.mast.bottomArmour,
@@ -1219,17 +1233,15 @@ export default class CompareShips {
     _setupModuleData() {
         // Get all modules where change modifier (moduleChanges) exists
         this._moduleProperties = new Map(
-            this._moduleDataDefault
-                .map(type =>
-                    type[1]
-                        .filter(module =>
-                            module.properties.some(property => {
-                                return this._moduleChanges.has(property.modifier);
-                            })
-                        )
-                        .map(module => [module.id, module])
-                )
-                .flat()
+            this._moduleDataDefault.flatMap(type =>
+                type[1]
+                    .filter(module =>
+                        module.properties.some(property => {
+                            return this._moduleChanges.has(property.modifier);
+                        })
+                    )
+                    .map(module => [module.id, module])
+            )
         );
 
         // Get types from moduleProperties list
@@ -1531,24 +1543,21 @@ export default class CompareShips {
             modifierAmount.forEach((value, key) => {
                 this._woodChanges.get(key).forEach(modifier => {
                     const index = modifier.split(".");
-                    const { absolute } = modifierAmount.get(key);
-                    let factor = 1;
+                    let value = modifierAmount.get(key).absolute;
                     if (modifierAmount.get(key).percentage) {
-                        factor = 1 + modifierAmount.get(key).percentage / 100;
+                        value = modifierAmount.get(key).percentage / 100;
                     }
 
                     if (index.length > 1) {
                         if (data[index[0]][index[1]]) {
-                            data[index[0]][index[1]] *= factor;
-                            data[index[0]][index[1]] += absolute;
+                            data[index[0]][index[1]] += value;
                         } else {
-                            data[index[0]][index[1]] = absolute;
+                            data[index[0]][index[1]] = value;
                         }
                     } else if (data[index[0]]) {
-                        data[index[0]] *= factor;
-                        data[index[0]] += absolute;
+                        data[index[0]] += value;
                     } else {
-                        data[index[0]] = absolute;
+                        data[index[0]] = value;
                     }
                 });
             });
