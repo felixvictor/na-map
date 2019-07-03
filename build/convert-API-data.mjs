@@ -2,6 +2,7 @@ import polylabel from "polylabel";
 
 import {
     capitalToCounty,
+    cleanName,
     convertCoordX,
     convertCoordY,
     distancePoints,
@@ -22,13 +23,6 @@ const apiShops = readJson(`${inBaseFilename}-Shops-${date}.json`);
 
 const minProfit = 3e4;
 
-// https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
-// eslint-disable-next-line no-extend-native,func-names
-String.prototype.replaceAll = function(search, replacement) {
-    const target = this;
-    return target.replace(new RegExp(search, "g"), replacement);
-};
-
 /**
  * Get item names
  * @return {Map<number, string>} Item names<id, name>
@@ -38,7 +32,7 @@ const getItemNames = () =>
         apiItems.map(item => [
             item.Id,
             {
-                name: item.Name.replaceAll("'", "’"),
+                name: cleanName(item.Name),
                 weight: item.ItemWeight,
                 itemType: item.ItemType,
                 trading:
@@ -229,7 +223,7 @@ function convertPorts() {
     const apiItemWeight = new Map(
         apiItems
             .filter(apiItem => !apiItem.NotUsed && !apiItem.NotTradeable && apiItem.ItemType !== "RecipeResource")
-            .map(apiItem => [apiItem.Name.replaceAll("'", "’"), apiItem.ItemWeight])
+            .map(apiItem => [cleanName(apiItem.Name), apiItem.ItemWeight])
     );
 
     portData.forEach(buyPort => {
@@ -273,7 +267,7 @@ function convertPorts() {
         // eslint-disable-next-line no-param-reassign
         region.geometry.type = "Point";
         // eslint-disable-next-line no-param-reassign
-        region.geometry.coordinates = polylabel([region.geometry.coordinates], 1.0).map(coordinate =>
+        region.geometry.coordinates = polylabel([region.geometry.coordinates], 1).map(coordinate =>
             Math.round(coordinate)
         );
     });
@@ -283,7 +277,7 @@ function convertPorts() {
         // eslint-disable-next-line no-param-reassign
         county.geometry.type = "Point";
         // eslint-disable-next-line no-param-reassign
-        county.geometry.coordinates = polylabel([county.geometry.coordinates], 1.0).map(coordinate =>
+        county.geometry.coordinates = polylabel([county.geometry.coordinates], 1).map(coordinate =>
             Math.round(coordinate)
         );
     });
