@@ -34,28 +34,28 @@ function get_current_branch() {
     git rev-parse --abbrev-ref HEAD
 }
 
-function git_push_all () {
-    git push --quiet gitlab --all
+function git_push () {
+    git push --quiet gitlab
 }
 
-function git_pull_all () {
-    git pull --quiet --all
+function git_pull () {
+    git pull --quiet
 }
 
-function pull_all () {
+function pull_master () {
     local branch
     branch=$(get_current_branch)
 
     git checkout master
-    git_pull_all
+    git_pull
     git checkout "${branch}"
 }
 
 function on_exit () {
     # If git push fails, git pull first
     if [ "${last_function}" == "push_data" ]; then
-        pull_all
-        git_push_all
+        pull_master
+        git_push
         exit 0
     fi
 }
@@ -333,7 +333,7 @@ function push_data () {
     fi
     # Status for on_exit trap
     last_function="push_data"
-    git_push_all
+    git_push
     last_function=""
 }
 

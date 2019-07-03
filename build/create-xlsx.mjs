@@ -1,18 +1,30 @@
-/* eslint-disable no-param-reassign */
+/**
+ * This file is part of na-map.
+ *
+ * @file      Create pb sheets.
+ * @module    build/create-xlsx
+ * @author    iB aka Felix Victor
+ * @copyright 2017, 2018, 2019
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
 
-// eslint-disable-next-line import/no-extraneous-dependencies
 import Excel4Node from "excel4node";
 
-// eslint-disable-next-line import/no-extraneous-dependencies
-// import { sass.renderSync as sassRenderSync } from "node-sass";
 import sass from "node-sass";
-// eslint-disable-next-line import/no-extraneous-dependencies
 import css from "css";
 import { readJson, sortBy } from "./common.mjs";
+
+const shallowWaterFrigates = ["Cerberus", "Hercules", "L’Hermione", "La Renommée", "Surprise"];
+const minDeepWaterBR = 80;
+const maxNumPlayers = 25;
+
+const columnWidth = 20;
+const rowHeight = 24;
 
 const shipFilename = process.argv[2];
 const portFilename = process.argv[3];
 const outFilename = process.argv[4];
+
 const shipsOrig = readJson(shipFilename);
 const portData = readJson(portFilename);
 
@@ -24,13 +36,6 @@ const portData = readJson(portFilename);
  * @returns {Number[]} Result
  */
 const range = (start, end) => [...new Array(1 + end - start).keys()].map(v => start + v);
-
-// https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
-// eslint-disable-next-line no-extend-native,func-names
-String.prototype.replaceAll = function(search, replacement) {
-    const target = this;
-    return target.replace(new RegExp(search, "g"), replacement);
-};
 
 const dwPorts = portData
     .filter(port => !port.shallow)
@@ -74,27 +79,29 @@ function setColours() {
  */
 function createExcel() {
     const colours = setColours();
-    const primary050 = colours.get("primary-050");
-    const primary200 = colours.get("primary-200");
-    const primary800 = colours.get("primary-800");
-    const secondary050 = colours.get("secondary-050");
-    const secondary100 = colours.get("secondary-100");
-    const secondary200 = colours.get("secondary-200");
-    const secondary400 = colours.get("secondary-400");
-    const secondary600 = colours.get("secondary-600");
-    const secondary800 = colours.get("secondary-800");
-    const background600 = colours.get("background-600");
-    const highlight = colours.get("info");
-    const red = colours.get("pink");
+    const colourWhite = colours.get("white");
+    const colourPrimaryWhite = colours.get("primary-050");
+    const colourPrimaryNearWhite = colours.get("primary-100");
+    const colourPrimaryLight = colours.get("primary-200");
+    const colourPrimaryDark = colours.get("primary-600");
+    const colourContrastWhite = colours.get("secondary-050");
+    const colourContrastNearWhite = colours.get("secondary-100");
+    const colourContrastLight = colours.get("secondary-200");
+    const colourContrastMiddle = colours.get("secondary-400");
+    const colourContrastDark = colours.get("secondary-600");
+    const colourText = colours.get("secondary-800");
+    const colourBackground = colours.get("background-600");
+    const colourHighlight = colours.get("info");
+    const colourRed = colours.get("pink");
 
     const wsOptions = {
         sheetView: {
             showGridLines: false // Flag indicating whether the sheet should have gridlines enabled or disabled during view
         },
         sheetFormat: {
-            baseColWidth: 20, // Defaults to 10. Specifies the number of characters of the maximum digit width of the normal style's font. This value does not include margin padding or extra padding for gridlines. It is only the number of characters.,
-            defaultColWidth: 20,
-            defaultRowHeight: 24
+            baseColWidth: columnWidth, // Defaults to 10. Specifies the number of characters of the maximum digit width of the normal style's font. This value does not include margin padding or extra padding for gridlines. It is only the number of characters.,
+            defaultColWidth: columnWidth,
+            defaultRowHeight: rowHeight
         }
     };
 
@@ -132,11 +139,11 @@ function createExcel() {
         border: {
             top: {
                 style: "thin",
-                color: background600
+                color: colourContrastLight
             },
             bottom: {
                 style: "thin",
-                color: background600
+                color: colourContrastLight
             }
         }
     });
@@ -146,7 +153,7 @@ function createExcel() {
      * @param {String} colour - Font colour
      * @returns {Object} Font object
      */
-    const brTooHigh = workbook.createStyle({ font: { bold: true, color: red } }); // §18.8.22
+    const brTooHigh = workbook.createStyle({ font: { bold: true, color: colourRed } }); // §18.8.22
 
     /**
      * Fill worksheet
@@ -156,13 +163,6 @@ function createExcel() {
      * @returns {void}
      */
     function fillSheet(sheet, ships, ports) {
-        const headerRows = 4;
-        const headerColumns = 5;
-        const numPlayers = 24;
-        const numRows = headerRows + ships.length;
-        const numColumns = headerColumns + numPlayers;
-        const rowHeight = 40;
-
         const numberStyle = {
             alignment: {
                 // §18.8.1
@@ -184,51 +184,46 @@ function createExcel() {
             numberFormat: "@" // §18.8.30 numFmt (Number Format)
         };
 
-        sheet.column(headerColumns).freeze(); // Freezes the first two columns and scrolls the right view to column D
-        sheet.row(headerRows).freeze();
+        const columnsHeader = [
+            { name: "Ship rate", width: 8, style: numberStyle },
+            { name: "Ship name", width: 22, style: textStyle },
+            { name: "Ship battle rating", width: 8, style: numberStyle },
+            { name: "Number of players", width: 12, style: numberStyle },
+            { name: "Total battle rating", width: 12, style: numberStyle }
+        ];
+        const numRowsHeader = 4;
+        const numRowsTotal = numRowsHeader + ships.length;
+        const numColumnsHeader = columnsHeader.length;
+        const numColumnsTotal = numColumnsHeader + maxNumPlayers;
+
+        sheet.column(numColumnsHeader).freeze(); // Freezes the first two columns and scrolls the right view to column D
+        sheet.row(numRowsHeader).freeze();
 
         // ***** Columns *****
-        // Format first columns
-        // Ship rate
-        let currentColumn = 1;
-        sheet.column(currentColumn).setWidth(8);
-        sheet.cell(1, currentColumn, numRows, currentColumn).style(numberStyle);
+        const setColumns = () => {
+            // Format first columns
 
-        // Ship name
-        currentColumn += 1;
-        sheet.column(currentColumn).setWidth(22);
-        sheet.cell(1, currentColumn, numRows, currentColumn).style(textStyle);
+            columnsHeader.forEach((column, i) => {
+                sheet.column(i + 1).setWidth(column.width);
+                sheet.cell(1, i + 1, numRowsTotal, i + 1).style(column.style);
+            });
 
-        // Ship battle rating
-        currentColumn += 1;
-        sheet.column(currentColumn).setWidth(8);
-        sheet.cell(1, currentColumn, numRows, currentColumn).style(numberStyle);
+            // Player names
+            range(numColumnsHeader + 1, numColumnsHeader + maxNumPlayers).forEach(column => {
+                sheet.column(column).setWidth(columnWidth);
+                sheet.cell(1, column, numRowsTotal, column).style(textStyle);
+            });
+        };
 
-        // Number of players
-        currentColumn += 1;
-        sheet.column(currentColumn).setWidth(12);
-        sheet.cell(1, currentColumn, numRows, currentColumn).style(numberStyle);
-
-        // Total battle rating
-        currentColumn += 1;
-        sheet.column(currentColumn).setWidth(12);
-        sheet.cell(1, currentColumn, numRows, currentColumn).style(numberStyle);
-
-        // Player names
-        range(headerColumns + 1, headerColumns + numPlayers).forEach(column => {
-            sheet.column(column).setWidth(20);
-            sheet.cell(1, column, numRows, column).style(textStyle);
-        });
+        setColumns();
 
         // ***** Rows *****
         // General description row
         let currentRow = 1;
-        sheet.row(currentRow).setHeight(rowHeight);
         sheet
-            .cell(currentRow, 1, currentRow, numColumns)
+            .cell(currentRow, 1, currentRow, numColumnsTotal)
             .style(textStyle)
-            .style(fontColour(secondary800))
-            .style(fillPattern(secondary200));
+            .style(fillPattern("white"));
         sheet.cell(currentRow, 1, currentRow, 3, true).string("Port battle calculator by Felix Victor");
         sheet
             .cell(currentRow, 4, currentRow, 5, true)
@@ -236,80 +231,75 @@ function createExcel() {
 
         // Port description row
         currentRow += 1;
-        sheet.row(currentRow).setHeight(rowHeight);
         sheet
-            .cell(currentRow, 1, currentRow, numColumns)
+            .cell(currentRow, 1, currentRow, numColumnsTotal)
             .style(textStyle)
-            .style(fontColour(secondary800))
-            .style(fillPattern(secondary200));
+            .style(fillPattern(colourContrastNearWhite));
         sheet.cell(currentRow, 1).string("Port");
         sheet
             .cell(currentRow, 2)
             .string("1. Select port")
-            .style(fontColourBold(highlight));
-        sheet.cell(currentRow, headerColumns - 1).string("Max BR");
-        sheet.cell(currentRow, headerColumns).style(numberStyle);
+            .style(fontColourBold(colourHighlight));
+        sheet.cell(currentRow, numColumnsHeader - 1).string("Max BR");
+        sheet.cell(currentRow, numColumnsHeader).style(numberStyle);
 
         // Column description row
         currentRow += 1;
-        sheet.row(currentRow).setHeight(rowHeight);
         sheet
-            .cell(currentRow, 1, currentRow, numColumns)
+            .cell(currentRow, 1, currentRow, numColumnsTotal)
             .style(textStyle)
-            .style(fontColourBold(secondary100))
-            .style(fillPattern(secondary600));
+            .style(fontColourBold(colourContrastNearWhite))
+            .style(fillPattern(colourContrastMiddle));
         sheet.cell(currentRow, 1).string("Rate");
         sheet.cell(currentRow, 2).string("Ship");
         sheet.cell(currentRow, 3).string("BR");
         sheet.cell(currentRow, 4).string("# Players");
         sheet.cell(currentRow, 5).string("BR total");
 
-        sheet.cell(currentRow, headerColumns + 1, currentRow, headerColumns + 2, true).string("Player names");
+        sheet.cell(currentRow, numColumnsHeader + 1, currentRow, numColumnsHeader + 2, true).string("Player names");
 
         // Total row
         currentRow += 1;
-        sheet.row(currentRow).setHeight(rowHeight);
         sheet
-            .cell(currentRow, 1, currentRow, numColumns)
+            .cell(currentRow, 1, currentRow, numColumnsTotal)
             .style(textStyle)
-            .style(fontColourBold(secondary100))
-            .style(fillPattern(secondary600));
+            .style(fontColourBold(colourContrastNearWhite))
+            .style(fillPattern(colourContrastMiddle));
 
         sheet
-            .cell(currentRow, headerColumns - 1, currentRow, headerColumns)
+            .cell(currentRow, numColumnsHeader - 1, currentRow, numColumnsHeader)
             .style(numberStyle)
-            .style(fontColourBold(secondary800))
-            .style(fillPattern(secondary400));
+            .style(fontColourBold(colourText))
+            .style(fillPattern(colourContrastLight));
         sheet
-            .cell(currentRow, headerColumns - 1)
+            .cell(currentRow, numColumnsHeader - 1)
             .formula(
-                `SUM(${Excel4Node.getExcelAlpha(headerColumns - 1)}${headerRows + 1}:${Excel4Node.getExcelAlpha(
-                    headerColumns - 1
-                )}${numRows})`
+                `SUM(${Excel4Node.getExcelAlpha(numColumnsHeader - 1)}${numRowsHeader + 1}:${Excel4Node.getExcelAlpha(
+                    numColumnsHeader - 1
+                )}${numRowsTotal})`
             );
         sheet
-            .cell(currentRow, headerColumns)
+            .cell(currentRow, numColumnsHeader)
             .formula(
-                `SUM(${Excel4Node.getExcelAlpha(headerColumns)}${headerRows + 1}:${Excel4Node.getExcelAlpha(
-                    headerColumns
-                )}${numRows})`
+                `SUM(${Excel4Node.getExcelAlpha(numColumnsHeader)}${numRowsHeader + 1}:${Excel4Node.getExcelAlpha(
+                    numColumnsHeader
+                )}${numRowsTotal})`
             );
 
         sheet
-            .cell(currentRow, headerColumns + 1, currentRow, numColumns, true)
+            .cell(currentRow, numColumnsHeader + 1, currentRow, numColumnsTotal, true)
             .string("2. Enter player names")
-            .style(fontColourBold(highlight));
+            .style(fontColourBold(colourHighlight));
 
         // Ship rows
-        const fgColourShip = [secondary050, secondary200];
-        const fgColourPlayer = [primary050, primary200];
+        const fgColourShip = ["white", colourContrastWhite];
+        const fgColourPlayer = ["white", colourPrimaryWhite];
         ships.forEach(ship => {
             currentRow += 1;
 
             sheet
-                .cell(currentRow, 1, currentRow, headerColumns)
+                .cell(currentRow, 1, currentRow, numColumnsHeader)
                 .style(textStyle)
-                .style(fontColour(primary800))
                 .style(border)
                 .style(fillPattern(fgColourShip[ship.class % 2]));
 
@@ -323,43 +313,43 @@ function createExcel() {
                 .number(ship.battleRating)
                 .style(numberStyle);
             sheet
-                .cell(currentRow, headerColumns - 1)
+                .cell(currentRow, numColumnsHeader - 1)
                 .formula(
-                    `COUNTA(${Excel4Node.getExcelAlpha(headerColumns + 1)}${currentRow}:${Excel4Node.getExcelAlpha(
-                        numColumns
+                    `COUNTA(${Excel4Node.getExcelAlpha(numColumnsHeader + 1)}${currentRow}:${Excel4Node.getExcelAlpha(
+                        numColumnsTotal
                     )}${currentRow})`
                 )
                 .style(numberStyle);
             sheet
-                .cell(currentRow, headerColumns)
+                .cell(currentRow, numColumnsHeader)
                 .formula(
-                    `${Excel4Node.getExcelAlpha(headerColumns - 2)}${currentRow}*${Excel4Node.getExcelAlpha(
-                        headerColumns - 1
+                    `${Excel4Node.getExcelAlpha(numColumnsHeader - 2)}${currentRow}*${Excel4Node.getExcelAlpha(
+                        numColumnsHeader - 1
                     )}${currentRow}`
                 )
                 .style(numberStyle);
 
             sheet
-                .cell(currentRow, headerColumns + 1, currentRow, numColumns)
+                .cell(currentRow, numColumnsHeader + 1, currentRow, numColumnsTotal)
                 .style(textStyle)
-                .style(fontColour(primary800))
                 .style(border)
                 .style(fillPattern(fgColourPlayer[ship.class % 2]));
         });
 
-        sheet.addConditionalFormattingRule(`${Excel4Node.getExcelAlpha(headerColumns)}${headerRows}`, {
+        // BR too high colour
+        sheet.addConditionalFormattingRule(`${Excel4Node.getExcelAlpha(numColumnsHeader)}${numRowsHeader}`, {
             type: "expression",
             priority: 1,
-            formula: `AND(NOT(ISBLANK(${Excel4Node.getExcelAlpha(headerColumns)}${headerRows - 2})),
-                ${Excel4Node.getExcelAlpha(headerColumns)}${headerRows} >
-                ${Excel4Node.getExcelAlpha(headerColumns)}${headerRows - 2})`, // formula that returns nonzero or 0
+            formula: `AND(NOT(ISBLANK(${Excel4Node.getExcelAlpha(numColumnsHeader)}${numRowsHeader - 2})),
+                ${Excel4Node.getExcelAlpha(numColumnsHeader)}${numRowsHeader} >
+                ${Excel4Node.getExcelAlpha(numColumnsHeader)}${numRowsHeader - 2})`, // formula that returns nonzero or 0
             style: brTooHigh
         });
 
         // Port select dropdown
         ports.forEach((port, i) => {
-            sheet.cell(i + 1, numColumns + 1).string(port.name);
-            sheet.cell(i + 1, numColumns + 2).number(port.br);
+            sheet.cell(i + 1, numColumnsTotal + 1).string(port.name);
+            sheet.cell(i + 1, numColumnsTotal + 2).number(port.br);
         });
 
         sheet.addDataValidation({
@@ -370,52 +360,43 @@ function createExcel() {
             showDropDown: true,
             sqref: "B2",
             formulas: [
-                `=${Excel4Node.getExcelAlpha(numColumns + 1)}1:${Excel4Node.getExcelAlpha(numColumns + 1)}${
+                `=${Excel4Node.getExcelAlpha(numColumnsTotal + 1)}1:${Excel4Node.getExcelAlpha(numColumnsTotal + 1)}${
                     ports.length
                 }`
             ]
         });
 
         sheet
-            .cell(2, headerColumns)
+            .cell(2, numColumnsHeader)
             .formula(
-                `VLOOKUP(B2,${Excel4Node.getExcelAlpha(numColumns + 1)}1:${Excel4Node.getExcelAlpha(numColumns + 2)}${
-                    ports.length
-                },2,0)`
+                `VLOOKUP(B2,${Excel4Node.getExcelAlpha(numColumnsTotal + 1)}1:${Excel4Node.getExcelAlpha(
+                    numColumnsTotal + 2
+                )}${ports.length},2,0)`
             );
 
         // Sample values
-        sheet.cell(headerRows + 1, headerColumns + 1).string("Fritz");
-        sheet.cell(headerRows + 1, headerColumns + 2).string("Franz");
-        sheet.cell(headerRows + 1, headerColumns + 3).string("Klaus");
-        sheet.cell(headerRows + 2, headerColumns + 1).string("x");
-        sheet.cell(headerRows + 2, headerColumns + 2).string("X");
-        sheet.cell(headerRows + 2, headerColumns + 3).string("x");
+        sheet.cell(numRowsHeader + 1, numColumnsHeader + 1).string("Fritz");
+        sheet.cell(numRowsHeader + 1, numColumnsHeader + 2).string("Franz");
+        sheet.cell(numRowsHeader + 1, numColumnsHeader + 3).string("Klaus");
+        sheet.cell(numRowsHeader + 2, numColumnsHeader + 1).string("x");
+        sheet.cell(numRowsHeader + 2, numColumnsHeader + 2).string("X");
+        sheet.cell(numRowsHeader + 2, numColumnsHeader + 3).string("x");
     }
 
     const dwShips = shipsOrig
         .filter(
             ship =>
                 !(ship.name.startsWith("Basic") || ship.name.startsWith("Rookie") || ship.name.startsWith("Trader")) &&
-                (ship.battleRating >= 80 || ship.name === "Mortar Brig")
+                (ship.battleRating >= minDeepWaterBR || ship.name === "Mortar Brig")
         )
-        .sort(sortBy(["class", "battleRating", "name"]));
+        .sort(sortBy(["class", "-battleRating", "name"]));
     const swShips = shipsOrig
         .filter(
             ship =>
-                ship.name === "Cerberus" ||
-                ship.name === "Hercules" ||
-                ship.name === "L’Hermione" ||
-                ship.name === "Renommee" ||
-                ship.name === "Surprise" ||
-                (ship.class >= 6 &&
-                    !(
-                        ship.name.startsWith("Basic") ||
-                        ship.name.startsWith("Rookie") ||
-                        ship.name.startsWith("Trader")
-                    ))
+                shallowWaterFrigates.includes(ship.name) ||
+                (ship.class >= 6 && !["Basic", "Rooki", "Trade"].includes(ship.name.substring(0, 5)))
         )
-        .sort(sortBy(["class", "battleRating", "name"]));
+        .sort(sortBy(["class", "-battleRating", "name"]));
 
     /*
     const dwSheet = workbook.addWorksheet("Deep water port", {
