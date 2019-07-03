@@ -104,7 +104,6 @@ export const capitalToCounty = new Map([
     ["Puerto de España", "Trinidad"],
     ["Puerto Plata", "La Vega"],
     ["Remedios", "Los Llanos"],
-    ["Road Town", "Virgin Islands"],
     ["Roseau", "Dominica"],
     ["Saint George's Town", "Bermuda"],
     ["Saint John's", "Leeward Islands"],
@@ -112,15 +111,16 @@ export const capitalToCounty = new Map([
     ["San Agustín", "Timucua"],
     ["San Juan", "San Juan"],
     ["San Marcos", "Apalache"],
-    ["Sant Iago", "Cuidad de Cuba"],
     ["Santa Fe", "Isla de Pinos"],
     ["Santa Marta", "Santa Marta"],
+    ["Santiago de Cuba", "Cuidad de Cuba"],
     ["Santo Domingo", "Santo Domingo"],
     ["Santo Tomé de Guayana", "Orinoco"],
     ["Savanna la Mar", "Cornwall"],
     ["Savannah", "Georgia"],
-    ["Selam", "Mérida"],
+    ["Sisal", "Mérida"],
     ["Soto La Marina", "Nuevo Santander"],
+    ["Spanish Town", "Virgin Islands"],
     ["Trinidad", "Quatro Villas"],
     ["Vera Cruz", "Vera Cruz"],
     ["West End", "Grand Bahama"],
@@ -228,7 +228,7 @@ Math.radiansToDegrees = radians => (radians * 180) / Math.PI;
  */
 export const rotationAngleInDegrees = (centerPt, targetPt) => {
     let theta = Math.atan2(targetPt[1] - centerPt[1], targetPt[0] - centerPt[0]);
-    theta -= Math.PI / 2.0;
+    theta -= Math.PI / 2;
     const degrees = Math.radiansToDegrees(theta);
     return (degrees + 360) % 360;
 };
@@ -357,10 +357,18 @@ export const simpleSort = (a, b) => {
 export const sortBy = properties => (a, b) => {
     let r = 0;
     properties.some(property => {
+        let sign = 1;
+
+        // property starts with '-' when sort is descending
+        if (property.startsWith("-")) {
+            sign = -1;
+            property = property.substr(1);
+        }
+
         if (a[property] < b[property]) {
-            r = -1;
+            r = -sign;
         } else if (a[property] > b[property]) {
-            r = 1;
+            r = sign;
         }
 
         return r !== 0;
@@ -381,3 +389,14 @@ export function getOrdinal(n, sup = true) {
     const text = s[(v - 20) % 10] || s[v] || s[0];
     return n + (sup ? `<span class="super">${text}</span>` : `${text}`);
 }
+
+/**
+ * Clean API name
+ * @param {string} name - Name
+ * @return {string} Cleaned name
+ */
+export const cleanName = name =>
+    name
+        .replace(/u([\dA-F]{4})/gi, match => String.fromCharCode(parseInt(match.replace(/u/g, ""), 16)))
+        .replace(/'/g, "’")
+        .trim();

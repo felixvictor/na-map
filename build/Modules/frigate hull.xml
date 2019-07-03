@@ -598,13 +598,13 @@
     <Pair>
       <Key>SHIP_PHYSICS_ACC_COEF</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>0.197</Value>
+        <Value>0.168</Value>
       </Value>
     </Pair>
     <Pair>
       <Key>SHIP_PHYSICS_DEC_COEF</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>0.0486</Value>
+        <Value>0.0414</Value>
       </Value>
     </Pair>
     <Pair>

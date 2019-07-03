@@ -1,6 +1,6 @@
 import fs from "fs";
 import moment from "moment";
-import { nations } from "./common.mjs";
+import { cleanName, nations } from "./common.mjs";
 
 const inBaseFilename = process.argv[2];
 const outFilename = process.argv[3];
@@ -17,13 +17,6 @@ function saveJson(data) {
     });
 }
 
-// https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
-// eslint-disable-next-line no-extend-native,func-names
-String.prototype.replaceAll = function(search, replacement) {
-    const target = this;
-    return target.replace(new RegExp(search, "g"), replacement);
-};
-
 function convertPorts() {
     const ticks = 621355968000000000;
     const json = {};
@@ -32,7 +25,7 @@ function convertPorts() {
     APIPorts.forEach(port => {
         const portData = {
             id: Number(port.Id),
-            name: port.Name.replaceAll("'", "’"),
+            name: cleanName(port.Name),
 
             nation: nations[port.Nation].short,
             capturer: port.Capturer,
