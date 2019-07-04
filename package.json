@@ -80,6 +80,7 @@
         "yaml-unist-parser": "^1.0.0"
     },
     "dependencies": {
+        "@d3fc/d3fc-label-layout": "^6.0.8",
         "@fortawesome/fontawesome": "^1.1.2",
         "@fortawesome/fontawesome-free-regular": "^5.0.4",
         "@fortawesome/fontawesome-free-solid": "^5.0.4",
@@ -99,7 +100,6 @@
         "d3-selection": "^1.4.0",
         "d3-shape": "^1.3.5",
         "d3-zoom": "^1.7.3",
-        "d3fc-label-layout": "^5.1.0",
         "hashids": "1.2.2",
         "js-cookie": "^2.2.0",
         "lit-html": "^1.1.0",
