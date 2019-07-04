@@ -134,6 +134,7 @@ function convertCannons() {
             .replace("0.5 E", "E")
             .replace(/^(\d+) - (.+)$/g, "$1 ($2)")
             .replace(/^Tower (\d+)$/g, "$1 (Tower)")
+            .replace("Blomfield", "Blomefield")
             .replace(" Gun", "");
         const cannon = {
             name
