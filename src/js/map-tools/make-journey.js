@@ -8,7 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { layoutTextLabel, layoutAnnealing, layoutLabel } from "d3fc-label-layout";
+import { layoutTextLabel, layoutAnnealing, layoutLabel } from "@d3fc/d3fc-label-layout";
 import { range as d3Range } from "d3-array";
 import { drag as d3Drag } from "d3-drag";
 import { scaleLinear as d3ScaleLinear } from "d3-scale";
