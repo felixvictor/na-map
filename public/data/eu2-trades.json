@@ -1,13 +1,1 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-[{"good":"Sugar","source":{"id":174,"grossPrice":10},"target":{"id":79,"grossPrice":455},"distance":451,"profitTotal":111250,"quantity":250,"weightPerItem":1},{"good":"Stone Block","source":{"id":353,"grossPrice":26},"target":{"id":97,"grossPrice":136},"distance":762,"profitTotal":110000,"quantity":1000,"weightPerItem":1},{"good":"Fir Log","source":{"id":349,"grossPrice":8},"target":{"id":79,"grossPrice":136},"distance":178,"profitTotal":74496,"quantity":582,"weightPerItem":1}]
-=======
-<<<<<<< HEAD
-[{"good":"Sugar","source":{"id":174,"grossPrice":10},"target":{"id":79,"grossPrice":455},"distance":451,"profitTotal":111250,"quantity":250,"weightPerItem":1},{"good":"Stone Block","source":{"id":353,"grossPrice":26},"target":{"id":97,"grossPrice":136},"distance":762,"profitTotal":110000,"quantity":1000,"weightPerItem":1},{"good":"Fir Log","source":{"id":349,"grossPrice":8},"target":{"id":79,"grossPrice":136},"distance":178,"profitTotal":74496,"quantity":582,"weightPerItem":1}]
-=======
-[]
->>>>>>> hotfix-8.11.4
->>>>>>> release-8.11.5
-=======
 [{"good":"Sugar","source":{"id":174,"grossPrice":10},"target":{"id":79,"grossPrice":455},"distance":451,"profitTotal":111250,"quantity":250,"weightPerItem":1},{"good":"Stone Block","source":{"id":353,"grossPrice":26},"target":{"id":97,"grossPrice":136},"distance":762,"profitTotal":93500,"quantity":850,"weightPerItem":1},{"good":"Fir Log","source":{"id":349,"grossPrice":8},"target":{"id":79,"grossPrice":114},"distance":178,"profitTotal":61692,"quantity":582,"weightPerItem":1},{"good":"Coal","source":{"id":300,"grossPrice":8},"target":{"id":79,"grossPrice":159},"distance":734,"profitTotal":48018,"quantity":318,"weightPerItem":1},{"good":"Grietje van Dijk","source":{"id":174,"grossPrice":440},"target":{"id":85,"grossPrice":4545},"distance":404,"profitTotal":41050,"quantity":10,"weightPerItem":20},{"good":"Provisions","source":{"id":237,"grossPrice":29},"target":{"id":27,"grossPrice":45},"distance":542,"profitTotal":32880,"quantity":2055,"weightPerItem":1}]
->>>>>>> 37030af7a50f392580ef54c9f5af52c7e2a25118
