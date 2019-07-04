@@ -1499,6 +1499,29 @@
     lodash "^4.17.11"
     to-fast-properties "^2.0.0"
 
+"@d3fc/d3fc-data-join@^5.0.8":
+  version "5.0.8"
+  resolved "https://registry.yarnpkg.com/@d3fc/d3fc-data-join/-/d3fc-data-join-5.0.8.tgz#8bb301317e874095cab19faed13fd7b8aaa25345"
+  integrity sha512-Z/D5WhXfyWSwzmCVh1bwh+xgUV7K8hAFqB3WQr4BclQjqGGK4ueWs2FriI5Xdbkwv+K2fVeQTmFSfY0CTLD8pQ==
+  dependencies:
+    d3-selection "^1.0.0"
+
+"@d3fc/d3fc-label-layout@^6.0.8":
+  version "6.0.8"
+  resolved "https://registry.yarnpkg.com/@d3fc/d3fc-label-layout/-/d3fc-label-layout-6.0.8.tgz#d1c67477fdcd53b4660989df5573166240551554"
+  integrity sha512-GqDwh4joA5QeBw9Zn4O1qHLazekamy+r6H4okY56DNR+8dAH2OqqEznpEqWoO+xLVVkpC4XzCe/+4yCxVicr2g==
+  dependencies:
+    "@d3fc/d3fc-data-join" "^5.0.8"
+    "@d3fc/d3fc-rebind" "^5.0.7"
+    d3-array "^1.0.0"
+    d3-scale "^1.0.6"
+    d3-selection "^1.0.0"
+
+"@d3fc/d3fc-rebind@^5.0.7":
+  version "5.0.7"
+  resolved "https://registry.yarnpkg.com/@d3fc/d3fc-rebind/-/d3fc-rebind-5.0.7.tgz#58de2a7668b70794a6a45e7c6f1fa436c5ced0f6"
+  integrity sha512-h/vvyF8tFGMd9jzicSDpC3aHC+pC0L6ae63OLaSt++0Gwc4Zi6ve5xaBXrkIrdFembezRUkGNr6zUPOMA6HN5g==
+
 "@fortawesome/fontawesome-common-types@^0.1.7":
   version "0.1.7"
   resolved "https://registry.yarnpkg.com/@fortawesome/fontawesome-common-types/-/fontawesome-common-types-0.1.7.tgz#4336c4b06d0b5608ff1215464b66fcf9f4795284"
@@ -5377,7 +5400,7 @@ d3-tip@^0.9.1:
     d3-collection "^1.0.4"
     d3-selection "^1.3.0"
 
-d3-transition@1, d3-transition@^1.0.0:
+d3-transition@1:
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/d3-transition/-/d3-transition-1.1.3.tgz#3a435b05ce9cef9524fe0d38121cfb6905331ca6"
   integrity sha512-tEvo3qOXL6pZ1EzcXxFcPNxC/Ygivu5NoBY6mbzidATAeML86da+JfVIUzon3dNM6UX6zjDx+xbYDmMVtTSjuA==
@@ -5441,30 +5464,6 @@ d3@5.4.0:
     d3-transition "1"
     d3-voronoi "1"
     d3-zoom "1"
-
-d3fc-data-join@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/d3fc-data-join/-/d3fc-data-join-2.0.0.tgz#9cb79fbc35bbf0c5fee1f2d932efec2df54fccf1"
-  integrity sha1-nLefvDW78MX+4fLZMu/sLfVPzPE=
-  dependencies:
-    d3-selection "^1.0.0"
-    d3-transition "^1.0.0"
-
-d3fc-label-layout@^5.1.0:
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/d3fc-label-layout/-/d3fc-label-layout-5.1.0.tgz#93a673079c4504670881f11ae34b832099486165"
-  integrity sha1-k6ZzB5xFBGcIgfEa40uDIJlIYWU=
-  dependencies:
-    d3-array "^1.0.0"
-    d3-scale "^1.0.6"
-    d3-selection "^1.0.0"
-    d3fc-data-join "^2.0.0"
-    d3fc-rebind "^4.0.0"
-
-d3fc-rebind@^4.0.0:
-  version "4.1.1"
-  resolved "https://registry.yarnpkg.com/d3fc-rebind/-/d3fc-rebind-4.1.1.tgz#70c8d6b63fee63dbb3cb577c68732ded535f9b32"
-  integrity sha1-cMjWtj/uY9uzy1d8aHMt7VNfmzI=
 
 dargs@^4.0.0:
   version "4.1.0"
