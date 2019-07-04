@@ -15,7 +15,6 @@ const ExtractCssChunks = require("extract-css-chunks-webpack-plugin");
 const SitemapPlugin = require("sitemap-webpack-plugin").default;
 const SriPlugin = require("webpack-subresource-integrity");
 const TerserPlugin = require("terser-webpack-plugin");
-const WebpackDeepScopeAnalysisPlugin = require("webpack-deep-scope-plugin").default;
 const WebpackPwaManifest = require("webpack-pwa-manifest");
 const { isProduction } = require("webpack-mode");
 const servers = require("./src/js/servers");
@@ -329,7 +328,6 @@ const config = {
         ]),
         new HtmlPlugin(htmlOpt),
         new SitemapPlugin(target, sitemapPaths, { skipGzip: false }),
-        new WebpackDeepScopeAnalysisPlugin(),
         new WebpackPwaManifest(manifestOpt),
         new webpack.HashedModuleIdsPlugin(),
         new SriPlugin({
