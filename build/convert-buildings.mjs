@@ -99,12 +99,6 @@ function convertBuildings() {
                 building.resource = { name: "Ships", price: 0 };
                 building.byproduct = [];
                 building.batch = [];
-                building.levels[0].materials = [
-                    {
-                        item: "Doubloons",
-                        amount: 0
-                    }
-                ];
             } else if (building.name === "Academy") {
                 building.resource = getItemsCraftedByAcademy();
                 building.byproduct = [];
