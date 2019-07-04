@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 [{"good":"Sugar","source":{"id":174,"grossPrice":10},"target":{"id":79,"grossPrice":455},"distance":451,"profitTotal":111250,"quantity":250,"weightPerItem":1},{"good":"Stone Block","source":{"id":353,"grossPrice":26},"target":{"id":97,"grossPrice":136},"distance":762,"profitTotal":110000,"quantity":1000,"weightPerItem":1},{"good":"Fir Log","source":{"id":349,"grossPrice":8},"target":{"id":79,"grossPrice":136},"distance":178,"profitTotal":74496,"quantity":582,"weightPerItem":1}]
+=======
+[]
+>>>>>>> hotfix-8.11.4
