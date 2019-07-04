@@ -218,7 +218,7 @@ function convertModules() {
                 }
 
                 // Some modifiers are wrongly indicated as a percentage
-                if (modifierName === "Boarding morale" || modifierName === "Leak resistance") {
+                if (modifierName === "Boarding morale") {
                     isPercentage = false;
                 }
 
