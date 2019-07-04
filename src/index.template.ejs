@@ -189,13 +189,6 @@
 
         <ul class="navbar-nav ml-auto">
 
-            <li class="nav-item pr-2">
-                <a role="button" class="btn btn-outline-primary" target="_blank" rel=”noopener”
-                   href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=MHRQ7ZGR88XSG&source=url">
-                    Donate
-                </a>
-            </li>
-
             <li class="nav-item dropdown pr-2">
                 <a class="nav-link dropdown-toggle" href="#" id="map-tools-dropdown"
                    role="button"
@@ -250,8 +243,9 @@
 
             <li class="nav-item dropdown pr-2">
                 <a class="nav-link dropdown-toggle" href="#" id="settingsDropdown" role="button"
-                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Settings
+                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Settings"
+                   aria-label="Settings">
+                    <i class="fas fa-cog text-secondary" aria-hidden="true"></i><span class="sr-only">Settings</span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-right extralarge-width" id="settingsMenu"
                      aria-labelledby="settingsDropdown">
@@ -385,9 +379,19 @@
                 </div>
             </li>
         </ul>
-        <div class="btn-group-vertical btn-group-sm" role="group">
-            <button type="button" id="reset" class="btn btn-outline-secondary">Clear</button>
-            <button type="button" id="about" class="btn btn-outline-secondary">About</button>
+
+        <div class="btn-group" role="group">
+            <a role="button" class="btn px-2" target="_blank" rel=”noopener” title="Donate" aria-label="Donate"
+               href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=MHRQ7ZGR88XSG&source=url">
+                <i class="fas fa-donate text-primary" aria-hidden="true"></i><span class="sr-only">Donate</span>
+            </a>
+            <button type="button" id="reset" class="btn px-2" title="Clear" aria-label="Clear"><i
+                        class="fas fa-eraser text-secondary" aria-hidden="true"></i><span class="sr-only">Clear</span>
+            </button>
+            <button type="button" id="about" class="btn px-2" title="About" aria-label="About"><i
+                        class="fas fa-info-circle text-secondary" aria-hidden="true"></i><span
+                        class="sr-only">About</span>
+            </button>
         </div>
     </div>
 </nav>
