@@ -8,7 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { formatPrefix as d3FormatPrefix, formatLocale as d3FormatLocale } from "d3-format";
+import { formatLocale as d3FormatLocale } from "d3-format";
 import { scaleBand as d3ScaleBand } from "d3-scale";
 import { html } from "lit-html";
 
@@ -26,7 +26,7 @@ const formatLocale = d3FormatLocale({
 /**
  * format with SI suffix
  */
-const formatPrefix = d3FormatPrefix(",.0", 1e3);
+const formatPrefix = formatLocale.formatPrefix(",.0", 1e3);
 
 /**
  * Format float
