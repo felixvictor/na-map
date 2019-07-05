@@ -46,7 +46,8 @@ function convertLoot() {
 
     const data = {};
 
-    data.loot = APIItems.filter(item => !item.NotUsed && item.ItemType === "ShipLootTableItem")
+    let types = ["ShipLootTableItem"];
+    data.loot = APIItems.filter(item => !item.NotUsed && types.includes(item.ItemType))
         .map(item => ({
             id: Number(item.Id),
             name: getLootName(Number(item.Class), item.EventLootTable),
@@ -54,7 +55,8 @@ function convertLoot() {
         }))
         .sort(sortBy(["class", "name"]));
 
-    data.chests = APIItems.filter(item => !item.NotUsed && item.ItemType === "TimeBasedConvertibleItem")
+    types = ["TimeBasedConvertibleItem"];
+    data.chests = APIItems.filter(item => !item.NotUsed && types.includes(item.ItemType))
         .map(item => ({
             id: Number(item.Id),
             name: cleanName(item.Name),
