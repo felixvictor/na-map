@@ -301,7 +301,7 @@ class Ship {
         text += displayFirstColumn("Resistance");
         text += displaySecondBlock();
         text += displayColumn("fireResistance", "Fire", 4);
-        text += displayColumn("leakResistance", "Leaks", 4);
+        text += displayColumn("leakResistance", "Leak", 4);
         text += displayColumn("splinterResistance", "Splinter", 4);
         text += "</div></div></div>";
 
@@ -1350,9 +1350,7 @@ export default class CompareShips {
                     `<optgroup label="${getOrdinal(key.key, false)} rate">${key.values
                         .map(
                             ship =>
-                                `<option data-subtext="${ship.battleRating}" value="${ship.id}">${ship.name} (${
-                                    ship.guns
-                                })`
+                                `<option data-subtext="${ship.battleRating}" value="${ship.id}">${ship.name} (${ship.guns})`
                         )
                         .join("</option>")}`
             )
@@ -1506,6 +1504,11 @@ export default class CompareShips {
      * @returns {Object} - Updated ship data
      */
     _addWoodData(shipData, compareId) {
+        const adjustAbsolute = (currentValue, additionalValue) =>
+            currentValue ? currentValue + additionalValue : additionalValue;
+        const adjustPercentage = (currentValue, additionalValue) =>
+            currentValue ? currentValue * (1 + additionalValue) : additionalValue;
+
         const data = JSON.parse(JSON.stringify(shipData));
 
         data.resistance = {};
@@ -1540,24 +1543,29 @@ export default class CompareShips {
                     }
                 });
             });
+
             modifierAmount.forEach((value, key) => {
                 this._woodChanges.get(key).forEach(modifier => {
                     const index = modifier.split(".");
-                    let value = modifierAmount.get(key).absolute;
-                    if (modifierAmount.get(key).percentage) {
-                        value = modifierAmount.get(key).percentage / 100;
+
+                    if (modifierAmount.get(key).absolute) {
+                        const { absolute } = modifierAmount.get(key);
+
+                        if (index.length > 1) {
+                            data[index[0]][index[1]] = adjustAbsolute(data[index[0]][index[1]], absolute);
+                        } else {
+                            data[index[0]] = adjustAbsolute(data[index[0]], absolute);
+                        }
                     }
 
-                    if (index.length > 1) {
-                        if (data[index[0]][index[1]]) {
-                            data[index[0]][index[1]] += value;
+                    if (modifierAmount.get(key).percentage) {
+                        const percentage = modifierAmount.get(key).percentage / 100;
+
+                        if (index.length > 1) {
+                            data[index[0]][index[1]] = adjustPercentage(data[index[0]][index[1]], percentage);
                         } else {
-                            data[index[0]][index[1]] = value;
+                            data[index[0]] = adjustPercentage(data[index[0]], percentage);
                         }
-                    } else if (data[index[0]]) {
-                        data[index[0]] += value;
-                    } else {
-                        data[index[0]] = value;
                     }
                 });
             });
