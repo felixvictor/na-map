@@ -45,6 +45,16 @@ import "../scss/main.scss";
  */
 function main() {
     /**
+     *  Workaround for google translate uses indexOf on svg text
+     *  {@link https://stackoverflow.com/a/53351574}
+     *  @return {object} Shim
+     */
+    SVGAnimatedString.prototype.indexOf = function() {
+        // eslint-disable-next-line prefer-spread,prefer-rest-params
+        return this.baseVal.indexOf.apply(this.baseVal, arguments);
+    };
+
+    /**
      * Base Id
      * @type {string}
      */
