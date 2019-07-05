@@ -14,20 +14,24 @@ import "bootstrap/js/dist/modal";
 import "bootstrap/js/dist/toast";
 import "bootstrap/js/dist/tooltip";
 
-import { library as faLibrary } from "@fortawesome/fontawesome";
-import { faCalendar, faCalendarCheck, faClock, faCopy } from "@fortawesome/fontawesome-free-regular";
+import { library as faLibrary, dom as faDom } from "@fortawesome/fontawesome-svg-core";
+import { faCalendar, faCalendarCheck, faClock, faCopy } from "@fortawesome/free-regular-svg-icons";
 import {
     faArrowDown,
     faArrowUp,
     faChevronLeft,
     faChevronRight,
+    faCog,
+    faDonate,
+    faEraser,
+    faInfoCircle,
     faPaste,
     faSort,
     faSortDown,
     faSortUp,
     faTimes,
     faTrash
-} from "@fortawesome/fontawesome-free-solid";
+} from "@fortawesome/free-solid-svg-icons";
 
 import { initAnalytics, registerPage } from "./analytics";
 import { servers } from "./servers";
@@ -40,6 +44,16 @@ import "../scss/main.scss";
  * @returns {void}
  */
 function main() {
+    /**
+     *  Workaround for google translate uses indexOf on svg text
+     *  {@link https://stackoverflow.com/a/53351574}
+     *  @return {object} Shim
+     */
+    SVGAnimatedString.prototype.indexOf = function() {
+        // eslint-disable-next-line prefer-spread,prefer-rest-params
+        return this.baseVal.indexOf.apply(this.baseVal, arguments);
+    };
+
     /**
      * Base Id
      * @type {string}
@@ -191,7 +205,11 @@ function main() {
         faChevronLeft,
         faChevronRight,
         faClock,
+        faCog,
         faCopy,
+        faDonate,
+        faEraser,
+        faInfoCircle,
         faPaste,
         faSort,
         faSortDown,
@@ -199,6 +217,7 @@ function main() {
         faTimes,
         faTrash
     );
+    faDom.watch();
 
     initAnalytics();
     registerPage("Homepage", "/");
