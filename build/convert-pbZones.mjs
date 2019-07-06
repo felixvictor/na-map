@@ -51,7 +51,7 @@ function convertPBZones() {
         return [x1, y1];
     };
 
-    const ports = APIPorts.map(port => ({
+    const ports = APIPorts.filter(port => !port.NonCapturable).map(port => ({
         id: port.Id,
         position: [
             Math.round(convertCoordX(port.Position.x, port.Position.z)),
