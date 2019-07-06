@@ -1625,26 +1625,31 @@ export default class CompareShips {
 
         const adjustDataByModifiers = () => {
             const adjustData = (key, modifier) => {
+                const adjustAbsolute = (currentValue, additionalValue) =>
+                    currentValue ? currentValue + additionalValue : additionalValue;
+                const adjustPercentage = (currentValue, additionalValue) =>
+                    currentValue ? currentValue * (1 + additionalValue) : additionalValue;
+
                 const index = modifier.split(".");
-                let factor = 1;
-                if (modifierAmounts.get(key).percentage) {
-                    factor = 1 + modifierAmounts.get(key).percentage / 100;
+
+                if (modifierAmounts.get(key).absolute) {
+                    const { absolute } = modifierAmounts.get(key);
+
+                    if (index.length > 1) {
+                        data[index[0]][index[1]] = adjustAbsolute(data[index[0]][index[1]], absolute);
+                    } else {
+                        data[index[0]] = adjustAbsolute(data[index[0]], absolute);
+                    }
                 }
 
-                const { absolute } = modifierAmounts.get(key);
+                if (modifierAmounts.get(key).percentage) {
+                    const percentage = modifierAmounts.get(key).percentage / 100;
 
-                if (index.length > 1) {
-                    if (data[index[0]][index[1]]) {
-                        data[index[0]][index[1]] *= factor;
-                        data[index[0]][index[1]] += absolute;
+                    if (index.length > 1) {
+                        data[index[0]][index[1]] = adjustPercentage(data[index[0]][index[1]], percentage);
                     } else {
-                        data[index[0]][index[1]] = absolute;
+                        data[index[0]] = adjustPercentage(data[index[0]], percentage);
                     }
-                } else if (data[index[0]]) {
-                    data[index[0]] *= factor;
-                    data[index[0]] += absolute;
-                } else {
-                    data[index[0]] = absolute;
                 }
             };
 
