@@ -4,31 +4,26 @@
  * @file      Display port battle zones.
  * @module    map/display-pb-zones
  * @author    iB aka Felix Victor
- * @copyright 2018
+ * @copyright 2018, 2019
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { geoPath as d3GeoPath } from "d3-geo";
 import { select as d3Select } from "d3-selection";
+import {
+    arc as d3Arc,
+    curveCatmullRomClosed as d3CurveCatmullRomClosed,
+    pie as d3Pie,
+    radialLine as d3RadialLine
+} from "d3-shape";
 
 import Cookie from "../util/cookie";
 import RadioButton from "../util/radio-button";
 
 export default class DisplayPbZones {
-    constructor(pbCircles, forts, towers, joinCircles, ports) {
+    constructor(pbZones, ports) {
         this._ports = ports;
 
-        this._pbCircleDataDefault = pbCircles;
-        this._pbCircleData = pbCircles;
-
-        this._fortDataDefault = forts;
-        this._fortData = forts;
-
-        this._towerDataDefault = towers;
-        this._towerData = towers;
-
-        this._joinCircleDataDefault = joinCircles;
-        this._joinCircleData = joinCircles;
+        this._pbZonesDefault = pbZones;
 
         this._showId = "show-pb";
 
@@ -66,11 +61,14 @@ export default class DisplayPbZones {
         this._g = d3Select("#na-svg")
             .insert("g", "#ports")
             .attr("class", "pb");
+        /*
         this._gJoinCirclesInner = this._g.append("path").attr("class", "join-circle");
         this._gJoinCirclesOuter = this._g.append("path").attr("class", "join-circle");
         this._gPBCircles = this._g.append("path").attr("class", "pb-circle");
         this._gTowers = this._g.append("path").attr("class", "tower");
         this._gForts = this._g.append("path").attr("class", "fort");
+
+         */
     }
 
     _setupListener() {
@@ -103,11 +101,54 @@ export default class DisplayPbZones {
     }
 
     _update() {
-        this._gPBCircles.datum(this._pbCircleData).attr("d", d3GeoPath().pointRadius(3.5));
-        this._gTowers.datum(this._towerData).attr("d", d3GeoPath().pointRadius(1.5));
-        this._gForts.datum(this._fortData).attr("d", d3GeoPath().pointRadius(2));
-        this._gJoinCirclesInner.datum(this._joinCircleData).attr("d", d3GeoPath().pointRadius(14));
-        this._gJoinCirclesOuter.datum(this._joinCircleData).attr("d", d3GeoPath().pointRadius(28));
+        const drawCircle = (x, y, r) => `M${x},${y} m${-r},0 a${r},${r} 0,1,0 ${r * 2},0 a${r},${r} 0,1,0 ${-r * 2},0`;
+        const drawRect = (x, y, r) => `M${x - r / 2},${y - r / 2}h${r}v${r}h${-r}z`;
+
+        this._g
+            .selectAll("g")
+            .data(this._pbZonesFiltered, d => d.id)
+            .join(enter => {
+                const g = enter.append("g");
+
+                // Join circles
+                g.append("path")
+                    .attr("class", "join-circle")
+                    .attr("d", d =>
+                        drawCircle(d.joinCircles[0], d.joinCircles[1], 28).concat(
+                            drawCircle(d.joinCircles[0], d.joinCircles[1], 14)
+                        )
+                    );
+
+                // Forts
+                g.append("path")
+                    .attr("class", "fort")
+                    .attr("d", d => d.forts.map(fort => drawRect(fort[0], fort[1], 3)).join(""));
+                g.append("text")
+                    .attr("class", "pb-text pb-fort-text")
+                    .attr("x", d => d.forts.map(fort => fort[0]))
+                    .attr("y", d => d.forts.map(fort => fort[1]))
+                    .text(d => d.forts.map((fort, i) => `${i + 1}`).join(""));
+
+                // Towers
+                g.append("path")
+                    .attr("class", "tower")
+                    .attr("d", d => d.towers.map(tower => drawCircle(tower[0], tower[1], 1.5)));
+                g.append("text")
+                    .attr("class", "pb-text pb-tower-text")
+                    .attr("x", d => d.towers.map(tower => tower[0]))
+                    .attr("y", d => d.towers.map(tower => tower[1]))
+                    .text(d => d.towers.map((tower, i) => `${i + 1}`).join(""));
+
+                // Port battle circles
+                g.append("path")
+                    .attr("class", "pb-circle")
+                    .attr("d", d => d.pbCircles.map(pbCircle => drawCircle(pbCircle[0], pbCircle[1], 3.5)));
+                g.append("text")
+                    .attr("class", "pb-text pb-circle-text")
+                    .attr("x", d => d.pbCircles.map(tower => tower[0]))
+                    .attr("y", d => d.pbCircles.map(tower => tower[1]))
+                    .text(d => d.pbCircles.map((tower, i) => String.fromCharCode(65 + i)).join(""));
+            });
     }
 
     _isPortIn(d) {
@@ -117,53 +158,14 @@ export default class DisplayPbZones {
     _setData() {
         if (this._ports.zoomLevel === "pbZone" && this._showPB !== "noShow") {
             this._filterVisible();
-            this._pbCircleData = {
-                type: "FeatureCollection",
-                features: this._pbCircleDataFiltered.filter(d => this._isPortIn(d))
-            };
-            this._fortData = {
-                type: "FeatureCollection",
-                features: this._fortDataFiltered.filter(d => this._isPortIn(d))
-            };
-            this._towerData = {
-                type: "FeatureCollection",
-                features: this._towerDataFiltered.filter(d => this._isPortIn(d))
-            };
-            this._joinCircleData = {
-                type: "FeatureCollection",
-                features: this._joinCircleDataFiltered.filter(d => this._isPortIn(d))
-            };
+            this._pbZonesFiltered = this._pbZonesFiltered.filter(d => this._isPortIn(d));
         } else {
-            this._pbCircleData = {};
-            this._fortData = {};
-            this._towerData = {};
-            this._joinCircleData = {};
+            this._pbZonesFiltered = {};
         }
     }
 
     _filterVisible() {
-        this._pbCircleDataFiltered = this._pbCircleDataDefault.filter(
-            port =>
-                port.position[0] >= this._lowerBound[0] &&
-                port.position[0] <= this._upperBound[0] &&
-                port.position[1] >= this._lowerBound[1] &&
-                port.position[1] <= this._upperBound[1]
-        );
-        this._fortDataFiltered = this._fortDataDefault.filter(
-            port =>
-                port.position[0] >= this._lowerBound[0] &&
-                port.position[0] <= this._upperBound[0] &&
-                port.position[1] >= this._lowerBound[1] &&
-                port.position[1] <= this._upperBound[1]
-        );
-        this._towerDataFiltered = this._towerDataDefault.filter(
-            port =>
-                port.position[0] >= this._lowerBound[0] &&
-                port.position[0] <= this._upperBound[0] &&
-                port.position[1] >= this._lowerBound[1] &&
-                port.position[1] <= this._upperBound[1]
-        );
-        this._joinCircleDataFiltered = this._joinCircleDataDefault.filter(
+        this._pbZonesFiltered = this._pbZonesDefault.filter(
             port =>
                 port.position[0] >= this._lowerBound[0] &&
                 port.position[0] <= this._upperBound[0] &&
