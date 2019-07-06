@@ -38,12 +38,12 @@ table,
 
 @mixin caps {
     font-variant-caps: all-small-caps;
-    letter-spacing: .08em;
+    letter-spacing: 0.08em;
 }
 
 @mixin des {
     position: relative;
-    top: -.4rem;
+    top: -0.4rem;
     font-size: small;
     color: $secondary-700;
 }
@@ -73,7 +73,7 @@ text {
 .position {
     path {
         fill: $green;
-        fill-opacity: .6;
+        fill-opacity: 0.6;
     }
 }
 
@@ -93,7 +93,8 @@ text {
             background-color: $secondary-100;
         }
 
-        th, td {
+        th,
+        td {
             padding-top: $paddingHalf;
             padding-bottom: $paddingHalf;
         }
@@ -146,7 +147,7 @@ text {
 }
 
 .badge {
-    padding-top: .15rem;
+    padding-top: 0.15rem;
 }
 
 .mm {
@@ -188,7 +189,7 @@ text {
 
     circle {
         fill: $secondary-600;
-        fill-opacity: .2;
+        fill-opacity: 0.2;
     }
 
     text {
@@ -202,13 +203,13 @@ text {
     }
 
     rect {
-        fill: rgba($primary-100, .8);
+        fill: rgba($primary-100, 0.8);
     }
 
     path {
         fill: none;
         stroke: $secondary-600;
-        stroke-width: .3rem;
+        stroke-width: 0.3rem;
     }
 
     .label {
@@ -223,7 +224,7 @@ text {
 
         .drag-active {
             stroke: $secondary-100;
-            stroke-width: .25rem;
+            stroke-width: 0.25rem;
         }
 
         .drag-hidden {
@@ -240,7 +241,7 @@ text {
     circle,
     line {
         stroke: $secondary-400;
-        stroke-width: .1rem;
+        stroke-width: 0.1rem;
     }
 
     text {
@@ -254,11 +255,11 @@ text {
     circle,
     line {
         stroke: $secondary-400;
-        stroke-width: .05rem;
+        stroke-width: 0.05rem;
     }
 
     path {
-        stroke-width: .15rem;
+        stroke-width: 0.15rem;
     }
 }
 
@@ -269,7 +270,7 @@ text {
 .f11 {
     circle {
         fill: $secondary-600;
-        fill-opacity: .5;
+        fill-opacity: 0.5;
     }
 
     text {
@@ -278,7 +279,7 @@ text {
 
     rect {
         fill: $primary-100;
-        fill-opacity: .7;
+        fill-opacity: 0.7;
     }
 }
 
@@ -345,7 +346,7 @@ text {
 .flag-icon {
     width: 2rem;
     height: 100%;
-    margin-right: .4rem;
+    margin-right: 0.4rem;
 }
 
 .rate {
@@ -371,7 +372,7 @@ text {
     }
 
     .diff {
-        opacity: .4;
+        opacity: 0.4;
     }
 }
 
@@ -387,12 +388,12 @@ text {
 
 .area {
     .area-label {
-        fill-opacity: .7;
+        fill-opacity: 0.7;
         fill: $white;
     }
 
     path {
-        stroke-opacity: .4;
+        stroke-opacity: 0.4;
         stroke: $white !important;
         stroke-width: 2px;
     }
@@ -445,7 +446,7 @@ text {
     justify-content: space-around;
     padding: $paddingHalf;
     pointer-events: all;
-    background: rgba($primary-200, .8);
+    background: rgba($primary-200, 0.8);
 
     button {
         margin-bottom: map-get($spacers, 2);
@@ -458,7 +459,7 @@ text {
     flex-direction: column;
     overflow-y: scroll;
     pointer-events: all;
-    background: rgba($primary-100, .8);
+    background: rgba($primary-100, 0.8);
 
     .bootstrap-select {
         padding: $paddingHalf;
@@ -471,7 +472,7 @@ text {
     padding-top: $spacer;
 
     .block:nth-of-type(odd) {
-        background: rgba($primary-400, .3);
+        background: rgba($primary-400, 0.3);
     }
 }
 
@@ -524,7 +525,7 @@ svg {
 
     rect {
         fill: $primary-100;
-        fill-opacity: .2;
+        fill-opacity: 0.2;
     }
 }
 
@@ -554,15 +555,15 @@ svg {
 }
 
 .wind-arrow {
-    opacity: .3;
+    opacity: 0.3;
     fill: none;
     stroke: $secondary-600;
-    stroke-width: .5em;
+    stroke-width: 0.5em;
 }
 
 .base-profile,
 .comp-profile {
-    opacity: .5;
+    opacity: 0.5;
 }
 
 .base-profile {
@@ -626,7 +627,7 @@ svg {
 }
 
 .bubble {
-    fill-opacity: .7;
+    fill-opacity: 0.7;
 }
 
 .both {
@@ -646,16 +647,16 @@ svg {
 }
 
 .non-capturable {
-    opacity: .8;
+    opacity: 0.8;
     fill: gray;
 }
 
 .capital {
-    opacity: .8;
+    opacity: 0.8;
 }
 
 .non-capital {
-    opacity: .4;
+    opacity: 0.4;
 }
 
 .hidden {
@@ -676,7 +677,7 @@ svg {
 
 .county {
     font-size: 60px;
-    letter-spacing: .6rem;
+    letter-spacing: 0.6rem;
 }
 
 .port-names {
@@ -692,8 +693,8 @@ svg {
 ////
 
 .pb {
-    fill-opacity: .6;
-    stroke-width: .5px;
+    fill-opacity: 0.6;
+    stroke-width: 0.5px;
     stroke-opacity: 1;
 }
 
@@ -702,9 +703,24 @@ svg {
     stroke: $primary-600;
 }
 
+.pb-text {
+    text-anchor: middle;
+    alignment-baseline: middle;
+    font-size: 15%;
+    font-variant-numeric: normal;
+}
+
+.pb-circle-text {
+    fill: $primary-900;
+}
+
 .fort {
     fill: darken($red, 20);
     stroke: darken($red, 20);
+}
+
+.pb-fort-text {
+    fill: lighten($red, 10);
 }
 
 .tower {
@@ -712,9 +728,13 @@ svg {
     stroke: $secondary-600;
 }
 
+.pb-tower-text {
+    fill: $secondary-200;
+}
+
 .join-circle {
     fill: $secondary-300;
-    fill-opacity: .4;
+    fill-opacity: 0.4;
     stroke: $secondary-500;
     stroke-width: 1px;
 }
