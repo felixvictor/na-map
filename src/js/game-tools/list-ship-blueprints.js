@@ -310,7 +310,7 @@ export default class ListShipBlueprints {
                 const index = resourcesData.findIndex(resource => resource[0] === this._woodsSelected.trim);
                 // Trim wood is already part of default resources (fir and oak log)
                 if (index >= 0) {
-                    resourcesData[index][1] += frameAmount;
+                    resourcesData[index][1] += trimAmount;
                 } else {
                     // Trim is an additional resource
                     trimAdded = true;
