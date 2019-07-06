@@ -6,12 +6,12 @@
     <title>Naval Action map</title>
     <meta content="Yet another map with in-game map, F11 coordinates, resources, ship and wood comparison. Port data is updated constantly from twitter and daily after maintenance." name="description">
     
-        <meta content="noindex" name="robots">
+        <link href="https://na-map.netlify.com/" rel="canonical">
     
     <meta content="Naval Action map" property="og:title" itemprop="name">
     <meta content="Yet another map with in-game map, F11 coordinates, resources, ship and wood comparison. Port data is updated constantly from twitter and daily after maintenance." property="og:description" itemprop="description">
     <meta content="images/icons/icon_1024x1024.png" property="og:image" itemprop="image">
-    <meta content="" property="og:url" itemprop="url">
+    <meta content="https://na-map.netlify.com/" property="og:url" itemprop="url">
 
     <meta content="en_gb" property="og:locale">
     <meta content="website" property="og:type">
@@ -19,7 +19,7 @@
     <meta content="summary_large_image" name="twitter:card">
 
     <script src="https://www.google-analytics.com/analytics.js" async></script>
-<meta content="width=device-width,initial-scale=1,shrink-to-fit=no" name="viewport"><link crossorigin="anonymous" href="main.9a3dd52c321cba5a96db.css" integrity="sha256-xrkkOVSV3JeDISKXVopnnecHvqt+eKRjgnxUeJaqpz0= sha384-oUrRbFOAA+oZP0PQTn2Uhnhdsz3gjq/R13qlBz+BQ+dpWTIKKDJa2BChoAys9Gm+" rel="stylesheet"></head>
+<meta content="width=device-width,initial-scale=1,shrink-to-fit=no" name="viewport"><link href="main.9a3dd52c321cba5a96db.css" rel="stylesheet" crossorigin="anonymous" integrity="sha256-xrkkOVSV3JeDISKXVopnnecHvqt+eKRjgnxUeJaqpz0= sha384-oUrRbFOAA+oZP0PQTn2Uhnhdsz3gjq/R13qlBz+BQ+dpWTIKKDJa2BChoAys9Gm+"></head>
 
 <body>
 
@@ -27,7 +27,7 @@
     <a class="navbar-brand" href="/">
         <img alt="Brand" height="32" src="images/icons/icon_32x32.png" width="32">
     </a>
-    <button class="navbar-toggler" type="button" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation" data-target="#navbarSupportedContent" data-toggle="collapse">
+    <button class="navbar-toggler" type="button" aria-label="Toggle navigation" aria-controls="navbarSupportedContent" aria-expanded="false" data-target="#navbarSupportedContent" data-toggle="collapse">
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -170,12 +170,6 @@
 
         <ul class="navbar-nav ml-auto">
 
-            <li class="nav-item pr-2">
-                <a class="btn btn-outline-primary" href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=MHRQ7ZGR88XSG&source=url" role="button" rel="”noopener”" target="_blank">
-                    Donate
-                </a>
-            </li>
-
             <li class="nav-item pr-2 dropdown">
                 <a class="dropdown-toggle nav-link" id="map-tools-dropdown" href="#" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
                     Map tools
@@ -220,8 +214,8 @@
             </li>
 
             <li class="nav-item pr-2 dropdown">
-                <a class="dropdown-toggle nav-link" id="settingsDropdown" href="#" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
-                    Settings
+                <a class="dropdown-toggle nav-link" id="settingsDropdown" href="#" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button" aria-label="Settings" title="Settings">
+                    <i class="fas text-secondary fa-cog" aria-hidden="true"></i><span class="sr-only">Settings</span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-right extralarge-width" id="settingsMenu" aria-labelledby="settingsDropdown">
 
@@ -341,9 +335,15 @@
                 </div>
             </li>
         </ul>
-        <div class="btn-group-sm btn-group-vertical" role="group">
-            <button class="btn btn-outline-secondary" type="button" id="reset">Clear</button>
-            <button class="btn btn-outline-secondary" type="button" id="about">About</button>
+
+        <div class="btn-group" role="group">
+            <a class="btn px-2" href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=MHRQ7ZGR88XSG&source=url" role="button" aria-label="Donate" title="Donate" rel="”noopener”" target="_blank">
+                <i class="fas fa-donate text-primary" aria-hidden="true"></i><span class="sr-only">Donate</span>
+            </a>
+            <button class="btn px-2" type="button" aria-label="Clear" id="reset" title="Clear"><i class="fas text-secondary fa-eraser" aria-hidden="true"></i><span class="sr-only">Clear</span>
+            </button>
+            <button class="btn px-2" type="button" aria-label="About" id="about" title="About"><i class="fas text-secondary fa-info-circle" aria-hidden="true"></i><span class="sr-only">About</span>
+            </button>
         </div>
     </div>
 </nav>
@@ -365,5 +365,5 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" crossorigin="anonymous" integrity="sha384-vk5WoKIaW/vJyUAd9n/wmopsmNhiy+L2Z+SBxGYnUkunIxVxAv/UtMOhba/xskxh"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.15.0/umd/popper.min.js" crossorigin="anonymous" integrity="sha384-L2pyEeut/H3mtgCBaUNw7KWzp5n9+4pDQiExs933/5QfaTh8YStYFFkOzSoXjlTb"></script>
-<script src="runtime.c6c73ac15bb024362f5a.js" crossorigin="anonymous" integrity="sha256-8tKujIo8VFkD2B2saKpSvlVa26u8XRPu9BKnxaqQ7As= sha384-kjNml1D9pkYLI0bS2sMqhr3onXOuYBgshGJtvdqqEFKSFtEcqN516/KiydCMjoUR"></script><script src="vendors~main.8bf4095c9bccc0c08c85.js" crossorigin="anonymous" integrity="sha256-/diwcQUukH3CwYMBVTXihvxP2Q6ZeU6PB5pZ7261TCA= sha384-EjZUeOzupJeUt+1pWc1HHkeAjnP0FBg8klkdAQOyS+hyqwhcX2AH8ppCC0F7w58b"></script><script src="main.eac3475141018d04eb01.js" crossorigin="anonymous" integrity="sha256-4yULT9/U9yyGQgO6d3hNTjWS1GO+yF+elKD52x3GvJM= sha384-TDds96OrIDVq6YORr4ErWIEEWi9wxvi/MCqlpdfgi9JyYdqjdRWlD3gWMz3BwPb2"></script></body>
+<script src="runtime.19cdd1aeb898c05fd5c9.js" crossorigin="anonymous" integrity="sha256-g7flKet7Eoi+WNelBxk2OsvSS7ei16s3BwmHUxciRS8= sha384-ttz6hpmc4kZTJf+yAy8iMjoBSo4VVJ/rgVk5Z4YyKeTn2HULSsabxDmp85CsZ9sp"></script><script src="vendors~main.497adf19062b69026575.js" crossorigin="anonymous" integrity="sha256-pL8aTpHsCN4pp+F8wsTHosRDWTcZsnidTwWbTlxanoo= sha384-0cQ0WJaULPlqzfpCWbSTiNaBuOdmcBsEqBmKFriY92s9pvifhGIhbuOn7BF3bWsS"></script><script src="main.2d307403522d24ef18aa.js" crossorigin="anonymous" integrity="sha256-R7gHNwIwemBDoEnhzGZfR2Dabw0T9UTNnZs7r7ajPpE= sha384-hzilarnuN2ID8Skv8mjkVLSAQGtLeUeuKdGuVSMgABv2cfWIT81iEv2lIJZwfxD/"></script></body>
 </html>
