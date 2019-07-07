@@ -101,7 +101,7 @@ export default class DisplayPbZones {
     }
 
     _update() {
-        const drawCircle = (x, y, r) => `M${x},${y} m${-r},0 a${r},${r} 0,1,0 ${r * 2},0 a${r},${r} 0,1,0 ${-r * 2},0`;
+        const drawCircle = (x, y, r) => `M${x},${y} m${-r},0 a${r},${r} 0,1,0 ${r * 2},0 a${r},${r} 0,1,0 ${-r * 2},0z`;
         const drawRect = (x, y, r) => `M${x - r / 2},${y - r / 2}h${r}v${r}h${-r}z`;
 
         this._g
@@ -132,7 +132,7 @@ export default class DisplayPbZones {
                 // Towers
                 g.append("path")
                     .attr("class", "tower")
-                    .attr("d", d => d.towers.map(tower => drawCircle(tower[0], tower[1], 1.5)));
+                    .attr("d", d => d.towers.map(tower => drawCircle(tower[0], tower[1], 1.5)).join(""));
                 g.append("text")
                     .attr("class", "pb-text pb-tower-text")
                     .attr("x", d => d.towers.map(tower => tower[0]))
@@ -142,7 +142,7 @@ export default class DisplayPbZones {
                 // Port battle circles
                 g.append("path")
                     .attr("class", "pb-circle")
-                    .attr("d", d => d.pbCircles.map(pbCircle => drawCircle(pbCircle[0], pbCircle[1], 3.5)));
+                    .attr("d", d => d.pbCircles.map(pbCircle => drawCircle(pbCircle[0], pbCircle[1], 3.5)).join(""));
                 g.append("text")
                     .attr("class", "pb-text pb-circle-text")
                     .attr("x", d => d.pbCircles.map(tower => tower[0]))
