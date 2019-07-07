@@ -67,7 +67,7 @@ const outputPath = path.resolve(__dirname, "public");
 
 const babelOpt = {
     cacheDirectory: true,
-    plugins: ["@babel/plugin-syntax-dynamic-import"],
+    plugins: ["@babel/plugin-transform-spread"],
     presets: [
         [
             "@babel/preset-env",
