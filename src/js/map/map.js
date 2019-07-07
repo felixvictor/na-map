@@ -237,18 +237,6 @@ class Map {
         // function();
         //        performance.mark(`${marks[marks.length - 1]}-end`);
 
-        // Port ids of capturable ports
-        const portIds = data.ports.filter(port => !port.nonCapturable).map(port => port.id);
-        const getFeature = object =>
-            object
-                .filter(port => portIds.includes(port.id))
-                .map(port => ({
-                    type: "Feature",
-                    id: port.id,
-                    position: port.properties.position,
-                    geometry: port.geometry
-                }));
-
         // Combine port data with port battle data
         const portData = data.ports.map(port => {
             const combinedData = port;
@@ -293,18 +281,7 @@ class Map {
         this._f11 = new ShowF11(this, this.coord);
         this._ports = new DisplayPorts(portData, this);
 
-        let pbCircles = topojsonFeature(data.pbZones, data.pbZones.objects.pbCircles);
-        pbCircles = getFeature(pbCircles.features);
-        let forts = topojsonFeature(data.pbZones, data.pbZones.objects.forts);
-        forts = getFeature(forts.features);
-
-        let towers = topojsonFeature(data.pbZones, data.pbZones.objects.towers);
-        towers = getFeature(towers.features);
-
-        let joinCircles = topojsonFeature(data.pbZones, data.pbZones.objects.joinCircles);
-        joinCircles = getFeature(joinCircles.features);
-
-        this._pbZone = new DisplayPbZones(pbCircles, forts, towers, joinCircles, this._ports);
+        this._pbZone = new DisplayPbZones(data.pbZones, this._ports);
         this._grid = new DisplayGrid(this);
 
         this._woodData = JSON.parse(JSON.stringify(data.woods));
