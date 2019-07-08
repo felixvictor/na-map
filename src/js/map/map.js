@@ -11,7 +11,6 @@
 import { range as d3Range } from "d3-array";
 import { event as d3Event, mouse as d3Mouse, select as d3Select } from "d3-selection";
 import { zoom as d3Zoom, zoomIdentity as d3ZoomIdentity, zoomTransform as d3ZoomTransform } from "d3-zoom";
-import { feature as topojsonFeature } from "topojson-client";
 
 import "bootstrap/js/dist/util";
 import "bootstrap/js/dist/collapse";
@@ -230,6 +229,7 @@ class Map {
     }
 
     _setupData(data) {
+        debugger;
         //        const marks = [];
 
         //        marks.push("setupData");
