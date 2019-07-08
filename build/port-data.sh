@@ -87,7 +87,7 @@ function common_var () {
     nation_file="${gen_dir}/nations.json"
     ownership_json="${gen_dir}/ownership.json"
     port_file="${gen_dir}/ports.json"
-    pb_file="${gen_dir}/pb.json"
+    pb_zone_file="${gen_dir}/pb.json"
     recipe_file="${gen_dir}/recipes.json"
     repair_file="${gen_dir}/repairs.json"
     ship_blueprint_file="${gen_dir}/ship-blueprints.json"
@@ -180,7 +180,7 @@ function get_port_data () {
         done
 
 
-        ${command_nodejs} build/convert-pbZones.mjs "${api_base_file}-${server_names[0]}" "${pb_file}" "${server_date}"
+        ${command_nodejs} build/convert-pbZones.mjs "${api_base_file}-${server_names[0]}" "${pb_zone_file}" "${server_date}"
         ${command_nodejs} build/convert-ports.mjs "${api_base_file}-${server_names[0]}" "${port_file}" "${server_date}"
         ${command_nodejs} build/convert-ships.mjs "${api_base_file}-${server_names[0]}" "${ship_file}" "${server_date}"
         ${command_nodejs} build/convert-additional-ship-data.mjs "${build_dir}/Modules" "${ship_file}"
