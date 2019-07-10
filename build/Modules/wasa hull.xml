@@ -466,7 +466,7 @@
     <Pair>
       <Key>SHIP_CLASS_TYPE</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="false" IsNegative="false">
-        <Value>2</Value>
+        <Value>1</Value>
       </Value>
     </Pair>
     <Pair>
