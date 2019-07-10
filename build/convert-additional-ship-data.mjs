@@ -45,6 +45,7 @@ function convertAdditionalShipData() {
         ["indefatiable", { id: 787, master: "" }],
         ["indiaman", { id: 425, master: "" }],
         ["ingermanland", { id: 395, master: "" }],
+        ["leopard", { id: 2078, master: "" }],
         ["lhermione", { id: 986, master: "" }],
         ["lynx", { id: 274, master: "" }],
         ["mercury", { id: 276, master: "" }],
