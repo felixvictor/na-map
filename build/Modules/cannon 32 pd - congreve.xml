@@ -28,13 +28,13 @@
     <Pair>
       <Key>CANNON_SHORT_PREFAB_PATH</Key>
       <Value xsi:type="StringAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>Assets/Resources/Client/Cannons/32p/32p_Short.prefab</Value>
+        <Value>Assets/Resources/Client/Cannons/32p/32p_Con_Short.prefab</Value>
       </Value>
     </Pair>
     <Pair>
       <Key>CANNON_FULL_PREFAB_PATH</Key>
       <Value xsi:type="StringAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>Assets/Resources/Client/Cannons/32p/32p_Full.prefab</Value>
+        <Value>Assets/Resources/Client/Cannons/32p/32p_Con_Full.prefab</Value>
       </Value>
     </Pair>
     <Pair>
