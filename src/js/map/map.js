@@ -229,7 +229,6 @@ class Map {
     }
 
     _setupData(data) {
-        debugger;
         //        const marks = [];
 
         //        marks.push("setupData");
