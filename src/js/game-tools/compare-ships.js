@@ -541,7 +541,7 @@ class ShipBase extends Ship {
             )}</span>`,
             minCrew: formatInt(this.shipData.crew.min),
             maxCrew: formatInt(this.shipData.crew.max),
-            sailingCrew: formatInt(this.shipData.crew.sailing),
+            sailingCrew: formatInt(this.shipData.crew.sailing||0),
             maxWeight: formatInt(this.shipData.maxWeight),
             holdSize: formatInt(this.shipData.holdSize),
             upgradeXP: formatInt(this.shipData.upgradeXP),
