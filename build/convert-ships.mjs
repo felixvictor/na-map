@@ -38,22 +38,44 @@ function convertShips() {
             decks: ship.Decks,
             holdSize: ship.HoldSize,
             maxWeight: ship.MaxWeight,
-            crew: { min: ship.MinCrewRequired, max: ship.HealthInfo.Crew },
+            crew: { min: ship.MinCrewRequired, max: ship.HealthInfo.Crew, sailing: 0 },
             speedDegrees,
             speed: {
                 min: speedDegrees.reduce((a, b) => Math.min(a, b)),
                 max: calcPortSpeed
             },
-            sides: { armour: ship.HealthInfo.LeftArmor },
-            bow: { armour: ship.HealthInfo.FrontArmor },
-            stern: { armour: ship.HealthInfo.BackArmor },
+            sides: { armour: ship.HealthInfo.LeftArmor, thickness: 0 },
+            bow: { armour: ship.HealthInfo.FrontArmor, thickness: 0 },
+            stern: { armour: ship.HealthInfo.BackArmor, thickness: 0 },
             structure: { armour: ship.HealthInfo.InternalStructure },
-            sails: { armour: ship.HealthInfo.Sails },
+            sails: { armour: ship.HealthInfo.Sails, risingSpeed: 0 },
             pump: { armour: ship.HealthInfo.Pump },
             rudder: {
-                armour: ship.HealthInfo.Rudder
+                armour: ship.HealthInfo.Rudder,
+                turnSpeed: 0,
+                halfturnTime: 0,
+                thickness: 0
             },
-            upgradeXP: ship.OverrideTotalXpForUpgradeSlots
+            upgradeXP: ship.OverrideTotalXpForUpgradeSlots,
+            repairTime: { stern: 120, bow: 120, sides: 120, rudder: 30, sails: 120, structure: 60 },
+            ship: {
+                waterlineHeight: 0,
+                firezoneHorizontalWidth: 0,
+                structureLeaksPerSecond: 0,
+                deceleration: 0,
+                acceleration: 0,
+                turningAcceleration: 0,
+                turningYardAcceleration: 0,
+                maxSpeed: 0
+            },
+            mast: {
+                bottomArmour: 0,
+                middleArmour: 0,
+                topArmour: 0,
+                bottomThickness: 0,
+                middleThickness: 0,
+                topThickness: 0
+            }
             // hostilityScore: ship.HostilityScore
         };
         // Delete mortar entry
