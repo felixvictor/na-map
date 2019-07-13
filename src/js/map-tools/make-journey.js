@@ -551,21 +551,21 @@ export default class Journey {
             .classed("journey-summary d-none", true);
 
         // Selected ship
-        this._journeySummaryShip = this._divJourneySummary.append("div").classed("block", true);
+        this._journeySummaryShip = this._divJourneySummary.append("div").classed("block small", true);
         this._journeySummaryTextWoods = this._journeySummaryShip.append("div");
         this._journeySummaryTextShip = this._journeySummaryShip.append("div");
         this._journeySummaryShip
             .append("div")
-            .classed("des", true)
-            .text("selected ship");
+            .classed("summary-des", true)
+            .text("ship");
 
         // Wind direction
-        this._journeySummaryWind = this._divJourneySummary.append("div").classed("block", true);
+        this._journeySummaryWind = this._divJourneySummary.append("div").classed("block small", true);
         this._journeySummaryTextWind = this._journeySummaryWind.append("div");
         this._journeySummaryWind
             .append("div")
-            .classed("des", true)
-            .text("wind direction");
+            .classed("summary-des", true)
+            .text("wind");
 
         this._divJourneySummary
             .append("div")
@@ -574,7 +574,7 @@ export default class Journey {
             .attr("id", this._deleteLastLegButtonId)
             .classed("btn btn-primary btn-sm", true)
             .attr("role", "button")
-            .text("Delete last leg");
+            .text("Clear last leg");
     }
 
     _displaySummary(showJourneySummary) {
