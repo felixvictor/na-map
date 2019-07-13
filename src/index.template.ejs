@@ -398,13 +398,11 @@
 
 <main role="main" class="container-fluid">
     <div id="na-map" class="central"></div>
-    <div id="axis-rect-x" class="d-none"></div>
-    <div class="flex-overlay">
-        <div id="axis-rect-y" class="d-none"></div>
-        <div id="wind" class="wind-predict">
+    <div class="overlay overlay-no-grid">
+        <div id="wind" class="wind-predict-column">
             <svg class="coord d-none"></svg>
         </div>
-        <div id="toast-section" aria-live="polite" aria-atomic="true" class="toasts"></div>
+        <div id="toast-column" aria-live="polite" aria-atomic="true" class="toast-column"></div>
         <div id="summary-column" class="summary-column"></div>
     </div>
     <div id="modal-section"></div>
