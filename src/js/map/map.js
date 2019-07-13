@@ -192,7 +192,7 @@ class Map {
          */
         this._showGrid = this._getShowGridValue();
 
-        [this._flexOverlay] = document.getElementsByClassName("flex-overlay");
+        [this.gridOverlay] = document.getElementsByClassName("overlay");
 
         this._setHeightWidth();
         this._setupScale();
@@ -651,11 +651,11 @@ class Map {
         this._setSvgSize();
         this._setFlexOverlayHeight();
         this._displayMap(zoomTransform);
-        this._grid.update(true);
+        this._grid.update();
     }
 
     getDimensions() {
-        const selector = document.getElementsByClassName("flex-overlay")[0];
+        const selector = document.getElementsByClassName("overlay")[0];
 
         return selector.getBoundingClientRect();
     }
@@ -693,7 +693,7 @@ class Map {
 
     _setFlexOverlayHeight() {
         const height = this.height - (this._grid.show && this.zoomLevel !== "initial" ? this.xGridBackgroundHeight : 0);
-        this._flexOverlay.setAttribute("style", `height:${height}px`);
+        document.getElementById("summary-column").setAttribute("style", `height:${height}px`);
     }
 
     initialZoomAndPan() {
