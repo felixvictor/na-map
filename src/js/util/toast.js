@@ -33,11 +33,11 @@ export default class Toast {
         $(this._toast.node())
             .toast({ autohide: false })
             .toast("show");
-        window.setTimeout(this._remove.bind(this), 1e4);
+        //window.setTimeout(this._remove.bind(this), 1e4);
     }
 
     _setupDiv() {
-        this._mainDiv = d3Select("#toast-section");
+        this._mainDiv = d3Select("#toast-column");
     }
 
     _set() {

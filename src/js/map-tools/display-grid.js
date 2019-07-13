@@ -148,44 +148,11 @@ export default class DisplayGrid {
 
         // svg groups
         this._svgMap = d3Select("#na-svg");
-        this._divXAxisRect = d3Select("#axis-rect-x");
 
-        const xLeft = this._yBackgroundWidth + this._defaultFontSize;
-        this._svgXAxis = this._svgMap
-            .insert("svg", "g.pb")
-            .attr("class", "axis d-none")
-            .attr("left", `${xLeft}px`)
-            .attr("height", `${this._height}px`)
-            .attr("width", `${this._width}px`);
-        this._svgXAxisRect = this._divXAxisRect
-            .append("svg")
-            .attr("class", "axis")
-            .attr("height", `${this._xBackgroundHeight}px`)
-            .attr("width", `${this._width}px`)
-            .append("rect")
-            .attr("height", `${this._xBackgroundHeight}px`)
-            .attr("width", `${this._width}px`);
+        this._svgXAxis = this._svgMap.insert("svg", "g.pb").attr("class", "axis d-none");
         this._gXAxis = this._svgXAxis.append("g");
 
-        const yTop = this._xBackgroundHeight + this._map.getDimensions().top;
-        const yHeight = this._height - this._xBackgroundHeight;
-        this._svgYAxis = d3Select("#axis-y");
-        this._divYAxisRect = d3Select("#axis-rect-y");
-
-        this._svgYAxis = this._svgMap
-            .insert("svg", "g.pb")
-            .attr("class", "axis d-none")
-            .attr("top", `${yTop}px`)
-            .attr("height", `${yHeight}px`)
-            .attr("width", `${this._width}px`);
-        this._svgYAxisRect = this._divYAxisRect
-            .append("svg")
-            .attr("class", "axis")
-            .attr("height", `${yHeight}px`)
-            .attr("width", `${this._yBackgroundWidth}px`)
-            .append("rect")
-            .attr("height", `${yHeight}px`)
-            .attr("width", `${this._yBackgroundWidth}px`);
+        this._svgYAxis = this._svgMap.insert("svg", "g.pb").attr("class", "axis d-none");
         this._gYAxis = this._svgYAxis.append("g");
 
         // Initialise both axis first
@@ -347,34 +314,22 @@ export default class DisplayGrid {
 
     /**
      * Update grid (shown or not shown)
-     * @param{boolean} resize - True if size needs to be changed
      * @return {void}
      * @public
      */
-    update(resize = false) {
+    update() {
         let show = false;
 
         if (this._isShown && this.zoomLevel !== "initial") {
             show = true;
         }
 
-        if (resize) {
-            this._height = this._map.height;
-            this._width = this._map.width;
-
-            this._svgXAxis.attr("width", this._width);
-            this._svgXAxisRect.attr("width", this._width);
-
-            const yHeight = this._height - this._xBackgroundHeight;
-            this._svgYAxis.attr("height", yHeight);
-            this._svgYAxisRect.attr("height", yHeight);
-        }
+        this._map.gridOverlay.classList.toggle("overlay-grid", show);
+        this._map.gridOverlay.classList.toggle("overlay-no-grid", !show);
 
         // Show or hide axis
         this._svgXAxis.classed("d-none", !show);
-        this._divXAxisRect.classed("d-none", !show);
         this._svgYAxis.classed("d-none", !show);
-        this._divYAxisRect.classed("d-none", !show);
     }
 
     /**
