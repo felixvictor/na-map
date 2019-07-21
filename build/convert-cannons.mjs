@@ -84,10 +84,10 @@ function convertCannons() {
         // ["DAMAGE_MULTIPLIER", { group: "damage", element: "multiplier" }],
         ["CANNON_BASIC_DAMAGE", { group: "damage", element: "basic" }],
         // ["CANNON_FIREPOWER", { group: "damage", element: "firepower" }],
-        ["CANNON_MIN_ANGLE", { group: "generic", element: "min angle" }],
-        ["CANNON_MAX_ANGLE", { group: "generic", element: "max angle" }],
-        ["CANNON_DISPERSION_PER100M", { group: "dispersion", element: "per 100m" }],
-        ["CANNON_DISPERSION_VERTICAL_PER100M", { group: "dispersion", element: "vertical per 100m" }],
+        ["CANNON_MIN_ANGLE", { group: "traverse", element: "up" }],
+        ["CANNON_MAX_ANGLE", { group: "traverse", element: "down" }],
+        ["CANNON_DISPERSION_PER100M", { group: "dispersion", element: "horizontal" }],
+        ["CANNON_DISPERSION_VERTICAL_PER100M", { group: "dispersion", element: "vertical" }],
         // ["CANNON_DISPERSION_REDUCTION_SPEED", { group: "dispersion", element: "reduction speed" }],
         ["CANNON_RELOAD_TIME", { group: "damage", element: "reload time" }],
         ["CANNON_MASS", { group: "generic", element: "weight" }],
@@ -107,9 +107,9 @@ function convertCannons() {
         // ["CANNON_TYPE", { group: "generic", element: "type" }],
         // ["CANNON_CLASS", { group: "generic", element: "class" }],
         // ["ARMOR_DAMAGE_ABSORB_MULTIPLIER", { group: "strength", element: "damage absorb multiplier" }],
-        ["CANNON_CREW_REQUIRED", { group: "crew", element: "required" }],
+        ["CANNON_CREW_REQUIRED", { group: "generic", element: "crew" }],
         // ["ARMOR_THICKNESS", { group: "strength", element: "thickness" }],
-        ["CANNON_BALL_ARMOR_SPLINTERS_DAMAGE_FOR_CREW", { group: "crew", element: "splinter damage" }]
+        ["CANNON_BALL_ARMOR_SPLINTERS_DAMAGE_FOR_CREW", { group: "damage", element: "splinter" }]
     ]);
 
     /**
