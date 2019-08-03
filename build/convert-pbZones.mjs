@@ -51,6 +51,12 @@ function convertPBZones() {
         return [x1, y1];
     };
 
+    const getRaidPoints = port =>
+        port.PortRaidSpawnPoints.map(raidPoint => [
+            Math.round(convertCoordX(raidPoint.Position.x, raidPoint.Position.z)),
+            Math.round(convertCoordY(raidPoint.Position.x, raidPoint.Position.z))
+        ]);
+
     const ports = APIPorts.filter(port => !port.NonCapturable).map(port => ({
         id: port.Id,
         position: [
@@ -60,7 +66,8 @@ function convertPBZones() {
         pbCircles: getPBCircles(port),
         forts: getForts(port),
         towers: getTowers(port),
-        joinCircles: getJoinCircles(port)
+        joinCircles: getJoinCircles(port),
+        raidPoints: getRaidPoints(port)
     }));
 
     saveJson(outFilename, ports);
