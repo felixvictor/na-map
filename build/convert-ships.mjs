@@ -75,7 +75,9 @@ function convertShips() {
                 bottomThickness: 0,
                 middleThickness: 0,
                 topThickness: 0
-            }
+            },
+            premium: ship.Premium,
+            tradeShip: ship.ShipType === 1
             // hostilityScore: ship.HostilityScore
         };
         // Delete mortar entry
