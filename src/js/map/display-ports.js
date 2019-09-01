@@ -348,7 +348,7 @@ export default class DisplayPorts {
         this._divPortSummary = d3Select("main #summary-column")
             .append("div")
             .attr("id", "port-summary")
-            .attr("class", "port-summary");
+            .attr("class", "port-summary port-summary-no-wind");
 
         // Number of selected ports
         this._portSummaryNumPorts = this._divPortSummary.append("div").attr("class", "block");
