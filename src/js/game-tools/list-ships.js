@@ -161,7 +161,7 @@ export default class ShipList {
                 text += `<td class="text-right">${ship.broadside.cannons}</td>`;
                 text += `<td class="text-right">${ship.gunsPerDeck[4] ? ship.gunsPerDeck[4] : ""}</td>`;
                 text += `<td class="text-right">${ship.gunsPerDeck[5] ? ship.gunsPerDeck[5] : ""}</td>`;
-                text += `<td class="text-right">${ship.sides.armour} (${ship.sides.thickness})</td>`;
+                text += `<td class="text-right" data-sort="${ship.sides.armour}">${ship.sides.armour} (${ship.sides.thickness})</td>`;
                 text += "</tr>";
             });
         text += "</tbody></table>";
