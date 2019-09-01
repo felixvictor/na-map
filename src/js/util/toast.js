@@ -37,7 +37,7 @@ export default class Toast {
     }
 
     _setupDiv() {
-        this._mainDiv = d3Select("#toast-section");
+        this._mainDiv = d3Select("#toast-column");
     }
 
     _set() {

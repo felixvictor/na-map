@@ -9,12 +9,6 @@
  */
 
 import { select as d3Select } from "d3-selection";
-import {
-    arc as d3Arc,
-    curveCatmullRomClosed as d3CurveCatmullRomClosed,
-    pie as d3Pie,
-    radialLine as d3RadialLine
-} from "d3-shape";
 
 import Cookie from "../util/cookie";
 import RadioButton from "../util/radio-button";
@@ -148,6 +142,18 @@ export default class DisplayPbZones {
                     .attr("x", d => d.pbCircles.map(tower => tower[0]))
                     .attr("y", d => d.pbCircles.map(tower => tower[1]))
                     .text(d => d.pbCircles.map((tower, i) => String.fromCharCode(65 + i)).join(""));
+
+                // Raid points
+                g.append("path")
+                    .attr("class", "raid-point")
+                    .attr("d", d =>
+                        d.raidPoints.map(raidPoint => drawCircle(raidPoint[0], raidPoint[1], 1.5)).join("")
+                    );
+                g.append("text")
+                    .attr("class", "pb-text pb-raid-point-text")
+                    .attr("x", d => d.raidPoints.map(raidPoint => raidPoint[0]))
+                    .attr("y", d => d.raidPoints.map(raidPoint => raidPoint[1]))
+                    .text("RR");
             });
     }
 
