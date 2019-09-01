@@ -422,6 +422,7 @@ function convertModules() {
                         module.name === "Gifted" ||
                         module.name === "Light Ship Master" ||
                         module.name === "Lineship Master" ||
+                        module.name === "Optimized Rudder" ||
                         module.name === "Press Gang" ||
                         module.name === "Signaling" ||
                         module.name === "TEST MODULE SPEED IN OW" ||
