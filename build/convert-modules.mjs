@@ -388,8 +388,8 @@ function convertModules() {
             if (!modules.has(module.name + module.moduleLevel)) {
                 // Check for wood module
                 if (
-                    module.name.endsWith(" Planking") ||
-                    module.name.endsWith(" Frame") ||
+                    (module.name.endsWith(" Planking") && module.moduleType === "Hidden") ||
+                    (module.name.endsWith(" Frame") && module.moduleType === "Hidden") ||
                     module.name === "Crew Space"
                 ) {
                     setWood(module);
