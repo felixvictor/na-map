@@ -117,10 +117,14 @@ export default class WindRose {
     }
 
     _setupSvg() {
-        this._div = d3Select("#port-summary")
+        const portSummary = d3Select("#port-summary");
+
+        portSummary.classed("port-summary-no-wind", false).classed("port-summary-wind", true);
+
+        this._div = portSummary
             .insert("div", ":first-child")
             .attr("id", this._baseId)
-            .classed("block", true);
+            .classed("block p-0", true);
         this._svg = this._div.append("svg").classed("coord small", true);
     }
 
