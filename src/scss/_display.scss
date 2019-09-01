@@ -715,43 +715,47 @@ svg {
 ////
 
 .pb {
-    fill-opacity: 0.6;
     stroke-width: 0.5px;
     stroke-opacity: 1;
 }
 
 .pb-circle {
-    fill: $primary-300;
-    stroke: $primary-600;
+    fill: $primary-900;
 }
 
 .pb-text {
     text-anchor: middle;
-    dominant-baseline: middle;
+    dominant-baseline: central;
     font-size: 15%;
-    font-variant-numeric: normal;
 }
 
 .pb-circle-text {
-    fill: $primary-900;
+    fill: $primary-100;
 }
 
 .fort {
-    fill: darken($red, 20);
-    stroke: darken($red, 20);
+    fill: darken($red, 30);
 }
 
 .pb-fort-text {
-    fill: lighten($red, 10);
+    fill: lighten($red, 30);
 }
 
 .tower {
-    fill: $secondary-600;
-    stroke: $secondary-600;
+    fill: $secondary-900;
 }
 
 .pb-tower-text {
-    fill: $secondary-200;
+    fill: $secondary-100;
+}
+
+.raid-point {
+    fill: $secondary-100;
+}
+
+.pb-raid-point-text {
+    font-size: 10%;
+    fill: $black;
 }
 
 .join-circle {
