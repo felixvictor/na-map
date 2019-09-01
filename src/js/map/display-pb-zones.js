@@ -145,12 +145,12 @@ export default class DisplayPbZones {
 
                 // Raid points
                 g.append("path")
-                    .attr("class", "tower")
+                    .attr("class", "raid-point")
                     .attr("d", d =>
                         d.raidPoints.map(raidPoint => drawCircle(raidPoint[0], raidPoint[1], 1.5)).join("")
                     );
                 g.append("text")
-                    .attr("class", "pb-text pb-tower-text")
+                    .attr("class", "pb-text pb-raid-point-text")
                     .attr("x", d => d.raidPoints.map(raidPoint => raidPoint[0]))
                     .attr("y", d => d.raidPoints.map(raidPoint => raidPoint[1]))
                     .text("RR");
