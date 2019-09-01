@@ -473,15 +473,22 @@ text {
 .port-summary,
 .journey-summary {
     display: grid;
-    grid-template-columns: auto auto auto;
     padding: $paddingHalf;
     pointer-events: all;
     background: rgba($primary-200, 0.8);
-line-height:1;
-line-height:1;
+    line-height: 1;
     button {
         margin-bottom: map-get($spacers, 2);
     }
+}
+
+.port-summary-no-wind,
+.journey-summary {
+    grid-template-columns: auto auto auto;
+}
+
+.port-summary-wind {
+    grid-template-columns: auto auto auto auto;
 }
 
 .inventory,
