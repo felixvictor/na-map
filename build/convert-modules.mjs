@@ -27,15 +27,15 @@ function convertModules() {
     const moduleRate = [
         {
             level: "L",
-            names: [" (1-3 rates)", "1-3rd"]
+            names: [" (1-3 rates)", " 1-3rd"]
         },
         {
             level: "M",
-            names: [" (4-5 rates)", "4-5th"]
+            names: [" (4-5 rates)", " 4-5th"]
         },
         {
             level: "S",
-            names: [" (6-7 rates)", "6-7th"]
+            names: [" (6-7 rates)", " 6-7th"]
         }
     ];
 
