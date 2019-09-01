@@ -128,10 +128,14 @@ const postcssOpt = {
 };
 
 const sassOpt = {
-    outputStyle: "expanded",
-    sourceMap: true,
-    sourceMapContents: true,
-    precision: 6
+    sourceMap: !isProduction,
+    sassOptions: {
+        outputStyle: "expanded",
+        precision: 6,
+        sourceMap: !isProduction,
+        sourceMapContents: !isProduction
+    }
+
 };
 
 const svgoOpt = {
