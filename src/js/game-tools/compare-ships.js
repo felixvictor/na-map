@@ -541,7 +541,7 @@ class ShipBase extends Ship {
             )}</span>`,
             minCrew: formatInt(this.shipData.crew.min),
             maxCrew: formatInt(this.shipData.crew.max),
-            sailingCrew: formatInt(this.shipData.crew.sailing||0),
+            sailingCrew: formatInt(this.shipData.crew.sailing || 0),
             maxWeight: formatInt(this.shipData.maxWeight),
             holdSize: formatInt(this.shipData.holdSize),
             upgradeXP: formatInt(this.shipData.upgradeXP),
@@ -1008,8 +1008,8 @@ export default class CompareShips {
             ["Leak resistance", ["resistance.leaks"]],
             ["Mast thickness", ["mast.bottomThickness", "mast.middleThickness", "mast.topThickness"]],
             ["Rudder speed", ["rudder.halfturnTime"]],
-            ["Ship speed", ["speed.max"]],
-            ["Turn speed", ["rudder.turnSpeed"]]
+            ["Max speed", ["speed.max"]],
+            ["Turn rate", ["rudder.turnSpeed"]]
         ]);
 
         this._moduleChanges = new Map([
@@ -1037,10 +1037,10 @@ export default class CompareShips {
             ["Sail repair amount", ["repairAmount.sails"]],
             ["Sail repair time", ["repairTime.sails"]],
             ["Sailing crew", ["crew.sailing"]],
-            ["Ship speed", ["speed.max"]],
+            ["Max speed", ["speed.max"]],
             ["Side armour repair time", ["repairTime.sides"]],
             ["Speed decrease", ["ship.deceleration"]],
-            ["Turn speed", ["rudder.turnSpeed"]],
+            ["Turn rate", ["rudder.turnSpeed"]],
             ["Water pump health", ["pump.armour"]],
             ["Water repair time", ["repairTime.pump"]]
         ]);
@@ -1073,12 +1073,12 @@ export default class CompareShips {
                     cap: { amount: 0.3, isPercentage: true }
                 }
             ],
-            ["Ship speed", { properties: ["speed.max"], cap: { amount: 15.5, isPercentage: false } }],
-            ["Turn speed", { properties: ["rudder.turnSpeed"], cap: { amount: 0.25, isPercentage: true } }]
+            ["Max speed", { properties: ["speed.max"], cap: { amount: 15.5, isPercentage: false } }],
+            ["Turn rate", { properties: ["rudder.turnSpeed"], cap: { amount: 0.25, isPercentage: true } }]
         ]);
 
         const theoreticalMinSpeed = d3Min(this._shipData, ship => ship.speed.min) * 1.2;
-        const theoreticalMaxSpeed = this._moduleCaps.get("Ship speed").cap.amount;
+        const theoreticalMaxSpeed = this._moduleCaps.get("Max speed").cap.amount;
         this._minSpeed = theoreticalMinSpeed;
         this._maxSpeed = theoreticalMaxSpeed;
         this._colorScale = d3ScaleLinear()
@@ -1571,7 +1571,7 @@ export default class CompareShips {
             });
 
             data.speedDegrees = data.speedDegrees.map(speed => {
-                const factor = 1 + modifierAmount.get("Ship speed").percentage / 100;
+                const factor = 1 + modifierAmount.get("Max speed").percentage / 100;
                 return Math.max(Math.min(speed * factor, this._maxSpeed), this._minSpeed);
             });
         }
@@ -1592,7 +1592,7 @@ export default class CompareShips {
 
         const setSpeedDegrees = () => {
             data.speedDegrees = data.speedDegrees.map(speed => {
-                const factor = 1 + modifierAmounts.get("Ship speed").percentage / 100;
+                const factor = 1 + modifierAmounts.get("Max speed").percentage / 100;
                 const newSpeed = speed > 0 ? speed * factor : speed / factor;
                 // Correct speed by caps
                 return Math.max(Math.min(newSpeed, this._maxSpeed), this._minSpeed);
@@ -1693,7 +1693,7 @@ export default class CompareShips {
         setModifierAmounts();
         adjustDataByModifiers();
         adjustDataByCaps();
-        if (modifierAmounts.has("Ship speed")) {
+        if (modifierAmounts.has("Max speed")) {
             setSpeedDegrees();
         }
 
