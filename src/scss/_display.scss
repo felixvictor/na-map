@@ -406,6 +406,7 @@ text {
 
 .overlay {
     display: grid;
+    pointer-events: none;
 }
 
 .overlay-grid {
@@ -455,7 +456,6 @@ text {
     grid-area: summary;
     display: grid;
     grid-template-rows: 6rem 1fr;
-    pointer-events: none;
 }
 
 .block {
@@ -484,11 +484,11 @@ text {
 
 .port-summary-no-wind,
 .journey-summary {
-    grid-template-columns: auto auto auto;
+    grid-template-columns: repeat(3, 1fr);
 }
 
 .port-summary-wind {
-    grid-template-columns: auto auto auto auto;
+    grid-template-columns: repeat(4, 1fr);
 }
 
 .inventory,
