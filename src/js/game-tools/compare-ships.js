@@ -985,6 +985,7 @@ export default class CompareShips {
         this._selectWood$ = {};
         this._selectModule$ = {};
         this._modal$ = null;
+        this._modifierAmount = new Map();
 
         if (this._baseId === "ship-compare") {
             this._columnsCompare = ["C1", "C2"];
@@ -1497,6 +1498,54 @@ export default class CompareShips {
         return shipDataUpdated;
     }
 
+    _adjustData(data, key, modifier) {
+        const adjustAbsolute = (currentValue, additionalValue) =>
+            currentValue ? currentValue + additionalValue : additionalValue;
+
+        const adjustPercentage = (currentValue, additionalValue) =>
+            currentValue ? currentValue * (1 + additionalValue) : additionalValue;
+
+        const index = modifier.split(".");
+
+        if (this._modifierAmount.get(key).absolute) {
+            const { absolute } = this._modifierAmount.get(key);
+
+            if (index.length > 1) {
+                data[index[0]][index[1]] = adjustAbsolute(data[index[0]][index[1]], absolute);
+            } else {
+                data[index[0]] = adjustAbsolute(data[index[0]], absolute);
+            }
+        }
+
+        if (this._modifierAmount.get(key).percentage) {
+            const percentage = this._modifierAmount.get(key).percentage / 100;
+
+            if (index.length > 1) {
+                data[index[0]][index[1]] = adjustPercentage(data[index[0]][index[1]], percentage);
+            } else {
+                data[index[0]] = adjustPercentage(data[index[0]], percentage);
+            }
+        }
+
+        return data;
+    }
+
+    _setModifier(property) {
+        let absolute = property.isPercentage ? 0 : property.amount;
+        let percentage = property.isPercentage ? property.amount : 0;
+
+        // If modifier has been in the Map add the amount
+        if (this._modifierAmount.has(property.modifier)) {
+            absolute += this._modifierAmount.get(property.modifier).absolute;
+            percentage += this._modifierAmount.get(property.modifier).percentage;
+        }
+
+        this._modifierAmount.set(property.modifier, {
+            absolute,
+            percentage
+        });
+    }
+
     /**
      * Add to ship data changes based on selected woods
      * @param {*} shipData - Ship id
@@ -1504,12 +1553,7 @@ export default class CompareShips {
      * @returns {Object} - Updated ship data
      */
     _addWoodData(shipData, compareId) {
-        const adjustAbsolute = (currentValue, additionalValue) =>
-            currentValue ? currentValue + additionalValue : additionalValue;
-        const adjustPercentage = (currentValue, additionalValue) =>
-            currentValue ? currentValue * (1 + additionalValue) : additionalValue;
-
-        const data = JSON.parse(JSON.stringify(shipData));
+        let data = JSON.parse(JSON.stringify(shipData));
 
         data.resistance = {};
         data.resistance.fire = 0;
@@ -1522,56 +1566,24 @@ export default class CompareShips {
                 dataLink = "_compareData";
             }
 
-            const modifierAmount = new Map();
+            this._modifierAmount = new Map();
             // Add modifier amount for both frame and trim
             ["frame", "trim"].forEach(type => {
                 this.woodCompare._instances[compareId][dataLink][type].properties.forEach(property => {
                     if (this._woodChanges.has(property.modifier)) {
-                        let absolute = property.isPercentage ? 0 : property.amount;
-                        let percentage = property.isPercentage ? property.amount : 0;
-
-                        // If modifier has been in the Map add the amount
-                        if (modifierAmount.has(property.modifier)) {
-                            absolute += modifierAmount.get(property.modifier).absolute;
-                            percentage += modifierAmount.get(property.modifier).percentage;
-                        }
-
-                        modifierAmount.set(property.modifier, {
-                            absolute,
-                            percentage
-                        });
+                        this._setModifier(property);
                     }
                 });
             });
 
-            modifierAmount.forEach((value, key) => {
+            this._modifierAmount.forEach((value, key) => {
                 this._woodChanges.get(key).forEach(modifier => {
-                    const index = modifier.split(".");
-
-                    if (modifierAmount.get(key).absolute) {
-                        const { absolute } = modifierAmount.get(key);
-
-                        if (index.length > 1) {
-                            data[index[0]][index[1]] = adjustAbsolute(data[index[0]][index[1]], absolute);
-                        } else {
-                            data[index[0]] = adjustAbsolute(data[index[0]], absolute);
-                        }
-                    }
-
-                    if (modifierAmount.get(key).percentage) {
-                        const percentage = modifierAmount.get(key).percentage / 100;
-
-                        if (index.length > 1) {
-                            data[index[0]][index[1]] = adjustPercentage(data[index[0]][index[1]], percentage);
-                        } else {
-                            data[index[0]] = adjustPercentage(data[index[0]], percentage);
-                        }
-                    }
+                    data = this._adjustData(data, key, modifier);
                 });
             });
 
             data.speedDegrees = data.speedDegrees.map(speed => {
-                const factor = 1 + modifierAmount.get("Max speed").percentage / 100;
+                const factor = 1 + this._modifierAmount.get("Max speed").percentage / 100;
                 return Math.max(Math.min(speed * factor, this._maxSpeed), this._minSpeed);
             });
         }
@@ -1587,12 +1599,12 @@ export default class CompareShips {
      * @returns {Object} - Updated ship data
      */
     _addModulesData(shipDataBase, shipDataUpdated, compareId) {
-        const data = JSON.parse(JSON.stringify(shipDataUpdated));
-        const modifierAmounts = new Map();
+        let data = JSON.parse(JSON.stringify(shipDataUpdated));
+        this._modifierAmount = new Map();
 
         const setSpeedDegrees = () => {
             data.speedDegrees = data.speedDegrees.map(speed => {
-                const factor = 1 + modifierAmounts.get("Max speed").percentage / 100;
+                const factor = 1 + this._modifierAmount.get("Max speed").percentage / 100;
                 const newSpeed = speed > 0 ? speed * factor : speed / factor;
                 // Correct speed by caps
                 return Math.max(Math.min(newSpeed, this._maxSpeed), this._minSpeed);
@@ -1605,65 +1617,24 @@ export default class CompareShips {
 
                 module.properties.forEach(property => {
                     if (this._moduleChanges.has(property.modifier)) {
-                        let absolute = property.isPercentage ? 0 : property.amount;
-                        let percentage = property.isPercentage ? property.amount : 0;
-
-                        // If modifier has been in the Map add the amount
-                        if (modifierAmounts.has(property.modifier)) {
-                            absolute += modifierAmounts.get(property.modifier).absolute;
-                            percentage += modifierAmounts.get(property.modifier).percentage;
-                        }
-
-                        modifierAmounts.set(property.modifier, {
-                            absolute,
-                            percentage
-                        });
+                        this._setModifier(property);
                     }
                 });
             });
         };
 
         const adjustDataByModifiers = () => {
-            const adjustData = (key, modifier) => {
-                const adjustAbsolute = (currentValue, additionalValue) =>
-                    currentValue ? currentValue + additionalValue : additionalValue;
-                const adjustPercentage = (currentValue, additionalValue) =>
-                    currentValue ? currentValue * (1 + additionalValue) : additionalValue;
-
-                const index = modifier.split(".");
-
-                if (modifierAmounts.get(key).absolute) {
-                    const { absolute } = modifierAmounts.get(key);
-
-                    if (index.length > 1) {
-                        data[index[0]][index[1]] = adjustAbsolute(data[index[0]][index[1]], absolute);
-                    } else {
-                        data[index[0]] = adjustAbsolute(data[index[0]], absolute);
-                    }
-                }
-
-                if (modifierAmounts.get(key).percentage) {
-                    const percentage = modifierAmounts.get(key).percentage / 100;
-
-                    if (index.length > 1) {
-                        data[index[0]][index[1]] = adjustPercentage(data[index[0]][index[1]], percentage);
-                    } else {
-                        data[index[0]] = adjustPercentage(data[index[0]], percentage);
-                    }
-                }
-            };
-
-            modifierAmounts.forEach((value, key) => {
+            this._modifierAmount.forEach((value, key) => {
                 if (this._moduleChanges.get(key)) {
                     this._moduleChanges.get(key).forEach(modifier => {
-                        adjustData(key, modifier);
+                        data = this._adjustData(data, key, modifier);
                     });
                 }
             });
         };
 
         const adjustDataByCaps = () => {
-            modifierAmounts.forEach((value, key) => {
+            this._modifierAmount.forEach((value, key) => {
                 if (this._moduleCaps.has(key)) {
                     const { cap } = this._moduleCaps.get(key);
                     this._moduleCaps.get(key).properties.forEach(property => {
@@ -1693,7 +1664,7 @@ export default class CompareShips {
         setModifierAmounts();
         adjustDataByModifiers();
         adjustDataByCaps();
-        if (modifierAmounts.has("Max speed")) {
+        if (this._modifierAmount.has("Max speed")) {
             setSpeedDegrees();
         }
 
