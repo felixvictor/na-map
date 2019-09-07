@@ -468,6 +468,7 @@ class ShipBase extends Ship {
             .attr("d", line(arcsBase));
 
         // Speed marker
+        // noinspection DuplicatedCode
         this.g
             .selectAll(".speed-markers")
             .data(arcsBase)
@@ -1498,36 +1499,30 @@ export default class CompareShips {
         return shipDataUpdated;
     }
 
-    _adjustData(data, key, modifier) {
+    _adjustValue(value, key) {
         const adjustAbsolute = (currentValue, additionalValue) =>
             currentValue ? currentValue + additionalValue : additionalValue;
 
         const adjustPercentage = (currentValue, additionalValue) =>
-            currentValue ? currentValue * (1 + additionalValue) : additionalValue;
+            currentValue
+                ? currentValue >= 1
+                    ? currentValue * (1 + additionalValue)
+                    : currentValue + additionalValue
+                : additionalValue;
 
-        const index = modifier.split(".");
+        let adjustedValue = 0;
 
         if (this._modifierAmount.get(key).absolute) {
             const { absolute } = this._modifierAmount.get(key);
-
-            if (index.length > 1) {
-                data[index[0]][index[1]] = adjustAbsolute(data[index[0]][index[1]], absolute);
-            } else {
-                data[index[0]] = adjustAbsolute(data[index[0]], absolute);
-            }
+            adjustedValue = adjustAbsolute(value, absolute);
         }
 
         if (this._modifierAmount.get(key).percentage) {
             const percentage = this._modifierAmount.get(key).percentage / 100;
-
-            if (index.length > 1) {
-                data[index[0]][index[1]] = adjustPercentage(data[index[0]][index[1]], percentage);
-            } else {
-                data[index[0]] = adjustPercentage(data[index[0]], percentage);
-            }
+            adjustedValue = adjustPercentage(value, percentage);
         }
 
-        return data;
+        return adjustedValue;
     }
 
     _setModifier(property) {
@@ -1553,7 +1548,7 @@ export default class CompareShips {
      * @returns {Object} - Updated ship data
      */
     _addWoodData(shipData, compareId) {
-        let data = JSON.parse(JSON.stringify(shipData));
+        const data = JSON.parse(JSON.stringify(shipData));
 
         data.resistance = {};
         data.resistance.fire = 0;
@@ -1577,8 +1572,15 @@ export default class CompareShips {
             });
 
             this._modifierAmount.forEach((value, key) => {
+                // noinspection DuplicatedCode
                 this._woodChanges.get(key).forEach(modifier => {
-                    data = this._adjustData(data, key, modifier);
+                    const index = modifier.split(".");
+
+                    if (index.length > 1) {
+                        data[index[0]][index[1]] = this._adjustValue(data[index[0]][index[1]], key);
+                    } else {
+                        data[index[0]] = this._adjustValue(data[index[0]], key);
+                    }
                 });
             });
 
@@ -1599,7 +1601,7 @@ export default class CompareShips {
      * @returns {Object} - Updated ship data
      */
     _addModulesData(shipDataBase, shipDataUpdated, compareId) {
-        let data = JSON.parse(JSON.stringify(shipDataUpdated));
+        const data = JSON.parse(JSON.stringify(shipDataUpdated));
         this._modifierAmount = new Map();
 
         const setSpeedDegrees = () => {
@@ -1626,8 +1628,18 @@ export default class CompareShips {
         const adjustDataByModifiers = () => {
             this._modifierAmount.forEach((value, key) => {
                 if (this._moduleChanges.get(key)) {
+                    // noinspection DuplicatedCode
                     this._moduleChanges.get(key).forEach(modifier => {
-                        data = this._adjustData(data, key, modifier);
+                        const index = modifier.split(".");
+                        if (modifier === "resistance.fire") {
+                            console.log(data[index[0]][index[1]], this._adjustValue(data[index[0]][index[1]], key));
+                        }
+
+                        if (index.length > 1) {
+                            data[index[0]][index[1]] = this._adjustValue(data[index[0]][index[1]], key);
+                        } else {
+                            data[index[0]] = this._adjustValue(data[index[0]], key);
+                        }
                     });
                 }
             });
