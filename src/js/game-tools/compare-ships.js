@@ -1000,51 +1000,78 @@ export default class CompareShips {
         this._selectedShips = { Base: {}, C1: {}, C2: {} };
 
         this._woodChanges = new Map([
-            ["Acceleration", ["ship.acceleration"]],
-            ["Armor thickness", ["sides.thickness", "bow.thickness", "stern.thickness"]],
-            ["Armour strength", ["bow.armour", "sides.armour", "stern.armour"]],
-            ["Splinter resistance", ["resistance.splinter"]],
-            ["Crew", ["crew.max"]],
-            ["Fire resistance", ["resistance.fire"]],
-            ["Hull strength", ["structure.armour"]],
-            ["Leak resistance", ["resistance.leaks"]],
-            ["Mast thickness", ["mast.bottomThickness", "mast.middleThickness", "mast.topThickness"]],
-            ["Rudder speed", ["rudder.halfturnTime"]],
-            ["Max speed", ["speed.max"]],
-            ["Turn rate", ["rudder.turnSpeed"]]
+            ["Acceleration", { properties: ["ship.acceleration"], isBaseValueAbsolute: true }],
+            [
+                "Armor thickness",
+                { properties: ["sides.thickness", "bow.thickness", "stern.thickness"], isBaseValueAbsolute: true }
+            ],
+            [
+                "Armour strength",
+                { properties: ["bow.armour", "sides.armour", "stern.armour"], isBaseValueAbsolute: true }
+            ],
+            ["Splinter resistance", { properties: ["resistance.splinter"], isBaseValueAbsolute: false }],
+            ["Crew", { properties: ["crew.max"], isBaseValueAbsolute: true }],
+            ["Fire resistance", { properties: ["resistance.fire"], isBaseValueAbsolute: false }],
+            ["Hull strength", { properties: ["structure.armour"], isBaseValueAbsolute: true }],
+            ["Leak resistance", { properties: ["resistance.leaks"], isBaseValueAbsolute: false }],
+            [
+                "Mast thickness",
+                {
+                    properties: ["mast.bottomThickness", "mast.middleThickness", "mast.topThickness"],
+                    isBaseValueAbsolute: true
+                }
+            ],
+            ["Rudder speed", { properties: ["rudder.halfturnTime"], isBaseValueAbsolute: true }],
+            ["Max speed", { properties: ["speed.max"], isBaseValueAbsolute: true }],
+            ["Turn rate", { properties: ["rudder.turnSpeed"], isBaseValueAbsolute: true }]
         ]);
 
         this._moduleChanges = new Map([
             // ["Sail damage", [  ]],
             // ["Sail health", [  ]],
-            ["Acceleration", ["ship.acceleration"]],
-            ["Armor thickness", ["sides.thickness", "bow.thickness", "stern.thickness"]],
-            ["Armour repair amount (perk)", ["repairAmount.armourPerk"]],
-            ["Armour repair amount", ["repairAmount.armour"]],
-            ["Armour strength", ["bow.armour", "sides.armour", "stern.armour"]],
-            ["Back armour thickness", ["stern.thickness"]],
-            ["Splinter resistance", ["resistance.splinter"]],
-            ["Crew", ["crew.max"]],
-            ["Fire resistance", ["resistance.fire"]],
-            ["Front armour thickness", ["bow.thickness"]],
-            ["Hold weight", ["maxWeight"]],
-            ["Hull strength", ["structure.armour"]],
-            ["Leak resistance", ["resistance.leaks"]],
-            ["Mast health", ["mast.bottomArmour", "mast.middleArmour", "mast.topArmour"]],
-            ["Mast thickness", ["mast.bottomThickness", "mast.middleThickness", "mast.topThickness"]],
-            ["Rudder health", ["rudder.armour"]],
-            ["Rudder repair time", ["repairTime.rudder"]],
-            ["Rudder speed", ["rudder.halfturnTime"]],
-            ["Sail repair amount (perk)", ["repairAmount.sailsPerk"]],
-            ["Sail repair amount", ["repairAmount.sails"]],
-            ["Sail repair time", ["repairTime.sails"]],
-            ["Sailing crew", ["crew.sailing"]],
-            ["Max speed", ["speed.max"]],
-            ["Side armour repair time", ["repairTime.sides"]],
-            ["Speed decrease", ["ship.deceleration"]],
-            ["Turn rate", ["rudder.turnSpeed"]],
-            ["Water pump health", ["pump.armour"]],
-            ["Water repair time", ["repairTime.pump"]]
+            ["Acceleration", { properties: ["ship.acceleration"], isBaseValueAbsolute: true }],
+            [
+                "Armor thickness",
+                { properties: ["sides.thickness", "bow.thickness", "stern.thickness"], isBaseValueAbsolute: true }
+            ],
+            ["Armour repair amount (perk)", { properties: ["repairAmount.armourPerk"], isBaseValueAbsolute: true }],
+            ["Armour repair amount", { properties: ["repairAmount.armour"], isBaseValueAbsolute: true }],
+            [
+                "Armour strength",
+                { properties: ["bow.armour", "sides.armour", "stern.armour"], isBaseValueAbsolute: true }
+            ],
+            ["Back armour thickness", { properties: ["stern.thickness"], isBaseValueAbsolute: true }],
+            ["Splinter resistance", { properties: ["resistance.splinter"], isBaseValueAbsolute: false }],
+            ["Crew", { properties: ["crew.max"], isBaseValueAbsolute: true }],
+            ["Fire resistance", { properties: ["resistance.fire"], isBaseValueAbsolute: false }],
+            ["Front armour thickness", { properties: ["bow.thickness"], isBaseValueAbsolute: true }],
+            ["Hold weight", { properties: ["maxWeight"], isBaseValueAbsolute: true }],
+            ["Hull strength", { properties: ["structure.armour"], isBaseValueAbsolute: true }],
+            ["Leak resistance", { properties: ["resistance.leaks"], isBaseValueAbsolute: false }],
+            [
+                "Mast health",
+                { properties: ["mast.bottomArmour", "mast.middleArmour", "mast.topArmour"], isBaseValueAbsolute: true }
+            ],
+            [
+                "Mast thickness",
+                {
+                    properties: ["mast.bottomThickness", "mast.middleThickness", "mast.topThickness"],
+                    isBaseValueAbsolute: true
+                }
+            ],
+            ["Rudder health", { properties: ["rudder.armour"], isBaseValueAbsolute: true }],
+            ["Rudder repair time", { properties: ["repairTime.rudder"], isBaseValueAbsolute: true }],
+            ["Rudder speed", { properties: ["rudder.halfturnTime"], isBaseValueAbsolute: true }],
+            ["Sail repair amount (perk)", { properties: ["repairAmount.sailsPerk"], isBaseValueAbsolute: true }],
+            ["Sail repair amount", { properties: ["repairAmount.sails"], isBaseValueAbsolute: true }],
+            ["Sail repair time", { properties: ["repairTime.sails"], isBaseValueAbsolute: true }],
+            ["Sailing crew", { properties: ["crew.sailing"], isBaseValueAbsolute: true }],
+            ["Max speed", { properties: ["speed.max"], isBaseValueAbsolute: true }],
+            ["Side armour repair time", { properties: ["repairTime.sides"], isBaseValueAbsolute: true }],
+            ["Speed decrease", { properties: ["ship.deceleration"], isBaseValueAbsolute: true }],
+            ["Turn rate", { properties: ["rudder.turnSpeed"], isBaseValueAbsolute: true }],
+            ["Water pump health", { properties: ["pump.armour"], isBaseValueAbsolute: true }],
+            ["Water repair time", { properties: ["repairTime.pump"], isBaseValueAbsolute: true }]
         ]);
 
         this._moduleCaps = new Map([
@@ -1499,13 +1526,13 @@ export default class CompareShips {
         return shipDataUpdated;
     }
 
-    _adjustValue(value, key) {
+    _adjustValue(value, key, isBaseValueAbsolute) {
         const adjustAbsolute = (currentValue, additionalValue) =>
             currentValue ? currentValue + additionalValue : additionalValue;
 
         const adjustPercentage = (currentValue, additionalValue) =>
             currentValue
-                ? currentValue >= 1
+                ? isBaseValueAbsolute
                     ? currentValue * (1 + additionalValue)
                     : currentValue + additionalValue
                 : additionalValue;
@@ -1573,13 +1600,21 @@ export default class CompareShips {
 
             this._modifierAmount.forEach((value, key) => {
                 // noinspection DuplicatedCode
-                this._woodChanges.get(key).forEach(modifier => {
+                this._woodChanges.get(key).properties.forEach(modifier => {
                     const index = modifier.split(".");
 
                     if (index.length > 1) {
-                        data[index[0]][index[1]] = this._adjustValue(data[index[0]][index[1]], key);
+                        data[index[0]][index[1]] = this._adjustValue(
+                            data[index[0]][index[1]],
+                            key,
+                            this._woodChanges.get(key).isBaseValueAbsolute
+                        );
                     } else {
-                        data[index[0]] = this._adjustValue(data[index[0]], key);
+                        data[index[0]] = this._adjustValue(
+                            data[index[0]],
+                            key,
+                            this._woodChanges.get(key).isBaseValueAbsolute
+                        );
                     }
                 });
             });
@@ -1627,18 +1662,23 @@ export default class CompareShips {
 
         const adjustDataByModifiers = () => {
             this._modifierAmount.forEach((value, key) => {
-                if (this._moduleChanges.get(key)) {
+                if (this._moduleChanges.get(key).properties) {
                     // noinspection DuplicatedCode
-                    this._moduleChanges.get(key).forEach(modifier => {
+                    this._moduleChanges.get(key).properties.forEach(modifier => {
                         const index = modifier.split(".");
-                        if (modifier === "resistance.fire") {
-                            console.log(data[index[0]][index[1]], this._adjustValue(data[index[0]][index[1]], key));
-                        }
 
                         if (index.length > 1) {
-                            data[index[0]][index[1]] = this._adjustValue(data[index[0]][index[1]], key);
+                            data[index[0]][index[1]] = this._adjustValue(
+                                data[index[0]][index[1]],
+                                key,
+                                this._moduleChanges.get(key).isBaseValueAbsolute
+                            );
                         } else {
-                            data[index[0]] = this._adjustValue(data[index[0]], key);
+                            data[index[0]] = this._adjustValue(
+                                data[index[0]],
+                                key,
+                                this._moduleChanges.get(key).isBaseValueAbsolute
+                            );
                         }
                     });
                 }
