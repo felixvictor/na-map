@@ -39,11 +39,11 @@ function updatePorts() {
     function captured(result) {
         const i = ports.ports.findIndex(findIndex, result[2]);
         const port = ports.ports[i];
-        const nationName = port.attackerNation ? port.attackerNation : result[4];
-        const capturedNation = nations.find(nation => nation.name === nationName);
+        const nationName = result[4];
+        const capturingNation = nations.find(nation => nation.name === nationName);
 
         console.log("      --- captured", i);
-        port.nation = capturedNation ? capturedNation.short : "";
+        port.nation = capturingNation.short;
         port.capturer = result[3];
         port.lastPortBattle = moment(result[1], "DD-MM-YYYY HH:mm").format("YYYY-MM-DD HH:mm");
         port.attackerNation = "";
@@ -119,14 +119,21 @@ function updatePorts() {
      * @returns {void}
      */
     function portBattleScheduled(result) {
+        const guessNationFromClanName = clanName => {
+            const nationShortname = ports.ports.find(port => port.capturer === clanName).nation;
+            const nationName = nationShortname ? nations.find(nation => nation.short === nationShortname).name : "n/a";
+
+            return nationName;
+        };
+
         const i = ports.ports.findIndex(findIndex, result[2]);
         const port = ports.ports[i];
 
         console.log("      --- portBattleScheduled", i);
-        if (typeof result[7] === "undefined") {
-            port.attackerNation = "n/a";
-        } else {
+        if (result[7]) {
             port.attackerNation = result[7];
+        } else {
+            port.attackerNation = guessNationFromClanName(result[6]);
         }
 
         port.attackerClan = result[6];
@@ -196,11 +203,10 @@ function updatePorts() {
     // When twitter-update has been used, reformat tweets.tweets
     if (!tweets.refresh) {
         tweets.tweets = tweets
-            .map(tweet => tweet.tweets)
-            .flat()
+            .flatMap(tweet => tweet.tweets)
             .sort((a, b) => {
-                const timeA=moment(a.text.slice(1,17), "DD-MM-YYYY HH:mm");
-                const timeB=moment(b.text.slice(1,17), "DD-MM-YYYY HH:mm");
+                const timeA = moment(a.text.slice(1, 17), "DD-MM-YYYY HH:mm");
+                const timeB = moment(b.text.slice(1, 17), "DD-MM-YYYY HH:mm");
                 if (timeA.isAfter(timeB)) {
                     return -1;
                 }
