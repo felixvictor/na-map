@@ -238,21 +238,21 @@ function get_tweets_change () {
     local time_of_day
 
     # Empty file
-   echo "[" > "${tweets_json}"
+    echo "[" > "${tweets_json}"
 
     time_of_day=$(date '+%d-%m-%Y' -d "${server_date} - 1 day")
     for query_hour in $(seq ${server_maintenance_hour} 23); do
-        get_tweets_in_range "${time_of_day}" "$(printf "%02d\n" ${query_hour})"
+        get_tweets_in_range "${time_of_day}" "$(printf "%02d\n" "${query_hour}")"
     done
 
     time_of_day=$(date '+%d-%m-%Y' -d "${server_date}")
     for query_hour in $(seq 0 23); do
-        get_tweets_in_range "${time_of_day}" "$(printf "%02d\n" ${query_hour})"
+        get_tweets_in_range "${time_of_day}" "$(printf "%02d\n" "${query_hour}")"
     done
 
     time_of_day=$(date '+%d-%m-%Y' -d "${server_date} + 1 day")
     for query_hour in $(seq 0 ${server_maintenance_hour}); do
-        get_tweets_in_range "${time_of_day}" "$(printf "%02d\n" ${query_hour})"
+        get_tweets_in_range "${time_of_day}" "$(printf "%02d\n" "${query_hour}")"
     done
 
     # Remove trailing comma
