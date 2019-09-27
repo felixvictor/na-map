@@ -274,7 +274,7 @@ class Ship {
         text += displayColumn("halfturnTime", "Rudder half time");
         text += "</div></div></div>";
 
-        text += displayFirstColumn('Armour <span class="badge badge-white">Thickness</span>');
+        text += displayFirstColumn('Hit points <span class="badge badge-white">Thickness</span>');
         text += displaySecondBlock();
         text += displayColumn("sideArmor", "Sides");
         text += displayColumn("structure", "Hull");
@@ -1004,13 +1004,13 @@ export default class CompareShips {
                 { properties: ["sides.thickness", "bow.thickness", "stern.thickness"], isBaseValueAbsolute: true }
             ],
             [
-                "Armour strength",
+                "Armour hit points",
                 { properties: ["bow.armour", "sides.armour", "stern.armour"], isBaseValueAbsolute: true }
             ],
             ["Splinter resistance", { properties: ["resistance.splinter"], isBaseValueAbsolute: false }],
             ["Crew", { properties: ["crew.max"], isBaseValueAbsolute: true }],
             ["Fire resistance", { properties: ["resistance.fire"], isBaseValueAbsolute: false }],
-            ["Hull strength", { properties: ["structure.armour"], isBaseValueAbsolute: true }],
+            ["Structure hit points", { properties: ["structure.armour"], isBaseValueAbsolute: true }],
             ["Leak resistance", { properties: ["resistance.leaks"], isBaseValueAbsolute: false }],
             [
                 "Mast thickness",
@@ -1035,7 +1035,7 @@ export default class CompareShips {
             ["Armour repair amount (perk)", { properties: ["repairAmount.armourPerk"], isBaseValueAbsolute: true }],
             ["Armour repair amount", { properties: ["repairAmount.armour"], isBaseValueAbsolute: true }],
             [
-                "Armour strength",
+                "Armour hit points",
                 { properties: ["bow.armour", "sides.armour", "stern.armour"], isBaseValueAbsolute: true }
             ],
             ["Back armour thickness", { properties: ["stern.thickness"], isBaseValueAbsolute: true }],
@@ -1044,7 +1044,7 @@ export default class CompareShips {
             ["Fire resistance", { properties: ["resistance.fire"], isBaseValueAbsolute: false }],
             ["Front armour thickness", { properties: ["bow.thickness"], isBaseValueAbsolute: true }],
             ["Hold weight", { properties: ["maxWeight"], isBaseValueAbsolute: true }],
-            ["Hull strength", { properties: ["structure.armour"], isBaseValueAbsolute: true }],
+            ["Structure hit points", { properties: ["structure.armour"], isBaseValueAbsolute: true }],
             ["Leak resistance", { properties: ["resistance.leaks"], isBaseValueAbsolute: false }],
             [
                 "Mast health",
@@ -1081,12 +1081,12 @@ export default class CompareShips {
                 }
             ],
             [
-                "Armour strength",
+                "Armour hit points",
                 { properties: ["bow.armour", "sides.armour", "stern.armour"], cap: { amount: 0.3, isPercentage: true } }
             ],
             ["Back armour thickness", { properties: ["stern.thickness"], cap: { amount: 0.3, isPercentage: true } }],
             ["Front armour thickness", { properties: ["bow.thickness"], cap: { amount: 0.3, isPercentage: true } }],
-            ["Hull strength", { properties: ["structure.armour"], cap: { amount: 0.3, isPercentage: true } }],
+            ["Structure hit points", { properties: ["structure.armour"], cap: { amount: 0.3, isPercentage: true } }],
             [
                 "Mast health",
                 {
