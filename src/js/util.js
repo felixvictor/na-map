@@ -48,7 +48,7 @@ export const formatFloat = (x, s = 2) => formatLocale.format(`,.${s}~r`)(x);
 export const formatSignFloat = (x, s = 2) =>
     formatLocale
         .format(`+,.${s}~r`)(x)
-        .replace("+", "\uFF0B\u202F");
+        .replace("+", "\uFF0B\u200A");
 
 /**
  * Format float
@@ -126,7 +126,7 @@ export const formatIntTrunc = x => formatLocale.format(",d")(x - 0.5);
 export const formatSignInt = x =>
     formatLocale
         .format("+,d")(x)
-        .replace("+", "\uFF0B\u202F");
+        .replace("+", "\uFF0B\u200A");
 
 /**
  * Format percentage point
@@ -188,7 +188,7 @@ export const formatSignPercent = x =>
     formatLocale
         .format("+.1%")(x)
         .replace(".0", "")
-        .replace("+", "\uFF0B\u202F");
+        .replace("+", "\uFF0B\u200A");
 
 /**
  * Format ordinal
