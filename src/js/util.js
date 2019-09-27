@@ -110,6 +110,14 @@ export const formatF11 = x => formatPrefix(x * -1).replace("k", "\u2009k");
 export const formatInt = x => formatLocale.format(",d")(x);
 
 /**
+ * Format truncated integer
+ * @function
+ * @param {Number} x - Integer
+ * @return {String} Formatted Integer
+ */
+export const formatIntTrunc = x => formatLocale.format(",d")(x - 0.5);
+
+/**
  * Format integer with +/- sign
  * @function
  * @param {Number} x - Integer
