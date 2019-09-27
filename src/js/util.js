@@ -20,7 +20,8 @@ const formatLocale = d3FormatLocale({
     thousands: "\u2009",
     grouping: [3],
     currency: ["", "\u00A0reals"],
-    percent: "\u202F%"
+    percent: "\u202F%",
+    minus: "\u2212\u2009"
 });
 
 /**
@@ -35,10 +36,7 @@ const formatPrefix = formatLocale.formatPrefix(",.0", 1e3);
  * @param {Number} s - Significant digits
  * @return {String} - Formatted float
  */
-export const formatFloat = (x, s = 2) =>
-    formatLocale
-        .format(`,.${s}~r`)(x)
-        .replace("-", "\u2212\u202f");
+export const formatFloat = (x, s = 2) => formatLocale.format(`,.${s}~r`)(x);
 
 /**
  * Format float with +/- sign
@@ -50,7 +48,6 @@ export const formatFloat = (x, s = 2) =>
 export const formatSignFloat = (x, s = 2) =>
     formatLocale
         .format(`+,.${s}~r`)(x)
-        .replace("-", "\u2212\u202f")
         .replace("+", "\uFF0B\u202F");
 
 /**
@@ -63,7 +60,6 @@ export const formatSignFloat = (x, s = 2) =>
 export const formatFloatFixed = (x, f = 2) =>
     formatLocale
         .format(`.${f}f`)(x)
-        .replace("-", "\u2212\u202f")
         .replace(".00", '<span class="hidden">.00</span>')
         .replace(/\.(\d)0/g, '.$1<span class="hidden">0</span>');
 
@@ -78,8 +74,6 @@ export const formatFloatFixedHTML = (x, f = 2) => {
     let [number, decimals] = formatLocale
         .format(`.${f}f`)(x)
         .split(".");
-
-    number = number.replace("-", "\u2212\u202f");
 
     if (decimals) {
         if (decimals === "0" || decimals === "00") {
@@ -105,10 +99,7 @@ export const formatFloatFixedHTML = (x, f = 2) => {
  * @param {Number} x - ShowF11 coordinate
  * @return {String} Formatted ShowF11 coordinate
  */
-export const formatF11 = x =>
-    formatPrefix(x * -1)
-        .replace("-", "\u2212\u202f")
-        .replace("k", "\u2009k");
+export const formatF11 = x => formatPrefix(x * -1).replace("k", "\u2009k");
 
 /**
  * Format integer
@@ -116,10 +107,7 @@ export const formatF11 = x =>
  * @param {Number} x - Integer
  * @return {String} Formatted Integer
  */
-export const formatInt = x =>
-    formatLocale
-        .format(",d")(x)
-        .replace("-", "\u2212\u202f");
+export const formatInt = x => formatLocale.format(",d")(x);
 
 /**
  * Format integer with +/- sign
@@ -130,7 +118,6 @@ export const formatInt = x =>
 export const formatSignInt = x =>
     formatLocale
         .format("+,d")(x)
-        .replace("-", "\u2212\u202f")
         .replace("+", "\uFF0B\u202F");
 
 /**
@@ -142,7 +129,6 @@ export const formatSignInt = x =>
 export const formatPP = x =>
     formatLocale
         .format(",.0%")(x)
-        .replace("-", "\u2212\u202f")
         .replace("%", "pp");
 
 /**
@@ -157,8 +143,7 @@ export const formatSiInt = x =>
         .replace(".0", "")
         .replace("M", "\u2009\u1d0d") // LATIN LETTER SMALL CAPITAL M
         .replace("k", "\u2009k")
-        .replace("m", "\u2009m")
-        .replace("-", "\u2212\u202f");
+        .replace("m", "\u2009m");
 
 /**
  * Format currency with SI suffix
@@ -171,8 +156,7 @@ export const formatSiCurrency = x =>
         .format("$,.2s")(x)
         .replace(".0", "")
         .replace("M", "\u2009\u1d0d") // LATIN LETTER SMALL CAPITAL M
-        .replace("k", "\u2009k")
-        .replace("-", "\u2212\u202f");
+        .replace("k", "\u2009k");
 
 /**
  * Format percent value
@@ -184,8 +168,7 @@ export const formatSiCurrency = x =>
 export const formatPercent = (x, f = 1) =>
     formatLocale
         .format(`.${f}%`)(x)
-        .replace(".0", "")
-        .replace("-", "\u2212\u202f");
+        .replace(".0", "");
 
 /**
  * Format percent value with +/- sign
@@ -197,7 +180,6 @@ export const formatSignPercent = x =>
     formatLocale
         .format("+.1%")(x)
         .replace(".0", "")
-        .replace("-", "\u2212\u202f")
         .replace("+", "\uFF0B\u202F");
 
 /**
