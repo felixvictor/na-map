@@ -45,6 +45,9 @@ import {
     formatInt,
     formatIntTrunc,
     formatPercent,
+    formatPP,
+    formatSignInt,
+    formatSignPercent,
     getOrdinal,
     isEmpty,
     roundToThousands,
@@ -1430,7 +1433,7 @@ export default class CompareShips {
                         `<optgroup label="${group.key}" data-max-options="${
                             moduleType.startsWith("Ship trim") ? 1 : 5
                         }">${group.values
-                            .map(module => `<option value="${module[0]}">${module[1].name}`)
+                            .map(module => `<option data-id="${module[0]}">${module[1].name}`)
                             .join("</option>")}`
                 )
                 .join("</optgroup>");
@@ -1438,7 +1441,7 @@ export default class CompareShips {
             // Get options without optgroups
             options = modules.map(
                 group =>
-                    `${group.values.map(module => `<option value="${module[0]}">${module[1].name}`).join("</option>")}`
+                    `${group.values.map(module => `<option data-id="${module[0]}">${module[1].name}`).join("</option>")}`
             );
         }
 
@@ -1461,6 +1464,47 @@ export default class CompareShips {
         });
     }
 
+    _getModifierFromModule(moduleType, moduleName) {
+        this._moduleDataDefault.forEach(type => {
+            if (type[0] === moduleType) {
+                const module = type[1].find(module => module.name === moduleName);
+                console.log(
+                    moduleType,
+                    moduleName,
+                    module
+                    /*
+                    ,
+                    module.properties.map(property => {
+                        const amount = property.isPercentage
+                            ? formatSignPercent(property.amount / 100)
+                            : property.amount < 1 && property.amount > 0
+                                ? formatPP(property.amount)
+                                : formatSignInt(property.amount);
+                        return `${property.modifier} ${amount}`;
+                    })
+
+                     */
+                );
+                /*
+                {
+                        console.log("gefunden");
+                        return module.properties.map(property => {
+                            const amount = property.isPercentage
+                                ? formatSignPercent(property.amount / 100)
+                                : property.amount < 1 && property.amount > 0
+                                    ? formatPP(property.amount)
+                                    : formatSignInt(property.amount);
+                            return `${property.modifier} ${amount}`;
+                        });
+                    }
+                });
+
+                 */
+            }
+        });
+        return moduleName;
+    }
+
     /**
      * Setup upgrades select
      * @param {string} columnId - Column id
@@ -1477,12 +1521,40 @@ export default class CompareShips {
                         this._modulesSelected(columnId);
                         this._refreshShips(columnId);
                     })
-                    .on("show.bs.select", () => {
+                    .on("show.bs.select", event => {
+                        const $el = $(event.currentTarget);
+
                         // Remove 'select all' button
-                        this._selectModule$[columnId][type]
-                            .parent()
+                        $el.parent()
                             .find("button.bs-select-all")
                             .remove();
+                    })
+                    .on("show.bs.select", event => {
+                        const $el = $(event.currentTarget);
+
+                        console.log(columnId, this._moduleProperties, $el.data("selectpicker").selectpicker.current);
+
+                        // Add tooltip
+                        $el.data("selectpicker").selectpicker.current.elements.forEach(element => {
+                            console.log(element);
+                            if (
+                                !(
+                                    element.classList.contains("dropdown-divider") ||
+                                    element.classList.contains("dropdown-header")
+                                )
+                            ) {
+                                // console.log("foreach", element.classList, element.innerText);
+                                $(element)
+                                    .attr("title", this._getModifierFromModule(type, element.innerText))
+                                    .tooltip();
+                            }
+                        });
+
+                        /*
+                        $($el.data("selectpicker").selectpicker.current.elements)
+                            .attr("title", "New Title")
+                            .tooltip();
+                         */
                     })
                     .selectpicker({
                         actionsBox: true,
