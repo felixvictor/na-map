@@ -45,6 +45,9 @@ import {
     formatInt,
     formatIntTrunc,
     formatPercent,
+    formatPP,
+    formatSignInt,
+    formatSignPercent,
     getOrdinal,
     isEmpty,
     roundToThousands,
@@ -1461,6 +1464,30 @@ export default class CompareShips {
         });
     }
 
+    _getModuleFromName(moduleName) {
+        let module = {};
+
+        this._moduleDataDefault.some(type => {
+            module = type[1].find(module => module.name === moduleName);
+            return Boolean(module);
+        });
+
+        return module;
+    }
+
+    _getModifierFromModule(properties) {
+        return `<p>${properties
+            .map(property => {
+                const amount = property.isPercentage
+                    ? formatSignPercent(property.amount / 100)
+                    : property.amount < 1 && property.amount > 0
+                        ? formatPP(property.amount)
+                        : formatSignInt(property.amount);
+                return `${property.modifier} ${amount}`;
+            })
+            .join("<br>")}</p>`;
+    }
+
     /**
      * Setup upgrades select
      * @param {string} columnId - Column id
@@ -1477,12 +1504,33 @@ export default class CompareShips {
                         this._modulesSelected(columnId);
                         this._refreshShips(columnId);
                     })
-                    .on("show.bs.select", () => {
+                    .on("show.bs.select", event => {
+                        const $el = $(event.currentTarget);
+
                         // Remove 'select all' button
-                        this._selectModule$[columnId][type]
-                            .parent()
+                        $el.parent()
                             .find("button.bs-select-all")
                             .remove();
+                    })
+                    .on("show.bs.select", event => {
+                        const $el = $(event.currentTarget);
+
+                        // Add tooltip
+                        $el.data("selectpicker").selectpicker.current.elements.forEach(element => {
+                            if (
+                                !(
+                                    element.classList.contains("dropdown-divider") ||
+                                    element.classList.contains("dropdown-header")
+                                )
+                            ) {
+                                const module = this._getModuleFromName(element.innerText);
+
+                                // Add tooltip with module properties
+                                $(element)
+                                    .attr("data-original-title", this._getModifierFromModule(module.properties))
+                                    .tooltip({ boundary: "viewport", html: true });
+                            }
+                        });
                     })
                     .selectpicker({
                         actionsBox: true,
