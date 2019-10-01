@@ -37,6 +37,7 @@
         "max-params": ["warn", 5],
         "multiline-ternary": ["error", "always-multiline"],
         "new-cap": "off",
+        "no-mixed-operators": "off",
         "object-curly-spacing": ["error", "always"],
         "prettier/prettier": ["error", { "tabWidth": 4, "printWidth": 120 }],
         "prefer-destructuring": [
