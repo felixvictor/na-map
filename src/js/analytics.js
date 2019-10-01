@@ -14,6 +14,7 @@ import { appName, appVersion } from "./common";
 
 const GA_TRACKING_ID = "UA-109520372-1";
 window.ga = function() {
+    // eslint-disable-next-line prefer-rest-params
     ga.q.push(arguments);
 };
 
@@ -23,7 +24,7 @@ ga.q = [];
  * Register event
  * @param {string} category Event category
  * @param {string} label Event label
- * @param {string} value Event value
+ * @param {number} value Event value
  * @return {void}
  */
 export const registerEvent = (category, label, value = 1) => {
