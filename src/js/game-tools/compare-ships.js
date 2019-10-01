@@ -1476,7 +1476,7 @@ export default class CompareShips {
     }
 
     _getModifierFromModule(properties) {
-        return `<p>${properties
+        return `<p class="mb-0">${properties
             .map(property => {
                 const amount = property.isPercentage
                     ? formatSignPercent(property.amount / 100)
