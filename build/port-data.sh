@@ -19,7 +19,7 @@ server_names=(eu1 eu2)
 
 server_twitter_names=(eu1)
 api_vars=(ItemTemplates Ports Shops)
-server_maintenance_hour=11
+server_maintenance_hour=10
 # Set server date
 if [ "$(date -u '+%H')" -lt "${server_maintenance_hour}" ]; then
     server_date=$(date -u '+%Y-%m-%d' --date "- 1 day")
