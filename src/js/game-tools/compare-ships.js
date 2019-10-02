@@ -1277,9 +1277,8 @@ export default class CompareShips {
 
         // Get types from moduleProperties list
         this._moduleTypes = new Set(
-            [...this._moduleProperties].map(module => module[1].type.replace(/\s–\s[a-zA-Z/\s]+/, ""))
+            [...this._moduleProperties].map(module => module[1].type.replace(/\s\u2013\s[a-zA-Z/\u25CB\s]+/, ""))
         );
-        // console.log(this._moduleProperties, this._moduleTypes);
     }
 
     /**
@@ -1419,19 +1418,20 @@ export default class CompareShips {
             .entries(
                 [...this._moduleProperties].filter(
                     module =>
-                        module[1].type.replace(/\s–\s[a-zA-Z/\s]+/, "") === moduleType &&
+                        module[1].type.replace(/\s–\s[a-zA-Z/\u25CB\s]+/, "") === moduleType &&
                         (module[1].moduleLevel === "U" || module[1].moduleLevel === getModuleLevel(shipClass))
                 )
             );
 
         let options = "";
+        const moduleTypeWithSingleOption = ["Permanent", "Ship trim"];
         if (modules.length > 1) {
             // Get options with sub types as optgroups
             options = modules
                 .map(
                     group =>
                         `<optgroup label="${group.key}" data-max-options="${
-                            moduleType.startsWith("Ship trim") ? 1 : 5
+                            moduleTypeWithSingleOption.includes(moduleType.replace(/[a-zA-Z\s]+\s–\s/, "")) ? 1 : 5
                         }">${group.values
                             .map(module => `<option value="${module[0]}">${module[1].name}`)
                             .join("</option>")}`
