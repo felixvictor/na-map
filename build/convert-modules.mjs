@@ -57,7 +57,7 @@ function convertModules() {
         ["ARMOR_ALL_SIDES ARMOR_THICKNESS", "Armor thickness"],
         ["ARMOR_ALL_SIDES MODULE_BASE_HP", "Armour hit points"],
         ["CREW MODULE_BASE_HP", "Crew"],
-        ["INTERNAL_STRUCTURE MODULE_BASE_HP", "Structure hit points"],
+        ["INTERNAL_STRUCTURE MODULE_BASE_HP", "Hull hit points"],
         ["NONE CREW_DAMAGE_RECEIVED_DECREASE_PERCENT", "Splinter resistance"],
         ["NONE GROG_MORALE_BONUS", "Morale"],
         ["NONE RUDDER_HALFTURN_TIME", "Rudder speed"],
