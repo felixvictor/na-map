@@ -315,6 +315,7 @@ function convertModules() {
     function getModuleType(module) {
         let type = "";
         let { sortingGroup } = module;
+        let { permanentType } = module;
 
         if (
             module.usageType === "All" &&
@@ -345,14 +346,20 @@ function convertModules() {
 
         if (type === "Ship trim") {
             const result = bonusRegex.exec(module.name);
-            sortingGroup = result ? `\u202F\u2013\u202f${result[1]}` : "";
+            sortingGroup = result ? `\u202F\u2013\u202F${result[1]}` : "";
         } else {
             sortingGroup = sortingGroup
                 ? `\u202F\u2013\u202f${capitalizeFirstLetter(module.sortingGroup).replace("_", "/")}`
                 : "";
         }
 
-        return `${type}${sortingGroup}`;
+        if (permanentType === "Default") {
+            permanentType = "";
+        } else {
+            permanentType = `\u202F\u25CB\u202F${permanentType}`;
+        }
+
+        return `${type}${sortingGroup}${permanentType}`;
     }
 
     apiItems
@@ -369,6 +376,7 @@ function convertModules() {
                 usageType: apiModule.UsageType,
                 APImodifiers: apiModule.Modifiers,
                 sortingGroup: apiModule.SortingGroup.replace("module:", ""),
+                permanentType: apiModule.PermanentType.replace(/_/g, " "),
                 // isStackable: !!apiModule.bCanBeSetWithSameType,
                 // minResourcesAmount: APImodule.MinResourcesAmount,
                 // maxResourcesAmount: APImodule.MaxResourcesAmount,
@@ -401,6 +409,7 @@ function convertModules() {
                     module.type = getModuleType(module);
                     delete module.moduleType;
                     delete module.sortingGroup;
+                    delete module.permanentType;
 
                     moduleRate.forEach(rate => {
                         rate.names.forEach(name => {
@@ -410,6 +419,19 @@ function convertModules() {
                             }
                         });
                     });
+
+                    const rateExceptions = [
+                        "Apprentice Carpenters",
+                        "Journeyman Carpenters",
+                        "Navy Carpenters",
+                        "Northern Carpenters",
+                        "Northern Master Carpenters",
+                        "Navy Mast Bands",
+                        "Navy Orlop Refit"
+                    ];
+                    if (rateExceptions.includes(module.name)) {
+                        module.moduleLevel = "U";
+                    }
 
                     if (
                         module.type.startsWith("Not used") ||
