@@ -1013,7 +1013,7 @@ export default class CompareShips {
             ["Splinter resistance", { properties: ["resistance.splinter"], isBaseValueAbsolute: false }],
             ["Crew", { properties: ["crew.max"], isBaseValueAbsolute: true }],
             ["Fire resistance", { properties: ["resistance.fire"], isBaseValueAbsolute: false }],
-            ["Structure hit points", { properties: ["structure.armour"], isBaseValueAbsolute: true }],
+            ["Hull hit points", { properties: ["structure.armour"], isBaseValueAbsolute: true }],
             ["Leak resistance", { properties: ["resistance.leaks"], isBaseValueAbsolute: false }],
             [
                 "Mast thickness",
@@ -1047,7 +1047,7 @@ export default class CompareShips {
             ["Fire resistance", { properties: ["resistance.fire"], isBaseValueAbsolute: false }],
             ["Front armour thickness", { properties: ["bow.thickness"], isBaseValueAbsolute: true }],
             ["Hold weight", { properties: ["maxWeight"], isBaseValueAbsolute: true }],
-            ["Structure hit points", { properties: ["structure.armour"], isBaseValueAbsolute: true }],
+            ["Hull hit points", { properties: ["structure.armour"], isBaseValueAbsolute: true }],
             ["Leak resistance", { properties: ["resistance.leaks"], isBaseValueAbsolute: false }],
             [
                 "Mast health",
