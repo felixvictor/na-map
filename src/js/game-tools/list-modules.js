@@ -138,12 +138,15 @@ export default class ListModules {
                         rate = "";
                     }
 
+                    let permanentType = rate ? "<br>" : "";
+                    permanentType += module.permanentType ? module.permanentType : "";
+
                     if (
                         typeof module.hasSamePropertiesAsPrevious === "undefined" ||
                         !module.hasSamePropertiesAsPrevious
                     ) {
                         rows.push(
-                            `<tr><td><span class="name">${module.name}</span><br>${rate}</td><td>${module.properties
+                            `<tr><td><span class="name">${module.name}<br>${rate}</span>${permanentType}</td><td>${module.properties
                                 .map(property => {
                                     const amount = property.isPercentage
                                         ? formatSignPercent(property.amount / 100)
