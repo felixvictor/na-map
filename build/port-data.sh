@@ -19,7 +19,7 @@ server_names=(eu1 eu2)
 
 server_twitter_names=(eu1)
 api_vars=(ItemTemplates Ports Shops)
-server_maintenance_hour=11
+server_maintenance_hour=10
 # Set server date
 if [ "$(date -u '+%H')" -lt "${server_maintenance_hour}" ]; then
     server_date=$(date -u '+%Y-%m-%d' --date "- 1 day")
@@ -135,19 +135,21 @@ function test_for_update () {
 
     local new_file
     local old_file
-	for api_var in "${api_vars[@]}"; do
-	    new_file="${api_base_file}-${server_names[0]}-${api_var}-${server_date}.json"
-		old_file="${api_base_file}-${server_names[0]}-${api_var}-${server_last_date}.json"
 
-		# If old file does not exist test succeeded
-		[[ ! -f "${old_file}" ]] && return 0;
+	  for api_var in "${api_vars[@]}"; do
+        new_file="${api_base_file}-${server_names[0]}-${api_var}-${server_date}.json"
+        old_file="${api_base_file}-${server_names[0]}-${api_var}-${server_last_date}.json"
 
-		# Get new file
-		get_API_data "${server_names[0]}" "${new_file}" "${api_var}"
+        # If old file does not exist test succeeded
+        [[ ! -f "${old_file}" ]] && return 0;
 
-		# Exit if $API_VAR file has not been updated yet
-		cmp --silent "${new_file}" "${old_file}" && { rm "${new_file}"; return 1; }
-	done
+        # Get new file
+        get_API_data "${server_names[0]}" "${new_file}" "${api_var}"
+
+        # Exit if $API_VAR file has not been updated yet
+        cmp --silent "${new_file}" "${old_file}" && { rm "${new_file}"; return 1; }
+    done
+
     return 0
 }
 
