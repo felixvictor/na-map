@@ -1087,8 +1087,6 @@ export default class CompareShips {
                 "Armour hit points",
                 { properties: ["bow.armour", "sides.armour", "stern.armour"], cap: { amount: 0.3, isPercentage: true } }
             ],
-            ["Back armour thickness", { properties: ["stern.thickness"], cap: { amount: 0.3, isPercentage: true } }],
-            ["Front armour thickness", { properties: ["bow.thickness"], cap: { amount: 0.3, isPercentage: true } }],
             ["Structure hit points", { properties: ["structure.armour"], cap: { amount: 0.3, isPercentage: true } }],
             [
                 "Mast health",
