@@ -376,7 +376,7 @@ function convertModules() {
                 usageType: apiModule.UsageType,
                 APImodifiers: apiModule.Modifiers,
                 sortingGroup: apiModule.SortingGroup.replace("module:", ""),
-                permanentType: apiModule.PermanentType.replace(/_/, " "),
+                permanentType: apiModule.PermanentType.replace(/_/g, " "),
                 // isStackable: !!apiModule.bCanBeSetWithSameType,
                 // minResourcesAmount: APImodule.MinResourcesAmount,
                 // maxResourcesAmount: APImodule.MaxResourcesAmount,
