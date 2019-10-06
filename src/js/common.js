@@ -243,11 +243,11 @@ export const speedConstB = 0.00272175949231;
 
 export const circleRadiusFactor = 5;
 
-const secondsForFullCircle = 48 * 60 + 55;
+const secondsForFullCircle = 2935; // 48 * 60 + 55
 export const fullCircle = 360;
 export const degreesPerSecond = fullCircle / secondsForFullCircle;
 
-/* eslint-disable-next-line no-undef */
+/* eslint-disable no-undef */
 export const colourGreen = CGREEN;
 export const colourGreenLight = CGREENLIGHT;
 export const colourGreenDark = CGREENDARK;
@@ -258,7 +258,6 @@ export const colourWhite = CWHITE;
 export const primary300 = CPRIMARY300;
 export const iconSmallSrc = ICONSMALL;
 
-/* eslint-disable-next-line no-undef */
 export const hullRepairsVolume = REPAIR_ARMOR_VOLUME;
 export const hullRepairsPercent = REPAIR_ARMOR_PERCENT;
 export const repairTime = REPAIR_ARMOR_TIME;
