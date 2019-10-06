@@ -55,9 +55,9 @@ function convertModules() {
     // Woods
     const modifiers = new Map([
         ["ARMOR_ALL_SIDES ARMOR_THICKNESS", "Armor thickness"],
-        ["ARMOR_ALL_SIDES MODULE_BASE_HP", "Armour strength"],
+        ["ARMOR_ALL_SIDES MODULE_BASE_HP", "Armour hit points"],
         ["CREW MODULE_BASE_HP", "Crew"],
-        ["INTERNAL_STRUCTURE MODULE_BASE_HP", "Hitpoints"],
+        ["INTERNAL_STRUCTURE MODULE_BASE_HP", "Hull hit points"],
         ["NONE CREW_DAMAGE_RECEIVED_DECREASE_PERCENT", "Splinter resistance"],
         ["NONE GROG_MORALE_BONUS", "Morale"],
         ["NONE RUDDER_HALFTURN_TIME", "Rudder speed"],
@@ -91,8 +91,8 @@ function convertModules() {
             "Mortar horizontal/vertical dispersion"
         ],
         ["DECK_CENTRAL CANNON_DISPERSION_REDUCTION_SPEED", "Mortar aiming speed"],
-        ["MAST MAST_BOTTOM_SECTION_HP,MAST_MIDDLE_SECTION_HP,MAST_TOP_SECTION_HP", "Mast strength"],
-        ["MAST MAST_TOP_SECTION_HP,MAST_MIDDLE_SECTION_HP,MAST_BOTTOM_SECTION_HP", "Mast strength"],
+        ["MAST MAST_BOTTOM_SECTION_HP,MAST_MIDDLE_SECTION_HP,MAST_TOP_SECTION_HP", "Mast hit points"],
+        ["MAST MAST_TOP_SECTION_HP,MAST_MIDDLE_SECTION_HP,MAST_BOTTOM_SECTION_HP", "Mast hit points"],
         ["NONE AXES_ATTACK_BONUS", "Melee attack"],
         ["NONE AXES_DISENGAGE_DURATION", "Disengage time"],
         ["NONE BARRICADES_FIREPOWER_BONUS", "Barricade musket defense"],
@@ -315,6 +315,7 @@ function convertModules() {
     function getModuleType(module) {
         let type = "";
         let { sortingGroup } = module;
+        let { permanentType } = module;
 
         if (
             module.usageType === "All" &&
@@ -345,14 +346,20 @@ function convertModules() {
 
         if (type === "Ship trim") {
             const result = bonusRegex.exec(module.name);
-            sortingGroup = result ? `\u202F\u2013\u202f${result[1]}` : "";
+            sortingGroup = result ? `\u202F\u2013\u202F${result[1]}` : "";
         } else {
             sortingGroup = sortingGroup
                 ? `\u202F\u2013\u202f${capitalizeFirstLetter(module.sortingGroup).replace("_", "/")}`
                 : "";
         }
 
-        return `${type}${sortingGroup}`;
+        if (permanentType === "Default") {
+            permanentType = "";
+        } else {
+            permanentType = `\u202F\u25CB\u202F${permanentType}`;
+        }
+
+        return `${type}${sortingGroup}${permanentType}`;
     }
 
     apiItems
@@ -369,6 +376,7 @@ function convertModules() {
                 usageType: apiModule.UsageType,
                 APImodifiers: apiModule.Modifiers,
                 sortingGroup: apiModule.SortingGroup.replace("module:", ""),
+                permanentType: apiModule.PermanentType.replace(/_/g, " "),
                 // isStackable: !!apiModule.bCanBeSetWithSameType,
                 // minResourcesAmount: APImodule.MinResourcesAmount,
                 // maxResourcesAmount: APImodule.MaxResourcesAmount,
@@ -401,6 +409,7 @@ function convertModules() {
                     module.type = getModuleType(module);
                     delete module.moduleType;
                     delete module.sortingGroup;
+                    delete module.permanentType;
 
                     moduleRate.forEach(rate => {
                         rate.names.forEach(name => {
@@ -410,6 +419,19 @@ function convertModules() {
                             }
                         });
                     });
+
+                    const rateExceptions = [
+                        "Apprentice Carpenters",
+                        "Journeyman Carpenters",
+                        "Navy Carpenters",
+                        "Northern Carpenters",
+                        "Northern Master Carpenters",
+                        "Navy Mast Bands",
+                        "Navy Orlop Refit"
+                    ];
+                    if (rateExceptions.includes(module.name)) {
+                        module.moduleLevel = "U";
+                    }
 
                     if (
                         module.type.startsWith("Not used") ||
@@ -422,7 +444,7 @@ function convertModules() {
                         module.name === "Gifted" ||
                         module.name === "Light Ship Master" ||
                         module.name === "Lineship Master" ||
-                        module.name === "Optimized Rudder" ||
+                        (module.name === "Optimized Rudder" && module.moduleLevel !== "U") ||
                         module.name === "Press Gang" ||
                         module.name === "Signaling" ||
                         module.name === "TEST MODULE SPEED IN OW" ||
