@@ -220,10 +220,10 @@ function main() {
     faDom.watch();
 
     initAnalytics();
-    registerPage("Homepage", "/");
+    registerPage("Homepage");
 
     setupListener();
-    load();
+    load().then();
 }
 
 main();
