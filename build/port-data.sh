@@ -29,6 +29,7 @@ else
     server_last_date=$(date -u '+%Y-%m-%d' --date "- 1 day")
 fi
 last_function=""
+is_updated=false
 
 function get_current_branch() {
     git rev-parse --abbrev-ref HEAD
@@ -303,7 +304,9 @@ function update_tweets () {
     if update_ports; then
         copy_data
         push_data
-        deploy_data
+        if [ "${is_updated}" = true ] ; then
+          deploy_data
+        fi
     fi
 }
 
@@ -328,6 +331,7 @@ function push_data () {
         fi
         git_message+="push ${script_run_type}"
         git commit -m "${git_message}"
+        is_updated=true
     fi
     # Status for on_exit trap
     last_function="push_data"
