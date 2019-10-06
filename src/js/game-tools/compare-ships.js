@@ -39,6 +39,7 @@ import {
     repairTime,
     insertBaseModal
 } from "../common";
+import Toast from "../util/toast";
 import {
     copyToClipboard,
     formatFloat,
@@ -1673,6 +1674,28 @@ export default class CompareShips {
         return data;
     }
 
+    _showCappingAdvice(compareId) {
+        const id = `${this._baseId}-${compareId}-capping`;
+
+        if (!document.getElementById(id)) {
+            const div = document.createElement("p");
+            div.id = id;
+            div.className = "alert alert-warning";
+            div.innerHTML = "Values capped";
+
+            const element = document.getElementById(`${this._baseId}-${compareId}`);
+            element.firstChild.after(div);
+        }
+    }
+
+    _removeCappingAdvice(compareId) {
+        const id = `${this._baseId}-${compareId}-capping`;
+        const div = document.getElementById(id);
+        if (div) {
+            div.remove();
+        }
+    }
+
     /**
      * Add upgrade changes to ship data
      * @param {*} shipDataBase - Base ship data
@@ -1731,6 +1754,16 @@ export default class CompareShips {
         };
 
         const adjustDataByCaps = () => {
+            let valueCapped = false;
+            const adjustValue = (currentValue, baseValue, capAmount, isPercentage) => {
+                const newValue = Math.min(currentValue, isPercentage ? baseValue * (1 + capAmount) : capAmount);
+                if (currentValue !== newValue) {
+                    valueCapped = true;
+                }
+
+                return newValue;
+            };
+
             this._modifierAmount.forEach((value, key) => {
                 if (this._moduleCaps.has(key)) {
                     const { cap } = this._moduleCaps.get(key);
@@ -1738,20 +1771,30 @@ export default class CompareShips {
                         const index = property.split(".");
                         if (index.length > 1) {
                             if (data[index[0]][index[1]]) {
-                                data[index[0]][index[1]] = Math.min(
+                                data[index[0]][index[1]] = adjustValue(
                                     data[index[0]][index[1]],
-                                    cap.isPercentage ? shipDataBase[index[0]][index[1]] * (1 + cap.amount) : cap.amount
+                                    shipDataBase[index[0]][index[1]],
+                                    cap.amount,
+                                    cap.isPercentage
                                 );
                             }
                         } else if (data[index[0]]) {
-                            data[index[0]] = Math.min(
+                            data[index[0]] = adjustValue(
                                 data[index[0]],
-                                cap.isPercentage ? shipDataBase[index[0]] * (1 + cap.amount) : cap.amount
+                                shipDataBase[index[0]],
+                                cap.amount,
+                                cap.isPercentage
                             );
                         }
                     });
                 }
             });
+
+            if (valueCapped) {
+                this._showCappingAdvice(compareId);
+            } else {
+                this._removeCappingAdvice(compareId);
+            }
         };
 
         if (!this._selectedUpgradeIdsList[compareId]) {
