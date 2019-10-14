@@ -7,13 +7,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import "bootstrap/js/dist/util";
-import "bootstrap/js/dist/button";
-import "bootstrap/js/dist/dropdown";
-import "bootstrap/js/dist/modal";
-import "bootstrap/js/dist/toast";
-import "bootstrap/js/dist/tooltip";
-
 import { library as faLibrary, dom as faDom } from "@fortawesome/fontawesome-svg-core";
 import { faCalendar, faCalendarCheck, faClock, faCopy } from "@fortawesome/free-regular-svg-icons";
 import {
@@ -159,7 +152,6 @@ function main() {
      */
     const loadMap = (serverId, searchParams) => {
         try {
-            console.log("loadMap", serverId, searchParams);
             import(/*  webpackPreload: true, webpackChunkName: "map" */ "./map/map").then(Map => {
                 const map = new Map.Map(serverId, searchParams);
 
@@ -181,7 +173,6 @@ function main() {
     // eslint-disable-next-line space-before-function-paren
     const loadGameTools = (serverId, searchParams) => {
         try {
-            console.log("loadGameTools", serverId, searchParams);
             import(/* webpackChunkName: "game-tools" */ "./game-tools").then(gameTools => {
                 gameTools.init(serverId, searchParams);
             });

@@ -8,6 +8,8 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+import "bootstrap/js/dist/util";
+import "bootstrap/js/dist/tooltip";
 import { min as d3Min, max as d3Max } from "d3-array";
 import { interpolateHcl as d3InterpolateHcl, interpolateHclLong as d3InterpolateHclLong } from "d3-interpolate";
 // import { polygonCentroid as d3PolygonCentroid, polygonHull as d3PolygonHull } from "d3-polygon";
