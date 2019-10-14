@@ -8,6 +8,8 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+import "bootstrap/js/dist/util";
+import "bootstrap/js/dist/modal";
 import { areaLabel as d3AreaLabel } from "d3-area-label";
 import { extent as d3Extent, max as d3Max, min as d3Min } from "d3-array";
 import { axisBottom as d3AxisBottom } from "d3-axis";
