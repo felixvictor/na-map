@@ -8,6 +8,8 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+import "bootstrap/js/dist/util";
+import "bootstrap/js/dist/modal";
 import { select as d3Select } from "d3-selection";
 import { nest as d3Nest } from "d3-collection";
 import { ascending as d3Ascending } from "d3-array";

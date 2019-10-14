@@ -8,6 +8,8 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+import "bootstrap/js/dist/util";
+import "bootstrap/js/dist/tooltip";
 import { extent as d3Extent } from "d3-array";
 import { scaleLinear as d3ScaleLinear, scalePoint as d3ScalePoint } from "d3-scale";
 import { select as d3Select } from "d3-selection";
