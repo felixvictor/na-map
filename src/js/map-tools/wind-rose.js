@@ -8,6 +8,17 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+
+import "bootstrap/js/dist/util";
+import "bootstrap/js/dist/button";
+import "bootstrap/js/dist/dropdown";
+import "bootstrap/js/dist/modal";
+import "bootstrap/js/dist/toast";
+import "bootstrap/js/dist/tooltip";
+
+
+import "bootstrap/js/dist/util";
+import "bootstrap/js/dist/modal";
 import { select as d3Select } from "d3-selection";
 import { line as d3Line } from "d3-shape";
 import moment from "moment";
