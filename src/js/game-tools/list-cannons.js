@@ -8,6 +8,8 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+import "bootstrap/js/dist/util";
+import "bootstrap/js/dist/modal";
 import { html, render } from "lit-html";
 import { repeat } from "lit-html/directives/repeat";
 // eslint-disable-next-line import/no-named-default
