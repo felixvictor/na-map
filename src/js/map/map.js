@@ -13,7 +13,6 @@ import { event as d3Event, mouse as d3Mouse, select as d3Select } from "d3-selec
 import { zoom as d3Zoom, zoomIdentity as d3ZoomIdentity, zoomTransform as d3ZoomTransform } from "d3-zoom";
 
 import "bootstrap/js/dist/util";
-import "bootstrap/js/dist/collapse";
 import "bootstrap/js/dist/modal";
 
 import { appDescription, appTitle, appVersion, defaultFontSize, insertBaseModal } from "../common";
