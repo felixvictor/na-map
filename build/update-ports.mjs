@@ -120,8 +120,10 @@ function updatePorts() {
      */
     function portBattleScheduled(result) {
         const guessNationFromClanName = clanName => {
-            const nationShortname = ports.ports.find(port => port.capturer === clanName).nation;
-            const nationName = nationShortname ? nations.find(nation => nation.short === nationShortname).name : "n/a";
+            const guessedNation = ports.ports.find(port => port.capturer === clanName);
+            const nationName = guessedNation
+                ? nations.find(nation => nation.short === guessedNation.nation).name
+                : "n/a";
 
             return nationName;
         };
