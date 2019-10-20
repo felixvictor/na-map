@@ -311,15 +311,12 @@ class Map {
     }
 
     _readData() {
-        const jsonData = [];
         const readData = {};
-        this._dataSources.forEach((datum, i) => {
-            jsonData[i] = fetch(`${this._dataDirectory}/${datum.fileName}`)
-                .then(checkFetchStatus)
-                .then(getJsonFromFetch);
-        });
 
-        Promise.all(jsonData)
+        const loadEntries = dataSources =>
+            Promise.all(dataSources.map(dataSource => import(`${this._dataDirectory}/${dataSource.fileName}`)));
+
+        loadEntries(this._dataSources)
             .then(values => {
                 values.forEach((value, i) => {
                     readData[this._dataSources[i].name] = value;
