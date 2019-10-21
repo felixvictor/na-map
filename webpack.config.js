@@ -12,7 +12,6 @@ const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
 const HtmlPlugin = require("html-webpack-plugin");
 const ExtractCssChunks = require("extract-css-chunks-webpack-plugin");
-const ManifestPlugin = require("webpack-manifest-plugin");
 const SitemapPlugin = require("sitemap-webpack-plugin").default;
 const SriPlugin = require("webpack-subresource-integrity");
 const TerserPlugin = require("terser-webpack-plugin");
@@ -325,28 +324,15 @@ const config = {
         new CopyPlugin([
             { from: "../netlify.toml" },
             {
-                from: "gen/*.json",
-                ignore: ["**/repairs.json"],
-                to: isProduction ? `${outputPath}/data/[name].[contenthash].[ext]` : `${outputPath}/data`,
+                from: "data/*.json",
+                to: `${outputPath}/data`,
                 flatten: true
             },
-            { from: "gen/*.xlsx", flatten: true },
+            { from: "data/*.xlsx", flatten: true },
             { from: "google979f2cf3bed204d6.html", to: "google979f2cf3bed204d6.html", toType: "file" },
             { from: "images/icons/favicon.ico", flatten: true },
             { from: "images/map", to: `${outputPath}/images/map` }
         ]),
-        new ManifestPlugin({
-            fileName: "asset-manifest.json",
-            filter: file => file.name.startsWith("data/"),
-            map: file => {
-                if (isProduction) {
-                    // Remove hash in manifest key
-                    file.name = file.name.replace(/(\.[a-f0-9]{32})(\..*)$/, "$2");
-                }
-
-                return file;
-            }
-        }),
         new HtmlPlugin(htmlOpt),
         new SitemapPlugin(target, sitemapPaths, { skipGzip: false }),
         new WebpackPwaManifest(manifestOpt),
