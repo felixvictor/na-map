@@ -16,7 +16,7 @@ import "bootstrap/js/dist/util";
 import "bootstrap/js/dist/modal";
 
 import { appDescription, appTitle, appVersion, defaultFontSize, insertBaseModal } from "../common";
-import { displayClan, nearestPow2, checkFetchStatus, getJsonFromFetch, putFetchError, roundToThousands } from "../util";
+import { displayClan, nearestPow2, putImportError, roundToThousands } from "../util";
 
 import { registerEvent } from "../analytics";
 
@@ -51,52 +51,6 @@ class Map {
         this._serverName = serverName;
 
         this._searchParams = searchParams;
-
-        /**
-         * Data directory
-         * @type {string}
-         * @private
-         */
-        this._dataDirectory = "data";
-
-        /**
-         * @type {Array<fileName: string, name: string>}
-         * @private
-         */
-        this._dataSources = [
-            {
-                fileName: "ports.json",
-                name: "ports"
-            },
-            {
-                fileName: `${serverName}-trades.json`,
-                name: "trades"
-            },
-            {
-                fileName: `${serverName}.json`,
-                name: "server"
-            },
-            {
-                fileName: `${serverName}-pb.json`,
-                name: "pb"
-            },
-            {
-                fileName: "pb.json",
-                name: "pbZones"
-            },
-            {
-                fileName: "ships.json",
-                name: "ships"
-            },
-            {
-                fileName: "woods.json",
-                name: "woods"
-            },
-            {
-                fileName: "modules.json",
-                name: "modules"
-            }
-        ];
 
         /**
          * Font size in px
@@ -236,6 +190,7 @@ class Map {
         //        performance.mark(`${marks[marks.length - 1]}-end`);
 
         // Combine port data with port battle data
+        console.log(data);
         const portData = data.ports.map(port => {
             const combinedData = port;
 
@@ -310,21 +265,58 @@ class Map {
         */
     }
 
-    _readData() {
+    async _readData() {
+        /**
+         * Data directory
+         * @type {string}
+         * @private
+         */
+        const dataDirectory = "data";
+
+        /**
+         * @type {Array<fileName: string, name: string>}
+         * @private
+         */
+        const dataSources = [
+            {
+                fileName: `${this._serverName}-trades.json`,
+                name: "trades"
+            },
+            {
+                fileName: `${this._serverName}.json`,
+                name: "server"
+            },
+            {
+                fileName: `${this._serverName}-pb.json`,
+                name: "pb"
+            }
+        ];
+
         const readData = {};
 
-        const loadEntries = dataSources =>
-            Promise.all(dataSources.map(dataSource => import(`${this._dataDirectory}/${dataSource.fileName}`)));
+        const loadEntries = async dataSources => {
+            for await (const dataSource of dataSources) {
+                const response = await fetch(`${dataDirectory}/${dataSource.fileName}`);
+                readData[dataSource.name] = await response.json();
+            }
+        };
 
-        loadEntries(this._dataSources)
-            .then(values => {
-                values.forEach((value, i) => {
-                    readData[this._dataSources[i].name] = value;
-                });
 
-                this._setupData(readData);
-            })
-            .catch(putFetchError);
+
+        try {
+            readData.ports = await import(/* webpackChunkName: "data-ports" */ "../../gen/ports.json");
+            readData.pbZones = await import(/* webpackChunkName: "data-pb" */ "../../gen/pb.json");
+            readData.ships = await import(/* webpackChunkName: "data-ships" */ "../../gen/ships.json");
+            readData.woods = await import(/* webpackChunkName: "data-woods" */ "../../gen/woods.json");
+            readData.modules = await import(/* webpackChunkName: "data-modules" */ "../../gen/modules.json");
+
+            await loadEntries(dataSources);
+            console.log(readData.ports);
+
+            this._setupData(readData);
+        } catch (error) {
+            putImportError(error);
+        }
     }
 
     _setupListener() {
