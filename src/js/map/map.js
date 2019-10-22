@@ -190,7 +190,6 @@ class Map {
         //        performance.mark(`${marks[marks.length - 1]}-end`);
 
         // Combine port data with port battle data
-        console.log(data);
         const portData = data.ports.map(port => {
             const combinedData = port;
 
@@ -274,6 +273,7 @@ class Map {
         const dataDirectory = "data";
 
         /**
+         * Data sources
          * @type {Array<fileName: string, name: string>}
          * @private
          */
@@ -292,7 +292,7 @@ class Map {
             }
         ];
 
-        const readData = {};
+        let readData = {};
 
         const loadEntries = async dataSources => {
             for await (const dataSource of dataSources) {
@@ -301,17 +301,21 @@ class Map {
             }
         };
 
-
-
         try {
-            readData.ports = await import(/* webpackChunkName: "data-ports" */ "../../gen/ports.json");
-            readData.pbZones = await import(/* webpackChunkName: "data-pb" */ "../../gen/pb.json");
-            readData.ships = await import(/* webpackChunkName: "data-ships" */ "../../gen/ships.json");
-            readData.woods = await import(/* webpackChunkName: "data-woods" */ "../../gen/woods.json");
-            readData.modules = await import(/* webpackChunkName: "data-modules" */ "../../gen/modules.json");
+            const { default: modules } = await import(/* webpackChunkName: "data-modules" */ "../../gen/modules.json");
+            const { default: pbZones } = await import(/* webpackChunkName: "data-pb" */ "../../gen/pb.json");
+            const { default: ports } = await import(/* webpackChunkName: "data-ports" */ "../../gen/ports.json");
+            const { default: ships } = await import(/* webpackChunkName: "data-ships" */ "../../gen/ships.json");
+            const { default: woods } = await import(/* webpackChunkName: "data-woods" */ "../../gen/woods.json");
+            readData = {
+                modules,
+                pbZones,
+                ports,
+                ships,
+                woods
+            };
 
             await loadEntries(dataSources);
-            console.log(readData.ports);
 
             this._setupData(readData);
         } catch (error) {
