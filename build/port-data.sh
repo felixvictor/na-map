@@ -88,7 +88,7 @@ function common_var () {
     cannon_file="${gen_dir}/cannons.json"
     loot_file="${gen_dir}/loot.json"
     nation_file="${gen_dir}/nations.json"
-    ownership_json="${gen_dir}/ownership.json"
+    ownership_file="${gen_dir}/ownership.json"
     port_file="${gen_dir}/ports.json"
     pb_zone_file="${gen_dir}/pb.json"
     recipe_file="${gen_dir}/recipes.json"
@@ -196,8 +196,9 @@ function get_port_data () {
         ${command_nodejs} build/convert-loot.mjs "${api_base_file}-${server_names[0]}" "${loot_file}" "${server_date}"
         ${command_nodejs} build/convert-recipes.mjs "${api_base_file}-${server_names[0]}" "${recipe_file}" "${server_date}"
         ${command_nodejs} build/convert-ship-blueprints.mjs "${api_base_file}-${server_names[0]}" "${ship_blueprint_file}" "${server_date}"
-        if [ "${script_run_type}" == "update" ]; then
-            ${command_nodejs} build/convert-ownership.mjs "${api_dir}" "api-${server_names[0]}-Ports" "${ownership_json}" "${nation_file}"
+
+        if [ "${script_run_type}" == "update" ] || [ ! -f "${ownership_file}" ] || [ ! -f "${nation_file}" ]; then
+            ${command_nodejs} build/convert-ownership.mjs "${api_dir}" "api-${server_names[0]}-Ports" "${ownership_file}" "${nation_file}"
         fi
 
         ${command_nodejs} build/create-xlsx.mjs "${ship_file}" "${port_file}" "${excel_file}"

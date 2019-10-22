@@ -32,6 +32,7 @@ import Cookie from "./util/cookie";
 import RadioButton from "./util/radio-button";
 
 import "../scss/main.scss";
+import { putImportError } from "./util";
 
 /**
  * @returns {void}
@@ -150,17 +151,17 @@ function main() {
      * @param {URLSearchParams} searchParams - Query arguments
      * @return {void}
      */
-    const loadMap = (serverId, searchParams) => {
+    // eslint-disable-next-line space-before-function-paren
+    const loadMap = async (serverId, searchParams) => {
         try {
-            import(/*  webpackPreload: true, webpackChunkName: "map" */ "./map/map").then(Map => {
-                const map = new Map.Map(serverId, searchParams);
+            const Map = await import(/*  webpackPreload: true, webpackChunkName: "map" */ "./map/map");
+            const map = new Map.Map(serverId, searchParams);
 
-                window.addEventListener("resize", () => {
-                    map.resize();
-                });
+            window.addEventListener("resize", () => {
+                map.resize();
             });
         } catch (error) {
-            throw new Error(error);
+            putImportError(error);
         }
     };
 
@@ -171,13 +172,12 @@ function main() {
      * @return {void}
      */
     // eslint-disable-next-line space-before-function-paren
-    const loadGameTools = (serverId, searchParams) => {
+    const loadGameTools = async (serverId, searchParams) => {
         try {
-            import(/* webpackChunkName: "game-tools" */ "./game-tools").then(gameTools => {
-                gameTools.init(serverId, searchParams);
-            });
+            const gameTools = await import(/* webpackChunkName: "game-tools" */ "./game-tools");
+            gameTools.init(serverId, searchParams);
         } catch (error) {
-            throw new Error(error);
+            putImportError(error);
         }
     };
 
