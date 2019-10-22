@@ -29,62 +29,10 @@ import ListWoods from "./list-woods";
 
 import { registerEvent } from "../analytics";
 import { appVersion } from "../common";
-import { checkFetchStatus, getJsonFromFetch, putFetchError } from "../util";
-
-/**
- * Data directory
- * @type {string}
- */
-const dataDirectory = "data";
+import { checkFetchStatus, getJsonFromFetch, putFetchError, putImportError } from "../util";
 
 let urlParams = "";
 let serverId = "";
-
-/**
- * @type {Array<fileName: string, name: string>}
- */
-const dataSources = [
-    {
-        fileName: "ships.json",
-        name: "ships"
-    },
-    {
-        fileName: "woods.json",
-        name: "woods"
-    },
-    {
-        fileName: "cannons.json",
-        name: "cannons"
-    },
-    {
-        fileName: "loot.json",
-        name: "loot"
-    },
-    {
-        fileName: "modules.json",
-        name: "modules"
-    },
-    {
-        fileName: "recipes.json",
-        name: "recipes"
-    },
-    {
-        fileName: "buildings.json",
-        name: "buildings"
-    },
-    {
-        fileName: "ownership.json",
-        name: "ownership"
-    },
-    {
-        fileName: "nations.json",
-        name: "nations"
-    },
-    {
-        fileName: "ship-blueprints.json",
-        name: "shipBlueprints"
-    }
-];
 
 /**
  * Setup all game tool modules
@@ -99,11 +47,7 @@ const setupData = data => {
     });
 
     const checkShipCompareData = () => {
-        if (
-            urlParams.has("cmp") &&
-            urlParams.has("v") &&
-            semver.lte(urlParams.get("v"), appVersion)
-        ) {
+        if (urlParams.has("cmp") && urlParams.has("v") && semver.lte(urlParams.get("v"), appVersion)) {
             registerEvent("Menu", "Paste ship compare");
             shipCompare.initFromClipboard(urlParams);
         }
@@ -148,24 +92,76 @@ const setupData = data => {
  * Fetch json data
  * @return {void}
  */
-const readData = () => {
-    const jsonData = [];
-    const fileData = {};
+const readData = async () => {
+    /**
+     * @type {Array<fileName: string, name: string>}
+     */
+    const dataSources = [
+        {
+            fileName: "cannons.json",
+            name: "cannons"
+        },
+        {
+            fileName: "loot.json",
+            name: "loot"
+        },
 
-    dataSources.forEach((datum, i) => {
-        jsonData[i] = fetch(`${dataDirectory}/${datum.fileName}`)
-            .then(checkFetchStatus)
-            .then(getJsonFromFetch);
-    });
+        {
+            fileName: "recipes.json",
+            name: "recipes"
+        },
+        {
+            fileName: "buildingsbuildings.json",
+            name: "buildings"
+        },
+        {
+            fileName: "ownership.json",
+            name: "ownership"
+        },
+        {
+            fileName: "nations.json",
+            name: "nations"
+        },
+        {
+            fileName: "ship-blueprints.json",
+            name: "shipBlueprints"
+        }
+    ];
 
-    Promise.all(jsonData)
-        .then(values => {
-            values.forEach((value, i) => {
-                fileData[dataSources[i].name] = value;
-            });
-            setupData(fileData);
-        })
-        .catch(putFetchError);
+    try {
+        const { default: buildings } = await import(
+            /* webpackChunkName: "data-buildings" */ "../../gen/buildings.json"
+        );
+        const { default: cannons } = await import(/* webpackChunkName: "data-cannons" */ "../../gen/cannons.json");
+        const { default: loot } = await import(/* webpackChunkName: "data-loot" */ "../../gen/loot.json");
+        const { default: modules } = await import(/* webpackChunkName: "data-modules" */ "../../gen/modules.json");
+        const { default: nations } = await import(/* webpackChunkName: "data-nations" */ "../../gen/nations.json");
+        const { default: ownership } = await import(
+            /* webpackChunkName: "data-ownership" */ "../../gen/ownership.json"
+        );
+        const { default: recipes } = await import(/* webpackChunkName: "data-recipes" */ "../../gen/recipes.json");
+        const { default: shipBlueprints } = await import(
+            /* webpackChunkName: "data-ship-blueprints" */ "../../gen/ship-blueprints.json"
+        );
+        const { default: ships } = await import(/* webpackChunkName: "data-ships" */ "../../gen/ships.json");
+        const { default: woods } = await import(/* webpackChunkName: "data-woods" */ "../../gen/woods.json");
+        const readData = {
+            buildings,
+            cannons,
+            loot,
+            nations,
+            ownership,
+            recipes,
+            shipBlueprints,
+            modules,
+            ships,
+            woods
+        };
+
+        setupData(readData);
+    } catch (error) {
+        putImportError(error);
+    }
 };
 
 /**
