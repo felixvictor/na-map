@@ -1,16 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ModuleTemplate xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="Leopard HULL" Type="HULL">
+<ModuleTemplate xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="Temeraire HULL" Type="HULL">
   <Attributes>
     <Pair>
       <Key>MODULE_DESCRIPTION</Key>
       <Value xsi:type="StringAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>Ships/Leopard.xml</Value>
+        <Value>Ships/Temeraire.xml</Value>
       </Value>
     </Pair>
     <Pair>
       <Key>MODULE_BASE_HP</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>2200</Value>
+        <Value>2700</Value>
       </Value>
     </Pair>
     <Pair>
@@ -35,8 +35,8 @@
           <TangentOut>0</TangentOut>
         </Value>
         <Value>
-          <Time>1.000018</Time>
-          <Value>4.865974E-05</Value>
+          <Time>0.9991804</Time>
+          <Value>0.03253941</Value>
           <TangentIn>0</TangentIn>
           <TangentOut>0</TangentOut>
         </Value>
@@ -47,15 +47,15 @@
       <Value xsi:type="CurveAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
         <Value>
           <Time>0</Time>
-          <Value>3.668247E-06</Value>
-          <TangentIn>0.7282717</TangentIn>
-          <TangentOut>0.7282717</TangentOut>
+          <Value>0</Value>
+          <TangentIn>0.6407749</TangentIn>
+          <TangentOut>0.6407749</TangentOut>
         </Value>
         <Value>
-          <Time>0.9998574</Time>
-          <Value>0.2002707</Value>
-          <TangentIn>0.08603368</TangentIn>
-          <TangentOut>0.08603368</TangentOut>
+          <Time>0.9964265</Time>
+          <Value>0.297772259</Value>
+          <TangentIn>0</TangentIn>
+          <TangentOut>0</TangentOut>
         </Value>
       </Value>
     </Pair>
@@ -103,13 +103,13 @@
     <Pair>
       <Key>SHIP_ACCELERATION</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>0.75</Value>
+        <Value>0.6</Value>
       </Value>
     </Pair>
     <Pair>
       <Key>SHIP_MAX_ROLL_ANGLE</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>30.4</Value>
+        <Value>19.4</Value>
       </Value>
     </Pair>
     <Pair>
@@ -133,7 +133,7 @@
     <Pair>
       <Key>MODULE_PREFAB_PATH</Key>
       <Value xsi:type="StringAttribute" Action="Relative" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>Assets/Resources/Common/Prefabs/Ships/UniversalUniversalLeopard.prefab</Value>
+        <Value>Assets/Resources/Common/Prefabs/Ships/UniversalUniversalTemeraire.prefab</Value>
       </Value>
     </Pair>
     <Pair>
@@ -142,12 +142,12 @@
         <Value>
           <Time>0</Time>
           <Value>1</Value>
-          <TangentIn>0</TangentIn>
-          <TangentOut>0</TangentOut>
+          <TangentIn>-0.2587506</TangentIn>
+          <TangentOut>-0.2587506</TangentOut>
         </Value>
         <Value>
-          <Time>1</Time>
-          <Value>0.2496079</Value>
+          <Time>1.000095</Time>
+          <Value>0.4004877</Value>
           <TangentIn>0</TangentIn>
           <TangentOut>0</TangentOut>
         </Value>
@@ -156,7 +156,7 @@
     <Pair>
       <Key>SHIP_MASS</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>1733</Value>
+        <Value>2963</Value>
       </Value>
     </Pair>
     <Pair>
@@ -168,13 +168,13 @@
     <Pair>
       <Key>SHIP_WATERLINE_HEIGHT</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>-0.1</Value>
+        <Value>-0.15</Value>
       </Value>
     </Pair>
     <Pair>
       <Key>FIREZONE_HORIZONTAL_WIDTH</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>30</Value>
+        <Value>35</Value>
       </Value>
     </Pair>
     <Pair>
@@ -358,7 +358,7 @@
     <Pair>
       <Key>SHIP_STRUCTURE_LEAKS_PER_SECOND</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
-        <Value>38.481</Value>
+        <Value>47.227</Value>
       </Value>
     </Pair>
     <Pair>
@@ -466,7 +466,7 @@
     <Pair>
       <Key>SHIP_CLASS_TYPE</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="false" IsNegative="false">
-        <Value>2</Value>
+        <Value>1</Value>
       </Value>
     </Pair>
     <Pair>
@@ -574,13 +574,13 @@
     <Pair>
       <Key>SHIP_PHYSICS_DEC_COEF</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>0.0317</Value>
+        <Value>0.0253</Value>
       </Value>
     </Pair>
     <Pair>
       <Key>SHIP_PHYSICS_ACC_COEF</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>0.103</Value>
+        <Value>0.077</Value>
       </Value>
     </Pair>
     <Pair>
@@ -657,19 +657,19 @@
     <Pair>
       <Key>SHIP_TURNING_ACCELERATION_TIME</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>5</Value>
+        <Value>6</Value>
       </Value>
     </Pair>
     <Pair>
       <Key>SHIP_TURNING_ACCELERATION_TIME_RHEAS</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>5</Value>
+        <Value>6</Value>
       </Value>
     </Pair>
     <Pair>
       <Key>SHIP_RHEAS_DRIFT</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>0.17</Value>
+        <Value>0.21</Value>
       </Value>
     </Pair>
     <Pair>
