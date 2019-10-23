@@ -44,6 +44,7 @@ function convertAdditionalShipData() {
         ["hermione", { id: 592, master: "" }],
         ["indefatiable", { id: 787, master: "" }],
         ["indiaman", { id: 425, master: "" }],
+        ["indiaman rookie", { id: 2223, master: "indiaman" }],
         ["ingermanland", { id: 395, master: "" }],
         ["leopard", { id: 2078, master: "" }],
         ["lhermione", { id: 986, master: "" }],
@@ -67,6 +68,7 @@ function convertAdditionalShipData() {
         ["santisima", { id: 286, master: "" }],
         ["snow", { id: 287, master: "" }],
         ["surprise", { id: 288, master: "" }],
+        ["temeraire", { id: 2229, master: "" }],
         ["trader brig", { id: 289, master: "brig" }],
         ["trader cutter", { id: 290, master: "cutter" }],
         ["trader lynx", { id: 291, master: "lynx" }],
@@ -109,6 +111,7 @@ function convertAdditionalShipData() {
         // Add 'basic' ship without files
         baseFileNames.add("basiccutter");
         baseFileNames.add("basiclynx");
+        baseFileNames.add("indiaman rookie");
     };
 
     /**
