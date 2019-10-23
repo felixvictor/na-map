@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ModuleTemplate xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="Leopard RUDDER" Type="HELM">
+<ModuleTemplate xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="Temeraire RUDDER" Type="HELM">
   <Attributes>
     <Pair>
       <Key>MODULE_DESCRIPTION</Key>
@@ -10,7 +10,7 @@
     <Pair>
       <Key>MODULE_BASE_HP</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>232</Value>
+        <Value>280</Value>
       </Value>
     </Pair>
     <Pair>
@@ -28,7 +28,7 @@
     <Pair>
       <Key>SHIP_TURNING_SPEED</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="false" IsNegative="false">
-        <Value>2.43</Value>
+        <Value>2.11</Value>
       </Value>
     </Pair>
     <Pair>
@@ -93,7 +93,7 @@
     <Pair>
       <Key>RUDDER_HALFTURN_TIME</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>4</Value>
+        <Value>5</Value>
       </Value>
     </Pair>
     <Pair>
