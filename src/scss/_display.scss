@@ -749,20 +749,30 @@ svg {
     fill: $secondary-100;
 }
 
+.raid-circle,
 .raid-point {
     fill: $secondary-100;
 }
 
-.pb-raid-point-text {
+.raid-circle-text {
+    fill: $black;
+}
+
+.raid-point-text {
     font-size: 10%;
     fill: $black;
 }
 
-.join-circle {
-    fill: $secondary-300;
-    fill-opacity: 0.4;
+.raid-join-circle {
     stroke: $secondary-500;
     stroke-width: 1px;
+    fill: none;
+}
+
+.pb-join-circle {
+    @extend .raid-join-circle;
+    fill: $secondary-300;
+    fill-opacity: 0.4;
 }
 
 // capital ports
