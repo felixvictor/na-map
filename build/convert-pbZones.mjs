@@ -51,6 +51,12 @@ function convertPBZones() {
         return [x1, y1];
     };
 
+    const getRaidCircles = port =>
+        port.PortRaidZonePositions.map(raidCircle => [
+            Math.round(convertCoordX(raidCircle.x, raidCircle.z)),
+            Math.round(convertCoordY(raidCircle.x, raidCircle.z))
+        ]);
+
     const getRaidPoints = port =>
         port.PortRaidSpawnPoints.map(raidPoint => [
             Math.round(convertCoordX(raidPoint.Position.x, raidPoint.Position.z)),
@@ -67,6 +73,7 @@ function convertPBZones() {
         forts: getForts(port),
         towers: getTowers(port),
         joinCircles: getJoinCircles(port),
+        raidCircles: getRaidCircles(port),
         raidPoints: getRaidPoints(port)
     }));
 
