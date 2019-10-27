@@ -22,7 +22,7 @@ const icoFile = `${iconsPath}/favicon.ico`;
 const convert = async () => {
     try {
         await sharp(inFilename)
-            .jpeg({ quality: 100, trellisQuantisation: true, overshootDeringing: true, progressive: false })
+            .webp({ quality: 100, reductionEffort: 6 })
             .sharpen()
             .tile({ size: tileSize, layout: "google" })
             .toFile(mapPath);
