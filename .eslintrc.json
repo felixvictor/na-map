@@ -50,7 +50,14 @@
         "prefer-template": "error",
         "operator-linebreak": ["error", "after", { "overrides": { "?": "before", ":": "before" } }],
         "quotes": ["error", "double", { "allowTemplateLiterals": false, "avoidEscape": true }],
-        "space-before-function-paren": ["error", "never"],
+        "space-before-function-paren": [
+            "error",
+            {
+                "anonymous": "never",
+                "named": "never",
+                "asyncArrow": "always"
+            }
+        ],
         "unicorn/consistent-function-scoping": "off",
         "unicorn/explicit-length-check": "off",
         "unicorn/import-index": "off",
