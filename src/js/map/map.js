@@ -467,7 +467,7 @@ class Map {
             .join(enter =>
                 enter
                     .append("image")
-                    .attr("xlink:href", d => `images/map/${d.z}/${d.row}/${d.col}.jpg`)
+                    .attr("xlink:href", d => `images/map/${d.z}/${d.row}/${d.col}.webp`)
                     .attr("x", d => d.col * this._tileSize)
                     .attr("y", d => d.row * this._tileSize)
                     .attr("width", this._tileSize + 1)
