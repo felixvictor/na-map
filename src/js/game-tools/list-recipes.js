@@ -16,14 +16,12 @@ import { ascending as d3Ascending } from "d3-array";
 import { registerEvent } from "../analytics";
 import { getCurrencyAmount, insertBaseModal } from "../common";
 import { servers } from "../servers";
-import { formatInt, formatSignPercent, getOrdinal } from "../util";
+import { formatInt, formatSignPercent, getOrdinal, putImportError } from "../util";
 
 const replacer = (match, p1, p2) => `${getOrdinal(p1)}\u202F\u2013\u202f${getOrdinal(p2)}`;
 
 export default class ListRecipes {
-    constructor(recipeData, moduleData, serverId) {
-        this._recipeData = recipeData;
-        this._moduleData = moduleData;
+    constructor(serverId) {
         this._serverType = servers.find(server => server.id === serverId).type;
 
         this._baseName = "List admiralty items and recipes";
@@ -34,8 +32,28 @@ export default class ListRecipes {
         this._setupListener();
     }
 
+    async _loadAndSetupData() {
+        try {
+            this._moduleData = await import(/* webpackChunkName: "data-modules" */ "../../gen/modules.json").then(
+                data => data.default
+            );
+            this._recipeData = await import(/* webpackChunkName: "data-recipes" */ "../../gen/recipes.json").then(
+                data => data.default.recipe
+            );
+        } catch (error) {
+            putImportError(error);
+        }
+    }
+
     _setupListener() {
-        $(`#${this._buttonId}`).on("click", event => {
+        let firstClick = true;
+
+        document.getElementById(this._buttonId).addEventListener("click", async event => {
+            if (firstClick) {
+                firstClick = false;
+                await this._loadAndSetupData();
+            }
+
             registerEvent("Tools", this._baseName);
             event.stopPropagation();
             this._recipeListSelected();
