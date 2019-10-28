@@ -273,13 +273,8 @@ export default class Journey {
         this._injectModal();
         this._setupWindInput();
 
-        this._shipCompare = new CompareShips({
-            shipData: this._shipData,
-            woodData: this._woodData,
-            moduleData: this._moduleData,
-            id: this._shipId
-        });
-        this._woodCompare = new CompareWoods(this._woodData, this._woodId);
+        this._shipCompare = new CompareShips(this._shipId);
+        this._shipCompare.shipJourneyInit();
     }
 
     _useUserInput() {
