@@ -25,26 +25,13 @@ import TimelinesChart from "timelines-chart";
 
 import { registerEvent } from "../analytics";
 import { colourList, insertBaseModal, nations } from "../common";
-
-// https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
-// eslint-disable-next-line no-extend-native,func-names
-String.prototype.replaceAll = function(search, replacement) {
-    const target = this;
-    return target.replace(new RegExp(search, "g"), replacement);
-};
+import { putImportError } from "../util";
 
 /**
  *
  */
 export default class ListPortOwnerships {
-    /**
-     * @param {object} ownershipData - Port ownership data over time
-     * @param {object} nationData - Nation data over time
-     */
-    constructor(ownershipData, nationData) {
-        this._ownershipData = ownershipData;
-        this._nationData = nationData;
-
+    constructor() {
         this._baseName = "Port ownership";
         this._baseId = "ownership-list";
         this._buttonId = `button-${this._baseId}`;
@@ -56,13 +43,33 @@ export default class ListPortOwnerships {
         this._setupListener();
     }
 
+    async _loadAndSetupData() {
+        try {
+            this._nationData = await import(/* webpackChunkName: "data-nations" */ "../../gen/nations.json").then(
+                data => data.default
+            );
+            this._ownershipData = await import(
+                /* webpackChunkName: "data-ownership" */ "../../gen/ownership.json"
+            ).then(data => data.default);
+        } catch (error) {
+            putImportError(error);
+        }
+    }
+
     /**
      * Setup listener
      * @return {void}
      * @private
      */
     _setupListener() {
-        $(`#${this._buttonId}`).on("click", event => {
+        let firstClick = true;
+
+        document.getElementById(this._buttonId).addEventListener("click", async event => {
+            if (firstClick) {
+                firstClick = false;
+                await this._loadAndSetupData();
+            }
+
             registerEvent("Tools", this._baseName);
             event.stopPropagation();
             this._ownershipListSelected();

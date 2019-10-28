@@ -12,26 +12,19 @@ import "bootstrap/js/dist/util";
 import "bootstrap/js/dist/modal";
 import { html, render } from "lit-html";
 import { repeat } from "lit-html/directives/repeat";
-// eslint-disable-next-line import/no-named-default
 import { default as Tablesort } from "tablesort";
 
 import { registerEvent } from "../analytics";
 import { initTablesort, insertBaseModalHTML } from "../common";
-import { capitalizeFirstLetter, formatFloatFixedHTML } from "../util";
-
-// https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
-// eslint-disable-next-line no-extend-native,func-names
-String.prototype.replaceAll = function(search, replacement) {
-    const target = this;
-    return target.replace(new RegExp(search, "g"), replacement);
-};
+import { capitalizeFirstLetter, formatFloatFixedHTML, putImportError } from "../util";
 
 /**
  *
  */
 export default class ListCannons {
-    constructor(cannonData) {
+    constructor() {
         this._cannonData = {};
+        this._groups = new Map();
 
         this._baseName = "List cannons";
         this._baseId = "cannon-list";
@@ -39,7 +32,22 @@ export default class ListCannons {
         this._modalId = `modal-${this._baseId}`;
 
         this._cannonTypes = ["medium", "long", "carronade"];
-        this._groups = new Map();
+
+        this._setupListener();
+    }
+
+    async _loadAndSetupData() {
+        try {
+            const { default: cannonData } = await import(
+                /* webpackChunkName: "data-cannons" */ "../../gen/cannons.json"
+            );
+            this._setupData(cannonData);
+        } catch (error) {
+            putImportError(error);
+        }
+    }
+
+    _setupData(cannonData) {
         cannonData.long.forEach(group => {
             for (const [key, value] of Object.entries(group)) {
                 if (key !== "name") {
@@ -61,12 +69,17 @@ export default class ListCannons {
         this._groups = new Map(
             [...this._groups.entries()].sort((a, b) => groupOrder.indexOf(a[0]) - groupOrder.indexOf(b[0]))
         );
-
-        this._setupListener();
     }
 
     _setupListener() {
-        $(`#${this._buttonId}`).on("click", event => {
+        let firstClick = true;
+
+        document.getElementById(this._buttonId).addEventListener("click", async event => {
+            if (firstClick) {
+                firstClick = false;
+                await this._loadAndSetupData();
+            }
+
             registerEvent("Tools", this._baseName);
             event.stopPropagation();
             this._cannonListSelected();
