@@ -62,6 +62,7 @@
         "unicorn/explicit-length-check": "off",
         "unicorn/import-index": "off",
         "unicorn/no-for-loop": "off",
+        "unicorn/no-nested-ternary": "off",
         "unicorn/no-unused-properties": "error",
         "unicorn/prefer-dataset": "off",
         "unicorn/prefer-includes": "off",
