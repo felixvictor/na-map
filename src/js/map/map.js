@@ -152,7 +152,7 @@ class Map {
         this._setupSvg();
         this._setSvgSize();
         this._setupListener();
-        this._readData();
+        this._setupData();
     }
 
     /**
@@ -181,7 +181,7 @@ class Map {
         return r;
     }
 
-    _setupData(data) {
+    _setupData() {
         //        const marks = [];
 
         //        marks.push("setupData");
@@ -189,72 +189,28 @@ class Map {
         // function();
         //        performance.mark(`${marks[marks.length - 1]}-end`);
 
-        // Combine port data with port battle data
-        const portData = data.ports.map(port => {
-            const combinedData = port;
-
-            const serverData = data.server.find(d => d.id === combinedData.id);
-
-            combinedData.portBattleStartTime = serverData.portBattleStartTime;
-            combinedData.portBattleType = serverData.portBattleType;
-            combinedData.nonCapturable = serverData.nonCapturable;
-            combinedData.conquestMarksPension = serverData.conquestMarksPension;
-            combinedData.portTax = serverData.portTax;
-            combinedData.taxIncome = serverData.taxIncome;
-            combinedData.netIncome = serverData.netIncome;
-            combinedData.tradingCompany = serverData.tradingCompany;
-            combinedData.laborHoursDiscount = serverData.laborHoursDiscount;
-            combinedData.dropsTrading = serverData.dropsTrading;
-            combinedData.consumesTrading = serverData.consumesTrading;
-            combinedData.producesNonTrading = serverData.producesNonTrading;
-            combinedData.dropsNonTrading = serverData.dropsNonTrading;
-            combinedData.inventory = serverData.inventory;
-
-            // Delete empty entries
-            ["dropsTrading", "consumesTrading", "producesNonTrading", "dropsNonTrading"].forEach(type => {
-                if (!combinedData[type]) {
-                    delete combinedData[type];
-                }
-            });
-
-            const pbData = data.pb.ports.find(d => d.id === combinedData.id);
-
-            combinedData.nation = pbData.nation;
-            combinedData.capturer = pbData.capturer;
-            combinedData.lastPortBattle = pbData.lastPortBattle;
-            combinedData.attackHostility = pbData.attackHostility;
-            combinedData.attackerClan = pbData.attackerClan;
-            combinedData.attackerNation = pbData.attackerNation;
-            combinedData.portBattle = pbData.portBattle;
-
-            return combinedData;
-        });
-
         this._f11 = new ShowF11(this, this.coord);
-        this._ports = new DisplayPorts(portData, this);
+        this._ports = new DisplayPorts(this);
+        this._ports.init().then(() => {
+            this._pbZone = new DisplayPbZones(this._ports);
+            this._grid = new DisplayGrid(this);
 
-        this._pbZone = new DisplayPbZones(data.pbZones, this._ports);
-        this._grid = new DisplayGrid(this);
+            this._journey = new Journey(this.rem);
+            this._windPrediction = new PredictWind();
+            this._windRose = new WindRose();
 
-        this._woodData = JSON.parse(JSON.stringify(data.woods));
-        this._shipData = JSON.parse(JSON.stringify(data.ships));
-        const moduleData = JSON.parse(JSON.stringify(data.modules));
-        this._journey = new Journey(this._shipData, this._woodData, moduleData, this.rem);
-
-        this._portSelect = new SelectPorts(this._ports, this._pbZone, this);
-        this.showTrades = new ShowTrades(
-            this._portSelect,
-            portData,
-            data.trades,
-            this._minScale,
-            this.coord.min,
-            this.coord.max
-        );
-
-        this._init();
-
-        this._windPrediction = new PredictWind();
-        this._windRose = new WindRose();
+            this._portSelect = new SelectPorts(this._ports, this._pbZone, this);
+            this.showTrades = new ShowTrades(
+                this._serverName,
+                this._portSelect,
+                this._minScale,
+                this.coord.min,
+                this.coord.max
+            );
+            this.showTrades.showOrHide().then(() => {
+                this._init();
+            });
+        });
 
         /*
         marks.forEach(mark => {
@@ -262,65 +218,6 @@ class Map {
         });
         console.log(performance.getEntriesByType("measure"));
         */
-    }
-
-    async _readData() {
-        /**
-         * Data directory
-         * @type {string}
-         * @private
-         */
-        const dataDirectory = "data";
-
-        /**
-         * Data sources
-         * @type {Array<fileName: string, name: string>}
-         * @private
-         */
-        const dataSources = [
-            {
-                fileName: `${this._serverName}-trades.json`,
-                name: "trades"
-            },
-            {
-                fileName: `${this._serverName}.json`,
-                name: "server"
-            },
-            {
-                fileName: `${this._serverName}-pb.json`,
-                name: "pb"
-            }
-        ];
-
-        let readData = {};
-
-        const loadEntries = async dataSources => {
-            for await (const dataSource of dataSources) {
-                const response = await fetch(`${dataDirectory}/${dataSource.fileName}`);
-                readData[dataSource.name] = await response.json();
-            }
-        };
-
-        try {
-            const { default: modules } = await import(/* webpackChunkName: "data-modules" */ "../../gen/modules.json");
-            const { default: pbZones } = await import(/* webpackChunkName: "data-pb" */ "../../gen/pb.json");
-            const { default: ports } = await import(/* webpackChunkName: "data-ports" */ "../../gen/ports.json");
-            const { default: ships } = await import(/* webpackChunkName: "data-ships" */ "../../gen/ships.json");
-            const { default: woods } = await import(/* webpackChunkName: "data-woods" */ "../../gen/woods.json");
-            readData = {
-                modules,
-                pbZones,
-                ports,
-                ships,
-                woods
-            };
-
-            await loadEntries(dataSources);
-
-            this._setupData(readData);
-        } catch (error) {
-            putImportError(error);
-        }
     }
 
     _setupListener() {
