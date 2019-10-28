@@ -14,13 +14,10 @@ import { select as d3Select } from "d3-selection";
 
 import { registerEvent } from "../analytics";
 import { insertBaseModal } from "../common";
-import { formatInt, sortBy } from "../util";
+import { formatInt, putImportError, sortBy } from "../util";
 
 export default class ListShipBlueprints {
-    constructor(blueprintData, woodData) {
-        this._blueprintData = blueprintData;
-        this._woodData = woodData;
-
+    constructor() {
         this._baseName = "List ship blueprint";
         this._baseId = "ship-blueprint-list";
         this._buttonId = `button-${this._baseId}`;
@@ -38,8 +35,28 @@ export default class ListShipBlueprints {
         this._setupListener();
     }
 
+    async _loadAndSetupData() {
+        try {
+            this._blueprintData = await import(
+                /* webpackChunkName: "data-ship-blueprints" */ "../../gen/ship-blueprints.json"
+            ).then(data => data.default);
+            this._woodData = await import(/* webpackChunkName: "data-woods" */ "../../gen/woods.json").then(
+                data => data.default
+            );
+        } catch (error) {
+            putImportError(error);
+        }
+    }
+
     _setupListener() {
-        $(`#${this._buttonId}`).on("click", event => {
+        let firstClick = true;
+
+        document.getElementById(this._buttonId).addEventListener("click", async event => {
+            if (firstClick) {
+                firstClick = false;
+                await this._loadAndSetupData();
+            }
+
             registerEvent("Tools", this._baseName);
             event.stopPropagation();
             this._listSelected();
