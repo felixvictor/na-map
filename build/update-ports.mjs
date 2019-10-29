@@ -170,12 +170,12 @@ function updatePorts() {
 
     // noinspection RegExpRedundantEscape
     const capturedRegex = new RegExp(
-        `\\[(${timeR}) UTC\\] (${portR}) captured by (${clanR}) \\((${nationR})\\)\\. Previous owner: (${clanR}) \\((${nationR})\\) #PBCaribbean #PBCaribbean${portHashR}`,
+        `\\[(${timeR}) UTC\\] (${portR}) captured by (${clanR}) ?\\(?(${nationR})?\\)?\\. Previous owner: (${clanR}) ?\\(?(${nationR})?\\)? #PBCaribbean #PBCaribbean${portHashR}`,
         "u"
     );
     // noinspection RegExpRedundantEscape
     const defendedRegex = new RegExp(
-        `\\[(${timeR}) UTC\\] (${portR}) defended by (${clanR}) \\(${nationR}\\) against (${clanR}) #PBCaribbean #PBCaribbean${portHashR}`,
+        `\\[(${timeR}) UTC\\] (${portR}) defended by (${clanR})( \\(${nationR}\\))? against (${clanR}) ?\\(?(${nationR})?\\)? #PBCaribbean #PBCaribbean${portHashR}`,
         "u"
     );
     // noinspection RegExpRedundantEscape
@@ -190,7 +190,7 @@ function updatePorts() {
     );
     // noinspection RegExpRedundantEscape
     const portBattleRegex = new RegExp(
-        `\\[(${timeR}) UTC\\] The port battle for (${portR}) \\((${nationR})\\) is scheduled for (${pbTimeR}) UTC\\. Defender: (${defenderR})\\. Attacker: (${clanR})( \\(${nationR}\\))?\\. BR: \\d+ #PBCaribbean #PBCaribbean${portHashR} #NavalAction`,
+        `\\[(${timeR}) UTC\\] The port battle for (${portR}) \\((${nationR})\\) is scheduled for (${pbTimeR}) UTC\\. Defender: (${defenderR})\\. Attacker: (${clanR}) ?\\(?(${nationR})?\\)?\\. BR: \\d+ #PBCaribbean #PBCaribbean${portHashR} #NavalAction`,
         "u"
     );
     // noinspection RegExpRedundantEscape
