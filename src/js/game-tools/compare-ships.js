@@ -8,6 +8,9 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+import "bootstrap/js/dist/util";
+import "bootstrap/js/dist/modal";
+import "bootstrap/js/dist/tooltip";
 import { ascending as d3Ascending, min as d3Min, range as d3Range } from "d3-array";
 import { nest as d3Nest } from "d3-collection";
 import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate";
@@ -39,7 +42,6 @@ import {
     repairTime,
     insertBaseModal
 } from "../common";
-import Toast from "../util/toast";
 import {
     copyToClipboard,
     formatFloat,
@@ -51,6 +53,7 @@ import {
     formatSignPercent,
     getOrdinal,
     isEmpty,
+    putImportError,
     roundToThousands,
     sortBy
 } from "../util";
@@ -965,14 +968,9 @@ class ShipComparison extends Ship {
  */
 export default class CompareShips {
     /**
-     * @param {Object} shipData - Ship data
-     * @param {Object} woodData - Wood data
-     * @param {Object} upgradeData - Module data
      * @param {string} id - Base id (default "ship-compare")
      */
-    constructor({ shipData, woodData, moduleData, id = "ship-compare" }) {
-        this._shipData = shipData;
-        this._moduleDataDefault = moduleData;
+    constructor(id = "ship-compare") {
         this._baseId = id;
 
         this._baseName = "Compare ships";
@@ -1001,6 +999,24 @@ export default class CompareShips {
 
         this._selectedShips = { Base: {}, C1: {}, C2: {} };
 
+        if (this._baseId === "ship-journey") {
+            this._woodId = "wood-journey";
+        } else {
+            this._woodId = "wood-ship";
+        }
+
+        if (this._baseId !== "ship-journey") {
+            this._setupListener();
+        }
+    }
+
+    async shipJourneyInit() {
+        await this._loadAndSetupData();
+        this._initData();
+        this._initSelects();
+    }
+
+    _setupData() {
         this._woodChanges = new Map([
             ["Acceleration", { properties: ["ship.acceleration"], isBaseValueAbsolute: true }],
             [
@@ -1109,26 +1125,26 @@ export default class CompareShips {
 
         const theoreticalMinSpeed = d3Min(this._shipData, ship => ship.speed.min) * 1.2;
         const theoreticalMaxSpeed = this._moduleCaps.get("Max speed").cap.amount;
+
         this._minSpeed = theoreticalMinSpeed;
         this._maxSpeed = theoreticalMaxSpeed;
         this._colorScale = d3ScaleLinear()
             .domain([this._minSpeed, 0, 8, 12, this._maxSpeed])
             .range([colourRed, "#fff", colourGreenLight, colourGreen, colourGreenDark])
             .interpolate(d3InterpolateHcl);
+    }
 
-        if (this._baseId === "ship-journey") {
-            this._woodId = "wood-journey";
-        } else {
-            this._woodId = "wood-ship";
-        }
-
-        this._woodCompare = new CompareWoods(woodData, this._woodId);
-
-        if (this._baseId === "ship-journey") {
-            this._initData();
-            this._initSelects();
-        } else {
-            this._setupListener();
+    async _loadAndSetupData() {
+        try {
+            this._moduleDataDefault = await import(
+                /* webpackChunkName: "data-modules" */ "../../gen/modules.json"
+            ).then(data => data.default);
+            this._shipData = await import(/* webpackChunkName: "data-ships" */ "../../gen/ships.json").then(
+                data => data.default
+            );
+            this._setupData();
+        } catch (error) {
+            putImportError(error);
         }
     }
 
@@ -1137,7 +1153,14 @@ export default class CompareShips {
      * @returns {void}
      */
     _setupListener() {
-        $(`#${this._buttonId}`).on("click", event => {
+        let firstClick = true;
+
+        document.getElementById(this._buttonId).addEventListener("click", async event => {
+            if (firstClick) {
+                firstClick = false;
+                await this._loadAndSetupData();
+            }
+
             registerEvent("Tools", this._baseName);
             event.stopPropagation();
             this._shipCompareSelected();
@@ -1343,18 +1366,20 @@ export default class CompareShips {
     _initData() {
         this._setupShipData();
         this._setupModuleData();
-        this.woodCompare._setupData();
     }
 
     _initSelects() {
-        this._columns.forEach(columnId => {
-            this._selectWood$[columnId] = {};
-            this._setupShipSelect(columnId);
-            ["frame", "trim"].forEach(type => {
-                this._selectWood$[columnId][type] = $(`#${this._getWoodSelectId(type, columnId)}`);
-                this.woodCompare._setupWoodSelects(columnId, type, this._selectWood$[columnId][type]);
+        this.woodCompare = new CompareWoods(this._woodId);
+        this.woodCompare.woodInit().then(() => {
+            this._columns.forEach(columnId => {
+                this._selectWood$[columnId] = {};
+                this._setupShipSelect(columnId);
+                ["frame", "trim"].forEach(type => {
+                    this._selectWood$[columnId][type] = $(`#${this._getWoodSelectId(type, columnId)}`);
+                    this.woodCompare._setupWoodSelects(columnId, type, this._selectWood$[columnId][type]);
+                });
+                this._setupSelectListener(columnId);
             });
-            this._setupSelectListener(columnId);
         });
     }
 
@@ -1537,6 +1562,9 @@ export default class CompareShips {
                             return `${amount} ${type.toLowerCase()}s selected`;
                         },
                         deselectAllText: "Clear",
+                        liveSearch: true,
+                        liveSearchNormalize: true,
+                        liveSearchPlaceholder: "Search ...",
                         maxOptions: type.startsWith("Ship trim") ? 6 : 5,
                         selectedTextFormat: "count > 1",
                         title: `${type}`,
@@ -1557,12 +1585,12 @@ export default class CompareShips {
         const shipDataDefault = this._shipData.find(ship => ship.id === this._shipIds[columnId]);
         let shipDataUpdated = shipDataDefault;
 
-        shipDataUpdated.repairAmount = {};
-        shipDataUpdated.repairAmount.armour = hullRepairsPercent;
-        shipDataUpdated.repairAmount.armourPerk = 0;
-        shipDataUpdated.repairAmount.sails = rigRepairsPercent;
-        shipDataUpdated.repairAmount.sailsPerk = 0;
-
+        shipDataUpdated.repairAmount = {
+            armour: hullRepairsPercent,
+            armourPerk: 0,
+            sails: rigRepairsPercent,
+            sailsPerk: 0
+        };
         shipDataUpdated.repairTime.sides = repairTime;
         shipDataUpdated.repairTime.default = repairTime;
 
@@ -1583,16 +1611,16 @@ export default class CompareShips {
                     : currentValue + additionalValue
                 : additionalValue;
 
-        let adjustedValue = 0;
+        let adjustedValue = value;
 
         if (this._modifierAmount.get(key).absolute) {
             const { absolute } = this._modifierAmount.get(key);
-            adjustedValue = adjustAbsolute(value, absolute);
+            adjustedValue = adjustAbsolute(adjustedValue, absolute);
         }
 
         if (this._modifierAmount.get(key).percentage) {
             const percentage = this._modifierAmount.get(key).percentage / 100;
-            adjustedValue = adjustPercentage(value, percentage);
+            adjustedValue = adjustPercentage(adjustedValue, percentage);
         }
 
         return adjustedValue;
@@ -1623,10 +1651,11 @@ export default class CompareShips {
     _addWoodData(shipData, compareId) {
         const data = JSON.parse(JSON.stringify(shipData));
 
-        data.resistance = {};
-        data.resistance.fire = 0;
-        data.resistance.leaks = 0;
-        data.resistance.splinter = 0;
+        data.resistance = {
+            fire: 0,
+            leaks: 0,
+            splinter: 0
+        };
 
         if (typeof this.woodCompare._instances[compareId] !== "undefined") {
             let dataLink = "_woodData";
@@ -1802,6 +1831,7 @@ export default class CompareShips {
         }
 
         setModifierAmounts();
+
         adjustDataByModifiers();
         adjustDataByCaps();
         if (this._modifierAmount.has("Max speed")) {
@@ -2013,6 +2043,10 @@ export default class CompareShips {
 
     _getModuleSelectId(type, columnId) {
         return `${this._moduleId}-${type.replace(/\s/, "")}-${columnId}-select`;
+    }
+
+    set woodCompare(woodCompare) {
+        this._woodCompare = woodCompare;
     }
 
     get woodCompare() {
