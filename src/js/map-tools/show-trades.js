@@ -271,13 +271,13 @@ export default class ShowTrades {
             .sort((a, b) => b.profit - a.profit);
     }
 
-    _showSelected() {
+    async _showSelected() {
         const show = this._showRadios.get();
         this.show = show === "on";
 
         this._showCookie.set(show);
 
-        this.showOrHide();
+        await this.showOrHide();
         this._portSelect.setupInventorySelect(this.show);
         this._filterTradesBySelectedNations();
         this._sortLinkData();
