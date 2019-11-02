@@ -135,7 +135,6 @@ const sassOpt = {
         sourceMap: !isProduction,
         sourceMapContents: !isProduction
     }
-
 };
 
 const svgoOpt = {
@@ -265,10 +264,10 @@ const config = {
     plugins: [
         /*
         new BundleAnalyzerPlugin({
-            analyzerMode: isProd ? "static" : "disabled",
+            analyzerMode: isProduction ? "static" : "disabled",
             generateStatsFile: true,
             logLevel: "warn",
-            openAnalyzer: isProd,
+            openAnalyzer: isProduction,
             statsFilename: path.resolve(__dirname, "webpack-stats.json"),
             reportFilename: path.resolve(__dirname, "report.html")
         }),
@@ -311,8 +310,8 @@ const config = {
             "window.moment": "moment",
             Popper: ["popper.js", "default"],
             // Alert: "exports-loader?Alert!bootstrap/js/dist/alert",
-            Button: "exports-loader?Button!bootstrap/js/dist/button",
-            Collapse: "exports-loader?Collapse!bootstrap/js/dist/collapse",
+            // Button: "exports-loader?Button!bootstrap/js/dist/button",
+            // Collapse: "exports-loader?Collapse!bootstrap/js/dist/collapse",
             Dropdown: "exports-loader?Dropdown!bootstrap/js/dist/dropdown",
             Modal: "exports-loader?Modal!bootstrap/js/dist/modal",
             // Popover: "exports-loader?Popover!bootstrap/js/dist/popover",
@@ -324,8 +323,12 @@ const config = {
         new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
         new CopyPlugin([
             { from: "../netlify.toml" },
-            { from: "gen/*.json", ignore: ["**/repairs.json"], to: `${outputPath}/data`, flatten: true },
-            { from: "gen/*.xlsx", flatten: true },
+            {
+                from: "data/*.json",
+                to: `${outputPath}/data`,
+                flatten: true
+            },
+            { from: "data/*.xlsx", flatten: true },
             { from: "google979f2cf3bed204d6.html", to: "google979f2cf3bed204d6.html", toType: "file" },
             { from: "images/icons/favicon.ico", flatten: true },
             { from: "images/map", to: `${outputPath}/images/map` }
