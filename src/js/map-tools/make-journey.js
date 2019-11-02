@@ -22,6 +22,7 @@ import "moment/locale/en-gb";
 
 import "round-slider/src/roundslider";
 import "round-slider/src/roundslider.css";
+import "../../scss/roundslider.scss";
 
 import { registerEvent } from "../analytics";
 import {
@@ -42,6 +43,7 @@ import {
     printCompassRose,
     rotationAngleInDegrees
 } from "../util";
+
 import CompareShips from "../game-tools/compare-ships";
 
 /**
