@@ -1562,6 +1562,9 @@ export default class CompareShips {
                             return `${amount} ${type.toLowerCase()}s selected`;
                         },
                         deselectAllText: "Clear",
+                        liveSearch: true,
+                        liveSearchNormalize: true,
+                        liveSearchPlaceholder: "Search ...",
                         maxOptions: type.startsWith("Ship trim") ? 6 : 5,
                         selectedTextFormat: "count > 1",
                         title: `${type}`,
