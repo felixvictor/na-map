@@ -1582,12 +1582,12 @@ export default class CompareShips {
         const shipDataDefault = this._shipData.find(ship => ship.id === this._shipIds[columnId]);
         let shipDataUpdated = shipDataDefault;
 
-        shipDataUpdated.repairAmount = {};
-        shipDataUpdated.repairAmount.armour = hullRepairsPercent;
-        shipDataUpdated.repairAmount.armourPerk = 0;
-        shipDataUpdated.repairAmount.sails = rigRepairsPercent;
-        shipDataUpdated.repairAmount.sailsPerk = 0;
-
+        shipDataUpdated.repairAmount = {
+            armour: hullRepairsPercent,
+            armourPerk: 0,
+            sails: rigRepairsPercent,
+            sailsPerk: 0
+        };
         shipDataUpdated.repairTime.sides = repairTime;
         shipDataUpdated.repairTime.default = repairTime;
 
@@ -1608,16 +1608,16 @@ export default class CompareShips {
                     : currentValue + additionalValue
                 : additionalValue;
 
-        let adjustedValue = 0;
+        let adjustedValue = value;
 
         if (this._modifierAmount.get(key).absolute) {
             const { absolute } = this._modifierAmount.get(key);
-            adjustedValue = adjustAbsolute(value, absolute);
+            adjustedValue = adjustAbsolute(adjustedValue, absolute);
         }
 
         if (this._modifierAmount.get(key).percentage) {
             const percentage = this._modifierAmount.get(key).percentage / 100;
-            adjustedValue = adjustPercentage(value, percentage);
+            adjustedValue = adjustPercentage(adjustedValue, percentage);
         }
 
         return adjustedValue;
@@ -1648,10 +1648,11 @@ export default class CompareShips {
     _addWoodData(shipData, compareId) {
         const data = JSON.parse(JSON.stringify(shipData));
 
-        data.resistance = {};
-        data.resistance.fire = 0;
-        data.resistance.leaks = 0;
-        data.resistance.splinter = 0;
+        data.resistance = {
+            fire: 0,
+            leaks: 0,
+            splinter: 0
+        };
 
         if (typeof this.woodCompare._instances[compareId] !== "undefined") {
             let dataLink = "_woodData";
@@ -1827,6 +1828,9 @@ export default class CompareShips {
         }
 
         setModifierAmounts();
+        console.log(this._modifierAmount);
+        console.log(this._modifierAmount.get("Armor thickness"));
+
         adjustDataByModifiers();
         adjustDataByCaps();
         if (this._modifierAmount.has("Max speed")) {
