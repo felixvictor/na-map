@@ -206,10 +206,9 @@ export default class DisplayPbZones {
     _setData() {
         const filterData = () => {
             this._filterVisible();
-            this._pbZonesFiltered = this._pbZonesFiltered.filter(d => this._isPortIn(d));
         };
 
-        if (this._ports.zoomLevel === "pbZone" && this._showPB !== "noShow") {
+        if (this._ports.zoomLevel === "pbZone" && this._showPB !== "off") {
             if (this._isDataLoaded) {
                 filterData();
             } else {
