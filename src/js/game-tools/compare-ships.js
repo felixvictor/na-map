@@ -1828,8 +1828,6 @@ export default class CompareShips {
         }
 
         setModifierAmounts();
-        console.log(this._modifierAmount);
-        console.log(this._modifierAmount.get("Armor thickness"));
 
         adjustDataByModifiers();
         adjustDataByCaps();
