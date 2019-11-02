@@ -18,8 +18,6 @@ export default class DisplayPbZones {
     constructor(ports) {
         this._ports = ports;
 
-        this._pbZonesDefault = pbZones;
-
         this._showId = "show-zones";
 
         /**
