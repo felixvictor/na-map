@@ -319,14 +319,13 @@ export default class ShowTrades {
         };
 
         if (this.show) {
-            if (this._isDataLoaded) {
-                show();
-            } else {
+            if (!this._isDataLoaded) {
                 await this._loadAndSetupData().then(() => {
                     this._isDataLoaded = true;
-                    show();
                 });
             }
+
+            show();
         } else {
             ShowTrades._hideElem(this._tradeDetailsDiv);
             this._linkData = [];
