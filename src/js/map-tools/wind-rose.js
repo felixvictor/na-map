@@ -4,28 +4,20 @@
  * @file      Show wind rose continuously.
  * @module    map-tools/wind-rose
  * @author    iB aka Felix Victor
- * @copyright 2018
+ * @copyright 2018, 2019
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-
 import "bootstrap/js/dist/util";
-import "bootstrap/js/dist/button";
-import "bootstrap/js/dist/dropdown";
 import "bootstrap/js/dist/modal";
-import "bootstrap/js/dist/toast";
 import "bootstrap/js/dist/tooltip";
 
-
-import "bootstrap/js/dist/util";
-import "bootstrap/js/dist/modal";
 import { select as d3Select } from "d3-selection";
 import { line as d3Line } from "d3-shape";
 import moment from "moment";
 import "moment/locale/en-gb";
 import "round-slider/src/roundslider";
 import "round-slider/src/roundslider.css";
-import "../../scss/roundslider.scss";
 
 import { registerEvent } from "../analytics";
 import { degreesPerSecond, insertBaseModal } from "../common";
@@ -151,9 +143,7 @@ export default class WindRose {
 
     _setupWindInput() {
         // workaround from https://github.com/soundar24/roundSlider/issues/71
-        // eslint-disable-next-line func-names,no-underscore-dangle
         const { _getTooltipPos } = $.fn.roundSlider.prototype;
-        // eslint-disable-next-line func-names,no-underscore-dangle
         $.fn.roundSlider.prototype._getTooltipPos = function() {
             if (!this.tooltip.is(":visible")) {
                 $("body").append(this.tooltip);
