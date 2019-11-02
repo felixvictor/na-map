@@ -14,8 +14,9 @@ import {
 
 const inBaseFilename = process.argv[2];
 const serverName = process.argv[3];
-const outDir = process.argv[4];
-const date = process.argv[5];
+const genDir = process.argv[4];
+const dataDir = process.argv[5];
+const date = process.argv[6];
 
 const apiItems = readJson(`${inBaseFilename}-ItemTemplates-${date}.json`);
 const apiPorts = readJson(`${inBaseFilename}-Ports-${date}.json`);
@@ -208,7 +209,7 @@ function convertPorts() {
         setRegionFeature(port, portPos);
         setPortFeature(port);
     });
-    saveJson(`${outDir}/${serverName}.json`, portData);
+    saveJson(`${dataDir}/${serverName}.json`, portData);
 
     const apiPortPos = new Map(
         apiPorts.map(apiPort => [
@@ -258,10 +259,10 @@ function convertPorts() {
     });
     trades.sort((a, b) => b.profitTotal - a.profitTotal);
 
-    saveJson(`${outDir}/${serverName}-trades.json`, trades);
+    saveJson(`${dataDir}/${serverName}-trades.json`, trades);
 
-    saveJson(`${outDir}/regions.json`, geoJsonRegions);
-    saveJson(`${outDir}/counties.json`, geoJsonCounties);
+    saveJson(`${genDir}/regions.json`, geoJsonRegions);
+    saveJson(`${genDir}/counties.json`, geoJsonCounties);
 
     geoJsonRegions.features.forEach(region => {
         // eslint-disable-next-line no-param-reassign
@@ -271,7 +272,7 @@ function convertPorts() {
             Math.round(coordinate)
         );
     });
-    saveJson(`${outDir}/region-labels.json`, geoJsonRegions);
+    saveJson(`${genDir}/region-labels.json`, geoJsonRegions);
 
     geoJsonCounties.features.forEach(county => {
         // eslint-disable-next-line no-param-reassign
@@ -281,7 +282,7 @@ function convertPorts() {
             Math.round(coordinate)
         );
     });
-    saveJson(`${outDir}/county-labels.json`, geoJsonCounties);
+    saveJson(`${genDir}/county-labels.json`, geoJsonCounties);
 }
 
 convertPorts();

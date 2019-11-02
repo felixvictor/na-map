@@ -8,15 +8,16 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+import "bootstrap/js/dist/util";
+import "bootstrap/js/dist/modal";
 import { select as d3Select } from "d3-selection";
-import { formatInt } from "../util";
+
 import { registerEvent } from "../analytics";
 import { getCurrencyAmount, insertBaseModal } from "../common";
+import { formatInt, putImportError } from "../util";
 
 export default class ListBuildings {
-    constructor(buildingData) {
-        this._buildingData = buildingData;
-
+    constructor() {
         this._baseName = "List buildings";
         this._baseId = "building-list";
         this._buttonId = `button-${this._baseId}`;
@@ -25,8 +26,25 @@ export default class ListBuildings {
         this._setupListener();
     }
 
+    async _loadAndSetupData() {
+        try {
+            this._buildingData = await import(/* webpackChunkName: "data-buildings" */ "../../gen/buildings.json").then(
+                data => data.default
+            );
+        } catch (error) {
+            putImportError(error);
+        }
+    }
+
     _setupListener() {
-        $(`#${this._buttonId}`).on("click", event => {
+        let firstClick = true;
+
+        document.getElementById(this._buttonId).addEventListener("click", async event => {
+            if (firstClick) {
+                firstClick = false;
+                await this._loadAndSetupData();
+            }
+
             registerEvent("Tools", this._baseName);
             event.stopPropagation();
             this._buildingListSelected();

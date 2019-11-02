@@ -8,16 +8,17 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+import "bootstrap/js/dist/util";
+import "bootstrap/js/dist/modal";
+import "bootstrap/js/dist/tooltip";
 import { select as d3Select } from "d3-selection";
-import { chunkify, formatSignInt, formatSignPercent } from "../util";
+
 import { registerEvent } from "../analytics";
 import { insertBaseModal } from "../common";
+import { chunkify, formatSignInt, formatSignPercent, putImportError } from "../util";
 
 export default class ListIngredients {
-    constructor(ingredientData, moduleData) {
-        this._ingredientData = ingredientData;
-        this._moduleData = moduleData;
-
+    constructor() {
         this._baseName = "List recipe ingredients";
         this._baseId = "ingredient-list";
         this._buttonId = `button-${this._baseId}`;
@@ -26,8 +27,28 @@ export default class ListIngredients {
         this._setupListener();
     }
 
+    async _loadAndSetupData() {
+        try {
+            this._moduleData = await import(/* webpackChunkName: "data-modules" */ "../../gen/modules.json").then(
+                data => data.default
+            );
+            this._ingredientData = await import(/* webpackChunkName: "data-recipes" */ "../../gen/recipes.json").then(
+                data => data.default.ingredient
+            );
+        } catch (error) {
+            putImportError(error);
+        }
+    }
+
     _setupListener() {
-        $(`#${this._buttonId}`).on("click", event => {
+        let firstClick = true;
+
+        document.getElementById(this._buttonId).addEventListener("click", async event => {
+            if (firstClick) {
+                firstClick = false;
+                await this._loadAndSetupData();
+            }
+
             registerEvent("Tools", this._baseName);
             event.stopPropagation();
             this._ingredientListSelected();
