@@ -78,15 +78,17 @@ function common_var () {
     [[ ! -d "${base_dir}/public" ]] && yarn run prod
 
     src_dir="${base_dir}/src"
-    out_dir="${base_dir}/public/data"
+    data_dir="${src_dir}/data"
     gen_dir="${src_dir}/gen"
+    out_dir="${base_dir}/public/data"
+
+    excel_file="${data_dir}/port-battle.xlsx"
 
     building_file="${gen_dir}/buildings.json"
     cannon_file="${gen_dir}/cannons.json"
-    excel_file="${gen_dir}/port-battle.xlsx"
     loot_file="${gen_dir}/loot.json"
     nation_file="${gen_dir}/nations.json"
-    ownership_json="${gen_dir}/ownership.json"
+    ownership_file="${gen_dir}/ownership.json"
     port_file="${gen_dir}/ports.json"
     pb_zone_file="${gen_dir}/pb.json"
     recipe_file="${gen_dir}/recipes.json"
@@ -172,13 +174,13 @@ function get_port_data () {
         local pb_file
         local api_file
         for server_name in "${server_names[@]}"; do
-            pb_file="${gen_dir}/${server_name}-pb.json"
+            pb_file="${data_dir}/${server_name}-pb.json"
             for api_var in "${api_vars[@]}"; do
                 api_file="${api_base_file}-${server_name}-${api_var}-${server_date}.json"
                 get_API_data "${server_name}" "${api_file}" "${api_var}"
             done
 
-            ${command_nodejs} build/convert-API-data.mjs "${api_base_file}-${server_name}" "${server_name}" "${gen_dir}" "${server_date}"
+            ${command_nodejs} build/convert-API-data.mjs "${api_base_file}-${server_name}" "${server_name}" "${gen_dir}" "${data_dir}" "${server_date}"
             ${command_nodejs} build/convert-API-pb-data.mjs "${api_base_file}-${server_name}" "${pb_file}" "${server_date}"
         done
 
@@ -194,8 +196,9 @@ function get_port_data () {
         ${command_nodejs} build/convert-loot.mjs "${api_base_file}-${server_names[0]}" "${loot_file}" "${server_date}"
         ${command_nodejs} build/convert-recipes.mjs "${api_base_file}-${server_names[0]}" "${recipe_file}" "${server_date}"
         ${command_nodejs} build/convert-ship-blueprints.mjs "${api_base_file}-${server_names[0]}" "${ship_blueprint_file}" "${server_date}"
-        if [ "${script_run_type}" == "update" ]; then
-            ${command_nodejs} build/convert-ownership.mjs "${api_dir}" "api-${server_names[0]}-Ports" "${ownership_json}" "${nation_file}"
+
+        if [ "${script_run_type}" == "update" ] || [ ! -f "${ownership_file}" ] || [ ! -f "${nation_file}" ]; then
+            ${command_nodejs} build/convert-ownership.mjs "${api_dir}" "api-${server_names[0]}-Ports" "${ownership_file}" "${nation_file}"
         fi
 
         ${command_nodejs} build/create-xlsx.mjs "${ship_file}" "${port_file}" "${excel_file}"
@@ -207,7 +210,7 @@ function get_port_data () {
 }
 
 function copy_data () {
-    cp --update "${gen_dir}"/*.json "${excel_file}" "${out_dir}"/
+    cp --update "${data_dir}"/*.json "${excel_file}" "${out_dir}"/
 }
 
 function deploy_data () {
@@ -282,7 +285,7 @@ function update_ports () {
     local pb_file
 
     for server_name in "${server_twitter_names[@]}"; do
-        pb_file="${gen_dir}/${server_name}-pb.json"
+        pb_file="${data_dir}/${server_name}-pb.json"
         ${command_nodejs} build/update-ports.mjs "${pb_file}" "${tweets_json}"
     done
 
