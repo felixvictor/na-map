@@ -2,17 +2,17 @@
 /// This file is part of na-map.
 /// Junicode font definitions.
 ///
-/// copyright 2018
+/// copyright 2018, 2019
 /// license   http://www.gnu.org/licenses/gpl.html
 /// @group    main
 /// @author   iB aka Felix Victor
 ////
 
-$font-name: "Junicode" !default;
-$font-path: "~Fonts/#{$font-name}/" !default;
+$font-name: "Junicode";
+$font-path: "~Fonts/#{$font-name}/";
 
-$font-weight: 400 !default;
-$font-weight-name: "regular" !default;
+$font-weight: 400;
+$font-weight-name: "regular";
 
 @font-face {
     font-family: "#{$font-name}";
