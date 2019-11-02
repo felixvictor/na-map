@@ -4,10 +4,12 @@
  * @file      Make a journey.
  * @module    map-tools/make-journey
  * @author    iB aka Felix Victor
- * @copyright 2018
+ * @copyright 2018, 2019
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+import "bootstrap/js/dist/util";
+import "bootstrap/js/dist/modal";
 import { layoutTextLabel, layoutAnnealing, layoutLabel } from "@d3fc/d3fc-label-layout";
 import { range as d3Range } from "d3-array";
 import { drag as d3Drag } from "d3-drag";
@@ -20,6 +22,7 @@ import "moment/locale/en-gb";
 
 import "round-slider/src/roundslider";
 import "round-slider/src/roundslider.css";
+import "../../scss/roundslider.scss";
 
 import { registerEvent } from "../analytics";
 import {
@@ -40,23 +43,17 @@ import {
     printCompassRose,
     rotationAngleInDegrees
 } from "../util";
+
 import CompareShips from "../game-tools/compare-ships";
-import CompareWoods from "../game-tools/compare-woods";
 
 /**
  * Journey
  */
 export default class Journey {
     /**
-     * @param {object} shipData - Ship data
-     * @param {object} woodData - Wood data
-     * @param {object} moduleData - Module data
      * @param {number} fontSize - Font size
      */
-    constructor(shipData, woodData, moduleData, fontSize) {
-        this._shipData = shipData;
-        this._woodData = woodData;
-        this._moduleData = moduleData;
+    constructor(fontSize) {
         this._fontSize = fontSize;
 
         this._compassRadius = 90;
@@ -110,7 +107,6 @@ export default class Journey {
             d3Select(nodes[i])
                 .attr("cx", d3Event.x)
                 .attr("cy", d3Event.y);
-            // eslint-disable-next-line no-param-reassign
             d.position = [d.position[0] + d3Event.dx, d.position[1] + d3Event.dy];
             this._printLines();
         };
@@ -185,9 +181,7 @@ export default class Journey {
 
     _setupWindInput() {
         // workaround from https://github.com/soundar24/roundSlider/issues/71
-        // eslint-disable-next-line func-names,no-underscore-dangle
         const { _getTooltipPos } = $.fn.roundSlider.prototype;
-        // eslint-disable-next-line func-names,no-underscore-dangle
         $.fn.roundSlider.prototype._getTooltipPos = function() {
             if (!this.tooltip.is(":visible")) {
                 $("body").append(this.tooltip);
@@ -271,13 +265,8 @@ export default class Journey {
         this._injectModal();
         this._setupWindInput();
 
-        this._shipCompare = new CompareShips({
-            shipData: this._shipData,
-            woodData: this._woodData,
-            moduleData: this._moduleData,
-            id: this._shipId
-        });
-        this._woodCompare = new CompareWoods(this._woodData, this._woodId);
+        this._shipCompare = new CompareShips(this._shipId);
+        this._shipCompare.shipJourneyInit();
     }
 
     _useUserInput() {

@@ -12,12 +12,11 @@ import { select as d3Select } from "d3-selection";
 
 import Cookie from "../util/cookie";
 import RadioButton from "../util/radio-button";
+import { putImportError } from "../util";
 
 export default class DisplayPbZones {
-    constructor(pbZones, ports) {
+    constructor(ports) {
         this._ports = ports;
-
-        this._pbZonesDefault = pbZones;
 
         this._showId = "show-zones";
 
@@ -47,6 +46,8 @@ export default class DisplayPbZones {
          */
         this._showPB = this._getShowPBSetting();
 
+        this._isDataLoaded = false;
+
         this._setupSvg();
         this._setupListener();
     }
@@ -55,6 +56,16 @@ export default class DisplayPbZones {
         this._g = d3Select("#na-svg")
             .insert("g", "#ports")
             .attr("class", "pb");
+    }
+
+    async _loadData() {
+        try {
+            this._pbZonesDefault = await import(/* webpackChunkName: "data-pb" */ "../../gen/pb.json").then(
+                data => data.default
+            );
+        } catch (error) {
+            putImportError(error);
+        }
     }
 
     _setupListener() {
@@ -193,8 +204,19 @@ export default class DisplayPbZones {
     }
 
     _setData() {
-        if (this._ports.zoomLevel === "pbZone" && this._showPB !== "off") {
+        const filterData = () => {
             this._filterVisible();
+        };
+
+        if (this._ports.zoomLevel === "pbZone" && this._showPB !== "off") {
+            if (this._isDataLoaded) {
+                filterData();
+            } else {
+                this._loadData().then(() => {
+                    this._isDataLoaded = true;
+                    filterData();
+                });
+            }
         } else {
             this._pbZonesFiltered = {};
         }
