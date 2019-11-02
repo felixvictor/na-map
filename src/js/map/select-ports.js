@@ -8,6 +8,8 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+import "bootstrap/js/dist/util";
+import "bootstrap/js/dist/dropdown";
 import "bootstrap-select/js/bootstrap-select";
 import moment from "moment";
 
@@ -81,6 +83,9 @@ export default class SelectPorts {
     }
 
     _setupListener() {
+        $(this._portNamesSelector).one("show.bs.select", () => {
+            this._injectPortSelect();
+        });
         this._portNamesSelector.addEventListener("change", event => {
             registerEvent("Menu", "Port relations");
             this._resetOtherSelects(this._portNamesSelector);
@@ -88,6 +93,9 @@ export default class SelectPorts {
             event.preventDefault();
         });
 
+        $(this._buyGoodsSelector).one("show.bs.select", () => {
+            this._injectGoodsSelect();
+        });
         this._buyGoodsSelector.addEventListener("change", event => {
             registerEvent("Menu", "Goods’ relations");
             this._resetOtherSelects(this._buyGoodsSelector);
@@ -183,7 +191,7 @@ export default class SelectPorts {
         initMultiDropdownNavbar("selectPortNavbar");
     }
 
-    _setupPortSelect() {
+    _injectPortSelect() {
         const selectPorts = this._ports.portDataDefault
             .map(d => ({
                 id: d.id,
@@ -195,13 +203,15 @@ export default class SelectPorts {
         const options = `${selectPorts
             .map(
                 port =>
-                    `<option data-subtext="${port.nation}" value="${port.coord}" data-id="${port.id}">${
-                        port.name
-                    }</option>`
+                    `<option data-subtext="${port.nation}" value="${port.coord}" data-id="${port.id}">${port.name}</option>`
             )
             .join("")}`;
 
         this._portNamesSelector.insertAdjacentHTML("beforeend", options);
+        $(this._portNamesSelector).selectpicker("refresh");
+    }
+
+    _setupPortSelect() {
         this._portNamesSelector.classList.add("selectpicker");
         $(this._portNamesSelector).selectpicker({
             dropupAuto: false,
@@ -211,11 +221,9 @@ export default class SelectPorts {
             title: "Show port relations",
             virtualScroll: true
         });
-        this._portNamesSelector.classList.remove("d-none");
-        this._portNamesSelector.parentNode.classList.remove("d-none");
     }
 
-    _setupGoodSelect() {
+    _injectGoodsSelect() {
         const selectGoods = new Set();
 
         this._ports.portDataDefault.forEach(port => {
@@ -232,6 +240,10 @@ export default class SelectPorts {
             .join("")}`;
 
         this._buyGoodsSelector.insertAdjacentHTML("beforeend", options);
+        $(this._buyGoodsSelector).selectpicker("refresh");
+    }
+
+    _setupGoodSelect() {
         this._buyGoodsSelector.classList.add("selectpicker");
         $(this._buyGoodsSelector).selectpicker({
             dropupAuto: false,
@@ -241,8 +253,6 @@ export default class SelectPorts {
             title: "Show goods’ relations",
             virtualScroll: true
         });
-        this._buyGoodsSelector.classList.remove("d-none");
-        this._buyGoodsSelector.parentNode.classList.remove("d-none");
     }
 
     setupInventorySelect(show) {
