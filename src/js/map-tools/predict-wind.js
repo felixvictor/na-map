@@ -4,12 +4,13 @@
  * @file      Predict wind.
  * @module    map-tools/predict-wind
  * @author    iB aka Felix Victor
- * @copyright 2018
+ * @copyright 2018, 2019
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
 import "bootstrap/js/dist/util";
 import "bootstrap/js/dist/modal";
+
 import { select as d3Select } from "d3-selection";
 import { line as d3Line } from "d3-shape";
 import moment from "moment";
@@ -87,9 +88,7 @@ export default class PredictWind {
 
     _setupWindInput() {
         // workaround from https://github.com/soundar24/roundSlider/issues/71
-        // eslint-disable-next-line func-names,no-underscore-dangle
         const { _getTooltipPos } = $.fn.roundSlider.prototype;
-        // eslint-disable-next-line func-names,no-underscore-dangle
         $.fn.roundSlider.prototype._getTooltipPos = function() {
             if (!this.tooltip.is(":visible")) {
                 $("body").append(this.tooltip);

@@ -264,10 +264,10 @@ const config = {
     plugins: [
         /*
         new BundleAnalyzerPlugin({
-            analyzerMode: isProd ? "static" : "disabled",
+            analyzerMode: isProduction ? "static" : "disabled",
             generateStatsFile: true,
             logLevel: "warn",
-            openAnalyzer: isProd,
+            openAnalyzer: isProduction,
             statsFilename: path.resolve(__dirname, "webpack-stats.json"),
             reportFilename: path.resolve(__dirname, "report.html")
         }),
