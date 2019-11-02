@@ -8,28 +8,20 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+import "bootstrap/js/dist/util";
+import "bootstrap/js/dist/modal";
 import { select as d3Select } from "d3-selection";
-// eslint-disable-next-line import/no-named-default
 import { default as Tablesort } from "tablesort";
 
 import { registerEvent } from "../analytics";
 import { insertBaseModal } from "../common";
-import { formatFloatFixed, sortBy } from "../util";
-
-// https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
-// eslint-disable-next-line no-extend-native,func-names
-String.prototype.replaceAll = function(search, replacement) {
-    const target = this;
-    return target.replace(new RegExp(search, "g"), replacement);
-};
+import { formatFloatFixed, putImportError, sortBy } from "../util";
 
 /**
  *
  */
 export default class ShipList {
-    constructor(shipData) {
-        this._shipData = shipData;
-
+    constructor() {
         this._baseName = "List ships";
         this._baseId = "ship-list";
         this._buttonId = `button-${this._baseId}`;
@@ -37,8 +29,25 @@ export default class ShipList {
         this._setupListener();
     }
 
+    async _loadAndSetupData() {
+        try {
+            this._shipData = await import(/* webpackChunkName: "data-ships" */ "../../gen/ships.json").then(
+                data => data.default
+            );
+        } catch (error) {
+            putImportError(error);
+        }
+    }
+
     _setupListener() {
-        $(`#${this._buttonId}`).on("click", event => {
+        let firstClick = true;
+
+        document.getElementById(this._buttonId).addEventListener("click", async event => {
+            if (firstClick) {
+                firstClick = false;
+                await this._loadAndSetupData();
+            }
+
             registerEvent("Tools", this._baseName);
             event.stopPropagation();
             this._shipListSelected();

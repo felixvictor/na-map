@@ -446,13 +446,23 @@ export const getJsonFromFetch = response => response.json();
 export const getTextFromFetch = response => response.text();
 
 /**
- * Write error to console
+ * Write fetch error to console
  * @function
  * @param {String} error - Error message
  * @return {void}
  */
 export const putFetchError = error => {
     console.error("Fetch request failed -->", error);
+};
+
+/**
+ * Write fetch error to console
+ * @function
+ * @param {String} error - Error message
+ * @return {void}
+ */
+export const putImportError = error => {
+    console.error("Import request failed -->", error);
 };
 
 /**
