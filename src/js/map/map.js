@@ -13,11 +13,10 @@ import { event as d3Event, mouse as d3Mouse, select as d3Select } from "d3-selec
 import { zoom as d3Zoom, zoomIdentity as d3ZoomIdentity, zoomTransform as d3ZoomTransform } from "d3-zoom";
 
 import "bootstrap/js/dist/util";
-import "bootstrap/js/dist/collapse";
 import "bootstrap/js/dist/modal";
 
 import { appDescription, appTitle, appVersion, defaultFontSize, insertBaseModal } from "../common";
-import { displayClan, nearestPow2, checkFetchStatus, getJsonFromFetch, putFetchError, roundToThousands } from "../util";
+import { displayClan, nearestPow2, putImportError, roundToThousands } from "../util";
 
 import { registerEvent } from "../analytics";
 
@@ -52,52 +51,6 @@ class Map {
         this._serverName = serverName;
 
         this._searchParams = searchParams;
-
-        /**
-         * Data directory
-         * @type {string}
-         * @private
-         */
-        this._dataDirectory = "data";
-
-        /**
-         * @type {Array<fileName: string, name: string>}
-         * @private
-         */
-        this._dataSources = [
-            {
-                fileName: "ports.json",
-                name: "ports"
-            },
-            {
-                fileName: `${serverName}-trades.json`,
-                name: "trades"
-            },
-            {
-                fileName: `${serverName}.json`,
-                name: "server"
-            },
-            {
-                fileName: `${serverName}-pb.json`,
-                name: "pb"
-            },
-            {
-                fileName: "pb.json",
-                name: "pbZones"
-            },
-            {
-                fileName: "ships.json",
-                name: "ships"
-            },
-            {
-                fileName: "woods.json",
-                name: "woods"
-            },
-            {
-                fileName: "modules.json",
-                name: "modules"
-            }
-        ];
 
         /**
          * Font size in px
@@ -199,7 +152,7 @@ class Map {
         this._setupSvg();
         this._setSvgSize();
         this._setupListener();
-        this._readData();
+        this._setupData();
     }
 
     /**
@@ -228,7 +181,7 @@ class Map {
         return r;
     }
 
-    _setupData(data) {
+    _setupData() {
         //        const marks = [];
 
         //        marks.push("setupData");
@@ -236,72 +189,28 @@ class Map {
         // function();
         //        performance.mark(`${marks[marks.length - 1]}-end`);
 
-        // Combine port data with port battle data
-        const portData = data.ports.map(port => {
-            const combinedData = port;
-
-            const serverData = data.server.find(d => d.id === combinedData.id);
-
-            combinedData.portBattleStartTime = serverData.portBattleStartTime;
-            combinedData.portBattleType = serverData.portBattleType;
-            combinedData.nonCapturable = serverData.nonCapturable;
-            combinedData.conquestMarksPension = serverData.conquestMarksPension;
-            combinedData.portTax = serverData.portTax;
-            combinedData.taxIncome = serverData.taxIncome;
-            combinedData.netIncome = serverData.netIncome;
-            combinedData.tradingCompany = serverData.tradingCompany;
-            combinedData.laborHoursDiscount = serverData.laborHoursDiscount;
-            combinedData.dropsTrading = serverData.dropsTrading;
-            combinedData.consumesTrading = serverData.consumesTrading;
-            combinedData.producesNonTrading = serverData.producesNonTrading;
-            combinedData.dropsNonTrading = serverData.dropsNonTrading;
-            combinedData.inventory = serverData.inventory;
-
-            // Delete empty entries
-            ["dropsTrading", "consumesTrading", "producesNonTrading", "dropsNonTrading"].forEach(type => {
-                if (!combinedData[type]) {
-                    delete combinedData[type];
-                }
-            });
-
-            const pbData = data.pb.ports.find(d => d.id === combinedData.id);
-
-            combinedData.nation = pbData.nation;
-            combinedData.capturer = pbData.capturer;
-            combinedData.lastPortBattle = pbData.lastPortBattle;
-            combinedData.attackHostility = pbData.attackHostility;
-            combinedData.attackerClan = pbData.attackerClan;
-            combinedData.attackerNation = pbData.attackerNation;
-            combinedData.portBattle = pbData.portBattle;
-
-            return combinedData;
-        });
-
         this._f11 = new ShowF11(this, this.coord);
-        this._ports = new DisplayPorts(portData, this);
+        this._ports = new DisplayPorts(this);
+        this._ports.init().then(() => {
+            this._pbZone = new DisplayPbZones(this._ports);
+            this._grid = new DisplayGrid(this);
 
-        this._pbZone = new DisplayPbZones(data.pbZones, this._ports);
-        this._grid = new DisplayGrid(this);
+            this._journey = new Journey(this.rem);
+            this._windPrediction = new PredictWind();
+            this._windRose = new WindRose();
 
-        this._woodData = JSON.parse(JSON.stringify(data.woods));
-        this._shipData = JSON.parse(JSON.stringify(data.ships));
-        const moduleData = JSON.parse(JSON.stringify(data.modules));
-        this._journey = new Journey(this._shipData, this._woodData, moduleData, this.rem);
-
-        this._portSelect = new SelectPorts(this._ports, this._pbZone, this);
-        this.showTrades = new ShowTrades(
-            this._portSelect,
-            portData,
-            data.trades,
-            this._minScale,
-            this.coord.min,
-            this.coord.max
-        );
-
-        this._init();
-
-        this._windPrediction = new PredictWind();
-        this._windRose = new WindRose();
+            this._portSelect = new SelectPorts(this._ports, this._pbZone, this);
+            this.showTrades = new ShowTrades(
+                this._serverName,
+                this._portSelect,
+                this._minScale,
+                this.coord.min,
+                this.coord.max
+            );
+            this.showTrades.showOrHide().then(() => {
+                this._init();
+            });
+        });
 
         /*
         marks.forEach(mark => {
@@ -309,26 +218,6 @@ class Map {
         });
         console.log(performance.getEntriesByType("measure"));
         */
-    }
-
-    _readData() {
-        const jsonData = [];
-        const readData = {};
-        this._dataSources.forEach((datum, i) => {
-            jsonData[i] = fetch(`${this._dataDirectory}/${datum.fileName}`)
-                .then(checkFetchStatus)
-                .then(getJsonFromFetch);
-        });
-
-        Promise.all(jsonData)
-            .then(values => {
-                values.forEach((value, i) => {
-                    readData[this._dataSources[i].name] = value;
-                });
-
-                this._setupData(readData);
-            })
-            .catch(putFetchError);
     }
 
     _setupListener() {
@@ -475,7 +364,7 @@ class Map {
             .join(enter =>
                 enter
                     .append("image")
-                    .attr("xlink:href", d => `images/map/${d.z}/${d.row}/${d.col}.jpg`)
+                    .attr("xlink:href", d => `images/map/${d.z}/${d.row}/${d.col}.webp`)
                     .attr("x", d => d.col * this._tileSize)
                     .attr("y", d => d.row * this._tileSize)
                     .attr("width", this._tileSize + 1)
