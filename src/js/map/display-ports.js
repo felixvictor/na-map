@@ -8,15 +8,14 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+import "bootstrap/js/dist/util";
+import "bootstrap/js/dist/tooltip";
 import { min as d3Min, max as d3Max } from "d3-array";
 import { interpolateHcl as d3InterpolateHcl, interpolateHclLong as d3InterpolateHclLong } from "d3-interpolate";
 // import { polygonCentroid as d3PolygonCentroid, polygonHull as d3PolygonHull } from "d3-polygon";
 import { scaleLinear as d3ScaleLinear, scaleOrdinal as d3ScaleOrdinal } from "d3-scale";
 import { select as d3Select } from "d3-selection";
 // import { curveCatmullRomClosed as d3CurveCatmullRomClosed, line as d3Line } from "d3-shape";
-
-import "bootstrap/js/dist/util";
-import "bootstrap/js/dist/tooltip";
 
 import moment from "moment";
 import "moment/locale/en-gb";
@@ -41,6 +40,7 @@ import {
     formatSiCurrency,
     formatSiInt,
     getOrdinal,
+    putImportError,
     roundToThousands
 } from "../util";
 import Cookie from "../util/cookie";
@@ -48,9 +48,7 @@ import RadioButton from "../util/radio-button";
 import TrilateratePosition from "../map-tools/get-position";
 
 export default class DisplayPorts {
-    constructor(portData, map) {
-        this._portDataDefault = portData;
-        this._portData = portData;
+    constructor(map) {
         this._map = map;
 
         this._serverName = this._map._serverName;
@@ -106,6 +104,58 @@ export default class DisplayPorts {
          */
         this._showRadius = this._getShowRadiusSetting();
 
+        this._trilateratePosition = new TrilateratePosition(this);
+    }
+
+    async init() {
+        await this._loadAndSetupData();
+    }
+
+    _setupData(data) {
+        // Combine port data with port battle data
+        const portData = data.ports.map(port => {
+            const combinedData = port;
+
+            const serverData = data.server.find(d => d.id === combinedData.id);
+
+            combinedData.portBattleStartTime = serverData.portBattleStartTime;
+            combinedData.portBattleType = serverData.portBattleType;
+            combinedData.nonCapturable = serverData.nonCapturable;
+            combinedData.conquestMarksPension = serverData.conquestMarksPension;
+            combinedData.portTax = serverData.portTax;
+            combinedData.taxIncome = serverData.taxIncome;
+            combinedData.netIncome = serverData.netIncome;
+            combinedData.tradingCompany = serverData.tradingCompany;
+            combinedData.laborHoursDiscount = serverData.laborHoursDiscount;
+            combinedData.dropsTrading = serverData.dropsTrading;
+            combinedData.consumesTrading = serverData.consumesTrading;
+            combinedData.producesNonTrading = serverData.producesNonTrading;
+            combinedData.dropsNonTrading = serverData.dropsNonTrading;
+            combinedData.inventory = serverData.inventory;
+
+            // Delete empty entries
+            ["dropsTrading", "consumesTrading", "producesNonTrading", "dropsNonTrading"].forEach(type => {
+                if (!combinedData[type]) {
+                    delete combinedData[type];
+                }
+            });
+
+            const pbData = data.pb.ports.find(d => d.id === combinedData.id);
+
+            combinedData.nation = pbData.nation;
+            combinedData.capturer = pbData.capturer;
+            combinedData.lastPortBattle = pbData.lastPortBattle;
+            combinedData.attackHostility = pbData.attackHostility;
+            combinedData.attackerClan = pbData.attackerClan;
+            combinedData.attackerNation = pbData.attackerNation;
+            combinedData.portBattle = pbData.portBattle;
+
+            return combinedData;
+        });
+
+        this._portDataDefault = portData;
+        this._portData = portData;
+
         this._setupScales();
         this._setupListener();
         this._setupSvg();
@@ -113,8 +163,56 @@ export default class DisplayPorts {
         this._setupRegions();
         this._setupSummary();
         this._setupFlags();
+    }
 
-        this._trilateratePosition = new TrilateratePosition(this);
+    async _loadData() {
+        /**
+         * Data directory
+         * @type {string}
+         * @private
+         */
+        const dataDirectory = "data";
+
+        /**
+         * Data sources
+         * @type {Array<fileName: string, name: string>}
+         * @private
+         */
+        const dataSources = [
+            {
+                fileName: `${this._serverName}.json`,
+                name: "server"
+            },
+            {
+                fileName: `${this._serverName}-pb.json`,
+                name: "pb"
+            }
+        ];
+
+        let readData = {};
+
+        const loadEntries = async dataSources => {
+            for await (const dataSource of dataSources) {
+                readData[dataSource.name] = await (await fetch(`${dataDirectory}/${dataSource.fileName}`)).json();
+            }
+        };
+
+        try {
+            const { default: ports } = await import(/* webpackChunkName: "data-ports" */ "../../gen/ports.json");
+            readData = {
+                ports
+            };
+
+            await loadEntries(dataSources);
+            return readData;
+        } catch (error) {
+            putImportError(error);
+        }
+    }
+
+    async _loadAndSetupData() {
+        const readData = await this._loadData();
+        this._setupData(readData);
     }
 
     _setupScales() {
@@ -596,15 +694,11 @@ export default class DisplayPorts {
 
             if (this.showTradePortPartners) {
                 if (port.goodsToSellInTradePort.length) {
-                    h += `<tr><td class='pl-0'>Sell in ${port.tradePort}\u00A0</td><td>${
-                        port.goodsToSellInTradePort
-                    }</td></tr>`;
+                    h += `<tr><td class='pl-0'>Sell in ${port.tradePort}\u00A0</td><td>${port.goodsToSellInTradePort}</td></tr>`;
                 }
 
                 if (port.goodsToBuyInTradePort.length) {
-                    h += `<tr><td class='pl-0'>Buy in ${port.tradePort}\u00A0</td><td>${
-                        port.goodsToBuyInTradePort
-                    }</td></tr>`;
+                    h += `<tr><td class='pl-0'>Buy in ${port.tradePort}\u00A0</td><td>${port.goodsToBuyInTradePort}</td></tr>`;
                 }
             }
 
