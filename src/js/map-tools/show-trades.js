@@ -8,12 +8,14 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+import "bootstrap/js/dist/util";
+import "bootstrap/js/dist/tooltip";
 import { extent as d3Extent } from "d3-array";
 import { scaleLinear as d3ScaleLinear, scalePoint as d3ScalePoint } from "d3-scale";
 import { select as d3Select } from "d3-selection";
 
 import { defaultFontSize, nations } from "../common";
-import { formatInt, formatSiCurrency, formatSiInt, roundToThousands } from "../util";
+import { formatInt, formatSiCurrency, formatSiInt, putImportError, roundToThousands } from "../util";
 import Cookie from "../util/cookie";
 import RadioButton from "../util/radio-button";
 
@@ -22,18 +24,17 @@ import RadioButton from "../util/radio-button";
  */
 export default class ShowTrades {
     /**
+     * @param {string} serverName - Server name
      * @param {object} portSelect - portSelect
-     * @param {object} portData - Port data
-     * @param {object} tradeData - Trade data
      * @param {number} minScale - Minimal scale
      * @param {Bound} lowerBound - Top left coordinates of current viewport
      * @param {Bound} upperBound - Bottom right coordinates of current viewport
      */
-    // eslint-disable-next-line max-params
-    constructor(portSelect, portData, tradeData, minScale, lowerBound, upperBound) {
+    constructor(serverName, portSelect, minScale, lowerBound, upperBound) {
+        this._serverName = serverName;
         this._portSelect = portSelect;
-        this._portData = portData;
-        this._linkDataDefault = tradeData;
+
+        this._isDataLoaded = false;
 
         this._minScale = minScale;
         this._scale = this._minScale;
@@ -92,23 +93,17 @@ export default class ShowTrades {
         this._setupProfitRadios();
         this._setupListener();
         this._setupList();
-        this._setupData();
         this.setBounds(lowerBound, upperBound);
 
         if (this.show) {
             this._portSelect.setupInventorySelect(this.show);
         }
 
-        this._showOrHide();
-
         /**
          * Get profit value from cookie or use default value
          * @type {string}
          */
         this._profitValue = this._getProfitValue();
-
-        this._filterPortsBySelectedNations();
-        this._sortLinkData();
     }
 
     _setupSvg() {
@@ -235,6 +230,7 @@ export default class ShowTrades {
     }
 
     _setupData() {
+        this._linkData = this._linkDataDefault;
         this._nodeData = new Map(
             this._portData.map(port => [
                 port.id,
@@ -247,6 +243,8 @@ export default class ShowTrades {
                 }
             ])
         );
+        this._filterPortsBySelectedNations();
+        this._sortLinkData();
     }
 
     _sortLinkData() {
@@ -273,23 +271,61 @@ export default class ShowTrades {
             .sort((a, b) => b.profit - a.profit);
     }
 
-    _showSelected() {
+    async _showSelected() {
         const show = this._showRadios.get();
         this.show = show === "on";
 
         this._showCookie.set(show);
 
-        this._showOrHide();
+        await this.showOrHide();
         this._portSelect.setupInventorySelect(this.show);
         this._filterTradesBySelectedNations();
         this._sortLinkData();
         this.update();
     }
 
-    _showOrHide() {
-        if (this.show) {
+    async _loadData() {
+        /**
+         * Data directory
+         * @type {string}
+         * @private
+         */
+        const dataDirectory = "data";
+
+        try {
+            this._portData = await import(/* webpackChunkName: "data-ports" */ "../../gen/ports.json").then(
+                data => data.default
+            );
+
+            this._linkDataDefault = await (await fetch(`${dataDirectory}/${this._serverName}-trades.json`)).json();
+        } catch (error) {
+            putImportError(error);
+        }
+    }
+
+    async _loadAndSetupData() {
+        try {
+            await this._loadData();
+            this._setupData();
+        } catch (error) {
+            putImportError(error);
+        }
+    }
+
+    async showOrHide() {
+        const show = () => {
             ShowTrades._showElem(this._tradeDetailsDiv);
             this._linkData = this._linkDataDefault;
+        };
+
+        if (this.show) {
+            if (!this._isDataLoaded) {
+                await this._loadAndSetupData().then(() => {
+                    this._isDataLoaded = true;
+                });
+            }
+
+            show();
         } else {
             ShowTrades._hideElem(this._tradeDetailsDiv);
             this._linkData = [];
@@ -688,9 +724,11 @@ export default class ShowTrades {
     }
 
     update(data = null) {
-        this._filterTradesByVisiblePorts();
-        this._updateGraph();
-        this._updateList(data);
+        if (this.show) {
+            this._filterTradesByVisiblePorts();
+            this._updateGraph();
+            this._updateList(data);
+        }
     }
 
     /**
@@ -707,7 +745,6 @@ export default class ShowTrades {
     transform(transform) {
         this._g.attr("transform", transform);
         this._scale = transform.k;
-
         this.update();
     }
 
