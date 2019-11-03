@@ -2,7 +2,7 @@
 /// This file is part of na-map.
 /// Bootstrap variables.
 ///
-/// copyright 2017-18
+/// copyright 2017, 2018. 2019
 /// license   http://www.gnu.org/licenses/gpl.html
 /// @group    main
 /// @author   iB aka Felix Victor
@@ -10,7 +10,6 @@
 
 // Options
 $enable-rounded: false;
-$enable-gradients: true;
 $enable-hover-media-query: false;
 
 // Spacing
@@ -18,10 +17,10 @@ $spacer: 1rem;
 $spacers: (
     0: 0,
     1: (
-        $spacer * .382
+        $spacer * 0.382
     ),
     2: (
-        $spacer * .618
+        $spacer * 0.618
     ),
     3: $spacer,
     4: (
@@ -52,7 +51,7 @@ $link-hover-color: $secondary-800;
 
 // Grid columns
 //$grid-columns: 12 !default;
-$grid-gutter-width: $spacer*2;
+$grid-gutter-width: $spacer * 2;
 
 //$input-color: $body-color;
 //$input-group-addon-bg: $primary-100;
@@ -124,7 +123,7 @@ $pagination-disabled-border-color: $pagination-bg;
 $badge-font-size: 90%;
 $badge-font-weight: 400;
 $badge-padding-y: 0;
-$badge-padding-x: .2rem;
+$badge-padding-x: 0.2rem;
 //$badge-border-radius:               $border-radius !default;
 //$badge-pill-padding-x:              .6em !default;
 // Use a higher than normal value to ensure completely rounded edges when
