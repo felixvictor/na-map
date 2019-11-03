@@ -1,0 +1,48 @@
+////
+/// This file is part of na-map.
+/// bytesize-icons definitions.
+///
+/// copyright 2019
+/// license   http://www.gnu.org/licenses/gpl.html
+/// @group    main
+/// @author   iB aka Felix Victor
+////
+
+
+/// Icons
+/// https://github.com/danklammer/bytesize-icons
+
+/// Minifier
+/// https://jakearchibald.github.io/svgomg/
+
+/// Encoder
+/// https://yoksel.github.io/url-encoder/
+
+
+/*
+<svg id="i-options" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+<path d="M28 6 L4 6 M28 16 L4 16 M28 26 L4 26 M24 3 L24 9 M8 13 L8 19 M20 23 L20 29" />
+</svg>
+ */
+
+.icon {
+  display: block;
+  width: 24px;
+  height: 24px;
+  overflow: visible;
+  background-color: $body-color;
+}
+
+.icon-navbar {
+  background-color: $navbar-light-color;
+}
+
+.icon-options {
+  mask-image: url("~Icons/icon-options.svg");
+
+}
+
+.icon-info {
+  mask-image: url("~Icons/icon-info.svg");
+
+}
