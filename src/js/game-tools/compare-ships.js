@@ -1355,12 +1355,12 @@ export default class CompareShips {
         const footer = d3Select(`#${this._modalId} .modal-footer`);
         footer
             .insert("button", "button")
-            .classed("btn btn-outline-secondary", true)
+            .classed("btn btn-outline-secondary icon-outline-button", true)
             .attr("id", this._copyButtonId)
             .attr("title", "Copy to clipboard (ctrl-c)")
             .attr("type", "button")
             .append("i")
-            .classed("far fa-copy", true);
+            .classed("icon icon-copy", true);
     }
 
     _initData() {
