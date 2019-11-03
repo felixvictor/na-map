@@ -3,28 +3,9 @@
  *
  * @file Main file.
  * @author iB aka Felix Victor
- * @copyright 2017, 2018
+ * @copyright 2017, 2018, 2019
  * @license   http://www.gnu.org/licenses/gpl.html
  */
-
-import { library as faLibrary, dom as faDom } from "@fortawesome/fontawesome-svg-core";
-import { faCalendar, faCalendarCheck, faClock, faCopy } from "@fortawesome/free-regular-svg-icons";
-import {
-    faArrowDown,
-    faArrowUp,
-    faChevronLeft,
-    faChevronRight,
-    faCog,
-    faDonate,
-    faEraser,
-    faInfoCircle,
-    faPaste,
-    faSort,
-    faSortDown,
-    faSortUp,
-    faTimes,
-    faTrash
-} from "@fortawesome/free-solid-svg-icons";
 
 import { initAnalytics, registerPage } from "./analytics";
 import { servers } from "./servers";
@@ -151,7 +132,6 @@ function main() {
      * @param {URLSearchParams} searchParams - Query arguments
      * @return {void}
      */
-    // eslint-disable-next-line space-before-function-paren
     const loadMap = async (serverId, searchParams) => {
         try {
             const Map = await import(/*  webpackPreload: true, webpackChunkName: "map" */ "./map/map");
@@ -171,7 +151,6 @@ function main() {
      * @param {URLSearchParams} searchParams - Query arguments
      * @return {void}
      */
-    // eslint-disable-next-line space-before-function-paren
     const loadGameTools = async (serverId, searchParams) => {
         try {
             const gameTools = await import(/* webpackChunkName: "game-tools" */ "./game-tools");
@@ -195,28 +174,6 @@ function main() {
             .getElementById("game-tools-dropdown")
             .addEventListener("click", () => loadGameTools(serverId, searchParams), { once: true });
     };
-
-    faLibrary.add(
-        faArrowDown,
-        faArrowUp,
-        faCalendar,
-        faCalendarCheck,
-        faChevronLeft,
-        faChevronRight,
-        faClock,
-        faCog,
-        faCopy,
-        faDonate,
-        faEraser,
-        faInfoCircle,
-        faPaste,
-        faSort,
-        faSortDown,
-        faSortUp,
-        faTimes,
-        faTrash
-    );
-    faDom.watch();
 
     initAnalytics();
     registerPage("Homepage");
