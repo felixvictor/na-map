@@ -1,0 +1,263 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ModuleTemplate xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="Implacable CREW" Type="CREW">
+  <Attributes>
+    <Pair>
+      <Key>MODULE_DESCRIPTION</Key>
+      <Value xsi:type="StringAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value />
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>MODULE_BASE_HP</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>650</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>DAMAGE_TYPE</Key>
+      <Value xsi:type="IntegerAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>2</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>HIT_PROBABILITY</Key>
+      <Value xsi:type="FloatAttribute" Action="Relative" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>0.05</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CREW_HIT_PROBABILITY</Key>
+      <Value xsi:type="FloatAttribute" Action="Relative" IsLocal="false" IsPermanent="false" IsNegative="false">
+        <Value>0.1</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CREW_DEFEND</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
+        <Value>0.07</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CREW_FIRE</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
+        <Value>0.07</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CREW_ATTACK</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
+        <Value>0.08</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>MORTAR_CREW_HIT_PROBABILITY</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
+        <Value>0.9</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>EXPLOSION_DAMAGE_ABSORB_MULTIPLIER</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
+        <Value>0.2</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>REPAIR_TYPE</Key>
+      <Value xsi:type="IntegerAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>0</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>REPAIR_MODULE_TIME</Key>
+      <Value xsi:type="FloatAttribute" Action="Relative" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>300</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>GRENADES_BONUS</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="false" IsNegative="false">
+        <Value>0</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>MARINES_FIREPOWER_MODIFIER</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
+        <Value>1</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>MARINES_MELEE_MODIFIER</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
+        <Value>1</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>GROG_ATTACK_BONUS</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="false" IsNegative="false">
+        <Value>0</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>MARINES_LEVEL</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="false" IsNegative="false">
+        <Value>0</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>MUSKETS_PERCENTAGE_OF_CREW</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
+        <Value>0.3</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>MUSKETS_PERCENTAGE_OF_MARINES</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
+        <Value>1</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>PREPARATION_BONUS</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="false" IsNegative="false">
+        <Value>0</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>BARRICADES_MELEE_BONUS</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="false" IsNegative="false">
+        <Value>0</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>BARRICADES_FIREPOWER_BONUS</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="false" IsNegative="false">
+        <Value>0</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>HANDBOOK_MORALE_BONUS</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="false" IsNegative="false">
+        <Value>0</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>HANDBOOK_DEFENSE_BONUS</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="false" IsNegative="false">
+        <Value>0</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>HANDBOOK_ATTACK_BONUS</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="false" IsNegative="false">
+        <Value>0</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>MUSKETS_ACCURACY_BONUS</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="false" IsNegative="false">
+        <Value>0</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>DECK_GUNS_ACCURACY_BONUS</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="false" IsNegative="false">
+        <Value>0</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>BOARDING_DEFENSE_BONUS</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="false" IsNegative="false">
+        <Value>0</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>BOARDING_ATTACK_BONUS</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="false" IsNegative="false">
+        <Value>0</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>LADDERS_MELEE_PENALTY_REDUCE</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="false" IsNegative="false">
+        <Value>0</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>HOOKS_DEFENSE_BONUS</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="false" IsNegative="false">
+        <Value>0</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>AXES_ATTACK_BONUS</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="false" IsNegative="false">
+        <Value>0</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>GROG_MORALE_BONUS</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="false" IsNegative="false">
+        <Value>0</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>GROG_ACCURACY_PENALTY</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="false" IsNegative="false">
+        <Value>0</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>DECKGUNFIRE_RELOAD</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="false" IsNegative="false">
+        <Value>0</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>PREPARATION_BONUS_PER_ROUND</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="false" IsNegative="false">
+        <Value>0</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>AXES_DISENGAGE_DURATION</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="false" IsNegative="false">
+        <Value>0</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>MARINES_PERCENTAGE</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="false" IsNegative="false">
+        <Value>0</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CREW_TRANSFER_SPEED</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
+        <Value>0</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CREW_TRANSFER_TICK</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
+        <Value>1</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>SHIP_REPAIR_SAIL_CREW_REQUIREMENT</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
+        <Value>0</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>SHIP_REPAIR_ARMOR_CREW_REQUIREMENT</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
+        <Value>0</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>SHIP_BOARDING_PREPARATION_BONUS</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
+        <Value>0</Value>
+      </Value>
+    </Pair>
+  </Attributes>
+</ModuleTemplate>
