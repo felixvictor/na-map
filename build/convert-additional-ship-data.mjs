@@ -46,6 +46,7 @@ function convertAdditionalShipData() {
         ["indiaman", { id: 425, master: "" }],
         ["indiaman rookie", { id: 2223, master: "indiaman" }],
         ["ingermanland", { id: 395, master: "" }],
+        ["implacable", { id: 2235, master: "" }],
         ["leopard", { id: 2078, master: "" }],
         ["lhermione", { id: 986, master: "" }],
         ["lynx", { id: 274, master: "" }],
