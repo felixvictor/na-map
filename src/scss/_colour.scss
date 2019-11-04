@@ -9,14 +9,14 @@
 ////
 
 // Colour scheme
-$primary-colour: rgb(169, 157, 137) !default;
-$secondary-colour: rgb(106, 113, 83) !default;
+$primary-colour: rgb(138, 165, 168); // Photoshop water #d9e1e3
+$secondary-colour: rgb(106, 113, 83); // Photoshop land #c0c5b0
 
-$sat: saturation($primary-colour) !default;
-$lit: lightness($primary-colour) !default;
-$hue: hue($primary-colour) !default;
+$sat: saturation($primary-colour);
+$lit: lightness($primary-colour);
+$hue: hue($primary-colour);
 
-$mix-weight: 70% !default;
+$mix-weight: 70%;
 
 @function colour-mixin($colour) {
     @return mix(hsl(hue($colour), $sat, $lit), $colour, $mix-weight);
