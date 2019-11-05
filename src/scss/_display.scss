@@ -2,15 +2,15 @@
 /// This file is part of na-map.
 /// Display.
 ///
-/// copyright 2017-18
+/// copyright 2017, 2018, 2019
 /// license   http://www.gnu.org/licenses/gpl.html
 /// @group    main
 /// @author   iB aka Felix Victor
 ////
 
-$background-colour: $primary-500 !default;
-$paddingHalf: map-get($spacers, 2) !default;
-$paddingThird: map-get($spacers, 1) !default;
+$background-colour: $secondary-050;
+$paddingHalf: map-get($spacers, 2);
+$paddingThird: map-get($spacers, 1);
 
 // opentype
 
@@ -554,7 +554,7 @@ svg {
     }
 
     line {
-        stroke: $primary-600;
+        stroke: $secondary-100;
     }
 
     text {
@@ -657,7 +657,7 @@ svg {
 }
 
 .here {
-    fill: $white;
+    fill: $yellow;
 }
 
 .neg {
@@ -703,7 +703,7 @@ svg {
 }
 
 .port-names {
-    fill: $white;
+    //fill: $white;
 }
 
 .port {
