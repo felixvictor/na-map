@@ -61,8 +61,8 @@
   "orientation": "portrait",
   "display": "standalone",
   "start_url": ".",
-  "background_color": "#a99d89",
+  "background_color": "#6a7153",
   "description": "Naval Action map",
   "lang": "en-GB",
-  "theme_color": "#6a7153"
+  "theme_color": "#8aa5a8"
 }
