@@ -765,7 +765,7 @@ class ShipComparison extends Ship {
                 this.shipBaseData.speed.min,
                 2
             )}`,
-            maxSpeed: `${formatFloat(this.shipCompareData.speed.max, 3)}\u00A0${getDiff(
+            maxSpeed: `${formatFloat(this.shipCompareData.speed.max, 4)}\u00A0${getDiff(
                 this.shipCompareData.speed.max,
                 this.shipBaseData.speed.max,
                 2
