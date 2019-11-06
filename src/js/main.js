@@ -151,7 +151,6 @@ function main() {
      * @param {URLSearchParams} searchParams - Query arguments
      * @return {void}
      */
-    // eslint-disable-next-line space-before-function-paren
     const loadMap = async (serverId, searchParams) => {
         try {
             const Map = await import(/*  webpackPreload: true, webpackChunkName: "map" */ "./map/map");
@@ -171,7 +170,6 @@ function main() {
      * @param {URLSearchParams} searchParams - Query arguments
      * @return {void}
      */
-    // eslint-disable-next-line space-before-function-paren
     const loadGameTools = async (serverId, searchParams) => {
         try {
             const gameTools = await import(/* webpackChunkName: "game-tools" */ "./game-tools");
