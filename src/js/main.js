@@ -151,10 +151,10 @@ function main() {
      * @param {URLSearchParams} searchParams - Query arguments
      * @return {void}
      */
-    // eslint-disable-next-line space-before-function-paren
     const loadMap = async (serverId, searchParams) => {
         try {
             const Map = await import(/*  webpackPreload: true, webpackChunkName: "map" */ "./map/map");
+            console.log("loadMap", serverId, searchParams);
             const map = new Map.Map(serverId, searchParams);
 
             window.addEventListener("resize", () => {
@@ -171,7 +171,6 @@ function main() {
      * @param {URLSearchParams} searchParams - Query arguments
      * @return {void}
      */
-    // eslint-disable-next-line space-before-function-paren
     const loadGameTools = async (serverId, searchParams) => {
         try {
             const gameTools = await import(/* webpackChunkName: "game-tools" */ "./game-tools");
@@ -181,10 +180,14 @@ function main() {
         }
     };
 
-    const load = () => {
-        const serverId = getServerName();
-        const searchParams = getSearchParams();
-
+    /**
+     * Load
+     * @param {string} serverId - Server id
+     * @param {URLSearchParams} searchParams - Query arguments
+     * @return {void}
+     */
+    const load = (serverId, searchParams) => {
+        console.log("load", new URL(document.location), searchParams);
         // Remove search string from URL
         // {@link https://stackoverflow.com/a/5298684}
         history.replaceState("", document.title, window.location.origin + window.location.pathname);
@@ -220,9 +223,11 @@ function main() {
 
     initAnalytics();
     registerPage("Homepage");
-
+    console.log("main", new URL(document.location), getSearchParams());
     setupListener();
-    load();
+    load(getServerName(), getSearchParams());
 }
 
 main();
+
+// http://localhost:8080/?v=8.16.1&cmp=xnDTVheh2kh6h5
