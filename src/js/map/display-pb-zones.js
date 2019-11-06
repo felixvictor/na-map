@@ -218,7 +218,9 @@ export default class DisplayPbZones {
                 });
             }
         } else {
+            this._defencesFiltered = {};
             this._pbZonesFiltered = {};
+            this._raidZonesFiltered = {};
         }
     }
 
