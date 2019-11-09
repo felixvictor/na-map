@@ -13,7 +13,7 @@ import "bootstrap/js/dist/modal";
 import "bootstrap/js/dist/tooltip";
 import { ascending as d3Ascending, min as d3Min, range as d3Range } from "d3-array";
 import { nest as d3Nest } from "d3-collection";
-import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate";
+import { interpolateHclLong as d3InterpolateHclLong } from "d3-interpolate";
 import { scaleLinear as d3ScaleLinear } from "d3-scale";
 import { select as d3Select } from "d3-selection";
 import {
@@ -656,7 +656,7 @@ class ShipComparison extends Ship {
         const colourScale = d3ScaleLinear()
             .domain([min, -1, -0.1, 0, 0.1, 1, max])
             .range([colourRedDark, colourRed, colourRedLight, "#fff", colourGreenLight, colourGreen, colourGreenDark])
-            .interpolate(d3InterpolateHcl);
+            .interpolate(d3InterpolateHclLong);
 
         // Base profile shape
         this.g
@@ -1131,7 +1131,7 @@ export default class CompareShips {
         this._colorScale = d3ScaleLinear()
             .domain([this._minSpeed, 0, 8, 12, this._maxSpeed])
             .range([colourRed, "#fff", colourGreenLight, colourGreen, colourGreenDark])
-            .interpolate(d3InterpolateHcl);
+            .interpolate(d3InterpolateHclLong);
     }
 
     async _loadAndSetupData() {
