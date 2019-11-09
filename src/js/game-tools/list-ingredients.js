@@ -4,13 +4,14 @@
  * @file      List ingredients.
  * @module    game-tools/list-ingredients
  * @author    iB aka Felix Victor
- * @copyright 2018
+ * @copyright 2018, 2019
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
 import "bootstrap/js/dist/util";
 import "bootstrap/js/dist/modal";
 import "bootstrap/js/dist/tooltip";
+
 import { select as d3Select } from "d3-selection";
 
 import { registerEvent } from "../analytics";

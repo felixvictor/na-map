@@ -10,9 +10,11 @@
 
 import "bootstrap/js/dist/util";
 import "bootstrap/js/dist/modal";
-import "bootstrap/js/dist/tab";
 
 import { default as semver } from "semver";
+
+import { registerEvent } from "../analytics";
+import { appVersion } from "../common";
 
 import CompareShips from "./compare-ships";
 import CompareWoods from "./compare-woods";
@@ -26,9 +28,6 @@ import ListShipBlueprints from "./list-ship-blueprints";
 import ListRecipes from "./list-recipes";
 import ListShips from "./list-ships";
 import ListWoods from "./list-woods";
-
-import { registerEvent } from "../analytics";
-import { appVersion } from "../common";
 
 /**
  * Init
