@@ -4,15 +4,15 @@
  * @file      Select ports.
  * @module    map/select-ports
  * @author    iB aka Felix Victor
- * @copyright 2018
+ * @copyright 2018, 2019
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
 import "bootstrap/js/dist/util";
 import "bootstrap/js/dist/dropdown";
 import "bootstrap-select/js/bootstrap-select";
-import moment from "moment";
 
+import moment from "moment";
 import "tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4";
 import "tempusdominus-core/build/js/tempusdominus-core";
 
