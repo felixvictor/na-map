@@ -4,7 +4,7 @@
  * @file      Display grid.
  * @module    map-tools/display-grid
  * @author    iB aka Felix Victor
- * @copyright 2017, 2018
+ * @copyright 2017, 2018, 2019
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -12,8 +12,8 @@ import { axisBottom as d3AxisBottom, axisRight as d3AxisRight } from "d3-axis";
 import { event as d3Event, select as d3Select } from "d3-selection";
 import { scaleLinear as d3ScaleLinear } from "d3-scale";
 
-import { formatF11, roundToThousands } from "../util";
 import { convertInvCoordX, convertInvCoordY } from "../common";
+import { formatF11, roundToThousands } from "../util";
 
 /**
  * Display grid
