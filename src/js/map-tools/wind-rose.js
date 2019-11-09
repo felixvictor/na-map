@@ -21,8 +21,8 @@ import "round-slider/src/roundslider.css";
 
 import { registerEvent } from "../analytics";
 import { degreesPerSecond, insertBaseModal } from "../common";
-import Cookie from "../util/cookie";
 import { compassDirections, degreesToRadians, displayCompass, getUserWind, printSmallCompassRose } from "../util";
+import Cookie from "../util/cookie";
 
 export default class WindRose {
     constructor() {
