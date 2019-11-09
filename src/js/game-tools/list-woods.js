@@ -10,6 +10,7 @@
 
 import "bootstrap/js/dist/util";
 import "bootstrap/js/dist/modal";
+
 import { select as d3Select } from "d3-selection";
 import { default as Tablesort } from "tablesort";
 

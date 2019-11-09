@@ -4,12 +4,13 @@
  * @file      ship list.
  * @module    ship-list
  * @author    iB aka Felix Victor
- * @copyright 2018
+ * @copyright 2018, 2019
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
 import "bootstrap/js/dist/util";
 import "bootstrap/js/dist/modal";
+
 import { select as d3Select } from "d3-selection";
 import { default as Tablesort } from "tablesort";
 
