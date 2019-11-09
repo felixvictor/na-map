@@ -10,6 +10,7 @@
 
 import "bootstrap/js/dist/util";
 import "bootstrap/js/dist/modal";
+
 import { layoutTextLabel, layoutAnnealing, layoutLabel } from "@d3fc/d3fc-label-layout";
 import { range as d3Range } from "d3-array";
 import { drag as d3Drag } from "d3-drag";

@@ -10,6 +10,7 @@
 
 import "bootstrap/js/dist/util";
 import "bootstrap/js/dist/modal";
+
 import { html, render } from "lit-html";
 import { repeat } from "lit-html/directives/repeat";
 
