@@ -9,7 +9,9 @@
  */
 
 import "bootstrap/js/dist/util";
+import "bootstrap/js/dist/tab";
 import "bootstrap/js/dist/modal";
+
 import { html, render } from "lit-html";
 import { repeat } from "lit-html/directives/repeat";
 import { default as Tablesort } from "tablesort";
