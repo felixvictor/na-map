@@ -4,7 +4,7 @@
  * @file      Get position.
  * @module    get-position
  * @author    iB aka Felix Victor
- * @copyright 2018
+ * @copyright 2018, 2019
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -24,7 +24,7 @@
  * @file      Display ports.
  * @module    map/display-ports
  * @author    iB aka Felix Victor
- * @copyright 2018
+ * @copyright 2018, 2019
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -44,7 +44,7 @@
  * @file      Select ports.
  * @module    map/select-ports
  * @author    iB aka Felix Victor
- * @copyright 2018
+ * @copyright 2018, 2019
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -54,7 +54,7 @@
  * @file      Display grid.
  * @module    map-tools/display-grid
  * @author    iB aka Felix Victor
- * @copyright 2017, 2018
+ * @copyright 2017, 2018, 2019
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -74,6 +74,6 @@
  * @file      Display map.
  * @module    map/map
  * @author    iB aka Felix Victor
- * @copyright 2017, 2018
+ * @copyright 2017, 2018, 2019
  * @license   http://www.gnu.org/licenses/gpl.html
  */
