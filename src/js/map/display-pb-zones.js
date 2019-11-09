@@ -10,9 +10,9 @@
 
 import { select as d3Select } from "d3-selection";
 
+import { putImportError } from "../util";
 import Cookie from "../util/cookie";
 import RadioButton from "../util/radio-button";
-import { putImportError } from "../util";
 
 export default class DisplayPbZones {
     constructor(ports) {
