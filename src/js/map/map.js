@@ -4,19 +4,19 @@
  * @file      Display map.
  * @module    map/map
  * @author    iB aka Felix Victor
- * @copyright 2017, 2018
+ * @copyright 2017, 2018, 2019
  * @license   http://www.gnu.org/licenses/gpl.html
  */
+
+import "bootstrap/js/dist/util";
+import "bootstrap/js/dist/modal";
 
 import { range as d3Range } from "d3-array";
 import { event as d3Event, mouse as d3Mouse, select as d3Select } from "d3-selection";
 import { zoom as d3Zoom, zoomIdentity as d3ZoomIdentity, zoomTransform as d3ZoomTransform } from "d3-zoom";
 
-import "bootstrap/js/dist/util";
-import "bootstrap/js/dist/modal";
-
 import { appDescription, appTitle, appVersion, defaultFontSize, insertBaseModal } from "../common";
-import { displayClan, nearestPow2, putImportError, roundToThousands } from "../util";
+import { displayClan, nearestPow2, roundToThousands } from "../util";
 
 import { registerEvent } from "../analytics";
 
