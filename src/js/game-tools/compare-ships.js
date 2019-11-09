@@ -11,6 +11,7 @@
 import "bootstrap/js/dist/util";
 import "bootstrap/js/dist/modal";
 import "bootstrap/js/dist/tooltip";
+
 import { ascending as d3Ascending, min as d3Min, range as d3Range } from "d3-array";
 import { nest as d3Nest } from "d3-collection";
 import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate";
