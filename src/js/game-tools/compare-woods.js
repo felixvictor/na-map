@@ -14,10 +14,8 @@ import { min as d3Min, max as d3Max } from "d3-array";
 import { select as d3Select } from "d3-selection";
 
 import { registerEvent } from "../analytics";
-import { colourGreen, colourGreenDark, colourGreenLight, colourRed, insertBaseModal } from "../common";
+import { insertBaseModal } from "../common";
 import { formatFloat, formatSignFloat, formatPercent, sortBy, putImportError } from "../util";
-import { scaleLinear as d3ScaleLinear } from "d3-scale";
-import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate";
 
 class Wood {
     constructor(compareId, woodCompare) {
