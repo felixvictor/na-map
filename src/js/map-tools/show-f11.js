@@ -4,19 +4,20 @@
  * @file      Show F11 coordinates.
  * @module    map-tools/show-f11
  * @author    iB aka Felix Victor
- * @copyright 2018
+ * @copyright 2018, 2019
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
 import "bootstrap/js/dist/util";
 import "bootstrap/js/dist/modal";
+
 import { select as d3Select } from "d3-selection";
 import moment from "moment";
 import "moment/locale/en-gb";
 
-import { between, copyF11ToClipboard, formatF11 } from "../util";
-import { convertCoordX, convertCoordY, convertInvCoordX, convertInvCoordY, insertBaseModal } from "../common";
 import { registerEvent } from "../analytics";
+import { convertCoordX, convertCoordY, convertInvCoordX, convertInvCoordY, insertBaseModal } from "../common";
+import { between, copyF11ToClipboard, formatF11 } from "../util";
 
 /**
  * ShowF11
