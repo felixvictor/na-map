@@ -3,9 +3,12 @@
  *
  * @file Main file.
  * @author iB aka Felix Victor
- * @copyright 2017, 2018
+ * @copyright 2017, 2018, 2019
  * @license   http://www.gnu.org/licenses/gpl.html
  */
+
+import "bootstrap/js/dist/util";
+import "bootstrap/js/dist/collapse";
 
 import { library as faLibrary, dom as faDom } from "@fortawesome/fontawesome-svg-core";
 import { faCalendar, faCalendarCheck, faClock, faCopy } from "@fortawesome/free-regular-svg-icons";
@@ -28,11 +31,11 @@ import {
 
 import { initAnalytics, registerPage } from "./analytics";
 import { servers } from "./servers";
+import { putImportError } from "./util";
 import Cookie from "./util/cookie";
 import RadioButton from "./util/radio-button";
 
 import "../scss/main.scss";
-import { putImportError } from "./util";
 
 /**
  * @returns {void}
