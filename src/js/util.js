@@ -223,12 +223,11 @@ export const roundToThousands = x => round(x, 3);
 
 /**
  * Test if object is empty
+ * {@link https://stackoverflow.com/a/32108184}
  * @param {object} object - Object
  * @return {boolean} True if object is empty
  */
-export function isEmpty(object) {
-    return Object.getOwnPropertyNames(object).length === 0 && object.constructor === Object;
-}
+export const isEmpty = object => Object.getOwnPropertyNames(object).length === 0 && object.constructor === Object;
 
 /**
  * Compass directions
