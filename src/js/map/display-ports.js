@@ -4,7 +4,7 @@
  * @file      Display ports.
  * @module    map/display-ports
  * @author    iB aka Felix Victor
- * @copyright 2018
+ * @copyright 2018, 2019
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -487,7 +487,7 @@ export default class DisplayPorts {
             return images;
         };
 
-        this._nationIcons = importAll(require.context("../../icons", false, /\.svg$/));
+        this._nationIcons = importAll(require.context("Flags", false, /\.svg$/));
         const svgDef = d3Select("#na-svg defs");
 
         nations
