@@ -194,6 +194,7 @@ const htmlOpt = {
 const faviconsOpt = {
     logo: fileLogo,
     cache: true,
+    devMode: "webapp",
     inject: true,
     prefix: dirPrefixIcons,
     favicons: {
