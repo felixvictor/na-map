@@ -11,11 +11,11 @@
 @import "functions";
 
 // Colour scheme
+// Photoshop water #8e8473 (primary-600)
 // Photoshop land #c0c5b0
-// Photoshop water #e8edee (secondary-050)
-$primary-colour: rgb(106, 113, 83);
+$primary-colour: rgb(169, 157, 137);
 $primary: $primary-colour;
-$secondary-colour: rgb(138, 165, 168);
+$secondary-colour: rgb(106, 113, 83);
 $secondary: $secondary-colour;
 
 // Set a specific jump point for requesting color jumps
@@ -28,7 +28,7 @@ $sat: saturation($primary-colour);
 $lit: lightness($primary-colour);
 $hue: hue($primary-colour);
 
-$mix-weight: 50%;
+$mix-weight: 20%;
 
 // Base colours
 $white: mix(white, colour-mixin(white), 90);
@@ -202,7 +202,7 @@ $info: $blue;
 $warning: $orange;
 $danger: $red-dark;
 
-$light: $primary-100;
+$light: $primary-050;
 $dark: $primary-900;
 
 $theme-colors: (
@@ -257,8 +257,9 @@ $colors: (
         "green-dark": $green-dark,
         "teal": $teal,
         "cyan": $cyan,
-        "gray": $gray-600,
-        "gray-dark": $gray-800,
+        "white": $white,
+        "gray": $gray-500,
+        "gray-dark": $gray-900,
         "black": $black
 
 );

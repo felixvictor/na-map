@@ -8,7 +8,7 @@
 /// @author   iB aka Felix Victor
 ////
 
-$background-colour: $secondary-050;
+$background-colour: $primary-600;
 $paddingHalf: map-get($spacers, 2);
 $paddingThird: map-get($spacers, 1);
 
@@ -240,7 +240,7 @@ text {
 .compass {
     circle,
     line {
-        stroke: $secondary-400;
+        stroke: $secondary-600;
         stroke-width: 0.1rem;
     }
 
@@ -554,7 +554,7 @@ svg {
     }
 
     line {
-        stroke: $secondary-100;
+        stroke: $primary-500;
     }
 
     text {
@@ -603,7 +603,7 @@ svg {
 }
 
 .column-comp {
-    background-color: $secondary-050;
+    background-color: $white;
     font-variant-numeric: normal; // onum off
 }
 
@@ -624,7 +624,7 @@ svg {
 
 .ship-compare {
     .row-light {
-        background-color: $secondary-100;
+        background-color: $secondary-050;
     }
 }
 
@@ -657,7 +657,7 @@ svg {
 }
 
 .here {
-    fill: $yellow;
+    fill: $white;
 }
 
 .neg {
@@ -703,7 +703,7 @@ svg {
 }
 
 .port-names {
-    //fill: $white;
+    fill: $white;
 }
 
 .port {
@@ -764,7 +764,7 @@ svg {
 }
 
 .raid-join-circle {
-    stroke: $secondary-500;
+    stroke: $secondary-300;
     stroke-width: 1px;
     fill: none;
 }
