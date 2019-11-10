@@ -26,7 +26,7 @@ const { TARGET } = process.env;
 const target = `https://${TARGET}.netlify.com/`;
 
 const description =
-    "Yet another map with in-game map, F11 coordinates, resources, ship and wood comparison. Port data is updated constantly from twitter and daily after maintenance.";
+    "Yet another map with in-game map, resources, ship and wood comparisons. Port battle data is updated constantly from twitter and all data daily after maintenance.";
 const sitemapPaths = ["/fonts/", "/icons", "/images"];
 
 /** Set colours
