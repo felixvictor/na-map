@@ -661,7 +661,9 @@ class ShipComparison extends Ship {
             this._shipCompare.colourScaleSpeedDiff.domain()[this._shipCompare.colourScaleSpeedDiff.domain().length - 1]
         );
 
+        console.log("_setColourScale vor", min, max, this._shipCompare.colourScaleSpeedDiff.domain());
         this._shipCompare.colourScaleSpeedDiff.domain([min, 0, max]);
+        console.log("_setColourScale nach", min, max, this._shipCompare.colourScaleSpeedDiff.domain());
     }
 
     /**
@@ -699,43 +701,27 @@ class ShipComparison extends Ship {
                 g.append("circle")
                     .attr("r", 5)
                     .attr("cy", (d, i) => Math.cos(i * segmentRadians) * -this.shipCompare.radiusScaleAbsolute(d.data))
-                    .attr("cx", (d, i) => Math.sin(i * segmentRadians) * this.shipCompare.radiusScaleAbsolute(d.data));
+                    .attr("cx", (d, i) => Math.sin(i * segmentRadians) * this.shipCompare.radiusScaleAbsolute(d.data))
+                    .attr("fill", (d, i) => {
+                        if (!i) {
+                            console.log("enter");
+                        }
+
+                        return this._shipCompare.colourScaleSpeedDiff(this._speedDiff[i]);
+                    });
+
                 g.append("title").text(
                     (d, i) => `${Math.round(d.data * 10) / 10} (${formatSignFloat(this._speedDiff[i], 1)}) knots`
                 );
             })
             .select("circle")
-            .attr("fill", (d, i) => this._shipCompare.colourScaleSpeedDiff(this._speedDiff[i]));
-        /*
-            .join(
-                enter =>
-                    enter
-                        .append("circle")
-                        .attr("class", "speed-markers")
-                        .attr("r", 5)
-                        .attr(
-                            "cy",
-                            (d, i) => Math.cos(i * segmentRadians) * -this.shipCompare.radiusScaleAbsolute(d.data)
-                        )
-                        .attr(
-                            "cx",
-                            (d, i) => Math.sin(i * segmentRadians) * this.shipCompare.radiusScaleAbsolute(d.data)
-                        )
-                        .append("title")
-                        .text(
-                            (d, i) =>
-                                `${Math.round(d.data * 10) / 10} (${formatSignFloat(this._speedDiff[i], 1)}) knots`
-                        ),
-                update => update.attr("fill", (d, i) => this._shipCompare.colourScaleSpeedDiff(this._speedDiff[i]))
-            );
+            .attr("fill", (d, i) => {
+                if (!i) {
+                    console.log("merge");
+                }
 
-         */
-        /*
-                        const g = enter.append("g").attr("class", "defence");
-
-                // Forts
-                g.append("path")
-         */
+                return this._shipCompare.colourScaleSpeedDiff(this._speedDiff[i]);
+            });
 
         colourRamp(d3Select(this._select), this._shipCompare.colourScaleSpeedDiff, this._speedDiff.length);
     }
@@ -1563,8 +1549,8 @@ export default class CompareShips {
                 const amount = property.isPercentage
                     ? formatSignPercent(property.amount / 100)
                     : property.amount < 1 && property.amount > 0
-                        ? formatPP(property.amount)
-                        : formatSignInt(property.amount);
+                    ? formatPP(property.amount)
+                    : formatSignInt(property.amount);
                 return `${property.modifier} ${amount}`;
             })
             .join("<br>")}</p>`;
@@ -1900,15 +1886,23 @@ export default class CompareShips {
     }
 
     /**
-     * Update sailing profile for compared ships
+     * Update sailing profile for compared ship
+     * @param {*} compareId - Column id
      * @returns {void}
      */
-    _updateSailingProfile() {
-        this._columnsCompare.forEach(compareId => {
-            if (!isEmpty(this._selectedShips[compareId])) {
-                console.log(compareId);
-                this._selectedShips[compareId].updateDifferenceProfile();
+    _updateSailingProfile(compareId) {
+        const update = id => {
+            if (id !== "Base" && !isEmpty(this._selectedShips[id])) {
+                console.log("_updateSailingProfile", id);
+                this._selectedShips[id].updateDifferenceProfile();
             }
+        };
+
+        // Update recent changes first
+        update(compareId);
+        // Then updadate the rest of columns
+        this._columnsCompare.forEach(otherCompareId => {
+            update(otherCompareId);
         });
     }
 
@@ -1948,8 +1942,7 @@ export default class CompareShips {
             );
         }
 
-        this._updateSailingProfile();
-        console.log(compareId, this._selectedShips);
+        this._updateSailingProfile(compareId);
     }
 
     /**
