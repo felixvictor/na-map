@@ -168,7 +168,7 @@ export default class PredictWind {
             .append("span")
             .classed("input-group-text", true)
             .append("i")
-            .classed("far fa-clock", true);
+            .classed("icon icon-clock", true);
 
         $(`#${this._timeGroupId}`).datetimepicker({
             defaultDate: moment.utc(),
