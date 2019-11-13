@@ -306,16 +306,7 @@ const config = {
             "window.jQuery": "jquery",
             moment: "moment",
             "window.moment": "moment",
-            Popper: ["popper.js", "default"],
-            // Alert: "exports-loader?Alert!bootstrap/js/dist/alert",
-            // Button: "exports-loader?Button!bootstrap/js/dist/button",
-            // Collapse: "exports-loader?Collapse!bootstrap/js/dist/collapse",
-            Dropdown: "exports-loader?Dropdown!bootstrap/js/dist/dropdown",
-            Modal: "exports-loader?Modal!bootstrap/js/dist/modal",
-            // Popover: "exports-loader?Popover!bootstrap/js/dist/popover",
-            Toast: "exports-loader?Tooltip!bootstrap/js/dist/toast",
-            Tooltip: "exports-loader?Tooltip!bootstrap/js/dist/tooltip",
-            Util: "exports-loader?Util!bootstrap/js/dist/util"
+            Popper: ["popper.js", "default"]
         }),
         // Do not include all moment locale files, certain locales are loaded by import
         new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
