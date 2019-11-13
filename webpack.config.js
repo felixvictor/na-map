@@ -31,6 +31,7 @@ const sitemapPaths = ["/fonts/", "/icons", "/images"];
 
 const dirFlags = path.resolve(__dirname, "src/images/flags");
 const dirFonts = path.resolve(__dirname, "src/fonts/");
+const dirIcons = path.resolve(__dirname, "src/icons");
 const dirOutput = path.resolve(__dirname, "public");
 const dirPrefixIcons = path.join("images", "icons");
 
@@ -239,6 +240,7 @@ const config = {
         alias: {
             Fonts: dirFonts,
             Flags: dirFlags,
+            Icons: dirIcons,
             "@fortawesome/fontawesome-free-regular$": "@fortawesome/fontawesome-free-regular/shakable.es.js",
             "@fortawesome/fontawesome-free-solid$": "@fortawesome/fontawesome-free-solid/shakable.es.js"
         },
@@ -436,6 +438,26 @@ const config = {
                         options: {
                             search: 'fill="#fff" fill-opacity=".7"/>',
                             replace: `fill="${primary300}" fill-opacity=".7"/>`
+                        }
+                    }
+                ]
+            },
+            {
+                test: /\.svg$/,
+                include: dirIcons,
+                use: [
+                    {
+                        loader: "svg-url-loader",
+                        options: {
+                            limit: 1000,
+                            name: "[name].[ext]",
+                            outputPath: "icons/"
+                        }
+                    },
+                    {
+                        loader: "image-webpack-loader",
+                        options: {
+                            svgo: svgoOpt
                         }
                     }
                 ]
