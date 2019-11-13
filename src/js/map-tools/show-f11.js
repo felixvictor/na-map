@@ -138,11 +138,11 @@ export default class ShowF11 {
 
         const button = buttonGroup
             .append("button")
-            .classed("btn btn-outline-secondary", true)
+            .classed("btn btn-outline-secondary icon-outline-button", true)
             .attr("id", this._copyButtonId)
             .attr("title", "Copy to clipboard (ctrl-c)")
             .attr("type", "button");
-        button.append("i").classed("far fa-copy", true);
+        button.append("i").classed("icon icon-copy", true);
         buttonGroup
             .append("button")
             .classed("btn btn-outline-secondary", true)
