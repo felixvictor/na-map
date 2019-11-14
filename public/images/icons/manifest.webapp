@@ -1,0 +1,14 @@
+{
+  "version": "8.16.1",
+  "name": "na-map",
+  "description": "Naval Action map",
+  "icons": {
+    "60": "/images/icons/firefox_app_60x60.png",
+    "128": "/images/icons/firefox_app_128x128.png",
+    "512": "/images/icons/firefox_app_512x512.png"
+  },
+  "developer": {
+    "name": null,
+    "url": null
+  }
+}
