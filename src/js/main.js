@@ -7,28 +7,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import "bootstrap/js/dist/util";
-import "bootstrap/js/dist/collapse";
-
-import { library as faLibrary, dom as faDom } from "@fortawesome/fontawesome-svg-core";
-import { faCalendar, faCalendarCheck, faClock, faCopy } from "@fortawesome/free-regular-svg-icons";
-import {
-    faArrowDown,
-    faArrowUp,
-    faChevronLeft,
-    faChevronRight,
-    faCog,
-    faDonate,
-    faEraser,
-    faInfoCircle,
-    faPaste,
-    faSort,
-    faSortDown,
-    faSortUp,
-    faTimes,
-    faTrash
-} from "@fortawesome/free-solid-svg-icons";
-
 import { initAnalytics, registerPage } from "./analytics";
 import { servers } from "./servers";
 import { putImportError } from "./util";
@@ -196,28 +174,6 @@ function main() {
             .getElementById("game-tools-dropdown")
             .addEventListener("click", () => loadGameTools(serverId, searchParams), { once: true });
     };
-
-    faLibrary.add(
-        faArrowDown,
-        faArrowUp,
-        faCalendar,
-        faCalendarCheck,
-        faChevronLeft,
-        faChevronRight,
-        faClock,
-        faCog,
-        faCopy,
-        faDonate,
-        faEraser,
-        faInfoCircle,
-        faPaste,
-        faSort,
-        faSortDown,
-        faSortUp,
-        faTimes,
-        faTrash
-    );
-    faDom.watch();
 
     initAnalytics();
     registerPage("Homepage");
