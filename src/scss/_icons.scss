@@ -1,0 +1,39 @@
+////
+/// This file is part of na-map.
+/// bytesize-icons definitions.
+///
+/// copyright 2019
+/// license   http://www.gnu.org/licenses/gpl.html
+/// @group    main
+/// @author   iB aka Felix Victor
+////
+
+/// Icons
+/// https://github.com/danklammer/bytesize-icons
+
+$icon-dir: "~Icons";
+
+.icon {
+    display: inline-block;
+    vertical-align: middle;
+    width: 24px;
+    height: 24px;
+    overflow: visible;
+    background-color: $body-color;
+}
+
+.icon-navbar {
+    background-color: $navbar-light-color;
+}
+
+.icon-outline-button:hover {
+    background-color: $primary-100;
+}
+
+$icon-list: calendar clear clock copy gift info options;
+
+@each $icon in $icon-list {
+    .icon-#{$icon} {
+        mask-image: url("#{$icon-dir}/icon-#{$icon}.svg");
+    }
+}
