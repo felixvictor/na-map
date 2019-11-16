@@ -2,15 +2,15 @@
 /// This file is part of na-map.
 /// Display.
 ///
-/// copyright 2017-18
+/// copyright 2017, 2018, 2019
 /// license   http://www.gnu.org/licenses/gpl.html
 /// @group    main
 /// @author   iB aka Felix Victor
 ////
 
-$background-colour: $primary-500 !default;
-$paddingHalf: map-get($spacers, 2) !default;
-$paddingThird: map-get($spacers, 1) !default;
+$background-colour: $primary-600;
+$paddingHalf: map-get($spacers, 2);
+$paddingThird: map-get($spacers, 1);
 
 // opentype
 
@@ -188,7 +188,7 @@ text {
     }
 
     circle {
-        fill: $secondary-600;
+        fill: $secondary-050;
         fill-opacity: 0.2;
     }
 
@@ -208,7 +208,7 @@ text {
 
     path {
         fill: none;
-        stroke: $secondary-600;
+        stroke: $secondary-050;
         stroke-width: 0.3rem;
     }
 
@@ -223,7 +223,7 @@ text {
         }
 
         .drag-active {
-            stroke: $secondary-100;
+            stroke: $secondary-050;
             stroke-width: 0.25rem;
         }
 
@@ -240,12 +240,12 @@ text {
 .compass {
     circle,
     line {
-        stroke: $secondary-400;
+        stroke: $secondary-050;
         stroke-width: 0.1rem;
     }
 
     text {
-        fill: $secondary-600;
+        fill: $secondary-050;
         text-anchor: middle;
         dominant-baseline: central;
     }
@@ -254,7 +254,7 @@ text {
 .small {
     circle,
     line {
-        stroke: $secondary-400;
+        stroke: $secondary-700;
         stroke-width: 0.05rem;
     }
 
@@ -298,7 +298,7 @@ text {
 }
 
 .course-head {
-    fill: $secondary-600 !important;
+    fill: $secondary-050 !important;
 }
 
 .wind-head {
@@ -334,7 +334,7 @@ text {
 
 .wind-text-current {
     font-size: smaller;
-    fill: $secondary-600 !important;
+    fill: $secondary-700 !important;
 }
 
 .trades {
@@ -554,11 +554,12 @@ svg {
     }
 
     line {
-        stroke: $primary-600;
+        stroke: $primary-500;
     }
 
     text {
         font-style: italic;
+        fill: $primary-100;
     }
 }
 
@@ -603,7 +604,7 @@ svg {
 }
 
 .column-comp {
-    background-color: $secondary-050;
+    background-color: $white;
     font-variant-numeric: normal; // onum off
 }
 
@@ -624,7 +625,7 @@ svg {
 
 .ship-compare {
     .row-light {
-        background-color: $secondary-100;
+        background-color: $secondary-050;
     }
 }
 
@@ -720,7 +721,7 @@ svg {
 }
 
 .pb-circle {
-    fill: $primary-900;
+    fill: $primary-800;
 }
 
 .pb-text {
@@ -764,15 +765,13 @@ svg {
 }
 
 .raid-join-circle {
-    stroke: $secondary-500;
+    stroke: $secondary-300;
     stroke-width: 1px;
     fill: none;
 }
 
 .pb-join-circle {
     @extend .raid-join-circle;
-    fill: $secondary-300;
-    fill-opacity: 0.4;
 }
 
 // capital ports
