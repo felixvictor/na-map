@@ -25,6 +25,87 @@
 
 <body>
 
+<% /*  %>
+<div class="row">
+    <div class="col-sm-3 colour-palette">
+        <div class="colour-slab colour-slab-base primary-500">500 primary</div>
+        <div class="colour-slab primary-050">50</div>
+        <div class="colour-slab primary-100">100</div>
+        <div class="colour-slab primary-200">200</div>
+        <div class="colour-slab primary-300">300</div>
+        <div class="colour-slab primary-400">400</div>
+        <div class="colour-slab primary-500">500</div>
+        <div class="colour-slab primary-600">600</div>
+        <div class="colour-slab primary-700">700</div>
+        <div class="colour-slab primary-800">800</div>
+        <div class="colour-slab primary-900">900</div>
+    </div>
+
+    <div class="col-sm-3 colour-palette">
+        <div class="colour-slab colour-slab-base secondary-500">500 secondary</div>
+        <div class="colour-slab secondary-050">50</div>
+        <div class="colour-slab secondary-100">100</div>
+        <div class="colour-slab secondary-200">200</div>
+        <div class="colour-slab secondary-300">300</div>
+        <div class="colour-slab secondary-400">400</div>
+        <div class="colour-slab secondary-500">500</div>
+        <div class="colour-slab secondary-600">600</div>
+        <div class="colour-slab secondary-700">700</div>
+        <div class="colour-slab secondary-800">800</div>
+        <div class="colour-slab secondary-900">900</div>
+    </div>
+
+    <div class="col-sm-3 colour-palette">
+        <div class="colour-slab colour-slab-base gray-500">500 gray</div>
+        <div class="colour-slab gray-100">100</div>
+        <div class="colour-slab gray-200">200</div>
+        <div class="colour-slab gray-300">300</div>
+        <div class="colour-slab gray-400">400</div>
+        <div class="colour-slab gray-500">500</div>
+        <div class="colour-slab gray-600">600</div>
+        <div class="colour-slab gray-700">700</div>
+        <div class="colour-slab gray-800">800</div>
+        <div class="colour-slab gray-900">900</div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-2 colour-palette">
+        <div class="colour-slab colour-slab-base success">success</div>
+    </div>
+    <div class="col-sm-2 colour-palette">
+        <div class="colour-slab colour-slab-base info">info</div>
+    </div>
+    <div class="col-sm-2 colour-palette">
+        <div class="colour-slab colour-slab-base warning">warning</div>
+    </div>
+    <div class="col-sm-2 colour-palette">
+        <div class="colour-slab colour-slab-base danger">danger</div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-2 colour-palette">
+        <div class="colour-slab colour-slab-base white">white</div>
+    </div>
+    <div class="col-sm-2 colour-palette">
+        <div class="colour-slab colour-slab-base light">light</div>
+    </div>
+    <div class="col-sm-2 colour-palette">
+        <div class="colour-slab colour-slab-base gray">gray</div>
+    </div>
+    <div class="col-sm-2 colour-palette">
+        <div class="colour-slab colour-slab-base dark">dark</div>
+    </div>
+    <div class="col-sm-2 colour-palette">
+        <div class="colour-slab colour-slab-base gray-dark">gray-dark</div>
+    </div>
+    <div class="col-sm-2 colour-palette">
+        <div class="colour-slab colour-slab-base black">black</div>
+    </div>
+</div>
+<%  */ %>
+
 <nav class="navbar navbar-expand-lg navbar-light">
     <a class="navbar-brand" href="/">
         <img src="<%= htmlWebpackPlugin.options.iconSmall %>" width="32" height="32" alt="Brand">
@@ -97,7 +178,7 @@
                                                    id="prop-pb-from-input" required/>
                                             <div class="input-group-append" data-target="#prop-pb-from"
                                                  data-toggle="datetimepicker">
-                                                <span class="input-group-text"><i class="far fa-clock"></i></span>
+                                                <span class="input-group-text"><i class="icon icon-clock"></i></span>
                                             </div>
                                         </div>
                                     </div>
@@ -110,7 +191,7 @@
                                                    id="prop-pb-to-input" required/>
                                             <div class="input-group-append" data-target="#prop-pb-to"
                                                  data-toggle="datetimepicker">
-                                                <span class="input-group-text"><i class="far fa-clock"></i></span>
+                                                <span class="input-group-text"><i class="icon icon-options"></i></span>
                                             </div>
                                         </div>
                                     </div>
@@ -149,7 +230,7 @@
                                                    id="prop-from-input" required/>
                                             <div class="input-group-append" data-target="#prop-from"
                                                  data-toggle="datetimepicker">
-                                                <span class="input-group-text"><i class="far fa-calendar"></i></span>
+                                                <span class="input-group-text"><i class="icon icon-calendar"></i></span>
                                             </div>
                                         </div>
                                     </div>
@@ -162,7 +243,7 @@
                                                    required/>
                                             <div class="input-group-append" data-target="#prop-to"
                                                  data-toggle="datetimepicker">
-                                                <span class="input-group-text"><i class="far fa-calendar"></i></span>
+                                                <span class="input-group-text"><i class="icon icon-calendar"></i></span>
                                             </div>
                                         </div>
                                     </div>
@@ -245,7 +326,8 @@
                 <a class="nav-link dropdown-toggle" href="#" id="settingsDropdown" role="button"
                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Settings"
                    aria-label="Settings">
-                    <i class="fas fa-cog text-secondary" aria-hidden="true"></i><span class="sr-only">Settings</span>
+                    <i class="icon icon-options icon-navbar" aria-hidden="true"></i><span
+                            class="sr-only">Settings</span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-right extralarge-width" id="settingsMenu"
                      aria-labelledby="settingsDropdown">
@@ -390,16 +472,15 @@
         </ul>
 
         <div class="btn-group" role="group">
+            <button type="button" id="reset" class="btn px-2" title="Clear" aria-label="Clear">
+                <i class="icon icon-clear icon-navbar" aria-hidden="true"></i><span class="sr-only">Clear</span>
+            </button>
             <a role="button" class="btn px-2" target="_blank" rel=”noopener” title="Donate" aria-label="Donate"
                href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=MHRQ7ZGR88XSG&source=url">
-                <i class="fas fa-donate text-primary" aria-hidden="true"></i><span class="sr-only">Donate</span>
+                <i class="icon icon-gift icon-navbar" aria-hidden="true"></i><span class="sr-only">Donate</span>
             </a>
-            <button type="button" id="reset" class="btn px-2" title="Clear" aria-label="Clear"><i
-                        class="fas fa-eraser text-secondary" aria-hidden="true"></i><span class="sr-only">Clear</span>
-            </button>
-            <button type="button" id="about" class="btn px-2" title="About" aria-label="About"><i
-                        class="fas fa-info-circle text-secondary" aria-hidden="true"></i><span
-                        class="sr-only">About</span>
+            <button type="button" id="about" class="btn px-2" title="About" aria-label="About">
+                <i class="icon icon-info icon-navbar" aria-hidden="true"></i><span class="sr-only">About</span>
             </button>
         </div>
     </div>
@@ -418,11 +499,11 @@
 
 </main>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"
-        integrity="sha384-vk5WoKIaW/vJyUAd9n/wmopsmNhiy+L2Z+SBxGYnUkunIxVxAv/UtMOhba/xskxh"
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.slim.min.js"
+        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
         crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.15.0/umd/popper.min.js"
-        integrity="sha384-L2pyEeut/H3mtgCBaUNw7KWzp5n9+4pDQiExs933/5QfaTh8YStYFFkOzSoXjlTb"
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
         crossorigin="anonymous"></script>
 </body>
 </html>

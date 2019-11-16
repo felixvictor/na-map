@@ -15,7 +15,7 @@ const ExtractCssChunks = require("extract-css-chunks-webpack-plugin");
 const SitemapPlugin = require("sitemap-webpack-plugin").default;
 const SriPlugin = require("webpack-subresource-integrity");
 const TerserPlugin = require("terser-webpack-plugin");
-const WebpackPwaManifest = require("webpack-pwa-manifest");
+const FaviconsPlugin = require("favicons-webpack-plugin");
 const { isProduction } = require("webpack-mode");
 const servers = require("./src/js/servers");
 const PACKAGE = require("./package.json");
@@ -25,9 +25,19 @@ const libraryName = PACKAGE.name;
 const { TARGET } = process.env;
 const target = `https://${TARGET}.netlify.com/`;
 
-const description =
-    "Yet another map with in-game map, F11 coordinates, resources, ship and wood comparison. Port data is updated constantly from twitter and daily after maintenance.";
+const descriptionLong =
+    "Yet another map with in-game map, resources, ship and wood comparisons. Port battle data is updated constantly from twitter and all data daily after maintenance.";
 const sitemapPaths = ["/fonts/", "/icons", "/images"];
+
+const dirFlags = path.resolve(__dirname, "src/images/flags");
+const dirFonts = path.resolve(__dirname, "src/fonts/");
+const dirIcons = path.resolve(__dirname, "src/icons");
+const dirOutput = path.resolve(__dirname, "public");
+const dirPrefixIcons = path.join("images", "icons");
+
+const fileLogo = path.resolve("src", "images", "icons", "logo.png");
+const filePostcssConfig = "build/postcss.config.js";
+const fileScssPreCompile = path.resolve("src", "scss", "pre-compile.scss");
 
 /** Set colours
  * @returns {Map} Colours
@@ -35,7 +45,7 @@ const sitemapPaths = ["/fonts/", "/icons", "/images"];
 function setColours() {
     const css = sass
         .renderSync({
-            file: path.resolve("src", "scss", "pre-compile.scss")
+            file: fileScssPreCompile
         })
         .css.toString();
     const parsedCss = parseCss.parse(css);
@@ -62,8 +72,6 @@ const colourRed = colours.get("red");
 const colourRedLight = colours.get("red-light");
 const colourRedDark = colours.get("red-dark");
 const colourWhite = colours.get("white");
-
-const outputPath = path.resolve(__dirname, "public");
 
 const babelOpt = {
     cacheDirectory: true,
@@ -102,27 +110,9 @@ const htmlMinifyOpt = {
     sortClassName: true
 };
 
-const imagewebpackOpt = {
-    gifsicle: {
-        optimizationLevel: 3,
-        interlaced: false
-    },
-    mozjpeg: {
-        quality: 70,
-        progressive: true
-    },
-    optipng: {
-        optimizationLevel: 0
-    },
-    pngquant: {
-        floyd: 0.5,
-        speed: 2
-    }
-};
-
 const postcssOpt = {
     config: {
-        path: "build/postcss.config.js"
+        path: filePostcssConfig
     },
     sourceMap: true
 };
@@ -187,11 +177,11 @@ const svgoOpt = {
 };
 
 const htmlOpt = {
-    iconSmall: "images/icons/icon_32x32.png",
-    iconLarge: "images/icons/icon_1024x1024.png",
+    iconSmall: `${dirPrefixIcons}/android-chrome-48x48.png`,
+    iconLarge: `${dirPrefixIcons}/firefox_app_512x512.png`,
     canonicalUrl: TARGET === "na-map" ? target : "",
     name: libraryName,
-    description,
+    description: descriptionLong,
     hash: false,
     inject: "body",
     lang: "en-GB",
@@ -202,30 +192,40 @@ const htmlOpt = {
     title: PACKAGE.description
 };
 
-const manifestOpt = {
-    background_color: backgroundColour,
-    description: PACKAGE.description,
-    display: "standalone",
-    fingerprints: false,
-    icons: [
-        {
-            src: path.resolve("src", "images", "icons", "logo.png"),
-            sizes: [32, 72, 96, 128, 144, 168, 192, 256, 384, 512, 1024],
-            destination: path.join("images", "icons")
-        }
-    ],
-    ios: false,
-    lang: "en-GB",
-    name: PACKAGE.name,
-    short_name: PACKAGE.name,
-    theme_color: themeColour
+const faviconsOpt = {
+    logo: fileLogo,
+    cache: true,
+    devMode: "webapp",
+    inject: true,
+    prefix: dirPrefixIcons,
+    favicons: {
+        appDescription: PACKAGE.description,
+        appName: PACKAGE.name,
+        appShortName: PACKAGE.name,
+        background: backgroundColour,
+        fingerprints: false,
+        icons: {
+            android: true,
+            appleIcon: false,
+            appleStartup: false,
+            coast: false,
+            favicons: false,
+            firefox: true,
+            windows: true,
+            yandex: false
+        },
+        lang: "en-GB",
+        start_url: "/",
+        theme_color: themeColour,
+        version: PACKAGE.version
+    }
 };
 
 const config = {
     context: path.resolve(__dirname, "src"),
 
     devServer: {
-        contentBase: outputPath,
+        contentBase: dirOutput,
         disableHostCheck: true
     },
 
@@ -238,9 +238,9 @@ const config = {
 
     resolve: {
         alias: {
-            Fonts: path.resolve(__dirname, "src/fonts/"),
-            Icons: path.resolve(__dirname, "src/icons/"),
-            Images: path.resolve(__dirname, "src/images/"),
+            Fonts: dirFonts,
+            Flags: dirFlags,
+            Icons: dirIcons,
             "@fortawesome/fontawesome-free-regular$": "@fortawesome/fontawesome-free-regular/shakable.es.js",
             "@fortawesome/fontawesome-free-solid$": "@fortawesome/fontawesome-free-solid/shakable.es.js"
         },
@@ -257,7 +257,7 @@ const config = {
     output: {
         chunkFilename: isProduction ? "[name].[chunkhash].js" : "[name].js",
         filename: isProduction ? "[name].[contenthash].js" : "[name].js",
-        path: outputPath,
+        path: dirOutput,
         crossOriginLoading: "anonymous"
     },
 
@@ -289,10 +289,10 @@ const config = {
             CREDDARK: JSON.stringify(colourRedDark),
             CWHITE: JSON.stringify(colourWhite),
             NAME: JSON.stringify(libraryName),
-            DESCRIPTION: JSON.stringify(description),
+            DESCRIPTION: JSON.stringify(descriptionLong),
             TITLE: JSON.stringify(PACKAGE.description),
             VERSION: JSON.stringify(PACKAGE.version),
-            ICONSMALL: JSON.stringify("images/icons/icon_32x32.png"),
+            ICONSMALL: JSON.stringify("images/icons/android-chrome-48x48.png"),
             REPAIR_ARMOR_VOLUME: JSON.stringify(repairs.armorRepair.volume),
             REPAIR_ARMOR_PERCENT: JSON.stringify(repairs.armorRepair.percent),
             REPAIR_ARMOR_TIME: JSON.stringify(repairs.armorRepair.time),
@@ -308,16 +308,7 @@ const config = {
             "window.jQuery": "jquery",
             moment: "moment",
             "window.moment": "moment",
-            Popper: ["popper.js", "default"],
-            // Alert: "exports-loader?Alert!bootstrap/js/dist/alert",
-            // Button: "exports-loader?Button!bootstrap/js/dist/button",
-            // Collapse: "exports-loader?Collapse!bootstrap/js/dist/collapse",
-            Dropdown: "exports-loader?Dropdown!bootstrap/js/dist/dropdown",
-            Modal: "exports-loader?Modal!bootstrap/js/dist/modal",
-            // Popover: "exports-loader?Popover!bootstrap/js/dist/popover",
-            Toast: "exports-loader?Tooltip!bootstrap/js/dist/toast",
-            Tooltip: "exports-loader?Tooltip!bootstrap/js/dist/tooltip",
-            Util: "exports-loader?Util!bootstrap/js/dist/util"
+            Popper: ["popper.js", "default"]
         }),
         // Do not include all moment locale files, certain locales are loaded by import
         new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
@@ -325,20 +316,19 @@ const config = {
             { from: "../netlify.toml" },
             {
                 from: "data/*.json",
-                to: `${outputPath}/data`,
+                to: `${dirOutput}/data`,
                 flatten: true
             },
             { from: "data/*.xlsx", flatten: true },
             { from: "google979f2cf3bed204d6.html", to: "google979f2cf3bed204d6.html", toType: "file" },
-            { from: "images/icons/favicon.ico", flatten: true },
-            { from: "images/map", to: `${outputPath}/images/map` }
+            { from: "images/map", to: `${dirOutput}/images/map` }
         ]),
         new HtmlPlugin(htmlOpt),
         new SitemapPlugin(target, sitemapPaths, { skipGzip: false }),
-        new WebpackPwaManifest(manifestOpt),
+        new FaviconsPlugin(faviconsOpt),
         new webpack.HashedModuleIdsPlugin(),
         new SriPlugin({
-            hashFuncNames: ["sha256", "sha384"],
+            hashFuncNames: ["sha384"],
             enabled: isProduction
         })
     ],
@@ -402,7 +392,7 @@ const config = {
             },
             {
                 test: /\.(woff2?|ttf|eot|svg)$/,
-                include: path.resolve(__dirname, "src/fonts"),
+                include: dirFonts,
                 use: {
                     loader: "file-loader",
                     options: {
@@ -412,52 +402,15 @@ const config = {
                 }
             },
             {
-                test: /\.(gif|png|jpe?g)$/i,
-                include: path.resolve(__dirname, "src/images"),
-                use: [
-                    {
-                        loader: "file-loader",
-                        options: {
-                            name: "[name].[ext]",
-                            outputPath: "images/"
-                        }
-                    },
-                    {
-                        loader: "image-webpack-loader",
-                        options: imagewebpackOpt
-                    }
-                ]
-            },
-            {
                 test: /\.svg$/,
-                include: path.resolve(__dirname, "src/images"),
-                use: [
-                    {
-                        loader: "svg-url-loader",
-                        options: {
-                            limit: 1,
-                            name: "[name].[ext]",
-                            outputPath: "images/"
-                        }
-                    },
-                    {
-                        loader: "image-webpack-loader",
-                        options: {
-                            svgo: svgoOpt
-                        }
-                    }
-                ]
-            },
-            {
-                test: /\.svg$/,
-                include: path.resolve(__dirname, "src/icons"),
+                include: dirFlags,
                 use: [
                     {
                         loader: "svg-url-loader",
                         options: {
                             limit: 1000,
                             name: "[name].[ext]",
-                            outputPath: "icons/"
+                            outputPath: "images/flags/"
                         }
                     },
                     {
@@ -485,6 +438,26 @@ const config = {
                         options: {
                             search: 'fill="#fff" fill-opacity=".7"/>',
                             replace: `fill="${primary300}" fill-opacity=".7"/>`
+                        }
+                    }
+                ]
+            },
+            {
+                test: /\.svg$/,
+                include: dirIcons,
+                use: [
+                    {
+                        loader: "svg-url-loader",
+                        options: {
+                            limit: 1000,
+                            name: "[name].[ext]",
+                            outputPath: "icons/"
+                        }
+                    },
+                    {
+                        loader: "image-webpack-loader",
+                        options: {
+                            svgo: svgoOpt
                         }
                     }
                 ]
