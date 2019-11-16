@@ -328,7 +328,7 @@ const config = {
         new FaviconsPlugin(faviconsOpt),
         new webpack.HashedModuleIdsPlugin(),
         new SriPlugin({
-            hashFuncNames: ["sha256", "sha384"],
+            hashFuncNames: ["sha384"],
             enabled: isProduction
         })
     ],
