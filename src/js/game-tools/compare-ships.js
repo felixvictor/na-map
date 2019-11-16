@@ -529,10 +529,10 @@ class ShipBase extends Ship {
             limitBack: this.shipData.deckClassLimit[5],
             firezoneHorizontalWidth: this.shipData.ship.firezoneHorizontalWidth,
             waterlineHeight: formatFloat(this.shipData.ship.waterlineHeight),
-            maxSpeed: formatFloat(this.shipData.speed.max, 3),
+            maxSpeed: formatFloat(this.shipData.speed.max, 4),
             acceleration: formatFloat(this.shipData.ship.acceleration),
             deceleration: formatFloat(this.shipData.ship.deceleration),
-            maxTurningSpeed: formatFloat(this.shipData.rudder.turnSpeed),
+            maxTurningSpeed: formatFloat(this.shipData.rudder.turnSpeed, 3),
             halfturnTime: formatFloat(this.shipData.rudder.halfturnTime),
             sideArmor: `${formatInt(this.shipData.sides.armour)}\u00A0<span class="badge badge-white">${formatInt(
                 this.shipData.sides.thickness
@@ -740,10 +740,10 @@ class ShipComparison extends Ship {
                 this.shipBaseData.battleRating
             )}`,
             guns: `${this.shipCompareData.guns}\u00A0${getDiff(this.shipCompareData.guns, this.shipBaseData.guns)}`,
-            decks: `${this.shipCompareData.decks} deck${this.shipCompareData.decks > 1 ? "s" : ""}\u00A0${getDiff(
+            decks: `${this.shipCompareData.decks}\u00A0${getDiff(
                 this.shipCompareData.decks,
                 this.shipBaseData.decks
-            )}`,
+            )} deck${this.shipCompareData.decks > 1 ? "s" : ""}`,
             additionalRow: `${this.shipCompareData.decks < 4 ? "<br>\u00A0" : ""}`,
             cannonsPerDeck: Ship.getCannonsPerDeck(
                 this.shipCompareData.deckClassLimit,
