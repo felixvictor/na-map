@@ -12,9 +12,10 @@ import "bootstrap/js/dist/util";
 import "bootstrap/js/dist/modal";
 import "bootstrap/js/dist/tooltip";
 
-import { ascending as d3Ascending, min as d3Min, range as d3Range } from "d3-array";
+import { ascending as d3Ascending, max as d3Max, min as d3Min, range as d3Range } from "d3-array";
 import { nest as d3Nest } from "d3-collection";
-import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate";
+import { interpolateCubehelixLong as d3InterpolateCubehelixLong } from "d3-interpolate";
+
 import { scaleLinear as d3ScaleLinear } from "d3-scale";
 import { select as d3Select } from "d3-selection";
 import {
@@ -27,12 +28,9 @@ import {
 import { registerEvent } from "../analytics";
 import {
     appVersion,
-    colourGreen,
     colourGreenDark,
-    colourGreenLight,
-    colourRed,
     colourRedDark,
-    colourRedLight,
+    colourWhite,
     hashids,
     hullRepairsPercent,
     hullRepairsVolume,
@@ -44,6 +42,7 @@ import {
     insertBaseModal
 } from "../common";
 import {
+    // colourRamp,
     copyToClipboard,
     formatFloat,
     formatInt,
@@ -51,6 +50,7 @@ import {
     formatPercent,
     formatPP,
     formatSignInt,
+    formatSignFloat,
     formatSignPercent,
     getOrdinal,
     isEmpty,
@@ -372,7 +372,6 @@ class ShipBase extends Ship {
         this._shipCompareData = shipCompareData;
 
         this._setBackground();
-        this._setBackgroundGradient();
         this._drawProfile();
         this._printText();
     }
@@ -413,43 +412,6 @@ class ShipBase extends Ship {
                     .attr("href", (d, i) => `#tick${i}`)
                     .text((d, i) => this._ticksSpeedLabels[i])
                     .attr("startOffset", "10%")
-            );
-    }
-
-    /**
-     * Set Background gradient
-     * @returns {void}
-     */
-    _setBackgroundGradient() {
-        // Extra scale since the color scale is interpolated
-        const gradientScale = d3ScaleLinear()
-            .domain([this.shipData.speed.min, this.shipData.speed.max])
-            .range([0, this.shipCompareData.svgWidth]);
-
-        // Calculate the variables for the gradient
-        const numberStops = 30;
-        const gradientDomain = gradientScale.domain();
-        gradientDomain[2] = gradientDomain[1] - gradientDomain[0];
-        const gradientPoint = [];
-        for (let i = 0; i < numberStops; i += 1) {
-            gradientPoint.push((i * gradientDomain[2]) / (numberStops - 1) + gradientDomain[0]);
-        }
-
-        // Create the gradient
-        this.g
-            .append("defs")
-            .append("radialGradient")
-            .attr("id", "gradient")
-            .attr("cx", 0.5)
-            .attr("cy", 0.25)
-            .attr("r", 0.5)
-            .selectAll("stop")
-            .data(d3Range(numberStops))
-            .join(enter =>
-                enter
-                    .append("stop")
-                    .attr("offset", (d, i) => gradientScale(gradientPoint[i]) / this.shipCompareData.svgWidth)
-                    .attr("stop-color", (d, i) => this.shipCompareData.colorScale(gradientPoint[i]))
             );
     }
 
@@ -498,6 +460,8 @@ class ShipBase extends Ship {
                     .append("title")
                     .text(d => `${Math.round(d.data * 10) / 10} knots`)
             );
+
+        // colourRamp(d3Select(this._select), this.shipCompareData.colorScale, this.shipData.speedDegrees.length);
     }
 
     /**
@@ -630,8 +594,35 @@ class ShipComparison extends Ship {
         this._shipCompareData = shipCompareData;
         this._shipCompare = shipCompare;
 
+        this._pie = d3Pie()
+            .sort(null)
+            .value(1);
+        const curve = d3CurveCatmullRomClosed;
+        this._line = d3RadialLine()
+            .angle((d, i) => i * segmentRadians)
+            .radius(d => this.shipCompare.radiusScaleAbsolute(d.data))
+            .curve(curve);
+        this._arcsBase = this._pie(this.shipBaseData.speedDegrees);
+        this._arcsComp = this._pie(this.shipCompareData.speedDegrees);
+        this._speedDiff = this.shipCompareData.speedDegrees.map((speedShipCompare, i) =>
+            roundToThousands(speedShipCompare - this.shipBaseData.speedDegrees[i])
+        );
+        this._minSpeedDiff = d3Min(this._speedDiff);
+        this._maxSpeedDiff = d3Max(this._speedDiff);
+
         this._drawDifferenceProfile();
         this._injectTextComparison();
+    }
+
+    _setColourScale(minSpeedDiff, maxSpeedDiff) {
+        // Compare with current min/max domain values
+        const min = Math.min(minSpeedDiff, this._shipCompare.colourScaleSpeedDiff.domain()[0]);
+        const max = Math.max(
+            maxSpeedDiff,
+            this._shipCompare.colourScaleSpeedDiff.domain()[this._shipCompare.colourScaleSpeedDiff.domain().length - 1]
+        );
+
+        this._shipCompare.colourScaleSpeedDiff.domain([min, 0, max]);
     }
 
     /**
@@ -639,52 +630,46 @@ class ShipComparison extends Ship {
      * @returns {void}
      */
     _drawDifferenceProfile() {
-        const pie = d3Pie()
-            .sort(null)
-            .value(1);
-        const arcsComp = pie(this.shipCompareData.speedDegrees);
-        const arcsBase = pie(this.shipBaseData.speedDegrees);
-        const curve = d3CurveCatmullRomClosed;
-        const line = d3RadialLine()
-            .angle((d, i) => i * segmentRadians)
-            .radius(d => this.shipCompare.radiusScaleAbsolute(d.data))
-            .curve(curve);
-        const speedDiff = this.shipCompareData.speedDegrees.map((speedShipCompare, i) =>
-            roundToThousands(speedShipCompare - this.shipBaseData.speedDegrees[i])
-        );
-        const min = this._shipCompare._minSpeed;
-        const max = this._shipCompare._maxSpeed;
-        const colourScale = d3ScaleLinear()
-            .domain([min, -1, -0.1, 0, 0.1, 1, max])
-            .range([colourRedDark, colourRed, colourRedLight, "#fff", colourGreenLight, colourGreen, colourGreenDark])
-            .interpolate(d3InterpolateHcl);
-
         // Base profile shape
         this.g
             .append("path")
             .attr("class", "base-profile")
-            .attr("d", line(arcsBase));
+            .attr("d", this._line(this._arcsBase));
 
         // Comp profile lines
         this.g
             .append("path")
             .attr("class", "comp-profile")
-            .attr("d", line(arcsComp));
+            .attr("d", this._line(this._arcsComp));
+    }
+
+    /**
+     * Update difference profile
+     * @returns {void}
+     */
+    updateDifferenceProfile() {
+        this._setColourScale(this._minSpeedDiff, this._maxSpeedDiff);
 
         this.g
-            .selectAll(".speed-markers")
-            .data(arcsComp)
-            .join(enter =>
-                enter
-                    .append("circle")
-                    .attr("class", "speed-markers")
+            .selectAll("g.speed-markers")
+            .data(this._arcsComp)
+            .join(enter => {
+                const g = enter.append("g").attr("class", "speed-markers");
+
+                g.append("circle")
                     .attr("r", 5)
                     .attr("cy", (d, i) => Math.cos(i * segmentRadians) * -this.shipCompare.radiusScaleAbsolute(d.data))
                     .attr("cx", (d, i) => Math.sin(i * segmentRadians) * this.shipCompare.radiusScaleAbsolute(d.data))
-                    .attr("fill", (d, i) => colourScale(speedDiff[i]))
-                    .append("title")
-                    .text(d => `${Math.round(d.data * 10) / 10} knots`)
-            );
+                    .attr("fill", (d, i) => this._shipCompare.colourScaleSpeedDiff(this._speedDiff[i]));
+
+                g.append("title").text(
+                    (d, i) => `${Math.round(d.data * 10) / 10} (${formatSignFloat(this._speedDiff[i], 1)}) knots`
+                );
+            })
+            .select("circle")
+            .attr("fill", (d, i) => this._shipCompare.colourScaleSpeedDiff(this._speedDiff[i]));
+
+        // colourRamp(d3Select(this._select), this._shipCompare.colourScaleSpeedDiff, this._speedDiff.length);
     }
 
     /**
@@ -980,6 +965,10 @@ export default class CompareShips {
         this._moduleId = `${this._baseId}-module`;
         this._copyButtonId = `button-copy-${this._baseId}`;
 
+        this.colourScaleSpeedDiff = d3ScaleLinear()
+            .range([colourRedDark, colourWhite, colourGreenDark])
+            .interpolate(d3InterpolateCubehelixLong);
+
         this._shipIds = [];
         this._selectedUpgradeIdsPerType = [];
         this._selectedUpgradeIdsList = [];
@@ -1130,9 +1119,9 @@ export default class CompareShips {
         this._minSpeed = theoreticalMinSpeed;
         this._maxSpeed = theoreticalMaxSpeed;
         this._colorScale = d3ScaleLinear()
-            .domain([this._minSpeed, 0, 8, 12, this._maxSpeed])
-            .range([colourRed, "#fff", colourGreenLight, colourGreen, colourGreenDark])
-            .interpolate(d3InterpolateHcl);
+            .domain([this._minSpeed, 0, this._maxSpeed])
+            .range([colourRedDark, colourWhite, colourGreenDark])
+            .interpolate(d3InterpolateCubehelixLong);
     }
 
     async _loadAndSetupData() {
@@ -1356,12 +1345,12 @@ export default class CompareShips {
         const footer = d3Select(`#${this._modalId} .modal-footer`);
         footer
             .insert("button", "button")
-            .classed("btn btn-outline-secondary", true)
+            .classed("btn btn-outline-secondary icon-outline-button", true)
             .attr("id", this._copyButtonId)
             .attr("title", "Copy to clipboard (ctrl-c)")
             .attr("type", "button")
             .append("i")
-            .classed("far fa-copy", true);
+            .classed("icon icon-copy", true);
     }
 
     _initData() {
@@ -1506,8 +1495,8 @@ export default class CompareShips {
                 const amount = property.isPercentage
                     ? formatSignPercent(property.amount / 100)
                     : property.amount < 1 && property.amount > 0
-                        ? formatPP(property.amount)
-                        : formatSignInt(property.amount);
+                    ? formatPP(property.amount)
+                    : formatSignInt(property.amount);
                 return `${property.modifier} ${amount}`;
             })
             .join("<br>")}</p>`;
@@ -1843,6 +1832,28 @@ export default class CompareShips {
     }
 
     /**
+     * Update sailing profile for compared ship
+     * @param {*} compareId - Column id
+     * @returns {void}
+     */
+    _updateSailingProfile(compareId) {
+        const update = id => {
+            if (id !== "Base" && !isEmpty(this._selectedShips[id])) {
+                this._selectedShips[id].updateDifferenceProfile();
+            }
+        };
+
+        // Update recent changes first
+        update(compareId);
+        // Then update the rest of columns
+        this._columnsCompare
+            .filter(otherCompareId => otherCompareId !== compareId)
+            .forEach(otherCompareId => {
+                update(otherCompareId);
+            });
+    }
+
+    /**
      * Refresh ship data
      * @param {*} compareId - Column id
      * @returns {void}
@@ -1877,6 +1888,8 @@ export default class CompareShips {
                 new ShipComparison(compareId, this.selectedShips.Base._shipData, singleShipData, this)
             );
         }
+
+        this._updateSailingProfile(compareId);
     }
 
     /**

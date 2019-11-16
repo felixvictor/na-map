@@ -187,7 +187,7 @@ export default class ListShipBlueprints {
 
     _updateTable(elem, dataBody, dataHead = []) {
         const addHead = () => {
-            let sortAscending = true;
+            const sortAscending = true;
 
             // Data join rows
             const tableRowUpdate = elem
@@ -244,26 +244,7 @@ export default class ListShipBlueprints {
                 .style("opacity", 1);
 
             // Merge cells
-            tableCellUpdate
-                .merge(tableCellEnter)
-                .html(d => d)
-                .append("i")
-                .classed("fas fa-sort", true)
-                .on("click", (d, i, nodes) => {
-                    if (sortAscending) {
-                        row.sort((a, b) => b[d] < a[d]);
-                        sortAscending = false;
-                        console.log(nodes[i]);
-                        nodes[i].classed("fa-sort-down", false);
-                        nodes[i].classed("fa-sort-up", true);
-                    } else {
-                        row.sort((a, b) => b[d] > a[d]);
-                        sortAscending = true;
-                        console.log(nodes[i]);
-                        nodes[i].classed("fa-sort-up", false);
-                        nodes[i].classed("fa-sort-down", true);
-                    }
-                });
+            tableCellUpdate.merge(tableCellEnter).html(d => d);
         };
 
         const addBody = () => {

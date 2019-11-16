@@ -12,7 +12,7 @@ import "bootstrap/js/dist/util";
 import "bootstrap/js/dist/tooltip";
 
 import { min as d3Min, max as d3Max } from "d3-array";
-import { interpolateHcl as d3InterpolateHcl, interpolateHclLong as d3InterpolateHclLong } from "d3-interpolate";
+import { interpolateHclLong as d3InterpolateHclLong } from "d3-interpolate";
 // import { polygonCentroid as d3PolygonCentroid, polygonHull as d3PolygonHull } from "d3-polygon";
 import { scaleLinear as d3ScaleLinear, scaleOrdinal as d3ScaleOrdinal } from "d3-scale";
 import { select as d3Select } from "d3-selection";
@@ -223,7 +223,7 @@ export default class DisplayPorts {
         this._colourScaleHostility = d3ScaleLinear()
             .domain([0, 0.5, 1])
             .range([colourWhite, colourRedLight, colourRedDark])
-            .interpolate(d3InterpolateHcl);
+            .interpolate(d3InterpolateHclLong);
         this._colourScaleCounty = d3ScaleOrdinal().range(colourList);
 
         this._minTaxIncome = d3Min(this._portData, d => d.taxIncome);
@@ -231,7 +231,7 @@ export default class DisplayPorts {
         this._colourScaleTax = d3ScaleLinear()
             .domain([this._minTaxIncome, this._maxTaxIncome / 10, this._maxTaxIncome])
             .range([colourWhite, colourGreenLight, colourGreenDark])
-            .interpolate(d3InterpolateHcl);
+            .interpolate(d3InterpolateHclLong);
 
         this._minNetIncome = d3Min(this._portData, d => d.netIncome);
         this._maxNetIncome = d3Max(this._portData, d => d.netIncome);
@@ -245,7 +245,7 @@ export default class DisplayPorts {
         this._colourScalePoints = d3ScaleLinear()
             .domain([this._minPortPoints, this._maxPortPoints])
             .range([colourWhite, colourGreenDark])
-            .interpolate(d3InterpolateHcl);
+            .interpolate(d3InterpolateHclLong);
     }
 
     _setupListener() {
@@ -488,7 +488,7 @@ export default class DisplayPorts {
             return images;
         };
 
-        this._nationIcons = importAll(require.context("../../icons", false, /\.svg$/));
+        this._nationIcons = importAll(require.context("Flags", false, /\.svg$/));
         const svgDef = d3Select("#na-svg defs");
 
         nations
