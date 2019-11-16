@@ -292,7 +292,7 @@ const config = {
             DESCRIPTION: JSON.stringify(descriptionLong),
             TITLE: JSON.stringify(PACKAGE.description),
             VERSION: JSON.stringify(PACKAGE.version),
-            ICONSMALL: JSON.stringify("images/icons/icon_32x32.png"),
+            ICONSMALL: JSON.stringify("images/icons/android-chrome-48x48.png"),
             REPAIR_ARMOR_VOLUME: JSON.stringify(repairs.armorRepair.volume),
             REPAIR_ARMOR_PERCENT: JSON.stringify(repairs.armorRepair.percent),
             REPAIR_ARMOR_TIME: JSON.stringify(repairs.armorRepair.time),
