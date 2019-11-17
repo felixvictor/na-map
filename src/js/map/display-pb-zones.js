@@ -103,33 +103,6 @@ export default class DisplayPbZones {
         const drawRect = (x, y, r) => `M${x - r / 2},${y - r / 2}h${r}v${r}h${-r}z`;
 
         this._g
-            .selectAll("g.defence")
-            .data(this._defencesFiltered, d => d.id)
-            .join(enter => {
-                const g = enter.append("g").attr("class", "defence");
-
-                // Forts
-                g.append("path")
-                    .attr("class", "fort")
-                    .attr("d", d => d.forts.map(fort => drawRect(fort[0], fort[1], 3)).join(""));
-                g.append("text")
-                    .attr("class", "pb-text pb-fort-text")
-                    .attr("x", d => d.forts.map(fort => fort[0]))
-                    .attr("y", d => d.forts.map(fort => fort[1]))
-                    .text(d => d.forts.map((fort, i) => `${i + 1}`).join(""));
-
-                // Towers
-                g.append("path")
-                    .attr("class", "tower")
-                    .attr("d", d => d.towers.map(tower => drawCircle(tower[0], tower[1], 1.5)).join(""));
-                g.append("text")
-                    .attr("class", "pb-text pb-tower-text")
-                    .attr("x", d => d.towers.map(tower => tower[0]))
-                    .attr("y", d => d.towers.map(tower => tower[1]))
-                    .text(d => d.towers.map((tower, i) => `${i + 1}`).join(""));
-            });
-
-        this._g
             .selectAll("g.pb-zones")
             .data(this._pbZonesFiltered, d => d.id)
             .join(enter => {
@@ -189,6 +162,33 @@ export default class DisplayPbZones {
                     .attr("x", d => d.raidPoints.map(raidPoint => raidPoint[0]))
                     .attr("y", d => d.raidPoints.map(raidPoint => raidPoint[1]))
                     .text(d => d.raidPoints.map((raidPoint, i) => String.fromCharCode(49 + i)).join(""));
+            });
+
+        this._g
+            .selectAll("g.defence")
+            .data(this._defencesFiltered, d => d.id)
+            .join(enter => {
+                const g = enter.append("g").attr("class", "defence");
+
+                // Forts
+                g.append("path")
+                    .attr("class", "fort")
+                    .attr("d", d => d.forts.map(fort => drawRect(fort[0], fort[1], 3)).join(""));
+                g.append("text")
+                    .attr("class", "pb-text pb-fort-text")
+                    .attr("x", d => d.forts.map(fort => fort[0]))
+                    .attr("y", d => d.forts.map(fort => fort[1]))
+                    .text(d => d.forts.map((fort, i) => `${i + 1}`).join(""));
+
+                // Towers
+                g.append("path")
+                    .attr("class", "tower")
+                    .attr("d", d => d.towers.map(tower => drawCircle(tower[0], tower[1], 1.5)).join(""));
+                g.append("text")
+                    .attr("class", "pb-text pb-tower-text")
+                    .attr("x", d => d.towers.map(tower => tower[0]))
+                    .attr("y", d => d.towers.map(tower => tower[1]))
+                    .text(d => d.towers.map((tower, i) => `${i + 1}`).join(""));
             });
     }
 
