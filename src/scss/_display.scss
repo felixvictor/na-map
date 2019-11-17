@@ -93,12 +93,6 @@ text {
             background-color: $secondary-100;
         }
 
-        th,
-        td {
-            padding-top: $paddingHalf;
-            padding-bottom: $paddingHalf;
-        }
-
         tbody {
             tr:nth-of-type(odd) {
                 background-color: $primary-100;
@@ -120,7 +114,7 @@ text {
 
     th,
     td {
-        padding-right: $paddingHalf;
+        padding-right: $paddingThird;
     }
 
     td {
@@ -459,7 +453,7 @@ text {
 }
 
 .block {
-    padding: $paddingHalf;
+    padding: $paddingThird;
 }
 
 .port-summary {
@@ -473,7 +467,7 @@ text {
 .port-summary,
 .journey-summary {
     display: grid;
-    padding: $paddingHalf;
+    padding: $paddingThird;
     pointer-events: all;
     background: rgba($primary-200, 0.8);
     line-height: 1;
@@ -500,7 +494,7 @@ text {
     background: rgba($primary-100, 0.8);
 
     .bootstrap-select {
-        padding: $paddingHalf;
+        padding: $paddingThird;
     }
 }
 
