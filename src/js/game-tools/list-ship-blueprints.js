@@ -38,12 +38,10 @@ export default class ListShipBlueprints {
 
     async _loadAndSetupData() {
         try {
-            this._blueprintData = await import(
+            this._blueprintData = (await import(
                 /* webpackChunkName: "data-ship-blueprints" */ "../../gen/ship-blueprints.json"
-            ).then(data => data.default);
-            this._woodData = await import(/* webpackChunkName: "data-woods" */ "../../gen/woods.json").then(
-                data => data.default
-            );
+            )).default;
+            this._woodData = (await import(/* webpackChunkName: "data-woods" */ "../../gen/woods.json")).default;
         } catch (error) {
             putImportError(error);
         }
