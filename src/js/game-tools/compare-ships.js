@@ -1126,12 +1126,9 @@ export default class CompareShips {
 
     async _loadAndSetupData() {
         try {
-            this._moduleDataDefault = await import(
-                /* webpackChunkName: "data-modules" */ "../../gen/modules.json"
-            ).then(data => data.default);
-            this._shipData = await import(/* webpackChunkName: "data-ships" */ "../../gen/ships.json").then(
-                data => data.default
-            );
+            this._moduleDataDefault = (await import(/* webpackChunkName: "data-modules" */ "../../gen/modules.json"))
+                .default;
+            this._shipData = (await import(/* webpackChunkName: "data-ships" */ "../../gen/ships.json")).default;
             this._setupData();
         } catch (error) {
             putImportError(error);

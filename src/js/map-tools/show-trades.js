@@ -295,9 +295,7 @@ export default class ShowTrades {
         const dataDirectory = "data";
 
         try {
-            this._portData = await import(/* webpackChunkName: "data-ports" */ "../../gen/ports.json").then(
-                data => data.default
-            );
+            this._portData = (await import(/* webpackChunkName: "data-ports" */ "../../gen/ports.json")).default;
 
             this._linkDataDefault = await (await fetch(`${dataDirectory}/${this._serverName}-trades.json`)).json();
         } catch (error) {
