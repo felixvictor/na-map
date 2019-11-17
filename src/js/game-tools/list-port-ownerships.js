@@ -46,12 +46,10 @@ export default class ListPortOwnerships {
 
     async _loadAndSetupData() {
         try {
-            this._nationData = await import(/* webpackChunkName: "data-nations" */ "../../gen/nations.json").then(
-                data => data.default
-            );
-            this._ownershipData = await import(
+            this._nationData = (await import(/* webpackChunkName: "data-nations" */ "../../gen/nations.json")).default;
+            this._ownershipData = (await import(
                 /* webpackChunkName: "data-ownership" */ "../../gen/ownership.json"
-            ).then(data => data.default);
+            )).default;
         } catch (error) {
             putImportError(error);
         }
