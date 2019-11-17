@@ -187,7 +187,7 @@ text {
     }
 
     text {
-        fill: $secondary-900;
+        fill: $secondary-050;
         text-anchor: middle;
         dominant-baseline: central;
 
@@ -197,7 +197,7 @@ text {
     }
 
     rect {
-        fill: rgba($primary-100, 0.8);
+        fill: rgba($primary-800, 0.8);
     }
 
     path {
@@ -292,11 +292,11 @@ text {
 }
 
 .course-head {
-    fill: $secondary-050 !important;
+    fill: $secondary-050;
 }
 
 .wind-head {
-    fill: $secondary-600 !important;
+    fill: $secondary-050;
 }
 
 .trade-link {
@@ -317,18 +317,15 @@ text {
     fill: $white;
 }
 
-.wind {
-    stroke: $secondary-600 !important;
-}
-
 .wind,
 .wind-text {
     text-anchor: middle !important;
+    fill: $secondary-050 !important;
 }
 
 .wind-text-current {
     font-size: smaller;
-    fill: $secondary-700 !important;
+    fill: $secondary-100 !important;
 }
 
 .trades {
@@ -774,4 +771,40 @@ pattern > circle {
     stroke-width: 4;
     stroke: $white;
     fill: none;
+}
+
+///
+// Wind prediction
+///
+
+.arrow-head {
+    fill: $secondary-050;
+}
+
+.text-light-separation {
+    fill: $primary-300 !important;
+}
+
+.overlay-block {
+    svg {
+        overflow: auto;
+    }
+
+    path {
+        fill: none;
+        stroke: $secondary-050;
+        stroke-width: 0.3rem;
+    }
+
+    text {
+        fill: $secondary-050;
+        text-anchor: middle;
+        dominant-baseline: central;
+
+        &.des {
+            fill: $secondary-800 !important;
+        }
+    }
+
+    fill: rgba($primary-800, 0.8);
 }
