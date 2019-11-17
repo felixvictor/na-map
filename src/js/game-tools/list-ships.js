@@ -16,7 +16,7 @@ import { default as Tablesort } from "tablesort";
 
 import { registerEvent } from "../analytics";
 import { insertBaseModal } from "../common";
-import { formatFloatFixed, putImportError, sortBy } from "../util";
+import { formatFloatFixed, formatInt, putImportError, sortBy } from "../util";
 
 /**
  *
@@ -129,29 +129,22 @@ export default class ShipList {
 
         text += `<table id="table-${this._baseId}" class="table table-sm small tablesort"><thead>`;
         text += "<tr>";
-        text += '<th scope="col"></th>';
-        text += '<th scope="col"></th>';
-        text += '<th scope="col"></th>';
-        text += '<th scope="col"></th>';
-        text += '<th scope="col"></th>';
-        text += '<th scope="col" colspan="2">Speed</th>';
-        text += '<th scope="col"></th>';
-        text += '<th scope="col" colspan="2">Chasers</th>';
-        text += '<th scope="col"></th>';
+        text += '<th scope="col" class="text-right" rowspan="2">Class</th>';
+        text += '<th scope="col" rowspan="2">Name</th>';
+        text += '<th scope="col" class="text-right" rowspan="2">Guns</th>';
+        text += '<th scope="col" class="text-right" rowspan="2">Battle<br>rating</th>';
+        text += '<th scope="col" class="text-right" rowspan="2">Crew</th>';
+        text += '<th scope="col" class="text-center" colspan="2">Speed</th>';
+        text += '<th scope="col" class="text-right" rowspan="2">Broadside</th>';
+        text += '<th scope="col" class="text-center" colspan="2">Chasers</th>';
+        text += '<th scope="col" class="text-right" rowspan="2">Sides</th>';
         text += "</tr>";
 
         text += "<tr>";
-        text += "<th>Class</th>";
-        text += '<th scope="col">Name</th>';
-        text += '<th scope="col">Guns</th>';
-        text += '<th scope="col">Battle<br>rating</th>';
-        text += '<th scope="col">Crew</th>';
-        text += '<th scope="col">Maximum</th>';
-        text += '<th scope="col">Turn</th>';
-        text += '<th scope="col">Broadside</th>';
-        text += '<th scope="col">Bow</th>';
-        text += '<th scope="col">Stern</th>';
-        text += '<th scope="col">Sides</th>';
+        text += '<th scope="col" class="text-right">Maximum</th>';
+        text += '<th scope="col" class="text-right">Turn</th>';
+        text += '<th scope="col" class="text-right">Bow</th>';
+        text += '<th scope="col" class="text-right">Stern</th>';
         text += "</tr></thead><tbody>";
 
         this._shipData
@@ -169,7 +162,7 @@ export default class ShipList {
                 text += `<td class="text-right">${ship.broadside.cannons}</td>`;
                 text += `<td class="text-right">${ship.gunsPerDeck[4] ? ship.gunsPerDeck[4] : ""}</td>`;
                 text += `<td class="text-right">${ship.gunsPerDeck[5] ? ship.gunsPerDeck[5] : ""}</td>`;
-                text += `<td class="text-right" data-sort="${ship.sides.armour}">${ship.sides.armour} (${ship.sides.thickness})</td>`;
+                text += `<td class="text-right" data-sort="${ship.sides.armour}">${formatInt(ship.sides.armour)} (${ship.sides.thickness})</td>`;
                 text += "</tr>";
             });
         text += "</tbody></table>";
