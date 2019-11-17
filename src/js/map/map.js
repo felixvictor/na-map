@@ -410,11 +410,8 @@ class Map {
     _doDoubleClickAction(self) {
         const coord = d3Mouse(self);
         const transform = d3ZoomTransform(self);
-        const mx = coord[0];
-        const my = coord[1];
-        const tk = transform.k;
-        const tx = transform.x;
-        const ty = transform.y;
+        const [mx, my] = coord;
+        const { k: tk, x: tx, y: ty } = transform;
 
         const x = (mx - tx) / tk;
         const y = (my - ty) / tk;
