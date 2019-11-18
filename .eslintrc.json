@@ -35,7 +35,6 @@
             }
         ],
         "max-params": ["warn", 5],
-        "multiline-ternary": ["error", "always-multiline"],
         "new-cap": "off",
         "no-mixed-operators": "off",
         "object-curly-spacing": ["error", "always"],
@@ -58,7 +57,6 @@
                 "asyncArrow": "always"
             }
         ],
-        "unicorn/consistent-function-scoping": "off",
         "unicorn/explicit-length-check": "off",
         "unicorn/import-index": "off",
         "unicorn/no-for-loop": "off",
