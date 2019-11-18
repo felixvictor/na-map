@@ -38,7 +38,6 @@ export default class ListPortOwnerships {
         this._buttonId = `button-${this._baseId}`;
         this._modalId = `modal-${this._baseId}`;
 
-        // http://tools.medialab.sciences-po.fr/iwanthue/
         this._colourScale = d3ScaleOrdinal().range(colourList);
 
         this._setupListener();
@@ -47,9 +46,9 @@ export default class ListPortOwnerships {
     async _loadAndSetupData() {
         try {
             this._nationData = (await import(/* webpackChunkName: "data-nations" */ "../../gen/nations.json")).default;
-            this._ownershipData = (await import(
-                /* webpackChunkName: "data-ownership" */ "../../gen/ownership.json"
-            )).default;
+            this._ownershipData = (
+                await import(/* webpackChunkName: "data-ownership" */ "../../gen/ownership.json")
+            ).default;
         } catch (error) {
             putImportError(error);
         }
@@ -162,7 +161,6 @@ export default class ListPortOwnerships {
      */
     static getHeight() {
         const factor = 0.75;
-        // eslint-disable-next-line no-restricted-globals
         return Math.floor(top.innerHeight * factor);
     }
 
@@ -176,21 +174,22 @@ export default class ListPortOwnerships {
     }
 
     /**
+     * Get x date value
+     * @param {*} d - data
+     * @return {Date} x value
+     */
+    static xValue(d) {
+        return new Date(d.date);
+    }
+
+    /**
      * Inject stacked area
      * @return {void}
      * @private
      */
     _injectArea() {
-        /**
-         * Get x date value
-         * @param {*} d - data
-         * @return {Date} x value
-         */
-        const xValue = d => new Date(d.date);
-
         const width = this._getWidth();
         const maxHeight = 1000;
-        // eslint-disable-next-line no-restricted-globals
         const height = Math.min(maxHeight, ListPortOwnerships.getHeight());
         const margin = { right: 32, bottom: 32, left: 32 };
 
@@ -210,7 +209,7 @@ export default class ListPortOwnerships {
          */
         const setXAxis = g => {
             const xTimeScale = d3ScaleTime()
-                .domain(d3Extent(nationData, d => xValue(d)))
+                .domain(d3Extent(nationData, d => this.xValue(d)))
                 .range([margin.left, width - margin.right]);
             g.attr("transform", `translate(0,${height - margin.bottom})`).call(
                 d3AxisBottom(xTimeScale)
@@ -226,14 +225,14 @@ export default class ListPortOwnerships {
          */
         const getArea = () => {
             const xScale = d3ScaleLinear()
-                .domain(d3Extent(nationData, d => xValue(d)))
+                .domain(d3Extent(nationData, d => this.xValue(d)))
                 .range([margin.left, width - margin.right]);
             const yScale = d3ScaleLinear()
                 .domain([d3Min(stacked[0], d => d[0]), d3Max(stacked[stacked.length - 1], d => d[1])])
                 .range([height - margin.bottom, 0]);
 
             const area = d3Area()
-                .x(d => xScale(xValue(d.data)))
+                .x(d => xScale(this.xValue(d.data)))
                 .y0(d => yScale(d[0]))
                 .y1(d => yScale(d[1]))
                 .curve(d3CurveBasis);
