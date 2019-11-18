@@ -15,11 +15,9 @@ import { range as d3Range } from "d3-array";
 import { event as d3Event, mouse as d3Mouse, select as d3Select } from "d3-selection";
 import { zoom as d3Zoom, zoomIdentity as d3ZoomIdentity, zoomTransform as d3ZoomTransform } from "d3-zoom";
 
+import { registerEvent } from "../analytics";
 import { appDescription, appTitle, appVersion, defaultFontSize, insertBaseModal } from "../common";
 import { displayClan, nearestPow2, roundToThousands } from "../util";
-
-import { registerEvent } from "../analytics";
-
 import Cookie from "../util/cookie";
 import RadioButton from "../util/radio-button";
 
@@ -220,16 +218,16 @@ class Map {
         */
     }
 
-    _setupListener() {
-        function stopProperty() {
-            if (d3Event.defaultPrevented) {
-                d3Event.stopPropagation();
-            }
+    static _stopProperty() {
+        if (d3Event.defaultPrevented) {
+            d3Event.stopPropagation();
         }
+    }
 
+    _setupListener() {
         this._svg
             .on("dblclick.zoom", null)
-            .on("click", stopProperty, true)
+            .on("click", Map._stopProperty, true)
             .on("dblclick", (d, i, nodes) => this._doDoubleClickAction(nodes[i]));
 
         document.getElementById("propertyDropdown").addEventListener("click", () => {
@@ -384,23 +382,23 @@ class Map {
             .selectpicker("refresh");
     }
 
+    static _initModal(id) {
+        insertBaseModal(id, `${appTitle} <span class="text-primary small">v${appVersion}</span>`, "");
+
+        const body = d3Select(`#${id} .modal-body`);
+        body.html(
+            `<p>${appDescription} Please check the <a href="https://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/"> Game-Labs forum post</a> for further details. Feedback is very welcome.</p><p>Designed by iB aka Felix Victor, clan Bastard Sons ${displayClan(
+                "(BASTD)"
+            )}</a>.</p>`
+        );
+    }
+
     _showAbout() {
-        function initModal(id) {
-            insertBaseModal(id, `${appTitle} <span class="text-primary small">v${appVersion}</span>`, "");
-
-            const body = d3Select(`#${id} .modal-body`);
-            body.html(
-                `<p>${appDescription} Please check the <a href="https://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/"> Game-Labs forum post</a> for further details. Feedback is very welcome.</p><p>Designed by iB aka Felix Victor, clan Bastard Sons ${displayClan(
-                    "(BASTD)"
-                )}</a>.</p>`
-            );
-        }
-
         const modalId = "modal-about";
 
         // If the modal has no content yet, insert it
         if (!$(`#${modalId}`).length) {
-            initModal(modalId);
+            Map._initModal(modalId);
         }
 
         // Show modal
@@ -549,14 +547,14 @@ class Map {
     _getWidth() {
         const { width } = this.getDimensions();
 
-        return width;
+        return Math.floor(width);
     }
 
     _getHeight() {
         const { top } = this.getDimensions();
         const fullHeight = document.documentElement.clientHeight - this.rem;
 
-        return fullHeight - top;
+        return Math.floor(fullHeight - top);
     }
 
     _setHeightWidth() {
