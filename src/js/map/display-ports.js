@@ -12,7 +12,7 @@ import "bootstrap/js/dist/util";
 import "bootstrap/js/dist/tooltip";
 
 import { min as d3Min, max as d3Max } from "d3-array";
-import { interpolateHclLong as d3InterpolateHclLong } from "d3-interpolate";
+import { interpolateCubehelixLong as d3InterpolateCubehelixLong } from "d3-interpolate";
 // import { polygonCentroid as d3PolygonCentroid, polygonHull as d3PolygonHull } from "d3-polygon";
 import { scaleLinear as d3ScaleLinear, scaleOrdinal as d3ScaleOrdinal } from "d3-scale";
 import { select as d3Select } from "d3-selection";
@@ -194,31 +194,31 @@ export default class DisplayPorts {
         this._attackRadius = d3ScaleLinear().domain([0, 1]);
 
         this._colourScaleHostility = d3ScaleLinear()
-            .domain([0, 0.5, 1])
-            .range([colourWhite, colourRedLight, colourRedDark])
-            .interpolate(d3InterpolateHclLong);
+            .domain([0, 1])
+            .range([colourWhite, colourRedDark])
+            .interpolate(d3InterpolateCubehelixLong);
         this._colourScaleCounty = d3ScaleOrdinal().range(colourList);
 
         this._minTaxIncome = d3Min(this._portData, d => d.taxIncome);
         this._maxTaxIncome = d3Max(this._portData, d => d.taxIncome);
         this._colourScaleTax = d3ScaleLinear()
-            .domain([this._minTaxIncome, this._maxTaxIncome / 10, this._maxTaxIncome])
-            .range([colourWhite, colourGreenLight, colourGreenDark])
-            .interpolate(d3InterpolateHclLong);
+            .domain([this._minTaxIncome, this._maxTaxIncome])
+            .range([colourWhite, colourGreenDark])
+            .interpolate(d3InterpolateCubehelixLong);
 
         this._minNetIncome = d3Min(this._portData, d => d.netIncome);
         this._maxNetIncome = d3Max(this._portData, d => d.netIncome);
         this._colourScaleNet = d3ScaleLinear()
-            .domain([this._minNetIncome, this._minNetIncome / 100, 0, this._maxNetIncome / 100, this._maxNetIncome])
+            .domain([this._minNetIncome, this._minNetIncome / 50, 0, this._maxNetIncome / 50, this._maxNetIncome])
             .range([colourRedDark, colourRedLight, colourWhite, colourGreenLight, colourGreenDark])
-            .interpolate(d3InterpolateHclLong);
+            .interpolate(d3InterpolateCubehelixLong);
 
         this._minPortPoints = d3Min(this._portData, d => d.portPoints);
         this._maxPortPoints = d3Max(this._portData, d => d.portPoints);
         this._colourScalePoints = d3ScaleLinear()
             .domain([this._minPortPoints, this._maxPortPoints])
             .range([colourWhite, colourGreenDark])
-            .interpolate(d3InterpolateHclLong);
+            .interpolate(d3InterpolateCubehelixLong);
     }
 
     _setupListener() {
@@ -608,7 +608,7 @@ export default class DisplayPorts {
         return port;
     }
 
-    static _tooltipData(port) {
+    _tooltipData(port) {
         let h = '<div class="d-flex align-items-baseline mb-1">';
         h += `<img alt="${port.icon}" class="flag-icon align-self-stretch" src="${this._nationIcons[port.icon]
             .replace('"', "")
@@ -719,7 +719,7 @@ export default class DisplayPorts {
             .tooltip({
                 html: true,
                 placement: "auto",
-                title: DisplayPorts._tooltipData(this._getText(d.id, d)),
+                title: this._tooltipData(this._getText(d.id, d)),
                 trigger: "manual",
                 sanitize: false
             })
