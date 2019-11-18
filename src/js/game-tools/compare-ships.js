@@ -12,7 +12,7 @@ import "bootstrap/js/dist/util";
 import "bootstrap/js/dist/modal";
 import "bootstrap/js/dist/tooltip";
 
-import { ascending as d3Ascending, max as d3Max, min as d3Min, range as d3Range } from "d3-array";
+import { ascending as d3Ascending, max as d3Max, min as d3Min } from "d3-array";
 import { nest as d3Nest } from "d3-collection";
 import { interpolateCubehelixLong as d3InterpolateCubehelixLong } from "d3-interpolate";
 
@@ -199,6 +199,14 @@ class Ship {
     }
 
     /**
+     * HTML format head of second block
+     * @return {string} HTML formatted block head
+     */
+    static displaySecondBlock() {
+        return '<div class="col-9"><div class="row no-gutters">';
+    }
+
+    /**
      * Get HTML formatted data for a single ship
      * @param {Object} ship - Ship data
      * @return {string} HTML formatted column
@@ -236,18 +244,10 @@ class Ship {
             return `<div class="col-${col}">${elementText}<br><span class="des">${description}</span>${br}</div>`;
         }
 
-        /**
-         * HTML format head of second block
-         * @return {string} HTML formatted block head
-         */
-        function displaySecondBlock() {
-            return '<div class="col-9"><div class="row no-gutters">';
-        }
-
         let text = "";
 
         text += displayFirstColumn(ship.shipRating);
-        text += displaySecondBlock();
+        text += Ship.displaySecondBlock();
         text += displayColumn("battleRating", "Battle rating");
         text += displayColumn("guns", "Cannons");
         text += displayColumn("upgradeXP", "Knowledge XP");
@@ -255,25 +255,25 @@ class Ship {
         text += "</div></div></div>";
 
         text += displayFirstColumn(ship.decks);
-        text += displaySecondBlock();
+        text += Ship.displaySecondBlock();
         text += displayColumn("cannonsPerDeck", "Gun decks");
         text += displayColumn("firezoneHorizontalWidth", "Firezone horizontal width");
         text += "</div></div></div>";
 
         text += displayFirstColumn("Broadside (lb)");
-        text += displaySecondBlock();
+        text += Ship.displaySecondBlock();
         text += displayColumn("cannonBroadside", "Cannons");
         text += displayColumn("carroBroadside", "Carronades");
         text += "</div></div></div>";
 
         text += displayFirstColumn("Chasers");
-        text += displaySecondBlock();
+        text += Ship.displaySecondBlock();
         text += displayColumn("gunsFront", "Bow");
         text += displayColumn("gunsBack", "Stern");
         text += "</div></div></div>";
 
         text += displayFirstColumn("Speed");
-        text += displaySecondBlock();
+        text += Ship.displaySecondBlock();
         text += displayColumn("maxSpeed", "Maximum");
         text += displayColumn("", "");
         text += displayColumn("acceleration", "Acceleration");
@@ -283,7 +283,7 @@ class Ship {
         text += "</div></div></div>";
 
         text += displayFirstColumn('Hit points <span class="badge badge-white">Thickness</span>');
-        text += displaySecondBlock();
+        text += Ship.displaySecondBlock();
         text += displayColumn("sideArmor", "Sides");
         text += displayColumn("structure", "Hull");
         text += displayColumn("frontArmor", "Bow");
@@ -293,7 +293,7 @@ class Ship {
         text += "</div></div></div>";
 
         text += displayFirstColumn('Masts <span class="badge badge-white">Thickness</span>');
-        text += displaySecondBlock();
+        text += Ship.displaySecondBlock();
         text += displayColumn("sails", "Sails");
         text += displayColumn("mastBottomArmor", "Bottom");
         text += displayColumn("mastMiddleArmor", "Middle");
@@ -301,35 +301,35 @@ class Ship {
         text += "</div></div></div>";
 
         text += displayFirstColumn("Crew");
-        text += displaySecondBlock();
+        text += Ship.displaySecondBlock();
         text += displayColumn("minCrew", "Minimum", 4);
         text += displayColumn("sailingCrew", "Sailing", 4);
         text += displayColumn("maxCrew", "Maximum", 4);
         text += "</div></div></div>";
 
         text += displayFirstColumn("Resistance");
-        text += displaySecondBlock();
+        text += Ship.displaySecondBlock();
         text += displayColumn("fireResistance", "Fire", 4);
         text += displayColumn("leakResistance", "Leak", 4);
         text += displayColumn("splinterResistance", "Splinter", 4);
         text += "</div></div></div>";
 
         text += displayFirstColumn('Repairs needed <span class="badge badge-white">Set of 5</span>');
-        text += displaySecondBlock();
+        text += Ship.displaySecondBlock();
         text += displayColumn("hullRepairsNeeded", "Hull", 4);
         text += displayColumn("rigRepairsNeeded", "Rig", 4);
         text += displayColumn("rumRepairsNeeded", "Rum", 4);
         text += "</div></div></div>";
 
         text += displayFirstColumn("Repair");
-        text += displaySecondBlock();
+        text += Ship.displaySecondBlock();
         text += displayColumn("hullRepairAmount", "Hull %", 4);
         text += displayColumn("rigRepairAmount", "Rig %", 4);
         text += displayColumn("repairTime", "Time (sec)", 4);
         text += "</div></div></div>";
 
         text += displayFirstColumn("Hold");
-        text += displaySecondBlock();
+        text += Ship.displaySecondBlock();
         text += displayColumn("maxWeight", "Tons");
         text += displayColumn("holdSize", "Cargo slots");
         text += "</div></div></div>";
@@ -550,6 +550,7 @@ class ShipBase extends Ship {
                 this.shipData.mast.topThickness
             )}</span>`
         };
+
         if (ship.gunsFront) {
             ship.gunsFront += `\u00A0${Ship.pd(ship.limitFront)}`;
         } else {
@@ -1126,8 +1127,9 @@ export default class CompareShips {
 
     async _loadAndSetupData() {
         try {
-            this._moduleDataDefault = (await import(/* webpackChunkName: "data-modules" */ "../../gen/modules.json"))
-                .default;
+            this._moduleDataDefault = (
+                await import(/* webpackChunkName: "data-modules" */ "../../gen/modules.json")
+            ).default;
             this._shipData = (await import(/* webpackChunkName: "data-ships" */ "../../gen/ships.json")).default;
             this._setupData();
         } catch (error) {
@@ -1413,6 +1415,10 @@ export default class CompareShips {
         }
     }
 
+    static _getModuleLevel(rate) {
+        return rate <= 3 ? "L" : rate <= 5 ? "M" : "S";
+    }
+
     /**
      * Get select options
      * @param {string} moduleType - Module type
@@ -1420,8 +1426,6 @@ export default class CompareShips {
      * @returns {string} HTML formatted option
      */
     _getUpgradesOptions(moduleType, shipClass) {
-        const getModuleLevel = rate => (rate <= 3 ? "L" : rate <= 5 ? "M" : "S");
-
         // Nest module data by sub type (e.g. "Gunnery")
         const modules = d3Nest()
             .key(module => module[1].type.replace(/[a-zA-Z\s]+\s–\s/, ""))
@@ -1430,7 +1434,8 @@ export default class CompareShips {
                 [...this._moduleProperties].filter(
                     module =>
                         module[1].type.replace(/\s–\s[a-zA-Z/\u25CB\s]+/, "") === moduleType &&
-                        (module[1].moduleLevel === "U" || module[1].moduleLevel === getModuleLevel(shipClass))
+                        (module[1].moduleLevel === "U" ||
+                            module[1].moduleLevel === CompareShips._getModuleLevel(shipClass))
                 )
             );
 
@@ -1460,6 +1465,7 @@ export default class CompareShips {
     }
 
     _fillModuleSelect(columnId, type) {
+        // eslint-disable-next-line unicorn/consistent-function-scoping
         const getShipClass = () => this._shipData.find(ship => ship.id === this._shipIds[columnId]).class;
 
         const options = this._getUpgradesOptions(type, getShipClass());
@@ -1587,27 +1593,29 @@ export default class CompareShips {
         return shipDataUpdated;
     }
 
+    static _adjustAbsolute(currentValue, additionalValue) {
+        return currentValue ? currentValue + additionalValue : additionalValue;
+    }
+
+    static _adjustPercentage(currentValue, additionalValue, isBaseValueAbsolute) {
+        return currentValue
+            ? isBaseValueAbsolute
+                ? currentValue * (1 + additionalValue)
+                : currentValue + additionalValue
+            : additionalValue;
+    }
+
     _adjustValue(value, key, isBaseValueAbsolute) {
-        const adjustAbsolute = (currentValue, additionalValue) =>
-            currentValue ? currentValue + additionalValue : additionalValue;
-
-        const adjustPercentage = (currentValue, additionalValue) =>
-            currentValue
-                ? isBaseValueAbsolute
-                    ? currentValue * (1 + additionalValue)
-                    : currentValue + additionalValue
-                : additionalValue;
-
         let adjustedValue = value;
 
         if (this._modifierAmount.get(key).absolute) {
             const { absolute } = this._modifierAmount.get(key);
-            adjustedValue = adjustAbsolute(adjustedValue, absolute);
+            adjustedValue = CompareShips._adjustAbsolute(adjustedValue, absolute);
         }
 
         if (this._modifierAmount.get(key).percentage) {
             const percentage = this._modifierAmount.get(key).percentage / 100;
-            adjustedValue = adjustPercentage(adjustedValue, percentage);
+            adjustedValue = CompareShips._adjustPercentage(adjustedValue, percentage, isBaseValueAbsolute);
         }
 
         return adjustedValue;
@@ -1744,6 +1752,7 @@ export default class CompareShips {
             });
         };
 
+        // eslint-disable-next-line unicorn/consistent-function-scoping
         const adjustDataByModifiers = () => {
             this._modifierAmount.forEach((value, key) => {
                 if (this._moduleChanges.get(key).properties) {
@@ -1828,25 +1837,25 @@ export default class CompareShips {
         return data;
     }
 
+    _updateDifferenceProfileNeeded(id) {
+        if (id !== "Base" && !isEmpty(this._selectedShips[id])) {
+            this._selectedShips[id].updateDifferenceProfile();
+        }
+    }
+
     /**
      * Update sailing profile for compared ship
      * @param {*} compareId - Column id
      * @returns {void}
      */
     _updateSailingProfile(compareId) {
-        const update = id => {
-            if (id !== "Base" && !isEmpty(this._selectedShips[id])) {
-                this._selectedShips[id].updateDifferenceProfile();
-            }
-        };
-
         // Update recent changes first
-        update(compareId);
+        this._updateDifferenceProfileNeeded(compareId);
         // Then update the rest of columns
         this._columnsCompare
             .filter(otherCompareId => otherCompareId !== compareId)
             .forEach(otherCompareId => {
-                update(otherCompareId);
+                this._updateDifferenceProfileNeeded(otherCompareId);
             });
     }
 
@@ -1957,81 +1966,84 @@ export default class CompareShips {
         });
     }
 
-    initFromClipboard(urlParams) {
-        const setSelect = (select$, id) => {
-            if (id) {
-                select$.val(id);
+    static _setSelect(select$, id) {
+        if (id) {
+            select$.val(id);
+        }
+
+        select$.selectpicker("render");
+    }
+
+    _setShipAndWoodsSelects(ids) {
+        let i = 0;
+
+        this._columns.some(columnId => {
+            if (!this._shipData.find(ship => ship.id === ids[i])) {
+                return false;
             }
 
-            select$.selectpicker("render");
-        };
+            this._shipIds[columnId] = ids[i];
+            i += 1;
+            CompareShips._setSelect(this._selectShip$[columnId], this._shipIds[columnId]);
+            if (columnId === "Base" && this._baseId !== "ship-journey") {
+                this._enableCompareSelects();
+            }
 
-        const setShipAndWoodsSelects = ids => {
-            let i = 0;
+            this.woodCompare.enableSelects(columnId);
+            this._setupModulesSelect(columnId);
 
-            this._columns.some(columnId => {
-                if (!this._shipData.find(ship => ship.id === ids[i])) {
-                    return false;
-                }
-
-                this._shipIds[columnId] = ids[i];
-                i += 1;
-                setSelect(this._selectShip$[columnId], this._shipIds[columnId]);
-                if (columnId === "Base" && this._baseId !== "ship-journey") {
-                    this._enableCompareSelects();
-                }
-
-                this.woodCompare.enableSelects(columnId);
-                this._setupModulesSelect(columnId);
-
-                if (ids[i]) {
-                    ["frame", "trim"].forEach(type => {
-                        setSelect(this._selectWood$[columnId][type], ids[i]);
-                        i += 1;
-                        this.woodCompare._woodSelected(columnId, type, this._selectWood$[columnId][type]);
-                    });
-                } else {
-                    i += 2;
-                }
-
-                this._refreshShips(columnId);
-                return i >= ids.length;
-            });
-        };
-
-        /**
-         * Get selected modules, new searchParam per module
-         * @return {void}
-         */
-        const setModuleSelects = () => {
-            this._columns.forEach((columnId, columnIndex) => {
-                let needRefresh = false;
-                [...this._moduleTypes].forEach((type, typeIndex) => {
-                    if (urlParams.has(`${columnIndex}${typeIndex}`)) {
-                        const moduleIds = hashids.decode(urlParams.get(`${columnIndex}${typeIndex}`));
-                        if (!this._selectedUpgradeIdsPerType[columnId]) {
-                            this._selectedUpgradeIdsPerType[columnId] = {};
-                        }
-
-                        if (!this._selectedUpgradeIdsList[columnId]) {
-                            this._selectedUpgradeIdsList[columnId] = [];
-                        }
-
-                        // console.log("moduleIds", { columnId }, { type }, { moduleIds });
-                        this._selectedUpgradeIdsPerType[columnId][type] = moduleIds.map(Number);
-                        setSelect(this._selectModule$[columnId][type], this._selectedUpgradeIdsPerType[columnId][type]);
-                        this._selectedUpgradeIdsList[columnId] = this._selectedUpgradeIdsList[columnId].concat(
-                            this._selectedUpgradeIdsPerType[columnId][type]
-                        );
-                        needRefresh = true;
-                    }
+            if (ids[i]) {
+                ["frame", "trim"].forEach(type => {
+                    CompareShips._setSelect(this._selectWood$[columnId][type], ids[i]);
+                    i += 1;
+                    this.woodCompare._woodSelected(columnId, type, this._selectWood$[columnId][type]);
                 });
-                if (needRefresh) {
-                    this._refreshShips(columnId);
+            } else {
+                i += 2;
+            }
+
+            this._refreshShips(columnId);
+            return i >= ids.length;
+        });
+    }
+
+    /**
+     * Get selected modules, new searchParam per module
+     * @return {void}
+     */
+    _setModuleSelects(urlParams) {
+        this._columns.forEach((columnId, columnIndex) => {
+            let needRefresh = false;
+            [...this._moduleTypes].forEach((type, typeIndex) => {
+                if (urlParams.has(`${columnIndex}${typeIndex}`)) {
+                    const moduleIds = hashids.decode(urlParams.get(`${columnIndex}${typeIndex}`));
+                    if (!this._selectedUpgradeIdsPerType[columnId]) {
+                        this._selectedUpgradeIdsPerType[columnId] = {};
+                    }
+
+                    if (!this._selectedUpgradeIdsList[columnId]) {
+                        this._selectedUpgradeIdsList[columnId] = [];
+                    }
+
+                    // console.log("moduleIds", { columnId }, { type }, { moduleIds });
+                    this._selectedUpgradeIdsPerType[columnId][type] = moduleIds.map(Number);
+                    this._setSelect(
+                        this._selectModule$[columnId][type],
+                        this._selectedUpgradeIdsPerType[columnId][type]
+                    );
+                    this._selectedUpgradeIdsList[columnId] = this._selectedUpgradeIdsList[columnId].concat(
+                        this._selectedUpgradeIdsPerType[columnId][type]
+                    );
+                    needRefresh = true;
                 }
             });
-        };
+            if (needRefresh) {
+                this._refreshShips(columnId);
+            }
+        });
+    }
 
+    initFromClipboard(urlParams) {
         const shipAndWoodsIds = hashids.decode(urlParams.get("cmp"));
         if (shipAndWoodsIds.length) {
             this._shipCompareSelected();
@@ -2039,8 +2051,8 @@ export default class CompareShips {
                 this._enableCompareSelects();
             }
 
-            setShipAndWoodsSelects(shipAndWoodsIds);
-            setModuleSelects();
+            this._setShipAndWoodsSelects(shipAndWoodsIds);
+            this._setModuleSelects(urlParams);
         }
     }
 
