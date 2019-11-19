@@ -176,127 +176,8 @@ text {
     background-color: $primary-100;
 }
 
-.coord {
-    svg {
-        overflow: auto;
-    }
-
-    circle {
-        fill: $secondary-050;
-        fill-opacity: 0.2;
-    }
-
-    text {
-        fill: $secondary-050;
-        text-anchor: middle;
-        dominant-baseline: central;
-
-        &.des {
-            fill: $secondary-800 !important;
-        }
-    }
-
-    rect {
-        fill: rgba($primary-800, 0.8);
-    }
-
-    path {
-        fill: none;
-        stroke: $secondary-050;
-        stroke-width: 0.3rem;
-    }
-
-    .label {
-        text {
-            text-anchor: start;
-        }
-
-        circle {
-            fill-opacity: 1;
-            cursor: pointer;
-        }
-
-        .drag-active {
-            stroke: $secondary-050;
-            stroke-width: 0.25rem;
-        }
-
-        .drag-hidden {
-            fill-opacity: 0;
-        }
-
-        .drag-hidden.drag-active {
-            stroke-width: 0;
-        }
-    }
-}
-
-.compass {
-    circle,
-    line {
-        stroke: $secondary-050;
-        stroke-width: 0.1rem;
-    }
-
-    text {
-        fill: $secondary-050;
-        text-anchor: middle;
-        dominant-baseline: central;
-    }
-}
-
-.small {
-    circle,
-    line {
-        stroke: $secondary-700;
-        stroke-width: 0.05rem;
-    }
-
-    path {
-        stroke-width: 0.15rem;
-    }
-}
-
-.label-rect {
-    fill: transparent;
-}
-
-.f11 {
-    circle {
-        fill: $secondary-600;
-        fill-opacity: 0.5;
-    }
-
-    text {
-        dominant-baseline: central;
-    }
-
-    rect {
-        fill: $primary-100;
-        fill-opacity: 0.7;
-    }
-}
-
-.f11-coord {
-    fill: $secondary-900;
-    text-anchor: end;
-}
-
-.f11-time {
-    fill: $secondary-600;
-    text-anchor: start;
-}
-
 .summary text {
     text-anchor: start;
-}
-
-.course-head {
-    fill: $secondary-050;
-}
-
-.wind-head {
-    fill: $secondary-050;
 }
 
 .trade-link {
@@ -315,17 +196,6 @@ text {
 
 .trade-head {
     fill: $white;
-}
-
-.wind,
-.wind-text {
-    text-anchor: middle !important;
-    fill: $secondary-050 !important;
-}
-
-.wind-text-current {
-    font-size: smaller;
-    fill: $secondary-100 !important;
 }
 
 .trades {
@@ -774,11 +644,119 @@ pattern > circle {
 }
 
 ///
-// Wind prediction
+// svg classes
 ///
 
+//$background-contrast-colour: $primary-800;
+$background-colour: $primary-800;
+$overlay-background: rgba($background-colour, 0.8);
+$overlay-text-colour: color-yiq($overlay-background);
+
+.journey,
+.wind-predict,
+.ingame-wind, .f11 {
+    svg {
+        overflow: auto;
+    }
+
+    circle {
+        fill: color-yiq($overlay-background);
+        fill-opacity: 0.2;
+    }
+
+    path {
+        fill: none;
+        stroke: color-yiq($overlay-background);
+        stroke-width: 0.3rem;
+    }
+
+    rect {
+        fill: $overlay-background;
+    }
+
+    text {
+        fill: $overlay-text-colour;
+        text-anchor: middle;
+        dominant-baseline: central;
+
+        &.des {
+            fill: $background-colour !important;
+        }
+    }
+}
+
+.f11-coord {
+    text-anchor: end !important;
+}
+
+.f11-time {
+    text-anchor: start !important;
+}
+
+.f11 {
+    circle {
+        fill-opacity: 0.5;
+    }
+}
+
+.compass {
+    circle,
+    line {
+        stroke: $overlay-text-colour;
+        stroke-width: 0.1rem;
+    }
+}
+
+.small {
+    circle,
+    line {
+        stroke-width: 0.05rem;
+    }
+
+    path {
+        stroke-width: 0.15rem;
+    }
+}
+
+.journey {
+    .label {
+        text {
+            text-anchor: start;
+        }
+
+        circle {
+            fill-opacity: 1;
+            cursor: pointer;
+        }
+
+        .drag-active {
+            stroke: $overlay-text-colour;
+            stroke-width: 0.25rem;
+        }
+
+        .drag-hidden {
+            fill-opacity: 0;
+        }
+
+        .drag-hidden.drag-active {
+            stroke-width: 0;
+        }
+    }
+}
+
 .arrow-head {
-    fill: $secondary-050;
+    fill: $overlay-text-colour;
+}
+
+.ship-base,.ship-compare {
+    line {
+        stroke: $background-colour;
+        stroke-width: 0.1rem;
+    }
+
+    .arrow-head {
+        fill: $background-colour;
+    }
 }
 
 .text-light-separation {
@@ -786,25 +764,5 @@ pattern > circle {
 }
 
 .overlay-block {
-    svg {
-        overflow: auto;
-    }
-
-    path {
-        fill: none;
-        stroke: $secondary-050;
-        stroke-width: 0.3rem;
-    }
-
-    text {
-        fill: $secondary-050;
-        text-anchor: middle;
-        dominant-baseline: central;
-
-        &.des {
-            fill: $secondary-800 !important;
-        }
-    }
-
-    fill: rgba($primary-800, 0.8);
+    fill: $overlay-background;
 }

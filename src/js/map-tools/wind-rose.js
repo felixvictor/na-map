@@ -127,8 +127,8 @@ export default class WindRose {
         this._div = portSummary
             .insert("div", ":first-child")
             .attr("id", this._baseId)
-            .classed("block p-0", true);
-        this._svg = this._div.append("svg").classed("coord small", true);
+            .attr("class", "block p-0");
+        this._svg = this._div.append("svg").attr("class", "ingame-wind small");
     }
 
     _navbarClick(event) {
@@ -185,7 +185,7 @@ export default class WindRose {
         const form = body.append("form").attr("id", this._formId);
 
         const formGroupA = form.append("div").attr("class", "form-group");
-        const slider = formGroupA.append("div").classed("alert alert-primary", true);
+        const slider = formGroupA.append("div").attr("class", "alert alert-primary");
         slider
             .append("label")
             .attr("for", this._sliderId)
@@ -274,15 +274,12 @@ export default class WindRose {
         // Compass rose
         const compassElement = this._svg
             .append("svg")
-            .classed("compass", true)
+            .attr("class", "compass")
             .attr("x", this._xCompass)
             .attr("y", this._yCompass);
         printSmallCompassRose({ element: compassElement, radius: this._compassRadius });
 
-        this._windPath = this._svg
-            .append("path")
-            .classed("wind", true)
-            .attr("marker-end", "url(#wind-arrow)");
+        this._windPath = this._svg.append("path").attr("marker-end", "url(#wind-arrow)");
     }
 
     clearMap() {
