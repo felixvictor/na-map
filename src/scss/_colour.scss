@@ -45,10 +45,6 @@ $gray-800: shade-color($gray, 6);
 $gray-900: shade-color($gray, 8);
 $black: mix(#000, colour-mixin(#000), 80);
 
-// Customize the light and dark text colors for use in our YIQ color contrast function.
-$yiq-text-dark: $gray-900;
-$yiq-text-light: $white;
-
 $grays: (
         "100": $gray-100,
         "200": $gray-200,
@@ -206,6 +202,9 @@ $danger: $red-dark;
 
 $light: $primary-050;
 $dark: $primary-900;
+
+$yiq-text-dark: $primary-900;
+$yiq-text-light: $primary-050;
 
 $theme-colors: (
         "primary": $primary,
