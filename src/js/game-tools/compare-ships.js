@@ -157,8 +157,8 @@ class Ship {
             .attr("y1", -160)
             .attr("x2", 0)
             .attr("y2", -79)
-            .attr("class", "arrow-head")
-            .attr("marker-end", "url(#journey-arrow)");
+            .attr("class", "ship-profile-arrow")
+            .attr("marker-end", "url(#ship-profile-arrow-head)");
     }
 
     /**
@@ -996,9 +996,27 @@ export default class CompareShips {
             this._woodId = "wood-ship";
         }
 
+        this._setupArrow();
         if (this._baseId !== "ship-journey") {
             this._setupListener();
         }
+    }
+
+    _setupArrow() {
+        // Get current arrow
+        const arrow = document.getElementById("journey-arrow");
+        // Clone arrow and change properties
+        const arrowNew = arrow.cloneNode(true);
+        arrowNew.id = "ship-profile-arrow-head";
+        if (arrowNew.hasChildNodes()) {
+            arrowNew.childNodes.forEach(child => {
+                child.classList.replace("arrow-head", "ship-profile-arrow-head");
+            });
+        }
+
+        // Insert new arrow
+        const defs = document.querySelector("#na-map svg defs");
+        defs.appendChild(arrowNew);
     }
 
     async shipJourneyInit() {
