@@ -61,6 +61,9 @@ import {
 
 import CompareWoods from "./compare-woods";
 
+// eslint-disable-next-line import/no-unresolved
+import { default as fishIcon } from "Icons/icon-ship.svg";
+
 const numberSegments = 24;
 const segmentRadians = (2 * Math.PI) / numberSegments;
 
@@ -72,12 +75,12 @@ const repairsSetSize = 5;
  */
 class Ship {
     /**
-     * @param {number} id - ship id
-     * @param {Object} shipData - ship data
+     * @param {number} id - column id
+     * @param {Class} shipCompare - Class instance of the ship to be compared to
      */
-    constructor(id, shipData) {
+    constructor(id, shipCompare) {
         this._id = id;
-        this._shipData = shipData;
+        this._shipCompare = shipCompare;
 
         // Speed ticks
         this._ticksSpeed = [12, 8, 4, 0];
@@ -101,12 +104,13 @@ class Ship {
 
         element
             .append("svg")
-            .attr("width", this.shipData.svgWidth)
-            .attr("height", this.shipData.svgHeight)
+
+            .attr("width", this._shipCompare.svgWidth)
+            .attr("height", this._shipCompare.svgHeight)
             .attr("data-ui-component", "sailing-profile")
             .attr("fill", "none")
             .append("g")
-            .attr("transform", `translate(${this.shipData.svgWidth / 2}, ${this.shipData.svgHeight / 2})`);
+            .attr("transform", `translate(${this._shipCompare.svgWidth / 2}, ${this._shipCompare.svgHeight / 2})`);
         d3Select(`${this.select} div`).remove();
 
         element.append("div").attr("class", "block-small");
@@ -125,8 +129,8 @@ class Ship {
             .value(1)(data);
 
         const arc = d3Arc()
-            .outerRadius(this.shipData.radiusScaleAbsolute(12))
-            .innerRadius(this.shipData.innerRadius);
+            .outerRadius(this._shipCompare.radiusScaleAbsolute(12))
+            .innerRadius(this._shipCompare.innerRadius);
 
         // Add compass arcs
         this.g
@@ -147,7 +151,7 @@ class Ship {
                 enter
                     .append("circle")
                     .attr("class", "speed-circle")
-                    .attr("r", d => this.shipData.radiusScaleAbsolute(d))
+                    .attr("r", d => this._shipCompare.radiusScaleAbsolute(d))
             );
 
         // Add big wind arrow
@@ -363,13 +367,13 @@ class ShipBase extends Ship {
     /**
      * @param {number} id - Ship id
      * @param {Object} shipData - Ship data
-     * @param {Object} shipCompareData - Ship data of the ship to be compared to
+     * @param {Class} shipCompare - Class instance of the ship to be compared to
      */
-    constructor(id, shipData, shipCompareData) {
-        super(id, shipCompareData);
+    constructor(id, shipData, shipCompare) {
+        super(id, shipCompare);
 
         this._shipData = shipData;
-        this._shipCompareData = shipCompareData;
+        this._shipCompare = shipCompare;
 
         this._setBackground();
         this._drawProfile();
@@ -377,16 +381,31 @@ class ShipBase extends Ship {
     }
 
     /**
-     * Set coloroured Background
+     * Set coloured Background
      * @returns {void}
      */
     _setBackground() {
         // Arc for text
         const speedArc = d3Arc()
-            .outerRadius(d => this.shipCompareData.radiusScaleAbsolute(d) + 2)
-            .innerRadius(d => this.shipCompareData.radiusScaleAbsolute(d) + 1)
+            .outerRadius(d => this._shipCompare.radiusScaleAbsolute(d) + 2)
+            .innerRadius(d => this._shipCompare.radiusScaleAbsolute(d) + 1)
             .startAngle(-Math.PI / 2)
             .endAngle(Math.PI / 2);
+
+        // Add ship outline
+        const { shipMass } = this._shipData;
+        const height = this._shipCompare.shipMassScale(shipMass);
+        const width = height;
+
+        this.g
+            .append("image")
+            .attr("height", height)
+            .attr("width", width)
+            .attr("x", -(width / 2))
+            .attr("y", -(height / 2))
+            .attr("class", "ship-outline")
+            .attr("transform", "rotate(90)")
+            .attr("xlink:href", fishIcon);
 
         // Add the paths for the text
         this.g
@@ -424,12 +443,12 @@ class ShipBase extends Ship {
             .sort(null)
             .value(1);
 
-        const arcsBase = pie(this.shipData.speedDegrees);
+        const arcsBase = pie(this._shipData.speedDegrees);
 
         const curve = d3CurveCatmullRomClosed;
         const line = d3RadialLine()
             .angle((d, i) => i * segmentRadians)
-            .radius(d => this.shipCompareData.radiusScaleAbsolute(d.data))
+            .radius(d => this._shipCompare.radiusScaleAbsolute(d.data))
             .curve(curve);
 
         // Profile shape
@@ -448,20 +467,15 @@ class ShipBase extends Ship {
                     .append("circle")
                     .attr("class", "speed-markers")
                     .attr("r", 5)
-                    .attr(
-                        "cy",
-                        (d, i) => Math.cos(i * segmentRadians) * -this.shipCompareData.radiusScaleAbsolute(d.data)
-                    )
-                    .attr(
-                        "cx",
-                        (d, i) => Math.sin(i * segmentRadians) * this.shipCompareData.radiusScaleAbsolute(d.data)
-                    )
-                    .attr("fill", d => this.shipCompareData.colorScale(d.data))
+                    .attr("cy", (d, i) => Math.cos(i * segmentRadians) * -this._shipCompare.radiusScaleAbsolute(d.data))
+                    .attr("cx", (d, i) => Math.sin(i * segmentRadians) * this._shipCompare.radiusScaleAbsolute(d.data))
+                    .attr("fill", d => this._shipCompare.colorScale(d.data))
+                    .attr("fill", d => this._shipCompare.colorScale(d.data))
                     .append("title")
                     .text(d => `${Math.round(d.data * 10) / 10} knots`)
             );
 
-        // colourRamp(d3Select(this._select), this.shipCompareData.colorScale, this.shipData.speedDegrees.length);
+        // colourRamp(d3Select(this._select), this.shipCompareData.colorScale, this._shipData.speedDegrees.length);
     }
 
     /**
@@ -469,65 +483,65 @@ class ShipBase extends Ship {
      * @returns {void}
      */
     _printText() {
-        const cannonsPerDeck = Ship.getCannonsPerDeck(this.shipData.deckClassLimit, this.shipData.gunsPerDeck);
+        const cannonsPerDeck = Ship.getCannonsPerDeck(this._shipData.deckClassLimit, this._shipData.gunsPerDeck);
         const hullRepairsNeeded = Math.round(
-            (this.shipData.sides.armour * this.shipData.repairAmount.armour) / hullRepairsVolume
+            (this._shipData.sides.armour * this._shipData.repairAmount.armour) / hullRepairsVolume
         );
         const rigRepairsNeeded = Math.round(
-            (this.shipData.sails.armour * this.shipData.repairAmount.sails) / rigRepairsVolume
+            (this._shipData.sails.armour * this._shipData.repairAmount.sails) / rigRepairsVolume
         );
-        const rumRepairsNeeded = Math.round(this.shipData.crew.max * rumRepairsFactor);
+        const rumRepairsNeeded = Math.round(this._shipData.crew.max * rumRepairsFactor);
 
         const ship = {
-            shipRating: `${getOrdinal(this.shipData.class)} rate`,
-            battleRating: this.shipData.battleRating,
-            guns: this.shipData.guns,
-            decks: `${this.shipData.decks} deck${this.shipData.decks > 1 ? "s" : ""}`,
-            additionalRow: `${this.shipData.decks < 4 ? "<br>\u00A0" : ""}`,
+            shipRating: `${getOrdinal(this._shipData.class)} rate`,
+            battleRating: this._shipData.battleRating,
+            guns: this._shipData.guns,
+            decks: `${this._shipData.decks} deck${this._shipData.decks > 1 ? "s" : ""}`,
+            additionalRow: `${this._shipData.decks < 4 ? "<br>\u00A0" : ""}`,
             cannonsPerDeck,
-            cannonBroadside: formatInt(this.shipData.broadside.cannons),
-            carroBroadside: formatInt(this.shipData.broadside.carronades),
-            gunsFront: this.shipData.gunsPerDeck[4],
-            limitFront: this.shipData.deckClassLimit[4],
-            gunsBack: this.shipData.gunsPerDeck[5],
-            limitBack: this.shipData.deckClassLimit[5],
-            firezoneHorizontalWidth: this.shipData.ship.firezoneHorizontalWidth,
-            waterlineHeight: formatFloat(this.shipData.ship.waterlineHeight),
-            maxSpeed: formatFloat(this.shipData.speed.max, 4),
-            acceleration: formatFloat(this.shipData.ship.acceleration),
-            deceleration: formatFloat(this.shipData.ship.deceleration),
-            maxTurningSpeed: formatFloat(this.shipData.rudder.turnSpeed, 3),
-            halfturnTime: formatFloat(this.shipData.rudder.halfturnTime),
-            sideArmor: `${formatInt(this.shipData.sides.armour)}\u00A0<span class="badge badge-white">${formatInt(
-                this.shipData.sides.thickness
+            cannonBroadside: formatInt(this._shipData.broadside.cannons),
+            carroBroadside: formatInt(this._shipData.broadside.carronades),
+            gunsFront: this._shipData.gunsPerDeck[4],
+            limitFront: this._shipData.deckClassLimit[4],
+            gunsBack: this._shipData.gunsPerDeck[5],
+            limitBack: this._shipData.deckClassLimit[5],
+            firezoneHorizontalWidth: this._shipData.ship.firezoneHorizontalWidth,
+            waterlineHeight: formatFloat(this._shipData.ship.waterlineHeight),
+            maxSpeed: formatFloat(this._shipData.speed.max, 4),
+            acceleration: formatFloat(this._shipData.ship.acceleration),
+            deceleration: formatFloat(this._shipData.ship.deceleration),
+            maxTurningSpeed: formatFloat(this._shipData.rudder.turnSpeed, 3),
+            halfturnTime: formatFloat(this._shipData.rudder.halfturnTime),
+            sideArmor: `${formatInt(this._shipData.sides.armour)}\u00A0<span class="badge badge-white">${formatInt(
+                this._shipData.sides.thickness
             )}</span>`,
-            frontArmor: `${formatInt(this.shipData.bow.armour)}\u00A0<span class="badge badge-white">${formatInt(
-                this.shipData.bow.thickness
+            frontArmor: `${formatInt(this._shipData.bow.armour)}\u00A0<span class="badge badge-white">${formatInt(
+                this._shipData.bow.thickness
             )}</span>`,
-            pump: formatInt(this.shipData.pump.armour),
-            sails: formatInt(this.shipData.sails.armour),
-            structure: formatInt(this.shipData.structure.armour),
-            backArmor: `${formatInt(this.shipData.stern.armour)}\u00A0<span class="badge badge-white">${formatInt(
-                this.shipData.stern.thickness
+            pump: formatInt(this._shipData.pump.armour),
+            sails: formatInt(this._shipData.sails.armour),
+            structure: formatInt(this._shipData.structure.armour),
+            backArmor: `${formatInt(this._shipData.stern.armour)}\u00A0<span class="badge badge-white">${formatInt(
+                this._shipData.stern.thickness
             )}</span>`,
-            rudder: `${formatInt(this.shipData.rudder.armour)}\u00A0<span class="badge badge-white">${formatInt(
-                this.shipData.rudder.thickness
+            rudder: `${formatInt(this._shipData.rudder.armour)}\u00A0<span class="badge badge-white">${formatInt(
+                this._shipData.rudder.thickness
             )}</span>`,
-            minCrew: formatInt(this.shipData.crew.min),
-            maxCrew: formatInt(this.shipData.crew.max),
-            sailingCrew: formatInt(this.shipData.crew.sailing || 0),
-            maxWeight: formatInt(this.shipData.maxWeight),
-            holdSize: formatInt(this.shipData.holdSize),
-            upgradeXP: formatInt(this.shipData.upgradeXP),
-            sternRepair: `${formatInt(this.shipData.repairTime.stern)}`,
-            bowRepair: `${formatInt(this.shipData.repairTime.bow)}`,
+            minCrew: formatInt(this._shipData.crew.min),
+            maxCrew: formatInt(this._shipData.crew.max),
+            sailingCrew: formatInt(this._shipData.crew.sailing || 0),
+            maxWeight: formatInt(this._shipData.maxWeight),
+            holdSize: formatInt(this._shipData.holdSize),
+            upgradeXP: formatInt(this._shipData.upgradeXP),
+            sternRepair: `${formatInt(this._shipData.repairTime.stern)}`,
+            bowRepair: `${formatInt(this._shipData.repairTime.bow)}`,
             hullRepairAmount: `${formatInt(
-                (this.shipData.repairAmount.armour + this.shipData.repairAmount.armourPerk) * 100
+                (this._shipData.repairAmount.armour + this._shipData.repairAmount.armourPerk) * 100
             )}`,
             rigRepairAmount: `${formatInt(
-                (this.shipData.repairAmount.sails + this.shipData.repairAmount.sailsPerk) * 100
+                (this._shipData.repairAmount.sails + this._shipData.repairAmount.sailsPerk) * 100
             )}`,
-            repairTime: `${formatInt(this.shipData.repairTime.sides)}`,
+            repairTime: `${formatInt(this._shipData.repairTime.sides)}`,
             hullRepairsNeeded: `${formatInt(hullRepairsNeeded)}\u00A0<span class="badge badge-white">${formatInt(
                 hullRepairsNeeded * repairsSetSize
             )}</span>`,
@@ -537,17 +551,17 @@ class ShipBase extends Ship {
             rumRepairsNeeded: `${formatInt(rumRepairsNeeded)}\u00A0<span class="badge badge-white">${formatInt(
                 rumRepairsNeeded * repairsSetSize
             )}</span>`,
-            fireResistance: formatPercent(this.shipData.resistance.fire, 0),
-            leakResistance: formatPercent(this.shipData.resistance.leaks, 0),
-            splinterResistance: formatPercent(this.shipData.resistance.splinter, 0),
+            fireResistance: formatPercent(this._shipData.resistance.fire, 0),
+            leakResistance: formatPercent(this._shipData.resistance.leaks, 0),
+            splinterResistance: formatPercent(this._shipData.resistance.splinter, 0),
             mastBottomArmor: `${formatInt(
-                this.shipData.mast.bottomArmour
-            )}\u00A0<span class="badge badge-white">${formatInt(this.shipData.mast.bottomThickness)}</span>`,
+                this._shipData.mast.bottomArmour
+            )}\u00A0<span class="badge badge-white">${formatInt(this._shipData.mast.bottomThickness)}</span>`,
             mastMiddleArmor: `${formatInt(
-                this.shipData.mast.middleArmour
-            )}\u00A0<span class="badge badge-white">${formatInt(this.shipData.mast.middleThickness)}</span>`,
-            mastTopArmor: `${formatInt(this.shipData.mast.topArmour)}\u00A0<span class="badge badge-white">${formatInt(
-                this.shipData.mast.topThickness
+                this._shipData.mast.middleArmour
+            )}\u00A0<span class="badge badge-white">${formatInt(this._shipData.mast.middleThickness)}</span>`,
+            mastTopArmor: `${formatInt(this._shipData.mast.topArmour)}\u00A0<span class="badge badge-white">${formatInt(
+                this._shipData.mast.topThickness
             )}</span>`
         };
 
@@ -566,14 +580,6 @@ class ShipBase extends Ship {
         $(`${this.select}`)
             .find("div")
             .append(Ship.getText(ship));
-    }
-
-    get shipData() {
-        return this._shipData;
-    }
-
-    get shipCompareData() {
-        return this._shipCompareData;
     }
 }
 
@@ -631,6 +637,21 @@ class ShipComparison extends Ship {
      * @returns {void}
      */
     _drawDifferenceProfile() {
+        // Add ship outline
+        const { shipMass } = this._shipCompareData;
+        const height = this._shipCompare.shipMassScale(shipMass);
+        const width = height;
+
+        this.g
+            .append("image")
+            .attr("height", height)
+            .attr("width", width)
+            .attr("x", -(width / 2))
+            .attr("y", -(height / 2))
+            .attr("class", "ship-outline")
+            .attr("transform", "rotate(90)")
+            .attr("xlink:href", fishIcon);
+
         // Base profile shape
         this.g
             .append("path")
@@ -1141,6 +1162,12 @@ export default class CompareShips {
             .domain([this._minSpeed, 0, this._maxSpeed])
             .range([colourRedDark, colourWhite, colourGreenDark])
             .interpolate(d3InterpolateCubehelixLong);
+
+        const minShipMass = d3Min(this._shipData, ship => ship.shipMass);
+        const maxShipMass = d3Max(this._shipData, ship => ship.shipMass);
+        this.shipMassScale = d3ScaleLinear()
+            .domain([minShipMass, maxShipMass])
+            .range([100, 200]);
     }
 
     async _loadAndSetupData() {
