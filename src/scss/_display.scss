@@ -13,8 +13,10 @@ $paddingHalf: map-get($spacers, 2);
 $paddingThird: map-get($spacers, 1);
 
 $overlay-background-colour: $primary-800;
-$overlay-background-contrast-colour: $primary-200;
+$overlay-background-colour-contrast: $primary-700;
 $overlay-background: rgba($overlay-background-colour, 0.8);
+$overlay-background-contrast: rgba($overlay-background-colour-contrast, 0.8);
+$overlay-text-colour-contrast: $primary-200;
 $overlay-text-colour: color-yiq($overlay-background);
 
 // opentype
@@ -184,30 +186,6 @@ text {
     text-anchor: start;
 }
 
-.trade-link {
-    fill: none;
-    stroke: $white;
-}
-
-.highlight {
-    stroke: $green;
-}
-
-.trade-label {
-    fill: $white;
-    text-anchor: middle;
-}
-
-.trade-head {
-    fill: $white;
-}
-
-.trades {
-    .link {
-        fill: none;
-    }
-}
-
 .flag-icon {
     width: 2rem;
     height: 100%;
@@ -363,10 +341,15 @@ text {
     flex-direction: column;
     overflow-y: scroll;
     pointer-events: all;
-    background: rgba($primary-100, 0.8);
+    color:$overlay-text-colour;
+    background: $overlay-background;
 
     .bootstrap-select {
         padding: $paddingThird;
+    }
+
+    .card {
+        background: $overlay-background;
     }
 }
 
@@ -376,8 +359,10 @@ text {
     padding-top: $spacer;
 
     .block:nth-of-type(odd) {
-        background: rgba($primary-400, 0.3);
+        background: $overlay-background-contrast;
     }
+
+    .des {color:$overlay-text-colour-contrast;}
 }
 
 .trade-list .block,
@@ -390,6 +375,31 @@ text {
 
     & > div {
         padding: 0 $paddingThird;
+    }
+}
+
+
+.trade-link {
+    fill: none;
+    stroke: $overlay-text-colour;
+}
+
+.highlight {
+    stroke: $green-light;
+}
+
+.trade-label {
+    fill: $overlay-text-colour;
+    text-anchor: middle;
+}
+
+.trade-head {
+    fill: $overlay-text-colour;
+}
+
+.trades {
+    .link {
+        fill: none;
     }
 }
 
@@ -441,13 +451,6 @@ svg {
 
 .speed-text {
     fill: $primary-300;
-}
-
-.wind-arrow {
-    opacity: 0.3;
-    fill: none;
-    stroke: $secondary-600;
-    stroke-width: 0.5em;
 }
 
 .base-profile,
@@ -512,7 +515,7 @@ svg {
 .summary-des {
     @include caps;
     @include des;
-    color: $overlay-background-contrast-colour;
+    color: $overlay-text-colour-contrast;
     top: 0;
 }
 
@@ -761,7 +764,7 @@ pattern > circle {
 }
 
 .text-light-separation {
-    fill: $overlay-background-contrast-colour !important;
+    fill: $overlay-text-colour-contrast !important;
 }
 
 .overlay-block {
