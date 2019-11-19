@@ -565,7 +565,7 @@ export default class Journey {
             .attr("class", "block")
             .append("button")
             .attr("id", this._deleteLastLegButtonId)
-            .attr("class", "btn btn-primary btn-sm")
+            .attr("class", "btn btn-outline-primary btn-sm")
             .attr("role", "button")
             .text("Clear last leg");
     }
