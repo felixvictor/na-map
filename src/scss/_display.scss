@@ -12,6 +12,11 @@ $background-colour: $primary-600;
 $paddingHalf: map-get($spacers, 2);
 $paddingThird: map-get($spacers, 1);
 
+$overlay-background-colour: $primary-800;
+$overlay-background-contrast-colour: $primary-200;
+$overlay-background: rgba($overlay-background-colour, 0.8);
+$overlay-text-colour: color-yiq($overlay-background);
+
 // opentype
 
 body {
@@ -45,7 +50,6 @@ table,
     position: relative;
     top: -0.4rem;
     font-size: small;
-    color: $secondary-700;
 }
 
 .des {
@@ -336,7 +340,8 @@ text {
     display: grid;
     padding: $paddingThird;
     pointer-events: all;
-    background: rgba($primary-200, 0.8);
+    background-color: $overlay-background;
+    color:$overlay-text-colour;
     line-height: 1;
     button {
         margin-bottom: map-get($spacers, 2);
@@ -507,6 +512,7 @@ svg {
 .summary-des {
     @include caps;
     @include des;
+    color: $overlay-background-contrast-colour;
     top: 0;
 }
 
@@ -647,14 +653,10 @@ pattern > circle {
 // svg classes
 ///
 
-//$background-contrast-colour: $primary-800;
-$background-colour: $primary-800;
-$overlay-background: rgba($background-colour, 0.8);
-$overlay-text-colour: color-yiq($overlay-background);
-
 .journey,
 .wind-predict,
-.ingame-wind, .f11 {
+.ingame-wind,
+.f11 {
     svg {
         overflow: auto;
     }
@@ -680,7 +682,7 @@ $overlay-text-colour: color-yiq($overlay-background);
         dominant-baseline: central;
 
         &.des {
-            fill: $background-colour !important;
+            fill: $overlay-background-colour !important;
         }
     }
 }
@@ -749,17 +751,17 @@ $overlay-text-colour: color-yiq($overlay-background);
 }
 
 .ship-profile-arrow-head {
-    fill: $background-colour;
+    fill: $overlay-background-colour;
 }
 
 .ship-profile-arrow {
-    stroke: $background-colour;
-    stroke-width: .7rem;
-    opacity: .3;
+    stroke: $overlay-background-colour;
+    stroke-width: 0.7rem;
+    opacity: 0.3;
 }
 
 .text-light-separation {
-    fill: $primary-300 !important;
+    fill: $overlay-background-contrast-colour !important;
 }
 
 .overlay-block {
