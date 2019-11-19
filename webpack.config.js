@@ -459,6 +459,13 @@ const config = {
                         options: {
                             svgo: svgoOpt
                         }
+                    },
+                    {
+                        loader: "string-replace-loader",
+                        options: {
+                            search: 'fill="$themeColour"',
+                            replace: `fill="${themeColour}"`
+                        }
                     }
                 ]
             }
