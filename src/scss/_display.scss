@@ -748,15 +748,14 @@ $overlay-text-colour: color-yiq($overlay-background);
     fill: $overlay-text-colour;
 }
 
-.ship-base,.ship-compare {
-    line {
-        stroke: $background-colour;
-        stroke-width: 0.1rem;
-    }
+.ship-profile-arrow-head {
+    fill: $background-colour;
+}
 
-    .arrow-head {
-        fill: $background-colour;
-    }
+.ship-profile-arrow {
+    stroke: $background-colour;
+    stroke-width: .7rem;
+    opacity: .3;
 }
 
 .text-light-separation {
