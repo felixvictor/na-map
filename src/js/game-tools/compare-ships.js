@@ -157,8 +157,8 @@ class Ship {
             .attr("y1", -160)
             .attr("x2", 0)
             .attr("y2", -79)
-            .attr("class", "wind-arrow")
-            .attr("marker-end", "url(#course-arrow)");
+            .attr("class", "arrow-head")
+            .attr("marker-end", "url(#journey-arrow)");
     }
 
     /**
