@@ -10,23 +10,22 @@
 
 import { select as d3Select } from "d3-selection";
 
+import { putImportError } from "../util";
 import Cookie from "../util/cookie";
 import RadioButton from "../util/radio-button";
 
 export default class DisplayPbZones {
-    constructor(pbZones, ports) {
+    constructor(ports) {
         this._ports = ports;
 
-        this._pbZonesDefault = pbZones;
-
-        this._showId = "show-pb";
+        this._showId = "show-zones";
 
         /**
          * Possible values for show port battle zones radio buttons (first is default value)
          * @type {string[]}
          * @private
          */
-        this._showValues = ["all", "single", "off"];
+        this._showValues = ["pb-all", "pb-single", "raid-all", "raid-single", "off"];
 
         /**
          * Show port battle zones cookie
@@ -47,6 +46,8 @@ export default class DisplayPbZones {
          */
         this._showPB = this._getShowPBSetting();
 
+        this._isDataLoaded = false;
+
         this._setupSvg();
         this._setupListener();
     }
@@ -55,18 +56,21 @@ export default class DisplayPbZones {
         this._g = d3Select("#na-svg")
             .insert("g", "#ports")
             .attr("class", "pb");
-        /*
-        this._gJoinCirclesInner = this._g.append("path").attr("class", "join-circle");
-        this._gJoinCirclesOuter = this._g.append("path").attr("class", "join-circle");
-        this._gPBCircles = this._g.append("path").attr("class", "pb-circle");
-        this._gTowers = this._g.append("path").attr("class", "tower");
-        this._gForts = this._g.append("path").attr("class", "fort");
+    }
 
-         */
+    async _loadData() {
+        try {
+            this._pbZonesDefault = (await import(/* webpackChunkName: "data-pb" */ "../../gen/pb.json")).default;
+        } catch (error) {
+            putImportError(error);
+        }
     }
 
     _setupListener() {
-        $("#show-pb").change(() => this._showPBZonesSelected());
+        document.getElementById(this._showId).addEventListener("change", event => {
+            this._showPBZonesSelected();
+            event.preventDefault();
+        });
     }
 
     /**
@@ -99,19 +103,72 @@ export default class DisplayPbZones {
         const drawRect = (x, y, r) => `M${x - r / 2},${y - r / 2}h${r}v${r}h${-r}z`;
 
         this._g
-            .selectAll("g")
+            .selectAll("g.pb-zones")
             .data(this._pbZonesFiltered, d => d.id)
             .join(enter => {
-                const g = enter.append("g");
+                const g = enter.append("g").attr("class", "pb-zones");
 
-                // Join circles
+                // Port battle join circles
                 g.append("path")
-                    .attr("class", "join-circle")
+                    .attr("class", "pb-join-circle")
                     .attr("d", d =>
                         drawCircle(d.joinCircles[0], d.joinCircles[1], 28).concat(
                             drawCircle(d.joinCircles[0], d.joinCircles[1], 14)
                         )
                     );
+
+                // Port battle circles
+                g.append("path")
+                    .attr("class", "pb-circle")
+                    .attr("d", d => d.pbCircles.map(pbCircle => drawCircle(pbCircle[0], pbCircle[1], 3.5)).join(""));
+                g.append("text")
+                    .attr("class", "pb-text pb-circle-text")
+                    .attr("x", d => d.pbCircles.map(pbCircle => pbCircle[0]))
+                    .attr("y", d => d.pbCircles.map(pbCircle => pbCircle[1]))
+                    .text(d => d.pbCircles.map((pbCircle, i) => String.fromCharCode(65 + i)).join(""));
+            });
+
+        this._g
+            .selectAll("g.raid-zones")
+            .data(this._raidZonesFiltered, d => d.id)
+            .join(enter => {
+                const g = enter.append("g").attr("class", "raid-zones");
+
+                // Raid join circles
+                g.append("path")
+                    .attr("class", "raid-join-circle")
+                    .attr("d", d => drawCircle(d.joinCircles[0], d.joinCircles[1], 35));
+
+                // Raid circles
+                g.append("path")
+                    .attr("class", "raid-circle")
+                    .attr("d", d =>
+                        d.raidCircles.map(raidCircle => drawCircle(raidCircle[0], raidCircle[1], 4.5)).join("")
+                    );
+                g.append("text")
+                    .attr("class", "pb-text raid-circle-text")
+                    .attr("x", d => d.raidCircles.map(raidCircle => raidCircle[0]))
+                    .attr("y", d => d.raidCircles.map(raidCircle => raidCircle[1]))
+                    .text(d => d.raidCircles.map((raidCircle, i) => String.fromCharCode(65 + i)).join(""));
+
+                // Raid points
+                g.append("path")
+                    .attr("class", "raid-point")
+                    .attr("d", d =>
+                        d.raidPoints.map(raidPoint => drawCircle(raidPoint[0], raidPoint[1], 1.5)).join("")
+                    );
+                g.append("text")
+                    .attr("class", "pb-text raid-point-text")
+                    .attr("x", d => d.raidPoints.map(raidPoint => raidPoint[0]))
+                    .attr("y", d => d.raidPoints.map(raidPoint => raidPoint[1]))
+                    .text(d => d.raidPoints.map((raidPoint, i) => String.fromCharCode(49 + i)).join(""));
+            });
+
+        this._g
+            .selectAll("g.defence")
+            .data(this._defencesFiltered, d => d.id)
+            .join(enter => {
+                const g = enter.append("g").attr("class", "defence");
 
                 // Forts
                 g.append("path")
@@ -132,52 +189,68 @@ export default class DisplayPbZones {
                     .attr("x", d => d.towers.map(tower => tower[0]))
                     .attr("y", d => d.towers.map(tower => tower[1]))
                     .text(d => d.towers.map((tower, i) => `${i + 1}`).join(""));
-
-                // Port battle circles
-                g.append("path")
-                    .attr("class", "pb-circle")
-                    .attr("d", d => d.pbCircles.map(pbCircle => drawCircle(pbCircle[0], pbCircle[1], 3.5)).join(""));
-                g.append("text")
-                    .attr("class", "pb-text pb-circle-text")
-                    .attr("x", d => d.pbCircles.map(tower => tower[0]))
-                    .attr("y", d => d.pbCircles.map(tower => tower[1]))
-                    .text(d => d.pbCircles.map((tower, i) => String.fromCharCode(65 + i)).join(""));
-
-                // Raid points
-                g.append("path")
-                    .attr("class", "raid-point")
-                    .attr("d", d =>
-                        d.raidPoints.map(raidPoint => drawCircle(raidPoint[0], raidPoint[1], 1.5)).join("")
-                    );
-                g.append("text")
-                    .attr("class", "pb-text pb-raid-point-text")
-                    .attr("x", d => d.raidPoints.map(raidPoint => raidPoint[0]))
-                    .attr("y", d => d.raidPoints.map(raidPoint => raidPoint[1]))
-                    .text("RR");
             });
     }
 
     _isPortIn(d) {
-        return this._showPB === "all" || (this._showPB === "single" && d.id === this._ports.currentPort.id);
+        return (
+            this._showPB === "pb-all" ||
+            this._showPB === "raid-all" ||
+            ((this._showPB === "pb-single" || this._showPB === "raid-single") &&
+                Number(d.id) === this._ports.currentPort.id)
+        );
     }
 
     _setData() {
-        if (this._ports.zoomLevel === "pbZone" && this._showPB !== "noShow") {
+        const filterData = () => {
             this._filterVisible();
-            this._pbZonesFiltered = this._pbZonesFiltered.filter(d => this._isPortIn(d));
+        };
+
+        if (this._ports.zoomLevel === "pbZone" && this._showPB !== "off") {
+            if (this._isDataLoaded) {
+                filterData();
+            } else {
+                this._loadData().then(() => {
+                    this._isDataLoaded = true;
+                    filterData();
+                });
+            }
         } else {
+            this._defencesFiltered = {};
             this._pbZonesFiltered = {};
+            this._raidZonesFiltered = {};
         }
     }
 
     _filterVisible() {
-        this._pbZonesFiltered = this._pbZonesDefault.filter(
-            port =>
-                port.position[0] >= this._lowerBound[0] &&
-                port.position[0] <= this._upperBound[0] &&
-                port.position[1] >= this._lowerBound[1] &&
-                port.position[1] <= this._upperBound[1]
-        );
+        const portsFiltered = this._pbZonesDefault
+            .filter(
+                port =>
+                    port.position[0] >= this._lowerBound[0] &&
+                    port.position[0] <= this._upperBound[0] &&
+                    port.position[1] >= this._lowerBound[1] &&
+                    port.position[1] <= this._upperBound[1]
+            )
+            .filter(d => this._isPortIn(d));
+
+        this._defencesFiltered = portsFiltered.map(port => ({ id: port.id, forts: port.forts, towers: port.towers }));
+
+        if (this._showPB === "pb-all" || this._showPB === "pb-single") {
+            this._pbZonesFiltered = portsFiltered.map(port => ({
+                id: port.id,
+                pbCircles: port.pbCircles,
+                joinCircles: port.joinCircles
+            }));
+            this._raidZonesFiltered = {};
+        } else {
+            this._pbZonesFiltered = {};
+            this._raidZonesFiltered = portsFiltered.map(port => ({
+                id: port.id,
+                joinCircles: port.joinCircles,
+                raidCircles: port.raidCircles,
+                raidPoints: port.raidPoints
+            }));
+        }
     }
 
     /**

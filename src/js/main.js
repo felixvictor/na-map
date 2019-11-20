@@ -3,38 +3,13 @@
  *
  * @file Main file.
  * @author iB aka Felix Victor
- * @copyright 2017, 2018
+ * @copyright 2017, 2018, 2019
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import "bootstrap/js/dist/util";
-import "bootstrap/js/dist/button";
-import "bootstrap/js/dist/dropdown";
-import "bootstrap/js/dist/modal";
-import "bootstrap/js/dist/toast";
-import "bootstrap/js/dist/tooltip";
-
-import { library as faLibrary, dom as faDom } from "@fortawesome/fontawesome-svg-core";
-import { faCalendar, faCalendarCheck, faClock, faCopy } from "@fortawesome/free-regular-svg-icons";
-import {
-    faArrowDown,
-    faArrowUp,
-    faChevronLeft,
-    faChevronRight,
-    faCog,
-    faDonate,
-    faEraser,
-    faInfoCircle,
-    faPaste,
-    faSort,
-    faSortDown,
-    faSortUp,
-    faTimes,
-    faTrash
-} from "@fortawesome/free-solid-svg-icons";
-
 import { initAnalytics, registerPage } from "./analytics";
 import { servers } from "./servers";
+import { putImportError } from "./util";
 import Cookie from "./util/cookie";
 import RadioButton from "./util/radio-button";
 
@@ -83,8 +58,7 @@ function main() {
      * Get server name from cookie or use default value
      * @returns {string} - server name
      */
-    // eslint-disable-next-line space-before-function-paren
-    const getServerName = async () => {
+    const getServerName = () => {
         const r = cookie.get();
 
         radios.set(r);
@@ -92,8 +66,7 @@ function main() {
         return r;
     };
 
-    // eslint-disable-next-line space-before-function-paren
-    const getSearchParams = async () => new URL(document.location).searchParams;
+    const getSearchParams = () => new URL(document.location).searchParams;
 
     /**
      * Change server name
@@ -159,14 +132,17 @@ function main() {
      * @param {URLSearchParams} searchParams - Query arguments
      * @return {void}
      */
-    // eslint-disable-next-line space-before-function-paren
     const loadMap = async (serverId, searchParams) => {
-        const { Map } = await import(/*  webpackPreload: true, webpackChunkName: "map" */ "./map/map");
-        const map = new Map(serverId, searchParams);
+        try {
+            const Map = await import(/*  webpackPreload: true, webpackChunkName: "map" */ "./map/map");
+            const map = new Map.Map(serverId, searchParams);
 
-        window.addEventListener("resize", () => {
-            map.resize();
-        });
+            window.addEventListener("resize", () => {
+                map.resize();
+            });
+        } catch (error) {
+            putImportError(error);
+        }
     };
 
     /**
@@ -175,55 +151,35 @@ function main() {
      * @param {URLSearchParams} searchParams - Query arguments
      * @return {void}
      */
-    // eslint-disable-next-line space-before-function-paren
     const loadGameTools = async (serverId, searchParams) => {
         try {
             const gameTools = await import(/* webpackChunkName: "game-tools" */ "./game-tools");
             gameTools.init(serverId, searchParams);
         } catch (error) {
-            throw new Error(error);
+            putImportError(error);
         }
     };
 
-    // eslint-disable-next-line space-before-function-paren
-    const load = async () => {
-        await Promise.all([getServerName(), getSearchParams()]).then(([serverId, searchParams]) => {
-            // Remove search string from URL
-            // {@link https://stackoverflow.com/a/5298684}
-            history.replaceState("", document.title, window.location.origin + window.location.pathname);
+    const load = () => {
+        const serverId = getServerName();
+        const searchParams = getSearchParams();
 
-            loadMap(serverId, searchParams);
-            loadGameTools(serverId, searchParams);
-        });
+        // Remove search string from URL
+        // {@link https://stackoverflow.com/a/5298684}
+        history.replaceState("", document.title, window.location.origin + window.location.pathname);
+
+        loadMap(serverId, searchParams);
+
+        document
+            .getElementById("game-tools-dropdown")
+            .addEventListener("click", () => loadGameTools(serverId, searchParams), { once: true });
     };
-
-    faLibrary.add(
-        faArrowDown,
-        faArrowUp,
-        faCalendar,
-        faCalendarCheck,
-        faChevronLeft,
-        faChevronRight,
-        faClock,
-        faCog,
-        faCopy,
-        faDonate,
-        faEraser,
-        faInfoCircle,
-        faPaste,
-        faSort,
-        faSortDown,
-        faSortUp,
-        faTimes,
-        faTrash
-    );
-    faDom.watch();
 
     initAnalytics();
     registerPage("Homepage");
 
     setupListener();
-    load().then();
+    load();
 }
 
 main();

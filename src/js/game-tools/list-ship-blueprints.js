@@ -8,17 +8,17 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+import "bootstrap/js/dist/util";
+import "bootstrap/js/dist/modal";
+
 import { select as d3Select } from "d3-selection";
 
 import { registerEvent } from "../analytics";
 import { insertBaseModal } from "../common";
-import { formatInt, sortBy } from "../util";
+import { formatInt, putImportError, sortBy } from "../util";
 
 export default class ListShipBlueprints {
-    constructor(blueprintData, woodData) {
-        this._blueprintData = blueprintData;
-        this._woodData = woodData;
-
+    constructor() {
         this._baseName = "List ship blueprint";
         this._baseId = "ship-blueprint-list";
         this._buttonId = `button-${this._baseId}`;
@@ -36,8 +36,26 @@ export default class ListShipBlueprints {
         this._setupListener();
     }
 
+    async _loadAndSetupData() {
+        try {
+            this._blueprintData = (await import(
+                /* webpackChunkName: "data-ship-blueprints" */ "../../gen/ship-blueprints.json"
+            )).default;
+            this._woodData = (await import(/* webpackChunkName: "data-woods" */ "../../gen/woods.json")).default;
+        } catch (error) {
+            putImportError(error);
+        }
+    }
+
     _setupListener() {
-        $(`#${this._buttonId}`).on("click", event => {
+        let firstClick = true;
+
+        document.getElementById(this._buttonId).addEventListener("click", async event => {
+            if (firstClick) {
+                firstClick = false;
+                await this._loadAndSetupData();
+            }
+
             registerEvent("Tools", this._baseName);
             event.stopPropagation();
             this._listSelected();
@@ -167,7 +185,7 @@ export default class ListShipBlueprints {
 
     _updateTable(elem, dataBody, dataHead = []) {
         const addHead = () => {
-            let sortAscending = true;
+            const sortAscending = true;
 
             // Data join rows
             const tableRowUpdate = elem
@@ -224,26 +242,7 @@ export default class ListShipBlueprints {
                 .style("opacity", 1);
 
             // Merge cells
-            tableCellUpdate
-                .merge(tableCellEnter)
-                .html(d => d)
-                .append("i")
-                .classed("fas fa-sort", true)
-                .on("click", (d, i, nodes) => {
-                    if (sortAscending) {
-                        row.sort((a, b) => b[d] < a[d]);
-                        sortAscending = false;
-                        console.log(nodes[i]);
-                        nodes[i].classed("fa-sort-down", false);
-                        nodes[i].classed("fa-sort-up", true);
-                    } else {
-                        row.sort((a, b) => b[d] > a[d]);
-                        sortAscending = true;
-                        console.log(nodes[i]);
-                        nodes[i].classed("fa-sort-up", false);
-                        nodes[i].classed("fa-sort-down", true);
-                    }
-                });
+            tableCellUpdate.merge(tableCellEnter).html(d => d);
         };
 
         const addBody = () => {

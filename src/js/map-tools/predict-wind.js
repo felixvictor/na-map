@@ -4,9 +4,12 @@
  * @file      Predict wind.
  * @module    map-tools/predict-wind
  * @author    iB aka Felix Victor
- * @copyright 2018
+ * @copyright 2018, 2019
  * @license   http://www.gnu.org/licenses/gpl.html
  */
+
+import "bootstrap/js/dist/util";
+import "bootstrap/js/dist/modal";
 
 import { select as d3Select } from "d3-selection";
 import { line as d3Line } from "d3-shape";
@@ -70,7 +73,7 @@ export default class PredictWind {
             .attr("orient", "auto")
             .append("path")
             .attr("d", `M0,-${width}L${doubleWidth},0L0,${width}`)
-            .classed("wind-head", true);
+            .attr("class", "arrow-head");
     }
 
     _navbarClick(event) {
@@ -85,9 +88,7 @@ export default class PredictWind {
 
     _setupWindInput() {
         // workaround from https://github.com/soundar24/roundSlider/issues/71
-        // eslint-disable-next-line func-names,no-underscore-dangle
         const { _getTooltipPos } = $.fn.roundSlider.prototype;
-        // eslint-disable-next-line func-names,no-underscore-dangle
         $.fn.roundSlider.prototype._getTooltipPos = function() {
             if (!this.tooltip.is(":visible")) {
                 $("body").append(this.tooltip);
@@ -140,7 +141,7 @@ export default class PredictWind {
             .attr("class", "rslider");
 
         const formGroupB = form.append("div").attr("class", "form-group");
-        const block = formGroupB.append("div").classed("alert alert-primary", true);
+        const block = formGroupB.append("div").attr("class", "alert alert-primary");
         block
             .append("label")
             .attr("for", this._timeInputId)
@@ -165,9 +166,9 @@ export default class PredictWind {
             .attr("data-target", `#${this._timeGroupId}`)
             .attr("data-toggle", "datetimepicker")
             .append("span")
-            .classed("input-group-text", true)
+            .attr("class", "input-group-text")
             .append("i")
-            .classed("far fa-clock", true);
+            .attr("class", "icon icon-clock");
 
         $(`#${this._timeGroupId}`).datetimepicker({
             defaultDate: moment.utc(),
@@ -271,7 +272,6 @@ export default class PredictWind {
         const compassElem = this._svg
             .append("svg")
             .attr("class", "compass")
-            .classed("compass", true)
             .attr("x", xCompass)
             .attr("y", yCompass);
         printCompassRose({ element: compassElem, radius });
@@ -281,7 +281,6 @@ export default class PredictWind {
             .append("path")
             .datum(lineData)
             .attr("d", line)
-            .classed("wind", true)
             .attr("marker-end", "url(#wind-arrow)");
     }
 
@@ -297,14 +296,13 @@ export default class PredictWind {
             .append("text")
             .attr("x", "50%")
             .attr("y", "33%")
-            .attr("class", "wind-text")
             .html(`From ${displayCompassAndDegrees(compass, true)} at ${predictTime}`);
 
         const text2 = textSvg
             .append("text")
             .attr("x", "50%")
             .attr("y", "66%")
-            .attr("class", "wind-text-current")
+            .attr("class", "text-light-separation")
             .html(`Currently at ${currentTime} from ${displayCompassAndDegrees(currentWind, true)}`);
 
         const bbox1 = text1.node().getBoundingClientRect();
