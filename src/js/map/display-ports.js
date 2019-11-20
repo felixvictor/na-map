@@ -4,19 +4,19 @@
  * @file      Display ports.
  * @module    map/display-ports
  * @author    iB aka Felix Victor
- * @copyright 2018
+ * @copyright 2018, 2019
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+import "bootstrap/js/dist/util";
+import "bootstrap/js/dist/tooltip";
+
 import { min as d3Min, max as d3Max } from "d3-array";
-import { interpolateHcl as d3InterpolateHcl, interpolateHclLong as d3InterpolateHclLong } from "d3-interpolate";
+import { interpolateCubehelixLong as d3InterpolateCubehelixLong } from "d3-interpolate";
 // import { polygonCentroid as d3PolygonCentroid, polygonHull as d3PolygonHull } from "d3-polygon";
 import { scaleLinear as d3ScaleLinear, scaleOrdinal as d3ScaleOrdinal } from "d3-scale";
 import { select as d3Select } from "d3-selection";
 // import { curveCatmullRomClosed as d3CurveCatmullRomClosed, line as d3Line } from "d3-shape";
-
-import "bootstrap/js/dist/util";
-import "bootstrap/js/dist/tooltip";
 
 import moment from "moment";
 import "moment/locale/en-gb";
@@ -41,16 +41,16 @@ import {
     formatSiCurrency,
     formatSiInt,
     getOrdinal,
+    putImportError,
     roundToThousands
 } from "../util";
 import Cookie from "../util/cookie";
 import RadioButton from "../util/radio-button";
+
 import TrilateratePosition from "../map-tools/get-position";
 
 export default class DisplayPorts {
-    constructor(portData, map) {
-        this._portDataDefault = portData;
-        this._portData = portData;
+    constructor(map) {
         this._map = map;
 
         this._serverName = this._map._serverName;
@@ -106,6 +106,33 @@ export default class DisplayPorts {
          */
         this._showRadius = this._getShowRadiusSetting();
 
+        this._trilateratePosition = new TrilateratePosition(this);
+    }
+
+    async init() {
+        await this._loadAndSetupData();
+    }
+
+    _setupData(data) {
+        // Combine port data with port battle data
+        const portData = data.ports.map(port => {
+            const serverData = data.server.find(d => d.id === port.id);
+            const pbData = data.pb.ports.find(d => d.id === port.id);
+            const combinedData = { ...port, ...serverData, ...pbData };
+
+            // Delete empty entries
+            ["dropsTrading", "consumesTrading", "producesNonTrading", "dropsNonTrading"].forEach(type => {
+                if (!combinedData[type]) {
+                    delete combinedData[type];
+                }
+            });
+
+            return combinedData;
+        });
+
+        this._portDataDefault = portData;
+        this._portData = portData;
+
         this._setupScales();
         this._setupListener();
         this._setupSvg();
@@ -113,8 +140,53 @@ export default class DisplayPorts {
         this._setupRegions();
         this._setupSummary();
         this._setupFlags();
+    }
 
-        this._trilateratePosition = new TrilateratePosition(this);
+    async _loadData() {
+        /**
+         * Data directory
+         * @type {string}
+         * @private
+         */
+        const dataDirectory = "data";
+
+        /**
+         * Data sources
+         * @type {Array<fileName: string, name: string>}
+         * @private
+         */
+        const dataSources = [
+            {
+                fileName: `${this._serverName}.json`,
+                name: "server"
+            },
+            {
+                fileName: `${this._serverName}-pb.json`,
+                name: "pb"
+            }
+        ];
+
+        const readData = {};
+
+        // eslint-disable-next-line unicorn/consistent-function-scoping
+        const loadEntries = async dataSources => {
+            for await (const dataSource of dataSources) {
+                readData[dataSource.name] = await (await fetch(`${dataDirectory}/${dataSource.fileName}`)).json();
+            }
+        };
+
+        try {
+            readData.ports = (await import(/* webpackChunkName: "data-ports" */ "../../gen/ports.json")).default;
+            await loadEntries(dataSources);
+            return readData;
+        } catch (error) {
+            putImportError(error);
+        }
+    }
+
+    async _loadAndSetupData() {
+        const readData = await this._loadData();
+        this._setupData(readData);
     }
 
     _setupScales() {
@@ -122,31 +194,31 @@ export default class DisplayPorts {
         this._attackRadius = d3ScaleLinear().domain([0, 1]);
 
         this._colourScaleHostility = d3ScaleLinear()
-            .domain([0, 0.5, 1])
-            .range([colourWhite, colourRedLight, colourRedDark])
-            .interpolate(d3InterpolateHcl);
+            .domain([0, 1])
+            .range([colourWhite, colourRedDark])
+            .interpolate(d3InterpolateCubehelixLong);
         this._colourScaleCounty = d3ScaleOrdinal().range(colourList);
 
         this._minTaxIncome = d3Min(this._portData, d => d.taxIncome);
         this._maxTaxIncome = d3Max(this._portData, d => d.taxIncome);
         this._colourScaleTax = d3ScaleLinear()
-            .domain([this._minTaxIncome, this._maxTaxIncome / 10, this._maxTaxIncome])
-            .range([colourWhite, colourGreenLight, colourGreenDark])
-            .interpolate(d3InterpolateHcl);
+            .domain([this._minTaxIncome, this._maxTaxIncome])
+            .range([colourWhite, colourGreenDark])
+            .interpolate(d3InterpolateCubehelixLong);
 
         this._minNetIncome = d3Min(this._portData, d => d.netIncome);
         this._maxNetIncome = d3Max(this._portData, d => d.netIncome);
         this._colourScaleNet = d3ScaleLinear()
-            .domain([this._minNetIncome, this._minNetIncome / 100, 0, this._maxNetIncome / 100, this._maxNetIncome])
+            .domain([this._minNetIncome, this._minNetIncome / 50, 0, this._maxNetIncome / 50, this._maxNetIncome])
             .range([colourRedDark, colourRedLight, colourWhite, colourGreenLight, colourGreenDark])
-            .interpolate(d3InterpolateHclLong);
+            .interpolate(d3InterpolateCubehelixLong);
 
         this._minPortPoints = d3Min(this._portData, d => d.portPoints);
         this._maxPortPoints = d3Max(this._portData, d => d.portPoints);
         this._colourScalePoints = d3ScaleLinear()
             .domain([this._minPortPoints, this._maxPortPoints])
             .range([colourWhite, colourGreenDark])
-            .interpolate(d3InterpolateHcl);
+            .interpolate(d3InterpolateCubehelixLong);
     }
 
     _setupListener() {
@@ -375,21 +447,21 @@ export default class DisplayPorts {
             .html("net<br>income");
     }
 
-    _setupFlags() {
-        /**
-         * @link https://stackoverflow.com/questions/42118296/dynamically-import-images-from-a-directory-using-webpack
-         * @param {object} r - webpack require.context
-         * @return {object} Images
-         */
-        const importAll = r => {
-            const images = {};
-            r.keys().forEach(item => {
-                images[item.replace("./", "").replace(".svg", "")] = r(item);
-            });
-            return images;
-        };
+    /**
+     * @link https://stackoverflow.com/questions/42118296/dynamically-import-images-from-a-directory-using-webpack
+     * @param {object} r - webpack require.context
+     * @return {object} Images
+     */
+    static _importAll(r) {
+        const images = {};
+        r.keys().forEach(item => {
+            images[item.replace("./", "").replace(".svg", "")] = r(item);
+        });
+        return images;
+    }
 
-        this._nationIcons = importAll(require.context("../../icons", false, /\.svg$/));
+    _setupFlags() {
+        this._nationIcons = DisplayPorts._importAll(require.context("Flags", false, /\.svg$/));
         const svgDef = d3Select("#na-svg defs");
 
         nations
@@ -536,122 +608,118 @@ export default class DisplayPorts {
         return port;
     }
 
-    _showDetails(d, i, nodes) {
-        const tooltipData = port => {
-            let h = '<div class="d-flex align-items-baseline mb-1">';
-            h += `<img alt="${port.icon}" class="flag-icon align-self-stretch" src="${this._nationIcons[port.icon]
-                .replace('"', "")
-                .replace('"', "")}"/>`;
-            h += `<div class="port-name">${port.name}</div>`;
-            h += `<div>\u2000${port.county} ${port.availableForAll}</div>`;
-            h += "</div>";
-            if (port.attack.length) {
-                h += `<div class="alert alert-danger mt-2" role="alert">${port.attack}</div>`;
-            }
+    _tooltipData(port) {
+        let h = '<div class="d-flex align-items-baseline mb-1">';
+        h += `<img alt="${port.icon}" class="flag-icon align-self-stretch" src="${this._nationIcons[port.icon]
+            .replace('"', "")
+            .replace('"', "")}"/>`;
+        h += `<div class="port-name">${port.name}</div>`;
+        h += `<div>\u2000${port.county} ${port.availableForAll}</div>`;
+        h += "</div>";
+        if (port.attack.length) {
+            h += `<div class="alert alert-danger mt-2" role="alert">${port.attack}</div>`;
+        }
 
-            h += `<p>${port.depth} water port ${port.countyCapital}${port.captured}<br>`;
-            if (port.nonCapturable) {
-                h += "Not capturable";
-                h += `<br>${port.portTax} tax`;
-            } else {
-                h += `Port battle ${port.pbTimeRange}, ${port.brLimit} <span class="caps">BR</span>, `;
-                h += `${port.pbType}\u202Frate <span class="caps">AI</span>, `;
-                h += `${port.conquestMarksPension}\u202Fconquest point`;
-                h += port.conquestMarksPension > 1 ? "s" : "";
-                h += `, ${port.portPoints}\u202Fport points`;
-                h += `<br>Tax income ${port.taxIncome} (${port.portTax}), net income ${port.netIncome}`;
-                h += port.tradingCompany;
-                h += port.laborHoursDiscount;
-            }
+        h += `<p>${port.depth} water port ${port.countyCapital}${port.captured}<br>`;
+        if (port.nonCapturable) {
+            h += "Not capturable";
+            h += `<br>${port.portTax} tax`;
+        } else {
+            h += `Port battle ${port.pbTimeRange}, ${port.brLimit} <span class="caps">BR</span>, `;
+            h += `${port.pbType}\u202Frate <span class="caps">AI</span>, `;
+            h += `${port.conquestMarksPension}\u202Fconquest point`;
+            h += port.conquestMarksPension > 1 ? "s" : "";
+            h += `, ${port.portPoints}\u202Fport points`;
+            h += `<br>Tax income ${port.taxIncome} (${port.portTax}), net income ${port.netIncome}`;
+            h += port.tradingCompany;
+            h += port.laborHoursDiscount;
+        }
 
-            h += "</p>";
-            h += "<table class='table table-sm'>";
-            if (port.producesNonTrading.length) {
-                h += "<tr><td class='pl-0'>Produces\u00A0</td><td>";
-                h += `<span class="non-trading">${port.producesNonTrading}</span>`;
-                h += "</td></tr>";
-            }
+        h += "</p>";
+        h += "<table class='table table-sm'>";
+        if (port.producesNonTrading.length) {
+            h += "<tr><td class='pl-0'>Produces\u00A0</td><td>";
+            h += `<span class="non-trading">${port.producesNonTrading}</span>`;
+            h += "</td></tr>";
+        }
 
-            if (port.dropsTrading.length || port.dropsNonTrading.length) {
-                h += `<tr><td class='pl-0'>Drops\u00A0${port.dropsNonTrading.length ? "\u00A0" : ""}</td><td>`;
-                if (port.dropsNonTrading.length) {
-                    h += `<span class="non-trading">${port.dropsNonTrading}</span>`;
-                    if (port.dropsTrading.length) {
-                        h += "<br>";
-                    }
-                }
-
+        if (port.dropsTrading.length || port.dropsNonTrading.length) {
+            h += `<tr><td class='pl-0'>Drops\u00A0${port.dropsNonTrading.length ? "\u00A0" : ""}</td><td>`;
+            if (port.dropsNonTrading.length) {
+                h += `<span class="non-trading">${port.dropsNonTrading}</span>`;
                 if (port.dropsTrading.length) {
-                    h += `${port.dropsTrading}`;
-                }
-
-                h += "</td></tr>";
-            }
-
-            if (port.consumesTrading.length) {
-                h += "<tr><td class='pl-0'>Consumes\u00A0</td><td>";
-                h += port.consumesTrading;
-                h += "</td></tr>";
-            }
-
-            if (this.showTradePortPartners) {
-                if (port.goodsToSellInTradePort.length) {
-                    h += `<tr><td class='pl-0'>Sell in ${port.tradePort}\u00A0</td><td>${
-                        port.goodsToSellInTradePort
-                    }</td></tr>`;
-                }
-
-                if (port.goodsToBuyInTradePort.length) {
-                    h += `<tr><td class='pl-0'>Buy in ${port.tradePort}\u00A0</td><td>${
-                        port.goodsToBuyInTradePort
-                    }</td></tr>`;
+                    h += "<br>";
                 }
             }
 
-            h += "</table>";
-
-            return h;
-        };
-
-        const getInventory = port => {
-            let h = "";
-
-            const buy = port.inventory
-                .filter(good => good.buyQuantity > 0)
-                .map(good => {
-                    return `${formatInt(good.buyQuantity)} ${good.name} @ ${formatSiCurrency(good.buyPrice)}`;
-                })
-                .join("<br>");
-            const sell = port.inventory
-                .filter(good => good.sellQuantity > 0)
-                .map(good => {
-                    return `${formatInt(good.sellQuantity)} ${good.name} @ ${formatSiCurrency(good.sellPrice)}`;
-                })
-                .join("<br>");
-
-            h += `<h5 class="caps">${port.name} <span class="small">${port.nation}</span></h5>`;
-            if (buy.length) {
-                h += "<h6>Buy</h6>";
-                h += buy;
+            if (port.dropsTrading.length) {
+                h += `${port.dropsTrading}`;
             }
 
-            if (buy.length && sell.length) {
-                h += "<p></p>";
+            h += "</td></tr>";
+        }
+
+        if (port.consumesTrading.length) {
+            h += "<tr><td class='pl-0'>Consumes\u00A0</td><td>";
+            h += port.consumesTrading;
+            h += "</td></tr>";
+        }
+
+        if (this.showTradePortPartners) {
+            if (port.goodsToSellInTradePort.length) {
+                h += `<tr><td class='pl-0'>Sell in ${port.tradePort}\u00A0</td><td>${port.goodsToSellInTradePort}</td></tr>`;
             }
 
-            if (sell.length) {
-                h += "<h6>Sell</h6>";
-                h += sell;
+            if (port.goodsToBuyInTradePort.length) {
+                h += `<tr><td class='pl-0'>Buy in ${port.tradePort}\u00A0</td><td>${port.goodsToBuyInTradePort}</td></tr>`;
             }
+        }
 
-            return h;
-        };
+        h += "</table>";
 
+        return h;
+    }
+
+    static _getInventory(port) {
+        let h = "";
+
+        const buy = port.inventory
+            .filter(good => good.buyQuantity > 0)
+            .map(good => {
+                return `${formatInt(good.buyQuantity)} ${good.name} @ ${formatSiCurrency(good.buyPrice)}`;
+            })
+            .join("<br>");
+        const sell = port.inventory
+            .filter(good => good.sellQuantity > 0)
+            .map(good => {
+                return `${formatInt(good.sellQuantity)} ${good.name} @ ${formatSiCurrency(good.sellPrice)}`;
+            })
+            .join("<br>");
+
+        h += `<h5 class="caps">${port.name} <span class="small">${port.nation}</span></h5>`;
+        if (buy.length) {
+            h += "<h6>Buy</h6>";
+            h += buy;
+        }
+
+        if (buy.length && sell.length) {
+            h += "<p></p>";
+        }
+
+        if (sell.length) {
+            h += "<h6>Sell</h6>";
+            h += sell;
+        }
+
+        return h;
+    }
+
+    _showDetails(d, i, nodes) {
         $(d3Select(nodes[i]).node())
             .tooltip({
                 html: true,
                 placement: "auto",
-                title: tooltipData(this._getText(d.id, d)),
+                title: this._tooltipData(this._getText(d.id, d)),
                 trigger: "manual",
                 sanitize: false
             })
@@ -662,15 +730,15 @@ export default class DisplayPorts {
                 this._map.showTrades.listType = "inventory";
             }
 
-            this._map.showTrades.update(getInventory(d));
+            this._map.showTrades.update(DisplayPorts._getInventory(d));
         }
     }
 
-    _updateIcons() {
-        const hideDetails = (d, i, nodes) => {
-            $(d3Select(nodes[i]).node()).tooltip("dispose");
-        };
+    static _hideDetails(d, i, nodes) {
+        $(d3Select(nodes[i]).node()).tooltip("dispose");
+    }
 
+    _updateIcons() {
         const circleScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale);
         const circleSize = roundToThousands(this._circleSize / circleScale);
         const data = this._portDataFiltered;
@@ -690,33 +758,36 @@ export default class DisplayPorts {
                     .attr("cx", d => d.coordinates[0])
                     .attr("cy", d => d.coordinates[1])
                     .on("click", (d, i, nodes) => this._showDetails(d, i, nodes))
-                    .on("mouseleave", hideDetails)
+                    .on("mouseleave", DisplayPorts._hideDetails)
             )
             .attr("r", circleSize);
     }
 
+    static _getTradePortMarker(port) {
+        let marker = "";
+        if (port.id === this.tradePortId) {
+            marker = "here";
+        } else if (port.sellInTradePort && port.buyInTradePort) {
+            marker = "both";
+        } else if (port.sellInTradePort) {
+            marker = "pos";
+        } else if (port.buyInTradePort) {
+            marker = "neg";
+        }
+
+        return marker;
+    }
+
     _updatePortCircles() {
-        const getTradePortMarker = port => {
-            let marker = "";
-            if (port.id === this.tradePortId) {
-                marker = "here";
-            } else if (port.sellInTradePort && port.buyInTradePort) {
-                marker = "both";
-            } else if (port.sellInTradePort) {
-                marker = "pos";
-            } else if (port.buyInTradePort) {
-                marker = "neg";
-            }
-
-            return marker;
-        };
-
         const circleScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale);
         const rMin = roundToThousands((this._circleSize / circleScale) * this._minRadiusFactor);
         const rMax = roundToThousands((this._circleSize / circleScale) * this._maxRadiusFactor);
         let data = this._portDataFiltered;
+        // eslint-disable-next-line unicorn/consistent-function-scoping
         let cssClass = () => {};
+        // eslint-disable-next-line unicorn/consistent-function-scoping
         let r = () => {};
+        // eslint-disable-next-line unicorn/consistent-function-scoping
         let fill = () => {};
 
         if (this._showRadius === "tax") {
@@ -732,7 +803,7 @@ export default class DisplayPorts {
             fill = d => this._colourScaleNet(d.netIncome);
             r = d => this._portRadius(Math.abs(d.netIncome));
         } else if (this.showTradePortPartners) {
-            cssClass = d => `bubble ${getTradePortMarker(d)}`;
+            cssClass = d => `bubble ${DisplayPorts._getTradePortMarker(d)}`;
             r = d => (d.id === this.tradePortId ? rMax : rMax / 2);
         } else if (this._showRadius === "points") {
             data = this._portDataFiltered.filter(d => !d.nonCapturable);
@@ -754,7 +825,7 @@ export default class DisplayPorts {
             r = () => rMax / 2;
         } else if (this._showRadius === "county") {
             cssClass = d =>
-                d.nonCapturable ? "bubble non-capturable" : d.countyCapital ? "bubble capital" : "bubble non-capital";
+                d.nonCapturable ? "bubble not-capturable" : d.countyCapital ? "bubble capital" : "bubble non-capital";
             fill = d => (d.nonCapturable ? "" : this._colourScaleCounty(d.county));
             r = d => (d.nonCapturable ? rMax / 3 : rMax / 2);
         } else if (this._showRadius === "off") {
