@@ -120,8 +120,10 @@ function updatePorts() {
      */
     function portBattleScheduled(result) {
         const guessNationFromClanName = clanName => {
-            const nationShortname = ports.ports.find(port => port.capturer === clanName).nation;
-            const nationName = nationShortname ? nations.find(nation => nation.short === nationShortname).name : "n/a";
+            const guessedNation = ports.ports.find(port => port.capturer === clanName);
+            const nationName = guessedNation
+                ? nations.find(nation => nation.short === guessedNation.nation).name
+                : "n/a";
 
             return nationName;
         };
@@ -139,6 +141,22 @@ function updatePorts() {
         port.attackerClan = result[6];
         port.attackHostility = 1;
         port.portBattle = moment(result[4], "DD MMM YYYY HH:mm").format("YYYY-MM-DD HH:mm");
+    }
+
+    /**
+     * NPC port battle scheduled
+     * @param {String[]} result - Result from tweet regex
+     * @returns {void}
+     */
+    function npcPortBattleScheduled(result) {
+        const i = ports.ports.findIndex(findIndex, result[2]);
+        const port = ports.ports[i];
+
+        console.log("      --- npcPortBattleScheduled", i);
+        port.attackerNation = "Neutral";
+        port.attackerClan = "NPC";
+        port.attackHostility = 1;
+        port.portBattle = moment(result[3], "DD MMM YYYY HH:mm").format("YYYY-MM-DD HH:mm");
     }
 
     const portR = "[A-zÀ-ÿ’ -]+";
@@ -173,6 +191,11 @@ function updatePorts() {
     // noinspection RegExpRedundantEscape
     const portBattleRegex = new RegExp(
         `\\[(${timeR}) UTC\\] The port battle for (${portR}) \\((${nationR})\\) is scheduled for (${pbTimeR}) UTC\\. Defender: (${defenderR})\\. Attacker: (${clanR}) ?\\(?(${nationR})?\\)?\\. BR: \\d+ #PBCaribbean #PBCaribbean${portHashR} #NavalAction`,
+        "u"
+    );
+    // noinspection RegExpRedundantEscape
+    const npcPortBattleRegex = new RegExp(
+        `\\[(${timeR}) UTC\\] NPC port battle for port (${portR})(?: \\(${nationR}\\)) will be started at (${pbTimeR}) UTC`,
         "u"
     );
     // noinspection RegExpRedundantEscape
@@ -240,6 +263,9 @@ function updatePorts() {
             } else if ((result = portBattleRegex.exec(tweet.text)) !== null) {
                 isPortDataChanged = true;
                 portBattleScheduled(result);
+            } else if ((result = npcPortBattleRegex.exec(tweet.text)) !== null) {
+                isPortDataChanged = true;
+                npcPortBattleScheduled(result);
             } else if ((result = gainHostilityRegex.exec(tweet.text)) !== null) {
                 // noop
                 // eslint-disable-next-line no-unused-expressions

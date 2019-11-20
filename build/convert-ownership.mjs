@@ -8,15 +8,12 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-/* eslint-disable import/no-extraneous-dependencies, import/no-named-default */
-
 import * as fs from "fs";
 import * as path from "path";
 import d3Node from "d3-node";
 import { default as lzma } from "lzma-native";
 import { default as readDirRecursive } from "recursive-readdir";
 
-// eslint-disable-next-line import/extensions
 import { capitalToCounty, cleanName, nations, saveJson } from "./common.mjs";
 
 const inDir = process.argv[2];
@@ -234,7 +231,6 @@ function convertOwnership() {
      */
     function writeResult() {
         const portsArray = [...ports.entries()].map(([key, value]) => {
-            // eslint-disable-next-line no-param-reassign
             value.id = key;
             return value;
         });

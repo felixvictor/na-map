@@ -4,32 +4,25 @@
  * @file      ship list.
  * @module    ship-list
  * @author    iB aka Felix Victor
- * @copyright 2018
+ * @copyright 2018, 2019
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+import "bootstrap/js/dist/util";
+import "bootstrap/js/dist/modal";
+
 import { select as d3Select } from "d3-selection";
-// eslint-disable-next-line import/no-named-default
 import { default as Tablesort } from "tablesort";
 
 import { registerEvent } from "../analytics";
 import { insertBaseModal } from "../common";
-import { formatFloatFixed, sortBy } from "../util";
-
-// https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
-// eslint-disable-next-line no-extend-native,func-names
-String.prototype.replaceAll = function(search, replacement) {
-    const target = this;
-    return target.replace(new RegExp(search, "g"), replacement);
-};
+import { formatFloatFixed, formatInt, putImportError, sortBy } from "../util";
 
 /**
  *
  */
 export default class ShipList {
-    constructor(shipData) {
-        this._shipData = shipData;
-
+    constructor() {
         this._baseName = "List ships";
         this._baseId = "ship-list";
         this._buttonId = `button-${this._baseId}`;
@@ -37,8 +30,23 @@ export default class ShipList {
         this._setupListener();
     }
 
+    async _loadAndSetupData() {
+        try {
+            this._shipData = (await import(/* webpackChunkName: "data-ships" */ "../../gen/ships.json")).default;
+        } catch (error) {
+            putImportError(error);
+        }
+    }
+
     _setupListener() {
-        $(`#${this._buttonId}`).on("click", event => {
+        let firstClick = true;
+
+        document.getElementById(this._buttonId).addEventListener("click", async event => {
+            if (firstClick) {
+                firstClick = false;
+                await this._loadAndSetupData();
+            }
+
             registerEvent("Tools", this._baseName);
             event.stopPropagation();
             this._shipListSelected();
@@ -121,29 +129,22 @@ export default class ShipList {
 
         text += `<table id="table-${this._baseId}" class="table table-sm small tablesort"><thead>`;
         text += "<tr>";
-        text += '<th scope="col"></th>';
-        text += '<th scope="col"></th>';
-        text += '<th scope="col"></th>';
-        text += '<th scope="col"></th>';
-        text += '<th scope="col"></th>';
-        text += '<th scope="col" colspan="2">Speed</th>';
-        text += '<th scope="col"></th>';
-        text += '<th scope="col" colspan="2">Chasers</th>';
-        text += '<th scope="col"></th>';
+        text += '<th scope="col" class="text-right" rowspan="2">Class</th>';
+        text += '<th scope="col" rowspan="2">Name</th>';
+        text += '<th scope="col" class="text-right" rowspan="2">Guns</th>';
+        text += '<th scope="col" class="text-right" rowspan="2">Battle<br>rating</th>';
+        text += '<th scope="col" class="text-right" rowspan="2">Crew</th>';
+        text += '<th scope="col" class="text-center" colspan="2">Speed</th>';
+        text += '<th scope="col" class="text-right" rowspan="2">Broadside</th>';
+        text += '<th scope="col" class="text-center" colspan="2">Chasers</th>';
+        text += '<th scope="col" class="text-right" rowspan="2">Sides</th>';
         text += "</tr>";
 
         text += "<tr>";
-        text += "<th>Class</th>";
-        text += '<th scope="col">Name</th>';
-        text += '<th scope="col">Guns</th>';
-        text += '<th scope="col">Battle<br>rating</th>';
-        text += '<th scope="col">Crew</th>';
-        text += '<th scope="col">Maximum</th>';
-        text += '<th scope="col">Turn</th>';
-        text += '<th scope="col">Broadside</th>';
-        text += '<th scope="col">Bow</th>';
-        text += '<th scope="col">Stern</th>';
-        text += '<th scope="col">Sides</th>';
+        text += '<th scope="col" class="text-right">Maximum</th>';
+        text += '<th scope="col" class="text-right">Turn</th>';
+        text += '<th scope="col" class="text-right">Bow</th>';
+        text += '<th scope="col" class="text-right">Stern</th>';
         text += "</tr></thead><tbody>";
 
         this._shipData
@@ -161,7 +162,7 @@ export default class ShipList {
                 text += `<td class="text-right">${ship.broadside.cannons}</td>`;
                 text += `<td class="text-right">${ship.gunsPerDeck[4] ? ship.gunsPerDeck[4] : ""}</td>`;
                 text += `<td class="text-right">${ship.gunsPerDeck[5] ? ship.gunsPerDeck[5] : ""}</td>`;
-                text += `<td class="text-right" data-sort="${ship.sides.armour}">${ship.sides.armour} (${ship.sides.thickness})</td>`;
+                text += `<td class="text-right" data-sort="${ship.sides.armour}">${formatInt(ship.sides.armour)} (${ship.sides.thickness})</td>`;
                 text += "</tr>";
             });
         text += "</tbody></table>";
