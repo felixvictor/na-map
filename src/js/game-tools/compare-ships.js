@@ -14,10 +14,11 @@ import "bootstrap/js/dist/tooltip";
 
 import { ascending as d3Ascending, max as d3Max, min as d3Min } from "d3-array";
 import { nest as d3Nest } from "d3-collection";
+import { drag as d3Drag } from "d3-drag";
 import { interpolateCubehelixLong as d3InterpolateCubehelixLong } from "d3-interpolate";
 
 import { scaleLinear as d3ScaleLinear } from "d3-scale";
-import { select as d3Select } from "d3-selection";
+import { event as d3Event, select as d3Select } from "d3-selection";
 import {
     arc as d3Arc,
     curveCatmullRomClosed as d3CurveCatmullRomClosed,
@@ -55,6 +56,7 @@ import {
     getOrdinal,
     isEmpty,
     putImportError,
+    radiansToDegrees,
     roundToThousands,
     sortBy
 } from "../util";
@@ -62,7 +64,7 @@ import {
 import CompareWoods from "./compare-woods";
 
 // eslint-disable-next-line import/no-unresolved
-import { default as fishIcon } from "Icons/icon-ship.svg";
+import { default as shipIcon } from "Icons/icon-ship.svg";
 
 const numberSegments = 24;
 const segmentRadians = (2 * Math.PI) / numberSegments;
@@ -75,7 +77,7 @@ const repairsSetSize = 5;
  */
 class Ship {
     /**
-     * @param {number} id - column id
+     * @param {string} id - column id
      * @param {Class} shipCompare - Class instance of the ship to be compared to
      */
     constructor(id, shipCompare) {
@@ -365,7 +367,7 @@ class Ship {
  */
 class ShipBase extends Ship {
     /**
-     * @param {number} id - Ship id
+     * @param {string} id - Ship id
      * @param {Object} shipData - Ship data
      * @param {Class} shipCompare - Class instance of the ship to be compared to
      */
@@ -375,9 +377,37 @@ class ShipBase extends Ship {
         this._shipData = shipData;
         this._shipCompare = shipCompare;
 
+        this._setupDrag();
         this._setBackground();
         this._drawProfile();
         this._printText();
+    }
+
+    _setupDrag() {
+        // eslint-disable-next-line unicorn/consistent-function-scoping
+        const dragStart = (d, i, nodes) => {
+            d3Select(nodes[i]).classed("drag-active", true);
+        };
+
+        // eslint-disable-next-line unicorn/consistent-function-scoping
+        const dragged = (d, i, nodes) => {
+            const xDelta = d3Event.x - this._xShip;
+            const yDelta = d3Event.y - this._yShip;
+            const radians = Math.atan2(yDelta, xDelta);
+            // console.log(d, d3Event, xDelta, yDelta, radians);
+
+            d3Select(nodes[i]).attr("transform", `rotate(${radiansToDegrees(radians)})`);
+        };
+
+        // eslint-disable-next-line unicorn/consistent-function-scoping
+        const dragEnd = (d, i, nodes) => {
+            d3Select(nodes[i]).classed("drag-active", false);
+        };
+
+        this._dragShip = d3Drag()
+            .on("start", dragStart)
+            .on("drag", dragged)
+            .on("end", dragEnd);
     }
 
     /**
@@ -394,18 +424,20 @@ class ShipBase extends Ship {
 
         // Add ship outline
         const { shipMass } = this._shipData;
-        const height = this._shipCompare.shipMassScale(shipMass);
-        const width = height;
-
+        this._heightShip = this._shipCompare.shipMassScale(shipMass);
+        this._widthShip = this._heightShip;
+        this._xShip = -(this._widthShip / 2);
+        this._yShip = -(this._heightShip / 2);
         this.g
             .append("image")
-            .attr("height", height)
-            .attr("width", width)
-            .attr("x", -(width / 2))
-            .attr("y", -(height / 2))
+            .attr("height", this._heightShip)
+            .attr("width", this._widthShip)
+            .attr("x", this._xShip)
+            .attr("y", this._yShip)
             .attr("class", "ship-outline")
             .attr("transform", "rotate(90)")
-            .attr("xlink:href", fishIcon);
+            .attr("xlink:href", shipIcon)
+            .call(this._dragShip);
 
         // Add the paths for the text
         this.g
@@ -650,7 +682,7 @@ class ShipComparison extends Ship {
             .attr("y", -(height / 2))
             .attr("class", "ship-outline")
             .attr("transform", "rotate(90)")
-            .attr("xlink:href", fishIcon);
+            .attr("xlink:href", shipIcon);
 
         // Base profile shape
         this.g
@@ -1172,9 +1204,9 @@ export default class CompareShips {
 
     async _loadAndSetupData() {
         try {
-            this._moduleDataDefault = (
-                await import(/* webpackChunkName: "data-modules" */ "../../gen/modules.json")
-            ).default;
+            this._moduleDataDefault = (await import(
+                /* webpackChunkName: "data-modules" */ "../../gen/modules.json"
+            )).default;
             this._shipData = (await import(/* webpackChunkName: "data-ships" */ "../../gen/ships.json")).default;
             this._setupData();
         } catch (error) {
