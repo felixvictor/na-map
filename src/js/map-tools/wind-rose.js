@@ -4,9 +4,13 @@
  * @file      Show wind rose continuously.
  * @module    map-tools/wind-rose
  * @author    iB aka Felix Victor
- * @copyright 2018
+ * @copyright 2018, 2019
  * @license   http://www.gnu.org/licenses/gpl.html
  */
+
+import "bootstrap/js/dist/util";
+import "bootstrap/js/dist/modal";
+import "bootstrap/js/dist/tooltip";
 
 import { select as d3Select } from "d3-selection";
 import { line as d3Line } from "d3-shape";
@@ -14,12 +18,11 @@ import moment from "moment";
 import "moment/locale/en-gb";
 import "round-slider/src/roundslider";
 import "round-slider/src/roundslider.css";
-import "../../scss/roundslider.scss";
 
 import { registerEvent } from "../analytics";
 import { degreesPerSecond, insertBaseModal } from "../common";
-import Cookie from "../util/cookie";
 import { compassDirections, degreesToRadians, displayCompass, getUserWind, printSmallCompassRose } from "../util";
+import Cookie from "../util/cookie";
 
 export default class WindRose {
     constructor() {
@@ -124,8 +127,8 @@ export default class WindRose {
         this._div = portSummary
             .insert("div", ":first-child")
             .attr("id", this._baseId)
-            .classed("block p-0", true);
-        this._svg = this._div.append("svg").classed("coord small", true);
+            .attr("class", "block p-0");
+        this._svg = this._div.append("svg").attr("class", "ingame-wind small");
     }
 
     _navbarClick(event) {
@@ -140,9 +143,7 @@ export default class WindRose {
 
     _setupWindInput() {
         // workaround from https://github.com/soundar24/roundSlider/issues/71
-        // eslint-disable-next-line func-names,no-underscore-dangle
         const { _getTooltipPos } = $.fn.roundSlider.prototype;
-        // eslint-disable-next-line func-names,no-underscore-dangle
         $.fn.roundSlider.prototype._getTooltipPos = function() {
             if (!this.tooltip.is(":visible")) {
                 $("body").append(this.tooltip);
@@ -184,7 +185,7 @@ export default class WindRose {
         const form = body.append("form").attr("id", this._formId);
 
         const formGroupA = form.append("div").attr("class", "form-group");
-        const slider = formGroupA.append("div").classed("alert alert-primary", true);
+        const slider = formGroupA.append("div").attr("class", "alert alert-primary");
         slider
             .append("label")
             .attr("for", this._sliderId)
@@ -273,15 +274,12 @@ export default class WindRose {
         // Compass rose
         const compassElement = this._svg
             .append("svg")
-            .classed("compass", true)
+            .attr("class", "compass")
             .attr("x", this._xCompass)
             .attr("y", this._yCompass);
         printSmallCompassRose({ element: compassElement, radius: this._compassRadius });
 
-        this._windPath = this._svg
-            .append("path")
-            .classed("wind", true)
-            .attr("marker-end", "url(#wind-arrow)");
+        this._windPath = this._svg.append("path").attr("marker-end", "url(#wind-arrow)");
     }
 
     clearMap() {

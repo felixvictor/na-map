@@ -4,16 +4,18 @@
  * @file      Compare woods.
  * @module    game-tools/compare-woods
  * @author    iB aka Felix Victor
- * @copyright 2018
+ * @copyright 2018, 2019
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+import "bootstrap/js/dist/util";
+import "bootstrap/js/dist/modal";
 import { min as d3Min, max as d3Max } from "d3-array";
 import { select as d3Select } from "d3-selection";
 
 import { registerEvent } from "../analytics";
-import { formatFloat, formatSignFloat, formatPercent, sortBy } from "../util";
 import { insertBaseModal } from "../common";
+import { formatFloat, formatSignFloat, formatPercent, sortBy, putImportError } from "../util";
 
 class Wood {
     constructor(compareId, woodCompare) {
@@ -292,16 +294,38 @@ class WoodComparison extends Wood {
  *
  */
 export default class CompareWoods {
-    constructor(woodData, baseFunction) {
-        this._woodData = woodData;
+    constructor(baseFunction) {
         this._baseFunction = baseFunction;
-
         this._baseName = "Compare woods";
         this._baseId = `${this._baseFunction}-compare`;
         this._buttonId = `button-${this._baseId}`;
         this._modalId = `modal-${this._baseId}`;
 
+        this._woodsSelected = [];
+        this._instances = [];
+
+        this._options = {};
+        this._minMaxProperty = new Map();
+
+        if (this._baseFunction === "wood") {
+            this._setupListener();
+        }
+    }
+
+    async woodInit() {
+        await this._loadAndSetupData();
+        this._initData();
+    }
+
+    _setupData() {
         const findWoodId = (type, woodName) => this._woodData[type].find(wood => wood.name === woodName).id;
+
+        this.propertyNames = new Set(
+            [
+                ...this._woodData.frame.flatMap(frame => frame.properties.map(property => property.modifier)),
+                ...this._woodData.trim.flatMap(trim => trim.properties.map(property => property.modifier))
+            ].sort()
+        );
 
         if (this._baseFunction === "wood") {
             this._defaultWood = {
@@ -325,23 +349,25 @@ export default class CompareWoods {
 
         this._columns = this._columnsCompare.slice();
         this._columns.unshift("Base");
-        this._woodsSelected = [];
-        this._instances = [];
-        this.propertyNames = new Set(
-            [
-                ...this._woodData.frame.map(frame => frame.properties.map(property => property.modifier)).flat(),
-                ...this._woodData.trim.map(trim => trim.properties.map(property => property.modifier)).flat()
-            ].sort()
-        );
+    }
 
-        this._options = {};
-        this._minMaxProperty = new Map();
-
-        this._setupListener();
+    async _loadAndSetupData() {
+        try {
+            this._woodData = (await import(/* webpackChunkName: "data-woods" */ "../../gen/woods.json")).default;
+            this._setupData();
+        } catch (error) {
+            putImportError(error);
+        }
     }
 
     _setupListener() {
-        $(`#${this._buttonId}`).on("click", event => {
+        let firstClick = true;
+        document.getElementById(this._buttonId).addEventListener("click", async event => {
+            if (firstClick) {
+                firstClick = false;
+                await this._loadAndSetupData();
+            }
+
             registerEvent("Tools", this._baseName);
             event.stopPropagation();
             this._woodCompareSelected();
@@ -358,7 +384,7 @@ export default class CompareWoods {
         $(`#${this._modalId}`).modal("show");
     }
 
-    _setupData() {
+    _initData() {
         this._frameSelectData = this._woodData.frame.sort(sortBy(["name"]));
         this._trimSelectData = this._woodData.trim.sort(sortBy(["name"]));
         this._setOption(
@@ -420,7 +446,7 @@ export default class CompareWoods {
     }
 
     _initModal() {
-        this._setupData();
+        this._initData();
         this._injectModal();
 
         this._columns.forEach(compareId => {

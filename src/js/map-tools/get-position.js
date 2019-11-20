@@ -4,9 +4,12 @@
  * @file      Get position.
  * @module    get-position
  * @author    iB aka Felix Victor
- * @copyright 2018
+ * @copyright 2018, 2019
  * @license   http://www.gnu.org/licenses/gpl.html
  */
+
+import "bootstrap/js/dist/util";
+import "bootstrap/js/dist/modal";
 
 import { select as d3Select } from "d3-selection";
 
@@ -45,47 +48,47 @@ import Toast from "../util/toast";
  * @param {boolean} returnMiddle If two solutions found then return the center of them
  * @return {object|Array|null} { x, y, z } or [ { x, y, z }, { x, y, z } ] or null
  */
+
+// Scalar and vector operations
+
+const sqr = a => a * a;
+
+const norm = a => Math.sqrt(sqr(a.x) + sqr(a.y) + sqr(a.z));
+
+const dot = (a, b) => a.x * b.x + a.y * b.y + a.z * b.z;
+
+const vectorSubtract = (a, b) => ({
+    x: a.x - b.x,
+    y: a.y - b.y,
+    z: a.z - b.z
+});
+
+const vectorAdd = (a, b) => ({
+    x: a.x + b.x,
+    y: a.y + b.y,
+    z: a.z + b.z
+});
+
+const vectorDivide = (a, b) => ({
+    x: a.x / b,
+    y: a.y / b,
+    z: a.z / b
+});
+
+const vectorMultiply = (a, b) => ({
+    x: a.x * b,
+    y: a.y * b,
+    z: a.z * b
+});
+
+const vectorCross = (a, b) => ({
+    x: a.y * b.z - a.z * b.y,
+    y: a.z * b.x - a.x * b.z,
+    z: a.x * b.y - a.y * b.x
+});
+
 function trilaterate(p1, p2, p3, returnMiddle = false) {
     // based on: https://en.wikipedia.org/wiki/Trilateration
-
-    // some additional local functions declared here for
-    // scalar and vector operations
-
-    const sqr = a => a * a;
-
-    const norm = a => Math.sqrt(sqr(a.x) + sqr(a.y) + sqr(a.z));
-
-    const dot = (a, b) => a.x * b.x + a.y * b.y + a.z * b.z;
-
-    const vectorSubtract = (a, b) => ({
-        x: a.x - b.x,
-        y: a.y - b.y,
-        z: a.z - b.z
-    });
-
-    const vectorAdd = (a, b) => ({
-        x: a.x + b.x,
-        y: a.y + b.y,
-        z: a.z + b.z
-    });
-
-    const vectorDivide = (a, b) => ({
-        x: a.x / b,
-        y: a.y / b,
-        z: a.z / b
-    });
-
-    const vectorMultiply = (a, b) => ({
-        x: a.x * b,
-        y: a.y * b,
-        z: a.z * b
-    });
-
-    const vectorCross = (a, b) => ({
-        x: a.y * b.z - a.z * b.y,
-        y: a.z * b.x - a.x * b.z,
-        z: a.x * b.y - a.y * b.x
-    });
 
     const ex = vectorDivide(vectorSubtract(p2, p1), norm(vectorSubtract(p2, p1)));
     const i = dot(ex, vectorSubtract(p3, p1));
@@ -247,45 +250,45 @@ export default class TrilateratePosition {
     }
 
     /**
+     * Show and go to Position
+     * @return {void}
+     */
+    _showAndGoToPosition() {
+        const circles = this._ports.portData.map(port => ({
+            x: port.coordinates[0],
+            y: port.coordinates[1],
+            z: 0,
+            r: port.distance
+        }));
+
+        const position = trilaterate(circles[0], circles[1], circles[2], true);
+
+        // If intersection is found
+        if (position) {
+            position.x = Math.round(position.x);
+            position.y = Math.round(position.y);
+
+            this._ports._map._f11.printCoord(position.x, position.y);
+            this._ports._map.zoomAndPan(position.x, position.y, 1);
+
+            const coordX = Math.round(convertInvCoordX(position.x, position.y) / -1000);
+            const coordY = Math.round(convertInvCoordY(position.x, position.y) / -1000);
+            copyF11ToClipboard(coordX, coordY);
+
+            // eslint-disable-next-line no-new
+            new Toast("Get position", "Coordinates copied to clipboard.");
+        } else {
+            // eslint-disable-next-line no-new
+            new Toast("Get position", "No intersection found.");
+        }
+    }
+
+    /**
      * Use user input and show position
      * @return {void}
      * @private
      */
     _useUserInput() {
-        /**
-         * Show and go to Position
-         * @return {void}
-         */
-        const showAndGoToPosition = () => {
-            const circles = this._ports.portData.map(port => ({
-                x: port.coordinates[0],
-                y: port.coordinates[1],
-                z: 0,
-                r: port.distance
-            }));
-
-            const position = trilaterate(circles[0], circles[1], circles[2], true);
-
-            // If intersection is found
-            if (position) {
-                position.x = Math.round(position.x);
-                position.y = Math.round(position.y);
-
-                this._ports._map._f11.printCoord(position.x, position.y);
-                this._ports._map.zoomAndPan(position.x, position.y, 1);
-
-                const coordX = Math.round(convertInvCoordX(position.x, position.y) / -1000);
-                const coordY = Math.round(convertInvCoordY(position.x, position.y) / -1000);
-                copyF11ToClipboard(coordX, coordY);
-
-                // eslint-disable-next-line no-new
-                new Toast("Get position", "Coordinates copied to clipboard.");
-            } else {
-                // eslint-disable-next-line no-new
-                new Toast("Get position", "No intersection found.");
-            }
-        };
-
         const roundingFactor = 1.04;
 
         /*
@@ -322,14 +325,13 @@ export default class TrilateratePosition {
                     this._ports.portDataDefault
                         .filter(port => ports.has(port.name))
                         .map(port => {
-                            // eslint-disable-next-line prefer-destructuring,no-param-reassign
                             port.distance = ports.get(port.name);
                             return port;
                         })
                 )
             );
             this._ports.update();
-            showAndGoToPosition();
+            this._showAndGoToPosition();
         } else {
             // eslint-disable-next-line no-new
             new Toast("Get position", "Not enough data.");
