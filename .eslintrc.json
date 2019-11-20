@@ -35,7 +35,6 @@
             }
         ],
         "max-params": ["warn", 5],
-        "multiline-ternary": ["error", "always-multiline"],
         "new-cap": "off",
         "no-mixed-operators": "off",
         "object-curly-spacing": ["error", "always"],
@@ -50,11 +49,18 @@
         "prefer-template": "error",
         "operator-linebreak": ["error", "after", { "overrides": { "?": "before", ":": "before" } }],
         "quotes": ["error", "double", { "allowTemplateLiterals": false, "avoidEscape": true }],
-        "space-before-function-paren": ["error", "never"],
-        "unicorn/consistent-function-scoping": "off",
+        "space-before-function-paren": [
+            "error",
+            {
+                "anonymous": "never",
+                "named": "never",
+                "asyncArrow": "always"
+            }
+        ],
         "unicorn/explicit-length-check": "off",
         "unicorn/import-index": "off",
         "unicorn/no-for-loop": "off",
+        "unicorn/no-nested-ternary": "off",
         "unicorn/no-unused-properties": "error",
         "unicorn/prefer-dataset": "off",
         "unicorn/prefer-includes": "off",
