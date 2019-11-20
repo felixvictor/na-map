@@ -4,19 +4,21 @@
  * @file      List modules.
  * @module    game-tools/list-modules
  * @author    iB aka Felix Victor
- * @copyright 2018
+ * @copyright 2018, 2019
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+import "bootstrap/js/dist/util";
+import "bootstrap/js/dist/modal";
+
 import { select as d3Select } from "d3-selection";
-import { chunkify, formatPP, formatSignInt, formatSignPercent, getOrdinal } from "../util";
+
 import { registerEvent } from "../analytics";
 import { insertBaseModal } from "../common";
+import { chunkify, formatPP, formatSignInt, formatSignPercent, getOrdinal, putImportError } from "../util";
 
 export default class ListModules {
-    constructor(moduleData) {
-        this._moduleData = moduleData;
-
+    constructor() {
         this._baseName = "List modules";
         this._baseId = "module-list";
         this._buttonId = `button-${this._baseId}`;
@@ -25,8 +27,23 @@ export default class ListModules {
         this._setupListener();
     }
 
+    async _loadAndSetupData() {
+        try {
+            this._moduleData = (await import(/* webpackChunkName: "data-modules" */ "../../gen/modules.json")).default;
+        } catch (error) {
+            putImportError(error);
+        }
+    }
+
     _setupListener() {
-        $(`#${this._buttonId}`).on("click", event => {
+        let firstClick = true;
+
+        document.getElementById(this._buttonId).addEventListener("click", async event => {
+            if (firstClick) {
+                firstClick = false;
+                await this._loadAndSetupData();
+            }
+
             registerEvent("Tools", this._baseName);
             event.stopPropagation();
             this._moduleListSelected();
@@ -127,13 +144,11 @@ export default class ListModules {
 
                     rate = getRate(module.moduleLevel);
                     if (hasSameProperties(i + 1)) {
-                        // eslint-disable-next-line no-param-reassign
                         type[1][i + 1].hasSamePropertiesAsPrevious = true;
                         rate += `<br>${getRate(type[1][i + 1].moduleLevel)}`;
                     }
 
                     if (hasSameProperties(i + 2)) {
-                        // eslint-disable-next-line no-param-reassign
                         type[1][i + 2].hasSamePropertiesAsPrevious = true;
                         rate = "";
                     }
@@ -146,7 +161,9 @@ export default class ListModules {
                         !module.hasSamePropertiesAsPrevious
                     ) {
                         rows.push(
-                            `<tr><td><span class="name">${module.name}<br>${rate}</span>${permanentType}</td><td>${module.properties
+                            `<tr><td><span class="name">${
+                                module.name
+                            }<br>${rate}</span>${permanentType}</td><td>${module.properties
                                 .map(property => {
                                     const amount = property.isPercentage
                                         ? formatSignPercent(property.amount / 100)

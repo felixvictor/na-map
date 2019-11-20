@@ -8,17 +8,18 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+import "bootstrap/js/dist/util";
+import "bootstrap/js/dist/modal";
+
 import { html, render } from "lit-html";
 import { repeat } from "lit-html/directives/repeat";
 
 import { registerEvent } from "../analytics";
 import { insertBaseModalHTML } from "../common";
-import { formatInt } from "../util";
+import { formatInt, putImportError } from "../util";
 
 export default class ListLoot {
-    constructor(sourceData) {
-        this._sourceData = sourceData;
-
+    constructor() {
         this._baseName = "List loot and chests";
         this._baseId = "loot-list";
         this._buttonId = `button-${this._baseId}`;
@@ -36,8 +37,23 @@ export default class ListLoot {
         this._setupListener();
     }
 
+    async _loadAndSetupData() {
+        try {
+            this._sourceData = (await import(/* webpackChunkName: "data-loot" */ "../../gen/loot.json")).default;
+        } catch (error) {
+            putImportError(error);
+        }
+    }
+
     _setupListener() {
-        $(`#${this._buttonId}`).on("click", event => {
+        let firstClick = true;
+
+        document.getElementById(this._buttonId).addEventListener("click", async event => {
+            if (firstClick) {
+                firstClick = false;
+                await this._loadAndSetupData();
+            }
+
             registerEvent("Tools", this._baseName);
             event.stopPropagation();
             this._sourceListSelected();
@@ -200,7 +216,7 @@ export default class ListLoot {
                 <thead>
                     <tr>
                         <th scope="col">Item</th>
-                        <th scope="col" class="text-right">Chance (0\u202F\u2212\u202F100)</th>
+                        <th scope="col" class="text-right">Chance (0 − 100)</th>
                         <th scope="col" class="text-right">Amount</th>
                     </tr>
                 </thead>

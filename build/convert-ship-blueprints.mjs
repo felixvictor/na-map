@@ -89,9 +89,12 @@ const convertShipBlueprints = () => {
                         name: itemNames.get(requirement.Template),
                         amount: requirement.Amount
                     })),
-                    provisions: apiBlueprint.FullRequirements.find(
-                        requirement => itemNames.get(requirement.Template) === "Provisions"
-                    ).Amount,
+                    provisions:
+                        (
+                            apiBlueprint.FullRequirements.find(
+                                requirement => itemNames.get(requirement.Template) === "Provisions"
+                            ) || {}
+                        ).Amount || 0,
                     doubloons:
                         (
                             apiBlueprint.FullRequirements.find(

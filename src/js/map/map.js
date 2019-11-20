@@ -4,23 +4,20 @@
  * @file      Display map.
  * @module    map/map
  * @author    iB aka Felix Victor
- * @copyright 2017, 2018
+ * @copyright 2017, 2018, 2019
  * @license   http://www.gnu.org/licenses/gpl.html
  */
+
+import "bootstrap/js/dist/util";
+import "bootstrap/js/dist/modal";
 
 import { range as d3Range } from "d3-array";
 import { event as d3Event, mouse as d3Mouse, select as d3Select } from "d3-selection";
 import { zoom as d3Zoom, zoomIdentity as d3ZoomIdentity, zoomTransform as d3ZoomTransform } from "d3-zoom";
 
-import "bootstrap/js/dist/util";
-import "bootstrap/js/dist/collapse";
-import "bootstrap/js/dist/modal";
-
-import { appDescription, appTitle, appVersion, defaultFontSize, insertBaseModal } from "../common";
-import { displayClan, nearestPow2, checkFetchStatus, getJsonFromFetch, putFetchError, roundToThousands } from "../util";
-
 import { registerEvent } from "../analytics";
-
+import { appDescription, appTitle, appVersion, defaultFontSize, insertBaseModal } from "../common";
+import { displayClan, nearestPow2, roundToThousands } from "../util";
 import Cookie from "../util/cookie";
 import RadioButton from "../util/radio-button";
 
@@ -52,52 +49,6 @@ class Map {
         this._serverName = serverName;
 
         this._searchParams = searchParams;
-
-        /**
-         * Data directory
-         * @type {string}
-         * @private
-         */
-        this._dataDirectory = "data";
-
-        /**
-         * @type {Array<fileName: string, name: string>}
-         * @private
-         */
-        this._dataSources = [
-            {
-                fileName: "ports.json",
-                name: "ports"
-            },
-            {
-                fileName: `${serverName}-trades.json`,
-                name: "trades"
-            },
-            {
-                fileName: `${serverName}.json`,
-                name: "server"
-            },
-            {
-                fileName: `${serverName}-pb.json`,
-                name: "pb"
-            },
-            {
-                fileName: "pb.json",
-                name: "pbZones"
-            },
-            {
-                fileName: "ships.json",
-                name: "ships"
-            },
-            {
-                fileName: "woods.json",
-                name: "woods"
-            },
-            {
-                fileName: "modules.json",
-                name: "modules"
-            }
-        ];
 
         /**
          * Font size in px
@@ -199,7 +150,7 @@ class Map {
         this._setupSvg();
         this._setSvgSize();
         this._setupListener();
-        this._readData();
+        this._setupData();
     }
 
     /**
@@ -228,7 +179,7 @@ class Map {
         return r;
     }
 
-    _setupData(data) {
+    _setupData() {
         //        const marks = [];
 
         //        marks.push("setupData");
@@ -236,72 +187,28 @@ class Map {
         // function();
         //        performance.mark(`${marks[marks.length - 1]}-end`);
 
-        // Combine port data with port battle data
-        const portData = data.ports.map(port => {
-            const combinedData = port;
-
-            const serverData = data.server.find(d => d.id === combinedData.id);
-
-            combinedData.portBattleStartTime = serverData.portBattleStartTime;
-            combinedData.portBattleType = serverData.portBattleType;
-            combinedData.nonCapturable = serverData.nonCapturable;
-            combinedData.conquestMarksPension = serverData.conquestMarksPension;
-            combinedData.portTax = serverData.portTax;
-            combinedData.taxIncome = serverData.taxIncome;
-            combinedData.netIncome = serverData.netIncome;
-            combinedData.tradingCompany = serverData.tradingCompany;
-            combinedData.laborHoursDiscount = serverData.laborHoursDiscount;
-            combinedData.dropsTrading = serverData.dropsTrading;
-            combinedData.consumesTrading = serverData.consumesTrading;
-            combinedData.producesNonTrading = serverData.producesNonTrading;
-            combinedData.dropsNonTrading = serverData.dropsNonTrading;
-            combinedData.inventory = serverData.inventory;
-
-            // Delete empty entries
-            ["dropsTrading", "consumesTrading", "producesNonTrading", "dropsNonTrading"].forEach(type => {
-                if (!combinedData[type]) {
-                    delete combinedData[type];
-                }
-            });
-
-            const pbData = data.pb.ports.find(d => d.id === combinedData.id);
-
-            combinedData.nation = pbData.nation;
-            combinedData.capturer = pbData.capturer;
-            combinedData.lastPortBattle = pbData.lastPortBattle;
-            combinedData.attackHostility = pbData.attackHostility;
-            combinedData.attackerClan = pbData.attackerClan;
-            combinedData.attackerNation = pbData.attackerNation;
-            combinedData.portBattle = pbData.portBattle;
-
-            return combinedData;
-        });
-
         this._f11 = new ShowF11(this, this.coord);
-        this._ports = new DisplayPorts(portData, this);
+        this._ports = new DisplayPorts(this);
+        this._ports.init().then(() => {
+            this._pbZone = new DisplayPbZones(this._ports);
+            this._grid = new DisplayGrid(this);
 
-        this._pbZone = new DisplayPbZones(data.pbZones, this._ports);
-        this._grid = new DisplayGrid(this);
+            this._journey = new Journey(this.rem);
+            this._windPrediction = new PredictWind();
+            this._windRose = new WindRose();
 
-        this._woodData = JSON.parse(JSON.stringify(data.woods));
-        this._shipData = JSON.parse(JSON.stringify(data.ships));
-        const moduleData = JSON.parse(JSON.stringify(data.modules));
-        this._journey = new Journey(this._shipData, this._woodData, moduleData, this.rem);
-
-        this._portSelect = new SelectPorts(this._ports, this._pbZone, this);
-        this.showTrades = new ShowTrades(
-            this._portSelect,
-            portData,
-            data.trades,
-            this._minScale,
-            this.coord.min,
-            this.coord.max
-        );
-
-        this._init();
-
-        this._windPrediction = new PredictWind();
-        this._windRose = new WindRose();
+            this._portSelect = new SelectPorts(this._ports, this._pbZone, this);
+            this.showTrades = new ShowTrades(
+                this._serverName,
+                this._portSelect,
+                this._minScale,
+                this.coord.min,
+                this.coord.max
+            );
+            this.showTrades.showOrHide().then(() => {
+                this._init();
+            });
+        });
 
         /*
         marks.forEach(mark => {
@@ -311,36 +218,16 @@ class Map {
         */
     }
 
-    _readData() {
-        const jsonData = [];
-        const readData = {};
-        this._dataSources.forEach((datum, i) => {
-            jsonData[i] = fetch(`${this._dataDirectory}/${datum.fileName}`)
-                .then(checkFetchStatus)
-                .then(getJsonFromFetch);
-        });
-
-        Promise.all(jsonData)
-            .then(values => {
-                values.forEach((value, i) => {
-                    readData[this._dataSources[i].name] = value;
-                });
-
-                this._setupData(readData);
-            })
-            .catch(putFetchError);
+    static _stopProperty() {
+        if (d3Event.defaultPrevented) {
+            d3Event.stopPropagation();
+        }
     }
 
     _setupListener() {
-        function stopProperty() {
-            if (d3Event.defaultPrevented) {
-                d3Event.stopPropagation();
-            }
-        }
-
         this._svg
             .on("dblclick.zoom", null)
-            .on("click", stopProperty, true)
+            .on("click", Map._stopProperty, true)
             .on("dblclick", (d, i, nodes) => this._doDoubleClickAction(nodes[i]));
 
         document.getElementById("propertyDropdown").addEventListener("click", () => {
@@ -475,7 +362,7 @@ class Map {
             .join(enter =>
                 enter
                     .append("image")
-                    .attr("xlink:href", d => `images/map/${d.z}/${d.row}/${d.col}.jpg`)
+                    .attr("xlink:href", d => `images/map/${d.z}/${d.row}/${d.col}.webp`)
                     .attr("x", d => d.col * this._tileSize)
                     .attr("y", d => d.row * this._tileSize)
                     .attr("width", this._tileSize + 1)
@@ -495,23 +382,23 @@ class Map {
             .selectpicker("refresh");
     }
 
+    static _initModal(id) {
+        insertBaseModal(id, `${appTitle} <span class="text-primary small">v${appVersion}</span>`, "");
+
+        const body = d3Select(`#${id} .modal-body`);
+        body.html(
+            `<p>${appDescription} Please check the <a href="https://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/"> Game-Labs forum post</a> for further details. Feedback is very welcome.</p><p>Designed by iB aka Felix Victor, clan Bastard Sons ${displayClan(
+                "(BASTD)"
+            )}</a>.</p>`
+        );
+    }
+
     _showAbout() {
-        function initModal(id) {
-            insertBaseModal(id, `${appTitle} <span class="text-primary small">v${appVersion}</span>`, "");
-
-            const body = d3Select(`#${id} .modal-body`);
-            body.html(
-                `<p>${appDescription} Please check the <a href="https://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/"> Game-Labs forum post</a> for further details. Feedback is very welcome.</p><p>Designed by iB aka Felix Victor, clan Bastard Sons ${displayClan(
-                    "(BASTD)"
-                )}</a>.</p>`
-            );
-        }
-
         const modalId = "modal-about";
 
         // If the modal has no content yet, insert it
         if (!$(`#${modalId}`).length) {
-            initModal(modalId);
+            Map._initModal(modalId);
         }
 
         // Show modal
@@ -521,11 +408,8 @@ class Map {
     _doDoubleClickAction(self) {
         const coord = d3Mouse(self);
         const transform = d3ZoomTransform(self);
-        const mx = coord[0];
-        const my = coord[1];
-        const tk = transform.k;
-        const tx = transform.x;
-        const ty = transform.y;
+        const [mx, my] = coord;
+        const { k: tk, x: tx, y: ty } = transform;
 
         const x = (mx - tx) / tk;
         const y = (my - ty) / tk;
@@ -663,14 +547,14 @@ class Map {
     _getWidth() {
         const { width } = this.getDimensions();
 
-        return width;
+        return Math.floor(width);
     }
 
     _getHeight() {
         const { top } = this.getDimensions();
         const fullHeight = document.documentElement.clientHeight - this.rem;
 
-        return fullHeight - top;
+        return Math.floor(fullHeight - top);
     }
 
     _setHeightWidth() {

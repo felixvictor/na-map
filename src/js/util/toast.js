@@ -8,10 +8,10 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { select as d3Select } from "d3-selection";
-
 import "bootstrap/js/dist/util";
 import "bootstrap/js/dist/toast";
+
+import { select as d3Select } from "d3-selection";
 
 import { iconSmallSrc } from "../common";
 

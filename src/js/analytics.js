@@ -54,8 +54,6 @@ export const registerPage = title => {
  * @return {void}
  */
 export const initAnalytics = () => {
-    const originalWindowErrorCallback = window.onerror;
-
     ga.l = Number(new Date());
     ga("create", GA_TRACKING_ID, "auto");
     ga("set", "anonymizeIp", true);
@@ -67,36 +65,22 @@ export const initAnalytics = () => {
      *
      * Third-party scripts without CORS will only provide "Script Error." as an error message.
      *
-     * @param  {String}           errorMessage Error message.
-     * @param  {String}           url          URL where error was raised.
-     * @param  {Number}           lineNumber   Line number where error was raised.
-     * @param  {Number|undefined} columnNumber Column number for the line where the error occurred.
-     * @param  {Object|undefined} errorObject  Error Object.
-     * @return {Boolean}                       When the function returns true, this prevents the
-     *                                         firing of the default event handler.
+     * @param  {String} errorMessage Error message.
+     * @return {Boolean} When the function returns true, this prevents the firing of the default event handler.
      */
-    window.addEventListener("error", (errorMessage, url, lineNumber, columnNumber, errorObject) => {
+    window.addEventListener("error", errorMessage => {
         const exceptionDescription = [
-            `Message: ${JSON.stringify(errorMessage, ["message", "arguments", "type", "name"])}`,
-            `URL: ${url}`,
-            `Line: ${lineNumber}`,
-            `Column: ${columnNumber}`,
-            `Error object: ${JSON.stringify(errorObject)}`
+            `Message: ${errorMessage.message} @ ${errorMessage.filename}-${errorMessage.lineno}:${errorMessage.colno}`,
+            `Error object: ${JSON.stringify(errorMessage.error)}`
         ].join(" - ");
 
         ga("send", "exception", {
             exDescription: exceptionDescription,
-            exFatal: false, // Some Error types might be considered as fatal.
+            exFatal: false,
             appName,
             appVersion
         });
 
-        // If the previous "window.onerror" callback can be called, pass it the data:
-        if (typeof originalWindowErrorCallback === "function") {
-            return originalWindowErrorCallback(errorMessage, url, lineNumber, columnNumber, errorObject);
-        }
-
-        // Otherwise, Let the default handler run:
         return false;
     });
 };

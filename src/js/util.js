@@ -77,14 +77,17 @@ export const formatFloatFixedHTML = (x, f = 2) => {
 
     if (decimals) {
         if (decimals === "0" || decimals === "00") {
-            // eslint-disable-next-line prettier/prettier
-            decimals = html`<span class="hidden">.${decimals}</span>`;
+            decimals = html`
+                <span class="hidden">.${decimals}</span>
+            `;
         } else if (decimals.endsWith("0")) {
-            // eslint-disable-next-line prettier/prettier
-            decimals = html`.${decimals.replace("0", "")}<span class="hidden">0</span>`;
+            decimals = html`
+                .${decimals.replace("0", "")}<span class="hidden">0</span>
+            `;
         } else {
-            // eslint-disable-next-line prettier/prettier
-            decimals = html`.${decimals}`;
+            decimals = html`
+                .${decimals}
+            `;
         }
     }
 
@@ -220,12 +223,11 @@ export const roundToThousands = x => round(x, 3);
 
 /**
  * Test if object is empty
+ * {@link https://stackoverflow.com/a/32108184}
  * @param {object} object - Object
  * @return {boolean} True if object is empty
  */
-export function isEmpty(object) {
-    return Object.getOwnPropertyNames(object).length === 0 && object.constructor === Object;
-}
+export const isEmpty = object => Object.getOwnPropertyNames(object).length === 0 && object.constructor === Object;
 
 /**
  * Compass directions
@@ -446,13 +448,23 @@ export const getJsonFromFetch = response => response.json();
 export const getTextFromFetch = response => response.text();
 
 /**
- * Write error to console
+ * Write fetch error to console
  * @function
  * @param {String} error - Error message
  * @return {void}
  */
 export const putFetchError = error => {
     console.error("Fetch request failed -->", error);
+};
+
+/**
+ * Write fetch error to console
+ * @function
+ * @param {String} error - Error message
+ * @return {void}
+ */
+export const putImportError = error => {
+    console.error("Import request failed -->", error);
 };
 
 /**
@@ -751,5 +763,35 @@ export const copyF11ToClipboard = (x, z) => {
         F11Url.searchParams.set("z", z);
 
         copyToClipboard(F11Url.href);
+    }
+};
+
+/**
+ * Ramp for visualizing colour scales
+ * {@link https://observablehq.com/@mbostock/color-ramp}
+ * @param {object} element - DOM element
+ * @param {object} colourScale - Colour
+ * @param {number|null} steps - Number of steps (default 512)
+ * @return {void}
+ */
+export const colourRamp = (element, colourScale, steps = 512) => {
+    const height = 50;
+    const width = element.node().clientWidth;
+    const canvas = element
+        .insert("canvas")
+        .attr("width", width)
+        .attr("height", height);
+    const context = canvas.node().getContext("2d");
+    canvas.style.imageRendering = "pixelated";
+
+    const min = colourScale.domain()[0];
+    const max = colourScale.domain()[colourScale.domain().length - 1];
+    const step = (max - min) / steps;
+    const stepWidth = width / steps;
+    let x = 0;
+    for (let currentStep = min; currentStep < max; currentStep += step) {
+        context.fillStyle = colourScale(currentStep);
+        context.fillRect(x, 0, stepWidth, height);
+        x += stepWidth;
     }
 };
