@@ -4,15 +4,17 @@
  * @file      Game tools main file.
  * @module    game-tools/index
  * @author    iB aka Felix Victor
- * @copyright 2017, 2018
+ * @copyright 2017, 2018, 2019
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
 import "bootstrap/js/dist/util";
 import "bootstrap/js/dist/modal";
-import "bootstrap/js/dist/tab";
 
 import { default as semver } from "semver";
+
+import { registerEvent } from "../analytics";
+import { appVersion } from "../common";
 
 import CompareShips from "./compare-ships";
 import CompareWoods from "./compare-woods";
@@ -27,159 +29,56 @@ import ListRecipes from "./list-recipes";
 import ListShips from "./list-ships";
 import ListWoods from "./list-woods";
 
-import { registerEvent } from "../analytics";
-import { appVersion } from "../common";
-import { checkFetchStatus, getJsonFromFetch, putFetchError } from "../util";
-
 /**
- * Data directory
- * @type {string}
- */
-const dataDirectory = "data";
-
-let urlParams = "";
-let serverId = "";
-
-/**
- * @type {Array<fileName: string, name: string>}
- */
-const dataSources = [
-    {
-        fileName: "ships.json",
-        name: "ships"
-    },
-    {
-        fileName: "woods.json",
-        name: "woods"
-    },
-    {
-        fileName: "cannons.json",
-        name: "cannons"
-    },
-    {
-        fileName: "loot.json",
-        name: "loot"
-    },
-    {
-        fileName: "modules.json",
-        name: "modules"
-    },
-    {
-        fileName: "recipes.json",
-        name: "recipes"
-    },
-    {
-        fileName: "buildings.json",
-        name: "buildings"
-    },
-    {
-        fileName: "ownership.json",
-        name: "ownership"
-    },
-    {
-        fileName: "nations.json",
-        name: "nations"
-    },
-    {
-        fileName: "ship-blueprints.json",
-        name: "shipBlueprints"
-    }
-];
-
-/**
- * Setup all game tool modules
- * @param {object} data - Data
+ * Init
+ * @param {string} serverId - Server id
+ * @param {URLSearchParams} urlParams - Search Parameters
  * @return {void}
  */
-const setupData = data => {
-    const shipCompare = new CompareShips({
-        shipData: data.ships,
-        woodData: data.woods,
-        moduleData: data.modules
-    });
+const init = (serverId, urlParams) => {
+    const shipCompare = new CompareShips("ship-compare");
 
     const checkShipCompareData = () => {
-        if (
-            urlParams.has("cmp") &&
-            urlParams.has("v") &&
-            semver.lte(urlParams.get("v"), appVersion)
-        ) {
+        if (urlParams.has("cmp") && urlParams.has("v") && semver.lte(urlParams.get("v"), appVersion)) {
             registerEvent("Menu", "Paste ship compare");
             shipCompare.initFromClipboard(urlParams);
         }
     };
 
     // eslint-disable-next-line no-unused-vars
-    const woodCompare = new CompareWoods(data.woods, "wood");
-    // eslint-disable-next-line no-unused-vars
-    const woodList = new ListWoods(data.woods);
+    const woodCompare = new CompareWoods("wood");
 
     // eslint-disable-next-line no-unused-vars
-    const cannonList = new ListCannons(data.cannons);
+    const woodList = new ListWoods();
 
     // eslint-disable-next-line no-unused-vars
-    const ownershipList = new ListPortOwnerships(data.ownership, data.nations);
+    const cannonList = new ListCannons();
 
     // eslint-disable-next-line no-unused-vars
-    const lootList = new ListLoot(data.loot);
+    const ownershipList = new ListPortOwnerships();
 
     // eslint-disable-next-line no-unused-vars
-    const moduleList = new ListModules(data.modules);
+    const lootList = new ListLoot();
 
     // eslint-disable-next-line no-unused-vars
-    const recipeList = new ListRecipes(data.recipes.recipe, data.modules, serverId);
+    const moduleList = new ListModules();
 
     // eslint-disable-next-line no-unused-vars
-    const shipList = new ListShips(data.ships);
+    const recipeList = new ListRecipes(serverId);
 
     // eslint-disable-next-line no-unused-vars
-    const ingredientList = new ListIngredients(data.recipes.ingredient, data.modules);
+    const shipList = new ListShips();
 
     // eslint-disable-next-line no-unused-vars
-    const buildingList = new ListBuildings(data.buildings);
+    const ingredientList = new ListIngredients();
 
     // eslint-disable-next-line no-unused-vars
-    const blueprintList = new ListShipBlueprints(data.shipBlueprints, data.woods);
+    const buildingList = new ListBuildings();
+
+    // eslint-disable-next-line no-unused-vars
+    const blueprintList = new ListShipBlueprints();
 
     checkShipCompareData();
 };
 
-/**
- * Fetch json data
- * @return {void}
- */
-const readData = () => {
-    const jsonData = [];
-    const fileData = {};
-
-    dataSources.forEach((datum, i) => {
-        jsonData[i] = fetch(`${dataDirectory}/${datum.fileName}`)
-            .then(checkFetchStatus)
-            .then(getJsonFromFetch);
-    });
-
-    Promise.all(jsonData)
-        .then(values => {
-            values.forEach((value, i) => {
-                fileData[dataSources[i].name] = value;
-            });
-            setupData(fileData);
-        })
-        .catch(putFetchError);
-};
-
-/**
- * Init
- * @param {string} id - Server id
- * @param {URLSearchParams} searchParams - Search Parameters
- * @return {void}
- */
-const init = (id, searchParams) => {
-    serverId = id;
-    urlParams = searchParams;
-
-    readData();
-};
-
-// eslint-disable-next-line import/prefer-default-export
 export { init };

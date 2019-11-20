@@ -4,24 +4,25 @@
  * @file      List woods.
  * @module    game-tools/list-woods
  * @author    iB aka Felix Victor
- * @copyright 2018
+ * @copyright 2018, 2019
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+import "bootstrap/js/dist/util";
+import "bootstrap/js/dist/modal";
+
 import { select as d3Select } from "d3-selection";
-// eslint-disable-next-line import/no-named-default
 import { default as Tablesort } from "tablesort";
-import { insertBaseModal } from "../common";
-import { formatFloatFixed } from "../util";
+
 import { registerEvent } from "../analytics";
+import { insertBaseModal } from "../common";
+import { formatFloatFixed, putImportError } from "../util";
 
 /**
  *
  */
 export default class ListWoods {
-    constructor(woodData) {
-        this._woodData = woodData;
-
+    constructor() {
         this._baseName = "List woods";
         this._baseId = "wood-list";
         this._buttonId = `button-${this._baseId}`;
@@ -30,8 +31,23 @@ export default class ListWoods {
         this._setupListener();
     }
 
+    async _loadAndSetupData() {
+        try {
+            this._woodData = (await import(/* webpackChunkName: "data-woods" */ "../../gen/woods.json")).default;
+        } catch (error) {
+            putImportError(error);
+        }
+    }
+
     _setupListener() {
-        $(`#${this._buttonId}`).on("click", event => {
+        let firstClick = true;
+
+        document.getElementById(this._buttonId).addEventListener("click", async event => {
+            if (firstClick) {
+                firstClick = false;
+                await this._loadAndSetupData();
+            }
+
             registerEvent("Tools", this._baseName);
             event.stopPropagation();
             this._woodListSelected();
