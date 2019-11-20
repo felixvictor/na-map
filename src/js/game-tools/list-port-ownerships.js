@@ -4,9 +4,12 @@
  * @file      Port ownership list.
  * @module    game-tools/list-port-ownerships
  * @author    iB aka Felix Victor
- * @copyright 2018
+ * @copyright 2018, 2019
  * @license   http://www.gnu.org/licenses/gpl.html
  */
+
+import "bootstrap/js/dist/util";
+import "bootstrap/js/dist/modal";
 
 import { areaLabel as d3AreaLabel } from "d3-area-label";
 import { extent as d3Extent, max as d3Max, min as d3Min } from "d3-array";
@@ -23,35 +26,32 @@ import TimelinesChart from "timelines-chart";
 
 import { registerEvent } from "../analytics";
 import { colourList, insertBaseModal, nations } from "../common";
-
-// https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
-// eslint-disable-next-line no-extend-native,func-names
-String.prototype.replaceAll = function(search, replacement) {
-    const target = this;
-    return target.replace(new RegExp(search, "g"), replacement);
-};
+import { putImportError } from "../util";
 
 /**
  *
  */
 export default class ListPortOwnerships {
-    /**
-     * @param {object} ownershipData - Port ownership data over time
-     * @param {object} nationData - Nation data over time
-     */
-    constructor(ownershipData, nationData) {
-        this._ownershipData = ownershipData;
-        this._nationData = nationData;
-
+    constructor() {
         this._baseName = "Port ownership";
         this._baseId = "ownership-list";
         this._buttonId = `button-${this._baseId}`;
         this._modalId = `modal-${this._baseId}`;
 
-        // http://tools.medialab.sciences-po.fr/iwanthue/
         this._colourScale = d3ScaleOrdinal().range(colourList);
 
         this._setupListener();
+    }
+
+    async _loadAndSetupData() {
+        try {
+            this._nationData = (await import(/* webpackChunkName: "data-nations" */ "../../gen/nations.json")).default;
+            this._ownershipData = (
+                await import(/* webpackChunkName: "data-ownership" */ "../../gen/ownership.json")
+            ).default;
+        } catch (error) {
+            putImportError(error);
+        }
     }
 
     /**
@@ -60,7 +60,14 @@ export default class ListPortOwnerships {
      * @private
      */
     _setupListener() {
-        $(`#${this._buttonId}`).on("click", event => {
+        let firstClick = true;
+
+        document.getElementById(this._buttonId).addEventListener("click", async event => {
+            if (firstClick) {
+                firstClick = false;
+                await this._loadAndSetupData();
+            }
+
             registerEvent("Tools", this._baseName);
             event.stopPropagation();
             this._ownershipListSelected();
@@ -154,7 +161,6 @@ export default class ListPortOwnerships {
      */
     static getHeight() {
         const factor = 0.75;
-        // eslint-disable-next-line no-restricted-globals
         return Math.floor(top.innerHeight * factor);
     }
 
@@ -168,21 +174,22 @@ export default class ListPortOwnerships {
     }
 
     /**
+     * Get x date value
+     * @param {*} d - data
+     * @return {Date} x value
+     */
+    static xValue(d) {
+        return new Date(d.date);
+    }
+
+    /**
      * Inject stacked area
      * @return {void}
      * @private
      */
     _injectArea() {
-        /**
-         * Get x date value
-         * @param {*} d - data
-         * @return {Date} x value
-         */
-        const xValue = d => new Date(d.date);
-
         const width = this._getWidth();
         const maxHeight = 1000;
-        // eslint-disable-next-line no-restricted-globals
         const height = Math.min(maxHeight, ListPortOwnerships.getHeight());
         const margin = { right: 32, bottom: 32, left: 32 };
 
@@ -202,7 +209,7 @@ export default class ListPortOwnerships {
          */
         const setXAxis = g => {
             const xTimeScale = d3ScaleTime()
-                .domain(d3Extent(nationData, d => xValue(d)))
+                .domain(d3Extent(nationData, d => this.xValue(d)))
                 .range([margin.left, width - margin.right]);
             g.attr("transform", `translate(0,${height - margin.bottom})`).call(
                 d3AxisBottom(xTimeScale)
@@ -218,14 +225,14 @@ export default class ListPortOwnerships {
          */
         const getArea = () => {
             const xScale = d3ScaleLinear()
-                .domain(d3Extent(nationData, d => xValue(d)))
+                .domain(d3Extent(nationData, d => this.xValue(d)))
                 .range([margin.left, width - margin.right]);
             const yScale = d3ScaleLinear()
                 .domain([d3Min(stacked[0], d => d[0]), d3Max(stacked[stacked.length - 1], d => d[1])])
                 .range([height - margin.bottom, 0]);
 
             const area = d3Area()
-                .x(d => xScale(xValue(d.data)))
+                .x(d => xScale(this.xValue(d.data)))
                 .y0(d => yScale(d[0]))
                 .y1(d => yScale(d[1]))
                 .curve(d3CurveBasis);

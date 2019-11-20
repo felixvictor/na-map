@@ -4,17 +4,20 @@
  * @file      Show F11 coordinates.
  * @module    map-tools/show-f11
  * @author    iB aka Felix Victor
- * @copyright 2018
+ * @copyright 2018, 2019
  * @license   http://www.gnu.org/licenses/gpl.html
  */
+
+import "bootstrap/js/dist/util";
+import "bootstrap/js/dist/modal";
 
 import { select as d3Select } from "d3-selection";
 import moment from "moment";
 import "moment/locale/en-gb";
 
-import { between, copyF11ToClipboard, formatF11 } from "../util";
-import { convertCoordX, convertCoordY, convertInvCoordX, convertInvCoordY, insertBaseModal } from "../common";
 import { registerEvent } from "../analytics";
+import { convertCoordX, convertCoordY, convertInvCoordX, convertInvCoordY, insertBaseModal } from "../common";
+import { between, copyF11ToClipboard, formatF11 } from "../util";
 
 /**
  * ShowF11
@@ -136,11 +139,11 @@ export default class ShowF11 {
 
         const button = buttonGroup
             .append("button")
-            .classed("btn btn-outline-secondary", true)
+            .classed("btn btn-outline-secondary icon-outline-button", true)
             .attr("id", this._copyButtonId)
             .attr("title", "Copy to clipboard (ctrl-c)")
             .attr("type", "button");
-        button.append("i").classed("far fa-copy", true);
+        button.append("i").classed("icon icon-copy", true);
         buttonGroup
             .append("button")
             .classed("btn btn-outline-secondary", true)

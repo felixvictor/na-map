@@ -156,7 +156,7 @@
     <Pair>
       <Key>SHIP_MASS</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>2741</Value>
+        <Value>1733</Value>
       </Value>
     </Pair>
     <Pair>
@@ -210,7 +210,7 @@
     <Pair>
       <Key>SINKING_MAX_PROBES_OFFSET</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>3</Value>
+        <Value>3.5</Value>
       </Value>
     </Pair>
     <Pair>
@@ -574,13 +574,13 @@
     <Pair>
       <Key>SHIP_PHYSICS_DEC_COEF</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>0.0255</Value>
+        <Value>0.0317</Value>
       </Value>
     </Pair>
     <Pair>
       <Key>SHIP_PHYSICS_ACC_COEF</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>0.079</Value>
+        <Value>0.103</Value>
       </Value>
     </Pair>
     <Pair>
