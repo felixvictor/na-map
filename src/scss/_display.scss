@@ -729,10 +729,8 @@ pattern > circle {
             text-anchor: start;
         }
 
-        circle {
             fill-opacity: 1;
             cursor: pointer;
-        }
 
         .drag-active {
             stroke: $overlay-text-colour;
