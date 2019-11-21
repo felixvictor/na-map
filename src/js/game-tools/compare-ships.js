@@ -395,8 +395,8 @@ class ShipBase extends Ship {
             const yDelta = d3Event.y - this._yShip;
             const radians = Math.atan2(yDelta, xDelta);
             // console.log(d, d3Event, xDelta, yDelta, radians);
-
-            d3Select(nodes[i]).attr("transform", `rotate(${radiansToDegrees(radians)})`);
+            this._shipRotate += radiansToDegrees(radians);
+            d3Select(nodes[i]).attr("transform", `rotate(${this._shipRotate})`);
         };
 
         // eslint-disable-next-line unicorn/consistent-function-scoping
@@ -428,6 +428,8 @@ class ShipBase extends Ship {
         this._widthShip = this._heightShip;
         this._xShip = -(this._widthShip / 2);
         this._yShip = -(this._heightShip / 2);
+        this._shipRotate = 90;
+
         this.g
             .append("image")
             .attr("height", this._heightShip)
@@ -435,8 +437,15 @@ class ShipBase extends Ship {
             .attr("x", this._xShip)
             .attr("y", this._yShip)
             .attr("class", "ship-outline")
-            .attr("transform", "rotate(90)")
-            .attr("xlink:href", shipIcon)
+            .attr("transform", `rotate(${this._shipRotate})`)
+            .attr("xlink:href", shipIcon);
+
+        this.g
+            .append("circle")
+            .attr("cx", "0")
+            .attr("cy", "0")
+            .attr("r", "20")
+            .attr("class", "ship-handle")
             .call(this._dragShip);
 
         // Add the paths for the text
@@ -1204,9 +1213,9 @@ export default class CompareShips {
 
     async _loadAndSetupData() {
         try {
-            this._moduleDataDefault = (await import(
-                /* webpackChunkName: "data-modules" */ "../../gen/modules.json"
-            )).default;
+            this._moduleDataDefault = (
+                await import(/* webpackChunkName: "data-modules" */ "../../gen/modules.json")
+            ).default;
             this._shipData = (await import(/* webpackChunkName: "data-ships" */ "../../gen/ships.json")).default;
             this._setupData();
         } catch (error) {
