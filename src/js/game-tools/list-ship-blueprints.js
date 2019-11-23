@@ -43,16 +43,22 @@ export default class ListShipBlueprints {
             ).default;
             this._woodData = (await import(/* webpackChunkName: "data-woods" */ "../../gen/woods.json")).default;
             /**
+             * @typedef {object} extractionCost
+             * @property {Number} price Extraction price
+             * @property {Number} labour Extraction labour
+             */
+
+            /**
              * Extraction prices
              * - key: resource name
-             * - value: extraction price
-             * @type {Map<string, number>}
+             * - values: extractionCost
+             * @type {Map<string, extractionCost>}
              * @private
              */
-            this._prices = new Map(
+            this._extractionCosts = new Map(
                 (
                     await import(/* webpackChunkName: "data-ship-blueprints" */ "../../gen/prices.json")
-                ).default.map(price => [price.name, price.price])
+                ).default.map(price => [price.name, { price: price.price, labour: price.labour }])
             );
         } catch (error) {
             putImportError(error);
@@ -283,23 +289,36 @@ export default class ListShipBlueprints {
      * @private
      */
     _updateText() {
-        const extraData = [];
+        /**
+         * @typedef {Array} itemsNeeded
+         * @property {string} item
+         * @property {number|string} Amount needed (number or formatted number)
+         */
+
+        /**
+         * Extra resources
+         * @type {itemsNeeded}
+         */
+        const extraResources = [];
         if (this._currentBlueprintData.doubloons) {
-            extraData.push(["Doubloons", this._currentBlueprintData.doubloons]);
+            extraResources.push(["Doubloons", this._currentBlueprintData.doubloons]);
         }
 
-        extraData.push(["Provisions", this._currentBlueprintData.provisions]);
+        extraResources.push(["Provisions", this._currentBlueprintData.provisions]);
         if (this._currentBlueprintData.permit) {
-            extraData.push(["Permit", this._currentBlueprintData.permit]);
+            extraResources.push(["Permit", this._currentBlueprintData.permit]);
         }
 
-        extraData.push(["Craft level", this._currentBlueprintData.craftLevel]);
-        extraData.push(["Shipyard level", this._currentBlueprintData.shipyardLevel]);
-        extraData.push(["Labour hours", this._currentBlueprintData.labourHours]);
-        extraData.push(["Craft experience", this._currentBlueprintData.craftXP]);
+        extraResources.push(["Craft level", this._currentBlueprintData.craftLevel]);
+        extraResources.push(["Shipyard level", this._currentBlueprintData.shipyardLevel]);
+        extraResources.push(["Labour hours", this._currentBlueprintData.labourHours]);
+        extraResources.push(["Craft experience", this._currentBlueprintData.craftXP]);
 
-        // Add default resources
-        const resourcesData = this._currentBlueprintData.resources.map(resource => [resource.name, resource.amount]);
+        /**
+         * Default resources
+         * @type {itemsNeeded}
+         */
+        const defaultResources = this._currentBlueprintData.resources.map(resource => [resource.name, resource.amount]);
 
         // Add trim
         let frameAdded = false;
@@ -308,69 +327,94 @@ export default class ListShipBlueprints {
         // Crew space means additional hemp
         if (this._woodsSelected.trim === "Crew Space") {
             const hempAmount = this._currentBlueprintData.trims.find(trim => trim.name === "Crew Space").amount;
-            const index = resourcesData.findIndex(resource => resource[0] === "Hemp");
-            resourcesData[index][1] += hempAmount;
+            const index = defaultResources.findIndex(resource => resource[0] === "Hemp");
+            defaultResources[index][1] += hempAmount;
         } else {
             const trimAmount = this._currentBlueprintData.trims.find(trim => trim.name === "Planking").amount;
             // Frame and trim have same wood: add trim to frame
             if (this._woodsSelected.trim === this._woodsSelected.frame) {
                 frameAmount += trimAmount;
             } else {
-                const index = resourcesData.findIndex(resource => resource[0] === this._woodsSelected.trim);
+                const index = defaultResources.findIndex(resource => resource[0] === this._woodsSelected.trim);
                 // Trim wood is already part of default resources (fir and oak log)
                 if (index >= 0) {
-                    resourcesData[index][1] += trimAmount;
+                    defaultResources[index][1] += trimAmount;
                 } else {
                     // Trim is an additional resource
                     trimAdded = true;
-                    resourcesData.push([this._woodsSelected.trim, trimAmount]);
+                    defaultResources.push([this._woodsSelected.trim, trimAmount]);
                 }
             }
         }
 
         // Add frame
         frameAmount += this._currentBlueprintData.frames.find(frame => frame.name === this._woodsSelected.frame).amount;
-        const index = resourcesData.findIndex(resource => resource[0] === this._woodsSelected.frame);
+        const index = defaultResources.findIndex(resource => resource[0] === this._woodsSelected.frame);
         if (index >= 0) {
             // Frame wood is already part of default resources (fir and oak log)
-            resourcesData[index][1] += frameAmount;
+            defaultResources[index][1] += frameAmount;
         } else {
             // Frame is an additional resource
             frameAdded = true;
-            resourcesData.push([this._woodsSelected.frame, frameAmount]);
+            defaultResources.push([this._woodsSelected.frame, frameAmount]);
         }
 
         // Order frame before trim if both are added
         if (frameAdded && trimAdded) {
-            const frameIndex = resourcesData.length - 1;
-            [resourcesData[frameIndex], resourcesData[frameIndex - 1]] = [
-                resourcesData[frameIndex - 1],
-                resourcesData[frameIndex]
+            const frameIndex = defaultResources.length - 1;
+            [defaultResources[frameIndex], defaultResources[frameIndex - 1]] = [
+                defaultResources[frameIndex - 1],
+                defaultResources[frameIndex]
             ];
         }
 
+        // Add extraction price and labour
+        /**
+         * Total price per item
+         * @param item {itemsNeeded}
+         * @return {number} Amount times price
+         */
         // eslint-disable-next-line unicorn/consistent-function-scoping
-        const getAmount = item => this._prices.get(item[0]) * item[1];
-        const reducer = (accumulator, currentValue) => {
-            if (Number.isNaN(accumulator)) {
-                accumulator = getAmount(accumulator);
-            }
-
-            return accumulator + getAmount(currentValue);
+        const getTotalPrice = item => this._extractionCosts.get(item[0]).price * item[1];
+        /**
+         * Total labour hours per item
+         * @param item {itemsNeeded}
+         * @return {number} Amount times labour hours
+         */
+        // eslint-disable-next-line unicorn/consistent-function-scoping
+        const getTotalLabour = item => this._extractionCosts.get(item[0]).labour * item[1];
+        /**
+         * Calculate total costs
+         * @param data {itemsNeeded}
+         */
+        const getCosts = data => {
+            data.filter(data => this._extractionCosts.has(data[0])).forEach(data => {
+                price += getTotalPrice(data);
+                labour += getTotalLabour(data);
+            });
         };
 
-        // Add extraction cost
+        /**
+         * Total extraction price
+         * @type {number}
+         */
         let price = 0;
-        price = resourcesData.filter(data => this._prices.has(data[0])).reduce(reducer, price);
-        price = extraData.filter(data => this._prices.has(data[0])).reduce(reducer, price);
-        extraData.push(["Extraction cost", formatInt(price)]);
+        /**
+         * Total extraction labour hours
+         * @type {number}
+         */
+        let labour = 0;
+        getCosts(defaultResources);
+        getCosts(extraResources);
+        extraResources.push(["Extraction price", formatInt(price)]);
+        extraResources.push(["Extraction labour", formatInt(labour)]);
 
         // Format amounts
-        resourcesData.map(data => [data[0], formatInt(data[1])]);
-        extraData.map(data => [data[0], formatInt(data[1])]);
+        defaultResources.map(data => [data[0], formatInt(data[1])]);
+        extraResources.map(data => [data[0], formatInt(data[1])]);
 
-        this._updateTable(this._tables.Extra, extraData);
-        this._updateTable(this._tables.Resources, resourcesData);
+        this._updateTable(this._tables.Extra, extraResources);
+        this._updateTable(this._tables.Resources, defaultResources);
     }
 
     /**
