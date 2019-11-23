@@ -38,10 +38,22 @@ export default class ListShipBlueprints {
 
     async _loadAndSetupData() {
         try {
-            this._blueprintData = (await import(
-                /* webpackChunkName: "data-ship-blueprints" */ "../../gen/ship-blueprints.json"
-            )).default;
+            this._blueprintData = (
+                await import(/* webpackChunkName: "data-ship-blueprints" */ "../../gen/ship-blueprints.json")
+            ).default;
             this._woodData = (await import(/* webpackChunkName: "data-woods" */ "../../gen/woods.json")).default;
+            /**
+             * Extraction prices
+             * - key: resource name
+             * - value: extraction price
+             * @type {Map<string, number>}
+             * @private
+             */
+            this._prices = new Map(
+                (
+                    await import(/* webpackChunkName: "data-ship-blueprints" */ "../../gen/prices.json")
+                ).default.map(price => [price.name, price.price])
+            );
         } catch (error) {
             putImportError(error);
         }
@@ -185,8 +197,6 @@ export default class ListShipBlueprints {
 
     _updateTable(elem, dataBody, dataHead = []) {
         const addHead = () => {
-            const sortAscending = true;
-
             // Data join rows
             const tableRowUpdate = elem
                 .select("thead")
@@ -275,18 +285,18 @@ export default class ListShipBlueprints {
     _updateText() {
         const extraData = [];
         if (this._currentBlueprintData.doubloons) {
-            extraData.push(["Doubloons", formatInt(this._currentBlueprintData.doubloons)]);
+            extraData.push(["Doubloons", this._currentBlueprintData.doubloons]);
         }
 
-        extraData.push(["Provisions", formatInt(this._currentBlueprintData.provisions)]);
+        extraData.push(["Provisions", this._currentBlueprintData.provisions]);
         if (this._currentBlueprintData.permit) {
-            extraData.push(["Permit", formatInt(this._currentBlueprintData.permit)]);
+            extraData.push(["Permit", this._currentBlueprintData.permit]);
         }
 
-        extraData.push(["Craft level", formatInt(this._currentBlueprintData.craftLevel)]);
-        extraData.push(["Shipyard level", formatInt(this._currentBlueprintData.shipyardLevel)]);
-        extraData.push(["Labour hours", formatInt(this._currentBlueprintData.labourHours)]);
-        extraData.push(["Craft experience", formatInt(this._currentBlueprintData.craftXP)]);
+        extraData.push(["Craft level", this._currentBlueprintData.craftLevel]);
+        extraData.push(["Shipyard level", this._currentBlueprintData.shipyardLevel]);
+        extraData.push(["Labour hours", this._currentBlueprintData.labourHours]);
+        extraData.push(["Craft experience", this._currentBlueprintData.craftXP]);
 
         // Add default resources
         const resourcesData = this._currentBlueprintData.resources.map(resource => [resource.name, resource.amount]);
@@ -339,10 +349,24 @@ export default class ListShipBlueprints {
             ];
         }
 
+        // eslint-disable-next-line unicorn/consistent-function-scoping
+        const getAmount = item => this._prices.get(item[0]) * item[1];
+        const reducer = (accumulator, currentValue) => {
+            if (Number.isNaN(accumulator)) {
+                accumulator = getAmount(accumulator);
+            }
+
+            return accumulator + getAmount(currentValue);
+        };
+
+        let price = 0;
+        price = resourcesData.filter(data => this._prices.has(data[0])).reduce(reducer, price);
+        price = extraData.filter(data => this._prices.has(data[0])).reduce(reducer, price);
+        extraData.push(["Extraction cost", formatInt(price)]);
+
         // Format amount
-        resourcesData.forEach(data => {
-            data[1] = formatInt(data[1]);
-        });
+        resourcesData.map(data => [data[0], formatInt(data[1])]);
+        extraData.map(data => [data[0], formatInt(data[1])]);
 
         this._updateTable(this._tables.Extra, extraData);
         this._updateTable(this._tables.Resources, resourcesData);
