@@ -135,7 +135,8 @@ function convertBuildings() {
         .filter(building => !Array.isArray(building.resource) && building.resource.price)
         .map(building => ({
             name: building.resource.name,
-            price: building.resource.price
+            price: building.resource.price,
+            labour: building.batch.labour
         }))
         .sort(sortBy(["name"]));
     saveJson(fileNamePrices, prices);
