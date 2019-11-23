@@ -156,12 +156,8 @@ class Ship {
 
         // Add big wind arrow
         this.g
-            .append("line")
-            .attr("x1", 0)
-            .attr("y1", -160)
-            .attr("x2", 0)
-            .attr("y2", -79)
-            .attr("class", "ship-profile-arrow")
+            .append("path")
+            .attr("d", "M0-79v-81z") // line 0,-160 0,-79
             .attr("marker-end", "url(#ship-profile-arrow-head)");
     }
 
@@ -1029,11 +1025,7 @@ export default class CompareShips {
         // Clone arrow and change properties
         const arrowNew = arrow.cloneNode(true);
         arrowNew.id = "ship-profile-arrow-head";
-        if (arrowNew.hasChildNodes()) {
-            arrowNew.childNodes.forEach(child => {
-                child.classList.replace("arrow-head", "ship-profile-arrow-head");
-            });
-        }
+        arrowNew.classList.replace("journey-arrow", "ship-profile-arrow");
 
         // Insert new arrow
         const defs = document.querySelector("#na-map svg defs");
