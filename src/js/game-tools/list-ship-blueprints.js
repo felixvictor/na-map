@@ -359,12 +359,13 @@ export default class ListShipBlueprints {
             return accumulator + getAmount(currentValue);
         };
 
+        // Add extraction cost
         let price = 0;
         price = resourcesData.filter(data => this._prices.has(data[0])).reduce(reducer, price);
         price = extraData.filter(data => this._prices.has(data[0])).reduce(reducer, price);
         extraData.push(["Extraction cost", formatInt(price)]);
 
-        // Format amount
+        // Format amounts
         resourcesData.map(data => [data[0], formatInt(data[1])]);
         extraData.map(data => [data[0], formatInt(data[1])]);
 
