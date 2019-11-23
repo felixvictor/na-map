@@ -11,8 +11,9 @@
 import { cleanName, readJson, saveJson, sortBy } from "./common.mjs";
 
 const itemsFilename = process.argv[2];
-const outFilename = process.argv[3];
-const date = process.argv[4];
+const fileNameBuildings = process.argv[3];
+const fileNamePrices = process.argv[4];
+const date = process.argv[5];
 
 const APIItems = readJson(`${itemsFilename}-ItemTemplates-${date}.json`);
 
@@ -130,8 +131,16 @@ function convertBuildings() {
     );
 
     let result = [...buildings.values()];
+    const prices = result
+        .filter(building => !Array.isArray(building.resource) && building.resource.price)
+        .map(building => ({
+            name: building.resource.name,
+            price: building.resource.price
+        }))
+        .sort(sortBy(["name"]));
+    saveJson(fileNamePrices, prices);
     result = result.filter(building => Object.keys(building).length).sort(sortBy(["name"]));
-    saveJson(outFilename, result);
+    saveJson(fileNameBuildings, result);
 }
 
 convertBuildings();
