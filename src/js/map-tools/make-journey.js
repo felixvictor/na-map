@@ -138,6 +138,7 @@ export default class Journey {
         d3Select("#na-svg defs")
             .append("marker")
             .attr("id", "journey-arrow")
+            .attr("class", "journey-arrow")
             .attr("viewBox", `0 -${width} ${doubleWidth} ${doubleWidth}`)
             .attr("refX", width)
             .attr("refY", 0)
@@ -145,8 +146,7 @@ export default class Journey {
             .attr("markerHeight", width)
             .attr("orient", "auto")
             .append("path")
-            .attr("d", `M0,-${width}L${doubleWidth},0L0,${width}`)
-            .attr("class", "arrow-head");
+            .attr("d", `M0,-${width}L${doubleWidth},0L0,${width}`);
     }
 
     _initJourneyData() {

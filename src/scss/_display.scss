@@ -718,10 +718,6 @@ pattern > circle {
         stroke: $overlay-text-colour;
     }
 
-    .arrow-head {
-        fill: $overlay-text-colour;
-    }
-
     .text-light-separation {
         fill: $overlay-text-colour-contrast !important;
     }
@@ -754,10 +750,6 @@ pattern > circle {
         stroke: $dark-overlay-text-colour;
     }
 
-    .arrow-head {
-        fill: $dark-overlay-text-colour;
-    }
-
     .text-light-separation {
         fill: $dark-overlay-text-colour-contrast !important;
     }
@@ -774,24 +766,6 @@ pattern > circle {
 .f11 {
     circle {
         fill-opacity: 0.5;
-    }
-}
-
-.compass {
-    circle,
-    line {
-        stroke-width: 0.1rem;
-    }
-}
-
-.small {
-    circle,
-    line {
-        stroke-width: 0.05rem;
-    }
-
-    path {
-        stroke-width: 0.15rem;
     }
 }
 
@@ -822,12 +796,32 @@ pattern > circle {
     }
 }
 
-.ship-profile-arrow-head {
-    fill: $dark-overlay-background-colour;
+.compass {
+    circle,
+    line {
+        stroke-width: 0.1rem;
+    }
 }
 
-.ship-profile-arrow {
-    stroke: $dark-overlay-background-colour;
+.small {
+    circle,
+    line {
+        stroke-width: 0.05rem;
+    }
+
+    path {
+        stroke-width: 0.15rem;
+    }
+}
+
+
+.journey-arrow {
+    fill: color-yiq($dark-overlay-background);
+}
+
+.ship-profile-arrow  {
+        fill: color-yiq($overlay-background);
+    stroke: color-yiq($overlay-background);
     stroke-width: 0.7rem;
     opacity: 0.3;
 }
