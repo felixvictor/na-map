@@ -136,25 +136,19 @@ class Ship {
 
         // Add compass arcs
         this.g
-            .selectAll(".compass-arc")
+            .append("g")
+            .attr("class", "compass-arc")
+            .selectAll("path")
             .data(pie)
-            .join(enter =>
-                enter
-                    .append("path")
-                    .attr("class", "compass-arc")
-                    .attr("d", arc)
-            );
+            .join(enter => enter.append("path").attr("d", arc));
 
         // Add the circles for each speed tick
         this.g
-            .selectAll(".speed-circle")
+            .append("g")
+            .attr("class", "speed-circle")
+            .selectAll("circle")
             .data(this._ticksSpeed)
-            .join(enter =>
-                enter
-                    .append("circle")
-                    .attr("class", "speed-circle")
-                    .attr("r", d => this._shipCompare.radiusScaleAbsolute(d))
-            );
+            .join(enter => enter.append("circle").attr("r", d => this._shipCompare.radiusScaleAbsolute(d)));
 
         // Add big wind arrow
         this.g
@@ -419,6 +413,36 @@ class ShipBase extends Ship {
             .startAngle(-Math.PI / 2)
             .endAngle(Math.PI / 2);
 
+        // Add the paths for the text
+        this.g
+            // .insert("g", "g.compass-arc")
+            .append("g")
+            .attr("data-ui-component", "speed-textpath")
+            .selectAll("path")
+            .data(this._ticksSpeed)
+            .join(enter =>
+                enter
+                    .append("path")
+                    .attr("d", speedArc)
+                    .attr("id", (d, i) => `tick${i}`)
+            );
+
+        // And add the text
+        this.g
+            // .insert("g", "g.compass-arc")
+            .append("g")
+            .attr("class", "speed-text")
+            .selectAll("text")
+            .data(this._ticksSpeed)
+            .join(enter =>
+                enter
+                    .append("text")
+                    .append("textPath")
+                    .attr("href", (d, i) => `#tick${i}`)
+                    .text((d, i) => this._ticksSpeedLabels[i])
+                    .attr("startOffset", "10%")
+            );
+
         // Add ship outline
         const { shipMass } = this._shipData;
         this._heightShip = this._shipCompare.shipMassScale(shipMass);
@@ -444,32 +468,6 @@ class ShipBase extends Ship {
             .attr("r", "20")
             .attr("class", "ship-handle")
             .call(this._dragShip);
-
-        // Add the paths for the text
-        this.g
-            .selectAll(".speed-textpath")
-            .data(this._ticksSpeed)
-            .join(enter =>
-                enter
-                    .append("path")
-                    .attr("class", "speed-textpath")
-                    .attr("d", speedArc)
-                    .attr("id", (d, i) => `tick${i}`)
-            );
-
-        // And add the text
-        this.g
-            .selectAll(".speed-text")
-            .data(this._ticksSpeed)
-            .join(enter =>
-                enter
-                    .append("text")
-                    .attr("class", "speed-text")
-                    .append("textPath")
-                    .attr("href", (d, i) => `#tick${i}`)
-                    .text((d, i) => this._ticksSpeedLabels[i])
-                    .attr("startOffset", "10%")
-            );
     }
 
     /**
@@ -498,12 +496,14 @@ class ShipBase extends Ship {
         // Speed marker
         // noinspection DuplicatedCode
         this.g
-            .selectAll(".speed-markers")
+            // .insert("g", "g.compass-arc")
+            .append("g")
+            .attr("data-ui-component", "speed-markers")
+            .selectAll("circle")
             .data(arcsBase)
             .join(enter =>
                 enter
                     .append("circle")
-                    .attr("class", "speed-markers")
                     .attr("r", 5)
                     .attr("cy", (d, i) => Math.cos(i * segmentRadians) * -this._shipCompare.radiusScaleAbsolute(d.data))
                     .attr("cx", (d, i) => Math.sin(i * segmentRadians) * this._shipCompare.radiusScaleAbsolute(d.data))
@@ -711,20 +711,22 @@ class ShipComparison extends Ship {
         this._setColourScale(this._minSpeedDiff, this._maxSpeedDiff);
 
         this.g
-            .selectAll("g.speed-markers")
+            // .insert("g", "g.compass-arc")
+            .append("g")
+            .attr("data-ui-component", "speed-markers")
+            .selectAll("circle")
             .data(this._arcsComp)
             .join(enter => {
-                const g = enter.append("g").attr("class", "speed-markers");
-
-                g.append("circle")
+                enter
+                    .append("circle")
                     .attr("r", 5)
                     .attr("cy", (d, i) => Math.cos(i * segmentRadians) * -this.shipCompare.radiusScaleAbsolute(d.data))
                     .attr("cx", (d, i) => Math.sin(i * segmentRadians) * this.shipCompare.radiusScaleAbsolute(d.data))
-                    .attr("fill", (d, i) => this._shipCompare.colourScaleSpeedDiff(this._speedDiff[i]));
-
-                g.append("title").text(
-                    (d, i) => `${Math.round(d.data * 10) / 10} (${formatSignFloat(this._speedDiff[i], 1)}) knots`
-                );
+                    .attr("fill", (d, i) => this._shipCompare.colourScaleSpeedDiff(this._speedDiff[i]))
+                    .append("title")
+                    .text(
+                        (d, i) => `${Math.round(d.data * 10) / 10} (${formatSignFloat(this._speedDiff[i], 1)}) knots`
+                    );
             })
             .select("circle")
             .attr("fill", (d, i) => this._shipCompare.colourScaleSpeedDiff(this._speedDiff[i]));
