@@ -73,7 +73,7 @@ export default class PredictWind {
             .attr("orient", "auto")
             .append("path")
             .attr("d", `M0,-${width}L${doubleWidth},0L0,${width}`)
-            .attr("class", "arrow-head");
+            .attr("class", "wind-predict-arrow-head");
     }
 
     _navbarClick(event) {
