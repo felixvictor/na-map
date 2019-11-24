@@ -774,8 +774,8 @@ pattern > circle {
             text-anchor: start;
         }
 
-            fill-opacity: 1;
-            cursor: pointer;
+        fill-opacity: 1;
+        cursor: pointer;
 
         .drag-active {
             stroke: $dark-overlay-text-colour;
@@ -827,5 +827,11 @@ pattern > circle {
 .ship-profile-arrow {
     opacity: .3;
     stroke: $overlay-text-colour;
+    stroke-width: .7rem;
+}
+
+.ship-outline {
+    fill: $secondary-500;
+    stroke: $secondary-500;
     stroke-width: .7rem;
 }
