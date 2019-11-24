@@ -14,15 +14,15 @@ $paddingThird: map-get($spacers, 1);
 
 $dark-overlay-background-colour: $primary-800;
 $dark-overlay-background-colour-contrast: $primary-700;
-$dark-overlay-background: rgba($dark-overlay-background-colour, 0.8);
-$dark-overlay-background-contrast: rgba($dark-overlay-background-colour-contrast, 0.8);
+$dark-overlay-background: rgba($dark-overlay-background-colour, .8);
+$dark-overlay-background-contrast: rgba($dark-overlay-background-colour-contrast, .8);
 $dark-overlay-text-colour-contrast: $primary-200;
 $dark-overlay-text-colour: color-yiq($dark-overlay-background);
 
 $overlay-background-colour: $primary-200;
 $overlay-background-colour-contrast: $primary-050;
-$overlay-background: rgba($overlay-background-colour, 0.8);
-$overlay-background-contrast: rgba($overlay-background-colour-contrast, 0.8);
+$overlay-background: rgba($overlay-background-colour, .8);
+$overlay-background-contrast: rgba($overlay-background-colour-contrast, .8);
 $overlay-text-colour-contrast: $primary-700;
 $overlay-text-colour: color-yiq($overlay-background);
 
@@ -52,22 +52,22 @@ table,
 
 @mixin caps {
     font-variant-caps: all-small-caps;
-    letter-spacing: 0.08em;
+    letter-spacing: .08em;
 }
 
 @mixin des {
     position: relative;
-    top: -0.4rem;
+    top: -.4rem;
     font-size: small;
 }
 
 .des {
-    @include des;
+    @include des ();
 }
 
 .caps,
 .des {
-    @include caps;
+    @include caps ();
 }
 
 .card-table {
@@ -86,7 +86,7 @@ text {
 .position {
     path {
         fill: $green;
-        fill-opacity: 0.6;
+        fill-opacity: .6;
     }
 }
 
@@ -154,7 +154,7 @@ text {
 }
 
 .badge {
-    padding-top: 0.15rem;
+    padding-top: .15rem;
 }
 
 .mm {
@@ -196,7 +196,7 @@ text {
 .flag-icon {
     width: 2rem;
     height: 100%;
-    margin-right: 0.4rem;
+    margin-right: .4rem;
 }
 
 .rate {
@@ -222,7 +222,7 @@ text {
     }
 
     .diff {
-        opacity: 0.4;
+        opacity: .4;
     }
 }
 
@@ -238,12 +238,12 @@ text {
 
 .area {
     .area-label {
-        fill-opacity: 0.7;
+        fill-opacity: .7;
         fill: $white;
     }
 
     path {
-        stroke-opacity: 0.4;
+        stroke-opacity: .4;
         stroke: $white !important;
         stroke-width: 2px;
     }
@@ -279,7 +279,7 @@ text {
     grid-area: x-axis;
     grid-column: 1 / 5;
     grid-row: 1;
-    background: rgba($primary-200, 0.4);
+    background: rgba($primary-200, .4);
 }
 
 .overlay-grid::after // acts as axis-rect-y
@@ -288,7 +288,7 @@ text {
     grid-area: y-axis;
     grid-column: 1 / 1;
     grid-row: 1 / 3;
-    background: rgba($primary-200, 0.4);
+    background: rgba($primary-200, .4);
 }
 
 .wind-predict-column {
@@ -324,10 +324,10 @@ text {
 .journey-summary {
     display: grid;
     padding: $paddingThird;
+    line-height: 1;
+    color: $overlay-text-colour;
     pointer-events: all;
     background-color: $overlay-background;
-    color: $overlay-text-colour;
-    line-height: 1;
     button {
         margin-bottom: map-get($spacers, 2);
     }
@@ -347,8 +347,8 @@ text {
     flex: 1 1 auto;
     flex-direction: column;
     overflow-y: scroll;
-    pointer-events: all;
     color: $overlay-text-colour;
+    pointer-events: all;
     background: $overlay-background;
 
     .bootstrap-select {
@@ -463,7 +463,7 @@ svg {
 
 .base-profile,
 .comp-profile {
-    opacity: 0.5;
+    opacity: .5;
 }
 
 .base-profile {
@@ -512,7 +512,7 @@ svg {
 
 .port-name {
     font-size: x-large;
-    @include caps;
+    @include caps ();
     font-variant-numeric: normal;
 }
 
@@ -521,14 +521,14 @@ svg {
 }
 
 .summary-des {
-    @include caps;
-    @include des;
-    color: $overlay-text-colour-contrast;
+    @include caps ();
+    @include des ();
     top: 0;
+    color: $overlay-text-colour-contrast;
 }
 
 .bubble {
-    fill-opacity: 0.7;
+    fill-opacity: .7;
 }
 
 .both {
@@ -548,16 +548,16 @@ svg {
 }
 
 .not-capturable {
-    opacity: 0.8;
+    opacity: .8;
     fill: gray;
 }
 
 .capital {
-    opacity: 0.9;
+    opacity: .9;
 }
 
 .non-capital {
-    opacity: 0.4;
+    opacity: .4;
 }
 
 .hidden {
@@ -578,7 +578,7 @@ svg {
 
 .county {
     font-size: 60px;
-    letter-spacing: 0.6rem;
+    letter-spacing: .6rem;
 }
 
 .port-names {
@@ -594,7 +594,7 @@ svg {
 ////
 
 .pb {
-    stroke-width: 0.5px;
+    stroke-width: .5px;
     stroke-opacity: 1;
 }
 
@@ -643,9 +643,9 @@ svg {
 }
 
 .raid-join-circle {
+    fill: none;
     stroke: $secondary-300;
     stroke-width: 1px;
-    fill: none;
 }
 
 .pb-join-circle {
@@ -654,10 +654,10 @@ svg {
 
 // capital ports
 pattern > circle {
-    stroke-opacity: 0.8;
-    stroke-width: 4;
-    stroke: $white;
     fill: none;
+    stroke: $white;
+    stroke-opacity: .8;
+    stroke-width: 4;
 }
 
 ///
@@ -673,12 +673,12 @@ pattern > circle {
     }
 
     circle {
-        fill-opacity: 0.2;
+        fill-opacity: .2;
     }
 
     path {
         fill: none;
-        stroke-width: 0.3rem;
+        stroke-width: .3rem;
     }
 
     text {
@@ -687,7 +687,7 @@ pattern > circle {
     }
 
     line {
-        stroke-width: 0.1rem;
+        stroke-width: .1rem;
     }
 }
 
@@ -765,7 +765,7 @@ pattern > circle {
 
 .f11 {
     circle {
-        fill-opacity: 0.5;
+        fill-opacity: .5;
     }
 }
 
@@ -782,7 +782,7 @@ pattern > circle {
 
         .drag-active {
             stroke: $dark-overlay-text-colour;
-            stroke-width: 0.25rem;
+            stroke-width: .25rem;
         }
 
         .drag-hidden {
@@ -799,29 +799,28 @@ pattern > circle {
 .compass {
     circle,
     line {
-        stroke-width: 0.1rem;
+        stroke-width: .1rem;
     }
 }
 
 .small {
     circle,
     line {
-        stroke-width: 0.05rem;
+        stroke-width: .05rem;
     }
 
     path {
-        stroke-width: 0.15rem;
+        stroke-width: .15rem;
     }
 }
-
 
 .journey-arrow {
     fill: color-yiq($dark-overlay-background);
 }
 
-.ship-profile-arrow  {
-        fill: color-yiq($overlay-background);
+.ship-profile-arrow {
+    opacity: .3;
+    fill: color-yiq($overlay-background);
     stroke: color-yiq($overlay-background);
-    stroke-width: 0.7rem;
-    opacity: 0.3;
+    stroke-width: .7rem;
 }
