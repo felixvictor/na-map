@@ -80,7 +80,7 @@ function common_var () {
     src_dir="${base_dir}/src"
     data_dir="${src_dir}/data"
     gen_dir="${src_dir}/gen"
-    out_dir="${base_dir}/public/data"
+    data_out_dir="${base_dir}/public/data"
 
     excel_file="${data_dir}/port-battle.xlsx"
 
@@ -90,7 +90,7 @@ function common_var () {
     nation_file="${gen_dir}/nations.json"
     ownership_file="${gen_dir}/ownership.json"
     port_file="${gen_dir}/ports.json"
-    pb_zone_file="${gen_dir}/pb.json"
+    pb_zone_file="${gen_dir}/pb-zones.json"
     recipe_file="${gen_dir}/recipes.json"
     repair_file="${gen_dir}/repairs.json"
     ship_blueprint_file="${gen_dir}/ship-blueprints.json"
@@ -210,7 +210,7 @@ function get_port_data () {
 }
 
 function copy_data () {
-    cp --update "${data_dir}"/*.json "${excel_file}" "${out_dir}"/
+    cp --update "${data_dir}"/*.json "${excel_file}" "${data_out_dir}"/
 }
 
 function deploy_data () {
@@ -246,8 +246,13 @@ function get_tweets_change () {
     # Empty file
     echo "[" > "${tweets_json}"
 
+    time_of_day=$(date '+%d-%m-%Y' -d "${server_date} - 2 day")
+    for query_hour in $(seq 0 23); do
+        get_tweets_in_range "${time_of_day}" "$(printf "%02d\n" "${query_hour}")"
+    done
+
     time_of_day=$(date '+%d-%m-%Y' -d "${server_date} - 1 day")
-    for query_hour in $(seq ${server_maintenance_hour} 23); do
+    for query_hour in $(seq 0 23); do
         get_tweets_in_range "${time_of_day}" "$(printf "%02d\n" "${query_hour}")"
     done
 
