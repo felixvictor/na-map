@@ -158,6 +158,7 @@ class Ship {
         this.g
             .append("path")
             .attr("d", "M0-79v-81z") // line 0,-160 0,-79
+            .attr("class", "ship-profile-arrow")
             .attr("marker-end", "url(#ship-profile-arrow-head)");
     }
 
@@ -1025,7 +1026,11 @@ export default class CompareShips {
         // Clone arrow and change properties
         const arrowNew = arrow.cloneNode(true);
         arrowNew.id = "ship-profile-arrow-head";
-        arrowNew.classList.replace("journey-arrow", "ship-profile-arrow");
+        if (arrowNew.hasChildNodes()) {
+            arrowNew.childNodes.forEach(child => {
+                child.classList.replace("journey-arrow-head", "ship-profile-arrow-head");
+            });
+        }
 
         // Insert new arrow
         const defs = document.querySelector("#na-map svg defs");
