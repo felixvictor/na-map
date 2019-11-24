@@ -188,6 +188,11 @@ function updatePorts() {
         "u"
     );
     // noinspection RegExpRedundantEscape
+    const npcDefendedRegex = new RegExp(
+        `\\[(${timeR}) UTC\\] NPC Raiders failed to capture port (${portR}) \\((${nationR})\\)`,
+        "u"
+    );
+    // noinspection RegExpRedundantEscape
     const hostilityLevelUpRegex = new RegExp(
         `\\[(${timeR}) UTC\\] The hostility level of the clan (${clanR}) \\((${nationR})\\) on the port (${portR}) \\((${nationR})\\) increased to (${percentageR})%\\. The previous value was (${percentageR})% #HOCaribbean${portHashR}`,
         "u"
@@ -264,6 +269,9 @@ function updatePorts() {
                 isPortDataChanged = true;
                 npcCaptured(result);
             } else if ((result = defendedRegex.exec(tweet.text)) !== null) {
+                isPortDataChanged = true;
+                defended(result);
+            } else if ((result = npcDefendedRegex.exec(tweet.text)) !== null) {
                 isPortDataChanged = true;
                 defended(result);
             } else if ((result = hostilityLevelUpRegex.exec(tweet.text)) !== null) {
