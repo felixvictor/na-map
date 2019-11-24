@@ -45,7 +45,26 @@ function updatePorts() {
         console.log("      --- captured", i);
         port.nation = capturingNation.short;
         port.capturer = result[3];
-        port.lastPortBattle = moment(result[1], "DD-MM-YYYY HH:mm").format("YYYY-MM-DD HH:mm");
+        port.lastPortBattle = moment.utc(result[1], "DD-MM-YYYY HH:mm").format("YYYY-MM-DD HH:mm");
+        port.attackerNation = "";
+        port.attackerClan = "";
+        port.attackHostility = "";
+        port.portBattle = "";
+    }
+
+    /**
+     * Port captured by NPC raiders
+     * @param {String[]} result - Result from tweet regex
+     * @returns {void}
+     */
+    function npcCaptured(result) {
+        const i = ports.ports.findIndex(findIndex, result[2]);
+        const port = ports.ports[i];
+
+        console.log("      --- captured by NPC", i);
+        port.nation = "NT";
+        port.capturer = "";
+        port.lastPortBattle = moment.utc(result[1], "DD-MM-YYYY HH:mm").format("YYYY-MM-DD HH:mm");
         port.attackerNation = "";
         port.attackerClan = "";
         port.attackHostility = "";
@@ -99,21 +118,6 @@ function updatePorts() {
     }
 
     /**
-     * Get attacker nation
-     * @param {String[]} result - Result from tweet regex
-     * @returns {void}
-     */
-    function getNation(result) {
-        const i = ports.ports.findIndex(findIndex, result[4]);
-        const port = ports.ports[i];
-
-        console.log("      --- getNation", i);
-        port.attackerNation = result[3];
-        port.attackerClan = "";
-        port.attackHostility = 0;
-    }
-
-    /**
      * Port battle scheduled
      * @param {String[]} result - Result from tweet regex
      * @returns {void}
@@ -140,7 +144,7 @@ function updatePorts() {
 
         port.attackerClan = result[6];
         port.attackHostility = 1;
-        port.portBattle = moment(result[4], "DD MMM YYYY HH:mm").format("YYYY-MM-DD HH:mm");
+        port.portBattle = moment.utc(result[4], "DD MMM YYYY HH:mm").format("YYYY-MM-DD HH:mm");
     }
 
     /**
@@ -156,7 +160,7 @@ function updatePorts() {
         port.attackerNation = "Neutral";
         port.attackerClan = "NPC";
         port.attackHostility = 1;
-        port.portBattle = moment(result[3], "DD MMM YYYY HH:mm").format("YYYY-MM-DD HH:mm");
+        port.portBattle = moment.utc(result[3], "DD MMM YYYY HH:mm").format("YYYY-MM-DD HH:mm");
     }
 
     const portR = "[A-zÀ-ÿ’ -]+";
@@ -171,6 +175,11 @@ function updatePorts() {
     // noinspection RegExpRedundantEscape
     const capturedRegex = new RegExp(
         `\\[(${timeR}) UTC\\] (${portR}) captured by (${clanR}) ?\\(?(${nationR})?\\)?\\. Previous owner: (${clanR}) ?\\(?(${nationR})?\\)? #PBCaribbean #PBCaribbean${portHashR}`,
+        "u"
+    );
+    // noinspection RegExpRedundantEscape
+    const npcCapturedRegex = new RegExp(
+        `\\[(${timeR}) UTC\\] NPC Raiders captured port (${portR}) \\((${nationR})\\)`,
         "u"
     );
     // noinspection RegExpRedundantEscape
@@ -220,7 +229,7 @@ function updatePorts() {
         .format("YYYY-MM-DD HH:mm");
     // adjust reference server time is needed
     if (moment.utc().isBefore(serverStart)) {
-        serverStart = moment(serverStart).subtract(1, "day");
+        serverStart = moment.utc(serverStart).subtract(1, "day");
     }
 
     // When twitter-update has been used, reformat tweets.tweets
@@ -228,8 +237,8 @@ function updatePorts() {
         tweets.tweets = tweets
             .flatMap(tweet => tweet.tweets)
             .sort((a, b) => {
-                const timeA = moment(a.text.slice(1, 17), "DD-MM-YYYY HH:mm");
-                const timeB = moment(b.text.slice(1, 17), "DD-MM-YYYY HH:mm");
+                const timeA = moment.utc(a.text.slice(1, 17), "DD-MM-YYYY HH:mm");
+                const timeB = moment.utc(b.text.slice(1, 17), "DD-MM-YYYY HH:mm");
                 if (timeA.isAfter(timeB)) {
                     return -1;
                 }
@@ -246,11 +255,14 @@ function updatePorts() {
         tweet.text = tweet.text.replace("'", "’");
         console.log("\ntweet", tweet.text);
         result = checkDateRegex.exec(tweet.text);
-        tweetTime = moment(result[1], "DD-MM-YYYY HH:mm");
+        tweetTime = moment.utc(result[1], "DD-MM-YYYY HH:mm");
         if (tweetTime.isAfter(serverStart)) {
             if ((result = capturedRegex.exec(tweet.text)) !== null) {
                 isPortDataChanged = true;
                 captured(result);
+            } else if ((result = npcCapturedRegex.exec(tweet.text)) !== null) {
+                isPortDataChanged = true;
+                npcCaptured(result);
             } else if ((result = defendedRegex.exec(tweet.text)) !== null) {
                 isPortDataChanged = true;
                 defended(result);
@@ -277,18 +289,26 @@ function updatePorts() {
                 // eslint-disable-next-line no-unused-expressions
                 () => {};
             }
-        } else if (tweetTime.isAfter(moment(serverStart).subtract(1, "day"))) {
-            // Add scheduled port battles
+        } else if (tweetTime.isAfter(moment.utc(serverStart).subtract(1, "day"))) {
+            // Add scheduled port battles (only if battle is in the future
             if ((result = portBattleRegex.exec(tweet.text)) !== null) {
+                if (moment.utc().isBefore(moment.utc(result[4], "DD MMM YYYY HH:mm"))) {
+                    isPortDataChanged = true;
+                    portBattleScheduled(result);
+                }
+            } else if ((result = npcPortBattleRegex.exec(tweet.text)) !== null) {
                 isPortDataChanged = true;
-                portBattleScheduled(result);
-                // get nation names
-            } else if ((result = hostilityLevelUpRegex.exec(tweet.text)) !== null) {
+                npcPortBattleScheduled(result);
+            }
+        } else if (tweetTime.isAfter(moment.utc(serverStart).subtract(2, "day"))) {
+            // Add scheduled NPC raids
+            if ((result = npcPortBattleRegex.exec(tweet.text)) !== null) {
                 isPortDataChanged = true;
-                getNation(result);
+                npcPortBattleScheduled(result);
             }
         }
     });
+
     if (isPortDataChanged) {
         saveJson(portFilename, ports);
     }
