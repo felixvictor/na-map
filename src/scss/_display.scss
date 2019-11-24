@@ -62,12 +62,12 @@ table,
 }
 
 .des {
-    @include des ();
+    @include des();
 }
 
 .caps,
 .des {
-    @include caps ();
+    @include caps();
 }
 
 .card-table {
@@ -389,7 +389,7 @@ text {
 
 .trade-link {
     fill: none;
-    stroke: $overlay-text-colour;
+    stroke: $dark-overlay-text-colour;
 }
 
 .highlight {
@@ -512,7 +512,7 @@ svg {
 
 .port-name {
     font-size: x-large;
-    @include caps ();
+    @include caps();
     font-variant-numeric: normal;
 }
 
@@ -521,8 +521,8 @@ svg {
 }
 
 .summary-des {
-    @include caps ();
-    @include des ();
+    @include caps();
+    @include des();
     top: 0;
     color: $overlay-text-colour-contrast;
 }
@@ -708,7 +708,7 @@ pattern > circle {
     text {
         fill: $overlay-text-colour;
 
-        &.des {
+        .des {
             fill: $overlay-background-colour !important;
         }
     }
@@ -740,7 +740,7 @@ pattern > circle {
     text {
         fill: $dark-overlay-text-colour;
 
-        &.des {
+        .des {
             fill: $dark-overlay-background-colour !important;
         }
     }
@@ -814,13 +814,21 @@ pattern > circle {
     }
 }
 
-.journey-arrow {
+.wind-predict-arrow-head {
+    fill: color-yiq($overlay-background);
+}
+
+.journey-arrow-head,
+.trade-arrow-head {
     fill: color-yiq($dark-overlay-background);
+}
+
+.ship-profile-arrow-head {
+    fill: $overlay-text-colour;
 }
 
 .ship-profile-arrow {
     opacity: .3;
-    fill: color-yiq($overlay-background);
-    stroke: color-yiq($overlay-background);
+    stroke: $overlay-text-colour;
     stroke-width: .7rem;
 }
