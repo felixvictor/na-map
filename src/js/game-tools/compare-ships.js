@@ -449,25 +449,33 @@ class ShipBase extends Ship {
         this._widthShip = this._heightShip;
         this._xShip = -(this._widthShip / 2);
         this._yShip = -(this._heightShip / 2);
-        this._shipRotate = 90;
+        this._shipRotate = 0;
 
-        this.g
+        const shipG = this.g
+            .append("g")
+            .attr("class", "ship-outline")
+            .attr("transform", `rotate(${this._shipRotate})`);
+
+        shipG
             .append("image")
             .attr("height", this._heightShip)
             .attr("width", this._widthShip)
             .attr("x", this._xShip)
             .attr("y", this._yShip)
-            .attr("class", "ship-outline")
-            .attr("transform", `rotate(${this._shipRotate})`)
             .attr("xlink:href", shipIcon);
 
-        this.g
+        shipG
+            .append("line")
+            .attr("x1", 0)
+            .attr("y1", 0)
+            .attr("x2", 0)
+            .attr("y2", 160);
+
+        shipG
             .append("circle")
             .attr("cx", "0")
-            .attr("cy", "0")
-            .attr("r", "20")
-            .attr("class", "ship-handle")
-            .call(this._dragShip);
+            .attr("cy", "160")
+            .attr("r", "10");
     }
 
     /**
