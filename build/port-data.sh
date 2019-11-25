@@ -108,8 +108,11 @@ function get_API_data () {
     url="${source_base_url}${api_var}_${server_base_name}${server_name}.json"
 
     if [[ ! -f "${out_file}" ]]; then
-        curl --silent --output "${out_file}" "${url}"
-        sed -i -e "s/^var $api_var = //; s/\\;$//" "${out_file}"
+        if curl --fail --silent --output "${out_file}" "${url}"; then
+            sed -i -e "s/^var $api_var = //; s/\\;$//" "${out_file}"
+        else
+            exit $?
+        fi
     fi
 }
 
