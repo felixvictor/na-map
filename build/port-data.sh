@@ -89,6 +89,7 @@ function common_var () {
     loot_file="${gen_dir}/loot.json"
     nation_file="${gen_dir}/nations.json"
     ownership_file="${gen_dir}/ownership.json"
+    pb_zone_file="${gen_dir}/pb-zones.json"
     port_file="${gen_dir}/ports.json"
     prices_file="${gen_dir}/prices.json"
     recipe_file="${gen_dir}/recipes.json"
