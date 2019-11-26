@@ -4,14 +4,13 @@
  * @file      Cannon data.
  * @module    convert-cannons
  * @author    iB aka Felix Victor
- * @copyright 2018
+ * @copyright 2018, 2019
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-/* eslint-disable import/no-extraneous-dependencies */
 import * as fs from "fs";
-import xml2Json from "xml2json";
-
+// noinspection ES6CheckImport
+import convert from "xml-js";
 import { readTextFile, round, saveJson } from "./common.mjs";
 
 const inDirectory = process.argv[2];
@@ -120,13 +119,13 @@ function convertCannons() {
     function addData(fileData) {
         let type = "medium";
 
-        if (fileData.ModuleTemplate.Name.includes("Carronade")) {
+        if (fileData.ModuleTemplate._attributes.Name.includes("Carronade")) {
             type = "carronade";
-        } else if (fileData.ModuleTemplate.Name.includes("Long")) {
+        } else if (fileData.ModuleTemplate._attributes.Name.includes("Long")) {
             type = "long";
         }
 
-        const name = fileData.ModuleTemplate.Name.replace("Cannon ", "")
+        const name = fileData.ModuleTemplate._attributes.Name.replace("Cannon ", "")
             .replace("Carronade ", "")
             .replace(" pd", "")
             .replace(" Long", "")
@@ -140,25 +139,25 @@ function convertCannons() {
             name
         };
 
-        // console.log(fileData.ModuleTemplate);
         dataMapping.forEach(({ group, element }, value) => {
             if (!cannon[group]) {
-                // eslint-disable-next-line no-param-reassign
                 cannon[group] = {};
                 cannon[group][element] = {};
             }
 
             cannon[group][element] = {
-                value: Number(fileData.ModuleTemplate.Attributes.Pair.find(pair => value === pair.Key).Value.Value),
+                value: Number(
+                    fileData.ModuleTemplate.Attributes.Pair.find(pair => pair.Key._text === value).Value.Value._text
+                ),
                 digits: 0
             };
         });
 
         // Calculate penetrations
         const penetrations = new Map(
-            fileData.ModuleTemplate.Attributes.Pair.find(pair => pair.Key === "CANNON_PENETRATION_DEGRADATION")
-                .Value.Value.filter(penetration => Number(penetration.Time) > 0)
-                .map(penetration => [penetration.Time * 1000, Number(penetration.Value)])
+            fileData.ModuleTemplate.Attributes.Pair.find(pair => pair.Key._text === "CANNON_PENETRATION_DEGRADATION")
+                .Value.Value.filter(penetration => Number(penetration.Time._text) > 0)
+                .map(penetration => [penetration.Time._text * 1000, Number(penetration.Value._text)])
         );
         penetrations.set(250, (penetrations.get(200) + penetrations.get(300)) / 2);
         penetrations.set(500, (penetrations.get(400) + penetrations.get(600)) / 2);
@@ -186,11 +185,11 @@ function convertCannons() {
      * @param {string} baseFileName - Base file name
      * @returns {Object} File content in json format
      */
-    function getFileData(baseFileName) {
+    const getFileData = baseFileName => {
         const fileName = `${inDirectory}/${baseFileName}`;
         const fileXmlData = readTextFile(fileName);
-        return xml2Json.toJson(fileXmlData, { object: true });
-    }
+        return convert.xml2js(fileXmlData, { compact: true });
+    };
 
     // Get all files without a master
     [...fileNames].forEach(baseFileName => {
