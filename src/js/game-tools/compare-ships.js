@@ -92,7 +92,6 @@ class Ship {
         this._select = `#ship-compare-${this._id}`;
 
         this._setupSvg();
-        this._g = d3Select(this._select).select("g");
         this._setCompass();
     }
 
@@ -105,7 +104,7 @@ class Ship {
 
         d3Select(`${this.select} svg`).remove();
 
-        element
+        this.g = element
             .append("svg")
 
             .attr("width", this._shipCompare.svgWidth)
@@ -113,7 +112,7 @@ class Ship {
             .attr("data-ui-component", "sailing-profile")
             .attr("fill", "none")
             .append("g")
-            .attr("transform", `translate(${this._shipCompare.svgWidth / 2}, ${this._shipCompare.svgHeight / 2})`);
+            .attr("transform", `translate(${this._shipCompare.svgWidth / 2},${this._shipCompare.svgHeight / 2})`);
         d3Select(`${this.select} div`).remove();
 
         element.append("div").attr("class", "block-small");
@@ -347,10 +346,6 @@ class Ship {
     get select() {
         return this._select;
     }
-
-    get g() {
-        return this._g;
-    }
 }
 
 /**
@@ -377,48 +372,44 @@ class ShipBase extends Ship {
 
     _setupDrag() {
         // eslint-disable-next-line unicorn/consistent-function-scoping
-        const dragStart = (d, i, nodes) => {
-            console.log(d3Event);
-            d3Select(nodes[i]).classed("drag-active", true);
+        const dragStart = d => {
+            d.this.classed("drag-active", true);
         };
 
         // eslint-disable-next-line unicorn/consistent-function-scoping
-        const dragged = (d, i, nodes) => {
-            /*
-            const x = d3Event.sourceEvent.x - d.x;
-            const y = d3Event.sourceEvent.y - d.y;
-            const radians = Math.atan2(y, x);
-            d.rotate = Math.trunc((d.rotate + radiansToDegrees(radians)) % 360);
-            */
+        const dragged = d => {
+            /** {@link https://stackoverflow.com/a/56567666}
+             */
+            const { x: xMouse } = d3Event;
+            const { y: yMouse } = d3Event;
 
-            /*
-            d.rotate = Math.trunc(
-                rotationAngleInDegrees({ x: d.x, y: d.y }, { x: d3Event.sourceEvent.x, y: d3Event.sourceEvent.y })
-            );
-*/
-
-            const { x } = d3Event;
-            const { y } = d3Event;
-
-            if (x < 0) {
-                d.rotate = 270 - (Math.atan(y / -x) * 180) / Math.PI;
+            if (xMouse < 0) {
+                d.rotate = 270 - (Math.atan(yMouse / -xMouse) * 180) / Math.PI;
             } else {
-                d.rotate = 90 + (Math.atan(y / x) * 180) / Math.PI;
+                d.rotate = 90 + (Math.atan(yMouse / xMouse) * 180) / Math.PI;
             }
 
-            console.log(d, d3Event.sourceEvent.x, d3Event.sourceEvent.y, d3Event.x, d3Event.y, d.rotate);
-            d3Select(nodes[i]).attr("transform", d => `rotate(${d.rotate})`);
+            /*
+            d.rotate = rotationAngleInDegrees({ x: d.x, y: d.y }, { x: xMouse, y: yMouse }) % 360;
+            if (d.rotate < 0) {
+                d.rotate += 360;
+            }
+             */
+
+            // console.log(d, d.rotate);
+            d.this.attr("transform", d => `rotate(${d.rotate})`);
         };
 
         // eslint-disable-next-line unicorn/consistent-function-scoping
-        const dragEnd = (d, i, nodes) => {
-            d3Select(nodes[i]).classed("drag-active", false);
+        const dragEnd = d => {
+            d.this.classed("drag-active", false);
         };
 
         this._dragShip = d3Drag()
             .on("start", dragStart)
             .on("drag", dragged)
-            .on("end", dragEnd);
+            .on("end", dragEnd)
+            .container(() => this.g.node());
     }
 
     /**
@@ -468,16 +459,16 @@ class ShipBase extends Ship {
         const heightShip = this._shipCompare.shipMassScale(shipMass);
         const widthShip = heightShip;
 
-        const shipG = this.g
+        const shipG = this.g.append("g").attr("class", "ship-outline");
+
+        shipG
             .datum({
                 x: 0,
                 y: 0,
-                rotate: 90
+                rotate: 90,
+                this: shipG
             })
-            .append("g")
-            .attr("class", "ship-outline")
-            .attr("transform", d => `rotate(${d.rotate})`)
-            .call(this._dragShip);
+            .attr("transform", d => `rotate(${d.rotate})`);
 
         shipG
             .append("image")
@@ -498,7 +489,8 @@ class ShipBase extends Ship {
             .append("circle")
             .attr("cx", this._shipCompare.svgHeight / 2)
             .attr("cy", d => d.y)
-            .attr("r", "10");
+            .attr("r", "10")
+            .call(this._dragShip);
     }
 
     /**
