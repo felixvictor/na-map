@@ -42,7 +42,7 @@ function convertShips() {
             speedDegrees,
             speed: {
                 min: speedDegrees.reduce((a, b) => Math.min(a, b)),
-                max: calcPortSpeed
+                max: roundToThousands(calcPortSpeed)
             },
             sides: { armour: ship.HealthInfo.LeftArmor, thickness: 0 },
             bow: { armour: ship.HealthInfo.FrontArmor, thickness: 0 },
