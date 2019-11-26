@@ -547,8 +547,8 @@ svg {
 }
 
 .not-capturable {
-    opacity: .8;
-    fill: gray;
+    opacity: .6;
+    fill: $gray-200;
 }
 
 .capital {
@@ -770,16 +770,16 @@ pattern > circle {
 
 .journey {
     .label {
-        text {
-            text-anchor: start;
+        fill-opacity: 1;
+
+        circle {
+            cursor: pointer;
+            stroke: $dark-overlay-text-colour;
+            fill-opacity: 1;
         }
 
-        fill-opacity: 1;
-        cursor: pointer;
-
-        .drag-active {
-            stroke: $dark-overlay-text-colour;
-            stroke-width: .25rem;
+        text {
+            text-anchor: start;
         }
 
         .drag-hidden {
@@ -834,4 +834,8 @@ pattern > circle {
     fill: $secondary-500;
     stroke: $secondary-500;
     stroke-width: .7rem;
+}
+
+.drag-active {
+    stroke-width: .5rem;
 }
