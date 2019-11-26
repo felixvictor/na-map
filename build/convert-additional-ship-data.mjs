@@ -1,6 +1,16 @@
-/* eslint-disable import/no-extraneous-dependencies */
+/**
+ * This file is part of na-map.
+ *
+ * @file      Convert additional ship data from xml game files.
+ * @module    build\convert-additional-ship-data
+ * @author    iB aka Felix Victor
+ * @copyright 2017, 2018, 2019
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
 import * as fs from "fs";
-import xml2Json from "xml2json";
+// noinspection ES6CheckImport
+import convert from "xml-js";
 import mergeAdvanced from "object-merge-advanced";
 
 import { isEmpty, readJson, readTextFile, saveJson } from "./common.mjs";
@@ -271,12 +281,10 @@ function convertAdditionalShipData() {
                     // Get all elements per group
                     Object.entries(values).forEach(([element, value]) => {
                         if (typeof ship[group] === "undefined") {
-                            // eslint-disable-next-line no-param-reassign
                             ship[group] = {};
                         }
 
                         // add value
-                        // eslint-disable-next-line no-param-reassign
                         ship[group][element] = value;
                     });
                 });
@@ -286,7 +294,7 @@ function convertAdditionalShipData() {
     function getFileData(baseFileName, ext) {
         const fileName = `${inDir}/${baseFileName} ${ext}.xml`;
         const fileXmlData = readTextFile(fileName);
-        return xml2Json.toJson(fileXmlData, { object: true });
+        return convert.xml2js(fileXmlData, { compact: true });
     }
 
     // Get all files without a master
