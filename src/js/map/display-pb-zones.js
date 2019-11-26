@@ -60,7 +60,9 @@ export default class DisplayPbZones {
 
     async _loadData() {
         try {
-            this._pbZonesDefault = (await import(/* webpackChunkName: "data-pb" */ "../../gen/pb.json")).default;
+            this._pbZonesDefault = (
+                await import(/* webpackChunkName: "data-pb-zones" */ "../../gen/pb-zones.json")
+            ).default;
         } catch (error) {
             putImportError(error);
         }
