@@ -150,13 +150,6 @@ class Ship {
             .selectAll("circle")
             .data(this._ticksSpeed)
             .join(enter => enter.append("circle").attr("r", d => this._shipCompare.radiusScaleAbsolute(d)));
-
-        // Add big wind arrow
-        this.mainG
-            .append("path")
-            .attr("d", "M0-79v-81z") // line 0,-160 0,-79
-            .attr("class", "ship-profile-arrow")
-            .attr("marker-end", "url(#ship-profile-arrow-head)");
     }
 
     /**
@@ -365,48 +358,11 @@ class ShipBase extends Ship {
         this._shipData = shipData;
         this._shipCompare = shipCompare;
 
-        this._setupDrag();
         this._setBackground();
-        this._drawProfile();
+        this._setupDrag();
+        this._drawWindProfile();
+        this._setupShipOutline();
         this._printText();
-    }
-
-    _getShipHeading(rotate, initRotate) {
-        let heading = rotate - initRotate;
-        if (heading < 0) {
-            heading += 360;
-        }
-
-        return degreesToCompass(heading);
-    }
-
-    _setupDrag() {
-        // eslint-disable-next-line unicorn/consistent-function-scoping
-        const dragStart = d => {
-            d.this.classed("drag-active", true);
-        };
-
-        // eslint-disable-next-line unicorn/consistent-function-scoping
-        const dragged = d => {
-            const { x: xMouse, y: yMouse } = d3Event;
-
-            d.rotate =
-                (d.initRotate + rotationAngleInDegrees({ x: d.initX, y: d.initY }, { x: xMouse, y: yMouse })) % 360;
-
-            d.this.attr("transform", d => `rotate(${d.rotate})`);
-            d.this.select("text").text(d => this._getShipHeading(d.rotate, d.initRotate));
-        };
-
-        // eslint-disable-next-line unicorn/consistent-function-scoping
-        const dragEnd = d => {
-            d.this.classed("drag-active", false);
-        };
-
-        this._dragShip = d3Drag()
-            .on("start", dragStart)
-            .on("drag", dragged)
-            .on("end", dragEnd)
-            .container(() => this.mainG.node());
     }
 
     /**
@@ -450,26 +406,84 @@ class ShipBase extends Ship {
                     .text((d, i) => this._ticksSpeedLabels[i])
                     .attr("startOffset", "10%")
             );
+    }
 
+    _getHeadingInDegrees(rotate, initRotate) {
+        let heading = rotate - initRotate;
+        if (heading < 0) {
+            heading += 360;
+        }
+
+        return heading;
+    }
+
+    _getHeadingInCompass(rotate, initRotate) {
+        return degreesToCompass(this._getHeadingInDegrees(rotate, initRotate));
+    }
+
+    _setupDrag() {
+        // eslint-disable-next-line unicorn/consistent-function-scoping
+        const dragStart = d => {
+            d.this.classed("drag-active", true);
+        };
+
+        // eslint-disable-next-line unicorn/consistent-function-scoping
+        const dragged = d => {
+            const { x: xMouse, y: yMouse } = d3Event;
+
+            // d.rotate = (d.initRotate + rotationAngleInDegrees({ x: d.initX, y: d.initY }, { x: xMouse, y: yMouse })) % 360;
+
+            d.rotate = this._getHeadingInDegrees(
+                rotationAngleInDegrees({ x: d.initX, y: d.initY }, { x: xMouse, y: yMouse }) - 180,
+                d.initRotate
+            );
+            d.this.attr("transform", d => `rotate(${d.rotate})`);
+            d.this
+                .select("text")
+                .attr("transform", d => `rotate(${-d.rotate},${d.textX},${d.textY})`)
+                .text(d => this._getHeadingInCompass(d.rotate, d.initRotate));
+        };
+
+        // eslint-disable-next-line unicorn/consistent-function-scoping
+        const dragEnd = d => {
+            d.this.classed("drag-active", false);
+        };
+
+        this._dragShip = d3Drag()
+            .on("start", dragStart)
+            .on("drag", dragged)
+            .on("end", dragEnd)
+            .container(() => this.mainG.node());
+
+        this._dragWindProfile = d3Drag()
+            .on("start", dragStart)
+            .on("drag", dragged)
+            .on("end", dragEnd)
+            .container(() => this.mainG.node());
+    }
+
+    _setupShipOutline() {
         // Add ship outline
         const { shipMass } = this._shipData;
         const heightShip = this._shipCompare.shipMassScale(shipMass);
         const widthShip = heightShip;
         const circleSize = 20;
-        const svgHeight = this._shipCompare.svgHeight / 2 - 20;
+        const svgHeight = this._shipCompare.svgHeight / 2 - 2 * circleSize;
 
-        const shipG = this.mainG.append("g").attr("class", "ship-outline");
+        const gShip = this.mainG.append("g").attr("class", "ship-outline");
 
-        shipG
+        gShip
             .datum({
                 initX: 0,
                 initY: 0,
                 initRotate: 90,
-                this: shipG
+                textX: svgHeight,
+                textY: 0,
+                this: gShip
             })
             .attr("transform", d => `rotate(${d.initRotate})`);
 
-        shipG
+        gShip
             .append("image")
             .attr("height", heightShip)
             .attr("width", widthShip)
@@ -477,24 +491,25 @@ class ShipBase extends Ship {
             .attr("y", -widthShip / 2)
             .attr("xlink:href", shipIcon);
 
-        shipG
+        gShip
             .append("circle")
             .attr("cx", svgHeight)
             .attr("cy", d => d.initY)
             .attr("r", circleSize)
             .call(this._dragShip);
 
-        shipG
+        gShip
             .append("text")
-            .attr("x", svgHeight)
-            .attr("y", d => d.initY)
-            .text(d => this._getShipHeading(d.initRotate, d.initRotate));
+            .attr("x", d => d.textX)
+            .attr("y", d => d.textY)
+            .attr("transform", d => `rotate(${-d.initRotate},${d.textX},${d.textY})`)
+            .text(d => this._getHeadingInCompass(d.initRotate, d.initRotate));
 
-        shipG
+        gShip
             .append("line")
             .attr("x1", d => d.initX)
             .attr("y1", d => d.initY)
-            .attr("x2", svgHeight - 2 * circleSize)
+            .attr("x2", svgHeight - circleSize)
             .attr("y2", d => d.initY);
     }
 
@@ -502,7 +517,7 @@ class ShipBase extends Ship {
      * Draw profile
      * @returns {void}
      */
-    _drawProfile() {
+    _drawWindProfile() {
         const pie = d3Pie()
             .sort(null)
             .value(1);
@@ -516,14 +531,50 @@ class ShipBase extends Ship {
             .curve(curve);
 
         // Profile shape
-        this.mainG
+        const circleSize = 20;
+        const svgHeight = this._shipCompare.svgHeight / 2;
+        const gWindProfile = this.mainG.append("g").attr("class", "wind-profile");
+
+        gWindProfile
+            .datum({
+                initX: 0,
+                initY: 0,
+                initRotate: 0,
+                textX: 0,
+                textY: -svgHeight / 2 - 20,
+                this: gWindProfile
+            })
+            .attr("transform", d => `rotate(${d.initRotate})`);
+
+        gWindProfile
+            .append("circle")
+            .attr("cx", svgHeight)
+            .attr("cy", d => d.initY)
+            .attr("r", circleSize)
+            .call(this._dragShip);
+
+        // Add big wind arrow
+        gWindProfile
+            .append("path")
+            .attr("d", `M0-${svgHeight / 2}v-${svgHeight / 2}z`) // line 0,-160 0,-79
+            .attr("class", "wind-profile-arrow")
+            .attr("marker-end", "url(#wind-profile-arrow-head)")
+            .call(this._dragWindProfile);
+
+        gWindProfile
+            .append("text")
+            .attr("x", d => d.textX)
+            .attr("y", d => d.textY)
+            .attr("transform", d => `rotate(${-d.initRotate},${d.textX},${d.textY})`)
+            .text(d => this._getHeadingInCompass(d.initRotate, d.initRotate));
+
+        gWindProfile
             .append("path")
             .attr("class", "base-profile")
             .attr("d", line(arcsBase));
 
         // Speed marker
-        // noinspection DuplicatedCode
-        this.mainG
+        gWindProfile
             // .insert("g", "g.compass-arc")
             .append("g")
             .attr("data-ui-component", "speed-markers")
@@ -1096,10 +1147,10 @@ export default class CompareShips {
         const arrow = document.getElementById("journey-arrow");
         // Clone arrow and change properties
         const arrowNew = arrow.cloneNode(true);
-        arrowNew.id = "ship-profile-arrow-head";
+        arrowNew.id = "wind-profile-arrow-head";
         if (arrowNew.hasChildNodes()) {
             arrowNew.childNodes.forEach(child => {
-                child.classList.replace("journey-arrow-head", "ship-profile-arrow-head");
+                child.classList.replace("journey-arrow-head", "wind-profile-arrow-head");
             });
         }
 

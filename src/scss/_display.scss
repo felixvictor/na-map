@@ -821,16 +821,6 @@ pattern > circle {
     fill: color-yiq($dark-overlay-background);
 }
 
-.ship-profile-arrow-head {
-    fill: $overlay-text-colour;
-}
-
-.ship-profile-arrow {
-    opacity: .3;
-    stroke: $overlay-text-colour;
-    stroke-width: .7rem;
-}
-
 $ship-outline-colour: $secondary-500;
 .ship-outline {
     fill: $ship-outline-colour;
@@ -842,9 +832,32 @@ $ship-outline-colour: $secondary-500;
     }
 
     text {
+        fill: color-yiq($ship-outline-colour);
+    }
+}
+
+$wind-profile-colour: $overlay-text-colour;
+.wind-profile-arrow-head {
+    fill: $wind-profile-colour;
+}
+
+.wind-profile-arrow {
+    opacity: .3;
+    stroke: $wind-profile-colour;
+    stroke-width: .7rem;
+
+}
+.wind-profile {
+    text {
+        fill: color-yiq($wind-profile-colour);
+    }
+}
+
+.ship-outline,
+.wind-profile {
+    text {
         font-size: small;
         pointer-events: none;
-        fill: color-yiq($ship-outline-colour);
         stroke: none;
         text-anchor: middle;
         dominant-baseline: mathematical;
