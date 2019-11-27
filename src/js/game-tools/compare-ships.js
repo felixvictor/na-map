@@ -59,7 +59,8 @@ import {
     radiansToDegrees,
     rotationAngleInDegrees,
     roundToThousands,
-    sortBy
+    sortBy,
+    degreesToCompass
 } from "../util";
 
 import CompareWoods from "./compare-woods";
@@ -104,13 +105,13 @@ class Ship {
 
         d3Select(`${this.select} svg`).remove();
 
-        this.g = element
+        this._svg = element
             .append("svg")
-
             .attr("width", this._shipCompare.svgWidth)
             .attr("height", this._shipCompare.svgHeight)
             .attr("data-ui-component", "sailing-profile")
-            .attr("fill", "none")
+            .attr("fill", "none");
+        this.mainG = this._svg
             .append("g")
             .attr("transform", `translate(${this._shipCompare.svgWidth / 2},${this._shipCompare.svgHeight / 2})`);
         d3Select(`${this.select} div`).remove();
@@ -135,7 +136,7 @@ class Ship {
             .innerRadius(this._shipCompare.innerRadius);
 
         // Add compass arcs
-        this.g
+        this.mainG
             .append("g")
             .attr("class", "compass-arc")
             .selectAll("path")
@@ -143,7 +144,7 @@ class Ship {
             .join(enter => enter.append("path").attr("d", arc));
 
         // Add the circles for each speed tick
-        this.g
+        this.mainG
             .append("g")
             .attr("class", "speed-circle")
             .selectAll("circle")
@@ -151,7 +152,7 @@ class Ship {
             .join(enter => enter.append("circle").attr("r", d => this._shipCompare.radiusScaleAbsolute(d)));
 
         // Add big wind arrow
-        this.g
+        this.mainG
             .append("path")
             .attr("d", "M0-79v-81z") // line 0,-160 0,-79
             .attr("class", "ship-profile-arrow")
@@ -370,6 +371,15 @@ class ShipBase extends Ship {
         this._printText();
     }
 
+    _getShipHeading(rotate, initRotate) {
+        let heading = rotate - initRotate;
+        if (heading < 0) {
+            heading += 360;
+        }
+
+        return degreesToCompass(heading);
+    }
+
     _setupDrag() {
         // eslint-disable-next-line unicorn/consistent-function-scoping
         const dragStart = d => {
@@ -378,26 +388,13 @@ class ShipBase extends Ship {
 
         // eslint-disable-next-line unicorn/consistent-function-scoping
         const dragged = d => {
-            /** {@link https://stackoverflow.com/a/56567666}
-             */
-            const { x: xMouse } = d3Event;
-            const { y: yMouse } = d3Event;
+            const { x: xMouse, y: yMouse } = d3Event;
 
-            if (xMouse < 0) {
-                d.rotate = 270 - (Math.atan(yMouse / -xMouse) * 180) / Math.PI;
-            } else {
-                d.rotate = 90 + (Math.atan(yMouse / xMouse) * 180) / Math.PI;
-            }
+            d.rotate =
+                (d.initRotate + rotationAngleInDegrees({ x: d.initX, y: d.initY }, { x: xMouse, y: yMouse })) % 360;
 
-            /*
-            d.rotate = rotationAngleInDegrees({ x: d.x, y: d.y }, { x: xMouse, y: yMouse }) % 360;
-            if (d.rotate < 0) {
-                d.rotate += 360;
-            }
-             */
-
-            // console.log(d, d.rotate);
             d.this.attr("transform", d => `rotate(${d.rotate})`);
+            d.this.select("text").text(d => this._getShipHeading(d.rotate, d.initRotate));
         };
 
         // eslint-disable-next-line unicorn/consistent-function-scoping
@@ -409,7 +406,7 @@ class ShipBase extends Ship {
             .on("start", dragStart)
             .on("drag", dragged)
             .on("end", dragEnd)
-            .container(() => this.g.node());
+            .container(() => this.mainG.node());
     }
 
     /**
@@ -425,7 +422,7 @@ class ShipBase extends Ship {
             .endAngle(Math.PI / 2);
 
         // Add the paths for the text
-        this.g
+        this.mainG
             // .insert("g", "g.compass-arc")
             .append("g")
             .attr("data-ui-component", "speed-textpath")
@@ -439,7 +436,7 @@ class ShipBase extends Ship {
             );
 
         // And add the text
-        this.g
+        this.mainG
             // .insert("g", "g.compass-arc")
             .append("g")
             .attr("class", "speed-text")
@@ -458,17 +455,19 @@ class ShipBase extends Ship {
         const { shipMass } = this._shipData;
         const heightShip = this._shipCompare.shipMassScale(shipMass);
         const widthShip = heightShip;
+        const circleSize = 20;
+        const svgHeight = this._shipCompare.svgHeight / 2 - 20;
 
-        const shipG = this.g.append("g").attr("class", "ship-outline");
+        const shipG = this.mainG.append("g").attr("class", "ship-outline");
 
         shipG
             .datum({
-                x: 0,
-                y: 0,
-                rotate: 90,
+                initX: 0,
+                initY: 0,
+                initRotate: 90,
                 this: shipG
             })
-            .attr("transform", d => `rotate(${d.rotate})`);
+            .attr("transform", d => `rotate(${d.initRotate})`);
 
         shipG
             .append("image")
@@ -479,18 +478,24 @@ class ShipBase extends Ship {
             .attr("xlink:href", shipIcon);
 
         shipG
-            .append("line")
-            .attr("x1", d => d.x)
-            .attr("y1", d => d.y)
-            .attr("x2", this._shipCompare.svgHeight / 2)
-            .attr("y2", d => d.y);
+            .append("circle")
+            .attr("cx", svgHeight)
+            .attr("cy", d => d.initY)
+            .attr("r", circleSize)
+            .call(this._dragShip);
 
         shipG
-            .append("circle")
-            .attr("cx", this._shipCompare.svgHeight / 2)
-            .attr("cy", d => d.y)
-            .attr("r", "10")
-            .call(this._dragShip);
+            .append("text")
+            .attr("x", svgHeight)
+            .attr("y", d => d.initY)
+            .text(d => this._getShipHeading(d.initRotate, d.initRotate));
+
+        shipG
+            .append("line")
+            .attr("x1", d => d.initX)
+            .attr("y1", d => d.initY)
+            .attr("x2", svgHeight - 2 * circleSize)
+            .attr("y2", d => d.initY);
     }
 
     /**
@@ -511,14 +516,14 @@ class ShipBase extends Ship {
             .curve(curve);
 
         // Profile shape
-        this.g
+        this.mainG
             .append("path")
             .attr("class", "base-profile")
             .attr("d", line(arcsBase));
 
         // Speed marker
         // noinspection DuplicatedCode
-        this.g
+        this.mainG
             // .insert("g", "g.compass-arc")
             .append("g")
             .attr("data-ui-component", "speed-markers")
