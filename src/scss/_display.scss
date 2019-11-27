@@ -457,6 +457,7 @@ svg {
 }
 
 .speed-text {
+    user-select: none;
     fill: $primary-300;
 }
 
@@ -830,10 +831,24 @@ pattern > circle {
     stroke-width: .7rem;
 }
 
+$ship-outline-colour: $secondary-500;
 .ship-outline {
-    fill: $secondary-500;
-    stroke: $secondary-500;
+    fill: $ship-outline-colour;
+    stroke: $ship-outline-colour;
     stroke-width: .7rem;
+
+    circle {
+        cursor: pointer;
+    }
+
+    text {
+        font-size: small;
+        pointer-events: none;
+        fill: color-yiq($ship-outline-colour);
+        stroke: none;
+        text-anchor: middle;
+        dominant-baseline: mathematical;
+    }
 }
 
 .drag-active {
