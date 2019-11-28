@@ -223,7 +223,7 @@ export default class PredictWind {
         const predictHours = parseInt(match[1], 10);
         const predictMinutes = parseInt(match[2], 10);
 
-        // Set current wind in degrees
+        // Set current wind in correctionValueDegrees
         if (Number.isNaN(Number(currentUserWind))) {
             currentWindDegrees = compassToDegrees(currentUserWind);
         } else {
