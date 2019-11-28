@@ -795,3 +795,8 @@ export const colourRamp = (element, colourScale, steps = 512) => {
         x += stepWidth;
     }
 };
+
+export const drawSvgCircle = (x, y, r) =>
+    `M${x},${y} m${-r},0 a${r},${r} 0,1,0 ${r * 2},0 a${r},${r} 0,1,0 ${-r * 2},0`;
+export const drawSvgRect = (x, y, r) => `M${x - r / 2},${y - r / 2}h${r}v${r}h${-r}z`;
+export const drawSvgLine = (x, y, l) => `M${x},${y}v${l}`;
