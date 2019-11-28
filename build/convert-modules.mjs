@@ -141,7 +141,7 @@ function convertModules() {
         ["NONE PERK_ENABLE_DOUBLE_CHARGE", "Double charge"],
         ["NONE PERK_ENABLE_DOUBLE_SHOT", "Double shot"],
         ["NONE PERK_FISHING_DROP_CHANCE_MODIFIER", "Fishing efficiency"],
-        ["NONE PERK_HEEL_DEGREES_MODIFIER", "Heel degrees"],
+        ["NONE PERK_HEEL_DEGREES_MODIFIER", "Heel correctionValueDegrees"],
         ["NONE PERK_HOLD_MAX_WEIGHT_MODIFIER", "Hold capacity"],
         ["NONE PERK_HULL_REPAIR_PERCENT_MODIFIER", "Planking repair amount (perk)"],
         ["NONE PERK_LABOR_HOURS_GENERATION_MODIFIER", "Labour hour generation"],
