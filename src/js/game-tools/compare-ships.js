@@ -409,8 +409,8 @@ class ShipBase extends Ship {
             );
     }
 
-    _getHeadingInDegrees(rotate, initRotate) {
-        let heading = rotate - initRotate;
+    _getHeadingInDegrees(rotate, degrees) {
+        let heading = rotate - degrees - 180;
         if (heading < 0) {
             heading += 360;
         }
@@ -419,11 +419,11 @@ class ShipBase extends Ship {
     }
 
     _getSpeed(rotate) {
-        return formatFloat(this._speedScale(Math.abs(rotate - 90)));
+        return formatFloat(this._speedScale(Math.abs(rotate)));
     }
 
-    _getHeadingInCompass(rotate, initRotate) {
-        return degreesToCompass(this._getHeadingInDegrees(rotate, initRotate));
+    _getHeadingInCompass(rotate) {
+        return degreesToCompass(rotate);
     }
 
     _setupDrag() {
@@ -446,7 +446,7 @@ class ShipBase extends Ship {
                 d.this.attr("transform", d => `rotate(${d.rotate})`);
                 d.compassText
                     .attr("transform", d => `rotate(${-d.rotate},${d.compassTextX},${d.compassTextY})`)
-                    .text(d => this._getHeadingInCompass(d.rotate, d.initRotate));
+                    .text(d => this._getHeadingInCompass(d.rotate));
                 if (d.type === "ship") {
                     d.speedText
                         .attr("transform", d => `rotate(${-d.rotate},${d.speedTextX},${d.speedTextY})`)
@@ -455,10 +455,9 @@ class ShipBase extends Ship {
             };
 
             const { x: xMouse, y: yMouse } = d3Event;
-
             d.rotate = this._getHeadingInDegrees(
-                rotationAngleInDegrees({ x: d.initX, y: d.initY }, { x: xMouse, y: yMouse }) - 180,
-                d.initRotate
+                rotationAngleInDegrees({ x: d.initX, y: d.initY }, { x: xMouse, y: yMouse }),
+                d.correctionValueDegrees
             );
             update();
         };
@@ -486,7 +485,8 @@ class ShipBase extends Ship {
         const datum = {
             initX: 0,
             initY: 0,
-            initRotate: 180,
+            initRotate: 0,
+            correctionValueDegrees: 180,
             compassTextX: 0,
             compassTextY: svgHeight,
             speedTextX: 0,
@@ -526,7 +526,7 @@ class ShipBase extends Ship {
             .attr("x", d => d.compassTextX)
             .attr("y", d => d.compassTextY)
             .attr("transform", d => `rotate(${-d.initRotate},${d.compassTextX},${d.compassTextY})`)
-            .text(d => this._getHeadingInCompass(d.initRotate, d.initRotate));
+            .text(d => this._getHeadingInCompass(d.initRotate));
 
         const speedText = gShip
             .append("text")
@@ -560,11 +560,12 @@ class ShipBase extends Ship {
 
         // Profile shape
         const circleSize = 20;
-        const svgHeight = this._shipCompare.svgHeight / 2;
+        const svgHeight = this._shipCompare.svgHeight / 2 - circleSize;
         const datum = {
             initX: 0,
             initY: 0,
             initRotate: 0,
+            correctionValueDegrees: 0,
             compassTextX: 0,
             compassTextY: -svgHeight,
             type: "windProfile"
@@ -600,7 +601,7 @@ class ShipBase extends Ship {
             .attr("x", d => d.compassTextX)
             .attr("y", d => d.compassTextY)
             .attr("transform", d => `rotate(${-d.initRotate},${d.compassTextX},${d.compassTextY})`)
-            .text(d => this._getHeadingInCompass(d.initRotate, d.initRotate));
+            .text(d => this._getHeadingInCompass(d.initRotate));
 
         gWindProfile
             .append("path")
