@@ -43,7 +43,7 @@ export default class WindRose {
         this._cookieExpire = this._getExpire();
 
         /**
-         * Wind degrees cookie
+         * Wind correctionValueDegrees cookie
          * @type {string}
          * @private
          */
@@ -53,7 +53,7 @@ export default class WindRose {
         });
 
         /**
-         * Wind degrees time cookie
+         * Wind correctionValueDegrees time cookie
          * @type {string}
          * @private
          */

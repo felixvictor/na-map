@@ -205,7 +205,7 @@ export function isEmpty(obj) {
 }
 
 /**
- * Convert radians to degrees (see {@link http://cwestblog.com/2012/11/12/javascript-degree-and-radian-conversion/})
+ * Convert radians to correctionValueDegrees (see {@link http://cwestblog.com/2012/11/12/javascript-degree-and-radian-conversion/})
  * @function
  * @param {Number} radians - Radians
  * @return {Number} Degrees
@@ -219,7 +219,7 @@ Math.radiansToDegrees = radians => (radians * 180) / Math.PI;
  */
 
 /**
- * Calculate the angle in degrees between two points
+ * Calculate the angle in correctionValueDegrees between two points
  * @see https://stackoverflow.com/questions/9970281/java-calculating-the-angle-between-two-points-in-degrees
  * @function
  * @param {Point} centerPt - Center point
@@ -234,7 +234,7 @@ export const rotationAngleInDegrees = (centerPt, targetPt) => {
 };
 
 /**
- * Calculate the angle in degrees between two points
+ * Calculate the angle in correctionValueDegrees between two points
  * @see https://stackoverflow.com/questions/9970281/java-calculating-the-angle-between-two-points-in-degrees
  * @function
  * @param {Point} centerPt - Center point
@@ -256,7 +256,7 @@ export const distancePoints = (centerPt, targetPt) =>
     Math.sqrt((centerPt.x - targetPt.x) ** 2 + (centerPt.y - targetPt.y) ** 2);
 
 /**
- * Convert degrees to radians
+ * Convert correctionValueDegrees to radians
  * @function
  * @param {Number} degrees - Degrees
  * @return {Number} Radians

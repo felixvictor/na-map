@@ -261,7 +261,7 @@ export const compassDirections = [
 ];
 
 /**
- * Converts compass direction to degrees
+ * Converts compass direction to correctionValueDegrees
  * @function
  * @param {String} compass - Compass direction
  * @return {Number} Degrees
@@ -272,7 +272,7 @@ export const compassToDegrees = compass => {
 };
 
 /**
- * Convert degrees to compass direction (see {@link https://stackoverflow.com/questions/7490660/converting-wind-direction-in-angles-to-text-words})
+ * Convert correctionValueDegrees to compass direction (see {@link https://stackoverflow.com/questions/7490660/converting-wind-direction-in-angles-to-text-words})
  * @function
  * @param {Number} degrees - Degrees
  * @return {String} Compass direction
@@ -285,7 +285,7 @@ export const degreesToCompass = degrees => {
 
 /**
  * Display formatted compass
- * @param {string} wind - Wind direction in compass or degrees
+ * @param {string} wind - Wind direction in compass or correctionValueDegrees
  * @param {boolean} svg - True to use 'tspan' instead of 'span'
  * @return {string} HTML formatted compass
  */
@@ -302,10 +302,10 @@ export const displayCompass = (wind, svg = false) => {
 };
 
 /**
- * Display formatted compass and degrees
- * @param {string} wind - Wind direction in compass or degrees
+ * Display formatted compass and correctionValueDegrees
+ * @param {string} wind - Wind direction in compass or correctionValueDegrees
  * @param {boolean} svg - True to use 'tspan' instead of 'span'
- * @return {string} HTML formatted compass and degrees
+ * @return {string} HTML formatted compass and correctionValueDegrees
  */
 export const displayCompassAndDegrees = (wind, svg = false) => {
     let compass;
@@ -323,9 +323,9 @@ export const displayCompassAndDegrees = (wind, svg = false) => {
 };
 
 /**
- * Get wind in degrees from user input (rs-slider)
+ * Get wind in correctionValueDegrees from user input (rs-slider)
  * @param {string} sliderId - Slider id
- * @return {number} Wind in degrees
+ * @return {number} Wind in correctionValueDegrees
  */
 export const getUserWind = sliderId => {
     const currentUserWind = degreesToCompass($(`#${sliderId}`).roundSlider("getValue"));
@@ -359,7 +359,7 @@ export const between = (value, a, b, inclusive) => {
 };
 
 /**
- * Convert radians to degrees (see {@link http://cwestblog.com/2012/11/12/javascript-degree-and-radian-conversion/})
+ * Convert radians to correctionValueDegrees (see {@link http://cwestblog.com/2012/11/12/javascript-degree-and-radian-conversion/})
  * @function
  * @param {Number} radians - Radians
  * @return {Number} Degrees
@@ -367,7 +367,7 @@ export const between = (value, a, b, inclusive) => {
 export const radiansToDegrees = radians => (radians * 180) / Math.PI;
 
 /**
- * Convert degrees to radians
+ * Convert correctionValueDegrees to radians
  * @function
  * @param {Number} degrees - Degrees
  * @return {Number} Radians
@@ -381,7 +381,7 @@ export const degreesToRadians = degrees => (Math.PI / 180) * (degrees - 90);
  */
 
 /**
- * Calculate the angle in degrees between two points
+ * Calculate the angle in correctionValueDegrees between two points
  * @see https://stackoverflow.com/questions/9970281/java-calculating-the-angle-between-two-points-in-degrees
  * @function
  * @param {Point} centerPt - Center point
