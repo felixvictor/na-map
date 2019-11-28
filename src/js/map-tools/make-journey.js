@@ -341,7 +341,7 @@ export default class Journey {
     _getStartWind() {
         const select$ = $(`#${this._sliderId}`);
         const currentUserWind = Number(select$.roundSlider("getValue"));
-        // Current wind in degrees
+        // Current wind in correctionValueDegrees
         return select$.length ? currentUserWind : 0;
     }
 
@@ -361,7 +361,7 @@ export default class Journey {
 
     /**
      * Segregate each segment into sections, calculate per section speed and distance (each section takes one minute)
-     * @param {number} courseDegrees - Ship course in degrees
+     * @param {number} courseDegrees - Ship course in correctionValueDegrees
      * @param {number} startWindDegrees - Wind at start of segment
      * @param {number} distanceSegment - Distance of segment
      * @return {number} - Minutes needed to travel the segment
