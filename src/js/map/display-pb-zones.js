@@ -10,7 +10,7 @@
 
 import { select as d3Select } from "d3-selection";
 
-import { putImportError } from "../util";
+import { drawSvgCircle, drawSvgRect, putImportError } from "../util";
 import Cookie from "../util/cookie";
 import RadioButton from "../util/radio-button";
 
@@ -101,9 +101,6 @@ export default class DisplayPbZones {
     }
 
     _update() {
-        const drawCircle = (x, y, r) => `M${x},${y} m${-r},0 a${r},${r} 0,1,0 ${r * 2},0 a${r},${r} 0,1,0 ${-r * 2},0z`;
-        const drawRect = (x, y, r) => `M${x - r / 2},${y - r / 2}h${r}v${r}h${-r}z`;
-
         this._g
             .selectAll("g.pb-zones")
             .data(this._pbZonesFiltered, d => d.id)
@@ -114,15 +111,15 @@ export default class DisplayPbZones {
                 g.append("path")
                     .attr("class", "pb-join-circle")
                     .attr("d", d =>
-                        drawCircle(d.joinCircles[0], d.joinCircles[1], 28).concat(
-                            drawCircle(d.joinCircles[0], d.joinCircles[1], 14)
+                        drawSvgCircle(d.joinCircles[0], d.joinCircles[1], 28).concat(
+                            drawSvgCircle(d.joinCircles[0], d.joinCircles[1], 14)
                         )
                     );
 
                 // Port battle circles
                 g.append("path")
                     .attr("class", "pb-circle")
-                    .attr("d", d => d.pbCircles.map(pbCircle => drawCircle(pbCircle[0], pbCircle[1], 3.5)).join(""));
+                    .attr("d", d => d.pbCircles.map(pbCircle => drawSvgCircle(pbCircle[0], pbCircle[1], 3.5)).join(""));
                 g.append("text")
                     .attr("class", "pb-text pb-circle-text")
                     .attr("x", d => d.pbCircles.map(pbCircle => pbCircle[0]))
@@ -139,13 +136,13 @@ export default class DisplayPbZones {
                 // Raid join circles
                 g.append("path")
                     .attr("class", "raid-join-circle")
-                    .attr("d", d => drawCircle(d.joinCircles[0], d.joinCircles[1], 35));
+                    .attr("d", d => drawSvgCircle(d.joinCircles[0], d.joinCircles[1], 35));
 
                 // Raid circles
                 g.append("path")
                     .attr("class", "raid-circle")
                     .attr("d", d =>
-                        d.raidCircles.map(raidCircle => drawCircle(raidCircle[0], raidCircle[1], 4.5)).join("")
+                        d.raidCircles.map(raidCircle => drawSvgCircle(raidCircle[0], raidCircle[1], 4.5)).join("")
                     );
                 g.append("text")
                     .attr("class", "pb-text raid-circle-text")
@@ -157,7 +154,7 @@ export default class DisplayPbZones {
                 g.append("path")
                     .attr("class", "raid-point")
                     .attr("d", d =>
-                        d.raidPoints.map(raidPoint => drawCircle(raidPoint[0], raidPoint[1], 1.5)).join("")
+                        d.raidPoints.map(raidPoint => drawSvgCircle(raidPoint[0], raidPoint[1], 1.5)).join("")
                     );
                 g.append("text")
                     .attr("class", "pb-text raid-point-text")
@@ -175,7 +172,7 @@ export default class DisplayPbZones {
                 // Forts
                 g.append("path")
                     .attr("class", "fort")
-                    .attr("d", d => d.forts.map(fort => drawRect(fort[0], fort[1], 3)).join(""));
+                    .attr("d", d => d.forts.map(fort => drawSvgRect(fort[0], fort[1], 3)).join(""));
                 g.append("text")
                     .attr("class", "pb-text pb-fort-text")
                     .attr("x", d => d.forts.map(fort => fort[0]))
@@ -185,7 +182,7 @@ export default class DisplayPbZones {
                 // Towers
                 g.append("path")
                     .attr("class", "tower")
-                    .attr("d", d => d.towers.map(tower => drawCircle(tower[0], tower[1], 1.5)).join(""));
+                    .attr("d", d => d.towers.map(tower => drawSvgCircle(tower[0], tower[1], 1.5)).join(""));
                 g.append("text")
                     .attr("class", "pb-text pb-tower-text")
                     .attr("x", d => d.towers.map(tower => tower[0]))
