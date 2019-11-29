@@ -252,19 +252,22 @@ function convertAdditionalShipData() {
 
         // Retrieve additional data per attribute pair
         fileData.ModuleTemplate.Attributes.Pair.forEach(pair => {
+            const key = pair.Key._text;
             // Check if pair is considered additional data
-            if (elements.has(pair.Key)) {
-                if (typeof addData[elements.get(pair.Key).group] === "undefined") {
-                    addData[elements.get(pair.Key).group] = {};
+            if (elements.has(key)) {
+                if (typeof addData[elements.get(key).group] === "undefined") {
+                    addData[elements.get(key).group] = {};
                 }
 
-                addData[elements.get(pair.Key).group][elements.get(pair.Key).element] = Number(pair.Value.Value);
+                console.log(pair.Value.Value);
+                addData[elements.get(key).group][elements.get(key).element] = Number(pair.Value.Value._text);
             }
 
             // Add calculated mast thickness
-            if (pair.Key === "MAST_THICKNESS") {
-                addData[elements.get(pair.Key).group].middleThickness = Number(pair.Value.Value) * 0.75;
-                addData[elements.get(pair.Key).group].topThickness = Number(pair.Value.Value) * 0.5;
+            if (key === "MAST_THICKNESS") {
+                console.log(pair.Value.Value);
+                addData[elements.get(key).group].middleThickness = Number(pair.Value.Value._text) * 0.75;
+                addData[elements.get(key).group].topThickness = Number(pair.Value.Value._text) * 0.5;
             }
         });
         return addData;
