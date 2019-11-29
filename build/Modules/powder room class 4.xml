@@ -58,7 +58,7 @@
     <Pair>
       <Key>POWDER_RADIUS</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>232</Value>
+        <Value>310</Value>
       </Value>
     </Pair>
     <Pair>
