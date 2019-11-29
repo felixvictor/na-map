@@ -1202,7 +1202,7 @@ export default class CompareShips {
         defs.appendChild(arrowNew);
     }
 
-    async shipJourneyInit() {
+    async CompareShipsInit() {
         await this._loadAndSetupData();
         this._initData();
         this._initSelects();
@@ -1584,6 +1584,8 @@ export default class CompareShips {
      * @returns {void}
      */
     _initModal() {
+        console.log("initModal");
+        console.log(this._selectShip$, Object.keys(this._selectShip$));
         this._initData();
         this._injectModal();
         this._initSelects();
@@ -2111,6 +2113,7 @@ export default class CompareShips {
      */
     _enableCompareSelects() {
         this._columnsCompare.forEach(compareId => {
+            console.log(compareId, this._selectShip$, Object.keys(this._selectShip$), this._selectShip$[compareId]);
             this._selectShip$[compareId].removeAttr("disabled").selectpicker("refresh");
         });
     }
@@ -2182,6 +2185,7 @@ export default class CompareShips {
     }
 
     _setShipAndWoodsSelects(ids) {
+        console.log("_setShipAndWoodsSelects");
         let i = 0;
 
         this._columns.some(columnId => {
@@ -2191,6 +2195,7 @@ export default class CompareShips {
 
             this._shipIds[columnId] = ids[i];
             i += 1;
+            console.log(columnId, this._selectShip$, this._selectShip$[columnId], this._shipIds[columnId]);
             CompareShips._setSelect(this._selectShip$[columnId], this._shipIds[columnId]);
             if (columnId === "Base" && this._baseId !== "ship-journey") {
                 this._enableCompareSelects();
@@ -2219,6 +2224,7 @@ export default class CompareShips {
      * @return {void}
      */
     _setModuleSelects(urlParams) {
+        console.log("_setModuleSelects");
         this._columns.forEach((columnId, columnIndex) => {
             let needRefresh = false;
             [...this._moduleTypes].forEach((type, typeIndex) => {
@@ -2250,17 +2256,52 @@ export default class CompareShips {
         });
     }
 
-    initFromClipboard(urlParams) {
+    /*
+        _setupFromClipboard(urlParams, shipAndWoodsIds) {
+        this._shipCompareSelected();
+        if (shipAndWoodsIds.length > 3) {
+            this._enableCompareSelects();
+        }
+
+        this._setShipAndWoodsSelects(shipAndWoodsIds);
+        this._setModuleSelects(urlParams);
+    }
+
+    async initFromClipboard(urlParams) {
+        await this._loadAndSetupData();
         const shipAndWoodsIds = hashids.decode(urlParams.get("cmp"));
+        console.log(urlParams.get("cmp"), shipAndWoodsIds);
         if (shipAndWoodsIds.length) {
+            this._setupFromClipboard(urlParams, shipAndWoodsIds);
+        }
+    }
+
+     */
+
+    async initFromClipboard(urlParams) {
+        await this._loadAndSetupData();
+        const shipAndWoodsIds = hashids.decode(urlParams.get("cmp"));
+        console.log(urlParams.get("cmp"), shipAndWoodsIds, this._shipData);
+        console.log(this._selectShip$, Object.keys(this._selectShip$));
+        if (shipAndWoodsIds.length) {
+            console.log("initFromClipboard vor _shipCompareSelected");
+            console.log(this._selectShip$, Object.keys(this._selectShip$));
             this._shipCompareSelected();
+            console.log("initFromClipboard nach _shipCompareSelected");
+            console.log(this._selectShip$, Object.keys(this._selectShip$));
             if (shipAndWoodsIds.length > 3) {
+                console.log("initFromClipboard vor _enableCompareSelects");
+                console.log(this._selectShip$, Object.keys(this._selectShip$));
                 this._enableCompareSelects();
+                console.log("initFromClipboard nach _enableCompareSelects");
+                console.log(this._selectShip$, Object.keys(this._selectShip$));
             }
 
             this._setShipAndWoodsSelects(shipAndWoodsIds);
             this._setModuleSelects(urlParams);
         }
+
+        console.log(this._selectShip$, Object.keys(this._selectShip$));
     }
 
     _getShipSelectId(columnId) {
