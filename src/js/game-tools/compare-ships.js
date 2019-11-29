@@ -448,10 +448,14 @@ class ShipBase extends Ship {
                     .attr("transform", d => `rotate(${-d.rotate},${d.compassTextX},${d.compassTextY})`)
                     .text(d => this._getHeadingInCompass(d.rotate));
                 if (d.type === "ship") {
-                    d.speedText
-                        .attr("transform", d => `rotate(${-d.rotate},${d.speedTextX},${d.speedTextY})`)
-                        .text(d => this._getSpeed(d.rotate));
+                    this._shipRotate = d.rotate;
+                } else if (d.type === "windProfile") {
+                    this._windProfileRotate = d.rotate;
                 }
+
+                this._speedText
+                    .attr("transform", `rotate(${-this._shipRotate})`)
+                    .text(this._getSpeed(this._windProfileRotate - this._shipRotate));
             };
 
             const { x: xMouse, y: yMouse } = d3Event;
@@ -475,7 +479,7 @@ class ShipBase extends Ship {
     }
 
     _setupShipOutline() {
-        // Add ship outline
+        this._shipRotate = 0;
         const { shipMass } = this._shipData;
         const heightShip = this._shipCompare.shipMassScale(shipMass);
         const widthShip = heightShip;
@@ -485,7 +489,7 @@ class ShipBase extends Ship {
         const datum = {
             initX: 0,
             initY: 0,
-            initRotate: 0,
+            initRotate: this._shipRotate,
             correctionValueDegrees: 180,
             compassTextX: 0,
             compassTextY: svgHeight,
@@ -528,16 +532,15 @@ class ShipBase extends Ship {
             .attr("transform", d => `rotate(${-d.initRotate},${d.compassTextX},${d.compassTextY})`)
             .text(d => this._getHeadingInCompass(d.initRotate));
 
-        const speedText = gShip
+        this._speedText = gShip
             .append("text")
             .attr("x", d => d.speedTextX)
             .attr("y", d => d.speedTextY)
-            .attr("transform", d => `rotate(${-d.initRotate},${d.speedTextX},${d.speedTextY})`)
+            .attr("transform", d => `rotate(${-d.initRotate})`)
             .text(d => this._getSpeed(d.initRotate));
 
         datum.this = gShip;
         datum.compassText = compassText;
-        datum.speedText = speedText;
         gShip.datum(datum).attr("transform", d => `rotate(${d.initRotate})`);
     }
 
@@ -559,12 +562,13 @@ class ShipBase extends Ship {
             .curve(curve);
 
         // Profile shape
+        this._windProfileRotate = 0;
         const circleSize = 20;
         const svgHeight = this._shipCompare.svgHeight / 2 - circleSize;
         const datum = {
             initX: 0,
             initY: 0,
-            initRotate: 0,
+            initRotate: this._windProfileRotate,
             correctionValueDegrees: 0,
             compassTextX: 0,
             compassTextY: -svgHeight,
