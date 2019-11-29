@@ -77,9 +77,10 @@ function convertBuildings() {
         const building = {
             id: APIbuilding.Id,
             name: cleanName(APIbuilding.Name),
-            resource: resources.get(
-                APIbuilding.ProduceResource ? APIbuilding.ProduceResource : APIbuilding.RequiredPortResource
-            ),
+            resource:
+                resources.get(
+                    APIbuilding.ProduceResource ? APIbuilding.ProduceResource : APIbuilding.RequiredPortResource
+                ) || [],
             batch: resourceRecipes.get(APIbuilding.RequiredPortResource),
             levels: APIbuilding.Levels.map(level => ({
                 labourDiscount: level.LaborDiscount,
