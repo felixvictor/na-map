@@ -259,13 +259,11 @@ function convertAdditionalShipData() {
                     addData[elements.get(key).group] = {};
                 }
 
-                console.log(pair.Value.Value);
                 addData[elements.get(key).group][elements.get(key).element] = Number(pair.Value.Value._text);
             }
 
             // Add calculated mast thickness
             if (key === "MAST_THICKNESS") {
-                console.log(pair.Value.Value);
                 addData[elements.get(key).group].middleThickness = Number(pair.Value.Value._text) * 0.75;
                 addData[elements.get(key).group].topThickness = Number(pair.Value.Value._text) * 0.5;
             }
