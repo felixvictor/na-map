@@ -19,6 +19,7 @@ const APIItems = readJson(`${itemsFilename}-ItemTemplates-${date}.json`);
 
 const idWorkshop = 450;
 const idAcademy = 879;
+const idSeasoningShed = 2291;
 const obsoleteBuildings = [
     "Compass Wood Forest",
     "Copper Ore Mine",
@@ -59,6 +60,20 @@ function getItemsCraftedByAcademy() {
         .sort(sortBy(["name"]));
 }
 
+function getItemsCraftedBySeasoningShed() {
+    return APIItems.filter(
+        item =>
+            item.BuildingRequirements &&
+            item.BuildingRequirements[0] &&
+            item.BuildingRequirements[0].BuildingTemplate === idSeasoningShed
+    )
+        .map(recipe => ({
+            name: cleanName(recipe.Name).replace(" Blueprint", ""),
+            price: 0
+        }))
+        .sort(sortBy(["name"]));
+}
+
 /**
  * Convert API building data and save sorted as JSON
  * @returns {void}
@@ -89,9 +104,10 @@ function convertBuildings() {
             const building = {
                 id: APIbuilding.Id,
                 name: cleanName(APIbuilding.Name),
-                resource: resources.get(
-                    APIbuilding.ProduceResource ? APIbuilding.ProduceResource : APIbuilding.RequiredPortResource
-                ),
+                resource:
+                    resources.get(
+                        APIbuilding.ProduceResource ? APIbuilding.ProduceResource : APIbuilding.RequiredPortResource
+                    ) || [],
                 batch: resourceRecipes.get(APIbuilding.RequiredPortResource),
                 levels: APIbuilding.Levels.map(level => ({
                     labourDiscount: level.LaborDiscount,
@@ -121,6 +137,10 @@ function convertBuildings() {
                     building.batch = [];
                 } else if (building.name === "Workshop") {
                     building.resource = getItemsCraftedByWorkshop();
+                    building.byproduct = [];
+                    building.batch = [];
+                } else if (building.name === "Seasoning Shed") {
+                    building.resource = getItemsCraftedBySeasoningShed();
                     building.byproduct = [];
                     building.batch = [];
                 }
