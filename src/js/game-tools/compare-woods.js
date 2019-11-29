@@ -313,8 +313,11 @@ export default class CompareWoods {
     }
 
     async woodInit() {
+        console.log("start woodInit");
         await this._loadAndSetupData();
+        console.log("mitte woodInit");
         this._initData();
+        console.log("ende woodInit");
     }
 
     _setupData() {
@@ -351,10 +354,18 @@ export default class CompareWoods {
         this._columns.unshift("Base");
     }
 
+    async _importDefault() {
+        return import(/* webpackChunkName: "data-woods" */ "../../gen/woods.json").then(ns => ns.default);
+    }
+
     async _loadAndSetupData() {
         try {
-            this._woodData = (await import(/* webpackChunkName: "data-woods" */ "../../gen/woods.json")).default;
+            await console.log("start wood _loadAndSetupData");
+            // this._woodData = (await import(/* webpackChunkName: "data-woods" */ "../../gen/woods.json")).default;
+            this._woodData = await this._importDefault();
+            console.log("mitte wood _loadAndSetupData", this._woodData);
             this._setupData();
+            console.log("ende wood _loadAndSetupData");
         } catch (error) {
             putImportError(error);
         }
