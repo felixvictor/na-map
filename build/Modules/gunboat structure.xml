@@ -74,7 +74,7 @@
     <Pair>
       <Key>EXPLOSION_DAMAGE_ABSORB_MULTIPLIER</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
-        <Value>0.4</Value>
+        <Value>0.8</Value>
       </Value>
     </Pair>
   </Attributes>
