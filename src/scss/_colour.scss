@@ -46,15 +46,15 @@ $gray-900: shade-color($gray, 8);
 $black: mix(#000, colour-mixin(#000), 80);
 
 $grays: (
-        "100": $gray-100,
-        "200": $gray-200,
-        "300": $gray-300,
-        "400": $gray-400,
-        "500": $gray-500,
-        "600": $gray-600,
-        "700": $gray-700,
-        "800": $gray-800,
-        "900": $gray-900
+    "100": $gray-100,
+    "200": $gray-200,
+    "300": $gray-300,
+    "400": $gray-400,
+    "500": $gray-500,
+    "600": $gray-600,
+    "700": $gray-700,
+    "800": $gray-800,
+    "900": $gray-900
 );
 
 $blue: colour-mixin(#0d6efd);
@@ -207,60 +207,60 @@ $yiq-text-dark: $primary-900;
 $yiq-text-light: $primary-050;
 
 $theme-colors: (
-        "primary": $primary,
-        "secondary": $secondary,
-        "success": $success,
-        "info": $info,
-        "warning": $warning,
-        "danger": $danger,
-        "light": $light,
-        "dark": $dark
+    "primary": $primary,
+    "secondary": $secondary,
+    "white": $white,
+    "success": $success,
+    "info": $info,
+    "warning": $warning,
+    "danger": $danger,
+    "light": $light,
+    "dark": $dark
 );
 
 $primarys: (
-        "050": $primary-050,
-        "100": $primary-100,
-        "200": $primary-200,
-        "300": $primary-300,
-        "400": $primary-400,
-        "500": $primary-500,
-        "600": $primary-600,
-        "700": $primary-700,
-        "800": $primary-800,
-        "900": $primary-900
+    "050": $primary-050,
+    "100": $primary-100,
+    "200": $primary-200,
+    "300": $primary-300,
+    "400": $primary-400,
+    "500": $primary-500,
+    "600": $primary-600,
+    "700": $primary-700,
+    "800": $primary-800,
+    "900": $primary-900
 );
 
 $secondarys: (
-        "050": $secondary-050,
-        "100": $secondary-100,
-        "200": $secondary-200,
-        "300": $secondary-300,
-        "400": $secondary-400,
-        "500": $secondary-500,
-        "600": $secondary-600,
-        "700": $secondary-700,
-        "800": $secondary-800,
-        "900": $secondary-900
+    "050": $secondary-050,
+    "100": $secondary-100,
+    "200": $secondary-200,
+    "300": $secondary-300,
+    "400": $secondary-400,
+    "500": $secondary-500,
+    "600": $secondary-600,
+    "700": $secondary-700,
+    "800": $secondary-800,
+    "900": $secondary-900
 );
 
 $colors: (
-        "blue": $blue,
-        "indigo": $indigo,
-        "purple": $purple,
-        "pink": $pink,
-        "red": $red,
-        "red-light": $red-light,
-        "red-dark": $red-dark,
-        "orange": $orange,
-        "yellow": $yellow,
-        "green": $green,
-        "green-light": $green-light,
-        "green-dark": $green-dark,
-        "teal": $teal,
-        "cyan": $cyan,
-        "white": $white,
-        "gray": $gray-500,
-        "gray-dark": $gray-900,
-        "black": $black
-
+    "blue": $blue,
+    "indigo": $indigo,
+    "purple": $purple,
+    "pink": $pink,
+    "red": $red,
+    "red-light": $red-light,
+    "red-dark": $red-dark,
+    "orange": $orange,
+    "yellow": $yellow,
+    "green": $green,
+    "green-light": $green-light,
+    "green-dark": $green-dark,
+    "teal": $teal,
+    "cyan": $cyan,
+    "white": $white,
+    "gray": $gray-500,
+    "gray-dark": $gray-900,
+    "black": $black
 );
