@@ -47,7 +47,6 @@ class Map {
          * @private
          */
         this._serverName = serverName;
-
         this._searchParams = searchParams;
 
         /**
@@ -150,7 +149,10 @@ class Map {
         this._setupSvg();
         this._setSvgSize();
         this._setupListener();
-        this._setupData();
+    }
+
+    async MapInit() {
+        await this._setupData();
     }
 
     /**
@@ -179,7 +181,7 @@ class Map {
         return r;
     }
 
-    _setupData() {
+    async _setupData() {
         //        const marks = [];
 
         //        marks.push("setupData");
@@ -189,26 +191,25 @@ class Map {
 
         this._f11 = new ShowF11(this, this.coord);
         this._ports = new DisplayPorts(this);
-        this._ports.init().then(() => {
-            this._pbZone = new DisplayPbZones(this._ports);
-            this._grid = new DisplayGrid(this);
+        await this._ports.init();
 
-            this._journey = new Journey(this.rem);
-            this._windPrediction = new PredictWind();
-            this._windRose = new WindRose();
+        this._pbZone = new DisplayPbZones(this._ports);
+        this._grid = new DisplayGrid(this);
 
-            this._portSelect = new SelectPorts(this._ports, this._pbZone, this);
-            this.showTrades = new ShowTrades(
-                this._serverName,
-                this._portSelect,
-                this._minScale,
-                this.coord.min,
-                this.coord.max
-            );
-            this.showTrades.showOrHide().then(() => {
-                this._init();
-            });
-        });
+        this._journey = new Journey(this.rem);
+        this._windPrediction = new PredictWind();
+        this._windRose = new WindRose();
+
+        this._portSelect = new SelectPorts(this._ports, this._pbZone, this);
+        this.showTrades = new ShowTrades(
+            this._serverName,
+            this._portSelect,
+            this._minScale,
+            this.coord.min,
+            this.coord.max
+        );
+        await this.showTrades.showOrHide();
+        this._init();
 
         /*
         marks.forEach(mark => {
@@ -601,5 +602,4 @@ class Map {
     }
 }
 
-// eslint-disable-next-line import/prefer-default-export
 export { Map };

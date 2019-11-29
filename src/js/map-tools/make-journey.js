@@ -56,7 +56,7 @@ export default class Journey {
      */
     constructor(fontSize) {
         this._fontSize = fontSize;
-
+        console.log("new Journey");
         this._compassRadius = 90;
         this._courseArrowWidth = 5;
         this._line = d3Line()
@@ -270,7 +270,7 @@ export default class Journey {
         this._setupWindInput();
 
         this._shipCompare = new CompareShips(this._shipId);
-        this._shipCompare.shipJourneyInit();
+        this._shipCompare.CompareShipsInit();
     }
 
     _useUserInput() {
