@@ -1334,6 +1334,10 @@ export default class CompareShips {
 
     async _loadAndSetupData() {
         try {
+            //          [this._moduleDataDefault, this._shipData] = await Promise.all([
+            //  (await import(/* webpackChunkName: "data-modules" */ "../../gen/modules.json")).default,
+            //  (await import(/* webpackChunkName: "data-ships" */ "../../gen/ships.json")).default
+            // ]);
             this._moduleDataDefault = (
                 await import(/* webpackChunkName: "data-modules" */ "../../gen/modules.json")
             ).default;
@@ -1380,7 +1384,7 @@ export default class CompareShips {
 
     /**
      * Action when selected
-     * @returns {void}
+     * @returns {Promise}
      */
     _shipCompareSelected() {
         console.log("_shipCompareSelected");
@@ -1404,6 +1408,8 @@ export default class CompareShips {
         // Show modal
         this._modal$.modal("show");
         this._setGraphicsParameters();
+        console.log("_shipCompareSelected promise.resolve");
+        return Promise.resolve();
     }
 
     _getShipAndWoodIds() {
@@ -1570,6 +1576,7 @@ export default class CompareShips {
         this.woodCompare = new CompareWoods(this._woodId);
         console.log("_initSelects new CompareWoods", Object.keys(this.woodCompare));
         this.woodCompare.woodInit().then(() => {
+        console.log("this.woodCompare.woodInit().then");
             this._columns.forEach(columnId => {
                 console.log("_initSelects loop", columnId);
                 this._setupShipSelect(columnId);
@@ -2290,17 +2297,18 @@ export default class CompareShips {
 
      */
 
-    initFromClipboard(urlParams) {
+    async initFromClipboard(urlParams) {
         console.log("anfang initFromClipboard", urlParams.get("cmp"));
-        this._loadAndSetupData().then(()=>{
+        await this._loadAndSetupData();
         const shipAndWoodsIds = hashids.decode(urlParams.get("cmp"));
         console.log("mitte initFromClipboard", shipAndWoodsIds, Object.keys(this._shipData));
         if (shipAndWoodsIds.length) {
-            this._shipCompareSelected();
+            await this._shipCompareSelected().then(()=>{
             this._setShipAndWoodsSelects(shipAndWoodsIds);
             this._setModuleSelects(urlParams);
+            });
         }
-        });
+
         console.log("ende initFromClipboard", this._selectShip$, Object.keys(this._selectShip$));
     }
 
