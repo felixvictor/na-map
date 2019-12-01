@@ -314,12 +314,10 @@ export default class CompareWoods {
 
     async woodInit() {
         console.log("start woodInit");
-        const promise=await this._loadAndSetupData().then(() => {
-            console.log("mitte woodInit");
-            this._initData();
-        });
+        await this._loadAndSetupData();
+        console.log("mitte woodInit");
+        await this._initData();
         console.log("ende woodInit");
-        return Promise.resolve(promise);
     }
 
     _setupData() {
@@ -361,7 +359,7 @@ export default class CompareWoods {
             console.log("start wood _loadAndSetupData");
             this._woodData = (await import(/* webpackChunkName: "data-woods" */ "../../gen/woods.json")).default;
             console.log("mitte wood _loadAndSetupData", Object.keys(this._woodData));
-            this._setupData();
+            await this._setupData();
             console.log("ende wood _loadAndSetupData");
         } catch (error) {
             putImportError(error);

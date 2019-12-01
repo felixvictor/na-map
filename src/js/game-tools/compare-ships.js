@@ -1334,15 +1334,11 @@ export default class CompareShips {
 
     async _loadAndSetupData() {
         try {
-            //          [this._moduleDataDefault, this._shipData] = await Promise.all([
-            //  (await import(/* webpackChunkName: "data-modules" */ "../../gen/modules.json")).default,
-            //  (await import(/* webpackChunkName: "data-ships" */ "../../gen/ships.json")).default
-            // ]);
             this._moduleDataDefault = (
                 await import(/* webpackChunkName: "data-modules" */ "../../gen/modules.json")
             ).default;
             this._shipData = (await import(/* webpackChunkName: "data-ships" */ "../../gen/ships.json")).default;
-            this._setupData();
+            await this._setupData();
         } catch (error) {
             putImportError(error);
         }
@@ -1387,7 +1383,7 @@ export default class CompareShips {
      * @returns {Promise}
      */
     _shipCompareSelected() {
-        console.log("_shipCompareSelected");
+        console.log("anfang _shipCompareSelected");
         // If the modal has no content yet, insert it
         if (!this._modal$) {
             this._initModal();
@@ -1408,8 +1404,7 @@ export default class CompareShips {
         // Show modal
         this._modal$.modal("show");
         this._setGraphicsParameters();
-        console.log("_shipCompareSelected promise.resolve");
-        return Promise.resolve();
+        console.log("ende _shipCompareSelected");
     }
 
     _getShipAndWoodIds() {
@@ -1571,23 +1566,22 @@ export default class CompareShips {
         this._setupModuleData();
     }
 
-    _initSelects() {
+    async _initSelects() {
         console.log("_initSelects");
-        this.woodCompare = new CompareWoods(this._woodId);
+        this.woodCompare = await new CompareWoods(this._woodId);
         console.log("_initSelects new CompareWoods", Object.keys(this.woodCompare));
-        this.woodCompare.woodInit().then(() => {
-        console.log("this.woodCompare.woodInit().then");
-            this._columns.forEach(columnId => {
-                console.log("_initSelects loop", columnId);
-                this._setupShipSelect(columnId);
-                this._selectWood$[columnId] = {};
-                ["frame", "trim"].forEach(type => {
-                    this._selectWood$[columnId][type] = $(`#${this._getWoodSelectId(type, columnId)}`);
-                    this.woodCompare._setupWoodSelects(columnId, type, this._selectWood$[columnId][type]);
-                });
-                this._setupSelectListener(columnId);
-            });
-        });
+        await this.woodCompare.woodInit();
+        for (const columnId of this._columns) {
+            console.log("_initSelects loop", columnId);
+            await this._setupShipSelect(columnId);
+            this._selectWood$[columnId] = {};
+            for (const type of ["frame", "trim"]) {
+                this._selectWood$[columnId][type] = await $(`#${this._getWoodSelectId(type, columnId)}`);
+                await this.woodCompare._setupWoodSelects(columnId, type, this._selectWood$[columnId][type]);
+            }
+
+            await this._setupSelectListener(columnId);
+        }
     }
 
     /**
@@ -2300,16 +2294,15 @@ export default class CompareShips {
     async initFromClipboard(urlParams) {
         console.log("anfang initFromClipboard", urlParams.get("cmp"));
         await this._loadAndSetupData();
-        const shipAndWoodsIds = hashids.decode(urlParams.get("cmp"));
-        console.log("mitte initFromClipboard", shipAndWoodsIds, Object.keys(this._shipData));
+        const shipAndWoodsIds = await hashids.decode(urlParams.get("cmp"));
+        console.log("mitte initFromClipboard", shipAndWoodsIds, await Object.keys(this._shipData));
         if (shipAndWoodsIds.length) {
-            await this._shipCompareSelected().then(()=>{
-            this._setShipAndWoodsSelects(shipAndWoodsIds);
-            this._setModuleSelects(urlParams);
-            });
+            await this._shipCompareSelected();
+            await this._setShipAndWoodsSelects(shipAndWoodsIds);
+            await this._setModuleSelects(urlParams);
         }
 
-        console.log("ende initFromClipboard", this._selectShip$, Object.keys(this._selectShip$));
+        console.log("ende initFromClipboard", this._selectShip$, await Object.keys(this._selectShip$));
     }
 
     _getShipSelectId(columnId) {
