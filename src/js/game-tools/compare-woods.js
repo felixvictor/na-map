@@ -312,12 +312,14 @@ export default class CompareWoods {
         }
     }
 
-     woodInit() {
+    async woodInit() {
         console.log("start woodInit");
-         this._loadAndSetupData()
-        console.log("mitte woodInit");
-        this._initData();
+        const promise=await this._loadAndSetupData().then(() => {
+            console.log("mitte woodInit");
+            this._initData();
+        });
         console.log("ende woodInit");
+        return Promise.resolve(promise);
     }
 
     _setupData() {
