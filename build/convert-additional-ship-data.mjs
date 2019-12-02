@@ -255,17 +255,19 @@ function convertAdditionalShipData() {
             const key = pair.Key._text;
             // Check if pair is considered additional data
             if (elements.has(key)) {
-                if (typeof addData[elements.get(key).group] === "undefined") {
-                    addData[elements.get(key).group] = {};
+                const value = Number(pair.Value.Value._text);
+                const { group, element } = elements.get(key);
+                if (!addData[group]) {
+                    addData[group] = {};
                 }
 
-                addData[elements.get(key).group][elements.get(key).element] = Number(pair.Value.Value._text);
-            }
+                addData[group][element] = value;
 
-            // Add calculated mast thickness
-            if (key === "MAST_THICKNESS") {
-                addData[elements.get(key).group].middleThickness = Number(pair.Value.Value._text) * 0.75;
-                addData[elements.get(key).group].topThickness = Number(pair.Value.Value._text) * 0.5;
+                // Add calculated mast thickness
+                if (key === "MAST_THICKNESS") {
+                    addData[group].middleThickness = value * 0.75;
+                    addData[group].topThickness = value * 0.5;
+                }
             }
         });
         return addData;
@@ -279,12 +281,9 @@ function convertAdditionalShipData() {
             .forEach(ship => {
                 // Get all data for each group
                 Object.entries(addData).forEach(([group, values]) => {
+                    ship[group] = {};
                     // Get all elements per group
                     Object.entries(values).forEach(([element, value]) => {
-                        if (typeof ship[group] === "undefined") {
-                            ship[group] = {};
-                        }
-
                         // add value
                         ship[group][element] = value;
                     });
