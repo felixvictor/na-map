@@ -25,7 +25,7 @@ export default class ListShipBlueprints {
         this._modalId = `modal-${this._baseId}`;
 
         this._defaultWood = {
-            frame: "Fir Log",
+            frame: "Fir",
             trim: "Crew Space"
         };
         this._woodsSelected = [];
@@ -180,14 +180,12 @@ export default class ListShipBlueprints {
     _setWoodSelect(type) {
         $(`#${this._baseId}-${type}-select`)
             .removeAttr("disabled")
-            .val(this._defaultWood[type].replace(" Log", ""))
+            .val(this._defaultWood[type])
             .selectpicker("refresh");
     }
 
     _woodSelected(type, select$) {
         this._woodsSelected[type] = select$.val();
-        this._woodsSelected[type] +=
-            this._woodsSelected[type] === "Bermuda Cedar" || this._woodsSelected[type] === "Crew Space" ? "" : " Log";
         this._updateText();
     }
 
@@ -326,11 +324,11 @@ export default class ListShipBlueprints {
         let frameAmount = 0;
         // Crew space means additional hemp
         if (this._woodsSelected.trim === "Crew Space") {
-            const hempAmount = this._currentBlueprintData.trims.find(trim => trim.name === "Crew Space").amount;
+            const hempAmount = this._currentBlueprintData.wood.find(wood => wood.name === "Crew Space").amount;
             const index = defaultResources.findIndex(resource => resource[0] === "Hemp");
             defaultResources[index][1] += hempAmount;
         } else {
-            const trimAmount = this._currentBlueprintData.trims.find(trim => trim.name === "Planking").amount;
+            const trimAmount = this._currentBlueprintData.wood.find(wood => wood.name === "Planking").amount;
             // Frame and trim have same wood: add trim to frame
             if (this._woodsSelected.trim === this._woodsSelected.frame) {
                 frameAmount += trimAmount;
@@ -348,7 +346,7 @@ export default class ListShipBlueprints {
         }
 
         // Add frame
-        frameAmount += this._currentBlueprintData.frames.find(frame => frame.name === this._woodsSelected.frame).amount;
+        frameAmount += this._currentBlueprintData.wood.find(wood => wood.name === "Frame").amount;
         const index = defaultResources.findIndex(resource => resource[0] === this._woodsSelected.frame);
         if (index >= 0) {
             // Frame wood is already part of default resources (fir and oak log)
