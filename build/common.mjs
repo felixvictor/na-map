@@ -399,4 +399,5 @@ export const cleanName = name =>
     name
         .replace(/u([\dA-F]{4})/gi, match => String.fromCharCode(parseInt(match.replace(/u/g, ""), 16)))
         .replace(/'/g, "’")
+        .replace("oak", "Oak")
         .trim();

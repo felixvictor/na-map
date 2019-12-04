@@ -60,23 +60,13 @@ const convertShipBlueprints = () => {
             .filter(apiItem => !apiItem.NotUsed && apiItem.ItemType === "RecipeShip")
             .map(apiBlueprint => {
                 const shipMass = getShipMass(apiBlueprint.Results[0].Template);
-
                 return {
                     id: apiBlueprint.Id,
                     name: cleanName(apiBlueprint.Name).replace(" Blueprint", ""),
-                    frames: apiBlueprint.WoodTypeDescs.map(wood => ({
-                        name: itemNames.get(wood.Requirements[0].Template),
-                        amount: wood.Requirements[0].Amount
-                    })).sort(sortBy(["name"])),
-                    trims: [
-                        {
-                            name: "Planking",
-                            amount: Math.round(shipMass * plankingRatio)
-                        },
-                        {
-                            name: "Crew Space",
-                            amount: Math.round(shipMass * crewSpaceRatio)
-                        }
+                    wood: [
+                        { name: "Frame", amount: apiBlueprint.WoodTypeDescs[0].Requirements[0].Amount },
+                        { name: "Planking", amount: Math.round(shipMass * plankingRatio) },
+                        { name: "Crew Space", amount: Math.round(shipMass * crewSpaceRatio) }
                     ],
                     resources: apiBlueprint.FullRequirements.filter(
                         requirement =>
@@ -86,7 +76,7 @@ const convertShipBlueprints = () => {
                                 itemNames.get(requirement.Template) === "Provisions"
                             )
                     ).map(requirement => ({
-                        name: itemNames.get(requirement.Template),
+                        name: itemNames.get(requirement.Template).replace(" Log", ""),
                         amount: requirement.Amount
                     })),
                     provisions:
