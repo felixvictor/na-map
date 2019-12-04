@@ -120,6 +120,9 @@ function convertBuildings() {
                     }))
                 }))
             };
+            if (APIbuilding.Name === "Seasoning Shed") {
+                console.log(building, getItemsCraftedBySeasoningShed());
+            }
 
             // Ignore double entries
             if (!buildings.has(building.name)) {
@@ -151,13 +154,39 @@ function convertBuildings() {
     );
 
     let result = [...buildings.values()];
-    const prices = result
+    const prices = {};
+    prices.standard = result
         .filter(building => !Array.isArray(building.resource) && building.resource.price)
         .map(building => ({
             name: building.resource.name,
-            price: building.resource.price,
+            real: building.resource.price,
             labour: building.batch.labour
         }))
+        .sort(sortBy(["name"]));
+    const getStandardPrices = name =>
+        prices.standard.find(standardItem => standardItem.name === name.replace(" (S)", ""));
+    const doubloonsId = 989;
+    const toolsId = 1825;
+    const getSeasonedItemPrice = name =>
+        APIItems.find(item => item.ItemType === "Recipe" && item.Name === name.replace("White Oak", "White oak"));
+    prices.seasoned = getItemsCraftedBySeasoningShed()
+        .map(seasonedItem => {
+            console.log(seasonedItem.name);
+            const seasonedItemPrices = getSeasonedItemPrice(seasonedItem.name);
+            return {
+                name: seasonedItem.name,
+                real: getStandardPrices(seasonedItem.name).real,
+                labour:
+                    getStandardPrices(seasonedItem.name).labour + getSeasonedItemPrice(seasonedItem.name).LaborPrice,
+                doubloon: seasonedItemPrices.FullRequirements.find(
+                    requirement => requirement.Template === doubloonsId
+                ).Amount,
+                tool: seasonedItemPrices.FullRequirements.find(
+                    requirement => requirement.Template === toolsId
+                ).Amount
+            };
+        })
+
         .sort(sortBy(["name"]));
     saveJson(fileNamePrices, prices);
     result = result.filter(building => Object.keys(building).length).sort(sortBy(["name"]));
