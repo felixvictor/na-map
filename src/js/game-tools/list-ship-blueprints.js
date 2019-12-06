@@ -55,10 +55,16 @@ export default class ListShipBlueprints {
              * @type {Map<string, extractionCost>}
              * @private
              */
+            const costs = (await import(/* webpackChunkName: "data-ship-blueprints" */ "../../gen/prices.json"))
+                .default;
             this._extractionCosts = new Map(
-                (
-                    await import(/* webpackChunkName: "data-ship-blueprints" */ "../../gen/prices.json")
-                ).default.map(price => [price.name, { price: price.price, labour: price.labour }])
+                costs.standard.map(cost => [cost.name, { real: cost.real, labour: cost.labour }])
+            );
+            this._craftingCosts = new Map(
+                costs.seasoned.map(cost => [
+                    cost.name,
+                    { real: cost.real, labour: cost.labour, doubloon: cost.doubloon, tool: cost.tool }
+                ])
             );
         } catch (error) {
             putImportError(error);
@@ -298,19 +304,23 @@ export default class ListShipBlueprints {
          * @type {itemsNeeded}
          */
         const extraResources = [];
+
         if (this._currentBlueprintData.doubloons) {
             extraResources.push(["Doubloons", this._currentBlueprintData.doubloons]);
         }
 
         extraResources.push(["Provisions", this._currentBlueprintData.provisions]);
+
         if (this._currentBlueprintData.permit) {
             extraResources.push(["Permit", this._currentBlueprintData.permit]);
         }
 
-        extraResources.push(["Craft level", this._currentBlueprintData.craftLevel]);
-        extraResources.push(["Shipyard level", this._currentBlueprintData.shipyardLevel]);
-        extraResources.push(["Labour hours", this._currentBlueprintData.labourHours]);
-        extraResources.push(["Craft experience", this._currentBlueprintData.craftXP]);
+        extraResources.push(
+            ["Craft level", this._currentBlueprintData.craftLevel],
+            ["Shipyard level", this._currentBlueprintData.shipyardLevel],
+            ["Labour hours", this._currentBlueprintData.labourHours],
+            ["Craft experience", this._currentBlueprintData.craftXP]
+        );
 
         /**
          * Default resources
@@ -322,13 +332,14 @@ export default class ListShipBlueprints {
         let frameAdded = false;
         let trimAdded = false;
         let frameAmount = 0;
+        let trimAmount = 0;
         // Crew space means additional hemp
         if (this._woodsSelected.trim === "Crew Space") {
             const hempAmount = this._currentBlueprintData.wood.find(wood => wood.name === "Crew Space").amount;
             const index = defaultResources.findIndex(resource => resource[0] === "Hemp");
             defaultResources[index][1] += hempAmount;
         } else {
-            const trimAmount = this._currentBlueprintData.wood.find(wood => wood.name === "Planking").amount;
+            trimAmount = this._currentBlueprintData.wood.find(wood => wood.name === "Planking").amount;
             // Frame and trim have same wood: add trim to frame
             if (this._woodsSelected.trim === this._woodsSelected.frame) {
                 frameAmount += trimAmount;
@@ -373,46 +384,96 @@ export default class ListShipBlueprints {
          * @return {number} Amount times price
          */
         // eslint-disable-next-line unicorn/consistent-function-scoping
-        const getTotalPrice = item => this._extractionCosts.get(item[0]).price * item[1];
+        const getTotalExtractionPrice = item => this._extractionCosts.get(item[0]).real * item[1];
+
         /**
          * Total labour hours per item
          * @param item {itemsNeeded}
          * @return {number} Amount times labour hours
          */
         // eslint-disable-next-line unicorn/consistent-function-scoping
-        const getTotalLabour = item => this._extractionCosts.get(item[0]).labour * item[1];
+        const getTotalExtractionLabour = item => this._extractionCosts.get(item[0]).labour * item[1];
+
         /**
-         * Calculate total costs
+         * Calculate total extraction costs
          * @param data {itemsNeeded}
          */
-        const getCosts = data => {
+        const applyExtractionCosts = data => {
             data.filter(data => this._extractionCosts.has(data[0])).forEach(data => {
-                price += getTotalPrice(data);
-                labour += getTotalLabour(data);
+                price += getTotalExtractionPrice(data);
+                labour += getTotalExtractionLabour(data);
             });
         };
 
         /**
-         * Total extraction price
+         * Total material price
          * @type {number}
          */
         let price = 0;
+
         /**
-         * Total extraction labour hours
+         * Total material labour hours
          * @type {number}
          */
         let labour = 0;
-        getCosts(defaultResources);
-        getCosts(extraResources);
-        extraResources.push(["Extraction price", formatInt(price)]);
-        extraResources.push(["Extraction labour", formatInt(labour)]);
 
-        // Format amounts
-        defaultResources.map(data => [data[0], formatInt(data[1])]);
-        extraResources.map(data => [data[0], formatInt(data[1])]);
+        /**
+         * Total material doubloons
+         * @type {number}
+         */
+        let doubloons = 0;
 
-        this._updateTable(this._tables.Extra, extraResources);
-        this._updateTable(this._tables.Resources, defaultResources);
+        /**
+         * Total material tools
+         * @type {number}
+         */
+        let tool = 0;
+
+        applyExtractionCosts(defaultResources);
+        applyExtractionCosts(extraResources);
+        console.log(
+            this._craftingCosts,
+            frameAmount,
+            trimAmount,
+            this._woodsSelected.trim,
+            this._craftingCosts.get(this._woodsSelected.trim),
+            this._woodsSelected.frame,
+            this._craftingCosts.get(this._woodsSelected.frame)
+        );
+
+        if (this._craftingCosts.has(this._woodsSelected.trim)) {
+            price += this._craftingCosts.get(this._woodsSelected.trim).real * trimAmount;
+            labour += this._craftingCosts.get(this._woodsSelected.trim).labour * trimAmount;
+            doubloons += this._craftingCosts.get(this._woodsSelected.trim).doubloon * trimAmount;
+            tool += this._craftingCosts.get(this._woodsSelected.trim).tool * trimAmount;
+        }
+
+        if (this._craftingCosts.has(this._woodsSelected.frame)) {
+            price += this._craftingCosts.get(this._woodsSelected.frame).real * frameAmount;
+            labour += this._craftingCosts.get(this._woodsSelected.frame).labour * frameAmount;
+            doubloons += this._craftingCosts.get(this._woodsSelected.frame).doubloon * frameAmount;
+            tool += this._craftingCosts.get(this._woodsSelected.frame).tool * frameAmount;
+        }
+
+        extraResources.push(["Material price", price], ["Material labour", labour]);
+
+        if (doubloons) {
+            extraResources.push(["Material doubloons", doubloons]);
+        }
+
+        if (tool) {
+            extraResources.push(["Material tools", tool]);
+        }
+
+        // Display formatted amounts
+        this._updateTable(
+            this._tables.Extra,
+            extraResources.map(data => [data[0], formatInt(data[1])])
+        );
+        this._updateTable(
+            this._tables.Resources,
+            defaultResources.map(data => [data[0], formatInt(data[1])])
+        );
     }
 
     /**
