@@ -281,7 +281,10 @@ function convertAdditionalShipData() {
             .forEach(ship => {
                 // Get all data for each group
                 Object.entries(addData).forEach(([group, values]) => {
-                    ship[group] = {};
+                    if (!ship[group]) {
+                        ship[group] = {};
+                    }
+
                     // Get all elements per group
                     Object.entries(values).forEach(([element, value]) => {
                         // add value
