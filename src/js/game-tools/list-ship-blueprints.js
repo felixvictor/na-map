@@ -15,7 +15,7 @@ import { select as d3Select } from "d3-selection";
 
 import { registerEvent } from "../analytics";
 import { insertBaseModal } from "../common";
-import { formatInt, putImportError, sortBy } from "../util";
+import { formatInt, formatSiInt, putImportError, sortBy } from "../util";
 
 export default class ListShipBlueprints {
     constructor() {
@@ -214,52 +214,22 @@ export default class ListShipBlueprints {
                 .data(dataHead, d => d[0]);
 
             // Remove old rows
-            tableRowUpdate
-                .exit()
-                .attr("class", "exit")
-                .transition()
-                .delay(2000)
-                .duration(5000)
-                .style("opacity", 0)
-                .remove();
+            tableRowUpdate.exit().remove();
 
             // Add new rows
-            const tableRowEnter = tableRowUpdate
-                .enter()
-                .append("tr")
-                .style("opacity", 0)
-                .attr("class", "enter")
-                .transition()
-                .delay(9000)
-                .duration(5000)
-                .style("opacity", 1);
+            const tableRowEnter = tableRowUpdate.enter().append("tr");
 
             // Merge rows
             const row = tableRowUpdate.merge(tableRowEnter);
 
             // Data join cells
             const tableCellUpdate = row.selectAll("th").data(d => d);
-            tableCellUpdate.attr("class", "update");
+
             // Remove old cells
-            tableCellUpdate
-                .exit()
-                .attr("class", "exit")
-                .transition()
-                .delay(2000)
-                .duration(5000)
-                .style("opacity", 0)
-                .remove();
+            tableCellUpdate.exit().remove();
 
             // Add new cells
-            const tableCellEnter = tableCellUpdate
-                .enter()
-                .append("th")
-                .style("opacity", 0)
-                .attr("class", "enter")
-                .transition()
-                .delay(9000)
-                .duration(5000)
-                .style("opacity", 1);
+            const tableCellEnter = tableCellUpdate.enter().append("th");
 
             // Merge cells
             tableCellUpdate.merge(tableCellEnter).html(d => d);
@@ -303,7 +273,7 @@ export default class ListShipBlueprints {
          * Extra resources
          * @type {itemsNeeded}
          */
-        const extraResources = [];
+        let extraResources = [];
 
         if (this._currentBlueprintData.doubloons) {
             extraResources.push(["Doubloons", this._currentBlueprintData.doubloons]);
@@ -326,7 +296,7 @@ export default class ListShipBlueprints {
          * Default resources
          * @type {itemsNeeded}
          */
-        const defaultResources = this._currentBlueprintData.resources.map(resource => [resource.name, resource.amount]);
+        let defaultResources = this._currentBlueprintData.resources.map(resource => [resource.name, resource.amount]);
 
         // Add trim
         let frameAdded = false;
@@ -405,41 +375,35 @@ export default class ListShipBlueprints {
             });
         };
 
+        applyExtractionCosts(defaultResources);
+        applyExtractionCosts(extraResources);
+
+        defaultResources = defaultResources.map(data => [data[0], formatInt(data[1])]);
+        extraResources = extraResources.map(data => [data[0], formatInt(data[1])]);
+
         /**
-         * Total material price
+         * Total (S) log price
          * @type {number}
          */
         let price = 0;
 
         /**
-         * Total material labour hours
+         * Total (S) log labour hours
          * @type {number}
          */
         let labour = 0;
 
         /**
-         * Total material doubloons
+         * Total (S) log doubloons
          * @type {number}
          */
         let doubloons = 0;
 
         /**
-         * Total material tools
+         * Total (S) log tools
          * @type {number}
          */
         let tool = 0;
-
-        applyExtractionCosts(defaultResources);
-        applyExtractionCosts(extraResources);
-        console.log(
-            this._craftingCosts,
-            frameAmount,
-            trimAmount,
-            this._woodsSelected.trim,
-            this._craftingCosts.get(this._woodsSelected.trim),
-            this._woodsSelected.frame,
-            this._craftingCosts.get(this._woodsSelected.frame)
-        );
 
         if (this._craftingCosts.has(this._woodsSelected.trim)) {
             price += this._craftingCosts.get(this._woodsSelected.trim).real * trimAmount;
@@ -455,25 +419,18 @@ export default class ListShipBlueprints {
             tool += this._craftingCosts.get(this._woodsSelected.frame).tool * frameAmount;
         }
 
-        extraResources.push(["Material price", price], ["Material labour", labour]);
-
-        if (doubloons) {
-            extraResources.push(["Material doubloons", doubloons]);
+        if (price) {
+            extraResources.push(
+                ["(S) reals", formatSiInt(price)],
+                ["(S) labour hours", formatSiInt(labour)],
+                ["(S) doubloons", formatSiInt(doubloons)],
+                ["(S) tools", formatSiInt(tool)]
+            );
         }
 
-        if (tool) {
-            extraResources.push(["Material tools", tool]);
-        }
-
-        // Display formatted amounts
-        this._updateTable(
-            this._tables.Extra,
-            extraResources.map(data => [data[0], formatInt(data[1])])
-        );
-        this._updateTable(
-            this._tables.Resources,
-            defaultResources.map(data => [data[0], formatInt(data[1])])
-        );
+        // Display amounts
+        this._updateTable(this._tables.Extra, extraResources);
+        this._updateTable(this._tables.Resources, defaultResources);
     }
 
     /**
