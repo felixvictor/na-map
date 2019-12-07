@@ -48,7 +48,6 @@ import {
     drawSvgCircle,
     drawSvgLine,
     formatFloat,
-    formatInt,
     formatIntTrunc,
     formatPercent,
     formatPP,
@@ -659,70 +658,70 @@ class ShipBase extends Ship {
             decks: `${this._shipData.decks} deck${this._shipData.decks > 1 ? "s" : ""}`,
             additionalRow: `${this._shipData.decks < 4 ? "<br>\u00A0" : ""}`,
             cannonsPerDeck,
-            cannonBroadside: formatInt(this._shipData.broadside.cannons),
-            carroBroadside: formatInt(this._shipData.broadside.carronades),
+            cannonBroadside: formatIntTrunc(this._shipData.broadside.cannons),
+            carroBroadside: formatIntTrunc(this._shipData.broadside.carronades),
             gunsFront: this._shipData.gunsPerDeck[4],
             limitFront: this._shipData.deckClassLimit[4],
             gunsBack: this._shipData.gunsPerDeck[5],
             limitBack: this._shipData.deckClassLimit[5],
             firezoneHorizontalWidth: this._shipData.ship.firezoneHorizontalWidth,
             waterlineHeight: formatFloat(this._shipData.ship.waterlineHeight),
-            maxSpeed: formatFloat(this._shipData.speed.max, 4),
+            maxSpeed: formatFloat(this._shipData.speed.max, 5),
             acceleration: formatFloat(this._shipData.ship.acceleration),
             deceleration: formatFloat(this._shipData.ship.deceleration),
-            maxTurningSpeed: formatFloat(this._shipData.rudder.turnSpeed, 3),
+            maxTurningSpeed: formatFloat(this._shipData.rudder.turnSpeed, 4),
             halfturnTime: formatFloat(this._shipData.rudder.halfturnTime),
-            sideArmor: `${formatInt(this._shipData.sides.armour)}\u00A0<span class="badge badge-white">${formatInt(
-                this._shipData.sides.thickness
-            )}</span>`,
-            frontArmor: `${formatInt(this._shipData.bow.armour)}\u00A0<span class="badge badge-white">${formatInt(
-                this._shipData.bow.thickness
-            )}</span>`,
-            pump: formatInt(this._shipData.pump.armour),
-            sails: formatInt(this._shipData.sails.armour),
-            structure: formatInt(this._shipData.structure.armour),
-            backArmor: `${formatInt(this._shipData.stern.armour)}\u00A0<span class="badge badge-white">${formatInt(
-                this._shipData.stern.thickness
-            )}</span>`,
-            rudder: `${formatInt(this._shipData.rudder.armour)}\u00A0<span class="badge badge-white">${formatInt(
-                this._shipData.rudder.thickness
-            )}</span>`,
-            minCrew: formatInt(this._shipData.crew.min),
-            maxCrew: formatInt(this._shipData.crew.max),
-            sailingCrew: formatInt(this._shipData.crew.sailing || 0),
-            maxWeight: formatInt(this._shipData.maxWeight),
-            holdSize: formatInt(this._shipData.holdSize),
-            upgradeXP: formatInt(this._shipData.upgradeXP),
-            sternRepair: `${formatInt(this._shipData.repairTime.stern)}`,
-            bowRepair: `${formatInt(this._shipData.repairTime.bow)}`,
-            hullRepairAmount: `${formatInt(
+            sideArmor: `${formatIntTrunc(
+                this._shipData.sides.armour
+            )}\u00A0<span class="badge badge-white">${formatIntTrunc(this._shipData.sides.thickness)}</span>`,
+            frontArmor: `${formatIntTrunc(
+                this._shipData.bow.armour
+            )}\u00A0<span class="badge badge-white">${formatIntTrunc(this._shipData.bow.thickness)}</span>`,
+            pump: formatIntTrunc(this._shipData.pump.armour),
+            sails: formatIntTrunc(this._shipData.sails.armour),
+            structure: formatIntTrunc(this._shipData.structure.armour),
+            backArmor: `${formatIntTrunc(
+                this._shipData.stern.armour
+            )}\u00A0<span class="badge badge-white">${formatIntTrunc(this._shipData.stern.thickness)}</span>`,
+            rudder: `${formatIntTrunc(
+                this._shipData.rudder.armour
+            )}\u00A0<span class="badge badge-white">${formatIntTrunc(this._shipData.rudder.thickness)}</span>`,
+            minCrew: formatIntTrunc(this._shipData.crew.min),
+            maxCrew: formatIntTrunc(this._shipData.crew.max),
+            sailingCrew: formatIntTrunc(this._shipData.crew.sailing || 0),
+            maxWeight: formatIntTrunc(this._shipData.maxWeight),
+            holdSize: formatIntTrunc(this._shipData.holdSize),
+            upgradeXP: formatIntTrunc(this._shipData.upgradeXP),
+            sternRepair: `${formatIntTrunc(this._shipData.repairTime.stern)}`,
+            bowRepair: `${formatIntTrunc(this._shipData.repairTime.bow)}`,
+            hullRepairAmount: `${formatIntTrunc(
                 (this._shipData.repairAmount.armour + this._shipData.repairAmount.armourPerk) * 100
             )}`,
-            rigRepairAmount: `${formatInt(
+            rigRepairAmount: `${formatIntTrunc(
                 (this._shipData.repairAmount.sails + this._shipData.repairAmount.sailsPerk) * 100
             )}`,
-            repairTime: `${formatInt(this._shipData.repairTime.sides)}`,
-            hullRepairsNeeded: `${formatInt(hullRepairsNeeded)}\u00A0<span class="badge badge-white">${formatInt(
-                hullRepairsNeeded * repairsSetSize
-            )}</span>`,
-            rigRepairsNeeded: `${formatInt(rigRepairsNeeded)}\u00A0<span class="badge badge-white">${formatInt(
-                rigRepairsNeeded * repairsSetSize
-            )}</span>`,
-            rumRepairsNeeded: `${formatInt(rumRepairsNeeded)}\u00A0<span class="badge badge-white">${formatInt(
-                rumRepairsNeeded * repairsSetSize
-            )}</span>`,
+            repairTime: `${formatIntTrunc(this._shipData.repairTime.sides)}`,
+            hullRepairsNeeded: `${formatIntTrunc(
+                hullRepairsNeeded
+            )}\u00A0<span class="badge badge-white">${formatIntTrunc(hullRepairsNeeded * repairsSetSize)}</span>`,
+            rigRepairsNeeded: `${formatIntTrunc(
+                rigRepairsNeeded
+            )}\u00A0<span class="badge badge-white">${formatIntTrunc(rigRepairsNeeded * repairsSetSize)}</span>`,
+            rumRepairsNeeded: `${formatIntTrunc(
+                rumRepairsNeeded
+            )}\u00A0<span class="badge badge-white">${formatIntTrunc(rumRepairsNeeded * repairsSetSize)}</span>`,
             fireResistance: formatPercent(this._shipData.resistance.fire, 0),
             leakResistance: formatPercent(this._shipData.resistance.leaks, 0),
             splinterResistance: formatPercent(this._shipData.resistance.splinter, 0),
-            mastBottomArmor: `${formatInt(
+            mastBottomArmor: `${formatIntTrunc(
                 this._shipData.mast.bottomArmour
-            )}\u00A0<span class="badge badge-white">${formatInt(this._shipData.mast.bottomThickness)}</span>`,
-            mastMiddleArmor: `${formatInt(
+            )}\u00A0<span class="badge badge-white">${formatIntTrunc(this._shipData.mast.bottomThickness)}</span>`,
+            mastMiddleArmor: `${formatIntTrunc(
                 this._shipData.mast.middleArmour
-            )}\u00A0<span class="badge badge-white">${formatInt(this._shipData.mast.middleThickness)}</span>`,
-            mastTopArmor: `${formatInt(this._shipData.mast.topArmour)}\u00A0<span class="badge badge-white">${formatInt(
-                this._shipData.mast.topThickness
-            )}</span>`
+            )}\u00A0<span class="badge badge-white">${formatIntTrunc(this._shipData.mast.middleThickness)}</span>`,
+            mastTopArmor: `${formatIntTrunc(
+                this._shipData.mast.topArmour
+            )}\u00A0<span class="badge badge-white">${formatIntTrunc(this._shipData.mast.topThickness)}</span>`
         };
 
         if (ship.gunsFront) {
@@ -1209,34 +1208,7 @@ export default class CompareShips {
     }
 
     _setupData() {
-        this._woodChanges = new Map([
-            ["Acceleration", { properties: ["ship.acceleration"], isBaseValueAbsolute: true }],
-            [
-                "Armor thickness",
-                { properties: ["sides.thickness", "bow.thickness", "stern.thickness"], isBaseValueAbsolute: true }
-            ],
-            [
-                "Armour hit points",
-                { properties: ["bow.armour", "sides.armour", "stern.armour"], isBaseValueAbsolute: true }
-            ],
-            ["Splinter resistance", { properties: ["resistance.splinter"], isBaseValueAbsolute: false }],
-            ["Crew", { properties: ["crew.max"], isBaseValueAbsolute: true }],
-            ["Fire resistance", { properties: ["resistance.fire"], isBaseValueAbsolute: false }],
-            ["Hull hit points", { properties: ["structure.armour"], isBaseValueAbsolute: true }],
-            ["Leak resistance", { properties: ["resistance.leaks"], isBaseValueAbsolute: false }],
-            [
-                "Mast thickness",
-                {
-                    properties: ["mast.bottomThickness", "mast.middleThickness", "mast.topThickness"],
-                    isBaseValueAbsolute: true
-                }
-            ],
-            ["Rudder speed", { properties: ["rudder.halfturnTime"], isBaseValueAbsolute: true }],
-            ["Max speed", { properties: ["speed.max"], isBaseValueAbsolute: true }],
-            ["Turn rate", { properties: ["rudder.turnSpeed"], isBaseValueAbsolute: true }]
-        ]);
-
-        this._moduleChanges = new Map([
+        this._moduleAndWoodChanges = new Map([
             // ["Sail damage", [  ]],
             // ["Sail health", [  ]],
             ["Acceleration", { properties: ["ship.acceleration"], isBaseValueAbsolute: true }],
@@ -1284,7 +1256,7 @@ export default class CompareShips {
             ["Water repair time", { properties: ["repairTime.pump"], isBaseValueAbsolute: true }]
         ]);
 
-        this._moduleCaps = new Map([
+        this._moduleAndWoodCaps = new Map([
             [
                 "Armor thickness",
                 {
@@ -1316,7 +1288,7 @@ export default class CompareShips {
         ]);
 
         const theoreticalMinSpeed = d3Min(this._shipData, ship => ship.speed.min) * 1.2;
-        const theoreticalMaxSpeed = this._moduleCaps.get("Max speed").cap.amount;
+        const theoreticalMaxSpeed = this._moduleAndWoodCaps.get("Max speed").cap.amount;
 
         this._minSpeed = theoreticalMinSpeed;
         this._maxSpeed = theoreticalMaxSpeed;
@@ -1488,7 +1460,7 @@ export default class CompareShips {
                 type[1]
                     .filter(module =>
                         module.properties.some(property => {
-                            return this._moduleChanges.has(property.modifier);
+                            return this._moduleAndWoodChanges.has(property.modifier);
                         })
                     )
                     .map(module => [module.id, module])
@@ -1794,11 +1766,16 @@ export default class CompareShips {
             sails: rigRepairsPercent,
             sailsPerk: 0
         };
-        shipDataUpdated.repairTime.sides = repairTime;
-        shipDataUpdated.repairTime.default = repairTime;
+        shipDataUpdated.repairTime = { sides: repairTime, default: repairTime };
+        shipDataUpdated.resistance = {
+            fire: 0,
+            leaks: 0,
+            splinter: 0
+        };
 
-        shipDataUpdated = this._addWoodData(shipDataDefault, columnId);
-        shipDataUpdated = this._addModulesData(shipDataDefault, shipDataUpdated, columnId);
+        // shipDataUpdated = this._addModulesData(shipDataDefault, shipDataUpdated, columnId);
+        // shipDataUpdated = this._addWoodData(shipDataUpdated, columnId);
+        shipDataUpdated = this._addModulesAndWoodData(shipDataDefault, shipDataUpdated, columnId);
 
         return shipDataUpdated;
     }
@@ -1828,7 +1805,7 @@ export default class CompareShips {
             adjustedValue = CompareShips._adjustPercentage(adjustedValue, percentage, isBaseValueAbsolute);
         }
 
-        return adjustedValue;
+        return Math.trunc(adjustedValue * 100) / 100;
     }
 
     _setModifier(property) {
@@ -1845,67 +1822,6 @@ export default class CompareShips {
             absolute,
             percentage
         });
-    }
-
-    /**
-     * Add to ship data changes based on selected woods
-     * @param {*} shipData - Ship id
-     * @param {*} compareId - Column id
-     * @returns {Object} - Updated ship data
-     */
-    _addWoodData(shipData, compareId) {
-        const data = JSON.parse(JSON.stringify(shipData));
-
-        data.resistance = {
-            fire: 0,
-            leaks: 0,
-            splinter: 0
-        };
-
-        if (typeof this.woodCompare._instances[compareId] !== "undefined") {
-            let dataLink = "_woodData";
-            if (compareId !== "Base") {
-                dataLink = "_compareData";
-            }
-
-            this._modifierAmount = new Map();
-            // Add modifier amount for both frame and trim
-            ["frame", "trim"].forEach(type => {
-                this.woodCompare._instances[compareId][dataLink][type].properties.forEach(property => {
-                    if (this._woodChanges.has(property.modifier)) {
-                        this._setModifier(property);
-                    }
-                });
-            });
-
-            this._modifierAmount.forEach((value, key) => {
-                // noinspection DuplicatedCode
-                this._woodChanges.get(key).properties.forEach(modifier => {
-                    const index = modifier.split(".");
-
-                    if (index.length > 1) {
-                        data[index[0]][index[1]] = this._adjustValue(
-                            data[index[0]][index[1]],
-                            key,
-                            this._woodChanges.get(key).isBaseValueAbsolute
-                        );
-                    } else {
-                        data[index[0]] = this._adjustValue(
-                            data[index[0]],
-                            key,
-                            this._woodChanges.get(key).isBaseValueAbsolute
-                        );
-                    }
-                });
-            });
-
-            data.speedDegrees = data.speedDegrees.map(speed => {
-                const factor = 1 + this._modifierAmount.get("Max speed").percentage / 100;
-                return Math.max(Math.min(speed * factor, this._maxSpeed), this._minSpeed);
-            });
-        }
-
-        return data;
     }
 
     _showCappingAdvice(compareId) {
@@ -1937,50 +1853,54 @@ export default class CompareShips {
      * @param {*} compareId - Column id
      * @returns {Object} - Updated ship data
      */
-    _addModulesData(shipDataBase, shipDataUpdated, compareId) {
+    _addModulesAndWoodData(shipDataBase, shipDataUpdated, compareId) {
         const data = JSON.parse(JSON.stringify(shipDataUpdated));
-        this._modifierAmount = new Map();
-
-        const setSpeedDegrees = () => {
-            data.speedDegrees = data.speedDegrees.map(speed => {
-                const factor = 1 + this._modifierAmount.get("Max speed").percentage / 100;
-                const newSpeed = speed > 0 ? speed * factor : speed / factor;
-                // Correct speed by caps
-                return Math.max(Math.min(newSpeed, this._maxSpeed), this._minSpeed);
-            });
-        };
 
         const setModifierAmounts = () => {
             this._selectedUpgradeIdsList[compareId].forEach(id => {
                 const module = this._moduleProperties.get(id);
 
                 module.properties.forEach(property => {
-                    if (this._moduleChanges.has(property.modifier)) {
+                    if (this._moduleAndWoodChanges.has(property.modifier)) {
                         this._setModifier(property);
                     }
                 });
             });
+
+            if (this.woodCompare._instances[compareId]) {
+                let dataLink = "_woodData";
+                if (compareId !== "Base") {
+                    dataLink = "_compareData";
+                }
+
+                // Add modifier amount for both frame and trim
+                ["frame", "trim"].forEach(type => {
+                    this.woodCompare._instances[compareId][dataLink][type].properties.forEach(property => {
+                        if (this._moduleAndWoodChanges.has(property.modifier)) {
+                            this._setModifier(property);
+                        }
+                    });
+                });
+            }
         };
 
         // eslint-disable-next-line unicorn/consistent-function-scoping
         const adjustDataByModifiers = () => {
             this._modifierAmount.forEach((value, key) => {
-                if (this._moduleChanges.get(key).properties) {
-                    // noinspection DuplicatedCode
-                    this._moduleChanges.get(key).properties.forEach(modifier => {
+                if (this._moduleAndWoodChanges.get(key).properties) {
+                    this._moduleAndWoodChanges.get(key).properties.forEach(modifier => {
                         const index = modifier.split(".");
-
                         if (index.length > 1) {
                             data[index[0]][index[1]] = this._adjustValue(
                                 data[index[0]][index[1]],
                                 key,
-                                this._moduleChanges.get(key).isBaseValueAbsolute
+                                this._moduleAndWoodChanges.get(key).isBaseValueAbsolute
                             );
                         } else {
                             data[index[0]] = this._adjustValue(
                                 data[index[0]],
                                 key,
-                                this._moduleChanges.get(key).isBaseValueAbsolute
+                                this._moduleAndWoodChanges.get(key).isBaseValueAbsolute
                             );
                         }
                     });
@@ -2000,9 +1920,9 @@ export default class CompareShips {
             };
 
             this._modifierAmount.forEach((value, key) => {
-                if (this._moduleCaps.has(key)) {
-                    const { cap } = this._moduleCaps.get(key);
-                    this._moduleCaps.get(key).properties.forEach(property => {
+                if (this._moduleAndWoodCaps.has(key)) {
+                    const { cap } = this._moduleAndWoodCaps.get(key);
+                    this._moduleAndWoodCaps.get(key).properties.forEach(property => {
                         const index = property.split(".");
                         if (index.length > 1) {
                             if (data[index[0]][index[1]]) {
@@ -2032,12 +1952,17 @@ export default class CompareShips {
             }
         };
 
-        if (!this._selectedUpgradeIdsList[compareId]) {
-            return data;
-        }
+        const setSpeedDegrees = () => {
+            data.speedDegrees = data.speedDegrees.map(speed => {
+                const factor = 1 + this._modifierAmount.get("Max speed").percentage / 100;
+                const newSpeed = speed > 0 ? speed * factor : speed / factor;
+                // Correct speed by caps
+                return Math.max(Math.min(newSpeed, this._maxSpeed), this._minSpeed);
+            });
+        };
 
+        this._modifierAmount = new Map();
         setModifierAmounts();
-
         adjustDataByModifiers();
         adjustDataByCaps();
         if (this._modifierAmount.has("Max speed")) {
