@@ -143,7 +143,7 @@ function convertModules() {
         ["NONE PERK_FISHING_DROP_CHANCE_MODIFIER", "Fishing efficiency"],
         ["NONE PERK_HEEL_DEGREES_MODIFIER", "Heel correctionValueDegrees"],
         ["NONE PERK_HOLD_MAX_WEIGHT_MODIFIER", "Hold capacity"],
-        ["NONE PERK_HULL_REPAIR_PERCENT_MODIFIER", "Planking repair amount (perk)"],
+        ["NONE PERK_HULL_REPAIR_PERCENT_MODIFIER", "Armour repair amount (perk)"],
         ["NONE PERK_LABOR_HOURS_GENERATION_MODIFIER", "Labour hour generation"],
         ["NONE PERK_LABOR_HOURS_WALLET_MODIFIER", "Labour hour reserve"],
         ["NONE PERK_MAX_FLEET_SIZE_MODIFIER", "Fleet size"],
