@@ -1,11 +1,25 @@
+/**
+ * This file is part of na-map.
+ *
+ * @file      Building data.
+ * @module    build/convert-buildings
+ * @author    iB aka Felix Victor
+ * @copyright 2019
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
 import { cleanName, readJson, saveJson, sortBy } from "./common.mjs";
 
 const itemsFilename = process.argv[2];
-const outFilename = process.argv[3];
-const date = process.argv[4];
+const fileNameBuildings = process.argv[3];
+const fileNamePrices = process.argv[4];
+const date = process.argv[5];
 
 const APIItems = readJson(`${itemsFilename}-ItemTemplates-${date}.json`);
 
+const idWorkshop = 450;
+const idAcademy = 879;
+const idSeasoningShed = 2291;
 const obsoleteBuildings = [
     "Compass Wood Forest",
     "Copper Ore Mine",
@@ -21,9 +35,9 @@ const obsoleteBuildings = [
 function getItemsCraftedByWorkshop() {
     return APIItems.filter(
         item =>
-            typeof item.BuildingRequirements !== "undefined" &&
-            typeof item.BuildingRequirements[0] !== "undefined" &&
-            item.BuildingRequirements[0].BuildingTemplate === 450
+            item.BuildingRequirements &&
+            item.BuildingRequirements[0] &&
+            item.BuildingRequirements[0].BuildingTemplate === idWorkshop
     )
         .map(recipe => ({
             name: cleanName(recipe.Name).replace(" Blueprint", ""),
@@ -35,12 +49,26 @@ function getItemsCraftedByWorkshop() {
 function getItemsCraftedByAcademy() {
     return APIItems.filter(
         item =>
-            typeof item.BuildingRequirements !== "undefined" &&
-            typeof item.BuildingRequirements[0] !== "undefined" &&
-            item.BuildingRequirements[0].BuildingTemplate === 879
+            item.BuildingRequirements &&
+            item.BuildingRequirements[0] &&
+            item.BuildingRequirements[0].BuildingTemplate === idAcademy
     )
         .map(recipe => ({
             name: cleanName(recipe.Name).replace(" Blueprint", ""),
+            price: 0
+        }))
+        .sort(sortBy(["name"]));
+}
+
+function getItemsCraftedBySeasoningShed() {
+    return APIItems.filter(
+        item =>
+            item.BuildingRequirements &&
+            item.BuildingRequirements[0] &&
+            item.BuildingRequirements[0].BuildingTemplate === idSeasoningShed
+    )
+        .map(recipe => ({
+            name: cleanName(recipe.Name),
             price: 0
         }))
         .sort(sortBy(["name"]));
@@ -71,62 +99,100 @@ function convertBuildings() {
         ])
     );
 
-    APIItems.filter(item => item.ItemType === "Building").forEach(APIbuilding => {
-        let dontSave = false;
-
-        const building = {
-            id: APIbuilding.Id,
-            name: cleanName(APIbuilding.Name),
-            resource:
-                resources.get(
-                    APIbuilding.ProduceResource ? APIbuilding.ProduceResource : APIbuilding.RequiredPortResource
-                ) || [],
-            batch: resourceRecipes.get(APIbuilding.RequiredPortResource),
-            levels: APIbuilding.Levels.map(level => ({
-                labourDiscount: level.LaborDiscount,
-                production: level.ProductionLevel * APIbuilding.BaseProduction,
-                maxStorage: level.MaxStorage,
-                price: level.UpgradePriceGold,
-                materials: level.UpgradePriceMaterials.map(material => ({
-                    item: resources.get(material.Template).name,
-                    amount: material.Amount
+    APIItems.filter(item => item.ItemType === "Building" && !obsoleteBuildings.includes(item.Name)).forEach(
+        APIbuilding => {
+            const building = {
+                id: APIbuilding.Id,
+                name: cleanName(APIbuilding.Name),
+                resource:
+                    resources.get(
+                        APIbuilding.ProduceResource ? APIbuilding.ProduceResource : APIbuilding.RequiredPortResource
+                    ) || [],
+                batch: resourceRecipes.get(APIbuilding.RequiredPortResource),
+                levels: APIbuilding.Levels.map(level => ({
+                    labourDiscount: level.LaborDiscount,
+                    production: level.ProductionLevel * APIbuilding.BaseProduction,
+                    maxStorage: level.MaxStorage,
+                    price: level.UpgradePriceGold,
+                    materials: level.UpgradePriceMaterials.map(material => ({
+                        item: resources.get(material.Template).name,
+                        amount: material.Amount
+                    }))
                 }))
-            }))
-        };
+            };
 
-        // Ignore double entries
-        if (!buildings.has(building.name)) {
-            if (building.name === "Shipyard") {
-                building.resource = { name: "Ships", price: 0 };
-                building.byproduct = [];
-                building.batch = [];
-            } else if (building.name === "Academy") {
-                building.resource = getItemsCraftedByAcademy();
-                building.byproduct = [];
-                building.batch = [];
-            } else if (building.name === "Forge") {
-                building.resource = { name: "Cannons", price: 0 };
-                building.byproduct = [];
-                building.batch = [];
-            } else if (building.name === "Workshop") {
-                building.resource = getItemsCraftedByWorkshop();
-                building.byproduct = [];
-                building.batch = [];
+            // Ignore double entries
+            if (!buildings.has(building.name)) {
+                if (building.name === "Shipyard") {
+                    building.resource = { name: "Ships", price: 0 };
+                    building.byproduct = [];
+                    building.batch = [];
+                } else if (building.name === "Academy") {
+                    building.resource = getItemsCraftedByAcademy();
+                    building.byproduct = [];
+                    building.batch = [];
+                } else if (building.name === "Forge") {
+                    building.resource = { name: "Cannons", price: 0 };
+                    building.byproduct = [];
+                    building.batch = [];
+                } else if (building.name === "Workshop") {
+                    building.resource = getItemsCraftedByWorkshop();
+                    building.byproduct = [];
+                    building.batch = [];
+                } else if (building.name === "Seasoning Shed") {
+                    building.resource = getItemsCraftedBySeasoningShed();
+                    building.byproduct = [];
+                    building.batch = [];
+                }
+
+                buildings.set(building.name, building);
             }
-
-            if (obsoleteBuildings.includes(building.name)) {
-                dontSave = true;
-            } else {
-                // console.log(building.id, building.name);
-            }
-
-            buildings.set(building.name, dontSave ? {} : building);
         }
-    });
+    );
 
     let result = [...buildings.values()];
+
+    const getStandardPrices = name =>
+        prices.standard.find(standardItem => standardItem.name === name.replace(" (S)", ""));
+
+    const getSeasonedItemPrice = name =>
+        APIItems.find(
+            item =>
+                item.ItemType === "Recipe" && item.Name.replace(" Log", "") === name.replace("White Oak", "White oak")
+        );
+
+    const doubloonsId = 989;
+    const toolsId = 1825;
+    const prices = {};
+
+    prices.standard = result
+        .filter(building => !Array.isArray(building.resource) && building.resource.price)
+        .map(building => ({
+            name: building.resource.name.replace(" Log", ""),
+            real: building.resource.price,
+            labour: building.batch.labour
+        }))
+        .sort(sortBy(["name"]));
+
+    prices.seasoned = getItemsCraftedBySeasoningShed()
+        .map(seasonedItem => {
+            const name = seasonedItem.name.replace(" Log", "");
+            const seasonedItemPrices = getSeasonedItemPrice(name);
+            return {
+                name,
+                real: getStandardPrices(name).real,
+                labour: getSeasonedItemPrice(name).LaborPrice,
+                doubloon: seasonedItemPrices.FullRequirements.find(requirement => requirement.Template === doubloonsId)
+                    .Amount,
+                tool: seasonedItemPrices.FullRequirements.find(requirement => requirement.Template === toolsId).Amount
+            };
+        })
+        .sort(sortBy(["name"]));
+
+    saveJson(fileNamePrices, prices);
+
     result = result.filter(building => Object.keys(building).length).sort(sortBy(["name"]));
-    saveJson(outFilename, result);
+    saveJson(fileNameBuildings, result);
 }
 
 convertBuildings();

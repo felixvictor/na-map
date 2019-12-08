@@ -25,7 +25,7 @@ export default class ListShipBlueprints {
         this._modalId = `modal-${this._baseId}`;
 
         this._defaultWood = {
-            frame: "Fir Log",
+            frame: "Fir",
             trim: "Crew Space"
         };
         this._woodsSelected = [];
@@ -38,11 +38,33 @@ export default class ListShipBlueprints {
 
     async _loadAndSetupData() {
         try {
-            this._blueprintData = await import(
-                /* webpackChunkName: "data-ship-blueprints" */ "../../gen/ship-blueprints.json"
-            ).then(data => data.default);
-            this._woodData = await import(/* webpackChunkName: "data-woods" */ "../../gen/woods.json").then(
-                data => data.default
+            this._blueprintData = (
+                await import(/* webpackChunkName: "data-ship-blueprints" */ "../../gen/ship-blueprints.json")
+            ).default;
+            this._woodData = (await import(/* webpackChunkName: "data-woods" */ "../../gen/woods.json")).default;
+            /**
+             * @typedef {object} extractionCost
+             * @property {Number} price Extraction price
+             * @property {Number} labour Extraction labour
+             */
+
+            /**
+             * Extraction prices
+             * - key: resource name
+             * - values: extractionCost
+             * @type {Map<string, extractionCost>}
+             * @private
+             */
+            const costs = (await import(/* webpackChunkName: "data-ship-blueprints" */ "../../gen/prices.json"))
+                .default;
+            this._extractionCosts = new Map(
+                costs.standard.map(cost => [cost.name, { real: cost.real, labour: cost.labour }])
+            );
+            this._craftingCosts = new Map(
+                costs.seasoned.map(cost => [
+                    cost.name,
+                    { real: cost.real, labour: cost.labour, doubloon: cost.doubloon, tool: cost.tool }
+                ])
             );
         } catch (error) {
             putImportError(error);
@@ -65,7 +87,7 @@ export default class ListShipBlueprints {
     }
 
     _injectModal() {
-        insertBaseModal(this._modalId, this._baseName, "md");
+        insertBaseModal(this._modalId, this._baseName, "lg");
 
         const id = `${this._baseId}-ship-select`;
         const body = d3Select(`#${this._modalId} .modal-body`);
@@ -164,14 +186,12 @@ export default class ListShipBlueprints {
     _setWoodSelect(type) {
         $(`#${this._baseId}-${type}-select`)
             .removeAttr("disabled")
-            .val(this._defaultWood[type].replace(" Log", ""))
+            .val(this._defaultWood[type])
             .selectpicker("refresh");
     }
 
     _woodSelected(type, select$) {
         this._woodsSelected[type] = select$.val();
-        this._woodsSelected[type] +=
-            this._woodsSelected[type] === "Bermuda Cedar" || this._woodsSelected[type] === "Crew Space" ? "" : " Log";
         this._updateText();
     }
 
@@ -187,8 +207,6 @@ export default class ListShipBlueprints {
 
     _updateTable(elem, dataBody, dataHead = []) {
         const addHead = () => {
-            let sortAscending = true;
-
             // Data join rows
             const tableRowUpdate = elem
                 .select("thead")
@@ -196,74 +214,25 @@ export default class ListShipBlueprints {
                 .data(dataHead, d => d[0]);
 
             // Remove old rows
-            tableRowUpdate
-                .exit()
-                .attr("class", "exit")
-                .transition()
-                .delay(2000)
-                .duration(5000)
-                .style("opacity", 0)
-                .remove();
+            tableRowUpdate.exit().remove();
 
             // Add new rows
-            const tableRowEnter = tableRowUpdate
-                .enter()
-                .append("tr")
-                .style("opacity", 0)
-                .attr("class", "enter")
-                .transition()
-                .delay(9000)
-                .duration(5000)
-                .style("opacity", 1);
+            const tableRowEnter = tableRowUpdate.enter().append("tr");
 
             // Merge rows
             const row = tableRowUpdate.merge(tableRowEnter);
 
             // Data join cells
             const tableCellUpdate = row.selectAll("th").data(d => d);
-            tableCellUpdate.attr("class", "update");
+
             // Remove old cells
-            tableCellUpdate
-                .exit()
-                .attr("class", "exit")
-                .transition()
-                .delay(2000)
-                .duration(5000)
-                .style("opacity", 0)
-                .remove();
+            tableCellUpdate.exit().remove();
 
             // Add new cells
-            const tableCellEnter = tableCellUpdate
-                .enter()
-                .append("th")
-                .style("opacity", 0)
-                .attr("class", "enter")
-                .transition()
-                .delay(9000)
-                .duration(5000)
-                .style("opacity", 1);
+            const tableCellEnter = tableCellUpdate.enter().append("th");
 
             // Merge cells
-            tableCellUpdate
-                .merge(tableCellEnter)
-                .html(d => d)
-                .append("i")
-                .classed("fas fa-sort", true)
-                .on("click", (d, i, nodes) => {
-                    if (sortAscending) {
-                        row.sort((a, b) => b[d] < a[d]);
-                        sortAscending = false;
-                        console.log(nodes[i]);
-                        nodes[i].classed("fa-sort-down", false);
-                        nodes[i].classed("fa-sort-up", true);
-                    } else {
-                        row.sort((a, b) => b[d] > a[d]);
-                        sortAscending = true;
-                        console.log(nodes[i]);
-                        nodes[i].classed("fa-sort-up", false);
-                        nodes[i].classed("fa-sort-down", true);
-                    }
-                });
+            tableCellUpdate.merge(tableCellEnter).html(d => d);
         };
 
         const addBody = () => {
@@ -294,79 +263,198 @@ export default class ListShipBlueprints {
      * @private
      */
     _updateText() {
-        const extraData = [];
-        if (this._currentBlueprintData.doubloons) {
-            extraData.push(["Doubloons", formatInt(this._currentBlueprintData.doubloons)]);
-        }
+        /**
+         * @typedef {Array} itemsNeeded
+         * @property {string} item
+         * @property {number|string} Amount needed (number or formatted number)
+         */
 
-        extraData.push(["Provisions", formatInt(this._currentBlueprintData.provisions)]);
-        if (this._currentBlueprintData.permit) {
-            extraData.push(["Permit", formatInt(this._currentBlueprintData.permit)]);
-        }
-
-        extraData.push(["Craft level", formatInt(this._currentBlueprintData.craftLevel)]);
-        extraData.push(["Shipyard level", formatInt(this._currentBlueprintData.shipyardLevel)]);
-        extraData.push(["Labour hours", formatInt(this._currentBlueprintData.labourHours)]);
-        extraData.push(["Craft experience", formatInt(this._currentBlueprintData.craftXP)]);
-
-        // Add default resources
-        const resourcesData = this._currentBlueprintData.resources.map(resource => [resource.name, resource.amount]);
+        /**
+         * Default resources
+         * @type {itemsNeeded}
+         */
+        let defaultResources = this._currentBlueprintData.resources.map(resource => [resource.name, resource.amount]);
 
         // Add trim
         let frameAdded = false;
         let trimAdded = false;
         let frameAmount = 0;
+        let trimAmount = 0;
         // Crew space means additional hemp
         if (this._woodsSelected.trim === "Crew Space") {
-            const hempAmount = this._currentBlueprintData.trims.find(trim => trim.name === "Crew Space").amount;
-            const index = resourcesData.findIndex(resource => resource[0] === "Hemp");
-            resourcesData[index][1] += hempAmount;
+            const hempAmount = this._currentBlueprintData.wood.find(wood => wood.name === "Crew Space").amount;
+            const index = defaultResources.findIndex(resource => resource[0] === "Hemp");
+            defaultResources[index][1] += hempAmount;
         } else {
-            const trimAmount = this._currentBlueprintData.trims.find(trim => trim.name === "Planking").amount;
+            trimAmount = this._currentBlueprintData.wood.find(wood => wood.name === "Planking").amount;
             // Frame and trim have same wood: add trim to frame
             if (this._woodsSelected.trim === this._woodsSelected.frame) {
                 frameAmount += trimAmount;
             } else {
-                const index = resourcesData.findIndex(resource => resource[0] === this._woodsSelected.trim);
+                const index = defaultResources.findIndex(resource => resource[0] === this._woodsSelected.trim);
                 // Trim wood is already part of default resources (fir and oak log)
                 if (index >= 0) {
-                    resourcesData[index][1] += trimAmount;
+                    defaultResources[index][1] += trimAmount;
                 } else {
                     // Trim is an additional resource
                     trimAdded = true;
-                    resourcesData.push([this._woodsSelected.trim, trimAmount]);
+                    defaultResources.push([this._woodsSelected.trim, trimAmount]);
                 }
             }
         }
 
         // Add frame
-        frameAmount += this._currentBlueprintData.frames.find(frame => frame.name === this._woodsSelected.frame).amount;
-        const index = resourcesData.findIndex(resource => resource[0] === this._woodsSelected.frame);
+        frameAmount += this._currentBlueprintData.wood.find(wood => wood.name === "Frame").amount;
+        const index = defaultResources.findIndex(resource => resource[0] === this._woodsSelected.frame);
         if (index >= 0) {
             // Frame wood is already part of default resources (fir and oak log)
-            resourcesData[index][1] += frameAmount;
+            defaultResources[index][1] += frameAmount;
         } else {
             // Frame is an additional resource
             frameAdded = true;
-            resourcesData.push([this._woodsSelected.frame, frameAmount]);
+            defaultResources.push([this._woodsSelected.frame, frameAmount]);
         }
 
         // Order frame before trim if both are added
         if (frameAdded && trimAdded) {
-            const frameIndex = resourcesData.length - 1;
-            [resourcesData[frameIndex], resourcesData[frameIndex - 1]] = [
-                resourcesData[frameIndex - 1],
-                resourcesData[frameIndex]
+            const frameIndex = defaultResources.length - 1;
+            [defaultResources[frameIndex], defaultResources[frameIndex - 1]] = [
+                defaultResources[frameIndex - 1],
+                defaultResources[frameIndex]
             ];
         }
 
-        // Format amount
-        resourcesData.forEach(data => {
-            data[1] = formatInt(data[1]);
-        });
+        /**
+         * Extra resources
+         * @type {itemsNeeded}
+         */
+        let extraResources = [];
 
-        this._updateTable(this._tables.Extra, extraData);
-        this._updateTable(this._tables.Resources, resourcesData);
+        if (this._currentBlueprintData.doubloons) {
+            extraResources.push(["Doubloons", this._currentBlueprintData.doubloons]);
+        }
+
+        extraResources.push(["Provisions", this._currentBlueprintData.provisions]);
+
+        if (this._currentBlueprintData.permit) {
+            extraResources.push(["Permit", this._currentBlueprintData.permit]);
+        }
+
+        extraResources.push(
+            ["Craft level", this._currentBlueprintData.craftLevel],
+            ["Shipyard level", this._currentBlueprintData.shipyardLevel],
+            ["Labour hours", this._currentBlueprintData.labourHours],
+            ["Craft experience", this._currentBlueprintData.craftXP]
+        );
+
+        // Add extraction price and labour
+        /**
+         * Extra resources
+         * @type {itemsNeeded}
+         */
+        const materials = [];
+
+        /**
+         * Total (extraction price
+         * @type {number}
+         */
+        let extractionPrice = 0;
+
+        /**
+         * Total extraction labour hours
+         * @type {number}
+         */
+        let extractionLabour = 0;
+
+        /**
+         * Total price per item
+         * @param item {itemsNeeded}
+         * @return {number} Amount times price
+         */
+        // eslint-disable-next-line unicorn/consistent-function-scoping
+        const getTotalExtractionPrice = item => this._extractionCosts.get(item[0]).real * item[1];
+
+        /**
+         * Total labour hours per item
+         * @param item {itemsNeeded}
+         * @return {number} Amount times labour hours
+         */
+        // eslint-disable-next-line unicorn/consistent-function-scoping
+        const getTotalExtractionLabour = item => this._extractionCosts.get(item[0]).labour * item[1];
+
+        /**
+         * Calculate total extraction costs
+         * @param data {itemsNeeded}
+         */
+        const addExtractionCosts = data => {
+            data.filter(data => this._extractionCosts.has(data[0])).forEach(data => {
+                extractionPrice += getTotalExtractionPrice(data);
+                extractionLabour += getTotalExtractionLabour(data);
+            });
+        };
+
+        addExtractionCosts(defaultResources);
+        addExtractionCosts(extraResources);
+
+        if (extractionPrice) {
+            materials.push(["Reals", formatInt(extractionPrice)], ["Labour hours", formatInt(extractionLabour)]);
+        }
+
+        /**
+         * Total (S) log price
+         * @type {number}
+         */
+        let sLogPrice = 0;
+
+        /**
+         * Total (S) log labour hours
+         * @type {number}
+         */
+        let sLogLabour = 0;
+
+        /**
+         * Total (S) log doubloons
+         * @type {number}
+         */
+        let sLogDoubloons = 0;
+
+        /**
+         * Total (S) log tools
+         * @type {number}
+         */
+        let sLogTools = 0;
+
+        if (this._craftingCosts.has(this._woodsSelected.trim)) {
+            sLogPrice += this._craftingCosts.get(this._woodsSelected.trim).real * trimAmount;
+            sLogLabour += this._craftingCosts.get(this._woodsSelected.trim).labour * trimAmount;
+            sLogDoubloons += this._craftingCosts.get(this._woodsSelected.trim).doubloon * trimAmount;
+            sLogTools += this._craftingCosts.get(this._woodsSelected.trim).tool * trimAmount;
+        }
+
+        if (this._craftingCosts.has(this._woodsSelected.frame)) {
+            sLogPrice += this._craftingCosts.get(this._woodsSelected.frame).real * frameAmount;
+            sLogLabour += this._craftingCosts.get(this._woodsSelected.frame).labour * frameAmount;
+            sLogDoubloons += this._craftingCosts.get(this._woodsSelected.frame).doubloon * frameAmount;
+            sLogTools += this._craftingCosts.get(this._woodsSelected.frame).tool * frameAmount;
+        }
+
+        if (sLogPrice) {
+            materials.push(
+                ["(S) reals", formatInt(sLogPrice)],
+                ["(S) labour hours", formatInt(sLogLabour)],
+                ["(S) doubloons", formatInt(sLogDoubloons)],
+                ["(S) tools", formatInt(sLogTools)]
+            );
+        }
+
+        // Format amounts
+        defaultResources = defaultResources.map(data => [data[0], formatInt(data[1])]);
+        extraResources = extraResources.map(data => [data[0], formatInt(data[1])]);
+
+        // Display amounts
+        this._updateTable(this._tables.Resources, defaultResources);
+        this._updateTable(this._tables.Extra, extraResources);
+        this._updateTable(this._tables.Materials, materials);
     }
 
     /**
@@ -398,6 +486,7 @@ export default class ListShipBlueprints {
 
             addCard("Resources");
             addCard("Extra");
+            addCard("Materials");
         }
 
         this._blueprint = $(event.currentTarget)

@@ -17,7 +17,6 @@ const tileSize = 256;
 const mapPath = "src/images/map";
 const iconsPath = "src/images/icons";
 const logoMainFile = `${iconsPath}/logo.png`;
-const icoFile = `${iconsPath}/favicon.ico`;
 
 const convert = async () => {
     try {
@@ -41,24 +40,6 @@ const convert = async () => {
                 console.error("stderr:", stderr);
             }
         });
-
-        // eslint-disable-next-line camelcase
-        await child_process.exec(
-            `convert ${logoMainFile} -define icon:auto-resize=16,32,48,64,128,256 ${icoFile}`,
-            (err, stdout, stderr) => {
-                if (err) {
-                    throw err;
-                }
-
-                if (stdout) {
-                    console.log("stdout:", stdout);
-                }
-
-                if (stderr) {
-                    console.error("stderr:", stderr);
-                }
-            }
-        );
     } catch (error) {
         throw new Error(error);
     }
