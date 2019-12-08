@@ -41,7 +41,7 @@
         "lzma-native": "^5.0.0",
         "moment-timezone": "^0.5.26",
         "ndjson-cli": "^0.3.1",
-        "netlify-cli": "^2.24.0",
+        "netlify-cli": "2.21.0",
         "node-sass": "^4.13.0",
         "object-merge-advanced": "^10.11.8",
         "polylabel": "^1.0.2",
