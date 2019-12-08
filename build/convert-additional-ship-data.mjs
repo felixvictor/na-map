@@ -1,6 +1,16 @@
-/* eslint-disable import/no-extraneous-dependencies */
+/**
+ * This file is part of na-map.
+ *
+ * @file      Convert additional ship data from xml game files.
+ * @module    build\convert-additional-ship-data
+ * @author    iB aka Felix Victor
+ * @copyright 2017, 2018, 2019
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
 import * as fs from "fs";
-import xml2Json from "xml2json";
+// noinspection ES6CheckImport
+import convert from "xml-js";
 import mergeAdvanced from "object-merge-advanced";
 
 import { isEmpty, readJson, readTextFile, saveJson } from "./common.mjs";
@@ -242,19 +252,22 @@ function convertAdditionalShipData() {
 
         // Retrieve additional data per attribute pair
         fileData.ModuleTemplate.Attributes.Pair.forEach(pair => {
+            const key = pair.Key._text;
             // Check if pair is considered additional data
-            if (elements.has(pair.Key)) {
-                if (typeof addData[elements.get(pair.Key).group] === "undefined") {
-                    addData[elements.get(pair.Key).group] = {};
+            if (elements.has(key)) {
+                const value = Number(pair.Value.Value._text);
+                const { group, element } = elements.get(key);
+                if (!addData[group]) {
+                    addData[group] = {};
                 }
 
-                addData[elements.get(pair.Key).group][elements.get(pair.Key).element] = Number(pair.Value.Value);
-            }
+                addData[group][element] = value;
 
-            // Add calculated mast thickness
-            if (pair.Key === "MAST_THICKNESS") {
-                addData[elements.get(pair.Key).group].middleThickness = Number(pair.Value.Value) * 0.75;
-                addData[elements.get(pair.Key).group].topThickness = Number(pair.Value.Value) * 0.5;
+                // Add calculated mast thickness
+                if (key === "MAST_THICKNESS") {
+                    addData[group].middleThickness = value * 0.75;
+                    addData[group].topThickness = value * 0.5;
+                }
             }
         });
         return addData;
@@ -268,15 +281,13 @@ function convertAdditionalShipData() {
             .forEach(ship => {
                 // Get all data for each group
                 Object.entries(addData).forEach(([group, values]) => {
+                    if (!ship[group]) {
+                        ship[group] = {};
+                    }
+
                     // Get all elements per group
                     Object.entries(values).forEach(([element, value]) => {
-                        if (typeof ship[group] === "undefined") {
-                            // eslint-disable-next-line no-param-reassign
-                            ship[group] = {};
-                        }
-
                         // add value
-                        // eslint-disable-next-line no-param-reassign
                         ship[group][element] = value;
                     });
                 });
@@ -285,8 +296,13 @@ function convertAdditionalShipData() {
 
     function getFileData(baseFileName, ext) {
         const fileName = `${inDir}/${baseFileName} ${ext}.xml`;
-        const fileXmlData = readTextFile(fileName);
-        return xml2Json.toJson(fileXmlData, { object: true });
+        let data = {};
+        if (fs.existsSync(fileName)) {
+            const fileXmlData = readTextFile(fileName);
+            data = convert.xml2js(fileXmlData, { compact: true });
+        }
+
+        return data;
     }
 
     // Get all files without a master

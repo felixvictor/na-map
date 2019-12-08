@@ -72,7 +72,7 @@ class WoodBase extends Wood {
         const middle = 100 / 2;
         let text = '<table class="table table-sm table-striped small mt-4"><thead>';
         text += "<tr>";
-        text += "<tr><th><em>Property</em></th><th><em>Change</em></th></tr></thead><tbody>";
+        text += '<tr><th scope="col">Property</th><th scope="col">Change</th></tr></thead><tbody>';
         wood.properties.forEach((value, key) => {
             text += `<tr><td>${key}</td><td>${
                 value.isPercentage ? formatPercent(value.amount / 100) : formatFloat(value.amount)
@@ -200,8 +200,7 @@ class WoodComparison extends Wood {
         let neutral = 0;
         let diffColour = "";
         let text = '<table class="table table-sm table-striped small wood mt-4"><thead>';
-        text += "<tr>";
-        text += "<tr><th><em>Property</em></th><th><em>Change</em></th></tr></thead><tbody>";
+        text += '<tr><th scope="col">Property</th><th scope="col">Change</th></tr></thead><tbody>';
         wood.properties.forEach((value, key) => {
             text += `<tr><td>${key}</td><td>${getDiff(value.compare, value.base, value.isPercentage)}`;
             text += '<span class="rate">';
@@ -353,9 +352,7 @@ export default class CompareWoods {
 
     async _loadAndSetupData() {
         try {
-            this._woodData = await import(/* webpackChunkName: "data-woods" */ "../../gen/woods.json").then(
-                data => data.default
-            );
+            this._woodData = (await import(/* webpackChunkName: "data-woods" */ "../../gen/woods.json")).default;
             this._setupData();
         } catch (error) {
             putImportError(error);
