@@ -209,7 +209,7 @@ export default class ListPortOwnerships {
          */
         const setXAxis = g => {
             const xTimeScale = d3ScaleTime()
-                .domain(d3Extent(nationData, d => this.xValue(d)))
+                .domain(d3Extent(nationData, d => ListPortOwnerships.xValue(d)))
                 .range([margin.left, width - margin.right]);
             g.attr("transform", `translate(0,${height - margin.bottom})`).call(
                 d3AxisBottom(xTimeScale)
@@ -225,14 +225,14 @@ export default class ListPortOwnerships {
          */
         const getArea = () => {
             const xScale = d3ScaleLinear()
-                .domain(d3Extent(nationData, d => this.xValue(d)))
+                .domain(d3Extent(nationData, d => ListPortOwnerships.xValue(d)))
                 .range([margin.left, width - margin.right]);
             const yScale = d3ScaleLinear()
                 .domain([d3Min(stacked[0], d => d[0]), d3Max(stacked[stacked.length - 1], d => d[1])])
                 .range([height - margin.bottom, 0]);
 
             const area = d3Area()
-                .x(d => xScale(this.xValue(d.data)))
+                .x(d => xScale(ListPortOwnerships.xValue(d.data)))
                 .y0(d => yScale(d[0]))
                 .y1(d => yScale(d[1]))
                 .curve(d3CurveBasis);
