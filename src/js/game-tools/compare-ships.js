@@ -1931,8 +1931,6 @@ export default class CompareShips {
             splinter: 0
         };
 
-        // shipDataUpdated = this._addModulesData(shipDataDefault, shipDataUpdated, columnId);
-        // shipDataUpdated = this._addWoodData(shipDataUpdated, columnId);
         shipDataUpdated = this._addModulesAndWoodData(shipDataDefault, shipDataUpdated, columnId);
 
         return shipDataUpdated;
@@ -2158,37 +2156,36 @@ export default class CompareShips {
      * @returns {void}
      */
     _refreshShips(compareId) {
-        if (this._baseId !== "ship-journey") {
-            this._modulesSelected(compareId);
-        }
-
-        const singleShipData = this._getShipData(compareId);
         if (this._baseId === "ship-journey") {
-            this._singleShipData = singleShipData;
-        } else if (compareId === "Base") {
-            this._setSelectedShip(compareId, new ShipBase(compareId, singleShipData, this));
-            this._columnsCompare.forEach(otherCompareId => {
-                this._selectShip$[otherCompareId].removeAttr("disabled").selectpicker("refresh");
-                if (!isEmpty(this.selectedShips[otherCompareId])) {
-                    this._setSelectedShip(
-                        otherCompareId,
-                        new ShipComparison(
-                            otherCompareId,
-                            singleShipData,
-                            this.selectedShips[otherCompareId]._shipCompareData,
-                            this
-                        )
-                    );
-                }
-            });
+            this._singleShipData = this._shipData.find(ship => ship.id === this._shipIds[compareId]);
         } else {
-            this._setSelectedShip(
-                compareId,
-                new ShipComparison(compareId, this.selectedShips.Base._shipData, singleShipData, this)
-            );
-        }
+            this._modulesSelected(compareId);
+            const singleShipData = this._getShipData(compareId);
+            if (compareId === "Base") {
+                this._setSelectedShip(compareId, new ShipBase(compareId, singleShipData, this));
+                this._columnsCompare.forEach(otherCompareId => {
+                    this._selectShip$[otherCompareId].removeAttr("disabled").selectpicker("refresh");
+                    if (!isEmpty(this.selectedShips[otherCompareId])) {
+                        this._setSelectedShip(
+                            otherCompareId,
+                            new ShipComparison(
+                                otherCompareId,
+                                singleShipData,
+                                this.selectedShips[otherCompareId]._shipCompareData,
+                                this
+                            )
+                        );
+                    }
+                });
+            } else {
+                this._setSelectedShip(
+                    compareId,
+                    new ShipComparison(compareId, this.selectedShips.Base._shipData, singleShipData, this)
+                );
+            }
 
-        this._updateSailingProfile(compareId);
+            this._updateSailingProfile(compareId);
+        }
     }
 
     /**
