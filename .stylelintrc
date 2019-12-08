@@ -1,8 +1,10 @@
 {
   "cache": true,
   "extends": [
-    "./node_modules/prettier-stylelint/config.js",
-    "stylelint-config-bootstrap/scss"
+    "stylelint-config-twbs-bootstrap/scss"
+  ],
+  "plugins": [
+    "stylelint-scss"
   ],
   "rules": {
     "indentation": 4

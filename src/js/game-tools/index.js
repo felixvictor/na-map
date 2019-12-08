@@ -45,6 +45,8 @@ const init = (serverId, urlParams) => {
         }
     };
 
+    checkShipCompareData();
+
     // eslint-disable-next-line no-unused-vars
     const woodCompare = new CompareWoods("wood");
 
@@ -77,8 +79,6 @@ const init = (serverId, urlParams) => {
 
     // eslint-disable-next-line no-unused-vars
     const blueprintList = new ListShipBlueprints();
-
-    checkShipCompareData();
 };
 
 export { init };

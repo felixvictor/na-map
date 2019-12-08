@@ -145,7 +145,7 @@ export default class ListCannons {
             <table id="table-${type}-list" class="table table-sm small tablesort">
                 <thead>
                     <tr>
-                        <th scope="col"></th>
+                        <th scope="col" class="text-right" rowspan="2" data-sort-default>Lb</th>
 
                         ${/* eslint-disable indent */
                         repeat(
@@ -155,8 +155,6 @@ export default class ListCannons {
                         )}
                     </tr>
                     <tr>
-                        <th scope="col" class="text-right" data-sort-default>Lb</th>
-
                         ${repeat(
                             this._groups,
                             (groupValue, groupKey) => groupKey,
