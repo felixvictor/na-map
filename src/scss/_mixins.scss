@@ -48,6 +48,6 @@
 /// @param {color} $colour - Colour
 /// @output `color` and `background-color`
 @mixin colour($colour) {
-    color: contrast-color($colour);
+    color: color-yiq($colour);
     background-color: $colour;
 }
