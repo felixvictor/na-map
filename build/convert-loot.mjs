@@ -16,12 +16,31 @@ const date = process.argv[4];
 
 const APIItems = readJson(`${inBaseFilename}-ItemTemplates-${date}.json`);
 
+const getLootName = (classId, isMission) => {
+    if (classId === -1) {
+        return "Trader bot (open world)";
+    }
+
+    return `${getOrdinal(classId, false)} rate bot (${isMission ? "mission" : "open world"})`;
+};
+
+const getLootItemName = (name, type) => {
+    let cleanedName = cleanName(name);
+
+    if (type === "Recipe" && !cleanedName.endsWith("Blueprint")) {
+        cleanedName = cleanedName.concat(" Blueprint");
+    }
+
+    return cleanedName;
+};
+
 function convertLoot() {
     /**
      * Get item names
      * @return {Map<number, string>} Item names<id, name>
      */
-    const getItemNames = () => new Map(APIItems.map(item => [Number(item.Id), cleanName(item.Name)]));
+    const getItemNames = () =>
+        new Map(APIItems.map(item => [Number(item.Id), getLootItemName(item.Name, item.ItemType)]));
 
     const itemNames = getItemNames();
 
@@ -35,14 +54,6 @@ function convertLoot() {
             chance: itemProbability.length ? Number(itemProbability[Number(item.Chance)]) : Number(item.Chance),
             amount: { min: Number(item.Stack.Min), max: Number(item.Stack.Max) }
         }));
-
-    const getLootName = (classId, isMission) => {
-        if (classId === -1) {
-            return "Trader bot (open world)";
-        }
-
-        return `${getOrdinal(classId, false)} rate bot (${isMission ? "mission" : "open world"})`;
-    };
 
     const data = {};
 
