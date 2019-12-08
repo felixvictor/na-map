@@ -4,7 +4,7 @@
  * @file      Common data and functions.
  * @module    common
  * @author    iB aka Felix Victor
- * @copyright 2017, 2018
+ * @copyright 2017, 2018, 2019
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -152,18 +152,19 @@ export function initMultiDropdownNavbar(id) {
     });
 }
 
+const cleanNumber = i => i.replace(/[^\-?0-9.]/g, "");
+
+const compareNumber = (a, b) => {
+    let aa = parseFloat(a);
+    let bb = parseFloat(b);
+
+    aa = Number.isNaN(aa) ? 0 : aa;
+    bb = Number.isNaN(bb) ? 0 : bb;
+
+    return aa - bb;
+};
+
 export const initTablesort = () => {
-    const cleanNumber = i => i.replace(/[^\-?0-9.]/g, "");
-    const compareNumber = (a, b) => {
-        let aa = parseFloat(a);
-        let bb = parseFloat(b);
-
-        aa = Number.isNaN(aa) ? 0 : aa;
-        bb = Number.isNaN(bb) ? 0 : bb;
-
-        return aa - bb;
-    };
-
     Tablesort.extend(
         "number",
         item =>
@@ -201,23 +202,25 @@ export const insertBaseModalHTML = ({ id, title, size = "xl", body, footer }) =>
     `;
 };
 
+// http://tools.medialab.sciences-po.fr/iwanthue/
 export const colourList = [
-    "#e7a800",
-    "#e621dd",
-    "#d3e700",
-    "#de78ff",
-    "#01d36b",
-    "#ff3205",
-    "#4df3ff",
-    "#910016",
-    "#01caf0",
-    "#ad0054",
-    "#c8ff9f",
-    "#0143a8",
-    "#00a97f",
-    "#70a4ff",
-    "#312800",
-    "#ffa29f"
+    "#48355d",
+    "#8bcb19",
+    "#003dc5",
+    "#01c071",
+    "#ff12c8",
+    "#93c590",
+    "#000776",
+    "#b66e00",
+    "#63a6ff",
+    "#984b00",
+    "#acb7ea",
+    "#99001b",
+    "#dfb16a",
+    "#4f0017",
+    "#ff7a6b",
+    "#422b00",
+    "#6f2400"
 ];
 
 /**
@@ -229,15 +232,6 @@ export const getCurrencyAmount = amount => `${amount}\u00A0real${Number(amount) 
 
 export const hashids = new Hashids("My salt: Yet another Naval Action map");
 
-// eslint-disable-next-line no-undef
-export const appName = NAME;
-// eslint-disable-next-line no-undef
-export const appDescription = DESCRIPTION;
-// eslint-disable-next-line no-undef
-export const appTitle = TITLE;
-// eslint-disable-next-line no-undef
-export const appVersion = VERSION;
-
 export const speedConstA = 0.074465523706782;
 export const speedConstB = 0.00272175949231;
 
@@ -248,6 +242,11 @@ export const fullCircle = 360;
 export const degreesPerSecond = fullCircle / secondsForFullCircle;
 
 /* eslint-disable no-undef */
+export const appName = NAME;
+export const appDescription = DESCRIPTION;
+export const appTitle = TITLE;
+export const appVersion = VERSION;
+
 export const colourGreen = CGREEN;
 export const colourGreenLight = CGREENLIGHT;
 export const colourGreenDark = CGREENDARK;

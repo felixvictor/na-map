@@ -29,9 +29,7 @@ export default class ListModules {
 
     async _loadAndSetupData() {
         try {
-            this._moduleData = await import(/* webpackChunkName: "data-modules" */ "../../gen/modules.json").then(
-                data => data.default
-            );
+            this._moduleData = (await import(/* webpackChunkName: "data-modules" */ "../../gen/modules.json")).default;
         } catch (error) {
             putImportError(error);
         }

@@ -15,11 +15,9 @@ import { range as d3Range } from "d3-array";
 import { event as d3Event, mouse as d3Mouse, select as d3Select } from "d3-selection";
 import { zoom as d3Zoom, zoomIdentity as d3ZoomIdentity, zoomTransform as d3ZoomTransform } from "d3-zoom";
 
+import { registerEvent } from "../analytics";
 import { appDescription, appTitle, appVersion, defaultFontSize, insertBaseModal } from "../common";
 import { displayClan, nearestPow2, roundToThousands } from "../util";
-
-import { registerEvent } from "../analytics";
-
 import Cookie from "../util/cookie";
 import RadioButton from "../util/radio-button";
 
@@ -49,7 +47,6 @@ class Map {
          * @private
          */
         this._serverName = serverName;
-
         this._searchParams = searchParams;
 
         /**
@@ -152,7 +149,10 @@ class Map {
         this._setupSvg();
         this._setSvgSize();
         this._setupListener();
-        this._setupData();
+    }
+
+    async MapInit() {
+        await this._setupData();
     }
 
     /**
@@ -181,7 +181,7 @@ class Map {
         return r;
     }
 
-    _setupData() {
+    async _setupData() {
         //        const marks = [];
 
         //        marks.push("setupData");
@@ -191,26 +191,25 @@ class Map {
 
         this._f11 = new ShowF11(this, this.coord);
         this._ports = new DisplayPorts(this);
-        this._ports.init().then(() => {
-            this._pbZone = new DisplayPbZones(this._ports);
-            this._grid = new DisplayGrid(this);
+        await this._ports.init();
 
-            this._journey = new Journey(this.rem);
-            this._windPrediction = new PredictWind();
-            this._windRose = new WindRose();
+        this._pbZone = new DisplayPbZones(this._ports);
+        this._grid = new DisplayGrid(this);
 
-            this._portSelect = new SelectPorts(this._ports, this._pbZone, this);
-            this.showTrades = new ShowTrades(
-                this._serverName,
-                this._portSelect,
-                this._minScale,
-                this.coord.min,
-                this.coord.max
-            );
-            this.showTrades.showOrHide().then(() => {
-                this._init();
-            });
-        });
+        this._journey = new Journey(this.rem);
+        this._windPrediction = new PredictWind();
+        this._windRose = new WindRose();
+
+        this._portSelect = new SelectPorts(this._ports, this._pbZone, this);
+        this.showTrades = new ShowTrades(
+            this._serverName,
+            this._portSelect,
+            this._minScale,
+            this.coord.min,
+            this.coord.max
+        );
+        await this.showTrades.showOrHide();
+        this._init();
 
         /*
         marks.forEach(mark => {
@@ -220,16 +219,16 @@ class Map {
         */
     }
 
-    _setupListener() {
-        function stopProperty() {
-            if (d3Event.defaultPrevented) {
-                d3Event.stopPropagation();
-            }
+    static _stopProperty() {
+        if (d3Event.defaultPrevented) {
+            d3Event.stopPropagation();
         }
+    }
 
+    _setupListener() {
         this._svg
             .on("dblclick.zoom", null)
-            .on("click", stopProperty, true)
+            .on("click", Map._stopProperty, true)
             .on("dblclick", (d, i, nodes) => this._doDoubleClickAction(nodes[i]));
 
         document.getElementById("propertyDropdown").addEventListener("click", () => {
@@ -384,23 +383,23 @@ class Map {
             .selectpicker("refresh");
     }
 
+    static _initModal(id) {
+        insertBaseModal(id, `${appTitle} <span class="text-primary small">v${appVersion}</span>`, "");
+
+        const body = d3Select(`#${id} .modal-body`);
+        body.html(
+            `<p>${appDescription} Please check the <a href="https://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/"> Game-Labs forum post</a> for further details. Feedback is very welcome.</p><p>Designed by iB aka Felix Victor, clan Bastard Sons ${displayClan(
+                "(BASTD)"
+            )}</a>.</p>`
+        );
+    }
+
     _showAbout() {
-        function initModal(id) {
-            insertBaseModal(id, `${appTitle} <span class="text-primary small">v${appVersion}</span>`, "");
-
-            const body = d3Select(`#${id} .modal-body`);
-            body.html(
-                `<p>${appDescription} Please check the <a href="https://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/"> Game-Labs forum post</a> for further details. Feedback is very welcome.</p><p>Designed by iB aka Felix Victor, clan Bastard Sons ${displayClan(
-                    "(BASTD)"
-                )}</a>.</p>`
-            );
-        }
-
         const modalId = "modal-about";
 
         // If the modal has no content yet, insert it
         if (!$(`#${modalId}`).length) {
-            initModal(modalId);
+            Map._initModal(modalId);
         }
 
         // Show modal
@@ -410,11 +409,8 @@ class Map {
     _doDoubleClickAction(self) {
         const coord = d3Mouse(self);
         const transform = d3ZoomTransform(self);
-        const mx = coord[0];
-        const my = coord[1];
-        const tk = transform.k;
-        const tx = transform.x;
-        const ty = transform.y;
+        const [mx, my] = coord;
+        const { k: tk, x: tx, y: ty } = transform;
 
         const x = (mx - tx) / tk;
         const y = (my - ty) / tk;
@@ -552,14 +548,14 @@ class Map {
     _getWidth() {
         const { width } = this.getDimensions();
 
-        return width;
+        return Math.floor(width);
     }
 
     _getHeight() {
         const { top } = this.getDimensions();
         const fullHeight = document.documentElement.clientHeight - this.rem;
 
-        return fullHeight - top;
+        return Math.floor(fullHeight - top);
     }
 
     _setHeightWidth() {
@@ -606,5 +602,4 @@ class Map {
     }
 }
 
-// eslint-disable-next-line import/prefer-default-export
 export { Map };
