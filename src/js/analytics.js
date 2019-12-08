@@ -70,7 +70,7 @@ export const initAnalytics = () => {
      */
     window.addEventListener("error", errorMessage => {
         const exceptionDescription = [
-            `Message: ${JSON.stringify(errorMessage, ["message", "filename", "lineno", "colno"])}`,
+            `Message: ${errorMessage.message} @ ${errorMessage.filename}-${errorMessage.lineno}:${errorMessage.colno}`,
             `Error object: ${JSON.stringify(errorMessage.error)}`
         ].join(" - ");
 

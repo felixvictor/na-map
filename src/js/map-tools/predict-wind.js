@@ -73,7 +73,7 @@ export default class PredictWind {
             .attr("orient", "auto")
             .append("path")
             .attr("d", `M0,-${width}L${doubleWidth},0L0,${width}`)
-            .classed("wind-head", true);
+            .attr("class", "wind-predict-arrow-head");
     }
 
     _navbarClick(event) {
@@ -141,7 +141,7 @@ export default class PredictWind {
             .attr("class", "rslider");
 
         const formGroupB = form.append("div").attr("class", "form-group");
-        const block = formGroupB.append("div").classed("alert alert-primary", true);
+        const block = formGroupB.append("div").attr("class", "alert alert-primary");
         block
             .append("label")
             .attr("for", this._timeInputId)
@@ -166,9 +166,9 @@ export default class PredictWind {
             .attr("data-target", `#${this._timeGroupId}`)
             .attr("data-toggle", "datetimepicker")
             .append("span")
-            .classed("input-group-text", true)
+            .attr("class", "input-group-text")
             .append("i")
-            .classed("far fa-clock", true);
+            .attr("class", "icon icon-clock");
 
         $(`#${this._timeGroupId}`).datetimepicker({
             defaultDate: moment.utc(),
@@ -223,7 +223,7 @@ export default class PredictWind {
         const predictHours = parseInt(match[1], 10);
         const predictMinutes = parseInt(match[2], 10);
 
-        // Set current wind in degrees
+        // Set current wind in correctionValueDegrees
         if (Number.isNaN(Number(currentUserWind))) {
             currentWindDegrees = compassToDegrees(currentUserWind);
         } else {
@@ -272,7 +272,6 @@ export default class PredictWind {
         const compassElem = this._svg
             .append("svg")
             .attr("class", "compass")
-            .classed("compass", true)
             .attr("x", xCompass)
             .attr("y", yCompass);
         printCompassRose({ element: compassElem, radius });
@@ -282,7 +281,6 @@ export default class PredictWind {
             .append("path")
             .datum(lineData)
             .attr("d", line)
-            .classed("wind", true)
             .attr("marker-end", "url(#wind-arrow)");
     }
 
@@ -298,14 +296,13 @@ export default class PredictWind {
             .append("text")
             .attr("x", "50%")
             .attr("y", "33%")
-            .attr("class", "wind-text")
             .html(`From ${displayCompassAndDegrees(compass, true)} at ${predictTime}`);
 
         const text2 = textSvg
             .append("text")
             .attr("x", "50%")
             .attr("y", "66%")
-            .attr("class", "wind-text-current")
+            .attr("class", "text-light-separation")
             .html(`Currently at ${currentTime} from ${displayCompassAndDegrees(currentWind, true)}`);
 
         const bbox1 = text1.node().getBoundingClientRect();

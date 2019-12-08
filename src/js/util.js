@@ -220,12 +220,11 @@ export const roundToThousands = x => round(x, 3);
 
 /**
  * Test if object is empty
+ * {@link https://stackoverflow.com/a/32108184}
  * @param {object} object - Object
  * @return {boolean} True if object is empty
  */
-export function isEmpty(object) {
-    return Object.getOwnPropertyNames(object).length === 0 && object.constructor === Object;
-}
+export const isEmpty = object => Object.getOwnPropertyNames(object).length === 0 && object.constructor === Object;
 
 /**
  * Compass directions
@@ -259,7 +258,7 @@ export const compassDirections = [
 ];
 
 /**
- * Converts compass direction to degrees
+ * Converts compass direction to correctionValueDegrees
  * @function
  * @param {String} compass - Compass direction
  * @return {Number} Degrees
@@ -270,7 +269,7 @@ export const compassToDegrees = compass => {
 };
 
 /**
- * Convert degrees to compass direction (see {@link https://stackoverflow.com/questions/7490660/converting-wind-direction-in-angles-to-text-words})
+ * Convert correctionValueDegrees to compass direction (see {@link https://stackoverflow.com/questions/7490660/converting-wind-direction-in-angles-to-text-words})
  * @function
  * @param {Number} degrees - Degrees
  * @return {String} Compass direction
@@ -283,7 +282,7 @@ export const degreesToCompass = degrees => {
 
 /**
  * Display formatted compass
- * @param {string} wind - Wind direction in compass or degrees
+ * @param {string} wind - Wind direction in compass or correctionValueDegrees
  * @param {boolean} svg - True to use 'tspan' instead of 'span'
  * @return {string} HTML formatted compass
  */
@@ -300,10 +299,10 @@ export const displayCompass = (wind, svg = false) => {
 };
 
 /**
- * Display formatted compass and degrees
- * @param {string} wind - Wind direction in compass or degrees
+ * Display formatted compass and correctionValueDegrees
+ * @param {string} wind - Wind direction in compass or correctionValueDegrees
  * @param {boolean} svg - True to use 'tspan' instead of 'span'
- * @return {string} HTML formatted compass and degrees
+ * @return {string} HTML formatted compass and correctionValueDegrees
  */
 export const displayCompassAndDegrees = (wind, svg = false) => {
     let compass;
@@ -321,9 +320,9 @@ export const displayCompassAndDegrees = (wind, svg = false) => {
 };
 
 /**
- * Get wind in degrees from user input (rs-slider)
+ * Get wind in correctionValueDegrees from user input (rs-slider)
  * @param {string} sliderId - Slider id
- * @return {number} Wind in degrees
+ * @return {number} Wind in correctionValueDegrees
  */
 export const getUserWind = sliderId => {
     const currentUserWind = degreesToCompass($(`#${sliderId}`).roundSlider("getValue"));
@@ -357,7 +356,7 @@ export const between = (value, a, b, inclusive) => {
 };
 
 /**
- * Convert radians to degrees (see {@link http://cwestblog.com/2012/11/12/javascript-degree-and-radian-conversion/})
+ * Convert radians to correctionValueDegrees (see {@link http://cwestblog.com/2012/11/12/javascript-degree-and-radian-conversion/})
  * @function
  * @param {Number} radians - Radians
  * @return {Number} Degrees
@@ -365,7 +364,7 @@ export const between = (value, a, b, inclusive) => {
 export const radiansToDegrees = radians => (radians * 180) / Math.PI;
 
 /**
- * Convert degrees to radians
+ * Convert correctionValueDegrees to radians
  * @function
  * @param {Number} degrees - Degrees
  * @return {Number} Radians
@@ -379,7 +378,7 @@ export const degreesToRadians = degrees => (Math.PI / 180) * (degrees - 90);
  */
 
 /**
- * Calculate the angle in degrees between two points
+ * Calculate the angle in correctionValueDegrees between two points
  * @see https://stackoverflow.com/questions/9970281/java-calculating-the-angle-between-two-points-in-degrees
  * @function
  * @param {Point} centerPt - Center point
@@ -763,3 +762,38 @@ export const copyF11ToClipboard = (x, z) => {
         copyToClipboard(F11Url.href);
     }
 };
+
+/**
+ * Ramp for visualizing colour scales
+ * {@link https://observablehq.com/@mbostock/color-ramp}
+ * @param {object} element - DOM element
+ * @param {object} colourScale - Colour
+ * @param {number|null} steps - Number of steps (default 512)
+ * @return {void}
+ */
+export const colourRamp = (element, colourScale, steps = 512) => {
+    const height = 50;
+    const width = element.node().clientWidth;
+    const canvas = element
+        .insert("canvas")
+        .attr("width", width)
+        .attr("height", height);
+    const context = canvas.node().getContext("2d");
+    canvas.style.imageRendering = "pixelated";
+
+    const min = colourScale.domain()[0];
+    const max = colourScale.domain()[colourScale.domain().length - 1];
+    const step = (max - min) / steps;
+    const stepWidth = width / steps;
+    let x = 0;
+    for (let currentStep = min; currentStep < max; currentStep += step) {
+        context.fillStyle = colourScale(currentStep);
+        context.fillRect(x, 0, stepWidth, height);
+        x += stepWidth;
+    }
+};
+
+export const drawSvgCircle = (x, y, r) =>
+    `M${x},${y} m${-r},0 a${r},${r} 0,1,0 ${r * 2},0 a${r},${r} 0,1,0 ${-r * 2},0`;
+export const drawSvgRect = (x, y, r) => `M${x - r / 2},${y - r / 2}h${r}v${r}h${-r}z`;
+export const drawSvgLine = (x, y, l) => `M${x},${y}v${l}`;

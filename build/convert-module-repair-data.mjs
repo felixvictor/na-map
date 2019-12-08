@@ -8,7 +8,8 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import xml2Json from "xml2json";
+// noinspection ES6CheckImport
+import convert from "xml-js";
 
 import { readTextFile, saveJson } from "./common.mjs";
 
@@ -19,13 +20,10 @@ import { readTextFile, saveJson } from "./common.mjs";
  * @return {string} Output camel case string
  */
 function toCamelCase(str) {
-    str = str.replace(/[-_\s]+(.)?/g, (
-        match,
-        ch // eslint-disable-line no-param-reassign
-    ) => (ch ? ch.toUpperCase() : ""));
+    str = str.replace(/[-_\s]+(.)?/g, (match, ch) => (ch ? ch.toUpperCase() : ""));
 
-    // Ensure first chat is always lowercase
-    return str.substr(0, 1).toLowerCase() + str.substr(1);
+    // Ensure first char is always lowercase
+    return str.slice(0, 1).toLowerCase() + str.slice(1);
 }
 
 const inDir = process.argv[2];
@@ -33,18 +31,18 @@ const filename = process.argv[3];
 
 const baseFileNames = ["armor repair", "sail repair", "crew repair"];
 
+const getFileData = (baseFileName, ext) => {
+    const fileName = `${inDir}/${baseFileName} ${ext}.xml`;
+    const fileXmlData = readTextFile(fileName);
+
+    return convert.xml2js(fileXmlData, { compact: true });
+};
+
 /**
  * Retrieve additional ship data from game files and add it to existing data from API
  * @returns {void}
  */
 function convertRepairData() {
-    function getFileData(baseFileName, ext) {
-        const fileName = `${inDir}/${baseFileName} ${ext}.xml`;
-        const fileXmlData = readTextFile(fileName);
-
-        return xml2Json.toJson(fileXmlData, { object: true });
-    }
-
     const repairs = {};
     /*
     REPAIR_VOLUME_PER_ITEM / REPAIR_PERCENT
@@ -55,16 +53,16 @@ function convertRepairData() {
         const data = {};
 
         fileData.ModuleTemplate.Attributes.Pair.forEach(pair => {
-            if (pair.Key === "REPAIR_VOLUME_PER_ITEM") {
-                data.volume = Number(pair.Value.Value);
+            if (pair.Key._text === "REPAIR_VOLUME_PER_ITEM") {
+                data.volume = Number(pair.Value.Value._text);
             }
 
-            if (pair.Key === "REPAIR_PERCENT") {
-                data.percent = Number(pair.Value.Value);
+            if (pair.Key._text === "REPAIR_PERCENT") {
+                data.percent = Number(pair.Value.Value._text);
             }
 
-            if (pair.Key === "REPAIR_MODULE_TIME") {
-                data.time = Number(pair.Value.Value);
+            if (pair.Key._text === "REPAIR_MODULE_TIME") {
+                data.time = Number(pair.Value.Value._text);
             }
         });
 
