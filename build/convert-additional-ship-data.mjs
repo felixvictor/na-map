@@ -296,8 +296,13 @@ function convertAdditionalShipData() {
 
     function getFileData(baseFileName, ext) {
         const fileName = `${inDir}/${baseFileName} ${ext}.xml`;
-        const fileXmlData = readTextFile(fileName);
-        return convert.xml2js(fileXmlData, { compact: true });
+        let data = {};
+        if (fs.existsSync(fileName)) {
+            const fileXmlData = readTextFile(fileName);
+            data = convert.xml2js(fileXmlData, { compact: true });
+        }
+
+        return data;
     }
 
     // Get all files without a master
