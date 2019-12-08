@@ -1,3 +1,4 @@
+/* eslint-disable no-irregular-whitespace */
 /**
  * This file is part of na-map.
  *
@@ -212,7 +213,7 @@ export default class ListLoot {
         const getChance = chance => formatInt((1 - chance) * 100);
 
         return html`
-            <table class="table table-sm">
+            <table class="table table-sm small">
                 <thead>
                     <tr>
                         <th scope="col">Item</th>
