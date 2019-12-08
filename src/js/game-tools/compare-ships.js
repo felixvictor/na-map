@@ -425,6 +425,14 @@ class ShipBase extends Ship {
         return degreesToCompass(rotate);
     }
 
+    _updateCompareWindProfiles() {
+        this._shipCompare._columnsCompare.forEach(otherCompareId => {
+            if (!isEmpty(this._shipCompare._selectedShips[otherCompareId])) {
+                this._shipCompare._selectedShips[otherCompareId].updateWindProfileRotation();
+            }
+        });
+    }
+
     _setupDrag() {
         const steps = this._shipData.speedDegrees.length;
         const degreesPerStep = 360 / steps;
@@ -449,12 +457,12 @@ class ShipBase extends Ship {
                 if (d.type === "ship") {
                     this._shipRotate = d.rotate;
                 } else if (d.type === "windProfile") {
-                    this._windProfileRotate = d.rotate;
+                    this._shipCompare.windProfileRotate = d.rotate;
                 }
 
                 this._speedText
                     .attr("transform", `rotate(${-this._shipRotate})`)
-                    .text(this._getSpeed(this._windProfileRotate - this._shipRotate));
+                    .text(this._getSpeed(this._shipCompare.windProfileRotate - this._shipRotate));
             };
 
             const { x: xMouse, y: yMouse } = d3Event;
@@ -463,6 +471,9 @@ class ShipBase extends Ship {
                 d.correctionValueDegrees
             );
             update();
+            if (d.type === "windProfile") {
+                this._updateCompareWindProfiles();
+            }
         };
 
         // eslint-disable-next-line unicorn/consistent-function-scoping
@@ -561,13 +572,13 @@ class ShipBase extends Ship {
             .curve(curve);
 
         // Profile shape
-        this._windProfileRotate = 0;
+        this._shipCompare.windProfileRotate = 0;
         const circleSize = 20;
         const svgHeight = this._shipCompare.svgHeight / 2 - circleSize;
         const datum = {
             initX: 0,
             initY: 0,
-            initRotate: this._windProfileRotate,
+            initRotate: this._shipCompare.windProfileRotate,
             correctionValueDegrees: 0,
             compassTextX: 0,
             compassTextY: -svgHeight,
@@ -760,23 +771,9 @@ class ShipComparison extends Ship {
         this._shipCompareData = shipCompareData;
         this._shipCompare = shipCompare;
 
-        this._pie = d3Pie()
-            .sort(null)
-            .value(1);
-        const curve = d3CurveCatmullRomClosed;
-        this._line = d3RadialLine()
-            .angle((d, i) => i * segmentRadians)
-            .radius(d => this.shipCompare.radiusSpeedScale(d.data))
-            .curve(curve);
-        this._arcsBase = this._pie(this.shipBaseData.speedDegrees);
-        this._arcsComp = this._pie(this.shipCompareData.speedDegrees);
-        this._speedDiff = this.shipCompareData.speedDegrees.map((speedShipCompare, i) =>
-            roundToThousands(speedShipCompare - this.shipBaseData.speedDegrees[i])
-        );
-        this._minSpeedDiff = d3Min(this._speedDiff);
-        this._maxSpeedDiff = d3Max(this._speedDiff);
-
+        this._setupDrag();
         this._drawDifferenceProfile();
+        this._setupShipOutline();
         this._injectTextComparison();
     }
 
@@ -791,37 +788,198 @@ class ShipComparison extends Ship {
         this._shipCompare.colourScaleSpeedDiff.domain([min, 0, max]);
     }
 
+    _getHeadingInDegrees(rotate, degrees) {
+        let heading = rotate - degrees - 180;
+        if (heading < 0) {
+            heading += 360;
+        }
+
+        return heading;
+    }
+
+    _getSpeed(rotate) {
+        return formatFloat(this._speedScale(Math.abs(rotate)));
+    }
+
+    _getHeadingInCompass(rotate) {
+        return degreesToCompass(rotate);
+    }
+
+    _updateSpeedText() {
+        this._speedText
+            .attr("transform", `rotate(${-this._shipRotate})`)
+            .text(this._getSpeed(this._shipCompare.windProfileRotate - this._shipRotate));
+    }
+
+    _setupDrag() {
+        const steps = this._shipCompareData.speedDegrees.length;
+        const degreesPerStep = 360 / steps;
+        const domain = new Array(steps + 1).fill().map((e, i) => i * degreesPerStep);
+        this._speedScale = d3ScaleLinear()
+            .domain(domain)
+            .range([...this._shipCompareData.speedDegrees, this._shipCompareData.speedDegrees[0]])
+            .clamp(true);
+
+        // eslint-disable-next-line unicorn/consistent-function-scoping
+        const dragStart = d => {
+            d.this.classed("drag-active", true);
+        };
+
+        // eslint-disable-next-line unicorn/consistent-function-scoping
+        const dragged = d => {
+            const update = () => {
+                d.this.attr("transform", d => `rotate(${d.rotate})`);
+                d.compassText
+                    .attr("transform", d => `rotate(${-d.rotate},${d.compassTextX},${d.compassTextY})`)
+                    .text(d => this._getHeadingInCompass(d.rotate));
+                this._shipRotate = d.rotate;
+                this._updateSpeedText();
+            };
+
+            const { x: xMouse, y: yMouse } = d3Event;
+            d.rotate = this._getHeadingInDegrees(
+                rotationAngleInDegrees({ x: d.initX, y: d.initY }, { x: xMouse, y: yMouse }),
+                d.correctionValueDegrees
+            );
+            update();
+        };
+
+        // eslint-disable-next-line unicorn/consistent-function-scoping
+        const dragEnd = d => {
+            d.this.classed("drag-active", false);
+        };
+
+        this._drag = d3Drag()
+            .on("start", dragStart)
+            .on("drag", dragged)
+            .on("end", dragEnd)
+            .container(() => this.mainG.node());
+    }
+
+    _setupShipOutline() {
+        this._shipRotate = 0;
+        const { shipMass } = this._shipCompareData;
+        const heightShip = this._shipCompare.shipMassScale(shipMass);
+        const widthShip = heightShip;
+        const circleSize = 20;
+        const svgHeight = this._shipCompare.svgHeight / 2 - 2 * circleSize;
+
+        const datum = {
+            initX: 0,
+            initY: 0,
+            initRotate: this._shipRotate,
+            correctionValueDegrees: 180,
+            compassTextX: 0,
+            compassTextY: svgHeight,
+            speedTextX: 0,
+            speedTextY: 0,
+            type: "ship"
+        };
+
+        const gShip = this.mainG
+            .append("g")
+            .datum(datum)
+            .attr("class", "ship-outline");
+
+        gShip
+            .append("line")
+            .attr("x1", d => d.initX)
+            .attr("y1", svgHeight - circleSize)
+            .attr("x2", d => d.initX)
+            .attr("y2", d => d.initY);
+
+        gShip
+            .append("image")
+            .attr("height", heightShip)
+            .attr("width", widthShip)
+            .attr("x", -heightShip / 2)
+            .attr("y", -widthShip / 2)
+            .attr("xlink:href", shipIcon);
+
+        gShip
+            .append("circle")
+            .attr("cx", d => d.compassTextX)
+            .attr("cy", d => d.compassTextY)
+            .attr("r", circleSize)
+            .call(this._drag);
+
+        const compassText = gShip
+            .append("text")
+            .attr("x", d => d.compassTextX)
+            .attr("y", d => d.compassTextY)
+            .attr("transform", d => `rotate(${-d.initRotate},${d.compassTextX},${d.compassTextY})`)
+            .text(d => this._getHeadingInCompass(d.initRotate));
+
+        this._speedText = gShip
+            .append("text")
+            .attr("x", d => d.speedTextX)
+            .attr("y", d => d.speedTextY)
+            .attr("transform", d => `rotate(${-d.initRotate})`)
+            .text(d => this._getSpeed(this._shipCompare.windProfileRotate - d.initRotate));
+
+        datum.this = gShip;
+        datum.compassText = compassText;
+        gShip.datum(datum).attr("transform", d => `rotate(${d.initRotate})`);
+    }
+
     /**
      * Draw difference profile
      * @returns {void}
      */
     _drawDifferenceProfile() {
-        // Add ship outline
-        const { shipMass } = this._shipCompareData;
-        const height = this._shipCompare.shipMassScale(shipMass);
-        const width = height;
+        this._pie = d3Pie()
+            .sort(null)
+            .value(1);
 
-        this.mainG
-            .append("image")
-            .attr("height", height)
-            .attr("width", width)
-            .attr("x", -(width / 2))
-            .attr("y", -(height / 2))
-            .attr("class", "ship-outline")
-            .attr("transform", "rotate(90)")
-            .attr("xlink:href", shipIcon);
+        const arcsBase = this._pie(this._shipBaseData.speedDegrees);
+        this._arcsComp = this._pie(this._shipCompareData.speedDegrees);
+
+        this._speedDiff = this._shipCompareData.speedDegrees.map((speedShipCompare, i) =>
+            roundToThousands(speedShipCompare - this._shipBaseData.speedDegrees[i])
+        );
+        this._minSpeedDiff = d3Min(this._speedDiff);
+        this._maxSpeedDiff = d3Max(this._speedDiff);
+
+        const curve = d3CurveCatmullRomClosed;
+        const line = d3RadialLine()
+            .angle((d, i) => i * segmentRadians)
+            .radius(d => this._shipCompare.radiusSpeedScale(d.data))
+            .curve(curve);
+
+        // Profile shape
+        const circleSize = 20;
+        const svgHeight = this._shipCompare.svgHeight / 2 - circleSize;
+        this._windProfile = {
+            initX: 0,
+            initY: 0,
+            initRotate: this._shipCompare.windProfileRotate,
+            correctionValueDegrees: 0,
+            compassTextX: 0,
+            compassTextY: -svgHeight,
+            type: "windProfile"
+        };
+
+        this._gWindProfile = this.mainG
+            .append("g")
+            .attr("class", "wind-profile")
+            .attr("transform", `rotate(${this._windProfile.initRotate})`);
 
         // Base profile shape
-        this.mainG
+        this._gWindProfile
             .append("path")
             .attr("class", "base-profile")
-            .attr("d", this._line(this._arcsBase));
+            .attr("d", line(arcsBase));
 
         // Comp profile lines
-        this.mainG
+        this._gWindProfile
             .append("path")
             .attr("class", "comp-profile")
-            .attr("d", this._line(this._arcsComp));
+            .attr("d", line(this._arcsComp));
+    }
+
+    updateWindProfileRotation() {
+        this._gWindProfile.attr("transform", `rotate(${this._shipCompare.windProfileRotate})`);
+        this._updateSpeedText();
     }
 
     /**
@@ -831,7 +989,7 @@ class ShipComparison extends Ship {
     updateDifferenceProfile() {
         this._setColourScale(this._minSpeedDiff, this._maxSpeedDiff);
 
-        this.mainG
+        this._gWindProfile
             // .insert("g", "g.compass-arc")
             .append("g")
             .attr("data-ui-component", "speed-markers")
@@ -841,8 +999,8 @@ class ShipComparison extends Ship {
                 enter
                     .append("circle")
                     .attr("r", 5)
-                    .attr("cy", (d, i) => Math.cos(i * segmentRadians) * -this.shipCompare.radiusSpeedScale(d.data))
-                    .attr("cx", (d, i) => Math.sin(i * segmentRadians) * this.shipCompare.radiusSpeedScale(d.data))
+                    .attr("cy", (d, i) => Math.cos(i * segmentRadians) * -this._shipCompare.radiusSpeedScale(d.data))
+                    .attr("cx", (d, i) => Math.sin(i * segmentRadians) * this._shipCompare.radiusSpeedScale(d.data))
                     .attr("fill", (d, i) => this._shipCompare.colourScaleSpeedDiff(this._speedDiff[i]))
                     .append("title")
                     .text(
@@ -1680,8 +1838,8 @@ export default class CompareShips {
                 const amount = property.isPercentage
                     ? formatSignPercent(property.amount / 100)
                     : property.amount < 1 && property.amount > 0
-                    ? formatPP(property.amount)
-                    : formatSignInt(property.amount);
+                        ? formatPP(property.amount)
+                        : formatSignInt(property.amount);
                 return `${property.modifier} ${amount}`;
             })
             .join("<br>")}</p>`;
