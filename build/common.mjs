@@ -1,6 +1,6 @@
 /*
     common.mjs
-    Copy of ../src/js/common.js
+    (More or less a) Copy of ../src/js/common.js
  */
 
 import fs from "fs";
@@ -129,10 +129,9 @@ export const capitalToCounty = new Map([
 ]);
 
 export function saveJson(fileName, data) {
-    // eslint-disable-next-line consistent-return
     fs.writeFile(fileName, JSON.stringify(data), "utf8", err => {
         if (err) {
-            return console.log(err);
+            return console.error(err);
         }
     });
 }
@@ -143,7 +142,7 @@ export function readTextFile(fileName) {
         data = fs.readFileSync(fileName, "utf8");
     } catch (error) {
         if (error.code === "ENOENT") {
-            // console.log("File", fileName, "not found");
+            console.error("File", fileName, "not found");
         } else {
             throw error;
         }
@@ -205,7 +204,7 @@ export function isEmpty(obj) {
 }
 
 /**
- * Convert radians to degrees (see {@link http://cwestblog.com/2012/11/12/javascript-degree-and-radian-conversion/})
+ * Convert radians to correctionValueDegrees (see {@link http://cwestblog.com/2012/11/12/javascript-degree-and-radian-conversion/})
  * @function
  * @param {Number} radians - Radians
  * @return {Number} Degrees
@@ -219,7 +218,7 @@ Math.radiansToDegrees = radians => (radians * 180) / Math.PI;
  */
 
 /**
- * Calculate the angle in degrees between two points
+ * Calculate the angle in correctionValueDegrees between two points
  * @see https://stackoverflow.com/questions/9970281/java-calculating-the-angle-between-two-points-in-degrees
  * @function
  * @param {Point} centerPt - Center point
@@ -234,7 +233,7 @@ export const rotationAngleInDegrees = (centerPt, targetPt) => {
 };
 
 /**
- * Calculate the angle in degrees between two points
+ * Calculate the angle in correctionValueDegrees between two points
  * @see https://stackoverflow.com/questions/9970281/java-calculating-the-angle-between-two-points-in-degrees
  * @function
  * @param {Point} centerPt - Center point
@@ -256,7 +255,7 @@ export const distancePoints = (centerPt, targetPt) =>
     Math.sqrt((centerPt.x - targetPt.x) ** 2 + (centerPt.y - targetPt.y) ** 2);
 
 /**
- * Convert degrees to radians
+ * Convert correctionValueDegrees to radians
  * @function
  * @param {Number} degrees - Degrees
  * @return {Number} Radians
@@ -362,7 +361,7 @@ export const sortBy = properties => (a, b) => {
         // property starts with '-' when sort is descending
         if (property.startsWith("-")) {
             sign = -1;
-            property = property.substr(1);
+            property = property.slice(1);
         }
 
         if (a[property] < b[property]) {
@@ -399,4 +398,5 @@ export const cleanName = name =>
     name
         .replace(/u([\dA-F]{4})/gi, match => String.fromCharCode(parseInt(match.replace(/u/g, ""), 16)))
         .replace(/'/g, "’")
+        .replace("oak", "Oak")
         .trim();

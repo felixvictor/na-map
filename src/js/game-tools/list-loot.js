@@ -1,3 +1,4 @@
+/* eslint-disable no-irregular-whitespace */
 /**
  * This file is part of na-map.
  *
@@ -39,9 +40,7 @@ export default class ListLoot {
 
     async _loadAndSetupData() {
         try {
-            this._sourceData = await import(/* webpackChunkName: "data-loot" */ "../../gen/loot.json").then(
-                data => data.default
-            );
+            this._sourceData = (await import(/* webpackChunkName: "data-loot" */ "../../gen/loot.json")).default;
         } catch (error) {
             putImportError(error);
         }
@@ -214,11 +213,11 @@ export default class ListLoot {
         const getChance = chance => formatInt((1 - chance) * 100);
 
         return html`
-            <table class="table table-sm">
+            <table class="table table-sm small">
                 <thead>
                     <tr>
                         <th scope="col">Item</th>
-                        <th scope="col" class="text-right">Chance (0\u202F\u2212\u202F100)</th>
+                        <th scope="col" class="text-right">Chance (0 − 100)</th>
                         <th scope="col" class="text-right">Amount</th>
                     </tr>
                 </thead>
