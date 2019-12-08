@@ -4,14 +4,14 @@
     <meta charset="utf-8">
     <meta content="width=device-width,initial-scale=1" name="viewport">
     <title>Naval Action map</title>
-    <meta content="Yet another map with in-game map, F11 coordinates, resources, ship and wood comparison. Port data is updated constantly from twitter and daily after maintenance." name="description">
+    <meta content="Yet another map with in-game map, resources, ship and wood comparisons. Port battle data is updated constantly from twitter and all data daily after maintenance." name="description">
     
-        <link href="https://na-map.netlify.com/" rel="canonical">
+        <meta content="noindex" name="robots">
     
     <meta content="Naval Action map" property="og:title" itemprop="name">
-    <meta content="Yet another map with in-game map, F11 coordinates, resources, ship and wood comparison. Port data is updated constantly from twitter and daily after maintenance." property="og:description" itemprop="description">
-    <meta content="images/icons/icon_1024x1024.png" property="og:image" itemprop="image">
-    <meta content="https://na-map.netlify.com/" property="og:url" itemprop="url">
+    <meta content="Yet another map with in-game map, resources, ship and wood comparisons. Port battle data is updated constantly from twitter and all data daily after maintenance." property="og:description" itemprop="description">
+    <meta content="images/icons/firefox_app_512x512.png" property="og:image" itemprop="image">
+    <meta content="" property="og:url" itemprop="url">
 
     <meta content="en_gb" property="og:locale">
     <meta content="website" property="og:type">
@@ -19,13 +19,15 @@
     <meta content="summary_large_image" name="twitter:card">
 
     <script src="https://www.google-analytics.com/analytics.js" async></script>
-<meta content="width=device-width,initial-scale=1,shrink-to-fit=no" name="viewport"><link href="main.0078b2a6282281e3ce85.css" rel="stylesheet" crossorigin="anonymous" integrity="sha256-+mBupJkcB5GMJQ9GooENh7A+0wlTRD7IJ+x9i7fglg0= sha384-mK4k3iRo5D9rd81dsLwYlDuEX9xznTFYtQBNUwBP2lLObaOGlInbViepj+sP8kwI"><meta name="theme-color" content="#6a7153" /><link rel="manifest" href="manifest.json" /></head>
+<link href="/images/icons/manifest.json" rel="manifest"><meta content="yes" name="mobile-web-app-capable"><meta content="#6a7153" name="theme-color"><meta content="na-map" name="application-name"><meta content="#a99d89" name="msapplication-TileColor"><meta content="/images/icons/mstile-144x144.png" name="msapplication-TileImage"><meta content="/images/icons/browserconfig.xml" name="msapplication-config"><meta content="width=device-width,initial-scale=1,shrink-to-fit=no" name="viewport"><link href="main.c2d72fd0ea09486a9dee.css" rel="stylesheet" crossorigin="anonymous" integrity="sha384-za0KB+At5yVPnsxRKMr7u2c2T3F4Zo1ggfCQWnjvtdOqMLGL8ui9Qt/Yovqk2QBL"></head>
 
 <body>
 
+
+
 <nav class="navbar navbar-expand-lg navbar-light">
     <a class="navbar-brand" href="/">
-        <img alt="Brand" height="32" src="images/icons/icon_32x32.png" width="32">
+        <img alt="Brand" height="32" src="images/icons/android-chrome-48x48.png" width="32">
     </a>
     <button class="navbar-toggler" type="button" aria-label="Toggle navigation" aria-controls="navbarSupportedContent" aria-expanded="false" data-target="#navbarSupportedContent" data-toggle="collapse">
         <span class="navbar-toggler-icon"></span>
@@ -89,7 +91,7 @@
                                         <div class="date input-group col-sm-8" id="prop-pb-from" data-target-input="nearest">
                                             <input class="datetimepicker-input form-control" id="prop-pb-from-input" type="text" aria-label="prop-pb-from" data-target="#prop-pb-from" required>
                                             <div class="input-group-append" data-target="#prop-pb-from" data-toggle="datetimepicker">
-                                                <span class="input-group-text"><i class="far fa-clock"></i></span>
+                                                <span class="input-group-text"><i class="icon icon-clock"></i></span>
                                             </div>
                                         </div>
                                     </div>
@@ -98,7 +100,7 @@
                                         <div class="date input-group col-sm-8" id="prop-pb-to" data-target-input="nearest">
                                             <input class="datetimepicker-input form-control" id="prop-pb-to-input" type="text" aria-label="prop-pb-to" data-target="#prop-pb-to" required>
                                             <div class="input-group-append" data-target="#prop-pb-to" data-toggle="datetimepicker">
-                                                <span class="input-group-text"><i class="far fa-clock"></i></span>
+                                                <span class="input-group-text"><i class="icon icon-options"></i></span>
                                             </div>
                                         </div>
                                     </div>
@@ -133,7 +135,7 @@
                                         <div class="date input-group col-sm-9" id="prop-from" data-target-input="nearest">
                                             <input class="datetimepicker-input form-control" id="prop-from-input" type="text" aria-label="prop-from" data-target="#prop-from" required>
                                             <div class="input-group-append" data-target="#prop-from" data-toggle="datetimepicker">
-                                                <span class="input-group-text"><i class="far fa-calendar"></i></span>
+                                                <span class="input-group-text"><i class="icon icon-calendar"></i></span>
                                             </div>
                                         </div>
                                     </div>
@@ -143,7 +145,7 @@
                                         <div class="date input-group col-sm-9" id="prop-to" data-target-input="nearest">
                                             <input class="datetimepicker-input form-control" id="prop-to-input" type="text" aria-label="prop-to" data-target="#prop-to" required>
                                             <div class="input-group-append" data-target="#prop-to" data-toggle="datetimepicker">
-                                                <span class="input-group-text"><i class="far fa-calendar"></i></span>
+                                                <span class="input-group-text"><i class="icon icon-calendar"></i></span>
                                             </div>
                                         </div>
                                     </div>
@@ -215,7 +217,7 @@
 
             <li class="nav-item pr-2 dropdown">
                 <a class="dropdown-toggle nav-link" id="settingsDropdown" href="#" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button" aria-label="Settings" title="Settings">
-                    <i class="fas text-secondary fa-cog" aria-hidden="true"></i><span class="sr-only">Settings</span>
+                    <i class="icon icon-navbar icon-options" aria-hidden="true"></i><span class="sr-only">Settings</span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-right extralarge-width" id="settingsMenu" aria-labelledby="settingsDropdown">
 
@@ -344,12 +346,14 @@
         </ul>
 
         <div class="btn-group" role="group">
-            <a class="btn px-2" href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=MHRQ7ZGR88XSG&source=url" role="button" aria-label="Donate" title="Donate" rel="”noopener”" target="_blank">
-                <i class="fas fa-donate text-primary" aria-hidden="true"></i><span class="sr-only">Donate</span>
-            </a>
-            <button class="btn px-2" type="button" aria-label="Clear" id="reset" title="Clear"><i class="fas text-secondary fa-eraser" aria-hidden="true"></i><span class="sr-only">Clear</span>
+            <button class="btn px-2" type="button" aria-label="Clear" id="reset" title="Clear">
+                <i class="icon icon-navbar icon-clear" aria-hidden="true"></i><span class="sr-only">Clear</span>
             </button>
-            <button class="btn px-2" type="button" aria-label="About" id="about" title="About"><i class="fas text-secondary fa-info-circle" aria-hidden="true"></i><span class="sr-only">About</span>
+            <a class="btn px-2" href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=MHRQ7ZGR88XSG&source=url" role="button" aria-label="Donate" title="Donate" rel="”noopener”" target="_blank">
+                <i class="icon icon-navbar icon-gift" aria-hidden="true"></i><span class="sr-only">Donate</span>
+            </a>
+            <button class="btn px-2" type="button" aria-label="About" id="about" title="About">
+                <i class="icon icon-navbar icon-info" aria-hidden="true"></i><span class="sr-only">About</span>
             </button>
         </div>
     </div>
@@ -359,7 +363,7 @@
     <div class="central" id="na-map"></div>
     <div class="overlay overlay-no-grid">
         <div class="wind-predict-column" id="wind">
-            <svg class="d-none coord"></svg>
+            <svg class="d-none wind-predict"></svg>
         </div>
         <div class="align-items-start toast-column" id="toast-column" aria-atomic="true" aria-live="polite"></div>
         <div class="summary-column" id="summary-column"></div>
@@ -368,7 +372,7 @@
 
 </main>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" crossorigin="anonymous" integrity="sha384-vk5WoKIaW/vJyUAd9n/wmopsmNhiy+L2Z+SBxGYnUkunIxVxAv/UtMOhba/xskxh"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.15.0/umd/popper.min.js" crossorigin="anonymous" integrity="sha384-L2pyEeut/H3mtgCBaUNw7KWzp5n9+4pDQiExs933/5QfaTh8YStYFFkOzSoXjlTb"></script>
-<script src="runtime.7b54849eaf3b98279da9.js" crossorigin="anonymous" integrity="sha256-fd+cnkWxRzwRo4oNvPp3i5tSm9v0I/FQwI7PvpDayhY= sha384-qS8uQ6QpCyPSNV3wVBLlCyeXJZ+wDW0IZ400JBG56veHKyH/L4ZheiIrDvVUJdKG"></script><script src="vendors~main.c64fad5a2fef867eb950.js" crossorigin="anonymous" integrity="sha256-uqy5PNWd74mPpnHBPLZAvFAqiogHpRXb7qj5j9hTxqo= sha384-5vk01JRMzfxZ0sFCxSrVKX3TxDZ4jU3x0hSDibJG+Tn72XJ+/ueh35TnAjL76QLT"></script><script src="main.450b31005235be6b92cb.js" crossorigin="anonymous" integrity="sha256-EL/L8tRZTxyRauYPExRTkJqsj5XzY0bELf/huwZfTJQ= sha384-REcXhc/bMlsVCAMnXFjEhNxgbg2ShTWmwHV+/pZkygzDkBjjwafBMlfr2nTRs1bP"></script></body>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.slim.min.js" crossorigin="anonymous" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" crossorigin="anonymous" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"></script>
+<script src="runtime.3543d445c981414edf24.js" crossorigin="anonymous" integrity="sha384-yfqRuPaK85erNrQWiUkENt31CO6tbvG393MmUNB1KqoVMUmTPC3buz37cuvHh/vO"></script><script src="vendors~main.b8956b6417814412ac58.js" crossorigin="anonymous" integrity="sha384-kSWVlVwJmKoF8EgAcmhiMND7AkhLSyx6YYGW3nhC0b7Jrku2/HxuDhMzqs/Hb54e"></script><script src="main.9a2f41d74e44cf9f9eec.js" crossorigin="anonymous" integrity="sha384-IoK458rNup85HRNMcAYxlBN4Y7o5n9RpiEkSx8NE9/0pXtyInl7UzYCXQsceewy6"></script></body>
 </html>
