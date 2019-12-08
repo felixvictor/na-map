@@ -135,17 +135,23 @@ text {
     }
 }
 
-.wood table tbody {
-    td + td {
-        text-align: right;
+.wood table {
+    thead {
+        background-color: $secondary-100;
     }
 
-    td:nth-child(1) {
-        width: 50%;
-    }
+    tbody {
+        td + td {
+            text-align: right;
+        }
 
-    td:nth-child(2) {
-        width: 50%;
+        td:nth-child(1) {
+            width: 50%;
+        }
+
+        td:nth-child(2) {
+            width: 50%;
+        }
     }
 }
 
@@ -214,15 +220,15 @@ text {
     }
 
     .pos {
-        @include colour($green);
+        @include colour($green-dark);
     }
 
     .neg {
-        @include colour($red);
+        @include colour($red-dark);
     }
 
     .diff {
-        opacity: .4;
+        opacity: .5;
     }
 }
 
@@ -481,7 +487,7 @@ svg {
 }
 
 .column-comp {
-    background-color: $white;
+    background-color: $secondary-050;
     font-variant-numeric: normal; // onum off
 }
 
@@ -502,7 +508,7 @@ svg {
 
 .ship-compare {
     .row-light {
-        background-color: $secondary-050;
+        background-color: $secondary-100;
     }
 }
 
@@ -846,8 +852,8 @@ $wind-profile-colour: $overlay-text-colour;
     fill: $wind-profile-colour;
     stroke: $wind-profile-colour;
     stroke-width: .7rem;
-
 }
+
 .wind-profile {
     text {
         fill: color-yiq($wind-profile-colour);
