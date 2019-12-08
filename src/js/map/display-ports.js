@@ -763,7 +763,7 @@ export default class DisplayPorts {
             .attr("r", circleSize);
     }
 
-    static _getTradePortMarker(port) {
+    _getTradePortMarker(port) {
         let marker = "";
         if (port.id === this.tradePortId) {
             marker = "here";
@@ -803,7 +803,7 @@ export default class DisplayPorts {
             fill = d => this._colourScaleNet(d.netIncome);
             r = d => this._portRadius(Math.abs(d.netIncome));
         } else if (this.showTradePortPartners) {
-            cssClass = d => `bubble ${DisplayPorts._getTradePortMarker(d)}`;
+            cssClass = d => `bubble ${this._getTradePortMarker(d)}`;
             r = d => (d.id === this.tradePortId ? rMax : rMax / 2);
         } else if (this._showRadius === "points") {
             data = this._portDataFiltered.filter(d => !d.nonCapturable);
