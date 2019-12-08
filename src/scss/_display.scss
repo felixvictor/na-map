@@ -2,15 +2,29 @@
 /// This file is part of na-map.
 /// Display.
 ///
-/// copyright 2017-18
+/// copyright 2017, 2018, 2019
 /// license   http://www.gnu.org/licenses/gpl.html
 /// @group    main
 /// @author   iB aka Felix Victor
 ////
 
-$background-colour: $primary-500 !default;
-$paddingHalf: map-get($spacers, 2) !default;
-$paddingThird: map-get($spacers, 1) !default;
+$background-colour: $primary-600;
+$paddingHalf: map-get($spacers, 2);
+$paddingThird: map-get($spacers, 1);
+
+$dark-overlay-background-colour: $primary-800;
+$dark-overlay-background-colour-contrast: $primary-700;
+$dark-overlay-background: rgba($dark-overlay-background-colour, .8);
+$dark-overlay-background-contrast: rgba($dark-overlay-background-colour-contrast, .8);
+$dark-overlay-text-colour-contrast: $primary-200;
+$dark-overlay-text-colour: color-yiq($dark-overlay-background);
+
+$overlay-background-colour: $primary-200;
+$overlay-background-colour-contrast: $primary-050;
+$overlay-background: rgba($overlay-background-colour, .8);
+$overlay-background-contrast: rgba($overlay-background-colour-contrast, .8);
+$overlay-text-colour-contrast: $primary-700;
+$overlay-text-colour: color-yiq($overlay-background);
 
 // opentype
 
@@ -38,23 +52,22 @@ table,
 
 @mixin caps {
     font-variant-caps: all-small-caps;
-    letter-spacing: 0.08em;
+    letter-spacing: .08em;
 }
 
 @mixin des {
     position: relative;
-    top: -0.4rem;
+    top: -.4rem;
     font-size: small;
-    color: $secondary-700;
 }
 
 .des {
-    @include des;
+    @include des();
 }
 
 .caps,
 .des {
-    @include caps;
+    @include caps();
 }
 
 .card-table {
@@ -73,7 +86,7 @@ text {
 .position {
     path {
         fill: $green;
-        fill-opacity: 0.6;
+        fill-opacity: .6;
     }
 }
 
@@ -91,12 +104,6 @@ text {
     table {
         thead {
             background-color: $secondary-100;
-        }
-
-        th,
-        td {
-            padding-top: $paddingHalf;
-            padding-bottom: $paddingHalf;
         }
 
         tbody {
@@ -120,7 +127,7 @@ text {
 
     th,
     td {
-        padding-right: $paddingHalf;
+        padding-right: $paddingThird;
     }
 
     td {
@@ -128,17 +135,23 @@ text {
     }
 }
 
-.wood table tbody {
-    td + td {
-        text-align: right;
+.wood table {
+    thead {
+        background-color: $secondary-100;
     }
 
-    td:nth-child(1) {
-        width: 50%;
-    }
+    tbody {
+        td + td {
+            text-align: right;
+        }
 
-    td:nth-child(2) {
-        width: 50%;
+        td:nth-child(1) {
+            width: 50%;
+        }
+
+        td:nth-child(2) {
+            width: 50%;
+        }
     }
 }
 
@@ -147,7 +160,7 @@ text {
 }
 
 .badge {
-    padding-top: 0.15rem;
+    padding-top: .15rem;
 }
 
 .mm {
@@ -182,171 +195,14 @@ text {
     background-color: $primary-100;
 }
 
-.coord {
-    svg {
-        overflow: auto;
-    }
-
-    circle {
-        fill: $secondary-600;
-        fill-opacity: 0.2;
-    }
-
-    text {
-        fill: $secondary-900;
-        text-anchor: middle;
-        dominant-baseline: central;
-
-        &.des {
-            fill: $secondary-800 !important;
-        }
-    }
-
-    rect {
-        fill: rgba($primary-100, 0.8);
-    }
-
-    path {
-        fill: none;
-        stroke: $secondary-600;
-        stroke-width: 0.3rem;
-    }
-
-    .label {
-        text {
-            text-anchor: start;
-        }
-
-        circle {
-            fill-opacity: 1;
-            cursor: pointer;
-        }
-
-        .drag-active {
-            stroke: $secondary-100;
-            stroke-width: 0.25rem;
-        }
-
-        .drag-hidden {
-            fill-opacity: 0;
-        }
-
-        .drag-hidden.drag-active {
-            stroke-width: 0;
-        }
-    }
-}
-
-.compass {
-    circle,
-    line {
-        stroke: $secondary-400;
-        stroke-width: 0.1rem;
-    }
-
-    text {
-        fill: $secondary-600;
-        text-anchor: middle;
-        dominant-baseline: central;
-    }
-}
-
-.small {
-    circle,
-    line {
-        stroke: $secondary-400;
-        stroke-width: 0.05rem;
-    }
-
-    path {
-        stroke-width: 0.15rem;
-    }
-}
-
-.label-rect {
-    fill: transparent;
-}
-
-.f11 {
-    circle {
-        fill: $secondary-600;
-        fill-opacity: 0.5;
-    }
-
-    text {
-        dominant-baseline: central;
-    }
-
-    rect {
-        fill: $primary-100;
-        fill-opacity: 0.7;
-    }
-}
-
-.f11-coord {
-    fill: $secondary-900;
-    text-anchor: end;
-}
-
-.f11-time {
-    fill: $secondary-600;
-    text-anchor: start;
-}
-
 .summary text {
     text-anchor: start;
-}
-
-.course-head {
-    fill: $secondary-600 !important;
-}
-
-.wind-head {
-    fill: $secondary-600 !important;
-}
-
-.trade-link {
-    fill: none;
-    stroke: $white;
-}
-
-.highlight {
-    stroke: $green;
-}
-
-.trade-label {
-    fill: $white;
-    text-anchor: middle;
-}
-
-.trade-head {
-    fill: $white;
-}
-
-.wind {
-    stroke: $secondary-600 !important;
-}
-
-.wind,
-.wind-text {
-    text-anchor: middle !important;
-}
-
-.wind-text-current {
-    font-size: smaller;
-    fill: $secondary-600 !important;
-}
-
-.trades {
-    .link {
-        fill: none;
-    }
 }
 
 .flag-icon {
     width: 2rem;
     height: 100%;
-    margin-right: 0.4rem;
+    margin-right: .4rem;
 }
 
 .rate {
@@ -364,15 +220,15 @@ text {
     }
 
     .pos {
-        @include colour($green);
+        @include colour($green-dark);
     }
 
     .neg {
-        @include colour($red);
+        @include colour($red-dark);
     }
 
     .diff {
-        opacity: 0.4;
+        opacity: .5;
     }
 }
 
@@ -388,12 +244,12 @@ text {
 
 .area {
     .area-label {
-        fill-opacity: 0.7;
+        fill-opacity: .7;
         fill: $white;
     }
 
     path {
-        stroke-opacity: 0.4;
+        stroke-opacity: .4;
         stroke: $white !important;
         stroke-width: 2px;
     }
@@ -429,7 +285,7 @@ text {
     grid-area: x-axis;
     grid-column: 1 / 5;
     grid-row: 1;
-    background: rgba($primary-200, 0.4);
+    background: rgba($primary-200, .4);
 }
 
 .overlay-grid::after // acts as axis-rect-y
@@ -438,7 +294,7 @@ text {
     grid-area: y-axis;
     grid-column: 1 / 1;
     grid-row: 1 / 3;
-    background: rgba($primary-200, 0.4);
+    background: rgba($primary-200, .4);
 }
 
 .wind-predict-column {
@@ -459,7 +315,7 @@ text {
 }
 
 .block {
-    padding: $paddingHalf;
+    padding: $paddingThird;
 }
 
 .port-summary {
@@ -473,10 +329,11 @@ text {
 .port-summary,
 .journey-summary {
     display: grid;
-    padding: $paddingHalf;
-    pointer-events: all;
-    background: rgba($primary-200, 0.8);
+    padding: $paddingThird;
     line-height: 1;
+    color: $overlay-text-colour;
+    pointer-events: all;
+    background-color: $overlay-background;
     button {
         margin-bottom: map-get($spacers, 2);
     }
@@ -496,11 +353,16 @@ text {
     flex: 1 1 auto;
     flex-direction: column;
     overflow-y: scroll;
+    color: $overlay-text-colour;
     pointer-events: all;
-    background: rgba($primary-100, 0.8);
+    background: $overlay-background;
 
     .bootstrap-select {
-        padding: $paddingHalf;
+        padding: $paddingThird;
+    }
+
+    .card {
+        background: $overlay-background;
     }
 }
 
@@ -510,7 +372,11 @@ text {
     padding-top: $spacer;
 
     .block:nth-of-type(odd) {
-        background: rgba($primary-400, 0.3);
+        background: $overlay-background-contrast;
+    }
+
+    .des {
+        color: $overlay-text-colour-contrast;
     }
 }
 
@@ -524,6 +390,30 @@ text {
 
     & > div {
         padding: 0 $paddingThird;
+    }
+}
+
+.trade-link {
+    fill: none;
+    stroke: $dark-overlay-text-colour;
+}
+
+.highlight {
+    stroke: $green-light;
+}
+
+.trade-label {
+    fill: $overlay-text-colour;
+    text-anchor: middle;
+}
+
+.trade-head {
+    fill: $overlay-text-colour;
+}
+
+.trades {
+    .link {
+        fill: none;
     }
 }
 
@@ -554,11 +444,12 @@ svg {
     }
 
     line {
-        stroke: $primary-600;
+        stroke: $primary-500;
     }
 
     text {
         font-style: italic;
+        fill: $primary-100;
     }
 }
 
@@ -568,24 +459,17 @@ svg {
 
 .compass-arc,
 .speed-circle {
-    fill: none;
     stroke: $primary-200;
 }
 
 .speed-text {
+    user-select: none;
     fill: $primary-300;
-}
-
-.wind-arrow {
-    opacity: 0.3;
-    fill: none;
-    stroke: $secondary-600;
-    stroke-width: 0.5em;
 }
 
 .base-profile,
 .comp-profile {
-    opacity: 0.5;
+    opacity: .5;
 }
 
 .base-profile {
@@ -634,7 +518,7 @@ svg {
 
 .port-name {
     font-size: x-large;
-    @include caps;
+    @include caps();
     font-variant-numeric: normal;
 }
 
@@ -643,13 +527,14 @@ svg {
 }
 
 .summary-des {
-    @include caps;
-    @include des;
+    @include caps();
+    @include des();
     top: 0;
+    color: $overlay-text-colour-contrast;
 }
 
 .bubble {
-    fill-opacity: 0.7;
+    fill-opacity: .7;
 }
 
 .both {
@@ -668,17 +553,17 @@ svg {
     fill: $green;
 }
 
-.non-capturable {
-    opacity: 0.8;
-    fill: gray;
+.not-capturable {
+    opacity: .6;
+    fill: $gray-200;
 }
 
 .capital {
-    opacity: 0.8;
+    opacity: .9;
 }
 
 .non-capital {
-    opacity: 0.4;
+    opacity: .4;
 }
 
 .hidden {
@@ -699,7 +584,7 @@ svg {
 
 .county {
     font-size: 60px;
-    letter-spacing: 0.6rem;
+    letter-spacing: .6rem;
 }
 
 .port-names {
@@ -715,12 +600,12 @@ svg {
 ////
 
 .pb {
-    stroke-width: 0.5px;
+    stroke-width: .5px;
     stroke-opacity: 1;
 }
 
 .pb-circle {
-    fill: $primary-900;
+    fill: $primary-800;
 }
 
 .pb-text {
@@ -764,21 +649,228 @@ svg {
 }
 
 .raid-join-circle {
-    stroke: $secondary-500;
-    stroke-width: 1px;
     fill: none;
+    stroke: $secondary-300;
+    stroke-width: 1px;
 }
 
 .pb-join-circle {
     @extend .raid-join-circle;
-    fill: $secondary-300;
-    fill-opacity: 0.4;
 }
 
 // capital ports
 pattern > circle {
-    stroke-opacity: 0.8;
-    stroke-width: 4;
-    stroke: $white;
     fill: none;
+    stroke: $white;
+    stroke-opacity: .8;
+    stroke-width: 4;
+}
+
+///
+// svg classes
+///
+
+.f11,
+.ingame-wind,
+.journey,
+.wind-predict {
+    svg {
+        overflow: auto;
+    }
+
+    circle {
+        fill-opacity: .2;
+    }
+
+    path {
+        fill: none;
+        stroke-width: .3rem;
+    }
+
+    text {
+        text-anchor: middle;
+        dominant-baseline: central;
+    }
+
+    line {
+        stroke-width: .1rem;
+    }
+}
+
+.ingame-wind,
+.wind-predict {
+    circle {
+        fill: color-yiq($overlay-background);
+    }
+
+    path {
+        stroke: color-yiq($overlay-background);
+    }
+
+    rect {
+        fill: $overlay-background;
+    }
+
+    text {
+        fill: $overlay-text-colour;
+
+        .des {
+            fill: $overlay-background-colour !important;
+        }
+    }
+
+    circle,
+    line {
+        stroke: $overlay-text-colour;
+    }
+
+    .text-light-separation {
+        fill: $overlay-text-colour-contrast !important;
+    }
+}
+
+.f11,
+.journey {
+    circle {
+        fill: color-yiq($dark-overlay-background);
+    }
+
+    path {
+        stroke: color-yiq($dark-overlay-background);
+    }
+
+    rect {
+        fill: $dark-overlay-background;
+    }
+
+    text {
+        fill: $dark-overlay-text-colour;
+
+        .des {
+            fill: $dark-overlay-background-colour !important;
+        }
+    }
+
+    circle,
+    line {
+        stroke: $dark-overlay-text-colour;
+    }
+
+    .text-light-separation {
+        fill: $dark-overlay-text-colour-contrast !important;
+    }
+}
+
+.f11-coord {
+    text-anchor: end !important;
+}
+
+.f11-time {
+    text-anchor: start !important;
+}
+
+.f11 {
+    circle {
+        fill-opacity: .5;
+    }
+}
+
+.journey {
+    .label {
+        fill-opacity: 1;
+
+        circle {
+            cursor: pointer;
+            stroke: $dark-overlay-text-colour;
+            fill-opacity: 1;
+        }
+
+        text {
+            text-anchor: start;
+        }
+
+        .drag-hidden {
+            fill-opacity: 0;
+            stroke: none;
+        }
+
+        .drag-hidden.drag-active {
+            stroke-width: 0;
+        }
+    }
+}
+
+.compass {
+    circle,
+    line {
+        stroke-width: .1rem;
+    }
+}
+
+.small {
+    circle,
+    line {
+        stroke-width: .05rem;
+    }
+
+    path {
+        stroke-width: .15rem;
+    }
+}
+
+.wind-predict-arrow-head {
+    fill: color-yiq($overlay-background);
+}
+
+.journey-arrow-head,
+.trade-arrow-head {
+    fill: color-yiq($dark-overlay-background);
+}
+
+$ship-outline-colour: $secondary-500;
+.ship-outline {
+    fill: $ship-outline-colour;
+    stroke: $ship-outline-colour;
+    stroke-width: .7rem;
+
+    circle {
+        cursor: pointer;
+    }
+
+    text {
+        fill: color-yiq($ship-outline-colour);
+    }
+}
+
+$wind-profile-colour: $overlay-text-colour;
+.wind-profile-arrow-head {
+    fill: $wind-profile-colour;
+}
+
+.wind-profile-arrow {
+    opacity: .5;
+    fill: $wind-profile-colour;
+    stroke: $wind-profile-colour;
+    stroke-width: .7rem;
+}
+
+.wind-profile {
+    text {
+        fill: color-yiq($wind-profile-colour);
+    }
+}
+
+.ship-outline,
+.wind-profile {
+    text {
+        font-size: small;
+        pointer-events: none;
+        stroke: none;
+        text-anchor: middle;
+        dominant-baseline: mathematical;
+    }
+}
+
+.drag-active {
+    stroke-width: .5rem;
 }

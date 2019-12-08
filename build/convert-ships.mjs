@@ -11,7 +11,7 @@ function convertShips() {
     const carroWeight = [0, 0, 68, 42, 32, 24, 0, 18, 12];
     const ships = [];
 
-    APIItems.filter(item => item.ItemType === "Ship").forEach(ship => {
+    APIItems.filter(item => item.ItemType === "Ship" && !item.NotUsed).forEach(ship => {
         const calcPortSpeed = ship.Specs.MaxSpeed * speedConstA - speedConstB;
         const speedDegrees = ship.Specs.SpeedToWind.map(speed => roundToThousands(speed * calcPortSpeed));
         const { length } = ship.Specs.SpeedToWind;
@@ -42,7 +42,7 @@ function convertShips() {
             speedDegrees,
             speed: {
                 min: speedDegrees.reduce((a, b) => Math.min(a, b)),
-                max: calcPortSpeed
+                max: roundToThousands(calcPortSpeed)
             },
             sides: { armour: ship.HealthInfo.LeftArmor, thickness: 0 },
             bow: { armour: ship.HealthInfo.FrontArmor, thickness: 0 },
