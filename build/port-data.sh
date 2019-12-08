@@ -89,8 +89,9 @@ function common_var () {
     loot_file="${gen_dir}/loot.json"
     nation_file="${gen_dir}/nations.json"
     ownership_file="${gen_dir}/ownership.json"
-    port_file="${gen_dir}/ports.json"
     pb_zone_file="${gen_dir}/pb-zones.json"
+    port_file="${gen_dir}/ports.json"
+    prices_file="${gen_dir}/prices.json"
     recipe_file="${gen_dir}/recipes.json"
     repair_file="${gen_dir}/repairs.json"
     ship_blueprint_file="${gen_dir}/ship-blueprints.json"
@@ -108,8 +109,11 @@ function get_API_data () {
     url="${source_base_url}${api_var}_${server_base_name}${server_name}.json"
 
     if [[ ! -f "${out_file}" ]]; then
-        curl --silent --output "${out_file}" "${url}"
-        sed -i -e "s/^var $api_var = //; s/\\;$//" "${out_file}"
+        if curl --fail --silent --output "${out_file}" "${url}"; then
+            sed -i -e "s/^var $api_var = //; s/\\;$//" "${out_file}"
+        else
+            exit $?
+        fi
     fi
 }
 
@@ -192,7 +196,7 @@ function get_port_data () {
         ${command_nodejs} build/convert-cannons.mjs "${build_dir}/Modules" "${cannon_file}"
         ${command_nodejs} build/convert-module-repair-data.mjs "${build_dir}/Modules" "${repair_file}"
         ${command_nodejs} build/convert-modules.mjs "${api_base_file}-${server_names[0]}" "${gen_dir}" "${server_date}"
-        ${command_nodejs} build/convert-buildings.mjs "${api_base_file}-${server_names[0]}" "${building_file}" "${server_date}"
+        ${command_nodejs} build/convert-buildings.mjs "${api_base_file}-${server_names[0]}" "${building_file}" "${prices_file}" "${server_date}"
         ${command_nodejs} build/convert-loot.mjs "${api_base_file}-${server_names[0]}" "${loot_file}" "${server_date}"
         ${command_nodejs} build/convert-recipes.mjs "${api_base_file}-${server_names[0]}" "${recipe_file}" "${server_date}"
         ${command_nodejs} build/convert-ship-blueprints.mjs "${api_base_file}-${server_names[0]}" "${ship_blueprint_file}" "${server_date}"

@@ -125,7 +125,7 @@ export default class ShowTrades {
             .attr("orient", "auto-start-reverse")
             .append("path")
             .attr("d", `M0,0L0,${this._arrowY}L${this._arrowX},${this._arrowY / 2}z`)
-            .attr("class", "trade-head");
+            .attr("class", "trade-arrow-head");
 
         this._tradeDetailsDiv = d3Select("main #summary-column")
             .append("div")
@@ -295,11 +295,14 @@ export default class ShowTrades {
         const dataDirectory = "data";
 
         try {
-            this._portData = await import(/* webpackChunkName: "data-ports" */ "../../gen/ports.json").then(
-                data => data.default
-            );
-
+            const portData = (await import(/* webpackChunkName: "data-ports" */ "../../gen/ports.json")).default;
+            const pbData = await (await fetch(`${dataDirectory}/${this._serverName}-pb.json`)).json();
             this._linkDataDefault = await (await fetch(`${dataDirectory}/${this._serverName}-trades.json`)).json();
+            // Combine port data with port battle data
+            this._portData = portData.map(port => {
+                const pbPortData = pbData.ports.find(d => d.id === port.id);
+                return { ...port, ...pbPortData };
+            });
         } catch (error) {
             putImportError(error);
         }
@@ -315,11 +318,6 @@ export default class ShowTrades {
     }
 
     async showOrHide() {
-        const show = () => {
-            ShowTrades._showElem(this._tradeDetailsDiv);
-            this._linkData = this._linkDataDefault;
-        };
-
         if (this.show) {
             if (!this._isDataLoaded) {
                 await this._loadAndSetupData().then(() => {
@@ -327,7 +325,8 @@ export default class ShowTrades {
                 });
             }
 
-            show();
+            ShowTrades._showElem(this._tradeDetailsDiv);
+            this._linkData = this._linkDataDefault;
         } else {
             ShowTrades._hideElem(this._tradeDetailsDiv);
             this._linkData = [];
@@ -354,30 +353,40 @@ export default class ShowTrades {
         return `trade-${link.source.id}-${link.good.replace(/ /g, "")}-${link.target.id}`;
     }
 
-    _getTradeLimitedData(trade) {
-        const addInfo = text => `<div><div>${text}</div>`;
-        const addDes = text => `<div class="des">${text}</div></div>`;
-        const getDepth = isShallow => (isShallow ? "(shallow)" : "(deep)");
+    static _addInfo(text) {
+        return `<div><div>${text}</div>`;
+    }
 
+    static _addDes(text) {
+        return `<div class="des">${text}</div></div>`;
+    }
+
+    static _getDepth(isShallow) {
+        return isShallow ? "(shallow)" : "(deep)";
+    }
+
+    _getTradeLimitedData(trade) {
         const weight = trade.weightPerItem * trade.quantity;
 
         let h = "";
-        h += addInfo(`${formatInt(trade.quantity)} ${trade.good}`) + addDes("trade");
-        h += addInfo(`${formatSiCurrency(trade.profit)}`) + addDes(this._profitText);
-        h += addInfo(`${formatSiInt(weight)} ${weight === 1 ? "ton" : "tons"}`) + addDes("weight");
+        h += ShowTrades._addInfo(`${formatInt(trade.quantity)} ${trade.good}`) + ShowTrades._addDes("trade");
+        h += ShowTrades._addInfo(`${formatSiCurrency(trade.profit)}`) + ShowTrades._addDes(this._profitText);
         h +=
-            addInfo(
+            ShowTrades._addInfo(`${formatSiInt(weight)} ${weight === 1 ? "ton" : "tons"}`) +
+            ShowTrades._addDes("weight");
+        h +=
+            ShowTrades._addInfo(
                 `${this._nodeData.get(trade.source.id).name} <span class="caps">${
                     this._nodeData.get(trade.source.id).nation
                 }</span>`
-            ) + addDes(`from ${getDepth(this._nodeData.get(trade.source.id).isShallow)}`);
+            ) + ShowTrades._addDes(`from ${ShowTrades._getDepth(this._nodeData.get(trade.source.id).isShallow)}`);
         h +=
-            addInfo(
+            ShowTrades._addInfo(
                 `${this._nodeData.get(trade.target.id).name} <span class="caps">${
                     this._nodeData.get(trade.target.id).nation
                 }</span>`
-            ) + addDes(`to ${getDepth(this._nodeData.get(trade.target.id).isShallow)}`);
-        h += addInfo(`${formatSiInt(trade.distance)}\u2009k`) + addDes("distance");
+            ) + ShowTrades._addDes(`to ${ShowTrades._getDepth(this._nodeData.get(trade.target.id).isShallow)}`);
+        h += ShowTrades._addInfo(`${formatSiInt(trade.distance)}\u2009k`) + ShowTrades._addDes("distance");
 
         return h;
     }
@@ -392,13 +401,15 @@ export default class ShowTrades {
         return trade.profitTotal / trade.distance;
     }
 
-    _getTradeFullData(trade) {
-        const addInfo = text => `<div>${text}</div>`;
-        const addDes = text => `<div class="des">${text}</div>`;
-        const startBlock = text => `<div class="block-block"><span>${text}</span>`;
-        const endBlock = () => "</div>";
-        const getDepth = isShallow => (isShallow ? "(shallow)" : "(deep)");
+    static _startBlock(text) {
+        return `<div class="block-block"><span>${text}</span>`;
+    }
 
+    static _endBlock() {
+        return "</div>";
+    }
+
+    _getTradeFullData(trade) {
         const weight = trade.weightPerItem * trade.quantity;
         const profitPerItem = trade.target.grossPrice - trade.source.grossPrice;
         const profitPerDistance = ShowTrades._getProfitPerDistance(trade);
@@ -406,37 +417,75 @@ export default class ShowTrades {
 
         let h = "";
 
-        h += startBlock("Trade");
-        h += addInfo(`${formatInt(trade.quantity)} ${trade.good}`) + addDes("good");
-        h += addInfo(`${formatSiCurrency(trade.source.grossPrice)}`) + addDes("gross buy price");
-        h += addInfo(`${formatSiCurrency(trade.target.grossPrice)}`) + addDes("gross sell price");
-        h += addInfo(`${formatSiInt(weight)} ${weight === 1 ? "ton" : "tons"}`) + addDes("weight");
-        h += endBlock();
-
-        h += startBlock("Profit");
-        h += addInfo(`${formatSiCurrency(trade.profitTotal)}`) + addDes("total");
-        h += addInfo(`${formatSiCurrency(profitPerItem)}`) + addDes("profit/item");
-        h += addInfo(`${formatSiCurrency(profitPerDistance)}`) + addDes("profit/distance");
-        h += addInfo(`${formatSiCurrency(profitPerWeight)}`) + addDes("profit/weight");
-        h += endBlock();
-
-        h += startBlock("Route");
+        h += ShowTrades._startBlock("Trade");
+        h += ShowTrades._addInfo(`${formatInt(trade.quantity)} ${trade.good}`) + ShowTrades._addDes("good");
         h +=
-            addInfo(
+            ShowTrades._addInfo(`${formatSiCurrency(trade.source.grossPrice)}`) + ShowTrades._addDes("gross buy price");
+        h +=
+            ShowTrades._addInfo(`${formatSiCurrency(trade.target.grossPrice)}`) +
+            ShowTrades._addDes("gross sell price");
+        h +=
+            ShowTrades._addInfo(`${formatSiInt(weight)} ${weight === 1 ? "ton" : "tons"}`) +
+            ShowTrades._addDes("weight");
+        h += ShowTrades._endBlock();
+
+        h += ShowTrades._startBlock("Profit");
+        h += ShowTrades._addInfo(`${formatSiCurrency(trade.profitTotal)}`) + ShowTrades._addDes("total");
+        h += ShowTrades._addInfo(`${formatSiCurrency(profitPerItem)}`) + ShowTrades._addDes("profit/item");
+        h += ShowTrades._addInfo(`${formatSiCurrency(profitPerDistance)}`) + ShowTrades._addDes("profit/distance");
+        h += ShowTrades._addInfo(`${formatSiCurrency(profitPerWeight)}`) + ShowTrades._addDes("profit/weight");
+        h += ShowTrades._endBlock();
+
+        h += ShowTrades._startBlock("Route");
+        h +=
+            ShowTrades._addInfo(
                 `${this._nodeData.get(trade.source.id).name} <span class="caps">${
                     this._nodeData.get(trade.source.id).nation
                 }</span>`
-            ) + addDes(`from ${getDepth(this._nodeData.get(trade.source.id).isShallow)}`);
+            ) + ShowTrades._addDes(`from ${ShowTrades._getDepth(this._nodeData.get(trade.source.id).isShallow)}`);
         h +=
-            addInfo(
+            ShowTrades._addInfo(
                 `${this._nodeData.get(trade.target.id).name} <span class="caps">${
                     this._nodeData.get(trade.target.id).nation
                 }</span>`
-            ) + addDes(`to ${getDepth(this._nodeData.get(trade.source.id).isShallow)}`);
-        h += addInfo(`${formatSiInt(trade.distance)}\u2009k`) + addDes("distance");
-        h += endBlock();
+            ) + ShowTrades._addDes(`to ${ShowTrades._getDepth(this._nodeData.get(trade.source.id).isShallow)}`);
+        h += ShowTrades._addInfo(`${formatSiInt(trade.distance)}\u2009k`) + ShowTrades._addDes("distance");
+        h += ShowTrades._endBlock();
 
         return h;
+    }
+
+    _showDetails(d, i, nodes) {
+        const trade = d3Select(nodes[i]);
+        const title = this._getTradeFullData(d);
+
+        $(trade.node())
+            .tooltip({
+                html: true,
+                placement: "auto",
+                template:
+                    '<div class="tooltip" role="tooltip">' +
+                    '<div class="tooltip-block tooltip-inner tooltip-small">' +
+                    "</div></div>",
+                title,
+                trigger: "manual",
+                sanitize: false
+            })
+            .tooltip("show");
+    }
+
+    static _hideDetails(d, i, nodes) {
+        $(d3Select(nodes[i]).node()).tooltip("dispose");
+    }
+
+    _getSiblingLinks(sourceId, targetId) {
+        return this._linkDataFiltered
+            .filter(
+                link =>
+                    (link.source.id === sourceId && link.target.id === targetId) ||
+                    (link.source.id === targetId && link.target.id === sourceId)
+            )
+            .map(link => link.profit);
     }
 
     /**
@@ -445,39 +494,7 @@ export default class ShowTrades {
      * @private
      */
     _updateGraph() {
-        const showDetails = (d, i, nodes) => {
-            const trade = d3Select(nodes[i]);
-            const title = this._getTradeFullData(d);
-
-            $(trade.node())
-                .tooltip({
-                    html: true,
-                    placement: "auto",
-                    template:
-                        '<div class="tooltip" role="tooltip">' +
-                        '<div class="tooltip-block tooltip-inner tooltip-small">' +
-                        "</div></div>",
-                    title,
-                    trigger: "manual",
-                    sanitize: false
-                })
-                .tooltip("show");
-        };
-
-        const hideDetails = (d, i, nodes) => {
-            $(d3Select(nodes[i]).node()).tooltip("dispose");
-        };
-
         const arcPath = (leftHand, d) => {
-            const getSiblingLinks = (sourceId, targetId) =>
-                this._linkDataFiltered
-                    .filter(
-                        link =>
-                            (link.source.id === sourceId && link.target.id === targetId) ||
-                            (link.source.id === targetId && link.target.id === sourceId)
-                    )
-                    .map(link => link.profit);
-
             const source = { x: this._nodeData.get(d.source.id).x, y: this._nodeData.get(d.source.id).y };
             const target = { x: this._nodeData.get(d.target.id).x, y: this._nodeData.get(d.target.id).y };
             const x1 = leftHand ? source.x : target.x;
@@ -489,7 +506,7 @@ export default class ShowTrades {
             const xRotation = 0;
             const largeArc = 0;
             const sweep = leftHand ? 0 : 1;
-            const siblings = getSiblingLinks(d.source.id, d.target.id);
+            const siblings = this._getSiblingLinks(d.source.id, d.target.id);
             if (siblings.length > 1) {
                 const arcScale = d3ScalePoint()
                     .domain(siblings)
@@ -530,8 +547,8 @@ export default class ShowTrades {
                         )
                         .attr("id", d => ShowTrades._getId(d))
                         .attr("opacity", 0)
-                        .on("click", showDetails)
-                        .on("mouseleave", hideDetails)
+                        .on("click", (d, i, nodes) => this._showDetails(d, i, nodes))
+                        .on("mouseleave", ShowTrades._hideDetails)
                         .call(enterCall => enterCall.transition(transition).attr("opacity", 1)),
                 update => update.attr("opacity", 1),
                 exit =>
@@ -626,11 +643,13 @@ export default class ShowTrades {
     _updateTradeList() {
         let highlightLink;
 
+        // eslint-disable-next-line unicorn/consistent-function-scoping
         const highlightOn = d => {
             highlightLink = d3Select(`path#${ShowTrades._getId(d)}`).classed("highlight", true);
             highlightLink.dispatch("click");
         };
 
+        // eslint-disable-next-line unicorn/consistent-function-scoping
         const highlightOff = () => {
             highlightLink.classed("highlight", false);
             highlightLink.dispatch("mouseleave");
