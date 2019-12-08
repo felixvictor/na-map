@@ -77,17 +77,14 @@ export const formatFloatFixedHTML = (x, f = 2) => {
 
     if (decimals) {
         if (decimals === "0" || decimals === "00") {
-            decimals = html`
-                <span class="hidden">.${decimals}</span>
-            `;
+            // eslint-disable-next-line prettier/prettier
+            decimals = html`<span class="hidden">.${decimals}</span>`;
         } else if (decimals.endsWith("0")) {
-            decimals = html`
-                .${decimals.replace("0", "")}<span class="hidden">0</span>
-            `;
+            // eslint-disable-next-line prettier/prettier
+            decimals = html`.${decimals.replace("0", "")}<span class="hidden">0</span>`;
         } else {
-            decimals = html`
-                .${decimals}
-            `;
+            // eslint-disable-next-line prettier/prettier
+            decimals = html`.${decimals}`;
         }
     }
 
