@@ -1,6 +1,6 @@
 /*
     common.mjs
-    Copy of ../src/js/common.js
+    (More or less a) Copy of ../src/js/common.js
  */
 
 import fs from "fs";
@@ -129,10 +129,9 @@ export const capitalToCounty = new Map([
 ]);
 
 export function saveJson(fileName, data) {
-    // eslint-disable-next-line consistent-return
     fs.writeFile(fileName, JSON.stringify(data), "utf8", err => {
         if (err) {
-            return console.log(err);
+            return console.error(err);
         }
     });
 }
@@ -143,7 +142,7 @@ export function readTextFile(fileName) {
         data = fs.readFileSync(fileName, "utf8");
     } catch (error) {
         if (error.code === "ENOENT") {
-            // console.log("File", fileName, "not found");
+            console.error("File", fileName, "not found");
         } else {
             throw error;
         }
@@ -362,7 +361,7 @@ export const sortBy = properties => (a, b) => {
         // property starts with '-' when sort is descending
         if (property.startsWith("-")) {
             sign = -1;
-            property = property.substr(1);
+            property = property.slice(1);
         }
 
         if (a[property] < b[property]) {
