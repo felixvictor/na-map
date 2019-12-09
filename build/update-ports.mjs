@@ -63,7 +63,7 @@ function updatePorts() {
 
         console.log("      --- captured by NPC", i);
         port.nation = "NT";
-        port.capturer = "";
+        port.capturer = "RAIDER";
         port.lastPortBattle = moment.utc(result[1], "DD-MM-YYYY HH:mm").format("YYYY-MM-DD HH:mm");
         port.attackerNation = "";
         port.attackerClan = "";
@@ -298,7 +298,7 @@ function updatePorts() {
                 () => {};
             }
         } else if (tweetTime.isAfter(moment.utc(serverStart).subtract(1, "day"))) {
-            // Add scheduled port battles (only if battle is in the future
+            // Add scheduled port battles (only if battle is in the future)
             if ((result = portBattleRegex.exec(tweet.text)) !== null) {
                 if (moment.utc().isBefore(moment.utc(result[4], "DD MMM YYYY HH:mm"))) {
                     isPortDataChanged = true;
@@ -307,6 +307,9 @@ function updatePorts() {
             } else if ((result = npcPortBattleRegex.exec(tweet.text)) !== null) {
                 isPortDataChanged = true;
                 npcPortBattleScheduled(result);
+            } else if ((result = npcDefendedRegex.exec(tweet.text)) !== null) {
+                isPortDataChanged = true;
+                defended(result);
             }
         } else if (tweetTime.isAfter(moment.utc(serverStart).subtract(2, "day"))) {
             // Add scheduled NPC raids
