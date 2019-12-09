@@ -1330,11 +1330,7 @@ export default class CompareShips {
 
         this._selectedShips = { Base: {}, C1: {}, C2: {} };
 
-        if (this._baseId === "ship-journey") {
-            this._woodId = "wood-journey";
-        } else {
-            this._woodId = "wood-ship";
-        }
+        this._woodId = "wood-ship";
 
         this._setupArrow();
         if (this._baseId !== "ship-journey") {
@@ -1469,8 +1465,10 @@ export default class CompareShips {
             ).default;
             this._shipData = (await import(/* webpackChunkName: "data-ships" */ "../../gen/ships.json")).default;
             this._setupData();
-            this.woodCompare = new CompareWoods(this._woodId);
-            await this.woodCompare.woodInit();
+            if (this._baseId !== "ship-journey") {
+                this.woodCompare = new CompareWoods(this._woodId);
+                await this.woodCompare.woodInit();
+            }
         } catch (error) {
             putImportError(error);
         }
@@ -1627,7 +1625,7 @@ export default class CompareShips {
 
         // Get types from moduleProperties list
         this._moduleTypes = new Set(
-            [...this._moduleProperties].map(module => module[1].type.replace(/\s\u2013\s[a-zA-Z/\u25CB\s]+/, ""))
+            [...this._moduleProperties].map(module => module[1].type.replace(/\s\u2013\s[\s/A-Za-z\u25CB]+/, ""))
         );
     }
 
@@ -1699,10 +1697,12 @@ export default class CompareShips {
     _initSelectColumns() {
         for (const columnId of this._columns) {
             this._setupShipSelect(columnId);
-            this._selectWood$[columnId] = {};
-            for (const type of ["frame", "trim"]) {
-                this._selectWood$[columnId][type] = $(`#${this._getWoodSelectId(type, columnId)}`);
-                this.woodCompare._setupWoodSelects(columnId, type, this._selectWood$[columnId][type]);
+            if (this._baseId !== "ship-journey") {
+                this._selectWood$[columnId] = {};
+                for (const type of ["frame", "trim"]) {
+                    this._selectWood$[columnId][type] = $(`#${this._getWoodSelectId(type, columnId)}`);
+                    this.woodCompare._setupWoodSelects(columnId, type, this._selectWood$[columnId][type]);
+                }
             }
 
             this._setupSelectListener(columnId);
@@ -1768,12 +1768,12 @@ export default class CompareShips {
     _getUpgradesOptions(moduleType, shipClass) {
         // Nest module data by sub type (e.g. "Gunnery")
         const modules = d3Nest()
-            .key(module => module[1].type.replace(/[a-zA-Z\s]+\s–\s/, ""))
+            .key(module => module[1].type.replace(/[\sA-Za-z]+\s–\s/, ""))
             .sortKeys(d3Ascending)
             .entries(
                 [...this._moduleProperties].filter(
                     module =>
-                        module[1].type.replace(/\s–\s[a-zA-Z/\u25CB\s]+/, "") === moduleType &&
+                        module[1].type.replace(/\s–\s[\s/A-Za-z\u25CB]+/, "") === moduleType &&
                         (module[1].moduleLevel === "U" ||
                             module[1].moduleLevel === CompareShips._getModuleLevel(shipClass))
                 )
@@ -1787,7 +1787,7 @@ export default class CompareShips {
                 .map(
                     group =>
                         `<optgroup label="${group.key}" data-max-options="${
-                            moduleTypeWithSingleOption.includes(moduleType.replace(/[a-zA-Z\s]+\s–\s/, "")) ? 1 : 5
+                            moduleTypeWithSingleOption.includes(moduleType.replace(/[\sA-Za-z]+\s–\s/, "")) ? 1 : 5
                         }">${group.values
                             .map(module => `<option value="${module[0]}">${module[1].name}`)
                             .join("</option>")}`
@@ -2243,17 +2243,20 @@ export default class CompareShips {
                 this._enableCompareSelects();
             }
 
-            this.woodCompare.enableSelects(compareId);
+            if (this._baseId !== "ship-journey") {
+                this.woodCompare.enableSelects(compareId);
+            }
         });
-
-        ["frame", "trim"].forEach(type => {
-            this._selectWood$[compareId][type]
-                .on("changed.bs.select", () => {
-                    this.woodCompare._woodSelected(compareId, type, this._selectWood$[compareId][type]);
-                    this._refreshShips(compareId);
-                })
-                .selectpicker({ title: `Wood ${type}`, width: "150px" });
-        });
+        if (this._baseId !== "ship-journey") {
+            ["frame", "trim"].forEach(type => {
+                this._selectWood$[compareId][type]
+                    .on("changed.bs.select", () => {
+                        this.woodCompare._woodSelected(compareId, type, this._selectWood$[compareId][type]);
+                        this._refreshShips(compareId);
+                    })
+                    .selectpicker({ title: `Wood ${type}`, width: "150px" });
+            });
+        }
     }
 
     static _setSelect(select$, id) {
