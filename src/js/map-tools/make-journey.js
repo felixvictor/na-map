@@ -84,7 +84,6 @@ export default class Journey {
         this._modalId = `modal-${this._baseId}`;
         this._sliderId = `slider-${this._baseId}`;
         this._shipId = "ship-journey";
-        this._woodId = "wood-journey";
 
         this._setupSummary();
         this._setupDrag();
@@ -152,7 +151,6 @@ export default class Journey {
     _initJourneyData() {
         this._journey = {
             shipName: this._defaultShipName,
-            woodNames: "",
             startWindDegrees: this._defaultStartWindDegrees,
             currentWindDegrees: this._defaultStartWindDegrees,
             totalDistance: 0,
@@ -241,24 +239,17 @@ export default class Journey {
             .attr("class", "rslider");
 
         const shipId = `${this._shipId}-Base-select`;
-        const shipAndWood = formGroup
+        const ship = formGroup
             .append("div")
             .attr("class", "alert alert-primary")
             .attr("role", "alert");
-        const div = shipAndWood.append("div").attr("class", "d-flex flex-column");
+        const div = ship.append("div").attr("class", "d-flex flex-column");
         div.append("label")
             .attr("for", shipId)
-            .text("Ship and woods (optional)");
+            .text("Ship (optional)");
         div.append("select")
             .attr("name", shipId)
             .attr("id", shipId);
-        ["frame", "trim"].forEach(type => {
-            const woodId = `${this._woodId}-${type}-Base-select`;
-            div.append("label").attr("for", woodId);
-            div.append("select")
-                .attr("name", woodId)
-                .attr("id", woodId);
-        });
     }
 
     /**
@@ -395,19 +386,9 @@ export default class Journey {
 
     _setShipName() {
         if (this._shipCompare && this._shipCompare._singleShipData && this._shipCompare._singleShipData.name) {
-            const frameName = this._shipCompare._woodCompare.getWoodTypeData(
-                "frame",
-                this._shipCompare._woodCompare._woodsSelected.Base.frame
-            ).name;
-            const trimName = this._shipCompare._woodCompare.getWoodTypeData(
-                "trim",
-                this._shipCompare._woodCompare._woodsSelected.Base.trim
-            ).name;
             this._journey.shipName = `${this._shipCompare._singleShipData.name}`;
-            this._journey.woodNames = `${frameName}/${trimName}`;
         } else {
             this._journey.shipName = this._defaultShipName;
-            this._journey.woodNames = "";
         }
     }
 
@@ -545,7 +526,6 @@ export default class Journey {
 
         // Selected ship
         this._journeySummaryShip = this._divJourneySummary.append("div").attr("class", "block small");
-        this._journeySummaryTextWoods = this._journeySummaryShip.append("div");
         this._journeySummaryTextShip = this._journeySummaryShip.append("div");
         this._journeySummaryShip
             .append("div")
@@ -584,7 +564,6 @@ export default class Journey {
     }
 
     _printSummaryShip() {
-        this._journeySummaryTextWoods.text(this._journey.woodNames);
         this._journeySummaryTextShip.text(this._journey.shipName);
     }
 
