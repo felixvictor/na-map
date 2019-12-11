@@ -240,9 +240,7 @@ const config = {
         alias: {
             Fonts: dirFonts,
             Flags: dirFlags,
-            Icons: dirIcons,
-            "@fortawesome/fontawesome-free-regular$": "@fortawesome/fontawesome-free-regular/shakable.es.js",
-            "@fortawesome/fontawesome-free-solid$": "@fortawesome/fontawesome-free-solid/shakable.es.js"
+            Icons: dirIcons
         },
         mainFields: ["module", "main"]
     },
