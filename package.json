@@ -1,6 +1,6 @@
 {
     "name": "na-map",
-    "version": "9.0.2",
+    "version": "9.0.3",
     "description": "Naval Action map",
     "devDependencies": {
         "@babel/core": "^7.7.5",
@@ -12,11 +12,11 @@
         "babel-eslint": "^10.0.3",
         "babel-loader": "^8.0.6",
         "clean-webpack-plugin": "^3.0.0",
-        "copy-webpack-plugin": "^5.0.5",
+        "copy-webpack-plugin": "^5.1.0",
         "core-js": "^3.4.7",
         "cross-env": "^6.0.3",
         "css": "^2.2.4",
-        "css-loader": "^3.2.1",
+        "css-loader": "^3.3.0",
         "d3-node": "^2.2.1",
         "documentation": "^12.1.4",
         "eslint": "^6.7.2",
@@ -83,10 +83,6 @@
     },
     "dependencies": {
         "@d3fc/d3fc-label-layout": "^6.0.11",
-        "@fortawesome/fontawesome-free": "^5.11.2",
-        "@fortawesome/fontawesome-svg-core": "^1.2.25",
-        "@fortawesome/free-regular-svg-icons": "^5.11.2",
-        "@fortawesome/free-solid-svg-icons": "^5.11.2",
         "bootstrap": "^4.3.1",
         "bootstrap-select": "1.13.12",
         "d3-area-label": "^1.5.0",
