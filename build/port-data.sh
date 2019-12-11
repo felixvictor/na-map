@@ -147,17 +147,6 @@ function test_for_update () {
         new_file="${api_base_file}-${server_names[0]}-${api_var}-${server_date}.json"
         old_file="${api_base_file}-${server_names[0]}-${api_var}-${server_last_date}.json"
 
-        if [[ -f "${old_file}" ]]; then
-          echo "old ${server_date} file ${old_file} exists"
-        else
-          echo "old ${server_date} file ${old_file} does not exist"
-        fi
-        if [[ -f "${old_file}" ]]; then
-          echo "new ${server_last_date} file ${new_file} exists"
-        else
-          echo "new ${server_last_date} file ${new_file} does not exist"
-        fi
-
         # If old file does not exist test succeeded
         [[ ! -f "${old_file}" ]] && return 0;
 
@@ -165,7 +154,6 @@ function test_for_update () {
         get_API_data "${server_names[0]}" "${new_file}" "${api_var}"
 
         # Exit if $API_VAR file has not been updated yet
-        echo cmp "${new_file}" "${old_file}"
         cmp "${new_file}" "${old_file}"
         cmp --silent "${new_file}" "${old_file}" && { rm "${new_file}"; return 1; }
     done
@@ -373,7 +361,6 @@ function update_data () {
     local last_update_date
     last_update_date=$(date --reference="${last_update_file}" +%Y-%m-%d)
     # Test if already updated today
-    echo "${last_update_date}" "${server_date}"
     if [ "${last_update_date}" != "${server_date}" ]; then
         update_yarn
         get_git_update
