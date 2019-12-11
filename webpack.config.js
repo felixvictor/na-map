@@ -240,14 +240,13 @@ const config = {
         alias: {
             Fonts: dirFonts,
             Flags: dirFlags,
-            Icons: dirIcons,
-            "@fortawesome/fontawesome-free-regular$": "@fortawesome/fontawesome-free-regular/shakable.es.js",
-            "@fortawesome/fontawesome-free-solid$": "@fortawesome/fontawesome-free-solid/shakable.es.js"
+            Icons: dirIcons
         },
         mainFields: ["module", "main"]
     },
 
     optimization: {
+        moduleIds: "hashed",
         runtimeChunk: "single",
         splitChunks: {
             chunks: "all"
@@ -301,7 +300,6 @@ const config = {
             REPAIR_CREW_VOLUME: JSON.stringify(repairs.crewRepair.volume),
             REPAIR_CREW_PERCENT: JSON.stringify(repairs.crewRepair.percent)
         }),
-        new webpack.HashedModuleIdsPlugin(),
         new webpack.ProvidePlugin({
             $: "jquery",
             jQuery: "jquery",
@@ -311,7 +309,10 @@ const config = {
             Popper: ["popper.js", "default"]
         }),
         // Do not include all moment locale files, certain locales are loaded by import
-        new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+        new webpack.IgnorePlugin({
+            resourceRegExp: /^\.\/locale$/,
+            contextRegExp: /moment$/
+        }),
         new CopyPlugin([
             { from: "../netlify.toml" },
             {
@@ -326,7 +327,6 @@ const config = {
         new HtmlPlugin(htmlOpt),
         new SitemapPlugin(target, sitemapPaths, { skipGzip: false }),
         new FaviconsPlugin(faviconsOpt),
-        new webpack.HashedModuleIdsPlugin(),
         new SriPlugin({
             hashFuncNames: ["sha384"],
             enabled: isProduction
@@ -475,7 +475,6 @@ const config = {
 
 module.exports = () => {
     if (isProduction) {
-        config.devtool = "";
         config.optimization.minimizer = [
             new TerserPlugin({
                 cache: true,
