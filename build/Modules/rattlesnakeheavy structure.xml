@@ -22,7 +22,7 @@
     <Pair>
       <Key>REPAIR_MODULE_TIME</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>60</Value>
+        <Value>120</Value>
       </Value>
     </Pair>
     <Pair>
