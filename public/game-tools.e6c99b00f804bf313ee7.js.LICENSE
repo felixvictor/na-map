@@ -1,0 +1,49 @@
+/**
+ * This file is part of na-map.
+ *
+ * @file      List loot and chests.
+ * @module    game-tools/list-loot
+ * @author    iB aka Felix Victor
+ * @copyright 2019
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
+/**
+ * This file is part of na-map.
+ *
+ * @file      List cannons.
+ * @module    game-tools/list-cannons
+ * @author    iB aka Felix Victor
+ * @copyright 2018, 2019
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
+/**
+ * This file is part of na-map.
+ *
+ * @file      List ingredients.
+ * @module    game-tools/list-ingredients
+ * @author    iB aka Felix Victor
+ * @copyright 2018, 2019
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
+/**
+ * This file is part of na-map.
+ *
+ * @file      List modules.
+ * @module    game-tools/list-modules
+ * @author    iB aka Felix Victor
+ * @copyright 2018, 2019
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
+/**
+ * This file is part of na-map.
+ *
+ * @file      List woods.
+ * @module    game-tools/list-woods
+ * @author    iB aka Felix Victor
+ * @copyright 2018, 2019
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
