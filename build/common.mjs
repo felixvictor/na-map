@@ -4,6 +4,19 @@
  */
 
 import fs from "fs";
+import * as path from "path";
+import { fileURLToPath } from "url";
+
+import dayjs from "dayjs";
+import fetch from "node-fetch";
+
+import utc from "dayjs/plugin/utc.js";
+dayjs.extend(utc);
+
+// https://stackoverflow.com/a/50052194
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const serverMaintenanceHour = 10;
 
 export const speedFactor = 390;
 
@@ -150,6 +163,17 @@ export function readTextFile(fileName) {
 
     return data;
 }
+
+export const readNAJson = async url => {
+    try {
+        const response = await fetch(url);
+        const text = await response.text();
+        // Return json
+        return JSON.parse(text.replace(/^var .+ = /, "").replace(/;$/, ""));
+    } catch (error) {
+        throw error;
+    }
+};
 
 export function readJson(fileName) {
     return JSON.parse(readTextFile(fileName));
@@ -396,7 +420,67 @@ export function getOrdinal(n, sup = true) {
  */
 export const cleanName = name =>
     name
-        .replace(/u([\dA-F]{4})/gi, match => String.fromCharCode(parseInt(match.replace(/u/g, ""), 16)))
+        .replace(/u([\da-f]{4})/gi, match => String.fromCharCode(parseInt(match.replace(/u/g, ""), 16)))
         .replace(/'/g, "’")
         .replace("oak", "Oak")
         .trim();
+
+/**
+ * Build common paths and file names
+ * @return {Object} Paths
+ */
+export const getCommonPaths = () => {
+    const dirOut = path.resolve(__dirname, "public/data");
+    const dirBuild = path.resolve(__dirname, "build");
+    const dirSrc = path.resolve(__dirname, "src");
+    const dirData = path.resolve(dirSrc, "data");
+    const dirGen = path.resolve(dirSrc, "gen");
+
+    return {
+        dirOut,
+        dirBuild,
+        dirSrc,
+        dirData,
+        dirGen,
+
+        fileTweets: path.resolve(dirBuild, "API/tweets.json"),
+
+        fileExcel: path.resolve(dirData, "port-battle.xlsx"),
+
+        fileBuilding: path.resolve(dirGen, "buildings.json"),
+        fileCannon: path.resolve(dirGen, "cannons.json"),
+        fileLoot: path.resolve(dirGen, "loot.json"),
+        fileNation: path.resolve(dirGen, "nations.json"),
+        fileOwnership: path.resolve(dirGen, "ownership.json"),
+        filePbZone: path.resolve(dirGen, "pb-zones.json"),
+        filePort: path.resolve(dirGen, "ports.json"),
+        filePrices: path.resolve(dirGen, "prices.json"),
+        fileRecipe: path.resolve(dirGen, "recipes.json"),
+        fileRepair: path.resolve(dirGen, "repairs.json"),
+        fileShip: path.resolve(dirGen, "ships.json"),
+        fileShipBlueprint: path.resolve(dirGen, "ship-blueprints.json")
+    };
+};
+
+/**
+ * Get server start (date and time)
+ * @return {string} Server start date and time
+ */
+export const getServerStartDateTime = () => {
+    let serverStart = dayjs()
+        .utc()
+        .hour(serverMaintenanceHour)
+        .format("YYYY-MM-DD HH:mm");
+    // adjust reference server time if needed
+    if (dayjs.utc().isBefore(serverStart)) {
+        serverStart = dayjs.utc(serverStart).subtract(1, "day");
+    }
+
+    return serverStart;
+};
+
+/**
+ * Get server start (date)
+ * @return {string} Server start date
+ */
+export const getServerStartDate = () => dayjs.utc(getServerStartDateTime()).format("YYYY-MM-DD");
