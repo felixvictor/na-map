@@ -9,13 +9,15 @@
  */
 
 import moment from "moment";
-import { nations, readJson, saveJson } from "./common.mjs";
+import { getServerStartDateTime, nations, readJson, saveJson } from "./common.mjs";
 
 const portFilename = process.argv[2];
 const tweetsFileName = process.argv[3];
 
 const ports = readJson(portFilename);
 const tweets = readJson(tweetsFileName);
+
+const serverStart = getServerStartDateTime();
 
 /**
  * Update port data from tweets
@@ -227,15 +229,6 @@ function updatePorts() {
     let result;
     let tweetTime;
     let isPortDataChanged = false;
-    let serverStart = moment()
-        .utc()
-        .hour(10)
-        .minute(0)
-        .format("YYYY-MM-DD HH:mm");
-    // adjust reference server time is needed
-    if (moment.utc().isBefore(serverStart)) {
-        serverStart = moment.utc(serverStart).subtract(1, "day");
-    }
 
     // When twitter-update has been used, reformat tweets.tweets
     if (!tweets.refresh) {
