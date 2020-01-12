@@ -677,11 +677,11 @@ class ShipBase extends Ship {
             limitBack: this._shipData.deckClassLimit[5],
             firezoneHorizontalWidth: this._shipData.ship.firezoneHorizontalWidth,
             waterlineHeight: formatFloat(this._shipData.ship.waterlineHeight),
-            maxSpeed: formatFloat(this._shipData.speed.max, 5),
+            maxSpeed: formatFloat(this._shipData.speed.max, 4),
             acceleration: formatFloat(this._shipData.ship.acceleration),
             deceleration: formatFloat(this._shipData.ship.deceleration),
             maxTurningSpeed: formatFloat(this._shipData.rudder.turnSpeed, 4),
-            halfturnTime: formatFloat(this._shipData.rudder.halfturnTime),
+            halfturnTime: formatFloat(this._shipData.rudder.halfturnTime, 4),
             sideArmor: `${formatIntTrunc(
                 this._shipData.sides.armour
             )}\u00A0<span class="badge badge-white">${formatIntTrunc(this._shipData.sides.thickness)}</span>`,
@@ -1097,7 +1097,7 @@ class ShipComparison extends Ship {
                 this.shipBaseData.speed.max,
                 2
             )}`,
-            maxTurningSpeed: `${formatFloat(this.shipCompareData.rudder.turnSpeed)}\u00A0${getDiff(
+            maxTurningSpeed: `${formatFloat(this.shipCompareData.rudder.turnSpeed, 4)}\u00A0${getDiff(
                 this.shipCompareData.rudder.turnSpeed,
                 this.shipBaseData.rudder.turnSpeed,
                 2
@@ -1121,9 +1121,10 @@ class ShipComparison extends Ship {
                 this.shipBaseData.ship.deceleration,
                 2
             )}`,
-            halfturnTime: `${formatFloat(this.shipCompareData.rudder.halfturnTime)}\u00A0${getDiff(
+            halfturnTime: `${formatFloat(this.shipCompareData.rudder.halfturnTime, 4)}\u00A0${getDiff(
                 this.shipCompareData.rudder.halfturnTime,
-                this.shipBaseData.rudder.halfturnTime
+                this.shipBaseData.rudder.halfturnTime,
+                2
             )}`,
             sideArmor: `${formatIntTrunc(this.shipCompareData.sides.armour)}\u00A0${getDiff(
                 this.shipCompareData.sides.armour,
@@ -1187,8 +1188,8 @@ class ShipComparison extends Ship {
                 this.shipBaseData.holdSize
             )}`,
             upgradeXP: `${formatIntTrunc(this.shipCompareData.upgradeXP)}\u00A0${getDiff(
-                this.shipCompareData.upgradeXP,
-                this.shipBaseData.upgradeXP
+                this.shipBaseData.upgradeXP,
+                this.shipCompareData.upgradeXP
             )}`,
             hullRepairAmount: `${formatIntTrunc(
                 (this.shipCompareData.repairAmount.armour + this.shipCompareData.repairAmount.armourPerk) * 100
@@ -1838,8 +1839,8 @@ export default class CompareShips {
                 const amount = property.isPercentage
                     ? formatSignPercent(property.amount / 100)
                     : property.amount < 1 && property.amount > 0
-                        ? formatPP(property.amount)
-                        : formatSignInt(property.amount);
+                    ? formatPP(property.amount)
+                    : formatSignInt(property.amount);
                 return `${property.modifier} ${amount}`;
             })
             .join("<br>")}</p>`;
@@ -1980,23 +1981,25 @@ export default class CompareShips {
         });
     }
 
-    _showCappingAdvice(compareId) {
+    _showCappingAdvice(compareId, modifiers) {
         const id = `${this._baseId}-${compareId}-capping`;
+        let div = document.getElementById(id);
 
-        if (!document.getElementById(id)) {
-            const div = document.createElement("p");
+        if (!div) {
+            div = document.createElement("p");
             div.id = id;
             div.className = "alert alert-warning";
-            div.innerHTML = "Values capped";
-
             const element = document.getElementById(`${this._baseId}-${compareId}`);
             element.firstChild.after(div);
         }
+
+        div.innerHTML = `${[...modifiers].join(", ")} capped`;
     }
 
     _removeCappingAdvice(compareId) {
         const id = `${this._baseId}-${compareId}-capping`;
         const div = document.getElementById(id);
+
         if (div) {
             div.remove();
         }
@@ -2065,44 +2068,44 @@ export default class CompareShips {
         };
 
         const adjustDataByCaps = () => {
-            let valueCapped = false;
-            const adjustValue = (currentValue, baseValue, capAmount, isPercentage) => {
-                const newValue = Math.min(currentValue, isPercentage ? baseValue * (1 + capAmount) : capAmount);
-                if (currentValue !== newValue) {
-                    valueCapped = true;
+            const valueCapped = { isCapped: false, modifiers: new Set() };
+
+            const adjustValue = (modifier, uncappedValue, baseValue, { amount: capAmount, isPercentage }) => {
+                const valueRespectingCap = Math.min(
+                    uncappedValue,
+                    isPercentage ? baseValue * (1 + capAmount) : capAmount
+                );
+                if (uncappedValue !== valueRespectingCap) {
+                    valueCapped.isCapped = true;
+                    valueCapped.modifiers.add(modifier);
                 }
 
-                return newValue;
+                return valueRespectingCap;
             };
 
-            this._modifierAmount.forEach((value, key) => {
-                if (this._moduleAndWoodCaps.has(key)) {
-                    const { cap } = this._moduleAndWoodCaps.get(key);
-                    this._moduleAndWoodCaps.get(key).properties.forEach(property => {
+            this._modifierAmount.forEach((value, modifier) => {
+                if (this._moduleAndWoodCaps.has(modifier)) {
+                    const { cap } = this._moduleAndWoodCaps.get(modifier);
+                    this._moduleAndWoodCaps.get(modifier).properties.forEach(property => {
                         const index = property.split(".");
                         if (index.length > 1) {
                             if (data[index[0]][index[1]]) {
                                 data[index[0]][index[1]] = adjustValue(
+                                    modifier,
                                     data[index[0]][index[1]],
                                     shipDataBase[index[0]][index[1]],
-                                    cap.amount,
-                                    cap.isPercentage
+                                    cap
                                 );
                             }
                         } else if (data[index[0]]) {
-                            data[index[0]] = adjustValue(
-                                data[index[0]],
-                                shipDataBase[index[0]],
-                                cap.amount,
-                                cap.isPercentage
-                            );
+                            data[index[0]] = adjustValue(modifier, data[index[0]], shipDataBase[index[0]], cap);
                         }
                     });
                 }
             });
 
-            if (valueCapped) {
-                this._showCappingAdvice(compareId);
+            if (valueCapped.isCapped) {
+                this._showCappingAdvice(compareId, valueCapped.modifiers);
             } else {
                 this._removeCappingAdvice(compareId);
             }
