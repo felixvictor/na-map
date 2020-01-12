@@ -1,3 +1,5 @@
+#!/usr/bin/env -S node --experimental-modules
+
 /**
  * This file is part of na-map.
  *
@@ -9,7 +11,6 @@
  */
 
 import * as fs from "fs";
-// noinspection ES6CheckImport
 import convert from "xml-js";
 import { readTextFile, round, saveJson } from "./common.mjs";
 
@@ -134,7 +135,10 @@ function convertCannons() {
             .replace(/^(\d+) - (.+)$/g, "$1 ($2)")
             .replace(/^Tower (\d+)$/g, "$1 (Tower)")
             .replace("Blomfield", "Blomefield")
-            .replace(" Gun", "");
+            .replace(" Gun", "")
+            // Edinorog are 18lb now
+            .replace("24 (Edinorog)", "18 (Edinorog)");
+
         const cannon = {
             name
         };
@@ -228,6 +232,15 @@ function convertCannons() {
                     });
                 }
             });
+        });
+        cannons[type].sort(({ name: a }, { name: b }) => {
+            // Sort either by lb numeral value when values are different
+            if (parseInt(a, 10) !== parseInt(b, 10)) {
+                return parseInt(a, 10) - parseInt(b, 10);
+            }
+
+            // Or sort by string
+            return a.localeCompare(b);
         });
     });
 
