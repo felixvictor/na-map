@@ -677,11 +677,11 @@ class ShipBase extends Ship {
             limitBack: this._shipData.deckClassLimit[5],
             firezoneHorizontalWidth: this._shipData.ship.firezoneHorizontalWidth,
             waterlineHeight: formatFloat(this._shipData.ship.waterlineHeight),
-            maxSpeed: formatFloat(this._shipData.speed.max, 5),
+            maxSpeed: formatFloat(this._shipData.speed.max, 4),
             acceleration: formatFloat(this._shipData.ship.acceleration),
             deceleration: formatFloat(this._shipData.ship.deceleration),
             maxTurningSpeed: formatFloat(this._shipData.rudder.turnSpeed, 4),
-            halfturnTime: formatFloat(this._shipData.rudder.halfturnTime),
+            halfturnTime: formatFloat(this._shipData.rudder.halfturnTime, 4),
             sideArmor: `${formatIntTrunc(
                 this._shipData.sides.armour
             )}\u00A0<span class="badge badge-white">${formatIntTrunc(this._shipData.sides.thickness)}</span>`,
@@ -1097,7 +1097,7 @@ class ShipComparison extends Ship {
                 this.shipBaseData.speed.max,
                 2
             )}`,
-            maxTurningSpeed: `${formatFloat(this.shipCompareData.rudder.turnSpeed)}\u00A0${getDiff(
+            maxTurningSpeed: `${formatFloat(this.shipCompareData.rudder.turnSpeed, 4)}\u00A0${getDiff(
                 this.shipCompareData.rudder.turnSpeed,
                 this.shipBaseData.rudder.turnSpeed,
                 2
@@ -1121,9 +1121,10 @@ class ShipComparison extends Ship {
                 this.shipBaseData.ship.deceleration,
                 2
             )}`,
-            halfturnTime: `${formatFloat(this.shipCompareData.rudder.halfturnTime)}\u00A0${getDiff(
+            halfturnTime: `${formatFloat(this.shipCompareData.rudder.halfturnTime, 4)}\u00A0${getDiff(
                 this.shipCompareData.rudder.halfturnTime,
-                this.shipBaseData.rudder.halfturnTime
+                this.shipBaseData.rudder.halfturnTime,
+                2
             )}`,
             sideArmor: `${formatIntTrunc(this.shipCompareData.sides.armour)}\u00A0${getDiff(
                 this.shipCompareData.sides.armour,
@@ -1187,8 +1188,8 @@ class ShipComparison extends Ship {
                 this.shipBaseData.holdSize
             )}`,
             upgradeXP: `${formatIntTrunc(this.shipCompareData.upgradeXP)}\u00A0${getDiff(
-                this.shipCompareData.upgradeXP,
-                this.shipBaseData.upgradeXP
+                this.shipBaseData.upgradeXP,
+                this.shipCompareData.upgradeXP
             )}`,
             hullRepairAmount: `${formatIntTrunc(
                 (this.shipCompareData.repairAmount.armour + this.shipCompareData.repairAmount.armourPerk) * 100
