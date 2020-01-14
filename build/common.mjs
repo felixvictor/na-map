@@ -1,6 +1,11 @@
-/*
-    common.mjs
-    (More or less a) Copy of ../src/js/common.js
+/**
+ * This file is part of na-map.
+ *
+ * @file      Common data and functions.
+ * @module    common
+ * @author    iB aka Felix Victor
+ * @copyright 2018, 2019, 2020
+ * @license   http://www.gnu.org/licenses/gpl.html
  */
 
 import fs from "fs";
@@ -167,9 +172,13 @@ export function readTextFile(fileName) {
 export const readNAJson = async url => {
     try {
         const response = await fetch(url);
-        const text = await response.text();
-        // Return json
-        return JSON.parse(text.replace(/^var .+ = /, "").replace(/;$/, ""));
+        if (response.ok) {
+            const text = await response.text();
+            // Return json
+            return JSON.parse(text.replace(/^var .+ = /, "").replace(/;$/, ""));
+        }
+
+        return new Error(`Cannot load ${url}`);
     } catch (error) {
         throw error;
     }
@@ -360,17 +369,15 @@ export function getDistance(pt0, pt1) {
  * @param {string} b - String b
  * @return {number} Sort result
  */
-export const simpleSort = (a, b) => {
-    if (a < b) {
-        return -1;
-    }
+export const simpleSort = (a, b) => a.localeCompare(b);
 
-    if (a > b) {
-        return 1;
-    }
-
-    return 0;
-};
+/**
+ * Sort of Id a and b as numbers
+ * @param {string} a - String a
+ * @param {string} b - String b
+ * @return {number} Sort result
+ */
+export const sortId = ({ Id: a }, { Id: b }) => Number(a) - Number(b);
 
 /**
  * Sort by a list of properties (in left-to-right order)
@@ -425,48 +432,46 @@ export const cleanName = name =>
         .replace("oak", "Oak")
         .trim();
 
+const dirOut = path.resolve(__dirname, "..", "public", "data");
+const dirBuild = path.resolve(__dirname, "..", "build");
+const dirSrc = path.resolve(__dirname, "..", "src");
+const dirData = path.resolve(dirSrc, "..", "data");
+const dirGen = path.resolve(dirSrc, "..", "gen");
+
 /**
  * Build common paths and file names
  * @return {Object} Paths
  */
-export const getCommonPaths = () => {
-    const dirOut = path.resolve(__dirname, "public/data");
-    const dirBuild = path.resolve(__dirname, "build");
-    const dirSrc = path.resolve(__dirname, "src");
-    const dirData = path.resolve(dirSrc, "data");
-    const dirGen = path.resolve(dirSrc, "gen");
+export const commonPaths = {
+    dirOut,
+    dirBuild,
+    dirSrc,
+    dirData,
+    dirGen,
 
-    return {
-        dirOut,
-        dirBuild,
-        dirSrc,
-        dirData,
-        dirGen,
+    fileTweets: path.resolve(dirBuild, "API/tweets.json"),
 
-        fileTweets: path.resolve(dirBuild, "API/tweets.json"),
+    fileExcel: path.resolve(dirData, "port-battle.xlsx"),
 
-        fileExcel: path.resolve(dirData, "port-battle.xlsx"),
-
-        fileBuilding: path.resolve(dirGen, "buildings.json"),
-        fileCannon: path.resolve(dirGen, "cannons.json"),
-        fileLoot: path.resolve(dirGen, "loot.json"),
-        fileNation: path.resolve(dirGen, "nations.json"),
-        fileOwnership: path.resolve(dirGen, "ownership.json"),
-        filePbZone: path.resolve(dirGen, "pb-zones.json"),
-        filePort: path.resolve(dirGen, "ports.json"),
-        filePrices: path.resolve(dirGen, "prices.json"),
-        fileRecipe: path.resolve(dirGen, "recipes.json"),
-        fileRepair: path.resolve(dirGen, "repairs.json"),
-        fileShip: path.resolve(dirGen, "ships.json"),
-        fileShipBlueprint: path.resolve(dirGen, "ship-blueprints.json")
-    };
+    fileBuilding: path.resolve(dirGen, "buildings.json"),
+    fileCannon: path.resolve(dirGen, "cannons.json"),
+    fileLoot: path.resolve(dirGen, "loot.json"),
+    fileNation: path.resolve(dirGen, "nations.json"),
+    fileOwnership: path.resolve(dirGen, "ownership.json"),
+    filePbZone: path.resolve(dirGen, "pb-zones.json"),
+    filePort: path.resolve(dirGen, "ports.json"),
+    filePrices: path.resolve(dirGen, "prices.json"),
+    fileRecipe: path.resolve(dirGen, "recipes.json"),
+    fileRepair: path.resolve(dirGen, "repairs.json"),
+    fileShip: path.resolve(dirGen, "ships.json"),
+    fileShipBlueprint: path.resolve(dirGen, "ship-blueprints.json")
 };
 
 /**
  * Get server start (date and time)
  * @return {string} Server start date and time
  */
-export const getServerStartDateTime = () => {
+const getServerStartDateTime = () => {
     let serverStart = dayjs()
         .utc()
         .hour(serverMaintenanceHour)
@@ -483,4 +488,16 @@ export const getServerStartDateTime = () => {
  * Get server start (date)
  * @return {string} Server start date
  */
-export const getServerStartDate = () => dayjs.utc(getServerStartDateTime()).format("YYYY-MM-DD");
+const getServerStartDate = () => dayjs.utc(getServerStartDateTime()).format("YYYY-MM-DD");
+
+export const serverStartDateTime = getServerStartDateTime();
+export const serverStartDate = getServerStartDate();
+export const serverNames = ["eu1", "eu2"];
+export const apiBaseFiles = ["ItemTemplates", "Ports", "Shops"];
+export const serverTwitterNames = ["eu1"];
+
+/* testbed
+   server_base_name="clean"
+   source_base_url="http://storage.googleapis.com/nacleandevshards/"
+   server_names=(dev)
+*/
