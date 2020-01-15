@@ -10,8 +10,32 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { getApiData } from "./get-api-data.mjs";
-import { convertPortData } from "./convert-port-data.mjs";
+import * as path from "path";
+import * as fs from "fs";
 
-getApiData();
-// convertPortData();
+import { getApiData } from "./get-api-data.mjs";
+import { convertGenericPortData } from "./convert-generic-port-data.mjs";
+import { convertServerSpecificPortData } from "./convert-server-specific-port-data.mjs";
+
+import { commonPaths, serverDateMonth, serverDateYear } from "./common.mjs";
+
+const makeDir = dir => {
+    try {
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+    } catch (error) {
+        throw error;
+    }
+};
+
+const baseFilename = path.resolve(commonPaths.dirBuild, "API", serverDateYear, serverDateMonth);
+
+const main = () => {
+    makeDir(baseFilename);
+    getApiData(baseFilename);
+    convertGenericPortData(baseFilename);
+    convertServerSpecificPortData(baseFilename);
+};
+
+main();
