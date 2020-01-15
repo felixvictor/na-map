@@ -81,44 +81,26 @@ const serverNameSelected = () => {
 const setupListener = () => {
     document.getElementById(baseId).addEventListener("change", () => serverNameSelected());
 
-    // https://www.codeply.com/go/1Iz3DxS60l
-    $(".dropdown-menu a.dropdown-toggle").on("click", event => {
-        const menu$ = $(event.currentTarget);
-        if (!menu$.next().hasClass("show")) {
-            menu$
+    // {@link https://jsfiddle.net/bootstrapious/j6zkyog8/}
+    $(".dropdown-menu [data-toggle='dropdown']").on("click", event => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const element = $(event.currentTarget);
+
+        element.siblings().toggleClass("show");
+
+        if (!element.next().hasClass("show")) {
+            element
                 .parents(".dropdown-menu")
                 .first()
                 .find(".show")
                 .removeClass("show");
         }
 
-        const subMenu$ = menu$.next(".dropdown-menu");
-        subMenu$.toggleClass("show");
-        $(this)
-            .parents("li.nav-item.dropdown.show")
-            .on("hidden.bs.dropdown", () => {
-                $(".dropdown-submenu .show").removeClass("show");
-            });
-        return false;
-    });
-
-    /*
-        $(".dropdown-menu").on("click.bs.dropdown.data-api", event => {
-            const menu$ = $(event.currentTarget);
-            console.log("click.bs.dropdown.data-api", menu$);
-            //event.preventDefault();
-            //event.stopPropagation();
-           // debugger;
-            $(".dropdown-menu.show")
-                .not(".inner")
-                .removeClass("show");
+        element.parents(".nav-item.dropdown.show").on("hidden.bs.dropdown", () => {
+            $(".dropdown-submenu .show").removeClass("show");
         });
-        */
-
-    $(".dropdown").on("hidden.bs.dropdown", () => {
-        $(".dropdown-menu.show")
-            .not(".inner")
-            .removeClass("show");
     });
 };
 
