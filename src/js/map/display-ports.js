@@ -104,7 +104,7 @@ export default class DisplayPorts {
          * @type {string}
          * @private
          */
-        this._showRadius = this._getShowRadiusSetting();
+        this.showRadius = this._getShowRadiusSetting();
 
         this._trilateratePosition = new TrilateratePosition(this);
     }
@@ -245,8 +245,8 @@ export default class DisplayPorts {
     }
 
     _showRadiusSelected() {
-        this._showRadius = this._radios.get();
-        this._cookie.set(this._showRadius);
+        this.showRadius = this._radios.get();
+        this._cookie.set(this.showRadius);
         this.update();
     }
 
@@ -778,6 +778,17 @@ export default class DisplayPorts {
         return marker;
     }
 
+    _getFrontlineMarker(port) {
+        let marker = "";
+        if (port.ownPort) {
+            marker = "pos";
+        } else if (port.enemyPort) {
+            marker = "neg";
+        }
+
+        return marker;
+    }
+
     _updatePortCircles() {
         const circleScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale);
         const rMin = roundToThousands((this._circleSize / circleScale) * this._minRadiusFactor);
@@ -790,46 +801,53 @@ export default class DisplayPorts {
         // eslint-disable-next-line unicorn/consistent-function-scoping
         let fill = () => {};
 
-        if (this._showRadius === "tax") {
+        if (this.showRadius === "tax") {
             data = this._portDataFiltered.filter(d => !d.nonCapturable);
             this._portRadius.domain([this._minTaxIncome, this._maxTaxIncome]).range([rMin, rMax]);
             cssClass = () => "bubble";
             fill = d => this._colourScaleTax(d.taxIncome);
             r = d => this._portRadius(d.taxIncome);
-        } else if (this._showRadius === "net") {
+        } else if (this.showRadius === "net") {
             data = this._portDataFiltered.filter(d => !d.nonCapturable);
             this._portRadius.domain([this._minNetIncome, this._maxNetIncome]).range([rMin, rMax]);
             cssClass = () => "bubble";
             fill = d => this._colourScaleNet(d.netIncome);
             r = d => this._portRadius(Math.abs(d.netIncome));
-        } else if (this.showTradePortPartners) {
-            cssClass = d => `bubble ${this._getTradePortMarker(d)}`;
-            r = d => (d.id === this.tradePortId ? rMax : rMax / 2);
-        } else if (this._showRadius === "points") {
+        } else if (this.showRadius === "points") {
             data = this._portDataFiltered.filter(d => !d.nonCapturable);
             this._portRadius.domain([this._minPortPoints, this._maxPortPoints]).range([rMin, rMax / 2]);
             cssClass = () => "bubble";
             fill = d => this._colourScalePoints(d.portPoints);
             r = d => this._portRadius(d.portPoints);
-        } else if (this._showRadius === "position") {
+        } else if (this.showRadius === "position") {
             cssClass = () => "bubble here";
             r = d => d.distance;
-        } else if (this._showRadius === "attack") {
+        } else if (this.showRadius === "attack") {
             data = this._portDataFiltered.filter(port => port.attackHostility);
             this._attackRadius.range([rMin, rMax]);
             cssClass = () => "bubble";
             fill = d => this._colourScaleHostility(d.attackHostility);
             r = d => this._attackRadius(d.attackHostility);
-        } else if (this.showCurrentGood) {
+        } else if (this.circleType === "currentGood") {
             cssClass = d => `bubble ${d.isSource ? "pos" : "neg"}`;
             r = () => rMax / 2;
-        } else if (this._showRadius === "county") {
+        } else if (this.showRadius === "county") {
             cssClass = d =>
                 d.nonCapturable ? "bubble not-capturable" : d.countyCapital ? "bubble capital" : "bubble non-capital";
             fill = d => (d.nonCapturable ? "" : this._colourScaleCounty(d.county));
             r = d => (d.nonCapturable ? rMax / 3 : rMax / 2);
-        } else if (this._showRadius === "off") {
-            data = {};
+        } else if (this.showRadius === "tradePorts") {
+            cssClass = d => `bubble ${this._getTradePortMarker(d)}`;
+            r = d => (d.id === this.tradePortId ? rMax : rMax / 2);
+        } else if (this.showRadius === "frontline") {
+            cssClass = d => `bubble ${this._getFrontlineMarker(d)}`;
+            r = d => (d.ownPort ? rMax / 3 : rMax / 2);
+            data = data.filter(d => d.enemyPort || d.ownPort);
+        } else if (this.showRadius === "currentGood") {
+            cssClass = d => `bubble ${d.isSource ? "pos" : "neg"}`;
+            r = () => rMax / 2;
+        } else if (this.showRadius === "off") {
+            data = [];
         }
 
         this._gPortCircle
@@ -927,7 +945,7 @@ export default class DisplayPorts {
                             .attr("transform", d => `translate(${d.centroid[0]},${d.centroid[1]})rotate(${d.angle})`)
                             .text(d => d.name),
                     update =>
-                        update.attr("fill", d => (this._showRadius === "county" ? this._colourScaleCounty(d.name) : ""))
+                        update.attr("fill", d => (this.showRadius === "county" ? this._colourScaleCounty(d.name) : ""))
                 );
 
             /*
@@ -997,7 +1015,7 @@ export default class DisplayPorts {
     }
 
     _filterVisible() {
-        if (this._showRadius === "position") {
+        if (this.showRadius === "position") {
             this._portDataFiltered = this._portData;
         } else {
             this._portDataFiltered = this._portData.filter(
@@ -1074,9 +1092,9 @@ export default class DisplayPorts {
     }
 
     setShowRadiusSetting(showRadius = this._radioButtonValues[0]) {
-        this._showRadius = showRadius;
-        this._radios.set(this._showRadius);
-        this._cookie.set(this._showRadius);
+        this.showRadius = showRadius;
+        this._radios.set(this.showRadius);
+        this._cookie.set(this.showRadius);
     }
 
     transform(transform) {
@@ -1086,8 +1104,7 @@ export default class DisplayPorts {
     clearMap(scale) {
         this._showSummary();
         this._portData = this._portDataDefault;
-        this.showCurrentGood = false;
-        this.showTradePortPartners = false;
+        this.circleType = "";
         this.setShowRadiusSetting();
         this.update(scale);
     }

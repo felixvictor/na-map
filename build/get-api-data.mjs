@@ -10,6 +10,7 @@
 
 import * as fs from "fs";
 import * as path from "path";
+import dayjs from "dayjs";
 
 import {
     apiBaseFiles,
@@ -28,6 +29,9 @@ const sourceBaseDir = "nacleanopenworldprodshards";
 
 // console.log(commonPaths);
 // console.log(serverDate);
+
+const serverDateYear = String(dayjs(serverDate).year());
+const serverDateMonth = String(dayjs(serverDate).month()).padStart(2, "0");
 
 const deleteFile = fileName => {
     try {
@@ -62,6 +66,8 @@ export const getApiData = () => {
             const outfileName = path.resolve(
                 commonPaths.dirBuild,
                 "API",
+                serverDateYear,
+                serverDateMonth,
                 `${apiBaseFile}-${serverName}-${serverDate}.json`
             );
             deleteAPIFiles(outfileName);
@@ -69,3 +75,28 @@ export const getApiData = () => {
         });
     });
 };
+
+const yearRegex = /^api-.+-(\d{4})-\d{2}-\d{2}\.json(\.xz)?$/;
+const monthRegex = /^api-.+-\d{4}-(\d{2})-\d{2}\.json(\.xz)?$/;
+const dirAPI = path.resolve(commonPaths.dirBuild, "API");
+
+const moveFile = fileName => {
+    if (fileName.match(yearRegex)) {
+        const year = fileName.match(yearRegex)[1];
+        const month = fileName.match(monthRegex)[1];
+        console.log(year, month);
+        const dirNew = path.resolve(dirAPI, year, month);
+        console.log(path.resolve(dirAPI, fileName), path.resolve(dirNew, fileName));
+        /*
+        fs.rename(path.resolve(dirAPI, fileName), path.resolve(dirNew, fileName), err => {
+            if (err) {
+                throw err;
+            }
+        });
+         */
+    }
+};
+
+fs.readdirSync(dirAPI).forEach(fileName => {
+    moveFile(fileName);
+});
