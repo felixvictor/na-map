@@ -50,6 +50,17 @@ export const convertInvCoordX = (x, y) => transformMatrixInv.A * x + transformMa
 // svg coord to F11 coord
 export const convertInvCoordY = (x, y) => transformMatrixInv.B * x - transformMatrixInv.A * y + transformMatrixInv.D;
 
+/**
+ * @typedef {Object} Nation
+ * @property {string} name - Name
+ * @property {string} short - Short name
+ * @property {number} id - Id
+ * @property {string} sortName - Name for sorting
+ */
+
+/**
+ * @type {Nation}
+ */
 export const nations = [
     { id: 0, short: "NT", name: "Neutral", sortName: "Neutral" },
     { id: 1, short: "PR", name: "Pirates", sortName: "Pirates" },
@@ -324,12 +335,12 @@ export const speedConstB = 0.00272175949231;
 
 /**
  * Group by
- * {@link https://stackoverflow.com/questions/14446511/what-is-the-most-efficient-method-to-groupby-on-a-javascript-array-of-objects}
+ * {@link https://stackoverflow.com/a/38327540
  * @param {*} list - list
  * @param {*} keyGetter - key getter
  * @return {Map<any, any>} Map
  */
-export function groupBy(list, keyGetter) {
+export function groupToMap(list, keyGetter) {
     const map = new Map();
     list.forEach(item => {
         const key = keyGetter(item);
@@ -455,6 +466,7 @@ export const commonPaths = {
 
     fileBuilding: path.resolve(dirGen, "buildings.json"),
     fileCannon: path.resolve(dirGen, "cannons.json"),
+    fileFrontlines: path.resolve(dirGen, "frontlines.json"),
     fileLoot: path.resolve(dirGen, "loot.json"),
     fileNation: path.resolve(dirGen, "nations.json"),
     fileOwnership: path.resolve(dirGen, "ownership.json"),
@@ -501,3 +513,26 @@ export const serverTwitterNames = ["eu1"];
    source_base_url="http://storage.googleapis.com/nacleandevshards/"
    server_names=(dev)
 */
+
+export const distanceMapSize = 4096;
+
+/**
+ * Find Nation object based on nation name
+ * @param {string} nationName
+ * @return {Nation}
+ */
+export const findNationByName = nationName => nations.find(nation => nationName === nation.name);
+
+/**
+ * Find Nation object based on nation short name
+ * @param {string} nationShortName
+ * @return {Nation}
+ */
+export const findNationByShortName = nationShortName => nations.find(nation => nationShortName === nation.short);
+
+/**
+ * Find Nation object based on nation id
+ * @param {number} nationId
+ * @return {Nation}
+ */
+export const findNationById = nationId => nations.find(nation => nationId === nation.id);
