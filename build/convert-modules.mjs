@@ -8,7 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { capitalizeFirstLetter, cleanName, groupBy, readJson, saveJson, sortBy } from "./common.mjs";
+import { capitalizeFirstLetter, cleanName, groupToMap, readJson, saveJson, sortBy } from "./common.mjs";
 
 const itemsFilename = process.argv[2];
 const outDir = process.argv[3];
@@ -464,7 +464,7 @@ function convertModules() {
 
     let result = [...modules.values()];
     result = result.filter(module => Object.keys(module).length).sort(sortBy(["type", "name", "moduleLevel"]));
-    const grouped = [...groupBy(result, module => module.type)];
+    const grouped = [...groupToMap(result, module => module.type)];
 
     saveJson(`${outDir}/modules.json`, grouped);
     saveJson(`${outDir}/woods.json`, woodJson);

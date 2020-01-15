@@ -11,7 +11,7 @@
  */
 
 import { getApiData } from "./get-api-data.mjs";
-import { convertSpecialPortData } from "./convert-special-port-data.mjs";
+import { convertPortData } from "./convert-port-data.mjs";
 
 getApiData();
-// convertSpecialPortData();
+// convertPortData();
