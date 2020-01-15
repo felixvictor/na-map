@@ -180,21 +180,6 @@ export function readTextFile(fileName) {
     return data;
 }
 
-export const readNAJson = async url => {
-    try {
-        const response = await fetch(url);
-        if (response.ok) {
-            const text = await response.text();
-            // Return json
-            return JSON.parse(text.replace(/^var .+ = /, "").replace(/;$/, ""));
-        }
-
-        return new Error(`Cannot load ${url}`);
-    } catch (error) {
-        throw error;
-    }
-};
-
 export function readJson(fileName) {
     return JSON.parse(readTextFile(fileName));
 }
@@ -446,8 +431,8 @@ export const cleanName = name =>
 const dirOut = path.resolve(__dirname, "..", "public", "data");
 const dirBuild = path.resolve(__dirname, "..", "build");
 const dirSrc = path.resolve(__dirname, "..", "src");
-const dirData = path.resolve(dirSrc, "..", "data");
-const dirGen = path.resolve(dirSrc, "..", "gen");
+const dirData = path.resolve(dirSrc, "data");
+const dirGen = path.resolve(dirSrc, "gen");
 
 /**
  * Build common paths and file names
@@ -466,7 +451,6 @@ export const commonPaths = {
 
     fileBuilding: path.resolve(dirGen, "buildings.json"),
     fileCannon: path.resolve(dirGen, "cannons.json"),
-    fileFrontlines: path.resolve(dirGen, "frontlines.json"),
     fileLoot: path.resolve(dirGen, "loot.json"),
     fileNation: path.resolve(dirGen, "nations.json"),
     fileOwnership: path.resolve(dirGen, "ownership.json"),
@@ -504,6 +488,8 @@ const getServerStartDate = () => dayjs.utc(getServerStartDateTime()).format("YYY
 
 export const serverStartDateTime = getServerStartDateTime();
 export const serverStartDate = getServerStartDate();
+export const serverDateYear = String(dayjs(serverStartDate).year());
+export const serverDateMonth = String(dayjs(serverStartDate).month() + 1).padStart(2, "0");
 export const serverNames = ["eu1", "eu2"];
 export const apiBaseFiles = ["ItemTemplates", "Ports", "Shops"];
 export const serverTwitterNames = ["eu1"];
