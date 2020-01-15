@@ -4,12 +4,12 @@
  * @file      Convert ports based on tweets.
  * @module    build/update-ports
  * @author    iB aka Felix Victor
- * @copyright 2017, 2018, 2019
+ * @copyright 2017, 2018, 2019, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
 import moment from "moment";
-import { getServerStartDateTime, nations, readJson, saveJson } from "./common.mjs";
+import { getServerStartDateTime, findNationByName, findNationByShortName, readJson, saveJson } from "./common.mjs";
 
 const portFilename = process.argv[2];
 const tweetsFileName = process.argv[3];
@@ -20,151 +20,145 @@ const tweets = readJson(tweetsFileName);
 const serverStart = getServerStartDateTime();
 
 /**
+ * Find index by port name
+ * @param {Object} element - port data
+ * @returns {Boolean} True if port name equals this
+ */
+const findIndex = element => element.name === this;
+
+/**
+ * Port captured
+ * @param {String[]} result - Result from tweet regex
+ * @returns {void}
+ */
+const captured = result => {
+    const i = ports.ports.findIndex(findIndex, result[2]);
+    const port = ports.ports[i];
+
+    console.log("      --- captured", i);
+    port.nation = findNationByName(result[4]).short;
+    port.capturer = result[3];
+    port.lastPortBattle = moment.utc(result[1], "DD-MM-YYYY HH:mm").format("YYYY-MM-DD HH:mm");
+    port.attackerNation = "";
+    port.attackerClan = "";
+    port.attackHostility = "";
+    port.portBattle = "";
+};
+
+/**
+ * Port captured by NPC raiders
+ * @param {String[]} result - Result from tweet regex
+ * @returns {void}
+ */
+const npcCaptured = result => {
+    const i = ports.ports.findIndex(findIndex, result[2]);
+    const port = ports.ports[i];
+
+    console.log("      --- captured by NPC", i);
+    port.nation = "NT";
+    port.capturer = "RAIDER";
+    port.lastPortBattle = moment.utc(result[1], "DD-MM-YYYY HH:mm").format("YYYY-MM-DD HH:mm");
+    port.attackerNation = "";
+    port.attackerClan = "";
+    port.attackHostility = "";
+    port.portBattle = "";
+};
+
+/**
+ * Port defended
+ * @param {String[]} result - Result from tweet regex
+ * @returns {void}
+ */
+const defended = result => {
+    const i = ports.ports.findIndex(findIndex, result[2]);
+    const port = ports.ports[i];
+
+    console.log("      --- defended", i);
+    port.attackerNation = "";
+    port.attackerClan = "";
+    port.attackHostility = "";
+    port.portBattle = "";
+};
+
+/**
+ * Hostility increased
+ * @param {String[]} result - Result from tweet regex
+ * @returns {void}
+ */
+const hostilityLevelUp = result => {
+    const i = ports.ports.findIndex(findIndex, result[4]);
+    const port = ports.ports[i];
+
+    console.log("      --- hostilityLevelUp", i);
+    port.attackerNation = result[3];
+    port.attackerClan = result[2];
+    port.attackHostility = result[6] / 100;
+};
+
+/**
+ * Hostility decreased
+ * @param {String[]} result - Result from tweet regex
+ * @returns {void}
+ */
+const hostilityLevelDown = result => {
+    const i = ports.ports.findIndex(findIndex, result[4]);
+    const port = ports.ports[i];
+
+    console.log("      --- hostilityLevelDown", i);
+    port.attackerNation = result[3];
+    port.attackerClan = result[2];
+    port.attackHostility = result[6] / 100;
+};
+
+/**
+ * Port battle scheduled
+ * @param {String[]} result - Result from tweet regex
+ * @returns {void}
+ */
+const portBattleScheduled = result => {
+    const guessNationFromClanName = clanName => {
+        const guessedNationShort = ports.ports.find(port => port.capturer === clanName);
+        const nationName = guessedNationShort ? findNationByShortName(guessedNationShort).name : "n/a";
+
+        return nationName;
+    };
+
+    const i = ports.ports.findIndex(findIndex, result[2]);
+    const port = ports.ports[i];
+
+    console.log("      --- portBattleScheduled", i);
+    if (result[7]) {
+        port.attackerNation = result[7];
+    } else {
+        port.attackerNation = guessNationFromClanName(result[6]);
+    }
+
+    port.attackerClan = result[6];
+    port.attackHostility = 1;
+    port.portBattle = moment.utc(result[4], "DD MMM YYYY HH:mm").format("YYYY-MM-DD HH:mm");
+};
+
+/**
+ * NPC port battle scheduled
+ * @param {String[]} result - Result from tweet regex
+ * @returns {void}
+ */
+const npcPortBattleScheduled = result => {
+    const i = ports.ports.findIndex(findIndex, result[2]);
+    const port = ports.ports[i];
+
+    console.log("      --- npcPortBattleScheduled", i);
+    port.attackerNation = "Neutral";
+    port.attackerClan = "NPC";
+    port.attackHostility = 1;
+    port.portBattle = moment.utc(result[3], "DD MMM YYYY HH:mm").format("YYYY-MM-DD HH:mm");
+};
+
+/**
  * Update port data from tweets
  * @returns {Boolean} True if port data changed (new tweets)
  */
 function updatePorts() {
-    /**
-     * Find index by port name
-     * @param {Object} element - port data
-     * @returns {Boolean} True if port name equals this
-     */
-    function findIndex(element) {
-        return element.name === this;
-    }
-
-    /**
-     * Port captured
-     * @param {String[]} result - Result from tweet regex
-     * @returns {void}
-     */
-    function captured(result) {
-        const i = ports.ports.findIndex(findIndex, result[2]);
-        const port = ports.ports[i];
-        const nationName = result[4];
-        const capturingNation = nations.find(nation => nation.name === nationName);
-
-        console.log("      --- captured", i);
-        port.nation = capturingNation.short;
-        port.capturer = result[3];
-        port.lastPortBattle = moment.utc(result[1], "DD-MM-YYYY HH:mm").format("YYYY-MM-DD HH:mm");
-        port.attackerNation = "";
-        port.attackerClan = "";
-        port.attackHostility = "";
-        port.portBattle = "";
-    }
-
-    /**
-     * Port captured by NPC raiders
-     * @param {String[]} result - Result from tweet regex
-     * @returns {void}
-     */
-    function npcCaptured(result) {
-        const i = ports.ports.findIndex(findIndex, result[2]);
-        const port = ports.ports[i];
-
-        console.log("      --- captured by NPC", i);
-        port.nation = "NT";
-        port.capturer = "RAIDER";
-        port.lastPortBattle = moment.utc(result[1], "DD-MM-YYYY HH:mm").format("YYYY-MM-DD HH:mm");
-        port.attackerNation = "";
-        port.attackerClan = "";
-        port.attackHostility = "";
-        port.portBattle = "";
-    }
-
-    /**
-     * Port defended
-     * @param {String[]} result - Result from tweet regex
-     * @returns {void}
-     */
-    function defended(result) {
-        const i = ports.ports.findIndex(findIndex, result[2]);
-        const port = ports.ports[i];
-
-        console.log("      --- defended", i);
-        port.attackerNation = "";
-        port.attackerClan = "";
-        port.attackHostility = "";
-        port.portBattle = "";
-    }
-
-    /**
-     * Hostility increased
-     * @param {String[]} result - Result from tweet regex
-     * @returns {void}
-     */
-    function hostilityLevelUp(result) {
-        const i = ports.ports.findIndex(findIndex, result[4]);
-        const port = ports.ports[i];
-
-        console.log("      --- hostilityLevelUp", i);
-        port.attackerNation = result[3];
-        port.attackerClan = result[2];
-        port.attackHostility = result[6] / 100;
-    }
-
-    /**
-     * Hostility decreased
-     * @param {String[]} result - Result from tweet regex
-     * @returns {void}
-     */
-    function hostilityLevelDown(result) {
-        const i = ports.ports.findIndex(findIndex, result[4]);
-        const port = ports.ports[i];
-
-        console.log("      --- hostilityLevelDown", i);
-        port.attackerNation = result[3];
-        port.attackerClan = result[2];
-        port.attackHostility = result[6] / 100;
-    }
-
-    /**
-     * Port battle scheduled
-     * @param {String[]} result - Result from tweet regex
-     * @returns {void}
-     */
-    function portBattleScheduled(result) {
-        const guessNationFromClanName = clanName => {
-            const guessedNation = ports.ports.find(port => port.capturer === clanName);
-            const nationName = guessedNation
-                ? nations.find(nation => nation.short === guessedNation.nation).name
-                : "n/a";
-
-            return nationName;
-        };
-
-        const i = ports.ports.findIndex(findIndex, result[2]);
-        const port = ports.ports[i];
-
-        console.log("      --- portBattleScheduled", i);
-        if (result[7]) {
-            port.attackerNation = result[7];
-        } else {
-            port.attackerNation = guessNationFromClanName(result[6]);
-        }
-
-        port.attackerClan = result[6];
-        port.attackHostility = 1;
-        port.portBattle = moment.utc(result[4], "DD MMM YYYY HH:mm").format("YYYY-MM-DD HH:mm");
-    }
-
-    /**
-     * NPC port battle scheduled
-     * @param {String[]} result - Result from tweet regex
-     * @returns {void}
-     */
-    function npcPortBattleScheduled(result) {
-        const i = ports.ports.findIndex(findIndex, result[2]);
-        const port = ports.ports[i];
-
-        console.log("      --- npcPortBattleScheduled", i);
-        port.attackerNation = "Neutral";
-        port.attackerClan = "NPC";
-        port.attackHostility = 1;
-        port.portBattle = moment.utc(result[3], "DD MMM YYYY HH:mm").format("YYYY-MM-DD HH:mm");
-    }
-
     const portR = "[A-zÀ-ÿ’ -]+";
     const portHashR = "[A-zÀ-ÿ]+";
     const nationR = "[A-zÀ-ÿ -]+";
