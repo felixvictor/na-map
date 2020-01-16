@@ -64,15 +64,17 @@ const getAPIDataAndSave = async (serverName, apiBaseFile, outfileName) => {
     }
 };
 
-export const getApiData = outBaseFilename => {
+export const getApiData = async outBaseFilename => {
+    const promiseArray = [];
     serverNames.forEach(serverName => {
         apiBaseFiles.forEach(apiBaseFile => {
             const outfileName = path.resolve(outBaseFilename, `${serverName}-${apiBaseFile}-${serverDate}.json`);
             console.log(outfileName);
             deleteAPIFiles(outfileName);
-            getAPIDataAndSave(serverName, apiBaseFile, outfileName);
+            promiseArray.push(getAPIDataAndSave(serverName, apiBaseFile, outfileName));
         });
     });
+    await Promise.all(promiseArray);
 };
 
 /*
