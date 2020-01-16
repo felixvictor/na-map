@@ -110,7 +110,7 @@ const getTowers = portElementsSlotGroups =>
         );
 
 const getJoinCircles = (id, rotation) => {
-    const [x0, y0] = apiPortPos.get(id);
+    const {x0, y0} = apiPortPos.get(id);
     const distance = 5;
     const degrees = 180 - rotation;
     const radians = (degrees * Math.PI) / 180;
