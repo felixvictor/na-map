@@ -33,9 +33,10 @@ const baseFilename = path.resolve(commonPaths.dirBuild, "API", serverDateYear, s
 
 const main = () => {
     makeDir(baseFilename);
-    getApiData(baseFilename);
-    convertGenericPortData(baseFilename);
-    convertServerSpecificPortData(baseFilename);
+    getApiData(baseFilename).then(() => {
+        convertGenericPortData(baseFilename);
+        convertServerSpecificPortData(baseFilename);
+    });
 };
 
 main();
