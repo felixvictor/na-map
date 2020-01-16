@@ -266,8 +266,11 @@ const setAndSaveFrontlines = serverName => {
 
 export const convertServerSpecificPortData = inBaseFilename => {
     serverNames.forEach(serverName => {
+        console.log(path.resolve(inBaseFilename, `${serverName}-ItemTemplates-${serverDate}.json`));
         apiItems = readJson(path.resolve(inBaseFilename, `${serverName}-ItemTemplates-${serverDate}.json`));
+        console.log(path.resolve(inBaseFilename, `${serverName}-Ports-${serverDate}.json`));
         apiPorts = readJson(path.resolve(inBaseFilename, `${serverName}-Ports-${serverDate}.json`));
+        console.log(path.resolve(inBaseFilename, `${serverName}-Shops-${serverDate}.json`));
         apiShops = readJson(path.resolve(inBaseFilename, `${serverName}-Shops-${serverDate}.json`));
 
         setAndSavePortData(serverName);
