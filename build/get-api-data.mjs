@@ -52,29 +52,33 @@ const readNAJson = async url => {
     }
 };
 
-const getAPIDataAndSave = async (serverName, apiBaseFile, outfileName) => {
+const getAPIDataAndSave = (serverName, apiBaseFile, outfileName) => {
     const url = new URL(`${sourceBaseUrl}${sourceBaseDir}/${apiBaseFile}_${serverBaseName}${serverName}.json`);
-    const data = await readNAJson(url);
-    if (data instanceof Error) {
-        throw new TypeError(data);
-    } else {
+    return new Promise(async (resolve, reject) => {
+        const data = await readNAJson(url);
+        if (data instanceof Error) {
+            reject(data);
+        }
+
         await data.sort(sortId);
-        console.log(serverName, apiBaseFile, outfileName, data[0].Id, data[0].Name);
+        console.log(serverName, apiBaseFile, outfileName, data[0].Id, data[0].Name ? data[0].Name : "");
         await saveJson(outfileName, data);
-    }
+        resolve();
+    });
 };
 
 export const getApiData = async outBaseFilename => {
-    const promiseArray = [];
-    serverNames.forEach(serverName => {
-        apiBaseFiles.forEach(apiBaseFile => {
+    const promises = [];
+    for (const serverName of serverNames) {
+        for (const apiBaseFile of apiBaseFiles) {
             const outfileName = path.resolve(outBaseFilename, `${serverName}-${apiBaseFile}-${serverDate}.json`);
             console.log(outfileName);
             deleteAPIFiles(outfileName);
-            promiseArray.push(getAPIDataAndSave(serverName, apiBaseFile, outfileName));
-        });
-    });
-    await Promise.all(promiseArray);
+            promises.push(getAPIDataAndSave(serverName, apiBaseFile, outfileName));
+        }
+    }
+
+    await Promise.all(promises);
 };
 
 /*
