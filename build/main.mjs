@@ -20,23 +20,24 @@ import { convertServerSpecificPortData } from "./convert-server-specific-port-da
 import { commonPaths, serverDateMonth, serverDateYear } from "./common.mjs";
 
 const makeDir = dir => {
-    try {
-        if (!fs.existsSync(dir)) {
-            fs.mkdirSync(dir, { recursive: true });
+    console.log("makeDir", dir);
+    fs.mkdir(dir, { recursive: true }, error => {
+        if (error) {
+            throw error;
         }
-    } catch (error) {
-        throw error;
-    }
+    });
 };
 
-const baseFilename = path.resolve(commonPaths.dirBuild, "API", serverDateYear, serverDateMonth);
+const baseFilename = path.resolve(commonPaths.dirBuild, "APIx", serverDateYear, serverDateMonth);
 
-const main = () => {
-    makeDir(baseFilename);
-    getApiData(baseFilename).then(() => {
-        convertGenericPortData(baseFilename);
-        convertServerSpecificPortData(baseFilename);
-    });
+const main = async () => {
+    await makeDir(baseFilename);
+    console.log(await getApiData(baseFilename));
+    console.log("nach getApiData");
+    console.log("vor convertGenericPortData");
+    console.log(await convertGenericPortData(baseFilename));
+    console.log("vor convertServerSpecificPortData");
+    console.log(await convertServerSpecificPortData(baseFilename));
 };
 
 main();
