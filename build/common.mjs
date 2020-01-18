@@ -13,7 +13,6 @@ import * as path from "path";
 import { fileURLToPath } from "url";
 
 import dayjs from "dayjs";
-import fetch from "node-fetch";
 
 import utc from "dayjs/plugin/utc.js";
 dayjs.extend(utc);
@@ -158,7 +157,8 @@ export const capitalToCounty = new Map([
 ]);
 
 export function saveJson(fileName, data) {
-    fs.writeFile(fileName, JSON.stringify(data), "utf8", err => {
+    console.log("saveJson", fileName);
+    fs.writeFile(fileName, JSON.stringify(data), { encoding: "utf8" }, err => {
         if (err) {
             return console.error(err);
         }
@@ -168,7 +168,7 @@ export function saveJson(fileName, data) {
 export function readTextFile(fileName) {
     let data = "";
     try {
-        data = fs.readFileSync(fileName, "utf8");
+        data = fs.readFileSync(fileName, { encoding: "utf8" });
     } catch (error) {
         if (error.code === "ENOENT") {
             console.error("File", fileName, "not found");
@@ -181,6 +181,7 @@ export function readTextFile(fileName) {
 }
 
 export function readJson(fileName) {
+    console.log("readJson", fileName);
     return JSON.parse(readTextFile(fileName));
 }
 
