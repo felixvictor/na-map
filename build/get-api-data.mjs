@@ -23,26 +23,32 @@ const serverBaseName = "cleanopenworldprod";
 // console.log(serverDate);
 
 const deleteFile = fileName => {
-    try {
-        if (fs.existsSync(fileName)) {
-            fs.unlinkSync(fileName);
+    console.log("delete", fileName);
+
+    fs.unlink(fileName, error => {
+        if (error) {
+            if (error.code !== "ENOENT") {
+                throw error;
+            }
         }
-    } catch (error) {
-        throw error;
-    }
+
+        console.log("!deleted", fileName);
+    });
 };
 
-const deleteAPIFiles = fileName => {
-    deleteFile(fileName);
-    deleteFile(`${fileName}.xz`);
+const deleteAPIFiles = async fileName => {
+    await deleteFile(fileName);
+    await deleteFile(`${fileName}.xz`);
+    return true;
 };
 
 const readNAJson = async url => {
     try {
         const response = await nodeFetch(url);
         if (response.ok) {
-            const text = await response.text();
-            const json = await JSON.parse(text.replace(/^var .+ = /, "").replace(/;$/, ""));
+            const text = (await response.text()).replace(/^var .+ = /, "").replace(/;$/, "");
+            console.log(text);
+            const json = await JSON.parse(text);
             return json;
         }
 
@@ -52,33 +58,38 @@ const readNAJson = async url => {
     }
 };
 
-const getAPIDataAndSave = (serverName, apiBaseFile, outfileName) => {
+const getAPIDataAndSave = async (serverName, apiBaseFile, outfileName) => {
     const url = new URL(`${sourceBaseUrl}${sourceBaseDir}/${apiBaseFile}_${serverBaseName}${serverName}.json`);
-    return new Promise(async (resolve, reject) => {
-        const data = await readNAJson(url);
-        if (data instanceof Error) {
-            reject(data);
-        }
+    console.log("get", url.href);
+    const data = await readNAJson(url);
 
-        await data.sort(sortId);
-        console.log(serverName, apiBaseFile, outfileName, data[0].Id, data[0].Name ? data[0].Name : "");
-        await saveJson(outfileName, data);
-        resolve();
-    });
+    if (data instanceof Error) {
+        console.log("throw", typeof data);
+        throw data;
+    }
+
+    data.sort(sortId);
+    console.log(serverName, apiBaseFile, outfileName, data[0].Id, data[0].Name ? data[0].Name : "");
+    await saveJson(outfileName, data);
+    return true;
 };
 
 export const getApiData = async outBaseFilename => {
-    const promises = [];
+    const deletePromise = [];
+    const getPromise = [];
     for (const serverName of serverNames) {
         for (const apiBaseFile of apiBaseFiles) {
             const outfileName = path.resolve(outBaseFilename, `${serverName}-${apiBaseFile}-${serverDate}.json`);
             console.log(outfileName);
-            deleteAPIFiles(outfileName);
-            promises.push(getAPIDataAndSave(serverName, apiBaseFile, outfileName));
+            deletePromise.push(deleteAPIFiles(outfileName));
+            getPromise.push(getAPIDataAndSave(serverName, apiBaseFile, outfileName));
         }
     }
 
-    await Promise.all(promises);
+    console.log(deletePromise, getPromise);
+    await Promise.all(deletePromise);
+    await Promise.all(getPromise);
+    console.log(deletePromise, getPromise);
 };
 
 /*
