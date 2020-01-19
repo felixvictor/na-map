@@ -142,7 +142,7 @@ const setAndSavePortData = serverName => {
     apiPorts.forEach(apiPort => {
         setPortFeaturePerServer(apiPort);
     });
-    saveJsonAsync(`${commonPaths.dirGenServer}/${serverName}.json`, portData);
+    saveJsonAsync(`${commonPaths.dirGenServer}/${serverName}-ports.json`, portData);
 };
 
 const setAndSaveTradeData = serverName => {
@@ -182,7 +182,7 @@ const setAndSaveTradeData = serverName => {
     });
     trades.sort(sortBy(["profitTotal"]));
 
-    saveJsonAsync(path.resolve(commonPaths.dirGenGeneric, `${serverName}-trades.json`), trades);
+    saveJsonAsync(path.resolve(commonPaths.dirGenServer, `${serverName}-trades.json`), trades);
 };
 
 const setAndSaveFrontlines = serverName => {
@@ -259,7 +259,7 @@ const setAndSaveFrontlines = serverName => {
         // frontlineDefendingNation[nationShortName].push({ key: toPortId, value: [...fromPorts] });
     }
 
-    saveJsonAsync(path.resolve(commonPaths.dirGenGeneric, `${serverName}-frontlines.json`), {
+    saveJsonAsync(path.resolve(commonPaths.dirGenServer, `${serverName}-frontlines.json`), {
         attacking: frontlineAttackingNationGroupedByToPort,
         defending: frontlineDefendingNation
     });
