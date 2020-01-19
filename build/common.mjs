@@ -23,6 +23,89 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const serverMaintenanceHour = 10;
 
 export const speedFactor = 390;
+export const speedConstA = 0.074465523706782;
+export const speedConstB = 0.00272175949231;
+
+const dirOut = path.resolve(__dirname, "..", "public", "data");
+const dirBuild = path.resolve(__dirname, "..", "build");
+const dirAPI = path.resolve(__dirname, "..", "build", "API");
+const dirModules = path.resolve(__dirname, "..", "build", "Modules");
+const dirSrc = path.resolve(__dirname, "..", "src");
+const dirGenServer = path.resolve(dirSrc, "gen-server");
+const dirGenGeneric = path.resolve(dirSrc, "gen-generic");
+
+/**
+ * Build common paths and file names
+ * @return {Object} Paths
+ */
+export const commonPaths = {
+    dirAPI,
+    dirBuild,
+    dirGenGeneric,
+    dirGenServer,
+    dirModules,
+    dirOut,
+    dirSrc,
+
+    fileTweets: path.resolve(dirAPI, "tweets.json"),
+
+    filePbSheet: path.resolve(dirGenServer, "port-battle.xlsx"),
+
+    fileBuilding: path.resolve(dirGenGeneric, "buildings.json"),
+    fileCannon: path.resolve(dirGenGeneric, "cannons.json"),
+    fileLoot: path.resolve(dirGenGeneric, "loot.json"),
+    fileModules: path.resolve(dirGenGeneric, "modules.json"),
+    fileNation: path.resolve(dirGenGeneric, "nations.json"),
+    fileOwnership: path.resolve(dirGenGeneric, "ownership.json"),
+    filePbZone: path.resolve(dirGenGeneric, "pb-zones.json"),
+    filePort: path.resolve(dirGenGeneric, "ports.json"),
+    filePrices: path.resolve(dirGenGeneric, "prices.json"),
+    fileRecipe: path.resolve(dirGenGeneric, "recipes.json"),
+    fileRepair: path.resolve(dirGenGeneric, "repairs.json"),
+    fileShip: path.resolve(dirGenGeneric, "ships.json"),
+    fileShipBlueprint: path.resolve(dirGenGeneric, "ship-blueprints.json"),
+    fileWood: path.resolve(dirGenGeneric, "woods.json")
+};
+
+/**
+ * Get server start (date and time)
+ * @return {string} Server start date and time
+ */
+const getServerStartDateTime = () => {
+    let serverStart = dayjs()
+        .utc()
+        .hour(serverMaintenanceHour)
+        .format("YYYY-MM-DD HH:mm");
+    // adjust reference server time if needed
+    if (dayjs.utc().isBefore(serverStart)) {
+        serverStart = dayjs.utc(serverStart).subtract(1, "day");
+    }
+
+    return serverStart;
+};
+
+/**
+ * Get server start (date)
+ * @return {string} Server start date
+ */
+const getServerStartDate = () => dayjs.utc(getServerStartDateTime()).format("YYYY-MM-DD");
+
+export const serverStartDateTime = getServerStartDateTime();
+export const serverStartDate = getServerStartDate();
+export const serverNames = ["eu1", "eu2"];
+export const apiBaseFiles = ["ItemTemplates", "Ports", "Shops"];
+export const serverTwitterNames = ["eu1"];
+const serverDateYear = String(dayjs(serverStartDate).year());
+const serverDateMonth = String(dayjs(serverStartDate).month() + 1).padStart(2, "0");
+export const baseAPIFilename = path.resolve(commonPaths.dirAPI, serverDateYear, serverDateMonth);
+
+/* testbed
+   server_base_name="clean"
+   source_base_url="http://storage.googleapis.com/nacleandevshards/"
+   server_names=(dev)
+*/
+
+export const distanceMapSize = 4096;
 
 const transformMatrix = {
     A: -0.00499866779363828,
@@ -315,9 +398,6 @@ export const round = (n, d = 0) => Number(Math.round(n * 10 ** d) / 10 ** d);
  */
 export const roundToThousands = x => round(x, 3);
 
-export const speedConstA = 0.074465523706782;
-export const speedConstB = 0.00272175949231;
-
 /**
  * Group by
  * {@link https://stackoverflow.com/a/38327540
@@ -338,6 +418,15 @@ export function groupToMap(list, keyGetter) {
     });
     return map;
 }
+
+/**
+ * Create array with numbers ranging from start to end
+ * {@link https://stackoverflow.com/questions/36947847/how-to-generate-range-of-numbers-from-0-to-n-in-es2015-only/36953272}
+ * @param {Number} start - Start index
+ * @param {Number} end - End index
+ * @returns {Number[]} Result
+ */
+export const range = (start, end) => [...new Array(1 + end - start).keys()].map(v => start + v);
 
 /**
  * Calculate the k distance between two svg coordinates
@@ -440,83 +529,6 @@ export const makeDirAsync = dir => {
         }
     });
 };
-
-const dirOut = path.resolve(__dirname, "..", "public", "data");
-const dirBuild = path.resolve(__dirname, "..", "build");
-const dirAPI = path.resolve(__dirname, "..", "build", "API");
-const dirSrc = path.resolve(__dirname, "..", "src");
-const dirGenServer = path.resolve(dirSrc, "gen-server");
-const dirGenGeneric = path.resolve(dirSrc, "gen-generic");
-
-/**
- * Build common paths and file names
- * @return {Object} Paths
- */
-export const commonPaths = {
-    dirAPI,
-    dirBuild,
-    dirGenGeneric,
-    dirGenServer,
-    dirOut,
-    dirSrc,
-
-    fileTweets: path.resolve(dirAPI, "tweets.json"),
-
-    fileExcel: path.resolve(dirGenServer, "port-battle.xlsx"),
-
-    fileBuilding: path.resolve(dirGenGeneric, "buildings.json"),
-    fileCannon: path.resolve(dirGenGeneric, "cannons.json"),
-    fileLoot: path.resolve(dirGenGeneric, "loot.json"),
-    fileNation: path.resolve(dirGenGeneric, "nations.json"),
-    fileOwnership: path.resolve(dirGenGeneric, "ownership.json"),
-    filePbZone: path.resolve(dirGenGeneric, "pb-zones.json"),
-    filePort: path.resolve(dirGenGeneric, "ports.json"),
-    filePrices: path.resolve(dirGenGeneric, "prices.json"),
-    fileRecipe: path.resolve(dirGenGeneric, "recipes.json"),
-    fileRepair: path.resolve(dirGenGeneric, "repairs.json"),
-    fileShip: path.resolve(dirGenGeneric, "ships.json"),
-    fileShipBlueprint: path.resolve(dirGenGeneric, "ship-blueprints.json")
-};
-
-/**
- * Get server start (date and time)
- * @return {string} Server start date and time
- */
-const getServerStartDateTime = () => {
-    let serverStart = dayjs()
-        .utc()
-        .hour(serverMaintenanceHour)
-        .format("YYYY-MM-DD HH:mm");
-    // adjust reference server time if needed
-    if (dayjs.utc().isBefore(serverStart)) {
-        serverStart = dayjs.utc(serverStart).subtract(1, "day");
-    }
-
-    return serverStart;
-};
-
-/**
- * Get server start (date)
- * @return {string} Server start date
- */
-const getServerStartDate = () => dayjs.utc(getServerStartDateTime()).format("YYYY-MM-DD");
-
-export const serverStartDateTime = getServerStartDateTime();
-export const serverStartDate = getServerStartDate();
-export const serverNames = ["eu1", "eu2"];
-export const apiBaseFiles = ["ItemTemplates", "Ports", "Shops"];
-export const serverTwitterNames = ["eu1"];
-const serverDateYear = String(dayjs(serverStartDate).year());
-const serverDateMonth = String(dayjs(serverStartDate).month() + 1).padStart(2, "0");
-export const baseAPIFilename = path.resolve(commonPaths.dirAPI, serverDateYear, serverDateMonth);
-
-/* testbed
-   server_base_name="clean"
-   source_base_url="http://storage.googleapis.com/nacleandevshards/"
-   server_names=(dev)
-*/
-
-export const distanceMapSize = 512;
 
 /**
  * Find Nation object based on nation name
