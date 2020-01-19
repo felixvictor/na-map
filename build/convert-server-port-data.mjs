@@ -9,7 +9,9 @@
  */
 
 import * as path from "path";
+
 import d3Node from "d3-node";
+import dayjs from "dayjs";
 
 import {
     baseAPIFilename,
@@ -185,6 +187,27 @@ const setAndSaveTradeData = serverName => {
     saveJsonAsync(path.resolve(commonPaths.dirGenServer, `${serverName}-trades.json`), trades);
 };
 
+const setAndSavePortBattleData = serverName => {
+    const ticks = 621355968000000000;
+    const pb = {};
+
+    pb.ports = apiPorts
+        .map(port => ({
+            id: Number(port.Id),
+            name: cleanName(port.Name),
+
+            nation: nations[port.Nation].short,
+            capturer: port.Capturer,
+            lastPortBattle: dayjs((port.LastPortBattle - ticks) / 10000).format("YYYY-MM-DD HH:mm"),
+            attackerNation: "",
+            attackerClan: "",
+            attackHostility: "",
+            portBattle: ""
+        }))
+        .sort(sortBy(["id"]));
+    saveJsonAsync(path.resolve(commonPaths.dirGenServer, `${serverName}-pb.json`), pb);
+};
+
 const setAndSaveFrontlines = serverName => {
     const outNations = ["NT"];
     const frontlineAttackingNationGroupedByToPort = {};
@@ -271,11 +294,9 @@ export const convertServerPortData = () => {
         apiShops = readJson(path.resolve(baseAPIFilename, `${serverName}-Shops-${serverDate}.json`));
         apiItems = readJson(path.resolve(baseAPIFilename, `${serverName}-ItemTemplates-${serverDate}.json`));
 
-        console.log("setAndSavePortData", serverName);
         setAndSavePortData(serverName);
-        console.log("setAndSaveTradeData", serverName);
         setAndSaveTradeData(serverName);
-        console.log("setAndSaveFrontlines", serverName);
+        setAndSavePortBattleData(serverName);
         setAndSaveFrontlines(serverName);
     }
 };

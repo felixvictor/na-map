@@ -53,7 +53,7 @@ export default class DisplayPorts {
     constructor(map) {
         this._map = map;
 
-        this._serverName = this._map._serverName;
+        this._serverName = this._map.serverName;
         this._minScale = this._map._minScale;
         this._scale = this._minScale;
         this.f11 = this._map._f11;
@@ -157,7 +157,7 @@ export default class DisplayPorts {
          */
         const dataSources = [
             {
-                fileName: `${this._serverName}.json`,
+                fileName: `${this._serverName}-ports.json`,
                 name: "server"
             },
             {
@@ -176,7 +176,9 @@ export default class DisplayPorts {
         };
 
         try {
-            readData.ports = (await import(/* webpackChunkName: "data-ports" */ "../../gen/ports.json")).default;
+            readData.ports = (
+                await import(/* webpackChunkName: "data-ports" */ "../../gen-generic/ports.json")
+            ).default;
             await loadEntries(dataSources);
             return readData;
         } catch (error) {

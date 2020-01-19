@@ -20,7 +20,7 @@ const { isProduction } = require("webpack-mode");
 const servers = require("./src/js/servers");
 const PACKAGE = require("./package.json");
 
-const repairs = require("./src/gen/repairs.json");
+const repairs = require("./src/gen-generic/repairs.json");
 const libraryName = PACKAGE.name;
 const { TARGET } = process.env;
 const target = `https://${TARGET}.netlify.com/`;
@@ -316,11 +316,10 @@ const config = {
         new CopyPlugin([
             { from: "../netlify.toml" },
             {
-                from: "data/*.json",
+                from: "gen-server",
                 to: `${dirOutput}/data`,
                 flatten: true
             },
-            { from: "data/*.xlsx", flatten: true },
             { from: "google979f2cf3bed204d6.html", to: "google979f2cf3bed204d6.html", toType: "file" },
             { from: "images/map", to: `${dirOutput}/images/map` }
         ]),
