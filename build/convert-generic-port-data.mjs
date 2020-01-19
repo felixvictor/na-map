@@ -21,7 +21,7 @@ import {
     distanceMapSize,
     readJson,
     rotationAngleInDegrees,
-    saveJson,
+    saveJsonAsync,
     serverNames,
     serverStartDate as serverDate,
     sortBy
@@ -78,7 +78,7 @@ const setAndSavePortData = () => {
         })
         .sort(sortBy(["id"]));
 
-    saveJson(commonPaths.filePort, ports);
+    saveJsonAsync(commonPaths.filePort, ports);
 };
 
 const getPBCircles = portBattleZonePositions =>
@@ -145,7 +145,7 @@ const setAndSavePBZones = () => {
         }))
         .sort(sortBy(["id"]));
 
-    saveJson(commonPaths.filePbZone, ports);
+    saveJsonAsync(commonPaths.filePbZone, ports);
 };
 
 /**
@@ -209,8 +209,8 @@ const setAndSaveCountyRegionData = () => {
         setCountyFeature(apiPort.CountyCapitalName, portPos);
         setRegionFeature(apiPort.Location, portPos);
     });
-    saveJson(`${commonPaths.dirGen}/regions.json`, geoJsonRegions);
-    saveJson(`${commonPaths.dirGen}/counties.json`, geoJsonCounties);
+    saveJsonAsync(`${commonPaths.dirGenGeneric}/regions.json`, geoJsonRegions);
+    saveJsonAsync(`${commonPaths.dirGenGeneric}/counties.json`, geoJsonCounties);
 
     geoJsonRegions.features.forEach(region => {
         region.geometry.type = "Point";
@@ -218,7 +218,7 @@ const setAndSaveCountyRegionData = () => {
             Math.trunc(coordinate)
         );
     });
-    saveJson(`${commonPaths.dirGen}/region-labels.json`, geoJsonRegions);
+    saveJsonAsync(`${commonPaths.dirGenGeneric}/region-labels.json`, geoJsonRegions);
 
     geoJsonCounties.features.forEach(county => {
         county.geometry.type = "Point";
@@ -227,14 +227,14 @@ const setAndSaveCountyRegionData = () => {
         );
     });
 
-    saveJson(`${commonPaths.dirGen}/county-labels.json`, geoJsonCounties);
+    saveJsonAsync(`${commonPaths.dirGenGeneric}/county-labels.json`, geoJsonCounties);
 };
 
 /**
  * Find all port with the same distance to two or more ports
  */
 const getEquidistantPorts = () => {
-    const distancesFile = path.resolve(commonPaths.dirGen, `distances-${distanceMapSize}.json`);
+    const distancesFile = path.resolve(commonPaths.dirGenGeneric, `distances-${distanceMapSize}.json`);
     const distances = readJson(distancesFile);
     const distancesMap = new Map();
 
@@ -255,7 +255,7 @@ const getEquidistantPorts = () => {
     });
 
     const out = [...distancesMap].filter(([, values]) => values.length > 1);
-    saveJson("equidistant-ports.json", out);
+    saveJsonAsync("equidistant-ports.json", out);
 };
 
 export const convertGenericPortData = () => {
