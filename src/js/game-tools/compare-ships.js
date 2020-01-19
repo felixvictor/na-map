@@ -1462,9 +1462,9 @@ export default class CompareShips {
     async _loadAndSetupData() {
         try {
             this._moduleDataDefault = (
-                await import(/* webpackChunkName: "data-modules" */ "../../gen/modules.json")
+                await import(/* webpackChunkName: "data-modules" */ "../../gen-generic/modules.json")
             ).default;
-            this._shipData = (await import(/* webpackChunkName: "data-ships" */ "../../gen/ships.json")).default;
+            this._shipData = (await import(/* webpackChunkName: "data-ships" */ "../../gen-generic/ships.json")).default;
             this._setupData();
             if (this._baseId !== "ship-journey") {
                 this.woodCompare = new CompareWoods(this._woodId);

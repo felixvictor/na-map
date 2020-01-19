@@ -92,10 +92,15 @@ export default class SelectPorts {
     }
 
     async _loadData() {
+        /**
+         * Data directory
+         * @type {string}
+         * @private
+         */
+        const dataDirectory = "data";
+
         try {
-            this._frontlinesData = (
-                await import(/* webpackChunkName: "data-frontlines" */ "../../gen/frontlines.json")
-            ).default;
+            this._frontlinesData = await (await fetch(`${dataDirectory}/${this._map.serverName}-frontlines.json`)).json();
         } catch (error) {
             putImportError(error);
         }
