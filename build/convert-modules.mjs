@@ -4,26 +4,34 @@
  * @file      Convert modules.
  * @module    build/convert-modules
  * @author    iB aka Felix Victor
- * @copyright 2017, 2018, 2019
+ * @copyright 2017, 2018, 2019, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { capitalizeFirstLetter, cleanName, groupToMap, readJson, saveJsonAsync, sortBy } from "./common.mjs";
+import {
+    capitalizeFirstLetter,
+    cleanName,
+    commonPaths,
+    groupToMap,
+    readJson,
+    saveJsonAsync,
+    sortBy,
+    baseAPIFilename,
+    serverNames,
+    serverStartDate as serverDate
+} from "./common.mjs";
+import * as path from "path";
 
-const itemsFilename = process.argv[2];
-const outDir = process.argv[3];
-const date = process.argv[4];
-
-const apiItems = readJson(`${itemsFilename}-ItemTemplates-${date}.json`);
+let apiItems = [];
 
 /**
- * Convert API module data and save sorted as JSON
+ * Convert API module data
  * @returns {void}
  */
-function convertModules() {
+export const convertModulesAndWoodData = () => {
     const modules = new Map();
 
-    const woodJson = {};
+    const woods = {};
     const moduleRate = [
         {
             level: "L",
@@ -41,8 +49,8 @@ function convertModules() {
 
     const bonusRegex = new RegExp("(.+\\sBonus)\\s(\\d)", "u");
 
-    woodJson.trim = [];
-    woodJson.frame = [];
+    woods.trim = [];
+    woods.frame = [];
 
     const levels = new Map([
         ["Universal", "U"],
@@ -245,17 +253,17 @@ function convertModules() {
         if (module.name.endsWith(" Planking") || module.name === "Crew Space") {
             wood.type = "Trim";
             wood.name = module.name.replace(" Planking", "");
-            woodJson.trim.push(wood);
+            woods.trim.push(wood);
         } else {
             wood.type = "Frame";
             wood.name = module.name.replace(" Frame", "");
-            woodJson.frame.push(wood);
+            woods.frame.push(wood);
         }
 
         // Sort by modifier
         ["frame", "trim"].forEach(type => {
-            woodJson[type].forEach(APIwood => {
-                APIwood.properties.sort(sortBy(["modifier"]));
+            woods[type].forEach(APIwood => {
+                APIwood.properties.sort(sortBy(["modifier", "id"]));
             });
         });
     }
@@ -463,11 +471,14 @@ function convertModules() {
         });
 
     let result = [...modules.values()];
-    result = result.filter(module => Object.keys(module).length).sort(sortBy(["type", "name", "moduleLevel"]));
-    const grouped = [...groupToMap(result, module => module.type)];
+    result = result.filter(module => Object.keys(module).length).sort(sortBy(["type", "id"]));
+    const modulesGrouped = [...groupToMap(result, module => module.type)];
 
-    saveJsonAsync(`${outDir}/modules.json`, grouped);
-    saveJsonAsync(`${outDir}/woods.json`, woodJson);
-}
+    saveJsonAsync(commonPaths.fileModules, modulesGrouped);
+    saveJsonAsync(commonPaths.fileWood, woods);
+};
 
-convertModules();
+export const convertModules = () => {
+    apiItems = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`));
+    convertModulesAndWoodData();
+};
