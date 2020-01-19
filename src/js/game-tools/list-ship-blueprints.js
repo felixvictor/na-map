@@ -39,9 +39,9 @@ export default class ListShipBlueprints {
     async _loadAndSetupData() {
         try {
             this._blueprintData = (
-                await import(/* webpackChunkName: "data-ship-blueprints" */ "../../gen/ship-blueprints.json")
+                await import(/* webpackChunkName: "data-ship-blueprints" */ "../../gen-generic/ship-blueprints.json")
             ).default;
-            this._woodData = (await import(/* webpackChunkName: "data-woods" */ "../../gen/woods.json")).default;
+            this._woodData = (await import(/* webpackChunkName: "data-woods" */ "../../gen-generic/woods.json")).default;
             /**
              * @typedef {object} extractionCost
              * @property {Number} price Extraction price
@@ -55,7 +55,7 @@ export default class ListShipBlueprints {
              * @type {Map<string, extractionCost>}
              * @private
              */
-            const costs = (await import(/* webpackChunkName: "data-ship-blueprints" */ "../../gen/prices.json"))
+            const costs = (await import(/* webpackChunkName: "data-ship-blueprints" */ "../../gen-generic/prices.json"))
                 .default;
             this._extractionCosts = new Map(
                 costs.standard.map(cost => [cost.name, { real: cost.real, labour: cost.labour }])

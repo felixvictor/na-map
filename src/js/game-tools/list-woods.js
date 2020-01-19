@@ -33,7 +33,7 @@ export default class ListWoods {
 
     async _loadAndSetupData() {
         try {
-            this._woodData = (await import(/* webpackChunkName: "data-woods" */ "../../gen/woods.json")).default;
+            this._woodData = (await import(/* webpackChunkName: "data-woods" */ "../../gen-generic/woods.json")).default;
         } catch (error) {
             putImportError(error);
         }
