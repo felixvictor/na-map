@@ -265,8 +265,8 @@ export const convertGenericPortData = () => {
         apiPorts.map(apiPort => [
             Number(apiPort.Id),
             {
-                x: apiPort.Position.x,
-                y: apiPort.Position.z
+                x: Math.trunc(convertCoordX(apiPort.Position.x, apiPort.Position.z)),
+                y: Math.trunc(convertCoordY(apiPort.Position.x, apiPort.Position.z))
             }
         ])
     );

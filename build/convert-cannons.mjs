@@ -1,21 +1,22 @@
-#!/usr/bin/env -S node --experimental-modules
-
 /**
  * This file is part of na-map.
  *
  * @file      Cannon data.
  * @module    convert-cannons
  * @author    iB aka Felix Victor
- * @copyright 2018, 2019
+ * @copyright 2018, 2019, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
 import * as fs from "fs";
-import convert from "xml-js";
-import { readTextFile, round, saveJsonAsync } from "./common.mjs";
+import * as path from "path";
 
-const inDirectory = process.argv[2];
-const filename = process.argv[3];
+import convert from "xml-js";
+
+import { commonPaths, readTextFile, round, saveJsonAsync } from "./common.mjs";
+
+const peneDistances = [50, 100, 250, 500, 750, 1000];
+const cannonTypes = ["medium", "long", "carronade"];
 
 const countDecimals = value => {
     if (Math.floor(value) === value) {
@@ -25,14 +26,22 @@ const countDecimals = value => {
     return value.toString().split(".")[1].length || 0;
 };
 
-const peneDistances = [50, 100, 250, 500, 750, 1000];
-const cannonTypes = ["medium", "long", "carronade"];
+/**
+ * Get content of XML file in json format
+ * @param {string} baseFileName - Base file name
+ * @returns {Object} File content in json format
+ */
+const getFileData = baseFileName => {
+    const fileName = path.resolve(commonPaths.dirModules, baseFileName);
+    const fileXmlData = readTextFile(fileName);
+    return convert.xml2js(fileXmlData, { compact: true });
+};
 
 /**
  * Retrieve cannon data from game files and store it
  * @returns {void}
  */
-function convertCannons() {
+export const convertCannons = () => {
     const cannons = {};
     cannonTypes.forEach(type => {
         cannons[type] = [];
@@ -65,7 +74,7 @@ function convertCannons() {
         });
     };
 
-    getBaseFileNames(inDirectory);
+    getBaseFileNames(commonPaths.dirModules);
 
     /**
      * @typedef SubFileStructure
@@ -184,17 +193,6 @@ function convertCannons() {
         cannons[type].push(cannon);
     }
 
-    /**
-     * Get content of XML file in json format
-     * @param {string} baseFileName - Base file name
-     * @returns {Object} File content in json format
-     */
-    const getFileData = baseFileName => {
-        const fileName = `${inDirectory}/${baseFileName}`;
-        const fileXmlData = readTextFile(fileName);
-        return convert.xml2js(fileXmlData, { compact: true });
-    };
-
     // Get all files without a master
     [...fileNames].forEach(baseFileName => {
         const fileData = getFileData(baseFileName);
@@ -244,7 +242,5 @@ function convertCannons() {
         });
     });
 
-    saveJsonAsync(filename, cannons);
-}
-
-convertCannons();
+    saveJsonAsync(commonPaths.fileCannon, cannons);
+};

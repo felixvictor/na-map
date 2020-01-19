@@ -14,10 +14,20 @@ import * as fs from "fs";
 import * as path from "path";
 import { execSync } from "child_process";
 
+import { convertBuildingData } from "./convert-buildings.mjs";
+import { convertCannons } from "./convert-cannons.mjs";
 import { convertGenericPortData } from "./convert-generic-port-data.mjs";
+import { convertLootData } from "./convert-loot.mjs";
+import { convertModules } from "./convert-modules.mjs";
+import { convertRecipeData } from "./convert-recipes.mjs";
+import { convertRepairData } from "./convert-module-repair-data.mjs";
 import { convertServerPortData } from "./convert-server-port-data.mjs";
+import { convertShipData } from "./convert-ship-data.mjs";
+import { convertOwnershipData } from "./convert-ownership.mjs";
 
 import { apiBaseFiles, baseAPIFilename, serverNames, serverStartDate as serverDate } from "./common.mjs";
+
+const runType = process.argv[2] || "client";
 
 const xz = (command, fileName) => {
     if (fs.existsSync(fileName)) {
@@ -54,10 +64,18 @@ const uncompressApiData = () => {
 };
 
 const convertApiData = () => {
-    console.log("vor convertGenericPortData");
+    convertBuildingData();
+    convertCannons();
     convertGenericPortData();
-    console.log("vor convertServerPortData");
+    convertLootData();
+    convertModules();
+    convertRecipeData();
+    convertRepairData();
     convertServerPortData();
+    convertShipData();
+    if (runType === "server") {
+        convertOwnershipData();
+    }
 };
 
 uncompressApiData();
