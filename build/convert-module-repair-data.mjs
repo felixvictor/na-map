@@ -11,7 +11,7 @@
 // noinspection ES6CheckImport
 import convert from "xml-js";
 
-import { readTextFile, saveJson } from "./common.mjs";
+import { readTextFile, saveJsonAsync } from "./common.mjs";
 
 /**
  * Change string from snake case to camelCase
@@ -69,7 +69,7 @@ function convertRepairData() {
         repairs[toCamelCase(baseFileName)] = data;
     });
 
-    saveJson(filename, repairs);
+    saveJsonAsync(filename, repairs);
 }
 
 convertRepairData();
