@@ -429,39 +429,54 @@ export const cleanName = name =>
         .replace("oak", "Oak")
         .trim();
 
+/**
+ * Make directories (recursive)
+ * @param {string} dir - Directory path
+ * @return {void}
+ */
+export const makeDirAsync = dir => {
+    fs.mkdir(dir, { recursive: true }, error => {
+        if (error) {
+            throw error;
+        }
+    });
+};
+
 const dirOut = path.resolve(__dirname, "..", "public", "data");
 const dirBuild = path.resolve(__dirname, "..", "build");
+const dirAPI = path.resolve(__dirname, "..", "build", "API");
 const dirSrc = path.resolve(__dirname, "..", "src");
-const dirData = path.resolve(dirSrc, "data");
-const dirGen = path.resolve(dirSrc, "gen");
+const dirGenServer = path.resolve(dirSrc, "gen-server");
+const dirGenGeneric = path.resolve(dirSrc, "gen-generic");
 
 /**
  * Build common paths and file names
  * @return {Object} Paths
  */
 export const commonPaths = {
-    dirOut,
+    dirAPI,
     dirBuild,
+    dirData: dirGenServer,
+    dirGen: dirGenGeneric,
+    dirOut,
     dirSrc,
-    dirData,
-    dirGen,
 
-    fileTweets: path.resolve(dirBuild, "API/tweets.json"),
+    fileTweets: path.resolve(dirAPI, "tweets.json"),
 
-    fileExcel: path.resolve(dirData, "port-battle.xlsx"),
+    fileExcel: path.resolve(dirGenServer, "port-battle.xlsx"),
 
-    fileBuilding: path.resolve(dirGen, "buildings.json"),
-    fileCannon: path.resolve(dirGen, "cannons.json"),
-    fileLoot: path.resolve(dirGen, "loot.json"),
-    fileNation: path.resolve(dirGen, "nations.json"),
-    fileOwnership: path.resolve(dirGen, "ownership.json"),
-    filePbZone: path.resolve(dirGen, "pb-zones.json"),
-    filePort: path.resolve(dirGen, "ports.json"),
-    filePrices: path.resolve(dirGen, "prices.json"),
-    fileRecipe: path.resolve(dirGen, "recipes.json"),
-    fileRepair: path.resolve(dirGen, "repairs.json"),
-    fileShip: path.resolve(dirGen, "ships.json"),
-    fileShipBlueprint: path.resolve(dirGen, "ship-blueprints.json")
+    fileBuilding: path.resolve(dirGenGeneric, "buildings.json"),
+    fileCannon: path.resolve(dirGenGeneric, "cannons.json"),
+    fileLoot: path.resolve(dirGenGeneric, "loot.json"),
+    fileNation: path.resolve(dirGenGeneric, "nations.json"),
+    fileOwnership: path.resolve(dirGenGeneric, "ownership.json"),
+    filePbZone: path.resolve(dirGenGeneric, "pb-zones.json"),
+    filePort: path.resolve(dirGenGeneric, "ports.json"),
+    filePrices: path.resolve(dirGenGeneric, "prices.json"),
+    fileRecipe: path.resolve(dirGenGeneric, "recipes.json"),
+    fileRepair: path.resolve(dirGenGeneric, "repairs.json"),
+    fileShip: path.resolve(dirGenGeneric, "ships.json"),
+    fileShipBlueprint: path.resolve(dirGenGeneric, "ship-blueprints.json")
 };
 
 /**
@@ -489,11 +504,12 @@ const getServerStartDate = () => dayjs.utc(getServerStartDateTime()).format("YYY
 
 export const serverStartDateTime = getServerStartDateTime();
 export const serverStartDate = getServerStartDate();
-export const serverDateYear = String(dayjs(serverStartDate).year());
-export const serverDateMonth = String(dayjs(serverStartDate).month() + 1).padStart(2, "0");
 export const serverNames = ["eu1", "eu2"];
 export const apiBaseFiles = ["ItemTemplates", "Ports", "Shops"];
 export const serverTwitterNames = ["eu1"];
+const serverDateYear = String(dayjs(serverStartDate).year());
+const serverDateMonth = String(dayjs(serverStartDate).month() + 1).padStart(2, "0");
+export const baseAPIFilename = path.resolve(commonPaths.dirAPI, serverDateYear, serverDateMonth);
 
 /* testbed
    server_base_name="clean"
