@@ -18,7 +18,7 @@ import {
     apiBaseFiles,
     baseAPIFilename,
     makeDirAsync,
-    saveJson,
+    saveJsonAsync,
     serverNames,
     serverStartDate as serverDate,
     sortId
@@ -91,7 +91,7 @@ const getAPIDataAndSave = async (serverName, apiBaseFile, outfileName) => {
     }
 
     data.sort(sortId);
-    await saveJson(outfileName, data);
+    await saveJsonAsync(outfileName, data);
     return true;
 };
 
@@ -116,5 +116,4 @@ const getApiData = async baseAPIFilename => {
     return true;
 };
 
-makeDirAsync(baseAPIFilename);
 getApiData(baseAPIFilename);

@@ -8,7 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { cleanName, readJson, saveJson, sortBy } from "./common.mjs";
+import { cleanName, readJson, saveJsonAsync, sortBy } from "./common.mjs";
 
 const inBaseFilename = process.argv[2];
 const outFilename = process.argv[3];
@@ -140,7 +140,7 @@ resourceRatios.forEach((value, key) => {
  * @return {void}
  */
 const convertShipBlueprints = () => {
-    saveJson(outFilename, data);
+    saveJsonAsync(outFilename, data);
 };
 
 convertShipBlueprints();

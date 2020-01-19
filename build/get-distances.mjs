@@ -11,9 +11,20 @@
  */
 
 import * as fs from "fs";
+import * as path from "path";
 import { default as Denque } from "denque";
 import { default as PNG } from "pngjs";
-import { convertCoordX, convertCoordY, readJson, saveJson } from "./common.mjs";
+import {
+    baseAPIFilename,
+    commonPaths,
+    convertCoordX,
+    convertCoordY,
+    distanceMapSize,
+    readJson,
+    saveJsonAsync,
+    serverNames,
+    serverStartDate as serverDate
+} from "./common.mjs";
 
 /**
  * ------------------------------------------------------------------------
@@ -21,9 +32,8 @@ import { convertCoordX, convertCoordY, readJson, saveJson } from "./common.mjs";
  * ------------------------------------------------------------------------
  */
 
-const mapSize = 4096;
-const mapFileName = `src/images/frontline-map-${mapSize}.png`;
-const outFileName = `src/gen/distances-${mapSize}.json`;
+const mapFileName = path.resolve(commonPaths.dirSrc, "images", `frontline-map-${distanceMapSize}.png`);
+const distancesFile = path.resolve(commonPaths.dirGenGeneric, `distances-${distanceMapSize}.json`);
 
 const spotWater = 0;
 const spotLand = -1;
@@ -62,7 +72,7 @@ const getCoordinates = (y, x) => [
  * ------------------------------------------------------------------------
  */
 
-const ports = readJson("build/API/api-eu1-Ports-2019-12-29.json");
+const ports = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-Ports-${serverDate}.json`));
 const portIds = ports.map(port => Number(port.Id));
 const numPorts = portIds.length;
 
@@ -232,7 +242,7 @@ const getDistances = () => {
 
     console.timeEnd("findPath");
 
-    saveJson(outFileName, distances);
+    saveJsonAsync(distancesFile, distances);
 };
 
 getDistances();
