@@ -1,4 +1,4 @@
-import { cleanName, sortBy, readJson, roundToThousands, saveJson, speedConstA, speedConstB } from "./common.mjs";
+import { cleanName, sortBy, readJson, roundToThousands, saveJsonAsync, speedConstA, speedConstB } from "./common.mjs";
 
 const inBaseFilename = process.argv[2];
 const outFilename = process.argv[3];
@@ -124,7 +124,7 @@ function convertShips() {
     });
 
     ships.sort(sortBy(["class", "name"]));
-    saveJson(outFilename, ships);
+    saveJsonAsync(outFilename, ships);
 }
 
 convertShips();
