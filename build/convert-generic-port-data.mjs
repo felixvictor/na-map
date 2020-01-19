@@ -12,6 +12,7 @@ import * as path from "path";
 import polylabel from "polylabel";
 
 import {
+    baseAPIFilename,
     capitalToCounty,
     cleanName,
     commonPaths,
@@ -36,7 +37,7 @@ const geoJsonCounties = { type: "FeatureCollection", features: [] };
 
 const getPortName = portId => apiPorts.find(({ Id }) => Number(Id) === portId).Name;
 
-const setAndSavePortData = async () => {
+const setAndSavePortData = () => {
     /**
      * Main port data
      * @type {object} Port data
@@ -77,7 +78,7 @@ const setAndSavePortData = async () => {
         })
         .sort(sortBy(["id"]));
 
-    await saveJson(commonPaths.filePort, ports);
+    saveJson(commonPaths.filePort, ports);
 };
 
 const getPBCircles = portBattleZonePositions =>
@@ -129,7 +130,7 @@ const getRaidPoints = portRaidSpawnPoints =>
         Math.trunc(convertCoordY(raidPoint.Position.x, raidPoint.Position.z))
     ]);
 
-const setAndSavePBZones = async () => {
+const setAndSavePBZones = () => {
     const ports = apiPorts
         .filter(port => !port.NonCapturable)
         .map(port => ({
@@ -144,7 +145,7 @@ const setAndSavePBZones = async () => {
         }))
         .sort(sortBy(["id"]));
 
-    await saveJson(commonPaths.filePbZone, ports);
+    saveJson(commonPaths.filePbZone, ports);
 };
 
 /**
@@ -202,14 +203,14 @@ const setRegionFeature = (location, portPos) => {
     }
 };
 
-const setAndSaveCountyRegionData = async () => {
+const setAndSaveCountyRegionData = () => {
     apiPorts.forEach(apiPort => {
         const portPos = apiPortPos.get(Number(apiPort.Id));
         setCountyFeature(apiPort.CountyCapitalName, portPos);
         setRegionFeature(apiPort.Location, portPos);
     });
-    await saveJson(`${commonPaths.dirGen}/regions.json`, geoJsonRegions);
-    await saveJson(`${commonPaths.dirGen}/counties.json`, geoJsonCounties);
+    saveJson(`${commonPaths.dirGen}/regions.json`, geoJsonRegions);
+    saveJson(`${commonPaths.dirGen}/counties.json`, geoJsonCounties);
 
     geoJsonRegions.features.forEach(region => {
         region.geometry.type = "Point";
@@ -217,7 +218,7 @@ const setAndSaveCountyRegionData = async () => {
             Math.trunc(coordinate)
         );
     });
-    await saveJson(`${commonPaths.dirGen}/region-labels.json`, geoJsonRegions);
+    saveJson(`${commonPaths.dirGen}/region-labels.json`, geoJsonRegions);
 
     geoJsonCounties.features.forEach(county => {
         county.geometry.type = "Point";
@@ -226,13 +227,13 @@ const setAndSaveCountyRegionData = async () => {
         );
     });
 
-    await saveJson(`${commonPaths.dirGen}/county-labels.json`, geoJsonCounties);
+    saveJson(`${commonPaths.dirGen}/county-labels.json`, geoJsonCounties);
 };
 
 /**
  * Find all port with the same distance to two or more ports
  */
-const getEquidistantPorts = async () => {
+const getEquidistantPorts = () => {
     const distancesFile = path.resolve(commonPaths.dirGen, `distances-${distanceMapSize}.json`);
     const distances = readJson(distancesFile);
     const distancesMap = new Map();
@@ -254,11 +255,11 @@ const getEquidistantPorts = async () => {
     });
 
     const out = [...distancesMap].filter(([, values]) => values.length > 1);
-    await saveJson("equidistant-ports.json", out);
+    saveJson("equidistant-ports.json", out);
 };
 
-export const convertGenericPortData = async inBaseFilename => {
-    apiPorts = readJson(path.resolve(inBaseFilename, `${serverNames[0]}-Ports-${serverDate}.json`));
+export const convertGenericPortData = () => {
+    apiPorts = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-Ports-${serverDate}.json`));
 
     apiPortPos = new Map(
         apiPorts.map(apiPort => [
@@ -270,7 +271,7 @@ export const convertGenericPortData = async inBaseFilename => {
         ])
     );
 
-    await setAndSavePortData();
-    await setAndSavePBZones();
-    await setAndSaveCountyRegionData();
+    setAndSavePortData();
+    setAndSavePBZones();
+    setAndSaveCountyRegionData();
 };
