@@ -8,7 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { cleanName, getOrdinal, readJson, saveJson, sortBy } from "./common.mjs";
+import { cleanName, getOrdinal, readJson, saveJsonAsync, sortBy } from "./common.mjs";
 
 const inBaseFilename = process.argv[2];
 const outFilename = process.argv[3];
@@ -81,7 +81,7 @@ function convertLoot() {
         }))
         .sort(sortBy(["name"]));
 
-    saveJson(outFilename, data);
+    saveJsonAsync(outFilename, data);
 }
 
 convertLoot();

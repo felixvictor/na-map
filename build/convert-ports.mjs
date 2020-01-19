@@ -15,7 +15,7 @@ import {
     convertCoordY,
     rotationAngleInDegrees,
     readJson,
-    saveJson
+    saveJsonAsync
 } from "./common.mjs";
 
 const inBaseFilename = process.argv[2];
@@ -73,7 +73,7 @@ function convertPorts() {
         });
     const ports = getPorts();
 
-    saveJson(outFilename, ports);
+    saveJsonAsync(outFilename, ports);
 }
 
 convertPorts();
