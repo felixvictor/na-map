@@ -2,7 +2,7 @@
  * This file is part of na-map.
  *
  * @file      Convert server specific port data.
- * @module    convert-server-specific-port-data
+ * @module    convert-server-port-data
  * @author    iB aka Felix Victor
  * @copyright 2018, 2019, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
@@ -19,7 +19,7 @@ import {
     findNationById,
     nations,
     readJson,
-    saveJson,
+    saveJsonAsync,
     serverNames,
     serverStartDate as serverDate,
     simpleSort,
@@ -36,7 +36,7 @@ let apiItems = [];
 let apiPorts = [];
 let apiShops = [];
 
-const distancesFile = path.resolve(commonPaths.dirGen, `distances-${distanceMapSize}.json`);
+const distancesFile = path.resolve(commonPaths.dirGenGeneric, `distances-${distanceMapSize}.json`);
 const distances = readJson(distancesFile);
 
 const portData = [];
@@ -142,7 +142,7 @@ const setAndSavePortData = serverName => {
     apiPorts.forEach(apiPort => {
         setPortFeaturePerServer(apiPort);
     });
-    saveJson(`${commonPaths.dirData}/${serverName}.json`, portData);
+    saveJsonAsync(`${commonPaths.dirGenServer}/${serverName}.json`, portData);
 };
 
 const setAndSaveTradeData = serverName => {
@@ -182,7 +182,7 @@ const setAndSaveTradeData = serverName => {
     });
     trades.sort(sortBy(["profitTotal"]));
 
-    saveJson(path.resolve(commonPaths.dirGen, `${serverName}-trades.json`), trades);
+    saveJsonAsync(path.resolve(commonPaths.dirGenGeneric, `${serverName}-trades.json`), trades);
 };
 
 const setAndSaveFrontlines = serverName => {
@@ -259,13 +259,13 @@ const setAndSaveFrontlines = serverName => {
         // frontlineDefendingNation[nationShortName].push({ key: toPortId, value: [...fromPorts] });
     }
 
-    saveJson(path.resolve(commonPaths.dirGen, `${serverName}-frontlines.json`), {
+    saveJsonAsync(path.resolve(commonPaths.dirGenGeneric, `${serverName}-frontlines.json`), {
         attacking: frontlineAttackingNationGroupedByToPort,
         defending: frontlineDefendingNation
     });
 };
 
-export const convertServerSpecificPortData = () => {
+export const convertServerPortData = () => {
     for (const serverName of serverNames) {
         apiPorts = readJson(path.resolve(baseAPIFilename, `${serverName}-Ports-${serverDate}.json`));
         apiShops = readJson(path.resolve(baseAPIFilename, `${serverName}-Shops-${serverDate}.json`));

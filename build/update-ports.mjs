@@ -9,7 +9,7 @@
  */
 
 import moment from "moment";
-import { getServerStartDateTime, findNationByName, findNationByShortName, readJson, saveJson } from "./common.mjs";
+import { getServerStartDateTime, findNationByName, findNationByShortName, readJson, saveJsonAsync } from "./common.mjs";
 
 const portFilename = process.argv[2];
 const tweetsFileName = process.argv[3];
@@ -308,7 +308,7 @@ function updatePorts() {
     });
 
     if (isPortDataChanged) {
-        saveJson(portFilename, ports);
+        saveJsonAsync(portFilename, ports);
     }
 
     return !isPortDataChanged;
