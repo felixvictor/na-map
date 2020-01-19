@@ -8,7 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { cleanName, readJson, saveJson, sortBy } from "./common.mjs";
+import { cleanName, readJson, saveJsonAsync, sortBy } from "./common.mjs";
 
 const itemsFilename = process.argv[2];
 const fileNameBuildings = process.argv[3];
@@ -189,10 +189,10 @@ function convertBuildings() {
         })
         .sort(sortBy(["name"]));
 
-    saveJson(fileNamePrices, prices);
+    saveJsonAsync(fileNamePrices, prices);
 
     result = result.filter(building => Object.keys(building).length).sort(sortBy(["name"]));
-    saveJson(fileNameBuildings, result);
+    saveJsonAsync(fileNameBuildings, result);
 }
 
 convertBuildings();

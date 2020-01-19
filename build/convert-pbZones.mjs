@@ -8,7 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { convertCoordX, convertCoordY, readJson, saveJson } from "./common.mjs";
+import { convertCoordX, convertCoordY, readJson, saveJsonAsync } from "./common.mjs";
 
 const infileBaseName = process.argv[2];
 const outFilename = process.argv[3];
@@ -77,7 +77,7 @@ function convertPBZones() {
         raidPoints: getRaidPoints(port)
     }));
 
-    saveJson(outFilename, ports);
+    saveJsonAsync(outFilename, ports);
 }
 
 convertPBZones();
