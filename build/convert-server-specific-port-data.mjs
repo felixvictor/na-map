@@ -12,6 +12,7 @@ import * as path from "path";
 import d3Node from "d3-node";
 
 import {
+    baseAPIFilename,
     cleanName,
     commonPaths,
     distanceMapSize,
@@ -137,14 +138,14 @@ const setPortFeaturePerServer = apiPort => {
     portData.push(portFeaturesPerServer);
 };
 
-const setAndSavePortData = async serverName => {
+const setAndSavePortData = serverName => {
     apiPorts.forEach(apiPort => {
         setPortFeaturePerServer(apiPort);
     });
-    await saveJson(`${commonPaths.dirData}/${serverName}.json`, portData);
+    saveJson(`${commonPaths.dirData}/${serverName}.json`, portData);
 };
 
-const setAndSaveTradeData = async serverName => {
+const setAndSaveTradeData = serverName => {
     const apiItemWeight = new Map(
         apiItems
             .filter(apiItem => !apiItem.NotUsed && !apiItem.NotTradeable && apiItem.ItemType !== "RecipeResource")
@@ -181,10 +182,10 @@ const setAndSaveTradeData = async serverName => {
     });
     trades.sort(sortBy(["profitTotal"]));
 
-    await saveJson(path.resolve(commonPaths.dirGen, `${serverName}-trades.json`), trades);
+    saveJson(path.resolve(commonPaths.dirGen, `${serverName}-trades.json`), trades);
 };
 
-const setAndSaveFrontlines = async serverName => {
+const setAndSaveFrontlines = serverName => {
     const outNations = ["NT"];
     const frontlineAttackingNationGroupedByToPort = {};
     const frontlineAttackingNationGroupedByFromPort = {};
@@ -258,23 +259,23 @@ const setAndSaveFrontlines = async serverName => {
         // frontlineDefendingNation[nationShortName].push({ key: toPortId, value: [...fromPorts] });
     }
 
-    await saveJson(path.resolve(commonPaths.dirGen, `${serverName}-frontlines.json`), {
+    saveJson(path.resolve(commonPaths.dirGen, `${serverName}-frontlines.json`), {
         attacking: frontlineAttackingNationGroupedByToPort,
         defending: frontlineDefendingNation
     });
 };
 
-export const convertServerSpecificPortData = async inBaseFilename => {
+export const convertServerSpecificPortData = () => {
     for (const serverName of serverNames) {
-        apiPorts = readJson(path.resolve(inBaseFilename, `${serverName}-Ports-${serverDate}.json`));
-        apiShops = readJson(path.resolve(inBaseFilename, `${serverName}-Shops-${serverDate}.json`));
-        apiItems = readJson(path.resolve(inBaseFilename, `${serverName}-ItemTemplates-${serverDate}.json`));
+        apiPorts = readJson(path.resolve(baseAPIFilename, `${serverName}-Ports-${serverDate}.json`));
+        apiShops = readJson(path.resolve(baseAPIFilename, `${serverName}-Shops-${serverDate}.json`));
+        apiItems = readJson(path.resolve(baseAPIFilename, `${serverName}-ItemTemplates-${serverDate}.json`));
 
         console.log("setAndSavePortData", serverName);
-      await  setAndSavePortData(serverName);
+        setAndSavePortData(serverName);
         console.log("setAndSaveTradeData", serverName);
-        await setAndSaveTradeData(serverName);
-        //   console.log("setAndSaveFrontlines", serverName);
-        //   setAndSaveFrontlines(serverName);
+        setAndSaveTradeData(serverName);
+        console.log("setAndSaveFrontlines", serverName);
+        setAndSaveFrontlines(serverName);
     }
 };
