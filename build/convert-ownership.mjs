@@ -14,7 +14,7 @@ import d3Node from "d3-node";
 import { default as lzma } from "lzma-native";
 import { default as readDirRecursive } from "recursive-readdir";
 
-import { capitalToCounty, cleanName, nations, saveJson } from "./common.mjs";
+import { capitalToCounty, cleanName, nations, saveJsonAsync } from "./common.mjs";
 
 const inDir = process.argv[2];
 const fileBaseName = process.argv[3];
@@ -265,8 +265,8 @@ function convertOwnership() {
             return newRegion;
         });
 
-        saveJson(outFileNameTimelinePorts, result);
-        saveJson(outFileNameTimelineDates, numPortsDates);
+        saveJsonAsync(outFileNameTimelinePorts, result);
+        saveJsonAsync(outFileNameTimelineDates, numPortsDates);
     }
 
     readDirRecursive(inDir, [ignoreFileName])
