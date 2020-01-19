@@ -157,7 +157,7 @@ export const capitalToCounty = new Map([
 ]);
 
 export function saveJsonAsync(fileName, data) {
-    makeDirAsync(path.basename(fileName));
+    makeDirAsync(path.dirname(fileName));
     fs.writeFile(fileName, JSON.stringify(data), { encoding: "utf8" }, err => {
         if (err) {
             return console.error(err);
