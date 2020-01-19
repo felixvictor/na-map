@@ -11,15 +11,15 @@
  */
 
 import { convertGenericPortData } from "./convert-generic-port-data.mjs";
-import { convertServerSpecificPortData } from "./convert-server-specific-port-data.mjs";
+import { convertServerPortData } from "./convert-server-port-data.mjs";
 
 // import {} from "./common.mjs";
 
 const convertApiData = async () => {
     console.log("vor convertGenericPortData");
     convertGenericPortData();
-    console.log("vor convertServerSpecificPortData");
-    convertServerSpecificPortData();
+    console.log("vor convertServerPortData");
+    convertServerPortData();
 };
 
 convertApiData();

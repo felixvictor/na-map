@@ -12,7 +12,7 @@
 
 import * as fs from "fs";
 import convert from "xml-js";
-import { readTextFile, round, saveJson } from "./common.mjs";
+import { readTextFile, round, saveJsonAsync } from "./common.mjs";
 
 const inDirectory = process.argv[2];
 const filename = process.argv[3];
@@ -244,7 +244,7 @@ function convertCannons() {
         });
     });
 
-    saveJson(filename, cannons);
+    saveJsonAsync(filename, cannons);
 }
 
 convertCannons();

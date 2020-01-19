@@ -2,7 +2,7 @@
     convert-recipes.mjs
  */
 
-import { cleanName, readJson, saveJson, simpleSort, sortBy } from "./common.mjs";
+import { cleanName, readJson, saveJsonAsync, simpleSort, sortBy } from "./common.mjs";
 
 const inBaseFilename = process.argv[2];
 const outFilename = process.argv[3];
@@ -124,7 +124,7 @@ function convertRecipes() {
     const result = [...ingredients.values()];
     data.ingredient = result.sort(sortBy(["name"]));
 
-    saveJson(outFilename, data);
+    saveJsonAsync(outFilename, data);
 }
 
 convertRecipes();

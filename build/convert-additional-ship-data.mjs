@@ -13,7 +13,7 @@ import * as fs from "fs";
 import convert from "xml-js";
 import mergeAdvanced from "object-merge-advanced";
 
-import { isEmpty, readJson, readTextFile, saveJson } from "./common.mjs";
+import { isEmpty, readJson, readTextFile, saveJsonAsync } from "./common.mjs";
 
 const inDir = process.argv[2];
 const filename = process.argv[3];
@@ -361,7 +361,7 @@ function convertAdditionalShipData() {
             });
         });
 
-    saveJson(filename, ships);
+    saveJsonAsync(filename, ships);
 }
 
 convertAdditionalShipData();

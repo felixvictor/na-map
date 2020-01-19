@@ -156,8 +156,8 @@ export const capitalToCounty = new Map([
     ["Wilmington", "North Carolina"]
 ]);
 
-export function saveJson(fileName, data) {
-    console.log("saveJson", fileName);
+export function saveJsonAsync(fileName, data) {
+    makeDirAsync(path.basename(fileName));
     fs.writeFile(fileName, JSON.stringify(data), { encoding: "utf8" }, err => {
         if (err) {
             return console.error(err);
@@ -181,7 +181,6 @@ export function readTextFile(fileName) {
 }
 
 export function readJson(fileName) {
-    console.log("readJson", fileName);
     return JSON.parse(readTextFile(fileName));
 }
 
@@ -456,8 +455,8 @@ const dirGenGeneric = path.resolve(dirSrc, "gen-generic");
 export const commonPaths = {
     dirAPI,
     dirBuild,
-    dirData: dirGenServer,
-    dirGen: dirGenGeneric,
+    dirGenGeneric,
+    dirGenServer,
     dirOut,
     dirSrc,
 
@@ -517,7 +516,7 @@ export const baseAPIFilename = path.resolve(commonPaths.dirAPI, serverDateYear, 
    server_names=(dev)
 */
 
-export const distanceMapSize = 4096;
+export const distanceMapSize = 512;
 
 /**
  * Find Nation object based on nation name
