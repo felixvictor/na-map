@@ -17,7 +17,6 @@ import { default as nodeFetch } from "node-fetch";
 import {
     apiBaseFiles,
     baseAPIFilename,
-    makeDirAsync,
     saveJsonAsync,
     serverNames,
     serverStartDate as serverDate,
