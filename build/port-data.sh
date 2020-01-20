@@ -296,7 +296,7 @@ function update_ports () {
 
     for server_name in "${server_twitter_names[@]}"; do
         pb_file="${data_dir}/${server_name}-pb.json"
-        ${command_nodejs} build/update-ports.mjs "${pb_file}" "${tweets_json}"
+        ${command_nodejs} build/update-twitter-full.mjs "${pb_file}" "${tweets_json}"
     done
 
     return $?
