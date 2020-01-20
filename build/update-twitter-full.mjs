@@ -1,23 +1,109 @@
+#!/usr/bin/env -S node --experimental-modules
+
 /**
  * This file is part of na-map.
  *
  * @file      Convert ports based on tweets.
- * @module    build/update-ports
+ * @module    build/update-twitter-full
  * @author    iB aka Felix Victor
  * @copyright 2017, 2018, 2019, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import moment from "moment";
-import { getServerStartDateTime, findNationByName, findNationByShortName, readJson, saveJsonAsync } from "./common.mjs";
+import * as path from "path";
+import dayjs from "dayjs";
+import Twit from "twit";
 
-const portFilename = process.argv[2];
-const tweetsFileName = process.argv[3];
+import {
+    baseAPIFilename,
+    commonPaths,
+    findNationByName,
+    findNationByShortName,
+    readJson,
+    saveJsonAsync,
+    serverNames,
+    serverStartDate as serverDate
+} from "./common.mjs";
 
-const ports = readJson(portFilename);
-const tweets = readJson(tweetsFileName);
+const consumerKey = process.argv[2];
+const consumerSecret = process.argv[3];
+const accessToken = process.argv[4];
+const accessTokenSecret = process.argv[5];
 
-const serverStart = getServerStartDateTime();
+const apiPorts = [];
+let tweets = {};
+
+const getTweetsInRange = () => {
+    /*
+    local query_date
+    query_date="$1"
+    local query_hour
+    query_hour="$2"
+
+    local url_start
+    url_start="/1.1/search/tweets.json?tweet_mode=extended&count=100&result_type=recent"
+    local query_end
+    query_end=":\"%20from:zz569k"
+    local jq_format
+    jq_format="{ tweets: [ .statuses[] | { id: .id_str, text: .full_text } ], refresh: .search_metadata.max_id_str }"
+    local query_start
+    query_start="&q=\"[${query_date} ${query_hour}"
+
+    ${command_twurl} "${url_start}${query_start}${query_end}" | ${command_jq} "${jq_format}" >> "${tweets_json}"
+    echo "," >> "${tweets_json}"
+     */
+};
+
+const getTweets = () => {
+    /*
+
+time_of_day=$(date '+%d-%m-%Y' -d "${server_date} - 2 day")
+for query_hour in $(seq 0 23); do
+    get_tweets_in_range "${time_of_day}" "$(printf "%02d\n" "${query_hour}")"
+done
+
+time_of_day=$(date '+%d-%m-%Y' -d "${server_date} - 1 day")
+for query_hour in $(seq 0 23); do
+    get_tweets_in_range "${time_of_day}" "$(printf "%02d\n" "${query_hour}")"
+done
+
+time_of_day=$(date '+%d-%m-%Y' -d "${server_date}")
+for query_hour in $(seq 0 23); do
+    get_tweets_in_range "${time_of_day}" "$(printf "%02d\n" "${query_hour}")"
+done
+
+time_of_day=$(date '+%d-%m-%Y' -d "${server_date} + 1 day")
+for query_hour in $(seq 0 ${server_maintenance_hour}); do
+    get_tweets_in_range "${time_of_day}" "$(printf "%02d\n" "${query_hour}")"
+done
+
+# Remove trailing comma
+sed -i '$s/,$//' "${tweets_json}"
+echo "]" >> "${tweets_json}"
+    */
+    const T = new Twit({
+        // eslint-disable-next-line camelcase
+        consumer_key: consumerKey,
+        // eslint-disable-next-line camelcase
+        consumer_secret: consumerSecret,
+        // eslint-disable-next-line camelcase
+        access_token: accessToken,
+        // eslint-disable-next-line camelcase
+        access_token_secret: accessTokenSecret,
+        // eslint-disable-next-line camelcase
+        timeout_ms: 60 * 1000, // optional HTTP request timeout to apply to all requests.
+        strictSSL: true // optional - requires SSL certificates to be valid.
+    });
+
+    T.get("search/tweets", { q: "from:zz569k", count: 100 }, (err, data) => {
+        if (err) {
+            throw err;
+        }
+
+        tweets = { tweets: data.statuses.map(status => status.text), refresh: Number(data.search_metadata.max_id) };
+        console.log(tweets);
+    });
+};
 
 /**
  * Find index by port name
@@ -32,13 +118,13 @@ const findIndex = element => element.name === this;
  * @returns {void}
  */
 const captured = result => {
-    const i = ports.ports.findIndex(findIndex, result[2]);
-    const port = ports.ports[i];
+    const i = apiPorts.ports.findIndex(findIndex, result[2]);
+    const port = apiPorts.ports[i];
 
     console.log("      --- captured", i);
     port.nation = findNationByName(result[4]).short;
     port.capturer = result[3];
-    port.lastPortBattle = moment.utc(result[1], "DD-MM-YYYY HH:mm").format("YYYY-MM-DD HH:mm");
+    port.lastPortBattle = dayjs.utc(result[1], "DD-MM-YYYY HH:mm").format("YYYY-MM-DD HH:mm");
     port.attackerNation = "";
     port.attackerClan = "";
     port.attackHostility = "";
@@ -51,13 +137,13 @@ const captured = result => {
  * @returns {void}
  */
 const npcCaptured = result => {
-    const i = ports.ports.findIndex(findIndex, result[2]);
-    const port = ports.ports[i];
+    const i = apiPorts.ports.findIndex(findIndex, result[2]);
+    const port = apiPorts.ports[i];
 
     console.log("      --- captured by NPC", i);
     port.nation = "NT";
     port.capturer = "RAIDER";
-    port.lastPortBattle = moment.utc(result[1], "DD-MM-YYYY HH:mm").format("YYYY-MM-DD HH:mm");
+    port.lastPortBattle = dayjs.utc(result[1], "DD-MM-YYYY HH:mm").format("YYYY-MM-DD HH:mm");
     port.attackerNation = "";
     port.attackerClan = "";
     port.attackHostility = "";
@@ -70,8 +156,8 @@ const npcCaptured = result => {
  * @returns {void}
  */
 const defended = result => {
-    const i = ports.ports.findIndex(findIndex, result[2]);
-    const port = ports.ports[i];
+    const i = apiPorts.ports.findIndex(findIndex, result[2]);
+    const port = apiPorts.ports[i];
 
     console.log("      --- defended", i);
     port.attackerNation = "";
@@ -86,8 +172,8 @@ const defended = result => {
  * @returns {void}
  */
 const hostilityLevelUp = result => {
-    const i = ports.ports.findIndex(findIndex, result[4]);
-    const port = ports.ports[i];
+    const i = apiPorts.ports.findIndex(findIndex, result[4]);
+    const port = apiPorts.ports[i];
 
     console.log("      --- hostilityLevelUp", i);
     port.attackerNation = result[3];
@@ -101,8 +187,8 @@ const hostilityLevelUp = result => {
  * @returns {void}
  */
 const hostilityLevelDown = result => {
-    const i = ports.ports.findIndex(findIndex, result[4]);
-    const port = ports.ports[i];
+    const i = apiPorts.ports.findIndex(findIndex, result[4]);
+    const port = apiPorts.ports[i];
 
     console.log("      --- hostilityLevelDown", i);
     port.attackerNation = result[3];
@@ -117,14 +203,14 @@ const hostilityLevelDown = result => {
  */
 const portBattleScheduled = result => {
     const guessNationFromClanName = clanName => {
-        const guessedNationShort = ports.ports.find(port => port.capturer === clanName);
+        const guessedNationShort = apiPorts.ports.find(port => port.capturer === clanName);
         const nationName = guessedNationShort ? findNationByShortName(guessedNationShort).name : "n/a";
 
         return nationName;
     };
 
-    const i = ports.ports.findIndex(findIndex, result[2]);
-    const port = ports.ports[i];
+    const i = apiPorts.ports.findIndex(findIndex, result[2]);
+    const port = apiPorts.ports[i];
 
     console.log("      --- portBattleScheduled", i);
     if (result[7]) {
@@ -135,7 +221,7 @@ const portBattleScheduled = result => {
 
     port.attackerClan = result[6];
     port.attackHostility = 1;
-    port.portBattle = moment.utc(result[4], "DD MMM YYYY HH:mm").format("YYYY-MM-DD HH:mm");
+    port.portBattle = dayjs.utc(result[4], "DD MMM YYYY HH:mm").format("YYYY-MM-DD HH:mm");
 };
 
 /**
@@ -144,14 +230,14 @@ const portBattleScheduled = result => {
  * @returns {void}
  */
 const npcPortBattleScheduled = result => {
-    const i = ports.ports.findIndex(findIndex, result[2]);
-    const port = ports.ports[i];
+    const i = apiPorts.ports.findIndex(findIndex, result[2]);
+    const port = apiPorts.ports[i];
 
     console.log("      --- npcPortBattleScheduled", i);
     port.attackerNation = "Neutral";
     port.attackerClan = "NPC";
     port.attackHostility = 1;
-    port.portBattle = moment.utc(result[3], "DD MMM YYYY HH:mm").format("YYYY-MM-DD HH:mm");
+    port.portBattle = dayjs.utc(result[3], "DD MMM YYYY HH:mm").format("YYYY-MM-DD HH:mm");
 };
 
 /**
@@ -229,8 +315,8 @@ function updatePorts() {
         tweets.tweets = tweets
             .flatMap(tweet => tweet.tweets)
             .sort((a, b) => {
-                const timeA = moment.utc(a.text.slice(1, 17), "DD-MM-YYYY HH:mm");
-                const timeB = moment.utc(b.text.slice(1, 17), "DD-MM-YYYY HH:mm");
+                const timeA = dayjs.utc(a.text.slice(1, 17), "DD-MM-YYYY HH:mm");
+                const timeB = dayjs.utc(b.text.slice(1, 17), "DD-MM-YYYY HH:mm");
                 if (timeA.isAfter(timeB)) {
                     return -1;
                 }
@@ -247,8 +333,8 @@ function updatePorts() {
         tweet.text = tweet.text.replace("'", "’");
         console.log("\ntweet", tweet.text);
         result = checkDateRegex.exec(tweet.text);
-        tweetTime = moment.utc(result[1], "DD-MM-YYYY HH:mm");
-        if (tweetTime.isAfter(serverStart)) {
+        tweetTime = dayjs.utc(result[1], "DD-MM-YYYY HH:mm");
+        if (tweetTime.isAfter(serverDate)) {
             if ((result = capturedRegex.exec(tweet.text)) !== null) {
                 isPortDataChanged = true;
                 captured(result);
@@ -284,10 +370,10 @@ function updatePorts() {
                 // eslint-disable-next-line no-unused-expressions
                 () => {};
             }
-        } else if (tweetTime.isAfter(moment.utc(serverStart).subtract(1, "day"))) {
+        } else if (tweetTime.isAfter(dayjs.utc(serverDate).subtract(1, "day"))) {
             // Add scheduled port battles (only if battle is in the future)
             if ((result = portBattleRegex.exec(tweet.text)) !== null) {
-                if (moment.utc().isBefore(moment.utc(result[4], "DD MMM YYYY HH:mm"))) {
+                if (dayjs.utc().isBefore(dayjs.utc(result[4], "DD MMM YYYY HH:mm"))) {
                     isPortDataChanged = true;
                     portBattleScheduled(result);
                 }
@@ -298,7 +384,7 @@ function updatePorts() {
                 isPortDataChanged = true;
                 defended(result);
             }
-        } else if (tweetTime.isAfter(moment.utc(serverStart).subtract(2, "day"))) {
+        } else if (tweetTime.isAfter(dayjs.utc(serverDate).subtract(2, "day"))) {
             // Add scheduled NPC raids
             if ((result = npcPortBattleRegex.exec(tweet.text)) !== null) {
                 isPortDataChanged = true;
@@ -308,11 +394,12 @@ function updatePorts() {
     });
 
     if (isPortDataChanged) {
-        saveJsonAsync(portFilename, ports);
+        saveJsonAsync(portFilename, apiPorts);
     }
 
     return !isPortDataChanged;
 }
 
-// process.exitCode = updatePorts();
-updatePorts();
+// apiPorts = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-Ports-${serverDate}.json`));
+getTweets();
+// updatePorts();
