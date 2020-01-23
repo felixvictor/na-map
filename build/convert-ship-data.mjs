@@ -18,6 +18,7 @@ import {
     baseAPIFilename,
     cleanName,
     commonPaths,
+    fileExists,
     isEmpty,
     readJson,
     readTextFile,
@@ -458,7 +459,7 @@ const convertAddShipData = ships => {
     const getFileData = (baseFileName, ext) => {
         const fileName = path.resolve(commonPaths.dirModules, `${baseFileName} ${ext}.xml`);
         let data = {};
-        if (fs.existsSync(fileName)) {
+        if (fileExists(fileName)) {
             const fileXmlData = readTextFile(fileName);
             data = convert.xml2js(fileXmlData, { compact: true });
         }
