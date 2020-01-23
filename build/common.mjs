@@ -20,7 +20,7 @@ dayjs.extend(utc);
 // https://stackoverflow.com/a/50052194
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const serverMaintenanceHour = 10;
+export const serverMaintenanceHour = 10;
 
 export const speedFactor = 390;
 export const speedConstA = 0.074465523706782;
@@ -47,7 +47,7 @@ export const commonPaths = {
     dirOut,
     dirSrc,
 
-    fileTweets: path.resolve(dirAPI, "tweets.json"),
+    fileTwitterRefreshId: path.resolve(dirAPI, "response-id.txt"),
 
     filePbSheet: path.resolve(dirGenServer, "port-battle.xlsx"),
 
@@ -69,13 +69,15 @@ export const commonPaths = {
 
 /**
  * Get server start (date and time)
- * @return {string} Server start date and time
+ * @return {dayjs} Server start
  */
 const getServerStartDateTime = () => {
     let serverStart = dayjs()
         .utc()
         .hour(serverMaintenanceHour)
-        .format("YYYY-MM-DD HH:mm");
+        .minute(0)
+        .second(0);
+
     // adjust reference server time if needed
     if (dayjs.utc().isBefore(serverStart)) {
         serverStart = dayjs.utc(serverStart).subtract(1, "day");
@@ -84,14 +86,8 @@ const getServerStartDateTime = () => {
     return serverStart;
 };
 
-/**
- * Get server start (date)
- * @return {string} Server start date
- */
-const getServerStartDate = () => dayjs.utc(getServerStartDateTime()).format("YYYY-MM-DD");
-
-export const serverStartDateTime = getServerStartDateTime();
-export const serverStartDate = getServerStartDate();
+export const serverStartDateTime = getServerStartDateTime().format("YYYY-MM-DD HH:mm");
+export const serverStartDate = getServerStartDateTime().format("YYYY-MM-DD");
 export const serverNames = ["eu1", "eu2"];
 export const apiBaseFiles = ["ItemTemplates", "Ports", "Shops"];
 export const serverTwitterNames = ["eu1"];
@@ -239,16 +235,39 @@ export const capitalToCounty = new Map([
     ["Wilmington", "North Carolina"]
 ]);
 
-export function saveJsonAsync(fileName, data) {
+export const fileExists = fileName => fs.existsSync(fileName);
+
+/**
+ * Make directories (recursive)
+ * @param {string} dir - Directory path
+ * @return {void}
+ */
+export const makeDirAsync = dir => {
+    fs.mkdir(dir, { recursive: true }, error => {
+        if (error) {
+            throw error;
+        }
+    });
+};
+
+export const saveJsonAsync = (fileName, data) => {
     makeDirAsync(path.dirname(fileName));
     fs.writeFile(fileName, JSON.stringify(data), { encoding: "utf8" }, err => {
         if (err) {
             return console.error(err);
         }
     });
-}
+};
 
-export function readTextFile(fileName) {
+export const saveTextFile = (fileName, data) => {
+    try {
+        fs.writeFileSync(fileName, data, { encoding: "utf8" });
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const readTextFile = fileName => {
     let data = "";
     try {
         data = fs.readFileSync(fileName, { encoding: "utf8" });
@@ -261,11 +280,9 @@ export function readTextFile(fileName) {
     }
 
     return data;
-}
+};
 
-export function readJson(fileName) {
-    return JSON.parse(readTextFile(fileName));
-}
+export const readJson = fileName => JSON.parse(readTextFile(fileName));
 
 /**
  * Check fetch status (see {@link https://developers.google.com/web/updates/2015/03/introduction-to-fetch})
@@ -516,19 +533,6 @@ export const cleanName = name =>
         .replace(/'/g, "’")
         .replace("oak", "Oak")
         .trim();
-
-/**
- * Make directories (recursive)
- * @param {string} dir - Directory path
- * @return {void}
- */
-export const makeDirAsync = dir => {
-    fs.mkdir(dir, { recursive: true }, error => {
-        if (error) {
-            throw error;
-        }
-    });
-};
 
 /**
  * Find Nation object based on nation name
