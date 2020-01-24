@@ -530,7 +530,7 @@ const convertAddShipData = ships => {
  * Convert ship blueprints
  * @return {void}
  */
-const convertShipBlueprints = () => {
+const convertShipBlueprints = async () => {
     const itemNames = getItemNames();
     const shipBlueprints = apiItems
         .filter(apiItem => !apiItem.NotUsed && apiItem.ItemType === "RecipeShip")
@@ -587,7 +587,7 @@ const convertShipBlueprints = () => {
         // Sort by name
         .sort(sortBy(["id"]));
 
-    saveJsonAsync(commonPaths.fileShipBlueprint, shipBlueprints);
+    await saveJsonAsync(commonPaths.fileShipBlueprint, shipBlueprints);
 };
 
 /*

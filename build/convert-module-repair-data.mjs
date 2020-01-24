@@ -38,7 +38,7 @@ const getFileData = (baseFileName, ext) => {
  * Retrieve additional ship data from game files and add it to existing data from API
  * @returns {void}
  */
-export const convertRepairData = () => {
+export const convertRepairData = async () => {
     const repairs = {};
     /*
     REPAIR_VOLUME_PER_ITEM / REPAIR_PERCENT
@@ -65,5 +65,5 @@ export const convertRepairData = () => {
         repairs[toCamelCase(baseFileName)] = data;
     });
 
-    saveJsonAsync(commonPaths.fileRepair, repairs);
+    await saveJsonAsync(commonPaths.fileRepair, repairs);
 };
