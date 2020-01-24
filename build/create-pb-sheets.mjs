@@ -10,20 +10,11 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import * as path from "path";
-
 import Excel4Node from "excel4node";
 import sass from "node-sass";
 import css from "css";
 
-import {
-    baseAPIFilename,
-    commonPaths,
-    readJson,
-    serverNames,
-    serverStartDate as serverDate,
-    sortBy
-} from "./common.mjs";
+import { commonPaths, range, readJson, sortBy } from "./common.mjs";
 
 const shallowWaterFrigates = ["Cerberus", "Hercules", "L’Hermione", "La Renommée", "Surprise"];
 const minDeepWaterBR = 80;
@@ -31,6 +22,9 @@ const maxNumPlayers = 25;
 
 const columnWidth = 20;
 const rowHeight = 24;
+
+let portsOrig;
+let shipsOrig;
 
 /** Set colours
  * @returns {Map} Colours
@@ -57,24 +51,21 @@ function setColours() {
  * @returns {void}
  */
 const createPortBattleSheets = () => {
-    const apiPorts = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-Ports-${serverDate}.json`));
-    const shipsOrig = readJson(commonPaths.fileShip);
-
-    const portsDeepWater = apiPorts
+    const portsDeepWater = portsOrig
         .filter(port => !port.shallow)
         .map(port => ({
             name: port.name,
             br: port.brLimit
         }))
-        .sort(sortBy(["name"]));
+        .sort((a, b) => a.name.localeCompare(b.name));
 
-    const portsShallowWater = apiPorts
+    const portsShallowWater = portsOrig
         .filter(port => port.shallow)
         .map(port => ({
             name: port.name,
             br: port.brLimit
         }))
-        .sort(sortBy(["name"]));
+        .sort((a, b) => a.name.localeCompare(b.name));
 
     const colours = setColours();
     const colourWhite = colours.get("white");
@@ -417,4 +408,9 @@ const createPortBattleSheets = () => {
     });
 };
 
-createPortBattleSheets();
+export const createPortBattleSheet = () => {
+    portsOrig = readJson(commonPaths.filePort);
+    shipsOrig = readJson(commonPaths.fileShip);
+
+    createPortBattleSheets();
+};
