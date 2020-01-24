@@ -220,7 +220,7 @@ const setVisitedPositionsDefault = () => {
  *
  *  @return {void}
  */
-const getDistances = () => {
+const getDistances = async () => {
     setVisitedPositionsDefault();
     //    const selectedPorts = [4, 176, 201, 256, 287, 355, 374];
 
@@ -242,7 +242,7 @@ const getDistances = () => {
 
     console.timeEnd("findPath");
 
-    saveJsonAsync(distancesFile, distances);
+    await saveJsonAsync(distancesFile, distances);
 };
 
 getDistances();
