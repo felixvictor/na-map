@@ -36,7 +36,7 @@ const groups = new Map([
     ["WoodWorking", "Cannons"]
 ]);
 
-const convertRecipes = () => {
+const convertRecipes = async () => {
     const data = {};
     const ingredients = new Map();
 
@@ -142,7 +142,7 @@ const convertRecipes = () => {
     const result = [...ingredients.values()];
     data.ingredient = result.sort(sortBy(["id"]));
 
-    saveJsonAsync(commonPaths.fileRecipe, data);
+    await saveJsonAsync(commonPaths.fileRecipe, data);
 };
 
 export const convertRecipeData = () => {
