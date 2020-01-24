@@ -24,7 +24,7 @@ import {
     commonPaths,
     fileExists,
     findNationByName,
-    findNationByShortName,
+    findNationByNationShortName,
     readJson,
     readTextFile,
     saveJsonAsync,
@@ -44,18 +44,22 @@ const portFilename = path.resolve(commonPaths.dirGenServer, `${serverNames[0]}-p
 let ports = [];
 let Twitter;
 let tweets = [];
-let refresh = 0;
+const refreshDefault = "0";
+let refresh = "0";
+const queryFrom = "from:zz569k";
 
 /**
  * Get refresh id, either from file or set default value (0)
- * @return {number} Refresh id
+ * @return {string} Refresh id
  */
 const getRefreshId = () =>
-    fileExists(commonPaths.fileTwitterRefreshId) ? Number(readTextFile(commonPaths.fileTwitterRefreshId)) : 0;
+    fileExists(commonPaths.fileTwitterRefreshId)
+        ? String(readTextFile(commonPaths.fileTwitterRefreshId))
+        : refreshDefault;
 
 /**
  * Save refresh id to file
- * @param {number} refresh
+ * @param {string} refresh
  */
 const saveRefreshId = refresh => {
     saveTextFile(commonPaths.fileTwitterRefreshId, refresh);
@@ -64,30 +68,32 @@ const saveRefreshId = refresh => {
 /**
  * Add new data to tweets and update refresh id
  * @param {object} data
- * @return {Promise<boolean>}
+ * @return {void}
  */
-const addTwitterData = async data => {
-    await tweets.push(...data.statuses.flatMap(status => xss(status.full_text)).sort());
-    refresh = await Math.max(refresh, Number(data.search_metadata.max_id));
+const addTwitterData = data => {
+    tweets.push(...data.statuses.flatMap(status => cleanName(xss(status.full_text))).sort());
+    refresh = data.search_metadata.max_id_str;
     console.log(
         data.statuses.length,
         tweets.length,
         refresh,
-        data.statuses.flatMap(status => xss(status.full_text)).sort()
+        data.statuses.flatMap(status => cleanName(xss(status.full_text))).sort()
     );
-    return true;
 };
 
 /**
  * Load data from twitter
  * @param {string} query Twitter query
- * @param {number} since_id Last tweet id
+ * @param {string} since_id Last tweet id
  * @return {Promise<void>}
  */
 // eslint-disable-next-line camelcase
 const getTwitterData = async (query, since_id = refresh) => {
+    console.log("getTwitterData", "query:", query, "since_id:", since_id, "refresh:", refresh);
     await Twitter.get("search/tweets", {
         count: 100,
+        // eslint-disable-next-line camelcase
+        include_entities: false,
         q: query,
         // eslint-disable-next-line camelcase
         result_type: "recent",
@@ -103,14 +109,34 @@ const getTwitterData = async (query, since_id = refresh) => {
 };
 
 /**
+ * Get tweets since sinceDateTime
+ * @param {dayjs} sinceDateTime Start dateTime
+ * @return {Promise<void>}
+ */
+const getTweetsSince = async sinceDateTime => {
+    const now = dayjs.utc();
+
+    for (let queryTime = sinceDateTime; queryTime.isBefore(now); queryTime = queryTime.add(1, "hour")) {
+        const query = `"[${queryTime.format("DD-MM-YYYY")}+${String(queryTime.hour()).padStart(2, "0")}:"+${queryFrom}`;
+        // eslint-disable-next-line no-await-in-loop
+        await getTwitterData(query, refreshDefault);
+    }
+};
+
+/**
+ * Get all available tweets from the 2 last days
+ * @return {Promise<void>}
+ */
+const getTweetsFull = async () => {
+    await getTweetsSince(dayjs.utc(serverStartDateTime).subtract(2, "day"));
+};
+
+/**
  * Get tweets since maintenance
  * @return {Promise<void>}
  */
 const getTweetsSinceMaintenance = async () => {
-    const queryTime = dayjs.utc(serverStartDateTime);
-    const query = `"[${queryTime.format("DD-MM-YYYY")} ${String(queryTime.hour()).padStart(2, "0")}:"%20from:zz569k`;
-
-    await getTwitterData(query);
+    await getTweetsSince(dayjs.utc(serverStartDateTime));
 };
 
 /**
@@ -118,7 +144,7 @@ const getTweetsSinceMaintenance = async () => {
  * @return {Promise<void>}
  */
 const getTweetsSinceRefresh = async () => {
-    const query = "from:zz569k";
+    const query = queryFrom;
 
     await getTwitterData(query);
 };
@@ -128,35 +154,10 @@ const getTweetsSinceRefresh = async () => {
  * @return {Promise<void>}
  */
 const getTweetsPartial = async () => {
-    if (refresh > 0) {
-        getTweetsSinceRefresh();
+    if (refresh === refreshDefault) {
+        await getTweetsSinceMaintenance();
     } else {
-        getTweetsSinceMaintenance();
-    }
-};
-
-/**
- * Get all available tweets from the last days
- * @return {Promise<void>}
- */
-const getTweetsFull = async () => {
-    const now = dayjs.utc();
-
-    for (
-        let queryTime = dayjs
-            .utc(serverStartDateTime)
-            .subtract(2, "day")
-            .hour(0);
-        queryTime.isBefore(now);
-        queryTime = queryTime.add(1, "hour")
-    ) {
-        const query = `"[${queryTime.format("DD-MM-YYYY")} ${String(queryTime.hour()).padStart(
-            2,
-            "0"
-        )}:"%20from:zz569k`;
-        console.log(query);
-        // eslint-disable-next-line no-await-in-loop
-        await getTwitterData(query, 0);
+        await getTweetsSinceRefresh();
     }
 };
 
@@ -197,7 +198,7 @@ const getTweets = async () => {
  * @param {string} portName - port name
  * @returns {number} Index
  */
-const findPortIndex = portName => ports.ports.findIndex(port => port.name === cleanName(portName));
+const findPortIndex = portName => ports.ports.findIndex(port => port.name === portName);
 
 /**
  * Port captured
@@ -211,7 +212,7 @@ const captured = result => {
 
     console.log("      --- captured", i);
     port.nation = findNationByName(result[4]).short;
-    port.capturer = cleanName(result[3]);
+    port.capturer = result[3];
     port.lastPortBattle = dayjs.utc(result[1], "DD-MM-YYYY HH:mm").format("YYYY-MM-DD HH:mm");
     port.attackerNation = "";
     port.attackerClan = "";
@@ -264,8 +265,8 @@ const hostilityLevelUp = result => {
     const port = ports.ports[i];
 
     console.log("      --- hostilityLevelUp", i);
-    port.attackerNation = cleanName(result[3]);
-    port.attackerClan = cleanName(result[2]);
+    port.attackerNation = result[3];
+    port.attackerClan = result[2];
     port.attackHostility = Number(result[6]) / 100;
 };
 
@@ -279,9 +280,27 @@ const hostilityLevelDown = result => {
     const port = ports.ports[i];
 
     console.log("      --- hostilityLevelDown", i);
-    port.attackerNation = cleanName(result[3]);
-    port.attackerClan = cleanName(result[2]);
+    port.attackerNation = result[3];
+    port.attackerClan = result[2];
     port.attackHostility = Number(result[6]) / 100;
+};
+
+/**
+ * Find port by name of port owning clan
+ * @param {string} clanName - Clan name
+ * @return {object} Port data
+ */
+const findPortByClanName = clanName => ports.ports.find(port => port.capturer === clanName);
+
+/**
+ * Try to find nation for a clan name
+ * @param {string} clanName - Clan name
+ * @return {string}
+ */
+const guessNationFromClanName = clanName => {
+    const port = findPortByClanName(clanName);
+    const nation = port ? findNationByNationShortName(port.nation).name : "n/a";
+    return nation;
 };
 
 /**
@@ -290,19 +309,12 @@ const hostilityLevelDown = result => {
  * @returns {void}
  */
 const portBattleScheduled = result => {
-    const guessNationFromClanName = clanName => {
-        const guessedNationShort = ports.ports.find(port => port.capturer === cleanName(clanName));
-        const nationName = guessedNationShort ? findNationByShortName(guessedNationShort).name : "n/a";
-
-        return nationName;
-    };
-
     const i = findPortIndex(result[2]);
     const port = ports.ports[i];
 
     console.log("      --- portBattleScheduled", i);
     if (result[7]) {
-        port.attackerNation = cleanName(result[7]);
+        port.attackerNation = result[7];
     } else {
         port.attackerNation = guessNationFromClanName(result[6]);
     }
