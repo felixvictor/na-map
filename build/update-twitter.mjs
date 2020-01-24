@@ -73,12 +73,14 @@ const saveRefreshId = refresh => {
 const addTwitterData = data => {
     tweets.push(...data.statuses.flatMap(status => cleanName(xss(status.full_text))).sort());
     refresh = data.search_metadata.max_id_str;
+    /*
     console.log(
         data.statuses.length,
         tweets.length,
         refresh,
         data.statuses.flatMap(status => cleanName(xss(status.full_text))).sort()
     );
+     */
 };
 
 /**
@@ -89,7 +91,7 @@ const addTwitterData = data => {
  */
 // eslint-disable-next-line camelcase
 const getTwitterData = async (query, since_id = refresh) => {
-    console.log("getTwitterData", "query:", query, "since_id:", since_id, "refresh:", refresh);
+    // console.log("getTwitterData", "query:", query, "since_id:", since_id, "refresh:", refresh);
     await Twitter.get("search/tweets", {
         count: 100,
         // eslint-disable-next-line camelcase
@@ -182,7 +184,7 @@ const getTweets = async () => {
         strictSSL: true // optional - requires SSL certificates to be valid.
     });
 
-    console.log(runType);
+    // console.log(runType);
     if (runType === "full") {
         await getTweetsFull();
     } else {
@@ -190,7 +192,7 @@ const getTweets = async () => {
     }
 
     saveRefreshId(refresh);
-    console.log(tweets);
+    // console.log(tweets);
 };
 
 /**
@@ -406,7 +408,7 @@ const checkDateRegex = new RegExp(`\\[(${timeR}) UTC\\]`, "u");
  * Update port data from tweets
  * @returns {Boolean} True if port data changed (new tweets)
  */
-const updatePorts = () => {
+const updatePorts = async () => {
     let result;
     let tweetTime;
     let isPortDataChanged = false;
@@ -476,7 +478,7 @@ const updatePorts = () => {
     }
 
     if (isPortDataChanged) {
-        saveJsonAsync(portFilename, ports);
+        await saveJsonAsync(portFilename, ports);
     }
 
     return !isPortDataChanged;
