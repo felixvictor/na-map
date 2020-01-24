@@ -8,7 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import fs from "fs";
+import { default as fs, promises as pfs } from "fs";
 import * as path from "path";
 import { fileURLToPath } from "url";
 
@@ -242,21 +242,21 @@ export const fileExists = fileName => fs.existsSync(fileName);
  * @param {string} dir - Directory path
  * @return {void}
  */
-export const makeDirAsync = dir => {
-    fs.mkdir(dir, { recursive: true }, error => {
-        if (error) {
-            throw error;
-        }
-    });
+export const makeDirAsync = async dir => {
+    try {
+        await pfs.mkdir(dir, { recursive: true });
+    } catch (error) {
+        throw error;
+    }
 };
 
-export const saveJsonAsync = (fileName, data) => {
-    makeDirAsync(path.dirname(fileName));
-    fs.writeFile(fileName, JSON.stringify(data), { encoding: "utf8" }, err => {
-        if (err) {
-            return console.error(err);
-        }
-    });
+export const saveJsonAsync = async (fileName, data) => {
+    await makeDirAsync(path.dirname(fileName));
+    try {
+        await pfs.writeFile(fileName, JSON.stringify(data), { encoding: "utf8" });
+    } catch (error) {
+        throw error;
+    }
 };
 
 export const saveTextFile = (fileName, data) => {

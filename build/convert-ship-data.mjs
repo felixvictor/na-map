@@ -621,16 +621,16 @@ resourceRatios.forEach((value, key) => {
 });
 */
 
-const convertShips = () => {
+const convertShips = async () => {
     let ships = convertGenericShipData();
     ships = convertAddShipData(ships);
     ships.sort(sortBy(["class", "name"]));
-    saveJsonAsync(commonPaths.fileShip, ships);
+    await saveJsonAsync(commonPaths.fileShip, ships);
 };
 
-export const convertShipData = () => {
+export const convertShipData = async () => {
     apiItems = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`));
 
-    convertShips();
+    await convertShips();
     convertShipBlueprints();
 };
