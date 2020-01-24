@@ -24,6 +24,7 @@ import { convertRepairData } from "./convert-module-repair-data.mjs";
 import { convertServerPortData } from "./convert-server-port-data.mjs";
 import { convertShipData } from "./convert-ship-data.mjs";
 import { convertOwnershipData } from "./convert-ownership.mjs";
+import { createPortBattleSheet } from "./create-pb-sheets.mjs";
 
 import { apiBaseFiles, baseAPIFilename, serverNames, serverStartDate as serverDate } from "./common.mjs";
 
@@ -63,7 +64,7 @@ const uncompressApiData = () => {
     loopApiFiles("unxz");
 };
 
-const convertApiData = () => {
+const convertApiData = async () => {
     convertBuildingData();
     convertCannons();
     convertGenericPortData();
@@ -72,7 +73,7 @@ const convertApiData = () => {
     convertRecipeData();
     convertRepairData();
     convertServerPortData();
-    convertShipData();
+    await convertShipData();
     if (runType === "server") {
         convertOwnershipData();
     }
@@ -80,4 +81,5 @@ const convertApiData = () => {
 
 uncompressApiData();
 convertApiData();
+createPortBattleSheet();
 compressApiData();
