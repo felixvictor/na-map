@@ -225,7 +225,7 @@ function convertOwnership() {
      * Write out result
      * @return {void}
      */
-    function writeResult() {
+    const writeResult = async () => {
         const portsArray = [...ports.entries()].map(([key, value]) => {
             value.id = key;
             return value;
@@ -261,9 +261,9 @@ function convertOwnership() {
             return newRegion;
         });
 
-        saveJsonAsync(commonPaths.fileOwnership, result);
-        saveJsonAsync(commonPaths.fileNation, numPortsDates);
-    }
+        await saveJsonAsync(commonPaths.fileOwnership, result);
+        await saveJsonAsync(commonPaths.fileNation, numPortsDates);
+    };
 
     readDirRecursive(commonPaths.dirAPI, [ignoreFileName])
         .then(fileNames => sortFileNames(fileNames))

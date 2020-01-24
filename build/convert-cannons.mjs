@@ -41,7 +41,7 @@ const getFileData = baseFileName => {
  * Retrieve cannon data from game files and store it
  * @returns {void}
  */
-export const convertCannons = () => {
+export const convertCannons = async () => {
     const cannons = {};
     cannonTypes.forEach(type => {
         cannons[type] = [];
@@ -242,5 +242,5 @@ export const convertCannons = () => {
         });
     });
 
-    saveJsonAsync(commonPaths.fileCannon, cannons);
+    await saveJsonAsync(commonPaths.fileCannon, cannons);
 };

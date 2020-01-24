@@ -28,7 +28,7 @@ let apiItems = [];
  * Convert API module data
  * @returns {void}
  */
-export const convertModulesAndWoodData = () => {
+export const convertModulesAndWoodData = async () => {
     const modules = new Map();
 
     const woods = {};
@@ -474,8 +474,8 @@ export const convertModulesAndWoodData = () => {
     result = result.filter(module => Object.keys(module).length).sort(sortBy(["type", "id"]));
     const modulesGrouped = [...groupToMap(result, module => module.type)];
 
-    saveJsonAsync(commonPaths.fileModules, modulesGrouped);
-    saveJsonAsync(commonPaths.fileWood, woods);
+    await saveJsonAsync(commonPaths.fileModules, modulesGrouped);
+    await saveJsonAsync(commonPaths.fileWood, woods);
 };
 
 export const convertModules = () => {
