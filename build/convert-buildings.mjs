@@ -37,7 +37,7 @@ const obsoleteBuildings = [
     "Tobacco Plantation"
 ];
 
-let apiItems = [];
+let apiItems;
 
 const getItemsCraftedByWorkshop = () =>
     apiItems
@@ -51,7 +51,7 @@ const getItemsCraftedByWorkshop = () =>
             name: cleanName(recipe.Name).replace(" Blueprint", ""),
             price: 0
         }))
-        .sort(sortBy(["name"]));
+        .sort((a, b) => a.name.localeCompare(b.name));
 
 const getItemsCraftedByAcademy = () =>
     apiItems
@@ -65,7 +65,7 @@ const getItemsCraftedByAcademy = () =>
             name: cleanName(recipe.Name).replace(" Blueprint", ""),
             price: 0
         }))
-        .sort(sortBy(["name"]));
+        .sort((a, b) => a.name.localeCompare(b.name));
 
 const getItemsCraftedBySeasoningShed = () =>
     apiItems
@@ -79,13 +79,13 @@ const getItemsCraftedBySeasoningShed = () =>
             name: cleanName(recipe.Name),
             price: 0
         }))
-        .sort(sortBy(["name"]));
+        .sort((a, b) => a.name.localeCompare(b.name));
 
 /**
  * Convert API building data and save sorted as JSON
- * @returns {void}
+ * @returns {Array}
  */
-const convertBuildings = () => {
+const getBuildings = () => {
     const buildings = new Map();
 
     const resources = new Map(
@@ -159,27 +159,27 @@ const convertBuildings = () => {
             }
         });
 
-    let result = [...buildings.values()];
+    return [...buildings.values()];
+};
 
+const getSeasonedItemPrice = name =>
+    apiItems.find(
+        item => item.ItemType === "Recipe" && item.Name.replace(" Log", "") === name.replace("White Oak", "White oak")
+    );
+
+const getPrices = buildings => {
+    const prices = {};
     const getStandardPrices = name =>
         prices.standard.find(standardItem => standardItem.name === name.replace(" (S)", ""));
 
-    const getSeasonedItemPrice = name =>
-        apiItems.find(
-            item =>
-                item.ItemType === "Recipe" && item.Name.replace(" Log", "") === name.replace("White Oak", "White oak")
-        );
-
-    const prices = {};
-
-    prices.standard = result
+    prices.standard = buildings
         .filter(building => !Array.isArray(building.resource) && building.resource.price)
         .map(building => ({
             name: building.resource.name.replace(" Log", ""),
             real: building.resource.price,
             labour: building.batch.labour
         }))
-        .sort(sortBy(["name"]));
+        .sort((a, b) => a.name.localeCompare(b.name));
 
     prices.seasoned = getItemsCraftedBySeasoningShed()
         .map(seasonedItem => {
@@ -194,18 +194,23 @@ const convertBuildings = () => {
                 tool: seasonedItemPrices.FullRequirements.find(requirement => requirement.Template === idTools).Amount
             };
         })
-        .sort(sortBy(["name"]));
+        .sort((a, b) => a.name.localeCompare(b.name));
 
-    saveJsonAsync(commonPaths.filePrices, prices);
-
-    result = result.filter(building => Object.keys(building).length).sort(sortBy(["id"]));
-    saveJsonAsync(commonPaths.fileBuilding, result);
+    return prices;
 };
 
-convertBuildings();
+const convertBuildings = async () => {
+    let buildings = getBuildings();
 
-export const convertBuildingData = () => {
+    const prices = getPrices(buildings);
+    await saveJsonAsync(commonPaths.filePrices, prices);
+
+    buildings = buildings.filter(building => Object.keys(building).length).sort(sortBy(["id"]));
+    await saveJsonAsync(commonPaths.fileBuilding, buildings);
+};
+
+export const convertBuildingData = async () => {
     apiItems = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`));
 
-    convertBuildings();
+    await convertBuildings();
 };

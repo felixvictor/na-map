@@ -36,14 +36,14 @@
         <ul class="navbar-nav mr-auto">
 
             <li class="nav-item pr-2 dropdown" id="selectPortNavbar">
-                <a class="dropdown-toggle nav-link" id="propertyDropdown" href="#" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
+                <a class="dropdown-toggle nav-link" id="propertyDropdown" href="#" data-toggle="dropdown" aria-expanded="false" aria-haspopup="true">
                     Select ports on
                 </a>
                 <div class="dropdown-menu" id="propertyMenu" aria-labelledby="propertyDropdown">
                     <h6 class="dropdown-header">Property</h6>
                     <div class="dropdown-submenu">
-                        <a class="dropdown-item dropdown-toggle" href="#" data-toggle="dropdown">Select</a>
-                        <div class="dropdown-menu">
+                        <a class="dropdown-item dropdown-toggle" id="dropdown-select" href="#" data-toggle="dropdown" role="button">Select</a>
+                        <div class="dropdown-menu" aria-labelledby="dropdown-select">
                             <a class="dropdown-item" id="menu-prop-deep" href="#">Deep water</a>
                             <a class="dropdown-item" id="menu-prop-shallow" href="#">Shallow water</a>
                             <div class="dropdown-divider"></div>
@@ -54,6 +54,20 @@
                             <a class="dropdown-item" id="menu-prop-medium" href="#">4th rate AI</a>
                             <a class="dropdown-item" id="menu-prop-small" href="#">6th rate AI</a>
                         </div>
+                    </div>
+
+                    <div class="dropdown-divider"></div>
+
+                    <h6 class="dropdown-header">Front lines</h6>
+                    <div class="dropdown-item">
+                        <label>
+                            <select id="frontlines-attacking-nation-select" name="frontlines-attacking-nation-select" title="Select nation attacking"></select>
+                        </label>
+                    </div>
+                    <div class="dropdown-item">
+                        <label>
+                            <select id="frontlines-defending-nation-select" name="frontlines-defending-nation-select" title="Select nation defending"></select>
+                        </label>
                     </div>
 
                     <div class="dropdown-divider"></div>
@@ -173,7 +187,7 @@
         <ul class="navbar-nav ml-auto">
 
             <li class="nav-item pr-2 dropdown">
-                <a class="dropdown-toggle nav-link" id="map-tools-dropdown" href="#" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
+                <a class="dropdown-toggle nav-link" id="map-tools-dropdown" href="#" data-toggle="dropdown" aria-expanded="false" aria-haspopup="true" role="button">
                     Map tools
                 </a>
                 <div class="dropdown-menu dropdown-menu-right" id="map-tools-menu" aria-labelledby="map-tools-dropdown">
@@ -187,7 +201,7 @@
             </li>
 
             <li class="nav-item pr-2 dropdown">
-                <a class="dropdown-toggle nav-link" id="game-tools-dropdown" href="#" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
+                <a class="dropdown-toggle nav-link" id="game-tools-dropdown" href="#" data-toggle="dropdown" aria-expanded="false" aria-haspopup="true" role="button">
                     Game tools
                 </a>
                 <div class="dropdown-menu dropdown-menu-right" id="game-tools-menu" aria-labelledby="game-tools-dropdown">
@@ -216,7 +230,7 @@
             </li>
 
             <li class="nav-item pr-2 dropdown">
-                <a class="dropdown-toggle nav-link" id="settingsDropdown" href="#" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button" aria-label="Settings" title="Settings">
+                <a class="dropdown-toggle nav-link" id="settingsDropdown" href="#" data-toggle="dropdown" aria-expanded="false" aria-haspopup="true" role="button" aria-label="Settings" title="Settings">
                     <i class="icon icon-navbar icon-options" aria-hidden="true"></i><span class="sr-only">Settings</span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-right extralarge-width" id="settingsMenu" aria-labelledby="settingsDropdown">
@@ -374,5 +388,5 @@
 
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.slim.min.js" crossorigin="anonymous" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" crossorigin="anonymous" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"></script>
-<script src="runtime.dbc9627796adaf72f09e.js" crossorigin="anonymous" integrity="sha384-0/GJ+nU8PlQP/DMmCggpnZB5tZV5Tps2aD2FeqsRKFlNqJN9q7bAyz2I/QvU8wsn"></script><script src="vendors~main.49987b5da56358d4659f.js" crossorigin="anonymous" integrity="sha384-uqyx1+/Rz+IvOCf+YEfsIun8JIutQDW1yUogWLUwbVtafl35GRNUeTecJXMvrsV+"></script><script src="main.ee27c20e0f5f210e262b.js" crossorigin="anonymous" integrity="sha384-WEyJJYx6s+fMjWM5OwplMR+hfFKG+RPxY/Vu+FSQ9BgIyz3AFaMJ63DZu3IM98Zi"></script></body>
+<script src="runtime.5dcb2ded785889cbe092.js" crossorigin="anonymous" integrity="sha384-ZODauhgxmoPwF9fAJt2WU2vzerRb6fyyBY1Sd98Llff25dXtOPQpKgVdo8CZgpLx"></script><script src="vendors~main.49987b5da56358d4659f.js" crossorigin="anonymous" integrity="sha384-uqyx1+/Rz+IvOCf+YEfsIun8JIutQDW1yUogWLUwbVtafl35GRNUeTecJXMvrsV+"></script><script src="main.2b3a8df57132afa1dbac.js" crossorigin="anonymous" integrity="sha384-cP+b+mNMXwR2OR/ZJ8Z+ByErBKx+oRCCOI2t4L4ZsBEyf4id7Q/R+wU31pROo5Kx"></script></body>
 </html>

@@ -41,7 +41,7 @@ const getLootItemName = (name, type) => {
     return cleanedName;
 };
 
-function convertLoot() {
+const convertLoot = async () => {
     /**
      * Get item names
      * @return {Map<number, string>} Item names<id, name>
@@ -90,8 +90,8 @@ function convertLoot() {
         }))
         .sort(sortBy(["id"]));
 
-    saveJsonAsync(commonPaths.fileLoot, data);
-}
+    await saveJsonAsync(commonPaths.fileLoot, data);
+};
 
 export const convertLootData = () => {
     apiItems = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`));
