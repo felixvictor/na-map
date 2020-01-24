@@ -531,7 +531,7 @@ export const cleanName = name =>
     name
         .replace(/u([\da-f]{4})/gi, match => String.fromCharCode(parseInt(match.replace(/u/g, ""), 16)))
         .replace(/'/g, "’")
-        .replace("oak", "Oak")
+        .replace(" oak", " Oak")
         .trim();
 
 /**
@@ -546,7 +546,7 @@ export const findNationByName = nationName => nations.find(nation => nationName 
  * @param {string} nationShortName
  * @return {Nation}
  */
-export const findNationByShortName = nationShortName => nations.find(nation => nationShortName === nation.short);
+export const findNationByNationShortName = nationShortName => nations.find(nation => nation.short === nationShortName);
 
 /**
  * Find Nation object based on nation id
