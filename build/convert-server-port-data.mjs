@@ -129,7 +129,7 @@ const setPortFeaturePerServer = apiPort => {
                 sellPrice: Math.round(good.SellPrice / (1 + apiPort.PortTax)),
                 sellQuantity: good.SellContractQuantity === -1 ? good.PriceTierQuantity : good.SellContractQuantity
             }))
-            .sort(sortBy(["name"]))
+            .sort((a, b) => a.name.localeCompare(b.name))
     };
     // Delete empty entries
     ["dropsTrading", "consumesTrading", "producesNonTrading", "dropsNonTrading"].forEach(type => {
@@ -140,14 +140,14 @@ const setPortFeaturePerServer = apiPort => {
     portData.push(portFeaturesPerServer);
 };
 
-const setAndSavePortData = serverName => {
+const setAndSavePortData = async serverName => {
     apiPorts.forEach(apiPort => {
         setPortFeaturePerServer(apiPort);
     });
-    saveJsonAsync(`${commonPaths.dirGenServer}/${serverName}-ports.json`, portData);
+    await saveJsonAsync(`${commonPaths.dirGenServer}/${serverName}-ports.json`, portData);
 };
 
-const setAndSaveTradeData = serverName => {
+const setAndSaveTradeData = async serverName => {
     const apiItemWeight = new Map(
         apiItems
             .filter(apiItem => !apiItem.NotUsed && !apiItem.NotTradeable && apiItem.ItemType !== "RecipeResource")
@@ -184,10 +184,10 @@ const setAndSaveTradeData = serverName => {
     });
     trades.sort(sortBy(["profitTotal"]));
 
-    saveJsonAsync(path.resolve(commonPaths.dirGenServer, `${serverName}-trades.json`), trades);
+    await saveJsonAsync(path.resolve(commonPaths.dirGenServer, `${serverName}-trades.json`), trades);
 };
 
-const setAndSavePortBattleData = serverName => {
+const setAndSavePortBattleData = async serverName => {
     const ticks = 621355968000000000;
     const pb = {};
 
@@ -205,10 +205,10 @@ const setAndSavePortBattleData = serverName => {
             portBattle: ""
         }))
         .sort(sortBy(["id"]));
-    saveJsonAsync(path.resolve(commonPaths.dirGenServer, `${serverName}-pb.json`), pb);
+    await saveJsonAsync(path.resolve(commonPaths.dirGenServer, `${serverName}-pb.json`), pb);
 };
 
-const setAndSaveFrontlines = serverName => {
+const setAndSaveFrontlines = async serverName => {
     const outNations = ["NT"];
     const frontlineAttackingNationGroupedByToPort = {};
     const frontlineAttackingNationGroupedByFromPort = {};
@@ -282,7 +282,7 @@ const setAndSaveFrontlines = serverName => {
         // frontlineDefendingNation[nationShortName].push({ key: toPortId, value: [...fromPorts] });
     }
 
-    saveJsonAsync(path.resolve(commonPaths.dirGenServer, `${serverName}-frontlines.json`), {
+    await  saveJsonAsync(path.resolve(commonPaths.dirGenServer, `${serverName}-frontlines.json`), {
         attacking: frontlineAttackingNationGroupedByToPort,
         defending: frontlineDefendingNation
     });
