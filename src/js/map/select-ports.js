@@ -100,7 +100,9 @@ export default class SelectPorts {
         const dataDirectory = "data";
 
         try {
-            this._frontlinesData = await (await fetch(`${dataDirectory}/${this._map.serverName}-frontlines.json`)).json();
+            this._frontlinesData = await (
+                await fetch(`${dataDirectory}/${this._map.serverName}-frontlines.json`)
+            ).json();
         } catch (error) {
             putImportError(error);
         }
