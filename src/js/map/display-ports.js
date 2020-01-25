@@ -667,7 +667,7 @@ export default class DisplayPorts {
             h += "</td></tr>";
         }
 
-        if (this.showTradePortPartners) {
+        if (this.showRadius === "tradePorts") {
             if (port.goodsToSellInTradePort.length) {
                 h += `<tr><td class='pl-0'>Sell in ${port.tradePort}\u00A0</td><td>${port.goodsToSellInTradePort}</td></tr>`;
             }
