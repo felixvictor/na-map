@@ -17,7 +17,7 @@ import "tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4";
 import "tempusdominus-core/build/js/tempusdominus-core";
 
 import { registerEvent } from "../analytics";
-import { initMultiDropdownNavbar, nations } from "../common";
+import { initMultiDropdownNavbar, nations, range, serverMaintenanceHour } from "../common";
 import { formatInt, formatSiCurrency, putImportError, sortBy } from "../util";
 
 export default class SelectPorts {
@@ -661,7 +661,7 @@ export default class SelectPorts {
     }
 
     _capturePBRange() {
-        const blackOutTimes = [8, 9, 10];
+        const blackOutTimes = range(serverMaintenanceHour - 2, serverMaintenanceHour);
         // 24 hours minus black-out hours
         const maxStartTime = 24 - (blackOutTimes.length + 1);
         const startTimes = new Set();
@@ -693,7 +693,7 @@ export default class SelectPorts {
     _filterCaptured(begin, end) {
         // console.log("Between %s and %s", begin.format("dddd D MMMM YYYY H:mm"), end.format("dddd D MMMM YYYY H:mm"));
         const portData = this._ports.portDataDefault.filter(port =>
-            moment(port.lastPortBattle).isBetween(begin, end, null, "(]")
+            moment(port.lastPortBattle, "YYYY-MM-DD HH:mm").isBetween(begin, end, null, "(]")
         );
 
         this._ports.portData = portData;
@@ -705,7 +705,7 @@ export default class SelectPorts {
         const now = moment.utc();
         let begin = moment()
             .utc()
-            .hour(11)
+            .hour(serverMaintenanceHour)
             .minute(0);
         if (now.hour() < begin.hour()) {
             begin = begin.subtract(1, "day");
@@ -718,7 +718,7 @@ export default class SelectPorts {
         const now = moment.utc();
         let begin = moment()
             .utc()
-            .hour(11)
+            .hour(serverMaintenanceHour)
             .minute(0)
             .subtract(1, "day");
         if (now.hour() < begin.hour()) {
@@ -733,11 +733,12 @@ export default class SelectPorts {
             .utc()
             .startOf("week");
         // This Monday
-        const begin = currentMondayOfWeek.hour(11);
+        const begin = currentMondayOfWeek.utc().hour(serverMaintenanceHour);
         // Next Monday
         const end = moment(currentMondayOfWeek)
+            .utc()
             .add(7, "day")
-            .hour(11);
+            .hour(serverMaintenanceHour);
 
         this._filterCaptured(begin, end);
     }
@@ -748,21 +749,27 @@ export default class SelectPorts {
             .startOf("week");
         // Monday last week
         const begin = moment(currentMondayOfWeek)
+            .utc()
             .subtract(7, "day")
-            .hour(11);
+            .hour(serverMaintenanceHour);
         // This Monday
-        const end = currentMondayOfWeek.hour(11);
+        const end = currentMondayOfWeek.utc().hour(serverMaintenanceHour);
 
         this._filterCaptured(begin, end);
     }
 
     _captureRange() {
-        const from = document.getElementById("prop-from-input").value;
-        const to = document.getElementById("prop-to-input").value;
-        const begin = moment(from, this._dateFormat).hour(11);
-        const end = moment(to, this._dateFormat)
+        const from = $("#prop-from").datetimepicker("viewDate");
+        const to = $("#prop-to").datetimepicker("viewDate");
+        const begin = from
+            .utc()
+            .hour(serverMaintenanceHour)
+            .minute(0);
+        const end = to
+            .utc()
             .add(1, "day")
-            .hour(11);
+            .hour(serverMaintenanceHour)
+            .minute(0);
 
         this._filterCaptured(begin, end);
     }
