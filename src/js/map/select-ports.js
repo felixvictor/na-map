@@ -185,6 +185,16 @@ export default class SelectPorts {
         document.getElementById("menu-prop-small").addEventListener("click", () => this._portSizeSelected("Small"));
 
         $.fn.datetimepicker.Constructor.Default = $.extend({}, $.fn.datetimepicker.Constructor.Default, {
+            icons: {
+                time: "icon icon-clock",
+                date: "icon icon-calendar",
+                up: "icon icon-chevron-top",
+                down: "icon icon-chevron-bottom",
+                previous: "icon icon-chevron-left",
+                next: "icon icon-chevron-right",
+                clear: "icon icon-clear",
+                close: "icon icon-close"
+            },
             timeZone: "UTC"
         });
 
