@@ -163,7 +163,7 @@ export function initMultiDropdownNavbar(id) {
     });
 }
 
-const cleanNumber = i => i.replace(/[^\-?0-9.]/g, "");
+const cleanNumber = i => i.replace(/[^\d-.?]/g, "");
 
 const compareNumber = (a, b) => {
     let aa = parseFloat(a);
@@ -179,9 +179,9 @@ export const initTablesort = () => {
     Tablesort.extend(
         "number",
         item =>
-            item.match(/^[-+]?[£\u0024Û¢´€]?\d+\s*([,.]\d{0,2})/) || // Prefixed currency
-            item.match(/^[-+]?\d+\s*([,.]\d{0,2})?[£\u0024Û¢´€]/) || // Suffixed currency
-            item.match(/^[-+]?(\d)*-?([,.])?-?(\d)+([E,e][-+][\d]+)?%?$/), // Number
+            item.match(/^[+-]?[$¢£´Û€]?\d+\s*([,.]\d{0,2})/) || // Prefixed currency
+            item.match(/^[+-]?\d+\s*([,.]\d{0,2})?[$¢£´Û€]/) || // Suffixed currency
+            item.match(/^[+-]?(\d)*-?([,.])?-?(\d)+([,Ee][+-]\d+)?%?$/), // Number
         (a, b) => {
             const aa = cleanNumber(a);
             const bb = cleanNumber(b);
