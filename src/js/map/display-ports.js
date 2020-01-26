@@ -537,6 +537,7 @@ export default class DisplayPorts {
         return id ? this._portDataDefault.find(port => port.id === id).name : "";
     }
 
+    // eslint-disable-next-line complexity
     _getText(id, portProperties) {
         moment.locale("en-gb");
         const portBattleLT = moment.utc(portProperties.portBattle).local();
