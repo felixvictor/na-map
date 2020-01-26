@@ -261,6 +261,7 @@ export const appVersion = VERSION;
 export const colourGreen = CGREEN;
 export const colourGreenLight = CGREENLIGHT;
 export const colourGreenDark = CGREENDARK;
+export const colourOrange = CORANGE;
 export const colourRed = CRED;
 export const colourRedLight = CREDLIGHT;
 export const colourRedDark = CREDDARK;
