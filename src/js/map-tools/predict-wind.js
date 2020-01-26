@@ -218,7 +218,7 @@ export default class PredictWind {
         const timeFormat = "H.mm";
         let currentWindDegrees;
 
-        const regex = /(\d+)[\s:.](\d+)/;
+        const regex = /(\d+)[\s.:](\d+)/;
         const match = regex.exec(predictUserTime);
         const predictHours = parseInt(match[1], 10);
         const predictMinutes = parseInt(match[2], 10);
