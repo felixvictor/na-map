@@ -49,10 +49,7 @@ class WoodBase extends Wood {
         let isPercentage = false;
 
         if (property && property.amount) {
-            // eslint-disable-next-line prefer-destructuring
-            amount = property.amount;
-            // eslint-disable-next-line prefer-destructuring
-            isPercentage = property.isPercentage;
+            [amount, isPercentage] = property;
         }
 
         return { amount, isPercentage };
@@ -316,7 +313,7 @@ export default class CompareWoods {
         this._initData();
     }
 
-    static _findWoodId(type, woodName) {
+    _findWoodId(type, woodName) {
         return this._woodData[type].find(wood => wood.name === woodName).id;
     }
 
@@ -330,20 +327,20 @@ export default class CompareWoods {
 
         if (this._baseFunction === "wood") {
             this._defaultWood = {
-                frame: CompareWoods._findWoodId("frame", "Fir"),
-                trim: CompareWoods._findWoodId("trim", "Crew Space")
+                frame: this._findWoodId("frame", "Fir"),
+                trim: this._findWoodId("trim", "Crew Space")
             };
             this._columnsCompare = ["C1", "C2", "C3"];
         } else if (this._baseFunction === "wood-journey") {
             this._defaultWood = {
-                frame: CompareWoods._findWoodId("frame", "Oak"),
-                trim: CompareWoods._findWoodId("trim", "Oak")
+                frame: this._findWoodId("frame", "Oak"),
+                trim: this._findWoodId("trim", "Oak")
             };
             this._columnsCompare = [];
         } else {
             this._defaultWood = {
-                frame: CompareWoods._findWoodId("frame", "Oak"),
-                trim: CompareWoods._findWoodId("trim", "Oak")
+                frame: this._findWoodId("frame", "Oak"),
+                trim: this._findWoodId("trim", "Oak")
             };
             this._columnsCompare = ["C1", "C2"];
         }
