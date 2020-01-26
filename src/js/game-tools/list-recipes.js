@@ -36,10 +36,12 @@ export default class ListRecipes {
 
     async _loadAndSetupData() {
         try {
-            this._moduleData = (await import(/* webpackChunkName: "data-modules" */ "../../gen-generic/modules.json")).default;
-            this._recipeData = (await import(
-                /* webpackChunkName: "data-recipes" */ "../../gen-generic/recipes.json"
-            )).default.recipe;
+            this._moduleData = (
+                await import(/* webpackChunkName: "data-modules" */ "../../gen-generic/modules.json")
+            ).default;
+            this._recipeData = (
+                await import(/* webpackChunkName: "data-recipes" */ "../../gen-generic/recipes.json")
+            ).default.recipe;
         } catch (error) {
             putImportError(error);
         }

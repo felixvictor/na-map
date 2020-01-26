@@ -186,14 +186,14 @@ class WoodComparison extends Wood {
         };
     }
 
+    static _getDiff(a, b, isPercentage, decimals = 1) {
+        const diff = parseFloat((a - b).toFixed(decimals));
+        const value = isPercentage ? formatPercent(a / 100, decimals) : formatFloat(a);
+
+        return `${value} <span class="badge badge-white">${formatSignFloat(diff)}</span>`;
+    }
+
     _getText(wood) {
-        function getDiff(a, b, isPercentage, decimals = 1) {
-            const diff = parseFloat((a - b).toFixed(decimals));
-            const value = isPercentage ? formatPercent(a / 100, decimals) : formatFloat(a);
-
-            return `${value} <span class="badge badge-white">${formatSignFloat(diff)}</span>`;
-        }
-
         const middle = 100 / 2;
         let base = 0;
         let diff = 0;
@@ -202,7 +202,7 @@ class WoodComparison extends Wood {
         let text = '<table class="table table-sm table-striped small wood mt-4"><thead>';
         text += '<tr><th scope="col">Property</th><th scope="col">Change</th></tr></thead><tbody>';
         wood.properties.forEach((value, key) => {
-            text += `<tr><td>${key}</td><td>${getDiff(value.compare, value.base, value.isPercentage)}`;
+            text += `<tr><td>${key}</td><td>${WoodComparison._getDiff(value.compare, value.base, value.isPercentage)}`;
             text += '<span class="rate">';
             if (value.compare >= 0) {
                 if (value.base >= 0) {
@@ -316,9 +316,11 @@ export default class CompareWoods {
         this._initData();
     }
 
-    _setupData() {
-        const findWoodId = (type, woodName) => this._woodData[type].find(wood => wood.name === woodName).id;
+    static _findWoodId(type, woodName) {
+        return this._woodData[type].find(wood => wood.name === woodName).id;
+    }
 
+    _setupData() {
         this.propertyNames = new Set(
             [
                 ...this._woodData.frame.flatMap(frame => frame.properties.map(property => property.modifier)),
@@ -328,20 +330,20 @@ export default class CompareWoods {
 
         if (this._baseFunction === "wood") {
             this._defaultWood = {
-                frame: findWoodId("frame", "Fir"),
-                trim: findWoodId("trim", "Crew Space")
+                frame: CompareWoods._findWoodId("frame", "Fir"),
+                trim: CompareWoods._findWoodId("trim", "Crew Space")
             };
             this._columnsCompare = ["C1", "C2", "C3"];
         } else if (this._baseFunction === "wood-journey") {
             this._defaultWood = {
-                frame: findWoodId("frame", "Oak"),
-                trim: findWoodId("trim", "Oak")
+                frame: CompareWoods._findWoodId("frame", "Oak"),
+                trim: CompareWoods._findWoodId("trim", "Oak")
             };
             this._columnsCompare = [];
         } else {
             this._defaultWood = {
-                frame: findWoodId("frame", "Oak"),
-                trim: findWoodId("trim", "Oak")
+                frame: CompareWoods._findWoodId("frame", "Oak"),
+                trim: CompareWoods._findWoodId("trim", "Oak")
             };
             this._columnsCompare = ["C1", "C2"];
         }
@@ -352,7 +354,9 @@ export default class CompareWoods {
 
     async _loadAndSetupData() {
         try {
-            this._woodData = (await import(/* webpackChunkName: "data-woods" */ "../../gen-generic/woods.json")).default;
+            this._woodData = (
+                await import(/* webpackChunkName: "data-woods" */ "../../gen-generic/woods.json")
+            ).default;
             this._setupData();
         } catch (error) {
             putImportError(error);
