@@ -45,7 +45,9 @@ export default class ListPortOwnerships {
 
     async _loadAndSetupData() {
         try {
-            this._nationData = (await import(/* webpackChunkName: "data-nations" */ "../../gen-generic/nations.json")).default;
+            this._nationData = (
+                await import(/* webpackChunkName: "data-nations" */ "../../gen-generic/nations.json")
+            ).default;
             this._ownershipData = (
                 await import(/* webpackChunkName: "data-ownership" */ "../../gen-generic/ownership.json")
             ).default;
