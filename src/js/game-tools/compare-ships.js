@@ -1835,7 +1835,7 @@ export default class CompareShips {
         return module;
     }
 
-    _getModifierFromModule(properties) {
+    static _getModifierFromModule(properties) {
         return `<p class="mb-0">${properties
             .map(property => {
                 let amount;
@@ -1892,7 +1892,7 @@ export default class CompareShips {
 
                                 // Add tooltip with module properties
                                 $(element)
-                                    .attr("data-original-title", this._getModifierFromModule(module.properties))
+                                    .attr("data-original-title", CompareShips._getModifierFromModule(module.properties))
                                     .tooltip({ boundary: "viewport", html: true });
                             }
                         });
