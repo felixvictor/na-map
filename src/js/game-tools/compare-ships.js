@@ -1464,7 +1464,9 @@ export default class CompareShips {
             this._moduleDataDefault = (
                 await import(/* webpackChunkName: "data-modules" */ "../../gen-generic/modules.json")
             ).default;
-            this._shipData = (await import(/* webpackChunkName: "data-ships" */ "../../gen-generic/ships.json")).default;
+            this._shipData = (
+                await import(/* webpackChunkName: "data-ships" */ "../../gen-generic/ships.json")
+            ).default;
             this._setupData();
             if (this._baseId !== "ship-journey") {
                 this.woodCompare = new CompareWoods(this._woodId);
@@ -1836,11 +1838,16 @@ export default class CompareShips {
     _getModifierFromModule(properties) {
         return `<p class="mb-0">${properties
             .map(property => {
-                const amount = property.isPercentage
-                    ? formatSignPercent(property.amount / 100)
-                    : property.amount < 1 && property.amount > 0
-                    ? formatPP(property.amount)
-                    : formatSignInt(property.amount);
+                let amount;
+                if (property.isPercentage) {
+                    amount = formatSignPercent(property.amount / 100);
+                } else {
+                    amount =
+                        property.amount < 1 && property.amount > 0
+                            ? formatPP(property.amount)
+                            : formatSignInt(property.amount);
+                }
+
                 return `${property.modifier} ${amount}`;
             })
             .join("<br>")}</p>`;

@@ -29,7 +29,9 @@ export default class ListModules {
 
     async _loadAndSetupData() {
         try {
-            this._moduleData = (await import(/* webpackChunkName: "data-modules" */ "../../gen-generic/modules.json")).default;
+            this._moduleData = (
+                await import(/* webpackChunkName: "data-modules" */ "../../gen-generic/modules.json")
+            ).default;
         } catch (error) {
             putImportError(error);
         }
@@ -165,11 +167,16 @@ export default class ListModules {
                                 module.name
                             }<br>${rate}</span>${permanentType}</td><td>${module.properties
                                 .map(property => {
-                                    const amount = property.isPercentage
-                                        ? formatSignPercent(property.amount / 100)
-                                        : property.amount < 1 && property.amount > 0
-                                        ? formatPP(property.amount)
-                                        : formatSignInt(property.amount);
+                                    let amount;
+                                    if (property.isPercentage) {
+                                        amount = formatSignPercent(property.amount / 100);
+                                    } else {
+                                        amount =
+                                            property.amount < 1 && property.amount > 0
+                                                ? formatPP(property.amount)
+                                                : formatSignInt(property.amount);
+                                    }
+
                                     return `${property.modifier} ${amount}`;
                                 })
                                 .join("<br>")}</td></tr>`
