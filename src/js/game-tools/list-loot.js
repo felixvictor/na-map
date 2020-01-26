@@ -40,7 +40,9 @@ export default class ListLoot {
 
     async _loadAndSetupData() {
         try {
-            this._sourceData = (await import(/* webpackChunkName: "data-loot" */ "../../gen-generic/loot.json")).default;
+            this._sourceData = (
+                await import(/* webpackChunkName: "data-loot" */ "../../gen-generic/loot.json")
+            ).default;
         } catch (error) {
             putImportError(error);
         }
@@ -206,12 +208,17 @@ export default class ListLoot {
         return this._sourceData[this._selectedType].find(item => item.id === selectedItemId);
     }
 
+    static _getAmount(amount) {
+        return amount.min === amount.max
+            ? formatInt(amount.min)
+            : `${formatInt(amount.min)} to ${formatInt(amount.max)}`;
+    }
+
+    static _getChance(chance) {
+        return formatInt((1 - chance) * 100);
+    }
+
     _getItemsText(items) {
-        const getAmount = amount =>
-            amount.min === amount.max ? formatInt(amount.min) : `${formatInt(amount.min)} to ${formatInt(amount.max)}`;
-
-        const getChance = chance => formatInt((1 - chance) * 100);
-
         return html`
             <table class="table table-sm small">
                 <thead>
@@ -231,10 +238,10 @@ export default class ListLoot {
                                 <tr>
                                     <td>${item.name}</td>
                                     <td class="text-right">
-                                        ${getChance(item.chance)}
+                                        ${ListLoot._getChance(item.chance)}
                                     </td>
                                     <td class="text-right">
-                                        ${getAmount(item.amount)}
+                                        ${ListLoot._getAmount(item.amount)}
                                     </td>
                                 </tr>
                             `

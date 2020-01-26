@@ -29,9 +29,9 @@ export default class ListBuildings {
 
     async _loadAndSetupData() {
         try {
-            this._buildingData = (await import(
-                /* webpackChunkName: "data-buildings" */ "../../gen-generic/buildings.json"
-            )).default;
+            this._buildingData = (
+                await import(/* webpackChunkName: "data-buildings" */ "../../gen-generic/buildings.json")
+            ).default;
         } catch (error) {
             putImportError(error);
         }

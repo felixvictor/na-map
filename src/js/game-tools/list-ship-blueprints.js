@@ -41,7 +41,9 @@ export default class ListShipBlueprints {
             this._blueprintData = (
                 await import(/* webpackChunkName: "data-ship-blueprints" */ "../../gen-generic/ship-blueprints.json")
             ).default;
-            this._woodData = (await import(/* webpackChunkName: "data-woods" */ "../../gen-generic/woods.json")).default;
+            this._woodData = (
+                await import(/* webpackChunkName: "data-woods" */ "../../gen-generic/woods.json")
+            ).default;
             /**
              * @typedef {object} extractionCost
              * @property {Number} price Extraction price
@@ -424,6 +426,7 @@ export default class ListShipBlueprints {
          */
         let sLogTools = 0;
 
+        // noinspection DuplicatedCode
         if (this._craftingCosts.has(this._woodsSelected.trim)) {
             sLogPrice += this._craftingCosts.get(this._woodsSelected.trim).real * trimAmount;
             sLogLabour += this._craftingCosts.get(this._woodsSelected.trim).labour * trimAmount;
@@ -431,6 +434,7 @@ export default class ListShipBlueprints {
             sLogTools += this._craftingCosts.get(this._woodsSelected.trim).tool * trimAmount;
         }
 
+        // noinspection DuplicatedCode
         if (this._craftingCosts.has(this._woodsSelected.frame)) {
             sLogPrice += this._craftingCosts.get(this._woodsSelected.frame).real * frameAmount;
             sLogLabour += this._craftingCosts.get(this._woodsSelected.frame).labour * frameAmount;
