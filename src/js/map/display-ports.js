@@ -25,6 +25,7 @@ import {
     colourGreenDark,
     colourGreenLight,
     colourList,
+    colourOrange,
     colourRedDark,
     colourRedLight,
     colourWhite,
@@ -827,9 +828,9 @@ export default class DisplayPorts {
             r = d => d.distance;
         } else if (this.showRadius === "attack") {
             data = this._portDataFiltered.filter(port => port.attackHostility);
-            this._attackRadius.range([rMin, rMax]);
+            this._attackRadius.range([rMin, rMax / 1.5]);
             cssClass = () => "bubble";
-            fill = d => this._colourScaleHostility(d.attackHostility);
+            fill = d => (d.attackerNation === "Neutral" ? colourOrange : this._colourScaleHostility(d.attackHostility));
             r = d => this._attackRadius(d.attackHostility);
         } else if (this.circleType === "currentGood") {
             cssClass = d => `bubble ${d.isSource ? "pos" : "neg"}`;

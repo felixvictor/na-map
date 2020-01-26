@@ -68,6 +68,7 @@ const primary300 = colours.get("primary-300");
 const colourGreen = colours.get("green");
 const colourGreenLight = colours.get("green-light");
 const colourGreenDark = colours.get("green-dark");
+const colourOrange = colours.get("orange");
 const colourRed = colours.get("red");
 const colourRedLight = colours.get("red-light");
 const colourRedDark = colours.get("red-dark");
@@ -283,6 +284,7 @@ const config = {
             CGREEN: JSON.stringify(colourGreen),
             CGREENLIGHT: JSON.stringify(colourGreenLight),
             CGREENDARK: JSON.stringify(colourGreenDark),
+            CORANGE: JSON.stringify(colourOrange),
             CRED: JSON.stringify(colourRed),
             CREDLIGHT: JSON.stringify(colourRedLight),
             CREDDARK: JSON.stringify(colourRedDark),
