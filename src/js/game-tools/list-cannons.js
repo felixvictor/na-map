@@ -145,8 +145,7 @@ export default class ListCannons {
             <table id="table-${type}-list" class="table table-sm small tablesort">
                 <thead>
                     <tr>
-                        <th scope="col" class="text-right" rowspan="2" data-sort-default>Lb</th>
-
+                        <th scope="col" class="border-bottom-0"></th>
                         ${/* eslint-disable indent */
                         repeat(
                             this._groups,
@@ -154,7 +153,8 @@ export default class ListCannons {
                             groupValue => getColumnGroupHeads(groupValue)
                         )}
                     </tr>
-                    <tr>
+                    <tr data-sort-method="thead">
+                        <th scope="col" class="text-right border-top-0" data-sort-default>Lb</th>
                         ${repeat(
                             this._groups,
                             (groupValue, groupKey) => groupKey,
