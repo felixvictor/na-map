@@ -39,17 +39,18 @@ let apiPorts = [];
 let apiShops = [];
 
 const distancesFile = path.resolve(commonPaths.dirGenGeneric, `distances-${distanceMapSize}.json`);
-const distances = readJson(distancesFile);
+const distancesOrig = readJson(distancesFile);
+const distances = new Map(
+    distancesOrig.forEach(([fromPortId, toPortId, distance]) => [[[fromPortId, toPortId], distance]])
+);
 
 const portData = [];
 const trades = [];
+let itemNames;
+let itemWeights;
 
 const getDistance = (fromPortId, toPortId) =>
-    (distances.find(
-        ([distanceFromPortId, distanceToPortId]) =>
-            (distanceFromPortId === fromPortId && distanceToPortId === toPortId) ||
-            (distanceFromPortId === toPortId && distanceToPortId === fromPortId)
-    ) || {})[2] || 0;
+    fromPortId < toPortId ? distances.get([fromPortId, toPortId]) : distances.get([toPortId, fromPortId]);
 
 /**
  *
@@ -57,25 +58,6 @@ const getDistance = (fromPortId, toPortId) =>
  * @return {void}
  */
 const setPortFeaturePerServer = apiPort => {
-    /**
-     * Item names
-     * @type {Map<number, string>} Item names<id, name>
-     */
-    const itemNames = new Map(
-        apiItems.map(item => [
-            item.Id,
-            {
-                name: cleanName(item.Name),
-                weight: item.ItemWeight,
-                itemType: item.ItemType,
-                trading:
-                    item.SortingGroup === "Resource.Trading" ||
-                    item.Name === "American Cotton" ||
-                    item.Name === "Tobacco"
-            }
-        ])
-    );
-
     const portShop = apiShops.find(shop => shop.Id === apiPort.Id);
 
     const portFeaturesPerServer = {
@@ -148,12 +130,6 @@ const setAndSavePortData = async serverName => {
 };
 
 const setAndSaveTradeData = async serverName => {
-    const apiItemWeight = new Map(
-        apiItems
-            .filter(apiItem => !apiItem.NotUsed && !apiItem.NotTradeable && apiItem.ItemType !== "RecipeResource")
-            .map(apiItem => [cleanName(apiItem.Name), apiItem.ItemWeight])
-    );
-
     portData.forEach(buyPort => {
         buyPort.inventory
             .filter(buyGood => buyGood.buyQuantity > 0)
@@ -174,7 +150,7 @@ const setAndSaveTradeData = async serverName => {
                                 distance: getDistance(buyPort.id, sellPort.id),
                                 profitTotal,
                                 quantity,
-                                weightPerItem: apiItemWeight.get(buyGood.name)
+                                weightPerItem: itemWeights.get(buyGood.name)
                             };
                             trades.push(trade);
                         }
@@ -282,7 +258,7 @@ const setAndSaveFrontlines = async serverName => {
         // frontlineDefendingNation[nationShortName].push({ key: toPortId, value: [...fromPorts] });
     }
 
-    await  saveJsonAsync(path.resolve(commonPaths.dirGenServer, `${serverName}-frontlines.json`), {
+    await saveJsonAsync(path.resolve(commonPaths.dirGenServer, `${serverName}-frontlines.json`), {
         attacking: frontlineAttackingNationGroupedByToPort,
         defending: frontlineDefendingNation
     });
@@ -293,6 +269,31 @@ export const convertServerPortData = () => {
         apiPorts = readJson(path.resolve(baseAPIFilename, `${serverName}-Ports-${serverDate}.json`));
         apiShops = readJson(path.resolve(baseAPIFilename, `${serverName}-Shops-${serverDate}.json`));
         apiItems = readJson(path.resolve(baseAPIFilename, `${serverName}-ItemTemplates-${serverDate}.json`));
+
+        /**
+         * Item names
+         * @type {Map<number, string>} Item names<id, name>
+         */
+        itemNames = new Map(
+            apiItems.map(item => [
+                item.Id,
+                {
+                    name: cleanName(item.Name),
+                    weight: item.ItemWeight,
+                    itemType: item.ItemType,
+                    trading:
+                        item.SortingGroup === "Resource.Trading" ||
+                        item.Name === "American Cotton" ||
+                        item.Name === "Tobacco"
+                }
+            ])
+        );
+
+        itemWeights = new Map(
+            apiItems
+                .filter(apiItem => !apiItem.NotUsed && !apiItem.NotTradeable && apiItem.ItemType !== "RecipeResource")
+                .map(apiItem => [cleanName(apiItem.Name), apiItem.ItemWeight])
+        );
 
         setAndSavePortData(serverName);
         setAndSaveTradeData(serverName);
