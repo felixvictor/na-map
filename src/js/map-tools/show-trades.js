@@ -295,7 +295,8 @@ export default class ShowTrades {
         const dataDirectory = "data";
 
         try {
-            const portData = (await import(/* webpackChunkName: "data-ports" */ "../../gen/ports.json")).default;
+            const portData = (await import(/* webpackChunkName: "data-ports" */ "../../gen-generic/ports.json"))
+                .default;
             const pbData = await (await fetch(`${dataDirectory}/${this._serverName}-pb.json`)).json();
             this._linkDataDefault = await (await fetch(`${dataDirectory}/${this._serverName}-trades.json`)).json();
             // Combine port data with port battle data

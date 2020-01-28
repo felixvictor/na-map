@@ -4,22 +4,27 @@
  * @file      Building data.
  * @module    build/convert-buildings
  * @author    iB aka Felix Victor
- * @copyright 2019
+ * @copyright 2019, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { cleanName, readJson, saveJson, sortBy } from "./common.mjs";
-
-const itemsFilename = process.argv[2];
-const fileNameBuildings = process.argv[3];
-const fileNamePrices = process.argv[4];
-const date = process.argv[5];
-
-const APIItems = readJson(`${itemsFilename}-ItemTemplates-${date}.json`);
+import * as path from "path";
+import {
+    baseAPIFilename,
+    cleanName,
+    commonPaths,
+    readJson,
+    saveJsonAsync,
+    serverNames,
+    serverStartDate as serverDate,
+    sortBy
+} from "./common.mjs";
 
 const idWorkshop = 450;
 const idAcademy = 879;
 const idSeasoningShed = 2291;
+const idDoubloons = 989;
+const idTools = 1825;
 const obsoleteBuildings = [
     "Compass Wood Forest",
     "Copper Ore Mine",
@@ -32,86 +37,91 @@ const obsoleteBuildings = [
     "Tobacco Plantation"
 ];
 
-function getItemsCraftedByWorkshop() {
-    return APIItems.filter(
-        item =>
-            item.BuildingRequirements &&
-            item.BuildingRequirements[0] &&
-            item.BuildingRequirements[0].BuildingTemplate === idWorkshop
-    )
+let apiItems;
+
+const getItemsCraftedByWorkshop = () =>
+    apiItems
+        .filter(
+            item =>
+                item.BuildingRequirements &&
+                item.BuildingRequirements[0] &&
+                item.BuildingRequirements[0].BuildingTemplate === idWorkshop
+        )
         .map(recipe => ({
             name: cleanName(recipe.Name).replace(" Blueprint", ""),
             price: 0
         }))
-        .sort(sortBy(["name"]));
-}
+        .sort((a, b) => a.name.localeCompare(b.name));
 
-function getItemsCraftedByAcademy() {
-    return APIItems.filter(
-        item =>
-            item.BuildingRequirements &&
-            item.BuildingRequirements[0] &&
-            item.BuildingRequirements[0].BuildingTemplate === idAcademy
-    )
+const getItemsCraftedByAcademy = () =>
+    apiItems
+        .filter(
+            item =>
+                item.BuildingRequirements &&
+                item.BuildingRequirements[0] &&
+                item.BuildingRequirements[0].BuildingTemplate === idAcademy
+        )
         .map(recipe => ({
             name: cleanName(recipe.Name).replace(" Blueprint", ""),
             price: 0
         }))
-        .sort(sortBy(["name"]));
-}
+        .sort((a, b) => a.name.localeCompare(b.name));
 
-function getItemsCraftedBySeasoningShed() {
-    return APIItems.filter(
-        item =>
-            item.BuildingRequirements &&
-            item.BuildingRequirements[0] &&
-            item.BuildingRequirements[0].BuildingTemplate === idSeasoningShed
-    )
+const getItemsCraftedBySeasoningShed = () =>
+    apiItems
+        .filter(
+            item =>
+                item.BuildingRequirements &&
+                item.BuildingRequirements[0] &&
+                item.BuildingRequirements[0].BuildingTemplate === idSeasoningShed
+        )
         .map(recipe => ({
             name: cleanName(recipe.Name),
             price: 0
         }))
-        .sort(sortBy(["name"]));
-}
+        .sort((a, b) => a.name.localeCompare(b.name));
 
 /**
  * Convert API building data and save sorted as JSON
- * @returns {void}
+ * @returns {Array}
  */
-function convertBuildings() {
+const getBuildings = () => {
     const buildings = new Map();
 
     const resources = new Map(
-        APIItems.map(APIresource => [
-            APIresource.Id,
-            { name: cleanName(APIresource.Name), price: APIresource.BasePrice }
+        apiItems.map(apiResource => [
+            apiResource.Id,
+            { name: cleanName(apiResource.Name), price: apiResource.BasePrice }
         ])
     );
 
     const resourceRecipes = new Map(
-        APIItems.filter(item => item.ItemType === "RecipeResource").map(recipe => [
-            recipe.Results[0].Template,
-            {
-                price: recipe.GoldRequirements,
-                amount: recipe.Results[0].Amount,
-                labour: recipe.LaborPrice
-            }
-        ])
+        apiItems
+            .filter(item => item.ItemType === "RecipeResource")
+            .map(recipe => [
+                recipe.Results[0].Template,
+                {
+                    price: recipe.GoldRequirements,
+                    amount: recipe.Results[0].Amount,
+                    labour: recipe.LaborPrice
+                }
+            ])
     );
 
-    APIItems.filter(item => item.ItemType === "Building" && !obsoleteBuildings.includes(item.Name)).forEach(
-        APIbuilding => {
+    apiItems
+        .filter(item => item.ItemType === "Building" && !obsoleteBuildings.includes(item.Name))
+        .forEach(apiBuilding => {
             const building = {
-                id: APIbuilding.Id,
-                name: cleanName(APIbuilding.Name),
+                id: apiBuilding.Id,
+                name: cleanName(apiBuilding.Name),
                 resource:
                     resources.get(
-                        APIbuilding.ProduceResource ? APIbuilding.ProduceResource : APIbuilding.RequiredPortResource
+                        apiBuilding.ProduceResource ? apiBuilding.ProduceResource : apiBuilding.RequiredPortResource
                     ) || [],
-                batch: resourceRecipes.get(APIbuilding.RequiredPortResource),
-                levels: APIbuilding.Levels.map(level => ({
+                batch: resourceRecipes.get(apiBuilding.RequiredPortResource),
+                levels: apiBuilding.Levels.map(level => ({
                     labourDiscount: level.LaborDiscount,
-                    production: level.ProductionLevel * APIbuilding.BaseProduction,
+                    production: level.ProductionLevel * apiBuilding.BaseProduction,
                     maxStorage: level.MaxStorage,
                     price: level.UpgradePriceGold,
                     materials: level.UpgradePriceMaterials.map(material => ({
@@ -147,32 +157,29 @@ function convertBuildings() {
 
                 buildings.set(building.name, building);
             }
-        }
+        });
+
+    return [...buildings.values()];
+};
+
+const getSeasonedItemPrice = name =>
+    apiItems.find(
+        item => item.ItemType === "Recipe" && item.Name.replace(" Log", "") === name.replace("White Oak", "White oak")
     );
 
-    let result = [...buildings.values()];
-
+const getPrices = buildings => {
+    const prices = {};
     const getStandardPrices = name =>
         prices.standard.find(standardItem => standardItem.name === name.replace(" (S)", ""));
 
-    const getSeasonedItemPrice = name =>
-        APIItems.find(
-            item =>
-                item.ItemType === "Recipe" && item.Name.replace(" Log", "") === name.replace("White Oak", "White oak")
-        );
-
-    const doubloonsId = 989;
-    const toolsId = 1825;
-    const prices = {};
-
-    prices.standard = result
+    prices.standard = buildings
         .filter(building => !Array.isArray(building.resource) && building.resource.price)
         .map(building => ({
             name: building.resource.name.replace(" Log", ""),
             real: building.resource.price,
             labour: building.batch.labour
         }))
-        .sort(sortBy(["name"]));
+        .sort((a, b) => a.name.localeCompare(b.name));
 
     prices.seasoned = getItemsCraftedBySeasoningShed()
         .map(seasonedItem => {
@@ -182,17 +189,28 @@ function convertBuildings() {
                 name,
                 real: getStandardPrices(name).real,
                 labour: getSeasonedItemPrice(name).LaborPrice,
-                doubloon: seasonedItemPrices.FullRequirements.find(requirement => requirement.Template === doubloonsId)
+                doubloon: seasonedItemPrices.FullRequirements.find(requirement => requirement.Template === idDoubloons)
                     .Amount,
-                tool: seasonedItemPrices.FullRequirements.find(requirement => requirement.Template === toolsId).Amount
+                tool: seasonedItemPrices.FullRequirements.find(requirement => requirement.Template === idTools).Amount
             };
         })
-        .sort(sortBy(["name"]));
+        .sort((a, b) => a.name.localeCompare(b.name));
 
-    saveJson(fileNamePrices, prices);
+    return prices;
+};
 
-    result = result.filter(building => Object.keys(building).length).sort(sortBy(["name"]));
-    saveJson(fileNameBuildings, result);
-}
+const convertBuildings = async () => {
+    let buildings = getBuildings();
 
-convertBuildings();
+    const prices = getPrices(buildings);
+    await saveJsonAsync(commonPaths.filePrices, prices);
+
+    buildings = buildings.filter(building => Object.keys(building).length).sort(sortBy(["id"]));
+    await saveJsonAsync(commonPaths.fileBuilding, buildings);
+};
+
+export const convertBuildingData = async () => {
+    apiItems = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`));
+
+    await convertBuildings();
+};
