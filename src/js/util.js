@@ -495,12 +495,10 @@ export function chunkify(array, n, balanced = true) {
         }
     } else if (balanced) {
         while (i < length_) {
-            // eslint-disable-next-line no-param-reassign, no-plusplus
             size = Math.ceil((length_ - i) / n--);
             out.push(array.slice(i, (i += size)));
         }
     } else {
-        // eslint-disable-next-line no-param-reassign
         n -= 1;
         size = Math.floor(length_ / n);
         if (length_ % size === 0) {
@@ -666,8 +664,7 @@ export const sortBy = properties => (a, b) => {
     let desc;
     properties.some(property => {
         if (property.startsWith("-")) {
-            // eslint-disable-next-line no-param-reassign
-            property = property.substring(1);
+            property = property.slice(1);
             desc = -1;
         } else {
             desc = 1;

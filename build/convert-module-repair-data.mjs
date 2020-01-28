@@ -4,14 +4,13 @@
  * @file      Convert repair data from modules.
  * @module    build/convert-module-repair
  * @author    iB aka Felix Victor
- * @copyright 2019
+ * @copyright 2019, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-// noinspection ES6CheckImport
+import * as path from "path";
 import convert from "xml-js";
-
-import { readTextFile, saveJson } from "./common.mjs";
+import { commonPaths, readTextFile, saveJsonAsync } from "./common.mjs";
 
 /**
  * Change string from snake case to camelCase
@@ -20,19 +19,16 @@ import { readTextFile, saveJson } from "./common.mjs";
  * @return {string} Output camel case string
  */
 function toCamelCase(str) {
-    str = str.replace(/[-_\s]+(.)?/g, (match, ch) => (ch ? ch.toUpperCase() : ""));
+    str = str.replace(/[\s-_]+(.)?/g, (match, ch) => (ch ? ch.toUpperCase() : ""));
 
     // Ensure first char is always lowercase
     return str.slice(0, 1).toLowerCase() + str.slice(1);
 }
 
-const inDir = process.argv[2];
-const filename = process.argv[3];
-
 const baseFileNames = ["armor repair", "sail repair", "crew repair"];
 
 const getFileData = (baseFileName, ext) => {
-    const fileName = `${inDir}/${baseFileName} ${ext}.xml`;
+    const fileName = path.resolve(commonPaths.dirModules, `${baseFileName} ${ext}.xml`);
     const fileXmlData = readTextFile(fileName);
 
     return convert.xml2js(fileXmlData, { compact: true });
@@ -42,7 +38,7 @@ const getFileData = (baseFileName, ext) => {
  * Retrieve additional ship data from game files and add it to existing data from API
  * @returns {void}
  */
-function convertRepairData() {
+export const convertRepairData = async () => {
     const repairs = {};
     /*
     REPAIR_VOLUME_PER_ITEM / REPAIR_PERCENT
@@ -69,7 +65,5 @@ function convertRepairData() {
         repairs[toCamelCase(baseFileName)] = data;
     });
 
-    saveJson(filename, repairs);
-}
-
-convertRepairData();
+    await saveJsonAsync(commonPaths.fileRepair, repairs);
+};
