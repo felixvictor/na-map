@@ -2,7 +2,7 @@ import d3Node from "d3-node";
 const d3n = d3Node();
 const { d3 } = d3n;
 
-import { cleanName, readJson, saveJson, distancePoints, sortBy, nations, speedFactor } from "./common.mjs";
+import { cleanName, readJson, saveJsonAsync, distancePoints, sortBy, nations, speedFactor } from "./common.mjs";
 
 const date = "2019-04-24";
 const numPorts = 3;
@@ -118,4 +118,4 @@ const portDistances = [...portDistancesNations, ...portDistancesFreeTowns].sort(
     sortBy(["fromNation", "fromPort", "distance"])
 );
 
-saveJson(outFilename, portDistances);
+saveJsonAsync(outFilename, portDistances);
