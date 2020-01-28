@@ -1,3 +1,5 @@
+#!/usr/bin/env -S yarn node --experimental-modules
+
 /**
  * This file is part of na-map.
  *

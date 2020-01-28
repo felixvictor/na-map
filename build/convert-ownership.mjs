@@ -4,22 +4,18 @@
  * @file      Convert port ownership.
  * @module    convert-ownership
  * @author    iB aka Felix Victor
- * @copyright 2018
+ * @copyright 2018, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
 import * as fs from "fs";
 import * as path from "path";
+
 import d3Node from "d3-node";
 import { default as lzma } from "lzma-native";
 import { default as readDirRecursive } from "recursive-readdir";
 
-import { capitalToCounty, cleanName, nations, saveJson } from "./common.mjs";
-
-const inDir = process.argv[2];
-const fileBaseName = process.argv[3];
-const outFileNameTimelinePorts = process.argv[4];
-const outFileNameTimelineDates = process.argv[5];
+import { capitalToCounty, cleanName, commonPaths, nations, saveJsonAsync, serverNames } from "./common.mjs";
 
 const fileExtension = ".json.xz";
 
@@ -33,7 +29,7 @@ const { d3 } = d3n;
 function convertOwnership() {
     const ports = new Map();
     const numPortsDates = [];
-    const fileBaseNameRegex = new RegExp(`${fileBaseName}-(20\\d{2}-\\d{2}-\\d{2})${fileExtension}`);
+    const fileBaseNameRegex = new RegExp(`${serverNames[0]}-Ports-(20\\d{2}-\\d{2}-\\d{2})${fileExtension}`);
 
     /**
      * Parse data and construct ports Map
@@ -229,7 +225,7 @@ function convertOwnership() {
      * Write out result
      * @return {void}
      */
-    function writeResult() {
+    const writeResult = async () => {
         const portsArray = [...ports.entries()].map(([key, value]) => {
             value.id = key;
             return value;
@@ -265,11 +261,11 @@ function convertOwnership() {
             return newRegion;
         });
 
-        saveJson(outFileNameTimelinePorts, result);
-        saveJson(outFileNameTimelineDates, numPortsDates);
-    }
+        await saveJsonAsync(commonPaths.fileOwnership, result);
+        await saveJsonAsync(commonPaths.fileNation, numPortsDates);
+    };
 
-    readDirRecursive(inDir, [ignoreFileName])
+    readDirRecursive(commonPaths.dirAPI, [ignoreFileName])
         .then(fileNames => sortFileNames(fileNames))
         .then(fileNames => processFiles(fileNames))
         .then(() => writeResult())
@@ -278,4 +274,6 @@ function convertOwnership() {
         });
 }
 
-convertOwnership();
+export const convertOwnershipData = () => {
+    convertOwnership();
+};

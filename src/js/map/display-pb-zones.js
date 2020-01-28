@@ -61,7 +61,7 @@ export default class DisplayPbZones {
     async _loadData() {
         try {
             this._pbZonesDefault = (
-                await import(/* webpackChunkName: "data-pb-zones" */ "../../gen/pb-zones.json")
+                await import(/* webpackChunkName: "data-pb-zones" */ "../../gen-generic/pb-zones.json")
             ).default;
         } catch (error) {
             putImportError(error);
@@ -201,17 +201,13 @@ export default class DisplayPbZones {
     }
 
     _setData() {
-        const filterData = () => {
-            this._filterVisible();
-        };
-
         if (this._ports.zoomLevel === "pbZone" && this._showPB !== "off") {
             if (this._isDataLoaded) {
-                filterData();
+                this._filterVisible();
             } else {
                 this._loadData().then(() => {
                     this._isDataLoaded = true;
-                    filterData();
+                    this._filterVisible();
                 });
             }
         } else {

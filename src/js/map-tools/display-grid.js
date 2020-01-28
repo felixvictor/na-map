@@ -239,46 +239,27 @@ export default class DisplayGrid {
      * @private
      */
     _displayAxis() {
-        this._displayXAxis();
-        this._displayYAxis();
-    }
-
-    /**
-     * Display x axis
-     * @return {void}
-     * @private
-     */
-    _displayXAxis() {
         const tk = d3Event ? d3Event.transform.k : 1;
-        const ty = d3Event ? d3Event.transform.y : 0;
-        const dx = ty / tk < this._width ? ty / tk : 0;
-        const padding = -this._maxCoord - dx;
         const fontSize = roundToThousands(this._defaultFontSize / tk);
         const strokeWidth = roundToThousands(1 / tk);
+
+        const tx = d3Event ? d3Event.transform.y : 0;
+        const dx = tx / tk < this._width ? tx / tk : 0;
+        const paddingX = -this._maxCoord - dx;
+
+        const ty = d3Event ? d3Event.transform.x : 0;
+        const dy = ty / tk < this._height ? ty / tk : 0;
+        const paddingY = -this._maxCoord - dy;
 
         this._gXAxis
             .attr("font-size", fontSize)
             .attr("stroke-width", strokeWidth)
-            .call(this._xAxis.tickPadding(padding));
-    }
-
-    /**
-     * Display y axis
-     * @return {void}
-     * @private
-     */
-    _displayYAxis() {
-        const tk = d3Event ? d3Event.transform.k : 1;
-        const tx = d3Event ? d3Event.transform.x : 0;
-        const dy = tx / tk < this._height ? tx / tk : 0;
-        const padding = -this._maxCoord - dy;
-        const fontSize = roundToThousands(this._defaultFontSize / tk);
-        const strokeWidth = roundToThousands(1 / tk);
+            .call(this._xAxis.tickPadding(paddingX));
 
         this._gYAxis
             .attr("font-size", fontSize)
             .attr("stroke-width", strokeWidth)
-            .call(this._yAxis.tickPadding(padding));
+            .call(this._yAxis.tickPadding(paddingY));
     }
 
     /**
