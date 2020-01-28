@@ -20,7 +20,7 @@ const { isProduction } = require("webpack-mode");
 const servers = require("./src/js/servers");
 const PACKAGE = require("./package.json");
 
-const repairs = require("./src/gen/repairs.json");
+const repairs = require("./src/gen-generic/repairs.json");
 const libraryName = PACKAGE.name;
 const { TARGET } = process.env;
 const target = `https://${TARGET}.netlify.com/`;
@@ -68,6 +68,7 @@ const primary300 = colours.get("primary-300");
 const colourGreen = colours.get("green");
 const colourGreenLight = colours.get("green-light");
 const colourGreenDark = colours.get("green-dark");
+const colourOrange = colours.get("orange");
 const colourRed = colours.get("red");
 const colourRedLight = colours.get("red-light");
 const colourRedDark = colours.get("red-dark");
@@ -283,6 +284,7 @@ const config = {
             CGREEN: JSON.stringify(colourGreen),
             CGREENLIGHT: JSON.stringify(colourGreenLight),
             CGREENDARK: JSON.stringify(colourGreenDark),
+            CORANGE: JSON.stringify(colourOrange),
             CRED: JSON.stringify(colourRed),
             CREDLIGHT: JSON.stringify(colourRedLight),
             CREDDARK: JSON.stringify(colourRedDark),
@@ -316,11 +318,10 @@ const config = {
         new CopyPlugin([
             { from: "../netlify.toml" },
             {
-                from: "data/*.json",
+                from: "gen-server",
                 to: `${dirOutput}/data`,
                 flatten: true
             },
-            { from: "data/*.xlsx", flatten: true },
             { from: "google979f2cf3bed204d6.html", to: "google979f2cf3bed204d6.html", toType: "file" },
             { from: "images/map", to: `${dirOutput}/images/map` }
         ]),
