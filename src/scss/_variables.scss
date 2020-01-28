@@ -17,10 +17,10 @@ $spacer: 1rem;
 $spacers: (
     0: 0,
     1: (
-        $spacer * 0.382
+        $spacer * .382
     ),
     2: (
-        $spacer * 0.618
+        $spacer * .618
     ),
     3: $spacer,
     4: (
@@ -123,7 +123,7 @@ $pagination-disabled-border-color: $pagination-bg;
 $badge-font-size: 90%;
 $badge-font-weight: 400;
 $badge-padding-y: 0;
-$badge-padding-x: 0.2rem;
+$badge-padding-x: .2rem;
 //$badge-border-radius:               $border-radius !default;
 //$badge-pill-padding-x:              .6em !default;
 // Use a higher than normal value to ensure completely rounded edges when
