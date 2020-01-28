@@ -1,14 +1,27 @@
-/*
-    convert-recipes.mjs
+/**
+ * This file is part of na-map.
+ *
+ * @file      Convert recipes.
+ * @module    build/convert-recipes
+ * @author    iB aka Felix Victor
+ * @copyright 2018, 2019, 2020
+ * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { cleanName, readJson, saveJson, simpleSort, sortBy } from "./common.mjs";
+import * as path from "path";
+import {
+    baseAPIFilename,
+    cleanName,
+    commonPaths,
+    readJson,
+    saveJsonAsync,
+    serverNames,
+    serverStartDate as serverDate,
+    simpleSort,
+    sortBy
+} from "./common.mjs";
 
-const inBaseFilename = process.argv[2];
-const outFilename = process.argv[3];
-const date = process.argv[4];
-
-const APIItems = readJson(`${inBaseFilename}-ItemTemplates-${date}.json`);
+let apiItems = [];
 
 const groups = new Map([
     ["AdmiralityShips", "Admirality permits"],
@@ -23,7 +36,7 @@ const groups = new Map([
     ["WoodWorking", "Cannons"]
 ]);
 
-function convertRecipes() {
+const convertRecipes = async () => {
     const data = {};
     const ingredients = new Map();
 
@@ -35,96 +48,105 @@ function convertRecipes() {
      * @return {Map<number, string>} Item names<id, name>
      */
     const getItemNames = () =>
-        new Map(APIItems.filter(item => !item.NotUsed).map(item => [item.Id, cleanName(item.Name)]));
+        new Map(apiItems.filter(item => !item.NotUsed).map(item => [item.Id, cleanName(item.Name)]));
 
     const itemNames = getItemNames();
 
     const getModuleNames = () =>
         new Map(
-            APIItems.filter(item => item.ItemType === "ShipUpgradeBookItem").map(item => [
-                item.Id,
-                itemNames.get(item.Upgrade)
-            ])
+            apiItems
+                .filter(item => item.ItemType === "ShipUpgradeBookItem")
+                .map(item => [item.Id, itemNames.get(item.Upgrade)])
         );
 
     const moduleNames = getModuleNames();
 
     const getIngredients = () =>
         new Map(
-            APIItems.filter(
-                item =>
-                    !item.NotUsed &&
-                    (item.ItemType === "ShipUpgradeBookItem" || item.SortingGroup === "Resource.Trading")
-            ).map(item => [item.Id, item.Id])
+            apiItems
+                .filter(
+                    item =>
+                        !item.NotUsed &&
+                        (item.ItemType === "ShipUpgradeBookItem" || item.SortingGroup === "Resource.Trading")
+                )
+                .map(item => [item.Id, item.Id])
         );
 
     const ingredientIds = getIngredients();
 
     const getUpgradeIds = () =>
-        new Map(APIItems.filter(item => !item.NotUsed && item.Upgrade).map(item => [item.Id, item.Upgrade]));
+        new Map(apiItems.filter(item => !item.NotUsed && item.Upgrade).map(item => [item.Id, item.Upgrade]));
 
     const upgradeIds = getUpgradeIds();
 
-    APIItems.filter(
-        APIrecipe => (APIrecipe.ItemType === "Recipe" || APIrecipe.ItemType === "RecipeModule") && !APIrecipe.NotUsed
-    ).forEach(APIrecipe => {
-        const resultReference =
-            APIrecipe.ItemType === "Recipe" ? APIrecipe.Results[0] : APIrecipe.Qualities[0].Results[0];
-        const recipe = {
-            id: APIrecipe.Id,
-            name: cleanName(APIrecipe.Name)
-                .replace(" Blueprint", "")
-                .replace(" - ", " – ")
-                .replace("u2013", "–")
-                .replace(/ $/, ""),
-            module: typeof APIrecipe.Results[0] === "undefined" ? "" : moduleNames.get(APIrecipe.Results[0].Template),
-            labourPrice: APIrecipe.LaborPrice,
-            goldPrice: APIrecipe.GoldRequirements,
-            itemRequirements: APIrecipe.FullRequirements.map(requirement => ({
-                name: itemNames.get(requirement.Template),
-                amount: requirement.Amount
-            })),
-            result: {
-                id: upgradeIds.has(resultReference.Template)
-                    ? upgradeIds.get(resultReference.Template)
-                    : resultReference.Template,
-                name: itemNames.get(resultReference.Template),
-                amount: resultReference.Amount
-            },
-            craftGroup: groups.has(APIrecipe.CraftGroup) ? groups.get(APIrecipe.CraftGroup) : APIrecipe.CraftGroup,
-            serverType: APIrecipe.ServerType
-        };
-        // if result exists
-        if (recipe.result.name) {
-            data.recipe.push(recipe);
-        }
-
-        APIrecipe.FullRequirements.filter(APIingredient => ingredientIds.has(APIingredient.Template)).forEach(
-            APIingredient => {
-                const recipeName = recipe.module ? recipe.module : recipe.name.replace(" Blueprint", "");
-                if (ingredients.has(APIingredient.Template)) {
-                    const updatedIngredient = ingredients.get(APIingredient.Template);
-                    updatedIngredient.recipeNames.push(recipeName);
-                    updatedIngredient.recipeNames.sort(simpleSort);
-                    ingredients.set(APIingredient.Template, updatedIngredient);
-                } else {
-                    const ingredient = {
-                        id: APIingredient.Template,
-                        name: itemNames.get(APIingredient.Template),
-                        recipeNames: [recipeName]
-                    };
-                    ingredients.set(APIingredient.Template, ingredient);
-                }
+    apiItems
+        .filter(
+            apiRecipe =>
+                (apiRecipe.ItemType === "Recipe" || apiRecipe.ItemType === "RecipeModule") && !apiRecipe.NotUsed
+        )
+        .forEach(apiRecipe => {
+            const resultReference =
+                apiRecipe.ItemType === "Recipe" ? apiRecipe.Results[0] : apiRecipe.Qualities[0].Results[0];
+            const recipe = {
+                id: apiRecipe.Id,
+                name: cleanName(apiRecipe.Name)
+                    .replace(" Blueprint", "")
+                    .replace(" - ", " – ")
+                    .replace("u2013", "–")
+                    .replace(/ $/, ""),
+                module:
+                    typeof apiRecipe.Results[0] === "undefined" ? "" : moduleNames.get(apiRecipe.Results[0].Template),
+                labourPrice: apiRecipe.LaborPrice,
+                goldPrice: apiRecipe.GoldRequirements,
+                itemRequirements: apiRecipe.FullRequirements.map(requirement => ({
+                    name: itemNames.get(requirement.Template),
+                    amount: requirement.Amount
+                })),
+                result: {
+                    id: upgradeIds.has(resultReference.Template)
+                        ? upgradeIds.get(resultReference.Template)
+                        : resultReference.Template,
+                    name: itemNames.get(resultReference.Template),
+                    amount: resultReference.Amount
+                },
+                craftGroup: groups.has(apiRecipe.CraftGroup) ? groups.get(apiRecipe.CraftGroup) : apiRecipe.CraftGroup,
+                serverType: apiRecipe.ServerType
+            };
+            // if result exists
+            if (recipe.result.name) {
+                data.recipe.push(recipe);
             }
-        );
-    });
 
-    data.recipe.sort(sortBy(["craftGroup", "name"]));
+            apiRecipe.FullRequirements.filter(APIingredient => ingredientIds.has(APIingredient.Template)).forEach(
+                apiIngredient => {
+                    const recipeName = recipe.module ? recipe.module : recipe.name.replace(" Blueprint", "");
+                    if (ingredients.has(apiIngredient.Template)) {
+                        const updatedIngredient = ingredients.get(apiIngredient.Template);
+                        updatedIngredient.recipeNames.push(recipeName);
+                        updatedIngredient.recipeNames.sort(simpleSort);
+                        ingredients.set(apiIngredient.Template, updatedIngredient);
+                    } else {
+                        const ingredient = {
+                            id: apiIngredient.Template,
+                            name: itemNames.get(apiIngredient.Template),
+                            recipeNames: [recipeName]
+                        };
+                        ingredients.set(apiIngredient.Template, ingredient);
+                    }
+                }
+            );
+        });
+
+    data.recipe.sort(sortBy(["craftGroup", "id"]));
 
     const result = [...ingredients.values()];
-    data.ingredient = result.sort(sortBy(["name"]));
+    data.ingredient = result.sort(sortBy(["id"]));
 
-    saveJson(outFilename, data);
-}
+    await saveJsonAsync(commonPaths.fileRecipe, data);
+};
 
-convertRecipes();
+export const convertRecipeData = () => {
+    apiItems = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`));
+
+    convertRecipes();
+};
