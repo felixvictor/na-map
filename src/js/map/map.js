@@ -44,9 +44,9 @@ class Map {
         /**
          * Naval action server name
          * @type {string}
-         * @private
+         * @public
          */
-        this._serverName = serverName;
+        this.serverName = serverName;
         this._searchParams = searchParams;
 
         /**
@@ -202,7 +202,7 @@ class Map {
 
         this._portSelect = new SelectPorts(this._ports, this._pbZone, this);
         this.showTrades = new ShowTrades(
-            this._serverName,
+            this.serverName,
             this._portSelect,
             this._minScale,
             this.coord.min,

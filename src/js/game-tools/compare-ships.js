@@ -1462,9 +1462,11 @@ export default class CompareShips {
     async _loadAndSetupData() {
         try {
             this._moduleDataDefault = (
-                await import(/* webpackChunkName: "data-modules" */ "../../gen/modules.json")
+                await import(/* webpackChunkName: "data-modules" */ "../../gen-generic/modules.json")
             ).default;
-            this._shipData = (await import(/* webpackChunkName: "data-ships" */ "../../gen/ships.json")).default;
+            this._shipData = (
+                await import(/* webpackChunkName: "data-ships" */ "../../gen-generic/ships.json")
+            ).default;
             this._setupData();
             if (this._baseId !== "ship-journey") {
                 this.woodCompare = new CompareWoods(this._woodId);
@@ -1833,14 +1835,19 @@ export default class CompareShips {
         return module;
     }
 
-    _getModifierFromModule(properties) {
+    static _getModifierFromModule(properties) {
         return `<p class="mb-0">${properties
             .map(property => {
-                const amount = property.isPercentage
-                    ? formatSignPercent(property.amount / 100)
-                    : property.amount < 1 && property.amount > 0
-                    ? formatPP(property.amount)
-                    : formatSignInt(property.amount);
+                let amount;
+                if (property.isPercentage) {
+                    amount = formatSignPercent(property.amount / 100);
+                } else {
+                    amount =
+                        property.amount < 1 && property.amount > 0
+                            ? formatPP(property.amount)
+                            : formatSignInt(property.amount);
+                }
+
                 return `${property.modifier} ${amount}`;
             })
             .join("<br>")}</p>`;
@@ -1885,7 +1892,7 @@ export default class CompareShips {
 
                                 // Add tooltip with module properties
                                 $(element)
-                                    .attr("data-original-title", this._getModifierFromModule(module.properties))
+                                    .attr("data-original-title", CompareShips._getModifierFromModule(module.properties))
                                     .tooltip({ boundary: "viewport", html: true });
                             }
                         });
