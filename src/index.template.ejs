@@ -25,7 +25,7 @@
 
 <body>
 
-<% /*  %>
+<% /*     %>
 <div class="row">
     <div class="col-sm-3 colour-palette">
         <div class="colour-slab colour-slab-base primary-500">500 primary</div>
@@ -104,7 +104,7 @@
         <div class="colour-slab colour-slab-base black">black</div>
     </div>
 </div>
-<%  */ %>
+<%     */ %>
 
 <nav class="navbar navbar-expand-lg navbar-light">
     <a class="navbar-brand" href="/">
@@ -118,15 +118,16 @@
         <ul class="navbar-nav mr-auto">
 
             <li id="selectPortNavbar" class="nav-item dropdown pr-2">
-                <a class="nav-link dropdown-toggle" href="#" id="propertyDropdown" role="button" data-toggle="dropdown"
+                <a class="nav-link dropdown-toggle" href="#" id="propertyDropdown" data-toggle="dropdown"
                    aria-haspopup="true" aria-expanded="false">
                     Select ports on
                 </a>
                 <div class="dropdown-menu" id="propertyMenu" aria-labelledby="propertyDropdown">
                     <h6 class="dropdown-header">Property</h6>
                     <div class="dropdown-submenu">
-                        <a class="dropdown-item dropdown-toggle" data-toggle="dropdown" href="#">Select</a>
-                        <div class="dropdown-menu">
+                        <a class="dropdown-item dropdown-toggle" id="dropdown-select" data-toggle="dropdown"
+                           role="button" href="#">Select</a>
+                        <div class="dropdown-menu" aria-labelledby="dropdown-select">
                             <a class="dropdown-item" id="menu-prop-deep" href="#">Deep water</a>
                             <a class="dropdown-item" id="menu-prop-shallow" href="#">Shallow water</a>
                             <div class="dropdown-divider"></div>
@@ -137,6 +138,22 @@
                             <a class="dropdown-item" id="menu-prop-medium" href="#">4th rate AI</a>
                             <a class="dropdown-item" id="menu-prop-small" href="#">6th rate AI</a>
                         </div>
+                    </div>
+
+                    <div class="dropdown-divider"></div>
+
+                    <h6 class="dropdown-header">Front lines</h6>
+                    <div class="dropdown-item">
+                        <label>
+                            <select title="Select nation attacking" name="frontlines-attacking-nation-select"
+                                    id="frontlines-attacking-nation-select"></select>
+                        </label>
+                    </div>
+                    <div class="dropdown-item">
+                        <label>
+                            <select title="Select nation defending" name="frontlines-defending-nation-select"
+                                    id="frontlines-defending-nation-select"></select>
+                        </label>
                     </div>
 
                     <div class="dropdown-divider"></div>
@@ -191,7 +208,7 @@
                                                    id="prop-pb-to-input" required/>
                                             <div class="input-group-append" data-target="#prop-pb-to"
                                                  data-toggle="datetimepicker">
-                                                <span class="input-group-text"><i class="icon icon-options"></i></span>
+                                                <span class="input-group-text"><i class="icon icon-clock"></i></span>
                                             </div>
                                         </div>
                                     </div>
@@ -317,7 +334,7 @@
 
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Download</h6>
-                    <a class="dropdown-item" id="button-download-pb-calc" href="port-battle.xlsx"
+                    <a class="dropdown-item" id="button-download-pb-calc" href="data/port-battle.xlsx"
                        download="port-battle-calculator.xlsx">Port battle calculator</a>
                 </div>
             </li>
