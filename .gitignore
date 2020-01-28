@@ -9,3 +9,4 @@
 /webpack-stats.json
 /yarn-error.log
 /port-distances.json
+/.env
