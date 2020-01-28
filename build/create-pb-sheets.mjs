@@ -1,18 +1,20 @@
+#!/usr/bin/env -S yarn node --experimental-modules
+
 /**
  * This file is part of na-map.
  *
  * @file      Create pb sheets.
- * @module    build/create-xlsx
+ * @module    build/create-pb-sheets
  * @author    iB aka Felix Victor
- * @copyright 2017, 2018, 2019
+ * @copyright 2017, 2018, 2019, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
 import Excel4Node from "excel4node";
-
 import sass from "node-sass";
 import css from "css";
-import { readJson, sortBy } from "./common.mjs";
+
+import { commonPaths, range, readJson, sortBy } from "./common.mjs";
 
 const shallowWaterFrigates = ["Cerberus", "Hercules", "L’Hermione", "La Renommée", "Surprise"];
 const minDeepWaterBR = 80;
@@ -21,37 +23,8 @@ const maxNumPlayers = 25;
 const columnWidth = 20;
 const rowHeight = 24;
 
-const shipFilename = process.argv[2];
-const portFilename = process.argv[3];
-const outFilename = process.argv[4];
-
-const shipsOrig = readJson(shipFilename);
-const portData = readJson(portFilename);
-
-/**
- * Create array with numbers ranging from start to end
- * {@link https://stackoverflow.com/questions/36947847/how-to-generate-range-of-numbers-from-0-to-n-in-es2015-only/36953272}
- * @param {Number} start - Start index
- * @param {Number} end - End index
- * @returns {Number[]} Result
- */
-const range = (start, end) => [...new Array(1 + end - start).keys()].map(v => start + v);
-
-const dwPorts = portData
-    .filter(port => !port.shallow)
-    .map(port => ({
-        name: port.name,
-        br: port.brLimit
-    }))
-    .sort(sortBy(["name"]));
-
-const swPorts = portData
-    .filter(port => port.shallow)
-    .map(port => ({
-        name: port.name,
-        br: port.brLimit
-    }))
-    .sort(sortBy(["name"]));
+let portsOrig;
+let shipsOrig;
 
 /** Set colours
  * @returns {Map} Colours
@@ -77,7 +50,23 @@ function setColours() {
  * Create excel spreadsheet
  * @returns {void}
  */
-function createExcel() {
+const createPortBattleSheets = () => {
+    const portsDeepWater = portsOrig
+        .filter(port => !port.shallow)
+        .map(port => ({
+            name: port.name,
+            br: port.brLimit
+        }))
+        .sort((a, b) => a.name.localeCompare(b.name));
+
+    const portsShallowWater = portsOrig
+        .filter(port => port.shallow)
+        .map(port => ({
+            name: port.name,
+            br: port.brLimit
+        }))
+        .sort((a, b) => a.name.localeCompare(b.name));
+
     const colours = setColours();
     const colourWhite = colours.get("white");
     const colourPrimaryWhite = colours.get("primary-050");
@@ -394,7 +383,7 @@ function createExcel() {
         .filter(
             ship =>
                 shallowWaterFrigates.includes(ship.name) ||
-                (ship.class >= 6 && !["Basic", "Rooki", "Trade"].includes(ship.name.substring(0, 5)))
+                (ship.class >= 6 && !["Basic", "Rooki", "Trade"].includes(ship.name.slice(0, 5)))
         )
         .sort(sortBy(["class", "-battleRating", "name"]));
 
@@ -409,14 +398,19 @@ function createExcel() {
     const dwSheet = workbook.addWorksheet("Deep water port", wsOptions);
     const swSheet = workbook.addWorksheet("Shallow water port", wsOptions);
 
-    fillSheet(dwSheet, dwShips, dwPorts);
-    fillSheet(swSheet, swShips, swPorts);
+    fillSheet(dwSheet, dwShips, portsDeepWater);
+    fillSheet(swSheet, swShips, portsShallowWater);
 
-    workbook.write(outFilename, err => {
+    workbook.write(commonPaths.filePbSheet, err => {
         if (err) {
             console.error(err);
         }
     });
-}
+};
 
-createExcel();
+export const createPortBattleSheet = () => {
+    portsOrig = readJson(commonPaths.filePort);
+    shipsOrig = readJson(commonPaths.fileShip);
+
+    createPortBattleSheets();
+};

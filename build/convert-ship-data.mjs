@@ -1,28 +1,200 @@
 /**
  * This file is part of na-map.
  *
- * @file      Convert additional ship data from xml game files.
- * @module    build\convert-additional-ship-data
+ * @file      Convert ship data.
+ * @module    convert-ship-data
  * @author    iB aka Felix Victor
- * @copyright 2017, 2018, 2019
+ * @copyright 2018, 2019, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
 import * as fs from "fs";
-// noinspection ES6CheckImport
+import * as path from "path";
+
 import convert from "xml-js";
 import mergeAdvanced from "object-merge-advanced";
 
-import { isEmpty, readJson, readTextFile, saveJson } from "./common.mjs";
-
-const inDir = process.argv[2];
-const filename = process.argv[3];
+import {
+    baseAPIFilename,
+    cleanName,
+    commonPaths,
+    fileExists,
+    isEmpty,
+    readJson,
+    readTextFile,
+    roundToThousands,
+    saveJsonAsync,
+    serverNames,
+    serverStartDate as serverDate,
+    sortBy,
+    speedConstA,
+    speedConstB
+} from "./common.mjs";
 
 /**
- * Retrieve additional ship data from game files and add it to existing data from API
- * @returns {void}
+ * Ratio of bottom mast thickness
+ * @type {number} Ratio
  */
-function convertAdditionalShipData() {
+const middleMastThicknessRatio = 0.75;
+/**
+ * Ratio of bottom mast thickness
+ * @type {number} Ratio
+ */
+const topMastThicknessRatio = 0.5;
+
+/**
+ * Logs needed for planking as a ratio of ship mass
+ * @type {number} Ratio
+ */
+const plankingRatio = 0.13;
+/**
+ * Hemp needed for crew space trim as a ratio of ship mass
+ * @type {number} Ratio
+ */
+const crewSpaceRatio = 0.025;
+
+/**
+ * Get item names
+ * @return {Map<number, string>} Item names<id, name>
+ */
+const getItemNames = () => new Map(apiItems.map(item => [item.Id, cleanName(item.Name)]));
+
+/**
+ * Get ship mass
+ * @param {number} id - Ship id
+ * @return {number} Ship mass
+ */
+const getShipMass = id => apiItems.find(apiItem => id === apiItem.Id).ShipMass;
+
+let apiItems = [];
+
+const convertGenericShipData = () => {
+    const cannonWeight = [0, 42, 32, 24, 18, 12, 9, 0, 6, 4, 4, 2];
+    const carroWeight = [0, 0, 68, 42, 32, 24, 0, 18, 12];
+    const ships = apiItems
+        .filter(item => item.ItemType === "Ship" && !item.NotUsed)
+        .map(ship => {
+            const calcPortSpeed = ship.Specs.MaxSpeed * speedConstA - speedConstB;
+            const speedDegrees = ship.Specs.SpeedToWind.map(speed => roundToThousands(speed * calcPortSpeed));
+            const { length } = ship.Specs.SpeedToWind;
+
+            // Mirror speed degrees
+            for (let i = 1; i < (length - 1) * 2; i += 2) {
+                speedDegrees.unshift(speedDegrees[i]);
+            }
+
+            // Delete last element
+            speedDegrees.pop();
+
+            const deckClassLimit = ship.DeckClassLimit.map(deck => [
+                cannonWeight[deck.Limitation1.Min],
+                carroWeight[deck.Limitation2.Min]
+            ]);
+            const gunsPerDeck = ship.GunsPerDeck;
+            // Delete mortar entry
+            gunsPerDeck.pop();
+            let guns = 0;
+            let cannonBroadside = 0;
+            let carronadesBroadside = 0;
+            const emptyDeck = [0, 0];
+            for (let i = 0; i < 4; i += 1) {
+                if (deckClassLimit[i]) {
+                    guns += gunsPerDeck[i];
+                    if (deckClassLimit[i][1]) {
+                        carronadesBroadside += (gunsPerDeck[i] * deckClassLimit[i][1]) / 2;
+                    } else {
+                        carronadesBroadside += (gunsPerDeck[i] * deckClassLimit[i][0]) / 2;
+                    }
+
+                    cannonBroadside += (gunsPerDeck[i] * deckClassLimit[i][0]) / 2;
+                } else {
+                    deckClassLimit.push(emptyDeck);
+                }
+            }
+
+            const broadside = { cannons: cannonBroadside, carronades: carronadesBroadside };
+
+            const frontDeck = ship.FrontDecks
+                ? ship.FrontDeckClassLimit.map(deck => [
+                    cannonWeight[deck.Limitation1.Min],
+                    carroWeight[deck.Limitation2.Min]
+                ])[0]
+                : emptyDeck;
+            deckClassLimit.push(frontDeck);
+
+            const backDeck = ship.BackDecks
+                ? ship.BackDeckClassLimit.map(deck => [
+                    cannonWeight[deck.Limitation1.Min],
+                    carroWeight[deck.Limitation2.Min]
+                ])[0]
+                : emptyDeck;
+            deckClassLimit.push(backDeck);
+
+            return {
+                id: Number(ship.Id),
+                name: cleanName(ship.Name),
+                class: ship.Class,
+                gunsPerDeck,
+                guns,
+                broadside,
+                deckClassLimit,
+                shipMass: ship.ShipMass,
+                battleRating: ship.BattleRating,
+                decks: ship.Decks,
+                holdSize: ship.HoldSize,
+                maxWeight: ship.MaxWeight,
+                crew: { min: ship.MinCrewRequired, max: ship.HealthInfo.Crew, sailing: 0 },
+                speedDegrees,
+                speed: {
+                    min: speedDegrees.reduce((a, b) => Math.min(a, b)),
+                    max: roundToThousands(calcPortSpeed)
+                },
+                sides: { armour: ship.HealthInfo.LeftArmor, thickness: 0 },
+                bow: { armour: ship.HealthInfo.FrontArmor, thickness: 0 },
+                stern: { armour: ship.HealthInfo.BackArmor, thickness: 0 },
+                structure: { armour: ship.HealthInfo.InternalStructure },
+                sails: { armour: ship.HealthInfo.Sails, risingSpeed: 0 },
+                pump: { armour: ship.HealthInfo.Pump },
+                rudder: {
+                    armour: ship.HealthInfo.Rudder,
+                    turnSpeed: 0,
+                    halfturnTime: 0,
+                    thickness: 0
+                },
+                upgradeXP: ship.OverrideTotalXpForUpgradeSlots,
+                repairTime: { stern: 120, bow: 120, sides: 120, rudder: 30, sails: 120, structure: 60 },
+                ship: {
+                    waterlineHeight: 0,
+                    firezoneHorizontalWidth: 0,
+                    structureLeaksPerSecond: 0,
+                    deceleration: 0,
+                    acceleration: 0,
+                    turningAcceleration: 0,
+                    turningYardAcceleration: 0,
+                    maxSpeed: 0
+                },
+                mast: {
+                    bottomArmour: 0,
+                    middleArmour: 0,
+                    topArmour: 0,
+                    bottomThickness: 0,
+                    middleThickness: 0,
+                    topThickness: 0
+                },
+                premium: ship.Premium,
+                tradeShip: ship.ShipType === 1
+                // hostilityScore: ship.HostilityScore
+            };
+        });
+
+    return ships;
+};
+
+/**
+ * Retrieve additional ship data from game files and add it to existing ship data
+ * @returns {object} Ship data
+ */
+const convertAddShipData = ships => {
     /**
      * Maps the ship name (lower case for the file name) to the ship id
      * @type {Map<string, {id: number, master: string}>}
@@ -125,13 +297,7 @@ function convertAdditionalShipData() {
         baseFileNames.add("indiaman rookie");
     };
 
-    /**
-     * Ship data
-     * @type {object}
-     */
-    const ships = readJson(filename);
-
-    getBaseFileNames(inDir);
+    getBaseFileNames(commonPaths.dirModules);
 
     /**
      * @typedef SubFileStructure
@@ -235,15 +401,11 @@ function convertAdditionalShipData() {
         }
     ];
 
-    function getShipId(baseFileName) {
-        return shipNames.get(baseFileName).id;
-    }
+    const getShipId = baseFileName => shipNames.get(baseFileName).id;
 
-    function getShipMaster(baseFileName) {
-        return shipNames.get(baseFileName).master;
-    }
+    const getShipMaster = baseFileName => shipNames.get(baseFileName).master;
 
-    function getAddData(elements, fileData) {
+    const getAddData = (elements, fileData) => {
         /**
          * Ship data to be added per file
          * @type {Object.<string, Object.<string, number>>}
@@ -265,16 +427,16 @@ function convertAdditionalShipData() {
 
                 // Add calculated mast thickness
                 if (key === "MAST_THICKNESS") {
-                    addData[group].middleThickness = value * 0.75;
-                    addData[group].topThickness = value * 0.5;
+                    addData[group].middleThickness = value * middleMastThicknessRatio;
+                    addData[group].topThickness = value * topMastThicknessRatio;
                 }
             }
         });
         return addData;
-    }
+    };
 
     // Add additional data to the existing data
-    function addAddData(addData, id) {
+    const addAddData = (addData, id) => {
         // Find current ship
         ships
             .filter(ship => ship.id === id)
@@ -292,18 +454,18 @@ function convertAdditionalShipData() {
                     });
                 });
             });
-    }
+    };
 
-    function getFileData(baseFileName, ext) {
-        const fileName = `${inDir}/${baseFileName} ${ext}.xml`;
+    const getFileData = (baseFileName, ext) => {
+        const fileName = path.resolve(commonPaths.dirModules, `${baseFileName} ${ext}.xml`);
         let data = {};
-        if (fs.existsSync(fileName)) {
+        if (fileExists(fileName)) {
             const fileXmlData = readTextFile(fileName);
             data = convert.xml2js(fileXmlData, { compact: true });
         }
 
         return data;
-    }
+    };
 
     // Get all files without a master
     [...baseFileNames]
@@ -352,16 +514,123 @@ function convertAdditionalShipData() {
                 const addMasterData = getAddData(file.elements, fileMasterData);
 
                 /*
-                        // https://stackoverflow.com/a/47554782
+                    https://stackoverflow.com/a/47554782
                     const mergedData = mergeDeep(addMasterData,addData);
-                    */
+                */
                 const mergedData = mergeAdvanced(addMasterData, addData);
 
                 addAddData(mergedData, id);
             });
         });
 
-    saveJson(filename, ships);
-}
+    return ships;
+};
 
-convertAdditionalShipData();
+/**
+ * Convert ship blueprints
+ * @return {void}
+ */
+const convertShipBlueprints = async () => {
+    const itemNames = getItemNames();
+    const shipBlueprints = apiItems
+        .filter(apiItem => !apiItem.NotUsed && apiItem.ItemType === "RecipeShip")
+        .map(apiBlueprint => {
+            const shipMass = getShipMass(apiBlueprint.Results[0].Template);
+            return {
+                id: apiBlueprint.Id,
+                name: cleanName(apiBlueprint.Name).replace(" Blueprint", ""),
+                wood: [
+                    { name: "Frame", amount: apiBlueprint.WoodTypeDescs[0].Requirements[0].Amount },
+                    { name: "Planking", amount: Math.round(shipMass * plankingRatio) },
+                    { name: "Crew Space", amount: Math.round(shipMass * crewSpaceRatio) }
+                ],
+                resources: apiBlueprint.FullRequirements.filter(
+                    requirement =>
+                        !(
+                            itemNames.get(requirement.Template).endsWith(" Permit") ||
+                            itemNames.get(requirement.Template) === "Doubloons" ||
+                            itemNames.get(requirement.Template) === "Provisions"
+                        )
+                ).map(requirement => ({
+                    name: itemNames.get(requirement.Template).replace(" Log", ""),
+                    amount: requirement.Amount
+                })),
+                provisions:
+                    (
+                        apiBlueprint.FullRequirements.find(
+                            requirement => itemNames.get(requirement.Template) === "Provisions"
+                        ) || {}
+                    ).Amount || 0,
+                doubloons:
+                    (
+                        apiBlueprint.FullRequirements.find(
+                            requirement => itemNames.get(requirement.Template) === "Doubloons"
+                        ) || {}
+                    ).Amount || 0,
+                permit:
+                    (
+                        apiBlueprint.FullRequirements.find(requirement =>
+                            itemNames.get(requirement.Template).endsWith(" Permit")
+                        ) || {}
+                    ).Amount || 0,
+                ship: {
+                    id: apiBlueprint.Results[0].Template,
+                    name: itemNames.get(apiBlueprint.Results[0].Template),
+                    mass: shipMass
+                },
+                shipyardLevel: apiBlueprint.BuildingRequirements[0].Level + 1,
+                craftLevel: apiBlueprint.RequiresLevel,
+                craftXP: apiBlueprint.GivesXP,
+                labourHours: apiBlueprint.LaborPrice
+            };
+        })
+        // Sort by name
+        .sort(sortBy(["id"]));
+
+    await saveJsonAsync(commonPaths.fileShipBlueprint, shipBlueprints);
+};
+
+/*
+ * Get resource ratios
+ */
+/*
+const getShipClass = id => apiItems.find(apiItem => id === apiItem.Id).Class;
+const resourceRatios = new Map(data[0].resources.map(resource => [resource.name, []]));
+resourceRatios.set("Frame", []);
+resourceRatios.set("Trim", []);
+const excludedShips = ["GunBoat", "Le Gros Ventre Refit"];
+data.filter(shipBP => !excludedShips.includes(shipBP.name))
+    // .filter(shipBP => getShipClass(shipBP.ship.id) === 5)
+    .forEach(shipBP => {
+        const ratio = shipBP.ship.mass;
+        shipBP.resources.forEach(resource => {
+            const value = round(resource.amount / ratio, 4);
+            resourceRatios.set(resource.name, resourceRatios.get(resource.name).concat(value));
+        });
+        let value = round(shipBP.frames[0].amount / ratio, 4);
+        resourceRatios.set("Frame", resourceRatios.get("Frame").concat(value));
+        value = round(shipBP.trims[0].amount / ratio, 4);
+        resourceRatios.set("Trim", resourceRatios.get("Trim").concat(value));
+        // console.log(`"${shipBP.name}";${ratio}`);
+        console.log(
+            `"${shipBP.name}";${shipBP.resources.map(resource => round(resource.amount / ratio, 4)).join(";")}`
+        );
+    });
+resourceRatios.forEach((value, key) => {
+    console.log(`"${key}";${d3.max(value, d => d)};${d3.median(value)}`);
+});
+*/
+
+const convertShips = async () => {
+    let ships = convertGenericShipData();
+    ships = convertAddShipData(ships);
+    ships.sort(sortBy(["class", "name"]));
+    await saveJsonAsync(commonPaths.fileShip, ships);
+};
+
+export const convertShipData = async () => {
+    apiItems = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`));
+
+    await convertShips();
+    convertShipBlueprints();
+};
