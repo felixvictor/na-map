@@ -4,17 +4,24 @@
  * @file      Convert loot tables.
  * @module    build/convert-loot
  * @author    iB aka Felix Victor
- * @copyright 2017, 2018, 2019
+ * @copyright 2017, 2018, 2019, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { cleanName, getOrdinal, readJson, saveJson, sortBy } from "./common.mjs";
+import * as path from "path";
+import {
+    cleanName,
+    commonPaths,
+    getOrdinal,
+    readJson,
+    saveJsonAsync,
+    sortBy,
+    baseAPIFilename,
+    serverNames,
+    serverStartDate as serverDate
+} from "./common.mjs";
 
-const inBaseFilename = process.argv[2];
-const outFilename = process.argv[3];
-const date = process.argv[4];
-
-const APIItems = readJson(`${inBaseFilename}-ItemTemplates-${date}.json`);
+let apiItems = [];
 
 const getLootName = (classId, isMission) => {
     if (classId === -1) {
@@ -34,18 +41,18 @@ const getLootItemName = (name, type) => {
     return cleanedName;
 };
 
-function convertLoot() {
+const convertLoot = async () => {
     /**
      * Get item names
      * @return {Map<number, string>} Item names<id, name>
      */
     const getItemNames = () =>
-        new Map(APIItems.map(item => [Number(item.Id), getLootItemName(item.Name, item.ItemType)]));
+        new Map(apiItems.map(item => [Number(item.Id), getLootItemName(item.Name, item.ItemType)]));
 
     const itemNames = getItemNames();
 
     const getLootItemsFromChestLootTable = chestLootTableId =>
-        APIItems.filter(item => Number(item.Id) === chestLootTableId).flatMap(item => getLootItems(item.Items));
+        apiItems.filter(item => Number(item.Id) === chestLootTableId).flatMap(item => getLootItems(item.Items));
 
     const getLootItems = (lootItems, itemProbability = []) =>
         lootItems.map(item => ({
@@ -58,16 +65,18 @@ function convertLoot() {
     const data = {};
 
     let types = ["ShipLootTableItem"];
-    data.loot = APIItems.filter(item => !item.NotUsed && types.includes(item.ItemType))
+    data.loot = apiItems
+        .filter(item => !item.NotUsed && types.includes(item.ItemType))
         .map(item => ({
             id: Number(item.Id),
             name: getLootName(Number(item.Class), item.EventLootTable),
-            items: getLootItems(item.Items, item.itemProbability).sort(sortBy(["chance", "name"]))
+            items: getLootItems(item.Items, item.itemProbability).sort(sortBy(["chance", "id"]))
         }))
-        .sort(sortBy(["class", "name"]));
+        .sort(sortBy(["class", "id"]));
 
     types = ["TimeBasedConvertibleItem"];
-    data.chests = APIItems.filter(item => !item.NotUsed && types.includes(item.ItemType))
+    data.chests = apiItems
+        .filter(item => !item.NotUsed && types.includes(item.ItemType))
         .map(item => ({
             id: Number(item.Id),
             name: cleanName(item.Name),
@@ -77,11 +86,15 @@ function convertLoot() {
                 getLootItemsFromChestLootTable(lootChestLootTableId)
             )
                 .reduce((acc, value) => acc.concat(value), [])
-                .sort(sortBy(["chance", "name"]))
+                .sort(sortBy(["chance", "id"]))
         }))
-        .sort(sortBy(["name"]));
+        .sort(sortBy(["id"]));
 
-    saveJson(outFilename, data);
-}
+    await saveJsonAsync(commonPaths.fileLoot, data);
+};
 
-convertLoot();
+export const convertLootData = () => {
+    apiItems = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`));
+
+    convertLoot();
+};

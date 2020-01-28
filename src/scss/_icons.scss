@@ -15,10 +15,10 @@ $icon-dir: "~Icons";
 
 .icon {
     display: inline-block;
-    vertical-align: middle;
     width: 24px;
     height: 24px;
     overflow: visible;
+    vertical-align: middle;
     background-color: $body-color;
 }
 
@@ -30,7 +30,7 @@ $icon-dir: "~Icons";
     background-color: $primary-100;
 }
 
-$icon-list: calendar clear clock copy gift info options;
+$icon-list: calendar chevron-bottom chevron-left chevron-right chevron-top clear clock close copy gift info options;
 
 @each $icon in $icon-list {
     .icon-#{$icon} {
