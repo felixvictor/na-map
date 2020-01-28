@@ -1,4 +1,4 @@
-#!/usr/bin/env -S node --experimental-modules
+#!/usr/bin/env -S yarn node --experimental-modules
 
 /**
  * This file is part of na-map.
@@ -34,11 +34,11 @@ import {
     serverStartDateTime
 } from "./common.mjs";
 
-const runType = process.argv[2];
-const consumerKey = process.argv[3];
-const consumerSecret = process.argv[4];
-const accessToken = process.argv[5];
-const accessTokenSecret = process.argv[6];
+const consumerKey = process.argv[2];
+const consumerSecret = process.argv[3];
+const accessToken = process.argv[4];
+const accessTokenSecret = process.argv[5];
+const runType = process.argv[6];
 
 const portFilename = path.resolve(commonPaths.dirGenServer, `${serverNames[0]}-pb.json`);
 let ports = [];
@@ -184,8 +184,7 @@ const getTweets = async () => {
         strictSSL: true // optional - requires SSL certificates to be valid.
     });
 
-    // console.log(runType);
-    if (runType === "full") {
+    if (runType.startsWith("full")) {
         await getTweetsFull();
     } else {
         await getTweetsPartial();
