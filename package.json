@@ -1,6 +1,6 @@
 {
     "name": "na-map",
-    "version": "9.1.2",
+    "version": "9.1.3",
     "description": "Naval Action map",
     "devDependencies": {
         "@babel/core": "^7.7.5",
@@ -141,7 +141,7 @@
         "build:deploy-main": " TARGET=na-map       run-s prod build:git-push deploy:netlify",
         "build:deploy-test": " TARGET=na-map-test  run-s prod                deploy:netlify-test",
         "build:deploy-test2": "TARGET=na-map-test2 run-s prod                deploy:netlify-test2",
-        "build:git-push": "git add --ignore-errors . && git commit -m 'squash! update' && git push --quiet gitlab",
+        "build:git-push": "git add --ignore-errors . && (git diff-index --quiet HEAD || git commit -m 'squash! update') && git push --quiet gitlab",
         "deploy:netlify": "export $(cat .env | xargs) && netlify deploy --prod --dir public --site ${KEY_NETLIFY}",
         "deploy:netlify-test": "export $(cat .env | xargs) && netlify deploy --prod --dir public --site ${KEY_NETLIFY_TEST}",
         "deploy:netlify-test2": "export $(cat .env | xargs) && netlify deploy --prod --dir public --site ${KEY_NETLIFY_TEST2}",
