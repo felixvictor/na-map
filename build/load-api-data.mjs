@@ -1,4 +1,4 @@
-#!/usr/bin/env -S node --experimental-modules
+#!/usr/bin/env -S yarn node --experimental-modules
 
 /**
  * This file is part of na-map.
@@ -99,7 +99,7 @@ const getAPIDataAndSave = async (serverName, apiBaseFile, outfileName) => {
  * @param {string} baseAPIFilename
  * @return {Promise<boolean>}
  */
-const getApiData = async baseAPIFilename => {
+const loadApiData = async baseAPIFilename => {
     const deletePromise = [];
     const getPromise = [];
     for (const serverName of serverNames) {
@@ -115,4 +115,4 @@ const getApiData = async baseAPIFilename => {
     return true;
 };
 
-getApiData(baseAPIFilename);
+loadApiData(baseAPIFilename);
