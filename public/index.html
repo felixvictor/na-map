@@ -19,7 +19,7 @@
     <meta content="summary_large_image" name="twitter:card">
 
     <script src="https://www.google-analytics.com/analytics.js" async></script>
-<link href="/images/icons/manifest.json" rel="manifest"><meta content="yes" name="mobile-web-app-capable"><meta content="#6a7153" name="theme-color"><meta content="na-map" name="application-name"><meta content="#a99d89" name="msapplication-TileColor"><meta content="/images/icons/mstile-144x144.png" name="msapplication-TileImage"><meta content="/images/icons/browserconfig.xml" name="msapplication-config"><meta content="width=device-width,initial-scale=1,shrink-to-fit=no" name="viewport"><link href="main.9c7f288337d6346f2fac.css" rel="stylesheet" crossorigin="anonymous" integrity="sha384-SkcsPw6v6hIFdIY2wFqL8w8tJMctxTf/luSOHvEzd+djQyoCV2LwRCDMcnoaMaML"></head>
+<link href="/images/icons/manifest.json" rel="manifest"><meta content="yes" name="mobile-web-app-capable"><meta content="#6a7153" name="theme-color"><meta content="na-map" name="application-name"><meta content="#a99d89" name="msapplication-TileColor"><meta content="/images/icons/mstile-144x144.png" name="msapplication-TileImage"><meta content="/images/icons/browserconfig.xml" name="msapplication-config"><meta content="width=device-width,initial-scale=1,shrink-to-fit=no" name="viewport"><link href="main.514a75923a63cfc889fd.css" rel="stylesheet" crossorigin="anonymous" integrity="sha384-LdTE94gC8+fhvjzanzB/0g43f3+QE9e6LE/4ea3b/JhsqKLu3xsK+5srF3XqImNB"></head>
 
 <body>
 
@@ -36,14 +36,14 @@
         <ul class="navbar-nav mr-auto">
 
             <li class="nav-item pr-2 dropdown" id="selectPortNavbar">
-                <a class="dropdown-toggle nav-link" id="propertyDropdown" href="#" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
+                <a class="dropdown-toggle nav-link" id="propertyDropdown" href="#" data-toggle="dropdown" aria-expanded="false" aria-haspopup="true">
                     Select ports on
                 </a>
                 <div class="dropdown-menu" id="propertyMenu" aria-labelledby="propertyDropdown">
                     <h6 class="dropdown-header">Property</h6>
                     <div class="dropdown-submenu">
-                        <a class="dropdown-item dropdown-toggle" href="#" data-toggle="dropdown">Select</a>
-                        <div class="dropdown-menu">
+                        <a class="dropdown-item dropdown-toggle" id="dropdown-select" href="#" data-toggle="dropdown" role="button">Select</a>
+                        <div class="dropdown-menu" aria-labelledby="dropdown-select">
                             <a class="dropdown-item" id="menu-prop-deep" href="#">Deep water</a>
                             <a class="dropdown-item" id="menu-prop-shallow" href="#">Shallow water</a>
                             <div class="dropdown-divider"></div>
@@ -54,6 +54,20 @@
                             <a class="dropdown-item" id="menu-prop-medium" href="#">4th rate AI</a>
                             <a class="dropdown-item" id="menu-prop-small" href="#">6th rate AI</a>
                         </div>
+                    </div>
+
+                    <div class="dropdown-divider"></div>
+
+                    <h6 class="dropdown-header">Front lines</h6>
+                    <div class="dropdown-item">
+                        <label>
+                            <select id="frontlines-attacking-nation-select" name="frontlines-attacking-nation-select" title="Select nation attacking"></select>
+                        </label>
+                    </div>
+                    <div class="dropdown-item">
+                        <label>
+                            <select id="frontlines-defending-nation-select" name="frontlines-defending-nation-select" title="Select nation defending"></select>
+                        </label>
                     </div>
 
                     <div class="dropdown-divider"></div>
@@ -100,7 +114,7 @@
                                         <div class="date input-group col-sm-8" id="prop-pb-to" data-target-input="nearest">
                                             <input class="datetimepicker-input form-control" id="prop-pb-to-input" type="text" aria-label="prop-pb-to" data-target="#prop-pb-to" required>
                                             <div class="input-group-append" data-target="#prop-pb-to" data-toggle="datetimepicker">
-                                                <span class="input-group-text"><i class="icon icon-options"></i></span>
+                                                <span class="input-group-text"><i class="icon icon-clock"></i></span>
                                             </div>
                                         </div>
                                     </div>
@@ -173,7 +187,7 @@
         <ul class="navbar-nav ml-auto">
 
             <li class="nav-item pr-2 dropdown">
-                <a class="dropdown-toggle nav-link" id="map-tools-dropdown" href="#" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
+                <a class="dropdown-toggle nav-link" id="map-tools-dropdown" href="#" data-toggle="dropdown" aria-expanded="false" aria-haspopup="true" role="button">
                     Map tools
                 </a>
                 <div class="dropdown-menu dropdown-menu-right" id="map-tools-menu" aria-labelledby="map-tools-dropdown">
@@ -187,7 +201,7 @@
             </li>
 
             <li class="nav-item pr-2 dropdown">
-                <a class="dropdown-toggle nav-link" id="game-tools-dropdown" href="#" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button">
+                <a class="dropdown-toggle nav-link" id="game-tools-dropdown" href="#" data-toggle="dropdown" aria-expanded="false" aria-haspopup="true" role="button">
                     Game tools
                 </a>
                 <div class="dropdown-menu dropdown-menu-right" id="game-tools-menu" aria-labelledby="game-tools-dropdown">
@@ -211,12 +225,12 @@
 
                     <div class="dropdown-divider"></div>
                     <h6 class="dropdown-header">Download</h6>
-                    <a class="dropdown-item" id="button-download-pb-calc" href="port-battle.xlsx" download="port-battle-calculator.xlsx">Port battle calculator</a>
+                    <a class="dropdown-item" id="button-download-pb-calc" href="data/port-battle.xlsx" download="port-battle-calculator.xlsx">Port battle calculator</a>
                 </div>
             </li>
 
             <li class="nav-item pr-2 dropdown">
-                <a class="dropdown-toggle nav-link" id="settingsDropdown" href="#" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button" aria-label="Settings" title="Settings">
+                <a class="dropdown-toggle nav-link" id="settingsDropdown" href="#" data-toggle="dropdown" aria-expanded="false" aria-haspopup="true" role="button" aria-label="Settings" title="Settings">
                     <i class="icon icon-navbar icon-options" aria-hidden="true"></i><span class="sr-only">Settings</span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-right extralarge-width" id="settingsMenu" aria-labelledby="settingsDropdown">
@@ -374,5 +388,13 @@
 
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.slim.min.js" crossorigin="anonymous" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" crossorigin="anonymous" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"></script>
+<<<<<<< HEAD
 <script src="runtime.b5548084cc3c454288a4.js" crossorigin="anonymous" integrity="sha384-+qCbnVpMRixq+fFVGAyC9/qInyCWlW7iWoysQJf7vt667qT8PrqPkeTo4QXO9t7D"></script><script src="vendors~main.49987b5da56358d4659f.js" crossorigin="anonymous" integrity="sha384-uqyx1+/Rz+IvOCf+YEfsIun8JIutQDW1yUogWLUwbVtafl35GRNUeTecJXMvrsV+"></script><script src="main.cb42f73b8a7b3a79879b.js" crossorigin="anonymous" integrity="sha384-bkmCZ9bn3MXK5oQF5QL7CDjZu+9iqDF3lhOwjyKKLnekeYOefT9XYHDuEKgajw7F"></script></body>
+=======
+<<<<<<< HEAD
+<script src="runtime.12a3d9533a13029727d1.js" crossorigin="anonymous" integrity="sha384-XWaGyCJ6Zxn8Ot90Xsx6lXnS9u9WcXpgrGxGUinhpFWk+j0/Lx9/vyO+WYEEJXLW"></script><script src="vendors~main.1e1fae62afbaa4c61a7a.js" crossorigin="anonymous" integrity="sha384-IQYpIXieUcEw5tYJ08R6cLtu7aQ9ZZWPk776jqN6W/N19nJPJQf8Dt+ymVXV7rAK"></script><script src="main.fed521cac16dcae3ee47.js" crossorigin="anonymous" integrity="sha384-3iJj8+ibD7csuGhchK/MOcvB1KI63fFmvFa5AURPLMdGvr8rwm2fWISrjcf+fF9K"></script></body>
+=======
+<script src="runtime.00aaf96038ae25f4284e.js" crossorigin="anonymous" integrity="sha384-wY8+c9zmuiqV1Uaf9uW2iEzZCO+v3O9YMHv4jyd6C+wB6+OJjc6t0dW/GKke+Q7L"></script><script src="vendors~main.48ad127de3f61b0318b7.js" crossorigin="anonymous" integrity="sha384-Q5kNvkVx1rDRklifjVjwoRB/W/LfCC14u91zJfytmfZUZTXSyQiZrTSUyGthiMX7"></script><script src="main.be173c6c177b83065fd6.js" crossorigin="anonymous" integrity="sha384-Nt+L7FodzMh3qTtAy1E8QnNlGWuHmb5T9qG3iyM2M8phz5Yr4qIrWKDEQdsvwHbk"></script></body>
+>>>>>>> 257-shell-node
+>>>>>>> release-9.1
 </html>

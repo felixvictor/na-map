@@ -1,11 +1,107 @@
-/*
-    common.mjs
-    (More or less a) Copy of ../src/js/common.js
+/**
+ * This file is part of na-map.
+ *
+ * @file      Common data and functions.
+ * @module    common
+ * @author    iB aka Felix Victor
+ * @copyright 2018, 2019, 2020
+ * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import fs from "fs";
+import { default as fs, promises as pfs } from "fs";
+import * as path from "path";
+import { fileURLToPath } from "url";
+
+import dayjs from "dayjs";
+
+import utc from "dayjs/plugin/utc.js";
+dayjs.extend(utc);
+
+// https://stackoverflow.com/a/50052194
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+export const serverMaintenanceHour = 10;
 
 export const speedFactor = 390;
+export const speedConstA = 0.074465523706782;
+export const speedConstB = 0.00272175949231;
+
+const dirOut = path.resolve(__dirname, "..", "public", "data");
+const dirBuild = path.resolve(__dirname, "..", "build");
+const dirAPI = path.resolve(__dirname, "..", "build", "API");
+const dirModules = path.resolve(__dirname, "..", "build", "Modules");
+const dirSrc = path.resolve(__dirname, "..", "src");
+const dirGenServer = path.resolve(dirSrc, "gen-server");
+const dirGenGeneric = path.resolve(dirSrc, "gen-generic");
+
+/**
+ * Build common paths and file names
+ * @return {Object} Paths
+ */
+export const commonPaths = {
+    dirAPI,
+    dirBuild,
+    dirGenGeneric,
+    dirGenServer,
+    dirModules,
+    dirOut,
+    dirSrc,
+
+    fileTwitterRefreshId: path.resolve(dirAPI, "response-id.txt"),
+
+    filePbSheet: path.resolve(dirGenServer, "port-battle.xlsx"),
+
+    fileBuilding: path.resolve(dirGenGeneric, "buildings.json"),
+    fileCannon: path.resolve(dirGenGeneric, "cannons.json"),
+    fileLoot: path.resolve(dirGenGeneric, "loot.json"),
+    fileModules: path.resolve(dirGenGeneric, "modules.json"),
+    fileNation: path.resolve(dirGenGeneric, "nations.json"),
+    fileOwnership: path.resolve(dirGenGeneric, "ownership.json"),
+    filePbZone: path.resolve(dirGenGeneric, "pb-zones.json"),
+    filePort: path.resolve(dirGenGeneric, "ports.json"),
+    filePrices: path.resolve(dirGenGeneric, "prices.json"),
+    fileRecipe: path.resolve(dirGenGeneric, "recipes.json"),
+    fileRepair: path.resolve(dirGenGeneric, "repairs.json"),
+    fileShip: path.resolve(dirGenGeneric, "ships.json"),
+    fileShipBlueprint: path.resolve(dirGenGeneric, "ship-blueprints.json"),
+    fileWood: path.resolve(dirGenGeneric, "woods.json")
+};
+
+/**
+ * Get server start (date and time)
+ * @return {dayjs} Server start
+ */
+const getServerStartDateTime = () => {
+    let serverStart = dayjs()
+        .utc()
+        .hour(serverMaintenanceHour)
+        .minute(0)
+        .second(0);
+
+    // adjust reference server time if needed
+    if (dayjs.utc().isBefore(serverStart)) {
+        serverStart = dayjs.utc(serverStart).subtract(1, "day");
+    }
+
+    return serverStart;
+};
+
+export const serverStartDateTime = getServerStartDateTime().format("YYYY-MM-DD HH:mm");
+export const serverStartDate = getServerStartDateTime().format("YYYY-MM-DD");
+export const serverNames = ["eu1", "eu2"];
+export const apiBaseFiles = ["ItemTemplates", "Ports", "Shops"];
+export const serverTwitterNames = ["eu1"];
+const serverDateYear = String(dayjs(serverStartDate).year());
+const serverDateMonth = String(dayjs(serverStartDate).month() + 1).padStart(2, "0");
+export const baseAPIFilename = path.resolve(commonPaths.dirAPI, serverDateYear, serverDateMonth);
+
+/* testbed
+   server_base_name="clean"
+   source_base_url="http://storage.googleapis.com/nacleandevshards/"
+   server_names=(dev)
+*/
+
+export const distanceMapSize = 4096;
 
 const transformMatrix = {
     A: -0.00499866779363828,
@@ -32,6 +128,17 @@ export const convertInvCoordX = (x, y) => transformMatrixInv.A * x + transformMa
 // svg coord to F11 coord
 export const convertInvCoordY = (x, y) => transformMatrixInv.B * x - transformMatrixInv.A * y + transformMatrixInv.D;
 
+/**
+ * @typedef {Object} Nation
+ * @property {string} name - Name
+ * @property {string} short - Short name
+ * @property {number} id - Id
+ * @property {string} sortName - Name for sorting
+ */
+
+/**
+ * @type {Nation}
+ */
 export const nations = [
     { id: 0, short: "NT", name: "Neutral", sortName: "Neutral" },
     { id: 1, short: "PR", name: "Pirates", sortName: "Pirates" },
@@ -128,18 +235,42 @@ export const capitalToCounty = new Map([
     ["Wilmington", "North Carolina"]
 ]);
 
-export function saveJson(fileName, data) {
-    fs.writeFile(fileName, JSON.stringify(data), "utf8", err => {
-        if (err) {
-            return console.error(err);
-        }
-    });
-}
+export const fileExists = fileName => fs.existsSync(fileName);
 
-export function readTextFile(fileName) {
+/**
+ * Make directories (recursive)
+ * @param {string} dir - Directory path
+ * @return {void}
+ */
+export const makeDirAsync = async dir => {
+    try {
+        await pfs.mkdir(dir, { recursive: true });
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const saveJsonAsync = async (fileName, data) => {
+    await makeDirAsync(path.dirname(fileName));
+    try {
+        await pfs.writeFile(fileName, JSON.stringify(data), { encoding: "utf8" });
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const saveTextFile = (fileName, data) => {
+    try {
+        fs.writeFileSync(fileName, data, { encoding: "utf8" });
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const readTextFile = fileName => {
     let data = "";
     try {
-        data = fs.readFileSync(fileName, "utf8");
+        data = fs.readFileSync(fileName, { encoding: "utf8" });
     } catch (error) {
         if (error.code === "ENOENT") {
             console.error("File", fileName, "not found");
@@ -149,11 +280,9 @@ export function readTextFile(fileName) {
     }
 
     return data;
-}
+};
 
-export function readJson(fileName) {
-    return JSON.parse(readTextFile(fileName));
-}
+export const readJson = fileName => JSON.parse(readTextFile(fileName));
 
 /**
  * Check fetch status (see {@link https://developers.google.com/web/updates/2015/03/introduction-to-fetch})
@@ -286,17 +415,14 @@ export const round = (n, d = 0) => Number(Math.round(n * 10 ** d) / 10 ** d);
  */
 export const roundToThousands = x => round(x, 3);
 
-export const speedConstA = 0.074465523706782;
-export const speedConstB = 0.00272175949231;
-
 /**
  * Group by
- * {@link https://stackoverflow.com/questions/14446511/what-is-the-most-efficient-method-to-groupby-on-a-javascript-array-of-objects}
+ * {@link https://stackoverflow.com/a/38327540
  * @param {*} list - list
  * @param {*} keyGetter - key getter
  * @return {Map<any, any>} Map
  */
-export function groupBy(list, keyGetter) {
+export function groupToMap(list, keyGetter) {
     const map = new Map();
     list.forEach(item => {
         const key = keyGetter(item);
@@ -309,6 +435,15 @@ export function groupBy(list, keyGetter) {
     });
     return map;
 }
+
+/**
+ * Create array with numbers ranging from start to end
+ * {@link https://stackoverflow.com/questions/36947847/how-to-generate-range-of-numbers-from-0-to-n-in-es2015-only/36953272}
+ * @param {Number} start - Start index
+ * @param {Number} end - End index
+ * @returns {Number[]} Result
+ */
+export const range = (start, end) => [...new Array(1 + end - start).keys()].map(v => start + v);
 
 /**
  * Calculate the k distance between two svg coordinates
@@ -336,17 +471,15 @@ export function getDistance(pt0, pt1) {
  * @param {string} b - String b
  * @return {number} Sort result
  */
-export const simpleSort = (a, b) => {
-    if (a < b) {
-        return -1;
-    }
+export const simpleSort = (a, b) => a.localeCompare(b);
 
-    if (a > b) {
-        return 1;
-    }
-
-    return 0;
-};
+/**
+ * Sort of Id a and b as numbers
+ * @param {string} a - String a
+ * @param {string} b - String b
+ * @return {number} Sort result
+ */
+export const sortId = ({ Id: a }, { Id: b }) => Number(a) - Number(b);
 
 /**
  * Sort by a list of properties (in left-to-right order)
@@ -396,7 +529,28 @@ export function getOrdinal(n, sup = true) {
  */
 export const cleanName = name =>
     name
-        .replace(/u([\dA-F]{4})/gi, match => String.fromCharCode(parseInt(match.replace(/u/g, ""), 16)))
+        .replace(/u([\da-f]{4})/gi, match => String.fromCharCode(parseInt(match.replace(/u/g, ""), 16)))
         .replace(/'/g, "’")
-        .replace("oak", "Oak")
+        .replace(" oak", " Oak")
         .trim();
+
+/**
+ * Find Nation object based on nation name
+ * @param {string} nationName
+ * @return {Nation}
+ */
+export const findNationByName = nationName => nations.find(nation => nationName === nation.name);
+
+/**
+ * Find Nation object based on nation short name
+ * @param {string} nationShortName
+ * @return {Nation}
+ */
+export const findNationByNationShortName = nationShortName => nations.find(nation => nation.short === nationShortName);
+
+/**
+ * Find Nation object based on nation id
+ * @param {number} nationId
+ * @return {Nation}
+ */
+export const findNationById = nationId => nations.find(nation => nationId === nation.id);
