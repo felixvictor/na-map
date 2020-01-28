@@ -15,7 +15,7 @@ import { select as d3Select } from "d3-selection";
 import { default as Tablesort } from "tablesort";
 
 import { registerEvent } from "../analytics";
-import { insertBaseModal } from "../common";
+import { initTablesort, insertBaseModal } from "../common";
 import { formatFloatFixed, putImportError } from "../util";
 
 /**
@@ -33,7 +33,9 @@ export default class ListWoods {
 
     async _loadAndSetupData() {
         try {
-            this._woodData = (await import(/* webpackChunkName: "data-woods" */ "../../gen/woods.json")).default;
+            this._woodData = (
+                await import(/* webpackChunkName: "data-woods" */ "../../gen-generic/woods.json")
+            ).default;
         } catch (error) {
             putImportError(error);
         }
@@ -68,35 +70,8 @@ export default class ListWoods {
             .attr("class", "modules");
     }
 
-    _initTablesort() {
-        const cleanNumber = i => i.replace(/[^\-?0-9.]/g, "");
-        const compareNumber = (a, b) => {
-            let aa = parseFloat(a);
-            let bb = parseFloat(b);
-
-            aa = Number.isNaN(aa) ? 0 : aa;
-            bb = Number.isNaN(bb) ? 0 : bb;
-
-            return aa - bb;
-        };
-
-        Tablesort.extend(
-            "number",
-            item =>
-                item.match(/^[-+]?[£\u0024Û¢´€]?\d+\s*([,.]\d{0,2})/) || // Prefixed currency
-                item.match(/^[-+]?\d+\s*([,.]\d{0,2})?[£\u0024Û¢´€]/) || // Suffixed currency
-                item.match(/^[-+]?(\d)*-?([,.])?-?(\d)+([E,e][-+][\d]+)?%?$/), // Number
-            (a, b) => {
-                const aa = cleanNumber(a);
-                const bb = cleanNumber(b);
-
-                return compareNumber(bb, aa);
-            }
-        );
-    }
-
     _initModal() {
-        this._initTablesort();
+        initTablesort();
         this._injectModal();
         this._injectList("frame");
         this._injectList("trim");
@@ -141,7 +116,7 @@ export default class ListWoods {
         const modifiers = this._getModifiers(type);
         let text = "";
 
-        text += `<table id="table-${type}-list" class="table table-sm small tablesort"><thead><tr><th data-sort-default>Wood</thdata-sort-default>`;
+        text += `<table id="table-${type}-list" class="table table-sm small tablesort"><thead><tr><th data-sort-default>Wood</th>`;
         modifiers.forEach(modifier => {
             text += `<th>${modifier}</th>`;
         });
