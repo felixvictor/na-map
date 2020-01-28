@@ -56,9 +56,20 @@ export const nations = [
     { id: 12, short: "PL", name: "Commonwealth of Poland", sortName: "Poland" }
 ].sort(sortBy(["sortName"]));
 
+export const serverMaintenanceHour = 10;
+
 export const defaultFontSize = 16;
 export const defaultCircleSize = 16;
 export const speedFactor = 390;
+
+/**
+ * Create array with numbers ranging from start to end
+ * {@link https://stackoverflow.com/questions/36947847/how-to-generate-range-of-numbers-from-0-to-n-in-es2015-only/36953272}
+ * @param {Number} start - Start index
+ * @param {Number} end - End index
+ * @returns {Number[]} Result
+ */
+export const range = (start, end) => [...new Array(1 + end - start).keys()].map(v => start + v);
 
 /**
  * Calculate the k distance between two svg coordinates
@@ -152,7 +163,7 @@ export function initMultiDropdownNavbar(id) {
     });
 }
 
-const cleanNumber = i => i.replace(/[^\-?0-9.]/g, "");
+const cleanNumber = i => i.replace(/[^\d-.?]/g, "");
 
 const compareNumber = (a, b) => {
     let aa = parseFloat(a);
@@ -168,9 +179,9 @@ export const initTablesort = () => {
     Tablesort.extend(
         "number",
         item =>
-            item.match(/^[-+]?[£\u0024Û¢´€]?\d+\s*([,.]\d{0,2})/) || // Prefixed currency
-            item.match(/^[-+]?\d+\s*([,.]\d{0,2})?[£\u0024Û¢´€]/) || // Suffixed currency
-            item.match(/^[-+]?(\d)*-?([,.])?-?(\d)+([E,e][-+][\d]+)?%?$/), // Number
+            item.match(/^[+-]?[$¢£´Û€]?\d+\s*([,.]\d{0,2})/) || // Prefixed currency
+            item.match(/^[+-]?\d+\s*([,.]\d{0,2})?[$¢£´Û€]/) || // Suffixed currency
+            item.match(/^[+-]?(\d)*-?([,.])?-?(\d)+([,Ee][+-]\d+)?%?$/), // Number
         (a, b) => {
             const aa = cleanNumber(a);
             const bb = cleanNumber(b);
@@ -250,6 +261,7 @@ export const appVersion = VERSION;
 export const colourGreen = CGREEN;
 export const colourGreenLight = CGREENLIGHT;
 export const colourGreenDark = CGREENDARK;
+export const colourOrange = CORANGE;
 export const colourRed = CRED;
 export const colourRedLight = CREDLIGHT;
 export const colourRedDark = CREDDARK;
