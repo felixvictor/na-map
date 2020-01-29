@@ -40,9 +40,8 @@ let apiShops = [];
 
 const distancesFile = path.resolve(commonPaths.dirGenGeneric, `distances-${distanceMapSize}.json`);
 const distancesOrig = readJson(distancesFile);
-const distances = new Map(
-    distancesOrig.forEach(([fromPortId, toPortId, distance]) => [[[fromPortId, toPortId], distance]])
-);
+let distances;
+let numberPorts;
 
 const portData = [];
 const trades = [];
@@ -50,8 +49,9 @@ let itemNames;
 let itemWeights;
 
 const getDistance = (fromPortId, toPortId) =>
-    fromPortId < toPortId ? distances.get([fromPortId, toPortId]) : distances.get([toPortId, fromPortId]);
-
+    fromPortId < toPortId
+        ? distances.get(fromPortId * numberPorts + toPortId)
+        : distances.get(toPortId * numberPorts + fromPortId);
 /**
  *
  * @param {Object} apiPort Port data.
@@ -293,6 +293,11 @@ export const convertServerPortData = () => {
             apiItems
                 .filter(apiItem => !apiItem.NotUsed && !apiItem.NotTradeable && apiItem.ItemType !== "RecipeResource")
                 .map(apiItem => [cleanName(apiItem.Name), apiItem.ItemWeight])
+        );
+
+        numberPorts = apiPorts.length;
+        distances = new Map(
+            distancesOrig.map(([fromPortId, toPortId, distance]) => [fromPortId * numberPorts + toPortId, distance])
         );
 
         setAndSavePortData(serverName);
