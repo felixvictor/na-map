@@ -47,6 +47,7 @@ let tweets = [];
 const refreshDefault = "0";
 let refresh = "0";
 const queryFrom = "from:zz569k";
+let isPortDataChanged = false;
 
 /**
  * Get refresh id, either from file or set default value (0)
@@ -73,14 +74,12 @@ const saveRefreshId = refresh => {
 const addTwitterData = data => {
     tweets.push(...data.statuses.flatMap(status => cleanName(xss(status.full_text))).sort());
     refresh = data.search_metadata.max_id_str;
-    /*
     console.log(
         data.statuses.length,
         tweets.length,
         refresh,
         data.statuses.flatMap(status => cleanName(xss(status.full_text))).sort()
     );
-     */
 };
 
 /**
@@ -138,7 +137,7 @@ const getTweetsFull = async () => {
  * @return {Promise<void>}
  */
 const getTweetsSinceMaintenance = async () => {
-    await getTweetsSince(dayjs.utc(serverStartDateTime));
+    await getTweetsSince(dayjs.utc(serverStartDateTime).subtract(1, "day"));
 };
 
 /**
@@ -405,12 +404,10 @@ const checkDateRegex = new RegExp(`\\[(${timeR}) UTC\\]`, "u");
 
 /**
  * Update port data from tweets
- * @returns {Boolean} True if port data changed (new tweets)
  */
 const updatePorts = async () => {
     let result;
     let tweetTime;
-    let isPortDataChanged = false;
 
     for (const tweet of tweets) {
         console.log("\ntweet", tweet);
@@ -479,14 +476,13 @@ const updatePorts = async () => {
     if (isPortDataChanged) {
         await saveJsonAsync(portFilename, ports);
     }
-
-    return !isPortDataChanged;
 };
 
 const updateTwitter = async () => {
     ports = readJson(portFilename);
     await getTweets();
     updatePorts();
+    process.exit(!isPortDataChanged);
 };
 
 updateTwitter();
