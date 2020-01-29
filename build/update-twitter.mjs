@@ -74,12 +74,14 @@ const saveRefreshId = refresh => {
 const addTwitterData = data => {
     tweets.push(...data.statuses.flatMap(status => cleanName(xss(status.full_text))).sort());
     refresh = data.search_metadata.max_id_str;
+    /*
     console.log(
         data.statuses.length,
         tweets.length,
         refresh,
         data.statuses.flatMap(status => cleanName(xss(status.full_text))).sort()
     );
+     */
 };
 
 /**
@@ -137,7 +139,7 @@ const getTweetsFull = async () => {
  * @return {Promise<void>}
  */
 const getTweetsSinceMaintenance = async () => {
-    await getTweetsSince(dayjs.utc(serverStartDateTime).subtract(1, "day"));
+    await getTweetsSince(dayjs.utc(serverStartDateTime));
 };
 
 /**
@@ -482,7 +484,9 @@ const updateTwitter = async () => {
     ports = readJson(portFilename);
     await getTweets();
     updatePorts();
-    process.exit(!isPortDataChanged);
+    if (runType.startsWith("partial")) {
+        process.exit(!isPortDataChanged);
+    }
 };
 
 updateTwitter();
