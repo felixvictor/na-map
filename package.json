@@ -133,7 +133,7 @@
         "pre-build:modules:correct:enc": "cd build/Modules/; for FILE in *.xml; do dos2unix -m -q \"${FILE}\"; done",
         "pre-build:modules:correct:names": "cd build/Modules/; mv \"traders brig hull.xml\" \"trader brig hull.xml\"; mv \"agamemnon deck armor .xml\" \"agamemnon deck armor.xml\"",
         "main:maintenance": "yarn --silent && run-s build:load 'build:data:* full-server'          build:deploy-main",
-        "main:between": "                yarn run              'build:data:twitter partial-server' || yarn run build:deploy-main",
+        "main:between": "                     run-s            'build:data:twitter partial-server' build:deploy-main",
         "main:development": "                 run-s build:load 'build:data:* full-client'          build:deploy-main",
         "build:load": "build/load-api-data.mjs",
         "build:data:convert": "build/convert-api-data.mjs",
