@@ -47,6 +47,7 @@ let tweets = [];
 const refreshDefault = "0";
 let refresh = "0";
 const queryFrom = "from:zz569k";
+let isPortDataChanged = false;
 
 /**
  * Get refresh id, either from file or set default value (0)
@@ -405,12 +406,10 @@ const checkDateRegex = new RegExp(`\\[(${timeR}) UTC\\]`, "u");
 
 /**
  * Update port data from tweets
- * @returns {Boolean} True if port data changed (new tweets)
  */
 const updatePorts = async () => {
     let result;
     let tweetTime;
-    let isPortDataChanged = false;
 
     for (const tweet of tweets) {
         console.log("\ntweet", tweet);
@@ -479,14 +478,15 @@ const updatePorts = async () => {
     if (isPortDataChanged) {
         await saveJsonAsync(portFilename, ports);
     }
-
-    return !isPortDataChanged;
 };
 
 const updateTwitter = async () => {
     ports = readJson(portFilename);
     await getTweets();
     updatePorts();
+    if (runType.startsWith("partial")) {
+        process.exit(!isPortDataChanged);
+    }
 };
 
 updateTwitter();
