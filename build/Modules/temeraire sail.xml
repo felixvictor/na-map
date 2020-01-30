@@ -10,7 +10,7 @@
     <Pair>
       <Key>MODULE_BASE_HP</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>15000</Value>
+        <Value>17943</Value>
       </Value>
     </Pair>
     <Pair>
@@ -22,7 +22,7 @@
     <Pair>
       <Key>SHIP_MAX_SPEED</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>11.09</Value>
+        <Value>11.62</Value>
       </Value>
     </Pair>
     <Pair>
@@ -37,12 +37,12 @@
         <Value>
           <Time>0</Time>
           <Value>0</Value>
-          <TangentIn>1.550734</TangentIn>
-          <TangentOut>1.550734</TangentOut>
+          <TangentIn>1.454796</TangentIn>
+          <TangentOut>1.454796</TangentOut>
         </Value>
         <Value>
           <Time>1</Time>
-          <Value>0.549649835</Value>
+          <Value>0.400731534</Value>
           <TangentIn>0</TangentIn>
           <TangentOut>0</TangentOut>
         </Value>
@@ -123,7 +123,7 @@
     <Pair>
       <Key>SAILING_CREW_REQUIRED</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
-        <Value>166</Value>
+        <Value>191</Value>
       </Value>
     </Pair>
     <Pair>
@@ -135,7 +135,7 @@
     <Pair>
       <Key>MAST_THICKNESS</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>126</Value>
+        <Value>131</Value>
       </Value>
     </Pair>
   </Attributes>
