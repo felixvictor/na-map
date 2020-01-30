@@ -1,6 +1,6 @@
 {
     "name": "na-map",
-    "version": "9.1.4",
+    "version": "9.1.5",
     "description": "Naval Action map",
     "devDependencies": {
         "@babel/core": "^7.7.5",
@@ -20,6 +20,7 @@
         "d3-node": "^2.2.1",
         "dayjs": "^1.8.19",
         "denque": "^1.4.1",
+        "diff2html-cli": "^4.2.1",
         "documentation": "^12.1.4",
         "eslint": "^6.7.2",
         "eslint-config-prettier": "^6.7.0",

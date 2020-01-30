@@ -109,7 +109,7 @@ const getTowers = portElementsSlotGroups =>
         );
 
 const getJoinCircles = (id, rotation) => {
-    const { x0, y0 } = apiPortPos.get(id);
+    const { x: x0, y: y0 } = apiPortPos.get(id);
     const distance = 5;
     const degrees = 180 - rotation;
     const radians = (degrees * Math.PI) / 180;
@@ -134,16 +134,19 @@ const getRaidPoints = portRaidSpawnPoints =>
 const setAndSavePBZones = async () => {
     const ports = apiPorts
         .filter(port => !port.NonCapturable)
-        .map(port => ({
-            id: Number(port.Id),
-            position: apiPortPos.get(Number(port.Id)),
-            pbCircles: getPBCircles(port.PortBattleZonePositions),
-            forts: getForts(port.PortElementsSlotGroups),
-            towers: getTowers(port.PortElementsSlotGroups),
-            joinCircles: getJoinCircles(Number(port.Id), Number(port.Rotation)),
-            raidCircles: getRaidCircles(port.PortRaidZonePositions),
-            raidPoints: getRaidPoints(port.PortRaidSpawnPoints)
-        }))
+        .map(port => {
+            const { x, y } = apiPortPos.get(Number(port.Id));
+            return {
+                id: Number(port.Id),
+                position: [x, y],
+                pbCircles: getPBCircles(port.PortBattleZonePositions),
+                forts: getForts(port.PortElementsSlotGroups),
+                towers: getTowers(port.PortElementsSlotGroups),
+                joinCircles: getJoinCircles(Number(port.Id), Number(port.Rotation)),
+                raidCircles: getRaidCircles(port.PortRaidZonePositions),
+                raidPoints: getRaidPoints(port.PortRaidSpawnPoints)
+            };
+        })
         .sort(sortBy(["id"]));
 
     await saveJsonAsync(commonPaths.filePbZone, ports);
