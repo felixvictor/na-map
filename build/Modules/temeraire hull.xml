@@ -24,19 +24,19 @@
       <Value xsi:type="CurveAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
         <Value>
           <Time>0</Time>
-          <Value>5.304813E-06</Value>
+          <Value>0.00852412</Value>
           <TangentIn>0</TangentIn>
           <TangentOut>0</TangentOut>
         </Value>
         <Value>
-          <Time>0.5001774</Time>
-          <Value>0.9995734</Value>
+          <Time>0.4989473</Time>
+          <Value>0.9937643</Value>
           <TangentIn>0</TangentIn>
           <TangentOut>0</TangentOut>
         </Value>
         <Value>
-          <Time>0.9991804</Time>
-          <Value>0.03253941</Value>
+          <Time>0.999122</Time>
+          <Value>-0.003947258</Value>
           <TangentIn>0</TangentIn>
           <TangentOut>0</TangentOut>
         </Value>
@@ -142,12 +142,12 @@
         <Value>
           <Time>0</Time>
           <Value>1</Value>
-          <TangentIn>-0.2587506</TangentIn>
-          <TangentOut>-0.2587506</TangentOut>
+          <TangentIn>0</TangentIn>
+          <TangentOut>0</TangentOut>
         </Value>
         <Value>
-          <Time>1.000095</Time>
-          <Value>0.4004877</Value>
+          <Time>1</Time>
+          <Value>0.2492975</Value>
           <TangentIn>0</TangentIn>
           <TangentOut>0</TangentOut>
         </Value>
@@ -156,7 +156,7 @@
     <Pair>
       <Key>SHIP_MASS</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>2963</Value>
+        <Value>3531</Value>
       </Value>
     </Pair>
     <Pair>
@@ -574,13 +574,13 @@
     <Pair>
       <Key>SHIP_PHYSICS_DEC_COEF</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>0.0253</Value>
+        <Value>0.0238</Value>
       </Value>
     </Pair>
     <Pair>
       <Key>SHIP_PHYSICS_ACC_COEF</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>0.077</Value>
+        <Value>0.072</Value>
       </Value>
     </Pair>
     <Pair>
