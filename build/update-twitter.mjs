@@ -1,4 +1,4 @@
-#!/usr/bin/env -S yarn node --experimental-modules
+#!/usr/bin/env -S yarn node --experimental-modules --no-warnings
 
 /**
  * This file is part of na-map.
@@ -483,9 +483,9 @@ const updatePorts = async () => {
 const updateTwitter = async () => {
     ports = readJson(portFilename);
     await getTweets();
-    updatePorts();
+    await updatePorts();
     if (runType.startsWith("partial")) {
-        process.exit(!isPortDataChanged);
+        process.exitCode = !isPortDataChanged;
     }
 };
 
