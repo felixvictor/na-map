@@ -214,6 +214,7 @@ const convertAddShipData = ships => {
         ["constitution", { id: 270, master: "" }],
         ["constitution2", { id: 1674, master: "" }],
         ["cutter", { id: 271, master: "" }],
+        ["de_ruyter", { id: 2318, master: "" }],
         ["diana", { id: 1665, master: "" }],
         ["endymion", { id: 768, master: "" }],
         ["essex", { id: 272, master: "" }],
