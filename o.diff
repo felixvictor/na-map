@@ -1,0 +1,120 @@
+304,306c304,306
+<             "bottomArmour": 1918,
+<             "middleArmour": 1279,
+<             "topArmour": 436,
+---
+>             "bottomArmour": 1800,
+>             "middleArmour": 1200,
+>             "topArmour": 409,
+382,384c382,384
+<             "bottomArmour": 1950,
+<             "middleArmour": 1300,
+<             "topArmour": 443,
+---
+>             "bottomArmour": 2055,
+>             "middleArmour": 1370,
+>             "topArmour": 467,
+440,441c440,441
+<         "sides": { "armour": 18000, "thickness": 72 },
+<         "bow": { "armour": 4500, "thickness": 43 },
+---
+>         "sides": { "armour": 18000, "thickness": 73 },
+>         "bow": { "armour": 4500, "thickness": 44 },
+453,454c453,454
+<             "deceleration": 0.0244,
+<             "acceleration": 0.072,
+---
+>             "deceleration": 0.0255,
+>             "acceleration": 0.077,
+463,465c463,465
+<             "bottomThickness": 130,
+<             "middleThickness": 97.5,
+<             "topThickness": 65
+---
+>             "bottomThickness": 131,
+>             "middleThickness": 98.25,
+>             "topThickness": 65.5
+535c535
+<             "maxSpeed": 11.09
+---
+>             "maxSpeed": 11.58
+802c802
+<         "crew": { "min": 276, "max": 690, "sailing": 166 },
+---
+>         "crew": { "min": 276, "max": 690, "sailing": 189 },
+830,832c830,832
+<         "sides": { "armour": 17767, "thickness": 70 },
+<         "bow": { "armour": 4442, "thickness": 42 },
+<         "stern": { "armour": 1777, "thickness": 28 },
+---
+>         "sides": { "armour": 17767, "thickness": 73 },
+>         "bow": { "armour": 4442, "thickness": 44 },
+>         "stern": { "armour": 1777, "thickness": 29 },
+836c836
+<         "rudder": { "armour": 280, "turnSpeed": 2.11, "halfturnTime": 5, "thickness": 10 },
+---
+>         "rudder": { "armour": 280, "turnSpeed": 2.01, "halfturnTime": 5, "thickness": 10 },
+843,844c843,844
+<             "deceleration": 0.0253,
+<             "acceleration": 0.077,
+---
+>             "deceleration": 0.0238,
+>             "acceleration": 0.072,
+847c847
+<             "maxSpeed": 11.09
+---
+>             "maxSpeed": 11.6
+850,855c850,855
+<             "bottomArmour": 1500,
+<             "middleArmour": 1000,
+<             "topArmour": 341,
+<             "bottomThickness": 126,
+<             "middleThickness": 94.5,
+<             "topThickness": 63
+---
+>             "bottomArmour": 1777,
+>             "middleArmour": 1184,
+>             "topArmour": 404,
+>             "bottomThickness": 131,
+>             "middleThickness": 98.25,
+>             "topThickness": 65.5
+880c880
+<         "crew": { "min": 276, "max": 690, "sailing": 166 },
+---
+>         "crew": { "min": 276, "max": 690, "sailing": 191 },
+908,910c908,910
+<         "sides": { "armour": 17943, "thickness": 70 },
+<         "bow": { "armour": 4486, "thickness": 42 },
+<         "stern": { "armour": 1794, "thickness": 28 },
+---
+>         "sides": { "armour": 17943, "thickness": 73 },
+>         "bow": { "armour": 4486, "thickness": 44 },
+>         "stern": { "armour": 1794, "thickness": 29 },
+914c914
+<         "rudder": { "armour": 280, "turnSpeed": 2.11, "halfturnTime": 5, "thickness": 10 },
+---
+>         "rudder": { "armour": 280, "turnSpeed": 2, "halfturnTime": 5, "thickness": 10 },
+921,922c921,922
+<             "deceleration": 0.0253,
+<             "acceleration": 0.077,
+---
+>             "deceleration": 0.0238,
+>             "acceleration": 0.072,
+925c925
+<             "maxSpeed": 11.09
+---
+>             "maxSpeed": 11.62
+928,933c928,933
+<             "bottomArmour": 1500,
+<             "middleArmour": 1000,
+<             "topArmour": 341,
+<             "bottomThickness": 126,
+<             "middleThickness": 94.5,
+<             "topThickness": 63
+---
+>             "bottomArmour": 1794,
+>             "middleArmour": 1196,
+>             "topArmour": 408,
+>             "bottomThickness": 131,
+>             "middleThickness": 98.25,
+>             "topThickness": 65.5
