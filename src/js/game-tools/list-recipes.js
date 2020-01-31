@@ -4,7 +4,7 @@
  * @file      List recipes.
  * @module    game-tools/list-recipes
  * @author    iB aka Felix Victor
- * @copyright 2018, 2019
+ * @copyright 2018, 2019, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -18,7 +18,7 @@ import { registerEvent } from "../analytics";
 
 import { getCurrencyAmount, insertBaseModal } from "../common";
 import { servers } from "../servers";
-import { formatInt, formatSignPercent, getOrdinal, putImportError } from "../util";
+import { formatInt, formatSignPercent, getOrdinal, putImportError, sortBy } from "../util";
 
 const replacer = (match, p1, p2) => `${getOrdinal(p1)}\u202F\u2013\u202f${getOrdinal(p2)}`;
 
@@ -84,6 +84,7 @@ export default class ListRecipes {
         const recipeData = d3Nest()
             .key(recipe => recipe.craftGroup)
             .sortKeys(d3Ascending)
+            .sortValues(sortBy(["name"]))
             .entries(
                 this._recipeData.filter(recipe => recipe.serverType === "Any" || recipe.serverType === this._serverType)
             );
