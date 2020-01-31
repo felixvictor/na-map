@@ -150,7 +150,7 @@ const setAndSaveTradeData = async serverName => {
                                 distance: getDistance(buyPort.id, sellPort.id),
                                 profitTotal,
                                 quantity,
-                                weightPerItem: itemWeights.get(buyGood.name)
+                                weightPerItem: itemWeights.get(buyGood.name) || 0
                             };
                             trades.push(trade);
                         }
@@ -291,7 +291,12 @@ export const convertServerPortData = () => {
 
         itemWeights = new Map(
             apiItems
-                .filter(apiItem => !apiItem.NotUsed && !apiItem.NotTradeable && apiItem.ItemType !== "RecipeResource")
+                .filter(
+                    apiItem =>
+                        !apiItem.NotUsed &&
+                        (!apiItem.NotTradeable || apiItem.ShowInContractsSelector) &&
+                        apiItem.ItemType !== "RecipeResource"
+                )
                 .map(apiItem => [cleanName(apiItem.Name), apiItem.ItemWeight])
         );
 

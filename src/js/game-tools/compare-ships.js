@@ -67,6 +67,7 @@ import CompareWoods from "./compare-woods";
 
 // eslint-disable-next-line import/no-unresolved
 import { default as shipIcon } from "Icons/icon-ship.svg";
+import { sort } from "semver";
 
 const numberSegments = 24;
 const segmentRadians = (2 * Math.PI) / numberSegments;
@@ -1773,6 +1774,7 @@ export default class CompareShips {
         const modules = d3Nest()
             .key(module => module[1].type.replace(/[\sA-Za-z]+\s–\s/, ""))
             .sortKeys(d3Ascending)
+            .sortValues((a, b) => a[1].name.localeCompare(b[1].name))
             .entries(
                 [...this._moduleProperties].filter(
                     module =>
