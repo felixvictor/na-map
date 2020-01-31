@@ -4,7 +4,7 @@
  * @file      List ship blueprints.
  * @module    game-tools/list-ship-blueprints
  * @author    iB aka Felix Victor
- * @copyright 2019
+ * @copyright 2019, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -118,6 +118,7 @@ export default class ListShipBlueprints {
 
     _getShipOptions() {
         return `${this._blueprintData
+            .sort(sortBy(["name"]))
             .map(blueprint => `<option value="${blueprint.name}">${blueprint.name}</option>;`)
             .join("")}`;
     }
