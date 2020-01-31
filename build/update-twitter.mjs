@@ -323,7 +323,7 @@ const portBattleScheduled = result => {
 
     port.attackerClan = result[6];
     port.attackHostility = 1;
-    port.portBattle = dayjs.utc(result[4], "DD MMM YYYY HH:mm").format("YYYY-MM-DD HH:mm");
+    port.portBattle = dayjs.utc(result[4], "D MMM YYYY HH:mm").format("YYYY-MM-DD HH:mm");
 };
 
 /**
@@ -339,7 +339,7 @@ const npcPortBattleScheduled = result => {
     port.attackerNation = "Neutral";
     port.attackerClan = "NPC";
     port.attackHostility = 1;
-    port.portBattle = dayjs.utc(result[3], "DD MMM YYYY HH:mm").format("YYYY-MM-DD HH:mm");
+    port.portBattle = dayjs.utc(result[3], "D MMM YYYY HH:mm").format("YYYY-MM-DD HH:mm");
 };
 
 const portR = "[A-zÀ-ÿ’ -]+";
@@ -455,7 +455,7 @@ const updatePorts = async () => {
         } else if (tweetTime.isAfter(dayjs.utc(serverDate).subtract(1, "day"))) {
             // Add scheduled port battles (only if battle is in the future)
             if ((result = portBattleRegex.exec(tweet)) !== null) {
-                if (dayjs.utc().isBefore(dayjs.utc(result[4], "DD MMM YYYY HH:mm"))) {
+                if (dayjs.utc().isBefore(dayjs.utc(result[4], "D MMM YYYY HH:mm"))) {
                     isPortDataChanged = true;
                     portBattleScheduled(result);
                 }
