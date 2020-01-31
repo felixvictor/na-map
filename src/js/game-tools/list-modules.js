@@ -4,7 +4,7 @@
  * @file      List modules.
  * @module    game-tools/list-modules
  * @author    iB aka Felix Victor
- * @copyright 2018, 2019
+ * @copyright 2018, 2019, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -15,7 +15,15 @@ import { select as d3Select } from "d3-selection";
 
 import { registerEvent } from "../analytics";
 import { insertBaseModal } from "../common";
-import { chunkify, formatPP, formatSignInt, formatSignPercent, getOrdinal, putImportError } from "../util";
+import {
+    chunkify,
+    formatPP,
+    formatSignInt,
+    formatSignPercent,
+    getOrdinal,
+    putImportError,
+    sortBy
+} from "../util";
 
 export default class ListModules {
     constructor() {
@@ -133,7 +141,7 @@ export default class ListModules {
         const rows = [];
         this._moduleData.forEach(type => {
             if (type[0] === moduleType) {
-                type[1].forEach((module, i) => {
+                type[1].sort(sortBy(["name"])).forEach((module, i) => {
                     /**
                      * Test if current module and module at index position has same properties
                      * @param {integer} index Position

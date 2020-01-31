@@ -4,7 +4,7 @@
  * @file      List buildings.
  * @module    game-tools/list-buildings
  * @author    iB aka Felix Victor
- * @copyright 2018, 2019
+ * @copyright 2018, 2019, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -15,7 +15,7 @@ import { select as d3Select } from "d3-selection";
 
 import { registerEvent } from "../analytics";
 import { getCurrencyAmount, insertBaseModal } from "../common";
-import { formatInt, putImportError } from "../util";
+import { formatInt, putImportError, sortBy } from "../util";
 
 export default class ListBuildings {
     constructor() {
@@ -68,6 +68,7 @@ export default class ListBuildings {
 
     _getOptions() {
         return `${this._buildingData
+            .sort(sortBy(["name"]))
             .map(building => `<option value="${building.name}">${building.name}</option>;`)
             .join("")}`;
     }
