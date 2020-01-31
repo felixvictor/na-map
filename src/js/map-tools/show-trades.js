@@ -748,9 +748,12 @@ export default class ShowTrades {
     update(data = null) {
         if (this.show) {
             this._filterTradesByVisiblePorts();
-            this._updateGraph();
             this._updateList(data);
+        } else {
+            this._linkDataFiltered = [];
         }
+
+        this._updateGraph();
     }
 
     /**
