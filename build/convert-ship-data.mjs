@@ -69,7 +69,7 @@ const getShipMass = id => apiItems.find(apiItem => id === apiItem.Id).ShipMass;
 let apiItems = [];
 
 const convertGenericShipData = () => {
-    const cannonWeight = [0, 42, 32, 24, 18, 12, 9, 0, 6, 4, 4, 2];
+    const cannonWeight = [0, 42, 32, 24, 18, 12, 9, 0, 6, 4, 3, 2];
     const carroWeight = [0, 0, 68, 42, 32, 24, 0, 18, 12];
     const ships = apiItems
         .filter(item => item.ItemType === "Ship" && !item.NotUsed)

@@ -4,7 +4,7 @@
  * @file      List ingredients.
  * @module    game-tools/list-ingredients
  * @author    iB aka Felix Victor
- * @copyright 2018, 2019
+ * @copyright 2018, 2019, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -16,7 +16,7 @@ import { select as d3Select } from "d3-selection";
 
 import { registerEvent } from "../analytics";
 import { insertBaseModal } from "../common";
-import { chunkify, formatSignInt, formatSignPercent, putImportError } from "../util";
+import { chunkify, formatSignInt, formatSignPercent, putImportError, sortBy } from "../util";
 
 export default class ListIngredients {
     constructor() {
@@ -87,6 +87,7 @@ export default class ListIngredients {
         let properties = "";
         this._moduleData.forEach(type => {
             type[1]
+                .sort(sortBy(["name"]))
                 .filter(module => module.name === recipeName)
                 .forEach(module => {
                     moduleType = type[0];
