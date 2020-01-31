@@ -49,7 +49,7 @@ class WoodBase extends Wood {
         let isPercentage = false;
 
         if (property && property.amount) {
-            [amount, isPercentage] = property;
+            ({ amount, isPercentage } = property);
         }
 
         return { amount, isPercentage };
@@ -139,10 +139,7 @@ class WoodComparison extends Wood {
         let isPercentage = false;
 
         if (property && property.amount) {
-            // eslint-disable-next-line prefer-destructuring
-            amount = property.amount;
-            // eslint-disable-next-line prefer-destructuring
-            isPercentage = property.isPercentage;
+            ({ amount, isPercentage } = property);
         }
 
         return { amount, isPercentage };

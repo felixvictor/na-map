@@ -5,7 +5,7 @@
  * @file      List loot and chests.
  * @module    game-tools/list-loot
  * @author    iB aka Felix Victor
- * @copyright 2019
+ * @copyright 2019, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -17,7 +17,7 @@ import { repeat } from "lit-html/directives/repeat";
 
 import { registerEvent } from "../analytics";
 import { insertBaseModalHTML } from "../common";
-import { formatInt, putImportError } from "../util";
+import { formatInt, putImportError, sortBy } from "../util";
 
 export default class ListLoot {
     constructor() {
@@ -68,7 +68,7 @@ export default class ListLoot {
             /* eslint-disable indent */
             return html`
                 ${repeat(
-                    this._sourceData[type],
+                    this._sourceData[type].sort(sortBy(["name"])),
                     item => item.id,
                     item =>
                         html`
@@ -99,19 +99,7 @@ export default class ListLoot {
             });
 
         // Sort by name
-        this._items = new Map(
-            [...items.entries()].sort((a, b) => {
-                if (a[1].name < b[1].name) {
-                    return -1;
-                }
-
-                if (a[1].name > b[1].name) {
-                    return 1;
-                }
-
-                return 0;
-            })
-        );
+        this._items = new Map([...items.entries()].sort((a, b) => a[1].name.localeCompare(b[1].name)));
 
         /* eslint-disable indent */
         return html`
@@ -265,7 +253,9 @@ export default class ListLoot {
     }
 
     _getSourceText() {
-        const items = [...this._items.get(this._selectedItemId).sources].map(value => value[1]);
+        const items = [...this._items.get(this._selectedItemId).sources]
+            .map(value => value[1])
+            .sort(sortBy(["chance", "name"]));
 
         return html`
             ${this._getItemsText(items)}
@@ -286,6 +276,7 @@ export default class ListLoot {
         }
 
         const currentItem = this._getItemData(this._selectedItemId);
+        currentItem.items = currentItem.items.sort(sortBy(["chance", "name"]));
 
         return this._selectedType === "loot" ? this._getLootText(currentItem) : this._getChestText(currentItem);
     }
