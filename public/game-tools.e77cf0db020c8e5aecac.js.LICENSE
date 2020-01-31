@@ -4,7 +4,7 @@
  * @file      List recipes.
  * @module    game-tools/list-recipes
  * @author    iB aka Felix Victor
- * @copyright 2018, 2019
+ * @copyright 2018, 2019, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -24,7 +24,7 @@
  * @file      List loot and chests.
  * @module    game-tools/list-loot
  * @author    iB aka Felix Victor
- * @copyright 2019
+ * @copyright 2019, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -34,7 +34,7 @@
  * @file      List ship blueprints.
  * @module    game-tools/list-ship-blueprints
  * @author    iB aka Felix Victor
- * @copyright 2019
+ * @copyright 2019, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -54,7 +54,7 @@
  * @file      List ingredients.
  * @module    game-tools/list-ingredients
  * @author    iB aka Felix Victor
- * @copyright 2018, 2019
+ * @copyright 2018, 2019, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -64,7 +64,7 @@
  * @file      List modules.
  * @module    game-tools/list-modules
  * @author    iB aka Felix Victor
- * @copyright 2018, 2019
+ * @copyright 2018, 2019, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -74,7 +74,7 @@
  * @file      List buildings.
  * @module    game-tools/list-buildings
  * @author    iB aka Felix Victor
- * @copyright 2018, 2019
+ * @copyright 2018, 2019, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
