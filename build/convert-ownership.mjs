@@ -8,28 +8,28 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import * as fs from "fs";
-import * as path from "path";
+import * as fs from "fs"
+import * as path from "path"
 
-import d3Node from "d3-node";
-import { default as lzma } from "lzma-native";
-import { default as readDirRecursive } from "recursive-readdir";
+import d3Node from "d3-node"
+import { default as lzma } from "lzma-native"
+import { default as readDirRecursive } from "recursive-readdir"
 
-import { capitalToCounty, cleanName, commonPaths, nations, saveJsonAsync, serverNames } from "./common.mjs";
+import { capitalToCounty, cleanName, commonPaths, nations, saveJsonAsync, serverNames } from "./common.mjs"
 
-const fileExtension = ".json.xz";
+const fileExtension = ".json.xz"
 
-const d3n = d3Node();
-const { d3 } = d3n;
+const d3n = d3Node()
+const { d3 } = d3n
 
 /**
  * Retrieve port data for nation/clan ownership
  * @returns {void}
  */
 function convertOwnership() {
-    const ports = new Map();
-    const numPortsDates = [];
-    const fileBaseNameRegex = new RegExp(`${serverNames[0]}-Ports-(20\\d{2}-\\d{2}-\\d{2})${fileExtension}`);
+    const ports = new Map()
+    const numPortsDates = []
+    const fileBaseNameRegex = new RegExp(`${serverNames[0]}-Ports-(20\\d{2}-\\d{2}-\\d{2})${fileExtension}`)
 
     /**
      * Parse data and construct ports Map
@@ -40,37 +40,35 @@ function convertOwnership() {
     function parseData(portData, date) {
         // console.log("**** new date", date);
 
-        const numPorts = [];
+        const numPorts = []
         nations
             .filter(nation => nation.id !== 9)
             .forEach(nation => {
-                numPorts[nation.short] = 0;
-            });
+                numPorts[nation.short] = 0
+            })
 
-        portData.forEach(port => {
+        for (const port of portData) {
             /**
              * Get data object
              * @return {{timeRange: string[], val: (string)}} - Object
              */
-            function getObject() {
-                return {
-                    timeRange: [date, date],
-                    val: nations[port.Nation].short,
-                    labelVal: nations[port.Nation].sortName
-                };
-            }
+            const getObject = () => ({
+                timeRange: [date, date],
+                val: nations[port.Nation].short,
+                labelVal: nations[port.Nation].sortName
+            })
 
             /**
              * Set initial data
              * @return {void}
              */
-            function initData() {
+            const initData = () => {
                 ports.set(port.Id, {
                     name: cleanName(port.Name),
                     region: port.Location,
                     county: capitalToCounty.get(port.CountyCapitalName) || "",
                     data: [getObject()]
-                });
+                })
             }
 
             /**
@@ -78,59 +76,59 @@ function convertOwnership() {
              * @return {string} - nation short name
              */
             const getPreviousNation = () => {
-                const index = ports.get(port.Id).data.length - 1;
-                return ports.get(port.Id).data[index].val;
-            };
+                const index = ports.get(port.Id).data.length - 1
+                return ports.get(port.Id).data[index].val
+            }
 
             /**
              * Add new nation entry
              * @return {void}
              */
-            function setNewNation() {
+            const setNewNation = () => {
                 // console.log("setNewNation -> ", ports.get(port.Id));
-                const values = ports.get(port.Id);
-                values.data.push(getObject());
-                ports.set(port.Id, values);
+                const values = ports.get(port.Id)
+                values.data.push(getObject())
+                ports.set(port.Id, values)
             }
 
             /**
              * Change end date for current nation
              * @return {void}
              */
-            function setNewEndDate() {
-                const values = ports.get(port.Id);
+            const setNewEndDate = () => {
+                const values = ports.get(port.Id)
                 // console.log("setNewEndDate -> ", ports.get(port.Id), values);
-                values.data[values.data.length - 1].timeRange[1] = date;
-                ports.set(port.Id, values);
+                values.data[values.data.length - 1].timeRange[1] = date
+                ports.set(port.Id, values)
             }
 
             // Exclude free towns
             if (port.Nation !== 9) {
-                numPorts[nations[port.Nation].short] += 1;
+                numPorts[nations[port.Nation].short] += 1
                 if (ports.get(port.Id)) {
                     // console.log("ports.get(port.Id)");
-                    const currentNation = nations[port.Nation].short;
-                    const oldNation = getPreviousNation();
+                    const currentNation = nations[port.Nation].short
+                    const oldNation = getPreviousNation()
                     if (currentNation === oldNation) {
-                        setNewEndDate();
+                        setNewEndDate()
                     } else {
-                        setNewNation();
+                        setNewNation()
                     }
                 } else {
                     // console.log("!ports.get(port.Id)");
-                    initData();
+                    initData()
                 }
             }
-        });
+        }
 
-        const numPortsDate = {};
-        numPortsDate.date = date;
+        const numPortsDate = {}
+        numPortsDate.date = date
         nations
             .filter(nation => nation.id !== 9)
             .forEach(nation => {
-                numPortsDate[nation.short] = numPorts[nation.short];
-            });
-        numPortsDates.push(numPortsDate);
+                numPortsDate[nation.short] = numPorts[nation.short]
+            })
+        numPortsDates.push(numPortsDate)
         // console.log("**** 138 -->", ports.get("138"));
     }
 
@@ -142,11 +140,11 @@ function convertOwnership() {
     function decompress(compressedContent) {
         return lzma.decompress(compressedContent, (decompressedContent, error) => {
             if (error) {
-                throw new Error(error);
+                throw new Error(error)
             }
 
-            return decompressedContent;
-        });
+            return decompressedContent
+        })
     }
 
     /**
@@ -158,12 +156,12 @@ function convertOwnership() {
         return new Promise((resolve, reject) => {
             fs.readFile(fileName, (error, data) => {
                 if (error) {
-                    reject(error);
+                    reject(error)
                 } else {
-                    resolve(data);
+                    resolve(data)
                 }
-            });
-        });
+            })
+        })
     }
 
     /**
@@ -184,10 +182,10 @@ function convertOwnership() {
                         )
                     )
                     .catch(error => {
-                        throw new Error(error);
+                        throw new Error(error)
                     }),
             Promise.resolve()
-        );
+        )
     }
 
     /**
@@ -197,7 +195,7 @@ function convertOwnership() {
      * @return {boolean} - True if file should be ignored
      */
     function ignoreFileName(fileName, stats) {
-        return !stats.isDirectory() && path.basename(fileName).match(fileBaseNameRegex) === null;
+        return !stats.isDirectory() && path.basename(fileName).match(fileBaseNameRegex) === null
     }
 
     /**
@@ -207,18 +205,18 @@ function convertOwnership() {
      */
     function sortFileNames(fileNames) {
         return fileNames.sort((a, b) => {
-            const ba = path.basename(a);
-            const bb = path.basename(b);
+            const ba = path.basename(a)
+            const bb = path.basename(b)
             if (ba < bb) {
-                return -1;
+                return -1
             }
 
             if (ba > bb) {
-                return 1;
+                return 1
             }
 
-            return 0;
-        });
+            return 0
+        })
     }
 
     /**
@@ -227,9 +225,9 @@ function convertOwnership() {
      */
     const writeResult = async () => {
         const portsArray = [...ports.entries()].map(([key, value]) => {
-            value.id = key;
-            return value;
-        });
+            value.id = key
+            return value
+        })
 
         // Nest by region and county
         const nested = d3
@@ -238,42 +236,42 @@ function convertOwnership() {
             .sortKeys(d3.ascending)
             .key(d => d.county)
             .sortKeys(d3.ascending)
-            .entries(portsArray);
+            .entries(portsArray)
 
         // Convert to data structure needed for timelines-chart
         // region
         // -- group (counties)
         //    -- label (ports)
         const result = nested.map(region => {
-            const newRegion = {};
-            newRegion.region = region.key;
+            const newRegion = {}
+            newRegion.region = region.key
             newRegion.data = region.values.map(county => {
-                const group = {};
-                group.group = county.key;
+                const group = {}
+                group.group = county.key
                 group.data = county.values.map(port => {
-                    const label = {};
-                    label.label = port.name;
-                    label.data = port.data;
-                    return label;
-                });
-                return group;
-            });
-            return newRegion;
-        });
+                    const label = {}
+                    label.label = port.name
+                    label.data = port.data
+                    return label
+                })
+                return group
+            })
+            return newRegion
+        })
 
-        await saveJsonAsync(commonPaths.fileOwnership, result);
-        await saveJsonAsync(commonPaths.fileNation, numPortsDates);
-    };
+        await saveJsonAsync(commonPaths.fileOwnership, result)
+        await saveJsonAsync(commonPaths.fileNation, numPortsDates)
+    }
 
     readDirRecursive(commonPaths.dirAPI, [ignoreFileName])
         .then(fileNames => sortFileNames(fileNames))
         .then(fileNames => processFiles(fileNames))
         .then(() => writeResult())
         .catch(error => {
-            throw new Error(error);
-        });
+            throw new Error(error)
+        })
 }
 
 export const convertOwnershipData = () => {
-    convertOwnership();
-};
+    convertOwnership()
+}

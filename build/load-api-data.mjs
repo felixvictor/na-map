@@ -10,9 +10,9 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import * as fs from "fs";
-import * as path from "path";
-import { default as nodeFetch } from "node-fetch";
+import * as fs from "fs"
+import * as path from "path"
+import { default as nodeFetch } from "node-fetch"
 
 import {
     apiBaseFiles,
@@ -21,11 +21,11 @@ import {
     serverNames,
     serverStartDate as serverDate,
     sortId
-} from "./common.mjs";
+} from "./common.mjs"
 
-const sourceBaseUrl = "https://storage.googleapis.com/";
-const sourceBaseDir = "nacleanopenworldprodshards";
-const serverBaseName = "cleanopenworldprod";
+const sourceBaseUrl = "https://storage.googleapis.com/"
+const sourceBaseDir = "nacleanopenworldprodshards"
+const serverBaseName = "cleanopenworldprod"
 // http://api.shipsofwar.net/servers?apikey=1ZptRtpXAyEaBe2SEp63To1aLmISuJj3Gxcl5ivl&callback=setActiveRealms
 
 /**
@@ -37,11 +37,11 @@ const deleteFile = fileName => {
     fs.unlink(fileName, error => {
         if (error) {
             if (error.code !== "ENOENT") {
-                throw error;
+                throw error
             }
         }
-    });
-};
+    })
+}
 
 /**
  * Delete API data (uncompressed and compressed)
@@ -49,10 +49,10 @@ const deleteFile = fileName => {
  * @return {Promise<boolean>}
  */
 const deleteAPIFiles = async fileName => {
-    await deleteFile(fileName);
-    await deleteFile(`${fileName}.xz`);
-    return true;
-};
+    await deleteFile(fileName)
+    await deleteFile(`${fileName}.xz`)
+    return true
+}
 
 /**
  * Download Naval Action API data
@@ -61,18 +61,17 @@ const deleteAPIFiles = async fileName => {
  */
 const readNAJson = async url => {
     try {
-        const response = await nodeFetch(url);
+        const response = await nodeFetch(url)
         if (response.ok) {
-            const text = (await response.text()).replace(/^var .+ = /, "").replace(/;$/, "");
-            const json = await JSON.parse(text);
-            return json;
+            const text = (await response.text()).replace(/^var .+ = /, "").replace(/;$/, "")
+            return await JSON.parse(text)
         }
 
-        return new Error(`Cannot load ${url}: ${response.statusText}`);
+        return new Error(`Cannot load ${url}: ${response.statusText}`)
     } catch (error) {
-        throw error;
+        throw error
     }
-};
+}
 
 /**
  * Load API data and save sorted data
@@ -82,17 +81,17 @@ const readNAJson = async url => {
  * @return {Promise<boolean>}
  */
 const getAPIDataAndSave = async (serverName, apiBaseFile, outfileName) => {
-    const url = new URL(`${sourceBaseUrl}${sourceBaseDir}/${apiBaseFile}_${serverBaseName}${serverName}.json`);
-    const data = await readNAJson(url);
+    const url = new URL(`${sourceBaseUrl}${sourceBaseDir}/${apiBaseFile}_${serverBaseName}${serverName}.json`)
+    const data = await readNAJson(url)
 
     if (data instanceof Error) {
-        throw data;
+        throw data
     }
 
-    data.sort(sortId);
-    await saveJsonAsync(outfileName, data);
-    return true;
-};
+    data.sort(sortId)
+    await saveJsonAsync(outfileName, data)
+    return true
+}
 
 /**
  * Load data for all servers and data files
@@ -100,19 +99,19 @@ const getAPIDataAndSave = async (serverName, apiBaseFile, outfileName) => {
  * @return {Promise<boolean>}
  */
 const loadApiData = async baseAPIFilename => {
-    const deletePromise = [];
-    const getPromise = [];
+    const deletePromise = []
+    const getPromise = []
     for (const serverName of serverNames) {
         for (const apiBaseFile of apiBaseFiles) {
-            const outfileName = path.resolve(baseAPIFilename, `${serverName}-${apiBaseFile}-${serverDate}.json`);
-            deletePromise.push(deleteAPIFiles(outfileName));
-            getPromise.push(getAPIDataAndSave(serverName, apiBaseFile, outfileName));
+            const outfileName = path.resolve(baseAPIFilename, `${serverName}-${apiBaseFile}-${serverDate}.json`)
+            deletePromise.push(deleteAPIFiles(outfileName))
+            getPromise.push(getAPIDataAndSave(serverName, apiBaseFile, outfileName))
         }
     }
 
-    await Promise.all(deletePromise);
-    await Promise.all(getPromise);
-    return true;
-};
+    await Promise.all(deletePromise)
+    await Promise.all(getPromise)
+    return true
+}
 
-loadApiData(baseAPIFilename);
+loadApiData(baseAPIFilename)

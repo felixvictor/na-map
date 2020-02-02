@@ -8,11 +8,11 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import * as fs from "fs";
-import * as path from "path";
+import * as fs from "fs"
+import * as path from "path"
 
-import convert from "xml-js";
-import mergeAdvanced from "object-merge-advanced";
+import convert from "xml-js"
+import mergeAdvanced from "object-merge-advanced"
 
 import {
     baseAPIFilename,
@@ -29,106 +29,107 @@ import {
     sortBy,
     speedConstA,
     speedConstB
-} from "./common.mjs";
+} from "./common.mjs"
 
 /**
  * Ratio of bottom mast thickness
  * @type {number} Ratio
  */
-const middleMastThicknessRatio = 0.75;
+const middleMastThicknessRatio = 0.75
 /**
  * Ratio of bottom mast thickness
  * @type {number} Ratio
  */
-const topMastThicknessRatio = 0.5;
+const topMastThicknessRatio = 0.5
 
 /**
  * Logs needed for planking as a ratio of ship mass
  * @type {number} Ratio
  */
-const plankingRatio = 0.13;
+const plankingRatio = 0.13
 /**
  * Hemp needed for crew space trim as a ratio of ship mass
  * @type {number} Ratio
  */
-const crewSpaceRatio = 0.025;
+const crewSpaceRatio = 0.025
 
 /**
  * Get item names
- * @return {Map<number, string>} Item names<id, name>
  */
-const getItemNames = () => new Map(apiItems.map(item => [item.Id, cleanName(item.Name)]));
+const getItemNames = () => new Map(apiItems.map(item => [item.Id, cleanName(item.Name)]))
 
 /**
  * Get ship mass
  * @param {number} id - Ship id
  * @return {number} Ship mass
  */
-const getShipMass = id => apiItems.find(apiItem => id === apiItem.Id).ShipMass;
+const getShipMass = id => apiItems.find(apiItem => id === apiItem.Id).ShipMass
 
-let apiItems = [];
+let apiItems = []
 
 const convertGenericShipData = () => {
-    const cannonWeight = [0, 42, 32, 24, 18, 12, 9, 0, 6, 4, 3, 2];
-    const carroWeight = [0, 0, 68, 42, 32, 24, 0, 18, 12];
+    // noinspection MagicNumberJS
+    const cannonWeight = [0, 42, 32, 24, 18, 12, 9, 0, 6, 4, 3, 2]
+    // noinspection MagicNumberJS
+    const carroWeight = [0, 0, 68, 42, 32, 24, 0, 18, 12]
     const ships = apiItems
         .filter(item => item.ItemType === "Ship" && !item.NotUsed)
         .map(ship => {
-            const calcPortSpeed = ship.Specs.MaxSpeed * speedConstA - speedConstB;
-            const speedDegrees = ship.Specs.SpeedToWind.map(speed => roundToThousands(speed * calcPortSpeed));
-            const { length } = ship.Specs.SpeedToWind;
+            const calcPortSpeed = ship.Specs.MaxSpeed * speedConstA - speedConstB
+            const speedDegrees = ship.Specs.SpeedToWind.map(speed => roundToThousands(speed * calcPortSpeed))
+            const { length } = ship.Specs.SpeedToWind
 
             // Mirror speed degrees
             for (let i = 1; i < (length - 1) * 2; i += 2) {
-                speedDegrees.unshift(speedDegrees[i]);
+                speedDegrees.unshift(speedDegrees[i])
             }
 
             // Delete last element
-            speedDegrees.pop();
+            speedDegrees.pop()
 
             const deckClassLimit = ship.DeckClassLimit.map(deck => [
                 cannonWeight[deck.Limitation1.Min],
                 carroWeight[deck.Limitation2.Min]
-            ]);
-            const gunsPerDeck = ship.GunsPerDeck;
+            ])
+            const gunsPerDeck = ship.GunsPerDeck
             // Delete mortar entry
-            gunsPerDeck.pop();
-            let guns = 0;
-            let cannonBroadside = 0;
-            let carronadesBroadside = 0;
-            const emptyDeck = [0, 0];
+            gunsPerDeck.pop()
+            let guns = 0
+            let cannonBroadside = 0
+            let carronadesBroadside = 0
+            const emptyDeck = [0, 0]
             for (let i = 0; i < 4; i += 1) {
                 if (deckClassLimit[i]) {
-                    guns += gunsPerDeck[i];
+                    guns += gunsPerDeck[i]
                     if (deckClassLimit[i][1]) {
-                        carronadesBroadside += (gunsPerDeck[i] * deckClassLimit[i][1]) / 2;
+                        carronadesBroadside += (gunsPerDeck[i] * deckClassLimit[i][1]) / 2
                     } else {
-                        carronadesBroadside += (gunsPerDeck[i] * deckClassLimit[i][0]) / 2;
+                        carronadesBroadside += (gunsPerDeck[i] * deckClassLimit[i][0]) / 2
                     }
 
-                    cannonBroadside += (gunsPerDeck[i] * deckClassLimit[i][0]) / 2;
+                    cannonBroadside += (gunsPerDeck[i] * deckClassLimit[i][0]) / 2
                 } else {
-                    deckClassLimit.push(emptyDeck);
+                    deckClassLimit.push(emptyDeck)
                 }
             }
 
-            const broadside = { cannons: cannonBroadside, carronades: carronadesBroadside };
+            const broadside = { cannons: cannonBroadside, carronades: carronadesBroadside }
 
             const frontDeck = ship.FrontDecks
                 ? ship.FrontDeckClassLimit.map(deck => [
                     cannonWeight[deck.Limitation1.Min],
                     carroWeight[deck.Limitation2.Min]
                 ])[0]
-                : emptyDeck;
-            deckClassLimit.push(frontDeck);
+                : emptyDeck
+            deckClassLimit.push(frontDeck)
 
             const backDeck = ship.BackDecks
                 ? ship.BackDeckClassLimit.map(deck => [
                     cannonWeight[deck.Limitation1.Min],
                     carroWeight[deck.Limitation2.Min]
                 ])[0]
-                : emptyDeck;
-            deckClassLimit.push(backDeck);
+                : emptyDeck
+            deckClassLimit.push(backDeck)
 
             return {
                 id: Number(ship.Id),
@@ -184,17 +185,18 @@ const convertGenericShipData = () => {
                 premium: ship.Premium,
                 tradeShip: ship.ShipType === 1
                 // hostilityScore: ship.HostilityScore
-            };
-        });
+            }
+        })
 
-    return ships;
-};
+    return ships
+}
 
 /**
  * Retrieve additional ship data from game files and add it to existing ship data
  * @returns {object} Ship data
  */
 const convertAddShipData = ships => {
+    // noinspection SpellCheckingInspection
     /**
      * Maps the ship name (lower case for the file name) to the ship id
      * @type {Map<string, {id: number, master: string}>}
@@ -263,42 +265,43 @@ const convertAddShipData = ships => {
         ["wasa_prototype", { id: 1938, master: "" }],
         ["yacht", { id: 295, master: "" }],
         ["yachtsilver", { id: 393, master: "" }]
-    ]);
+    ])
 
     /**
      * List of file names to be read
      * @type {Set<string>}
      */
-    const baseFileNames = new Set();
+    const baseFileNames = new Set()
     /**
      * Gets all files from directory <dir> and stores valid ship names in <fileNames>
      * @param {string} dir - Directory
      * @returns {void}
      */
     const getBaseFileNames = dir => {
-        fs.readdirSync(dir).forEach(fileName => {
+        for (const fileName of fs.readdirSync(dir)) {
             /**
              * First part of the file name containing the ship name
              * @type {string}
              */
-            let str = fileName.slice(0, fileName.indexOf(" "));
+            let str = fileName.slice(0, fileName.indexOf(" "))
             if (str === "rookie" || str === "trader") {
-                const shortenedFileName = fileName.replace("rookie ", "").replace("trader ", "");
-                const str2 = shortenedFileName.slice(0, shortenedFileName.indexOf(" "));
-                str = str.concat(" ").concat(str2);
+                const shortenedFileName = fileName.replace("rookie ", "").replace("trader ", "")
+                const str2 = shortenedFileName.slice(0, shortenedFileName.indexOf(" "))
+                str = str.concat(" ").concat(str2)
             }
 
             if (shipNames.has(str)) {
-                baseFileNames.add(str);
+                baseFileNames.add(str)
             }
-        });
-        // Add 'basic' ship without files
-        baseFileNames.add("basiccutter");
-        baseFileNames.add("basiclynx");
-        baseFileNames.add("indiaman rookie");
-    };
+        }
 
-    getBaseFileNames(commonPaths.dirModules);
+        // Add 'basic' ship without files
+        baseFileNames.add("basiccutter")
+        baseFileNames.add("basiclynx")
+        baseFileNames.add("indiaman rookie")
+    }
+
+    getBaseFileNames(commonPaths.dirModules)
 
     /**
      * @typedef SubFileStructure
@@ -307,6 +310,7 @@ const convertAddShipData = ships => {
      * @property {Map<string, {group: string, element: string}>} elements - elements to be retrieved from the file.
      */
 
+    // noinspection SpellCheckingInspection
     /**
      * Data structure for content of the individual files.
      * @type {SubFileStructure}
@@ -400,41 +404,42 @@ const convertAddShipData = ships => {
                 ["REPAIR_MODULE_TIME", { group: "repairTime", element: "structure" }]
             ])
         }
-    ];
+    ]
 
-    const getShipId = baseFileName => shipNames.get(baseFileName).id;
+    const getShipId = baseFileName => shipNames.get(baseFileName).id
 
-    const getShipMaster = baseFileName => shipNames.get(baseFileName).master;
+    const getShipMaster = baseFileName => shipNames.get(baseFileName).master
 
     const getAddData = (elements, fileData) => {
         /**
          * Ship data to be added per file
          * @type {Object.<string, Object.<string, number>>}
          */
-        const addData = {};
+        const addData = {}
 
         // Retrieve additional data per attribute pair
-        fileData.ModuleTemplate.Attributes.Pair.forEach(pair => {
-            const key = pair.Key._text;
+        for (const pair of fileData.ModuleTemplate.Attributes.Pair) {
+            const key = pair.Key._text
             // Check if pair is considered additional data
             if (elements.has(key)) {
-                const value = Number(pair.Value.Value._text);
-                const { group, element } = elements.get(key);
+                const value = Number(pair.Value.Value._text)
+                const { group, element } = elements.get(key)
                 if (!addData[group]) {
-                    addData[group] = {};
+                    addData[group] = {}
                 }
 
-                addData[group][element] = value;
+                addData[group][element] = value
 
                 // Add calculated mast thickness
                 if (key === "MAST_THICKNESS") {
-                    addData[group].middleThickness = value * middleMastThicknessRatio;
-                    addData[group].topThickness = value * topMastThicknessRatio;
+                    addData[group].middleThickness = value * middleMastThicknessRatio
+                    addData[group].topThickness = value * topMastThicknessRatio
                 }
             }
-        });
-        return addData;
-    };
+        }
+
+        return addData
+    }
 
     // Add additional data to the existing data
     const addAddData = (addData, id) => {
@@ -443,100 +448,101 @@ const convertAddShipData = ships => {
             .filter(ship => ship.id === id)
             .forEach(ship => {
                 // Get all data for each group
-                Object.entries(addData).forEach(([group, values]) => {
+                for (const [group, values] of Object.entries(addData)) {
                     if (!ship[group]) {
-                        ship[group] = {};
+                        ship[group] = {}
                     }
 
                     // Get all elements per group
-                    Object.entries(values).forEach(([element, value]) => {
+                    for (const [element, value] of Object.entries(values)) {
                         // add value
-                        ship[group][element] = value;
-                    });
-                });
-            });
-    };
+                        ship[group][element] = value
+                    }
+                }
+            })
+    }
 
     const getFileData = (baseFileName, ext) => {
-        const fileName = path.resolve(commonPaths.dirModules, `${baseFileName} ${ext}.xml`);
-        let data = {};
+        const fileName = path.resolve(commonPaths.dirModules, `${baseFileName} ${ext}.xml`)
+        let data = {}
         if (fileExists(fileName)) {
-            const fileXmlData = readTextFile(fileName);
-            data = convert.xml2js(fileXmlData, { compact: true });
+            const fileXmlData = readTextFile(fileName)
+            data = convert.xml2js(fileXmlData, { compact: true })
         }
 
-        return data;
-    };
+        return data
+    }
 
     // Get all files without a master
-    [...baseFileNames]
-        .filter(baseFileName => !getShipMaster(baseFileName))
-        .forEach(baseFileName => {
+
+    for (const baseFileName of baseFileNames) {
+        if (!getShipMaster(baseFileName)) {
             /**
              * @type {number} Current ship id
              */
-            const id = getShipId(baseFileName);
+            const id = getShipId(baseFileName)
 
             // Retrieve and store additional data per file
-            subFileStructure.forEach(file => {
-                const fileData = getFileData(baseFileName, file.ext);
+            for (const file of subFileStructure) {
+                const fileData = getFileData(baseFileName, file.ext)
                 /**
                  * Ship data to be added per file
                  * @type {Object.<string, Object.<string, number>>}
                  */
-                const addData = getAddData(file.elements, fileData);
+                const addData = getAddData(file.elements, fileData)
 
-                addAddData(addData, id);
-            });
-        });
+                addAddData(addData, id)
+            }
+        }
+    }
 
     // Get all files with a master (ship data has to be copied from master)
-    [...baseFileNames]
-        .filter(baseFileName => getShipMaster(baseFileName))
-        .forEach(baseFileName => {
+    for (const baseFileName of baseFileNames) {
+        if (getShipMaster(baseFileName)) {
             /**
              * @type {number} Current ship id
              */
-            const id = getShipId(baseFileName);
+            const id = getShipId(baseFileName)
             /**
-             * @type {number} Current ship master
+             * @type {string} Current ship master
              */
-            const masterBaseFileName = getShipMaster(baseFileName);
+            const masterBaseFileName = getShipMaster(baseFileName)
 
             // Retrieve and store additional data per file
-            subFileStructure.forEach(file => {
-                const fileData = getFileData(baseFileName, file.ext);
-                const fileMasterData = getFileData(masterBaseFileName, file.ext);
+            for (const file of subFileStructure) {
+                const fileData = getFileData(baseFileName, file.ext)
+                const fileMasterData = getFileData(masterBaseFileName, file.ext)
                 /**
                  * Ship data to be added per file
                  * @type {Object.<string, Object.<string, number>>}
                  */
-                const addData = isEmpty(fileData) ? {} : getAddData(file.elements, fileData);
-                const addMasterData = getAddData(file.elements, fileMasterData);
+                const addData = isEmpty(fileData) ? {} : getAddData(file.elements, fileData)
+                const addMasterData = getAddData(file.elements, fileMasterData)
 
                 /*
                     https://stackoverflow.com/a/47554782
                     const mergedData = mergeDeep(addMasterData,addData);
                 */
-                const mergedData = mergeAdvanced(addMasterData, addData);
+                const mergedData = mergeAdvanced(addMasterData, addData)
 
-                addAddData(mergedData, id);
-            });
-        });
+                addAddData(mergedData, id)
+            }
+        }
+    }
 
-    return ships;
-};
+    return ships
+}
 
 /**
  * Convert ship blueprints
  * @return {void}
  */
 const convertShipBlueprints = async () => {
-    const itemNames = getItemNames();
+    const itemNames = getItemNames()
     const shipBlueprints = apiItems
         .filter(apiItem => !apiItem.NotUsed && apiItem.ItemType === "RecipeShip")
         .map(apiBlueprint => {
-            const shipMass = getShipMass(apiBlueprint.Results[0].Template);
+            const shipMass = getShipMass(apiBlueprint.Results[0].Template)
             return {
                 id: apiBlueprint.Id,
                 name: cleanName(apiBlueprint.Name).replace(" Blueprint", ""),
@@ -583,13 +589,13 @@ const convertShipBlueprints = async () => {
                 craftLevel: apiBlueprint.RequiresLevel,
                 craftXP: apiBlueprint.GivesXP,
                 labourHours: apiBlueprint.LaborPrice
-            };
+            }
         })
         // Sort by name
-        .sort(sortBy(["id"]));
+        .sort(sortBy(["id"]))
 
-    await saveJsonAsync(commonPaths.fileShipBlueprint, shipBlueprints);
-};
+    await saveJsonAsync(commonPaths.fileShipBlueprint, shipBlueprints)
+}
 
 /*
  * Get resource ratios
@@ -623,15 +629,15 @@ resourceRatios.forEach((value, key) => {
 */
 
 const convertShips = async () => {
-    let ships = convertGenericShipData();
-    ships = convertAddShipData(ships);
-    ships.sort(sortBy(["class", "name"]));
-    await saveJsonAsync(commonPaths.fileShip, ships);
-};
+    let ships = convertGenericShipData()
+    ships = convertAddShipData(ships)
+    ships.sort(sortBy(["class", "name"]))
+    await saveJsonAsync(commonPaths.fileShip, ships)
+}
 
 export const convertShipData = async () => {
-    apiItems = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`));
+    apiItems = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`))
 
-    await convertShips();
-    convertShipBlueprints();
-};
+    await convertShips()
+    convertShipBlueprints()
+}
