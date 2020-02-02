@@ -4,7 +4,7 @@
  * @file      List woods.
  * @module    game-tools/list-woods
  * @author    iB aka Felix Victor
- * @copyright 2018, 2019
+ * @copyright 2018, 2019, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -128,7 +128,7 @@ export default class ListWoods {
                 const amount = wood.properties
                     .filter(property => property.modifier === modifier)
                     .map(property => property.amount)[0];
-                text += `<td class="text-right" data-sort="${amount || 0}">${
+                text += `<td class="text-right" data-sort="${amount ?? 0}">${
                     amount ? formatFloatFixed(amount) : ""
                 }</td>`;
             });

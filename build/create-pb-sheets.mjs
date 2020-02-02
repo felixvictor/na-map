@@ -10,21 +10,21 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import Excel4Node from "excel4node";
-import sass from "node-sass";
-import css from "css";
+import Excel4Node from "excel4node"
+import sass from "node-sass"
+import css from "css"
 
-import { commonPaths, range, readJson, sortBy } from "./common.mjs";
+import { commonPaths, range, readJson, sortBy } from "./common.mjs"
 
-const shallowWaterFrigates = ["Cerberus", "Hercules", "L’Hermione", "La Renommée", "Surprise"];
-const minDeepWaterBR = 80;
-const maxNumPlayers = 25;
+const shallowWaterFrigates = ["Cerberus", "Hercules", "L’Hermione", "La Renommée", "Surprise"]
+const minDeepWaterBR = 80
+const maxNumPlayers = 25
 
-const columnWidth = 20;
-const rowHeight = 24;
+const columnWidth = 20
+const rowHeight = 24
 
-let portsOrig;
-let shipsOrig;
+let portsOrig
+let shipsOrig
 
 /** Set colours
  * @returns {Map} Colours
@@ -34,18 +34,19 @@ function setColours() {
         .renderSync({
             file: "src/scss/pre-compile.scss"
         })
-        .css.toString();
-    const parsedCss = css.parse(compiledCss);
+        .css.toString()
+    const parsedCss = css.parse(compiledCss)
     return new Map(
         parsedCss.stylesheet.rules
             .filter(rule => rule.selectors !== undefined && rule.selectors[0].startsWith(".colour-palette "))
             .map(rule => {
-                const d = rule.declarations.find(declaration => declaration.property === "background-color");
-                return [rule.selectors[0].replace(".colour-palette .", ""), d ? d.value : ""];
+                const d = rule.declarations.find(declaration => declaration.property === "background-color")
+                return [rule.selectors[0].replace(".colour-palette .", ""), d ? d.value : ""]
             })
-    );
+    )
 }
 
+// noinspection FunctionTooLongJS
 /**
  * Create excel spreadsheet
  * @returns {void}
@@ -57,7 +58,7 @@ const createPortBattleSheets = () => {
             name: port.name,
             br: port.brLimit
         }))
-        .sort((a, b) => a.name.localeCompare(b.name));
+        .sort((a, b) => a.name.localeCompare(b.name))
 
     const portsShallowWater = portsOrig
         .filter(port => port.shallow)
@@ -65,23 +66,23 @@ const createPortBattleSheets = () => {
             name: port.name,
             br: port.brLimit
         }))
-        .sort((a, b) => a.name.localeCompare(b.name));
+        .sort((a, b) => a.name.localeCompare(b.name))
 
-    const colours = setColours();
-    const colourWhite = colours.get("white");
-    const colourPrimaryWhite = colours.get("primary-050");
-    const colourPrimaryNearWhite = colours.get("primary-100");
-    const colourPrimaryLight = colours.get("primary-200");
-    const colourPrimaryDark = colours.get("primary-600");
-    const colourContrastWhite = colours.get("secondary-050");
-    const colourContrastNearWhite = colours.get("secondary-100");
-    const colourContrastLight = colours.get("secondary-200");
-    const colourContrastMiddle = colours.get("secondary-400");
-    const colourContrastDark = colours.get("secondary-600");
-    const colourText = colours.get("secondary-800");
-    const colourBackground = colours.get("background-600");
-    const colourHighlight = colours.get("info");
-    const colourRed = colours.get("pink");
+    const colours = setColours()
+    // const colourWhite = colours.get("white")
+    const colourPrimaryWhite = colours.get("primary-050")
+    // const colourPrimaryNearWhite = colours.get("primary-100")
+    // const colourPrimaryLight = colours.get("primary-200")
+    // const colourPrimaryDark = colours.get("primary-600")
+    const colourContrastWhite = colours.get("secondary-050")
+    const colourContrastNearWhite = colours.get("secondary-100")
+    const colourContrastLight = colours.get("secondary-200")
+    const colourContrastMiddle = colours.get("secondary-400")
+    // const colourContrastDark = colours.get("secondary-600")
+    const colourText = colours.get("secondary-800")
+    // const colourBackground = colours.get("background-600")
+    const colourHighlight = colours.get("info")
+    const colourRed = colours.get("pink")
 
     const wsOptions = {
         sheetView: {
@@ -92,9 +93,9 @@ const createPortBattleSheets = () => {
             defaultColWidth: columnWidth,
             defaultRowHeight: rowHeight
         }
-    };
+    }
 
-    const workbook = new Excel4Node.Workbook();
+    const workbook = new Excel4Node.Workbook()
 
     /**
      * Returns fill pattern object
@@ -102,21 +103,21 @@ const createPortBattleSheets = () => {
      * @returns {Object} Fill pattern
      */
     const fillPattern = colour =>
-        workbook.createStyle({ fill: { type: "pattern", patternType: "solid", fgColor: colour } }); // §18.8.20 fill (Fill)
+        workbook.createStyle({ fill: { type: "pattern", patternType: "solid", fgColor: colour } }) // §18.8.20 fill (Fill)
 
     /**
      * Returns font object with color colour
      * @param {String} colour - Font colour
      * @returns {Object} Font object
      */
-    const fontColour = colour => workbook.createStyle({ font: { color: colour } }); // §18.8.22
+    // const fontColour = colour => workbook.createStyle({ font: { color: colour } }) // §18.8.22
 
     /**
      * Returns font object with bold font
      * @param {String} colour - Font colour
      * @returns {Object} Font object
      */
-    const fontColourBold = colour => workbook.createStyle({ font: { bold: true, color: colour } }); // §18.8.22
+    const fontColourBold = colour => workbook.createStyle({ font: { bold: true, color: colour } }) // §18.8.22
 
     /**
      * Returns font object with bold font
@@ -135,15 +136,16 @@ const createPortBattleSheets = () => {
                 color: colourContrastLight
             }
         }
-    });
+    })
 
     /**
      * Returns font object with bold font
      * @param {String} colour - Font colour
      * @returns {Object} Font object
      */
-    const brTooHigh = workbook.createStyle({ font: { bold: true, color: colourRed } }); // §18.8.22
+    const brTooHigh = workbook.createStyle({ font: { bold: true, color: colourRed } }) // §18.8.22
 
+    // noinspection FunctionTooLongJS
     /**
      * Fill worksheet
      * @param {Worksheet} sheet - Worksheet
@@ -161,7 +163,7 @@ const createPortBattleSheets = () => {
                 vertical: "center"
             },
             numberFormat: "#" // §18.8.30 numFmt (Number Format)
-        };
+        }
         const textStyle = {
             alignment: {
                 // §18.8.1
@@ -171,7 +173,7 @@ const createPortBattleSheets = () => {
                 vertical: "center"
             },
             numberFormat: "@" // §18.8.30 numFmt (Number Format)
-        };
+        }
 
         const columnsHeader = [
             { name: "Ship rate", width: 8, style: numberStyle },
@@ -179,128 +181,129 @@ const createPortBattleSheets = () => {
             { name: "Ship battle rating", width: 8, style: numberStyle },
             { name: "Number of players", width: 12, style: numberStyle },
             { name: "Total battle rating", width: 12, style: numberStyle }
-        ];
-        const numRowsHeader = 4;
-        const numRowsTotal = numRowsHeader + ships.length;
-        const numColumnsHeader = columnsHeader.length;
-        const numColumnsTotal = numColumnsHeader + maxNumPlayers;
+        ]
+        const numRowsHeader = 4
+        const numRowsTotal = numRowsHeader + ships.length
+        const numColumnsHeader = columnsHeader.length
+        const numColumnsTotal = numColumnsHeader + maxNumPlayers
 
-        sheet.column(numColumnsHeader).freeze(); // Freezes the first two columns and scrolls the right view to column D
-        sheet.row(numRowsHeader).freeze();
+        sheet.column(numColumnsHeader).freeze() // Freezes the first two columns and scrolls the right view to column D
+        sheet.row(numRowsHeader).freeze()
 
         // ***** Columns *****
         const setColumns = () => {
             // Format first columns
 
-            columnsHeader.forEach((column, i) => {
-                sheet.column(i + 1).setWidth(column.width);
-                sheet.cell(1, i + 1, numRowsTotal, i + 1).style(column.style);
-            });
+            for (const column of columnsHeader) {
+                const i = columnsHeader.indexOf(column)
+                sheet.column(i + 1).setWidth(column.width)
+                sheet.cell(1, i + 1, numRowsTotal, i + 1).style(column.style)
+            }
 
             // Player names
-            range(numColumnsHeader + 1, numColumnsHeader + maxNumPlayers).forEach(column => {
-                sheet.column(column).setWidth(columnWidth);
-                sheet.cell(1, column, numRowsTotal, column).style(textStyle);
-            });
-        };
+            for (const column of range(numColumnsHeader + 1, numColumnsHeader + maxNumPlayers)) {
+                sheet.column(column).setWidth(columnWidth)
+                sheet.cell(1, column, numRowsTotal, column).style(textStyle)
+            }
+        }
 
-        setColumns();
+        setColumns()
 
         // ***** Rows *****
         // General description row
-        let currentRow = 1;
+        let currentRow = 1
         sheet
             .cell(currentRow, 1, currentRow, numColumnsTotal)
             .style(textStyle)
-            .style(fillPattern("white"));
-        sheet.cell(currentRow, 1, currentRow, 3, true).string("Port battle calculator by Felix Victor");
+            .style(fillPattern("white"))
+        sheet.cell(currentRow, 1, currentRow, 3, true).string("Port battle calculator by Felix Victor")
         sheet
             .cell(currentRow, 4, currentRow, 5, true)
-            .link("https://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/", "Game Labs Forum");
+            .link("https://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/", "Game Labs Forum")
 
         // Port description row
-        currentRow += 1;
+        currentRow += 1
         sheet
             .cell(currentRow, 1, currentRow, numColumnsTotal)
             .style(textStyle)
-            .style(fillPattern(colourContrastNearWhite));
-        sheet.cell(currentRow, 1).string("Port");
+            .style(fillPattern(colourContrastNearWhite))
+        sheet.cell(currentRow, 1).string("Port")
         sheet
             .cell(currentRow, 2)
             .string("1. Select port")
-            .style(fontColourBold(colourHighlight));
-        sheet.cell(currentRow, numColumnsHeader - 1).string("Max BR");
-        sheet.cell(currentRow, numColumnsHeader).style(numberStyle);
+            .style(fontColourBold(colourHighlight))
+        sheet.cell(currentRow, numColumnsHeader - 1).string("Max BR")
+        sheet.cell(currentRow, numColumnsHeader).style(numberStyle)
 
         // Column description row
-        currentRow += 1;
+        currentRow += 1
         sheet
             .cell(currentRow, 1, currentRow, numColumnsTotal)
             .style(textStyle)
             .style(fontColourBold(colourContrastNearWhite))
-            .style(fillPattern(colourContrastMiddle));
-        sheet.cell(currentRow, 1).string("Rate");
-        sheet.cell(currentRow, 2).string("Ship");
-        sheet.cell(currentRow, 3).string("BR");
-        sheet.cell(currentRow, 4).string("# Players");
-        sheet.cell(currentRow, 5).string("BR total");
+            .style(fillPattern(colourContrastMiddle))
+        sheet.cell(currentRow, 1).string("Rate")
+        sheet.cell(currentRow, 2).string("Ship")
+        sheet.cell(currentRow, 3).string("BR")
+        sheet.cell(currentRow, 4).string("# Players")
+        sheet.cell(currentRow, 5).string("BR total")
 
-        sheet.cell(currentRow, numColumnsHeader + 1, currentRow, numColumnsHeader + 2, true).string("Player names");
+        sheet.cell(currentRow, numColumnsHeader + 1, currentRow, numColumnsHeader + 2, true).string("Player names")
 
         // Total row
-        currentRow += 1;
+        currentRow += 1
         sheet
             .cell(currentRow, 1, currentRow, numColumnsTotal)
             .style(textStyle)
             .style(fontColourBold(colourContrastNearWhite))
-            .style(fillPattern(colourContrastMiddle));
+            .style(fillPattern(colourContrastMiddle))
 
         sheet
             .cell(currentRow, numColumnsHeader - 1, currentRow, numColumnsHeader)
             .style(numberStyle)
             .style(fontColourBold(colourText))
-            .style(fillPattern(colourContrastLight));
+            .style(fillPattern(colourContrastLight))
         sheet
             .cell(currentRow, numColumnsHeader - 1)
             .formula(
                 `SUM(${Excel4Node.getExcelAlpha(numColumnsHeader - 1)}${numRowsHeader + 1}:${Excel4Node.getExcelAlpha(
                     numColumnsHeader - 1
                 )}${numRowsTotal})`
-            );
+            )
         sheet
             .cell(currentRow, numColumnsHeader)
             .formula(
                 `SUM(${Excel4Node.getExcelAlpha(numColumnsHeader)}${numRowsHeader + 1}:${Excel4Node.getExcelAlpha(
                     numColumnsHeader
                 )}${numRowsTotal})`
-            );
+            )
 
         sheet
             .cell(currentRow, numColumnsHeader + 1, currentRow, numColumnsTotal, true)
             .string("2. Enter player names")
-            .style(fontColourBold(colourHighlight));
+            .style(fontColourBold(colourHighlight))
 
         // Ship rows
-        const fgColourShip = ["white", colourContrastWhite];
-        const fgColourPlayer = ["white", colourPrimaryWhite];
-        ships.forEach(ship => {
-            currentRow += 1;
+        const fgColourShip = ["white", colourContrastWhite]
+        const fgColourPlayer = ["white", colourPrimaryWhite]
+        for (const ship of ships) {
+            currentRow += 1
 
             sheet
                 .cell(currentRow, 1, currentRow, numColumnsHeader)
                 .style(textStyle)
                 .style(border)
-                .style(fillPattern(fgColourShip[ship.class % 2]));
+                .style(fillPattern(fgColourShip[ship.class % 2]))
 
             sheet
                 .cell(currentRow, 1)
                 .number(ship.class)
-                .style(numberStyle);
-            sheet.cell(currentRow, 2).string(ship.name);
+                .style(numberStyle)
+            sheet.cell(currentRow, 2).string(ship.name)
             sheet
                 .cell(currentRow, 3)
                 .number(ship.battleRating)
-                .style(numberStyle);
+                .style(numberStyle)
             sheet
                 .cell(currentRow, numColumnsHeader - 1)
                 .formula(
@@ -308,7 +311,7 @@ const createPortBattleSheets = () => {
                         numColumnsTotal
                     )}${currentRow})`
                 )
-                .style(numberStyle);
+                .style(numberStyle)
             sheet
                 .cell(currentRow, numColumnsHeader)
                 .formula(
@@ -316,14 +319,14 @@ const createPortBattleSheets = () => {
                         numColumnsHeader - 1
                     )}${currentRow}`
                 )
-                .style(numberStyle);
+                .style(numberStyle)
 
             sheet
                 .cell(currentRow, numColumnsHeader + 1, currentRow, numColumnsTotal)
                 .style(textStyle)
                 .style(border)
-                .style(fillPattern(fgColourPlayer[ship.class % 2]));
-        });
+                .style(fillPattern(fgColourPlayer[ship.class % 2]))
+        }
 
         // BR too high colour
         sheet.addConditionalFormattingRule(`${Excel4Node.getExcelAlpha(numColumnsHeader)}${numRowsHeader}`, {
@@ -333,13 +336,14 @@ const createPortBattleSheets = () => {
                 ${Excel4Node.getExcelAlpha(numColumnsHeader)}${numRowsHeader} >
                 ${Excel4Node.getExcelAlpha(numColumnsHeader)}${numRowsHeader - 2})`, // formula that returns nonzero or 0
             style: brTooHigh
-        });
+        })
 
         // Port select dropdown
-        ports.forEach((port, i) => {
-            sheet.cell(i + 1, numColumnsTotal + 1).string(port.name);
-            sheet.cell(i + 1, numColumnsTotal + 2).number(port.br);
-        });
+        for (const port of ports) {
+            let i = ports.indexOf(port)
+            sheet.cell(i + 1, numColumnsTotal + 1).string(port.name)
+            sheet.cell(i + 1, numColumnsTotal + 2).number(port.br)
+        }
 
         sheet.addDataValidation({
             type: "list",
@@ -353,7 +357,7 @@ const createPortBattleSheets = () => {
                     ports.length
                 }`
             ]
-        });
+        })
 
         sheet
             .cell(2, numColumnsHeader)
@@ -361,31 +365,32 @@ const createPortBattleSheets = () => {
                 `VLOOKUP(B2,${Excel4Node.getExcelAlpha(numColumnsTotal + 1)}1:${Excel4Node.getExcelAlpha(
                     numColumnsTotal + 2
                 )}${ports.length},2,0)`
-            );
+            )
 
         // Sample values
-        sheet.cell(numRowsHeader + 1, numColumnsHeader + 1).string("Fritz");
-        sheet.cell(numRowsHeader + 1, numColumnsHeader + 2).string("Franz");
-        sheet.cell(numRowsHeader + 1, numColumnsHeader + 3).string("Klaus");
-        sheet.cell(numRowsHeader + 2, numColumnsHeader + 1).string("x");
-        sheet.cell(numRowsHeader + 2, numColumnsHeader + 2).string("X");
-        sheet.cell(numRowsHeader + 2, numColumnsHeader + 3).string("x");
+        sheet.cell(numRowsHeader + 1, numColumnsHeader + 1).string("Fritz")
+        sheet.cell(numRowsHeader + 1, numColumnsHeader + 2).string("Franz")
+        sheet.cell(numRowsHeader + 1, numColumnsHeader + 3).string("Klaus")
+        sheet.cell(numRowsHeader + 2, numColumnsHeader + 1).string("x")
+        sheet.cell(numRowsHeader + 2, numColumnsHeader + 2).string("X")
+        sheet.cell(numRowsHeader + 2, numColumnsHeader + 3).string("x")
     }
 
+    // noinspection OverlyComplexBooleanExpressionJS
     const dwShips = shipsOrig
         .filter(
             ship =>
                 !(ship.name.startsWith("Basic") || ship.name.startsWith("Rookie") || ship.name.startsWith("Trader")) &&
                 (ship.battleRating >= minDeepWaterBR || ship.name === "Mortar Brig")
         )
-        .sort(sortBy(["class", "-battleRating", "name"]));
+        .sort(sortBy(["class", "-battleRating", "name"]))
     const swShips = shipsOrig
         .filter(
             ship =>
                 shallowWaterFrigates.includes(ship.name) ||
                 (ship.class >= 6 && !["Basic", "Rooki", "Trade"].includes(ship.name.slice(0, 5)))
         )
-        .sort(sortBy(["class", "-battleRating", "name"]));
+        .sort(sortBy(["class", "-battleRating", "name"]))
 
     /*
     const dwSheet = workbook.addWorksheet("Deep water port", {
@@ -395,22 +400,22 @@ const createPortBattleSheets = () => {
             properties: { tabColor: { argb: secondary500 } }
         });
         */
-    const dwSheet = workbook.addWorksheet("Deep water port", wsOptions);
-    const swSheet = workbook.addWorksheet("Shallow water port", wsOptions);
+    const dwSheet = workbook.addWorksheet("Deep water port", wsOptions)
+    const swSheet = workbook.addWorksheet("Shallow water port", wsOptions)
 
-    fillSheet(dwSheet, dwShips, portsDeepWater);
-    fillSheet(swSheet, swShips, portsShallowWater);
+    fillSheet(dwSheet, dwShips, portsDeepWater)
+    fillSheet(swSheet, swShips, portsShallowWater)
 
     workbook.write(commonPaths.filePbSheet, err => {
         if (err) {
-            console.error(err);
+            console.error(err)
         }
-    });
-};
+    })
+}
 
 export const createPortBattleSheet = () => {
-    portsOrig = readJson(commonPaths.filePort);
-    shipsOrig = readJson(commonPaths.fileShip);
+    portsOrig = readJson(commonPaths.filePort)
+    shipsOrig = readJson(commonPaths.fileShip)
 
-    createPortBattleSheets();
-};
+    createPortBattleSheets()
+}
