@@ -16,15 +16,17 @@ const SitemapPlugin = require("sitemap-webpack-plugin").default
 const SriPlugin = require("webpack-subresource-integrity")
 const TerserPlugin = require("terser-webpack-plugin")
 const FaviconsPlugin = require("favicons-webpack-plugin")
-const { isProduction } = require("webpack-mode")
 const servers = require("./src/js/servers")
 const PACKAGE = require("./package.json")
-
 const repairs = require("./src/gen-generic/repairs.json")
-const libraryName = PACKAGE.name
-const { TARGET } = process.env
-const target = `https://${TARGET}.netlify.com/`
 
+// Environment
+const { TARGET, QUIET } = process.env
+const { isProduction } = require("webpack-mode")
+const isQuiet = Boolean(QUIET)
+const target = TARGET ? `https://${TARGET}.netlify.com/` : ""
+
+const libraryName = PACKAGE.name
 const descriptionLong =
     "Yet another map with in-game map, resources, ship and wood comparisons. Port battle data is updated constantly from twitter and all data daily after maintenance."
 const sitemapPaths = ["/fonts/", "/icons", "/images"]
@@ -216,7 +218,9 @@ const faviconsOpt = {
             yandex: false
         },
         lang: "en-GB",
+        // eslint-disable-next-line camelcase
         start_url: "/",
+        // eslint-disable-next-line camelcase
         theme_color: themeColour,
         version: PACKAGE.version
     }
@@ -470,6 +474,10 @@ const config = {
 }
 
 module.exports = () => {
+    if (isQuiet) {
+        config.stats = "errors-only"
+    }
+
     if (isProduction) {
         config.optimization.minimizer = [
             new TerserPlugin({
