@@ -3,17 +3,17 @@
  *
  * @file Main file.
  * @author iB aka Felix Victor
- * @copyright 2017, 2018, 2019
+ * @copyright 2017, 2018, 2019, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { initAnalytics, registerPage } from "./analytics";
-import { servers } from "./servers";
-import { putImportError } from "./util";
-import Cookie from "./util/cookie";
-import RadioButton from "./util/radio-button";
+import { initAnalytics, registerPage } from "./analytics"
+import { servers } from "./servers"
+import { putImportError } from "./util"
+import Cookie from "./util/cookie"
+import RadioButton from "./util/radio-button"
 
-import "../scss/main.scss";
+import "../scss/main.scss"
 
 /**
  *  Workaround for google translate uses indexOf on svg text
@@ -22,87 +22,87 @@ import "../scss/main.scss";
  */
 SVGAnimatedString.prototype.indexOf = function() {
     // eslint-disable-next-line prefer-spread,prefer-rest-params
-    return this.baseVal.indexOf.apply(this.baseVal, arguments);
-};
+    return this.baseVal.indexOf.apply(this.baseVal, arguments)
+}
 
 /**
  * Base Id
  * @type {string}
  */
-const baseId = "server-name";
+const baseId = "server-name"
 
 /**
  * Possible values for server names (first is default value)
  * @type {string[]}
  * @private
  */
-const radioButtonValues = servers.map(server => server.id);
+const radioButtonValues = servers.map(server => server.id)
 
 /**
  * Server name cookie
  * @type {Cookie}
  */
-const cookie = new Cookie({ id: baseId, values: radioButtonValues });
+const cookie = new Cookie({ id: baseId, values: radioButtonValues })
 
 /**
  * Server name radio buttons
  * @type {RadioButton}
  */
-const radios = new RadioButton(baseId, radioButtonValues);
+const radios = new RadioButton(baseId, radioButtonValues)
 
 /**
  * Get server name from cookie or use default value
  * @returns {string} - server name
  */
 const getServerName = () => {
-    const r = cookie.get();
+    const r = cookie.get()
 
-    radios.set(r);
+    radios.set(r)
 
-    return r;
-};
+    return r
+}
 
-const getSearchParams = () => new URL(document.location).searchParams;
+const getSearchParams = () => new URL(document.location).searchParams
 
 /**
  * Change server name
  * @return {void}
  */
 const serverNameSelected = () => {
-    const serverId = radios.get();
-    cookie.set(serverId);
-    document.location.reload();
-};
+    const serverId = radios.get()
+    cookie.set(serverId)
+    document.location.reload()
+}
 
 /**
  * Setup listeners
  * @return {void}
  */
 const setupListener = () => {
-    document.getElementById(baseId).addEventListener("change", () => serverNameSelected());
+    document.getElementById(baseId).addEventListener("change", () => serverNameSelected())
 
     // {@link https://jsfiddle.net/bootstrapious/j6zkyog8/}
     $(".dropdown-menu [data-toggle='dropdown']").on("click", event => {
-        event.preventDefault();
-        event.stopPropagation();
+        event.preventDefault()
+        event.stopPropagation()
 
-        const element = $(event.currentTarget);
+        const element = $(event.currentTarget)
 
-        element.siblings().toggleClass("show");
+        element.siblings().toggleClass("show")
 
         if (!element.next().hasClass("show")) {
             element
                 .parents(".dropdown-menu")
                 .first()
                 .find(".show")
-                .removeClass("show");
+                .removeClass("show")
         }
 
         element.parents(".nav-item.dropdown.show").on("hidden.bs.dropdown", () => {
-            $(".dropdown-submenu .show").removeClass("show");
-        });
-    });
-};
+            $(".dropdown-submenu .show").removeClass("show")
+        })
+    })
+}
 
 /**
  * Load map and set resize event
@@ -112,17 +112,17 @@ const setupListener = () => {
  */
 const loadMap = async (serverId, searchParams) => {
     try {
-        const Map = await import(/*  webpackPreload: true, webpackChunkName: "map" */ "./map/map");
-        const map = new Map.Map(serverId, searchParams);
-        await map.MapInit();
+        const Map = await import(/*  webpackPreload: true, webpackChunkName: "map" */ "./map/map")
+        const map = new Map.Map(serverId, searchParams)
+        await map.MapInit()
 
         window.addEventListener("resize", () => {
-            map.resize();
-        });
+            map.resize()
+        })
     } catch (error) {
-        putImportError(error);
+        putImportError(error)
     }
-};
+}
 
 /**
  * Load game tools
@@ -132,40 +132,40 @@ const loadMap = async (serverId, searchParams) => {
  */
 const loadGameTools = async (serverId, searchParams) => {
     try {
-        const gameTools = await import(/* webpackChunkName: "game-tools" */ "./game-tools");
-        gameTools.init(serverId, searchParams);
+        const gameTools = await import(/* webpackChunkName: "game-tools" */ "./game-tools")
+        gameTools.init(serverId, searchParams)
     } catch (error) {
-        putImportError(error);
+        putImportError(error)
     }
-};
+}
 
 const load = async () => {
-    const serverId = getServerName();
-    const searchParams = getSearchParams();
+    const serverId = getServerName()
+    const searchParams = getSearchParams()
 
     // Remove search string from URL
     // {@link https://stackoverflow.com/a/5298684}
-    history.replaceState("", document.title, window.location.origin + window.location.pathname);
+    history.replaceState("", document.title, window.location.origin + window.location.pathname)
 
-    await loadMap(serverId, searchParams);
+    await loadMap(serverId, searchParams)
     if (searchParams.get("v")) {
-        loadGameTools(serverId, searchParams);
+        loadGameTools(serverId, searchParams)
     } else {
         document
             .getElementById("game-tools-dropdown")
-            .addEventListener("click", () => loadGameTools(serverId, searchParams), { once: true });
+            .addEventListener("click", () => loadGameTools(serverId, searchParams), { once: true })
     }
-};
+}
 
 /**
  * @returns {void}
  */
 function main() {
-    initAnalytics();
-    registerPage("Homepage");
+    initAnalytics()
+    registerPage("Homepage")
 
-    setupListener();
-    load();
+    setupListener()
+    load()
 }
 
-main();
+main()
