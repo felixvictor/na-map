@@ -116,7 +116,7 @@
         "tablesort": "^5.1.0",
         "tempusdominus-bootstrap-4": "^5.1.2",
         "tempusdominus-core": "^5.0.3",
-        "timelines-chart": "https://github.com/felixvictor/timelines-chart"
+        "timelines-chart": "^2.8.4"
     },
     "peerDependencies": {
         "jquery": "^3.4.1",
