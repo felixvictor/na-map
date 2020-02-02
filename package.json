@@ -8,9 +8,10 @@
     "scripts": {
         "build:data:convert": "build/convert-api-data.mjs",
         "build:data:twitter": "export $(cat .env | xargs) && build/update-twitter.mjs ${CONSUMER_KEY} ${CONSUMER_SECRET} ${ACCESS_TOKEN} ${ACCESS_TOKEN_SECRET}",
-        "build:deploy-main": " TARGET=na-map       run-s prod build:git-push deploy:netlify",
-        "build:deploy-test": " TARGET=na-map-test  run-s prod                deploy:netlify-test",
-        "build:deploy-test2": "TARGET=na-map-test2 run-s prod                deploy:netlify-test2",
+        "build:deploy-main": "       TARGET=na-map       run-s prod       build:git-push deploy:netlify",
+        "build:deploy-main-quiet": " TARGET=na-map       run-s prod-quiet build:git-push deploy:netlify",
+        "build:deploy-test": "       TARGET=na-map-test  run-s prod                      deploy:netlify-test",
+        "build:deploy-test2": "      TARGET=na-map-test2 run-s prod                      deploy:netlify-test2",
         "build:git-push": "git add --ignore-errors . && (git diff-index --quiet HEAD || git commit -m 'squash! update') && git push --quiet gitlab",
         "build:load": "build/load-api-data.mjs",
         "deploy:netlify": "export $(cat .env | xargs) && netlify deploy --prod --dir public --site ${KEY_NETLIFY}",
@@ -23,7 +24,7 @@
         "lint": "run-s lint:*",
         "lint:css": "stylelint --config .stylelintrc --syntax scss \"src/scss/*.scss\"",
         "lint:js": "eslint -c .eslintrc.json src/js",
-        "main:between": "                     run-s            'build:data:twitter partial-server' build:deploy-main",
+        "main:between": "                     run-s            'build:data:twitter partial-server' build:deploy-main-quiet",
         "main:development": "                 run-s build:load 'build:data:* full-client'          build:deploy-main",
         "main:maintenance": "yarn --silent && run-s build:load 'build:data:* full-server'          build:deploy-main",
         "pre-build:modules": "run-s pre-build:modules:**",
@@ -33,9 +34,10 @@
         "pre-build:modules:get": "cp -u /mnt/Modules.zip build/ && unzip -Iutf-8 -L -u build/Modules.zip -d build/",
         "pre-build:tiles": "cp /mnt/na-map.tif src/images/map.tif && rm -rf src/images/map/ && build/make-tiles.mjs src/images/map.tif && rm src/images/map.tif",
         "prettier": "prettier --tab-width 4 --print-width 120 --write .eslintrc.json package.json *.js src/js/*.json src/scss/*.scss",
-        "prod": "NODE_ENV=production webpack --mode=production --colors --config webpack.config.js",
-        "start": "NODE_ENV=development webpack-dev-server --open --mode=development --colors --config webpack.config.js",
-        "watch": "NODE_ENV=development webpack --mode=development --watch --colors --config webpack.config.js"
+        "prod": "webpack --env.production --mode=production --colors --config webpack.config.js",
+        "prod-quiet": "QUIET=true webpack --env.production --mode=production --config webpack.config.js",
+        "start": "webpack-dev-server --env.production=0 --open --mode=development --colors --config webpack.config.js",
+        "watch": "webpack --env.production=0 --mode=development --watch --colors --config webpack.config.js"
     },
     "browserslist": [
         ">= 1%",
