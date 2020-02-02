@@ -1,23 +1,23 @@
-import d3Node from "d3-node";
-const d3n = d3Node();
-const { d3 } = d3n;
+import d3Node from "d3-node"
+const d3n = d3Node()
+const { d3 } = d3n
 
-import { cleanName, readJson, saveJsonAsync, distancePoints, sortBy, nations, speedFactor } from "./common.mjs";
+import { cleanName, readJson, saveJsonAsync, distancePoints, sortBy, nations, speedFactor } from "./common.mjs"
 
-const date = "2019-04-24";
-const numPorts = 3;
-const inFilename = `build/API/api-eu1-Ports-${date}.json`;
-const outFilename = "port-distances.json";
+const date = "2019-04-24"
+const numPorts = 3
+const inFilename = `build/API/api-eu1-Ports-${date}.json`
+const outFilename = "port-distances.json"
 
-const outNations = ["NT"];
+const outNations = ["NT"]
 
-const ports = readJson(inFilename);
+const ports = readJson(inFilename)
 
-const findNationName = nationId => nations.find(nation => nation.id === nationId).name;
+const findNationName = nationId => nations.find(nation => nation.id === nationId).name
 
-const getName = port => (port.CountyCapitalName ? port.CountyCapitalName : port.Name);
+const getName = port => (port.CountyCapitalName ? port.CountyCapitalName : port.Name)
 
-const getKDistanceFromF11 = (Pt1, Pt2) => Math.round(distancePoints(Pt1, Pt2) / (2.63 * speedFactor));
+const getKDistanceFromF11 = (Pt1, Pt2) => Math.round(distancePoints(Pt1, Pt2) / (2.63 * speedFactor))
 
 // Group port coordinates by county
 // https://stackoverflow.com/questions/40774697/how-to-group-an-array-of-objects-by-key
@@ -27,14 +27,14 @@ const counties = ports.reduce(
             [getName(a)]: (r[getName(a)] || []).concat([[a.Position.x, a.Position.z]])
         }),
     {}
-);
+)
 // console.log(counties);
 const countyCentroids = new Map(
     Object.entries(counties).map(([key, value]) => {
-        const polygon = d3.polygonHull(value);
-        return [key, polygon ? d3.polygonCentroid(polygon) : value.flat()];
+        const polygon = d3.polygonHull(value)
+        return [key, polygon ? d3.polygonCentroid(polygon) : value.flat()]
     })
-);
+)
 // console.log(countyPolygons);
 
 const portDistancesNations = nations
@@ -76,7 +76,7 @@ const portDistancesNations = nations
                     .sort(sortBy(["distance"]))
                     .slice(0, numPorts)
             )
-    );
+    )
 
 const portDistancesFreeTowns = nations
     .filter(fromNation => !outNations.includes(fromNation.short) && fromNation.short !== "FT")
@@ -112,10 +112,10 @@ const portDistancesFreeTowns = nations
                     .sort(sortBy(["distance"]))
                     .slice(0, numPorts)
             )
-    );
+    )
 
 const portDistances = [...portDistancesNations, ...portDistancesFreeTowns].sort(
     sortBy(["fromNation", "fromPort", "distance"])
-);
+)
 
-saveJsonAsync(outFilename, portDistances);
+saveJsonAsync(outFilename, portDistances)
