@@ -2,42 +2,42 @@
  * webpack.config.js
  */
 
-const webpack = require("webpack");
+const webpack = require("webpack")
 
-const path = require("path");
-const sass = require("node-sass");
-const parseCss = require("css");
+const path = require("path")
+const sass = require("node-sass")
+const parseCss = require("css")
 // const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
-const { CleanWebpackPlugin } = require("clean-webpack-plugin");
-const CopyPlugin = require("copy-webpack-plugin");
-const HtmlPlugin = require("html-webpack-plugin");
-const ExtractCssChunks = require("extract-css-chunks-webpack-plugin");
-const SitemapPlugin = require("sitemap-webpack-plugin").default;
-const SriPlugin = require("webpack-subresource-integrity");
-const TerserPlugin = require("terser-webpack-plugin");
-const FaviconsPlugin = require("favicons-webpack-plugin");
-const { isProduction } = require("webpack-mode");
-const servers = require("./src/js/servers");
-const PACKAGE = require("./package.json");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin")
+const CopyPlugin = require("copy-webpack-plugin")
+const HtmlPlugin = require("html-webpack-plugin")
+const ExtractCssChunks = require("extract-css-chunks-webpack-plugin")
+const SitemapPlugin = require("sitemap-webpack-plugin").default
+const SriPlugin = require("webpack-subresource-integrity")
+const TerserPlugin = require("terser-webpack-plugin")
+const FaviconsPlugin = require("favicons-webpack-plugin")
+const { isProduction } = require("webpack-mode")
+const servers = require("./src/js/servers")
+const PACKAGE = require("./package.json")
 
-const repairs = require("./src/gen-generic/repairs.json");
-const libraryName = PACKAGE.name;
-const { TARGET } = process.env;
-const target = `https://${TARGET}.netlify.com/`;
+const repairs = require("./src/gen-generic/repairs.json")
+const libraryName = PACKAGE.name
+const { TARGET } = process.env
+const target = `https://${TARGET}.netlify.com/`
 
 const descriptionLong =
-    "Yet another map with in-game map, resources, ship and wood comparisons. Port battle data is updated constantly from twitter and all data daily after maintenance.";
-const sitemapPaths = ["/fonts/", "/icons", "/images"];
+    "Yet another map with in-game map, resources, ship and wood comparisons. Port battle data is updated constantly from twitter and all data daily after maintenance."
+const sitemapPaths = ["/fonts/", "/icons", "/images"]
 
-const dirFlags = path.resolve(__dirname, "src/images/flags");
-const dirFonts = path.resolve(__dirname, "src/fonts/");
-const dirIcons = path.resolve(__dirname, "src/icons");
-const dirOutput = path.resolve(__dirname, "public");
-const dirPrefixIcons = path.join("images", "icons");
+const dirFlags = path.resolve(__dirname, "src/images/flags")
+const dirFonts = path.resolve(__dirname, "src/fonts/")
+const dirIcons = path.resolve(__dirname, "src/icons")
+const dirOutput = path.resolve(__dirname, "public")
+const dirPrefixIcons = path.join("images", "icons")
 
-const fileLogo = path.resolve("src", "images", "icons", "logo.png");
-const filePostcssConfig = "build/postcss.config.js";
-const fileScssPreCompile = path.resolve("src", "scss", "pre-compile.scss");
+const fileLogo = path.resolve("src", "images", "icons", "logo.png")
+const filePostcssConfig = "build/postcss.config.js"
+const fileScssPreCompile = path.resolve("src", "scss", "pre-compile.scss")
 
 /** Set colours
  * @returns {Map} Colours
@@ -47,36 +47,36 @@ function setColours() {
         .renderSync({
             file: fileScssPreCompile
         })
-        .css.toString();
-    const parsedCss = parseCss.parse(css);
+        .css.toString()
+    const parsedCss = parseCss.parse(css)
     return new Map(
         parsedCss.stylesheet.rules
             .filter(rule => rule.selectors !== undefined && rule.selectors[0].startsWith(".colour-palette "))
             .map(rule => {
-                const d = rule.declarations.find(declaration => declaration.property === "background-color");
-                return [rule.selectors[0].replace(".colour-palette .", ""), d ? d.value : ""];
+                const d = rule.declarations.find(declaration => declaration.property === "background-color")
+                return [rule.selectors[0].replace(".colour-palette .", ""), d ? d.value : ""]
             })
-    );
+    )
 }
 
-const colours = setColours();
-const backgroundColour = colours.get("primary-500");
-const themeColour = colours.get("secondary-500");
-const primary700 = colours.get("primary-700");
-const primary200 = colours.get("primary-200");
-const primary300 = colours.get("primary-300");
-const colourGreen = colours.get("green");
-const colourGreenLight = colours.get("green-light");
-const colourGreenDark = colours.get("green-dark");
-const colourOrange = colours.get("orange");
-const colourRed = colours.get("red");
-const colourRedLight = colours.get("red-light");
-const colourRedDark = colours.get("red-dark");
-const colourWhite = colours.get("white");
+const colours = setColours()
+const backgroundColour = colours.get("primary-500")
+const themeColour = colours.get("secondary-500")
+const primary700 = colours.get("primary-700")
+const primary200 = colours.get("primary-200")
+const primary300 = colours.get("primary-300")
+const colourGreen = colours.get("green")
+const colourGreenLight = colours.get("green-light")
+const colourGreenDark = colours.get("green-dark")
+const colourOrange = colours.get("orange")
+const colourRed = colours.get("red")
+const colourRedLight = colours.get("red-light")
+const colourRedDark = colours.get("red-dark")
+const colourWhite = colours.get("white")
 
 const babelOpt = {
     cacheDirectory: true,
-    plugins: ["@babel/plugin-transform-spread"],
+    plugins: ["@babel/plugin-proposal-nullish-coalescing-operator", "@babel/plugin-transform-spread"],
     presets: [
         [
             "@babel/preset-env",
@@ -93,11 +93,11 @@ const babelOpt = {
             }
         ]
     ]
-};
+}
 
 const cssOpt = {
     sourceMap: true
-};
+}
 
 const htmlMinifyOpt = {
     collapseBooleanAttributes: true,
@@ -109,14 +109,14 @@ const htmlMinifyOpt = {
     removeComments: true,
     sortAttributes: true,
     sortClassName: true
-};
+}
 
 const postcssOpt = {
     config: {
         path: filePostcssConfig
     },
     sourceMap: true
-};
+}
 
 const sassOpt = {
     sourceMap: !isProduction,
@@ -126,7 +126,7 @@ const sassOpt = {
         sourceMap: !isProduction,
         sourceMapContents: !isProduction
     }
-};
+}
 
 const svgoOpt = {
     plugins: [
@@ -175,7 +175,7 @@ const svgoOpt = {
         { removeStyleElement: false },
         { removeScriptElement: false }
     ]
-};
+}
 
 const htmlOpt = {
     iconSmall: `${dirPrefixIcons}/android-chrome-48x48.png`,
@@ -191,7 +191,7 @@ const htmlOpt = {
     servers: servers.servers,
     template: "index.template.ejs",
     title: PACKAGE.description
-};
+}
 
 const faviconsOpt = {
     logo: fileLogo,
@@ -220,7 +220,7 @@ const faviconsOpt = {
         theme_color: themeColour,
         version: PACKAGE.version
     }
-};
+}
 
 const config = {
     context: path.resolve(__dirname, "src"),
@@ -467,7 +467,7 @@ const config = {
             }
         ]
     }
-};
+}
 
 module.exports = () => {
     if (isProduction) {
@@ -479,11 +479,11 @@ module.exports = () => {
                     output: { comments: false }
                 }
             })
-        ];
+        ]
     } else {
-        config.devtool = "eval-source-map";
-        config.plugins.push(new webpack.HotModuleReplacementPlugin());
+        config.devtool = "eval-source-map"
+        config.plugins.push(new webpack.HotModuleReplacementPlugin())
     }
 
-    return config;
-};
+    return config
+}
