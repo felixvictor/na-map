@@ -4,29 +4,29 @@
  * @file      Compare ships.
  * @module    game-tools/compare-ships
  * @author    iB aka Felix Victor
- * @copyright 2018, 2019
+ * @copyright 2018, 2019, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import "bootstrap/js/dist/util";
-import "bootstrap/js/dist/modal";
-import "bootstrap/js/dist/tooltip";
+import "bootstrap/js/dist/util"
+import "bootstrap/js/dist/modal"
+import "bootstrap/js/dist/tooltip"
 
-import { ascending as d3Ascending, max as d3Max, min as d3Min } from "d3-array";
-import { nest as d3Nest } from "d3-collection";
-import { drag as d3Drag } from "d3-drag";
-import { interpolateCubehelixLong as d3InterpolateCubehelixLong } from "d3-interpolate";
+import { ascending as d3Ascending, max as d3Max, min as d3Min } from "d3-array"
+import { nest as d3Nest } from "d3-collection"
+import { drag as d3Drag } from "d3-drag"
+import { interpolateCubehelixLong as d3InterpolateCubehelixLong } from "d3-interpolate"
 
-import { scaleLinear as d3ScaleLinear } from "d3-scale";
-import { event as d3Event, select as d3Select } from "d3-selection";
+import { scaleLinear as d3ScaleLinear } from "d3-scale"
+import { event as d3Event, select as d3Select } from "d3-selection"
 import {
     arc as d3Arc,
     curveCatmullRomClosed as d3CurveCatmullRomClosed,
     pie as d3Pie,
     radialLine as d3RadialLine
-} from "d3-shape";
+} from "d3-shape"
 
-import { registerEvent } from "../analytics";
+import { registerEvent } from "../analytics"
 import {
     appVersion,
     colourGreenDark,
@@ -41,7 +41,7 @@ import {
     rumRepairsVolume,
     repairTime,
     insertBaseModal
-} from "../common";
+} from "../common"
 import {
     // colourRamp,
     copyToClipboard,
@@ -61,17 +61,17 @@ import {
     roundToThousands,
     sortBy,
     degreesToCompass
-} from "../util";
+} from "../util"
 
-import CompareWoods from "./compare-woods";
+import CompareWoods from "./compare-woods"
 
-import { default as shipIcon } from "Icons/icon-ship.svg";
+import { default as shipIcon } from "Icons/icon-ship.svg"
 
-const numberSegments = 24;
-const segmentRadians = (2 * Math.PI) / numberSegments;
+const numberSegments = 24
+const segmentRadians = (2 * Math.PI) / numberSegments
 
-const rumRepairsFactor = rumRepairsPercent / rumRepairsVolume;
-const repairsSetSize = 5;
+const rumRepairsFactor = rumRepairsPercent / rumRepairsVolume
+const repairsSetSize = 5
 
 /**
  * Ship
@@ -79,20 +79,21 @@ const repairsSetSize = 5;
 class Ship {
     /**
      * @param {string} id - column id
-     * @param {Class} shipCompare - Class instance of the ship to be compared to
+     * @param {CompareShips} shipCompare - Class instance of the ship to be compared to
      */
     constructor(id, shipCompare) {
-        this._id = id;
-        this._shipCompare = shipCompare;
+        this._id = id
+        this._shipCompare = shipCompare
 
         // Speed ticks
-        this._ticksSpeed = [12, 8, 4, 0];
-        this._ticksSpeedLabels = ["12 knots", "8 knots", "4 knots", "0 knots"];
+        // noinspection MagicNumberJS
+        this._ticksSpeed = [12, 8, 4, 0]
+        this._ticksSpeedLabels = ["12 knots", "8 knots", "4 knots", "0 knots"]
 
-        this._select = `#ship-compare-${this._id}`;
+        this._select = `#ship-compare-${this._id}`
 
-        this._setupSvg();
-        this._setCompass();
+        this._setupSvg()
+        this._setCompass()
     }
 
     /**
@@ -100,22 +101,22 @@ class Ship {
      * @returns {void}
      */
     _setupSvg() {
-        const element = d3Select(this.select);
+        const element = d3Select(this.select)
 
-        d3Select(`${this.select} svg`).remove();
+        d3Select(`${this.select} svg`).remove()
 
         this._svg = element
             .append("svg")
             .attr("width", this._shipCompare.svgWidth)
             .attr("height", this._shipCompare.svgHeight)
             .attr("data-ui-component", "sailing-profile")
-            .attr("fill", "none");
+            .attr("fill", "none")
         this.mainG = this._svg
             .append("g")
-            .attr("transform", `translate(${this._shipCompare.svgWidth / 2},${this._shipCompare.svgHeight / 2})`);
-        d3Select(`${this.select} div`).remove();
+            .attr("transform", `translate(${this._shipCompare.svgWidth / 2},${this._shipCompare.svgHeight / 2})`)
+        d3Select(`${this.select} div`).remove()
 
-        element.append("div").attr("class", "block-small");
+        element.append("div").attr("class", "block-small")
     }
 
     /**
@@ -124,15 +125,15 @@ class Ship {
      */
     _setCompass() {
         // Compass
-        const data = new Array(numberSegments / 2);
-        data.fill(1, 0);
+        const data = new Array(numberSegments / 2)
+        data.fill(1, 0)
         const pie = d3Pie()
             .sort(null)
-            .value(1)(data);
+            .value(1)(data)
 
         const arc = d3Arc()
             .outerRadius(this._shipCompare.radiusSpeedScale(12))
-            .innerRadius(this._shipCompare.innerRadius);
+            .innerRadius(this._shipCompare.innerRadius)
 
         // Add compass arcs
         this.mainG
@@ -140,7 +141,7 @@ class Ship {
             .attr("class", "compass-arc")
             .selectAll("path")
             .data(pie)
-            .join(enter => enter.append("path").attr("d", arc));
+            .join(enter => enter.append("path").attr("d", arc))
 
         // Add the circles for each speed tick
         this.mainG
@@ -148,7 +149,7 @@ class Ship {
             .attr("class", "speed-circle")
             .selectAll("circle")
             .data(this._ticksSpeed)
-            .join(enter => enter.append("circle").attr("r", d => this._shipCompare.radiusSpeedScale(d)));
+            .join(enter => enter.append("circle").attr("r", d => this._shipCompare.radiusSpeedScale(d)))
     }
 
     /**
@@ -157,15 +158,15 @@ class Ship {
      * @return {void}
      */
     static pd(limit) {
-        let s = `<span class="badge badge-white">${limit[0]}\u202F/\u202F`;
+        let s = `<span class="badge badge-white">${limit[0]}\u202F/\u202F`
         if (limit[1]) {
-            s += `${limit[1]}`;
+            s += `${limit[1]}`
         } else {
-            s += "\u2013";
+            s += "\u2013"
         }
 
-        s += "\u202Flb</span>";
-        return s;
+        s += "\u202Flb</span>"
+        return s
     }
 
     /**
@@ -175,17 +176,17 @@ class Ship {
      * @returns {string[]} Formatted string [0] limits and [1] possibly empty lines at the bottom
      */
     static getCannonsPerDeck(deckClassLimit, gunsPerDeck) {
-        let s = `${gunsPerDeck[0]}\u00A0${Ship.pd(deckClassLimit[0])}`;
-        let br = "";
+        let s = `${gunsPerDeck[0]}\u00A0${Ship.pd(deckClassLimit[0])}`
+        let br = ""
         for (let i = 1; i < 4; i += 1) {
             if (gunsPerDeck[i]) {
-                s = `${gunsPerDeck[i]}\u00A0${Ship.pd(deckClassLimit[i])}\u202F<br>${s}`;
+                s = `${gunsPerDeck[i]}\u00A0${Ship.pd(deckClassLimit[i])}\u202F<br>${s}`
             } else {
-                br = `${br}<br>`;
+                br = `${br}<br>`
             }
         }
 
-        return [s, br];
+        return [s, br]
     }
 
     /**
@@ -193,24 +194,25 @@ class Ship {
      * @return {string} HTML formatted block head
      */
     static displaySecondBlock() {
-        return '<div class="col-9"><div class="row no-gutters">';
+        return '<div class="col-9"><div class="row no-gutters">'
     }
 
+    // noinspection FunctionTooLongJS
     /**
      * Get HTML formatted data for a single ship
      * @param {Object} ship - Ship data
      * @return {string} HTML formatted column
      */
     static getText(ship) {
-        let row = 0;
+        let row = 0
         /**
          * HTML format the first column
          * @param {string} element - Ship element
          * @return {string} HTML formatted column
          */
         function displayFirstColumn(element) {
-            row += 1;
-            return `<div class="row row-small ${row % 2 ? "row-light" : ""}"><div class="col-3">${element}</div>`;
+            row += 1
+            return `<div class="row row-small ${row % 2 ? "row-light" : ""}"><div class="col-3">${element}</div>`
         }
 
         /**
@@ -221,123 +223,123 @@ class Ship {
          * @return {string} HTML formatted column
          */
         function displayColumn(element, description, col = 6) {
-            let elementText = "";
-            let br = "";
+            let elementText = ""
+            let br = ""
 
             if (element === "cannonsPerDeck") {
-                [elementText, br] = ship[element];
-                br = `<br>${br}`;
+                [elementText, br] = ship[element]
+                br = `<br>${br}`
             } else {
-                elementText = element === "" ? "" : ship[element];
+                elementText = element === "" ? "" : ship[element]
             }
 
-            return `<div class="col-${col}">${elementText}<br><span class="des">${description}</span>${br}</div>`;
+            return `<div class="col-${col}">${elementText}<br><span class="des">${description}</span>${br}</div>`
         }
 
-        let text = "";
+        let text = ""
 
-        text += displayFirstColumn(ship.shipRating);
-        text += Ship.displaySecondBlock();
-        text += displayColumn("battleRating", "Battle rating");
-        text += displayColumn("guns", "Cannons");
-        text += displayColumn("upgradeXP", "Knowledge XP");
-        text += displayColumn("waterlineHeight", "Water line");
-        text += "</div></div></div>";
+        text += displayFirstColumn(ship.shipRating)
+        text += Ship.displaySecondBlock()
+        text += displayColumn("battleRating", "Battle rating")
+        text += displayColumn("guns", "Cannons")
+        text += displayColumn("upgradeXP", "Knowledge XP")
+        text += displayColumn("waterlineHeight", "Water line")
+        text += "</div></div></div>"
 
-        text += displayFirstColumn(ship.decks);
-        text += Ship.displaySecondBlock();
-        text += displayColumn("cannonsPerDeck", "Gun decks");
-        text += displayColumn("firezoneHorizontalWidth", "Firezone horizontal width");
-        text += "</div></div></div>";
+        text += displayFirstColumn(ship.decks)
+        text += Ship.displaySecondBlock()
+        text += displayColumn("cannonsPerDeck", "Gun decks")
+        text += displayColumn("firezoneHorizontalWidth", "Firezone horizontal width")
+        text += "</div></div></div>"
 
-        text += displayFirstColumn("Broadside (lb)");
-        text += Ship.displaySecondBlock();
-        text += displayColumn("cannonBroadside", "Cannons");
-        text += displayColumn("carroBroadside", "Carronades");
-        text += "</div></div></div>";
+        text += displayFirstColumn("Broadside (lb)")
+        text += Ship.displaySecondBlock()
+        text += displayColumn("cannonBroadside", "Cannons")
+        text += displayColumn("carroBroadside", "Carronades")
+        text += "</div></div></div>"
 
-        text += displayFirstColumn("Chasers");
-        text += Ship.displaySecondBlock();
-        text += displayColumn("gunsFront", "Bow");
-        text += displayColumn("gunsBack", "Stern");
-        text += "</div></div></div>";
+        text += displayFirstColumn("Chasers")
+        text += Ship.displaySecondBlock()
+        text += displayColumn("gunsFront", "Bow")
+        text += displayColumn("gunsBack", "Stern")
+        text += "</div></div></div>"
 
-        text += displayFirstColumn("Speed");
-        text += Ship.displaySecondBlock();
-        text += displayColumn("maxSpeed", "Maximum");
-        text += displayColumn("", "");
-        text += displayColumn("acceleration", "Acceleration");
-        text += displayColumn("deceleration", "Deceleration");
-        text += displayColumn("maxTurningSpeed", "Turn speed");
-        text += displayColumn("halfturnTime", "Rudder half time");
-        text += "</div></div></div>";
+        text += displayFirstColumn("Speed")
+        text += Ship.displaySecondBlock()
+        text += displayColumn("maxSpeed", "Maximum")
+        text += displayColumn("", "")
+        text += displayColumn("acceleration", "Acceleration")
+        text += displayColumn("deceleration", "Deceleration")
+        text += displayColumn("maxTurningSpeed", "Turn speed")
+        text += displayColumn("halfturnTime", "Rudder half time")
+        text += "</div></div></div>"
 
-        text += displayFirstColumn('Hit points <span class="badge badge-white">Thickness</span>');
-        text += Ship.displaySecondBlock();
-        text += displayColumn("sideArmor", "Sides");
-        text += displayColumn("structure", "Hull");
-        text += displayColumn("frontArmor", "Bow");
-        text += displayColumn("backArmor", "Stern");
-        text += displayColumn("pump", "Pump");
-        text += displayColumn("rudder", "Rudder");
-        text += "</div></div></div>";
+        text += displayFirstColumn('Hit points <span class="badge badge-white">Thickness</span>')
+        text += Ship.displaySecondBlock()
+        text += displayColumn("sideArmor", "Sides")
+        text += displayColumn("structure", "Hull")
+        text += displayColumn("frontArmor", "Bow")
+        text += displayColumn("backArmor", "Stern")
+        text += displayColumn("pump", "Pump")
+        text += displayColumn("rudder", "Rudder")
+        text += "</div></div></div>"
 
-        text += displayFirstColumn('Masts <span class="badge badge-white">Thickness</span>');
-        text += Ship.displaySecondBlock();
-        text += displayColumn("sails", "Sails");
-        text += displayColumn("mastBottomArmor", "Bottom");
-        text += displayColumn("mastMiddleArmor", "Middle");
-        text += displayColumn("mastTopArmor", "Top");
-        text += "</div></div></div>";
+        text += displayFirstColumn('Masts <span class="badge badge-white">Thickness</span>')
+        text += Ship.displaySecondBlock()
+        text += displayColumn("sails", "Sails")
+        text += displayColumn("mastBottomArmor", "Bottom")
+        text += displayColumn("mastMiddleArmor", "Middle")
+        text += displayColumn("mastTopArmor", "Top")
+        text += "</div></div></div>"
 
-        text += displayFirstColumn("Crew");
-        text += Ship.displaySecondBlock();
-        text += displayColumn("minCrew", "Minimum", 4);
-        text += displayColumn("sailingCrew", "Sailing", 4);
-        text += displayColumn("maxCrew", "Maximum", 4);
-        text += "</div></div></div>";
+        text += displayFirstColumn("Crew")
+        text += Ship.displaySecondBlock()
+        text += displayColumn("minCrew", "Minimum", 4)
+        text += displayColumn("sailingCrew", "Sailing", 4)
+        text += displayColumn("maxCrew", "Maximum", 4)
+        text += "</div></div></div>"
 
-        text += displayFirstColumn("Resistance");
-        text += Ship.displaySecondBlock();
-        text += displayColumn("fireResistance", "Fire", 4);
-        text += displayColumn("leakResistance", "Leak", 4);
-        text += displayColumn("splinterResistance", "Splinter", 4);
-        text += "</div></div></div>";
+        text += displayFirstColumn("Resistance")
+        text += Ship.displaySecondBlock()
+        text += displayColumn("fireResistance", "Fire", 4)
+        text += displayColumn("leakResistance", "Leak", 4)
+        text += displayColumn("splinterResistance", "Splinter", 4)
+        text += "</div></div></div>"
 
-        text += displayFirstColumn('Repairs needed <span class="badge badge-white">Set of 5</span>');
-        text += Ship.displaySecondBlock();
-        text += displayColumn("hullRepairsNeeded", "Hull", 4);
-        text += displayColumn("rigRepairsNeeded", "Rig", 4);
-        text += displayColumn("rumRepairsNeeded", "Rum", 4);
-        text += "</div></div></div>";
+        text += displayFirstColumn('Repairs needed <span class="badge badge-white">Set of 5</span>')
+        text += Ship.displaySecondBlock()
+        text += displayColumn("hullRepairsNeeded", "Hull", 4)
+        text += displayColumn("rigRepairsNeeded", "Rig", 4)
+        text += displayColumn("rumRepairsNeeded", "Rum", 4)
+        text += "</div></div></div>"
 
-        text += displayFirstColumn("Repair");
-        text += Ship.displaySecondBlock();
-        text += displayColumn("hullRepairAmount", "Hull %", 4);
-        text += displayColumn("rigRepairAmount", "Rig %", 4);
-        text += displayColumn("repairTime", "Time (sec)", 4);
-        text += "</div></div></div>";
+        text += displayFirstColumn("Repair")
+        text += Ship.displaySecondBlock()
+        text += displayColumn("hullRepairAmount", "Hull %", 4)
+        text += displayColumn("rigRepairAmount", "Rig %", 4)
+        text += displayColumn("repairTime", "Time (sec)", 4)
+        text += "</div></div></div>"
 
-        text += displayFirstColumn("Hold");
-        text += Ship.displaySecondBlock();
-        text += displayColumn("maxWeight", "Tons");
-        text += displayColumn("holdSize", "Cargo slots");
-        text += "</div></div></div>";
+        text += displayFirstColumn("Hold")
+        text += Ship.displaySecondBlock()
+        text += displayColumn("maxWeight", "Tons")
+        text += displayColumn("holdSize", "Cargo slots")
+        text += "</div></div></div>"
 
-        text += "</div>";
-        return text;
+        text += "</div>"
+        return text
     }
 
     get id() {
-        return this._id;
+        return this._id
     }
 
     get shipData() {
-        return this._shipData;
+        return this._shipData
     }
 
     get select() {
-        return this._select;
+        return this._select
     }
 }
 
@@ -352,16 +354,16 @@ class ShipBase extends Ship {
      * @param {Class} shipCompare - Class instance of the ship to be compared to
      */
     constructor(id, shipData, shipCompare) {
-        super(id, shipCompare);
+        super(id, shipCompare)
 
-        this._shipData = shipData;
-        this._shipCompare = shipCompare;
+        this._shipData = shipData
+        this._shipCompare = shipCompare
 
-        this._setBackground();
-        this._setupDrag();
-        this._drawWindProfile();
-        this._setupShipOutline();
-        this._printText();
+        this._setBackground()
+        this._setupDrag()
+        this._drawWindProfile()
+        this._setupShipOutline()
+        this._printText()
     }
 
     /**
@@ -374,7 +376,7 @@ class ShipBase extends Ship {
             .outerRadius(d => this._shipCompare.radiusSpeedScale(d) + 2)
             .innerRadius(d => this._shipCompare.radiusSpeedScale(d) + 1)
             .startAngle(-Math.PI / 2)
-            .endAngle(Math.PI / 2);
+            .endAngle(Math.PI / 2)
 
         // Add the paths for the text
         this.mainG
@@ -388,7 +390,7 @@ class ShipBase extends Ship {
                     .append("path")
                     .attr("d", speedArc)
                     .attr("id", (d, i) => `tick${i}`)
-            );
+            )
 
         // And add the text
         this.mainG
@@ -404,96 +406,94 @@ class ShipBase extends Ship {
                     .attr("href", (d, i) => `#tick${i}`)
                     .text((d, i) => this._ticksSpeedLabels[i])
                     .attr("startOffset", "10%")
-            );
+            )
     }
 
     _getHeadingInDegrees(rotate, degrees) {
-        let heading = rotate - degrees - 180;
+        let heading = rotate - degrees - 180
         if (heading < 0) {
-            heading += 360;
+            heading += 360
         }
 
-        return heading;
+        return heading
     }
 
     _getSpeed(rotate) {
-        return formatFloat(this._speedScale(Math.abs(rotate)));
+        return formatFloat(this._speedScale(Math.abs(rotate)))
     }
 
     _getHeadingInCompass(rotate) {
-        return degreesToCompass(rotate);
+        return degreesToCompass(rotate)
     }
 
     _updateCompareWindProfiles() {
-        this._shipCompare._columnsCompare.forEach(otherCompareId => {
+        for (const otherCompareId of this._shipCompare._columnsCompare) {
             if (!isEmpty(this._shipCompare._selectedShips[otherCompareId])) {
-                this._shipCompare._selectedShips[otherCompareId].updateWindProfileRotation();
+                this._shipCompare._selectedShips[otherCompareId].updateWindProfileRotation()
             }
-        });
+        }
     }
 
     _setupDrag() {
-        const steps = this._shipData.speedDegrees.length;
-        const degreesPerStep = 360 / steps;
-        const domain = new Array(steps + 1).fill().map((e, i) => i * degreesPerStep);
+        const steps = this._shipData.speedDegrees.length
+        const degreesPerStep = 360 / steps
+        const domain = new Array(steps + 1).fill().map((e, i) => i * degreesPerStep)
         this._speedScale = d3ScaleLinear()
             .domain(domain)
             .range([...this._shipData.speedDegrees, this._shipData.speedDegrees[0]])
-            .clamp(true);
+            .clamp(true)
 
-        // eslint-disable-next-line unicorn/consistent-function-scoping
         const dragStart = d => {
-            d.this.classed("drag-active", true);
-        };
+            d.this.classed("drag-active", true)
+        }
 
-        // eslint-disable-next-line unicorn/consistent-function-scoping
         const dragged = d => {
             const update = () => {
-                d.this.attr("transform", d => `rotate(${d.rotate})`);
+                d.this.attr("transform", d => `rotate(${d.rotate})`)
                 d.compassText
                     .attr("transform", d => `rotate(${-d.rotate},${d.compassTextX},${d.compassTextY})`)
-                    .text(d => this._getHeadingInCompass(d.rotate));
+                    .text(d => this._getHeadingInCompass(d.rotate))
                 if (d.type === "ship") {
-                    this._shipRotate = d.rotate;
+                    this._shipRotate = d.rotate
                 } else if (d.type === "windProfile") {
-                    this._shipCompare.windProfileRotate = d.rotate;
+                    this._shipCompare.windProfileRotate = d.rotate
                 }
 
                 this._speedText
                     .attr("transform", `rotate(${-this._shipRotate})`)
-                    .text(this._getSpeed(this._shipCompare.windProfileRotate - this._shipRotate));
-            };
+                    .text(this._getSpeed(this._shipCompare.windProfileRotate - this._shipRotate))
+            }
 
-            const { x: xMouse, y: yMouse } = d3Event;
+            const { x: xMouse, y: yMouse } = d3Event
             d.rotate = this._getHeadingInDegrees(
                 rotationAngleInDegrees({ x: d.initX, y: d.initY }, { x: xMouse, y: yMouse }),
                 d.correctionValueDegrees
-            );
-            update();
+            )
+            update()
             if (d.type === "windProfile") {
-                this._updateCompareWindProfiles();
+                this._updateCompareWindProfiles()
             }
-        };
+        }
 
-        // eslint-disable-next-line unicorn/consistent-function-scoping
         const dragEnd = d => {
-            d.this.classed("drag-active", false);
-        };
+            d.this.classed("drag-active", false)
+        }
 
         this._drag = d3Drag()
             .on("start", dragStart)
             .on("drag", dragged)
             .on("end", dragEnd)
-            .container(() => this.mainG.node());
+            .container(() => this.mainG.node())
     }
 
     _setupShipOutline() {
-        this._shipRotate = 0;
-        const { shipMass } = this._shipData;
-        const heightShip = this._shipCompare.shipMassScale(shipMass);
-        const widthShip = heightShip;
-        const circleSize = 20;
-        const svgHeight = this._shipCompare.svgHeight / 2 - 2 * circleSize;
+        this._shipRotate = 0
+        const { shipMass } = this._shipData
+        const heightShip = this._shipCompare.shipMassScale(shipMass)
+        // noinspection JSSuspiciousNameCombination
+        const widthShip = heightShip
+        const circleSize = 20
+        const svgHeight = this._shipCompare.svgHeight / 2 - 2 * circleSize
 
         const datum = {
             initX: 0,
@@ -505,19 +505,19 @@ class ShipBase extends Ship {
             speedTextX: 0,
             speedTextY: 0,
             type: "ship"
-        };
+        }
 
         const gShip = this.mainG
             .append("g")
             .datum(datum)
-            .attr("class", "ship-outline");
+            .attr("class", "ship-outline")
 
         gShip
             .append("line")
             .attr("x1", d => d.initX)
             .attr("y1", svgHeight - circleSize)
             .attr("x2", d => d.initX)
-            .attr("y2", d => d.initY);
+            .attr("y2", d => d.initY)
 
         gShip
             .append("image")
@@ -525,32 +525,32 @@ class ShipBase extends Ship {
             .attr("width", widthShip)
             .attr("x", -heightShip / 2)
             .attr("y", -widthShip / 2)
-            .attr("xlink:href", shipIcon);
+            .attr("xlink:href", shipIcon)
 
         gShip
             .append("circle")
             .attr("cx", d => d.compassTextX)
             .attr("cy", d => d.compassTextY)
             .attr("r", circleSize)
-            .call(this._drag);
+            .call(this._drag)
 
         const compassText = gShip
             .append("text")
             .attr("x", d => d.compassTextX)
             .attr("y", d => d.compassTextY)
             .attr("transform", d => `rotate(${-d.initRotate},${d.compassTextX},${d.compassTextY})`)
-            .text(d => this._getHeadingInCompass(d.initRotate));
+            .text(d => this._getHeadingInCompass(d.initRotate))
 
         this._speedText = gShip
             .append("text")
             .attr("x", d => d.speedTextX)
             .attr("y", d => d.speedTextY)
             .attr("transform", d => `rotate(${-d.initRotate})`)
-            .text(d => this._getSpeed(d.initRotate));
+            .text(d => this._getSpeed(d.initRotate))
 
-        datum.this = gShip;
-        datum.compassText = compassText;
-        gShip.datum(datum).attr("transform", d => `rotate(${d.initRotate})`);
+        datum.this = gShip
+        datum.compassText = compassText
+        gShip.datum(datum).attr("transform", d => `rotate(${d.initRotate})`)
     }
 
     /**
@@ -560,20 +560,20 @@ class ShipBase extends Ship {
     _drawWindProfile() {
         const pie = d3Pie()
             .sort(null)
-            .value(1);
+            .value(1)
 
-        const arcsBase = pie(this._shipData.speedDegrees);
+        const arcsBase = pie(this._shipData.speedDegrees)
 
-        const curve = d3CurveCatmullRomClosed;
+        const curve = d3CurveCatmullRomClosed
         const line = d3RadialLine()
             .angle((d, i) => i * segmentRadians)
             .radius(d => this._shipCompare.radiusSpeedScale(d.data))
-            .curve(curve);
+            .curve(curve)
 
         // Profile shape
-        this._shipCompare.windProfileRotate = 0;
-        const circleSize = 20;
-        const svgHeight = this._shipCompare.svgHeight / 2 - circleSize;
+        this._shipCompare.windProfileRotate = 0
+        const circleSize = 20
+        const svgHeight = this._shipCompare.svgHeight / 2 - circleSize
         const datum = {
             initX: 0,
             initY: 0,
@@ -582,12 +582,12 @@ class ShipBase extends Ship {
             compassTextX: 0,
             compassTextY: -svgHeight,
             type: "windProfile"
-        };
+        }
 
         const gWindProfile = this.mainG
             .append("g")
             .datum(datum)
-            .attr("class", "wind-profile");
+            .attr("class", "wind-profile")
 
         // Add big wind arrow
         gWindProfile
@@ -601,25 +601,25 @@ class ShipBase extends Ship {
 
             .attr("class", "wind-profile-arrow")
             .attr("marker-end", "url(#wind-profile-arrow-head)")
-            .call(this._drag);
+            .call(this._drag)
 
         gWindProfile
             .append("circle")
             .attr("cx", d => d.compassTextX)
             .attr("cy", d => d.compassTextY)
-            .attr("r", circleSize);
+            .attr("r", circleSize)
 
         const compassText = gWindProfile
             .append("text")
             .attr("x", d => d.compassTextX)
             .attr("y", d => d.compassTextY)
             .attr("transform", d => `rotate(${-d.initRotate},${d.compassTextX},${d.compassTextY})`)
-            .text(d => this._getHeadingInCompass(d.initRotate));
+            .text(d => this._getHeadingInCompass(d.initRotate))
 
         gWindProfile
             .append("path")
             .attr("class", "base-profile")
-            .attr("d", line(arcsBase));
+            .attr("d", line(arcsBase))
 
         // Speed marker
         gWindProfile
@@ -638,11 +638,11 @@ class ShipBase extends Ship {
                     .attr("fill", d => this._shipCompare.colorScale(d.data))
                     .append("title")
                     .text(d => `${Math.round(d.data * 10) / 10} knots`)
-            );
+            )
 
-        datum.this = gWindProfile;
-        datum.compassText = compassText;
-        gWindProfile.datum(datum).attr("transform", d => `rotate(${d.initRotate})`);
+        datum.this = gWindProfile
+        datum.compassText = compassText
+        gWindProfile.datum(datum).attr("transform", d => `rotate(${d.initRotate})`)
 
         // colourRamp(d3Select(this._select), this.shipCompareData.colorScale, this._shipData.speedDegrees.length);
     }
@@ -652,14 +652,14 @@ class ShipBase extends Ship {
      * @returns {void}
      */
     _printText() {
-        const cannonsPerDeck = Ship.getCannonsPerDeck(this._shipData.deckClassLimit, this._shipData.gunsPerDeck);
+        const cannonsPerDeck = Ship.getCannonsPerDeck(this._shipData.deckClassLimit, this._shipData.gunsPerDeck)
         const hullRepairsNeeded = Math.round(
             (this._shipData.sides.armour * this._shipData.repairAmount.armour) / hullRepairsVolume
-        );
+        )
         const rigRepairsNeeded = Math.round(
             (this._shipData.sails.armour * this._shipData.repairAmount.sails) / rigRepairsVolume
-        );
-        const rumRepairsNeeded = Math.round(this._shipData.crew.max * rumRepairsFactor);
+        )
+        const rumRepairsNeeded = Math.round(this._shipData.crew.max * rumRepairsFactor)
 
         const ship = {
             shipRating: `${getOrdinal(this._shipData.class)} rate`,
@@ -698,7 +698,7 @@ class ShipBase extends Ship {
             )}\u00A0<span class="badge badge-white">${formatIntTrunc(this._shipData.rudder.thickness)}</span>`,
             minCrew: formatIntTrunc(this._shipData.crew.min),
             maxCrew: formatIntTrunc(this._shipData.crew.max),
-            sailingCrew: formatIntTrunc(this._shipData.crew.sailing || 0),
+            sailingCrew: formatIntTrunc(this._shipData.crew.sailing ?? 0),
             maxWeight: formatIntTrunc(this._shipData.maxWeight),
             holdSize: formatIntTrunc(this._shipData.holdSize),
             upgradeXP: formatIntTrunc(this._shipData.upgradeXP),
@@ -732,23 +732,23 @@ class ShipBase extends Ship {
             mastTopArmor: `${formatIntTrunc(
                 this._shipData.mast.topArmour
             )}\u00A0<span class="badge badge-white">${formatIntTrunc(this._shipData.mast.topThickness)}</span>`
-        };
+        }
 
         if (ship.gunsFront) {
-            ship.gunsFront += `\u00A0${Ship.pd(ship.limitFront)}`;
+            ship.gunsFront += `\u00A0${Ship.pd(ship.limitFront)}`
         } else {
-            ship.gunsFront = "\u2013";
+            ship.gunsFront = "\u2013"
         }
 
         if (ship.gunsBack) {
-            ship.gunsBack += `\u00A0${Ship.pd(ship.limitBack)}`;
+            ship.gunsBack += `\u00A0${Ship.pd(ship.limitBack)}`
         } else {
-            ship.gunsBack = "\u2013";
+            ship.gunsBack = "\u2013"
         }
 
         $(`${this.select}`)
             .find("div")
-            .append(Ship.getText(ship));
+            .append(Ship.getText(ship))
     }
 }
 
@@ -758,110 +758,107 @@ class ShipBase extends Ship {
  */
 class ShipComparison extends Ship {
     /**
-     * @param {number} compareId - Ship id
+     * @param {string} compareId - Compare id
      * @param {Object} shipBaseData - Base ship data
      * @param {Object} shipCompareData - Ship data of the ship to be compared to
-     * @param {Class} shipCompare - Class instance of the ship to be compared to
+     * @param {CompareShips} shipCompare - Class instance of the ship to be compared to
      */
     constructor(compareId, shipBaseData, shipCompareData, shipCompare) {
-        super(compareId, shipCompare);
+        super(compareId, shipCompare)
 
-        this._shipBaseData = shipBaseData;
-        this._shipCompareData = shipCompareData;
-        this._shipCompare = shipCompare;
+        this._shipBaseData = shipBaseData
+        this._shipCompareData = shipCompareData
+        this._shipCompare = shipCompare
 
-        this._setupDrag();
-        this._drawDifferenceProfile();
-        this._setupShipOutline();
-        this._injectTextComparison();
+        this._setupDrag()
+        this._drawDifferenceProfile()
+        this._setupShipOutline()
+        this._injectTextComparison()
     }
 
     _setColourScale(minSpeedDiff, maxSpeedDiff) {
         // Compare with current min/max domain values
-        const min = Math.min(minSpeedDiff, this._shipCompare.colourScaleSpeedDiff.domain()[0]);
+        const min = Math.min(minSpeedDiff, this._shipCompare.colourScaleSpeedDiff.domain()[0])
         const max = Math.max(
             maxSpeedDiff,
             this._shipCompare.colourScaleSpeedDiff.domain()[this._shipCompare.colourScaleSpeedDiff.domain().length - 1]
-        );
+        )
 
-        this._shipCompare.colourScaleSpeedDiff.domain([min, 0, max]);
+        this._shipCompare.colourScaleSpeedDiff.domain([min, 0, max])
     }
 
     _getHeadingInDegrees(rotate, degrees) {
-        let heading = rotate - degrees - 180;
+        let heading = rotate - degrees - 180
         if (heading < 0) {
-            heading += 360;
+            heading += 360
         }
 
-        return heading;
+        return heading
     }
 
     _getSpeed(rotate) {
-        return formatFloat(this._speedScale(Math.abs(rotate)));
+        return formatFloat(this._speedScale(Math.abs(rotate)))
     }
 
     _getHeadingInCompass(rotate) {
-        return degreesToCompass(rotate);
+        return degreesToCompass(rotate)
     }
 
     _updateSpeedText() {
         this._speedText
             .attr("transform", `rotate(${-this._shipRotate})`)
-            .text(this._getSpeed(this._shipCompare.windProfileRotate - this._shipRotate));
+            .text(this._getSpeed(this._shipCompare.windProfileRotate - this._shipRotate))
     }
 
     _setupDrag() {
-        const steps = this._shipCompareData.speedDegrees.length;
-        const degreesPerStep = 360 / steps;
-        const domain = new Array(steps + 1).fill().map((e, i) => i * degreesPerStep);
+        const steps = this._shipCompareData.speedDegrees.length
+        const degreesPerStep = 360 / steps
+        const domain = new Array(steps + 1).fill().map((e, i) => i * degreesPerStep)
         this._speedScale = d3ScaleLinear()
             .domain(domain)
             .range([...this._shipCompareData.speedDegrees, this._shipCompareData.speedDegrees[0]])
-            .clamp(true);
+            .clamp(true)
 
-        // eslint-disable-next-line unicorn/consistent-function-scoping
         const dragStart = d => {
-            d.this.classed("drag-active", true);
-        };
+            d.this.classed("drag-active", true)
+        }
 
-        // eslint-disable-next-line unicorn/consistent-function-scoping
         const dragged = d => {
             const update = () => {
-                d.this.attr("transform", d => `rotate(${d.rotate})`);
+                d.this.attr("transform", d => `rotate(${d.rotate})`)
                 d.compassText
                     .attr("transform", d => `rotate(${-d.rotate},${d.compassTextX},${d.compassTextY})`)
-                    .text(d => this._getHeadingInCompass(d.rotate));
-                this._shipRotate = d.rotate;
-                this._updateSpeedText();
-            };
+                    .text(d => this._getHeadingInCompass(d.rotate))
+                this._shipRotate = d.rotate
+                this._updateSpeedText()
+            }
 
-            const { x: xMouse, y: yMouse } = d3Event;
+            const { x: xMouse, y: yMouse } = d3Event
             d.rotate = this._getHeadingInDegrees(
                 rotationAngleInDegrees({ x: d.initX, y: d.initY }, { x: xMouse, y: yMouse }),
                 d.correctionValueDegrees
-            );
-            update();
-        };
+            )
+            update()
+        }
 
-        // eslint-disable-next-line unicorn/consistent-function-scoping
         const dragEnd = d => {
-            d.this.classed("drag-active", false);
-        };
+            d.this.classed("drag-active", false)
+        }
 
         this._drag = d3Drag()
             .on("start", dragStart)
             .on("drag", dragged)
             .on("end", dragEnd)
-            .container(() => this.mainG.node());
+            .container(() => this.mainG.node())
     }
 
     _setupShipOutline() {
-        this._shipRotate = 0;
-        const { shipMass } = this._shipCompareData;
-        const heightShip = this._shipCompare.shipMassScale(shipMass);
-        const widthShip = heightShip;
-        const circleSize = 20;
-        const svgHeight = this._shipCompare.svgHeight / 2 - 2 * circleSize;
+        this._shipRotate = 0
+        const { shipMass } = this._shipCompareData
+        const heightShip = this._shipCompare.shipMassScale(shipMass)
+        const widthShip = heightShip
+        const circleSize = 20
+        const svgHeight = this._shipCompare.svgHeight / 2 - 2 * circleSize
 
         const datum = {
             initX: 0,
@@ -873,19 +870,19 @@ class ShipComparison extends Ship {
             speedTextX: 0,
             speedTextY: 0,
             type: "ship"
-        };
+        }
 
         const gShip = this.mainG
             .append("g")
             .datum(datum)
-            .attr("class", "ship-outline");
+            .attr("class", "ship-outline")
 
         gShip
             .append("line")
             .attr("x1", d => d.initX)
             .attr("y1", svgHeight - circleSize)
             .attr("x2", d => d.initX)
-            .attr("y2", d => d.initY);
+            .attr("y2", d => d.initY)
 
         gShip
             .append("image")
@@ -893,32 +890,32 @@ class ShipComparison extends Ship {
             .attr("width", widthShip)
             .attr("x", -heightShip / 2)
             .attr("y", -widthShip / 2)
-            .attr("xlink:href", shipIcon);
+            .attr("xlink:href", shipIcon)
 
         gShip
             .append("circle")
             .attr("cx", d => d.compassTextX)
             .attr("cy", d => d.compassTextY)
             .attr("r", circleSize)
-            .call(this._drag);
+            .call(this._drag)
 
         const compassText = gShip
             .append("text")
             .attr("x", d => d.compassTextX)
             .attr("y", d => d.compassTextY)
             .attr("transform", d => `rotate(${-d.initRotate},${d.compassTextX},${d.compassTextY})`)
-            .text(d => this._getHeadingInCompass(d.initRotate));
+            .text(d => this._getHeadingInCompass(d.initRotate))
 
         this._speedText = gShip
             .append("text")
             .attr("x", d => d.speedTextX)
             .attr("y", d => d.speedTextY)
             .attr("transform", d => `rotate(${-d.initRotate})`)
-            .text(d => this._getSpeed(this._shipCompare.windProfileRotate - d.initRotate));
+            .text(d => this._getSpeed(this._shipCompare.windProfileRotate - d.initRotate))
 
-        datum.this = gShip;
-        datum.compassText = compassText;
-        gShip.datum(datum).attr("transform", d => `rotate(${d.initRotate})`);
+        datum.this = gShip
+        datum.compassText = compassText
+        gShip.datum(datum).attr("transform", d => `rotate(${d.initRotate})`)
     }
 
     /**
@@ -928,26 +925,26 @@ class ShipComparison extends Ship {
     _drawDifferenceProfile() {
         this._pie = d3Pie()
             .sort(null)
-            .value(1);
+            .value(1)
 
-        const arcsBase = this._pie(this._shipBaseData.speedDegrees);
-        this._arcsComp = this._pie(this._shipCompareData.speedDegrees);
+        const arcsBase = this._pie(this._shipBaseData.speedDegrees)
+        this._arcsComp = this._pie(this._shipCompareData.speedDegrees)
 
         this._speedDiff = this._shipCompareData.speedDegrees.map((speedShipCompare, i) =>
             roundToThousands(speedShipCompare - this._shipBaseData.speedDegrees[i])
-        );
-        this._minSpeedDiff = d3Min(this._speedDiff);
-        this._maxSpeedDiff = d3Max(this._speedDiff);
+        )
+        this._minSpeedDiff = d3Min(this._speedDiff)
+        this._maxSpeedDiff = d3Max(this._speedDiff)
 
-        const curve = d3CurveCatmullRomClosed;
+        const curve = d3CurveCatmullRomClosed
         const line = d3RadialLine()
             .angle((d, i) => i * segmentRadians)
             .radius(d => this._shipCompare.radiusSpeedScale(d.data))
-            .curve(curve);
+            .curve(curve)
 
         // Profile shape
-        const circleSize = 20;
-        const svgHeight = this._shipCompare.svgHeight / 2 - circleSize;
+        const circleSize = 20
+        const svgHeight = this._shipCompare.svgHeight / 2 - circleSize
         this._windProfile = {
             initX: 0,
             initY: 0,
@@ -956,29 +953,29 @@ class ShipComparison extends Ship {
             compassTextX: 0,
             compassTextY: -svgHeight,
             type: "windProfile"
-        };
+        }
 
         this._gWindProfile = this.mainG
             .append("g")
             .attr("class", "wind-profile")
-            .attr("transform", `rotate(${this._windProfile.initRotate})`);
+            .attr("transform", `rotate(${this._windProfile.initRotate})`)
 
         // Base profile shape
         this._gWindProfile
             .append("path")
             .attr("class", "base-profile")
-            .attr("d", line(arcsBase));
+            .attr("d", line(arcsBase))
 
         // Comp profile lines
         this._gWindProfile
             .append("path")
             .attr("class", "comp-profile")
-            .attr("d", line(this._arcsComp));
+            .attr("d", line(this._arcsComp))
     }
 
     updateWindProfileRotation() {
-        this._gWindProfile.attr("transform", `rotate(${this._shipCompare.windProfileRotate})`);
-        this._updateSpeedText();
+        this._gWindProfile.attr("transform", `rotate(${this._shipCompare.windProfileRotate})`)
+        this._updateSpeedText()
     }
 
     /**
@@ -986,7 +983,7 @@ class ShipComparison extends Ship {
      * @returns {void}
      */
     updateDifferenceProfile() {
-        this._setColourScale(this._minSpeedDiff, this._maxSpeedDiff);
+        this._setColourScale(this._minSpeedDiff, this._maxSpeedDiff)
 
         this._gWindProfile
             // .insert("g", "g.compass-arc")
@@ -1002,12 +999,10 @@ class ShipComparison extends Ship {
                     .attr("cx", (d, i) => Math.sin(i * segmentRadians) * this._shipCompare.radiusSpeedScale(d.data))
                     .attr("fill", (d, i) => this._shipCompare.colourScaleSpeedDiff(this._speedDiff[i]))
                     .append("title")
-                    .text(
-                        (d, i) => `${Math.round(d.data * 10) / 10} (${formatSignFloat(this._speedDiff[i], 1)}) knots`
-                    );
+                    .text((d, i) => `${Math.round(d.data * 10) / 10} (${formatSignFloat(this._speedDiff[i], 1)}) knots`)
             })
             .select("circle")
-            .attr("fill", (d, i) => this._shipCompare.colourScaleSpeedDiff(this._speedDiff[i]));
+            .attr("fill", (d, i) => this._shipCompare.colourScaleSpeedDiff(this._speedDiff[i]))
 
         // colourRamp(d3Select(this._select), this._shipCompare.colourScaleSpeedDiff, this._speedDiff.length);
     }
@@ -1026,37 +1021,37 @@ class ShipComparison extends Ship {
          * @returns {string} HTML formatted string
          */
         function getDiff(a, b, decimals = 0, isPercentage = false) {
-            let diff = parseFloat((a - b).toFixed(decimals));
+            let diff = parseFloat((a - b).toFixed(decimals))
 
             if (isPercentage) {
-                diff *= 100;
+                diff *= 100
             }
 
             if (diff < 0) {
-                return `<span class="badge badge-danger">${formatFloat(Math.abs(diff))}</span>`;
+                return `<span class="badge badge-danger">${formatFloat(Math.abs(diff))}</span>`
             }
 
             if (diff > 0) {
-                return `<span class="badge badge-success">${formatFloat(diff)}</span>`;
+                return `<span class="badge badge-success">${formatFloat(diff)}</span>`
             }
 
-            return "";
+            return ""
         }
 
         const hullRepairsNeededBase = Math.round(
             (this.shipBaseData.sides.armour * this.shipBaseData.repairAmount.armour) / hullRepairsVolume
-        );
+        )
         const rigRepairsNeededBase = Math.round(
             (this.shipBaseData.sails.armour * this.shipBaseData.repairAmount.sails) / rigRepairsVolume
-        );
-        const rumRepairsNeededBase = Math.round(this.shipBaseData.crew.max * rumRepairsFactor);
+        )
+        const rumRepairsNeededBase = Math.round(this.shipBaseData.crew.max * rumRepairsFactor)
         const hullRepairsNeededCompare = Math.round(
             (this.shipCompareData.sides.armour * this.shipCompareData.repairAmount.armour) / hullRepairsVolume
-        );
+        )
         const rigRepairsNeededCompare = Math.round(
             (this.shipCompareData.sails.armour * this.shipCompareData.repairAmount.sails) / rigRepairsVolume
-        );
-        const rumRepairsNeededCompare = Math.round(this.shipCompareData.crew.max * rumRepairsFactor);
+        )
+        const rumRepairsNeededCompare = Math.round(this.shipCompareData.crew.max * rumRepairsFactor)
 
         const ship = {
             shipRating: `${getOrdinal(this.shipCompareData.class)} rate`,
@@ -1258,35 +1253,35 @@ class ShipComparison extends Ship {
             )} <span class="badge badge-white">${formatIntTrunc(
                 this.shipCompareData.mast.topThickness
             )}</span>${getDiff(this.shipCompareData.mast.topThickness, this.shipBaseData.mast.topThickness)}`
-        };
+        }
 
         if (ship.gunsFront) {
-            ship.gunsFront += `\u00A0${Ship.pd(ship.limitFront)}`;
+            ship.gunsFront += `\u00A0${Ship.pd(ship.limitFront)}`
         } else {
-            ship.gunsFront = "\u2013";
+            ship.gunsFront = "\u2013"
         }
 
         if (ship.gunsBack) {
-            ship.gunsBack += `\u00A0${Ship.pd(ship.limitBack)}`;
+            ship.gunsBack += `\u00A0${Ship.pd(ship.limitBack)}`
         } else {
-            ship.gunsBack = "\u2013";
+            ship.gunsBack = "\u2013"
         }
 
         $(`${this.select}`)
             .find("div")
-            .append(Ship.getText(ship));
+            .append(Ship.getText(ship))
     }
 
     get shipBaseData() {
-        return this._shipBaseData;
+        return this._shipBaseData
     }
 
     get shipCompareData() {
-        return this._shipCompareData;
+        return this._shipCompareData
     }
 
     get shipCompare() {
-        return this._shipCompare;
+        return this._shipCompare
     }
 }
 
@@ -1298,67 +1293,67 @@ export default class CompareShips {
      * @param {string} id - Base id (default "ship-compare")
      */
     constructor(id = "ship-compare") {
-        this._baseId = id;
+        this._baseId = id
 
-        this._baseName = "Compare ships";
-        this._buttonId = `button-${this._baseId}`;
-        this._modalId = `modal-${this._baseId}`;
-        this._moduleId = `${this._baseId}-module`;
-        this._copyButtonId = `button-copy-${this._baseId}`;
+        this._baseName = "Compare ships"
+        this._buttonId = `button-${this._baseId}`
+        this._modalId = `modal-${this._baseId}`
+        this._moduleId = `${this._baseId}-module`
+        this._copyButtonId = `button-copy-${this._baseId}`
 
         this.colourScaleSpeedDiff = d3ScaleLinear()
             .range([colourRedDark, colourWhite, colourGreenDark])
-            .interpolate(d3InterpolateCubehelixLong);
+            .interpolate(d3InterpolateCubehelixLong)
 
-        this._shipIds = [];
-        this._selectedUpgradeIdsPerType = [];
-        this._selectedUpgradeIdsList = [];
-        this._selectShip$ = {};
-        this._selectWood$ = {};
-        this._selectModule$ = {};
-        this._modal$ = null;
-        this._modifierAmount = new Map();
+        this._shipIds = []
+        this._selectedUpgradeIdsPerType = []
+        this._selectedUpgradeIdsList = []
+        this._selectShip$ = {}
+        this._selectWood$ = {}
+        this._selectModule$ = {}
+        this._modal$ = null
+        this._modifierAmount = new Map()
 
         if (this._baseId === "ship-compare") {
-            this._columnsCompare = ["C1", "C2"];
+            this._columnsCompare = ["C1", "C2"]
         } else {
-            this._columnsCompare = [];
+            this._columnsCompare = []
         }
 
-        this._columns = this._columnsCompare.slice();
-        this._columns.unshift("Base");
+        this._columns = this._columnsCompare.slice()
+        this._columns.unshift("Base")
 
-        this._selectedShips = { Base: {}, C1: {}, C2: {} };
+        this._selectedShips = { Base: {}, C1: {}, C2: {} }
 
-        this._woodId = "wood-ship";
+        this._woodId = "wood-ship"
 
-        this._setupArrow();
+        this._setupArrow()
         if (this._baseId !== "ship-journey") {
-            this._setupListener();
+            this._setupListener()
         }
     }
 
     _setupArrow() {
         // Get current arrow
-        const arrow = document.getElementById("journey-arrow");
+        const arrow = document.getElementById("journey-arrow")
         // Clone arrow and change properties
-        const arrowNew = arrow.cloneNode(true);
-        arrowNew.id = "wind-profile-arrow-head";
+        const arrowNew = arrow.cloneNode(true)
+        arrowNew.id = "wind-profile-arrow-head"
         if (arrowNew.hasChildNodes()) {
-            arrowNew.childNodes.forEach(child => {
-                child.classList.replace("journey-arrow-head", "wind-profile-arrow-head");
-            });
+            for (const child of arrowNew.childNodes) {
+                child.classList.replace("journey-arrow-head", "wind-profile-arrow-head")
+            }
         }
 
         // Insert new arrow
-        const defs = document.querySelector("#na-map svg defs");
-        defs.appendChild(arrowNew);
+        const defs = document.querySelector("#na-map svg defs")
+        defs.appendChild(arrowNew)
     }
 
     async CompareShipsInit() {
-        await this._loadAndSetupData();
-        this._initData();
-        this._initSelects();
+        await this._loadAndSetupData()
+        this._initData()
+        this._initSelects()
     }
 
     _setupData() {
@@ -1408,7 +1403,7 @@ export default class CompareShips {
             ["Turn rate", { properties: ["rudder.turnSpeed"], isBaseValueAbsolute: true }],
             ["Water pump health", { properties: ["pump.armour"], isBaseValueAbsolute: true }],
             ["Water repair time", { properties: ["repairTime.pump"], isBaseValueAbsolute: true }]
-        ]);
+        ])
 
         this._moduleAndWoodCaps = new Map([
             [
@@ -1439,40 +1434,38 @@ export default class CompareShips {
             ],
             ["Max speed", { properties: ["speed.max"], cap: { amount: 16, isPercentage: false } }],
             ["Turn rate", { properties: ["rudder.turnSpeed"], cap: { amount: 0.25, isPercentage: true } }]
-        ]);
+        ])
 
-        const theoreticalMinSpeed = d3Min(this._shipData, ship => ship.speed.min) * 1.2;
-        const theoreticalMaxSpeed = this._moduleAndWoodCaps.get("Max speed").cap.amount;
+        const theoreticalMinSpeed = d3Min(this._shipData, ship => ship.speed.min) * 1.2
+        const theoreticalMaxSpeed = this._moduleAndWoodCaps.get("Max speed").cap.amount
 
-        this._minSpeed = theoreticalMinSpeed;
-        this._maxSpeed = theoreticalMaxSpeed;
+        this._minSpeed = theoreticalMinSpeed
+        this._maxSpeed = theoreticalMaxSpeed
         this._colorScale = d3ScaleLinear()
             .domain([this._minSpeed, 0, this._maxSpeed])
             .range([colourRedDark, colourWhite, colourGreenDark])
-            .interpolate(d3InterpolateCubehelixLong);
+            .interpolate(d3InterpolateCubehelixLong)
 
-        const minShipMass = d3Min(this._shipData, ship => ship.shipMass);
-        const maxShipMass = d3Max(this._shipData, ship => ship.shipMass);
+        const minShipMass = d3Min(this._shipData, ship => ship.shipMass)
+        const maxShipMass = d3Max(this._shipData, ship => ship.shipMass)
         this.shipMassScale = d3ScaleLinear()
             .domain([minShipMass, maxShipMass])
-            .range([100, 150]);
+            .range([100, 150])
     }
 
     async _loadAndSetupData() {
         try {
             this._moduleDataDefault = (
                 await import(/* webpackChunkName: "data-modules" */ "../../gen-generic/modules.json")
-            ).default;
-            this._shipData = (
-                await import(/* webpackChunkName: "data-ships" */ "../../gen-generic/ships.json")
-            ).default;
-            this._setupData();
+            ).default
+            this._shipData = (await import(/* webpackChunkName: "data-ships" */ "../../gen-generic/ships.json")).default
+            this._setupData()
             if (this._baseId !== "ship-journey") {
-                this.woodCompare = new CompareWoods(this._woodId);
-                await this.woodCompare.woodInit();
+                this.woodCompare = new CompareWoods(this._woodId)
+                await this.woodCompare.woodInit()
             }
         } catch (error) {
-            putImportError(error);
+            putImportError(error)
         }
     }
 
@@ -1481,18 +1474,18 @@ export default class CompareShips {
      * @returns {void}
      */
     _setupListener() {
-        let firstClick = true;
+        let firstClick = true
 
         document.getElementById(this._buttonId).addEventListener("click", async event => {
             if (firstClick) {
-                firstClick = false;
-                await this._loadAndSetupData();
+                firstClick = false
+                await this._loadAndSetupData()
             }
 
-            registerEvent("Tools", this._baseName);
-            event.stopPropagation();
-            this._shipCompareSelected();
-        });
+            registerEvent("Tools", this._baseName)
+            event.stopPropagation()
+            this._shipCompareSelected()
+        })
     }
 
     /**
@@ -1500,14 +1493,14 @@ export default class CompareShips {
      * @returns {void}
      */
     _setGraphicsParameters() {
-        this.svgWidth = parseInt($(`#${this._modalId} .column-base`).width(), 10);
+        this.svgWidth = parseInt($(`#${this._modalId} .column-base`).width(), 10)
         // noinspection JSSuspiciousNameCombination
-        this.svgHeight = this.svgWidth;
-        this.outerRadius = Math.floor(Math.min(this.svgWidth, this.svgHeight) / 2);
-        this.innerRadius = Math.floor(this.outerRadius * 0.3);
+        this.svgHeight = this.svgWidth
+        this.outerRadius = Math.floor(Math.min(this.svgWidth, this.svgHeight) / 2)
+        this.innerRadius = Math.floor(this.outerRadius * 0.3)
         this.radiusSpeedScale = d3ScaleLinear()
             .domain([this.minSpeed, 0, this.maxSpeed])
-            .range([10, this.innerRadius, this.outerRadius]);
+            .range([10, this.innerRadius, this.outerRadius])
     }
 
     /**
@@ -1517,72 +1510,73 @@ export default class CompareShips {
     _shipCompareSelected() {
         // If the modal has no content yet, insert it
         if (!this._modal$) {
-            this._initModal();
-            this._modal$ = $(`#${this._modalId}`);
+            this._initModal()
+            this._modal$ = $(`#${this._modalId}`)
 
             // Copy data to clipboard (ctrl-c key event)
             this._modal$.on("keydown", event => {
                 if (event.code === "KeyC" && event.ctrlKey) {
-                    this._copyDataClicked(event);
+                    this._copyDataClicked(event)
                 }
-            });
+            })
             // Copy data to clipboard (click event)
             document.getElementById(this._copyButtonId).addEventListener("click", event => {
-                this._copyDataClicked(event);
-            });
+                this._copyDataClicked(event)
+            })
         }
 
         // Show modal
-        this._modal$.modal("show");
-        this._setGraphicsParameters();
+        this._modal$.modal("show")
+        this._setGraphicsParameters()
     }
 
     _getShipAndWoodIds() {
-        const data = [];
+        const data = []
 
-        this._columns.forEach(columnId => {
+        for (const columnId of this._columns) {
             if (this._shipIds[columnId] !== undefined) {
-                data.push(this._shipIds[columnId]);
-
-                ["frame", "trim"].forEach(type => {
-                    data.push(Number(this._selectWood$[columnId][type].val()));
-                });
+                data.push(this._shipIds[columnId])
+                for (const type of ["frame", "trim"]) {
+                    data.push(Number(this._selectWood$[columnId][type].val()))
+                }
             }
-        });
+        }
 
-        return data;
+        return data
     }
 
     _copyDataClicked(event) {
-        registerEvent("Menu", "Copy ship compare");
-        event.preventDefault();
+        registerEvent("Menu", "Copy ship compare")
+        event.preventDefault()
 
-        const ShipAndWoodIds = this._getShipAndWoodIds();
+        const ShipAndWoodIds = this._getShipAndWoodIds()
 
         if (ShipAndWoodIds.length) {
-            const ShipCompareUrl = new URL(window.location);
+            const ShipCompareUrl = new URL(window.location)
 
             // Add app version
-            ShipCompareUrl.searchParams.set("v", encodeURIComponent(appVersion));
+            ShipCompareUrl.searchParams.set("v", encodeURIComponent(appVersion))
             // Add selected ships and woods, triple (shipId, frameId, trimId) per column, flat array
-            ShipCompareUrl.searchParams.set("cmp", hashids.encode(ShipAndWoodIds));
+            ShipCompareUrl.searchParams.set("cmp", hashids.encode(ShipAndWoodIds))
 
             // Add selected modules, new searchParam per module
-            this._columns.forEach((columnId, columnIndex) => {
+            for (const columnId of this._columns) {
+                const columnIndex = this._columns.indexOf(columnId)
                 if (this._selectedUpgradeIdsPerType[columnId]) {
-                    [...this._moduleTypes].forEach((type, typeIndex) => {
-                        const moduleIds = this._selectedUpgradeIdsPerType[columnId][type];
+                    for (const type of [...this._moduleTypes]) {
+                        const typeIndex = [...this._moduleTypes].indexOf(type)
+                        const moduleIds = this._selectedUpgradeIdsPerType[columnId][type]
 
                         if (moduleIds && moduleIds.length) {
-                            const param = `${columnIndex}${typeIndex}`;
+                            const param = `${columnIndex}${typeIndex}`
 
-                            ShipCompareUrl.searchParams.set(param, hashids.encode(moduleIds));
+                            ShipCompareUrl.searchParams.set(param, hashids.encode(moduleIds))
                         }
-                    });
+                    }
                 }
-            });
+            }
 
-            copyToClipboard(ShipCompareUrl.href);
+            copyToClipboard(ShipCompareUrl.href)
         }
     }
 
@@ -1604,7 +1598,7 @@ export default class CompareShips {
                         guns: ship.guns
                     }))
                     .sort(sortBy(["name"]))
-            );
+            )
     }
 
     /**
@@ -1618,17 +1612,17 @@ export default class CompareShips {
                 type[1]
                     .filter(module =>
                         module.properties.some(property => {
-                            return this._moduleAndWoodChanges.has(property.modifier);
+                            return this._moduleAndWoodChanges.has(property.modifier)
                         })
                     )
                     .map(module => [module.id, module])
             )
-        );
+        )
 
         // Get types from moduleProperties list
         this._moduleTypes = new Set(
             [...this._moduleProperties].map(module => module[1].type.replace(/\s\u2013\s[\s/A-Za-z\u25CB]+/, ""))
-        );
+        )
     }
 
     /**
@@ -1636,51 +1630,50 @@ export default class CompareShips {
      * @returns {void}
      */
     _injectModal() {
-        insertBaseModal(this._modalId, this._baseName);
+        insertBaseModal(this._modalId, this._baseName)
 
         const row = d3Select(`#${this._modalId} .modal-body`)
             .append("div")
             .attr("class", "container-fluid")
             .append("div")
-            .attr("class", "row");
+            .attr("class", "row")
 
-        this._columns.forEach(columnId => {
+        for (const columnId of this._columns) {
             const div = row
                 .append("div")
-                .attr("class", `col-md-4 ml-auto pt-2 ${columnId === "Base" ? "column-base" : "column-comp"}`);
+                .attr("class", `col-md-4 ml-auto pt-2 ${columnId === "Base" ? "column-base" : "column-comp"}`)
 
-            const shipSelectId = this._getShipSelectId(columnId);
+            const shipSelectId = this._getShipSelectId(columnId)
             div.append("label")
                 .append("select")
                 .attr("name", shipSelectId)
                 .attr("id", shipSelectId)
-                .attr("class", "selectpicker");
-
-            ["frame", "trim"].forEach(type => {
-                const woodId = this._getWoodSelectId(type, columnId);
+                .attr("class", "selectpicker")
+            for (const type of ["frame", "trim"]) {
+                const woodId = this._getWoodSelectId(type, columnId)
                 div.append("label")
                     .append("select")
                     .attr("name", woodId)
                     .attr("id", woodId)
-                    .attr("class", "selectpicker");
-            });
+                    .attr("class", "selectpicker")
+            }
 
-            this._moduleTypes.forEach(type => {
-                const moduleId = this._getModuleSelectId(type, columnId);
+            for (const type of this._moduleTypes) {
+                const moduleId = this._getModuleSelectId(type, columnId)
                 div.append("label")
                     .append("select")
                     .attr("name", moduleId)
                     .attr("id", moduleId)
                     .property("multiple", true)
-                    .attr("class", "selectpicker");
-            });
+                    .attr("class", "selectpicker")
+            }
 
             div.append("div")
                 .attr("id", `${this._baseId}-${columnId}`)
-                .attr("class", `${columnId === "Base" ? "ship-base" : "ship-compare"}`);
-        });
+                .attr("class", `${columnId === "Base" ? "ship-base" : "ship-compare"}`)
+        }
 
-        const footer = d3Select(`#${this._modalId} .modal-footer`);
+        const footer = d3Select(`#${this._modalId} .modal-footer`)
         footer
             .insert("button", "button")
             .classed("btn btn-outline-secondary icon-outline-button", true)
@@ -1688,31 +1681,31 @@ export default class CompareShips {
             .attr("title", "Copy to clipboard (ctrl-c)")
             .attr("type", "button")
             .append("i")
-            .classed("icon icon-copy", true);
+            .classed("icon icon-copy", true)
     }
 
     _initData() {
-        this._setupShipData();
-        this._setupModuleData();
+        this._setupShipData()
+        this._setupModuleData()
     }
 
     _initSelectColumns() {
         for (const columnId of this._columns) {
-            this._setupShipSelect(columnId);
+            this._setupShipSelect(columnId)
             if (this._baseId !== "ship-journey") {
-                this._selectWood$[columnId] = {};
+                this._selectWood$[columnId] = {}
                 for (const type of ["frame", "trim"]) {
-                    this._selectWood$[columnId][type] = $(`#${this._getWoodSelectId(type, columnId)}`);
-                    this.woodCompare._setupWoodSelects(columnId, type, this._selectWood$[columnId][type]);
+                    this._selectWood$[columnId][type] = $(`#${this._getWoodSelectId(type, columnId)}`)
+                    this.woodCompare._setupWoodSelects(columnId, type, this._selectWood$[columnId][type])
                 }
             }
 
-            this._setupSelectListener(columnId);
+            this._setupSelectListener(columnId)
         }
     }
 
     _initSelects() {
-        this._initSelectColumns();
+        this._initSelectColumns()
     }
 
     /**
@@ -1720,9 +1713,9 @@ export default class CompareShips {
      * @returns {void}
      */
     _initModal() {
-        this._initData();
-        this._injectModal();
-        this._initSelects();
+        this._initData()
+        this._injectModal()
+        this._initSelects()
     }
 
     /**
@@ -1740,7 +1733,7 @@ export default class CompareShips {
                         )
                         .join("</option>")}`
             )
-            .join("</optgroup>");
+            .join("</optgroup>")
     }
 
     /**
@@ -1749,16 +1742,16 @@ export default class CompareShips {
      * @returns {void}
      */
     _setupShipSelect(columnId) {
-        this._selectShip$[columnId] = $(`#${this._getShipSelectId(columnId)}`);
-        const options = this._getShipOptions();
-        this._selectShip$[columnId].append(options);
+        this._selectShip$[columnId] = $(`#${this._getShipSelectId(columnId)}`)
+        const options = this._getShipOptions()
+        this._selectShip$[columnId].append(options)
         if (columnId !== "Base") {
-            this._selectShip$[columnId].attr("disabled", "disabled");
+            this._selectShip$[columnId].attr("disabled", "disabled")
         }
     }
 
     static _getModuleLevel(rate) {
-        return rate <= 3 ? "L" : rate <= 5 ? "M" : "S";
+        return rate <= 3 ? "L" : rate <= 5 ? "M" : "S"
     }
 
     /**
@@ -1780,10 +1773,10 @@ export default class CompareShips {
                         (module[1].moduleLevel === "U" ||
                             module[1].moduleLevel === CompareShips._getModuleLevel(shipClass))
                 )
-            );
+            )
 
-        let options = "";
-        const moduleTypeWithSingleOption = ["Permanent", "Ship trim"];
+        let options = ""
+        const moduleTypeWithSingleOption = ["Permanent", "Ship trim"]
         if (modules.length > 1) {
             // Get options with sub types as optgroups
             options = modules
@@ -1795,62 +1788,62 @@ export default class CompareShips {
                             .map(module => `<option value="${module[0]}">${module[1].name}`)
                             .join("</option>")}`
                 )
-                .join("</optgroup>");
+                .join("</optgroup>")
         } else {
             // Get options without optgroups
             options = modules.map(
                 group =>
                     `${group.values.map(module => `<option value="${module[0]}">${module[1].name}`).join("</option>")}`
-            );
+            )
         }
 
-        return options;
+        return options
     }
 
     _fillModuleSelect(columnId, type) {
         // eslint-disable-next-line unicorn/consistent-function-scoping
-        const getShipClass = () => this._shipData.find(ship => ship.id === this._shipIds[columnId]).class;
+        const getShipClass = () => this._shipData.find(ship => ship.id === this._shipIds[columnId]).class
 
-        const options = this._getUpgradesOptions(type, getShipClass());
+        const options = this._getUpgradesOptions(type, getShipClass())
 
-        this._selectModule$[columnId][type].find("option").remove();
-        this._selectModule$[columnId][type].append(options);
+        this._selectModule$[columnId][type].find("option").remove()
+        this._selectModule$[columnId][type].append(options)
     }
 
     _resetModuleSelects(columnId) {
-        this._moduleTypes.forEach(type => {
-            this._fillModuleSelect(columnId, type);
-            this._selectModule$[columnId][type].selectpicker("refresh");
-        });
+        for (const type of this._moduleTypes) {
+            this._fillModuleSelect(columnId, type)
+            this._selectModule$[columnId][type].selectpicker("refresh")
+        }
     }
 
     _getModuleFromName(moduleName) {
-        let module = {};
+        let module = {}
 
         this._moduleDataDefault.some(type => {
-            module = type[1].find(module => module.name === moduleName);
-            return Boolean(module);
-        });
+            module = type[1].find(module => module.name === moduleName)
+            return Boolean(module)
+        })
 
-        return module;
+        return module
     }
 
     static _getModifierFromModule(properties) {
         return `<p class="mb-0">${properties
             .map(property => {
-                let amount;
+                let amount
                 if (property.isPercentage) {
-                    amount = formatSignPercent(property.amount / 100);
+                    amount = formatSignPercent(property.amount / 100)
                 } else {
                     amount =
                         property.amount < 1 && property.amount > 0
                             ? formatPP(property.amount)
-                            : formatSignInt(property.amount);
+                            : formatSignInt(property.amount)
                 }
 
-                return `${property.modifier} ${amount}`;
+                return `${property.modifier} ${amount}`
             })
-            .join("<br>")}</p>`;
+            .join("<br>")}</p>`
     }
 
     /**
@@ -1860,47 +1853,47 @@ export default class CompareShips {
      */
     _setupModulesSelect(columnId) {
         if (!this._selectModule$[columnId]) {
-            this._selectModule$[columnId] = {};
+            this._selectModule$[columnId] = {}
 
-            this._moduleTypes.forEach(type => {
-                this._selectModule$[columnId][type] = $(`#${this._getModuleSelectId(type, columnId)}`);
+            for (const type of this._moduleTypes) {
+                this._selectModule$[columnId][type] = $(`#${this._getModuleSelectId(type, columnId)}`)
                 this._selectModule$[columnId][type]
                     .on("changed.bs.select", () => {
-                        this._modulesSelected(columnId);
-                        this._refreshShips(columnId);
+                        this._modulesSelected(columnId)
+                        this._refreshShips(columnId)
                     })
                     .on("show.bs.select", event => {
-                        const $el = $(event.currentTarget);
+                        const $el = $(event.currentTarget)
 
                         // Remove 'select all' button
                         $el.parent()
                             .find("button.bs-select-all")
-                            .remove();
+                            .remove()
                     })
                     .on("show.bs.select", event => {
-                        const $el = $(event.currentTarget);
+                        const $el = $(event.currentTarget)
 
                         // Add tooltip
-                        $el.data("selectpicker").selectpicker.current.elements.forEach(element => {
+                        for (const element of $el.data("selectpicker").selectpicker.current.elements) {
                             if (
                                 !(
                                     element.classList.contains("dropdown-divider") ||
                                     element.classList.contains("dropdown-header")
                                 )
                             ) {
-                                const module = this._getModuleFromName(element.innerText);
+                                const module = this._getModuleFromName(element.innerText)
 
                                 // Add tooltip with module properties
                                 $(element)
                                     .attr("data-original-title", CompareShips._getModifierFromModule(module.properties))
-                                    .tooltip({ boundary: "viewport", html: true });
+                                    .tooltip({ boundary: "viewport", html: true })
                             }
-                        });
+                        }
                     })
                     .selectpicker({
                         actionsBox: true,
                         countSelectedText(amount) {
-                            return `${amount} ${type.toLowerCase()}s selected`;
+                            return `${amount} ${type.toLowerCase()}s selected`
                         },
                         deselectAllText: "Clear",
                         liveSearch: true,
@@ -1910,11 +1903,11 @@ export default class CompareShips {
                         selectedTextFormat: "count > 1",
                         title: `${type}`,
                         width: "150px"
-                    });
-            });
+                    })
+            }
         }
 
-        this._resetModuleSelects(columnId);
+        this._resetModuleSelects(columnId)
     }
 
     /**
@@ -1923,92 +1916,93 @@ export default class CompareShips {
      * @returns {Object} Ship data
      */
     _getShipData(columnId) {
-        const shipDataDefault = this._shipData.find(ship => ship.id === this._shipIds[columnId]);
-        let shipDataUpdated = shipDataDefault;
+        const shipDataDefault = this._shipData.find(ship => ship.id === this._shipIds[columnId])
+        let shipDataUpdated = shipDataDefault
 
         shipDataUpdated.repairAmount = {
             armour: hullRepairsPercent,
             armourPerk: 0,
             sails: rigRepairsPercent,
             sailsPerk: 0
-        };
-        shipDataUpdated.repairTime = { sides: repairTime, default: repairTime };
+        }
+        shipDataUpdated.repairTime = { sides: repairTime, default: repairTime }
         shipDataUpdated.resistance = {
             fire: 0,
             leaks: 0,
             splinter: 0
-        };
+        }
 
-        shipDataUpdated = this._addModulesAndWoodData(shipDataDefault, shipDataUpdated, columnId);
+        shipDataUpdated = this._addModulesAndWoodData(shipDataDefault, shipDataUpdated, columnId)
 
-        return shipDataUpdated;
+        return shipDataUpdated
     }
 
     static _adjustAbsolute(currentValue, additionalValue) {
-        return currentValue ? currentValue + additionalValue : additionalValue;
+        return currentValue ? currentValue + additionalValue : additionalValue
     }
 
     static _adjustPercentage(currentValue, additionalValue, isBaseValueAbsolute) {
-        return currentValue
-            ? isBaseValueAbsolute
-                ? currentValue * (1 + additionalValue)
-                : currentValue + additionalValue
-            : additionalValue;
+        if (isBaseValueAbsolute) {
+            return currentValue ? currentValue * (1 + additionalValue) : additionalValue
+        }
+
+        return currentValue ? currentValue + additionalValue : additionalValue
     }
 
     _adjustValue(value, key, isBaseValueAbsolute) {
-        let adjustedValue = value;
+        let adjustedValue = value
 
         if (this._modifierAmount.get(key).absolute) {
-            const { absolute } = this._modifierAmount.get(key);
-            adjustedValue = CompareShips._adjustAbsolute(adjustedValue, absolute);
+            const { absolute } = this._modifierAmount.get(key)
+            adjustedValue = CompareShips._adjustAbsolute(adjustedValue, absolute)
         }
 
         if (this._modifierAmount.get(key).percentage) {
-            const percentage = this._modifierAmount.get(key).percentage / 100;
-            adjustedValue = CompareShips._adjustPercentage(adjustedValue, percentage, isBaseValueAbsolute);
+            const percentage = this._modifierAmount.get(key).percentage / 100
+            adjustedValue = CompareShips._adjustPercentage(adjustedValue, percentage, isBaseValueAbsolute)
         }
 
-        return Math.trunc(adjustedValue * 100) / 100;
+        return Math.trunc(adjustedValue * 100) / 100
     }
 
     _setModifier(property) {
-        let absolute = property.isPercentage ? 0 : property.amount;
-        let percentage = property.isPercentage ? property.amount : 0;
+        let absolute = property.isPercentage ? 0 : property.amount
+        let percentage = property.isPercentage ? property.amount : 0
 
         // If modifier has been in the Map add the amount
         if (this._modifierAmount.has(property.modifier)) {
-            absolute += this._modifierAmount.get(property.modifier).absolute;
-            percentage += this._modifierAmount.get(property.modifier).percentage;
+            absolute += this._modifierAmount.get(property.modifier).absolute
+            percentage += this._modifierAmount.get(property.modifier).percentage
         }
 
         this._modifierAmount.set(property.modifier, {
             absolute,
             percentage
-        });
+        })
     }
 
     _showCappingAdvice(compareId, modifiers) {
-        const id = `${this._baseId}-${compareId}-capping`;
-        let div = document.getElementById(id);
+        const id = `${this._baseId}-${compareId}-capping`
+        let div = document.getElementById(id)
 
         if (!div) {
-            div = document.createElement("p");
-            div.id = id;
-            div.className = "alert alert-warning";
-            const element = document.getElementById(`${this._baseId}-${compareId}`);
-            element.firstChild.after(div);
+            div = document.createElement("p")
+            div.id = id
+            div.className = "alert alert-warning"
+            const element = document.getElementById(`${this._baseId}-${compareId}`)
+            element.firstChild.after(div)
         }
 
-        div.innerHTML = `${[...modifiers].join(", ")} capped`;
+        // noinspection InnerHTMLJS
+        div.innerHTML = `${[...modifiers].join(", ")} capped`
     }
 
     _removeCappingAdvice(compareId) {
-        const id = `${this._baseId}-${compareId}-capping`;
-        const div = document.getElementById(id);
+        const id = `${this._baseId}-${compareId}-capping`
+        const div = document.getElementById(id)
 
         if (div) {
-            div.remove();
+            div.remove()
         }
     }
 
@@ -2020,127 +2014,127 @@ export default class CompareShips {
      * @returns {Object} - Updated ship data
      */
     _addModulesAndWoodData(shipDataBase, shipDataUpdated, compareId) {
-        const data = JSON.parse(JSON.stringify(shipDataUpdated));
+        const data = JSON.parse(JSON.stringify(shipDataUpdated))
 
         const setModifierAmounts = () => {
-            this._selectedUpgradeIdsList[compareId].forEach(id => {
-                const module = this._moduleProperties.get(id);
+            for (const id of this._selectedUpgradeIdsList[compareId]) {
+                const module = this._moduleProperties.get(id)
 
-                module.properties.forEach(property => {
+                for (const property of module.properties) {
                     if (this._moduleAndWoodChanges.has(property.modifier)) {
-                        this._setModifier(property);
+                        this._setModifier(property)
                     }
-                });
-            });
+                }
+            }
 
             if (this.woodCompare._instances[compareId]) {
-                let dataLink = "_woodData";
+                let dataLink = "_woodData"
                 if (compareId !== "Base") {
-                    dataLink = "_compareData";
+                    dataLink = "_compareData"
                 }
 
                 // Add modifier amount for both frame and trim
-                ["frame", "trim"].forEach(type => {
-                    this.woodCompare._instances[compareId][dataLink][type].properties.forEach(property => {
+                for (const type of ["frame", "trim"]) {
+                    for (const property of this.woodCompare._instances[compareId][dataLink][type].properties) {
                         if (this._moduleAndWoodChanges.has(property.modifier)) {
-                            this._setModifier(property);
+                            this._setModifier(property)
                         }
-                    });
-                });
+                    }
+                }
             }
-        };
+        }
 
-        // eslint-disable-next-line unicorn/consistent-function-scoping
         const adjustDataByModifiers = () => {
-            this._modifierAmount.forEach((value, key) => {
+            for (const [key] of this._modifierAmount.entries()) {
                 if (this._moduleAndWoodChanges.get(key).properties) {
-                    this._moduleAndWoodChanges.get(key).properties.forEach(modifier => {
-                        const index = modifier.split(".");
+                    for (const modifier of this._moduleAndWoodChanges.get(key).properties) {
+                        const index = modifier.split(".")
                         if (index.length > 1) {
                             data[index[0]][index[1]] = this._adjustValue(
                                 data[index[0]][index[1]],
                                 key,
                                 this._moduleAndWoodChanges.get(key).isBaseValueAbsolute
-                            );
+                            )
                         } else {
                             data[index[0]] = this._adjustValue(
                                 data[index[0]],
                                 key,
                                 this._moduleAndWoodChanges.get(key).isBaseValueAbsolute
-                            );
+                            )
                         }
-                    });
+                    }
                 }
-            });
-        };
+            }
+        }
 
         const adjustDataByCaps = () => {
-            const valueCapped = { isCapped: false, modifiers: new Set() };
+            const valueCapped = { isCapped: false, modifiers: new Set() }
 
             const adjustValue = (modifier, uncappedValue, baseValue, { amount: capAmount, isPercentage }) => {
                 const valueRespectingCap = Math.min(
                     uncappedValue,
                     isPercentage ? baseValue * (1 + capAmount) : capAmount
-                );
+                )
                 if (uncappedValue !== valueRespectingCap) {
-                    valueCapped.isCapped = true;
-                    valueCapped.modifiers.add(modifier);
+                    valueCapped.isCapped = true
+                    valueCapped.modifiers.add(modifier)
                 }
 
-                return valueRespectingCap;
-            };
+                return valueRespectingCap
+            }
 
-            this._modifierAmount.forEach((value, modifier) => {
+            for (const [, modifier] of this._modifierAmount.entries()) {
                 if (this._moduleAndWoodCaps.has(modifier)) {
-                    const { cap } = this._moduleAndWoodCaps.get(modifier);
-                    this._moduleAndWoodCaps.get(modifier).properties.forEach(property => {
-                        const index = property.split(".");
+                    const { cap } = this._moduleAndWoodCaps.get(modifier)
+                    for (const property of this._moduleAndWoodCaps.get(modifier).properties) {
+                        const index = property.split(".")
                         if (index.length > 1) {
+                            // eslint-disable-next-line max-depth
                             if (data[index[0]][index[1]]) {
                                 data[index[0]][index[1]] = adjustValue(
                                     modifier,
                                     data[index[0]][index[1]],
                                     shipDataBase[index[0]][index[1]],
                                     cap
-                                );
+                                )
                             }
                         } else if (data[index[0]]) {
-                            data[index[0]] = adjustValue(modifier, data[index[0]], shipDataBase[index[0]], cap);
+                            data[index[0]] = adjustValue(modifier, data[index[0]], shipDataBase[index[0]], cap)
                         }
-                    });
+                    }
                 }
-            });
+            }
 
             if (valueCapped.isCapped) {
-                this._showCappingAdvice(compareId, valueCapped.modifiers);
+                this._showCappingAdvice(compareId, valueCapped.modifiers)
             } else {
-                this._removeCappingAdvice(compareId);
+                this._removeCappingAdvice(compareId)
             }
-        };
+        }
 
         const setSpeedDegrees = () => {
             data.speedDegrees = data.speedDegrees.map(speed => {
-                const factor = 1 + this._modifierAmount.get("Max speed").percentage / 100;
-                const newSpeed = speed > 0 ? speed * factor : speed / factor;
+                const factor = 1 + this._modifierAmount.get("Max speed").percentage / 100
+                const newSpeed = speed > 0 ? speed * factor : speed / factor
                 // Correct speed by caps
-                return Math.max(Math.min(newSpeed, this._maxSpeed), this._minSpeed);
-            });
-        };
-
-        this._modifierAmount = new Map();
-        setModifierAmounts();
-        adjustDataByModifiers();
-        adjustDataByCaps();
-        if (this._modifierAmount.has("Max speed")) {
-            setSpeedDegrees();
+                return Math.max(Math.min(newSpeed, this._maxSpeed), this._minSpeed)
+            })
         }
 
-        return data;
+        this._modifierAmount = new Map()
+        setModifierAmounts()
+        adjustDataByModifiers()
+        adjustDataByCaps()
+        if (this._modifierAmount.has("Max speed")) {
+            setSpeedDegrees()
+        }
+
+        return data
     }
 
     _updateDifferenceProfileNeeded(id) {
         if (id !== "Base" && !isEmpty(this._selectedShips[id])) {
-            this._selectedShips[id].updateDifferenceProfile();
+            this._selectedShips[id].updateDifferenceProfile()
         }
     }
 
@@ -2151,13 +2145,14 @@ export default class CompareShips {
      */
     _updateSailingProfile(compareId) {
         // Update recent changes first
-        this._updateDifferenceProfileNeeded(compareId);
+        this._updateDifferenceProfileNeeded(compareId)
         // Then update the rest of columns
-        this._columnsCompare
-            .filter(otherCompareId => otherCompareId !== compareId)
-            .forEach(otherCompareId => {
-                this._updateDifferenceProfileNeeded(otherCompareId);
-            });
+
+        for (const otherCompareId of this._columnsCompare) {
+            if (otherCompareId !== compareId) {
+                this._updateDifferenceProfileNeeded(otherCompareId)
+            }
+        }
     }
 
     /**
@@ -2167,14 +2162,14 @@ export default class CompareShips {
      */
     _refreshShips(compareId) {
         if (this._baseId === "ship-journey") {
-            this._singleShipData = this._shipData.find(ship => ship.id === this._shipIds[compareId]);
+            this._singleShipData = this._shipData.find(ship => ship.id === this._shipIds[compareId])
         } else {
-            this._modulesSelected(compareId);
-            const singleShipData = this._getShipData(compareId);
+            this._modulesSelected(compareId)
+            const singleShipData = this._getShipData(compareId)
             if (compareId === "Base") {
-                this._setSelectedShip(compareId, new ShipBase(compareId, singleShipData, this));
-                this._columnsCompare.forEach(otherCompareId => {
-                    this._selectShip$[otherCompareId].removeAttr("disabled").selectpicker("refresh");
+                this._setSelectedShip(compareId, new ShipBase(compareId, singleShipData, this))
+                for (const otherCompareId of this._columnsCompare) {
+                    this._selectShip$[otherCompareId].removeAttr("disabled").selectpicker("refresh")
                     if (!isEmpty(this.selectedShips[otherCompareId])) {
                         this._setSelectedShip(
                             otherCompareId,
@@ -2184,17 +2179,17 @@ export default class CompareShips {
                                 this.selectedShips[otherCompareId]._shipCompareData,
                                 this
                             )
-                        );
+                        )
                     }
-                });
+                }
             } else {
                 this._setSelectedShip(
                     compareId,
                     new ShipComparison(compareId, this.selectedShips.Base._shipData, singleShipData, this)
-                );
+                )
             }
 
-            this._updateSailingProfile(compareId);
+            this._updateSailingProfile(compareId)
         }
     }
 
@@ -2203,37 +2198,37 @@ export default class CompareShips {
      * @returns {void}
      */
     _enableCompareSelects() {
-        this._columnsCompare.forEach(compareId => {
-            this._selectShip$[compareId].removeAttr("disabled").selectpicker("refresh");
-        });
+        for (const compareId of this._columnsCompare) {
+            this._selectShip$[compareId].removeAttr("disabled").selectpicker("refresh")
+        }
     }
 
     _modulesSelected(compareId) {
-        this._selectedUpgradeIdsList[compareId] = [];
-        this._selectedUpgradeIdsPerType[compareId] = {};
+        this._selectedUpgradeIdsList[compareId] = []
+        this._selectedUpgradeIdsPerType[compareId] = {}
 
-        this._moduleTypes.forEach(type => {
-            this._selectedUpgradeIdsPerType[compareId][type] = this._selectModule$[compareId][type].val();
+        for (const type of this._moduleTypes) {
+            this._selectedUpgradeIdsPerType[compareId][type] = this._selectModule$[compareId][type].val()
             if (Array.isArray(this._selectedUpgradeIdsPerType[compareId][type])) {
                 // Multiple selects
                 this._selectedUpgradeIdsPerType[compareId][type] = this._selectedUpgradeIdsPerType[compareId][type].map(
                     Number
-                );
+                )
             } else {
                 // Single select
                 this._selectedUpgradeIdsPerType[compareId][type] =
                     this._selectedUpgradeIdsPerType[compareId][type] === ""
                         ? []
-                        : [Number(this._selectedUpgradeIdsPerType[compareId][type])];
+                        : [Number(this._selectedUpgradeIdsPerType[compareId][type])]
             }
 
             if (this._selectedUpgradeIdsPerType[compareId][type].length) {
                 this._selectedUpgradeIdsList[compareId] = this._selectedUpgradeIdsList[compareId].concat(
                     this._selectedUpgradeIdsPerType[compareId][type]
-                );
+                )
             }
             // console.log("_modulesSelected", compareId, type, this._selectedUpgradeIdsPerType[compareId][type]);
-        });
+        }
     }
 
     /**
@@ -2243,71 +2238,71 @@ export default class CompareShips {
      */
     _setupSelectListener(compareId) {
         this._selectShip$[compareId].selectpicker({ title: "Ship" }).on("changed.bs.select", () => {
-            this._shipIds[compareId] = Number(this._selectShip$[compareId].val());
+            this._shipIds[compareId] = Number(this._selectShip$[compareId].val())
             if (this._baseId !== "ship-journey") {
-                this._setupModulesSelect(compareId);
+                this._setupModulesSelect(compareId)
             }
 
-            this._refreshShips(compareId);
+            this._refreshShips(compareId)
             if (compareId === "Base" && this._baseId !== "ship-journey") {
-                this._enableCompareSelects();
+                this._enableCompareSelects()
             }
 
             if (this._baseId !== "ship-journey") {
-                this.woodCompare.enableSelects(compareId);
+                this.woodCompare.enableSelects(compareId)
             }
-        });
+        })
         if (this._baseId !== "ship-journey") {
-            ["frame", "trim"].forEach(type => {
+            for (const type of ["frame", "trim"]) {
                 this._selectWood$[compareId][type]
                     .on("changed.bs.select", () => {
-                        this.woodCompare._woodSelected(compareId, type, this._selectWood$[compareId][type]);
-                        this._refreshShips(compareId);
+                        this.woodCompare._woodSelected(compareId, type, this._selectWood$[compareId][type])
+                        this._refreshShips(compareId)
                     })
-                    .selectpicker({ title: `Wood ${type}`, width: "150px" });
-            });
+                    .selectpicker({ title: `Wood ${type}`, width: "150px" })
+            }
         }
     }
 
     static _setSelect(select$, id) {
         if (id) {
-            select$.val(id);
+            select$.val(id)
         }
 
-        select$.selectpicker("render");
+        select$.selectpicker("render")
     }
 
     _setShipAndWoodsSelects(ids) {
-        let i = 0;
+        let i = 0
 
         this._columns.some(columnId => {
             if (!this._shipData.find(ship => ship.id === ids[i])) {
-                return false;
+                return false
             }
 
-            this._shipIds[columnId] = ids[i];
-            i += 1;
-            CompareShips._setSelect(this._selectShip$[columnId], this._shipIds[columnId]);
+            this._shipIds[columnId] = ids[i]
+            i += 1
+            CompareShips._setSelect(this._selectShip$[columnId], this._shipIds[columnId])
             if (columnId === "Base" && this._baseId !== "ship-journey") {
-                this._enableCompareSelects();
+                this._enableCompareSelects()
             }
 
-            this.woodCompare.enableSelects(columnId);
-            this._setupModulesSelect(columnId);
+            this.woodCompare.enableSelects(columnId)
+            this._setupModulesSelect(columnId)
 
             if (ids[i]) {
-                ["frame", "trim"].forEach(type => {
-                    CompareShips._setSelect(this._selectWood$[columnId][type], ids[i]);
-                    i += 1;
-                    this.woodCompare._woodSelected(columnId, type, this._selectWood$[columnId][type]);
-                });
+                for (const type of ["frame", "trim"]) {
+                    CompareShips._setSelect(this._selectWood$[columnId][type], ids[i])
+                    i += 1
+                    this.woodCompare._woodSelected(columnId, type, this._selectWood$[columnId][type])
+                }
             } else {
-                i += 2;
+                i += 2
             }
 
-            this._refreshShips(columnId);
-            return i >= ids.length;
-        });
+            this._refreshShips(columnId)
+            return i >= ids.length
+        })
     }
 
     /**
@@ -2315,124 +2310,127 @@ export default class CompareShips {
      * @return {void}
      */
     _setModuleSelects(urlParams) {
-        this._columns.forEach((columnId, columnIndex) => {
-            let needRefresh = false;
-            [...this._moduleTypes].forEach((type, typeIndex) => {
+        for (const columnId of this._columns) {
+            const columnIndex = this._columns.indexOf(columnId)
+            let needRefresh = false
+            for (const type of [...this._moduleTypes]) {
+                const typeIndex = [...this._moduleTypes].indexOf(type)
                 if (urlParams.has(`${columnIndex}${typeIndex}`)) {
-                    const moduleIds = hashids.decode(urlParams.get(`${columnIndex}${typeIndex}`));
+                    const moduleIds = hashids.decode(urlParams.get(`${columnIndex}${typeIndex}`))
                     if (!this._selectedUpgradeIdsPerType[columnId]) {
-                        this._selectedUpgradeIdsPerType[columnId] = {};
+                        this._selectedUpgradeIdsPerType[columnId] = {}
                     }
 
                     if (!this._selectedUpgradeIdsList[columnId]) {
-                        this._selectedUpgradeIdsList[columnId] = [];
+                        this._selectedUpgradeIdsList[columnId] = []
                     }
 
                     // console.log("moduleIds", { columnId }, { type }, { moduleIds });
-                    this._selectedUpgradeIdsPerType[columnId][type] = moduleIds.map(Number);
+                    this._selectedUpgradeIdsPerType[columnId][type] = moduleIds.map(Number)
                     CompareShips._setSelect(
                         this._selectModule$[columnId][type],
                         this._selectedUpgradeIdsPerType[columnId][type]
-                    );
+                    )
                     this._selectedUpgradeIdsList[columnId] = this._selectedUpgradeIdsList[columnId].concat(
                         this._selectedUpgradeIdsPerType[columnId][type]
-                    );
-                    needRefresh = true;
+                    )
+                    needRefresh = true
                 }
-            });
-            if (needRefresh) {
-                this._refreshShips(columnId);
             }
-        });
+
+            if (needRefresh) {
+                this._refreshShips(columnId)
+            }
+        }
     }
 
     async initFromClipboard(urlParams) {
-        await this._loadAndSetupData();
-        const shipAndWoodsIds = hashids.decode(urlParams.get("cmp"));
+        await this._loadAndSetupData()
+        const shipAndWoodsIds = hashids.decode(urlParams.get("cmp"))
         if (shipAndWoodsIds.length) {
-            this._shipCompareSelected();
-            this._setShipAndWoodsSelects(shipAndWoodsIds);
-            this._setModuleSelects(urlParams);
+            this._shipCompareSelected()
+            this._setShipAndWoodsSelects(shipAndWoodsIds)
+            this._setModuleSelects(urlParams)
         }
     }
 
     _getShipSelectId(columnId) {
-        return `${this._baseId}-${columnId}-select`;
+        return `${this._baseId}-${columnId}-select`
     }
 
     _getWoodSelectId(type, columnId) {
-        return `${this._woodId}-${type}-${columnId}-select`;
+        return `${this._woodId}-${type}-${columnId}-select`
     }
 
     _getModuleSelectId(type, columnId) {
-        return `${this._moduleId}-${type.replace(/\s/, "")}-${columnId}-select`;
+        return `${this._moduleId}-${type.replace(/\s/, "")}-${columnId}-select`
     }
 
     set woodCompare(woodCompare) {
-        this._woodCompare = woodCompare;
+        this._woodCompare = woodCompare
     }
 
     get woodCompare() {
-        return this._woodCompare;
+        return this._woodCompare
     }
 
     _setSelectedShip(columnId, ship) {
-        this._selectedShips[columnId] = ship;
+        this._selectedShips[columnId] = ship
     }
 
     get selectedShips() {
-        return this._selectedShips;
+        return this._selectedShips
     }
 
     get minSpeed() {
-        return this._minSpeed;
+        return this._minSpeed
     }
 
     get maxSpeed() {
-        return this._maxSpeed;
+        return this._maxSpeed
     }
 
     get colorScale() {
-        return this._colorScale;
+        return this._colorScale
     }
 
     set svgWidth(width) {
-        this._svgWidth = width;
+        this._svgWidth = width
     }
 
     get svgWidth() {
-        return this._svgWidth;
+        return this._svgWidth
     }
 
     set svgHeight(height) {
-        this._svgHeight = height;
+        this._svgHeight = height
     }
 
     get svgHeight() {
-        return this._svgHeight;
+        return this._svgHeight
     }
 
     set outerRadius(radius) {
-        this._outerRadius = radius;
+        this._outerRadius = radius
     }
 
     get outerRadius() {
-        return this._outerRadius;
+        return this._outerRadius
     }
 
     set innerRadius(radius) {
-        this._innerRadius = radius;
+        this._innerRadius = radius
     }
 
     get innerRadius() {
-        return this._innerRadius;
+        return this._innerRadius
     }
 
     set radiusSpeedScale(scale) {
-        this._radiusSpeedScale = scale;
+        this._radiusSpeedScale = scale
     }
 
     get radiusSpeedScale() {
-        return this._radiusSpeedScale;
+        return this._radiusSpeedScale
     }
 }
