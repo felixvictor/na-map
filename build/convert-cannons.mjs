@@ -8,23 +8,24 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import * as fs from "fs";
-import * as path from "path";
+import * as fs from "fs"
+import * as path from "path"
 
-import convert from "xml-js";
+import convert from "xml-js"
 
-import { commonPaths, readTextFile, round, saveJsonAsync } from "./common.mjs";
+import { commonPaths, readTextFile, round, saveJsonAsync } from "./common.mjs"
 
-const peneDistances = [50, 100, 250, 500, 750, 1000];
-const cannonTypes = ["medium", "long", "carronade"];
+// noinspection MagicNumberJS
+const peneDistances = [50, 100, 250, 500, 750, 1000]
+const cannonTypes = ["medium", "long", "carronade"]
 
 const countDecimals = value => {
     if (Math.floor(value) === value) {
-        return 0;
+        return 0
     }
 
-    return value.toString().split(".")[1].length || 0;
-};
+    return value.toString().split(".")[1].length || 0
+}
 
 /**
  * Get content of XML file in json format
@@ -32,49 +33,51 @@ const countDecimals = value => {
  * @returns {Object} File content in json format
  */
 const getFileData = baseFileName => {
-    const fileName = path.resolve(commonPaths.dirModules, baseFileName);
-    const fileXmlData = readTextFile(fileName);
-    return convert.xml2js(fileXmlData, { compact: true });
-};
+    const fileName = path.resolve(commonPaths.dirModules, baseFileName)
+    const fileXmlData = readTextFile(fileName)
+    return convert.xml2js(fileXmlData, { compact: true })
+}
 
+// noinspection OverlyComplexFunctionJS,FunctionTooLongJS
 /**
  * Retrieve cannon data from game files and store it
  * @returns {void}
  */
 export const convertCannons = async () => {
-    const cannons = {};
-    cannonTypes.forEach(type => {
-        cannons[type] = [];
-    });
+    const cannons = {}
+    for (const type of cannonTypes) {
+        cannons[type] = []
+    }
 
     /**
      * List of file names to be read
      * @type {Set<string>}
      */
-    const fileNames = new Set();
+    const fileNames = new Set()
     /**
      * Gets all files from directory <dir> and stores valid cannon/carronade file names in <fileNames>
      * @param {string} directory - Directory
      * @returns {void}
      */
     const getBaseFileNames = directory => {
-        fs.readdirSync(directory).forEach(fileName => {
+        for (const fileName of fs.readdirSync(directory)) {
             /**
              * First part of the file name containing the type
              * @type {string}
              */
-            const fileNameFirstPart = fileName.slice(0, fileName.indexOf(" "));
+            const fileNameFirstPart = fileName.slice(0, fileName.indexOf(" "))
+            // noinspection OverlyComplexBooleanExpressionJS
             if (
                 (fileNameFirstPart === "cannon" && fileName !== "cannon repair kit.xml") ||
                 fileNameFirstPart === "carronade" ||
                 fileName.startsWith("tower cannon")
             ) {
-                fileNames.add(fileName);
+                fileNames.add(fileName)
             }
-        });
-    };
+        }
+    }
 
-    getBaseFileNames(commonPaths.dirModules);
+    getBaseFileNames(commonPaths.dirModules)
 
     /**
      * @typedef SubFileStructure
@@ -119,7 +122,7 @@ export const convertCannons = async () => {
         ["CANNON_CREW_REQUIRED", { group: "generic", element: "crew" }],
         // ["ARMOR_THICKNESS", { group: "strength", element: "thickness" }],
         ["CANNON_BALL_ARMOR_SPLINTERS_DAMAGE_FOR_CREW", { group: "damage", element: "splinter" }]
-    ]);
+    ])
 
     /**
      * Add data
@@ -127,12 +130,12 @@ export const convertCannons = async () => {
      * @returns {void}
      */
     function addData(fileData) {
-        let type = "medium";
+        let type = "medium"
 
         if (fileData.ModuleTemplate._attributes.Name.includes("Carronade")) {
-            type = "carronade";
+            type = "carronade"
         } else if (fileData.ModuleTemplate._attributes.Name.includes("Long")) {
-            type = "long";
+            type = "long"
         }
 
         const name = fileData.ModuleTemplate._attributes.Name.replace("Cannon ", "")
@@ -146,16 +149,16 @@ export const convertCannons = async () => {
             .replace("Blomfield", "Blomefield")
             .replace(" Gun", "")
             // Edinorog are 18lb now
-            .replace("24 (Edinorog)", "18 (Edinorog)");
+            .replace("24 (Edinorog)", "18 (Edinorog)")
 
         const cannon = {
             name
-        };
+        }
 
         dataMapping.forEach(({ group, element }, value) => {
             if (!cannon[group]) {
-                cannon[group] = {};
-                cannon[group][element] = {};
+                cannon[group] = {}
+                cannon[group][element] = {}
             }
 
             cannon[group][element] = {
@@ -163,84 +166,92 @@ export const convertCannons = async () => {
                     fileData.ModuleTemplate.Attributes.Pair.find(pair => pair.Key._text === value).Value.Value._text
                 ),
                 digits: 0
-            };
-        });
+            }
+        })
 
         // Calculate penetrations
         const penetrations = new Map(
             fileData.ModuleTemplate.Attributes.Pair.find(pair => pair.Key._text === "CANNON_PENETRATION_DEGRADATION")
                 .Value.Value.filter(penetration => Number(penetration.Time._text) > 0)
                 .map(penetration => [penetration.Time._text * 1000, Number(penetration.Value._text)])
-        );
-        penetrations.set(250, (penetrations.get(200) + penetrations.get(300)) / 2);
-        penetrations.set(500, (penetrations.get(400) + penetrations.get(600)) / 2);
-        penetrations.set(750, penetrations.get(800) + (penetrations.get(600) - penetrations.get(800)) * 0.25);
-        cannon["penetration (m)"] = {};
-        peneDistances.forEach(distance => {
+        )
+        // noinspection MagicNumberJS
+        penetrations.set(250, (penetrations.get(200) + penetrations.get(300)) / 2)
+        // noinspection MagicNumberJS
+        penetrations.set(500, (penetrations.get(400) + penetrations.get(600)) / 2)
+        // noinspection MagicNumberJS
+        penetrations.set(750, penetrations.get(800) + (penetrations.get(600) - penetrations.get(800)) * 0.25)
+        cannon["penetration (m)"] = {}
+        for (const distance of peneDistances) {
             cannon["penetration (m)"][distance] = {
                 value: Math.trunc(penetrations.get(distance) * cannon.damage.penetration.value) | 0,
                 digits: 0
-            };
-        });
-        delete cannon.damage.penetration;
+            }
+        }
+
+        delete cannon.damage.penetration
 
         // Calculate damage per second
         cannon.damage["per second"] = {
             value: round(cannon.damage.basic.value / cannon.damage["reload time"].value, 2),
             digits: 0
-        };
+        }
 
-        cannons[type].push(cannon);
+        cannons[type].push(cannon)
     }
 
     // Get all files without a master
-    [...fileNames].forEach(baseFileName => {
-        const fileData = getFileData(baseFileName);
-        addData(fileData);
-    });
+    for (const baseFileName of [...fileNames]) {
+        const fileData = getFileData(baseFileName)
+        addData(fileData)
+    }
 
     // Set maximum digits after decimal point
-    const maxDigits = {};
-    cannonTypes.forEach(type => {
-        maxDigits[type] = {};
+    const maxDigits = {}
+    for (const type of cannonTypes) {
+        maxDigits[type] = {}
 
-        cannons[type].forEach(cannon => {
-            Object.entries(cannon).forEach(([groupKey, groupValue]) => {
+        for (const cannon of cannons[type]) {
+            for (const [groupKey, groupValue] of Object.entries(cannon)) {
                 if (typeof groupValue === "object") {
                     if (!maxDigits[type][groupKey]) {
-                        maxDigits[type][groupKey] = {};
+                        maxDigits[type][groupKey] = {}
                     }
 
-                    Object.entries(groupValue).forEach(([elementKey, elementValue]) => {
+                    // noinspection JSCheckFunctionSignatures
+                    for (const [elementKey, elementValue] of Object.entries(groupValue)) {
                         maxDigits[type][groupKey][elementKey] = Math.max(
-                            maxDigits[type][groupKey][elementKey] | 0,
+                            maxDigits[type][groupKey][elementKey] || 0,
                             countDecimals(elementValue.value)
-                        );
-                    });
+                        )
+                    }
                 }
-            });
-        });
-    });
-    cannonTypes.forEach(type => {
-        cannons[type].forEach(cannon => {
-            Object.entries(cannon).forEach(([groupKey, groupValue]) => {
+            }
+        }
+    }
+
+    for (const type of cannonTypes) {
+        for (const cannon of cannons[type]) {
+            for (const [groupKey, groupValue] of Object.entries(cannon)) {
                 if (typeof groupValue === "object") {
-                    Object.entries(groupValue).forEach(([elementKey]) => {
-                        cannon[groupKey][elementKey].digits = maxDigits[type][groupKey][elementKey];
-                    });
+                    // eslint-disable-next-line max-depth
+                    for (const [elementKey] of Object.entries(groupValue)) {
+                        cannon[groupKey][elementKey].digits = maxDigits[type][groupKey][elementKey]
+                    }
                 }
-            });
-        });
+            }
+        }
+
         cannons[type].sort(({ name: a }, { name: b }) => {
             // Sort either by lb numeral value when values are different
             if (parseInt(a, 10) !== parseInt(b, 10)) {
-                return parseInt(a, 10) - parseInt(b, 10);
+                return parseInt(a, 10) - parseInt(b, 10)
             }
 
             // Or sort by string
-            return a.localeCompare(b);
-        });
-    });
+            return a.localeCompare(b)
+        })
+    }
 
-    await saveJsonAsync(commonPaths.fileCannon, cannons);
-};
+    await saveJsonAsync(commonPaths.fileCannon, cannons)
+}
