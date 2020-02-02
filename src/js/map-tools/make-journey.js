@@ -8,24 +8,24 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import "bootstrap/js/dist/util";
-import "bootstrap/js/dist/modal";
+import "bootstrap/js/dist/util"
+import "bootstrap/js/dist/modal"
 
-import { layoutTextLabel, layoutAnnealing, layoutLabel } from "@d3fc/d3fc-label-layout";
-import { range as d3Range } from "d3-array";
-import { drag as d3Drag } from "d3-drag";
-import { scaleLinear as d3ScaleLinear } from "d3-scale";
-import { event as d3Event, select as d3Select } from "d3-selection";
-import { line as d3Line } from "d3-shape";
-import { zoomIdentity as d3ZoomIdentity, zoomTransform as d3ZoomTransform } from "d3-zoom";
-import moment from "moment";
-import "moment/locale/en-gb";
+import { layoutTextLabel, layoutAnnealing, layoutLabel } from "@d3fc/d3fc-label-layout"
+import { range as d3Range } from "d3-array"
+import { drag as d3Drag } from "d3-drag"
+import { scaleLinear as d3ScaleLinear } from "d3-scale"
+import { event as d3Event, select as d3Select } from "d3-selection"
+import { line as d3Line } from "d3-shape"
+import { zoomIdentity as d3ZoomIdentity, zoomTransform as d3ZoomTransform } from "d3-zoom"
+import moment from "moment"
+import "moment/locale/en-gb"
 
-import "round-slider/src/roundslider";
-import "round-slider/src/roundslider.css";
-import "../../scss/roundslider.scss";
+import "round-slider/src/roundslider"
+import "round-slider/src/roundslider.css"
+import "../../scss/roundslider.scss"
 
-import { registerEvent } from "../analytics";
+import { registerEvent } from "../analytics"
 import {
     convertInvCoordX,
     convertInvCoordY,
@@ -34,7 +34,7 @@ import {
     getDistance,
     insertBaseModal,
     speedFactor
-} from "../common";
+} from "../common"
 import {
     compassDirections,
     degreesToCompass,
@@ -43,9 +43,9 @@ import {
     formatF11,
     printCompassRose,
     rotationAngleInDegrees
-} from "../util";
+} from "../util"
 
-import CompareShips from "../game-tools/compare-ships";
+import CompareShips from "../game-tools/compare-ships"
 
 /**
  * Journey
@@ -55,84 +55,81 @@ export default class Journey {
      * @param {number} fontSize - Font size
      */
     constructor(fontSize) {
-        this._fontSize = fontSize;
+        this._fontSize = fontSize
 
-        this._compassRadius = 90;
-        this._courseArrowWidth = 5;
+        this._compassRadius = 90
+        this._courseArrowWidth = 5
         this._line = d3Line()
             .x(d => d[0])
-            .y(d => d[1]);
+            .y(d => d[1])
 
-        this._labelPadding = 20;
+        this._labelPadding = 20
 
-        this._degreesPerMinute = degreesPerSecond / 60;
-        this._degreesSegment = 15;
-        this._minOWSpeed = 2;
-        this._owSpeedFactor = 2;
+        this._degreesPerMinute = degreesPerSecond / 60
+        this._degreesSegment = 15
+        this._minOWSpeed = 2
+        this._owSpeedFactor = 2
 
-        this._speedScale = d3ScaleLinear().domain(d3Range(0, fullCircle, this._degreesSegment));
+        this._speedScale = d3ScaleLinear().domain(d3Range(0, fullCircle, this._degreesSegment))
 
-        this._defaultShipName = "None";
-        this._defaultShipSpeed = 19;
-        this._defaultStartWindDegrees = 0;
+        this._defaultShipName = "None"
+        this._defaultShipSpeed = 19
+        this._defaultStartWindDegrees = 0
 
-        this._baseName = "Make journey";
-        this._baseId = "make-journey";
-        this._buttonId = `button-${this._baseId}`;
-        this._compassId = `compass-${this._baseId}`;
-        this._deleteLastLegButtonId = `button-delete-leg-${this._baseId}`;
-        this._modalId = `modal-${this._baseId}`;
-        this._sliderId = `slider-${this._baseId}`;
-        this._shipId = "ship-journey";
+        this._baseName = "Make journey"
+        this._baseId = "make-journey"
+        this._buttonId = `button-${this._baseId}`
+        this._compassId = `compass-${this._baseId}`
+        this._deleteLastLegButtonId = `button-delete-leg-${this._baseId}`
+        this._modalId = `modal-${this._baseId}`
+        this._sliderId = `slider-${this._baseId}`
+        this._shipId = "ship-journey"
 
-        this._setupSummary();
-        this._setupDrag();
-        this._setupSvg();
-        this._initJourneyData();
-        this._setupListener();
+        this._setupSummary()
+        this._setupDrag()
+        this._setupSvg()
+        this._initJourneyData()
+        this._setupListener()
     }
 
     _setupDrag() {
-        // eslint-disable-next-line unicorn/consistent-function-scoping
         const dragStart = (d, i, nodes) => {
-            this._removeLabels();
-            d3Select(nodes[i]).classed("drag-active", true);
-        };
+            this._removeLabels()
+            d3Select(nodes[i]).classed("drag-active", true)
+        }
 
-        // eslint-disable-next-line unicorn/consistent-function-scoping
         const dragged = (d, i, nodes) => {
             // Set compass position
             if (i === 0) {
-                this._compass.attr("x", d.position[0] + d3Event.dx).attr("y", d.position[1] + d3Event.dy);
+                this._compass.attr("x", d.position[0] + d3Event.dx).attr("y", d.position[1] + d3Event.dy)
             }
 
             d3Select(nodes[i])
                 .attr("cx", d3Event.x)
-                .attr("cy", d3Event.y);
-            d.position = [d.position[0] + d3Event.dx, d.position[1] + d3Event.dy];
-            this._printLines();
-        };
+                .attr("cy", d3Event.y)
+            d.position = [d.position[0] + d3Event.dx, d.position[1] + d3Event.dy]
+            this._printLines()
+        }
 
-        // eslint-disable-next-line unicorn/consistent-function-scoping
         const dragEnd = (d, i, nodes) => {
-            d3Select(nodes[i]).classed("drag-active", false);
+            d3Select(nodes[i]).classed("drag-active", false)
             //  this._journey.segment[i].position = [d.position[0] + d3Event.x, d.position[1] + d3Event.y];
-            this._printJourney();
-        };
+            this._printJourney()
+        }
 
         this._drag = d3Drag()
             .on("start", dragStart)
             .on("drag", dragged)
-            .on("end", dragEnd);
+            .on("end", dragEnd)
     }
 
     _setupSvg() {
-        const width = this._courseArrowWidth;
-        const doubleWidth = this._courseArrowWidth * 2;
+        const width = this._courseArrowWidth
+        const doubleWidth = this._courseArrowWidth * 2
 
         this._g = d3Select("#na-svg")
             .insert("g", "g.pb")
-            .attr("class", "journey");
+            .attr("class", "journey")
 
         d3Select("#na-svg defs")
             .append("marker")
@@ -145,7 +142,7 @@ export default class Journey {
             .attr("orient", "auto")
             .append("path")
             .attr("class", "journey-arrow-head")
-            .attr("d", `M0,-${width}L${doubleWidth},0L0,${width}`);
+            .attr("d", `M0,-${width}L${doubleWidth},0L0,${width}`)
     }
 
     _initJourneyData() {
@@ -156,20 +153,20 @@ export default class Journey {
             totalDistance: 0,
             totalMinutes: 0,
             segment: [{ position: [null, null], label: "" }]
-        };
+        }
     }
 
     _resetJourneyData() {
-        this._journey.startWindDegrees = this._getStartWind();
-        this._journey.currentWindDegrees = this._journey.startWindDegrees;
-        this._journey.totalDistance = 0;
-        this._journey.totalMinutes = 0;
+        this._journey.startWindDegrees = this._getStartWind()
+        this._journey.currentWindDegrees = this._journey.startWindDegrees
+        this._journey.totalDistance = 0
+        this._journey.totalMinutes = 0
     }
 
     _navbarClick(event) {
-        registerEvent("Menu", "Journey");
-        event.stopPropagation();
-        this._journeySelected();
+        registerEvent("Menu", "Journey")
+        event.stopPropagation()
+        this._journeySelected()
     }
 
     /**
@@ -177,24 +174,25 @@ export default class Journey {
      * @returns {void}
      */
     _setupListener() {
-        document.getElementById(`${this._buttonId}`).addEventListener("mouseup", event => this._navbarClick(event));
-        document.getElementById(this._deleteLastLegButtonId).addEventListener("mouseup", () => this._deleteLastLeg());
+        document.getElementById(`${this._buttonId}`).addEventListener("mouseup", event => this._navbarClick(event))
+        document.getElementById(this._deleteLastLegButtonId).addEventListener("mouseup", () => this._deleteLastLeg())
     }
 
+    // noinspection DuplicatedCode
     _setupWindInput() {
         // workaround from https://github.com/soundar24/roundSlider/issues/71
-        const { _getTooltipPos } = $.fn.roundSlider.prototype;
+        const { _getTooltipPos } = $.fn.roundSlider.prototype
         $.fn.roundSlider.prototype._getTooltipPos = function() {
             if (!this.tooltip.is(":visible")) {
-                $("body").append(this.tooltip);
+                $("body").append(this.tooltip)
             }
 
-            const pos = _getTooltipPos.call(this);
-            this.container.append(this.tooltip);
-            return pos;
-        };
+            const pos = _getTooltipPos.call(this)
+            this.container.append(this.tooltip)
+            return pos
+        }
 
-        window.tooltip = arguments_ => `${displayCompass(arguments_.value)}<br>${arguments_.value}°`;
+        window.tooltip = arguments_ => `${displayCompass(arguments_.value)}<br>${arguments_.value}°`
 
         $(`#${this._sliderId}`).roundSlider({
             sliderType: "default",
@@ -208,48 +206,48 @@ export default class Journey {
             editableTooltip: false,
             tooltipFormat: "tooltip",
             create() {
-                this.control.css("display", "block");
+                this.control.css("display", "block")
             },
             change() {
-                this._currentWind = $(`#${this._sliderId}`).roundSlider("getValue");
+                this._currentWind = $(`#${this._sliderId}`).roundSlider("getValue")
             }
-        });
+        })
     }
 
     _injectModal() {
-        insertBaseModal(this._modalId, this._baseName, "sm");
+        insertBaseModal(this._modalId, this._baseName, "sm")
 
-        const body = d3Select(`#${this._modalId} .modal-body`);
+        const body = d3Select(`#${this._modalId} .modal-body`)
         const formGroup = body
             .append("form")
             .append("div")
-            .attr("class", "form-group");
+            .attr("class", "form-group")
 
         const slider = formGroup
             .append("div")
             .attr("class", "alert alert-primary")
-            .attr("role", "alert");
+            .attr("role", "alert")
         slider
             .append("label")
             .attr("for", this._sliderId)
-            .text("Current in-game wind");
+            .text("Current in-game wind")
         slider
             .append("div")
             .attr("id", this._sliderId)
-            .attr("class", "rslider");
+            .attr("class", "rslider")
 
-        const shipId = `${this._shipId}-Base-select`;
+        const shipId = `${this._shipId}-Base-select`
         const ship = formGroup
             .append("div")
             .attr("class", "alert alert-primary")
-            .attr("role", "alert");
-        const div = ship.append("div").attr("class", "d-flex flex-column");
+            .attr("role", "alert")
+        const div = ship.append("div").attr("class", "d-flex flex-column")
         div.append("label")
             .attr("for", shipId)
-            .text("Ship (optional)");
+            .text("Ship (optional)")
         div.append("select")
             .attr("name", shipId)
-            .attr("id", shipId);
+            .attr("id", shipId)
     }
 
     /**
@@ -257,19 +255,19 @@ export default class Journey {
      * @returns {void}
      */
     _initModal() {
-        this._injectModal();
-        this._setupWindInput();
+        this._injectModal()
+        this._setupWindInput()
 
-        this._shipCompare = new CompareShips(this._shipId);
-        this._shipCompare.CompareShipsInit();
+        this._shipCompare = new CompareShips(this._shipId)
+        this._shipCompare.CompareShipsInit()
     }
 
     _useUserInput() {
-        this._resetJourneyData();
-        this._journey.startWindDegrees = this._getStartWind();
-        this._setShipName();
-        this._printSummary();
-        this._printJourney();
+        this._resetJourneyData()
+        this._journey.startWindDegrees = this._getStartWind()
+        this._setShipName()
+        this._printSummary()
+        this._printJourney()
     }
 
     /**
@@ -279,20 +277,20 @@ export default class Journey {
     _journeySelected() {
         // If the modal has no content yet, insert it
         if (!document.getElementById(this._modalId)) {
-            this._initModal();
+            this._initModal()
         }
 
         // Show modal
         $(`#${this._modalId}`)
             .modal("show")
             .one("hidden.bs.modal", () => {
-                this._useUserInput();
-            });
+                this._useUserInput()
+            })
     }
 
     _printCompass() {
-        const x = this._journey.segment[0].position[0];
-        const y = this._journey.segment[0].position[1];
+        const x = this._journey.segment[0].position[0]
+        const y = this._journey.segment[0].position[1]
 
         this._compass = this._g
             .append("svg")
@@ -300,23 +298,23 @@ export default class Journey {
             .attr("class", "compass")
             .attr("x", x)
             .attr("y", y)
-            .call(this._drag);
+            .call(this._drag)
 
-        this._compassG = this._compass.append("g");
-        printCompassRose({ element: this._compassG, radius: this._compassRadius });
+        this._compassG = this._compass.append("g")
+        printCompassRose({ element: this._compassG, radius: this._compassRadius })
     }
 
     _removeCompass() {
-        this._compass.remove();
+        this._compass.remove()
     }
 
     _getSpeedAtDegrees(degrees) {
-        return Math.max(this._speedScale(degrees), this._minOWSpeed);
+        return Math.max(this._speedScale(degrees), this._minOWSpeed)
     }
 
     _calculateDistanceForSection(degreesCourse, degreesCurrentWind) {
-        const degreesForSpeedCalc = (fullCircle - degreesCourse + degreesCurrentWind) % fullCircle;
-        const speedCurrentSection = this._getSpeedAtDegrees(degreesForSpeedCalc) * this._owSpeedFactor;
+        const degreesForSpeedCalc = (fullCircle - degreesCourse + degreesCurrentWind) % fullCircle
+        const speedCurrentSection = this._getSpeedAtDegrees(degreesForSpeedCalc) * this._owSpeedFactor
         /*
         console.log(
             { degreesCourse },
@@ -326,27 +324,28 @@ export default class Journey {
             { speedCurrentSection * speedFactor }
         );
         */
-        return speedCurrentSection * speedFactor;
+        return speedCurrentSection * speedFactor
     }
 
     _getStartWind() {
-        const select$ = $(`#${this._sliderId}`);
-        const currentUserWind = Number(select$.roundSlider("getValue"));
+        const select$ = $(`#${this._sliderId}`)
+        const currentUserWind = Number(select$.roundSlider("getValue"))
         // Current wind in correctionValueDegrees
-        return select$.length ? currentUserWind : 0;
+        return select$.length ? currentUserWind : 0
     }
 
     _setShipSpeed() {
-        let speedDegrees = [];
+        let speedDegrees = []
 
         if (this._journey.shipName === this._defaultShipName) {
             // Dummy ship speed
-            speedDegrees = [...new Array(24).fill(this._defaultShipSpeed / 2)];
+            speedDegrees = [...new Array(24).fill(this._defaultShipSpeed / 2)]
         } else {
-            ({ speedDegrees } = this._shipCompare._singleShipData);
+            // eslint-disable-next-line no-extra-semi
+            ;({ speedDegrees } = this._shipCompare._singleShipData)
         }
 
-        this._speedScale.range(speedDegrees);
+        this._speedScale.range(speedDegrees)
         // console.log(this._speedScale.range());
     }
 
@@ -359,36 +358,36 @@ export default class Journey {
      * @private
      */
     _calculateMinutesForSegment(courseDegrees, startWindDegrees, distanceSegment) {
-        let distanceRemaining = distanceSegment;
-        let currentWindDegrees = startWindDegrees;
-        let totalMinutesSegment = 0;
+        let distanceRemaining = distanceSegment
+        let currentWindDegrees = startWindDegrees
+        let totalMinutesSegment = 0
 
-        this._setShipSpeed();
+        this._setShipSpeed()
         while (distanceRemaining > 0) {
-            const distanceCurrentSection = this._calculateDistanceForSection(courseDegrees, currentWindDegrees);
+            const distanceCurrentSection = this._calculateDistanceForSection(courseDegrees, currentWindDegrees)
             if (distanceRemaining > distanceCurrentSection) {
-                distanceRemaining -= distanceCurrentSection;
-                totalMinutesSegment += 1;
+                distanceRemaining -= distanceCurrentSection
+                totalMinutesSegment += 1
             } else {
-                totalMinutesSegment += distanceRemaining / distanceCurrentSection;
-                distanceRemaining = 0;
+                totalMinutesSegment += distanceRemaining / distanceCurrentSection
+                distanceRemaining = 0
             }
 
-            currentWindDegrees = (fullCircle + currentWindDegrees - this._degreesPerMinute) % fullCircle;
+            currentWindDegrees = (fullCircle + currentWindDegrees - this._degreesPerMinute) % fullCircle
 
             // console.log({ distanceCurrentSection }, { totalMinutesSegment });
         }
 
-        this._journey.currentWindDegrees = currentWindDegrees;
+        this._journey.currentWindDegrees = currentWindDegrees
 
-        return totalMinutesSegment;
+        return totalMinutesSegment
     }
 
     _setShipName() {
         if (this._shipCompare && this._shipCompare._singleShipData && this._shipCompare._singleShipData.name) {
-            this._journey.shipName = `${this._shipCompare._singleShipData.name}`;
+            this._journey.shipName = `${this._shipCompare._singleShipData.name}`
         } else {
-            this._journey.shipName = this._defaultShipName;
+            this._journey.shipName = this._defaultShipName
         }
     }
 
@@ -398,21 +397,21 @@ export default class Journey {
      * @private
      */
     _removeLabels() {
-        const label = this._g.selectAll("g.journey g.label");
-        label.select("text").remove();
-        label.select("rect").remove();
+        const label = this._g.selectAll("g.journey g.label")
+        label.select("text").remove()
+        label.select("rect").remove()
     }
 
     _correctJourney() {
-        const defaultTranslate = 20;
-        const currentTransform = d3ZoomTransform(d3Select("#na-svg").node());
+        const defaultTranslate = 20
+        const currentTransform = d3ZoomTransform(d3Select("#na-svg").node())
         // Don't scale on higher zoom level
-        const scale = Math.max(1, currentTransform.k);
-        const fontSize = this._fontSize / scale;
-        const textTransform = d3ZoomIdentity.translate(defaultTranslate / scale, defaultTranslate / scale);
-        const textPadding = this._labelPadding / scale;
-        const circleRadius = 10 / scale;
-        const pathWidth = 5 / scale;
+        const scale = Math.max(1, currentTransform.k)
+        const fontSize = this._fontSize / scale
+        const textTransform = d3ZoomIdentity.translate(defaultTranslate / scale, defaultTranslate / scale)
+        const textPadding = this._labelPadding / scale
+        const circleRadius = 10 / scale
+        const pathWidth = 5 / scale
 
         /** Correct Text Box
          *  - split text into lines
@@ -427,59 +426,59 @@ export default class Journey {
          */
         const correctTextBox = (d, i, nodes) => {
             // Split text into lines
-            const node = d3Select(nodes[i]);
-            const text = node.select("text");
-            const lines = d.label.split("|");
-            const lineHeight = fontSize * 1.3;
+            const node = d3Select(nodes[i])
+            const text = node.select("text")
+            const lines = d.label.split("|")
+            const lineHeight = fontSize * 1.3
 
             text.text("")
                 .attr("dy", 0)
                 .attr("transform", textTransform)
-                .style("font-size", `${fontSize}px`);
+                .style("font-size", `${fontSize}px`)
             lines.forEach((line, j) => {
-                const tspan = text.append("tspan").html(line);
+                const tspan = text.append("tspan").html(line)
                 if (j > 0) {
-                    tspan.attr("x", 0).attr("dy", lineHeight);
+                    tspan.attr("x", 0).attr("dy", lineHeight)
                 }
-            });
+            })
 
             // Correct box width
-            const bbText = text.node().getBBox();
-            const width = d.label ? bbText.width + textPadding * 2 : 0;
-            const height = d.label ? bbText.height + textPadding : 0;
+            const bbText = text.node().getBBox()
+            const width = d.label ? bbText.width + textPadding * 2 : 0
+            const height = d.label ? bbText.height + textPadding : 0
             node.select("rect")
                 .attr("width", width)
-                .attr("height", height);
+                .attr("height", height)
 
             // Enlarge circles
             const circle = node
                 .select("circle")
                 .attr("r", circleRadius)
-                .attr("class", "");
+                .attr("class", "")
 
             // Move circles down and visually above text box
-            node.append(() => circle.remove().node());
+            node.append(() => circle.remove().node())
 
             // Enlarge and hide first circle
             if (i === 0) {
-                circle.attr("r", circleRadius * 4).attr("class", "drag-hidden");
+                circle.attr("r", circleRadius * 4).attr("class", "drag-hidden")
             }
 
             // Hide last circle
             if (i === nodes.length - 1) {
-                circle.attr("r", circleRadius).attr("class", "drag-hidden");
+                circle.attr("r", circleRadius).attr("class", "drag-hidden")
             }
-        };
+        }
 
         // Correct text boxes
-        this._g.selectAll("g.journey g.label").each(correctTextBox);
+        this._g.selectAll("g.journey g.label").each(correctTextBox)
         // Correct journey stroke width
         if (this._gJourneyPath) {
-            this._gJourneyPath.style("stroke-width", `${pathWidth}px`);
+            this._gJourneyPath.style("stroke-width", `${pathWidth}px`)
         }
 
         if (this._compassG) {
-            this._compassG.attr("transform", `scale(${1 / scale})`);
+            this._compassG.attr("transform", `scale(${1 / scale})`)
         }
     }
 
@@ -493,28 +492,28 @@ export default class Journey {
         const textLabel = layoutTextLabel()
             .padding(this._labelPadding)
             .value(d => {
-                const lines = d.label.split("|");
+                const lines = d.label.split("|")
                 // Find longest line (number of characters)
-                const index = lines.reduce((p, c, i, a) => (a[p].length > c.length ? p : i), 0);
-                return lines[index];
-            });
+                const index = lines.reduce((p, c, i, a) => (a[p].length > c.length ? p : i), 0)
+                return lines[index]
+            })
 
         // Strategy that combines simulated annealing with removal of overlapping labels
-        const strategy = layoutAnnealing();
+        const strategy = layoutAnnealing()
 
         // Create the layout that positions the labels
         const labels = layoutLabel(strategy)
             .size((d, i, nodes) => {
                 // measure the label and add the required padding
-                const numberLines = d.label.split("|").length;
-                const bbText = nodes[i].getElementsByTagName("text")[0].getBBox();
-                return [bbText.width + this._labelPadding * 2, bbText.height * numberLines + this._labelPadding * 2];
+                const numberLines = d.label.split("|").length
+                const bbText = nodes[i].getElementsByTagName("text")[0].getBBox()
+                return [bbText.width + this._labelPadding * 2, bbText.height * numberLines + this._labelPadding * 2]
             })
             .position(d => d.position)
-            .component(textLabel);
+            .component(textLabel)
 
         // Render
-        this._g.datum(this._journey.segment.map(segment => segment)).call(labels);
+        this._g.datum(this._journey.segment.map(segment => segment)).call(labels)
     }
 
     _setupSummary() {
@@ -522,23 +521,23 @@ export default class Journey {
         this._divJourneySummary = d3Select("main #summary-column")
             .append("div")
             .attr("id", "journey-summary")
-            .attr("class", "journey-summary d-none");
+            .attr("class", "journey-summary d-none")
 
         // Selected ship
-        this._journeySummaryShip = this._divJourneySummary.append("div").attr("class", "block small");
-        this._journeySummaryTextShip = this._journeySummaryShip.append("div");
+        this._journeySummaryShip = this._divJourneySummary.append("div").attr("class", "block small")
+        this._journeySummaryTextShip = this._journeySummaryShip.append("div")
         this._journeySummaryShip
             .append("div")
             .attr("class", "summary-des")
-            .text("ship");
+            .text("ship")
 
         // Wind direction
-        this._journeySummaryWind = this._divJourneySummary.append("div").attr("class", "block small");
-        this._journeySummaryTextWind = this._journeySummaryWind.append("div");
+        this._journeySummaryWind = this._divJourneySummary.append("div").attr("class", "block small")
+        this._journeySummaryTextWind = this._journeySummaryWind.append("div")
         this._journeySummaryWind
             .append("div")
             .attr("class", "summary-des")
-            .text("wind");
+            .text("wind")
 
         this._divJourneySummary
             .append("div")
@@ -547,33 +546,33 @@ export default class Journey {
             .attr("id", this._deleteLastLegButtonId)
             .attr("class", "btn btn-outline-primary btn-sm")
             .attr("role", "button")
-            .text("Clear last leg");
+            .text("Clear last leg")
     }
 
     _displaySummary(showJourneySummary) {
-        this._divJourneySummary.classed("d-none", !showJourneySummary);
-        d3Select("#port-summary").classed("d-none", showJourneySummary);
+        this._divJourneySummary.classed("d-none", !showJourneySummary)
+        d3Select("#port-summary").classed("d-none", showJourneySummary)
     }
 
     _showSummary() {
-        this._displaySummary(true);
+        this._displaySummary(true)
     }
 
     _hideSummary() {
-        this._displaySummary(false);
+        this._displaySummary(false)
     }
 
     _printSummaryShip() {
-        this._journeySummaryTextShip.text(this._journey.shipName);
+        this._journeySummaryTextShip.text(this._journey.shipName)
     }
 
     _printSummaryWind() {
-        this._journeySummaryTextWind.html(`From ${displayCompassAndDegrees(this._journey.startWindDegrees)}`);
+        this._journeySummaryTextWind.html(`From ${displayCompassAndDegrees(this._journey.startWindDegrees)}`)
     }
 
     _printSummary() {
-        this._printSummaryWind();
-        this._printSummaryShip();
+        this._printSummaryWind()
+        this._printSummaryShip()
     }
 
     _printLines() {
@@ -585,136 +584,136 @@ export default class Journey {
                         : [[null, null]]
                 )
                 .attr("marker-end", "url(#journey-arrow)")
-                .attr("d", this._line);
+                .attr("d", this._line)
         }
     }
 
     _getTextDirection(courseCompass, courseDegrees, pt1) {
         return `${displayCompassAndDegrees(courseCompass, true)} \u2056 F11: ${formatF11(
             convertInvCoordX(pt1.x, pt1.y)
-        )}\u202F/\u202F${formatF11(convertInvCoordY(pt1.x, pt1.y))}`;
+        )}\u202F/\u202F${formatF11(convertInvCoordY(pt1.x, pt1.y))}`
     }
 
     static _pluralize(number, word) {
-        return `${number} ${word + (number === 1 ? "" : "s")}`;
+        return `${number} ${word + (number === 1 ? "" : "s")}`
     }
 
     _getTextDistance(distanceK, minutes, addTotal) {
         function getHumanisedDuration(duration) {
-            moment.locale("en-gb");
+            moment.locale("en-gb")
 
-            const durationHours = Math.floor(duration / 60);
-            const durationMinutes = Math.round(duration % 60);
+            const durationHours = Math.floor(duration / 60)
+            const durationMinutes = Math.round(duration % 60)
 
-            let s = "in ";
+            let s = "in "
             if (duration < 1) {
-                s += "less than a minute";
+                s += "less than a minute"
             } else {
-                const hourString = durationHours === 0 ? "" : Journey._pluralize(durationHours, "hour");
-                const minuteString = durationMinutes === 0 ? "" : Journey._pluralize(durationMinutes, "minute");
-                s += hourString + (hourString === "" ? "" : " ") + minuteString;
+                const hourString = durationHours === 0 ? "" : Journey._pluralize(durationHours, "hour")
+                const minuteString = durationMinutes === 0 ? "" : Journey._pluralize(durationMinutes, "minute")
+                s += hourString + (hourString === "" ? "" : " ") + minuteString
             }
 
-            return s;
+            return s
         }
 
-        let textDistance = `${Math.round(distanceK)}\u2009k ${getHumanisedDuration(minutes)}`;
+        let textDistance = `${Math.round(distanceK)}\u2009k ${getHumanisedDuration(minutes)}`
 
         if (addTotal) {
             textDistance += ` \u2056 total ${Math.round(this._journey.totalDistance)}\u2009k ${getHumanisedDuration(
                 this._journey.totalMinutes
-            )}`;
+            )}`
         }
 
-        return textDistance;
+        return textDistance
     }
 
     _setSegmentLabel(index = this._journey.segment.length - 1) {
-        const pt1 = { x: this._journey.segment[index].position[0], y: this._journey.segment[index].position[1] };
+        const pt1 = { x: this._journey.segment[index].position[0], y: this._journey.segment[index].position[1] }
         const pt2 = {
             x: this._journey.segment[index - 1].position[0],
             y: this._journey.segment[index - 1].position[1]
-        };
+        }
 
-        const courseDegrees = rotationAngleInDegrees(pt1, pt2);
-        const distanceK = getDistance(pt1, pt2);
-        const courseCompass = degreesToCompass(courseDegrees);
+        const courseDegrees = rotationAngleInDegrees(pt1, pt2)
+        const distanceK = getDistance(pt1, pt2)
+        const courseCompass = degreesToCompass(courseDegrees)
 
         const minutes = this._calculateMinutesForSegment(
             courseDegrees,
             this._journey.currentWindDegrees,
             distanceK * 1000
-        );
+        )
         // console.log("*** start", this._journey.currentWindDegrees, { distanceK }, { courseCompass });
-        this._journey.totalDistance += distanceK;
-        this._journey.totalMinutes += minutes;
-        const textDirection = this._getTextDirection(courseCompass, courseDegrees, pt1);
-        const textDistance = this._getTextDistance(distanceK, minutes, index > 1);
+        this._journey.totalDistance += distanceK
+        this._journey.totalMinutes += minutes
+        const textDirection = this._getTextDirection(courseCompass, courseDegrees, pt1)
+        const textDistance = this._getTextDistance(distanceK, minutes, index > 1)
 
-        this._journey.segment[index].label = `${textDirection}|${textDistance}`;
+        this._journey.segment[index].label = `${textDirection}|${textDistance}`
         // console.log("*** end", this._journey);
     }
 
     _printSegment() {
-        this._printLines();
-        this._setSegmentLabel();
-        this._printLabels();
-        this._correctJourney();
-        this._g.selectAll("g.journey g.label circle").call(this._drag);
+        this._printLines()
+        this._setSegmentLabel()
+        this._printLabels()
+        this._correctJourney()
+        this._g.selectAll("g.journey g.label circle").call(this._drag)
     }
 
     _printJourney() {
-        this._printLines();
-        this._resetJourneyData();
+        this._printLines()
+        this._resetJourneyData()
         this._journey.segment.forEach((d, i) => {
             if (i < this._journey.segment.length - 1) {
-                this._setSegmentLabel(i + 1);
+                this._setSegmentLabel(i + 1)
             }
-        });
+        })
 
-        this._printLabels();
-        this._correctJourney();
-        this._g.selectAll("g.journey g.label circle").call(this._drag);
+        this._printLabels()
+        this._correctJourney()
+        this._g.selectAll("g.journey g.label circle").call(this._drag)
     }
 
     _deleteLastLeg() {
-        this._journey.segment.pop();
+        this._journey.segment.pop()
         if (this._journey.segment.length) {
-            this._printJourney();
+            this._printJourney()
         } else {
-            this._g.selectAll("g.journey g.label").remove();
-            this._gJourneyPath.remove();
-            this._removeCompass();
-            this._hideSummary();
-            this._initJourneyData();
+            this._g.selectAll("g.journey g.label").remove()
+            this._gJourneyPath.remove()
+            this._removeCompass()
+            this._hideSummary()
+            this._initJourneyData()
         }
     }
 
     _initJourney() {
-        this._showSummary();
-        this._printSummary();
-        this._printCompass();
-        this._gJourneyPath = this._g.append("path");
+        this._showSummary()
+        this._printSummary()
+        this._printCompass()
+        this._gJourneyPath = this._g.append("path")
     }
 
     /* public */
 
     setSummaryPosition(topMargin, rightMargin) {
-        this._divJourneySummary.style("top", `${topMargin}px`).style("right", `${rightMargin}px`);
+        this._divJourneySummary.style("top", `${topMargin}px`).style("right", `${rightMargin}px`)
     }
 
     plotCourse(x, y) {
         if (this._journey.segment[0].position[0]) {
-            this._journey.segment.push({ position: [x, y], label: "" });
-            this._printSegment();
+            this._journey.segment.push({ position: [x, y], label: "" })
+            this._printSegment()
         } else {
-            this._journey.segment[0] = { position: [x, y], label: "" };
-            this._initJourney();
+            this._journey.segment[0] = { position: [x, y], label: "" }
+            this._initJourney()
         }
     }
 
     transform(transform) {
-        this._g.attr("transform", transform);
-        this._correctJourney();
+        this._g.attr("transform", transform)
+        this._correctJourney()
     }
 }
