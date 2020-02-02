@@ -4,13 +4,13 @@
  * @file      Utility functions.
  * @module    util
  * @author    iB aka Felix Victor
- * @copyright 2017, 2018
+ * @copyright 2017, 2018, 2019, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { formatLocale as d3FormatLocale } from "d3-format";
-import { scaleBand as d3ScaleBand } from "d3-scale";
-import { html } from "lit-html";
+import { formatLocale as d3FormatLocale } from "d3-format"
+import { scaleBand as d3ScaleBand } from "d3-scale"
+import { html } from "lit-html"
 
 /**
  * Default format
@@ -22,12 +22,12 @@ const formatLocale = d3FormatLocale({
     currency: ["", "\u00A0reals"],
     percent: "\u202F%",
     minus: "\u2212\u2009"
-});
+})
 
 /**
  * format with SI suffix
  */
-const formatPrefix = formatLocale.formatPrefix(",.0", 1e3);
+const formatPrefix = formatLocale.formatPrefix(",.0", 1e3)
 
 /**
  * Format float
@@ -36,7 +36,7 @@ const formatPrefix = formatLocale.formatPrefix(",.0", 1e3);
  * @param {Number} s - Significant digits
  * @return {String} - Formatted float
  */
-export const formatFloat = (x, s = 2) => formatLocale.format(`,.${s}~r`)(x);
+export const formatFloat = (x, s = 2) => formatLocale.format(`,.${s}~r`)(x)
 
 /**
  * Format float with +/- sign
@@ -48,7 +48,7 @@ export const formatFloat = (x, s = 2) => formatLocale.format(`,.${s}~r`)(x);
 export const formatSignFloat = (x, s = 2) =>
     formatLocale
         .format(`+,.${s}~r`)(x)
-        .replace("+", "\uFF0B\u200A");
+        .replace("+", "\uFF0B\u200A")
 
 /**
  * Format float
@@ -61,7 +61,7 @@ export const formatFloatFixed = (x, f = 2) =>
     formatLocale
         .format(`.${f}f`)(x)
         .replace(".00", '<span class="hidden">.00</span>')
-        .replace(/\.(\d)0/g, '.$1<span class="hidden">0</span>');
+        .replace(/\.(\d)0/g, '.$1<span class="hidden">0</span>')
 
 /**
  * Format float for lit-html
@@ -73,25 +73,25 @@ export const formatFloatFixed = (x, f = 2) =>
 export const formatFloatFixedHTML = (x, f = 2) => {
     let [number, decimals] = formatLocale
         .format(`.${f}f`)(x)
-        .split(".");
+        .split(".")
 
     if (decimals) {
         if (decimals === "0" || decimals === "00") {
             // eslint-disable-next-line prettier/prettier
-            decimals = html`<span class="hidden">.${decimals}</span>`;
+            decimals = html`<span class="hidden">.${decimals}</span>`
         } else if (decimals.endsWith("0")) {
             // eslint-disable-next-line prettier/prettier
-            decimals = html`.${decimals.replace("0", "")}<span class="hidden">0</span>`;
+            decimals = html`.${decimals.replace("0", "")}<span class="hidden">0</span>`
         } else {
             // eslint-disable-next-line prettier/prettier
-            decimals = html`.${decimals}`;
+            decimals = html`.${decimals}`
         }
     }
 
     return html`
         ${number}${decimals}
-    `;
-};
+    `
+}
 
 /**
  * Format ShowF11 coordinate
@@ -99,7 +99,7 @@ export const formatFloatFixedHTML = (x, f = 2) => {
  * @param {Number} x - ShowF11 coordinate
  * @return {String} Formatted ShowF11 coordinate
  */
-export const formatF11 = x => formatPrefix(x * -1).replace("k", "\u2009k");
+export const formatF11 = x => formatPrefix(x * -1).replace("k", "\u2009k")
 
 /**
  * Format integer
@@ -107,7 +107,7 @@ export const formatF11 = x => formatPrefix(x * -1).replace("k", "\u2009k");
  * @param {Number} x - Integer
  * @return {String} Formatted Integer
  */
-export const formatInt = x => formatLocale.format(",d")(x);
+export const formatInt = x => formatLocale.format(",d")(x)
 
 /**
  * Format truncated integer
@@ -115,7 +115,7 @@ export const formatInt = x => formatLocale.format(",d")(x);
  * @param {Number} x - Integer
  * @return {String} Formatted Integer
  */
-export const formatIntTrunc = x => formatLocale.format(",d")(x - 0.5);
+export const formatIntTrunc = x => formatLocale.format(",d")(x - 0.5)
 
 /**
  * Format integer with +/- sign
@@ -126,7 +126,7 @@ export const formatIntTrunc = x => formatLocale.format(",d")(x - 0.5);
 export const formatSignInt = x =>
     formatLocale
         .format("+,d")(x)
-        .replace("+", "\uFF0B\u200A");
+        .replace("+", "\uFF0B\u200A")
 
 /**
  * Format percentage point
@@ -137,7 +137,7 @@ export const formatSignInt = x =>
 export const formatPP = x =>
     formatLocale
         .format(",.0%")(x)
-        .replace("%", "pp");
+        .replace("%", "pp")
 
 /**
  * Format integer with SI suffix
@@ -151,7 +151,7 @@ export const formatSiInt = x =>
         .replace(".0", "")
         .replace("M", "\u2009\u1d0d") // LATIN LETTER SMALL CAPITAL M
         .replace("k", "\u2009k")
-        .replace("m", "\u2009m");
+        .replace("m", "\u2009m")
 
 /**
  * Format currency with SI suffix
@@ -164,7 +164,7 @@ export const formatSiCurrency = x =>
         .format("$,.2s")(x)
         .replace(".0", "")
         .replace("M", "\u2009\u1d0d") // LATIN LETTER SMALL CAPITAL M
-        .replace("k", "\u2009k");
+        .replace("k", "\u2009k")
 
 /**
  * Format percent value
@@ -176,7 +176,7 @@ export const formatSiCurrency = x =>
 export const formatPercent = (x, f = 1) =>
     formatLocale
         .format(`.${f}%`)(x)
-        .replace(".0", "");
+        .replace(".0", "")
 
 /**
  * Format percent value with +/- sign
@@ -188,7 +188,7 @@ export const formatSignPercent = x =>
     formatLocale
         .format("+.1%")(x)
         .replace(".0", "")
-        .replace("+", "\uFF0B\u200A");
+        .replace("+", "\uFF0B\u200A")
 
 /**
  * Format ordinal
@@ -197,10 +197,10 @@ export const formatSignPercent = x =>
  * @return {String} Formatted Ordinal
  */
 export function getOrdinal(n, sup = true) {
-    const s = ["th", "st", "nd", "rd"];
-    const v = n % 100;
-    const text = s[(v - 20) % 10] || s[v] || s[0];
-    return n + (sup ? `<span class="super">${text}</span>` : `${text}`);
+    const s = ["th", "st", "nd", "rd"]
+    const v = n % 100
+    const text = s[(v - 20) % 10] || s[v] || s[0]
+    return n + (sup ? `<span class="super">${text}</span>` : `${text}`)
 }
 
 /**
@@ -209,14 +209,14 @@ export function getOrdinal(n, sup = true) {
  * @param {number} decimals - decimals
  * @return {number} Rounded number
  */
-const round = (n, decimals = 0) => Number(`${Math.round(`${n}e${decimals}`)}e-${decimals}`);
+const round = (n, decimals = 0) => Number(`${Math.round(`${n}e${decimals}`)}e-${decimals}`)
 
 /**
  * Round to thousands
  * @param {Number} x - Integer
  * @return {Number} Rounded input
  */
-export const roundToThousands = x => round(x, 3);
+export const roundToThousands = x => round(x, 3)
 
 /**
  * Test if object is empty
@@ -224,7 +224,7 @@ export const roundToThousands = x => round(x, 3);
  * @param {object} object - Object
  * @return {boolean} True if object is empty
  */
-export const isEmpty = object => Object.getOwnPropertyNames(object).length === 0 && object.constructor === Object;
+export const isEmpty = object => Object.getOwnPropertyNames(object).length === 0 && object.constructor === Object
 
 /**
  * Compass directions
@@ -255,7 +255,7 @@ export const compassDirections = [
     "NW",
     "N⅔NW",
     "N⅓NW"
-];
+]
 
 /**
  * Converts compass direction to correctionValueDegrees
@@ -264,9 +264,9 @@ export const compassDirections = [
  * @return {Number} Degrees
  */
 export const compassToDegrees = compass => {
-    const degree = 360 / compassDirections.length;
-    return compassDirections.indexOf(compass) * degree;
-};
+    const degree = 360 / compassDirections.length
+    return compassDirections.indexOf(compass) * degree
+}
 
 /**
  * Convert correctionValueDegrees to compass direction (see {@link https://stackoverflow.com/questions/7490660/converting-wind-direction-in-angles-to-text-words})
@@ -275,10 +275,10 @@ export const compassToDegrees = compass => {
  * @return {String} Compass direction
  */
 export const degreesToCompass = degrees => {
-    const ticks = 360 / compassDirections.length;
-    const value = Math.floor(degrees / ticks + 0.5);
-    return compassDirections[value % compassDirections.length];
-};
+    const ticks = 360 / compassDirections.length
+    const value = Math.floor(degrees / ticks + 0.5)
+    return compassDirections[value % compassDirections.length]
+}
 
 /**
  * Display formatted compass
@@ -287,16 +287,16 @@ export const degreesToCompass = degrees => {
  * @return {string} HTML formatted compass
  */
 export const displayCompass = (wind, svg = false) => {
-    let compass;
+    let compass
 
     if (Number.isNaN(Number(wind))) {
-        compass = wind;
+        compass = wind
     } else {
-        compass = degreesToCompass(Number(wind));
+        compass = degreesToCompass(Number(wind))
     }
 
-    return `<${svg ? "tspan" : "span"} class="caps">${compass}</${svg ? "tspan" : "span"}>`;
-};
+    return `<${svg ? "tspan" : "span"} class="caps">${compass}</${svg ? "tspan" : "span"}>`
+}
 
 /**
  * Display formatted compass and correctionValueDegrees
@@ -305,19 +305,19 @@ export const displayCompass = (wind, svg = false) => {
  * @return {string} HTML formatted compass and correctionValueDegrees
  */
 export const displayCompassAndDegrees = (wind, svg = false) => {
-    let compass;
-    let degrees;
+    let compass
+    let degrees
 
     if (Number.isNaN(Number(wind))) {
-        compass = wind;
-        degrees = compassToDegrees(compass) % 360;
+        compass = wind
+        degrees = compassToDegrees(compass) % 360
     } else {
-        degrees = Number(wind);
-        compass = degreesToCompass(degrees);
+        degrees = Number(wind)
+        compass = degreesToCompass(degrees)
     }
 
-    return `<${svg ? "tspan" : "span"} class="caps">${compass}</${svg ? "tspan" : "span"}> (${degrees}°)`;
-};
+    return `<${svg ? "tspan" : "span"} class="caps">${compass}</${svg ? "tspan" : "span"}> (${degrees}°)`
+}
 
 /**
  * Get wind in correctionValueDegrees from user input (rs-slider)
@@ -325,17 +325,17 @@ export const displayCompassAndDegrees = (wind, svg = false) => {
  * @return {number} Wind in correctionValueDegrees
  */
 export const getUserWind = sliderId => {
-    const currentUserWind = degreesToCompass($(`#${sliderId}`).roundSlider("getValue"));
-    let windDegrees;
+    const currentUserWind = degreesToCompass($(`#${sliderId}`).roundSlider("getValue"))
+    let windDegrees
 
     if (Number.isNaN(Number(currentUserWind))) {
-        windDegrees = compassToDegrees(currentUserWind);
+        windDegrees = compassToDegrees(currentUserWind)
     } else {
-        windDegrees = Number(currentUserWind);
+        windDegrees = Number(currentUserWind)
     }
 
-    return windDegrees;
-};
+    return windDegrees
+}
 
 /**
  * Test if Number is between two unordered Numbers (see {@link https://stackoverflow.com/questions/14718561/how-to-check-if-a-number-is-between-two-values})
@@ -348,12 +348,12 @@ export const getUserWind = sliderId => {
  */
 export const between = (value, a, b, inclusive) => {
     // eslint-disable-next-line no-useless-call
-    const min = Math.min.apply(Math, [a, b]);
+    const min = Math.min.apply(Math, [a, b])
     // eslint-disable-next-line no-useless-call
-    const max = Math.max.apply(Math, [a, b]);
+    const max = Math.max.apply(Math, [a, b])
 
-    return inclusive ? value >= min && value <= max : value > min && value < max;
-};
+    return inclusive ? value >= min && value <= max : value > min && value < max
+}
 
 /**
  * Convert radians to correctionValueDegrees (see {@link http://cwestblog.com/2012/11/12/javascript-degree-and-radian-conversion/})
@@ -361,7 +361,7 @@ export const between = (value, a, b, inclusive) => {
  * @param {Number} radians - Radians
  * @return {Number} Degrees
  */
-export const radiansToDegrees = radians => (radians * 180) / Math.PI;
+export const radiansToDegrees = radians => (radians * 180) / Math.PI
 
 /**
  * Convert correctionValueDegrees to radians
@@ -369,7 +369,7 @@ export const radiansToDegrees = radians => (radians * 180) / Math.PI;
  * @param {Number} degrees - Degrees
  * @return {Number} Radians
  */
-export const degreesToRadians = degrees => (Math.PI / 180) * (degrees - 90);
+export const degreesToRadians = degrees => (Math.PI / 180) * (degrees - 90)
 
 /**
  * @typedef {Object} Point
@@ -386,15 +386,15 @@ export const degreesToRadians = degrees => (Math.PI / 180) * (degrees - 90);
  * @return {Number} Degrees between centerPt and targetPt
  */
 export const rotationAngleInDegrees = (centerPt, targetPt) => {
-    let theta = Math.atan2(targetPt.y - centerPt.y, targetPt.x - centerPt.x);
-    theta -= Math.PI / 2;
-    let degrees = radiansToDegrees(theta);
+    let theta = Math.atan2(targetPt.y - centerPt.y, targetPt.x - centerPt.x)
+    theta -= Math.PI / 2
+    let degrees = radiansToDegrees(theta)
     if (degrees < 0) {
-        degrees += 360;
+        degrees += 360
     }
 
-    return degrees;
-};
+    return degrees
+}
 
 /**
  * Calculate the distance between two points
@@ -405,7 +405,7 @@ export const rotationAngleInDegrees = (centerPt, targetPt) => {
  * @return {Number} Distance between centerPt and targetPt
  */
 export const distancePoints = (centerPt, targetPt) =>
-    Math.sqrt((centerPt.x - targetPt.x) ** 2 + (centerPt.y - targetPt.y) ** 2);
+    Math.sqrt((centerPt.x - targetPt.x) ** 2 + (centerPt.y - targetPt.y) ** 2)
 
 /**
  * Calculate the closest power of 2 (see {@link https://bocoup.com/blog/find-the-closest-power-of-2-with-javascript})
@@ -413,7 +413,7 @@ export const distancePoints = (centerPt, targetPt) =>
  * @param {Number} aSize - Input
  * @return {Number} Closest power of 2 of aSize
  */
-export const nearestPow2 = aSize => 2 ** Math.round(Math.log2(aSize));
+export const nearestPow2 = aSize => 2 ** Math.round(Math.log2(aSize))
 
 /**
  * Check fetch status (see {@link https://developers.google.com/web/updates/2015/03/introduction-to-fetch})
@@ -422,10 +422,10 @@ export const nearestPow2 = aSize => 2 ** Math.round(Math.log2(aSize));
  */
 export function checkFetchStatus(response) {
     if (response.status >= 200 && response.status < 300) {
-        return Promise.resolve(response);
+        return Promise.resolve(response)
     }
 
-    return Promise.reject(new Error(response.statusText));
+    return Promise.reject(new Error(response.statusText))
 }
 
 /**
@@ -434,7 +434,7 @@ export function checkFetchStatus(response) {
  * @param {Object} response - fetch response
  * @return {Object} json
  */
-export const getJsonFromFetch = response => response.json();
+export const getJsonFromFetch = response => response.json()
 
 /**
  * Get text from fetch response
@@ -442,7 +442,7 @@ export const getJsonFromFetch = response => response.json();
  * @param {Object} response - fetch response
  * @return {Object} String
  */
-export const getTextFromFetch = response => response.text();
+export const getTextFromFetch = response => response.text()
 
 /**
  * Write fetch error to console
@@ -451,8 +451,8 @@ export const getTextFromFetch = response => response.text();
  * @return {void}
  */
 export const putFetchError = error => {
-    console.error("Fetch request failed -->", error);
-};
+    console.error("Fetch request failed -->", error)
+}
 
 /**
  * Write fetch error to console
@@ -461,15 +461,15 @@ export const putFetchError = error => {
  * @return {void}
  */
 export const putImportError = error => {
-    console.error("Import request failed -->", error);
-};
+    console.error("Import request failed -->", error)
+}
 
 /**
  * {@link https://stackoverflow.com/questions/1026069/how-do-i-make-the-first-letter-of-a-string-uppercase-in-javascript}
  * @param {string} string - String
  * @return {string} Uppercased string
  */
-export const capitalizeFirstLetter = string => string.charAt(0).toUpperCase() + string.slice(1);
+export const capitalizeFirstLetter = string => string.charAt(0).toUpperCase() + string.slice(1)
 
 /** Split array into n pieces
  * {@link https://stackoverflow.com/questions/8188548/splitting-a-js-array-into-n-arrays}
@@ -480,39 +480,39 @@ export const capitalizeFirstLetter = string => string.charAt(0).toUpperCase() + 
  */
 export function chunkify(array, n, balanced = true) {
     if (n < 2) {
-        return [array];
+        return [array]
     }
 
-    const length_ = array.length;
-    const out = [];
-    let i = 0;
-    let size;
+    const length_ = array.length
+    const out = []
+    let i = 0
+    let size
 
     if (length_ % n === 0) {
-        size = Math.floor(length_ / n);
+        size = Math.floor(length_ / n)
         while (i < length_) {
-            out.push(array.slice(i, (i += size)));
+            out.push(array.slice(i, (i += size)))
         }
     } else if (balanced) {
         while (i < length_) {
-            size = Math.ceil((length_ - i) / n--);
-            out.push(array.slice(i, (i += size)));
+            size = Math.ceil((length_ - i) / n--)
+            out.push(array.slice(i, (i += size)))
         }
     } else {
-        n -= 1;
-        size = Math.floor(length_ / n);
+        n -= 1
+        size = Math.floor(length_ / n)
         if (length_ % size === 0) {
-            size -= 1;
+            size -= 1
         }
 
         while (i < size * n) {
-            out.push(array.slice(i, (i += size)));
+            out.push(array.slice(i, (i += size)))
         }
 
-        out.push(array.slice(size * n));
+        out.push(array.slice(size * n))
     }
 
-    return out;
+    return out
 }
 
 /**
@@ -522,22 +522,22 @@ export function chunkify(array, n, balanced = true) {
  * @return {void}
  */
 export function printCompassRose({ element, radius }) {
-    const steps = 24;
-    const degreesPerStep = 360 / steps;
-    const innerRadius = Math.round(radius * 0.8);
-    const strokeWidth = 3;
-    const data = new Array(steps).fill().map((e, i) => degreesToCompass(i * degreesPerStep));
+    const steps = 24
+    const degreesPerStep = 360 / steps
+    const innerRadius = Math.round(radius * 0.8)
+    const strokeWidth = 3
+    const data = new Array(steps).fill().map((e, i) => degreesToCompass(i * degreesPerStep))
     const xScale = d3ScaleBand()
         .range([0 - degreesPerStep / 2, 360 - degreesPerStep / 2])
         .domain(data)
-        .align(0);
+        .align(0)
 
     element
         .append("circle")
         .attr("r", innerRadius)
-        .style("stroke-width", `${strokeWidth}px`);
+        .style("stroke-width", `${strokeWidth}px`)
 
-    const dummy = element.append("text");
+    const dummy = element.append("text")
 
     // Cardinal and intercardinal winds
     const label = element
@@ -550,42 +550,42 @@ export function printCompassRose({ element, radius }) {
                     "transform",
                     d => `rotate(${Math.round(xScale(d) + xScale.bandwidth() / 2 - 90)})translate(${innerRadius},0)`
                 )
-        );
+        )
 
     label
         .filter((d, i) => i % 3 !== 0)
         .append("line")
-        .attr("x2", 9);
+        .attr("x2", 9)
 
     label
         .filter((d, i) => i % 3 === 0)
         .append("text")
         .attr("transform", d => {
-            let rotate = Math.round(xScale(d) + xScale.bandwidth() / 2);
-            let translate = "";
+            let rotate = Math.round(xScale(d) + xScale.bandwidth() / 2)
+            let translate = ""
 
-            dummy.text(d);
-            const { height: textHeight, width: textWidth } = dummy.node().getBBox();
+            dummy.text(d)
+            const { height: textHeight, width: textWidth } = dummy.node().getBBox()
 
             if ((rotate >= 0 && rotate <= 45) || rotate === 315) {
-                rotate = 90;
-                translate = `0,-${textHeight / 2}`;
+                rotate = 90
+                translate = `0,-${textHeight / 2}`
             } else if (rotate === 90) {
-                rotate = 0;
-                translate = `${textWidth / 2 + strokeWidth},0`;
+                rotate = 0
+                translate = `${textWidth / 2 + strokeWidth},0`
             } else if (rotate === 270) {
-                rotate = 180;
-                translate = `-${textWidth / 2 + strokeWidth},0`;
+                rotate = 180
+                translate = `-${textWidth / 2 + strokeWidth},0`
             } else {
-                rotate = -90;
-                translate = `0,${textHeight / 2 + strokeWidth + 2}`;
+                rotate = -90
+                translate = `0,${textHeight / 2 + strokeWidth + 2}`
             }
 
-            return `rotate(${rotate})translate(${translate})`;
+            return `rotate(${rotate})translate(${translate})`
         })
-        .text(d => d);
+        .text(d => d)
 
-    dummy.remove();
+    dummy.remove()
 }
 
 /**
@@ -595,38 +595,43 @@ export function printCompassRose({ element, radius }) {
  * @return {void}
  */
 export function printSmallCompassRose({ element, radius }) {
-    const steps = 24;
-    const degreesPerStep = 360 / steps;
-    const innerRadius = Math.round(radius * 0.8);
-    const strokeWidth = 1.5;
-    const data = new Array(steps).fill().map((e, i) => degreesToCompass(i * degreesPerStep));
+    const steps = 24
+    const degreesPerStep = 360 / steps
+    const innerRadius = Math.round(radius * 0.8)
+    const strokeWidth = 1.5
+    const data = new Array(steps).fill().map((e, i) => degreesToCompass(i * degreesPerStep))
     const xScale = d3ScaleBand()
         .range([0 - degreesPerStep / 2, 360 - degreesPerStep / 2])
         .domain(data)
-        .align(0);
+        .align(0)
 
     element
         .append("circle")
         .attr("r", innerRadius)
-        .style("stroke-width", `${strokeWidth}px`);
+        .style("stroke-width", `${strokeWidth}px`)
 
     // Ticks
-    const x2 = 2;
-    const x2InterCard = 4;
-    const x2Card = 6;
+    const x2 = 2
+    const x2InterCard = 4
+    const x2Card = 6
     element
         .selectAll("line")
         .data(data)
         .join(enter =>
             enter
                 .append("line")
-                // eslint-disable-next-line no-negated-condition
-                .attr("x2", (d, i) => (i % 3 !== 0 ? x2 : i % 6 !== 0 ? x2InterCard : x2Card))
+                .attr("x2", (d, i) => {
+                    if (i % 3 === 0) {
+                        return i % 6 === 0 ? x2Card : x2InterCard
+                    }
+
+                    return x2
+                })
                 .attr(
                     "transform",
                     d => `rotate(${Math.round(xScale(d) + xScale.bandwidth() / 2)})translate(${innerRadius},0)`
                 )
-        );
+        )
 }
 
 /**
@@ -634,7 +639,7 @@ export function printSmallCompassRose({ element, radius }) {
  * @param {string} clan - Clan name
  * @return {string} Formatted clan name
  */
-export const displayClan = clan => `<span class="caps">${clan}</span>`;
+export const displayClan = clan => `<span class="caps">${clan}</span>`
 
 /**
  * Simple sort of strings a and b
@@ -644,15 +649,15 @@ export const displayClan = clan => `<span class="caps">${clan}</span>`;
  */
 export const simpleSort = (a, b) => {
     if (a < b) {
-        return -1;
+        return -1
     }
 
     if (a > b) {
-        return 1;
+        return 1
     }
 
-    return 0;
-};
+    return 0
+}
 
 /**
  * Sort by a list of properties (in left-to-right order, "-" as first character for descending sort)
@@ -660,27 +665,27 @@ export const simpleSort = (a, b) => {
  * @return {function(*, *): number} Sort function
  */
 export const sortBy = properties => (a, b) => {
-    let r = 0;
-    let desc;
+    let r = 0
+    let desc
     properties.some(property => {
         if (property.startsWith("-")) {
-            property = property.slice(1);
-            desc = -1;
+            property = property.slice(1)
+            desc = -1
         } else {
-            desc = 1;
+            desc = 1
         }
 
         if (a[property] < b[property]) {
-            r = -1 * desc;
+            r = -1 * desc
         } else if (a[property] > b[property]) {
-            r = Number(desc);
+            r = Number(desc)
         }
 
-        return r !== 0;
-    });
+        return r !== 0
+    })
 
-    return r;
-};
+    return r
+}
 
 /**
  * Copy to clipboard (fallback solution)
@@ -690,27 +695,27 @@ export const sortBy = properties => (a, b) => {
 const copyToClipboardFallback = text => {
     // console.log("copyToClipboardFallback");
     if (document.queryCommandSupported && document.queryCommandSupported("copy")) {
-        const input = document.createElement("input");
+        const input = document.createElement("input")
 
-        input.type = "text";
-        input.value = text;
-        input.style = "position: absolute; left: -1000px; top: -1000px";
-        this._modal$.append(input);
-        input.select();
+        input.type = "text"
+        input.value = text
+        input.style = "position: absolute; left: -1000px; top: -1000px"
+        this._modal$.append(input)
+        input.select()
 
         try {
-            return document.execCommand("copy");
+            return document.execCommand("copy")
         } catch (error) {
-            console.error("Copy to clipboard failed.", error);
-            return false;
+            console.error("Copy to clipboard failed.", error)
+            return false
         } finally {
-            input.remove();
+            input.remove()
         }
     } else {
-        console.error(`Insufficient rights to copy ${text} to clipboard`);
-        return false;
+        console.error(`Insufficient rights to copy ${text} to clipboard`)
+        return false
     }
-};
+}
 
 /**
  * Copy to clipboard (API)
@@ -722,13 +727,13 @@ const writeClipboard = text => {
         .writeText(text)
         .then(() => {
             // console.log(`Copied ${text} to clipboard.`);
-            return true;
+            return true
         })
         .catch(error => {
-            console.error(`Cannot copy ${text} to clipboard`, error);
-            return false;
-        });
-};
+            console.error(`Cannot copy ${text} to clipboard`, error)
+            return false
+        })
+}
 
 /**
  * Copy to clipboard (clipboard API)
@@ -737,11 +742,11 @@ const writeClipboard = text => {
  */
 export const copyToClipboard = text => {
     if (!navigator.clipboard) {
-        copyToClipboardFallback(text);
+        copyToClipboardFallback(text)
     }
 
-    writeClipboard(text);
-};
+    writeClipboard(text)
+}
 
 /**
  * Copy F11 coordinates to clipboard
@@ -751,14 +756,14 @@ export const copyToClipboard = text => {
  */
 export const copyF11ToClipboard = (x, z) => {
     if (Number.isFinite(x) && Number.isFinite(z)) {
-        const F11Url = new URL(window.location);
+        const F11Url = new URL(window.location)
 
-        F11Url.searchParams.set("x", x);
-        F11Url.searchParams.set("z", z);
+        F11Url.searchParams.set("x", x)
+        F11Url.searchParams.set("z", z)
 
-        copyToClipboard(F11Url.href);
+        copyToClipboard(F11Url.href)
     }
-};
+}
 
 /**
  * Ramp for visualizing colour scales
@@ -769,28 +774,27 @@ export const copyF11ToClipboard = (x, z) => {
  * @return {void}
  */
 export const colourRamp = (element, colourScale, steps = 512) => {
-    const height = 50;
-    const width = element.node().clientWidth;
+    const height = 50
+    const width = element.node().clientWidth
     const canvas = element
         .insert("canvas")
         .attr("width", width)
-        .attr("height", height);
-    const context = canvas.node().getContext("2d");
-    canvas.style.imageRendering = "pixelated";
+        .attr("height", height)
+    const context = canvas.node().getContext("2d")
+    canvas.style.imageRendering = "pixelated"
 
-    const min = colourScale.domain()[0];
-    const max = colourScale.domain()[colourScale.domain().length - 1];
-    const step = (max - min) / steps;
-    const stepWidth = width / steps;
-    let x = 0;
+    const min = colourScale.domain()[0]
+    const max = colourScale.domain()[colourScale.domain().length - 1]
+    const step = (max - min) / steps
+    const stepWidth = width / steps
+    let x = 0
     for (let currentStep = min; currentStep < max; currentStep += step) {
-        context.fillStyle = colourScale(currentStep);
-        context.fillRect(x, 0, stepWidth, height);
-        x += stepWidth;
+        context.fillStyle = colourScale(currentStep)
+        context.fillRect(x, 0, stepWidth, height)
+        x += stepWidth
     }
-};
+}
 
-export const drawSvgCircle = (x, y, r) =>
-    `M${x},${y} m${-r},0 a${r},${r} 0,1,0 ${r * 2},0 a${r},${r} 0,1,0 ${-r * 2},0`;
-export const drawSvgRect = (x, y, r) => `M${x - r / 2},${y - r / 2}h${r}v${r}h${-r}z`;
-export const drawSvgLine = (x, y, l) => `M${x},${y}v${l}`;
+export const drawSvgCircle = (x, y, r) => `M${x},${y} m${-r},0 a${r},${r} 0,1,0 ${r * 2},0 a${r},${r} 0,1,0 ${-r * 2},0`
+export const drawSvgRect = (x, y, r) => `M${x - r / 2},${y - r / 2}h${r}v${r}h${-r}z`
+export const drawSvgLine = (x, y, l) => `M${x},${y}v${l}`
