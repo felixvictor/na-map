@@ -8,10 +8,10 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import * as path from "path";
+import * as path from "path"
 
-import d3Node from "d3-node";
-import dayjs from "dayjs";
+import d3Node from "d3-node"
+import dayjs from "dayjs"
 
 import {
     baseAPIFilename,
@@ -26,40 +26,41 @@ import {
     serverStartDate as serverDate,
     simpleSort,
     sortBy
-} from "./common.mjs";
+} from "./common.mjs"
 
-const minProfit = 3e4;
-const frontlinePorts = 2;
+const minProfit = 30000
+const frontlinePorts = 2
 
-const d3n = d3Node();
-const { d3 } = d3n;
+const d3n = d3Node()
+const { d3 } = d3n
 
-let apiItems = [];
-let apiPorts = [];
-let apiShops = [];
+let apiItems = []
+let apiPorts = []
+let apiShops = []
 
-const distancesFile = path.resolve(commonPaths.dirGenGeneric, `distances-${distanceMapSize}.json`);
-const distancesOrig = readJson(distancesFile);
-let distances;
-let numberPorts;
+const distancesFile = path.resolve(commonPaths.dirGenGeneric, `distances-${distanceMapSize}.json`)
+const distancesOrig = readJson(distancesFile)
+let distances
+let numberPorts
 
-const portData = [];
-const trades = [];
-let itemNames;
-let itemWeights;
+const portData = []
+const trades = []
+let itemNames
+let itemWeights
 
 const getDistance = (fromPortId, toPortId) =>
     fromPortId < toPortId
         ? distances.get(fromPortId * numberPorts + toPortId)
-        : distances.get(toPortId * numberPorts + fromPortId);
+        : distances.get(toPortId * numberPorts + fromPortId)
 /**
  *
  * @param {Object} apiPort Port data.
  * @return {void}
  */
 const setPortFeaturePerServer = apiPort => {
-    const portShop = apiShops.find(shop => shop.Id === apiPort.Id);
+    const portShop = apiShops.find(shop => shop.Id === apiPort.Id)
 
+    // noinspection MagicNumberJS
     const portFeaturesPerServer = {
         id: Number(apiPort.Id),
         portBattleStartTime: apiPort.PortBattleStartTime,
@@ -112,36 +113,38 @@ const setPortFeaturePerServer = apiPort => {
                 sellQuantity: good.SellContractQuantity === -1 ? good.PriceTierQuantity : good.SellContractQuantity
             }))
             .sort((a, b) => a.name.localeCompare(b.name))
-    };
+    }
     // Delete empty entries
-    ["dropsTrading", "consumesTrading", "producesNonTrading", "dropsNonTrading"].forEach(type => {
+    for (const type of ["dropsTrading", "consumesTrading", "producesNonTrading", "dropsNonTrading"]) {
         if (!portFeaturesPerServer[type].length) {
-            delete portFeaturesPerServer[type];
+            delete portFeaturesPerServer[type]
         }
-    });
-    portData.push(portFeaturesPerServer);
-};
+    }
+
+    portData.push(portFeaturesPerServer)
+}
 
 const setAndSavePortData = async serverName => {
-    apiPorts.forEach(apiPort => {
-        setPortFeaturePerServer(apiPort);
-    });
-    await saveJsonAsync(`${commonPaths.dirGenServer}/${serverName}-ports.json`, portData);
-};
+    for (const apiPort of apiPorts) {
+        setPortFeaturePerServer(apiPort)
+    }
+
+    await saveJsonAsync(`${commonPaths.dirGenServer}/${serverName}-ports.json`, portData)
+}
 
 const setAndSaveTradeData = async serverName => {
-    portData.forEach(buyPort => {
+    for (const buyPort of portData) {
         buyPort.inventory
             .filter(buyGood => buyGood.buyQuantity > 0)
             .forEach(buyGood => {
-                const { buyPrice, buyQuantity } = buyGood;
-                portData.forEach(sellPort => {
-                    const sellGood = sellPort.inventory.find(good => good.name === buyGood.name);
+                const { buyPrice, buyQuantity } = buyGood
+                for (const sellPort of portData) {
+                    const sellGood = sellPort.inventory.find(good => good.name === buyGood.name)
                     if (sellPort.id !== buyPort.id && sellGood) {
-                        const { sellPrice, sellQuantity } = sellGood;
-                        const quantity = Math.min(buyQuantity, sellQuantity);
-                        const profitPerItem = sellPrice - buyPrice;
-                        const profitTotal = profitPerItem * quantity;
+                        const { sellPrice, sellQuantity } = sellGood
+                        const quantity = Math.min(buyQuantity, sellQuantity)
+                        const profitPerItem = sellPrice - buyPrice
+                        const profitTotal = profitPerItem * quantity
                         if (profitTotal >= minProfit) {
                             const trade = {
                                 good: buyGood.name,
@@ -151,22 +154,24 @@ const setAndSaveTradeData = async serverName => {
                                 profitTotal,
                                 quantity,
                                 weightPerItem: itemWeights.get(buyGood.name) || 0
-                            };
-                            trades.push(trade);
+                            }
+                            trades.push(trade)
                         }
                     }
-                });
-            });
-    });
-    trades.sort(sortBy(["profitTotal"]));
+                }
+            })
+    }
 
-    await saveJsonAsync(path.resolve(commonPaths.dirGenServer, `${serverName}-trades.json`), trades);
-};
+    trades.sort(sortBy(["profitTotal"]))
 
+    await saveJsonAsync(path.resolve(commonPaths.dirGenServer, `${serverName}-trades.json`), trades)
+}
+
+const ticks = 621355968000000000
 const setAndSavePortBattleData = async serverName => {
-    const ticks = 621355968000000000;
-    const pb = {};
+    const pb = {}
 
+    // noinspection MagicNumberJS
     pb.ports = apiPorts
         .map(port => ({
             id: Number(port.Id),
@@ -180,14 +185,14 @@ const setAndSavePortBattleData = async serverName => {
             attackHostility: "",
             portBattle: ""
         }))
-        .sort(sortBy(["id"]));
-    await saveJsonAsync(path.resolve(commonPaths.dirGenServer, `${serverName}-pb.json`), pb);
-};
+        .sort(sortBy(["id"]))
+    await saveJsonAsync(path.resolve(commonPaths.dirGenServer, `${serverName}-pb.json`), pb)
+}
 
 const setAndSaveFrontlines = async serverName => {
-    const outNations = ["NT"];
-    const frontlineAttackingNationGroupedByToPort = {};
-    const frontlineAttackingNationGroupedByFromPort = {};
+    const outNations = ["NT"]
+    const frontlineAttackingNationGroupedByToPort = {}
+    const frontlineAttackingNationGroupedByFromPort = {}
 
     nations
         .filter(({ short: nationShort }) => !outNations.includes(nationShort))
@@ -211,7 +216,7 @@ const setAndSaveFrontlines = async serverName => {
                         }))
                         .sort(sortBy(["distance"]))
                         .slice(0, frontlinePorts)
-                );
+                )
 
             frontlineAttackingNationGroupedByToPort[nationShortName] = d3
                 .nest()
@@ -219,56 +224,56 @@ const setAndSaveFrontlines = async serverName => {
                 .key(d => d.toPortId)
                 // .rollup(values => values.map(value => [value.fromPortId, value.fromPortName, value.distance]))
                 .rollup(values => values.map(value => value.fromPortId))
-                .entries(frontlinesFrom);
+                .entries(frontlinesFrom)
 
             frontlineAttackingNationGroupedByFromPort[nationShortName] = d3
                 .nest()
                 // .key(d => `${d.fromPortId} ${d.fromPortName}`)
                 .key(d => d.fromPortId)
                 .rollup(values => values.map(value => ({ id: value.toPortId, nation: value.toPortNation })))
-                .entries(frontlinesFrom);
-        });
+                .entries(frontlinesFrom)
+        })
 
-    const frontlineDefendingNationMap = new Map();
-    Object.keys(frontlineAttackingNationGroupedByFromPort).forEach(attackingNation => {
-        frontlineAttackingNationGroupedByFromPort[attackingNation].forEach(fromPort => {
-            fromPort.value.forEach(toPort => {
-                const key = toPort.nation + String(toPort.id);
-                let fromPorts = frontlineDefendingNationMap.get(key);
+    const frontlineDefendingNationMap = new Map()
+    for (const attackingNation of Object.keys(frontlineAttackingNationGroupedByFromPort)) {
+        for (const fromPort of frontlineAttackingNationGroupedByFromPort[attackingNation]) {
+            for (const toPort of fromPort.value) {
+                const key = toPort.nation + String(toPort.id)
+                let fromPorts = frontlineDefendingNationMap.get(key)
                 if (fromPorts) {
-                    fromPorts.add(fromPort.key);
+                    fromPorts.add(fromPort.key)
                 } else {
-                    fromPorts = new Set([fromPort.key]);
+                    fromPorts = new Set([fromPort.key])
                 }
 
-                frontlineDefendingNationMap.set(key, fromPorts);
-            });
-        });
-    });
+                frontlineDefendingNationMap.set(key, fromPorts)
+            }
+        }
+    }
 
-    const frontlineDefendingNation = {};
+    const frontlineDefendingNation = {}
     for (const [key, fromPorts] of [...frontlineDefendingNationMap]) {
-        const nationShortName = key.slice(0, 2);
-        const toPortId = Number(key.slice(2));
+        const nationShortName = key.slice(0, 2)
+        const toPortId = Number(key.slice(2))
         if (!frontlineDefendingNation[nationShortName]) {
-            frontlineDefendingNation[nationShortName] = [];
+            frontlineDefendingNation[nationShortName] = []
         }
 
-        frontlineDefendingNation[nationShortName].push({ key: toPortId, value: [...fromPorts].map(Number) });
+        frontlineDefendingNation[nationShortName].push({ key: toPortId, value: [...fromPorts].map(Number) })
         // frontlineDefendingNation[nationShortName].push({ key: toPortId, value: [...fromPorts] });
     }
 
     await saveJsonAsync(path.resolve(commonPaths.dirGenServer, `${serverName}-frontlines.json`), {
         attacking: frontlineAttackingNationGroupedByToPort,
         defending: frontlineDefendingNation
-    });
-};
+    })
+}
 
 export const convertServerPortData = () => {
     for (const serverName of serverNames) {
-        apiPorts = readJson(path.resolve(baseAPIFilename, `${serverName}-Ports-${serverDate}.json`));
-        apiShops = readJson(path.resolve(baseAPIFilename, `${serverName}-Shops-${serverDate}.json`));
-        apiItems = readJson(path.resolve(baseAPIFilename, `${serverName}-ItemTemplates-${serverDate}.json`));
+        apiPorts = readJson(path.resolve(baseAPIFilename, `${serverName}-Ports-${serverDate}.json`))
+        apiShops = readJson(path.resolve(baseAPIFilename, `${serverName}-Shops-${serverDate}.json`))
+        apiItems = readJson(path.resolve(baseAPIFilename, `${serverName}-ItemTemplates-${serverDate}.json`))
 
         /**
          * Item names
@@ -287,8 +292,9 @@ export const convertServerPortData = () => {
                         item.Name === "Tobacco"
                 }
             ])
-        );
+        )
 
+        // noinspection OverlyComplexBooleanExpressionJS
         itemWeights = new Map(
             apiItems
                 .filter(
@@ -298,16 +304,16 @@ export const convertServerPortData = () => {
                         apiItem.ItemType !== "RecipeResource"
                 )
                 .map(apiItem => [cleanName(apiItem.Name), apiItem.ItemWeight])
-        );
+        )
 
-        numberPorts = apiPorts.length;
+        numberPorts = apiPorts.length
         distances = new Map(
             distancesOrig.map(([fromPortId, toPortId, distance]) => [fromPortId * numberPorts + toPortId, distance])
-        );
+        )
 
-        setAndSavePortData(serverName);
-        setAndSaveTradeData(serverName);
-        setAndSavePortBattleData(serverName);
-        setAndSaveFrontlines(serverName);
+        setAndSavePortData(serverName)
+        setAndSaveTradeData(serverName)
+        setAndSavePortBattleData(serverName)
+        setAndSaveFrontlines(serverName)
     }
-};
+}
