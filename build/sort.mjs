@@ -1,11 +1,15 @@
-import { readJson, saveJsonAsync } from "./common.mjs";
+import { readJson, saveJsonAsync } from "./common.mjs"
 
-const dates = ["2018-06-18", "2018-06-23"];
+const dates = ["2018-06-18", "2018-06-23"]
 
 function sortData(fileName) {
-    const data = readJson(`api-eu1-${fileName}.json`);
-    data.sort((a, b) => parseInt(a.Id, 10) - parseInt(b.Id, 10));
-    saveJsonAsync(`${fileName}.json`, data);
+    const data = readJson(`api-eu1-${fileName}.json`)
+    data.sort((a, b) => parseInt(a.Id, 10) - parseInt(b.Id, 10))
+    saveJsonAsync(`${fileName}.json`, data)
 }
 
-dates.forEach(date => ["ItemTemplates", "Ports", "Shops"].forEach(type => sortData(`${type}-${date}`)));
+for (const date of dates) {
+    for (const type of ["ItemTemplates", "Ports", "Shops"]) {
+        sortData(`${type}-${date}`)
+    }
+}

@@ -41,7 +41,7 @@ p {
 p a,
 table a {
     text-decoration: underline dotted $secondary-600 !important;
-    @include hover-focus () {
+    @include hover-focus() {
         text-decoration-style: solid !important;
     }
 }
@@ -49,7 +49,7 @@ table a {
 .tooltip {
     font-size: smaller;
     text-align: left;
-    box-shadow: 0 14px 28px rgba($primary-900, .25), 0 10px 10px rgba($primary-900, .22);
+    box-shadow: 0 14px 28px rgba($primary-900, 0.25), 0 10px 10px rgba($primary-900, 0.22);
 
     table {
         margin-bottom: 0;
@@ -96,7 +96,7 @@ table a {
 
     th [aria-sort]:not(.no-sort)::after {
         visibility: visible;
-        opacity: .4;
+        opacity: 0.4;
     }
 
     th [role="columnheader"]:not(.no-sort):hover::after {
@@ -145,9 +145,9 @@ table a {
     }
 
     .series-group {
-        fill-opacity: .6;
+        fill-opacity: 0.6;
         stroke: $primary-700;
-        stroke-opacity: .2;
+        stroke-opacity: 0.2;
     }
 
     .series-segment {
@@ -167,7 +167,7 @@ table a {
 
     .reset-zoom-btn {
         cursor: pointer;
-        opacity: .6;
+        opacity: 0.6;
         fill: $primary-600;
     }
 }
@@ -201,8 +201,8 @@ table a {
 .brusher .brush .selection {
     fill: $primary-700;
     stroke: $primary-700;
-    stroke-opacity: .6;
-    fill-opacity: .3;
+    stroke-opacity: 0.6;
+    fill-opacity: 0.3;
     shape-rendering: crispEdges;
 }
 
