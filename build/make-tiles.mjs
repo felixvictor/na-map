@@ -1,4 +1,4 @@
-#!/usr/bin/env -S yarn node --experimental-modules --no-warnings
+#!/usr/bin/env -S yarn yarn node --experimental-modules --no-warnings
 
 /**
  * This file is part of na-map.
