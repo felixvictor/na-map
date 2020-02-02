@@ -65,9 +65,7 @@ import {
 
 import CompareWoods from "./compare-woods";
 
-// eslint-disable-next-line import/no-unresolved
 import { default as shipIcon } from "Icons/icon-ship.svg";
-import { sort } from "semver";
 
 const numberSegments = 24;
 const segmentRadians = (2 * Math.PI) / numberSegments;
