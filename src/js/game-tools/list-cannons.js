@@ -4,88 +4,88 @@
  * @file      List cannons.
  * @module    game-tools/list-cannons
  * @author    iB aka Felix Victor
- * @copyright 2018, 2019
+ * @copyright 2018, 2019, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import "bootstrap/js/dist/util";
-import "bootstrap/js/dist/tab";
-import "bootstrap/js/dist/modal";
+import "bootstrap/js/dist/util"
+import "bootstrap/js/dist/tab"
+import "bootstrap/js/dist/modal"
 
-import { html, render } from "lit-html";
-import { repeat } from "lit-html/directives/repeat";
-import { default as Tablesort } from "tablesort";
+import { html, render } from "lit-html"
+import { repeat } from "lit-html/directives/repeat"
+import { default as Tablesort } from "tablesort"
 
-import { registerEvent } from "../analytics";
-import { initTablesort, insertBaseModalHTML } from "../common";
-import { capitalizeFirstLetter, formatFloatFixedHTML, putImportError } from "../util";
+import { registerEvent } from "../analytics"
+import { initTablesort, insertBaseModalHTML } from "../common"
+import { capitalizeFirstLetter, formatFloatFixedHTML, putImportError } from "../util"
 
 /**
  *
  */
 export default class ListCannons {
     constructor() {
-        this._cannonData = {};
-        this._groups = new Map();
+        this._cannonData = {}
+        this._groups = new Map()
 
-        this._baseName = "List cannons";
-        this._baseId = "cannon-list";
-        this._buttonId = `button-${this._baseId}`;
-        this._modalId = `modal-${this._baseId}`;
+        this._baseName = "List cannons"
+        this._baseId = "cannon-list"
+        this._buttonId = `button-${this._baseId}`
+        this._modalId = `modal-${this._baseId}`
 
-        this._cannonTypes = ["medium", "long", "carronade"];
+        this._cannonTypes = ["medium", "long", "carronade"]
 
-        this._setupListener();
+        this._setupListener()
     }
 
     async _loadAndSetupData() {
         try {
             const { default: cannonData } = await import(
                 /* webpackChunkName: "data-cannons" */ "../../gen-generic/cannons.json"
-            );
-            this._setupData(cannonData);
+            )
+            this._setupData(cannonData)
         } catch (error) {
-            putImportError(error);
+            putImportError(error)
         }
     }
 
     _setupData(cannonData) {
-        cannonData.long.forEach(group => {
+        for (const group of cannonData.long) {
             for (const [key, value] of Object.entries(group)) {
                 if (key !== "name") {
-                    this._groups.set(key, { values: value, count: Object.entries(value).length });
+                    this._groups.set(key, { values: value, count: Object.entries(value).length })
                 }
             }
-        });
+        }
 
         // Sort data and groups (for table header)
-        const groupOrder = ["name", "damage", "penetration (m)", "dispersion", "traverse", "generic"];
-        this._cannonTypes.forEach(type => {
+        const groupOrder = ["name", "damage", "penetration (m)", "dispersion", "traverse", "generic"]
+        for (const type of this._cannonTypes) {
             this._cannonData[type] = cannonData[type].map(cannon =>
                 Object.keys(cannon)
                     .sort((a, b) => groupOrder.indexOf(a) - groupOrder.indexOf(b))
                     // eslint-disable-next-line no-return-assign,no-sequences
                     .reduce((r, k) => ((r[k] = cannon[k]), r), {})
-            );
-        });
+            )
+        }
         this._groups = new Map(
             [...this._groups.entries()].sort((a, b) => groupOrder.indexOf(a[0]) - groupOrder.indexOf(b[0]))
-        );
+        )
     }
 
     _setupListener() {
-        let firstClick = true;
+        let firstClick = true
 
         document.getElementById(this._buttonId).addEventListener("click", async event => {
             if (firstClick) {
-                firstClick = false;
-                await this._loadAndSetupData();
+                firstClick = false
+                await this._loadAndSetupData()
             }
 
-            registerEvent("Tools", this._baseName);
-            event.stopPropagation();
-            this._cannonListSelected();
-        });
+            registerEvent("Tools", this._baseName)
+            event.stopPropagation()
+            this._cannonListSelected()
+        })
     }
 
     _getList(type) {
@@ -93,7 +93,7 @@ export default class ListCannons {
             <th scope="col" class="text-center" colspan="${groupValue[1].count}">
                 ${capitalizeFirstLetter(groupValue[0])}
             </th>
-        `;
+        `
 
         const getColumnHeads = groupValue => html`
             ${/* eslint-disable indent */
@@ -103,43 +103,43 @@ export default class ListCannons {
                         <th class="text-right">${capitalizeFirstLetter(modifierValue[0])}</th>
                     `
             )}
-        `;
+        `
 
         const getRowHead = name => {
-            let nameConverted = name;
-            const nameSplit = name.split(" (");
+            let nameConverted = name
+            const nameSplit = name.split(" (")
 
             if (nameSplit.length > 1) {
                 nameConverted = html`
                     ${nameSplit[0]}<br /><em>${nameSplit[1].replace(")", "")}</em>
-                `;
+                `
             }
 
             return html`
                 <th scope="row" class="text-right" data-sort="${parseInt(name, 10)}">
                     ${nameConverted}
                 </th>
-            `;
-        };
+            `
+        }
 
         const getRow = cannon => html`
             ${Object.entries(cannon).map(groupValue => {
                 if (groupValue[0] === "name") {
-                    return "";
+                    return ""
                 }
 
                 return Object.entries(groupValue[1]).map(
                     modifierValue =>
                         html`
-                            <td class="text-right" data-sort="${modifierValue[1].value || 0}">
+                            <td class="text-right" data-sort="${modifierValue[1].value ?? 0}">
                                 ${modifierValue[1]
                                     ? formatFloatFixedHTML(modifierValue[1].value, modifierValue[1].digits)
                                     : ""}
                             </td>
                         `
-                );
+                )
             })}
-        `;
+        `
 
         return html`
             <table id="table-${type}-list" class="table table-sm small tablesort">
@@ -172,12 +172,12 @@ export default class ListCannons {
                                 <tr>
                                     ${getRowHead(cannon.name)}${getRow(cannon)}
                                 </tr>
-                            `;
+                            `
                         }
                     )}
                 </tbody>
             </table>
-        `;
+        `
     }
 
     _getModalBody() {
@@ -224,7 +224,7 @@ export default class ListCannons {
                         `
                 )}
             </div>
-        `;
+        `
     }
 
     _getModalFooter() {
@@ -232,7 +232,7 @@ export default class ListCannons {
             <button type="button" class="btn btn-secondary" data-dismiss="modal">
                 Close
             </button>
-        `;
+        `
     }
 
     _injectModal() {
@@ -244,27 +244,27 @@ export default class ListCannons {
                 footer: this._getModalFooter
             }),
             document.getElementById("modal-section")
-        );
+        )
 
-        this._cannonTypes.forEach(type => {
-            const table = document.getElementById(`table-${type}-list`);
+        for (const type of this._cannonTypes) {
+            const table = document.getElementById(`table-${type}-list`)
             // eslint-disable-next-line no-unused-vars
-            const sortTable = new Tablesort(table);
-        });
+            const sortTable = new Tablesort(table)
+        }
     }
 
     _initModal() {
-        initTablesort();
-        this._injectModal();
+        initTablesort()
+        this._injectModal()
     }
 
     _cannonListSelected() {
         // If the modal has no content yet, insert it
         if (!document.getElementById(this._modalId)) {
-            this._initModal();
+            this._initModal()
         }
 
         // Show modal
-        $(`#${this._modalId}`).modal("show");
+        $(`#${this._modalId}`).modal("show")
     }
 }
