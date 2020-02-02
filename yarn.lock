@@ -5756,10 +5756,10 @@ eslint-plugin-prettier@^3.1.1:
   dependencies:
     prettier-linter-helpers "^1.0.0"
 
-eslint-plugin-unicorn@^15.0.1:
-  version "15.0.1"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-unicorn/-/eslint-plugin-unicorn-15.0.1.tgz#8379d1d6882f9f8631bec8025ac9e8fe89e43945"
-  integrity sha512-yahqrPGFUzwH5cnmnj+iPlgPapAiBIZ/ZNSDkhTVPgPCo7/mOEjJ2gDhEclrtQVBE9olmec4N+CKDnJuZ9XpRA==
+eslint-plugin-unicorn@^16.0.0:
+  version "16.0.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-unicorn/-/eslint-plugin-unicorn-16.0.0.tgz#5fc03d70b2944fa85099bf511c352b3d50201738"
+  integrity sha512-zqWMYzTopdixyqu0+3td4vIGmpBxwdBVeWBm3TzwnFMvHoAE6tTQ/w2Xv5RG/MklKkfQdHsRqa8CVsSpjSA4qQ==
   dependencies:
     ci-info "^2.0.0"
     clean-regexp "^1.0.0"
@@ -5776,7 +5776,7 @@ eslint-plugin-unicorn@^15.0.1:
     regexpp "^3.0.0"
     reserved-words "^0.1.2"
     safe-regex "^2.1.1"
-    semver "^6.3.0"
+    semver "^7.1.2"
 
 eslint-scope@^4.0.3:
   version "4.0.3"
