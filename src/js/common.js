@@ -4,42 +4,43 @@
  * @file      Common data and functions.
  * @module    common
  * @author    iB aka Felix Victor
- * @copyright 2017, 2018, 2019
+ * @copyright 2017, 2018, 2019, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { select as d3Select } from "d3-selection";
-import { html } from "lit-html";
-import Hashids from "hashids";
-import { default as Tablesort } from "tablesort";
+import { select as d3Select } from "d3-selection"
+import { html } from "lit-html"
+import Hashids from "hashids"
+import { default as Tablesort } from "tablesort"
 
-import { distancePoints, sortBy } from "./util";
+import { distancePoints, sortBy } from "./util"
 
 const transformMatrix = {
     A: -0.00499866779363828,
     B: -0.00000021464254980645,
     C: 4096.88635151897,
     D: 4096.90282787469
-};
+}
 const transformMatrixInv = {
     A: -200.053302087577,
     B: -0.00859027897636011,
     C: 819630.836437126,
     D: -819563.745651571
-};
+}
 
 // F11 coord to svg coord
-export const convertCoordX = (x, y) => transformMatrix.A * x + transformMatrix.B * y + transformMatrix.C;
+export const convertCoordX = (x, y) => transformMatrix.A * x + transformMatrix.B * y + transformMatrix.C
 
 // F11 coord to svg coord
-export const convertCoordY = (x, y) => transformMatrix.B * x - transformMatrix.A * y + transformMatrix.D;
+export const convertCoordY = (x, y) => transformMatrix.B * x - transformMatrix.A * y + transformMatrix.D
 
 // svg coord to F11 coord
-export const convertInvCoordX = (x, y) => transformMatrixInv.A * x + transformMatrixInv.B * y + transformMatrixInv.C;
+export const convertInvCoordX = (x, y) => transformMatrixInv.A * x + transformMatrixInv.B * y + transformMatrixInv.C
 
 // svg coord to F11 coord
-export const convertInvCoordY = (x, y) => transformMatrixInv.B * x - transformMatrixInv.A * y + transformMatrixInv.D;
+export const convertInvCoordY = (x, y) => transformMatrixInv.B * x - transformMatrixInv.A * y + transformMatrixInv.D
 
+// noinspection SpellCheckingInspection
 export const nations = [
     { id: 0, short: "NT", name: "Neutral", sortName: "Neutral" },
     { id: 1, short: "PR", name: "Pirates", sortName: "Pirates" },
@@ -54,13 +55,13 @@ export const nations = [
     { id: 10, short: "RU", name: "Russian Empire", sortName: "Russian Empire" },
     { id: 11, short: "DE", name: "Kingdom of Prussia", sortName: "Prussia" },
     { id: 12, short: "PL", name: "Commonwealth of Poland", sortName: "Poland" }
-].sort(sortBy(["sortName"]));
+].sort(sortBy(["sortName"]))
 
-export const serverMaintenanceHour = 10;
+export const serverMaintenanceHour = 10
 
-export const defaultFontSize = 16;
-export const defaultCircleSize = 16;
-export const speedFactor = 390;
+export const defaultFontSize = 16
+export const defaultCircleSize = 16
+export const speedFactor = 390
 
 /**
  * Create array with numbers ranging from start to end
@@ -69,7 +70,7 @@ export const speedFactor = 390;
  * @param {Number} end - End index
  * @returns {Number[]} Result
  */
-export const range = (start, end) => [...new Array(1 + end - start).keys()].map(v => start + v);
+export const range = (start, end) => [...new Array(1 + end - start).keys()].map(v => start + v)
 
 /**
  * Calculate the k distance between two svg coordinates
@@ -82,13 +83,13 @@ export function getDistance(pt0, pt1) {
     const F11_0 = {
         x: convertInvCoordX(pt0.x, pt0.y),
         y: convertInvCoordY(pt0.x, pt0.y)
-    };
+    }
     const F11_1 = {
         x: convertInvCoordX(pt1.x, pt1.y),
         y: convertInvCoordY(pt1.x, pt1.y)
-    };
+    }
 
-    return distancePoints(F11_0, F11_1) / (2.63 * speedFactor);
+    return distancePoints(F11_0, F11_1) / (2.63 * speedFactor)
 }
 
 /**
@@ -111,26 +112,26 @@ export function insertBaseModal(id, title, size = "xl", buttonText = "Close") {
         .attr("aria-hidden", "true")
         .append("div")
         .attr("class", `modal-dialog${size === "xl" || size === "lg" || size === "sm" ? ` modal-${size}` : ""}`)
-        .attr("role", "document");
+        .attr("role", "document")
 
-    const content = modal.append("div").attr("class", "modal-content");
+    const content = modal.append("div").attr("class", "modal-content")
 
-    const header = content.append("header").attr("class", "modal-header");
+    const header = content.append("header").attr("class", "modal-header")
     header
         .append("h5")
         .attr("class", "modal-title")
         .attr("id", `title-${id}`)
-        .html(title);
+        .html(title)
 
-    content.append("div").attr("class", "modal-body");
+    content.append("div").attr("class", "modal-body")
 
-    const footer = content.append("footer").attr("class", "modal-footer");
+    const footer = content.append("footer").attr("class", "modal-footer")
     footer
         .append("button")
         .text(buttonText)
         .attr("type", "button")
         .attr("class", "btn btn-secondary")
-        .attr("data-dismiss", "modal");
+        .attr("data-dismiss", "modal")
 }
 
 /**
@@ -141,39 +142,39 @@ export function insertBaseModal(id, title, size = "xl", buttonText = "Close") {
  */
 export function initMultiDropdownNavbar(id) {
     $(`#${id} .dropdown-menu .bootstrap-select .dropdown-toggle`).on("click", event => {
-        const element = $(event.currentTarget);
-        element.next(".dropdown-menu").toggleClass("show");
-        element.parent("li").toggleClass("show");
+        const element = $(event.currentTarget)
+        element.next(".dropdown-menu").toggleClass("show")
+        element.parent("li").toggleClass("show")
         element.parents("li.nav-item.dropdown.show").on("hidden.bs.dropdown", event2 => {
             $(event2.currentTarget)
                 .find(".dropdown-menu.show")
                 .not(".inner")
-                .removeClass("show");
-        });
+                .removeClass("show")
+        })
 
-        return false;
-    });
+        return false
+    })
 
     $(`#${id} div.dropdown.bootstrap-select`).on("hidden", event => {
         // hide any open menus when parent closes
         $(event.currentTarget)
             .find(".dropdown-menu.show")
             .not(".inner")
-            .removeClass("show");
-    });
+            .removeClass("show")
+    })
 }
 
-const cleanNumber = i => i.replace(/[^\d-.?]/g, "");
+const cleanNumber = i => i.replace(/[^\d-.?]/g, "")
 
 const compareNumber = (a, b) => {
-    let aa = parseFloat(a);
-    let bb = parseFloat(b);
+    let aa = parseFloat(a)
+    let bb = parseFloat(b)
 
-    aa = Number.isNaN(aa) ? 0 : aa;
-    bb = Number.isNaN(bb) ? 0 : bb;
+    aa = Number.isNaN(aa) ? 0 : aa
+    bb = Number.isNaN(bb) ? 0 : bb
 
-    return aa - bb;
-};
+    return aa - bb
+}
 
 export const initTablesort = () => {
     Tablesort.extend(
@@ -183,16 +184,16 @@ export const initTablesort = () => {
             item.match(/^[+-]?\d+\s*([,.]\d{0,2})?[$¢£´Û€]/) || // Suffixed currency
             item.match(/^[+-]?(\d)*-?([,.])?-?(\d)+([,Ee][+-]\d+)?%?$/), // Number
         (a, b) => {
-            const aa = cleanNumber(a);
-            const bb = cleanNumber(b);
+            const aa = cleanNumber(a)
+            const bb = cleanNumber(b)
 
-            return compareNumber(bb, aa);
+            return compareNumber(bb, aa)
         }
-    );
-};
+    )
+}
 
 export const insertBaseModalHTML = ({ id, title, size = "xl", body, footer }) => {
-    const modalSize = size === "xl" || size === "lg" || size === "sm" ? ` modal-${size}` : "";
+    const modalSize = size === "xl" || size === "lg" || size === "sm" ? ` modal-${size}` : ""
 
     return html`
         <div id="${id}" class="modal" tabindex="-1" role="dialog" aria-labelledby="title-${id}" aria-hidden="true">
@@ -210,8 +211,8 @@ export const insertBaseModalHTML = ({ id, title, size = "xl", body, footer }) =>
                 </div>
             </div>
         </div>
-    `;
-};
+    `
+}
 
 // http://tools.medialab.sciences-po.fr/iwanthue/
 export const colourList = [
@@ -232,47 +233,47 @@ export const colourList = [
     "#ff7a6b",
     "#422b00",
     "#6f2400"
-];
+]
 
 /**
  * Get currency
  * @param {int|string} amount - Amount
  * @return {string} Currency string
  */
-export const getCurrencyAmount = amount => `${amount}\u00A0real${Number(amount) > 1 ? "s" : ""}`;
+export const getCurrencyAmount = amount => `${amount}\u00A0real${Number(amount) > 1 ? "s" : ""}`
 
-export const hashids = new Hashids("My salt: Yet another Naval Action map");
+export const hashids = new Hashids("My salt: Yet another Naval Action map")
 
-export const speedConstA = 0.074465523706782;
-export const speedConstB = 0.00272175949231;
+export const speedConstA = 0.074465523706782
+export const speedConstB = 0.00272175949231
 
-export const circleRadiusFactor = 5;
+export const circleRadiusFactor = 5
 
-const secondsForFullCircle = 2935; // 48 * 60 + 55
-export const fullCircle = 360;
-export const degreesPerSecond = fullCircle / secondsForFullCircle;
+const secondsForFullCircle = 2935 // 48 * 60 + 55
+export const fullCircle = 360
+export const degreesPerSecond = fullCircle / secondsForFullCircle
 
 /* eslint-disable no-undef */
-export const appName = NAME;
-export const appDescription = DESCRIPTION;
-export const appTitle = TITLE;
-export const appVersion = VERSION;
+export const appName = NAME
+export const appDescription = DESCRIPTION
+export const appTitle = TITLE
+export const appVersion = VERSION
 
-export const colourGreen = CGREEN;
-export const colourGreenLight = CGREENLIGHT;
-export const colourGreenDark = CGREENDARK;
-export const colourOrange = CORANGE;
-export const colourRed = CRED;
-export const colourRedLight = CREDLIGHT;
-export const colourRedDark = CREDDARK;
-export const colourWhite = CWHITE;
-export const primary300 = CPRIMARY300;
-export const iconSmallSrc = ICONSMALL;
+export const colourGreen = CGREEN
+export const colourGreenLight = CGREENLIGHT
+export const colourGreenDark = CGREENDARK
+export const colourOrange = CORANGE
+export const colourRed = CRED
+export const colourRedLight = CREDLIGHT
+export const colourRedDark = CREDDARK
+export const colourWhite = CWHITE
+export const primary300 = CPRIMARY300
+export const iconSmallSrc = ICONSMALL
 
-export const hullRepairsVolume = REPAIR_ARMOR_VOLUME;
-export const hullRepairsPercent = REPAIR_ARMOR_PERCENT;
-export const repairTime = REPAIR_ARMOR_TIME;
-export const rigRepairsVolume = REPAIR_SAIL_VOLUME;
-export const rigRepairsPercent = REPAIR_SAIL_PERCENT;
-export const rumRepairsVolume = REPAIR_CREW_VOLUME;
-export const rumRepairsPercent = REPAIR_CREW_PERCENT;
+export const hullRepairsVolume = REPAIR_ARMOR_VOLUME
+export const hullRepairsPercent = REPAIR_ARMOR_PERCENT
+export const repairTime = REPAIR_ARMOR_TIME
+export const rigRepairsVolume = REPAIR_SAIL_VOLUME
+export const rigRepairsPercent = REPAIR_SAIL_PERCENT
+export const rumRepairsVolume = REPAIR_CREW_VOLUME
+export const rumRepairsPercent = REPAIR_CREW_PERCENT
