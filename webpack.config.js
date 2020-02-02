@@ -238,11 +238,6 @@ const config = {
     },
 
     resolve: {
-        alias: {
-            Fonts: dirFonts,
-            Flags: dirFlags,
-            Icons: dirIcons
-        },
         mainFields: ["module", "main"]
     },
 
@@ -355,7 +350,7 @@ const config = {
             {
                 test: /\.js$/,
                 include: path.resolve(__dirname, "src/js"),
-                loader: "babel-loader",
+                loader: require.resolve("babel-loader"),
                 options: babelOpt
             },
             {
@@ -364,15 +359,15 @@ const config = {
                 use: [
                     ExtractCssChunks.loader,
                     {
-                        loader: "css-loader",
+                        loader: require.resolve("css-loader"),
                         options: cssOpt
                     },
                     {
-                        loader: "postcss-loader",
+                        loader: require.resolve("postcss-loader"),
                         options: postcssOpt
                     },
                     {
-                        loader: "sass-loader",
+                        loader: require.resolve("sass-loader"),
                         options: sassOpt
                     }
                 ]
@@ -382,11 +377,11 @@ const config = {
                 use: [
                     ExtractCssChunks.loader,
                     {
-                        loader: "css-loader",
+                        loader: require.resolve("css-loader"),
                         options: cssOpt
                     },
                     {
-                        loader: "postcss-loader",
+                        loader: require.resolve("postcss-loader"),
                         options: postcssOpt
                     }
                 ]
@@ -395,7 +390,7 @@ const config = {
                 test: /\.(woff2?|ttf|eot|svg)$/,
                 include: dirFonts,
                 use: {
-                    loader: "file-loader",
+                    loader: require.resolve("file-loader"),
                     options: {
                         name: "[name].[ext]",
                         outputPath: "fonts/"
@@ -407,7 +402,7 @@ const config = {
                 include: dirFlags,
                 use: [
                     {
-                        loader: "svg-url-loader",
+                        loader: require.resolve("svg-url-loader"),
                         options: {
                             limit: 1000,
                             name: "[name].[ext]",
@@ -415,27 +410,27 @@ const config = {
                         }
                     },
                     {
-                        loader: "image-webpack-loader",
+                        loader: require.resolve("image-webpack-loader"),
                         options: {
                             svgo: svgoOpt
                         }
                     },
                     {
-                        loader: "string-replace-loader",
+                        loader: require.resolve("string-replace-loader"),
                         options: {
                             search: 'fill="#fff" fill-opacity="0"/>',
                             replace: `fill="${primary700}" fill-opacity="0.3"/>`
                         }
                     },
                     {
-                        loader: "string-replace-loader",
+                        loader: require.resolve("string-replace-loader"),
                         options: {
                             search: 'fill="#fff" fill-opacity="1"/>',
                             replace: `fill="${primary200}" fill-opacity="1"/>`
                         }
                     },
                     {
-                        loader: "string-replace-loader",
+                        loader: require.resolve("string-replace-loader"),
                         options: {
                             search: 'fill="#fff" fill-opacity=".7"/>',
                             replace: `fill="${primary300}" fill-opacity=".7"/>`
@@ -448,7 +443,7 @@ const config = {
                 include: dirIcons,
                 use: [
                     {
-                        loader: "svg-url-loader",
+                        loader: require.resolve("svg-url-loader"),
                         options: {
                             limit: 1000,
                             name: "[name].[ext]",
@@ -456,13 +451,13 @@ const config = {
                         }
                     },
                     {
-                        loader: "image-webpack-loader",
+                        loader: require.resolve("image-webpack-loader"),
                         options: {
                             svgo: svgoOpt
                         }
                     },
                     {
-                        loader: "string-replace-loader",
+                        loader: require.resolve("string-replace-loader"),
                         options: {
                             search: 'fill="$themeColour"',
                             replace: `fill="${themeColour}"`
