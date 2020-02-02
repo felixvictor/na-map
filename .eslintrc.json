@@ -34,11 +34,10 @@
                 "SwitchCase": 1
             }
         ],
-        "max-params": ["warn", 5],
         "new-cap": "off",
         "no-mixed-operators": "off",
         "object-curly-spacing": ["error", "always"],
-        "prettier/prettier": ["error", { "tabWidth": 4, "printWidth": 120 }],
+        "prettier/prettier": ["error", { "tabWidth": 4, "printWidth": 120, "semi": false }],
         "prefer-destructuring": [
             "error",
             {
@@ -49,6 +48,7 @@
         "prefer-template": "error",
         "operator-linebreak": ["error", "after", { "overrides": { "?": "before", ":": "before" } }],
         "quotes": ["error", "double", { "allowTemplateLiterals": false, "avoidEscape": true }],
+        "semi": ["error", "never"],
         "space-before-function-paren": [
             "error",
             {
@@ -57,10 +57,10 @@
                 "asyncArrow": "always"
             }
         ],
+        "unicorn/consistent-function-scoping": "off",
         "unicorn/explicit-length-check": "off",
         "unicorn/import-index": "off",
         "unicorn/no-for-loop": "off",
-        "unicorn/no-nested-ternary": "off",
         "unicorn/no-unused-properties": "error",
         "unicorn/prefer-dataset": "off",
         "unicorn/prefer-includes": "off",

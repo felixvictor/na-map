@@ -1,4 +1,4 @@
-#!/usr/bin/env -S yarn node --experimental-modules --no-warnings
+#!/usr/bin/env -S yarn yarn node --experimental-modules --no-warnings
 
 /**
  * This file is part of na-map.
@@ -10,10 +10,10 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import * as fs from "fs";
-import * as path from "path";
-import { default as Denque } from "denque";
-import { default as PNG } from "pngjs";
+import * as fs from "fs"
+import * as path from "path"
+import { default as Denque } from "denque"
+import { default as PNG } from "pngjs"
 import {
     baseAPIFilename,
     commonPaths,
@@ -24,7 +24,7 @@ import {
     saveJsonAsync,
     serverNames,
     serverStartDate as serverDate
-} from "./common.mjs";
+} from "./common.mjs"
 
 /**
  * ------------------------------------------------------------------------
@@ -32,11 +32,11 @@ import {
  * ------------------------------------------------------------------------
  */
 
-const mapFileName = path.resolve(commonPaths.dirSrc, "images", `frontline-map-${distanceMapSize}.png`);
-const distancesFile = path.resolve(commonPaths.dirGenGeneric, `distances-${distanceMapSize}.json`);
+const mapFileName = path.resolve(commonPaths.dirSrc, "images", `frontline-map-${distanceMapSize}.png`)
+const distancesFile = path.resolve(commonPaths.dirGenGeneric, `distances-${distanceMapSize}.json`)
 
-const spotWater = 0;
-const spotLand = -1;
+const spotWater = 0
+const spotLand = -1
 
 /**
  * ------------------------------------------------------------------------
@@ -45,14 +45,14 @@ const spotLand = -1;
  */
 
 // Read map file
-const fileData = fs.readFileSync(mapFileName);
+const fileData = fs.readFileSync(mapFileName)
 // Read map file content as png
-const png = PNG.PNG.sync.read(fileData);
+const png = PNG.PNG.sync.read(fileData)
 
-const mapHeight = png.height; // y
-const mapWidth = png.width; // x
-const origMapSize = 8192;
-const mapScale = mapWidth / origMapSize;
+const mapHeight = png.height // y
+const mapWidth = png.width // x
+const origMapSize = 8192
+const mapScale = mapWidth / origMapSize
 
 /**
  * ------------------------------------------------------------------------
@@ -60,11 +60,11 @@ const mapScale = mapWidth / origMapSize;
  * ------------------------------------------------------------------------
  */
 
-const getIndex = (y, x) => y * mapWidth + x;
+const getIndex = (y, x) => y * mapWidth + x
 const getCoordinates = (y, x) => [
     Math.trunc(convertCoordY(x, y) * mapScale),
     Math.trunc(convertCoordX(x, y) * mapScale)
-];
+]
 
 /**
  * ------------------------------------------------------------------------
@@ -72,9 +72,9 @@ const getCoordinates = (y, x) => [
  * ------------------------------------------------------------------------
  */
 
-const ports = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-Ports-${serverDate}.json`));
-const portIds = ports.map(port => Number(port.Id));
-const numPorts = portIds.length;
+const ports = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-Ports-${serverDate}.json`))
+const portIds = ports.map(port => Number(port.Id))
+const numPorts = portIds.length
 
 /**
  * @typedef {Array} GridMap
@@ -88,15 +88,15 @@ const numPorts = portIds.length;
  */
 const map = new Array(mapWidth * mapHeight)
     .fill()
-    .map((e, index) => (png.data[index << 2] > 127 ? spotWater : spotLand));
+    .map((e, index) => (png.data[index << 2] > 127 ? spotWater : spotLand))
 
 // Add port id to port entrances
 ports.forEach(({ Id, EntrancePosition: { z: y, x } }) => {
-    const [portY, portX] = getCoordinates(y, x);
-    const index = getIndex(portY, portX);
+    const [portY, portX] = getCoordinates(y, x)
+    const index = getIndex(portY, portX)
 
-    map[index] = Number(Id);
-});
+    map[index] = Number(Id)
+})
 
 /**
  * ------------------------------------------------------------------------
@@ -105,7 +105,7 @@ ports.forEach(({ Id, EntrancePosition: { z: y, x } }) => {
  */
 
 // Outer-grid land borders
-const visitedPositionsDefault = new Set();
+const visitedPositionsDefault = new Set()
 
 /**
  * @typedef {Array} Distances
@@ -119,14 +119,14 @@ const visitedPositionsDefault = new Set();
  *
  * @type {Distances}
  */
-const distances = [];
+const distances = []
 
 /**
  * Set of start ports so far
  *
  * @type {Set<number>}
  */
-const startPortIds = new Set();
+const startPortIds = new Set()
 
 /**
  * Find shortest paths between start port and all other ports (breadth first search).
@@ -137,35 +137,35 @@ const startPortIds = new Set();
  */
 const findPaths = (startPortId, startY, startX) => {
     // Add outer-grid land borders
-    const visitedPositions = new Set(visitedPositionsDefault);
+    const visitedPositions = new Set(visitedPositionsDefault)
     // Queue holds unchecked positions ([index, distance from start port])
-    const queue = new Denque();
+    const queue = new Denque()
 
     // Add start port
-    const startIndex = getIndex(startY, startX);
-    const foundPortIds = new Set();
-    startPortIds.add(startPortId);
-    visitedPositions.add(startIndex);
-    queue.push([startIndex, 0]);
+    const startIndex = getIndex(startY, startX)
+    const foundPortIds = new Set()
+    startPortIds.add(startPortId)
+    visitedPositions.add(startIndex)
+    queue.push([startIndex, 0])
 
     while (foundPortIds.size + startPortIds.size < numPorts && !queue.isEmpty()) {
-        let [pos, distance] = queue.shift();
-        distance++;
+        let [pos, distance] = queue.shift()
+        distance++
 
         // Check if port is found
         if (map[pos] > startPortId) {
-            distances.push([startPortId, map[pos], distance]);
-            foundPortIds.add(map[pos]);
+            distances.push([startPortId, map[pos], distance])
+            foundPortIds.add(map[pos])
         }
 
         // Check all nine neighbour positions ([-1, 0, 1][-1, 0, 1])
         for (let y = -mapWidth; y <= mapWidth; y += mapWidth) {
             for (let x = -1; x <= 1; x += 1) {
-                const index = pos + y + x;
+                const index = pos + y + x
                 // Add not visited non-land neighbour index
                 if (!visitedPositions.has(index) && map[index] !== spotLand) {
-                    visitedPositions.add(index);
-                    queue.push([index, distance]);
+                    visitedPositions.add(index)
+                    queue.push([index, distance])
                 }
             }
         }
@@ -174,7 +174,7 @@ const findPaths = (startPortId, startY, startX) => {
     if (foundPortIds.size + startPortIds.size < numPorts) {
         const missingPortIds = portIds
             .filter(portId => portId > startPortId && !foundPortIds.has(portId))
-            .sort((a, b) => a - b);
+            .sort((a, b) => a - b)
         console.error(
             "Only",
             foundPortIds.size + startPortIds.size,
@@ -183,12 +183,12 @@ const findPaths = (startPortId, startY, startX) => {
             "ports found! Ports",
             missingPortIds,
             "are missing."
-        );
+        )
         missingPortIds.forEach(missingPortId => {
-            distances.push([startPortId, missingPortId, 0]);
-        });
+            distances.push([startPortId, missingPortId, 0])
+        })
     }
-};
+}
 
 /**
  *  Set outer-grid borders to land as a barrier
@@ -197,23 +197,23 @@ const findPaths = (startPortId, startY, startX) => {
  */
 const setVisitedPositionsDefault = () => {
     // Define outer bounds (map grid covers [0, mapSize-1])
-    const minY = -1;
-    const minX = -1;
-    const maxY = mapHeight;
-    const maxX = mapWidth;
+    const minY = -1
+    const minX = -1
+    const maxY = mapHeight
+    const maxX = mapWidth
 
     for (let y = minY; y <= maxY; y += maxY + 1) {
         for (let x = minX; x <= maxX; x += 1) {
-            visitedPositionsDefault.add(getIndex(y, x));
+            visitedPositionsDefault.add(getIndex(y, x))
         }
     }
 
     for (let y = minY; y <= maxY; y += 1) {
         for (let x = minX; x <= maxX; x += maxX + 1) {
-            visitedPositionsDefault.add(getIndex(y, x));
+            visitedPositionsDefault.add(getIndex(y, x))
         }
     }
-};
+}
 
 /**
  *  Calculate distances between all ports
@@ -221,28 +221,28 @@ const setVisitedPositionsDefault = () => {
  *  @return {void}
  */
 const getDistances = async () => {
-    setVisitedPositionsDefault();
+    setVisitedPositionsDefault()
     //    const selectedPorts = [4, 176, 201, 256, 287, 355, 374];
 
-    console.time("findPath");
+    console.time("findPath")
     ports
         .sort((a, b) => Number(a.Id) - Number(b.Id))
         //        .filter(fromPort => selectedPorts.includes(Number(fromPort.Id)))
         .forEach(fromPort => {
-            const fromPortId = Number(fromPort.Id);
+            const fromPortId = Number(fromPort.Id)
             const {
                 EntrancePosition: { z: y, x }
-            } = fromPort;
-            const [fromPortY, fromPortX] = getCoordinates(y, x);
+            } = fromPort
+            const [fromPortY, fromPortX] = getCoordinates(y, x)
 
-            findPaths(fromPortId, fromPortY, fromPortX);
+            findPaths(fromPortId, fromPortY, fromPortX)
 
-            console.timeLog("findPath", `${fromPort.Id} ${fromPort.Name} (${fromPortY}, ${fromPortX})`);
-        });
+            console.timeLog("findPath", `${fromPort.Id} ${fromPort.Name} (${fromPortY}, ${fromPortX})`)
+        })
 
-    console.timeEnd("findPath");
+    console.timeEnd("findPath")
 
-    await saveJsonAsync(distancesFile, distances);
-};
+    await saveJsonAsync(distancesFile, distances)
+}
 
-getDistances();
+getDistances()
