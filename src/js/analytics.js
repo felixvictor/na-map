@@ -4,21 +4,21 @@
  * @file      Google analytics.
  * @module    analytics
  * @author    iB aka Felix Victor
- * @copyright 2017, 2018
+ * @copyright 2017, 2018, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
 /* global ga */
 
-import { appName, appVersion } from "./common";
+import { appName, appVersion } from "./common"
 
-const GA_TRACKING_ID = "UA-109520372-1";
+const GA_TRACKING_ID = "UA-109520372-1"
 window.ga = function() {
     // eslint-disable-next-line prefer-rest-params
-    ga.q.push(arguments);
-};
+    ga.q.push(arguments)
+}
 
-ga.q = [];
+ga.q = []
 
 /**
  * Register event
@@ -33,8 +33,8 @@ export const registerEvent = (category, label, value = 1) => {
         eventCategory: category,
         eventLabel: label,
         eventValue: value
-    });
-};
+    })
+}
 
 /**
  * Register page
@@ -45,8 +45,8 @@ export const registerPage = title => {
     ga("send", {
         hitType: "pageview",
         title
-    });
-};
+    })
+}
 
 /**
  * Init google tag manager
@@ -54,11 +54,11 @@ export const registerPage = title => {
  * @return {void}
  */
 export const initAnalytics = () => {
-    ga.l = Number(new Date());
-    ga("create", GA_TRACKING_ID, "auto");
-    ga("set", "anonymizeIp", true);
-    ga("set", "transport", "beacon");
-    ga("send", "pageview");
+    ga.l = Number(new Date())
+    ga("create", GA_TRACKING_ID, "auto")
+    ga("set", "anonymizeIp", true)
+    ga("set", "transport", "beacon")
+    ga("send", "pageview")
 
     /**
      * Log any script error to Google Analytics.
@@ -72,15 +72,15 @@ export const initAnalytics = () => {
         const exceptionDescription = [
             `Message: ${errorMessage.message} @ ${errorMessage.filename}-${errorMessage.lineno}:${errorMessage.colno}`,
             `Error object: ${JSON.stringify(errorMessage.error)}`
-        ].join(" - ");
+        ].join(" - ")
 
         ga("send", "exception", {
             exDescription: exceptionDescription,
             exFatal: false,
             appName,
             appVersion
-        });
+        })
 
-        return false;
-    });
-};
+        return false
+    })
+}
