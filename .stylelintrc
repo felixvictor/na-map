@@ -1,12 +1,16 @@
 {
   "cache": true,
   "extends": [
-    "stylelint-config-twbs-bootstrap/scss"
+    "stylelint-config-prettier",
+    "stylelint-config-twbs-bootstrap/scss",
+    "stylelint-prettier/recommended"
   ],
   "plugins": [
+    "stylelint-prettier",
     "stylelint-scss"
   ],
   "rules": {
-    "indentation": 4
+    "indentation": 4,
+    "prettier/prettier": true
   }
 }

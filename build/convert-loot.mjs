@@ -8,7 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import * as path from "path";
+import * as path from "path"
 import {
     cleanName,
     commonPaths,
@@ -19,27 +19,28 @@ import {
     baseAPIFilename,
     serverNames,
     serverStartDate as serverDate
-} from "./common.mjs";
+} from "./common.mjs"
 
-let apiItems = [];
+let apiItems = []
+const secondsPerHour = 3600
 
 const getLootName = (classId, isMission) => {
     if (classId === -1) {
-        return "Trader bot (open world)";
+        return "Trader bot (open world)"
     }
 
-    return `${getOrdinal(classId, false)} rate bot (${isMission ? "mission" : "open world"})`;
-};
+    return `${getOrdinal(classId, false)} rate bot (${isMission ? "mission" : "open world"})`
+}
 
 const getLootItemName = (name, type) => {
-    let cleanedName = cleanName(name);
+    let cleanedName = cleanName(name)
 
     if (type === "Recipe" && !cleanedName.endsWith("Blueprint")) {
-        cleanedName = cleanedName.concat(" Blueprint");
+        cleanedName = cleanedName.concat(" Blueprint")
     }
 
-    return cleanedName;
-};
+    return cleanedName
+}
 
 const convertLoot = async () => {
     /**
@@ -47,12 +48,12 @@ const convertLoot = async () => {
      * @return {Map<number, string>} Item names<id, name>
      */
     const getItemNames = () =>
-        new Map(apiItems.map(item => [Number(item.Id), getLootItemName(item.Name, item.ItemType)]));
+        new Map(apiItems.map(item => [Number(item.Id), getLootItemName(item.Name, item.ItemType)]))
 
-    const itemNames = getItemNames();
+    const itemNames = getItemNames()
 
     const getLootItemsFromChestLootTable = chestLootTableId =>
-        apiItems.filter(item => Number(item.Id) === chestLootTableId).flatMap(item => getLootItems(item.Items));
+        apiItems.filter(item => Number(item.Id) === chestLootTableId).flatMap(item => getLootItems(item.Items))
 
     const getLootItems = (lootItems, itemProbability = []) =>
         lootItems.map(item => ({
@@ -60,11 +61,11 @@ const convertLoot = async () => {
             name: itemNames.has(Number(item.Template)) ? itemNames.get(Number(item.Template)) : Number(item.Template),
             chance: itemProbability.length ? Number(itemProbability[Number(item.Chance)]) : Number(item.Chance),
             amount: { min: Number(item.Stack.Min), max: Number(item.Stack.Max) }
-        }));
+        }))
 
-    const data = {};
+    const data = {}
 
-    let types = ["ShipLootTableItem"];
+    let types = ["ShipLootTableItem"]
     data.loot = apiItems
         .filter(item => !item.NotUsed && types.includes(item.ItemType))
         .map(item => ({
@@ -72,29 +73,32 @@ const convertLoot = async () => {
             name: getLootName(Number(item.Class), item.EventLootTable),
             items: getLootItems(item.Items, item.itemProbability).sort(sortBy(["chance", "id"]))
         }))
-        .sort(sortBy(["class", "id"]));
+        .sort(sortBy(["class", "id"]))
 
-    types = ["TimeBasedConvertibleItem"];
+    // noinspection ReuseOfLocalVariableJS
+    types = ["TimeBasedConvertibleItem"]
     data.chests = apiItems
         .filter(item => !item.NotUsed && types.includes(item.ItemType))
-        .map(item => ({
-            id: Number(item.Id),
-            name: cleanName(item.Name),
-            weight: Number(item.ItemWeight),
-            lifetime: Number(item.LifetimeSeconds) / (60 * 60),
-            items: item.ExtendedLootTable.map(lootChestLootTableId =>
-                getLootItemsFromChestLootTable(lootChestLootTableId)
-            )
-                .reduce((acc, value) => acc.concat(value), [])
-                .sort(sortBy(["chance", "id"]))
-        }))
-        .sort(sortBy(["id"]));
+        .map(item => {
+            return {
+                id: Number(item.Id),
+                name: cleanName(item.Name),
+                weight: Number(item.ItemWeight),
+                lifetime: Number(item.LifetimeSeconds) / secondsPerHour,
+                items: item.ExtendedLootTable.map(lootChestLootTableId =>
+                    getLootItemsFromChestLootTable(lootChestLootTableId)
+                )
+                    .reduce((acc, value) => acc.concat(value), [])
+                    .sort(sortBy(["chance", "id"]))
+            }
+        })
+        .sort(sortBy(["id"]))
 
-    await saveJsonAsync(commonPaths.fileLoot, data);
-};
+    await saveJsonAsync(commonPaths.fileLoot, data)
+}
 
 export const convertLootData = () => {
-    apiItems = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`));
+    apiItems = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`))
 
-    convertLoot();
-};
+    convertLoot()
+}
