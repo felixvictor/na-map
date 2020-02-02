@@ -1,4 +1,4 @@
-#!/usr/bin/env -S yarn yarn node --experimental-modules --no-warnings
+#!/usr/bin/env -S yarn yarn yarn node --experimental-modules --no-warnings
 
 /**
  * This file is part of na-map.
@@ -11,14 +11,14 @@
  */
 
 // eslint-disable-next-line camelcase
-import child_process from "child_process";
-import sharp from "sharp";
+import child_process from "child_process"
+import sharp from "sharp"
 
-const inFilename = process.argv[2];
-const tileSize = 256;
-const mapPath = "src/images/map";
-const iconsPath = "src/images/icons";
-const logoMainFile = `${iconsPath}/logo.png`;
+const inFilename = process.argv[2]
+const tileSize = 256
+const mapPath = "src/images/map"
+const iconsPath = "src/images/icons"
+const logoMainFile = `${iconsPath}/logo.png`
 
 const convert = async () => {
     try {
@@ -26,25 +26,25 @@ const convert = async () => {
             .webp({ quality: 100, reductionEffort: 6 })
             .sharpen()
             .tile({ size: tileSize, layout: "google" })
-            .toFile(mapPath);
+            .toFile(mapPath)
 
         // eslint-disable-next-line camelcase
         await child_process.exec(`convert ${inFilename} -resize 1024 ${logoMainFile}`, (err, stdout, stderr) => {
             if (err) {
-                throw err;
+                throw err
             }
 
             if (stdout) {
-                console.log("stdout:", stdout);
+                console.log("stdout:", stdout)
             }
 
             if (stderr) {
-                console.error("stderr:", stderr);
+                console.error("stderr:", stderr)
             }
-        });
+        })
     } catch (error) {
-        throw new Error(error);
+        throw new Error(error)
     }
-};
+}
 
-convert();
+convert()
