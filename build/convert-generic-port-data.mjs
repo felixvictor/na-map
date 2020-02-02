@@ -8,8 +8,8 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import * as path from "path";
-import polylabel from "polylabel";
+import * as path from "path"
+import polylabel from "polylabel"
 
 import {
     baseAPIFilename,
@@ -18,6 +18,7 @@ import {
     commonPaths,
     convertCoordX,
     convertCoordY,
+    degreesHalfCircle,
     distanceMapSize,
     readJson,
     rotationAngleInDegrees,
@@ -25,17 +26,17 @@ import {
     serverNames,
     serverStartDate as serverDate,
     sortBy
-} from "./common.mjs";
+} from "./common.mjs"
 
-let apiPorts = [];
-let apiPortPos = new Map();
+let apiPorts = []
+let apiPortPos = new Map()
 
-const counties = new Map();
-const regions = new Map();
-const geoJsonRegions = { type: "FeatureCollection", features: [] };
-const geoJsonCounties = { type: "FeatureCollection", features: [] };
+const counties = new Map()
+const regions = new Map()
+const geoJsonRegions = { type: "FeatureCollection", features: [] }
+const geoJsonCounties = { type: "FeatureCollection", features: [] }
 
-const getPortName = portId => apiPorts.find(({ Id }) => Number(Id) === portId).Name;
+const getPortName = portId => apiPorts.find(({ Id }) => Number(Id) === portId).Name
 
 const setAndSavePortData = async () => {
     /**
@@ -52,17 +53,18 @@ const setAndSavePortData = async () => {
             const circleAPos = [
                 Math.trunc(convertCoordX(apiPort.PortBattleZonePositions[0].x, apiPort.PortBattleZonePositions[0].z)),
                 Math.trunc(convertCoordY(apiPort.PortBattleZonePositions[0].x, apiPort.PortBattleZonePositions[0].z))
-            ];
-            const angle = Math.round(rotationAngleInDegrees(apiPortPos.get(Number(apiPort.Id)), circleAPos));
-            const coordinates = apiPortPos.get(Number(apiPort.Id));
+            ]
+            const { x, y } = apiPortPos.get(Number(apiPort.Id))
+            const angle = Math.round(rotationAngleInDegrees([x, y], circleAPos))
+            const coordinates = apiPortPos.get(Number(apiPort.Id))
             return {
                 id: Number(apiPort.Id),
                 name: cleanName(apiPort.Name),
                 coordinates: [coordinates.x, coordinates.y],
                 angle,
-                textAnchor: angle > 0 && angle < 180 ? "start" : "end",
+                textAnchor: angle > 0 && angle < degreesHalfCircle ? "start" : "end",
                 region: apiPort.Location,
-                countyCapitalName: apiPort.CountyCapitalName,
+                countyCapitalName: cleanName(apiPort.CountyCapitalName),
                 county: capitalToCounty.has(apiPort.CountyCapitalName)
                     ? capitalToCounty.get(apiPort.CountyCapitalName)
                     : "",
@@ -75,18 +77,18 @@ const setAndSavePortData = async () => {
                 portBattleType: apiPort.PortBattleType,
                 nonCapturable: apiPort.NonCapturable,
                 conquestMarksPension: apiPort.ConquestMarksPension
-            };
+            }
         })
-        .sort(sortBy(["id"]));
+        .sort(sortBy(["id"]))
 
-    await saveJsonAsync(commonPaths.filePort, ports);
-};
+    await saveJsonAsync(commonPaths.filePort, ports)
+}
 
 const getPBCircles = portBattleZonePositions =>
     portBattleZonePositions.map(pbCircle => [
         Math.trunc(convertCoordX(pbCircle.x, pbCircle.z)),
         Math.trunc(convertCoordY(pbCircle.x, pbCircle.z))
-    ]);
+    ])
 
 const getForts = portElementsSlotGroups =>
     portElementsSlotGroups
@@ -96,7 +98,7 @@ const getForts = portElementsSlotGroups =>
                 Math.trunc(convertCoordX(d.Position.x, d.Position.z)),
                 Math.trunc(convertCoordY(d.Position.x, d.Position.z))
             ])
-        );
+        )
 
 const getTowers = portElementsSlotGroups =>
     portElementsSlotGroups
@@ -106,36 +108,36 @@ const getTowers = portElementsSlotGroups =>
                 Math.trunc(convertCoordX(d.Position.x, d.Position.z)),
                 Math.trunc(convertCoordY(d.Position.x, d.Position.z))
             ])
-        );
+        )
 
 const getJoinCircles = (id, rotation) => {
-    const { x: x0, y: y0 } = apiPortPos.get(id);
-    const distance = 5;
-    const degrees = 180 - rotation;
-    const radians = (degrees * Math.PI) / 180;
-    const x1 = Math.trunc(x0 + distance * Math.sin(radians));
-    const y1 = Math.trunc(y0 + distance * Math.cos(radians));
+    const { x: x0, y: y0 } = apiPortPos.get(id)
+    const distance = 5
+    const degrees = degreesHalfCircle - rotation
+    const radians = (degrees * Math.PI) / degreesHalfCircle
+    const x1 = Math.trunc(x0 + distance * Math.sin(radians))
+    const y1 = Math.trunc(y0 + distance * Math.cos(radians))
 
-    return [x1, y1];
-};
+    return [x1, y1]
+}
 
 const getRaidCircles = portRaidZonePositions =>
     portRaidZonePositions.map(raidCircle => [
         Math.trunc(convertCoordX(raidCircle.x, raidCircle.z)),
         Math.trunc(convertCoordY(raidCircle.x, raidCircle.z))
-    ]);
+    ])
 
 const getRaidPoints = portRaidSpawnPoints =>
     portRaidSpawnPoints.map(raidPoint => [
         Math.trunc(convertCoordX(raidPoint.Position.x, raidPoint.Position.z)),
         Math.trunc(convertCoordY(raidPoint.Position.x, raidPoint.Position.z))
-    ]);
+    ])
 
 const setAndSavePBZones = async () => {
     const ports = apiPorts
         .filter(port => !port.NonCapturable)
         .map(port => {
-            const { x, y } = apiPortPos.get(Number(port.Id));
+            const { x, y } = apiPortPos.get(Number(port.Id))
             return {
                 id: Number(port.Id),
                 position: [x, y],
@@ -145,28 +147,28 @@ const setAndSavePBZones = async () => {
                 joinCircles: getJoinCircles(Number(port.Id), Number(port.Rotation)),
                 raidCircles: getRaidCircles(port.PortRaidZonePositions),
                 raidPoints: getRaidPoints(port.PortRaidSpawnPoints)
-            };
+            }
         })
-        .sort(sortBy(["id"]));
+        .sort(sortBy(["id"]))
 
-    await saveJsonAsync(commonPaths.filePbZone, ports);
-};
+    await saveJsonAsync(commonPaths.filePbZone, ports)
+}
 
 /**
  *
- * @param {Object} port Port data.
+ * @param {string} countyCapitalName
  * @param {Array} portPos Port screen x/y coordinates.
  * @return {void}
  */
 const setCountyFeature = (countyCapitalName, portPos) => {
-    const county = capitalToCounty.has(countyCapitalName) ? capitalToCounty.get(countyCapitalName) : "";
+    const county = capitalToCounty.has(countyCapitalName) ? capitalToCounty.get(countyCapitalName) : ""
     if (county !== "") {
         if (counties.has(county)) {
             geoJsonCounties.features
                 .filter(countyFeature => countyFeature.id === county)
-                .some(countyFeature => countyFeature.geometry.coordinates.push(portPos));
+                .some(countyFeature => countyFeature.geometry.coordinates.push(portPos))
         } else {
-            counties.set(county, county);
+            counties.set(county, county)
 
             const feature = {
                 type: "Feature",
@@ -175,15 +177,15 @@ const setCountyFeature = (countyCapitalName, portPos) => {
                     type: "Polygon",
                     coordinates: [portPos]
                 }
-            };
-            geoJsonCounties.features.push(feature);
+            }
+            geoJsonCounties.features.push(feature)
         }
     }
-};
+}
 
 /**
  *
- * @param {Object} port Port data.
+ * @param {string} location
  * @param {Array} portPos Port screen x/y coordinates.
  * @return {void}
  */
@@ -191,9 +193,9 @@ const setRegionFeature = (location, portPos) => {
     if (regions.has(location)) {
         geoJsonRegions.features
             .filter(region => region.id === location)
-            .some(region => region.geometry.coordinates.push(portPos));
+            .some(region => region.geometry.coordinates.push(portPos))
     } else {
-        regions.set(location, location);
+        regions.set(location, location)
 
         const feature = {
             type: "Feature",
@@ -202,68 +204,68 @@ const setRegionFeature = (location, portPos) => {
                 type: "Polygon",
                 coordinates: [portPos]
             }
-        };
-        geoJsonRegions.features.push(feature);
+        }
+        geoJsonRegions.features.push(feature)
     }
-};
+}
 
 const setAndSaveCountyRegionData = async () => {
     apiPorts.forEach(apiPort => {
-        const portPos = apiPortPos.get(Number(apiPort.Id));
-        setCountyFeature(apiPort.CountyCapitalName, portPos);
-        setRegionFeature(apiPort.Location, portPos);
-    });
-    await saveJsonAsync(`${commonPaths.dirGenGeneric}/regions.json`, geoJsonRegions);
-    await saveJsonAsync(`${commonPaths.dirGenGeneric}/counties.json`, geoJsonCounties);
+        const portPos = apiPortPos.get(Number(apiPort.Id))
+        setCountyFeature(apiPort.CountyCapitalName, portPos)
+        setRegionFeature(apiPort.Location, portPos)
+    })
+    await saveJsonAsync(`${commonPaths.dirGenGeneric}/regions.json`, geoJsonRegions)
+    await saveJsonAsync(`${commonPaths.dirGenGeneric}/counties.json`, geoJsonCounties)
 
     geoJsonRegions.features.forEach(region => {
-        region.geometry.type = "Point";
+        region.geometry.type = "Point"
         region.geometry.coordinates = polylabel([region.geometry.coordinates], 1).map(coordinate =>
             Math.trunc(coordinate)
-        );
-    });
-    await saveJsonAsync(`${commonPaths.dirGenGeneric}/region-labels.json`, geoJsonRegions);
+        )
+    })
+    await saveJsonAsync(`${commonPaths.dirGenGeneric}/region-labels.json`, geoJsonRegions)
 
     geoJsonCounties.features.forEach(county => {
-        county.geometry.type = "Point";
+        county.geometry.type = "Point"
         county.geometry.coordinates = polylabel([county.geometry.coordinates], 1).map(coordinate =>
             Math.trunc(coordinate)
-        );
-    });
+        )
+    })
 
-    await saveJsonAsync(`${commonPaths.dirGenGeneric}/county-labels.json`, geoJsonCounties);
-};
+    await saveJsonAsync(`${commonPaths.dirGenGeneric}/county-labels.json`, geoJsonCounties)
+}
 
 /**
  * Find all port with the same distance to two or more ports
  */
 const getEquidistantPorts = async () => {
-    const distancesFile = path.resolve(commonPaths.dirGenGeneric, `distances-${distanceMapSize}.json`);
-    const distances = readJson(distancesFile);
-    const distancesMap = new Map();
+    const distancesFile = path.resolve(commonPaths.dirGenGeneric, `distances-${distanceMapSize}.json`)
+    const distances = readJson(distancesFile)
+    const distancesMap = new Map()
 
     distances.forEach(distance => {
         // const newPortRelation = [distance[0], distance[1]];
-        const newPortRelation = `${getPortName(distance[0])} -> ${getPortName(distance[1])}`;
+        const newPortRelation = `${getPortName(distance[0])} -> ${getPortName(distance[1])}`
         // const key = `${distance[2]}-${distance[0]}`;
-        const key = `${getPortName(distance[0])} (${distance[2]})`;
+        const key = `${getPortName(distance[0])} (${distance[2]})`
 
-        let portRelations = distancesMap.get(key);
+        let portRelations = distancesMap.get(key)
         if (portRelations) {
-            portRelations.push(newPortRelation);
+            portRelations.push(newPortRelation)
         } else {
-            portRelations = [newPortRelation];
+            portRelations = [newPortRelation]
         }
 
-        distancesMap.set(key, portRelations);
-    });
+        distancesMap.set(key, portRelations)
+    })
 
-    const out = [...distancesMap].filter(([, values]) => values.length > 1);
-    await saveJsonAsync("equidistant-ports.json", out);
-};
+    const out = [...distancesMap].filter(([, values]) => values.length > 1)
+    await saveJsonAsync("equidistant-ports.json", out)
+}
 
 export const convertGenericPortData = () => {
-    apiPorts = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-Ports-${serverDate}.json`));
+    apiPorts = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-Ports-${serverDate}.json`))
 
     apiPortPos = new Map(
         apiPorts.map(apiPort => [
@@ -273,9 +275,9 @@ export const convertGenericPortData = () => {
                 y: Math.trunc(convertCoordY(apiPort.Position.x, apiPort.Position.z))
             }
         ])
-    );
+    )
 
-    setAndSavePortData();
-    setAndSavePBZones();
-    setAndSaveCountyRegionData();
-};
+    setAndSavePortData()
+    setAndSavePBZones()
+    setAndSaveCountyRegionData()
+}
