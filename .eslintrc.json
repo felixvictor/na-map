@@ -1,8 +1,8 @@
 {
     "root": true,
-    "parser": "babel-eslint",
+    "parser": "@typescript-eslint/parser",
     "parserOptions": {
-        "ecmaVersion": 6,
+        "ecmaVersion": 2020,
         "sourceType": "module",
         "ecmaFeatures": {
             "modules": true,
@@ -15,15 +15,11 @@
         "jquery": true
     },
     "extends": [
-        "plugin:import/errors",
-        "plugin:import/warnings",
+        "plugin:@typescript-eslint/recommended",
         "plugin:lit/recommended",
-        "plugin:prettier/recommended",
-        "plugin:unicorn/recommended",
-        "xo/esnext",
-        "xo/browser"
+        "plugin:prettier/recommended"
     ],
-    "plugins": ["lit", "prettier"],
+    "plugins": ["lit", "prettier", "@typescript-eslint/eslint-plugin"],
     "rules": {
         "capitalized-comments": "off",
         "indent": [
@@ -57,17 +53,18 @@
                 "asyncArrow": "always"
             }
         ],
-        "unicorn/consistent-function-scoping": "off",
-        "unicorn/explicit-length-check": "off",
-        "unicorn/import-index": "off",
-        "unicorn/no-for-loop": "off",
-        "unicorn/no-unused-properties": "error",
-        "unicorn/prefer-dataset": "off",
-        "unicorn/prefer-includes": "off",
-        "unicorn/prefer-node-append": "off",
-        "unicorn/prefer-node-remove": "off",
-        "unicorn/prefer-query-selector": "off",
-        "unicorn/prefer-text-content": "off",
-        "unicorn/prevent-abbreviations": "off"
+        "@typescript-eslint/member-delimiter-style": [
+            "error",
+            {
+                "multiline": {
+                    "delimiter": "none",
+                    "requireLast": false
+                },
+                "singleline": {
+                    "delimiter": "comma",
+                    "requireLast": false
+                }
+            }
+        ]
     }
 }
