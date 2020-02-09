@@ -2,7 +2,7 @@
  * This file is part of na-map.
  *
  * @file      Common data and functions.
- * @module    common
+ * @module    src/node/common
  * @author    iB aka Felix Victor
  * @copyright 2018, 2019, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
@@ -18,10 +18,12 @@ import utc from "dayjs/plugin/utc.js"
 dayjs.extend(utc)
 
 // https://stackoverflow.com/a/50052194
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 export const serverMaintenanceHour = 10
 
+export const distanceMapSize = 4096
 export const timeFactor = 2.63
 export const speedFactor = 390
 export const speedConstA = 0.074465523706782
@@ -43,7 +45,6 @@ const dirGenGeneric = path.resolve(dirSrc, "gen-generic")
 
 /**
  * Build common paths and file names
- * @return {Object} Paths
  */
 export const commonPaths = {
     dirAPI,
@@ -76,9 +77,8 @@ export const commonPaths = {
 
 /**
  * Get server start (date and time)
- * @return {dayjs.Dayjs} Server start
  */
-const getServerStartDateTime = () => {
+const getServerStartDateTime = (): dayjs.Dayjs => {
     let serverStart = dayjs()
         .utc()
         .hour(serverMaintenanceHour)
@@ -108,8 +108,6 @@ export const baseAPIFilename = path.resolve(commonPaths.dirAPI, serverDateYear, 
    server_names=(dev)
 */
 
-export const distanceMapSize = 4096
-
 // noinspection MagicNumberJS,DuplicatedCode
 const transformMatrix = {
     A: -0.00499866779363828,
@@ -127,30 +125,30 @@ const transformMatrixInv = {
 }
 
 // F11 coord to svg coord
-export const convertCoordX = (x, y) => transformMatrix.A * x + transformMatrix.B * y + transformMatrix.C
+export const convertCoordX = (x: number, y: number): number =>
+    transformMatrix.A * x + transformMatrix.B * y + transformMatrix.C
 
 // F11 coord to svg coord
-export const convertCoordY = (x, y) => transformMatrix.B * x - transformMatrix.A * y + transformMatrix.D
+export const convertCoordY = (x: number, y: number): number =>
+    transformMatrix.B * x - transformMatrix.A * y + transformMatrix.D
 
 // svg coord to F11 coord
-export const convertInvCoordX = (x, y) => transformMatrixInv.A * x + transformMatrixInv.B * y + transformMatrixInv.C
+export const convertInvCoordX = (x: number, y: number): number =>
+    transformMatrixInv.A * x + transformMatrixInv.B * y + transformMatrixInv.C
 
 // svg coord to F11 coord
-export const convertInvCoordY = (x, y) => transformMatrixInv.B * x - transformMatrixInv.A * y + transformMatrixInv.D
+export const convertInvCoordY = (x: number, y: number): number =>
+    transformMatrixInv.B * x - transformMatrixInv.A * y + transformMatrixInv.D
 
-/**
- * @typedef {Object} Nation
- * @property {number} id - Id
- * @property {string} short - Short name
- * @property {string} name - Name
- * @property {string} sortName - Name for sorting
- */
+interface Nation {
+    id: number
+    short: string // Short name
+    name: string // Name
+    sortName: string // Name for sorting
+}
 
 // noinspection DuplicatedCode,SpellCheckingInspection,JSValidateTypes
-/**
- * @type {Array<Nation>}
- */
-export const nations = [
+export const nations: Array<Nation> = [
     { id: 0, short: "NT", name: "Neutral", sortName: "Neutral" },
     { id: 1, short: "PR", name: "Pirates", sortName: "Pirates" },
     { id: 2, short: "ES", name: "España", sortName: "España" },
@@ -247,14 +245,12 @@ export const capitalToCounty = new Map([
     ["Wilmington", "North Carolina"]
 ])
 
-export const fileExists = fileName => fs.existsSync(fileName)
+export const fileExists = (fileName: string): boolean => fs.existsSync(fileName)
 
 /**
  * Make directories (recursive)
- * @param {string} dir - Directory path
- * @return {void}
  */
-export const makeDirAsync = async dir => {
+export const makeDirAsync = async (dir: string): Promise<void> => {
     try {
         await pfs.mkdir(dir, { recursive: true })
     } catch (error) {
@@ -262,7 +258,7 @@ export const makeDirAsync = async dir => {
     }
 }
 
-export const saveJsonAsync = async (fileName, data) => {
+export const saveJsonAsync = async (fileName: string, data: object): Promise<void> => {
     await makeDirAsync(path.dirname(fileName))
     try {
         await pfs.writeFile(fileName, JSON.stringify(data), { encoding: "utf8" })
@@ -271,7 +267,7 @@ export const saveJsonAsync = async (fileName, data) => {
     }
 }
 
-export const saveTextFile = (fileName, data) => {
+export const saveTextFile = (fileName: string, data: object): void => {
     try {
         fs.writeFileSync(fileName, data, { encoding: "utf8" })
     } catch (error) {
@@ -279,7 +275,7 @@ export const saveTextFile = (fileName, data) => {
     }
 }
 
-export const readTextFile = fileName => {
+export const readTextFile = (fileName: string): string => {
     let data = ""
     try {
         // noinspection JSCheckFunctionSignatures
@@ -295,14 +291,13 @@ export const readTextFile = fileName => {
     return data
 }
 
-export const readJson = fileName => JSON.parse(readTextFile(fileName))
+// export const readJson = (fileName: string): Record<string, string | number>[] => JSON.parse(readTextFile(fileName))
+export const readJson = (fileName: string): StringIdedObject[] => JSON.parse(readTextFile(fileName))
 
 /**
  * Check fetch status (see {@link https://developers.google.com/web/updates/2015/03/introduction-to-fetch})
- * @param {Object} response - fetch response
- * @return {Promise<Object>} Resolved or rejected promise
  */
-export function checkFetchStatus(response) {
+export const checkFetchStatus = (response: Response): Promise<object> => {
     // noinspection MagicNumberJS
     if (response.status >= 200 && response.status < 300) {
         return Promise.resolve(response)
@@ -313,131 +308,102 @@ export function checkFetchStatus(response) {
 
 /**
  * Get json from fetch response
- * @function
- * @param {Object} response - fetch response
- * @return {Object} json
  */
-export const getJsonFromFetch = response => response.json()
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const getJsonFromFetch = (response: Response): Promise<any> => response.json()
 
 /**
  * Get text from fetch response
- * @function
- * @param {Object} response - fetch response
- * @return {Object} String
  */
-export const getTextFromFetch = response => response.text()
+export const getTextFromFetch = (response: Response): Promise<string> => response.text()
 
 /**
  * Write error to console
- * @function
- * @param {String} error - Error message
- * @return {void}
  */
-export const putFetchError = error => {
+export const putFetchError = (error: string): void => {
     console.error("Request failed -->", error)
 }
 
 /**
  * Test if object is empty
- * @param {Object} obj - Object
- * @return {Boolean} True if object is empty
  */
-export function isEmpty(obj) {
-    return Object.getOwnPropertyNames(obj).length === 0 && obj.constructor === Object
-}
+export const isEmpty = (obj: object): boolean =>
+    Object.getOwnPropertyNames(obj).length === 0 && obj.constructor === Object
 
 /**
  * Convert radians to correctionValueDegrees (see {@link http://cwestblog.com/2012/11/12/javascript-degree-and-radian-conversion/})
- * @function
- * @param {Number} radians - Radians
- * @return {Number} Degrees
  */
-Math.radiansToDegrees = radians => (radians * degreesHalfCircle) / Math.PI
+const radiansToDegrees = (radians: number): number => (radians * degreesHalfCircle) / Math.PI
 
-/**
- * @typedef {number[]} Point
- * @property {number} 0 - X coordinate
- * @property {number} 1 - Y coordinate
- */
+export interface Point extends Array<number> {
+    0: number // X coordinate
+    1: number // Y coordinate
+}
 
 /**
  * Calculate the angle in correctionValueDegrees between two points
  * @see https://stackoverflow.com/questions/9970281/java-calculating-the-angle-between-two-points-in-degrees
- * @function
- * @param {Point} centerPt - Center point
- * @param {Point} targetPt - Target point
- * @return {Number} Degrees between centerPt and targetPt
  */
-export const rotationAngleInDegrees = (centerPt, targetPt) => {
+export const rotationAngleInDegrees = (centerPt: Point, targetPt: Point): number => {
     let theta = Math.atan2(targetPt[1] - centerPt[1], targetPt[0] - centerPt[0])
     theta -= Math.PI / 2
-    const degrees = Math.radiansToDegrees(theta)
+    const degrees = radiansToDegrees(theta)
     return (degrees + degreesFullCircle) % degreesFullCircle
 }
 
 /**
  * Calculate the angle in correctionValueDegrees between two points
  * @see https://stackoverflow.com/questions/9970281/java-calculating-the-angle-between-two-points-in-degrees
- * @function
- * @param {Point} centerPt - Center point
- * @param {Point} targetPt - Target point
- * @return {Number} Degrees between centerPt and targetPt
  */
-export const rotationAngleInRadians = (centerPt, targetPt) =>
+export const rotationAngleInRadians = (centerPt: Point, targetPt: Point): number =>
     Math.atan2(centerPt[1], centerPt[0]) - Math.atan2(targetPt[1], targetPt[0])
+
+export interface Coordinate {
+    x: number // X coordinate
+    y: number // Y coordinate
+}
 
 /**
  * Calculate the distance between two points
  * @see https://www.mathsisfun.com/algebra/distance-2-points.html
- * @function
- * @param {Point} centerPt - Center point
- * @param {Point} targetPt - Target point
- * @return {Number} Distance between centerPt and targetPt
  */
-export const distancePoints = (centerPt, targetPt) =>
+export const distancePoints = (centerPt: Coordinate, targetPt: Coordinate): number =>
     Math.sqrt((centerPt.x - targetPt.x) ** 2 + (centerPt.y - targetPt.y) ** 2)
 
 /**
  * Convert correctionValueDegrees to radians
- * @function
- * @param {Number} degrees - Degrees
- * @return {Number} Radians
  */
-export const degreesToRadians = degrees => (Math.PI / degreesHalfCircle) * (degrees - degreesQuarterCircle)
+export const degreesToRadians = (degrees: number): number =>
+    (Math.PI / degreesHalfCircle) * (degrees - degreesQuarterCircle)
 
 /**
  * {@link https://stackoverflow.com/questions/1026069/how-do-i-make-the-first-letter-of-a-string-uppercase-in-javascript}
- * @param {string} string - String
- * @return {string} Uppercased string
  */
-export const capitalizeFirstLetter = string => string.charAt(0).toUpperCase() + string.slice(1)
+export const capitalizeFirstLetter = (string: string): string => string.charAt(0).toUpperCase() + string.slice(1)
 
 /**
+ * Round to <d> digits
  * {@link https://github.com/30-seconds/30-seconds-of-code#round}
- * @param {number} n - number
- * @param {number} d - decimals
- * @return {number} Rounded number
  */
-export const round = (n, d = 0) => Number(Math.round(n * 10 ** d) / 10 ** d)
+export const round = (n: number, d = 0): number => Number(Math.round(n * 10 ** d) / 10 ** d)
 
 /**
- * Round to thousands* @param {Number} x - Integer
- * @return {Number} Rounded input
+ * Round to thousands
  */
-export const roundToThousands = x => round(x, 3)
+export const roundToThousands = (x: number): number => round(x, 3)
 
 /**
  * Group by
  * {@link https://stackoverflow.com/a/38327540
- * @param {*} list - list
- * @param {*} keyGetter - key getter
- * @return {Map<any, any>} Map
  */
-export function groupToMap(list, keyGetter) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const groupToMap = (list: any, keyGetter: any): Map<any, any> => {
     const map = new Map()
-    list.forEach(item => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    list.forEach((item: any) => {
         const key = keyGetter(item)
-        const collection = map.get(key)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const collection: any = map.get(key)
         if (collection) {
             collection.push(item)
         } else {
@@ -450,20 +416,16 @@ export function groupToMap(list, keyGetter) {
 /**
  * Create array with numbers ranging from start to end
  * {@link https://stackoverflow.com/questions/36947847/how-to-generate-range-of-numbers-from-0-to-n-in-es2015-only/36953272}
- * @param {Number} start - Start index
- * @param {Number} end - End index
- * @returns {Number[]} Result
  */
-export const range = (start, end) => [...new Array(1 + end - start).keys()].map(v => start + v)
+export const range = (
+    start: number, // Start index
+    end: number // End index
+): number[] => [...new Array(1 + end - start).keys()].map(v => start + v)
 
 /**
  * Calculate the k distance between two svg coordinates
- * @function
- * @param {Point} pt0 - First point
- * @param {Point} pt1 - Second point
- * @return {Number} Distance between Pt0 and Pt1 in k
  */
-export function getDistance(pt0, pt1) {
+export const getDistance = (pt0: Coordinate, pt1: Coordinate): number => {
     const fromF11 = {
         x: convertInvCoordX(pt0.x, pt0.y),
         y: convertInvCoordY(pt0.x, pt0.y)
@@ -478,28 +440,29 @@ export function getDistance(pt0, pt1) {
 
 /**
  * Simple sort of strings a and b
- * @param {string} a - String a
- * @param {string} b - String b
- * @return {number} Sort result
  */
-export const simpleSort = (a, b) => a.localeCompare(b)
+export const simpleSort = (a: string, b: string): number => a.localeCompare(b)
+
+export interface StringIdedObject {
+    Id: string
+    [key: string]: string | number | object | []
+}
 
 /**
  * Sort of Id a and b as numbers
- * @param {string} a - String a
- * @param {string} b - String b
- * @return {number} Sort result
  */
-export const sortId = ({ Id: a }, { Id: b }) => Number(a) - Number(b)
+
+export const sortId = ({ Id: a }: StringIdedObject, { Id: b }: StringIdedObject): number => Number(a) - Number(b)
 
 /**
  * Sort by a list of properties (in left-to-right order)
- * @param {string[]} properties - Sort properties
- * @return {function(*, *): number} Sort function
  */
-export const sortBy = properties => (a, b) => {
+export const sortBy = (properties: string[]) => (
+    a: { [index: string]: string | number },
+    b: { [index: string]: string | number }
+): number => {
     let r = 0
-    properties.some(property => {
+    properties.some((property: string) => {
         let sign = 1
 
         // property starts with '-' when sort is descending
@@ -522,11 +485,11 @@ export const sortBy = properties => (a, b) => {
 
 /**
  * Format ordinal
- * @param {number} n - Integer
- * @param {boolean} sup - True if superscript tags needed
- * @return {String} Formatted Ordinal
  */
-export function getOrdinal(n, sup = true) {
+export const getOrdinal = (
+    n: number,
+    sup = true // True if superscript tags needed
+): string => {
     const s = ["th", "st", "nd", "rd"]
     // noinspection MagicNumberJS
     const v = n % 100
@@ -537,10 +500,8 @@ export function getOrdinal(n, sup = true) {
 
 /**
  * Clean API name
- * @param {string} name - Name
- * @return {string} Cleaned name
  */
-export const cleanName = name =>
+export const cleanName = (name: string): string =>
     name
         .replace(/u([\da-f]{4})/gi, match => String.fromCharCode(parseInt(match.replace(/u/g, ""), 16)))
         .replace(/'/g, "’")
@@ -550,21 +511,17 @@ export const cleanName = name =>
 
 /**
  * Find Nation object based on nation name
- * @param {string} nationName
- * @return {Nation}
  */
-export const findNationByName = nationName => nations.find(nation => nationName === nation.name)
+export const findNationByName = (nationName: string): Nation | undefined =>
+    nations.find(nation => nationName === nation.name)
 
 /**
  * Find Nation object based on nation short name
- * @param {string} nationShortName
- * @return {Nation}
  */
-export const findNationByNationShortName = nationShortName => nations.find(nation => nation.short === nationShortName)
+export const findNationByNationShortName = (nationShortName: string): Nation | undefined =>
+    nations.find(nation => nation.short === nationShortName)
 
 /**
  * Find Nation object based on nation id
- * @param {number} nationId
- * @return {Nation}
  */
-export const findNationById = nationId => nations.find(nation => nationId === nation.id)
+export const findNationById = (nationId: number): Nation | undefined => nations.find(nation => nationId === nation.id)
