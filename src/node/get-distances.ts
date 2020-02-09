@@ -1,12 +1,13 @@
-#!/usr/bin/env -S yarn yarn node --experimental-modules --no-warnings
+#!/usr/bin/env -S yarn node --experimental-specifier-resolution=node
+// #!/usr/bin/env -S yarn tsc --esModuleInterop --module esnext --moduleResolution node --target ESNEXT
 
 /**
  * This file is part of na-map.
  *
  * @file      Get distances for front lines.
- * @module    get-distances
+ * @module    src/node/get-distances
  * @author    iB aka Felix Victor
- * @copyright 2019
+ * @copyright 2019, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -20,11 +21,12 @@ import {
     convertCoordX,
     convertCoordY,
     distanceMapSize,
+    Point,
     readJson,
     saveJsonAsync,
     serverNames,
     serverStartDate as serverDate
-} from "./common.mjs"
+} from "./common"
 
 /**
  * ------------------------------------------------------------------------
@@ -60,8 +62,8 @@ const mapScale = mapWidth / origMapSize
  * ------------------------------------------------------------------------
  */
 
-const getIndex = (y, x) => y * mapWidth + x
-const getCoordinates = (y, x) => [
+const getIndex = (y: number, x: number): number => y * mapWidth + x
+const getCoordinates = (y: number, x: number): Point => [
     Math.trunc(convertCoordY(x, y) * mapScale),
     Math.trunc(convertCoordX(x, y) * mapScale)
 ]
@@ -72,26 +74,34 @@ const getCoordinates = (y, x) => [
  * ------------------------------------------------------------------------
  */
 
-const ports = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-Ports-${serverDate}.json`))
-const portIds = ports.map(port => Number(port.Id))
+interface Port {
+    Id: string
+    EntrancePosition: {
+        z: number
+        x: number
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    [key: string]: any
+}
+
+const apiPorts = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-Ports-${serverDate}.json`)) as Port[]
+const portIds = apiPorts.map((port: Port) => Number(port.Id))
 const numPorts = portIds.length
 
-/**
- * @typedef {Array} GridMap
- * @property {number} 0 - type (spotLand, spotWater, port id)
- */
+interface GridMap {
+    [index: number]: number // type (spotLand, spotWater, port id)
+}
 
+// noinspection MagicNumberJS
 /**
  * Convert png to map (black -> spotLand, white -> spotWater)
- *
- * @type {GridMap}
  */
-const map = new Array(mapWidth * mapHeight)
-    .fill()
-    .map((e, index) => (png.data[index << 2] > 127 ? spotWater : spotLand))
+const map: GridMap = new Array(mapWidth * mapHeight)
+    .fill(0)
+    .map((e: number, index: number) => (png.data[index << 2] > 127 ? spotWater : spotLand))
 
 // Add port id to port entrances
-ports.forEach(({ Id, EntrancePosition: { z: y, x } }) => {
+apiPorts.forEach(({ Id, EntrancePosition: { z: y, x } }: Port) => {
     const [portY, portX] = getCoordinates(y, x)
     const index = getIndex(portY, portX)
 
@@ -107,35 +117,30 @@ ports.forEach(({ Id, EntrancePosition: { z: y, x } }) => {
 // Outer-grid land borders
 const visitedPositionsDefault = new Set()
 
-/**
- * @typedef {Array} Distances
- * @property {number} 0 - From port id
- * @property {number} 1 - To port id
- * @property {number} 2 - Distance (in pixels)
- */
+interface Distances extends Array<number> {
+    0: number // From port id
+    1: number // To port id
+    2: number // Distance (in pixels)
+}
 
 /**
  * Distances between all ports
- *
- * @type {Distances}
  */
-const distances = []
+const distances: Distances[] = []
 
 /**
  * Set of start ports so far
- *
- * @type {Set<number>}
  */
-const startPortIds = new Set()
+const startPortIds: Set<number> = new Set()
 
 /**
  * Find shortest paths between start port and all other ports (breadth first search).
- *
- * @param {number} startPortId - Start port id
- * @param {number} startY Start - Start port y position
- * @param {number} startX Start - Start port x position
  */
-const findPaths = (startPortId, startY, startX) => {
+const findPaths = (
+    startPortId: number, // Start port id
+    startY: number, // Start port y position
+    startX: number // Start port x position
+): void => {
     // Add outer-grid land borders
     const visitedPositions = new Set(visitedPositionsDefault)
     // Queue holds unchecked positions ([index, distance from start port])
@@ -173,8 +178,8 @@ const findPaths = (startPortId, startY, startX) => {
 
     if (foundPortIds.size + startPortIds.size < numPorts) {
         const missingPortIds = portIds
-            .filter(portId => portId > startPortId && !foundPortIds.has(portId))
-            .sort((a, b) => a - b)
+            .filter((portId: number) => portId > startPortId && !foundPortIds.has(portId))
+            .sort((a: number, b: number): number => a - b)
         console.error(
             "Only",
             foundPortIds.size + startPortIds.size,
@@ -184,7 +189,7 @@ const findPaths = (startPortId, startY, startX) => {
             missingPortIds,
             "are missing."
         )
-        missingPortIds.forEach(missingPortId => {
+        missingPortIds.forEach((missingPortId: number) => {
             distances.push([startPortId, missingPortId, 0])
         })
     }
@@ -195,7 +200,7 @@ const findPaths = (startPortId, startY, startX) => {
  *
  *  @return {void}
  */
-const setVisitedPositionsDefault = () => {
+const setVisitedPositionsDefault = (): void => {
     // Define outer bounds (map grid covers [0, mapSize-1])
     const minY = -1
     const minX = -1
@@ -220,15 +225,15 @@ const setVisitedPositionsDefault = () => {
  *
  *  @return {void}
  */
-const getDistances = async () => {
+const getDistances = async (): Promise<void> => {
     setVisitedPositionsDefault()
     //    const selectedPorts = [4, 176, 201, 256, 287, 355, 374];
 
     console.time("findPath")
-    ports
-        .sort((a, b) => Number(a.Id) - Number(b.Id))
+    apiPorts
+        .sort((a: Port, b: Port) => Number(a.Id) - Number(b.Id))
         //        .filter(fromPort => selectedPorts.includes(Number(fromPort.Id)))
-        .forEach(fromPort => {
+        .forEach((fromPort: Port) => {
             const fromPortId = Number(fromPort.Id)
             const {
                 EntrancePosition: { z: y, x }
