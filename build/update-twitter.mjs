@@ -344,7 +344,7 @@ const npcPortBattleScheduled = result => {
 const portR = "[A-zÀ-ÿ’ -]+"
 const portHashR = "[A-zÀ-ÿ]+"
 const nationR = "[A-zÀ-ÿ -]+"
-const clanR = "\\w+"
+const clanR = "[\\w ]+"
 const defenderR = "[\\w ]+"
 const timeR = "\\d{2}-\\d{2}-\\d{4} \\d{2}:\\d{2}"
 const pbTimeR = "\\d{1,2} \\w{3} \\d{4} \\d{2}:\\d{2}"
