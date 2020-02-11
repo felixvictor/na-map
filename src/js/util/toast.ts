@@ -11,7 +11,7 @@
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/toast"
 
-import { select as d3Select } from "d3-selection"
+import { BaseType, select as d3Select } from "d3-selection"
 
 import { iconSmallSrc } from "../common"
 
@@ -19,36 +19,45 @@ import { iconSmallSrc } from "../common"
  * Toast
  */
 export default class Toast {
-    /**
-     * Constructor
-     * @param {string} title - Toast title
-     * @param {string} text - Toast text
-     */
-    constructor(title, text) {
-        this._title = title
-        this._text = text
+    // Toast title
+    #title: string
+    // Toast text
+    #text: string
+    // Toast instance
+    #toast: Selection<BaseType, unknown, HTMLElement, any>
+    // Main div
+    #mainDiv: Selection<BaseType, unknown, HTMLElement, any>
+
+    constructor(
+        // Toast title
+        title: string,
+        // Toast text
+        text: string) {
+        this.#title = title
+        this.#text = text
 
         this._setupDiv()
-        this._set(title, text)
-        $(this._toast.node())
+        this.#toast = this._set()
+        $(this.#toast.node())
             .toast({ autohide: false })
             .toast("show")
         window.setTimeout(this._remove.bind(this), 1e4)
     }
 
-    _setupDiv() {
-        this._mainDiv = d3Select("#toast-column")
+    _setupDiv(): void {
+        this.#mainDiv = d3Select("#toast-column")
     }
 
-    _set() {
-        this._toast = this._mainDiv
+    _set() :Selection<BaseType, unknown, HTMLElement, any>{
+        const toast =
+ this.#mainDiv
             .append("div")
             .attr("class", "toast")
             .attr("role", "alert")
             .attr("aria-live", "assertive")
             .attr("aria-atomic", "true")
 
-        const header = this._toast.append("div").attr("class", "toast-header")
+        const header = this.#toast.append("div").attr("class", "toast-header")
         header
             .append("img")
             .attr("class", "rounded mr-2")
@@ -57,7 +66,7 @@ export default class Toast {
         header
             .append("em")
             .attr("class", "mr-auto")
-            .html(this._title)
+            .html(this.#title)
         header
             .append("button")
             .attr("type", "button")
@@ -68,13 +77,14 @@ export default class Toast {
             .attr("aria-hidden", "true")
             .html("&times;")
 
-        this._toast
+        toast
             .append("div")
             .attr("class", "toast-body")
-            .html(this._text)
+            .html(this.#text)
+        return toast
     }
 
-    _remove() {
-        this._toast.remove()
+    _remove(): void {
+        this.#toast.remove()
     }
 }
