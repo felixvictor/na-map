@@ -8,9 +8,13 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-const servers = [
+export interface Server {
+    id: string
+    name: string
+    type: string
+}
+
+export const servers = [
     { id: "eu1", name: "War", type: "PVP" },
     { id: "eu2", name: "Peace", type: "PVE" }
 ]
-
-module.exports = { servers }

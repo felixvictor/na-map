@@ -7,36 +7,35 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { initAnalytics, registerPage } from "./analytics"
-import { servers } from "./servers"
-import { putImportError } from "./util"
-import Cookie from "./util/cookie"
-import RadioButton from "./util/radio-button"
+import { initAnalytics, registerPage } from "./analytics";
+import { Server, servers } from "./servers";
+import { putImportError } from "./util";
+import Cookie from "./util/cookie";
+import RadioButton from "./util/radio-button.ts";
 
-import "../scss/main.scss"
+import "../scss/main.scss";
 
 /**
  *  Workaround for google translate uses indexOf on svg text
  *  {@link https://stackoverflow.com/a/53351574}
- *  @return {object} Shim
  */
-SVGAnimatedString.prototype.indexOf = function() {
-    // eslint-disable-next-line prefer-spread,prefer-rest-params
-    return this.baseVal.indexOf.apply(this.baseVal, arguments)
-}
+// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+// @ts-ignore
+SVGAnimatedString.prototype.indexOf = (): object =>
+    // eslint-disable-next-line prefer-spread,prefer-rest-params,@typescript-eslint/ban-ts-ignore
+    // @ts-ignore
+    // eslint-disable-next-line prefer-spread
+    this.baseVal.indexOf.apply(this.baseVal, arguments)
 
 /**
  * Base Id
- * @type {string}
  */
 const baseId = "server-name"
 
 /**
  * Possible values for server names (first is default value)
- * @type {string[]}
- * @private
  */
-const radioButtonValues = servers.map(server => server.id)
+const radioButtonValues = servers.map((server: Server) => server.id)
 
 /**
  * Server name cookie
@@ -52,9 +51,10 @@ const radios = new RadioButton(baseId, radioButtonValues)
 
 /**
  * Get server name from cookie or use default value
- * @returns {string} - server name
  */
-const getServerName = () => {
+const getServerName = (): string => {
+    // Server name
+
     const r = cookie.get()
 
     radios.set(r)
@@ -62,13 +62,12 @@ const getServerName = () => {
     return r
 }
 
-const getSearchParams = () => new URL(document.location).searchParams
+const getSearchParams = (): URLSearchParams => new URL(document.location.href).searchParams
 
 /**
  * Change server name
- * @return {void}
  */
-const serverNameSelected = () => {
+const serverNameSelected = (): void => {
     const serverId = radios.get()
     cookie.set(serverId)
     document.location.reload()
@@ -76,10 +75,9 @@ const serverNameSelected = () => {
 
 /**
  * Setup listeners
- * @return {void}
  */
-const setupListener = () => {
-    document.getElementById(baseId).addEventListener("change", () => serverNameSelected())
+const setupListener = (): void => {
+    ;(document.getElementById(baseId) as HTMLInputElement).addEventListener("change", () => serverNameSelected())
 
     // {@link https://jsfiddle.net/bootstrapious/j6zkyog8/}
     $(".dropdown-menu [data-toggle='dropdown']").on("click", event => {
@@ -106,11 +104,11 @@ const setupListener = () => {
 
 /**
  * Load map and set resize event
- * @param {string} serverId - Server id
- * @param {URLSearchParams} searchParams - Query arguments
- * @return {void}
  */
-const loadMap = async (serverId, searchParams) => {
+const loadMap = async (
+    serverId: string, // Server id
+    searchParams: URLSearchParams // Query arguments
+): Promise<void> => {
     try {
         const Map = await import(/*  webpackPreload: true, webpackChunkName: "map" */ "./map/map")
         const map = new Map.Map(serverId, searchParams)
@@ -126,11 +124,11 @@ const loadMap = async (serverId, searchParams) => {
 
 /**
  * Load game tools
- * @param {string} serverId - Server id
- * @param {URLSearchParams} searchParams - Query arguments
- * @return {void}
  */
-const loadGameTools = async (serverId, searchParams) => {
+const loadGameTools = async (
+    serverId: string, // Server id
+    searchParams: URLSearchParams // Query arguments
+): Promise<void> => {
     try {
         const gameTools = await import(/* webpackChunkName: "game-tools" */ "./game-tools")
         gameTools.init(serverId, searchParams)
@@ -139,7 +137,7 @@ const loadGameTools = async (serverId, searchParams) => {
     }
 }
 
-const load = async () => {
+const load = async (): Promise<void> => {
     const serverId = getServerName()
     const searchParams = getSearchParams()
 
@@ -151,16 +149,18 @@ const load = async () => {
     if (searchParams.get("v")) {
         loadGameTools(serverId, searchParams)
     } else {
-        document
-            .getElementById("game-tools-dropdown")
-            .addEventListener("click", () => loadGameTools(serverId, searchParams), { once: true })
+        ;(document.getElementById("game-tools-dropdown") as HTMLInputElement).addEventListener(
+            "click",
+            () => loadGameTools(serverId, searchParams),
+            { once: true }
+        )
     }
 }
 
 /**
- * @returns {void}
+ * Main function
  */
-function main() {
+const main = (): void => {
     initAnalytics()
     registerPage("Homepage")
 
