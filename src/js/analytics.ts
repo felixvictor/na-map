@@ -10,10 +10,12 @@
 
 /* global ga */
 
-import { appName, appVersion } from "./common"
+import { appName, appVersion } from "../node/common"
 
 const GA_TRACKING_ID = "UA-109520372-1"
-window.ga = function() {
+// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+// @ts-ignore
+window.ga = (): void => {
     // eslint-disable-next-line prefer-rest-params
     ga.q.push(arguments)
 }
@@ -22,12 +24,12 @@ ga.q = []
 
 /**
  * Register event
- * @param {string} category Event category
- * @param {string} label Event label
- * @param {number} value Event value
- * @return {void}
  */
-export const registerEvent = (category, label, value = 1) => {
+export const registerEvent = (
+    category: string, // Event category
+    label: string, // Event label
+    value = 1 // Event label
+): void => {
     ga("send", {
         hitType: "event",
         eventCategory: category,
@@ -38,10 +40,10 @@ export const registerEvent = (category, label, value = 1) => {
 
 /**
  * Register page
- * @param {string} title Page title
- * @return {void}
  */
-export const registerPage = title => {
+export const registerPage = (
+    title: string // Page title
+): void => {
     ga("send", {
         hitType: "pageview",
         title
@@ -51,9 +53,8 @@ export const registerPage = title => {
 /**
  * Init google tag manager
  * {@link https://stackoverflow.com/a/29552301}
- * @return {void}
  */
-export const initAnalytics = () => {
+export const initAnalytics = (): void => {
     ga.l = Number(new Date())
     ga("create", GA_TRACKING_ID, "auto")
     ga("set", "anonymizeIp", true)
@@ -62,13 +63,10 @@ export const initAnalytics = () => {
 
     /**
      * Log any script error to Google Analytics.
-     *
      * Third-party scripts without CORS will only provide "Script Error." as an error message.
-     *
-     * @param  {String} errorMessage Error message.
-     * @return {Boolean} When the function returns true, this prevents the firing of the default event handler.
      */
-    window.addEventListener("error", errorMessage => {
+    window.addEventListener("error", (errorMessage: ErrorEvent): boolean => {
+        // When the function returns true, this prevents the firing of the default event handler
         const exceptionDescription = [
             `Message: ${errorMessage.message} @ ${errorMessage.filename}-${errorMessage.lineno}:${errorMessage.colno}`,
             `Error object: ${JSON.stringify(errorMessage.error)}`
