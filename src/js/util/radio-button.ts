@@ -13,24 +13,23 @@
  */
 export default class RadioButton {
     // Radio button name
-    #name: string
+    private readonly _name: string
     // Radio button ids
-    #ids: string[]
+    private readonly _ids: string[]
     // Default checked radio button id
-    #default: string
+    private readonly _default: string
 
     constructor(name: string, ids: string[]) {
-        this.#name = name.replace(/ /g, "")
-        this.#ids = ids
-
-        ;[this.#default] = ids
+        this._name = name.replace(/ /g, "")
+        this._ids = ids
+        ;[this._default] = ids
     }
 
     /**
      * Set radio button
      */
     set(id: string): void {
-        (document.getElementById(`${this.#name}-${id}`) as HTMLInputElement).checked = true
+        ;(document.getElementById(`${this._name}-${id}`) as HTMLInputElement).checked = true
     }
 
     /**
@@ -38,11 +37,11 @@ export default class RadioButton {
      */
     get(): string {
         // Radio button value
-        let { value } = (document.querySelector(`input[name="${this.#name}"]:checked`) as HTMLInputElement)
+        let { value } = document.querySelector(`input[name="${this._name}"]:checked`) as HTMLInputElement
 
-        if (typeof value === "undefined" || !this.#ids.includes(value)) {
+        if (typeof value === "undefined" || !this._ids.includes(value)) {
             // Use default value if radio button does not exist or has invalid data
-            value = this.#default
+            value = this._default
             this.set(value)
         }
 

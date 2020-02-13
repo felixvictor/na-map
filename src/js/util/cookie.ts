@@ -9,31 +9,33 @@
  */
 
 import Cookies from "js-cookie"
-import { appName } from "../common"
+import { appName } from "../../node/common"
+
+const yearInDays = 365
 
 /**
  * Cookie
  */
 export default class Cookie {
     // Cookie base id
-    readonly #baseId: string
+    private readonly _baseId: string
     // Expire (number=days or Date)
-    readonly #expire: number|Date
+    private readonly _expire: number | Date
     // Cookie name
-    readonly #name: string
+    private readonly _name: string
     // Possible cookie values
-    readonly #values: string[]
+    private readonly _values: string[]
     // Default cookie value
-    readonly #default: string
+    private readonly _default: string
 
-    // noinspection MagicNumberJS
-    constructor({ id: baseId, values = [], expire = 365 }: { id: string, values: string[], expire: number|Date }) {
-        this.#baseId = baseId
-        this.#expire = expire
+    // eslint-disable-next-line prettier/prettier
+    constructor({ id: baseId, values = [], expire = yearInDays }: { id: string, values: string[], expire?: number | Date }) {
+        this._baseId = baseId
+        this._expire = expire
 
-        this.#name = `${appName}--${this.#baseId}`
-        this.#values = values
-        this.#default = values?.[0]
+        this._name = `${appName}--${this._baseId}`
+        this._values = values
+        this._default = values?.[0]
     }
 
     /**
@@ -41,12 +43,12 @@ export default class Cookie {
      */
     set(cookieValue: string): void {
         // Set cookie if not default value
-        if (cookieValue === this.#default) {
+        if (cookieValue === this._default) {
             // Else remove cookie
             this.remove()
         } else {
-            Cookies.set(this.#name, cookieValue, {
-                expires: this.#expire
+            Cookies.set(this._name, cookieValue, {
+                expires: this._expire
             })
         }
     }
@@ -55,17 +57,17 @@ export default class Cookie {
      * Get cookie
      */
     get(): string {
-        let cookieValue = Cookies.get(this.#name) ?? null
+        let cookieValue = Cookies.get(this._name) ?? null
 
         if (cookieValue) {
-            if (this.#values.length && !this.#values.includes(cookieValue)) {
+            if (this._values.length && !this._values.includes(cookieValue)) {
                 // Use default value if cookie has invalid data and remove cookie
-                cookieValue = this.#default
+                cookieValue = this._default
                 this.remove()
             }
         } else {
             // Use default value if cookie is not stored
-            cookieValue = this.#default
+            cookieValue = this._default
         }
 
         return cookieValue
@@ -75,6 +77,6 @@ export default class Cookie {
      * Remove cookie
      */
     remove(): void {
-        Cookies.remove(this.#name)
+        Cookies.remove(this._name)
     }
 }
