@@ -19,10 +19,10 @@ import { Point } from "../node/common"
 export interface Building {
     id: number
     name: string
-    resource: BuildingResource[]
-    batch?: BuildingBatch | null[] | null
-    levels?: BuildingLevelsEntity[] | null
-    byproduct?: null[] | null
+    resource: BuildingResource
+    batch?: BuildingBatch
+    levels?: BuildingLevelsEntity
+    byproduct?: null[]
 }
 export interface BuildingResource {
     name: string
