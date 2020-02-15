@@ -1521,6 +1521,13 @@
   dependencies:
     "@types/babel-types" "*"
 
+"@types/bootstrap-select@^1.11.1":
+  version "1.11.1"
+  resolved "https://registry.yarnpkg.com/@types/bootstrap-select/-/bootstrap-select-1.11.1.tgz#05dcbc0018f50428cf7943e6a1cda4d3a122051f"
+  integrity sha512-ihXOSLbeQHsJAezuwdduhg7OfqvEEEfrrVqFAAmlb/xUhEAttwHT5Uy64epXOnG4E2fXtAQdSxlaetbg8ZJl7Q==
+  dependencies:
+    "@types/jquery" "*"
+
 "@types/bootstrap@^4.3.1":
   version "4.3.1"
   resolved "https://registry.yarnpkg.com/@types/bootstrap/-/bootstrap-4.3.1.tgz#15fa89a4d275b114a4eceb90909d4eb8b90d43f5"
