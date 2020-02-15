@@ -14,10 +14,18 @@ import "bootstrap/js/dist/modal"
 import { select as d3Select } from "d3-selection"
 
 import { registerEvent } from "../analytics"
-import { getCurrencyAmount, insertBaseModal } from "../common"
+import { getCurrencyAmount, insertBaseModal } from "../../node/common-browser"
 import { formatInt, putImportError, sortBy } from "../util"
+import { Building } from "../json-types"
 
 export default class ListBuildings {
+    private readonly _baseName: string
+    private readonly _baseId: string
+    private readonly _buttonId: string
+    private readonly _modalId: string
+
+    private _buildingData: Building[]
+
     constructor() {
         this._baseName = "List buildings"
         this._baseId = "building-list"
@@ -27,7 +35,7 @@ export default class ListBuildings {
         this._setupListener()
     }
 
-    async _loadAndSetupData() {
+    async _loadAndSetupData(): Promise<void> {
         try {
             this._buildingData = (
                 await import(/* webpackChunkName: "data-buildings" */ "../../gen-generic/buildings.json")
@@ -37,10 +45,10 @@ export default class ListBuildings {
         }
     }
 
-    _setupListener() {
+    _setupListener(): void {
         let firstClick = true
 
-        document.getElementById(this._buttonId).addEventListener("click", async event => {
+        ;(document.getElementById(this._buttonId) as HTMLElement).addEventListener("click", async event => {
             if (firstClick) {
                 firstClick = false
                 await this._loadAndSetupData()
@@ -53,7 +61,7 @@ export default class ListBuildings {
     }
 
     // noinspection DuplicatedCode
-    _injectModal() {
+    _injectModal(): void {
         insertBaseModal(this._modalId, this._baseName)
 
         const id = `${this._baseId}-select`
@@ -67,37 +75,37 @@ export default class ListBuildings {
             .attr("class", "container-fluid")
     }
 
-    _getOptions() {
+    _getOptions(): string {
         return `${this._buildingData
             .sort(sortBy(["name"]))
             .map(building => `<option value="${building.name}">${building.name}</option>;`)
             .join("")}`
     }
 
-    _setupSelect() {
+    _setupSelect(): void {
         const select$ = $(`#${this._baseId}-select`)
         const options = this._getOptions()
         select$.append(options)
     }
 
-    _setupSelectListener() {
+    _setupSelectListener(): void {
         const select$ = $(`#${this._baseId}-select`)
 
         select$
             .addClass("selectpicker")
-            .on("change", event => this._buildingSelected(event))
+            .on("change", (event: Event) => this._buildingSelected(event))
             .selectpicker({ noneSelectedText: "Select building" })
             .val("default")
             .selectpicker("refresh")
     }
 
-    _initModal() {
+    _initModal(): void {
         this._injectModal()
         this._setupSelect()
         this._setupSelectListener()
     }
 
-    _buildingListSelected() {
+    _buildingListSelected(): void {
         // If the modal has no content yet, insert it
         if (!document.getElementById(this._modalId)) {
             this._initModal()
@@ -107,11 +115,11 @@ export default class ListBuildings {
         $(`#${this._modalId}`).modal("show")
     }
 
-    _getBuildingData(selectedBuildingName) {
+    _getBuildingData(selectedBuildingName: string): Building {
         return this._buildingData.filter(building => building.name === selectedBuildingName)[0]
     }
 
-    _getProductText(currentBuilding) {
+    _getProductText(currentBuilding: Building): string {
         let text = ""
         if (Array.isArray(currentBuilding.resource)) {
             text += '<table class="table table-sm"><tbody>'
@@ -139,7 +147,7 @@ export default class ListBuildings {
         return text
     }
 
-    _getRequirementText(currentBuilding) {
+    _getRequirementText(currentBuilding: Building) {
         let text = ""
 
         text += '<table class="table table-sm card-table"><thead>'
@@ -148,7 +156,7 @@ export default class ListBuildings {
             text += "<tr><th>Level</th><th>Level build materials</th><th>Build price (reals)</th></tr>"
             text += "</thead><tbody>"
             for (const level of currentBuilding.levels) {
-                let i = currentBuilding.levels.indexOf(level)
+                const i = currentBuilding.levels.indexOf(level)
                 text += `<tr><td>${i + 1}</td><td class="text-left">`
                 text += level.materials.map(material => `${formatInt(material.amount)} ${material.item}`).join("<br>")
                 text += "</td>"
@@ -160,7 +168,7 @@ export default class ListBuildings {
                 "<tr><th>Level</th><th>Production</th><th>Labour cost (%)</th><th>Storage</th><th>Build price (reals)</th></tr>"
             text += "</thead><tbody>"
             for (const level of currentBuilding.levels) {
-                let i = currentBuilding.levels.indexOf(level)
+                const i = currentBuilding.levels.indexOf(level)
                 text += `<tr><td>${i + 1}</td><td>${formatInt(level.production)}</td><td>${formatInt(
                     level.labourDiscount * -100
                 )}</td><td>${formatInt(level.maxStorage)}</td><td>${formatInt(level.price)}</td></tr>`
@@ -173,11 +181,8 @@ export default class ListBuildings {
 
     /**
      * Construct building tables
-     * @param {string} selectedBuildingName Selected building.
-     * @return {string} html string
-     * @private
      */
-    _getText(selectedBuildingName) {
+    _getText(selectedBuildingName: string): string {
         const currentBuilding = this._getBuildingData(selectedBuildingName)
 
         let text = '<div class="row no-gutters card-deck">'
@@ -198,11 +203,8 @@ export default class ListBuildings {
 
     /**
      * Show buildings for selected building type
-     * @param {Object} event Event
-     * @return {void}
-     * @private
      */
-    _buildingSelected(event) {
+    _buildingSelected(event: Event): void {
         const building = $(event.currentTarget)
             .find(":selected")
             .val()
