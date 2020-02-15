@@ -9,7 +9,7 @@
  */
 
 import Cookies from "js-cookie"
-import { appName } from "../../node/common"
+import { appName } from "../../node/common-browser"
 
 const yearInDays = 365
 
