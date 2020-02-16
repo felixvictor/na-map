@@ -10,7 +10,7 @@
 
 /* global ga */
 
-import { appName, appVersion } from "../node/common"
+import { appName, appVersion } from "./common"
 
 const GA_TRACKING_ID = "UA-109520372-1"
 // eslint-disable-next-line @typescript-eslint/ban-ts-ignore

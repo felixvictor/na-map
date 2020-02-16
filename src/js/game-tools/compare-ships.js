@@ -67,11 +67,7 @@ import CompareWoods from "./compare-woods"
 
 import { default as shipIcon } from "Icons/icon-ship.svg"
 
-const numberSegments = 24
-const segmentRadians = (2 * Math.PI) / numberSegments
 
-const rumRepairsFactor = rumRepairsPercent / rumRepairsVolume
-const repairsSetSize = 5
 
 /**
  * Ship

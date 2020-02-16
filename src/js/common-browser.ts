@@ -38,10 +38,10 @@ declare const CGREEN: string,
     REPAIR_SAIL_PERCENT: string,
     REPAIR_SAIL_VOLUME: string
 
-export const Description = DESCRIPTION
-export const Name = NAME
-export const Title = TITLE
-export const Version = VERSION
+export const appDescription = DESCRIPTION
+export const appName = NAME
+export const appTitle = TITLE
+export const appVersion = VERSION
 export const colourGreen = CGREEN
 export const colourGreenDark = CGREENDARK
 export const colourGreenLight = CGREENLIGHT
@@ -62,6 +62,11 @@ export const rumRepairsVolume = REPAIR_CREW_VOLUME
 
 export const hashids = new Hashids("My salt: Yet another Naval Action map")
 
+export const numberSegments = 24
+export const segmentRadians = (2 * Math.PI) / numberSegments
+
+const rumRepairsFactor = rumRepairsPercent / rumRepairsVolume
+export const repairsSetSize = 5
 export const circleRadiusFactor = 5
 const secondsForFullCircle = 2935 // 48 * 60 + 55
 export const degreesPerSecond = degreesFullCircle / secondsForFullCircle

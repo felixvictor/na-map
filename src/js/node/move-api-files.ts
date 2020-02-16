@@ -11,7 +11,7 @@
 import * as fs from "fs"
 import * as path from "path"
 
-import { makeDirAsync } from "./common"
+import { makeDirAsync } from "../common"
 import { commonPaths } from "./common-node"
 
 const yearRegex = /^api-.+-(\d{4})-\d{2}-\d{2}\.json(\.xz)?$/
