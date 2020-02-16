@@ -1,8 +1,8 @@
 /**
  * This file is part of na-map.
  *
- * @file      Json types.
- * @module    json-types
+ * @file      Types for generated json.
+ * @module    types-gen-json
  * @author    iB aka Felix Victor
  * @copyright 2020
  * @license   http://www.gnu.org/licenses/gpl.html
@@ -10,7 +10,7 @@
 
 // https://jvilk.com/MakeTypes/
 
-import { Point } from "../node/common"
+import { Point } from "./common"
 
 /****************************
  * buildings.json
@@ -19,12 +19,12 @@ import { Point } from "../node/common"
 export interface Building {
     id: number
     name: string
-    resource: BuildingResource
-    batch?: BuildingBatch
-    levels?: BuildingLevelsEntity
-    byproduct?: null[]
+    result: BuildingResult[] | []
+    batch: BuildingBatch | []
+    levels: BuildingLevelsEntity[]
+    byproduct?: []
 }
-export interface BuildingResource {
+export interface BuildingResult {
     name: string
     price: number
 }
@@ -38,7 +38,7 @@ export interface BuildingLevelsEntity {
     production: number
     maxStorage: number
     price: number
-    materials?: (BuildingMaterialsEntity | null)[] | null
+    materials: BuildingMaterialsEntity[]
 }
 export interface BuildingMaterialsEntity {
     item: string
@@ -54,7 +54,7 @@ export interface Cannon {
     long: CannonEntity[]
     carronade: CannonEntity[]
 }
-export interface CannonEntity {
+interface CannonEntity {
     name: string
     damage: CannonDamage
     traverse: CannonTraverse
@@ -62,29 +62,29 @@ export interface CannonEntity {
     generic: CannonGeneric
     "penetration(m)": CannonPenetration
 }
-export interface CannonDamage {
+interface CannonDamage {
     basic: CannonValue
     "reload time": CannonValue
     splinter: CannonValue
     "per second": CannonValue
 }
-export interface CannonValue {
+interface CannonValue {
     value: number
     digits: number
 }
-export interface CannonTraverse {
+interface CannonTraverse {
     up: CannonValue
     down: CannonValue
 }
-export interface CannonDispersion {
+interface CannonDispersion {
     horizontal: CannonValue
     vertical: CannonValue
 }
-export interface CannonGeneric {
+interface CannonGeneric {
     weight: CannonValue
     crew: CannonValue
 }
-export interface CannonPenetration {
+interface CannonPenetration {
     50: CannonValue
     100: CannonValue
     250: CannonValue
@@ -101,22 +101,22 @@ export interface Loot {
     loot: LootLootEntity[]
     chests: LootChestsEntity[]
 }
-export interface LootLootEntity {
+interface LootLootEntity {
     id: number
     name: string
     items: LootItemsEntity[]
 }
-export interface LootItemsEntity {
+interface LootItemsEntity {
     id: number
     name: string
     chance: number
     amount: LootAmount
 }
-export interface LootAmount {
+interface LootAmount {
     min: number
     max: number
 }
-export interface LootChestsEntity {
+interface LootChestsEntity {
     id: number
     name: string
     weight: number
@@ -136,12 +136,12 @@ export interface ModuleEntity {
     properties?: ModulePropertiesEntity
     type: string
 }
-export interface ModulePropertiesEntity {
+interface ModulePropertiesEntity {
     modifier: string
     amount: number
     isPercentage: boolean
 }
-export type Module = string | ModuleEntity[]
+type Module = string | ModuleEntity[]
 
 /****************************
  * nations.json
@@ -171,15 +171,15 @@ export interface Ownership {
     region: string
     data: OwnershipGroup[]
 }
-export interface OwnershipGroup {
+interface OwnershipGroup {
     group: string
     data: OwnershipLabel[]
 }
-export interface OwnershipLabel {
+interface OwnershipLabel {
     label: string
     data: OwnershipLabelRange[]
 }
-export interface OwnershipLabelRange {
+interface OwnershipLabelRange {
     timeRange: string[]
     val: string
     labelVal: string
@@ -232,12 +232,12 @@ export interface Price {
     standard: PriceStandardWood[]
     seasoned: PriceSeasonedWood[]
 }
-export interface PriceStandardWood {
+interface PriceStandardWood {
     name: string
     real: number
     labour: number
 }
-export interface PriceSeasonedWood {
+interface PriceSeasonedWood {
     name: string
     real: number
     labour: number
@@ -253,7 +253,7 @@ export interface Recipe {
     recipe: RecipeEntity[]
     ingredient: RecipeIngredientEntity[]
 }
-export interface RecipeEntity {
+interface RecipeEntity {
     id: number
     name: string
     labourPrice: number
@@ -263,16 +263,16 @@ export interface RecipeEntity {
     craftGroup: string
     serverType: string
 }
-export interface RecipeItemRequirement {
+interface RecipeItemRequirement {
     name: string
     amount: number
 }
-export interface RecipeResult {
+interface RecipeResult {
     id: number
     name: string
     amount: number
 }
-export interface RecipeIngredientEntity {
+interface RecipeIngredientEntity {
     id: number
     name: string
     recipeNames: string[]
@@ -296,11 +296,11 @@ export interface ShipBlueprint {
     craftXP: number
     labourHours: number
 }
-export interface ShipBlueprintResource {
+interface ShipBlueprintResource {
     name: string
     amount: number
 }
-export interface ShipBlueprintShip {
+interface ShipBlueprintShip {
     id: number
     name: string
     mass: number
@@ -340,37 +340,37 @@ export interface Ship {
     premium: boolean
     tradeShip: boolean
 }
-export interface ShipBroadside {
+interface ShipBroadside {
     cannons: number
     carronades: number
 }
-export interface ShipCrew {
+interface ShipCrew {
     min: number
     max: number
     sailing: number
 }
-export interface ShipSpeed {
+interface ShipSpeed {
     min: number
     max: number
 }
-export interface ShipHealth {
+interface ShipHealth {
     armour: number
     thickness: number
 }
-export interface ShipStructureOrPump {
+interface ShipStructureOrPump {
     armour: number
 }
-export interface ShipSails {
+interface ShipSails {
     armour: number
     risingSpeed: number
 }
-export interface ShipRudder {
+interface ShipRudder {
     armour: number
     turnSpeed: number
     halfturnTime: number
     thickness: number
 }
-export interface ShipRepairTime {
+interface ShipRepairTime {
     stern: number
     bow: number
     sides: number
@@ -378,7 +378,7 @@ export interface ShipRepairTime {
     sails: number
     structure: number
 }
-export interface ShipShip {
+interface ShipShip {
     waterlineHeight: number
     firezoneHorizontalWidth: number
     structureLeaksPerSecond: number
@@ -388,7 +388,7 @@ export interface ShipShip {
     turningYardAcceleration: number
     maxSpeed: number
 }
-export interface ShipMast {
+interface ShipMast {
     bottomArmour: number
     middleArmour: number
     topArmour: number
@@ -405,13 +405,13 @@ export interface Wood {
     trim: WoodTrimEntityOrFrameEntity[]
     frame: WoodTrimEntityOrFrameEntity[]
 }
-export interface WoodTrimEntityOrFrameEntity {
+interface WoodTrimEntityOrFrameEntity {
     id: number
     properties: WoodProperty[]
     type: string
     name: string
 }
-export interface WoodProperty {
+interface WoodProperty {
     modifier: string
     amount: number
     isPercentage: boolean
