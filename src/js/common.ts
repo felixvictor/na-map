@@ -17,10 +17,11 @@ export const speedConstA = 0.074465523706782
 export const speedConstB = 0.00272175949231
 export const defaultFontSize = 16
 export const defaultCircleSize = 16
+export const defaultCircleSize = 16
 
 export const degreesFullCircle = 360
 export const degreesHalfCircle = 180
-const degreesQuarterCircle = 90
+export const degreesQuarterCircle = 90
 
 export const serverNames = ["eu1", "eu2"]
 export const apiBaseFiles = ["ItemTemplates", "Ports", "Shops"]
@@ -364,6 +365,9 @@ export const getDistance = (pt0: Coordinate, pt1: Coordinate): number => {
 
 /**
  * Simple sort of strings a and b
+ * @param   a - String a
+ * @param   b - String b
+ * @returns Sort result
  */
 export const simpleSort = (a: string, b: string): number => a.localeCompare(b)
 

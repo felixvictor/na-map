@@ -14,9 +14,9 @@ import "bootstrap/js/dist/modal"
 import { select as d3Select } from "d3-selection"
 
 import { registerEvent } from "../analytics"
-import { getCurrencyAmount, insertBaseModal } from "../../node/common-browser"
+import { getCurrencyAmount, insertBaseModal } from "../common-browser"
 import { formatInt, putImportError, sortBy } from "../util"
-import { Building } from "../json-types"
+import { Building, BuildingResult } from "../types-gen-json"
 
 export default class ListBuildings {
     private readonly _baseName: string
@@ -121,19 +121,19 @@ export default class ListBuildings {
 
     _getProductText(currentBuilding: Building): string {
         let text = ""
-        if (Array.isArray(currentBuilding.resource)) {
+        if (Array.isArray(currentBuilding.result)) {
             text += '<table class="table table-sm"><tbody>'
 
-            text += `<tr><td>${currentBuilding.resource
-                .map(resource => resource.name)
+            text += `<tr><td>${currentBuilding.result
+                .map((result: BuildingResult) => result.name)
                 .join("</td></tr><tr><td>")}</td></tr>`
             text += "</tbody></table>"
         } else {
-            text += `<h5 class="card-title">${currentBuilding.resource.name}</h5>`
+            text += `<h5 class="card-title">${currentBuilding.result.name}</h5>`
 
-            if (currentBuilding.resource.price) {
+            if (currentBuilding.result.price) {
                 text += '<table class="table table-sm card-table"><tbody>'
-                text += `<tr><td>${getCurrencyAmount(currentBuilding.resource.price)} per unit</td></tr>`
+                text += `<tr><td>${getCurrencyAmount(currentBuilding.result.price)} per unit</td></tr>`
                 if (currentBuilding.batch) {
                     text += `<tr><td>${currentBuilding.batch.labour} labour hour${
                         currentBuilding.batch.labour > 1 ? "s" : ""
