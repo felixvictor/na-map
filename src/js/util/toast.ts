@@ -13,7 +13,7 @@ import "bootstrap/js/dist/toast"
 
 import { BaseType, select as d3Select, Selection } from "d3-selection"
 
-import { iconSmallSrc } from "../../node/common"
+import { iconSmallSrc } from "../common-browser"
 
 /**
  * Toast
