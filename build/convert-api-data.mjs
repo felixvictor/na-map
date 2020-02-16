@@ -14,7 +14,7 @@ import * as fs from "fs"
 import * as path from "path"
 import { execSync } from "child_process"
 
-import { convertBuildingData } from "./convert-buildings.mjs"
+import { convertBuildingData } from "./convert-buildings.js"
 import { convertCannons } from "./convert-cannons.mjs"
 import { convertGenericPortData } from "./convert-generic-port-data.mjs"
 import { convertLootData } from "./convert-loot.mjs"
