@@ -430,7 +430,7 @@ export interface APIRecipeResource {
     GoldRequirements: number
     Results: TemplateEntity[]
     ServerType: string
-    NationAvailability?: null[] | null
+    NationAvailability: []
     CraftGroup: string
     RequiresLevel: number
     GivesXP: number
