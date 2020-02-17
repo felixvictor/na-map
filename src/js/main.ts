@@ -7,13 +7,13 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { initAnalytics, registerPage } from "./analytics";
-import { Server, servers } from "./servers";
-import { putImportError } from "./util";
-import Cookie from "./util/cookie";
-import RadioButton from "./util/radio-button.ts";
+import { initAnalytics, registerPage } from "./analytics"
+import { Server, servers } from "./servers"
+import { putImportError } from "./common"
+import Cookie from "./util/cookie"
+import RadioButton from "./util/radio-button"
 
-import "../scss/main.scss";
+import "../scss/main.scss"
 
 /**
  *  Workaround for google translate uses indexOf on svg text
