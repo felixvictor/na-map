@@ -232,12 +232,12 @@ export interface Price {
     standard: PriceStandardWood[]
     seasoned: PriceSeasonedWood[]
 }
-interface PriceStandardWood {
+export interface PriceStandardWood {
     name: string
     real: number
     labour: number
 }
-interface PriceSeasonedWood {
+export interface PriceSeasonedWood {
     name: string
     real: number
     labour: number
