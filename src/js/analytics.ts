@@ -10,13 +10,12 @@
 
 /* global ga */
 
-import { appName, appVersion } from "./common"
+import { appName, appVersion } from "./common-browser"
 
 const GA_TRACKING_ID = "UA-109520372-1"
 // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
 // @ts-ignore
-window.ga = (): void => {
-    // eslint-disable-next-line prefer-rest-params
+window.ga = (arguments): void => {
     ga.q.push(arguments)
 }
 

@@ -9,7 +9,7 @@
  */
 
 import * as path from "path"
-import { cleanName, readJson, saveJsonAsync, serverNames, sortBy } from "../common"
+import { cleanName, readJson, saveJsonAsync, serverNames, sortBy, sortId, StringIdedObject } from "../common";
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "./common-node"
 import { APIBuilding, LevelsEntity, TemplateEntity, APIItem, APIRecipeResource } from "./types-api-json"
 import {
@@ -17,8 +17,13 @@ import {
     BuildingLevelsEntity,
     BuildingMaterialsEntity,
     BuildingBatch,
-    BuildingResult
+    BuildingResult,
+    Price,
+    PriceStandardWood,
+    Recipe,
+    PriceSeasonedWood
 } from "../types-gen-json"
+import { sort } from "semver"
 
 const idWorkshop = 450
 const idAcademy = 879
@@ -86,7 +91,7 @@ const getBuildings = (): Building[] => {
 
     apiBuilding.forEach(apiBuilding => {
         const building: Building = {
-            id: +apiBuilding.Id,
+            id: Number(apiBuilding.Id),
             name: cleanName(apiBuilding.Name),
             result: [
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -94,7 +99,8 @@ const getBuildings = (): Building[] => {
                     apiBuilding.ProduceResource ? apiBuilding.ProduceResource : apiBuilding.RequiredPortResource
                 )!
             ],
-            batch: resourceRecipes.get(apiBuilding.RequiredPortResource) || [],
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            batch: resourceRecipes.get(apiBuilding.RequiredPortResource)!,
             levels: apiBuilding.Levels.map(
                 (level: LevelsEntity): BuildingLevelsEntity => ({
                     labourDiscount: level.LaborDiscount,
@@ -103,7 +109,7 @@ const getBuildings = (): Building[] => {
                     price: level.UpgradePriceGold,
                     materials: level.UpgradePriceMaterials.map(
                         (material: TemplateEntity): BuildingMaterialsEntity => ({
-                            item: buildingResources.get(material.Template)?.name || "",
+                            item: buildingResources.get(material.Template)?.name ?? "",
                             amount: material.Amount
                         })
                     )
@@ -149,49 +155,58 @@ const getBuildings = (): Building[] => {
     return [...buildings.values()]
 }
 
-const getSeasonedItemPrice = name =>
-    apiItems.find(
+const getAPISeasonedItem = (name: string): APIRecipeResource =>
+    (apiItems.find(
         item => item.ItemType === "Recipe" && item.Name.replace(" Log", "") === name.replace("White Oak", "White oak")
-    )
+    ) as unknown) as APIRecipeResource
 
-const getPrices = buildings => {
-    const prices = {}
-    const getStandardPrices = name =>
-        prices.standard.find(standardItem => standardItem.name === name.replace(" (S)", ""))
+const getPrices = (buildings: Building[]): Price => {
+    const prices: Price = { standard: [], seasoned: [] }
+    const getStandardPrices = (name: string): number | undefined =>
+        prices.standard.find(standardItem => standardItem.name === name.replace(" (S)", ""))?.real
 
     prices.standard = buildings
-        .filter(building => !Array.isArray(building.resource) && building.resource.price)
-        .map(building => ({
-            name: building.resource.name.replace(" Log", ""),
-            real: building.resource.price,
-            labour: building.batch.labour
-        }))
+        .filter((building: Building) => building.result[0].price)
+        .map(
+            (building: Building): PriceStandardWood => ({
+                name: building.result[0].name.replace(" Log", ""),
+                real: building.result[0].price,
+                labour: "labour" in building.batch ? building.batch.labour : 0
+            })
+        )
         .sort((a, b) => a.name.localeCompare(b.name))
 
     prices.seasoned = getItemsCraftedBySeasoningShed()
-        .map(seasonedItem => {
-            const name = seasonedItem.name.replace(" Log", "")
-            const seasonedItemPrices = getSeasonedItemPrice(name)
-            return {
-                name,
-                real: getStandardPrices(name).real,
-                labour: getSeasonedItemPrice(name).LaborPrice,
-                doubloon: seasonedItemPrices.FullRequirements.find(requirement => requirement.Template === idDoubloons)
-                    .Amount,
-                tool: seasonedItemPrices.FullRequirements.find(requirement => requirement.Template === idTools).Amount
+        .map(
+            (seasonedItem: BuildingResult): PriceSeasonedWood => {
+                const name = seasonedItem.name.replace(" Log", "")
+                const apiSeasonedItem = getAPISeasonedItem(name)
+                return {
+                    name,
+                    real: getStandardPrices(name) ?? 0,
+                    labour: apiSeasonedItem.LaborPrice,
+                    doubloon:
+                        apiSeasonedItem.FullRequirements.find(requirement => requirement.Template === idDoubloons)
+                            ?.Amount ?? 0,
+                    tool:
+                        apiSeasonedItem.FullRequirements.find(requirement => requirement.Template === idTools)
+                            ?.Amount ?? 0
+                }
             }
-        })
+        )
         .sort((a, b) => a.name.localeCompare(b.name))
 
     return prices
 }
 
-const convertBuildings = async () => {
+const convertBuildings = async (): Promise<void> => {
     let buildings = getBuildings()
 
     const prices = getPrices(buildings)
     await saveJsonAsync(commonPaths.filePrices, prices)
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // @ts-ignore
     buildings = buildings.filter(building => Object.keys(building).length).sort(sortBy(["id"]))
     await saveJsonAsync(commonPaths.fileBuilding, buildings)
 }

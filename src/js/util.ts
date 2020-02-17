@@ -723,6 +723,7 @@ export const copyF11ToClipboard = (x: number, z: number): void => {
  * @param colourScale - Colour
  * @param steps - Number of steps (default 512)
  */
+/*
 export const colourRamp = (
     element: Selection<GElement, OldDatum, HTMLElement, any>,
     colourScale,
@@ -748,6 +749,7 @@ export const colourRamp = (
         x += stepWidth
     }
 }
+*/
 
 export const drawSvgCircle = (x: number, y: number, r: number): string =>
     `M${x},${y} m${-r},0 a${r},${r} 0,1,0 ${r * 2},0 a${r},${r} 0,1,0 ${-r * 2},0`
