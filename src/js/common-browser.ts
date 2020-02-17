@@ -65,7 +65,7 @@ export const hashids = new Hashids("My salt: Yet another Naval Action map")
 export const numberSegments = 24
 export const segmentRadians = (2 * Math.PI) / numberSegments
 
-const rumRepairsFactor = rumRepairsPercent / rumRepairsVolume
+export const rumRepairsFactor = Number(rumRepairsPercent) / Number(rumRepairsVolume)
 export const repairsSetSize = 5
 export const circleRadiusFactor = 5
 const secondsForFullCircle = 2935 // 48 * 60 + 55

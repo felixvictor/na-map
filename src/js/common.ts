@@ -17,7 +17,6 @@ export const speedConstA = 0.074465523706782
 export const speedConstB = 0.00272175949231
 export const defaultFontSize = 16
 export const defaultCircleSize = 16
-export const defaultCircleSize = 16
 
 export const degreesFullCircle = 360
 export const degreesHalfCircle = 180
@@ -247,6 +246,14 @@ export const getTextFromFetch = (response: Response): Promise<string> => respons
  */
 export const putFetchError = (error: string): void => {
     console.error("Request failed -->", error)
+}
+
+/**
+ * Write fetch error to console
+ * @param error - Error message
+ */
+export const putImportError = (error: string): void => {
+    console.error("Import request failed -->", error)
 }
 
 /**
