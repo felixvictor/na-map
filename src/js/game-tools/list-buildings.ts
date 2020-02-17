@@ -15,7 +15,8 @@ import { select as d3Select } from "d3-selection"
 
 import { registerEvent } from "../analytics"
 import { getCurrencyAmount, insertBaseModal } from "../common-browser"
-import { formatInt, putImportError, sortBy } from "../util"
+import { putImportError, sortBy } from "../common"
+import { formatInt } from "../util"
 import { Building, BuildingResult } from "../types-gen-json"
 
 export default class ListBuildings {
