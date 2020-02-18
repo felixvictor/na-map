@@ -344,7 +344,7 @@ const npcPortBattleScheduled = result => {
 const portR = "[A-zÀ-ÿ’ -]+"
 const portHashR = "[A-zÀ-ÿ]+"
 const nationR = "[A-zÀ-ÿ -]+"
-const clanR = "\\w+"
+const clanR = "[\\w ]+"
 const defenderR = "[\\w ]+"
 const timeR = "\\d{2}-\\d{2}-\\d{4} \\d{2}:\\d{2}"
 const pbTimeR = "\\d{1,2} \\w{3} \\d{4} \\d{2}:\\d{2}"
@@ -464,8 +464,11 @@ const updatePorts = async () => {
                 defended(result)
             }
         } else if (tweetTime.isAfter(dayjs.utc(serverDate).subtract(2, "day"))) {
-            // Add scheduled NPC raids
-            if ((result = npcPortBattleRegex.exec(tweet)) !== null) {
+            // Add scheduled NPC raids (only if battle is in the future)
+            if (
+                (result = npcPortBattleRegex.exec(tweet)) !== null &&
+                dayjs.utc().isBefore(dayjs.utc(result[4], "D MMM YYYY HH:mm"))
+            ) {
                 isPortDataChanged = true
                 npcPortBattleScheduled(result)
             }
