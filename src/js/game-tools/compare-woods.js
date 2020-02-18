@@ -70,7 +70,7 @@ class WoodBase extends Wood {
         let text = '<table class="table table-sm table-striped small mt-4"><thead>'
         text += "<tr>"
         text += '<tr><th scope="col">Property</th><th scope="col">Change</th></tr></thead><tbody>'
-        for (const [value, key] of wood.properties.entries()) {
+        for (const [key, value] of wood.properties) {
             text += `<tr><td>${key}</td><td>${
                 value.isPercentage ? formatPercent(value.amount / 100) : formatFloat(value.amount)
             }`
@@ -197,7 +197,7 @@ class WoodComparison extends Wood {
         let diffColour = ""
         let text = '<table class="table table-sm table-striped small wood mt-4"><thead>'
         text += '<tr><th scope="col">Property</th><th scope="col">Change</th></tr></thead><tbody>'
-        for (const [value, key] of wood.properties.entries()) {
+        for (const [key, value] of wood.properties) {
             text += `<tr><td>${key}</td><td>${WoodComparison._getDiff(value.compare, value.base, value.isPercentage)}`
             text += '<span class="rate">'
             if (value.compare >= 0) {
@@ -396,16 +396,15 @@ export default class CompareWoods {
                 ...this._woodData.frame.map(
                     frame =>
                         frame.properties
-                            .filter(modifier => modifier.modifier === propertyName)
-                            .map(modifier => modifier.amount)[0]
+                            .find(modifier => modifier.modifier === propertyName)?.amount
                 )
             ]
             const trims = [
                 ...this._woodData.trim.map(
                     trim =>
                         trim.properties
-                            .filter(modifier => modifier.modifier === propertyName)
-                            .map(modifier => modifier.amount)[0]
+                            .find(modifier => modifier.modifier === propertyName)
+                            ?.amount
                 )
             ]
 
