@@ -36,6 +36,6 @@ export interface ValueEntity {
     TangentIn: TextEntity
     TangentOut: TextEntity
 }
-interface TextEntity {
+export interface TextEntity {
     _text: string
 }
