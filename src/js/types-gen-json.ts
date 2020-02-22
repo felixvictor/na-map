@@ -54,6 +54,13 @@ export interface Cannon {
     carronade: CannonEntity[]
     [key: string]: CannonEntity[]
 }
+export type CannonGroupIndex =
+    | string
+    | CannonDamage
+    | CannonTraverse
+    | CannonDispersion
+    | CannonGeneric
+    | CannonPenetration
 export interface CannonEntity {
     name: string
     damage: CannonDamage
@@ -61,7 +68,7 @@ export interface CannonEntity {
     dispersion: CannonDispersion
     generic: CannonGeneric
     penetration: CannonPenetration
-    [key: string]: string | CannonDamage | CannonTraverse | CannonDispersion | CannonGeneric | CannonPenetration
+    [key: string]: CannonGroupIndex
 }
 export interface CannonDamage {
     basic: CannonValue
@@ -69,10 +76,6 @@ export interface CannonDamage {
     splinter: CannonValue
     "per second": CannonValue
     penetration?: CannonValue
-}
-export interface CannonValue {
-    value: number
-    digits: number
 }
 export interface CannonTraverse {
     up: CannonValue
@@ -94,6 +97,10 @@ export interface CannonPenetration {
     750: CannonValue
     1000: CannonValue
     [key: string]: CannonValue
+}
+export interface CannonValue {
+    value: number
+    digits: number
 }
 
 /****************************
