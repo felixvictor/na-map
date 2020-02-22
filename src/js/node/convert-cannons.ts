@@ -15,17 +15,8 @@ import convert from "xml-js"
 
 import { readTextFile, round, saveJsonAsync } from "../common"
 import { commonPaths } from "./common-node"
-import {
-    Cannon,
-    CannonDamage,
-    CannonDispersion,
-    CannonEntity,
-    CannonGeneric,
-    CannonPenetration,
-    CannonTraverse,
-    CannonValue
-} from "../types-gen-json"
-import { PairEntity, ValueEntity, XmlCannon } from "./types-xml"
+import { Cannon, CannonEntity, CannonGroupIndex, CannonPenetration, CannonValue } from "../types-gen-json"
+import { PairEntity, TextEntity, ValueEntity, XmlCannon } from "./types-xml"
 
 // noinspection MagicNumberJS
 const peneDistances = [50, 100, 250, 500, 750, 1000]
@@ -149,32 +140,27 @@ const addData = (fileData: XmlCannon): void => {
 
     for (const [value, { group, element }] of dataMapping) {
         if (!cannon[group]) {
-            cannon[group] = {} as
-                | string
-                | CannonDamage
-                | CannonTraverse
-                | CannonDispersion
-                | CannonGeneric
-                | CannonPenetration
-            cannon[group][element] = {} as CannonValue
+            cannon[group] = {} as CannonGroupIndex
         }
 
         cannon[group][element] = {
             value: Number(
-                fileData.ModuleTemplate.Attributes.Pair.find(pair => pair.Key._text === value)?.Value.Value._text ?? 0
+                (fileData.ModuleTemplate.Attributes.Pair.find(pair => pair.Key._text === value)?.Value
+                    .Value as TextEntity)._text ?? 0
             ),
             digits: 0
-        } as CannonValue
+        }
     }
 
     // Calculate penetrations
     const penetrations: Map<number, number> = new Map(
-        fileData.ModuleTemplate.Attributes.Pair.find(
+        (fileData.ModuleTemplate.Attributes.Pair.find(
             (pair: PairEntity) => pair.Key._text === "CANNON_PENETRATION_DEGRADATION"
-        )
-            ?.Value.Value.filter((penetration: ValueEntity) => Number(penetration.Time._text) > 0)
-            .map((penetration: ValueEntity) => [Number(penetration.Time._text) * 1000, Number(penetration.Value._text)])
+        )?.Value.Value as ValueEntity[])
+            .filter(penetration => Number(penetration.Time._text) > 0)
+            .map(penetration => [Number(penetration.Time._text) * 1000, Number(penetration.Value._text)])
     )
+
     // noinspection MagicNumberJS
     penetrations.set(250, ((penetrations.get(200) ?? 0) + (penetrations.get(300) ?? 0)) / 2)
     // noinspection MagicNumberJS
@@ -184,6 +170,7 @@ const addData = (fileData: XmlCannon): void => {
         750,
         (penetrations.get(800) ?? 0) + ((penetrations.get(600) ?? 0) - (penetrations.get(800) ?? 0)) * 0.25
     )
+
     cannon["penetration"] = {} as CannonPenetration
     for (const distance of peneDistances) {
         cannon["penetration"][distance] = {
@@ -230,7 +217,7 @@ export const convertCannons = async (): Promise<void> => {
                     // noinspection JSCheckFunctionSignatures
                     for (const [elementKey, elementValue] of Object.entries(groupValue)) {
                         maxDigits[type][groupKey][elementKey] = Math.max(
-                            maxDigits[type][groupKey][elementKey] || 0,
+                            maxDigits[type][groupKey][elementKey] ?? 0,
                             countDecimals(elementValue.value)
                         )
                     }
