@@ -48,49 +48,52 @@ export interface BuildingMaterialsEntity {
 /****************************
  * cannons.json
  */
-
 export interface Cannon {
     medium: CannonEntity[]
     long: CannonEntity[]
     carronade: CannonEntity[]
+    [key: string]: CannonEntity[]
 }
-interface CannonEntity {
+export interface CannonEntity {
     name: string
     damage: CannonDamage
     traverse: CannonTraverse
     dispersion: CannonDispersion
     generic: CannonGeneric
-    "penetration(m)": CannonPenetration
+    penetration: CannonPenetration
+    [key: string]: string | CannonDamage | CannonTraverse | CannonDispersion | CannonGeneric | CannonPenetration
 }
-interface CannonDamage {
+export interface CannonDamage {
     basic: CannonValue
     "reload time": CannonValue
     splinter: CannonValue
     "per second": CannonValue
+    penetration?: CannonValue
 }
-interface CannonValue {
+export interface CannonValue {
     value: number
     digits: number
 }
-interface CannonTraverse {
+export interface CannonTraverse {
     up: CannonValue
     down: CannonValue
 }
-interface CannonDispersion {
+export interface CannonDispersion {
     horizontal: CannonValue
     vertical: CannonValue
 }
-interface CannonGeneric {
+export interface CannonGeneric {
     weight: CannonValue
     crew: CannonValue
 }
-interface CannonPenetration {
+export interface CannonPenetration {
     50: CannonValue
     100: CannonValue
     250: CannonValue
     500: CannonValue
     750: CannonValue
     1000: CannonValue
+    [key: string]: CannonValue
 }
 
 /****************************
