@@ -1,5 +1,3 @@
-#!/usr/bin/env -S yarn yarn node --experimental-modules --no-warnings
-
 /**
  * This file is part of na-map.
  *
@@ -14,29 +12,31 @@ import * as fs from "fs"
 import * as path from "path"
 import { execSync } from "child_process"
 
-import { convertBuildingData } from "./convert-buildings.js"
-import { convertCannons } from "./convert-cannons.mjs"
-import { convertGenericPortData } from "./convert-generic-port-data.mjs"
-import { convertLootData } from "./convert-loot.mjs"
-import { convertModules } from "./convert-modules.mjs"
-import { convertRecipeData } from "./convert-recipes.mjs"
-import { convertRepairData } from "./convert-module-repair-data.mjs"
-import { convertServerPortData } from "./convert-server-port-data.mjs"
-import { convertShipData } from "./convert-ship-data.mjs"
-import { convertOwnershipData } from "./convert-ownership.mjs"
-import { createPortBattleSheet } from "./create-pb-sheets.mjs"
-
-import { apiBaseFiles, baseAPIFilename, serverNames, serverStartDate as serverDate } from "./common.mjs"
+import { convertBuildingData } from "./convert-buildings"
+import { convertCannons } from "./convert-cannons"
+/*
+import { convertGenericPortData } from "./convert-generic-port-data"
+import { convertLootData } from "./convert-loot"
+import { convertModules } from "./convert-modules"
+import { convertRecipeData } from "./convert-recipes"
+import { convertRepairData } from "./convert-module-repair-data"
+import { convertServerPortData } from "./convert-server-port-data"
+import { convertShipData } from "./convert-ship-data"
+import { convertOwnershipData } from "./convert-ownership"
+import { createPortBattleSheet } from "./create-pb-sheets"
+*/
+import { apiBaseFiles, serverNames } from "../common"
+import { baseAPIFilename, serverStartDate as serverDate } from "./common-node"
 
 const runType = process.argv[2] || "client"
 
-const xz = (command, fileName) => {
+const xz = (command: string, fileName: string): void => {
     if (fs.existsSync(fileName)) {
         execSync(`${command} ${fileName}`)
     }
 }
 
-const loopApiFiles = command => {
+const loopApiFiles = (command: string): void => {
     const ext = command === "xz" ? "json" : "json.xz"
 
     for (const serverName of serverNames) {
@@ -55,7 +55,7 @@ const uncompressApiData = () => {
     loopApiFiles("unxz")
 }
 
-const convertApiData = async () => {
+const convertApiData = async (): Promise<void> => {
     convertBuildingData()
     convertCannons()
     convertGenericPortData()
