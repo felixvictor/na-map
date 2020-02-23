@@ -151,7 +151,6 @@ interface ModulePropertiesEntity {
     amount: number
     isPercentage: boolean
 }
-type Module = string | ModuleEntity[]
 
 /****************************
  * nations.json
