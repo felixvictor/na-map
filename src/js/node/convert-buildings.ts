@@ -9,7 +9,7 @@
  */
 
 import * as path from "path"
-import { cleanName, readJson, saveJsonAsync, serverNames, sortBy, sortId, StringIdedObject } from "../common";
+import { cleanName, readJson, saveJsonAsync, serverNames, sortBy, sortId, StringIdedObject } from "../common"
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "./common-node"
 import { APIBuilding, LevelsEntity, TemplateEntity, APIItem, APIRecipeResource } from "./types-api-json"
 import {
@@ -23,7 +23,6 @@ import {
     Recipe,
     PriceSeasonedWood
 } from "../types-gen-json"
-import { sort } from "semver"
 
 const idWorkshop = 450
 const idAcademy = 879
@@ -59,7 +58,6 @@ const getItemsCraftedBySeasoningShed = (): BuildingResult[] => getItemsCrafted(i
 
 /**
  * Convert API building data and save sorted as JSON
- * @returns {Array}
  */
 const getBuildings = (): Building[] => {
     const buildings = new Map()
@@ -155,10 +153,20 @@ const getBuildings = (): Building[] => {
     return [...buildings.values()]
 }
 
-const getAPISeasonedItem = (name: string): APIRecipeResource =>
-    (apiItems.find(
+const getAPISeasonedItem = (name: string): APIRecipeResource => {
+    const i = apiItems.find(
+        item => item.ItemType === "Recipe" && item.Name.replace(" Log", "") === name.replace("White Oak", "White oak")
+    )
+
+    console.log(
+        apiItems.find(item => item.ItemType === "Recipe" && item.Name === name),
+        name,
+        i
+    )
+    return (apiItems.find(
         item => item.ItemType === "Recipe" && item.Name.replace(" Log", "") === name.replace("White Oak", "White oak")
     ) as unknown) as APIRecipeResource
+}
 
 const getPrices = (buildings: Building[]): Price => {
     const prices: Price = { standard: [], seasoned: [] }
@@ -181,6 +189,7 @@ const getPrices = (buildings: Building[]): Price => {
             (seasonedItem: BuildingResult): PriceSeasonedWood => {
                 const name = seasonedItem.name.replace(" Log", "")
                 const apiSeasonedItem = getAPISeasonedItem(name)
+                console.log(apiSeasonedItem, name)
                 return {
                     name,
                     real: getStandardPrices(name) ?? 0,
