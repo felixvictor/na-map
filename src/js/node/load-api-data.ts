@@ -1,5 +1,3 @@
-#!/usr/bin/env -S yarn yarn node --experimental-modules --no-warnings
-
 /**
  * This file is part of na-map.
  *
@@ -14,14 +12,8 @@ import * as fs from "fs"
 import * as path from "path"
 import { default as nodeFetch } from "node-fetch"
 
-import {
-    apiBaseFiles,
-    baseAPIFilename,
-    saveJsonAsync,
-    serverNames,
-    serverStartDate as serverDate,
-    sortId
-} from "./common.mjs"
+import { apiBaseFiles, saveJsonAsync, serverNames, sortId } from "../common"
+import { baseAPIFilename, serverStartDate as serverDate, xzAsync } from "./common-node"
 
 const sourceBaseUrl = "https://storage.googleapis.com/"
 const sourceBaseDir = "nacleanopenworldprodshards"
@@ -30,25 +22,21 @@ const serverBaseName = "cleanopenworldprod"
 
 /**
  * Delete file (ignore if file does not exist)
- * @param {string} fileName - File name
- * @return {void}
+ * @param fileName - File name
  */
-const deleteFile = fileName => {
+const deleteFile = (fileName: string): void => {
     fs.unlink(fileName, error => {
-        if (error) {
-            if (error.code !== "ENOENT") {
-                throw error
-            }
+        if (error?.code !== "ENOENT") {
+            throw error
         }
     })
 }
 
 /**
  * Delete API data (uncompressed and compressed)
- * @param {string} fileName - File name
- * @return {Promise<boolean>}
+ * @param fileName - File name
  */
-const deleteAPIFiles = async fileName => {
+const deleteAPIFiles = async (fileName: string): Promise<boolean> => {
     await deleteFile(fileName)
     await deleteFile(`${fileName}.xz`)
     return true
@@ -56,10 +44,9 @@ const deleteAPIFiles = async fileName => {
 
 /**
  * Download Naval Action API data
- * @param {Url} url - Download url
- * @return {Promise<Error|any>}
+ * @param url - Download url
  */
-const readNAJson = async url => {
+const readNAJson = async (url: URL): Promise<Error | any> => {
     try {
         const response = await nodeFetch(url)
         if (response.ok) {
@@ -75,12 +62,8 @@ const readNAJson = async url => {
 
 /**
  * Load API data and save sorted data
- * @param {string} serverName
- * @param {string} apiBaseFile
- * @param {string} outfileName
- * @return {Promise<boolean>}
  */
-const getAPIDataAndSave = async (serverName, apiBaseFile, outfileName) => {
+const getAPIDataAndSave = async (serverName: string, apiBaseFile: string, outfileName: string): Promise<boolean> => {
     const url = new URL(`${sourceBaseUrl}${sourceBaseDir}/${apiBaseFile}_${serverBaseName}${serverName}.json`)
     const data = await readNAJson(url)
 
@@ -88,22 +71,23 @@ const getAPIDataAndSave = async (serverName, apiBaseFile, outfileName) => {
         throw data
     }
 
-    data.sort(sortId)
+    await data.sort(sortId)
     await saveJsonAsync(outfileName, data)
+    await xzAsync("xz", outfileName)
+
     return true
 }
 
 /**
  * Load data for all servers and data files
- * @param {string} baseAPIFilename
- * @return {Promise<boolean>}
  */
-const loadApiData = async baseAPIFilename => {
+const loadData = async (baseAPIFilename: string): Promise<boolean> => {
     const deletePromise = []
     const getPromise = []
     for (const serverName of serverNames) {
         for (const apiBaseFile of apiBaseFiles) {
             const outfileName = path.resolve(baseAPIFilename, `${serverName}-${apiBaseFile}-${serverDate}.json`)
+
             deletePromise.push(deleteAPIFiles(outfileName))
             getPromise.push(getAPIDataAndSave(serverName, apiBaseFile, outfileName))
         }
@@ -111,7 +95,9 @@ const loadApiData = async baseAPIFilename => {
 
     await Promise.all(deletePromise)
     await Promise.all(getPromise)
+
     return true
 }
 
-loadApiData(baseAPIFilename)
+// noinspection JSIgnoredPromiseFromCall
+loadData(baseAPIFilename)
