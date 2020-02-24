@@ -9,7 +9,7 @@
  */
 
 import * as path from "path"
-import { cleanName, readJson, saveJsonAsync, serverNames, sortBy, sortId, StringIdedObject } from "../common"
+import { cleanName, readJson, saveJsonAsync, serverNames, sortBy } from "../common"
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "./common-node"
 import { APIBuilding, LevelsEntity, TemplateEntity, APIItem, APIRecipeResource } from "./types-api-json"
 import {
@@ -20,7 +20,6 @@ import {
     BuildingResult,
     Price,
     PriceStandardWood,
-    Recipe,
     PriceSeasonedWood
 } from "../types-gen-json"
 
@@ -153,20 +152,12 @@ const getBuildings = (): Building[] => {
     return [...buildings.values()]
 }
 
-const getAPISeasonedItem = (name: string): APIRecipeResource => {
-    const i = apiItems.find(
-        item => item.ItemType === "Recipe" && item.Name.replace(" Log", "") === name.replace("White Oak", "White oak")
-    )
-
-    console.log(
-        apiItems.find(item => item.ItemType === "Recipe" && item.Name === name),
-        name,
-        i
-    )
-    return (apiItems.find(
-        item => item.ItemType === "Recipe" && item.Name.replace(" Log", "") === name.replace("White Oak", "White oak")
+const getAPISeasonedItem = (name: string): APIRecipeResource =>
+    (apiItems.find(
+        item =>
+            item.ItemType === "Recipe" &&
+            item.Name.replace(" Log", "") === name.replace(/\s/g, " ").replace("White Oak", "White oak")
     ) as unknown) as APIRecipeResource
-}
 
 const getPrices = (buildings: Building[]): Price => {
     const prices: Price = { standard: [], seasoned: [] }
@@ -189,7 +180,7 @@ const getPrices = (buildings: Building[]): Price => {
             (seasonedItem: BuildingResult): PriceSeasonedWood => {
                 const name = seasonedItem.name.replace(" Log", "")
                 const apiSeasonedItem = getAPISeasonedItem(name)
-                console.log(apiSeasonedItem, name)
+
                 return {
                     name,
                     real: getStandardPrices(name) ?? 0,
@@ -217,6 +208,7 @@ const convertBuildings = async (): Promise<void> => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
     // @ts-ignore
     buildings = buildings.filter(building => Object.keys(building).length).sort(sortBy(["id"]))
+    console.log(commonPaths.fileBuilding)
     await saveJsonAsync(commonPaths.fileBuilding, buildings)
 }
 
