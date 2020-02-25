@@ -108,6 +108,7 @@
         "@types/node": "^13.7.0",
         "@types/node-fetch": "^2.5.4",
         "@types/pngjs": "^3.4.1",
+        "@types/polylabel": "^1.0.5",
         "@types/sharp": "^0.24.0",
         "@typescript-eslint/eslint-plugin": "^2.19.0",
         "@typescript-eslint/parser": "^2.19.0",
