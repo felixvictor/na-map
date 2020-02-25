@@ -12,8 +12,8 @@ import { compressApiData, uncompressApiData } from "./common-node"
 
 import { convertBuildingData } from "./convert-buildings"
 import { convertCannons } from "./convert-cannons"
-/*
 import { convertGenericPortData } from "./convert-generic-port-data"
+/*
 import { convertLootData } from "./convert-loot"
 import { convertModules } from "./convert-modules"
 import { convertRecipeData } from "./convert-recipes"
@@ -24,13 +24,13 @@ import { convertOwnershipData } from "./convert-ownership"
 import { createPortBattleSheet } from "./create-pb-sheets"
  */
 
-const runType = process.argv[2] || "client"
+// const runType = process.argv[2] || "client"
 
 const convertApiData = async (): Promise<void> => {
     convertBuildingData()
     convertCannons()
-    /*
     convertGenericPortData()
+    /*
     convertLootData()
     convertModules()
     convertRecipeData()

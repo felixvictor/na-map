@@ -1,8 +1,8 @@
 /**
  * This file is part of na-map.
  *
- * @file      Types for api json.
- * @module    types-api-json
+ * @file      Types for api item json.
+ * @module    types-api-item
  * @author    iB aka Felix Victor
  * @copyright 2020
  * @license   http://www.gnu.org/licenses/gpl.html
