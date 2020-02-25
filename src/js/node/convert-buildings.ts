@@ -11,7 +11,7 @@
 import * as path from "path"
 import { cleanName, readJson, saveJsonAsync, serverNames, sortBy } from "../common"
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "./common-node"
-import { APIBuilding, LevelsEntity, TemplateEntity, APIItem, APIRecipeResource } from "./types-api-json"
+import { APIBuilding, LevelsEntity, TemplateEntity, APIItem, APIRecipeResource } from "./types-api-item"
 import {
     Building,
     BuildingLevelsEntity,
