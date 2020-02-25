@@ -12,23 +12,26 @@ import * as path from "path"
 import polylabel from "polylabel"
 
 import {
-    baseAPIFilename,
     capitalToCounty,
     cleanName,
-    commonPaths,
     convertCoordX,
     convertCoordY,
-    degreesHalfCircle,
-    distanceMapSize,
+    degreesHalfCircle, Point,
     readJson,
     rotationAngleInDegrees,
     saveJsonAsync,
     serverNames,
-    serverStartDate as serverDate,
     sortBy
-} from "./common.mjs"
+} from "../common";
+import {
+    baseAPIFilename,
+    commonPaths,
+    distanceMapSize,
+    serverStartDate as serverDate,
+} from "./common-node"
+import { APIPort, PortElementsSlotGroupsEntity, PortPosition, PortRaidSpawnPointsEntity } from "./types-api-port";
 
-let apiPorts = []
+let apiPorts = [] as APIPort[]
 let apiPortPos = new Map()
 
 const counties = new Map()
@@ -36,7 +39,7 @@ const regions = new Map()
 const geoJsonRegions = { type: "FeatureCollection", features: [] }
 const geoJsonCounties = { type: "FeatureCollection", features: [] }
 
-const getPortName = portId => apiPorts.find(({ Id }) => Number(Id) === portId).Name
+const getPortName = (portId: number): string => apiPorts.find(({ Id }) => Number(Id) === portId)?.Name
 
 const setAndSavePortData = async () => {
     /**
@@ -47,13 +50,12 @@ const setAndSavePortData = async () => {
     const ports = apiPorts
         .map(apiPort => {
             /**
-             * Position of the port battle circle A
-             * @type {Point}
+             * PortPosition of the port battle circle A
              */
             const circleAPos = [
                 Math.trunc(convertCoordX(apiPort.PortBattleZonePositions[0].x, apiPort.PortBattleZonePositions[0].z)),
                 Math.trunc(convertCoordY(apiPort.PortBattleZonePositions[0].x, apiPort.PortBattleZonePositions[0].z))
-            ]
+            ] as Point
             const { x, y } = apiPortPos.get(Number(apiPort.Id))
             const angle = Math.round(rotationAngleInDegrees([x, y], circleAPos))
             const coordinates = apiPortPos.get(Number(apiPort.Id))
@@ -84,13 +86,13 @@ const setAndSavePortData = async () => {
     await saveJsonAsync(commonPaths.filePort, ports)
 }
 
-const getPBCircles = portBattleZonePositions =>
+const getPBCircles = (portBattleZonePositions: PortPosition[]) =>
     portBattleZonePositions.map(pbCircle => [
         Math.trunc(convertCoordX(pbCircle.x, pbCircle.z)),
         Math.trunc(convertCoordY(pbCircle.x, pbCircle.z))
     ])
 
-const getForts = portElementsSlotGroups =>
+const getForts = (portElementsSlotGroups: PortElementsSlotGroupsEntity[]) =>
     portElementsSlotGroups
         .filter(portElement => portElement.TemplateName === "Fort2")
         .flatMap(portElement =>
@@ -100,7 +102,7 @@ const getForts = portElementsSlotGroups =>
             ])
         )
 
-const getTowers = portElementsSlotGroups =>
+const getTowers = (portElementsSlotGroups: PortElementsSlotGroupsEntity[])  =>
     portElementsSlotGroups
         .filter(portElement => portElement.TemplateName !== "Fort2")
         .flatMap(portElement =>
@@ -110,7 +112,7 @@ const getTowers = portElementsSlotGroups =>
             ])
         )
 
-const getJoinCircles = (id, rotation) => {
+const getJoinCircles = (id: number, rotation: number) => {
     const { x: x0, y: y0 } = apiPortPos.get(id)
     const distance = 5
     const degrees = degreesHalfCircle - rotation
@@ -121,13 +123,13 @@ const getJoinCircles = (id, rotation) => {
     return [x1, y1]
 }
 
-const getRaidCircles = portRaidZonePositions =>
+const getRaidCircles = (portRaidZonePositions: PortPosition[]) =>
     portRaidZonePositions.map(raidCircle => [
         Math.trunc(convertCoordX(raidCircle.x, raidCircle.z)),
         Math.trunc(convertCoordY(raidCircle.x, raidCircle.z))
     ])
 
-const getRaidPoints = portRaidSpawnPoints =>
+const getRaidPoints = (portRaidSpawnPoints: PortRaidSpawnPointsEntity[]) =>
     portRaidSpawnPoints.map(raidPoint => [
         Math.trunc(convertCoordX(raidPoint.Position.x, raidPoint.Position.z)),
         Math.trunc(convertCoordY(raidPoint.Position.x, raidPoint.Position.z))
