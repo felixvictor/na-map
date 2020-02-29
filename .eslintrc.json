@@ -67,6 +67,7 @@
                     "requireLast": false
                 }
             }
-        ]
+        ],
+        "@typescript-eslint/ban-ts-ignore": "off"
     }
 }

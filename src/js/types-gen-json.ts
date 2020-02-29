@@ -425,3 +425,21 @@ interface WoodProperty {
     amount: number
     isPercentage: boolean
 }
+
+/****************************
+ * region-labels.json
+ */
+
+export interface GeoJson {
+    type: "FeatureCollection"
+    features: FeaturesEntity[]
+}
+export interface FeaturesEntity {
+    type: "Feature"
+    id: string
+    geometry: Geometry
+}
+export interface Geometry {
+    type: "Point" | "Polygon"
+    coordinates: Point[]
+}
