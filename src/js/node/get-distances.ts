@@ -15,7 +15,7 @@ import * as fs from "fs"
 import * as path from "path"
 import { default as Denque } from "denque"
 import { default as PNG } from "pngjs"
-import { convertCoordX, convertCoordY, Point, readJson, saveJsonAsync, serverNames } from "../common"
+import { convertCoordX, convertCoordY, Distance, Point, readJson, saveJsonAsync, serverNames } from "../common"
 import { baseAPIFilename, commonPaths, distanceMapSize, serverStartDate as serverDate } from "./common-node"
 
 /**
@@ -107,16 +107,10 @@ apiPorts.forEach(({ Id, EntrancePosition: { z: y, x } }: Port) => {
 // Outer-grid land borders
 const visitedPositionsDefault = new Set()
 
-interface Distances extends Array<number> {
-    0: number // From port id
-    1: number // To port id
-    2: number // Distance (in pixels)
-}
-
 /**
- * Distances between all ports
+ * Distance between all ports
  */
-const distances: Distances[] = []
+const distances: Distance[] = []
 
 /**
  * Set of start ports so far

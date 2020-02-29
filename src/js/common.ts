@@ -267,6 +267,12 @@ export const isEmpty = (obj: object): boolean =>
  */
 const radiansToDegrees = (radians: number): number => (radians * degreesHalfCircle) / Math.PI
 
+export interface Distance extends Array<number> {
+    0: number // From port id
+    1: number // To port id
+    2: number // Distance (in pixels)
+}
+
 export interface Point extends Array<number> {
     0: number // X coordinate
     1: number // Y coordinate
