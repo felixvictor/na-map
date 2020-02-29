@@ -15,7 +15,7 @@ import convert from "xml-js"
 
 import { readTextFile, round, saveJsonAsync } from "../common"
 import { commonPaths } from "./common-node"
-import { Cannon, CannonEntity, CannonGroupIndex, CannonPenetration, CannonValue } from "../types-gen-json"
+import { Cannon, CannonEntity, CannonGroupIndex, CannonPenetration } from "../types-gen-json"
 import { PairEntity, TextEntity, ValueEntity, XmlCannon } from "./types-xml"
 
 // noinspection MagicNumberJS
