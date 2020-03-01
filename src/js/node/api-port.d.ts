@@ -2,7 +2,7 @@
  * This file is part of na-map.
  *
  * @file      Types for api port json.
- * @module    types-api-port
+ * @module    api-port.d
  * @author    iB aka Felix Victor
  * @copyright 2020
  * @license   http://www.gnu.org/licenses/gpl.html

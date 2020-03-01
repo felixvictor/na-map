@@ -15,8 +15,16 @@ import convert from "xml-js"
 
 import { readTextFile, round, saveJsonAsync } from "../common"
 import { commonPaths } from "./common-node"
-import { Cannon, CannonEntity, CannonGroupIndex, CannonPenetration } from "../types-gen-json"
-import { PairEntity, TextEntity, ValueEntity, XmlCannon } from "./types-xml"
+import {
+    Cannon,
+    CannonElementIndex,
+    CannonEntity,
+    CannonGroupIndex,
+    CannonPenetration,
+    CannonValue,
+    ObjectIndexer
+} from "../gen-json";
+import { PairEntity, TextEntity, ValueEntity, XmlCannon } from "./xml"
 
 // noinspection MagicNumberJS
 const peneDistances = [50, 100, 250, 500, 750, 1000]
@@ -137,19 +145,17 @@ const addData = (fileData: XmlCannon): void => {
     const cannon = {
         name
     } as CannonEntity
-
     for (const [value, { group, element }] of dataMapping) {
         if (!cannon[group]) {
             cannon[group] = {} as CannonGroupIndex
         }
-
         cannon[group][element] = {
             value: Number(
                 (fileData.ModuleTemplate.Attributes.Pair.find(pair => pair.Key._text === value)?.Value
                     .Value as TextEntity)._text ?? 0
             ),
             digits: 0
-        }
+        } as CannonValue
     }
 
     // Calculate penetrations
