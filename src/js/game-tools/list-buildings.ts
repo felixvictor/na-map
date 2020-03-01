@@ -17,7 +17,7 @@ import { registerEvent } from "../analytics"
 import { getCurrencyAmount, insertBaseModal } from "../common-browser"
 import { putImportError, sortBy } from "../common"
 import { formatInt } from "../util"
-import { Building, BuildingResult } from "../types-gen-json"
+import { Building, BuildingResult } from "../gen-json"
 
 export default class ListBuildings {
     private readonly _baseName: string
