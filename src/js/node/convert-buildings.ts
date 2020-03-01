@@ -11,7 +11,7 @@
 import * as path from "path"
 import { cleanName, readJson, saveJsonAsync, serverNames, sortBy } from "../common"
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "./common-node"
-import { APIBuilding, LevelsEntity, TemplateEntity, APIItem, APIRecipeResource } from "./types-api-item"
+import { APIBuilding, LevelsEntity, TemplateEntity, APIItem, APIRecipeResource } from "./api-item"
 import {
     Building,
     BuildingLevelsEntity,
@@ -21,7 +21,7 @@ import {
     Price,
     PriceStandardWood,
     PriceSeasonedWood
-} from "../types-gen-json"
+} from "../gen-json"
 
 const idWorkshop = 450
 const idAcademy = 879
@@ -205,7 +205,6 @@ const convertBuildings = async (): Promise<void> => {
     const prices = getPrices(buildings)
     await saveJsonAsync(commonPaths.filePrices, prices)
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
     // @ts-ignore
     buildings = buildings.filter(building => Object.keys(building).length).sort(sortBy(["id"]))
     console.log(commonPaths.fileBuilding)
