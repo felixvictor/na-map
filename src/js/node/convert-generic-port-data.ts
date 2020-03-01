@@ -25,8 +25,8 @@ import {
     sortBy
 } from "../common"
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "./common-node"
-import { APIPort, PortElementsSlotGroupsEntity, PortPosition, PortRaidSpawnPointsEntity } from "./types-api-port"
-import { FeaturesEntity, GeoJson } from "../types-gen-json"
+import { APIPort, PortElementsSlotGroupsEntity, PortPosition, PortRaidSpawnPointsEntity } from "./api-port"
+import { FeaturesEntity, GeoJson } from "../gen-json"
 
 let apiPorts = [] as APIPort[]
 let apiPortPos = new Map()
