@@ -2,7 +2,7 @@
  * This file is part of na-map.
  *
  * @file      Types for generated json.
- * @module    types-gen-json
+ * @module    gen-json.d
  * @author    iB aka Felix Victor
  * @copyright 2020
  * @license   http://www.gnu.org/licenses/gpl.html
@@ -48,11 +48,16 @@ export interface BuildingMaterialsEntity {
 /****************************
  * cannons.json
  */
-export interface Cannon {
+
+// https://stackoverflow.com/a/54319112
+export interface ObjectIndexer<T> {
+    [key: string]: T
+}
+
+export interface Cannon extends ObjectIndexer<CannonEntity[]> {
     medium: CannonEntity[]
     long: CannonEntity[]
     carronade: CannonEntity[]
-    [key: string]: CannonEntity[]
 }
 export type CannonGroupIndex =
     | string
@@ -61,42 +66,41 @@ export type CannonGroupIndex =
     | CannonDispersion
     | CannonGeneric
     | CannonPenetration
-export interface CannonEntity {
+export interface CannonEntity extends ObjectIndexer<CannonGroupIndex> {
     name: string
     damage: CannonDamage
     traverse: CannonTraverse
     dispersion: CannonDispersion
     generic: CannonGeneric
     penetration: CannonPenetration
-    [key: string]: CannonGroupIndex
 }
-export interface CannonDamage {
+export type CannonElementIndex = CannonValue | undefined
+export interface CannonDamage extends ObjectIndexer<CannonElementIndex> {
     basic: CannonValue
     "reload time": CannonValue
     splinter: CannonValue
     "per second": CannonValue
     penetration?: CannonValue
 }
-export interface CannonTraverse {
+export interface CannonTraverse extends ObjectIndexer<CannonElementIndex> {
     up: CannonValue
     down: CannonValue
 }
-export interface CannonDispersion {
+export interface CannonDispersion extends ObjectIndexer<CannonElementIndex> {
     horizontal: CannonValue
     vertical: CannonValue
 }
-export interface CannonGeneric {
+export interface CannonGeneric extends ObjectIndexer<CannonElementIndex> {
     weight: CannonValue
     crew: CannonValue
 }
-export interface CannonPenetration {
+export interface CannonPenetration extends ObjectIndexer<CannonElementIndex> {
     50: CannonValue
     100: CannonValue
     250: CannonValue
     500: CannonValue
     750: CannonValue
     1000: CannonValue
-    [key: string]: CannonValue
 }
 export interface CannonValue {
     value: number
