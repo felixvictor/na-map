@@ -443,3 +443,93 @@ export interface APIRecipeResource {
     DeliveryOrderOptions: DeliveryOrderOptions
     PortPrices: PortPrices
 }
+
+/****************************
+ * Loot
+ */
+
+export interface ShipLootTableItem {
+    __type: string
+    Items?: ItemsEntity[]
+    Name: string
+    Id: number
+    NotUsed: boolean
+    NotTradeable: boolean
+    PreventTeleport: boolean
+    DropChanceReductionPerItem: number
+    MaxStack: number
+    ItemWeight: number
+    BasePrice: number
+    SellPrice: PriceModifier
+    BuyPrice: PriceModifier
+    PriceReductionAmount: number
+    ConsumedScale: number
+    NonConsumedScale: number
+    PriceTierQuantity: number
+    MaxQuantity: number
+    SortingOverrideTemplateType: string
+    SortingGroup: string
+    SellableInShop: boolean
+    CanBeSoldToShop: boolean
+    ResetStockOnServerStart: boolean
+    SellPriceCoefficient: number
+    ItemType: string
+    MongoID: string
+    EventLootTable: boolean
+    Class: number
+    ItemsToGive: MinMax
+    lootProbability?: number[]
+    itemProbability?: number[]
+    quantityProbability?: number[]
+    ShowInContractsSelector: boolean
+    DeliveryOrderOptions: DeliveryOrderOptions
+    PortPrices: PortPrices
+}
+
+export interface TimeBasedConvertibleItem {
+    __type: string
+    Name: string
+    Id: number
+    NotUsed: boolean
+    NotTradeable: boolean
+    PreventTeleport: boolean
+    DropChanceReductionPerItem: number
+    MaxStack: number
+    ItemWeight: number
+    BasePrice: number
+    SellPrice: PriceModifier
+    BuyPrice: PriceModifier
+    PriceReductionAmount: number
+    ConsumedScale: number
+    NonConsumedScale: number
+    PriceTierQuantity: number
+    MaxQuantity: number
+    SortingOverrideTemplateType: string
+    SortingGroup: string
+    SellableInShop: boolean
+    CanBeSoldToShop: boolean
+    ResetStockOnServerStart: boolean
+    SellPriceCoefficient: number
+    ItemType: string
+    MongoID: string
+    GeneralChest: boolean
+    LifetimeSeconds: number
+    ExtendedLootTable?: number[] | null
+    CanBeConverted: string
+    ConvertsTo?: null[] | null
+    ExtraLootTable: number
+    InitialAmount: number
+    ProductionScale: number
+    ConsumptionScale: number
+    SpawnChance: number
+    AutoFillCoefficient: number
+    ProducedByNation: number
+    ConsumedByNation: number
+    ProducedInCapitals: boolean
+    ProducedInTowns: boolean
+    ConsumedInCapitals: boolean
+    ConsumedInTowns: boolean
+    ShowInContractsSelector: boolean
+    DeliveryOrderOptions: DeliveryOrderOptions
+    PortPrices: PortPrices
+}
