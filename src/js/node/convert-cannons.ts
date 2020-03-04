@@ -15,15 +15,7 @@ import convert from "xml-js"
 
 import { readTextFile, round, saveJsonAsync } from "../common"
 import { commonPaths } from "./common-node"
-import {
-    Cannon,
-    CannonElementIndex,
-    CannonEntity,
-    CannonGroupIndex,
-    CannonPenetration,
-    CannonValue,
-    ObjectIndexer
-} from "../gen-json";
+import { Cannon, CannonEntity, CannonGroupIndex, CannonPenetration, CannonValue } from "../gen-json"
 import { PairEntity, TextEntity, ValueEntity, XmlCannon } from "./xml"
 
 // noinspection MagicNumberJS
@@ -149,6 +141,7 @@ const addData = (fileData: XmlCannon): void => {
         if (!cannon[group]) {
             cannon[group] = {} as CannonGroupIndex
         }
+        // @ts-ignore
         cannon[group][element] = {
             value: Number(
                 (fileData.ModuleTemplate.Attributes.Pair.find(pair => pair.Key._text === value)?.Value
@@ -209,21 +202,26 @@ export const convertCannons = async (): Promise<void> => {
     }
 
     // Set maximum digits after decimal point
-    const maxDigits = {}
+    const maxDigits = {} as Cannon
     for (const type of cannonTypes) {
-        maxDigits[type] = {}
+        maxDigits[type] = {} as CannonEntity[]
 
         for (const cannon of cannons[type]) {
             for (const [groupKey, groupValue] of Object.entries(cannon)) {
                 if (typeof groupValue === "object") {
+                    // @ts-ignore
                     if (!maxDigits[type][groupKey]) {
+                        // @ts-ignore
                         maxDigits[type][groupKey] = {}
                     }
 
                     // noinspection JSCheckFunctionSignatures
                     for (const [elementKey, elementValue] of Object.entries(groupValue)) {
+                        // @ts-ignore
                         maxDigits[type][groupKey][elementKey] = Math.max(
+                            // @ts-ignore
                             maxDigits[type][groupKey][elementKey] ?? 0,
+                            // @ts-ignore
                             countDecimals(elementValue.value)
                         )
                     }
@@ -238,6 +236,7 @@ export const convertCannons = async (): Promise<void> => {
                 if (typeof groupValue === "object") {
                     // eslint-disable-next-line max-depth
                     for (const [elementKey] of Object.entries(groupValue)) {
+                        // @ts-ignore
                         cannon[groupKey][elementKey].digits = maxDigits[type][groupKey][elementKey]
                     }
                 }

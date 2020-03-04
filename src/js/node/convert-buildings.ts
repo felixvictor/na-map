@@ -207,7 +207,6 @@ const convertBuildings = async (): Promise<void> => {
 
     // @ts-ignore
     buildings = buildings.filter(building => Object.keys(building).length).sort(sortBy(["id"]))
-    console.log(commonPaths.fileBuilding)
     await saveJsonAsync(commonPaths.fileBuilding, buildings)
 }
 

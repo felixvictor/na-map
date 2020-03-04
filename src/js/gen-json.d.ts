@@ -120,7 +120,7 @@ interface LootLootEntity {
     name: string
     items: LootItemsEntity[]
 }
-interface LootItemsEntity {
+export interface LootItemsEntity {
     id: number
     name: string
     chance: number
