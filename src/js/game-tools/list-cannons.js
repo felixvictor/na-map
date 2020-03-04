@@ -59,7 +59,7 @@ export default class ListCannons {
         }
 
         // Sort data and groups (for table header)
-        const groupOrder = ["name", "damage", "penetration (m)", "dispersion", "traverse", "generic"]
+        const groupOrder = ["name", "damage", "penetration", "dispersion", "traverse", "generic"]
         for (const type of this._cannonTypes) {
             this._cannonData[type] = cannonData[type].map(cannon =>
                 Object.keys(cannon)
