@@ -133,7 +133,6 @@ const convertBuildings = async () => {
     const prices = getPrices(buildings);
     await saveJsonAsync(commonPaths.filePrices, prices);
     buildings = buildings.filter(building => Object.keys(building).length).sort(sortBy(["id"]));
-    console.log(commonPaths.fileBuilding);
     await saveJsonAsync(commonPaths.fileBuilding, buildings);
 };
 export const convertBuildingData = async () => {
