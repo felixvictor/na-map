@@ -13,8 +13,8 @@ import { compressApiData, uncompressApiData } from "./common-node"
 import { convertBuildingData } from "./convert-buildings"
 import { convertCannons } from "./convert-cannons"
 import { convertGenericPortData } from "./convert-generic-port-data"
-/*
 import { convertLootData } from "./convert-loot"
+/*
 import { convertModules } from "./convert-modules"
 import { convertRecipeData } from "./convert-recipes"
 import { convertRepairData } from "./convert-module-repair-data"
@@ -30,8 +30,8 @@ const convertApiData = async (): Promise<void> => {
     convertBuildingData()
     convertCannons()
     convertGenericPortData()
-    /*
     convertLootData()
+    /*
     convertModules()
     convertRecipeData()
     convertRepairData()
@@ -40,8 +40,7 @@ const convertApiData = async (): Promise<void> => {
     if (runType.endsWith("server")) {
         convertOwnershipData()
     }
-
-     */
+    */
 }
 
 uncompressApiData()
