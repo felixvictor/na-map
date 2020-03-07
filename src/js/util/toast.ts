@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * This file is part of na-map.
  *
@@ -24,7 +25,7 @@ export default class Toast {
     // Toast text
     private readonly _text: string
     // Toast instance
-    private _toast: Selection<GElement, OldDatum, HTMLElement, any>
+    private _toast: Selection<HTMLDivElement, unknown, HTMLElement, any>
     // Main div
     private _mainDiv: Selection<BaseType, unknown, HTMLElement, any>
 
@@ -39,17 +40,17 @@ export default class Toast {
 
         this._mainDiv = this._setupDiv()
         this._toast = this._set()
-        $(this._toast.node())
-            .toast({ autohide: false })
-            .toast("show")
-        window.setTimeout(this._remove.bind(this), 1e4)
+        this._showToast()
+
+        const timeout = 1.0e4
+        window.setTimeout(this._remove.bind(this), timeout)
     }
 
     _setupDiv(): Selection<BaseType, unknown, HTMLElement, any> {
         return d3Select("#toast-column")
     }
 
-    _set(): Selection<GElement, OldDatum, HTMLElement, any> {
+    _set(): Selection<HTMLDivElement, unknown, HTMLElement, any> {
         const toast = this._mainDiv
             .append("div")
             .attr("class", "toast")
@@ -82,6 +83,14 @@ export default class Toast {
             .attr("class", "toast-body")
             .html(this._text)
         return toast
+    }
+
+    _showToast(): void {
+        const toastNode = this._toast.node()
+        if (toastNode !== null) {
+            const toast$ = $(toastNode)
+            toast$.toast({ autohide: false }).toast("show")
+        }
     }
 
     _remove(): void {
