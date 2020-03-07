@@ -10,15 +10,9 @@
 
 // https://jvilk.com/MakeTypes/
 
-export interface XmlCannon {
-    ModuleTemplate: ModuleTemplate
-}
-interface ModuleTemplate {
-    _attributes: UnderscoreAttributes
-    Attributes: Attributes
-}
-interface UnderscoreAttributes {
+interface MainUnderscoreAttributes<type> {
     Name: string
+    Type: type | string
 }
 interface Attributes {
     Pair: PairEntity[]
@@ -28,9 +22,17 @@ export interface PairEntity {
     Value: Value
 }
 interface Value {
-    Value: TextEntity | ValueEntity[]
+    _attributes: ValueUnderscoreAttributes
+    Value: TextEntity | TangentEntity[]
 }
-export interface ValueEntity {
+export interface ValueUnderscoreAttributes {
+    "xsi:type": string
+    Action: string
+    IsLocal: string
+    IsPermanent: string
+    IsNegative: string
+}
+export interface TangentEntity {
     Time: TextEntity
     Value: TextEntity
     TangentIn: TextEntity
@@ -38,4 +40,22 @@ export interface ValueEntity {
 }
 export interface TextEntity {
     _text: string
+}
+
+/****************************
+ * Cannons
+ */
+
+export interface XmlCannon {
+    _attributes: MainUnderscoreAttributes<string>
+    Attributes: Attributes
+}
+
+/****************************
+ * Repairs
+ */
+
+export interface XmlRepair {
+    _attributes: MainUnderscoreAttributes<"REPAIR_KIT">
+    Attributes: Attributes
 }
