@@ -16,7 +16,7 @@ export default class ListBuildings {
     }
     async _loadAndSetupData() {
         try {
-            this._buildingData = (await import("../../gen-generic/buildings.json")).default;
+            this._buildingData = (await import("../../dist/gen-generic/buildings.json")).default;
         }
         catch (error) {
             putImportError(error);
@@ -49,7 +49,7 @@ export default class ListBuildings {
     _getOptions() {
         return `${this._buildingData
             .sort(sortBy(["name"]))
-            .map(building => `<option value="${building.name}">${building.name}</option>;`)
+            .map((building) => `<option value="${building.name}">${building.name}</option>;`)
             .join("")}`;
     }
     _setupSelect() {
@@ -62,9 +62,8 @@ export default class ListBuildings {
         select$
             .addClass("selectpicker")
             .on("change", (event) => this._buildingSelected(event))
-            .selectpicker({ noneSelectedText: "Select building" })
-            .val("default")
-            .selectpicker("refresh");
+            .selectpicker({ noneSelectedText: "Select building" });
+        select$.val("default").selectpicker("refresh");
     }
     _initModal() {
         this._injectModal();
@@ -82,22 +81,24 @@ export default class ListBuildings {
     }
     _getProductText(currentBuilding) {
         let text = "";
-        if (Array.isArray(currentBuilding.result)) {
-            text += '<table class="table table-sm"><tbody>';
-            text += `<tr><td>${currentBuilding.result
-                .map((result) => result.name)
-                .join("</td></tr><tr><td>")}</td></tr>`;
-            text += "</tbody></table>";
-        }
-        else {
-            text += `<h5 class="card-title">${currentBuilding.result.name}</h5>`;
-            if (currentBuilding.result.price) {
-                text += '<table class="table table-sm card-table"><tbody>';
-                text += `<tr><td>${getCurrencyAmount(currentBuilding.result.price)} per unit</td></tr>`;
-                if (currentBuilding.batch) {
-                    text += `<tr><td>${currentBuilding.batch.labour} labour hour${currentBuilding.batch.labour > 1 ? "s" : ""} per unit</td></tr>`;
-                }
+        if (currentBuilding.result) {
+            if (currentBuilding.result.length > 1) {
+                text += '<table class="table table-sm"><tbody>';
+                text += `<tr><td>${currentBuilding.result
+                    .map((result) => result.name)
+                    .join("</td></tr><tr><td>")}</td></tr>`;
                 text += "</tbody></table>";
+            }
+            else {
+                text += `<h5 class="card-title">${currentBuilding.result[0].name}</h5>`;
+                if (currentBuilding.result[0].price) {
+                    text += '<table class="table table-sm card-table"><tbody>';
+                    text += `<tr><td>${getCurrencyAmount(currentBuilding.result[0].price)} per unit</td></tr>`;
+                    if (currentBuilding.batch) {
+                        text += `<tr><td>${currentBuilding.batch.labour} labour hour${currentBuilding.batch.labour > 1 ? "s" : ""} per unit</td></tr>`;
+                    }
+                    text += "</tbody></table>";
+                }
             }
         }
         return text;
@@ -144,9 +145,9 @@ export default class ListBuildings {
         return text;
     }
     _buildingSelected(event) {
-        const building = $(event.currentTarget)
+        const building = String($(event.currentTarget)
             .find(":selected")
-            .val();
+            .val());
         d3Select(`#${this._baseId} div`).remove();
         d3Select(`#${this._baseId}`)
             .append("div")
