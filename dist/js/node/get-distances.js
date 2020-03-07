@@ -25,7 +25,7 @@ const portIds = apiPorts.map((port) => Number(port.Id));
 const numPorts = portIds.length;
 const map = new Array(mapWidth * mapHeight)
     .fill(0)
-    .map((e, index) => (png.data[index << 2] > 127 ? spotWater : spotLand));
+    .map((_e, index) => (png.data[index << 2] > 127 ? spotWater : spotLand));
 apiPorts.forEach(({ Id, EntrancePosition: { z: y, x } }) => {
     const [portY, portX] = getCoordinates(y, x);
     const index = getIndex(portY, portX);

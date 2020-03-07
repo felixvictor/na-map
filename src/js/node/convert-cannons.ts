@@ -11,12 +11,12 @@
 import * as fs from "fs"
 import * as path from "path"
 
-import convert from "xml-js"
+import convert, { ElementCompact } from "xml-js"
 
 import { readTextFile, round, saveJsonAsync } from "../common"
 import { commonPaths } from "./common-node"
 import { Cannon, CannonEntity, CannonGroupIndex, CannonPenetration, CannonValue } from "../gen-json"
-import { PairEntity, TextEntity, ValueEntity, XmlCannon } from "./xml"
+import { PairEntity, TangentEntity, TextEntity, XmlCannon } from "./xml"
 
 // noinspection MagicNumberJS
 const peneDistances = [50, 100, 250, 500, 750, 1000]
@@ -38,7 +38,8 @@ const countDecimals = (value: number): number => {
 const getFileData = (baseFileName: string): XmlCannon => {
     const fileName = path.resolve(commonPaths.dirModules, baseFileName)
     const fileXmlData = readTextFile(fileName)
-    return convert.xml2js(fileXmlData, { compact: true }) as XmlCannon
+
+    return (convert.xml2js(fileXmlData, { compact: true }) as ElementCompact).ModuleTemplate as XmlCannon
 }
 
 /**
@@ -115,13 +116,13 @@ for (const type of cannonTypes) {
 const addData = (fileData: XmlCannon): void => {
     let type = "medium"
 
-    if (fileData.ModuleTemplate._attributes.Name.includes("Carronade")) {
+    if (fileData._attributes.Name.includes("Carronade")) {
         type = "carronade"
-    } else if (fileData.ModuleTemplate._attributes.Name.includes("Long")) {
+    } else if (fileData._attributes.Name.includes("Long")) {
         type = "long"
     }
 
-    const name = fileData.ModuleTemplate._attributes.Name.replace("Cannon ", "")
+    const name = fileData._attributes.Name.replace("Cannon ", "")
         .replace("Carronade ", "")
         .replace(" pd", "")
         .replace(" Long", "")
@@ -144,8 +145,7 @@ const addData = (fileData: XmlCannon): void => {
         // @ts-ignore
         cannon[group][element] = {
             value: Number(
-                (fileData.ModuleTemplate.Attributes.Pair.find(pair => pair.Key._text === value)?.Value
-                    .Value as TextEntity)._text ?? 0
+                (fileData.Attributes.Pair.find(pair => pair.Key._text === value)?.Value.Value as TextEntity)._text ?? 0
             ),
             digits: 0
         } as CannonValue
@@ -153,9 +153,8 @@ const addData = (fileData: XmlCannon): void => {
 
     // Calculate penetrations
     const penetrations: Map<number, number> = new Map(
-        (fileData.ModuleTemplate.Attributes.Pair.find(
-            (pair: PairEntity) => pair.Key._text === "CANNON_PENETRATION_DEGRADATION"
-        )?.Value.Value as ValueEntity[])
+        (fileData.Attributes.Pair.find((pair: PairEntity) => pair.Key._text === "CANNON_PENETRATION_DEGRADATION")?.Value
+            .Value as TangentEntity[])
             .filter(penetration => Number(penetration.Time._text) > 0)
             .map(penetration => [Number(penetration.Time._text) * 1000, Number(penetration.Value._text)])
     )

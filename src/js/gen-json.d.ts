@@ -455,3 +455,18 @@ export interface Geometry {
     type: "Point" | "Polygon"
     coordinates: Point[]
 }
+
+/****************************
+ * repairs.json
+ */
+
+export interface Repair extends ObjectIndexer<RepairAmount> {
+    armorRepair: RepairAmount
+    sailRepair: RepairAmount
+    crewRepair: RepairAmount
+}
+export interface RepairAmount {
+    percent: number
+    time: number
+    volume: number
+}
