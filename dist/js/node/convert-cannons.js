@@ -15,7 +15,7 @@ const countDecimals = (value) => {
 const getFileData = (baseFileName) => {
     const fileName = path.resolve(commonPaths.dirModules, baseFileName);
     const fileXmlData = readTextFile(fileName);
-    return convert.xml2js(fileXmlData, { compact: true });
+    return convert.xml2js(fileXmlData, { compact: true }).ModuleTemplate;
 };
 const fileNames = new Set();
 const getBaseFileNames = (directory) => {
@@ -47,13 +47,13 @@ for (const type of cannonTypes) {
 const addData = (fileData) => {
     var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
     let type = "medium";
-    if (fileData.ModuleTemplate._attributes.Name.includes("Carronade")) {
+    if (fileData._attributes.Name.includes("Carronade")) {
         type = "carronade";
     }
-    else if (fileData.ModuleTemplate._attributes.Name.includes("Long")) {
+    else if (fileData._attributes.Name.includes("Long")) {
         type = "long";
     }
-    const name = fileData.ModuleTemplate._attributes.Name.replace("Cannon ", "")
+    const name = fileData._attributes.Name.replace("Cannon ", "")
         .replace("Carronade ", "")
         .replace(" pd", "")
         .replace(" Long", "")
@@ -72,11 +72,11 @@ const addData = (fileData) => {
             cannon[group] = {};
         }
         cannon[group][element] = {
-            value: Number((_b = ((_a = fileData.ModuleTemplate.Attributes.Pair.find(pair => pair.Key._text === value)) === null || _a === void 0 ? void 0 : _a.Value.Value)._text) !== null && _b !== void 0 ? _b : 0),
+            value: Number((_b = ((_a = fileData.Attributes.Pair.find(pair => pair.Key._text === value)) === null || _a === void 0 ? void 0 : _a.Value.Value)._text) !== null && _b !== void 0 ? _b : 0),
             digits: 0
         };
     }
-    const penetrations = new Map(((_c = fileData.ModuleTemplate.Attributes.Pair.find((pair) => pair.Key._text === "CANNON_PENETRATION_DEGRADATION")) === null || _c === void 0 ? void 0 : _c.Value.Value)
+    const penetrations = new Map(((_c = fileData.Attributes.Pair.find((pair) => pair.Key._text === "CANNON_PENETRATION_DEGRADATION")) === null || _c === void 0 ? void 0 : _c.Value.Value)
         .filter(penetration => Number(penetration.Time._text) > 0)
         .map(penetration => [Number(penetration.Time._text) * 1000, Number(penetration.Value._text)]));
     penetrations.set(250, (((_d = penetrations.get(200)) !== null && _d !== void 0 ? _d : 0) + ((_e = penetrations.get(300)) !== null && _e !== void 0 ? _e : 0)) / 2);
