@@ -88,7 +88,7 @@ interface GridMap {
  */
 const map: GridMap = new Array(mapWidth * mapHeight)
     .fill(0)
-    .map((e: number, index: number) => (png.data[index << 2] > 127 ? spotWater : spotLand))
+    .map((_e, index: number) => (png.data[index << 2] > 127 ? spotWater : spotLand))
 
 // Add port id to port entrances
 apiPorts.forEach(({ Id, EntrancePosition: { z: y, x } }: Port) => {

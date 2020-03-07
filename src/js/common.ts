@@ -398,10 +398,7 @@ export const sortId = ({ Id: a }: StringIdedObject, { Id: b }: StringIdedObject)
 /**
  * Sort by a list of properties (in left-to-right order)
  */
-export const sortBy = (properties: string[]) => (
-    a: { [index: string]: string | number },
-    b: { [index: string]: string | number }
-): number => {
+export const sortBy = (properties: string[]) => <T>(a: { [index: string]: T }, b: { [index: string]: T }): number => {
     let r = 0
     properties.some((property: string) => {
         let sign = 1
