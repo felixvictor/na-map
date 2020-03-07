@@ -273,7 +273,7 @@ export default class TrilateratePosition {
 
             const coordX = Math.round(convertInvCoordX(position.x, position.y) / -1000)
             const coordY = Math.round(convertInvCoordY(position.x, position.y) / -1000)
-            copyF11ToClipboard(coordX, coordY)
+            copyF11ToClipboard(coordX, coordY, this._modal$)
 
             // eslint-disable-next-line no-new
             new Toast("Get position", "Coordinates copied to clipboard.")
