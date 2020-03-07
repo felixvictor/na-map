@@ -41,7 +41,7 @@ export default class ListBuildings {
     async _loadAndSetupData(): Promise<void> {
         try {
             this._buildingData = (
-                await import(/* webpackChunkName: "data-buildings" */ "../../gen-generic/buildings.json")
+                await import(/* webpackChunkName: "data-buildings" */ "dist/gen-generic/buildings.json")
             ).default
         } catch (error) {
             putImportError(error)
@@ -80,8 +80,9 @@ export default class ListBuildings {
 
     _getOptions(): string {
         return `${this._buildingData
+            // @ts-ignore
             .sort(sortBy(["name"]))
-            .map(building => `<option value="${building.name}">${building.name}</option>;`)
+            .map((building: Building): string => `<option value="${building.name}">${building.name}</option>;`)
             .join("")}`
     }
 
@@ -98,8 +99,7 @@ export default class ListBuildings {
             .addClass("selectpicker")
             .on("change", (event: Event) => this._buildingSelected(event))
             .selectpicker({ noneSelectedText: "Select building" })
-            .val("default")
-            .selectpicker("refresh")
+        select$.val("default").selectpicker("refresh")
     }
 
     _initModal(): void {
@@ -124,33 +124,35 @@ export default class ListBuildings {
 
     _getProductText(currentBuilding: Building): string {
         let text = ""
-        if (Array.isArray(currentBuilding.result)) {
-            text += '<table class="table table-sm"><tbody>'
+        if (currentBuilding.result) {
+            if (currentBuilding.result.length > 1) {
+                text += '<table class="table table-sm"><tbody>'
 
-            text += `<tr><td>${currentBuilding.result
-                .map((result: BuildingResult) => result.name)
-                .join("</td></tr><tr><td>")}</td></tr>`
-            text += "</tbody></table>"
-        } else {
-            text += `<h5 class="card-title">${currentBuilding.result.name}</h5>`
-
-            if (currentBuilding.result.price) {
-                text += '<table class="table table-sm card-table"><tbody>'
-                text += `<tr><td>${getCurrencyAmount(currentBuilding.result.price)} per unit</td></tr>`
-                if (currentBuilding.batch) {
-                    text += `<tr><td>${currentBuilding.batch.labour} labour hour${
-                        currentBuilding.batch.labour > 1 ? "s" : ""
-                    } per unit</td></tr>`
-                }
-
+                text += `<tr><td>${currentBuilding.result
+                    .map((result: BuildingResult) => result.name)
+                    .join("</td></tr><tr><td>")}</td></tr>`
                 text += "</tbody></table>"
+            } else {
+                text += `<h5 class="card-title">${currentBuilding.result[0].name}</h5>`
+
+                if (currentBuilding.result[0].price) {
+                    text += '<table class="table table-sm card-table"><tbody>'
+                    text += `<tr><td>${getCurrencyAmount(currentBuilding.result[0].price)} per unit</td></tr>`
+                    if (currentBuilding.batch) {
+                        text += `<tr><td>${currentBuilding.batch.labour} labour hour${
+                            currentBuilding.batch.labour > 1 ? "s" : ""
+                        } per unit</td></tr>`
+                    }
+
+                    text += "</tbody></table>"
+                }
             }
         }
 
         return text
     }
 
-    _getRequirementText(currentBuilding: Building) {
+    _getRequirementText(currentBuilding: Building): string {
         let text = ""
 
         text += '<table class="table table-sm card-table"><thead>'
@@ -208,9 +210,11 @@ export default class ListBuildings {
      * Show buildings for selected building type
      */
     _buildingSelected(event: Event): void {
-        const building = $(event.currentTarget)
-            .find(":selected")
-            .val()
+        const building = String(
+            $(event.currentTarget as EventTarget)
+                .find(":selected")
+                .val()
+        )
 
         // Remove old recipe list
         d3Select(`#${this._baseId} div`).remove()

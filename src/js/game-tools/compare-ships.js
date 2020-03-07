@@ -1572,7 +1572,7 @@ export default class CompareShips {
                 }
             }
 
-            copyToClipboard(ShipCompareUrl.href)
+            copyToClipboard(ShipCompareUrl.href, this._modal$)
         }
     }
 
