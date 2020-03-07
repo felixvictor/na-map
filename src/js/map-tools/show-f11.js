@@ -229,7 +229,7 @@ export default class ShowF11 {
         const x = this._getXCoord()
         const z = this._getZCoord()
 
-        copyF11ToClipboard(x, z)
+        copyF11ToClipboard(x, z, this._modal$)
     }
 
     _printF11Coord(x, y, F11X, F11Y) {

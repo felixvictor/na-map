@@ -19,8 +19,8 @@ import { Point } from "./common"
 export interface Building {
     id: number
     name: string
-    result: BuildingResult[] | []
-    batch: BuildingBatch | []
+    result?: BuildingResult[]
+    batch?: BuildingBatch
     levels: BuildingLevelsEntity[]
     byproduct?: []
 }
@@ -43,6 +43,14 @@ export interface BuildingLevelsEntity {
 export interface BuildingMaterialsEntity {
     item: string
     amount: number
+}
+export interface BuildingWithResult {
+    id: number
+    name: string
+    result: BuildingResult[]
+    batch?: BuildingBatch
+    levels: BuildingLevelsEntity[]
+    byproduct?: []
 }
 
 /****************************
