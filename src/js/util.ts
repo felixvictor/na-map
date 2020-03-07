@@ -516,7 +516,7 @@ export const printCompassRose = ({
     // noinspection MagicNumberJS
     const innerRadius = Math.round(radius * 0.8)
     const strokeWidth = 3
-    const data = new Array(steps).fill(null).map((e, i) => degreesToCompass(i * degreesPerStep))
+    const data = new Array(steps).fill(null).map((_e, i) => degreesToCompass(i * degreesPerStep))
     const xScale = d3ScaleBand()
         .range([0 - degreesPerStep / 2, degreesFullCircle - degreesPerStep / 2])
         .domain(data)
@@ -546,12 +546,12 @@ export const printCompassRose = ({
         )
 
     label
-        .filter((d, i) => i % 3 !== 0)
+        .filter((_d, i) => i % 3 !== 0)
         .append("line")
         .attr("x2", 9)
 
     label
-        .filter((d, i) => i % 3 === 0)
+        .filter((_d, i) => i % 3 === 0)
         .append("text")
         .attr("transform", d => {
             let rotate = Math.round((xScale(d) ?? 0) + xScale.bandwidth() / 2)
@@ -598,7 +598,7 @@ export const printSmallCompassRose = ({
     const degreesPerStep = degreesFullCircle / steps
     const innerRadius = Math.round(radius * 0.8)
     const strokeWidth = 1.5
-    const data = new Array(steps).fill(null).map((e, i) => degreesToCompass(i * degreesPerStep))
+    const data = new Array(steps).fill(null).map((_e, i) => degreesToCompass(i * degreesPerStep))
     const xScale = d3ScaleBand()
         .range([0 - degreesPerStep / 2, degreesFullCircle - degreesPerStep / 2])
         .domain(data)
@@ -619,7 +619,7 @@ export const printSmallCompassRose = ({
         .join(enter =>
             enter
                 .append("line")
-                .attr("x2", (d, i) => {
+                .attr("x2", (_d, i) => {
                     if (i % 3 === 0) {
                         return i % 6 === 0 ? x2Card : x2InterCard
                     }
@@ -643,17 +643,20 @@ export const displayClan = (clan: string): string => `<span class="caps">${clan}
 /**
  * Copy to clipboard (fallback solution)
  * @param   text - String
+ * @param modal$ - Modal
  * @returns Success
  */
-const copyToClipboardFallback = (text: string): boolean => {
+const copyToClipboardFallback = (text: string, modal$: JQuery): boolean => {
     // console.log("copyToClipboardFallback");
     if (document.queryCommandSupported && document.queryCommandSupported("copy")) {
         const input = document.createElement("input")
 
         input.type = "text"
         input.value = text
-        input.style = "position: absolute; left: -1000px; top: -1000px"
-        this._modal$.append(input)
+        input.style.position = "absolute"
+        input.style.left = "-1000px"
+        input.style.top = "-1000px"
+        modal$.append(input)
         input.select()
 
         try {
@@ -691,10 +694,11 @@ const writeClipboard = (text: string): Promise<boolean> => {
 /**
  * Copy to clipboard (clipboard API)
  * @param text - String
+ * @param modal$ - Modal
  */
-export const copyToClipboard = (text: string): void => {
+export const copyToClipboard = (text: string, modal$: JQuery): void => {
     if (!navigator.clipboard) {
-        copyToClipboardFallback(text)
+        copyToClipboardFallback(text, modal$)
     }
 
     writeClipboard(text)
@@ -704,15 +708,16 @@ export const copyToClipboard = (text: string): void => {
  * Copy F11 coordinates to clipboard
  * @param x - X Coordinate
  * @param z - Z Coordinate
+ * @param modal$ - Modal
  */
-export const copyF11ToClipboard = (x: number, z: number): void => {
+export const copyF11ToClipboard = (x: number, z: number, modal$: JQuery): void => {
     if (Number.isFinite(x) && Number.isFinite(z)) {
         const F11Url = new URL(window.location.href)
 
         F11Url.searchParams.set("x", String(x))
         F11Url.searchParams.set("z", String(z))
 
-        copyToClipboard(F11Url.href)
+        copyToClipboard(F11Url.href, modal$)
     }
 }
 
