@@ -8,10 +8,9 @@ export default class Toast {
         this._text = text;
         this._mainDiv = this._setupDiv();
         this._toast = this._set();
-        $(this._toast.node())
-            .toast({ autohide: false })
-            .toast("show");
-        window.setTimeout(this._remove.bind(this), 1e4);
+        this._showToast();
+        const timeout = 1.0e4;
+        window.setTimeout(this._remove.bind(this), timeout);
     }
     _setupDiv() {
         return d3Select("#toast-column");
@@ -47,6 +46,13 @@ export default class Toast {
             .attr("class", "toast-body")
             .html(this._text);
         return toast;
+    }
+    _showToast() {
+        const toastNode = this._toast.node();
+        if (toastNode !== null) {
+            const toast$ = $(toastNode);
+            toast$.toast({ autohide: false }).toast("show");
+        }
     }
     _remove() {
         this._toast.remove();

@@ -71,27 +71,22 @@ const getBuildings = () => {
                 case "Shipyard":
                     building.result = [{ name: "Ships", price: 0 }];
                     building.byproduct = [];
-                    building.batch = [];
                     break;
                 case "Academy":
                     building.result = getItemsCraftedByAcademy();
                     building.byproduct = [];
-                    building.batch = [];
                     break;
                 case "Forge":
                     building.result = [{ name: "Cannons", price: 0 }];
                     building.byproduct = [];
-                    building.batch = [];
                     break;
                 case "Workshop":
                     building.result = getItemsCraftedByWorkshop();
                     building.byproduct = [];
-                    building.batch = [];
                     break;
                 case "Seasoning Shed":
                     building.result = getItemsCraftedBySeasoningShed();
                     building.byproduct = [];
-                    building.batch = [];
                     break;
             }
             buildings.set(building.name, building);
@@ -104,13 +99,16 @@ const getAPISeasonedItem = (name) => apiItems.find(item => item.ItemType === "Re
 const getPrices = (buildings) => {
     const prices = { standard: [], seasoned: [] };
     const getStandardPrices = (name) => { var _a; return (_a = prices.standard.find(standardItem => standardItem.name === name.replace(" (S)", ""))) === null || _a === void 0 ? void 0 : _a.real; };
-    prices.standard = buildings
-        .filter((building) => building.result[0].price)
-        .map((building) => ({
-        name: building.result[0].name.replace(" Log", ""),
-        real: building.result[0].price,
-        labour: "labour" in building.batch ? building.batch.labour : 0
-    }))
+    prices.standard = buildings.filter((building) => building.result && building.result[0] && building.result[0].price)
+        .map((building) => {
+        var _a, _b;
+        const result = building.result[0];
+        return {
+            name: result.name.replace(" Log", ""),
+            real: result.price,
+            labour: (_b = (_a = building === null || building === void 0 ? void 0 : building.batch) === null || _a === void 0 ? void 0 : _a.labour) !== null && _b !== void 0 ? _b : 0
+        };
+    })
         .sort((a, b) => a.name.localeCompare(b.name));
     prices.seasoned = getItemsCraftedBySeasoningShed()
         .map((seasonedItem) => {
