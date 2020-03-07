@@ -14,10 +14,10 @@ import { convertBuildingData } from "./convert-buildings"
 import { convertCannons } from "./convert-cannons"
 import { convertGenericPortData } from "./convert-generic-port-data"
 import { convertLootData } from "./convert-loot"
+import { convertRepairData } from "./convert-module-repair-data"
 /*
 import { convertModules } from "./convert-modules"
 import { convertRecipeData } from "./convert-recipes"
-import { convertRepairData } from "./convert-module-repair-data"
 import { convertServerPortData } from "./convert-server-port-data"
 import { convertShipData } from "./convert-ship-data"
 import { convertOwnershipData } from "./convert-ownership"
@@ -31,10 +31,10 @@ const convertApiData = async (): Promise<void> => {
     convertCannons()
     convertGenericPortData()
     convertLootData()
+    convertRepairData()
     /*
     convertModules()
     convertRecipeData()
-    convertRepairData()
     convertServerPortData()
     await convertShipData()
     if (runType.endsWith("server")) {
