@@ -41,8 +41,8 @@ export interface APIItem {
     ItemType: string
     MongoID: string
     ShowInContractsSelector: boolean
-    DeliveryOrderOptions: DeliveryOrderOptions
-    PortPrices: PortPrices
+    DeliveryOrderOptions: DeliveryOrderOptions<boolean, number>
+    PortPrices: PortPrices<boolean, number>
     InitialAmount?: number
     ProductionScale?: number
     ConsumptionScale?: number
@@ -77,7 +77,7 @@ export interface APIItem {
     Weight?: number
     Template?: string
     Items?: ItemsEntity[]
-    ItemsToGive?: MinMax
+    ItemsToGive?: MinMax<number>
     lootProbability?: number[]
     itemProbability?: number[]
     quantityProbability?: number[]
@@ -197,50 +197,50 @@ export interface APIItem {
     Hidden1?: number[]
     Hidden2?: number[]
     PortBonuses?: PortBonusesEntity[]
-    ShipPermanentSlotsCount?: MinMax
-    ShipPersistentModuleSlotsCount?: MinMax
-    PortBonusesCount?: MinMax
+    ShipPermanentSlotsCount?: MinMax<number>
+    ShipPersistentModuleSlotsCount?: MinMax<number>
+    PortBonusesCount?: MinMax<number>
 }
 interface PriceModifier {
     x: number
     y: number
 }
-interface DeliveryOrderOptions {
-    Valid: boolean
-    StockSizeCraftExperience: number
-    StockSize: number
+interface DeliveryOrderOptions<valid, amount> {
+    Valid: valid
+    StockSizeCraftExperience: amount
+    StockSize: amount
 }
-interface PortPrices {
-    Valid: boolean
-    Produced: SellAndBuyPrices
-    Consumed: SellAndBuyPrices
-    Regular: SellAndBuyPrices
-    FullStackAmount: number
-    FullStack: SellAndBuyPrices
-    RandomPct: number
-    RangePct: number
+interface PortPrices<valid, price> {
+    Valid: valid
+    Produced: SellAndBuyPrices<price>
+    Consumed: SellAndBuyPrices<price>
+    Regular: SellAndBuyPrices<price>
+    FullStackAmount: price
+    FullStack: SellAndBuyPrices<price>
+    RandomPct: price
+    RangePct: price
 }
-interface SellAndBuyPrices {
-    SellPrice: MinMax
-    BuyPrice: MinMax
+interface SellAndBuyPrices<price> {
+    SellPrice: MinMax<price>
+    BuyPrice: MinMax<price>
 }
 interface ModifiersEntity {
     Slot: string
-    MappingIds?: string[]
+    MappingIds: string[]
     Absolute: number
     Percentage: number
 }
 interface ItemsEntity {
     Template?: number
     Chance?: number
-    Stack?: MinMax
+    Stack?: MinMax<number>
     StackIsPercOfAmount?: boolean
     Unique?: boolean
     ItemTypes?: number[]
 }
-interface MinMax {
-    Min: number
-    Max: number
+interface MinMax<amount> {
+    Min: amount
+    Max: amount
 }
 interface BuildingRequirementsEntity {
     BuildingTemplate: number
@@ -303,9 +303,9 @@ interface HealthInfo {
     Deck4: number
 }
 interface Limit {
-    Limitation1: MinMax
-    Limitation2: MinMax
-    Limitation3: MinMax
+    Limitation1: MinMax<number>
+    Limitation2: MinMax<number>
+    Limitation3: MinMax<number>
 }
 interface Unlocks {
     UpgradeSlot?: null[]
@@ -323,7 +323,7 @@ interface PortRequirementsEntity {
 interface ItemsEntityOrConvertsToEntity {
     Template: number
     Chance: number
-    Stack: MinMax
+    Stack: MinMax<number>
     StackIsPercOfAmount: boolean
     Unique: boolean
 }
@@ -394,8 +394,8 @@ export interface APIBuilding {
     CanBeUsedInPort: boolean
     CanBeUsedInOpenWorld: boolean
     ShowInContractsSelector: boolean
-    DeliveryOrderOptions: DeliveryOrderOptions
-    PortPrices: PortPrices
+    DeliveryOrderOptions: DeliveryOrderOptions<false, 0>
+    PortPrices: PortPrices<false, 0>
 }
 
 export interface APIRecipeResource {
@@ -422,7 +422,7 @@ export interface APIRecipeResource {
     CanBeSoldToShop: boolean
     ResetStockOnServerStart: boolean
     SellPriceCoefficient: number
-    ItemType: string
+    ItemType: "Recipe"
     MongoID: string
     LaborPrice: number
     BuildingRequirements: BuildingRequirementsEntity[]
@@ -440,8 +440,8 @@ export interface APIRecipeResource {
     CanBeUsedInPort: boolean
     CanBeUsedInOpenWorld: boolean
     ShowInContractsSelector: boolean
-    DeliveryOrderOptions: DeliveryOrderOptions
-    PortPrices: PortPrices
+    DeliveryOrderOptions: DeliveryOrderOptions<false, 0>
+    PortPrices: PortPrices<false, 0>
 }
 
 /****************************
@@ -473,17 +473,17 @@ export interface ShipLootTableItem {
     CanBeSoldToShop: boolean
     ResetStockOnServerStart: boolean
     SellPriceCoefficient: number
-    ItemType: string
+    ItemType: "ShipLootTableItem"
     MongoID: string
     EventLootTable: boolean
     Class: number
-    ItemsToGive: MinMax
+    ItemsToGive: MinMax<number>
     lootProbability?: number[]
     itemProbability?: number[]
     quantityProbability?: number[]
     ShowInContractsSelector: boolean
-    DeliveryOrderOptions: DeliveryOrderOptions
-    PortPrices: PortPrices
+    DeliveryOrderOptions: DeliveryOrderOptions<false, 0>
+    PortPrices: PortPrices<false, 0>
 }
 
 export interface TimeBasedConvertibleItem {
@@ -510,7 +510,7 @@ export interface TimeBasedConvertibleItem {
     CanBeSoldToShop: boolean
     ResetStockOnServerStart: boolean
     SellPriceCoefficient: number
-    ItemType: string
+    ItemType: "TimeBasedConvertibleItem"
     MongoID: string
     GeneralChest: boolean
     LifetimeSeconds: number
@@ -530,6 +530,57 @@ export interface TimeBasedConvertibleItem {
     ConsumedInCapitals: boolean
     ConsumedInTowns: boolean
     ShowInContractsSelector: boolean
-    DeliveryOrderOptions: DeliveryOrderOptions
-    PortPrices: PortPrices
+    DeliveryOrderOptions: DeliveryOrderOptions<false, 0>
+    PortPrices: PortPrices<false, 0>
+}
+
+/****************************
+ * Module
+ */
+
+export interface APIModule {
+    __type: "MegaChaka.Services.Items.ModuleTemplate, MegaChaka"
+    Modifiers?: ModifiersEntity[]
+    scoreValue: number
+    UsageType: string
+    MaxItems: 1
+    Name: string
+    Id: number
+    NotUsed: boolean
+    NotTradeable: false
+    PreventTeleport: boolean
+    DropChanceReductionPerItem: 0
+    MaxStack: 1
+    ItemWeight: 0
+    BasePrice: number
+    SellPrice: PriceModifier
+    BuyPrice: PriceModifier
+    PriceReductionAmount: -1
+    ConsumedScale: 1.5
+    NonConsumedScale: 1
+    PriceTierQuantity: 2
+    MaxQuantity: 20
+    SortingOverrideTemplateType: ""
+    SortingGroup: string
+    SellableInShop: false
+    CanBeSoldToShop: true
+    ResetStockOnServerStart: false
+    SellPriceCoefficient: 0.5
+    ItemType: "Module"
+    MongoID: string
+    MinResourcesAmount: number
+    MaxResourcesAmount: number
+    BreakUpItemsAmount: number
+    CanBeBreakedUp: string
+    bCanBeBreakedUp: false
+    PermanentType: string
+    BookType: "Default"
+    ModuleType: string
+    ModuleLevel: string
+    Limitation1_Value: 0
+    Limitation2_Value: 0
+    Limitation3_Value: 0
+    ShowInContractsSelector: false
+    DeliveryOrderOptions: DeliveryOrderOptions<false, 0>
+    PortPrices: PortPrices<false, 0>
 }
