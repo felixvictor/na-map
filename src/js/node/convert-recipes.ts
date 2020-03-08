@@ -9,19 +9,12 @@
  */
 
 import * as path from "path"
-import {
-    baseAPIFilename,
-    cleanName,
-    commonPaths,
-    readJson,
-    saveJsonAsync,
-    serverNames,
-    serverStartDate as serverDate,
-    simpleSort,
-    sortBy
-} from "./common.mjs"
+import { cleanName, readJson, saveJsonAsync, serverNames, simpleSort, sortBy } from "../common"
+import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "./common-node"
+import { APIItem, APIRecipeModuleResource, APIRecipeResource, APIShipUpgradeBookItem } from "./api-item"
+import { Recipe, RecipeEntity } from "../gen-json"
 
-let apiItems = []
+let apiItems: APIItem[]
 
 // noinspection SpellCheckingInspection
 const groups = new Map([
@@ -37,8 +30,8 @@ const groups = new Map([
     ["WoodWorking", "Cannons"]
 ])
 
-const convertRecipes = async () => {
-    const data = {}
+const convertRecipes = async (): Promise<void> => {
+    const data = {} as Recipe
     const ingredients = new Map()
 
     data.recipe = []
@@ -47,21 +40,21 @@ const convertRecipes = async () => {
     /**
      * Get item names
      */
-    const getItemNames = () =>
+    const getItemNames = (): Map<number, string> =>
         new Map(apiItems.filter(item => !item.NotUsed).map(item => [item.Id, cleanName(item.Name)]))
 
     const itemNames = getItemNames()
 
-    const getModuleNames = () =>
+    const getModuleNames = (): Map<number, string> =>
         new Map(
-            apiItems
-                .filter(item => item.ItemType === "ShipUpgradeBookItem")
-                .map(item => [item.Id, itemNames.get(item.Upgrade)])
+            ((apiItems.filter(
+                item => item.ItemType === "ShipUpgradeBookItem"
+            ) as unknown) as APIShipUpgradeBookItem[]).map(item => [item.Id, itemNames.get(item.Upgrade) ?? ""])
         )
 
     const moduleNames = getModuleNames()
 
-    const getIngredients = () =>
+    const getIngredients = (): Map<number, number> =>
         new Map(
             apiItems
                 .filter(
@@ -74,19 +67,18 @@ const convertRecipes = async () => {
 
     const ingredientIds = getIngredients()
 
-    const getUpgradeIds = () =>
-        new Map(apiItems.filter(item => !item.NotUsed && item.Upgrade).map(item => [item.Id, item.Upgrade]))
+    const getUpgradeIds = (): Map<number, number> =>
+        new Map(apiItems.filter(item => !item.NotUsed && item.Upgrade).map(item => [item.Id, item.Upgrade ?? 0]))
 
     const upgradeIds = getUpgradeIds()
-
-    apiItems
-        .filter(
-            apiRecipe =>
-                (apiRecipe.ItemType === "Recipe" || apiRecipe.ItemType === "RecipeModule") && !apiRecipe.NotUsed
-        )
-        .forEach(apiRecipe => {
+    ;(apiItems.filter(
+        apiRecipe => (apiRecipe.ItemType === "Recipe" || apiRecipe.ItemType === "RecipeModule") && !apiRecipe.NotUsed
+    ) as APIRecipeResource[] | APIRecipeModuleResource[]).forEach(
+        (apiRecipe: APIRecipeResource | APIRecipeModuleResource) => {
             const resultReference =
-                apiRecipe.ItemType === "Recipe" ? apiRecipe.Results[0] : apiRecipe.Qualities[0].Results[0]
+                apiRecipe.ItemType === "Recipe"
+                    ? apiRecipe.Results[0]
+                    : (apiRecipe as APIRecipeModuleResource).Qualities[0].Results[0]
             const recipe = {
                 id: apiRecipe.Id,
                 name: cleanName(apiRecipe.Name)
@@ -111,7 +103,7 @@ const convertRecipes = async () => {
                 },
                 craftGroup: groups.has(apiRecipe.CraftGroup) ? groups.get(apiRecipe.CraftGroup) : apiRecipe.CraftGroup,
                 serverType: apiRecipe.ServerType
-            }
+            } as RecipeEntity
             // if result exists
             if (recipe.result.name) {
                 data.recipe.push(recipe)
@@ -135,8 +127,10 @@ const convertRecipes = async () => {
                     }
                 }
             )
-        })
+        }
+    )
 
+    // @ts-ignore
     data.recipe.sort(sortBy(["craftGroup", "id"]))
 
     const result = [...ingredients.values()]
@@ -145,8 +139,11 @@ const convertRecipes = async () => {
     await saveJsonAsync(commonPaths.fileRecipe, data)
 }
 
-export const convertRecipeData = () => {
-    apiItems = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`))
+export const convertRecipeData = (): void => {
+    apiItems = (readJson(
+        path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`)
+    ) as unknown) as APIItem[]
 
+    // noinspection JSIgnoredPromiseFromCall
     convertRecipes()
 }

@@ -282,6 +282,7 @@ export interface Recipe {
 interface RecipeEntity {
     id: number
     name: string
+    module: string
     labourPrice: number
     goldPrice: number
     itemRequirements: RecipeItemRequirement[]
