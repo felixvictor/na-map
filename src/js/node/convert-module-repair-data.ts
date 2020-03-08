@@ -40,7 +40,6 @@ const getFileData = (baseFileName: string, ext: string): XmlRepair => {
 
 /**
  * Retrieve additional ship data from game files and add it to existing data from API
- * @returns {void}
  */
 export const convertRepairData = async (): Promise<void> => {
     const repairs = {} as Repair
