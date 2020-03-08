@@ -1,28 +1,10 @@
-/**
- * This file is part of na-map.
- *
- * @file      Convert modules.
- * @module    src/node/convert-modules
- * @author    iB aka Felix Victor
- * @copyright 2017, 2018, 2019, 2020
- * @license   http://www.gnu.org/licenses/gpl.html
- */
-
-import * as path from "path"
-import { capitalizeFirstLetter, cleanName, groupToMap, readJson, saveJsonAsync, serverNames, sortBy } from "../common"
-import { commonPaths, baseAPIFilename, serverStartDate as serverDate } from "./common-node"
-import { APIItem, APIModule, ModifiersEntity } from "./api-item"
-import { ModuleEntity, ModulePropertiesEntity, Wood, WoodTrimOrFrame } from "../gen-json"
-
-let apiItems: APIItem[]
-
-/**
- * Convert API module data
- */
-export const convertModulesAndWoodData = async (): Promise<void> => {
-    const modules = new Map()
-
-    const woods = {} as Wood
+import * as path from "path";
+import { capitalizeFirstLetter, cleanName, groupToMap, readJson, saveJsonAsync, serverNames, sortBy } from "../common";
+import { commonPaths, baseAPIFilename, serverStartDate as serverDate } from "./common-node";
+let apiItems;
+export const convertModulesAndWoodData = async () => {
+    const modules = new Map();
+    const woods = {};
     const moduleRate = [
         {
             level: "L",
@@ -36,23 +18,17 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
             level: "S",
             names: [" (6-7 rates)", " 6-7th"]
         }
-    ]
-
-    const bonusRegex = /(.+\sBonus)\s(\d)/u
-
-    woods.trim = []
-    woods.frame = []
-
+    ];
+    const bonusRegex = /(.+\sBonus)\s(\d)/u;
+    woods.trim = [];
+    woods.frame = [];
     const levels = new Map([
         ["Universal", "U"],
         ["Regular", "R"],
         ["LightShips", "S"],
         ["Medium", "M"],
         ["LineShips", "L"]
-    ])
-
-    // Woods
-    // noinspection SpellCheckingInspection
+    ]);
     const modifiers = new Map([
         ["ARMOR_ALL_SIDES ARMOR_THICKNESS", "Armor thickness"],
         ["ARMOR_ALL_SIDES MODULE_BASE_HP", "Armour hit points"],
@@ -69,8 +45,6 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         ["STRUCTURE FIRE_INCREASE_RATE", "Fire resistance"],
         ["STRUCTURE SHIP_PHYSICS_ACC_COEF", "Acceleration"],
         ["STRUCTURE SHIP_STRUCTURE_LEAKS_PER_SECOND", "Leak resistance"],
-
-        // Modules
         ["ARMOR_ALL_SIDES REPAIR_MODULE_TIME", "Side armour repair time"],
         ["ARMOR_BACK ARMOR_THICKNESS", "Back armour thickness"],
         ["ARMOR_FRONT ARMOR_THICKNESS", "Front armour thickness"],
@@ -158,7 +132,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         ["NONE PERK_SAIL_DAMAGE_MODIFIER", "Sail damage"],
         ["NONE PERK_SAIL_REPAIR_PERCENT_MODIFIER", "Sail repair amount (perk)"],
         ["NONE PERK_SHIP_EXTRA_CHAIN_UNITS", "Additional chains"],
-        ["NONE PERK_SHIP_EXTRA_DOBULE_CHARGE_UNITS", "Additional double charges"], // typo
+        ["NONE PERK_SHIP_EXTRA_DOBULE_CHARGE_UNITS", "Additional double charges"],
         ["NONE PERK_SHIP_EXTRA_DOUBLE_CHARGE_UNITS", "Additional double charges"],
         ["NONE PERK_SHIP_EXTRA_DOUBLE_SHOT_UNITS", "Additional double shots"],
         ["NONE PERK_SHIP_MASTER_CLASS_TYPE", "Ship master class type"],
@@ -172,7 +146,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         ["NONE SAIL_RISING_SPEED", "Sail rising speed"],
         ["NONE SHIP_BOARDING_PREPARATION_BONUS", "Boarding preparation bonus"],
         ["NONE SHIP_EXTRA_CHAIN_UNITS", "Additional chains"],
-        ["NONE SHIP_EXTRA_DOBULE_CHARGE_UNITS", "Additional double charges"], // typo
+        ["NONE SHIP_EXTRA_DOBULE_CHARGE_UNITS", "Additional double charges"],
         ["NONE SHIP_EXTRA_DOUBLE_CHARGE_UNITS", "Additional double charges"],
         ["NONE SHIP_EXTRA_DOUBLE_SHOT_UNITS", "Additional double shots"],
         ["NONE SHIP_MAX_ROLL_ANGLE", "Heel"],
@@ -194,182 +168,140 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         ["STRUCTURE SHIP_CANNON_DESTROY_PROBABILITY", "Cannon destroy probability"],
         ["WATER_PUMP MODULE_BASE_HP", "Water pump hitpoints"],
         ["WATER_PUMP REPAIR_MODULE_TIME", "Water pump repair time"]
-    ])
-
-    /**
-     * Set wood properties
-     * @param module - Module data
-     */
-    const setWood = (module: ModuleEntity): void => {
-        const wood = {} as WoodTrimOrFrame
-        wood.id = module.id
-        wood.properties = []
+    ]);
+    const setWood = (module) => {
+        const wood = {};
+        wood.id = module.id;
+        wood.properties = [];
         for (const modifier of module.APImodifiers) {
-            // Add modifier if in modifier map
             if (modifiers.has(`${modifier.Slot} ${modifier.MappingIds}`)) {
-                const modifierName = modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`)
-                let amount = modifier.Percentage
-                let isPercentage = true
-
+                const modifierName = modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`);
+                let amount = modifier.Percentage;
+                let isPercentage = true;
                 if (modifier.Absolute) {
-                    amount = modifier.Absolute
-                    isPercentage = false
+                    amount = modifier.Absolute;
+                    isPercentage = false;
                 }
-
-                // Some modifiers are wrongly indicated as a percentage
                 if (modifierName === "Boarding morale") {
-                    isPercentage = false
+                    isPercentage = false;
                 }
-
-                if (
-                    modifierName === "Fire resistance" ||
+                if (modifierName === "Fire resistance" ||
                     modifierName === "Leak resistance" ||
-                    modifierName === "Rudder speed"
-                ) {
-                    amount *= -1
+                    modifierName === "Rudder speed") {
+                    amount *= -1;
                 }
-
                 if (modifierName === "Splinter resistance") {
-                    amount *= 100
-                    isPercentage = true
+                    amount *= 100;
+                    isPercentage = true;
                 }
-
                 wood.properties.push({
-                    modifier: modifierName ?? "",
+                    modifier: modifierName !== null && modifierName !== void 0 ? modifierName : "",
                     amount,
                     isPercentage
-                })
+                });
             }
         }
         if (module.name.endsWith(" Planking") || module.name === "Crew Space") {
-            wood.type = "Trim"
-            wood.name = module.name.replace(" Planking", "")
-            woods.trim.push(wood)
-        } else {
-            wood.type = "Frame"
-            wood.name = module.name.replace(" Frame", "")
-            woods.frame.push(wood)
+            wood.type = "Trim";
+            wood.name = module.name.replace(" Planking", "");
+            woods.trim.push(wood);
         }
-
-        // Sort by modifier
+        else {
+            wood.type = "Frame";
+            wood.name = module.name.replace(" Frame", "");
+            woods.frame.push(wood);
+        }
         for (const type of ["frame", "trim"]) {
             for (const APIwood of woods[type]) {
-                // @ts-ignore
-                APIwood.properties.sort(sortBy(["modifier", "id"]))
+                APIwood.properties.sort(sortBy(["modifier", "id"]));
             }
         }
-    }
-
-    /**
-     * Get module modifier properties
-     * @param APImodifiers - Module modifier data
-     * @returns Module modifier properties
-     */
-    const getModuleProperties = (APImodifiers: ModifiersEntity[]): ModulePropertiesEntity[] => {
+    };
+    const getModuleProperties = (APImodifiers) => {
         return APImodifiers.map(modifier => {
+            var _a;
             if (!modifiers.has(`${modifier.Slot} ${modifier.MappingIds}`)) {
-                console.log(`${modifier.Slot} ${modifier.MappingIds} modifier undefined`)
+                console.log(`${modifier.Slot} ${modifier.MappingIds} modifier undefined`);
             }
-
-            const modifierName = modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`) ?? ""
-            let amount = modifier.Percentage
-            let isPercentage = true
-
+            const modifierName = (_a = modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`)) !== null && _a !== void 0 ? _a : "";
+            let amount = modifier.Percentage;
+            let isPercentage = true;
             if (modifier.Absolute) {
-                if (
-                    Math.abs(modifier.Absolute) >= 1 ||
+                if (Math.abs(modifier.Absolute) >= 1 ||
                     modifier.MappingIds[0].endsWith("PERCENT_MODIFIER") ||
-                    modifier.MappingIds[0] === "REPAIR_PERCENT"
-                ) {
-                    amount = modifier.Absolute
-                    isPercentage = false
-                } else {
-                    amount = Math.round(modifier.Absolute * 10000) / 100
+                    modifier.MappingIds[0] === "REPAIR_PERCENT") {
+                    amount = modifier.Absolute;
+                    isPercentage = false;
+                }
+                else {
+                    amount = Math.round(modifier.Absolute * 10000) / 100;
                 }
             }
-
-            if (
-                modifierName === "Fire resistance" ||
+            if (modifierName === "Fire resistance" ||
                 modifierName === "Leak resistance" ||
-                modifierName === "Rudder speed"
-            ) {
-                amount *= -1
-            } else if (modifierName === "Splinter resistance") {
-                amount = Math.round(modifier.Absolute * 10000) / 100
-                isPercentage = true
+                modifierName === "Rudder speed") {
+                amount *= -1;
             }
-
+            else if (modifierName === "Splinter resistance") {
+                amount = Math.round(modifier.Absolute * 10000) / 100;
+                isPercentage = true;
+            }
             return {
                 modifier: modifierName,
                 amount,
                 isPercentage
-            }
-        })
-    }
-
-    /**
-     * Get module type
-     * @param module - Module data
-     * @returns Module type
-     */
-    const getModuleType = (module: ModuleEntity): string => {
-        let type = ""
-        let { permanentType, sortingGroup } = module
-
-        // noinspection IfStatementWithTooManyBranchesJS,OverlyComplexBooleanExpressionJS
-        if (
-            module.usageType === "All" &&
+            };
+        });
+    };
+    const getModuleType = (module) => {
+        var _a;
+        let type = "";
+        let { permanentType, sortingGroup } = module;
+        if (module.usageType === "All" &&
             sortingGroup &&
             module.moduleLevel === "U" &&
-            module.moduleType === "Hidden"
-        ) {
-            type = "Ship trim"
-        } else if (module.moduleType === "Permanent" && !module.name.endsWith(" Bonus")) {
-            type = "Permanent"
-        } else if (
-            module.usageType === "All" &&
+            module.moduleType === "Hidden") {
+            type = "Ship trim";
+        }
+        else if (module.moduleType === "Permanent" && !module.name.endsWith(" Bonus")) {
+            type = "Permanent";
+        }
+        else if (module.usageType === "All" &&
             !sortingGroup &&
             module.moduleLevel === "U" &&
-            module.moduleType === "Hidden"
-        ) {
-            type = "Perk"
-        } else if (module.moduleType === "Regular") {
-            type = "Ship knowledge"
-        } else {
-            type = "Not used"
+            module.moduleType === "Hidden") {
+            type = "Perk";
         }
-
-        // Correct sorting group
+        else if (module.moduleType === "Regular") {
+            type = "Ship knowledge";
+        }
+        else {
+            type = "Not used";
+        }
         if (module.name.endsWith("French Rig Refit") || module.name === "Bridgetown Frame Refit") {
-            sortingGroup = "survival"
+            sortingGroup = "survival";
         }
-
         if (type === "Ship trim") {
-            const result = bonusRegex.exec(module.name)
-            sortingGroup = result ? `\u202F\u2013\u202F${result[1]}` : ""
-        } else {
+            const result = bonusRegex.exec(module.name);
+            sortingGroup = result ? `\u202F\u2013\u202F${result[1]}` : "";
+        }
+        else {
             sortingGroup = sortingGroup
-                ? `\u202F\u2013\u202f${capitalizeFirstLetter(module.sortingGroup ?? "").replace("_", "/")}`
-                : ""
+                ? `\u202F\u2013\u202f${capitalizeFirstLetter((_a = module.sortingGroup) !== null && _a !== void 0 ? _a : "").replace("_", "/")}`
+                : "";
         }
-
         if (permanentType === "Default") {
-            permanentType = ""
-        } else {
-            permanentType = `\u202F\u25CB\u202F${permanentType}`
+            permanentType = "";
         }
-
-        return `${type}${sortingGroup}${permanentType}`
-    }
-
-    // noinspection OverlyComplexBooleanExpressionJS
-    const apiModules = apiItems.filter(
-        item =>
-            item.ItemType === "Module" &&
-            ((item.ModuleType === "Permanent" && !item.NotUsed) || item.ModuleType !== "Permanent")
-    ) as APIModule[]
+        else {
+            permanentType = `\u202F\u25CB\u202F${permanentType}`;
+        }
+        return `${type}${sortingGroup}${permanentType}`;
+    };
+    const apiModules = apiItems.filter(item => item.ItemType === "Module" &&
+        ((item.ModuleType === "Permanent" && !item.NotUsed) || item.ModuleType !== "Permanent"));
     apiModules.forEach(apiModule => {
-        let dontSave = false
+        let dontSave = false;
         const module = {
             id: apiModule.Id,
             name: cleanName(apiModule.Name),
@@ -377,52 +309,35 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
             APImodifiers: apiModule.Modifiers,
             sortingGroup: apiModule.SortingGroup.replace("module:", ""),
             permanentType: apiModule.PermanentType.replace(/_/g, " "),
-            // isStackable: !!apiModule.bCanBeSetWithSameType,
-            // minResourcesAmount: APImodule.MinResourcesAmount,
-            // maxResourcesAmount: APImodule.MaxResourcesAmount,
-            // breakUpItemsAmount: APImodule.BreakUpItemsAmount,
-            // canBeBreakedUp: APImodule.CanBeBreakedUp,
-            // bCanBeBreakedUp: APImodule.bCanBeBreakedUp,
             moduleType: apiModule.ModuleType,
             moduleLevel: levels.get(apiModule.ModuleLevel)
-        } as ModuleEntity
-
+        };
         if (module.name.startsWith("Bow figure - ")) {
-            module.name = `${module.name.replace("Bow figure - ", "")} bow figure`
-            module.moduleLevel = "U"
+            module.name = `${module.name.replace("Bow figure - ", "")} bow figure`;
+            module.moduleLevel = "U";
         }
-
-        // Ignore double entries
         if (!modules.has(module.name + module.moduleLevel)) {
-            // Check for wood module
-            // noinspection OverlyComplexBooleanExpressionJS
-            if (
-                (module.name.endsWith(" Planking") && module.moduleType === "Hidden") ||
+            if ((module.name.endsWith(" Planking") && module.moduleType === "Hidden") ||
                 (module.name.endsWith(" Frame") && module.moduleType === "Hidden") ||
-                module.name === "Crew Space"
-            ) {
-                setWood(module)
-                // noinspection ReuseOfLocalVariableJS
-                dontSave = true
-            } else {
-                module.properties = getModuleProperties(module.APImodifiers)
-                delete module.APImodifiers
-
-                module.type = getModuleType(module)
-
-                delete module.moduleType
-                delete module.sortingGroup
-                delete module.permanentType
-
+                module.name === "Crew Space") {
+                setWood(module);
+                dontSave = true;
+            }
+            else {
+                module.properties = getModuleProperties(module.APImodifiers);
+                delete module.APImodifiers;
+                module.type = getModuleType(module);
+                delete module.moduleType;
+                delete module.sortingGroup;
+                delete module.permanentType;
                 for (const rate of moduleRate) {
                     for (const name of rate.names) {
                         if (module.name.endsWith(name)) {
-                            module.name = module.name.replace(name, "")
-                            module.moduleLevel = rate.level
+                            module.name = module.name.replace(name, "");
+                            module.moduleLevel = rate.level;
                         }
                     }
                 }
-
                 const rateExceptions = [
                     "Apprentice Carpenters",
                     "Journeyman Carpenters",
@@ -431,12 +346,10 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
                     "Northern Master Carpenters",
                     "Navy Mast Bands",
                     "Navy Orlop Refit"
-                ]
+                ];
                 if (rateExceptions.includes(module.name)) {
-                    module.moduleLevel = "U"
+                    module.moduleLevel = "U";
                 }
-
-                // noinspection SpellCheckingInspection
                 const nameExceptions = [
                     "Cannon nation module - France",
                     "Coward",
@@ -451,39 +364,27 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
                     "Signaling",
                     "TEST MODULE SPEED IN OW",
                     "Thrifty"
-                ]
-                // noinspection OverlyComplexBooleanExpressionJS
-                if (
-                    nameExceptions.includes(module.name) ||
+                ];
+                if (nameExceptions.includes(module.name) ||
                     (module.name === "Optimized Rudder" && module.moduleLevel !== "U") ||
                     module.name.endsWith(" - OLD") ||
                     module.name.endsWith("TEST") ||
-                    module.type.startsWith("Not used")
-                ) {
-                    // noinspection ReuseOfLocalVariableJS
-                    dontSave = true
-                } else {
-                    // console.log(module.id, module.name);
+                    module.type.startsWith("Not used")) {
+                    dontSave = true;
+                }
+                else {
                 }
             }
-
-            modules.set(module.name + module.moduleLevel, dontSave ? {} : module)
+            modules.set(module.name + module.moduleLevel, dontSave ? {} : module);
         }
-    })
-
-    let result = [...modules.values()]
-    result = result.filter(module => Object.keys(module).length).sort(sortBy(["type", "id"]))
-    const modulesGrouped = [...groupToMap(result, (module: ModuleEntity): string => module.type)]
-
-    await saveJsonAsync(commonPaths.fileModules, modulesGrouped)
-    await saveJsonAsync(commonPaths.fileWood, woods)
-}
-
-export const convertModules = (): void => {
-    apiItems = (readJson(
-        path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`)
-    ) as unknown) as APIItem[]
-
-    // noinspection JSIgnoredPromiseFromCall
-    convertModulesAndWoodData()
-}
+    });
+    let result = [...modules.values()];
+    result = result.filter(module => Object.keys(module).length).sort(sortBy(["type", "id"]));
+    const modulesGrouped = [...groupToMap(result, (module) => module.type)];
+    await saveJsonAsync(commonPaths.fileModules, modulesGrouped);
+    await saveJsonAsync(commonPaths.fileWood, woods);
+};
+export const convertModules = () => {
+    apiItems = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`));
+    convertModulesAndWoodData();
+};
