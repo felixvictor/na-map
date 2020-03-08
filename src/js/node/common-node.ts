@@ -33,9 +33,9 @@ const dirBuild = path.resolve(__dirname, "..", "..", "..", "build")
 const dirAPI = path.resolve(dirBuild, "API")
 const dirModules = path.resolve(dirBuild, "Modules")
 const dirSrc = path.resolve(__dirname, "..", "src")
-const dirDist = path.resolve(__dirname, "..", "..")
-const dirGenServer = path.resolve(dirDist, "gen-server")
-const dirGenGeneric = path.resolve(dirDist, "gen-generic")
+const dirLib = path.resolve(__dirname, "..", "..", "..", "lib")
+const dirGenServer = path.resolve(dirLib, "gen-server")
+const dirGenGeneric = path.resolve(dirLib, "gen-generic")
 
 /**
  * Build common paths and file names
