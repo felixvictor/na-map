@@ -15,12 +15,12 @@ import { convertCannons } from "./convert-cannons"
 import { convertGenericPortData } from "./convert-generic-port-data"
 import { convertLootData } from "./convert-loot"
 import { convertModules } from "./convert-modules"
-import { convertRepairData } from "./convert-module-repair-data"
-/*
 import { convertRecipeData } from "./convert-recipes"
+import { convertRepairData } from "./convert-module-repair-data"
+import { convertOwnershipData } from "./convert-ownership"
+/*
 import { convertServerPortData } from "./convert-server-port-data"
 import { convertShipData } from "./convert-ship-data"
-import { convertOwnershipData } from "./convert-ownership"
 import { createPortBattleSheet } from "./create-pb-sheets"
  */
 
@@ -32,14 +32,14 @@ const convertApiData = async (): Promise<void> => {
     convertGenericPortData()
     convertLootData()
     convertModules()
-    convertRepairData()
-    /*
     convertRecipeData()
+    convertRepairData()
+//    if (runType.endsWith("server")) {
+        convertOwnershipData()
+//    }
+    /*
     convertServerPortData()
     await convertShipData()
-    if (runType.endsWith("server")) {
-        convertOwnershipData()
-    }
     */
 }
 

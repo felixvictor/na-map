@@ -27,6 +27,7 @@ import {
     simpleSort,
     sortBy
 } from "./common.mjs"
+import { APIItem } from "./api-item";
 
 const minProfit = 30000
 const frontlinePorts = 2
@@ -274,6 +275,12 @@ export const convertServerPortData = () => {
         apiPorts = readJson(path.resolve(baseAPIFilename, `${serverName}-Ports-${serverDate}.json`))
         apiShops = readJson(path.resolve(baseAPIFilename, `${serverName}-Shops-${serverDate}.json`))
         apiItems = readJson(path.resolve(baseAPIFilename, `${serverName}-ItemTemplates-${serverDate}.json`))
+
+        apiItems = (readJson(
+            path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`)
+        ) as unknown) as APIItem[]
+
+        console.log(apiItems.filter(apiRecipe => apiRecipe.ItemType === "RecipeModule").map(d => d.Results))
 
         /**
          * Item names
