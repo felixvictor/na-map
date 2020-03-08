@@ -2,36 +2,27 @@
  * This file is part of na-map.
  *
  * @file      Convert modules.
- * @module    build/convert-modules
+ * @module    src/node/convert-modules
  * @author    iB aka Felix Victor
  * @copyright 2017, 2018, 2019, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import {
-    capitalizeFirstLetter,
-    cleanName,
-    commonPaths,
-    groupToMap,
-    readJson,
-    saveJsonAsync,
-    sortBy,
-    baseAPIFilename,
-    serverNames,
-    serverStartDate as serverDate
-} from "./common.mjs"
 import * as path from "path"
+import { capitalizeFirstLetter, cleanName, groupToMap, readJson, saveJsonAsync, serverNames, sortBy } from "../common"
+import { commonPaths, baseAPIFilename, serverStartDate as serverDate } from "./common-node"
+import { APIItem, APIModule, ModifiersEntity } from "./api-item"
+import { ModuleEntity, ModulePropertiesEntity, Wood, WoodTrimOrFrame } from "../gen-json"
 
-let apiItems = []
+let apiItems: APIItem[]
 
 /**
  * Convert API module data
- * @returns {void}
  */
-export const convertModulesAndWoodData = async () => {
+export const convertModulesAndWoodData = async (): Promise<void> => {
     const modules = new Map()
 
-    const woods = {}
+    const woods = {} as Wood
     const moduleRate = [
         {
             level: "L",
@@ -207,11 +198,10 @@ export const convertModulesAndWoodData = async () => {
 
     /**
      * Set wood properties
-     * @param {Object} module Module data.
-     * @returns {void}
+     * @param module - Module data
      */
-    function setWood(module) {
-        const wood = {}
+    const setWood = (module: ModuleEntity): void => {
+        const wood = {} as WoodTrimOrFrame
         wood.id = module.id
         wood.properties = []
         for (const modifier of module.APImodifiers) {
@@ -245,7 +235,7 @@ export const convertModulesAndWoodData = async () => {
                 }
 
                 wood.properties.push({
-                    modifier: modifierName,
+                    modifier: modifierName ?? "",
                     amount,
                     isPercentage
                 })
@@ -264,6 +254,7 @@ export const convertModulesAndWoodData = async () => {
         // Sort by modifier
         for (const type of ["frame", "trim"]) {
             for (const APIwood of woods[type]) {
+                // @ts-ignore
                 APIwood.properties.sort(sortBy(["modifier", "id"]))
             }
         }
@@ -271,16 +262,16 @@ export const convertModulesAndWoodData = async () => {
 
     /**
      * Get module modifier properties
-     * @param {Object} APImodifiers Module modifier data.
-     * @returns {Object} module modifier properties
+     * @param APImodifiers - Module modifier data
+     * @returns Module modifier properties
      */
-    function getModuleProperties(APImodifiers) {
+    const getModuleProperties = (APImodifiers: ModifiersEntity[]): ModulePropertiesEntity[] => {
         return APImodifiers.map(modifier => {
             if (!modifiers.has(`${modifier.Slot} ${modifier.MappingIds}`)) {
                 console.log(`${modifier.Slot} ${modifier.MappingIds} modifier undefined`)
             }
 
-            const modifierName = modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`)
+            const modifierName = modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`) ?? ""
             let amount = modifier.Percentage
             let isPercentage = true
 
@@ -318,21 +309,11 @@ export const convertModulesAndWoodData = async () => {
 
     /**
      * Get module type
-     * @param {Object} module Module data.
-     * @returns {string} Module type
+     * @param module - Module data
+     * @returns Module type
      */
-    function getModuleType(module) {
+    const getModuleType = (module: ModuleEntity): string => {
         let type = ""
-
-        /**
-         * @typedef {string} permanentType - Permanent type.
-         */
-        /**
-         * @typedef {string} sortingGroup - Sorting group.
-         */
-        /**
-         * @type {{permanentType, sortingGroup}} Module
-         */
         let { permanentType, sortingGroup } = module
 
         // noinspection IfStatementWithTooManyBranchesJS,OverlyComplexBooleanExpressionJS
@@ -368,7 +349,7 @@ export const convertModulesAndWoodData = async () => {
             sortingGroup = result ? `\u202F\u2013\u202F${result[1]}` : ""
         } else {
             sortingGroup = sortingGroup
-                ? `\u202F\u2013\u202f${capitalizeFirstLetter(module.sortingGroup).replace("_", "/")}`
+                ? `\u202F\u2013\u202f${capitalizeFirstLetter(module.sortingGroup ?? "").replace("_", "/")}`
                 : ""
         }
 
@@ -382,124 +363,127 @@ export const convertModulesAndWoodData = async () => {
     }
 
     // noinspection OverlyComplexBooleanExpressionJS
-    apiItems
-        .filter(
-            item =>
-                item.ItemType === "Module" &&
-                ((item.ModuleType === "Permanent" && !item.NotUsed) || item.ModuleType !== "Permanent")
-        )
-        .forEach(apiModule => {
-            let dontSave = false
-            const module = {
-                id: apiModule.Id,
-                name: cleanName(apiModule.Name),
-                usageType: apiModule.UsageType,
-                APImodifiers: apiModule.Modifiers,
-                sortingGroup: apiModule.SortingGroup.replace("module:", ""),
-                permanentType: apiModule.PermanentType.replace(/_/g, " "),
-                // isStackable: !!apiModule.bCanBeSetWithSameType,
-                // minResourcesAmount: APImodule.MinResourcesAmount,
-                // maxResourcesAmount: APImodule.MaxResourcesAmount,
-                // breakUpItemsAmount: APImodule.BreakUpItemsAmount,
-                // canBeBreakedUp: APImodule.CanBeBreakedUp,
-                // bCanBeBreakedUp: APImodule.bCanBeBreakedUp,
-                moduleType: apiModule.ModuleType,
-                moduleLevel: levels.get(apiModule.ModuleLevel)
-            }
+    const apiModules = apiItems.filter(
+        item =>
+            item.ItemType === "Module" &&
+            ((item.ModuleType === "Permanent" && !item.NotUsed) || item.ModuleType !== "Permanent")
+    ) as APIModule[]
+    apiModules.forEach(apiModule => {
+        let dontSave = false
+        const module = {
+            id: apiModule.Id,
+            name: cleanName(apiModule.Name),
+            usageType: apiModule.UsageType,
+            APImodifiers: apiModule.Modifiers,
+            sortingGroup: apiModule.SortingGroup.replace("module:", ""),
+            permanentType: apiModule.PermanentType.replace(/_/g, " "),
+            // isStackable: !!apiModule.bCanBeSetWithSameType,
+            // minResourcesAmount: APImodule.MinResourcesAmount,
+            // maxResourcesAmount: APImodule.MaxResourcesAmount,
+            // breakUpItemsAmount: APImodule.BreakUpItemsAmount,
+            // canBeBreakedUp: APImodule.CanBeBreakedUp,
+            // bCanBeBreakedUp: APImodule.bCanBeBreakedUp,
+            moduleType: apiModule.ModuleType,
+            moduleLevel: levels.get(apiModule.ModuleLevel)
+        } as ModuleEntity
 
-            if (module.name.startsWith("Bow figure - ")) {
-                module.name = `${module.name.replace("Bow figure - ", "")} bow figure`
-                module.moduleLevel = "U"
-            }
+        if (module.name.startsWith("Bow figure - ")) {
+            module.name = `${module.name.replace("Bow figure - ", "")} bow figure`
+            module.moduleLevel = "U"
+        }
 
-            // Ignore double entries
-            if (!modules.has(module.name + module.moduleLevel)) {
-                // Check for wood module
-                // noinspection OverlyComplexBooleanExpressionJS
-                if (
-                    (module.name.endsWith(" Planking") && module.moduleType === "Hidden") ||
-                    (module.name.endsWith(" Frame") && module.moduleType === "Hidden") ||
-                    module.name === "Crew Space"
-                ) {
-                    setWood(module)
-                    // noinspection ReuseOfLocalVariableJS
-                    dontSave = true
-                } else {
-                    module.properties = getModuleProperties(module.APImodifiers)
-                    delete module.APImodifiers
+        // Ignore double entries
+        if (!modules.has(module.name + module.moduleLevel)) {
+            // Check for wood module
+            // noinspection OverlyComplexBooleanExpressionJS
+            if (
+                (module.name.endsWith(" Planking") && module.moduleType === "Hidden") ||
+                (module.name.endsWith(" Frame") && module.moduleType === "Hidden") ||
+                module.name === "Crew Space"
+            ) {
+                setWood(module)
+                // noinspection ReuseOfLocalVariableJS
+                dontSave = true
+            } else {
+                module.properties = getModuleProperties(module.APImodifiers)
+                delete module.APImodifiers
 
-                    module.type = getModuleType(module)
+                module.type = getModuleType(module)
 
-                    delete module.moduleType
-                    delete module.sortingGroup
-                    delete module.permanentType
+                delete module.moduleType
+                delete module.sortingGroup
+                delete module.permanentType
 
-                    for (const rate of moduleRate) {
-                        for (const name of rate.names) {
-                            if (module.name.endsWith(name)) {
-                                module.name = module.name.replace(name, "")
-                                module.moduleLevel = rate.level
-                            }
+                for (const rate of moduleRate) {
+                    for (const name of rate.names) {
+                        if (module.name.endsWith(name)) {
+                            module.name = module.name.replace(name, "")
+                            module.moduleLevel = rate.level
                         }
-                    }
-
-                    const rateExceptions = [
-                        "Apprentice Carpenters",
-                        "Journeyman Carpenters",
-                        "Navy Carpenters",
-                        "Northern Carpenters",
-                        "Northern Master Carpenters",
-                        "Navy Mast Bands",
-                        "Navy Orlop Refit"
-                    ]
-                    if (rateExceptions.includes(module.name)) {
-                        module.moduleLevel = "U"
-                    }
-
-                    // noinspection SpellCheckingInspection
-                    const nameExceptions = [
-                        "Cannon nation module - France",
-                        "Coward",
-                        "Doctor",
-                        "Dreadful",
-                        "Expert Surgeon",
-                        "Frigate Master",
-                        "Gifted",
-                        "Light Ship Master",
-                        "Lineship Master",
-                        "Press Gang",
-                        "Signaling",
-                        "TEST MODULE SPEED IN OW",
-                        "Thrifty"
-                    ]
-                    // noinspection OverlyComplexBooleanExpressionJS
-                    if (
-                        nameExceptions.includes(module.name) ||
-                        (module.name === "Optimized Rudder" && module.moduleLevel !== "U") ||
-                        module.name.endsWith(" - OLD") ||
-                        module.name.endsWith("TEST") ||
-                        module.type.startsWith("Not used")
-                    ) {
-                        // noinspection ReuseOfLocalVariableJS
-                        dontSave = true
-                    } else {
-                        // console.log(module.id, module.name);
                     }
                 }
 
-                modules.set(module.name + module.moduleLevel, dontSave ? {} : module)
+                const rateExceptions = [
+                    "Apprentice Carpenters",
+                    "Journeyman Carpenters",
+                    "Navy Carpenters",
+                    "Northern Carpenters",
+                    "Northern Master Carpenters",
+                    "Navy Mast Bands",
+                    "Navy Orlop Refit"
+                ]
+                if (rateExceptions.includes(module.name)) {
+                    module.moduleLevel = "U"
+                }
+
+                // noinspection SpellCheckingInspection
+                const nameExceptions = [
+                    "Cannon nation module - France",
+                    "Coward",
+                    "Doctor",
+                    "Dreadful",
+                    "Expert Surgeon",
+                    "Frigate Master",
+                    "Gifted",
+                    "Light Ship Master",
+                    "Lineship Master",
+                    "Press Gang",
+                    "Signaling",
+                    "TEST MODULE SPEED IN OW",
+                    "Thrifty"
+                ]
+                // noinspection OverlyComplexBooleanExpressionJS
+                if (
+                    nameExceptions.includes(module.name) ||
+                    (module.name === "Optimized Rudder" && module.moduleLevel !== "U") ||
+                    module.name.endsWith(" - OLD") ||
+                    module.name.endsWith("TEST") ||
+                    module.type.startsWith("Not used")
+                ) {
+                    // noinspection ReuseOfLocalVariableJS
+                    dontSave = true
+                } else {
+                    // console.log(module.id, module.name);
+                }
             }
-        })
+
+            modules.set(module.name + module.moduleLevel, dontSave ? {} : module)
+        }
+    })
 
     let result = [...modules.values()]
     result = result.filter(module => Object.keys(module).length).sort(sortBy(["type", "id"]))
-    const modulesGrouped = [...groupToMap(result, module => module.type)]
+    const modulesGrouped = [...groupToMap(result, (module: ModuleEntity): string => module.type)]
 
     await saveJsonAsync(commonPaths.fileModules, modulesGrouped)
     await saveJsonAsync(commonPaths.fileWood, woods)
 }
 
-export const convertModules = () => {
-    apiItems = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`))
+export const convertModules = (): void => {
+    apiItems = (readJson(
+        path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`)
+    ) as unknown) as APIItem[]
+    console.log(apiItems.filter(item => item.ItemType === "TimeBasedConvertibleItem"))
+    // noinspection JSIgnoredPromiseFromCall
     convertModulesAndWoodData()
 }
