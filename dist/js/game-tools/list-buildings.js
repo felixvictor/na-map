@@ -16,7 +16,9 @@ export default class ListBuildings {
     }
     async _loadAndSetupData() {
         try {
-            this._buildingData = (await import("../../dist/gen-generic/buildings.json")).default;
+            const fileName = "../../../lib/gen-generic/buildings.json";
+            this._buildingData = (await import(fileName))
+                .default;
         }
         catch (error) {
             putImportError(error);
