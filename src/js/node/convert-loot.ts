@@ -11,7 +11,7 @@
 import * as path from "path"
 import { cleanName, getOrdinal, readJson, saveJsonAsync, serverNames, sortBy } from "../common"
 import { commonPaths, baseAPIFilename, serverStartDate as serverDate } from "./common-node"
-import { APIItem, ItemsEntity, ShipLootTableItem, TimeBasedConvertibleItem } from "./api-item"
+import { APIItem, ItemsEntity, APIShipLootTableItem, APITimeBasedConvertibleItem } from "./api-item"
 import { Loot, LootChestsEntity, LootItemsEntity, LootLootEntity } from "../gen-json"
 
 let apiItems: APIItem[]
@@ -63,7 +63,7 @@ const convertLoot = async () => {
     let types = ["ShipLootTableItem"]
     const loot = (apiItems.filter(
         item => !item.NotUsed && types.includes(item.ItemType)
-    ) as unknown) as ShipLootTableItem[]
+    ) as unknown) as APIShipLootTableItem[]
     data.loot = loot
         .map(
             (item): LootLootEntity => ({
@@ -79,7 +79,7 @@ const convertLoot = async () => {
     types = ["TimeBasedConvertibleItem"]
     const chests = (apiItems.filter(
         item => !item.NotUsed && types.includes(item.ItemType)
-    ) as unknown) as TimeBasedConvertibleItem[]
+    ) as unknown) as APITimeBasedConvertibleItem[]
     data.chests = chests
         .map(
             (item): LootChestsEntity => ({
