@@ -255,7 +255,7 @@ export interface TemplateEntity {
 interface QualitiesEntity {
     RequiresLevel: number
     Requirements?: TemplateEntity[]
-    Results?: TemplateEntity[]
+    Results: TemplateEntity[]
     MaxPermanentModules?: number
     MaxUpgradeModules?: number
 }
@@ -348,29 +348,29 @@ interface PortBonusesEntity {
  */
 
 export interface APIBuilding {
-    __type: string
+    __type: "MegaChaka.Services.Items.BuildingTemplate, MegaChaka"
     Name: string
     Id: number
     NotUsed: boolean
-    NotTradeable: boolean
-    PreventTeleport: boolean
-    DropChanceReductionPerItem: number
-    MaxStack: number
-    ItemWeight: number
-    BasePrice: number
+    NotTradeable: false
+    PreventTeleport: true
+    DropChanceReductionPerItem: 0
+    MaxStack: 0
+    ItemWeight: 0
+    BasePrice: 0
     SellPrice: PriceModifier
     BuyPrice: PriceModifier
-    PriceReductionAmount: number
-    ConsumedScale: number
-    NonConsumedScale: number
-    PriceTierQuantity: number
-    MaxQuantity: number
-    SortingOverrideTemplateType: string
-    SortingGroup: string
-    SellableInShop: boolean
-    CanBeSoldToShop: boolean
-    ResetStockOnServerStart: boolean
-    SellPriceCoefficient: number
+    PriceReductionAmount: -1
+    ConsumedScale: 1.5
+    NonConsumedScale: 1
+    PriceTierQuantity: 0
+    MaxQuantity: 0
+    SortingOverrideTemplateType: ""
+    SortingGroup: ""
+    SellableInShop: false
+    CanBeSoldToShop: false
+    ResetStockOnServerStart: false
+    SellPriceCoefficient: 0
     ItemType: "Building"
     MongoID: string
     LootTable: number
@@ -390,39 +390,42 @@ export interface APIBuilding {
     GivesXP: number
     AccessibleByLevel: boolean
     BreakUpRecipeSpawnChance: number
-    DisposeOnUse: boolean
-    CanBeUsedInPort: boolean
-    CanBeUsedInOpenWorld: boolean
-    ShowInContractsSelector: boolean
+    DisposeOnUse: false
+    CanBeUsedInPort: false
+    CanBeUsedInOpenWorld: false
+    ShowInContractsSelector: false
     DeliveryOrderOptions: DeliveryOrderOptions<false, 0>
     PortPrices: PortPrices<false, 0>
 }
 
-export interface APIRecipeResource {
-    __type: string
+/****************************
+ * RecipeResource
+ */
+
+export interface APIRecipe {
     Name: string
     Id: number
     NotUsed: boolean
-    NotTradeable: boolean
-    PreventTeleport: boolean
-    DropChanceReductionPerItem: number
-    MaxStack: number
-    ItemWeight: number
-    BasePrice: number
+    NotTradeable: false
+    PreventTeleport: false
+    DropChanceReductionPerItem: 0
+    MaxStack: 1
+    ItemWeight: 0
+    BasePrice: -1
     SellPrice: PriceModifier
     BuyPrice: PriceModifier
-    PriceReductionAmount: number
-    ConsumedScale: number
-    NonConsumedScale: number
-    PriceTierQuantity: number
+    PriceReductionAmount: -1
+    ConsumedScale: 1.5
+    NonConsumedScale: 1
+    PriceTierQuantity: 100
     MaxQuantity: number
-    SortingOverrideTemplateType: string
-    SortingGroup: string
-    SellableInShop: boolean
-    CanBeSoldToShop: boolean
-    ResetStockOnServerStart: boolean
-    SellPriceCoefficient: number
-    ItemType: "Recipe"
+    SortingOverrideTemplateType: ""
+    SortingGroup: ""
+    SellableInShop: false
+    CanBeSoldToShop: true
+    ResetStockOnServerStart: false
+    SellPriceCoefficient: 0.5
+    ItemType: "Recipe" | "RecipeModule"
     MongoID: string
     LaborPrice: number
     BuildingRequirements: BuildingRequirementsEntity[]
@@ -436,100 +439,109 @@ export interface APIRecipeResource {
     GivesXP: number
     AccessibleByLevel: boolean
     BreakUpRecipeSpawnChance: number
-    DisposeOnUse: boolean
-    CanBeUsedInPort: boolean
-    CanBeUsedInOpenWorld: boolean
-    ShowInContractsSelector: boolean
+    DisposeOnUse: true
+    CanBeUsedInPort: false
+    CanBeUsedInOpenWorld: false
+    ShowInContractsSelector: false
     DeliveryOrderOptions: DeliveryOrderOptions<false, 0>
     PortPrices: PortPrices<false, 0>
+}
+
+export interface APIRecipeResource extends APIRecipe {
+    __type: "MegaChaka.Services.Items.RecipeTemplate, MegaChaka"
+}
+
+export interface APIRecipeModuleResource extends APIRecipe {
+    __type: "MegaChaka.Services.Items.RecipeModuleTemplate, MegaChaka"
+    Qualities: QualitiesEntity[]
 }
 
 /****************************
  * Loot
  */
 
-export interface ShipLootTableItem {
-    __type: string
+export interface APIShipLootTableItem {
+    __type: "MegaChaka.Services.Items.ShipLootTableItemTemplate, MegaChaka"
     Items?: ItemsEntity[]
     Name: string
     Id: number
     NotUsed: boolean
-    NotTradeable: boolean
-    PreventTeleport: boolean
-    DropChanceReductionPerItem: number
-    MaxStack: number
-    ItemWeight: number
-    BasePrice: number
+    NotTradeable: false
+    PreventTeleport: true
+    DropChanceReductionPerItem: 0
+    MaxStack: 0
+    ItemWeight: 0
+    BasePrice: -1
     SellPrice: PriceModifier
     BuyPrice: PriceModifier
-    PriceReductionAmount: number
-    ConsumedScale: number
-    NonConsumedScale: number
-    PriceTierQuantity: number
-    MaxQuantity: number
-    SortingOverrideTemplateType: string
-    SortingGroup: string
-    SellableInShop: boolean
-    CanBeSoldToShop: boolean
-    ResetStockOnServerStart: boolean
-    SellPriceCoefficient: number
+    PriceReductionAmount: -1
+    ConsumedScale: 1.5
+    NonConsumedScale: 1
+    PriceTierQuantity: 100
+    MaxQuantity: 1000
+    SortingOverrideTemplateType: ""
+    SortingGroup: ""
+    SellableInShop: true
+    CanBeSoldToShop: true
+    ResetStockOnServerStart: false
+    SellPriceCoefficient: 0.5
     ItemType: "ShipLootTableItem"
     MongoID: string
     EventLootTable: boolean
     Class: number
-    ItemsToGive: MinMax<number>
-    lootProbability?: number[]
-    itemProbability?: number[]
-    quantityProbability?: number[]
-    ShowInContractsSelector: boolean
+    ItemsToGive: MinMax<1>
+    lootProbability: number[]
+    itemProbability: number[]
+    quantityProbability: number[]
+    ShowInContractsSelector: true
     DeliveryOrderOptions: DeliveryOrderOptions<false, 0>
     PortPrices: PortPrices<false, 0>
 }
 
-export interface TimeBasedConvertibleItem {
-    __type: string
+export interface APITimeBasedConvertibleItem {
+    __type: "MegaChaka.Services.Items.TimeBasedConvertibleItemTemplate, MegaChaka"
     Name: string
     Id: number
     NotUsed: boolean
-    NotTradeable: boolean
-    PreventTeleport: boolean
-    DropChanceReductionPerItem: number
-    MaxStack: number
+    NotTradeable: false
+    PreventTeleport: true
+    DropChanceReductionPerItem: 0
+    MaxStack: 1
     ItemWeight: number
-    BasePrice: number
+    BasePrice: 5000
     SellPrice: PriceModifier
     BuyPrice: PriceModifier
-    PriceReductionAmount: number
-    ConsumedScale: number
-    NonConsumedScale: number
-    PriceTierQuantity: number
-    MaxQuantity: number
-    SortingOverrideTemplateType: string
-    SortingGroup: string
-    SellableInShop: boolean
-    CanBeSoldToShop: boolean
-    ResetStockOnServerStart: boolean
-    SellPriceCoefficient: number
+    PriceReductionAmount: -1
+    ConsumedScale: 1.5
+    NonConsumedScale: 1
+    PriceTierQuantity: 5000
+    MaxQuantity: 5000
+    SortingOverrideTemplateType: ""
+    SortingGroup: ""
+    SellableInShop: false
+    CanBeSoldToShop: false
+    ResetStockOnServerStart: false
+    SellPriceCoefficient: 0.5
     ItemType: "TimeBasedConvertibleItem"
     MongoID: string
     GeneralChest: boolean
-    LifetimeSeconds: number
-    ExtendedLootTable?: number[] | null
-    CanBeConverted: string
-    ConvertsTo?: null[] | null
-    ExtraLootTable: number
-    InitialAmount: number
-    ProductionScale: number
-    ConsumptionScale: number
-    SpawnChance: number
-    AutoFillCoefficient: number
-    ProducedByNation: number
-    ConsumedByNation: number
-    ProducedInCapitals: boolean
-    ProducedInTowns: boolean
-    ConsumedInCapitals: boolean
-    ConsumedInTowns: boolean
-    ShowInContractsSelector: boolean
+    LifetimeSeconds: 10800
+    ExtendedLootTable: number[]
+    CanBeConverted: "Port"
+    ConvertsTo: []
+    ExtraLootTable: 0
+    InitialAmount: 0
+    ProductionScale: 0.6
+    ConsumptionScale: 1
+    SpawnChance: 1
+    AutoFillCoefficient: 5
+    ProducedByNation: 9
+    ConsumedByNation: -1
+    ProducedInCapitals: false
+    ProducedInTowns: false
+    ConsumedInCapitals: false
+    ConsumedInTowns: false
+    ShowInContractsSelector: false
     DeliveryOrderOptions: DeliveryOrderOptions<false, 0>
     PortPrices: PortPrices<false, 0>
 }
@@ -581,6 +593,41 @@ export interface APIModule {
     Limitation2_Value: 0
     Limitation3_Value: 0
     ShowInContractsSelector: false
+    DeliveryOrderOptions: DeliveryOrderOptions<false, 0>
+    PortPrices: PortPrices<false, 0>
+}
+
+export interface APIShipUpgradeBookItem {
+    __type: "MegaChaka.Services.Items.ShipUpgradeBookItemTemplate, MegaChaka"
+    Name: string
+    Id: number
+    NotUsed: boolean
+    NotTradeable: false
+    PreventTeleport: false
+    DropChanceReductionPerItem: 0
+    MaxStack: 100
+    ItemWeight: 0
+    BasePrice: 800
+    SellPrice: PriceModifier
+    BuyPrice: PriceModifier
+    PriceReductionAmount: -1
+    ConsumedScale: 1.5
+    NonConsumedScale: 1
+    PriceTierQuantity: 100
+    MaxQuantity: 1000
+    SortingOverrideTemplateType: "ShipUpgradeBookItemTemplate"
+    SortingGroup: ""
+    SellableInShop: false
+    CanBeSoldToShop: true
+    ResetStockOnServerStart: true
+    SellPriceCoefficient: 0.5
+    ItemType: "ShipUpgradeBookItem"
+    MongoID: string
+    Upgrade: number
+    DisposeOnUse: false
+    CanBeUsedInPort: false
+    CanBeUsedInOpenWorld: false
+    ShowInContractsSelector: true
     DeliveryOrderOptions: DeliveryOrderOptions<false, 0>
     PortPrices: PortPrices<false, 0>
 }
