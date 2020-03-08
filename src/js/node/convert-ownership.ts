@@ -15,32 +15,72 @@ import d3Node from "d3-node"
 import { default as lzma } from "lzma-native"
 import { default as readDirRecursive } from "recursive-readdir"
 
-import { capitalToCounty, cleanName, commonPaths, nations, saveJsonAsync, serverNames } from "./common.mjs"
+import { capitalToCounty, cleanName, nations, saveJsonAsync, serverNames } from "../common"
+import { commonPaths } from "./common-node"
+import { Ownership, OwnershipGroup, OwnershipLabel } from "../gen-json"
+import { APIPort } from "./api-port";
 
 const fileExtension = ".json.xz"
 
 const d3n = d3Node()
 const { d3 } = d3n
 
+interface Port {
+    name: string
+    region: string
+    county: string
+    data: OwnershipOverTime[]
+    id?: string
+}
+interface OwnershipOverTime {
+    timeRange: string[]
+    val: string
+    labelVal: string
+}
+interface RegionNested {
+    key: string
+    values: CountyNested[]
+}
+interface CountyNested {
+    key: string
+    values: Port[]
+}
+interface NationList {
+    NT: number
+    PR: number
+    ES: number
+    FR: number
+    GB: number
+    VP: number
+    DK: number
+    SE: number
+    US: number
+    RU: number
+    DE: number
+    PL: number
+    [index: string]: number | string
+}
+interface OwnershipNation extends NationList {
+    date: string
+}
+
 /**
  * Retrieve port data for nation/clan ownership
- * @returns {void}
  */
-function convertOwnership() {
-    const ports = new Map()
-    const numPortsDates = []
+function convertOwnership(): void {
+    const ports = new Map() as Map<string, Port>
+    const numPortsDates: OwnershipNation[] = []
     const fileBaseNameRegex = new RegExp(`${serverNames[0]}-Ports-(20\\d{2}-\\d{2}-\\d{2})${fileExtension}`)
 
     /**
      * Parse data and construct ports Map
-     * @param {object} portData - Port data
-     * @param {string} date - current date
-     * @return {void}
+     * @param portData - Port data
+     * @param date - current date
      */
-    function parseData(portData, date) {
+    function parseData(portData: APIPort[], date: string): void {
         // console.log("**** new date", date);
 
-        const numPorts = []
+        const numPorts = {} as NationList
         nations
             .filter(nation => nation.id !== 9)
             .forEach(nation => {
@@ -50,9 +90,8 @@ function convertOwnership() {
         for (const port of portData) {
             /**
              * Get data object
-             * @return {{timeRange: string[], val: (string)}} - Object
              */
-            const getObject = () => ({
+            const getObject = (): OwnershipOverTime => ({
                 timeRange: [date, date],
                 val: nations[port.Nation].short,
                 labelVal: nations[port.Nation].sortName
@@ -60,9 +99,8 @@ function convertOwnership() {
 
             /**
              * Set initial data
-             * @return {void}
              */
-            const initData = () => {
+            const initData = (): void => {
                 ports.set(port.Id, {
                     name: cleanName(port.Name),
                     region: port.Location,
@@ -73,18 +111,17 @@ function convertOwnership() {
 
             /**
              * Get previous nation short name
-             * @return {string} - nation short name
+             * @returns nation short name
              */
-            const getPreviousNation = () => {
+            const getPreviousNation = (): string => {
                 const index = ports.get(port.Id).data.length - 1
                 return ports.get(port.Id).data[index].val
             }
 
             /**
              * Add new nation entry
-             * @return {void}
              */
-            const setNewNation = () => {
+            const setNewNation = (): void => {
                 // console.log("setNewNation -> ", ports.get(port.Id));
                 const values = ports.get(port.Id)
                 values.data.push(getObject())
@@ -93,9 +130,8 @@ function convertOwnership() {
 
             /**
              * Change end date for current nation
-             * @return {void}
              */
-            const setNewEndDate = () => {
+            const setNewEndDate = (): void => {
                 const values = ports.get(port.Id)
                 // console.log("setNewEndDate -> ", ports.get(port.Id), values);
                 values.data[values.data.length - 1].timeRange[1] = date
@@ -134,10 +170,10 @@ function convertOwnership() {
 
     /**
      * Decompress file content
-     * @param {Buffer} compressedContent - Compressed file content
-     * @return {Buffer|void} - Decompressed file content or error
+     * @param compressedContent - Compressed file content
+     * @returns Decompressed file content or error
      */
-    function decompress(compressedContent) {
+    const decompress = (compressedContent: Buffer): Buffer | void => {
         return lzma.decompress(compressedContent, (decompressedContent, error) => {
             if (error) {
                 throw new Error(error)
@@ -149,10 +185,10 @@ function convertOwnership() {
 
     /**
      * Read file content
-     * @param {string} fileName - File name
-     * @return {Promise<any>} - Promise
+     * @param fileName - File name
+     * @returns Promise
      */
-    function readFileContent(fileName) {
+    function readFileContent(fileName: string): Promise<any> {
         return new Promise((resolve, reject) => {
             fs.readFile(fileName, (error, data) => {
                 if (error) {
@@ -166,10 +202,10 @@ function convertOwnership() {
 
     /**
      * Process all files
-     * @param {string[]} fileNames - File names
-     * @return {*} - Resolved promise
+     * @param fileNames - File names
+     * @returns Resolved promise
      */
-    function processFiles(fileNames) {
+    function processFiles(fileNames: string[]): Promise<any> {
         return fileNames.reduce(
             (sequence, fileName) =>
                 sequence
@@ -190,20 +226,20 @@ function convertOwnership() {
 
     /**
      * Check if file should be ignored
-     * @param {string} fileName - File name
-     * @param {*} stats - Stat
-     * @return {boolean} - True if file should be ignored
+     * @param fileName - File name
+     * @param stats - Stat
+     * @returns True if file should be ignored
      */
-    function ignoreFileName(fileName, stats) {
+    function ignoreFileName(fileName: string, stats: any): boolean {
         return !stats.isDirectory() && path.basename(fileName).match(fileBaseNameRegex) === null
     }
 
     /**
      * Sort file names
-     * @param {string[]} fileNames - File names
-     * @return {string[]} - Sorted file names
+     * @param fileNames - File names
+     * @returns Sorted file names
      */
-    function sortFileNames(fileNames) {
+    function sortFileNames(fileNames: string[]): string[] {
         return fileNames.sort((a, b) => {
             const ba = path.basename(a)
             const bb = path.basename(b)
@@ -221,9 +257,8 @@ function convertOwnership() {
 
     /**
      * Write out result
-     * @return {void}
      */
-    const writeResult = async () => {
+    const writeResult = async (): Promise<void> => {
         const portsArray = [...ports.entries()].map(([key, value]) => {
             value.id = key
             return value
@@ -232,24 +267,25 @@ function convertOwnership() {
         // Nest by region and county
         const nested = d3
             .nest()
-            .key(d => d.region)
+            .key((d: Port) => d.region)
             .sortKeys(d3.ascending)
-            .key(d => d.county)
+            .key((d: Port) => d.county)
             .sortKeys(d3.ascending)
-            .entries(portsArray)
+            .entries(portsArray) as RegionNested[]
 
+        console.log(nested)
         // Convert to data structure needed for timelines-chart
         // region
         // -- group (counties)
         //    -- label (ports)
         const result = nested.map(region => {
-            const newRegion = {}
+            const newRegion = {} as Ownership
             newRegion.region = region.key
             newRegion.data = region.values.map(county => {
-                const group = {}
+                const group = {} as OwnershipGroup
                 group.group = county.key
                 group.data = county.values.map(port => {
-                    const label = {}
+                    const label = {} as OwnershipLabel
                     label.label = port.name
                     label.data = port.data
                     return label

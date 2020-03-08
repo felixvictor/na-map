@@ -40,9 +40,9 @@ export default class ListBuildings {
 
     async _loadAndSetupData(): Promise<void> {
         try {
-            this._buildingData = ((
-                await import(/* webpackChunkName: "data-buildings" */ "../../../dist/gen-generic/buildings.json")
-            ).default as unknown) as Building[]
+            const fileName = "../../../lib/gen-generic/buildings.json"
+            this._buildingData = ((await import(/* webpackChunkName: "data-buildings" */ fileName))
+                .default as unknown) as Building[]
         } catch (error) {
             putImportError(error)
         }
@@ -50,7 +50,6 @@ export default class ListBuildings {
 
     _setupListener(): void {
         let firstClick = true
-
         ;(document.getElementById(this._buttonId) as HTMLElement).addEventListener("click", async event => {
             if (firstClick) {
                 firstClick = false
