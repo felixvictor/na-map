@@ -11,6 +11,7 @@
 // https://jvilk.com/MakeTypes/
 
 import { Point } from "./common"
+import { ModifiersEntity } from "./node/api-item"
 
 /****************************
  * buildings.json
@@ -155,10 +156,14 @@ export interface ModuleEntity {
     name: string
     usageType: string
     moduleLevel: string
-    properties?: ModulePropertiesEntity
+    properties?: ModulePropertiesEntity[]
     type: string
+    APImodifiers: ModifiersEntity[]
+    sortingGroup?: string
+    permanentType?: string
+    moduleType?: string
 }
-interface ModulePropertiesEntity {
+export interface ModulePropertiesEntity {
     modifier: string
     amount: number
     isPercentage: boolean
@@ -422,11 +427,11 @@ interface ShipMast {
  * woods.json
  */
 
-export interface Wood {
-    trim: WoodTrimEntityOrFrameEntity[]
-    frame: WoodTrimEntityOrFrameEntity[]
+export interface Wood extends ObjectIndexer<WoodTrimOrFrame[]> {
+    trim: WoodTrimOrFrame[]
+    frame: WoodTrimOrFrame[]
 }
-interface WoodTrimEntityOrFrameEntity {
+interface WoodTrimOrFrame {
     id: number
     properties: WoodProperty[]
     type: string

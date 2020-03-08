@@ -40,9 +40,9 @@ export default class ListBuildings {
 
     async _loadAndSetupData(): Promise<void> {
         try {
-            this._buildingData = (
+            this._buildingData = ((
                 await import(/* webpackChunkName: "data-buildings" */ "../../../dist/gen-generic/buildings.json")
-            ).default
+            ).default as unknown) as Building[]
         } catch (error) {
             putImportError(error)
         }
