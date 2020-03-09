@@ -34,23 +34,32 @@ function convertOwnership() {
                 });
             };
             const getPreviousNation = () => {
-                const index = ports.get(port.Id).data.length - 1;
-                return ports.get(port.Id).data[index].val;
+                var _a;
+                const portData = ports.get(port.Id);
+                if (portData) {
+                    const index = (_a = portData.data.length - 1) !== null && _a !== void 0 ? _a : 0;
+                    return portData.data[index].val;
+                }
+                return "";
             };
             const setNewNation = () => {
-                const values = ports.get(port.Id);
-                values.data.push(getObject());
-                ports.set(port.Id, values);
+                const portData = ports.get(port.Id);
+                if (portData) {
+                    portData.data.push(getObject());
+                    ports.set(port.Id, portData);
+                }
             };
             const setNewEndDate = () => {
-                const values = ports.get(port.Id);
-                values.data[values.data.length - 1].timeRange[1] = date;
-                ports.set(port.Id, values);
+                const portData = ports.get(port.Id);
+                if (portData) {
+                    portData.data[portData.data.length - 1].timeRange[1] = date;
+                    ports.set(port.Id, portData);
+                }
             };
             if (port.Nation !== 9) {
-                numPorts[nations[port.Nation].short] += 1;
+                const currentNation = nations[port.Nation].short;
+                numPorts[currentNation] = Number(numPorts[currentNation]) + 1;
                 if (ports.get(port.Id)) {
-                    const currentNation = nations[port.Nation].short;
                     const oldNation = getPreviousNation();
                     if (currentNation === oldNation) {
                         setNewEndDate();
@@ -74,7 +83,7 @@ function convertOwnership() {
         numPortsDates.push(numPortsDate);
     }
     const decompress = (compressedContent) => {
-        return lzma.decompress(compressedContent, (decompressedContent, error) => {
+        return lzma.decompress(compressedContent, {}, (decompressedContent, error) => {
             if (error) {
                 throw new Error(error);
             }
@@ -97,7 +106,13 @@ function convertOwnership() {
         return fileNames.reduce((sequence, fileName) => sequence
             .then(() => readFileContent(fileName))
             .then(compressedContent => decompress(compressedContent))
-            .then(decompressedContent => parseData(JSON.parse(decompressedContent.toString()), path.basename(fileName).match(fileBaseNameRegex)[1]))
+            .then(decompressedContent => {
+            var _a;
+            if (decompressedContent) {
+                const currentDate = ((_a = path.basename(fileName).match(fileBaseNameRegex)) !== null && _a !== void 0 ? _a : [])[1];
+                parseData(JSON.parse(decompressedContent.toString()), currentDate);
+            }
+        })
             .catch(error => {
             throw new Error(error);
         }), Promise.resolve());
@@ -130,7 +145,6 @@ function convertOwnership() {
             .key((d) => d.county)
             .sortKeys(d3.ascending)
             .entries(portsArray);
-        console.log(nested);
         const result = nested.map(region => {
             const newRegion = {};
             newRegion.region = region.key;
