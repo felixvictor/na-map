@@ -9,16 +9,17 @@
  */
 
 import * as fs from "fs"
+import { Stats } from "fs"
 import * as path from "path"
 
 import d3Node from "d3-node"
 import { default as lzma } from "lzma-native"
-import { default as readDirRecursive } from "recursive-readdir"
 
+import { default as readDirRecursive } from "recursive-readdir"
 import { capitalToCounty, cleanName, nations, saveJsonAsync, serverNames } from "../common"
 import { commonPaths } from "./common-node"
-import { Ownership, OwnershipGroup, OwnershipLabel } from "../gen-json"
-import { APIPort } from "./api-port";
+import { NationList, Ownership, OwnershipGroup, OwnershipLabel, OwnershipNation } from "../gen-json"
+import { APIPort } from "./api-port"
 
 const fileExtension = ".json.xz"
 
@@ -44,24 +45,6 @@ interface RegionNested {
 interface CountyNested {
     key: string
     values: Port[]
-}
-interface NationList {
-    NT: number
-    PR: number
-    ES: number
-    FR: number
-    GB: number
-    VP: number
-    DK: number
-    SE: number
-    US: number
-    RU: number
-    DE: number
-    PL: number
-    [index: string]: number | string
-}
-interface OwnershipNation extends NationList {
-    date: string
 }
 
 /**
@@ -114,8 +97,12 @@ function convertOwnership(): void {
              * @returns nation short name
              */
             const getPreviousNation = (): string => {
-                const index = ports.get(port.Id).data.length - 1
-                return ports.get(port.Id).data[index].val
+                const portData = ports.get(port.Id)
+                if (portData) {
+                    const index = portData.data.length - 1 ?? 0
+                    return portData.data[index].val
+                }
+                return ""
             }
 
             /**
@@ -123,27 +110,31 @@ function convertOwnership(): void {
              */
             const setNewNation = (): void => {
                 // console.log("setNewNation -> ", ports.get(port.Id));
-                const values = ports.get(port.Id)
-                values.data.push(getObject())
-                ports.set(port.Id, values)
+                const portData = ports.get(port.Id)
+                if (portData) {
+                    portData.data.push(getObject())
+                    ports.set(port.Id, portData)
+                }
             }
 
             /**
              * Change end date for current nation
              */
             const setNewEndDate = (): void => {
-                const values = ports.get(port.Id)
-                // console.log("setNewEndDate -> ", ports.get(port.Id), values);
-                values.data[values.data.length - 1].timeRange[1] = date
-                ports.set(port.Id, values)
+                const portData = ports.get(port.Id)
+                if (portData) {
+                    // console.log("setNewEndDate -> ", ports.get(port.Id), values);
+                    portData.data[portData.data.length - 1].timeRange[1] = date
+                    ports.set(port.Id, portData)
+                }
             }
 
             // Exclude free towns
             if (port.Nation !== 9) {
-                numPorts[nations[port.Nation].short] += 1
+                const currentNation = nations[port.Nation].short
+                numPorts[currentNation] = Number(numPorts[currentNation]) + 1
                 if (ports.get(port.Id)) {
                     // console.log("ports.get(port.Id)");
-                    const currentNation = nations[port.Nation].short
                     const oldNation = getPreviousNation()
                     if (currentNation === oldNation) {
                         setNewEndDate()
@@ -157,7 +148,7 @@ function convertOwnership(): void {
             }
         }
 
-        const numPortsDate = {}
+        const numPortsDate = {} as OwnershipNation
         numPortsDate.date = date
         nations
             .filter(nation => nation.id !== 9)
@@ -171,10 +162,10 @@ function convertOwnership(): void {
     /**
      * Decompress file content
      * @param compressedContent - Compressed file content
-     * @returns Decompressed file content or error
+     * @returns Decompressed file content or void
      */
     const decompress = (compressedContent: Buffer): Buffer | void => {
-        return lzma.decompress(compressedContent, (decompressedContent, error) => {
+        return lzma.decompress(compressedContent, {}, (decompressedContent: Buffer | void, error?: string) => {
             if (error) {
                 throw new Error(error)
             }
@@ -188,7 +179,7 @@ function convertOwnership(): void {
      * @param fileName - File name
      * @returns Promise
      */
-    function readFileContent(fileName: string): Promise<any> {
+    function readFileContent(fileName: string): Promise<Buffer> {
         return new Promise((resolve, reject) => {
             fs.readFile(fileName, (error, data) => {
                 if (error) {
@@ -211,12 +202,12 @@ function convertOwnership(): void {
                 sequence
                     .then(() => readFileContent(fileName))
                     .then(compressedContent => decompress(compressedContent))
-                    .then(decompressedContent =>
-                        parseData(
-                            JSON.parse(decompressedContent.toString()),
-                            path.basename(fileName).match(fileBaseNameRegex)[1]
-                        )
-                    )
+                    .then(decompressedContent => {
+                        if (decompressedContent) {
+                            const currentDate = (path.basename(fileName).match(fileBaseNameRegex) ?? [])[1]
+                            parseData(JSON.parse(decompressedContent.toString()), currentDate)
+                        }
+                    })
                     .catch(error => {
                         throw new Error(error)
                     }),
@@ -230,7 +221,7 @@ function convertOwnership(): void {
      * @param stats - Stat
      * @returns True if file should be ignored
      */
-    function ignoreFileName(fileName: string, stats: any): boolean {
+    function ignoreFileName(fileName: string, stats: Stats): boolean {
         return !stats.isDirectory() && path.basename(fileName).match(fileBaseNameRegex) === null
     }
 
@@ -273,7 +264,6 @@ function convertOwnership(): void {
             .sortKeys(d3.ascending)
             .entries(portsArray) as RegionNested[]
 
-        console.log(nested)
         // Convert to data structure needed for timelines-chart
         // region
         // -- group (counties)

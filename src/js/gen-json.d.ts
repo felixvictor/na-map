@@ -173,8 +173,7 @@ export interface ModulePropertiesEntity {
  * nations.json
  */
 
-export interface OwnershipPortsPerNation {
-    date: string
+export interface NationList extends ObjectIndexer<number | string> {
     NT: number
     PR: number
     ES: number
@@ -187,6 +186,9 @@ export interface OwnershipPortsPerNation {
     RU: number
     DE: number
     PL: number
+}
+export interface OwnershipNation extends NationList {
+    date: string
 }
 
 /****************************
