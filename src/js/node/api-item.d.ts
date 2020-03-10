@@ -14,7 +14,7 @@
  * Items
  */
 
-export interface APIItem {
+export interface APIItemGeneric {
     __type: string
     Name: string
     Id: number
@@ -261,7 +261,7 @@ interface QualitiesEntity {
 }
 interface WoodTypeDescsEntity {
     WoodType: number
-    Requirements?: TemplateEntity[]
+    Requirements: TemplateEntity[]
 }
 interface Specs {
     MaxPassableHeight: number
@@ -269,8 +269,8 @@ interface Specs {
     MaxTurningSpeed: number
     Acceleration: number
     Deceleration: number
-    SpeedToWind?: number[]
-    TurnToSpeed?: number[]
+    SpeedToWind: number[]
+    TurnToSpeed: number[]
     VisibilityDistanceScaleSelf: number
     VisibilityDistanceScaleOthers: number
     AttackDistanceScaleSelf: number
@@ -630,4 +630,137 @@ export interface APIShipUpgradeBookItem {
     ShowInContractsSelector: true
     DeliveryOrderOptions: DeliveryOrderOptions<false, 0>
     PortPrices: PortPrices<false, 0>
+}
+
+export interface APIShip {
+    __type: "MegaChaka.Services.Items.ShipTemplate, MegaChaka"
+    RepairPriceCoefficient: number
+    Class: number
+    ShipTemplateName: string
+    Specs: Specs
+    VisualTemplateId: number
+    HiddenModuleTemplates: number[]
+    DefaultCannons: null[]
+    BotCannons: number[]
+    BotCannonsVariants: BotCannonsVariantsEntity[]
+    MaxItems: number
+    Name: string
+    Id: number
+    NotUsed: boolean
+    NotTradeable: boolean
+    PreventTeleport: boolean
+    DropChanceReductionPerItem: number
+    MaxStack: number
+    ItemWeight: number
+    BasePrice: number
+    SellPrice: PriceModifier
+    BuyPrice: PriceModifier
+    PriceReductionAmount: number
+    ConsumedScale: number
+    NonConsumedScale: number
+    PriceTierQuantity: number
+    MaxQuantity: number
+    SortingOverrideTemplateType: string
+    SortingGroup: string
+    SellableInShop: boolean
+    CanBeSoldToShop: boolean
+    ResetStockOnServerStart: boolean
+    SellPriceCoefficient: number
+    ItemType: "Ship"
+    MongoID: string
+    BaseDurability: number
+    QualityPrices: number[]
+    Premium: boolean
+    CaptureNPCType: string
+    CanBeUsedInFleet: boolean
+    FleetHirePriceCoefficient: number
+    CanBeSoldOnlyIn: number
+    RepairKits: PriceModifier
+    RepairKitPriceModifier: PriceModifier
+    RepairKitCooldownModifier: PriceModifier
+    RepairAmount: number
+    HealthInfo: HealthInfo
+    ShipMass: number
+    BattleRating: number
+    GunsPerDeck: number[]
+    ShipType: number
+    HiddenModulesCount: number
+    PortBonusModulesCount: number
+    PersistentModulesCount: number
+    PermanentModulesLimit: Limit[]
+    UpgradeModulesCount: number
+    MinUpgradeModulesCount: number
+    UpgradeModulesLimit: Limit[]
+    OfficerSlots: number
+    Decks: number
+    DeckClassLimit: Limit[]
+    FrontDecks: number
+    FrontDeckClassLimit: Limit[]
+    BackDecks: number
+    BackDeckClassLimit: Limit[]
+    MortarDecks: number
+    MortarDeckClassLimit: Limit[]
+    HoldSize: number
+    MaxWeight: number
+    MinCrewRequired: number
+    ShipClassType: number
+    Unlocks: Unlocks
+    OverrideTotalXpForUpgradeSlots: number
+    Skins?: SkinsEntity[]
+    Limitations: []
+    HostilityScore: number
+    Limitation1_Value: number
+    Limitation2_Value: number
+    Limitation3_Value: number
+    ShowInContractsSelector: boolean
+    DeliveryOrderOptions: DeliveryOrderOptions<false, 0>
+    PortPrices: PortPrices<false, 0>
+}
+
+export interface APIShipBlueprint {
+    __type: "MegaChaka.Services.Items.RecipeShipTemplate, MegaChaka"
+    Name: string
+    Id: number
+    NotUsed: boolean
+    NotTradeable: boolean
+    PreventTeleport: boolean
+    DropChanceReductionPerItem: number
+    MaxStack: number
+    ItemWeight: number
+    BasePrice: number
+    SellPrice: PriceModifier
+    BuyPrice: PriceModifier
+    PriceReductionAmount: number
+    ConsumedScale: number
+    NonConsumedScale: number
+    PriceTierQuantity: number
+    MaxQuantity: number
+    SortingOverrideTemplateType: string
+    SortingGroup: string
+    SellableInShop: boolean
+    CanBeSoldToShop: boolean
+    ResetStockOnServerStart: boolean
+    SellPriceCoefficient: number
+    ItemType: string
+    MongoID: string
+    WoodTypeDescs: WoodTypeDescsEntity[]
+    Qualities: QualitiesEntity[]
+    LaborPrice: number
+    BuildingRequirements: BuildingRequirementsEntity[]
+    FullRequirements: TemplateEntity[]
+    GoldRequirements: number
+    Results: TemplateEntity[]
+    ServerType: string
+    NationAvailability: []
+    CraftGroup: string
+    RequiresLevel: number
+    GivesXP: number
+    AccessibleByLevel: boolean
+    BreakUpRecipeSpawnChance: number
+    DisposeOnUse: boolean
+    CanBeUsedInPort: boolean
+    CanBeUsedInOpenWorld: boolean
+    ShowInContractsSelector: boolean
+    DeliveryOrderOptions: DeliveryOrderOptions
+    PortPrices: PortPrices
 }

@@ -11,7 +11,7 @@
 import * as path from "path"
 import { cleanName, readJson, saveJsonAsync, serverNames, sortBy } from "../common"
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "./common-node"
-import { APIBuilding, LevelsEntity, TemplateEntity, APIItem, APIRecipeResource } from "./api-item"
+import { APIBuilding, LevelsEntity, TemplateEntity, APIItemGeneric, APIRecipeResource } from "./api-item"
 import {
     Building,
     BuildingLevelsEntity,
@@ -41,7 +41,7 @@ const obsoleteBuildings = [
     "Tobacco Plantation"
 ]
 
-let apiItems: APIItem[]
+let apiItems: APIItemGeneric[]
 
 const getItemsCrafted = (buildingId: number): BuildingResult[] =>
     apiItems
@@ -213,7 +213,7 @@ const convertBuildings = async (): Promise<void> => {
 export const convertBuildingData = async (): Promise<void> => {
     apiItems = (readJson(
         path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`)
-    ) as unknown) as APIItem[]
+    ) as unknown) as APIItemGeneric[]
 
     await convertBuildings()
 }
