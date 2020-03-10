@@ -1,7 +1,7 @@
+var _a;
 import { exec, execSync } from "child_process";
 import fs from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
 import { promisify } from "util";
 const execP = promisify(exec);
 import dayjs from "dayjs";
@@ -10,14 +10,13 @@ dayjs.extend(utc);
 import { apiBaseFiles, serverNames } from "../common";
 export const serverMaintenanceHour = 10;
 export const distanceMapSize = 4096;
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const dirOut = path.resolve(__dirname, "..", "public", "data");
-const dirBuild = path.resolve(__dirname, "..", "..", "..", "build");
+const appRoot = (_a = process.env.PWD) !== null && _a !== void 0 ? _a : "";
+const dirOut = path.resolve(appRoot, "public", "data");
+const dirBuild = path.resolve(appRoot, "build");
 const dirAPI = path.resolve(dirBuild, "API");
 const dirModules = path.resolve(dirBuild, "Modules");
-const dirSrc = path.resolve(__dirname, "..", "src");
-const dirLib = path.resolve(__dirname, "..", "..", "..", "lib");
+const dirSrc = path.resolve(appRoot, "src");
+const dirLib = path.resolve(appRoot, "lib");
 const dirGenServer = path.resolve(dirLib, "gen-server");
 const dirGenGeneric = path.resolve(dirLib, "gen-generic");
 export const commonPaths = {
@@ -69,7 +68,7 @@ export const xzAsync = async (command, fileName) => {
     }
     return true;
 };
-const xz = (command, fileName) => {
+export const xz = (command, fileName) => {
     if (fs.existsSync(fileName)) {
         execSync(`${command} ${fileName}`);
     }
