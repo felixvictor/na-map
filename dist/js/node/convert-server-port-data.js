@@ -225,13 +225,9 @@ export const convertServerPortData = () => {
             .map(apiItem => [cleanName(apiItem.Name), apiItem.ItemWeight]));
         numberPorts = apiPorts.length;
         distances = new Map(distancesOrig.map(([fromPortId, toPortId, distance]) => [fromPortId * numberPorts + toPortId, distance]));
-        console.log("setAndSavePortData");
         setAndSavePortData(serverName);
-        console.log("setAndSaveTradeData");
         setAndSaveTradeData(serverName);
-        console.log("setAndSavePortBattleData");
         setAndSavePortBattleData(serverName);
-        console.log("setAndSaveFrontlines");
         setAndSaveFrontlines(serverName);
     }
 };
