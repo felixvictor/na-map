@@ -8,6 +8,7 @@ import { convertRecipeData } from "./convert-recipes";
 import { convertRepairData } from "./convert-module-repair-data";
 import { convertOwnershipData } from "./convert-ownership";
 import { convertServerPortData } from "./convert-server-port-data";
+import { convertShipData } from "./convert-ship-data";
 const runType = process.argv[2] || "client";
 const convertApiData = async () => {
     convertBuildingData();
@@ -21,6 +22,7 @@ const convertApiData = async () => {
     if (runType.endsWith("server")) {
         convertOwnershipData();
     }
+    await convertShipData();
 };
 uncompressApiData();
 convertApiData();
