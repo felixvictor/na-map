@@ -24,7 +24,7 @@ import { convertShipData } from "./convert-ship-data"
 import { createPortBattleSheet } from "./create-pb-sheets"
  */
 
-// const runType = process.argv[2] || "client"
+const runType = process.argv[2] || "client"
 
 const convertApiData = async (): Promise<void> => {
     convertBuildingData()
@@ -35,7 +35,9 @@ const convertApiData = async (): Promise<void> => {
     convertRecipeData()
     convertRepairData()
     convertServerPortData()
-    convertOwnershipData()
+    if (runType.endsWith("server")) {
+        convertOwnershipData()
+    }
     /*
     await convertShipData()
     */
