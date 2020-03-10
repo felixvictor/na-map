@@ -412,7 +412,7 @@ export interface Ship {
     gunsPerDeck: number[]
     guns: number
     broadside: ShipBroadside
-    deckClassLimit: number[]
+    deckClassLimit: number[][]
     shipMass: number
     battleRating: number
     decks: number
