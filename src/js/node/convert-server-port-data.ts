@@ -312,8 +312,6 @@ export const convertServerPortData = () => {
             path.resolve(baseAPIFilename, `${serverNames[0]}-Shops-${serverDate}.json`)
         ) as unknown) as APIShop[]
 
-        console.log(apiItems.filter(apiRecipe => apiRecipe.ItemType === "RecipeModule").map(d => d.Results))
-
         /**
          * Item names
          */
@@ -349,12 +347,16 @@ export const convertServerPortData = () => {
             distancesOrig.map(([fromPortId, toPortId, distance]) => [fromPortId * numberPorts + toPortId, distance])
         )
 
+        console.log("setAndSavePortData")
         // noinspection JSIgnoredPromiseFromCall
         setAndSavePortData(serverName)
+        console.log("setAndSaveTradeData")
         // noinspection JSIgnoredPromiseFromCall
         setAndSaveTradeData(serverName)
+        console.log("setAndSavePortBattleData")
         // noinspection JSIgnoredPromiseFromCall
         setAndSavePortBattleData(serverName)
+        console.log("setAndSaveFrontlines")
         // noinspection JSIgnoredPromiseFromCall
         setAndSaveFrontlines(serverName)
     }
