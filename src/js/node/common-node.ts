@@ -21,7 +21,7 @@ dayjs.extend(utc)
 import { apiBaseFiles, serverNames } from "../common"
 
 export const serverMaintenanceHour = 10
-export const distanceMapSize = 2048
+export const distanceMapSize = 4096
 
 // https://stackoverflow.com/a/50052194
 const appRoot = process.env.PWD ?? ""
