@@ -382,7 +382,7 @@ export const getDistance = (pt0: Coordinate, pt1: Coordinate): number => {
  * @param   b - String b
  * @returns Sort result
  */
-export const simpleSort = (a: string, b: string): number => a.localeCompare(b)
+export const simpleSort = (a: string | undefined, b: string | undefined): number => (a && b ? a.localeCompare(b) : 0)
 
 export interface StringIdedObject {
     Id: string
