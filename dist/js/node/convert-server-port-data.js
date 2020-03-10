@@ -207,7 +207,6 @@ export const convertServerPortData = () => {
         apiItems = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`));
         apiPorts = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-Ports-${serverDate}.json`));
         apiShops = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-Shops-${serverDate}.json`));
-        console.log(apiItems.filter(apiRecipe => apiRecipe.ItemType === "RecipeModule").map(d => d.Results));
         itemNames = new Map(apiItems.map(item => [
             item.Id,
             {
@@ -226,9 +225,13 @@ export const convertServerPortData = () => {
             .map(apiItem => [cleanName(apiItem.Name), apiItem.ItemWeight]));
         numberPorts = apiPorts.length;
         distances = new Map(distancesOrig.map(([fromPortId, toPortId, distance]) => [fromPortId * numberPorts + toPortId, distance]));
+        console.log("setAndSavePortData");
         setAndSavePortData(serverName);
+        console.log("setAndSaveTradeData");
         setAndSaveTradeData(serverName);
+        console.log("setAndSavePortBattleData");
         setAndSavePortBattleData(serverName);
+        console.log("setAndSaveFrontlines");
         setAndSaveFrontlines(serverName);
     }
 };
