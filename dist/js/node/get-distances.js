@@ -1,10 +1,9 @@
-#!/usr/bin/env -S yarn node --experimental-specifier-resolution=node
 import * as fs from "fs";
 import * as path from "path";
 import { default as Denque } from "denque";
 import { default as PNG } from "pngjs";
 import { convertCoordX, convertCoordY, readJson, saveJsonAsync, serverNames } from "../common";
-import { baseAPIFilename, commonPaths, distanceMapSize, serverStartDate as serverDate } from "./common-node";
+import { baseAPIFilename, commonPaths, distanceMapSize, serverStartDate as serverDate, xz } from "./common-node";
 const mapFileName = path.resolve(commonPaths.dirSrc, "images", `frontline-map-${distanceMapSize}.png`);
 const distancesFile = path.resolve(commonPaths.dirGenGeneric, `distances-${distanceMapSize}.json`);
 const spotWater = 0;
@@ -20,17 +19,10 @@ const getCoordinates = (y, x) => [
     Math.trunc(convertCoordY(x, y) * mapScale),
     Math.trunc(convertCoordX(x, y) * mapScale)
 ];
-const apiPorts = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-Ports-${serverDate}.json`));
-const portIds = apiPorts.map((port) => Number(port.Id));
-const numPorts = portIds.length;
-const map = new Array(mapWidth * mapHeight)
-    .fill(0)
-    .map((_e, index) => (png.data[index << 2] > 127 ? spotWater : spotLand));
-apiPorts.forEach(({ Id, EntrancePosition: { z: y, x } }) => {
-    const [portY, portX] = getCoordinates(y, x);
-    const index = getIndex(portY, portX);
-    map[index] = Number(Id);
-});
+const fileName = path.resolve(baseAPIFilename, `${serverNames[0]}-Ports-${serverDate}.json`);
+let apiPorts = [];
+let portIds = [];
+let numPorts = 0;
 const visitedPositionsDefault = new Set();
 const distances = [];
 const startPortIds = new Set();
@@ -95,9 +87,22 @@ const getDistances = async () => {
         const { EntrancePosition: { z: y, x } } = fromPort;
         const [fromPortY, fromPortX] = getCoordinates(y, x);
         findPaths(fromPortId, fromPortY, fromPortX);
-        console.timeLog("findPath", `${fromPort.Id} ${fromPort.Name} (${fromPortY}, ${fromPortX})`);
+        console.timeLog("findPath", `${fromPortId} ${fromPort.Name} (${fromPortY}, ${fromPortX})`);
     });
     console.timeEnd("findPath");
     await saveJsonAsync(distancesFile, distances);
 };
+xz("unxz", `${fileName}.xz`);
+apiPorts = readJson(fileName);
+portIds = apiPorts.map((port) => Number(port.Id));
+numPorts = portIds.length;
+const map = new Array(mapWidth * mapHeight)
+    .fill(0)
+    .map((_e, index) => (png.data[index << 2] > 127 ? spotWater : spotLand));
+apiPorts.forEach(({ Id, EntrancePosition: { z: y, x } }) => {
+    const [portY, portX] = getCoordinates(y, x);
+    const index = getIndex(portY, portX);
+    map[index] = Number(Id);
+});
 getDistances();
+xz("xz", fileName);
