@@ -10,8 +10,10 @@
 
 // https://jvilk.com/MakeTypes/
 
-import { Point } from "./common"
+import { cleanName, nations, Point } from "./common"
 import { ModifiersEntity } from "./node/api-item"
+import { numberSegments } from "./common-browser"
+import dayjs from "dayjs"
 
 /****************************
  * buildings.json
@@ -214,6 +216,22 @@ interface OwnershipLabelRange {
 }
 
 /****************************
+ * <servername>-pb.json
+ */
+
+export interface PortBattlePerServer {
+    id: number
+    name: string
+    nation: string
+    capturer: string
+    lastPortBattle: string
+    attackerNation: string
+    attackerClan: string
+    attackHostility: string
+    portBattle: string
+}
+
+/****************************
  * pb-zones.json
  */
 
@@ -232,7 +250,7 @@ export interface PbZone {
  * ports.json
  */
 
-export interface Port {
+export interface PortGeneric {
     id: number
     name: string
     coordinates: Point
@@ -250,6 +268,36 @@ export interface Port {
     portBattleType: string
     nonCapturable: boolean
     conquestMarksPension: number
+}
+
+/****************************
+ * <servername>-ports.json
+ */
+
+export interface PortPerServer
+    extends ObjectIndexer<undefined | boolean | number | string | string[] | InventoryEntity[]> {
+    id: number
+    portBattleStartTime: number
+    portBattleType: string
+    nonCapturable: boolean
+    conquestMarksPension: number
+    portTax: number
+    taxIncome: number
+    netIncome: number
+    tradingCompany: number
+    laborHoursDiscount: number
+    dropsTrading?: string[]
+    consumesTrading?: string[]
+    producesNonTrading?: string[]
+    dropsNonTrading?: string[]
+    inventory: InventoryEntity[]
+}
+export interface InventoryEntity {
+    name: string
+    buyQuantity: number
+    buyPrice: number
+    sellPrice: number
+    sellQuantity: number
 }
 
 /****************************
@@ -305,6 +353,24 @@ interface RecipeIngredientEntity {
     id: number
     name: string
     recipeNames: string[]
+}
+
+/****************************
+ * <servername>-trades.json
+ */
+
+export interface Trade {
+    good: string
+    source: TradePrice
+    target: TradePrice
+    distance: number
+    profitTotal: number
+    quantity: number
+    weightPerItem: number
+}
+interface TradePrice {
+    id: number
+    grossPrice: number
 }
 
 /****************************

@@ -218,7 +218,7 @@ export const getDistance = (pt0, pt1) => {
     };
     return distancePoints(fromF11, toF11) / (timeFactor * speedFactor);
 };
-export const simpleSort = (a, b) => a.localeCompare(b);
+export const simpleSort = (a, b) => (a && b ? a.localeCompare(b) : 0);
 export const sortId = ({ Id: a }, { Id: b }) => Number(a) - Number(b);
 export const sortBy = (properties) => (a, b) => {
     let r = 0;
