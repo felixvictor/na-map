@@ -25,7 +25,7 @@ import {
     sortBy
 } from "../common"
 import { baseAPIFilename, commonPaths, distanceMapSize, serverStartDate as serverDate } from "./common-node"
-import { APIItem } from "./api-item"
+import { APIItemGeneric } from "./api-item"
 import { APIPort } from "./api-port"
 import { APIShop } from "./api-shop"
 import { PortBattlePerServer, PortPerServer, Trade } from "../gen-json"
@@ -43,7 +43,7 @@ const frontlinePorts = 2
 const d3n = d3Node()
 const { d3 } = d3n
 
-let apiItems: APIItem[]
+let apiItems: APIItemGeneric[]
 let apiPorts: APIPort[] = []
 let apiShops: APIShop[] = []
 
@@ -304,7 +304,7 @@ export const convertServerPortData = () => {
     for (const serverName of serverNames) {
         apiItems = (readJson(
             path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`)
-        ) as unknown) as APIItem[]
+        ) as unknown) as APIItemGeneric[]
         apiPorts = (readJson(
             path.resolve(baseAPIFilename, `${serverNames[0]}-Ports-${serverDate}.json`)
         ) as unknown) as APIPort[]
