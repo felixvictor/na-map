@@ -7,6 +7,7 @@ import { convertModules } from "./convert-modules";
 import { convertRecipeData } from "./convert-recipes";
 import { convertRepairData } from "./convert-module-repair-data";
 import { convertOwnershipData } from "./convert-ownership";
+import { convertServerPortData } from "./convert-server-port-data";
 const convertApiData = async () => {
     convertBuildingData();
     convertCannons();
@@ -15,6 +16,7 @@ const convertApiData = async () => {
     convertModules();
     convertRecipeData();
     convertRepairData();
+    convertServerPortData();
     convertOwnershipData();
 };
 uncompressApiData();
