@@ -18,8 +18,8 @@ import { convertModules } from "./convert-modules"
 import { convertRecipeData } from "./convert-recipes"
 import { convertRepairData } from "./convert-module-repair-data"
 import { convertOwnershipData } from "./convert-ownership"
-/*
 import { convertServerPortData } from "./convert-server-port-data"
+/*
 import { convertShipData } from "./convert-ship-data"
 import { createPortBattleSheet } from "./create-pb-sheets"
  */
@@ -34,11 +34,9 @@ const convertApiData = async (): Promise<void> => {
     convertModules()
     convertRecipeData()
     convertRepairData()
-//    if (runType.endsWith("server")) {
-        convertOwnershipData()
-//    }
-    /*
     convertServerPortData()
+    convertOwnershipData()
+    /*
     await convertShipData()
     */
 }
