@@ -11,10 +11,10 @@
 import * as path from "path"
 import { capitalizeFirstLetter, cleanName, groupToMap, readJson, saveJsonAsync, serverNames, sortBy } from "../common"
 import { commonPaths, baseAPIFilename, serverStartDate as serverDate } from "./common-node"
-import { APIItem, APIModule, ModifiersEntity } from "./api-item"
+import { APIItemGeneric, APIModule, ModifiersEntity } from "./api-item"
 import { ModuleEntity, ModulePropertiesEntity, Wood, WoodTrimOrFrame } from "../gen-json"
 
-let apiItems: APIItem[]
+let apiItems: APIItemGeneric[]
 
 /**
  * Convert API module data
@@ -482,7 +482,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
 export const convertModules = (): void => {
     apiItems = (readJson(
         path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`)
-    ) as unknown) as APIItem[]
+    ) as unknown) as APIItemGeneric[]
 
     // noinspection JSIgnoredPromiseFromCall
     convertModulesAndWoodData()
