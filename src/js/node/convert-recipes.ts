@@ -11,10 +11,10 @@
 import * as path from "path"
 import { cleanName, readJson, saveJsonAsync, serverNames, simpleSort, sortBy } from "../common"
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "./common-node"
-import { APIItem, APIRecipeModuleResource, APIRecipeResource, APIShipUpgradeBookItem } from "./api-item"
+import { APIItemGeneric, APIRecipeModuleResource, APIRecipeResource, APIShipUpgradeBookItem } from "./api-item"
 import { Recipe, RecipeEntity } from "../gen-json"
 
-let apiItems: APIItem[]
+let apiItems: APIItemGeneric[]
 
 // noinspection SpellCheckingInspection
 const groups = new Map([
@@ -142,7 +142,7 @@ const convertRecipes = async (): Promise<void> => {
 export const convertRecipeData = (): void => {
     apiItems = (readJson(
         path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`)
-    ) as unknown) as APIItem[]
+    ) as unknown) as APIItemGeneric[]
 
     // noinspection JSIgnoredPromiseFromCall
     convertRecipes()

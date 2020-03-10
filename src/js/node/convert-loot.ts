@@ -11,10 +11,10 @@
 import * as path from "path"
 import { cleanName, getOrdinal, readJson, saveJsonAsync, serverNames, sortBy } from "../common"
 import { commonPaths, baseAPIFilename, serverStartDate as serverDate } from "./common-node"
-import { APIItem, ItemsEntity, APIShipLootTableItem, APITimeBasedConvertibleItem } from "./api-item"
+import { APIItemGeneric, ItemsEntity, APIShipLootTableItem, APITimeBasedConvertibleItem } from "./api-item"
 import { Loot, LootChestsEntity, LootItemsEntity, LootLootEntity } from "../gen-json"
 
-let apiItems: APIItem[]
+let apiItems: APIItemGeneric[]
 const secondsPerHour = 3600
 
 const getLootName = (classId: number, isMission: boolean): string => {
@@ -104,7 +104,7 @@ const convertLoot = async () => {
 export const convertLootData = () => {
     apiItems = (readJson(
         path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`)
-    ) as unknown) as APIItem[]
+    ) as unknown) as APIItemGeneric[]
 
     convertLoot()
 }
