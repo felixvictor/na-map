@@ -11,8 +11,9 @@
 import * as fs from "fs"
 import * as path from "path"
 
-import convert, { ElementCompact } from "xml-js";
-import mergeAdvanced from "object-merge-advanced"
+import { mergeAdvanced } from "object-merge-advanced"
+
+import convert, { ElementCompact } from "xml-js"
 
 import {
     cleanName,
@@ -30,11 +31,12 @@ import {
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "./common-node"
 import { APIItemGeneric, APIShip, APIShipBlueprint } from "./api-item"
 import { Ship } from "../gen-json"
-import { XmlCannon } from "./xml";
+import { TextEntity, XmlGeneric } from "./xml"
 
+type ElementMap = Map<string, { group: string; element: string; [key: string]: string }>
 interface SubFileStructure {
     ext: string // file name extension (base file name is a ship name)
-    elements: Map<string, { group: string; element: string }>
+    elements: ElementMap
 }
 
 /**
@@ -227,6 +229,7 @@ const subFileStructure: SubFileStructure[] = [
 ]
 
 let apiItems: APIItemGeneric[]
+let ships: Ship[]
 
 /**
  * Get item names
@@ -395,20 +398,20 @@ const getBaseFileNames = (dir: string): void => {
     baseFileNames.add("indiaman rookie")
 }
 
-const getAddData = (elements, fileData) => {
+const getAddData = (elements: ElementMap, fileData: XmlGeneric): Ship => {
     /**
      * Ship data to be added per file
-     * @type {Object.<string, Object.<string, number>>}
      */
-    const addData = {}
+    const addData = {} as Ship
 
     // Retrieve additional data per attribute pair
-    for (const pair of fileData.ModuleTemplate.Attributes.Pair) {
+    for (const pair of fileData.Attributes.Pair) {
         const key = pair.Key._text
         // Check if pair is considered additional data
         if (elements.has(key)) {
-            const value = Number(pair.Value.Value._text)
-            const { group, element } = elements.get(key)
+            const value = Number((pair.Value.Value as TextEntity)._text)
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            const { group, element } = elements.get(key)!
             if (!addData[group]) {
                 addData[group] = {}
             }
@@ -427,7 +430,7 @@ const getAddData = (elements, fileData) => {
 }
 
 // Add additional data to the existing data
-const addAddData = (addData, id) => {
+const addAddData = (addData: Ship, id: number): void => {
     // Find current ship
     ships
         .filter(ship => ship.id === id)
@@ -447,12 +450,12 @@ const addAddData = (addData, id) => {
         })
 }
 
-const getFileData = (baseFileName: string, ext: string): any => {
+const getFileData = (baseFileName: string, ext: string): XmlGeneric => {
     const fileName = path.resolve(commonPaths.dirModules, `${baseFileName} ${ext}.xml`)
-    let data = {}
+    let data = {} as XmlGeneric
     if (fileExists(fileName)) {
         const fileXmlData = readTextFile(fileName)
-        data = (convert.xml2js(fileXmlData, { compact: true }) as ElementCompact).ModuleTemplate
+        data = (convert.xml2js(fileXmlData, { compact: true }) as ElementCompact).ModuleTemplate as XmlGeneric
     }
 
     return data
@@ -479,7 +482,6 @@ const convertAddShipData = (ships: Ship[]): Ship[] => {
                 const fileData = getFileData(baseFileName, file.ext)
                 /**
                  * Ship data to be added per file
-                 * @type {Object.<string, Object.<string, number>>}
                  */
                 const addData = getAddData(file.elements, fileData)
 
@@ -506,16 +508,15 @@ const convertAddShipData = (ships: Ship[]): Ship[] => {
                 const fileMasterData = getFileData(masterBaseFileName, file.ext)
                 /**
                  * Ship data to be added per file
-                 * @type {Object.<string, Object.<string, number>>}
                  */
-                const addData = isEmpty(fileData) ? {} : getAddData(file.elements, fileData)
-                const addMasterData = getAddData(file.elements, fileMasterData)
+                const addData = isEmpty(fileData) ? ({} as Ship) : getAddData(file.elements, fileData)
+                const addMasterData = getAddData(file.elements, fileMasterData) as Ship
 
                 /*
                     https://stackoverflow.com/a/47554782
                     const mergedData = mergeDeep(addMasterData,addData);
                 */
-                const mergedData = mergeAdvanced(addMasterData, addData)
+                const mergedData = mergeAdvanced(addMasterData, addData) as Ship
 
                 addAddData(mergedData, id)
             }
@@ -620,15 +621,15 @@ resourceRatios.forEach((value, key) => {
 });
 */
 
-const convertShips = async () => {
-    let ships = convertGenericShipData()
+const convertShips = async (): Promise<void> => {
+    ships = convertGenericShipData()
     ships = convertAddShipData(ships)
     // @ts-ignore
     ships.sort(sortBy(["class", "name"]))
     await saveJsonAsync(commonPaths.fileShip, ships)
 }
 
-export const convertShipData = async () => {
+export const convertShipData = async (): Promise<void> => {
     apiItems = (readJson(
         path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`)
     ) as unknown) as APIItemGeneric[]
