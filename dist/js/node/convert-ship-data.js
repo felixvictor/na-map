@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
+import { mergeAdvanced } from "object-merge-advanced";
 import convert from "xml-js";
-import mergeAdvanced from "object-merge-advanced";
 import { cleanName, fileExists, isEmpty, readJson, readTextFile, roundToThousands, saveJsonAsync, serverNames, sortBy, speedConstA, speedConstB } from "../common";
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "./common-node";
 const middleMastThicknessRatio = 0.75;
@@ -144,6 +144,7 @@ const subFileStructure = [
     }
 ];
 let apiItems;
+let ships;
 const getItemNames = () => new Map(apiItems.map(item => [item.Id, cleanName(item.Name)]));
 const getShipMass = (id) => { var _a, _b; return (_b = (_a = apiItems.find(apiItem => id === apiItem.Id)) === null || _a === void 0 ? void 0 : _a.ShipMass) !== null && _b !== void 0 ? _b : 0; };
 const convertGenericShipData = () => {
@@ -272,7 +273,7 @@ const getBaseFileNames = (dir) => {
 };
 const getAddData = (elements, fileData) => {
     const addData = {};
-    for (const pair of fileData.ModuleTemplate.Attributes.Pair) {
+    for (const pair of fileData.Attributes.Pair) {
         const key = pair.Key._text;
         if (elements.has(key)) {
             const value = Number(pair.Value.Value._text);
@@ -383,7 +384,7 @@ const convertShipBlueprints = async () => {
     await saveJsonAsync(commonPaths.fileShipBlueprint, shipBlueprints);
 };
 const convertShips = async () => {
-    let ships = convertGenericShipData();
+    ships = convertGenericShipData();
     ships = convertAddShipData(ships);
     ships.sort(sortBy(["class", "name"]));
     await saveJsonAsync(commonPaths.fileShip, ships);
