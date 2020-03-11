@@ -1832,6 +1832,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/geojson@*":
+  version "7946.0.7"
+  resolved "https://registry.yarnpkg.com/@types/geojson/-/geojson-7946.0.7.tgz#c8fa532b60a0042219cdf173ca21a975ef0666ad"
+  integrity sha512-wE2v81i4C4Ol09RtsWFAqg3BUitWbHSpSlIo+bNdsCJijO9sjme+zm+73ZMCa/qMC8UEERxzGbvmr1cffo2SiQ==
+
 "@types/glob@^7.1.1":
   version "7.1.1"
   resolved "https://registry.yarnpkg.com/@types/glob/-/glob-7.1.1.tgz#aa59a1c6e3fbc421e07ccd31a944c30eba521575"
@@ -2032,6 +2037,14 @@
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/@types/tapable/-/tapable-1.0.5.tgz#9adbc12950582aa65ead76bffdf39fe0c27a3c02"
   integrity sha512-/gG2M/Imw7cQFp8PGvz/SwocNrmKFjFsm5Pb8HdbHkZ1K8pmuPzOX4VeVoiEecFCVf4CsN1r3/BRvx+6sNqwtQ==
+
+"@types/twit@^2.2.23":
+  version "2.2.23"
+  resolved "https://registry.yarnpkg.com/@types/twit/-/twit-2.2.23.tgz#e76962f5d4a4c74617ebc55ed36dba62ce0b0fe6"
+  integrity sha512-r7hqCaOjlzOEtpCM2z+mwCNKXxc9SZAAPL86QVun+TcgrsBfdeQX7s8cf/9QNJVNwTfLC69Yof0zc7G31p09xQ==
+  dependencies:
+    "@types/geojson" "*"
+    "@types/node" "*"
 
 "@types/uglify-js@*":
   version "3.0.4"
