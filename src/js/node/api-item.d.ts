@@ -761,6 +761,6 @@ export interface APIShipBlueprint {
     CanBeUsedInPort: boolean
     CanBeUsedInOpenWorld: boolean
     ShowInContractsSelector: boolean
-    DeliveryOrderOptions: DeliveryOrderOptions
-    PortPrices: PortPrices
+    DeliveryOrderOptions: DeliveryOrderOptions<false, 0>
+    PortPrices: PortPrices<false, 0>
 }
