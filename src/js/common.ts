@@ -175,29 +175,17 @@ export const fileExists = (fileName: string): boolean => fs.existsSync(fileName)
  * Make directories (recursive)
  */
 export const makeDirAsync = async (dir: string): Promise<void> => {
-    try {
-        await pfs.mkdir(dir, { recursive: true })
-    } catch (error) {
-        throw error
-    }
+    await pfs.mkdir(dir, { recursive: true })
 }
 
 export const saveJsonAsync = async (fileName: string, data: object): Promise<void> => {
     await makeDirAsync(path.dirname(fileName))
-    try {
-        await pfs.writeFile(fileName, JSON.stringify(data), { encoding: "utf8" })
-    } catch (error) {
-        throw error
-    }
+    await pfs.writeFile(fileName, JSON.stringify(data), { encoding: "utf8" })
 }
 
-export const saveTextFile = (fileName: string, data: object): void => {
-    try {
-        fs.writeFileSync(fileName, data, { encoding: "utf8" })
-    } catch (error) {
-        throw error
-    }
-}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const saveTextFile = (fileName: string, data: any): void =>
+    fs.writeFileSync(fileName, data, { encoding: "utf8" })
 
 export const readTextFile = (fileName: string): string => {
     let data = ""
