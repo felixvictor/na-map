@@ -405,7 +405,7 @@ interface ShipBlueprintShip {
  * ships.json
  */
 
-export interface Ship {
+export interface Ship extends ObjectIndexer<any> {
     id: number
     name: string
     class: number

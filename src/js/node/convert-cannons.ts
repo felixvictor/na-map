@@ -16,7 +16,7 @@ import convert, { ElementCompact } from "xml-js"
 import { readTextFile, round, saveJsonAsync } from "../common"
 import { commonPaths } from "./common-node"
 import { Cannon, CannonEntity, CannonGroupIndex, CannonPenetration, CannonValue } from "../gen-json"
-import { PairEntity, TangentEntity, TextEntity, XmlCannon } from "./xml"
+import { PairEntity, TangentEntity, TextEntity, XmlGeneric } from "./xml"
 
 // noinspection MagicNumberJS
 const peneDistances = [50, 100, 250, 500, 750, 1000]
@@ -35,11 +35,11 @@ const countDecimals = (value: number): number => {
  * @param baseFileName - Base file name
  * @returns File content in json format
  */
-const getFileData = (baseFileName: string): XmlCannon => {
+const getFileData = (baseFileName: string): XmlGeneric => {
     const fileName = path.resolve(commonPaths.dirModules, baseFileName)
     const fileXmlData = readTextFile(fileName)
 
-    return (convert.xml2js(fileXmlData, { compact: true }) as ElementCompact).ModuleTemplate as XmlCannon
+    return (convert.xml2js(fileXmlData, { compact: true }) as ElementCompact).ModuleTemplate as XmlGeneric
 }
 
 /**
@@ -113,7 +113,7 @@ for (const type of cannonTypes) {
  * Add data
  * @param fileData - File data per cannon
  */
-const addData = (fileData: XmlCannon): void => {
+const addData = (fileData: XmlGeneric): void => {
     let type = "medium"
 
     if (fileData._attributes.Name.includes("Carronade")) {
