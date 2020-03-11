@@ -124,30 +124,13 @@ export const capitalToCounty = new Map([
 ]);
 export const fileExists = (fileName) => fs.existsSync(fileName);
 export const makeDirAsync = async (dir) => {
-    try {
-        await pfs.mkdir(dir, { recursive: true });
-    }
-    catch (error) {
-        throw error;
-    }
+    await pfs.mkdir(dir, { recursive: true });
 };
 export const saveJsonAsync = async (fileName, data) => {
     await makeDirAsync(path.dirname(fileName));
-    try {
-        await pfs.writeFile(fileName, JSON.stringify(data), { encoding: "utf8" });
-    }
-    catch (error) {
-        throw error;
-    }
+    await pfs.writeFile(fileName, JSON.stringify(data), { encoding: "utf8" });
 };
-export const saveTextFile = (fileName, data) => {
-    try {
-        fs.writeFileSync(fileName, data, { encoding: "utf8" });
-    }
-    catch (error) {
-        throw error;
-    }
-};
+export const saveTextFile = (fileName, data) => fs.writeFileSync(fileName, data, { encoding: "utf8" });
 export const readTextFile = (fileName) => {
     let data = "";
     try {

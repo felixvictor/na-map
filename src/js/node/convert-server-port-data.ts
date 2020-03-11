@@ -199,7 +199,7 @@ const setAndSavePortBattleData = async (serverName: string): Promise<void> => {
             lastPortBattle: dayjs((port.LastPortBattle - ticks) / 10000).format("YYYY-MM-DD HH:mm"),
             attackerNation: "",
             attackerClan: "",
-            attackHostility: "",
+            attackHostility: 0,
             portBattle: ""
         }))
         .sort(sortBy(["id"])) as PortBattlePerServer[]
