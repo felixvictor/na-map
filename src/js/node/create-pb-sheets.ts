@@ -1,20 +1,26 @@
-#!/usr/bin/env -S yarn yarn node --experimental-modules --no-warnings
-
 /**
  * This file is part of na-map.
  *
  * @file      Create pb sheets.
- * @module    build/create-pb-sheets
+ * @module    src/js/node/create-pb-sheets
  * @author    iB aka Felix Victor
  * @copyright 2017, 2018, 2019, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import Excel4Node from "excel4node"
+import Excel4Node, { Style, Worksheet } from "excel4node"
 import sass from "node-sass"
-import css from "css"
+import css, { Declaration, Rule } from "css"
 
-import { commonPaths, range, readJson, sortBy } from "./common.mjs"
+import { range, readJson, sortBy } from "../common"
+import { commonPaths } from "./common-node"
+import { PortGeneric, Ship } from "../gen-json"
+
+type ColourMap = Map<string, string>
+interface PortBR {
+    name: string
+    br: number
+}
 
 const shallowWaterFrigates = ["Cerberus", "Hercules", "L’Hermione", "La Renommée", "Surprise"]
 const minDeepWaterBR = 80
@@ -23,13 +29,13 @@ const maxNumPlayers = 25
 const columnWidth = 20
 const rowHeight = 24
 
-let portsOrig
-let shipsOrig
+let portsOrig: PortGeneric[]
+let shipsOrig: Ship[]
 
 /** Set colours
- * @returns {Map} Colours
+ * @returns Colours
  */
-function setColours() {
+const setColours = (): ColourMap => {
     const compiledCss = sass
         .renderSync({
             file: "src/scss/pre-compile.scss"
@@ -37,22 +43,23 @@ function setColours() {
         .css.toString()
     const parsedCss = css.parse(compiledCss)
     return new Map(
-        parsedCss.stylesheet.rules
-            .filter(rule => rule.selectors !== undefined && rule.selectors[0].startsWith(".colour-palette "))
-            .map(rule => {
-                const d = rule.declarations.find(declaration => declaration.property === "background-color")
-                return [rule.selectors[0].replace(".colour-palette .", ""), d ? d.value : ""]
-            })
+        (parsedCss.stylesheet?.rules.filter((rule: Rule) =>
+            rule.selectors?.[0].startsWith(".colour-palette ")
+        ) as Rule[]).map(rule => {
+            const d = rule?.declarations?.find(
+                (declaration: Declaration) => declaration.property === "background-color"
+            ) as Declaration
+            return [rule.selectors?.[0].replace(".colour-palette .", "") ?? "", d.value ?? ""]
+        })
     )
 }
 
 // noinspection FunctionTooLongJS
 /**
  * Create excel spreadsheet
- * @returns {void}
  */
-const createPortBattleSheets = () => {
-    const portsDeepWater = portsOrig
+const createPortBattleSheets = (): void => {
+    const portsDeepWater: PortBR[] = portsOrig
         .filter(port => !port.shallow)
         .map(port => ({
             name: port.name,
@@ -60,7 +67,7 @@ const createPortBattleSheets = () => {
         }))
         .sort((a, b) => a.name.localeCompare(b.name))
 
-    const portsShallowWater = portsOrig
+    const portsShallowWater: PortBR[] = portsOrig
         .filter(port => port.shallow)
         .map(port => ({
             name: port.name,
@@ -70,19 +77,19 @@ const createPortBattleSheets = () => {
 
     const colours = setColours()
     // const colourWhite = colours.get("white")
-    const colourPrimaryWhite = colours.get("primary-050")
+    const colourPrimaryWhite = colours.get("primary-050") ?? ""
     // const colourPrimaryNearWhite = colours.get("primary-100")
     // const colourPrimaryLight = colours.get("primary-200")
     // const colourPrimaryDark = colours.get("primary-600")
-    const colourContrastWhite = colours.get("secondary-050")
-    const colourContrastNearWhite = colours.get("secondary-100")
-    const colourContrastLight = colours.get("secondary-200")
-    const colourContrastMiddle = colours.get("secondary-400")
+    const colourContrastWhite = colours.get("secondary-050") ?? ""
+    const colourContrastNearWhite = colours.get("secondary-100") ?? ""
+    const colourContrastLight = colours.get("secondary-200") ?? ""
+    const colourContrastMiddle = colours.get("secondary-400") ?? ""
     // const colourContrastDark = colours.get("secondary-600")
-    const colourText = colours.get("secondary-800")
+    const colourText = colours.get("secondary-800") ?? ""
     // const colourBackground = colours.get("background-600")
-    const colourHighlight = colours.get("info")
-    const colourRed = colours.get("pink")
+    const colourHighlight = colours.get("info") ?? ""
+    const colourRed = colours.get("pink") ?? ""
 
     const wsOptions = {
         sheetView: {
@@ -99,31 +106,26 @@ const createPortBattleSheets = () => {
 
     /**
      * Returns fill pattern object
-     * @param {String} colour - Pattern colour
-     * @returns {Object} Fill pattern
+     * @param colour - Pattern colour
+     * @returns Fill pattern
      */
-    const fillPattern = colour =>
+    const fillPattern = (colour: string): Style =>
         workbook.createStyle({ fill: { type: "pattern", patternType: "solid", fgColor: colour } }) // §18.8.20 fill (Fill)
 
     /**
      * Returns font object with color colour
-     * @param {String} colour - Font colour
-     * @returns {Object} Font object
+     * @param colour - Font colour
+     * @returns Font object
      */
-    // const fontColour = colour => workbook.createStyle({ font: { color: colour } }) // §18.8.22
+    // const fontColour = (colour: string) => workbook.createStyle({ font: { color: colour } }) // §18.8.22
 
     /**
      * Returns font object with bold font
-     * @param {String} colour - Font colour
-     * @returns {Object} Font object
+     * @param colour - Font colour
+     * @returns Font object
      */
-    const fontColourBold = colour => workbook.createStyle({ font: { bold: true, color: colour } }) // §18.8.22
+    const fontColourBold = (colour: string): Style => workbook.createStyle({ font: { bold: true, color: colour } }) // §18.8.22
 
-    /**
-     * Returns font object with bold font
-     * @param {String} colour - Font colour
-     * @returns {Object} Font object
-     */
     const border = workbook.createStyle({
         // §18.8.4 border (Border)
         border: {
@@ -138,22 +140,16 @@ const createPortBattleSheets = () => {
         }
     })
 
-    /**
-     * Returns font object with bold font
-     * @param {String} colour - Font colour
-     * @returns {Object} Font object
-     */
     const brTooHigh = workbook.createStyle({ font: { bold: true, color: colourRed } }) // §18.8.22
 
     // noinspection FunctionTooLongJS
     /**
      * Fill worksheet
-     * @param {Worksheet} sheet - Worksheet
-     * @param {Object[]} ships - Ship data
-     * @param {Object[]} ports - port data
-     * @returns {void}
+     * @param sheet - Worksheet
+     * @param ships - Ship data
+     * @param ports - port data
      */
-    function fillSheet(sheet, ships, ports) {
+    function fillSheet(sheet: Worksheet, ships: Ship[], ports: PortBR[]): void {
         const numberStyle = {
             alignment: {
                 // §18.8.1
@@ -163,7 +159,7 @@ const createPortBattleSheets = () => {
                 vertical: "center"
             },
             numberFormat: "#" // §18.8.30 numFmt (Number Format)
-        }
+        } as Style
         const textStyle = {
             alignment: {
                 // §18.8.1
@@ -173,7 +169,7 @@ const createPortBattleSheets = () => {
                 vertical: "center"
             },
             numberFormat: "@" // §18.8.30 numFmt (Number Format)
-        }
+        } as Style
 
         const columnsHeader = [
             { name: "Ship rate", width: 8, style: numberStyle },
@@ -191,7 +187,7 @@ const createPortBattleSheets = () => {
         sheet.row(numRowsHeader).freeze()
 
         // ***** Columns *****
-        const setColumns = () => {
+        const setColumns = (): void => {
             // Format first columns
 
             for (const column of columnsHeader) {
@@ -340,11 +336,12 @@ const createPortBattleSheets = () => {
 
         // Port select dropdown
         for (const port of ports) {
-            let i = ports.indexOf(port)
+            const i = ports.indexOf(port)
             sheet.cell(i + 1, numColumnsTotal + 1).string(port.name)
             sheet.cell(i + 1, numColumnsTotal + 2).number(port.br)
         }
 
+        // noinspection SqlNoDataSourceInspection
         sheet.addDataValidation({
             type: "list",
             allowBlank: true,
@@ -414,8 +411,8 @@ const createPortBattleSheets = () => {
 }
 
 export const createPortBattleSheet = () => {
-    portsOrig = readJson(commonPaths.filePort)
-    shipsOrig = readJson(commonPaths.fileShip)
+    portsOrig = (readJson(commonPaths.filePort) as unknown) as PortGeneric[]
+    shipsOrig = (readJson(commonPaths.fileShip) as unknown) as Ship[]
 
     createPortBattleSheets()
 }
