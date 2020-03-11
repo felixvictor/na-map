@@ -46,7 +46,7 @@ export interface TextEntity {
  * Cannons
  */
 
-export interface XmlCannon {
+export interface XmlGeneric {
     _attributes: MainUnderscoreAttributes<string>
     Attributes: Attributes
 }
