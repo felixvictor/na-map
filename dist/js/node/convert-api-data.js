@@ -9,6 +9,7 @@ import { convertRepairData } from "./convert-module-repair-data";
 import { convertOwnershipData } from "./convert-ownership";
 import { convertServerPortData } from "./convert-server-port-data";
 import { convertShipData } from "./convert-ship-data";
+import { createPortBattleSheet } from "./create-pb-sheets";
 const runType = process.argv[2] || "client";
 const convertApiData = async () => {
     convertBuildingData();
@@ -26,4 +27,5 @@ const convertApiData = async () => {
 };
 uncompressApiData();
 convertApiData();
+createPortBattleSheet();
 compressApiData();
