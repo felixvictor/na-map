@@ -8,7 +8,7 @@
     "main": "src/js/main",
     "scripts": {
         "build:data:convert": "yarn node --experimental-specifier-resolution=node dist/js/node/convert-api-data.js",
-        "build:data:twitter": "export $(cat .env | xargs) && build/update-twitter.mjs ${CONSUMER_KEY} ${CONSUMER_SECRET} ${ACCESS_TOKEN} ${ACCESS_TOKEN_SECRET}",
+        "build:data:twitter": "export $(cat .env | xargs) && yarn node --experimental-specifier-resolution=node dist/js/node/update-twitter.js ${CONSUMER_KEY} ${CONSUMER_SECRET} ${ACCESS_TOKEN} ${ACCESS_TOKEN_SECRET}",
         "build:deploy-main": "       TARGET=na-map       run-s prod       build:git-push deploy:netlify",
         "build:deploy-main-quiet": " TARGET=na-map       run-s prod-quiet build:git-push deploy:netlify",
         "build:deploy-test": "       TARGET=na-map-test  run-s prod                      deploy:netlify-test",
@@ -116,6 +116,7 @@
         "@types/polylabel": "^1.0.5",
         "@types/recursive-readdir": "^2.2.0",
         "@types/sharp": "^0.24.0",
+        "@types/twit": "^2.2.23",
         "@typescript-eslint/eslint-plugin": "^2.22.0",
         "@typescript-eslint/parser": "^2.22.0",
         "angular-html-parser": "^1.3.0",
