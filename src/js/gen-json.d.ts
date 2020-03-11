@@ -227,7 +227,7 @@ export interface PortBattlePerServer {
     lastPortBattle: string
     attackerNation: string
     attackerClan: string
-    attackHostility: string
+    attackHostility: number
     portBattle: string
 }
 
