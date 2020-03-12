@@ -1,80 +1,87 @@
 /**
- * webpack.config.js
+ * webpack.config
  */
 
-const webpack = require("webpack");
+import webpack from "webpack"
 
-const path = require("path");
-const sass = require("node-sass");
-const parseCss = require("css");
+import path from "path"
+import sass from "node-sass"
+import css, { Declaration, Rule } from "css"
 // const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
-const { CleanWebpackPlugin } = require("clean-webpack-plugin");
-const CopyPlugin = require("copy-webpack-plugin");
-const HtmlPlugin = require("html-webpack-plugin");
-const ExtractCssChunks = require("extract-css-chunks-webpack-plugin");
-const SitemapPlugin = require("sitemap-webpack-plugin").default;
-const SriPlugin = require("webpack-subresource-integrity");
-const TerserPlugin = require("terser-webpack-plugin");
-const FaviconsPlugin = require("favicons-webpack-plugin");
-const servers = require("./src/js/servers");
-const PACKAGE = require("./package.json");
-const repairs = require("./src/gen-generic/repairs.json");
+import { CleanWebpackPlugin } from "clean-webpack-plugin"
+import CopyPlugin from "copy-webpack-plugin"
+import HtmlPlugin from "html-webpack-plugin"
+import HtmlMinifierPlugin from "html-minifier-terser"
+import ExtractCssChunks from "extract-css-chunks-webpack-plugin"
+import { default as SitemapPlugin } from "sitemap-webpack-plugin"
+import SriPlugin from "webpack-subresource-integrity"
+import TerserPlugin from "terser-webpack-plugin"
+import FaviconsPlugin from "favicons-webpack-plugin"
+import { servers as serverServers } from "./src/js/servers"
+import PACKAGE from "./package.json"
+import repairs from "./lib/gen-generic/repairs.json"
 
 // Environment
-const { TARGET, QUIET } = process.env;
-const { isProduction } = require("webpack-mode");
-const isQuiet = Boolean(QUIET);
-const target = TARGET ? `https://${TARGET}.netlify.com/` : "";
+const { TARGET, QUIET } = process.env
+import { isProduction } from "webpack-mode"
+const isQuiet = Boolean(QUIET)
+const target = TARGET ? `https://${TARGET}.netlify.com/` : ""
 
-const libraryName = PACKAGE.name;
+const libraryName = PACKAGE.name
 const descriptionLong =
-    "Yet another map with in-game map, resources, ship and wood comparisons. Port battle data is updated constantly from twitter and all data daily after maintenance.";
-const sitemapPaths = ["/fonts/", "/icons", "/images"];
+    "Yet another map with in-game map, resources, ship and wood comparisons. Port battle data is updated constantly from twitter and all data daily after maintenance."
+const sitemapPaths = ["/fonts/", "/icons", "/images"]
 
-const dirFlags = path.resolve(__dirname, "src/images/flags");
-const dirFonts = path.resolve(__dirname, "src/fonts/");
-const dirIcons = path.resolve(__dirname, "src/icons");
-const dirOutput = path.resolve(__dirname, "public");
-const dirPrefixIcons = path.join("images", "icons");
+const dirFlags = path.resolve(__dirname, "src/images/flags")
+const dirFonts = path.resolve(__dirname, "src/fonts/")
+const dirIcons = path.resolve(__dirname, "src/icons")
+const dirOutput = path.resolve(__dirname, "public")
+const dirPrefixIcons = path.join("images", "icons")
 
-const fileLogo = path.resolve("src", "images", "icons", "logo.png");
-const filePostcssConfig = "build/postcss.config.js";
-const fileScssPreCompile = path.resolve("src", "scss", "pre-compile.scss");
+const fileLogo = path.resolve("src", "images", "icons", "logo.png")
+const fileScssPreCompile = path.resolve("src", "scss", "pre-compile.scss")
 
+type ColourMap = Map<string, string>
 /** Set colours
- * @returns {Map} Colours
+ * @returns Colours
  */
-function setColours() {
-    const css = sass
+const setColours = (): ColourMap => {
+    const compiledCss = sass
         .renderSync({
             file: fileScssPreCompile
         })
-        .css.toString();
-    const parsedCss = parseCss.parse(css);
+        .css.toString()
+    const parsedCss = css.parse(compiledCss)
     return new Map(
-        parsedCss.stylesheet.rules
-            .filter(rule => rule.selectors !== undefined && rule.selectors[0].startsWith(".colour-palette "))
+        (parsedCss.stylesheet?.rules.filter((rule: Rule) =>
+            rule.selectors?.[0].startsWith(".colour-palette ")
+        ) as Rule[])
+            .filter((rule: Rule) =>
+                rule?.declarations?.find((declaration: Declaration) => declaration.property === "background-color")
+            )
             .map(rule => {
-                const d = rule.declarations.find(declaration => declaration.property === "background-color");
-                return [rule.selectors[0].replace(".colour-palette .", ""), d ? d.value : ""];
+                const d = rule?.declarations?.find(
+                    (declaration: Declaration) => declaration.property === "background-color"
+                ) as Declaration
+                return [rule.selectors?.[0].replace(".colour-palette .", "") ?? "", d.value ?? ""]
             })
-    );
+    )
 }
 
-const colours = setColours();
-const backgroundColour = colours.get("primary-500");
-const themeColour = colours.get("secondary-500");
-const primary700 = colours.get("primary-700");
-const primary200 = colours.get("primary-200");
-const primary300 = colours.get("primary-300");
-const colourGreen = colours.get("green");
-const colourGreenLight = colours.get("green-light");
-const colourGreenDark = colours.get("green-dark");
-const colourOrange = colours.get("orange");
-const colourRed = colours.get("red");
-const colourRedLight = colours.get("red-light");
-const colourRedDark = colours.get("red-dark");
-const colourWhite = colours.get("white");
+const colours = setColours()
+const backgroundColour = colours.get("primary-500")
+const themeColour = colours.get("secondary-500")
+const primary700 = colours.get("primary-700")
+const primary200 = colours.get("primary-200")
+const primary300 = colours.get("primary-300")
+const colourGreen = colours.get("green")
+const colourGreenLight = colours.get("green-light")
+const colourGreenDark = colours.get("green-dark")
+const colourOrange = colours.get("orange")
+const colourRed = colours.get("red")
+const colourRedLight = colours.get("red-light")
+const colourRedDark = colours.get("red-dark")
+const colourWhite = colours.get("white")
 
 const babelOpt = {
     cacheDirectory: true,
@@ -93,32 +100,39 @@ const babelOpt = {
                 },
                 useBuiltIns: "usage"
             }
-        ]
+        ],
+        "@babel/preset-typescript"
     ]
-};
+}
 
 const cssOpt = {
     sourceMap: true
-};
+}
 
 const htmlMinifyOpt = {
     collapseBooleanAttributes: true,
-    collapseWhitespace: false,
     collapseInlineTagWhitespace: true,
+    collapseWhitespace: false,
     decodeEntities: true,
     html5: true,
     minifyURLs: true,
     removeComments: true,
+    removeRedundantAttributes: true,
+    removeScriptTypeAttributes: true,
+    removeStyleLinkTypeAttributes: true,
     sortAttributes: true,
-    sortClassName: true
-};
+    sortClassName: true,
+    useShortDoctype: true
+} as HtmlMinifierPlugin.Options
+
+const postcssCleanOpt = {
+    level: { 1: { specialComments: 0 }, 2: {} }
+}
 
 const postcssOpt = {
-    config: {
-        path: filePostcssConfig
-    },
+    plugins: [require("autoprefixer"), isProduction ? require("postcss-clean")({ postcssCleanOpt }) : {}],
     sourceMap: true
-};
+}
 
 const sassOpt = {
     sourceMap: !isProduction,
@@ -128,7 +142,7 @@ const sassOpt = {
         sourceMap: !isProduction,
         sourceMapContents: !isProduction
     }
-};
+}
 
 const svgoOpt = {
     plugins: [
@@ -177,7 +191,7 @@ const svgoOpt = {
         { removeStyleElement: false },
         { removeScriptElement: false }
     ]
-};
+}
 
 const htmlOpt = {
     iconSmall: `${dirPrefixIcons}/android-chrome-48x48.png`,
@@ -190,10 +204,10 @@ const htmlOpt = {
     lang: "en-GB",
     meta: { viewport: "width=device-width, initial-scale=1, shrink-to-fit=no" },
     minify: htmlMinifyOpt,
-    servers: servers.servers,
+    servers: serverServers,
     template: "index.template.ejs",
     title: PACKAGE.description
-};
+} as HtmlPlugin.Options
 
 const faviconsOpt = {
     logo: fileLogo,
@@ -218,13 +232,13 @@ const faviconsOpt = {
             yandex: false
         },
         lang: "en-GB",
-        // eslint-disable-next-line camelcase
+        // eslint-disable-next-line @typescript-eslint/camelcase
         start_url: "/",
-        // eslint-disable-next-line camelcase
+        // eslint-disable-next-line @typescript-eslint/camelcase
         theme_color: themeColour,
         version: PACKAGE.version
     }
-};
+} as any
 
 const config = {
     context: path.resolve(__dirname, "src"),
@@ -233,6 +247,8 @@ const config = {
         contentBase: dirOutput,
         disableHostCheck: true
     },
+
+    devtool: false,
 
     entry: [path.resolve(__dirname, PACKAGE.main), path.resolve(__dirname, PACKAGE.sass)],
 
@@ -347,12 +363,12 @@ const config = {
         chunkOrigins: true,
 
         excludeAssets: [/images\/map\/*/]
-    },
+    } as object | string,
 
     module: {
         rules: [
             {
-                test: /\.js$/,
+                test: /\.tsx?$/,
                 include: path.resolve(__dirname, "src/js"),
                 loader: require.resolve("babel-loader"),
                 options: babelOpt
@@ -471,14 +487,17 @@ const config = {
             }
         ]
     }
-};
+} as webpack.Configuration
 
-module.exports = () => {
+module.exports = (): webpack.Configuration => {
     if (isQuiet) {
-        config.stats = "errors-only";
+        config.stats = "errors-only"
     }
 
     if (isProduction) {
+        if (!config.optimization) {
+            config.optimization = {}
+        }
         config.optimization.minimizer = [
             new TerserPlugin({
                 cache: true,
@@ -487,11 +506,11 @@ module.exports = () => {
                     output: { comments: false }
                 }
             })
-        ];
+        ]
     } else {
-        config.devtool = "eval-source-map";
-        config.plugins.push(new webpack.HotModuleReplacementPlugin());
+        config.devtool = "eval-source-map"
+        config.plugins?.push(new webpack.HotModuleReplacementPlugin())
     }
 
-    return config;
-};
+    return config
+}

@@ -12,8 +12,11 @@ import * as fs from "fs"
 import * as path from "path"
 import { default as Denque } from "denque"
 import { default as PNG } from "pngjs"
-import { convertCoordX, convertCoordY, Distance, Point, readJson, saveJsonAsync, serverNames } from "../common"
-import { baseAPIFilename, commonPaths, distanceMapSize, serverStartDate as serverDate, xz } from "./common-node"
+
+import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "./common-dir"
+import { readJson, saveJsonAsync, xz } from "./common-file"
+import { convertCoordX, convertCoordY, Distance, Point } from "./common-math"
+import { distanceMapSize, serverNames } from "./common-var"
 
 /**
  * ------------------------------------------------------------------------

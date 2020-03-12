@@ -16,8 +16,9 @@ import { html, render } from "lit-html"
 import { repeat } from "lit-html/directives/repeat"
 
 import { registerEvent } from "../analytics"
-import { insertBaseModalHTML } from "../common"
-import { formatInt, putImportError, sortBy } from "../util"
+import { insertBaseModalHTML } from "../node/common"
+import { putImportError, sortBy } from "../util"
+import { formatInt } from "../common-format";
 
 export default class ListLoot {
     constructor() {
@@ -41,7 +42,9 @@ export default class ListLoot {
 
     async _loadAndSetupData() {
         try {
-            this._sourceData = (await import(/* webpackChunkName: "data-loot" */ "../../gen-generic/loot.json")).default
+            this._sourceData = (
+                await import(/* webpackChunkName: "data-loot" */ "../../../lib/gen-generic/loot.json")
+            ).default
         } catch (error) {
             putImportError(error)
         }
