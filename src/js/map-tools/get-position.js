@@ -14,9 +14,10 @@ import "bootstrap/js/dist/modal"
 import { select as d3Select } from "d3-selection"
 
 import { registerEvent } from "../analytics"
-import { circleRadiusFactor, convertInvCoordX, convertInvCoordY, insertBaseModal } from "../common"
+import { circleRadiusFactor, insertBaseModal } from "../node/common"
 import { copyF11ToClipboard, sortBy } from "../util"
 import Toast from "../util/toast"
+import { convertInvCoordX, convertInvCoordY } from "../node/common-math";
 
 /**
  * JavaScript implementation of Trilateration to find the position of a
@@ -292,13 +293,13 @@ export default class TrilateratePosition {
         const roundingFactor = 1.04
 
         /*
-        const ports = new Map([
+        const ports = new NAMap([
             ["Les Cayes", 21 * circleRadiusFactor],
             ["Saint-Louis", 29 * circleRadiusFactor],
             ["Tiburon", 34 * circleRadiusFactor],
             ["Kingston / Port Royal", 132 * circleRadiusFactor]
         ]);
-        const ports = new Map([
+        const ports = new NAMap([
             ["Gracias a Dios", 52 * roundingFactor * circleRadiusFactor],
             ["Port Morant", 296 * roundingFactor * circleRadiusFactor],
             ["Santanillas", 82 * roundingFactor * circleRadiusFactor]

@@ -11,10 +11,11 @@
 import * as path from "path"
 import convert, { ElementCompact } from "xml-js"
 
-import { readTextFile, saveJsonAsync } from "../common"
-import { commonPaths } from "./common-node"
-import { TextEntity, XmlRepair } from "./xml"
+import { commonPaths } from "./common-dir"
+import { readTextFile, saveJsonAsync } from "./common-file"
+
 import { Repair, RepairAmount } from "../gen-json"
+import { TextEntity, XmlRepair } from "./xml"
 
 /**
  * Change string from snake case to camelCase

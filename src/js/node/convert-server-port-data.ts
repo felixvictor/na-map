@@ -13,18 +13,13 @@ import * as path from "path"
 import d3Node from "d3-node"
 import dayjs from "dayjs"
 
-import {
-    cleanName,
-    Distance,
-    findNationById,
-    nations,
-    readJson,
-    saveJsonAsync,
-    serverNames,
-    simpleSort,
-    sortBy
-} from "../common"
-import { baseAPIFilename, commonPaths, distanceMapSize, serverStartDate as serverDate } from "./common-node"
+import { findNationById, nations } from "./common"
+import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "./common-dir"
+import { readJson, saveJsonAsync } from "./common-file"
+import { Distance } from "./common-math"
+import { cleanName, simpleSort, sortBy } from "./common-node"
+import { distanceMapSize, serverNames } from "./common-var"
+
 import { APIItemGeneric } from "./api-item"
 import { APIPort } from "./api-port"
 import { APIShop } from "./api-shop"

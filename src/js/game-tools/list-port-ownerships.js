@@ -25,7 +25,7 @@ import {
 import TimelinesChart from "timelines-chart"
 
 import { registerEvent } from "../analytics"
-import { colourList, insertBaseModal, nations } from "../common"
+import { colourList, insertBaseModal, nations } from "../node/common"
 import { putImportError } from "../util"
 
 /**
@@ -46,10 +46,10 @@ export default class ListPortOwnerships {
     async _loadAndSetupData() {
         try {
             this._nationData = (
-                await import(/* webpackChunkName: "data-nations" */ "../../gen-generic/nations.json")
+                await import(/* webpackChunkName: "data-nations" */ "../../../lib/gen-generic/nations.json")
             ).default
             this._ownershipData = (
-                await import(/* webpackChunkName: "data-ownership" */ "../../gen-generic/ownership.json")
+                await import(/* webpackChunkName: "data-ownership" */ "../../../lib/gen-generic/ownership.json")
             ).default
         } catch (error) {
             putImportError(error)

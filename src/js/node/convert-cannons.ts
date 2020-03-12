@@ -13,8 +13,10 @@ import * as path from "path"
 
 import convert, { ElementCompact } from "xml-js"
 
-import { readTextFile, round, saveJsonAsync } from "../common"
-import { commonPaths } from "./common-node"
+import { commonPaths } from "./common-dir"
+import { readTextFile, saveJsonAsync } from "./common-file"
+import { round } from "./common-math"
+
 import { Cannon, CannonEntity, CannonGroupIndex, CannonPenetration, CannonValue } from "../gen-json"
 import { PairEntity, TangentEntity, TextEntity, XmlGeneric } from "./xml"
 

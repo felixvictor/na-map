@@ -10,10 +10,8 @@
 
 // https://jvilk.com/MakeTypes/
 
-import { cleanName, nations, Point } from "./common"
 import { ModifiersEntity } from "./node/api-item"
-import { numberSegments } from "./common-browser"
-import dayjs from "dayjs"
+import { Point } from "./node/common-math";
 
 /****************************
  * buildings.json
