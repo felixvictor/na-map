@@ -12,8 +12,11 @@ import Excel4Node, { Style, Worksheet } from "excel4node"
 import sass from "node-sass"
 import css, { Declaration, Rule } from "css"
 
-import { range, readJson, sortBy } from "../common"
-import { commonPaths } from "./common-node"
+import { range } from "./common"
+import { commonPaths } from "./common-dir"
+import { sortBy } from "./common-node"
+import { readJson } from "./common-file"
+
 import { PortGeneric, Ship } from "../gen-json"
 
 type ColourMap = Map<string, string>

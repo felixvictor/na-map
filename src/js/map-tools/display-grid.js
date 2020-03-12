@@ -12,8 +12,9 @@ import { axisBottom as d3AxisBottom, axisRight as d3AxisRight } from "d3-axis"
 import { event as d3Event, select as d3Select } from "d3-selection"
 import { scaleLinear as d3ScaleLinear } from "d3-scale"
 
-import { convertInvCoordX, convertInvCoordY } from "../common"
-import { formatF11, roundToThousands } from "../util"
+import { roundToThousands } from "../util"
+import { convertInvCoordX, convertInvCoordY } from "../node/common-math";
+import { formatF11 } from "../common-format";
 
 /**
  * Display grid

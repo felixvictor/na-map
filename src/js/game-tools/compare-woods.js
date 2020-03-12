@@ -14,8 +14,9 @@ import { min as d3Min, max as d3Max } from "d3-array"
 import { select as d3Select } from "d3-selection"
 
 import { registerEvent } from "../analytics"
-import { insertBaseModal } from "../common"
-import { formatFloat, formatSignFloat, formatPercent, sortBy, putImportError } from "../util"
+import { insertBaseModal } from "../node/common"
+import { sortBy, putImportError } from "../util"
+import { formatFloat, formatPercent, formatSignFloat } from "../common-format";
 
 class Wood {
     constructor(compareId, woodCompare) {
@@ -49,7 +50,7 @@ class WoodBase extends Wood {
         let isPercentage = false
 
         if (property && property.amount) {
-            ({ amount, isPercentage } = property)
+            ;({ amount, isPercentage } = property)
         }
 
         return { amount, isPercentage }
@@ -140,7 +141,7 @@ class WoodComparison extends Wood {
         let isPercentage = false
 
         if (property && property.amount) {
-            ({ amount, isPercentage } = property)
+            ;({ amount, isPercentage } = property)
         }
 
         return { amount, isPercentage }
@@ -352,7 +353,9 @@ export default class CompareWoods {
 
     async _loadAndSetupData() {
         try {
-            this._woodData = (await import(/* webpackChunkName: "data-woods" */ "../../gen-generic/woods.json")).default
+            this._woodData = (
+                await import(/* webpackChunkName: "data-woods" */ "../../../lib/gen-generic/woods.json")
+            ).default
             this._setupData()
         } catch (error) {
             putImportError(error)
@@ -394,17 +397,12 @@ export default class CompareWoods {
         for (const propertyName of this.propertyNames) {
             const frames = [
                 ...this._woodData.frame.map(
-                    frame =>
-                        frame.properties
-                            .find(modifier => modifier.modifier === propertyName)?.amount
+                    frame => frame.properties.find(modifier => modifier.modifier === propertyName)?.amount
                 )
             ]
             const trims = [
                 ...this._woodData.trim.map(
-                    trim =>
-                        trim.properties
-                            .find(modifier => modifier.modifier === propertyName)
-                            ?.amount
+                    trim => trim.properties.find(modifier => modifier.modifier === propertyName)?.amount
                 )
             ]
 
