@@ -19,13 +19,15 @@ import "../scss/main.scss"
  *  Workaround for google translate uses indexOf on svg text
  *  {@link https://stackoverflow.com/a/53351574}
  */
-// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-// @ts-ignore
-SVGAnimatedString.prototype.indexOf = (): object =>
-    // eslint-disable-next-line prefer-spread,prefer-rest-params,@typescript-eslint/ban-ts-ignore
+declare global {
+    interface SVGAnimatedString {
+        indexOf(): object
+    }
+}
+SVGAnimatedString.prototype.indexOf = function(this: SVGAnimatedString): object {
     // @ts-ignore
-    // eslint-disable-next-line prefer-spread
-    this.baseVal.indexOf.apply(this.baseVal, arguments)
+    return this.baseVal.indexOf.apply(this.baseVal, arguments)
+}
 
 /**
  * Base Id
@@ -39,22 +41,19 @@ const radioButtonValues = servers.map((server: Server) => server.id)
 
 /**
  * Server name cookie
- * @type {Cookie}
  */
 const cookie = new Cookie({ id: baseId, values: radioButtonValues })
 
 /**
  * Server name radio buttons
- * @type {RadioButton}
  */
 const radios = new RadioButton(baseId, radioButtonValues)
 
 /**
  * Get server name from cookie or use default value
+ * @returns Server name
  */
 const getServerName = (): string => {
-    // Server name
-
     const r = cookie.get()
 
     radios.set(r)
@@ -165,6 +164,7 @@ const main = (): void => {
     registerPage("Homepage")
 
     setupListener()
+    // noinspection JSIgnoredPromiseFromCall
     load()
 }
 
