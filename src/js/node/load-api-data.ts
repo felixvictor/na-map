@@ -12,8 +12,10 @@ import * as fs from "fs"
 import * as path from "path"
 import { default as nodeFetch } from "node-fetch"
 
-import { apiBaseFiles, saveJsonAsync, serverNames, sortId } from "../common"
-import { baseAPIFilename, serverStartDate as serverDate, xzAsync } from "./common-node"
+import { baseAPIFilename, serverStartDate as serverDate } from "./common-dir"
+import { apiBaseFiles, serverNames } from "./common-var"
+import { saveJsonAsync, xzAsync } from "./common-file"
+import { sortId } from "./common-node"
 
 const sourceBaseUrl = "https://storage.googleapis.com/"
 const sourceBaseDir = "nacleanopenworldprodshards"

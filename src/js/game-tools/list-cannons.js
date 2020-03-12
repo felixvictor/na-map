@@ -17,8 +17,9 @@ import { repeat } from "lit-html/directives/repeat"
 import { default as Tablesort } from "tablesort"
 
 import { registerEvent } from "../analytics"
-import { initTablesort, insertBaseModalHTML } from "../common"
-import { capitalizeFirstLetter, formatFloatFixedHTML, putImportError } from "../util"
+import { initTablesort, insertBaseModalHTML } from "../node/common"
+import { capitalizeFirstLetter, putImportError } from "../util"
+import { formatFloatFixedHTML } from "../common-format";
 
 /**
  *
@@ -41,7 +42,7 @@ export default class ListCannons {
     async _loadAndSetupData() {
         try {
             const { default: cannonData } = await import(
-                /* webpackChunkName: "data-cannons" */ "../../gen-generic/cannons.json"
+                /* webpackChunkName: "data-cannons" */ "../../../lib/gen-generic/cannons.json"
             )
             this._setupData(cannonData)
         } catch (error) {

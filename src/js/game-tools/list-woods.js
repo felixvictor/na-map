@@ -15,8 +15,9 @@ import { select as d3Select } from "d3-selection";
 import { default as Tablesort } from "tablesort";
 
 import { registerEvent } from "../analytics";
-import { initTablesort, insertBaseModal } from "../common";
-import { formatFloatFixed, putImportError } from "../util";
+import { initTablesort, insertBaseModal } from "../node/common";
+import { putImportError } from "../util";
+import { formatFloatFixed } from "../common-format";
 
 /**
  *
@@ -34,7 +35,7 @@ export default class ListWoods {
     async _loadAndSetupData() {
         try {
             this._woodData = (
-                await import(/* webpackChunkName: "data-woods" */ "../../gen-generic/woods.json")
+                await import(/* webpackChunkName: "data-woods" */ "../../../lib/gen-generic/woods.json")
             ).default;
         } catch (error) {
             putImportError(error);

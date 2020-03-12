@@ -22,9 +22,6 @@ import "tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4"
 import "tempusdominus-core/build/js/tempusdominus-core"
 
 import {
-    compassDirections,
-    compassToDegrees,
-    degreesToCompass,
     degreesToRadians,
     displayCompass,
     displayCompassAndDegrees,
@@ -32,7 +29,8 @@ import {
     printCompassRose
 } from "../util"
 import { registerEvent } from "../analytics"
-import { degreesPerSecond, insertBaseModal } from "../common"
+import { degreesPerSecond, insertBaseModal } from "../node/common"
+import { compassDirections, compassToDegrees, degreesToCompass } from "../node/common-math";
 
 export default class PredictWind {
     constructor() {
