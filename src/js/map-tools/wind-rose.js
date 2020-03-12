@@ -20,9 +20,10 @@ import "round-slider/src/roundslider"
 import "round-slider/src/roundslider.css"
 
 import { registerEvent } from "../analytics"
-import { degreesPerSecond, insertBaseModal } from "../common"
-import { compassDirections, degreesToRadians, displayCompass, getUserWind, printSmallCompassRose } from "../util"
+import { degreesPerSecond, insertBaseModal } from "../node/common"
+import { degreesToRadians, displayCompass, getUserWind, printSmallCompassRose } from "../util"
 import Cookie from "../util/cookie"
+import { compassDirections } from "../node/common-math";
 
 export default class WindRose {
     constructor() {

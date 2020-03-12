@@ -29,18 +29,12 @@ import {
     colourRedDark,
     colourRedLight,
     colourWhite,
-    defaultCircleSize,
-    defaultFontSize,
     nations
-} from "../common"
+} from "../node/common"
 import {
     degreesToRadians,
     displayClan,
     distancePoints,
-    formatInt,
-    formatPercent,
-    formatSiCurrency,
-    formatSiInt,
     getOrdinal,
     putImportError,
     roundToThousands
@@ -49,6 +43,8 @@ import Cookie from "../util/cookie"
 import RadioButton from "../util/radio-button"
 
 import TrilateratePosition from "../map-tools/get-position"
+import { defaultCircleSize, defaultFontSize } from "../node/common-math";
+import { formatInt, formatPercent, formatSiCurrency, formatSiInt } from "../common-format";
 
 export default class DisplayPorts {
     constructor(map) {

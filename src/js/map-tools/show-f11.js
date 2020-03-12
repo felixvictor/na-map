@@ -16,8 +16,10 @@ import moment from "moment"
 import "moment/locale/en-gb"
 
 import { registerEvent } from "../analytics"
-import { convertCoordX, convertCoordY, convertInvCoordX, convertInvCoordY, insertBaseModal } from "../common"
-import { between, copyF11ToClipboard, formatF11 } from "../util"
+import { insertBaseModal } from "../node/common"
+import { copyF11ToClipboard} from "../util"
+import { between, convertCoordX, convertCoordY, convertInvCoordX, convertInvCoordY } from "../node/common-math";
+import { formatF11 } from "../common-format";
 
 /**
  * ShowF11
