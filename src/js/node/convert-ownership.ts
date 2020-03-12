@@ -14,12 +14,16 @@ import * as path from "path"
 
 import d3Node from "d3-node"
 import { default as lzma } from "lzma-native"
-
 import { default as readDirRecursive } from "recursive-readdir"
-import { capitalToCounty, cleanName, nations, saveJsonAsync, serverNames } from "../common"
-import { commonPaths } from "./common-node"
-import { NationList, Ownership, OwnershipGroup, OwnershipLabel, OwnershipNation } from "../gen-json"
+
+import { capitalToCounty, nations } from "./common"
+import { commonPaths } from "./common-dir"
+import { saveJsonAsync } from "./common-file"
+import { serverNames } from "./common-var"
+import { cleanName } from "./common-node"
+
 import { APIPort } from "./api-port"
+import { NationList, Ownership, OwnershipGroup, OwnershipLabel, OwnershipNation } from "../gen-json"
 
 const fileExtension = ".json.xz"
 

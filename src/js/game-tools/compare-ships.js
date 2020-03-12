@@ -41,31 +41,33 @@ import {
     rumRepairsVolume,
     repairTime,
     insertBaseModal
-} from "../common"
+} from "../node/common"
 import {
     // colourRamp,
     copyToClipboard,
     drawSvgCircle,
     drawSvgLine,
-    formatFloat,
-    formatIntTrunc,
-    formatPercent,
-    formatPP,
-    formatSignInt,
-    formatSignFloat,
-    formatSignPercent,
     getOrdinal,
     isEmpty,
     putImportError,
     rotationAngleInDegrees,
     roundToThousands,
-    sortBy,
-    degreesToCompass
+    sortBy
 } from "../util"
 
 import CompareWoods from "./compare-woods"
 
 import { default as shipIcon } from "Icons/icon-ship.svg"
+import {
+    formatFloat,
+    formatIntTrunc,
+    formatPercent,
+    formatPP,
+    formatSignFloat,
+    formatSignInt,
+    formatSignPercent
+} from "../common-format";
+import { degreesToCompass } from "../node/common-math";
 
 
 
@@ -1452,9 +1454,9 @@ export default class CompareShips {
     async _loadAndSetupData() {
         try {
             this._moduleDataDefault = (
-                await import(/* webpackChunkName: "data-modules" */ "../../gen-generic/modules.json")
+                await import(/* webpackChunkName: "data-modules" */ "../../../lib/gen-generic/modules.json")
             ).default
-            this._shipData = (await import(/* webpackChunkName: "data-ships" */ "../../gen-generic/ships.json")).default
+            this._shipData = (await import(/* webpackChunkName: "data-ships" */ "../../../lib/gen-generic/ships.json")).default
             this._setupData()
             if (this._baseId !== "ship-journey") {
                 this.woodCompare = new CompareWoods(this._woodId)

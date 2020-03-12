@@ -14,8 +14,9 @@ import "bootstrap/js/dist/modal"
 import { select as d3Select } from "d3-selection"
 
 import { registerEvent } from "../analytics"
-import { insertBaseModal } from "../common"
-import { formatInt, putImportError, sortBy } from "../util"
+import { insertBaseModal } from "../node/common"
+import { putImportError, sortBy } from "../util"
+import { formatInt } from "../common-format";
 
 export default class ListShipBlueprints {
     constructor() {
@@ -39,9 +40,9 @@ export default class ListShipBlueprints {
     async _loadAndSetupData() {
         try {
             this._blueprintData = (
-                await import(/* webpackChunkName: "data-ship-blueprints" */ "../../gen-generic/ship-blueprints.json")
+                await import(/* webpackChunkName: "data-ship-blueprints" */ "../../../lib/gen-generic/ship-blueprints.json")
             ).default
-            this._woodData = (await import(/* webpackChunkName: "data-woods" */ "../../gen-generic/woods.json")).default
+            this._woodData = (await import(/* webpackChunkName: "data-woods" */ "../../../lib/gen-generic/woods.json")).default
             /**
              * @typedef {object} extractionCost
              * @property {Number} price Extraction price

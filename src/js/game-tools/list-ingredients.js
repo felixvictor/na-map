@@ -15,8 +15,9 @@ import "bootstrap/js/dist/tooltip"
 import { select as d3Select } from "d3-selection"
 
 import { registerEvent } from "../analytics"
-import { insertBaseModal } from "../common"
-import { chunkify, formatSignInt, formatSignPercent, putImportError, sortBy } from "../util"
+import { insertBaseModal } from "../node/common"
+import { chunkify, putImportError, sortBy } from "../util"
+import { formatSignInt, formatSignPercent } from "../common-format";
 
 export default class ListIngredients {
     constructor() {
@@ -31,10 +32,10 @@ export default class ListIngredients {
     async _loadAndSetupData() {
         try {
             this._moduleData = (
-                await import(/* webpackChunkName: "data-modules" */ "../../gen-generic/modules.json")
+                await import(/* webpackChunkName: "data-modules" */ "../../../lib/gen-generic/modules.json")
             ).default
             this._ingredientData = (
-                await import(/* webpackChunkName: "data-recipes" */ "../../gen-generic/recipes.json")
+                await import(/* webpackChunkName: "data-recipes" */ "../../../lib/gen-generic/recipes.json")
             ).default.ingredient
         } catch (error) {
             putImportError(error)

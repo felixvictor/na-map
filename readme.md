@@ -8,7 +8,7 @@
 
 ### Table of Contents
 
--   [Map tools](#map-tools)
+-   [NAMap tools](#map-tools)
     -   [Port data](#port-data)
 -   [Menues](#menues)
     -   [Predict wind](#predict-wind)
@@ -27,7 +27,7 @@
 
 ---
 
-# Map tools
+# NAMap tools
 
 ---
 

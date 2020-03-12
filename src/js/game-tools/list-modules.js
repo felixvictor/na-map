@@ -14,8 +14,9 @@ import "bootstrap/js/dist/modal"
 import { select as d3Select } from "d3-selection"
 
 import { registerEvent } from "../analytics"
-import { insertBaseModal } from "../common"
-import { chunkify, formatPP, formatSignInt, formatSignPercent, getOrdinal, putImportError, sortBy } from "../util"
+import { insertBaseModal } from "../node/common"
+import { chunkify, getOrdinal, putImportError, sortBy } from "../util"
+import { formatPP, formatSignInt, formatSignPercent } from "../common-format";
 
 export default class ListModules {
     constructor() {
@@ -30,7 +31,7 @@ export default class ListModules {
     async _loadAndSetupData() {
         try {
             this._moduleData = (
-                await import(/* webpackChunkName: "data-modules" */ "../../gen-generic/modules.json")
+                await import(/* webpackChunkName: "data-modules" */ "../../../lib/gen-generic/modules.json")
             ).default
         } catch (error) {
             putImportError(error)
