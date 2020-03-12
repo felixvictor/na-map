@@ -9,8 +9,12 @@
  */
 
 import * as path from "path"
-import { cleanName, readJson, saveJsonAsync, serverNames, sortBy } from "../common"
-import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "./common-node"
+
+import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "./common-dir"
+import { readJson, saveJsonAsync } from "./common-file"
+import { cleanName, sortBy } from "./common-node"
+import { serverNames } from "./common-var"
+
 import { APIBuilding, LevelsEntity, TemplateEntity, APIItemGeneric, APIRecipeResource } from "./api-item"
 import {
     Building,

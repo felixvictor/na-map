@@ -15,9 +15,10 @@ import { select as d3Select } from "d3-selection"
 
 import { registerEvent } from "../analytics"
 import { getCurrencyAmount, insertBaseModal } from "../common-browser"
-import { putImportError, sortBy } from "../common"
-import { formatInt } from "../util"
+import { sortBy } from "../node/common"
 import { Building, BuildingResult } from "../gen-json"
+import { putImportError } from "../node/common-file";
+import { formatInt } from "../common-format";
 
 export default class ListBuildings {
     private readonly _baseName: string
@@ -40,7 +41,7 @@ export default class ListBuildings {
 
     async _loadAndSetupData(): Promise<void> {
         try {
-            const fileName = "../../../lib/gen-generic/buildings.json"
+            const fileName = ".../../../lib/gen-generic/buildings.json"
             this._buildingData = ((await import(/* webpackChunkName: "data-buildings" */ fileName))
                 .default as unknown) as Building[]
         } catch (error) {
