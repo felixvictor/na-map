@@ -11,13 +11,13 @@
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
 
-import { range as d3Range } from "d3-array"
-import { event as d3Event, mouse as d3Mouse, select as d3Select } from "d3-selection"
-import { zoom as d3Zoom, zoomIdentity as d3ZoomIdentity, zoomTransform as d3ZoomTransform } from "d3-zoom"
+import * as d3Range from "d3-array"
+import * as d3Selection from "d3-selection"
+import * as d3Zoom from "d3-zoom"
 
 import { registerEvent } from "../analytics"
-import { appDescription, appTitle, appVersion, defaultFontSize, insertBaseModal } from "../common"
-import { displayClan, nearestPow2, roundToThousands } from "../util"
+import { appDescription, appTitle, appVersion, Bound, insertBaseModal } from "../common-browser"
+import { displayClan, roundToThousands } from "../util"
 import Cookie from "../util/cookie"
 import RadioButton from "../util/radio-button"
 
@@ -31,58 +31,96 @@ import Journey from "../map-tools/make-journey"
 import PredictWind from "../map-tools/predict-wind"
 import WindRose from "../map-tools/wind-rose"
 import ShowTrades from "../map-tools/show-trades"
+import { defaultFontSize, nearestPow2 } from "../node/common-math";
+
+interface Tile {
+    z: number
+    row: number
+    col: number
+    id: string
+}
+
+interface SVGSVGDatum {}
+interface SVGGDatum {}
 
 /**
  * Display naval action map
  */
-class Map {
+class NAMap {
+    serverName: string
+    private readonly _searchParams: URLSearchParams
+    rem: number
+    xGridBackgroundHeight: number
+    yGridBackgroundWidth: number
+    coord: { min: number; max: number }
+    private _currentTranslate!: d3Zoom.ZoomTransform
+    private readonly _tileSize: number
+    private readonly _maxScale: number
+    private readonly _wheelDelta: number
+    private readonly _PBZoneZoomThreshold: number
+    private readonly _labelZoomThreshold: number
+    private readonly _doubleClickActionId: string
+    private readonly _doubleClickActionValues: string[]
+    private _doubleClickActionCookie: Cookie
+    private _doubleClickActionRadios: RadioButton
+    private _doubleClickAction: string
+    private readonly _showGridId: string
+    private readonly _showGridValues: string[]
+    private _showGridCookie: Cookie
+    private _showGridRadios: RadioButton
+    private _showGrid: string
+    readonly gridOverlay: HTMLElement
+    private _f11!: ShowF11
+    private _ports!: DisplayPorts
+    private _pbZone!: DisplayPbZones
+    private _grid!: DisplayGrid
+    private _journey!: Journey
+    private _windPrediction!: PredictWind
+    private _windRose!: WindRose
+    private _portSelect!: SelectPorts
+    showTrades!: ShowTrades
+    private _minScale = 0
+    private _svg!: d3Selection.Selection<SVGSVGElement, SVGSVGDatum, HTMLElement, any>
+    width = 0
+    height = 0
+    private _currentScale = 0
+    private _zoom!: d3Zoom.ZoomBehavior<SVGSVGElement, SVGSVGDatum>
+    private _zoomLevel!: string
+    private _gMap!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, any>
+
     /**
-     * @param {string} serverName - Naval action server name
-     * @param {URLSearchParams} searchParams - Query arguments
+     * @param serverName - Naval action server name
+     * @param searchParams - Query arguments
      */
-    constructor(serverName, searchParams) {
+    constructor(serverName: string, searchParams: URLSearchParams) {
         /**
          * Naval action server name
-         * @type {string}
-         * @public
          */
         this.serverName = serverName
         this._searchParams = searchParams
 
         /**
          * Font size in px
-         * @type {Number}
-         * @private
          */
         this.rem = defaultFontSize
 
         /**
          * Left padding for brand icon
-         * @type {Number}
-         * @private
          */
         this.xGridBackgroundHeight = Math.floor(3 * this.rem)
 
         /**
          * Left padding for brand icon
-         * @type {Number}
-         * @private
          */
         this.yGridBackgroundWidth = Math.floor(4 * this.rem)
 
         /**
          * Outer bounds (world coordinates)
-         * @type {Object}
-         * @property {Number} min - Minimum world coordinate
-         * @property {Number} max - Maximum world coordinate
-         * @private
          */
         this.coord = {
-            min: 0,
-            max: 8192
+            min: 0, // Minimum world coordinate
+            max: 8192 // Maximum world coordinate
         }
-
-        this._currentTranslate = {}
 
         this._tileSize = 256
         this._maxScale = 2 ** 3 // power of 2
@@ -92,16 +130,11 @@ class Map {
 
         /**
          * DoubleClickAction cookie name
-         * @type {string}
-         * @private
-         * @private
          */
         this._doubleClickActionId = "double-click-action"
 
         /**
          * DoubleClickAction settings
-         * @type {string[]}
-         * @private
          */
         this._doubleClickActionValues = ["compass", "f11"]
 
@@ -113,22 +146,16 @@ class Map {
 
         /**
          * Get DoubleClickAction setting from cookie or use default value
-         * @type {string}
-         * @private
          */
         this._doubleClickAction = this._getDoubleClickAction()
 
         /**
          * showGrid cookie name
-         * @type {string}
-         * @private
          */
         this._showGridId = "show-grid"
 
         /**
          * showGrid settings
-         * @type {string[]}
-         * @private
          */
         this._showGridValues = ["off", "on"]
 
@@ -137,13 +164,10 @@ class Map {
 
         /**
          * Get showGrid setting from cookie or use default value
-         * @type {string}
-         * @private
          */
         this._showGrid = this._getShowGridValue()
 
-        // eslint-disable-next-line semi-style
-        ;[this.gridOverlay] = document.getElementsByClassName("overlay")
+        this.gridOverlay = (document.getElementsByClassName("overlay") as HTMLCollectionOf<HTMLElement>)[0]
 
         this._setHeightWidth()
         this._setupScale()
@@ -152,16 +176,14 @@ class Map {
         this._setupListener()
     }
 
-    async MapInit() {
+    async MapInit(): Promise<void> {
         await this._setupData()
     }
 
     /**
      * Read cookie for doubleClickAction
-     * @return {string} doubleClickAction
-     * @private
      */
-    _getDoubleClickAction() {
+    _getDoubleClickAction(): string {
         const r = this._doubleClickActionCookie.get()
 
         this._doubleClickActionRadios.set(r)
@@ -171,10 +193,9 @@ class Map {
 
     /**
      * Read cookie for showGrid
-     * @return {string} showGrid
-     * @private
+     * @returns showGrid
      */
-    _getShowGridValue() {
+    _getShowGridValue(): string {
         const r = this._showGridCookie.get()
 
         this._showGridRadios.set(r)
@@ -182,7 +203,7 @@ class Map {
         return r
     }
 
-    async _setupData() {
+    async _setupData(): Promise<void> {
         //        const marks = [];
 
         //        marks.push("setupData");
@@ -210,7 +231,6 @@ class Map {
             this.coord.max
         )
         await this.showTrades.showOrHide()
-        this._init()
 
         /*
         marks.forEach(mark => {
@@ -220,52 +240,55 @@ class Map {
         */
     }
 
-    static _stopProperty() {
-        if (d3Event.defaultPrevented) {
-            d3Event.stopPropagation()
+    static _stopProperty(): void {
+        if (d3Selection.event.defaultPrevented) {
+            d3Selection.event.stopPropagation()
         }
     }
 
-    _setupListener() {
+    _setupListener(): void {
         this._svg
             .on("dblclick.zoom", null)
-            .on("click", Map._stopProperty, true)
-            .on("dblclick", (d, i, nodes) => this._doDoubleClickAction(nodes[i]))
+            .on("click", NAMap._stopProperty, true)
+            .on(
+                "dblclick",
+                (_d: SVGSVGDatum, i: number, nodes: SVGSVGElement[] | d3Selection.ArrayLike<SVGSVGElement>): void =>
+                    this._doDoubleClickAction(nodes[i])
+            )
 
-        document.getElementById("propertyDropdown").addEventListener("click", () => {
+        document.getElementById("propertyDropdown")?.addEventListener("click", () => {
             registerEvent("Menu", "Select port on property")
         })
-        document.getElementById("settingsDropdown").addEventListener("click", () => {
+        document.getElementById("settingsDropdown")?.addEventListener("click", () => {
             registerEvent("Menu", "Settings")
         })
-        document.getElementById("button-download-pb-calc").addEventListener("click", () => {
+        document.getElementById("button-download-pb-calc")?.addEventListener("click", () => {
             registerEvent("Tools", "Download pb calculator")
         })
-        document.getElementById("reset").addEventListener("click", () => {
+        document.getElementById("reset")?.addEventListener("click", () => {
             this._clearMap()
         })
-        document.getElementById("about").addEventListener("click", () => {
+        document.getElementById("about")?.addEventListener("click", () => {
             this._showAbout()
         })
 
-        document.getElementById("double-click-action").addEventListener("change", () => this._doubleClickSelected())
-        document.getElementById("show-grid").addEventListener("change", () => this._showGridSelected())
+        document.getElementById("double-click-action")?.addEventListener("change", () => this._doubleClickSelected())
+        document.getElementById("show-grid")?.addEventListener("change", () => this._showGridSelected())
     }
 
-    _setupScale() {
+    _setupScale(): void {
         this._minScale = nearestPow2(Math.min(this.width / this.coord.max, this.height / this.coord.max))
 
         /**
          * Current map scale
-         * @type {Number}
-         * @private
          */
         this._currentScale = this._minScale
     }
 
-    _setupSvg() {
-        this._zoom = d3Zoom()
-            .wheelDelta(() => -this._wheelDelta * Math.sign(d3Event.deltaY))
+    _setupSvg(): void {
+        this._zoom = d3Zoom
+            .zoom<SVGSVGElement, SVGSVGDatum>()
+            .wheelDelta(() => -this._wheelDelta * Math.sign(d3Selection.event.deltaY))
             .translateExtent([
                 [
                     this.coord.min - this.yGridBackgroundWidth * this._minScale,
@@ -276,17 +299,18 @@ class Map {
             .scaleExtent([this._minScale, this._maxScale])
             .on("zoom", () => this._naZoomed())
 
-        this._svg = d3Select("#na-map")
-            .append("svg")
+        this._svg = d3Selection
+            .select<SVGSVGElement, SVGSVGDatum>("#na-map")
+            .append<SVGSVGElement>("svg")
             .attr("id", "na-svg")
             .call(this._zoom)
 
-        this._svg.append("defs")
+        this._svg.append<SVGDefsElement>("defs")
 
         this._gMap = this._svg.append("g").classed("map", true)
     }
 
-    _doubleClickSelected() {
+    _doubleClickSelected(): void {
         this._doubleClickAction = this._doubleClickActionRadios.get()
 
         this._doubleClickActionCookie.set(this._doubleClickAction)
@@ -294,7 +318,7 @@ class Map {
         this._clearMap()
     }
 
-    _showGridSelected() {
+    _showGridSelected(): void {
         this._showGrid = this._showGridRadios.get()
         this._grid.show = this._showGrid === "on"
 
@@ -303,11 +327,11 @@ class Map {
         this._refreshLayer()
     }
 
-    _refreshLayer() {
+    _refreshLayer(): void {
         this._grid.update()
     }
 
-    _displayMap(transform) {
+    _displayMap(transform: d3Zoom.ZoomTransform): void {
         // Based on d3-tile v0.0.3
         // https://github.com/d3/d3-tile/blob/0f8cc9f52564d4439845f651c5fab2fcc2fdef9e/src/tile.js
         const { x: tx, y: ty, k: tk } = transform
@@ -331,11 +355,11 @@ class Map {
             dx = maxCoordScaled < x1 ? tx : 0
         // crop bottom
         const dy = maxCoordScaled < y1 ? ty : 0
-        const cols = d3Range(
+        const cols = d3Range.range(
             Math.max(0, Math.floor((x0 - tx) / tileSizeScaled)),
             Math.max(0, Math.min(Math.ceil((x1 - tx - dx) / tileSizeScaled), 2 ** tileZoom))
         )
-        const rows = d3Range(
+        const rows = d3Range.range(
             Math.max(0, Math.floor((y0 - ty) / tileSizeScaled)),
             Math.max(0, Math.min(Math.ceil((y1 - ty - dy) / tileSizeScaled), 2 ** tileZoom))
         )
@@ -348,19 +372,19 @@ class Map {
                     row,
                     col,
                     id: `${tileZoom.toString()}-${row.toString()}-${col.toString()}`
-                })
+                } as Tile)
             }
         }
 
-        tiles.transform = d3ZoomIdentity.translate(tx, ty).scale(roundToThousands(k))
+        const transformNew = d3Zoom.zoomIdentity.translate(tx, ty).scale(roundToThousands(k))
 
-        this._updateMap(tiles)
+        this._updateMap(tiles, transformNew)
     }
 
-    _updateMap(tiles) {
+    _updateMap(tiles: Tile[], transform: d3Zoom.ZoomTransform): void {
         this._gMap
-            .attr("transform", tiles.transform)
-            .selectAll("image")
+            .attr("transform", transform.toString())
+            .selectAll<HTMLImageElement, Tile>("image")
             .data(tiles, d => d.id)
             .join(enter =>
                 enter
@@ -373,7 +397,7 @@ class Map {
             )
     }
 
-    _clearMap() {
+    _clearMap(): void {
         this._windPrediction.clearMap()
         this._windRose.clearMap()
         this._f11.clearMap()
@@ -385,10 +409,10 @@ class Map {
             .selectpicker("refresh")
     }
 
-    static _initModal(id) {
+    static _initModal(id: string): void {
         insertBaseModal(id, `${appTitle} <span class="text-primary small">v${appVersion}</span>`, "")
 
-        const body = d3Select(`#${id} .modal-body`)
+        const body = d3Selection.select(`#${id} .modal-body`)
         body.html(
             `<p>${appDescription} Please check the <a href="https://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/"> Game-Labs forum post</a> for further details. Feedback is very welcome.</p><p>Designed by iB aka Felix Victor, clan Bastard Sons ${displayClan(
                 "(BASTD)"
@@ -396,21 +420,22 @@ class Map {
         )
     }
 
-    _showAbout() {
+    _showAbout(): void {
         const modalId = "modal-about"
+        const modal$ = $(`#${modalId}`)
 
         // If the modal has no content yet, insert it
-        if (!$(`#${modalId}`).length) {
-            Map._initModal(modalId)
+        if (!modal$.length) {
+            NAMap._initModal(modalId)
         }
 
         // Show modal
-        $(`#${modalId}`).modal("show")
+        modal$.modal("show")
     }
 
-    _doDoubleClickAction(self) {
-        const coord = d3Mouse(self)
-        const transform = d3ZoomTransform(self)
+    _doDoubleClickAction(self: SVGSVGElement): void {
+        const coord = d3Selection.mouse(self)
+        const transform = d3Zoom.zoomTransform(self)
         const [mx, my] = coord
         const { k: tk, x: tx, y: ty } = transform
 
@@ -426,9 +451,9 @@ class Map {
         this.zoomAndPan(x, y, 1)
     }
 
-    _setZoomLevelAndData() {
-        if (d3Event.transform.k !== this._currentScale) {
-            this._currentScale = d3Event.transform.k
+    _setZoomLevelAndData(): void {
+        if (d3Selection.event.transform.k !== this._currentScale) {
+            this._currentScale = d3Selection.event.transform.k
             if (this._currentScale > this._PBZoneZoomThreshold) {
                 if (this.zoomLevel !== "pbZone") {
                     this.zoomLevel = "pbZone"
@@ -451,45 +476,34 @@ class Map {
 
     /**
      * Zoom svg groups
-     * @return {void}
-     * @private
      */
-    _naZoomed() {
-        /**
-         * D3 transform ({@link https://github.com/d3/d3-zoom/blob/master/src/transform.js})
-         * @external Transform
-         * @property {number} x - X Coordinate
-         * @property {number} y - Y Coordinate
-         * @property {number} k - Scale factor
+    _naZoomed(): void {
+        /*
+        this._currentTranslate.x = Math.floor(d3Selection.event.transform.x)
+        this._currentTranslate.y = Math.floor(d3Selection.event.transform.y)
+
          */
-        this._currentTranslate.x = Math.floor(d3Event.transform.x)
-        this._currentTranslate.y = Math.floor(d3Event.transform.y)
+        this._currentTranslate = {
+            x: Math.floor(d3Selection.event.transform.x),
+            y: Math.floor(d3Selection.event.transform.y)
+        } as d3Zoom.ZoomTransform
 
         /**
          * Current transform
-         * @type {Transform}
          */
-        const zoomTransform = d3ZoomIdentity
+        const zoomTransform = d3Zoom.zoomIdentity
             .translate(this._currentTranslate.x, this._currentTranslate.y)
-            .scale(roundToThousands(d3Event.transform.k))
-
-        /**
-         * lower or upper bound coordinates
-         * @typedef {Bound}
-         * @property {number[]} Coordinates
-         */
+            .scale(roundToThousands(d3Selection.event.transform.k))
 
         /**
          * Top left coordinates of current viewport
-         * @type{Bound}
          */
-        const lowerBound = zoomTransform.invert([this.coord.min, this.coord.min])
+        const lowerBound: Bound = zoomTransform.invert([this.coord.min, this.coord.min])
 
         /**
          * Bottom right coordinates of current viewport
-         * @type{Bound}
          */
-        const upperBound = zoomTransform.invert([this.width, this.height])
+        const upperBound: Bound = zoomTransform.invert([this.width, this.height])
 
         this._ports.setBounds(lowerBound, upperBound)
         this._pbZone.setBounds(lowerBound, upperBound)
@@ -506,13 +520,13 @@ class Map {
         this._setZoomLevelAndData()
     }
 
-    _checkF11Coord() {
+    _checkF11Coord(): void {
         if (this._searchParams.has("x") && this._searchParams.has("z")) {
             this._f11.goToF11FromParam(this._searchParams)
         }
     }
 
-    _init() {
+    _init(): void {
         this.zoomLevel = "initial"
         this.initialZoomAndPan()
         this._checkF11Coord()
@@ -529,8 +543,8 @@ class Map {
         return this._zoomLevel
     }
 
-    resize() {
-        const zoomTransform = d3ZoomIdentity
+    resize(): void {
+        const zoomTransform = d3Zoom.zoomIdentity
             .translate(this._currentTranslate.x, this._currentTranslate.y)
             .scale(this._currentScale)
 
@@ -547,55 +561,53 @@ class Map {
         return selector.getBoundingClientRect()
     }
 
-    _getWidth() {
+    _getWidth(): number {
         const { width } = this.getDimensions()
 
         return Math.floor(width)
     }
 
-    _getHeight() {
+    _getHeight(): number {
         const { top } = this.getDimensions()
         const fullHeight = document.documentElement.clientHeight - this.rem
 
         return Math.floor(fullHeight - top)
     }
 
-    _setHeightWidth() {
+    _setHeightWidth(): void {
         /**
          * Width of map svg (screen coordinates)
-         * @type {Number}
          */
         this.width = this._getWidth()
 
         /**
          * Height of map svg (screen coordinates)
-         * @type {Number}
          */
         this.height = this._getHeight()
     }
 
-    _setSvgSize() {
+    _setSvgSize(): void {
         this._svg.attr("width", this.width).attr("height", this.height)
     }
 
-    _setFlexOverlayHeight() {
+    _setFlexOverlayHeight(): void {
         const height = this.height - (this._grid.show && this.zoomLevel !== "initial" ? this.xGridBackgroundHeight : 0)
-        document.getElementById("summary-column").setAttribute("style", `height:${height}px`)
+        document.getElementById("summary-column")?.setAttribute("style", `height:${height}px`)
     }
 
-    initialZoomAndPan() {
+    initialZoomAndPan(): void {
         this._svg.call(this._zoom.scaleTo, this._minScale)
     }
 
-    zoomAndPan(x, y, scale) {
-        const transform = d3ZoomIdentity
+    zoomAndPan(x: number, y: number, scale: number): void {
+        const transform = d3Zoom.zoomIdentity
             .scale(scale)
             .translate(Math.round(-x + this.width / 2 / scale), Math.round(-y + this.height / 2 / scale))
 
         this._svg.call(this._zoom.transform, transform)
     }
 
-    goToPort() {
+    goToPort(): void {
         if (this._ports.currentPort.id === "0") {
             this.initialZoomAndPan()
         } else {
@@ -604,4 +616,4 @@ class Map {
     }
 }
 
-export { Map }
+export { NAMap }

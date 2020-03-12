@@ -9,10 +9,13 @@
  */
 
 import * as path from "path"
-import { capitalizeFirstLetter, cleanName, groupToMap, readJson, saveJsonAsync, serverNames, sortBy } from "../common"
-import { commonPaths, baseAPIFilename, serverStartDate as serverDate } from "./common-node"
 import { APIItemGeneric, APIModule, ModifiersEntity } from "./api-item"
 import { ModuleEntity, ModulePropertiesEntity, Wood, WoodTrimOrFrame } from "../gen-json"
+import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "./common-dir"
+import { capitalizeFirstLetter, groupToMap } from "./common"
+import { cleanName, sortBy } from "./common-node"
+import { readJson, saveJsonAsync } from "./common-file"
+import { serverNames } from "./common-var"
 
 let apiItems: APIItemGeneric[]
 
