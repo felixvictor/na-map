@@ -27,25 +27,27 @@ import "../../scss/roundslider.scss"
 
 import { registerEvent } from "../analytics"
 import {
-    convertInvCoordX,
-    convertInvCoordY,
     degreesPerSecond,
     fullCircle,
-    getDistance,
-    insertBaseModal,
-    speedFactor
-} from "../common"
+    insertBaseModal
+} from "../node/common"
 import {
-    compassDirections,
-    degreesToCompass,
     displayCompass,
     displayCompassAndDegrees,
-    formatF11,
     printCompassRose,
     rotationAngleInDegrees
 } from "../util"
 
 import CompareShips from "../game-tools/compare-ships"
+import {
+    compassDirections,
+    convertInvCoordX,
+    convertInvCoordY,
+    degreesToCompass,
+    getDistance,
+    speedFactor
+} from "../node/common-math";
+import { formatF11 } from "../common-format";
 
 /**
  * Journey

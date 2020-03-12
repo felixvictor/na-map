@@ -11,16 +11,14 @@
 import * as fs from "fs"
 import * as path from "path"
 
-import { makeDirAsync } from "../common"
-import { commonPaths } from "./common-node"
+import { commonPaths } from "./common-dir"
+import { makeDirAsync } from "./common-file"
 
 const yearRegex = /^api-.+-(\d{4})-\d{2}-\d{2}\.json(\.xz)?$/
 const monthRegex = /^api-.+-\d{4}-(\d{2})-\d{2}\.json(\.xz)?$/
 
 /**
  * Move file (async)
- * @param {string} oldFileName
- * @param {string} newFileName
  */
 const moveFileAsync = (oldFileName: string, newFileName: string): void => {
     fs.rename(oldFileName, newFileName, err => {
@@ -32,8 +30,6 @@ const moveFileAsync = (oldFileName: string, newFileName: string): void => {
 
 /**
  * Move API files
- * @param {string} fileName
- * @return {Promise<void>}
  */
 const moveAPIFile = async (fileName: string): Promise<void> => {
     // Consider only file to match regex "api-...")
@@ -51,5 +47,6 @@ const moveAPIFile = async (fileName: string): Promise<void> => {
 
 for (const fileName of fs.readdirSync(commonPaths.dirAPI)) {
     console.log("loop", fileName)
+    // noinspection JSIgnoredPromiseFromCall
     moveAPIFile(fileName)
 }

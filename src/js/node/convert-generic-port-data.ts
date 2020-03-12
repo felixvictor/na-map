@@ -11,20 +11,13 @@
 import * as path from "path"
 import polylabel from "polylabel"
 
-import {
-    capitalToCounty,
-    cleanName,
-    convertCoordX,
-    convertCoordY,
-    degreesHalfCircle,
-    Point,
-    readJson,
-    rotationAngleInDegrees,
-    saveJsonAsync,
-    serverNames,
-    sortBy
-} from "../common"
-import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "./common-node"
+import { capitalToCounty } from "./common"
+import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "./common-dir"
+import { readJson, saveJsonAsync } from "./common-file"
+import { cleanName, sortBy } from "./common-node"
+import { convertCoordX, convertCoordY, degreesHalfCircle, Point, rotationAngleInDegrees } from "./common-math"
+import { serverNames } from "./common-var"
+
 import { APIPort, PortElementsSlotGroupsEntity, PortPosition, PortRaidSpawnPointsEntity } from "./api-port"
 import { FeaturesEntity, GeoJson } from "../gen-json"
 

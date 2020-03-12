@@ -16,9 +16,10 @@ import { nest as d3Nest } from "d3-collection"
 import { ascending as d3Ascending } from "d3-array"
 import { registerEvent } from "../analytics"
 
-import { getCurrencyAmount, insertBaseModal } from "../common"
+import { getCurrencyAmount, insertBaseModal } from "../node/common"
 import { servers } from "../servers"
-import { formatInt, formatSignPercent, getOrdinal, putImportError, sortBy } from "../util"
+import { getOrdinal, putImportError, sortBy } from "../util"
+import { formatInt, formatSignPercent } from "../common-format";
 
 const replacer = (match, p1, p2) => `${getOrdinal(p1)}\u202F\u2013\u202f${getOrdinal(p2)}`
 
@@ -37,10 +38,10 @@ export default class ListRecipes {
     async _loadAndSetupData() {
         try {
             this._moduleData = (
-                await import(/* webpackChunkName: "data-modules" */ "../../gen-generic/modules.json")
+                await import(/* webpackChunkName: "data-modules" */ "../../../lib/gen-generic/modules.json")
             ).default
             this._recipeData = (
-                await import(/* webpackChunkName: "data-recipes" */ "../../gen-generic/recipes.json")
+                await import(/* webpackChunkName: "data-recipes" */ "../../../lib/gen-generic/recipes.json")
             ).default.recipe
         } catch (error) {
             putImportError(error)
