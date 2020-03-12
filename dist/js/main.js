@@ -4,7 +4,9 @@ import { putImportError } from "./common";
 import Cookie from "./util/cookie";
 import RadioButton from "./util/radio-button";
 import "../scss/main.scss";
-SVGAnimatedString.prototype.indexOf = () => this.baseVal.indexOf.apply(this.baseVal, arguments);
+SVGAnimatedString.prototype.indexOf = function () {
+    return this.baseVal.indexOf.apply(this.baseVal, arguments);
+};
 const baseId = "server-name";
 const radioButtonValues = servers.map((server) => server.id);
 const cookie = new Cookie({ id: baseId, values: radioButtonValues });
