@@ -9,11 +9,11 @@
 
 import { initAnalytics, registerPage } from "./analytics"
 import { Server, servers } from "./servers"
-import { putImportError } from "./common"
 import Cookie from "./util/cookie"
 import RadioButton from "./util/radio-button"
 
 import "../scss/main.scss"
+import { putImportError } from "./node/common-file";
 
 /**
  *  Workaround for google translate uses indexOf on svg text
@@ -103,14 +103,13 @@ const setupListener = (): void => {
 
 /**
  * Load map and set resize event
+ * @param serverId - Server id
+ * @param searchParams - Query arguments
  */
-const loadMap = async (
-    serverId: string, // Server id
-    searchParams: URLSearchParams // Query arguments
-): Promise<void> => {
+const loadMap = async (serverId: string, searchParams: URLSearchParams): Promise<void> => {
     try {
-        const Map = await import(/*  webpackPreload: true, webpackChunkName: "map" */ "./map/map")
-        const map = new Map.Map(serverId, searchParams)
+        const Map = await import(/*  webpackPreload: true, webpackChunkName: "map" */ "./map/NAMap")
+        const map = new Map.NAMap(serverId, searchParams)
         await map.MapInit()
 
         window.addEventListener("resize", () => {
@@ -123,11 +122,10 @@ const loadMap = async (
 
 /**
  * Load game tools
+ * @param serverId - Server id
+ * @param searchParams - Query arguments
  */
-const loadGameTools = async (
-    serverId: string, // Server id
-    searchParams: URLSearchParams // Query arguments
-): Promise<void> => {
+const loadGameTools = async (serverId: string, searchParams: URLSearchParams): Promise<void> => {
     try {
         const gameTools = await import(/* webpackChunkName: "game-tools" */ "./game-tools")
         gameTools.init(serverId, searchParams)

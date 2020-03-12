@@ -13,7 +13,7 @@ import Hashids from "hashids"
 import { html, TemplateResult } from "lit-html"
 import { default as Tablesort } from "tablesort"
 
-import { degreesFullCircle } from "./common"
+import { degreesFullCircle } from "./node/common-math";
 
 // noinspection SpellCheckingInspection
 declare const CGREEN: string,
@@ -231,3 +231,8 @@ export const insertBaseModalHTML = ({
  */
 export const getCurrencyAmount = (amount: number | string): string =>
     `${amount}\u00A0real${Number(amount) > 1 ? "s" : ""}`
+
+/**
+ * Lower or upper bound coordinates
+ */
+export type Bound = [number, number]

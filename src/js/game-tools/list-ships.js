@@ -15,8 +15,9 @@ import { select as d3Select } from "d3-selection"
 import { default as Tablesort } from "tablesort"
 
 import { registerEvent } from "../analytics"
-import { initTablesort, insertBaseModal } from "../common"
-import { formatFloatFixed, formatInt, putImportError, sortBy } from "../util"
+import { initTablesort, insertBaseModal } from "../node/common"
+import { putImportError, sortBy } from "../util"
+import { formatFloatFixed, formatInt } from "../common-format";
 
 /**
  *
@@ -32,7 +33,7 @@ export default class ShipList {
 
     async _loadAndSetupData() {
         try {
-            this._shipData = (await import(/* webpackChunkName: "data-ships" */ "../../gen-generic/ships.json")).default
+            this._shipData = (await import(/* webpackChunkName: "data-ships" */ "../../../lib/gen-generic/ships.json")).default
         } catch (error) {
             putImportError(error)
         }

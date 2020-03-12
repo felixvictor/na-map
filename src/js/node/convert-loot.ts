@@ -9,8 +9,13 @@
  */
 
 import * as path from "path"
-import { cleanName, getOrdinal, readJson, saveJsonAsync, serverNames, sortBy } from "../common"
-import { commonPaths, baseAPIFilename, serverStartDate as serverDate } from "./common-node"
+
+import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "./common-dir"
+import { readJson, saveJsonAsync } from "./common-file"
+import { getOrdinal } from "./common-math"
+import { cleanName, sortBy } from "./common-node"
+import { serverNames } from "./common-var"
+
 import { APIItemGeneric, ItemsEntity, APIShipLootTableItem, APITimeBasedConvertibleItem } from "./api-item"
 import { Loot, LootChestsEntity, LootItemsEntity, LootLootEntity } from "../gen-json"
 
@@ -106,5 +111,6 @@ export const convertLootData = () => {
         path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`)
     ) as unknown) as APIItemGeneric[]
 
+    // noinspection JSIgnoredPromiseFromCall
     convertLoot()
 }
