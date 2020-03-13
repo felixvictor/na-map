@@ -22,17 +22,9 @@
         "prettier/@typescript-eslint",
         "plugin:prettier/recommended"
     ],
-    "plugins": ["lit", "@typescript-eslint", "prettier", "eslint-plugin-tsdoc"],
+    "plugins": ["lit", "@typescript-eslint", "eslint-plugin-tsdoc"],
     "rules": {
         "capitalized-comments": "off",
-        "indent": [
-            "error",
-            4,
-            {
-                "MemberExpression": "off",
-                "SwitchCase": 1
-            }
-        ],
         "new-cap": "off",
         "no-mixed-operators": "off",
         "object-curly-spacing": ["error", "always"],
