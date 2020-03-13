@@ -14,7 +14,7 @@
         "build:deploy-test": "       TARGET=na-map-test  run-s prod                      deploy:netlify-test",
         "build:deploy-test2": "      TARGET=na-map-test2 run-s prod                      deploy:netlify-test2",
         "build:git-push": "git add --ignore-errors . && (git diff-index --quiet HEAD || git commit -m 'squash! update') && git push --quiet gitlab",
-        "build:node": "yarn tsc --build tsconfig-for-node.json",
+        "build:node": "yarn tsc --project tsconfig-for-node.json",
         "build:load": "yarn node --experimental-specifier-resolution=node dist/js/node/load-api-data.js",
         "deploy:netlify": "export $(cat .env | xargs) && netlify deploy --prod --dir public --site ${KEY_NETLIFY}",
         "deploy:netlify-test": "export $(cat .env | xargs) && netlify deploy --prod --dir public --site ${KEY_NETLIFY_TEST}",
