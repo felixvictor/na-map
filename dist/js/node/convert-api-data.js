@@ -1,3 +1,12 @@
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Convert API data.
+ * @module    convert-api-data
+ * @author    iB aka Felix Victor
+ * @copyright 2020
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
 import { compressApiData, uncompressApiData } from "./common-file";
 import { convertBuildingData } from "./convert-buildings";
 import { convertCannons } from "./convert-cannons";
