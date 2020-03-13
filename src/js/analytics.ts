@@ -8,14 +8,14 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-/* global ga */
-
 import { appName, appVersion } from "./common-browser"
+import { GA_TRACKING_ID } from "./node/common-var"
 
-const GA_TRACKING_ID = "UA-109520372-1"
-// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-// @ts-ignore
-window.ga = (arguments): void => {
+const ga = {} as UniversalAnalytics.ga
+
+    // @ts-ignore
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any,no-shadow-restricted-names
+;(window as any).ga = (arguments): void => {
     ga.q.push(arguments)
 }
 
@@ -23,12 +23,11 @@ ga.q = []
 
 /**
  * Register event
+ * @param category - Event category
+ * @param label - Event label
+ * @param value - Event label
  */
-export const registerEvent = (
-    category: string, // Event category
-    label: string, // Event label
-    value = 1 // Event label
-): void => {
+export const registerEvent = (category: string, label: string, value = 1): void => {
     ga("send", {
         hitType: "event",
         eventCategory: category,
@@ -39,10 +38,9 @@ export const registerEvent = (
 
 /**
  * Register page
+ * @param title - Page title
  */
-export const registerPage = (
-    title: string // Page title
-): void => {
+export const registerPage = (title: string): void => {
     ga("send", {
         hitType: "pageview",
         title

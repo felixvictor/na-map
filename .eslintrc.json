@@ -7,7 +7,7 @@
             "impliedStrict": true
         },
         "ecmaVersion": 2020,
-        "project": ["./tsconfig-for-node.json","./tsconfig-for-webpack.json"],
+        "project": ["./tsconfig-for-node.json", "./tsconfig-for-webpack.json"],
         "sourceType": "module"
     },
     "env": {
@@ -64,5 +64,14 @@
             }
         ],
         "@typescript-eslint/ban-ts-ignore": "off"
-    }
+    },
+    "overrides": [
+        {
+            "files": ["*.js", "*.jsx"],
+            "rules": {
+                "tsdoc/syntax": "off",
+                "@typescript-eslint/explicit-function-return-type": "off"
+            }
+        }
+    ]
 }
