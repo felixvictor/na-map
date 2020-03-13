@@ -1,4 +1,4 @@
-/**
+/*!
  * This file is part of na-map.
  *
  * @file      Move api files to directories (year|month).
