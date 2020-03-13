@@ -1,4 +1,4 @@
-/**
+/*!
  * This file is part of na-map.
  *
  * @file      Convert repair data from modules.
