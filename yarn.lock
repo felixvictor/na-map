@@ -2518,6 +2518,10 @@
   version "0.0.0"
   uid ""
 
+"Lib@link:./lib":
+  version "0.0.0"
+  uid ""
+
 a-sync-waterfall@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/a-sync-waterfall/-/a-sync-waterfall-1.0.1.tgz#75b6b6aa72598b497a125e7a2770f14f4c8a1fa7"
@@ -6372,7 +6376,7 @@ escodegen@^1.6.1, escodegen@^1.8.0:
   optionalDependencies:
     source-map "~0.6.1"
 
-eslint-config-prettier@^6.7.0:
+eslint-config-prettier@^6.10.0:
   version "6.10.0"
   resolved "https://registry.yarnpkg.com/eslint-config-prettier/-/eslint-config-prettier-6.10.0.tgz#7b15e303bf9c956875c948f6b21500e48ded6a7f"
   integrity sha512-AtndijGte1rPILInUdHjvKEGbIV06NuvPrqlIEaEaWtbtvJh464mDeyGMdZEQMsGvC0ZVkiex1fSNcC4HAbRGg==
