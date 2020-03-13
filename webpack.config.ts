@@ -130,6 +130,7 @@ const postcssCleanOpt = {
 }
 
 const postcssOpt = {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     plugins: [require("autoprefixer"), isProduction ? require("postcss-clean")({ postcssCleanOpt }) : {}],
     sourceMap: true
 }
