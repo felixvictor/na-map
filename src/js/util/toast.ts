@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/**
+/*!
  * This file is part of na-map.
  *
  * @file      Toast.
