@@ -43,7 +43,7 @@ export default class ListLoot {
     async _loadAndSetupData() {
         try {
             this._sourceData = (
-                await import(/* webpackChunkName: "data-loot" */ "../../../lib/gen-generic/loot.json")
+                await import(/* webpackChunkName: "data-loot" */ "~Lib/gen-generic/loot.json")
             ).default
         } catch (error) {
             putImportError(error)

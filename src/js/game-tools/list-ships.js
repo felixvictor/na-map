@@ -33,7 +33,7 @@ export default class ShipList {
 
     async _loadAndSetupData() {
         try {
-            this._shipData = (await import(/* webpackChunkName: "data-ships" */ "../../../lib/gen-generic/ships.json")).default
+            this._shipData = (await import(/* webpackChunkName: "data-ships" */ "~Lib/gen-generic/ships.json")).default
         } catch (error) {
             putImportError(error)
         }
