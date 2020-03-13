@@ -1,5 +1,5 @@
 /* eslint-disable no-irregular-whitespace */
-/**
+/*!
  * This file is part of na-map.
  *
  * @file      List loot and chests.
