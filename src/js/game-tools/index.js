@@ -13,8 +13,8 @@ import "bootstrap/js/dist/modal"
 
 import { default as semver } from "semver"
 
-import { registerEvent } from "../analytics"
-import { appVersion } from "../node/common"
+import { registerEvent } from "../analytics.ts"
+import { appVersion } from "../common-browser"
 
 import CompareShips from "./compare-ships"
 import CompareWoods from "./compare-woods"
