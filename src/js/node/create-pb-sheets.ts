@@ -8,15 +8,17 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+import path from "path"
+
 import Excel4Node, { Style, Worksheet } from "excel4node"
 import sass from "node-sass"
-import css, { Declaration, Rule } from "css"
 
+import css, { Declaration, Rule } from "css"
 import { range } from "./common"
 import { commonPaths } from "./common-dir"
 import { sortBy } from "./common-node"
-import { readJson } from "./common-file"
 
+import { readJson } from "./common-file"
 import { PortGeneric, Ship } from "../gen-json"
 
 type ColourMap = Map<string, string>
@@ -35,25 +37,31 @@ const rowHeight = 24
 let portsOrig: PortGeneric[]
 let shipsOrig: Ship[]
 
-/** Set colours
+const fileScssPreCompile = path.resolve("src", "scss", "pre-compile.scss")
+/**
+ * Set colours
  * @returns Colours
  */
 const setColours = (): ColourMap => {
     const compiledCss = sass
         .renderSync({
-            file: "src/scss/pre-compile.scss"
+            file: fileScssPreCompile
         })
         .css.toString()
     const parsedCss = css.parse(compiledCss)
     return new Map(
         (parsedCss.stylesheet?.rules.filter((rule: Rule) =>
             rule.selectors?.[0].startsWith(".colour-palette ")
-        ) as Rule[]).map(rule => {
-            const d = rule?.declarations?.find(
-                (declaration: Declaration) => declaration.property === "background-color"
-            ) as Declaration
-            return [rule.selectors?.[0].replace(".colour-palette .", "") ?? "", d.value ?? ""]
-        })
+        ) as Rule[])
+            .filter((rule: Rule) =>
+                rule?.declarations?.find((declaration: Declaration) => declaration.property === "background-color")
+            )
+            .map(rule => {
+                const d = rule?.declarations?.find(
+                    (declaration: Declaration) => declaration.property === "background-color"
+                ) as Declaration
+                return [rule.selectors?.[0].replace(".colour-palette .", "") ?? "", d.value ?? ""]
+            })
     )
 }
 
@@ -413,7 +421,7 @@ const createPortBattleSheets = (): void => {
     })
 }
 
-export const createPortBattleSheet = () => {
+export const createPortBattleSheet = (): void => {
     portsOrig = (readJson(commonPaths.filePort) as unknown) as PortGeneric[]
     shipsOrig = (readJson(commonPaths.fileShip) as unknown) as Ship[]
 
