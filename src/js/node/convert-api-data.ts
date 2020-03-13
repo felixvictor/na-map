@@ -8,6 +8,8 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+import { compressApiData, uncompressApiData } from "./common-file"
+
 import { convertBuildingData } from "./convert-buildings"
 import { convertCannons } from "./convert-cannons"
 import { convertGenericPortData } from "./convert-generic-port-data"
@@ -19,7 +21,6 @@ import { convertOwnershipData } from "./convert-ownership"
 import { convertServerPortData } from "./convert-server-port-data"
 import { convertShipData } from "./convert-ship-data"
 import { createPortBattleSheet } from "./create-pb-sheets"
-import { compressApiData, uncompressApiData } from "./common-file"
 
 const runType = process.argv[2] || "client"
 
@@ -38,8 +39,13 @@ const convertApiData = async (): Promise<void> => {
     await convertShipData()
 }
 
-uncompressApiData()
+const convert = async (): Promise<void> => {
+    uncompressApiData()
+    // noinspection JSIgnoredPromiseFromCall
+    await convertApiData()
+    createPortBattleSheet()
+    compressApiData()
+}
+
 // noinspection JSIgnoredPromiseFromCall
-convertApiData()
-createPortBattleSheet()
-compressApiData()
+convert()

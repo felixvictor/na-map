@@ -32,10 +32,10 @@ export default class ListIngredients {
     async _loadAndSetupData() {
         try {
             this._moduleData = (
-                await import(/* webpackChunkName: "data-modules" */ "../../../lib/gen-generic/modules.json")
+                await import(/* webpackChunkName: "data-modules" */ "~Lib/gen-generic/modules.json")
             ).default
             this._ingredientData = (
-                await import(/* webpackChunkName: "data-recipes" */ "../../../lib/gen-generic/recipes.json")
+                await import(/* webpackChunkName: "data-recipes" */ "~Lib/gen-generic/recipes.json")
             ).default.ingredient
         } catch (error) {
             putImportError(error)

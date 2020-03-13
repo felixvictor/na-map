@@ -42,7 +42,7 @@ export default class ListCannons {
     async _loadAndSetupData() {
         try {
             const { default: cannonData } = await import(
-                /* webpackChunkName: "data-cannons" */ "../../../lib/gen-generic/cannons.json"
+                /* webpackChunkName: "data-cannons" */ "~Lib/gen-generic/cannons.json"
             )
             this._setupData(cannonData)
         } catch (error) {
