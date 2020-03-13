@@ -2,17 +2,18 @@
     "root": true,
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
-        "ecmaVersion": 2020,
-        "sourceType": "module",
         "ecmaFeatures": {
             "modules": true,
             "impliedStrict": true
-        }
+        },
+        "ecmaVersion": 2020,
+        "project": ["./tsconfig-for-node.json","./tsconfig-for-webpack.json"],
+        "sourceType": "module"
     },
     "env": {
-        "browser": true,
-        "node": true,
-        "jquery": true
+        "es2020": true,
+        "jquery": true,
+        "shared-node-browser": true
     },
     "extends": [
         "plugin:lit/recommended",

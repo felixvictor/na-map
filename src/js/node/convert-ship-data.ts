@@ -11,8 +11,7 @@
 import * as fs from "fs"
 import * as path from "path"
 
-import { mergeAdvanced } from "object-merge-advanced"
-
+import mergeAdvanced from "object-merge-advanced"
 import convert, { ElementCompact } from "xml-js"
 
 import { isEmpty } from "./common"
@@ -286,17 +285,17 @@ const convertGenericShipData = (): Ship[] => {
 
             const frontDeck = ship.FrontDecks
                 ? ship.FrontDeckClassLimit.map(deck => [
-                    cannonWeight[deck.Limitation1.Min],
-                    carroWeight[deck.Limitation2.Min]
-                ])[0]
+                      cannonWeight[deck.Limitation1.Min],
+                      carroWeight[deck.Limitation2.Min]
+                  ])[0]
                 : emptyDeck
             deckClassLimit.push(frontDeck)
 
             const backDeck = ship.BackDecks
                 ? ship.BackDeckClassLimit.map(deck => [
-                    cannonWeight[deck.Limitation1.Min],
-                    carroWeight[deck.Limitation2.Min]
-                ])[0]
+                      cannonWeight[deck.Limitation1.Min],
+                      carroWeight[deck.Limitation2.Min]
+                  ])[0]
                 : emptyDeck
             deckClassLimit.push(backDeck)
 
@@ -626,7 +625,6 @@ export const convertShipData = async (): Promise<void> => {
     apiItems = (readJson(
         path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`)
     ) as unknown) as APIItemGeneric[]
-
     await convertShips()
-    convertShipBlueprints()
+    await convertShipBlueprints()
 }
