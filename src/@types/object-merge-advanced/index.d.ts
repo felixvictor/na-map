@@ -1,4 +1,6 @@
 declare module "object-merge-advanced" {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    export function mergeAdvanced(input1orig: any | any[], input2orig: any | any[], originalOpts?: {}): any | any[]
+    type BaseType = any
+    // noinspection JSDuplicatedDeclaration
+    export default function mergeAdvanced(input1orig: BaseType, input2orig: BaseType, originalOpts?: {}): BaseType
 }
