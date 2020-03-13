@@ -114,7 +114,6 @@
         "@types/jquery": "^3.3.32",
         "@types/js-cookie": "^2.2.5",
         "@types/lzma-native": "^4.0.0",
-        "@types/node": "^13.9.1",
         "@types/node-fetch": "^2.5.5",
         "@types/node-sass": "^4.11.0",
         "@types/pngjs": "^3.4.1",
@@ -213,6 +212,7 @@
         "yarn-deduplicate": "^2.0.0"
     },
     "peerDependencies": {
+        "@types/node": "^13.9.1",
         "jquery": "^3.4.1",
         "moment-timezone": "^0.5.14",
         "popper.js": "^1.16.0"
