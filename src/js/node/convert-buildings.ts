@@ -10,10 +10,10 @@
 
 import * as path from "path"
 
-import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "./common-dir"
-import { readJson, saveJsonAsync } from "./common-file"
-import { cleanName, sortBy } from "./common-node"
-import { serverNames } from "./common-var"
+import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
+import { readJson, saveJsonAsync } from "../common/common-file"
+import { cleanName, sortBy } from "../common/common-node"
+import { serverNames } from "../common/common-var"
 
 import { APIBuilding, LevelsEntity, TemplateEntity, APIItemGeneric, APIRecipeResource } from "./api-item"
 import {
@@ -26,7 +26,7 @@ import {
     PriceStandardWood,
     PriceSeasonedWood,
     BuildingWithResult
-} from "../gen-json"
+} from "../common/gen-json"
 
 const idWorkshop = 450
 const idAcademy = 879

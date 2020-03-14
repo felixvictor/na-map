@@ -16,13 +16,13 @@ import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat.js"
 import utc from "dayjs/plugin/utc.js"
 
-import { findNationByName, findNationByNationShortName } from "./common"
-import { commonPaths, serverStartDate as serverDate, serverStartDateTime } from "./common-dir"
-import { fileExists, readJson, readTextFile, saveJsonAsync, saveTextFile } from "./common-file"
-import { cleanName } from "./common-node"
-import { serverNames } from "./common-var"
+import { findNationByName, findNationByNationShortName } from "../common/common"
+import { commonPaths, serverStartDate as serverDate, serverStartDateTime } from "../common/common-dir"
+import { fileExists, readJson, readTextFile, saveJsonAsync, saveTextFile } from "../common/common-file"
+import { cleanName } from "../common/common-node"
+import { serverNames } from "../common/common-var"
 
-import { PortBattlePerServer } from "../gen-json"
+import { PortBattlePerServer } from "../common/gen-json"
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)

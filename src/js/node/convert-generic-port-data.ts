@@ -11,15 +11,15 @@
 import * as path from "path"
 import polylabel from "polylabel"
 
-import { capitalToCounty } from "./common"
-import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "./common-dir"
-import { readJson, saveJsonAsync } from "./common-file"
-import { cleanName, sortBy } from "./common-node"
-import { convertCoordX, convertCoordY, degreesHalfCircle, Point, rotationAngleInDegrees } from "./common-math"
-import { serverNames } from "./common-var"
+import { capitalToCounty } from "../common/common"
+import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
+import { readJson, saveJsonAsync } from "../common/common-file"
+import { cleanName, sortBy } from "../common/common-node"
+import { convertCoordX, convertCoordY, degreesHalfCircle, Point, rotationAngleInDegrees } from "../common/common-math"
+import { serverNames } from "../common/common-var"
 
 import { APIPort, PortElementsSlotGroupsEntity, PortPosition, PortRaidSpawnPointsEntity } from "./api-port"
-import { FeaturesEntity, GeoJson } from "../gen-json"
+import { FeaturesEntity, GeoJson } from "../common/gen-json"
 
 let apiPorts = [] as APIPort[]
 let apiPortPos = new Map()

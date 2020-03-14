@@ -13,17 +13,17 @@ import * as path from "path"
 import d3Node from "d3-node"
 import dayjs from "dayjs"
 
-import { findNationById, nations } from "./common"
-import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "./common-dir"
-import { readJson, saveJsonAsync } from "./common-file"
-import { Distance } from "./common-math"
-import { cleanName, simpleSort, sortBy } from "./common-node"
-import { distanceMapSize, serverNames } from "./common-var"
+import { findNationById, nations } from "../common/common"
+import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
+import { readJson, saveJsonAsync } from "../common/common-file"
+import { Distance } from "../common/common-math"
+import { cleanName, simpleSort, sortBy } from "../common/common-node"
+import { distanceMapSize, serverNames } from "../common/common-var"
 
 import { APIItemGeneric } from "./api-item"
 import { APIPort } from "./api-port"
 import { APIShop } from "./api-shop"
-import { PortBattlePerServer, PortPerServer, Trade } from "../gen-json"
+import { PortBattlePerServer, PortPerServer, Trade } from "../common/gen-json"
 
 interface Item {
     name: string
