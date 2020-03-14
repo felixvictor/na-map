@@ -8,11 +8,11 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 import * as path from "path";
-import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "./common-dir";
-import { capitalizeFirstLetter, groupToMap } from "./common";
-import { cleanName, sortBy } from "./common-node";
-import { readJson, saveJsonAsync } from "./common-file";
-import { serverNames } from "./common-var";
+import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir";
+import { capitalizeFirstLetter, groupToMap } from "../common/common";
+import { cleanName, sortBy } from "../common/common-node";
+import { readJson, saveJsonAsync } from "../common/common-file";
+import { serverNames } from "../common/common-var";
 let apiItems;
 export const convertModulesAndWoodData = async () => {
     const modules = new Map();
@@ -207,7 +207,7 @@ export const convertModulesAndWoodData = async () => {
                     isPercentage = true;
                 }
                 wood.properties.push({
-                    modifier: modifierName !== null && modifierName !== void 0 ? modifierName : "",
+                    modifier: modifierName ?? "",
                     amount,
                     isPercentage
                 });
@@ -231,11 +231,10 @@ export const convertModulesAndWoodData = async () => {
     };
     const getModuleProperties = (APImodifiers) => {
         return APImodifiers.map(modifier => {
-            var _a;
             if (!modifiers.has(`${modifier.Slot} ${modifier.MappingIds}`)) {
                 console.log(`${modifier.Slot} ${modifier.MappingIds} modifier undefined`);
             }
-            const modifierName = (_a = modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`)) !== null && _a !== void 0 ? _a : "";
+            const modifierName = modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`) ?? "";
             let amount = modifier.Percentage;
             let isPercentage = true;
             if (modifier.Absolute) {
@@ -266,7 +265,6 @@ export const convertModulesAndWoodData = async () => {
         });
     };
     const getModuleType = (module) => {
-        var _a;
         let type = "";
         let { permanentType, sortingGroup } = module;
         if (module.usageType === "All" &&
@@ -299,7 +297,7 @@ export const convertModulesAndWoodData = async () => {
         }
         else {
             sortingGroup = sortingGroup
-                ? `\u202F\u2013\u202f${capitalizeFirstLetter((_a = module.sortingGroup) !== null && _a !== void 0 ? _a : "").replace("_", "/")}`
+                ? `\u202F\u2013\u202f${capitalizeFirstLetter(module.sortingGroup ?? "").replace("_", "/")}`
                 : "";
         }
         if (permanentType === "Default") {
