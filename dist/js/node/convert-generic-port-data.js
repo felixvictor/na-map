@@ -1,3 +1,12 @@
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Convert generic port data.
+ * @module    convert-generic-port-data
+ * @author    iB aka Felix Victor
+ * @copyright 2018, 2019, 2020
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
 import * as path from "path";
 import polylabel from "polylabel";
 import { capitalToCounty } from "./common";

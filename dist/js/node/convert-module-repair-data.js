@@ -1,3 +1,12 @@
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Convert repair data from modules.
+ * @module    src/node/convert-module-repair
+ * @author    iB aka Felix Victor
+ * @copyright 2019, 2020
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
 import * as path from "path";
 import convert from "xml-js";
 import { commonPaths } from "./common-dir";

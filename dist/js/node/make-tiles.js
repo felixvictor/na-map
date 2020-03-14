@@ -1,3 +1,12 @@
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Make map tiles.
+ * @module    src/node/make-tiles
+ * @author    iB aka Felix Victor
+ * @copyright 2018, 2019, 2020
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
 import child_process from "child_process";
 import sharp from "sharp";
 const inFilename = process.argv[2];

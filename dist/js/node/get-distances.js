@@ -1,3 +1,12 @@
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Get distances for front lines.
+ * @module    src/node/get-distances
+ * @author    iB aka Felix Victor
+ * @copyright 2019, 2020
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
 import * as fs from "fs";
 import * as path from "path";
 import { default as Denque } from "denque";
