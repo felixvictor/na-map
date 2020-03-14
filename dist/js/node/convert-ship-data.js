@@ -1,3 +1,12 @@
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Convert ship data.
+ * @module    convert-ship-data
+ * @author    iB aka Felix Victor
+ * @copyright 2018, 2019, 2020
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
 import * as fs from "fs";
 import * as path from "path";
 import mergeAdvanced from "object-merge-advanced";

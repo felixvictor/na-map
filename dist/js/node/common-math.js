@@ -1,3 +1,12 @@
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Common data and functions for node.
+ * @module    src/common-math
+ * @author    iB aka Felix Victor
+ * @copyright 2020
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
 export const timeFactor = 2.63;
 export const speedFactor = 390;
 export const speedConstA = 0.074465523706782;
