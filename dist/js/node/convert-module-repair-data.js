@@ -9,8 +9,8 @@
  */
 import * as path from "path";
 import convert from "xml-js";
-import { commonPaths } from "./common-dir";
-import { readTextFile, saveJsonAsync } from "./common-file";
+import { commonPaths } from "../common/common-dir";
+import { readTextFile, saveJsonAsync } from "../common/common-file";
 function toCamelCase(str) {
     str = str.replace(/[\s-_]+(.)?/g, (_match, ch) => (ch ? ch.toUpperCase() : ""));
     return str.slice(0, 1).toLowerCase() + str.slice(1);

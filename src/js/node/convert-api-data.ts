@@ -8,7 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { compressApiData, uncompressApiData } from "./common-file"
+import { compressApiData, uncompressApiData } from "../common/common-file"
 
 import { convertBuildingData } from "./convert-buildings"
 import { convertCannons } from "./convert-cannons"
