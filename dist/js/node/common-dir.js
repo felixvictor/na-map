@@ -1,3 +1,12 @@
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Common data and functions for node.
+ * @module    src/node/common-dir
+ * @author    iB aka Felix Victor
+ * @copyright 2020
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
 var _a;
 import path from "path";
 import dayjs from "dayjs";
