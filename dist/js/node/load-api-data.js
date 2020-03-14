@@ -1,3 +1,12 @@
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Get api data.
+ * @module    get-api-data
+ * @author    iB aka Felix Victor
+ * @copyright 2020
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
 import * as fs from "fs";
 import * as path from "path";
 import { default as nodeFetch } from "node-fetch";

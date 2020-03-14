@@ -1,3 +1,12 @@
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Convert modules.
+ * @module    src/node/convert-modules
+ * @author    iB aka Felix Victor
+ * @copyright 2017, 2018, 2019, 2020
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
 import * as path from "path";
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "./common-dir";
 import { capitalizeFirstLetter, groupToMap } from "./common";
