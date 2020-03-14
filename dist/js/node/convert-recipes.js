@@ -1,3 +1,12 @@
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Convert recipes.
+ * @module    build/convert-recipes
+ * @author    iB aka Felix Victor
+ * @copyright 2018, 2019, 2020
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
 import * as path from "path";
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "./common-dir";
 import { readJson, saveJsonAsync } from "./common-file";
