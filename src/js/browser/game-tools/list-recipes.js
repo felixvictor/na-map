@@ -17,7 +17,7 @@ import { ascending as d3Ascending } from "d3-array"
 import { registerEvent } from "../analytics"
 
 import { getCurrencyAmount, insertBaseModal } from "../../common/common"
-import { servers } from "../servers"
+import { servers } from "../../common/servers"
 import { getOrdinal, putImportError, sortBy } from "../util"
 import { formatInt, formatSignPercent } from "../../common/common-format";
 
