@@ -10,12 +10,12 @@
 
 import * as path from "path"
 import { APIItemGeneric, APIModule, ModifiersEntity } from "./api-item"
-import { ModuleEntity, ModulePropertiesEntity, Wood, WoodTrimOrFrame } from "../gen-json"
-import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "./common-dir"
-import { capitalizeFirstLetter, groupToMap } from "./common"
-import { cleanName, sortBy } from "./common-node"
-import { readJson, saveJsonAsync } from "./common-file"
-import { serverNames } from "./common-var"
+import { ModuleEntity, ModulePropertiesEntity, Wood, WoodTrimOrFrame } from "../common/gen-json"
+import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
+import { capitalizeFirstLetter, groupToMap } from "../common/common"
+import { cleanName, sortBy } from "../common/common-node"
+import { readJson, saveJsonAsync } from "../common/common-file"
+import { serverNames } from "../common/common-var"
 
 let apiItems: APIItemGeneric[]
 

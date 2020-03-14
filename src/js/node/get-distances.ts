@@ -13,10 +13,10 @@ import * as path from "path"
 import { default as Denque } from "denque"
 import { default as PNG } from "pngjs"
 
-import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "./common-dir"
-import { readJson, saveJsonAsync, xz } from "./common-file"
-import { convertCoordX, convertCoordY, Distance, Point } from "./common-math"
-import { distanceMapSize, serverNames } from "./common-var"
+import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
+import { readJson, saveJsonAsync, xz } from "../common/common-file"
+import { convertCoordX, convertCoordY, Distance, Point } from "../common/common-math"
+import { distanceMapSize, serverNames } from "../common/common-var"
 
 /**
  * ------------------------------------------------------------------------
