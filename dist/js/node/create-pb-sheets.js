@@ -1,3 +1,12 @@
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Create pb sheets.
+ * @module    src/js/node/create-pb-sheets
+ * @author    iB aka Felix Victor
+ * @copyright 2017, 2018, 2019, 2020
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
 import path from "path";
 import Excel4Node from "excel4node";
 import sass from "node-sass";

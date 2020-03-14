@@ -1,3 +1,12 @@
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Common data and functions.
+ * @module    src/node/common
+ * @author    iB aka Felix Victor
+ * @copyright 2018, 2019, 2020
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
 export const nations = [
     { id: 0, short: "NT", name: "Neutral", sortName: "Neutral" },
     { id: 1, short: "PR", name: "Pirates", sortName: "Pirates" },
