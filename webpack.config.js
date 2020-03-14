@@ -1,13 +1,14 @@
 /**
- * webpack.config
+ * webpack.config.js
  */
 
 import webpack from "webpack"
-import ToStringOptionsObject = webpack.Stats.ToStringOptionsObject
 
 import path from "path"
+import process from "process"
+import { fileURLToPath } from "url"
 import sass from "node-sass"
-import css, { Declaration, Rule } from "css"
+import css from "css"
 // const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
 import { CleanWebpackPlugin } from "clean-webpack-plugin"
 import CopyPlugin from "copy-webpack-plugin"
@@ -22,9 +23,12 @@ import { servers as serverServers } from "./src/js/browser/servers"
 import PACKAGE from "./package.json"
 import repairs from "./lib/gen-generic/repairs.json"
 
+// https://stackoverflow.com/a/50052194
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
 // Environment
 const { TARGET, QUIET } = process.env
-import { isProduction } from "webpack-mode"
+//import { isProduction } from "webpack-mode"
 const isQuiet = Boolean(QUIET)
 const target = TARGET ? `https://${TARGET}.netlify.com/` : ""
 
@@ -42,11 +46,10 @@ const dirPrefixIcons = path.join("images", "icons")
 const fileLogo = path.resolve("src", "images", "icons", "logo.png")
 const fileScssPreCompile = path.resolve("src", "scss", "pre-compile.scss")
 
-type ColourMap = Map<string, string>
 /** Set colours
  * @returns Colours
  */
-const setColours = (): ColourMap => {
+const setColours = () => {
     const compiledCss = sass
         .renderSync({
             file: fileScssPreCompile
@@ -54,16 +57,11 @@ const setColours = (): ColourMap => {
         .css.toString()
     const parsedCss = css.parse(compiledCss)
     return new Map(
-        (parsedCss.stylesheet?.rules.filter((rule: Rule) =>
-            rule.selectors?.[0].startsWith(".colour-palette ")
-        ) as Rule[])
-            .filter((rule: Rule) =>
-                rule?.declarations?.find((declaration: Declaration) => declaration.property === "background-color")
-            )
+        parsedCss.stylesheet?.rules
+            .filter(rule => rule.selectors?.[0].startsWith(".colour-palette "))
+            .filter(rule => rule?.declarations?.find(declaration => declaration.property === "background-color"))
             .map(rule => {
-                const d = rule?.declarations?.find(
-                    (declaration: Declaration) => declaration.property === "background-color"
-                ) as Declaration
+                const d = rule?.declarations?.find(declaration => declaration.property === "background-color")
                 return [rule.selectors?.[0].replace(".colour-palette .", "") ?? "", d.value ?? ""]
             })
     )
@@ -124,15 +122,17 @@ const htmlMinifyOpt = {
     sortAttributes: true,
     sortClassName: true,
     useShortDoctype: true
-} as HtmlMinifierPlugin.Options
+}
 
 const postcssCleanOpt = {
     level: { 1: { specialComments: 0 }, 2: {} }
 }
 
 const postcssOpt = {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    plugins: [require("autoprefixer"), isProduction ? require("postcss-clean")({ postcssCleanOpt }) : {}],
+    plugins: {
+        autoprefixer: true,
+        "postcss-clean": isProduction ? postcssCleanOpt : false
+    },
     sourceMap: true
 }
 
@@ -209,7 +209,7 @@ const htmlOpt = {
     servers: serverServers,
     template: "index.template.ejs",
     title: PACKAGE.description
-} as HtmlPlugin.Options
+}
 
 const faviconsOpt = {
     logo: fileLogo,
@@ -240,9 +240,9 @@ const faviconsOpt = {
         theme_color: themeColour,
         version: PACKAGE.version
     }
-} as any
+}
 
-const config: webpack.Configuration = {
+const config = {
     context: path.resolve(__dirname, "src"),
 
     devServer: {
@@ -366,22 +366,19 @@ const config: webpack.Configuration = {
         chunkOrigins: true,
 
         excludeAssets: [/images\/map\/*/]
-    } as ToStringOptionsObject,
+    },
 
     module: {
         rules: [
             {
                 test: /\.ts$/,
                 include: path.resolve(__dirname, "src/js"),
-                use: [
-                    { loader: require.resolve("babel-loader"), options: babelOpt },
-                    { loader: require.resolve("ts-loader") }
-                ]
+                use: [{ loader: "babel-loader", options: babelOpt }, { loader: "ts-loader" }]
             },
             {
                 test: /\.js$/,
                 include: path.resolve(__dirname, "src/js"),
-                use: [{ loader: require.resolve("babel-loader"), options: babelOpt }]
+                use: [{ loader: "babel-loader", options: babelOpt }]
             },
             {
                 test: /\.scss$/,
@@ -389,15 +386,15 @@ const config: webpack.Configuration = {
                 use: [
                     ExtractCssChunks.loader,
                     {
-                        loader: require.resolve("css-loader"),
+                        loader: "css-loader",
                         options: cssOpt
                     },
                     {
-                        loader: require.resolve("postcss-loader"),
+                        loader: "postcss-loader",
                         options: postcssOpt
                     },
                     {
-                        loader: require.resolve("sass-loader"),
+                        loader: "sass-loader",
                         options: sassOpt
                     }
                 ]
@@ -407,11 +404,11 @@ const config: webpack.Configuration = {
                 use: [
                     ExtractCssChunks.loader,
                     {
-                        loader: require.resolve("css-loader"),
+                        loader: "css-loader",
                         options: cssOpt
                     },
                     {
-                        loader: require.resolve("postcss-loader"),
+                        loader: "postcss-loader",
                         options: postcssOpt
                     }
                 ]
@@ -420,7 +417,7 @@ const config: webpack.Configuration = {
                 test: /\.(woff2?|ttf|eot|svg)$/,
                 include: dirFonts,
                 use: {
-                    loader: require.resolve("file-loader"),
+                    loader: "file-loader",
                     options: {
                         name: "[name].[ext]",
                         outputPath: "fonts/"
@@ -432,7 +429,7 @@ const config: webpack.Configuration = {
                 include: dirFlags,
                 use: [
                     {
-                        loader: require.resolve("svg-url-loader"),
+                        loader: "svg-url-loader",
                         options: {
                             limit: 1000,
                             name: "[name].[ext]",
@@ -440,27 +437,27 @@ const config: webpack.Configuration = {
                         }
                     },
                     {
-                        loader: require.resolve("image-webpack-loader"),
+                        loader: "image-webpack-loader",
                         options: {
                             svgo: svgoOpt
                         }
                     },
                     {
-                        loader: require.resolve("string-replace-loader"),
+                        loader: "string-replace-loader",
                         options: {
                             search: 'fill="#fff" fill-opacity="0"/>',
                             replace: `fill="${primary700}" fill-opacity="0.3"/>`
                         }
                     },
                     {
-                        loader: require.resolve("string-replace-loader"),
+                        loader: "string-replace-loader",
                         options: {
                             search: 'fill="#fff" fill-opacity="1"/>',
                             replace: `fill="${primary200}" fill-opacity="1"/>`
                         }
                     },
                     {
-                        loader: require.resolve("string-replace-loader"),
+                        loader: "string-replace-loader",
                         options: {
                             search: 'fill="#fff" fill-opacity=".7"/>',
                             replace: `fill="${primary300}" fill-opacity=".7"/>`
@@ -473,7 +470,7 @@ const config: webpack.Configuration = {
                 include: dirIcons,
                 use: [
                     {
-                        loader: require.resolve("svg-url-loader"),
+                        loader: "svg-url-loader",
                         options: {
                             limit: 1000,
                             name: "[name].[ext]",
@@ -481,13 +478,13 @@ const config: webpack.Configuration = {
                         }
                     },
                     {
-                        loader: require.resolve("image-webpack-loader"),
+                        loader: "image-webpack-loader",
                         options: {
                             svgo: svgoOpt
                         }
                     },
                     {
-                        loader: require.resolve("string-replace-loader"),
+                        loader: "string-replace-loader",
                         options: {
                             search: 'fill="$themeColour"',
                             replace: `fill="${themeColour}"`
@@ -504,8 +501,7 @@ if (isQuiet) {
 }
 
 if (isProduction) {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    config.optimization!.minimizer = [
+    config.optimization.minimizer = [
         new TerserPlugin({
             cache: true,
             parallel: true,
@@ -516,7 +512,7 @@ if (isProduction) {
     ]
 } else {
     config.devtool = "eval-source-map"
-    config.plugins?.push(new webpack.HotModuleReplacementPlugin())
+    config.plugins.push(new webpack.HotModuleReplacementPlugin())
 }
 
 export default config
