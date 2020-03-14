@@ -9,13 +9,13 @@
  */
 
 import * as path from "path"
-import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "./common-dir"
-import { readJson, saveJsonAsync } from "./common-file"
-import { cleanName, simpleSort, sortBy } from "./common-node"
-import { serverNames } from "./common-var"
+import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
+import { readJson, saveJsonAsync } from "../common/common-file"
+import { cleanName, simpleSort, sortBy } from "../common/common-node"
+import { serverNames } from "../common/common-var"
 
 import { APIItemGeneric, APIRecipeModuleResource, APIRecipeResource, APIShipUpgradeBookItem } from "./api-item"
-import { Recipe, RecipeEntity } from "../gen-json"
+import { Recipe, RecipeEntity } from "../common/gen-json"
 
 let apiItems: APIItemGeneric[]
 

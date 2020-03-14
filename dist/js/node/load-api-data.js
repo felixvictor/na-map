@@ -10,16 +10,16 @@
 import * as fs from "fs";
 import * as path from "path";
 import { default as nodeFetch } from "node-fetch";
-import { baseAPIFilename, serverStartDate as serverDate } from "./common-dir";
-import { apiBaseFiles, serverNames } from "./common-var";
-import { saveJsonAsync, xzAsync } from "./common-file";
-import { sortId } from "./common-node";
+import { baseAPIFilename, serverStartDate as serverDate } from "../common/common-dir";
+import { apiBaseFiles, serverNames } from "../common/common-var";
+import { saveJsonAsync, xzAsync } from "../common/common-file";
+import { sortId } from "../common/common-node";
 const sourceBaseUrl = "https://storage.googleapis.com/";
 const sourceBaseDir = "nacleanopenworldprodshards";
 const serverBaseName = "cleanopenworldprod";
 const deleteFile = (fileName) => {
     fs.unlink(fileName, error => {
-        if ((error === null || error === void 0 ? void 0 : error.code) !== "ENOENT") {
+        if (error?.code !== "ENOENT") {
             throw error;
         }
     });
