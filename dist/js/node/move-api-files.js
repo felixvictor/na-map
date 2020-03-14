@@ -1,3 +1,12 @@
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Move api files to directories (year|month).
+ * @module    src/node/move-api-files
+ * @author    iB aka Felix Victor
+ * @copyright 2020
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
 import * as fs from "fs";
 import * as path from "path";
 import { commonPaths } from "./common-dir";

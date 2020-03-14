@@ -1,3 +1,12 @@
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Convert port ownership.
+ * @module    convert-ownership
+ * @author    iB aka Felix Victor
+ * @copyright 2018, 2020
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
 import * as fs from "fs";
 import * as path from "path";
 import d3Node from "d3-node";

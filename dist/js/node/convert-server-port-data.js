@@ -1,3 +1,12 @@
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Convert server specific port data.
+ * @module    convert-server-port-data
+ * @author    iB aka Felix Victor
+ * @copyright 2018, 2019, 2020
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
 import * as path from "path";
 import d3Node from "d3-node";
 import dayjs from "dayjs";

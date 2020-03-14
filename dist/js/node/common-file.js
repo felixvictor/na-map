@@ -1,3 +1,12 @@
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Common data and functions for node.
+ * @module    src/node/common-file
+ * @author    iB aka Felix Victor
+ * @copyright 2020
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
 import { exec, execSync } from "child_process";
 import { default as fs, promises as pfs } from "fs";
 import path from "path";
