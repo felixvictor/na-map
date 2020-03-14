@@ -7,6 +7,7 @@ import webpack from "webpack"
 import path from "path"
 import process from "process"
 import { fileURLToPath } from "url"
+
 import sass from "node-sass"
 import css from "css"
 // const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
@@ -19,16 +20,16 @@ import { default as SitemapPlugin } from "sitemap-webpack-plugin"
 import SriPlugin from "webpack-subresource-integrity"
 import TerserPlugin from "terser-webpack-plugin"
 import FaviconsPlugin from "favicons-webpack-plugin"
-import { servers as serverServers } from "./src/js/browser/servers"
+import { servers as serverServers } from "dist/js/common/servers"
 import PACKAGE from "./package.json"
-import repairs from "./lib/gen-generic/repairs.json"
+import repairs from "lib/gen-generic/repairs.json"
 
 // https://stackoverflow.com/a/50052194
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 // Environment
 const { TARGET, QUIET } = process.env
-//import { isProduction } from "webpack-mode"
+import isProduction from "webpack-mode"
 const isQuiet = Boolean(QUIET)
 const target = TARGET ? `https://${TARGET}.netlify.com/` : ""
 
@@ -42,7 +43,6 @@ const dirFonts = path.resolve(__dirname, "src/fonts/")
 const dirIcons = path.resolve(__dirname, "src/icons")
 const dirOutput = path.resolve(__dirname, "public")
 const dirPrefixIcons = path.join("images", "icons")
-
 const fileLogo = path.resolve("src", "images", "icons", "logo.png")
 const fileScssPreCompile = path.resolve("src", "scss", "pre-compile.scss")
 
@@ -243,7 +243,7 @@ const faviconsOpt = {
 }
 
 const config = {
-    context: path.resolve(__dirname, "src"),
+    context: path.resolve(__dirname, "dist"),
 
     devServer: {
         contentBase: dirOutput,
@@ -252,7 +252,7 @@ const config = {
 
     devtool: false,
 
-    entry: [path.resolve(__dirname, PACKAGE.main), path.resolve(__dirname, PACKAGE.sass)],
+    entry: [path.resolve(__dirname, "dist", "browser", "main.js"), path.resolve(__dirname, PACKAGE.sass)],
 
     externals: {
         jquery: "jQuery",
@@ -260,7 +260,6 @@ const config = {
     },
 
     resolve: {
-        extensions: [".ts", ".js"],
         mainFields: ["module", "main"]
     },
 
