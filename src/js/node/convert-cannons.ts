@@ -13,11 +13,11 @@ import * as path from "path"
 
 import convert, { ElementCompact } from "xml-js"
 
-import { commonPaths } from "./common-dir"
-import { readTextFile, saveJsonAsync } from "./common-file"
-import { round } from "./common-math"
+import { commonPaths } from "../common/common-dir"
+import { readTextFile, saveJsonAsync } from "../common/common-file"
+import { round } from "../common/common-math"
 
-import { Cannon, CannonEntity, CannonGroupIndex, CannonPenetration, CannonValue } from "../gen-json"
+import { Cannon, CannonEntity, CannonGroupIndex, CannonPenetration, CannonValue } from "../common/gen-json"
 import { PairEntity, TangentEntity, TextEntity, XmlGeneric } from "./xml"
 
 // noinspection MagicNumberJS

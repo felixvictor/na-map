@@ -14,15 +14,15 @@ import * as path from "path"
 import mergeAdvanced from "object-merge-advanced"
 import convert, { ElementCompact } from "xml-js"
 
-import { isEmpty } from "./common"
-import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "./common-dir"
-import { fileExists, readJson, readTextFile, saveJsonAsync } from "./common-file"
-import { roundToThousands, speedConstA, speedConstB } from "./common-math"
-import { cleanName, sortBy } from "./common-node"
-import { serverNames } from "./common-var"
+import { isEmpty } from "../common/common"
+import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
+import { fileExists, readJson, readTextFile, saveJsonAsync } from "../common/common-file"
+import { roundToThousands, speedConstA, speedConstB } from "../common/common-math"
+import { cleanName, sortBy } from "../common/common-node"
+import { serverNames } from "../common/common-var"
 
 import { APIItemGeneric, APIShip, APIShipBlueprint } from "./api-item"
-import { Ship } from "../gen-json"
+import { Ship } from "../common/gen-json"
 import { TextEntity, XmlGeneric } from "./xml"
 
 type ElementMap = Map<string, { group: string; element: string; [key: string]: string }>

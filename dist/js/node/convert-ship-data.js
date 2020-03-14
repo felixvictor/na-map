@@ -11,12 +11,12 @@ import * as fs from "fs";
 import * as path from "path";
 import mergeAdvanced from "object-merge-advanced";
 import convert from "xml-js";
-import { isEmpty } from "./common";
-import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "./common-dir";
-import { fileExists, readJson, readTextFile, saveJsonAsync } from "./common-file";
-import { roundToThousands, speedConstA, speedConstB } from "./common-math";
-import { cleanName, sortBy } from "./common-node";
-import { serverNames } from "./common-var";
+import { isEmpty } from "../common/common";
+import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir";
+import { fileExists, readJson, readTextFile, saveJsonAsync } from "../common/common-file";
+import { roundToThousands, speedConstA, speedConstB } from "../common/common-math";
+import { cleanName, sortBy } from "../common/common-node";
+import { serverNames } from "../common/common-var";
 const middleMastThicknessRatio = 0.75;
 const topMastThicknessRatio = 0.5;
 const plankingRatio = 0.13;
@@ -86,8 +86,8 @@ const shipNames = new Map([
     ["yacht", { id: 295, master: "" }],
     ["yachtsilver", { id: 393, master: "" }]
 ]);
-const getShipId = (baseFileName) => { var _a, _b; return (_b = (_a = shipNames.get(baseFileName)) === null || _a === void 0 ? void 0 : _a.id) !== null && _b !== void 0 ? _b : 0; };
-const getShipMaster = (baseFileName) => { var _a, _b; return (_b = (_a = shipNames.get(baseFileName)) === null || _a === void 0 ? void 0 : _a.master) !== null && _b !== void 0 ? _b : ""; };
+const getShipId = (baseFileName) => shipNames.get(baseFileName)?.id ?? 0;
+const getShipMaster = (baseFileName) => shipNames.get(baseFileName)?.master ?? "";
 const subFileStructure = [
     {
         ext: "b armor",
@@ -159,7 +159,7 @@ const subFileStructure = [
 let apiItems;
 let ships;
 const getItemNames = () => new Map(apiItems.map(item => [item.Id, cleanName(item.Name)]));
-const getShipMass = (id) => { var _a, _b; return (_b = (_a = apiItems.find(apiItem => id === apiItem.Id)) === null || _a === void 0 ? void 0 : _a.ShipMass) !== null && _b !== void 0 ? _b : 0; };
+const getShipMass = (id) => apiItems.find(apiItem => id === apiItem.Id)?.ShipMass ?? 0;
 const convertGenericShipData = () => {
     const cannonWeight = [0, 42, 32, 24, 18, 12, 9, 0, 6, 4, 3, 2];
     const carroWeight = [0, 0, 68, 42, 32, 24, 0, 18, 12];
@@ -367,21 +367,15 @@ const convertShipBlueprints = async () => {
                 { name: "Planking", amount: Math.round(shipMass * plankingRatio) },
                 { name: "Crew Space", amount: Math.round(shipMass * crewSpaceRatio) }
             ],
-            resources: apiBlueprint.FullRequirements.filter(requirement => {
-                var _a;
-                return !(((_a = itemNames.get(requirement.Template)) === null || _a === void 0 ? void 0 : _a.endsWith(" Permit")) ||
-                    itemNames.get(requirement.Template) === "Doubloons" ||
-                    itemNames.get(requirement.Template) === "Provisions");
-            }).map(requirement => {
-                var _a;
-                return ({
-                    name: (_a = itemNames.get(requirement.Template)) === null || _a === void 0 ? void 0 : _a.replace(" Log", ""),
-                    amount: requirement.Amount
-                });
-            }),
+            resources: apiBlueprint.FullRequirements.filter(requirement => !(itemNames.get(requirement.Template)?.endsWith(" Permit") ||
+                itemNames.get(requirement.Template) === "Doubloons" ||
+                itemNames.get(requirement.Template) === "Provisions")).map(requirement => ({
+                name: itemNames.get(requirement.Template)?.replace(" Log", ""),
+                amount: requirement.Amount
+            })),
             provisions: (apiBlueprint.FullRequirements.find(requirement => itemNames.get(requirement.Template) === "Provisions") || {}).Amount || 0,
             doubloons: (apiBlueprint.FullRequirements.find(requirement => itemNames.get(requirement.Template) === "Doubloons") || {}).Amount || 0,
-            permit: (apiBlueprint.FullRequirements.find(requirement => { var _a; return (_a = itemNames.get(requirement.Template)) === null || _a === void 0 ? void 0 : _a.endsWith(" Permit"); }) || {}).Amount || 0,
+            permit: (apiBlueprint.FullRequirements.find(requirement => itemNames.get(requirement.Template)?.endsWith(" Permit")) || {}).Amount || 0,
             ship: {
                 id: apiBlueprint.Results[0].Template,
                 name: itemNames.get(apiBlueprint.Results[0].Template),

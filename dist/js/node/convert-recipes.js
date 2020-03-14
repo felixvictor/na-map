@@ -8,10 +8,10 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 import * as path from "path";
-import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "./common-dir";
-import { readJson, saveJsonAsync } from "./common-file";
-import { cleanName, simpleSort, sortBy } from "./common-node";
-import { serverNames } from "./common-var";
+import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir";
+import { readJson, saveJsonAsync } from "../common/common-file";
+import { cleanName, simpleSort, sortBy } from "../common/common-node";
+import { serverNames } from "../common/common-var";
 let apiItems;
 const groups = new Map([
     ["AdmiralityShips", "Admirality permits"],
@@ -32,14 +32,14 @@ const convertRecipes = async () => {
     data.ingredient = [];
     const getItemNames = () => new Map(apiItems.filter(item => !item.NotUsed).map(item => [item.Id, cleanName(item.Name)]));
     const itemNames = getItemNames();
-    const getModuleNames = () => new Map(apiItems.filter(item => item.ItemType === "ShipUpgradeBookItem").map(item => { var _a; return [item.Id, (_a = itemNames.get(item.Upgrade)) !== null && _a !== void 0 ? _a : ""]; }));
+    const getModuleNames = () => new Map(apiItems.filter(item => item.ItemType === "ShipUpgradeBookItem").map(item => [item.Id, itemNames.get(item.Upgrade) ?? ""]));
     const moduleNames = getModuleNames();
     const getIngredients = () => new Map(apiItems
         .filter(item => !item.NotUsed &&
         (item.ItemType === "ShipUpgradeBookItem" || item.SortingGroup === "Resource.Trading"))
         .map(item => [item.Id, item.Id]));
     const ingredientIds = getIngredients();
-    const getUpgradeIds = () => new Map(apiItems.filter(item => !item.NotUsed && item.Upgrade).map(item => { var _a; return [item.Id, (_a = item.Upgrade) !== null && _a !== void 0 ? _a : 0]; }));
+    const getUpgradeIds = () => new Map(apiItems.filter(item => !item.NotUsed && item.Upgrade).map(item => [item.Id, item.Upgrade ?? 0]));
     const upgradeIds = getUpgradeIds();
     apiItems.filter(apiRecipe => (apiRecipe.ItemType === "Recipe" || apiRecipe.ItemType === "RecipeModule") && !apiRecipe.NotUsed).forEach((apiRecipe) => {
         const resultReference = apiRecipe.ItemType === "Recipe"
