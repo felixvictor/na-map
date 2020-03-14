@@ -8,12 +8,12 @@
  */
 
 import { initAnalytics, registerPage } from "./analytics"
-import { Server, servers } from "./servers"
+import { Server, servers } from "../common/servers"
 import Cookie from "./util/cookie"
 import RadioButton from "./util/radio-button"
 
 import "../../scss/main.scss"
-import { putImportError } from "./common/common-file";
+import { putImportError } from "../common/common-file"
 
 /**
  *  Workaround for google translate uses indexOf on svg text
@@ -108,7 +108,7 @@ const setupListener = (): void => {
  */
 const loadMap = async (serverId: string, searchParams: URLSearchParams): Promise<void> => {
     try {
-        const Map = await import(/*  webpackPreload: true, webpackChunkName: "map" */ "./browser/map/NAMap")
+        const Map = await import(/*  webpackPreload: true, webpackChunkName: "map" */ "./map/NAMap")
         const map = new Map.NAMap(serverId, searchParams)
         await map.MapInit()
 
@@ -127,7 +127,7 @@ const loadMap = async (serverId: string, searchParams: URLSearchParams): Promise
  */
 const loadGameTools = async (serverId: string, searchParams: URLSearchParams): Promise<void> => {
     try {
-        const gameTools = await import(/* webpackChunkName: "game-tools" */ "./browser/game-tools")
+        const gameTools = await import(/* webpackChunkName: "game-tools" */ "./game-tools")
         gameTools.init(serverId, searchParams)
     } catch (error) {
         putImportError(error)
