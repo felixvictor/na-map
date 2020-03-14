@@ -12,11 +12,11 @@ import * as path from "path";
 import d3Node from "d3-node";
 import { default as lzma } from "lzma-native";
 import { default as readDirRecursive } from "recursive-readdir";
-import { capitalToCounty, nations } from "./common";
-import { commonPaths } from "./common-dir";
-import { saveJsonAsync } from "./common-file";
-import { serverNames } from "./common-var";
-import { cleanName } from "./common-node";
+import { capitalToCounty, nations } from "../common/common";
+import { commonPaths } from "../common/common-dir";
+import { saveJsonAsync } from "../common/common-file";
+import { serverNames } from "../common/common-var";
+import { cleanName } from "../common/common-node";
 const fileExtension = ".json.xz";
 const d3n = d3Node();
 const { d3 } = d3n;
@@ -46,10 +46,9 @@ function convertOwnership() {
                 });
             };
             const getPreviousNation = () => {
-                var _a;
                 const portData = ports.get(port.Id);
                 if (portData) {
-                    const index = (_a = portData.data.length - 1) !== null && _a !== void 0 ? _a : 0;
+                    const index = portData.data.length - 1 ?? 0;
                     return portData.data[index].val;
                 }
                 return "";
@@ -119,9 +118,8 @@ function convertOwnership() {
             .then(() => readFileContent(fileName))
             .then(compressedContent => decompress(compressedContent))
             .then(decompressedContent => {
-            var _a;
             if (decompressedContent) {
-                const currentDate = ((_a = path.basename(fileName).match(fileBaseNameRegex)) !== null && _a !== void 0 ? _a : [])[1];
+                const currentDate = (path.basename(fileName).match(fileBaseNameRegex) ?? [])[1];
                 parseData(JSON.parse(decompressedContent.toString()), currentDate);
             }
         })

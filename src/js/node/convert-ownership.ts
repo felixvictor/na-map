@@ -16,14 +16,14 @@ import d3Node from "d3-node"
 import { default as lzma } from "lzma-native"
 import { default as readDirRecursive } from "recursive-readdir"
 
-import { capitalToCounty, nations } from "./common"
-import { commonPaths } from "./common-dir"
-import { saveJsonAsync } from "./common-file"
-import { serverNames } from "./common-var"
-import { cleanName } from "./common-node"
+import { capitalToCounty, nations } from "../common/common"
+import { commonPaths } from "../common/common-dir"
+import { saveJsonAsync } from "../common/common-file"
+import { serverNames } from "../common/common-var"
+import { cleanName } from "../common/common-node"
 
 import { APIPort } from "./api-port"
-import { NationList, Ownership, OwnershipGroup, OwnershipLabel, OwnershipNation } from "../gen-json"
+import { NationList, Ownership, OwnershipGroup, OwnershipLabel, OwnershipNation } from "../common/gen-json"
 
 const fileExtension = ".json.xz"
 

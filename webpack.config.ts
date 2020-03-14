@@ -3,6 +3,7 @@
  */
 
 import webpack from "webpack"
+import ToStringOptionsObject = webpack.Stats.ToStringOptionsObject
 
 import path from "path"
 import sass from "node-sass"
@@ -17,7 +18,7 @@ import { default as SitemapPlugin } from "sitemap-webpack-plugin"
 import SriPlugin from "webpack-subresource-integrity"
 import TerserPlugin from "terser-webpack-plugin"
 import FaviconsPlugin from "favicons-webpack-plugin"
-import { servers as serverServers } from "./src/js/servers"
+import { servers as serverServers } from "./src/js/browser/servers"
 import PACKAGE from "./package.json"
 import repairs from "./lib/gen-generic/repairs.json"
 
@@ -100,8 +101,8 @@ const babelOpt = {
                 },
                 useBuiltIns: "usage"
             }
-        ],
-        "@babel/preset-typescript"
+        ]
+        //  "@babel/preset-typescript"
     ]
 }
 
@@ -241,7 +242,7 @@ const faviconsOpt = {
     }
 } as any
 
-const config = {
+const config: webpack.Configuration = {
     context: path.resolve(__dirname, "src"),
 
     devServer: {
@@ -259,6 +260,7 @@ const config = {
     },
 
     resolve: {
+        extensions: [".ts", ".js"],
         mainFields: ["module", "main"]
     },
 
@@ -364,15 +366,22 @@ const config = {
         chunkOrigins: true,
 
         excludeAssets: [/images\/map\/*/]
-    } as object | string,
+    } as ToStringOptionsObject,
 
     module: {
         rules: [
             {
-                test: /\.tsx?$/,
+                test: /\.ts$/,
                 include: path.resolve(__dirname, "src/js"),
-                loader: require.resolve("babel-loader"),
-                options: babelOpt
+                use: [
+                    { loader: require.resolve("babel-loader"), options: babelOpt },
+                    { loader: require.resolve("ts-loader") }
+                ]
+            },
+            {
+                test: /\.js$/,
+                include: path.resolve(__dirname, "src/js"),
+                use: [{ loader: require.resolve("babel-loader"), options: babelOpt }]
             },
             {
                 test: /\.scss$/,
@@ -488,30 +497,26 @@ const config = {
             }
         ]
     }
-} as webpack.Configuration
-
-module.exports = (): webpack.Configuration => {
-    if (isQuiet) {
-        config.stats = "errors-only"
-    }
-
-    if (isProduction) {
-        if (!config.optimization) {
-            config.optimization = {}
-        }
-        config.optimization.minimizer = [
-            new TerserPlugin({
-                cache: true,
-                parallel: true,
-                terserOptions: {
-                    output: { comments: false }
-                }
-            })
-        ]
-    } else {
-        config.devtool = "eval-source-map"
-        config.plugins?.push(new webpack.HotModuleReplacementPlugin())
-    }
-
-    return config
 }
+
+if (isQuiet) {
+    config.stats = "errors-only"
+}
+
+if (isProduction) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    config.optimization!.minimizer = [
+        new TerserPlugin({
+            cache: true,
+            parallel: true,
+            terserOptions: {
+                output: { comments: false }
+            }
+        })
+    ]
+} else {
+    config.devtool = "eval-source-map"
+    config.plugins?.push(new webpack.HotModuleReplacementPlugin())
+}
+
+export default config

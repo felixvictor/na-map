@@ -7,7 +7,6 @@
             "impliedStrict": true
         },
         "ecmaVersion": 2020,
-        "project": ["./tsconfig-for-node.json", "./tsconfig-for-webpack.json"],
         "sourceType": "module"
     },
     "env": {

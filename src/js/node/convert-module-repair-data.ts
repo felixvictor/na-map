@@ -11,10 +11,10 @@
 import * as path from "path"
 import convert, { ElementCompact } from "xml-js"
 
-import { commonPaths } from "./common-dir"
-import { readTextFile, saveJsonAsync } from "./common-file"
+import { commonPaths } from "../common/common-dir"
+import { readTextFile, saveJsonAsync } from "../common/common-file"
 
-import { Repair, RepairAmount } from "../gen-json"
+import { Repair, RepairAmount } from "../common/gen-json"
 import { TextEntity, XmlRepair } from "./xml"
 
 /**
