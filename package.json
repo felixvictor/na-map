@@ -1,11 +1,11 @@
 {
     "name": "na-map",
     "version": "9.2.3",
+    "private": true,
     "description": "Naval Action map",
     "license": "ISC",
     "author": "",
     "type": "module",
-    "main": "src/js/browser/main.ts",
     "scripts": {
         "build:data:convert": "yarn node --experimental-specifier-resolution=node dist/js/node/convert-api-data.js",
         "build:data:twitter": "export $(cat .env | xargs) && yarn node --experimental-specifier-resolution=node dist/js/node/update-twitter.js ${CONSUMER_KEY} ${CONSUMER_SECRET} ${ACCESS_TOKEN} ${ACCESS_TOKEN_SECRET}",
@@ -39,7 +39,7 @@
         "pre-build:tiles:pre": "cp /mnt/na-map.tif src/images/map.tif && rm -rf src/images/map/",
         "pre-build:tiles:build": "yarn node --experimental-specifier-resolution=node dist/js/node/make-tiles.js src/images/map.tif",
         "pre-build:tiles:post": "rm src/images/map.tif",
-        "prod": "yarn node --experimental-modules webpack --env.production --mode=production --colors --config webpack.config.js",
+        "prod": "webpack --env.production --mode=production --colors --config webpack.config.ts",
         "prod-quiet": "QUIET=true webpack --env.production --mode=production --config webpack.config.ts",
         "start": "webpack-dev-server --env.production=0 --open --mode=development --colors --config webpack.config.ts",
         "watch": "webpack --env.production=0 --mode=development --watch --colors --config webpack.config.ts"
@@ -193,6 +193,7 @@
         "stylelint-prettier": "^1.1.2",
         "svg-url-loader": "^4.0.0",
         "terser-webpack-plugin": "^2.2.2",
+        "ts-loader": "^6.2.1",
         "twit": "^2.2.11",
         "typescript": "^3.8.3",
         "url-loader": "^3.0.0",
@@ -217,7 +218,7 @@
         "popper.js": "^1.16.0"
     },
     "engines": {
-        "node": ">=12"
+        "node": ">=13"
     },
     "sass": "src/scss/main.scss"
 }
