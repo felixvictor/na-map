@@ -1,35 +1,31 @@
 /**
- * webpack.config.js
+ * webpack.config
  */
 
 import webpack from "webpack"
+import ToStringOptionsObject = webpack.Stats.ToStringOptionsObject
 
 import path from "path"
-import process from "process"
-import { fileURLToPath } from "url"
-
 import sass from "node-sass"
-import css from "css"
+import css, { Declaration, Rule } from "css"
 // const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
 import { CleanWebpackPlugin } from "clean-webpack-plugin"
 import CopyPlugin from "copy-webpack-plugin"
-import HtmlPlugin from "html-webpack-plugin"
+import HtmlPlugin, { MinifyOptions, Options } from "html-webpack-plugin"
 import HtmlMinifierPlugin from "html-minifier-terser"
 import ExtractCssChunks from "extract-css-chunks-webpack-plugin"
 import { default as SitemapPlugin } from "sitemap-webpack-plugin"
 import SriPlugin from "webpack-subresource-integrity"
 import TerserPlugin from "terser-webpack-plugin"
 import FaviconsPlugin from "favicons-webpack-plugin"
-import { servers as serverServers } from "dist/js/common/servers"
+import { servers as serverServers } from "./dist/js/common/servers"
 import PACKAGE from "./package.json"
-import repairs from "lib/gen-generic/repairs.json"
-
-// https://stackoverflow.com/a/50052194
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
+import repairs from "./lib/gen-generic/repairs.json"
 
 // Environment
 const { TARGET, QUIET } = process.env
-import isProduction from "webpack-mode"
+import { isProduction } from "webpack-mode"
+import WebpackDevServer from "webpack-dev-server"
 const isQuiet = Boolean(QUIET)
 const target = TARGET ? `https://${TARGET}.netlify.com/` : ""
 
@@ -38,18 +34,23 @@ const descriptionLong =
     "Yet another map with in-game map, resources, ship and wood comparisons. Port battle data is updated constantly from twitter and all data daily after maintenance."
 const sitemapPaths = ["/fonts/", "/icons", "/images"]
 
-const dirFlags = path.resolve(__dirname, "src/images/flags")
-const dirFonts = path.resolve(__dirname, "src/fonts/")
-const dirIcons = path.resolve(__dirname, "src/icons")
-const dirOutput = path.resolve(__dirname, "public")
+const dirSrc = path.resolve(__dirname, "src")
+const dirFlags = path.resolve(dirSrc, "src/images/flags")
+const dirFonts = path.resolve(dirSrc, "src/fonts/")
+const dirIcons = path.resolve(dirSrc, "src/icons")
+const dirJsSrc = path.resolve(dirSrc, "src/js")
+const dirScssSrc = path.resolve(dirSrc, "src/scss")
+const dirOutput = path.resolve(dirSrc, "public")
 const dirPrefixIcons = path.join("images", "icons")
-const fileLogo = path.resolve("src", "images", "icons", "logo.png")
-const fileScssPreCompile = path.resolve("src", "scss", "pre-compile.scss")
 
+const fileLogo = path.resolve(dirSrc, "images", "icons", "logo.png")
+const fileScssPreCompile = path.resolve(dirSrc, "scss", "pre-compile.scss")
+
+type ColourMap = Map<string, string>
 /** Set colours
  * @returns Colours
  */
-const setColours = () => {
+const setColours = (): ColourMap => {
     const compiledCss = sass
         .renderSync({
             file: fileScssPreCompile
@@ -57,11 +58,16 @@ const setColours = () => {
         .css.toString()
     const parsedCss = css.parse(compiledCss)
     return new Map(
-        parsedCss.stylesheet?.rules
-            .filter(rule => rule.selectors?.[0].startsWith(".colour-palette "))
-            .filter(rule => rule?.declarations?.find(declaration => declaration.property === "background-color"))
+        (parsedCss.stylesheet?.rules.filter((rule: Rule) =>
+            rule.selectors?.[0].startsWith(".colour-palette ")
+        ) as Rule[])
+            .filter((rule: Rule) =>
+                rule?.declarations?.find((declaration: Declaration) => declaration.property === "background-color")
+            )
             .map(rule => {
-                const d = rule?.declarations?.find(declaration => declaration.property === "background-color")
+                const d = rule?.declarations?.find(
+                    (declaration: Declaration) => declaration.property === "background-color"
+                ) as Declaration
                 return [rule.selectors?.[0].replace(".colour-palette .", "") ?? "", d.value ?? ""]
             })
     )
@@ -108,7 +114,7 @@ const cssOpt = {
     sourceMap: true
 }
 
-const htmlMinifyOpt = {
+const htmlMinifyOpt: HtmlPlugin.MinifyOptions = {
     collapseBooleanAttributes: true,
     collapseInlineTagWhitespace: true,
     collapseWhitespace: false,
@@ -129,10 +135,8 @@ const postcssCleanOpt = {
 }
 
 const postcssOpt = {
-    plugins: {
-        autoprefixer: true,
-        "postcss-clean": isProduction ? postcssCleanOpt : false
-    },
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    plugins: [require("autoprefixer"), isProduction ? require("postcss-clean")({ postcssCleanOpt }) : {}],
     sourceMap: true
 }
 
@@ -195,7 +199,7 @@ const svgoOpt = {
     ]
 }
 
-const htmlOpt = {
+const htmlOpt: HtmlPlugin.Options = {
     iconSmall: `${dirPrefixIcons}/android-chrome-48x48.png`,
     iconLarge: `${dirPrefixIcons}/firefox_app_512x512.png`,
     canonicalUrl: TARGET === "na-map" ? target : "",
@@ -211,7 +215,8 @@ const htmlOpt = {
     title: PACKAGE.description
 }
 
-const faviconsOpt = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const faviconsOpt: any = {
     logo: fileLogo,
     cache: true,
     devMode: "webapp",
@@ -242,17 +247,17 @@ const faviconsOpt = {
     }
 }
 
-const config = {
-    context: path.resolve(__dirname, "dist"),
+const config: webpack.Configuration = {
+    context: path.resolve(__dirname, "src"),
 
     devServer: {
         contentBase: dirOutput,
         disableHostCheck: true
-    },
+    } as WebpackDevServer.Configuration,
 
     devtool: false,
 
-    entry: [path.resolve(__dirname, "dist", "browser", "main.js"), path.resolve(__dirname, PACKAGE.sass)],
+    entry: [path.resolve(__dirname, dirJsSrc, "browser/main.ts"), path.resolve(__dirname, PACKAGE.sass)],
 
     externals: {
         jquery: "jQuery",
@@ -260,7 +265,7 @@ const config = {
     },
 
     resolve: {
-        mainFields: ["module", "main"]
+        extensions: [".ts", ".js"]
     },
 
     optimization: {
@@ -335,7 +340,7 @@ const config = {
         new CopyPlugin([
             { from: "../netlify.toml" },
             {
-                from: "gen-server",
+                from: "../lib/gen-server",
                 to: `${dirOutput}/data`,
                 flatten: true
             },
@@ -365,23 +370,23 @@ const config = {
         chunkOrigins: true,
 
         excludeAssets: [/images\/map\/*/]
-    },
+    } as ToStringOptionsObject,
 
     module: {
         rules: [
             {
                 test: /\.ts$/,
-                include: path.resolve(__dirname, "src/js"),
+                include: dirJsSrc,
                 use: [{ loader: "babel-loader", options: babelOpt }, { loader: "ts-loader" }]
             },
             {
                 test: /\.js$/,
-                include: path.resolve(__dirname, "src/js"),
+                include: dirJsSrc,
                 use: [{ loader: "babel-loader", options: babelOpt }]
             },
             {
                 test: /\.scss$/,
-                include: path.resolve(__dirname, "src/scss"),
+                include: dirScssSrc,
                 use: [
                     ExtractCssChunks.loader,
                     {
@@ -500,7 +505,8 @@ if (isQuiet) {
 }
 
 if (isProduction) {
-    config.optimization.minimizer = [
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    config.optimization!.minimizer = [
         new TerserPlugin({
             cache: true,
             parallel: true,
@@ -511,7 +517,7 @@ if (isProduction) {
     ]
 } else {
     config.devtool = "eval-source-map"
-    config.plugins.push(new webpack.HotModuleReplacementPlugin())
+    config.plugins?.push(new webpack.HotModuleReplacementPlugin())
 }
 
 export default config
