@@ -28,31 +28,11 @@ import {
 
 import { registerEvent } from "../analytics"
 import {
-    appVersion,
-    colourGreenDark,
-    colourRedDark,
-    colourWhite,
-    hashids,
-    hullRepairsPercent,
-    hullRepairsVolume,
-    rigRepairsPercent,
-    rigRepairsVolume,
-    rumRepairsPercent,
-    rumRepairsVolume,
-    repairTime,
-    insertBaseModal
-} from "../../common/common"
-import {
     // colourRamp,
     copyToClipboard,
     drawSvgCircle,
     drawSvgLine,
-    getOrdinal,
-    isEmpty,
-    putImportError,
-    rotationAngleInDegrees,
-    roundToThousands,
-    sortBy
+    rotationAngleInDegrees
 } from "../util"
 
 import CompareWoods from "./compare-woods"
@@ -66,10 +46,8 @@ import {
     formatSignFloat,
     formatSignInt,
     formatSignPercent
-} from "../../common/common-format";
-import { degreesToCompass } from "../../common/common-math";
-
-
+} from "../../common/common-format"
+import { degreesToCompass } from "../../common/common-math"
 
 /**
  * Ship
@@ -225,7 +203,7 @@ class Ship {
             let br = ""
 
             if (element === "cannonsPerDeck") {
-                [elementText, br] = ship[element]
+                ;[elementText, br] = ship[element]
                 br = `<br>${br}`
             } else {
                 elementText = element === "" ? "" : ship[element]
