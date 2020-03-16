@@ -12,21 +12,34 @@ import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/tab"
 import "bootstrap/js/dist/modal"
 
-import { html, render } from "lit-html"
+import { html, render, TemplateResult } from "lit-html"
 import { repeat } from "lit-html/directives/repeat"
 import { default as Tablesort } from "tablesort"
 
 import { registerEvent } from "../analytics"
-import { initTablesort, insertBaseModalHTML } from "../../common/common"
-import { capitalizeFirstLetter, putImportError } from "../util"
-import { formatFloatFixedHTML } from "../../common/common-format";
+import { capitalizeFirstLetter } from "../../common/common"
+import { initTablesort, insertBaseModalHTML } from "../../common/common-browser"
+import { putImportError } from "../../common/common-file"
+import { formatFloatFixedHTML } from "../../common/common-format"
+import { Cannon, CannonEntity } from "../../common/gen-json"
 
 /**
  *
  */
+type GroupKey = string
+type GroupData = { values: string; count: number }
+type GroupObject = [GroupKey, GroupData]
+type GroupMap = Map<GroupKey, GroupData>
 export default class ListCannons {
+    private _cannonData: Cannon[] = [] as Cannon[]
+    private _groups: GroupMap
+    private _baseName: string
+    private _baseId: string
+    private _buttonId: string
+    private _modalId: string
+    private _cannonTypes: string[]
+
     constructor() {
-        this._cannonData = {}
         this._groups = new Map()
 
         this._baseName = "List cannons"
@@ -39,22 +52,21 @@ export default class ListCannons {
         this._setupListener()
     }
 
-    async _loadAndSetupData() {
+    async _loadAndSetupData(): Promise<void> {
+        const fileName = "~Lib/gen-generic/cannons.json"
         try {
-            const { default: cannonData } = await import(
-                /* webpackChunkName: "data-cannons" */ "~Lib/gen-generic/cannons.json"
-            )
+            const { default: cannonData } = await import(/* webpackChunkName: "data-cannons" */ fileName)
             this._setupData(cannonData)
         } catch (error) {
             putImportError(error)
         }
     }
 
-    _setupData(cannonData) {
+    _setupData(cannonData: Cannon): void {
         for (const group of cannonData.long) {
             for (const [key, value] of Object.entries(group)) {
                 if (key !== "name") {
-                    this._groups.set(key, { values: value, count: Object.entries(value).length })
+                    this._groups.set(key, { values: value, count: Object.entries(value).length } as GroupData)
                 }
             }
         }
@@ -74,7 +86,7 @@ export default class ListCannons {
         )
     }
 
-    _setupListener() {
+    _setupListener(): void {
         let firstClick = true
 
         document.getElementById(this._buttonId).addEventListener("click", async event => {
@@ -89,14 +101,14 @@ export default class ListCannons {
         })
     }
 
-    _getList(type) {
-        const getColumnGroupHeads = groupValue => html`
+    _getList(type: string): TemplateResult {
+        const getColumnGroupHeads = (groupValue: GroupObject): TemplateResult => html`
             <th scope="col" class="text-center" colspan="${groupValue[1].count}">
                 ${capitalizeFirstLetter(groupValue[0])}
             </th>
         `
 
-        const getColumnHeads = groupValue => html`
+        const getColumnHeads = (groupValue: GroupObject): TemplateResult => html`
             ${/* eslint-disable indent */
             Object.entries(groupValue[1].values).map(
                 modifierValue =>
@@ -106,8 +118,8 @@ export default class ListCannons {
             )}
         `
 
-        const getRowHead = name => {
-            let nameConverted = name
+        const getRowHead = (name: string): TemplateResult => {
+            let nameConverted: TemplateResult | string = name
             const nameSplit = name.split(" (")
 
             if (nameSplit.length > 1) {
@@ -123,23 +135,25 @@ export default class ListCannons {
             `
         }
 
-        const getRow = cannon => html`
-            ${Object.entries(cannon).map(groupValue => {
-                if (groupValue[0] === "name") {
-                    return ""
-                }
+        const getRow = (cannon: CannonEntity): TemplateResult => html`
+            ${Object.entries(cannon).map(
+                (groupValue: GroupObject): TemplateResult => {
+                    if (groupValue[0] === "name") {
+                        return html``
+                    }
 
-                return Object.entries(groupValue[1]).map(
-                    modifierValue =>
-                        html`
-                            <td class="text-right" data-sort="${modifierValue[1].value ?? 0}">
-                                ${modifierValue[1]
-                                    ? formatFloatFixedHTML(modifierValue[1].value, modifierValue[1].digits)
-                                    : ""}
-                            </td>
-                        `
-                )
-            })}
+                    return Object.entries(groupValue[1]).map(
+                        (modifierValue: GroupData): TemplateResult =>
+                            html`
+                                <td class="text-right" data-sort="${modifierValue[1].value ?? 0}">
+                                    ${modifierValue[1]
+                                        ? formatFloatFixedHTML(modifierValue[1].value, modifierValue[1].digits)
+                                        : ""}
+                                </td>
+                            `
+                    )
+                }
+            )}
         `
 
         return html`
@@ -167,8 +181,8 @@ export default class ListCannons {
                     ${/* eslint-disable indent */
                     repeat(
                         this._cannonData[type],
-                        cannon => cannon.id,
-                        cannon => {
+                        (cannon: CannonEntity) => cannon.id,
+                        (cannon: CannonEntity) => {
                             return html`
                                 <tr>
                                     ${getRowHead(cannon.name)}${getRow(cannon)}
@@ -181,7 +195,7 @@ export default class ListCannons {
         `
     }
 
-    _getModalBody() {
+    _getModalBody(): TemplateResult {
         return html`
             <ul class="nav nav-pills" role="tablist">
                 ${/* eslint-disable indent */
@@ -228,7 +242,7 @@ export default class ListCannons {
         `
     }
 
-    _getModalFooter() {
+    _getModalFooter(): TemplateResult {
         return html`
             <button type="button" class="btn btn-secondary" data-dismiss="modal">
                 Close
@@ -236,7 +250,7 @@ export default class ListCannons {
         `
     }
 
-    _injectModal() {
+    _injectModal(): void {
         render(
             insertBaseModalHTML({
                 id: this._modalId,
@@ -254,12 +268,12 @@ export default class ListCannons {
         }
     }
 
-    _initModal() {
+    _initModal(): void {
         initTablesort()
         this._injectModal()
     }
 
-    _cannonListSelected() {
+    _cannonListSelected(): void {
         // If the modal has no content yet, insert it
         if (!document.getElementById(this._modalId)) {
             this._initModal()
