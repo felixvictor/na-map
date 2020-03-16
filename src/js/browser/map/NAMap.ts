@@ -17,21 +17,21 @@ import * as d3Zoom from "d3-zoom"
 
 import { registerEvent } from "../analytics"
 import { appDescription, appTitle, appVersion, Bound, insertBaseModal } from "../../common/common-browser"
-import { displayClan, roundToThousands } from "../util"
+import { defaultFontSize, nearestPow2, roundToThousands } from "../../common/common-math"
+import { displayClan } from "../util"
+
 import Cookie from "../util/cookie"
 import RadioButton from "../util/radio-button"
-
 import DisplayPbZones from "./display-pb-zones"
 import DisplayPorts from "./display-ports"
-import SelectPorts from "./select-ports"
 
+import SelectPorts from "./select-ports"
 import ShowF11 from "../map-tools/show-f11"
 import DisplayGrid from "../map-tools/display-grid"
 import Journey from "../map-tools/make-journey"
 import PredictWind from "../map-tools/predict-wind"
 import WindRose from "../map-tools/wind-rose"
 import ShowTrades from "../map-tools/show-trades"
-import { defaultFontSize, nearestPow2 } from "../../common/common-math";
 
 interface Tile {
     z: number
@@ -40,7 +40,9 @@ interface Tile {
     id: string
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface SVGSVGDatum {}
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface SVGGDatum {}
 
 /**
