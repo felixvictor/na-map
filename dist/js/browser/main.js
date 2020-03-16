@@ -11,7 +11,7 @@ import { servers } from "../common/servers";
 import Cookie from "./util/cookie";
 import RadioButton from "./util/radio-button";
 import "../../scss/main.scss";
-import { putImportError } from "./common/common-file";
+import { putImportError } from "../common/common-file";
 SVGAnimatedString.prototype.indexOf = function () {
     return this.baseVal.indexOf.apply(this.baseVal, arguments);
 };
@@ -52,7 +52,7 @@ const setupListener = () => {
 };
 const loadMap = async (serverId, searchParams) => {
     try {
-        const Map = await import("./browser/map/NAMap");
+        const Map = await import("./map/NAMap");
         const map = new Map.NAMap(serverId, searchParams);
         await map.MapInit();
         window.addEventListener("resize", () => {
@@ -65,7 +65,7 @@ const loadMap = async (serverId, searchParams) => {
 };
 const loadGameTools = async (serverId, searchParams) => {
     try {
-        const gameTools = await import("./browser/game-tools");
+        const gameTools = await import("./game-tools");
         gameTools.init(serverId, searchParams);
     }
     catch (error) {
