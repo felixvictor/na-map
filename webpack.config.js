@@ -2,30 +2,29 @@
  * webpack.config
  */
 
-import webpack from "webpack"
-import ToStringOptionsObject = webpack.Stats.ToStringOptionsObject
+const path = require("path")
+const webpack = require("webpack")
 
-import path from "path"
-import sass from "node-sass"
-import css, { Declaration, Rule } from "css"
 // const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
-import { CleanWebpackPlugin } from "clean-webpack-plugin"
-import CopyPlugin from "copy-webpack-plugin"
-import HtmlPlugin, { MinifyOptions, Options } from "html-webpack-plugin"
-import HtmlMinifierPlugin from "html-minifier-terser"
-import ExtractCssChunks from "extract-css-chunks-webpack-plugin"
-import { default as SitemapPlugin } from "sitemap-webpack-plugin"
-import SriPlugin from "webpack-subresource-integrity"
-import TerserPlugin from "terser-webpack-plugin"
-import FaviconsPlugin from "favicons-webpack-plugin"
-import { servers as serverServers } from "./dist/js/common/servers"
-import PACKAGE from "./package.json"
-import repairs from "./lib/gen-generic/repairs.json"
+const CopyPlugin = require("copy-webpack-plugin")
+const ExtractCssChunks = require("extract-css-chunks-webpack-plugin")
+const FaviconsPlugin = require("favicons-webpack-plugin")
+const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin")
+const HtmlPlugin = require("html-webpack-plugin")
+const parseCss = require("css")
+const sass = require("node-sass")
+const SitemapPlugin = require("sitemap-webpack-plugin").default
+const SriPlugin = require("webpack-subresource-integrity")
+const TerserPlugin = require("terser-webpack-plugin")
+const { CleanWebpackPlugin } = require("clean-webpack-plugin")
+
+const servers = require("./dist/js/common/servers")
+const PACKAGE = require("./package.json")
+const repairs = require("./lib/gen-generic/repairs.json")
 
 // Environment
 const { TARGET, QUIET } = process.env
-import { isProduction } from "webpack-mode"
-import WebpackDevServer from "webpack-dev-server"
+const { isProduction } = require("webpack-mode")
 const isQuiet = Boolean(QUIET)
 const target = TARGET ? `https://${TARGET}.netlify.com/` : ""
 
@@ -35,40 +34,42 @@ const descriptionLong =
 const sitemapPaths = ["/fonts/", "/icons", "/images"]
 
 const dirSrc = path.resolve(__dirname, "src")
-const dirFlags = path.resolve(dirSrc, "src/images/flags")
-const dirFonts = path.resolve(dirSrc, "src/fonts/")
-const dirIcons = path.resolve(dirSrc, "src/icons")
-const dirJsSrc = path.resolve(dirSrc, "src/js")
-const dirScssSrc = path.resolve(dirSrc, "src/scss")
+const dirFlags = path.resolve(dirSrc, "images/flags")
+const dirFonts = path.resolve(dirSrc, "fonts/")
+const dirIcons = path.resolve(dirSrc, "icons")
+const dirJsSrc = path.resolve(dirSrc, "js")
+const dirScssSrc = path.resolve(dirSrc, "scss")
 const dirOutput = path.resolve(dirSrc, "public")
 const dirPrefixIcons = path.join("images", "icons")
 
 const fileLogo = path.resolve(dirSrc, "images", "icons", "logo.png")
 const fileScssPreCompile = path.resolve(dirSrc, "scss", "pre-compile.scss")
 
-type ColourMap = Map<string, string>
 /** Set colours
  * @returns Colours
  */
-const setColours = (): ColourMap => {
+const setColours = () => {
     const compiledCss = sass
         .renderSync({
             file: fileScssPreCompile
         })
         .css.toString()
-    const parsedCss = css.parse(compiledCss)
+    const parsedCss = parseCss.parse(compiledCss)
     return new Map(
-        (parsedCss.stylesheet?.rules.filter((rule: Rule) =>
-            rule.selectors?.[0].startsWith(".colour-palette ")
-        ) as Rule[])
-            .filter((rule: Rule) =>
-                rule?.declarations?.find((declaration: Declaration) => declaration.property === "background-color")
+        parsedCss.stylesheet.rules
+            .filter(rule => rule.selectors && rule.selectors[0].startsWith(".colour-palette "))
+            .filter(
+                rule =>
+                    rule &&
+                    rule.declarations &&
+                    rule.declarations.find(declaration => declaration.property === "background-color")
             )
             .map(rule => {
-                const d = rule?.declarations?.find(
-                    (declaration: Declaration) => declaration.property === "background-color"
-                ) as Declaration
-                return [rule.selectors?.[0].replace(".colour-palette .", "") ?? "", d.value ?? ""]
+                const d =
+                    rule &&
+                    rule.declarations &&
+                    rule.declarations.find(declaration => declaration.property === "background-color")
+                return [rule.selectors[0].replace(".colour-palette .", "") || "", d.value || ""]
             })
     )
 }
@@ -90,7 +91,11 @@ const colourWhite = colours.get("white")
 
 const babelOpt = {
     cacheDirectory: true,
-    plugins: ["@babel/plugin-proposal-nullish-coalescing-operator", "@babel/plugin-transform-spread"],
+    plugins: [
+        "@babel/plugin-proposal-nullish-coalescing-operator",
+        "@babel/plugin-transform-spread",
+        "@babel/proposal-class-properties"
+    ],
     presets: [
         [
             "@babel/preset-env",
@@ -105,8 +110,8 @@ const babelOpt = {
                 },
                 useBuiltIns: "usage"
             }
-        ]
-        //  "@babel/preset-typescript"
+        ],
+        "@babel/typescript"
     ]
 }
 
@@ -114,7 +119,7 @@ const cssOpt = {
     sourceMap: true
 }
 
-const htmlMinifyOpt: HtmlPlugin.MinifyOptions = {
+const htmlMinifyOpt = {
     collapseBooleanAttributes: true,
     collapseInlineTagWhitespace: true,
     collapseWhitespace: false,
@@ -199,7 +204,7 @@ const svgoOpt = {
     ]
 }
 
-const htmlOpt: HtmlPlugin.Options = {
+const htmlOpt = {
     iconSmall: `${dirPrefixIcons}/android-chrome-48x48.png`,
     iconLarge: `${dirPrefixIcons}/firefox_app_512x512.png`,
     canonicalUrl: TARGET === "na-map" ? target : "",
@@ -210,13 +215,13 @@ const htmlOpt: HtmlPlugin.Options = {
     lang: "en-GB",
     meta: { viewport: "width=device-width, initial-scale=1, shrink-to-fit=no" },
     minify: htmlMinifyOpt,
-    servers: serverServers,
-    template: "index.template.ejs",
+    servers,
+    template: path.resolve(__dirname, dirSrc, "index.template.ejs"),
     title: PACKAGE.description
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const faviconsOpt: any = {
+const faviconsOpt = {
     logo: fileLogo,
     cache: true,
     devMode: "webapp",
@@ -247,17 +252,15 @@ const faviconsOpt: any = {
     }
 }
 
-const config: webpack.Configuration = {
-    context: path.resolve(__dirname, "src"),
-
+const config = {
     devServer: {
         contentBase: dirOutput,
         disableHostCheck: true
-    } as WebpackDevServer.Configuration,
+    },
 
     devtool: false,
 
-    entry: [path.resolve(__dirname, dirJsSrc, "browser/main.ts"), path.resolve(__dirname, PACKAGE.sass)],
+    entry: [path.resolve(dirJsSrc, "browser/main.ts"), path.resolve(__dirname, PACKAGE.sass)],
 
     externals: {
         jquery: "jQuery",
@@ -265,7 +268,7 @@ const config: webpack.Configuration = {
     },
 
     resolve: {
-        extensions: [".ts", ".js"]
+        extensions: [".ts", ".js", ".json"]
     },
 
     optimization: {
@@ -294,6 +297,7 @@ const config: webpack.Configuration = {
             reportFilename: path.resolve(__dirname, "report.html")
         }),
         */
+        new ForkTsCheckerWebpackPlugin(),
         new CleanWebpackPlugin({
             verbose: false
         }),
@@ -370,17 +374,12 @@ const config: webpack.Configuration = {
         chunkOrigins: true,
 
         excludeAssets: [/images\/map\/*/]
-    } as ToStringOptionsObject,
+    },
 
     module: {
         rules: [
             {
-                test: /\.ts$/,
-                include: dirJsSrc,
-                use: [{ loader: "babel-loader", options: babelOpt }, { loader: "ts-loader" }]
-            },
-            {
-                test: /\.js$/,
+                test: /\.(ts|js)$/,
                 include: dirJsSrc,
                 use: [{ loader: "babel-loader", options: babelOpt }]
             },
@@ -506,7 +505,7 @@ if (isQuiet) {
 
 if (isProduction) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    config.optimization!.minimizer = [
+    config.optimization.minimizer = [
         new TerserPlugin({
             cache: true,
             parallel: true,
@@ -517,7 +516,7 @@ if (isProduction) {
     ]
 } else {
     config.devtool = "eval-source-map"
-    config.plugins?.push(new webpack.HotModuleReplacementPlugin())
+    config.plugins.push(new webpack.HotModuleReplacementPlugin())
 }
 
-export default config
+module.exports = () => config
