@@ -10,9 +10,10 @@
         "sourceType": "module"
     },
     "env": {
+        "commonjs": true,
         "es2020": true,
         "jquery": true,
-        "shared-node-browser": true
+        "node": true
     },
     "rules": {
         "capitalized-comments": "off",
