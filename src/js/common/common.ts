@@ -175,3 +175,11 @@ export const findNationByNationShortName = (nationShortName: string): Nation | u
  * Find Nation object based on nation id
  */
 export const findNationById = (nationId: number): Nation | undefined => nations.find(nation => nationId === nation.id)
+
+/**
+ * Write fetch error to console
+ * @param error - Error message
+ */
+export const putImportError = (error: string): void => {
+    console.error("Import request failed -->", error)
+}

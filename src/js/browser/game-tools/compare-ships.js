@@ -8,15 +8,20 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+/// <reference types="bootstrap" />
+/// <reference types="bootstrap" />
 import "bootstrap/js/dist/util"
+/// <reference types="bootstrap" />
+/// <reference types="bootstrap" />
 import "bootstrap/js/dist/modal"
+/// <reference types="bootstrap" />
+/// <reference types="bootstrap" />
 import "bootstrap/js/dist/tooltip"
-
+import "bootstrap-select/js/bootstrap-select"
 import { ascending as d3Ascending, max as d3Max, min as d3Min } from "d3-array"
 import { nest as d3Nest } from "d3-collection"
 import { drag as d3Drag } from "d3-drag"
 import { interpolateCubehelixLong as d3InterpolateCubehelixLong } from "d3-interpolate"
-
 import { scaleLinear as d3ScaleLinear } from "d3-scale"
 import { event as d3Event, select as d3Select } from "d3-selection"
 import {
