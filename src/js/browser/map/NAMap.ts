@@ -8,9 +8,11 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+/// <reference types="bootstrap" />
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
 
+import "bootstrap-select/js/bootstrap-select"
 import * as d3Range from "d3-array"
 import * as d3Selection from "d3-selection"
 import * as d3Zoom from "d3-zoom"
@@ -22,6 +24,8 @@ import { displayClan } from "../util"
 
 import Cookie from "../util/cookie"
 import RadioButton from "../util/radio-button"
+
+/*
 import DisplayPbZones from "./display-pb-zones"
 import DisplayPorts from "./display-ports"
 
@@ -32,6 +36,7 @@ import Journey from "../map-tools/make-journey"
 import PredictWind from "../map-tools/predict-wind"
 import WindRose from "../map-tools/wind-rose"
 import ShowTrades from "../map-tools/show-trades"
+*/
 
 interface Tile {
     z: number

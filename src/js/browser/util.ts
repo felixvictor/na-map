@@ -345,6 +345,7 @@ export const copyToClipboard = (text: string, modal$: JQuery): void => {
         copyToClipboardFallback(text, modal$)
     }
 
+    // noinspection JSIgnoredPromiseFromCall
     writeClipboard(text)
 }
 
