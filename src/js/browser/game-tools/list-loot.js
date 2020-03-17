@@ -18,7 +18,7 @@ import { html, render } from "lit-html"
 import { repeat } from "lit-html/directives/repeat"
 
 import { registerEvent } from "../analytics"
-import { insertBaseModalHTML } from "../../common/common"
+import { insertBaseModalHTML } from "../../common/interfaces"
 import { putImportError, sortBy } from "../util"
 import { formatInt } from "../../common/common-format";
 

@@ -16,7 +16,7 @@ import "bootstrap-select/js/bootstrap-select"
 import { select as d3Select } from "d3-selection"
 
 import { registerEvent } from "../analytics"
-import { insertBaseModal } from "../../common/common"
+import { insertBaseModal } from "../../common/interfaces"
 import { putImportError, sortBy } from "../util"
 import { formatInt } from "../../common/common-format";
 

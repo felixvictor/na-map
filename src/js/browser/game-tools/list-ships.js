@@ -16,7 +16,7 @@ import { select as d3Select } from "d3-selection"
 import { default as Tablesort } from "tablesort"
 
 import { registerEvent } from "../analytics"
-import { initTablesort, insertBaseModal } from "../../common/common"
+import { initTablesort, insertBaseModal } from "../../common/interfaces"
 import { putImportError, sortBy } from "../util"
 import { formatFloatFixed, formatInt } from "../../common/common-format";
 

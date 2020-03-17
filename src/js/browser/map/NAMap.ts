@@ -20,17 +20,18 @@ import * as d3Zoom from "d3-zoom"
 import { registerEvent } from "../analytics"
 import { appDescription, appTitle, appVersion, Bound, insertBaseModal } from "../../common/common-browser"
 import { defaultFontSize, nearestPow2, roundToThousands } from "../../common/common-math"
+import { MinMaxCoord, SVGGDatum, SVGSVGDatum } from "../../common/interface"
 import { displayClan } from "../util"
 
 import Cookie from "../util/cookie"
 import RadioButton from "../util/radio-button"
 
+import ShowF11 from "../map-tools/show-f11"
 /*
 import DisplayPbZones from "./display-pb-zones"
 import DisplayPorts from "./display-ports"
 
 import SelectPorts from "./select-ports"
-import ShowF11 from "../map-tools/show-f11"
 import DisplayGrid from "../map-tools/display-grid"
 import Journey from "../map-tools/make-journey"
 import PredictWind from "../map-tools/predict-wind"
@@ -45,11 +46,6 @@ interface Tile {
     id: string
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface SVGSVGDatum {}
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface SVGGDatum {}
-
 /**
  * Display naval action map
  */
@@ -59,7 +55,7 @@ class NAMap {
     rem: number
     xGridBackgroundHeight: number
     yGridBackgroundWidth: number
-    coord: { min: number; max: number }
+    coord: MinMaxCoord
     private _currentTranslate!: d3Zoom.ZoomTransform
     private readonly _tileSize: number
     private readonly _maxScale: number

@@ -66,7 +66,6 @@ export default class ListBuildings {
         })
     }
 
-    // noinspection DuplicatedCode
     _injectModal(): void {
         insertBaseModal(this._modalId, this._baseName)
 

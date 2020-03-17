@@ -10,24 +10,46 @@
 
 /// <reference types="bootstrap" />
 import "bootstrap/js/dist/util"
-/// <reference types="bootstrap" />
 import "bootstrap/js/dist/modal"
 import { select as d3Select } from "d3-selection"
 import moment from "moment"
 import "moment/locale/en-gb"
 
 import { registerEvent } from "../analytics"
-import { insertBaseModal } from "../../common/common"
-import { copyF11ToClipboard} from "../util"
-import { between, convertCoordX, convertCoordY, convertInvCoordX, convertInvCoordY } from "../../common/common-math";
-import { formatF11 } from "../../common/common-format";
+import { formatF11 } from "../../common/common-format"
+import { BaseModalPure, HtmlString, insertBaseModal } from "../../common/common-browser"
+import { between, convertCoordX, convertCoordY, convertInvCoordX, convertInvCoordY } from "../../common/common-math"
+import { MinMaxCoord, SVGGDatum, SVGSVGDatum } from "../../common/interface"
+import { copyF11ToClipboard } from "../util"
+
+import { NAMap } from "../map/NAMap"
+import * as d3Selection from "d3-selection"
 
 /**
  * ShowF11
  */
 export default class ShowF11 {
-    constructor(map, coord) {
+    private _map: NAMap
+    private _coord: MinMaxCoord
+    private _baseName: HtmlString
+    private _baseId: HtmlString
+    private _buttonId: HtmlString
+    private _modalId: HtmlString
+    private _formId: HtmlString
+    private _xInputId: HtmlString
+    private _zInputId: HtmlString
+    private _copyButtonId: HtmlString
+    private _submitButtonId: HtmlString
+    private _modal$!: JQuery
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    private _g!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, any>
+    private _formSel!: HTMLFormElement
+    private _xInputSel!: HTMLElement
+    private _zInputSel!: HTMLElement
+
+    constructor(map: NAMap, coord: MinMaxCoord) {
         this._map = map
+
         this._coord = coord
 
         this._baseName = "Go to F11"
@@ -40,26 +62,24 @@ export default class ShowF11 {
         this._copyButtonId = `copy-coord-${this._baseId}`
         this._submitButtonId = `submit-${this._baseId}`
 
-        this._modal$ = null
-
         this._setupSvg()
         this._setupListener()
     }
 
-    _setupSvg() {
-        this._g = d3Select("#na-svg")
+    _setupSvg(): void {
+        this._g = d3Select<SVGSVGElement, SVGSVGDatum>("#na-svg")
             .append("g")
             .classed("f11", true)
     }
 
-    _navbarClick(event) {
+    _navbarClick(event: Event): void {
         registerEvent("Menu", "Go to F11")
         event.stopPropagation()
         this._f11Selected()
     }
 
-    _setupListener() {
-        document.getElementById(`${this._buttonId}`).addEventListener("click", event => this._navbarClick(event))
+    _setupListener(): void {
+        document.getElementById(`${this._buttonId}`)?.addEventListener("click", event => this._navbarClick(event))
         window.addEventListener("keydown", event => {
             if (event.code === "F11" && event.shiftKey) {
                 this._navbarClick(event)
@@ -67,15 +87,15 @@ export default class ShowF11 {
         })
     }
 
-    _injectModal() {
-        insertBaseModal(this._modalId, this._baseName, "sm")
+    _injectModal(): void {
+        insertBaseModal({ id: this._modalId, title: this._baseName, size: "sm" } as BaseModalPure)
 
         const body = d3Select(`#${this._modalId} .modal-body`)
         const form = body
             .append("form")
             .attr("id", this._formId)
             .attr("role", "form")
-        this._formSel = form.node()
+        this._formSel = form.node() as HTMLFormElement
 
         form.append("div")
             .classed("alert alert-primary", true)
@@ -161,23 +181,21 @@ export default class ShowF11 {
 
     /**
      * Init modal
-     * @returns {void}
      */
-    _initModal() {
+    _initModal(): void {
         this._injectModal()
     }
 
     /**
      * Action when selected
-     * @returns {void}
      */
-    _f11Selected() {
+    _f11Selected(): void {
         // If the modal has no content yet, insert it
         if (!this._modal$) {
             this._initModal()
             this._modal$ = $(`#${this._modalId}`)
-            this._xInputSel = document.getElementById(this._xInputId)
-            this._zInputSel = document.getElementById(this._zInputId)
+            this._xInputSel = document.getElementById(this._xInputId) as HTMLElement
+            this._zInputSel = document.getElementById(this._zInputId) as HTMLElement
             // Submit handler
             this._formSel.addEventListener("submit", event => {
                 this._modal$.modal("hide")
@@ -186,13 +204,13 @@ export default class ShowF11 {
             })
 
             // Copy coordinates to clipboard (ctrl-c key event)
-            this._modal$.on("keydown", event => {
-                if (event.code === "KeyC" && event.ctrlKey) {
+            this._modal$.on("keydown", (event: KeyboardEvent): void => {
+                if (event.key === "KeyC" && event.ctrlKey) {
                     this._copyCoordClicked(event)
                 }
             })
             // Copy coordinates to clipboard (click event)
-            document.getElementById(this._copyButtonId).addEventListener("click", event => {
+            document.getElementById(this._copyButtonId)?.addEventListener("click", event => {
                 this._copyCoordClicked(event)
             })
         }
@@ -203,20 +221,20 @@ export default class ShowF11 {
         this._xInputSel.select()
     }
 
-    _getInputValue(element) {
+    _getInputValue(element): number {
         const { value } = element
         return value === "" ? Infinity : Number(value)
     }
 
-    _getXCoord() {
+    _getXCoord(): number {
         return this._getInputValue(this._xInputSel)
     }
 
-    _getZCoord() {
+    _getZCoord(): number {
         return this._getInputValue(this._zInputSel)
     }
 
-    _useUserInput() {
+    _useUserInput(): void {
         const x = this._getXCoord() * -1000
         const z = this._getZCoord() * -1000
 
@@ -225,7 +243,7 @@ export default class ShowF11 {
         }
     }
 
-    _copyCoordClicked(event) {
+    _copyCoordClicked(event): void {
         registerEvent("Menu", "Copy F11 coordinates")
         event.preventDefault()
 
@@ -235,7 +253,7 @@ export default class ShowF11 {
         copyF11ToClipboard(x, z, this._modal$)
     }
 
-    _printF11Coord(x, y, F11X, F11Y) {
+    _printF11Coord(x, y, F11X, F11Y): void {
         let circleSize = 10
         const g = this._g.append("g").attr("transform", `translate(${x},${y})`)
         const coordRect = g.append("rect")
@@ -293,7 +311,7 @@ export default class ShowF11 {
             .attr("width", timeWidth + circleSize)
     }
 
-    _goToF11(F11XIn, F11YIn) {
+    _goToF11(F11XIn, F11YIn): void {
         const F11X = Number(F11XIn)
         const F11Y = Number(F11YIn)
         const x = Math.floor(convertCoordX(F11X, F11Y))
@@ -307,10 +325,9 @@ export default class ShowF11 {
 
     /**
      * Get F11 coordinates from url query arguments and display position
-     * @param {URLSearchParams} urlParams - Query arguments
-     * @return {void}
+     * @param urlParams - Query arguments
      */
-    goToF11FromParam(urlParams) {
+    goToF11FromParam(urlParams: URLSearchParams): void {
         const x = Number(urlParams.get("x")) * -1000
         const z = Number(urlParams.get("z")) * -1000
 
@@ -320,18 +337,18 @@ export default class ShowF11 {
         }
     }
 
-    printCoord(x, y) {
+    printCoord(x, y): void {
         const F11X = convertInvCoordX(x, y)
         const F11Y = convertInvCoordY(x, y)
 
         this._printF11Coord(x, y, F11X, F11Y)
     }
 
-    transform(transform) {
+    transform(transform): void {
         this._g.attr("transform", transform)
     }
 
-    clearMap() {
+    clearMap(): void {
         this._g.selectAll("*").remove()
     }
 }
