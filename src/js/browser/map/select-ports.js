@@ -8,10 +8,13 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+/// <reference types="bootstrap" />
 import "bootstrap/js/dist/util"
+/// <reference types="bootstrap" />
 import "bootstrap/js/dist/dropdown"
 import "bootstrap-select/js/bootstrap-select"
 
+import "bootstrap-select/js/bootstrap-select"
 import moment from "moment"
 import "tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4"
 import "tempusdominus-core/build/js/tempusdominus-core"

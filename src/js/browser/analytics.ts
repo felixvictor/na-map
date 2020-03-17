@@ -12,13 +12,8 @@
 
 import { appName, appVersion } from "../common/common-browser"
 import { GA_TRACKING_ID } from "../common/common-var"
-
-const ga = {} as UniversalAnalytics.ga
-
-    // @ts-ignore
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any,no-shadow-restricted-names
-;(window as any).ga = (arguments): void => {
-    ga.q.push(arguments)
+;(window as any).ga = (commandArray: Array<string | boolean | number>): void => {
+    ga.q.push(commandArray)
 }
 
 ga.q = []
