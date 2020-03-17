@@ -19,7 +19,7 @@ import { extent as d3Extent } from "d3-array"
 import { scaleLinear as d3ScaleLinear, scalePoint as d3ScalePoint } from "d3-scale"
 import { select as d3Select } from "d3-selection"
 
-import { nations } from "../../common/common"
+import { nations } from "../../common/interfaces"
 import { putImportError, roundToThousands } from "../util"
 import Cookie from "../util/cookie"
 import RadioButton from "../util/radio-button"
