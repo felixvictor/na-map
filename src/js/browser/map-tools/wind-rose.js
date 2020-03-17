@@ -22,7 +22,7 @@ import "round-slider/src/roundslider"
 import "round-slider/src/roundslider.css"
 
 import { registerEvent } from "../analytics"
-import { degreesPerSecond, insertBaseModal } from "../../common/common"
+import { degreesPerSecond, insertBaseModal } from "../../common/interfaces"
 import { degreesToRadians, displayCompass, getUserWind, printSmallCompassRose } from "../util"
 import Cookie from "../util/cookie"
 import { compassDirections } from "../../common/common-math";

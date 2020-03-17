@@ -27,7 +27,7 @@ import {
 import TimelinesChart from "timelines-chart"
 
 import { registerEvent } from "../analytics"
-import { colourList, insertBaseModal, nations } from "../../common/common"
+import { colourList, insertBaseModal, nations } from "../../common/interfaces"
 import { putImportError } from "../util"
 
 /**
