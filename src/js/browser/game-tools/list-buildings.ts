@@ -8,17 +8,20 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+/// <reference types="bootstrap" />
+
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
 
 import { select as d3Select } from "d3-selection"
+import "bootstrap-select/js/bootstrap-select"
 
 import { registerEvent } from "../analytics"
 import { getCurrencyAmount, insertBaseModal } from "../../common/common-browser"
-import { sortBy } from "../../common/common"
+import { putImportError } from "../../common/common"
+import { formatInt } from "../../common/common-format"
+import { sortBy } from "../../common/common-node"
 import { Building, BuildingResult } from "../../common/gen-json"
-import { putImportError } from "../../common/common-file";
-import { formatInt } from "../../common/common-format";
 
 export default class ListBuildings {
     private readonly _baseName: string
@@ -41,7 +44,7 @@ export default class ListBuildings {
 
     async _loadAndSetupData(): Promise<void> {
         try {
-            const fileName = ".~Lib/gen-generic/buildings.json"
+            const fileName = "~Lib/gen-generic/buildings.json"
             this._buildingData = ((await import(/* webpackChunkName: "data-buildings" */ fileName))
                 .default as unknown) as Building[]
         } catch (error) {
