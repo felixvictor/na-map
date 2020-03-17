@@ -94,53 +94,11 @@ export const colourList = [
 ]
 
 /**
- * Insert bootstrap modal
- */
-export const insertBaseModal = (
-    id: string, // Modal id
-    title: string, // Modal id
-    size = "xl", // "lg" when modal should be large (default)
-    buttonText = "Close" // button text (default "Close")
-): void => {
-    const modal = d3Select("#modal-section")
-        .append("div")
-        .attr("id", id)
-        .attr("class", "modal")
-        .attr("tabindex", "-1")
-        .attr("role", "dialog")
-        .attr("aria-labelledby", `title-${id}`)
-        .attr("aria-hidden", "true")
-        .append("div")
-        .attr("class", `modal-dialog${size === "xl" || size === "lg" || size === "sm" ? ` modal-${size}` : ""}`)
-        .attr("role", "document")
-
-    const content = modal.append("div").attr("class", "modal-content")
-
-    const header = content.append("header").attr("class", "modal-header")
-    header
-        .append("h5")
-        .attr("class", "modal-title")
-        .attr("id", `title-${id}`)
-        .html(title)
-
-    content.append("div").attr("class", "modal-body")
-
-    const footer = content.append("footer").attr("class", "modal-footer")
-    footer
-        .append("button")
-        .text(buttonText)
-        .attr("type", "button")
-        .attr("class", "btn btn-secondary")
-        .attr("data-dismiss", "modal")
-}
-
-/**
  * Enable nested dropdowns in navbar
  * @link https://github.com/bootstrapthemesco/bootstrap-4-multi-dropdown-navbar
+ * @param id - nav-item id
  */
-export const initMultiDropdownNavbar = (
-    id: string // nav-item id
-): void => {
+export const initMultiDropdownNavbar = (id: string): void => {
     $(`#${id} .dropdown-menu .bootstrap-select .dropdown-toggle`).on("click", event => {
         const element = $(event.currentTarget)
         element.next(".dropdown-menu").toggleClass("show")
@@ -192,11 +150,16 @@ export const initTablesort = (): void => {
     )
 }
 
-type HtmlString = string
+export type HtmlString = string
 export interface BaseModal {
     id: HtmlString
     title: HtmlString
     size?: string
+}
+export interface BaseModalPure extends BaseModal {
+    buttonText?: HtmlString
+}
+export interface BaseModalHtml extends BaseModal {
     body: () => TemplateResult
     footer: () => TemplateResult
 }
@@ -205,11 +168,51 @@ export interface BaseModal {
  * Insert bootstrap modal
  * @param id - Modal id
  * @param title - Modal title
- * @param size - Modal size
+ * @param size - Modal size, "xl" (default)
+ * @param buttonText - Button text, "Close" (default)
+ */
+export const insertBaseModal = ({ id, title, size = "xl", buttonText = "Close" }: BaseModalPure): void => {
+    const modal = d3Select("#modal-section")
+        .append("div")
+        .attr("id", id)
+        .attr("class", "modal")
+        .attr("tabindex", "-1")
+        .attr("role", "dialog")
+        .attr("aria-labelledby", `title-${id}`)
+        .attr("aria-hidden", "true")
+        .append("div")
+        .attr("class", `modal-dialog${size === "xl" || size === "lg" || size === "sm" ? ` modal-${size}` : ""}`)
+        .attr("role", "document")
+
+    const content = modal.append("div").attr("class", "modal-content")
+
+    const header = content.append("header").attr("class", "modal-header")
+    header
+        .append("h5")
+        .attr("class", "modal-title")
+        .attr("id", `title-${id}`)
+        .html(title)
+
+    content.append("div").attr("class", "modal-body")
+
+    const footer = content.append("footer").attr("class", "modal-footer")
+    footer
+        .append("button")
+        .text(buttonText)
+        .attr("type", "button")
+        .attr("class", "btn btn-secondary")
+        .attr("data-dismiss", "modal")
+}
+
+/**
+ * Insert bootstrap modal with html-lit
+ * @param id - Modal id
+ * @param title - Modal title
+ * @param size - Modal size, "xl" (default)
  * @param body - Body content
  * @param footer - Footer content
  */
-export const insertBaseModalHTML = ({ id, title, size = "xl", body, footer }: BaseModal): TemplateResult => {
+export const insertBaseModalHTML = ({ id, title, size = "xl", body, footer }: BaseModalHtml): TemplateResult => {
     const modalSize = size === "xl" || size === "lg" || size === "sm" ? ` modal-${size}` : ""
 
     return html`
