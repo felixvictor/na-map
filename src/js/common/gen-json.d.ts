@@ -11,7 +11,7 @@
 // https://jvilk.com/MakeTypes/
 
 import { ModifiersEntity } from "../node/api-item"
-import { Point } from "./common-math";
+import { Point } from "./common-math"
 
 /****************************
  * buildings.json

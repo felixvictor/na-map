@@ -20,7 +20,7 @@ import "tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4"
 import "tempusdominus-core/build/js/tempusdominus-core"
 
 import { registerEvent } from "../analytics"
-import { initMultiDropdownNavbar, nations, range, serverMaintenanceHour } from "../../common/common"
+import { initMultiDropdownNavbar, nations, range, serverMaintenanceHour } from "../../common/interfaces"
 import { putImportError, sortBy } from "../util"
 import { formatInt, formatSiCurrency } from "../../common/common-format";
 

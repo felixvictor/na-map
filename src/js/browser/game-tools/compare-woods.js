@@ -17,7 +17,7 @@ import { min as d3Min, max as d3Max } from "d3-array"
 import { select as d3Select } from "d3-selection"
 
 import { registerEvent } from "../analytics"
-import { insertBaseModal } from "../../common/common"
+import { insertBaseModal } from "../../common/interfaces"
 import { sortBy, putImportError } from "../util"
 import { formatFloat, formatPercent, formatSignFloat } from "../../common/common-format";
 
