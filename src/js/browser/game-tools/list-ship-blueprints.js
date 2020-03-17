@@ -8,9 +8,11 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+/// <reference types="bootstrap" />
 import "bootstrap/js/dist/util"
+/// <reference types="bootstrap" />
 import "bootstrap/js/dist/modal"
-
+import "bootstrap-select/js/bootstrap-select"
 import { select as d3Select } from "d3-selection"
 
 import { registerEvent } from "../analytics"

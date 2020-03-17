@@ -8,12 +8,15 @@
  */
 
 import { initAnalytics, registerPage } from "./analytics"
-import { Server, servers } from "../common/servers"
+import { putImportError } from "../common/common"
+import { Server } from "../common/servers"
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const servers = require("../common/servers")
+
 import Cookie from "./util/cookie"
 import RadioButton from "./util/radio-button"
 
 import "../../scss/main.scss"
-import { putImportError } from "../common/common-file"
 
 /**
  *  Workaround for google translate uses indexOf on svg text
