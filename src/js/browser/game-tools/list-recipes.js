@@ -8,14 +8,16 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+/// <reference types="bootstrap" />
 import "bootstrap/js/dist/util"
+/// <reference types="bootstrap" />
 import "bootstrap/js/dist/modal"
-
+import "bootstrap-select/js/bootstrap-select"
 import { select as d3Select } from "d3-selection"
 import { nest as d3Nest } from "d3-collection"
 import { ascending as d3Ascending } from "d3-array"
-import { registerEvent } from "../analytics"
 
+import { registerEvent } from "../analytics"
 import { getCurrencyAmount, insertBaseModal } from "../../common/common"
 import { servers } from "../../common/servers"
 import { getOrdinal, putImportError, sortBy } from "../util"
