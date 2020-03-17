@@ -31,7 +31,7 @@ import {
     colourRedLight,
     colourWhite,
     nations
-} from "../../common/common"
+} from "../../common/interfaces"
 import {
     degreesToRadians,
     displayClan,

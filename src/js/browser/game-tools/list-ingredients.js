@@ -17,7 +17,7 @@ import "bootstrap/js/dist/tooltip"
 import { select as d3Select } from "d3-selection"
 
 import { registerEvent } from "../analytics"
-import { insertBaseModal } from "../../common/common"
+import { insertBaseModal } from "../../common/interfaces"
 import { chunkify, putImportError, sortBy } from "../util"
 import { formatSignInt, formatSignPercent } from "../../common/common-format";
 

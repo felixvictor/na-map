@@ -18,7 +18,7 @@ import { nest as d3Nest } from "d3-collection"
 import { ascending as d3Ascending } from "d3-array"
 
 import { registerEvent } from "../analytics"
-import { getCurrencyAmount, insertBaseModal } from "../../common/common"
+import { getCurrencyAmount, insertBaseModal } from "../../common/interfaces"
 import { servers } from "../../common/servers"
 import { getOrdinal, putImportError, sortBy } from "../util"
 import { formatInt, formatSignPercent } from "../../common/common-format";
