@@ -20,7 +20,7 @@ import Tablesort from "tablesort"
 
 import { registerEvent } from "../analytics"
 import { capitalizeFirstLetter, putImportError } from "../../common/common"
-import { BaseModal, initTablesort, insertBaseModalHTML } from "../../common/common-browser"
+import { BaseModalHtml, initTablesort, insertBaseModalHTML } from "../../common/common-browser"
 import { formatFloatFixedHTML } from "../../common/common-format"
 import { Cannon, CannonEntity, CannonValue } from "../../common/gen-json"
 
@@ -253,7 +253,7 @@ export default class ListCannons {
                 title: this._baseName,
                 body: this._getModalBody.bind(this),
                 footer: this._getModalFooter
-            } as BaseModal),
+            } as BaseModalHtml),
             document.getElementById("modal-section") as HTMLElement
         )
 
