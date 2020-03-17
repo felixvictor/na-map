@@ -8,9 +8,10 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+/// <reference types="bootstrap" />
 import "bootstrap/js/dist/util"
+/// <reference types="bootstrap" />
 import "bootstrap/js/dist/modal"
-
 import { select as d3Select } from "d3-selection"
 import moment from "moment"
 import "moment/locale/en-gb"

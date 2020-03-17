@@ -13,7 +13,7 @@ import Hashids from "hashids"
 import { html, TemplateResult } from "lit-html"
 import { default as Tablesort } from "tablesort"
 
-import { degreesFullCircle } from "./common-math";
+import { degreesFullCircle } from "./common-math"
 
 // noinspection SpellCheckingInspection
 declare const CGREEN: string,
@@ -192,19 +192,24 @@ export const initTablesort = (): void => {
     )
 }
 
-export const insertBaseModalHTML = ({
-    id,
-    title,
-    size = "xl",
-    body,
-    footer
-}: {
-    id: string
-    title: string
-    size: string
-    body: () => {}
-    footer: () => {}
-}): TemplateResult => {
+type HtmlString = string
+export interface BaseModal {
+    id: HtmlString
+    title: HtmlString
+    size?: string
+    body: () => TemplateResult
+    footer: () => TemplateResult
+}
+
+/**
+ * Insert bootstrap modal
+ * @param id - Modal id
+ * @param title - Modal title
+ * @param size - Modal size
+ * @param body - Body content
+ * @param footer - Footer content
+ */
+export const insertBaseModalHTML = ({ id, title, size = "xl", body, footer }: BaseModal): TemplateResult => {
     const modalSize = size === "xl" || size === "lg" || size === "sm" ? ` modal-${size}` : ""
 
     return html`

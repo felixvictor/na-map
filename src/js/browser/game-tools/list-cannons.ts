@@ -8,28 +8,30 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+/// <reference types="bootstrap" />
+
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/tab"
 import "bootstrap/js/dist/modal"
 
 import { html, render, TemplateResult } from "lit-html"
 import { repeat } from "lit-html/directives/repeat"
-import { default as Tablesort } from "tablesort"
+import Tablesort from "tablesort"
 
 import { registerEvent } from "../analytics"
-import { capitalizeFirstLetter } from "../../common/common"
-import { initTablesort, insertBaseModalHTML } from "../../common/common-browser"
-import { putImportError } from "../../common/common-file"
+import { capitalizeFirstLetter, putImportError } from "../../common/common"
+import { BaseModal, initTablesort, insertBaseModalHTML } from "../../common/common-browser"
 import { formatFloatFixedHTML } from "../../common/common-format"
-import { Cannon, CannonEntity } from "../../common/gen-json"
+import { Cannon, CannonEntity, CannonValue } from "../../common/gen-json"
+
+type GroupKey = string
+type GroupData = { values: string; count?: number }
+type GroupObject = [GroupKey, GroupData]
+type GroupMap = Map<GroupKey, GroupData>
 
 /**
  *
  */
-type GroupKey = string
-type GroupData = { values: string; count: number }
-type GroupObject = [GroupKey, GroupData]
-type GroupMap = Map<GroupKey, GroupData>
 export default class ListCannons {
     private _cannonData: Cannon[] = [] as Cannon[]
     private _groups: GroupMap
@@ -88,8 +90,7 @@ export default class ListCannons {
 
     _setupListener(): void {
         let firstClick = true
-
-        document.getElementById(this._buttonId).addEventListener("click", async event => {
+        ;(document.getElementById(this._buttonId) as HTMLElement).addEventListener("click", async event => {
             if (firstClick) {
                 firstClick = false
                 await this._loadAndSetupData()
@@ -109,8 +110,7 @@ export default class ListCannons {
         `
 
         const getColumnHeads = (groupValue: GroupObject): TemplateResult => html`
-            ${/* eslint-disable indent */
-            Object.entries(groupValue[1].values).map(
+            ${Object.entries(groupValue[1].values).map(
                 modifierValue =>
                     html`
                         <th class="text-right">${capitalizeFirstLetter(modifierValue[0])}</th>
@@ -143,7 +143,7 @@ export default class ListCannons {
                     }
 
                     return Object.entries(groupValue[1]).map(
-                        (modifierValue: GroupData): TemplateResult =>
+                        (modifierValue: CannonValue): TemplateResult =>
                             html`
                                 <td class="text-right" data-sort="${modifierValue[1].value ?? 0}">
                                     ${modifierValue[1]
@@ -161,8 +161,7 @@ export default class ListCannons {
                 <thead>
                     <tr>
                         <th scope="col" class="border-bottom-0"></th>
-                        ${/* eslint-disable indent */
-                        repeat(
+                        ${repeat(
                             this._groups,
                             (groupValue, groupKey) => groupKey,
                             groupValue => getColumnGroupHeads(groupValue)
@@ -178,8 +177,7 @@ export default class ListCannons {
                     </tr>
                 </thead>
                 <tbody>
-                    ${/* eslint-disable indent */
-                    repeat(
+                    ${repeat(
                         this._cannonData[type],
                         (cannon: CannonEntity) => cannon.id,
                         (cannon: CannonEntity) => {
@@ -198,8 +196,7 @@ export default class ListCannons {
     _getModalBody(): TemplateResult {
         return html`
             <ul class="nav nav-pills" role="tablist">
-                ${/* eslint-disable indent */
-                repeat(
+                ${repeat(
                     this._cannonTypes,
                     type => type,
                     (type, index) =>
@@ -220,8 +217,7 @@ export default class ListCannons {
                 )}
             </ul>
             <div class="tab-content pt-2">
-                ${/* eslint-disable indent */
-                repeat(
+                ${repeat(
                     this._cannonTypes,
                     type => type,
                     (type, index) =>
@@ -257,14 +253,16 @@ export default class ListCannons {
                 title: this._baseName,
                 body: this._getModalBody.bind(this),
                 footer: this._getModalFooter
-            }),
-            document.getElementById("modal-section")
+            } as BaseModal),
+            document.getElementById("modal-section") as HTMLElement
         )
 
         for (const type of this._cannonTypes) {
             const table = document.getElementById(`table-${type}-list`)
-            // eslint-disable-next-line no-unused-vars
-            const sortTable = new Tablesort(table)
+            if (table) {
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                const sortTable = new Tablesort.Tablesort(table)
+            }
         }
     }
 

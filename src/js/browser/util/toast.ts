@@ -9,9 +9,10 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+/// <reference types="bootstrap" />
 import "bootstrap/js/dist/util"
+/// <reference types="bootstrap" />
 import "bootstrap/js/dist/toast"
-
 import { BaseType, select as d3Select, Selection } from "d3-selection"
 
 import { iconSmallSrc } from "../../common/common-browser"
