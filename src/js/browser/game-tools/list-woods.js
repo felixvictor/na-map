@@ -97,7 +97,7 @@ export default class ListWoods {
     _injectList(type) {
         $(`#${type}-list`).append(this._getList(type));
         const table = document.getElementById(`table-${type}-list`);
-        // eslint-disable-next-line no-unused-vars
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const sortTable = new Tablesort(table);
     }
 

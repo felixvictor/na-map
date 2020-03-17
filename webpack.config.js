@@ -26,7 +26,7 @@ const repairs = require("./lib/gen-generic/repairs.json")
 const { TARGET, QUIET } = process.env
 const { isProduction } = require("webpack-mode")
 const isQuiet = Boolean(QUIET)
-const target = TARGET ? `https://${TARGET}.netlify.com/` : ""
+const targetUrl = TARGET ? `https://${TARGET}.netlify.com/` : `http://localhost/na/`
 
 const libraryName = PACKAGE.name
 const descriptionLong =
@@ -35,6 +35,7 @@ const sitemapPaths = ["/fonts/", "/icons", "/images"]
 
 const dirSrc = path.resolve(__dirname, "src")
 const dirFlags = path.resolve(dirSrc, "images/flags")
+const dirMap = path.resolve(dirSrc, "images/map")
 const dirFonts = path.resolve(dirSrc, "fonts/")
 const dirIcons = path.resolve(dirSrc, "icons")
 const dirJsSrc = path.resolve(dirSrc, "js")
@@ -207,7 +208,7 @@ const svgoOpt = {
 const htmlOpt = {
     iconSmall: `${dirPrefixIcons}/android-chrome-48x48.png`,
     iconLarge: `${dirPrefixIcons}/firefox_app_512x512.png`,
-    canonicalUrl: TARGET === "na-map" ? target : "",
+    canonicalUrl: TARGET === "na-map" ? targetUrl : "",
     name: libraryName,
     description: descriptionLong,
     hash: false,
@@ -342,17 +343,17 @@ const config = {
             contextRegExp: /moment$/
         }),
         new CopyPlugin([
-            { from: "../netlify.toml" },
+            { from: "netlify.toml" },
             {
-                from: "../lib/gen-server",
+                from: "lib/gen-server",
                 to: `${dirOutput}/data`,
                 flatten: true
             },
-            { from: "google979f2cf3bed204d6.html", to: "google979f2cf3bed204d6.html", toType: "file" },
-            { from: "images/map", to: `${dirOutput}/images/map` }
+            { from: "src/google979f2cf3bed204d6.html" },
+            { from: dirMap, to: `${dirOutput}/images/map` }
         ]),
         new HtmlPlugin(htmlOpt),
-        new SitemapPlugin(target, sitemapPaths, { skipGzip: false }),
+        new SitemapPlugin(targetUrl, sitemapPaths, { skipGzip: false }),
         new FaviconsPlugin(faviconsOpt),
         new SriPlugin({
             hashFuncNames: ["sha384"],

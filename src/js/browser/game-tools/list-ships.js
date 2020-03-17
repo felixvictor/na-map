@@ -8,9 +8,10 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+/// <reference types="bootstrap" />
 import "bootstrap/js/dist/util"
+/// <reference types="bootstrap" />
 import "bootstrap/js/dist/modal"
-
 import { select as d3Select } from "d3-selection"
 import { default as Tablesort } from "tablesort"
 
@@ -94,7 +95,7 @@ export default class ShipList {
             .classed("row ingredients", true)
         d3Select(`#${this._baseId} div`).html(this._getList())
         const table = document.getElementById(`table-${this._baseId}`)
-        // eslint-disable-next-line no-unused-vars
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const sortTable = new Tablesort(table)
     }
 

@@ -9,9 +9,11 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+/// <reference types="bootstrap" />
 import "bootstrap/js/dist/util"
+/// <reference types="bootstrap" />
 import "bootstrap/js/dist/modal"
-
+import "bootstrap-select/js/bootstrap-select"
 import { html, render } from "lit-html"
 import { repeat } from "lit-html/directives/repeat"
 
@@ -67,7 +69,7 @@ export default class ListLoot {
 
     _getOptions(type) {
         if (type !== "items") {
-            /* eslint-disable indent */
+
             return html`
                 ${repeat(
                     this._sourceData[type].sort(sortBy(["name"])),
@@ -102,7 +104,7 @@ export default class ListLoot {
         // Sort by name
         this._items = new Map([...items.entries()].sort((a, b) => a[1].name.localeCompare(b[1].name)))
 
-        /* eslint-disable indent */
+
         return html`
             ${repeat(
                 this._items,
@@ -219,7 +221,7 @@ export default class ListLoot {
                     </tr>
                 </thead>
                 <tbody>
-                    ${/* eslint-disable indent */
+                    ${
                     repeat(
                         items,
                         item => item.id,
