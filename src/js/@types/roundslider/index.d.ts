@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+/// <reference types="jquery"/>
+
 interface JQuery {
-    roundSlider(options?: any): any
+    roundSlider(options?: object | string): any
 }
