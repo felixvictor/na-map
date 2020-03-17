@@ -16,7 +16,7 @@ import "bootstrap-select/js/bootstrap-select"
 import { select as d3Select } from "d3-selection"
 
 import { registerEvent } from "../analytics"
-import { circleRadiusFactor, insertBaseModal } from "../../common/common"
+import { circleRadiusFactor, insertBaseModal } from "../../common/interfaces"
 import { copyF11ToClipboard, sortBy } from "../util"
 import Toast from "../util/toast"
 import { convertInvCoordX, convertInvCoordY } from "../../common/common-math";
