@@ -8,7 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-// eslint-disable-next-line camelcase,@typescript-eslint/camelcase
+// eslint-disable-next-line @typescript-eslint/camelcase
 import child_process from "child_process"
 import sharp from "sharp"
 
@@ -26,8 +26,8 @@ const convert = async (): Promise<void> => {
             .tile({ size: tileSize, layout: "google" })
             .toFile(mapPath)
 
-        // eslint-disable-next-line camelcase,@typescript-eslint/camelcase
-        await child_process.exec(`convert ${inFilename} -resize 1024 ${logoMainFile}`, (err, stdout, stderr) => {
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        child_process.exec(`convert ${inFilename} -resize 1024 ${logoMainFile}`, (err, stdout, stderr) => {
             if (err) {
                 throw err
             }

@@ -23,7 +23,7 @@ import { distanceMapSize, serverNames } from "../common/common-var"
 import { APIItemGeneric } from "./api-item"
 import { APIPort } from "./api-port"
 import { APIShop } from "./api-shop"
-import { PortBattlePerServer, PortPerServer, Trade } from "../common/gen-json"
+import { NationList, PortBattlePerServer, PortPerServer, Trade } from "../common/gen-json"
 
 interface Item {
     name: string
@@ -129,7 +129,8 @@ const setPortFeaturePerServer = (apiPort: APIPort): void => {
         } as PortPerServer
         // Delete empty entries
         for (const type of ["dropsTrading", "consumesTrading", "producesNonTrading", "dropsNonTrading"]) {
-            if (!(portFeaturesPerServer[type] as string[]).length) {
+            if ((portFeaturesPerServer[type] as string[]).length === 0) {
+                // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
                 delete portFeaturesPerServer[type]
             }
         }
@@ -210,9 +211,24 @@ const setAndSaveFrontlines = async (serverName: string): Promise<void> => {
         toPortNation: string
         distance: number
     }
+    interface FANValue {
+        id: number
+        nation: string
+    }
+
+    interface FANPort {
+        key: string // From/To port id
+        value: FANValue[]
+    }
+
+    interface FDNPort {
+        key: number // From port id
+        value: number[] // Port ids
+    }
+
     const outNations = ["NT"]
-    const frontlineAttackingNationGroupedByToPort = {} as { [key: string]: any[] }
-    const frontlineAttackingNationGroupedByFromPort = {} as { [key: string]: any[] }
+    const frontlineAttackingNationGroupedByToPort = {} as NationList<FANPort[]>
+    const frontlineAttackingNationGroupedByFromPort = {} as NationList<FANPort[]>
 
     nations
         .filter(({ short: nationShort }) => !outNations.includes(nationShort))
@@ -255,7 +271,13 @@ const setAndSaveFrontlines = async (serverName: string): Promise<void> => {
                 // .key((d: DistanceExtended) => `${d.fromPortId} ${d.fromPortName}`)
                 .key((d: DistanceExtended) => d.fromPortId)
                 .rollup((values: DistanceExtended[]) =>
-                    values.map(value => ({ id: value.toPortId, nation: value.toPortNation }))
+                    values.map(
+                        value =>
+                            ({
+                                id: value.toPortId,
+                                nation: value.toPortNation
+                            } as FANValue)
+                    )
                 )
                 .entries(frontlinesFrom)
         })
@@ -264,7 +286,7 @@ const setAndSaveFrontlines = async (serverName: string): Promise<void> => {
     for (const attackingNation of Object.keys(frontlineAttackingNationGroupedByFromPort)) {
         for (const fromPort of frontlineAttackingNationGroupedByFromPort[attackingNation]) {
             for (const toPort of fromPort.value) {
-                const key = toPort.nation + String(toPort.id)
+                const key = String(toPort.nation) + String(toPort.id)
                 let fromPorts = frontlineDefendingNationMap.get(key)
                 if (fromPorts) {
                     fromPorts.add(fromPort.key)
@@ -277,7 +299,7 @@ const setAndSaveFrontlines = async (serverName: string): Promise<void> => {
         }
     }
 
-    const frontlineDefendingNation = {} as { [key: string]: any[] }
+    const frontlineDefendingNation = {} as NationList<FDNPort[]>
     for (const [key, fromPorts] of [...frontlineDefendingNationMap]) {
         const nationShortName = key.slice(0, 2)
         const toPortId = Number(key.slice(2))
@@ -295,7 +317,7 @@ const setAndSaveFrontlines = async (serverName: string): Promise<void> => {
     })
 }
 
-export const convertServerPortData = () => {
+export const convertServerPortData = (): void => {
     for (const serverName of serverNames) {
         apiItems = (readJson(
             path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`)

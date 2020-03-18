@@ -20,7 +20,7 @@ const monthRegex = /^api-.+-\d{4}-(\d{2})-\d{2}\.json(\.xz)?$/
 /**
  * Move file (async)
  */
-const moveFileAsync = (oldFileName: string, newFileName: string): void => {
+const moveFileAsync = async (oldFileName: string, newFileName: string): Promise<void> => {
     fs.rename(oldFileName, newFileName, err => {
         if (err) {
             throw err
@@ -33,14 +33,14 @@ const moveFileAsync = (oldFileName: string, newFileName: string): void => {
  */
 const moveAPIFile = async (fileName: string): Promise<void> => {
     // Consider only file to match regex "api-...")
-    const year = fileName.match(yearRegex)?.[1]
-    const month = fileName.match(monthRegex)?.[1]
+    const year = yearRegex.exec(fileName)?.[1]
+    const month = monthRegex.exec(fileName)?.[1]
     if (year && month) {
         const dirNew = path.resolve(commonPaths.dirAPI, year, month)
         const fileNameNew = fileName.replace("api-", "")
         await makeDirAsync(dirNew)
 
-        console.log("-> ", path.resolve(commonPaths.dirAPI, fileName), path.resolve(dirNew, fileNameNew))
+        console.log("->", path.resolve(commonPaths.dirAPI, fileName), path.resolve(dirNew, fileNameNew))
         await moveFileAsync(path.resolve(commonPaths.dirAPI, fileName), path.resolve(dirNew, fileNameNew))
     }
 }
