@@ -19,7 +19,7 @@ import utc from "dayjs/plugin/utc.js"
 import { findNationByName, findNationByNationShortName } from "../common/common"
 import { commonPaths, serverStartDate as serverDate, serverStartDateTime } from "../common/common-dir"
 import { fileExists, readJson, readTextFile, saveJsonAsync, saveTextFile } from "../common/common-file"
-import { cleanName } from "../common/common-node"
+import { cleanName, simpleSort } from "../common/common-node"
 import { serverNames } from "../common/common-var"
 
 import { PortBattlePerServer } from "../common/gen-json"
@@ -65,7 +65,7 @@ const addTwitterData = (data: Twit.Twitter.SearchResults): void => {
     tweets.push(
         ...data.statuses
             .flatMap((status: Twit.Twitter.Status) => cleanName(xss.filterXSS(status.full_text ?? "")))
-            .sort()
+            .sort(simpleSort)
     )
     refresh = data.search_metadata.max_id_str ?? ""
     /*
@@ -168,7 +168,7 @@ const getTweets = async (): Promise<void> => {
         // eslint-disable-next-line @typescript-eslint/camelcase
         timeout_ms: 60 * 1000, // optional HTTP request timeout to apply to all requests.
         strictSSL: true // optional - requires SSL certificates to be valid.
-    }) as Twit
+    })
 
     if (runType.startsWith("full")) {
         await getTweetsFull()
@@ -393,6 +393,7 @@ const updatePorts = async (): Promise<void> => {
         if (!result) {
             return
         }
+
         tweetTime = dayjs.utc(result[1], "DD-MM-YYYY HH:mm")
 
         if (tweetTime.isAfter(serverDate)) {

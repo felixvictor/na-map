@@ -52,6 +52,59 @@ interface CountyNested {
 }
 
 /**
+ * Decompress file content
+ * @param compressedContent - Compressed file content
+ * @returns Decompressed file content or void
+ */
+const decompress = (compressedContent: Buffer): Buffer | void => {
+    return lzma.decompress(compressedContent, {}, (decompressedContent: Buffer | void, error?: string) => {
+        if (error) {
+            throw new Error(error)
+        }
+
+        return decompressedContent
+    })
+}
+
+/**
+ * Read file content
+ * @param fileName - File name
+ * @returns Promise
+ */
+const readFileContent = async (fileName: string): Promise<Buffer> => {
+    return new Promise((resolve, reject) => {
+        fs.readFile(fileName, (error, data) => {
+            if (error) {
+                reject(error)
+            } else {
+                resolve(data)
+            }
+        })
+    })
+}
+
+/**
+ * Sort file names
+ * @param fileNames - File names
+ * @returns Sorted file names
+ */
+const sortFileNames = (fileNames: string[]): string[] => {
+    return fileNames.sort((a, b) => {
+        const ba = path.basename(a)
+        const bb = path.basename(b)
+        if (ba < bb) {
+            return -1
+        }
+
+        if (ba > bb) {
+            return 1
+        }
+
+        return 0
+    })
+}
+
+/**
  * Retrieve port data for nation/clan ownership
  */
 function convertOwnership(): void {
@@ -91,7 +144,7 @@ function convertOwnership(): void {
                 ports.set(port.Id, {
                     name: cleanName(port.Name),
                     region: port.Location,
-                    county: capitalToCounty.get(port.CountyCapitalName) || "",
+                    county: capitalToCounty.get(port.CountyCapitalName) ?? "",
                     data: [getObject()]
                 })
             }
@@ -106,6 +159,7 @@ function convertOwnership(): void {
                     const index = portData.data.length - 1 ?? 0
                     return portData.data[index].val
                 }
+
                 return ""
             }
 
@@ -164,51 +218,19 @@ function convertOwnership(): void {
     }
 
     /**
-     * Decompress file content
-     * @param compressedContent - Compressed file content
-     * @returns Decompressed file content or void
-     */
-    const decompress = (compressedContent: Buffer): Buffer | void => {
-        return lzma.decompress(compressedContent, {}, (decompressedContent: Buffer | void, error?: string) => {
-            if (error) {
-                throw new Error(error)
-            }
-
-            return decompressedContent
-        })
-    }
-
-    /**
-     * Read file content
-     * @param fileName - File name
-     * @returns Promise
-     */
-    function readFileContent(fileName: string): Promise<Buffer> {
-        return new Promise((resolve, reject) => {
-            fs.readFile(fileName, (error, data) => {
-                if (error) {
-                    reject(error)
-                } else {
-                    resolve(data)
-                }
-            })
-        })
-    }
-
-    /**
      * Process all files
      * @param fileNames - File names
      * @returns Resolved promise
      */
-    function processFiles(fileNames: string[]): Promise<any> {
+    const processFiles = async (fileNames: string[]): Promise<any> => {
         return fileNames.reduce(
-            (sequence, fileName) =>
+            async (sequence, fileName) =>
                 sequence
-                    .then(() => readFileContent(fileName))
+                    .then(async () => readFileContent(fileName))
                     .then(compressedContent => decompress(compressedContent))
                     .then(decompressedContent => {
                         if (decompressedContent) {
-                            const currentDate = (path.basename(fileName).match(fileBaseNameRegex) ?? [])[1]
+                            const currentDate = (fileBaseNameRegex.exec(path.basename(fileName)) ?? [])[1]
                             parseData(JSON.parse(decompressedContent.toString()), currentDate)
                         }
                     })
@@ -225,29 +247,8 @@ function convertOwnership(): void {
      * @param stats - Stat
      * @returns True if file should be ignored
      */
-    function ignoreFileName(fileName: string, stats: Stats): boolean {
-        return !stats.isDirectory() && path.basename(fileName).match(fileBaseNameRegex) === null
-    }
-
-    /**
-     * Sort file names
-     * @param fileNames - File names
-     * @returns Sorted file names
-     */
-    function sortFileNames(fileNames: string[]): string[] {
-        return fileNames.sort((a, b) => {
-            const ba = path.basename(a)
-            const bb = path.basename(b)
-            if (ba < bb) {
-                return -1
-            }
-
-            if (ba > bb) {
-                return 1
-            }
-
-            return 0
-        })
+    const ignoreFileName = (fileName: string, stats: Stats): boolean => {
+        return !stats.isDirectory() && fileBaseNameRegex.exec(path.basename(fileName)) === null
     }
 
     /**
@@ -295,13 +296,13 @@ function convertOwnership(): void {
 
     readDirRecursive(commonPaths.dirAPI, [ignoreFileName])
         .then(fileNames => sortFileNames(fileNames))
-        .then(fileNames => processFiles(fileNames))
-        .then(() => writeResult())
+        .then(async fileNames => processFiles(fileNames))
+        .then(async () => writeResult())
         .catch(error => {
             throw new Error(error)
         })
 }
 
-export const convertOwnershipData = () => {
+export const convertOwnershipData = (): void => {
     convertOwnership()
 }
