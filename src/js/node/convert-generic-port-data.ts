@@ -15,14 +15,21 @@ import { capitalToCounty } from "../common/common"
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
 import { readJson, saveJsonAsync } from "../common/common-file"
 import { cleanName, sortBy } from "../common/common-node"
-import { convertCoordX, convertCoordY, degreesHalfCircle, Point, rotationAngleInDegrees } from "../common/common-math"
+import {
+    convertCoordX,
+    convertCoordY,
+    Coordinate,
+    degreesHalfCircle,
+    Point,
+    rotationAngleInDegrees
+} from "../common/common-math"
 import { serverNames } from "../common/common-var"
 
 import { APIPort, PortElementsSlotGroupsEntity, PortPosition, PortRaidSpawnPointsEntity } from "./api-port"
 import { FeaturesEntity, GeoJson } from "../common/gen-json"
 
 let apiPorts = [] as APIPort[]
-let apiPortPos = new Map()
+let apiPortPos: Map<number, Coordinate> = new Map()
 
 const counties = new Map()
 const regions = new Map()
@@ -43,9 +50,9 @@ const setAndSavePortData = async (): Promise<void> => {
                 Math.trunc(convertCoordX(apiPort.PortBattleZonePositions[0].x, apiPort.PortBattleZonePositions[0].z)),
                 Math.trunc(convertCoordY(apiPort.PortBattleZonePositions[0].x, apiPort.PortBattleZonePositions[0].z))
             ] as Point
-            const { x, y } = apiPortPos.get(Number(apiPort.Id))
+            const { x, y } = apiPortPos.get(Number(apiPort.Id))!
             const angle = Math.round(rotationAngleInDegrees([x, y], circleAPos))
-            const coordinates = apiPortPos.get(Number(apiPort.Id))
+            const coordinates = apiPortPos.get(Number(apiPort.Id))!
             return {
                 id: Number(apiPort.Id),
                 name: cleanName(apiPort.Name),
@@ -101,7 +108,7 @@ const getTowers = (portElementsSlotGroups: PortElementsSlotGroupsEntity[]): Poin
         )
 
 const getJoinCircles = (id: number, rotation: number): Point => {
-    const { x: x0, y: y0 } = apiPortPos.get(id)
+    const { x: x0, y: y0 } = apiPortPos.get(id)!
     const distance = 5
     const degrees = degreesHalfCircle - rotation
     const radians = (degrees * Math.PI) / degreesHalfCircle
@@ -127,7 +134,7 @@ const setAndSavePBZones = async (): Promise<void> => {
     const ports = apiPorts
         .filter(port => !port.NonCapturable)
         .map(port => {
-            const { x, y } = apiPortPos.get(Number(port.Id))
+            const { x, y } = apiPortPos.get(Number(port.Id))!
             return {
                 id: Number(port.Id),
                 position: [x, y],
@@ -202,9 +209,9 @@ const setRegionFeature = (location: string, portPos: Point): void => {
 
 const setAndSaveCountyRegionData = async (): Promise<void> => {
     apiPorts.forEach(apiPort => {
-        const portPos = apiPortPos.get(Number(apiPort.Id))
-        setCountyFeature(apiPort.CountyCapitalName, portPos)
-        setRegionFeature(apiPort.Location, portPos)
+        const { x, y } = apiPortPos.get(Number(apiPort.Id))!
+        setCountyFeature(apiPort.CountyCapitalName, [x, y])
+        setRegionFeature(apiPort.Location, [x, y])
     })
     await saveJsonAsync(`${commonPaths.dirGenGeneric}/regions.json`, geoJsonRegions)
     await saveJsonAsync(`${commonPaths.dirGenGeneric}/counties.json`, geoJsonCounties)
@@ -227,7 +234,7 @@ const setAndSaveCountyRegionData = async (): Promise<void> => {
     await saveJsonAsync(`${commonPaths.dirGenGeneric}/county-labels.json`, geoJsonCounties)
 }
 
-//const getPortName = (portId: number): string => apiPorts.find(({ Id }) => Number(Id) === portId)?.Name ?? "n/a"
+// const getPortName = (portId: number): string => apiPorts.find(({ Id }) => Number(Id) === portId)?.Name ?? "n/a"
 
 /**
  * Find all port with the same distance to two or more ports
