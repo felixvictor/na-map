@@ -24,6 +24,7 @@ import { copyF11ToClipboard } from "../util"
 
 import { NAMap } from "../map/NAMap"
 import * as d3Selection from "d3-selection"
+import * as d3Zoom from "d3-zoom"
 
 /**
  * ShowF11
@@ -44,8 +45,8 @@ export default class ShowF11 {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private _g!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, any>
     private _formSel!: HTMLFormElement
-    private _xInputSel!: HTMLElement
-    private _zInputSel!: HTMLElement
+    private _xInputSel!: HTMLInputElement
+    private _zInputSel!: HTMLInputElement
 
     constructor(map: NAMap, coord: MinMaxCoord) {
         this._map = map
@@ -194,8 +195,8 @@ export default class ShowF11 {
         if (!this._modal$) {
             this._initModal()
             this._modal$ = $(`#${this._modalId}`)
-            this._xInputSel = document.getElementById(this._xInputId) as HTMLElement
-            this._zInputSel = document.getElementById(this._zInputId) as HTMLElement
+            this._xInputSel = document.getElementById(this._xInputId) as HTMLInputElement
+            this._zInputSel = document.getElementById(this._zInputId) as HTMLInputElement
             // Submit handler
             this._formSel.addEventListener("submit", event => {
                 this._modal$.modal("hide")
@@ -204,13 +205,13 @@ export default class ShowF11 {
             })
 
             // Copy coordinates to clipboard (ctrl-c key event)
-            this._modal$.on("keydown", (event: KeyboardEvent): void => {
+            document.getElementById(this._modalId)?.addEventListener("keydown", (event): void => {
                 if (event.key === "KeyC" && event.ctrlKey) {
                     this._copyCoordClicked(event)
                 }
             })
             // Copy coordinates to clipboard (click event)
-            document.getElementById(this._copyButtonId)?.addEventListener("click", event => {
+            document.getElementById(this._copyButtonId)?.addEventListener("click", (event): void => {
                 this._copyCoordClicked(event)
             })
         }
@@ -221,7 +222,7 @@ export default class ShowF11 {
         this._xInputSel.select()
     }
 
-    _getInputValue(element): number {
+    _getInputValue(element: HTMLInputElement): number {
         const { value } = element
         return value === "" ? Infinity : Number(value)
     }
@@ -243,7 +244,7 @@ export default class ShowF11 {
         }
     }
 
-    _copyCoordClicked(event): void {
+    _copyCoordClicked(event: Event): void {
         registerEvent("Menu", "Copy F11 coordinates")
         event.preventDefault()
 
@@ -253,7 +254,7 @@ export default class ShowF11 {
         copyF11ToClipboard(x, z, this._modal$)
     }
 
-    _printF11Coord(x, y, F11X, F11Y): void {
+    _printF11Coord(x: number, y: number, F11X: number, F11Y: number): void {
         let circleSize = 10
         const g = this._g.append("g").attr("transform", `translate(${x},${y})`)
         const coordRect = g.append("rect")
@@ -274,8 +275,8 @@ export default class ShowF11 {
             .attr("dy", `${circleSize / 2 + 2}px`)
             .attr("class", "f11-coord")
             .text(formatF11(F11Y))
-        const F11XDim = F11XText.node().getBBox()
-        const F11YDim = F11YText.node().getBBox()
+        const F11XDim = F11XText.node()?.getBBox()
+        const F11YDim = F11YText.node()?.getBBox()
 
         const timeStamp = moment().utc()
         const timeStampLocal = moment()
@@ -291,13 +292,17 @@ export default class ShowF11 {
             .attr("dy", `${circleSize / 2 + 2}px`)
             .attr("class", "f11-time")
             .text(`(${timeStampLocal.format("H.mm")} local)`)
-        const timeStampDim = timeStampText.node().getBBox()
-        const timeStampLocalDim = timeStampLocalText.node().getBBox()
+        const timeStampDim = timeStampText.node()?.getBBox()
+        const timeStampLocalDim = timeStampLocalText.node()?.getBBox()
 
-        const coordHeight = Math.round(F11XDim.height + F11YDim.height) * 1.2
-        const coordWidth = Math.round(Math.max(F11XDim.width, F11YDim.width) + 5)
-        const timeHeight = Math.round(timeStampDim.height + timeStampLocalDim.height) * 1.2
-        const timeWidth = Math.round(Math.max(timeStampDim.width, timeStampLocalDim.width) + 5)
+        const coordHeight = F11XDim && F11YDim ? Math.round(F11XDim.height + F11YDim.height) * 1.2 : 0
+        const coordWidth = F11XDim && F11YDim ? Math.round(Math.max(F11XDim.width, F11YDim.width) + 5) : 0
+        const timeHeight =
+            timeStampDim && timeStampLocalDim ? Math.round(timeStampDim.height + timeStampLocalDim.height) * 1.2 : 0
+        const timeWidth =
+            timeStampDim && timeStampLocalDim
+                ? Math.round(Math.max(timeStampDim.width, timeStampLocalDim.width) + 5)
+                : 0
         const height = Math.max(coordHeight, timeHeight)
         coordRect
             .attr("x", -coordWidth - circleSize)
@@ -311,9 +316,7 @@ export default class ShowF11 {
             .attr("width", timeWidth + circleSize)
     }
 
-    _goToF11(F11XIn, F11YIn): void {
-        const F11X = Number(F11XIn)
-        const F11Y = Number(F11YIn)
+    _goToF11(F11X: number, F11Y: number): void {
         const x = Math.floor(convertCoordX(F11X, F11Y))
         const y = Math.floor(convertCoordY(F11X, F11Y))
 
@@ -337,15 +340,15 @@ export default class ShowF11 {
         }
     }
 
-    printCoord(x, y): void {
+    printCoord(x: number, y: number): void {
         const F11X = convertInvCoordX(x, y)
         const F11Y = convertInvCoordY(x, y)
 
         this._printF11Coord(x, y, F11X, F11Y)
     }
 
-    transform(transform): void {
-        this._g.attr("transform", transform)
+    transform(transform: d3Zoom.ZoomTransform): void {
+        this._g.attr("transform", transform.toString())
     }
 
     clearMap(): void {
