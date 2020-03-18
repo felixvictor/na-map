@@ -40,10 +40,10 @@ const getLootItemName = (name: string, type: string): string => {
     return cleanedName
 }
 
-const convertLoot = async () => {
+const convertLoot = async (): Promise<void> => {
     /**
      * Get item names
-     * @returns Item names Map<id, name>
+     * @returns Item names
      */
     const getItemNames = (): Map<number, string> =>
         new Map(apiItems.map(item => [Number(item.Id), getLootItemName(item.Name, item.ItemType)]))
@@ -55,7 +55,7 @@ const convertLoot = async () => {
             (item): LootItemsEntity => ({
                 id: Number(item.Template),
                 name: itemNames.get(Number(item.Template)) ?? "",
-                chance: itemProbability.length ? Number(itemProbability[Number(item.Chance)]) : Number(item.Chance),
+                chance: itemProbability.length > 0 ? Number(itemProbability[Number(item.Chance)]) : Number(item.Chance),
                 amount: { min: Number(item.Stack?.Min), max: Number(item.Stack?.Max) }
             })
         )
@@ -106,7 +106,7 @@ const convertLoot = async () => {
     await saveJsonAsync(commonPaths.fileLoot, data)
 }
 
-export const convertLootData = () => {
+export const convertLootData = (): void => {
     apiItems = (readJson(
         path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`)
     ) as unknown) as APIItemGeneric[]

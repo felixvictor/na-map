@@ -144,6 +144,7 @@ const addData = (fileData: XmlGeneric): void => {
         if (!cannon[group]) {
             cannon[group] = {} as CannonGroupIndex
         }
+
         // @ts-ignore
         cannon[group][element] = {
             value: Number(
@@ -171,9 +172,9 @@ const addData = (fileData: XmlGeneric): void => {
         (penetrations.get(800) ?? 0) + ((penetrations.get(600) ?? 0) - (penetrations.get(800) ?? 0)) * 0.25
     )
 
-    cannon["penetration"] = {} as CannonPenetration
+    cannon.penetration = {} as CannonPenetration
     for (const distance of peneDistances) {
-        cannon["penetration"][distance] = {
+        cannon.penetration[distance] = {
             value: Math.trunc((penetrations.get(distance) ?? 0) * (cannon.damage.penetration?.value ?? 0)),
             digits: 0
         }

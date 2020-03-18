@@ -54,7 +54,7 @@ export default class ListBuildings {
 
     _setupListener(): void {
         let firstClick = true
-        ;(document.getElementById(this._buttonId) as HTMLElement).addEventListener("click", async event => {
+        ;(document.querySelector(this._buttonId) as HTMLElement).addEventListener("click", async event => {
             if (firstClick) {
                 firstClick = false
                 await this._loadAndSetupData()
@@ -67,8 +67,7 @@ export default class ListBuildings {
     }
 
     _injectModal(): void {
-        insertBaseModal(this._modalId, this._baseName)
-
+        insertBaseModal({ id: this._modalId, title: this._baseName })
         const id = `${this._baseId}-select`
         const body = d3Select(`#${this._modalId} .modal-body`)
         body.append("label").attr("for", id)
@@ -112,7 +111,7 @@ export default class ListBuildings {
 
     _buildingListSelected(): void {
         // If the modal has no content yet, insert it
-        if (!document.getElementById(this._modalId)) {
+        if (!document.querySelector(this._modalId)) {
             this._initModal()
         }
 
@@ -159,7 +158,7 @@ export default class ListBuildings {
 
         text += '<table class="table table-sm card-table"><thead>'
 
-        if (currentBuilding.levels[0].materials.length) {
+        if (currentBuilding.levels[0].materials.length > 0) {
             text += "<tr><th>Level</th><th>Level build materials</th><th>Build price (reals)</th></tr>"
             text += "</thead><tbody>"
             for (const level of currentBuilding.levels) {
