@@ -22,7 +22,7 @@ import { registerEvent } from "../analytics"
 import { capitalizeFirstLetter, putImportError } from "../../common/common"
 import { BaseModalHtml, initTablesort, insertBaseModalHTML } from "../../common/common-browser"
 import { formatFloatFixedHTML } from "../../common/common-format"
-import { Cannon, CannonEntity, CannonValue } from "../../common/gen-json"
+import { Cannon, CannonEntity } from "../../common/gen-json"
 
 type GroupKey = string
 type GroupData = { values: string; count?: number }
@@ -35,11 +35,11 @@ type GroupMap = Map<GroupKey, GroupData>
 export default class ListCannons {
     private _cannonData: Cannon[] = [] as Cannon[]
     private _groups: GroupMap
-    private _baseName: string
-    private _baseId: string
-    private _buttonId: string
-    private _modalId: string
-    private _cannonTypes: string[]
+    private readonly _baseName: string
+    private readonly _baseId: string
+    private readonly _buttonId: string
+    private readonly _modalId: string
+    private readonly _cannonTypes: string[]
 
     constructor() {
         this._groups = new Map()
@@ -76,13 +76,16 @@ export default class ListCannons {
         // Sort data and groups (for table header)
         const groupOrder = ["name", "damage", "penetration", "dispersion", "traverse", "generic"]
         for (const type of this._cannonTypes) {
-            this._cannonData[type] = cannonData[type].map(cannon =>
-                Object.keys(cannon)
-                    .sort((a, b) => groupOrder.indexOf(a) - groupOrder.indexOf(b))
-                    // eslint-disable-next-line no-return-assign,no-sequences
-                    .reduce((r, k) => ((r[k] = cannon[k]), r), {})
+            // @ts-ignore
+            this._cannonData[type] = cannonData[type].map(
+                cannon =>
+                    Object.keys(cannon)
+                        .sort((a, b) => groupOrder.indexOf(a) - groupOrder.indexOf(b))
+                        // @ts-ignore
+                        .reduce((r, k) => ((r[k] = cannon[k]), r), {}) // eslint-disable-line no-return-assign,no-sequences
             )
         }
+
         this._groups = new Map(
             [...this._groups.entries()].sort((a, b) => groupOrder.indexOf(a[0]) - groupOrder.indexOf(b[0]))
         )
@@ -90,7 +93,7 @@ export default class ListCannons {
 
     _setupListener(): void {
         let firstClick = true
-        ;(document.getElementById(this._buttonId) as HTMLElement).addEventListener("click", async event => {
+        ;(document.querySelector(this._buttonId) as HTMLElement).addEventListener("click", async event => {
             if (firstClick) {
                 firstClick = false
                 await this._loadAndSetupData()
@@ -136,24 +139,22 @@ export default class ListCannons {
         }
 
         const getRow = (cannon: CannonEntity): TemplateResult => html`
-            ${Object.entries(cannon).map(
-                (groupValue: GroupObject): TemplateResult => {
-                    if (groupValue[0] === "name") {
-                        return html``
-                    }
-
-                    return Object.entries(groupValue[1]).map(
-                        (modifierValue: CannonValue): TemplateResult =>
-                            html`
-                                <td class="text-right" data-sort="${modifierValue[1].value ?? 0}">
-                                    ${modifierValue[1]
-                                        ? formatFloatFixedHTML(modifierValue[1].value, modifierValue[1].digits)
-                                        : ""}
-                                </td>
-                            `
-                    )
+            ${Object.entries(cannon).map((groupValue): TemplateResult | TemplateResult[] => {
+                if (groupValue[0] === "name") {
+                    return html``
                 }
-            )}
+
+                return Object.entries(groupValue[1]).map(
+                    modifierValue =>
+                        html`
+                            <td class="text-right" data-sort="${modifierValue[1].value ?? 0}">
+                                ${modifierValue[1]
+                                    ? formatFloatFixedHTML(modifierValue[1].value, modifierValue[1].digits)
+                                    : ""}
+                            </td>
+                        `
+                )
+            })}
         `
 
         return html`
@@ -178,6 +179,7 @@ export default class ListCannons {
                 </thead>
                 <tbody>
                     ${repeat(
+                        // @ts-ignore
                         this._cannonData[type],
                         (cannon: CannonEntity) => cannon.id,
                         (cannon: CannonEntity) => {
@@ -254,11 +256,11 @@ export default class ListCannons {
                 body: this._getModalBody.bind(this),
                 footer: this._getModalFooter
             } as BaseModalHtml),
-            document.getElementById("modal-section") as HTMLElement
+            document.querySelector("#modal-section") as HTMLElement
         )
 
         for (const type of this._cannonTypes) {
-            const table = document.getElementById(`table-${type}-list`)
+            const table = document.querySelector(`table-${type}-list`) as HTMLElement
             if (table) {
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 const sortTable = new Tablesort.Tablesort(table)
@@ -273,7 +275,7 @@ export default class ListCannons {
 
     _cannonListSelected(): void {
         // If the modal has no content yet, insert it
-        if (!document.getElementById(this._modalId)) {
+        if (!document.querySelector(this._modalId)) {
             this._initModal()
         }
 
