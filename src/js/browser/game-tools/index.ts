@@ -39,7 +39,7 @@ import ListWoods from "./list-woods"
  */
 const init = (serverId: string, urlParameters): void => {
     /*
-    Const shipCompare = new CompareShips("ship-compare")
+    const shipCompare = new CompareShips("ship-compare")
 
     const checkShipCompareData = (): void => {
         if (urlParams.has("cmp") && urlParams.has("v")) {
