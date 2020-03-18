@@ -25,7 +25,7 @@ import { APIItemGeneric, APIShip, APIShipBlueprint } from "./api-item"
 import { Ship } from "../common/gen-json"
 import { TextEntity, XmlGeneric } from "./xml"
 
-type ElementMap = Map<string, { group: string; element: string; [key: string]: string }>
+type ElementMap = Map<string, { [key: string]: string; group: string; element: string }>
 interface SubFileStructure {
     ext: string // file name extension (base file name is a ship name)
     elements: ElementMap
@@ -502,7 +502,7 @@ const convertAddShipData = (ships: Ship[]): Ship[] => {
                  * Ship data to be added per file
                  */
                 const addData = isEmpty(fileData) ? ({} as Ship) : getAddData(file.elements, fileData)
-                const addMasterData = getAddData(file.elements, fileMasterData) as Ship
+                const addMasterData = getAddData(file.elements, fileMasterData)
 
                 /*
                     https://stackoverflow.com/a/47554782
@@ -539,8 +539,8 @@ const convertShipBlueprints = async (): Promise<void> => {
                 resources: apiBlueprint.FullRequirements.filter(
                     requirement =>
                         !(
-                            itemNames.get(requirement.Template)?.endsWith(" Permit") ||
-                            itemNames.get(requirement.Template) === "Doubloons" ||
+                            (itemNames.get(requirement.Template)?.endsWith(" Permit") ??
+                                itemNames.get(requirement.Template) === "Doubloons") ||
                             itemNames.get(requirement.Template) === "Provisions"
                         )
                 ).map(requirement => ({
@@ -551,20 +551,20 @@ const convertShipBlueprints = async (): Promise<void> => {
                     (
                         apiBlueprint.FullRequirements.find(
                             requirement => itemNames.get(requirement.Template) === "Provisions"
-                        ) || {}
-                    ).Amount || 0,
+                        ) ?? {}
+                    ).Amount ?? 0,
                 doubloons:
                     (
                         apiBlueprint.FullRequirements.find(
                             requirement => itemNames.get(requirement.Template) === "Doubloons"
-                        ) || {}
-                    ).Amount || 0,
+                        ) ?? {}
+                    ).Amount ?? 0,
                 permit:
                     (
                         apiBlueprint.FullRequirements.find(requirement =>
                             itemNames.get(requirement.Template)?.endsWith(" Permit")
-                        ) || {}
-                    ).Amount || 0,
+                        ) ?? {}
+                    ).Amount ?? 0,
                 ship: {
                     id: apiBlueprint.Results[0].Template,
                     name: itemNames.get(apiBlueprint.Results[0].Template),
