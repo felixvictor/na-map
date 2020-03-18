@@ -28,8 +28,8 @@ const serverBaseName = "cleanopenworldprod"
  */
 const deleteFile = (fileName: string): void => {
     fs.unlink(fileName, error => {
-        if (error?.code !== "ENOENT") {
-            throw error
+        if (error && error.code !== "ENOENT") {
+            throw new Error(`Error deleteFile: ${error.message}`)
         }
     })
 }
@@ -38,27 +38,27 @@ const deleteFile = (fileName: string): void => {
  * Delete API data (uncompressed and compressed)
  * @param fileName - File name
  */
-const deleteAPIFiles = async (fileName: string): Promise<boolean> => {
-    await deleteFile(fileName)
-    await deleteFile(`${fileName}.xz`)
-    return true
+const deleteAPIFiles = (fileName: string): void => {
+    deleteFile(fileName)
+    deleteFile(`${fileName}.xz`)
 }
 
 /**
  * Download Naval Action API data
  * @param url - Download url
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const readNAJson = async (url: URL): Promise<Error | any> => {
     try {
         const response = await nodeFetch(url)
         if (response.ok) {
             const text = (await response.text()).replace(/^var .+ = /, "").replace(/;$/, "")
-            return await JSON.parse(text)
+            return JSON.parse(text)
         }
 
-        return new Error(`Cannot load ${url}: ${response.statusText}`)
+        return new Error(`Cannot load ${url.href}: ${response.statusText}`)
     } catch (error) {
-        throw error
+        throw new Error(error)
     }
 }
 
