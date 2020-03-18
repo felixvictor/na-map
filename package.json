@@ -4,6 +4,7 @@
     "private": true,
     "description": "Naval Action map",
     "license": "ISC",
+    "type": "module",
     "scripts": {
         "build:data:convert": "yarn node --experimental-specifier-resolution=node dist/js/node/convert-api-data.js",
         "build:data:twitter": "export $(cat .env | xargs) && yarn node --experimental-specifier-resolution=node dist/js/node/update-twitter.js ${CONSUMER_KEY} ${CONSUMER_SECRET} ${ACCESS_TOKEN} ${ACCESS_TOKEN_SECRET}",
