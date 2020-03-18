@@ -67,7 +67,7 @@ const getBuildings = (): Building[] => {
     const buildings = new Map()
     const buildingResources = new Map<number, BuildingResult>(
         apiItems.map(apiResource => [
-            +apiResource.Id,
+            Number(apiResource.Id),
             { name: cleanName(apiResource.Name), price: apiResource.BasePrice }
         ])
     )
