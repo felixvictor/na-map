@@ -173,21 +173,21 @@ export interface ModulePropertiesEntity {
  * nations.json
  */
 
-export interface NationList extends ObjectIndexer<number | string> {
-    NT: number
-    PR: number
-    ES: number
-    FR: number
-    GB: number
-    VP: number
-    DK: number
-    SE: number
-    US: number
-    RU: number
-    DE: number
-    PL: number
+export interface NationList<T> extends ObjectIndexer<T> {
+    NT: T
+    PR: T
+    ES: T
+    FR: T
+    GB: T
+    VP: T
+    DK: T
+    SE: T
+    US: T
+    RU: T
+    DE: T
+    PL: T
 }
-export interface OwnershipNation extends NationList {
+export interface OwnershipNation extends NationList<number | string> {
     date: string
 }
 
