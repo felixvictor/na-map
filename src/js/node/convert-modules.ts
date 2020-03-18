@@ -209,8 +209,8 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         wood.properties = []
         for (const modifier of module.APImodifiers) {
             // Add modifier if in modifier map
-            if (modifiers.has(`${modifier.Slot} ${modifier.MappingIds}`)) {
-                const modifierName = modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`)
+            if (modifiers.has(`${modifier.Slot} ${modifier.MappingIds.join()}`)) {
+                const modifierName = modifiers.get(`${modifier.Slot} ${modifier.MappingIds.join()}`)
                 let amount = modifier.Percentage
                 let isPercentage = true
 
@@ -244,6 +244,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
                 })
             }
         }
+
         if (module.name.endsWith(" Planking") || module.name === "Crew Space") {
             wood.type = "Trim"
             wood.name = module.name.replace(" Planking", "")
@@ -270,11 +271,11 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
      */
     const getModuleProperties = (APImodifiers: ModifiersEntity[]): ModulePropertiesEntity[] => {
         return APImodifiers.map(modifier => {
-            if (!modifiers.has(`${modifier.Slot} ${modifier.MappingIds}`)) {
-                console.log(`${modifier.Slot} ${modifier.MappingIds} modifier undefined`)
+            if (!modifiers.has(`${modifier.Slot} ${modifier.MappingIds.join()}`)) {
+                console.log(`${modifier.Slot} ${modifier.MappingIds.join()} modifier undefined`)
             }
 
-            const modifierName = modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`) ?? ""
+            const modifierName = modifiers.get(`${modifier.Slot} ${modifier.MappingIds.join()}`) ?? ""
             let amount = modifier.Percentage
             let isPercentage = true
 
@@ -359,6 +360,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         if (permanentType === "Default") {
             permanentType = ""
         } else {
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
             permanentType = `\u202F\u25CB\u202F${permanentType}`
         }
 

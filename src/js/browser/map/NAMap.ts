@@ -50,46 +50,46 @@ interface Tile {
  * Display naval action map
  */
 class NAMap {
-    serverName: string
-    private readonly _searchParams: URLSearchParams
+    coord: MinMaxCoord
+    height = 0
     rem: number
+    serverName: string
+    showTrades!: ShowTrades
+    width = 0
     xGridBackgroundHeight: number
     yGridBackgroundWidth: number
-    coord: MinMaxCoord
-    private _currentTranslate!: d3Zoom.ZoomTransform
-    private readonly _tileSize: number
-    private readonly _maxScale: number
-    private readonly _wheelDelta: number
-    private readonly _PBZoneZoomThreshold: number
-    private readonly _labelZoomThreshold: number
-    private readonly _doubleClickActionId: string
-    private readonly _doubleClickActionValues: string[]
-    private _doubleClickActionCookie: Cookie
-    private _doubleClickActionRadios: RadioButton
-    private _doubleClickAction: string
-    private readonly _showGridId: string
-    private readonly _showGridValues: string[]
-    private _showGridCookie: Cookie
-    private _showGridRadios: RadioButton
-    private _showGrid: string
     readonly gridOverlay: HTMLElement
+    private _currentScale = 0
+    private _currentTranslate!: d3Zoom.ZoomTransform
+    private _doubleClickAction: string
     private _f11!: ShowF11
-    private _ports!: DisplayPorts
-    private _pbZone!: DisplayPbZones
+    private _gMap!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, any>
     private _grid!: DisplayGrid
     private _journey!: Journey
+    private _minScale = 0
+    private _pbZone!: DisplayPbZones
+    private _ports!: DisplayPorts
+    private _portSelect!: SelectPorts
+    private _showGrid: string
+    private _svg!: d3Selection.Selection<SVGSVGElement, SVGSVGDatum, HTMLElement, any>
     private _windPrediction!: PredictWind
     private _windRose!: WindRose
-    private _portSelect!: SelectPorts
-    showTrades!: ShowTrades
-    private _minScale = 0
-    private _svg!: d3Selection.Selection<SVGSVGElement, SVGSVGDatum, HTMLElement, any>
-    width = 0
-    height = 0
-    private _currentScale = 0
     private _zoom!: d3Zoom.ZoomBehavior<SVGSVGElement, SVGSVGDatum>
     private _zoomLevel!: string
-    private _gMap!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, any>
+    private readonly _doubleClickActionCookie: Cookie
+    private readonly _doubleClickActionId: string
+    private readonly _doubleClickActionRadios: RadioButton
+    private readonly _doubleClickActionValues: string[]
+    private readonly _labelZoomThreshold: number
+    private readonly _maxScale: number
+    private readonly _PBZoneZoomThreshold: number
+    private readonly _searchParams: URLSearchParams
+    private readonly _showGridCookie: Cookie
+    private readonly _showGridId: string
+    private readonly _showGridRadios: RadioButton
+    private readonly _showGridValues: string[]
+    private readonly _tileSize: number
+    private readonly _wheelDelta: number
 
     /**
      * @param serverName - Naval action server name
@@ -126,7 +126,7 @@ class NAMap {
         }
 
         this._tileSize = 256
-        this._maxScale = 2 ** 3 // power of 2
+        this._maxScale = 2 ** 3 // Power of 2
         this._wheelDelta = 0.5
         this._PBZoneZoomThreshold = 1.5
         this._labelZoomThreshold = 0.5
@@ -153,12 +153,12 @@ class NAMap {
         this._doubleClickAction = this._getDoubleClickAction()
 
         /**
-         * showGrid cookie name
+         * ShowGrid cookie name
          */
         this._showGridId = "show-grid"
 
         /**
-         * showGrid settings
+         * ShowGrid settings
          */
         this._showGridValues = ["off", "on"]
 
@@ -170,13 +170,30 @@ class NAMap {
          */
         this._showGrid = this._getShowGridValue()
 
-        this.gridOverlay = (document.getElementsByClassName("overlay") as HTMLCollectionOf<HTMLElement>)[0]
+        this.gridOverlay = document.querySelectorAll(".overlay")[0] as HTMLElement
 
         this._setHeightWidth()
         this._setupScale()
         this._setupSvg()
         this._setSvgSize()
         this._setupListener()
+    }
+
+    static _initModal(id: string): void {
+        insertBaseModal({ id, title: `${appTitle} <span class="text-primary small">v${appVersion}</span>` })
+
+        const body = d3Selection.select(`#${id} .modal-body`)
+        body.html(
+            `<p>${appDescription} Please check the <a href="https://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/"> Game-Labs forum post</a> for further details. Feedback is very welcome.</p><p>Designed by iB aka Felix Victor, clan Bastard Sons ${displayClan(
+                "(BASTD)"
+            )}</a>.</p>`
+        )
+    }
+
+    static _stopProperty(): void {
+        if (d3Selection.event.defaultPrevented) {
+            d3Selection.event.stopPropagation()
+        }
     }
 
     async MapInit(): Promise<void> {
@@ -207,7 +224,7 @@ class NAMap {
     }
 
     async _setupData(): Promise<void> {
-        //        const marks = [];
+        //        Const marks = [];
 
         //        marks.push("setupData");
         //        performance.mark(`${marks[marks.length - 1]}-start`);
@@ -236,17 +253,11 @@ class NAMap {
         await this.showTrades.showOrHide()
 
         /*
-        marks.forEach(mark => {
+        Marks.forEach(mark => {
             performance.measure(mark, `${mark}-start`, `${mark}-end`);
         });
         console.log(performance.getEntriesByType("measure"));
         */
-    }
-
-    static _stopProperty(): void {
-        if (d3Selection.event.defaultPrevented) {
-            d3Selection.event.stopPropagation()
-        }
     }
 
     _setupListener(): void {
@@ -259,24 +270,24 @@ class NAMap {
                     this._doDoubleClickAction(nodes[i])
             )
 
-        document.getElementById("propertyDropdown")?.addEventListener("click", () => {
+        document.querySelector("#propertyDropdown")?.addEventListener("click", () => {
             registerEvent("Menu", "Select port on property")
         })
-        document.getElementById("settingsDropdown")?.addEventListener("click", () => {
+        document.querySelector("#settingsDropdown")?.addEventListener("click", () => {
             registerEvent("Menu", "Settings")
         })
-        document.getElementById("button-download-pb-calc")?.addEventListener("click", () => {
+        document.querySelector("#button-download-pb-calc")?.addEventListener("click", () => {
             registerEvent("Tools", "Download pb calculator")
         })
-        document.getElementById("reset")?.addEventListener("click", () => {
+        document.querySelector("#reset")?.addEventListener("click", () => {
             this._clearMap()
         })
-        document.getElementById("about")?.addEventListener("click", () => {
+        document.querySelector("#about")?.addEventListener("click", () => {
             this._showAbout()
         })
 
-        document.getElementById("double-click-action")?.addEventListener("change", () => this._doubleClickSelected())
-        document.getElementById("show-grid")?.addEventListener("change", () => this._showGridSelected())
+        document.querySelector("#double-click-action")?.addEventListener("change", () => this._doubleClickSelected())
+        document.querySelector("#show-grid")?.addEventListener("change", () => this._showGridSelected())
     }
 
     _setupScale(): void {
@@ -354,9 +365,9 @@ class NAMap {
         const k = this._wheelDelta ** p
         const tileSizeScaled = this._tileSize * k
 
-        const // crop right side
+        const // Crop right side
             dx = maxCoordScaled < x1 ? tx : 0
-        // crop bottom
+        // Crop bottom
         const dy = maxCoordScaled < y1 ? ty : 0
         const cols = d3Range.range(
             Math.max(0, Math.floor((x0 - tx) / tileSizeScaled)),
@@ -412,23 +423,12 @@ class NAMap {
             .selectpicker("refresh")
     }
 
-    static _initModal(id: string): void {
-        insertBaseModal(id, `${appTitle} <span class="text-primary small">v${appVersion}</span>`, "")
-
-        const body = d3Selection.select(`#${id} .modal-body`)
-        body.html(
-            `<p>${appDescription} Please check the <a href="https://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/"> Game-Labs forum post</a> for further details. Feedback is very welcome.</p><p>Designed by iB aka Felix Victor, clan Bastard Sons ${displayClan(
-                "(BASTD)"
-            )}</a>.</p>`
-        )
-    }
-
     _showAbout(): void {
         const modalId = "modal-about"
         const modal$ = $(`#${modalId}`)
 
         // If the modal has no content yet, insert it
-        if (!modal$.length) {
+        if (modal$.length === 0) {
             NAMap._initModal(modalId)
         }
 
@@ -484,7 +484,6 @@ class NAMap {
         /*
         this._currentTranslate.x = Math.floor(d3Selection.event.transform.x)
         this._currentTranslate.y = Math.floor(d3Selection.event.transform.y)
-
          */
         this._currentTranslate = {
             x: Math.floor(d3Selection.event.transform.x),
@@ -536,14 +535,14 @@ class NAMap {
         this._setFlexOverlayHeight()
     }
 
+    get zoomLevel(): string {
+        return this._zoomLevel
+    }
+
     set zoomLevel(zoomLevel) {
         this._zoomLevel = zoomLevel
         this._ports.zoomLevel = zoomLevel
         this._grid.zoomLevel = zoomLevel
-    }
-
-    get zoomLevel() {
-        return this._zoomLevel
     }
 
     resize(): void {
@@ -558,8 +557,8 @@ class NAMap {
         this._grid.update()
     }
 
-    getDimensions() {
-        const selector = document.getElementsByClassName("overlay")[0]
+    getDimensions(): DOMRect {
+        const selector = document.querySelectorAll(".overlay")[0]
 
         return selector.getBoundingClientRect()
     }
@@ -595,7 +594,7 @@ class NAMap {
 
     _setFlexOverlayHeight(): void {
         const height = this.height - (this._grid.show && this.zoomLevel !== "initial" ? this.xGridBackgroundHeight : 0)
-        document.getElementById("summary-column")?.setAttribute("style", `height:${height}px`)
+        document.querySelector("#summary-column")?.setAttribute("style", `height:${height}px`)
     }
 
     initialZoomAndPan(): void {

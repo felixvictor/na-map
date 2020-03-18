@@ -18,7 +18,7 @@ import { registerEvent } from "../analytics.js"
 import { appVersion } from "../../common/common-browser"
 
 /*
-import CompareShips from "./compare-ships"
+Import CompareShips from "./compare-ships"
 import CompareWoods from "./compare-woods"
 import ListBuildings from "./list-buildings"
 import ListCannons from "./list-cannons"
@@ -37,9 +37,9 @@ import ListWoods from "./list-woods"
  * @param serverId - Server id
  * @param urlParams - Search Parameters
  */
-const init = (serverId: string, urlParams: URLSearchParams): void => {
+const init = (serverId: string, urlParameters): void => {
     /*
-    const shipCompare = new CompareShips("ship-compare")
+    Const shipCompare = new CompareShips("ship-compare")
 
     const checkShipCompareData = (): void => {
         if (urlParams.has("cmp") && urlParams.has("v")) {
