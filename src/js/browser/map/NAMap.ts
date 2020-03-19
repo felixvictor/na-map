@@ -26,10 +26,11 @@ import { displayClan } from "../util"
 import Cookie from "../util/cookie"
 import RadioButton from "../util/radio-button"
 
-import ShowF11 from "../map-tools/show-f11"
-/*
 import DisplayPbZones from "./display-pb-zones"
 import DisplayPorts from "./display-ports"
+
+import ShowF11 from "../map-tools/show-f11"
+/*
 
 import SelectPorts from "./select-ports"
 import DisplayGrid from "../map-tools/display-grid"
@@ -51,7 +52,9 @@ interface Tile {
  */
 class NAMap {
     coord: MinMaxCoord
+    f11!: ShowF11
     height = 0
+    minScale = 0
     rem: number
     serverName: string
     showTrades!: ShowTrades
@@ -62,11 +65,9 @@ class NAMap {
     private _currentScale = 0
     private _currentTranslate!: d3Zoom.ZoomTransform
     private _doubleClickAction: string
-    private _f11!: ShowF11
     private _gMap!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, any>
     private _grid!: DisplayGrid
     private _journey!: Journey
-    private _minScale = 0
     private _pbZone!: DisplayPbZones
     private _ports!: DisplayPorts
     private _portSelect!: SelectPorts
@@ -231,7 +232,7 @@ class NAMap {
         // function();
         //        performance.mark(`${marks[marks.length - 1]}-end`);
 
-        this._f11 = new ShowF11(this, this.coord)
+        this.f11 = new ShowF11(this, this.coord)
         this._ports = new DisplayPorts(this)
         await this._ports.init()
 
@@ -246,7 +247,7 @@ class NAMap {
         this.showTrades = new ShowTrades(
             this.serverName,
             this._portSelect,
-            this._minScale,
+            this.minScale,
             this.coord.min,
             this.coord.max
         )
@@ -291,12 +292,12 @@ class NAMap {
     }
 
     _setupScale(): void {
-        this._minScale = nearestPow2(Math.min(this.width / this.coord.max, this.height / this.coord.max))
+        this.minScale = nearestPow2(Math.min(this.width / this.coord.max, this.height / this.coord.max))
 
         /**
          * Current map scale
          */
-        this._currentScale = this._minScale
+        this._currentScale = this.minScale
     }
 
     _setupSvg(): void {
@@ -305,12 +306,12 @@ class NAMap {
             .wheelDelta(() => -this._wheelDelta * Math.sign(d3Selection.event.deltaY))
             .translateExtent([
                 [
-                    this.coord.min - this.yGridBackgroundWidth * this._minScale,
-                    this.coord.min - this.xGridBackgroundHeight * this._minScale
+                    this.coord.min - this.yGridBackgroundWidth * this.minScale,
+                    this.coord.min - this.xGridBackgroundHeight * this.minScale
                 ],
                 [this.coord.max, this.coord.max]
             ])
-            .scaleExtent([this._minScale, this._maxScale])
+            .scaleExtent([this.minScale, this._maxScale])
             .on("zoom", () => this._naZoomed())
 
         this._svg = d3Selection
@@ -414,7 +415,7 @@ class NAMap {
     _clearMap(): void {
         this._windPrediction.clearMap()
         this._windRose.clearMap()
-        this._f11.clearMap()
+        this.f11.clearMap()
         this._ports.clearMap()
         this._portSelect.clearMap()
         this.showTrades.clearMap()
@@ -446,7 +447,7 @@ class NAMap {
         const y = (my - ty) / tk
 
         if (this._doubleClickAction === "f11") {
-            this._f11.printCoord(x, y)
+            this.f11.printCoord(x, y)
         } else {
             this._journey.plotCourse(x, y)
         }
@@ -516,7 +517,7 @@ class NAMap {
         this._ports.transform(zoomTransform)
         this._journey.transform(zoomTransform)
         this._pbZone.transform(zoomTransform)
-        this._f11.transform(zoomTransform)
+        this.f11.transform(zoomTransform)
         this.showTrades.transform(zoomTransform)
 
         this._setZoomLevelAndData()
@@ -524,7 +525,7 @@ class NAMap {
 
     _checkF11Coord(): void {
         if (this._searchParams.has("x") && this._searchParams.has("z")) {
-            this._f11.goToF11FromParam(this._searchParams)
+            this.f11.goToF11FromParam(this._searchParams)
         }
     }
 
@@ -598,7 +599,7 @@ class NAMap {
     }
 
     initialZoomAndPan(): void {
-        this._svg.call(this._zoom.scaleTo, this._minScale)
+        this._svg.call(this._zoom.scaleTo, this.minScale)
     }
 
     zoomAndPan(x: number, y: number, scale: number): void {
