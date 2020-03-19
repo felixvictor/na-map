@@ -9,17 +9,32 @@
  */
 
 /// <reference types="bootstrap" />
+
 import "bootstrap/js/dist/util"
-/// <reference types="bootstrap" />
 import "bootstrap/js/dist/modal"
+
 import "bootstrap-select/js/bootstrap-select"
 import { select as d3Select } from "d3-selection"
 
 import { registerEvent } from "../analytics"
-import { circleRadiusFactor, insertBaseModal } from "../../common/interfaces"
-import { copyF11ToClipboard, sortBy } from "../util"
+import { copyF11ToClipboard } from "../util"
 import Toast from "../util/toast"
-import { convertInvCoordX, convertInvCoordY } from "../../common/common-math";
+import { convertInvCoordX, convertInvCoordY } from "../../common/common-math"
+import DisplayPorts from "../map/display-ports"
+import { circleRadiusFactor, HtmlString, insertBaseModal } from "../../common/common-browser"
+import { sortBy } from "../../common/common-node"
+
+interface Vector {
+    x: number
+    y: number
+    z: number
+}
+interface Circle {
+    x: number
+    y: number
+    z: number
+    r: number
+}
 
 /**
  * JavaScript implementation of Trilateration to find the position of a
@@ -35,6 +50,44 @@ import { convertInvCoordX, convertInvCoordY } from "../../common/common-math";
  * See the GitHub page: https://github.com/gheja/trilateration.js
  */
 
+// Scalar and vector operations
+
+const sqr = (a: number): number => a * a
+
+const norm = (a: Vector): number => Math.sqrt(sqr(a.x) + sqr(a.y) + sqr(a.z))
+
+const dot = (a: Vector, b: Vector): number => a.x * b.x + a.y * b.y + a.z * b.z
+
+const vectorSubtract = (a: Vector, b: Vector): Vector => ({
+    x: a.x - b.x,
+    y: a.y - b.y,
+    z: a.z - b.z
+})
+
+const vectorAdd = (a: Vector, b: Vector): Vector => ({
+    x: a.x + b.x,
+    y: a.y + b.y,
+    z: a.z + b.z
+})
+
+const vectorDivide = (a: Vector, b: number): Vector => ({
+    x: a.x / b,
+    y: a.y / b,
+    z: a.z / b
+})
+
+const vectorMultiply = (a: Vector, b: number): Vector => ({
+    x: a.x * b,
+    y: a.y * b,
+    z: a.z * b
+})
+
+const vectorCross = (a: Vector, b: Vector): Vector => ({
+    x: a.y * b.z - a.z * b.y,
+    y: a.z * b.x - a.x * b.z,
+    z: a.x * b.y - a.y * b.x
+})
+
 /**
  * Calculates the coordinates of a point in 3D space from three known points
  * and the distances between those points and the point in question.
@@ -45,52 +98,13 @@ import { convertInvCoordX, convertInvCoordY } from "../../common/common-math";
  * parameter (return_middle) is set to true when the middle of the two solution
  * will be returned.
  *
- * @param {object} p1 Point and distance: { x, y, z, r }
- * @param {object} p2 Point and distance: { x, y, z, r }
- * @param {object} p3 Point and distance: { x, y, z, r }
- * @param {boolean} returnMiddle If two solutions found then return the center of them
- * @return {object|Array|null} { x, y, z } or [ { x, y, z }, { x, y, z } ] or null
+ * @param p1 - Point and distance
+ * @param p2 - Point and distance
+ * @param p3 - Point and distance
+ * @param returnMiddle - If two solutions found then return the center of them
+ * @returns Solution
  */
-
-// Scalar and vector operations
-
-const sqr = a => a * a
-
-const norm = a => Math.sqrt(sqr(a.x) + sqr(a.y) + sqr(a.z))
-
-const dot = (a, b) => a.x * b.x + a.y * b.y + a.z * b.z
-
-const vectorSubtract = (a, b) => ({
-    x: a.x - b.x,
-    y: a.y - b.y,
-    z: a.z - b.z
-})
-
-const vectorAdd = (a, b) => ({
-    x: a.x + b.x,
-    y: a.y + b.y,
-    z: a.z + b.z
-})
-
-const vectorDivide = (a, b) => ({
-    x: a.x / b,
-    y: a.y / b,
-    z: a.z / b
-})
-
-const vectorMultiply = (a, b) => ({
-    x: a.x * b,
-    y: a.y * b,
-    z: a.z * b
-})
-
-const vectorCross = (a, b) => ({
-    x: a.y * b.z - a.z * b.y,
-    y: a.z * b.x - a.x * b.z,
-    z: a.x * b.y - a.y * b.x
-})
-
-function trilaterate(p1, p2, p3, returnMiddle = false) {
+const trilaterate = (p1: Circle, p2: Circle, p3: Circle, returnMiddle = false): Vector | Vector[] | null => {
     // based on: https://en.wikipedia.org/wiki/Trilateration
 
     const ex = vectorDivide(vectorSubtract(p2, p1), norm(vectorSubtract(p2, p1)))
@@ -134,10 +148,21 @@ function trilaterate(p1, p2, p3, returnMiddle = false) {
  * Get position
  */
 export default class TrilateratePosition {
+    private _ports: DisplayPorts
+    private readonly _NumberOfInputs: number
+    private readonly _baseName: string
+    private readonly _baseId: string
+    private readonly _buttonId: HtmlString
+    private readonly _modalId: HtmlString
+    private _modal$: JQuery
+    private readonly _select: HtmlString[]
+    private readonly _input: HtmlString[]
+    private readonly _selector: HTMLSelectElement[]
+
     /**
-     * @param {object} ports - Port data
+     * @param ports - Port data
      */
-    constructor(ports) {
+    constructor(ports: DisplayPorts) {
         this._ports = ports
 
         // Number of input port distances
@@ -159,7 +184,7 @@ export default class TrilateratePosition {
         this._setupListener()
     }
 
-    _navbarClick(event) {
+    _navbarClick(event: Event): void {
         registerEvent("Menu", "Get position")
         event.stopPropagation()
         this._positionSelected()
@@ -167,14 +192,13 @@ export default class TrilateratePosition {
 
     /**
      * Setup menu item listener
-     * @returns {void}
      */
-    _setupListener() {
-        document.getElementById(`${this._buttonId}`).addEventListener("click", event => this._navbarClick(event))
+    _setupListener(): void {
+        document.querySelector(`${this._buttonId}`)?.addEventListener("click", event => this._navbarClick(event))
     }
 
-    _injectModal() {
-        insertBaseModal(this._modalId, this._baseName, "", "Go")
+    _injectModal(): void {
+        insertBaseModal({ id: this._modalId, title: this._baseName, size: "", buttonText: "Go" })
 
         const body = d3Select(`#${this._modalId} .modal-body`)
         body.append("div")
@@ -184,7 +208,6 @@ export default class TrilateratePosition {
 
         const form = body.append("form")
         const dataList = form.append("datalist").attr("id", "defaultDistances")
-        // noinspection MagicNumberJS
         for (const distance of [5, 10, 15, 20, 30, 50, 100, 200]) {
             dataList.append("option").attr("value", distance)
         }
@@ -215,7 +238,7 @@ export default class TrilateratePosition {
         }
     }
 
-    _setupSelects() {
+    _setupSelects(): void {
         const selectPorts = this._ports.portDataDefault
             .map(d => ({
                 id: d.id,
@@ -229,7 +252,7 @@ export default class TrilateratePosition {
             .map(port => `<option data-subtext="${port.nation}">${port.name}</option>`)
             .join("")}`
         for (const inputNumber of [...new Array(this._NumberOfInputs).keys()]) {
-            this._selector[inputNumber] = document.getElementById(this._select[inputNumber])
+            this._selector[inputNumber] = document.querySelector(this._select[inputNumber]) as HTMLInputElement
 
             this._selector[inputNumber].insertAdjacentHTML("beforeend", options)
             $(this._selector[inputNumber]).selectpicker({
@@ -239,24 +262,22 @@ export default class TrilateratePosition {
                 liveSearchPlaceholder: "Search ...",
                 title: "Select port",
                 virtualScroll: true
-            })
+            } as BootstrapSelectOptions)
         }
     }
 
     /**
      * Init modal
-     * @returns {void}
      */
-    _initModal() {
+    _initModal(): void {
         this._injectModal()
         this._setupSelects()
     }
 
     /**
      * Show and go to Position
-     * @return {void}
      */
-    _showAndGoToPosition() {
+    _showAndGoToPosition(): void {
         const circles = this._ports.portData.map(port => ({
             x: port.coordinates[0],
             y: port.coordinates[1],
@@ -264,7 +285,7 @@ export default class TrilateratePosition {
             r: port.distance
         }))
 
-        const position = trilaterate(circles[0], circles[1], circles[2], true)
+        const position = trilaterate(circles[0], circles[1], circles[2], true) as Vector
 
         // If intersection is found
         if (position) {
@@ -288,10 +309,8 @@ export default class TrilateratePosition {
 
     /**
      * Use user input and show position
-     * @return {void}
-     * @private
      */
-    _useUserInput() {
+    _useUserInput(): void {
         const roundingFactor = 1.04
 
         /*
@@ -313,7 +332,7 @@ export default class TrilateratePosition {
             const port = this._selector[inputNumber].selectedIndex
                 ? this._selector[inputNumber].options[this._selector[inputNumber].selectedIndex].text
                 : ""
-            const distance = Number(document.getElementById(this._input[inputNumber]).value)
+            const distance = Number((document.querySelector(this._input[inputNumber]) as HTMLSelectElement).value)
 
             if (distance && port !== "") {
                 ports.set(port, distance * roundingFactor * circleRadiusFactor)
@@ -342,9 +361,8 @@ export default class TrilateratePosition {
 
     /**
      * Action when selected
-     * @returns {void}
      */
-    _positionSelected() {
+    _positionSelected(): void {
         // If the modal has no content yet, insert it
         if (!this._modal$) {
             this._initModal()
