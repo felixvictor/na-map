@@ -3,6 +3,7 @@
 {
     "extends": "../tsconfig.json",
     "compilerOptions": {
+        "types": ["webpack-env"],
         "noEmit": true /* Do not emit outputs. */
         // "outFile": "./",                       /* Concatenate and emit output to single file. */
         //"outDir": "../../../dist/js/node" /* Redirect output structure to the directory. */,
