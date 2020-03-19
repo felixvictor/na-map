@@ -69,10 +69,7 @@ const setAndSavePortData = async (): Promise<void> => {
                 availableForAll: apiPort.AvailableForAll,
                 brLimit: apiPort.PortBattleBRLimit,
                 portPoints: apiPort.PortPoints,
-                portBattleStartTime: apiPort.PortBattleStartTime,
                 portBattleType: apiPort.PortBattleType,
-                nonCapturable: apiPort.NonCapturable,
-                conquestMarksPension: apiPort.ConquestMarksPension
             }
         })
         // @ts-ignore

@@ -12,6 +12,8 @@
 export interface SVGSVGDatum {}
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface SVGGDatum {}
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface DivDatum {}
 
 export interface MinMaxCoord {
     min: number

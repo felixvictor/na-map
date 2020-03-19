@@ -10,12 +10,12 @@
 
 import { select as d3Select } from "d3-selection"
 
-import { drawSvgCircle, drawSvgRect, putImportError } from "../util"
+import { drawSvgCircle, drawSvgRect } from "../util"
 import Cookie from "../util/cookie"
 import RadioButton from "../util/radio-button"
 
 export default class DisplayPbZones {
-    constructor(ports) {
+    constructor(ports: DisplayPorts) {
         this._ports = ports
 
         this._showId = "show-zones"
