@@ -125,6 +125,7 @@
         "@types/twit": "^2.2.23",
         "@types/webpack": "^4.41.7",
         "@types/webpack-dev-server": "^3.10.1",
+        "@types/webpack-env": "^1.15.1",
         "@types/webpack-subresource-integrity": "^1.2.0",
         "@typescript-eslint/eslint-plugin": "^2.24.0",
         "@typescript-eslint/parser": "^2.24.0",
