@@ -19,7 +19,7 @@ import { commonPaths } from "../common/common-dir"
 import { sortBy } from "../common/common-node"
 
 import { readJson } from "../common/common-file"
-import { PortGeneric, Ship } from "../common/gen-json"
+import { PortBasic, Ship } from "../common/gen-json"
 
 type ColourMap = Map<string, string>
 interface PortBR {
@@ -34,7 +34,7 @@ const maxNumPlayers = 25
 const columnWidth = 20
 const rowHeight = 24
 
-let portsOrig: PortGeneric[]
+let portsOrig: PortBasic[]
 let shipsOrig: Ship[]
 
 const fileScssPreCompile = path.resolve("src", "scss", "pre-compile.scss")
@@ -422,7 +422,7 @@ const createPortBattleSheets = (): void => {
 }
 
 export const createPortBattleSheet = (): void => {
-    portsOrig = (readJson(commonPaths.filePort) as unknown) as PortGeneric[]
+    portsOrig = (readJson(commonPaths.filePort) as unknown) as PortBasic[]
     shipsOrig = (readJson(commonPaths.fileShip) as unknown) as Ship[]
 
     createPortBattleSheets()
