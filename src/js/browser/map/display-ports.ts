@@ -9,20 +9,22 @@
  */
 
 /// <reference types="bootstrap" />
+
 import "bootstrap/js/dist/util"
-/// <reference types="bootstrap" />
 import "bootstrap/js/dist/tooltip"
 import { min as d3Min, max as d3Max } from "d3-array"
 import { interpolateCubehelixLong as d3InterpolateCubehelixLong } from "d3-interpolate"
 // import { polygonCentroid as d3PolygonCentroid, polygonHull as d3PolygonHull } from "d3-polygon";
-import { scaleLinear as d3ScaleLinear, scaleOrdinal as d3ScaleOrdinal } from "d3-scale"
+import { ScaleLinear, scaleLinear as d3ScaleLinear, ScaleOrdinal, scaleOrdinal as d3ScaleOrdinal } from "d3-scale"
 import { select as d3Select } from "d3-selection"
+import * as d3Selection from "d3-selection"
 // import { curveCatmullRomClosed as d3CurveCatmullRomClosed, line as d3Line } from "d3-shape";
 
 import moment from "moment"
 import "moment/locale/en-gb"
 
 import {
+    Bound,
     colourGreenDark,
     colourGreenLight,
     colourList,
@@ -30,31 +32,112 @@ import {
     colourRedDark,
     colourRedLight,
     colourWhite,
-    nations
-} from "../../common/interfaces"
+    HtmlString
+} from "../../common/common-browser"
+import { nations, putImportError } from "../../common/common"
+import { formatInt, formatPercent, formatSiCurrency, formatSiInt } from "../../common/common-format"
 import {
+    Coordinate,
+    defaultCircleSize,
+    defaultFontSize,
     degreesToRadians,
-    displayClan,
     distancePoints,
     getOrdinal,
-    putImportError,
+    Point,
     roundToThousands
-} from "../util"
+} from "../../common/common-math"
+import { displayClan } from "../util"
+
 import Cookie from "../util/cookie"
 import RadioButton from "../util/radio-button"
-
 import TrilateratePosition from "../map-tools/get-position"
-import { defaultCircleSize, defaultFontSize } from "../../common/common-math";
-import { formatInt, formatPercent, formatSiCurrency, formatSiInt } from "../../common/common-format";
+import { NAMap } from "./NAMap"
+import ShowF11 from "../map-tools/show-f11"
+import { Port, PortBattlePerServer, PortBasic, PortPerServer } from "../../common/gen-json"
+import { DivDatum, SVGGDatum, SVGSVGDatum } from "../../common/interface"
+
+interface Area {
+    name: string
+    centroid: Point
+    angle: number
+}
+
+interface DataSource {
+    fileName: string
+    name: string
+}
+
+interface ReadData {
+    [index: string]: PortBasic[] | PortPerServer[] | PortBattlePerServer[]
+    ports: PortBasic[]
+    server: PortPerServer[]
+    pb: PortBattlePerServer[]
+}
 
 export default class DisplayPorts {
-    constructor(map) {
+    private readonly _map: NAMap
+    private readonly _serverName: string
+    private readonly _minScale: number
+    private _scale: number
+    private readonly _f11: ShowF11
+    private readonly showCurrentGood: boolean
+    private readonly showTradePortPartners: boolean
+    private readonly _currentPort: { coord: Coordinate; id: string }
+    private readonly _showPBZones: string
+    private readonly _tooltipDuration: number
+    private readonly _iconSize: number
+    private readonly _fontSize: number
+    private readonly _circleSize: number
+    private readonly _minRadiusFactor: number
+    private readonly _maxRadiusFactor: number
+    private readonly _baseId: string
+    private readonly _radioButtonValues: string[]
+    private readonly _cookie: Cookie
+    private readonly _radios: RadioButton
+    private showRadius: string
+    private readonly _trilateratePosition: TrilateratePosition
+    private _lowerBound!: Bound
+    private _upperBound!: Bound
+    private readonly _zoomLevel: string
+    private _portDataDefault!: Port[]
+    private _portData!: Port[]
+    private _portRadius!: ScaleLinear<number, number>
+    private _attackRadius!: ScaleLinear<number, number>
+    private _colourScaleHostility!: ScaleLinear<string, string>
+    private _colourScaleCounty!: ScaleOrdinal<string, unknown>
+    private _minTaxIncome!: number
+    private _maxTaxIncome!: number
+    private _colourScaleTax!: ScaleLinear<string, string>
+    private _minNetIncome!: number
+    private _maxNetIncome!: number
+    private _colourScaleNet!: ScaleLinear<string, string>
+    private _minPortPoints!: number
+    private _maxPortPoints!: number
+    private _colourScalePoints!: ScaleLinear<string, string>
+    private _gPort!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, any>
+    private _gRegion!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, any>
+    private _gCounty!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, any>
+    private _gPortCircle!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, any>
+    private _gIcon!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, any>
+    private _gText!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, any>
+    private _countyPolygon!: Area[]
+    private _regionPolygon!: Area[]
+    private _divPortSummary!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, any>
+    private _portSummaryNumPorts!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, any>
+    private _portSummaryTextNumPorts!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, any>
+    private _portSummaryTaxIncome!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, any>
+    private _portSummaryTextTaxIncome!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, any>
+    private _portSummaryTextNetIncome!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, any>
+    private _portSummaryNetIncome!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, any>
+    private _nationIcons!: __WebpackModuleApi.RequireContext[]
+
+    constructor(map: NAMap) {
         this._map = map
 
         this._serverName = this._map.serverName
-        this._minScale = this._map._minScale
+        this._minScale = this._map.minScale
         this._scale = this._minScale
-        this.f11 = this._map._f11
+        this._f11 = this._map.f11
 
         this.showCurrentGood = false
         this.showTradePortPartners = false
@@ -62,7 +145,7 @@ export default class DisplayPorts {
         // Shroud Cay
         this._currentPort = { id: "366", coord: { x: 4396, y: 2494 } }
 
-        this.zoomLevel = "initial"
+        this._zoomLevel = "initial"
         this._showPBZones = "all"
         this._tooltipDuration = 200
         this._iconSize = 48
@@ -74,53 +157,60 @@ export default class DisplayPorts {
 
         /**
          * Base Id
-         * @type {string}
          */
         this._baseId = "show-radius"
 
         /**
          * Possible values for show radius (first is default value)
-         * @type {string[]}
-         * @private
          */
         this._radioButtonValues = ["attack", "county", "points", "position", "tax", "net", "off"]
 
         /**
          * Show radius cookie
-         * @type {Cookie}
          */
         this._cookie = new Cookie({ id: this._baseId, values: this._radioButtonValues })
 
         /**
          * Show radius radio buttons
-         * @type {RadioButton}
          */
         this._radios = new RadioButton(this._baseId, this._radioButtonValues)
 
         /**
          * Get showRadius setting from cookie or use default value
-         * @type {string}
-         * @private
          */
         this.showRadius = this._getShowRadiusSetting()
 
         this._trilateratePosition = new TrilateratePosition(this)
     }
 
-    async init() {
+    /**
+     * {@link https://stackoverflow.com/questions/42118296/dynamically-import-images-from-a-directory-using-webpack}
+     * @param r - webpack require.context
+     * @returns Images
+     */
+    static _importAll(r: __WebpackModuleApi.RequireContext): object {
+        const images = {} as { [index: string]: __WebpackModuleApi.RequireContext }
+        r.keys().forEach(item => {
+            images[item.replace("./", "").replace(".svg", "")] = r(item)
+        })
+        return images
+    }
+
+    async init(): Promise<void> {
         await this._loadAndSetupData()
     }
 
-    _setupData(data) {
+    _setupData(data: ReadData): void {
         // Combine port data with port battle data
-        const portData = data.ports.map(port => {
-            const serverData = data.server.find(d => d.id === port.id)
-            const pbData = data.pb.ports.find(d => d.id === port.id)
-            const combinedData = { ...port, ...serverData, ...pbData }
+        const portData: Port[] = data.ports.map((port: PortBasic) => {
+            const serverData = data.server.find((d: PortPerServer) => d.id === port.id) as PortPerServer
+            const pbData = data.pb.find((d: PortBattlePerServer) => d.id === port.id) as PortBattlePerServer
+            const combinedData = { ...port, ...serverData, ...pbData } as Port
 
-            // Delete empty entries
+                // Delete empty entries
             ;["dropsTrading", "consumesTrading", "producesNonTrading", "dropsNonTrading"].forEach(type => {
                 if (!combinedData[type]) {
+                    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
                     delete combinedData[type]
                 }
             })
@@ -140,20 +230,16 @@ export default class DisplayPorts {
         this._setupFlags()
     }
 
-    async _loadData() {
+    async _loadData(): Promise<ReadData> {
         /**
          * Data directory
-         * @type {string}
-         * @private
          */
         const dataDirectory = "data"
 
         /**
          * Data sources
-         * @type {Array<fileName: string, name: string>}
-         * @private
          */
-        const dataSources = [
+        const dataSources: DataSource[] = [
             {
                 fileName: `${this._serverName}-ports.json`,
                 name: "server"
@@ -164,75 +250,76 @@ export default class DisplayPorts {
             }
         ]
 
-        const readData = {}
+        const readData = {} as ReadData
 
-        const loadEntries = async dataSources => {
+        const loadEntries = async (dataSources: DataSource[]): Promise<void> => {
             for await (const dataSource of dataSources) {
                 readData[dataSource.name] = await (await fetch(`${dataDirectory}/${dataSource.fileName}`)).json()
             }
         }
 
+        const fileName = "~Lib/gen-generic/ports.json"
         try {
-            readData.ports = (await import(/* webpackChunkName: "data-ports" */ "../../gen-generic/ports.json")).default
+            readData.ports = (await import(/* webpackChunkName: "data-ports" */ fileName)).default
             await loadEntries(dataSources)
-            return readData
         } catch (error) {
             putImportError(error)
         }
+
+        return readData
     }
 
-    async _loadAndSetupData() {
+    async _loadAndSetupData(): Promise<void> {
         const readData = await this._loadData()
         this._setupData(readData)
     }
 
-    _setupScales() {
+    _setupScales(): void {
         this._portRadius = d3ScaleLinear()
         this._attackRadius = d3ScaleLinear().domain([0, 1])
 
-        this._colourScaleHostility = d3ScaleLinear()
+        this._colourScaleHostility = d3ScaleLinear<string, string>()
             .domain([0, 1])
             .range([colourWhite, colourRedDark])
             .interpolate(d3InterpolateCubehelixLong)
         this._colourScaleCounty = d3ScaleOrdinal().range(colourList)
 
-        this._minTaxIncome = d3Min(this._portData, d => d.taxIncome)
-        this._maxTaxIncome = d3Max(this._portData, d => d.taxIncome)
-        this._colourScaleTax = d3ScaleLinear()
+        this._minTaxIncome = d3Min(this._portData, d => d.taxIncome) ?? 0
+        this._maxTaxIncome = d3Max(this._portData, d => d.taxIncome) ?? 0
+        this._colourScaleTax = d3ScaleLinear<string, string>()
             .domain([this._minTaxIncome, this._maxTaxIncome])
             .range([colourWhite, colourGreenDark])
             .interpolate(d3InterpolateCubehelixLong)
 
-        this._minNetIncome = d3Min(this._portData, d => d.netIncome)
-        this._maxNetIncome = d3Max(this._portData, d => d.netIncome)
-        this._colourScaleNet = d3ScaleLinear()
+        this._minNetIncome = d3Min(this._portData, d => d.netIncome) ?? 0
+        this._maxNetIncome = d3Max(this._portData, d => d.netIncome) ?? 0
+        this._colourScaleNet = d3ScaleLinear<string, string>()
             .domain([this._minNetIncome, this._minNetIncome / 50, 0, this._maxNetIncome / 50, this._maxNetIncome])
             .range([colourRedDark, colourRedLight, colourWhite, colourGreenLight, colourGreenDark])
             .interpolate(d3InterpolateCubehelixLong)
 
-        this._minPortPoints = d3Min(this._portData, d => d.portPoints)
-        this._maxPortPoints = d3Max(this._portData, d => d.portPoints)
-        this._colourScalePoints = d3ScaleLinear()
+        this._minPortPoints = d3Min(this._portData, d => d.portPoints) ?? 0
+        this._maxPortPoints = d3Max(this._portData, d => d.portPoints) ?? 0
+        this._colourScalePoints = d3ScaleLinear<string, string>()
             .domain([this._minPortPoints, this._maxPortPoints])
             .range([colourWhite, colourGreenDark])
             .interpolate(d3InterpolateCubehelixLong)
     }
 
-    _setupListener() {
-        document.getElementById("show-radius").addEventListener("change", () => this._showRadiusSelected())
+    _setupListener(): void {
+        document.querySelector("#show-radius")?.addEventListener("change", () => this._showRadiusSelected())
     }
 
     /**
      * Get show setting from cookie or use default value
-     * @returns {string} - Show setting
-     * @private
+     * @returns Show setting
      */
-    _getShowRadiusSetting() {
+    _getShowRadiusSetting(): string {
         let r = this._cookie.get()
 
         // Radius "position" after reload is useless
         if (r === "position") {
-            [r] = this._radioButtonValues
+            ;[r] = this._radioButtonValues
             this._cookie.set(r)
         }
 
@@ -241,25 +328,25 @@ export default class DisplayPorts {
         return r
     }
 
-    _showRadiusSelected() {
+    _showRadiusSelected(): void {
         this.showRadius = this._radios.get()
         this._cookie.set(this.showRadius)
         this.update()
     }
 
-    _setupSvg() {
-        this._gPort = d3Select("#na-svg")
+    _setupSvg(): void {
+        this._gPort = d3Select<SVGSVGElement, SVGSVGDatum>("#na-svg")
             .insert("g", "g.f11")
             .attr("data-ui-component", "ports")
             .attr("id", "ports")
-        this._gRegion = this._gPort.append("g").attr("class", "region")
-        this._gCounty = this._gPort.append("g").attr("class", "county")
-        this._gPortCircle = this._gPort.append("g").attr("data-ui-component", "port-circles")
-        this._gIcon = this._gPort.append("g").attr("class", "port")
-        this._gText = this._gPort.append("g").attr("class", "port-names")
+        this._gRegion = this._gPort.append<SVGGElement>("g").attr("class", "region")
+        this._gCounty = this._gPort.append<SVGGElement>("g").attr("class", "county")
+        this._gPortCircle = this._gPort.append<SVGGElement>("g").attr("data-ui-component", "port-circles")
+        this._gIcon = this._gPort.append<SVGGElement>("g").attr("class", "port")
+        this._gText = this._gPort.append<SVGGElement>("g").attr("class", "port-names")
     }
 
-    _setupCounties() {
+    _setupCounties(): void {
         /*
         // Automatic calculation of text position
         // https://stackoverflow.com/questions/40774697/how-to-group-an-array-of-objects-by-key
@@ -283,7 +370,7 @@ export default class DisplayPorts {
         });
          */
 
-        // noinspection SpellCheckingInspection,MagicNumberJS
+        // noinspection SpellCheckingInspection
         this._countyPolygon = [
             { name: "Abaco", centroid: [4500, 1953], angle: 0 },
             { name: "Andros", centroid: [3870, 2350], angle: 0 },
@@ -373,7 +460,7 @@ export default class DisplayPorts {
         this._colourScaleCounty.domain(this._countyPolygon.map(county => county.name))
     }
 
-    _setupRegions() {
+    _setupRegions(): void {
         /*
         ** Automatic calculation of text position
         // https://stackoverflow.com/questions/40774697/how-to-group-an-array-of-objects-by-key
@@ -394,7 +481,6 @@ export default class DisplayPorts {
         });
         */
 
-        // noinspection MagicNumberJS
         this._regionPolygon = [
             { name: "Atlantic Coast", centroid: [4200, 970], angle: 0 },
             { name: "Atlantic", centroid: [6401, 684], angle: 0 },
@@ -414,53 +500,42 @@ export default class DisplayPorts {
         ]
     }
 
-    _setupSummary() {
+    _setupSummary(): void {
         // Main box
-        this._divPortSummary = d3Select("main #summary-column")
-            .append("div")
+        this._divPortSummary = d3Select<HTMLDivElement, DivDatum>("main #summary-column")
+            .append<HTMLDivElement>("div")
             .attr("id", "port-summary")
             .attr("class", "port-summary port-summary-no-wind")
 
         // Number of selected ports
-        this._portSummaryNumPorts = this._divPortSummary.append("div").attr("class", "block")
-        this._portSummaryTextNumPorts = this._portSummaryNumPorts.append("div")
+        this._portSummaryNumPorts = this._divPortSummary.append<HTMLDivElement>("div").attr("class", "block")
+        this._portSummaryTextNumPorts = this._portSummaryNumPorts.append<HTMLDivElement>("div")
         this._portSummaryNumPorts
-            .append("div")
+            .append<HTMLDivElement>("div")
             .attr("class", "summary-des")
             .html("selected<br>ports")
 
         // Total tax income
-        this._portSummaryTaxIncome = this._divPortSummary.append("div").attr("class", "block")
-        this._portSummaryTextTaxIncome = this._portSummaryTaxIncome.append("div")
+        this._portSummaryTaxIncome = this._divPortSummary.append<HTMLDivElement>("div").attr("class", "block")
+        this._portSummaryTextTaxIncome = this._portSummaryTaxIncome.append<HTMLDivElement>("div")
         this._portSummaryTaxIncome
-            .append("div")
+            .append<HTMLDivElement>("div")
             .attr("class", "summary-des")
             .html("tax<br>income")
 
         // Total net income
-        this._portSummaryNetIncome = this._divPortSummary.append("div").attr("class", "block")
-        this._portSummaryTextNetIncome = this._portSummaryNetIncome.append("div")
+        this._portSummaryNetIncome = this._divPortSummary.append<HTMLDivElement>("div").attr("class", "block")
+        this._portSummaryTextNetIncome = this._portSummaryNetIncome.append<HTMLDivElement>("div")
         this._portSummaryNetIncome
-            .append("div")
+            .append<HTMLDivElement>("div")
             .attr("class", "summary-des")
             .html("net<br>income")
     }
 
-    /**
-     * @link https://stackoverflow.com/questions/42118296/dynamically-import-images-from-a-directory-using-webpack
-     * @param {object} r - webpack require.context
-     * @return {object} Images
-     */
-    static _importAll(r) {
-        const images = {}
-        r.keys().forEach(item => {
-            images[item.replace("./", "").replace(".svg", "")] = r(item)
-        })
-        return images
-    }
-
-    _setupFlags() {
-        this._nationIcons = DisplayPorts._importAll(require.context("Flags", false, /\.svg$/))
+    _setupFlags(): void {
+        this._nationIcons = DisplayPorts._importAll(
+            (require as __WebpackModuleApi.RequireFunction).context("Flags", false, /\.svg$/)
+        ) as __WebpackModuleApi.RequireContext[]
         const svgDef = d3Select("#na-svg defs")
 
         nations
@@ -489,7 +564,7 @@ export default class DisplayPorts {
                         .append("image")
                         .attr("height", this._iconSize)
                         .attr("width", this._iconSize)
-                        .attr("href", this._nationIcons[`${nation}`].replace('"', "").replace('"', ""))
+                        .attr("href", this._nationIcons[nation].replace('"', "").replace('"', ""))
                     patternCapital
                         .append("circle")
                         .attr("cx", this._iconSize / 2)
@@ -530,11 +605,10 @@ export default class DisplayPorts {
             })
     }
 
-    _getPortName(id) {
-        return id ? this._portDataDefault.find(port => port.id === id).name : ""
+    _getPortName(id: number): string {
+        return id ? this._portDataDefault.find(port => port.id === id)?.name ?? "" : ""
     }
 
-    // noinspection OverlyComplexFunctionJS
     _getText(id, portProperties) {
         moment.locale("en-gb")
         const portBattleLT = moment.utc(portProperties.portBattle).local()
@@ -608,9 +682,8 @@ export default class DisplayPorts {
         return port
     }
 
-    // noinspection OverlyComplexFunctionJS
-    _tooltipData(port) {
-        let h = '<div class="d-flex align-items-baseline mb-1">'
+    _tooltipData(port): HtmlString {
+        let h: HtmlString = '<div class="d-flex align-items-baseline mb-1">'
         h += `<img alt="${port.icon}" class="flag-icon align-self-stretch" src="${this._nationIcons[port.icon]
             .replace('"', "")
             .replace('"', "")}"/>`
@@ -681,8 +754,8 @@ export default class DisplayPorts {
         return h
     }
 
-    static _getInventory(port) {
-        let h = ""
+    static _getInventory(port): HtmlString {
+        let h: HtmlString = ""
 
         const buy = port.inventory
             .filter(good => good.buyQuantity > 0)
@@ -715,7 +788,7 @@ export default class DisplayPorts {
         return h
     }
 
-    _showDetails(d, i, nodes) {
+    _showDetails(d, i, nodes): void {
         $(d3Select(nodes[i]).node())
             .tooltip({
                 html: true,
@@ -739,7 +812,7 @@ export default class DisplayPorts {
         $(d3Select(nodes[i]).node()).tooltip("dispose")
     }
 
-    _updateIcons() {
+    _updateIcons(): void {
         const circleScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale)
         const circleSize = roundToThousands(this._circleSize / circleScale)
         const data = this._portDataFiltered
@@ -764,7 +837,7 @@ export default class DisplayPorts {
             .attr("r", circleSize)
     }
 
-    _getTradePortMarker(port) {
+    _getTradePortMarker(port): string {
         let marker = ""
         if (port.id === this.tradePortId) {
             marker = "here"
@@ -779,7 +852,7 @@ export default class DisplayPorts {
         return marker
     }
 
-    _getFrontlineMarker(port) {
+    _getFrontlineMarker(port): string {
         let marker = ""
         if (port.ownPort) {
             marker = "pos"
@@ -790,8 +863,7 @@ export default class DisplayPorts {
         return marker
     }
 
-    // noinspection OverlyComplexFunctionJS
-    _updatePortCircles() {
+    _updatePortCircles(): void {
         const circleScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale)
         const rMin = roundToThousands((this._circleSize / circleScale) * this._minRadiusFactor)
         const rMax = roundToThousands((this._circleSize / circleScale) * this._maxRadiusFactor)
@@ -864,15 +936,14 @@ export default class DisplayPorts {
             .attr("fill", d => fill(d))
     }
 
-    _updateTextsX(d, circleSize) {
-        // noinspection OverlyComplexBooleanExpressionJS
+    _updateTextsX(d, circleSize): number {
         return this.zoomLevel === "pbZone" &&
             (this._showPBZones === "all" || (this._showPBZones === "single" && d.id === this.currentPort.id))
             ? d.coordinates[0] + Math.round(circleSize * 1.2 * Math.cos(degreesToRadians(d.angle)))
             : d.coordinates[0]
     }
 
-    _updateTextsY(d, circleSize, fontSize) {
+    _updateTextsY(d, circleSize, fontSize): number {
         const deltaY = circleSize + fontSize * 1.2
 
         if (this.zoomLevel !== "pbZone") {
@@ -885,8 +956,7 @@ export default class DisplayPorts {
             : d.coordinates[1] + deltaY
     }
 
-    _updateTextsAnchor(d) {
-        // noinspection OverlyComplexBooleanExpressionJS
+    _updateTextsAnchor(d): string {
         if (
             this.zoomLevel === "pbZone" &&
             (this._showPBZones === "all" || (this._showPBZones === "single" && d.id === this.currentPort.id))
@@ -897,7 +967,7 @@ export default class DisplayPorts {
         return "middle"
     }
 
-    updateTexts() {
+    updateTexts(): void {
         if (this.zoomLevel === "initial") {
             this._gText.classed("d-none", true)
         } else {
@@ -918,7 +988,7 @@ export default class DisplayPorts {
         }
     }
 
-    _updateSummary() {
+    _updateSummary(): void {
         const numberPorts = Object.keys(this._portData).length
         let taxTotal = 0
         let netTotal = 0
@@ -933,7 +1003,7 @@ export default class DisplayPorts {
         this._portSummaryTextNetIncome.text(`${formatSiInt(netTotal)}`)
     }
 
-    _updateCounties() {
+    _updateCounties(): void {
         if (this.zoomLevel === "portLabel") {
             const data = this._countyPolygonFiltered
 
@@ -970,7 +1040,7 @@ export default class DisplayPorts {
         }
     }
 
-    _updateRegions() {
+    _updateRegions(): void {
         if (this.zoomLevel === "initial") {
             const data = this._regionPolygonFiltered
 
@@ -1004,7 +1074,7 @@ export default class DisplayPorts {
         }
     }
 
-    update(scale = null) {
+    update(scale = null): void {
         this._scale = scale ?? this._scale
 
         this._filterVisible()
@@ -1016,11 +1086,10 @@ export default class DisplayPorts {
         this._updateRegions()
     }
 
-    _filterVisible() {
+    _filterVisible(): void {
         if (this.showRadius === "position") {
             this._portDataFiltered = this._portData
         } else {
-            // noinspection OverlyComplexBooleanExpressionJS
             this._portDataFiltered = this._portData.filter(
                 port =>
                     port.coordinates[0] >= this._lowerBound[0] &&
@@ -1030,7 +1099,6 @@ export default class DisplayPorts {
             )
         }
 
-        // noinspection OverlyComplexBooleanExpressionJS
         this._countyPolygonFiltered = this._countyPolygon.filter(
             county =>
                 county.centroid[0] >= this._lowerBound[0] &&
@@ -1039,7 +1107,6 @@ export default class DisplayPorts {
                 county.centroid[1] <= this._upperBound[1]
         )
 
-        // noinspection OverlyComplexBooleanExpressionJS
         this._regionPolygonFiltered = this._regionPolygon.filter(
             region =>
                 region.centroid[0] >= this._lowerBound[0] &&
@@ -1051,62 +1118,29 @@ export default class DisplayPorts {
 
     /**
      * Set bounds of current viewport
-     * @param {Bound} lowerBound - Top left coordinates of current viewport
-     * @param {Bound} upperBound - Bottom right coordinates of current viewport
-     * @return {void}
+     * @param lowerBound - Top left coordinates of current viewport
+     * @param upperBound - Bottom right coordinates of current viewport
      */
-    setBounds(lowerBound, upperBound) {
+    setBounds(lowerBound: Bound, upperBound: Bound): void {
         this._lowerBound = lowerBound
         this._upperBound = upperBound
     }
 
-    set portDataDefault(portDataDefault) {
-        this._portDataDefault = portDataDefault
-    }
-
-    get portDataDefault() {
-        return this._portDataDefault
-    }
-
-    set portData(portData) {
-        this._portData = portData
-    }
-
-    get portData() {
-        return this._portData
-    }
-
-    set currentPort(currentPort) {
-        this._currentPort = currentPort
-    }
-
-    get currentPort() {
-        return this._currentPort
-    }
-
-    set zoomLevel(zoomLevel) {
-        this._zoomLevel = zoomLevel
-    }
-
-    get zoomLevel() {
-        return this._zoomLevel
-    }
-
-    _showSummary() {
+    _showSummary(): void {
         this._divPortSummary.classed("hidden", false)
     }
 
-    setShowRadiusSetting(showRadius = this._radioButtonValues[0]) {
+    setShowRadiusSetting(showRadius = this._radioButtonValues[0]): void {
         this.showRadius = showRadius
         this._radios.set(this.showRadius)
         this._cookie.set(this.showRadius)
     }
 
-    transform(transform) {
+    transform(transform): void {
         this._gPort.attr("transform", transform)
     }
 
-    clearMap(scale) {
+    clearMap(scale): void {
         this._showSummary()
         this._portData = this._portDataDefault
         this.circleType = ""
