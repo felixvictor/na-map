@@ -60,7 +60,7 @@ export interface BuildingWithResult {
 
 // https://stackoverflow.com/a/54319112
 export interface ObjectIndexer<T> {
-    [key: string]: T
+    [index: string]: T
 }
 
 export interface Cannon extends ObjectIndexer<CannonEntity[]> {
@@ -214,22 +214,6 @@ interface OwnershipLabelRange {
 }
 
 /****************************
- * <servername>-pb.json
- */
-
-export interface PortBattlePerServer {
-    id: number
-    name: string
-    nation: string
-    capturer: string
-    lastPortBattle: string
-    attackerNation: string
-    attackerClan: string
-    attackHostility: number
-    portBattle: string
-}
-
-/****************************
  * pb-zones.json
  */
 
@@ -248,7 +232,7 @@ export interface PbZone {
  * ports.json
  */
 
-export interface PortGeneric {
+export interface PortBasic {
     id: number
     name: string
     coordinates: Point
@@ -262,10 +246,45 @@ export interface PortGeneric {
     availableForAll: boolean
     brLimit: number
     portPoints: number
-    portBattleStartTime: number
     portBattleType: string
+}
+
+export interface Port
+    extends ObjectIndexer<undefined | boolean | number | string | string[] | InventoryEntity[] | Point> {
+    id: number
+    name: string
+    coordinates: Point
+    angle: number
+    textAnchor: string
+    region: string
+    countyCapitalName: string
+    county: string
+    countyCapital: boolean
+    shallow: boolean
+    availableForAll: boolean
+    brLimit: number
+    portPoints: number
+    portBattleType: string
+    portBattleStartTime: number
     nonCapturable: boolean
     conquestMarksPension: number
+    portTax: number
+    taxIncome: number
+    netIncome: number
+    tradingCompany: number
+    laborHoursDiscount: number
+    dropsTrading?: string[]
+    consumesTrading?: string[]
+    producesNonTrading?: string[]
+    dropsNonTrading?: string[]
+    inventory: InventoryEntity[]
+    nation: string
+    capturer: string
+    lastPortBattle: string
+    attackerNation: string
+    attackerClan: string
+    attackHostility: number
+    portBattle: string
 }
 
 /****************************
@@ -276,7 +295,6 @@ export interface PortPerServer
     extends ObjectIndexer<undefined | boolean | number | string | string[] | InventoryEntity[]> {
     id: number
     portBattleStartTime: number
-    portBattleType: string
     nonCapturable: boolean
     conquestMarksPension: number
     portTax: number
@@ -296,6 +314,22 @@ export interface InventoryEntity {
     buyPrice: number
     sellPrice: number
     sellQuantity: number
+}
+
+/****************************
+ * <servername>-pb.json
+ */
+
+export interface PortBattlePerServer {
+    id: number
+    name: string
+    nation: string
+    capturer: string
+    lastPortBattle: string
+    attackerNation: string
+    attackerClan: string
+    attackHostility: number
+    portBattle: string
 }
 
 /****************************
