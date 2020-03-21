@@ -286,7 +286,10 @@ export interface Port
     attackHostility: number
     portBattle: string
 }
+export interface PortWithTrades
+    extends Port {
 
+    }
 /****************************
  * <servername>-ports.json
  */
