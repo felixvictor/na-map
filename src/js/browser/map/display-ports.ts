@@ -53,7 +53,7 @@ import RadioButton from "../util/radio-button"
 import TrilateratePosition from "../map-tools/get-position"
 import { NAMap } from "./NAMap"
 import ShowF11 from "../map-tools/show-f11"
-import { Port, PortBattlePerServer, PortBasic, PortPerServer } from "../../common/gen-json"
+import { Port, PortBattlePerServer, PortBasic, PortPerServer, NationList } from "../../common/gen-json"
 import { DivDatum, SVGGDatum, SVGSVGDatum } from "../../common/interface"
 
 interface Area {
@@ -65,6 +65,36 @@ interface Area {
 interface DataSource {
     fileName: string
     name: string
+}
+
+interface PortForDisplay {
+    name: string
+    icon: string
+    availableForAll: string
+    depth: string
+    county: string
+    countyCapital: string
+    nonCapturable: boolean
+    captured: string
+    lastPortBattle: string
+    attack: string
+    pbTimeRange: string
+    brLimit: string
+    portPoints: string
+    conquestMarksPension: number
+    taxIncome: string
+    portTax: string
+    netIncome: string
+    tradingCompany: string
+    laborHoursDiscount: string
+    dropsTrading: string
+    consumesTrading: string
+    producesNonTrading: string
+    dropsNonTrading: string
+    tradePort: string
+    goodsToSellInTradePort: string
+    goodsToBuyInTradePort: string
+    pbType: string
 }
 
 interface ReadData {
@@ -129,7 +159,7 @@ export default class DisplayPorts {
     private _portSummaryTextTaxIncome!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, any>
     private _portSummaryTextNetIncome!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, any>
     private _portSummaryNetIncome!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, any>
-    private _nationIcons!: __WebpackModuleApi.RequireContext[]
+    private _nationIcons!: NationList<string>
 
     constructor(map: NAMap) {
         this._map = map
@@ -535,7 +565,7 @@ export default class DisplayPorts {
     _setupFlags(): void {
         this._nationIcons = DisplayPorts._importAll(
             (require as __WebpackModuleApi.RequireFunction).context("Flags", false, /\.svg$/)
-        ) as __WebpackModuleApi.RequireContext[]
+        ) as NationList<string>
         const svgDef = d3Select("#na-svg defs")
 
         nations
@@ -609,7 +639,7 @@ export default class DisplayPorts {
         return id ? this._portDataDefault.find(port => port.id === id)?.name ?? "" : ""
     }
 
-    _getText(id, portProperties) {
+    _getText(portProperties: Port): PortForDisplay {
         moment.locale("en-gb")
         const portBattleLT = moment.utc(portProperties.portBattle).local()
         const portBattleST = moment.utc(portProperties.portBattle)
@@ -621,10 +651,11 @@ export default class DisplayPorts {
             : "11.00\u202F–\u202F8.00"
         const endSyllable = portBattleST.isAfter(moment.utc()) ? "s" : "ed"
         const attackHostility = `${displayClan(portProperties.attackerClan)} (${portProperties.attackerNation}) attack${
-            portProperties.portBattle.length
+            portProperties.portBattle.length > 0
                 ? `${endSyllable} ${portBattleST.fromNow()} at ${portBattleST.format("H.mm")}${localTime}`
                 : `s: ${formatPercent(portProperties.attackHostility)} hostility`
         }`
+
         const port = {
             name: portProperties.name,
             icon: portProperties.nation,
@@ -665,7 +696,7 @@ export default class DisplayPorts {
             goodsToBuyInTradePort: portProperties.goodsToBuyInTradePort
                 ? portProperties.goodsToBuyInTradePort.join(", ")
                 : ""
-        }
+        } as PortForDisplay
 
         switch (portProperties.portBattleType) {
             case "Large":
@@ -682,7 +713,7 @@ export default class DisplayPorts {
         return port
     }
 
-    _tooltipData(port): HtmlString {
+    _tooltipData(port: PortForDisplay): HtmlString {
         let h: HtmlString = '<div class="d-flex align-items-baseline mb-1">'
         h += `<img alt="${port.icon}" class="flag-icon align-self-stretch" src="${this._nationIcons[port.icon]
             .replace('"', "")
