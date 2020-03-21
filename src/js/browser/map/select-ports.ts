@@ -10,9 +10,7 @@
 
 /// <reference types="bootstrap" />
 import "bootstrap/js/dist/util"
-/// <reference types="bootstrap" />
 import "bootstrap/js/dist/dropdown"
-import "bootstrap-select/js/bootstrap-select"
 
 import "bootstrap-select/js/bootstrap-select"
 import moment from "moment"
@@ -20,12 +18,38 @@ import "tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4"
 import "tempusdominus-core/build/js/tempusdominus-core"
 
 import { registerEvent } from "../analytics"
-import { initMultiDropdownNavbar, nations, range, serverMaintenanceHour } from "../../common/interfaces"
-import { putImportError, sortBy } from "../util"
-import { formatInt, formatSiCurrency } from "../../common/common-format";
+import { formatInt, formatSiCurrency } from "../../common/common-format"
+import { NAMap } from "./NAMap"
+import { PbZone, Port } from "../../common/gen-json"
+import { serverMaintenanceHour } from "../../common/common-var"
+import { nations, putImportError } from "../../common/common"
+import { sortBy } from "../../common/common-node"
+import { initMultiDropdownNavbar } from "../../common/common-browser"
 
 export default class SelectPorts {
-    constructor(ports, pbZone, map) {
+    private _ports: Port
+    private readonly _pbZone: PbZone
+    private readonly _map: NAMap
+    private readonly _dateFormat: string
+    private readonly _timeFormat: string
+    private readonly _frontlineAttackingNationId: string
+    private readonly _frontlineAttackingNationSelector: HTMLSelectElement
+    private readonly _frontlineDefendingNationId: string
+    private readonly _frontlineDefendingNationSelector: HTMLSelectElement
+    private readonly _portNamesId: string
+    private readonly _portNamesSelector: HTMLSelectElement
+    private readonly _buyGoodsId: string
+    private readonly _buyGoodsSelector: HTMLSelectElement
+    private readonly _inventoryId: string
+    private readonly _inventorySelector: HTMLSelectElement
+    private readonly _propNationId: string
+    private readonly _propNationSelector: HTMLSelectElement
+    private readonly _propClanId: string
+    private readonly _propClanSelector: HTMLSelectElement
+    private readonly _propCMId: string
+    private readonly _propCMSelector: HTMLSelectElement
+    private isInventorySelected: boolean
+    constructor(ports: Port, pbZone: PbZone, map: NAMap) {
         this._ports = ports
         this._pbZone = pbZone
         this._map = map
@@ -34,28 +58,32 @@ export default class SelectPorts {
         this._timeFormat = "HH.00"
 
         this._frontlineAttackingNationId = "frontlines-attacking-nation-select"
-        this._frontlineAttackingNationSelector = document.getElementById(this._frontlineAttackingNationId)
+        this._frontlineAttackingNationSelector = document.querySelector(
+            this._frontlineAttackingNationId
+        ) as HTMLSelectElement
 
         this._frontlineDefendingNationId = "frontlines-defending-nation-select"
-        this._frontlineDefendingNationSelector = document.getElementById(this._frontlineDefendingNationId)
+        this._frontlineDefendingNationSelector = document.querySelector(
+            this._frontlineDefendingNationId
+        ) as HTMLSelectElement
 
         this._portNamesId = "port-names-select"
-        this._portNamesSelector = document.getElementById(this._portNamesId)
+        this._portNamesSelector = document.querySelector(this._portNamesId) as HTMLSelectElement
 
         this._buyGoodsId = "buy-goods-select"
-        this._buyGoodsSelector = document.getElementById(this._buyGoodsId)
+        this._buyGoodsSelector = document.querySelector(this._buyGoodsId) as HTMLSelectElement
 
         this._inventoryId = "inventory-select"
-        this._inventorySelector = document.getElementById(this._inventoryId)
+        this._inventorySelector = document.querySelector(this._inventoryId) as HTMLSelectElement
 
         this._propNationId = "prop-nation-select"
-        this._propNationSelector = document.getElementById(this._propNationId)
+        this._propNationSelector = document.querySelector(this._propNationId) as HTMLSelectElement
 
         this._propClanId = "prop-clan-select"
-        this._propClanSelector = document.getElementById(this._propClanId)
+        this._propClanSelector = document.querySelector(this._propClanId) as HTMLSelectElement
 
         this._propCMId = "prop-cm-select"
-        this._propCMSelector = document.getElementById(this._propCMId)
+        this._propCMSelector = document.querySelector(this._propCMId) as HTMLSelectElement
 
         this.isInventorySelected = false
 
@@ -63,7 +91,7 @@ export default class SelectPorts {
         this._setupListener()
     }
 
-    _setupSelects() {
+    _setupSelects(): void {
         this._setupPortSelect()
         this._setupGoodSelect()
         this._setupFrontlinesNationSelect()
@@ -72,7 +100,7 @@ export default class SelectPorts {
         this._setupCMSelect()
     }
 
-    _resetOtherSelects(activeSelectSelector) {
+    _resetOtherSelects(activeSelectSelector): void {
         for (const selectSelector of [
             this._portNamesSelector,
             this._buyGoodsSelector,
@@ -96,7 +124,7 @@ export default class SelectPorts {
         }
     }
 
-    async _loadData() {
+    async _loadData(): Promise<void> {
         /**
          * Data directory
          * @type {string}
@@ -113,7 +141,7 @@ export default class SelectPorts {
         }
     }
 
-    _setupListener() {
+    _setupListener(): void {
         $(this._portNamesSelector).one("show.bs.select", () => {
             this._injectPortSelect()
         })
@@ -179,15 +207,15 @@ export default class SelectPorts {
             event.preventDefault()
         })
 
-        document.getElementById("menu-prop-deep").addEventListener("click", () => this._depthSelected("deep"))
-        document.getElementById("menu-prop-shallow").addEventListener("click", () => this._depthSelected("shallow"))
+        document.querySelector("menu-prop-deep")?.addEventListener("click", () => this._depthSelected("deep"))
+        document.querySelector("menu-prop-shallow")?.addEventListener("click", () => this._depthSelected("shallow"))
 
-        document.getElementById("menu-prop-all").addEventListener("click", () => this._allSelected())
-        document.getElementById("menu-prop-non-capturable").addEventListener("click", () => this._nonCapSelected())
+        document.querySelector("menu-prop-all")?.addEventListener("click", () => this._allSelected())
+        document.querySelector("menu-prop-non-capturable")?.addEventListener("click", () => this._nonCapSelected())
 
-        document.getElementById("menu-prop-large").addEventListener("click", () => this._portSizeSelected("Large"))
-        document.getElementById("menu-prop-medium").addEventListener("click", () => this._portSizeSelected("Medium"))
-        document.getElementById("menu-prop-small").addEventListener("click", () => this._portSizeSelected("Small"))
+        document.querySelector("menu-prop-large")?.addEventListener("click", () => this._portSizeSelected("Large"))
+        document.querySelector("menu-prop-medium")?.addEventListener("click", () => this._portSizeSelected("Medium"))
+        document.querySelector("menu-prop-small")?.addEventListener("click", () => this._portSizeSelected("Small"))
 
         $.fn.datetimepicker.Constructor.Default = $.extend({}, $.fn.datetimepicker.Constructor.Default, {
             icons: {
@@ -214,10 +242,10 @@ export default class SelectPorts {
             event.preventDefault()
         })
 
-        document.getElementById("menu-prop-today").addEventListener("click", () => this._capturedToday())
-        document.getElementById("menu-prop-yesterday").addEventListener("click", () => this._capturedYesterday())
-        document.getElementById("menu-prop-this-week").addEventListener("click", () => this._capturedThisWeek())
-        document.getElementById("menu-prop-last-week").addEventListener("click", () => this._capturedLastWeek())
+        document.querySelector("menu-prop-today")?.addEventListener("click", () => this._capturedToday())
+        document.querySelector("menu-prop-yesterday")?.addEventListener("click", () => this._capturedYesterday())
+        document.querySelector("menu-prop-this-week")?.addEventListener("click", () => this._capturedThisWeek())
+        document.querySelector("menu-prop-last-week")?.addEventListener("click", () => this._capturedLastWeek())
 
         const portFrom = $("#prop-from")
         const portTo = $("#prop-to")
@@ -239,7 +267,7 @@ export default class SelectPorts {
         initMultiDropdownNavbar("selectPortNavbar")
     }
 
-    _injectPortSelect() {
+    _injectPortSelect(): void {
         const selectPorts = this._ports.portDataDefault
             .map(d => ({
                 id: d.id,
@@ -259,7 +287,7 @@ export default class SelectPorts {
         $(this._portNamesSelector).selectpicker("refresh")
     }
 
-    _setupPortSelect() {
+    _setupPortSelect(): void {
         this._portNamesSelector.classList.add("selectpicker")
         $(this._portNamesSelector).selectpicker({
             dropupAuto: false,
@@ -268,10 +296,10 @@ export default class SelectPorts {
             liveSearchPlaceholder: "Search ...",
             title: "Show port relations",
             virtualScroll: true
-        })
+        } as BootstrapSelectOptions)
     }
 
-    _injectGoodsSelect() {
+    _injectGoodsSelect(): void {
         const selectGoods = new Set()
 
         for (const port of this._ports.portDataDefault) {
@@ -293,7 +321,7 @@ export default class SelectPorts {
         $(this._buyGoodsSelector).selectpicker("refresh")
     }
 
-    _setupGoodSelect() {
+    _setupGoodSelect(): void {
         this._buyGoodsSelector.classList.add("selectpicker")
         $(this._buyGoodsSelector).selectpicker({
             dropupAuto: false,
@@ -302,10 +330,10 @@ export default class SelectPorts {
             liveSearchPlaceholder: "Search ...",
             title: "Show goods’ relations",
             virtualScroll: true
-        })
+        } as BootstrapSelectOptions)
     }
 
-    setupInventorySelect(show) {
+    setupInventorySelect(show): void {
         if (!this._inventorySelector.classList.contains("selectpicker")) {
             const selectGoods = new Set()
 
@@ -331,7 +359,7 @@ export default class SelectPorts {
                 liveSearchPlaceholder: "Search ...",
                 title: "Show good availability",
                 virtualScroll: true
-            })
+            } as BootstrapSelectOptions)
         }
 
         if (show) {
@@ -343,7 +371,7 @@ export default class SelectPorts {
         }
     }
 
-    _getNationOptions(neutralPortsIncluded = true) {
+    _getNationOptions(neutralPortsIncluded = true): string {
         return `${nations
             // Exclude neutral nation and free towns when neutralPortsIncluded is set
             .filter(nation => !(!neutralPortsIncluded && (nation.short === "FT" || nation.short === "NT")))
@@ -352,7 +380,7 @@ export default class SelectPorts {
             .join("")}`
     }
 
-    _setupFrontlinesNationSelect() {
+    _setupFrontlinesNationSelect(): void {
         const options = this._getNationOptions(false)
 
         this._frontlineAttackingNationSelector.insertAdjacentHTML("beforeend", options)
@@ -361,7 +389,7 @@ export default class SelectPorts {
             dropupAuto: false,
             liveSearch: false,
             virtualScroll: true
-        })
+        } as BootstrapSelectOptions)
 
         this._frontlineDefendingNationSelector.insertAdjacentHTML("beforeend", options)
         this._frontlineDefendingNationSelector.classList.add("selectpicker")
@@ -369,10 +397,10 @@ export default class SelectPorts {
             dropupAuto: false,
             liveSearch: false,
             virtualScroll: true
-        })
+        } as BootstrapSelectOptions)
     }
 
-    _setupNationSelect() {
+    _setupNationSelect(): void {
         const options = this._getNationOptions(true)
 
         this._propNationSelector.insertAdjacentHTML("beforeend", options)
@@ -381,10 +409,10 @@ export default class SelectPorts {
             dropupAuto: false,
             liveSearch: false,
             virtualScroll: true
-        })
+        } as BootstrapSelectOptions)
     }
 
-    _setupClanSelect() {
+    _setupClanSelect(): void {
         const clanList = new Set()
         for (const d of this._ports.portData.filter(d => d.capturer)) {
             clanList.add(d.capturer)
@@ -410,10 +438,10 @@ export default class SelectPorts {
             dropupAuto: false,
             liveSearch: false,
             virtualScroll: true
-        })
+        } as BootstrapSelectOptions)
     }
 
-    _setupCMSelect() {
+    _setupCMSelect(): void {
         const cmList = new Set()
 
         for (const d of this._ports.portData) {
@@ -429,7 +457,7 @@ export default class SelectPorts {
         $(this._propCMSelector).selectpicker()
     }
 
-    _setTradePortPartners() {
+    _setTradePortPartners(): void {
         const tradePort = this._ports.portDataDefault.find(port => port.id === this._ports.tradePortId)
 
         const tradePortConsumedGoods = tradePort.consumesTrading ? tradePort.consumesTrading.map(good => good) : []
@@ -451,7 +479,7 @@ export default class SelectPorts {
             .filter(port => port.id === this._ports.tradePortId || port.sellInTradePort || port.buyInTradePort)
     }
 
-    _portSelected() {
+    _portSelected(): void {
         const port = this._portNamesSelector.options[this._portNamesSelector.selectedIndex]
         const c = port.value.split(",")
         const id = Number(port.getAttribute("data-id"))
@@ -473,7 +501,7 @@ export default class SelectPorts {
         this._ports._map.initialZoomAndPan()
     }
 
-    _goodSelected() {
+    _goodSelected(): void {
         const goodSelected = this._buyGoodsSelector.options[this._buyGoodsSelector.selectedIndex].value
         const sourcePorts = JSON.parse(
             JSON.stringify(
@@ -505,7 +533,7 @@ export default class SelectPorts {
         this._ports.update()
     }
 
-    inventorySelected() {
+    inventorySelected(): void {
         this.isInventorySelected = true
 
         const goodSelected = this._inventorySelector.options[this._inventorySelector.selectedIndex].value
@@ -570,7 +598,7 @@ export default class SelectPorts {
         this._ports.update()
     }
 
-    _setFrontlinePorts(type, nation) {
+    _setFrontlinePorts(type, nation): void {
         const enemyPorts = new Set(this._frontlinesData[type][nation].map(frontlinePort => Number(frontlinePort.key)))
         const ownPorts = new Set(
             this._frontlinesData[type][nation].flatMap(frontlinePort => frontlinePort.value.map(d => d))
@@ -583,7 +611,7 @@ export default class SelectPorts {
         })
     }
 
-    _frontlineAttackingNationSelected() {
+    _frontlineAttackingNationSelected(): void {
         const nation = this._frontlineAttackingNationSelector.options[
             this._frontlineAttackingNationSelector.selectedIndex
         ].value
@@ -594,7 +622,7 @@ export default class SelectPorts {
         this._ports.update()
     }
 
-    _frontlineDefendingNationSelected() {
+    _frontlineDefendingNationSelected(): void {
         const nation = this._frontlineDefendingNationSelector.options[
             this._frontlineDefendingNationSelector.selectedIndex
         ].value
@@ -605,7 +633,7 @@ export default class SelectPorts {
         this._ports.update()
     }
 
-    _nationSelected() {
+    _nationSelected(): void {
         this._nation = this._propNationSelector.options[this._propNationSelector.selectedIndex].value
 
         this._ports.portData = this._ports.portDataDefault.filter(port => port.nation === this._nation)
@@ -615,7 +643,7 @@ export default class SelectPorts {
         $(this._propClanSelector).selectpicker("refresh")
     }
 
-    _clanSelected() {
+    _clanSelected(): void {
         const clan = this._propClanSelector.options[this._propClanSelector.selectedIndex].value
 
         if (clan !== 0) {
@@ -628,7 +656,7 @@ export default class SelectPorts {
         this._ports.update()
     }
 
-    _depthSelected(depth) {
+    _depthSelected(depth): void {
         const portData = this._ports.portDataDefault.filter(d => (depth === "shallow" ? d.shallow : !d.shallow))
 
         this._ports.portData = portData
@@ -636,7 +664,7 @@ export default class SelectPorts {
         this._ports.update()
     }
 
-    _allSelected() {
+    _allSelected(): void {
         const portData = this._ports.portDataDefault.filter(d => d.availableForAll)
 
         this._ports.portData = portData
@@ -644,7 +672,7 @@ export default class SelectPorts {
         this._ports.update()
     }
 
-    _nonCapSelected() {
+    _nonCapSelected(): void {
         const portData = this._ports.portDataDefault.filter(d => d.nonCapturable)
 
         this._ports.portData = portData
@@ -652,7 +680,7 @@ export default class SelectPorts {
         this._ports.update()
     }
 
-    _portSizeSelected(size) {
+    _portSizeSelected(size): void {
         const portData = this._ports.portDataDefault.filter(d => size === d.portBattleType)
 
         this._ports.portData = portData
@@ -660,7 +688,7 @@ export default class SelectPorts {
         this._ports.update()
     }
 
-    _CMSelected() {
+    _CMSelected(): void {
         const value = Number(this._propCMSelector.options[this._propCMSelector.selectedIndex].value)
         let portData
 
@@ -675,13 +703,13 @@ export default class SelectPorts {
         this._ports.update()
     }
 
-    _capturePBRange() {
+    _capturePBRange(): void {
         const blackOutTimes = range(serverMaintenanceHour - 2, serverMaintenanceHour)
         // 24 hours minus black-out hours
         const maxStartTime = 24 - (blackOutTimes.length + 1)
         const startTimes = new Set()
-        const begin = moment(document.getElementById("prop-pb-from-input").value, this._timeFormat).hour()
-        let end = moment(document.getElementById("prop-pb-to-input").value, this._timeFormat).hour()
+        const begin = moment(document.querySelector("prop-pb-from-input").value, this._timeFormat).hour()
+        let end = moment(document.querySelector("prop-pb-to-input").value, this._timeFormat).hour()
 
         // console.log("Between %d and %d", begin, end);
 
@@ -705,7 +733,7 @@ export default class SelectPorts {
         this._ports.update()
     }
 
-    _filterCaptured(begin, end) {
+    _filterCaptured(begin, end): void {
         // console.log("Between %s and %s", begin.format("dddd D MMMM YYYY H:mm"), end.format("dddd D MMMM YYYY H:mm"));
         const portData = this._ports.portDataDefault.filter(port =>
             moment(port.lastPortBattle, "YYYY-MM-DD HH:mm").isBetween(begin, end, null, "(]")
@@ -716,7 +744,7 @@ export default class SelectPorts {
         this._ports.update()
     }
 
-    _capturedToday() {
+    _capturedToday(): void {
         const now = moment.utc()
         let begin = moment()
             .utc()
@@ -729,7 +757,7 @@ export default class SelectPorts {
         this._filterCaptured(begin, moment.utc(begin).add(1, "day"))
     }
 
-    _capturedYesterday() {
+    _capturedYesterday(): void {
         const now = moment.utc()
         let begin = moment()
             .utc()
@@ -743,7 +771,7 @@ export default class SelectPorts {
         this._filterCaptured(begin, moment.utc(begin).add(1, "day"))
     }
 
-    _capturedThisWeek() {
+    _capturedThisWeek(): void {
         const currentMondayOfWeek = moment()
             .utc()
             .startOf("week")
@@ -758,7 +786,7 @@ export default class SelectPorts {
         this._filterCaptured(begin, end)
     }
 
-    _capturedLastWeek() {
+    _capturedLastWeek(): void {
         const currentMondayOfWeek = moment()
             .utc()
             .startOf("week")
@@ -773,7 +801,7 @@ export default class SelectPorts {
         this._filterCaptured(begin, end)
     }
 
-    _captureRange() {
+    _captureRange(): void {
         const from = $("#prop-from").datetimepicker("viewDate")
         const to = $("#prop-to").datetimepicker("viewDate")
         const begin = from
@@ -789,7 +817,7 @@ export default class SelectPorts {
         this._filterCaptured(begin, end)
     }
 
-    clearMap() {
+    clearMap(): void {
         this.isInventorySelected = false
         this._setupClanSelect()
         $(this._propClanSelector).selectpicker("refresh")
