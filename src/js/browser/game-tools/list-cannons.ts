@@ -33,13 +33,12 @@ type GroupMap = Map<GroupKey, GroupData>
  *
  */
 export default class ListCannons {
-    private _cannonData: Cannon[] = [] as Cannon[]
-    private _groups: GroupMap
+    private _cannonData!: Cannon
     private readonly _baseName: string
     private readonly _baseId: string
     private readonly _buttonId: string
     private readonly _modalId: string
-    private readonly _cannonTypes: string[]
+    private _groups!: GroupMap
 
     constructor() {
         this._groups = new Map()
@@ -49,15 +48,13 @@ export default class ListCannons {
         this._buttonId = `button-${this._baseId}`
         this._modalId = `modal-${this._baseId}`
 
-        this._cannonTypes = ["medium", "long", "carronade"]
-
         this._setupListener()
     }
 
     async _loadAndSetupData(): Promise<void> {
         const fileName = "~Lib/gen-generic/cannons.json"
         try {
-            const { default: cannonData } = await import(/* webpackChunkName: "data-cannons" */ fileName)
+            const cannonData = (await import(/* webpackChunkName: "data-cannons" */ fileName)).default as Cannon
             this._setupData(cannonData)
         } catch (error) {
             putImportError(error)
@@ -75,14 +72,14 @@ export default class ListCannons {
 
         // Sort data and groups (for table header)
         const groupOrder = ["name", "damage", "penetration", "dispersion", "traverse", "generic"]
-        for (const type of this._cannonTypes) {
-            // @ts-ignore
+        for (const type of Object.keys(cannonData)) {
             this._cannonData[type] = cannonData[type].map(
-                cannon =>
+                (cannon: CannonEntity): CannonEntity =>
+                    // @ts-ignore
                     Object.keys(cannon)
                         .sort((a, b) => groupOrder.indexOf(a) - groupOrder.indexOf(b))
                         // @ts-ignore
-                        .reduce((r, k) => ((r[k] = cannon[k]), r), {}) // eslint-disable-line no-return-assign,no-sequences
+                        .reduce((r: CannonEntity, k) => ((r[k] = cannon[k]), r), {}) // eslint-disable-line no-return-assign,no-sequences
             )
         }
 
@@ -199,8 +196,8 @@ export default class ListCannons {
         return html`
             <ul class="nav nav-pills" role="tablist">
                 ${repeat(
-                    this._cannonTypes,
-                    type => type,
+                    Object.keys(this._cannonData),
+                    (type: string): string => type,
                     (type, index) =>
                         html`
                             <li class="nav-item">
@@ -220,8 +217,8 @@ export default class ListCannons {
             </ul>
             <div class="tab-content pt-2">
                 ${repeat(
-                    this._cannonTypes,
-                    type => type,
+                    Object.keys(this._cannonData),
+                    (type: string): string => type,
                     (type, index) =>
                         html`
                             <div
@@ -259,7 +256,7 @@ export default class ListCannons {
             document.querySelector("#modal-section") as HTMLElement
         )
 
-        for (const type of this._cannonTypes) {
+        for (const type of Object.keys(this._cannonData)) {
             const table = document.querySelector(`table-${type}-list`) as HTMLElement
             if (table) {
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars

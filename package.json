@@ -202,6 +202,7 @@
         "twit": "^2.2.11",
         "typescript": "^3.8.3",
         "url-loader": "^3.0.0",
+        "utility-types": "^3.10.0",
         "webpack": "^4.42.0",
         "webpack-bundle-analyzer": "^3.6.1",
         "webpack-cli": "^3.3.9",
