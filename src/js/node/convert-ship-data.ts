@@ -402,7 +402,6 @@ const getAddData = (elements: ElementMap, fileData: XmlGeneric): Ship => {
         // Check if pair is considered additional data
         if (elements.has(key)) {
             const value = Number((pair.Value.Value as TextEntity)._text)
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             const { group, element } = elements.get(key)!
             if (!addData[group]) {
                 addData[group] = {}
@@ -616,7 +615,6 @@ resourceRatios.forEach((value, key) => {
 const convertShips = async (): Promise<void> => {
     ships = convertGenericShipData()
     ships = convertAddShipData(ships)
-    // @ts-ignore
     ships.sort(sortBy(["class", "name"]))
     await saveJsonAsync(commonPaths.fileShip, ships)
 }

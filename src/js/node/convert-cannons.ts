@@ -24,7 +24,11 @@ import { PairEntity, TangentEntity, TextEntity, XmlGeneric } from "./xml"
 const peneDistances = [50, 100, 250, 500, 750, 1000]
 const cannonTypes = ["medium", "long", "carronade"]
 
-const countDecimals = (value: number): number => {
+const countDecimals = (value: number | undefined): number => {
+    if (value === undefined) {
+        return 0
+    }
+
     if (Math.floor(value) === value) {
         return 0
     }
@@ -217,14 +221,12 @@ export const convertCannons = async (): Promise<void> => {
                         maxDigits[type][groupKey] = {}
                     }
 
-                    // noinspection JSCheckFunctionSignatures
                     for (const [elementKey, elementValue] of Object.entries(groupValue)) {
                         // @ts-ignore
                         maxDigits[type][groupKey][elementKey] = Math.max(
                             // @ts-ignore
                             maxDigits[type][groupKey][elementKey] ?? 0,
-                            // @ts-ignore
-                            countDecimals(elementValue.value)
+                            countDecimals(elementValue?.value)
                         )
                     }
                 }
