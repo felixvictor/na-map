@@ -538,7 +538,7 @@ interface WoodTrimOrFrame {
     type: string
     name: string
 }
-interface WoodProperty {
+interface WoodProperty extends ObjectIndexer<boolean | number | string> {
     modifier: string
     amount: number
     isPercentage: boolean
