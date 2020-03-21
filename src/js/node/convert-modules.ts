@@ -317,10 +317,9 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
      * @returns Module type
      */
     const getModuleType = (module: ModuleEntity): string => {
-        let type = ""
+        let type: string
         let { permanentType, sortingGroup } = module
 
-        // noinspection IfStatementWithTooManyBranchesJS,OverlyComplexBooleanExpressionJS
         if (
             module.usageType === "All" &&
             sortingGroup &&
@@ -367,7 +366,6 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         return `${type}${sortingGroup}${permanentType}`
     }
 
-    // noinspection OverlyComplexBooleanExpressionJS
     const apiModules = apiItems.filter(
         item =>
             item.ItemType === "Module" &&
@@ -400,14 +398,12 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         // Ignore double entries
         if (!modules.has(module.name + module.moduleLevel)) {
             // Check for wood module
-            // noinspection OverlyComplexBooleanExpressionJS
             if (
                 (module.name.endsWith(" Planking") && module.moduleType === "Hidden") ||
                 (module.name.endsWith(" Frame") && module.moduleType === "Hidden") ||
                 module.name === "Crew Space"
             ) {
                 setWood(module)
-                // noinspection ReuseOfLocalVariableJS
                 dontSave = true
             } else {
                 module.properties = getModuleProperties(module.APImodifiers)
@@ -421,6 +417,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
 
                 for (const rate of moduleRate) {
                     for (const name of rate.names) {
+                        // eslint-disable-next-line max-depth
                         if (module.name.endsWith(name)) {
                             module.name = module.name.replace(name, "")
                             module.moduleLevel = rate.level
@@ -457,7 +454,6 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
                     "TEST MODULE SPEED IN OW",
                     "Thrifty"
                 ]
-                // noinspection OverlyComplexBooleanExpressionJS
                 if (
                     nameExceptions.includes(module.name) ||
                     (module.name === "Optimized Rudder" && module.moduleLevel !== "U") ||
@@ -465,7 +461,6 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
                     module.name.endsWith("TEST") ||
                     module.type.startsWith("Not used")
                 ) {
-                    // noinspection ReuseOfLocalVariableJS
                     dontSave = true
                 } else {
                     // console.log(module.id, module.name);
