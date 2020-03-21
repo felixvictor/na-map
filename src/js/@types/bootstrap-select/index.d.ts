@@ -2,10 +2,13 @@
 
 /// <reference types="jquery"/>
 
+type CountSelectedTextF = (numSelected: number, numTotal: number) => string
+type MaxOptionsTextF = (numAll: number, numGroup: number) => string[]
+
 interface BootstrapSelectOptions {
     actionsBox?: boolean
     container?: string | boolean
-    countSelectedText?: string | Function
+    countSelectedText?: string | CountSelectedTextF
     deselectAllText?: string
     dropdownAlignRight?: string | boolean
     dropupAuto?: boolean
@@ -17,7 +20,7 @@ interface BootstrapSelectOptions {
     liveSearchPlaceholder?: string
     liveSearchStyle?: string
     maxOptions?: number | boolean
-    maxOptionsText?: string | Array<any> | Function
+    maxOptionsText?: string | any[] | MaxOptionsTextF
     mobile?: boolean
     multipleSeparator?: string
     noneSelectedText?: string
@@ -37,5 +40,5 @@ interface BootstrapSelectOptions {
 
 interface JQuery {
     selectpicker(opts?: BootstrapSelectOptions): void
-    selectpicker(method: string, ...args: Array<string | Array<string>>): void
+    selectpicker(method: string, ...args: Array<string | string[]>): void
 }
