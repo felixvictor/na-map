@@ -173,6 +173,20 @@ export interface ModulePropertiesEntity {
  * nations.json
  */
 
+interface NationListOptional<T> extends ObjectIndexer<T | undefined> {
+    NT?: T
+    PR?: T
+    ES?: T
+    FR?: T
+    GB?: T
+    VP?: T
+    DK?: T
+    SE?: T
+    US?: T
+    RU?: T
+    DE?: T
+    PL?: T
+}
 export interface NationList<T> extends ObjectIndexer<T> {
     NT: T
     PR: T
@@ -216,22 +230,33 @@ interface OwnershipLabelRange {
 /****************************
  * pb-zones.json
  */
-
-export interface PbZone {
+export interface PbZoneDefence {
     id: number
-    position: Point
-    pbCircles: Point[]
     forts: Point[]
     towers: Point[]
-    joinCircles: Point[]
+}
+export interface PbZoneBasic {
+    id: number
+    joinCircle: Point
+    pbCircles: Point[]
+}
+export interface PbZoneRaid {
+    id: number
+    joinCircle: Point
     raidCircles: Point[]
     raidPoints: Point[]
+}
+
+export interface PbZone extends PbZoneBasic, PbZoneDefence, PbZoneRaid {
+    id: number
+    position: Point
 }
 
 /****************************
  * ports.json
  */
 
+export type PortBattleType = "Small" | "Medium" | "Large"
 export interface PortBasic {
     id: number
     name: string
@@ -246,65 +271,39 @@ export interface PortBasic {
     availableForAll: boolean
     brLimit: number
     portPoints: number
-    portBattleType: string
+    portBattleType: PortBattleType
 }
 
 export interface Port
-    extends ObjectIndexer<undefined | boolean | number | string | string[] | InventoryEntity[] | Point> {
-    id: number
-    name: string
-    coordinates: Point
-    angle: number
-    textAnchor: string
-    region: string
-    countyCapitalName: string
-    county: string
-    countyCapital: boolean
-    shallow: boolean
-    availableForAll: boolean
-    brLimit: number
-    portPoints: number
-    portBattleType: string
-    portBattleStartTime: number
-    nonCapturable: boolean
-    conquestMarksPension: number
-    portTax: number
-    taxIncome: number
-    netIncome: number
-    tradingCompany: number
-    laborHoursDiscount: number
-    dropsTrading?: string[]
-    consumesTrading?: string[]
-    producesNonTrading?: string[]
-    dropsNonTrading?: string[]
-    inventory: InventoryEntity[]
-    nation: string
-    capturer: string
-    lastPortBattle: string
-    attackerNation: string
-    attackerClan: string
-    attackHostility: number
-    portBattle: string
+    extends PortBasic,
+        PortPerServer,
+        PortBattlePerServer,
+        ObjectIndexer<undefined | boolean | number | string | Point | Array<string | InventoryEntity>> {}
+export interface PortWithTrades extends Port {
+    tradePortId: number
+    goodsToBuyInTradePort?: string[]
+    buyInTradePort: boolean
+    goodsToSellInTradePort?: string[]
+    sellInTradePort: boolean
+    distance?: number
 }
-export interface PortWithTrades
-    extends Port {
 
-    }
 /****************************
  * <servername>-ports.json
  */
 
+export type ConquestMarksPension = 1 | 3
 export interface PortPerServer
-    extends ObjectIndexer<undefined | boolean | number | string | string[] | InventoryEntity[]> {
+    extends ObjectIndexer<undefined | boolean | number | string | Point | Array<string | InventoryEntity>> {
     id: number
     portBattleStartTime: number
     nonCapturable: boolean
-    conquestMarksPension: number
+    conquestMarksPension: ConquestMarksPension
     portTax: number
     taxIncome: number
     netIncome: number
-    tradingCompany: number
-    laborHoursDiscount: number
+    tradingCompany: 0 | 1 | 2
+    laborHoursDiscount: 0 | 1 | 2
     dropsTrading?: string[]
     consumesTrading?: string[]
     producesNonTrading?: string[]
@@ -322,14 +321,30 @@ export interface InventoryEntity {
 /****************************
  * <servername>-pb.json
  */
+export type NationShortName = "DE" | "DK" | "ES" | "FR" | "FT" | "GB" | "NT" | "PL" | "PR" | "RU" | "SE" | "US" | "VP"
 
+export type NationFullName =
+    | "Commonwealth of Poland"
+    | "Danmark-Norge"
+    | "España"
+    | "France"
+    | "Free Town"
+    | "Great Britain"
+    | "Kingdom of Prussia"
+    | "Neutral"
+    | "Pirates"
+    | "Russian Empire"
+    | "Sverige"
+    | "United States"
+    | "Verenigde Provinciën"
+type AttackerNationName = NationFullName | "n/a" | ""
 export interface PortBattlePerServer {
     id: number
     name: string
-    nation: string
+    nation: NationShortName
     capturer: string
     lastPortBattle: string
-    attackerNation: string
+    attackerNation: AttackerNationName
     attackerClan: string
     attackHostility: number
     portBattle: string
@@ -578,4 +593,18 @@ export interface RepairAmount {
     percent: number
     time: number
     volume: number
+}
+
+/****************************
+ * <servername>-frontlines.json
+ */
+export interface FrontlinesPerServer {
+    attacking: Attacking
+    defending: Defending
+}
+interface Attacking extends NationListOptional<FrontLineValue> {}
+interface Defending extends NationListOptional<FrontLineValue> {}
+export interface FrontLineValue {
+    key: string
+    value: number[]
 }

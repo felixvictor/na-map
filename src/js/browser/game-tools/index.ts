@@ -37,7 +37,7 @@ import ListWoods from "./list-woods"
  * @param serverId - Server id
  * @param urlParams - Search Parameters
  */
-const init = (serverId: string, urlParameters): void => {
+const init = (serverId: string, urlParams: URLSearchParams): void => {
     /*
     const shipCompare = new CompareShips("ship-compare")
 

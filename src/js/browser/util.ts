@@ -19,7 +19,7 @@ import {
     Coordinate,
     degreesFullCircle,
     degreesQuarterCircle,
-    degreesToCompass,
+    degreesToCompass, Point,
     radiansToDegrees
 } from "../common/common-math"
 
