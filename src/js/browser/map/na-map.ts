@@ -9,6 +9,7 @@
  */
 
 /// <reference types="bootstrap" />
+
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
 
@@ -28,11 +29,10 @@ import RadioButton from "../util/radio-button"
 
 import DisplayPbZones from "./display-pb-zones"
 import DisplayPorts from "./display-ports"
-
+import SelectPorts from "./select-ports"
 import ShowF11 from "../map-tools/show-f11"
 /*
 
-import SelectPorts from "./select-ports"
 import DisplayGrid from "../map-tools/display-grid"
 import Journey from "../map-tools/make-journey"
 import PredictWind from "../map-tools/predict-wind"
@@ -611,7 +611,7 @@ class NAMap {
     }
 
     goToPort(): void {
-        if (this._ports.currentPort.id === "0") {
+        if (this._ports.currentPort.id === 0) {
             this.initialZoomAndPan()
         } else {
             this.zoomAndPan(this._ports.currentPort.coord.x, this._ports.currentPort.coord.y, 2)
