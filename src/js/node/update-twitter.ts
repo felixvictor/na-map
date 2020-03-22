@@ -19,10 +19,10 @@ import utc from "dayjs/plugin/utc.js"
 import { findNationByName, findNationByNationShortName } from "../common/common"
 import { commonPaths, serverStartDate as serverDate, serverStartDateTime } from "../common/common-dir"
 import { fileExists, readJson, readTextFile, saveJsonAsync, saveTextFile } from "../common/common-file"
-import { cleanName, simpleSort } from "../common/common-node"
+import { cleanName, simpleStringSort } from "../common/common-node"
 import { serverNames } from "../common/common-var"
 
-import { PortBattlePerServer } from "../common/gen-json"
+import { AttackerNationName, NationShortName, PortBattlePerServer } from "../common/gen-json"
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -65,7 +65,7 @@ const addTwitterData = (data: Twit.Twitter.SearchResults): void => {
     tweets.push(
         ...data.statuses
             .flatMap((status: Twit.Twitter.Status) => cleanName(xss.filterXSS(status.full_text ?? "")))
-            .sort(simpleSort)
+            .sort(simpleStringSort)
     )
     refresh = data.search_metadata.max_id_str ?? ""
     /*
@@ -197,7 +197,7 @@ const captured = (result: RegExpExecArray): void => {
     const port = ports[i]
 
     console.log("      --- captured", i)
-    port.nation = findNationByName(result[4])?.short ?? ""
+    port.nation = (findNationByName(result[4])?.short as NationShortName) ?? ""
     port.capturer = result[3]
     port.lastPortBattle = dayjs.utc(result[1], "DD-MM-YYYY HH:mm").format("YYYY-MM-DD HH:mm")
     port.attackerNation = ""
@@ -248,7 +248,7 @@ const hostilityLevelUp = (result: RegExpExecArray): void => {
     const port = ports[i]
 
     console.log("      --- hostilityLevelUp", i)
-    port.attackerNation = result[3]
+    port.attackerNation = result[3] as AttackerNationName
     port.attackerClan = result[2]
     port.attackHostility = Number(result[6]) / 100
 }
@@ -262,7 +262,7 @@ const hostilityLevelDown = (result: RegExpExecArray): void => {
     const port = ports[i]
 
     console.log("      --- hostilityLevelDown", i)
-    port.attackerNation = result[3]
+    port.attackerNation = result[3] as AttackerNationName
     port.attackerClan = result[2]
     port.attackHostility = Number(result[6]) / 100
 }
@@ -279,7 +279,7 @@ const findPortByClanName = (clanName: string): PortBattlePerServer | undefined =
  * Try to find nation for a clan name
  * @param clanName - Clan name
  */
-const guessNationFromClanName = (clanName: string): string => {
+const guessNationFromClanName = (clanName: string): AttackerNationName => {
     const port = findPortByClanName(clanName)
     // noinspection UnnecessaryLocalVariableJS
     const nation = port ? findNationByNationShortName(port.nation)?.name ?? "" : "n/a"
@@ -296,7 +296,7 @@ const portBattleScheduled = (result: RegExpExecArray): void => {
 
     console.log("      --- portBattleScheduled", i)
     if (result[7]) {
-        port.attackerNation = result[7]
+        port.attackerNation = result[7] as AttackerNationName
     } else {
         port.attackerNation = guessNationFromClanName(result[6])
     }
