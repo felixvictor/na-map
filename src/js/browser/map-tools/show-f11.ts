@@ -22,7 +22,7 @@ import { between, convertCoordX, convertCoordY, convertInvCoordX, convertInvCoor
 import { MinMaxCoord, SVGGDatum, SVGSVGDatum } from "../../common/interface"
 import { copyF11ToClipboard } from "../util"
 
-import { NAMap } from "../map/NAMap"
+import { NAMap } from "../map/na-map"
 import * as d3Selection from "d3-selection"
 import * as d3Zoom from "d3-zoom"
 

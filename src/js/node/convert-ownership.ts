@@ -120,7 +120,7 @@ function convertOwnership(): void {
     function parseData(portData: APIPort[], date: string): void {
         // console.log("**** new date", date);
 
-        const numPorts = {} as NationList
+        const numPorts = {} as NationList<number>
         nations
             .filter(nation => nation.id !== 9)
             .forEach(nation => {
