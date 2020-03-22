@@ -171,7 +171,7 @@ export default class TrilateratePosition {
         this._baseId = "get-position"
         this._buttonId = `button-${this._baseId}`
         this._modalId = `modal-${this._baseId}`
-        this._modal$ = null
+        this._modal$ = {} as JQuery<HTMLElement>
 
         this._select = []
         this._input = []
@@ -252,7 +252,7 @@ export default class TrilateratePosition {
             .map(port => `<option data-subtext="${port.nation}">${port.name}</option>`)
             .join("")}`
         for (const inputNumber of [...new Array(this._NumberOfInputs).keys()]) {
-            this._selector[inputNumber] = document.querySelector(this._select[inputNumber]) as HTMLInputElement
+            this._selector[inputNumber] = document.querySelector(this._select[inputNumber]) as HTMLSelectElement
 
             this._selector[inputNumber].insertAdjacentHTML("beforeend", options)
             $(this._selector[inputNumber]).selectpicker({
@@ -282,7 +282,7 @@ export default class TrilateratePosition {
             x: port.coordinates[0],
             y: port.coordinates[1],
             z: 0,
-            r: port.distance
+            r: port.distance??0
         }))
 
         const position = trilaterate(circles[0], circles[1], circles[2], true) as Vector

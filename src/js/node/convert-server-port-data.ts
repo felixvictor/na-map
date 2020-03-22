@@ -17,7 +17,7 @@ import { findNationById, nations } from "../common/common"
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
 import { readJson, saveJsonAsync } from "../common/common-file"
 import { Distance } from "../common/common-math"
-import { cleanName, simpleSort, sortBy } from "../common/common-node"
+import { cleanName, simpleStringSort, sortBy } from "../common/common-node"
 import { distanceMapSize, serverNames } from "../common/common-var"
 
 import { APIItemGeneric } from "./api-item"
@@ -83,7 +83,7 @@ const setPortFeaturePerServer = (apiPort: APIPort): void => {
                         good => itemNames.has(good.Template) && itemNames.get(good.Template)?.trading
                     )
                         .map(good => itemNames.get(good.Template)?.name)
-                        .sort(simpleSort)
+                        .sort(simpleStringSort)
                 )
             ],
             consumesTrading: [
@@ -92,7 +92,7 @@ const setPortFeaturePerServer = (apiPort: APIPort): void => {
                         good => itemNames.has(good.Key) && itemNames.get(good.Key)?.trading
                     )
                         .map(good => itemNames.get(good.Key)?.name)
-                        .sort(simpleSort)
+                        .sort(simpleStringSort)
                 )
             ],
             producesNonTrading: [
@@ -101,7 +101,7 @@ const setPortFeaturePerServer = (apiPort: APIPort): void => {
                         good => itemNames.has(good.Key) && !itemNames.get(good.Key)?.trading
                     )
                         .map(good => itemNames.get(good.Key)?.name)
-                        .sort(simpleSort)
+                        .sort(simpleStringSort)
                 )
             ],
             dropsNonTrading: [
@@ -110,7 +110,7 @@ const setPortFeaturePerServer = (apiPort: APIPort): void => {
                         good => itemNames.has(good.Template) && !itemNames.get(good.Template)?.trading
                     )
                         .map(good => itemNames.get(good.Template)?.name)
-                        .sort(simpleSort)
+                        .sort(simpleStringSort)
                 )
             ],
             inventory: portShop.RegularItems.filter(good => itemNames.get(good.TemplateId)?.itemType !== "Cannon")
