@@ -30,7 +30,16 @@ export const cleanName = (name: string): string =>
  * @param   b - String b
  * @returns Sort result
  */
-export const simpleSort = (a: string | undefined, b: string | undefined): number => (a && b ? a.localeCompare(b) : 0)
+export const simpleStringSort = (a: string | undefined, b: string | undefined): number =>
+    a && b ? a.localeCompare(b) : 0
+
+/**
+ * Simple sort of numbers a and b
+ * @param   a - Number a
+ * @param   b - Number b
+ * @returns Sort result
+ */
+export const simpleNumberSort = (a: number | undefined, b: number | undefined): number => (a && b ? a - b : 0)
 
 /**
  * Sort of Id a and b as numbers

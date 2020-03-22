@@ -8,15 +8,16 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-interface Nation {
+import { NationFullName, NationShortName } from "./gen-json"
+
+export interface Nation {
     id: number
-    short: string // Short name
-    name: string // Name
+    short: NationShortName // Short name
+    name: NationFullName // Name
     sortName: string // Name for sorting
 }
 
-// noinspection DuplicatedCode,SpellCheckingInspection,JSValidateTypes
-export const nations: Array<Nation> = [
+export const nations: Nation[] = [
     { id: 0, short: "NT", name: "Neutral", sortName: "Neutral" },
     { id: 1, short: "PR", name: "Pirates", sortName: "Pirates" },
     { id: 2, short: "ES", name: "España", sortName: "España" },
