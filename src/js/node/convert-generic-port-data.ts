@@ -26,7 +26,7 @@ import {
 import { serverNames } from "../common/common-var"
 
 import { APIPort, PortElementsSlotGroupsEntity, PortPosition, PortRaidSpawnPointsEntity } from "./api-port"
-import { FeaturesEntity, GeoJson } from "../common/gen-json"
+import { FeaturesEntity, GeoJson, PbZone } from "../common/gen-json"
 
 let apiPorts = [] as APIPort[]
 let apiPortPos: Map<number, Coordinate> = new Map()
@@ -69,7 +69,7 @@ const setAndSavePortData = async (): Promise<void> => {
                 availableForAll: apiPort.AvailableForAll,
                 brLimit: apiPort.PortBattleBRLimit,
                 portPoints: apiPort.PortPoints,
-                portBattleType: apiPort.PortBattleType,
+                portBattleType: apiPort.PortBattleType
             }
         })
         // @ts-ignore
@@ -104,7 +104,7 @@ const getTowers = (portElementsSlotGroups: PortElementsSlotGroupsEntity[]): Poin
             ])
         )
 
-const getJoinCircles = (id: number, rotation: number): Point => {
+const getJoinCircle = (id: number, rotation: number): Point => {
     const { x: x0, y: y0 } = apiPortPos.get(id)!
     const distance = 5
     const degrees = degreesHalfCircle - rotation
@@ -138,10 +138,10 @@ const setAndSavePBZones = async (): Promise<void> => {
                 pbCircles: getPBCircles(port.PortBattleZonePositions),
                 forts: getForts(port.PortElementsSlotGroups),
                 towers: getTowers(port.PortElementsSlotGroups),
-                joinCircles: getJoinCircles(Number(port.Id), Number(port.Rotation)),
+                joinCircle: getJoinCircle(Number(port.Id), Number(port.Rotation)),
                 raidCircles: getRaidCircles(port.PortRaidZonePositions),
                 raidPoints: getRaidPoints(port.PortRaidSpawnPoints)
-            }
+            } as PbZone
         })
         // @ts-ignore
         .sort(sortBy(["id"]))
