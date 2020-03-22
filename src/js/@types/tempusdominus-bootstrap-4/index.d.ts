@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /// <reference types="jquery"/>
 
-import { Moment } from "moment"
+import { Moment, MomentBuiltinFormat } from "moment"
 
 interface Icon {
     time: string
@@ -49,35 +50,40 @@ interface Button {
     showClose: boolean
 }
 
+interface WidgetPositioningOptions {
+    horizontal?: "auto" | "left" | "right"
+    vertical?: "auto" | "top" | "bottom"
+}
+
 type ParseInputDateF = (inputDate: Moment) => Moment
 
-interface Options {
+interface DatetimepickerOption {
     allowInputToggle?: boolean
     allowMultidate?: boolean
     buttons?: Button
     calendarWeeks?: boolean
     collapse?: boolean
-    daysOfWeekDisabled?: number[]
+    daysOfWeekDisabled?: number[] | boolean
     dayViewHeaderFormat?: string
     debug?: boolean
-    defaultDate?: Moment
-    disabledDates?: Moment[]
-    disabledHours?: number[]
-    disabledTimeIntervals?: Moment[][]
-    enabledDates?: Moment[]
-    enabledHours?: number[]
-    extraFormats?: string[]
+    defaultDate?: boolean | Moment | Date | string
+    disabledDates?: boolean | Array<Moment | Date | string> | any
+    disabledHours?: boolean | number[] | any
+    disabledTimeIntervals?: boolean | Moment[][]
+    enabledDates?: boolean | Array<Moment | Date | string> | any
+    enabledHours?: boolean | number[]
+    extraFormats?: boolean | Array<string | MomentBuiltinFormat>
     focusOnShow?: boolean
-    format?: string
+    format?: boolean | string | MomentBuiltinFormat
     icons?: Icon
     ignoreReadonly?: boolean
     inline?: boolean
     keepInvalid?: boolean
     keepOpen?: boolean
-    keyBinds?: string
+    keyBinds?: { [key: string]: (widget: boolean | JQuery) => void }
     locale?: string
-    maxDate?: Moment | null
-    minDate?: Moment | null
+    maxDate?: boolean | Moment | Date | string
+    minDate?: boolean | Moment | Date | string
     multidateSeparator?: string
     parseInputDate?: ParseInputDateF
     sideBySide?: boolean
@@ -85,14 +91,23 @@ interface Options {
     timeZone?: string
     toolbarPlacement?: "default" | "top" | "bottom"
     tooltips?: Tooltip
-    useCurrent?: "year" | "month" | "day" | "hour" | "minute"
+    useCurrent?: boolean | "year" | "month" | "day" | "hour" | "minute"
     useStrict?: boolean
-    viewDate?: Moment
+    viewDate?: boolean | Moment | Date | string
     viewMode?: "times" | "days" | "months" | "years" | "decades"
-    widgetParent?: string
-    widgetPositioning?: string
+    widgetParent?: string | JQuery
+    widgetPositioning?: WidgetPositioningOptions
 }
 
-interface JQuery {
-    datetimepicker(options?: Options): void
+export interface DatetimepickerEvent extends JQuery.Event {
+    date: Moment
+}
+
+declare global {
+    interface JQuery {
+        datetimepicker(options?: DatetimepickerOption): void
+        datetimepicker(value: "viewDate"): Moment
+
+        on(events: "change.datetimepicker", handler: (eventobject: DatetimepickerEvent) => any): JQuery
+    }
 }
