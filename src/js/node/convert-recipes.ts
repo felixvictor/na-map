@@ -11,7 +11,7 @@
 import * as path from "path"
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
 import { readJson, saveJsonAsync } from "../common/common-file"
-import { cleanName, simpleSort, sortBy } from "../common/common-node"
+import { cleanName, simpleStringSort, sortBy } from "../common/common-node"
 import { serverNames } from "../common/common-var"
 
 import { APIItemGeneric, APIRecipeModuleResource, APIRecipeResource, APIShipUpgradeBookItem } from "./api-item"
@@ -118,7 +118,7 @@ const convertRecipes = async (): Promise<void> => {
                     if (ingredients.has(apiIngredient.Template)) {
                         const updatedIngredient = ingredients.get(apiIngredient.Template)
                         updatedIngredient.recipeNames.push(recipeName)
-                        updatedIngredient.recipeNames.sort(simpleSort)
+                        updatedIngredient.recipeNames.sort(simpleStringSort)
                         ingredients.set(apiIngredient.Template, updatedIngredient)
                     } else {
                         const ingredient = {
