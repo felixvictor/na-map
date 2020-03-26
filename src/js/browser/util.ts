@@ -19,8 +19,8 @@ import {
     Coordinate,
     degreesFullCircle,
     degreesQuarterCircle,
-    degreesToCompass, Point,
-    radiansToDegrees
+    degreesToCompass,
+    radiansToDegrees,
 } from "../common/common-math"
 
 /**
@@ -150,7 +150,7 @@ export const chunkify = (array: Array<number | string>, n: number, balanced = tr
  */
 export const printCompassRose = ({
     element,
-    radius
+    radius,
 }: {
     element: Selection<BaseType, unknown, HTMLElement, any>
     radius: number
@@ -166,10 +166,7 @@ export const printCompassRose = ({
         .domain(data)
         .align(0)
 
-    element
-        .append("circle")
-        .attr("r", innerRadius)
-        .style("stroke-width", `${strokeWidth}px`)
+    element.append("circle").attr("r", innerRadius).style("stroke-width", `${strokeWidth}px`)
 
     const dummy = element.append("text")
 
@@ -177,12 +174,12 @@ export const printCompassRose = ({
     const label = element
         .selectAll("g")
         .data(data)
-        .join(enter =>
+        .join((enter) =>
             enter
                 .append("g")
                 .attr(
                     "transform",
-                    d =>
+                    (d) =>
                         `rotate(${Math.round(
                             (xScale(d) ?? 0) + xScale.bandwidth() / 2 - degreesQuarterCircle
                         )})translate(${innerRadius},0)`
@@ -197,7 +194,7 @@ export const printCompassRose = ({
     label
         .filter((_d, i) => i % 3 === 0)
         .append("text")
-        .attr("transform", d => {
+        .attr("transform", (d) => {
             let rotate = Math.round((xScale(d) ?? 0) + xScale.bandwidth() / 2)
             let translate = ""
 
@@ -221,7 +218,7 @@ export const printCompassRose = ({
 
             return `rotate(${rotate})translate(${translate})`
         })
-        .text(d => d)
+        .text((d) => d)
 
     dummy.remove()
 }
@@ -233,7 +230,7 @@ export const printCompassRose = ({
  */
 export const printSmallCompassRose = ({
     element,
-    radius
+    radius,
 }: {
     element: Selection<BaseType, unknown, HTMLElement, any>
     radius: number
@@ -248,10 +245,7 @@ export const printSmallCompassRose = ({
         .domain(data)
         .align(0)
 
-    element
-        .append("circle")
-        .attr("r", innerRadius)
-        .style("stroke-width", `${strokeWidth}px`)
+    element.append("circle").attr("r", innerRadius).style("stroke-width", `${strokeWidth}px`)
 
     // Ticks
     const x2 = 2
@@ -260,7 +254,7 @@ export const printSmallCompassRose = ({
     element
         .selectAll("line")
         .data(data)
-        .join(enter =>
+        .join((enter) =>
             enter
                 .append("line")
                 .attr("x2", (_d, i) => {
@@ -272,7 +266,7 @@ export const printSmallCompassRose = ({
                 })
                 .attr(
                     "transform",
-                    d => `rotate(${Math.round((xScale(d) ?? 0) + xScale.bandwidth() / 2)})translate(${innerRadius},0)`
+                    (d) => `rotate(${Math.round((xScale(d) ?? 0) + xScale.bandwidth() / 2)})translate(${innerRadius},0)`
                 )
         )
 }
@@ -329,7 +323,7 @@ const writeClipboard = (text: string): Promise<boolean> => {
             // console.log(`Copied ${text} to clipboard.`);
             return true
         })
-        .catch(error => {
+        .catch((error) => {
             console.error(`Cannot copy ${text} to clipboard`, error)
             return false
         })
