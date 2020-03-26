@@ -11,12 +11,13 @@ import { initAnalytics, registerPage } from "./analytics"
 import { putImportError } from "../common/common"
 import { Server } from "../common/servers"
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const servers = require("../common/servers")
+const servers: Server[] = require("../common/servers")
 
 import Cookie from "./util/cookie"
 import RadioButton from "./util/radio-button"
 
 import "../../scss/main.scss"
+import { NAMap } from "./map/na-map";
 
 /**
  *  Workaround for google translate uses indexOf on svg text
@@ -27,9 +28,9 @@ declare global {
         indexOf(): object
     }
 }
-SVGAnimatedString.prototype.indexOf = function(this: SVGAnimatedString): object {
+SVGAnimatedString.prototype.indexOf = function (this: SVGAnimatedString): object {
     // @ts-ignore
-    return this.baseVal.indexOf.apply(this.baseVal, arguments)
+    return this.baseVal.indexOf.apply(this.baseVal, arguments) // eslint-disable-line prefer-spread,prefer-rest-params
 }
 
 /**
@@ -79,10 +80,10 @@ const serverNameSelected = (): void => {
  * Setup listeners
  */
 const setupListener = (): void => {
-    ;(document.getElementById(baseId) as HTMLInputElement).addEventListener("change", () => serverNameSelected())
+    ;(document.querySelector(baseId) as HTMLInputElement).addEventListener("change", () => serverNameSelected())
 
     // {@link https://jsfiddle.net/bootstrapious/j6zkyog8/}
-    $(".dropdown-menu [data-toggle='dropdown']").on("click", event => {
+    $(".dropdown-menu [data-toggle='dropdown']").on("click", (event) => {
         event.preventDefault()
         event.stopPropagation()
 
@@ -91,11 +92,7 @@ const setupListener = (): void => {
         element.siblings().toggleClass("show")
 
         if (!element.next().hasClass("show")) {
-            element
-                .parents(".dropdown-menu")
-                .first()
-                .find(".show")
-                .removeClass("show")
+            element.parents(".dropdown-menu").first().find(".show").removeClass("show")
         }
 
         element.parents(".nav-item.dropdown.show").on("hidden.bs.dropdown", () => {
@@ -149,9 +146,9 @@ const load = async (): Promise<void> => {
     if (searchParams.get("v")) {
         loadGameTools(serverId, searchParams)
     } else {
-        ;(document.getElementById("game-tools-dropdown") as HTMLInputElement).addEventListener(
+        ;(document.querySelector("#game-tools-dropdown") as HTMLInputElement).addEventListener(
             "click",
-            () => loadGameTools(serverId, searchParams),
+            async () => loadGameTools(serverId, searchParams),
             { once: true }
         )
     }

@@ -8,10 +8,14 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+/* global ga */
+
 /// <reference types="google.analytics" />
 
 import { appName, appVersion } from "../common/common-browser"
 import { GA_TRACKING_ID } from "../common/common-var"
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access
 ;(window as any).ga = (commandArray: Array<string | boolean | number>): void => {
     ga.q.push(commandArray)
 }
@@ -29,7 +33,7 @@ export const registerEvent = (category: string, label: string, value = 1): void 
         hitType: "event",
         eventCategory: category,
         eventLabel: label,
-        eventValue: value
+        eventValue: value,
     })
 }
 
@@ -40,7 +44,7 @@ export const registerEvent = (category: string, label: string, value = 1): void 
 export const registerPage = (title: string): void => {
     ga("send", {
         hitType: "pageview",
-        title
+        title,
     })
 }
 
@@ -63,14 +67,14 @@ export const initAnalytics = (): void => {
         // When the function returns true, this prevents the firing of the default event handler
         const exceptionDescription = [
             `Message: ${errorMessage.message} @ ${errorMessage.filename}-${errorMessage.lineno}:${errorMessage.colno}`,
-            `Error object: ${JSON.stringify(errorMessage.error)}`
+            `Error object: ${JSON.stringify(errorMessage.error)}`,
         ].join(" - ")
 
         ga("send", "exception", {
             exDescription: exceptionDescription,
             exFatal: false,
             appName,
-            appVersion
+            appVersion,
         })
 
         return false
