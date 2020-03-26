@@ -107,7 +107,7 @@ const dataMapping: Map<string, { group: string; element: string }> = new Map([
     // ["ARMOR_DAMAGE_ABSORB_MULTIPLIER", { group: "strength", element: "damage absorb multiplier" }],
     ["CANNON_CREW_REQUIRED", { group: "generic", element: "crew" }],
     // ["ARMOR_THICKNESS", { group: "strength", element: "thickness" }],
-    ["CANNON_BALL_ARMOR_SPLINTERS_DAMAGE_FOR_CREW", { group: "damage", element: "splinter" }]
+    ["CANNON_BALL_ARMOR_SPLINTERS_DAMAGE_FOR_CREW", { group: "damage", element: "splinter" }],
 ])
 
 const cannons = {} as Cannon
@@ -142,7 +142,7 @@ const addData = (fileData: XmlGeneric): void => {
         .replace("24 (Edinorog)", "18 (Edinorog)")
 
     const cannon = {
-        name
+        name,
     } as CannonEntity
     for (const [value, { group, element }] of dataMapping) {
         if (!cannon[group]) {
@@ -152,9 +152,10 @@ const addData = (fileData: XmlGeneric): void => {
         // @ts-ignore
         cannon[group][element] = {
             value: Number(
-                (fileData.Attributes.Pair.find(pair => pair.Key._text === value)?.Value.Value as TextEntity)._text ?? 0
+                (fileData.Attributes.Pair.find((pair) => pair.Key._text === value)?.Value.Value as TextEntity)._text ??
+                    0
             ),
-            digits: 0
+            digits: 0,
         } as CannonValue
     }
 
@@ -162,8 +163,8 @@ const addData = (fileData: XmlGeneric): void => {
     const penetrations: Map<number, number> = new Map(
         (fileData.Attributes.Pair.find((pair: PairEntity) => pair.Key._text === "CANNON_PENETRATION_DEGRADATION")?.Value
             .Value as TangentEntity[])
-            .filter(penetration => Number(penetration.Time._text) > 0)
-            .map(penetration => [Number(penetration.Time._text) * 1000, Number(penetration.Value._text)])
+            .filter((penetration) => Number(penetration.Time._text) > 0)
+            .map((penetration) => [Number(penetration.Time._text) * 1000, Number(penetration.Value._text)])
     )
 
     // noinspection MagicNumberJS
@@ -180,7 +181,7 @@ const addData = (fileData: XmlGeneric): void => {
     for (const distance of peneDistances) {
         cannon.penetration[distance] = {
             value: Math.trunc((penetrations.get(distance) ?? 0) * (cannon.damage.penetration?.value ?? 0)),
-            digits: 0
+            digits: 0,
         }
     }
 
@@ -189,7 +190,7 @@ const addData = (fileData: XmlGeneric): void => {
     // Calculate damage per second
     cannon.damage["per second"] = {
         value: round(cannon.damage.basic.value / cannon.damage["reload time"].value, 2),
-        digits: 0
+        digits: 0,
     }
 
     cannons[type].push(cannon)
@@ -249,8 +250,8 @@ export const convertCannons = async (): Promise<void> => {
 
         cannons[type].sort(({ name: a }, { name: b }) => {
             // Sort either by lb numeral value when values are different
-            if (parseInt(a, 10) !== parseInt(b, 10)) {
-                return parseInt(a, 10) - parseInt(b, 10)
+            if (Number.parseInt(a, 10) !== Number.parseInt(b, 10)) {
+                return Number.parseInt(a, 10) - Number.parseInt(b, 10)
             }
 
             // Or sort by string

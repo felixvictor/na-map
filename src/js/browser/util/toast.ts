@@ -22,13 +22,13 @@ import { iconSmallSrc } from "../../common/common-browser"
  */
 export default class Toast {
     // Toast title
-    private readonly _title: string
+    readonly #title: string
     // Toast text
-    private readonly _text: string
+    readonly #text: string
     // Toast instance
-    private _toast: Selection<HTMLDivElement, unknown, HTMLElement, any>
+    #toast: Selection<HTMLDivElement, unknown, HTMLElement, any>
     // Main div
-    private _mainDiv: Selection<BaseType, unknown, HTMLElement, any>
+    #mainDiv: Selection<BaseType, unknown, HTMLElement, any>
 
     constructor(
         // Toast title
@@ -36,14 +36,14 @@ export default class Toast {
         // Toast text
         text: string
     ) {
-        this._title = title
-        this._text = text
+        this.#title = title
+        this.#text = text
 
-        this._mainDiv = this._setupDiv()
-        this._toast = this._set()
+        this.#mainDiv = this._setupDiv()
+        this.#toast = this._set()
         this._showToast()
 
-        const timeout = 1.0e4
+        const timeout = 1e4
         window.setTimeout(this._remove.bind(this), timeout)
     }
 
@@ -52,23 +52,19 @@ export default class Toast {
     }
 
     _set(): Selection<HTMLDivElement, unknown, HTMLElement, any> {
-        const toast = this._mainDiv
+        const toast = this.#mainDiv
             .append("div")
             .attr("class", "toast")
             .attr("role", "alert")
             .attr("aria-live", "assertive")
             .attr("aria-atomic", "true")
 
-        const header = this._toast.append("div").attr("class", "toast-header")
-        header
-            .append("img")
-            .attr("class", "rounded mr-2")
-            .attr("src", iconSmallSrc)
-            .attr("alt", "logo")
+        const header = this.#toast.append("div").attr("class", "toast-header")
+        header.append("img").attr("class", "rounded mr-2").attr("src", iconSmallSrc).attr("alt", "logo")
         header
             .append("em")
             .attr("class", "mr-auto")
-            .html(this._title)
+            .html(this.#title)
         header
             .append("button")
             .attr("type", "button")
@@ -82,12 +78,12 @@ export default class Toast {
         toast
             .append("div")
             .attr("class", "toast-body")
-            .html(this._text)
+            .html(this.#text)
         return toast
     }
 
     _showToast(): void {
-        const toastNode = this._toast.node()
+        const toastNode = this.#toast.node()
         if (toastNode !== null) {
             const toast$ = $(toastNode)
             toast$.toast({ autohide: false }).toast("show")
@@ -95,6 +91,6 @@ export default class Toast {
     }
 
     _remove(): void {
-        this._toast.remove()
+        this.#toast.remove()
     }
 }

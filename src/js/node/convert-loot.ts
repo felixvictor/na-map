@@ -46,7 +46,7 @@ const convertLoot = async (): Promise<void> => {
      * @returns Item names
      */
     const getItemNames = (): Map<number, string> =>
-        new Map(apiItems.map(item => [Number(item.Id), getLootItemName(item.Name, item.ItemType)]))
+        new Map(apiItems.map((item) => [Number(item.Id), getLootItemName(item.Name, item.ItemType)]))
 
     const itemNames = getItemNames()
 
@@ -56,18 +56,20 @@ const convertLoot = async (): Promise<void> => {
                 id: Number(item.Template),
                 name: itemNames.get(Number(item.Template)) ?? "",
                 chance: itemProbability.length > 0 ? Number(itemProbability[Number(item.Chance)]) : Number(item.Chance),
-                amount: { min: Number(item.Stack?.Min), max: Number(item.Stack?.Max) }
+                amount: { min: Number(item.Stack?.Min), max: Number(item.Stack?.Max) },
             })
         )
 
     const getLootItemsFromChestLootTable = (chestLootTableId: number) =>
-        apiItems.filter(item => Number(item.Id) === chestLootTableId).flatMap(item => getLootItems(item.Items ?? []))
+        apiItems
+            .filter((item) => Number(item.Id) === chestLootTableId)
+            .flatMap((item) => getLootItems(item.Items ?? []))
 
     const data = {} as Loot
 
     let types = ["ShipLootTableItem"]
     const loot = (apiItems.filter(
-        item => !item.NotUsed && types.includes(item.ItemType)
+        (item) => !item.NotUsed && types.includes(item.ItemType)
     ) as unknown) as APIShipLootTableItem[]
     data.loot = loot
         .map(
@@ -75,7 +77,7 @@ const convertLoot = async (): Promise<void> => {
                 id: Number(item.Id),
                 name: getLootName(Number(item.Class), item.EventLootTable),
                 // @ts-ignore
-                items: getLootItems(item.Items ?? [], item.itemProbability ?? [0]).sort(sortBy(["chance", "id"]))
+                items: getLootItems(item.Items ?? [], item.itemProbability ?? [0]).sort(sortBy(["chance", "id"])),
             })
         )
         // @ts-ignore
@@ -83,7 +85,7 @@ const convertLoot = async (): Promise<void> => {
 
     types = ["TimeBasedConvertibleItem"]
     const chests = (apiItems.filter(
-        item => !item.NotUsed && types.includes(item.ItemType)
+        (item) => !item.NotUsed && types.includes(item.ItemType)
     ) as unknown) as APITimeBasedConvertibleItem[]
     data.chests = chests
         .map(
@@ -92,12 +94,12 @@ const convertLoot = async (): Promise<void> => {
                 name: cleanName(item.Name),
                 weight: Number(item.ItemWeight),
                 lifetime: Number(item.LifetimeSeconds) / secondsPerHour,
-                items: item.ExtendedLootTable?.map(lootChestLootTableId =>
+                items: item.ExtendedLootTable?.map((lootChestLootTableId) =>
                     getLootItemsFromChestLootTable(lootChestLootTableId)
                 )
                     .reduce((acc, value) => acc.concat(value), [])
                     // @ts-ignore
-                    .sort(sortBy(["chance", "id"]))
+                    .sort(sortBy(["chance", "id"])),
             })
         )
         // @ts-ignore
@@ -107,9 +109,7 @@ const convertLoot = async (): Promise<void> => {
 }
 
 export const convertLootData = (): void => {
-    apiItems = (readJson(
-        path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`)
-    ) as unknown) as APIItemGeneric[]
+    apiItems = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`))
 
     // noinspection JSIgnoredPromiseFromCall
     convertLoot()

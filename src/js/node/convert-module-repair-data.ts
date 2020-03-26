@@ -24,7 +24,7 @@ import { TextEntity, XmlRepair } from "./xml"
  * @returns Output camel case string
  */
 function toCamelCase(str: string): string {
-    str = str.replace(/[\s-_]+(.)?/g, (_match, ch) => (ch ? ch.toUpperCase() : ""))
+    str = str.replace(/[\s-_]+(.)?/g, (_match, ch: string) => (ch ? ch.toUpperCase() : ""))
 
     // Ensure first char is always lowercase
     return str.slice(0, 1).toLowerCase() + str.slice(1)
@@ -53,7 +53,7 @@ export const convertRepairData = async (): Promise<void> => {
         const fileData = getFileData(baseFileName, "kit")
         const data = {} as RepairAmount
 
-        fileData.Attributes.Pair.forEach(pair => {
+        fileData.Attributes.Pair.forEach((pair) => {
             if (pair.Key._text === "REPAIR_VOLUME_PER_ITEM") {
                 data.volume = Number((pair.Value.Value as TextEntity)._text)
             }

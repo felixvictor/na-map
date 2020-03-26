@@ -21,7 +21,7 @@ import {
     Coordinate,
     degreesHalfCircle,
     Point,
-    rotationAngleInDegrees
+    rotationAngleInDegrees,
 } from "../common/common-math"
 import { serverNames } from "../common/common-var"
 
@@ -42,13 +42,13 @@ const setAndSavePortData = async (): Promise<void> => {
      */
 
     const ports = apiPorts
-        .map(apiPort => {
+        .map((apiPort) => {
             /**
              * PortPosition of the port battle circle A
              */
             const circleAPos = [
                 Math.trunc(convertCoordX(apiPort.PortBattleZonePositions[0].x, apiPort.PortBattleZonePositions[0].z)),
-                Math.trunc(convertCoordY(apiPort.PortBattleZonePositions[0].x, apiPort.PortBattleZonePositions[0].z))
+                Math.trunc(convertCoordY(apiPort.PortBattleZonePositions[0].x, apiPort.PortBattleZonePositions[0].z)),
             ] as Point
             const { x, y } = apiPortPos.get(Number(apiPort.Id))!
             const angle = Math.round(rotationAngleInDegrees([x, y], circleAPos))
@@ -69,7 +69,7 @@ const setAndSavePortData = async (): Promise<void> => {
                 availableForAll: apiPort.AvailableForAll,
                 brLimit: apiPort.PortBattleBRLimit,
                 portPoints: apiPort.PortPoints,
-                portBattleType: apiPort.PortBattleType
+                portBattleType: apiPort.PortBattleType,
             }
         })
         // @ts-ignore
@@ -79,28 +79,28 @@ const setAndSavePortData = async (): Promise<void> => {
 }
 
 const getPBCircles = (portBattleZonePositions: PortPosition[]): Point[] =>
-    portBattleZonePositions.map(pbCircle => [
+    portBattleZonePositions.map((pbCircle) => [
         Math.trunc(convertCoordX(pbCircle.x, pbCircle.z)),
-        Math.trunc(convertCoordY(pbCircle.x, pbCircle.z))
+        Math.trunc(convertCoordY(pbCircle.x, pbCircle.z)),
     ])
 
 const getForts = (portElementsSlotGroups: PortElementsSlotGroupsEntity[]): Point[] =>
     portElementsSlotGroups
-        .filter(portElement => portElement.TemplateName === "Fort2")
+        .filter((portElement) => portElement.TemplateName === "Fort2")
         .flatMap((portElement): Point[] =>
-            portElement.PortElementsSlots.map(d => [
+            portElement.PortElementsSlots.map((d) => [
                 Math.trunc(convertCoordX(d.Position.x, d.Position.z)),
-                Math.trunc(convertCoordY(d.Position.x, d.Position.z))
+                Math.trunc(convertCoordY(d.Position.x, d.Position.z)),
             ])
         )
 
 const getTowers = (portElementsSlotGroups: PortElementsSlotGroupsEntity[]): Point[] =>
     portElementsSlotGroups
-        .filter(portElement => portElement.TemplateName !== "Fort2")
+        .filter((portElement) => portElement.TemplateName !== "Fort2")
         .flatMap((portElement): Point[] =>
-            portElement.PortElementsSlots.map(d => [
+            portElement.PortElementsSlots.map((d) => [
                 Math.trunc(convertCoordX(d.Position.x, d.Position.z)),
-                Math.trunc(convertCoordY(d.Position.x, d.Position.z))
+                Math.trunc(convertCoordY(d.Position.x, d.Position.z)),
             ])
         )
 
@@ -116,21 +116,21 @@ const getJoinCircle = (id: number, rotation: number): Point => {
 }
 
 const getRaidCircles = (portRaidZonePositions: PortPosition[]): Point[] =>
-    portRaidZonePositions.map(raidCircle => [
+    portRaidZonePositions.map((raidCircle) => [
         Math.trunc(convertCoordX(raidCircle.x, raidCircle.z)),
-        Math.trunc(convertCoordY(raidCircle.x, raidCircle.z))
+        Math.trunc(convertCoordY(raidCircle.x, raidCircle.z)),
     ])
 
 const getRaidPoints = (portRaidSpawnPoints: PortRaidSpawnPointsEntity[]): Point[] =>
-    portRaidSpawnPoints.map(raidPoint => [
+    portRaidSpawnPoints.map((raidPoint) => [
         Math.trunc(convertCoordX(raidPoint.Position.x, raidPoint.Position.z)),
-        Math.trunc(convertCoordY(raidPoint.Position.x, raidPoint.Position.z))
+        Math.trunc(convertCoordY(raidPoint.Position.x, raidPoint.Position.z)),
     ])
 
 const setAndSavePBZones = async (): Promise<void> => {
     const ports = apiPorts
-        .filter(port => !port.NonCapturable)
-        .map(port => {
+        .filter((port) => !port.NonCapturable)
+        .map((port) => {
             const { x, y } = apiPortPos.get(Number(port.Id))!
             return {
                 id: Number(port.Id),
@@ -140,7 +140,7 @@ const setAndSavePBZones = async (): Promise<void> => {
                 towers: getTowers(port.PortElementsSlotGroups),
                 joinCircle: getJoinCircle(Number(port.Id), Number(port.Rotation)),
                 raidCircles: getRaidCircles(port.PortRaidZonePositions),
-                raidPoints: getRaidPoints(port.PortRaidSpawnPoints)
+                raidPoints: getRaidPoints(port.PortRaidSpawnPoints),
             } as PbZone
         })
         // @ts-ignore
@@ -160,8 +160,8 @@ const setCountyFeature = (countyCapitalName: string, portPos: Point): void => {
         // noinspection DuplicatedCode
         if (counties.has(county)) {
             geoJsonCounties.features
-                .filter(countyFeature => countyFeature.id === county)
-                .some(countyFeature => countyFeature.geometry.coordinates.push(portPos))
+                .filter((countyFeature) => countyFeature.id === county)
+                .some((countyFeature) => countyFeature.geometry.coordinates.push(portPos))
         } else {
             counties.set(county, county)
 
@@ -170,8 +170,8 @@ const setCountyFeature = (countyCapitalName: string, portPos: Point): void => {
                 id: county,
                 geometry: {
                     type: "Polygon",
-                    coordinates: [portPos]
-                }
+                    coordinates: [portPos],
+                },
             } as FeaturesEntity
             geoJsonCounties.features.push(feature)
         }
@@ -187,8 +187,8 @@ const setRegionFeature = (location: string, portPos: Point): void => {
     // noinspection DuplicatedCode
     if (regions.has(location)) {
         geoJsonRegions.features
-            .filter(region => region.id === location)
-            .some(region => region.geometry.coordinates.push(portPos))
+            .filter((region) => region.id === location)
+            .some((region) => region.geometry.coordinates.push(portPos))
     } else {
         regions.set(location, location)
 
@@ -197,15 +197,15 @@ const setRegionFeature = (location: string, portPos: Point): void => {
             id: location,
             geometry: {
                 type: "Polygon",
-                coordinates: [portPos]
-            }
+                coordinates: [portPos],
+            },
         } as FeaturesEntity
         geoJsonRegions.features.push(feature)
     }
 }
 
 const setAndSaveCountyRegionData = async (): Promise<void> => {
-    apiPorts.forEach(apiPort => {
+    apiPorts.forEach((apiPort) => {
         const { x, y } = apiPortPos.get(Number(apiPort.Id))!
         setCountyFeature(apiPort.CountyCapitalName, [x, y])
         setRegionFeature(apiPort.Location, [x, y])
@@ -213,18 +213,18 @@ const setAndSaveCountyRegionData = async (): Promise<void> => {
     await saveJsonAsync(`${commonPaths.dirGenGeneric}/regions.json`, geoJsonRegions)
     await saveJsonAsync(`${commonPaths.dirGenGeneric}/counties.json`, geoJsonCounties)
 
-    geoJsonRegions.features.forEach(region => {
+    geoJsonRegions.features.forEach((region) => {
         region.geometry.type = "Point"
         region.geometry.coordinates = [
-            polylabel([region.geometry.coordinates], 1).map(coordinate => Math.trunc(coordinate)) as Point
+            polylabel([region.geometry.coordinates], 1).map((coordinate) => Math.trunc(coordinate)) as Point,
         ]
     })
     await saveJsonAsync(`${commonPaths.dirGenGeneric}/region-labels.json`, geoJsonRegions)
 
-    geoJsonCounties.features.forEach(county => {
+    geoJsonCounties.features.forEach((county) => {
         county.geometry.type = "Point"
         county.geometry.coordinates = [
-            polylabel([county.geometry.coordinates], 1).map(coordinate => Math.trunc(coordinate)) as Point
+            polylabel([county.geometry.coordinates], 1).map((coordinate) => Math.trunc(coordinate)) as Point,
         ]
     })
 
@@ -264,17 +264,15 @@ const getEquidistantPorts = async (): Promise<void> => {
 */
 
 export const convertGenericPortData = (): void => {
-    apiPorts = (readJson(
-        path.resolve(baseAPIFilename, `${serverNames[0]}-Ports-${serverDate}.json`)
-    ) as unknown) as APIPort[]
+    apiPorts = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-Ports-${serverDate}.json`))
 
     apiPortPos = new Map(
-        apiPorts.map(apiPort => [
+        apiPorts.map((apiPort) => [
             Number(apiPort.Id),
             {
                 x: Math.trunc(convertCoordX(apiPort.Position.x, apiPort.Position.z)),
-                y: Math.trunc(convertCoordY(apiPort.Position.x, apiPort.Position.z))
-            }
+                y: Math.trunc(convertCoordY(apiPort.Position.x, apiPort.Position.z)),
+            },
         ])
     )
 

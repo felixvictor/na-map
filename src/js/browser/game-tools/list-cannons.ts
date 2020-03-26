@@ -90,7 +90,7 @@ export default class ListCannons {
 
     _setupListener(): void {
         let firstClick = true
-        ;(document.querySelector(this._buttonId) as HTMLElement).addEventListener("click", async event => {
+        ;(document.querySelector(this._buttonId) as HTMLElement).addEventListener("click", async (event) => {
             if (firstClick) {
                 firstClick = false
                 await this._loadAndSetupData()
@@ -111,10 +111,7 @@ export default class ListCannons {
 
         const getColumnHeads = (groupValue: GroupObject): TemplateResult => html`
             ${Object.entries(groupValue[1].values).map(
-                modifierValue =>
-                    html`
-                        <th class="text-right">${capitalizeFirstLetter(modifierValue[0])}</th>
-                    `
+                (modifierValue) => html` <th class="text-right">${capitalizeFirstLetter(modifierValue[0])}</th> `
             )}
         `
 
@@ -123,13 +120,11 @@ export default class ListCannons {
             const nameSplit = name.split(" (")
 
             if (nameSplit.length > 1) {
-                nameConverted = html`
-                    ${nameSplit[0]}<br /><em>${nameSplit[1].replace(")", "")}</em>
-                `
+                nameConverted = html` ${nameSplit[0]}<br /><em>${nameSplit[1].replace(")", "")}</em> `
             }
 
             return html`
-                <th scope="row" class="text-right" data-sort="${parseInt(name, 10)}">
+                <th scope="row" class="text-right" data-sort="${Number.parseInt(name, 10)}">
                     ${nameConverted}
                 </th>
             `
@@ -142,7 +137,7 @@ export default class ListCannons {
                 }
 
                 return Object.entries(groupValue[1]).map(
-                    modifierValue =>
+                    (modifierValue) =>
                         html`
                             <td class="text-right" data-sort="${modifierValue[1].value ?? 0}">
                                 ${modifierValue[1]
@@ -162,7 +157,7 @@ export default class ListCannons {
                         ${repeat(
                             this._groups,
                             (groupValue, groupKey) => groupKey,
-                            groupValue => getColumnGroupHeads(groupValue)
+                            (groupValue) => getColumnGroupHeads(groupValue)
                         )}
                     </tr>
                     <tr data-sort-method="thead">
@@ -170,7 +165,7 @@ export default class ListCannons {
                         ${repeat(
                             this._groups,
                             (groupValue, groupKey) => groupKey,
-                            groupValue => getColumnHeads(groupValue)
+                            (groupValue) => getColumnHeads(groupValue)
                         )}
                     </tr>
                 </thead>
@@ -251,7 +246,7 @@ export default class ListCannons {
                 id: this._modalId,
                 title: this._baseName,
                 body: this._getModalBody.bind(this),
-                footer: this._getModalFooter
+                footer: this._getModalFooter,
             } as BaseModalHtml),
             document.querySelector("#modal-section") as HTMLElement
         )
