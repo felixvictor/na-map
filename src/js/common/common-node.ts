@@ -8,17 +8,15 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-export interface StringIdedObject {
-    Id: string
-    [key: string]: string | number | object | []
-}
+import "utility-types"
+import { ValuesType } from "utility-types"
 
 /**
  * Clean API name
  */
 export const cleanName = (name: string): string =>
     name
-        .replace(/u([\da-f]{4})/gi, match => String.fromCharCode(parseInt(match.replace(/u/g, ""), 16)))
+        .replace(/u([\da-f]{4})/gi, (match) => String.fromCharCode(Number.parseInt(match.replace(/u/g, ""), 16)))
         .replace(/'/g, "’")
         .replace(" oak", " Oak")
         .replace(" (S)", "\u202F(S)")
@@ -50,7 +48,10 @@ export const sortId = ({ Id: a }: StringIdedObject, { Id: b }: StringIdedObject)
 /**
  * Sort by a list of properties (in left-to-right order)
  */
-export const sortBy = (properties: string[]) => <T>(a: { [index: string]: T }, b: { [index: string]: T }): number => {
+export const sortBy = <T>(properties: string[]) => (
+    a: { [index: string]: ValuesType<T> },
+    b: { [index: string]: ValuesType<T> }
+): number => {
     let r = 0
     properties.some((property: string) => {
         let sign = 1
