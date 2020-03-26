@@ -13,13 +13,13 @@ import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/dropdown"
 
 import "bootstrap-select/js/bootstrap-select"
-import moment, {Moment} from "moment"
+import moment, { Moment } from "moment"
 import "tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4"
 import { DatetimepickerEvent, DatetimepickerOption } from "../../@types/tempusdominus-bootstrap-4"
 import "tempusdominus-core/build/js/tempusdominus-core"
 
 import { registerEvent } from "../analytics"
-import {Nation, nations, putImportError, range} from "../../common/common"
+import { Nation, nations, putImportError, range } from "../../common/common"
 import { HtmlString, initMultiDropdownNavbar } from "../../common/common-browser"
 import { formatInt, formatSiCurrency } from "../../common/common-format"
 import { Point } from "../../common/common-math"
@@ -27,18 +27,20 @@ import { simpleNumberSort, simpleStringSort, sortBy } from "../../common/common-
 import { serverMaintenanceHour } from "../../common/common-var"
 import {
     ConquestMarksPension,
-    FrontlinesPerServer, FrontLineValue, InventoryEntity,
+    FrontlinesPerServer,
+    FrontLineValue,
+    InventoryEntity,
     NationShortName,
     PbZone,
-    Port, PortBattleType,
-    PortWithTrades
+    Port,
+    PortBattleType,
+    PortWithTrades,
 } from "../../common/gen-json"
 import { NAMap } from "./na-map"
 import DisplayPorts from "./display-ports"
 import DisplayPbZones from "./display-pb-zones"
-import htmlString = JQuery.htmlString;
 
-type goodMap = Map<string, { name: string, nation: NationShortName, good: InventoryEntity }>
+type goodMap = Map<string, { name: string; nation: NationShortName; good: InventoryEntity }>
 type PortDepth = "deep" | "shallow"
 
 interface SelectPort {
@@ -72,7 +74,7 @@ export default class SelectPorts {
     private readonly _propCMSelector: HTMLSelectElement
     private isInventorySelected: boolean
     private _frontlinesData!: FrontlinesPerServer[]
-    private _nation!: NationShortName;
+    private _nation!: NationShortName
 
     constructor(ports: DisplayPorts, pbZone: DisplayPbZones, map: NAMap) {
         this._ports = ports
@@ -134,7 +136,7 @@ export default class SelectPorts {
             this._frontlineDefendingNationSelector,
             this._propNationSelector,
             this._propClanSelector,
-            this._propCMSelector
+            this._propCMSelector,
         ]) {
             // noinspection OverlyComplexBooleanExpressionJS
             if (
@@ -142,9 +144,7 @@ export default class SelectPorts {
                 !(selectSelector === this._propClanSelector && activeSelectSelector === this._propNationSelector) &&
                 !(selectSelector === this._propNationSelector && activeSelectSelector === this._propClanSelector)
             ) {
-                $(selectSelector)
-                    .val("default")
-                    .selectpicker("refresh")
+                $(selectSelector).val("default").selectpicker("refresh")
             }
         }
     }
@@ -168,7 +168,7 @@ export default class SelectPorts {
         $(this._portNamesSelector).one("show.bs.select", () => {
             this._injectPortSelect()
         })
-        this._portNamesSelector.addEventListener("change", event => {
+        this._portNamesSelector.addEventListener("change", (event) => {
             registerEvent("Menu", "Port relations")
             this._resetOtherSelects(this._portNamesSelector)
             this._portSelected()
@@ -178,14 +178,14 @@ export default class SelectPorts {
         $(this._buyGoodsSelector).one("show.bs.select", () => {
             this._injectGoodsSelect()
         })
-        this._buyGoodsSelector.addEventListener("change", event => {
+        this._buyGoodsSelector.addEventListener("change", (event) => {
             registerEvent("Menu", "Goods’ relations")
             this._resetOtherSelects(this._buyGoodsSelector)
             this._goodSelected()
             event.preventDefault()
         })
 
-        this._inventorySelector.addEventListener("change", event => {
+        this._inventorySelector.addEventListener("change", (event) => {
             registerEvent("Menu", "Inventory")
             this._resetOtherSelects(this._inventorySelector)
             this.inventorySelected()
@@ -195,7 +195,7 @@ export default class SelectPorts {
         $(this._frontlineAttackingNationSelector).one("loaded.bs.select", async () => {
             await this._loadData()
         })
-        this._frontlineAttackingNationSelector.addEventListener("change", event => {
+        this._frontlineAttackingNationSelector.addEventListener("change", (event) => {
             registerEvent("Menu", "Frontlines Attack")
             this._resetOtherSelects(this._frontlineAttackingNationSelector)
             this._frontlineAttackingNationSelected()
@@ -205,26 +205,26 @@ export default class SelectPorts {
         $(this._frontlineDefendingNationSelector).one("loaded.bs.select", async () => {
             await this._loadData()
         })
-        this._frontlineDefendingNationSelector.addEventListener("change", event => {
+        this._frontlineDefendingNationSelector.addEventListener("change", (event) => {
             registerEvent("Menu", "Frontlines Defence")
             this._resetOtherSelects(this._frontlineDefendingNationSelector)
             this._frontlineDefendingNationSelected()
             event.preventDefault()
         })
 
-        this._propNationSelector.addEventListener("change", event => {
+        this._propNationSelector.addEventListener("change", (event) => {
             this._resetOtherSelects(this._propNationSelector)
             this._nationSelected()
             event.preventDefault()
         })
 
-        this._propClanSelector.addEventListener("change", event => {
+        this._propClanSelector.addEventListener("change", (event) => {
             this._resetOtherSelects(this._propClanSelector)
             this._clanSelected()
             event.preventDefault()
         })
 
-        this._propCMSelector.addEventListener("change", event => {
+        this._propCMSelector.addEventListener("change", (event) => {
             this._resetOtherSelects(this._propCMSelector)
             this._CMSelected()
             event.preventDefault()
@@ -250,18 +250,18 @@ export default class SelectPorts {
                 previous: "icon icon-chevron-left",
                 next: "icon icon-chevron-right",
                 clear: "icon icon-clear",
-                close: "icon icon-close"
+                close: "icon icon-close",
             },
-            timeZone: "UTC"
+            timeZone: "UTC",
         })
 
         $("#prop-pb-from").datetimepicker({
-            format: this._timeFormat
+            format: this._timeFormat,
         } as DatetimepickerOption)
         $("#prop-pb-to").datetimepicker({
-            format: this._timeFormat
+            format: this._timeFormat,
         })
-        document.querySelector("#prop-pb-range")?.addEventListener("submit", event => {
+        document.querySelector("#prop-pb-range")?.addEventListener("submit", (event) => {
             this._capturePBRange()
             event.preventDefault()
         })
@@ -274,11 +274,11 @@ export default class SelectPorts {
         const portFrom = $("#prop-from")
         const portTo = $("#prop-to")
         portFrom.datetimepicker({
-            format: this._dateFormat
+            format: this._dateFormat,
         })
         portTo.datetimepicker({
             format: this._dateFormat,
-            useCurrent: false
+            useCurrent: false,
         })
         portFrom.on("change.datetimepicker", (event: DatetimepickerEvent) =>
             portTo.datetimepicker({ minDate: event.date })
@@ -287,7 +287,7 @@ export default class SelectPorts {
             portFrom.datetimepicker({ maxDate: event.date })
         )
 
-        document.querySelector("#prop-range")?.addEventListener("submit", event => {
+        document.querySelector("#prop-range")?.addEventListener("submit", (event) => {
             this._captureRange()
             event.preventDefault()
         })
@@ -303,7 +303,7 @@ export default class SelectPorts {
                         id: d.id,
                         coord: [d.coordinates[0], d.coordinates[1]],
                         name: d.name,
-                        nation: d.nation
+                        nation: d.nation,
                     } as SelectPort)
             )
             // @ts-ignore
@@ -329,7 +329,7 @@ export default class SelectPorts {
             liveSearchNormalize: true,
             liveSearchPlaceholder: "Search ...",
             title: "Show port relations",
-            virtualScroll: true
+            virtualScroll: true,
         } as BootstrapSelectOptions)
     }
 
@@ -348,7 +348,7 @@ export default class SelectPorts {
 
         const options = `${[...selectGoods]
             .sort(simpleStringSort)
-            .map(good => `<option>${good}</option>`)
+            .map((good) => `<option>${good}</option>`)
             .join("")}`
 
         this._buyGoodsSelector.insertAdjacentHTML("beforeend", options)
@@ -363,7 +363,7 @@ export default class SelectPorts {
             liveSearchNormalize: true,
             liveSearchPlaceholder: "Search ...",
             title: "Show goods’ relations",
-            virtualScroll: true
+            virtualScroll: true,
         } as BootstrapSelectOptions)
     }
 
@@ -381,7 +381,7 @@ export default class SelectPorts {
 
             const options = `${[...selectGoods]
                 .sort()
-                .map(good => `<option>${good}</option>`)
+                .map((good) => `<option>${good}</option>`)
                 .join("")}`
 
             this._inventorySelector.insertAdjacentHTML("beforeend", options)
@@ -392,7 +392,7 @@ export default class SelectPorts {
                 liveSearchNormalize: true,
                 liveSearchPlaceholder: "Search ...",
                 title: "Show good availability",
-                virtualScroll: true
+                virtualScroll: true,
             } as BootstrapSelectOptions)
         }
 
@@ -408,7 +408,7 @@ export default class SelectPorts {
     _getNationOptions(neutralPortsIncluded = true): string {
         return `${nations
             // Exclude neutral nation and free towns when neutralPortsIncluded is set
-            .filter(nation => !(!neutralPortsIncluded && (nation.short === "FT" || nation.short === "NT")))
+            .filter((nation) => !(!neutralPortsIncluded && (nation.short === "FT" || nation.short === "NT")))
             // @ts-ignore
             .sort(sortBy(["name"]))
             .map((nation: Nation): string => `<option value="${nation.short}">${nation.name}</option>`)
@@ -423,7 +423,7 @@ export default class SelectPorts {
         $(this._frontlineAttackingNationSelector).selectpicker({
             dropupAuto: false,
             liveSearch: false,
-            virtualScroll: true
+            virtualScroll: true,
         } as BootstrapSelectOptions)
 
         this._frontlineDefendingNationSelector.insertAdjacentHTML("beforeend", options)
@@ -431,7 +431,7 @@ export default class SelectPorts {
         $(this._frontlineDefendingNationSelector).selectpicker({
             dropupAuto: false,
             liveSearch: false,
-            virtualScroll: true
+            virtualScroll: true,
         } as BootstrapSelectOptions)
     }
 
@@ -443,13 +443,13 @@ export default class SelectPorts {
         $(this._propNationSelector).selectpicker({
             dropupAuto: false,
             liveSearch: false,
-            virtualScroll: true
+            virtualScroll: true,
         } as BootstrapSelectOptions)
     }
 
     _setupClanSelect(): void {
         const clanList = new Set<string>()
-        for (const d of this._ports.portData.filter(d => d.capturer)) {
+        for (const d of this._ports.portData.filter((d) => d.capturer)) {
             clanList.add(d.capturer)
         }
 
@@ -463,7 +463,7 @@ export default class SelectPorts {
             this._propClanSelector.disabled = false
             options = `${[...clanList]
                 .sort(simpleStringSort)
-                .map(clan => `<option value="${clan}" class="caps">${clan}</option>`)
+                .map((clan) => `<option value="${clan}" class="caps">${clan}</option>`)
                 .join("")}`
         }
 
@@ -472,7 +472,7 @@ export default class SelectPorts {
         $(this._propClanSelector).selectpicker({
             dropupAuto: false,
             liveSearch: false,
-            virtualScroll: true
+            virtualScroll: true,
         } as BootstrapSelectOptions)
     }
 
@@ -485,7 +485,7 @@ export default class SelectPorts {
 
         const options = `${[...cmList]
             .sort(simpleNumberSort)
-            .map(cm => `<option value="${cm}">${cm}</option>`)
+            .map((cm) => `<option value="${cm}">${cm}</option>`)
             .join("")}`
         this._propCMSelector.insertAdjacentHTML("beforeend", options)
         this._propCMSelector.classList.add("selectpicker")
@@ -493,25 +493,25 @@ export default class SelectPorts {
     }
 
     _setTradePortPartners(): void {
-        const tradePort = this._ports.portDataDefault.find(port => port.id === this._ports.tradePortId)
+        const tradePort = this._ports.portDataDefault.find((port) => port.id === this._ports.tradePortId)
 
-        const tradePortConsumedGoods = tradePort?.consumesTrading ? tradePort.consumesTrading.map(good => good) : []
-        const tradePortProducedGoods = tradePort?.dropsTrading ? tradePort.dropsTrading.map(good => good) : []
+        const tradePortConsumedGoods = tradePort?.consumesTrading ? tradePort.consumesTrading.map((good) => good) : []
+        const tradePortProducedGoods = tradePort?.dropsTrading ? tradePort.dropsTrading.map((good) => good) : []
 
         this._ports.portData = this._ports.portDataDefault
-            .map(port => {
+            .map((port) => {
                 port.goodsToBuyInTradePort = port.consumesTrading
-                    ? port.consumesTrading.filter(good => tradePortProducedGoods.includes(good)).map(good => good)
+                    ? port.consumesTrading.filter((good) => tradePortProducedGoods.includes(good)).map((good) => good)
                     : []
                 port.buyInTradePort = Boolean(port.goodsToBuyInTradePort.length)
                 port.goodsToSellInTradePort = port.dropsTrading
-                    ? port.dropsTrading.filter(good => tradePortConsumedGoods.includes(good)).map(good => good)
+                    ? port.dropsTrading.filter((good) => tradePortConsumedGoods.includes(good)).map((good) => good)
                     : []
                 port.sellInTradePort = Boolean(port.goodsToSellInTradePort.length)
 
                 return port
             })
-            .filter(port => port.id === this._ports.tradePortId || port.sellInTradePort || port.buyInTradePort)
+            .filter((port) => port.id === this._ports.tradePortId || port.sellInTradePort || port.buyInTradePort)
     }
 
     _portSelected(): void {
@@ -521,7 +521,7 @@ export default class SelectPorts {
 
         this._ports.currentPort = {
             id,
-            coord: { x: Number(c[0]), y: Number(c[1]) }
+            coord: { x: Number(c[0]), y: Number(c[1]) },
         }
         this._ports.tradePortId = id
 
@@ -541,23 +541,23 @@ export default class SelectPorts {
         const sourcePorts = JSON.parse(
             JSON.stringify(
                 this._ports.portDataDefault.filter(
-                    port =>
-                        (port.dropsTrading && port.dropsTrading.some(good => good === goodSelected)) ||
-                        (port.dropsNonTrading && port.dropsNonTrading.some(good => good === goodSelected)) ||
-                        (port.producesNonTrading && port.producesNonTrading.some(good => good === goodSelected))
+                    (port) =>
+                        (port.dropsTrading && port.dropsTrading.some((good) => good === goodSelected)) ||
+                        (port.dropsNonTrading && port.dropsNonTrading.some((good) => good === goodSelected)) ||
+                        (port.producesNonTrading && port.producesNonTrading.some((good) => good === goodSelected))
                 )
             )
-        ).map(port => {
+        ).map((port) => {
             port.isSource = true
             return port
         })
         const consumingPorts = JSON.parse(
             JSON.stringify(
                 this._ports.portDataDefault.filter(
-                    port => port.consumesTrading && port.consumesTrading.some(good => good === goodSelected)
+                    (port) => port.consumesTrading && port.consumesTrading.some((good) => good === goodSelected)
                 )
             )
-        ).map(port => {
+        ).map((port) => {
             port.isSource = false
             return port
         })
@@ -575,10 +575,10 @@ export default class SelectPorts {
         const buyGoods = new Map() as goodMap
         const sellGoods = new Map() as goodMap
         const portsFiltered = this._ports.portDataDefault
-            .filter(port => port.inventory && port.inventory.some(good => good.name === goodSelected))
+            .filter((port) => port.inventory && port.inventory.some((good) => good.name === goodSelected))
             .sort(sortBy(["name"]))
-            .map(port => {
-                const item = port.inventory.find(good => good.name === goodSelected)
+            .map((port) => {
+                const item = port.inventory.find((good) => good.name === goodSelected)
                 if (item) {
                     port.sellInTradePort = item.buyQuantity > 0
                     if (port.sellInTradePort) {
@@ -634,14 +634,12 @@ export default class SelectPorts {
         this._ports.update()
     }
 
-    _setFrontlinePorts(type:string, nation:NationShortName): void {
+    _setFrontlinePorts(type: string, nation: NationShortName): void {
         const ports = this._frontlinesData[type][nation] as FrontLineValue[]
-        const enemyPorts = new Set<number>(ports.map(frontlinePort => Number(frontlinePort.key)))
-        const ownPorts = new Set<number>(
-            ports.flatMap(frontlinePort => frontlinePort.value.map(d => d))
-        )
+        const enemyPorts = new Set<number>(ports.map((frontlinePort) => Number(frontlinePort.key)))
+        const ownPorts = new Set<number>(ports.flatMap((frontlinePort) => frontlinePort.value.map((d) => d)))
 
-        this._ports.portData = this._ports.portDataDefault.map(port => {
+        this._ports.portData = this._ports.portDataDefault.map((port) => {
             port.enemyPort = enemyPorts.has(port.id)
             port.ownPort = ownPorts.has(port.id)
             return port
@@ -673,7 +671,7 @@ export default class SelectPorts {
     _nationSelected(): void {
         this._nation = this._propNationSelector.options[this._propNationSelector.selectedIndex].value as NationShortName
 
-        this._ports.portData = this._ports.portDataDefault.filter(port => port.nation === this._nation)
+        this._ports.portData = this._ports.portDataDefault.filter((port) => port.nation === this._nation)
         this._ports.showRadius = ""
         this._ports.update()
         this._setupClanSelect()
@@ -684,17 +682,17 @@ export default class SelectPorts {
         const clan = this._propClanSelector.options[this._propClanSelector.selectedIndex].value
 
         if (clan) {
-            this._ports.portData = this._ports.portDataDefault.filter(port => port.capturer === clan)
+            this._ports.portData = this._ports.portDataDefault.filter((port) => port.capturer === clan)
         } else if (this._nation) {
-            this._ports.portData = this._ports.portDataDefault.filter(port => port.nation === this._nation)
+            this._ports.portData = this._ports.portDataDefault.filter((port) => port.nation === this._nation)
         }
 
         this._ports.showRadius = ""
         this._ports.update()
     }
 
-    _depthSelected(depth:PortDepth): void {
-        const portData = this._ports.portDataDefault.filter(d => (depth === "shallow" ? d.shallow : !d.shallow))
+    _depthSelected(depth: PortDepth): void {
+        const portData = this._ports.portDataDefault.filter((d) => (depth === "shallow" ? d.shallow : !d.shallow))
 
         this._ports.portData = portData
         this._ports.showRadius = ""
@@ -702,7 +700,7 @@ export default class SelectPorts {
     }
 
     _allSelected(): void {
-        const portData = this._ports.portDataDefault.filter(d => d.availableForAll)
+        const portData = this._ports.portDataDefault.filter((d) => d.availableForAll)
 
         this._ports.portData = portData
         this._ports.showRadius = ""
@@ -710,15 +708,15 @@ export default class SelectPorts {
     }
 
     _nonCapSelected(): void {
-        const portData = this._ports.portDataDefault.filter(d => d.nonCapturable)
+        const portData = this._ports.portDataDefault.filter((d) => d.nonCapturable)
 
         this._ports.portData = portData
         this._ports.showRadius = ""
         this._ports.update()
     }
 
-    _portSizeSelected(size:PortBattleType): void {
-        const portData = this._ports.portDataDefault.filter(d => size === d.portBattleType)
+    _portSizeSelected(size: PortBattleType): void {
+        const portData = this._ports.portDataDefault.filter((d) => size === d.portBattleType)
 
         this._ports.portData = portData
         this._ports.showRadius = ""
@@ -732,7 +730,7 @@ export default class SelectPorts {
         if (value === 0) {
             portData = this._ports.portDataDefault
         } else {
-            portData = this._ports.portDataDefault.filter(d => value === d.conquestMarksPension)
+            portData = this._ports.portDataDefault.filter((d) => value === d.conquestMarksPension)
         }
 
         this._ports.portData = portData
@@ -745,8 +743,14 @@ export default class SelectPorts {
         // 24 hours minus black-out hours
         const maxStartTime = 24 - (blackOutTimes.length + 1)
         const startTimes = new Set()
-        const begin = moment((document.querySelector("prop-pb-from-input") as HTMLSelectElement)?.value, this._timeFormat).hour()
-        let end = moment((document.querySelector("prop-pb-to-input") as HTMLSelectElement)?.value, this._timeFormat).hour()
+        const begin = moment(
+            (document.querySelector("prop-pb-from-input") as HTMLSelectElement)?.value,
+            this._timeFormat
+        ).hour()
+        let end = moment(
+            (document.querySelector("prop-pb-to-input") as HTMLSelectElement)?.value,
+            this._timeFormat
+        ).hour()
 
         // console.log("Between %d and %d", begin, end);
 
@@ -763,16 +767,16 @@ export default class SelectPorts {
         }
 
         const portData = this._ports.portDataDefault.filter(
-            d => !d.nonCapturable && d.nation !== "FT" && startTimes.has(d.portBattleStartTime)
+            (d) => !d.nonCapturable && d.nation !== "FT" && startTimes.has(d.portBattleStartTime)
         )
         this._ports.portData = portData
         this._ports.showRadius = ""
         this._ports.update()
     }
 
-    _filterCaptured(begin:Moment, end:Moment): void {
+    _filterCaptured(begin: Moment, end: Moment): void {
         // console.log("Between %s and %s", begin.format("dddd D MMMM YYYY H:mm"), end.format("dddd D MMMM YYYY H:mm"));
-        const portData = this._ports.portDataDefault.filter(port =>
+        const portData = this._ports.portDataDefault.filter((port) =>
             moment(port.lastPortBattle, "YYYY-MM-DD HH:mm").isBetween(begin, end, "hours", "(]")
         )
 
@@ -783,10 +787,7 @@ export default class SelectPorts {
 
     _capturedToday(): void {
         const now = moment.utc()
-        let begin = moment()
-            .utc()
-            .hour(serverMaintenanceHour)
-            .minute(0)
+        let begin = moment().utc().hour(serverMaintenanceHour).minute(0)
         if (now.hour() < begin.hour()) {
             begin = begin.subtract(1, "day")
         }
@@ -796,11 +797,7 @@ export default class SelectPorts {
 
     _capturedYesterday(): void {
         const now = moment.utc()
-        let begin = moment()
-            .utc()
-            .hour(serverMaintenanceHour)
-            .minute(0)
-            .subtract(1, "day")
+        let begin = moment().utc().hour(serverMaintenanceHour).minute(0).subtract(1, "day")
         if (now.hour() < begin.hour()) {
             begin = begin.subtract(1, "day")
         }
@@ -809,29 +806,19 @@ export default class SelectPorts {
     }
 
     _capturedThisWeek(): void {
-        const currentMondayOfWeek = moment()
-            .utc()
-            .startOf("week")
+        const currentMondayOfWeek = moment().utc().startOf("week")
         // This Monday
         const begin = currentMondayOfWeek.utc().hour(serverMaintenanceHour)
         // Next Monday
-        const end = moment(currentMondayOfWeek)
-            .utc()
-            .add(7, "day")
-            .hour(serverMaintenanceHour)
+        const end = moment(currentMondayOfWeek).utc().add(7, "day").hour(serverMaintenanceHour)
 
         this._filterCaptured(begin, end)
     }
 
     _capturedLastWeek(): void {
-        const currentMondayOfWeek = moment()
-            .utc()
-            .startOf("week")
+        const currentMondayOfWeek = moment().utc().startOf("week")
         // Monday last week
-        const begin = moment(currentMondayOfWeek)
-            .utc()
-            .subtract(7, "day")
-            .hour(serverMaintenanceHour)
+        const begin = moment(currentMondayOfWeek).utc().subtract(7, "day").hour(serverMaintenanceHour)
         // This Monday
         const end = currentMondayOfWeek.utc().hour(serverMaintenanceHour)
 
@@ -841,15 +828,8 @@ export default class SelectPorts {
     _captureRange(): void {
         const from = $("#prop-from").datetimepicker("viewDate")
         const to = $("#prop-to").datetimepicker("viewDate")
-        const begin = from
-            .utc()
-            .hour(serverMaintenanceHour)
-            .minute(0)
-        const end = to
-            .utc()
-            .add(1, "day")
-            .hour(serverMaintenanceHour)
-            .minute(0)
+        const begin = from.utc().hour(serverMaintenanceHour).minute(0)
+        const end = to.utc().add(1, "day").hour(serverMaintenanceHour).minute(0)
 
         this._filterCaptured(begin, end)
     }

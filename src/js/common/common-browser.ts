@@ -16,6 +16,7 @@ import { default as Tablesort } from "tablesort"
 import { degreesFullCircle } from "./common-math"
 
 // noinspection SpellCheckingInspection
+// eslint-disable-next-line one-var
 declare const CGREEN: string,
     CGREENDARK: string,
     CGREENLIGHT: string,
@@ -90,7 +91,7 @@ export const colourList = [
     "#4f0017",
     "#ff7a6b",
     "#422b00",
-    "#6f2400"
+    "#6f2400",
 ]
 
 /**
@@ -99,34 +100,28 @@ export const colourList = [
  * @param id - nav-item id
  */
 export const initMultiDropdownNavbar = (id: string): void => {
-    $(`#${id} .dropdown-menu .bootstrap-select .dropdown-toggle`).on("click", event => {
+    $(`#${id} .dropdown-menu .bootstrap-select .dropdown-toggle`).on("click", (event) => {
         const element = $(event.currentTarget)
         element.next(".dropdown-menu").toggleClass("show")
         element.parent("li").toggleClass("show")
-        element.parents("li.nav-item.dropdown.show").on("hidden.bs.dropdown", event2 => {
-            $(event2.currentTarget)
-                .find(".dropdown-menu.show")
-                .not(".inner")
-                .removeClass("show")
+        element.parents("li.nav-item.dropdown.show").on("hidden.bs.dropdown", (event2) => {
+            $(event2.currentTarget).find(".dropdown-menu.show").not(".inner").removeClass("show")
         })
 
         return false
     })
 
-    $(`#${id} div.dropdown.bootstrap-select`).on("hidden", event => {
+    $(`#${id} div.dropdown.bootstrap-select`).on("hidden", (event) => {
         // hide any open menus when parent closes
-        $(event.currentTarget)
-            .find(".dropdown-menu.show")
-            .not(".inner")
-            .removeClass("show")
+        $(event.currentTarget).find(".dropdown-menu.show").not(".inner").removeClass("show")
     })
 }
 
 const cleanNumber = (i: string): string => i.replace(/[^\d-.?]/g, "")
 
 const compareNumber = (a: string, b: string): number => {
-    let aa = parseFloat(a)
-    let bb = parseFloat(b)
+    let aa = Number.parseFloat(a)
+    let bb = Number.parseFloat(b)
 
     aa = Number.isNaN(aa) ? 0 : aa
     bb = Number.isNaN(bb) ? 0 : bb
@@ -138,9 +133,9 @@ export const initTablesort = (): void => {
     Tablesort.extend(
         "number",
         (item: string) =>
-            item.match(/^[+-]?[$¢£´Û€]?\d+\s*([,.]\d{0,2})/) || // Prefixed currency
-            item.match(/^[+-]?\d+\s*([,.]\d{0,2})?[$¢£´Û€]/) || // Suffixed currency
-            item.match(/^[+-]?(\d)*-?([,.])?-?(\d)+([,Ee][+-]\d+)?%?$/), // Number
+            /^[+-]?[$¢£´Û€]?\d+\s*([,.]\d{0,2})/.exec(item) ?? // Prefixed currency
+            /^[+-]?\d+\s*([,.]\d{0,2})?[$¢£´Û€]/.exec(item) ?? // Suffixed currency
+            /^[+-]?(\d)*-?([,.])?-?(\d)+([,Ee][+-]\d+)?%?$/.exec(item), // Number
         (a: string, b: string) => {
             const aa = cleanNumber(a)
             const bb = cleanNumber(b)
@@ -187,11 +182,7 @@ export const insertBaseModal = ({ id, title, size = "xl", buttonText = "Close" }
     const content = modal.append("div").attr("class", "modal-content")
 
     const header = content.append("header").attr("class", "modal-header")
-    header
-        .append("h5")
-        .attr("class", "modal-title")
-        .attr("id", `title-${id}`)
-        .html(title)
+    header.append("h5").attr("class", "modal-title").attr("id", `title-${id}`).html(title)
 
     content.append("div").attr("class", "modal-body")
 

@@ -122,8 +122,8 @@ function convertOwnership(): void {
 
         const numPorts = {} as NationList<number>
         nations
-            .filter(nation => nation.id !== 9)
-            .forEach(nation => {
+            .filter((nation) => nation.id !== 9)
+            .forEach((nation) => {
                 numPorts[nation.short] = 0
             })
 
@@ -134,7 +134,7 @@ function convertOwnership(): void {
             const getObject = (): OwnershipOverTime => ({
                 timeRange: [date, date],
                 val: nations[port.Nation].short,
-                labelVal: nations[port.Nation].sortName
+                labelVal: nations[port.Nation].sortName,
             })
 
             /**
@@ -145,7 +145,7 @@ function convertOwnership(): void {
                     name: cleanName(port.Name),
                     region: port.Location,
                     county: capitalToCounty.get(port.CountyCapitalName) ?? "",
-                    data: [getObject()]
+                    data: [getObject()],
                 })
             }
 
@@ -209,8 +209,8 @@ function convertOwnership(): void {
         const numPortsDate = {} as OwnershipNation
         numPortsDate.date = date
         nations
-            .filter(nation => nation.id !== 9)
-            .forEach(nation => {
+            .filter((nation) => nation.id !== 9)
+            .forEach((nation) => {
                 numPortsDate[nation.short] = numPorts[nation.short]
             })
         numPortsDates.push(numPortsDate)
@@ -227,14 +227,14 @@ function convertOwnership(): void {
             async (sequence, fileName) =>
                 sequence
                     .then(async () => readFileContent(fileName))
-                    .then(compressedContent => decompress(compressedContent))
-                    .then(decompressedContent => {
+                    .then((compressedContent) => decompress(compressedContent))
+                    .then((decompressedContent) => {
                         if (decompressedContent) {
                             const currentDate = (fileBaseNameRegex.exec(path.basename(fileName)) ?? [])[1]
                             parseData(JSON.parse(decompressedContent.toString()), currentDate)
                         }
                     })
-                    .catch(error => {
+                    .catch((error) => {
                         throw new Error(error)
                     }),
             Promise.resolve()
@@ -273,13 +273,13 @@ function convertOwnership(): void {
         // region
         // -- group (counties)
         //    -- label (ports)
-        const result = nested.map(region => {
+        const result = nested.map((region) => {
             const newRegion = {} as Ownership
             newRegion.region = region.key
-            newRegion.data = region.values.map(county => {
+            newRegion.data = region.values.map((county) => {
                 const group = {} as OwnershipGroup
                 group.group = county.key
-                group.data = county.values.map(port => {
+                group.data = county.values.map((port) => {
                     const label = {} as OwnershipLabel
                     label.label = port.name
                     label.data = port.data
@@ -295,10 +295,10 @@ function convertOwnership(): void {
     }
 
     readDirRecursive(commonPaths.dirAPI, [ignoreFileName])
-        .then(fileNames => sortFileNames(fileNames))
-        .then(async fileNames => processFiles(fileNames))
+        .then((fileNames) => sortFileNames(fileNames))
+        .then(async (fileNames) => processFiles(fileNames))
         .then(async () => writeResult())
-        .catch(error => {
+        .catch((error) => {
             throw new Error(error)
         })
 }
