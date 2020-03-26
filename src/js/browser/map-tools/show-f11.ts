@@ -30,17 +30,17 @@ import * as d3Zoom from "d3-zoom"
  * ShowF11
  */
 export default class ShowF11 {
-    private _map: NAMap
-    private _coord: MinMaxCoord
-    private _baseName: HtmlString
-    private _baseId: HtmlString
-    private _buttonId: HtmlString
-    private _modalId: HtmlString
-    private _formId: HtmlString
-    private _xInputId: HtmlString
-    private _zInputId: HtmlString
-    private _copyButtonId: HtmlString
-    private _submitButtonId: HtmlString
+    private readonly _map: NAMap
+    private readonly _coord: MinMaxCoord
+    private readonly _baseName: HtmlString
+    private readonly _baseId: HtmlString
+    private readonly _buttonId: HtmlString
+    private readonly _modalId: HtmlString
+    private readonly _formId: HtmlString
+    private readonly _xInputId: HtmlString
+    private readonly _zInputId: HtmlString
+    private readonly _copyButtonId: HtmlString
+    private readonly _submitButtonId: HtmlString
     private _modal$!: JQuery
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private _g!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, any>
@@ -68,9 +68,7 @@ export default class ShowF11 {
     }
 
     _setupSvg(): void {
-        this._g = d3Select<SVGSVGElement, SVGSVGDatum>("#na-svg")
-            .append("g")
-            .classed("f11", true)
+        this._g = d3Select<SVGSVGElement, SVGSVGDatum>("#na-svg").append("g").classed("f11", true)
     }
 
     _navbarClick(event: Event): void {
@@ -80,8 +78,8 @@ export default class ShowF11 {
     }
 
     _setupListener(): void {
-        document.getElementById(`${this._buttonId}`)?.addEventListener("click", event => this._navbarClick(event))
-        window.addEventListener("keydown", event => {
+        document.querySelector(`${this._buttonId}`)?.addEventListener("click", (event) => this._navbarClick(event))
+        window.addEventListener("keydown", (event) => {
             if (event.code === "F11" && event.shiftKey) {
                 this._navbarClick(event)
             }
@@ -92,21 +90,12 @@ export default class ShowF11 {
         insertBaseModal({ id: this._modalId, title: this._baseName, size: "sm" } as BaseModalPure)
 
         const body = d3Select(`#${this._modalId} .modal-body`)
-        const form = body
-            .append("form")
-            .attr("id", this._formId)
-            .attr("role", "form")
+        const form = body.append("form").attr("id", this._formId).attr("role", "form")
         this._formSel = form.node() as HTMLFormElement
 
-        form.append("div")
-            .classed("alert alert-primary", true)
-            .text("Use F11 in open world.")
+        form.append("div").classed("alert alert-primary", true).text("Use F11 in open world.")
 
-        const inputGroup1 = form
-            .append("div")
-            .classed("form-group", true)
-            .append("div")
-            .classed("input-group", true)
+        const inputGroup1 = form.append("div").classed("form-group", true).append("div").classed("input-group", true)
         inputGroup1.append("label").attr("for", this._xInputId)
         inputGroup1
             .append("input")
@@ -127,11 +116,7 @@ export default class ShowF11 {
             .classed("input-group-text", true)
             .text("k")
 
-        const inputGroup2 = form
-            .append("div")
-            .classed("form-group", true)
-            .append("div")
-            .classed("input-group", true)
+        const inputGroup2 = form.append("div").classed("form-group", true).append("div").classed("input-group", true)
         inputGroup2.append("label").attr("for", this._zInputId)
         inputGroup2
             .append("input")
@@ -156,10 +141,7 @@ export default class ShowF11 {
             .append("small")
             .html("In k units (divide by 1,000).<br>Example: <em>43</em> for value of <em>43,162.5</em>.")
 
-        const buttonGroup = form
-            .append("div")
-            .classed("float-right btn-group", true)
-            .attr("role", "group")
+        const buttonGroup = form.append("div").classed("float-right btn-group", true).attr("role", "group")
 
         const button = buttonGroup
             .append("button")
@@ -195,23 +177,23 @@ export default class ShowF11 {
         if (!this._modal$) {
             this._initModal()
             this._modal$ = $(`#${this._modalId}`)
-            this._xInputSel = document.getElementById(this._xInputId) as HTMLInputElement
-            this._zInputSel = document.getElementById(this._zInputId) as HTMLInputElement
+            this._xInputSel = document.querySelector(this._xInputId) as HTMLInputElement
+            this._zInputSel = document.querySelector(this._zInputId) as HTMLInputElement
             // Submit handler
-            this._formSel.addEventListener("submit", event => {
+            this._formSel.addEventListener("submit", (event) => {
                 this._modal$.modal("hide")
                 event.preventDefault()
                 this._useUserInput()
             })
 
             // Copy coordinates to clipboard (ctrl-c key event)
-            document.getElementById(this._modalId)?.addEventListener("keydown", (event): void => {
+            document.querySelector(this._modalId)?.addEventListener("keydown", (event): void => {
                 if (event.key === "KeyC" && event.ctrlKey) {
                     this._copyCoordClicked(event)
                 }
             })
             // Copy coordinates to clipboard (click event)
-            document.getElementById(this._copyButtonId)?.addEventListener("click", (event): void => {
+            document.querySelector(this._copyButtonId)?.addEventListener("click", (event): void => {
                 this._copyCoordClicked(event)
             })
         }

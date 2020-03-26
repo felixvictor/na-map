@@ -99,6 +99,7 @@ interface DatetimepickerOption {
     widgetPositioning?: WidgetPositioningOptions
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 export interface DatetimepickerEvent extends JQuery.Event {
     date: Moment
 }
