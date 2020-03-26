@@ -24,7 +24,7 @@
         "docs:sass": "sassdoc src/scss -d ./doc-sass",
         "lint": "run-s lint:*",
         "lint:css": "stylelint --config .stylelintrc --syntax scss \"src/scss/*.scss\"",
-        "lint:js": "eslint -c .eslintrc.json --ext .js,.jsx,.ts,.tsx src/js",
+        "lint:js": "eslint -c .eslintrc.json --ext .ts,.tsx src/js",
         "main:between": "                     run-s            'build:data:twitter partial-server' build:deploy-main-quiet",
         "main:development": "                 run-s build:load 'build:data:* full-client'          build:deploy-main",
         "main:maintenance": "yarn --silent && run-s build:load 'build:data:* full-server'          build:deploy-main",
