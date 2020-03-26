@@ -16,7 +16,7 @@ export interface Server {
 
 const servers = [
     { id: "eu1", name: "War", type: "PVP" },
-    { id: "eu2", name: "Peace", type: "PVE" }
+    { id: "eu2", name: "Peace", type: "PVE" },
 ]
 
 module.exports = servers

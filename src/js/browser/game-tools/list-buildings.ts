@@ -54,7 +54,7 @@ export default class ListBuildings {
 
     _setupListener(): void {
         let firstClick = true
-        ;(document.querySelector(this._buttonId) as HTMLElement).addEventListener("click", async event => {
+        ;(document.querySelector(this._buttonId) as HTMLElement).addEventListener("click", async (event) => {
             if (firstClick) {
                 firstClick = false
                 await this._loadAndSetupData()
@@ -71,12 +71,8 @@ export default class ListBuildings {
         const id = `${this._baseId}-select`
         const body = d3Select(`#${this._modalId} .modal-body`)
         body.append("label").attr("for", id)
-        body.append("select")
-            .attr("name", id)
-            .attr("id", id)
-        body.append("div")
-            .attr("id", `${this._baseId}`)
-            .attr("class", "container-fluid")
+        body.append("select").attr("name", id).attr("id", id)
+        body.append("div").attr("id", `${this._baseId}`).attr("class", "container-fluid")
     }
 
     _getOptions(): string {
@@ -120,7 +116,7 @@ export default class ListBuildings {
     }
 
     _getBuildingData(selectedBuildingName: string): Building {
-        return this._buildingData.filter(building => building.name === selectedBuildingName)[0]
+        return this._buildingData.filter((building) => building.name === selectedBuildingName)[0]
     }
 
     _getProductText(currentBuilding: Building): string {
@@ -164,7 +160,7 @@ export default class ListBuildings {
             for (const level of currentBuilding.levels) {
                 const i = currentBuilding.levels.indexOf(level)
                 text += `<tr><td>${i + 1}</td><td class="text-left">`
-                text += level.materials.map(material => `${formatInt(material.amount)} ${material.item}`).join("<br>")
+                text += level.materials.map((material) => `${formatInt(material.amount)} ${material.item}`).join("<br>")
                 text += "</td>"
                 text += `<td>${formatInt(level.price)}</td>`
                 text += "</tr>"
@@ -221,9 +217,7 @@ export default class ListBuildings {
         d3Select(`#${this._baseId} div`).remove()
 
         // Add new recipe list
-        d3Select(`#${this._baseId}`)
-            .append("div")
-            .classed("buildings mt-4", true)
+        d3Select(`#${this._baseId}`).append("div").classed("buildings mt-4", true)
         d3Select(`#${this._baseId} div`).html(this._getText(building))
     }
 }

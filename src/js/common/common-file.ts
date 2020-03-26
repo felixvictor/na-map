@@ -15,7 +15,6 @@ import { promisify } from "util"
 
 import { apiBaseFiles, serverNames } from "./common-var"
 import { baseAPIFilename, serverStartDate } from "./common-dir"
-import { StringIdedObject } from "./common-node"
 
 const execP = promisify(exec)
 
@@ -40,7 +39,6 @@ export const saveTextFile = (fileName: string, data: any): void =>
 export const readTextFile = (fileName: string): string => {
     let data = ""
     try {
-        // noinspection JSCheckFunctionSignatures
         data = fs.readFileSync(fileName, { encoding: "utf8" })
     } catch (error) {
         if (error.code === "ENOENT") {
@@ -54,13 +52,13 @@ export const readTextFile = (fileName: string): string => {
 }
 
 // export const readJson = (fileName: string): Record<string, string | number>[] => JSON.parse(readTextFile(fileName))
-export const readJson = (fileName: string): StringIdedObject[] => JSON.parse(readTextFile(fileName))
+export const readJson = <T>(fileName: string): T => JSON.parse(readTextFile(fileName)) as T
 
 /**
  * {@link https://stackoverflow.com/a/57708635}
  */
 const fileExistsAsync = async (fileName: string): Promise<boolean> =>
-    !!(await fs.promises.stat(fileName).catch(() => false))
+    Boolean(await fs.promises.stat(fileName).catch(() => false))
 
 export const xzAsync = async (command: string, fileName: string): Promise<boolean> => {
     const fileExists = await fileExistsAsync(fileName)
@@ -68,6 +66,7 @@ export const xzAsync = async (command: string, fileName: string): Promise<boolea
     if (fileExists) {
         await execP(`${command} ${fileName}`)
     }
+
     return true
 }
 
