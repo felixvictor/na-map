@@ -25,7 +25,7 @@ import {
     Price,
     PriceStandardWood,
     PriceSeasonedWood,
-    BuildingWithResult
+    BuildingWithResult,
 } from "../common/gen-json"
 
 const idWorkshop = 450
@@ -33,7 +33,7 @@ const idAcademy = 879
 const idSeasoningShed = 2291
 const idDoubloons = 989
 const idTools = 1825
-const obsoleteBuildings = [
+const obsoleteBuildings = new Set([
     "Compass Wood Forest",
     "Copper Ore Mine",
     "Gold Mine",
@@ -42,17 +42,17 @@ const obsoleteBuildings = [
     "Saltpeter Cave",
     "Silver Mine",
     "Sulphur Mine",
-    "Tobacco Plantation"
-]
+    "Tobacco Plantation",
+])
 
 let apiItems: APIItemGeneric[]
 
 const getItemsCrafted = (buildingId: number): BuildingResult[] =>
     apiItems
-        .filter(item => item.BuildingRequirements?.[0]?.BuildingTemplate === buildingId)
-        .map(recipe => ({
+        .filter((item) => item.BuildingRequirements?.[0]?.BuildingTemplate === buildingId)
+        .map((recipe) => ({
             name: cleanName(recipe.Name).replace(" Blueprint", ""),
-            price: 0
+            price: 0,
         }))
         .sort((a, b) => a.name.localeCompare(b.name))
 
@@ -66,32 +66,32 @@ const getItemsCraftedBySeasoningShed = (): BuildingResult[] => getItemsCrafted(i
 const getBuildings = (): Building[] => {
     const buildings = new Map()
     const buildingResources = new Map<number, BuildingResult>(
-        apiItems.map(apiResource => [
+        apiItems.map((apiResource) => [
             Number(apiResource.Id),
-            { name: cleanName(apiResource.Name), price: apiResource.BasePrice }
+            { name: cleanName(apiResource.Name), price: apiResource.BasePrice },
         ])
     )
 
     const apiRecipeResources = (apiItems.filter(
-        item => item.ItemType === "RecipeResource"
+        (item) => item.ItemType === "RecipeResource"
     ) as unknown) as APIRecipeResource[]
 
     const resourceRecipes = new Map<number, BuildingBatch>(
-        apiRecipeResources.map(recipe => [
+        apiRecipeResources.map((recipe) => [
             recipe.Results[0].Template,
             {
                 price: recipe.GoldRequirements,
                 amount: recipe.Results[0].Amount,
-                labour: recipe.LaborPrice
-            }
+                labour: recipe.LaborPrice,
+            },
         ])
     )
 
     const apiBuilding = apiItems.filter(
-        item => item.ItemType === "Building" && (!obsoleteBuildings.includes(item.Name) as unknown)
+        (item) => item.ItemType === "Building" && (!obsoleteBuildings.has(item.Name) as unknown)
     ) as APIBuilding[]
 
-    apiBuilding.forEach(apiBuilding => {
+    apiBuilding.forEach((apiBuilding) => {
         const building: Building = {
             id: Number(apiBuilding.Id),
             name: cleanName(apiBuilding.Name),
@@ -99,7 +99,7 @@ const getBuildings = (): Building[] => {
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 buildingResources.get(
                     apiBuilding.ProduceResource ? apiBuilding.ProduceResource : apiBuilding.RequiredPortResource
-                )!
+                )!,
             ],
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             batch: resourceRecipes.get(apiBuilding.RequiredPortResource)!,
@@ -112,11 +112,11 @@ const getBuildings = (): Building[] => {
                     materials: level.UpgradePriceMaterials.map(
                         (material: TemplateEntity): BuildingMaterialsEntity => ({
                             item: buildingResources.get(material.Template)?.name ?? "",
-                            amount: material.Amount
+                            amount: material.Amount,
                         })
-                    )
+                    ),
                 })
-            )
+            ),
         }
 
         // Ignore double entries
@@ -154,7 +154,7 @@ const getBuildings = (): Building[] => {
 
 const getAPISeasonedItem = (name: string): APIRecipeResource =>
     (apiItems.find(
-        item =>
+        (item) =>
             item.ItemType === "Recipe" &&
             item.Name.replace(" Log", "") === name.replace(/\s/g, " ").replace("White Oak", "White oak")
     ) as unknown) as APIRecipeResource
@@ -162,7 +162,7 @@ const getAPISeasonedItem = (name: string): APIRecipeResource =>
 const getPrices = (buildings: Building[]): Price => {
     const prices: Price = { standard: [], seasoned: [] }
     const getStandardPrices = (name: string): number | undefined =>
-        prices.standard.find(standardItem => standardItem.name === name.replace(" (S)", ""))?.real
+        prices.standard.find((standardItem) => standardItem.name === name.replace(" (S)", ""))?.real
 
     prices.standard = (buildings.filter(
         (building: Building) => building.result && building.result[0] && building.result[0].price
@@ -173,7 +173,7 @@ const getPrices = (buildings: Building[]): Price => {
                 return {
                     name: result.name.replace(" Log", ""),
                     real: result.price,
-                    labour: building?.batch?.labour ?? 0
+                    labour: building?.batch?.labour ?? 0,
                 }
             }
         )
@@ -190,11 +190,11 @@ const getPrices = (buildings: Building[]): Price => {
                     real: getStandardPrices(name) ?? 0,
                     labour: apiSeasonedItem.LaborPrice,
                     doubloon:
-                        apiSeasonedItem.FullRequirements.find(requirement => requirement.Template === idDoubloons)
+                        apiSeasonedItem.FullRequirements.find((requirement) => requirement.Template === idDoubloons)
                             ?.Amount ?? 0,
                     tool:
-                        apiSeasonedItem.FullRequirements.find(requirement => requirement.Template === idTools)
-                            ?.Amount ?? 0
+                        apiSeasonedItem.FullRequirements.find((requirement) => requirement.Template === idTools)
+                            ?.Amount ?? 0,
                 }
             }
         )
@@ -210,14 +210,12 @@ const convertBuildings = async (): Promise<void> => {
     await saveJsonAsync(commonPaths.filePrices, prices)
 
     // @ts-ignore
-    buildings = buildings.filter(building => Object.keys(building).length).sort(sortBy(["id"]))
+    buildings = buildings.filter((building) => Object.keys(building).length).sort(sortBy(["id"]))
     await saveJsonAsync(commonPaths.fileBuilding, buildings)
 }
 
 export const convertBuildingData = async (): Promise<void> => {
-    apiItems = (readJson(
-        path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`)
-    ) as unknown) as APIItemGeneric[]
+    apiItems = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`))
 
     await convertBuildings()
 }

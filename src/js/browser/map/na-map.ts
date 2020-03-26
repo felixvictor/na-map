@@ -123,7 +123,7 @@ class NAMap {
          */
         this.coord = {
             min: 0, // Minimum world coordinate
-            max: 8192 // Maximum world coordinate
+            max: 8192, // Maximum world coordinate
         }
 
         this._tileSize = 256
@@ -144,7 +144,7 @@ class NAMap {
 
         this._doubleClickActionCookie = new Cookie({
             id: this._doubleClickActionId,
-            values: this._doubleClickActionValues
+            values: this._doubleClickActionValues,
         })
         this._doubleClickActionRadios = new RadioButton(this._doubleClickActionId, this._doubleClickActionValues)
 
@@ -307,9 +307,9 @@ class NAMap {
             .translateExtent([
                 [
                     this.coord.min - this.yGridBackgroundWidth * this.minScale,
-                    this.coord.min - this.xGridBackgroundHeight * this.minScale
+                    this.coord.min - this.xGridBackgroundHeight * this.minScale,
                 ],
-                [this.coord.max, this.coord.max]
+                [this.coord.max, this.coord.max],
             ])
             .scaleExtent([this.minScale, this._maxScale])
             .on("zoom", () => this._naZoomed())
@@ -386,7 +386,7 @@ class NAMap {
                     z: tileZoom,
                     row,
                     col,
-                    id: `${tileZoom.toString()}-${row.toString()}-${col.toString()}`
+                    id: `${tileZoom.toString()}-${row.toString()}-${col.toString()}`,
                 } as Tile)
             }
         }
@@ -400,13 +400,13 @@ class NAMap {
         this._gMap
             .attr("transform", transform.toString())
             .selectAll<HTMLImageElement, Tile>("image")
-            .data(tiles, d => d.id)
-            .join(enter =>
+            .data(tiles, (d) => d.id)
+            .join((enter) =>
                 enter
                     .append("image")
-                    .attr("xlink:href", d => `images/map/${d.z}/${d.row}/${d.col}.webp`)
-                    .attr("x", d => d.col * this._tileSize)
-                    .attr("y", d => d.row * this._tileSize)
+                    .attr("xlink:href", (d) => `images/map/${d.z}/${d.row}/${d.col}.webp`)
+                    .attr("x", (d) => d.col * this._tileSize)
+                    .attr("y", (d) => d.row * this._tileSize)
                     .attr("width", this._tileSize + 1)
                     .attr("height", this._tileSize + 1)
             )
@@ -419,9 +419,7 @@ class NAMap {
         this._ports.clearMap()
         this._portSelect.clearMap()
         this.showTrades.clearMap()
-        $(".selectpicker")
-            .val("default")
-            .selectpicker("refresh")
+        $(".selectpicker").val("default").selectpicker("refresh")
     }
 
     _showAbout(): void {
@@ -488,7 +486,7 @@ class NAMap {
          */
         this._currentTranslate = {
             x: Math.floor(d3Selection.event.transform.x),
-            y: Math.floor(d3Selection.event.transform.y)
+            y: Math.floor(d3Selection.event.transform.y),
         } as d3Zoom.ZoomTransform
 
         /**
