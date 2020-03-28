@@ -10,11 +10,14 @@
 
 // https://jvilk.com/MakeTypes/
 
+import { ValuesType } from "utility-types"
+
 /****************************
  * Items
  */
 
 export interface APIItemGeneric {
+    [index: string]: ValuesType<APIItemGeneric>
     __type: string
     Name: string
     Id: number
@@ -348,6 +351,7 @@ interface PortBonusesEntity {
  */
 
 export interface APIBuilding {
+    [index: string]: ValuesType<APIItemGeneric>
     __type: "MegaChaka.Services.Items.BuildingTemplate, MegaChaka"
     Name: string
     Id: number
@@ -403,6 +407,7 @@ export interface APIBuilding {
  */
 
 export interface APIRecipe {
+    [index: string]: ValuesType<APIItemGeneric>
     Name: string
     Id: number
     NotUsed: boolean

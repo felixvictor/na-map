@@ -15,8 +15,12 @@ import { default as nodeFetch } from "node-fetch"
 import { baseAPIFilename, serverStartDate as serverDate } from "../common/common-dir"
 import { apiBaseFiles, serverNames } from "../common/common-var"
 import { saveJsonAsync, xzAsync } from "../common/common-file"
-import { sortId } from "../common/common-node"
+import { sortBy } from "../common/common-node"
+import { APIItemGeneric } from "./api-item"
+import { APIPort } from "./api-port"
+import { APIShop } from "./api-shop"
 
+type APIType = APIItemGeneric | APIPort | APIShop
 const sourceBaseUrl = "https://storage.googleapis.com/"
 const sourceBaseDir = "nacleanopenworldprodshards"
 const serverBaseName = "cleanopenworldprod"
@@ -27,7 +31,7 @@ const serverBaseName = "cleanopenworldprod"
  * @param fileName - File name
  */
 const deleteFile = (fileName: string): void => {
-    fs.unlink(fileName, error => {
+    fs.unlink(fileName, (error) => {
         if (error && error.code !== "ENOENT") {
             throw new Error(`Error deleteFile: ${error.message}`)
         }
@@ -47,13 +51,12 @@ const deleteAPIFiles = (fileName: string): void => {
  * Download Naval Action API data
  * @param url - Download url
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const readNAJson = async (url: URL): Promise<Error | any> => {
+const readNAJson = async (url: URL): Promise<Error | APIType[]> => {
     try {
         const response = await nodeFetch(url)
         if (response.ok) {
             const text = (await response.text()).replace(/^var .+ = /, "").replace(/;$/, "")
-            return JSON.parse(text)
+            return JSON.parse(text) as APIType[]
         }
 
         return new Error(`Cannot load ${url.href}: ${response.statusText}`)
@@ -67,13 +70,15 @@ const readNAJson = async (url: URL): Promise<Error | any> => {
  */
 const getAPIDataAndSave = async (serverName: string, apiBaseFile: string, outfileName: string): Promise<boolean> => {
     const url = new URL(`${sourceBaseUrl}${sourceBaseDir}/${apiBaseFile}_${serverBaseName}${serverName}.json`)
-    const data = await readNAJson(url)
+    const data: Error | APIType[] = await readNAJson(url)
 
     if (data instanceof Error) {
         throw data
     }
 
-    await data.sort(sortId)
+    data.sort(
+        sortBy<APIType>(["Id"])
+    )
     await saveJsonAsync(outfileName, data)
     await xzAsync("xz", outfileName)
 
