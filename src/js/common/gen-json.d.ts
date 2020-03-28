@@ -12,6 +12,7 @@
 
 import { ModifiersEntity } from "../node/api-item"
 import { Point } from "./common-math"
+import { ValuesType } from "utility-types"
 
 /****************************
  * buildings.json
@@ -274,18 +275,21 @@ export interface PortBasic {
     portBattleType: PortBattleType
 }
 
-export interface Port
-    extends PortBasic,
-        PortPerServer,
-        PortBattlePerServer,
-        ObjectIndexer<undefined | boolean | number | string | Point | Array<string | InventoryEntity>> {}
+type PortIntersection =
+    | ValuesType<PortWithTrades>
+    | ValuesType<Port>
+    | ValuesType<PortBasic>
+    | ValuesType<PortPerServer>
+    | ValuesType<PortBattlePerServer>
+export interface Port extends PortBasic, PortPerServer, PortBattlePerServer {}
+
 export interface PortWithTrades extends Port {
     tradePortId: number
     goodsToBuyInTradePort?: string[]
     buyInTradePort: boolean
     goodsToSellInTradePort?: string[]
     sellInTradePort: boolean
-    distance?: number
+    distance: number
 }
 
 /****************************
@@ -293,8 +297,10 @@ export interface PortWithTrades extends Port {
  */
 
 export type ConquestMarksPension = 1 | 3
-export interface PortPerServer
-    extends ObjectIndexer<undefined | boolean | number | string | Point | Array<string | InventoryEntity>> {
+export type TradingCompany = 0 | 1 | 2
+export type LaborHoursDiscount = 0 | 1 | 2
+export interface PortPerServer {
+    [index: string]: PortIntersection
     id: number
     portBattleStartTime: number
     nonCapturable: boolean
@@ -302,8 +308,8 @@ export interface PortPerServer
     portTax: number
     taxIncome: number
     netIncome: number
-    tradingCompany: 0 | 1 | 2
-    laborHoursDiscount: 0 | 1 | 2
+    tradingCompany: TradingCompany
+    laborHoursDiscount: LaborHoursDiscount
     dropsTrading?: string[]
     consumesTrading?: string[]
     producesNonTrading?: string[]
@@ -605,6 +611,7 @@ export interface FrontlinesPerServer {
 interface Attacking extends NationListOptional<FrontLineValue> {}
 interface Defending extends NationListOptional<FrontLineValue> {}
 export interface FrontLineValue {
+    [index: string]: ValuesType<FrontLineValue>
     key: string
     value: number[]
 }
