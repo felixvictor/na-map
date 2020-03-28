@@ -23,7 +23,7 @@ import { distanceMapSize, serverNames } from "../common/common-var"
 import { APIItemGeneric } from "./api-item"
 import { APIPort } from "./api-port"
 import { APIShop } from "./api-shop"
-import { NationList, PortBattlePerServer, PortPerServer, Trade } from "../common/gen-json"
+import { InventoryEntity, NationList, PortBattlePerServer, PortPerServer, Trade } from "../common/gen-json"
 
 interface Item {
     name: string
@@ -111,17 +111,22 @@ const setPortFeaturePerServer = (apiPort: APIPort): void => {
                 ),
             ],
             inventory: portShop.RegularItems.filter((good) => itemNames.get(good.TemplateId)?.itemType !== "Cannon")
-                .map((good) => ({
-                    name: itemNames.get(good.TemplateId)?.name,
-                    buyQuantity: good.Quantity === -1 ? good.BuyContractQuantity : good.Quantity,
-                    buyPrice: Math.round(good.BuyPrice * (1 + apiPort.PortTax)),
-                    sellPrice: Math.round(good.SellPrice / (1 + apiPort.PortTax)),
-                    sellQuantity:
-                        good.SellContractQuantity === -1
-                            ? getPriceTierQuantity(good.TemplateId)
-                            : good.SellContractQuantity,
-                }))
-                .sort((a, b) => (a.name && b.name ? a.name.localeCompare(b.name) : 0)),
+                .map(
+                    (good) =>
+                        ({
+                            name: itemNames.get(good.TemplateId)?.name,
+                            buyQuantity: good.Quantity === -1 ? good.BuyContractQuantity : good.Quantity,
+                            buyPrice: Math.round(good.BuyPrice * (1 + apiPort.PortTax)),
+                            sellPrice: Math.round(good.SellPrice / (1 + apiPort.PortTax)),
+                            sellQuantity:
+                                good.SellContractQuantity === -1
+                                    ? getPriceTierQuantity(good.TemplateId)
+                                    : good.SellContractQuantity,
+                        } as InventoryEntity)
+                )
+                .sort(
+                    sortBy<InventoryEntity>(["name"])
+                ),
         } as PortPerServer
         // Delete empty entries
         for (const type of ["dropsTrading", "consumesTrading", "producesNonTrading", "dropsNonTrading"]) {
@@ -182,19 +187,24 @@ const setAndSaveTradeData = async (serverName: string): Promise<void> => {
 const ticks = 621355968000000000
 const setAndSavePortBattleData = async (serverName: string): Promise<void> => {
     const pb = apiPorts
-        .map((port) => ({
-            id: Number(port.Id),
-            name: cleanName(port.Name),
+        .map(
+            (port) =>
+                ({
+                    id: Number(port.Id),
+                    name: cleanName(port.Name),
 
-            nation: nations[port.Nation].short,
-            capturer: port.Capturer,
-            lastPortBattle: dayjs((port.LastPortBattle - ticks) / 10000).format("YYYY-MM-DD HH:mm"),
-            attackerNation: "",
-            attackerClan: "",
-            attackHostility: 0,
-            portBattle: "",
-        }))
-        .sort(sortBy(["id"])) as PortBattlePerServer[]
+                    nation: nations[port.Nation].short,
+                    capturer: port.Capturer,
+                    lastPortBattle: dayjs((port.LastPortBattle - ticks) / 10000).format("YYYY-MM-DD HH:mm"),
+                    attackerNation: "",
+                    attackerClan: "",
+                    attackHostility: 0,
+                    portBattle: "",
+                } as PortBattlePerServer)
+        )
+        .sort(
+            sortBy<PortBattlePerServer>(["id"])
+        )
     await saveJsonAsync(path.resolve(commonPaths.dirGenServer, `${serverName}-pb.json`), pb)
 }
 
@@ -216,12 +226,12 @@ const setAndSaveFrontlines = async (serverName: string): Promise<void> => {
 
     interface FANPort {
         key: string // From/To port id
-        value: FANValue[]
+        values: FANValue[]
     }
 
     interface FDNPort {
         key: number // From port id
-        value: number[] // Port ids
+        values: number[] // Port ids
     }
 
     const outNations = new Set(["NT"])
@@ -258,18 +268,18 @@ const setAndSaveFrontlines = async (serverName: string): Promise<void> => {
                 )
 
             frontlineAttackingNationGroupedByToPort[nationShortName] = d3Collection
-                .nest()
+                .nest<DistanceExtended, number[]>()
                 // .key((d: DistanceExtended) => `${d.toPortId} ${d.toPortName}`)
-                .key((d: DistanceExtended) => String(d.toPortId))
+                .key((d) => String(d.toPortId))
                 // .rollup((values: DistanceExtended[]) => values.map(value => [value.fromPortId, value.fromPortName, value.distance]))
-                .rollup((values: DistanceExtended[]) => values.map((value) => value.fromPortId))
+                .rollup((values) => values.map((value) => value.fromPortId))
                 .entries(frontlinesFrom)
 
             frontlineAttackingNationGroupedByFromPort[nationShortName] = d3Collection
-                .nest()
+                .nest<DistanceExtended, FANValue[]>()
                 // .key((d: DistanceExtended) => `${d.fromPortId} ${d.fromPortName}`)
-                .key((d: DistanceExtended) => d.fromPortId)
-                .rollup((values: DistanceExtended[]) =>
+                .key((d) => String(d.toPortId))
+                .rollup((values) =>
                     values.map(
                         (value) =>
                             ({
@@ -281,10 +291,10 @@ const setAndSaveFrontlines = async (serverName: string): Promise<void> => {
                 .entries(frontlinesFrom)
         })
 
-    const frontlineDefendingNationMap = new Map()
+    const frontlineDefendingNationMap: Map<string, Set<string>> = new Map()
     for (const attackingNation of Object.keys(frontlineAttackingNationGroupedByFromPort)) {
         for (const fromPort of frontlineAttackingNationGroupedByFromPort[attackingNation]) {
-            for (const toPort of fromPort.value) {
+            for (const toPort of fromPort.values) {
                 const key = String(toPort.nation) + String(toPort.id)
                 let fromPorts = frontlineDefendingNationMap.get(key)
                 if (fromPorts) {
@@ -306,7 +316,7 @@ const setAndSaveFrontlines = async (serverName: string): Promise<void> => {
             frontlineDefendingNation[nationShortName] = []
         }
 
-        frontlineDefendingNation[nationShortName].push({ key: toPortId, value: [...fromPorts].map(Number) })
+        frontlineDefendingNation[nationShortName].push({ key: toPortId, values: [...fromPorts].map(Number) })
         // frontlineDefendingNation[nationShortName].push({ key: toPortId, value: [...fromPorts] });
     }
 

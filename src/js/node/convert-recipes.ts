@@ -17,6 +17,12 @@ import { serverNames } from "../common/common-var"
 import { APIItemGeneric, APIRecipeModuleResource, APIRecipeResource, APIShipUpgradeBookItem } from "./api-item"
 import { Recipe, RecipeEntity } from "../common/gen-json"
 
+interface Ingredient {
+    id: number
+    name: string
+    recipeNames: string[]
+}
+
 let apiItems: APIItemGeneric[]
 
 // noinspection SpellCheckingInspection
@@ -30,12 +36,12 @@ const groups = new Map([
     ["Cannons", "Repairs"],
     ["Exchange", "Exchange"],
     ["Manufacturing", "Manufacturing"],
-    ["WoodWorking", "Cannons"]
+    ["WoodWorking", "Cannons"],
 ])
 
 const convertRecipes = async (): Promise<void> => {
     const data = {} as Recipe
-    const ingredients = new Map()
+    const ingredients = new Map<number, Ingredient>()
 
     data.recipe = []
     data.ingredient = []
@@ -44,38 +50,38 @@ const convertRecipes = async (): Promise<void> => {
      * Get item names
      */
     const getItemNames = (): Map<number, string> =>
-        new Map(apiItems.filter(item => !item.NotUsed).map(item => [item.Id, cleanName(item.Name)]))
+        new Map(apiItems.filter((item) => !item.NotUsed).map((item) => [item.Id, cleanName(item.Name)]))
 
     const itemNames = getItemNames()
 
     const getModuleNames = (): Map<number, string> =>
         new Map(
             ((apiItems.filter(
-                item => item.ItemType === "ShipUpgradeBookItem"
-            ) as unknown) as APIShipUpgradeBookItem[]).map(item => [item.Id, itemNames.get(item.Upgrade) ?? ""])
+                (item) => item.ItemType === "ShipUpgradeBookItem"
+            ) as unknown) as APIShipUpgradeBookItem[]).map((item) => [item.Id, itemNames.get(item.Upgrade) ?? ""])
         )
 
     const moduleNames = getModuleNames()
 
-    const getIngredients = (): Map<number, number> =>
+    const getIngredientIds = (): Map<number, number> =>
         new Map(
             apiItems
                 .filter(
-                    item =>
+                    (item) =>
                         !item.NotUsed &&
                         (item.ItemType === "ShipUpgradeBookItem" || item.SortingGroup === "Resource.Trading")
                 )
-                .map(item => [item.Id, item.Id])
+                .map((item) => [item.Id, item.Id])
         )
 
-    const ingredientIds = getIngredients()
+    const ingredientIds = getIngredientIds()
 
     const getUpgradeIds = (): Map<number, number> =>
-        new Map(apiItems.filter(item => !item.NotUsed && item.Upgrade).map(item => [item.Id, item.Upgrade ?? 0]))
+        new Map(apiItems.filter((item) => !item.NotUsed && item.Upgrade).map((item) => [item.Id, item.Upgrade ?? 0]))
 
     const upgradeIds = getUpgradeIds()
     ;(apiItems.filter(
-        apiRecipe => (apiRecipe.ItemType === "Recipe" || apiRecipe.ItemType === "RecipeModule") && !apiRecipe.NotUsed
+        (apiRecipe) => (apiRecipe.ItemType === "Recipe" || apiRecipe.ItemType === "RecipeModule") && !apiRecipe.NotUsed
     ) as APIRecipeResource[] | APIRecipeModuleResource[]).forEach(
         (apiRecipe: APIRecipeResource | APIRecipeModuleResource) => {
             const resultReference =
@@ -93,30 +99,30 @@ const convertRecipes = async (): Promise<void> => {
                     typeof apiRecipe.Results[0] === "undefined" ? "" : moduleNames.get(apiRecipe.Results[0].Template),
                 labourPrice: apiRecipe.LaborPrice,
                 goldPrice: apiRecipe.GoldRequirements,
-                itemRequirements: apiRecipe.FullRequirements.map(requirement => ({
+                itemRequirements: apiRecipe.FullRequirements.map((requirement) => ({
                     name: itemNames.get(requirement.Template),
-                    amount: requirement.Amount
+                    amount: requirement.Amount,
                 })),
                 result: {
                     id: upgradeIds.has(resultReference.Template)
                         ? upgradeIds.get(resultReference.Template)
                         : resultReference.Template,
                     name: itemNames.get(resultReference.Template),
-                    amount: resultReference.Amount
+                    amount: resultReference.Amount,
                 },
                 craftGroup: groups.has(apiRecipe.CraftGroup) ? groups.get(apiRecipe.CraftGroup) : apiRecipe.CraftGroup,
-                serverType: apiRecipe.ServerType
+                serverType: apiRecipe.ServerType,
             } as RecipeEntity
             // if result exists
             if (recipe.result.name) {
                 data.recipe.push(recipe)
             }
 
-            apiRecipe.FullRequirements.filter(APIingredient => ingredientIds.has(APIingredient.Template)).forEach(
-                apiIngredient => {
+            apiRecipe.FullRequirements.filter((APIingredient) => ingredientIds.has(APIingredient.Template)).forEach(
+                (apiIngredient) => {
                     const recipeName = recipe.module ? recipe.module : recipe.name.replace(" Blueprint", "")
                     if (ingredients.has(apiIngredient.Template)) {
-                        const updatedIngredient = ingredients.get(apiIngredient.Template)
+                        const updatedIngredient = ingredients.get(apiIngredient.Template)!
                         updatedIngredient.recipeNames.push(recipeName)
                         updatedIngredient.recipeNames.sort(simpleStringSort)
                         ingredients.set(apiIngredient.Template, updatedIngredient)
@@ -124,8 +130,8 @@ const convertRecipes = async (): Promise<void> => {
                         const ingredient = {
                             id: apiIngredient.Template,
                             name: itemNames.get(apiIngredient.Template),
-                            recipeNames: [recipeName]
-                        }
+                            recipeNames: [recipeName],
+                        } as Ingredient
                         ingredients.set(apiIngredient.Template, ingredient)
                     }
                 }
@@ -143,9 +149,7 @@ const convertRecipes = async (): Promise<void> => {
 }
 
 export const convertRecipeData = (): void => {
-    apiItems = (readJson(
-        path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`)
-    ) as unknown) as APIItemGeneric[]
+    apiItems = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`))
 
     // noinspection JSIgnoredPromiseFromCall
     convertRecipes()
