@@ -23,12 +23,12 @@ import RadioButton from "../util/radio-button"
 import DisplayPorts from "./display-ports"
 
 export default class DisplayPbZones {
+    showPB: string
     private readonly _ports!: DisplayPorts
     private readonly _showId: string
     private readonly _showValues: string[]
     private readonly _showCookie: Cookie
     private readonly _showRadios: RadioButton
-    private _showPB: string
     private _isDataLoaded: boolean
     private _pbZonesDefault!: PbZone[]
     private _lowerBound!: Bound
@@ -61,7 +61,7 @@ export default class DisplayPbZones {
         /**
          * Get showLayer setting from cookie or use default value
          */
-        this._showPB = this._getShowPBSetting()
+        this.showPB = this._getShowPBSetting()
 
         this._isDataLoaded = false
 
@@ -107,9 +107,9 @@ export default class DisplayPbZones {
     }
 
     _showPBZonesSelected(): void {
-        this._showPB = this._showRadios.get()
+        this.showPB = this._showRadios.get()
 
-        this._showCookie.set(this._showPB)
+        this._showCookie.set(this.showPB)
         this._refreshPBZones()
     }
 
@@ -208,15 +208,15 @@ export default class DisplayPbZones {
 
     _isPortIn(d: PbZone): boolean {
         return (
-            this._showPB === "pb-all" ||
-            this._showPB === "raid-all" ||
-            ((this._showPB === "pb-single" || this._showPB === "raid-single") &&
+            this.showPB === "pb-all" ||
+            this.showPB === "raid-all" ||
+            ((this.showPB === "pb-single" || this.showPB === "raid-single") &&
                 Number(d.id) === this._ports.currentPort.id)
         )
     }
 
     _setData(): void {
-        if (this._ports.zoomLevel === "pbZone" && this._showPB !== "off") {
+        if (this._ports.zoomLevel === "pbZone" && this.showPB !== "off") {
             if (this._isDataLoaded) {
                 this._filterVisible()
             } else {
@@ -245,7 +245,7 @@ export default class DisplayPbZones {
 
         this._defencesFiltered = portsFiltered.map((port) => ({ id: port.id, forts: port.forts, towers: port.towers }))
 
-        if (this._showPB === "pb-all" || this._showPB === "pb-single") {
+        if (this.showPB === "pb-all" || this.showPB === "pb-single") {
             this._pbZonesFiltered = portsFiltered.map((port) => ({
                 id: port.id,
                 pbCircles: port.pbCircles,

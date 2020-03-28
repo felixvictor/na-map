@@ -72,7 +72,6 @@ const setAndSavePortData = async (): Promise<void> => {
                 portBattleType: apiPort.PortBattleType,
             }
         })
-        // @ts-ignore
         .sort(sortBy(["id"]))
 
     await saveJsonAsync(commonPaths.filePort, ports)
@@ -143,7 +142,6 @@ const setAndSavePBZones = async (): Promise<void> => {
                 raidPoints: getRaidPoints(port.PortRaidSpawnPoints),
             } as PbZone
         })
-        // @ts-ignore
         .sort(sortBy(["id"]))
 
     await saveJsonAsync(commonPaths.filePbZone, ports)
