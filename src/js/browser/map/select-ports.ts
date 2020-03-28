@@ -31,11 +31,11 @@ import {
     FrontLineValue,
     InventoryEntity,
     NationShortName,
-    PbZone,
     Port,
     PortBattleType,
-    PortWithTrades,
-} from "../../common/gen-json"
+    PortIntersection, PortPerServerTrade,
+    PortWithTrades
+} from "../../common/gen-json";
 import { NAMap } from "./na-map"
 import DisplayPorts from "./display-ports"
 import DisplayPbZones from "./display-pb-zones"
@@ -44,6 +44,7 @@ type goodMap = Map<string, { name: string; nation: NationShortName; good: Invent
 type PortDepth = "deep" | "shallow"
 
 interface SelectPort {
+    [index: string]: PortIntersection
     id: number
     coord: Point
     name: string
@@ -334,7 +335,7 @@ export default class SelectPorts {
     }
 
     _injectGoodsSelect(): void {
-        const selectGoods = new Set()
+        const selectGoods = new Set<string>()
         const types = ["consumesTrading", "dropsTrading", "dropsNonTrading", "producesNonTrading"]
         for (const port of this._ports.portDataDefault) {
             for (const type of types) {
@@ -369,7 +370,7 @@ export default class SelectPorts {
 
     setupInventorySelect(show: boolean): void {
         if (!this._inventorySelector.classList.contains("selectpicker")) {
-            const selectGoods = new Set()
+            const selectGoods = new Set<string>()
 
             for (const port of this._ports.portDataDefault) {
                 if (port.inventory) {
@@ -409,7 +410,6 @@ export default class SelectPorts {
         return `${nations
             // Exclude neutral nation and free towns when neutralPortsIncluded is set
             .filter((nation) => !(!neutralPortsIncluded && (nation.short === "FT" || nation.short === "NT")))
-            // @ts-ignore
             .sort(sortBy(["name"]))
             .map((nation: Nation): string => `<option value="${nation.short}">${nation.name}</option>`)
             .join("")}`
@@ -527,7 +527,7 @@ export default class SelectPorts {
 
         this._setTradePortPartners()
 
-        if (this._pbZone._showPBZones) {
+        if (this._pbZone.showPB) {
             this._pbZone.refresh()
         }
 
@@ -538,7 +538,7 @@ export default class SelectPorts {
 
     _goodSelected(): void {
         const goodSelected = this._buyGoodsSelector.options[this._buyGoodsSelector.selectedIndex].value
-        const sourcePorts = JSON.parse(
+        const sourcePorts = (JSON.parse(
             JSON.stringify(
                 this._ports.portDataDefault.filter(
                     (port) =>
@@ -547,17 +547,17 @@ export default class SelectPorts {
                         (port.producesNonTrading && port.producesNonTrading.some((good) => good === goodSelected))
                 )
             )
-        ).map((port) => {
+        ) as PortWithTrades[]).map((port) => {
             port.isSource = true
             return port
         })
-        const consumingPorts = JSON.parse(
+        const consumingPorts = (JSON.parse(
             JSON.stringify(
                 this._ports.portDataDefault.filter(
                     (port) => port.consumesTrading && port.consumesTrading.some((good) => good === goodSelected)
                 )
             )
-        ).map((port) => {
+        ) as PortWithTrades[]).map((port) => {
             port.isSource = false
             return port
         })
@@ -594,8 +594,8 @@ export default class SelectPorts {
                 return port
             })
 
-        const getPortList = (): htmlString => {
-            let h = ""
+        const getPortList = (): HtmlString => {
+            let h: HtmlString = ""
 
             h += `<h5>${goodSelected}</h5>`
             if (buyGoods.size) {

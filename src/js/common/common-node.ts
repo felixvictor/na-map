@@ -8,9 +8,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import "utility-types"
-import { ValuesType } from "utility-types"
-
 /**
  * Clean API name
  */
@@ -40,18 +37,9 @@ export const simpleStringSort = (a: string | undefined, b: string | undefined): 
 export const simpleNumberSort = (a: number | undefined, b: number | undefined): number => (a && b ? a - b : 0)
 
 /**
- * Sort of Id a and b as numbers
- */
-
-export const sortId = ({ Id: a }: StringIdedObject, { Id: b }: StringIdedObject): number => Number(a) - Number(b)
-
-/**
  * Sort by a list of properties (in left-to-right order)
  */
-export const sortBy = <T>(properties: string[]) => (
-    a: { [index: string]: ValuesType<T> },
-    b: { [index: string]: ValuesType<T> }
-): number => {
+export const sortBy = <T>(properties: string[]) => (a: T, b: T): number => {
     let r = 0
     properties.some((property: string) => {
         let sign = 1
@@ -62,11 +50,8 @@ export const sortBy = <T>(properties: string[]) => (
             property = property.slice(1)
         }
 
-        if (a[property] < b[property]) {
-            r = -sign
-        } else if (a[property] > b[property]) {
-            r = sign
-        }
+        // @ts-ignore
+        r = a[property].localecompare(b[property]) * sign // eslint-disable @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
 
         return r !== 0
     })
