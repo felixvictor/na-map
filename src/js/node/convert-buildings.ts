@@ -64,7 +64,7 @@ const getItemsCraftedBySeasoningShed = (): BuildingResult[] => getItemsCrafted(i
  * Convert API building data and save sorted as JSON
  */
 const getBuildings = (): Building[] => {
-    const buildings = new Map()
+    const buildings = new Map<string, Building>()
     const buildingResources = new Map<number, BuildingResult>(
         apiItems.map((apiResource) => [
             Number(apiResource.Id),
@@ -88,7 +88,7 @@ const getBuildings = (): Building[] => {
     )
 
     const apiBuilding = apiItems.filter(
-        (item) => item.ItemType === "Building" && (!obsoleteBuildings.has(item.Name) as unknown)
+        (item) => item.ItemType === "Building" && !obsoleteBuildings.has(item.Name)
     ) as APIBuilding[]
 
     apiBuilding.forEach((apiBuilding) => {
@@ -96,12 +96,10 @@ const getBuildings = (): Building[] => {
             id: Number(apiBuilding.Id),
             name: cleanName(apiBuilding.Name),
             result: [
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 buildingResources.get(
                     apiBuilding.ProduceResource ? apiBuilding.ProduceResource : apiBuilding.RequiredPortResource
                 )!,
             ],
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             batch: resourceRecipes.get(apiBuilding.RequiredPortResource)!,
             levels: apiBuilding.Levels.map(
                 (level: LevelsEntity): BuildingLevelsEntity => ({
