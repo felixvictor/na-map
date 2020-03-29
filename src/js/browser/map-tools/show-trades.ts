@@ -9,43 +9,89 @@
  */
 
 /// <reference types="bootstrap" />
+
 import "bootstrap/js/dist/util"
-/// <reference types="bootstrap" />
 import "bootstrap/js/dist/collapse"
-/// <reference types="bootstrap" />
 import "bootstrap/js/dist/tooltip"
+
 import "bootstrap-select/js/bootstrap-select"
 import { extent as d3Extent } from "d3-array"
 import { scaleLinear as d3ScaleLinear, scalePoint as d3ScalePoint } from "d3-scale"
 import { select as d3Select } from "d3-selection"
+import * as d3Zoom from "d3-zoom"
 
-import { nations } from "../../common/interfaces"
-import { putImportError, roundToThousands } from "../util"
+import { nations, putImportError } from "../../common/common"
+import { Bound, HtmlString } from "../../common/common-browser"
+import { formatInt, formatSiCurrency, formatSiInt } from "../../common/common-format"
+import { defaultFontSize, roundToThousands } from "../../common/common-math"
 import Cookie from "../util/cookie"
 import RadioButton from "../util/radio-button"
-import { defaultFontSize } from "../../common/common-math";
-import { formatInt, formatSiCurrency, formatSiInt } from "../../common/common-format";
+
+import SelectPorts from "../map/select-ports"
+import { DivDatum, SVGGDatum, SVGSVGDatum } from "../../common/interface"
+import * as d3Selection from "d3-selection"
+import { NationShortName, PortBasic, PortBattlePerServer, PortWithTrades, Trade } from "../../common/gen-json"
+
+interface Node {
+    name: string
+    nation: NationShortName
+    isShallow: boolean
+    x: number
+    y: number
+}
 
 /**
  * Show trades
  */
 export default class ShowTrades {
-    /**
-     * @param {string} serverName - Server name
-     * @param {object} portSelect - portSelect
-     * @param {number} minScale - Minimal scale
-     * @param {Bound} lowerBound - Top left coordinates of current viewport
-     * @param {Bound} upperBound - Bottom right coordinates of current viewport
-     */
-    constructor(serverName, portSelect, minScale, lowerBound, upperBound) {
+    private readonly _serverName: string
+    private readonly _portSelect: SelectPorts
+    private _isDataLoaded: boolean
+    private readonly _minScale: number
+    private _scale: number
+    private readonly _fontSize: number
+    private readonly _numTrades: number
+    private readonly _arrowX: number
+    private readonly _arrowY: number
+    private readonly _baseId: HtmlString
+    private readonly _nationSelectId: HtmlString
+    private _listType: string
+    private readonly _showId: HtmlString
+    private readonly _showRadioValues: string[]
+    private readonly _showCookie: Cookie
+    private readonly _showRadios: RadioButton
+    private readonly _profitId: HtmlString
+    private readonly _profitRadioValues: string[]
+    private readonly _profitCookie: Cookie
+    private readonly _profitRadios: RadioButton
+    private show: boolean
+    private _profitValue: string
+    private _lowerBound!: Bound
+    private _upperBound!: Bound
+    private _profitText!: string
+
+    private _g!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, any>
+    private _labelG!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, any>
+    private _tradeDetailsDiv!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, any>
+    private _tradeDetailsHead!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, any>
+    private _nationSelector!: HTMLSelectElement
+    private _list!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, any>
+    private _linkDataDefault!: Trade[]
+    private _linkData!: Trade[]
+    private _portData!: PortWithTrades[]
+    private _nodeData!: Map<number, Node>
+    private _linkDataFiltered!: Trade[]
+    private _portDataFiltered!: Set<number>
+
+    constructor(serverName: string, portSelect: SelectPorts, minScale: number, lowerBound: Bound, upperBound: Bound) {
         this._serverName = serverName
         this._portSelect = portSelect
-
-        this._isDataLoaded = false
 
         this._minScale = minScale
         this._scale = this._minScale
         this._fontSize = defaultFontSize
+
+        this._isDataLoaded = false
 
         this._numTrades = 30
 
@@ -60,20 +106,16 @@ export default class ShowTrades {
 
         /**
          * Possible values for show trade radio buttons (first is default value)
-         * @type {string[]}
-         * @private
          */
         this._showRadioValues = ["off", "on"]
 
         /**
          * Show trade cookie
-         * @type {Cookie}
          */
         this._showCookie = new Cookie({ id: this._showId, values: this._showRadioValues })
 
         /**
          * Show trade radio buttons
-         * @type {RadioButton}
          */
         this._showRadios = new RadioButton(this._showId, this._showRadioValues)
 
@@ -81,8 +123,6 @@ export default class ShowTrades {
 
         /**
          * Possible values for profit radio buttons (first is default value)
-         * @type {string[]}
-         * @private
          */
         this._profitRadioValues = ["weight", "distance", "total"]
 
@@ -91,7 +131,6 @@ export default class ShowTrades {
 
         /**
          * Get show value from cookie or use default value
-         * @type {string}
          */
         this.show = this._getShowValue()
 
@@ -108,15 +147,58 @@ export default class ShowTrades {
 
         /**
          * Get profit value from cookie or use default value
-         * @type {string}
          */
         this._profitValue = this._getProfitValue()
     }
 
-    _setupSvg() {
-        this._g = d3Select("#na-svg")
-            .insert("g", "g.pb")
-            .attr("class", "trades")
+    static _getId(link: Trade): HtmlString {
+        return `trade-${link.source.id}-${link.good.replace(/ /g, "")}-${link.target.id}`
+    }
+
+    static _addInfo(text: string): HtmlString {
+        return `<div><div>${text}</div>`
+    }
+
+    static _addDes(text: string): HtmlString {
+        return `<div class="des">${text}</div></div>`
+    }
+
+    static _getDepth(isShallow: boolean): string {
+        return isShallow ? "(shallow)" : "(deep)"
+    }
+
+    static _getProfitPerWeight(trade: Trade): number {
+        return trade.weightPerItem === 0
+            ? trade.profitTotal
+            : Math.round(trade.profitTotal / (trade.weightPerItem * trade.quantity))
+    }
+
+    static _getProfitPerDistance(trade: Trade): number {
+        return trade.profitTotal / trade.distance
+    }
+
+    static _startBlock(text: string): HtmlString {
+        return `<div class="block-block"><span>${text}</span>`
+    }
+
+    static _endBlock(): HtmlString {
+        return "</div>"
+    }
+
+    static _hideDetails(d: Trade, i: number, nodes: SVGPathElement[] | d3Selection.ArrayLike<SVGPathElement>) {
+        $(d3Select(nodes[i]).node()).tooltip("dispose")
+    }
+
+    static _showElem(elem: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, any>): void {
+        elem.classed("d-none", false)
+    }
+
+    static _hideElem(elem: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, any>): void {
+        elem.classed("d-none", true)
+    }
+
+    _setupSvg(): void {
+        this._g = d3Select<SVGSVGElement, SVGSVGDatum>("#na-svg").insert("g", "g.pb").attr("class", "trades")
         this._labelG = this._g.append("g")
 
         d3Select("#na-svg defs")
@@ -132,15 +214,15 @@ export default class ShowTrades {
             .attr("d", `M0,0L0,${this._arrowY}L${this._arrowX},${this._arrowY / 2}z`)
             .attr("class", "trade-arrow-head")
 
-        this._tradeDetailsDiv = d3Select("main #summary-column")
+        this._tradeDetailsDiv = d3Select<HTMLDivElement, DivDatum>("main #summary-column")
             .append("div")
             .attr("id", "trade-details")
             .attr("class", "trade-details")
     }
 
-    _setupSelects() {
+    _setupSelects(): void {
         const options = `${nations
-            .map(nation => `<option value="${nation.short}" selected>${nation.name}</option>`)
+            .map((nation) => `<option value="${nation.short}" selected>${nation.name}</option>`)
             .join("")}`
         const cardId = `${this._baseId}-card`
 
@@ -153,7 +235,7 @@ export default class ShowTrades {
             .property("multiple", true)
             .attr("class", "selectpicker")
 
-        this._nationSelector = select.node()
+        this._nationSelector = select.node()!
         this._nationSelector.insertAdjacentHTML("beforeend", options)
         $(this._nationSelector).selectpicker({
             actionsBox: true,
@@ -163,12 +245,12 @@ export default class ShowTrades {
                 if (amount === nations.length) {
                     text = "All"
                 } else {
-                    text = amount
+                    text = String(amount)
                 }
 
                 return `${text} nations selected`
             },
-            title: "Select nations"
+            title: "Select nations",
         })
 
         label
@@ -193,15 +275,12 @@ export default class ShowTrades {
             )
     }
 
-    _setupProfitRadios() {
+    _setupProfitRadios(): void {
         const profitRadioGroup = this._tradeDetailsHead
             .append("div")
             .attr("id", this._profitId)
             .attr("class", "align-self-center radio-group pl-2")
-        profitRadioGroup
-            .append("legend")
-            .attr("class", "col-form-label")
-            .text("Sort net profit by")
+        profitRadioGroup.append("legend").attr("class", "col-form-label").text("Sort net profit by")
 
         for (const button of this._profitRadioValues) {
             const id = `${this._profitId}-${button.replace(/ /g, "")}`
@@ -216,47 +295,44 @@ export default class ShowTrades {
                 .attr("class", "custom-control-input")
                 .attr("value", button)
 
-            div.append("label")
-                .attr("for", id)
-                .attr("class", "custom-control-label")
-                .text(button)
+            div.append("label").attr("for", id).attr("class", "custom-control-label").text(button)
         }
     }
 
-    _setupListener() {
-        document.getElementById(this._showId).addEventListener("change", () => this._showSelected())
-        document.getElementById(this._profitId).addEventListener("change", () => this._profitValueSelected())
-        this._nationSelector.addEventListener("change", event => {
+    _setupListener(): void {
+        document.querySelector(this._showId)?.addEventListener("change", async () => this._showSelected())
+        document.querySelector(this._profitId)?.addEventListener("change", () => this._profitValueSelected())
+        this._nationSelector.addEventListener("change", (event) => {
             this._nationChanged()
             event.preventDefault()
         })
     }
 
-    _setupList() {
+    _setupList(): void {
         this._list = this._tradeDetailsDiv.append("div").attr("class", "trade-list small")
     }
 
-    _setupData() {
+    _setupData(): void {
         this._linkData = this._linkDataDefault
-        this._nodeData = new Map(
-            this._portData.map(port => [
+        this._nodeData = new Map<number, Node>(
+            this._portData.map((port) => [
                 port.id,
                 {
                     name: port.name,
                     nation: port.nation,
                     isShallow: port.shallow,
                     x: port.coordinates[0],
-                    y: port.coordinates[1]
-                }
+                    y: port.coordinates[1],
+                } as Node,
             ])
         )
         this._filterPortsBySelectedNations()
         this._sortLinkData()
     }
 
-    _sortLinkData() {
+    _sortLinkData(): void {
         this._linkData = this._linkData
-            .map(trade => {
+            .map((trade) => {
                 let profit = 0
                 switch (this._profitValue) {
                     case "weight":
@@ -278,7 +354,7 @@ export default class ShowTrades {
             .sort((a, b) => b.profit - a.profit)
     }
 
-    async _showSelected() {
+    async _showSelected(): Promise<void> {
         const show = this._showRadios.get()
         this.show = show === "on"
 
@@ -291,29 +367,32 @@ export default class ShowTrades {
         this.update()
     }
 
-    async _loadData() {
+    async _loadData(): Promise<void> {
         /**
          * Data directory
-         * @type {string}
-         * @private
          */
         const dataDirectory = "data"
+        const fileName = "~Lib/gen-generic/ports.json"
 
         try {
-            const portData = (await import(/* webpackChunkName: "data-ports" */ "../../gen-generic/ports.json")).default
-            const pbData = await (await fetch(`${dataDirectory}/${this._serverName}-pb.json`)).json()
-            this._linkDataDefault = await (await fetch(`${dataDirectory}/${this._serverName}-trades.json`)).json()
+            const portData = (await import(/* webpackChunkName: "data-ports" */ fileName)).default as PortBasic[]
+            const pbData = (await (
+                await fetch(`${dataDirectory}/${this._serverName}-pb.json`)
+            ).json()) as PortBattlePerServer[]
+            this._linkDataDefault = (await (
+                await fetch(`${dataDirectory}/${this._serverName}-trades.json`)
+            ).json()) as Trade[]
             // Combine port data with port battle data
-            this._portData = portData.map(port => {
-                const pbPortData = pbData.ports.find(d => d.id === port.id)
-                return { ...port, ...pbPortData }
+            this._portData = portData.map((port) => {
+                const pbPortData = pbData.find((d) => d.id === port.id)
+                return { ...port, ...pbPortData } as PortWithTrades
             })
         } catch (error) {
             putImportError(error)
         }
     }
 
-    async _loadAndSetupData() {
+    async _loadAndSetupData(): Promise<void> {
         try {
             await this._loadData()
             this._setupData()
@@ -322,7 +401,7 @@ export default class ShowTrades {
         }
     }
 
-    async showOrHide() {
+    async showOrHide(): Promise<void> {
         if (this.show) {
             if (!this._isDataLoaded) {
                 await this._loadAndSetupData().then(() => {
@@ -338,7 +417,7 @@ export default class ShowTrades {
         }
     }
 
-    _profitValueSelected() {
+    _profitValueSelected(): void {
         this._profitValue = this._profitRadios.get()
 
         this._profitCookie.set(this._profitValue)
@@ -347,80 +426,47 @@ export default class ShowTrades {
         this.update()
     }
 
-    _nationChanged() {
+    _nationChanged(): void {
         this._linkData = this._linkDataDefault
         this._filterPortsBySelectedNations()
         this._filterTradesBySelectedNations()
         this.update()
     }
 
-    static _getId(link) {
-        return `trade-${link.source.id}-${link.good.replace(/ /g, "")}-${link.target.id}`
-    }
-
-    static _addInfo(text) {
-        return `<div><div>${text}</div>`
-    }
-
-    static _addDes(text) {
-        return `<div class="des">${text}</div></div>`
-    }
-
-    static _getDepth(isShallow) {
-        return isShallow ? "(shallow)" : "(deep)"
-    }
-
-    _getTradeLimitedData(trade) {
+    _getTradeLimitedData(trade: Trade): HtmlString {
         const weight = trade.weightPerItem * trade.quantity
 
-        let h = ""
+        let h = "" as HtmlString
         h += ShowTrades._addInfo(`${formatInt(trade.quantity)} ${trade.good}`) + ShowTrades._addDes("trade")
-        h += ShowTrades._addInfo(`${formatSiCurrency(trade.profit)}`) + ShowTrades._addDes(this._profitText)
+        h += ShowTrades._addInfo(`${formatSiCurrency(trade.profit ?? 0)}`) + ShowTrades._addDes(this._profitText)
         h +=
             ShowTrades._addInfo(`${formatSiInt(weight)} ${weight === 1 ? "ton" : "tons"}`) +
             ShowTrades._addDes("weight")
         h +=
             ShowTrades._addInfo(
-                `${this._nodeData.get(trade.source.id).name} <span class="caps">${
-                    this._nodeData.get(trade.source.id).nation
+                `${this._nodeData.get(trade.source.id)?.name} <span class="caps">${
+                    this._nodeData.get(trade.source.id)?.nation
                 }</span>`
-            ) + ShowTrades._addDes(`from ${ShowTrades._getDepth(this._nodeData.get(trade.source.id).isShallow)}`)
+            ) +
+            ShowTrades._addDes(`from ${ShowTrades._getDepth(this._nodeData.get(trade.source.id)?.isShallow ?? true)}`)
         h +=
             ShowTrades._addInfo(
-                `${this._nodeData.get(trade.target.id).name} <span class="caps">${
-                    this._nodeData.get(trade.target.id).nation
+                `${this._nodeData.get(trade.target.id)?.name} <span class="caps">${
+                    this._nodeData.get(trade.target.id)?.nation
                 }</span>`
-            ) + ShowTrades._addDes(`to ${ShowTrades._getDepth(this._nodeData.get(trade.target.id).isShallow)}`)
+            ) + ShowTrades._addDes(`to ${ShowTrades._getDepth(this._nodeData.get(trade.target.id)?.isShallow ?? true)}`)
         h += ShowTrades._addInfo(`${formatSiInt(trade.distance)}\u2009k`) + ShowTrades._addDes("distance")
 
         return h
     }
 
-    static _getProfitPerWeight(trade) {
-        return trade.weightPerItem === 0
-            ? trade.profitTotal
-            : Math.round(trade.profitTotal / (trade.weightPerItem * trade.quantity))
-    }
-
-    static _getProfitPerDistance(trade) {
-        return trade.profitTotal / trade.distance
-    }
-
-    static _startBlock(text) {
-        return `<div class="block-block"><span>${text}</span>`
-    }
-
-    static _endBlock() {
-        return "</div>"
-    }
-
-    _getTradeFullData(trade) {
+    _getTradeFullData(trade: Trade): HtmlString {
         const weight = trade.weightPerItem * trade.quantity
         const profitPerItem = trade.target.grossPrice - trade.source.grossPrice
         const profitPerDistance = ShowTrades._getProfitPerDistance(trade)
         const profitPerWeight = ShowTrades._getProfitPerWeight(trade)
 
-        let h = ""
+        let h = "" as HtmlString
 
         h += ShowTrades._startBlock("Trade")
         h += ShowTrades._addInfo(`${formatInt(trade.quantity)} ${trade.good}`) + ShowTrades._addDes("good")
@@ -442,23 +488,24 @@ export default class ShowTrades {
         h += ShowTrades._startBlock("Route")
         h +=
             ShowTrades._addInfo(
-                `${this._nodeData.get(trade.source.id).name} <span class="caps">${
-                    this._nodeData.get(trade.source.id).nation
+                `${this._nodeData.get(trade.source.id)?.name} <span class="caps">${
+                    this._nodeData.get(trade.source.id)?.nation
                 }</span>`
-            ) + ShowTrades._addDes(`from ${ShowTrades._getDepth(this._nodeData.get(trade.source.id).isShallow)}`)
+            ) +
+            ShowTrades._addDes(`from ${ShowTrades._getDepth(this._nodeData.get(trade.source.id)?.isShallow ?? true)}`)
         h +=
             ShowTrades._addInfo(
-                `${this._nodeData.get(trade.target.id).name} <span class="caps">${
-                    this._nodeData.get(trade.target.id).nation
+                `${this._nodeData.get(trade.target.id)?.name} <span class="caps">${
+                    this._nodeData.get(trade.target.id)?.nation
                 }</span>`
-            ) + ShowTrades._addDes(`to ${ShowTrades._getDepth(this._nodeData.get(trade.source.id).isShallow)}`)
+            ) + ShowTrades._addDes(`to ${ShowTrades._getDepth(this._nodeData.get(trade.source.id)?.isShallow ?? true)}`)
         h += ShowTrades._addInfo(`${formatSiInt(trade.distance)}\u2009k`) + ShowTrades._addDes("distance")
         h += ShowTrades._endBlock()
 
         return h
     }
 
-    _showDetails(d, i, nodes) {
+    _showDetails(d: Trade, i: number, nodes: SVGPathElement[] | d3Selection.ArrayLike<SVGPathElement>): void {
         const trade = d3Select(nodes[i])
         const title = this._getTradeFullData(d)
 
@@ -472,34 +519,28 @@ export default class ShowTrades {
                     "</div></div>",
                 title,
                 trigger: "manual",
-                sanitize: false
+                sanitize: false,
             })
             .tooltip("show")
     }
 
-    static _hideDetails(d, i, nodes) {
-        $(d3Select(nodes[i]).node()).tooltip("dispose")
-    }
-
-    _getSiblingLinks(sourceId, targetId) {
+    _getSiblingLinks(sourceId: number, targetId: number): number[] {
         return this._linkDataFiltered
             .filter(
-                link =>
+                (link) =>
                     (link.source.id === sourceId && link.target.id === targetId) ||
                     (link.source.id === targetId && link.target.id === sourceId)
             )
-            .map(link => link.profit)
+            .map((link) => link.profit ?? 0)
     }
 
     /**
      * @link https://bl.ocks.org/mattkohl/146d301c0fc20d89d85880df537de7b0
-     * @return {void}
-     * @private
      */
-    _updateGraph() {
-        const arcPath = (leftHand, d) => {
-            const source = { x: this._nodeData.get(d.source.id).x, y: this._nodeData.get(d.source.id).y }
-            const target = { x: this._nodeData.get(d.target.id).x, y: this._nodeData.get(d.target.id).y }
+    _updateGraph(): void {
+        const arcPath = (leftHand: boolean, d: Trade): string => {
+            const source = { x: this._nodeData.get(d.source.id)?.x ?? 0, y: this._nodeData.get(d.source.id)?.y ?? 0 }
+            const target = { x: this._nodeData.get(d.target.id)?.x ?? 0, y: this._nodeData.get(d.target.id)?.y ?? 0 }
             const x1 = leftHand ? source.x : target.x
             const y1 = leftHand ? source.y : target.y
             const x2 = leftHand ? target.x : source.x
@@ -511,10 +552,8 @@ export default class ShowTrades {
             const sweep = leftHand ? 0 : 1
             const siblings = this._getSiblingLinks(d.source.id, d.target.id)
             if (siblings.length > 1) {
-                const arcScale = d3ScalePoint()
-                    .domain(siblings)
-                    .range([1, siblings.length])
-                dr /= 1 + (1 / siblings.length) * (arcScale(d.profit) - 1)
+                const arcScale = d3ScalePoint<number>().domain(siblings).range([1, siblings.length])
+                dr /= 1 + (1 / siblings.length) * (arcScale(d.profit ?? 0) ?? 0 - 1)
             }
 
             dr = Math.round(dr)
@@ -523,74 +562,67 @@ export default class ShowTrades {
         }
 
         const data = this._portSelect.isInventorySelected ? [] : this._linkDataFiltered
+        const extent = d3Extent(this._linkDataFiltered, (d: Trade): number => d.profit ?? 0) as number[]
         const linkWidthScale = d3ScaleLinear()
             .range([5 / this._scale, 15 / this._scale])
-            .domain(d3Extent(this._linkDataFiltered, d => d.profit))
+            .domain(extent)
         const fontScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale)
         const fontSize = roundToThousands(this._fontSize / fontScale)
         const transition = this._g.transition().duration(500)
 
         this._g
-            .selectAll(".trade-link")
-            .data(data, d => ShowTrades._getId(d))
+            .selectAll<SVGPathElement, Trade>(".trade-link")
+            .data(data, (d) => ShowTrades._getId(d))
             .join(
-                enter =>
+                (enter) =>
                     enter
                         .append("path")
                         .attr("class", "trade-link")
-                        .attr("marker-start", d =>
+                        .attr("marker-start", (d) =>
                             this._nodeData.get(d.source.id).x < this._nodeData.get(d.target.id).x
                                 ? ""
                                 : "url(#trade-arrow)"
                         )
-                        .attr("marker-end", d =>
+                        .attr("marker-end", (d) =>
                             this._nodeData.get(d.source.id).x < this._nodeData.get(d.target.id).x
                                 ? "url(#trade-arrow)"
                                 : ""
                         )
-                        .attr("id", d => ShowTrades._getId(d))
+                        .attr("id", (d) => ShowTrades._getId(d))
                         .attr("opacity", 0)
                         .on("click", (d, i, nodes) => this._showDetails(d, i, nodes))
                         .on("mouseleave", ShowTrades._hideDetails)
-                        .call(enterCall => enterCall.transition(transition).attr("opacity", 1)),
-                update => update.attr("opacity", 1),
-                exit =>
-                    exit.call(exitCall =>
-                        exitCall
-                            .transition(transition)
-                            .attr("opacity", 0)
-                            .remove()
-                    )
+                        .call((enterCall) => enterCall.transition(transition).attr("opacity", 1)),
+                (update) => update.attr("opacity", 1),
+                (exit) => exit.call((exitCall) => exitCall.transition(transition).attr("opacity", 0).remove())
             )
-            .attr("d", d => arcPath(this._nodeData.get(d.source.id).x < this._nodeData.get(d.target.id).x, d))
-            .attr("stroke-width", d => `${linkWidthScale(d.profit)}px`)
+            .attr("d", (d) => arcPath(this._nodeData.get(d.source.id).x < this._nodeData.get(d.target.id).x, d))
+            .attr("stroke-width", (d) => `${linkWidthScale(d.profit ?? 0)}px`)
 
         this._labelG.attr("font-size", `${fontSize}px`)
 
         this._labelG
-            .selectAll(".trade-label")
-            .data(this._linkDataFiltered, d => ShowTrades._getId(d))
+            .selectAll<SVGTextElement, Trade>(".trade-label")
+            .data(this._linkDataFiltered, (d) => ShowTrades._getId(d))
             .join(
-                enter =>
+                (enter) =>
                     enter
                         .append("text")
                         .attr("class", "trade-label")
                         .append("textPath")
                         .attr("startOffset", "15%")
-                        .attr("xlink:href", d => `#${ShowTrades._getId(d)}`)
-                        .text(d => `${formatInt(d.quantity)} ${d.good}`)
+                        .attr("xlink:href", (d) => `#${ShowTrades._getId(d)}`)
+                        .text((d) => `${formatInt(d.quantity)} ${d.good}`)
                         .attr("opacity", 0)
-                        .call(enterCall => enterCall.transition(transition).attr("opacity", 1)),
-                update => update.attr("opacity", 1),
-                exit =>
-                    exit.call(exitCall =>
-                        exitCall
-                            .transition(transition)
-                            .attr("opacity", 0)
-                            .remove()
-                    )
+                        .call((enterCall) => enterCall.transition(transition).attr("opacity", 1)),
+                (update) => update.attr("opacity", 1),
+                (exit) => exit.call((exitCall) => exitCall.transition(transition).attr("opacity", 0).remove())
             )
-            .attr("dy", d => `-${linkWidthScale(d.profit) / 1.5}px`)
+            .attr("dy", (d) => `-${linkWidthScale(d.profit ? d.profit / 1.5 : 0)}px`)
+    }
+
+    get listType(): string {
+        return this._listType
     }
 
     set listType(type) {
@@ -617,11 +649,7 @@ export default class ShowTrades {
         }
     }
 
-    get listType() {
-        return this._listType
-    }
-
-    _updateList(data = null) {
+    _updateList(data?: string): void {
         switch (this._listType) {
             case "inventory":
                 this._updateInventory(data)
@@ -635,77 +663,76 @@ export default class ShowTrades {
         }
     }
 
-    _updateInventory(inventory) {
-        this._list.html(inventory)
+    _updateInventory(inventory?: string): void {
+        this._list.html(inventory ?? "")
     }
 
-    _updatePortList(portList) {
-        this._list.html(portList)
+    _updatePortList(portList?: string): void {
+        this._list.html(portList ?? "")
     }
 
-    _updateTradeList() {
-        let highlightLink
+    _updateTradeList(): void {
+        let highlightLink: d3Selection.Selection<SVGPathElement, SVGSVGDatum, HTMLElement, any>
 
-        // eslint-disable-next-line unicorn/consistent-function-scoping
-        const highlightOn = d => {
-            highlightLink = d3Select(`path#${ShowTrades._getId(d)}`).classed("highlight", true)
+        const highlightOn = (d: Trade): void => {
+            highlightLink = d3Select<SVGPathElement, SVGSVGDatum>(`path#${ShowTrades._getId(d)}`).classed(
+                "highlight",
+                true
+            )
             highlightLink.dispatch("click")
         }
 
-        // eslint-disable-next-line unicorn/consistent-function-scoping
-        const highlightOff = () => {
+        const highlightOff = (): void => {
             highlightLink.classed("highlight", false)
             highlightLink.dispatch("mouseleave")
         }
 
         this._list
-            .selectAll("div.block")
-            .data(this._linkDataFiltered, d => ShowTrades._getId(d))
-            .join(enter =>
-                enter
-                    .append("div")
-                    .attr("class", "block")
-                    .on("mouseenter", highlightOn)
-                    .on("mouseleave", highlightOff)
+            .selectAll<HTMLDivElement, Trade>("div.block")
+            .data(this._linkDataFiltered, (d) => ShowTrades._getId(d))
+            .join((enter) =>
+                enter.append("div").attr("class", "block").on("mouseenter", highlightOn).on("mouseleave", highlightOff)
             )
-            .html(d => this._getTradeLimitedData(d))
+            .html((d) => this._getTradeLimitedData(d))
     }
 
-    _filterTradesByVisiblePorts() {
+    _filterTradesByVisiblePorts(): void {
         const portDataFiltered = new Set(
             this._portData
                 .filter(
-                    port =>
+                    (port) =>
                         port.coordinates[0] >= this._lowerBound[0] &&
                         port.coordinates[0] <= this._upperBound[0] &&
                         port.coordinates[1] >= this._lowerBound[1] &&
                         port.coordinates[1] <= this._upperBound[1]
                 )
-                .map(port => port.id)
+                .map((port) => port.id)
         )
         this._linkDataFiltered = this._linkData
-            .filter(trade => portDataFiltered.has(trade.source.id) || portDataFiltered.has(trade.target.id))
+            .filter((trade) => portDataFiltered.has(trade.source.id) || portDataFiltered.has(trade.target.id))
             .slice(0, this._numTrades)
     }
 
-    _filterTradesBySelectedNations() {
+    _filterTradesBySelectedNations(): void {
         this._linkData = this._linkData
-            .filter(trade => this._portDataFiltered.has(trade.source.id) && this._portDataFiltered.has(trade.target.id))
+            .filter(
+                (trade) => this._portDataFiltered.has(trade.source.id) && this._portDataFiltered.has(trade.target.id)
+            )
             .slice(0, this._numTrades)
     }
 
-    _filterPortsBySelectedNations() {
-        const selectedNations = new Set([...this._nationSelector.selectedOptions].map(option => option.value))
-        this._portDataFiltered = new Set(
-            this._portData.filter(port => selectedNations.has(port.nation)).map(port => port.id)
+    _filterPortsBySelectedNations(): void {
+        const selectedNations = new Set([...this._nationSelector.selectedOptions].map((option) => option.value))
+        this._portDataFiltered = new Set<number>(
+            this._portData.filter((port) => selectedNations.has(port.nation)).map((port) => port.id)
         )
     }
 
     /**
-     * Get profit value from cookie or use default value
-     * @returns {string} - profit value
+     * Get show value from cookie or use default value
+     * @returns Show value
      */
-    _getShowValue() {
+    _getShowValue(): boolean {
         const r = this._showCookie.get()
 
         this._showRadios.set(r)
@@ -715,9 +742,9 @@ export default class ShowTrades {
 
     /**
      * Get profit value from cookie or use default value
-     * @returns {string} - profit value
+     * @returns Profit value
      */
-    _getProfitValue() {
+    _getProfitValue(): string {
         const r = this._profitCookie.get()
 
         this._profitRadios.set(r)
@@ -739,15 +766,7 @@ export default class ShowTrades {
         return r
     }
 
-    static _showElem(elem) {
-        elem.classed("d-none", false)
-    }
-
-    static _hideElem(elem) {
-        elem.classed("d-none", true)
-    }
-
-    update(data = null) {
+    update(data?: string): void {
         if (this.show) {
             this._filterTradesByVisiblePorts()
             this._updateList(data)
@@ -760,22 +779,21 @@ export default class ShowTrades {
 
     /**
      * Set bounds of current viewport
-     * @param {Bound} lowerBound - Top left coordinates of current viewport
-     * @param {Bound} upperBound - Bottom right coordinates of current viewport
-     * @return {void}
+     * @param lowerBound - Top left coordinates of current viewport
+     * @param upperBound - Bottom right coordinates of current viewport
      */
-    setBounds(lowerBound, upperBound) {
+    setBounds(lowerBound: Bound, upperBound: Bound): void {
         this._lowerBound = lowerBound
         this._upperBound = upperBound
     }
 
-    transform(transform) {
-        this._g.attr("transform", transform)
+    transform(transform: d3Zoom.ZoomTransform): void {
+        this._g.attr("transform", transform.toString)
         this._scale = transform.k
         this.update()
     }
 
-    clearMap() {
+    clearMap(): void {
         this.listType = "tradeList"
 
         if (this.show) {
