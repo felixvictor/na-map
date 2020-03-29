@@ -31,13 +31,13 @@ import DisplayPbZones from "./display-pb-zones"
 import DisplayPorts from "./display-ports"
 import SelectPorts from "./select-ports"
 import ShowF11 from "../map-tools/show-f11"
-/*
+import ShowTrades from "../map-tools/show-trades"
 
+/*
 import DisplayGrid from "../map-tools/display-grid"
 import Journey from "../map-tools/make-journey"
 import PredictWind from "../map-tools/predict-wind"
 import WindRose from "../map-tools/wind-rose"
-import ShowTrades from "../map-tools/show-trades"
 */
 
 interface Tile {
@@ -66,15 +66,15 @@ class NAMap {
     private _currentTranslate!: d3Zoom.ZoomTransform
     private _doubleClickAction: string
     private _gMap!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, any>
-    private _grid!: DisplayGrid
-    private _journey!: Journey
+    //  private _grid!: DisplayGrid
+    //  private _journey!: Journey
     private _pbZone!: DisplayPbZones
     private _ports!: DisplayPorts
     private _portSelect!: SelectPorts
     private _showGrid: string
     private _svg!: d3Selection.Selection<SVGSVGElement, SVGSVGDatum, HTMLElement, any>
-    private _windPrediction!: PredictWind
-    private _windRose!: WindRose
+    // private _windPrediction!: PredictWind
+    // private _windRose!: WindRose
     private _zoom!: d3Zoom.ZoomBehavior<SVGSVGElement, SVGSVGDatum>
     private _zoomLevel!: string
     private readonly _doubleClickActionCookie: Cookie
@@ -237,19 +237,20 @@ class NAMap {
         await this._ports.init()
 
         this._pbZone = new DisplayPbZones(this._ports)
-        this._grid = new DisplayGrid(this)
+        //  this._grid = new DisplayGrid(this)
 
-        this._journey = new Journey(this.rem)
-        this._windPrediction = new PredictWind()
-        this._windRose = new WindRose()
+        //   this._journey = new Journey(this.rem)
+        //   this._windPrediction = new PredictWind()
+        //    this._windRose = new WindRose()
 
         this._portSelect = new SelectPorts(this._ports, this._pbZone, this)
+        const zoomTransform = this._getZoomTransform()
         this.showTrades = new ShowTrades(
             this.serverName,
             this._portSelect,
             this.minScale,
-            this.coord.min,
-            this.coord.max
+            this._getLowerBound(zoomTransform),
+            this._getUpperBound(zoomTransform)
         )
         await this.showTrades.showOrHide()
 
@@ -477,13 +478,20 @@ class NAMap {
     }
 
     /**
-     * Zoom svg groups
+     * Top left coordinates of current viewport
      */
-    _naZoomed(): void {
-        /*
-        this._currentTranslate.x = Math.floor(d3Selection.event.transform.x)
-        this._currentTranslate.y = Math.floor(d3Selection.event.transform.y)
-         */
+    _getLowerBound(zoomTransform: d3Zoom.ZoomTransform): Bound {
+        return zoomTransform.invert([this.coord.min, this.coord.min])
+    }
+
+    /**
+     * Bottom right coordinates of current viewport
+     */
+    _getUpperBound(zoomTransform: d3Zoom.ZoomTransform): Bound {
+        return zoomTransform.invert([this.width, this.height])
+    }
+
+    _getZoomTransform(): d3Zoom.ZoomTransform {
         this._currentTranslate = {
             x: Math.floor(d3Selection.event.transform.x),
             y: Math.floor(d3Selection.event.transform.y),
@@ -492,19 +500,26 @@ class NAMap {
         /**
          * Current transform
          */
-        const zoomTransform = d3Zoom.zoomIdentity
+        return d3Zoom.zoomIdentity
             .translate(this._currentTranslate.x, this._currentTranslate.y)
             .scale(roundToThousands(d3Selection.event.transform.k))
+    }
+
+    /**
+     * Zoom svg groups
+     */
+    _naZoomed(): void {
+        const zoomTransform = this._getZoomTransform()
 
         /**
          * Top left coordinates of current viewport
          */
-        const lowerBound: Bound = zoomTransform.invert([this.coord.min, this.coord.min])
+        const lowerBound = this._getLowerBound(zoomTransform)
 
         /**
          * Bottom right coordinates of current viewport
          */
-        const upperBound: Bound = zoomTransform.invert([this.width, this.height])
+        const upperBound = this._getUpperBound(zoomTransform)
 
         this._ports.setBounds(lowerBound, upperBound)
         this._pbZone.setBounds(lowerBound, upperBound)

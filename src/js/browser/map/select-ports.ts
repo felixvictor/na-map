@@ -19,7 +19,7 @@ import { DatetimepickerEvent, DatetimepickerOption } from "../../@types/tempusdo
 import "tempusdominus-core/build/js/tempusdominus-core"
 
 import { registerEvent } from "../analytics"
-import { Nation, nations, putImportError, range } from "../../common/common"
+import { Nation, nations, putImportError, range, validNationShortName } from "../../common/common"
 import { HtmlString, initMultiDropdownNavbar } from "../../common/common-browser"
 import { formatInt, formatSiCurrency } from "../../common/common-format"
 import { Point } from "../../common/common-math"
@@ -28,14 +28,15 @@ import { serverMaintenanceHour } from "../../common/common-var"
 import {
     ConquestMarksPension,
     FrontlinesPerServer,
-    FrontLineValue,
+    GoodList,
     InventoryEntity,
     NationShortName,
     Port,
     PortBattleType,
-    PortIntersection, PortPerServerTrade,
-    PortWithTrades
-} from "../../common/gen-json";
+    PortIntersection,
+    PortPerServer,
+    PortWithTrades,
+} from "../../common/gen-json"
 import { NAMap } from "./na-map"
 import DisplayPorts from "./display-ports"
 import DisplayPbZones from "./display-pb-zones"
@@ -52,6 +53,7 @@ interface SelectPort {
 }
 
 export default class SelectPorts {
+    isInventorySelected: boolean
     private _ports: DisplayPorts
     private readonly _pbZone: DisplayPbZones
     private readonly _map: NAMap
@@ -73,8 +75,7 @@ export default class SelectPorts {
     private readonly _propClanSelector: HTMLSelectElement
     private readonly _propCMId: string
     private readonly _propCMSelector: HTMLSelectElement
-    private isInventorySelected: boolean
-    private _frontlinesData!: FrontlinesPerServer[]
+    private _frontlinesData!: FrontlinesPerServer
     private _nation!: NationShortName
 
     constructor(ports: DisplayPorts, pbZone: DisplayPbZones, map: NAMap) {
@@ -159,7 +160,7 @@ export default class SelectPorts {
         try {
             this._frontlinesData = (await (
                 await fetch(`${dataDirectory}/${this._map.serverName}-frontlines.json`)
-            ).json()) as FrontlinesPerServer[]
+            ).json()) as FrontlinesPerServer
         } catch (error) {
             putImportError(error)
         }
@@ -336,11 +337,14 @@ export default class SelectPorts {
 
     _injectGoodsSelect(): void {
         const selectGoods = new Set<string>()
-        const types = ["consumesTrading", "dropsTrading", "dropsNonTrading", "producesNonTrading"]
+        const types = ["consumesTrading", "dropsTrading", "dropsNonTrading", "producesNonTrading"] as Array<
+            keyof PortPerServer
+        >
         for (const port of this._ports.portDataDefault) {
             for (const type of types) {
-                if (port[type]) {
-                    for (const good of port[type]) {
+                const goodList = port[type] as GoodList
+                if (goodList) {
+                    for (const good of goodList) {
                         selectGoods.add(good)
                     }
                 }
@@ -375,13 +379,13 @@ export default class SelectPorts {
             for (const port of this._ports.portDataDefault) {
                 if (port.inventory) {
                     for (const good of port.inventory) {
-                        selectGoods.add(good.name)
+                        selectGoods.add((good as InventoryEntity).name)
                     }
                 }
             }
 
             const options = `${[...selectGoods]
-                .sort()
+                .sort(simpleStringSort)
                 .map((good) => `<option>${good}</option>`)
                 .join("")}`
 
@@ -449,7 +453,7 @@ export default class SelectPorts {
 
     _setupClanSelect(): void {
         const clanList = new Set<string>()
-        for (const d of this._ports.portData.filter((d) => d.capturer)) {
+        for (const d of this._ports.portData.filter((d) => d.capturer !== "")) {
             clanList.add(d.capturer)
         }
 
@@ -494,24 +498,33 @@ export default class SelectPorts {
 
     _setTradePortPartners(): void {
         const tradePort = this._ports.portDataDefault.find((port) => port.id === this._ports.tradePortId)
+        if (tradePort) {
+            const tradePortConsumedGoods = tradePort.consumesTrading
+                ? tradePort.consumesTrading.map((good) => good as string)
+                : []
+            const tradePortProducedGoods = tradePort.dropsTrading
+                ? tradePort.dropsTrading.map((good) => good as string)
+                : []
 
-        const tradePortConsumedGoods = tradePort?.consumesTrading ? tradePort.consumesTrading.map((good) => good) : []
-        const tradePortProducedGoods = tradePort?.dropsTrading ? tradePort.dropsTrading.map((good) => good) : []
+            this._ports.portData = this._ports.portDataDefault
+                .map((port) => {
+                    port.goodsToBuyInTradePort = port.consumesTrading
+                        ? port.consumesTrading
+                              .filter((good) => tradePortProducedGoods.includes(good))
+                              .map((good) => good as string)
+                        : []
+                    port.buyInTradePort = Boolean(port.goodsToBuyInTradePort.length)
+                    port.goodsToSellInTradePort = port.dropsTrading
+                        ? port.dropsTrading
+                              .filter((good) => tradePortConsumedGoods.includes(good))
+                              .map((good) => good as string)
+                        : []
+                    port.sellInTradePort = Boolean(port.goodsToSellInTradePort.length)
 
-        this._ports.portData = this._ports.portDataDefault
-            .map((port) => {
-                port.goodsToBuyInTradePort = port.consumesTrading
-                    ? port.consumesTrading.filter((good) => tradePortProducedGoods.includes(good)).map((good) => good)
-                    : []
-                port.buyInTradePort = Boolean(port.goodsToBuyInTradePort.length)
-                port.goodsToSellInTradePort = port.dropsTrading
-                    ? port.dropsTrading.filter((good) => tradePortConsumedGoods.includes(good)).map((good) => good)
-                    : []
-                port.sellInTradePort = Boolean(port.goodsToSellInTradePort.length)
-
-                return port
-            })
-            .filter((port) => port.id === this._ports.tradePortId || port.sellInTradePort || port.buyInTradePort)
+                    return port
+                })
+                .filter((port) => port.id === this._ports.tradePortId || port.sellInTradePort || port.buyInTradePort)
+        }
     }
 
     _portSelected(): void {
@@ -575,7 +588,7 @@ export default class SelectPorts {
         const buyGoods = new Map() as goodMap
         const sellGoods = new Map() as goodMap
         const portsFiltered = this._ports.portDataDefault
-            .filter((port) => port.inventory && port.inventory.some((good) => good.name === goodSelected))
+            .filter((port) => port.inventory.some((good) => good.name === goodSelected))
             .sort(sortBy(["name"]))
             .map((port) => {
                 const item = port.inventory.find((good) => good.name === goodSelected)
@@ -634,8 +647,8 @@ export default class SelectPorts {
         this._ports.update()
     }
 
-    _setFrontlinePorts(type: string, nation: NationShortName): void {
-        const ports = this._frontlinesData[type][nation] as FrontLineValue[]
+    _setFrontlinePorts(type: keyof FrontlinesPerServer, nation: NationShortName): void {
+        const ports = this._frontlinesData[type][nation]!
         const enemyPorts = new Set<number>(ports.map((frontlinePort) => Number(frontlinePort.key)))
         const ownPorts = new Set<number>(ports.flatMap((frontlinePort) => frontlinePort.value.map((d) => d)))
 
@@ -651,10 +664,12 @@ export default class SelectPorts {
             this._frontlineAttackingNationSelector.selectedIndex
         ].value as NationShortName
 
-        this._setFrontlinePorts("attacking", nation)
+        if (validNationShortName(nation)) {
+            this._setFrontlinePorts("attacking", nation)
 
-        this._ports.showRadius = "frontline"
-        this._ports.update()
+            this._ports.showRadius = "frontline"
+            this._ports.update()
+        }
     }
 
     _frontlineDefendingNationSelected(): void {
@@ -662,20 +677,26 @@ export default class SelectPorts {
             this._frontlineDefendingNationSelector.selectedIndex
         ].value as NationShortName
 
-        this._setFrontlinePorts("defending", nation)
+        if (validNationShortName(nation)) {
+            this._setFrontlinePorts("defending", nation)
 
-        this._ports.showRadius = "frontline"
-        this._ports.update()
+            this._ports.showRadius = "frontline"
+            this._ports.update()
+        }
     }
 
     _nationSelected(): void {
         this._nation = this._propNationSelector.options[this._propNationSelector.selectedIndex].value as NationShortName
 
-        this._ports.portData = this._ports.portDataDefault.filter((port) => port.nation === this._nation)
-        this._ports.showRadius = ""
-        this._ports.update()
-        this._setupClanSelect()
-        $(this._propClanSelector).selectpicker("refresh")
+        if (validNationShortName(this._nation)) {
+            this._ports.portData = this._ports.portDataDefault.filter((port) => port.nation === this._nation)
+            this._ports.showRadius = ""
+            this._ports.update()
+            this._setupClanSelect()
+            $(this._propClanSelector).selectpicker("refresh")
+        } else {
+            this._nation = "NT"
+        }
     }
 
     _clanSelected(): void {
@@ -692,7 +713,9 @@ export default class SelectPorts {
     }
 
     _depthSelected(depth: PortDepth): void {
-        const portData = this._ports.portDataDefault.filter((d) => (depth === "shallow" ? d.shallow : !d.shallow))
+        const portData = this._ports.portDataDefault.filter(
+            (d) => (depth === "shallow" ? d.shallow : !d.shallow) as boolean
+        )
 
         this._ports.portData = portData
         this._ports.showRadius = ""
@@ -700,7 +723,7 @@ export default class SelectPorts {
     }
 
     _allSelected(): void {
-        const portData = this._ports.portDataDefault.filter((d) => d.availableForAll)
+        const portData = this._ports.portDataDefault.filter((d) => d.availableForAll as boolean)
 
         this._ports.portData = portData
         this._ports.showRadius = ""
@@ -708,7 +731,7 @@ export default class SelectPorts {
     }
 
     _nonCapSelected(): void {
-        const portData = this._ports.portDataDefault.filter((d) => d.nonCapturable)
+        const portData = this._ports.portDataDefault.filter((d) => d.nonCapturable as boolean)
 
         this._ports.portData = portData
         this._ports.showRadius = ""
