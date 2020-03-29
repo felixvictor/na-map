@@ -207,7 +207,6 @@ const convertBuildings = async (): Promise<void> => {
     const prices = getPrices(buildings)
     await saveJsonAsync(commonPaths.filePrices, prices)
 
-    // @ts-ignore
     buildings = buildings.filter((building) => Object.keys(building).length).sort(sortBy(["id"]))
     await saveJsonAsync(commonPaths.fileBuilding, buildings)
 }
