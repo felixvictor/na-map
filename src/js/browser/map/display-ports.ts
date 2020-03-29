@@ -56,6 +56,7 @@ import ShowF11 from "../map-tools/show-f11"
 import { Port, PortBattlePerServer, PortBasic, PortPerServer, NationList, PortWithTrades } from "../../common/gen-json"
 import { DivDatum, SVGGDatum, SVGSVGDatum } from "../../common/interface"
 import * as d3Zoom from "d3-zoom"
+import PlainObject = JQuery.PlainObject;
 
 type PortCircleStringF = (d: PortWithTrades) => string
 type PortCircleNumberF = (d: PortWithTrades) => number
@@ -121,7 +122,7 @@ export default class DisplayPorts {
     circleType = ""
     readonly #map: NAMap
     private _attackRadius!: ScaleLinear<number, number>
-    private _colourScaleCounty!: ScaleOrdinal<string, unknown>
+    private _colourScaleCounty!: ScaleOrdinal<string, string>
     private _colourScaleHostility!: ScaleLinear<string, string>
     private _colourScaleNet!: ScaleLinear<string, string>
     private _colourScalePoints!: ScaleLinear<string, string>
@@ -356,7 +357,7 @@ export default class DisplayPorts {
             .domain([0, 1])
             .range([colourWhite, colourRedDark])
             .interpolate(d3InterpolateCubehelixLong)
-        this._colourScaleCounty = d3ScaleOrdinal().range(colourList)
+        this._colourScaleCounty = d3ScaleOrdinal<string, string>().range(colourList)
 
         this._minTaxIncome = d3Min(this.portData, (d) => d.taxIncome) ?? 0
         this._maxTaxIncome = d3Max(this.portData, (d) => d.taxIncome) ?? 0
@@ -409,7 +410,7 @@ export default class DisplayPorts {
     }
 
     _setupSvg(): void {
-        this._gPort = d3Select<SVGSVGElement, SVGSVGDatum>("#na-svg")
+        this._gPort = d3Select<SVGGElement, SVGGDatum>("#na-svg")
             .insert("g", "g.f11")
             .attr("data-ui-component", "ports")
             .attr("id", "ports")
@@ -726,10 +727,10 @@ export default class DisplayPorts {
             dropsNonTrading: portProperties.dropsNonTrading ? portProperties.dropsNonTrading.join(", ") : "",
             tradePort: this._getPortName(this.tradePortId),
             goodsToSellInTradePort: portProperties.goodsToSellInTradePort
-                ? portProperties.goodsToSellInTradePort.join(", ")
+                ? (portProperties.goodsToSellInTradePort as string[]).join(", ")
                 : "",
             goodsToBuyInTradePort: portProperties.goodsToBuyInTradePort
-                ? portProperties.goodsToBuyInTradePort.join(", ")
+                ? (portProperties.goodsToBuyInTradePort as string[]).join(", ")
                 : "",
         } as PortForDisplay
 
@@ -841,6 +842,7 @@ export default class DisplayPorts {
             }
 
             this.#map.showTrades.update(DisplayPorts._getInventory(d))
+
         }
     }
 
@@ -858,7 +860,7 @@ export default class DisplayPorts {
         const data = this._portDataFiltered
 
         this._gIcon
-            .selectAll("circle")
+            .selectAll<SVGCircleElement, PortWithTrades>("circle")
             .data(data, (d) => d.id)
             .join((enter) =>
                 enter
@@ -932,7 +934,7 @@ export default class DisplayPorts {
             fill = (d): string => this._colourScalePoints(d.portPoints)
             r = (d): number => this._portRadius(d.portPoints)
         } else if (this.showRadius === "position") {
-            cssClass = () => "bubble here"
+            cssClass = (): string => "bubble here"
             r = (d): number => d.distance
         } else if (this.showRadius === "attack") {
             data = this._portDataFiltered.filter((port) => port.attackHostility)
@@ -964,7 +966,7 @@ export default class DisplayPorts {
         }
 
         this._gPortCircle
-            .selectAll("circle")
+            .selectAll<SVGCircleElement, PortWithTrades>("circle")
             .data(data, (d) => d.id)
             .join((enter) =>
                 enter
@@ -1016,10 +1018,11 @@ export default class DisplayPorts {
             const circleSize = roundToThousands(this._circleSize / circleScale)
             const fontScale = 2 ** Math.log2((Math.abs(this._minScale) + this._scale) * 0.9)
             const fontSize = roundToThousands(this._fontSize / fontScale)
+            const data = this._portDataFiltered
 
             this._gText
-                .selectAll("text")
-                .data(this._portDataFiltered, (d) => d.id)
+                .selectAll<SVGTextElement, PortWithTrades>("text")
+                .data(data, (d) => d.id)
                 .join((enter) => enter.append("text").text((d) => d.name))
                 .attr("x", (d) => this._updateTextsX(d, circleSize))
                 .attr("y", (d) => this._updateTextsY(d, circleSize, fontSize))
@@ -1049,7 +1052,7 @@ export default class DisplayPorts {
             const data = this._countyPolygonFiltered
 
             this._gCounty
-                .selectAll("text")
+                .selectAll<SVGTextElement, Area>("text")
                 .data(data, (d) => d.name)
                 .join(
                     (enter) =>
@@ -1058,7 +1061,7 @@ export default class DisplayPorts {
                             .attr("transform", (d) => `translate(${d.centroid[0]},${d.centroid[1]})rotate(${d.angle})`)
                             .text((d) => d.name),
                     (update) =>
-                        update.attr("fill", (d) =>
+                        update.attr("fill", (d: Area): string =>
                             this.showRadius === "county" ? this._colourScaleCounty(d.name) : ""
                         )
                 )
@@ -1088,7 +1091,7 @@ export default class DisplayPorts {
             const data = this._regionPolygonFiltered
 
             this._gRegion
-                .selectAll("text")
+                .selectAll<SVGTextElement, Area>("text")
                 .data(data, (d) => d.name)
                 .join((enter) =>
                     enter

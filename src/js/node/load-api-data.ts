@@ -76,9 +76,7 @@ const getAPIDataAndSave = async (serverName: string, apiBaseFile: string, outfil
         throw data
     }
 
-    data.sort(
-        sortBy<APIType>(["Id"])
-    )
+    data.sort(sortBy(["Id"]))
     await saveJsonAsync(outfileName, data)
     await xzAsync("xz", outfileName)
 

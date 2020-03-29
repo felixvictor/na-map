@@ -124,9 +124,7 @@ const setPortFeaturePerServer = (apiPort: APIPort): void => {
                                     : good.SellContractQuantity,
                         } as InventoryEntity)
                 )
-                .sort(
-                    sortBy<InventoryEntity>(["name"])
-                ),
+                .sort(sortBy(["name"])),
         } as PortPerServer
         // Delete empty entries
         for (const type of ["dropsTrading", "consumesTrading", "producesNonTrading", "dropsNonTrading"]) {
@@ -178,7 +176,6 @@ const setAndSaveTradeData = async (serverName: string): Promise<void> => {
             })
     }
 
-    // @ts-ignore
     trades.sort(sortBy(["profitTotal"]))
 
     await saveJsonAsync(path.resolve(commonPaths.dirGenServer, `${serverName}-trades.json`), trades)
@@ -202,9 +199,7 @@ const setAndSavePortBattleData = async (serverName: string): Promise<void> => {
                     portBattle: "",
                 } as PortBattlePerServer)
         )
-        .sort(
-            sortBy<PortBattlePerServer>(["id"])
-        )
+        .sort(sortBy(["id"]))
     await saveJsonAsync(path.resolve(commonPaths.dirGenServer, `${serverName}-pb.json`), pb)
 }
 
@@ -261,9 +256,7 @@ const setAndSaveFrontlines = async (serverName: string): Promise<void> => {
                                     distance: getDistance(Number(fromPort.Id), Number(toPort.Id)),
                                 } as DistanceExtended)
                         )
-                        .sort(
-                            sortBy<DistanceExtended>(["distance"])
-                        )
+                        .sort(sortBy(["distance"]))
                         .slice(0, frontlinePorts)
                 )
 
