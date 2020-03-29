@@ -299,6 +299,7 @@ export interface PortWithTrades extends Port {
 export type ConquestMarksPension = 1 | 3
 export type TradingCompany = 0 | 1 | 2
 export type LaborHoursDiscount = 0 | 1 | 2
+export type GoodList = string[]
 export interface PortPerServer {
     [index: string]: PortIntersection
     id: number
@@ -310,10 +311,10 @@ export interface PortPerServer {
     netIncome: number
     tradingCompany: TradingCompany
     laborHoursDiscount: LaborHoursDiscount
-    dropsTrading?: string[]
-    consumesTrading?: string[]
-    producesNonTrading?: string[]
-    dropsNonTrading?: string[]
+    dropsTrading?: GoodList
+    consumesTrading?: GoodList
+    producesNonTrading?: GoodList
+    dropsNonTrading?: GoodList
     inventory: InventoryEntity[]
 }
 export interface InventoryEntity {
@@ -423,6 +424,7 @@ export interface Trade {
     profitTotal: number
     quantity: number
     weightPerItem: number
+    profit?: number
 }
 interface TradePrice {
     id: number
@@ -605,11 +607,12 @@ export interface RepairAmount {
  * <servername>-frontlines.json
  */
 export interface FrontlinesPerServer {
+    [index: string]: ValuesType<FrontlinesPerServer>
     attacking: Attacking
     defending: Defending
 }
-interface Attacking extends NationListOptional<FrontLineValue> {}
-interface Defending extends NationListOptional<FrontLineValue> {}
+interface Attacking extends NationListOptional<FrontLineValue[]> {}
+interface Defending extends NationListOptional<FrontLineValue[]> {}
 export interface FrontLineValue {
     [index: string]: ValuesType<FrontLineValue>
     key: string
