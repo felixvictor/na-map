@@ -39,19 +39,18 @@ export const simpleNumberSort = (a: number | undefined, b: number | undefined): 
 /**
  * Sort by a list of properties (in left-to-right order)
  */
-export const sortBy = <T>(properties: string[]) => (a: T, b: T): number => {
+export const sortBy = <T, K extends keyof T>(propertyNames: K[]) => (a: T, b: T): number => {
     let r = 0
-    properties.some((property: string) => {
+    propertyNames.some((propertyName: K) => {
         let sign = 1
 
         // property starts with '-' when sort is descending
-        if (property.startsWith("-")) {
+        if (String(propertyName).startsWith("-")) {
             sign = -1
-            property = property.slice(1)
+            propertyName = String(propertyName).slice(1) as K
         }
 
-        // @ts-ignore
-        r = a[property].localecompare(b[property]) * sign // eslint-disable @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+        r = String(a[propertyName]).localeCompare(String(b[propertyName])) * sign
 
         return r !== 0
     })
