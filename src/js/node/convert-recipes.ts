@@ -139,7 +139,6 @@ const convertRecipes = async (): Promise<void> => {
         }
     )
 
-    // @ts-ignore
     data.recipe.sort(sortBy(["craftGroup", "id"]))
 
     const result = [...ingredients.values()]

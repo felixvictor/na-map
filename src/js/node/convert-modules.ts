@@ -258,7 +258,6 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         // Sort by modifier
         for (const type of ["frame", "trim"]) {
             for (const APIwood of woods[type]) {
-                // @ts-ignore
                 APIwood.properties.sort(sortBy(["modifier", "id"]))
             }
         }

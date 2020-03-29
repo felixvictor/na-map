@@ -30,7 +30,7 @@ export const nations: Nation[] = [
     { id: 9, short: "FT", name: "Free Town", sortName: "Free Town" },
     { id: 10, short: "RU", name: "Russian Empire", sortName: "Russian Empire" },
     { id: 11, short: "DE", name: "Kingdom of Prussia", sortName: "Prussia" },
-    { id: 12, short: "PL", name: "Commonwealth of Poland", sortName: "Poland" }
+    { id: 12, short: "PL", name: "Commonwealth of Poland", sortName: "Poland" },
 ]
 
 // noinspection SpellCheckingInspection
@@ -111,8 +111,11 @@ export const capitalToCounty = new Map([
     ["Vera Cruz", "Vera Cruz"],
     ["West End", "Grand Bahama"],
     ["Willemstad", "Benedenwinds"],
-    ["Wilmington", "North Carolina"]
+    ["Wilmington", "North Carolina"],
 ])
+
+export const validNationShortName = (nationShortName: string): boolean =>
+    nations.some((nation) => nation.short === nationShortName)
 
 /**
  * Test if object is empty
@@ -158,24 +161,24 @@ export const groupToMap = (list: any, keyGetter: any): Map<any, any> => {
 export const range = (
     start: number, // Start index
     end: number // End index
-): number[] => [...new Array(1 + end - start).keys()].map(v => start + v)
+): number[] => [...new Array(1 + end - start).keys()].map((v) => start + v)
 
 /**
  * Find Nation object based on nation name
  */
 export const findNationByName = (nationName: string): Nation | undefined =>
-    nations.find(nation => nationName === nation.name)
+    nations.find((nation) => nationName === nation.name)
 
 /**
  * Find Nation object based on nation short name
  */
 export const findNationByNationShortName = (nationShortName: string): Nation | undefined =>
-    nations.find(nation => nation.short === nationShortName)
+    nations.find((nation) => nation.short === nationShortName)
 
 /**
  * Find Nation object based on nation id
  */
-export const findNationById = (nationId: number): Nation | undefined => nations.find(nation => nationId === nation.id)
+export const findNationById = (nationId: number): Nation | undefined => nations.find((nation) => nationId === nation.id)
 
 /**
  * Write fetch error to console
