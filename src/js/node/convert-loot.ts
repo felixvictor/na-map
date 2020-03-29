@@ -73,15 +73,14 @@ const convertLoot = async (): Promise<void> => {
     ) as unknown) as APIShipLootTableItem[]
     data.loot = loot
         .map(
-            (item): LootLootEntity => ({
-                id: Number(item.Id),
-                name: getLootName(Number(item.Class), item.EventLootTable),
-                // @ts-ignore
-                items: getLootItems(item.Items ?? [], item.itemProbability ?? [0]).sort(sortBy(["chance", "id"])),
-            })
+            (item) =>
+                ({
+                    id: Number(item.Id),
+                    name: getLootName(Number(item.Class), item.EventLootTable),
+                    items: getLootItems(item.Items ?? [], item.itemProbability ?? [0]).sort(sortBy(["chance", "id"])),
+                } as LootLootEntity)
         )
-        // @ts-ignore
-        .sort(sortBy(["class", "id"]))
+        .sort(sortBy(["name", "id"]))
 
     types = ["TimeBasedConvertibleItem"]
     const chests = (apiItems.filter(
@@ -89,20 +88,19 @@ const convertLoot = async (): Promise<void> => {
     ) as unknown) as APITimeBasedConvertibleItem[]
     data.chests = chests
         .map(
-            (item): LootChestsEntity => ({
-                id: Number(item.Id),
-                name: cleanName(item.Name),
-                weight: Number(item.ItemWeight),
-                lifetime: Number(item.LifetimeSeconds) / secondsPerHour,
-                items: item.ExtendedLootTable?.map((lootChestLootTableId) =>
-                    getLootItemsFromChestLootTable(lootChestLootTableId)
-                )
-                    .reduce((acc, value) => acc.concat(value), [])
-                    // @ts-ignore
-                    .sort(sortBy(["chance", "id"])),
-            })
+            (item) =>
+                ({
+                    id: Number(item.Id),
+                    name: cleanName(item.Name),
+                    weight: Number(item.ItemWeight),
+                    lifetime: Number(item.LifetimeSeconds) / secondsPerHour,
+                    items: item.ExtendedLootTable?.map((lootChestLootTableId) =>
+                        getLootItemsFromChestLootTable(lootChestLootTableId)
+                    )
+                        .reduce((acc, value) => acc.concat(value), [])
+                        .sort(sortBy(["chance", "id"])),
+                } as LootChestsEntity)
         )
-        // @ts-ignore
         .sort(sortBy(["id"]))
 
     await saveJsonAsync(commonPaths.fileLoot, data)
