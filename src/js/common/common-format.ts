@@ -59,14 +59,14 @@ const formatLocale = d3FormatLocale({
     grouping: [3],
     currency: ["", "\u00A0reals"],
     percent: "\u202F%",
-    minus: "\u2212\u2009"
+    minus: "\u2212\u2009",
 } as FormatLocaleDefinition)
 
 // noinspection MagicNumberJS
 /**
  * format with SI suffix
  */
-const formatPrefix = formatLocale.formatPrefix(",.0", 1.0e3)
+const formatPrefix = formatLocale.formatPrefix(",.0", 1e3)
 
 /**
  * Format float
@@ -83,9 +83,7 @@ export const formatFloat = (x: number, s = 2): string => formatLocale.format(`,.
  * @returns Formatted signed float
  */
 export const formatSignFloat = (x: number, s = 2): string =>
-    formatLocale
-        .format(`+,.${s}~r`)(x)
-        .replace("+", "\uFF0B\u200A")
+    formatLocale.format(`+,.${s}~r`)(x).replace("+", "\uFF0B\u200A")
 
 /**
  * Format float
@@ -106,12 +104,8 @@ export const formatFloatFixed = (x: number, f = 2): string =>
  * @returns Formatted float
  */
 export const formatFloatFixedHTML = (x: number, f = 2): TemplateResult => {
-    const [number, decimals] = formatLocale
-        .format(`.${f}f`)(x)
-        .split(".")
-    let formattedFloat: TemplateResult = html`
-        ${decimals}
-    `
+    const [number, decimals] = formatLocale.format(`.${f}f`)(x).split(".")
+    let formattedFloat: TemplateResult = html` ${decimals} `
 
     if (decimals) {
         if (decimals === "0" || decimals === "00") {
@@ -131,9 +125,8 @@ export const formatFloatFixedHTML = (x: number, f = 2): TemplateResult => {
             `
         }
     }
-    return html`
-        ${number}${formattedFloat}
-    `
+
+    return html` ${number}${String(formattedFloat)} `
 }
 
 /**
@@ -163,20 +156,14 @@ export const formatIntTrunc = (x: number): string => formatLocale.format(",d")(x
  * @param   x - Integer
  * @returns Formatted Integer
  */
-export const formatSignInt = (x: number): string =>
-    formatLocale
-        .format("+,d")(x)
-        .replace("+", "\uFF0B\u200A")
+export const formatSignInt = (x: number): string => formatLocale.format("+,d")(x).replace("+", "\uFF0B\u200A")
 
 /**
  * Format percentage point
  * @param   x - Integer
  * @returns Formatted percentage point
  */
-export const formatPP = (x: number): string =>
-    formatLocale
-        .format(",.0%")(x)
-        .replace("%", "pp")
+export const formatPP = (x: number): string => formatLocale.format(",.0%")(x).replace("%", "pp")
 
 /**
  * Format integer with SI suffix
@@ -209,10 +196,7 @@ export const formatSiCurrency = (x: number): string =>
  * @param   f - digits following decimal point
  * @returns Formatted percent value
  */
-export const formatPercent = (x: number, f = 1): string =>
-    formatLocale
-        .format(`.${f}%`)(x)
-        .replace(".0", "")
+export const formatPercent = (x: number, f = 1): string => formatLocale.format(`.${f}%`)(x).replace(".0", "")
 
 /**
  * Format percent value with +/- sign
@@ -220,7 +204,4 @@ export const formatPercent = (x: number, f = 1): string =>
  * @returns Formatted percent value
  */
 export const formatSignPercent = (x: number): string =>
-    formatLocale
-        .format("+.1%")(x)
-        .replace(".0", "")
-        .replace("+", "\uFF0B\u200A")
+    formatLocale.format("+.1%")(x).replace(".0", "").replace("+", "\uFF0B\u200A")

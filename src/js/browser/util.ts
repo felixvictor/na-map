@@ -47,12 +47,12 @@ export const displayCompass = (wind: string, svg = false): string => {
  * @param   svg - True to use 'tspan' instead of 'span'
  * @returns HTML formatted compass and correctionValueDegrees
  */
-export const displayCompassAndDegrees = (wind: string, svg = false): string => {
-    let compass
-    let degrees
+export const displayCompassAndDegrees = (wind: number | string, svg = false): string => {
+    let compass: string
+    let degrees: number
 
     if (Number.isNaN(Number(wind))) {
-        compass = wind
+        compass = wind as string
         degrees = compassToDegrees(compass) % degreesFullCircle
     } else {
         degrees = Number(wind)
@@ -152,7 +152,7 @@ export const printCompassRose = ({
     element,
     radius,
 }: {
-    element: Selection<BaseType, unknown, HTMLElement, any>
+    element: Selection<BaseType, any, HTMLElement, any>
     radius: number
 }): void => {
     const steps = numberSegments
