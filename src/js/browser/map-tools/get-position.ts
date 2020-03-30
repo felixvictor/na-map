@@ -61,31 +61,31 @@ const dot = (a: Vector, b: Vector): number => a.x * b.x + a.y * b.y + a.z * b.z
 const vectorSubtract = (a: Vector, b: Vector): Vector => ({
     x: a.x - b.x,
     y: a.y - b.y,
-    z: a.z - b.z
+    z: a.z - b.z,
 })
 
 const vectorAdd = (a: Vector, b: Vector): Vector => ({
     x: a.x + b.x,
     y: a.y + b.y,
-    z: a.z + b.z
+    z: a.z + b.z,
 })
 
 const vectorDivide = (a: Vector, b: number): Vector => ({
     x: a.x / b,
     y: a.y / b,
-    z: a.z / b
+    z: a.z / b,
 })
 
 const vectorMultiply = (a: Vector, b: number): Vector => ({
     x: a.x * b,
     y: a.y * b,
-    z: a.z * b
+    z: a.z * b,
 })
 
 const vectorCross = (a: Vector, b: Vector): Vector => ({
     x: a.y * b.z - a.z * b.y,
     y: a.z * b.x - a.x * b.z,
-    z: a.x * b.y - a.y * b.x
+    z: a.x * b.y - a.y * b.x,
 })
 
 /**
@@ -129,7 +129,7 @@ const trilaterate = (p1: Circle, p2: Circle, p3: Circle, returnMiddle = false): 
     const z = Math.sqrt(b)
 
     // no solution found
-    if (isNaN(z)) {
+    if (Number.isNaN(z)) {
         return null
     }
 
@@ -171,7 +171,7 @@ export default class TrilateratePosition {
         this._baseId = "get-position"
         this._buttonId = `button-${this._baseId}`
         this._modalId = `modal-${this._baseId}`
-        this._modal$ = {} as JQuery<HTMLElement>
+        this._modal$ = {} as JQuery
 
         this._select = []
         this._input = []
@@ -194,17 +194,14 @@ export default class TrilateratePosition {
      * Setup menu item listener
      */
     _setupListener(): void {
-        document.querySelector(`${this._buttonId}`)?.addEventListener("click", event => this._navbarClick(event))
+        document.querySelector(`${this._buttonId}`)?.addEventListener("click", (event) => this._navbarClick(event))
     }
 
     _injectModal(): void {
         insertBaseModal({ id: this._modalId, title: this._baseName, size: "", buttonText: "Go" })
 
         const body = d3Select(`#${this._modalId} .modal-body`)
-        body.append("div")
-            .attr("class", "alert alert-primary")
-            .attr("role", "alert")
-            .text("Use in-game trader tool.")
+        body.append("div").attr("class", "alert alert-primary").attr("role", "alert").text("Use in-game trader tool.")
 
         const form = body.append("form")
         const dataList = form.append("datalist").attr("id", "defaultDistances")
@@ -240,16 +237,16 @@ export default class TrilateratePosition {
 
     _setupSelects(): void {
         const selectPorts = this._ports.portDataDefault
-            .map(d => ({
+            .map((d) => ({
                 id: d.id,
                 coord: [d.coordinates[0], d.coordinates[1]],
                 name: d.name,
-                nation: d.nation
+                nation: d.nation,
             }))
             .sort(sortBy(["name"]))
 
         const options = `${selectPorts
-            .map(port => `<option data-subtext="${port.nation}">${port.name}</option>`)
+            .map((port) => `<option data-subtext="${port.nation}">${port.name}</option>`)
             .join("")}`
         for (const inputNumber of [...new Array(this._NumberOfInputs).keys()]) {
             this._selector[inputNumber] = document.querySelector(this._select[inputNumber]) as HTMLSelectElement
@@ -261,7 +258,7 @@ export default class TrilateratePosition {
                 liveSearchNormalize: true,
                 liveSearchPlaceholder: "Search ...",
                 title: "Select port",
-                virtualScroll: true
+                virtualScroll: true,
             } as BootstrapSelectOptions)
         }
     }
@@ -278,11 +275,11 @@ export default class TrilateratePosition {
      * Show and go to Position
      */
     _showAndGoToPosition(): void {
-        const circles = this._ports.portData.map(port => ({
+        const circles = this._ports.portData.map((port) => ({
             x: port.coordinates[0],
             y: port.coordinates[1],
             z: 0,
-            r: port.distance??0
+            r: port.distance ?? 0,
         }))
 
         const position = trilaterate(circles[0], circles[1], circles[2], true) as Vector
@@ -292,8 +289,8 @@ export default class TrilateratePosition {
             position.x = Math.round(position.x)
             position.y = Math.round(position.y)
 
-            this._ports._map._f11.printCoord(position.x, position.y)
-            this._ports._map.zoomAndPan(position.x, position.y, 1)
+            this._ports.map.f11.printCoord(position.x, position.y)
+            this._ports.map.zoomAndPan(position.x, position.y, 1)
 
             const coordX = Math.round(convertInvCoordX(position.x, position.y) / -1000)
             const coordY = Math.round(convertInvCoordY(position.x, position.y) / -1000)
@@ -344,8 +341,8 @@ export default class TrilateratePosition {
             this._ports.portData = JSON.parse(
                 JSON.stringify(
                     this._ports.portDataDefault
-                        .filter(port => ports.has(port.name))
-                        .map(port => {
+                        .filter((port) => ports.has(port.name))
+                        .map((port) => {
                             port.distance = ports.get(port.name)
                             return port
                         })

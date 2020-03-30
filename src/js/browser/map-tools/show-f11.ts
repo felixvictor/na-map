@@ -187,8 +187,8 @@ export default class ShowF11 {
             })
 
             // Copy coordinates to clipboard (ctrl-c key event)
-            document.querySelector(this._modalId)?.addEventListener("keydown", (event): void => {
-                if (event.key === "KeyC" && event.ctrlKey) {
+            document.querySelector(this._modalId)?.addEventListener("keydown", (event: Event): void => {
+                if ((event as KeyboardEvent).key === "KeyC" && (event as KeyboardEvent).ctrlKey) {
                     this._copyCoordClicked(event)
                 }
             })
