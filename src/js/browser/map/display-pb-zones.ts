@@ -115,8 +115,8 @@ export default class DisplayPbZones {
 
     _update(): void {
         this._g
-            .selectAll<SVGGElement, any>("g.pb-zones")
-            .data(this._pbZonesFiltered, (d) => d.id)
+            .selectAll<SVGGElement, PbZoneBasic>("g.pb-zones")
+            .data(this._pbZonesFiltered, (d) => String(d.id))
             .join((enter) => {
                 const g = enter.append("g").attr("class", "pb-zones")
 
@@ -140,11 +140,13 @@ export default class DisplayPbZones {
                     .attr("x", (d) => d.pbCircles.map((pbCircle) => pbCircle[0]).join(","))
                     .attr("y", (d) => d.pbCircles.map((pbCircle) => pbCircle[1]).join(","))
                     .text((d) => d.pbCircles.map((pbCircle, i) => String.fromCharCode(65 + i)).join(""))
+
+                return enter
             })
 
         this._g
-            .selectAll<SVGGElement, any>("g.raid-zones")
-            .data(this._raidZonesFiltered, (d) => d.id)
+            .selectAll<SVGGElement, PbZoneRaid>("g.raid-zones")
+            .data(this._raidZonesFiltered, (d) => String(d.id))
             .join((enter) => {
                 const g = enter.append("g").attr("class", "raid-zones")
 
@@ -176,11 +178,13 @@ export default class DisplayPbZones {
                     .attr("x", (d) => d.raidPoints.map((raidPoint) => raidPoint[0]).join(","))
                     .attr("y", (d) => d.raidPoints.map((raidPoint) => raidPoint[1]).join(","))
                     .text((d) => d.raidPoints.map((raidPoint, i) => String.fromCharCode(49 + i)).join(""))
+
+                return enter
             })
 
         this._g
-            .selectAll<SVGGElement, any>("g.defence")
-            .data(this._defencesFiltered, (d) => d.id)
+            .selectAll<SVGGElement, PbZoneDefence>("g.defence")
+            .data(this._defencesFiltered, (d) => String(d.id))
             .join((enter) => {
                 const g = enter.append("g").attr("class", "defence")
 
@@ -203,6 +207,8 @@ export default class DisplayPbZones {
                     .attr("x", (d) => d.towers.map((tower) => tower[0]).join(","))
                     .attr("y", (d) => d.towers.map((tower) => tower[1]).join(","))
                     .text((d) => d.towers.map((tower, i) => `${i + 1}`).join(""))
+
+                return enter
             })
     }
 
