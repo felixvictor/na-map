@@ -44,6 +44,7 @@ interface Node {
  * Show trades
  */
 export default class ShowTrades {
+    show: boolean
     private readonly _serverName: string
     private readonly _portSelect: SelectPorts
     private _isDataLoaded: boolean
@@ -64,7 +65,6 @@ export default class ShowTrades {
     private readonly _profitRadioValues: string[]
     private readonly _profitCookie: Cookie
     private readonly _profitRadios: RadioButton
-    private show: boolean
     private _profitValue: string
     private _lowerBound!: Bound
     private _upperBound!: Bound
@@ -163,10 +163,6 @@ export default class ShowTrades {
         return `<div class="des">${text}</div></div>`
     }
 
-    static _getDepth(isShallow: boolean): string {
-        return isShallow ? "(shallow)" : "(deep)"
-    }
-
     static _getProfitPerWeight(trade: Trade): number {
         return trade.weightPerItem === 0
             ? trade.profitTotal
@@ -185,8 +181,8 @@ export default class ShowTrades {
         return "</div>"
     }
 
-    static _hideDetails(d: Trade, i: number, nodes: SVGPathElement[] | d3Selection.ArrayLike<SVGPathElement>) {
-        $(d3Select(nodes[i]).node()).tooltip("dispose")
+    static _hideDetails(d: Trade, i: number, nodes: SVGPathElement[] | d3Selection.ArrayLike<SVGPathElement>): void {
+        $(d3Select(nodes[i]).node() as JQuery.PlainObject).tooltip("dispose")
     }
 
     static _showElem(elem: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, any>): void {
@@ -351,7 +347,7 @@ export default class ShowTrades {
                 trade.profit = profit
                 return trade
             })
-            .sort((a, b) => b.profit - a.profit)
+            .sort((a, b) => b.profit ?? 0 - (a.profit ?? 0))
     }
 
     async _showSelected(): Promise<void> {
@@ -433,6 +429,14 @@ export default class ShowTrades {
         this.update()
     }
 
+    _portIsShallow(portId: number): boolean {
+        return this._nodeData.get(portId)?.isShallow ?? true
+    }
+
+    _getDepth(portId: number): string {
+        return this._portIsShallow(portId) ? "(shallow)" : "(deep)"
+    }
+
     _getTradeLimitedData(trade: Trade): HtmlString {
         const weight = trade.weightPerItem * trade.quantity
 
@@ -447,14 +451,13 @@ export default class ShowTrades {
                 `${this._nodeData.get(trade.source.id)?.name} <span class="caps">${
                     this._nodeData.get(trade.source.id)?.nation
                 }</span>`
-            ) +
-            ShowTrades._addDes(`from ${ShowTrades._getDepth(this._nodeData.get(trade.source.id)?.isShallow ?? true)}`)
+            ) + ShowTrades._addDes(`from ${this._getDepth(trade.source.id)}`)
         h +=
             ShowTrades._addInfo(
                 `${this._nodeData.get(trade.target.id)?.name} <span class="caps">${
                     this._nodeData.get(trade.target.id)?.nation
                 }</span>`
-            ) + ShowTrades._addDes(`to ${ShowTrades._getDepth(this._nodeData.get(trade.target.id)?.isShallow ?? true)}`)
+            ) + ShowTrades._addDes(`to ${this._getDepth(trade.target.id)}`)
         h += ShowTrades._addInfo(`${formatSiInt(trade.distance)}\u2009k`) + ShowTrades._addDes("distance")
 
         return h
@@ -491,14 +494,13 @@ export default class ShowTrades {
                 `${this._nodeData.get(trade.source.id)?.name} <span class="caps">${
                     this._nodeData.get(trade.source.id)?.nation
                 }</span>`
-            ) +
-            ShowTrades._addDes(`from ${ShowTrades._getDepth(this._nodeData.get(trade.source.id)?.isShallow ?? true)}`)
+            ) + ShowTrades._addDes(`from ${this._getDepth(trade.source.id)}`)
         h +=
             ShowTrades._addInfo(
                 `${this._nodeData.get(trade.target.id)?.name} <span class="caps">${
                     this._nodeData.get(trade.target.id)?.nation
                 }</span>`
-            ) + ShowTrades._addDes(`to ${ShowTrades._getDepth(this._nodeData.get(trade.source.id)?.isShallow ?? true)}`)
+            ) + ShowTrades._addDes(`to ${this._getDepth(trade.source.id)}`)
         h += ShowTrades._addInfo(`${formatSiInt(trade.distance)}\u2009k`) + ShowTrades._addDes("distance")
         h += ShowTrades._endBlock()
 
@@ -509,7 +511,7 @@ export default class ShowTrades {
         const trade = d3Select(nodes[i])
         const title = this._getTradeFullData(d)
 
-        $(trade.node())
+        $(trade.node() as JQuery.PlainObject)
             .tooltip({
                 html: true,
                 placement: "auto",
@@ -534,13 +536,21 @@ export default class ShowTrades {
             .map((link) => link.profit ?? 0)
     }
 
+    _getXCoord(portId: number): number {
+        return this._nodeData.get(portId)?.x ?? 0
+    }
+
+    _getYCoord(portId: number): number {
+        return this._nodeData.get(portId)?.y ?? 0
+    }
+
     /**
-     * @link https://bl.ocks.org/mattkohl/146d301c0fc20d89d85880df537de7b0
+     * {@link https://bl.ocks.org/mattkohl/146d301c0fc20d89d85880df537de7b0}
      */
     _updateGraph(): void {
         const arcPath = (leftHand: boolean, d: Trade): string => {
-            const source = { x: this._nodeData.get(d.source.id)?.x ?? 0, y: this._nodeData.get(d.source.id)?.y ?? 0 }
-            const target = { x: this._nodeData.get(d.target.id)?.x ?? 0, y: this._nodeData.get(d.target.id)?.y ?? 0 }
+            const source = { x: this._getXCoord(d.source.id), y: this._getYCoord(d.source.id) }
+            const target = { x: this._getXCoord(d.target.id), y: this._getYCoord(d.target.id) }
             const x1 = leftHand ? source.x : target.x
             const y1 = leftHand ? source.y : target.y
             const x2 = leftHand ? target.x : source.x
@@ -568,35 +578,26 @@ export default class ShowTrades {
             .domain(extent)
         const fontScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale)
         const fontSize = roundToThousands(this._fontSize / fontScale)
-        const transition = this._g.transition().duration(500)
 
         this._g
             .selectAll<SVGPathElement, Trade>(".trade-link")
             .data(data, (d) => ShowTrades._getId(d))
-            .join(
-                (enter) =>
-                    enter
-                        .append("path")
-                        .attr("class", "trade-link")
-                        .attr("marker-start", (d) =>
-                            this._nodeData.get(d.source.id).x < this._nodeData.get(d.target.id).x
-                                ? ""
-                                : "url(#trade-arrow)"
-                        )
-                        .attr("marker-end", (d) =>
-                            this._nodeData.get(d.source.id).x < this._nodeData.get(d.target.id).x
-                                ? "url(#trade-arrow)"
-                                : ""
-                        )
-                        .attr("id", (d) => ShowTrades._getId(d))
-                        .attr("opacity", 0)
-                        .on("click", (d, i, nodes) => this._showDetails(d, i, nodes))
-                        .on("mouseleave", ShowTrades._hideDetails)
-                        .call((enterCall) => enterCall.transition(transition).attr("opacity", 1)),
-                (update) => update.attr("opacity", 1),
-                (exit) => exit.call((exitCall) => exitCall.transition(transition).attr("opacity", 0).remove())
+            .join((enter) =>
+                enter
+                    .append("path")
+                    .attr("class", "trade-link")
+                    .attr("marker-start", (d) =>
+                        this._getXCoord(d.source.id) < this._getXCoord(d.target.id) ? "" : "url(#trade-arrow)"
+                    )
+                    .attr("marker-end", (d) =>
+                        this._getXCoord(d.source.id) < this._getXCoord(d.target.id) ? "url(#trade-arrow)" : ""
+                    )
+                    .attr("id", (d) => ShowTrades._getId(d))
+                    .attr("opacity", 0)
+                    .on("click", (d, i, nodes) => this._showDetails(d, i, nodes))
+                    .on("mouseleave", ShowTrades._hideDetails)
             )
-            .attr("d", (d) => arcPath(this._nodeData.get(d.source.id).x < this._nodeData.get(d.target.id).x, d))
+            .attr("d", (d) => arcPath(this._getXCoord(d.source.id) < this._getXCoord(d.target.id), d))
             .attr("stroke-width", (d) => `${linkWidthScale(d.profit ?? 0)}px`)
 
         this._labelG.attr("font-size", `${fontSize}px`)
@@ -604,19 +605,15 @@ export default class ShowTrades {
         this._labelG
             .selectAll<SVGTextElement, Trade>(".trade-label")
             .data(this._linkDataFiltered, (d) => ShowTrades._getId(d))
-            .join(
-                (enter) =>
-                    enter
-                        .append("text")
-                        .attr("class", "trade-label")
-                        .append("textPath")
-                        .attr("startOffset", "15%")
-                        .attr("xlink:href", (d) => `#${ShowTrades._getId(d)}`)
-                        .text((d) => `${formatInt(d.quantity)} ${d.good}`)
-                        .attr("opacity", 0)
-                        .call((enterCall) => enterCall.transition(transition).attr("opacity", 1)),
-                (update) => update.attr("opacity", 1),
-                (exit) => exit.call((exitCall) => exitCall.transition(transition).attr("opacity", 0).remove())
+            .join((enter) =>
+                enter
+                    .append("text")
+                    .attr("class", "trade-label")
+                    .append("textPath")
+                    .attr("startOffset", "15%")
+                    .attr("xlink:href", (d) => `#${ShowTrades._getId(d)}`)
+                    .text((d) => `${formatInt(d.quantity)} ${d.good}`)
+                    .attr("opacity", 0)
             )
             .attr("dy", (d) => `-${linkWidthScale(d.profit ? d.profit / 1.5 : 0)}px`)
     }
