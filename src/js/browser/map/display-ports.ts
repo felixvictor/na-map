@@ -9,6 +9,7 @@
  */
 
 /// <reference types="bootstrap" />
+/// <reference types="webpack-env" />
 
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/tooltip"
@@ -18,11 +19,13 @@ import { interpolateCubehelixLong as d3InterpolateCubehelixLong } from "d3-inter
 import { ScaleLinear, scaleLinear as d3ScaleLinear, ScaleOrdinal, scaleOrdinal as d3ScaleOrdinal } from "d3-scale"
 import { select as d3Select } from "d3-selection"
 import * as d3Selection from "d3-selection"
+import * as d3Zoom from "d3-zoom"
 // import { curveCatmullRomClosed as d3CurveCatmullRomClosed, line as d3Line } from "d3-shape";
 
 import moment from "moment"
 import "moment/locale/en-gb"
 
+import { nations, putImportError } from "../../common/common"
 import {
     Bound,
     colourGreenDark,
@@ -34,7 +37,6 @@ import {
     colourWhite,
     HtmlString,
 } from "../../common/common-browser"
-import { nations, putImportError } from "../../common/common"
 import { formatInt, formatPercent, formatSiCurrency, formatSiInt } from "../../common/common-format"
 import {
     Coordinate,
@@ -46,17 +48,16 @@ import {
     Point,
     roundToThousands,
 } from "../../common/common-math"
-import { displayClan } from "../util"
 
+import { displayClan } from "../util"
 import Cookie from "../util/cookie"
 import RadioButton from "../util/radio-button"
+import { Port, PortBattlePerServer, PortBasic, PortPerServer, NationList, PortWithTrades } from "../../common/gen-json"
+import { DivDatum, SVGGDatum } from "../../common/interface"
+
 import TrilateratePosition from "../map-tools/get-position"
 import { NAMap } from "./na-map"
 import ShowF11 from "../map-tools/show-f11"
-import { Port, PortBattlePerServer, PortBasic, PortPerServer, NationList, PortWithTrades } from "../../common/gen-json"
-import { DivDatum, SVGGDatum, SVGSVGDatum } from "../../common/interface"
-import * as d3Zoom from "d3-zoom"
-import PlainObject = JQuery.PlainObject;
 
 type PortCircleStringF = (d: PortWithTrades) => string
 type PortCircleNumberF = (d: PortWithTrades) => number
@@ -120,7 +121,6 @@ export default class DisplayPorts {
     tradePortId!: number
     zoomLevel: string
     circleType = ""
-    readonly #map: NAMap
     private _attackRadius!: ScaleLinear<number, number>
     private _colourScaleCounty!: ScaleOrdinal<string, string>
     private _colourScaleHostility!: ScaleLinear<string, string>
@@ -173,12 +173,10 @@ export default class DisplayPorts {
     private _regionPolygonFiltered!: Area[]
 
     constructor(readonly map: NAMap) {
-        this.#map = map
-
-        this._serverName = this.#map.serverName
-        this._minScale = this.#map.minScale
+        this._serverName = this.map.serverName
+        this._minScale = this.map.minScale
         this._scale = this._minScale
-        this._f11 = this.#map.f11
+        this._f11 = this.map.f11
 
         this.showCurrentGood = false
         this.showTradePortPartners = false
@@ -269,6 +267,14 @@ export default class DisplayPorts {
         }
 
         return h
+    }
+
+    static _hideDetails(
+        _d: PortWithTrades,
+        i: number,
+        nodes: SVGCircleElement[] | d3Selection.ArrayLike<SVGCircleElement>
+    ): void {
+        $(d3Select(nodes[i]).node() as JQuery.PlainObject).tooltip("dispose")
     }
 
     async init(): Promise<void> {
@@ -525,7 +531,7 @@ export default class DisplayPorts {
         ] as Area[]
 
         // Sort by distance, origin is top left corner
-        const origin = { x: this.#map.coord.max / 2, y: this.#map.coord.max / 2 }
+        const origin = { x: this.map.coord.max / 2, y: this.map.coord.max / 2 }
         this._countyPolygon = this._countyPolygon.sort((a, b) => {
             const pointA = { x: a.centroid[0], y: a.centroid[1] }
             const pointB = { x: b.centroid[0], y: b.centroid[1] }
@@ -826,32 +832,23 @@ export default class DisplayPorts {
         i: number,
         nodes: SVGCircleElement[] | d3Selection.ArrayLike<SVGCircleElement>
     ): void {
-        $(d3Select(nodes[i]).node())
+        $(d3Select(nodes[i]).node() as JQuery.PlainObject)
             .tooltip({
                 html: true,
                 placement: "auto",
-                title: this._tooltipData(this._getText(d.id, d)),
+                title: this._tooltipData(this._getText(d)),
                 trigger: "manual",
                 sanitize: false,
             })
             .tooltip("show")
 
-        if (this.#map.showTrades.show) {
-            if (this.#map.showTrades.listType !== "inventory") {
-                this.#map.showTrades.listType = "inventory"
+        if (this.map.showTrades.show) {
+            if (this.map.showTrades.listType !== "inventory") {
+                this.map.showTrades.listType = "inventory"
             }
 
-            this.#map.showTrades.update(DisplayPorts._getInventory(d))
-
+            this.map.showTrades.update(DisplayPorts._getInventory(d))
         }
-    }
-
-    static _hideDetails(
-        _d: PortWithTrades,
-        i: number,
-        nodes: SVGCircleElement[] | d3Selection.ArrayLike<SVGCircleElement>
-    ) {
-        $(d3Select(nodes[i]).node()).tooltip("dispose")
     }
 
     _updateIcons(): void {
@@ -861,7 +858,7 @@ export default class DisplayPorts {
 
         this._gIcon
             .selectAll<SVGCircleElement, PortWithTrades>("circle")
-            .data(data, (d) => d.id)
+            .data(data, (d) => String(d.id))
             .join((enter) =>
                 enter
                     .append("circle")
@@ -873,7 +870,7 @@ export default class DisplayPorts {
                     })
                     .attr("cx", (d) => d.coordinates[0])
                     .attr("cy", (d) => d.coordinates[1])
-                    .on("click", (d, i, nodes) => this._showDetails(d, i, nodes))
+                    .on("click", this._showDetails)
                     .on("mouseleave", DisplayPorts._hideDetails)
             )
             .attr("r", circleSize)
@@ -967,7 +964,7 @@ export default class DisplayPorts {
 
         this._gPortCircle
             .selectAll<SVGCircleElement, PortWithTrades>("circle")
-            .data(data, (d) => d.id)
+            .data(data, (d) => String(d.id))
             .join((enter) =>
                 enter
                     .append("circle")
@@ -1022,7 +1019,7 @@ export default class DisplayPorts {
 
             this._gText
                 .selectAll<SVGTextElement, PortWithTrades>("text")
-                .data(data, (d) => d.id)
+                .data(data, (d) => String(d.id))
                 .join((enter) => enter.append("text").text((d) => d.name))
                 .attr("x", (d) => this._updateTextsX(d, circleSize))
                 .attr("y", (d) => this._updateTextsY(d, circleSize, fontSize))

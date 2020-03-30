@@ -27,6 +27,7 @@ import { displayClan } from "../util"
 import Cookie from "../util/cookie"
 import RadioButton from "../util/radio-button"
 
+import DisplayGrid from "../map-tools/display-grid"
 import DisplayPbZones from "./display-pb-zones"
 import DisplayPorts from "./display-ports"
 import SelectPorts from "./select-ports"
@@ -34,8 +35,7 @@ import ShowF11 from "../map-tools/show-f11"
 import ShowTrades from "../map-tools/show-trades"
 
 /*
-import DisplayGrid from "../map-tools/display-grid"
-import Journey from "../map-tools/make-journey"
+import MakeJourney from "../map-tools/make-journey"
 import PredictWind from "../map-tools/predict-wind"
 import WindRose from "../map-tools/wind-rose"
 */
@@ -61,17 +61,17 @@ class NAMap {
     width = 0
     xGridBackgroundHeight: number
     yGridBackgroundWidth: number
+    showGrid: string
     readonly gridOverlay: HTMLElement
+    private _grid!: DisplayGrid
     private _currentScale = 0
     private _currentTranslate!: d3Zoom.ZoomTransform
     private _doubleClickAction: string
     private _gMap!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, any>
-    //  private _grid!: DisplayGrid
-    //  private _journey!: Journey
+    //  private _journey!: MakeJourney
     private _pbZone!: DisplayPbZones
     private _ports!: DisplayPorts
     private _portSelect!: SelectPorts
-    private _showGrid: string
     private _svg!: d3Selection.Selection<SVGSVGElement, SVGSVGDatum, HTMLElement, any>
     // private _windPrediction!: PredictWind
     // private _windRose!: WindRose
@@ -169,7 +169,7 @@ class NAMap {
         /**
          * Get showGrid setting from cookie or use default value
          */
-        this._showGrid = this._getShowGridValue()
+        this.showGrid = this._getShowGridValue()
 
         this.gridOverlay = document.querySelectorAll(".overlay")[0] as HTMLElement
 
@@ -239,7 +239,7 @@ class NAMap {
         this._pbZone = new DisplayPbZones(this._ports)
         //  this._grid = new DisplayGrid(this)
 
-        //   this._journey = new Journey(this.rem)
+        //   this._journey = new MakeJourney(this.rem)
         //   this._windPrediction = new PredictWind()
         //    this._windRose = new WindRose()
 
