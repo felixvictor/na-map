@@ -10,30 +10,40 @@
 
 /// <reference types="bootstrap" />
 import "bootstrap/js/dist/util"
-/// <reference types="bootstrap" />
 import "bootstrap/js/dist/modal"
+
 import { select as d3Select } from "d3-selection"
+import * as d3Selection from "d3-selection"
 import { line as d3Line } from "d3-shape"
-import moment from "moment"
+
+import moment, { Moment } from "moment"
 import "moment/locale/en-gb"
+
 import "round-slider/src/roundslider"
 import "round-slider/src/roundslider.css"
 import "../../../scss/roundslider.scss"
+
 import "tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4"
 import "tempusdominus-core/build/js/tempusdominus-core"
 
-import {
-    degreesToRadians,
-    displayCompass,
-    displayCompassAndDegrees,
-    getUserWind,
-    printCompassRose
-} from "../util"
 import { registerEvent } from "../analytics"
-import { degreesPerSecond, insertBaseModal } from "../node/common"
-import { compassDirections, compassToDegrees, degreesToCompass } from "../node/common-math";
+import { degreesPerSecond, HtmlString, insertBaseModal } from "../../common/common-browser"
+import { compassDirections, compassToDegrees, degreesToCompass, degreesToRadians } from "../../common/common-math"
+import { displayCompass, displayCompassAndDegrees, getUserWind, printCompassRose } from "../util"
 
 export default class PredictWind {
+    private readonly _height: number
+    private readonly _width: number
+    private readonly _windArrowWidth: number
+    private readonly _baseName: string
+    private readonly _baseId: HtmlString
+    private readonly _buttonId: HtmlString
+    private readonly _modalId: HtmlString
+    private readonly _formId: HtmlString
+    private readonly _sliderId: HtmlString
+    private readonly _timeGroupId: HtmlString
+    private readonly _timeInputId: HtmlString
+    private _svg!: d3Selection.Selection<SVGSVGElement, unknown, HTMLElement, any>
     constructor() {
         this._height = 300
         this._width = 260
@@ -53,11 +63,11 @@ export default class PredictWind {
         this._setupListener()
     }
 
-    _setupSvg() {
+    _setupSvg(): void {
         this._svg = d3Select("#wind svg")
     }
 
-    _setupArrow() {
+    _setupArrow(): void {
         const width = this._windArrowWidth
         const doubleWidth = this._windArrowWidth * 2
 
@@ -75,20 +85,21 @@ export default class PredictWind {
             .attr("class", "wind-predict-arrow-head")
     }
 
-    _navbarClick(event) {
+    _navbarClick(event: Event): void {
         registerEvent("Menu", this._baseName)
         event.stopPropagation()
         this._windSelected()
     }
 
-    _setupListener() {
-        document.getElementById(`${this._buttonId}`).addEventListener("click", event => this._navbarClick(event))
+    _setupListener(): void {
+        document.querySelector(`${this._buttonId}`)?.addEventListener("click", (event) => this._navbarClick(event))
     }
 
-    _setupWindInput() {
+    _setupWindInput(): void {
         // workaround from https://github.com/soundar24/roundSlider/issues/71
-        const { _getTooltipPos } = $.fn.roundSlider.prototype
-        $.fn.roundSlider.prototype._getTooltipPos = function() {
+        // eslint-disable-next-line prefer-destructuring
+        const _getTooltipPos: () => RoundSliderPos = $.fn.roundSlider.prototype._getTooltipPos
+        $.fn.roundSlider.prototype._getTooltipPos = function (): RoundSliderPos {
             if (!this.tooltip.is(":visible")) {
                 $("body").append(this.tooltip)
             }
@@ -98,7 +109,8 @@ export default class PredictWind {
             return pos
         }
 
-        window.tooltip = args => `${displayCompass(args.value)}<br>${args.value}°`
+        // @ts-ignore
+        window.tooltip = (arguments_) => `${displayCompass(arguments_.value)}<br>${String(arguments_.value)}°`
 
         $(`#${this._sliderId}`).roundSlider({
             sliderType: "default",
@@ -112,39 +124,28 @@ export default class PredictWind {
             editableTooltip: false,
             tooltipFormat: "tooltip",
             create() {
+                // @ts-ignore
                 this.control.css("display", "block")
             },
-            change() {
-                this._currentWind = $(`#${this._sliderId}`).roundSlider("getValue")
-            }
         })
     }
 
-    _injectModal() {
+    _injectModal(): void {
         moment.locale("en-gb")
 
-        insertBaseModal(this._modalId, this._baseName, "sm")
+        insertBaseModal({ id: this._modalId, title: this._baseName, size: "sm" })
 
         const body = d3Select(`#${this._modalId} .modal-body`)
         const form = body.append("form").attr("id", this._formId)
 
         const formGroupA = form.append("div").attr("class", "form-group")
         const slider = formGroupA.append("div").classed("alert alert-primary", true)
-        slider
-            .append("label")
-            .attr("for", this._sliderId)
-            .text("Current in-game wind")
-        slider
-            .append("div")
-            .attr("id", this._sliderId)
-            .attr("class", "rslider")
+        slider.append("label").attr("for", this._sliderId).text("Current in-game wind")
+        slider.append("div").attr("id", this._sliderId).attr("class", "rslider")
 
         const formGroupB = form.append("div").attr("class", "form-group")
         const block = formGroupB.append("div").attr("class", "alert alert-primary")
-        block
-            .append("label")
-            .attr("for", this._timeInputId)
-            .text("Predict time (server time)")
+        block.append("label").attr("for", this._timeInputId).text("Predict time (server time)")
 
         const inputGroup = block
             .append("div")
@@ -171,26 +172,24 @@ export default class PredictWind {
 
         $(`#${this._timeGroupId}`).datetimepicker({
             defaultDate: moment.utc(),
-            format: "LT"
+            format: "LT",
         })
     }
 
     /**
      * Init modal
-     * @returns {void}
      */
-    _initModal() {
+    _initModal(): void {
         this._injectModal()
         this._setupWindInput()
     }
 
     /**
      * Action when selected
-     * @returns {void}
      */
-    _windSelected() {
+    _windSelected(): void {
         // If the modal has no content yet, insert it
-        if (!document.getElementById(this._modalId)) {
+        if (!document.querySelector(this._modalId)) {
             this._initModal()
         }
 
@@ -202,40 +201,33 @@ export default class PredictWind {
             })
     }
 
-    _useUserInput() {
+    _useUserInput(): void {
         const currentWind = getUserWind(this._sliderId)
-        const time = $(`#${this._timeInputId}`)
-            .val()
-            .trim()
+        const time = ($(`#${this._timeInputId}`).val()! as string).trim()
 
         this._predictWind(currentWind, time)
     }
 
-    _predictWind(currentUserWind, predictUserTime) {
+    _predictWind(currentUserWind: number, predictUserTime: string): void {
         moment.locale("en-gb")
 
         const timeFormat = "H.mm"
-        let currentWindDegrees
+        let currentWindDegrees: number | string
 
         const regex = /(\d+)[\s.:](\d+)/
         const match = regex.exec(predictUserTime)
-        const predictHours = parseInt(match[1], 10)
-        const predictMinutes = parseInt(match[2], 10)
+        const predictHours = Number.parseInt(match![1], 10)
+        const predictMinutes = Number.parseInt(match![2], 10)
 
         // Set current wind in correctionValueDegrees
         if (Number.isNaN(Number(currentUserWind))) {
-            currentWindDegrees = compassToDegrees(currentUserWind)
+            currentWindDegrees = compassToDegrees(String(currentUserWind))
         } else {
             currentWindDegrees = Number(currentUserWind)
         }
 
-        const currentTime = moment()
-            .utc()
-            .seconds(0)
-            .milliseconds(0)
-        const predictTime = moment(currentTime)
-            .hour(predictHours)
-            .minutes(predictMinutes)
+        const currentTime = moment().utc().seconds(0).milliseconds(0)
+        const predictTime = moment(currentTime).hour(predictHours).minutes(predictMinutes)
         if (predictTime.isBefore(currentTime)) {
             predictTime.add(1, "day")
         }
@@ -251,8 +243,8 @@ export default class PredictWind {
         )
     }
 
-    _printCompass(predictedWindDegrees) {
-        const line = d3Line()
+    _printCompass(predictedWindDegrees: number): void {
+        const line = d3Line<[number, number]>()
         const radius = Math.min(this._height / 1.4, this._width / 1.4) / 2
         const xCompass = this._width / 2
         const yCompass = this._height / 2.8
@@ -262,31 +254,24 @@ export default class PredictWind {
         const dy = length * Math.sin(radians)
         const lineData = [
             [Math.round(xCompass + dx), Math.round(yCompass + dy)],
-            [Math.round(xCompass - dx), Math.round(yCompass - dy)]
-        ]
+            [Math.round(xCompass - dx), Math.round(yCompass - dy)],
+        ] as Array<[number, number]>
 
         this._svg.attr("height", this._height).attr("width", this._width)
 
         // Compass rose
-        const compassElem = this._svg
-            .append("svg")
-            .attr("class", "compass")
-            .attr("x", xCompass)
-            .attr("y", yCompass)
+        const compassElem = this._svg.append("svg").attr("class", "compass").attr("x", xCompass).attr("y", yCompass)
+        // @ts-ignore
         printCompassRose({ element: compassElem, radius })
 
         // Wind direction
-        this._svg
-            .append("path")
-            .datum(lineData)
-            .attr("d", line)
-            .attr("marker-end", "url(#wind-arrow)")
+        this._svg.append("path").datum(lineData).attr("d", line).attr("marker-end", "url(#wind-arrow)")
     }
 
-    _printText(predictedWindDegrees, predictTime, currentWind, currentTime) {
+    _printText(predictedWindDegrees: number, predictTime: string, currentWind: string, currentTime: string): void {
         const compass = degreesToCompass(predictedWindDegrees)
-        const lineHeight = parseInt(
-            window.getComputedStyle(document.getElementById("wind")).getPropertyValue("line-height"),
+        const lineHeight = Number.parseInt(
+            window.getComputedStyle(document.querySelector("#wind")!).getPropertyValue("line-height"),
             10
         )
         const textSvg = this._svg.append("svg")
@@ -304,10 +289,10 @@ export default class PredictWind {
             .attr("class", "text-light-separation")
             .html(`Currently at ${currentTime} from ${displayCompassAndDegrees(currentWind, true)}`)
 
-        const bbox1 = text1.node().getBoundingClientRect()
-        const bbox2 = text2.node().getBoundingClientRect()
-        const textHeight = Math.max(bbox1.height, bbox2.height) * 2 + lineHeight
-        const textWidth = Math.max(bbox1.width, bbox2.width) + lineHeight
+        const bbox1 = text1.node()?.getBoundingClientRect()
+        const bbox2 = text2.node()?.getBoundingClientRect()
+        const textHeight = Math.max(Number(bbox1?.height), Number(bbox2?.height)) * 2 + lineHeight
+        const textWidth = Math.max(Number(bbox1?.width), Number(bbox2?.width)) + lineHeight
 
         textSvg
             .attr("x", (this._width - textWidth) / 2)
@@ -316,7 +301,7 @@ export default class PredictWind {
             .attr("width", textWidth)
     }
 
-    _addBackground() {
+    _addBackground(): void {
         this._svg
             .insert("rect", ":first-child")
             .attr("x", 0)
@@ -325,7 +310,12 @@ export default class PredictWind {
             .attr("width", this._width)
     }
 
-    _printPredictedWind(predictedWindDegrees, predictTime, currentWind, currentTime) {
+    _printPredictedWind(
+        predictedWindDegrees: number,
+        predictTime: string,
+        currentWind: string,
+        currentTime: string
+    ): void {
         this.clearMap()
         this._svg.classed("d-none", false)
 
@@ -334,11 +324,11 @@ export default class PredictWind {
         this._addBackground()
     }
 
-    setPosition(topMargin, leftMargin) {
+    setPosition(topMargin: number, leftMargin: number): void {
         this._svg.style("margin-left", `${leftMargin}px`).style("margin-top", `${topMargin}px`)
     }
 
-    clearMap() {
+    clearMap(): void {
         this._svg.selectAll("*").remove()
         this._svg.classed("d-none", true)
     }
