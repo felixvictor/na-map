@@ -33,12 +33,9 @@ import DisplayPorts from "./display-ports"
 import SelectPorts from "./select-ports"
 import ShowF11 from "../map-tools/show-f11"
 import ShowTrades from "../map-tools/show-trades"
-
-/*
+import WindRose from "../map-tools/wind-rose"
 import MakeJourney from "../map-tools/make-journey"
 import PredictWind from "../map-tools/predict-wind"
-import WindRose from "../map-tools/wind-rose"
-*/
 
 interface Tile {
     z: number
@@ -53,34 +50,32 @@ interface Tile {
 class NAMap {
     coord: MinMaxCoord
     f11!: ShowF11
+    readonly gridOverlay: HTMLElement
     height = 0
     minScale = 0
     rem: number
     serverName: string
+    showGrid: string
     showTrades!: ShowTrades
     width = 0
     xGridBackgroundHeight: number
     yGridBackgroundWidth: number
-    showGrid: string
-    readonly gridOverlay: HTMLElement
-    private _grid!: DisplayGrid
     private _currentScale = 0
     private _currentTranslate!: d3Zoom.ZoomTransform
     private _doubleClickAction: string
     private _gMap!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, any>
-    //  private _journey!: MakeJourney
+    private _grid!: DisplayGrid
     private _pbZone!: DisplayPbZones
     private _ports!: DisplayPorts
     private _portSelect!: SelectPorts
     private _svg!: d3Selection.Selection<SVGSVGElement, SVGSVGDatum, HTMLElement, any>
-    // private _windPrediction!: PredictWind
-    // private _windRose!: WindRose
     private _zoom!: d3Zoom.ZoomBehavior<SVGSVGElement, SVGSVGDatum>
     private _zoomLevel!: string
     private readonly _doubleClickActionCookie: Cookie
     private readonly _doubleClickActionId: string
     private readonly _doubleClickActionRadios: RadioButton
     private readonly _doubleClickActionValues: string[]
+    private readonly _journey!: MakeJourney
     private readonly _labelZoomThreshold: number
     private readonly _maxScale: number
     private readonly _PBZoneZoomThreshold: number
@@ -91,6 +86,9 @@ class NAMap {
     private readonly _showGridValues: string[]
     private readonly _tileSize: number
     private readonly _wheelDelta: number
+    private readonly _windPrediction!: PredictWind
+    private readonly _windRose!: WindRose
+    private _showGrid!: string
 
     /**
      * @param serverName - Naval action server name

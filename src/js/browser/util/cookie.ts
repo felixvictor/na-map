@@ -34,7 +34,7 @@ export default class Cookie {
         expire = yearInDays,
     }: {
         id: string
-        values: string[]
+        values?: string[]
         expire?: number | Date
     }) {
         this.#baseId = baseId
