@@ -98,6 +98,7 @@ export default class MakeJourney {
     private _journeySummaryTextWind!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, any>
     private _gJourneyPath!: d3Selection.Selection<SVGPathElement, Segment, HTMLElement, any>
     private _drag!: d3Drag.DragBehavior<SVGSVGElement | SVGGElement, Segment, unknown>
+
     constructor(fontSize: number) {
         this._fontSize = fontSize
 
@@ -710,7 +711,7 @@ export default class MakeJourney {
 
     _deleteLastLeg(): void {
         this._journey.segments.pop()
-        if (this._journey.segments.length) {
+        if (this._journey.segments.length > 0) {
             this._printJourney()
         } else {
             this._g.selectAll("g.journey g.label").remove()
