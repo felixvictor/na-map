@@ -22,7 +22,7 @@ import { cleanName, sortBy } from "../common/common-node"
 import { serverNames } from "../common/common-var"
 
 import { APIItemGeneric, APIShip, APIShipBlueprint } from "./api-item"
-import { Ship } from "../common/gen-json"
+import { ShipData } from "../common/gen-json"
 import { TextEntity, XmlGeneric } from "./xml"
 
 type ElementMap = Map<string, { [key: string]: string; group: string; element: string }>
@@ -221,7 +221,7 @@ const subFileStructure: SubFileStructure[] = [
 ]
 
 let apiItems: APIItemGeneric[]
-let ships: Ship[]
+let ships: ShipData[]
 
 /**
  * Get item names
@@ -236,13 +236,13 @@ const getItemNames = (): Map<number, string> => new Map(apiItems.map(item => [it
  */
 const getShipMass = (id: number): number => apiItems.find(apiItem => id === apiItem.Id)?.ShipMass ?? 0
 
-const convertGenericShipData = (): Ship[] => {
+const convertGenericShipData = (): ShipData[] => {
     // noinspection MagicNumberJS
     const cannonWeight = [0, 42, 32, 24, 18, 12, 9, 0, 6, 4, 3, 2]
     // noinspection MagicNumberJS
     const carroWeight = [0, 0, 68, 42, 32, 24, 0, 18, 12]
     return ((apiItems.filter(item => item.ItemType === "Ship" && !item.NotUsed) as unknown) as APIShip[]).map(
-        (ship: APIShip): Ship => {
+        (ship: APIShip): ShipData => {
             const calcPortSpeed = ship.Specs.MaxSpeed * speedConstA - speedConstB
             const speedDegrees = ship.Specs.SpeedToWind.map(speed => roundToThousands(speed * calcPortSpeed))
             const { length } = ship.Specs.SpeedToWind
@@ -353,7 +353,7 @@ const convertGenericShipData = (): Ship[] => {
                 premium: ship.Premium,
                 tradeShip: ship.ShipType === 1
                 // hostilityScore: ship.HostilityScore
-            } as Ship
+            } as ShipData
         }
     )
 }
@@ -390,11 +390,11 @@ const getBaseFileNames = (dir: string): void => {
     baseFileNames.add("indiaman rookie")
 }
 
-const getAddData = (elements: ElementMap, fileData: XmlGeneric): Ship => {
+const getAddData = (elements: ElementMap, fileData: XmlGeneric): ShipData => {
     /**
      * Ship data to be added per file
      */
-    const addData = {} as Ship
+    const addData = {} as ShipData
 
     // Retrieve additional data per attribute pair
     for (const pair of fileData.Attributes.Pair) {
@@ -421,7 +421,7 @@ const getAddData = (elements: ElementMap, fileData: XmlGeneric): Ship => {
 }
 
 // Add additional data to the existing data
-const addAddData = (addData: Ship, id: number): void => {
+const addAddData = (addData: ShipData, id: number): void => {
     // Find current ship
     ships
         .filter(ship => ship.id === id)
@@ -456,7 +456,7 @@ const getFileData = (baseFileName: string, ext: string): XmlGeneric => {
  * Retrieve additional ship data from game files and add it to existing ship data
  * @returns Ship data
  */
-const convertAddShipData = (ships: Ship[]): Ship[] => {
+const convertAddShipData = (ships: ShipData[]): ShipData[] => {
     getBaseFileNames(commonPaths.dirModules)
 
     // Get all files without a master
@@ -500,14 +500,14 @@ const convertAddShipData = (ships: Ship[]): Ship[] => {
                 /**
                  * Ship data to be added per file
                  */
-                const addData = isEmpty(fileData) ? ({} as Ship) : getAddData(file.elements, fileData)
+                const addData = isEmpty(fileData) ? ({} as ShipData) : getAddData(file.elements, fileData)
                 const addMasterData = getAddData(file.elements, fileMasterData)
 
                 /*
                     https://stackoverflow.com/a/47554782
                     const mergedData = mergeDeep(addMasterData,addData);
                 */
-                const mergedData = mergeAdvanced(addMasterData, addData) as Ship
+                const mergedData = mergeAdvanced(addMasterData, addData) as ShipData
 
                 addAddData(mergedData, id)
             }
