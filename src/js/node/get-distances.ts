@@ -16,7 +16,10 @@ import { default as PNG } from "pngjs"
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
 import { readJson, saveJsonAsync, xz } from "../common/common-file"
 import { convertCoordX, convertCoordY, Distance, Point } from "../common/common-math"
+import { simpleNumberSort, sortBy } from "../common/common-node"
 import { distanceMapSize, serverNames } from "../common/common-var"
+
+import { APIPort } from "./api-port"
 
 /**
  * ------------------------------------------------------------------------
@@ -55,7 +58,7 @@ const mapScale = mapWidth / origMapSize
 const getIndex = (y: number, x: number): number => y * mapWidth + x
 const getCoordinates = (y: number, x: number): Point => [
     Math.trunc(convertCoordY(x, y) * mapScale),
-    Math.trunc(convertCoordX(x, y) * mapScale)
+    Math.trunc(convertCoordX(x, y) * mapScale),
 ]
 
 /**
@@ -64,18 +67,8 @@ const getCoordinates = (y: number, x: number): Point => [
  * ------------------------------------------------------------------------
  */
 
-interface Port {
-    Id: string
-    EntrancePosition: EntrancePosition
-    [key: string]: number | string | EntrancePosition
-}
-interface EntrancePosition {
-    z: number
-    x: number
-}
-
 const fileName = path.resolve(baseAPIFilename, `${serverNames[0]}-Ports-${serverDate}.json`)
-let apiPorts: Port[] = []
+let apiPorts: APIPort[] = []
 let portIds: number[] = []
 let numPorts = 0
 
@@ -89,8 +82,15 @@ interface GridMap {
  * ------------------------------------------------------------------------
  */
 
+/**
+ * Convert png to map (black -\> spotLand, white -\> spotWater)
+ */
+const map: GridMap = new Array(mapWidth * mapHeight)
+    .fill(0)
+    .map((_e, index: number) => (png.data[index << 2] > 127 ? spotWater : spotLand))
+
 // Outer-grid land borders
-const visitedPositionsDefault = new Set()
+const visitedPositionsDefault = new Set<number>()
 
 /**
  * Distance between all ports
@@ -111,20 +111,19 @@ const findPaths = (
     startX: number // Start port x position
 ): void => {
     // Add outer-grid land borders
-    const visitedPositions = new Set(visitedPositionsDefault)
+    const visitedPositions = new Set<number>(visitedPositionsDefault)
     // Queue holds unchecked positions ([index, distance from start port])
     const queue = new Denque()
 
     // Add start port
     const startIndex = getIndex(startY, startX)
-    const foundPortIds: Set<number> = new Set()
+    const foundPortIds = new Set<number>()
     startPortIds.add(startPortId)
     visitedPositions.add(startIndex)
     queue.push([startIndex, 0])
 
     while (foundPortIds.size + startPortIds.size < numPorts && !queue.isEmpty()) {
-        // eslint-disable-next-line prefer-const
-        let [pos, distance] = queue.shift()
+        let [pos, distance]: [number, number] = queue.shift()
         distance++
 
         // Check if port is found
@@ -149,7 +148,7 @@ const findPaths = (
     if (foundPortIds.size + startPortIds.size < numPorts) {
         const missingPortIds = portIds
             .filter((portId: number) => portId > startPortId && !foundPortIds.has(portId))
-            .sort((a: number, b: number): number => a - b)
+            .sort(simpleNumberSort)
         console.error(
             "Only",
             foundPortIds.size + startPortIds.size,
@@ -194,42 +193,38 @@ const setVisitedPositionsDefault = (): void => {
 const getDistances = async (): Promise<void> => {
     setVisitedPositionsDefault()
     //    const selectedPorts = [4, 176, 201, 256, 287, 355, 374];
+    try {
+        console.time("findPath")
+        apiPorts
+            .sort((a: APIPort, b: APIPort) => Number(a.Id) - Number(b.Id))
+            //        .filter(fromPort => selectedPorts.includes(Number(fromPort.Id)))
+            .forEach((fromPort: APIPort) => {
+                const fromPortId = Number(fromPort.Id)
+                const {
+                    EntrancePosition: { z: y, x },
+                } = fromPort
+                const [fromPortY, fromPortX] = getCoordinates(y, x)
 
-    console.time("findPath")
-    apiPorts
-        .sort((a: Port, b: Port) => Number(a.Id) - Number(b.Id))
-        //        .filter(fromPort => selectedPorts.includes(Number(fromPort.Id)))
-        .forEach((fromPort: Port) => {
-            const fromPortId = Number(fromPort.Id)
-            const {
-                EntrancePosition: { z: y, x }
-            } = fromPort
-            const [fromPortY, fromPortX] = getCoordinates(y, x)
+                findPaths(fromPortId, fromPortY, fromPortX)
 
-            findPaths(fromPortId, fromPortY, fromPortX)
+                console.timeLog("findPath", `${fromPortId} ${fromPort.Name} (${fromPortY}, ${fromPortX})`)
+            })
 
-            console.timeLog("findPath", `${fromPortId} ${fromPort.Name} (${fromPortY}, ${fromPortX})`)
-        })
+        console.timeEnd("findPath")
 
-    console.timeEnd("findPath")
-
-    await saveJsonAsync(distancesFile, distances)
+        await saveJsonAsync(distancesFile, distances)
+    } catch (error) {
+        console.error("Map distance error:", error)
+    }
 }
 
 xz("unxz", `${fileName}.xz`)
-apiPorts = readJson(fileName) as Port[]
-portIds = apiPorts.map((port: Port) => Number(port.Id))
+apiPorts = readJson(fileName)
+portIds = apiPorts.map((port: APIPort) => Number(port.Id))
 numPorts = portIds.length
 
-/**
- * Convert png to map (black -> spotLand, white -> spotWater)
- */
-const map: GridMap = new Array(mapWidth * mapHeight)
-    .fill(0)
-    .map((_e, index: number) => (png.data[index << 2] > 127 ? spotWater : spotLand))
-
 // Add port id to port entrances
-apiPorts.forEach(({ Id, EntrancePosition: { z: y, x } }: Port) => {
+apiPorts.forEach(({ Id, EntrancePosition: { z: y, x } }: APIPort) => {
     const [portY, portX] = getCoordinates(y, x)
     const index = getIndex(portY, portX)
 
