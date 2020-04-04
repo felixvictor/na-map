@@ -19,7 +19,7 @@ import { commonPaths } from "../common/common-dir"
 import { sortBy } from "../common/common-node"
 
 import { readJson } from "../common/common-file"
-import { PortBasic, Ship } from "../common/gen-json"
+import { PortBasic, ShipData } from "../common/gen-json"
 
 type ColourMap = Map<string, string>
 interface PortBR {
@@ -35,7 +35,7 @@ const columnWidth = 20
 const rowHeight = 24
 
 let portsOrig: PortBasic[]
-let shipsOrig: Ship[]
+let shipsOrig: ShipData[]
 
 const fileScssPreCompile = path.resolve("src", "scss", "pre-compile.scss")
 /**
@@ -160,7 +160,7 @@ const createPortBattleSheets = (): void => {
      * @param ships - Ship data
      * @param ports - port data
      */
-    function fillSheet(sheet: Worksheet, ships: Ship[], ports: PortBR[]): void {
+    function fillSheet(sheet: Worksheet, ships: ShipData[], ports: PortBR[]): void {
         const numberStyle = {
             alignment: {
                 // §18.8.1
@@ -423,7 +423,7 @@ const createPortBattleSheets = (): void => {
 
 export const createPortBattleSheet = (): void => {
     portsOrig = (readJson(commonPaths.filePort) as unknown) as PortBasic[]
-    shipsOrig = (readJson(commonPaths.fileShip) as unknown) as Ship[]
+    shipsOrig = (readJson(commonPaths.fileShip) as unknown) as ShipData[]
 
     createPortBattleSheets()
 }
