@@ -463,7 +463,7 @@ interface ShipBlueprintShip {
  * ships.json
  */
 
-export interface Ship extends ObjectIndexer<any> {
+export interface ShipData extends ObjectIndexer<any> {
     id: number
     name: string
     class: number
