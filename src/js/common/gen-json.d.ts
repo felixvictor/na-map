@@ -530,6 +530,7 @@ interface ShipRepairTime {
     rudder: number
     sails: number
     structure: number
+    default?: number
 }
 interface ShipShip {
     waterlineHeight: number
