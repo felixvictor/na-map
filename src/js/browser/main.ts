@@ -17,7 +17,6 @@ import Cookie from "./util/cookie"
 import RadioButton from "./util/radio-button"
 
 import "../../scss/main.scss"
-import { NAMap } from "./map/na-map";
 
 /**
  *  Workaround for google translate uses indexOf on svg text
@@ -80,7 +79,7 @@ const serverNameSelected = (): void => {
  * Setup listeners
  */
 const setupListener = (): void => {
-    ;(document.querySelector(baseId) as HTMLInputElement).addEventListener("change", () => serverNameSelected())
+    document.querySelector(baseId)?.addEventListener("change", () => serverNameSelected())
 
     // {@link https://jsfiddle.net/bootstrapious/j6zkyog8/}
     $(".dropdown-menu [data-toggle='dropdown']").on("click", (event) => {
@@ -146,11 +145,9 @@ const load = async (): Promise<void> => {
     if (searchParams.get("v")) {
         loadGameTools(serverId, searchParams)
     } else {
-        ;(document.querySelector("#game-tools-dropdown") as HTMLInputElement).addEventListener(
-            "click",
-            async () => loadGameTools(serverId, searchParams),
-            { once: true }
-        )
+        document
+            .querySelector("#game-tools-dropdown")
+            ?.addEventListener("click", async () => loadGameTools(serverId, searchParams), { once: true })
     }
 }
 
