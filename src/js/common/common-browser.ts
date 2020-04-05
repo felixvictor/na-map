@@ -51,15 +51,15 @@ export const colourRed = CRED
 export const colourRedDark = CREDDARK
 export const colourRedLight = CREDLIGHT
 export const colourWhite = CWHITE
-export const hullRepairsPercent = REPAIR_ARMOR_PERCENT
-export const hullRepairsVolume = REPAIR_ARMOR_VOLUME
+export const hullRepairsPercent = Number(REPAIR_ARMOR_PERCENT)
+export const hullRepairsVolume = Number(REPAIR_ARMOR_VOLUME)
 export const iconSmallSrc = ICONSMALL
 export const primary300 = CPRIMARY300
-export const repairTime = REPAIR_ARMOR_TIME
-export const rigRepairsPercent = REPAIR_SAIL_PERCENT
-export const rigRepairsVolume = REPAIR_SAIL_VOLUME
-export const rumRepairsPercent = REPAIR_CREW_PERCENT
-export const rumRepairsVolume = REPAIR_CREW_VOLUME
+export const repairTime = Number(REPAIR_ARMOR_TIME)
+export const rigRepairsPercent = Number(REPAIR_SAIL_PERCENT)
+export const rigRepairsVolume = Number(REPAIR_SAIL_VOLUME)
+export const rumRepairsPercent = Number(REPAIR_CREW_PERCENT)
+export const rumRepairsVolume = Number(REPAIR_CREW_VOLUME)
 
 export const hashids = new Hashids("My salt: Yet another Naval Action map")
 
