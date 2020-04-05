@@ -52,24 +52,24 @@ const fileScssPreCompile = path.resolve(dirSrc, "scss", "pre-compile.scss")
 const setColours = () => {
     const compiledCss = sass
         .renderSync({
-            file: fileScssPreCompile
+            file: fileScssPreCompile,
         })
         .css.toString()
     const parsedCss = parseCss.parse(compiledCss)
     return new Map(
         parsedCss.stylesheet.rules
-            .filter(rule => rule.selectors && rule.selectors[0].startsWith(".colour-palette "))
+            .filter((rule) => rule.selectors && rule.selectors[0].startsWith(".colour-palette "))
             .filter(
-                rule =>
+                (rule) =>
                     rule &&
                     rule.declarations &&
-                    rule.declarations.find(declaration => declaration.property === "background-color")
+                    rule.declarations.find((declaration) => declaration.property === "background-color")
             )
-            .map(rule => {
+            .map((rule) => {
                 const d =
                     rule &&
                     rule.declarations &&
-                    rule.declarations.find(declaration => declaration.property === "background-color")
+                    rule.declarations.find((declaration) => declaration.property === "background-color")
                 return [rule.selectors[0].replace(".colour-palette .", "") || "", d.value || ""]
             })
     )
@@ -95,29 +95,29 @@ const babelOpt = {
     plugins: [
         "@babel/plugin-proposal-nullish-coalescing-operator",
         "@babel/plugin-transform-spread",
-        "@babel/proposal-class-properties"
+        "@babel/proposal-class-properties",
     ],
     presets: [
         [
             "@babel/preset-env",
             {
                 // debug: true,
-                corejs: 3,
+                corejs: { version: 3, proposals: true },
                 loose: true,
                 modules: false,
                 shippedProposals: true,
                 targets: {
-                    browsers: PACKAGE.browserslist
+                    browsers: PACKAGE.browserslist,
                 },
-                useBuiltIns: "usage"
-            }
+                useBuiltIns: "usage",
+            },
         ],
-        "@babel/typescript"
-    ]
+        "@babel/typescript",
+    ],
 }
 
 const cssOpt = {
-    sourceMap: true
+    sourceMap: true,
 }
 
 const htmlMinifyOpt = {
@@ -133,17 +133,16 @@ const htmlMinifyOpt = {
     removeStyleLinkTypeAttributes: true,
     sortAttributes: true,
     sortClassName: true,
-    useShortDoctype: true
+    useShortDoctype: true,
 }
 
 const postcssCleanOpt = {
-    level: { 1: { specialComments: 0 }, 2: {} }
+    level: { 1: { specialComments: 0 }, 2: {} },
 }
 
 const postcssOpt = {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     plugins: [require("autoprefixer"), isProduction ? require("postcss-clean")({ postcssCleanOpt }) : {}],
-    sourceMap: true
+    sourceMap: true,
 }
 
 const sassOpt = {
@@ -152,8 +151,8 @@ const sassOpt = {
         outputStyle: "expanded",
         precision: 6,
         sourceMap: !isProduction,
-        sourceMapContents: !isProduction
-    }
+        sourceMapContents: !isProduction,
+    },
 }
 
 const svgoOpt = {
@@ -201,8 +200,8 @@ const svgoOpt = {
         { addClassesToSVGElement: false },
         { addAttributesToSVGElement: false },
         { removeStyleElement: false },
-        { removeScriptElement: false }
-    ]
+        { removeScriptElement: false },
+    ],
 }
 
 const htmlOpt = {
@@ -218,10 +217,9 @@ const htmlOpt = {
     minify: htmlMinifyOpt,
     servers,
     template: path.resolve(__dirname, dirSrc, "index.template.ejs"),
-    title: PACKAGE.description
+    title: PACKAGE.description,
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const faviconsOpt = {
     logo: fileLogo,
     cache: true,
@@ -242,21 +240,21 @@ const faviconsOpt = {
             favicons: false,
             firefox: true,
             windows: true,
-            yandex: false
+            yandex: false,
         },
         lang: "en-GB",
-        // eslint-disable-next-line @typescript-eslint/camelcase
+        // eslint-disable-next-line camelcase
         start_url: "/",
-        // eslint-disable-next-line @typescript-eslint/camelcase
+        // eslint-disable-next-line camelcase
         theme_color: themeColour,
-        version: PACKAGE.version
-    }
+        version: PACKAGE.version,
+    },
 }
 
 const config = {
     devServer: {
         contentBase: dirOutput,
-        disableHostCheck: true
+        disableHostCheck: true,
     },
 
     devtool: false,
@@ -265,26 +263,26 @@ const config = {
 
     externals: {
         jquery: "jQuery",
-        "popper.js": "Popper"
+        "popper.js": "Popper",
     },
 
     resolve: {
-        extensions: [".ts", ".js", ".json"]
+        extensions: [".ts", ".js", ".json"],
     },
 
     optimization: {
         moduleIds: "hashed",
         runtimeChunk: "single",
         splitChunks: {
-            chunks: "all"
-        }
+            chunks: "all",
+        },
     },
 
     output: {
         chunkFilename: isProduction ? "[name].[chunkhash].js" : "[name].js",
         filename: isProduction ? "[name].[contenthash].js" : "[name].js",
         path: dirOutput,
-        crossOriginLoading: "anonymous"
+        crossOriginLoading: "anonymous",
     },
 
     plugins: [
@@ -300,11 +298,11 @@ const config = {
         */
         new ForkTsCheckerWebpackPlugin(),
         new CleanWebpackPlugin({
-            verbose: false
+            verbose: false,
         }),
         new ExtractCssChunks({
             filename: isProduction ? "[name].[contenthash].css" : "[name].css",
-            orderWarning: true
+            orderWarning: true,
         }),
         new webpack.DefinePlugin({
             CPRIMARY300: JSON.stringify(primary300),
@@ -327,7 +325,7 @@ const config = {
             REPAIR_SAIL_VOLUME: JSON.stringify(repairs.sailRepair.volume),
             REPAIR_SAIL_PERCENT: JSON.stringify(repairs.sailRepair.percent),
             REPAIR_CREW_VOLUME: JSON.stringify(repairs.crewRepair.volume),
-            REPAIR_CREW_PERCENT: JSON.stringify(repairs.crewRepair.percent)
+            REPAIR_CREW_PERCENT: JSON.stringify(repairs.crewRepair.percent),
         }),
         new webpack.ProvidePlugin({
             $: "jquery",
@@ -335,30 +333,30 @@ const config = {
             "window.jQuery": "jquery",
             moment: "moment",
             "window.moment": "moment",
-            Popper: ["popper.js", "default"]
+            Popper: ["popper.js", "default"],
         }),
         // Do not include all moment locale files, certain locales are loaded by import
         new webpack.IgnorePlugin({
             resourceRegExp: /^\.\/locale$/,
-            contextRegExp: /moment$/
+            contextRegExp: /moment$/,
         }),
         new CopyPlugin([
             { from: "netlify.toml" },
             {
                 from: "lib/gen-server",
                 to: `${dirOutput}/data`,
-                flatten: true
+                flatten: true,
             },
             { from: "src/google979f2cf3bed204d6.html" },
-            { from: dirMap, to: `${dirOutput}/images/map` }
+            { from: dirMap, to: `${dirOutput}/images/map` },
         ]),
         new HtmlPlugin(htmlOpt),
         new SitemapPlugin(targetUrl, sitemapPaths, { skipGzip: false }),
         new FaviconsPlugin(faviconsOpt),
         new SriPlugin({
             hashFuncNames: ["sha384"],
-            enabled: isProduction
-        })
+            enabled: isProduction,
+        }),
     ],
 
     stats: {
@@ -374,7 +372,7 @@ const config = {
         // Add the origins of chunks and chunk merging info
         chunkOrigins: true,
 
-        excludeAssets: [/images\/map\/*/]
+        excludeAssets: [/images\/map\/*/],
     },
 
     module: {
@@ -382,7 +380,7 @@ const config = {
             {
                 test: /\.(ts|js)$/,
                 include: dirJsSrc,
-                use: [{ loader: "babel-loader", options: babelOpt }]
+                use: [{ loader: "babel-loader", options: babelOpt }],
             },
             {
                 test: /\.scss$/,
@@ -391,17 +389,17 @@ const config = {
                     ExtractCssChunks.loader,
                     {
                         loader: "css-loader",
-                        options: cssOpt
+                        options: cssOpt,
                     },
                     {
                         loader: "postcss-loader",
-                        options: postcssOpt
+                        options: postcssOpt,
                     },
                     {
                         loader: "sass-loader",
-                        options: sassOpt
-                    }
-                ]
+                        options: sassOpt,
+                    },
+                ],
             },
             {
                 test: /\.css$/,
@@ -409,13 +407,13 @@ const config = {
                     ExtractCssChunks.loader,
                     {
                         loader: "css-loader",
-                        options: cssOpt
+                        options: cssOpt,
                     },
                     {
                         loader: "postcss-loader",
-                        options: postcssOpt
-                    }
-                ]
+                        options: postcssOpt,
+                    },
+                ],
             },
             {
                 test: /\.(woff2?|ttf|eot|svg)$/,
@@ -424,9 +422,9 @@ const config = {
                     loader: "file-loader",
                     options: {
                         name: "[name].[ext]",
-                        outputPath: "fonts/"
-                    }
-                }
+                        outputPath: "fonts/",
+                    },
+                },
             },
             {
                 test: /\.svg$/,
@@ -437,37 +435,37 @@ const config = {
                         options: {
                             limit: 1000,
                             name: "[name].[ext]",
-                            outputPath: "images/flags/"
-                        }
+                            outputPath: "images/flags/",
+                        },
                     },
                     {
                         loader: "image-webpack-loader",
                         options: {
-                            svgo: svgoOpt
-                        }
+                            svgo: svgoOpt,
+                        },
                     },
                     {
                         loader: "string-replace-loader",
                         options: {
                             search: 'fill="#fff" fill-opacity="0"/>',
-                            replace: `fill="${primary700}" fill-opacity="0.3"/>`
-                        }
+                            replace: `fill="${primary700}" fill-opacity="0.3"/>`,
+                        },
                     },
                     {
                         loader: "string-replace-loader",
                         options: {
                             search: 'fill="#fff" fill-opacity="1"/>',
-                            replace: `fill="${primary200}" fill-opacity="1"/>`
-                        }
+                            replace: `fill="${primary200}" fill-opacity="1"/>`,
+                        },
                     },
                     {
                         loader: "string-replace-loader",
                         options: {
                             search: 'fill="#fff" fill-opacity=".7"/>',
-                            replace: `fill="${primary300}" fill-opacity=".7"/>`
-                        }
-                    }
-                ]
+                            replace: `fill="${primary300}" fill-opacity=".7"/>`,
+                        },
+                    },
+                ],
             },
             {
                 test: /\.svg$/,
@@ -478,26 +476,26 @@ const config = {
                         options: {
                             limit: 1000,
                             name: "[name].[ext]",
-                            outputPath: "icons/"
-                        }
+                            outputPath: "icons/",
+                        },
                     },
                     {
                         loader: "image-webpack-loader",
                         options: {
-                            svgo: svgoOpt
-                        }
+                            svgo: svgoOpt,
+                        },
                     },
                     {
                         loader: "string-replace-loader",
                         options: {
                             search: 'fill="$themeColour"',
-                            replace: `fill="${themeColour}"`
-                        }
-                    }
-                ]
-            }
-        ]
-    }
+                            replace: `fill="${themeColour}"`,
+                        },
+                    },
+                ],
+            },
+        ],
+    },
 }
 
 if (isQuiet) {
@@ -505,15 +503,14 @@ if (isQuiet) {
 }
 
 if (isProduction) {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     config.optimization.minimizer = [
         new TerserPlugin({
             cache: true,
             parallel: true,
             terserOptions: {
-                output: { comments: false }
-            }
-        })
+                output: { comments: false },
+            },
+        }),
     ]
 } else {
     config.devtool = "eval-source-map"
