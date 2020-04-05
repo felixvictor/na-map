@@ -39,6 +39,6 @@ interface BootstrapSelectOptions {
 }
 
 interface JQuery {
-    selectpicker(opts?: BootstrapSelectOptions): void
+    selectpicker(opts?: BootstrapSelectOptions): this
     selectpicker(method: string, ...args: Array<string | string[]>): void
 }

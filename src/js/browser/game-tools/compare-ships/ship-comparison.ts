@@ -18,6 +18,7 @@ import { drag as d3Drag } from "d3-drag"
 import { curveCatmullRomClosed as d3CurveCatmullRomClosed, pie as d3Pie, radialLine as d3RadialLine } from "d3-shape"
 import { max as d3Max, min as d3Min } from "d3-array"
 import { Ship } from "./ship"
+import { CompareShips } from "./compare-ships";
 
 export class ShipComparison extends Ship {
     /**
