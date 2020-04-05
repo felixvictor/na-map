@@ -80,13 +80,17 @@
         },
         {
             "files": ["*.js", "*.jsx"],
+            "parser": "babel-eslint",
+            "env": {
+                "es2020": true,
+                "node": true
+            },
             "extends": [
                 "plugin:lit/recommended",
                 "eslint:recommended",
                 "plugin:unicorn/recommended",
                 "xo/esnext",
                 "xo/browser",
-                "xo-typescript",
                 "plugin:prettier/recommended"
             ],
             "rules": {
