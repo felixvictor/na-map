@@ -33,7 +33,15 @@ import { isEmpty, putImportError } from "../../../common/common"
 import { ShipBase } from "./ship-base"
 import { ShipComparison } from "./ship-comparison"
 import { sortBy } from "../../../common/common-node"
-import { ModuleEntity, ModulePropertiesEntity, ShipData, ShipRepairTime } from "../../../common/gen-json"
+import { Module, ModuleEntity, ModulePropertiesEntity, ShipData, ShipRepairTime } from "../../../common/gen-json"
+
+interface ShipSelectData {
+    id: number
+    name: string
+    class: number
+    battleRating: number
+    guns: number
+}
 
 interface Property {
     properties: string[]
@@ -78,14 +86,14 @@ export class CompareShips {
     private _modifierAmount: Map<string, AbsoluteAndPercentageAmount>
     private _moduleAndWoodCaps!: Map<string, PropertyWithCap>
     private _moduleAndWoodChanges!: Map<string, Property>
-    private _moduleDataDefault!: ModuleEntity[]
+    private _moduleDataDefault!: Module[]
     private _moduleProperties!: Map<number, ModuleEntity>
     private _moduleTypes!: Set<ModuleType>
     private _selectedShips!: Index<ShipBase | ShipComparison>
     private _selectedUpgradeIdsList: NestedIndex<number[]> = {}
     private _selectedUpgradeIdsPerType: NestedIndex<number[]> = {}
     private _selectModule$: NestedIndex<JQuery<HTMLSelectElement>> = {}
-    private _selectShip$: NestedIndex<JQuery<HTMLSelectElement>> = {}
+    private _selectShip$: Index<JQuery<HTMLSelectElement>> = {}
     private _selectWood$: NestedIndex<JQuery<HTMLSelectElement>> = {}
     private _shipData!: ShipData[]
     private _shipIds: Index<number> = {}
@@ -107,7 +115,7 @@ export class CompareShips {
     private readonly _woodId: HtmlString
     private readonly colourScaleSpeedDiff: ScaleLinear<string, string>
     private _singleShipData!: ShipData
-    private _shipSelectData!: HtmlString
+    private _shipSelectData!: ShipSelectData[]
 
     /**
      *
@@ -182,9 +190,9 @@ export class CompareShips {
             .join("<br>")}</p>`
     }
 
-    static _setSelect(select$: JQuery, id: number): void {
-        if (id) {
-            select$.val(id)
+    static _setSelect(select$: JQuery, ids: number[]): void {
+        if (ids) {
+            select$.val(ids.toString)
         }
 
         select$.selectpicker("render")
@@ -327,7 +335,7 @@ export class CompareShips {
 
         try {
             this._moduleDataDefault = (await import(/* webpackChunkName: "data-modules" */ moduleFileName))
-                .default as ModuleEntity[]
+                .default as Module[]
             this._shipData = (await import(/* webpackChunkName: "data-ships" */ shipFileName)).default as ShipData[]
             this._setupData()
             if (this._baseId !== "ship-journey") {
@@ -451,18 +459,21 @@ export class CompareShips {
      * Setup ship data (group by class)
      */
     _setupShipData(): void {
-        this._shipSelectData = d3Nest()
-            .key((ship) => ship.class)
+        this._shipSelectData = d3Nest<ShipData, ShipSelectData>()
+            .key((ship) => String(ship.class))
             .sortKeys(d3Ascending)
             .entries(
                 this._shipData
-                    .map((ship) => ({
-                        id: ship.id,
-                        name: ship.name,
-                        class: ship.class,
-                        battleRating: ship.battleRating,
-                        guns: ship.guns,
-                    }))
+                    .map(
+                        (ship) =>
+                            ({
+                                id: ship.id,
+                                name: ship.name,
+                                class: ship.class,
+                                battleRating: ship.battleRating,
+                                guns: ship.guns,
+                            } as ShipSelectData)
+                    )
                     .sort(sortBy(["name"]))
             )
     }
@@ -605,8 +616,7 @@ export class CompareShips {
     _setupShipSelect(columnId: keyof CompareId): void {
         this._selectShip$[columnId] = $(`#${this._getShipSelectId(columnId)}`)
         const options = this._getShipOptions()
-        this._selectShip$[columnId].apts2349
-        pend(options)
+        this._selectShip$[columnId].append(options)
         if (columnId !== "Base") {
             this._selectShip$[columnId].attr("disabled", "disabled")
         }
@@ -1030,8 +1040,8 @@ export class CompareShips {
     }
 
     _modulesSelected(compareId: keyof CompareId): void {
-        this._selectedUpgradeIdsList[compareId] = []
-        this._selectedUpgradeIdsPerType[compareId] = []
+        this._selectedUpgradeIdsList[compareId] = {}
+        this._selectedUpgradeIdsPerType[compareId] = {}
 
         for (const type of this._moduleTypes) {
             // @ts-ignore
@@ -1046,10 +1056,9 @@ export class CompareShips {
             } else {
                 // Single select
 
-                this._selectedUpgradeIdsPerType[compareId][type] =
-                    this._selectedUpgradeIdsPerType[compareId][type] === ""
-                        ? []
-                        : [Number(this._selectedUpgradeIdsPerType[compareId][type])]
+                this._selectedUpgradeIdsPerType[compareId][type] = this._selectedUpgradeIdsPerType[compareId][type]
+                    ? [Number(this._selectedUpgradeIdsPerType[compareId][type])]
+                    : []
             }
 
             // @ts-ignore

@@ -227,7 +227,7 @@ interface SellAndBuyPrices<price> {
     SellPrice: MinMax<price>
     BuyPrice: MinMax<price>
 }
-interface ModifiersEntity {
+export interface ModifiersEntity {
     Slot: string
     MappingIds: string[]
     Absolute: number
