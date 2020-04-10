@@ -8,8 +8,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-/// <reference types="jquery"/>
-
 import { ScaleLinear, scaleLinear as d3ScaleLinear } from "d3-scale"
 import { interpolateCubehelixLong as d3InterpolateCubehelixLong } from "d3-interpolate"
 import { ascending as d3Ascending, max as d3Max, min as d3Min } from "d3-array"
@@ -61,16 +59,12 @@ interface CompareId {
     [index: string]: number
 }
 
-interface JQueryArray {
-    [index: string]: JQuery
-}
-
 interface Index<T> {
     [index: string]: T
 }
 
 interface NestedIndex<T> {
-    [index: string]: T[]
+    [index: string]: Index<T>
 }
 
 type ColumnType = string
@@ -88,11 +82,11 @@ export class CompareShips {
     private _moduleProperties!: Map<number, ModuleEntity>
     private _moduleTypes!: Set<ModuleType>
     private _selectedShips!: Index<ShipBase | ShipComparison>
-    private _selectedUpgradeIdsList: NestedIndex<number> = {}
-    private _selectedUpgradeIdsPerType: NestedIndex<number> = {}
-    private _selectModule$: JQueryArray = {}
-    private _selectShip$: JQueryArray = {}
-    private _selectWood$: JQueryArray = {}
+    private _selectedUpgradeIdsList: NestedIndex<number[]> = {}
+    private _selectedUpgradeIdsPerType: NestedIndex<number[]> = {}
+    private _selectModule$: NestedIndex<JQuery<HTMLSelectElement>> = {}
+    private _selectShip$: NestedIndex<JQuery<HTMLSelectElement>> = {}
+    private _selectWood$: NestedIndex<JQuery<HTMLSelectElement>> = {}
     private _shipData!: ShipData[]
     private _shipIds: Index<number> = {}
     private innerRadius!: number
@@ -113,6 +107,7 @@ export class CompareShips {
     private readonly _woodId: HtmlString
     private readonly colourScaleSpeedDiff: ScaleLinear<string, string>
     private _singleShipData!: ShipData
+    private _shipSelectData!: HtmlString
 
     /**
      *
@@ -203,7 +198,7 @@ export class CompareShips {
 
     async initFromClipboard(urlParams: URLSearchParams): Promise<void> {
         await this._loadAndSetupData()
-        const shipAndWoodsIds = hashids.decode(urlParams.get("cmp") ?? "")
+        const shipAndWoodsIds = hashids.decode(urlParams.get("cmp") ?? "") as number[]
         if (shipAndWoodsIds.length > 0) {
             this._shipCompareSelected()
             this._setShipAndWoodsSelects(shipAndWoodsIds)
@@ -562,7 +557,7 @@ export class CompareShips {
         for (const columnId of this._columns) {
             this._setupShipSelect(columnId)
             if (this._baseId !== "ship-journey") {
-                this._selectWood$[columnId] = {} as JQuery
+                this._selectWood$[columnId] = {}
                 for (const type of ["frame", "trim"]) {
                     this._selectWood$[columnId][type] = $(`#${this._getWoodSelectId(type, columnId)}`)
                     this.woodCompare._setupWoodSelects(columnId, type, this._selectWood$[columnId][type])
@@ -610,7 +605,8 @@ export class CompareShips {
     _setupShipSelect(columnId: keyof CompareId): void {
         this._selectShip$[columnId] = $(`#${this._getShipSelectId(columnId)}`)
         const options = this._getShipOptions()
-        this._selectShip$[columnId].append(options)
+        this._selectShip$[columnId].apts2349
+        pend(options)
         if (columnId !== "Base") {
             this._selectShip$[columnId].attr("disabled", "disabled")
         }
@@ -669,16 +665,13 @@ export class CompareShips {
 
         const options = this._getUpgradesOptions(type, getShipClass())
 
-        // @ts-ignore
         this._selectModule$[columnId][type].find("option").remove()
-        // @ts-ignore
         this._selectModule$[columnId][type].append(options)
     }
 
     _resetModuleSelects(columnId: keyof CompareId): void {
         for (const type of this._moduleTypes) {
             this._fillModuleSelect(columnId, type)
-            // @ts-ignore
             this._selectModule$[columnId][type].selectpicker("refresh")
         }
     }
@@ -700,12 +693,11 @@ export class CompareShips {
      */
     _setupModulesSelect(columnId: keyof CompareId): void {
         if (!this._selectModule$[columnId]) {
-            this._selectModule$[columnId] = {} as JQuery
+            this._selectModule$[columnId] = {}
 
             for (const type of this._moduleTypes) {
-                // @ts-ignore
                 this._selectModule$[columnId][type] = $(`#${this._getModuleSelectId(type, columnId)}`)
-                // @ts-ignore
+
                 this._selectModule$[columnId][type]
                     .on("changed.bs.select", () => {
                         this._modulesSelected(columnId)
@@ -1047,25 +1039,22 @@ export class CompareShips {
             // @ts-ignore
             if (Array.isArray(this._selectedUpgradeIdsPerType[compareId][type])) {
                 // Multiple selects
-                // @ts-ignore
+
                 this._selectedUpgradeIdsPerType[compareId][type] = this._selectedUpgradeIdsPerType[compareId][type].map(
                     Number
                 )
             } else {
                 // Single select
-                // @ts-ignore
+
                 this._selectedUpgradeIdsPerType[compareId][type] =
-                    // @ts-ignore
                     this._selectedUpgradeIdsPerType[compareId][type] === ""
                         ? []
-                        : // @ts-ignore
-                          [Number(this._selectedUpgradeIdsPerType[compareId][type])]
+                        : [Number(this._selectedUpgradeIdsPerType[compareId][type])]
             }
 
             // @ts-ignore
             if (this._selectedUpgradeIdsPerType[compareId][type].length) {
                 this._selectedUpgradeIdsList[compareId] = this._selectedUpgradeIdsList[compareId].concat(
-                    // @ts-ignore
                     this._selectedUpgradeIdsPerType[compareId][type]
                 )
             }
@@ -1095,10 +1084,8 @@ export class CompareShips {
         })
         if (this._baseId !== "ship-journey") {
             for (const type of ["frame", "trim"]) {
-                // @ts-ignore
                 this._selectWood$[compareId][type]
                     .on("changed.bs.select", () => {
-                        // @ts-ignore
                         this.woodCompare._woodSelected(compareId, type, this._selectWood$[compareId][type])
                         this._refreshShips(compareId)
                     })
@@ -1127,10 +1114,9 @@ export class CompareShips {
 
             if (ids[i]) {
                 for (const type of ["frame", "trim"]) {
-                    // @ts-ignore
                     CompareShips._setSelect(this._selectWood$[columnId][type], ids[i])
                     i += 1
-                    // @ts-ignore
+
                     this.woodCompare._woodSelected(columnId, type, this._selectWood$[columnId][type])
                 }
             } else {
@@ -1154,24 +1140,21 @@ export class CompareShips {
                 if (urlParams.has(`${columnIndex}${typeIndex}`)) {
                     const moduleIds = hashids.decode(urlParams.get(`${columnIndex}${typeIndex}`)!)
                     if (!this._selectedUpgradeIdsPerType[columnId]) {
-                        this._selectedUpgradeIdsPerType[columnId] = []
+                        this._selectedUpgradeIdsPerType[columnId] = {}
                     }
 
                     if (!this._selectedUpgradeIdsList[columnId]) {
-                        this._selectedUpgradeIdsList[columnId] = []
+                        this._selectedUpgradeIdsList[columnId] = {}
                     }
 
                     // console.log("moduleIds", { columnId }, { type }, { moduleIds });
-                    // @ts-ignore
+
                     this._selectedUpgradeIdsPerType[columnId][type] = moduleIds.map(Number)
                     CompareShips._setSelect(
-                        // @ts-ignore
                         this._selectModule$[columnId][type],
-                        // @ts-ignore
                         this._selectedUpgradeIdsPerType[columnId][type]
                     )
                     this._selectedUpgradeIdsList[columnId] = this._selectedUpgradeIdsList[columnId].concat(
-                        // @ts-ignore
                         this._selectedUpgradeIdsPerType[columnId][type]
                     )
                     needRefresh = true
