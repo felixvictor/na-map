@@ -67,6 +67,14 @@ interface CompareId {
     [index: string]: number
 }
 
+interface ArrayIndex<T> {
+    [index: string]: T[]
+}
+
+interface NestedArrayIndex<T> {
+    [index: string]: ArrayIndex<T>
+}
+
 interface Index<T> {
     [index: string]: T
 }
@@ -74,6 +82,7 @@ interface Index<T> {
 interface NestedIndex<T> {
     [index: string]: Index<T>
 }
+
 
 type ColumnType = string
 type ModuleType = string
@@ -89,14 +98,14 @@ export class CompareShips {
     private _moduleDataDefault!: Module[]
     private _moduleProperties!: Map<number, ModuleEntity>
     private _moduleTypes!: Set<ModuleType>
-    private _selectedShips!: Index<ShipBase | ShipComparison>
-    private _selectedUpgradeIdsList: NestedIndex<number[]> = {}
-    private _selectedUpgradeIdsPerType: NestedIndex<number[]> = {}
+    private _selectedShips!: ArrayIndex<ShipBase | ShipComparison>
+    private _selectedUpgradeIdsList: NestedArrayIndex<number> = {}
+    private _selectedUpgradeIdsPerType: NestedArrayIndex<number> = {}
     private _selectModule$: NestedIndex<JQuery<HTMLSelectElement>> = {}
     private _selectShip$: Index<JQuery<HTMLSelectElement>> = {}
     private _selectWood$: NestedIndex<JQuery<HTMLSelectElement>> = {}
     private _shipData!: ShipData[]
-    private _shipIds: Index<number> = {}
+    private _shipIds: NestedIndex<number> = {}
     private innerRadius!: number
     private outerRadius!: number
     private radiusSpeedScale!: ScaleLinear<number, number>
@@ -687,14 +696,14 @@ export class CompareShips {
     }
 
     _getModuleFromName(moduleName: string): ModuleEntity {
-        let module = {} as ModuleEntity
+        let module = {} as ModuleEntity | undefined
 
         this._moduleDataDefault.some((type) => {
             module = type[1].find((module) => module.name === moduleName)
             return Boolean(module)
         })
 
-        return module
+        return module as ModuleEntity
     }
 
     /**
@@ -808,8 +817,8 @@ export class CompareShips {
 
         // If modifier has been in the Map add the amount
         if (this._modifierAmount.has(property.modifier)) {
-            absolute += this._modifierAmount.get(property.modifier).absolute
-            percentage += this._modifierAmount.get(property.modifier).percentage
+            absolute += this._modifierAmount.get(property.modifier)?.absolute ?? 0
+            percentage += this._modifierAmount.get(property.modifier)?.percentage ?? 0
         }
 
         this._modifierAmount.set(property.modifier, {
@@ -855,7 +864,7 @@ export class CompareShips {
 
         const setModifierAmounts = (): void => {
             for (const id of this._selectedUpgradeIdsList[compareId]) {
-                const module = this._moduleProperties.get(id)
+                const module = this._moduleProperties.get(id)!
 
                 for (const property of module.properties) {
                     if (this._moduleAndWoodChanges.has(property.modifier)) {
@@ -1103,15 +1112,15 @@ export class CompareShips {
         }
     }
 
-    _setShipAndWoodsSelects(ids: number[]): void {
+    _setShipAndWoodsSelects(id: number): void {
         let i = 0
 
         this._columns.some((columnId) => {
-            if (!this._shipData.find((ship) => ship.id === ids[i])) {
+            if (!this._shipData.find((ship) => ship.id === id[i])) {
                 return false
             }
 
-            this._shipIds[columnId] = ids[i]
+            this._shipIds[columnId] = id[i]
             i += 1
             CompareShips._setSelect(this._selectShip$[columnId], this._shipIds[columnId])
             if (columnId === "Base" && this._baseId !== "ship-journey") {
@@ -1121,9 +1130,9 @@ export class CompareShips {
             this.woodCompare.enableSelects(columnId)
             this._setupModulesSelect(columnId)
 
-            if (ids[i]) {
+            if (id[i]) {
                 for (const type of ["frame", "trim"]) {
-                    CompareShips._setSelect(this._selectWood$[columnId][type], ids[i])
+                    CompareShips._setSelect(this._selectWood$[columnId][type], id[i])
                     i += 1
 
                     this.woodCompare._woodSelected(columnId, type, this._selectWood$[columnId][type])
@@ -1133,7 +1142,7 @@ export class CompareShips {
             }
 
             this._refreshShips(columnId)
-            return i >= ids.length
+            return i >= id.length
         })
     }
 
@@ -1163,9 +1172,7 @@ export class CompareShips {
                         this._selectModule$[columnId][type],
                         this._selectedUpgradeIdsPerType[columnId][type]
                     )
-                    this._selectedUpgradeIdsList[columnId] = this._selectedUpgradeIdsList[columnId].concat(
-                        this._selectedUpgradeIdsPerType[columnId][type]
-                    )
+                    this._selectedUpgradeIdsList[columnId].push(...this._selectedUpgradeIdsPerType[columnId][type])
                     needRefresh = true
                 }
             }
