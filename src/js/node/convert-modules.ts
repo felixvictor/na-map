@@ -9,13 +9,15 @@
  */
 
 import * as path from "path"
-import { APIItemGeneric, APIModule, ModifiersEntity } from "./api-item"
-import { ModuleEntity, ModulePropertiesEntity, Wood, WoodTrimOrFrame } from "../common/gen-json"
+
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
 import { capitalizeFirstLetter, groupToMap } from "../common/common"
 import { cleanName, sortBy } from "../common/common-node"
 import { readJson, saveJsonAsync } from "../common/common-file"
 import { serverNames } from "../common/common-var"
+
+import { APIItemGeneric, APIModule, ModifiersEntity } from "./api-item"
+import { ModuleConvertEntity, ModuleEntity, ModulePropertiesEntity, Wood, WoodTrimOrFrame } from "../common/gen-json"
 
 let apiItems: APIItemGeneric[]
 
@@ -203,7 +205,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
      * Set wood properties
      * @param module - Module data
      */
-    const setWood = (module: ModuleEntity): void => {
+    const setWood = (module: ModuleConvertEntity): void => {
         const wood = {} as WoodTrimOrFrame
         wood.id = module.id
         wood.properties = []
@@ -315,7 +317,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
      * @param module - Module data
      * @returns Module type
      */
-    const getModuleType = (module: ModuleEntity): string => {
+    const getModuleType = (module: ModuleConvertEntity): string => {
         let type: string
         let { permanentType, sortingGroup } = module
 
@@ -358,7 +360,6 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         if (permanentType === "Default") {
             permanentType = ""
         } else {
-            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
             permanentType = `\u202F\u25CB\u202F${permanentType}`
         }
 
@@ -387,7 +388,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
             // bCanBeBreakedUp: APImodule.bCanBeBreakedUp,
             moduleType: apiModule.ModuleType,
             moduleLevel: levels.get(apiModule.ModuleLevel),
-        } as ModuleEntity
+        } as ModuleConvertEntity
 
         if (module.name.startsWith("Bow figure - ")) {
             module.name = `${module.name.replace("Bow figure - ", "")} bow figure`
