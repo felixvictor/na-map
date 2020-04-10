@@ -152,17 +152,20 @@ interface LootChestsEntity {
  * modules.json
  */
 
+export type Module = [string, ModuleEntity[]]
 export interface ModuleEntity {
     id: number
     name: string
     usageType: string
     moduleLevel: string
-    properties?: ModulePropertiesEntity[]
+    properties: ModulePropertiesEntity[]
     type: string
+}
+export interface ModuleConvertEntity extends ModuleEntity {
     APImodifiers: ModifiersEntity[]
-    sortingGroup?: string
-    permanentType?: string
-    moduleType?: string
+    sortingGroup: string
+    permanentType: string
+    moduleType: string
 }
 export interface ModulePropertiesEntity {
     modifier: string
