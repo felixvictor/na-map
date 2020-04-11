@@ -19,13 +19,13 @@ import { CompareShips, ShipDisplayData } from "."
 export class Ship {
     readonly ticksSpeed: number[]
     readonly ticksSpeedLabels: string[]
+    // Class instance of the ship to be compared to
+    readonly _shipCompare: CompareShips
     readonly select!: HtmlString
+    _mainG!: d3Selection.Selection<SVGGElement, unknown, HTMLElement, any>
     // Column id
     private readonly _id: string
-    // Class instance of the ship to be compared to
-    private readonly _shipCompare: CompareShips
     private _svg!: d3Selection.Selection<SVGSVGElement, unknown, HTMLElement, any>
-    private _mainG!: d3Selection.Selection<SVGGElement, unknown, HTMLElement, any>
     constructor(id: string, shipCompare: CompareShips) {
         this._id = id
         this._shipCompare = shipCompare
@@ -259,6 +259,7 @@ export class Ship {
             .attr("class", "compass-arc")
             .selectAll("path")
             .data(pie)
+            // @ts-ignore
             .join((enter) => enter.append("path").attr("d", arc))
 
         // Add the circles for each speed tick

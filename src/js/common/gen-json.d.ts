@@ -467,34 +467,36 @@ interface ShipBlueprintShip {
  */
 
 export interface ShipData extends ObjectIndexer<any> {
-    id: number
-    name: string
-    class: number
-    gunsPerDeck: number[]
-    guns: number
-    broadside: ShipBroadside
-    deckClassLimit: number[][]
-    shipMass: number
     battleRating: number
-    decks: number
-    holdSize: number
-    maxWeight: number
-    crew: ShipCrew
-    speedDegrees: number[]
-    speed: ShipSpeed
-    sides: ShipHealth
     bow: ShipHealth
+    broadside: ShipBroadside
+    class: number
+    crew: ShipCrew
+    deckClassLimit: number[][]
+    decks: number
+    guns: number
+    gunsPerDeck: number[]
+    holdSize: number
+    id: number
+    mast: ShipMast
+    maxWeight: number
+    name: string
+    premium: boolean
+    pump: ShipStructureOrPump
+    repairTime: ShipRepairTime
+    repairAmount?: ShipRepairAmount
+    resistance?: ShipResistance
+    rudder: ShipRudder
+    sails: ShipSails
+    ship: ShipShip
+    shipMass: number
+    sides: ShipHealth
+    speed: ShipSpeed
+    speedDegrees: number[]
     stern: ShipHealth
     structure: ShipStructureOrPump
-    sails: ShipSails
-    pump: ShipStructureOrPump
-    rudder: ShipRudder
-    upgradeXP: number
-    repairTime: ShipRepairTime
-    ship: ShipShip
-    mast: ShipMast
-    premium: boolean
     tradeShip: boolean
+    upgradeXP: number
 }
 interface ShipBroadside {
     cannons: number
@@ -526,6 +528,12 @@ interface ShipRudder {
     halfturnTime: number
     thickness: number
 }
+interface ShipRepairAmount {
+    armour: number
+    armourPerk: number
+    sails: number
+    sailsPerk: number
+}
 interface ShipRepairTime {
     stern: number
     bow: number
@@ -534,6 +542,11 @@ interface ShipRepairTime {
     sails: number
     structure: number
     default?: number
+}
+interface ShipResistance {
+    fire: number
+    leaks: number
+    splinter: number
 }
 interface ShipShip {
     waterlineHeight: number
@@ -558,7 +571,8 @@ interface ShipMast {
  * woods.json
  */
 
-export interface Wood extends ObjectIndexer<WoodTrimOrFrame[]> {
+export interface WoodData {
+    [index: string]: ValuesType<WoodData>
     trim: WoodTrimOrFrame[]
     frame: WoodTrimOrFrame[]
 }

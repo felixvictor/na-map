@@ -26,7 +26,7 @@ export const convertRepairData = async () => {
     for (const baseFileName of baseFileNames) {
         const fileData = getFileData(baseFileName, "kit");
         const data = {};
-        fileData.Attributes.Pair.forEach(pair => {
+        fileData.Attributes.Pair.forEach((pair) => {
             if (pair.Key._text === "REPAIR_VOLUME_PER_ITEM") {
                 data.volume = Number(pair.Value.Value._text);
             }
