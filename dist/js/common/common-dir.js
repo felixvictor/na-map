@@ -7,12 +7,13 @@
  * @copyright 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
+var _a;
 import path from "path";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc.js";
 dayjs.extend(utc);
 import { serverMaintenanceHour } from "./common-var";
-const appRoot = process.env.PWD ?? "";
+const appRoot = (_a = process.env.PWD) !== null && _a !== void 0 ? _a : "";
 const dirOut = path.resolve(appRoot, "public", "data");
 const dirBuild = path.resolve(appRoot, "build");
 const dirAPI = path.resolve(dirBuild, "API");
@@ -44,14 +45,10 @@ export const commonPaths = {
     fileRepair: path.resolve(dirGenGeneric, "repairs.json"),
     fileShip: path.resolve(dirGenGeneric, "ships.json"),
     fileShipBlueprint: path.resolve(dirGenGeneric, "ship-blueprints.json"),
-    fileWood: path.resolve(dirGenGeneric, "woods.json")
+    fileWood: path.resolve(dirGenGeneric, "woods.json"),
 };
 const getServerStartDateTime = () => {
-    let serverStart = dayjs()
-        .utc()
-        .hour(serverMaintenanceHour)
-        .minute(0)
-        .second(0);
+    let serverStart = dayjs().utc().hour(serverMaintenanceHour).minute(0).second(0);
     if (dayjs.utc().isBefore(serverStart)) {
         serverStart = dayjs.utc(serverStart).subtract(1, "day");
     }

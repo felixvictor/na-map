@@ -20,6 +20,39 @@ import { cleanName } from "../common/common-node";
 const fileExtension = ".json.xz";
 const d3n = d3Node();
 const { d3 } = d3n;
+const decompress = (compressedContent) => {
+    return lzma.decompress(compressedContent, {}, (decompressedContent, error) => {
+        if (error) {
+            throw new Error(error);
+        }
+        return decompressedContent;
+    });
+};
+const readFileContent = async (fileName) => {
+    return new Promise((resolve, reject) => {
+        fs.readFile(fileName, (error, data) => {
+            if (error) {
+                reject(error);
+            }
+            else {
+                resolve(data);
+            }
+        });
+    });
+};
+const sortFileNames = (fileNames) => {
+    return fileNames.sort((a, b) => {
+        const ba = path.basename(a);
+        const bb = path.basename(b);
+        if (ba < bb) {
+            return -1;
+        }
+        if (ba > bb) {
+            return 1;
+        }
+        return 0;
+    });
+};
 function convertOwnership() {
     const ports = new Map();
     const numPortsDates = [];
@@ -27,28 +60,30 @@ function convertOwnership() {
     function parseData(portData, date) {
         const numPorts = {};
         nations
-            .filter(nation => nation.id !== 9)
-            .forEach(nation => {
+            .filter((nation) => nation.id !== 9)
+            .forEach((nation) => {
             numPorts[nation.short] = 0;
         });
         for (const port of portData) {
             const getObject = () => ({
                 timeRange: [date, date],
                 val: nations[port.Nation].short,
-                labelVal: nations[port.Nation].sortName
+                labelVal: nations[port.Nation].sortName,
             });
             const initData = () => {
+                var _a;
                 ports.set(port.Id, {
                     name: cleanName(port.Name),
                     region: port.Location,
-                    county: capitalToCounty.get(port.CountyCapitalName) || "",
-                    data: [getObject()]
+                    county: (_a = capitalToCounty.get(port.CountyCapitalName)) !== null && _a !== void 0 ? _a : "",
+                    data: [getObject()],
                 });
             };
             const getPreviousNation = () => {
+                var _a;
                 const portData = ports.get(port.Id);
                 if (portData) {
-                    const index = portData.data.length - 1 ?? 0;
+                    const index = (_a = portData.data.length - 1) !== null && _a !== void 0 ? _a : 0;
                     return portData.data[index].val;
                 }
                 return "";
@@ -87,62 +122,30 @@ function convertOwnership() {
         const numPortsDate = {};
         numPortsDate.date = date;
         nations
-            .filter(nation => nation.id !== 9)
-            .forEach(nation => {
+            .filter((nation) => nation.id !== 9)
+            .forEach((nation) => {
             numPortsDate[nation.short] = numPorts[nation.short];
         });
         numPortsDates.push(numPortsDate);
     }
-    const decompress = (compressedContent) => {
-        return lzma.decompress(compressedContent, {}, (decompressedContent, error) => {
-            if (error) {
-                throw new Error(error);
-            }
-            return decompressedContent;
-        });
-    };
-    function readFileContent(fileName) {
-        return new Promise((resolve, reject) => {
-            fs.readFile(fileName, (error, data) => {
-                if (error) {
-                    reject(error);
-                }
-                else {
-                    resolve(data);
-                }
-            });
-        });
-    }
-    function processFiles(fileNames) {
-        return fileNames.reduce((sequence, fileName) => sequence
-            .then(() => readFileContent(fileName))
-            .then(compressedContent => decompress(compressedContent))
-            .then(decompressedContent => {
+    const processFiles = async (fileNames) => {
+        return fileNames.reduce(async (sequence, fileName) => sequence
+            .then(async () => readFileContent(fileName))
+            .then((compressedContent) => decompress(compressedContent))
+            .then((decompressedContent) => {
+            var _a;
             if (decompressedContent) {
-                const currentDate = (path.basename(fileName).match(fileBaseNameRegex) ?? [])[1];
+                const currentDate = ((_a = fileBaseNameRegex.exec(path.basename(fileName))) !== null && _a !== void 0 ? _a : [])[1];
                 parseData(JSON.parse(decompressedContent.toString()), currentDate);
             }
         })
-            .catch(error => {
+            .catch((error) => {
             throw new Error(error);
         }), Promise.resolve());
-    }
-    function ignoreFileName(fileName, stats) {
-        return !stats.isDirectory() && path.basename(fileName).match(fileBaseNameRegex) === null;
-    }
-    function sortFileNames(fileNames) {
-        return fileNames.sort((a, b) => {
-            const ba = path.basename(a);
-            const bb = path.basename(b);
-            if (ba < bb) {
-                return -1;
-            }
-            if (ba > bb) {
-                return 1;
-            }
-            return 0;
-        });
-    }
+    };
+    const ignoreFileName = (fileName, stats) => {
+        return !stats.isDirectory() && fileBaseNameRegex.exec(path.basename(fileName)) === null;
+    };
     const writeResult = async () => {
         const portsArray = [...ports.entries()].map(([key, value]) => {
             value.id = key;
@@ -155,13 +158,13 @@ function convertOwnership() {
             .key((d) => d.county)
             .sortKeys(d3.ascending)
             .entries(portsArray);
-        const result = nested.map(region => {
+        const result = nested.map((region) => {
             const newRegion = {};
             newRegion.region = region.key;
-            newRegion.data = region.values.map(county => {
+            newRegion.data = region.values.map((county) => {
                 const group = {};
                 group.group = county.key;
-                group.data = county.values.map(port => {
+                group.data = county.values.map((port) => {
                     const label = {};
                     label.label = port.name;
                     label.data = port.data;
@@ -175,10 +178,10 @@ function convertOwnership() {
         await saveJsonAsync(commonPaths.fileNation, numPortsDates);
     };
     readDirRecursive(commonPaths.dirAPI, [ignoreFileName])
-        .then(fileNames => sortFileNames(fileNames))
-        .then(fileNames => processFiles(fileNames))
-        .then(() => writeResult())
-        .catch(error => {
+        .then((fileNames) => sortFileNames(fileNames))
+        .then(async (fileNames) => processFiles(fileNames))
+        .then(async () => writeResult())
+        .catch((error) => {
         throw new Error(error);
     });
 }

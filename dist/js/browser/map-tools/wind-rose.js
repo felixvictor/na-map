@@ -17,13 +17,15 @@ import "moment/locale/en-gb";
 import "round-slider/src/roundslider";
 import "round-slider/src/roundslider.css";
 import { registerEvent } from "../analytics";
-import { degreesPerSecond, insertBaseModal } from "../../common/common";
-import { degreesToRadians, displayCompass, getUserWind, printSmallCompassRose } from "../util";
+import { degreesPerSecond, insertBaseModal } from "../../common/common-browser";
+import { compassDirections, degreesToRadians } from "../../common/common-math";
+import { displayCompass, getUserWind, printSmallCompassRose } from "../util";
 import Cookie from "../util/cookie";
-import { compassDirections } from "../../common/common-math";
 export default class WindRose {
     constructor() {
-        this._line = d3Line();
+        this._line = d3Line()
+            .x((d) => d[0])
+            .y((d) => d[1]);
         this._windPath = null;
         this._windArrowWidth = 4;
         this._intervalSeconds = 40;
@@ -36,7 +38,7 @@ export default class WindRose {
         this._cookieExpire = this._getExpire();
         this._cookieWindDegrees = new Cookie({
             id: `${this._baseId}-degrees`,
-            expire: this._cookieExpire
+            expire: this._cookieExpire,
         });
         this._cookieTime = new Cookie({ id: `${this._baseId}-time` });
         this._currentWindDegrees = this._getCurrentWindCookie();
@@ -47,15 +49,18 @@ export default class WindRose {
     }
     _getHeight() {
         const div = document.querySelector("#port-summary .block");
-        const { height, top } = div.getBoundingClientRect();
-        const paddingTop = parseFloat(window.getComputedStyle(div).getPropertyValue("padding-top"));
-        const paddingBottom = parseFloat(window.getComputedStyle(div).getPropertyValue("padding-bottom"));
-        return height - top - paddingTop - paddingBottom;
+        if (div) {
+            const { height, top } = div.getBoundingClientRect();
+            const paddingTop = Number.parseFloat(window.getComputedStyle(div).getPropertyValue("padding-top"));
+            const paddingBottom = Number.parseFloat(window.getComputedStyle(div).getPropertyValue("padding-bottom"));
+            return height - top - paddingTop - paddingBottom;
+        }
+        return 0;
     }
     _getCurrentWindCookie() {
-        const wind = this._cookieWindDegrees.get();
+        const wind = Number(this._cookieWindDegrees.get());
         if (wind) {
-            const time = this._cookieTime.get();
+            const time = Number(this._cookieTime.get());
             const diffSeconds = Math.round((Date.now() - time) / 1000);
             this._currentWindDegrees = 360 + (Math.floor(wind - degreesPerSecond * diffSeconds) % 360);
         }
@@ -63,27 +68,20 @@ export default class WindRose {
     }
     _getExpire() {
         const now = moment.utc();
-        let end = moment()
-            .utc()
-            .hour(10)
-            .minute(0)
-            .second(0);
+        let end = moment().utc().hour(10).minute(0).second(0);
         if (now.hour() >= end.hour()) {
             end = end.add(1, "day");
         }
         return end.local().toDate();
     }
     _storeCurrentWindCookie() {
-        this._cookieWindDegrees.set(this._currentWindDegrees);
-        this._cookieTime.set(Date.now());
+        this._cookieWindDegrees.set(String(this._currentWindDegrees));
+        this._cookieTime.set(String(Date.now()));
     }
     _setupSvg() {
         const portSummary = d3Select("#port-summary");
         portSummary.classed("port-summary-no-wind", false).classed("port-summary-wind", true);
-        this._div = portSummary
-            .insert("div", ":first-child")
-            .attr("id", this._baseId)
-            .attr("class", "block p-0");
+        this._div = portSummary.insert("div", ":first-child").attr("id", this._baseId).attr("class", "block p-0");
         this._svg = this._div.append("svg").attr("class", "ingame-wind small");
     }
     _navbarClick(event) {
@@ -92,10 +90,11 @@ export default class WindRose {
         this._windRoseSelected();
     }
     _setupListener() {
-        document.getElementById(`${this._buttonId}`).addEventListener("click", event => this._navbarClick(event));
+        var _a;
+        (_a = document.querySelector(`${this._buttonId}`)) === null || _a === void 0 ? void 0 : _a.addEventListener("click", (event) => this._navbarClick(event));
     }
     _setupWindInput() {
-        const { _getTooltipPos } = $.fn.roundSlider.prototype;
+        const _getTooltipPos = $.fn.roundSlider.prototype._getTooltipPos;
         $.fn.roundSlider.prototype._getTooltipPos = function () {
             if (!this.tooltip.is(":visible")) {
                 $("body").append(this.tooltip);
@@ -104,7 +103,7 @@ export default class WindRose {
             this.container.append(this.tooltip);
             return pos;
         };
-        window.tooltip = arguments_ => `${displayCompass(arguments_.value)}<br>${arguments_.value}°`;
+        window.tooltip = (arguments_) => `${displayCompass(arguments_.value)}<br>${String(arguments_.value)}°`;
         $(`#${this._sliderId}`).roundSlider({
             sliderType: "default",
             handleSize: "+1",
@@ -119,33 +118,24 @@ export default class WindRose {
             create() {
                 this.control.css("display", "block");
             },
-            change() {
-                this._currentWind = $(`#${this._sliderId}`).roundSlider("getValue");
-            }
         });
     }
     _injectModal() {
         moment.locale("en-gb");
-        insertBaseModal(this._modalId, this._baseName, "sm");
+        insertBaseModal({ id: this._modalId, title: this._baseName, size: "sm" });
         const body = d3Select(`#${this._modalId} .modal-body`);
         const form = body.append("form").attr("id", this._formId);
         const formGroupA = form.append("div").attr("class", "form-group");
         const slider = formGroupA.append("div").attr("class", "alert alert-primary");
-        slider
-            .append("label")
-            .attr("for", this._sliderId)
-            .text("Current in-game wind");
-        slider
-            .append("div")
-            .attr("id", this._sliderId)
-            .attr("class", "rslider");
+        slider.append("label").attr("for", this._sliderId).text("Current in-game wind");
+        slider.append("div").attr("id", this._sliderId).attr("class", "rslider");
     }
     _initModal() {
         this._injectModal();
         this._setupWindInput();
     }
     _windRoseSelected() {
-        if (!document.getElementById(this._modalId)) {
+        if (!document.querySelector(this._modalId)) {
             this._initModal();
         }
         $(`#${this._modalId}`)
@@ -181,10 +171,12 @@ export default class WindRose {
         const dy = this._length * Math.sin(radians);
         const lineData = [
             [Math.round(this._xCompass + dx), Math.round(this._yCompass + dy)],
-            [Math.round(this._xCompass - dx), Math.round(this._yCompass - dy)]
+            [Math.round(this._xCompass - dx), Math.round(this._yCompass - dy)],
         ];
-        this._windPath.datum(lineData).attr("d", this._line);
-        this._storeCurrentWindCookie();
+        if (this._windPath) {
+            this._windPath.datum(lineData).attr("d", this._line);
+            this._storeCurrentWindCookie();
+        }
     }
     _initPrintCompassRose() {
         this._height = this._getHeight();

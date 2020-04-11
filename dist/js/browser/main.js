@@ -7,11 +7,11 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 import { initAnalytics, registerPage } from "./analytics";
-import { servers } from "../common/servers";
+import { putImportError } from "../common/common";
+const servers = require("../common/servers");
 import Cookie from "./util/cookie";
 import RadioButton from "./util/radio-button";
 import "../../scss/main.scss";
-import { putImportError } from "../common/common-file";
 SVGAnimatedString.prototype.indexOf = function () {
     return this.baseVal.indexOf.apply(this.baseVal, arguments);
 };
@@ -31,19 +31,15 @@ const serverNameSelected = () => {
     document.location.reload();
 };
 const setupListener = () => {
-    ;
-    document.getElementById(baseId).addEventListener("change", () => serverNameSelected());
-    $(".dropdown-menu [data-toggle='dropdown']").on("click", event => {
+    var _a;
+    (_a = document.querySelector(baseId)) === null || _a === void 0 ? void 0 : _a.addEventListener("change", () => serverNameSelected());
+    $(".dropdown-menu [data-toggle='dropdown']").on("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
         const element = $(event.currentTarget);
         element.siblings().toggleClass("show");
         if (!element.next().hasClass("show")) {
-            element
-                .parents(".dropdown-menu")
-                .first()
-                .find(".show")
-                .removeClass("show");
+            element.parents(".dropdown-menu").first().find(".show").removeClass("show");
         }
         element.parents(".nav-item.dropdown.show").on("hidden.bs.dropdown", () => {
             $(".dropdown-submenu .show").removeClass("show");
@@ -52,7 +48,7 @@ const setupListener = () => {
 };
 const loadMap = async (serverId, searchParams) => {
     try {
-        const Map = await import("./map/NAMap");
+        const Map = await import("./map/na-map");
         const map = new Map.NAMap(serverId, searchParams);
         await map.MapInit();
         window.addEventListener("resize", () => {
@@ -73,6 +69,7 @@ const loadGameTools = async (serverId, searchParams) => {
     }
 };
 const load = async () => {
+    var _a;
     const serverId = getServerName();
     const searchParams = getSearchParams();
     history.replaceState("", document.title, window.location.origin + window.location.pathname);
@@ -81,8 +78,8 @@ const load = async () => {
         loadGameTools(serverId, searchParams);
     }
     else {
-        ;
-        document.getElementById("game-tools-dropdown").addEventListener("click", () => loadGameTools(serverId, searchParams), { once: true });
+        (_a = document
+            .querySelector("#game-tools-dropdown")) === null || _a === void 0 ? void 0 : _a.addEventListener("click", async () => loadGameTools(serverId, searchParams), { once: true });
     }
 };
 const main = () => {

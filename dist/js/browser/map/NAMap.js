@@ -9,29 +9,24 @@
  */
 import "bootstrap/js/dist/util";
 import "bootstrap/js/dist/modal";
+import "bootstrap-select/js/bootstrap-select";
 import * as d3Range from "d3-array";
 import * as d3Selection from "d3-selection";
 import * as d3Zoom from "d3-zoom";
 import { registerEvent } from "../analytics";
 import { appDescription, appTitle, appVersion, insertBaseModal } from "../../common/common-browser";
-import { displayClan, roundToThousands } from "../util";
+import { defaultFontSize, nearestPow2, roundToThousands } from "../../common/common-math";
+import { displayClan } from "../util";
 import Cookie from "../util/cookie";
 import RadioButton from "../util/radio-button";
 import DisplayPbZones from "./display-pb-zones";
 import DisplayPorts from "./display-ports";
-import SelectPorts from "./select-ports";
 import ShowF11 from "../map-tools/show-f11";
-import DisplayGrid from "../map-tools/display-grid";
-import Journey from "../map-tools/make-journey";
-import PredictWind from "../map-tools/predict-wind";
-import WindRose from "../map-tools/wind-rose";
-import ShowTrades from "../map-tools/show-trades";
-import { defaultFontSize, nearestPow2 } from "../../common/common-math";
 class NAMap {
     constructor(serverName, searchParams) {
-        this._minScale = 0;
-        this.width = 0;
         this.height = 0;
+        this.minScale = 0;
+        this.width = 0;
         this._currentScale = 0;
         this.serverName = serverName;
         this._searchParams = searchParams;
@@ -60,12 +55,22 @@ class NAMap {
         this._showGridCookie = new Cookie({ id: this._showGridId, values: this._showGridValues });
         this._showGridRadios = new RadioButton(this._showGridId, this._showGridValues);
         this._showGrid = this._getShowGridValue();
-        this.gridOverlay = document.getElementsByClassName("overlay")[0];
+        this.gridOverlay = document.querySelectorAll(".overlay")[0];
         this._setHeightWidth();
         this._setupScale();
         this._setupSvg();
         this._setSvgSize();
         this._setupListener();
+    }
+    static _initModal(id) {
+        insertBaseModal({ id, title: `${appTitle} <span class="text-primary small">v${appVersion}</span>` });
+        const body = d3Selection.select(`#${id} .modal-body`);
+        body.html(`<p>${appDescription} Please check the <a href="https://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/"> Game-Labs forum post</a> for further details. Feedback is very welcome.</p><p>Designed by iB aka Felix Victor, clan Bastard Sons ${displayClan("(BASTD)")}</a>.</p>`);
+    }
+    static _stopProperty() {
+        if (d3Selection.event.defaultPrevented) {
+            d3Selection.event.stopPropagation();
+        }
     }
     async MapInit() {
         await this._setupData();
@@ -81,49 +86,45 @@ class NAMap {
         return r;
     }
     async _setupData() {
-        this._f11 = new ShowF11(this, this.coord);
+        this.f11 = new ShowF11(this, this.coord);
         this._ports = new DisplayPorts(this);
         await this._ports.init();
         this._pbZone = new DisplayPbZones(this._ports);
         this._grid = new DisplayGrid(this);
-        this._journey = new Journey(this.rem);
+        this._journey = new MakeJourney(this.rem);
         this._windPrediction = new PredictWind();
         this._windRose = new WindRose();
         this._portSelect = new SelectPorts(this._ports, this._pbZone, this);
-        this.showTrades = new ShowTrades(this.serverName, this._portSelect, this._minScale, this.coord.min, this.coord.max);
+        this.showTrades = new ShowTrades(this.serverName, this._portSelect, this.minScale, this.coord.min, this.coord.max);
         await this.showTrades.showOrHide();
     }
-    static _stopProperty() {
-        if (d3Selection.event.defaultPrevented) {
-            d3Selection.event.stopPropagation();
-        }
-    }
     _setupListener() {
+        var _a, _b, _c, _e, _f, _g, _h;
         this._svg
             .on("dblclick.zoom", null)
             .on("click", NAMap._stopProperty, true)
             .on("dblclick", (_d, i, nodes) => this._doDoubleClickAction(nodes[i]));
-        document.getElementById("propertyDropdown")?.addEventListener("click", () => {
+        (_a = document.querySelector("#propertyDropdown")) === null || _a === void 0 ? void 0 : _a.addEventListener("click", () => {
             registerEvent("Menu", "Select port on property");
         });
-        document.getElementById("settingsDropdown")?.addEventListener("click", () => {
+        (_b = document.querySelector("#settingsDropdown")) === null || _b === void 0 ? void 0 : _b.addEventListener("click", () => {
             registerEvent("Menu", "Settings");
         });
-        document.getElementById("button-download-pb-calc")?.addEventListener("click", () => {
+        (_c = document.querySelector("#button-download-pb-calc")) === null || _c === void 0 ? void 0 : _c.addEventListener("click", () => {
             registerEvent("Tools", "Download pb calculator");
         });
-        document.getElementById("reset")?.addEventListener("click", () => {
+        (_e = document.querySelector("#reset")) === null || _e === void 0 ? void 0 : _e.addEventListener("click", () => {
             this._clearMap();
         });
-        document.getElementById("about")?.addEventListener("click", () => {
+        (_f = document.querySelector("#about")) === null || _f === void 0 ? void 0 : _f.addEventListener("click", () => {
             this._showAbout();
         });
-        document.getElementById("double-click-action")?.addEventListener("change", () => this._doubleClickSelected());
-        document.getElementById("show-grid")?.addEventListener("change", () => this._showGridSelected());
+        (_g = document.querySelector("#double-click-action")) === null || _g === void 0 ? void 0 : _g.addEventListener("change", () => this._doubleClickSelected());
+        (_h = document.querySelector("#show-grid")) === null || _h === void 0 ? void 0 : _h.addEventListener("change", () => this._showGridSelected());
     }
     _setupScale() {
-        this._minScale = nearestPow2(Math.min(this.width / this.coord.max, this.height / this.coord.max));
-        this._currentScale = this._minScale;
+        this.minScale = nearestPow2(Math.min(this.width / this.coord.max, this.height / this.coord.max));
+        this._currentScale = this.minScale;
     }
     _setupSvg() {
         this._zoom = d3Zoom
@@ -131,12 +132,12 @@ class NAMap {
             .wheelDelta(() => -this._wheelDelta * Math.sign(d3Selection.event.deltaY))
             .translateExtent([
             [
-                this.coord.min - this.yGridBackgroundWidth * this._minScale,
-                this.coord.min - this.xGridBackgroundHeight * this._minScale
+                this.coord.min - this.yGridBackgroundWidth * this.minScale,
+                this.coord.min - this.xGridBackgroundHeight * this.minScale
             ],
             [this.coord.max, this.coord.max]
         ])
-            .scaleExtent([this._minScale, this._maxScale])
+            .scaleExtent([this.minScale, this._maxScale])
             .on("zoom", () => this._naZoomed());
         this._svg = d3Selection
             .select("#na-map")
@@ -210,7 +211,7 @@ class NAMap {
     _clearMap() {
         this._windPrediction.clearMap();
         this._windRose.clearMap();
-        this._f11.clearMap();
+        this.f11.clearMap();
         this._ports.clearMap();
         this._portSelect.clearMap();
         this.showTrades.clearMap();
@@ -218,15 +219,10 @@ class NAMap {
             .val("default")
             .selectpicker("refresh");
     }
-    static _initModal(id) {
-        insertBaseModal(id, `${appTitle} <span class="text-primary small">v${appVersion}</span>`, "");
-        const body = d3Selection.select(`#${id} .modal-body`);
-        body.html(`<p>${appDescription} Please check the <a href="https://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/"> Game-Labs forum post</a> for further details. Feedback is very welcome.</p><p>Designed by iB aka Felix Victor, clan Bastard Sons ${displayClan("(BASTD)")}</a>.</p>`);
-    }
     _showAbout() {
         const modalId = "modal-about";
         const modal$ = $(`#${modalId}`);
-        if (!modal$.length) {
+        if (modal$.length === 0) {
             NAMap._initModal(modalId);
         }
         modal$.modal("show");
@@ -239,7 +235,7 @@ class NAMap {
         const x = (mx - tx) / tk;
         const y = (my - ty) / tk;
         if (this._doubleClickAction === "f11") {
-            this._f11.printCoord(x, y);
+            this.f11.printCoord(x, y);
         }
         else {
             this._journey.plotCourse(x, y);
@@ -286,13 +282,13 @@ class NAMap {
         this._ports.transform(zoomTransform);
         this._journey.transform(zoomTransform);
         this._pbZone.transform(zoomTransform);
-        this._f11.transform(zoomTransform);
+        this.f11.transform(zoomTransform);
         this.showTrades.transform(zoomTransform);
         this._setZoomLevelAndData();
     }
     _checkF11Coord() {
         if (this._searchParams.has("x") && this._searchParams.has("z")) {
-            this._f11.goToF11FromParam(this._searchParams);
+            this.f11.goToF11FromParam(this._searchParams);
         }
     }
     _init() {
@@ -301,13 +297,13 @@ class NAMap {
         this._checkF11Coord();
         this._setFlexOverlayHeight();
     }
+    get zoomLevel() {
+        return this._zoomLevel;
+    }
     set zoomLevel(zoomLevel) {
         this._zoomLevel = zoomLevel;
         this._ports.zoomLevel = zoomLevel;
         this._grid.zoomLevel = zoomLevel;
-    }
-    get zoomLevel() {
-        return this._zoomLevel;
     }
     resize() {
         const zoomTransform = d3Zoom.zoomIdentity
@@ -320,7 +316,7 @@ class NAMap {
         this._grid.update();
     }
     getDimensions() {
-        const selector = document.getElementsByClassName("overlay")[0];
+        const selector = document.querySelectorAll(".overlay")[0];
         return selector.getBoundingClientRect();
     }
     _getWidth() {
@@ -340,11 +336,12 @@ class NAMap {
         this._svg.attr("width", this.width).attr("height", this.height);
     }
     _setFlexOverlayHeight() {
+        var _a;
         const height = this.height - (this._grid.show && this.zoomLevel !== "initial" ? this.xGridBackgroundHeight : 0);
-        document.getElementById("summary-column")?.setAttribute("style", `height:${height}px`);
+        (_a = document.querySelector("#summary-column")) === null || _a === void 0 ? void 0 : _a.setAttribute("style", `height:${height}px`);
     }
     initialZoomAndPan() {
-        this._svg.call(this._zoom.scaleTo, this._minScale);
+        this._svg.call(this._zoom.scaleTo, this.minScale);
     }
     zoomAndPan(x, y, scale) {
         const transform = d3Zoom.zoomIdentity
