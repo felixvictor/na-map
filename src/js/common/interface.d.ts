@@ -19,3 +19,20 @@ export interface MinMaxCoord {
     min: number
     max: number
 }
+
+export interface ArrayIndex<T> {
+    [index: string]: T[]
+}
+
+export interface NestedArrayIndex<T> {
+    [index: string]: ArrayIndex<T>
+}
+
+export interface Index<T> {
+    [index: string]: T
+}
+
+export interface NestedIndex<T> {
+    [index: string]: Index<T>
+}
+

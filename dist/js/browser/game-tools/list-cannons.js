@@ -12,25 +12,24 @@ import "bootstrap/js/dist/tab";
 import "bootstrap/js/dist/modal";
 import { html, render } from "lit-html";
 import { repeat } from "lit-html/directives/repeat";
-import { default as Tablesort } from "tablesort";
+import Tablesort from "tablesort";
 import { registerEvent } from "../analytics";
-import { initTablesort, insertBaseModalHTML } from "../../common/common";
-import { capitalizeFirstLetter, putImportError } from "../util";
+import { capitalizeFirstLetter, putImportError } from "../../common/common";
+import { initTablesort, insertBaseModalHTML } from "../../common/common-browser";
 import { formatFloatFixedHTML } from "../../common/common-format";
 export default class ListCannons {
     constructor() {
-        this._cannonData = {};
         this._groups = new Map();
         this._baseName = "List cannons";
         this._baseId = "cannon-list";
         this._buttonId = `button-${this._baseId}`;
         this._modalId = `modal-${this._baseId}`;
-        this._cannonTypes = ["medium", "long", "carronade"];
         this._setupListener();
     }
     async _loadAndSetupData() {
+        const fileName = "~Lib/gen-generic/cannons.json";
         try {
-            const { default: cannonData } = await import("~Lib/gen-generic/cannons.json");
+            const cannonData = (await import(fileName)).default;
             this._setupData(cannonData);
         }
         catch (error) {
@@ -46,8 +45,8 @@ export default class ListCannons {
             }
         }
         const groupOrder = ["name", "damage", "penetration", "dispersion", "traverse", "generic"];
-        for (const type of this._cannonTypes) {
-            this._cannonData[type] = cannonData[type].map(cannon => Object.keys(cannon)
+        for (const type of Object.keys(cannonData)) {
+            this._cannonData[type] = cannonData[type].map((cannon) => Object.keys(cannon)
                 .sort((a, b) => groupOrder.indexOf(a) - groupOrder.indexOf(b))
                 .reduce((r, k) => ((r[k] = cannon[k]), r), {}));
         }
@@ -55,7 +54,7 @@ export default class ListCannons {
     }
     _setupListener() {
         let firstClick = true;
-        document.getElementById(this._buttonId).addEventListener("click", async (event) => {
+        document.querySelector(this._buttonId).addEventListener("click", async (event) => {
             if (firstClick) {
                 firstClick = false;
                 await this._loadAndSetupData();
@@ -66,42 +65,41 @@ export default class ListCannons {
         });
     }
     _getList(type) {
-        const getColumnGroupHeads = groupValue => html `
+        const getColumnGroupHeads = (groupValue) => html `
             <th scope="col" class="text-center" colspan="${groupValue[1].count}">
                 ${capitalizeFirstLetter(groupValue[0])}
             </th>
         `;
-        const getColumnHeads = groupValue => html `
-            ${Object.entries(groupValue[1].values).map(modifierValue => html `
-                        <th class="text-right">${capitalizeFirstLetter(modifierValue[0])}</th>
-                    `)}
+        const getColumnHeads = (groupValue) => html `
+            ${Object.entries(groupValue[1].values).map((modifierValue) => html ` <th class="text-right">${capitalizeFirstLetter(modifierValue[0])}</th> `)}
         `;
-        const getRowHead = name => {
+        const getRowHead = (name) => {
             let nameConverted = name;
             const nameSplit = name.split(" (");
             if (nameSplit.length > 1) {
-                nameConverted = html `
-                    ${nameSplit[0]}<br /><em>${nameSplit[1].replace(")", "")}</em>
-                `;
+                nameConverted = html ` ${nameSplit[0]}<br /><em>${nameSplit[1].replace(")", "")}</em> `;
             }
             return html `
-                <th scope="row" class="text-right" data-sort="${parseInt(name, 10)}">
+                <th scope="row" class="text-right" data-sort="${Number.parseInt(name, 10)}">
                     ${nameConverted}
                 </th>
             `;
         };
-        const getRow = cannon => html `
-            ${Object.entries(cannon).map(groupValue => {
+        const getRow = (cannon) => html `
+            ${Object.entries(cannon).map((groupValue) => {
             if (groupValue[0] === "name") {
-                return "";
+                return html ``;
             }
-            return Object.entries(groupValue[1]).map(modifierValue => html `
-                            <td class="text-right" data-sort="${modifierValue[1].value ?? 0}">
+            return Object.entries(groupValue[1]).map((modifierValue) => {
+                var _a;
+                return html `
+                            <td class="text-right" data-sort="${(_a = modifierValue[1].value) !== null && _a !== void 0 ? _a : 0}">
                                 ${modifierValue[1]
-                ? formatFloatFixedHTML(modifierValue[1].value, modifierValue[1].digits)
-                : ""}
+                    ? formatFloatFixedHTML(modifierValue[1].value, modifierValue[1].digits)
+                    : ""}
                             </td>
-                        `);
+                        `;
+            });
         })}
         `;
         return html `
@@ -109,15 +107,15 @@ export default class ListCannons {
                 <thead>
                     <tr>
                         <th scope="col" class="border-bottom-0"></th>
-                        ${repeat(this._groups, (groupValue, groupKey) => groupKey, groupValue => getColumnGroupHeads(groupValue))}
+                        ${repeat(this._groups, (groupValue, groupKey) => groupKey, (groupValue) => getColumnGroupHeads(groupValue))}
                     </tr>
                     <tr data-sort-method="thead">
                         <th scope="col" class="text-right border-top-0" data-sort-default>Lb</th>
-                        ${repeat(this._groups, (groupValue, groupKey) => groupKey, groupValue => getColumnHeads(groupValue))}
+                        ${repeat(this._groups, (groupValue, groupKey) => groupKey, (groupValue) => getColumnHeads(groupValue))}
                     </tr>
                 </thead>
                 <tbody>
-                    ${repeat(this._cannonData[type], cannon => cannon.id, cannon => {
+                    ${repeat(this._cannonData[type], (cannon) => cannon.id, (cannon) => {
             return html `
                                 <tr>
                                     ${getRowHead(cannon.name)}${getRow(cannon)}
@@ -131,7 +129,7 @@ export default class ListCannons {
     _getModalBody() {
         return html `
             <ul class="nav nav-pills" role="tablist">
-                ${repeat(this._cannonTypes, type => type, (type, index) => html `
+                ${repeat(Object.keys(this._cannonData), (type) => type, (type, index) => html `
                             <li class="nav-item">
                                 <a
                                     class="nav-link${index === 0 ? " active" : ""}"
@@ -147,7 +145,7 @@ export default class ListCannons {
                         `)}
             </ul>
             <div class="tab-content pt-2">
-                ${repeat(this._cannonTypes, type => type, (type, index) => html `
+                ${repeat(Object.keys(this._cannonData), (type) => type, (type, index) => html `
                             <div
                                 class="tab-pane fade${index === 0 ? " show active" : ""}"
                                 id="tab-content-${this._baseId}-${type}"
@@ -174,11 +172,13 @@ export default class ListCannons {
             id: this._modalId,
             title: this._baseName,
             body: this._getModalBody.bind(this),
-            footer: this._getModalFooter
-        }), document.getElementById("modal-section"));
-        for (const type of this._cannonTypes) {
-            const table = document.getElementById(`table-${type}-list`);
-            const sortTable = new Tablesort(table);
+            footer: this._getModalFooter,
+        }), document.querySelector("#modal-section"));
+        for (const type of Object.keys(this._cannonData)) {
+            const table = document.querySelector(`table-${type}-list`);
+            if (table) {
+                const sortTable = new Tablesort.Tablesort(table);
+            }
         }
     }
     _initModal() {
@@ -186,7 +186,7 @@ export default class ListCannons {
         this._injectModal();
     }
     _cannonListSelected() {
-        if (!document.getElementById(this._modalId)) {
+        if (!document.querySelector(this._modalId)) {
             this._initModal();
         }
         $(`#${this._modalId}`).modal("show");

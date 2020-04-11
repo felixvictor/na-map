@@ -17,7 +17,7 @@ import { readJson, saveJsonAsync } from "../common/common-file"
 import { serverNames } from "../common/common-var"
 
 import { APIItemGeneric, APIModule, ModifiersEntity } from "./api-item"
-import { ModuleConvertEntity, ModuleEntity, ModulePropertiesEntity, Wood, WoodTrimOrFrame } from "../common/gen-json"
+import { ModuleConvertEntity, ModuleEntity, ModulePropertiesEntity, WoodData, WoodTrimOrFrame } from "../common/gen-json"
 
 let apiItems: APIItemGeneric[]
 
@@ -27,7 +27,7 @@ let apiItems: APIItemGeneric[]
 export const convertModulesAndWoodData = async (): Promise<void> => {
     const modules = new Map()
 
-    const woods = {} as Wood
+    const woods = {} as WoodData
     const moduleRate = [
         {
             level: "L",
