@@ -21,7 +21,7 @@ const convert = async () => {
             .sharpen()
             .tile({ size: tileSize, layout: "google" })
             .toFile(mapPath);
-        await child_process.exec(`convert ${inFilename} -resize 1024 ${logoMainFile}`, (err, stdout, stderr) => {
+        child_process.exec(`convert ${inFilename} -resize 1024 ${logoMainFile}`, (err, stdout, stderr) => {
             if (err) {
                 throw err;
             }
