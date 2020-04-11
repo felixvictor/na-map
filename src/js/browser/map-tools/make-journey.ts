@@ -17,6 +17,7 @@ import { range as d3Range } from "d3-array"
 import * as d3Drag from "d3-drag"
 import { ScaleLinear, scaleLinear as d3ScaleLinear } from "d3-scale"
 import { event as d3Event, select as d3Select } from "d3-selection"
+import * as d3Selection from "d3-selection"
 import { Line, line as d3Line } from "d3-shape"
 import {
     zoomIdentity as d3ZoomIdentity,
@@ -45,7 +46,8 @@ import {
     speedFactor,
 } from "../../common/common-math"
 import { displayCompass, displayCompassAndDegrees, printCompassRose, rotationAngleInDegrees } from "../util"
-import * as d3Selection from "d3-selection"
+
+import { CompareShips } from "../game-tools/compare-ships"
 
 interface Journey {
     shipName: string
@@ -408,7 +410,7 @@ export default class MakeJourney {
             // Dummy ship speed
             speedDegrees = [...new Array(24).fill(this._defaultShipSpeed / 2)]
         } else {
-            ;({ speedDegrees } = this._shipCompare._singleShipData)
+            ;({ speedDegrees } = this._shipCompare.singleShipData)
         }
 
         this._speedScale.range(speedDegrees)
@@ -448,8 +450,8 @@ export default class MakeJourney {
     }
 
     _setShipName(): void {
-        if (this._shipCompare && this._shipCompare._singleShipData && this._shipCompare._singleShipData.name) {
-            this._journey.shipName = `${this._shipCompare._singleShipData.name as string}`
+        if (this._shipCompare && this._shipCompare.singleShipData && this._shipCompare.singleShipData.name) {
+            this._journey.shipName = `${this._shipCompare.singleShipData.name}`
         } else {
             this._journey.shipName = this._defaultShipName
         }

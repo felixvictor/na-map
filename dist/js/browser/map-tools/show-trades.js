@@ -10,23 +10,23 @@
 import "bootstrap/js/dist/util";
 import "bootstrap/js/dist/collapse";
 import "bootstrap/js/dist/tooltip";
+import "bootstrap-select/js/bootstrap-select";
 import { extent as d3Extent } from "d3-array";
 import { scaleLinear as d3ScaleLinear, scalePoint as d3ScalePoint } from "d3-scale";
 import { select as d3Select } from "d3-selection";
-import { nations } from "../../common/common";
-import { putImportError, roundToThousands } from "../util";
+import { nations, putImportError } from "../../common/common";
+import { formatInt, formatSiCurrency, formatSiInt } from "../../common/common-format";
+import { defaultFontSize, roundToThousands } from "../../common/common-math";
 import Cookie from "../util/cookie";
 import RadioButton from "../util/radio-button";
-import { defaultFontSize } from "../../common/common-math";
-import { formatInt, formatSiCurrency, formatSiInt } from "../../common/common-format";
 export default class ShowTrades {
     constructor(serverName, portSelect, minScale, lowerBound, upperBound) {
         this._serverName = serverName;
         this._portSelect = portSelect;
-        this._isDataLoaded = false;
         this._minScale = minScale;
         this._scale = this._minScale;
         this._fontSize = defaultFontSize;
+        this._isDataLoaded = false;
         this._numTrades = 30;
         this._arrowX = 18;
         this._arrowY = 18;
@@ -53,10 +53,40 @@ export default class ShowTrades {
         }
         this._profitValue = this._getProfitValue();
     }
+    static _getId(link) {
+        return `trade-${link.source.id}-${link.good.replace(/ /g, "")}-${link.target.id}`;
+    }
+    static _addInfo(text) {
+        return `<div><div>${text}</div>`;
+    }
+    static _addDes(text) {
+        return `<div class="des">${text}</div></div>`;
+    }
+    static _getProfitPerWeight(trade) {
+        return trade.weightPerItem === 0
+            ? trade.profitTotal
+            : Math.round(trade.profitTotal / (trade.weightPerItem * trade.quantity));
+    }
+    static _getProfitPerDistance(trade) {
+        return trade.profitTotal / trade.distance;
+    }
+    static _startBlock(text) {
+        return `<div class="block-block"><span>${text}</span>`;
+    }
+    static _endBlock() {
+        return "</div>";
+    }
+    static _hideDetails(d, i, nodes) {
+        $(d3Select(nodes[i]).node()).tooltip("dispose");
+    }
+    static _showElem(elem) {
+        elem.classed("d-none", false);
+    }
+    static _hideElem(elem) {
+        elem.classed("d-none", true);
+    }
     _setupSvg() {
-        this._g = d3Select("#na-svg")
-            .insert("g", "g.pb")
-            .attr("class", "trades");
+        this._g = d3Select("#na-svg").insert("g", "g.pb").attr("class", "trades");
         this._labelG = this._g.append("g");
         d3Select("#na-svg defs")
             .append("marker")
@@ -77,7 +107,7 @@ export default class ShowTrades {
     }
     _setupSelects() {
         const options = `${nations
-            .map(nation => `<option value="${nation.short}" selected>${nation.name}</option>`)
+            .map((nation) => `<option value="${nation.short}" selected>${nation.name}</option>`)
             .join("")}`;
         const cardId = `${this._baseId}-card`;
         this._tradeDetailsHead = this._tradeDetailsDiv.append("div");
@@ -99,11 +129,11 @@ export default class ShowTrades {
                     text = "All";
                 }
                 else {
-                    text = amount;
+                    text = String(amount);
                 }
                 return `${text} nations selected`;
             },
-            title: "Select nations"
+            title: "Select nations",
         });
         label
             .append("button")
@@ -129,10 +159,7 @@ export default class ShowTrades {
             .append("div")
             .attr("id", this._profitId)
             .attr("class", "align-self-center radio-group pl-2");
-        profitRadioGroup
-            .append("legend")
-            .attr("class", "col-form-label")
-            .text("Sort net profit by");
+        profitRadioGroup.append("legend").attr("class", "col-form-label").text("Sort net profit by");
         for (const button of this._profitRadioValues) {
             const id = `${this._profitId}-${button.replace(/ /g, "")}`;
             const div = profitRadioGroup
@@ -144,16 +171,14 @@ export default class ShowTrades {
                 .attr("type", "radio")
                 .attr("class", "custom-control-input")
                 .attr("value", button);
-            div.append("label")
-                .attr("for", id)
-                .attr("class", "custom-control-label")
-                .text(button);
+            div.append("label").attr("for", id).attr("class", "custom-control-label").text(button);
         }
     }
     _setupListener() {
-        document.getElementById(this._showId).addEventListener("change", () => this._showSelected());
-        document.getElementById(this._profitId).addEventListener("change", () => this._profitValueSelected());
-        this._nationSelector.addEventListener("change", event => {
+        var _a, _b;
+        (_a = document.querySelector(this._showId)) === null || _a === void 0 ? void 0 : _a.addEventListener("change", async () => this._showSelected());
+        (_b = document.querySelector(this._profitId)) === null || _b === void 0 ? void 0 : _b.addEventListener("change", () => this._profitValueSelected());
+        this._nationSelector.addEventListener("change", (event) => {
             this._nationChanged();
             event.preventDefault();
         });
@@ -163,22 +188,22 @@ export default class ShowTrades {
     }
     _setupData() {
         this._linkData = this._linkDataDefault;
-        this._nodeData = new Map(this._portData.map(port => [
+        this._nodeData = new Map(this._portData.map((port) => [
             port.id,
             {
                 name: port.name,
                 nation: port.nation,
                 isShallow: port.shallow,
                 x: port.coordinates[0],
-                y: port.coordinates[1]
-            }
+                y: port.coordinates[1],
+            },
         ]));
         this._filterPortsBySelectedNations();
         this._sortLinkData();
     }
     _sortLinkData() {
         this._linkData = this._linkData
-            .map(trade => {
+            .map((trade) => {
             let profit = 0;
             switch (this._profitValue) {
                 case "weight":
@@ -196,7 +221,7 @@ export default class ShowTrades {
             trade.profit = profit;
             return trade;
         })
-            .sort((a, b) => b.profit - a.profit);
+            .sort((a, b) => { var _a, _b; return (_a = b.profit) !== null && _a !== void 0 ? _a : 0 - ((_b = a.profit) !== null && _b !== void 0 ? _b : 0); });
     }
     async _showSelected() {
         const show = this._showRadios.get();
@@ -210,12 +235,13 @@ export default class ShowTrades {
     }
     async _loadData() {
         const dataDirectory = "data";
+        const fileName = "~Lib/gen-generic/ports.json";
         try {
-            const portData = (await import("../../gen-generic/ports.json")).default;
-            const pbData = await (await fetch(`${dataDirectory}/${this._serverName}-pb.json`)).json();
-            this._linkDataDefault = await (await fetch(`${dataDirectory}/${this._serverName}-trades.json`)).json();
-            this._portData = portData.map(port => {
-                const pbPortData = pbData.ports.find(d => d.id === port.id);
+            const portData = (await import(fileName)).default;
+            const pbData = (await (await fetch(`${dataDirectory}/${this._serverName}-pb.json`)).json());
+            this._linkDataDefault = (await (await fetch(`${dataDirectory}/${this._serverName}-trades.json`)).json());
+            this._portData = portData.map((port) => {
+                const pbPortData = pbData.find((d) => d.id === port.id);
                 return { ...port, ...pbPortData };
             });
         }
@@ -259,48 +285,31 @@ export default class ShowTrades {
         this._filterTradesBySelectedNations();
         this.update();
     }
-    static _getId(link) {
-        return `trade-${link.source.id}-${link.good.replace(/ /g, "")}-${link.target.id}`;
+    _portIsShallow(portId) {
+        var _a, _b;
+        return (_b = (_a = this._nodeData.get(portId)) === null || _a === void 0 ? void 0 : _a.isShallow) !== null && _b !== void 0 ? _b : true;
     }
-    static _addInfo(text) {
-        return `<div><div>${text}</div>`;
-    }
-    static _addDes(text) {
-        return `<div class="des">${text}</div></div>`;
-    }
-    static _getDepth(isShallow) {
-        return isShallow ? "(shallow)" : "(deep)";
+    _getDepth(portId) {
+        return this._portIsShallow(portId) ? "(shallow)" : "(deep)";
     }
     _getTradeLimitedData(trade) {
+        var _a, _b, _c, _d, _e;
         const weight = trade.weightPerItem * trade.quantity;
         let h = "";
         h += ShowTrades._addInfo(`${formatInt(trade.quantity)} ${trade.good}`) + ShowTrades._addDes("trade");
-        h += ShowTrades._addInfo(`${formatSiCurrency(trade.profit)}`) + ShowTrades._addDes(this._profitText);
+        h += ShowTrades._addInfo(`${formatSiCurrency((_a = trade.profit) !== null && _a !== void 0 ? _a : 0)}`) + ShowTrades._addDes(this._profitText);
         h +=
             ShowTrades._addInfo(`${formatSiInt(weight)} ${weight === 1 ? "ton" : "tons"}`) +
                 ShowTrades._addDes("weight");
         h +=
-            ShowTrades._addInfo(`${this._nodeData.get(trade.source.id).name} <span class="caps">${this._nodeData.get(trade.source.id).nation}</span>`) + ShowTrades._addDes(`from ${ShowTrades._getDepth(this._nodeData.get(trade.source.id).isShallow)}`);
+            ShowTrades._addInfo(`${(_b = this._nodeData.get(trade.source.id)) === null || _b === void 0 ? void 0 : _b.name} <span class="caps">${(_c = this._nodeData.get(trade.source.id)) === null || _c === void 0 ? void 0 : _c.nation}</span>`) + ShowTrades._addDes(`from ${this._getDepth(trade.source.id)}`);
         h +=
-            ShowTrades._addInfo(`${this._nodeData.get(trade.target.id).name} <span class="caps">${this._nodeData.get(trade.target.id).nation}</span>`) + ShowTrades._addDes(`to ${ShowTrades._getDepth(this._nodeData.get(trade.target.id).isShallow)}`);
+            ShowTrades._addInfo(`${(_d = this._nodeData.get(trade.target.id)) === null || _d === void 0 ? void 0 : _d.name} <span class="caps">${(_e = this._nodeData.get(trade.target.id)) === null || _e === void 0 ? void 0 : _e.nation}</span>`) + ShowTrades._addDes(`to ${this._getDepth(trade.target.id)}`);
         h += ShowTrades._addInfo(`${formatSiInt(trade.distance)}\u2009k`) + ShowTrades._addDes("distance");
         return h;
     }
-    static _getProfitPerWeight(trade) {
-        return trade.weightPerItem === 0
-            ? trade.profitTotal
-            : Math.round(trade.profitTotal / (trade.weightPerItem * trade.quantity));
-    }
-    static _getProfitPerDistance(trade) {
-        return trade.profitTotal / trade.distance;
-    }
-    static _startBlock(text) {
-        return `<div class="block-block"><span>${text}</span>`;
-    }
-    static _endBlock() {
-        return "</div>";
-    }
     _getTradeFullData(trade) {
+        var _a, _b, _c, _d;
         const weight = trade.weightPerItem * trade.quantity;
         const profitPerItem = trade.target.grossPrice - trade.source.grossPrice;
         const profitPerDistance = ShowTrades._getProfitPerDistance(trade);
@@ -323,9 +332,9 @@ export default class ShowTrades {
         h += ShowTrades._endBlock();
         h += ShowTrades._startBlock("Route");
         h +=
-            ShowTrades._addInfo(`${this._nodeData.get(trade.source.id).name} <span class="caps">${this._nodeData.get(trade.source.id).nation}</span>`) + ShowTrades._addDes(`from ${ShowTrades._getDepth(this._nodeData.get(trade.source.id).isShallow)}`);
+            ShowTrades._addInfo(`${(_a = this._nodeData.get(trade.source.id)) === null || _a === void 0 ? void 0 : _a.name} <span class="caps">${(_b = this._nodeData.get(trade.source.id)) === null || _b === void 0 ? void 0 : _b.nation}</span>`) + ShowTrades._addDes(`from ${this._getDepth(trade.source.id)}`);
         h +=
-            ShowTrades._addInfo(`${this._nodeData.get(trade.target.id).name} <span class="caps">${this._nodeData.get(trade.target.id).nation}</span>`) + ShowTrades._addDes(`to ${ShowTrades._getDepth(this._nodeData.get(trade.source.id).isShallow)}`);
+            ShowTrades._addInfo(`${(_c = this._nodeData.get(trade.target.id)) === null || _c === void 0 ? void 0 : _c.name} <span class="caps">${(_d = this._nodeData.get(trade.target.id)) === null || _d === void 0 ? void 0 : _d.nation}</span>`) + ShowTrades._addDes(`to ${this._getDepth(trade.source.id)}`);
         h += ShowTrades._addInfo(`${formatSiInt(trade.distance)}\u2009k`) + ShowTrades._addDes("distance");
         h += ShowTrades._endBlock();
         return h;
@@ -342,23 +351,29 @@ export default class ShowTrades {
                 "</div></div>",
             title,
             trigger: "manual",
-            sanitize: false
+            sanitize: false,
         })
             .tooltip("show");
     }
-    static _hideDetails(d, i, nodes) {
-        $(d3Select(nodes[i]).node()).tooltip("dispose");
-    }
     _getSiblingLinks(sourceId, targetId) {
         return this._linkDataFiltered
-            .filter(link => (link.source.id === sourceId && link.target.id === targetId) ||
+            .filter((link) => (link.source.id === sourceId && link.target.id === targetId) ||
             (link.source.id === targetId && link.target.id === sourceId))
-            .map(link => link.profit);
+            .map((link) => { var _a; return (_a = link.profit) !== null && _a !== void 0 ? _a : 0; });
+    }
+    _getXCoord(portId) {
+        var _a, _b;
+        return (_b = (_a = this._nodeData.get(portId)) === null || _a === void 0 ? void 0 : _a.x) !== null && _b !== void 0 ? _b : 0;
+    }
+    _getYCoord(portId) {
+        var _a, _b;
+        return (_b = (_a = this._nodeData.get(portId)) === null || _a === void 0 ? void 0 : _a.y) !== null && _b !== void 0 ? _b : 0;
     }
     _updateGraph() {
         const arcPath = (leftHand, d) => {
-            const source = { x: this._nodeData.get(d.source.id).x, y: this._nodeData.get(d.source.id).y };
-            const target = { x: this._nodeData.get(d.target.id).x, y: this._nodeData.get(d.target.id).y };
+            var _a, _b;
+            const source = { x: this._getXCoord(d.source.id), y: this._getYCoord(d.source.id) };
+            const target = { x: this._getXCoord(d.target.id), y: this._getYCoord(d.target.id) };
             const x1 = leftHand ? source.x : target.x;
             const y1 = leftHand ? source.y : target.y;
             const x2 = leftHand ? target.x : source.x;
@@ -369,60 +384,49 @@ export default class ShowTrades {
             const sweep = leftHand ? 0 : 1;
             const siblings = this._getSiblingLinks(d.source.id, d.target.id);
             if (siblings.length > 1) {
-                const arcScale = d3ScalePoint()
-                    .domain(siblings)
-                    .range([1, siblings.length]);
-                dr /= 1 + (1 / siblings.length) * (arcScale(d.profit) - 1);
+                const arcScale = d3ScalePoint().domain(siblings).range([1, siblings.length]);
+                dr /= 1 + (1 / siblings.length) * ((_b = arcScale((_a = d.profit) !== null && _a !== void 0 ? _a : 0)) !== null && _b !== void 0 ? _b : 0 - 1);
             }
             dr = Math.round(dr);
             return `M${x1},${y1}A${dr},${dr} ${xRotation},${largeArc},${sweep} ${x2},${y2}`;
         };
         const data = this._portSelect.isInventorySelected ? [] : this._linkDataFiltered;
+        const extent = d3Extent(this._linkDataFiltered, (d) => { var _a; return (_a = d.profit) !== null && _a !== void 0 ? _a : 0; });
         const linkWidthScale = d3ScaleLinear()
             .range([5 / this._scale, 15 / this._scale])
-            .domain(d3Extent(this._linkDataFiltered, d => d.profit));
+            .domain(extent);
         const fontScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale);
         const fontSize = roundToThousands(this._fontSize / fontScale);
-        const transition = this._g.transition().duration(500);
         this._g
             .selectAll(".trade-link")
-            .data(data, d => ShowTrades._getId(d))
-            .join(enter => enter
+            .data(data, (d) => ShowTrades._getId(d))
+            .join((enter) => enter
             .append("path")
             .attr("class", "trade-link")
-            .attr("marker-start", d => this._nodeData.get(d.source.id).x < this._nodeData.get(d.target.id).x
-            ? ""
-            : "url(#trade-arrow)")
-            .attr("marker-end", d => this._nodeData.get(d.source.id).x < this._nodeData.get(d.target.id).x
-            ? "url(#trade-arrow)"
-            : "")
-            .attr("id", d => ShowTrades._getId(d))
+            .attr("marker-start", (d) => this._getXCoord(d.source.id) < this._getXCoord(d.target.id) ? "" : "url(#trade-arrow)")
+            .attr("marker-end", (d) => this._getXCoord(d.source.id) < this._getXCoord(d.target.id) ? "url(#trade-arrow)" : "")
+            .attr("id", (d) => ShowTrades._getId(d))
             .attr("opacity", 0)
             .on("click", (d, i, nodes) => this._showDetails(d, i, nodes))
-            .on("mouseleave", ShowTrades._hideDetails)
-            .call(enterCall => enterCall.transition(transition).attr("opacity", 1)), update => update.attr("opacity", 1), exit => exit.call(exitCall => exitCall
-            .transition(transition)
-            .attr("opacity", 0)
-            .remove()))
-            .attr("d", d => arcPath(this._nodeData.get(d.source.id).x < this._nodeData.get(d.target.id).x, d))
-            .attr("stroke-width", d => `${linkWidthScale(d.profit)}px`);
+            .on("mouseleave", ShowTrades._hideDetails))
+            .attr("d", (d) => arcPath(this._getXCoord(d.source.id) < this._getXCoord(d.target.id), d))
+            .attr("stroke-width", (d) => { var _a; return `${linkWidthScale((_a = d.profit) !== null && _a !== void 0 ? _a : 0)}px`; });
         this._labelG.attr("font-size", `${fontSize}px`);
         this._labelG
             .selectAll(".trade-label")
-            .data(this._linkDataFiltered, d => ShowTrades._getId(d))
-            .join(enter => enter
+            .data(this._linkDataFiltered, (d) => ShowTrades._getId(d))
+            .join((enter) => enter
             .append("text")
             .attr("class", "trade-label")
             .append("textPath")
             .attr("startOffset", "15%")
-            .attr("xlink:href", d => `#${ShowTrades._getId(d)}`)
-            .text(d => `${formatInt(d.quantity)} ${d.good}`)
-            .attr("opacity", 0)
-            .call(enterCall => enterCall.transition(transition).attr("opacity", 1)), update => update.attr("opacity", 1), exit => exit.call(exitCall => exitCall
-            .transition(transition)
-            .attr("opacity", 0)
-            .remove()))
-            .attr("dy", d => `-${linkWidthScale(d.profit) / 1.5}px`);
+            .attr("xlink:href", (d) => `#${ShowTrades._getId(d)}`)
+            .text((d) => `${formatInt(d.quantity)} ${d.good}`)
+            .attr("opacity", 0))
+            .attr("dy", (d) => `-${linkWidthScale(d.profit ? d.profit / 1.5 : 0)}px`);
+    }
+    get listType() {
+        return this._listType;
     }
     set listType(type) {
         this._listType = type;
@@ -447,10 +451,7 @@ export default class ShowTrades {
                 break;
         }
     }
-    get listType() {
-        return this._listType;
-    }
-    _updateList(data = null) {
+    _updateList(data) {
         switch (this._listType) {
             case "inventory":
                 this._updateInventory(data);
@@ -464,14 +465,14 @@ export default class ShowTrades {
         }
     }
     _updateInventory(inventory) {
-        this._list.html(inventory);
+        this._list.html(inventory !== null && inventory !== void 0 ? inventory : "");
     }
     _updatePortList(portList) {
-        this._list.html(portList);
+        this._list.html(portList !== null && portList !== void 0 ? portList : "");
     }
     _updateTradeList() {
         let highlightLink;
-        const highlightOn = d => {
+        const highlightOn = (d) => {
             highlightLink = d3Select(`path#${ShowTrades._getId(d)}`).classed("highlight", true);
             highlightLink.dispatch("click");
         };
@@ -481,33 +482,29 @@ export default class ShowTrades {
         };
         this._list
             .selectAll("div.block")
-            .data(this._linkDataFiltered, d => ShowTrades._getId(d))
-            .join(enter => enter
-            .append("div")
-            .attr("class", "block")
-            .on("mouseenter", highlightOn)
-            .on("mouseleave", highlightOff))
-            .html(d => this._getTradeLimitedData(d));
+            .data(this._linkDataFiltered, (d) => ShowTrades._getId(d))
+            .join((enter) => enter.append("div").attr("class", "block").on("mouseenter", highlightOn).on("mouseleave", highlightOff))
+            .html((d) => this._getTradeLimitedData(d));
     }
     _filterTradesByVisiblePorts() {
         const portDataFiltered = new Set(this._portData
-            .filter(port => port.coordinates[0] >= this._lowerBound[0] &&
+            .filter((port) => port.coordinates[0] >= this._lowerBound[0] &&
             port.coordinates[0] <= this._upperBound[0] &&
             port.coordinates[1] >= this._lowerBound[1] &&
             port.coordinates[1] <= this._upperBound[1])
-            .map(port => port.id));
+            .map((port) => port.id));
         this._linkDataFiltered = this._linkData
-            .filter(trade => portDataFiltered.has(trade.source.id) || portDataFiltered.has(trade.target.id))
+            .filter((trade) => portDataFiltered.has(trade.source.id) || portDataFiltered.has(trade.target.id))
             .slice(0, this._numTrades);
     }
     _filterTradesBySelectedNations() {
         this._linkData = this._linkData
-            .filter(trade => this._portDataFiltered.has(trade.source.id) && this._portDataFiltered.has(trade.target.id))
+            .filter((trade) => this._portDataFiltered.has(trade.source.id) && this._portDataFiltered.has(trade.target.id))
             .slice(0, this._numTrades);
     }
     _filterPortsBySelectedNations() {
-        const selectedNations = new Set([...this._nationSelector.selectedOptions].map(option => option.value));
-        this._portDataFiltered = new Set(this._portData.filter(port => selectedNations.has(port.nation)).map(port => port.id));
+        const selectedNations = new Set([...this._nationSelector.selectedOptions].map((option) => option.value));
+        this._portDataFiltered = new Set(this._portData.filter((port) => selectedNations.has(port.nation)).map((port) => port.id));
     }
     _getShowValue() {
         const r = this._showCookie.get();
@@ -532,13 +529,7 @@ export default class ShowTrades {
         }
         return r;
     }
-    static _showElem(elem) {
-        elem.classed("d-none", false);
-    }
-    static _hideElem(elem) {
-        elem.classed("d-none", true);
-    }
-    update(data = null) {
+    update(data) {
         if (this.show) {
             this._filterTradesByVisiblePorts();
             this._updateList(data);
@@ -553,7 +544,7 @@ export default class ShowTrades {
         this._upperBound = upperBound;
     }
     transform(transform) {
-        this._g.attr("transform", transform);
+        this._g.attr("transform", transform.toString);
         this._scale = transform.k;
         this.update();
     }

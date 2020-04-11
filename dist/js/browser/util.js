@@ -9,7 +9,7 @@
  */
 import { scaleBand as d3ScaleBand } from "d3-scale";
 import { numberSegments } from "../common/common-browser";
-import { compassToDegrees, degreesFullCircle, degreesQuarterCircle, degreesToCompass, radiansToDegrees } from "../common/common-math";
+import { compassToDegrees, degreesFullCircle, degreesQuarterCircle, degreesToCompass, radiansToDegrees, } from "../common/common-math";
 export const displayCompass = (wind, svg = false) => {
     let compass;
     if (Number.isNaN(Number(wind))) {
@@ -86,7 +86,7 @@ export const chunkify = (array, n, balanced = true) => {
     }
     return out;
 };
-export const printCompassRose = ({ element, radius }) => {
+export const printCompassRose = ({ element, radius, }) => {
     const steps = numberSegments;
     const degreesPerStep = degreesFullCircle / steps;
     const innerRadius = Math.round(radius * 0.8);
@@ -96,17 +96,17 @@ export const printCompassRose = ({ element, radius }) => {
         .range([0 - degreesPerStep / 2, degreesFullCircle - degreesPerStep / 2])
         .domain(data)
         .align(0);
-    element
-        .append("circle")
-        .attr("r", innerRadius)
-        .style("stroke-width", `${strokeWidth}px`);
+    element.append("circle").attr("r", innerRadius).style("stroke-width", `${strokeWidth}px`);
     const dummy = element.append("text");
     const label = element
         .selectAll("g")
         .data(data)
-        .join(enter => enter
+        .join((enter) => enter
         .append("g")
-        .attr("transform", d => `rotate(${Math.round((xScale(d) ?? 0) + xScale.bandwidth() / 2 - degreesQuarterCircle)})translate(${innerRadius},0)`));
+        .attr("transform", (d) => {
+        var _a;
+        return `rotate(${Math.round(((_a = xScale(d)) !== null && _a !== void 0 ? _a : 0) + xScale.bandwidth() / 2 - degreesQuarterCircle)})translate(${innerRadius},0)`;
+    }));
     label
         .filter((_d, i) => i % 3 !== 0)
         .append("line")
@@ -114,12 +114,13 @@ export const printCompassRose = ({ element, radius }) => {
     label
         .filter((_d, i) => i % 3 === 0)
         .append("text")
-        .attr("transform", d => {
-        let rotate = Math.round((xScale(d) ?? 0) + xScale.bandwidth() / 2);
+        .attr("transform", (d) => {
+        var _a, _b, _c, _f, _g;
+        let rotate = Math.round(((_a = xScale(d)) !== null && _a !== void 0 ? _a : 0) + xScale.bandwidth() / 2);
         let translate = "";
         dummy.text(d);
-        const textHeight = dummy.node()?.getBBox().height ?? 0;
-        const textWidth = dummy.node()?.getBBox().width ?? 0;
+        const textHeight = (_c = (_b = dummy.node()) === null || _b === void 0 ? void 0 : _b.getBBox().height) !== null && _c !== void 0 ? _c : 0;
+        const textWidth = (_g = (_f = dummy.node()) === null || _f === void 0 ? void 0 : _f.getBBox().width) !== null && _g !== void 0 ? _g : 0;
         if ((rotate >= 0 && rotate <= 45) || rotate === 315) {
             rotate = 90;
             translate = `0,-${textHeight / 2}`;
@@ -138,10 +139,10 @@ export const printCompassRose = ({ element, radius }) => {
         }
         return `rotate(${rotate})translate(${translate})`;
     })
-        .text(d => d);
+        .text((d) => d);
     dummy.remove();
 };
-export const printSmallCompassRose = ({ element, radius }) => {
+export const printSmallCompassRose = ({ element, radius, }) => {
     const steps = numberSegments;
     const degreesPerStep = degreesFullCircle / steps;
     const innerRadius = Math.round(radius * 0.8);
@@ -151,17 +152,14 @@ export const printSmallCompassRose = ({ element, radius }) => {
         .range([0 - degreesPerStep / 2, degreesFullCircle - degreesPerStep / 2])
         .domain(data)
         .align(0);
-    element
-        .append("circle")
-        .attr("r", innerRadius)
-        .style("stroke-width", `${strokeWidth}px`);
+    element.append("circle").attr("r", innerRadius).style("stroke-width", `${strokeWidth}px`);
     const x2 = 2;
     const x2InterCard = 4;
     const x2Card = 6;
     element
         .selectAll("line")
         .data(data)
-        .join(enter => enter
+        .join((enter) => enter
         .append("line")
         .attr("x2", (_d, i) => {
         if (i % 3 === 0) {
@@ -169,7 +167,7 @@ export const printSmallCompassRose = ({ element, radius }) => {
         }
         return x2;
     })
-        .attr("transform", d => `rotate(${Math.round((xScale(d) ?? 0) + xScale.bandwidth() / 2)})translate(${innerRadius},0)`));
+        .attr("transform", (d) => { var _a; return `rotate(${Math.round(((_a = xScale(d)) !== null && _a !== void 0 ? _a : 0) + xScale.bandwidth() / 2)})translate(${innerRadius},0)`; }));
 };
 export const displayClan = (clan) => `<span class="caps">${clan}</span>`;
 const copyToClipboardFallback = (text, modal$) => {
@@ -204,7 +202,7 @@ const writeClipboard = (text) => {
         .then(() => {
         return true;
     })
-        .catch(error => {
+        .catch((error) => {
         console.error(`Cannot copy ${text} to clipboard`, error);
         return false;
     });
