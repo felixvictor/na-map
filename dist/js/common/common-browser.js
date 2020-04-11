@@ -24,15 +24,15 @@ export const colourRed = CRED;
 export const colourRedDark = CREDDARK;
 export const colourRedLight = CREDLIGHT;
 export const colourWhite = CWHITE;
-export const hullRepairsPercent = REPAIR_ARMOR_PERCENT;
-export const hullRepairsVolume = REPAIR_ARMOR_VOLUME;
+export const hullRepairsPercent = Number(REPAIR_ARMOR_PERCENT);
+export const hullRepairsVolume = Number(REPAIR_ARMOR_VOLUME);
 export const iconSmallSrc = ICONSMALL;
 export const primary300 = CPRIMARY300;
-export const repairTime = REPAIR_ARMOR_TIME;
-export const rigRepairsPercent = REPAIR_SAIL_PERCENT;
-export const rigRepairsVolume = REPAIR_SAIL_VOLUME;
-export const rumRepairsPercent = REPAIR_CREW_PERCENT;
-export const rumRepairsVolume = REPAIR_CREW_VOLUME;
+export const repairTime = Number(REPAIR_ARMOR_TIME);
+export const rigRepairsPercent = Number(REPAIR_SAIL_PERCENT);
+export const rigRepairsVolume = Number(REPAIR_SAIL_VOLUME);
+export const rumRepairsPercent = Number(REPAIR_CREW_PERCENT);
+export const rumRepairsVolume = Number(REPAIR_CREW_VOLUME);
 export const hashids = new Hashids("My salt: Yet another Naval Action map");
 export const numberSegments = 24;
 export const segmentRadians = (2 * Math.PI) / numberSegments;
@@ -58,9 +58,38 @@ export const colourList = [
     "#4f0017",
     "#ff7a6b",
     "#422b00",
-    "#6f2400"
+    "#6f2400",
 ];
-export const insertBaseModal = (id, title, size = "xl", buttonText = "Close") => {
+export const initMultiDropdownNavbar = (id) => {
+    $(`#${id} .dropdown-menu .bootstrap-select .dropdown-toggle`).on("click", (event) => {
+        const element = $(event.currentTarget);
+        element.next(".dropdown-menu").toggleClass("show");
+        element.parent("li").toggleClass("show");
+        element.parents("li.nav-item.dropdown.show").on("hidden.bs.dropdown", (event2) => {
+            $(event2.currentTarget).find(".dropdown-menu.show").not(".inner").removeClass("show");
+        });
+        return false;
+    });
+    $(`#${id} div.dropdown.bootstrap-select`).on("hidden", (event) => {
+        $(event.currentTarget).find(".dropdown-menu.show").not(".inner").removeClass("show");
+    });
+};
+const cleanNumber = (i) => i.replace(/[^\d-.?]/g, "");
+const compareNumber = (a, b) => {
+    let aa = Number.parseFloat(a);
+    let bb = Number.parseFloat(b);
+    aa = Number.isNaN(aa) ? 0 : aa;
+    bb = Number.isNaN(bb) ? 0 : bb;
+    return aa - bb;
+};
+export const initTablesort = () => {
+    Tablesort.extend("number", (item) => { var _a, _b; return (_b = (_a = /^[+-]?[$¢£´Û€]?\d+\s*([,.]\d{0,2})/.exec(item)) !== null && _a !== void 0 ? _a : /^[+-]?\d+\s*([,.]\d{0,2})?[$¢£´Û€]/.exec(item)) !== null && _b !== void 0 ? _b : /^[+-]?(\d)*-?([,.])?-?(\d)+([,Ee][+-]\d+)?%?$/.exec(item); }, (a, b) => {
+        const aa = cleanNumber(a);
+        const bb = cleanNumber(b);
+        return compareNumber(bb, aa);
+    });
+};
+export const insertBaseModal = ({ id, title, size = "xl", buttonText = "Close" }) => {
     const modal = d3Select("#modal-section")
         .append("div")
         .attr("id", id)
@@ -74,11 +103,7 @@ export const insertBaseModal = (id, title, size = "xl", buttonText = "Close") =>
         .attr("role", "document");
     const content = modal.append("div").attr("class", "modal-content");
     const header = content.append("header").attr("class", "modal-header");
-    header
-        .append("h5")
-        .attr("class", "modal-title")
-        .attr("id", `title-${id}`)
-        .html(title);
+    header.append("h5").attr("class", "modal-title").attr("id", `title-${id}`).html(title);
     content.append("div").attr("class", "modal-body");
     const footer = content.append("footer").attr("class", "modal-footer");
     footer
@@ -87,43 +112,6 @@ export const insertBaseModal = (id, title, size = "xl", buttonText = "Close") =>
         .attr("type", "button")
         .attr("class", "btn btn-secondary")
         .attr("data-dismiss", "modal");
-};
-export const initMultiDropdownNavbar = (id) => {
-    $(`#${id} .dropdown-menu .bootstrap-select .dropdown-toggle`).on("click", event => {
-        const element = $(event.currentTarget);
-        element.next(".dropdown-menu").toggleClass("show");
-        element.parent("li").toggleClass("show");
-        element.parents("li.nav-item.dropdown.show").on("hidden.bs.dropdown", event2 => {
-            $(event2.currentTarget)
-                .find(".dropdown-menu.show")
-                .not(".inner")
-                .removeClass("show");
-        });
-        return false;
-    });
-    $(`#${id} div.dropdown.bootstrap-select`).on("hidden", event => {
-        $(event.currentTarget)
-            .find(".dropdown-menu.show")
-            .not(".inner")
-            .removeClass("show");
-    });
-};
-const cleanNumber = (i) => i.replace(/[^\d-.?]/g, "");
-const compareNumber = (a, b) => {
-    let aa = parseFloat(a);
-    let bb = parseFloat(b);
-    aa = Number.isNaN(aa) ? 0 : aa;
-    bb = Number.isNaN(bb) ? 0 : bb;
-    return aa - bb;
-};
-export const initTablesort = () => {
-    Tablesort.extend("number", (item) => item.match(/^[+-]?[$¢£´Û€]?\d+\s*([,.]\d{0,2})/) ||
-        item.match(/^[+-]?\d+\s*([,.]\d{0,2})?[$¢£´Û€]/) ||
-        item.match(/^[+-]?(\d)*-?([,.])?-?(\d)+([,Ee][+-]\d+)?%?$/), (a, b) => {
-        const aa = cleanNumber(a);
-        const bb = cleanNumber(b);
-        return compareNumber(bb, aa);
-    });
 };
 export const insertBaseModalHTML = ({ id, title, size = "xl", body, footer }) => {
     const modalSize = size === "xl" || size === "lg" || size === "sm" ? ` modal-${size}` : "";

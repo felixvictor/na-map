@@ -20,16 +20,16 @@ export const convertModulesAndWoodData = async () => {
     const moduleRate = [
         {
             level: "L",
-            names: [" (1-3 rates)", " 1-3rd"]
+            names: [" (1-3 rates)", " 1-3rd"],
         },
         {
             level: "M",
-            names: [" (4-5 rates)", " 4-5th"]
+            names: [" (4-5 rates)", " 4-5th"],
         },
         {
             level: "S",
-            names: [" (6-7 rates)", " 6-7th"]
-        }
+            names: [" (6-7 rates)", " 6-7th"],
+        },
     ];
     const bonusRegex = /(.+\sBonus)\s(\d)/u;
     woods.trim = [];
@@ -39,7 +39,7 @@ export const convertModulesAndWoodData = async () => {
         ["Regular", "R"],
         ["LightShips", "S"],
         ["Medium", "M"],
-        ["LineShips", "L"]
+        ["LineShips", "L"],
     ]);
     const modifiers = new Map([
         ["ARMOR_ALL_SIDES ARMOR_THICKNESS", "Armor thickness"],
@@ -65,7 +65,7 @@ export const convertModulesAndWoodData = async () => {
         ["DECK_ALL CANNON_DISPERSION_PER100M", "Cannon horizontal dispersion"],
         [
             "DECK_ALL CANNON_DISPERSION_PER100M,CANNON_DISPERSION_VERTICAL_PER100M",
-            "Cannon horizontal/vertical dispersion"
+            "Cannon horizontal/vertical dispersion",
         ],
         ["DECK_ALL CANNON_DISPERSION_REDUCTION_SPEED", "Cannon aiming speed"],
         ["DECK_ALL CANNON_DISPERSION_VERTICAL_PER100M", "Cannon vertical dispersion"],
@@ -74,7 +74,7 @@ export const convertModulesAndWoodData = async () => {
         ["DECK_ALL FIRE_PROBABILITY", "Fire probability"],
         [
             "DECK_CENTRAL CANNON_DISPERSION_PER100M,CANNON_DISPERSION_VERTICAL_PER100M",
-            "Mortar horizontal/vertical dispersion"
+            "Mortar horizontal/vertical dispersion",
         ],
         ["DECK_CENTRAL CANNON_DISPERSION_REDUCTION_SPEED", "Mortar aiming speed"],
         ["MAST MAST_BOTTOM_SECTION_HP,MAST_MIDDLE_SECTION_HP,MAST_TOP_SECTION_HP", "Mast hit points"],
@@ -179,15 +179,15 @@ export const convertModulesAndWoodData = async () => {
         ["STRUCTURE CANNON_MASS", "Cannon weight"],
         ["STRUCTURE SHIP_CANNON_DESTROY_PROBABILITY", "Cannon destroy probability"],
         ["WATER_PUMP MODULE_BASE_HP", "Water pump hitpoints"],
-        ["WATER_PUMP REPAIR_MODULE_TIME", "Water pump repair time"]
+        ["WATER_PUMP REPAIR_MODULE_TIME", "Water pump repair time"],
     ]);
     const setWood = (module) => {
         const wood = {};
         wood.id = module.id;
         wood.properties = [];
         for (const modifier of module.APImodifiers) {
-            if (modifiers.has(`${modifier.Slot} ${modifier.MappingIds}`)) {
-                const modifierName = modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`);
+            if (modifiers.has(`${modifier.Slot} ${modifier.MappingIds.join()}`)) {
+                const modifierName = modifiers.get(`${modifier.Slot} ${modifier.MappingIds.join()}`);
                 let amount = modifier.Percentage;
                 let isPercentage = true;
                 if (modifier.Absolute) {
@@ -207,9 +207,9 @@ export const convertModulesAndWoodData = async () => {
                     isPercentage = true;
                 }
                 wood.properties.push({
-                    modifier: modifierName ?? "",
+                    modifier: modifierName !== null && modifierName !== void 0 ? modifierName : "",
                     amount,
-                    isPercentage
+                    isPercentage,
                 });
             }
         }
@@ -230,11 +230,12 @@ export const convertModulesAndWoodData = async () => {
         }
     };
     const getModuleProperties = (APImodifiers) => {
-        return APImodifiers.map(modifier => {
-            if (!modifiers.has(`${modifier.Slot} ${modifier.MappingIds}`)) {
-                console.log(`${modifier.Slot} ${modifier.MappingIds} modifier undefined`);
+        return APImodifiers.map((modifier) => {
+            var _a;
+            if (!modifiers.has(`${modifier.Slot} ${modifier.MappingIds.join()}`)) {
+                console.log(`${modifier.Slot} ${modifier.MappingIds.join()} modifier undefined`);
             }
-            const modifierName = modifiers.get(`${modifier.Slot} ${modifier.MappingIds}`) ?? "";
+            const modifierName = (_a = modifiers.get(`${modifier.Slot} ${modifier.MappingIds.join()}`)) !== null && _a !== void 0 ? _a : "";
             let amount = modifier.Percentage;
             let isPercentage = true;
             if (modifier.Absolute) {
@@ -260,12 +261,13 @@ export const convertModulesAndWoodData = async () => {
             return {
                 modifier: modifierName,
                 amount,
-                isPercentage
+                isPercentage,
             };
         });
     };
     const getModuleType = (module) => {
-        let type = "";
+        var _a;
+        let type;
         let { permanentType, sortingGroup } = module;
         if (module.usageType === "All" &&
             sortingGroup &&
@@ -297,7 +299,7 @@ export const convertModulesAndWoodData = async () => {
         }
         else {
             sortingGroup = sortingGroup
-                ? `\u202F\u2013\u202f${capitalizeFirstLetter(module.sortingGroup ?? "").replace("_", "/")}`
+                ? `\u202F\u2013\u202f${capitalizeFirstLetter((_a = module.sortingGroup) !== null && _a !== void 0 ? _a : "").replace("_", "/")}`
                 : "";
         }
         if (permanentType === "Default") {
@@ -308,9 +310,9 @@ export const convertModulesAndWoodData = async () => {
         }
         return `${type}${sortingGroup}${permanentType}`;
     };
-    const apiModules = apiItems.filter(item => item.ItemType === "Module" &&
+    const apiModules = apiItems.filter((item) => item.ItemType === "Module" &&
         ((item.ModuleType === "Permanent" && !item.NotUsed) || item.ModuleType !== "Permanent"));
-    apiModules.forEach(apiModule => {
+    apiModules.forEach((apiModule) => {
         let dontSave = false;
         const module = {
             id: apiModule.Id,
@@ -320,7 +322,7 @@ export const convertModulesAndWoodData = async () => {
             sortingGroup: apiModule.SortingGroup.replace("module:", ""),
             permanentType: apiModule.PermanentType.replace(/_/g, " "),
             moduleType: apiModule.ModuleType,
-            moduleLevel: levels.get(apiModule.ModuleLevel)
+            moduleLevel: levels.get(apiModule.ModuleLevel),
         };
         if (module.name.startsWith("Bow figure - ")) {
             module.name = `${module.name.replace("Bow figure - ", "")} bow figure`;
@@ -348,19 +350,19 @@ export const convertModulesAndWoodData = async () => {
                         }
                     }
                 }
-                const rateExceptions = [
+                const rateExceptions = new Set([
                     "Apprentice Carpenters",
                     "Journeyman Carpenters",
                     "Navy Carpenters",
                     "Northern Carpenters",
                     "Northern Master Carpenters",
                     "Navy Mast Bands",
-                    "Navy Orlop Refit"
-                ];
-                if (rateExceptions.includes(module.name)) {
+                    "Navy Orlop Refit",
+                ]);
+                if (rateExceptions.has(module.name)) {
                     module.moduleLevel = "U";
                 }
-                const nameExceptions = [
+                const nameExceptions = new Set([
                     "Cannon nation module - France",
                     "Coward",
                     "Doctor",
@@ -373,9 +375,9 @@ export const convertModulesAndWoodData = async () => {
                     "Press Gang",
                     "Signaling",
                     "TEST MODULE SPEED IN OW",
-                    "Thrifty"
-                ];
-                if (nameExceptions.includes(module.name) ||
+                    "Thrifty",
+                ]);
+                if (nameExceptions.has(module.name) ||
                     (module.name === "Optimized Rudder" && module.moduleLevel !== "U") ||
                     module.name.endsWith(" - OLD") ||
                     module.name.endsWith("TEST") ||
@@ -389,7 +391,7 @@ export const convertModulesAndWoodData = async () => {
         }
     });
     let result = [...modules.values()];
-    result = result.filter(module => Object.keys(module).length).sort(sortBy(["type", "id"]));
+    result = result.filter((module) => Object.keys(module).length).sort(sortBy(["type", "id"]));
     const modulesGrouped = [...groupToMap(result, (module) => module.type)];
     await saveJsonAsync(commonPaths.fileModules, modulesGrouped);
     await saveJsonAsync(commonPaths.fileWood, woods);
