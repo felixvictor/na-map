@@ -86,8 +86,8 @@ const shipNames = new Map([
     ["yacht", { id: 295, master: "" }],
     ["yachtsilver", { id: 393, master: "" }]
 ]);
-const getShipId = (baseFileName) => shipNames.get(baseFileName)?.id ?? 0;
-const getShipMaster = (baseFileName) => shipNames.get(baseFileName)?.master ?? "";
+const getShipId = (baseFileName) => { var _a, _b; return (_b = (_a = shipNames.get(baseFileName)) === null || _a === void 0 ? void 0 : _a.id) !== null && _b !== void 0 ? _b : 0; };
+const getShipMaster = (baseFileName) => { var _a, _b; return (_b = (_a = shipNames.get(baseFileName)) === null || _a === void 0 ? void 0 : _a.master) !== null && _b !== void 0 ? _b : ""; };
 const subFileStructure = [
     {
         ext: "b armor",
@@ -159,7 +159,7 @@ const subFileStructure = [
 let apiItems;
 let ships;
 const getItemNames = () => new Map(apiItems.map(item => [item.Id, cleanName(item.Name)]));
-const getShipMass = (id) => apiItems.find(apiItem => id === apiItem.Id)?.ShipMass ?? 0;
+const getShipMass = (id) => { var _a, _b; return (_b = (_a = apiItems.find(apiItem => id === apiItem.Id)) === null || _a === void 0 ? void 0 : _a.ShipMass) !== null && _b !== void 0 ? _b : 0; };
 const convertGenericShipData = () => {
     const cannonWeight = [0, 42, 32, 24, 18, 12, 9, 0, 6, 4, 3, 2];
     const carroWeight = [0, 0, 68, 42, 32, 24, 0, 18, 12];
@@ -358,6 +358,7 @@ const convertShipBlueprints = async () => {
     const itemNames = getItemNames();
     const shipBlueprints = apiItems.filter(apiItem => !apiItem.NotUsed && apiItem.ItemType === "RecipeShip")
         .map(apiBlueprint => {
+        var _a, _b, _c, _d, _e, _f;
         const shipMass = getShipMass(apiBlueprint.Results[0].Template);
         return {
             id: apiBlueprint.Id,
@@ -367,15 +368,20 @@ const convertShipBlueprints = async () => {
                 { name: "Planking", amount: Math.round(shipMass * plankingRatio) },
                 { name: "Crew Space", amount: Math.round(shipMass * crewSpaceRatio) }
             ],
-            resources: apiBlueprint.FullRequirements.filter(requirement => !(itemNames.get(requirement.Template)?.endsWith(" Permit") ||
-                itemNames.get(requirement.Template) === "Doubloons" ||
-                itemNames.get(requirement.Template) === "Provisions")).map(requirement => ({
-                name: itemNames.get(requirement.Template)?.replace(" Log", ""),
-                amount: requirement.Amount
-            })),
-            provisions: (apiBlueprint.FullRequirements.find(requirement => itemNames.get(requirement.Template) === "Provisions") || {}).Amount || 0,
-            doubloons: (apiBlueprint.FullRequirements.find(requirement => itemNames.get(requirement.Template) === "Doubloons") || {}).Amount || 0,
-            permit: (apiBlueprint.FullRequirements.find(requirement => itemNames.get(requirement.Template)?.endsWith(" Permit")) || {}).Amount || 0,
+            resources: apiBlueprint.FullRequirements.filter(requirement => {
+                var _a, _b;
+                return !(((_b = (_a = itemNames.get(requirement.Template)) === null || _a === void 0 ? void 0 : _a.endsWith(" Permit")) !== null && _b !== void 0 ? _b : itemNames.get(requirement.Template) === "Doubloons") ||
+                    itemNames.get(requirement.Template) === "Provisions");
+            }).map(requirement => {
+                var _a;
+                return ({
+                    name: (_a = itemNames.get(requirement.Template)) === null || _a === void 0 ? void 0 : _a.replace(" Log", ""),
+                    amount: requirement.Amount
+                });
+            }),
+            provisions: (_b = ((_a = apiBlueprint.FullRequirements.find(requirement => itemNames.get(requirement.Template) === "Provisions")) !== null && _a !== void 0 ? _a : {}).Amount) !== null && _b !== void 0 ? _b : 0,
+            doubloons: (_d = ((_c = apiBlueprint.FullRequirements.find(requirement => itemNames.get(requirement.Template) === "Doubloons")) !== null && _c !== void 0 ? _c : {}).Amount) !== null && _d !== void 0 ? _d : 0,
+            permit: (_f = ((_e = apiBlueprint.FullRequirements.find(requirement => { var _a; return (_a = itemNames.get(requirement.Template)) === null || _a === void 0 ? void 0 : _a.endsWith(" Permit"); })) !== null && _e !== void 0 ? _e : {}).Amount) !== null && _f !== void 0 ? _f : 0,
             ship: {
                 id: apiBlueprint.Results[0].Template,
                 name: itemNames.get(apiBlueprint.Results[0].Template),

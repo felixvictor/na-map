@@ -20,7 +20,7 @@ export const nations = [
     { id: 9, short: "FT", name: "Free Town", sortName: "Free Town" },
     { id: 10, short: "RU", name: "Russian Empire", sortName: "Russian Empire" },
     { id: 11, short: "DE", name: "Kingdom of Prussia", sortName: "Prussia" },
-    { id: 12, short: "PL", name: "Commonwealth of Poland", sortName: "Poland" }
+    { id: 12, short: "PL", name: "Commonwealth of Poland", sortName: "Poland" },
 ];
 export const capitalToCounty = new Map([
     ["Arenas", "Cayos del Golfo"],
@@ -99,8 +99,9 @@ export const capitalToCounty = new Map([
     ["Vera Cruz", "Vera Cruz"],
     ["West End", "Grand Bahama"],
     ["Willemstad", "Benedenwinds"],
-    ["Wilmington", "North Carolina"]
+    ["Wilmington", "North Carolina"],
 ]);
+export const validNationShortName = (nationShortName) => nations.some((nation) => nation.short === nationShortName);
 export const isEmpty = (object) => Object.getOwnPropertyNames(object).length === 0 && object.constructor === Object;
 export const capitalizeFirstLetter = (string) => string.charAt(0).toUpperCase() + string.slice(1);
 export const groupToMap = (list, keyGetter) => {
@@ -117,8 +118,11 @@ export const groupToMap = (list, keyGetter) => {
     });
     return map;
 };
-export const range = (start, end) => [...new Array(1 + end - start).keys()].map(v => start + v);
-export const findNationByName = (nationName) => nations.find(nation => nationName === nation.name);
-export const findNationByNationShortName = (nationShortName) => nations.find(nation => nation.short === nationShortName);
-export const findNationById = (nationId) => nations.find(nation => nationId === nation.id);
+export const range = (start, end) => [...new Array(1 + end - start).keys()].map((v) => start + v);
+export const findNationByName = (nationName) => nations.find((nation) => nationName === nation.name);
+export const findNationByNationShortName = (nationShortName) => nations.find((nation) => nation.short === nationShortName);
+export const findNationById = (nationId) => nations.find((nation) => nationId === nation.id);
+export const putImportError = (error) => {
+    console.error("Import request failed -->", error);
+};
 //# sourceMappingURL=common.js.map

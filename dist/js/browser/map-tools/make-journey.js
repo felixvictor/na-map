@@ -11,36 +11,36 @@ import "bootstrap/js/dist/util";
 import "bootstrap/js/dist/modal";
 import { layoutTextLabel, layoutAnnealing, layoutLabel } from "@d3fc/d3fc-label-layout";
 import { range as d3Range } from "d3-array";
-import { drag as d3Drag } from "d3-drag";
+import * as d3Drag from "d3-drag";
 import { scaleLinear as d3ScaleLinear } from "d3-scale";
 import { event as d3Event, select as d3Select } from "d3-selection";
 import { line as d3Line } from "d3-shape";
-import { zoomIdentity as d3ZoomIdentity, zoomTransform as d3ZoomTransform } from "d3-zoom";
+import { zoomIdentity as d3ZoomIdentity, zoomTransform as d3ZoomTransform, } from "d3-zoom";
 import moment from "moment";
 import "moment/locale/en-gb";
+import "../../../scss/roundslider.scss";
 import "round-slider/src/roundslider";
 import "round-slider/src/roundslider.css";
-import "../../../scss/roundslider.scss";
 import { registerEvent } from "../analytics";
-import { degreesPerSecond, fullCircle, insertBaseModal } from "../node/common";
+import { degreesPerSecond, insertBaseModal } from "../../common/common-browser";
+import { formatF11 } from "../../common/common-format";
+import { compassDirections, convertInvCoordX, convertInvCoordY, degreesFullCircle, degreesToCompass, getDistance, speedFactor, } from "../../common/common-math";
 import { displayCompass, displayCompassAndDegrees, printCompassRose, rotationAngleInDegrees } from "../util";
-import CompareShips from "../game-tools/compare-ships";
-import { compassDirections, convertInvCoordX, convertInvCoordY, degreesToCompass, getDistance, speedFactor } from "../node/common-math";
-import { formatF11 } from "../common-format";
-export default class Journey {
+import { CompareShips } from "../game-tools/compare-ships";
+export default class MakeJourney {
     constructor(fontSize) {
         this._fontSize = fontSize;
         this._compassRadius = 90;
         this._courseArrowWidth = 5;
         this._line = d3Line()
-            .x(d => d[0])
-            .y(d => d[1]);
+            .x((d) => d[0])
+            .y((d) => d[1]);
         this._labelPadding = 20;
         this._degreesPerMinute = degreesPerSecond / 60;
         this._degreesSegment = 15;
         this._minOWSpeed = 2;
         this._owSpeedFactor = 2;
-        this._speedScale = d3ScaleLinear().domain(d3Range(0, fullCircle, this._degreesSegment));
+        this._speedScale = d3ScaleLinear().domain(d3Range(0, degreesFullCircle, this._degreesSegment));
         this._defaultShipName = "None";
         this._defaultShipSpeed = 19;
         this._defaultStartWindDegrees = 0;
@@ -58,26 +58,48 @@ export default class Journey {
         this._initJourneyData();
         this._setupListener();
     }
+    static _pluralize(number, word) {
+        return `${number} ${word + (number === 1 ? "" : "s")}`;
+    }
+    static _getHumanisedDuration(duration) {
+        moment.locale("en-gb");
+        const durationHours = Math.floor(duration / 60);
+        const durationMinutes = Math.round(duration % 60);
+        let s = "in ";
+        if (duration < 1) {
+            s += "less than a minute";
+        }
+        else {
+            const hourString = durationHours === 0 ? "" : MakeJourney._pluralize(durationHours, "hour");
+            const minuteString = durationMinutes === 0 ? "" : MakeJourney._pluralize(durationMinutes, "minute");
+            s += hourString + (hourString === "" ? "" : " ") + minuteString;
+        }
+        return s;
+    }
     _setupDrag() {
-        const dragStart = (d, i, nodes) => {
+        const dragStart = (_d, i, nodes) => {
+            const event = d3Event;
+            event.sourceEvent.stopPropagation();
             this._removeLabels();
             d3Select(nodes[i]).classed("drag-active", true);
         };
         const dragged = (d, i, nodes) => {
+            const event = d3Event;
+            const newX = d.position[0] + Number(event.dx);
+            const newY = d.position[1] + Number(event.dy);
             if (i === 0) {
-                this._compass.attr("x", d.position[0] + d3Event.dx).attr("y", d.position[1] + d3Event.dy);
+                this._compass.attr("x", newX).attr("y", newY);
             }
-            d3Select(nodes[i])
-                .attr("cx", d3Event.x)
-                .attr("cy", d3Event.y);
-            d.position = [d.position[0] + d3Event.dx, d.position[1] + d3Event.dy];
+            d3Select(nodes[i]).attr("cx", event.x).attr("cy", event.y);
+            d.position = [newX, newY];
             this._printLines();
         };
-        const dragEnd = (d, i, nodes) => {
+        const dragEnd = (_d, i, nodes) => {
             d3Select(nodes[i]).classed("drag-active", false);
             this._printJourney();
         };
-        this._drag = d3Drag()
+        this._drag = d3Drag
+            .drag()
             .on("start", dragStart)
             .on("drag", dragged)
             .on("end", dragEnd);
@@ -85,9 +107,7 @@ export default class Journey {
     _setupSvg() {
         const width = this._courseArrowWidth;
         const doubleWidth = this._courseArrowWidth * 2;
-        this._g = d3Select("#na-svg")
-            .insert("g", "g.pb")
-            .attr("class", "journey");
+        this._g = d3Select("#na-svg").insert("g", "g.pb").attr("class", "journey");
         d3Select("#na-svg defs")
             .append("marker")
             .attr("id", "journey-arrow")
@@ -108,7 +128,7 @@ export default class Journey {
             currentWindDegrees: this._defaultStartWindDegrees,
             totalDistance: 0,
             totalMinutes: 0,
-            segment: [{ position: [null, null], label: "" }]
+            segments: [{ position: [0, 0], label: "" }],
         };
     }
     _resetJourneyData() {
@@ -118,16 +138,17 @@ export default class Journey {
         this._journey.totalMinutes = 0;
     }
     _navbarClick(event) {
-        registerEvent("Menu", "Journey");
+        registerEvent("Menu", "MakeJourney");
         event.stopPropagation();
         this._journeySelected();
     }
     _setupListener() {
-        document.getElementById(`${this._buttonId}`).addEventListener("mouseup", event => this._navbarClick(event));
-        document.getElementById(this._deleteLastLegButtonId).addEventListener("mouseup", () => this._deleteLastLeg());
+        var _a, _b;
+        (_a = document.querySelector(`${this._buttonId}`)) === null || _a === void 0 ? void 0 : _a.addEventListener("mouseup", (event) => this._navbarClick(event));
+        (_b = document.querySelector(this._deleteLastLegButtonId)) === null || _b === void 0 ? void 0 : _b.addEventListener("mouseup", () => this._deleteLastLeg());
     }
     _setupWindInput() {
-        const { _getTooltipPos } = $.fn.roundSlider.prototype;
+        const _getTooltipPos = $.fn.roundSlider.prototype._getTooltipPos;
         $.fn.roundSlider.prototype._getTooltipPos = function () {
             if (!this.tooltip.is(":visible")) {
                 $("body").append(this.tooltip);
@@ -136,7 +157,7 @@ export default class Journey {
             this.container.append(this.tooltip);
             return pos;
         };
-        window.tooltip = arguments_ => `${displayCompass(arguments_.value)}<br>${arguments_.value}°`;
+        window.tooltip = (arguments_) => `${displayCompass(arguments_.value)}<br>${String(arguments_.value)}°`;
         $(`#${this._sliderId}`).roundSlider({
             sliderType: "default",
             handleSize: "+1",
@@ -151,42 +172,20 @@ export default class Journey {
             create() {
                 this.control.css("display", "block");
             },
-            change() {
-                this._currentWind = $(`#${this._sliderId}`).roundSlider("getValue");
-            }
         });
     }
     _injectModal() {
-        insertBaseModal(this._modalId, this._baseName, "sm");
+        insertBaseModal({ id: this._modalId, title: this._baseName, size: "sm" });
         const body = d3Select(`#${this._modalId} .modal-body`);
-        const formGroup = body
-            .append("form")
-            .append("div")
-            .attr("class", "form-group");
-        const slider = formGroup
-            .append("div")
-            .attr("class", "alert alert-primary")
-            .attr("role", "alert");
-        slider
-            .append("label")
-            .attr("for", this._sliderId)
-            .text("Current in-game wind");
-        slider
-            .append("div")
-            .attr("id", this._sliderId)
-            .attr("class", "rslider");
+        const formGroup = body.append("form").append("div").attr("class", "form-group");
+        const slider = formGroup.append("div").attr("class", "alert alert-primary").attr("role", "alert");
+        slider.append("label").attr("for", this._sliderId).text("Current in-game wind");
+        slider.append("div").attr("id", this._sliderId).attr("class", "rslider");
         const shipId = `${this._shipId}-Base-select`;
-        const ship = formGroup
-            .append("div")
-            .attr("class", "alert alert-primary")
-            .attr("role", "alert");
+        const ship = formGroup.append("div").attr("class", "alert alert-primary").attr("role", "alert");
         const div = ship.append("div").attr("class", "d-flex flex-column");
-        div.append("label")
-            .attr("for", shipId)
-            .text("Ship (optional)");
-        div.append("select")
-            .attr("name", shipId)
-            .attr("id", shipId);
+        div.append("label").attr("for", shipId).text("Ship (optional)");
+        div.append("select").attr("name", shipId).attr("id", shipId);
     }
     _initModal() {
         this._injectModal();
@@ -202,7 +201,7 @@ export default class Journey {
         this._printJourney();
     }
     _journeySelected() {
-        if (!document.getElementById(this._modalId)) {
+        if (!document.querySelector(this._modalId)) {
             this._initModal();
         }
         $(`#${this._modalId}`)
@@ -212,8 +211,8 @@ export default class Journey {
         });
     }
     _printCompass() {
-        const x = this._journey.segment[0].position[0];
-        const y = this._journey.segment[0].position[1];
+        const x = this._journey.segments[0].position[0];
+        const y = this._journey.segments[0].position[1];
         this._compass = this._g
             .append("svg")
             .attr("id", this._compassId)
@@ -231,14 +230,14 @@ export default class Journey {
         return Math.max(this._speedScale(degrees), this._minOWSpeed);
     }
     _calculateDistanceForSection(degreesCourse, degreesCurrentWind) {
-        const degreesForSpeedCalc = (fullCircle - degreesCourse + degreesCurrentWind) % fullCircle;
+        const degreesForSpeedCalc = (degreesFullCircle - degreesCourse + degreesCurrentWind) % degreesFullCircle;
         const speedCurrentSection = this._getSpeedAtDegrees(degreesForSpeedCalc) * this._owSpeedFactor;
         return speedCurrentSection * speedFactor;
     }
     _getStartWind() {
         const select$ = $(`#${this._sliderId}`);
         const currentUserWind = Number(select$.roundSlider("getValue"));
-        return select$.length ? currentUserWind : 0;
+        return select$.length > 0 ? currentUserWind : 0;
     }
     _setShipSpeed() {
         let speedDegrees = [];
@@ -247,7 +246,7 @@ export default class Journey {
         }
         else {
             ;
-            ({ speedDegrees } = this._shipCompare._singleShipData);
+            ({ speedDegrees } = this._shipCompare.singleShipData);
         }
         this._speedScale.range(speedDegrees);
     }
@@ -266,14 +265,14 @@ export default class Journey {
                 totalMinutesSegment += distanceRemaining / distanceCurrentSection;
                 distanceRemaining = 0;
             }
-            currentWindDegrees = (fullCircle + currentWindDegrees - this._degreesPerMinute) % fullCircle;
+            currentWindDegrees = (degreesFullCircle + currentWindDegrees - this._degreesPerMinute) % degreesFullCircle;
         }
         this._journey.currentWindDegrees = currentWindDegrees;
         return totalMinutesSegment;
     }
     _setShipName() {
-        if (this._shipCompare && this._shipCompare._singleShipData && this._shipCompare._singleShipData.name) {
-            this._journey.shipName = `${this._shipCompare._singleShipData.name}`;
+        if (this._shipCompare && this._shipCompare.singleShipData && this._shipCompare.singleShipData.name) {
+            this._journey.shipName = `${this._shipCompare.singleShipData.name}`;
         }
         else {
             this._journey.shipName = this._defaultShipName;
@@ -286,7 +285,8 @@ export default class Journey {
     }
     _correctJourney() {
         const defaultTranslate = 20;
-        const currentTransform = d3ZoomTransform(d3Select("#na-svg").node());
+        const svg = d3Select("#na-svg");
+        const currentTransform = d3ZoomTransform(svg.node());
         const scale = Math.max(1, currentTransform.k);
         const fontSize = this._fontSize / scale;
         const textTransform = d3ZoomIdentity.translate(defaultTranslate / scale, defaultTranslate / scale);
@@ -298,10 +298,7 @@ export default class Journey {
             const text = node.select("text");
             const lines = d.label.split("|");
             const lineHeight = fontSize * 1.3;
-            text.text("")
-                .attr("dy", 0)
-                .attr("transform", textTransform)
-                .style("font-size", `${fontSize}px`);
+            text.text("").attr("dy", 0).attr("transform", textTransform.toString).style("font-size", `${fontSize}px`);
             lines.forEach((line, j) => {
                 const tspan = text.append("tspan").html(line);
                 if (j > 0) {
@@ -311,13 +308,8 @@ export default class Journey {
             const bbText = text.node().getBBox();
             const width = d.label ? bbText.width + textPadding * 2 : 0;
             const height = d.label ? bbText.height + textPadding : 0;
-            node.select("rect")
-                .attr("width", width)
-                .attr("height", height);
-            const circle = node
-                .select("circle")
-                .attr("r", circleRadius)
-                .attr("class", "");
+            node.select("rect").attr("width", width).attr("height", height);
+            const circle = node.select("circle").attr("r", circleRadius).attr("class", "");
             node.append(() => circle.remove().node());
             if (i === 0) {
                 circle.attr("r", circleRadius * 4).attr("class", "drag-hidden");
@@ -337,7 +329,7 @@ export default class Journey {
     _printLabels() {
         const textLabel = layoutTextLabel()
             .padding(this._labelPadding)
-            .value(d => {
+            .value((d) => {
             const lines = d.label.split("|");
             const index = lines.reduce((p, c, i, a) => (a[p].length > c.length ? p : i), 0);
             return lines[index];
@@ -346,12 +338,12 @@ export default class Journey {
         const labels = layoutLabel(strategy)
             .size((d, i, nodes) => {
             const numberLines = d.label.split("|").length;
-            const bbText = nodes[i].getElementsByTagName("text")[0].getBBox();
+            const bbText = nodes[i].querySelectorAll("text")[0].getBBox();
             return [bbText.width + this._labelPadding * 2, bbText.height * numberLines + this._labelPadding * 2];
         })
-            .position(d => d.position)
+            .position((d) => d.position)
             .component(textLabel);
-        this._g.datum(this._journey.segment.map(segment => segment)).call(labels);
+        this._g.datum(this._journey.segments.map((segment) => segment)).call(labels);
     }
     _setupSummary() {
         this._divJourneySummary = d3Select("main #summary-column")
@@ -360,16 +352,10 @@ export default class Journey {
             .attr("class", "journey-summary d-none");
         this._journeySummaryShip = this._divJourneySummary.append("div").attr("class", "block small");
         this._journeySummaryTextShip = this._journeySummaryShip.append("div");
-        this._journeySummaryShip
-            .append("div")
-            .attr("class", "summary-des")
-            .text("ship");
+        this._journeySummaryShip.append("div").attr("class", "summary-des").text("ship");
         this._journeySummaryWind = this._divJourneySummary.append("div").attr("class", "block small");
         this._journeySummaryTextWind = this._journeySummaryWind.append("div");
-        this._journeySummaryWind
-            .append("div")
-            .attr("class", "summary-des")
-            .text("wind");
+        this._journeySummaryWind.append("div").attr("class", "summary-des").text("wind");
         this._divJourneySummary
             .append("div")
             .attr("class", "block")
@@ -402,9 +388,9 @@ export default class Journey {
     _printLines() {
         if (this._gJourneyPath) {
             this._gJourneyPath
-                .datum(this._journey.segment.length > 1
-                ? this._journey.segment.map(segment => segment.position)
-                : [[null, null]])
+                .datum(this._journey.segments.length > 1
+                ? this._journey.segments.map((segment) => segment.position)
+                : [[0, 0]])
                 .attr("marker-end", "url(#journey-arrow)")
                 .attr("d", this._line);
         }
@@ -412,36 +398,18 @@ export default class Journey {
     _getTextDirection(courseCompass, courseDegrees, pt1) {
         return `${displayCompassAndDegrees(courseCompass, true)} \u2056 F11: ${formatF11(convertInvCoordX(pt1.x, pt1.y))}\u202F/\u202F${formatF11(convertInvCoordY(pt1.x, pt1.y))}`;
     }
-    static _pluralize(number, word) {
-        return `${number} ${word + (number === 1 ? "" : "s")}`;
-    }
     _getTextDistance(distanceK, minutes, addTotal) {
-        function getHumanisedDuration(duration) {
-            moment.locale("en-gb");
-            const durationHours = Math.floor(duration / 60);
-            const durationMinutes = Math.round(duration % 60);
-            let s = "in ";
-            if (duration < 1) {
-                s += "less than a minute";
-            }
-            else {
-                const hourString = durationHours === 0 ? "" : Journey._pluralize(durationHours, "hour");
-                const minuteString = durationMinutes === 0 ? "" : Journey._pluralize(durationMinutes, "minute");
-                s += hourString + (hourString === "" ? "" : " ") + minuteString;
-            }
-            return s;
-        }
-        let textDistance = `${Math.round(distanceK)}\u2009k ${getHumanisedDuration(minutes)}`;
+        let textDistance = `${Math.round(distanceK)}\u2009k ${MakeJourney._getHumanisedDuration(minutes)}`;
         if (addTotal) {
-            textDistance += ` \u2056 total ${Math.round(this._journey.totalDistance)}\u2009k ${getHumanisedDuration(this._journey.totalMinutes)}`;
+            textDistance += ` \u2056 total ${Math.round(this._journey.totalDistance)}\u2009k ${MakeJourney._getHumanisedDuration(this._journey.totalMinutes)}`;
         }
         return textDistance;
     }
-    _setSegmentLabel(index = this._journey.segment.length - 1) {
-        const pt1 = { x: this._journey.segment[index].position[0], y: this._journey.segment[index].position[1] };
+    _setSegmentLabel(index = this._journey.segments.length - 1) {
+        const pt1 = { x: this._journey.segments[index].position[0], y: this._journey.segments[index].position[1] };
         const pt2 = {
-            x: this._journey.segment[index - 1].position[0],
-            y: this._journey.segment[index - 1].position[1]
+            x: this._journey.segments[index - 1].position[0],
+            y: this._journey.segments[index - 1].position[1],
         };
         const courseDegrees = rotationAngleInDegrees(pt1, pt2);
         const distanceK = getDistance(pt1, pt2);
@@ -451,7 +419,7 @@ export default class Journey {
         this._journey.totalMinutes += minutes;
         const textDirection = this._getTextDirection(courseCompass, courseDegrees, pt1);
         const textDistance = this._getTextDistance(distanceK, minutes, index > 1);
-        this._journey.segment[index].label = `${textDirection}|${textDistance}`;
+        this._journey.segments[index].label = `${textDirection}|${textDistance}`;
     }
     _printSegment() {
         this._printLines();
@@ -463,8 +431,8 @@ export default class Journey {
     _printJourney() {
         this._printLines();
         this._resetJourneyData();
-        this._journey.segment.forEach((d, i) => {
-            if (i < this._journey.segment.length - 1) {
+        this._journey.segments.forEach((d, i) => {
+            if (i < this._journey.segments.length - 1) {
                 this._setSegmentLabel(i + 1);
             }
         });
@@ -473,8 +441,8 @@ export default class Journey {
         this._g.selectAll("g.journey g.label circle").call(this._drag);
     }
     _deleteLastLeg() {
-        this._journey.segment.pop();
-        if (this._journey.segment.length) {
+        this._journey.segments.pop();
+        if (this._journey.segments.length > 0) {
             this._printJourney();
         }
         else {
@@ -495,17 +463,17 @@ export default class Journey {
         this._divJourneySummary.style("top", `${topMargin}px`).style("right", `${rightMargin}px`);
     }
     plotCourse(x, y) {
-        if (this._journey.segment[0].position[0]) {
-            this._journey.segment.push({ position: [x, y], label: "" });
+        if (this._journey.segments[0].position[0] > 0) {
+            this._journey.segments.push({ position: [x, y], label: "" });
             this._printSegment();
         }
         else {
-            this._journey.segment[0] = { position: [x, y], label: "" };
+            this._journey.segments[0] = { position: [x, y], label: "" };
             this._initJourney();
         }
     }
     transform(transform) {
-        this._g.attr("transform", transform);
+        this._g.attr("transform", transform.toString);
         this._correctJourney();
     }
 }
