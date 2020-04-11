@@ -13,33 +13,32 @@ import { default as nodeFetch } from "node-fetch";
 import { baseAPIFilename, serverStartDate as serverDate } from "../common/common-dir";
 import { apiBaseFiles, serverNames } from "../common/common-var";
 import { saveJsonAsync, xzAsync } from "../common/common-file";
-import { sortId } from "../common/common-node";
+import { sortBy } from "../common/common-node";
 const sourceBaseUrl = "https://storage.googleapis.com/";
 const sourceBaseDir = "nacleanopenworldprodshards";
 const serverBaseName = "cleanopenworldprod";
 const deleteFile = (fileName) => {
-    fs.unlink(fileName, error => {
-        if (error?.code !== "ENOENT") {
-            throw error;
+    fs.unlink(fileName, (error) => {
+        if (error && error.code !== "ENOENT") {
+            throw new Error(`Error deleteFile: ${error.message}`);
         }
     });
 };
-const deleteAPIFiles = async (fileName) => {
-    await deleteFile(fileName);
-    await deleteFile(`${fileName}.xz`);
-    return true;
+const deleteAPIFiles = (fileName) => {
+    deleteFile(fileName);
+    deleteFile(`${fileName}.xz`);
 };
 const readNAJson = async (url) => {
     try {
         const response = await nodeFetch(url);
         if (response.ok) {
             const text = (await response.text()).replace(/^var .+ = /, "").replace(/;$/, "");
-            return await JSON.parse(text);
+            return JSON.parse(text);
         }
-        return new Error(`Cannot load ${url}: ${response.statusText}`);
+        return new Error(`Cannot load ${url.href}: ${response.statusText}`);
     }
     catch (error) {
-        throw error;
+        throw new Error(error);
     }
 };
 const getAPIDataAndSave = async (serverName, apiBaseFile, outfileName) => {
@@ -48,7 +47,7 @@ const getAPIDataAndSave = async (serverName, apiBaseFile, outfileName) => {
     if (data instanceof Error) {
         throw data;
     }
-    await data.sort(sortId);
+    data.sort(sortBy(["Id"]));
     await saveJsonAsync(outfileName, data);
     await xzAsync("xz", outfileName);
     return true;

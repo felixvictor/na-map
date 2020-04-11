@@ -13,7 +13,7 @@ import { commonPaths } from "../common/common-dir";
 import { makeDirAsync } from "../common/common-file";
 const yearRegex = /^api-.+-(\d{4})-\d{2}-\d{2}\.json(\.xz)?$/;
 const monthRegex = /^api-.+-\d{4}-(\d{2})-\d{2}\.json(\.xz)?$/;
-const moveFileAsync = (oldFileName, newFileName) => {
+const moveFileAsync = async (oldFileName, newFileName) => {
     fs.rename(oldFileName, newFileName, err => {
         if (err) {
             throw err;
@@ -21,13 +21,14 @@ const moveFileAsync = (oldFileName, newFileName) => {
     });
 };
 const moveAPIFile = async (fileName) => {
-    const year = fileName.match(yearRegex)?.[1];
-    const month = fileName.match(monthRegex)?.[1];
+    var _a, _b;
+    const year = (_a = yearRegex.exec(fileName)) === null || _a === void 0 ? void 0 : _a[1];
+    const month = (_b = monthRegex.exec(fileName)) === null || _b === void 0 ? void 0 : _b[1];
     if (year && month) {
         const dirNew = path.resolve(commonPaths.dirAPI, year, month);
         const fileNameNew = fileName.replace("api-", "");
         await makeDirAsync(dirNew);
-        console.log("-> ", path.resolve(commonPaths.dirAPI, fileName), path.resolve(dirNew, fileNameNew));
+        console.log("->", path.resolve(commonPaths.dirAPI, fileName), path.resolve(dirNew, fileNameNew));
         await moveFileAsync(path.resolve(commonPaths.dirAPI, fileName), path.resolve(dirNew, fileNameNew));
     }
 };
