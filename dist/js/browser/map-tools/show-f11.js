@@ -13,10 +13,10 @@ import { select as d3Select } from "d3-selection";
 import moment from "moment";
 import "moment/locale/en-gb";
 import { registerEvent } from "../analytics";
-import { insertBaseModal } from "../../common/common";
-import { copyF11ToClipboard } from "../util";
-import { between, convertCoordX, convertCoordY, convertInvCoordX, convertInvCoordY } from "../../common/common-math";
 import { formatF11 } from "../../common/common-format";
+import { insertBaseModal } from "../../common/common-browser";
+import { between, convertCoordX, convertCoordY, convertInvCoordX, convertInvCoordY } from "../../common/common-math";
+import { copyF11ToClipboard } from "../util";
 export default class ShowF11 {
     constructor(map, coord) {
         this._map = map;
@@ -30,14 +30,11 @@ export default class ShowF11 {
         this._zInputId = `input-z-${this._baseId}`;
         this._copyButtonId = `copy-coord-${this._baseId}`;
         this._submitButtonId = `submit-${this._baseId}`;
-        this._modal$ = null;
         this._setupSvg();
         this._setupListener();
     }
     _setupSvg() {
-        this._g = d3Select("#na-svg")
-            .append("g")
-            .classed("f11", true);
+        this._g = d3Select("#na-svg").append("g").classed("f11", true);
     }
     _navbarClick(event) {
         registerEvent("Menu", "Go to F11");
@@ -45,29 +42,21 @@ export default class ShowF11 {
         this._f11Selected();
     }
     _setupListener() {
-        document.getElementById(`${this._buttonId}`).addEventListener("click", event => this._navbarClick(event));
-        window.addEventListener("keydown", event => {
+        var _a;
+        (_a = document.querySelector(`${this._buttonId}`)) === null || _a === void 0 ? void 0 : _a.addEventListener("click", (event) => this._navbarClick(event));
+        window.addEventListener("keydown", (event) => {
             if (event.code === "F11" && event.shiftKey) {
                 this._navbarClick(event);
             }
         });
     }
     _injectModal() {
-        insertBaseModal(this._modalId, this._baseName, "sm");
+        insertBaseModal({ id: this._modalId, title: this._baseName, size: "sm" });
         const body = d3Select(`#${this._modalId} .modal-body`);
-        const form = body
-            .append("form")
-            .attr("id", this._formId)
-            .attr("role", "form");
+        const form = body.append("form").attr("id", this._formId).attr("role", "form");
         this._formSel = form.node();
-        form.append("div")
-            .classed("alert alert-primary", true)
-            .text("Use F11 in open world.");
-        const inputGroup1 = form
-            .append("div")
-            .classed("form-group", true)
-            .append("div")
-            .classed("input-group", true);
+        form.append("div").classed("alert alert-primary", true).text("Use F11 in open world.");
+        const inputGroup1 = form.append("div").classed("form-group", true).append("div").classed("input-group", true);
         inputGroup1.append("label").attr("for", this._xInputId);
         inputGroup1
             .append("input")
@@ -86,11 +75,7 @@ export default class ShowF11 {
             .append("span")
             .classed("input-group-text", true)
             .text("k");
-        const inputGroup2 = form
-            .append("div")
-            .classed("form-group", true)
-            .append("div")
-            .classed("input-group", true);
+        const inputGroup2 = form.append("div").classed("form-group", true).append("div").classed("input-group", true);
         inputGroup2.append("label").attr("for", this._zInputId);
         inputGroup2
             .append("input")
@@ -113,10 +98,7 @@ export default class ShowF11 {
             .classed("alert alert-primary", true)
             .append("small")
             .html("In k units (divide by 1,000).<br>Example: <em>43</em> for value of <em>43,162.5</em>.");
-        const buttonGroup = form
-            .append("div")
-            .classed("float-right btn-group", true)
-            .attr("role", "group");
+        const buttonGroup = form.append("div").classed("float-right btn-group", true).attr("role", "group");
         const button = buttonGroup
             .append("button")
             .classed("btn btn-outline-secondary icon-outline-button", true)
@@ -138,22 +120,23 @@ export default class ShowF11 {
         this._injectModal();
     }
     _f11Selected() {
+        var _a, _b;
         if (!this._modal$) {
             this._initModal();
             this._modal$ = $(`#${this._modalId}`);
-            this._xInputSel = document.getElementById(this._xInputId);
-            this._zInputSel = document.getElementById(this._zInputId);
-            this._formSel.addEventListener("submit", event => {
+            this._xInputSel = document.querySelector(this._xInputId);
+            this._zInputSel = document.querySelector(this._zInputId);
+            this._formSel.addEventListener("submit", (event) => {
                 this._modal$.modal("hide");
                 event.preventDefault();
                 this._useUserInput();
             });
-            this._modal$.on("keydown", event => {
-                if (event.code === "KeyC" && event.ctrlKey) {
+            (_a = document.querySelector(this._modalId)) === null || _a === void 0 ? void 0 : _a.addEventListener("keydown", (event) => {
+                if (event.key === "KeyC" && event.ctrlKey) {
                     this._copyCoordClicked(event);
                 }
             });
-            document.getElementById(this._copyButtonId).addEventListener("click", event => {
+            (_b = document.querySelector(this._copyButtonId)) === null || _b === void 0 ? void 0 : _b.addEventListener("click", (event) => {
                 this._copyCoordClicked(event);
             });
         }
@@ -186,6 +169,7 @@ export default class ShowF11 {
         copyF11ToClipboard(x, z, this._modal$);
     }
     _printF11Coord(x, y, F11X, F11Y) {
+        var _a, _b, _c, _d;
         let circleSize = 10;
         const g = this._g.append("g").attr("transform", `translate(${x},${y})`);
         const coordRect = g.append("rect");
@@ -204,8 +188,8 @@ export default class ShowF11 {
             .attr("dy", `${circleSize / 2 + 2}px`)
             .attr("class", "f11-coord")
             .text(formatF11(F11Y));
-        const F11XDim = F11XText.node().getBBox();
-        const F11YDim = F11YText.node().getBBox();
+        const F11XDim = (_a = F11XText.node()) === null || _a === void 0 ? void 0 : _a.getBBox();
+        const F11YDim = (_b = F11YText.node()) === null || _b === void 0 ? void 0 : _b.getBBox();
         const timeStamp = moment().utc();
         const timeStampLocal = moment();
         const timeStampText = g
@@ -220,12 +204,14 @@ export default class ShowF11 {
             .attr("dy", `${circleSize / 2 + 2}px`)
             .attr("class", "f11-time")
             .text(`(${timeStampLocal.format("H.mm")} local)`);
-        const timeStampDim = timeStampText.node().getBBox();
-        const timeStampLocalDim = timeStampLocalText.node().getBBox();
-        const coordHeight = Math.round(F11XDim.height + F11YDim.height) * 1.2;
-        const coordWidth = Math.round(Math.max(F11XDim.width, F11YDim.width) + 5);
-        const timeHeight = Math.round(timeStampDim.height + timeStampLocalDim.height) * 1.2;
-        const timeWidth = Math.round(Math.max(timeStampDim.width, timeStampLocalDim.width) + 5);
+        const timeStampDim = (_c = timeStampText.node()) === null || _c === void 0 ? void 0 : _c.getBBox();
+        const timeStampLocalDim = (_d = timeStampLocalText.node()) === null || _d === void 0 ? void 0 : _d.getBBox();
+        const coordHeight = F11XDim && F11YDim ? Math.round(F11XDim.height + F11YDim.height) * 1.2 : 0;
+        const coordWidth = F11XDim && F11YDim ? Math.round(Math.max(F11XDim.width, F11YDim.width) + 5) : 0;
+        const timeHeight = timeStampDim && timeStampLocalDim ? Math.round(timeStampDim.height + timeStampLocalDim.height) * 1.2 : 0;
+        const timeWidth = timeStampDim && timeStampLocalDim
+            ? Math.round(Math.max(timeStampDim.width, timeStampLocalDim.width) + 5)
+            : 0;
         const height = Math.max(coordHeight, timeHeight);
         coordRect
             .attr("x", -coordWidth - circleSize)
@@ -238,9 +224,7 @@ export default class ShowF11 {
             .attr("height", height)
             .attr("width", timeWidth + circleSize);
     }
-    _goToF11(F11XIn, F11YIn) {
-        const F11X = Number(F11XIn);
-        const F11Y = Number(F11YIn);
+    _goToF11(F11X, F11Y) {
         const x = Math.floor(convertCoordX(F11X, F11Y));
         const y = Math.floor(convertCoordY(F11X, F11Y));
         if (between(x, this._coord.min, this._coord.max, true) && between(y, this._coord.min, this._coord.max, true)) {
@@ -262,7 +246,7 @@ export default class ShowF11 {
         this._printF11Coord(x, y, F11X, F11Y);
     }
     transform(transform) {
-        this._g.attr("transform", transform);
+        this._g.attr("transform", transform.toString());
     }
     clearMap() {
         this._g.selectAll("*").remove();

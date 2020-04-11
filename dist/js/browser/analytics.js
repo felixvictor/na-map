@@ -9,9 +9,8 @@
  */
 import { appName, appVersion } from "../common/common-browser";
 import { GA_TRACKING_ID } from "../common/common-var";
-const ga = {};
-window.ga = (arguments) => {
-    ga.q.push(arguments);
+window.ga = (commandArray) => {
+    ga.q.push(commandArray);
 };
 ga.q = [];
 export const registerEvent = (category, label, value = 1) => {
@@ -19,13 +18,13 @@ export const registerEvent = (category, label, value = 1) => {
         hitType: "event",
         eventCategory: category,
         eventLabel: label,
-        eventValue: value
+        eventValue: value,
     });
 };
 export const registerPage = (title) => {
     ga("send", {
         hitType: "pageview",
-        title
+        title,
     });
 };
 export const initAnalytics = () => {
@@ -37,13 +36,13 @@ export const initAnalytics = () => {
     window.addEventListener("error", (errorMessage) => {
         const exceptionDescription = [
             `Message: ${errorMessage.message} @ ${errorMessage.filename}-${errorMessage.lineno}:${errorMessage.colno}`,
-            `Error object: ${JSON.stringify(errorMessage.error)}`
+            `Error object: ${JSON.stringify(errorMessage.error)}`,
         ].join(" - ");
         ga("send", "exception", {
             exDescription: exceptionDescription,
             exFatal: false,
             appName,
-            appVersion
+            appVersion,
         });
         return false;
     });
