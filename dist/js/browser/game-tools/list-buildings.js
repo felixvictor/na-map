@@ -10,11 +10,12 @@
 import "bootstrap/js/dist/util";
 import "bootstrap/js/dist/modal";
 import { select as d3Select } from "d3-selection";
+import "bootstrap-select/js/bootstrap-select";
 import { registerEvent } from "../analytics";
 import { getCurrencyAmount, insertBaseModal } from "../../common/common-browser";
-import { sortBy } from "../../common/common";
-import { putImportError } from "../../common/common-file";
+import { putImportError } from "../../common/common";
 import { formatInt } from "../../common/common-format";
+import { sortBy } from "../../common/common-node";
 export default class ListBuildings {
     constructor() {
         this._baseName = "List buildings";
@@ -26,9 +27,8 @@ export default class ListBuildings {
     }
     async _loadAndSetupData() {
         try {
-            const fileName = ".~Lib/gen-generic/buildings.json";
-            this._buildingData = (await import(fileName))
-                .default;
+            const fileName = "~Lib/gen-generic/buildings.json";
+            this._buildingData = (await import(fileName)).default;
         }
         catch (error) {
             putImportError(error);
@@ -36,7 +36,7 @@ export default class ListBuildings {
     }
     _setupListener() {
         let firstClick = true;
-        document.getElementById(this._buttonId).addEventListener("click", async (event) => {
+        document.querySelector(this._buttonId).addEventListener("click", async (event) => {
             if (firstClick) {
                 firstClick = false;
                 await this._loadAndSetupData();
@@ -47,16 +47,12 @@ export default class ListBuildings {
         });
     }
     _injectModal() {
-        insertBaseModal(this._modalId, this._baseName);
+        insertBaseModal({ id: this._modalId, title: this._baseName });
         const id = `${this._baseId}-select`;
         const body = d3Select(`#${this._modalId} .modal-body`);
         body.append("label").attr("for", id);
-        body.append("select")
-            .attr("name", id)
-            .attr("id", id);
-        body.append("div")
-            .attr("id", `${this._baseId}`)
-            .attr("class", "container-fluid");
+        body.append("select").attr("name", id).attr("id", id);
+        body.append("div").attr("id", `${this._baseId}`).attr("class", "container-fluid");
     }
     _getOptions() {
         return `${this._buildingData
@@ -83,13 +79,13 @@ export default class ListBuildings {
         this._setupSelectListener();
     }
     _buildingListSelected() {
-        if (!document.getElementById(this._modalId)) {
+        if (!document.querySelector(this._modalId)) {
             this._initModal();
         }
         $(`#${this._modalId}`).modal("show");
     }
     _getBuildingData(selectedBuildingName) {
-        return this._buildingData.filter(building => building.name === selectedBuildingName)[0];
+        return this._buildingData.filter((building) => building.name === selectedBuildingName)[0];
     }
     _getProductText(currentBuilding) {
         let text = "";
@@ -118,13 +114,13 @@ export default class ListBuildings {
     _getRequirementText(currentBuilding) {
         let text = "";
         text += '<table class="table table-sm card-table"><thead>';
-        if (currentBuilding.levels[0].materials.length) {
+        if (currentBuilding.levels[0].materials.length > 0) {
             text += "<tr><th>Level</th><th>Level build materials</th><th>Build price (reals)</th></tr>";
             text += "</thead><tbody>";
             for (const level of currentBuilding.levels) {
                 const i = currentBuilding.levels.indexOf(level);
                 text += `<tr><td>${i + 1}</td><td class="text-left">`;
-                text += level.materials.map(material => `${formatInt(material.amount)} ${material.item}`).join("<br>");
+                text += level.materials.map((material) => `${formatInt(material.amount)} ${material.item}`).join("<br>");
                 text += "</td>";
                 text += `<td>${formatInt(level.price)}</td>`;
                 text += "</tr>";
@@ -161,9 +157,7 @@ export default class ListBuildings {
             .find(":selected")
             .val());
         d3Select(`#${this._baseId} div`).remove();
-        d3Select(`#${this._baseId}`)
-            .append("div")
-            .classed("buildings mt-4", true);
+        d3Select(`#${this._baseId}`).append("div").classed("buildings mt-4", true);
         d3Select(`#${this._baseId} div`).html(this._getText(building));
     }
 }

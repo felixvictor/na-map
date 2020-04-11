@@ -39,7 +39,7 @@ export const readTextFile = (fileName) => {
     return data;
 };
 export const readJson = (fileName) => JSON.parse(readTextFile(fileName));
-const fileExistsAsync = async (fileName) => !!(await fs.promises.stat(fileName).catch(() => false));
+const fileExistsAsync = async (fileName) => Boolean(await fs.promises.stat(fileName).catch(() => false));
 export const xzAsync = async (command, fileName) => {
     const fileExists = await fileExistsAsync(fileName);
     if (fileExists) {
@@ -77,8 +77,5 @@ export const getJsonFromFetch = (response) => response.json();
 export const getTextFromFetch = (response) => response.text();
 export const putFetchError = (error) => {
     console.error("Request failed -->", error);
-};
-export const putImportError = (error) => {
-    console.error("Import request failed -->", error);
 };
 //# sourceMappingURL=common-file.js.map

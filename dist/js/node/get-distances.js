@@ -14,6 +14,7 @@ import { default as PNG } from "pngjs";
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir";
 import { readJson, saveJsonAsync, xz } from "../common/common-file";
 import { convertCoordX, convertCoordY } from "../common/common-math";
+import { simpleNumberSort } from "../common/common-node";
 import { distanceMapSize, serverNames } from "../common/common-var";
 const mapFileName = path.resolve(commonPaths.dirSrc, "images", `frontline-map-${distanceMapSize}.png`);
 const distancesFile = path.resolve(commonPaths.dirGenGeneric, `distances-${distanceMapSize}.json`);
@@ -28,12 +29,15 @@ const mapScale = mapWidth / origMapSize;
 const getIndex = (y, x) => y * mapWidth + x;
 const getCoordinates = (y, x) => [
     Math.trunc(convertCoordY(x, y) * mapScale),
-    Math.trunc(convertCoordX(x, y) * mapScale)
+    Math.trunc(convertCoordX(x, y) * mapScale),
 ];
 const fileName = path.resolve(baseAPIFilename, `${serverNames[0]}-Ports-${serverDate}.json`);
 let apiPorts = [];
 let portIds = [];
 let numPorts = 0;
+const map = new Array(mapWidth * mapHeight)
+    .fill(0)
+    .map((_e, index) => (png.data[index << 2] > 127 ? spotWater : spotLand));
 const visitedPositionsDefault = new Set();
 const distances = [];
 const startPortIds = new Set();
@@ -65,7 +69,7 @@ const findPaths = (startPortId, startY, startX) => {
     if (foundPortIds.size + startPortIds.size < numPorts) {
         const missingPortIds = portIds
             .filter((portId) => portId > startPortId && !foundPortIds.has(portId))
-            .sort((a, b) => a - b);
+            .sort(simpleNumberSort);
         console.error("Only", foundPortIds.size + startPortIds.size, "of all", numPorts, "ports found! Ports", missingPortIds, "are missing.");
         missingPortIds.forEach((missingPortId) => {
             distances.push([startPortId, missingPortId, 0]);
@@ -90,26 +94,28 @@ const setVisitedPositionsDefault = () => {
 };
 const getDistances = async () => {
     setVisitedPositionsDefault();
-    console.time("findPath");
-    apiPorts
-        .sort((a, b) => Number(a.Id) - Number(b.Id))
-        .forEach((fromPort) => {
-        const fromPortId = Number(fromPort.Id);
-        const { EntrancePosition: { z: y, x } } = fromPort;
-        const [fromPortY, fromPortX] = getCoordinates(y, x);
-        findPaths(fromPortId, fromPortY, fromPortX);
-        console.timeLog("findPath", `${fromPortId} ${fromPort.Name} (${fromPortY}, ${fromPortX})`);
-    });
-    console.timeEnd("findPath");
-    await saveJsonAsync(distancesFile, distances);
+    try {
+        console.time("findPath");
+        apiPorts
+            .sort((a, b) => Number(a.Id) - Number(b.Id))
+            .forEach((fromPort) => {
+            const fromPortId = Number(fromPort.Id);
+            const { EntrancePosition: { z: y, x }, } = fromPort;
+            const [fromPortY, fromPortX] = getCoordinates(y, x);
+            findPaths(fromPortId, fromPortY, fromPortX);
+            console.timeLog("findPath", `${fromPortId} ${fromPort.Name} (${fromPortY}, ${fromPortX})`);
+        });
+        console.timeEnd("findPath");
+        await saveJsonAsync(distancesFile, distances);
+    }
+    catch (error) {
+        console.error("Map distance error:", error);
+    }
 };
 xz("unxz", `${fileName}.xz`);
 apiPorts = readJson(fileName);
 portIds = apiPorts.map((port) => Number(port.Id));
 numPorts = portIds.length;
-const map = new Array(mapWidth * mapHeight)
-    .fill(0)
-    .map((_e, index) => (png.data[index << 2] > 127 ? spotWater : spotLand));
 apiPorts.forEach(({ Id, EntrancePosition: { z: y, x } }) => {
     const [portY, portX] = getCoordinates(y, x);
     const index = getIndex(portY, portX);

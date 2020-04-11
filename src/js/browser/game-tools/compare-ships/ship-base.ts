@@ -13,7 +13,8 @@ import {
     arc as d3Arc,
     curveCatmullRomClosed as d3CurveCatmullRomClosed,
     pie as d3Pie,
-    radialLine as d3RadialLine,
+    lineRadial as d3LineRadial,
+    PieArcDatum,
 } from "d3-shape"
 import { formatFloat, formatIntTrunc, formatPercent } from "../../../common/common-format"
 import { degreesToCompass, getOrdinal } from "../../../common/common-math"
@@ -31,19 +32,18 @@ import {
 } from "../../../common/common-browser"
 import { default as shipIcon } from "Icons/icon-ship.svg"
 
-import { CompareShips, DragData, Ship, ShipDisplayData } from ".";
+import { CompareShips, DragData, Ship, ShipComparison, ShipDisplayData } from "."
 import { ShipData } from "../../../common/gen-json"
 
 /**
  * Base ship for comparison (displayed on the left side)
  */
 export class ShipBase extends Ship {
-    private readonly _shipData: ShipData
-    private readonly _mainG!: d3Selection.Selection<SVGGElement, unknown, HTMLElement, any>
+    readonly shipData: ShipData
     private _speedScale!: ScaleLinear<number, number>
     private _shipRotate!: number
     private _speedText!: d3Selection.Selection<SVGTextElement, DragData, HTMLElement, any>
-    private _drag!: d3Drag.DragBehavior<SVGElement, DragData, any>
+    private _drag!: d3Drag.DragBehavior<SVGCircleElement | SVGPathElement, DragData, any>
 
     /**
      * @param id - Ship id
@@ -53,7 +53,7 @@ export class ShipBase extends Ship {
     constructor(id: string, shipData: ShipData, shipCompare: CompareShips) {
         super(id, shipCompare)
 
-        this._shipData = shipData
+        this.shipData = shipData
 
         this._setBackground()
         this._setupDrag()
@@ -120,20 +120,20 @@ export class ShipBase extends Ship {
     }
 
     _updateCompareWindProfiles(): void {
-        for (const otherCompareId of this._shipCompare._columnsCompare) {
-            if (!isEmpty(this._shipCompare._selectedShips[otherCompareId])) {
-                this._shipCompare._selectedShips[otherCompareId].updateWindProfileRotation()
+        for (const otherCompareId of this._shipCompare.columnsCompare) {
+            if (!isEmpty(this._shipCompare.selectedShips[otherCompareId])) {
+                ;(this._shipCompare.selectedShips[otherCompareId] as ShipComparison).updateWindProfileRotation()
             }
         }
     }
 
     _setupDrag(): void {
-        const steps = this._shipData.speedDegrees.length
+        const steps = this.shipData.speedDegrees.length
         const degreesPerStep = 360 / steps
         const domain = new Array(steps + 1).fill(null).map((e, i) => i * degreesPerStep)
         this._speedScale = d3ScaleLinear()
             .domain(domain)
-            .range([...this._shipData.speedDegrees, this._shipData.speedDegrees[0]])
+            .range([...this.shipData.speedDegrees, this.shipData.speedDegrees[0]])
             .clamp(true)
 
         // eslint-disable-next-line unicorn/consistent-function-scoping
@@ -175,7 +175,7 @@ export class ShipBase extends Ship {
         }
 
         this._drag = d3Drag
-            .drag<SVGElement, DragData>()
+            .drag<SVGCircleElement | SVGPathElement, DragData>()
             .on("start", dragStart)
             .on("drag", dragged)
             .on("end", dragEnd)
@@ -184,7 +184,7 @@ export class ShipBase extends Ship {
 
     _setupShipOutline(): void {
         this._shipRotate = 0
-        const { shipMass } = this._shipData
+        const { shipMass } = this.shipData
         const heightShip = this._shipCompare.shipMassScale(shipMass)
         // noinspection JSSuspiciousNameCombination
         const widthShip = heightShip
@@ -225,7 +225,7 @@ export class ShipBase extends Ship {
             .attr("cx", (d) => d.compassTextX)
             .attr("cy", (d) => d.compassTextY)
             .attr("r", circleSize)
-            .call(this._drag)
+            .call(this._drag as d3Drag.DragBehavior<SVGCircleElement, DragData, any>)
 
         const compassText = gShip
             .append("text")
@@ -252,10 +252,10 @@ export class ShipBase extends Ship {
     _drawWindProfile(): void {
         const pie = d3Pie().sort(null).value(1)
 
-        const arcsBase = pie(this._shipData.speedDegrees)
+        const arcsBase = pie(this.shipData.speedDegrees) as Array<PieArcDatum<number>>
 
         const curve = d3CurveCatmullRomClosed
-        const line = d3RadialLine()
+        const line = d3LineRadial<PieArcDatum<number>>()
             .angle((d, i) => i * segmentRadians)
             .radius((d) => this._shipCompare.radiusSpeedScale(d.data))
             .curve(curve)
@@ -288,7 +288,7 @@ export class ShipBase extends Ship {
 
             .attr("class", "wind-profile-arrow")
             .attr("marker-end", "url(#wind-profile-arrow-head)")
-            .call(this._drag)
+            .call(this._drag as d3Drag.DragBehavior<SVGPathElement, DragData, any>)
 
         gWindProfile
             .append("circle")
@@ -303,6 +303,7 @@ export class ShipBase extends Ship {
             .attr("transform", (d) => `rotate(${-d.initRotate},${d.compassTextX},${d.compassTextY})`)
             .text((d) => this._getHeadingInCompass(d.initRotate))
 
+        // @ts-ignore
         gWindProfile.append("path").attr("class", "base-profile").attr("d", line(arcsBase))
 
         // Speed marker
@@ -321,7 +322,7 @@ export class ShipBase extends Ship {
                     .attr("fill", (d) => this._shipCompare.colorScale(d.data))
                     .attr("fill", (d) => this._shipCompare.colorScale(d.data))
                     .append("title")
-                    .text((d) => `${Math.round(d.data * 10) / 10} knots`)
+                    .text((d) => `${Math.round(d.data as number * 10) / 10} knots`)
             )
 
         datum.this = gWindProfile
@@ -335,86 +336,86 @@ export class ShipBase extends Ship {
      * Print text
      */
     _printText(): void {
-        const cannonsPerDeck = Ship.getCannonsPerDeck(this._shipData.deckClassLimit, this._shipData.gunsPerDeck)
+        const cannonsPerDeck = Ship.getCannonsPerDeck(this.shipData.deckClassLimit, this.shipData.gunsPerDeck)
         const hullRepairsNeeded = Math.round(
-            (this._shipData.sides.armour * this._shipData.repairAmount.armour) / hullRepairsVolume
+            (this.shipData.sides.armour * this.shipData.repairAmount!.armour) / hullRepairsVolume
         )
         const rigRepairsNeeded = Math.round(
-            (this._shipData.sails.armour * this._shipData.repairAmount.sails) / rigRepairsVolume
+            (this.shipData.sails.armour * this.shipData.repairAmount!.sails) / rigRepairsVolume
         )
-        const rumRepairsNeeded = Math.round(this._shipData.crew.max * rumRepairsFactor)
+        const rumRepairsNeeded = Math.round(this.shipData.crew.max * rumRepairsFactor)
 
         const ship = {
-            shipRating: `${getOrdinal(this._shipData.class)} rate`,
-            battleRating: this._shipData.battleRating,
-            guns: this._shipData.guns,
-            decks: `${this._shipData.decks} deck${this._shipData.decks > 1 ? "s" : ""}`,
-            additionalRow: `${this._shipData.decks < 4 ? "<br>\u00A0" : ""}`,
-            cannonsPerDeck,
-            cannonBroadside: formatIntTrunc(this._shipData.broadside.cannons),
-            carroBroadside: formatIntTrunc(this._shipData.broadside.carronades),
-            gunsFront: this._shipData.gunsPerDeck[4],
-            limitFront: this._shipData.deckClassLimit[4],
-            gunsBack: this._shipData.gunsPerDeck[5],
-            limitBack: this._shipData.deckClassLimit[5],
-            firezoneHorizontalWidth: this._shipData.ship.firezoneHorizontalWidth,
-            waterlineHeight: formatFloat(this._shipData.ship.waterlineHeight),
-            maxSpeed: formatFloat(this._shipData.speed.max, 4),
-            acceleration: formatFloat(this._shipData.ship.acceleration),
-            deceleration: formatFloat(this._shipData.ship.deceleration),
-            maxTurningSpeed: formatFloat(this._shipData.rudder.turnSpeed, 4),
-            halfturnTime: formatFloat(this._shipData.rudder.halfturnTime, 4),
-            sideArmor: `${formatIntTrunc(
-                this._shipData.sides.armour
-            )}\u00A0<span class="badge badge-white">${formatIntTrunc(this._shipData.sides.thickness)}</span>`,
-            frontArmor: `${formatIntTrunc(
-                this._shipData.bow.armour
-            )}\u00A0<span class="badge badge-white">${formatIntTrunc(this._shipData.bow.thickness)}</span>`,
-            pump: formatIntTrunc(this._shipData.pump.armour),
-            sails: formatIntTrunc(this._shipData.sails.armour),
-            structure: formatIntTrunc(this._shipData.structure.armour),
+            acceleration: formatFloat(this.shipData.ship.acceleration),
+            additionalRow: `${this.shipData.decks < 4 ? "<br>\u00A0" : ""}`,
             backArmor: `${formatIntTrunc(
-                this._shipData.stern.armour
-            )}\u00A0<span class="badge badge-white">${formatIntTrunc(this._shipData.stern.thickness)}</span>`,
-            rudder: `${formatIntTrunc(
-                this._shipData.rudder.armour
-            )}\u00A0<span class="badge badge-white">${formatIntTrunc(this._shipData.rudder.thickness)}</span>`,
-            minCrew: formatIntTrunc(this._shipData.crew.min),
-            maxCrew: formatIntTrunc(this._shipData.crew.max),
-            sailingCrew: formatIntTrunc(this._shipData.crew.sailing ?? 0),
-            maxWeight: formatIntTrunc(this._shipData.maxWeight),
-            holdSize: formatIntTrunc(this._shipData.holdSize),
-            upgradeXP: formatIntTrunc(this._shipData.upgradeXP),
-            sternRepair: `${formatIntTrunc(this._shipData.repairTime.stern)}`,
-            bowRepair: `${formatIntTrunc(this._shipData.repairTime.bow)}`,
+                this.shipData.stern.armour
+            )}\u00A0<span class="badge badge-white">${formatIntTrunc(this.shipData.stern.thickness)}</span>`,
+            battleRating: String(this.shipData.battleRating),
+            bowRepair: `${formatIntTrunc(this.shipData.repairTime.bow)}`,
+            cannonBroadside: formatIntTrunc(this.shipData.broadside.cannons),
+            cannonsPerDeck,
+            carroBroadside: formatIntTrunc(this.shipData.broadside.carronades),
+            deceleration: formatFloat(this.shipData.ship.deceleration),
+            decks: `${this.shipData.decks} deck${this.shipData.decks > 1 ? "s" : ""}`,
+            fireResistance: formatPercent(this.shipData.resistance!.fire, 0),
+            firezoneHorizontalWidth: String(this.shipData.ship.firezoneHorizontalWidth),
+            frontArmor: `${formatIntTrunc(
+                this.shipData.bow.armour
+            )}\u00A0<span class="badge badge-white">${formatIntTrunc(this.shipData.bow.thickness)}</span>`,
+            guns: String(this.shipData.guns),
+            gunsBack: this.shipData.gunsPerDeck[5],
+            gunsFront: this.shipData.gunsPerDeck[4],
+            halfturnTime: formatFloat(this.shipData.rudder.halfturnTime, 4),
+            holdSize: formatIntTrunc(this.shipData.holdSize),
             hullRepairAmount: `${formatIntTrunc(
-                (this._shipData.repairAmount.armour + this._shipData.repairAmount.armourPerk) * 100
+                (this.shipData.repairAmount!.armour + this.shipData.repairAmount!.armourPerk) * 100
             )}`,
-            rigRepairAmount: `${formatIntTrunc(
-                (this._shipData.repairAmount.sails + this._shipData.repairAmount.sailsPerk) * 100
-            )}`,
-            repairTime: `${formatIntTrunc(this._shipData.repairTime.sides)}`,
             hullRepairsNeeded: `${formatIntTrunc(
                 hullRepairsNeeded
             )}\u00A0<span class="badge badge-white">${formatIntTrunc(hullRepairsNeeded * repairsSetSize)}</span>`,
+            leakResistance: formatPercent(this.shipData.resistance!.leaks, 0),
+            limitBack: this.shipData.deckClassLimit[5],
+            limitFront: this.shipData.deckClassLimit[4],
+            mastBottomArmor: `${formatIntTrunc(
+                this.shipData.mast.bottomArmour
+            )}\u00A0<span class="badge badge-white">${formatIntTrunc(this.shipData.mast.bottomThickness)}</span>`,
+            mastMiddleArmor: `${formatIntTrunc(
+                this.shipData.mast.middleArmour
+            )}\u00A0<span class="badge badge-white">${formatIntTrunc(this.shipData.mast.middleThickness)}</span>`,
+            mastTopArmor: `${formatIntTrunc(
+                this.shipData.mast.topArmour
+            )}\u00A0<span class="badge badge-white">${formatIntTrunc(this.shipData.mast.topThickness)}</span>`,
+            maxCrew: formatIntTrunc(this.shipData.crew.max),
+            maxSpeed: formatFloat(this.shipData.speed.max, 4),
+            maxTurningSpeed: formatFloat(this.shipData.rudder.turnSpeed, 4),
+            maxWeight: formatIntTrunc(this.shipData.maxWeight),
+            minCrew: formatIntTrunc(this.shipData.crew.min),
+            pump: formatIntTrunc(this.shipData.pump.armour),
+            repairTime: `${formatIntTrunc(this.shipData.repairTime.sides)}`,
+            rigRepairAmount: `${formatIntTrunc(
+                (this.shipData.repairAmount!.sails + this.shipData.repairAmount!.sailsPerk) * 100
+            )}`,
             rigRepairsNeeded: `${formatIntTrunc(
                 rigRepairsNeeded
             )}\u00A0<span class="badge badge-white">${formatIntTrunc(rigRepairsNeeded * repairsSetSize)}</span>`,
+            rudder: `${formatIntTrunc(
+                this.shipData.rudder.armour
+            )}\u00A0<span class="badge badge-white">${formatIntTrunc(this.shipData.rudder.thickness)}</span>`,
             rumRepairsNeeded: `${formatIntTrunc(
                 rumRepairsNeeded
             )}\u00A0<span class="badge badge-white">${formatIntTrunc(rumRepairsNeeded * repairsSetSize)}</span>`,
-            fireResistance: formatPercent(this._shipData.resistance.fire, 0),
-            leakResistance: formatPercent(this._shipData.resistance.leaks, 0),
-            splinterResistance: formatPercent(this._shipData.resistance.splinter, 0),
-            mastBottomArmor: `${formatIntTrunc(
-                this._shipData.mast.bottomArmour
-            )}\u00A0<span class="badge badge-white">${formatIntTrunc(this._shipData.mast.bottomThickness)}</span>`,
-            mastMiddleArmor: `${formatIntTrunc(
-                this._shipData.mast.middleArmour
-            )}\u00A0<span class="badge badge-white">${formatIntTrunc(this._shipData.mast.middleThickness)}</span>`,
-            mastTopArmor: `${formatIntTrunc(
-                this._shipData.mast.topArmour
-            )}\u00A0<span class="badge badge-white">${formatIntTrunc(this._shipData.mast.topThickness)}</span>`,
+            sailingCrew: formatIntTrunc(this.shipData.crew.sailing ?? 0),
+            sails: formatIntTrunc(this.shipData.sails.armour),
+            shipRating: `${getOrdinal(this.shipData.class)} rate`,
+            sideArmor: `${formatIntTrunc(
+                this.shipData.sides.armour
+            )}\u00A0<span class="badge badge-white">${formatIntTrunc(this.shipData.sides.thickness)}</span>`,
+            splinterResistance: formatPercent(this.shipData.resistance!.splinter, 0),
+            sternRepair: `${formatIntTrunc(this.shipData.repairTime.stern)}`,
+            structure: formatIntTrunc(this.shipData.structure.armour),
+            upgradeXP: formatIntTrunc(this.shipData.upgradeXP),
+            waterlineHeight: formatFloat(this.shipData.ship.waterlineHeight),
         } as ShipDisplayData
 
         if (ship.gunsFront) {

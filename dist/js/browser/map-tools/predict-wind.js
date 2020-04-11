@@ -18,10 +18,10 @@ import "round-slider/src/roundslider.css";
 import "../../../scss/roundslider.scss";
 import "tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4";
 import "tempusdominus-core/build/js/tempusdominus-core";
-import { degreesToRadians, displayCompass, displayCompassAndDegrees, getUserWind, printCompassRose } from "../util";
 import { registerEvent } from "../analytics";
-import { degreesPerSecond, insertBaseModal } from "../node/common";
-import { compassDirections, compassToDegrees, degreesToCompass } from "../node/common-math";
+import { degreesPerSecond, insertBaseModal } from "../../common/common-browser";
+import { compassDirections, compassToDegrees, degreesToCompass, degreesToRadians } from "../../common/common-math";
+import { displayCompass, displayCompassAndDegrees, getUserWind, printCompassRose } from "../util";
 export default class PredictWind {
     constructor() {
         this._height = 300;
@@ -64,10 +64,11 @@ export default class PredictWind {
         this._windSelected();
     }
     _setupListener() {
-        document.getElementById(`${this._buttonId}`).addEventListener("click", event => this._navbarClick(event));
+        var _a;
+        (_a = document.querySelector(`${this._buttonId}`)) === null || _a === void 0 ? void 0 : _a.addEventListener("click", (event) => this._navbarClick(event));
     }
     _setupWindInput() {
-        const { _getTooltipPos } = $.fn.roundSlider.prototype;
+        const _getTooltipPos = $.fn.roundSlider.prototype._getTooltipPos;
         $.fn.roundSlider.prototype._getTooltipPos = function () {
             if (!this.tooltip.is(":visible")) {
                 $("body").append(this.tooltip);
@@ -76,7 +77,7 @@ export default class PredictWind {
             this.container.append(this.tooltip);
             return pos;
         };
-        window.tooltip = args => `${displayCompass(args.value)}<br>${args.value}°`;
+        window.tooltip = (arguments_) => `${displayCompass(arguments_.value)}<br>${String(arguments_.value)}°`;
         $(`#${this._sliderId}`).roundSlider({
             sliderType: "default",
             handleSize: "+1",
@@ -91,32 +92,20 @@ export default class PredictWind {
             create() {
                 this.control.css("display", "block");
             },
-            change() {
-                this._currentWind = $(`#${this._sliderId}`).roundSlider("getValue");
-            }
         });
     }
     _injectModal() {
         moment.locale("en-gb");
-        insertBaseModal(this._modalId, this._baseName, "sm");
+        insertBaseModal({ id: this._modalId, title: this._baseName, size: "sm" });
         const body = d3Select(`#${this._modalId} .modal-body`);
         const form = body.append("form").attr("id", this._formId);
         const formGroupA = form.append("div").attr("class", "form-group");
         const slider = formGroupA.append("div").classed("alert alert-primary", true);
-        slider
-            .append("label")
-            .attr("for", this._sliderId)
-            .text("Current in-game wind");
-        slider
-            .append("div")
-            .attr("id", this._sliderId)
-            .attr("class", "rslider");
+        slider.append("label").attr("for", this._sliderId).text("Current in-game wind");
+        slider.append("div").attr("id", this._sliderId).attr("class", "rslider");
         const formGroupB = form.append("div").attr("class", "form-group");
         const block = formGroupB.append("div").attr("class", "alert alert-primary");
-        block
-            .append("label")
-            .attr("for", this._timeInputId)
-            .text("Predict time (server time)");
+        block.append("label").attr("for", this._timeInputId).text("Predict time (server time)");
         const inputGroup = block
             .append("div")
             .classed("input-group date", true)
@@ -141,7 +130,7 @@ export default class PredictWind {
             .attr("class", "icon icon-clock");
         $(`#${this._timeGroupId}`).datetimepicker({
             defaultDate: moment.utc(),
-            format: "LT"
+            format: "LT",
         });
     }
     _initModal() {
@@ -149,7 +138,7 @@ export default class PredictWind {
         this._setupWindInput();
     }
     _windSelected() {
-        if (!document.getElementById(this._modalId)) {
+        if (!document.querySelector(this._modalId)) {
             this._initModal();
         }
         $(`#${this._modalId}`)
@@ -160,9 +149,7 @@ export default class PredictWind {
     }
     _useUserInput() {
         const currentWind = getUserWind(this._sliderId);
-        const time = $(`#${this._timeInputId}`)
-            .val()
-            .trim();
+        const time = $(`#${this._timeInputId}`).val().trim();
         this._predictWind(currentWind, time);
     }
     _predictWind(currentUserWind, predictUserTime) {
@@ -171,21 +158,16 @@ export default class PredictWind {
         let currentWindDegrees;
         const regex = /(\d+)[\s.:](\d+)/;
         const match = regex.exec(predictUserTime);
-        const predictHours = parseInt(match[1], 10);
-        const predictMinutes = parseInt(match[2], 10);
+        const predictHours = Number.parseInt(match[1], 10);
+        const predictMinutes = Number.parseInt(match[2], 10);
         if (Number.isNaN(Number(currentUserWind))) {
-            currentWindDegrees = compassToDegrees(currentUserWind);
+            currentWindDegrees = compassToDegrees(String(currentUserWind));
         }
         else {
             currentWindDegrees = Number(currentUserWind);
         }
-        const currentTime = moment()
-            .utc()
-            .seconds(0)
-            .milliseconds(0);
-        const predictTime = moment(currentTime)
-            .hour(predictHours)
-            .minutes(predictMinutes);
+        const currentTime = moment().utc().seconds(0).milliseconds(0);
+        const predictTime = moment(currentTime).hour(predictHours).minutes(predictMinutes);
         if (predictTime.isBefore(currentTime)) {
             predictTime.add(1, "day");
         }
@@ -204,24 +186,17 @@ export default class PredictWind {
         const dy = length * Math.sin(radians);
         const lineData = [
             [Math.round(xCompass + dx), Math.round(yCompass + dy)],
-            [Math.round(xCompass - dx), Math.round(yCompass - dy)]
+            [Math.round(xCompass - dx), Math.round(yCompass - dy)],
         ];
         this._svg.attr("height", this._height).attr("width", this._width);
-        const compassElem = this._svg
-            .append("svg")
-            .attr("class", "compass")
-            .attr("x", xCompass)
-            .attr("y", yCompass);
+        const compassElem = this._svg.append("svg").attr("class", "compass").attr("x", xCompass).attr("y", yCompass);
         printCompassRose({ element: compassElem, radius });
-        this._svg
-            .append("path")
-            .datum(lineData)
-            .attr("d", line)
-            .attr("marker-end", "url(#wind-arrow)");
+        this._svg.append("path").datum(lineData).attr("d", line).attr("marker-end", "url(#wind-arrow)");
     }
     _printText(predictedWindDegrees, predictTime, currentWind, currentTime) {
+        var _a, _b;
         const compass = degreesToCompass(predictedWindDegrees);
-        const lineHeight = parseInt(window.getComputedStyle(document.getElementById("wind")).getPropertyValue("line-height"), 10);
+        const lineHeight = Number.parseInt(window.getComputedStyle(document.querySelector("#wind")).getPropertyValue("line-height"), 10);
         const textSvg = this._svg.append("svg");
         const text1 = textSvg
             .append("text")
@@ -234,10 +209,10 @@ export default class PredictWind {
             .attr("y", "66%")
             .attr("class", "text-light-separation")
             .html(`Currently at ${currentTime} from ${displayCompassAndDegrees(currentWind, true)}`);
-        const bbox1 = text1.node().getBoundingClientRect();
-        const bbox2 = text2.node().getBoundingClientRect();
-        const textHeight = Math.max(bbox1.height, bbox2.height) * 2 + lineHeight;
-        const textWidth = Math.max(bbox1.width, bbox2.width) + lineHeight;
+        const bbox1 = (_a = text1.node()) === null || _a === void 0 ? void 0 : _a.getBoundingClientRect();
+        const bbox2 = (_b = text2.node()) === null || _b === void 0 ? void 0 : _b.getBoundingClientRect();
+        const textHeight = Math.max(Number(bbox1 === null || bbox1 === void 0 ? void 0 : bbox1.height), Number(bbox2 === null || bbox2 === void 0 ? void 0 : bbox2.height)) * 2 + lineHeight;
+        const textWidth = Math.max(Number(bbox1 === null || bbox1 === void 0 ? void 0 : bbox1.width), Number(bbox2 === null || bbox2 === void 0 ? void 0 : bbox2.width)) + lineHeight;
         textSvg
             .attr("x", (this._width - textWidth) / 2)
             .attr("y", "72%")
