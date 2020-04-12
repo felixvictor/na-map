@@ -143,7 +143,6 @@
         "cross-env": "^7.0.2",
         "css": "^2.2.4",
         "css-loader": "^3.5.1",
-        "d3-node": "^2.2.1",
         "denque": "^1.4.1",
         "diff2html-cli": "^5.0.4",
         "eslint": "^6.8.0",
