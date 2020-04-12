@@ -33,17 +33,18 @@ const descriptionLong =
     "Yet another map with in-game map, resources, ship and wood comparisons. Port battle data is updated constantly from twitter and all data daily after maintenance."
 const sitemapPaths = ["/fonts/", "/icons", "/images"]
 
+const dirOutput = path.resolve(__dirname, "public")
 const dirSrc = path.resolve(__dirname, "src")
-const dirFlags = path.resolve(dirSrc, "images/flags")
-const dirMap = path.resolve(dirSrc, "images/map")
-const dirFonts = path.resolve(dirSrc, "fonts/")
+const dirFlags = path.resolve(dirSrc, "images", "flags")
+const dirMap = path.resolve(dirSrc, "images", "map")
+const dirFonts = path.resolve(dirSrc, "fonts")
 const dirIcons = path.resolve(dirSrc, "icons")
 const dirJsSrc = path.resolve(dirSrc, "js")
 const dirScssSrc = path.resolve(dirSrc, "scss")
-const dirOutput = path.resolve(dirSrc, "public")
 const dirPrefixIcons = path.join("images", "icons")
 
 const fileLogo = path.resolve(dirSrc, "images", "icons", "logo.png")
+const filePostcssConfig = path.resolve(dirSrc, "postcss.config.js")
 const fileScssPreCompile = path.resolve(dirSrc, "scss", "pre-compile.scss")
 
 /** Set colours
@@ -136,12 +137,10 @@ const htmlMinifyOpt = {
     useShortDoctype: true,
 }
 
-const postcssCleanOpt = {
-    level: { 1: { specialComments: 0 }, 2: {} },
-}
-
 const postcssOpt = {
-    plugins: [require("autoprefixer"), isProduction ? require("postcss-clean")({ postcssCleanOpt }) : {}],
+    config: {
+        path: filePostcssConfig,
+    },
     sourceMap: true,
 }
 
@@ -259,7 +258,7 @@ const config = {
 
     devtool: false,
 
-    entry: [path.resolve(dirJsSrc, "browser/main.ts"), path.resolve(__dirname, PACKAGE.sass)],
+    entry: [path.resolve(dirJsSrc, "browser/main.ts")],
 
     externals: {
         jquery: "jQuery",

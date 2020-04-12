@@ -368,10 +368,10 @@ export default class ShowTrades {
          * Data directory
          */
         const dataDirectory = "data"
-        const fileName = "~Lib/gen-generic/ports.json"
 
         try {
-            const portData = (await import(/* webpackChunkName: "data-ports" */ fileName)).default as PortBasic[]
+            const portData = (await import(/* webpackChunkName: "data-ports" */ "Lib/gen-generic/ports.json"))
+                .default as PortBasic[]
             const pbData = (await (
                 await fetch(`${dataDirectory}/${this._serverName}-pb.json`)
             ).json()) as PortBattlePerServer[]
