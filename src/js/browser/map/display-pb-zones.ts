@@ -14,11 +14,11 @@ import * as d3Zoom from "d3-zoom"
 
 import { putImportError } from "../../common/common"
 import { Bound } from "../../common/common-browser"
-import { PbZone, PbZoneBasic, PbZoneDefence, PbZoneRaid } from "../../common/gen-json"
+import { PbZone, PbZoneBasic, PbZoneDefence, PbZoneRaid, PortBasic } from "../../common/gen-json"
 import { SVGGDatum, SVGSVGDatum } from "../../common/interface"
 import { drawSvgCircle, drawSvgRect } from "../util"
-import Cookie from "../util/cookie"
 
+import Cookie from "../util/cookie"
 import RadioButton from "../util/radio-button"
 import DisplayPorts from "./display-ports"
 
@@ -74,9 +74,10 @@ export default class DisplayPbZones {
     }
 
     async _loadData(): Promise<void> {
-        const fileName = "~Lib/gen-generic/pb-zones.json"
         try {
-            this._pbZonesDefault = (await import(/* webpackChunkName: "data-pb-zones" */ fileName)).default as PbZone[]
+            this._pbZonesDefault = (
+                await import(/* webpackChunkName: "data-pb-zones" */ "Lib/gen-generic/pb-zones.json")
+            ).default as PbZone[]
         } catch (error) {
             putImportError(error)
         }
