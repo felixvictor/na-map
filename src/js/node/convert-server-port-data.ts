@@ -9,9 +9,10 @@
  */
 
 import * as path from "path"
-
-import { rollup as d3Rollup } from "d3-array"
 import dayjs from "dayjs"
+
+import d3Array from "d3-array"
+const { rollup: d3Rollup } = d3Array
 
 import { findNationById, nations } from "../common/common"
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
@@ -267,7 +268,6 @@ const setAndSaveFrontlines = async (serverName: string): Promise<void> => {
                 frontlinesFrom,
                 (values) =>
                     values.map(
-                        // @ts-ignore
                         (value) =>
                             ({
                                 id: value.toPortId,
