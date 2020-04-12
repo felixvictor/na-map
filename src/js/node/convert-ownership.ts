@@ -12,7 +12,11 @@ import * as fs from "fs"
 import { Stats } from "fs"
 import * as path from "path"
 
-import d3Node from "d3-node"
+import d3Collection from "d3-collection"
+import d3Array from "d3-array"
+const { nest: d3Nest } = d3Collection
+const { ascending: d3Ascending } = d3Array
+
 import { default as lzma } from "lzma-native"
 import { default as readDirRecursive } from "recursive-readdir"
 
@@ -26,9 +30,6 @@ import { APIPort } from "./api-port"
 import { NationList, Ownership, OwnershipGroup, OwnershipLabel, OwnershipNation } from "../common/gen-json"
 
 const fileExtension = ".json.xz"
-
-const d3n = d3Node()
-const { d3 } = d3n
 
 interface Port {
     name: string
@@ -261,12 +262,11 @@ function convertOwnership(): void {
         })
 
         // Nest by region and county
-        const nested = d3
-            .nest()
-            .key((d: Port) => d.region)
-            .sortKeys(d3.ascending)
-            .key((d: Port) => d.county)
-            .sortKeys(d3.ascending)
+        const nested = d3Nest<Port>()
+            .key((d) => d.region)
+            .sortKeys(d3Ascending)
+            .key((d) => d.county)
+            .sortKeys(d3Ascending)
             .entries(portsArray) as RegionNested[]
 
         // Convert to data structure needed for timelines-chart
