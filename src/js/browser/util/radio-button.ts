@@ -29,7 +29,7 @@ export default class RadioButton {
      * Set radio button
      */
     set(id: string): void {
-        ;(document.querySelector(`${this.#name}-${id}`) as HTMLInputElement).checked = true
+        ;(document.querySelector(`#${this.#name}-${id}`) as HTMLInputElement).checked = true
     }
 
     /**
