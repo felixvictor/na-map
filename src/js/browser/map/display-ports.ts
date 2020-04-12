@@ -339,9 +339,9 @@ export default class DisplayPorts {
             }
         }
 
-        const fileName = "~Lib/gen-generic/ports.json"
         try {
-            readData.ports = (await import(/* webpackChunkName: "data-ports" */ fileName)).default
+            readData.ports = (await import(/* webpackChunkName: "data-ports" */ "Lib/gen-generic/ports.json"))
+                .default as PortBasic[]
             await loadEntries(dataSources)
         } catch (error) {
             putImportError(error)
