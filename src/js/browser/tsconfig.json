@@ -3,7 +3,7 @@
 {
     "extends": "../tsconfig.json",
     "compilerOptions": {
-        "noEmit": true /* Do not emit outputs. */
+        //"noEmit": true /* Do not emit outputs. */
         // "outFile": "./",                       /* Concatenate and emit output to single file. */
         //"outDir": "../../../dist/js/node" /* Redirect output structure to the directory. */,
         //"rootDir": "../" /* Specify the root directory of input files. Use to control the output directory structure with --outDir. */
