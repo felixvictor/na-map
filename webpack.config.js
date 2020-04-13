@@ -2,6 +2,31 @@
  * webpack.config
  */
 
+/*
+import path from "path"
+import webpack from "webpack"
+import process from "process"
+import sass from "node-sass"
+import { css as parseCss } from "css"
+// import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer"
+import { CleanWebpackPlugin } from "clean-webpack-plugin"
+import CopyPlugin from "copy-webpack-plugin"
+import FaviconsPlugin from "favicons-webpack-plugin"
+import ForkTsCheckerWebpackPlugin from "fork-ts-checker-webpack-plugin"
+import HtmlPlugin from "html-webpack-plugin"
+import ExtractCssChunks from "extract-css-chunks-webpack-plugin"
+import { default as SitemapPlugin } from "sitemap-webpack-plugin"
+import SriPlugin from "webpack-subresource-integrity"
+import TerserPlugin from "terser-webpack-plugin"
+
+import Servers from "./dist/js/common/servers"
+const { servers } = Servers
+import PACKAGE from "./package.json"
+import repairs from "./lib/gen-generic/repairs.json"
+import WebpackMode from "webpack-mode"
+const { isProduction } = WebpackMode
+ */
+
 const path = require("path")
 const webpack = require("webpack")
 
@@ -47,9 +72,6 @@ const fileLogo = path.resolve(dirSrc, "images", "icons", "logo.png")
 const filePostcssConfig = path.resolve(dirSrc, "postcss.config.js")
 const fileScssPreCompile = path.resolve(dirSrc, "scss", "pre-compile.scss")
 
-/** Set colours
- * @returns Colours
- */
 const setColours = () => {
     const compiledCss = sass
         .renderSync({
@@ -502,18 +524,34 @@ if (isQuiet) {
 }
 
 if (isProduction) {
-    config.optimization.minimizer = [
-        new TerserPlugin({
-            cache: true,
-            parallel: true,
-            terserOptions: {
-                output: { comments: false },
-            },
-        }),
-    ]
+    config.optimization = {
+        minimize: true,
+        minimizer: [
+            new TerserPlugin({
+                cache: true, // does not work with webpack 5
+                parallel: true,
+                /*
+                terserOptions: {
+                    ecma: 2020,
+                    module: true,
+                    mangle: {
+                        properties: true,
+                    },
+                    // compress: { passes: 3 },
+                    output: {
+                        beautify: false,
+                    },
+                    toplevel: true,
+                },
+
+                 */
+            }),
+        ],
+    }
 } else {
     config.devtool = "eval-source-map"
     config.plugins.push(new webpack.HotModuleReplacementPlugin())
 }
 
+// export default config
 module.exports = () => config
