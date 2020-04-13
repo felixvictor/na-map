@@ -283,9 +283,9 @@ export default class CompareWoods {
         this._columns.unshift("Base");
     }
     async _loadAndSetupData() {
-        const woodFileName = "~Lib/gen-generic/woods.json";
         try {
-            this._woodData = (await import(woodFileName)).default;
+            this._woodData = (await import("Lib/gen-generic/woods.json"))
+                .default;
             this._setupData();
         }
         catch (error) {
@@ -295,7 +295,7 @@ export default class CompareWoods {
     _setupListener() {
         var _a;
         let firstClick = true;
-        (_a = document.querySelector(this._buttonId)) === null || _a === void 0 ? void 0 : _a.addEventListener("click", async (event) => {
+        (_a = document.querySelector(`#${this._buttonId}`)) === null || _a === void 0 ? void 0 : _a.addEventListener("click", async (event) => {
             if (firstClick) {
                 firstClick = false;
                 await this._loadAndSetupData();
@@ -306,7 +306,7 @@ export default class CompareWoods {
         });
     }
     _woodCompareSelected() {
-        if (!document.querySelector(this._modalId)) {
+        if (!document.querySelector(`#${this._modalId}`)) {
             this._initModal();
         }
         $(`#${this._modalId}`).modal("show");

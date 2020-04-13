@@ -27,21 +27,21 @@ export default class SelectPorts {
         this._dateFormat = "D MMM";
         this._timeFormat = "HH.00";
         this._frontlineAttackingNationId = "frontlines-attacking-nation-select";
-        this._frontlineAttackingNationSelector = document.querySelector(this._frontlineAttackingNationId);
+        this._frontlineAttackingNationSelector = document.querySelector(`#${this._frontlineAttackingNationId}`);
         this._frontlineDefendingNationId = "frontlines-defending-nation-select";
-        this._frontlineDefendingNationSelector = document.querySelector(this._frontlineDefendingNationId);
+        this._frontlineDefendingNationSelector = document.querySelector(`#${this._frontlineDefendingNationId}`);
         this._portNamesId = "port-names-select";
-        this._portNamesSelector = document.querySelector(this._portNamesId);
+        this._portNamesSelector = document.querySelector(`#${this._portNamesId}`);
         this._buyGoodsId = "buy-goods-select";
-        this._buyGoodsSelector = document.querySelector(this._buyGoodsId);
+        this._buyGoodsSelector = document.querySelector(`#${this._buyGoodsId}`);
         this._inventoryId = "inventory-select";
-        this._inventorySelector = document.querySelector(this._inventoryId);
+        this._inventorySelector = document.querySelector(`#${this._inventoryId}`);
         this._propNationId = "prop-nation-select";
-        this._propNationSelector = document.querySelector(this._propNationId);
+        this._propNationSelector = document.querySelector(`#${this._propNationId}`);
         this._propClanId = "prop-clan-select";
-        this._propClanSelector = document.querySelector(this._propClanId);
+        this._propClanSelector = document.querySelector(`#${this._propClanId}`);
         this._propCMId = "prop-cm-select";
-        this._propCMSelector = document.querySelector(this._propCMId);
+        this._propCMSelector = document.querySelector(`#${this._propCMId}`);
         this.isInventorySelected = false;
         this._setupSelects();
         this._setupListener();
@@ -140,13 +140,13 @@ export default class SelectPorts {
             this._CMSelected();
             event.preventDefault();
         });
-        (_a = document.querySelector("menu-prop-deep")) === null || _a === void 0 ? void 0 : _a.addEventListener("click", () => this._depthSelected("deep"));
-        (_b = document.querySelector("menu-prop-shallow")) === null || _b === void 0 ? void 0 : _b.addEventListener("click", () => this._depthSelected("shallow"));
-        (_c = document.querySelector("menu-prop-all")) === null || _c === void 0 ? void 0 : _c.addEventListener("click", () => this._allSelected());
-        (_d = document.querySelector("menu-prop-non-capturable")) === null || _d === void 0 ? void 0 : _d.addEventListener("click", () => this._nonCapSelected());
-        (_e = document.querySelector("menu-prop-large")) === null || _e === void 0 ? void 0 : _e.addEventListener("click", () => this._portSizeSelected("Large"));
-        (_f = document.querySelector("menu-prop-medium")) === null || _f === void 0 ? void 0 : _f.addEventListener("click", () => this._portSizeSelected("Medium"));
-        (_g = document.querySelector("menu-prop-small")) === null || _g === void 0 ? void 0 : _g.addEventListener("click", () => this._portSizeSelected("Small"));
+        (_a = document.querySelector("#menu-prop-deep")) === null || _a === void 0 ? void 0 : _a.addEventListener("click", () => this._depthSelected("deep"));
+        (_b = document.querySelector("#menu-prop-shallow")) === null || _b === void 0 ? void 0 : _b.addEventListener("click", () => this._depthSelected("shallow"));
+        (_c = document.querySelector("#menu-prop-all")) === null || _c === void 0 ? void 0 : _c.addEventListener("click", () => this._allSelected());
+        (_d = document.querySelector("#menu-prop-non-capturable")) === null || _d === void 0 ? void 0 : _d.addEventListener("click", () => this._nonCapSelected());
+        (_e = document.querySelector("#menu-prop-large")) === null || _e === void 0 ? void 0 : _e.addEventListener("click", () => this._portSizeSelected("Large"));
+        (_f = document.querySelector("#menu-prop-medium")) === null || _f === void 0 ? void 0 : _f.addEventListener("click", () => this._portSizeSelected("Medium"));
+        (_g = document.querySelector("#menu-prop-small")) === null || _g === void 0 ? void 0 : _g.addEventListener("click", () => this._portSizeSelected("Small"));
         $.fn.datetimepicker.Constructor.Default = $.extend({}, $.fn.datetimepicker.Constructor.Default, {
             icons: {
                 time: "icon icon-clock",
@@ -170,10 +170,10 @@ export default class SelectPorts {
             this._capturePBRange();
             event.preventDefault();
         });
-        (_j = document.querySelector("menu-prop-today")) === null || _j === void 0 ? void 0 : _j.addEventListener("click", () => this._capturedToday());
-        (_k = document.querySelector("menu-prop-yesterday")) === null || _k === void 0 ? void 0 : _k.addEventListener("click", () => this._capturedYesterday());
-        (_l = document.querySelector("menu-prop-this-week")) === null || _l === void 0 ? void 0 : _l.addEventListener("click", () => this._capturedThisWeek());
-        (_m = document.querySelector("menu-prop-last-week")) === null || _m === void 0 ? void 0 : _m.addEventListener("click", () => this._capturedLastWeek());
+        (_j = document.querySelector("#menu-prop-today")) === null || _j === void 0 ? void 0 : _j.addEventListener("click", () => this._capturedToday());
+        (_k = document.querySelector("#menu-prop-yesterday")) === null || _k === void 0 ? void 0 : _k.addEventListener("click", () => this._capturedYesterday());
+        (_l = document.querySelector("#menu-prop-this-week")) === null || _l === void 0 ? void 0 : _l.addEventListener("click", () => this._capturedThisWeek());
+        (_m = document.querySelector("#menu-prop-last-week")) === null || _m === void 0 ? void 0 : _m.addEventListener("click", () => this._capturedLastWeek());
         const portFrom = $("#prop-from");
         const portTo = $("#prop-to");
         portFrom.datetimepicker({
@@ -360,9 +360,7 @@ export default class SelectPorts {
             const tradePortConsumedGoods = tradePort.consumesTrading
                 ? tradePort.consumesTrading.map((good) => good)
                 : [];
-            const tradePortProducedGoods = tradePort.dropsTrading
-                ? tradePort.dropsTrading.map((good) => good)
-                : [];
+            const tradePortProducedGoods = tradePort.dropsTrading ? tradePort.dropsTrading.map((good) => good) : [];
             this._ports.portData = this._ports.portDataDefault
                 .map((port) => {
                 port.goodsToBuyInTradePort = port.consumesTrading
@@ -372,9 +370,7 @@ export default class SelectPorts {
                     : [];
                 port.buyInTradePort = Boolean(port.goodsToBuyInTradePort.length);
                 port.goodsToSellInTradePort = port.dropsTrading
-                    ? port.dropsTrading
-                        .filter((good) => tradePortConsumedGoods.includes(good))
-                        .map((good) => good)
+                    ? port.dropsTrading.filter((good) => tradePortConsumedGoods.includes(good)).map((good) => good)
                     : [];
                 port.sellInTradePort = Boolean(port.goodsToSellInTradePort.length);
                 return port;
@@ -559,8 +555,8 @@ export default class SelectPorts {
         const blackOutTimes = range(serverMaintenanceHour - 2, serverMaintenanceHour);
         const maxStartTime = 24 - (blackOutTimes.length + 1);
         const startTimes = new Set();
-        const begin = moment((_a = document.querySelector("prop-pb-from-input")) === null || _a === void 0 ? void 0 : _a.value, this._timeFormat).hour();
-        let end = moment((_b = document.querySelector("prop-pb-to-input")) === null || _b === void 0 ? void 0 : _b.value, this._timeFormat).hour();
+        const begin = moment((_a = document.querySelector("#prop-pb-from-input")) === null || _a === void 0 ? void 0 : _a.value, this._timeFormat).hour();
+        let end = moment((_b = document.querySelector("#prop-pb-to-input")) === null || _b === void 0 ? void 0 : _b.value, this._timeFormat).hour();
         if (!(blackOutTimes.includes(begin) && blackOutTimes.includes(end) && begin <= end)) {
             startTimes.add(0);
             if (end < begin) {

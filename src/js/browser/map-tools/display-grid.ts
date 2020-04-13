@@ -285,8 +285,8 @@ export default class DisplayGrid {
      * @param transform - Current transformation
      */
     transform(transform: d3Zoom.ZoomTransform): void {
-        this.#gXAxis.attr("transform", transform.toString)
-        this.#gYAxis.attr("transform", transform.toString)
+        this.#gXAxis.attr("transform", transform.toString())
+        this.#gYAxis.attr("transform", transform.toString())
         this._displayAxis()
     }
 }

@@ -8,8 +8,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-/// <reference types="bootstrap" />
-
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
 
@@ -65,17 +63,20 @@ class NAMap {
     private _doubleClickAction: string
     private _gMap!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, any>
     private _grid!: DisplayGrid
+    private _journey!: MakeJourney
     private _pbZone!: DisplayPbZones
     private _ports!: DisplayPorts
     private _portSelect!: SelectPorts
+    private _showGrid!: string
     private _svg!: d3Selection.Selection<SVGSVGElement, SVGSVGDatum, HTMLElement, any>
+    private _windPrediction!: PredictWind
+    private _windRose!: WindRose
     private _zoom!: d3Zoom.ZoomBehavior<SVGSVGElement, SVGSVGDatum>
     private _zoomLevel!: string
     private readonly _doubleClickActionCookie: Cookie
     private readonly _doubleClickActionId: string
     private readonly _doubleClickActionRadios: RadioButton
     private readonly _doubleClickActionValues: string[]
-    private readonly _journey!: MakeJourney
     private readonly _labelZoomThreshold: number
     private readonly _maxScale: number
     private readonly _PBZoneZoomThreshold: number
@@ -86,9 +87,6 @@ class NAMap {
     private readonly _showGridValues: string[]
     private readonly _tileSize: number
     private readonly _wheelDelta: number
-    private readonly _windPrediction!: PredictWind
-    private readonly _windRose!: WindRose
-    private _showGrid!: string
 
     /**
      * @param serverName - Naval action server name
@@ -235,22 +233,22 @@ class NAMap {
         await this._ports.init()
 
         this._pbZone = new DisplayPbZones(this._ports)
-        //  this._grid = new DisplayGrid(this)
+        this._grid = new DisplayGrid(this)
 
-        //   this._journey = new MakeJourney(this.rem)
-        //   this._windPrediction = new PredictWind()
-        //    this._windRose = new WindRose()
+        this._journey = new MakeJourney(this.rem)
+        this._windPrediction = new PredictWind()
+        this._windRose = new WindRose()
 
         this._portSelect = new SelectPorts(this._ports, this._pbZone, this)
-        const zoomTransform = this._getZoomTransform()
         this.showTrades = new ShowTrades(
             this.serverName,
             this._portSelect,
             this.minScale,
-            this._getLowerBound(zoomTransform),
-            this._getUpperBound(zoomTransform)
+            [this.coord.min, this.coord.min],
+            [this.width, this.height]
         )
         await this.showTrades.showOrHide()
+        this._init()
 
         /*
         Marks.forEach(mark => {
@@ -508,7 +506,6 @@ class NAMap {
      */
     _naZoomed(): void {
         const zoomTransform = this._getZoomTransform()
-
         /**
          * Top left coordinates of current viewport
          */
