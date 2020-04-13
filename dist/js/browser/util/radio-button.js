@@ -33,7 +33,7 @@ export default class RadioButton {
     }
     set(id) {
         ;
-        document.querySelector(`${__classPrivateFieldGet(this, _name)}-${id}`).checked = true;
+        document.querySelector(`#${__classPrivateFieldGet(this, _name)}-${id}`).checked = true;
     }
     get() {
         let { value } = document.querySelector(`input[name="${__classPrivateFieldGet(this, _name)}"]:checked`);
