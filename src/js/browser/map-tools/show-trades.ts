@@ -593,7 +593,6 @@ export default class ShowTrades {
                         this._getXCoord(d.source.id) < this._getXCoord(d.target.id) ? "url(#trade-arrow)" : ""
                     )
                     .attr("id", (d) => ShowTrades._getId(d))
-                    .attr("opacity", 0)
                     .on("click", (d, i, nodes) => this._showDetails(d, i, nodes))
                     .on("mouseleave", ShowTrades._hideDetails)
             )
@@ -613,9 +612,8 @@ export default class ShowTrades {
                     .attr("startOffset", "15%")
                     .attr("xlink:href", (d) => `#${ShowTrades._getId(d)}`)
                     .text((d) => `${formatInt(d.quantity)} ${d.good}`)
-                    .attr("opacity", 0)
             )
-            .attr("dy", (d) => `-${linkWidthScale(d.profit ? d.profit / 1.5 : 0)}px`)
+            .attr("dy", (d) => `-${linkWidthScale(d.profit ?? 0) / 1.5}px`)
     }
 
     get listType(): string {
@@ -785,7 +783,7 @@ export default class ShowTrades {
     }
 
     transform(transform: d3Zoom.ZoomTransform): void {
-        this._g.attr("transform", transform.toString)
+        this._g.attr("transform", transform.toString())
         this._scale = transform.k
         this.update()
     }
