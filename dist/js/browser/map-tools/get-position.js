@@ -97,7 +97,7 @@ export default class TrilateratePosition {
     }
     _setupListener() {
         var _a;
-        (_a = document.querySelector(`${this._buttonId}`)) === null || _a === void 0 ? void 0 : _a.addEventListener("click", (event) => this._navbarClick(event));
+        (_a = document.querySelector(`#${this._buttonId}`)) === null || _a === void 0 ? void 0 : _a.addEventListener("click", (event) => this._navbarClick(event));
     }
     _injectModal() {
         insertBaseModal({ id: this._modalId, title: this._baseName, size: "", buttonText: "Go" });
@@ -146,7 +146,7 @@ export default class TrilateratePosition {
             .map((port) => `<option data-subtext="${port.nation}">${port.name}</option>`)
             .join("")}`;
         for (const inputNumber of [...new Array(this._NumberOfInputs).keys()]) {
-            this._selector[inputNumber] = document.querySelector(this._select[inputNumber]);
+            this._selector[inputNumber] = document.querySelector(`#${this._select[inputNumber]}`);
             this._selector[inputNumber].insertAdjacentHTML("beforeend", options);
             $(this._selector[inputNumber]).selectpicker({
                 dropupAuto: false,
@@ -194,7 +194,7 @@ export default class TrilateratePosition {
             const port = this._selector[inputNumber].selectedIndex
                 ? this._selector[inputNumber].options[this._selector[inputNumber].selectedIndex].text
                 : "";
-            const distance = Number(document.querySelector(this._input[inputNumber]).value);
+            const distance = Number(document.querySelector(`#${this._input[inputNumber]}`).value);
             if (distance && port !== "") {
                 ports.set(port, distance * roundingFactor * circleRadiusFactor);
             }

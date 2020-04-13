@@ -176,8 +176,8 @@ export default class ShowTrades {
     }
     _setupListener() {
         var _a, _b;
-        (_a = document.querySelector(this._showId)) === null || _a === void 0 ? void 0 : _a.addEventListener("change", async () => this._showSelected());
-        (_b = document.querySelector(this._profitId)) === null || _b === void 0 ? void 0 : _b.addEventListener("change", () => this._profitValueSelected());
+        (_a = document.querySelector(`#${this._showId}`)) === null || _a === void 0 ? void 0 : _a.addEventListener("change", async () => this._showSelected());
+        (_b = document.querySelector(`#${this._profitId}`)) === null || _b === void 0 ? void 0 : _b.addEventListener("change", () => this._profitValueSelected());
         this._nationSelector.addEventListener("change", (event) => {
             this._nationChanged();
             event.preventDefault();
@@ -406,7 +406,6 @@ export default class ShowTrades {
             .attr("marker-start", (d) => this._getXCoord(d.source.id) < this._getXCoord(d.target.id) ? "" : "url(#trade-arrow)")
             .attr("marker-end", (d) => this._getXCoord(d.source.id) < this._getXCoord(d.target.id) ? "url(#trade-arrow)" : "")
             .attr("id", (d) => ShowTrades._getId(d))
-            .attr("opacity", 0)
             .on("click", (d, i, nodes) => this._showDetails(d, i, nodes))
             .on("mouseleave", ShowTrades._hideDetails))
             .attr("d", (d) => arcPath(this._getXCoord(d.source.id) < this._getXCoord(d.target.id), d))
@@ -421,9 +420,8 @@ export default class ShowTrades {
             .append("textPath")
             .attr("startOffset", "15%")
             .attr("xlink:href", (d) => `#${ShowTrades._getId(d)}`)
-            .text((d) => `${formatInt(d.quantity)} ${d.good}`)
-            .attr("opacity", 0))
-            .attr("dy", (d) => `-${linkWidthScale(d.profit ? d.profit / 1.5 : 0)}px`);
+            .text((d) => `${formatInt(d.quantity)} ${d.good}`))
+            .attr("dy", (d) => { var _a; return `-${linkWidthScale((_a = d.profit) !== null && _a !== void 0 ? _a : 0) / 1.5}px`; });
     }
     get listType() {
         return this._listType;
@@ -544,7 +542,7 @@ export default class ShowTrades {
         this._upperBound = upperBound;
     }
     transform(transform) {
-        this._g.attr("transform", transform.toString);
+        this._g.attr("transform", transform.toString());
         this._scale = transform.k;
         this.update();
     }

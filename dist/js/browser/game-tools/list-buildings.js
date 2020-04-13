@@ -27,8 +27,7 @@ export default class ListBuildings {
     }
     async _loadAndSetupData() {
         try {
-            const fileName = "~Lib/gen-generic/buildings.json";
-            this._buildingData = (await import(fileName)).default;
+            this._buildingData = (await import("Lib/gen-generic/buildings.json")).default;
         }
         catch (error) {
             putImportError(error);
@@ -36,7 +35,7 @@ export default class ListBuildings {
     }
     _setupListener() {
         let firstClick = true;
-        document.querySelector(this._buttonId).addEventListener("click", async (event) => {
+        document.querySelector(`#${this._buttonId}`).addEventListener("click", async (event) => {
             if (firstClick) {
                 firstClick = false;
                 await this._loadAndSetupData();
@@ -79,7 +78,7 @@ export default class ListBuildings {
         this._setupSelectListener();
     }
     _buildingListSelected() {
-        if (!document.querySelector(this._modalId)) {
+        if (!document.querySelector(`#${this._modalId}`)) {
             this._initModal();
         }
         $(`#${this._modalId}`).modal("show");
