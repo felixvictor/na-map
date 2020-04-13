@@ -265,12 +265,14 @@ export class ShipComparison extends Ship {
     updateDifferenceProfile(): void {
         this._setColourScale(this._minSpeedDiff, this._maxSpeedDiff)
 
+        // @ts-ignore
         this._gWindProfile
             // .insert("g", "g.compass-arc")
             .append("g")
             .attr("data-ui-component", "speed-markers")
             .selectAll("circle")
             .data(this._arcsComp)
+            // @ts-ignore
             .join((enter) => {
                 enter
                     .append("circle")
@@ -286,7 +288,6 @@ export class ShipComparison extends Ship {
                                 1
                             )}) knots`
                     )
-                return enter
             })
             .select("circle")
             // @ts-ignore

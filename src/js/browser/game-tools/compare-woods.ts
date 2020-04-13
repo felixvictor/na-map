@@ -24,9 +24,30 @@ import * as d3Selection from "d3-selection"
 import { putImportError } from "../../common/common"
 import { simpleStringSort, sortBy } from "../../common/common-node"
 import { WoodData, WoodTrimOrFrame } from "../../common/gen-json"
-import { Index, NestedIndex } from "../../common/interface"
+import { ArrayIndex, Index, NestedIndex } from "../../common/interface"
 
-export type WoodType = "frame" | "trim"
+const woodType = ["frame", "trim"] as const
+export type WoodType = typeof woodType[number]
+type WoodTypeList<T> = {
+    [K in WoodType]: T
+}
+type WoodTypeArray<T> = {
+    [K in WoodType]: T[]
+}
+type WoodTypeNestedArray<T> = {
+    [K1 in WoodType]: ArrayIndex<T>
+}
+
+const woodColumnType = ["Base", "C1", "C2", "C3"] as const
+export type WoodColumnType = typeof woodColumnType[number]
+
+type ColumnArray<T> = {
+    [K in WoodColumnType]: T[]
+}
+type ColumnNestedArray<T> = {
+    [K1 in WoodColumnType]: ArrayIndex<T>
+}
+
 interface MinMax {
     min: number
     max: number
@@ -58,13 +79,14 @@ interface WoodCompareAmount {
     compare: number
     isPercentage: boolean
 }
+
 class Wood {
     readonly select: HtmlString
     protected readonly _woodCompare: CompareWoods
-    private readonly _id: string
-    private readonly _g: d3Selection.Selection<SVGGElement, unknown, HTMLElement, any>
+    private readonly _id: WoodColumnType
+    private readonly _g: d3Selection.Selection<SVGGElement, unknown, HTMLElement, unknown>
 
-    constructor(compareId: string, woodCompare: CompareWoods) {
+    constructor(compareId: WoodColumnType, woodCompare: CompareWoods) {
         this._id = compareId
         this._woodCompare = woodCompare
         this.select = `#${this._woodCompare.baseFunction}-${this._id}`
@@ -81,7 +103,7 @@ class Wood {
 
 class WoodBase extends Wood {
     private readonly _woodData!: SelectedWood
-    constructor(compareId: string, woodData: SelectedWood, woodCompare: CompareWoods) {
+    constructor(compareId: WoodColumnType, woodData: SelectedWood, woodCompare: CompareWoods) {
         super(compareId, woodCompare)
 
         this._woodData = woodData
@@ -171,7 +193,12 @@ class WoodComparison extends Wood {
     private readonly _baseData: SelectedWood
     private readonly _compareData: SelectedWood
 
-    constructor(compareId: string, baseData: SelectedWood, compareData: SelectedWood, woodCompare: CompareWoods) {
+    constructor(
+        compareId: WoodColumnType,
+        baseData: SelectedWood,
+        compareData: SelectedWood,
+        woodCompare: CompareWoods
+    ) {
         super(compareId, woodCompare)
 
         this._baseData = baseData
@@ -180,7 +207,7 @@ class WoodComparison extends Wood {
         this._printTextComparison()
     }
 
-    static _getDiff(a: number, b: number, isPercentage: boolean, decimals = 1) {
+    static _getDiff(a: number, b: number, isPercentage: boolean, decimals = 1): HtmlString {
         const diff = Number.parseFloat((a - b).toFixed(decimals))
         const value = isPercentage ? formatPercent(a / 100, decimals) : formatFloat(a)
 
@@ -235,7 +262,7 @@ class WoodComparison extends Wood {
     }
 
     // noinspection FunctionTooLongJS
-    _getText(wood: WoodDisplayCompareData) {
+    _getText(wood: WoodDisplayCompareData): HtmlString {
         const middle = 100 / 2
         let base = 0
         let diff = 0
@@ -343,13 +370,13 @@ export default class CompareWoods {
     private readonly _buttonId: HtmlString
     private readonly _modalId: HtmlString
     private _woodData!: WoodData
-    private _columnsCompare!: string[]
-    private _defaultWoodId!: { frame: number; trim: number }
-    private _columns!: string[]
+    private _columnsCompare!: WoodColumnType[]
+    private _defaultWoodId: WoodTypeList<number> = {} as WoodTypeList<number>
+    private _columns!: WoodColumnType[]
     private _frameSelectData!: WoodTrimOrFrame[]
     private _trimSelectData!: WoodTrimOrFrame[]
-    private _options: { frame: HtmlString; trim: HtmlString } = {} as { frame: HtmlString; trim: HtmlString }
-    private _woodIdsSelected!: NestedIndex<number>
+    private _options: WoodTypeList<HtmlString> = {} as WoodTypeList<HtmlString>
+    private _woodIdsSelected: NestedIndex<number> = {} as NestedIndex<number>
 
     constructor(baseFunction: string) {
         this.baseFunction = baseFunction
@@ -449,12 +476,12 @@ export default class CompareWoods {
         for (const propertyName of this.propertyNames) {
             const frames = [
                 ...this._woodData.frame.map(
-                    (frame) => frame.properties.find((modifier) => modifier.modifier === propertyName)!.amount
+                    (frame) => frame.properties.find((modifier) => modifier.modifier === propertyName)?.amount ?? 0
                 ),
             ]
             const trims = [
                 ...this._woodData.trim.map(
-                    (trim) => trim.properties.find((modifier) => modifier.modifier === propertyName)!.amount
+                    (trim) => trim.properties.find((modifier) => modifier.modifier === propertyName)?.amount ?? 0
                 ),
             ]
 
@@ -481,7 +508,7 @@ export default class CompareWoods {
             const div = row
                 .append("div")
                 .attr("class", `col-md-3 ml-auto pt-2 ${column === "Base" ? "column-base" : "column-comp"}`)
-            for (const type of ["frame", "trim"]) {
+            for (const type of woodType) {
                 const id = `${this.baseFunction}-${type}-${column}-select`
                 div.append("label").attr("for", id)
                 div.append("select").attr("name", id).attr("id", id).attr("class", "selectpicker")
@@ -496,15 +523,15 @@ export default class CompareWoods {
         this._injectModal()
 
         for (const compareId of this._columns) {
-            for (const type of ["frame", "trim"]) {
+            for (const type of woodType) {
                 const select$ = $(`#${this.baseFunction}-${type}-${compareId}-select`)
-                this._setupWoodSelects(compareId, type as WoodType, select$)
-                this._setupSelectListener(compareId, type as WoodType, select$)
+                this._setupWoodSelects(compareId, type, select$)
+                this._setupSelectListener(compareId, type, select$)
             }
         }
     }
 
-    _setWoodsSelected(compareId: string, type: WoodType, woodId: number): void {
+    _setWoodsSelected(compareId: WoodColumnType, type: WoodType, woodId: number): void {
         if (!this._woodIdsSelected[compareId]) {
             this._woodIdsSelected[compareId] = {}
         }
@@ -512,7 +539,7 @@ export default class CompareWoods {
         this._woodIdsSelected[compareId][type] = woodId
     }
 
-    _setupWoodSelects(compareId: string, type: WoodType, select$: JQuery): void {
+    _setupWoodSelects(compareId: WoodColumnType, type: WoodType, select$: JQuery): void {
         this._setWoodsSelected(compareId, type, this._defaultWoodId[type])
         select$.append(this._options[type])
         if (this.baseFunction !== "wood" || (compareId !== "Base" && this.baseFunction === "wood")) {
@@ -520,7 +547,7 @@ export default class CompareWoods {
         }
     }
 
-    _setOtherSelect(columnId: string, type: WoodType): void {
+    _setOtherSelect(columnId: WoodColumnType, type: WoodType): void {
         const otherType = type === "frame" ? "trim" : "frame"
 
         if (this._woodIdsSelected[columnId][otherType] === this._defaultWoodId[otherType]) {
@@ -530,13 +557,13 @@ export default class CompareWoods {
         }
     }
 
-    enableSelects(id: string): void {
-        for (const type of ["frame", "trim"]) {
+    enableSelects(id: WoodColumnType): void {
+        for (const type of woodType) {
             $(`#${this.baseFunction}-${type}-${id}-select`).removeAttr("disabled").selectpicker("refresh")
         }
     }
 
-    _woodSelected(compareId: string, type: WoodType, select$: JQuery): void {
+    _woodSelected(compareId: WoodColumnType, type: WoodType, select$: JQuery): void {
         const woodId = Number(select$.val())
 
         this._setWoodsSelected(compareId, type, woodId)
@@ -567,13 +594,13 @@ export default class CompareWoods {
         }
     }
 
-    _setupSelectListener(compareId: string, type: WoodType, select$: JQuery): void {
+    _setupSelectListener(compareId: WoodColumnType, type: WoodType, select$: JQuery): void {
         select$
             .on("change", () => this._woodSelected(compareId, type, select$))
             .selectpicker({ title: `Select ${type}` })
     }
 
-    _getWoodData(id: string): SelectedWood {
+    _getWoodData(id: WoodColumnType): SelectedWood {
         return {
             frame: this.getWoodTypeData("frame", this._woodIdsSelected[id].frame),
             trim: this.getWoodTypeData("trim", this._woodIdsSelected[id].trim),
@@ -589,7 +616,7 @@ export default class CompareWoods {
         this._options.trim = trim
     }
 
-    _addInstance(id: string, woodInstance: WoodBase | WoodComparison): void {
+    _addInstance(id: WoodColumnType, woodInstance: WoodBase | WoodComparison): void {
         this.instances[id] = woodInstance
     }
 

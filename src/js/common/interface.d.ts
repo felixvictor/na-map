@@ -20,11 +20,11 @@ export interface MinMaxCoord {
     max: number
 }
 
-export interface ArrayIndex<T> {
+export type ArrayIndex<T> = T[] & {
     [index: string]: T[]
 }
 
-export interface NestedArrayIndex<T> {
+export type NestedArrayIndex<T> = {
     [index: string]: ArrayIndex<T>
 }
 
