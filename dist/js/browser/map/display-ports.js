@@ -130,9 +130,9 @@ export default class DisplayPorts {
                 readData[dataSource.name] = await (await fetch(`${dataDirectory}/${dataSource.fileName}`)).json();
             }
         };
-        const fileName = "~Lib/gen-generic/ports.json";
         try {
-            readData.ports = (await import(fileName)).default;
+            readData.ports = (await import("Lib/gen-generic/ports.json"))
+                .default;
             await loadEntries(dataSources);
         }
         catch (error) {

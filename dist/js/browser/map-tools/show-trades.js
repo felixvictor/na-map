@@ -235,9 +235,9 @@ export default class ShowTrades {
     }
     async _loadData() {
         const dataDirectory = "data";
-        const fileName = "~Lib/gen-generic/ports.json";
         try {
-            const portData = (await import(fileName)).default;
+            const portData = (await import("Lib/gen-generic/ports.json"))
+                .default;
             const pbData = (await (await fetch(`${dataDirectory}/${this._serverName}-pb.json`)).json());
             this._linkDataDefault = (await (await fetch(`${dataDirectory}/${this._serverName}-trades.json`)).json());
             this._portData = portData.map((port) => {
