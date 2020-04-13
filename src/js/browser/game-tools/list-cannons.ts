@@ -16,7 +16,7 @@ import "bootstrap/js/dist/modal"
 
 import { html, render, TemplateResult } from "lit-html"
 import { repeat } from "lit-html/directives/repeat"
-import Tablesort from "tablesort"
+import { Tablesort } from "tablesort"
 
 import { registerEvent } from "../analytics"
 import { capitalizeFirstLetter, putImportError } from "../../common/common"
@@ -29,11 +29,14 @@ type GroupData = { values: string; count?: number }
 type GroupObject = [GroupKey, GroupData]
 type GroupMap = Map<GroupKey, GroupData>
 
+const cannonType = ["medium", "long", "carronade"] as const
+export type CannonType = typeof cannonType[number]
+
 /**
  *
  */
 export default class ListCannons {
-    private _cannonData!: Cannon
+    private _cannonData: Cannon = {} as Cannon
     private readonly _baseName: string
     private readonly _baseId: string
     private readonly _buttonId: string
@@ -72,7 +75,7 @@ export default class ListCannons {
 
         // Sort data and groups (for table header)
         const groupOrder = ["name", "damage", "penetration", "dispersion", "traverse", "generic"]
-        for (const type of Object.keys(cannonData)) {
+        for (const type of cannonType) {
             this._cannonData[type] = cannonData[type].map(
                 (cannon: CannonEntity): CannonEntity =>
                     // @ts-ignore
@@ -90,7 +93,7 @@ export default class ListCannons {
 
     _setupListener(): void {
         let firstClick = true
-        ;(document.querySelector(`#${this._buttonId}`) as HTMLElement).addEventListener("click", async (event) => {
+        ;(document.querySelector(`#${this._buttonId}`) as HTMLElement)?.addEventListener("click", async (event) => {
             if (firstClick) {
                 firstClick = false
                 await this._loadAndSetupData()
@@ -255,7 +258,7 @@ export default class ListCannons {
             const table = document.querySelector(`#table-${type}-list`) as HTMLElement
             if (table) {
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                const sortTable = new Tablesort.Tablesort(table)
+                const sortTable = new Tablesort(table)
             }
         }
     }
