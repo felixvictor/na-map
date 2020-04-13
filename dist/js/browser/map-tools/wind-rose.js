@@ -91,7 +91,7 @@ export default class WindRose {
     }
     _setupListener() {
         var _a;
-        (_a = document.querySelector(`${this._buttonId}`)) === null || _a === void 0 ? void 0 : _a.addEventListener("click", (event) => this._navbarClick(event));
+        (_a = document.querySelector(`#${this._buttonId}`)) === null || _a === void 0 ? void 0 : _a.addEventListener("click", (event) => this._navbarClick(event));
     }
     _setupWindInput() {
         const _getTooltipPos = $.fn.roundSlider.prototype._getTooltipPos;
@@ -135,7 +135,7 @@ export default class WindRose {
         this._setupWindInput();
     }
     _windRoseSelected() {
-        if (!document.querySelector(this._modalId)) {
+        if (!document.querySelector(`#${this._modalId}`)) {
             this._initModal();
         }
         $(`#${this._modalId}`)
