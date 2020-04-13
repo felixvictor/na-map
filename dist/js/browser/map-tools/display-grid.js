@@ -161,8 +161,8 @@ export default class DisplayGrid {
         __classPrivateFieldGet(this, _svgYAxis).classed("d-none", !show);
     }
     transform(transform) {
-        __classPrivateFieldGet(this, _gXAxis).attr("transform", transform.toString);
-        __classPrivateFieldGet(this, _gYAxis).attr("transform", transform.toString);
+        __classPrivateFieldGet(this, _gXAxis).attr("transform", transform.toString());
+        __classPrivateFieldGet(this, _gYAxis).attr("transform", transform.toString());
         this._displayAxis();
     }
 }

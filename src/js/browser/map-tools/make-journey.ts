@@ -498,7 +498,7 @@ export default class MakeJourney {
             const lines = d.label.split("|")
             const lineHeight = fontSize * 1.3
 
-            text.text("").attr("dy", 0).attr("transform", textTransform.toString).style("font-size", `${fontSize}px`)
+            text.text("").attr("dy", 0).attr("transform", textTransform.toString()).style("font-size", `${fontSize}px`)
             lines.forEach((line, j) => {
                 const tspan = text.append("tspan").html(line)
                 if (j > 0) {
@@ -748,7 +748,7 @@ export default class MakeJourney {
     }
 
     transform(transform: D3ZoomTransform): void {
-        this._g.attr("transform", transform.toString)
+        this._g.attr("transform", transform.toString())
         this._correctJourney()
     }
 }

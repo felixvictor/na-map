@@ -551,7 +551,7 @@ export default class DisplayPorts {
         })
             .attr("cx", (d) => d.coordinates[0])
             .attr("cy", (d) => d.coordinates[1])
-            .on("click", this._showDetails)
+            .on("click", (d, i, nodes) => this._showDetails(d, i, nodes))
             .on("mouseleave", DisplayPorts._hideDetails))
             .attr("r", circleSize);
     }
@@ -586,9 +586,9 @@ export default class DisplayPorts {
         const rMin = roundToThousands((this._circleSize / circleScale) * this._minRadiusFactor);
         const rMax = roundToThousands((this._circleSize / circleScale) * this._maxRadiusFactor);
         let data = this._portDataFiltered;
-        let cssClass;
-        let r;
-        let fill;
+        let cssClass = () => "";
+        let r = () => 0;
+        let fill = () => "";
         if (this.showRadius === "tax") {
             data = this._portDataFiltered.filter((d) => !d.nonCapturable);
             this._portRadius.domain([this._minTaxIncome, this._maxTaxIncome]).range([rMin, rMax]);
@@ -786,7 +786,7 @@ export default class DisplayPorts {
         this._cookie.set(this.showRadius);
     }
     transform(transform) {
-        this._gPort.attr("transform", transform.toString);
+        this._gPort.attr("transform", transform.toString());
     }
     clearMap(scale) {
         this._showSummary();
