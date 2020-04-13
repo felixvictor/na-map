@@ -88,31 +88,31 @@ export default class SelectPorts {
 
         this._frontlineAttackingNationId = "frontlines-attacking-nation-select"
         this._frontlineAttackingNationSelector = document.querySelector(
-            this._frontlineAttackingNationId
+            `#${this._frontlineAttackingNationId}`
         ) as HTMLSelectElement
 
         this._frontlineDefendingNationId = "frontlines-defending-nation-select"
         this._frontlineDefendingNationSelector = document.querySelector(
-            this._frontlineDefendingNationId
+            `#${this._frontlineDefendingNationId}`
         ) as HTMLSelectElement
 
         this._portNamesId = "port-names-select"
-        this._portNamesSelector = document.querySelector(this._portNamesId) as HTMLSelectElement
+        this._portNamesSelector = document.querySelector(`#${this._portNamesId}`) as HTMLSelectElement
 
         this._buyGoodsId = "buy-goods-select"
-        this._buyGoodsSelector = document.querySelector(this._buyGoodsId) as HTMLSelectElement
+        this._buyGoodsSelector = document.querySelector(`#${this._buyGoodsId}`) as HTMLSelectElement
 
         this._inventoryId = "inventory-select"
-        this._inventorySelector = document.querySelector(this._inventoryId) as HTMLSelectElement
+        this._inventorySelector = document.querySelector(`#${this._inventoryId}`) as HTMLSelectElement
 
         this._propNationId = "prop-nation-select"
-        this._propNationSelector = document.querySelector(this._propNationId) as HTMLSelectElement
+        this._propNationSelector = document.querySelector(`#${this._propNationId}`) as HTMLSelectElement
 
         this._propClanId = "prop-clan-select"
-        this._propClanSelector = document.querySelector(this._propClanId) as HTMLSelectElement
+        this._propClanSelector = document.querySelector(`#${this._propClanId}`) as HTMLSelectElement
 
         this._propCMId = "prop-cm-select"
-        this._propCMSelector = document.querySelector(this._propCMId) as HTMLSelectElement
+        this._propCMSelector = document.querySelector(`#${this._propCMId}`) as HTMLSelectElement
 
         this.isInventorySelected = false
 
@@ -232,15 +232,15 @@ export default class SelectPorts {
             event.preventDefault()
         })
 
-        document.querySelector("menu-prop-deep")?.addEventListener("click", () => this._depthSelected("deep"))
-        document.querySelector("menu-prop-shallow")?.addEventListener("click", () => this._depthSelected("shallow"))
+        document.querySelector("#menu-prop-deep")?.addEventListener("click", () => this._depthSelected("deep"))
+        document.querySelector("#menu-prop-shallow")?.addEventListener("click", () => this._depthSelected("shallow"))
 
-        document.querySelector("menu-prop-all")?.addEventListener("click", () => this._allSelected())
-        document.querySelector("menu-prop-non-capturable")?.addEventListener("click", () => this._nonCapSelected())
+        document.querySelector("#menu-prop-all")?.addEventListener("click", () => this._allSelected())
+        document.querySelector("#menu-prop-non-capturable")?.addEventListener("click", () => this._nonCapSelected())
 
-        document.querySelector("menu-prop-large")?.addEventListener("click", () => this._portSizeSelected("Large"))
-        document.querySelector("menu-prop-medium")?.addEventListener("click", () => this._portSizeSelected("Medium"))
-        document.querySelector("menu-prop-small")?.addEventListener("click", () => this._portSizeSelected("Small"))
+        document.querySelector("#menu-prop-large")?.addEventListener("click", () => this._portSizeSelected("Large"))
+        document.querySelector("#menu-prop-medium")?.addEventListener("click", () => this._portSizeSelected("Medium"))
+        document.querySelector("#menu-prop-small")?.addEventListener("click", () => this._portSizeSelected("Small"))
 
         // @ts-ignore
         $.fn.datetimepicker.Constructor.Default = $.extend({}, $.fn.datetimepicker.Constructor.Default, {
@@ -268,10 +268,10 @@ export default class SelectPorts {
             event.preventDefault()
         })
 
-        document.querySelector("menu-prop-today")?.addEventListener("click", () => this._capturedToday())
-        document.querySelector("menu-prop-yesterday")?.addEventListener("click", () => this._capturedYesterday())
-        document.querySelector("menu-prop-this-week")?.addEventListener("click", () => this._capturedThisWeek())
-        document.querySelector("menu-prop-last-week")?.addEventListener("click", () => this._capturedLastWeek())
+        document.querySelector("#menu-prop-today")?.addEventListener("click", () => this._capturedToday())
+        document.querySelector("#menu-prop-yesterday")?.addEventListener("click", () => this._capturedYesterday())
+        document.querySelector("#menu-prop-this-week")?.addEventListener("click", () => this._capturedThisWeek())
+        document.querySelector("#menu-prop-last-week")?.addEventListener("click", () => this._capturedLastWeek())
 
         const portFrom = $("#prop-from")
         const portTo = $("#prop-to")
@@ -379,7 +379,7 @@ export default class SelectPorts {
             for (const port of this._ports.portDataDefault) {
                 if (port.inventory) {
                     for (const good of port.inventory) {
-                        selectGoods.add((good as InventoryEntity).name)
+                        selectGoods.add(good.name)
                     }
                 }
             }
@@ -500,24 +500,20 @@ export default class SelectPorts {
         const tradePort = this._ports.portDataDefault.find((port) => port.id === this._ports.tradePortId)
         if (tradePort) {
             const tradePortConsumedGoods = tradePort.consumesTrading
-                ? tradePort.consumesTrading.map((good) => good as string)
+                ? tradePort.consumesTrading.map((good) => good)
                 : []
-            const tradePortProducedGoods = tradePort.dropsTrading
-                ? tradePort.dropsTrading.map((good) => good as string)
-                : []
+            const tradePortProducedGoods = tradePort.dropsTrading ? tradePort.dropsTrading.map((good) => good) : []
 
             this._ports.portData = this._ports.portDataDefault
                 .map((port) => {
                     port.goodsToBuyInTradePort = port.consumesTrading
                         ? port.consumesTrading
                               .filter((good) => tradePortProducedGoods.includes(good))
-                              .map((good) => good as string)
+                              .map((good) => good)
                         : []
                     port.buyInTradePort = Boolean(port.goodsToBuyInTradePort.length)
                     port.goodsToSellInTradePort = port.dropsTrading
-                        ? port.dropsTrading
-                              .filter((good) => tradePortConsumedGoods.includes(good))
-                              .map((good) => good as string)
+                        ? port.dropsTrading.filter((good) => tradePortConsumedGoods.includes(good)).map((good) => good)
                         : []
                     port.sellInTradePort = Boolean(port.goodsToSellInTradePort.length)
 
@@ -713,9 +709,7 @@ export default class SelectPorts {
     }
 
     _depthSelected(depth: PortDepth): void {
-        const portData = this._ports.portDataDefault.filter(
-            (d) => (depth === "shallow" ? d.shallow : !d.shallow) as boolean
-        )
+        const portData = this._ports.portDataDefault.filter((d) => (depth === "shallow" ? d.shallow : !d.shallow))
 
         this._ports.portData = portData
         this._ports.showRadius = ""
@@ -723,7 +717,7 @@ export default class SelectPorts {
     }
 
     _allSelected(): void {
-        const portData = this._ports.portDataDefault.filter((d) => d.availableForAll as boolean)
+        const portData = this._ports.portDataDefault.filter((d) => d.availableForAll)
 
         this._ports.portData = portData
         this._ports.showRadius = ""
@@ -731,7 +725,7 @@ export default class SelectPorts {
     }
 
     _nonCapSelected(): void {
-        const portData = this._ports.portDataDefault.filter((d) => d.nonCapturable as boolean)
+        const portData = this._ports.portDataDefault.filter((d) => d.nonCapturable)
 
         this._ports.portData = portData
         this._ports.showRadius = ""
@@ -767,11 +761,11 @@ export default class SelectPorts {
         const maxStartTime = 24 - (blackOutTimes.length + 1)
         const startTimes = new Set()
         const begin = moment(
-            (document.querySelector("prop-pb-from-input") as HTMLSelectElement)?.value,
+            (document.querySelector("#prop-pb-from-input") as HTMLSelectElement)?.value,
             this._timeFormat
         ).hour()
         let end = moment(
-            (document.querySelector("prop-pb-to-input") as HTMLSelectElement)?.value,
+            (document.querySelector("#prop-pb-to-input") as HTMLSelectElement)?.value,
             this._timeFormat
         ).hour()
 
