@@ -13,6 +13,8 @@
 import { ModifiersEntity } from "../node/api-item"
 import { Point } from "./common-math"
 import { ValuesType } from "utility-types"
+import { WoodType } from "../browser/game-tools/compare-woods";
+import { CannonType } from "../browser/game-tools/list-cannons";
 
 /****************************
  * buildings.json
@@ -63,11 +65,8 @@ export interface BuildingWithResult {
 export interface ObjectIndexer<T> {
     [index: string]: T
 }
-
-export interface Cannon extends ObjectIndexer<CannonEntity[]> {
-    medium: CannonEntity[]
-    long: CannonEntity[]
-    carronade: CannonEntity[]
+type Cannon = {
+    [K in CannonType]: CannonEntity[]
 }
 export type CannonGroupIndex =
     | string
