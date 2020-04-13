@@ -8,6 +8,10 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+/// <reference types="bootstrap" />
+import "bootstrap/js/dist/util"
+import "bootstrap/js/dist/modal"
+
 import { ascending as d3Ascending, max as d3Max, min as d3Min } from "d3-array"
 import { nest as d3Nest } from "d3-collection"
 import { interpolateCubehelixLong as d3InterpolateCubehelixLong } from "d3-interpolate"
@@ -15,8 +19,6 @@ import { ScaleLinear, scaleLinear as d3ScaleLinear } from "d3-scale"
 import { select as d3Select } from "d3-selection"
 
 import { registerEvent } from "../../analytics"
-import { formatPP, formatSignInt, formatSignPercent } from "../../../common/common-format"
-import { getOrdinal } from "../../../common/common-math"
 import {
     appVersion,
     colourGreenDark,
@@ -30,14 +32,16 @@ import {
     rigRepairsPercent,
 } from "../../../common/common-browser"
 import { isEmpty, putImportError } from "../../../common/common"
+import { formatPP, formatSignInt, formatSignPercent } from "../../../common/common-format"
+import { ArrayIndex, Index, NestedIndex } from "../../../common/interface"
+import { getOrdinal } from "../../../common/common-math"
 import { sortBy } from "../../../common/common-node"
 import { copyToClipboard } from "../../util"
 
-import { ArrayIndex, Index, NestedArrayIndex, NestedIndex } from "../../../common/interface"
 import { Module, ModuleEntity, ModulePropertiesEntity, ShipData, ShipRepairTime } from "../../../common/gen-json"
 
 import { ShipBase, ShipComparison } from "."
-import CompareWoods, { WoodType } from "../compare-woods"
+import CompareWoods, { WoodColumnType, WoodType } from "../compare-woods"
 
 interface ShipSelectMap {
     key: string
@@ -72,17 +76,21 @@ interface PropertyWithCap {
     cap: Amount
 }
 
-interface CompareId {
-    [index: string]: number
-}
-
-type ColumnType = string
 type ModuleType = string
+
+const shipColumnType = ["Base", "C1", "C2"] as const
+type ShipColumnType = typeof shipColumnType[number]
+type ColumnArray<T> = {
+    [K in ShipColumnType]: T[]
+}
+type ColumnNestedArray<T> = {
+    [K1 in ShipColumnType]: ArrayIndex<T>
+}
 
 export class CompareShips {
     colorScale!: ScaleLinear<string, string>
     readonly colourScaleSpeedDiff: ScaleLinear<string, string>
-    readonly columnsCompare: Array<keyof CompareId>
+    readonly columnsCompare: ShipColumnType[]
     innerRadius!: number
     outerRadius!: number
     radiusSpeedScale!: ScaleLinear<number, number>
@@ -95,15 +103,15 @@ export class CompareShips {
     woodCompare!: CompareWoods
     private _maxSpeed!: number
     private _minSpeed!: number
-    private _modal$: JQuery
+    private _modal$: JQuery = {} as JQuery
     private _modifierAmount: Map<string, AbsoluteAndPercentageAmount>
     private _moduleAndWoodCaps!: Map<string, PropertyWithCap>
     private _moduleAndWoodChanges!: Map<string, Property>
     private _moduleDataDefault!: Module[]
     private _moduleProperties!: Map<number, ModuleEntity>
     private _moduleTypes!: Set<ModuleType>
-    private _selectedUpgradeIdsList: NestedArrayIndex<number> = {}
-    private _selectedUpgradeIdsPerType: NestedArrayIndex<number> = {}
+    private _selectedUpgradeIdsList: ColumnArray<number> = {} as ColumnArray<number>
+    private _selectedUpgradeIdsPerType: ColumnNestedArray<number> = {} as ColumnNestedArray<number>
     private _selectModule$: NestedIndex<JQuery<HTMLSelectElement>> = {}
     private _selectShip$: Index<JQuery<HTMLSelectElement>> = {}
     private _selectWood$: NestedIndex<JQuery<HTMLSelectElement>> = {}
@@ -113,7 +121,7 @@ export class CompareShips {
     private readonly _baseId: string
     private readonly _baseName: string
     private readonly _buttonId: HtmlString
-    private readonly _columns: Array<keyof CompareId>
+    private readonly _columns: ShipColumnType[]
     private readonly _copyButtonId: HtmlString
     private readonly _modalId: HtmlString
     private readonly _moduleId: HtmlString
@@ -136,7 +144,6 @@ export class CompareShips {
             .range([colourRedDark, colourWhite, colourGreenDark])
             .interpolate(d3InterpolateCubehelixLong)
 
-        this._modal$ = {} as JQuery
         this._modifierAmount = new Map()
 
         if (this._baseId === "ship-compare") {
@@ -385,7 +392,7 @@ export class CompareShips {
      */
     _shipCompareSelected(): void {
         // If the modal has no content yet, insert it
-        if (!this._modal$) {
+        if (isEmpty(this._modal$)) {
             this._initModal()
             this._modal$ = $(`#${this._modalId}`)
 
@@ -573,7 +580,7 @@ export class CompareShips {
                 for (const type of ["frame", "trim"]) {
                     this._selectWood$[columnId][type] = $(`#${this._getWoodSelectId(type, columnId)}`)
                     this.woodCompare._setupWoodSelects(
-                        columnId as string,
+                        columnId as WoodColumnType,
                         type as WoodType,
                         this._selectWood$[columnId][type]
                     )
@@ -618,7 +625,7 @@ export class CompareShips {
      * Setup ship select
      * @param columnId - Column id
      */
-    _setupShipSelect(columnId: keyof CompareId): void {
+    _setupShipSelect(columnId: ShipColumnType): void {
         this._selectShip$[columnId] = $(`#${this._getShipSelectId(columnId)}`)
         const options = this._getShipOptions()
         this._selectShip$[columnId].append(options)
@@ -685,7 +692,7 @@ export class CompareShips {
         return options
     }
 
-    _fillModuleSelect(columnId: keyof CompareId, type: string): void {
+    _fillModuleSelect(columnId: ShipColumnType, type: string): void {
         const getShipClass = (): number => this._shipData.find((ship) => ship.id === this._shipIds[columnId])!.class
 
         const options = this._getUpgradesOptions(type, getShipClass())
@@ -694,7 +701,7 @@ export class CompareShips {
         this._selectModule$[columnId][type].append(options)
     }
 
-    _resetModuleSelects(columnId: keyof CompareId): void {
+    _resetModuleSelects(columnId: ShipColumnType): void {
         for (const type of this._moduleTypes) {
             this._fillModuleSelect(columnId, type)
             this._selectModule$[columnId][type].selectpicker("refresh")
@@ -716,7 +723,7 @@ export class CompareShips {
      * Setup upgrades select
      * @param columnId - Column id
      */
-    _setupModulesSelect(columnId: keyof CompareId): void {
+    _setupModulesSelect(columnId: ShipColumnType): void {
         if (!this._selectModule$[columnId]) {
             this._selectModule$[columnId] = {}
 
@@ -779,7 +786,7 @@ export class CompareShips {
      * @param columnId - Column id
      * @returns Ship data
      */
-    _getShipData(columnId: keyof CompareId): ShipData {
+    _getShipData(columnId: ShipColumnType): ShipData {
         const shipDataDefault = this._shipData.find((ship) => ship.id === this._shipIds[columnId])!
         let shipDataUpdated = shipDataDefault
 
@@ -833,7 +840,7 @@ export class CompareShips {
         })
     }
 
-    _showCappingAdvice(compareId: keyof CompareId, modifiers: Set<string>): void {
+    _showCappingAdvice(compareId: ShipColumnType, modifiers: Set<string>): void {
         const id = `${this._baseId}-${compareId}-capping`
         let div = document.querySelector(`#${id}`)
 
@@ -849,7 +856,7 @@ export class CompareShips {
         div.innerHTML = `${[...modifiers].join(", ")} capped`
     }
 
-    _removeCappingAdvice(compareId: keyof CompareId): void {
+    _removeCappingAdvice(compareId: ShipColumnType): void {
         const id = `${this._baseId}-${compareId}-capping`
         const div = document.querySelector(`#${id}`)
 
@@ -865,11 +872,11 @@ export class CompareShips {
      * @param compareId - Column id
      * @returns Updated ship data
      */
-    _addModulesAndWoodData(shipDataBase: ShipData, shipDataUpdated: ShipData, compareId: keyof CompareId): ShipData {
+    _addModulesAndWoodData(shipDataBase: ShipData, shipDataUpdated: ShipData, compareId: ShipColumnType): ShipData {
         const data = JSON.parse(JSON.stringify(shipDataUpdated)) as ShipData
 
         const setModifierAmounts = (): void => {
-            for (const id of (this._selectedUpgradeIdsList[compareId] as unknown) as number[]) {
+            for (const id of this._selectedUpgradeIdsList[compareId]) {
                 const module = this._moduleProperties.get(id)!
 
                 for (const property of module.properties) {
@@ -987,7 +994,7 @@ export class CompareShips {
         return data
     }
 
-    _updateDifferenceProfileNeeded(id: keyof CompareId): void {
+    _updateDifferenceProfileNeeded(id: ShipColumnType): void {
         if (id !== "Base" && !isEmpty(this.selectedShips[id])) {
             ;(this.selectedShips[id] as ShipComparison).updateDifferenceProfile()
         }
@@ -997,7 +1004,7 @@ export class CompareShips {
      * Update sailing profile for compared ship
      * @param compareId - Column id
      */
-    _updateSailingProfile(compareId: keyof CompareId): void {
+    _updateSailingProfile(compareId: ShipColumnType): void {
         // Update recent changes first
         this._updateDifferenceProfileNeeded(compareId)
         // Then update the rest of columns
@@ -1013,7 +1020,7 @@ export class CompareShips {
      * Refresh ship data
      * @param compareId - Column id
      */
-    _refreshShips(compareId: keyof CompareId): void {
+    _refreshShips(compareId: ShipColumnType): void {
         if (this._baseId === "ship-journey") {
             this.singleShipData = this._shipData.find((ship) => ship.id === this._shipIds[compareId])!
         } else {
@@ -1060,9 +1067,9 @@ export class CompareShips {
         }
     }
 
-    _modulesSelected(compareId: keyof CompareId): void {
-        this._selectedUpgradeIdsList[compareId] = {}
-        this._selectedUpgradeIdsPerType[compareId] = {}
+    _modulesSelected(compareId: ShipColumnType): void {
+        this._selectedUpgradeIdsList[compareId] = []
+        this._selectedUpgradeIdsPerType[compareId] = {} as ArrayIndex<number>
 
         for (const type of this._moduleTypes) {
             // @ts-ignore
@@ -1081,11 +1088,9 @@ export class CompareShips {
             }
 
             if (this._selectedUpgradeIdsPerType[compareId][type].length > 0) {
-                this._selectedUpgradeIdsList[compareId] = (((this._selectedUpgradeIdsList[
-                    compareId
-                ] as unknown) as number[]).concat(
-                    (this._selectedUpgradeIdsPerType[compareId][type] as unknown) as number[]
-                ) as unknown) as ArrayIndex<number>
+                this._selectedUpgradeIdsList[compareId] = this._selectedUpgradeIdsList[compareId].concat(
+                    this._selectedUpgradeIdsPerType[compareId][type]
+                )
             }
             // console.log("_modulesSelected", compareId, type, this._selectedUpgradeIdsPerType[compareId][type]);
         }
@@ -1095,7 +1100,7 @@ export class CompareShips {
      * Listener for the select
      * @param compareId - Column id
      */
-    _setupSelectListener(compareId: keyof CompareId): void {
+    _setupSelectListener(compareId: ShipColumnType): void {
         this._selectShip$[compareId].selectpicker({ title: "Ship" }).on("changed.bs.select", () => {
             this._shipIds[compareId] = Number(this._selectShip$[compareId].val())
             if (this._baseId !== "ship-journey") {
@@ -1108,7 +1113,7 @@ export class CompareShips {
             }
 
             if (this._baseId !== "ship-journey") {
-                this.woodCompare.enableSelects(compareId as string)
+                this.woodCompare.enableSelects(compareId as WoodColumnType)
             }
         })
         if (this._baseId !== "ship-journey") {
@@ -1116,7 +1121,7 @@ export class CompareShips {
                 this._selectWood$[compareId][type]
                     .on("changed.bs.select", () => {
                         this.woodCompare._woodSelected(
-                            compareId as string,
+                            compareId as WoodColumnType,
                             type as WoodType,
                             this._selectWood$[compareId][type]
                         )
@@ -1142,7 +1147,7 @@ export class CompareShips {
                 this._enableCompareSelects()
             }
 
-            this.woodCompare.enableSelects(columnId as string)
+            this.woodCompare.enableSelects(columnId as WoodColumnType)
             this._setupModulesSelect(columnId)
 
             if (ids[i]) {
@@ -1151,7 +1156,7 @@ export class CompareShips {
                     i += 1
 
                     this.woodCompare._woodSelected(
-                        columnId as string,
+                        columnId as WoodColumnType,
                         type as WoodType,
                         this._selectWood$[columnId][type]
                     )
@@ -1177,11 +1182,11 @@ export class CompareShips {
                 if (urlParams.has(`${columnIndex}${typeIndex}`)) {
                     const moduleIds = hashids.decode(urlParams.get(`${columnIndex}${typeIndex}`)!)
                     if (!this._selectedUpgradeIdsPerType[columnId]) {
-                        this._selectedUpgradeIdsPerType[columnId] = {}
+                        this._selectedUpgradeIdsPerType[columnId] = {} as ArrayIndex<number>
                     }
 
                     if (!this._selectedUpgradeIdsList[columnId]) {
-                        this._selectedUpgradeIdsList[columnId] = {}
+                        this._selectedUpgradeIdsList[columnId] = []
                     }
 
                     // console.log("moduleIds", { columnId }, { type }, { moduleIds });
@@ -1191,9 +1196,7 @@ export class CompareShips {
                         this._selectModule$[columnId][type],
                         this._selectedUpgradeIdsPerType[columnId][type]
                     )
-                    ;((this._selectedUpgradeIdsList[columnId] as unknown) as number[]).push(
-                        ...this._selectedUpgradeIdsPerType[columnId][type]
-                    )
+                    this._selectedUpgradeIdsList[columnId].push(...this._selectedUpgradeIdsPerType[columnId][type])
                     needRefresh = true
                 }
             }
@@ -1204,19 +1207,19 @@ export class CompareShips {
         }
     }
 
-    _getShipSelectId(columnId: keyof CompareId): HtmlString {
+    _getShipSelectId(columnId: ShipColumnType): HtmlString {
         return `${this._baseId}-${columnId}-select`
     }
 
-    _getWoodSelectId(type: string, columnId: keyof CompareId): HtmlString {
+    _getWoodSelectId(type: string, columnId: ShipColumnType): HtmlString {
         return `${this._woodId}-${type}-${columnId}-select`
     }
 
-    _getModuleSelectId(type: string, columnId: keyof CompareId): HtmlString {
+    _getModuleSelectId(type: string, columnId: ShipColumnType): HtmlString {
         return `${this._moduleId}-${type.replace(/\s/, "")}-${columnId}-select`
     }
 
-    _setSelectedShip(columnId: keyof CompareId, ship: ShipBase | ShipComparison): void {
+    _setSelectedShip(columnId: ShipColumnType, ship: ShipBase | ShipComparison): void {
         this.selectedShips[columnId] = ship
     }
 }
