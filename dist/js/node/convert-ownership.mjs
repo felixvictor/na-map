@@ -9,7 +9,10 @@
  */
 import * as fs from "fs";
 import * as path from "path";
-import d3Node from "d3-node";
+import d3Collection from "d3-collection";
+import d3Array from "d3-array";
+const { nest: d3Nest } = d3Collection;
+const { ascending: d3Ascending } = d3Array;
 import { default as lzma } from "lzma-native";
 import { default as readDirRecursive } from "recursive-readdir";
 import { capitalToCounty, nations } from "../common/common";
@@ -18,8 +21,6 @@ import { saveJsonAsync } from "../common/common-file";
 import { serverNames } from "../common/common-var";
 import { cleanName } from "../common/common-node";
 const fileExtension = ".json.xz";
-const d3n = d3Node();
-const { d3 } = d3n;
 const decompress = (compressedContent) => {
     return lzma.decompress(compressedContent, {}, (decompressedContent, error) => {
         if (error) {
@@ -151,12 +152,11 @@ function convertOwnership() {
             value.id = key;
             return value;
         });
-        const nested = d3
-            .nest()
+        const nested = d3Nest()
             .key((d) => d.region)
-            .sortKeys(d3.ascending)
+            .sortKeys(d3Ascending)
             .key((d) => d.county)
-            .sortKeys(d3.ascending)
+            .sortKeys(d3Ascending)
             .entries(portsArray);
         const result = nested.map((region) => {
             const newRegion = {};
