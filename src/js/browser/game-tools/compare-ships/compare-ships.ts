@@ -332,13 +332,12 @@ export class CompareShips {
     }
 
     async _loadAndSetupData(): Promise<void> {
-        const shipFileName = "~Lib/gen-generic/ships.json"
-        const moduleFileName = "~Lib/gen-generic/modules.json"
-
         try {
-            this._moduleDataDefault = (await import(/* webpackChunkName: "data-modules" */ moduleFileName))
-                .default as Module[]
-            this._shipData = (await import(/* webpackChunkName: "data-ships" */ shipFileName)).default as ShipData[]
+            this._moduleDataDefault = (
+                await import(/* webpackChunkName: "data-modules" */ "Lib/gen-generic/modules.json")
+            ).default as Module[]
+            this._shipData = (await import(/* webpackChunkName: "data-ships" */ "Lib/gen-generic/ships.json"))
+                .default as ShipData[]
             this._setupData()
             if (this._baseId !== "ship-journey") {
                 this.woodCompare = new CompareWoods(this._woodId)

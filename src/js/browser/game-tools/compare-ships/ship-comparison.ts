@@ -271,7 +271,6 @@ export class ShipComparison extends Ship {
             .attr("data-ui-component", "speed-markers")
             .selectAll("circle")
             .data(this._arcsComp)
-            // @ts-ignore
             .join((enter) => {
                 enter
                     .append("circle")
@@ -287,8 +286,10 @@ export class ShipComparison extends Ship {
                                 1
                             )}) knots`
                     )
+                return enter
             })
             .select("circle")
+            // @ts-ignore
             .attr("fill", (_d: number, i: number) => this._shipCompare.colourScaleSpeedDiff(this._speedDiff[i]))
 
         // colourRamp(d3Select(this._select), this._shipCompare.colourScaleSpeedDiff, this._speedDiff.length);
