@@ -212,12 +212,10 @@ export class CompareShips {
         this.shipMassScale = d3ScaleLinear().domain([minShipMass, maxShipMass]).range([100, 150]);
     }
     async _loadAndSetupData() {
-        const shipFileName = "~Lib/gen-generic/ships.json";
-        const moduleFileName = "~Lib/gen-generic/modules.json";
         try {
-            this._moduleDataDefault = (await import(moduleFileName))
+            this._moduleDataDefault = (await import("Lib/gen-generic/modules.json")).default;
+            this._shipData = (await import("Lib/gen-generic/ships.json"))
                 .default;
-            this._shipData = (await import(shipFileName)).default;
             this._setupData();
             if (this._baseId !== "ship-journey") {
                 this.woodCompare = new CompareWoods(this._woodId);
@@ -231,7 +229,7 @@ export class CompareShips {
     _setupListener() {
         var _a;
         let firstClick = true;
-        (_a = document.querySelector(this._buttonId)) === null || _a === void 0 ? void 0 : _a.addEventListener("click", async (event) => {
+        (_a = document.querySelector(`#${this._buttonId}`)) === null || _a === void 0 ? void 0 : _a.addEventListener("click", async (event) => {
             if (firstClick) {
                 firstClick = false;
                 await this._loadAndSetupData();
@@ -256,12 +254,12 @@ export class CompareShips {
         if (!this._modal$) {
             this._initModal();
             this._modal$ = $(`#${this._modalId}`);
-            (_a = document.querySelector(this._modalId)) === null || _a === void 0 ? void 0 : _a.addEventListener("keydown", (event) => {
+            (_a = document.querySelector(`#${this._modalId}`)) === null || _a === void 0 ? void 0 : _a.addEventListener("keydown", (event) => {
                 if (event.key === "KeyC" && event.ctrlKey) {
                     this._copyDataClicked(event);
                 }
             });
-            (_b = document.querySelector(this._copyButtonId)) === null || _b === void 0 ? void 0 : _b.addEventListener("click", (event) => {
+            (_b = document.querySelector(`#${this._copyButtonId}`)) === null || _b === void 0 ? void 0 : _b.addEventListener("click", (event) => {
                 this._copyDataClicked(event);
             });
         }
@@ -551,19 +549,19 @@ export class CompareShips {
     _showCappingAdvice(compareId, modifiers) {
         var _a;
         const id = `${this._baseId}-${compareId}-capping`;
-        let div = document.querySelector(id);
+        let div = document.querySelector(`#${id}`);
         if (!div) {
             div = document.createElement("p");
             div.id = id;
             div.className = "alert alert-warning";
-            const element = document.querySelector(`${this._baseId}-${compareId}`);
+            const element = document.querySelector(`#${this._baseId}-${compareId}`);
             (_a = element === null || element === void 0 ? void 0 : element.firstChild) === null || _a === void 0 ? void 0 : _a.after(div);
         }
         div.innerHTML = `${[...modifiers].join(", ")} capped`;
     }
     _removeCappingAdvice(compareId) {
         const id = `${this._baseId}-${compareId}-capping`;
-        const div = document.querySelector(id);
+        const div = document.querySelector(`#${id}`);
         if (div) {
             div.remove();
         }

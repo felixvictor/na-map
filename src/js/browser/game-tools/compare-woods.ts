@@ -405,10 +405,9 @@ export default class CompareWoods {
     }
 
     async _loadAndSetupData(): Promise<void> {
-        const woodFileName = "~Lib/gen-generic/woods.json"
-
         try {
-            this._woodData = (await import(/* webpackChunkName: "data-woods" */ woodFileName)).default as WoodData
+            this._woodData = (await import(/* webpackChunkName: "data-woods" */ "Lib/gen-generic/woods.json"))
+                .default as WoodData
             this._setupData()
         } catch (error) {
             putImportError(error)
@@ -417,7 +416,7 @@ export default class CompareWoods {
 
     _setupListener(): void {
         let firstClick = true
-        document.querySelector("#"+this._buttonId)?.addEventListener("click", async (event) => {
+        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", async (event) => {
             if (firstClick) {
                 firstClick = false
                 await this._loadAndSetupData()
@@ -431,7 +430,7 @@ export default class CompareWoods {
 
     _woodCompareSelected(): void {
         // If the modal has no content yet, insert it
-        if (!document.querySelector("#"+this._modalId)) {
+        if (!document.querySelector(`#${this._modalId}`)) {
             this._initModal()
         }
 

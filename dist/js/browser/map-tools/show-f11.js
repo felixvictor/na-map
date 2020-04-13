@@ -43,7 +43,7 @@ export default class ShowF11 {
     }
     _setupListener() {
         var _a;
-        (_a = document.querySelector(`${this._buttonId}`)) === null || _a === void 0 ? void 0 : _a.addEventListener("click", (event) => this._navbarClick(event));
+        (_a = document.querySelector(`#${this._buttonId}`)) === null || _a === void 0 ? void 0 : _a.addEventListener("click", (event) => this._navbarClick(event));
         window.addEventListener("keydown", (event) => {
             if (event.code === "F11" && event.shiftKey) {
                 this._navbarClick(event);
@@ -124,19 +124,19 @@ export default class ShowF11 {
         if (!this._modal$) {
             this._initModal();
             this._modal$ = $(`#${this._modalId}`);
-            this._xInputSel = document.querySelector(this._xInputId);
-            this._zInputSel = document.querySelector(this._zInputId);
+            this._xInputSel = document.querySelector(`#${this._xInputId}`);
+            this._zInputSel = document.querySelector(`#${this._zInputId}`);
             this._formSel.addEventListener("submit", (event) => {
                 this._modal$.modal("hide");
                 event.preventDefault();
                 this._useUserInput();
             });
-            (_a = document.querySelector(this._modalId)) === null || _a === void 0 ? void 0 : _a.addEventListener("keydown", (event) => {
+            (_a = document.querySelector(`#${this._modalId}`)) === null || _a === void 0 ? void 0 : _a.addEventListener("keydown", (event) => {
                 if (event.key === "KeyC" && event.ctrlKey) {
                     this._copyCoordClicked(event);
                 }
             });
-            (_b = document.querySelector(this._copyButtonId)) === null || _b === void 0 ? void 0 : _b.addEventListener("click", (event) => {
+            (_b = document.querySelector(`#${this._copyButtonId}`)) === null || _b === void 0 ? void 0 : _b.addEventListener("click", (event) => {
                 this._copyCoordClicked(event);
             });
         }

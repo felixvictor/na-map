@@ -28,9 +28,8 @@ export default class DisplayPbZones {
         this._g = d3Select("#na-svg").insert("g", "#ports").attr("class", "pb");
     }
     async _loadData() {
-        const fileName = "~Lib/gen-generic/pb-zones.json";
         try {
-            this._pbZonesDefault = (await import(fileName)).default;
+            this._pbZonesDefault = (await import("Lib/gen-generic/pb-zones.json")).default;
         }
         catch (error) {
             putImportError(error);
@@ -38,7 +37,7 @@ export default class DisplayPbZones {
     }
     _setupListener() {
         var _a;
-        (_a = document.querySelector(this._showId)) === null || _a === void 0 ? void 0 : _a.addEventListener("change", (event) => {
+        (_a = document.querySelector(`#${this._showId}`)) === null || _a === void 0 ? void 0 : _a.addEventListener("change", (event) => {
             this._showPBZonesSelected();
             event.preventDefault();
         });
@@ -74,7 +73,7 @@ export default class DisplayPbZones {
                 .attr("x", (d) => d.pbCircles.map((pbCircle) => pbCircle[0]).join(","))
                 .attr("y", (d) => d.pbCircles.map((pbCircle) => pbCircle[1]).join(","))
                 .text((d) => d.pbCircles.map((pbCircle, i) => String.fromCharCode(65 + i)).join(""));
-            return enter;
+            return g;
         });
         this._g
             .selectAll("g.raid-zones")
@@ -100,7 +99,7 @@ export default class DisplayPbZones {
                 .attr("x", (d) => d.raidPoints.map((raidPoint) => raidPoint[0]).join(","))
                 .attr("y", (d) => d.raidPoints.map((raidPoint) => raidPoint[1]).join(","))
                 .text((d) => d.raidPoints.map((raidPoint, i) => String.fromCharCode(49 + i)).join(""));
-            return enter;
+            return g;
         });
         this._g
             .selectAll("g.defence")
@@ -123,7 +122,7 @@ export default class DisplayPbZones {
                 .attr("x", (d) => d.towers.map((tower) => tower[0]).join(","))
                 .attr("y", (d) => d.towers.map((tower) => tower[1]).join(","))
                 .text((d) => d.towers.map((tower, i) => `${i + 1}`).join(""));
-            return enter;
+            return g;
         });
     }
     _isPortIn(d) {
@@ -185,7 +184,7 @@ export default class DisplayPbZones {
         this._update();
     }
     transform(transform) {
-        this._g.attr("transform", transform.toString);
+        this._g.attr("transform", transform.toString());
     }
 }
 //# sourceMappingURL=display-pb-zones.js.map
