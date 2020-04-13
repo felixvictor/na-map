@@ -156,7 +156,7 @@ export default class WindRose {
     }
 
     _setupListener(): void {
-        document.querySelector(`${this._buttonId}`)?.addEventListener("click", (event) => this._navbarClick(event))
+        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", (event) => this._navbarClick(event))
     }
 
     _setupWindInput(): void {
@@ -221,7 +221,7 @@ export default class WindRose {
      */
     _windRoseSelected(): void {
         // If the modal has no content yet, insert it
-        if (!document.querySelector(this._modalId)) {
+        if (!document.querySelector(`#${this._modalId}`)) {
             this._initModal()
         }
 

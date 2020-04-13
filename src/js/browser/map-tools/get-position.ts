@@ -194,7 +194,7 @@ export default class TrilateratePosition {
      * Setup menu item listener
      */
     _setupListener(): void {
-        document.querySelector(`${this._buttonId}`)?.addEventListener("click", (event) => this._navbarClick(event))
+        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", (event) => this._navbarClick(event))
     }
 
     _injectModal(): void {
@@ -249,7 +249,7 @@ export default class TrilateratePosition {
             .map((port) => `<option data-subtext="${port.nation}">${port.name}</option>`)
             .join("")}`
         for (const inputNumber of [...new Array(this._NumberOfInputs).keys()]) {
-            this._selector[inputNumber] = document.querySelector(this._select[inputNumber]) as HTMLSelectElement
+            this._selector[inputNumber] = document.querySelector(`#${this._select[inputNumber]}`) as HTMLSelectElement
 
             this._selector[inputNumber].insertAdjacentHTML("beforeend", options)
             $(this._selector[inputNumber]).selectpicker({
@@ -329,7 +329,7 @@ export default class TrilateratePosition {
             const port = this._selector[inputNumber].selectedIndex
                 ? this._selector[inputNumber].options[this._selector[inputNumber].selectedIndex].text
                 : ""
-            const distance = Number((document.querySelector(this._input[inputNumber]) as HTMLSelectElement).value)
+            const distance = Number((document.querySelector(`#${this._input[inputNumber]}`) as HTMLSelectElement).value)
 
             if (distance && port !== "") {
                 ports.set(port, distance * roundingFactor * circleRadiusFactor)
