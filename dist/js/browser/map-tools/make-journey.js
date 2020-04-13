@@ -144,8 +144,9 @@ export default class MakeJourney {
     }
     _setupListener() {
         var _a, _b;
-        (_a = document.querySelector(`${this._buttonId}`)) === null || _a === void 0 ? void 0 : _a.addEventListener("mouseup", (event) => this._navbarClick(event));
-        (_b = document.querySelector(this._deleteLastLegButtonId)) === null || _b === void 0 ? void 0 : _b.addEventListener("mouseup", () => this._deleteLastLeg());
+        (_a = document.querySelector(`#${this._buttonId}`)) === null || _a === void 0 ? void 0 : _a.addEventListener("mouseup", (event) => this._navbarClick(event));
+        (_b = document
+            .querySelector(`#${this._deleteLastLegButtonId}`)) === null || _b === void 0 ? void 0 : _b.addEventListener("mouseup", () => this._deleteLastLeg());
     }
     _setupWindInput() {
         const _getTooltipPos = $.fn.roundSlider.prototype._getTooltipPos;
@@ -201,7 +202,7 @@ export default class MakeJourney {
         this._printJourney();
     }
     _journeySelected() {
-        if (!document.querySelector(this._modalId)) {
+        if (!document.querySelector(`#${this._modalId}`)) {
             this._initModal();
         }
         $(`#${this._modalId}`)
@@ -298,7 +299,7 @@ export default class MakeJourney {
             const text = node.select("text");
             const lines = d.label.split("|");
             const lineHeight = fontSize * 1.3;
-            text.text("").attr("dy", 0).attr("transform", textTransform.toString).style("font-size", `${fontSize}px`);
+            text.text("").attr("dy", 0).attr("transform", textTransform.toString()).style("font-size", `${fontSize}px`);
             lines.forEach((line, j) => {
                 const tspan = text.append("tspan").html(line);
                 if (j > 0) {
@@ -473,7 +474,7 @@ export default class MakeJourney {
         }
     }
     transform(transform) {
-        this._g.attr("transform", transform.toString);
+        this._g.attr("transform", transform.toString());
         this._correctJourney();
     }
 }

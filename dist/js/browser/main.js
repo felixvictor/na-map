@@ -32,7 +32,7 @@ const serverNameSelected = () => {
 };
 const setupListener = () => {
     var _a;
-    (_a = document.querySelector(baseId)) === null || _a === void 0 ? void 0 : _a.addEventListener("change", () => serverNameSelected());
+    (_a = document.querySelector(`#${baseId}`)) === null || _a === void 0 ? void 0 : _a.addEventListener("change", () => serverNameSelected());
     $(".dropdown-menu [data-toggle='dropdown']").on("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
