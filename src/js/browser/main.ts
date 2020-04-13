@@ -79,7 +79,7 @@ const serverNameSelected = (): void => {
  * Setup listeners
  */
 const setupListener = (): void => {
-    document.querySelector(baseId)?.addEventListener("change", () => serverNameSelected())
+    document.querySelector(`#${baseId}`)?.addEventListener("change", () => serverNameSelected())
 
     // {@link https://jsfiddle.net/bootstrapious/j6zkyog8/}
     $(".dropdown-menu [data-toggle='dropdown']").on("click", (event) => {
