@@ -264,8 +264,10 @@ export default class MakeJourney {
      * Setup menu item listener
      */
     _setupListener(): void {
-        document.querySelector(`${this._buttonId}`)?.addEventListener("mouseup", (event) => this._navbarClick(event))
-        document.querySelector(this._deleteLastLegButtonId)?.addEventListener("mouseup", () => this._deleteLastLeg())
+        document.querySelector(`#${this._buttonId}`)?.addEventListener("mouseup", (event) => this._navbarClick(event))
+        document
+            .querySelector(`#${this._deleteLastLegButtonId}`)
+            ?.addEventListener("mouseup", () => this._deleteLastLeg())
     }
 
     _setupWindInput(): void {
@@ -344,7 +346,7 @@ export default class MakeJourney {
      */
     _journeySelected(): void {
         // If the modal has no content yet, insert it
-        if (!document.querySelector(this._modalId)) {
+        if (!document.querySelector(`#${this._modalId}`)) {
             this._initModal()
         }
 
