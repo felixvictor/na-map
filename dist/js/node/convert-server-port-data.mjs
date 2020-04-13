@@ -8,8 +8,9 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 import * as path from "path";
-import * as d3Collection from "d3-collection";
 import dayjs from "dayjs";
+import d3Array from "d3-array";
+const { rollup: d3Rollup } = d3Array;
 import { findNationById, nations } from "../common/common";
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir";
 import { readJson, saveJsonAsync } from "../common/common-file";
@@ -170,31 +171,26 @@ const setAndSaveFrontlines = async (serverName) => {
         })
             .sort(sortBy(["distance"]))
             .slice(0, frontlinePorts));
-        frontlineAttackingNationGroupedByToPort[nationShortName] = d3Collection
-            .nest()
-            .key((d) => String(d.toPortId))
-            .rollup((values) => values.map((value) => value.fromPortId))
-            .entries(frontlinesFrom);
-        frontlineAttackingNationGroupedByFromPort[nationShortName] = d3Collection
-            .nest()
-            .key((d) => String(d.toPortId))
-            .rollup((values) => values.map((value) => ({
+        frontlineAttackingNationGroupedByToPort[nationShortName] = d3Rollup(frontlinesFrom, (values) => values.map((value) => value.fromPortId), (d) => String(d.toPortId));
+        frontlineAttackingNationGroupedByFromPort[nationShortName] = d3Rollup(frontlinesFrom, (values) => values.map((value) => ({
             id: value.toPortId,
             nation: value.toPortNation,
-        })))
-            .entries(frontlinesFrom);
+        })), (d) => String(d.toPortId));
     });
+    console.log(frontlineAttackingNationGroupedByFromPort.PR);
     const frontlineDefendingNationMap = new Map();
     for (const attackingNation of Object.keys(frontlineAttackingNationGroupedByFromPort)) {
-        for (const fromPort of frontlineAttackingNationGroupedByFromPort[attackingNation]) {
-            for (const toPort of fromPort.values) {
+        console.log(attackingNation, frontlineAttackingNationGroupedByFromPort[attackingNation]);
+        for (const [, fromPort] of [...frontlineAttackingNationGroupedByFromPort[attackingNation]]) {
+            console.log(fromPort);
+            for (const toPort of [...fromPort]) {
                 const key = String(toPort.nation) + String(toPort.id);
                 let fromPorts = frontlineDefendingNationMap.get(key);
                 if (fromPorts) {
-                    fromPorts.add(fromPort.key);
+                    fromPorts.add(key);
                 }
                 else {
-                    fromPorts = new Set([fromPort.key]);
+                    fromPorts = new Set([key]);
                 }
                 frontlineDefendingNationMap.set(key, fromPorts);
             }
@@ -207,7 +203,7 @@ const setAndSaveFrontlines = async (serverName) => {
         if (!frontlineDefendingNation[nationShortName]) {
             frontlineDefendingNation[nationShortName] = [];
         }
-        frontlineDefendingNation[nationShortName].push({ key: toPortId, values: [...fromPorts].map(Number) });
+        frontlineDefendingNation[nationShortName].push({ key: toPortId, value: [...fromPorts].map(Number) });
     }
     await saveJsonAsync(path.resolve(commonPaths.dirGenServer, `${serverName}-frontlines.json`), {
         attacking: frontlineAttackingNationGroupedByToPort,
