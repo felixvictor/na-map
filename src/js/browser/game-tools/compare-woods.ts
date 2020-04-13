@@ -417,7 +417,7 @@ export default class CompareWoods {
 
     _setupListener(): void {
         let firstClick = true
-        document.querySelector(this._buttonId)?.addEventListener("click", async (event) => {
+        document.querySelector("#"+this._buttonId)?.addEventListener("click", async (event) => {
             if (firstClick) {
                 firstClick = false
                 await this._loadAndSetupData()
@@ -431,7 +431,7 @@ export default class CompareWoods {
 
     _woodCompareSelected(): void {
         // If the modal has no content yet, insert it
-        if (!document.querySelector(this._modalId)) {
+        if (!document.querySelector("#"+this._modalId)) {
             this._initModal()
         }
 
