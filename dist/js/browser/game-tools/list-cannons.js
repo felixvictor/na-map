@@ -27,9 +27,9 @@ export default class ListCannons {
         this._setupListener();
     }
     async _loadAndSetupData() {
-        const fileName = "~Lib/gen-generic/cannons.json";
         try {
-            const cannonData = (await import(fileName)).default;
+            const cannonData = (await import("Lib/gen-generic/cannons.json"))
+                .default;
             this._setupData(cannonData);
         }
         catch (error) {
@@ -54,7 +54,7 @@ export default class ListCannons {
     }
     _setupListener() {
         let firstClick = true;
-        document.querySelector(this._buttonId).addEventListener("click", async (event) => {
+        document.querySelector(`#${this._buttonId}`).addEventListener("click", async (event) => {
             if (firstClick) {
                 firstClick = false;
                 await this._loadAndSetupData();
@@ -175,7 +175,7 @@ export default class ListCannons {
             footer: this._getModalFooter,
         }), document.querySelector("#modal-section"));
         for (const type of Object.keys(this._cannonData)) {
-            const table = document.querySelector(`table-${type}-list`);
+            const table = document.querySelector(`#table-${type}-list`);
             if (table) {
                 const sortTable = new Tablesort.Tablesort(table);
             }
@@ -186,7 +186,7 @@ export default class ListCannons {
         this._injectModal();
     }
     _cannonListSelected() {
-        if (!document.querySelector(this._modalId)) {
+        if (!document.querySelector(`#${this._modalId}`)) {
             this._initModal();
         }
         $(`#${this._modalId}`).modal("show");

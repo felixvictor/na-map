@@ -681,6 +681,7 @@ export default class DisplayPorts {
         return id ? this.portDataDefault.find((port) => port.id === id)?.name ?? "" : ""
     }
 
+    // eslint-disable-next-line complexity
     _getText(portProperties: Port): PortForDisplay {
         moment.locale("en-gb")
         const portBattleLT = moment.utc(portProperties.portBattle).local()
@@ -870,7 +871,7 @@ export default class DisplayPorts {
                     })
                     .attr("cx", (d) => d.coordinates[0])
                     .attr("cy", (d) => d.coordinates[1])
-                    .on("click", this._showDetails)
+                    .on("click", (d, i, nodes) => this._showDetails(d, i, nodes))
                     .on("mouseleave", DisplayPorts._hideDetails)
             )
             .attr("r", circleSize)
@@ -907,9 +908,12 @@ export default class DisplayPorts {
         const rMin = roundToThousands((this._circleSize / circleScale) * this._minRadiusFactor)
         const rMax = roundToThousands((this._circleSize / circleScale) * this._maxRadiusFactor)
         let data = this._portDataFiltered
-        let cssClass: PortCircleStringF
-        let r: PortCircleNumberF
-        let fill: PortCircleStringF
+        // eslint-disable-next-line unicorn/consistent-function-scoping
+        let cssClass: PortCircleStringF = () => ""
+        // eslint-disable-next-line unicorn/consistent-function-scoping
+        let r: PortCircleNumberF = () => 0
+        // eslint-disable-next-line unicorn/consistent-function-scoping
+        let fill: PortCircleStringF = () => ""
 
         // noinspection IfStatementWithTooManyBranchesJS
         if (this.showRadius === "tax") {
@@ -1180,7 +1184,7 @@ export default class DisplayPorts {
     }
 
     transform(transform: d3Zoom.ZoomTransform): void {
-        this._gPort.attr("transform", transform.toString)
+        this._gPort.attr("transform", transform.toString())
     }
 
     clearMap(scale?: number): void {
