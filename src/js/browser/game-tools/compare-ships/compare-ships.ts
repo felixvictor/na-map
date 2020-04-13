@@ -355,7 +355,7 @@ export class CompareShips {
     _setupListener(): void {
         let firstClick = true
 
-        document.querySelector(this._buttonId)?.addEventListener("click", async (event) => {
+        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", async (event) => {
             if (firstClick) {
                 firstClick = false
                 await this._loadAndSetupData()
@@ -391,13 +391,13 @@ export class CompareShips {
             this._modal$ = $(`#${this._modalId}`)
 
             // Copy data to clipboard (ctrl-c key event)
-            document.querySelector(this._modalId)?.addEventListener("keydown", (event: Event): void => {
+            document.querySelector(`#${this._modalId}`)?.addEventListener("keydown", (event: Event): void => {
                 if ((event as KeyboardEvent).key === "KeyC" && (event as KeyboardEvent).ctrlKey) {
                     this._copyDataClicked(event)
                 }
             })
             // Copy data to clipboard (click event)
-            document.querySelector(this._copyButtonId)?.addEventListener("click", (event) => {
+            document.querySelector(`#${this._copyButtonId}`)?.addEventListener("click", (event) => {
                 this._copyDataClicked(event)
             })
         }
@@ -836,13 +836,13 @@ export class CompareShips {
 
     _showCappingAdvice(compareId: keyof CompareId, modifiers: Set<string>): void {
         const id = `${this._baseId}-${compareId}-capping`
-        let div = document.querySelector(id)
+        let div = document.querySelector(`#${id}`)
 
         if (!div) {
             div = document.createElement("p")
             div.id = id
             div.className = "alert alert-warning"
-            const element = document.querySelector(`${this._baseId}-${compareId}`)
+            const element = document.querySelector(`#${this._baseId}-${compareId}`)
             element?.firstChild?.after(div)
         }
 
@@ -852,7 +852,7 @@ export class CompareShips {
 
     _removeCappingAdvice(compareId: keyof CompareId): void {
         const id = `${this._baseId}-${compareId}-capping`
-        const div = document.querySelector(id)
+        const div = document.querySelector(`#${id}`)
 
         if (div) {
             div.remove()
