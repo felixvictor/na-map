@@ -78,7 +78,7 @@ export default class ShowF11 {
     }
 
     _setupListener(): void {
-        document.querySelector(`${this._buttonId}`)?.addEventListener("click", (event) => this._navbarClick(event))
+        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", (event) => this._navbarClick(event))
         window.addEventListener("keydown", (event) => {
             if (event.code === "F11" && event.shiftKey) {
                 this._navbarClick(event)
@@ -177,8 +177,8 @@ export default class ShowF11 {
         if (!this._modal$) {
             this._initModal()
             this._modal$ = $(`#${this._modalId}`)
-            this._xInputSel = document.querySelector(this._xInputId) as HTMLInputElement
-            this._zInputSel = document.querySelector(this._zInputId) as HTMLInputElement
+            this._xInputSel = document.querySelector(`#${this._xInputId}`) as HTMLInputElement
+            this._zInputSel = document.querySelector(`#${this._zInputId}`) as HTMLInputElement
             // Submit handler
             this._formSel.addEventListener("submit", (event) => {
                 this._modal$.modal("hide")
@@ -187,13 +187,13 @@ export default class ShowF11 {
             })
 
             // Copy coordinates to clipboard (ctrl-c key event)
-            document.querySelector(this._modalId)?.addEventListener("keydown", (event: Event): void => {
+            document.querySelector(`#${this._modalId}`)?.addEventListener("keydown", (event: Event): void => {
                 if ((event as KeyboardEvent).key === "KeyC" && (event as KeyboardEvent).ctrlKey) {
                     this._copyCoordClicked(event)
                 }
             })
             // Copy coordinates to clipboard (click event)
-            document.querySelector(this._copyButtonId)?.addEventListener("click", (event): void => {
+            document.querySelector(`#${this._copyButtonId}`)?.addEventListener("click", (event): void => {
                 this._copyCoordClicked(event)
             })
         }

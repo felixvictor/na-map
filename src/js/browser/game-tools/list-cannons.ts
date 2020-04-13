@@ -90,7 +90,7 @@ export default class ListCannons {
 
     _setupListener(): void {
         let firstClick = true
-        ;(document.querySelector(this._buttonId) as HTMLElement).addEventListener("click", async (event) => {
+        ;(document.querySelector(`#${this._buttonId}`) as HTMLElement).addEventListener("click", async (event) => {
             if (firstClick) {
                 firstClick = false
                 await this._loadAndSetupData()
@@ -252,7 +252,7 @@ export default class ListCannons {
         )
 
         for (const type of Object.keys(this._cannonData)) {
-            const table = document.querySelector(`table-${type}-list`) as HTMLElement
+            const table = document.querySelector(`#table-${type}-list`) as HTMLElement
             if (table) {
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 const sortTable = new Tablesort.Tablesort(table)
@@ -267,7 +267,7 @@ export default class ListCannons {
 
     _cannonListSelected(): void {
         // If the modal has no content yet, insert it
-        if (!document.querySelector(this._modalId)) {
+        if (!document.querySelector(`#${this._modalId}`)) {
             this._initModal()
         }
 
