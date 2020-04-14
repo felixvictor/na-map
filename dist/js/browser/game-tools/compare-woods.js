@@ -17,6 +17,8 @@ import { formatFloat, formatPercent, formatSignFloat } from "../../common/common
 import { insertBaseModal } from "../../common/common-browser";
 import { putImportError } from "../../common/common";
 import { simpleStringSort, sortBy } from "../../common/common-node";
+const woodType = ["frame", "trim"];
+const woodColumnType = ["Base", "C1", "C2", "C3"];
 class Wood {
     constructor(compareId, woodCompare) {
         this._id = compareId;
@@ -235,7 +237,9 @@ export default class CompareWoods {
     constructor(baseFunction) {
         this.instances = {};
         this.minMaxProperty = new Map();
+        this._defaultWoodId = {};
         this._options = {};
+        this._woodIdsSelected = {};
         this.baseFunction = baseFunction;
         this._baseName = "Compare woods";
         this._baseId = `${this.baseFunction}-compare`;
@@ -318,10 +322,10 @@ export default class CompareWoods {
         this._setOption(this._frameSelectData.map((wood) => `<option value="${wood.id}">${wood.name}</option>`).toString(), this._trimSelectData.map((wood) => `<option value="${wood.id}">${wood.name}</option>`).toString());
         for (const propertyName of this.propertyNames) {
             const frames = [
-                ...this._woodData.frame.map((frame) => frame.properties.find((modifier) => modifier.modifier === propertyName).amount),
+                ...this._woodData.frame.map((frame) => { var _a, _b; return (_b = (_a = frame.properties.find((modifier) => modifier.modifier === propertyName)) === null || _a === void 0 ? void 0 : _a.amount) !== null && _b !== void 0 ? _b : 0; }),
             ];
             const trims = [
-                ...this._woodData.trim.map((trim) => trim.properties.find((modifier) => modifier.modifier === propertyName).amount),
+                ...this._woodData.trim.map((trim) => { var _a, _b; return (_b = (_a = trim.properties.find((modifier) => modifier.modifier === propertyName)) === null || _a === void 0 ? void 0 : _a.amount) !== null && _b !== void 0 ? _b : 0; }),
             ];
             const minFrames = (_a = d3Min(frames)) !== null && _a !== void 0 ? _a : 0;
             const maxFrames = (_b = d3Max(frames)) !== null && _b !== void 0 ? _b : 0;
@@ -344,7 +348,7 @@ export default class CompareWoods {
             const div = row
                 .append("div")
                 .attr("class", `col-md-3 ml-auto pt-2 ${column === "Base" ? "column-base" : "column-comp"}`);
-            for (const type of ["frame", "trim"]) {
+            for (const type of woodType) {
                 const id = `${this.baseFunction}-${type}-${column}-select`;
                 div.append("label").attr("for", id);
                 div.append("select").attr("name", id).attr("id", id).attr("class", "selectpicker");
@@ -356,7 +360,7 @@ export default class CompareWoods {
         this._initData();
         this._injectModal();
         for (const compareId of this._columns) {
-            for (const type of ["frame", "trim"]) {
+            for (const type of woodType) {
                 const select$ = $(`#${this.baseFunction}-${type}-${compareId}-select`);
                 this._setupWoodSelects(compareId, type, select$);
                 this._setupSelectListener(compareId, type, select$);
@@ -385,7 +389,7 @@ export default class CompareWoods {
         }
     }
     enableSelects(id) {
-        for (const type of ["frame", "trim"]) {
+        for (const type of woodType) {
             $(`#${this.baseFunction}-${type}-${id}-select`).removeAttr("disabled").selectpicker("refresh");
         }
     }

@@ -40,7 +40,7 @@ export default class Cookie {
         this.#baseId = baseId
         this.#expire = expire
 
-        this.#name = `${appName}--${this.#baseId}`
+        this.#name =`${appName}--${this.#baseId}`
         this.#values = values
         this.#default = values?.[0]
     }

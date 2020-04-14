@@ -278,13 +278,9 @@ const setAndSaveFrontlines = async (serverName: string): Promise<void> => {
             )
         })
 
-    console.log(frontlineAttackingNationGroupedByFromPort.PR)
-
     const frontlineDefendingNationMap: Map<string, Set<string>> = new Map()
     for (const attackingNation of Object.keys(frontlineAttackingNationGroupedByFromPort)) {
-        console.log(attackingNation, frontlineAttackingNationGroupedByFromPort[attackingNation])
         for (const [, fromPort] of [...frontlineAttackingNationGroupedByFromPort[attackingNation]]) {
-            console.log(fromPort)
             for (const toPort of [...fromPort]) {
                 const key = String(toPort.nation) + String(toPort.id)
                 let fromPorts = frontlineDefendingNationMap.get(key)
