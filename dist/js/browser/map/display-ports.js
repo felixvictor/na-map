@@ -396,7 +396,7 @@ export default class DisplayPorts {
         moment.locale("en-gb");
         const portBattleLT = moment.utc(portProperties.portBattle).local();
         const portBattleST = moment.utc(portProperties.portBattle);
-        const localTime = portBattleST === portBattleLT ? "" : ` (${portBattleLT.format("H.mm")} local)`;
+        const localTime = portBattleST === portBattleLT ? "" : `(${portBattleLT.format("H.mm")} local)`;
         const portBattleStartTime = portProperties.portBattleStartTime
             ? `${(portProperties.portBattleStartTime + 10) % 24}.00\u202F–\u202F${(portProperties.portBattleStartTime + 13) % 24}.00`
             : "11.00\u202F–\u202F8.00";
@@ -413,7 +413,7 @@ export default class DisplayPorts {
             countyCapital: portProperties.countyCapital ? " (county capital)" : "",
             nonCapturable: portProperties.nonCapturable,
             captured: portProperties.capturer
-                ? ` captured by ${displayClan(portProperties.capturer)} ${moment
+                ? `captured by ${displayClan(portProperties.capturer)} ${moment
                     .utc(portProperties.lastPortBattle)
                     .fromNow()}`
                 : "",
@@ -474,8 +474,8 @@ export default class DisplayPorts {
             h += `<br>${port.portTax} tax`;
         }
         else {
-            h += `Port battle ${port.pbTimeRange}, ${port.brLimit} <span class="caps">BR</span>, `;
-            h += `${port.pbType}\u202Frate <span class="caps">AI</span>, `;
+            h += `Port battle ${port.pbTimeRange}, ${port.brLimit} <span class="caps">BR</span>,`;
+            h += `${port.pbType}\u202Frate <span class="caps">AI</span>,`;
             h += `${port.conquestMarksPension}\u202Fconquest point`;
             h += port.conquestMarksPension > 1 ? "s" : "";
             h += `, ${port.portPoints}\u202Fport points`;

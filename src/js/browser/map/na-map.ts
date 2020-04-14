@@ -252,7 +252,7 @@ class NAMap {
 
         /*
         Marks.forEach(mark => {
-            performance.measure(mark, `${mark}-start`, `${mark}-end`);
+            performance.measure(mark,`${mark}-start`,`${mark}-end`);
         });
         console.log(performance.getEntriesByType("measure"));
         */

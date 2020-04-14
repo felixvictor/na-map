@@ -55,13 +55,13 @@ export default class ShowF11 {
 
         this._baseName = "Go to F11"
         this._baseId = "go-to-f11"
-        this._buttonId = `button-${this._baseId}`
-        this._modalId = `modal-${this._baseId}`
-        this._formId = `form-${this._baseId}`
-        this._xInputId = `input-x-${this._baseId}`
-        this._zInputId = `input-z-${this._baseId}`
-        this._copyButtonId = `copy-coord-${this._baseId}`
-        this._submitButtonId = `submit-${this._baseId}`
+        this._buttonId =`button-${this._baseId}`
+        this._modalId =`modal-${this._baseId}`
+        this._formId =`form-${this._baseId}`
+        this._xInputId =`input-x-${this._baseId}`
+        this._zInputId =`input-z-${this._baseId}`
+        this._copyButtonId =`copy-coord-${this._baseId}`
+        this._submitButtonId =`submit-${this._baseId}`
 
         this._setupSvg()
         this._setupListener()
@@ -238,7 +238,7 @@ export default class ShowF11 {
 
     _printF11Coord(x: number, y: number, F11X: number, F11Y: number): void {
         let circleSize = 10
-        const g = this._g.append("g").attr("transform", `translate(${x},${y})`)
+        const g = this._g.append("g").attr("transform",`translate(${x},${y})`)
         const coordRect = g.append("rect")
         const timeRect = g.append("rect")
         g.append("circle").attr("r", circleSize)
@@ -247,14 +247,14 @@ export default class ShowF11 {
         circleSize *= 1.6
         const F11XText = g
             .append("text")
-            .attr("dx", `${-circleSize}px`)
-            .attr("dy", `${-circleSize / 2 - 2}px`)
+            .attr("dx",`${-circleSize}px`)
+            .attr("dy",`${-circleSize / 2 - 2}px`)
             .attr("class", "f11-coord")
             .text(formatF11(F11X))
         const F11YText = g
             .append("text")
-            .attr("dx", `${-circleSize}px`)
-            .attr("dy", `${circleSize / 2 + 2}px`)
+            .attr("dx",`${-circleSize}px`)
+            .attr("dy",`${circleSize / 2 + 2}px`)
             .attr("class", "f11-coord")
             .text(formatF11(F11Y))
         const F11XDim = F11XText.node()?.getBBox()
@@ -264,14 +264,14 @@ export default class ShowF11 {
         const timeStampLocal = moment()
         const timeStampText = g
             .append("text")
-            .attr("dx", `${circleSize}px`)
-            .attr("dy", `${-circleSize / 2 - 2}px`)
+            .attr("dx",`${circleSize}px`)
+            .attr("dy",`${-circleSize / 2 - 2}px`)
             .attr("class", "f11-time")
             .text(timeStamp.format("H.mm"))
         const timeStampLocalText = g
             .append("text")
-            .attr("dx", `${circleSize}px`)
-            .attr("dy", `${circleSize / 2 + 2}px`)
+            .attr("dx",`${circleSize}px`)
+            .attr("dy",`${circleSize / 2 + 2}px`)
             .attr("class", "f11-time")
             .text(`(${timeStampLocal.format("H.mm")} local)`)
         const timeStampDim = timeStampText.node()?.getBBox()
