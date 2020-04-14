@@ -19,18 +19,15 @@ import { repeat } from "lit-html/directives/repeat"
 // import { Tablesort } from "tablesort"
 
 import { registerEvent } from "../analytics"
-import { capitalizeFirstLetter, putImportError } from "../../common/common"
-import { BaseModalHtml, initTablesort, insertBaseModalHTML } from "../../common/common-browser"
+import { cannonType, capitalizeFirstLetter, putImportError } from "../../common/common"
+import { BaseModalHtml, HtmlString, initTablesort, insertBaseModalHTML } from "../../common/common-browser"
 import { formatFloatFixedHTML } from "../../common/common-format"
-import { Cannon, CannonEntity } from "../../common/gen-json"
+import { Cannon, CannonEntity, CannonValue } from "../../common/gen-json"
 
 type GroupKey = string
 type GroupData = { values: string; count?: number }
 type GroupObject = [GroupKey, GroupData]
 type GroupMap = Map<GroupKey, GroupData>
-
-const cannonType = ["medium", "long", "carronade"] as const
-export type CannonType = typeof cannonType[number]
 
 /**
  *
@@ -38,9 +35,9 @@ export type CannonType = typeof cannonType[number]
 export default class ListCannons {
     private _cannonData: Cannon = {} as Cannon
     private readonly _baseName: string
-    private readonly _baseId: string
-    private readonly _buttonId: string
-    private readonly _modalId: string
+    private readonly _baseId: HtmlString
+    private readonly _buttonId: HtmlString
+    private readonly _modalId: HtmlString
     private _groups!: GroupMap
 
     constructor() {
@@ -139,7 +136,7 @@ export default class ListCannons {
                     return html``
                 }
 
-                return Object.entries(groupValue[1]).map(
+                return Object.entries<CannonValue>(groupValue[1]).map(
                     (modifierValue) =>
                         html`
                             <td class="text-right" data-sort="${modifierValue[1].value ?? 0}">
@@ -176,7 +173,7 @@ export default class ListCannons {
                     ${repeat(
                         // @ts-ignore
                         this._cannonData[type],
-                        (cannon: CannonEntity) => cannon.id,
+                        (cannon: CannonEntity) => cannon.name,
                         (cannon: CannonEntity) => {
                             return html`
                                 <tr>
