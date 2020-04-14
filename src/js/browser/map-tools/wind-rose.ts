@@ -64,10 +64,10 @@ export default class WindRose {
 
         this._baseName = "In-game wind"
         this._baseId = "ingame-wind"
-        this._buttonId = `button-${this._baseId}`
-        this._modalId = `modal-${this._baseId}`
-        this._formId = `form-${this._baseId}`
-        this._sliderId = `slider-${this._baseId}`
+        this._buttonId =`button-${this._baseId}`
+        this._modalId =`modal-${this._baseId}`
+        this._formId =`form-${this._baseId}`
+        this._sliderId =`slider-${this._baseId}`
 
         this._cookieExpire = this._getExpire()
 
@@ -75,14 +75,14 @@ export default class WindRose {
          * Wind correctionValueDegrees cookie
          */
         this._cookieWindDegrees = new Cookie({
-            id: `${this._baseId}-degrees`,
+            id:`${this._baseId}-degrees`,
             expire: this._cookieExpire,
         })
 
         /**
          * Wind correctionValueDegrees time cookie
          */
-        this._cookieTime = new Cookie({ id: `${this._baseId}-time` })
+        this._cookieTime = new Cookie({ id:`${this._baseId}-time`})
 
         /**
          * Get current wind from cookie or use default value
@@ -174,7 +174,7 @@ export default class WindRose {
         }
 
         // @ts-ignore
-        window.tooltip = (arguments_) => `${displayCompass(arguments_.value)}<br>${String(arguments_.value)}°`
+        window.tooltip = (arguments_) =>`${displayCompass(arguments_.value)}<br>${String(arguments_.value)}°`
 
         $(`#${this._sliderId}`).roundSlider({
             sliderType: "default",

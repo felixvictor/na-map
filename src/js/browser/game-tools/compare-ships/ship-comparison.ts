@@ -38,10 +38,10 @@ import { ShipData } from "../../../common/gen-json"
 import { CompareShips, DragData, Ship, ShipDisplayData } from "."
 
 export class ShipComparison extends Ship {
-    // Base ship data
-    private readonly _shipBaseData: ShipData
     // Ship data of the ship to be compared to
     readonly shipCompareData: ShipData
+    // Base ship data
+    private readonly _shipBaseData: ShipData
     private _speedScale!: ScaleLinear<number, number>
     private _speedDiff!: number[]
     private _minSpeedDiff!: number

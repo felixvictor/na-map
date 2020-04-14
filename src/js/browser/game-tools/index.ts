@@ -17,10 +17,9 @@ import { CompareShips } from "./compare-ships"
 import CompareWoods from "./compare-woods"
 import ListBuildings from "./list-buildings"
 import ListCannons from "./list-cannons"
-
-/*
 import ListIngredients from "./list-ingredients"
 import ListLoot from "./list-loot"
+/*
 import ListModules from "./list-modules"
 import ListPortOwnerships from "./list-port-ownerships"
 import ListShipBlueprints from "./list-ship-blueprints"
@@ -62,10 +61,13 @@ const init = (serverId: string, urlParams: URLSearchParams): void => {
     const cannonList = new ListCannons()
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    //  const ownershipList = new ListPortOwnerships()
+    const ingredientList = new ListIngredients()
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    // const lootList = new ListLoot()
+    const lootList = new ListLoot()
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    //  const ownershipList = new ListPortOwnerships()
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     // const moduleList = new ListModules()
@@ -75,9 +77,6 @@ const init = (serverId: string, urlParams: URLSearchParams): void => {
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     // const shipList = new ListShips()
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    // const ingredientList = new ListIngredients()
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     // const blueprintList = new ListShipBlueprints()
