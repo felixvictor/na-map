@@ -125,11 +125,11 @@ export default class MakeJourney {
 
         this._baseName = "Make journey"
         this._baseId = "make-journey"
-        this._buttonId = `button-${this._baseId}`
-        this._compassId = `compass-${this._baseId}`
-        this._deleteLastLegButtonId = `button-delete-leg-${this._baseId}`
-        this._modalId = `modal-${this._baseId}`
-        this._sliderId = `slider-${this._baseId}`
+        this._buttonId =`button-${this._baseId}`
+        this._compassId =`compass-${this._baseId}`
+        this._deleteLastLegButtonId =`button-delete-leg-${this._baseId}`
+        this._modalId =`modal-${this._baseId}`
+        this._sliderId =`slider-${this._baseId}`
         this._shipId = "ship-journey"
 
         this._setupSummary()
@@ -140,7 +140,7 @@ export default class MakeJourney {
     }
 
     static _pluralize(number: number, word: string): string {
-        return `${number} ${word + (number === 1 ? "" : "s")}`
+        return`${number} ${word + (number === 1 ? "" : "s")}`
     }
 
     static _getHumanisedDuration(duration: number): string {
@@ -225,7 +225,7 @@ export default class MakeJourney {
         d3Select("#na-svg defs")
             .append("marker")
             .attr("id", "journey-arrow")
-            .attr("viewBox", `0 -${width} ${doubleWidth} ${doubleWidth}`)
+            .attr("viewBox",`0 -${width} ${doubleWidth} ${doubleWidth}`)
             .attr("refX", width)
             .attr("refY", 0)
             .attr("markerWidth", width)
@@ -233,7 +233,7 @@ export default class MakeJourney {
             .attr("orient", "auto")
             .append("path")
             .attr("class", "journey-arrow-head")
-            .attr("d", `M0,-${width}L${doubleWidth},0L0,${width}`)
+            .attr("d",`M0,-${width}L${doubleWidth},0L0,${width}`)
     }
 
     _initJourneyData(): void {
@@ -285,7 +285,7 @@ export default class MakeJourney {
         }
 
         // @ts-ignore
-        window.tooltip = (arguments_) => `${displayCompass(arguments_.value)}<br>${String(arguments_.value)}°`
+        window.tooltip = (arguments_) =>`${displayCompass(arguments_.value)}<br>${String(arguments_.value)}°`
 
         $(`#${this._sliderId}`).roundSlider({
             sliderType: "default",
@@ -315,7 +315,7 @@ export default class MakeJourney {
         slider.append("label").attr("for", this._sliderId).text("Current in-game wind")
         slider.append("div").attr("id", this._sliderId).attr("class", "rslider")
 
-        const shipId = `${this._shipId}-Base-select`
+        const shipId =`${this._shipId}-Base-select`
         const ship = formGroup.append("div").attr("class", "alert alert-primary").attr("role", "alert")
         const div = ship.append("div").attr("class", "d-flex flex-column")
         div.append("label").attr("for", shipId).text("Ship (optional)")
@@ -453,7 +453,7 @@ export default class MakeJourney {
 
     _setShipName(): void {
         if (this._shipCompare && this._shipCompare.singleShipData && this._shipCompare.singleShipData.name) {
-            this._journey.shipName = `${this._shipCompare.singleShipData.name}`
+            this._journey.shipName =`${this._shipCompare.singleShipData.name}`
         } else {
             this._journey.shipName = this._defaultShipName
         }
@@ -498,7 +498,7 @@ export default class MakeJourney {
             const lines = d.label.split("|")
             const lineHeight = fontSize * 1.3
 
-            text.text("").attr("dy", 0).attr("transform", textTransform.toString()).style("font-size", `${fontSize}px`)
+            text.text("").attr("dy", 0).attr("transform", textTransform.toString()).style("font-size",`${fontSize}px`)
             lines.forEach((line, j) => {
                 const tspan = text.append("tspan").html(line)
                 if (j > 0) {
@@ -533,11 +533,11 @@ export default class MakeJourney {
         this._g.selectAll<SVGGElement, Segment>("g.journey g.label").each(correctTextBox)
         // Correct journey stroke width
         if (this._gJourneyPath) {
-            this._gJourneyPath.style("stroke-width", `${pathWidth}px`)
+            this._gJourneyPath.style("stroke-width",`${pathWidth}px`)
         }
 
         if (this._compassG) {
-            this._compassG.attr("transform", `scale(${1 / scale})`)
+            this._compassG.attr("transform",`scale(${1 / scale})`)
         }
     }
 
@@ -648,16 +648,16 @@ export default class MakeJourney {
     }
 
     _getTextDirection(courseCompass: string, courseDegrees: number, pt1: Coordinate): string {
-        return `${displayCompassAndDegrees(courseCompass, true)} \u2056 F11: ${formatF11(
+        return`${displayCompassAndDegrees(courseCompass, true)} \u2056 F11: ${formatF11(
             convertInvCoordX(pt1.x, pt1.y)
         )}\u202F/\u202F${formatF11(convertInvCoordY(pt1.x, pt1.y))}`
     }
 
     _getTextDistance(distanceK: number, minutes: number, addTotal: boolean): string {
-        let textDistance = `${Math.round(distanceK)}\u2009k ${MakeJourney._getHumanisedDuration(minutes)}`
+        let textDistance =`${Math.round(distanceK)}\u2009k ${MakeJourney._getHumanisedDuration(minutes)}`
 
         if (addTotal) {
-            textDistance += ` \u2056 total ${Math.round(
+            textDistance +=`\u2056 total ${Math.round(
                 this._journey.totalDistance
             )}\u2009k ${MakeJourney._getHumanisedDuration(this._journey.totalMinutes)}`
         }
@@ -687,7 +687,7 @@ export default class MakeJourney {
         const textDirection = this._getTextDirection(courseCompass, courseDegrees, pt1)
         const textDistance = this._getTextDistance(distanceK, minutes, index > 1)
 
-        this._journey.segments[index].label = `${textDirection}|${textDistance}`
+        this._journey.segments[index].label =`${textDirection}|${textDistance}`
         // console.log("*** end", this._journey);
     }
 
@@ -734,7 +734,7 @@ export default class MakeJourney {
     }
 
     setSummaryPosition(topMargin: number, rightMargin: number) {
-        this._divJourneySummary.style("top", `${topMargin}px`).style("right", `${rightMargin}px`)
+        this._divJourneySummary.style("top",`${topMargin}px`).style("right",`${rightMargin}px`)
     }
 
     plotCourse(x: number, y: number): void {

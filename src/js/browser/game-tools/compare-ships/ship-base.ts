@@ -322,7 +322,7 @@ export class ShipBase extends Ship {
                     .attr("fill", (d) => this._shipCompare.colorScale(d.data))
                     .attr("fill", (d) => this._shipCompare.colorScale(d.data))
                     .append("title")
-                    .text((d) => `${Math.round(d.data as number * 10) / 10} knots`)
+                    .text((d) => `${Math.round(d.data * 10) / 10} knots`)
             )
 
         datum.this = gWindProfile

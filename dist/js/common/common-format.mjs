@@ -44,7 +44,7 @@ export const formatFloatFixedHTML = (x, f = 2) => {
             `;
         }
     }
-    return html ` ${number}${String(formattedFloat)} `;
+    return html `${number}${formattedFloat}`;
 };
 export const formatF11 = (x) => formatPrefix(x * -1).replace("k", "\u2009k");
 export const formatInt = (x) => formatLocale.format(",d")(x);
