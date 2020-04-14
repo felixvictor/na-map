@@ -17,12 +17,12 @@ import { commonPaths } from "../common/common-dir"
 import { readTextFile, saveJsonAsync } from "../common/common-file"
 import { round } from "../common/common-math"
 
-import { Cannon, CannonEntity, CannonGroupIndex, CannonPenetration, CannonValue } from "../common/gen-json"
+import { cannonEntityType, CannonEntityType, CannonType, cannonType } from "../common/common"
+import { Cannon, CannonEntity, CannonPenetration, CannonValue } from "../common/gen-json"
 import { PairEntity, TangentEntity, TextEntity, XmlGeneric } from "./xml"
 
 // noinspection MagicNumberJS
 const peneDistances = [50, 100, 250, 500, 750, 1000]
-const cannonTypes = ["medium", "long", "carronade"]
 
 const countDecimals = (value: number | undefined): number => {
     if (value === undefined) {
@@ -76,7 +76,7 @@ const getBaseFileNames = (directory: string): void => {
 /**
  * Data mapping for content of the individual files.
  */
-const dataMapping: Map<string, { group: string; element: string }> = new Map([
+const dataMapping: Map<string, { group: CannonEntityType; element: string }> = new Map([
     // ["CANNON_BLOW_CHANCE", { group: "generic", element: "blow chance" }],
     // ["HIT_PROBABILITY", { group: "damage", element: "hit probability" }],
     // ["DAMAGE_MULTIPLIER", { group: "damage", element: "multiplier" }],
@@ -111,7 +111,7 @@ const dataMapping: Map<string, { group: string; element: string }> = new Map([
 ])
 
 const cannons = {} as Cannon
-for (const type of cannonTypes) {
+for (const type of cannonType) {
     cannons[type] = []
 }
 
@@ -120,7 +120,7 @@ for (const type of cannonTypes) {
  * @param fileData - File data per cannon
  */
 const addData = (fileData: XmlGeneric): void => {
-    let type = "medium"
+    let type: CannonType = "medium"
 
     if (fileData._attributes.Name.includes("Carronade")) {
         type = "carronade"
@@ -146,10 +146,10 @@ const addData = (fileData: XmlGeneric): void => {
     } as CannonEntity
     for (const [value, { group, element }] of dataMapping) {
         if (!cannon[group]) {
-            cannon[group] = {} as CannonGroupIndex
+            // @ts-ignore
+            cannon[group] = {}
         }
 
-        // @ts-ignore
         cannon[group][element] = {
             value: Number(
                 (fileData.Attributes.Pair.find((pair) => pair.Key._text === value)?.Value.Value as TextEntity)._text ??
@@ -209,45 +209,28 @@ export const convertCannons = async (): Promise<void> => {
     }
 
     // Set maximum digits after decimal point
-    const maxDigits = {} as Cannon
-    for (const type of cannonTypes) {
-        maxDigits[type] = {} as CannonEntity[]
-
+    const maxDigits = new Map<[CannonType, CannonEntityType, string], number>()
+    for (const type of cannonType) {
         for (const cannon of cannons[type]) {
-            for (const [groupKey, groupValue] of Object.entries(cannon)) {
-                if (typeof groupValue === "object") {
-                    // @ts-ignore
-                    if (!maxDigits[type][groupKey]) {
-                        // @ts-ignore
-                        maxDigits[type][groupKey] = {}
-                    }
-
-                    for (const [elementKey, elementValue] of Object.entries(groupValue)) {
-                        // @ts-ignore
-                        maxDigits[type][groupKey][elementKey] = Math.max(
-                            // @ts-ignore
-                            maxDigits[type][groupKey][elementKey] ?? 0,
-                            countDecimals(elementValue?.value)
-                        )
-                    }
+            for (const group of cannonEntityType) {
+                // @ts-ignore
+                for (const [elementKey, elementValue] of Object.entries<CannonValue>(cannon[group])) {
+                    maxDigits.set(
+                        [type, group, elementKey],
+                        Math.max(maxDigits.get([type, group, elementKey]) ?? 0, countDecimals(elementValue?.value))
+                    )
                 }
             }
         }
     }
 
-    for (const type of cannonTypes) {
-        for (const cannon of cannons[type]) {
-            for (const [groupKey, groupValue] of Object.entries(cannon)) {
-                if (typeof groupValue === "object") {
-                    // eslint-disable-next-line max-depth
-                    for (const [elementKey] of Object.entries(groupValue)) {
-                        // @ts-ignore
-                        cannon[groupKey][elementKey].digits = maxDigits[type][groupKey][elementKey]
-                    }
-                }
-            }
+    for (const [key, value] of maxDigits) {
+        for (const cannon of cannons[key[0]]) {
+            cannon[key[1]][key[2]]!.digits = value
         }
+    }
 
+    for (const type of cannonType) {
         cannons[type].sort(({ name: a }, { name: b }) => {
             // Sort either by lb numeral value when values are different
             if (Number.parseInt(a, 10) !== Number.parseInt(b, 10)) {

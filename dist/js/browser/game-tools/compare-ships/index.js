@@ -7,8 +7,8 @@
  * @copyright 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
-export * from "./ship";
-export * from "./ship-base";
-export * from "./ship-comparison";
-export * from "./compare-ships";
+export { Ship } from "./ship";
+export { ShipBase } from "./ship-base";
+export { ShipComparison } from "./ship-comparison";
+export { CompareShips } from "./compare-ships";
 //# sourceMappingURL=index.js.map

@@ -13,8 +13,9 @@
 import { ModifiersEntity } from "../node/api-item"
 import { Point } from "./common-math"
 import { ValuesType } from "utility-types"
-import { WoodType } from "../browser/game-tools/compare-woods";
-import { CannonType } from "../browser/game-tools/list-cannons";
+
+import { LootType } from "../browser/game-tools/list-loot"
+import { CannonType } from "./common"
 
 /****************************
  * buildings.json
@@ -75,7 +76,7 @@ export type CannonGroupIndex =
     | CannonDispersion
     | CannonGeneric
     | CannonPenetration
-export interface CannonEntity extends ObjectIndexer<CannonGroupIndex> {
+export interface CannonEntity {
     name: string
     damage: CannonDamage
     traverse: CannonTraverse
@@ -119,11 +120,10 @@ export interface CannonValue {
 /****************************
  * loot.json
  */
-
-export interface Loot {
-    loot: LootLootEntity[]
-    chests: LootChestsEntity[]
+export type LootTypeList<T> = {
+    [K in LootType]: T
 }
+export type Loot = LootTypeList<LootLootEntity[] | LootChestsEntity[]>
 interface LootLootEntity {
     id: number
     name: string

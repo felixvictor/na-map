@@ -10,6 +10,11 @@
 
 import { NationFullName, NationShortName } from "./gen-json"
 
+export const cannonType = ["medium", "long", "carronade"] as const
+export type CannonType = typeof cannonType[number]
+export const cannonEntityType = ["damage", "traverse", "dispersion", "generic", "penetration"] as const
+export type CannonEntityType = typeof cannonEntityType[number]
+
 export interface Nation {
     id: number
     short: NationShortName // Short name

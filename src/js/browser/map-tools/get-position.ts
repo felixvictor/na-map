@@ -169,16 +169,16 @@ export default class TrilateratePosition {
         this._NumberOfInputs = 3
         this._baseName = "Get position"
         this._baseId = "get-position"
-        this._buttonId = `button-${this._baseId}`
-        this._modalId = `modal-${this._baseId}`
+        this._buttonId =`button-${this._baseId}`
+        this._modalId =`modal-${this._baseId}`
         this._modal$ = {} as JQuery
 
         this._select = []
         this._input = []
         this._selector = []
         for (const inputNumber of [...new Array(this._NumberOfInputs).keys()]) {
-            this._select[inputNumber] = `${this._baseId}-${inputNumber}-select`
-            this._input[inputNumber] = `${this._baseId}-${inputNumber}-input`
+            this._select[inputNumber] =`${this._baseId}-${inputNumber}-select`
+            this._input[inputNumber] =`${this._baseId}-${inputNumber}-input`
         }
 
         this._setupListener()
@@ -245,8 +245,8 @@ export default class TrilateratePosition {
             }))
             .sort(sortBy(["name"]))
 
-        const options = `${selectPorts
-            .map((port) => `<option data-subtext="${port.nation}">${port.name}</option>`)
+        const options =`${selectPorts
+            .map((port) =>`<option data-subtext="${port.nation}">${port.name}</option>`)
             .join("")}`
         for (const inputNumber of [...new Array(this._NumberOfInputs).keys()]) {
             this._selector[inputNumber] = document.querySelector(`#${this._select[inputNumber]}`) as HTMLSelectElement
