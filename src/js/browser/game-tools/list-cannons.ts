@@ -16,7 +16,7 @@ import "bootstrap/js/dist/modal"
 
 import { html, render, TemplateResult } from "lit-html"
 import { repeat } from "lit-html/directives/repeat"
-import { Tablesort } from "tablesort"
+// import { Tablesort } from "tablesort"
 
 import { registerEvent } from "../analytics"
 import { capitalizeFirstLetter, putImportError } from "../../common/common"
@@ -114,7 +114,7 @@ export default class ListCannons {
 
         const getColumnHeads = (groupValue: GroupObject): TemplateResult => html`
             ${Object.entries(groupValue[1].values).map(
-                (modifierValue) => html` <th class="text-right">${capitalizeFirstLetter(modifierValue[0])}</th> `
+                (modifierValue) => html`<th class="text-right">${capitalizeFirstLetter(modifierValue[0])}</th>`
             )}
         `
 
@@ -123,7 +123,7 @@ export default class ListCannons {
             const nameSplit = name.split(" (")
 
             if (nameSplit.length > 1) {
-                nameConverted = html` ${nameSplit[0]}<br /><em>${nameSplit[1].replace(")", "")}</em> `
+                nameConverted = html`${nameSplit[0]}<br /><em>${nameSplit[1].replace(")", "")}</em>`
             }
 
             return html`
@@ -254,6 +254,7 @@ export default class ListCannons {
             document.querySelector("#modal-section") as HTMLElement
         )
 
+        /*
         for (const type of Object.keys(this._cannonData)) {
             const table = document.querySelector(`#table-${type}-list`) as HTMLElement
             if (table) {
@@ -261,6 +262,7 @@ export default class ListCannons {
                 const sortTable = new Tablesort(table)
             }
         }
+        */
     }
 
     _initModal(): void {
