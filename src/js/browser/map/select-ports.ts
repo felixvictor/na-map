@@ -88,12 +88,12 @@ export default class SelectPorts {
 
         this._frontlineAttackingNationId = "frontlines-attacking-nation-select"
         this._frontlineAttackingNationSelector = document.querySelector(
-            `#${this._frontlineAttackingNationId}`
+           `#${this._frontlineAttackingNationId}`
         ) as HTMLSelectElement
 
         this._frontlineDefendingNationId = "frontlines-defending-nation-select"
         this._frontlineDefendingNationSelector = document.querySelector(
-            `#${this._frontlineDefendingNationId}`
+           `#${this._frontlineDefendingNationId}`
         ) as HTMLSelectElement
 
         this._portNamesId = "port-names-select"
@@ -310,10 +310,10 @@ export default class SelectPorts {
             )
             // @ts-ignore
             .sort(sortBy(["name"]))
-        const options = `${selectPorts
+        const options =`${selectPorts
             .map(
                 (port: SelectPort): HtmlString =>
-                    `<option data-subtext="${port.nation}" value="${port.coord.toString()}" data-id="${port.id}">${
+                   `<option data-subtext="${port.nation}" value="${port.coord.toString()}" data-id="${port.id}">${
                         port.name
                     }</option>`
             )
@@ -351,9 +351,9 @@ export default class SelectPorts {
             }
         }
 
-        const options = `${[...selectGoods]
+        const options =`${[...selectGoods]
             .sort(simpleStringSort)
-            .map((good) => `<option>${good}</option>`)
+            .map((good) =>`<option>${good}</option>`)
             .join("")}`
 
         this._buyGoodsSelector.insertAdjacentHTML("beforeend", options)
@@ -384,9 +384,9 @@ export default class SelectPorts {
                 }
             }
 
-            const options = `${[...selectGoods]
+            const options =`${[...selectGoods]
                 .sort(simpleStringSort)
-                .map((good) => `<option>${good}</option>`)
+                .map((good) =>`<option>${good}</option>`)
                 .join("")}`
 
             this._inventorySelector.insertAdjacentHTML("beforeend", options)
@@ -411,11 +411,11 @@ export default class SelectPorts {
     }
 
     _getNationOptions(neutralPortsIncluded = true): string {
-        return `${nations
+        return`${nations
             // Exclude neutral nation and free towns when neutralPortsIncluded is set
             .filter((nation) => !(!neutralPortsIncluded && (nation.short === "FT" || nation.short === "NT")))
             .sort(sortBy(["name"]))
-            .map((nation: Nation): string => `<option value="${nation.short}">${nation.name}</option>`)
+            .map((nation: Nation): string =>`<option value="${nation.short}">${nation.name}</option>`)
             .join("")}`
     }
 
@@ -465,9 +465,9 @@ export default class SelectPorts {
             this._propClanSelector.disabled = true
         } else {
             this._propClanSelector.disabled = false
-            options = `${[...clanList]
+            options =`${[...clanList]
                 .sort(simpleStringSort)
-                .map((clan) => `<option value="${clan}" class="caps">${clan}</option>`)
+                .map((clan) =>`<option value="${clan}" class="caps">${clan}</option>`)
                 .join("")}`
         }
 
@@ -487,9 +487,9 @@ export default class SelectPorts {
             cmList.add(d.conquestMarksPension)
         }
 
-        const options = `${[...cmList]
+        const options =`${[...cmList]
             .sort(simpleNumberSort)
-            .map((cm) => `<option value="${cm}">${cm}</option>`)
+            .map((cm) =>`<option value="${cm}">${cm}</option>`)
             .join("")}`
         this._propCMSelector.insertAdjacentHTML("beforeend", options)
         this._propCMSelector.classList.add("selectpicker")
@@ -606,11 +606,11 @@ export default class SelectPorts {
         const getPortList = (): HtmlString => {
             let h: HtmlString = ""
 
-            h += `<h5>${goodSelected}</h5>`
+            h +=`<h5>${goodSelected}</h5>`
             if (buyGoods.size) {
                 h += "<h6>Buy</h6>"
                 for (const [, value] of buyGoods) {
-                    h += `${value.name} <span class="caps">${value.nation}</span>: ${formatInt(
+                    h +=`${value.name} <span class="caps">${value.nation}</span>: ${formatInt(
                         value.good.buyQuantity
                     )} @ ${formatSiCurrency(value.good.buyPrice)}<br>`
                 }
@@ -623,7 +623,7 @@ export default class SelectPorts {
             if (sellGoods.size) {
                 h += "<h6>Sell</h6>"
                 for (const [, value] of sellGoods) {
-                    h += `${value.name} <span class="caps">${value.nation}</span>: ${formatInt(
+                    h +=`${value.name} <span class="caps">${value.nation}</span>: ${formatInt(
                         value.good.sellQuantity
                     )} @ ${formatSiCurrency(value.good.sellPrice)}<br>`
                 }

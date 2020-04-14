@@ -13,8 +13,8 @@ import convert from "xml-js";
 import { commonPaths } from "../common/common-dir";
 import { readTextFile, saveJsonAsync } from "../common/common-file";
 import { round } from "../common/common-math";
+import { cannonEntityType, cannonType } from "../common/common";
 const peneDistances = [50, 100, 250, 500, 750, 1000];
-const cannonTypes = ["medium", "long", "carronade"];
 const countDecimals = (value) => {
     var _a;
     if (value === undefined) {
@@ -54,7 +54,7 @@ const dataMapping = new Map([
     ["CANNON_BALL_ARMOR_SPLINTERS_DAMAGE_FOR_CREW", { group: "damage", element: "splinter" }],
 ]);
 const cannons = {};
-for (const type of cannonTypes) {
+for (const type of cannonType) {
     cannons[type] = [];
 }
 const addData = (fileData) => {
@@ -116,32 +116,23 @@ export const convertCannons = async () => {
         const fileData = getFileData(baseFileName);
         addData(fileData);
     }
-    const maxDigits = {};
-    for (const type of cannonTypes) {
-        maxDigits[type] = {};
+    const maxDigits = new Map();
+    for (const type of cannonType) {
         for (const cannon of cannons[type]) {
-            for (const [groupKey, groupValue] of Object.entries(cannon)) {
-                if (typeof groupValue === "object") {
-                    if (!maxDigits[type][groupKey]) {
-                        maxDigits[type][groupKey] = {};
-                    }
-                    for (const [elementKey, elementValue] of Object.entries(groupValue)) {
-                        maxDigits[type][groupKey][elementKey] = Math.max((_a = maxDigits[type][groupKey][elementKey]) !== null && _a !== void 0 ? _a : 0, countDecimals(elementValue === null || elementValue === void 0 ? void 0 : elementValue.value));
-                    }
+            for (const group of cannonEntityType) {
+                console.log(type, group, cannon[group]);
+                for (const [elementKey, elementValue] of Object.entries(cannon[group])) {
+                    maxDigits.set([type, group, elementKey], Math.max((_a = maxDigits.get([type, group, elementKey])) !== null && _a !== void 0 ? _a : 0, countDecimals(elementValue === null || elementValue === void 0 ? void 0 : elementValue.value)));
                 }
             }
         }
     }
-    for (const type of cannonTypes) {
-        for (const cannon of cannons[type]) {
-            for (const [groupKey, groupValue] of Object.entries(cannon)) {
-                if (typeof groupValue === "object") {
-                    for (const [elementKey] of Object.entries(groupValue)) {
-                        cannon[groupKey][elementKey].digits = maxDigits[type][groupKey][elementKey];
-                    }
-                }
-            }
+    for (const [key, value] of maxDigits) {
+        for (const cannon of cannons[key[0]]) {
+            cannon[key[1]][key[2]].digits = value;
         }
+    }
+    for (const type of cannonType) {
         cannons[type].sort(({ name: a }, { name: b }) => {
             if (Number.parseInt(a, 10) !== Number.parseInt(b, 10)) {
                 return Number.parseInt(a, 10) - Number.parseInt(b, 10);
