@@ -126,7 +126,8 @@ export const formatFloatFixedHTML = (x: number, f = 2): TemplateResult => {
         }
     }
 
-    return html` ${number}${String(formattedFloat)} `
+    // eslint-disable-next-line @typescript-eslint/no-base-to-string
+    return html`${number}${formattedFloat}`
 }
 
 /**
