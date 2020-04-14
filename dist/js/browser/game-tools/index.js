@@ -7,9 +7,32 @@
  * @copyright 2017, 2018, 2019, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
-import "bootstrap/js/dist/util";
-import "bootstrap/js/dist/modal";
+import { default as semver } from "semver";
+import { registerEvent } from "../analytics";
+import { appVersion } from "../../common/common-browser";
+import { CompareShips } from "./compare-ships";
+import CompareWoods from "./compare-woods";
+import ListBuildings from "./list-buildings";
+import ListCannons from "./list-cannons";
+import ListIngredients from "./list-ingredients";
+import ListLoot from "./list-loot";
 const init = (serverId, urlParams) => {
+    const shipCompare = new CompareShips("ship-compare");
+    const checkShipCompareData = () => {
+        if (urlParams.has("cmp") && urlParams.has("v")) {
+            const version = urlParams.get("v");
+            if (version && semver.lte(version, appVersion)) {
+                registerEvent("Menu", "Paste ship compare");
+                shipCompare.initFromClipboard(urlParams);
+            }
+        }
+    };
+    checkShipCompareData();
+    const woodCompare = new CompareWoods("wood");
+    const buildingList = new ListBuildings();
+    const cannonList = new ListCannons();
+    const ingredientList = new ListIngredients();
+    const lootList = new ListLoot();
 };
 export { init };
 //# sourceMappingURL=index.js.map

@@ -7,23 +7,27 @@
  * @copyright 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
+import "bootstrap/js/dist/util";
+import "bootstrap/js/dist/modal";
 import { ascending as d3Ascending, max as d3Max, min as d3Min } from "d3-array";
 import { nest as d3Nest } from "d3-collection";
 import { interpolateCubehelixLong as d3InterpolateCubehelixLong } from "d3-interpolate";
 import { scaleLinear as d3ScaleLinear } from "d3-scale";
 import { select as d3Select } from "d3-selection";
 import { registerEvent } from "../../analytics";
-import { formatPP, formatSignInt, formatSignPercent } from "../../../common/common-format";
-import { getOrdinal } from "../../../common/common-math";
 import { appVersion, colourGreenDark, colourRedDark, colourWhite, hashids, hullRepairsPercent, insertBaseModal, repairTime, rigRepairsPercent, } from "../../../common/common-browser";
 import { isEmpty, putImportError } from "../../../common/common";
+import { formatPP, formatSignInt, formatSignPercent } from "../../../common/common-format";
+import { getOrdinal } from "../../../common/common-math";
 import { sortBy } from "../../../common/common-node";
 import { copyToClipboard } from "../../util";
 import { ShipBase, ShipComparison } from ".";
 import CompareWoods from "../compare-woods";
+const shipColumnType = ["Base", "C1", "C2"];
 export class CompareShips {
     constructor(id = "ship-compare") {
         this.windProfileRotate = 0;
+        this._modal$ = {};
         this._selectedUpgradeIdsList = {};
         this._selectedUpgradeIdsPerType = {};
         this._selectModule$ = {};
@@ -39,7 +43,6 @@ export class CompareShips {
         this.colourScaleSpeedDiff = d3ScaleLinear()
             .range([colourRedDark, colourWhite, colourGreenDark])
             .interpolate(d3InterpolateCubehelixLong);
-        this._modal$ = {};
         this._modifierAmount = new Map();
         if (this._baseId === "ship-compare") {
             this.columnsCompare = ["C1", "C2"];
@@ -251,7 +254,7 @@ export class CompareShips {
     }
     _shipCompareSelected() {
         var _a, _b;
-        if (!this._modal$) {
+        if (isEmpty(this._modal$)) {
             this._initModal();
             this._modal$ = $(`#${this._modalId}`);
             (_a = document.querySelector(`#${this._modalId}`)) === null || _a === void 0 ? void 0 : _a.addEventListener("keydown", (event) => {
@@ -699,7 +702,7 @@ export class CompareShips {
         }
     }
     _modulesSelected(compareId) {
-        this._selectedUpgradeIdsList[compareId] = {};
+        this._selectedUpgradeIdsList[compareId] = [];
         this._selectedUpgradeIdsPerType[compareId] = {};
         for (const type of this._moduleTypes) {
             this._selectedUpgradeIdsPerType[compareId][type] = this._selectModule$[compareId][type].val();
@@ -781,7 +784,7 @@ export class CompareShips {
                         this._selectedUpgradeIdsPerType[columnId] = {};
                     }
                     if (!this._selectedUpgradeIdsList[columnId]) {
-                        this._selectedUpgradeIdsList[columnId] = {};
+                        this._selectedUpgradeIdsList[columnId] = [];
                     }
                     this._selectedUpgradeIdsPerType[columnId][type] = moduleIds.map(Number);
                     CompareShips._setSelect(this._selectModule$[columnId][type], this._selectedUpgradeIdsPerType[columnId][type]);

@@ -10,18 +10,26 @@
 
 /// <reference types="bootstrap" />
 import "bootstrap/js/dist/util"
-/// <reference types="bootstrap" />
 import "bootstrap/js/dist/modal"
-/// <reference types="bootstrap" />
 import "bootstrap/js/dist/tooltip"
 import { select as d3Select } from "d3-selection"
 
 import { registerEvent } from "../analytics"
-import { insertBaseModal } from "../../common/interfaces"
-import { chunkify, putImportError, sortBy } from "../util"
-import { formatSignInt, formatSignPercent } from "../../common/common-format";
+import { putImportError } from "../../common/common"
+import { HtmlString, insertBaseModal } from "../../common/common-browser"
+import { formatSignInt, formatSignPercent } from "../../common/common-format"
+import { sortBy } from "../../common/common-node"
+import { chunkify } from "../util"
+
+import { Module, RecipeIngredientEntity } from "../../common/gen-json"
 
 export default class ListIngredients {
+    private readonly _baseName: string
+    private readonly _baseId: HtmlString
+    private readonly _buttonId: HtmlString
+    private readonly _modalId: HtmlString
+    private _moduleData: Module[] = {} as Module[]
+    private _ingredientData: RecipeIngredientEntity[] = {} as RecipeIngredientEntity[]
     constructor() {
         this._baseName = "List recipe ingredients"
         this._baseId = "ingredient-list"
@@ -31,23 +39,21 @@ export default class ListIngredients {
         this._setupListener()
     }
 
-    async _loadAndSetupData() {
+    async _loadAndSetupData(): Promise<void> {
         try {
-            this._moduleData = (
-                await import(/* webpackChunkName: "data-modules" */ "~Lib/gen-generic/modules.json")
-            ).default
-            this._ingredientData = (
-                await import(/* webpackChunkName: "data-recipes" */ "~Lib/gen-generic/recipes.json")
-            ).default.ingredient
+            this._moduleData = (await import(/* webpackChunkName: "data-modules" */ "Lib/gen-generic/modules.json"))
+                .default as Module[]
+            this._ingredientData = (await import(/* webpackChunkName: "data-recipes" */ "Lib/gen-generic/recipes.json"))
+                .default.ingredient as RecipeIngredientEntity[]
         } catch (error) {
             putImportError(error)
         }
     }
 
-    _setupListener() {
+    _setupListener(): void {
         let firstClick = true
 
-        document.getElementById(this._buttonId).addEventListener("click", async event => {
+        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", async (event) => {
             if (firstClick) {
                 firstClick = false
                 await this._loadAndSetupData()
@@ -59,24 +65,22 @@ export default class ListIngredients {
         })
     }
 
-    _injectModal() {
-        insertBaseModal(this._modalId, this._baseName)
+    _injectModal(): void {
+        insertBaseModal({ id: this._modalId, title: this._baseName })
 
         const body = d3Select(`#${this._modalId} .modal-body`)
 
-        body.append("div")
-            .attr("id", `${this._baseId}`)
-            .attr("class", "container-fluid")
+        body.append("div").attr("id", `${this._baseId}`).attr("class", "container-fluid")
     }
 
-    _initModal() {
+    _initModal(): void {
         this._injectModal()
         this._injectList()
     }
 
-    _ingredientListSelected() {
+    _ingredientListSelected(): void {
         // If the modal has no content yet, insert it
-        if (!document.getElementById(this._modalId)) {
+        if (!document.querySelector(`#${this._modalId}`)) {
             this._initModal()
         }
 
@@ -84,17 +88,17 @@ export default class ListIngredients {
         $(`#${this._modalId}`).modal("show")
     }
 
-    _getProperties(recipeName) {
+    _getProperties(recipeName: string): HtmlString {
         let text = ""
         let moduleType = ""
         let properties = ""
         for (const type of this._moduleData) {
-            const modules = type[1].sort(sortBy(["name"])).filter(module => module.name === recipeName)
+            const modules = type[1].sort(sortBy(["name"])).filter((module) => module.name === recipeName)
             for (const module of modules) {
                 moduleType = type[0]
 
                 properties = `<tr><td>${module.properties
-                    .map(property => {
+                    .map((property) => {
                         const amount = property.isPercentage
                             ? formatSignPercent(property.amount / 100)
                             : formatSignInt(property.amount)
@@ -110,11 +114,11 @@ export default class ListIngredients {
         return properties ? text : ""
     }
 
-    _getRows() {
+    _getRows(): HtmlString[] {
         return this._ingredientData.map(
-            ingredient =>
+            (ingredient) =>
                 `<tr><td>${ingredient.name}</td><td>${ingredient.recipeNames
-                    .map(recipeName => {
+                    .map((recipeName) => {
                         const properties = this._getProperties(recipeName)
 
                         return properties
@@ -127,10 +131,8 @@ export default class ListIngredients {
 
     /**
      * Construct ingredient tables
-     * @return {string} html string
-     * @private
      */
-    _getText() {
+    _getText(): HtmlString {
         const columns = 2
         const rows = this._getRows()
         const splitRows = chunkify(rows, columns)
@@ -148,22 +150,18 @@ export default class ListIngredients {
 
     /**
      * Show ingredients
-     * @return {void}
-     * @private
      */
-    _injectList() {
+    _injectList(): void {
         // Remove old recipe list
         d3Select(`#${this._baseId} div`).remove()
 
         // Add new recipe list
-        d3Select(`#${this._baseId}`)
-            .append("div")
-            .classed("row ingredients", true)
+        d3Select(`#${this._baseId}`).append("div").classed("row ingredients", true)
         d3Select(`#${this._baseId} div`).html(this._getText())
         $('[data-toggle="tooltip"]').tooltip({
             html: true,
             placement: "auto",
-            sanitize: false
+            sanitize: false,
         })
     }
 }

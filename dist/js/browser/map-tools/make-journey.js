@@ -402,7 +402,7 @@ export default class MakeJourney {
     _getTextDistance(distanceK, minutes, addTotal) {
         let textDistance = `${Math.round(distanceK)}\u2009k ${MakeJourney._getHumanisedDuration(minutes)}`;
         if (addTotal) {
-            textDistance += ` \u2056 total ${Math.round(this._journey.totalDistance)}\u2009k ${MakeJourney._getHumanisedDuration(this._journey.totalMinutes)}`;
+            textDistance += `\u2056 total ${Math.round(this._journey.totalDistance)}\u2009k ${MakeJourney._getHumanisedDuration(this._journey.totalMinutes)}`;
         }
         return textDistance;
     }
