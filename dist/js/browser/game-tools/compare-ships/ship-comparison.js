@@ -190,7 +190,6 @@ export class ShipComparison extends Ship {
                 .attr("fill", (d, i) => this._shipCompare.colourScaleSpeedDiff(this._speedDiff[i]))
                 .append("title")
                 .text((d, i) => `${Math.round(d.data * 10) / 10} (${formatSignFloat(this._speedDiff[i], 1)}) knots`);
-            return enter;
         })
             .select("circle")
             .attr("fill", (_d, i) => this._shipCompare.colourScaleSpeedDiff(this._speedDiff[i]));

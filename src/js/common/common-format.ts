@@ -105,28 +105,18 @@ export const formatFloatFixed = (x: number, f = 2): string =>
  */
 export const formatFloatFixedHTML = (x: number, f = 2): TemplateResult => {
     const [number, decimals] = formatLocale.format(`.${f}f`)(x).split(".")
-    let formattedFloat: TemplateResult = html` ${decimals} `
+    let formattedFloat: TemplateResult = html`${decimals}`
 
     if (decimals) {
         if (decimals === "0" || decimals === "00") {
-            // eslint-disable-next-line prettier/prettier
-            formattedFloat = html`
-                <span class="hidden">.${decimals}</span>
-            `
+            formattedFloat = html`<span class="hidden">.${decimals}</span>`
         } else if (decimals.endsWith("0")) {
-            // eslint-disable-next-line prettier/prettier
-            formattedFloat = html`
-                .${decimals.replace("0", "")}<span class="hidden">0</span>
-            `
+            formattedFloat = html`.${decimals.replace("0", "")}<span class="hidden">0</span>`
         } else {
-            // eslint-disable-next-line prettier/prettier
-            formattedFloat = html`
-                .${decimals}
-            `
+            formattedFloat = html`.${decimals}`
         }
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-base-to-string
     return html`${number}${formattedFloat}`
 }
 

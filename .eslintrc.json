@@ -53,6 +53,7 @@
                 "unicorn/no-nested-ternary": "off",
                 "tsdoc/syntax": "warn",
                 "@typescript-eslint/consistent-type-assertions": ["error", { "assertionStyle": "as" }],
+                "@typescript-eslint/no-base-to-string": "off",
                 "@typescript-eslint/no-non-null-assertion": "off",
                 "@typescript-eslint/no-unsafe-call": "warn",
                 "@typescript-eslint/no-unsafe-member-access": "warn",
