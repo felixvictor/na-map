@@ -241,17 +241,17 @@ export default class DisplayPorts {
         const buy = port.inventory
             .filter((good) => good.buyQuantity > 0)
             .map((good) => {
-                return `${formatInt(good.buyQuantity)} ${good.name} @ ${formatSiCurrency(good.buyPrice)}`
+                return`${formatInt(good.buyQuantity)} ${good.name} @ ${formatSiCurrency(good.buyPrice)}`
             })
             .join("<br>")
         const sell = port.inventory
             .filter((good) => good.sellQuantity > 0)
             .map((good) => {
-                return `${formatInt(good.sellQuantity)} ${good.name} @ ${formatSiCurrency(good.sellPrice)}`
+                return`${formatInt(good.sellQuantity)} ${good.name} @ ${formatSiCurrency(good.sellPrice)}`
             })
             .join("<br>")
 
-        h += `<h5 class="caps">${port.name} <span class="small">${port.nation}</span></h5>`
+        h +=`<h5 class="caps">${port.name} <span class="small">${port.nation}</span></h5>`
         if (buy.length > 0) {
             h += "<h6>Buy</h6>"
             h += buy
@@ -322,11 +322,11 @@ export default class DisplayPorts {
          */
         const dataSources: DataSource[] = [
             {
-                fileName: `${this._serverName}-ports.json`,
+                fileName:`${this._serverName}-ports.json`,
                 name: "server",
             },
             {
-                fileName: `${this._serverName}-pb.json`,
+                fileName:`${this._serverName}-pb.json`,
                 name: "pb",
             },
         ]
@@ -618,7 +618,7 @@ export default class DisplayPorts {
                     .attr("id", nation)
                     .attr("width", "133%")
                     .attr("height", "100%")
-                    .attr("viewBox", `6 6 ${this._iconSize} ${this._iconSize * 0.75}`)
+                    .attr("viewBox",`6 6 ${this._iconSize} ${this._iconSize * 0.75}`)
                 pattern
                     .append("image")
                     .attr("height", this._iconSize)
@@ -628,10 +628,10 @@ export default class DisplayPorts {
                 if (nation !== "FT") {
                     const patternCapital = svgDef
                         .append("pattern")
-                        .attr("id", `${nation}c`)
+                        .attr("id",`${nation}c`)
                         .attr("width", "133%")
                         .attr("height", "100%")
-                        .attr("viewBox", `6 6 ${this._iconSize} ${this._iconSize * 0.75}`)
+                        .attr("viewBox",`6 6 ${this._iconSize} ${this._iconSize * 0.75}`)
                     patternCapital
                         .append("image")
                         .attr("height", this._iconSize)
@@ -647,10 +647,10 @@ export default class DisplayPorts {
                 if (nation !== "NT" && nation !== "FT") {
                     const patternAvail = svgDef
                         .append("pattern")
-                        .attr("id", `${nation}a`)
+                        .attr("id",`${nation}a`)
                         .attr("width", "133%")
                         .attr("height", "100%")
-                        .attr("viewBox", `6 6 ${this._iconSize} ${this._iconSize * 0.75}`)
+                        .attr("viewBox",`6 6 ${this._iconSize} ${this._iconSize * 0.75}`)
                     patternAvail
                         .append("image")
                         .attr("height", this._iconSize)
@@ -659,10 +659,10 @@ export default class DisplayPorts {
 
                     const patternCapitalAvail = svgDef
                         .append("pattern")
-                        .attr("id", `${nation}ca`)
+                        .attr("id",`${nation}ca`)
                         .attr("width", "133%")
                         .attr("height", "100%")
-                        .attr("viewBox", `6 6 ${this._iconSize} ${this._iconSize * 0.75}`)
+                        .attr("viewBox",`6 6 ${this._iconSize} ${this._iconSize * 0.75}`)
                     patternCapitalAvail
                         .append("image")
                         .attr("height", this._iconSize)
@@ -686,17 +686,17 @@ export default class DisplayPorts {
         moment.locale("en-gb")
         const portBattleLT = moment.utc(portProperties.portBattle).local()
         const portBattleST = moment.utc(portProperties.portBattle)
-        const localTime = portBattleST === portBattleLT ? "" : ` (${portBattleLT.format("H.mm")} local)`
+        const localTime = portBattleST === portBattleLT ? "" :`(${portBattleLT.format("H.mm")} local)`
         const portBattleStartTime = portProperties.portBattleStartTime
-            ? `${(portProperties.portBattleStartTime + 10) % 24}.00\u202F–\u202F${
+            ?`${(portProperties.portBattleStartTime + 10) % 24}.00\u202F–\u202F${
                   (portProperties.portBattleStartTime + 13) % 24
               }.00`
             : "11.00\u202F–\u202F8.00"
         const endSyllable = portBattleST.isAfter(moment.utc()) ? "s" : "ed"
-        const attackHostility = `${displayClan(portProperties.attackerClan)} (${portProperties.attackerNation}) attack${
+        const attackHostility =`${displayClan(portProperties.attackerClan)} (${portProperties.attackerNation}) attack${
             portProperties.portBattle.length > 0
-                ? `${endSyllable} ${portBattleST.fromNow()} at ${portBattleST.format("H.mm")}${localTime}`
-                : `s: ${formatPercent(portProperties.attackHostility)} hostility`
+                ?`${endSyllable} ${portBattleST.fromNow()} at ${portBattleST.format("H.mm")}${localTime}`
+                :`s: ${formatPercent(portProperties.attackHostility)} hostility`
         }`
 
         const port = {
@@ -705,11 +705,11 @@ export default class DisplayPorts {
             availableForAll: portProperties.availableForAll ? "(accessible to all nations)" : "",
             depth: portProperties.shallow ? "Shallow" : "Deep",
             county:
-                (portProperties.county === "" ? "" : `${portProperties.county}\u200A/\u200A`) + portProperties.region,
+                (portProperties.county === "" ? "" :`${portProperties.county}\u200A/\u200A`) + portProperties.region,
             countyCapital: portProperties.countyCapital ? " (county capital)" : "",
             nonCapturable: portProperties.nonCapturable,
             captured: portProperties.capturer
-                ? ` captured by ${displayClan(portProperties.capturer)} ${moment
+                ?`captured by ${displayClan(portProperties.capturer)} ${moment
                       .utc(portProperties.lastPortBattle)
                       .fromNow()}`
                 : "",
@@ -723,10 +723,10 @@ export default class DisplayPorts {
             portTax: formatPercent(portProperties.portTax),
             netIncome: formatSiInt(portProperties.netIncome),
             tradingCompany: portProperties.tradingCompany
-                ? `, trading company level\u202F${portProperties.tradingCompany}`
+                ?`, trading company level\u202F${portProperties.tradingCompany}`
                 : "",
             laborHoursDiscount: portProperties.laborHoursDiscount
-                ? `, labor hours discount level\u202F${portProperties.laborHoursDiscount}`
+                ?`, labor hours discount level\u202F${portProperties.laborHoursDiscount}`
                 : "",
             dropsTrading: portProperties.dropsTrading ? portProperties.dropsTrading.join(", ") : "",
             consumesTrading: portProperties.consumesTrading ? portProperties.consumesTrading.join(", ") : "",
@@ -758,27 +758,27 @@ export default class DisplayPorts {
 
     _tooltipData(port: PortForDisplay): HtmlString {
         let h: HtmlString = '<div class="d-flex align-items-baseline mb-1">'
-        h += `<img alt="${port.icon}" class="flag-icon align-self-stretch" src="${this._nationIcons[port.icon]
+        h +=`<img alt="${port.icon}" class="flag-icon align-self-stretch" src="${this._nationIcons[port.icon]
             .replace('"', "")
             .replace('"', "")}"/>`
-        h += `<div class="port-name">${port.name}</div>`
-        h += `<div>\u2000${port.county} ${port.availableForAll}</div>`
+        h +=`<div class="port-name">${port.name}</div>`
+        h +=`<div>\u2000${port.county} ${port.availableForAll}</div>`
         h += "</div>"
         if (port.attack.length > 0) {
-            h += `<div class="alert alert-danger mt-2" role="alert">${port.attack}</div>`
+            h +=`<div class="alert alert-danger mt-2" role="alert">${port.attack}</div>`
         }
 
-        h += `<p>${port.depth} water port ${port.countyCapital}${port.captured}<br>`
+        h +=`<p>${port.depth} water port ${port.countyCapital}${port.captured}<br>`
         if (port.nonCapturable) {
             h += "Not capturable"
-            h += `<br>${port.portTax} tax`
+            h +=`<br>${port.portTax} tax`
         } else {
-            h += `Port battle ${port.pbTimeRange}, ${port.brLimit} <span class="caps">BR</span>, `
-            h += `${port.pbType}\u202Frate <span class="caps">AI</span>, `
-            h += `${port.conquestMarksPension}\u202Fconquest point`
+            h +=`Port battle ${port.pbTimeRange}, ${port.brLimit} <span class="caps">BR</span>,`
+            h +=`${port.pbType}\u202Frate <span class="caps">AI</span>,`
+            h +=`${port.conquestMarksPension}\u202Fconquest point`
             h += port.conquestMarksPension > 1 ? "s" : ""
-            h += `, ${port.portPoints}\u202Fport points`
-            h += `<br>Tax income ${port.taxIncome} (${port.portTax}), net income ${port.netIncome}`
+            h +=`, ${port.portPoints}\u202Fport points`
+            h +=`<br>Tax income ${port.taxIncome} (${port.portTax}), net income ${port.netIncome}`
             h += port.tradingCompany
             h += port.laborHoursDiscount
         }
@@ -787,21 +787,21 @@ export default class DisplayPorts {
         h += "<table class='table table-sm'>"
         if (port.producesNonTrading.length > 0) {
             h += "<tr><td class='pl-0'>Produces\u00A0</td><td>"
-            h += `<span class="non-trading">${port.producesNonTrading}</span>`
+            h +=`<span class="non-trading">${port.producesNonTrading}</span>`
             h += "</td></tr>"
         }
 
         if (port.dropsTrading.length > 0 || port.dropsNonTrading.length > 0) {
-            h += `<tr><td class='pl-0'>Drops\u00A0${port.dropsNonTrading.length > 0 ? "\u00A0" : ""}</td><td>`
+            h +=`<tr><td class='pl-0'>Drops\u00A0${port.dropsNonTrading.length > 0 ? "\u00A0" : ""}</td><td>`
             if (port.dropsNonTrading.length > 0) {
-                h += `<span class="non-trading">${port.dropsNonTrading}</span>`
+                h +=`<span class="non-trading">${port.dropsNonTrading}</span>`
                 if (port.dropsTrading.length > 0) {
                     h += "<br>"
                 }
             }
 
             if (port.dropsTrading.length > 0) {
-                h += `${port.dropsTrading}`
+                h +=`${port.dropsTrading}`
             }
 
             h += "</td></tr>"
@@ -815,11 +815,11 @@ export default class DisplayPorts {
 
         if (this.showRadius === "tradePorts") {
             if (port.goodsToSellInTradePort.length > 0) {
-                h += `<tr><td class='pl-0'>Sell in ${port.tradePort}\u00A0</td><td>${port.goodsToSellInTradePort}</td></tr>`
+                h +=`<tr><td class='pl-0'>Sell in ${port.tradePort}\u00A0</td><td>${port.goodsToSellInTradePort}</td></tr>`
             }
 
             if (port.goodsToBuyInTradePort.length > 0) {
-                h += `<tr><td class='pl-0'>Buy in ${port.tradePort}\u00A0</td><td>${port.goodsToBuyInTradePort}</td></tr>`
+                h +=`<tr><td class='pl-0'>Buy in ${port.tradePort}\u00A0</td><td>${port.goodsToBuyInTradePort}</td></tr>`
             }
         }
 
@@ -864,10 +864,10 @@ export default class DisplayPorts {
                 enter
                     .append("circle")
                     .attr("fill", (d) => {
-                        const appendix = `${d.countyCapital && !d.nonCapturable ? "c" : ""}${
+                        const appendix =`${d.countyCapital && !d.nonCapturable ? "c" : ""}${
                             d.availableForAll && d.nation !== "NT" ? "a" : ""
                         }`
-                        return `url(#${d.nation}${appendix})`
+                        return`url(#${d.nation}${appendix})`
                     })
                     .attr("cx", (d) => d.coordinates[0])
                     .attr("cy", (d) => d.coordinates[1])
@@ -945,7 +945,7 @@ export default class DisplayPorts {
                 d.attackerNation === "Neutral" ? colourOrange : this._colourScaleHostility(d.attackHostility)
             r = (d): number => this._attackRadius(d.attackHostility)
         } else if (this.circleType === "currentGood") {
-            cssClass = (d): string => `bubble ${d.isSource ? "pos" : "neg"}`
+            cssClass = (d): string =>`bubble ${d.isSource ? "pos" : "neg"}`
             r = (): number => rMax / 2
         } else if (this.showRadius === "county") {
             cssClass = (d): string =>
@@ -953,14 +953,14 @@ export default class DisplayPorts {
             fill = (d): string => (d.nonCapturable ? "" : this._colourScaleCounty(d.county))
             r = (d): number => (d.nonCapturable ? rMax / 3 : rMax / 2)
         } else if (this.showRadius === "tradePorts") {
-            cssClass = (d): string => `bubble ${this._getTradePortMarker(d)}`
+            cssClass = (d): string =>`bubble ${this._getTradePortMarker(d)}`
             r = (d): number => (d.id === this.tradePortId ? rMax : rMax / 2)
         } else if (this.showRadius === "frontline") {
-            cssClass = (d): string => `bubble ${this._getFrontlineMarker(d)}`
+            cssClass = (d): string =>`bubble ${this._getFrontlineMarker(d)}`
             r = (d): number => (d.ownPort ? rMax / 3 : rMax / 2)
             data = data.filter((d) => d.enemyPort ?? d.ownPort)
         } else if (this.showRadius === "currentGood") {
-            cssClass = (d): string => `bubble ${d.isSource ? "pos" : "neg"}`
+            cssClass = (d): string =>`bubble ${d.isSource ? "pos" : "neg"}`
             r = (): number => rMax / 2
         } else if (this.showRadius === "off") {
             data = []
@@ -1029,7 +1029,7 @@ export default class DisplayPorts {
                 .attr("y", (d) => this._updateTextsY(d, circleSize, fontSize))
                 .attr("text-anchor", (d) => this._updateTextsAnchor(d))
 
-            this._gText.attr("font-size", `${fontSize}px`).classed("d-none", false)
+            this._gText.attr("font-size",`${fontSize}px`).classed("d-none", false)
         }
     }
 
@@ -1059,7 +1059,7 @@ export default class DisplayPorts {
                     (enter) =>
                         enter
                             .append("text")
-                            .attr("transform", (d) => `translate(${d.centroid[0]},${d.centroid[1]})rotate(${d.angle})`)
+                            .attr("transform", (d) =>`translate(${d.centroid[0]},${d.centroid[1]})rotate(${d.angle})`)
                             .text((d) => d.name),
                     (update) =>
                         update.attr("fill", (d: Area): string =>
@@ -1097,7 +1097,7 @@ export default class DisplayPorts {
                 .join((enter) =>
                     enter
                         .append("text")
-                        .attr("transform", (d) => `translate(${d.centroid[0]},${d.centroid[1]})rotate(${d.angle})`)
+                        .attr("transform", (d) =>`translate(${d.centroid[0]},${d.centroid[1]})rotate(${d.angle})`)
                         .text((d) => d.name)
                 )
 

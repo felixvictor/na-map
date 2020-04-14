@@ -200,7 +200,7 @@ export default class DisplayPbZones {
                         .attr("class", "pb-text pb-fort-text")
                         .attr("x", (d) => d.forts.map((fort) => fort[0]).join(","))
                         .attr("y", (d) => d.forts.map((fort) => fort[1]).join(","))
-                        .text((d) => d.forts.map((fort, i) => `${i + 1}`).join(""))
+                        .text((d) => d.forts.map((fort, i) =>`${i + 1}`).join(""))
 
                     // Towers
                     g.append("path")
@@ -210,7 +210,7 @@ export default class DisplayPbZones {
                         .attr("class", "pb-text pb-tower-text")
                         .attr("x", (d) => d.towers.map((tower) => tower[0]).join(","))
                         .attr("y", (d) => d.towers.map((tower) => tower[1]).join(","))
-                        .text((d) => d.towers.map((tower, i) => `${i + 1}`).join(""))
+                        .text((d) => d.towers.map((tower, i) =>`${i + 1}`).join(""))
                     return g
                 }
             )
