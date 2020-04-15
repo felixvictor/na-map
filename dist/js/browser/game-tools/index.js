@@ -16,6 +16,8 @@ import ListBuildings from "./list-buildings";
 import ListCannons from "./list-cannons";
 import ListIngredients from "./list-ingredients";
 import ListLoot from "./list-loot";
+import ListModules from "./list-modules";
+import ListPortOwnerships from "./list-port-ownerships";
 const init = (serverId, urlParams) => {
     const shipCompare = new CompareShips("ship-compare");
     const checkShipCompareData = () => {
@@ -33,6 +35,8 @@ const init = (serverId, urlParams) => {
     const cannonList = new ListCannons();
     const ingredientList = new ListIngredients();
     const lootList = new ListLoot();
+    const moduleList = new ListModules();
+    const ownershipList = new ListPortOwnerships();
 };
 export { init };
 //# sourceMappingURL=index.js.map
