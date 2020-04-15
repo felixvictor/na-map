@@ -18,6 +18,10 @@ import ListIngredients from "./list-ingredients";
 import ListLoot from "./list-loot";
 import ListModules from "./list-modules";
 import ListPortOwnerships from "./list-port-ownerships";
+import ListRecipes from "./list-recipes";
+import ListShips from "./list-ships";
+import ListShipBlueprints from "./list-ship-blueprints";
+import ListWoods from "./list-woods";
 const init = (serverId, urlParams) => {
     const shipCompare = new CompareShips("ship-compare");
     const checkShipCompareData = () => {
@@ -31,12 +35,16 @@ const init = (serverId, urlParams) => {
     };
     checkShipCompareData();
     const woodCompare = new CompareWoods("wood");
+    const woodList = new ListWoods();
     const buildingList = new ListBuildings();
     const cannonList = new ListCannons();
     const ingredientList = new ListIngredients();
     const lootList = new ListLoot();
     const moduleList = new ListModules();
     const ownershipList = new ListPortOwnerships();
+    const recipeList = new ListRecipes(serverId);
+    const shipList = new ListShips();
+    const blueprintList = new ListShipBlueprints();
 };
 export { init };
 //# sourceMappingURL=index.js.map
