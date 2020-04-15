@@ -1,62 +1,99 @@
 /**
- * webpack.config.js
+ * webpack.config
  */
 
-const webpack = require("webpack")
+/*
+import path from "path"
+import webpack from "webpack"
+import process from "process"
+import sass from "node-sass"
+import { css as parseCss } from "css"
+// import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer"
+import { CleanWebpackPlugin } from "clean-webpack-plugin"
+import CopyPlugin from "copy-webpack-plugin"
+import FaviconsPlugin from "favicons-webpack-plugin"
+import ForkTsCheckerWebpackPlugin from "fork-ts-checker-webpack-plugin"
+import HtmlPlugin from "html-webpack-plugin"
+import ExtractCssChunks from "extract-css-chunks-webpack-plugin"
+import { default as SitemapPlugin } from "sitemap-webpack-plugin"
+import SriPlugin from "webpack-subresource-integrity"
+import TerserPlugin from "terser-webpack-plugin"
+
+import Servers from "./dist/js/common/servers"
+const { servers } = Servers
+import PACKAGE from "./package.json"
+import repairs from "./lib/gen-generic/repairs.json"
+import WebpackMode from "webpack-mode"
+const { isProduction } = WebpackMode
+ */
 
 const path = require("path")
-const sass = require("node-sass")
-const parseCss = require("css")
+const webpack = require("webpack")
+
 // const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
-const { CleanWebpackPlugin } = require("clean-webpack-plugin")
 const CopyPlugin = require("copy-webpack-plugin")
-const HtmlPlugin = require("html-webpack-plugin")
 const ExtractCssChunks = require("extract-css-chunks-webpack-plugin")
+const FaviconsPlugin = require("favicons-webpack-plugin")
+const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin")
+const HtmlPlugin = require("html-webpack-plugin")
+const parseCss = require("css")
+const sass = require("node-sass")
 const SitemapPlugin = require("sitemap-webpack-plugin").default
 const SriPlugin = require("webpack-subresource-integrity")
 const TerserPlugin = require("terser-webpack-plugin")
-const FaviconsPlugin = require("favicons-webpack-plugin")
-const servers = require("./src/js/servers")
+const { CleanWebpackPlugin } = require("clean-webpack-plugin")
+
+const servers = require("./dist/js/common/servers")
 const PACKAGE = require("./package.json")
-const repairs = require("./src/gen-generic/repairs.json")
+const repairs = require("./lib/gen-generic/repairs.json")
 
 // Environment
 const { TARGET, QUIET } = process.env
 const { isProduction } = require("webpack-mode")
 const isQuiet = Boolean(QUIET)
-const target = TARGET ? `https://${TARGET}.netlify.com/` : ""
+const targetUrl = TARGET ? `https://${TARGET}.netlify.com/` : `http://localhost/na/`
 
 const libraryName = PACKAGE.name
 const descriptionLong =
     "Yet another map with in-game map, resources, ship and wood comparisons. Port battle data is updated constantly from twitter and all data daily after maintenance."
 const sitemapPaths = ["/fonts/", "/icons", "/images"]
 
-const dirFlags = path.resolve(__dirname, "src/images/flags")
-const dirFonts = path.resolve(__dirname, "src/fonts/")
-const dirIcons = path.resolve(__dirname, "src/icons")
 const dirOutput = path.resolve(__dirname, "public")
+const dirSrc = path.resolve(__dirname, "src")
+const dirFlags = path.resolve(dirSrc, "images", "flags")
+const dirMap = path.resolve(dirSrc, "images", "map")
+const dirFonts = path.resolve(dirSrc, "fonts")
+const dirIcons = path.resolve(dirSrc, "icons")
+const dirJsSrc = path.resolve(dirSrc, "js")
+const dirScssSrc = path.resolve(dirSrc, "scss")
 const dirPrefixIcons = path.join("images", "icons")
 
-const fileLogo = path.resolve("src", "images", "icons", "logo.png")
-const filePostcssConfig = "build/postcss.config.js"
-const fileScssPreCompile = path.resolve("src", "scss", "pre-compile.scss")
+const fileLogo = path.resolve(dirSrc, "images", "icons", "logo.png")
+const filePostcssConfig = path.resolve(dirSrc, "postcss.config.js")
+const fileScssPreCompile = path.resolve(dirSrc, "scss", "pre-compile.scss")
 
-/** Set colours
- * @returns {Map} Colours
- */
-function setColours() {
-    const css = sass
+const setColours = () => {
+    const compiledCss = sass
         .renderSync({
-            file: fileScssPreCompile
+            file: fileScssPreCompile,
         })
         .css.toString()
-    const parsedCss = parseCss.parse(css)
+    const parsedCss = parseCss.parse(compiledCss)
     return new Map(
         parsedCss.stylesheet.rules
-            .filter(rule => rule.selectors !== undefined && rule.selectors[0].startsWith(".colour-palette "))
-            .map(rule => {
-                const d = rule.declarations.find(declaration => declaration.property === "background-color")
-                return [rule.selectors[0].replace(".colour-palette .", ""), d ? d.value : ""]
+            .filter((rule) => rule.selectors && rule.selectors[0].startsWith(".colour-palette "))
+            .filter(
+                (rule) =>
+                    rule &&
+                    rule.declarations &&
+                    rule.declarations.find((declaration) => declaration.property === "background-color")
+            )
+            .map((rule) => {
+                const d =
+                    rule &&
+                    rule.declarations &&
+                    rule.declarations.find((declaration) => declaration.property === "background-color")
+                return [rule.selectors[0].replace(".colour-palette .", "") || "", d.value || ""]
             })
     )
 }
@@ -78,46 +115,55 @@ const colourWhite = colours.get("white")
 
 const babelOpt = {
     cacheDirectory: true,
-    plugins: ["@babel/plugin-proposal-nullish-coalescing-operator", "@babel/plugin-transform-spread"],
+    plugins: [
+        "@babel/plugin-proposal-nullish-coalescing-operator",
+        "@babel/plugin-transform-spread",
+        "@babel/proposal-class-properties",
+    ],
     presets: [
         [
             "@babel/preset-env",
             {
                 // debug: true,
-                corejs: 3,
+                corejs: { version: 3, proposals: true },
                 loose: true,
                 modules: false,
                 shippedProposals: true,
                 targets: {
-                    browsers: PACKAGE.browserslist
+                    browsers: PACKAGE.browserslist,
                 },
-                useBuiltIns: "usage"
-            }
-        ]
-    ]
+                useBuiltIns: "usage",
+            },
+        ],
+        "@babel/typescript",
+    ],
 }
 
 const cssOpt = {
-    sourceMap: true
+    sourceMap: true,
 }
 
 const htmlMinifyOpt = {
     collapseBooleanAttributes: true,
-    collapseWhitespace: false,
     collapseInlineTagWhitespace: true,
+    collapseWhitespace: false,
     decodeEntities: true,
     html5: true,
     minifyURLs: true,
     removeComments: true,
+    removeRedundantAttributes: true,
+    removeScriptTypeAttributes: true,
+    removeStyleLinkTypeAttributes: true,
     sortAttributes: true,
-    sortClassName: true
+    sortClassName: true,
+    useShortDoctype: true,
 }
 
 const postcssOpt = {
     config: {
-        path: filePostcssConfig
+        path: filePostcssConfig,
     },
-    sourceMap: true
+    sourceMap: true,
 }
 
 const sassOpt = {
@@ -126,8 +172,8 @@ const sassOpt = {
         outputStyle: "expanded",
         precision: 6,
         sourceMap: !isProduction,
-        sourceMapContents: !isProduction
-    }
+        sourceMapContents: !isProduction,
+    },
 }
 
 const svgoOpt = {
@@ -175,14 +221,14 @@ const svgoOpt = {
         { addClassesToSVGElement: false },
         { addAttributesToSVGElement: false },
         { removeStyleElement: false },
-        { removeScriptElement: false }
-    ]
+        { removeScriptElement: false },
+    ],
 }
 
 const htmlOpt = {
     iconSmall: `${dirPrefixIcons}/android-chrome-48x48.png`,
     iconLarge: `${dirPrefixIcons}/firefox_app_512x512.png`,
-    canonicalUrl: TARGET === "na-map" ? target : "",
+    canonicalUrl: TARGET === "na-map" ? targetUrl : "",
     name: libraryName,
     description: descriptionLong,
     hash: false,
@@ -190,9 +236,9 @@ const htmlOpt = {
     lang: "en-GB",
     meta: { viewport: "width=device-width, initial-scale=1, shrink-to-fit=no" },
     minify: htmlMinifyOpt,
-    servers: servers.servers,
-    template: "index.template.ejs",
-    title: PACKAGE.description
+    servers,
+    template: path.resolve(__dirname, dirSrc, "index.template.ejs"),
+    title: PACKAGE.description,
 }
 
 const faviconsOpt = {
@@ -215,49 +261,49 @@ const faviconsOpt = {
             favicons: false,
             firefox: true,
             windows: true,
-            yandex: false
+            yandex: false,
         },
         lang: "en-GB",
         // eslint-disable-next-line camelcase
         start_url: "/",
         // eslint-disable-next-line camelcase
         theme_color: themeColour,
-        version: PACKAGE.version
-    }
+        version: PACKAGE.version,
+    },
 }
 
 const config = {
-    context: path.resolve(__dirname, "src"),
-
     devServer: {
         contentBase: dirOutput,
-        disableHostCheck: true
+        disableHostCheck: true,
     },
 
-    entry: [path.resolve(__dirname, PACKAGE.main), path.resolve(__dirname, PACKAGE.sass)],
+    devtool: false,
+
+    entry: [path.resolve(dirJsSrc, "browser/main.ts")],
 
     externals: {
         jquery: "jQuery",
-        "popper.js": "Popper"
+        "popper.js": "Popper",
     },
 
     resolve: {
-        mainFields: ["module", "main"]
+        extensions: [".ts", ".js", ".json"],
     },
 
     optimization: {
         moduleIds: "hashed",
         runtimeChunk: "single",
         splitChunks: {
-            chunks: "all"
-        }
+            chunks: "all",
+        },
     },
 
     output: {
         chunkFilename: isProduction ? "[name].[chunkhash].js" : "[name].js",
         filename: isProduction ? "[name].[contenthash].js" : "[name].js",
         path: dirOutput,
-        crossOriginLoading: "anonymous"
+        crossOriginLoading: "anonymous",
     },
 
     plugins: [
@@ -271,12 +317,13 @@ const config = {
             reportFilename: path.resolve(__dirname, "report.html")
         }),
         */
+        new ForkTsCheckerWebpackPlugin(),
         new CleanWebpackPlugin({
-            verbose: false
+            verbose: false,
         }),
         new ExtractCssChunks({
             filename: isProduction ? "[name].[contenthash].css" : "[name].css",
-            orderWarning: true
+            orderWarning: true,
         }),
         new webpack.DefinePlugin({
             CPRIMARY300: JSON.stringify(primary300),
@@ -299,7 +346,7 @@ const config = {
             REPAIR_SAIL_VOLUME: JSON.stringify(repairs.sailRepair.volume),
             REPAIR_SAIL_PERCENT: JSON.stringify(repairs.sailRepair.percent),
             REPAIR_CREW_VOLUME: JSON.stringify(repairs.crewRepair.volume),
-            REPAIR_CREW_PERCENT: JSON.stringify(repairs.crewRepair.percent)
+            REPAIR_CREW_PERCENT: JSON.stringify(repairs.crewRepair.percent),
         }),
         new webpack.ProvidePlugin({
             $: "jquery",
@@ -307,30 +354,30 @@ const config = {
             "window.jQuery": "jquery",
             moment: "moment",
             "window.moment": "moment",
-            Popper: ["popper.js", "default"]
+            Popper: ["popper.js", "default"],
         }),
         // Do not include all moment locale files, certain locales are loaded by import
         new webpack.IgnorePlugin({
             resourceRegExp: /^\.\/locale$/,
-            contextRegExp: /moment$/
+            contextRegExp: /moment$/,
         }),
         new CopyPlugin([
-            { from: "../netlify.toml" },
+            { from: "netlify.toml" },
             {
-                from: "gen-server",
+                from: "lib/gen-server",
                 to: `${dirOutput}/data`,
-                flatten: true
+                flatten: true,
             },
-            { from: "google979f2cf3bed204d6.html", to: "google979f2cf3bed204d6.html", toType: "file" },
-            { from: "images/map", to: `${dirOutput}/images/map` }
+            { from: "src/google979f2cf3bed204d6.html" },
+            { from: dirMap, to: `${dirOutput}/images/map` },
         ]),
         new HtmlPlugin(htmlOpt),
-        new SitemapPlugin(target, sitemapPaths, { skipGzip: false }),
+        new SitemapPlugin(targetUrl, sitemapPaths, { skipGzip: false }),
         new FaviconsPlugin(faviconsOpt),
         new SriPlugin({
             hashFuncNames: ["sha384"],
-            enabled: isProduction
-        })
+            enabled: isProduction,
+        }),
     ],
 
     stats: {
@@ -346,152 +393,165 @@ const config = {
         // Add the origins of chunks and chunk merging info
         chunkOrigins: true,
 
-        excludeAssets: [/images\/map\/*/]
+        excludeAssets: [/images\/map\/*/],
     },
 
     module: {
         rules: [
             {
-                test: /\.js$/,
-                include: path.resolve(__dirname, "src/js"),
-                loader: require.resolve("babel-loader"),
-                options: babelOpt
+                test: /\.(ts|js)$/,
+                include: dirJsSrc,
+                use: [{ loader: "babel-loader", options: babelOpt }],
             },
             {
                 test: /\.scss$/,
-                include: path.resolve(__dirname, "src/scss"),
+                include: dirScssSrc,
                 use: [
                     ExtractCssChunks.loader,
                     {
-                        loader: require.resolve("css-loader"),
-                        options: cssOpt
+                        loader: "css-loader",
+                        options: cssOpt,
                     },
                     {
-                        loader: require.resolve("postcss-loader"),
-                        options: postcssOpt
+                        loader: "postcss-loader",
+                        options: postcssOpt,
                     },
                     {
-                        loader: require.resolve("sass-loader"),
-                        options: sassOpt
-                    }
-                ]
+                        loader: "sass-loader",
+                        options: sassOpt,
+                    },
+                ],
             },
             {
                 test: /\.css$/,
                 use: [
                     ExtractCssChunks.loader,
                     {
-                        loader: require.resolve("css-loader"),
-                        options: cssOpt
+                        loader: "css-loader",
+                        options: cssOpt,
                     },
                     {
-                        loader: require.resolve("postcss-loader"),
-                        options: postcssOpt
-                    }
-                ]
+                        loader: "postcss-loader",
+                        options: postcssOpt,
+                    },
+                ],
             },
             {
                 test: /\.(woff2?|ttf|eot|svg)$/,
                 include: dirFonts,
                 use: {
-                    loader: require.resolve("file-loader"),
+                    loader: "file-loader",
                     options: {
                         name: "[name].[ext]",
-                        outputPath: "fonts/"
-                    }
-                }
+                        outputPath: "fonts/",
+                    },
+                },
             },
             {
                 test: /\.svg$/,
                 include: dirFlags,
                 use: [
                     {
-                        loader: require.resolve("svg-url-loader"),
+                        loader: "svg-url-loader",
                         options: {
                             limit: 1000,
                             name: "[name].[ext]",
-                            outputPath: "images/flags/"
-                        }
+                            outputPath: "images/flags/",
+                        },
                     },
                     {
-                        loader: require.resolve("image-webpack-loader"),
+                        loader: "image-webpack-loader",
                         options: {
-                            svgo: svgoOpt
-                        }
+                            svgo: svgoOpt,
+                        },
                     },
                     {
-                        loader: require.resolve("string-replace-loader"),
+                        loader: "string-replace-loader",
                         options: {
                             search: 'fill="#fff" fill-opacity="0"/>',
-                            replace: `fill="${primary700}" fill-opacity="0.3"/>`
-                        }
+                            replace: `fill="${primary700}" fill-opacity="0.3"/>`,
+                        },
                     },
                     {
-                        loader: require.resolve("string-replace-loader"),
+                        loader: "string-replace-loader",
                         options: {
                             search: 'fill="#fff" fill-opacity="1"/>',
-                            replace: `fill="${primary200}" fill-opacity="1"/>`
-                        }
+                            replace: `fill="${primary200}" fill-opacity="1"/>`,
+                        },
                     },
                     {
-                        loader: require.resolve("string-replace-loader"),
+                        loader: "string-replace-loader",
                         options: {
                             search: 'fill="#fff" fill-opacity=".7"/>',
-                            replace: `fill="${primary300}" fill-opacity=".7"/>`
-                        }
-                    }
-                ]
+                            replace: `fill="${primary300}" fill-opacity=".7"/>`,
+                        },
+                    },
+                ],
             },
             {
                 test: /\.svg$/,
                 include: dirIcons,
                 use: [
                     {
-                        loader: require.resolve("svg-url-loader"),
+                        loader: "svg-url-loader",
                         options: {
                             limit: 1000,
                             name: "[name].[ext]",
-                            outputPath: "icons/"
-                        }
+                            outputPath: "icons/",
+                        },
                     },
                     {
-                        loader: require.resolve("image-webpack-loader"),
+                        loader: "image-webpack-loader",
                         options: {
-                            svgo: svgoOpt
-                        }
+                            svgo: svgoOpt,
+                        },
                     },
                     {
-                        loader: require.resolve("string-replace-loader"),
+                        loader: "string-replace-loader",
                         options: {
                             search: 'fill="$themeColour"',
-                            replace: `fill="${themeColour}"`
-                        }
-                    }
-                ]
-            }
-        ]
-    }
+                            replace: `fill="${themeColour}"`,
+                        },
+                    },
+                ],
+            },
+        ],
+    },
 }
 
-module.exports = () => {
-    if (isQuiet) {
-        config.stats = "errors-only"
-    }
+if (isQuiet) {
+    config.stats = "errors-only"
+}
 
-    if (isProduction) {
-        config.optimization.minimizer = [
+if (isProduction) {
+    config.optimization = {
+        minimize: true,
+        minimizer: [
             new TerserPlugin({
-                cache: true,
+                cache: true, // does not work with webpack 5
                 parallel: true,
+                /*
                 terserOptions: {
-                    output: { comments: false }
-                }
-            })
-        ]
-    } else {
-        config.devtool = "eval-source-map"
-        config.plugins.push(new webpack.HotModuleReplacementPlugin())
-    }
+                    ecma: 2020,
+                    module: true,
+                    mangle: {
+                        properties: true,
+                    },
+                    // compress: { passes: 3 },
+                    output: {
+                        beautify: false,
+                    },
+                    toplevel: true,
+                },
 
-    return config
+                 */
+            }),
+        ],
+    }
+} else {
+    config.devtool = "eval-source-map"
+    config.plugins.push(new webpack.HotModuleReplacementPlugin())
 }
+
+// export default config
+module.exports = () => config
