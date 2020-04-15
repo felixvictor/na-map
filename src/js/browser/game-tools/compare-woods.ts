@@ -21,22 +21,10 @@ import { registerEvent } from "../analytics"
 import { formatFloat, formatPercent, formatSignFloat } from "../../common/common-format"
 import { HtmlString, insertBaseModal } from "../../common/common-browser"
 import * as d3Selection from "d3-selection"
-import { putImportError } from "../../common/common"
+import { putImportError, woodType, WoodType, WoodTypeList } from "../../common/common";
 import { simpleStringSort, sortBy } from "../../common/common-node"
 import { WoodData, WoodTrimOrFrame } from "../../common/gen-json"
 import { ArrayIndex, Index, NestedIndex } from "../../common/interface"
-
-const woodType = ["frame", "trim"] as const
-export type WoodType = typeof woodType[number]
-type WoodTypeList<T> = {
-    [K in WoodType]: T
-}
-type WoodTypeArray<T> = {
-    [K in WoodType]: T[]
-}
-type WoodTypeNestedArray<T> = {
-    [K1 in WoodType]: ArrayIndex<T>
-}
 
 const woodColumnType = ["Base", "C1", "C2", "C3"] as const
 export type WoodColumnType = typeof woodColumnType[number]
