@@ -35,4 +35,3 @@ export interface Index<T> {
 export interface NestedIndex<T> {
     [index: string]: Index<T>
 }
-

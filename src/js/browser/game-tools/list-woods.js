@@ -26,8 +26,8 @@ export default class ListWoods {
     constructor() {
         this._baseName = "List woods";
         this._baseId = "wood-list";
-        this._buttonId = `button-${this._baseId}`;
-        this._modalId = `modal-${this._baseId}`;
+        this._buttonId =`button-${this._baseId}`;
+        this._modalId =`modal-${this._baseId}`;
 
         this._setupListener();
     }
@@ -117,19 +117,19 @@ export default class ListWoods {
         const modifiers = this._getModifiers(type);
         let text = "";
 
-        text += `<table id="table-${type}-list" class="table table-sm small tablesort"><thead><tr><th data-sort-default>Wood</th>`;
+        text +=`<table id="table-${type}-list" class="table table-sm small tablesort"><thead><tr><th data-sort-default>Wood</th>`;
         modifiers.forEach(modifier => {
-            text += `<th>${modifier}</th>`;
+            text +=`<th>${modifier}</th>`;
         });
         text += "</tr></thead><tbody>";
 
         this._woodData[type].forEach(wood => {
-            text += `<tr><td>${wood.name}</td>`;
+            text +=`<tr><td>${wood.name}</td>`;
             modifiers.forEach(modifier => {
                 const amount = wood.properties
                     .filter(property => property.modifier === modifier)
                     .map(property => property.amount)[0];
-                text += `<td class="text-right" data-sort="${amount ?? 0}">${
+                text +=`<td class="text-right" data-sort="${amount ?? 0}">${
                     amount ? formatFloatFixed(amount) : ""
                 }</td>`;
             });

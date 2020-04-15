@@ -110,7 +110,7 @@ const sortFileNames = (fileNames: string[]): string[] => {
  */
 function convertOwnership(): void {
     const ports = new Map() as Map<string, Port>
-    const numPortsDates: OwnershipNation[] = []
+    const numPortsDates: Array<OwnershipNation<number>> = []
     const fileBaseNameRegex = new RegExp(`${serverNames[0]}-Ports-(20\\d{2}-\\d{2}-\\d{2})${fileExtension}`)
 
     /**
@@ -207,7 +207,7 @@ function convertOwnership(): void {
             }
         }
 
-        const numPortsDate = {} as OwnershipNation
+        const numPortsDate = {} as OwnershipNation<number>
         numPortsDate.date = date
         nations
             .filter((nation) => nation.id !== 9)

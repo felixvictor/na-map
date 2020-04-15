@@ -26,22 +26,16 @@ export const formatFloatFixed = (x, f = 2) => formatLocale
     .replace(/\.(\d)0/g, '.$1<span class="hidden">0</span>');
 export const formatFloatFixedHTML = (x, f = 2) => {
     const [number, decimals] = formatLocale.format(`.${f}f`)(x).split(".");
-    let formattedFloat = html ` ${decimals} `;
+    let formattedFloat = html `${decimals}`;
     if (decimals) {
         if (decimals === "0" || decimals === "00") {
-            formattedFloat = html `
-                <span class="hidden">.${decimals}</span>
-            `;
+            formattedFloat = html `<span class="hidden">.${decimals}</span>`;
         }
         else if (decimals.endsWith("0")) {
-            formattedFloat = html `
-                .${decimals.replace("0", "")}<span class="hidden">0</span>
-            `;
+            formattedFloat = html `.${decimals.replace("0", "")}<span class="hidden">0</span>`;
         }
         else {
-            formattedFloat = html `
-                .${decimals}
-            `;
+            formattedFloat = html `.${decimals}`;
         }
     }
     return html `${number}${formattedFloat}`;
