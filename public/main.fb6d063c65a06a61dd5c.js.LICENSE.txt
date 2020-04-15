@@ -1,0 +1,100 @@
+/*!
+ * JavaScript Cookie v2.2.1
+ * https://github.com/js-cookie/js-cookie
+ *
+ * Copyright 2006, 2015 Klaus Hartl & Fagner Brack
+ * Released under the MIT license
+ */
+
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Common data and functions for browser.
+ * @module    src/node/common-browser
+ * @author    iB aka Felix Victor
+ * @copyright 2020
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Common data and functions for node.
+ * @module    src/common-math
+ * @author    iB aka Felix Victor
+ * @copyright 2020
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Common data and functions for node.
+ * @module    src/node/common-var
+ * @author    iB aka Felix Victor
+ * @copyright 2020
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Common data and functions.
+ * @module    src/node/common
+ * @author    iB aka Felix Victor
+ * @copyright 2018, 2019, 2020
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Cookie.
+ * @module    util/cookie
+ * @author    iB aka Felix Victor
+ * @copyright 2019, 2020
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Google analytics.
+ * @module    analytics
+ * @author    iB aka Felix Victor
+ * @copyright 2017, 2018, 2020
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
+/*!
+ * This file is part of na-map.
+ *
+ * @file      radioButton.
+ * @module    util/radio-button
+ * @author    iB aka Felix Victor
+ * @copyright 2019, 2020
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
+/*!
+ * This file is part of na-map.
+ *
+ * @file Main file.
+ * @author iB aka Felix Victor
+ * @copyright 2017, 2018, 2019, 2020
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
+/**
+ * @license
+ * Copyright (c) 2017 The Polymer Project Authors. All rights reserved.
+ * This code may only be used under the BSD style license found at
+ * http://polymer.github.io/LICENSE.txt
+ * The complete set of authors may be found at
+ * http://polymer.github.io/AUTHORS.txt
+ * The complete set of contributors may be found at
+ * http://polymer.github.io/CONTRIBUTORS.txt
+ * Code distributed by Google as part of the polymer project is also
+ * subject to an additional IP rights grant found at
+ * http://polymer.github.io/PATENTS.txt
+ */
