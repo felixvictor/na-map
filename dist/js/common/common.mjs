@@ -7,6 +7,7 @@
  * @copyright 2018, 2019, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
+export const woodType = ["frame", "trim"];
 export const cannonType = ["medium", "long", "carronade"];
 export const cannonEntityType = ["damage", "traverse", "dispersion", "generic", "penetration"];
 export const nationShortName = [
