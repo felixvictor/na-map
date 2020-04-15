@@ -1,0 +1,10 @@
+// Path-based compiler options (outDir, outFile, rootDir, include, files) are resolved from the config file they're found in
+// https://github.com/microsoft/TypeScript/issues/29172
+{
+    "extends": "../../tsconfig-main.json",
+    "compilerOptions": {
+        // "outFile": "./",                       /* Concatenate and emit output to single file. */
+        "outDir": "../../dist/js" /* Redirect output structure to the directory. */,
+       // "rootDir": "./" /* Specify the root directory of input files. Use to control the output directory structure with --outDir. */
+    },
+}
