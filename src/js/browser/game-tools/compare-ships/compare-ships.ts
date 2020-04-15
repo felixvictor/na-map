@@ -84,7 +84,7 @@ type ColumnArray<T> = {
     [K in ShipColumnType]: T[]
 }
 type ColumnNestedArray<T> = {
-    [K1 in ShipColumnType]: ArrayIndex<T>
+    [K in ShipColumnType]: ArrayIndex<T>
 }
 
 export class CompareShips {
