@@ -8,6 +8,20 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+import { ArrayIndex } from "./interface";
+
+export const woodType = ["frame", "trim"] as const
+export type WoodType = typeof woodType[number]
+export type WoodTypeList<T> = {
+    [K in WoodType]: T
+}
+export type WoodTypeArray<T> = {
+    [K in WoodType]: T[]
+}
+export type WoodTypeNestedArray<T> = {
+    [K1 in WoodType]: ArrayIndex<T>
+}
+
 export const cannonType = ["medium", "long", "carronade"] as const
 export type CannonType = typeof cannonType[number]
 export const cannonEntityType = ["damage", "traverse", "dispersion", "generic", "penetration"] as const
