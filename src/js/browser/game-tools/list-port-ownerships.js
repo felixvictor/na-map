@@ -37,8 +37,8 @@ export default class ListPortOwnerships {
     constructor() {
         this._baseName = "Port ownership"
         this._baseId = "ownership-list"
-        this._buttonId = `button-${this._baseId}`
-        this._modalId = `modal-${this._baseId}`
+        this._buttonId =`button-${this._baseId}`
+        this._modalId =`modal-${this._baseId}`
 
         this._colourScale = d3ScaleOrdinal().range(colourList)
 
@@ -86,7 +86,7 @@ export default class ListPortOwnerships {
     _injectModal() {
         insertBaseModal(this._modalId, this._baseName)
 
-        const select = `${this._baseId}-select`
+        const select =`${this._baseId}-select`
         const body = d3Select(`#${this._modalId} .modal-body`)
 
         body.append("label")
@@ -94,14 +94,14 @@ export default class ListPortOwnerships {
             .attr("name", select)
             .attr("id", select)
 
-        const div = body.append("div").attr("id", `${this._baseId}`)
+        const div = body.append("div").attr("id",`${this._baseId}`)
         this._div = div.append("div")
         this._svg = div.append("svg").attr("class", "area")
     }
 
     _getOptions() {
-        return `${this._ownershipData
-            .map(region => `<option value="${region.region}">${region.region}</option>;`)
+        return`${this._ownershipData
+            .map(region =>`<option value="${region.region}">${region.region}</option>;`)
             .join("")}`
     }
 
@@ -215,7 +215,7 @@ export default class ListPortOwnerships {
             const xTimeScale = d3ScaleTime()
                 .domain(d3Extent(nationData, d => ListPortOwnerships.xValue(d)))
                 .range([margin.left, width - margin.right])
-            g.attr("transform", `translate(0,${height - margin.bottom})`).call(
+            g.attr("transform",`translate(0,${height - margin.bottom})`).call(
                 d3AxisBottom(xTimeScale)
                     .ticks(width / 80)
                     .tickSizeOuter(0)

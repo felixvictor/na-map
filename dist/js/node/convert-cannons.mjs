@@ -120,7 +120,6 @@ export const convertCannons = async () => {
     for (const type of cannonType) {
         for (const cannon of cannons[type]) {
             for (const group of cannonEntityType) {
-                console.log(type, group, cannon[group]);
                 for (const [elementKey, elementValue] of Object.entries(cannon[group])) {
                     maxDigits.set([type, group, elementKey], Math.max((_a = maxDigits.get([type, group, elementKey])) !== null && _a !== void 0 ? _a : 0, countDecimals(elementValue === null || elementValue === void 0 ? void 0 : elementValue.value)));
                 }

@@ -8,8 +8,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { NationFullName, NationShortName } from "./gen-json"
-
 export const cannonType = ["medium", "long", "carronade"] as const
 export type CannonType = typeof cannonType[number]
 export const cannonEntityType = ["damage", "traverse", "dispersion", "generic", "penetration"] as const
@@ -22,6 +20,58 @@ export interface Nation {
     sortName: string // Name for sorting
 }
 
+export const nationShortName = [
+    "CN",
+    "DE",
+    "DK",
+    "ES",
+    "FR",
+    "FT",
+    "GB",
+    "NT",
+    "PL",
+    "PR",
+    "RU",
+    "SE",
+    "US",
+    "VP",
+] as const
+export type NationShortName = typeof nationShortName[number]
+export const nationShortNameAlternative = [
+    "CNa",
+    "DEa",
+    "DKa",
+    "ESa",
+    "FRa",
+    "FTa",
+    "GBa",
+    "NTa",
+    "PLa",
+    "PRa",
+    "RUa",
+    "SEa",
+    "USa",
+    "VPa",
+] as const
+export type NationShortNameAlternative = typeof nationShortNameAlternative[number]
+
+export const nationFullName = [
+    "China",
+    "Commonwealth of Poland",
+    "Danmark-Norge",
+    "España",
+    "France",
+    "Free Town",
+    "Great Britain",
+    "Kingdom of Prussia",
+    "Neutral",
+    "Pirates",
+    "Russian Empire",
+    "Sverige",
+    "United States",
+    "Verenigde Provinciën",
+] as const
+export type NationFullName = typeof nationFullName[number]
 export const nations: Nation[] = [
     { id: 0, short: "NT", name: "Neutral", sortName: "Neutral" },
     { id: 1, short: "PR", name: "Pirates", sortName: "Pirates" },
@@ -36,6 +86,7 @@ export const nations: Nation[] = [
     { id: 10, short: "RU", name: "Russian Empire", sortName: "Russian Empire" },
     { id: 11, short: "DE", name: "Kingdom of Prussia", sortName: "Prussia" },
     { id: 12, short: "PL", name: "Commonwealth of Poland", sortName: "Poland" },
+    { id: 13, short: "CN", name: "China", sortName: "China" },
 ]
 
 // noinspection SpellCheckingInspection
