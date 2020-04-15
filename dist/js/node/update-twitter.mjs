@@ -54,12 +54,12 @@ const getTwitterData = async (query, since_id = refresh) => {
         q: query,
         result_type: "recent",
         since_id,
-        tweet_mode: "extended"
+        tweet_mode: "extended",
     })
-        .catch(error => {
+        .catch((error) => {
         throw error.stack;
     })
-        .then(result => addTwitterData(result.data));
+        .then((result) => addTwitterData(result.data));
 };
 const getTweetsSince = async (sinceDateTime) => {
     const now = dayjs.utc();
@@ -94,7 +94,7 @@ const getTweets = async () => {
         access_token: accessToken,
         access_token_secret: accessTokenSecret,
         timeout_ms: 60 * 1000,
-        strictSSL: true
+        strictSSL: true,
     });
     if (runType.startsWith("full")) {
         await getTweetsFull();
@@ -104,7 +104,7 @@ const getTweets = async () => {
     }
     saveRefreshId(refresh);
 };
-const findPortIndex = (portName) => ports.findIndex(port => port.name === portName);
+const findPortIndex = (portName) => ports.findIndex((port) => port.name === portName);
 const captured = (result) => {
     var _a, _b;
     const i = findPortIndex(result[2]);
@@ -155,7 +155,7 @@ const hostilityLevelDown = (result) => {
     port.attackerClan = result[2];
     port.attackHostility = Number(result[6]) / 100;
 };
-const findPortByClanName = (clanName) => ports.find(port => port.capturer === clanName);
+const findPortByClanName = (clanName) => ports.find((port) => port.capturer === clanName);
 const guessNationFromClanName = (clanName) => {
     var _a, _b;
     const port = findPortByClanName(clanName);

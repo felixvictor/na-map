@@ -16,13 +16,13 @@ import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat.js"
 import utc from "dayjs/plugin/utc.js"
 
-import { findNationByName, findNationByNationShortName } from "../common/common"
+import { findNationByName, findNationByNationShortName, NationShortName } from "../common/common";
 import { commonPaths, serverStartDate as serverDate, serverStartDateTime } from "../common/common-dir"
 import { fileExists, readJson, readTextFile, saveJsonAsync, saveTextFile } from "../common/common-file"
 import { cleanName, simpleStringSort } from "../common/common-node"
 import { serverNames } from "../common/common-var"
 
-import { AttackerNationName, NationShortName, PortBattlePerServer } from "../common/gen-json"
+import { AttackerNationName, PortBattlePerServer } from "../common/gen-json"
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -96,12 +96,12 @@ const getTwitterData = async (query: string, since_id: string = refresh): Promis
         // eslint-disable-next-line @typescript-eslint/camelcase
         since_id,
         // eslint-disable-next-line @typescript-eslint/camelcase
-        tweet_mode: "extended"
+        tweet_mode: "extended",
     })
-        .catch(error => {
+        .catch((error) => {
             throw error.stack
         })
-        .then(result => addTwitterData(result.data as Twit.Twitter.SearchResults))
+        .then((result) => addTwitterData(result.data as Twit.Twitter.SearchResults))
 }
 
 /**
@@ -167,7 +167,7 @@ const getTweets = async (): Promise<void> => {
         access_token_secret: accessTokenSecret,
         // eslint-disable-next-line @typescript-eslint/camelcase
         timeout_ms: 60 * 1000, // optional HTTP request timeout to apply to all requests.
-        strictSSL: true // optional - requires SSL certificates to be valid.
+        strictSSL: true, // optional - requires SSL certificates to be valid.
     })
 
     if (runType.startsWith("full")) {
@@ -185,7 +185,7 @@ const getTweets = async (): Promise<void> => {
  * @param portName - Port name
  * @returns Index
  */
-const findPortIndex = (portName: string): number => ports.findIndex(port => port.name === portName)
+const findPortIndex = (portName: string): number => ports.findIndex((port) => port.name === portName)
 
 /**
  * Port captured
@@ -273,7 +273,7 @@ const hostilityLevelDown = (result: RegExpExecArray): void => {
  * @returns Port data
  */
 const findPortByClanName = (clanName: string): PortBattlePerServer | undefined =>
-    ports.find(port => port.capturer === clanName)
+    ports.find((port) => port.capturer === clanName)
 
 /**
  * Try to find nation for a clan name
@@ -461,7 +461,7 @@ const updatePorts = async (): Promise<void> => {
 }
 
 const updateTwitter = async (): Promise<void> => {
-    ports = (readJson(portFilename) as unknown) as PortBattlePerServer[]
+    ports = readJson(portFilename)
     await getTweets()
     await updatePorts()
     if (runType.startsWith("partial")) {

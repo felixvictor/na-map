@@ -15,7 +15,8 @@ import { Point } from "./common-math"
 import { ValuesType } from "utility-types"
 
 import { LootType } from "../browser/game-tools/list-loot"
-import { CannonType } from "./common"
+import { CannonType, NationFullName, NationShortName, NationShortNameAlternative } from "./common"
+import { ArrayIndex, Index } from "./interface"
 
 /****************************
  * buildings.json
@@ -176,35 +177,21 @@ export interface ModulePropertiesEntity {
  * nations.json
  */
 
-interface NationListOptional<T> extends ObjectIndexer<T | undefined> {
-    NT?: T
-    PR?: T
-    ES?: T
-    FR?: T
-    GB?: T
-    VP?: T
-    DK?: T
-    SE?: T
-    US?: T
-    RU?: T
-    DE?: T
-    PL?: T
+export type NationListOptional<T> = {
+    [K in NationShortName]?: ArrayIndex<T | undefined>
 }
-export interface NationList<T> extends ObjectIndexer<T> {
-    NT: T
-    PR: T
-    ES: T
-    FR: T
-    GB: T
-    VP: T
-    DK: T
-    SE: T
-    US: T
-    RU: T
-    DE: T
-    PL: T
+export type NationArrayList<T> = {
+    [K in NationShortName]: ArrayIndex<T>
 }
-export interface OwnershipNation extends NationList<number | string> {
+export type NationList<T> = T &
+    {
+        [K in NationShortName]: T
+    }
+export type NationListAlternative<T> = {
+    [K in NationShortName | NationShortNameAlternative]: T
+}
+
+export type OwnershipNation<T> = NationList<T> & {
     date: string
 }
 
@@ -330,22 +317,7 @@ export interface InventoryEntity {
 /****************************
  * <servername>-pb.json
  */
-export type NationShortName = "DE" | "DK" | "ES" | "FR" | "FT" | "GB" | "NT" | "PL" | "PR" | "RU" | "SE" | "US" | "VP"
 
-export type NationFullName =
-    | "Commonwealth of Poland"
-    | "Danmark-Norge"
-    | "España"
-    | "France"
-    | "Free Town"
-    | "Great Britain"
-    | "Kingdom of Prussia"
-    | "Neutral"
-    | "Pirates"
-    | "Russian Empire"
-    | "Sverige"
-    | "United States"
-    | "Verenigde Provinciën"
 type AttackerNationName = NationFullName | "n/a" | ""
 export interface PortBattlePerServer {
     id: number
@@ -628,8 +600,8 @@ export interface FrontlinesPerServer {
     attacking: Attacking
     defending: Defending
 }
-interface Attacking extends NationListOptional<FrontLineValue[]> {}
-interface Defending extends NationListOptional<FrontLineValue[]> {}
+interface Attacking extends NationArrayList<FrontLineValue> {}
+interface Defending extends NationArrayList<FrontLineValue> {}
 export interface FrontLineValue {
     [index: string]: ValuesType<FrontLineValue>
     key: string

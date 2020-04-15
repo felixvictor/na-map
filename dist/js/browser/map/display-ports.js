@@ -368,7 +368,9 @@ export default class DisplayPorts {
                     .append("image")
                     .attr("height", this._iconSize)
                     .attr("width", this._iconSize)
-                    .attr("href", this._nationIcons[`${nation}a`].replace('"', "").replace('"', ""));
+                    .attr("href", this._nationIcons[`${nation}a`]
+                    .replace('"', "")
+                    .replace('"', ""));
                 const patternCapitalAvail = svgDef
                     .append("pattern")
                     .attr("id", `${nation}ca`)
@@ -379,7 +381,9 @@ export default class DisplayPorts {
                     .append("image")
                     .attr("height", this._iconSize)
                     .attr("width", this._iconSize)
-                    .attr("href", this._nationIcons[`${nation}a`].replace('"', "").replace('"', ""));
+                    .attr("href", this._nationIcons[`${nation}a`]
+                    .replace('"', "")
+                    .replace('"', ""));
                 patternCapitalAvail
                     .append("circle")
                     .attr("cx", this._iconSize / 2)
