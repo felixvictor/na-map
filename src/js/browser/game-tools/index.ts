@@ -24,9 +24,7 @@ import ListPortOwnerships from "./list-port-ownerships"
 import ListRecipes from "./list-recipes"
 import ListShips from "./list-ships"
 import ListShipBlueprints from "./list-ship-blueprints"
-/*
 import ListWoods from "./list-woods"
-*/
 
 /**
  * Init
@@ -52,7 +50,7 @@ const init = (serverId: string, urlParams: URLSearchParams): void => {
     const woodCompare = new CompareWoods("wood")
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    //    const woodList = new ListWoods()
+    const woodList = new ListWoods()
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const buildingList = new ListBuildings()
