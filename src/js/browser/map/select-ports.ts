@@ -19,7 +19,15 @@ import { DatetimepickerEvent, DatetimepickerOption } from "../../@types/tempusdo
 import "tempusdominus-core/build/js/tempusdominus-core"
 
 import { registerEvent } from "../analytics"
-import { Nation, nations, NationShortName, putImportError, range, validNationShortName } from "../../common/common"
+import {
+    isEmpty,
+    Nation,
+    nations,
+    NationShortName,
+    putImportError,
+    range,
+    validNationShortName,
+} from "../../common/common"
 import { HtmlString, initMultiDropdownNavbar } from "../../common/common-browser"
 import { formatInt, formatSiCurrency } from "../../common/common-format"
 import { Point } from "../../common/common-math"
@@ -643,7 +651,7 @@ export default class SelectPorts {
     }
 
     _setFrontlinePorts(type: keyof FrontlinesPerServer, nation: NationShortName): void {
-        const ports = this._frontlinesData[type][nation]!
+        const ports = this._frontlinesData[type][nation]
         const enemyPorts = new Set<number>(ports.map((frontlinePort) => Number(frontlinePort.key)))
         const ownPorts = new Set<number>(ports.flatMap((frontlinePort) => frontlinePort.value.map((d) => d)))
 
