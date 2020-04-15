@@ -1,73 +1,119 @@
 {
     "root": true,
-    "parser": "babel-eslint",
     "parserOptions": {
-        "ecmaVersion": 6,
-        "sourceType": "module",
         "ecmaFeatures": {
             "modules": true,
             "impliedStrict": true
-        }
+        },
+        "ecmaVersion": 2020,
+        "sourceType": "module"
     },
     "env": {
-        "browser": true,
-        "node": true,
-        "jquery": true
+        "commonjs": true,
+        "es2020": true,
+        "jquery": true,
+        "node": true
     },
-    "extends": [
-        "plugin:import/errors",
-        "plugin:import/warnings",
-        "plugin:lit/recommended",
-        "plugin:prettier/recommended",
-        "plugin:unicorn/recommended",
-        "xo/esnext",
-        "xo/browser"
-    ],
-    "plugins": ["lit", "prettier"],
-    "rules": {
-        "capitalized-comments": "off",
-        "indent": [
-            "error",
-            4,
-            {
-                "MemberExpression": "off",
-                "SwitchCase": 1
+    "rules": {},
+    "overrides": [
+        {
+            "files": ["*.ts", "*.tsx"],
+            "parser": "@typescript-eslint/parser",
+            "extends": [
+                "plugin:lit/recommended",
+                "eslint:recommended",
+                "plugin:@typescript-eslint/eslint-recommended",
+                "plugin:@typescript-eslint/recommended",
+                "plugin:unicorn/recommended",
+                "xo/browser",
+                "xo/esnext",
+                "xo-typescript",
+                "prettier/@typescript-eslint",
+                "plugin:prettier/recommended"
+            ],
+            "plugins": ["lit", "@typescript-eslint", "eslint-plugin-tsdoc"],
+            "rules": {
+                "capitalized-comments": "off",
+                "new-cap": "off",
+                "no-mixed-operators": "off",
+                "object-curly-spacing": ["error", "always"],
+                "prettier/prettier": ["error", { "tabWidth": 4, "printWidth": 120, "semi": false }],
+                "prefer-destructuring": [
+                    "error",
+                    {
+                        "object": true,
+                        "array": false
+                    }
+                ],
+                "prefer-template": "error",
+                "operator-linebreak": ["error", "after", { "overrides": { "?": "before", ":": "before" } }],
+                "quotes": ["error", "double", { "allowTemplateLiterals": true, "avoidEscape": true }],
+                "semi": ["error", "never"],
+                "unicorn/prevent-abbreviations": "off",
+                "unicorn/no-nested-ternary": "off",
+                "tsdoc/syntax": "warn",
+                "@typescript-eslint/consistent-type-assertions": ["error", { "assertionStyle": "as" }],
+                "@typescript-eslint/no-base-to-string": "off",
+                "@typescript-eslint/no-non-null-assertion": "off",
+                "@typescript-eslint/no-unsafe-call": "warn",
+                "@typescript-eslint/no-unsafe-member-access": "warn",
+                "@typescript-eslint/no-unsafe-return": "warn",
+                "@typescript-eslint/restrict-template-expressions": [
+                    "error",
+                    { "allowNullable": true, "allowNumber": true }
+                ],
+                "@typescript-eslint/prefer-readonly-parameter-types": "off",
+                "@typescript-eslint/member-delimiter-style": [
+                    "error",
+                    {
+                        "multiline": {
+                            "delimiter": "none",
+                            "requireLast": false
+                        },
+                        "singleline": {
+                            "delimiter": "semi",
+                            "requireLast": false
+                        }
+                    }
+                ],
+                "@typescript-eslint/ban-ts-ignore": "off"
             }
-        ],
-        "new-cap": "off",
-        "no-mixed-operators": "off",
-        "object-curly-spacing": ["error", "always"],
-        "prettier/prettier": ["error", { "tabWidth": 4, "printWidth": 120, "semi": false }],
-        "prefer-destructuring": [
-            "error",
-            {
-                "object": true,
-                "array": false
-            }
-        ],
-        "prefer-template": "error",
-        "operator-linebreak": ["error", "after", { "overrides": { "?": "before", ":": "before" } }],
-        "quotes": ["error", "double", { "allowTemplateLiterals": false, "avoidEscape": true }],
-        "semi": ["error", "never"],
-        "space-before-function-paren": [
-            "error",
-            {
-                "anonymous": "never",
-                "named": "never",
-                "asyncArrow": "always"
-            }
-        ],
-        "unicorn/consistent-function-scoping": "off",
-        "unicorn/explicit-length-check": "off",
-        "unicorn/import-index": "off",
-        "unicorn/no-for-loop": "off",
-        "unicorn/no-unused-properties": "error",
-        "unicorn/prefer-dataset": "off",
-        "unicorn/prefer-includes": "off",
-        "unicorn/prefer-node-append": "off",
-        "unicorn/prefer-node-remove": "off",
-        "unicorn/prefer-query-selector": "off",
-        "unicorn/prefer-text-content": "off",
-        "unicorn/prevent-abbreviations": "off"
-    }
+        },
+        {
+            "files": ["*.js", "*.jsx"],
+            "parser": "babel-eslint",
+            "env": {
+                "es2020": true,
+                "node": true
+            },
+            "extends": [
+                "plugin:lit/recommended",
+                "eslint:recommended",
+                "plugin:unicorn/recommended",
+                "xo/esnext",
+                "xo/browser",
+                "plugin:prettier/recommended"
+            ],
+            "rules": {
+                "capitalized-comments": "off",
+                "new-cap": "off",
+                "no-mixed-operators": "off",
+                "object-curly-spacing": ["error", "always"],
+                "prettier/prettier": ["error", { "tabWidth": 4, "printWidth": 120, "semi": false }],
+                "prefer-destructuring": [
+                    "error",
+                    {
+                        "object": true,
+                        "array": false
+                    }
+                ],
+                "prefer-template": "error",
+                "operator-linebreak": ["error", "after", { "overrides": { "?": "before", ":": "before" } }],
+                "quotes": ["error", "double", { "allowTemplateLiterals": true, "avoidEscape": true }],
+                "semi": ["error", "never"],
+                "unicorn/prevent-abbreviations": "off"
+            },
+            "plugins": ["lit"]
+        }
+    ]
 }

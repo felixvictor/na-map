@@ -6,12 +6,12 @@
     <title>Naval Action map</title>
     <meta content="Yet another map with in-game map, resources, ship and wood comparisons. Port battle data is updated constantly from twitter and all data daily after maintenance." name="description">
     
-        <link href="https://na-map.netlify.com/" rel="canonical">
+        <meta content="noindex" name="robots">
     
     <meta content="Naval Action map" property="og:title" itemprop="name">
     <meta content="Yet another map with in-game map, resources, ship and wood comparisons. Port battle data is updated constantly from twitter and all data daily after maintenance." property="og:description" itemprop="description">
     <meta content="images/icons/firefox_app_512x512.png" property="og:image" itemprop="image">
-    <meta content="https://na-map.netlify.com/" property="og:url" itemprop="url">
+    <meta content="" property="og:url" itemprop="url">
 
     <meta content="en_gb" property="og:locale">
     <meta content="website" property="og:type">
@@ -103,7 +103,7 @@
                                     <div class="form-group row">
                                         <label class="col-form-label col-sm-4" for="prop-pb-from-input">From</label>
                                         <div class="date input-group col-sm-8" id="prop-pb-from" data-target-input="nearest">
-                                            <input class="datetimepicker-input form-control" id="prop-pb-from-input" type="text" aria-label="prop-pb-from" data-target="#prop-pb-from" required>
+                                            <input class="datetimepicker-input form-control" id="prop-pb-from-input" aria-label="prop-pb-from" data-target="#prop-pb-from" required>
                                             <div class="input-group-append" data-target="#prop-pb-from" data-toggle="datetimepicker">
                                                 <span class="input-group-text"><i class="icon icon-clock"></i></span>
                                             </div>
@@ -112,7 +112,7 @@
                                     <div class="form-group row">
                                         <label class="col-form-label col-sm-4" for="prop-pb-to-input">To</label>
                                         <div class="date input-group col-sm-8" id="prop-pb-to" data-target-input="nearest">
-                                            <input class="datetimepicker-input form-control" id="prop-pb-to-input" type="text" aria-label="prop-pb-to" data-target="#prop-pb-to" required>
+                                            <input class="datetimepicker-input form-control" id="prop-pb-to-input" aria-label="prop-pb-to" data-target="#prop-pb-to" required>
                                             <div class="input-group-append" data-target="#prop-pb-to" data-toggle="datetimepicker">
                                                 <span class="input-group-text"><i class="icon icon-clock"></i></span>
                                             </div>
@@ -147,7 +147,7 @@
                                     <div class="form-group row">
                                         <label class="col-form-label col-sm-3" for="prop-from-input">From</label>
                                         <div class="date input-group col-sm-9" id="prop-from" data-target-input="nearest">
-                                            <input class="datetimepicker-input form-control" id="prop-from-input" type="text" aria-label="prop-from" data-target="#prop-from" required>
+                                            <input class="datetimepicker-input form-control" id="prop-from-input" aria-label="prop-from" data-target="#prop-from" required>
                                             <div class="input-group-append" data-target="#prop-from" data-toggle="datetimepicker">
                                                 <span class="input-group-text"><i class="icon icon-calendar"></i></span>
                                             </div>
@@ -157,7 +157,7 @@
 
                                         <label class="col-form-label col-sm-3" for="prop-to-input">To</label>
                                         <div class="date input-group col-sm-9" id="prop-to" data-target-input="nearest">
-                                            <input class="datetimepicker-input form-control" id="prop-to-input" type="text" aria-label="prop-to" data-target="#prop-to" required>
+                                            <input class="datetimepicker-input form-control" id="prop-to-input" aria-label="prop-to" data-target="#prop-to" required>
                                             <div class="input-group-append" data-target="#prop-to" data-toggle="datetimepicker">
                                                 <span class="input-group-text"><i class="icon icon-calendar"></i></span>
                                             </div>
@@ -241,7 +241,7 @@
                         
                         
                             <div class="custom-control custom-control-inline custom-radio">
-                                <input class="custom-control-input" id="server-name-eu1" type="radio" name="server-name" value="eu1">
+                                <input class="custom-control-input" id="server-name-eu1" name="server-name" type="radio" value="eu1">
                                 <label class="custom-control-label" for="server-name-eu1">
                                     War
                                     <span class="caps">(PVP)</span>
@@ -249,7 +249,7 @@
                             </div>
                         
                             <div class="custom-control custom-control-inline custom-radio">
-                                <input class="custom-control-input" id="server-name-eu2" type="radio" name="server-name" value="eu2">
+                                <input class="custom-control-input" id="server-name-eu2" name="server-name" type="radio" value="eu2">
                                 <label class="custom-control-label" for="server-name-eu2">
                                     Peace
                                     <span class="caps">(PVE)</span>
@@ -262,31 +262,31 @@
                     <h6 class="dropdown-header">Show per port</h6>
                     <div class="align-self-center col-auto ml-1 radio-group" id="show-radius">
                         <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="show-radius-attack" type="radio" name="show-radius" value="attack">
+                            <input class="custom-control-input" id="show-radius-attack" name="show-radius" type="radio" value="attack">
                             <label class="custom-control-label" for="show-radius-attack">Attack</label>
                         </div>
                         <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="show-radius-county" type="radio" name="show-radius" value="county">
+                            <input class="custom-control-input" id="show-radius-county" name="show-radius" type="radio" value="county">
                             <label class="custom-control-label" for="show-radius-county">County</label>
                         </div>
                         <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="show-radius-position" type="radio" name="show-radius" value="position">
+                            <input class="custom-control-input" id="show-radius-position" name="show-radius" type="radio" value="position">
                             <label class="custom-control-label" for="show-radius-position">Position</label>
                         </div>
                         <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="show-radius-points" type="radio" name="show-radius" value="points">
+                            <input class="custom-control-input" id="show-radius-points" name="show-radius" type="radio" value="points">
                             <label class="custom-control-label" for="show-radius-points">Points</label>
                         </div>
                         <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="show-radius-tax" type="radio" name="show-radius" value="tax">
+                            <input class="custom-control-input" id="show-radius-tax" name="show-radius" type="radio" value="tax">
                             <label class="custom-control-label" for="show-radius-tax">Tax income</label>
                         </div>
                         <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="show-radius-net" type="radio" name="show-radius" value="net">
+                            <input class="custom-control-input" id="show-radius-net" name="show-radius" type="radio" value="net">
                             <label class="custom-control-label" for="show-radius-net">Net income</label>
                         </div>
                         <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="show-radius-off" type="radio" name="show-radius" value="off">
+                            <input class="custom-control-input" id="show-radius-off" name="show-radius" type="radio" value="off">
                             <label class="custom-control-label" for="show-radius-off">Off</label>
                         </div>
                     </div>
@@ -295,23 +295,23 @@
                     <h6 class="dropdown-header">Zones</h6>
                     <div class="align-self-center col-auto ml-1 radio-group" id="show-zones">
                         <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="show-zones-pb-all" type="radio" name="show-zones" value="pb-all">
+                            <input class="custom-control-input" id="show-zones-pb-all" name="show-zones" type="radio" value="pb-all">
                             <label class="custom-control-label" for="show-zones-pb-all">All port battle</label>
                         </div>
                         <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="show-zones-pb-single" type="radio" name="show-zones" value="pb-single">
+                            <input class="custom-control-input" id="show-zones-pb-single" name="show-zones" type="radio" value="pb-single">
                             <label class="custom-control-label" for="show-zones-pb-single">Single port battle</label>
                         </div>
                         <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="show-zones-raid-all" type="radio" name="show-zones" value="raid-all">
+                            <input class="custom-control-input" id="show-zones-raid-all" name="show-zones" type="radio" value="raid-all">
                             <label class="custom-control-label" for="show-zones-raid-all">All raid</label>
                         </div>
                         <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="show-zones-raid-single" type="radio" name="show-zones" value="raid-single">
+                            <input class="custom-control-input" id="show-zones-raid-single" name="show-zones" type="radio" value="raid-single">
                             <label class="custom-control-label" for="show-zones-raid-single">Single raid</label>
                         </div>
                         <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="show-zones-off" type="radio" name="show-zones" value="off">
+                            <input class="custom-control-input" id="show-zones-off" name="show-zones" type="radio" value="off">
                             <label class="custom-control-label" for="show-zones-off">Off</label>
                         </div>
                     </div>
@@ -320,11 +320,11 @@
                     <h6 class="dropdown-header">Show trades</h6>
                     <div class="align-self-center col-auto ml-1 radio-group" id="show-trades-show">
                         <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="show-trades-show-on" type="radio" name="show-trades-show" value="on">
+                            <input class="custom-control-input" id="show-trades-show-on" name="show-trades-show" type="radio" value="on">
                             <label class="custom-control-label" for="show-trades-show-on">On</label>
                         </div>
                         <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="show-trades-show-off" type="radio" name="show-trades-show" value="off">
+                            <input class="custom-control-input" id="show-trades-show-off" name="show-trades-show" type="radio" value="off">
                             <label class="custom-control-label" for="show-trades-show-off">Off</label>
                         </div>
                     </div>
@@ -333,11 +333,11 @@
                     <h6 class="dropdown-header">Show grid</h6>
                     <div class="align-self-center col-auto ml-1 radio-group" id="show-grid">
                         <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="show-grid-on" type="radio" name="show-grid" value="on">
+                            <input class="custom-control-input" id="show-grid-on" name="show-grid" type="radio" value="on">
                             <label class="custom-control-label" for="show-grid-on">On</label>
                         </div>
                         <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="show-grid-off" type="radio" name="show-grid" value="off">
+                            <input class="custom-control-input" id="show-grid-off" name="show-grid" type="radio" value="off">
                             <label class="custom-control-label" for="show-grid-off">Off</label>
                         </div>
                     </div>
@@ -346,11 +346,11 @@
                     <h6 class="dropdown-header">Double click to</h6>
                     <div class="align-self-center col-auto ml-1 radio-group" id="double-click-action">
                         <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="double-click-action-compass" type="radio" name="double-click-action" value="compass">
+                            <input class="custom-control-input" id="double-click-action-compass" name="double-click-action" type="radio" value="compass">
                             <label class="custom-control-label" for="double-click-action-compass">Plot a course</label>
                         </div>
                         <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="double-click-action-f11" type="radio" name="double-click-action" value="f11">
+                            <input class="custom-control-input" id="double-click-action-f11" name="double-click-action" type="radio" value="f11">
                             <label class="custom-control-label" for="double-click-action-f11">Show <span class="caps">F11</span>
                                 coordinates</label>
                         </div>
@@ -388,5 +388,5 @@
 
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.slim.min.js" crossorigin="anonymous" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" crossorigin="anonymous" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"></script>
-<script src="runtime.fc8bc9e7d7c7fc554943.js" crossorigin="anonymous" integrity="sha384-bQvGKKqB6QOW6iylCMaHbcL23/OrY/kNGhb7I2/E2iZzdpKEnAe0hTSYdZwjY4vP"></script><script src="vendors~main.561b81e8eafe692a519f.js" crossorigin="anonymous" integrity="sha384-Tb7hWn3zfUyqL97n8hzAhesVdZ7zi6pTYsbiwCg1+1C+QsXw5reM55/noFLfxdWY"></script><script src="main.682bc3bdb5a17eb39d31.js" crossorigin="anonymous" integrity="sha384-ZexdrfffBag3ToLgff2OPZvxJBmSdgM+b4ZHSOvjdmWkGjONlmsKdiDhFAR2bpvz"></script></body>
+<script src="main.f37045ce7b8343e1bf5c.js" crossorigin="anonymous" integrity="sha384-/mqCySlII7cTMm9fM3Weorx6fSm9k8BLB02J5MzMtc/NpckRSgikWhc/31nr8Ubb"></script></body>
 </html>
