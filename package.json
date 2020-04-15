@@ -17,7 +17,7 @@
         "build:js:node": "tsc --project src/js/tsconfig.json",
         "build:js:mjs": "find ./dist/js -name \"*.js\" -type f -regextype posix-egrep -regex \".*/(common|node)/.+\" -exec bash -c 'mv \"$1\" \"${1%.js}\".mjs' - '{}' \\; && cp dist/js/common/servers.mjs dist/js/common/servers.js",
         "build:load": "yarn node --experimental-specifier-resolution=node dist/js/node/load-api-data.mjs",
-        "clean:src:js": "find ./src/js -name \"*.ts\" -type f -regextype posix-egrep -regex \".*/(browser|common|node)/.+\" -exec bash -c 'for file in \"${1%.ts}\".js \"${1%.ts}\".js.map; do [ -e \"$file\" ] && ls \"$file\"; done' - '{}' \\;",
+        "clean:src:js": "find ./src/js -name \"*.ts\" -type f -regextype posix-egrep -regex \".*/(browser|common|node)/.+\" -exec bash -c 'for file in \"${1%.ts}\".js \"${1%.ts}\".js.map; do [ -e \"$file\" ] && rm -f \"$file\"; done' - '{}' \\;",
         "deploy:netlify": "export $(cat .env | xargs) && netlify deploy --prod --dir public --site ${KEY_NETLIFY}",
         "deploy:netlify-test": "export $(cat .env | xargs) && netlify deploy --prod --dir public --site ${KEY_NETLIFY_TEST}",
         "deploy:netlify-test2": "export $(cat .env | xargs) && netlify deploy --prod --dir public --site ${KEY_NETLIFY_TEST2}",
