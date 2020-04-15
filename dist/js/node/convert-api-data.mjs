@@ -29,9 +29,7 @@ const convertApiData = async () => {
     convertRecipeData();
     convertRepairData();
     convertServerPortData();
-    if (runType.endsWith("server")) {
-        convertOwnershipData();
-    }
+    convertOwnershipData();
     await convertShipData();
 };
 const convert = async () => {
