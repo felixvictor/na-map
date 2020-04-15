@@ -13,8 +13,10 @@ import dayjs from "dayjs"
 
 import d3Array from "d3-array"
 const { rollup: d3Rollup } = d3Array
+import d3Collection from "d3-collection"
+const { nest: d3Nest } = d3Collection
 
-import { findNationById, nations, nationShortName, NationShortName } from "../common/common"
+import { findNationById, nations, NationShortName } from "../common/common"
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
 import { readJson, saveJsonAsync } from "../common/common-file"
 import { Distance } from "../common/common-math"
@@ -215,6 +217,11 @@ const setAndSaveFrontlines = async (serverName: string): Promise<void> => {
         distance: number
     }
 
+    interface FANPort {
+        key: string // From/To port id
+        values: FANValue[]
+    }
+
     interface FANValue {
         id: number
         nation: NationShortName
@@ -226,7 +233,7 @@ const setAndSaveFrontlines = async (serverName: string): Promise<void> => {
     }
 
     const outNations = new Set(["NT"])
-    const frontlineAttackingNationGroupedByToPort = {} as NationList<Map<string, number[]>>
+    const frontlineAttackingNationGroupedByToPort = {} as NationList<FANPort[]>
     const frontlineAttackingNationGroupedByFromPort = {} as NationList<Map<string, FANValue[]>>
 
     nations
@@ -256,13 +263,12 @@ const setAndSaveFrontlines = async (serverName: string): Promise<void> => {
                         .slice(0, frontlinePorts)
                 )
 
-            frontlineAttackingNationGroupedByToPort[nationShortName] = d3Rollup(
-                frontlinesFrom,
-                // (values: DistanceExtended[]) => values.map(value => [value.fromPortId, value.fromPortName, value.distance])
-                (values) => values.map((value) => value.fromPortId),
-                // (d: DistanceExtended) => `${d.toPortId} ${d.toPortName}`
-                (d) => String(d.toPortId)
-            )
+            frontlineAttackingNationGroupedByToPort[nationShortName] = d3Nest<DistanceExtended, number[]>()
+                // .key(d => `${d.toPortId} ${d.toPortName}`)
+                .key((d) => String(d.toPortId))
+                // .rollup(values => values.map(value => [value.fromPortId, value.fromPortName, value.distance]))
+                .rollup((values) => values.map((value) => value.fromPortId))
+                .entries(frontlinesFrom)
 
             frontlineAttackingNationGroupedByFromPort[nationShortName] = d3Rollup(
                 frontlinesFrom,
