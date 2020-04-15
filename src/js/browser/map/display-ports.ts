@@ -289,6 +289,8 @@ export default class DisplayPorts {
     }
 
     _setupData(data: ReadData): void {
+        const tradingType = ["dropsTrading", "consumesTrading", "producesNonTrading", "dropsNonTrading"] as const
+
         // Combine port data with port battle data
         const portData = data.ports.map((port: PortBasic) => {
             const serverData = data.server.find((d: PortPerServer) => d.id === port.id) as PortPerServer
@@ -296,12 +298,12 @@ export default class DisplayPorts {
             const combinedData = { ...port, ...serverData, ...pbData } as PortWithTrades
 
             // Delete empty entries
-            ;["dropsTrading", "consumesTrading", "producesNonTrading", "dropsNonTrading"].forEach((type) => {
+            for (const type of tradingType) {
                 if (!combinedData[type]) {
                     // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
                     delete combinedData[type]
                 }
-            })
+            }
 
             return combinedData
         })
@@ -703,7 +705,7 @@ export default class DisplayPorts {
         moment.locale("en-gb")
         const portBattleLT = moment.utc(portProperties.portBattle).local()
         const portBattleST = moment.utc(portProperties.portBattle)
-        const localTime = portBattleST === portBattleLT ? "" : `(${portBattleLT.format("H.mm")} local)`
+        const localTime = portBattleST === portBattleLT ? "" : ` (${portBattleLT.format("H.mm")} local)`
         const portBattleStartTime = portProperties.portBattleStartTime
             ? `${(portProperties.portBattleStartTime + 10) % 24}.00\u202F–\u202F${
                   (portProperties.portBattleStartTime + 13) % 24
