@@ -10,40 +10,49 @@
 
 /// <reference types="bootstrap" />
 import "bootstrap/js/dist/util"
-/// <reference types="bootstrap" />
 import "bootstrap/js/dist/modal"
+
 import "bootstrap-select/js/bootstrap-select"
 import { select as d3Select } from "d3-selection"
 
 import { registerEvent } from "../analytics"
-import { insertBaseModal } from "../../common/interfaces"
-import { chunkify, getOrdinal, putImportError, sortBy } from "../util"
-import { formatPP, formatSignInt, formatSignPercent } from "../../common/common-format";
+import { putImportError } from "../../common/common"
+import { HtmlString, insertBaseModal } from "../../common/common-browser"
+import { formatPP, formatSignInt, formatSignPercent } from "../../common/common-format"
+import { getOrdinal } from "../../common/common-math"
+import { sortBy } from "../../common/common-node"
+import { chunkify } from "../util"
+
+import { Module } from "../../common/gen-json"
 
 export default class ListModules {
+    private readonly _baseName: string
+    private readonly _baseId: HtmlString
+    private readonly _buttonId: HtmlString
+    private readonly _modalId: HtmlString
+    private _moduleData: Module[] = {} as Module[]
     constructor() {
         this._baseName = "List modules"
         this._baseId = "module-list"
-        this._buttonId =`button-${this._baseId}`
-        this._modalId =`modal-${this._baseId}`
+        this._buttonId = `button-${this._baseId}`
+        this._modalId = `modal-${this._baseId}`
 
         this._setupListener()
     }
 
-    async _loadAndSetupData() {
+    async _loadAndSetupData(): Promise<void> {
         try {
-            this._moduleData = (
-                await import(/* webpackChunkName: "data-modules" */ "~Lib/gen-generic/modules.json")
-            ).default
+            this._moduleData = (await import(/* webpackChunkName: "data-modules" */ "Lib/gen-generic/modules.json"))
+                .default as Module[]
         } catch (error) {
             putImportError(error)
         }
     }
 
-    _setupListener() {
+    _setupListener(): void {
         let firstClick = true
 
-        document.getElementById(this._buttonId).addEventListener("click", async event => {
+        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", async (event) => {
             if (firstClick) {
                 firstClick = false
                 await this._loadAndSetupData()
@@ -56,50 +65,46 @@ export default class ListModules {
     }
 
     // noinspection DuplicatedCode
-    _injectModal() {
-        insertBaseModal(this._modalId, this._baseName)
+    _injectModal(): void {
+        insertBaseModal({ id: this._modalId, title: this._baseName })
 
-        const id =`${this._baseId}-select`
+        const id = `${this._baseId}-select`
         const body = d3Select(`#${this._modalId} .modal-body`)
         body.append("label").attr("for", id)
-        body.append("select")
-            .attr("name", id)
-            .attr("id", id)
-        body.append("div")
-            .attr("id",`${this._baseId}`)
-            .attr("class", "container-fluid")
+        body.append("select").attr("name", id).attr("id", id)
+        body.append("div").attr("id", `${this._baseId}`).attr("class", "container-fluid")
     }
 
-    _getOptions() {
-        return`${this._moduleData.map(type =>`<option value="${type[0]}"">${type[0]}</option>;`).join("")}`
+    _getOptions(): HtmlString {
+        return `${this._moduleData.map((type) => `<option value="${type[0]}"">${type[0]}</option>;`).join("")}`
     }
 
-    _setupSelect() {
+    _setupSelect(): void {
         const select$ = $(`#${this._baseId}-select`)
         const options = this._getOptions()
         select$.append(options)
     }
 
-    _setupSelectListener() {
+    _setupSelectListener(): void {
         const select$ = $(`#${this._baseId}-select`)
 
         select$
             .addClass("selectpicker")
-            .on("change", event => this._moduleSelected(event))
+            .on("change", (event) => this._moduleSelected(event))
             .selectpicker({ noneSelectedText: "Select module category" })
             .val("default")
             .selectpicker("refresh")
     }
 
-    _initModal() {
+    _initModal(): void {
         this._injectModal()
         this._setupSelect()
         this._setupSelectListener()
     }
 
-    _moduleListSelected() {
+    _moduleListSelected(): void {
         // If the modal has no content yet, insert it
-        if (!document.getElementById(this._modalId)) {
+        if (!document.querySelector(`#${this._modalId}`)) {
             this._initModal()
         }
 
@@ -109,41 +114,37 @@ export default class ListModules {
 
     /**
      * Get rows with modules for module moduleType
-     * @param {String} moduleType Module Type
-     * @return {Array} html table rows
-     * @private
+     * @param moduleType - Module Type
+     * @returns html table rows
      */
-    _getRows(moduleType) {
+    _getRows(moduleType: string): HtmlString[] {
         /**
          * Rate code mapped into human readable string
-         * @type {Map<String, String>}
          */
-        const rates = new Map([
-            ["L",`${getOrdinal(1)}\u202F\u2013\u202f${getOrdinal(3)}`],
-            ["M",`${getOrdinal(4)}\u202F\u2013\u202f${getOrdinal(5)}`],
-            ["S",`${getOrdinal(6)}\u202F\u2013\u202f${getOrdinal(7)}`]
+        const rates = new Map<string, string>([
+            ["L", `${getOrdinal(1)}\u202F\u2013\u202f${getOrdinal(3)}`],
+            ["M", `${getOrdinal(4)}\u202F\u2013\u202f${getOrdinal(5)}`],
+            ["S", `${getOrdinal(6)}\u202F\u2013\u202f${getOrdinal(7)}`],
         ])
 
         /**
          * Get ship rate from module level
-         * @param {Object} moduleLevel Module level
-         * @return {string} Ship rate
+         * @param moduleLevel - Module level
+         * @returns Ship rate
          */
-        function getRate(moduleLevel) {
-            return moduleLevel === "U" ? "" :`${rates.get(moduleLevel)}`
-        }
+        const getRate = (moduleLevel: string): string => (moduleLevel === "U" ? "" : `${rates.get(moduleLevel)}`)
 
         let rate = ""
-        const rows = []
+        const rows = [] as HtmlString[]
         for (const type of this._moduleData) {
             if (type[0] === moduleType) {
                 type[1].sort(sortBy(["name"])).forEach((module, i) => {
                     /**
                      * Test if current module and module at index position has same properties
-                     * @param {integer} index Position
-                     * @return {boolean} True if same
+                     * @param index - Position
+                     * @returns True if same
                      */
-                    const hasSameProperties = index =>
+                    const hasSameProperties = (index: number): boolean =>
                         index < type[1].length &&
                         module.name === type[1][index].name &&
                         JSON.stringify(module.properties) === JSON.stringify(type[1][index].properties)
@@ -151,7 +152,7 @@ export default class ListModules {
                     rate = getRate(module.moduleLevel)
                     if (hasSameProperties(i + 1)) {
                         type[1][i + 1].hasSamePropertiesAsPrevious = true
-                        rate +=`<br>${getRate(type[1][i + 1].moduleLevel)}`
+                        rate += `<br>${getRate(type[1][i + 1].moduleLevel)}`
                     }
 
                     if (hasSameProperties(i + 2)) {
@@ -159,18 +160,15 @@ export default class ListModules {
                         rate = ""
                     }
 
-                    let permanentType = rate ? "<br>" : ""
-                    permanentType += module.permanentType ? module.permanentType : ""
-
                     if (
                         typeof module.hasSamePropertiesAsPrevious === "undefined" ||
                         !module.hasSamePropertiesAsPrevious
                     ) {
                         rows.push(
-                           `<tr><td><span class="name">${
+                            `<tr><td><span class="name">${
                                 module.name
-                            }<br>${rate}</span>${permanentType}</td><td>${module.properties
-                                .map(property => {
+                            }<br>${rate}</span></td><td>${module.properties
+                                .map((property) => {
                                     let amount
                                     if (property.isPercentage) {
                                         amount = formatSignPercent(property.amount / 100)
@@ -181,7 +179,7 @@ export default class ListModules {
                                                 : formatSignInt(property.amount)
                                     }
 
-                                    return`${property.modifier} ${amount}`
+                                    return `${property.modifier} ${amount}`
                                 })
                                 .join("<br>")}</td></tr>`
                         )
@@ -195,17 +193,15 @@ export default class ListModules {
 
     /**
      * Construct module list tables
-     * @param {string} moduleType Module type.
-     * @return {string} html string
-     * @private
+     * @param moduleType - Module type.
      */
-    _getText(moduleType) {
+    _getText(moduleType: string): HtmlString {
         const columns = 3
         const rows = this._getRows(moduleType)
         const splitRows = chunkify(rows, columns)
         let text = ""
         for (const column of [...new Array(splitRows.length).keys()]) {
-            text +=`<div class="col-md-${Math.floor(12 / splitRows.length)}">`
+            text += `<div class="col-md-${Math.floor(12 / splitRows.length)}">`
             text += '<table class="table table-sm small"><thead>'
             text += "<tr><th>Module</th><th>Modifier</th></tr></thead><tbody>"
             text += splitRows[column].join("")
@@ -217,22 +213,16 @@ export default class ListModules {
 
     /**
      * Show modules for selected module type
-     * @param {Object} event Event
-     * @return {void}
-     * @private
+     * @param event - Event
      */
-    _moduleSelected(event) {
-        const moduleType = $(event.currentTarget)
-            .find(":selected")
-            .val()
+    _moduleSelected(event: JQuery.ChangeEvent): void {
+        const moduleType = $(event.currentTarget).find(":selected").val() as string
 
         // Remove old recipe list
         d3Select(`#${this._baseId} div`).remove()
 
         // Add new recipe list
-        d3Select(`#${this._baseId}`)
-            .append("div")
-            .classed("row modules mt-4", true)
+        d3Select(`#${this._baseId}`).append("div").classed("row modules mt-4", true)
         d3Select(`#${this._baseId} div`).html(this._getText(moduleType))
     }
 }
