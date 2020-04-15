@@ -23,7 +23,7 @@ import { servers } from "../../common/servers"
 import { getOrdinal, putImportError, sortBy } from "../util"
 import { formatInt, formatSignPercent } from "../../common/common-format";
 
-const replacer = (match, p1, p2) => `${getOrdinal(p1)}\u202F\u2013\u202f${getOrdinal(p2)}`
+const replacer = (match, p1, p2) =>`${getOrdinal(p1)}\u202F\u2013\u202f${getOrdinal(p2)}`
 
 export default class ListRecipes {
     constructor(serverId) {
@@ -31,8 +31,8 @@ export default class ListRecipes {
 
         this._baseName = "List admiralty items and recipes"
         this._baseId = "recipe-list"
-        this._buttonId = `button-${this._baseId}`
-        this._modalId = `modal-${this._baseId}`
+        this._buttonId =`button-${this._baseId}`
+        this._modalId =`modal-${this._baseId}`
 
         this._setupListener()
     }
@@ -68,7 +68,7 @@ export default class ListRecipes {
     _injectModal() {
         insertBaseModal(this._modalId, this._baseName)
 
-        const id = `${this._baseId}-select`
+        const id =`${this._baseId}-select`
         const body = d3Select(`#${this._modalId} .modal-body`)
         body.append("select")
             .attr("name", id)
@@ -79,7 +79,7 @@ export default class ListRecipes {
             .text("Items listed here may not be available in the game (yet).")
 
         body.append("div")
-            .attr("id", `${this._baseId}`)
+            .attr("id",`${this._baseId}`)
             .attr("class", "container-fluid")
     }
 
@@ -95,10 +95,10 @@ export default class ListRecipes {
         return recipeData
             .map(
                 key =>
-                    `<optgroup label="${key.key}">${key.values
+                   `<optgroup label="${key.key}">${key.values
                         .map(
                             recipe =>
-                                `<option value="${recipe.id}">${recipe.name.replace(/(\d)-(\d)(st|rd|th)/, replacer)}`
+                               `<option value="${recipe.id}">${recipe.name.replace(/(\d)-(\d)(st|rd|th)/, replacer)}`
                         )
                         .join("</option>")}`
             )
@@ -156,16 +156,16 @@ export default class ListRecipes {
     _getRequirementText(currentRecipe) {
         let text = '<table class="table table-sm card-table"><tbody>'
         if (currentRecipe.labourPrice) {
-            text += `<tr><td>${currentRecipe.labourPrice} labour hours</td></tr>`
+            text +=`<tr><td>${currentRecipe.labourPrice} labour hours</td></tr>`
         }
 
         if (currentRecipe.goldPrice) {
-            text += `<tr><td>${getCurrencyAmount(currentRecipe.goldPrice)}</td></tr>`
+            text +=`<tr><td>${getCurrencyAmount(currentRecipe.goldPrice)}</td></tr>`
         }
 
         if (currentRecipe.itemRequirements.length) {
-            text += `<tr><td>${currentRecipe.itemRequirements
-                .map(requirement => `${requirement.amount} ${requirement.name}`)
+            text +=`<tr><td>${currentRecipe.itemRequirements
+                .map(requirement =>`${requirement.amount} ${requirement.name}`)
                 .join("</td></tr><tr><td>")}</td></tr>`
         }
 
@@ -183,22 +183,22 @@ export default class ListRecipes {
             const modules = type[1].filter(module => module.id === currentRecipe.result.id)
             for (const module of modules) {
                 [moduleType] = type
-                properties = `<tr><td>${module.properties
+                properties =`<tr><td>${module.properties
                     .map(property => {
                         const amount = property.isPercentage
                             ? formatSignPercent(property.amount / 100)
                             : property.amount
-                        return `${property.modifier} ${amount}`
+                        return`${property.modifier} ${amount}`
                     })
                     .join("</td></tr><tr><td>")}</td></tr>`
             }
         }
 
         if (properties) {
-            text += `<h6 class="card-subtitle mb-2 text-muted">${moduleType}</h6>`
-            text += `<table class="table table-sm card-table"><tbody>${properties}</tbody></table>`
+            text +=`<h6 class="card-subtitle mb-2 text-muted">${moduleType}</h6>`
+            text +=`<table class="table table-sm card-table"><tbody>${properties}</tbody></table>`
         } else {
-            text += `<p>${formatInt(currentRecipe.result.amount)} ${currentRecipe.result.name}</p>`
+            text +=`<p>${formatInt(currentRecipe.result.amount)} ${currentRecipe.result.name}</p>`
         }
 
         return text
