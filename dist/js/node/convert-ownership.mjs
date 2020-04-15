@@ -67,9 +67,8 @@ function convertOwnership() {
         });
         for (const port of portData) {
             const getObject = () => ({
-                timeRange: [date, date],
+                timeRange: [new Date(date), new Date(date)],
                 val: nations[port.Nation].short,
-                labelVal: nations[port.Nation].sortName,
             });
             const initData = () => {
                 var _a;
@@ -99,7 +98,7 @@ function convertOwnership() {
             const setNewEndDate = () => {
                 const portData = ports.get(port.Id);
                 if (portData) {
-                    portData.data[portData.data.length - 1].timeRange[1] = date;
+                    portData.data[portData.data.length - 1].timeRange[1] = new Date(date);
                     ports.set(port.Id, portData);
                 }
             };
