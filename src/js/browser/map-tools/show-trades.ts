@@ -20,7 +20,7 @@ import { scaleLinear as d3ScaleLinear, scalePoint as d3ScalePoint } from "d3-sca
 import { select as d3Select } from "d3-selection"
 import * as d3Zoom from "d3-zoom"
 
-import { nations, putImportError } from "../../common/common"
+import { nations, NationShortName, putImportError } from "../../common/common"
 import { Bound, HtmlString } from "../../common/common-browser"
 import { formatInt, formatSiCurrency, formatSiInt } from "../../common/common-format"
 import { defaultFontSize, roundToThousands } from "../../common/common-math"
@@ -30,7 +30,7 @@ import RadioButton from "../util/radio-button"
 import SelectPorts from "../map/select-ports"
 import { DivDatum, SVGGDatum, SVGSVGDatum } from "../../common/interface"
 import * as d3Selection from "d3-selection"
-import { NationShortName, PortBasic, PortBattlePerServer, PortWithTrades, Trade } from "../../common/gen-json"
+import { PortBasic, PortBattlePerServer, PortWithTrades, Trade } from "../../common/gen-json"
 
 interface Node {
     name: string
@@ -99,7 +99,7 @@ export default class ShowTrades {
         this._arrowY = 18
 
         this._baseId = "show-trades"
-        this._nationSelectId =`${this._baseId}-nation-select`
+        this._nationSelectId = `${this._baseId}-nation-select`
         this._listType = "tradeList"
 
         this._showId = "show-trades-show"
@@ -152,15 +152,15 @@ export default class ShowTrades {
     }
 
     static _getId(link: Trade): HtmlString {
-        return`trade-${link.source.id}-${link.good.replace(/ /g, "")}-${link.target.id}`
+        return `trade-${link.source.id}-${link.good.replace(/ /g, "")}-${link.target.id}`
     }
 
     static _addInfo(text: string): HtmlString {
-        return`<div><div>${text}</div>`
+        return `<div><div>${text}</div>`
     }
 
     static _addDes(text: string): HtmlString {
-        return`<div class="des">${text}</div></div>`
+        return `<div class="des">${text}</div></div>`
     }
 
     static _getProfitPerWeight(trade: Trade): number {
@@ -174,7 +174,7 @@ export default class ShowTrades {
     }
 
     static _startBlock(text: string): HtmlString {
-        return`<div class="block-block"><span>${text}</span>`
+        return `<div class="block-block"><span>${text}</span>`
     }
 
     static _endBlock(): HtmlString {
@@ -207,7 +207,7 @@ export default class ShowTrades {
             .attr("markerUnits", "userSpaceOnUse")
             .attr("orient", "auto-start-reverse")
             .append("path")
-            .attr("d",`M0,0L0,${this._arrowY}L${this._arrowX},${this._arrowY / 2}z`)
+            .attr("d", `M0,0L0,${this._arrowY}L${this._arrowX},${this._arrowY / 2}z`)
             .attr("class", "trade-arrow-head")
 
         this._tradeDetailsDiv = d3Select<HTMLDivElement, DivDatum>("main #summary-column")
@@ -217,10 +217,10 @@ export default class ShowTrades {
     }
 
     _setupSelects(): void {
-        const options =`${nations
-            .map((nation) =>`<option value="${nation.short}" selected>${nation.name}</option>`)
+        const options = `${nations
+            .map((nation) => `<option value="${nation.short}" selected>${nation.name}</option>`)
             .join("")}`
-        const cardId =`${this._baseId}-card`
+        const cardId = `${this._baseId}-card`
 
         this._tradeDetailsHead = this._tradeDetailsDiv.append("div")
         const label = this._tradeDetailsHead.append("label")
@@ -244,7 +244,7 @@ export default class ShowTrades {
                     text = String(amount)
                 }
 
-                return`${text} nations selected`
+                return `${text} nations selected`
             },
             title: "Select nations",
         })
@@ -253,7 +253,7 @@ export default class ShowTrades {
             .append("button")
             .attr("class", "btn btn-small btn-outline-primary")
             .attr("data-toggle", "collapse")
-            .attr("data-target",`#${cardId}`)
+            .attr("data-target", `#${cardId}`)
             .text("Info")
         this._tradeDetailsHead
             .append("div")
@@ -279,7 +279,7 @@ export default class ShowTrades {
         profitRadioGroup.append("legend").attr("class", "col-form-label").text("Sort net profit by")
 
         for (const button of this._profitRadioValues) {
-            const id =`${this._profitId}-${button.replace(/ /g, "")}`
+            const id = `${this._profitId}-${button.replace(/ /g, "")}`
 
             const div = profitRadioGroup
                 .append("div")
@@ -448,13 +448,13 @@ export default class ShowTrades {
             ShowTrades._addDes("weight")
         h +=
             ShowTrades._addInfo(
-               `${this._nodeData.get(trade.source.id)?.name} <span class="caps">${
+                `${this._nodeData.get(trade.source.id)?.name} <span class="caps">${
                     this._nodeData.get(trade.source.id)?.nation
                 }</span>`
             ) + ShowTrades._addDes(`from ${this._getDepth(trade.source.id)}`)
         h +=
             ShowTrades._addInfo(
-               `${this._nodeData.get(trade.target.id)?.name} <span class="caps">${
+                `${this._nodeData.get(trade.target.id)?.name} <span class="caps">${
                     this._nodeData.get(trade.target.id)?.nation
                 }</span>`
             ) + ShowTrades._addDes(`to ${this._getDepth(trade.target.id)}`)
@@ -491,13 +491,13 @@ export default class ShowTrades {
         h += ShowTrades._startBlock("Route")
         h +=
             ShowTrades._addInfo(
-               `${this._nodeData.get(trade.source.id)?.name} <span class="caps">${
+                `${this._nodeData.get(trade.source.id)?.name} <span class="caps">${
                     this._nodeData.get(trade.source.id)?.nation
                 }</span>`
             ) + ShowTrades._addDes(`from ${this._getDepth(trade.source.id)}`)
         h +=
             ShowTrades._addInfo(
-               `${this._nodeData.get(trade.target.id)?.name} <span class="caps">${
+                `${this._nodeData.get(trade.target.id)?.name} <span class="caps">${
                     this._nodeData.get(trade.target.id)?.nation
                 }</span>`
             ) + ShowTrades._addDes(`to ${this._getDepth(trade.source.id)}`)
@@ -568,7 +568,7 @@ export default class ShowTrades {
 
             dr = Math.round(dr)
 
-            return`M${x1},${y1}A${dr},${dr} ${xRotation},${largeArc},${sweep} ${x2},${y2}`
+            return `M${x1},${y1}A${dr},${dr} ${xRotation},${largeArc},${sweep} ${x2},${y2}`
         }
 
         const data = this._portSelect.isInventorySelected ? [] : this._linkDataFiltered
@@ -597,9 +597,9 @@ export default class ShowTrades {
                     .on("mouseleave", ShowTrades._hideDetails)
             )
             .attr("d", (d) => arcPath(this._getXCoord(d.source.id) < this._getXCoord(d.target.id), d))
-            .attr("stroke-width", (d) =>`${linkWidthScale(d.profit ?? 0)}px`)
+            .attr("stroke-width", (d) => `${linkWidthScale(d.profit ?? 0)}px`)
 
-        this._labelG.attr("font-size",`${fontSize}px`)
+        this._labelG.attr("font-size", `${fontSize}px`)
 
         this._labelG
             .selectAll<SVGTextElement, Trade>(".trade-label")
@@ -610,10 +610,10 @@ export default class ShowTrades {
                     .attr("class", "trade-label")
                     .append("textPath")
                     .attr("startOffset", "15%")
-                    .attr("xlink:href", (d) =>`#${ShowTrades._getId(d)}`)
-                    .text((d) =>`${formatInt(d.quantity)} ${d.good}`)
+                    .attr("xlink:href", (d) => `#${ShowTrades._getId(d)}`)
+                    .text((d) => `${formatInt(d.quantity)} ${d.good}`)
             )
-            .attr("dy", (d) =>`-${linkWidthScale(d.profit ?? 0) / 1.5}px`)
+            .attr("dy", (d) => `-${linkWidthScale(d.profit ?? 0) / 1.5}px`)
     }
 
     get listType(): string {
