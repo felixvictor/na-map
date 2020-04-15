@@ -22,8 +22,8 @@ import ListLoot from "./list-loot"
 import ListModules from "./list-modules"
 import ListPortOwnerships from "./list-port-ownerships"
 import ListRecipes from "./list-recipes"
-/*
 import ListShipBlueprints from "./list-ship-blueprints"
+/*
 import ListShips from "./list-ships"
 import ListWoods from "./list-woods"
 */
@@ -76,10 +76,10 @@ const init = (serverId: string, urlParams: URLSearchParams): void => {
     const recipeList = new ListRecipes(serverId)
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    // const shipList = new ListShips()
+    //const shipList = new ListShips()
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    // const blueprintList = new ListShipBlueprints()
+    const blueprintList = new ListShipBlueprints()
 }
 
 export { init }
