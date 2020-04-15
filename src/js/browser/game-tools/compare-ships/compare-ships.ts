@@ -31,7 +31,7 @@ import {
     repairTime,
     rigRepairsPercent,
 } from "../../../common/common-browser"
-import { isEmpty, putImportError } from "../../../common/common"
+import { isEmpty, putImportError, WoodType } from "../../../common/common"
 import { formatPP, formatSignInt, formatSignPercent } from "../../../common/common-format"
 import { ArrayIndex, Index, NestedIndex } from "../../../common/interface"
 import { getOrdinal } from "../../../common/common-math"
@@ -41,7 +41,7 @@ import { copyToClipboard } from "../../util"
 import { Module, ModuleEntity, ModulePropertiesEntity, ShipData, ShipRepairTime } from "../../../common/gen-json"
 
 import { ShipBase, ShipComparison } from "."
-import CompareWoods, { WoodColumnType, WoodType } from "../compare-woods"
+import CompareWoods, { WoodColumnType } from "../compare-woods"
 
 interface ShipSelectMap {
     key: string
