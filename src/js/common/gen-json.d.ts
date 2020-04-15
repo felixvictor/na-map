@@ -16,7 +16,8 @@ import { ValuesType } from "utility-types"
 
 import { LootType } from "../browser/game-tools/list-loot"
 import { CannonType, NationFullName, NationShortName, NationShortNameAlternative } from "./common"
-import { ArrayIndex, Index } from "./interface"
+import { ArrayIndex } from "./interface"
+import { Group } from "timelines-chart"
 
 /****************************
  * buildings.json
@@ -194,6 +195,7 @@ export type NationListAlternative<T> = {
 
 export type OwnershipNation<T> = NationList<T> & {
     date: string
+    keys?: NationShortName[]
 }
 
 /****************************
@@ -202,20 +204,7 @@ export type OwnershipNation<T> = NationList<T> & {
 
 export interface Ownership {
     region: string
-    data: OwnershipGroup[]
-}
-interface OwnershipGroup {
-    group: string
-    data: OwnershipLabel[]
-}
-interface OwnershipLabel {
-    label: string
-    data: OwnershipLabelRange[]
-}
-interface OwnershipLabelRange {
-    timeRange: string[]
-    val: string
-    labelVal: string
+    data: Group[]
 }
 
 /****************************
