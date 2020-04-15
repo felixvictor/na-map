@@ -24,8 +24,8 @@ export default class ListModules {
     constructor() {
         this._baseName = "List modules"
         this._baseId = "module-list"
-        this._buttonId = `button-${this._baseId}`
-        this._modalId = `modal-${this._baseId}`
+        this._buttonId =`button-${this._baseId}`
+        this._modalId =`modal-${this._baseId}`
 
         this._setupListener()
     }
@@ -59,19 +59,19 @@ export default class ListModules {
     _injectModal() {
         insertBaseModal(this._modalId, this._baseName)
 
-        const id = `${this._baseId}-select`
+        const id =`${this._baseId}-select`
         const body = d3Select(`#${this._modalId} .modal-body`)
         body.append("label").attr("for", id)
         body.append("select")
             .attr("name", id)
             .attr("id", id)
         body.append("div")
-            .attr("id", `${this._baseId}`)
+            .attr("id",`${this._baseId}`)
             .attr("class", "container-fluid")
     }
 
     _getOptions() {
-        return `${this._moduleData.map(type => `<option value="${type[0]}"">${type[0]}</option>;`).join("")}`
+        return`${this._moduleData.map(type =>`<option value="${type[0]}"">${type[0]}</option>;`).join("")}`
     }
 
     _setupSelect() {
@@ -119,9 +119,9 @@ export default class ListModules {
          * @type {Map<String, String>}
          */
         const rates = new Map([
-            ["L", `${getOrdinal(1)}\u202F\u2013\u202f${getOrdinal(3)}`],
-            ["M", `${getOrdinal(4)}\u202F\u2013\u202f${getOrdinal(5)}`],
-            ["S", `${getOrdinal(6)}\u202F\u2013\u202f${getOrdinal(7)}`]
+            ["L",`${getOrdinal(1)}\u202F\u2013\u202f${getOrdinal(3)}`],
+            ["M",`${getOrdinal(4)}\u202F\u2013\u202f${getOrdinal(5)}`],
+            ["S",`${getOrdinal(6)}\u202F\u2013\u202f${getOrdinal(7)}`]
         ])
 
         /**
@@ -130,7 +130,7 @@ export default class ListModules {
          * @return {string} Ship rate
          */
         function getRate(moduleLevel) {
-            return moduleLevel === "U" ? "" : ` ${rates.get(moduleLevel)}`
+            return moduleLevel === "U" ? "" :`${rates.get(moduleLevel)}`
         }
 
         let rate = ""
@@ -151,7 +151,7 @@ export default class ListModules {
                     rate = getRate(module.moduleLevel)
                     if (hasSameProperties(i + 1)) {
                         type[1][i + 1].hasSamePropertiesAsPrevious = true
-                        rate += `<br>${getRate(type[1][i + 1].moduleLevel)}`
+                        rate +=`<br>${getRate(type[1][i + 1].moduleLevel)}`
                     }
 
                     if (hasSameProperties(i + 2)) {
@@ -167,7 +167,7 @@ export default class ListModules {
                         !module.hasSamePropertiesAsPrevious
                     ) {
                         rows.push(
-                            `<tr><td><span class="name">${
+                           `<tr><td><span class="name">${
                                 module.name
                             }<br>${rate}</span>${permanentType}</td><td>${module.properties
                                 .map(property => {
@@ -181,7 +181,7 @@ export default class ListModules {
                                                 : formatSignInt(property.amount)
                                     }
 
-                                    return `${property.modifier} ${amount}`
+                                    return`${property.modifier} ${amount}`
                                 })
                                 .join("<br>")}</td></tr>`
                         )
@@ -205,7 +205,7 @@ export default class ListModules {
         const splitRows = chunkify(rows, columns)
         let text = ""
         for (const column of [...new Array(splitRows.length).keys()]) {
-            text += `<div class="col-md-${Math.floor(12 / splitRows.length)}">`
+            text +=`<div class="col-md-${Math.floor(12 / splitRows.length)}">`
             text += '<table class="table table-sm small"><thead>'
             text += "<tr><th>Module</th><th>Modifier</th></tr></thead><tbody>"
             text += splitRows[column].join("")
