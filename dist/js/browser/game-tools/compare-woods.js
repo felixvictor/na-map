@@ -15,9 +15,8 @@ import { select as d3Select } from "d3-selection";
 import { registerEvent } from "../analytics";
 import { formatFloat, formatPercent, formatSignFloat } from "../../common/common-format";
 import { insertBaseModal } from "../../common/common-browser";
-import { putImportError } from "../../common/common";
+import { putImportError, woodType } from "../../common/common";
 import { simpleStringSort, sortBy } from "../../common/common-node";
-const woodType = ["frame", "trim"];
 const woodColumnType = ["Base", "C1", "C2", "C3"];
 class Wood {
     constructor(compareId, woodCompare) {
