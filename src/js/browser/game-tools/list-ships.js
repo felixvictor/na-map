@@ -27,8 +27,8 @@ export default class ShipList {
     constructor() {
         this._baseName = "List ships"
         this._baseId = "ship-list"
-        this._buttonId = `button-${this._baseId}`
-        this._modalId = `modal-${this._baseId}`
+        this._buttonId =`button-${this._baseId}`
+        this._modalId =`modal-${this._baseId}`
         this._setupListener()
     }
 
@@ -60,7 +60,7 @@ export default class ShipList {
 
         d3Select(`#${this._modalId} .modal-body`)
             .append("div")
-            .attr("id", `${this._baseId}`)
+            .attr("id",`${this._baseId}`)
             .attr("class", "container-fluid")
     }
 
@@ -103,7 +103,7 @@ export default class ShipList {
     _getList() {
         let text = ""
 
-        text += `<table id="table-${this._baseId}" class="table table-sm small tablesort"><thead>`
+        text +=`<table id="table-${this._baseId}" class="table table-sm small tablesort"><thead>`
         text += "<tr>"
         text += '<th scope="col" class="border-bottom-0"></th>'
         text += '<th scope="col" class="border-bottom-0"></th>'
@@ -136,17 +136,17 @@ export default class ShipList {
             .sort(sortBy(["class", "-battleRating", "name"]))
         for (const ship of ships) {
             text += "<tr>"
-            text += `<td class="text-right">${ship.class}</td>`
-            text += `<td>${ship.name}</td>`
-            text += `<td class="text-right">${ship.guns}</td>`
-            text += `<td class="text-right">${ship.battleRating}</td>`
-            text += `<td class="text-right">${ship.crew.max}</td>`
-            text += `<td class="text-right">${formatFloatFixed(ship.ship.maxSpeed)}</td>`
-            text += `<td class="text-right">${formatFloatFixed(ship.rudder.turnSpeed)}</td>`
-            text += `<td class="text-right">${ship.broadside.cannons}</td>`
-            text += `<td class="text-right">${ship.gunsPerDeck[4] ? ship.gunsPerDeck[4] : ""}</td>`
-            text += `<td class="text-right">${ship.gunsPerDeck[5] ? ship.gunsPerDeck[5] : ""}</td>`
-            text += `<td class="text-right" data-sort="${ship.sides.armour}">${formatInt(ship.sides.armour)} (${
+            text +=`<td class="text-right">${ship.class}</td>`
+            text +=`<td>${ship.name}</td>`
+            text +=`<td class="text-right">${ship.guns}</td>`
+            text +=`<td class="text-right">${ship.battleRating}</td>`
+            text +=`<td class="text-right">${ship.crew.max}</td>`
+            text +=`<td class="text-right">${formatFloatFixed(ship.ship.maxSpeed)}</td>`
+            text +=`<td class="text-right">${formatFloatFixed(ship.rudder.turnSpeed)}</td>`
+            text +=`<td class="text-right">${ship.broadside.cannons}</td>`
+            text +=`<td class="text-right">${ship.gunsPerDeck[4] ? ship.gunsPerDeck[4] : ""}</td>`
+            text +=`<td class="text-right">${ship.gunsPerDeck[5] ? ship.gunsPerDeck[5] : ""}</td>`
+            text +=`<td class="text-right" data-sort="${ship.sides.armour}">${formatInt(ship.sides.armour)} (${
                 ship.sides.thickness
             })</td>`
             text += "</tr>"

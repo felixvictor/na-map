@@ -24,8 +24,8 @@ export default class ListShipBlueprints {
     constructor() {
         this._baseName = "List ship blueprint"
         this._baseId = "ship-blueprint-list"
-        this._buttonId = `button-${this._baseId}`
-        this._modalId = `modal-${this._baseId}`
+        this._buttonId =`button-${this._baseId}`
+        this._modalId =`modal-${this._baseId}`
 
         this._defaultWood = {
             frame: "Fir",
@@ -92,7 +92,7 @@ export default class ListShipBlueprints {
     _injectModal() {
         insertBaseModal(this._modalId, this._baseName, "lg")
 
-        const id = `${this._baseId}-ship-select`
+        const id =`${this._baseId}-ship-select`
         const body = d3Select(`#${this._modalId} .modal-body`)
         let row = body.append("div").classed("row no-gutters mb-2", true)
         row.append("label").attr("for", id)
@@ -102,7 +102,7 @@ export default class ListShipBlueprints {
 
         row = body.append("div").classed("row no-gutters", true)
         for (const type of ["frame", "trim"]) {
-            const selectId = `${this._baseId}-${type}-select`
+            const selectId =`${this._baseId}-${type}-select`
             row.append("label").attr("for", selectId)
             row.append("select")
                 .attr("name", selectId)
@@ -112,14 +112,14 @@ export default class ListShipBlueprints {
 
         this._blueprintList = body
             .append("div")
-            .attr("id", `${this._baseId}`)
+            .attr("id",`${this._baseId}`)
             .classed("blueprint mt-4", true)
     }
 
     _getShipOptions() {
-        return `${this._blueprintData
+        return`${this._blueprintData
             .sort(sortBy(["name"]))
-            .map(blueprint => `<option value="${blueprint.name}">${blueprint.name}</option>;`)
+            .map(blueprint =>`<option value="${blueprint.name}">${blueprint.name}</option>;`)
             .join("")}`
     }
 
@@ -133,8 +133,8 @@ export default class ListShipBlueprints {
         const frameSelectData = this._woodData.frame.sort(sortBy(["name"]))
         const trimSelectData = this._woodData.trim.filter(trim => trim.name !== "Light").sort(sortBy(["name"]))
 
-        this._woodOptions.frame = frameSelectData.map(wood => `<option value="${wood.name}">${wood.name}</option>`)
-        this._woodOptions.trim = trimSelectData.map(wood => `<option value="${wood.name}">${wood.name}</option>`)
+        this._woodOptions.frame = frameSelectData.map(wood =>`<option value="${wood.name}">${wood.name}</option>`)
+        this._woodOptions.trim = trimSelectData.map(wood =>`<option value="${wood.name}">${wood.name}</option>`)
     }
 
     _setupWoodSelect(type, select$) {
@@ -167,7 +167,7 @@ export default class ListShipBlueprints {
         select$
             .addClass("selectpicker")
             .on("change", () => this._woodSelected(type, select$))
-            .selectpicker({ noneSelectedText: `Select ${type}`, width: "fit" })
+            .selectpicker({ noneSelectedText:`Select ${type}`, width: "fit" })
             .val("default")
             .selectpicker("refresh")
     }

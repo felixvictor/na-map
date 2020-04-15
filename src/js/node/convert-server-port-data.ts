@@ -14,7 +14,7 @@ import dayjs from "dayjs"
 import d3Array from "d3-array"
 const { rollup: d3Rollup } = d3Array
 
-import { findNationById, nations } from "../common/common"
+import { findNationById, nations, nationShortName, NationShortName } from "../common/common"
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
 import { readJson, saveJsonAsync } from "../common/common-file"
 import { Distance } from "../common/common-math"
@@ -211,13 +211,13 @@ const setAndSaveFrontlines = async (serverName: string): Promise<void> => {
         fromPortName: string
         toPortId: number
         toPortName: string
-        toPortNation: string
+        toPortNation: NationShortName
         distance: number
     }
 
     interface FANValue {
         id: number
-        nation: string
+        nation: NationShortName
     }
 
     interface FDNPort {
@@ -279,7 +279,9 @@ const setAndSaveFrontlines = async (serverName: string): Promise<void> => {
         })
 
     const frontlineDefendingNationMap: Map<string, Set<string>> = new Map()
-    for (const attackingNation of Object.keys(frontlineAttackingNationGroupedByFromPort)) {
+    let attackingNation: NationShortName
+    // @ts-ignore
+    for (attackingNation of Object.keys(frontlineAttackingNationGroupedByFromPort)) {
         for (const [, fromPort] of [...frontlineAttackingNationGroupedByFromPort[attackingNation]]) {
             for (const toPort of [...fromPort]) {
                 const key = String(toPort.nation) + String(toPort.id)
@@ -297,7 +299,7 @@ const setAndSaveFrontlines = async (serverName: string): Promise<void> => {
 
     const frontlineDefendingNation = {} as NationList<FDNPort[]>
     for (const [key, fromPorts] of [...frontlineDefendingNationMap]) {
-        const nationShortName = key.slice(0, 2)
+        const nationShortName = key.slice(0, 2) as NationShortName
         const toPortId = Number(key.slice(2))
         if (!frontlineDefendingNation[nationShortName]) {
             frontlineDefendingNation[nationShortName] = []
