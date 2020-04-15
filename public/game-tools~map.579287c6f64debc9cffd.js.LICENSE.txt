@@ -1,0 +1,79 @@
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Common data and functions for node.
+ * @module    src/common-format
+ * @author    iB aka Felix Victor
+ * @copyright 2020
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Common data and functions for node.
+ * @module    src/node/common-node
+ * @author    iB aka Felix Victor
+ * @copyright 2020
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Compare ships base file.
+ * @module    game-tools/compare-ships/ship-base
+ * @author    iB aka Felix Victor
+ * @copyright 2020
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Compare ships comparison file.
+ * @module    game-tools/compare-ships/ship-comparison
+ * @author    iB aka Felix Victor
+ * @copyright 2020
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Compare ships file.
+ * @module    game-tools/compare-ships/compare-ships
+ * @author    iB aka Felix Victor
+ * @copyright 2020
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Compare ships ship file.
+ * @module    game-tools/compare-ships/ship
+ * @author    iB aka Felix Victor
+ * @copyright 2020
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Compare woods.
+ * @module    game-tools/compare-woods
+ * @author    iB aka Felix Victor
+ * @copyright 2018, 2019, 2020
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Utility functions.
+ * @module    util
+ * @author    iB aka Felix Victor
+ * @copyright 2017, 2018, 2019, 2020
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
