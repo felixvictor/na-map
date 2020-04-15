@@ -11,6 +11,8 @@ import * as path from "path";
 import dayjs from "dayjs";
 import d3Array from "d3-array";
 const { rollup: d3Rollup } = d3Array;
+import d3Collection from "d3-collection";
+const { nest: d3Nest } = d3Collection;
 import { findNationById, nations } from "../common/common";
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir";
 import { readJson, saveJsonAsync } from "../common/common-file";
@@ -171,7 +173,10 @@ const setAndSaveFrontlines = async (serverName) => {
         })
             .sort(sortBy(["distance"]))
             .slice(0, frontlinePorts));
-        frontlineAttackingNationGroupedByToPort[nationShortName] = d3Rollup(frontlinesFrom, (values) => values.map((value) => value.fromPortId), (d) => String(d.toPortId));
+        frontlineAttackingNationGroupedByToPort[nationShortName] = d3Nest()
+            .key((d) => String(d.toPortId))
+            .rollup((values) => values.map((value) => value.fromPortId))
+            .entries(frontlinesFrom);
         frontlineAttackingNationGroupedByFromPort[nationShortName] = d3Rollup(frontlinesFrom, (values) => values.map((value) => ({
             id: value.toPortId,
             nation: value.toPortNation,
