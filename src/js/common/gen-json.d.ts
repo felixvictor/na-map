@@ -160,6 +160,7 @@ export interface ModuleEntity {
     moduleLevel: string
     properties: ModulePropertiesEntity[]
     type: string
+    hasSamePropertiesAsPrevious?: boolean
 }
 export interface ModuleConvertEntity extends ModuleEntity {
     APImodifiers: ModifiersEntity[]
