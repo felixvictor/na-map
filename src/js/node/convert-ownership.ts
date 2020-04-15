@@ -20,14 +20,15 @@ const { ascending: d3Ascending } = d3Array
 import { default as lzma } from "lzma-native"
 import { default as readDirRecursive } from "recursive-readdir"
 
-import { capitalToCounty, nations } from "../common/common"
+import { capitalToCounty, nations, NationShortName } from "../common/common"
 import { commonPaths } from "../common/common-dir"
 import { saveJsonAsync } from "../common/common-file"
 import { serverNames } from "../common/common-var"
 import { cleanName } from "../common/common-node"
 
 import { APIPort } from "./api-port"
-import { NationList, Ownership, OwnershipGroup, OwnershipLabel, OwnershipNation } from "../common/gen-json"
+import { NationList, Ownership, OwnershipNation } from "../common/gen-json"
+import { Group, Line, Segment } from "timelines-chart"
 
 const fileExtension = ".json.xz"
 
@@ -35,13 +36,8 @@ interface Port {
     name: string
     region: string
     county: string
-    data: OwnershipOverTime[]
+    data: Segment[]
     id?: string
-}
-interface OwnershipOverTime {
-    timeRange: string[]
-    val: string
-    labelVal: string
 }
 interface RegionNested {
     key: string
@@ -132,10 +128,9 @@ function convertOwnership(): void {
             /**
              * Get data object
              */
-            const getObject = (): OwnershipOverTime => ({
-                timeRange: [date, date],
+            const getObject = (): Segment => ({
+                timeRange: [new Date(date), new Date(date)],
                 val: nations[port.Nation].short,
-                labelVal: nations[port.Nation].sortName,
             })
 
             /**
@@ -154,11 +149,11 @@ function convertOwnership(): void {
              * Get previous nation short name
              * @returns nation short name
              */
-            const getPreviousNation = (): string => {
+            const getPreviousNation = (): NationShortName | "" => {
                 const portData = ports.get(port.Id)
                 if (portData) {
                     const index = portData.data.length - 1 ?? 0
-                    return portData.data[index].val
+                    return portData.data[index].val as NationShortName
                 }
 
                 return ""
@@ -183,7 +178,7 @@ function convertOwnership(): void {
                 const portData = ports.get(port.Id)
                 if (portData) {
                     // console.log("setNewEndDate -> ", ports.get(port.Id), values);
-                    portData.data[portData.data.length - 1].timeRange[1] = date
+                    portData.data[portData.data.length - 1].timeRange[1] = new Date(date)
                     ports.set(port.Id, portData)
                 }
             }
@@ -277,10 +272,10 @@ function convertOwnership(): void {
             const newRegion = {} as Ownership
             newRegion.region = region.key
             newRegion.data = region.values.map((county) => {
-                const group = {} as OwnershipGroup
+                const group = {} as Group
                 group.group = county.key
                 group.data = county.values.map((port) => {
-                    const label = {} as OwnershipLabel
+                    const label = {} as Line
                     label.label = port.name
                     label.data = port.data
                     return label
