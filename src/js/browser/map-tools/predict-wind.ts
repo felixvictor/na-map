@@ -9,6 +9,7 @@
  */
 
 /// <reference types="bootstrap" />
+
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
 
@@ -16,7 +17,7 @@ import { select as d3Select } from "d3-selection"
 import * as d3Selection from "d3-selection"
 import { line as d3Line } from "d3-shape"
 
-import moment, { Moment } from "moment"
+import moment from "moment"
 import "moment/locale/en-gb"
 
 import "round-slider/src/roundslider"
@@ -51,12 +52,12 @@ export default class PredictWind {
 
         this._baseName = "Predict wind"
         this._baseId = "predict-wind"
-        this._buttonId =`button-${this._baseId}`
-        this._modalId =`modal-${this._baseId}`
-        this._formId =`form-${this._baseId}`
-        this._sliderId =`slider-${this._baseId}`
-        this._timeGroupId =`input-group-${this._baseId}`
-        this._timeInputId =`input-${this._baseId}`
+        this._buttonId = `button-${this._baseId}`
+        this._modalId = `modal-${this._baseId}`
+        this._formId = `form-${this._baseId}`
+        this._sliderId = `slider-${this._baseId}`
+        this._timeGroupId = `input-group-${this._baseId}`
+        this._timeInputId = `input-${this._baseId}`
 
         this._setupSvg()
         this._setupArrow()
@@ -74,14 +75,14 @@ export default class PredictWind {
         d3Select("#na-svg defs")
             .append("marker")
             .attr("id", "wind-arrow")
-            .attr("viewBox",`0 -${width} ${doubleWidth} ${doubleWidth}`)
+            .attr("viewBox", `0 -${width} ${doubleWidth} ${doubleWidth}`)
             .attr("refX", width)
             .attr("refY", 0)
             .attr("markerWidth", width)
             .attr("markerHeight", width)
             .attr("orient", "auto")
             .append("path")
-            .attr("d",`M0,-${width}L${doubleWidth},0L0,${width}`)
+            .attr("d", `M0,-${width}L${doubleWidth},0L0,${width}`)
             .attr("class", "wind-predict-arrow-head")
     }
 
@@ -110,7 +111,7 @@ export default class PredictWind {
         }
 
         // @ts-ignore
-        window.tooltip = (arguments_) =>`${displayCompass(arguments_.value)}<br>${String(arguments_.value)}°`
+        window.tooltip = (arguments_) => `${displayCompass(arguments_.value)}<br>${String(arguments_.value)}°`
 
         $(`#${this._sliderId}`).roundSlider({
             sliderType: "default",
@@ -157,13 +158,13 @@ export default class PredictWind {
             .classed("form-control datetimepicker-input", true)
             .attr("type", "text")
             .attr("id", this._timeInputId)
-            .attr("data-target",`#${this._timeGroupId}`)
+            .attr("data-target", `#${this._timeGroupId}`)
             .attr("aria-label", this._timeGroupId)
             .attr("required", "")
         inputGroup
             .append("div")
             .classed("input-group-append", true)
-            .attr("data-target",`#${this._timeGroupId}`)
+            .attr("data-target", `#${this._timeGroupId}`)
             .attr("data-toggle", "datetimepicker")
             .append("span")
             .attr("class", "input-group-text")
@@ -325,7 +326,7 @@ export default class PredictWind {
     }
 
     setPosition(topMargin: number, leftMargin: number): void {
-        this._svg.style("margin-left",`${leftMargin}px`).style("margin-top",`${topMargin}px`)
+        this._svg.style("margin-left", `${leftMargin}px`).style("margin-top", `${topMargin}px`)
     }
 
     clearMap(): void {
