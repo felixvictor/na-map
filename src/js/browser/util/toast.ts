@@ -11,9 +11,9 @@
 
 /// <reference types="bootstrap" />
 import "bootstrap/js/dist/util"
-/// <reference types="bootstrap" />
 import "bootstrap/js/dist/toast"
-import { BaseType, select as d3Select, Selection } from "d3-selection"
+import { select as d3Select } from "d3-selection"
+import * as d3Selection from "d3-selection"
 
 import { iconSmallSrc } from "../../common/common-browser"
 
@@ -26,9 +26,9 @@ export default class Toast {
     // Toast text
     readonly #text: string
     // Toast instance
-    #toast: Selection<HTMLDivElement, unknown, HTMLElement, any>
+    #toast!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>
     // Main div
-    #mainDiv: Selection<BaseType, unknown, HTMLElement, any>
+    #mainDiv: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>
 
     constructor(
         // Toast title
@@ -39,20 +39,16 @@ export default class Toast {
         this.#title = title
         this.#text = text
 
-        this.#mainDiv = this._setupDiv()
-        this.#toast = this._set()
-        this._showToast()
+        this.#mainDiv = d3Select("#toast-column")
+        this._set()
+        this._show()
 
         const timeout = 1e4
         window.setTimeout(this._remove.bind(this), timeout)
     }
 
-    _setupDiv(): Selection<BaseType, unknown, HTMLElement, any> {
-        return d3Select("#toast-column")
-    }
-
-    _set(): Selection<HTMLDivElement, unknown, HTMLElement, any> {
-        const toast = this.#mainDiv
+    _set(): void {
+        this.#toast = this.#mainDiv
             .append("div")
             .attr("class", "toast")
             .attr("role", "alert")
@@ -75,14 +71,13 @@ export default class Toast {
             .attr("aria-hidden", "true")
             .html("&times;")
 
-        toast
+        this.#toast
             .append("div")
             .attr("class", "toast-body")
             .html(this.#text)
-        return toast
     }
 
-    _showToast(): void {
+    _show(): void {
         const toastNode = this.#toast.node()
         if (toastNode !== null) {
             const toast$ = $(toastNode)
