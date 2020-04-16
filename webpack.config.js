@@ -51,7 +51,7 @@ const repairs = require("./lib/gen-generic/repairs.json")
 const { TARGET, QUIET } = process.env
 const { isProduction } = require("webpack-mode")
 const isQuiet = Boolean(QUIET)
-const targetUrl = TARGET ? `https://${TARGET}.netlify.com/` : `http://localhost/na/`
+const targetUrl = TARGET ? `https://${TARGET}.netlify.app/` : `http://localhost/na/`
 
 const libraryName = PACKAGE.name
 const descriptionLong =
@@ -258,7 +258,7 @@ const faviconsOpt = {
             appleIcon: false,
             appleStartup: false,
             coast: false,
-            favicons: false,
+            favicons: true,
             firefox: true,
             windows: true,
             yandex: false,
