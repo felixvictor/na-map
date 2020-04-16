@@ -16,7 +16,7 @@ import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat.js"
 import utc from "dayjs/plugin/utc.js"
 
-import { findNationByName, findNationByNationShortName, NationShortName } from "../common/common";
+import { findNationByName, findNationByNationShortName, NationShortName } from "../common/common"
 import { commonPaths, serverStartDate as serverDate, serverStartDateTime } from "../common/common-dir"
 import { fileExists, readJson, readTextFile, saveJsonAsync, saveTextFile } from "../common/common-file"
 import { cleanName, simpleStringSort } from "../common/common-node"
@@ -249,7 +249,7 @@ const hostilityLevelUp = (result: RegExpExecArray): void => {
 
     console.log("      --- hostilityLevelUp", i)
     port.attackerNation = result[3] as AttackerNationName
-    port.attackerClan = result[2]
+    port.attackerClan = result[2].trim()
     port.attackHostility = Number(result[6]) / 100
 }
 
@@ -263,7 +263,7 @@ const hostilityLevelDown = (result: RegExpExecArray): void => {
 
     console.log("      --- hostilityLevelDown", i)
     port.attackerNation = result[3] as AttackerNationName
-    port.attackerClan = result[2]
+    port.attackerClan = result[2].trim()
     port.attackHostility = Number(result[6]) / 100
 }
 
@@ -293,15 +293,16 @@ const guessNationFromClanName = (clanName: string): AttackerNationName => {
 const portBattleScheduled = (result: RegExpExecArray): void => {
     const i = findPortIndex(result[2])
     const port = ports[i]
+    const clanName = result[6].trim()
 
     console.log("      --- portBattleScheduled", i)
     if (result[7]) {
         port.attackerNation = result[7] as AttackerNationName
     } else {
-        port.attackerNation = guessNationFromClanName(result[6])
+        port.attackerNation = guessNationFromClanName(clanName)
     }
 
-    port.attackerClan = result[6]
+    port.attackerClan = clanName
     port.attackHostility = 1
     port.portBattle = dayjs.utc(result[4], "D MMM YYYY HH:mm").format("YYYY-MM-DD HH:mm")
 }
