@@ -530,21 +530,17 @@ if (isProduction) {
             new TerserPlugin({
                 cache: true, // does not work with webpack 5
                 parallel: true,
-                /*
                 terserOptions: {
                     ecma: 2020,
                     module: true,
                     mangle: {
-                        properties: true,
+                        properties: false,
                     },
-                    // compress: { passes: 3 },
                     output: {
                         beautify: false,
                     },
-                    toplevel: true,
+                    toplevel: false,
                 },
-
-                 */
             }),
         ],
     }
