@@ -74,16 +74,16 @@ const trilaterate = (p1, p2, p3, returnMiddle = false) => {
 };
 export default class TrilateratePosition {
     constructor(ports) {
+        this._modal$ = {};
+        this._select = [];
+        this._input = [];
+        this._selector = [];
         this._ports = ports;
         this._NumberOfInputs = 3;
         this._baseName = "Get position";
         this._baseId = "get-position";
         this._buttonId = `button-${this._baseId}`;
         this._modalId = `modal-${this._baseId}`;
-        this._modal$ = {};
-        this._select = [];
-        this._input = [];
-        this._selector = [];
         for (const inputNumber of [...new Array(this._NumberOfInputs).keys()]) {
             this._select[inputNumber] = `${this._baseId}-${inputNumber}-select`;
             this._input[inputNumber] = `${this._baseId}-${inputNumber}-input`;
@@ -215,7 +215,7 @@ export default class TrilateratePosition {
         }
     }
     _positionSelected() {
-        if (!this._modal$) {
+        if (!document.querySelector(`#${this._modalId}`)) {
             this._initModal();
             this._modal$ = $(`#${this._modalId}`);
         }
