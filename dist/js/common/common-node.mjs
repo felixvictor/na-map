@@ -23,7 +23,12 @@ export const sortBy = (propertyNames) => (a, b) => {
             sign = -1;
             propertyName = String(propertyName).slice(1);
         }
-        r = String(a[propertyName]).localeCompare(String(b[propertyName])) * sign;
+        if (Number.isNaN(Number(a[propertyName])) && Number.isNaN(Number(b[propertyName]))) {
+            r = String(a[propertyName]).localeCompare(String(b[propertyName])) * sign;
+        }
+        else {
+            r = Number(a[propertyName]) - Number(b[propertyName]) * sign;
+        }
         return r !== 0;
     });
     return r;
