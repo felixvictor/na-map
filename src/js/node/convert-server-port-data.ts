@@ -11,12 +11,10 @@
 import * as path from "path"
 import dayjs from "dayjs"
 
-import d3Array from "d3-array"
-const { rollup: d3Rollup } = d3Array
 import d3Collection from "d3-collection"
 const { nest: d3Nest } = d3Collection
 
-import { findNationById, nations, NationShortName } from "../common/common"
+import { findNationById, nations, nationShortName, NationShortName } from "../common/common"
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
 import { readJson, saveJsonAsync } from "../common/common-file"
 import { Distance } from "../common/common-math"
@@ -234,7 +232,7 @@ const setAndSaveFrontlines = async (serverName: string): Promise<void> => {
 
     const outNations = new Set(["NT"])
     const frontlineAttackingNationGroupedByToPort = {} as NationList<FANPort[]>
-    const frontlineAttackingNationGroupedByFromPort = {} as NationList<Map<string, FANValue[]>>
+    const frontlineAttackingNationGroupedByFromPort = {} as NationList<FANPort[]>
 
     nations
         .filter(({ short: nationShort }) => !outNations.has(nationShort))
@@ -270,35 +268,37 @@ const setAndSaveFrontlines = async (serverName: string): Promise<void> => {
                 .rollup((values) => values.map((value) => value.fromPortId))
                 .entries(frontlinesFrom)
 
-            frontlineAttackingNationGroupedByFromPort[nationShortName] = d3Rollup(
-                frontlinesFrom,
-                (values) =>
+            frontlineAttackingNationGroupedByFromPort[nationShortName] = d3Collection
+                .nest<DistanceExtended, FANValue[]>()
+                // .key((d: DistanceExtended) => `${d.fromPortId} ${d.fromPortName}`)
+                .key((d) => String(d.toPortId))
+                .rollup((values) =>
                     values.map(
                         (value) =>
                             ({
                                 id: value.toPortId,
                                 nation: value.toPortNation,
                             } as FANValue)
-                    ),
-                (d) => String(d.toPortId)
-            )
+                    )
+                )
+                .entries(frontlinesFrom)
         })
 
     const frontlineDefendingNationMap: Map<string, Set<string>> = new Map()
-    let attackingNation: NationShortName
-    // @ts-ignore
-    for (attackingNation of Object.keys(frontlineAttackingNationGroupedByFromPort)) {
-        for (const [, fromPort] of [...frontlineAttackingNationGroupedByFromPort[attackingNation]]) {
-            for (const toPort of [...fromPort]) {
-                const key = String(toPort.nation) + String(toPort.id)
-                let fromPorts = frontlineDefendingNationMap.get(key)
-                if (fromPorts) {
-                    fromPorts.add(key)
-                } else {
-                    fromPorts = new Set([key])
-                }
+    for (const attackingNation of nationShortName) {
+        if (frontlineAttackingNationGroupedByFromPort[attackingNation]) {
+            for (const fromPort of frontlineAttackingNationGroupedByFromPort[attackingNation]) {
+                for (const toPort of fromPort.values) {
+                    const key = String(toPort.nation) + String(toPort.id)
+                    let fromPorts = frontlineDefendingNationMap.get(key)
+                    if (fromPorts) {
+                        fromPorts.add(fromPort.key)
+                    } else {
+                        fromPorts = new Set([fromPort.key])
+                    }
 
-                frontlineDefendingNationMap.set(key, fromPorts)
+                    frontlineDefendingNationMap.set(key, fromPorts)
+                }
             }
         }
     }
@@ -311,7 +311,10 @@ const setAndSaveFrontlines = async (serverName: string): Promise<void> => {
             frontlineDefendingNation[nationShortName] = []
         }
 
-        frontlineDefendingNation[nationShortName].push({ key: toPortId, value: [...fromPorts].map(Number) })
+        frontlineDefendingNation[nationShortName].push({
+            key: toPortId,
+            value: [...fromPorts].map(Number),
+        })
         // frontlineDefendingNation[nationShortName].push({ key: toPortId, value: [...fromPorts] });
     }
 
