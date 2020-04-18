@@ -74,6 +74,7 @@ export const nations = [
     { id: 12, short: "PL", name: "Commonwealth of Poland", sortName: "Poland" },
     { id: 13, short: "CN", name: "China", sortName: "China" },
 ];
+const nationMap = new Map(nations.map((nation) => [nation.id, nation]));
 export const capitalToCounty = new Map([
     ["Arenas", "Cayos del Golfo"],
     ["Ays", "Costa del Fuego"],
@@ -173,7 +174,7 @@ export const groupToMap = (list, keyGetter) => {
 export const range = (start, end) => [...new Array(1 + end - start).keys()].map((v) => start + v);
 export const findNationByName = (nationName) => nations.find((nation) => nationName === nation.name);
 export const findNationByNationShortName = (nationShortName) => nations.find((nation) => nation.short === nationShortName);
-export const findNationById = (nationId) => nations.find((nation) => nationId === nation.id);
+export const findNationById = (nationId) => nationMap.get(nationId);
 export const putImportError = (error) => {
     console.error("Import request failed -->", error);
 };
