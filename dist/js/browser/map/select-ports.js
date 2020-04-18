@@ -14,11 +14,12 @@ import moment from "moment";
 import "tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4";
 import "tempusdominus-core/build/js/tempusdominus-core";
 import { registerEvent } from "../analytics";
-import { nations, putImportError, range, validNationShortName, } from "../../common/common";
+import { nations, putImportError, range, validNationShortName } from "../../common/common";
 import { initMultiDropdownNavbar } from "../../common/common-browser";
 import { formatInt, formatSiCurrency } from "../../common/common-format";
 import { simpleNumberSort, simpleStringSort, sortBy } from "../../common/common-node";
 import { serverMaintenanceHour } from "../../common/common-var";
+const frontlinesType = ["attacking", "defending"];
 export default class SelectPorts {
     constructor(ports, pbZone, map) {
         this._ports = ports;
