@@ -144,7 +144,7 @@ const hostilityLevelUp = (result) => {
     const port = ports[i];
     console.log("      --- hostilityLevelUp", i);
     port.attackerNation = result[3];
-    port.attackerClan = result[2];
+    port.attackerClan = result[2].trim();
     port.attackHostility = Number(result[6]) / 100;
 };
 const hostilityLevelDown = (result) => {
@@ -152,7 +152,7 @@ const hostilityLevelDown = (result) => {
     const port = ports[i];
     console.log("      --- hostilityLevelDown", i);
     port.attackerNation = result[3];
-    port.attackerClan = result[2];
+    port.attackerClan = result[2].trim();
     port.attackHostility = Number(result[6]) / 100;
 };
 const findPortByClanName = (clanName) => ports.find((port) => port.capturer === clanName);
@@ -165,14 +165,15 @@ const guessNationFromClanName = (clanName) => {
 const portBattleScheduled = (result) => {
     const i = findPortIndex(result[2]);
     const port = ports[i];
+    const clanName = result[6].trim();
     console.log("      --- portBattleScheduled", i);
     if (result[7]) {
         port.attackerNation = result[7];
     }
     else {
-        port.attackerNation = guessNationFromClanName(result[6]);
+        port.attackerNation = guessNationFromClanName(clanName);
     }
-    port.attackerClan = result[6];
+    port.attackerClan = clanName;
     port.attackHostility = 1;
     port.portBattle = dayjs.utc(result[4], "D MMM YYYY HH:mm").format("YYYY-MM-DD HH:mm");
 };
