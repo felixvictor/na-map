@@ -276,7 +276,7 @@ const setAndSaveFrontlines = async (serverName: string): Promise<void> => {
             frontlineAttackingNationGroupedByFromPort[nationShortName] = d3Collection
                 .nest<DistanceExtended, FANValue[]>()
                 // .key((d: DistanceExtended) => `${d.fromPortId} ${d.fromPortName}`)
-                .key((d) => String(d.toPortId))
+                .key((d) => String(d.fromPortId))
                 .rollup((values) =>
                     values.map(
                         (value) =>
