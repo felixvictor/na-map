@@ -37,16 +37,15 @@ const minProfit = 30000
 const frontlinePorts = 2
 
 let apiItems: APIItemGeneric[]
-let apiPorts: APIPort[] = []
-let apiShops: APIShop[] = []
+let apiPorts: APIPort[]
+let apiShops: APIShop[]
 
 const distancesFile = path.resolve(commonPaths.dirGenGeneric, `distances-${distanceMapSize}.json`)
 const distancesOrig: Distance[] = readJson(distancesFile)
 let distances: Map<number, number>
 let numberPorts: number
 
-const portData: PortPerServer[] = []
-const trades: Trade[] = []
+let portData: PortPerServer[]
 let itemNames: Map<number, Item>
 let itemWeights: Map<string, number>
 
@@ -148,6 +147,7 @@ const setAndSavePortData = async (serverName: string): Promise<void> => {
 }
 
 const setAndSaveTradeData = async (serverName: string): Promise<void> => {
+    const trades: Trade[] = []
     for (const buyPort of portData) {
         buyPort.inventory
             .filter((buyGood) => buyGood.buyQuantity > 0)
@@ -332,11 +332,14 @@ const setAndSaveFrontlines = async (serverName: string): Promise<void> => {
 }
 
 export const convertServerPortData = (): void => {
+    distances = new Map(
+        distancesOrig.map(([fromPortId, toPortId, distance]) => [fromPortId * numberPorts + toPortId, distance])
+    )
+
     for (const serverName of serverNames) {
         apiItems = readJson(path.resolve(baseAPIFilename, `${serverName}-ItemTemplates-${serverDate}.json`))
         apiPorts = readJson(path.resolve(baseAPIFilename, `${serverName}-Ports-${serverDate}.json`))
         apiShops = readJson(path.resolve(baseAPIFilename, `${serverName}-Shops-${serverDate}.json`))
-
         /**
          * Item names
          */
@@ -367,10 +370,8 @@ export const convertServerPortData = (): void => {
                 .map((apiItem) => [cleanName(apiItem.Name), apiItem.ItemWeight])
         )
 
+        portData = []
         numberPorts = apiPorts.length
-        distances = new Map(
-            distancesOrig.map(([fromPortId, toPortId, distance]) => [fromPortId * numberPorts + toPortId, distance])
-        )
 
         // noinspection JSIgnoredPromiseFromCall
         setAndSavePortData(serverName)
