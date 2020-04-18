@@ -19,15 +19,7 @@ import { DatetimepickerEvent, DatetimepickerOption } from "../../@types/tempusdo
 import "tempusdominus-core/build/js/tempusdominus-core"
 
 import { registerEvent } from "../analytics"
-import {
-    isEmpty,
-    Nation,
-    nations,
-    NationShortName,
-    putImportError,
-    range,
-    validNationShortName,
-} from "../../common/common"
+import { Nation, nations, NationShortName, putImportError, range, validNationShortName } from "../../common/common"
 import { HtmlString, initMultiDropdownNavbar } from "../../common/common-browser"
 import { formatInt, formatSiCurrency } from "../../common/common-format"
 import { Point } from "../../common/common-math"
@@ -58,6 +50,9 @@ interface SelectPort {
     name: string
     nation: NationShortName
 }
+
+const frontlinesType = ["attacking", "defending"] as const
+export type FrontlinesType = typeof frontlinesType[number]
 
 export default class SelectPorts {
     isInventorySelected: boolean
