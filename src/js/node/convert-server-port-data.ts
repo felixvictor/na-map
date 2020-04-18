@@ -332,14 +332,11 @@ const setAndSaveFrontlines = async (serverName: string): Promise<void> => {
 }
 
 export const convertServerPortData = (): void => {
-    distances = new Map(
-        distancesOrig.map(([fromPortId, toPortId, distance]) => [fromPortId * numberPorts + toPortId, distance])
-    )
-
     for (const serverName of serverNames) {
         apiItems = readJson(path.resolve(baseAPIFilename, `${serverName}-ItemTemplates-${serverDate}.json`))
         apiPorts = readJson(path.resolve(baseAPIFilename, `${serverName}-Ports-${serverDate}.json`))
         apiShops = readJson(path.resolve(baseAPIFilename, `${serverName}-Shops-${serverDate}.json`))
+
         /**
          * Item names
          */
@@ -372,6 +369,9 @@ export const convertServerPortData = (): void => {
 
         portData = []
         numberPorts = apiPorts.length
+        distances = new Map(
+            distancesOrig.map(([fromPortId, toPortId, distance]) => [fromPortId * numberPorts + toPortId, distance])
+        )
 
         // noinspection JSIgnoredPromiseFromCall
         setAndSavePortData(serverName)
