@@ -11,12 +11,10 @@
 import * as path from "path"
 import dayjs from "dayjs"
 
-import d3Array from "d3-array"
-const { rollup: d3Rollup } = d3Array
 import d3Collection from "d3-collection"
 const { nest: d3Nest } = d3Collection
 
-import { findNationById, nations, NationShortName } from "../common/common"
+import { findNationById, nations, nationShortName, NationShortName } from "../common/common"
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
 import { readJson, saveJsonAsync } from "../common/common-file"
 import { Distance } from "../common/common-math"
@@ -39,16 +37,15 @@ const minProfit = 30000
 const frontlinePorts = 2
 
 let apiItems: APIItemGeneric[]
-let apiPorts: APIPort[] = []
-let apiShops: APIShop[] = []
+let apiPorts: APIPort[]
+let apiShops: APIShop[]
 
 const distancesFile = path.resolve(commonPaths.dirGenGeneric, `distances-${distanceMapSize}.json`)
 const distancesOrig: Distance[] = readJson(distancesFile)
 let distances: Map<number, number>
 let numberPorts: number
 
-const portData: PortPerServer[] = []
-const trades: Trade[] = []
+let portData: PortPerServer[]
 let itemNames: Map<number, Item>
 let itemWeights: Map<string, number>
 
@@ -150,6 +147,7 @@ const setAndSavePortData = async (serverName: string): Promise<void> => {
 }
 
 const setAndSaveTradeData = async (serverName: string): Promise<void> => {
+    const trades: Trade[] = []
     for (const buyPort of portData) {
         buyPort.inventory
             .filter((buyGood) => buyGood.buyQuantity > 0)
@@ -217,9 +215,14 @@ const setAndSaveFrontlines = async (serverName: string): Promise<void> => {
         distance: number
     }
 
-    interface FANPort {
-        key: string // From/To port id
-        values: FANValue[]
+    interface FANToPort {
+        key: string // To port id
+        value: number[] | undefined
+    }
+
+    interface FANFromPort {
+        key: string // From port id
+        value: FANValue[] | undefined
     }
 
     interface FANValue {
@@ -233,8 +236,8 @@ const setAndSaveFrontlines = async (serverName: string): Promise<void> => {
     }
 
     const outNations = new Set(["NT"])
-    const frontlineAttackingNationGroupedByToPort = {} as NationList<FANPort[]>
-    const frontlineAttackingNationGroupedByFromPort = {} as NationList<Map<string, FANValue[]>>
+    const frontlineAttackingNationGroupedByToPort = {} as NationList<FANToPort[]>
+    const frontlineAttackingNationGroupedByFromPort = {} as NationList<FANFromPort[]>
 
     nations
         .filter(({ short: nationShort }) => !outNations.has(nationShort))
@@ -270,35 +273,39 @@ const setAndSaveFrontlines = async (serverName: string): Promise<void> => {
                 .rollup((values) => values.map((value) => value.fromPortId))
                 .entries(frontlinesFrom)
 
-            frontlineAttackingNationGroupedByFromPort[nationShortName] = d3Rollup(
-                frontlinesFrom,
-                (values) =>
+            frontlineAttackingNationGroupedByFromPort[nationShortName] = d3Collection
+                .nest<DistanceExtended, FANValue[]>()
+                // .key((d: DistanceExtended) => `${d.fromPortId} ${d.fromPortName}`)
+                .key((d) => String(d.fromPortId))
+                .rollup((values) =>
                     values.map(
                         (value) =>
                             ({
                                 id: value.toPortId,
                                 nation: value.toPortNation,
                             } as FANValue)
-                    ),
-                (d) => String(d.toPortId)
-            )
+                    )
+                )
+                .entries(frontlinesFrom)
         })
 
     const frontlineDefendingNationMap: Map<string, Set<string>> = new Map()
-    let attackingNation: NationShortName
-    // @ts-ignore
-    for (attackingNation of Object.keys(frontlineAttackingNationGroupedByFromPort)) {
-        for (const [, fromPort] of [...frontlineAttackingNationGroupedByFromPort[attackingNation]]) {
-            for (const toPort of [...fromPort]) {
-                const key = String(toPort.nation) + String(toPort.id)
-                let fromPorts = frontlineDefendingNationMap.get(key)
-                if (fromPorts) {
-                    fromPorts.add(key)
-                } else {
-                    fromPorts = new Set([key])
-                }
+    for (const attackingNation of nationShortName) {
+        if (frontlineAttackingNationGroupedByFromPort[attackingNation]) {
+            for (const fromPort of frontlineAttackingNationGroupedByFromPort[attackingNation]) {
+                if (fromPort.value) {
+                    for (const toPort of fromPort.value) {
+                        const key = String(toPort.nation) + String(toPort.id)
+                        let fromPorts = frontlineDefendingNationMap.get(key)
+                        if (fromPorts) {
+                            fromPorts.add(fromPort.key)
+                        } else {
+                            fromPorts = new Set([fromPort.key])
+                        }
 
-                frontlineDefendingNationMap.set(key, fromPorts)
+                        frontlineDefendingNationMap.set(key, fromPorts)
+                    }
+                }
             }
         }
     }
@@ -311,7 +318,10 @@ const setAndSaveFrontlines = async (serverName: string): Promise<void> => {
             frontlineDefendingNation[nationShortName] = []
         }
 
-        frontlineDefendingNation[nationShortName].push({ key: toPortId, value: [...fromPorts].map(Number) })
+        frontlineDefendingNation[nationShortName].push({
+            key: toPortId,
+            value: [...fromPorts].map(Number),
+        })
         // frontlineDefendingNation[nationShortName].push({ key: toPortId, value: [...fromPorts] });
     }
 
@@ -323,9 +333,9 @@ const setAndSaveFrontlines = async (serverName: string): Promise<void> => {
 
 export const convertServerPortData = (): void => {
     for (const serverName of serverNames) {
-        apiItems = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`))
-        apiPorts = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-Ports-${serverDate}.json`))
-        apiShops = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-Shops-${serverDate}.json`))
+        apiItems = readJson(path.resolve(baseAPIFilename, `${serverName}-ItemTemplates-${serverDate}.json`))
+        apiPorts = readJson(path.resolve(baseAPIFilename, `${serverName}-Ports-${serverDate}.json`))
+        apiShops = readJson(path.resolve(baseAPIFilename, `${serverName}-Shops-${serverDate}.json`))
 
         /**
          * Item names
@@ -357,6 +367,7 @@ export const convertServerPortData = (): void => {
                 .map((apiItem) => [cleanName(apiItem.Name), apiItem.ItemWeight])
         )
 
+        portData = []
         numberPorts = apiPorts.length
         distances = new Map(
             distancesOrig.map(([fromPortId, toPortId, distance]) => [fromPortId * numberPorts + toPortId, distance])
