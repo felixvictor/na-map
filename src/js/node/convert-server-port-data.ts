@@ -323,9 +323,9 @@ const setAndSaveFrontlines = async (serverName: string): Promise<void> => {
 
 export const convertServerPortData = (): void => {
     for (const serverName of serverNames) {
-        apiItems = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`))
-        apiPorts = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-Ports-${serverDate}.json`))
-        apiShops = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-Shops-${serverDate}.json`))
+        apiItems = readJson(path.resolve(baseAPIFilename, `${serverName}-ItemTemplates-${serverDate}.json`))
+        apiPorts = readJson(path.resolve(baseAPIFilename, `${serverName}-Ports-${serverDate}.json`))
+        apiShops = readJson(path.resolve(baseAPIFilename, `${serverName}-Shops-${serverDate}.json`))
 
         /**
          * Item names
