@@ -8,7 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { ArrayIndex } from "./interface";
+import { ArrayIndex } from "./interface"
 
 export const woodType = ["frame", "trim"] as const
 export type WoodType = typeof woodType[number]
@@ -102,6 +102,7 @@ export const nations: Nation[] = [
     { id: 12, short: "PL", name: "Commonwealth of Poland", sortName: "Poland" },
     { id: 13, short: "CN", name: "China", sortName: "China" },
 ]
+const nationMap = new Map<number, Nation>(nations.map((nation) => [nation.id, nation]))
 
 // noinspection SpellCheckingInspection
 export const capitalToCounty = new Map([
@@ -248,7 +249,7 @@ export const findNationByNationShortName = (nationShortName: string): Nation | u
 /**
  * Find Nation object based on nation id
  */
-export const findNationById = (nationId: number): Nation | undefined => nations.find((nation) => nationId === nation.id)
+export const findNationById = (nationId: number): Nation => nationMap.get(nationId)!
 
 /**
  * Write fetch error to console
