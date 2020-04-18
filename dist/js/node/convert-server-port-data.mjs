@@ -177,7 +177,7 @@ const setAndSaveFrontlines = async (serverName) => {
             .entries(frontlinesFrom);
         frontlineAttackingNationGroupedByFromPort[nationShortName] = d3Collection
             .nest()
-            .key((d) => String(d.toPortId))
+            .key((d) => String(d.fromPortId))
             .rollup((values) => values.map((value) => ({
             id: value.toPortId,
             nation: value.toPortNation,
@@ -222,7 +222,6 @@ const setAndSaveFrontlines = async (serverName) => {
     });
 };
 export const convertServerPortData = () => {
-    distances = new Map(distancesOrig.map(([fromPortId, toPortId, distance]) => [fromPortId * numberPorts + toPortId, distance]));
     for (const serverName of serverNames) {
         apiItems = readJson(path.resolve(baseAPIFilename, `${serverName}-ItemTemplates-${serverDate}.json`));
         apiPorts = readJson(path.resolve(baseAPIFilename, `${serverName}-Ports-${serverDate}.json`));
@@ -245,6 +244,7 @@ export const convertServerPortData = () => {
             .map((apiItem) => [cleanName(apiItem.Name), apiItem.ItemWeight]));
         portData = [];
         numberPorts = apiPorts.length;
+        distances = new Map(distancesOrig.map(([fromPortId, toPortId, distance]) => [fromPortId * numberPorts + toPortId, distance]));
         setAndSavePortData(serverName);
         setAndSaveTradeData(serverName);
         setAndSavePortBattleData(serverName);
