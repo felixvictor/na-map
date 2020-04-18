@@ -215,9 +215,14 @@ const setAndSaveFrontlines = async (serverName: string): Promise<void> => {
         distance: number
     }
 
-    interface FANPort {
-        key: string // From/To port id
-        values: FANValue[]
+    interface FANToPort {
+        key: string // To port id
+        value: number[] | undefined
+    }
+
+    interface FANFromPort {
+        key: string // From port id
+        value: FANValue[] | undefined
     }
 
     interface FANValue {
@@ -231,8 +236,8 @@ const setAndSaveFrontlines = async (serverName: string): Promise<void> => {
     }
 
     const outNations = new Set(["NT"])
-    const frontlineAttackingNationGroupedByToPort = {} as NationList<FANPort[]>
-    const frontlineAttackingNationGroupedByFromPort = {} as NationList<FANPort[]>
+    const frontlineAttackingNationGroupedByToPort = {} as NationList<FANToPort[]>
+    const frontlineAttackingNationGroupedByFromPort = {} as NationList<FANFromPort[]>
 
     nations
         .filter(({ short: nationShort }) => !outNations.has(nationShort))
@@ -288,16 +293,18 @@ const setAndSaveFrontlines = async (serverName: string): Promise<void> => {
     for (const attackingNation of nationShortName) {
         if (frontlineAttackingNationGroupedByFromPort[attackingNation]) {
             for (const fromPort of frontlineAttackingNationGroupedByFromPort[attackingNation]) {
-                for (const toPort of fromPort.values) {
-                    const key = String(toPort.nation) + String(toPort.id)
-                    let fromPorts = frontlineDefendingNationMap.get(key)
-                    if (fromPorts) {
-                        fromPorts.add(fromPort.key)
-                    } else {
-                        fromPorts = new Set([fromPort.key])
-                    }
+                if (fromPort.value) {
+                    for (const toPort of fromPort.value) {
+                        const key = String(toPort.nation) + String(toPort.id)
+                        let fromPorts = frontlineDefendingNationMap.get(key)
+                        if (fromPorts) {
+                            fromPorts.add(fromPort.key)
+                        } else {
+                            fromPorts = new Set([fromPort.key])
+                        }
 
-                    frontlineDefendingNationMap.set(key, fromPorts)
+                        frontlineDefendingNationMap.set(key, fromPorts)
+                    }
                 }
             }
         }
