@@ -38,7 +38,6 @@ export default class ListLoot {
     private readonly _baseId: HtmlString
     private readonly _buttonId: HtmlString
     private readonly _modalId: HtmlString
-    private _modal$: JQuery = {} as JQuery
     private readonly _types: LootType[] = ["loot", "chests", "items"]
     private _sourceData: Loot = {} as Loot
     private _selectedType: LootType
@@ -210,13 +209,12 @@ export default class ListLoot {
 
     _sourceListSelected(): void {
         // If the modal has no content yet, insert it
-        if (!this._modal$) {
+        if (!document.querySelector(`#${this._modalId}`)) {
             this._initModal()
-            this._modal$ = $(`#${this._modalId}`)
         }
 
         // Show modal
-        this._modal$.modal("show")
+        $(`#${this._modalId}`).modal("show")
     }
 
     _getItemData(selectedItemId: number): LootLootEntity | LootChestsEntity {
