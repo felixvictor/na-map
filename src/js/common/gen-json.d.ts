@@ -18,6 +18,7 @@ import { LootType } from "../browser/game-tools/list-loot"
 import { CannonType, NationFullName, NationShortName, NationShortNameAlternative } from "./common"
 import { ArrayIndex } from "./interface"
 import { Group } from "timelines-chart"
+import { FrontlinesType } from "../browser/map/select-ports"
 
 /****************************
  * buildings.json
@@ -585,13 +586,11 @@ export interface RepairAmount {
 /****************************
  * <servername>-frontlines.json
  */
-export interface FrontlinesPerServer {
-    [index: string]: ValuesType<FrontlinesPerServer>
-    attacking: Attacking
-    defending: Defending
+
+export type FrontlinesPerServer = {
+    [K in FrontlinesType]: NationArrayList<FrontLineValue>
 }
-interface Attacking extends NationArrayList<FrontLineValue> {}
-interface Defending extends NationArrayList<FrontLineValue> {}
+
 export interface FrontLineValue {
     [index: string]: ValuesType<FrontLineValue>
     key: string

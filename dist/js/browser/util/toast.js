@@ -33,21 +33,18 @@ export default class Toast {
         _mainDiv.set(this, void 0);
         __classPrivateFieldSet(this, _title, title);
         __classPrivateFieldSet(this, _text, text);
-        __classPrivateFieldSet(this, _mainDiv, this._setupDiv());
-        __classPrivateFieldSet(this, _toast, this._set());
-        this._showToast();
+        __classPrivateFieldSet(this, _mainDiv, d3Select("#toast-column"));
+        this._set();
+        this._show();
         const timeout = 1e4;
         window.setTimeout(this._remove.bind(this), timeout);
     }
-    _setupDiv() {
-        return d3Select("#toast-column");
-    }
     _set() {
-        const toast = __classPrivateFieldGet(this, _mainDiv).append("div")
+        __classPrivateFieldSet(this, _toast, __classPrivateFieldGet(this, _mainDiv).append("div")
             .attr("class", "toast")
             .attr("role", "alert")
             .attr("aria-live", "assertive")
-            .attr("aria-atomic", "true");
+            .attr("aria-atomic", "true"));
         const header = __classPrivateFieldGet(this, _toast).append("div").attr("class", "toast-header");
         header.append("img").attr("class", "rounded mr-2").attr("src", iconSmallSrc).attr("alt", "logo");
         header
@@ -63,13 +60,11 @@ export default class Toast {
             .append("span")
             .attr("aria-hidden", "true")
             .html("&times;");
-        toast
-            .append("div")
+        __classPrivateFieldGet(this, _toast).append("div")
             .attr("class", "toast-body")
             .html(__classPrivateFieldGet(this, _text));
-        return toast;
     }
-    _showToast() {
+    _show() {
         const toastNode = __classPrivateFieldGet(this, _toast).node();
         if (toastNode !== null) {
             const toast$ = $(toastNode);

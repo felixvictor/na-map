@@ -50,7 +50,11 @@ export const sortBy = <T, K extends keyof T>(propertyNames: K[]) => (a: T, b: T)
             propertyName = String(propertyName).slice(1) as K
         }
 
-        r = String(a[propertyName]).localeCompare(String(b[propertyName])) * sign
+        if (Number.isNaN(Number(a[propertyName])) && Number.isNaN(Number(b[propertyName]))) {
+            r = String(a[propertyName]).localeCompare(String(b[propertyName])) * sign
+        } else {
+            r = Number(a[propertyName]) - Number(b[propertyName]) * sign
+        }
 
         return r !== 0
     })
