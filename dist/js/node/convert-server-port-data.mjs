@@ -9,11 +9,9 @@
  */
 import * as path from "path";
 import dayjs from "dayjs";
-import d3Array from "d3-array";
-const { rollup: d3Rollup } = d3Array;
 import d3Collection from "d3-collection";
 const { nest: d3Nest } = d3Collection;
-import { findNationById, nations } from "../common/common";
+import { findNationById, nations, nationShortName } from "../common/common";
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir";
 import { readJson, saveJsonAsync } from "../common/common-file";
 import { cleanName, simpleStringSort, sortBy } from "../common/common-node";
@@ -21,14 +19,13 @@ import { distanceMapSize, serverNames } from "../common/common-var";
 const minProfit = 30000;
 const frontlinePorts = 2;
 let apiItems;
-let apiPorts = [];
-let apiShops = [];
+let apiPorts;
+let apiShops;
 const distancesFile = path.resolve(commonPaths.dirGenGeneric, `distances-${distanceMapSize}.json`);
 const distancesOrig = readJson(distancesFile);
 let distances;
 let numberPorts;
-const portData = [];
-const trades = [];
+let portData;
 let itemNames;
 let itemWeights;
 const getDistance = (fromPortId, toPortId) => {
@@ -100,6 +97,7 @@ const setAndSavePortData = async (serverName) => {
     await saveJsonAsync(`${commonPaths.dirGenServer}/${serverName}-ports.json`, portData);
 };
 const setAndSaveTradeData = async (serverName) => {
+    const trades = [];
     for (const buyPort of portData) {
         buyPort.inventory
             .filter((buyGood) => buyGood.buyQuantity > 0)
@@ -177,25 +175,32 @@ const setAndSaveFrontlines = async (serverName) => {
             .key((d) => String(d.toPortId))
             .rollup((values) => values.map((value) => value.fromPortId))
             .entries(frontlinesFrom);
-        frontlineAttackingNationGroupedByFromPort[nationShortName] = d3Rollup(frontlinesFrom, (values) => values.map((value) => ({
+        frontlineAttackingNationGroupedByFromPort[nationShortName] = d3Collection
+            .nest()
+            .key((d) => String(d.fromPortId))
+            .rollup((values) => values.map((value) => ({
             id: value.toPortId,
             nation: value.toPortNation,
-        })), (d) => String(d.toPortId));
+        })))
+            .entries(frontlinesFrom);
     });
     const frontlineDefendingNationMap = new Map();
-    let attackingNation;
-    for (attackingNation of Object.keys(frontlineAttackingNationGroupedByFromPort)) {
-        for (const [, fromPort] of [...frontlineAttackingNationGroupedByFromPort[attackingNation]]) {
-            for (const toPort of [...fromPort]) {
-                const key = String(toPort.nation) + String(toPort.id);
-                let fromPorts = frontlineDefendingNationMap.get(key);
-                if (fromPorts) {
-                    fromPorts.add(key);
+    for (const attackingNation of nationShortName) {
+        if (frontlineAttackingNationGroupedByFromPort[attackingNation]) {
+            for (const fromPort of frontlineAttackingNationGroupedByFromPort[attackingNation]) {
+                if (fromPort.value) {
+                    for (const toPort of fromPort.value) {
+                        const key = String(toPort.nation) + String(toPort.id);
+                        let fromPorts = frontlineDefendingNationMap.get(key);
+                        if (fromPorts) {
+                            fromPorts.add(fromPort.key);
+                        }
+                        else {
+                            fromPorts = new Set([fromPort.key]);
+                        }
+                        frontlineDefendingNationMap.set(key, fromPorts);
+                    }
                 }
-                else {
-                    fromPorts = new Set([key]);
-                }
-                frontlineDefendingNationMap.set(key, fromPorts);
             }
         }
     }
@@ -206,7 +211,10 @@ const setAndSaveFrontlines = async (serverName) => {
         if (!frontlineDefendingNation[nationShortName]) {
             frontlineDefendingNation[nationShortName] = [];
         }
-        frontlineDefendingNation[nationShortName].push({ key: toPortId, value: [...fromPorts].map(Number) });
+        frontlineDefendingNation[nationShortName].push({
+            key: toPortId,
+            value: [...fromPorts].map(Number),
+        });
     }
     await saveJsonAsync(path.resolve(commonPaths.dirGenServer, `${serverName}-frontlines.json`), {
         attacking: frontlineAttackingNationGroupedByToPort,
@@ -215,9 +223,9 @@ const setAndSaveFrontlines = async (serverName) => {
 };
 export const convertServerPortData = () => {
     for (const serverName of serverNames) {
-        apiItems = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`));
-        apiPorts = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-Ports-${serverDate}.json`));
-        apiShops = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-Shops-${serverDate}.json`));
+        apiItems = readJson(path.resolve(baseAPIFilename, `${serverName}-ItemTemplates-${serverDate}.json`));
+        apiPorts = readJson(path.resolve(baseAPIFilename, `${serverName}-Ports-${serverDate}.json`));
+        apiShops = readJson(path.resolve(baseAPIFilename, `${serverName}-Shops-${serverDate}.json`));
         itemNames = new Map(apiItems.map((item) => [
             item.Id,
             {
@@ -234,6 +242,7 @@ export const convertServerPortData = () => {
             (!apiItem.NotTradeable || apiItem.ShowInContractsSelector) &&
             apiItem.ItemType !== "RecipeResource")
             .map((apiItem) => [cleanName(apiItem.Name), apiItem.ItemWeight]));
+        portData = [];
         numberPorts = apiPorts.length;
         distances = new Map(distancesOrig.map(([fromPortId, toPortId, distance]) => [fromPortId * numberPorts + toPortId, distance]));
         setAndSavePortData(serverName);
