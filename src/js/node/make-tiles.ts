@@ -27,19 +27,22 @@ const convert = async (): Promise<void> => {
             .toFile(mapPath)
 
         // eslint-disable-next-line @typescript-eslint/camelcase
-        child_process.exec(`convert ${inFilename} -resize 1024 ${logoMainFile}`, (err, stdout, stderr) => {
-            if (err) {
-                throw err
-            }
+        child_process.exec(
+            `convert ${inFilename} -fuzz 4% -fill 'rgb(195, 189, 180)' -opaque 'rgb(142, 132, 115)' -resize 1024 ${logoMainFile}`,
+            (err, stdout, stderr) => {
+                if (err) {
+                    throw err
+                }
 
-            if (stdout) {
-                console.log("stdout:", stdout)
-            }
+                if (stdout) {
+                    console.log("stdout:", stdout)
+                }
 
-            if (stderr) {
-                console.error("stderr:", stderr)
+                if (stderr) {
+                    console.error("stderr:", stderr)
+                }
             }
-        })
+        )
     } catch (error) {
         throw new Error(error)
     }
