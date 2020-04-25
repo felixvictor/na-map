@@ -14,7 +14,7 @@ import "bootstrap/js/dist/modal"
 
 import { ascending as d3Ascending, max as d3Max, min as d3Min } from "d3-array"
 import { nest as d3Nest } from "d3-collection"
-import { interpolateCubehelixLong as d3InterpolateCubehelixLong } from "d3-interpolate"
+import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate"
 import { ScaleLinear, scaleLinear as d3ScaleLinear } from "d3-scale"
 import { select as d3Select } from "d3-selection"
 
@@ -142,7 +142,7 @@ export class CompareShips {
 
         this.colourScaleSpeedDiff = d3ScaleLinear<string, string>()
             .range([colourRedDark, colourWhite, colourGreenDark])
-            .interpolate(d3InterpolateCubehelixLong)
+            .interpolate(d3InterpolateHcl)
 
         this._modifierAmount = new Map()
 
@@ -331,7 +331,7 @@ export class CompareShips {
         this.colorScale = d3ScaleLinear<string, string>()
             .domain([this._minSpeed, 0, this._maxSpeed])
             .range([colourRedDark, colourWhite, colourGreenDark])
-            .interpolate(d3InterpolateCubehelixLong)
+            .interpolate(d3InterpolateHcl)
 
         const minShipMass = d3Min(this._shipData, (ship) => ship.shipMass) ?? 0
         const maxShipMass = d3Max(this._shipData, (ship) => ship.shipMass) ?? 0
