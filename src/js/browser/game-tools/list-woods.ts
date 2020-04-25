@@ -12,7 +12,7 @@ import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
 
 import { select as d3Select } from "d3-selection"
-// import { default as Tablesort } from "tablesort"
+import Tablesort from "tablesort"
 
 import { registerEvent } from "../analytics"
 import { putImportError, WoodType } from "../../common/common"
@@ -97,11 +97,10 @@ export default class ListWoods {
      */
     _injectList(type: WoodType): void {
         $(`#${type}-list`).append(this._getList(type))
-        /*
-        const table = document.querySelector(`#table-${type}-list`)
+        const table = document.querySelector(`#table-${type}-list`) as HTMLTableElement
+        // @ts-ignore
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const sortTable = new Tablesort(table)
-        */
     }
 
     _getModifiers(type: WoodType): string[] {
