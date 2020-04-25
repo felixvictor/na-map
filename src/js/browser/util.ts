@@ -10,7 +10,7 @@
 
 /// <reference types="jquery" />
 
-import { scaleBand as d3ScaleBand } from "d3-scale"
+import { scaleBand as d3ScaleBand, ScaleLinear, scaleLinear as d3ScaleLinear } from "d3-scale"
 import { BaseType, Selection } from "d3-selection"
 
 import { numberSegments } from "../common/common-browser"
@@ -367,33 +367,34 @@ export const copyF11ToClipboard = (x: number, z: number, modal$: JQuery): void =
  * @param colourScale - Colour
  * @param steps - Number of steps (default 512)
  */
-/*
 export const colourRamp = (
-    element: Selection<GElement, OldDatum, HTMLElement, any>,
-    colourScale,
+    element: Selection<SVGElement | HTMLElement, unknown, HTMLElement, any>,
+    colourScale: ScaleLinear<string | CanvasGradient | CanvasPattern, string | CanvasGradient | CanvasPattern>,
     steps = 512
 ): void => {
-    const height = 50
-    const width = element.node().clientWidth
-    const canvas = element
-        .insert("canvas")
-        .attr("width", width)
-        .attr("height", height)
+    const height = 200
+    const width = 1000
+    const canvas = element.insert("canvas").attr("width", width).attr("height", height)
+    // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
     const context = canvas.node()?.getContext("2d")
+    // @ts-ignore
     canvas.style.imageRendering = "pixelated"
-
     const min = colourScale.domain()[0]
+
     const max = colourScale.domain()[colourScale.domain().length - 1]
     const step = (max - min) / steps
-    const stepWidth = width / steps
+    const stepWidth = Math.floor(width / steps)
     let x = 0
-    for (let currentStep = min; currentStep < max; currentStep += step) {
-        context.fillStyle = colourScale(currentStep)
-        context.fillRect(x, 0, stepWidth, height)
-        x += stepWidth
+    console.log(canvas, context)
+    console.log(min, max, steps, step)
+    if (context) {
+        for (let currentStep = min; currentStep < max; currentStep += step) {
+            context.fillStyle = colourScale(currentStep)
+            context.fillRect(x, 0, stepWidth, height)
+            x += stepWidth
+        }
     }
 }
-*/
 
 export const drawSvgCircle = (x: number, y: number, r: number): string =>
     `M${x},${y} m${-r},0 a${r},${r} 0,1,0 ${r * 2},0 a${r},${r} 0,1,0 ${-r * 2},0`
