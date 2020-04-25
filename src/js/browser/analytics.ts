@@ -15,9 +15,10 @@
 import { appName, appVersion } from "../common/common-browser"
 import { GA_TRACKING_ID } from "../common/common-var"
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-;(window as { [key: string]: any }).ga = (commandArray: Array<string | boolean | number>): void => {
-    ga.q.push(commandArray)
+// @ts-ignore
+window.ga = function (): void {
+    // eslint-disable-next-line prefer-rest-params
+    ga.q.push(arguments)
 }
 
 ga.q = []
