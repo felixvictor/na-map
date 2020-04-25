@@ -12,7 +12,7 @@
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
 import { select as d3Select } from "d3-selection"
-// import { default as Tablesort } from "tablesort"
+import Tablesort from "tablesort"
 
 import { registerEvent } from "../analytics"
 import { putImportError } from "../../common/common"
@@ -100,11 +100,11 @@ export default class ShipList {
         // Add new recipe list
         d3Select(`#${this._baseId}`).append("div").classed("row ingredients", true)
         d3Select(`#${this._baseId} div`).html(this._getList())
-        /*
-        const table = document.querySelector(`#table-${this._baseId}`)
+
+        const table = document.querySelector(`#table-${this._baseId}`) as HTMLTableElement
+        // @ts-ignore
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const sortTable = new Tablesort(table)
-        */
     }
 
     // noinspection FunctionTooLongJS
@@ -148,10 +148,10 @@ export default class ShipList {
             text += `<td>${ship.name}</td>`
             text += `<td class="text-right">${ship.guns}</td>`
             text += `<td class="text-right">${ship.battleRating}</td>`
-            text += `<td class="text-right">${ship.crew.max}</td>`
+            text += `<td class="text-right">${formatInt(ship.crew.max)}</td>`
             text += `<td class="text-right">${formatFloatFixed(ship.ship.maxSpeed)}</td>`
             text += `<td class="text-right">${formatFloatFixed(ship.rudder.turnSpeed)}</td>`
-            text += `<td class="text-right">${ship.broadside.cannons}</td>`
+            text += `<td class="text-right">${formatInt(ship.broadside.cannons)}</td>`
             text += `<td class="text-right">${ship.gunsPerDeck[4] ? ship.gunsPerDeck[4] : ""}</td>`
             text += `<td class="text-right">${ship.gunsPerDeck[5] ? ship.gunsPerDeck[5] : ""}</td>`
             text += `<td class="text-right" data-sort="${ship.sides.armour}">${formatInt(ship.sides.armour)} (${

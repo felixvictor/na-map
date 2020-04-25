@@ -16,7 +16,7 @@ import "bootstrap/js/dist/modal"
 
 import { html, render, TemplateResult } from "lit-html"
 import { repeat } from "lit-html/directives/repeat"
-// import { Tablesort } from "tablesort"
+import Tablesort from "tablesort"
 
 import { registerEvent } from "../analytics"
 import { cannonType, capitalizeFirstLetter, putImportError } from "../../common/common"
@@ -251,15 +251,14 @@ export default class ListCannons {
             document.querySelector("#modal-section") as HTMLElement
         )
 
-        /*
         for (const type of Object.keys(this._cannonData)) {
-            const table = document.querySelector(`#table-${type}-list`) as HTMLElement
+            const table = document.querySelector(`#table-${type}-list`) as HTMLTableElement
             if (table) {
+                // @ts-ignore
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 const sortTable = new Tablesort(table)
             }
         }
-        */
     }
 
     _initModal(): void {
