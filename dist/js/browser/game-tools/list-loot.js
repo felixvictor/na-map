@@ -20,7 +20,6 @@ import { sortBy } from "../../common/common-node";
 const lootType = ["loot", "chests", "items"];
 export default class ListLoot {
     constructor() {
-        this._modal$ = {};
         this._types = ["loot", "chests", "items"];
         this._sourceData = {};
         this._selectId = {};
@@ -150,11 +149,10 @@ export default class ListLoot {
         this._setupSelectListeners();
     }
     _sourceListSelected() {
-        if (!this._modal$) {
+        if (!document.querySelector(`#${this._modalId}`)) {
             this._initModal();
-            this._modal$ = $(`#${this._modalId}`);
         }
-        this._modal$.modal("show");
+        $(`#${this._modalId}`).modal("show");
     }
     _getItemData(selectedItemId) {
         return this._sourceData[this._selectedType].find((item) => item.id === selectedItemId);
