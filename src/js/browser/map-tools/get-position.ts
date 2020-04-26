@@ -95,7 +95,7 @@ const vectorCross = (a: Vector, b: Vector): Vector => ({
  * If no solution found then null will be returned.
  *
  * If two solutions found then both will be returned, unless the fourth
- * parameter (return_middle) is set to true when the middle of the two solution
+ * parameter (return#middle) is set to true when the middle of the two solution
  * will be returned.
  *
  * @param p1 - Point and distance
@@ -137,7 +137,7 @@ const trilaterate = (p1: Circle, p2: Circle, p3: Circle, returnMiddle = false): 
     const p4a = vectorAdd(a, vectorMultiply(ez, z))
     const p4b = vectorSubtract(a, vectorMultiply(ez, z))
 
-    if (z === 0 ?? returnMiddle) {
+    if (z === 0 || returnMiddle) {
         return a
     }
 
@@ -148,33 +148,35 @@ const trilaterate = (p1: Circle, p2: Circle, p3: Circle, returnMiddle = false): 
  * Get position
  */
 export default class TrilateratePosition {
-    private _ports: DisplayPorts
-    private readonly _NumberOfInputs: number
-    private readonly _baseName: string
-    private readonly _baseId: string
-    private readonly _buttonId: HtmlString
-    private readonly _modalId: HtmlString
-    private _modal$: JQuery = {} as JQuery
-    private readonly _select: HtmlString[] = [] as HtmlString[]
-    private readonly _input: HtmlString[] = [] as HtmlString[]
-    private readonly _selector: HTMLSelectElement[] = [] as HTMLSelectElement[]
+    #modal$: JQuery = {} as JQuery
+    #ports: DisplayPorts
+    readonly #baseId: string
+    readonly #baseName: string
+    readonly #buttonId: HtmlString
+    readonly #input: HtmlString[] = [] as HtmlString[]
+    readonly #modalId: HtmlString
+    readonly #NumberOfInputs: number
+    readonly #numbers: number[]
+    readonly #select: HtmlString[] = [] as HtmlString[]
+    readonly #selector: HTMLSelectElement[] = [] as HTMLSelectElement[]
 
     /**
      * @param ports - Port data
      */
     constructor(ports: DisplayPorts) {
-        this._ports = ports
+        this.#ports = ports
 
         // Number of input port distances
-        this._NumberOfInputs = 3
-        this._baseName = "Get position"
-        this._baseId = "get-position"
-        this._buttonId = `button-${this._baseId}`
-        this._modalId = `modal-${this._baseId}`
+        this.#NumberOfInputs = 3
+        this.#numbers = [...new Array(this.#NumberOfInputs).keys()]
+        this.#baseName = "Get position"
+        this.#baseId = "get-position"
+        this.#buttonId = `button-${this.#baseId}`
 
-        for (const inputNumber of [...new Array(this._NumberOfInputs).keys()]) {
-            this._select[inputNumber] = `${this._baseId}-${inputNumber}-select`
-            this._input[inputNumber] = `${this._baseId}-${inputNumber}-input`
+        this.#modalId = `modal-${this.#baseId}`
+        for (const inputNumber of this.#numbers) {
+            this.#select[inputNumber] = `${this.#baseId}-${inputNumber}-select`
+            this.#input[inputNumber] = `${this.#baseId}-${inputNumber}-input`
         }
 
         this._setupListener()
@@ -190,13 +192,13 @@ export default class TrilateratePosition {
      * Setup menu item listener
      */
     _setupListener(): void {
-        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", (event) => this._navbarClick(event))
+        document.querySelector(`#${this.#buttonId}`)?.addEventListener("click", (event) => this._navbarClick(event))
     }
 
     _injectModal(): void {
-        insertBaseModal({ id: this._modalId, title: this._baseName, size: "", buttonText: "Go" })
+        insertBaseModal({ id: this.#modalId, title: this.#baseName, size: "", buttonText: "Go" })
 
-        const body = d3Select(`#${this._modalId} .modal-body`)
+        const body = d3Select(`#${this.#modalId} .modal-body`)
         body.append("div").attr("class", "alert alert-primary").attr("role", "alert").text("Use in-game trader tool.")
 
         const form = body.append("form")
@@ -205,22 +207,22 @@ export default class TrilateratePosition {
             dataList.append("option").attr("value", distance)
         }
 
-        for (const inputNumber of [...new Array(this._NumberOfInputs).keys()]) {
+        for (const inputNumber of this.#numbers) {
             const formRow = form.append("div").attr("class", "form-row")
             formRow
                 .append("div")
                 .attr("class", "col-md-6")
                 .append("label")
                 .append("select")
-                .attr("name", this._select[inputNumber])
-                .attr("id", this._select[inputNumber])
+                .attr("name", this.#select[inputNumber])
+                .attr("id", this.#select[inputNumber])
                 .attr("class", "selectpicker")
             formRow
                 .append("div")
                 .attr("class", "col-md-6")
                 .append("input")
-                .attr("id", this._input[inputNumber])
-                .attr("name", this._input[inputNumber])
+                .attr("id", this.#input[inputNumber])
+                .attr("name", this.#input[inputNumber])
                 .attr("type", "number")
                 .attr("class", "form-control")
                 .attr("placeholder", "Distance in k")
@@ -232,7 +234,7 @@ export default class TrilateratePosition {
     }
 
     _setupSelects(): void {
-        const selectPorts = this._ports.portDataDefault
+        const selectPorts = this.#ports.portDataDefault
             .map((d) => ({
                 id: d.id,
                 coord: [d.coordinates[0], d.coordinates[1]],
@@ -244,11 +246,11 @@ export default class TrilateratePosition {
         const options = `${selectPorts
             .map((port) => `<option data-subtext="${port.nation}">${port.name}</option>`)
             .join("")}`
-        for (const inputNumber of [...new Array(this._NumberOfInputs).keys()]) {
-            this._selector[inputNumber] = document.querySelector(`#${this._select[inputNumber]}`) as HTMLSelectElement
+        for (const inputNumber of this.#numbers) {
+            this.#selector[inputNumber] = document.querySelector(`#${this.#select[inputNumber]}`) as HTMLSelectElement
 
-            this._selector[inputNumber].insertAdjacentHTML("beforeend", options)
-            $(this._selector[inputNumber]).selectpicker({
+            this.#selector[inputNumber].insertAdjacentHTML("beforeend", options)
+            $(this.#selector[inputNumber]).selectpicker({
                 dropupAuto: false,
                 liveSearch: true,
                 liveSearchNormalize: true,
@@ -271,7 +273,7 @@ export default class TrilateratePosition {
      * Show and go to Position
      */
     _showAndGoToPosition(): void {
-        const circles = this._ports.portData.map((port) => ({
+        const circles = this.#ports.portData.map((port) => ({
             x: port.coordinates[0],
             y: port.coordinates[1],
             z: 0,
@@ -285,12 +287,12 @@ export default class TrilateratePosition {
             position.x = Math.round(position.x)
             position.y = Math.round(position.y)
 
-            this._ports.map.f11.printCoord(position.x, position.y)
-            this._ports.map.zoomAndPan(position.x, position.y, 1)
+            this.#ports.map.f11.printCoord(position.x, position.y)
+            this.#ports.map.zoomAndPan(position.x, position.y, 1)
 
             const coordX = Math.round(convertInvCoordX(position.x, position.y) / -1000)
             const coordY = Math.round(convertInvCoordY(position.x, position.y) / -1000)
-            copyF11ToClipboard(coordX, coordY, this._modal$)
+            copyF11ToClipboard(coordX, coordY, this.#modal$)
 
             // eslint-disable-next-line no-new
             new Toast("Get position", "Coordinates copied to clipboard.")
@@ -307,44 +309,41 @@ export default class TrilateratePosition {
         const roundingFactor = 1.04
 
         /*
-        const ports = new NAMap([
+        const ports = new Map([
             ["Les Cayes", 21 * circleRadiusFactor],
             ["Saint-Louis", 29 * circleRadiusFactor],
             ["Tiburon", 34 * circleRadiusFactor],
             ["Kingston / Port Royal", 132 * circleRadiusFactor]
         ]);
-        const ports = new NAMap([
+
+        const ports = new Map([
             ["Gracias a Dios", 52 * roundingFactor * circleRadiusFactor],
             ["Port Morant", 296 * roundingFactor * circleRadiusFactor],
-            ["Santanillas", 82 * roundingFactor * circleRadiusFactor]
-        ]);
+            ["Santanillas", 82 * roundingFactor * circleRadiusFactor],
+        ])
         */
 
         const ports = new Map()
-        for (const inputNumber of [...new Array(this._NumberOfInputs).keys()]) {
-            const port = this._selector[inputNumber].selectedIndex
-                ? this._selector[inputNumber].options[this._selector[inputNumber].selectedIndex].text
+        for (const inputNumber of this.#numbers) {
+            const port = this.#selector[inputNumber].selectedIndex
+                ? this.#selector[inputNumber].options[this.#selector[inputNumber].selectedIndex].text
                 : ""
-            const distance = Number((document.querySelector(`#${this._input[inputNumber]}`) as HTMLSelectElement).value)
+            const distance = Number((document.querySelector(`#${this.#input[inputNumber]}`) as HTMLSelectElement).value)
 
             if (distance && port !== "") {
                 ports.set(port, distance * roundingFactor * circleRadiusFactor)
             }
         }
 
-        if (ports.size === this._NumberOfInputs) {
-            this._ports.setShowRadiusSetting("position")
-            this._ports.portData = JSON.parse(
-                JSON.stringify(
-                    this._ports.portDataDefault
-                        .filter((port) => ports.has(port.name))
-                        .map((port) => {
-                            port.distance = ports.get(port.name)
-                            return port
-                        })
-                )
-            )
-            this._ports.update()
+        if (ports.size === this.#NumberOfInputs) {
+            this.#ports.setShowRadiusSetting("position")
+            this.#ports.portData = this.#ports.portDataDefault
+                .filter((port) => ports.has(port.name))
+                .map((port) => {
+                    port.distance = ports.get(port.name)
+                    return port
+                })
+            this.#ports.update()
             this._showAndGoToPosition()
         } else {
             // eslint-disable-next-line no-new
@@ -357,13 +356,13 @@ export default class TrilateratePosition {
      */
     _positionSelected(): void {
         // If the modal has no content yet, insert it
-        if (!document.querySelector(`#${this._modalId}`)) {
+        if (!document.querySelector(`#${this.#modalId}`)) {
             this._initModal()
-            this._modal$ = $(`#${this._modalId}`)
+            this.#modal$ = $(`#${this.#modalId}`)
         }
 
         // Show modal
-        this._modal$.modal("show").one("hidden.bs.modal", () => {
+        this.#modal$.modal("show").one("hidden.bs.modal", () => {
             this._useUserInput()
         })
     }

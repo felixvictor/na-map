@@ -280,7 +280,7 @@ text {
 }
 
 .overlay-grid::before // acts as axis-rect-x
- {
+{
     content: "";
     grid-area: x-axis;
     grid-column: 1 / 5;
@@ -289,7 +289,7 @@ text {
 }
 
 .overlay-grid::after // acts as axis-rect-y
- {
+{
     content: "";
     grid-area: y-axis;
     grid-column: 1 / 1;
@@ -542,6 +542,7 @@ svg {
 }
 
 .here {
+    opacity: 0.3;
     fill: $white;
 }
 
