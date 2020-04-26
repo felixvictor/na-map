@@ -132,7 +132,7 @@ export default class ListShipBlueprints {
         row.append("select").attr("name", id).attr("id", id)
 
         row = body.append("div").classed("row no-gutters", true)
-        for (const type of ["frame", "trim"]) {
+        for (const type of woodType) {
             const selectId = `${this._baseId}-${type}-select`
             row.append("label").attr("for", selectId)
             row.append("select").attr("name", selectId).attr("id", selectId).classed("pr-2", true)
