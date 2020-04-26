@@ -12,6 +12,7 @@ import "bootstrap/js/dist/tab";
 import "bootstrap/js/dist/modal";
 import { html, render } from "lit-html";
 import { repeat } from "lit-html/directives/repeat";
+import Tablesort from "tablesort";
 import { registerEvent } from "../analytics";
 import { cannonType, capitalizeFirstLetter, putImportError } from "../../common/common";
 import { initTablesort, insertBaseModalHTML } from "../../common/common-browser";
@@ -175,6 +176,12 @@ export default class ListCannons {
             body: this._getModalBody.bind(this),
             footer: this._getModalFooter,
         }), document.querySelector("#modal-section"));
+        for (const type of Object.keys(this._cannonData)) {
+            const table = document.querySelector(`#table-${type}-list`);
+            if (table) {
+                const sortTable = new Tablesort(table);
+            }
+        }
     }
     _initModal() {
         initTablesort();
