@@ -7,6 +7,20 @@
  * @copyright 2018, 2019
  * @license   http://www.gnu.org/licenses/gpl.html
  */
+var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, privateMap, value) {
+    if (!privateMap.has(receiver)) {
+        throw new TypeError("attempted to set private field on non-instance");
+    }
+    privateMap.set(receiver, value);
+    return value;
+};
+var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, privateMap) {
+    if (!privateMap.has(receiver)) {
+        throw new TypeError("attempted to get private field on non-instance");
+    }
+    return privateMap.get(receiver);
+};
+var _modal$, _ports, _baseId, _baseName, _buttonId, _input, _modalId, _NumberOfInputs, _numbers, _select, _selector;
 import "bootstrap/js/dist/util";
 import "bootstrap/js/dist/modal";
 import "bootstrap-select/js/bootstrap-select";
@@ -46,7 +60,6 @@ const vectorCross = (a, b) => ({
     z: a.x * b.y - a.y * b.x,
 });
 const trilaterate = (p1, p2, p3, returnMiddle = false) => {
-    var _a;
     const ex = vectorDivide(vectorSubtract(p2, p1), norm(vectorSubtract(p2, p1)));
     const i = dot(ex, vectorSubtract(p3, p1));
     let a = vectorSubtract(vectorSubtract(p3, p1), vectorMultiply(ex, i));
@@ -67,26 +80,34 @@ const trilaterate = (p1, p2, p3, returnMiddle = false) => {
     a = vectorAdd(p1, vectorAdd(vectorMultiply(ex, x), vectorMultiply(ey, y)));
     const p4a = vectorAdd(a, vectorMultiply(ez, z));
     const p4b = vectorSubtract(a, vectorMultiply(ez, z));
-    if ((_a = z === 0) !== null && _a !== void 0 ? _a : returnMiddle) {
+    if (z === 0 || returnMiddle) {
         return a;
     }
     return [p4a, p4b];
 };
 export default class TrilateratePosition {
     constructor(ports) {
-        this._modal$ = {};
-        this._select = [];
-        this._input = [];
-        this._selector = [];
-        this._ports = ports;
-        this._NumberOfInputs = 3;
-        this._baseName = "Get position";
-        this._baseId = "get-position";
-        this._buttonId = `button-${this._baseId}`;
-        this._modalId = `modal-${this._baseId}`;
-        for (const inputNumber of [...new Array(this._NumberOfInputs).keys()]) {
-            this._select[inputNumber] = `${this._baseId}-${inputNumber}-select`;
-            this._input[inputNumber] = `${this._baseId}-${inputNumber}-input`;
+        _modal$.set(this, {});
+        _ports.set(this, void 0);
+        _baseId.set(this, void 0);
+        _baseName.set(this, void 0);
+        _buttonId.set(this, void 0);
+        _input.set(this, []);
+        _modalId.set(this, void 0);
+        _NumberOfInputs.set(this, void 0);
+        _numbers.set(this, void 0);
+        _select.set(this, []);
+        _selector.set(this, []);
+        __classPrivateFieldSet(this, _ports, ports);
+        __classPrivateFieldSet(this, _NumberOfInputs, 3);
+        __classPrivateFieldSet(this, _numbers, [...new Array(__classPrivateFieldGet(this, _NumberOfInputs)).keys()]);
+        __classPrivateFieldSet(this, _baseName, "Get position");
+        __classPrivateFieldSet(this, _baseId, "get-position");
+        __classPrivateFieldSet(this, _buttonId, `button-${__classPrivateFieldGet(this, _baseId)}`);
+        __classPrivateFieldSet(this, _modalId, `modal-${__classPrivateFieldGet(this, _baseId)}`);
+        for (const inputNumber of __classPrivateFieldGet(this, _numbers)) {
+            __classPrivateFieldGet(this, _select)[inputNumber] = `${__classPrivateFieldGet(this, _baseId)}-${inputNumber}-select`;
+            __classPrivateFieldGet(this, _input)[inputNumber] = `${__classPrivateFieldGet(this, _baseId)}-${inputNumber}-input`;
         }
         this._setupListener();
     }
@@ -97,33 +118,33 @@ export default class TrilateratePosition {
     }
     _setupListener() {
         var _a;
-        (_a = document.querySelector(`#${this._buttonId}`)) === null || _a === void 0 ? void 0 : _a.addEventListener("click", (event) => this._navbarClick(event));
+        (_a = document.querySelector(`#${__classPrivateFieldGet(this, _buttonId)}`)) === null || _a === void 0 ? void 0 : _a.addEventListener("click", (event) => this._navbarClick(event));
     }
     _injectModal() {
-        insertBaseModal({ id: this._modalId, title: this._baseName, size: "", buttonText: "Go" });
-        const body = d3Select(`#${this._modalId} .modal-body`);
+        insertBaseModal({ id: __classPrivateFieldGet(this, _modalId), title: __classPrivateFieldGet(this, _baseName), size: "", buttonText: "Go" });
+        const body = d3Select(`#${__classPrivateFieldGet(this, _modalId)} .modal-body`);
         body.append("div").attr("class", "alert alert-primary").attr("role", "alert").text("Use in-game trader tool.");
         const form = body.append("form");
         const dataList = form.append("datalist").attr("id", "defaultDistances");
         for (const distance of [5, 10, 15, 20, 30, 50, 100, 200]) {
             dataList.append("option").attr("value", distance);
         }
-        for (const inputNumber of [...new Array(this._NumberOfInputs).keys()]) {
+        for (const inputNumber of __classPrivateFieldGet(this, _numbers)) {
             const formRow = form.append("div").attr("class", "form-row");
             formRow
                 .append("div")
                 .attr("class", "col-md-6")
                 .append("label")
                 .append("select")
-                .attr("name", this._select[inputNumber])
-                .attr("id", this._select[inputNumber])
+                .attr("name", __classPrivateFieldGet(this, _select)[inputNumber])
+                .attr("id", __classPrivateFieldGet(this, _select)[inputNumber])
                 .attr("class", "selectpicker");
             formRow
                 .append("div")
                 .attr("class", "col-md-6")
                 .append("input")
-                .attr("id", this._input[inputNumber])
-                .attr("name", this._input[inputNumber])
+                .attr("id", __classPrivateFieldGet(this, _input)[inputNumber])
+                .attr("name", __classPrivateFieldGet(this, _input)[inputNumber])
                 .attr("type", "number")
                 .attr("class", "form-control")
                 .attr("placeholder", "Distance in k")
@@ -134,7 +155,7 @@ export default class TrilateratePosition {
         }
     }
     _setupSelects() {
-        const selectPorts = this._ports.portDataDefault
+        const selectPorts = __classPrivateFieldGet(this, _ports).portDataDefault
             .map((d) => ({
             id: d.id,
             coord: [d.coordinates[0], d.coordinates[1]],
@@ -145,10 +166,10 @@ export default class TrilateratePosition {
         const options = `${selectPorts
             .map((port) => `<option data-subtext="${port.nation}">${port.name}</option>`)
             .join("")}`;
-        for (const inputNumber of [...new Array(this._NumberOfInputs).keys()]) {
-            this._selector[inputNumber] = document.querySelector(`#${this._select[inputNumber]}`);
-            this._selector[inputNumber].insertAdjacentHTML("beforeend", options);
-            $(this._selector[inputNumber]).selectpicker({
+        for (const inputNumber of __classPrivateFieldGet(this, _numbers)) {
+            __classPrivateFieldGet(this, _selector)[inputNumber] = document.querySelector(`#${__classPrivateFieldGet(this, _select)[inputNumber]}`);
+            __classPrivateFieldGet(this, _selector)[inputNumber].insertAdjacentHTML("beforeend", options);
+            $(__classPrivateFieldGet(this, _selector)[inputNumber]).selectpicker({
                 dropupAuto: false,
                 liveSearch: true,
                 liveSearchNormalize: true,
@@ -163,7 +184,7 @@ export default class TrilateratePosition {
         this._setupSelects();
     }
     _showAndGoToPosition() {
-        const circles = this._ports.portData.map((port) => {
+        const circles = __classPrivateFieldGet(this, _ports).portData.map((port) => {
             var _a;
             return ({
                 x: port.coordinates[0],
@@ -176,11 +197,11 @@ export default class TrilateratePosition {
         if (position) {
             position.x = Math.round(position.x);
             position.y = Math.round(position.y);
-            this._ports.map.f11.printCoord(position.x, position.y);
-            this._ports.map.zoomAndPan(position.x, position.y, 1);
+            __classPrivateFieldGet(this, _ports).map.f11.printCoord(position.x, position.y);
+            __classPrivateFieldGet(this, _ports).map.zoomAndPan(position.x, position.y, 1);
             const coordX = Math.round(convertInvCoordX(position.x, position.y) / -1000);
             const coordY = Math.round(convertInvCoordY(position.x, position.y) / -1000);
-            copyF11ToClipboard(coordX, coordY, this._modal$);
+            copyF11ToClipboard(coordX, coordY, __classPrivateFieldGet(this, _modal$));
             new Toast("Get position", "Coordinates copied to clipboard.");
         }
         else {
@@ -190,24 +211,24 @@ export default class TrilateratePosition {
     _useUserInput() {
         const roundingFactor = 1.04;
         const ports = new Map();
-        for (const inputNumber of [...new Array(this._NumberOfInputs).keys()]) {
-            const port = this._selector[inputNumber].selectedIndex
-                ? this._selector[inputNumber].options[this._selector[inputNumber].selectedIndex].text
+        for (const inputNumber of __classPrivateFieldGet(this, _numbers)) {
+            const port = __classPrivateFieldGet(this, _selector)[inputNumber].selectedIndex
+                ? __classPrivateFieldGet(this, _selector)[inputNumber].options[__classPrivateFieldGet(this, _selector)[inputNumber].selectedIndex].text
                 : "";
-            const distance = Number(document.querySelector(`#${this._input[inputNumber]}`).value);
+            const distance = Number(document.querySelector(`#${__classPrivateFieldGet(this, _input)[inputNumber]}`).value);
             if (distance && port !== "") {
                 ports.set(port, distance * roundingFactor * circleRadiusFactor);
             }
         }
-        if (ports.size === this._NumberOfInputs) {
-            this._ports.setShowRadiusSetting("position");
-            this._ports.portData = JSON.parse(JSON.stringify(this._ports.portDataDefault
+        if (ports.size === __classPrivateFieldGet(this, _NumberOfInputs)) {
+            __classPrivateFieldGet(this, _ports).setShowRadiusSetting("position");
+            __classPrivateFieldGet(this, _ports).portData = __classPrivateFieldGet(this, _ports).portDataDefault
                 .filter((port) => ports.has(port.name))
                 .map((port) => {
                 port.distance = ports.get(port.name);
                 return port;
-            })));
-            this._ports.update();
+            });
+            __classPrivateFieldGet(this, _ports).update();
             this._showAndGoToPosition();
         }
         else {
@@ -215,13 +236,14 @@ export default class TrilateratePosition {
         }
     }
     _positionSelected() {
-        if (!document.querySelector(`#${this._modalId}`)) {
+        if (!document.querySelector(`#${__classPrivateFieldGet(this, _modalId)}`)) {
             this._initModal();
-            this._modal$ = $(`#${this._modalId}`);
+            __classPrivateFieldSet(this, _modal$, $(`#${__classPrivateFieldGet(this, _modalId)}`));
         }
-        this._modal$.modal("show").one("hidden.bs.modal", () => {
+        __classPrivateFieldGet(this, _modal$).modal("show").one("hidden.bs.modal", () => {
             this._useUserInput();
         });
     }
 }
+_modal$ = new WeakMap(), _ports = new WeakMap(), _baseId = new WeakMap(), _baseName = new WeakMap(), _buttonId = new WeakMap(), _input = new WeakMap(), _modalId = new WeakMap(), _NumberOfInputs = new WeakMap(), _numbers = new WeakMap(), _select = new WeakMap(), _selector = new WeakMap();
 //# sourceMappingURL=get-position.js.map

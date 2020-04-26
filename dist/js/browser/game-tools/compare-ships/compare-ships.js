@@ -16,7 +16,7 @@ import { scaleLinear as d3ScaleLinear } from "d3-scale";
 import { select as d3Select } from "d3-selection";
 import { registerEvent } from "../../analytics";
 import { appVersion, colourGreenDark, colourRedDark, colourWhite, hashids, hullRepairsPercent, insertBaseModal, repairTime, rigRepairsPercent, } from "../../../common/common-browser";
-import { isEmpty, putImportError } from "../../../common/common";
+import { isEmpty, putImportError, woodType } from "../../../common/common";
 import { formatPP, formatSignInt, formatSignPercent } from "../../../common/common-format";
 import { getOrdinal } from "../../../common/common-math";
 import { sortBy } from "../../../common/common-node";
@@ -89,8 +89,15 @@ export class CompareShips {
             .join("<br>")}</p>`;
     }
     static _setSelect(select$, ids) {
-        if (ids) {
-            select$.val(ids.toString);
+        let value;
+        if (Array.isArray(ids)) {
+            value = ids.map((id) => String(id));
+        }
+        else {
+            value = String(ids);
+        }
+        if (value) {
+            select$.val(value);
         }
         select$.selectpicker("render");
     }
@@ -272,9 +279,9 @@ export class CompareShips {
     _getShipAndWoodIds() {
         const data = [];
         for (const columnId of this._columns) {
-            if (this._shipIds[columnId] !== undefined) {
-                data.push(...this._shipIds[columnId]);
-                for (const type of ["frame", "trim"]) {
+            if (this._shipIds[columnId]) {
+                data.push(this._shipIds[columnId]);
+                for (const type of woodType) {
                     data.push(Number(this._selectWood$[columnId][type].val()));
                 }
             }
@@ -344,7 +351,7 @@ export class CompareShips {
                 .attr("name", shipSelectId)
                 .attr("id", shipSelectId)
                 .attr("class", "selectpicker");
-            for (const type of ["frame", "trim"]) {
+            for (const type of woodType) {
                 const woodId = this._getWoodSelectId(type, columnId);
                 div.append("label")
                     .append("select")
@@ -384,7 +391,7 @@ export class CompareShips {
             this._setupShipSelect(columnId);
             if (this._baseId !== "ship-journey") {
                 this._selectWood$[columnId] = {};
-                for (const type of ["frame", "trim"]) {
+                for (const type of woodType) {
                     this._selectWood$[columnId][type] = $(`#${this._getWoodSelectId(type, columnId)}`);
                     this.woodCompare._setupWoodSelects(columnId, type, this._selectWood$[columnId][type]);
                 }
@@ -585,7 +592,7 @@ export class CompareShips {
                 if (compareId !== "Base") {
                     dataLink = "_compareData";
                 }
-                for (const type of ["frame", "trim"]) {
+                for (const type of woodType) {
                     for (const property of this.woodCompare.instances[compareId][dataLink][type].properties) {
                         if (this._moduleAndWoodChanges.has(property.modifier)) {
                             this._setModifier(property);
@@ -734,7 +741,7 @@ export class CompareShips {
             }
         });
         if (this._baseId !== "ship-journey") {
-            for (const type of ["frame", "trim"]) {
+            for (const type of woodType) {
                 this._selectWood$[compareId][type]
                     .on("changed.bs.select", () => {
                     this.woodCompare._woodSelected(compareId, type, this._selectWood$[compareId][type]);
@@ -759,7 +766,7 @@ export class CompareShips {
             this.woodCompare.enableSelects(columnId);
             this._setupModulesSelect(columnId);
             if (ids[i]) {
-                for (const type of ["frame", "trim"]) {
+                for (const type of woodType) {
                     CompareShips._setSelect(this._selectWood$[columnId][type], ids[i]);
                     i += 1;
                     this.woodCompare._woodSelected(columnId, type, this._selectWood$[columnId][type]);
