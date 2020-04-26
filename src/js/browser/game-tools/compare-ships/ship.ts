@@ -237,7 +237,7 @@ export class Ship {
             .attr("transform", `translate(${this._shipCompare.svgWidth / 2},${this._shipCompare.svgHeight / 2})`)
         d3Select(`${this.select} div`).remove()
 
-        element.append("div").attr("class", "block-small")
+        element.append("div")
     }
 
     /**

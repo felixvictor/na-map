@@ -125,11 +125,6 @@ text {
 .buildings .requirements table {
     width: auto;
 
-    th,
-    td {
-        padding-right: $padding-third;
-    }
-
     td {
         text-align: right;
     }
@@ -316,6 +311,7 @@ text {
 
 .block {
     padding: $padding-third;
+    justify-self: center;
 }
 
 .port-summary {
@@ -329,6 +325,7 @@ text {
 .port-summary,
 .journey-summary {
     display: grid;
+    align-items: center;
     padding: $padding-third;
     line-height: 1;
     color: $overlay-text-colour;
@@ -489,10 +486,6 @@ svg {
 .column-comp {
     background-color: $secondary-050;
     font-variant-numeric: normal; // onum off
-}
-
-.block-small {
-    padding: 0 $padding-third;
 }
 
 .row-small {
