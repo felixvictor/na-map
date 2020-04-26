@@ -92,8 +92,14 @@ type ModuleType = string
 
 const shipColumnType = ["Base", "C1", "C2"] as const
 type ShipColumnType = typeof shipColumnType[number]
+type Column<T> = {
+    [K in ShipColumnType]: T
+}
 type ColumnArray<T> = {
     [K in ShipColumnType]: T[]
+}
+type ColumnNested<T> = {
+    [K in ShipColumnType]: Index<T>
 }
 type ColumnNestedArray<T> = {
     [K in ShipColumnType]: ArrayIndex<T>
@@ -473,22 +479,39 @@ export class CompareShips {
         return description
     }
 
-    _getText(selectId: string, ids: string | string[]): string {
-        const description = this._getDescription(selectId)
-        const prefix = description.description ? `${description.description}: ` : ""
+    _getSelectType(selectId: string): string {
+        let id = selectId.replace(`${this._baseId}-`, "")
+        for (const columnId of this._columns) {
+            id = id.replace(`-${columnId}-select`, "")
+        }
 
+        console.log(id)
+
+        let type = ""
+        if (id.endsWith("-select")) {
+            type = "ship"
+        } else if (id.startsWith("module-")) {
+            type = "module"
+        } else if (id.startsWith("wood-ship-")) {
+            type = id.replace("wood-ship-", "")
+        }
+
+        return type
+    }
+
+    _getText(type: string, ids: string | string[]): string {
         if (!Array.isArray(ids)) {
-            const propertyText = this._getPropertyText(description.type, ids)
-            return `${prefix}${propertyText}`
+            const propertyText = this._getPropertyText(type, ids)
+            return `${propertyText}`
         }
 
         const texts = [] as string[]
         for (const id of ids) {
-            const propertyText = this._getPropertyText(description.type, id)
+            const propertyText = this._getPropertyText(type, id)
             texts.push(propertyText)
         }
 
-        return `${prefix}${texts.join(", ")}`
+        return `${texts.join(", ")}`
     }
 
     _insertDescription(mainElement: HTMLElement, selectElementId: string, values: string | string[]): void {
@@ -503,20 +526,89 @@ export class CompareShips {
     }
 
     _replaceSelectsWithText(clonedDocument: Document): void {
+        /*
         const bootstrapSelectElements = clonedDocument.querySelectorAll<HTMLElement>(".bootstrap-select")
+        const texts = new Map<string, string>()
         console.log(bootstrapSelectElements.length)
+
         for (const bootstrapSelectElement of bootstrapSelectElements) {
             const selectElement = bootstrapSelectElement.querySelector<HTMLSelectElement>("select")
             if (selectElement) {
                 const values = $(`#${selectElement.id}`).val() as string | string[]
-                console.log(values, typeof values, values.length)
+                const type = this._getSelectType(selectElement.id)
+                let text = ""
+
                 if ((Array.isArray(values) && values.length > 0) || (!Number.isNaN(Number(values)) && Number(values))) {
-                    this._insertDescription(bootstrapSelectElement, selectElement.id, values)
+                    text = this._getText(type, values)
                 }
 
-                ;(bootstrapSelectElement?.parentNode as HTMLElement).remove()
+                texts.set(type, text)
             }
         }
+
+        console.log(...texts)
+
+         */
+
+        /*
+        const selectData = {} as ColumnNestedArray<number>
+        for (const columnId of this._columns) {
+            if (this._shipIds[columnId]) {
+                selectData[columnId] = {} as ArrayIndex<number>
+                selectData[columnId].ship = [this._shipIds[columnId]]
+                for (const type of woodType) {
+                    selectData[columnId][type] = [Number(this._selectWood$[columnId][type].val())]
+                }
+
+                if (this._selectedUpgradeIdsPerType[columnId]) {
+                    for (const type of [...this._moduleTypes]) {
+                        selectData[columnId][type] = this._selectedUpgradeIdsPerType[columnId][type]
+                    }
+                }
+            }
+        }
+
+
+         */
+        const selectData = {} as ColumnNested<string>
+        for (const columnId of this._columns) {
+            if (this._shipIds[columnId]) {
+                selectData[columnId] = {} as Index<string>
+                selectData[columnId].ship = this._getShipName(this._shipIds[columnId])
+                for (const type of woodType) {
+                    selectData[columnId][type] = this.woodCompare.getWoodName(
+                        type,
+                        Number(this._selectWood$[columnId][type].val())
+                    )
+                }
+
+                if (this._selectedUpgradeIdsPerType[columnId]) {
+                    for (const type of [...this._moduleTypes]) {
+                        const text = [] as string[]
+                        for (const id of this._selectedUpgradeIdsPerType[columnId][type]) {
+                            text.push(this._moduleProperties.get(id)?.name.replace(" Bonus", "") ?? "")
+                        }
+
+                        selectData[columnId][type] = text.join(", ")
+                    }
+                }
+            }
+
+            const labels = clonedDocument.querySelectorAll(`#${this._baseId}-${columnId.toLowerCase()} label`)
+            const parent = labels[0].parentNode as HTMLDivElement
+            for (const label of labels) {
+                label.remove()
+            }
+
+            const mainDiv = document.createElement("div")
+            mainDiv.classList.add("small-text")
+            const text = document.createTextNode("Hallo")
+            mainDiv.append(text)
+            parent.insertBefore(mainDiv, parent.firstChild)
+
+        }
+
+        console.log(selectData)
     }
 
     async _makeImage(): Promise<void> {
@@ -685,6 +777,7 @@ export class CompareShips {
         for (const columnId of this._columns) {
             const div = row
                 .append("div")
+                .attr("id", `${this._baseId}-${columnId.toLowerCase()}`)
                 .attr("class", `col-md-4 ml-auto pt-2 ${columnId === "Base" ? "column-base" : "column-comp"}`)
 
             const shipSelectId = this._getShipSelectId(columnId)
