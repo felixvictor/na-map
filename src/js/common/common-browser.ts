@@ -72,26 +72,40 @@ export const circleRadiusFactor = 5
 const secondsForFullCircle = 2935 // 48 * 60 + 55
 export const degreesPerSecond = degreesFullCircle / secondsForFullCircle
 
-// http://tools.medialab.sciences-po.fr/iwanthue/
+// old: http://tools.medialab.sciences-po.fr/iwanthue/
+// new: http://phrogz.net/css/distinct-colors.html
 // noinspection CssConvertColorToRgbInspection
 export const colourList = [
-    "#48355d",
-    "#8bcb19",
-    "#003dc5",
-    "#01c071",
-    "#ff12c8",
-    "#93c590",
-    "#000776",
-    "#b66e00",
-    "#63a6ff",
-    "#984b00",
-    "#acb7ea",
-    "#99001b",
-    "#dfb16a",
-    "#4f0017",
-    "#ff7a6b",
-    "#422b00",
-    "#6f2400",
+    "#f23d3d",
+    "#806060",
+    "#8c3f23",
+    "#f2c6b6",
+    "#bf7c30",
+    "#ffd580",
+    "#403a30",
+    "#73621d",
+    "#9da67c",
+    "#ace639",
+    "#165916",
+    "#b6f2be",
+    "#39e67e",
+    "#30bfb6",
+    "#0d3330",
+    "#5395a6",
+    "#3db6f2",
+    "#397ee6",
+    "#334766",
+    "#404080",
+    "#c6b6f2",
+    "#7033cc",
+    "#39134d",
+    "#e63df2",
+    "#40303d",
+    "#f279ca",
+    "#802053",
+    "#d93662",
+    "#330d12",
+    "#f2b6be",
 ]
 
 /**

@@ -14,7 +14,7 @@
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/tooltip"
 import { min as d3Min, max as d3Max } from "d3-array"
-import { interpolateCubehelixLong as d3InterpolateCubehelixLong } from "d3-interpolate"
+import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate"
 // import { polygonCentroid as d3PolygonCentroid, polygonHull as d3PolygonHull } from "d3-polygon";
 import { ScaleLinear, scaleLinear as d3ScaleLinear, ScaleOrdinal, scaleOrdinal as d3ScaleOrdinal } from "d3-scale"
 import { select as d3Select } from "d3-selection"
@@ -29,11 +29,9 @@ import { nations, NationShortName, NationShortNameAlternative, putImportError } 
 import {
     Bound,
     colourGreenDark,
-    colourGreenLight,
     colourList,
     colourOrange,
     colourRedDark,
-    colourRedLight,
     colourWhite,
     HtmlString,
 } from "../../common/common-browser"
@@ -371,7 +369,7 @@ export default class DisplayPorts {
         this._colourScaleHostility = d3ScaleLinear<string, string>()
             .domain([0, 1])
             .range([colourWhite, colourRedDark])
-            .interpolate(d3InterpolateCubehelixLong)
+            .interpolate(d3InterpolateHcl)
         this._colourScaleCounty = d3ScaleOrdinal<string, string>().range(colourList)
 
         this._minTaxIncome = d3Min(this.portData, (d) => d.taxIncome) ?? 0
@@ -379,21 +377,21 @@ export default class DisplayPorts {
         this._colourScaleTax = d3ScaleLinear<string, string>()
             .domain([this._minTaxIncome, this._maxTaxIncome])
             .range([colourWhite, colourGreenDark])
-            .interpolate(d3InterpolateCubehelixLong)
+            .interpolate(d3InterpolateHcl)
 
         this._minNetIncome = d3Min(this.portData, (d) => d.netIncome) ?? 0
         this._maxNetIncome = d3Max(this.portData, (d) => d.netIncome) ?? 0
         this._colourScaleNet = d3ScaleLinear<string, string>()
-            .domain([this._minNetIncome, this._minNetIncome / 50, 0, this._maxNetIncome / 50, this._maxNetIncome])
-            .range([colourRedDark, colourRedLight, colourWhite, colourGreenLight, colourGreenDark])
-            .interpolate(d3InterpolateCubehelixLong)
+            .domain([this._minNetIncome, 0, this._maxNetIncome])
+            .range([colourRedDark, colourWhite, colourGreenDark])
+            .interpolate(d3InterpolateHcl)
 
         this._minPortPoints = d3Min(this.portData, (d) => d.portPoints) ?? 0
         this._maxPortPoints = d3Max(this.portData, (d) => d.portPoints) ?? 0
         this._colourScalePoints = d3ScaleLinear<string, string>()
             .domain([this._minPortPoints, this._maxPortPoints])
             .range([colourWhite, colourGreenDark])
-            .interpolate(d3InterpolateCubehelixLong)
+            .interpolate(d3InterpolateHcl)
     }
 
     _setupListener(): void {
