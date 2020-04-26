@@ -10,6 +10,7 @@
 import "bootstrap/js/dist/util";
 import "bootstrap/js/dist/modal";
 import { select as d3Select } from "d3-selection";
+import Tablesort from "tablesort";
 import { registerEvent } from "../analytics";
 import { putImportError } from "../../common/common";
 import { initTablesort, insertBaseModal } from "../../common/common-browser";
@@ -68,6 +69,8 @@ export default class ListWoods {
     }
     _injectList(type) {
         $(`#${type}-list`).append(this._getList(type));
+        const table = document.querySelector(`#table-${type}-list`);
+        const sortTable = new Tablesort(table);
     }
     _getModifiers(type) {
         const modifiers = new Set();
