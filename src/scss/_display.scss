@@ -280,7 +280,7 @@ text {
 }
 
 .overlay-grid::before // acts as axis-rect-x
- {
+{
     content: "";
     grid-area: x-axis;
     grid-column: 1 / 5;
@@ -289,7 +289,7 @@ text {
 }
 
 .overlay-grid::after // acts as axis-rect-y
- {
+{
     content: "";
     grid-area: y-axis;
     grid-column: 1 / 1;
@@ -316,6 +316,7 @@ text {
 
 .block {
     padding: $padding-third;
+    justify-self: center;
 }
 
 .port-summary {
@@ -329,6 +330,7 @@ text {
 .port-summary,
 .journey-summary {
     display: grid;
+    align-items: center;
     padding: $padding-third;
     line-height: 1;
     color: $overlay-text-colour;
