@@ -125,11 +125,6 @@ text {
 .buildings .requirements table {
     width: auto;
 
-    th,
-    td {
-        padding-right: $padding-third;
-    }
-
     td {
         text-align: right;
     }
@@ -491,10 +486,6 @@ svg {
 .column-comp {
     background-color: $secondary-050;
     font-variant-numeric: normal; // onum off
-}
-
-.block-small {
-    padding: 0 $padding-third;
 }
 
 .row-small {
