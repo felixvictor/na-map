@@ -27,7 +27,7 @@ interface PortBR {
     br: number
 }
 
-const shallowWaterFrigates = ["Cerberus", "Hercules", "L’Hermione", "La Renommée", "Surprise"]
+const shallowWaterFrigates = new Set(["Cerberus", "Hercules", "L’Hermione", "La Renommée", "Surprise"])
 const minDeepWaterBR = 80
 const maxNumPlayers = 25
 
@@ -45,7 +45,7 @@ const fileScssPreCompile = path.resolve("src", "scss", "pre-compile.scss")
 const setColours = (): ColourMap => {
     const compiledCss = sass
         .renderSync({
-            file: fileScssPreCompile
+            file: fileScssPreCompile,
         })
         .css.toString()
     const parsedCss = css.parse(compiledCss)
@@ -56,7 +56,7 @@ const setColours = (): ColourMap => {
             .filter((rule: Rule) =>
                 rule?.declarations?.find((declaration: Declaration) => declaration.property === "background-color")
             )
-            .map(rule => {
+            .map((rule) => {
                 const d = rule?.declarations?.find(
                     (declaration: Declaration) => declaration.property === "background-color"
                 ) as Declaration
@@ -71,18 +71,18 @@ const setColours = (): ColourMap => {
  */
 const createPortBattleSheets = (): void => {
     const portsDeepWater: PortBR[] = portsOrig
-        .filter(port => !port.shallow)
-        .map(port => ({
+        .filter((port) => !port.shallow)
+        .map((port) => ({
             name: port.name,
-            br: port.brLimit
+            br: port.brLimit,
         }))
         .sort((a, b) => a.name.localeCompare(b.name))
 
     const portsShallowWater: PortBR[] = portsOrig
-        .filter(port => port.shallow)
-        .map(port => ({
+        .filter((port) => port.shallow)
+        .map((port) => ({
             name: port.name,
-            br: port.brLimit
+            br: port.brLimit,
         }))
         .sort((a, b) => a.name.localeCompare(b.name))
 
@@ -104,13 +104,13 @@ const createPortBattleSheets = (): void => {
 
     const wsOptions = {
         sheetView: {
-            showGridLines: false // Flag indicating whether the sheet should have gridlines enabled or disabled during view
+            showGridLines: false, // Flag indicating whether the sheet should have gridlines enabled or disabled during view
         },
         sheetFormat: {
             baseColWidth: columnWidth, // Defaults to 10. Specifies the number of characters of the maximum digit width of the normal style's font. This value does not include margin padding or extra padding for gridlines. It is only the number of characters.,
             defaultColWidth: columnWidth,
-            defaultRowHeight: rowHeight
-        }
+            defaultRowHeight: rowHeight,
+        },
     }
 
     const workbook = new Excel4Node.Workbook()
@@ -142,13 +142,13 @@ const createPortBattleSheets = (): void => {
         border: {
             top: {
                 style: "thin",
-                color: colourContrastLight
+                color: colourContrastLight,
             },
             bottom: {
                 style: "thin",
-                color: colourContrastLight
-            }
-        }
+                color: colourContrastLight,
+            },
+        },
     })
 
     const brTooHigh = workbook.createStyle({ font: { bold: true, color: colourRed } }) // §18.8.22
@@ -167,9 +167,9 @@ const createPortBattleSheets = (): void => {
                 horizontal: "right",
                 indent: 1, // Number of spaces to indent = indent value * 3
                 //                relativeIndent: integer, // number of additional spaces to indent
-                vertical: "center"
+                vertical: "center",
             },
-            numberFormat: "#" // §18.8.30 numFmt (Number Format)
+            numberFormat: "#", // §18.8.30 numFmt (Number Format)
         } as Style
         const textStyle = {
             alignment: {
@@ -177,9 +177,9 @@ const createPortBattleSheets = (): void => {
                 horizontal: "left",
                 indent: 1, // Number of spaces to indent = indent value * 3
                 //                relativeIndent: integer, // number of additional spaces to indent
-                vertical: "center"
+                vertical: "center",
             },
-            numberFormat: "@" // §18.8.30 numFmt (Number Format)
+            numberFormat: "@", // §18.8.30 numFmt (Number Format)
         } as Style
 
         const columnsHeader = [
@@ -187,7 +187,7 @@ const createPortBattleSheets = (): void => {
             { name: "Ship name", width: 22, style: textStyle },
             { name: "Ship battle rating", width: 8, style: numberStyle },
             { name: "Number of players", width: 12, style: numberStyle },
-            { name: "Total battle rating", width: 12, style: numberStyle }
+            { name: "Total battle rating", width: 12, style: numberStyle },
         ]
         const numRowsHeader = 4
         const numRowsTotal = numRowsHeader + ships.length
@@ -219,10 +219,7 @@ const createPortBattleSheets = (): void => {
         // ***** Rows *****
         // General description row
         let currentRow = 1
-        sheet
-            .cell(currentRow, 1, currentRow, numColumnsTotal)
-            .style(textStyle)
-            .style(fillPattern("white"))
+        sheet.cell(currentRow, 1, currentRow, numColumnsTotal).style(textStyle).style(fillPattern("white"))
         sheet.cell(currentRow, 1, currentRow, 3, true).string("Port battle calculator by Felix Victor")
         sheet
             .cell(currentRow, 4, currentRow, 5, true)
@@ -235,10 +232,7 @@ const createPortBattleSheets = (): void => {
             .style(textStyle)
             .style(fillPattern(colourContrastNearWhite))
         sheet.cell(currentRow, 1).string("Port")
-        sheet
-            .cell(currentRow, 2)
-            .string("1. Select port")
-            .style(fontColourBold(colourHighlight))
+        sheet.cell(currentRow, 2).string("1. Select port").style(fontColourBold(colourHighlight))
         sheet.cell(currentRow, numColumnsHeader - 1).string("Max BR")
         sheet.cell(currentRow, numColumnsHeader).style(numberStyle)
 
@@ -302,15 +296,9 @@ const createPortBattleSheets = (): void => {
                 .style(border)
                 .style(fillPattern(fgColourShip[ship.class % 2]))
 
-            sheet
-                .cell(currentRow, 1)
-                .number(ship.class)
-                .style(numberStyle)
+            sheet.cell(currentRow, 1).number(ship.class).style(numberStyle)
             sheet.cell(currentRow, 2).string(ship.name)
-            sheet
-                .cell(currentRow, 3)
-                .number(ship.battleRating)
-                .style(numberStyle)
+            sheet.cell(currentRow, 3).number(ship.battleRating).style(numberStyle)
             sheet
                 .cell(currentRow, numColumnsHeader - 1)
                 .formula(
@@ -342,7 +330,7 @@ const createPortBattleSheets = (): void => {
             formula: `AND(NOT(ISBLANK(${Excel4Node.getExcelAlpha(numColumnsHeader)}${numRowsHeader - 2})),
                 ${Excel4Node.getExcelAlpha(numColumnsHeader)}${numRowsHeader} >
                 ${Excel4Node.getExcelAlpha(numColumnsHeader)}${numRowsHeader - 2})`, // formula that returns nonzero or 0
-            style: brTooHigh
+            style: brTooHigh,
         })
 
         // Port select dropdown
@@ -363,8 +351,8 @@ const createPortBattleSheets = (): void => {
             formulas: [
                 `=${Excel4Node.getExcelAlpha(numColumnsTotal + 1)}1:${Excel4Node.getExcelAlpha(numColumnsTotal + 1)}${
                     ports.length
-                }`
-            ]
+                }`,
+            ],
         })
 
         sheet
@@ -387,16 +375,16 @@ const createPortBattleSheets = (): void => {
     // noinspection OverlyComplexBooleanExpressionJS
     const dwShips = shipsOrig
         .filter(
-            ship =>
-                !(ship.name.startsWith("Basic") || ship.name.startsWith("Rookie") || ship.name.startsWith("Trader")) &&
+            (ship) =>
+                !["Basic", "Hulk ", "Rooki", "Trade", "Tutor"].includes(ship.name.slice(0, 5)) &&
                 (ship.battleRating >= minDeepWaterBR || ship.name === "Mortar Brig")
         )
         .sort(sortBy(["class", "-battleRating", "name"]))
     const swShips = shipsOrig
         .filter(
-            ship =>
-                shallowWaterFrigates.includes(ship.name) ||
-                (ship.class >= 6 && !["Basic", "Rooki", "Trade"].includes(ship.name.slice(0, 5)))
+            (ship) =>
+                shallowWaterFrigates.has(ship.name) ||
+                (ship.class >= 6 && !["Basic", "Rooki", "Trade", "Tutor"].includes(ship.name.slice(0, 5)))
         )
         .sort(sortBy(["class", "-battleRating", "name"]))
 
@@ -414,7 +402,7 @@ const createPortBattleSheets = (): void => {
     fillSheet(dwSheet, dwShips, portsDeepWater)
     fillSheet(swSheet, swShips, portsShallowWater)
 
-    workbook.write(commonPaths.filePbSheet, err => {
+    workbook.write(commonPaths.filePbSheet, (err) => {
         if (err) {
             console.error(err)
         }
@@ -422,8 +410,8 @@ const createPortBattleSheets = (): void => {
 }
 
 export const createPortBattleSheet = (): void => {
-    portsOrig = (readJson(commonPaths.filePort) as unknown) as PortBasic[]
-    shipsOrig = (readJson(commonPaths.fileShip) as unknown) as ShipData[]
+    portsOrig = readJson(commonPaths.filePort)
+    shipsOrig = readJson(commonPaths.fileShip)
 
     createPortBattleSheets()
 }
