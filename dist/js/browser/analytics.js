@@ -9,8 +9,8 @@
  */
 import { appName, appVersion } from "../common/common-browser";
 import { GA_TRACKING_ID } from "../common/common-var";
-window.ga = (commandArray) => {
-    ga.q.push(commandArray);
+window.ga = function () {
+    ga.q.push(arguments);
 };
 ga.q = [];
 export const registerEvent = (category, label, value = 1) => {
