@@ -31,7 +31,7 @@ import {
     repairTime,
     rigRepairsPercent,
 } from "../../../common/common-browser"
-import { isEmpty, putImportError, WoodType } from "../../../common/common"
+import { isEmpty, putImportError, woodType } from "../../../common/common"
 import { formatPP, formatSignInt, formatSignPercent } from "../../../common/common-format"
 import { ArrayIndex, Index, NestedIndex } from "../../../common/interface"
 import { getOrdinal } from "../../../common/common-math"
@@ -42,6 +42,7 @@ import { Module, ModuleEntity, ModulePropertiesEntity, ShipData, ShipRepairTime 
 
 import { ShipBase, ShipComparison } from "."
 import CompareWoods, { WoodColumnType } from "../compare-woods"
+import { isArray } from "util"
 
 interface ShipSelectMap {
     key: string
@@ -116,7 +117,7 @@ export class CompareShips {
     private _selectShip$: Index<JQuery<HTMLSelectElement>> = {}
     private _selectWood$: NestedIndex<JQuery<HTMLSelectElement>> = {}
     private _shipData!: ShipData[]
-    private _shipIds: Index<number> | NestedIndex<number> = {}
+    private _shipIds: Index<number> = {}
     private _shipSelectData!: ShipSelectMap[]
     private readonly _baseId: string
     private readonly _baseName: string
@@ -200,8 +201,15 @@ export class CompareShips {
     }
 
     static _setSelect(select$: JQuery, ids: number | number[]): void {
-        if (ids) {
-            select$.val(ids.toString)
+        let value: string | string[]
+        if (Array.isArray(ids)) {
+            value = ids.map<string>((id: number | string) => String(id))
+        } else {
+            value = String(ids)
+        }
+
+        if (value) {
+            select$.val(value)
         }
 
         select$.selectpicker("render")
@@ -417,9 +425,9 @@ export class CompareShips {
         const data: number[] = []
 
         for (const columnId of this._columns) {
-            if (this._shipIds[columnId] !== undefined) {
-                data.push(...((this._shipIds[columnId] as unknown) as number[]))
-                for (const type of ["frame", "trim"]) {
+            if (this._shipIds[columnId]) {
+                data.push(this._shipIds[columnId])
+                for (const type of woodType) {
                     data.push(Number(this._selectWood$[columnId][type].val()))
                 }
             }
@@ -532,7 +540,7 @@ export class CompareShips {
                 .attr("name", shipSelectId)
                 .attr("id", shipSelectId)
                 .attr("class", "selectpicker")
-            for (const type of ["frame", "trim"]) {
+            for (const type of woodType) {
                 const woodId = this._getWoodSelectId(type, columnId)
                 div.append("label")
                     .append("select")
@@ -577,11 +585,11 @@ export class CompareShips {
             this._setupShipSelect(columnId)
             if (this._baseId !== "ship-journey") {
                 this._selectWood$[columnId] = {}
-                for (const type of ["frame", "trim"]) {
+                for (const type of woodType) {
                     this._selectWood$[columnId][type] = $(`#${this._getWoodSelectId(type, columnId)}`)
                     this.woodCompare._setupWoodSelects(
                         columnId as WoodColumnType,
-                        type as WoodType,
+                        type,
                         this._selectWood$[columnId][type]
                     )
                 }
@@ -893,7 +901,7 @@ export class CompareShips {
                 }
 
                 // Add modifier amount for both frame and trim
-                for (const type of ["frame", "trim"]) {
+                for (const type of woodType) {
                     // @ts-ignore
                     for (const property of this.woodCompare.instances[compareId][dataLink][type].properties) {
                         if (this._moduleAndWoodChanges.has(property.modifier)) {
@@ -1117,12 +1125,12 @@ export class CompareShips {
             }
         })
         if (this._baseId !== "ship-journey") {
-            for (const type of ["frame", "trim"]) {
+            for (const type of woodType) {
                 this._selectWood$[compareId][type]
                     .on("changed.bs.select", () => {
                         this.woodCompare._woodSelected(
                             compareId as WoodColumnType,
-                            type as WoodType,
+                            type,
                             this._selectWood$[compareId][type]
                         )
                         this._refreshShips(compareId)
@@ -1142,7 +1150,7 @@ export class CompareShips {
 
             this._shipIds[columnId] = ids[i]
             i += 1
-            CompareShips._setSelect(this._selectShip$[columnId], (this._shipIds[columnId] as unknown) as number[])
+            CompareShips._setSelect(this._selectShip$[columnId], this._shipIds[columnId])
             if (columnId === "Base" && this._baseId !== "ship-journey") {
                 this._enableCompareSelects()
             }
@@ -1151,15 +1159,11 @@ export class CompareShips {
             this._setupModulesSelect(columnId)
 
             if (ids[i]) {
-                for (const type of ["frame", "trim"]) {
+                for (const type of woodType) {
                     CompareShips._setSelect(this._selectWood$[columnId][type], ids[i])
                     i += 1
 
-                    this.woodCompare._woodSelected(
-                        columnId as WoodColumnType,
-                        type as WoodType,
-                        this._selectWood$[columnId][type]
-                    )
+                    this.woodCompare._woodSelected(columnId as WoodColumnType, type, this._selectWood$[columnId][type])
                 }
             } else {
                 i += 2
