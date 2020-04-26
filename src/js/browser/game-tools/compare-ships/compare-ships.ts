@@ -17,6 +17,10 @@ import { nest as d3Nest } from "d3-collection"
 import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate"
 import { ScaleLinear, scaleLinear as d3ScaleLinear } from "d3-scale"
 import { select as d3Select } from "d3-selection"
+import dayjs from "dayjs"
+import customParseFormat from "dayjs/plugin/customParseFormat.js"
+import utc from "dayjs/plugin/utc.js"
+import html2canvas from "html2canvas"
 
 import { registerEvent } from "../../analytics"
 import {
@@ -31,7 +35,7 @@ import {
     repairTime,
     rigRepairsPercent,
 } from "../../../common/common-browser"
-import { isEmpty, putImportError, woodType } from "../../../common/common"
+import { capitalizeFirstLetter, isEmpty, putImportError, WoodType, woodType } from "../../../common/common"
 import { formatPP, formatSignInt, formatSignPercent } from "../../../common/common-format"
 import { ArrayIndex, Index, NestedIndex } from "../../../common/interface"
 import { getOrdinal } from "../../../common/common-math"
@@ -42,7 +46,14 @@ import { Module, ModuleEntity, ModulePropertiesEntity, ShipData, ShipRepairTime 
 
 import { ShipBase, ShipComparison } from "."
 import CompareWoods, { WoodColumnType } from "../compare-woods"
-import { isArray } from "util"
+
+dayjs.extend(customParseFormat)
+dayjs.extend(utc)
+
+interface Description {
+    type: string
+    description: string
+}
 
 interface ShipSelectMap {
     key: string
@@ -124,6 +135,7 @@ export class CompareShips {
     private readonly _buttonId: HtmlString
     private readonly _columns: ShipColumnType[]
     private readonly _copyButtonId: HtmlString
+    private readonly _imageButtonId: HtmlString
     private readonly _modalId: HtmlString
     private readonly _moduleId: HtmlString
     private readonly _woodId: HtmlString
@@ -140,6 +152,7 @@ export class CompareShips {
         this._modalId = `modal-${this._baseId}`
         this._moduleId = `${this._baseId}-module`
         this._copyButtonId = `button-copy-${this._baseId}`
+        this._imageButtonId = `button-image-${this._baseId}`
 
         this.colourScaleSpeedDiff = d3ScaleLinear<string, string>()
             .range([colourRedDark, colourWhite, colourGreenDark])
@@ -213,6 +226,28 @@ export class CompareShips {
         }
 
         select$.selectpicker("render")
+    }
+
+    static _saveCanvasAsImage(uri: string): void {
+        const date = dayjs.utc().format("YYYY-MM-DD HH-mm-ss")
+        const fileName = `na-map ship compare ${date}.png`
+        const link = document.createElement("a")
+
+        if (typeof link.download === "string") {
+            link.href = uri
+            link.download = fileName
+
+            // Firefox requires the link to be in the body
+            document.body.append(link)
+
+            // simulate click
+            link.click()
+
+            // remove the link when done
+            link.remove()
+        } else {
+            window.open(uri)
+        }
     }
 
     async CompareShipsInit(): Promise<void> {
@@ -395,6 +430,120 @@ export class CompareShips {
             .range([10, this.innerRadius, this.outerRadius])
     }
 
+    _getShipName(id: number): string {
+        return this._shipData.find((ship) => ship.id === id)?.name ?? ""
+    }
+
+    _getPropertyText(type: string, itemId: string): string {
+        const id = Number(itemId)
+        let propertyText = ""
+
+        if (type === "ship") {
+            propertyText = this._getShipName(id)
+        } else if (type === "module") {
+            propertyText = this._moduleProperties.get(id)?.name.replace(" Bonus", "") ?? ""
+        } else {
+            propertyText = this.woodCompare.getWoodName(type as WoodType, id)
+        }
+
+        return propertyText
+    }
+
+    _getDescription(selectId: string): Description {
+        let type = selectId.replace(`${this._baseId}-`, "")
+        for (const columnId of this._columns) {
+            type = type.replace(`-${columnId}-select`, "")
+        }
+
+        console.log(type)
+
+        const description = {} as Description
+        if (type.endsWith("-select")) {
+            description.description = ""
+            description.type = "ship"
+        } else if (type.startsWith("module-")) {
+            description.description = `Ship ${type.replace("module-", "").replace("Ship", "")}`
+            description.type = "module"
+        } else if (type.startsWith("wood-ship-")) {
+            const woodType = type.replace("wood-ship-", "")
+            description.description = `Wood ${woodType}`
+            description.type = woodType
+        }
+
+        return description
+    }
+
+    _getText(selectId: string, ids: string | string[]): string {
+        const description = this._getDescription(selectId)
+        const prefix = description.description ? `${description.description}: ` : ""
+
+        if (!Array.isArray(ids)) {
+            const propertyText = this._getPropertyText(description.type, ids)
+            return `${prefix}${propertyText}`
+        }
+
+        const texts = [] as string[]
+        for (const id of ids) {
+            const propertyText = this._getPropertyText(description.type, id)
+            texts.push(propertyText)
+        }
+
+        return `${prefix}${texts.join(", ")}`
+    }
+
+    _insertDescription(mainElement: HTMLElement, selectElementId: string, values: string | string[]): void {
+        const parent = mainElement.parentNode?.parentNode as HTMLElement
+        if (parent) {
+            const div = document.createElement("div")
+            div.classList.add("small-text")
+            const text = document.createTextNode(this._getText(selectElementId, values))
+            div.append(text)
+            parent.insertBefore(div, parent.firstChild)
+        }
+    }
+
+    _replaceSelectsWithText(clonedDocument: Document): void {
+        const bootstrapSelectElements = clonedDocument.querySelectorAll<HTMLElement>(".bootstrap-select")
+        console.log(bootstrapSelectElements.length)
+        for (const bootstrapSelectElement of bootstrapSelectElements) {
+            const selectElement = bootstrapSelectElement.querySelector<HTMLSelectElement>("select")
+            if (selectElement) {
+                const values = $(`#${selectElement.id}`).val() as string | string[]
+                console.log(values, typeof values, values.length)
+                if ((Array.isArray(values) && values.length > 0) || (!Number.isNaN(Number(values)) && Number(values))) {
+                    this._insertDescription(bootstrapSelectElement, selectElement.id, values)
+                }
+
+                ;(bootstrapSelectElement?.parentNode as HTMLElement).remove()
+            }
+        }
+    }
+
+    async _makeImage(): Promise<void> {
+        const element = document.querySelector(
+            `#${this._modalId} .modal-dialog .modal-content .modal-body`
+        ) as HTMLElement
+        console.log("_makeImage", element.scrollHeight, element.scrollWidth)
+        if (element) {
+            const canvas = await html2canvas(element, {
+                allowTaint: true,
+                foreignObjectRendering: true,
+                ignoreElements: (element) =>
+                    element.classList.contains("central") ||
+                    element.classList.contains("overlay") ||
+                    element.classList.contains("navbar"),
+                logging: true,
+                onclone: (clonedDocument) => {
+                    this._replaceSelectsWithText(clonedDocument)
+                },
+                x: 0,
+                y: 0,
+            })
+
+            CompareShips._saveCanvasAsImage(canvas.toDataURL())
+        }
+    }
+
     /**
      * Action when selected
      */
@@ -413,6 +562,10 @@ export class CompareShips {
             // Copy data to clipboard (click event)
             document.querySelector(`#${this._copyButtonId}`)?.addEventListener("click", (event) => {
                 this._copyDataClicked(event)
+            })
+            // Make image
+            document.querySelector(`#${this._imageButtonId}`)?.addEventListener("click", () => {
+                this._makeImage()
             })
         }
 
@@ -573,6 +726,14 @@ export class CompareShips {
             .attr("type", "button")
             .append("i")
             .classed("icon icon-copy", true)
+        footer
+            .insert("button", "button")
+            .classed("btn btn-outline-secondary icon-outline-button", true)
+            .attr("id", this._imageButtonId)
+            .attr("title", "Make image")
+            .attr("type", "button")
+            .append("i")
+            .classed("icon icon-image", true)
     }
 
     _initData(): void {
