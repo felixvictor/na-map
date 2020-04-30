@@ -35,7 +35,7 @@ import {
     repairTime,
     rigRepairsPercent,
 } from "../../../common/common-browser"
-import { capitalizeFirstLetter, isEmpty, putImportError, WoodType, woodType } from "../../../common/common"
+import { isEmpty, putImportError, WoodType, woodType } from "../../../common/common"
 import { formatPP, formatSignInt, formatSignPercent } from "../../../common/common-format"
 import { ArrayIndex, Index, NestedIndex } from "../../../common/interface"
 import { getOrdinal } from "../../../common/common-math"
@@ -50,9 +50,10 @@ import CompareWoods, { WoodColumnType } from "../compare-woods"
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
 
-interface Description {
-    type: string
-    description: string
+interface SelectedData {
+    moduleData: Map<string, string>
+    ship: string
+    wood: string[]
 }
 
 interface ShipSelectMap {
@@ -455,50 +456,6 @@ export class CompareShips {
         return propertyText
     }
 
-    _getDescription(selectId: string): Description {
-        let type = selectId.replace(`${this._baseId}-`, "")
-        for (const columnId of this._columns) {
-            type = type.replace(`-${columnId}-select`, "")
-        }
-
-        console.log(type)
-
-        const description = {} as Description
-        if (type.endsWith("-select")) {
-            description.description = ""
-            description.type = "ship"
-        } else if (type.startsWith("module-")) {
-            description.description = `Ship ${type.replace("module-", "").replace("Ship", "")}`
-            description.type = "module"
-        } else if (type.startsWith("wood-ship-")) {
-            const woodType = type.replace("wood-ship-", "")
-            description.description = `Wood ${woodType}`
-            description.type = woodType
-        }
-
-        return description
-    }
-
-    _getSelectType(selectId: string): string {
-        let id = selectId.replace(`${this._baseId}-`, "")
-        for (const columnId of this._columns) {
-            id = id.replace(`-${columnId}-select`, "")
-        }
-
-        console.log(id)
-
-        let type = ""
-        if (id.endsWith("-select")) {
-            type = "ship"
-        } else if (id.startsWith("module-")) {
-            type = "module"
-        } else if (id.startsWith("wood-ship-")) {
-            type = id.replace("wood-ship-", "")
-        }
-
-        return type
-    }
-
     _getText(type: string, ids: string | string[]): string {
         if (!Array.isArray(ids)) {
             const propertyText = this._getPropertyText(type, ids)
@@ -514,101 +471,76 @@ export class CompareShips {
         return `${texts.join(", ")}`
     }
 
-    _insertDescription(mainElement: HTMLElement, selectElementId: string, values: string | string[]): void {
-        const parent = mainElement.parentNode?.parentNode as HTMLElement
-        if (parent) {
-            const div = document.createElement("div")
-            div.classList.add("small-text")
-            const text = document.createTextNode(this._getText(selectElementId, values))
-            div.append(text)
-            parent.insertBefore(div, parent.firstChild)
+    _getSelectedData(columnId: ShipColumnType): SelectedData {
+        const selectedData = {
+            moduleData: new Map<string, string>(),
+            ship: "",
+            wood: [] as string[],
+        }
+        if (this._shipIds[columnId]) {
+            selectedData.ship = this._getShipName(this._shipIds[columnId])
+            for (const type of woodType) {
+                selectedData.wood.push(
+                    this.woodCompare.getWoodName(type, Number(this._selectWood$[columnId][type].val()))
+                )
+            }
+
+            if (this._selectedUpgradeIdsPerType[columnId]) {
+                for (const type of [...this._moduleTypes]) {
+                    const text = [] as string[]
+                    for (const id of this._selectedUpgradeIdsPerType[columnId][type]) {
+                        text.push(this._moduleProperties.get(id)?.name.replace(" Bonus", "") ?? "")
+                    }
+
+                    selectedData.moduleData.set(type, text.join(", "))
+                }
+            }
+        }
+
+        return selectedData
+    }
+
+    _printSelectedData(clonedDocument: Document, selectedData: SelectedData, columnId: ShipColumnType): void {
+        const labels = clonedDocument.querySelectorAll<HTMLElement>(`#${this._baseId}-${columnId.toLowerCase()} label`)
+        const parent = labels[0].parentNode as HTMLElement
+        const labelHeight = labels[0].offsetHeight
+        for (const label of labels) {
+            label.remove()
+        }
+
+        const mainDiv = d3Select(parent)
+            .insert("div", ":first-child")
+            .style("height", `${labelHeight * 5}px`)
+        if (selectedData.ship) {
+            mainDiv.append("div").style("margin-bottom", "5px").style("line-height", "1.1").text(selectedData.ship)
+        }
+
+        if (selectedData.wood[0] !== "") {
+            mainDiv
+                .append("div")
+                .style("font-size", "smaller")
+                .style("margin-bottom", "5px")
+                .style("line-height", "1.1")
+                .text(selectedData.wood.join(" | "))
+        }
+
+        for (const [key, value] of selectedData.moduleData) {
+            if (value !== "") {
+                mainDiv
+                    .append("div")
+                    .style("font-size", "small")
+                    .style("margin-bottom", "5px")
+                    .style("line-height", "1.1")
+                    .html(`<em>${key}</em>: ${value}`)
+            }
         }
     }
 
     _replaceSelectsWithText(clonedDocument: Document): void {
-        /*
-        const bootstrapSelectElements = clonedDocument.querySelectorAll<HTMLElement>(".bootstrap-select")
-        const texts = new Map<string, string>()
-        console.log(bootstrapSelectElements.length)
-
-        for (const bootstrapSelectElement of bootstrapSelectElements) {
-            const selectElement = bootstrapSelectElement.querySelector<HTMLSelectElement>("select")
-            if (selectElement) {
-                const values = $(`#${selectElement.id}`).val() as string | string[]
-                const type = this._getSelectType(selectElement.id)
-                let text = ""
-
-                if ((Array.isArray(values) && values.length > 0) || (!Number.isNaN(Number(values)) && Number(values))) {
-                    text = this._getText(type, values)
-                }
-
-                texts.set(type, text)
-            }
-        }
-
-        console.log(...texts)
-
-         */
-
-        /*
-        const selectData = {} as ColumnNestedArray<number>
         for (const columnId of this._columns) {
-            if (this._shipIds[columnId]) {
-                selectData[columnId] = {} as ArrayIndex<number>
-                selectData[columnId].ship = [this._shipIds[columnId]]
-                for (const type of woodType) {
-                    selectData[columnId][type] = [Number(this._selectWood$[columnId][type].val())]
-                }
-
-                if (this._selectedUpgradeIdsPerType[columnId]) {
-                    for (const type of [...this._moduleTypes]) {
-                        selectData[columnId][type] = this._selectedUpgradeIdsPerType[columnId][type]
-                    }
-                }
-            }
+            const selectedData = this._getSelectedData(columnId)
+            this._printSelectedData(clonedDocument, selectedData, columnId)
         }
-
-
-         */
-        const selectData = {} as ColumnNested<string>
-        for (const columnId of this._columns) {
-            if (this._shipIds[columnId]) {
-                selectData[columnId] = {} as Index<string>
-                selectData[columnId].ship = this._getShipName(this._shipIds[columnId])
-                for (const type of woodType) {
-                    selectData[columnId][type] = this.woodCompare.getWoodName(
-                        type,
-                        Number(this._selectWood$[columnId][type].val())
-                    )
-                }
-
-                if (this._selectedUpgradeIdsPerType[columnId]) {
-                    for (const type of [...this._moduleTypes]) {
-                        const text = [] as string[]
-                        for (const id of this._selectedUpgradeIdsPerType[columnId][type]) {
-                            text.push(this._moduleProperties.get(id)?.name.replace(" Bonus", "") ?? "")
-                        }
-
-                        selectData[columnId][type] = text.join(", ")
-                    }
-                }
-            }
-
-            const labels = clonedDocument.querySelectorAll(`#${this._baseId}-${columnId.toLowerCase()} label`)
-            const parent = labels[0].parentNode as HTMLDivElement
-            for (const label of labels) {
-                label.remove()
-            }
-
-            const mainDiv = document.createElement("div")
-            mainDiv.classList.add("small-text")
-            const text = document.createTextNode("Hallo")
-            mainDiv.append(text)
-            parent.insertBefore(mainDiv, parent.firstChild)
-
-        }
-
-        console.log(selectData)
     }
 
     async _makeImage(): Promise<void> {
