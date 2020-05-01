@@ -17,6 +17,10 @@ import { nest as d3Nest } from "d3-collection"
 import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate"
 import { ScaleLinear, scaleLinear as d3ScaleLinear } from "d3-scale"
 import { select as d3Select } from "d3-selection"
+import dayjs from "dayjs"
+import customParseFormat from "dayjs/plugin/customParseFormat.js"
+import utc from "dayjs/plugin/utc.js"
+import html2canvas from "html2canvas"
 
 import { registerEvent } from "../../analytics"
 import {
@@ -31,7 +35,7 @@ import {
     repairTime,
     rigRepairsPercent,
 } from "../../../common/common-browser"
-import { isEmpty, putImportError, woodType } from "../../../common/common"
+import { isEmpty, putImportError, WoodType, woodType } from "../../../common/common"
 import { formatPP, formatSignInt, formatSignPercent } from "../../../common/common-format"
 import { ArrayIndex, Index, NestedIndex } from "../../../common/interface"
 import { getOrdinal } from "../../../common/common-math"
@@ -42,7 +46,15 @@ import { Module, ModuleEntity, ModulePropertiesEntity, ShipData, ShipRepairTime 
 
 import { ShipBase, ShipComparison } from "."
 import CompareWoods, { WoodColumnType } from "../compare-woods"
-import { isArray } from "util"
+
+dayjs.extend(customParseFormat)
+dayjs.extend(utc)
+
+interface SelectedData {
+    moduleData: Map<string, string>
+    ship: string
+    wood: string[]
+}
 
 interface ShipSelectMap {
     key: string
@@ -81,8 +93,14 @@ type ModuleType = string
 
 const shipColumnType = ["Base", "C1", "C2"] as const
 type ShipColumnType = typeof shipColumnType[number]
+type Column<T> = {
+    [K in ShipColumnType]: T
+}
 type ColumnArray<T> = {
     [K in ShipColumnType]: T[]
+}
+type ColumnNested<T> = {
+    [K in ShipColumnType]: Index<T>
 }
 type ColumnNestedArray<T> = {
     [K in ShipColumnType]: ArrayIndex<T>
@@ -124,6 +142,7 @@ export class CompareShips {
     private readonly _buttonId: HtmlString
     private readonly _columns: ShipColumnType[]
     private readonly _copyButtonId: HtmlString
+    private readonly _imageButtonId: HtmlString
     private readonly _modalId: HtmlString
     private readonly _moduleId: HtmlString
     private readonly _woodId: HtmlString
@@ -140,6 +159,7 @@ export class CompareShips {
         this._modalId = `modal-${this._baseId}`
         this._moduleId = `${this._baseId}-module`
         this._copyButtonId = `button-copy-${this._baseId}`
+        this._imageButtonId = `button-image-${this._baseId}`
 
         this.colourScaleSpeedDiff = d3ScaleLinear<string, string>()
             .range([colourRedDark, colourWhite, colourGreenDark])
@@ -213,6 +233,28 @@ export class CompareShips {
         }
 
         select$.selectpicker("render")
+    }
+
+    static _saveCanvasAsImage(uri: string): void {
+        const date = dayjs.utc().format("YYYY-MM-DD HH-mm-ss")
+        const fileName = `na-map ship compare ${date}.png`
+        const link = document.createElement("a")
+
+        if (typeof link.download === "string") {
+            link.href = uri
+            link.download = fileName
+
+            // Firefox requires the link to be in the body
+            document.body.append(link)
+
+            // simulate click
+            link.click()
+
+            // remove the link when done
+            link.remove()
+        } else {
+            window.open(uri)
+        }
     }
 
     async CompareShipsInit(): Promise<void> {
@@ -395,6 +437,137 @@ export class CompareShips {
             .range([10, this.innerRadius, this.outerRadius])
     }
 
+    _getShipName(id: number): string {
+        return this._shipData.find((ship) => ship.id === id)?.name ?? ""
+    }
+
+    _getPropertyText(type: string, itemId: string): string {
+        const id = Number(itemId)
+        let propertyText = ""
+
+        if (type === "ship") {
+            propertyText = this._getShipName(id)
+        } else if (type === "module") {
+            propertyText = this._moduleProperties.get(id)?.name.replace(" Bonus", "") ?? ""
+        } else {
+            propertyText = this.woodCompare.getWoodName(type as WoodType, id)
+        }
+
+        return propertyText
+    }
+
+    _getText(type: string, ids: string | string[]): string {
+        if (!Array.isArray(ids)) {
+            const propertyText = this._getPropertyText(type, ids)
+            return `${propertyText}`
+        }
+
+        const texts = [] as string[]
+        for (const id of ids) {
+            const propertyText = this._getPropertyText(type, id)
+            texts.push(propertyText)
+        }
+
+        return `${texts.join(", ")}`
+    }
+
+    _getSelectedData(columnId: ShipColumnType): SelectedData {
+        const selectedData = {
+            moduleData: new Map<string, string>(),
+            ship: "",
+            wood: [] as string[],
+        }
+        if (this._shipIds[columnId]) {
+            selectedData.ship = this._getShipName(this._shipIds[columnId])
+            for (const type of woodType) {
+                selectedData.wood.push(
+                    this.woodCompare.getWoodName(type, Number(this._selectWood$[columnId][type].val()))
+                )
+            }
+
+            if (this._selectedUpgradeIdsPerType[columnId]) {
+                for (const type of [...this._moduleTypes]) {
+                    const text = [] as string[]
+                    for (const id of this._selectedUpgradeIdsPerType[columnId][type]) {
+                        text.push(this._moduleProperties.get(id)?.name.replace(" Bonus", "") ?? "")
+                    }
+
+                    selectedData.moduleData.set(type, text.join(", "))
+                }
+            }
+        }
+
+        return selectedData
+    }
+
+    _printSelectedData(clonedDocument: Document, selectedData: SelectedData, columnId: ShipColumnType): void {
+        const labels = clonedDocument.querySelectorAll<HTMLElement>(`#${this._baseId}-${columnId.toLowerCase()} label`)
+        const parent = labels[0].parentNode as HTMLElement
+        const labelHeight = labels[0].offsetHeight
+        for (const label of labels) {
+            label.remove()
+        }
+
+        const mainDiv = d3Select(parent)
+            .insert("div", ":first-child")
+            .style("height", `${labelHeight * 5}px`)
+        if (selectedData.ship) {
+            mainDiv.append("div").style("margin-bottom", "5px").style("line-height", "1.1").text(selectedData.ship)
+        }
+
+        if (selectedData.wood[0] !== "") {
+            mainDiv
+                .append("div")
+                .style("font-size", "smaller")
+                .style("margin-bottom", "5px")
+                .style("line-height", "1.1")
+                .text(selectedData.wood.join(" | "))
+        }
+
+        for (const [key, value] of selectedData.moduleData) {
+            if (value !== "") {
+                mainDiv
+                    .append("div")
+                    .style("font-size", "small")
+                    .style("margin-bottom", "5px")
+                    .style("line-height", "1.1")
+                    .html(`<em>${key}</em>: ${value}`)
+            }
+        }
+    }
+
+    _replaceSelectsWithText(clonedDocument: Document): void {
+        for (const columnId of this._columns) {
+            const selectedData = this._getSelectedData(columnId)
+            this._printSelectedData(clonedDocument, selectedData, columnId)
+        }
+    }
+
+    async _makeImage(): Promise<void> {
+        const element = document.querySelector(
+            `#${this._modalId} .modal-dialog .modal-content .modal-body`
+        ) as HTMLElement
+        console.log("_makeImage", element.scrollHeight, element.scrollWidth)
+        if (element) {
+            const canvas = await html2canvas(element, {
+                allowTaint: true,
+                foreignObjectRendering: true,
+                ignoreElements: (element) =>
+                    element.classList.contains("central") ||
+                    element.classList.contains("overlay") ||
+                    element.classList.contains("navbar"),
+                logging: true,
+                onclone: (clonedDocument) => {
+                    this._replaceSelectsWithText(clonedDocument)
+                },
+                x: 0,
+                y: 0,
+            })
+
+            CompareShips._saveCanvasAsImage(canvas.toDataURL())
+        }
+    }
+
     /**
      * Action when selected
      */
@@ -413,6 +586,10 @@ export class CompareShips {
             // Copy data to clipboard (click event)
             document.querySelector(`#${this._copyButtonId}`)?.addEventListener("click", (event) => {
                 this._copyDataClicked(event)
+            })
+            // Make image
+            document.querySelector(`#${this._imageButtonId}`)?.addEventListener("click", () => {
+                this._makeImage()
             })
         }
 
@@ -532,6 +709,7 @@ export class CompareShips {
         for (const columnId of this._columns) {
             const div = row
                 .append("div")
+                .attr("id", `${this._baseId}-${columnId.toLowerCase()}`)
                 .attr("class", `col-md-4 ml-auto pt-2 ${columnId === "Base" ? "column-base" : "column-comp"}`)
 
             const shipSelectId = this._getShipSelectId(columnId)
@@ -573,6 +751,14 @@ export class CompareShips {
             .attr("type", "button")
             .append("i")
             .classed("icon icon-copy", true)
+        footer
+            .insert("button", "button")
+            .classed("btn btn-outline-secondary icon-outline-button", true)
+            .attr("id", this._imageButtonId)
+            .attr("title", "Make image")
+            .attr("type", "button")
+            .append("i")
+            .classed("icon icon-image", true)
     }
 
     _initData(): void {
