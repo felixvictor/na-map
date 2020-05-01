@@ -220,14 +220,8 @@ export interface PbZoneBasic {
     joinCircle: Point
     pbCircles: Point[]
 }
-export interface PbZoneRaid {
-    id: number
-    joinCircle: Point
-    raidCircles: Point[]
-    raidPoints: Point[]
-}
 
-export interface PbZone extends PbZoneBasic, PbZoneDefence, PbZoneRaid {
+export interface PbZone extends PbZoneBasic, PbZoneDefence {
     id: number
     position: Point
 }
