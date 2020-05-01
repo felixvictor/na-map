@@ -329,7 +329,7 @@ export default class SelectPorts {
             liveSearch: true,
             liveSearchNormalize: true,
             liveSearchPlaceholder: "Search ...",
-            title: "Show port relations",
+            title: "Show trade relations",
             virtualScroll: true,
         } as BootstrapSelectOptions)
     }
