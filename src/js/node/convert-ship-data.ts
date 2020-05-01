@@ -118,7 +118,7 @@ const shipNames: Map<string, { id: number; master: string }> = new Map([
     ["wasa", { id: 1021, master: "" }],
     ["wasa_prototype", { id: 1938, master: "" }],
     ["yacht", { id: 295, master: "" }],
-    ["yachtsilver", { id: 393, master: "" }]
+    ["yachtsilver", { id: 393, master: "" }],
 ])
 
 const getShipId = (baseFileName: string): number => shipNames.get(baseFileName)?.id ?? 0
@@ -135,24 +135,24 @@ const subFileStructure: SubFileStructure[] = [
         elements: new Map([
             // ["ARMOR_REAR_HP", { group: "stern", element: "armour" }], // removed patch 30
             ["ARMOR_THICKNESS", { group: "stern", element: "thickness" }],
-            ["REPAIR_MODULE_TIME", { group: "repairTime", element: "stern" }]
-        ])
+            ["REPAIR_MODULE_TIME", { group: "repairTime", element: "stern" }],
+        ]),
     },
     {
         ext: "f armor",
         elements: new Map([
             // ["ARMOR_FRONT_HP", { group: "bow", element: "armour" }], // removed patch 30
             ["ARMOR_THICKNESS", { group: "bow", element: "thickness" }],
-            ["REPAIR_MODULE_TIME", { group: "repairTime", element: "bow" }]
-        ])
+            ["REPAIR_MODULE_TIME", { group: "repairTime", element: "bow" }],
+        ]),
     },
     {
         ext: "l armor",
         elements: new Map([
             // ["ARMOR_LEFT_HP", { group: "sides", element: "armour" }], // removed patch 30
             ["ARMOR_THICKNESS", { group: "sides", element: "thickness" }],
-            ["REPAIR_MODULE_TIME", { group: "repairTime", element: "sides" }]
-        ])
+            ["REPAIR_MODULE_TIME", { group: "repairTime", element: "sides" }],
+        ]),
     },
     {
         ext: "hull",
@@ -171,8 +171,8 @@ const subFileStructure: SubFileStructure[] = [
             ["SHIP_STRUCTURE_LEAKS_PER_SECOND", { group: "ship", element: "structureLeaksPerSecond" }],
             ["SHIP_TURNING_ACCELERATION_TIME", { group: "ship", element: "turningAcceleration" }],
             ["SHIP_TURNING_ACCELERATION_TIME_RHEAS", { group: "ship", element: "turningYardAcceleration" }],
-            ["SHIP_WATERLINE_HEIGHT", { group: "ship", element: "waterlineHeight" }]
-        ])
+            ["SHIP_WATERLINE_HEIGHT", { group: "ship", element: "waterlineHeight" }],
+        ]),
     },
     {
         ext: "mast",
@@ -180,8 +180,8 @@ const subFileStructure: SubFileStructure[] = [
             // ["HIT_PROBABILITY", "HIT_PROBABILITY"],
             ["MAST_BOTTOM_SECTION_HP", { group: "mast", element: "bottomArmour" }],
             ["MAST_MIDDLE_SECTION_HP", { group: "mast", element: "middleArmour" }],
-            ["MAST_TOP_SECTION_HP", { group: "mast", element: "topArmour" }]
-        ])
+            ["MAST_TOP_SECTION_HP", { group: "mast", element: "topArmour" }],
+        ]),
     },
     {
         ext: "rudder",
@@ -191,8 +191,8 @@ const subFileStructure: SubFileStructure[] = [
             // ["MODULE_BASE_HP", { group: "rudder", element: "armour" }], // removed patch 30
             ["REPAIR_MODULE_TIME", { group: "repairTime", element: "rudder" }],
             ["RUDDER_HALFTURN_TIME", { group: "rudder", element: "halfturnTime" }],
-            ["SHIP_TURNING_SPEED", { group: "rudder", element: "turnSpeed" }]
-        ])
+            ["SHIP_TURNING_SPEED", { group: "rudder", element: "turnSpeed" }],
+        ]),
     },
     {
         ext: "sail",
@@ -206,18 +206,18 @@ const subFileStructure: SubFileStructure[] = [
             // ["RHEA_TURN_SPEED", "RHEA_TURN_SPEED"],
             ["SAIL_RISING_SPEED", { group: "sails", element: "risingSpeed" }],
             ["SAILING_CREW_REQUIRED", { group: "crew", element: "sailing" }],
-            ["SHIP_MAX_SPEED", { group: "ship", element: "maxSpeed" }]
+            ["SHIP_MAX_SPEED", { group: "ship", element: "maxSpeed" }],
             // ["SPANKER_TURN_SPEED", { group: "sails", element: "spankerTurnSpeed" }]
-        ])
+        ]),
     },
     {
         ext: "structure",
         elements: new Map([
             // ["EXPLOSION_DAMAGE_ABSORB_MULTIPLIER", "EXPLOSION_DAMAGE_ABSORB_MULTIPLIER"],
             // ["MODULE_BASE_HP", { group: "structure", element: "armour" }], // removed patch 30
-            ["REPAIR_MODULE_TIME", { group: "repairTime", element: "structure" }]
-        ])
-    }
+            ["REPAIR_MODULE_TIME", { group: "repairTime", element: "structure" }],
+        ]),
+    },
 ]
 
 let apiItems: APIItemGeneric[]
@@ -227,24 +227,24 @@ let ships: ShipData[]
  * Get item names
  * @returns Item names
  */
-const getItemNames = (): Map<number, string> => new Map(apiItems.map(item => [item.Id, cleanName(item.Name)]))
+const getItemNames = (): Map<number, string> => new Map(apiItems.map((item) => [item.Id, cleanName(item.Name)]))
 
 /**
  * Get ship mass
  * @param id - Ship id
  * @returns Ship mass
  */
-const getShipMass = (id: number): number => apiItems.find(apiItem => id === apiItem.Id)?.ShipMass ?? 0
+const getShipMass = (id: number): number => apiItems.find((apiItem) => id === apiItem.Id)?.ShipMass ?? 0
 
 const convertGenericShipData = (): ShipData[] => {
     // noinspection MagicNumberJS
     const cannonWeight = [0, 42, 32, 24, 18, 12, 9, 0, 6, 4, 3, 2]
     // noinspection MagicNumberJS
     const carroWeight = [0, 0, 68, 42, 32, 24, 0, 18, 12]
-    return ((apiItems.filter(item => item.ItemType === "Ship" && !item.NotUsed) as unknown) as APIShip[]).map(
+    return ((apiItems.filter((item) => item.ItemType === "Ship" && !item.NotUsed) as unknown) as APIShip[]).map(
         (ship: APIShip): ShipData => {
             const calcPortSpeed = ship.Specs.MaxSpeed * speedConstA - speedConstB
-            const speedDegrees = ship.Specs.SpeedToWind.map(speed => roundToThousands(speed * calcPortSpeed))
+            const speedDegrees = ship.Specs.SpeedToWind.map((speed) => roundToThousands(speed * calcPortSpeed))
             const { length } = ship.Specs.SpeedToWind
 
             // Mirror speed degrees
@@ -255,9 +255,9 @@ const convertGenericShipData = (): ShipData[] => {
             // Delete last element
             speedDegrees.pop()
 
-            const deckClassLimit = ship.DeckClassLimit.map(deck => [
+            const deckClassLimit = ship.DeckClassLimit.map((deck) => [
                 cannonWeight[deck.Limitation1.Min],
-                carroWeight[deck.Limitation2.Min]
+                carroWeight[deck.Limitation2.Min],
             ])
             const gunsPerDeck = ship.GunsPerDeck
             // Delete mortar entry
@@ -284,17 +284,17 @@ const convertGenericShipData = (): ShipData[] => {
             const broadside = { cannons: cannonBroadside, carronades: carronadesBroadside }
 
             const frontDeck = ship.FrontDecks
-                ? ship.FrontDeckClassLimit.map(deck => [
+                ? ship.FrontDeckClassLimit.map((deck) => [
                       cannonWeight[deck.Limitation1.Min],
-                      carroWeight[deck.Limitation2.Min]
+                      carroWeight[deck.Limitation2.Min],
                   ])[0]
                 : emptyDeck
             deckClassLimit.push(frontDeck)
 
             const backDeck = ship.BackDecks
-                ? ship.BackDeckClassLimit.map(deck => [
+                ? ship.BackDeckClassLimit.map((deck) => [
                       cannonWeight[deck.Limitation1.Min],
-                      carroWeight[deck.Limitation2.Min]
+                      carroWeight[deck.Limitation2.Min],
                   ])[0]
                 : emptyDeck
             deckClassLimit.push(backDeck)
@@ -316,7 +316,7 @@ const convertGenericShipData = (): ShipData[] => {
                 speedDegrees,
                 speed: {
                     min: speedDegrees.reduce((a, b) => Math.min(a, b)),
-                    max: roundToThousands(calcPortSpeed)
+                    max: roundToThousands(calcPortSpeed),
                 },
                 sides: { armour: ship.HealthInfo.LeftArmor, thickness: 0 },
                 bow: { armour: ship.HealthInfo.FrontArmor, thickness: 0 },
@@ -328,7 +328,7 @@ const convertGenericShipData = (): ShipData[] => {
                     armour: ship.HealthInfo.Rudder,
                     turnSpeed: 0,
                     halfturnTime: 0,
-                    thickness: 0
+                    thickness: 0,
                 },
                 upgradeXP: ship.OverrideTotalXpForUpgradeSlots,
                 repairTime: { stern: 120, bow: 120, sides: 120, rudder: 30, sails: 120, structure: 60 },
@@ -340,7 +340,7 @@ const convertGenericShipData = (): ShipData[] => {
                     acceleration: 0,
                     turningAcceleration: 0,
                     turningYardAcceleration: 0,
-                    maxSpeed: 0
+                    maxSpeed: 0,
                 },
                 mast: {
                     bottomArmour: 0,
@@ -348,10 +348,10 @@ const convertGenericShipData = (): ShipData[] => {
                     topArmour: 0,
                     bottomThickness: 0,
                     middleThickness: 0,
-                    topThickness: 0
+                    topThickness: 0,
                 },
                 premium: ship.Premium,
-                tradeShip: ship.ShipType === 1
+                tradeShip: ship.ShipType === 1,
                 // hostilityScore: ship.HostilityScore
             } as ShipData
         }
@@ -424,8 +424,8 @@ const getAddData = (elements: ElementMap, fileData: XmlGeneric): ShipData => {
 const addAddData = (addData: ShipData, id: number): void => {
     // Find current ship
     ships
-        .filter(ship => ship.id === id)
-        .forEach(ship => {
+        .filter((ship) => ship.id === id)
+        .forEach((ship) => {
             // Get all data for each group
             for (const [group, values] of Object.entries(addData)) {
                 if (!ship[group]) {
@@ -523,56 +523,56 @@ const convertAddShipData = (ships: ShipData[]): ShipData[] => {
 const convertShipBlueprints = async (): Promise<void> => {
     const itemNames = getItemNames()
     const shipBlueprints = ((apiItems.filter(
-        apiItem => !apiItem.NotUsed && apiItem.ItemType === "RecipeShip"
+        (apiItem) => !apiItem.NotUsed && apiItem.ItemType === "RecipeShip"
     ) as unknown) as APIShipBlueprint[])
-        .map(apiBlueprint => {
+        .map((apiBlueprint) => {
             const shipMass = getShipMass(apiBlueprint.Results[0].Template)
             return {
                 id: apiBlueprint.Id,
                 name: cleanName(apiBlueprint.Name).replace(" Blueprint", ""),
                 wood: [
                     { name: "Frame", amount: apiBlueprint.WoodTypeDescs[0].Requirements[0].Amount },
-                    { name: "Planking", amount: Math.round(shipMass * plankingRatio) },
-                    { name: "Crew Space", amount: Math.round(shipMass * crewSpaceRatio) }
+                    { name: "Planking", amount: Math.round(shipMass * plankingRatio + 0.5) },
+                    { name: "Crew Space", amount: Math.round(shipMass * crewSpaceRatio + 0.5) },
                 ],
                 resources: apiBlueprint.FullRequirements.filter(
-                    requirement =>
+                    (requirement) =>
                         !(
                             (itemNames.get(requirement.Template)?.endsWith(" Permit") ??
                                 itemNames.get(requirement.Template) === "Doubloons") ||
                             itemNames.get(requirement.Template) === "Provisions"
                         )
-                ).map(requirement => ({
+                ).map((requirement) => ({
                     name: itemNames.get(requirement.Template)?.replace(" Log", ""),
-                    amount: requirement.Amount
+                    amount: requirement.Amount,
                 })),
                 provisions:
                     (
                         apiBlueprint.FullRequirements.find(
-                            requirement => itemNames.get(requirement.Template) === "Provisions"
+                            (requirement) => itemNames.get(requirement.Template) === "Provisions"
                         ) ?? {}
                     ).Amount ?? 0,
                 doubloons:
                     (
                         apiBlueprint.FullRequirements.find(
-                            requirement => itemNames.get(requirement.Template) === "Doubloons"
+                            (requirement) => itemNames.get(requirement.Template) === "Doubloons"
                         ) ?? {}
                     ).Amount ?? 0,
                 permit:
                     (
-                        apiBlueprint.FullRequirements.find(requirement =>
+                        apiBlueprint.FullRequirements.find((requirement) =>
                             itemNames.get(requirement.Template)?.endsWith(" Permit")
                         ) ?? {}
                     ).Amount ?? 0,
                 ship: {
                     id: apiBlueprint.Results[0].Template,
                     name: itemNames.get(apiBlueprint.Results[0].Template),
-                    mass: shipMass
+                    mass: shipMass,
                 },
                 shipyardLevel: apiBlueprint.BuildingRequirements[0].Level + 1,
                 craftLevel: apiBlueprint.RequiresLevel,
                 craftXP: apiBlueprint.GivesXP,
-                labourHours: apiBlueprint.LaborPrice
+                labourHours: apiBlueprint.LaborPrice,
             }
         })
         // Sort by name
@@ -620,9 +620,7 @@ const convertShips = async (): Promise<void> => {
 }
 
 export const convertShipData = async (): Promise<void> => {
-    apiItems = (readJson(
-        path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`)
-    ) as unknown) as APIItemGeneric[]
+    apiItems = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`))
     await convertShips()
     await convertShipBlueprints()
 }
