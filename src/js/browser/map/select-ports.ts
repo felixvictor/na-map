@@ -51,9 +51,6 @@ interface SelectPort {
     nation: NationShortName
 }
 
-const frontlinesType = ["attacking", "defending"] as const
-export type FrontlinesType = typeof frontlinesType[number]
-
 export default class SelectPorts {
     isInventorySelected: boolean
     private _ports: DisplayPorts

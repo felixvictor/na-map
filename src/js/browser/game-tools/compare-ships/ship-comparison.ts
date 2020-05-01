@@ -33,9 +33,11 @@ import {
 import { rotationAngleInDegrees } from "../../util"
 import { default as shipIcon } from "Icons/icon-ship.svg"
 
-import { ShipData } from "../../../common/gen-json"
+import { Ship } from "./ship"
+import { CompareShips } from "./compare-ships"
 
-import { CompareShips, DragData, Ship, ShipDisplayData } from "."
+import { ShipData } from "../../../common/gen-json"
+import { DragData, ShipDisplayData } from "./types"
 
 export class ShipComparison extends Ship {
     // Ship data of the ship to be compared to
