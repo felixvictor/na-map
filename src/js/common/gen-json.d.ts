@@ -14,11 +14,10 @@ import { ModifiersEntity } from "../node/api-item"
 import { Point } from "./common-math"
 import { ValuesType } from "utility-types"
 
-import { LootType } from "../browser/game-tools/list-loot"
 import { CannonType, NationFullName, NationShortName, NationShortNameAlternative } from "./common"
 import { ArrayIndex } from "./interface"
 import { Group } from "timelines-chart"
-import { FrontlinesType } from "../browser/map/select-ports"
+import { FrontlinesType, LootType } from "./types"
 
 /****************************
  * buildings.json

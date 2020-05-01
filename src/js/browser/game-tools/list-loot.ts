@@ -1,4 +1,3 @@
-/* eslint-disable no-irregular-whitespace */
 /*!
  * This file is part of na-map.
  *
@@ -29,9 +28,7 @@ import {
 } from "../../common/gen-json"
 import { putImportError } from "../../common/common"
 import { sortBy } from "../../common/common-node"
-
-const lootType = ["loot", "chests", "items"] as const
-export type LootType = typeof lootType[number]
+import { LootType } from "../../common/types"
 
 export default class ListLoot {
     private readonly _baseName: string
@@ -222,6 +219,7 @@ export default class ListLoot {
     }
 
     _getItemsText(items: LootItemsEntity[]): TemplateResult {
+        /* eslint-disable no-irregular-whitespace */
         return html`
             <table class="table table-sm small">
                 <thead>
