@@ -137,6 +137,15 @@ export interface LootItemsEntity {
     chance: number
     amount: LootAmount
 }
+export interface ChestItemsEntity {
+    id: number
+    name: string
+    amount: LootAmount
+}
+export interface ChestGroup {
+    chance: number
+    items: ChestItemsEntity[]
+}
 interface LootAmount {
     min: number
     max: number
@@ -146,7 +155,7 @@ interface LootChestsEntity {
     name: string
     weight: number
     lifetime: number
-    items: LootItemsEntity[]
+    itemGroup: ChestGroup[]
 }
 
 /****************************
