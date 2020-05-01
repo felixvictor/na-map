@@ -30,8 +30,8 @@ $icon-dir: "~Icons";
     background-color: $primary-100;
 }
 
-$icon-list: bar-chart calendar chevron-bottom chevron-left chevron-right chevron-top clear clock close copy gift info
-    map options;
+$icon-list: bar-chart calendar chevron-bottom chevron-left chevron-right chevron-top clear clock close copy gift image
+    info map options;
 
 @each $icon in $icon-list {
     .icon-#{$icon} {
