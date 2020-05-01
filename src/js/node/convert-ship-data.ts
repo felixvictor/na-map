@@ -241,11 +241,18 @@ const convertGenericShipData = (): ShipData[] => {
     const cannonWeight = [0, 42, 32, 24, 18, 12, 9, 0, 6, 4, 3, 2]
     // noinspection MagicNumberJS
     const carroWeight = [0, 0, 68, 42, 32, 24, 0, 18, 12]
+    const shipsWith36lb = new Set(["Admiraal de Ruyter", "Implacable", "Redoutable"])
+
     return ((apiItems.filter((item) => item.ItemType === "Ship" && !item.NotUsed) as unknown) as APIShip[]).map(
         (ship: APIShip): ShipData => {
             const calcPortSpeed = ship.Specs.MaxSpeed * speedConstA - speedConstB
             const speedDegrees = ship.Specs.SpeedToWind.map((speed) => roundToThousands(speed * calcPortSpeed))
             const { length } = ship.Specs.SpeedToWind
+            if (shipsWith36lb.has(ship.Name)) {
+                cannonWeight[2] = 36
+            } else {
+                cannonWeight[2] = 32
+            }
 
             // Mirror speed degrees
             for (let i = 1; i < (length - 1) * 2; i += 2) {
