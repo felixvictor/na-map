@@ -545,7 +545,10 @@ export class CompareShips {
         }
     }
 
-    async _makeImage(): Promise<void> {
+    async _makeImage(event: Event): Promise<void> {
+        registerEvent("Menu", "Ship compare image")
+        event.preventDefault()
+
         const element = document.querySelector(
             `#${this._modalId} .modal-dialog .modal-content .modal-body`
         ) as HTMLElement
@@ -590,8 +593,8 @@ export class CompareShips {
                 this._copyDataClicked(event)
             })
             // Make image
-            document.querySelector(`#${this._imageButtonId}`)?.addEventListener("click", () => {
-                this._makeImage()
+            document.querySelector(`#${this._imageButtonId}`)?.addEventListener("click", (event) => {
+                this._makeImage(event)
             })
         }
 
