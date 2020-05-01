@@ -14,7 +14,8 @@ import * as d3Selection from "d3-selection"
 
 import { HtmlString, numberSegments } from "../../../common/common-browser"
 
-import { CompareShips, ShipDisplayData } from "."
+import { CompareShips } from "./compare-ships"
+import { ShipDisplayData } from "./types"
 
 export class Ship {
     readonly ticksSpeed: number[]

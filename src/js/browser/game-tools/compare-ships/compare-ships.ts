@@ -42,10 +42,12 @@ import { getOrdinal } from "../../../common/common-math"
 import { sortBy } from "../../../common/common-node"
 import { copyToClipboard } from "../../util"
 
-import { Module, ModuleEntity, ModulePropertiesEntity, ShipData, ShipRepairTime } from "../../../common/gen-json"
-
-import { ShipBase, ShipComparison } from "."
 import CompareWoods, { WoodColumnType } from "../compare-woods"
+
+import { ShipBase } from "./ship-base"
+import { ShipComparison } from "./ship-comparison"
+
+import { Module, ModuleEntity, ModulePropertiesEntity, ShipData, ShipRepairTime } from "../../../common/gen-json"
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
