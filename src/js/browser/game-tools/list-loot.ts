@@ -29,7 +29,6 @@ import {
     LootLootEntity,
     LootTypeList,
     LootChestItemsEntity,
-    LootChestGroup,
 } from "../../common/gen-json"
 import { LootType } from "../../common/types"
 
@@ -132,7 +131,7 @@ export default class ListLoot {
             source: LootLootEntity | LootChestsEntity,
             item: LootLootItemsEntity | LootChestItemsEntity,
             chance: number
-        ) => {
+        ): void => {
             const sourceDetail = new Map<number, SourceDetail>([
                 [source.id, { id: source.id, name: source.name, chance, amount: item.amount }],
             ])
@@ -315,7 +314,8 @@ export default class ListLoot {
 
     _getChestsText(): TemplateResult {
         const currentChest = this.#chestsData.find((item) => item.id === this.#selectedItemId)!
-        const h = html`
+
+        return html`
             <p>Weight ${formatInt(currentChest.weight)} tons<br />Lifetime ${formatInt(currentChest.lifetime)} hours</p>
             ${repeat(
                 currentChest.itemGroup,
@@ -324,15 +324,6 @@ export default class ListLoot {
                     ${this._getLootItemsText(group.items.sort(sortBy(["name"])), false)}`
             )}
         `
-
-        /*
-            for (const group of currentChest.itemGroup) {
-                const items = group.items.sort(sortBy(["name"]))
-                h += html``
-                h + =this._getLootItemsText(items)
-            }
-          */
-        return h
     }
 
     _getLootText(): TemplateResult {
