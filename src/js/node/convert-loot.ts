@@ -24,11 +24,11 @@ import {
     APIShipLootTableItem,
 } from "./api-item"
 import {
-    ChestGroup,
-    ChestItemsEntity,
+    LootChestGroup,
+    LootChestItemsEntity,
     Loot,
     LootChestsEntity,
-    LootItemsEntity,
+    LootLootItemsEntity,
     LootLootEntity,
 } from "../common/gen-json"
 
@@ -68,9 +68,9 @@ const convertLoot = async (): Promise<void> => {
         return lootTable[0].Items[0].Chance
     }
 
-    const getLootItems = (lootItems: ItemsEntity[], itemProbability: number[]): LootItemsEntity[] =>
+    const getLootItems = (lootItems: ItemsEntity[], itemProbability: number[]): LootLootItemsEntity[] =>
         lootItems.map(
-            (item): LootItemsEntity => ({
+            (item): LootLootItemsEntity => ({
                 id: Number(item.Template),
                 name: itemNames.get(Number(item.Template)) ?? "",
                 chance: itemProbability.length > 0 ? Number(itemProbability[Number(item.Chance)]) : Number(item.Chance),
@@ -78,14 +78,14 @@ const convertLoot = async (): Promise<void> => {
             })
         )
 
-    const getChestItems = (lootItems: ItemsEntity[]): ChestItemsEntity[] =>
+    const getChestItems = (lootItems: ItemsEntity[]): LootChestItemsEntity[] =>
         lootItems.map((item) => ({
             id: Number(item.Template),
             name: itemNames.get(Number(item.Template)) ?? "",
             amount: { min: Number(item.Stack?.Min), max: Number(item.Stack?.Max) },
         }))
 
-    const getChestItemsFromChestLootTable = (chestLootTableId: number): ChestItemsEntity[] =>
+    const getChestItemsFromChestLootTable = (chestLootTableId: number): LootChestItemsEntity[] =>
         apiItems
             .filter((item) => Number(item.Id) === chestLootTableId)
             .flatMap((item) => getChestItems(item.Items ?? []))
