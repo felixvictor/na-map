@@ -126,36 +126,33 @@ export type LootTypeList<T> = {
     [K in LootType]: T
 }
 export type Loot = LootTypeList<LootLootEntity[] | LootChestsEntity[]>
-interface LootLootEntity {
+interface LootGenericEntity {
     id: number
     name: string
-    items: LootItemsEntity[]
 }
-export interface LootItemsEntity {
+interface LootLootEntity extends LootGenericEntity {
+    items: LootLootItemsEntity[]
+}
+interface LootChestsEntity extends LootGenericEntity {
+    weight: number
+    lifetime: number
+    itemGroup: LootChestGroup[]
+}
+export interface LootChestGroup {
+    chance: number
+    items: LootChestItemsEntity[]
+}
+export interface LootChestItemsEntity {
     id: number
     name: string
-    chance: number
     amount: LootAmount
 }
-export interface ChestItemsEntity {
-    id: number
-    name: string
-    amount: LootAmount
-}
-export interface ChestGroup {
+export interface LootLootItemsEntity extends LootChestItemsEntity {
     chance: number
-    items: ChestItemsEntity[]
 }
 interface LootAmount {
     min: number
     max: number
-}
-interface LootChestsEntity {
-    id: number
-    name: string
-    weight: number
-    lifetime: number
-    itemGroup: ChestGroup[]
 }
 
 /****************************
