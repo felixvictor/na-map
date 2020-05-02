@@ -16,63 +16,69 @@ import { html, render, TemplateResult } from "lit-html"
 import { repeat } from "lit-html/directives/repeat"
 
 import { registerEvent } from "../analytics"
-import { formatInt } from "../../common/common-format"
+import { putImportError } from "../../common/common"
 import { HtmlString, insertBaseModalHTML } from "../../common/common-browser"
+import { formatInt } from "../../common/common-format"
+import { sortBy } from "../../common/common-node"
+
 import {
     Loot,
     LootAmount,
     LootChestsEntity,
-    LootItemsEntity,
+    LootLootItemsEntity,
     LootLootEntity,
     LootTypeList,
+    LootChestItemsEntity,
+    LootChestGroup,
 } from "../../common/gen-json"
-import { putImportError } from "../../common/common"
-import { sortBy } from "../../common/common-node"
 import { LootType } from "../../common/types"
 
 export default class ListLoot {
-    private readonly _baseName: string
-    private readonly _baseId: HtmlString
-    private readonly _buttonId: HtmlString
-    private readonly _modalId: HtmlString
-    private readonly _types: LootType[] = ["loot", "chests", "items"]
-    private _sourceData: Loot = {} as Loot
-    private _selectedType: LootType
-    private readonly _selectId: LootTypeList<HtmlString> = {} as LootTypeList<HtmlString>
-    private _select$: LootTypeList<JQuery> = {} as LootTypeList<JQuery>
-    private _selectedItemId = 0
-    private _mainDiv!: HTMLDivElement
-    private _items!: Map<number, { name: string; sources: Map<number, LootItemsEntity> }>
+    readonly #baseName: string
+    readonly #baseId: HtmlString
+    readonly #buttonId: HtmlString
+    readonly #modalId: HtmlString
+    readonly #types: LootType[] = ["loot", "chests", "items"]
+    #selectedType: LootType
+    readonly #selectId: LootTypeList<HtmlString> = {} as LootTypeList<HtmlString>
+    #select$: LootTypeList<JQuery> = {} as LootTypeList<JQuery>
+    #selectedItemId = 0
+    #mainDiv!: HTMLDivElement
+    #items!: Map<number, { name: string; sources: Map<number, LootLootItemsEntity> }>
+    #lootData!: LootLootEntity[]
+    #chestsData!: LootChestsEntity[]
 
     constructor() {
-        this._baseName = "List loot and chests"
-        this._baseId = "loot-list"
-        this._buttonId = `button-${this._baseId}`
-        this._modalId = `modal-${this._baseId}`
+        this.#baseName = "List loot and chests"
+        this.#baseId = "loot-list"
+        this.#buttonId = `button-${this.#baseId}`
+        this.#modalId = `modal-${this.#baseId}`
 
-        for (const type of this._types) {
-            this._selectId[type] = `${this._baseId}-${type}-select`
+        for (const type of this.#types) {
+            this.#selectId[type] = `${this.#baseId}-${type}-select`
         }
 
-        this._selectedType = "" as LootType
+        this.#selectedType = "" as LootType
 
         this._setupListener()
     }
 
-    static _getAmount(amount: LootAmount): string {
+    static _printAmount(amount: LootAmount): string {
         return amount.min === amount.max
             ? formatInt(amount.min)
             : `${formatInt(amount.min)} to ${formatInt(amount.max)}`
     }
 
-    static _getChance(chance: number): string {
+    static _printChance(chance: number): string {
         return formatInt((1 - chance) * 100)
     }
 
     async _loadAndSetupData(): Promise<void> {
         try {
-            this._sourceData = (await import(/* webpackChunkName: "data-loot" */ "Lib/gen-generic/loot.json"))
+            const sourceData = (await import(/* webpackChunkName: "data-loot" */ "Lib/gen-generic/loot.json"))
                 .default as Loot
+            this.#lootData = sourceData.loot as LootLootEntity[]
+            this.#chestsData = sourceData.chests as LootChestsEntity[]
         } catch (error) {
             putImportError(error)
         }
@@ -81,54 +87,88 @@ export default class ListLoot {
     _setupListener(): void {
         let firstClick = true
 
-        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", async (event) => {
+        document.querySelector(`#${this.#buttonId}`)?.addEventListener("click", async (event) => {
             if (firstClick) {
                 firstClick = false
                 await this._loadAndSetupData()
             }
 
-            registerEvent("Tools", this._baseName)
+            registerEvent("Tools", this.#baseName)
             event.stopPropagation()
             this._sourceListSelected()
         })
     }
 
-    _getOptions(type: LootType): TemplateResult {
-        if (type !== "items") {
-            return html`
-                ${repeat(
-                    this._sourceData[type].sort(sortBy(["name"])),
-                    (item) => item.id,
-                    (item) => html`<option value="${item.id}">${item.name}</option>`
-                )}
-            `
+    _getLootOptions(): TemplateResult {
+        return html`
+            ${repeat(
+                this.#lootData.sort(sortBy(["name"])),
+                (item) => item.id,
+                (item) => html`<option value="${item.id}">${item.name}</option>`
+            )}
+        `
+    }
+
+    _getChestsOptions(): TemplateResult {
+        return html`
+            ${repeat(
+                this.#chestsData.sort(sortBy(["name"])),
+                (item) => item.id,
+                (item) => html`<option value="${item.id}">${item.name}</option>`
+            )}
+        `
+    }
+
+    _getItemsOptions(): TemplateResult {
+        interface SourceDetail {
+            id: number
+            name: string
+            chance: number
+            amount: LootAmount
+        }
+        const optionItems = new Map<number, { name: string; sources: Map<number, SourceDetail> }>()
+
+        const setOptionItems = (
+            source: LootLootEntity | LootChestsEntity,
+            item: LootLootItemsEntity | LootChestItemsEntity,
+            chance: number
+        ) => {
+            const sourceDetail = new Map<number, SourceDetail>([
+                [source.id, { id: source.id, name: source.name, chance, amount: item.amount }],
+            ])
+
+            optionItems.set(item.id, {
+                name: item.name,
+                sources: optionItems.has(item.id)
+                    ? new Map([...optionItems.get(item.id)!.sources, ...sourceDetail])
+                    : sourceDetail,
+            })
         }
 
-        const items = new Map<number, { name: string; sources: Map<number, LootItemsEntity> }>()
-        const types = this._types.filter((type) => type !== "items")
-        for (const type of types) {
-            for (const source of this._sourceData[type]) {
-                for (const item of source.items) {
-                    const sourceDetail = new Map<number, LootItemsEntity>([
-                        [source.id, { id: source.id, name: source.name, chance: item.chance, amount: item.amount }],
-                    ])
+        // Loot
+        for (const loot of this.#lootData) {
+            const { items } = loot
+            for (const item of items) {
+                setOptionItems(loot, item, item.chance)
+            }
+        }
 
-                    items.set(item.id, {
-                        name: item.name,
-                        sources: items.has(item.id)
-                            ? new Map([...items.get(item.id)!.sources, ...sourceDetail])
-                            : sourceDetail,
-                    })
+        // Chests
+        for (const chest of this.#chestsData) {
+            for (const group of chest.itemGroup) {
+                const { items } = group
+                for (const item of items) {
+                    setOptionItems(chest, item, group.chance)
                 }
             }
         }
 
         // Sort by name
-        this._items = new Map([...items.entries()].sort((a, b) => a[1].name.localeCompare(b[1].name)))
+        this.#items = new Map([...optionItems.entries()].sort((a, b) => a[1].name.localeCompare(b[1].name)))
 
         return html`
             ${repeat(
-                this._items,
+                this.#items,
                 (value, key) => key,
                 (value) => {
                     return html`<option value="${value[0]}">${value[1].name}</option>`
@@ -137,21 +177,37 @@ export default class ListLoot {
         `
     }
 
+    _getOptions(type: LootType): TemplateResult {
+        if (type === "items") {
+            return this._getItemsOptions()
+        }
+
+        if (type === "chests") {
+            return this._getChestsOptions()
+        }
+
+        if (type === "loot") {
+            return this._getLootOptions()
+        }
+
+        return html``
+    }
+
     _getModalBody(): TemplateResult {
         return html`
             ${repeat(
-                this._types,
+                this.#types,
                 (type) => type,
                 (type) =>
                     html`
                         <label>
-                            <select id="${this._selectId[type]}" class="selectpicker">
+                            <select id="${this.#selectId[type]}" class="selectpicker">
                                 ${this._getOptions(type)}
                             </select>
                         </label>
                     `
             )}
-            <div id="${this._baseId}"></div>
+            <div id="${this.#baseId}"></div>
         `
     }
 
@@ -166,8 +222,8 @@ export default class ListLoot {
     _injectModal(): void {
         render(
             insertBaseModalHTML({
-                id: this._modalId,
-                title: this._baseName,
+                id: this.#modalId,
+                title: this.#baseName,
                 size: "md",
                 body: this._getModalBody.bind(this),
                 footer: this._getModalFooter,
@@ -177,10 +233,10 @@ export default class ListLoot {
     }
 
     _setupSelectListeners(): void {
-        for (const type of this._types) {
-            this._select$[type]
+        for (const type of this.#types) {
+            this.#select$[type]
                 .on("change", () => {
-                    this._selectedType = type
+                    this.#selectedType = type
                     this._itemSelected()
                 })
                 .selectpicker({
@@ -196,9 +252,9 @@ export default class ListLoot {
 
     _initModal(): void {
         this._injectModal()
-        this._mainDiv = document.querySelector(`#${this._baseId}`) as HTMLDivElement
-        for (const type of this._types) {
-            this._select$[type] = $(`#${this._selectId[type]}`)
+        this.#mainDiv = document.querySelector(`#${this.#baseId}`) as HTMLDivElement
+        for (const type of this.#types) {
+            this.#select$[type] = $(`#${this.#selectId[type]}`)
         }
 
         this._setupSelectListeners()
@@ -206,26 +262,22 @@ export default class ListLoot {
 
     _sourceListSelected(): void {
         // If the modal has no content yet, insert it
-        if (!document.querySelector(`#${this._modalId}`)) {
+        if (!document.querySelector(`#${this.#modalId}`)) {
             this._initModal()
         }
 
         // Show modal
-        $(`#${this._modalId}`).modal("show")
+        $(`#${this.#modalId}`).modal("show")
     }
 
-    _getItemData(selectedItemId: number): LootLootEntity | LootChestsEntity {
-        return this._sourceData[this._selectedType].find((item) => item.id === selectedItemId)!
-    }
-
-    _getItemsText(items: LootItemsEntity[]): TemplateResult {
+    _getLootItemsText(items: Array<LootLootItemsEntity | LootChestItemsEntity>, chance = true): TemplateResult {
         /* eslint-disable no-irregular-whitespace */
         return html`
             <table class="table table-sm small">
                 <thead>
                     <tr>
                         <th scope="col">Item</th>
-                        <th scope="col" class="text-right">Chance (0 − 100)</th>
+                        ${chance ? html`<th scope="col" class="text-right">Chance (0 − 100)</th>` : ""}
                         <th scope="col" class="text-right">Amount</th>
                     </tr>
                 </thead>
@@ -237,11 +289,13 @@ export default class ListLoot {
                             html`
                                 <tr>
                                     <td>${item.name}</td>
+                                    ${chance
+                                        ? html` <td class="text-right">
+                                              ${ListLoot._printChance((item as LootLootItemsEntity).chance)}
+                                          </td>`
+                                        : ""}
                                     <td class="text-right">
-                                        ${ListLoot._getChance(item.chance)}
-                                    </td>
-                                    <td class="text-right">
-                                        ${ListLoot._getAmount(item.amount)}
+                                        ${ListLoot._printAmount(item.amount)}
                                     </td>
                                 </tr>
                             `
@@ -251,43 +305,53 @@ export default class ListLoot {
         `
     }
 
-    _getLootText(currentItem: LootLootEntity): TemplateResult {
-        return html`${this._getItemsText(currentItem.items)}`
-    }
-
-    _getChestText(currentItem: LootChestsEntity): TemplateResult {
-        return html`
-            <p>Weight ${formatInt(currentItem.weight)} tons<br />Lifetime ${formatInt(currentItem.lifetime)} hours</p>
-            ${this._getItemsText(currentItem.items)}
-        `
-    }
-
     _getSourceText(): TemplateResult {
-        const items = [...this._items.get(this._selectedItemId)!.sources]
+        const items = [...this.#items.get(this.#selectedItemId)!.sources]
             .map((value) => value[1])
             .sort(sortBy(["chance", "name"]))
 
-        return html`${this._getItemsText(items)}`
+        return html`${this._getLootItemsText(items)}`
     }
 
-    _resetOtherSelects(): void {
-        const types = this._types.filter((type) => type !== this._selectedType)
-        for (const type of types) {
-            this._select$[type].val("default").selectpicker("refresh")
-        }
+    _getChestsText(): TemplateResult {
+        const currentChest = this.#chestsData.find((item) => item.id === this.#selectedItemId)!
+        const h = html`
+            <p>Weight ${formatInt(currentChest.weight)} tons<br />Lifetime ${formatInt(currentChest.lifetime)} hours</p>
+            ${repeat(
+                currentChest.itemGroup,
+                (group) => group,
+                (group) => html` <h6>Group chance: ${ListLoot._printChance(group.chance)}</h6>
+                    ${this._getLootItemsText(group.items.sort(sortBy(["name"])), false)}`
+            )}
+        `
+
+        /*
+            for (const group of currentChest.itemGroup) {
+                const items = group.items.sort(sortBy(["name"]))
+                h += html``
+                h + =this._getLootItemsText(items)
+            }
+          */
+        return h
+    }
+
+    _getLootText(): TemplateResult {
+        const currentItem = this.#lootData.find((item) => item.id === this.#selectedItemId)!
+        const items = currentItem.items.sort(sortBy(["chance", "name"]))
+
+        return html`${this._getLootItemsText(items)}`
     }
 
     _getText(): TemplateResult {
-        if (this._selectedType === "items") {
+        if (this.#selectedType === "items") {
             return this._getSourceText()
         }
 
-        const currentItem = this._getItemData(this._selectedItemId)
-        currentItem.items = currentItem.items.sort(sortBy(["chance", "name"]))
+        if (this.#selectedType === "chests") {
+            return this._getChestsText()
+        }
 
-        return this._selectedType === "loot"
-            ? this._getLootText(currentItem as LootLootEntity)
-            : this._getChestText(currentItem as LootChestsEntity)
+        return this._getLootText()
     }
 
     /**
@@ -301,16 +365,23 @@ export default class ListLoot {
         `
     }
 
+    _resetOtherSelects(): void {
+        const types = this.#types.filter((type) => type !== this.#selectedType)
+        for (const type of types) {
+            this.#select$[type].val("default").selectpicker("refresh")
+        }
+    }
+
     /**
      * Show items for selected loot or chest
      */
     _itemSelected(): void {
-        const currentItem$ = this._select$[this._selectedType].find(":selected")
-        this._selectedItemId = Number(currentItem$.val())
+        const currentItem$ = this.#select$[this.#selectedType].find(":selected")
+        this.#selectedItemId = Number(currentItem$.val())
 
         this._resetOtherSelects()
 
         // Add new list
-        render(this._getTable(), this._mainDiv)
+        render(this._getTable(), this.#mainDiv)
     }
 }
