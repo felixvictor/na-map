@@ -10385,6 +10385,7 @@ svg .axis {
 }
 
 .here {
+  opacity: 0.3;
   fill: #fdfdfd;
 }
 
