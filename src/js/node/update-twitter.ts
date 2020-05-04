@@ -198,7 +198,7 @@ const captured = (result: RegExpExecArray): void => {
 
     console.log("      --- captured", i)
     port.nation = (findNationByName(result[4])?.short as NationShortName) ?? ""
-    port.capturer = result[3]
+    port.capturer = result[3].trim()
     port.lastPortBattle = dayjs.utc(result[1], "DD-MM-YYYY HH:mm").format("YYYY-MM-DD HH:mm")
     port.attackerNation = ""
     port.attackerClan = ""
