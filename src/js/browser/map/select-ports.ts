@@ -35,6 +35,7 @@ import {
     PortIntersection,
     PortPerServer,
     PortWithTrades,
+    TradeGood,
 } from "../../common/gen-json"
 import { NAMap } from "./na-map"
 import DisplayPorts from "./display-ports"
@@ -496,24 +497,32 @@ export default class SelectPorts {
     }
 
     _setTradePortPartners(): void {
-        const tradePort = this._ports.portDataDefault.find((port) => port.id === this._ports.tradePortId)
+        const tradePort = (this._ports.portDataDefault.find((port) => port.id === this._ports.tradePortId) ??
+            []) as PortWithTrades
+
         if (tradePort) {
-            const tradePortConsumedGoods = tradePort.consumesTrading
-                ? tradePort.consumesTrading.map((good) => good)
-                : []
-            const tradePortProducedGoods = tradePort.dropsTrading ? tradePort.dropsTrading.map((good) => good) : []
+            const getGoodsToBuyInTradePort = (port: PortWithTrades): string[] => {
+                const tradePortProducedGoods = new Set(tradePort.dropsTrading?.map((good) => good)) ?? []
+
+                return port.dropsTrading?.filter((good) => tradePortProducedGoods.has(good)).map((good) => good) ?? []
+            }
+
+            const getGoodsToSellInTradePort = (port: PortWithTrades): TradeGood[] => {
+                const tradePortConsumedGoods = new Set(tradePort.consumesTrading?.map((good) => good)) ?? []
+
+                return (port.dropsTrading
+                    ?.filter((good) => tradePortConsumedGoods.has(good))
+                    .map((good) => ({
+                        name: good,
+                        profit: 0,
+                    })) ?? []) as TradeGood[]
+            }
 
             this._ports.portData = this._ports.portDataDefault
                 .map((port) => {
-                    port.goodsToBuyInTradePort = port.consumesTrading
-                        ? port.consumesTrading
-                              .filter((good) => tradePortProducedGoods.includes(good))
-                              .map((good) => good)
-                        : []
+                    port.goodsToBuyInTradePort = getGoodsToBuyInTradePort(port)
                     port.buyInTradePort = Boolean(port.goodsToBuyInTradePort.length)
-                    port.goodsToSellInTradePort = port.dropsTrading
-                        ? port.dropsTrading.filter((good) => tradePortConsumedGoods.includes(good)).map((good) => good)
-                        : []
+                    port.goodsToSellInTradePort = getGoodsToSellInTradePort(port)
                     port.sellInTradePort = Boolean(port.goodsToSellInTradePort.length)
 
                     return port

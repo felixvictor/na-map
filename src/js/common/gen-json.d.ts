@@ -255,20 +255,30 @@ export interface PortBasic {
 }
 
 type PortIntersection =
-    | ValuesType<PortWithTrades>
-    | ValuesType<Port>
-    | ValuesType<PortBasic>
-    | ValuesType<PortPerServer>
-    | ValuesType<PortBattlePerServer>
-export interface Port extends PortBasic, PortPerServer, PortBattlePerServer {}
-
+    | boolean
+    | number
+    | string
+    | undefined
+    | GoodList
+    | Point
+    | Array<string | InventoryEntity | TradeGood>
+export interface Port extends PortBasic, PortPerServer, PortBattlePerServer {
+    [index: string]: PortIntersection
+}
+export interface TradeGood {
+    name: string
+    profit: number
+}
 export interface PortWithTrades extends Port {
     tradePortId: number
-    goodsToBuyInTradePort?: string[]
+    goodsToBuyInTradePort: string[]
     buyInTradePort: boolean
-    goodsToSellInTradePort?: string[]
+    goodsToSellInTradePort: TradeGood[]
     sellInTradePort: boolean
     distance: number
+    isSource: boolean
+    ownPort: boolean
+    enemyPort: boolean
 }
 
 /****************************
