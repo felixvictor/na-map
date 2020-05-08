@@ -111,7 +111,7 @@ const captured = (result) => {
     const port = ports[i];
     console.log("      --- captured", i);
     port.nation = (_b = (_a = findNationByName(result[4])) === null || _a === void 0 ? void 0 : _a.short) !== null && _b !== void 0 ? _b : "";
-    port.capturer = result[3];
+    port.capturer = result[3].trim();
     port.lastPortBattle = dayjs.utc(result[1], "DD-MM-YYYY HH:mm").format("YYYY-MM-DD HH:mm");
     port.attackerNation = "";
     port.attackerClan = "";
