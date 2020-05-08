@@ -23,14 +23,7 @@ import {
     APITimeBasedConvertibleItem,
     APIShipLootTableItem,
 } from "./api-item"
-import {
-    LootChestGroup,
-    LootChestItemsEntity,
-    Loot,
-    LootChestsEntity,
-    LootLootItemsEntity,
-    LootLootEntity,
-} from "../common/gen-json"
+import { LootChestItemsEntity, Loot, LootChestsEntity, LootLootItemsEntity, LootLootEntity } from "../common/gen-json"
 
 let apiItems: APIItemGeneric[]
 const secondsPerHour = 3600
