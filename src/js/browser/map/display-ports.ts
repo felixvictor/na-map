@@ -56,6 +56,7 @@ import {
     PortPerServer,
     PortWithTrades,
     NationListAlternative,
+    TradeItem,
 } from "../../common/gen-json"
 import { DivDatum, SVGGDatum } from "../../common/interface"
 
@@ -175,6 +176,7 @@ export default class DisplayPorts {
     private _portDataFiltered!: PortWithTrades[]
     private _countyPolygonFiltered!: Area[]
     private _regionPolygonFiltered!: Area[]
+    tradeItem!: Map<number, TradeItem>
 
     constructor(readonly map: NAMap) {
         this._serverName = this.map.serverName
@@ -348,6 +350,12 @@ export default class DisplayPorts {
         try {
             readData.ports = (await import(/* webpackChunkName: "data-ports" */ "Lib/gen-generic/ports.json"))
                 .default as PortBasic[]
+
+            const tradeItems = (await (
+                await fetch(`${dataDirectory}/${this.map.serverName}-items.json`)
+            ).json()) as TradeItem[]
+            this.tradeItem = new Map(tradeItems.map((item) => [item.id, item]))
+
             await loadEntries(dataSources)
         } catch (error) {
             putImportError(error)
@@ -744,13 +752,18 @@ export default class DisplayPorts {
             laborHoursDiscount: portProperties.laborHoursDiscount
                 ? `, labor hours discount level\u202F${portProperties.laborHoursDiscount}`
                 : "",
-            dropsTrading: portProperties.dropsTrading ? portProperties.dropsTrading.join(", ") : "",
-            consumesTrading: portProperties.consumesTrading ? portProperties.consumesTrading.join(", ") : "",
-            producesNonTrading: portProperties.producesNonTrading ? portProperties.producesNonTrading.join(", ") : "",
-            dropsNonTrading: portProperties.dropsNonTrading ? portProperties.dropsNonTrading.join(", ") : "",
+            // dropsTrading: portProperties.dropsTrading ? portProperties.dropsTrading.join(", ") : "",
+            dropsTrading:
+                portProperties.dropsTrading?.map((item) => this.tradeItem.get(item)?.name ?? "").join(", ") ?? "",
+            consumesTrading:
+                portProperties.consumesTrading?.map((item) => this.tradeItem.get(item)?.name ?? "").join(", ") ?? "",
+            producesNonTrading:
+                portProperties.producesNonTrading?.map((item) => this.tradeItem.get(item)?.name ?? "").join(", ") ?? "",
+            dropsNonTrading:
+                portProperties.dropsNonTrading?.map((item) => this.tradeItem.get(item)?.name ?? "").join(", ") ?? "",
             tradePort: this._getPortName(this.tradePortId),
             goodsToSellInTradePort: portProperties.goodsToSellInTradePort
-                .map((good) => `${good.name} (${formatSiInt(good.profit)})`)
+                ?.map((good) => `${good.name} (${formatSiInt(good.profit)})`)
                 .join(", "),
             goodsToBuyInTradePort: portProperties.goodsToBuyInTradePort
                 ? portProperties.goodsToBuyInTradePort.join(", ")
