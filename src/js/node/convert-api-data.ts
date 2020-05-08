@@ -25,6 +25,7 @@ import { createPortBattleSheet } from "./create-pb-sheets"
 const runType = process.argv[2] || "client"
 
 const convertApiData = async (): Promise<void> => {
+    /* eslint-disable @typescript-eslint/no-floating-promises */
     convertBuildingData()
     convertCannons()
     convertGenericPortData()

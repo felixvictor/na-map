@@ -24,13 +24,14 @@ import { distanceMapSize, serverNames } from "../common/common-var"
 import { APIItemGeneric } from "./api-item"
 import { APIPort } from "./api-port"
 import { APIShop } from "./api-shop"
-import { InventoryEntity, NationList, PortBattlePerServer, PortPerServer, Trade } from "../common/gen-json"
+import { InventoryEntity, NationList, PortBattlePerServer, PortPerServer, Trade, TradeItem } from "../common/gen-json"
 
 interface Item {
     name: string
     weight: number
     itemType: string
     trading: boolean
+    buyPrice: number
 }
 
 const minProfit = 30000
@@ -76,38 +77,30 @@ const setPortFeaturePerServer = (apiPort: APIPort): void => {
             laborHoursDiscount: apiPort.LaborHoursDiscount,
             dropsTrading: [
                 ...new Set(
-                    portShop.ResourcesAdded.filter(
-                        (good) => itemNames.has(good.Template) && itemNames.get(good.Template)?.trading
+                    portShop.ResourcesAdded.filter((good) => itemNames.get(good.Template)?.trading).map(
+                        (good) => good.Template
                     )
-                        .map((good) => itemNames.get(good.Template)?.name)
-                        .sort(simpleStringSort)
                 ),
             ],
             consumesTrading: [
                 ...new Set(
-                    portShop.ResourcesConsumed.filter(
-                        (good) => itemNames.has(good.Key) && itemNames.get(good.Key)?.trading
+                    portShop.ResourcesConsumed.filter((good) => itemNames.get(good.Key)?.trading).map(
+                        (good) => good.Key
                     )
-                        .map((good) => itemNames.get(good.Key)?.name)
-                        .sort(simpleStringSort)
                 ),
             ],
             producesNonTrading: [
                 ...new Set(
-                    portShop.ResourcesProduced.filter(
-                        (good) => itemNames.has(good.Key) && !itemNames.get(good.Key)?.trading
+                    portShop.ResourcesProduced.filter((good) => !itemNames.get(good.Key)?.trading).map(
+                        (good) => good.Key
                     )
-                        .map((good) => itemNames.get(good.Key)?.name)
-                        .sort(simpleStringSort)
                 ),
             ],
             dropsNonTrading: [
                 ...new Set(
-                    portShop.ResourcesAdded.filter(
-                        (good) => itemNames.has(good.Template) && !itemNames.get(good.Template)?.trading
+                    portShop.ResourcesAdded.filter((good) => !itemNames.get(good.Template)?.trading).map(
+                        (good) => good.Template
                     )
-                        .map((good) => itemNames.get(good.Template)?.name)
-                        .sort(simpleStringSort)
                 ),
             ],
             inventory: portShop.RegularItems.filter((good) => itemNames.get(good.TemplateId)?.itemType !== "Cannon")
@@ -180,6 +173,27 @@ const setAndSaveTradeData = async (serverName: string): Promise<void> => {
     trades.sort(sortBy(["profitTotal"]))
 
     await saveJsonAsync(path.resolve(commonPaths.dirGenServer, `${serverName}-trades.json`), trades)
+}
+
+const setAndSaveDroppedItems = async (serverName: string): Promise<void> => {
+    const items = apiItems
+        .filter(
+            (item) =>
+                item.ItemType === "Material" ||
+                item.SortingGroup === "Resource.Food" ||
+                item.SortingGroup === "Resource.Resources" ||
+                item.SortingGroup === "Resource.Trading" ||
+                item.Name === "American Cotton" ||
+                item.Name === "Tobacco"
+        )
+        .map((item) => ({
+            id: item.Id,
+            name: cleanName(item.Name),
+            price: item.BasePrice,
+            distanceFactor: item.PortPrices.RangePct,
+        })) as TradeItem[]
+
+    await saveJsonAsync(path.resolve(commonPaths.dirGenServer, `${serverName}-items.json`), items)
 }
 
 const ticks = 621355968000000000
@@ -320,7 +334,7 @@ const setAndSaveFrontlines = async (serverName: string): Promise<void> => {
 
         frontlineDefendingNation[nationShortName].push({
             key: toPortId,
-            value: [...fromPorts].map(Number),
+            value: [...fromPorts].map((element) => Number(element)),
         })
         // frontlineDefendingNation[nationShortName].push({ key: toPortId, value: [...fromPorts] });
     }
@@ -347,6 +361,7 @@ export const convertServerPortData = (): void => {
                     name: cleanName(item.Name),
                     weight: item.ItemWeight,
                     itemType: item.ItemType,
+                    buyPrice: item.BasePrice,
                     trading:
                         item.SortingGroup === "Resource.Trading" ||
                         item.Name === "American Cotton" ||
@@ -373,13 +388,11 @@ export const convertServerPortData = (): void => {
             distancesOrig.map(([fromPortId, toPortId, distance]) => [fromPortId * numberPorts + toPortId, distance])
         )
 
-        // noinspection JSIgnoredPromiseFromCall
+        /* eslint-disable @typescript-eslint/no-floating-promises */
         setAndSavePortData(serverName)
-        // noinspection JSIgnoredPromiseFromCall
         setAndSaveTradeData(serverName)
-        // noinspection JSIgnoredPromiseFromCall
+        setAndSaveDroppedItems(serverName)
         setAndSavePortBattleData(serverName)
-        // noinspection JSIgnoredPromiseFromCall
         setAndSaveFrontlines(serverName)
     }
 }
