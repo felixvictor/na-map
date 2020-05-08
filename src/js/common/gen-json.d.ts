@@ -120,8 +120,20 @@ export interface CannonValue {
 }
 
 /****************************
+ * items.json
+ */
+
+export interface TradeItem {
+    id: number
+    name: string
+    price: number
+    distanceFactor: number
+}
+
+/****************************
  * loot.json
  */
+
 export type LootTypeList<T> = {
     [K in LootType]: T
 }
@@ -261,19 +273,20 @@ type PortIntersection =
     | undefined
     | GoodList
     | Point
-    | Array<string | InventoryEntity | TradeGood>
+    | Array<string | InventoryEntity | TradeGoodProfit>
 export interface Port extends PortBasic, PortPerServer, PortBattlePerServer {
     [index: string]: PortIntersection
 }
-export interface TradeGood {
+export interface TradeGoodProfit {
     name: string
     profit: number
 }
 export interface PortWithTrades extends Port {
     tradePortId: number
+    sailingDistanceToTradePort: number
     goodsToBuyInTradePort: string[]
     buyInTradePort: boolean
-    goodsToSellInTradePort: TradeGood[]
+    goodsToSellInTradePort: TradeGoodProfit[]
     sellInTradePort: boolean
     distance: number
     isSource: boolean
@@ -288,7 +301,7 @@ export interface PortWithTrades extends Port {
 export type ConquestMarksPension = 1 | 3
 export type TradingCompany = 0 | 1 | 2
 export type LaborHoursDiscount = 0 | 1 | 2
-export type GoodList = string[]
+export type GoodList = number[]
 export interface PortPerServer {
     [index: string]: PortIntersection
     id: number
