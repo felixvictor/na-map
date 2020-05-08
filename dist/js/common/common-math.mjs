@@ -20,13 +20,13 @@ const transformMatrix = {
     A: -0.00499866779363828,
     B: -0.00000021464254980645,
     C: 4096.88635151897,
-    D: 4096.90282787469
+    D: 4096.90282787469,
 };
 const transformMatrixInv = {
     A: -200.053302087577,
     B: -0.00859027897636011,
     C: 819630.836437126,
-    D: -819563.745651571
+    D: -819563.745651571,
 };
 export const convertCoordX = (x, y) => transformMatrix.A * x + transformMatrix.B * y + transformMatrix.C;
 export const convertCoordY = (x, y) => transformMatrix.B * x - transformMatrix.A * y + transformMatrix.D;
@@ -47,11 +47,11 @@ export const roundToThousands = (x) => round(x, 3);
 export const getDistance = (pt0, pt1) => {
     const fromF11 = {
         x: convertInvCoordX(pt0.x, pt0.y),
-        y: convertInvCoordY(pt0.x, pt0.y)
+        y: convertInvCoordY(pt0.x, pt0.y),
     };
     const toF11 = {
         x: convertInvCoordX(pt1.x, pt1.y),
-        y: convertInvCoordY(pt1.x, pt1.y)
+        y: convertInvCoordY(pt1.x, pt1.y),
     };
     return distancePoints(fromF11, toF11) / (timeFactor * speedFactor);
 };
@@ -85,7 +85,7 @@ export const compassDirections = [
     "W⅔NW",
     "NW",
     "N⅔NW",
-    "N⅓NW"
+    "N⅓NW",
 ];
 export const compassToDegrees = (compass) => {
     const degree = degreesFullCircle / compassDirections.length;
