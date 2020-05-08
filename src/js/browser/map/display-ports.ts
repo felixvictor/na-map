@@ -51,7 +51,6 @@ import { displayClan } from "../util"
 import Cookie from "../util/cookie"
 import RadioButton from "../util/radio-button"
 import {
-    Port,
     PortBattlePerServer,
     PortBasic,
     PortPerServer,
@@ -699,7 +698,7 @@ export default class DisplayPorts {
     }
 
     // eslint-disable-next-line complexity
-    _getText(portProperties: Port): PortForDisplay {
+    _getText(portProperties: PortWithTrades): PortForDisplay {
         moment.locale("en-gb")
         const portBattleLT = moment.utc(portProperties.portBattle).local()
         const portBattleST = moment.utc(portProperties.portBattle)
@@ -751,10 +750,10 @@ export default class DisplayPorts {
             dropsNonTrading: portProperties.dropsNonTrading ? portProperties.dropsNonTrading.join(", ") : "",
             tradePort: this._getPortName(this.tradePortId),
             goodsToSellInTradePort: portProperties.goodsToSellInTradePort
-                ? (portProperties.goodsToSellInTradePort as string[]).join(", ")
-                : "",
+                .map((good) => `${good.name} (${formatSiInt(good.profit)})`)
+                .join(", "),
             goodsToBuyInTradePort: portProperties.goodsToBuyInTradePort
-                ? (portProperties.goodsToBuyInTradePort as string[]).join(", ")
+                ? portProperties.goodsToBuyInTradePort.join(", ")
                 : "",
         } as PortForDisplay
 
