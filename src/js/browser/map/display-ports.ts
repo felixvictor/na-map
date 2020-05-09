@@ -64,7 +64,7 @@ import { DivDatum, SVGGDatum } from "../../common/interface"
 import TrilateratePosition from "../map-tools/get-position"
 import { NAMap } from "./na-map"
 import ShowF11 from "../map-tools/show-f11"
-import { simpleStringSort, sortBy } from "../../common/common-node"
+import { simpleStringSort } from "../../common/common-node"
 
 type PortCircleStringF = (d: PortWithTrades) => string
 type PortCircleNumberF = (d: PortWithTrades) => number
@@ -119,15 +119,17 @@ interface ReadData {
 }
 
 export default class DisplayPorts {
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    circleType = ""
     currentPort!: { id: number; coord: Coordinate }
     portData!: PortWithTrades[]
     portDataDefault!: PortWithTrades[]
     showCurrentGood: boolean
     showRadius: string
     showTradePortPartners: boolean
+    tradeItem!: Map<number, TradeItem>
     tradePortId!: number
     zoomLevel: string
-    circleType = ""
     private _attackRadius!: ScaleLinear<number, number>
     private _colourScaleCounty!: ScaleOrdinal<string, string>
     private _colourScaleHostility!: ScaleLinear<string, string>
@@ -135,6 +137,7 @@ export default class DisplayPorts {
     private _colourScalePoints!: ScaleLinear<string, string>
     private _colourScaleTax!: ScaleLinear<string, string>
     private _countyPolygon!: Area[]
+    private _countyPolygonFiltered!: Area[]
     private _divPortSummary!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, any>
     private _gCounty!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, any>
     private _gIcon!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, any>
@@ -150,6 +153,7 @@ export default class DisplayPorts {
     private _minPortPoints!: number
     private _minTaxIncome!: number
     private _nationIcons!: NationListAlternative<string>
+    private _portDataFiltered!: PortWithTrades[]
     private _portRadius!: ScaleLinear<number, number>
     private _portSummaryNetIncome!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, any>
     private _portSummaryNumPorts!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, any>
@@ -158,6 +162,7 @@ export default class DisplayPorts {
     private _portSummaryTextNumPorts!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, any>
     private _portSummaryTextTaxIncome!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, any>
     private _regionPolygon!: Area[]
+    private _regionPolygonFiltered!: Area[]
     private _scale: number
     private _upperBound!: Bound
     private readonly _baseId: string
@@ -175,10 +180,6 @@ export default class DisplayPorts {
     private readonly _showPBZones: string
     private readonly _tooltipDuration: number
     private readonly _trilateratePosition: TrilateratePosition
-    private _portDataFiltered!: PortWithTrades[]
-    private _countyPolygonFiltered!: Area[]
-    private _regionPolygonFiltered!: Area[]
-    tradeItem!: Map<number, TradeItem>
 
     constructor(readonly map: NAMap) {
         this._serverName = this.map.serverName
@@ -707,8 +708,8 @@ export default class DisplayPorts {
         return id ? this.portDataDefault.find((port) => port.id === id)?.name ?? "" : ""
     }
 
-    // eslint-disable-next-line complexity
     _getText(portProperties: PortWithTrades): PortForDisplay {
+        // eslint-disable-next-line unicorn/consistent-function-scoping
         const sortByProfit = (a: TradeGoodProfit, b: TradeGoodProfit): number => b.profit.profit - a.profit.profit
         moment.locale("en-gb")
         const portBattleLT = moment.utc(portProperties.portBattle).local()
@@ -787,8 +788,14 @@ export default class DisplayPorts {
                 )
                 .join(", "),
             goodsToBuyInTradePort: portProperties.goodsToBuyInTradePort
-                ? portProperties.goodsToBuyInTradePort.join(", ")
-                : "",
+                ?.sort(sortByProfit)
+                ?.map(
+                    (good) =>
+                        `${good.name} (${formatSiInt(good.profit.profit)}/${formatSiInt(
+                            good.profit.profitPerDistance
+                        )})`
+                )
+                .join(", "),
         } as PortForDisplay
 
         switch (portProperties.portBattleType) {
