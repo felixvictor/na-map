@@ -24,10 +24,9 @@ import { HtmlString, initMultiDropdownNavbar } from "../../common/common-browser
 import { formatInt, formatSiCurrency } from "../../common/common-format"
 import { Coordinate, Distance, getDistance, Point } from "../../common/common-math"
 import { simpleNumberSort, simpleStringSort, sortBy } from "../../common/common-node"
-import { distanceMapSize, serverMaintenanceHour } from "../../common/common-var"
+import { serverMaintenanceHour } from "../../common/common-var"
 import {
     ConquestMarksPension,
-    TradeItem,
     FrontlinesPerServer,
     GoodList,
     InventoryEntity,
@@ -37,7 +36,7 @@ import {
     PortPerServer,
     PortWithTrades,
     TradeGoodProfit,
-    SellProfit,
+    TradeProfit,
 } from "../../common/gen-json"
 import { NAMap } from "./na-map"
 import DisplayPorts from "./display-ports"
@@ -61,34 +60,33 @@ interface SourcePort {
 
 export default class SelectPorts {
     isInventorySelected: boolean
+    private _dataLoaded = false
+    private _distances: Map<number, number> = new Map()
+    private _frontlinesData!: FrontlinesPerServer
+    private _nation!: NationShortName
     private _ports: DisplayPorts
-    private readonly _pbZone: DisplayPbZones
-    private readonly _map: NAMap
+    private readonly _buyGoodsId: string
+    private readonly _buyGoodsSelector: HTMLSelectElement
     private readonly _dateFormat: string
-    private readonly _timeFormat: string
     private readonly _frontlineAttackingNationId: string
     private readonly _frontlineAttackingNationSelector: HTMLSelectElement
     private readonly _frontlineDefendingNationId: string
     private readonly _frontlineDefendingNationSelector: HTMLSelectElement
-    private readonly _portNamesId: string
-    private readonly _portNamesSelector: HTMLSelectElement
-    private readonly _buyGoodsId: string
-    private readonly _buyGoodsSelector: HTMLSelectElement
     private readonly _inventoryId: string
     private readonly _inventorySelector: HTMLSelectElement
-    private readonly _propNationId: string
-    private readonly _propNationSelector: HTMLSelectElement
+    private readonly _map: NAMap
+    private readonly _numberPorts: number
+    private readonly _pbZone: DisplayPbZones
+    private readonly _portNamesId: string
+    private readonly _portNamesSelector: HTMLSelectElement
     private readonly _propClanId: string
     private readonly _propClanSelector: HTMLSelectElement
     private readonly _propCMId: string
     private readonly _propCMSelector: HTMLSelectElement
-    private _frontlinesData!: FrontlinesPerServer
-    private _nation!: NationShortName
-    private _distances: Map<number, number> = new Map()
-    private readonly _numberPorts: number
-    private _dataLoaded = false
-    private readonly _closestSourcePorts: Map<string, SourcePort> = new Map()
-    private readonly _sellProfit: Map<string, SellProfit> = new Map()
+    private readonly _propNationId: string
+    private readonly _propNationSelector: HTMLSelectElement
+    private readonly _sellProfit: Map<string, TradeProfit> = new Map()
+    private readonly _timeFormat: string
 
     constructor(ports: DisplayPorts, pbZone: DisplayPbZones, map: NAMap) {
         this._ports = ports
@@ -175,9 +173,7 @@ export default class SelectPorts {
                 ).json()) as FrontlinesPerServer
 
                 const distances = (
-                    await import(
-                        /* webpackChunkName: "data-distances" */ `Lib/gen-generic/distances-${distanceMapSize}.json`
-                    )
+                    await import(/* webpackChunkName: "data-distances" */ `Lib/gen-generic/distances.json`)
                 ).default as Distance[]
                 this._distances = new Map(
                     distances.map(([fromPortId, toPortId, distance]) => [
@@ -534,13 +530,10 @@ export default class SelectPorts {
     }
 
     _setTradeRelations(tradePort: PortWithTrades): void {
-        const getItemName = (itemId: number): string => this._ports.tradeItem.get(itemId)?.name ?? ""
         const getBuyPrice = (itemId: number): number => this._ports.tradeItem.get(itemId)?.price ?? 0
         const getDistanceFactor = (itemId: number): number => this._ports.tradeItem.get(itemId)?.distanceFactor ?? 0
         const getPortTax = (portId: number): number =>
             this._ports.portDataDefault.find((port) => port.id === portId)?.portTax ?? 0
-        const getPortName = (portId: number): string =>
-            this._ports.portDataDefault.find((port) => port.id === portId)?.name ?? ""
         const getCoordinates = (portId: number): Coordinate => {
             const port = this._ports.portDataDefault.find((port) => port.id === portId)
             return { x: port?.coordinates[0] ?? 0, y: port?.coordinates[1] ?? 0 }
@@ -549,19 +542,11 @@ export default class SelectPorts {
         const getPlanarDistance = (fromPortId: number, toPortId: number): number => {
             const fromPortCoord = getCoordinates(fromPortId)
             const toPortCoord = getCoordinates(toPortId)
-            console.log(
-                fromPortId,
-                getPortName(fromPortId),
-                fromPortCoord,
-                toPortId,
-                getPortName(toPortId),
-                toPortCoord,
-                getDistance(fromPortCoord, toPortCoord)
-            )
+
             return getDistance(fromPortCoord, toPortCoord)
         }
 
-        const findClosestSourcePort = (itemId: number): SourcePort => {
+        const findClosestSourcePort = (sellPort: PortWithTrades, itemId: number): SourcePort => {
             let minDistance = Infinity
             let closestPort = 0
             const sourcePortIds = new Set(
@@ -571,7 +556,7 @@ export default class SelectPorts {
             )
 
             for (const sourcePortId of sourcePortIds) {
-                const distance = getPlanarDistance(sourcePortId, tradePort.id)
+                const distance = getPlanarDistance(sourcePortId, sellPort.id)
                 if (distance < minDistance) {
                     minDistance = distance
                     closestPort = sourcePortId
@@ -584,26 +569,17 @@ export default class SelectPorts {
             }
         }
 
-        const calculateSellProfit = (buyPort: PortWithTrades, itemId: number): SellProfit => {
-            const { id: closestSourcePortId, distance: planarDistance } = findClosestSourcePort(itemId)
-            const sailingDistance = this._getSailingDistance(closestSourcePortId, tradePort.id)
+        const calculateSellProfit = (
+            buyPort: PortWithTrades,
+            sellPort: PortWithTrades,
+            itemId: number
+        ): TradeProfit => {
+            const { id: closestSourcePortId, distance: planarDistance } = findClosestSourcePort(sellPort, itemId)
+            const sailingDistance = this._getSailingDistance(closestSourcePortId, sellPort.id)
             const buyTax = getPortTax(buyPort.id)
-            const sellTax = getPortTax(tradePort.id)
+            const sellTax = getPortTax(sellPort.id)
             let buyPrice = getBuyPrice(itemId)
             let sellPrice = buyPrice * 3 + (planarDistance * buyPrice * getDistanceFactor(itemId)) / 6 / 100
-            if (getItemName(itemId) === "Batavian Spices") {
-                console.log(
-                    getItemName(itemId),
-                    getPortName(tradePort.id),
-                    getPortName(closestSourcePortId),
-                    buyPrice,
-                    getDistanceFactor(itemId),
-                    planarDistance,
-                    (buyPrice * getDistanceFactor(itemId)) / 6 / 100,
-                    sellPrice
-                )
-            }
-
             buyPrice *= 1 + buyTax
             sellPrice /= 1 + sellTax
             const profit = Math.round(sellPrice - buyPrice)
@@ -611,24 +587,24 @@ export default class SelectPorts {
             return { profit, profitPerDistance: profit / sailingDistance }
         }
 
-        const getSellProfit = (buyPort: PortWithTrades, itemId: number): SellProfit => {
-            const key = String(tradePort.id).padStart(4, "0") + String(itemId).padStart(4, "0")
+        const getProfit = (buyPort: PortWithTrades, sellPort: PortWithTrades, itemId: number): TradeProfit => {
+            const key = String(sellPort.id).padStart(4, "0") + String(itemId).padStart(4, "0")
             if (!this._sellProfit.has(key)) {
-                this._sellProfit.set(key, calculateSellProfit(buyPort, itemId))
-                console.log("getSellProfit", getItemName(itemId), getPortName(tradePort.id), this._sellProfit.get(key))
+                this._sellProfit.set(key, calculateSellProfit(buyPort, sellPort, itemId))
             }
 
             return this._sellProfit.get(key)!
         }
 
-        const getGoodsToBuyInTradePort = (targetPort: PortWithTrades): string[] => {
+        const getGoodsToBuyInTradePort = (sellPort: PortWithTrades): TradeGoodProfit[] => {
             const tradePortProducedGoods = new Set(tradePort.dropsTrading?.map((good) => good)) ?? []
 
-            return (
-                targetPort.dropsTrading
-                    ?.filter((good) => tradePortProducedGoods.has(good))
-                    .map((good) => this._ports.tradeItem.get(good)?.name ?? "") ?? []
-            )
+            return (sellPort.consumesTrading
+                ?.filter((good) => tradePortProducedGoods.has(good))
+                .map((good) => ({
+                    name: this._ports.tradeItem.get(good)?.name ?? "",
+                    profit: getProfit(tradePort, sellPort, good),
+                })) ?? []) as TradeGoodProfit[]
         }
 
         const getGoodsToSellInTradePort = (buyPort: PortWithTrades): TradeGoodProfit[] => {
@@ -638,7 +614,7 @@ export default class SelectPorts {
                 ?.filter((good) => tradePortConsumedGoods.has(good))
                 .map((good) => ({
                     name: this._ports.tradeItem.get(good)?.name ?? "",
-                    profit: getSellProfit(buyPort, good),
+                    profit: getProfit(buyPort, tradePort, good),
                 })) ?? []) as TradeGoodProfit[]
         }
 
