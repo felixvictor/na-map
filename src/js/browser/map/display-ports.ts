@@ -51,18 +51,20 @@ import { displayClan } from "../util"
 import Cookie from "../util/cookie"
 import RadioButton from "../util/radio-button"
 import {
-    Port,
     PortBattlePerServer,
     PortBasic,
     PortPerServer,
     PortWithTrades,
     NationListAlternative,
+    TradeItem,
+    TradeGoodProfit,
 } from "../../common/gen-json"
 import { DivDatum, SVGGDatum } from "../../common/interface"
 
 import TrilateratePosition from "../map-tools/get-position"
 import { NAMap } from "./na-map"
 import ShowF11 from "../map-tools/show-f11"
+import { simpleStringSort } from "../../common/common-node"
 
 type PortCircleStringF = (d: PortWithTrades) => string
 type PortCircleNumberF = (d: PortWithTrades) => number
@@ -117,15 +119,17 @@ interface ReadData {
 }
 
 export default class DisplayPorts {
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    circleType = ""
     currentPort!: { id: number; coord: Coordinate }
     portData!: PortWithTrades[]
     portDataDefault!: PortWithTrades[]
     showCurrentGood: boolean
     showRadius: string
     showTradePortPartners: boolean
+    tradeItem!: Map<number, TradeItem>
     tradePortId!: number
     zoomLevel: string
-    circleType = ""
     private _attackRadius!: ScaleLinear<number, number>
     private _colourScaleCounty!: ScaleOrdinal<string, string>
     private _colourScaleHostility!: ScaleLinear<string, string>
@@ -133,6 +137,7 @@ export default class DisplayPorts {
     private _colourScalePoints!: ScaleLinear<string, string>
     private _colourScaleTax!: ScaleLinear<string, string>
     private _countyPolygon!: Area[]
+    private _countyPolygonFiltered!: Area[]
     private _divPortSummary!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, any>
     private _gCounty!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, any>
     private _gIcon!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, any>
@@ -148,6 +153,7 @@ export default class DisplayPorts {
     private _minPortPoints!: number
     private _minTaxIncome!: number
     private _nationIcons!: NationListAlternative<string>
+    private _portDataFiltered!: PortWithTrades[]
     private _portRadius!: ScaleLinear<number, number>
     private _portSummaryNetIncome!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, any>
     private _portSummaryNumPorts!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, any>
@@ -156,6 +162,7 @@ export default class DisplayPorts {
     private _portSummaryTextNumPorts!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, any>
     private _portSummaryTextTaxIncome!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, any>
     private _regionPolygon!: Area[]
+    private _regionPolygonFiltered!: Area[]
     private _scale: number
     private _upperBound!: Bound
     private readonly _baseId: string
@@ -173,9 +180,6 @@ export default class DisplayPorts {
     private readonly _showPBZones: string
     private readonly _tooltipDuration: number
     private readonly _trilateratePosition: TrilateratePosition
-    private _portDataFiltered!: PortWithTrades[]
-    private _countyPolygonFiltered!: Area[]
-    private _regionPolygonFiltered!: Area[]
 
     constructor(readonly map: NAMap) {
         this._serverName = this.map.serverName
@@ -349,6 +353,12 @@ export default class DisplayPorts {
         try {
             readData.ports = (await import(/* webpackChunkName: "data-ports" */ "Lib/gen-generic/ports.json"))
                 .default as PortBasic[]
+
+            const tradeItems = (await (
+                await fetch(`${dataDirectory}/${this.map.serverName}-items.json`)
+            ).json()) as TradeItem[]
+            this.tradeItem = new Map(tradeItems.map((item) => [item.id, item]))
+
             await loadEntries(dataSources)
         } catch (error) {
             putImportError(error)
@@ -482,7 +492,7 @@ export default class DisplayPorts {
             { name: "Costa del Fuego", centroid: [3700, 1670], angle: 70 },
             { name: "Costa Rica", centroid: [3140, 5920], angle: 0 },
             { name: "Crooked", centroid: [4925, 2950], angle: 0 },
-            { name: "Cuidad de Cuba", centroid: [4500, 3495], angle: 0 },
+            { name: "Ciudad de Cuba", centroid: [4500, 3495], angle: 0 },
             { name: "Cumaná", centroid: [7280, 5770], angle: 0 },
             { name: "Dominica", centroid: [7640, 4602], angle: 0 },
             { name: "Exuma", centroid: [4700, 2560], angle: 0 },
@@ -698,8 +708,9 @@ export default class DisplayPorts {
         return id ? this.portDataDefault.find((port) => port.id === id)?.name ?? "" : ""
     }
 
-    // eslint-disable-next-line complexity
-    _getText(portProperties: Port): PortForDisplay {
+    _getText(portProperties: PortWithTrades): PortForDisplay {
+        // eslint-disable-next-line unicorn/consistent-function-scoping
+        const sortByProfit = (a: TradeGoodProfit, b: TradeGoodProfit): number => b.profit.profit - a.profit.profit
         moment.locale("en-gb")
         const portBattleLT = moment.utc(portProperties.portBattle).local()
         const portBattleST = moment.utc(portProperties.portBattle)
@@ -745,17 +756,46 @@ export default class DisplayPorts {
             laborHoursDiscount: portProperties.laborHoursDiscount
                 ? `, labor hours discount level\u202F${portProperties.laborHoursDiscount}`
                 : "",
-            dropsTrading: portProperties.dropsTrading ? portProperties.dropsTrading.join(", ") : "",
-            consumesTrading: portProperties.consumesTrading ? portProperties.consumesTrading.join(", ") : "",
-            producesNonTrading: portProperties.producesNonTrading ? portProperties.producesNonTrading.join(", ") : "",
-            dropsNonTrading: portProperties.dropsNonTrading ? portProperties.dropsNonTrading.join(", ") : "",
+            // dropsTrading: portProperties.dropsTrading ? portProperties.dropsTrading.join(", ") : "",
+            dropsTrading:
+                portProperties.dropsTrading
+                    ?.map((item) => this.tradeItem.get(item)?.name ?? "")
+                    .sort(simpleStringSort)
+                    .join(", ") ?? "",
+            consumesTrading:
+                portProperties.consumesTrading
+                    ?.map((item) => this.tradeItem.get(item)?.name ?? "")
+                    .sort(simpleStringSort)
+                    .join(", ") ?? "",
+            producesNonTrading:
+                portProperties.producesNonTrading
+                    ?.map((item) => this.tradeItem.get(item)?.name ?? "")
+                    .sort(simpleStringSort)
+                    .join(", ") ?? "",
+            dropsNonTrading:
+                portProperties.dropsNonTrading
+                    ?.map((item) => this.tradeItem.get(item)?.name ?? "")
+                    .sort(simpleStringSort)
+                    .join(", ") ?? "",
             tradePort: this._getPortName(this.tradePortId),
             goodsToSellInTradePort: portProperties.goodsToSellInTradePort
-                ? (portProperties.goodsToSellInTradePort as string[]).join(", ")
-                : "",
+                ?.sort(sortByProfit)
+                ?.map(
+                    (good) =>
+                        `${good.name} (${formatSiInt(good.profit.profit)}/${formatSiInt(
+                            good.profit.profitPerDistance
+                        )})`
+                )
+                .join(", "),
             goodsToBuyInTradePort: portProperties.goodsToBuyInTradePort
-                ? (portProperties.goodsToBuyInTradePort as string[]).join(", ")
-                : "",
+                ?.sort(sortByProfit)
+                ?.map(
+                    (good) =>
+                        `${good.name} (${formatSiInt(good.profit.profit)}/${formatSiInt(
+                            good.profit.profitPerDistance
+                        )})`
+                )
+                .join(", "),
         } as PortForDisplay
 
         switch (portProperties.portBattleType) {

@@ -170,7 +170,7 @@ export const capitalToCounty = new Map([
     ["San Marcos", "Apalache"],
     ["Santa Fe", "Isla de Pinos"],
     ["Santa Marta", "Santa Marta"],
-    ["Santiago de Cuba", "Cuidad de Cuba"],
+    ["Santiago de Cuba", "Ciudad de Cuba"],
     ["Santo Domingo", "Santo Domingo"],
     ["Santo Tomé de Guayana", "Orinoco"],
     ["Savanna la Mar", "Cornwall"],

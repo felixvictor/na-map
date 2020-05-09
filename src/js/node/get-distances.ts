@@ -16,7 +16,7 @@ import { default as PNG } from "pngjs"
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
 import { readJson, saveJsonAsync, xz } from "../common/common-file"
 import { convertCoordX, convertCoordY, Distance, Point } from "../common/common-math"
-import { simpleNumberSort, sortBy } from "../common/common-node"
+import { simpleNumberSort } from "../common/common-node"
 import { distanceMapSize, serverNames } from "../common/common-var"
 
 import { APIPort } from "./api-port"
@@ -28,7 +28,7 @@ import { APIPort } from "./api-port"
  */
 
 const mapFileName = path.resolve(commonPaths.dirSrc, "images", `frontline-map-${distanceMapSize}.png`)
-const distancesFile = path.resolve(commonPaths.dirGenGeneric, `distances-${distanceMapSize}.json`)
+const distancesFile = path.resolve(commonPaths.dirGenGeneric, `distances.json`)
 
 const spotWater = 0
 const spotLand = -1
@@ -231,7 +231,7 @@ apiPorts.forEach(({ Id, EntrancePosition: { z: y, x } }: APIPort) => {
     map[index] = Number(Id)
 })
 
-// noinspection JSIgnoredPromiseFromCall
+// eslint-disable-next-line @typescript-eslint/no-floating-promises
 getDistances()
 
 xz("xz", fileName)
