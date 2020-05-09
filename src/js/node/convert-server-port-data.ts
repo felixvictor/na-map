@@ -18,8 +18,8 @@ import { findNationById, nations, nationShortName, NationShortName } from "../co
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
 import { readJson, saveJsonAsync } from "../common/common-file"
 import { Distance } from "../common/common-math"
-import { cleanName, simpleStringSort, sortBy } from "../common/common-node"
-import { distanceMapSize, serverNames } from "../common/common-var"
+import { cleanName, sortBy } from "../common/common-node"
+import { serverNames } from "../common/common-var"
 
 import { APIItemGeneric } from "./api-item"
 import { APIPort } from "./api-port"
@@ -41,7 +41,7 @@ let apiItems: APIItemGeneric[]
 let apiPorts: APIPort[]
 let apiShops: APIShop[]
 
-const distancesFile = path.resolve(commonPaths.dirGenGeneric, `distances-${distanceMapSize}.json`)
+const distancesFile = path.resolve(commonPaths.dirGenGeneric, `distances.json`)
 const distancesOrig: Distance[] = readJson(distancesFile)
 let distances: Map<number, number>
 let numberPorts: number
