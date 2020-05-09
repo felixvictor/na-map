@@ -277,9 +277,15 @@ type PortIntersection =
 export interface Port extends PortBasic, PortPerServer, PortBattlePerServer {
     [index: string]: PortIntersection
 }
+
+export interface SellProfit {
+    profit: number
+    profitPerDistance: number
+}
+
 export interface TradeGoodProfit {
     name: string
-    profit: number
+    profit: SellProfit
 }
 export interface PortWithTrades extends Port {
     tradePortId: number
