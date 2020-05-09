@@ -71,13 +71,6 @@ export interface ObjectIndexer<T> {
 type Cannon = {
     [K in CannonType]: CannonEntity[]
 }
-export type CannonGroupIndex =
-    | string
-    | CannonDamage
-    | CannonTraverse
-    | CannonDispersion
-    | CannonGeneric
-    | CannonPenetration
 export interface CannonEntity {
     name: string
     damage: CannonDamage
@@ -278,19 +271,19 @@ export interface Port extends PortBasic, PortPerServer, PortBattlePerServer {
     [index: string]: PortIntersection
 }
 
-export interface SellProfit {
+export interface TradeProfit {
     profit: number
     profitPerDistance: number
 }
 
 export interface TradeGoodProfit {
     name: string
-    profit: SellProfit
+    profit: TradeProfit
 }
 export interface PortWithTrades extends Port {
     tradePortId: number
     sailingDistanceToTradePort: number
-    goodsToBuyInTradePort: string[]
+    goodsToBuyInTradePort: TradeGoodProfit[]
     buyInTradePort: boolean
     goodsToSellInTradePort: TradeGoodProfit[]
     sellInTradePort: boolean
@@ -456,6 +449,7 @@ interface ShipBlueprintShip {
  * ships.json
  */
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface ShipData extends ObjectIndexer<any> {
     battleRating: number
     bow: ShipHealth
