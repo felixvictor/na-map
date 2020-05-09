@@ -22,7 +22,7 @@ import { registerEvent } from "../analytics"
 import { Nation, nations, NationShortName, putImportError, range, validNationShortName } from "../../common/common"
 import { HtmlString, initMultiDropdownNavbar } from "../../common/common-browser"
 import { formatInt, formatSiCurrency } from "../../common/common-format"
-import { Point } from "../../common/common-math"
+import { Coordinate, Distance, getDistance, Point } from "../../common/common-math"
 import { simpleNumberSort, simpleStringSort, sortBy } from "../../common/common-node"
 import { serverMaintenanceHour } from "../../common/common-var"
 import {
@@ -35,6 +35,8 @@ import {
     PortIntersection,
     PortPerServer,
     PortWithTrades,
+    TradeGoodProfit,
+    TradeProfit,
 } from "../../common/gen-json"
 import { NAMap } from "./na-map"
 import DisplayPorts from "./display-ports"
@@ -51,36 +53,47 @@ interface SelectPort {
     nation: NationShortName
 }
 
+interface SourcePort {
+    id: number
+    distance: number
+}
+
 export default class SelectPorts {
     isInventorySelected: boolean
+    private _dataLoaded = false
+    private _distances: Map<number, number> = new Map()
+    private _frontlinesData!: FrontlinesPerServer
+    private _nation!: NationShortName
     private _ports: DisplayPorts
-    private readonly _pbZone: DisplayPbZones
-    private readonly _map: NAMap
+    private readonly _buyGoodsId: string
+    private readonly _buyGoodsSelector: HTMLSelectElement
     private readonly _dateFormat: string
-    private readonly _timeFormat: string
     private readonly _frontlineAttackingNationId: string
     private readonly _frontlineAttackingNationSelector: HTMLSelectElement
     private readonly _frontlineDefendingNationId: string
     private readonly _frontlineDefendingNationSelector: HTMLSelectElement
-    private readonly _portNamesId: string
-    private readonly _portNamesSelector: HTMLSelectElement
-    private readonly _buyGoodsId: string
-    private readonly _buyGoodsSelector: HTMLSelectElement
     private readonly _inventoryId: string
     private readonly _inventorySelector: HTMLSelectElement
-    private readonly _propNationId: string
-    private readonly _propNationSelector: HTMLSelectElement
+    private readonly _map: NAMap
+    private readonly _numberPorts: number
+    private readonly _pbZone: DisplayPbZones
+    private readonly _portNamesId: string
+    private readonly _portNamesSelector: HTMLSelectElement
     private readonly _propClanId: string
     private readonly _propClanSelector: HTMLSelectElement
     private readonly _propCMId: string
     private readonly _propCMSelector: HTMLSelectElement
-    private _frontlinesData!: FrontlinesPerServer
-    private _nation!: NationShortName
+    private readonly _propNationId: string
+    private readonly _propNationSelector: HTMLSelectElement
+    private readonly _sellProfit: Map<string, TradeProfit> = new Map()
+    private readonly _timeFormat: string
 
     constructor(ports: DisplayPorts, pbZone: DisplayPbZones, map: NAMap) {
         this._ports = ports
         this._pbZone = pbZone
         this._map = map
+
+        this._numberPorts = this._ports.portData.length
 
         this._dateFormat = "D MMM"
         this._timeFormat = "HH.00"
@@ -151,17 +164,28 @@ export default class SelectPorts {
     }
 
     async _loadData(): Promise<void> {
-        /**
-         * Data directory
-         */
-        const dataDirectory = "data"
+        if (!this._dataLoaded) {
+            const dataDirectory = "data"
 
-        try {
-            this._frontlinesData = (await (
-                await fetch(`${dataDirectory}/${this._map.serverName}-frontlines.json`)
-            ).json()) as FrontlinesPerServer
-        } catch (error) {
-            putImportError(error)
+            try {
+                this._frontlinesData = (await (
+                    await fetch(`${dataDirectory}/${this._map.serverName}-frontlines.json`)
+                ).json()) as FrontlinesPerServer
+
+                const distances = (
+                    await import(/* webpackChunkName: "data-distances" */ `Lib/gen-generic/distances.json`)
+                ).default as Distance[]
+                this._distances = new Map(
+                    distances.map(([fromPortId, toPortId, distance]) => [
+                        fromPortId * this._numberPorts + toPortId,
+                        distance,
+                    ])
+                )
+
+                this._dataLoaded = true
+            } catch (error) {
+                putImportError(error)
+            }
         }
     }
 
@@ -169,14 +193,16 @@ export default class SelectPorts {
         $(this._portNamesSelector).one("show.bs.select", () => {
             this._injectPortSelect()
         })
-        this._portNamesSelector.addEventListener("change", (event) => {
-            registerEvent("Menu", "Port relations")
+        this._portNamesSelector.addEventListener("change", async (event) => {
+            registerEvent("Menu", "Trade relations")
+            await this._loadData()
             this._resetOtherSelects(this._portNamesSelector)
             this._portSelected()
             event.preventDefault()
         })
 
-        $(this._buyGoodsSelector).one("show.bs.select", () => {
+        $(this._buyGoodsSelector).one("show.bs.select", async () => {
+            await this._loadData()
             this._injectGoodsSelect()
         })
         this._buyGoodsSelector.addEventListener("change", (event) => {
@@ -193,21 +219,17 @@ export default class SelectPorts {
             event.preventDefault()
         })
 
-        $(this._frontlineAttackingNationSelector).one("loaded.bs.select", async () => {
-            await this._loadData()
-        })
-        this._frontlineAttackingNationSelector.addEventListener("change", (event) => {
+        this._frontlineAttackingNationSelector.addEventListener("change", async (event) => {
             registerEvent("Menu", "Frontlines Attack")
+            await this._loadData()
             this._resetOtherSelects(this._frontlineAttackingNationSelector)
             this._frontlineAttackingNationSelected()
             event.preventDefault()
         })
 
-        $(this._frontlineDefendingNationSelector).one("loaded.bs.select", async () => {
-            await this._loadData()
-        })
-        this._frontlineDefendingNationSelector.addEventListener("change", (event) => {
+        this._frontlineDefendingNationSelector.addEventListener("change", async (event) => {
             registerEvent("Menu", "Frontlines Defence")
+            await this._loadData()
             this._resetOtherSelects(this._frontlineDefendingNationSelector)
             this._frontlineDefendingNationSelected()
             event.preventDefault()
@@ -335,7 +357,7 @@ export default class SelectPorts {
     }
 
     _injectGoodsSelect(): void {
-        const selectGoods = new Set<string>()
+        const selectGoods = new Map<number, string>()
         const types = ["consumesTrading", "dropsTrading", "dropsNonTrading", "producesNonTrading"] as Array<
             keyof PortPerServer
         >
@@ -344,17 +366,14 @@ export default class SelectPorts {
                 const goodList = port[type] as GoodList
                 if (goodList) {
                     for (const good of goodList) {
-                        selectGoods.add(good)
+                        selectGoods.set(good, this._ports.tradeItem.get(good)!.name)
                     }
                 }
             }
         }
 
-        const options = `${[...selectGoods]
-            .sort(simpleStringSort)
-            .map((good) => `<option>${good}</option>`)
-            .join("")}`
-
+        const sortedGoods = [...selectGoods].sort((a, b) => a[1].localeCompare(b[1]))
+        const options = `${sortedGoods.map((good) => `<option value="${good[0]}">${good[1]}</option>`).join("")}`
         this._buyGoodsSelector.insertAdjacentHTML("beforeend", options)
         $(this._buyGoodsSelector).selectpicker("refresh")
     }
@@ -495,31 +514,121 @@ export default class SelectPorts {
         $(this._propCMSelector).selectpicker()
     }
 
+    _getSailingDistance(fromPortId: number, toPortId: number): number {
+        return fromPortId < toPortId
+            ? this._distances.get(fromPortId * this._numberPorts + toPortId) ?? 0
+            : this._distances.get(toPortId * this._numberPorts + fromPortId) ?? 0
+    }
+
     _setTradePortPartners(): void {
-        const tradePort = this._ports.portDataDefault.find((port) => port.id === this._ports.tradePortId)
+        const tradePort = (this._ports.portDataDefault.find((port) => port.id === this._ports.tradePortId) ??
+            []) as PortWithTrades
+
         if (tradePort) {
-            const tradePortConsumedGoods = tradePort.consumesTrading
-                ? tradePort.consumesTrading.map((good) => good)
-                : []
-            const tradePortProducedGoods = tradePort.dropsTrading ? tradePort.dropsTrading.map((good) => good) : []
-
-            this._ports.portData = this._ports.portDataDefault
-                .map((port) => {
-                    port.goodsToBuyInTradePort = port.consumesTrading
-                        ? port.consumesTrading
-                              .filter((good) => tradePortProducedGoods.includes(good))
-                              .map((good) => good)
-                        : []
-                    port.buyInTradePort = Boolean(port.goodsToBuyInTradePort.length)
-                    port.goodsToSellInTradePort = port.dropsTrading
-                        ? port.dropsTrading.filter((good) => tradePortConsumedGoods.includes(good)).map((good) => good)
-                        : []
-                    port.sellInTradePort = Boolean(port.goodsToSellInTradePort.length)
-
-                    return port
-                })
-                .filter((port) => port.id === this._ports.tradePortId || port.sellInTradePort || port.buyInTradePort)
+            this._setTradeRelations(tradePort)
         }
+    }
+
+    _setTradeRelations(tradePort: PortWithTrades): void {
+        const getBuyPrice = (itemId: number): number => this._ports.tradeItem.get(itemId)?.price ?? 0
+        const getDistanceFactor = (itemId: number): number => this._ports.tradeItem.get(itemId)?.distanceFactor ?? 0
+        const getPortTax = (portId: number): number =>
+            this._ports.portDataDefault.find((port) => port.id === portId)?.portTax ?? 0
+        const getCoordinates = (portId: number): Coordinate => {
+            const port = this._ports.portDataDefault.find((port) => port.id === portId)
+            return { x: port?.coordinates[0] ?? 0, y: port?.coordinates[1] ?? 0 }
+        }
+
+        const getPlanarDistance = (fromPortId: number, toPortId: number): number => {
+            const fromPortCoord = getCoordinates(fromPortId)
+            const toPortCoord = getCoordinates(toPortId)
+
+            return getDistance(fromPortCoord, toPortCoord)
+        }
+
+        const findClosestSourcePort = (sellPort: PortWithTrades, itemId: number): SourcePort => {
+            let minDistance = Infinity
+            let closestPort = 0
+            const sourcePortIds = new Set(
+                this._ports.portDataDefault
+                    .filter((port) => port.dropsTrading?.includes(itemId) ?? port.dropsNonTrading?.includes(itemId))
+                    .map((port) => port.id)
+            )
+
+            for (const sourcePortId of sourcePortIds) {
+                const distance = getPlanarDistance(sourcePortId, sellPort.id)
+                if (distance < minDistance) {
+                    minDistance = distance
+                    closestPort = sourcePortId
+                }
+            }
+
+            return {
+                id: closestPort,
+                distance: minDistance,
+            }
+        }
+
+        const calculateSellProfit = (
+            buyPort: PortWithTrades,
+            sellPort: PortWithTrades,
+            itemId: number
+        ): TradeProfit => {
+            const { id: closestSourcePortId, distance: planarDistance } = findClosestSourcePort(sellPort, itemId)
+            const sailingDistance = this._getSailingDistance(closestSourcePortId, sellPort.id)
+            const buyTax = getPortTax(buyPort.id)
+            const sellTax = getPortTax(sellPort.id)
+            let buyPrice = getBuyPrice(itemId)
+            let sellPrice = buyPrice * 3 + (planarDistance * buyPrice * getDistanceFactor(itemId)) / 6 / 100
+            buyPrice *= 1 + buyTax
+            sellPrice /= 1 + sellTax
+            const profit = Math.round(sellPrice - buyPrice)
+
+            return { profit, profitPerDistance: profit / sailingDistance }
+        }
+
+        const getProfit = (buyPort: PortWithTrades, sellPort: PortWithTrades, itemId: number): TradeProfit => {
+            const key = String(sellPort.id).padStart(4, "0") + String(itemId).padStart(4, "0")
+            if (!this._sellProfit.has(key)) {
+                this._sellProfit.set(key, calculateSellProfit(buyPort, sellPort, itemId))
+            }
+
+            return this._sellProfit.get(key)!
+        }
+
+        const getGoodsToBuyInTradePort = (sellPort: PortWithTrades): TradeGoodProfit[] => {
+            const tradePortProducedGoods = new Set(tradePort.dropsTrading?.map((good) => good)) ?? []
+
+            return (sellPort.consumesTrading
+                ?.filter((good) => tradePortProducedGoods.has(good))
+                .map((good) => ({
+                    name: this._ports.tradeItem.get(good)?.name ?? "",
+                    profit: getProfit(tradePort, sellPort, good),
+                })) ?? []) as TradeGoodProfit[]
+        }
+
+        const getGoodsToSellInTradePort = (buyPort: PortWithTrades): TradeGoodProfit[] => {
+            const tradePortConsumedGoods = new Set(tradePort.consumesTrading?.map((good) => good)) ?? []
+
+            return (buyPort.dropsTrading
+                ?.filter((good) => tradePortConsumedGoods.has(good))
+                .map((good) => ({
+                    name: this._ports.tradeItem.get(good)?.name ?? "",
+                    profit: getProfit(buyPort, tradePort, good),
+                })) ?? []) as TradeGoodProfit[]
+        }
+
+        this._ports.portData = this._ports.portDataDefault
+            .map((port) => {
+                port.sailingDistanceToTradePort = this._getSailingDistance(port.id, tradePort.id)
+                port.goodsToBuyInTradePort = getGoodsToBuyInTradePort(port)
+                port.buyInTradePort = Boolean(port.goodsToBuyInTradePort.length)
+                port.goodsToSellInTradePort = getGoodsToSellInTradePort(port)
+                port.sellInTradePort = Boolean(port.goodsToSellInTradePort.length)
+
+                return port
+            })
+            .filter((port) => port.id === this._ports.tradePortId || port.sellInTradePort || port.buyInTradePort)
     }
 
     _portSelected(): void {
@@ -545,14 +654,17 @@ export default class SelectPorts {
     }
 
     _goodSelected(): void {
-        const goodSelected = this._buyGoodsSelector.options[this._buyGoodsSelector.selectedIndex].value
+        const goodSelectedId = Number(this._buyGoodsSelector.options[this._buyGoodsSelector.selectedIndex].value)
+
         const sourcePorts = (JSON.parse(
             JSON.stringify(
                 this._ports.portDataDefault.filter(
                     (port) =>
-                        (port.dropsTrading && port.dropsTrading.some((good) => good === goodSelected)) ||
-                        (port.dropsNonTrading && port.dropsNonTrading.some((good) => good === goodSelected)) ||
-                        (port.producesNonTrading && port.producesNonTrading.some((good) => good === goodSelected))
+                        (port.dropsTrading && port.dropsTrading.some((good: number) => good === goodSelectedId)) ||
+                        (port.dropsNonTrading &&
+                            port.dropsNonTrading.some((good: number) => good === goodSelectedId)) ||
+                        (port.producesNonTrading &&
+                            port.producesNonTrading.some((good: number) => good === goodSelectedId))
                 )
             )
         ) as PortWithTrades[]).map((port) => {
@@ -562,7 +674,7 @@ export default class SelectPorts {
         const consumingPorts = (JSON.parse(
             JSON.stringify(
                 this._ports.portDataDefault.filter(
-                    (port) => port.consumesTrading && port.consumesTrading.some((good) => good === goodSelected)
+                    (port) => port.consumesTrading && port.consumesTrading.some((good) => good === goodSelectedId)
                 )
             )
         ) as PortWithTrades[]).map((port) => {
