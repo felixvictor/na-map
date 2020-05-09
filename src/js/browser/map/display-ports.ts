@@ -492,7 +492,7 @@ export default class DisplayPorts {
             { name: "Costa del Fuego", centroid: [3700, 1670], angle: 70 },
             { name: "Costa Rica", centroid: [3140, 5920], angle: 0 },
             { name: "Crooked", centroid: [4925, 2950], angle: 0 },
-            { name: "Cuidad de Cuba", centroid: [4500, 3495], angle: 0 },
+            { name: "Ciudad de Cuba", centroid: [4500, 3495], angle: 0 },
             { name: "Cumaná", centroid: [7280, 5770], angle: 0 },
             { name: "Dominica", centroid: [7640, 4602], angle: 0 },
             { name: "Exuma", centroid: [4700, 2560], angle: 0 },
