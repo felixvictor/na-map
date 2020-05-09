@@ -57,12 +57,14 @@ import {
     PortWithTrades,
     NationListAlternative,
     TradeItem,
+    TradeGoodProfit,
 } from "../../common/gen-json"
 import { DivDatum, SVGGDatum } from "../../common/interface"
 
 import TrilateratePosition from "../map-tools/get-position"
 import { NAMap } from "./na-map"
 import ShowF11 from "../map-tools/show-f11"
+import { simpleStringSort, sortBy } from "../../common/common-node"
 
 type PortCircleStringF = (d: PortWithTrades) => string
 type PortCircleNumberF = (d: PortWithTrades) => number
@@ -707,6 +709,7 @@ export default class DisplayPorts {
 
     // eslint-disable-next-line complexity
     _getText(portProperties: PortWithTrades): PortForDisplay {
+        const sortByProfit = (a: TradeGoodProfit, b: TradeGoodProfit): number => b.profit.profit - a.profit.profit
         moment.locale("en-gb")
         const portBattleLT = moment.utc(portProperties.portBattle).local()
         const portBattleST = moment.utc(portProperties.portBattle)
@@ -754,16 +757,34 @@ export default class DisplayPorts {
                 : "",
             // dropsTrading: portProperties.dropsTrading ? portProperties.dropsTrading.join(", ") : "",
             dropsTrading:
-                portProperties.dropsTrading?.map((item) => this.tradeItem.get(item)?.name ?? "").join(", ") ?? "",
+                portProperties.dropsTrading
+                    ?.map((item) => this.tradeItem.get(item)?.name ?? "")
+                    .sort(simpleStringSort)
+                    .join(", ") ?? "",
             consumesTrading:
-                portProperties.consumesTrading?.map((item) => this.tradeItem.get(item)?.name ?? "").join(", ") ?? "",
+                portProperties.consumesTrading
+                    ?.map((item) => this.tradeItem.get(item)?.name ?? "")
+                    .sort(simpleStringSort)
+                    .join(", ") ?? "",
             producesNonTrading:
-                portProperties.producesNonTrading?.map((item) => this.tradeItem.get(item)?.name ?? "").join(", ") ?? "",
+                portProperties.producesNonTrading
+                    ?.map((item) => this.tradeItem.get(item)?.name ?? "")
+                    .sort(simpleStringSort)
+                    .join(", ") ?? "",
             dropsNonTrading:
-                portProperties.dropsNonTrading?.map((item) => this.tradeItem.get(item)?.name ?? "").join(", ") ?? "",
+                portProperties.dropsNonTrading
+                    ?.map((item) => this.tradeItem.get(item)?.name ?? "")
+                    .sort(simpleStringSort)
+                    .join(", ") ?? "",
             tradePort: this._getPortName(this.tradePortId),
             goodsToSellInTradePort: portProperties.goodsToSellInTradePort
-                ?.map((good) => `${good.name} (${formatSiInt(good.profit)})`)
+                ?.sort(sortByProfit)
+                ?.map(
+                    (good) =>
+                        `${good.name} (${formatSiInt(good.profit.profit)}/${formatSiInt(
+                            good.profit.profitPerDistance
+                        )})`
+                )
                 .join(", "),
             goodsToBuyInTradePort: portProperties.goodsToBuyInTradePort
                 ? portProperties.goodsToBuyInTradePort.join(", ")
