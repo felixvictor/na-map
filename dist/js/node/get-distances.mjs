@@ -17,7 +17,7 @@ import { convertCoordX, convertCoordY } from "../common/common-math";
 import { simpleNumberSort } from "../common/common-node";
 import { distanceMapSize, serverNames } from "../common/common-var";
 const mapFileName = path.resolve(commonPaths.dirSrc, "images", `frontline-map-${distanceMapSize}.png`);
-const distancesFile = path.resolve(commonPaths.dirGenGeneric, `distances-${distanceMapSize}.json`);
+const distancesFile = path.resolve(commonPaths.dirGenGeneric, `distances.json`);
 const spotWater = 0;
 const spotLand = -1;
 const fileData = fs.readFileSync(mapFileName);
