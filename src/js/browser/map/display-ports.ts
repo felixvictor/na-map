@@ -101,7 +101,7 @@ interface PortForDisplay {
     netIncome: string
     tradingCompany: string
     laborHoursDiscount: string
-    sailingDistance: number
+    sailingDistance: string
     dropsTrading: string
     consumesTrading: string
     producesNonTrading: string
@@ -764,7 +764,7 @@ export default class DisplayPorts {
                     ?.map((item) => this.tradeItem.get(item)?.name ?? "")
                     .sort(simpleStringSort)
                     .join(", ") ?? "",
-            sailingDistance: getSailingDistanceInK(portProperties.sailingDistanceToTradePort),
+            sailingDistance: formatInt(getSailingDistanceInK(portProperties.sailingDistanceToTradePort)),
             consumesTrading:
                 portProperties.consumesTrading
                     ?.map((item) => this.tradeItem.get(item)?.name ?? "")
