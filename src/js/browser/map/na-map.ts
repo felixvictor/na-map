@@ -34,6 +34,7 @@ import ShowTrades from "../map-tools/show-trades"
 import WindRose from "../map-tools/wind-rose"
 import MakeJourney from "../map-tools/make-journey"
 import PredictWind from "../map-tools/predict-wind"
+import { mapSize } from "../../common/common-var";
 
 interface Tile {
     z: number
@@ -119,7 +120,7 @@ class NAMap {
          */
         this.coord = {
             min: 0, // Minimum world coordinate
-            max: 8192, // Maximum world coordinate
+            max: mapSize, // Maximum world coordinate
         }
 
         this._tileSize = 256

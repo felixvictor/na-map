@@ -17,7 +17,7 @@ import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../
 import { readJson, saveJsonAsync, xz } from "../common/common-file"
 import { convertCoordX, convertCoordY, Distance, Point } from "../common/common-math"
 import { simpleNumberSort } from "../common/common-node"
-import { distanceMapSize, serverNames } from "../common/common-var"
+import { distanceMapSize, mapSize, serverNames } from "../common/common-var";
 
 import { APIPort } from "./api-port"
 
@@ -46,7 +46,7 @@ const png = PNG.PNG.sync.read(fileData)
 
 const mapHeight = png.height // y
 const mapWidth = png.width // x
-const origMapSize = 8192
+const origMapSize = mapSize
 const mapScale = mapWidth / origMapSize
 
 /**
