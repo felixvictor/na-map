@@ -53,11 +53,6 @@ interface SelectPort {
     nation: NationShortName
 }
 
-interface SourcePort {
-    id: number
-    distance: number
-}
-
 export default class SelectPorts {
     isInventorySelected: boolean
     private _dataLoaded = false
@@ -546,9 +541,8 @@ export default class SelectPorts {
             return getDistance(fromPortCoord, toPortCoord)
         }
 
-        const findClosestSourcePort = (sellPort: PortWithTrades, itemId: number): SourcePort => {
+        const findClosestSourcePort = (sellPort: PortWithTrades, itemId: number): number => {
             let minDistance = Infinity
-            let closestPort = 0
             const sourcePortIds = new Set(
                 this._ports.portDataDefault
                     .filter((port) => port.dropsTrading?.includes(itemId) ?? port.dropsNonTrading?.includes(itemId))
@@ -556,17 +550,10 @@ export default class SelectPorts {
             )
 
             for (const sourcePortId of sourcePortIds) {
-                const distance = getPlanarDistance(sourcePortId, sellPort.id)
-                if (distance < minDistance) {
-                    minDistance = distance
-                    closestPort = sourcePortId
-                }
+                minDistance = Math.min(minDistance, getPlanarDistance(sourcePortId, sellPort.id))
             }
 
-            return {
-                id: closestPort,
-                distance: minDistance,
-            }
+            return minDistance
         }
 
         const calculateSellProfit = (
@@ -574,8 +561,8 @@ export default class SelectPorts {
             sellPort: PortWithTrades,
             itemId: number
         ): TradeProfit => {
-            const { id: closestSourcePortId, distance: planarDistance } = findClosestSourcePort(sellPort, itemId)
-            const sailingDistance = this._getSailingDistance(closestSourcePortId, sellPort.id)
+            const planarDistance = findClosestSourcePort(sellPort, itemId)
+            const sailingDistance = this._getSailingDistance(buyPort.id, sellPort.id)
             const buyTax = getPortTax(buyPort.id)
             const sellTax = getPortTax(sellPort.id)
             let buyPrice = getBuyPrice(itemId)
