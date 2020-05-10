@@ -43,6 +43,7 @@ import {
     degreesToRadians,
     distancePoints,
     getOrdinal,
+    getSailingDistanceInK,
     Point,
     roundToThousands,
 } from "../../common/common-math"
@@ -100,6 +101,7 @@ interface PortForDisplay {
     netIncome: string
     tradingCompany: string
     laborHoursDiscount: string
+    sailingDistance: number
     dropsTrading: string
     consumesTrading: string
     producesNonTrading: string
@@ -762,6 +764,7 @@ export default class DisplayPorts {
                     ?.map((item) => this.tradeItem.get(item)?.name ?? "")
                     .sort(simpleStringSort)
                     .join(", ") ?? "",
+            sailingDistance: getSailingDistanceInK(portProperties.sailingDistanceToTradePort),
             consumesTrading:
                 portProperties.consumesTrading
                     ?.map((item) => this.tradeItem.get(item)?.name ?? "")
@@ -872,11 +875,11 @@ export default class DisplayPorts {
 
         if (this.showRadius === "tradePorts") {
             if (port.goodsToSellInTradePort.length > 0) {
-                h += `<tr><td class='pl-0'>Sell in ${port.tradePort}\u00A0</td><td>${port.goodsToSellInTradePort}</td></tr>`
+                h += `<tr><td class='pl-0'>Sell in ${port.tradePort} (distance ${port.sailingDistance})\u00A0</td><td>${port.goodsToSellInTradePort}</td></tr>`
             }
 
             if (port.goodsToBuyInTradePort.length > 0) {
-                h += `<tr><td class='pl-0'>Buy in ${port.tradePort}\u00A0</td><td>${port.goodsToBuyInTradePort}</td></tr>`
+                h += `<tr><td class='pl-0'>Buy in ${port.tradePort} (distance ${port.sailingDistance})\u00A0</td><td>${port.goodsToBuyInTradePort}</td></tr>`
             }
         }
 

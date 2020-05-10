@@ -8,6 +8,8 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+import { distanceMapSize, mapSize } from "./common-var"
+
 export const timeFactor = 2.63
 export const speedFactor = 390
 export const speedConstA = 0.074465523706782
@@ -142,6 +144,13 @@ export const getDistance = (pt0: Coordinate, pt1: Coordinate): number => {
     }
 
     return distancePoints(fromF11, toF11) / (timeFactor * speedFactor)
+}
+
+/**
+ * Calculate the k distance from pixelDistance
+ */
+export const getSailingDistanceInK = (pixelDistance: number): number => {
+    return (pixelDistance * (mapSize / distanceMapSize)) / (timeFactor * speedFactor)
 }
 
 /**
