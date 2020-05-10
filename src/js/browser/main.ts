@@ -24,7 +24,7 @@ import "../../scss/main.scss"
  */
 declare global {
     interface SVGAnimatedString {
-        indexOf(): object
+        indexOf: () => object
     }
 }
 SVGAnimatedString.prototype.indexOf = function (this: SVGAnimatedString): object {
@@ -143,6 +143,7 @@ const load = async (): Promise<void> => {
 
     await loadMap(serverId, searchParams)
     if (searchParams.get("v")) {
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
         loadGameTools(serverId, searchParams)
     } else {
         document
@@ -159,7 +160,7 @@ const main = (): void => {
     registerPage("Homepage")
 
     setupListener()
-    // noinspection JSIgnoredPromiseFromCall
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     load()
 }
 
