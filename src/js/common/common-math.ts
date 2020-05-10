@@ -150,7 +150,7 @@ export const getDistance = (pt0: Coordinate, pt1: Coordinate): number => {
  * Calculate the k distance from pixelDistance
  */
 export const getSailingDistanceInK = (pixelDistance: number): number => {
-    return (pixelDistance * (mapSize / distanceMapSize)) / (timeFactor * speedFactor)
+    return pixelDistance ** (mapSize / distanceMapSize) / (timeFactor * speedFactor)
 }
 
 /**
