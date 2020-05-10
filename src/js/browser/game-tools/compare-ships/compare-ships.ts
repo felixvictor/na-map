@@ -35,7 +35,7 @@ import {
     repairTime,
     rigRepairsPercent,
 } from "../../../common/common-browser"
-import { isEmpty, putImportError, WoodType, woodType } from "../../../common/common"
+import { isEmpty, putImportError, woodType } from "../../../common/common"
 import { formatPP, formatSignInt, formatSignPercent } from "../../../common/common-format"
 import { ArrayIndex, Index, NestedIndex } from "../../../common/interface"
 import { getOrdinal } from "../../../common/common-math"
@@ -242,21 +242,17 @@ export class CompareShips {
         const fileName = `na-map ship compare ${date}.png`
         const link = document.createElement("a")
 
-        if (typeof link.download === "string") {
-            link.href = uri
-            link.download = fileName
+        link.href = uri
+        link.download = fileName
 
-            // Firefox requires the link to be in the body
-            document.body.append(link)
+        // Firefox requires the link to be in the body
+        document.body.append(link)
 
-            // simulate click
-            link.click()
+        // simulate click
+        link.click()
 
-            // remove the link when done
-            link.remove()
-        } else {
-            window.open(uri)
-        }
+        // remove the link when done
+        link.remove()
     }
 
     async CompareShipsInit(): Promise<void> {
@@ -443,36 +439,6 @@ export class CompareShips {
         return this._shipData.find((ship) => ship.id === id)?.name ?? ""
     }
 
-    _getPropertyText(type: string, itemId: string): string {
-        const id = Number(itemId)
-        let propertyText = ""
-
-        if (type === "ship") {
-            propertyText = this._getShipName(id)
-        } else if (type === "module") {
-            propertyText = this._moduleProperties.get(id)?.name.replace(" Bonus", "") ?? ""
-        } else {
-            propertyText = this.woodCompare.getWoodName(type as WoodType, id)
-        }
-
-        return propertyText
-    }
-
-    _getText(type: string, ids: string | string[]): string {
-        if (!Array.isArray(ids)) {
-            const propertyText = this._getPropertyText(type, ids)
-            return `${propertyText}`
-        }
-
-        const texts = [] as string[]
-        for (const id of ids) {
-            const propertyText = this._getPropertyText(type, id)
-            texts.push(propertyText)
-        }
-
-        return `${texts.join(", ")}`
-    }
-
     _getSelectedData(columnId: ShipColumnType): SelectedData {
         const selectedData = {
             moduleData: new Map<string, string>(),
@@ -513,6 +479,7 @@ export class CompareShips {
         const mainDiv = d3Select(parent)
             .insert("div", ":first-child")
             .style("height", `${labelHeight * 5}px`)
+
         if (selectedData.ship) {
             mainDiv.append("div").style("margin-bottom", "5px").style("line-height", "1.1").text(selectedData.ship)
         }
@@ -593,8 +560,8 @@ export class CompareShips {
                 this._copyDataClicked(event)
             })
             // Make image
-            document.querySelector(`#${this._imageButtonId}`)?.addEventListener("click", (event) => {
-                this._makeImage(event)
+            document.querySelector(`#${this._imageButtonId}`)?.addEventListener("click", async (event) => {
+                await this._makeImage(event)
             })
         }
 
@@ -1276,9 +1243,9 @@ export class CompareShips {
             // @ts-ignore
             if (Array.isArray(this._selectedUpgradeIdsPerType[compareId][type])) {
                 // Multiple selects
-                this._selectedUpgradeIdsPerType[compareId][type] = this._selectedUpgradeIdsPerType[compareId][type].map(
-                    Number
-                )
+                this._selectedUpgradeIdsPerType[compareId][type] = this._selectedUpgradeIdsPerType[compareId][
+                    type
+                ].map((element) => Number(element))
             } else {
                 // Single select
                 this._selectedUpgradeIdsPerType[compareId][type] = this._selectedUpgradeIdsPerType[compareId][type]
@@ -1386,7 +1353,7 @@ export class CompareShips {
 
                     // console.log("moduleIds", { columnId }, { type }, { moduleIds });
 
-                    this._selectedUpgradeIdsPerType[columnId][type] = moduleIds.map(Number)
+                    this._selectedUpgradeIdsPerType[columnId][type] = moduleIds.map((element) => Number(element))
                     CompareShips._setSelect(
                         this._selectModule$[columnId][type],
                         this._selectedUpgradeIdsPerType[columnId][type]
