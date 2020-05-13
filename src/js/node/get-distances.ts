@@ -10,16 +10,20 @@
 
 import * as fs from "fs"
 import * as path from "path"
-import { default as Denque } from "denque"
+import { default as Immutable } from "immutable"
 import { default as PNG } from "pngjs"
 
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
 import { readJson, saveJsonAsync, xz } from "../common/common-file"
 import { convertCoordX, convertCoordY, Distance, Point } from "../common/common-math"
 import { simpleNumberSort } from "../common/common-node"
-import { distanceMapSize, mapSize, serverNames } from "../common/common-var";
+import { distanceMapSize, mapSize, serverNames } from "../common/common-var"
 
 import { APIPort } from "./api-port"
+
+type Index = number
+type PixelDistance = number
+type SpotType = number
 
 /**
  * ------------------------------------------------------------------------
@@ -30,8 +34,8 @@ import { APIPort } from "./api-port"
 const mapFileName = path.resolve(commonPaths.dirSrc, "images", `frontline-map-${distanceMapSize}.png`)
 const distancesFile = path.resolve(commonPaths.dirGenGeneric, `distances.json`)
 
-const spotWater = 0
-const spotLand = -1
+const spotWater: SpotType = 0
+const spotLand: SpotType = -1
 
 /**
  * ------------------------------------------------------------------------
@@ -55,7 +59,7 @@ const mapScale = mapWidth / origMapSize
  * ------------------------------------------------------------------------
  */
 
-const getIndex = (y: number, x: number): number => y * mapWidth + x
+const getIndex = (y: number, x: number): Index => y * mapWidth + x
 const getCoordinates = (y: number, x: number): Point => [
     Math.trunc(convertCoordY(x, y) * mapScale),
     Math.trunc(convertCoordX(x, y) * mapScale),
@@ -73,7 +77,7 @@ let portIds: number[] = []
 let numPorts = 0
 
 interface GridMap {
-    [index: number]: number // type (spotLand, spotWater, port id)
+    [index: number]: SpotType // type (spotLand, spotWater, port id)
 }
 
 /**
@@ -111,35 +115,37 @@ const findPaths = (
     startX: number // Start port x position
 ): void => {
     // Add outer-grid land borders
-    const visitedPositions = new Set<number>(visitedPositionsDefault)
-    // Queue holds unchecked positions ([index, distance from start port])
-    const queue = new Denque()
+    let visitedPositions = Immutable.Set<Index>([...visitedPositionsDefault])
 
     // Add start port
     const startIndex = getIndex(startY, startX)
     const foundPortIds = new Set<number>()
     startPortIds.add(startPortId)
-    visitedPositions.add(startIndex)
-    queue.push([startIndex, 0])
+    visitedPositions = visitedPositions.add(startIndex)
+    // Queue holds unchecked positions ([index, distance from start port])
+    let queue = Immutable.List<[Index, PixelDistance]>([[startIndex, 0]])
 
     while (foundPortIds.size + startPortIds.size < numPorts && !queue.isEmpty()) {
-        let [pos, distance]: [number, number] = queue.shift()
-        distance++
+        let [index, pixelDistance]: [Index, PixelDistance] = queue.first()
+        queue = queue.shift()
+        pixelDistance++
+
+        // console.log(index, pixelDistance)
 
         // Check if port is found
-        if (map[pos] > startPortId) {
-            distances.push([startPortId, map[pos], distance])
-            foundPortIds.add(map[pos])
+        if (map[index] > startPortId) {
+            distances.push([startPortId, map[index], pixelDistance])
+            foundPortIds.add(map[index])
         }
 
         // Check all nine neighbour positions ([-1, 0, 1][-1, 0, 1])
         for (let y = -mapWidth; y <= mapWidth; y += mapWidth) {
             for (let x = -1; x <= 1; x += 1) {
-                const index = pos + y + x
+                const neighbourIndex: Index = index + y + x
                 // Add not visited non-land neighbour index
-                if (!visitedPositions.has(index) && map[index] !== spotLand) {
-                    visitedPositions.add(index)
-                    queue.push([index, distance])
+                if (!visitedPositions.has(neighbourIndex) && map[neighbourIndex] !== spotLand) {
+                    visitedPositions = visitedPositions.add(neighbourIndex)
+                    queue = queue.push([neighbourIndex, pixelDistance])
                 }
             }
         }
