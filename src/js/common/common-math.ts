@@ -147,11 +147,10 @@ export const getDistance = (pt0: Coordinate, pt1: Coordinate): number => {
 }
 
 /**
- * Calculate the k distance from pixelDistance
+ * Calculate/Estimate the k distance from pixelDistance
+ * @param pixelDistance - Distance in pixels
  */
-export const getSailingDistanceInK = (pixelDistance: number): number => {
-    return pixelDistance ** (mapSize / distanceMapSize) / (timeFactor * speedFactor)
-}
+export const getSailingDistanceInK = (pixelDistance: number): number => pixelDistance / 5 + 12
 
 /**
  * Format ordinal
@@ -165,7 +164,7 @@ export function getOrdinal(n: number, sup = true): string {
     const v = n % 100
     // noinspection MagicNumberJS
     const text = s[(v - 20) % 10] || s[v] || s[0]
-    return n + (sup ? `<span class="super">${text}</span>` : `${text}`)
+    return String(n) + (sup ? `<span class="super">${text}</span>` : `${text}`)
 }
 
 /**
