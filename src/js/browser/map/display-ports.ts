@@ -42,6 +42,7 @@ import {
     defaultFontSize,
     degreesToRadians,
     distancePoints,
+    getDistance,
     getOrdinal,
     getSailingDistanceInK,
     Point,
@@ -711,6 +712,17 @@ export default class DisplayPorts {
     }
 
     _getText(portProperties: PortWithTrades): PortForDisplay {
+        const getCoord = (portId: number): Coordinate => {
+            const port = this.portDataDefault.find((port) => port.id === portId)!
+            return { x: port.coordinates[0], y: port.coordinates[1] }
+        }
+
+        const getKDistance = (fromPortId: number, toPortId: number): number => {
+            const fromPortCoord = getCoord(fromPortId)
+            const toPortCoord = getCoord(toPortId)
+            return getDistance(fromPortCoord, toPortCoord)
+        }
+
         // eslint-disable-next-line unicorn/consistent-function-scoping
         const sortByProfit = (a: TradeGoodProfit, b: TradeGoodProfit): number => b.profit.profit - a.profit.profit
         moment.locale("en-gb")
@@ -758,13 +770,14 @@ export default class DisplayPorts {
             laborHoursDiscount: portProperties.laborHoursDiscount
                 ? `, labor hours discount level\u202F${portProperties.laborHoursDiscount}`
                 : "",
-            // dropsTrading: portProperties.dropsTrading ? portProperties.dropsTrading.join(", ") : "",
             dropsTrading:
                 portProperties.dropsTrading
                     ?.map((item) => this.tradeItem.get(item)?.name ?? "")
                     .sort(simpleStringSort)
                     .join(", ") ?? "",
-            sailingDistance: formatInt(getSailingDistanceInK(portProperties.sailingDistanceToTradePort)),
+            sailingDistance: `Old ${formatInt(getKDistance(portProperties.id, this.tradePortId))}k -- new ${String(
+                portProperties.sailingDistanceToTradePort
+            )} -> ${formatInt(getSailingDistanceInK(portProperties.sailingDistanceToTradePort))}k`,
             consumesTrading:
                 portProperties.consumesTrading
                     ?.map((item) => this.tradeItem.get(item)?.name ?? "")
