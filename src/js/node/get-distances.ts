@@ -25,7 +25,7 @@ type Index = number
 type PixelDistance = number
 type SpotType = number
 
-interface GridMap {
+interface GridMap extends Array<SpotType> {
     [index: number]: SpotType // type (spotLand, spotWater, port id)
 }
 
@@ -55,7 +55,7 @@ class Map {
     #pngData!: Buffer
     #distances: Distance[] = []
     #distancesFile = path.resolve(commonPaths.dirGenGeneric, "distances.json")
-    #map: GridMap = {}
+    #map: GridMap = {} as GridMap
     #mapHeight!: number
     #mapScale!: number
     #mapWidth!: number
@@ -133,18 +133,18 @@ class Map {
     setBorders(): void {
         // Define outer bounds (map grid covers [0, mapSize-1])
         const minY = 0
-        const minX = 0
         const maxY = this.#mapHeight - 1
+        const minX = 0
         const maxX = this.#mapWidth - 1
 
-        for (let y = minY; y <= maxY; y += maxY + 1) {
+        for (let y = minY; y <= maxY; y += maxY) {
             for (let x = minX; x <= maxX; x += 1) {
                 this.visit(this.getIndex(y, x))
             }
         }
 
         for (let y = minY; y <= maxY; y += 1) {
-            for (let x = minX; x <= maxX; x += maxX + 1) {
+            for (let x = minX; x <= maxX; x += maxX) {
                 this.visit(this.getIndex(y, x))
             }
         }
@@ -152,15 +152,13 @@ class Map {
 
     resetVisitedSpots(): void {
         const minY = 1
-        const minX = 1
         const maxY = this.#mapHeight - 2
+        const minX = 1
         const maxX = this.#mapWidth - 2
 
-        let index = minY * this.#mapWidth + minX
         for (let y = minY; y <= maxY; y += 1) {
             for (let x = minX; x <= maxX; x += 1) {
-                this.resetVisit(index)
-                index += 1
+                this.resetVisit(this.getIndex(y, x))
             }
         }
     }
