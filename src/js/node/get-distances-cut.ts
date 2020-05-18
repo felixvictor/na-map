@@ -16,8 +16,7 @@ import { default as PNG } from "pngjs"
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
 import { readJson, saveJsonAsync, xz } from "../common/common-file"
 import { convertCoordX, convertCoordY, Distance, Point } from "../common/common-math"
-import { simpleNumberSort } from "../common/common-node"
-import { distanceMapSize, mapSize, serverNames } from "../common/common-var"
+import { serverNames } from "../common/common-var"
 
 import { APIPort } from "./api-port"
 
@@ -51,10 +50,10 @@ class Port {
 }
 
 class Map {
-    #mapFileName = path.resolve(commonPaths.dirSrc, "images", `frontline-map-${distanceMapSize}.png`)
+    #mapFileName = path.resolve(commonPaths.dirSrc, "images", `cut.png`)
     #pngData!: Buffer
     #distances: Distance[] = []
-    #distancesFile = path.resolve(commonPaths.dirGenGeneric, "distances.json")
+    #distancesFile = path.resolve(commonPaths.dirGenGeneric, "distances-cut.json")
     #map: GridMap = {} as GridMap
     #mapHeight!: number
     #mapScale!: number
@@ -66,6 +65,10 @@ class Map {
     #VISITED = 0
     #FLAGS = 0
 
+    #cutMinY = 4884
+    #cutMinX = 2702
+    private selectedPorts!: Set<number>
+
     constructor() {
         this.#port = new Port()
 
@@ -74,8 +77,37 @@ class Map {
         this.mapInit()
         this.setPorts()
         this.setBorders()
+
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         this.getAndSaveDistances()
+    }
+
+    printMap(): void {
+        const minY = 0
+        const maxY = this.#mapHeight - 1
+        const minX = 0
+        const maxX = this.#mapWidth - 1
+
+        let index = 0
+        for (let x = minX; x <= maxX; x += 1) {
+            let h = ""
+            for (let y = minY; y <= maxY; y += 1) {
+                const spot = this.getSpot(index)
+                if (spot & this.#VISITED) {
+                    h += "X"
+                } else if (spot & this.#WATER) {
+                    h += " "
+                } else if (spot & this.#LAND) {
+                    h += "~"
+                } else {
+                    h += "*"
+                }
+
+                index++
+            }
+
+            console.log(h)
+        }
     }
 
     setBitFlags(): void {
@@ -100,7 +132,7 @@ class Map {
 
         this.#mapHeight = png.height // y
         this.#mapWidth = png.width // x
-        this.#mapScale = this.#mapWidth / mapSize
+        this.#mapScale = 1
         this.#pngData = png.data
 
         console.log(this.#mapHeight, this.#mapWidth)
@@ -121,9 +153,16 @@ class Map {
     setPorts(): void {
         this.#port.apiPorts.forEach(({ Id, EntrancePosition: { z: y, x } }: APIPort) => {
             const [portY, portX] = this.#port.getCoordinates(y, x, this.#mapScale)
-            const index = this.getIndex(portY, portX)
-
-            this.setPortSpot(index, Number(Id))
+            if (
+                portY >= this.#cutMinY &&
+                portY <= this.#cutMinY + this.#mapHeight &&
+                portX >= this.#cutMinX &&
+                portX <= this.#cutMinX + this.#mapWidth
+            ) {
+                const index = this.getIndex(portY, portX)
+                console.log(portY, portX, index, Number(Id))
+                this.setPortSpot(index, Number(Id))
+            }
         })
     }
 
@@ -132,29 +171,29 @@ class Map {
      */
     setBorders(): void {
         // Define outer bounds (map grid covers [0, mapSize-1])
-        const minY = 0
-        const maxY = this.#mapHeight - 1
-        const minX = 0
-        const maxX = this.#mapWidth - 1
+        const minY = this.#cutMinY
+        const maxY = this.#cutMinY + this.#mapHeight - 1
+        const minX = this.#cutMinX
+        const maxX = this.#cutMinX + this.#mapWidth - 1
 
-        for (let y = minY; y <= maxY; y += maxY) {
+        for (let y = minY; y <= maxY; y += this.#mapHeight - 1) {
             for (let x = minX; x <= maxX; x += 1) {
                 this.visit(this.getIndex(y, x))
             }
         }
 
         for (let y = minY; y <= maxY; y += 1) {
-            for (let x = minX; x <= maxX; x += maxX) {
+            for (let x = minX; x <= maxX; x += this.#mapWidth - 1) {
                 this.visit(this.getIndex(y, x))
             }
         }
     }
 
     resetVisitedSpots(): void {
-        const minY = 1
-        const maxY = this.#mapHeight - 2
-        const minX = 1
-        const maxX = this.#mapWidth - 2
+        const minY = this.#cutMinY + 1
+        const maxY = this.#cutMinY + this.#mapHeight - 2
+        const minX = this.#cutMinX + 1
+        const maxX = this.#cutMinX + this.#mapWidth - 2
 
         for (let y = minY; y <= maxY; y += 1) {
             for (let x = minX; x <= maxX; x += 1) {
@@ -171,8 +210,9 @@ class Map {
         startY: number, // Start port y position
         startX: number // Start port x position
     ): void {
-        const foundPortIds = new Set<number>()
+        console.log(startPortId, startY, startX)
 
+        const foundPortIds = new Set<number>()
         this.resetVisitedSpots()
 
         // Add start port
@@ -183,16 +223,19 @@ class Map {
         // Queue holds unchecked positions ([index, distance from start port])
         let queue = Immutable.List<[Index, PixelDistance]>([[startIndex, 0]])
 
-        while (foundPortIds.size + this.#completedPorts.size < this.#port.numPorts && !queue.isEmpty()) {
+        while (!queue.isEmpty()) {
             let [index, pixelDistance]: [Index, PixelDistance] = queue.first()
             queue = queue.shift()
             const spot = this.getPortId(this.getSpot(index))
 
+            // console.log([startPortId, spot, index, pixelDistance])
+
             // Check if port is found
             if (spot > startPortId) {
-                // console.log([startPortId, portId, index, pixelDistance])
+                console.log([startPortId, spot, index, pixelDistance])
                 this.#distances.push([startPortId, spot, pixelDistance])
                 foundPortIds.add(spot)
+                this.printMap()
             }
 
             pixelDistance++
@@ -209,25 +252,9 @@ class Map {
                 }
             }
         }
-
-        if (foundPortIds.size + this.#completedPorts.size < this.#port.numPorts) {
-            const missingPortIds = this.#port.portIds
-                .filter((portId: number) => portId > startPortId && !foundPortIds.has(portId))
-                .sort(simpleNumberSort)
-            console.error(
-                "Only",
-                foundPortIds.size + this.#completedPorts.size,
-                "of all",
-                this.#port.numPorts,
-                "ports found! Ports",
-                missingPortIds,
-                "are missing."
-            )
-            missingPortIds.forEach((missingPortId: number) => {
-                this.#distances.push([startPortId, missingPortId, 0])
-            })
-        }
     }
+
+
 
     /**
      *  Calculate distances between all ports
@@ -235,8 +262,12 @@ class Map {
     async getAndSaveDistances(): Promise<void> {
         try {
             console.time("findPath")
+            // this.selectedPorts = new Set([230, 231, 232, 233, 234, 235, 236, 237, 238])
+            // this.selectedPorts = new Set([231, 232, 233, 234, 235, 236, 237])
+            this.selectedPorts = new Set([231, 235, 237])
             this.#port.apiPorts
                 .sort((a: APIPort, b: APIPort) => Number(a.Id) - Number(b.Id))
+                .filter((fromPort) => this.selectedPorts.has(Number(fromPort.Id)))
                 .forEach((fromPort: APIPort) => {
                     const fromPortId = Number(fromPort.Id)
                     const {
@@ -258,7 +289,7 @@ class Map {
     }
 
     getIndex(y: number, x: number): Index {
-        return y * this.#mapWidth + x
+        return (y - this.#cutMinY) * this.#mapWidth + (x - this.#cutMinX)
     }
 
     getSpot(index: number): SpotType {
