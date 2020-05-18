@@ -33,6 +33,8 @@
         "main:develop-test2": "               run-s build:load build:js 'build:data:* full-client'          build:deploy-test2",
         "main:maintenance": "yarn --silent && run-s build:load          'build:data:* full-server'          build:deploy-main",
         "pre-build:distances": "yarn node --max-heap-size=10000 --experimental-specifier-resolution=node dist/js/node/get-distances.mjs",
+        "pre-build:distances-cut": "yarn node --max-heap-size=10000 --experimental-specifier-resolution=node dist/js/node/get-distances-cut.mjs",
+        "pre-build:distances-test": "yarn node --max-heap-size=10000 --experimental-specifier-resolution=node dist/js/node/get-distances-test.mjs",
         "pre-build:modules": "run-s pre-build:modules:**",
         "pre-build:modules:correct:dir": "rm -rf build/Modules/; mv build/modules build/Modules",
         "pre-build:modules:correct:enc": "cd build/Modules/; for FILE in *.xml; do dos2unix -m -q \"${FILE}\"; done",
