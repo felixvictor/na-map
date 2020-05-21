@@ -65,9 +65,9 @@ class Map {
     #VISITED = 0
     #FLAGS = 0
 
-    #cutMinY = 4884
-    #cutMinX = 2702
-    private selectedPorts!: Set<number>
+    #cutMinY = 3155
+    #cutMinX = 230
+    selectedPorts: Set<number> = new Set()
 
     constructor() {
         this.#port = new Port()
@@ -161,6 +161,7 @@ class Map {
             ) {
                 const index = this.getIndex(portY, portX)
                 console.log(portY, portX, index, Number(Id))
+                this.selectedPorts.add(Number(Id))
                 this.setPortSpot(index, Number(Id))
             }
         })
@@ -223,7 +224,7 @@ class Map {
         // Queue holds unchecked positions ([index, distance from start port])
         let queue = Immutable.List<[Index, PixelDistance]>([[startIndex, 0]])
 
-        while (!queue.isEmpty()) {
+        while (foundPortIds.size + this.#completedPorts.size < this.selectedPorts.size && !queue.isEmpty()) {
             let [index, pixelDistance]: [Index, PixelDistance] = queue.first()
             queue = queue.shift()
             const spot = this.getPortId(this.getSpot(index))
@@ -231,7 +232,8 @@ class Map {
             // console.log([startPortId, spot, index, pixelDistance])
 
             // Check if port is found
-            if (spot > startPortId) {
+            // if (spot > startPortId) {
+            if ((startPortId === 270 && spot === 276) || (startPortId === 276 && spot === 338)) {
                 console.log([startPortId, spot, index, pixelDistance])
                 this.#distances.push([startPortId, spot, pixelDistance])
                 foundPortIds.add(spot)
@@ -254,17 +256,12 @@ class Map {
         }
     }
 
-
-
     /**
      *  Calculate distances between all ports
      */
     async getAndSaveDistances(): Promise<void> {
         try {
             console.time("findPath")
-            // this.selectedPorts = new Set([230, 231, 232, 233, 234, 235, 236, 237, 238])
-            // this.selectedPorts = new Set([231, 232, 233, 234, 235, 236, 237])
-            this.selectedPorts = new Set([231, 235, 237])
             this.#port.apiPorts
                 .sort((a: APIPort, b: APIPort) => Number(a.Id) - Number(b.Id))
                 .filter((fromPort) => this.selectedPorts.has(Number(fromPort.Id)))
