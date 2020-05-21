@@ -51,7 +51,7 @@ class Port {
 
 class PixelMap {
     #distances: Distance[] = []
-    #distancesFile = path.resolve(commonPaths.dirGenGeneric, "distances-copy.json")
+    #distancesFile = path.resolve(commonPaths.dirGenGeneric, "distances-test.json")
     #map: GridMap = {} as GridMap
     #mapHeight!: number
     #mapScale!: number
@@ -61,6 +61,8 @@ class PixelMap {
     #LAND = 0
     #WATER = 0
     #VISITED = 0
+    #CURRENT = 0
+    #INQUEUE = 0
     #FLAGS = 0
 
     #cutMinY = 0
@@ -90,7 +92,11 @@ class PixelMap {
             let h = ""
             for (let y = minY; y <= maxY; y += 1) {
                 const spot = this.getSpot(index)
-                if (spot & this.#VISITED) {
+                if (spot & this.#CURRENT) {
+                    h += "%"
+                } else if (spot & this.#INQUEUE) {
+                    h += "#"
+                } else if (spot & this.#VISITED) {
                     h += "X"
                 } else if (spot & this.#WATER) {
                     h += " "
@@ -118,7 +124,11 @@ class PixelMap {
         this.#LAND = 1 << bitsForPortIds
         this.#WATER = this.#LAND << 1
         this.#VISITED = this.#WATER << 1
-        this.#FLAGS = this.#LAND | this.#WATER | this.#VISITED
+        this.#INQUEUE = this.#VISITED << 1
+        this.#CURRENT = this.#INQUEUE << 1
+        this.#FLAGS = this.#LAND | this.#WATER | this.#VISITED | this.#INQUEUE | this.#CURRENT
+
+        console.log(this.#LAND, this.#WATER, this.#VISITED, this.#FLAGS)
     }
 
     readMap(): void {
@@ -136,12 +146,12 @@ class PixelMap {
         /*
                 this.#map = [
             w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w,
+            w, w, w, w, 3, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w,
             w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w,
-            w, w, l, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w,
-            w, 1, l, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w,
-            w, w, l, 2, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w,
-            w, w, l, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w,
-            w, w, l, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w,
+            w, 1, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w,
+            w, w, w, 2, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w,
+            w, w, w, w, 4, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w,
+            w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w,
             w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w,
             w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w,
             w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w,
@@ -161,32 +171,50 @@ class PixelMap {
             w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w,
         ]
          */
+
+        /* eslint-disable prettier/prettier */
         this.#map = [
-            w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w,
-            w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w,
-            w, w, l, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w,
-            w, 1, l, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w,
-            w, w, l, 2, 3, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w,
-            w, w, l, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w,
-            w, w, l, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w,
+            w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, l, l, w,
+            w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, l, l, w,
+            w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, l, w,
+            w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, l, l, w,
             w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w,
             w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w,
             w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w,
+            w, w, 3, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w,
             w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w,
             w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w,
-            w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w,
-            w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w,
+            w, w, w, w, w, w, w, w, w, w, 2, w, w, w, w, w, w, w, w, w, w, w, w, w,
             w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w,
             w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w,
             w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w,
             w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w,
             w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w,
+            w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w,
+            w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w,
+            w, w, w, w, 1, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w,
             w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w,
             w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w,
             w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w,
             w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w,
             w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w,
         ]
+        /* eslint-enable prettier/prettier */
+
+        this.selectedPorts = new Map()
+        const minY = this.#cutMinY
+        const maxY = this.#cutMinY + this.#mapHeight - 1
+        const minX = this.#cutMinX
+        const maxX = this.#cutMinX + this.#mapWidth - 1
+
+        for (let y = minY; y <= maxY; y += 1) {
+            for (let x = minX; x <= maxX; x += 1) {
+                const spot = this.getSpot(this.getIndex(y, x))
+                if (spot < this.#LAND) {
+                    this.selectedPorts.set(spot, [y, x])
+                }
+            }
+        }
     }
 
     /**
@@ -236,6 +264,7 @@ class PixelMap {
         console.log(startPortId, startY, startX)
         this.printMap()
         const foundPortIds = new Set<number>()
+        this.#completedPorts.add(startPortId)
         this.resetVisitedSpots()
         this.printMap()
 
@@ -247,11 +276,20 @@ class PixelMap {
         // Queue holds unchecked positions ([index, distance from start port])
         let queue = Immutable.List<[Index, PixelDistance]>([[startIndex, 0]])
 
-        while (!queue.isEmpty()) {
+        while (foundPortIds.size + this.#completedPorts.size < this.selectedPorts.size && !queue.isEmpty()) {
+            console.log(
+                foundPortIds.size,
+                this.selectedPorts.size,
+                foundPortIds.size < this.selectedPorts.size,
+                queue.size
+            )
             let [index, pixelDistance]: [Index, PixelDistance] = queue.first()
             queue = queue.shift()
             const spot = this.getPortId(this.getSpot(index))
-
+            console.log("new element from queue", index, pixelDistance, spot)
+            this.#map[index] |= this.#CURRENT
+            this.#map[index] &= ~this.#INQUEUE
+            // this.printMap()
             // console.log([startPortId, spot, index, pixelDistance])
 
             // Check if port is found
@@ -268,13 +306,26 @@ class PixelMap {
             for (let y = -this.#mapWidth; y <= this.#mapWidth; y += this.#mapWidth) {
                 for (let x = -1; x <= 1; x += 1) {
                     const neighbourIndex: Index = index + y + x
+                    console.log(
+                        "neighbours",
+                        y,
+                        x,
+                        neighbourIndex,
+                        this.getSpot(neighbourIndex),
+                        this.getPortId(this.getSpot(neighbourIndex))
+                    )
                     // Add not visited non-land neighbour index
                     if (this.isSpotNotVisitedNonLand(neighbourIndex)) {
                         this.visit(neighbourIndex)
                         queue = queue.push([neighbourIndex, pixelDistance])
+                        console.log("isSpotNotVisitedNonLand")
+                        this.#map[neighbourIndex] |= this.#INQUEUE
+                        // this.printMap()
                     }
                 }
             }
+
+            this.#map[index] &= ~this.#CURRENT
         }
     }
 
@@ -284,18 +335,16 @@ class PixelMap {
     async getAndSaveDistances(): Promise<void> {
         try {
             console.time("findPath")
-            // this.selectedPorts = new Set([230, 231, 232, 233, 234, 235, 236, 237, 238])
-            // this.selectedPorts = new Set([231, 232, 233, 234, 235, 236, 237])
-            this.selectedPorts = new Map([
-                [1, [3, 1]],
-                [2, [4, 3]],
-            ])
-            for (const [fromPortId, coord] of this.selectedPorts) {
+            const ports = [...this.selectedPorts].sort((a, b) => a[0] - b[0])
+            console.log(ports)
+            for (const [fromPortId, coord] of ports) {
                 const [fromPortY, fromPortX] = coord
 
                 this.findPaths(fromPortId, fromPortY, fromPortX)
 
                 console.timeLog("findPath", `${fromPortId} (${fromPortY}, ${fromPortX})`)
+
+                // process.exit(0)
             }
 
             console.timeEnd("findPath")
