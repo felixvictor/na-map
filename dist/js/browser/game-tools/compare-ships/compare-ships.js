@@ -113,16 +113,11 @@ export class CompareShips {
         const date = dayjs.utc().format("YYYY-MM-DD HH-mm-ss");
         const fileName = `na-map ship compare ${date}.png`;
         const link = document.createElement("a");
-        if (typeof link.download === "string") {
-            link.href = uri;
-            link.download = fileName;
-            document.body.append(link);
-            link.click();
-            link.remove();
-        }
-        else {
-            window.open(uri);
-        }
+        link.href = uri;
+        link.download = fileName;
+        document.body.append(link);
+        link.click();
+        link.remove();
     }
     async CompareShipsInit() {
         await this._loadAndSetupData();
@@ -286,33 +281,6 @@ export class CompareShips {
         var _a, _b;
         return (_b = (_a = this._shipData.find((ship) => ship.id === id)) === null || _a === void 0 ? void 0 : _a.name) !== null && _b !== void 0 ? _b : "";
     }
-    _getPropertyText(type, itemId) {
-        var _a, _b;
-        const id = Number(itemId);
-        let propertyText = "";
-        if (type === "ship") {
-            propertyText = this._getShipName(id);
-        }
-        else if (type === "module") {
-            propertyText = (_b = (_a = this._moduleProperties.get(id)) === null || _a === void 0 ? void 0 : _a.name.replace(" Bonus", "")) !== null && _b !== void 0 ? _b : "";
-        }
-        else {
-            propertyText = this.woodCompare.getWoodName(type, id);
-        }
-        return propertyText;
-    }
-    _getText(type, ids) {
-        if (!Array.isArray(ids)) {
-            const propertyText = this._getPropertyText(type, ids);
-            return `${propertyText}`;
-        }
-        const texts = [];
-        for (const id of ids) {
-            const propertyText = this._getPropertyText(type, id);
-            texts.push(propertyText);
-        }
-        return `${texts.join(", ")}`;
-    }
     _getSelectedData(columnId) {
         var _a, _b;
         const selectedData = {
@@ -410,8 +378,8 @@ export class CompareShips {
             (_b = document.querySelector(`#${this._copyButtonId}`)) === null || _b === void 0 ? void 0 : _b.addEventListener("click", (event) => {
                 this._copyDataClicked(event);
             });
-            (_c = document.querySelector(`#${this._imageButtonId}`)) === null || _c === void 0 ? void 0 : _c.addEventListener("click", (event) => {
-                this._makeImage(event);
+            (_c = document.querySelector(`#${this._imageButtonId}`)) === null || _c === void 0 ? void 0 : _c.addEventListener("click", async (event) => {
+                await this._makeImage(event);
             });
         }
         this._modal$.modal("show");
@@ -864,7 +832,7 @@ export class CompareShips {
         for (const type of this._moduleTypes) {
             this._selectedUpgradeIdsPerType[compareId][type] = this._selectModule$[compareId][type].val();
             if (Array.isArray(this._selectedUpgradeIdsPerType[compareId][type])) {
-                this._selectedUpgradeIdsPerType[compareId][type] = this._selectedUpgradeIdsPerType[compareId][type].map(Number);
+                this._selectedUpgradeIdsPerType[compareId][type] = this._selectedUpgradeIdsPerType[compareId][type].map((element) => Number(element));
             }
             else {
                 this._selectedUpgradeIdsPerType[compareId][type] = this._selectedUpgradeIdsPerType[compareId][type]
@@ -943,7 +911,7 @@ export class CompareShips {
                     if (!this._selectedUpgradeIdsList[columnId]) {
                         this._selectedUpgradeIdsList[columnId] = [];
                     }
-                    this._selectedUpgradeIdsPerType[columnId][type] = moduleIds.map(Number);
+                    this._selectedUpgradeIdsPerType[columnId][type] = moduleIds.map((element) => Number(element));
                     CompareShips._setSelect(this._selectModule$[columnId][type], this._selectedUpgradeIdsPerType[columnId][type]);
                     this._selectedUpgradeIdsList[columnId].push(...this._selectedUpgradeIdsPerType[columnId][type]);
                     needRefresh = true;
