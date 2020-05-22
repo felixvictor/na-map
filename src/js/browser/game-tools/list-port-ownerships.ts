@@ -85,7 +85,7 @@ export default class ListPortOwnerships {
         try {
             this._nationData = (await import(/* webpackChunkName: "data-nations" */ "Lib/gen-generic/nations.json"))
                 .default as Array<OwnershipNation<number>>
-            // @ts-ignore
+            // @ts-expect-error
             this._ownershipData = (
                 await import(/* webpackChunkName: "data-ownership" */ "Lib/gen-generic/ownership.json")
             ).default as Ownership[]
@@ -199,7 +199,7 @@ export default class ListPortOwnerships {
 
         const keys = nations.filter((nation) => nation.id !== 9).map((nation) => nation.short)
         const nationData = this._nationData
-        // @ts-ignore
+        // @ts-expect-error
         nationData.keys = keys
 
         const stacked = d3Stack<
@@ -219,7 +219,7 @@ export default class ListPortOwnerships {
                 .domain(d3Extent(nationData, (d) => new Date(d.date)) as [Date, Date])
                 .range([margin.left, width - margin.right])
             g.attr("transform", `translate(0,${height - margin.bottom})`).call(
-                // @ts-ignore
+                // @ts-expect-error
                 d3AxisBottom<Date>(xTimeScale)
                     .ticks(width / 80)
                     .tickSizeOuter(0)
@@ -232,7 +232,7 @@ export default class ListPortOwnerships {
         /**
          * Get area
          */
-        const getArea = (): Area<[string, number]> => {
+        const getArea = (): Area<NationArea> => {
             const xScale = d3ScaleLinear<number, Date>()
                 .domain(d3Extent(nationData, (d) => new Date(d.date)) as [Date, Date])
                 .range([margin.left, width - margin.right])
@@ -244,7 +244,7 @@ export default class ListPortOwnerships {
                 .range([height - margin.bottom, 0])
 
             const area = d3Area<NationArea>()
-                // @ts-ignore
+                // @ts-expect-error
                 .x((d: NationArea): Date => xScale(new Date(d.data.date)))
                 .y0((d: NationArea) => yScale(d[0]))
                 .y1((d: NationArea) => yScale(d[1]))
@@ -272,7 +272,7 @@ export default class ListPortOwnerships {
                         .append("path")
                         .attr("fill", (d) => this._colourScale(d.key))
                         .attr("stroke", (d) => this._colourScale(d.key))
-                        // @ts-ignore
+                        // @ts-expect-error
                         .attr("d", area)
                 )
 
@@ -281,7 +281,7 @@ export default class ListPortOwnerships {
                 .selectAll(".area-label")
                 .data(stacked)
                 .join((enter) =>
-                    // @ts-ignore
+                    // @ts-expect-error
                     enter
                         .append("text")
                         .attr("class", "area-label")

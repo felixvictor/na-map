@@ -52,6 +52,7 @@
                 "unicorn/prevent-abbreviations": "off",
                 "unicorn/no-nested-ternary": "off",
                 "tsdoc/syntax": "warn",
+                "@typescript-eslint/ban-ts-comment": "off",
                 "@typescript-eslint/consistent-type-assertions": ["error", { "assertionStyle": "as" }],
                 "@typescript-eslint/no-base-to-string": "off",
                 "@typescript-eslint/no-non-null-assertion": "off",
