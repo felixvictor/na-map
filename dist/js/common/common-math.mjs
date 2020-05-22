@@ -55,11 +55,12 @@ export const getDistance = (pt0, pt1) => {
     };
     return distancePoints(fromF11, toF11) / (timeFactor * speedFactor);
 };
+export const getSailingDistanceInK = (pixelDistance) => pixelDistance / 5 + 12;
 export function getOrdinal(n, sup = true) {
     const s = ["th", "st", "nd", "rd"];
     const v = n % 100;
     const text = s[(v - 20) % 10] || s[v] || s[0];
-    return n + (sup ? `<span class="super">${text}</span>` : `${text}`);
+    return String(n) + (sup ? `<span class="super">${text}</span>` : `${text}`);
 }
 export const compassDirections = [
     "N",
