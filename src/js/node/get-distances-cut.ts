@@ -65,8 +65,8 @@ class Map {
     #VISITED = 0
     #FLAGS = 0
 
-    #cutMinY = 3155
-    #cutMinX = 230
+    #cutMinY = 2812
+    #cutMinX = 47
     selectedPorts: Set<number> = new Set()
 
     constructor() {
@@ -237,7 +237,7 @@ class Map {
                 console.log([startPortId, spot, index, pixelDistance])
                 this.#distances.push([startPortId, spot, pixelDistance])
                 foundPortIds.add(spot)
-                this.printMap()
+                // this.printMap()
             }
 
             pixelDistance++
