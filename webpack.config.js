@@ -364,8 +364,7 @@ const config = {
             resourceRegExp: /^\.\/locale$/,
             contextRegExp: /moment$/,
         }),
-        new CopyPlugin(
-            {
+        new CopyPlugin({
             patterns: [
                 { from: "netlify.toml" },
                 {
