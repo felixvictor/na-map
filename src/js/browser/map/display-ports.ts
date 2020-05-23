@@ -13,7 +13,7 @@
 
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/tooltip"
-import { min as d3Min, max as d3Max } from "d3-array"
+import { min as d3Min, max as d3Max, sum as d3Sum } from "d3-array"
 import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate"
 // import { polygonCentroid as d3PolygonCentroid, polygonHull as d3PolygonHull } from "d3-polygon";
 import { ScaleLinear, scaleLinear as d3ScaleLinear, ScaleOrdinal, scaleOrdinal as d3ScaleOrdinal } from "d3-scale"
@@ -85,8 +85,8 @@ interface DataSource {
 interface PortForDisplay {
     name: string
     icon: NationShortName
-    availableForAll: string
-    depth: string
+    availableForAll: boolean
+    shallow: boolean
     county: string
     countyCapital: string
     nonCapturable: boolean
@@ -312,7 +312,6 @@ export default class DisplayPorts {
 
             return combinedData
         })
-
         this.portDataDefault = portData
         this.portData = portData
 
@@ -744,8 +743,8 @@ export default class DisplayPorts {
         const port = {
             name: portProperties.name,
             icon: portProperties.nation,
-            availableForAll: portProperties.availableForAll ? "(accessible to all nations)" : "",
-            depth: portProperties.shallow ? "Shallow" : "Deep",
+            availableForAll: portProperties.availableForAll,
+            shallow: portProperties.shallow,
             county:
                 (portProperties.county === "" ? "" : `${portProperties.county}\u200A/\u200A`) + portProperties.region,
             countyCapital: portProperties.countyCapital ? " (county capital)" : "",
@@ -775,9 +774,12 @@ export default class DisplayPorts {
                     ?.map((item) => this.tradeItem.get(item)?.name ?? "")
                     .sort(simpleStringSort)
                     .join(", ") ?? "",
-            sailingDistance: `Old ${formatInt(getKDistance(portProperties.id, this.tradePortId))}k -- new ${String(
-                portProperties.sailingDistanceToTradePort
-            )} -> ${formatInt(getSailingDistanceInK(portProperties.sailingDistanceToTradePort))}k`,
+            sailingDistance:
+                this.showRadius === "tradePorts"
+                    ? `Old ${formatInt(getKDistance(portProperties.id, this.tradePortId))}k -- new ${String(
+                          portProperties.sailingDistanceToTradePort
+                      )} -> ${formatInt(getSailingDistanceInK(portProperties.sailingDistanceToTradePort))}k`
+                    : "",
             consumesTrading:
                 portProperties.consumesTrading
                     ?.map((item) => this.tradeItem.get(item)?.name ?? "")
@@ -835,13 +837,23 @@ export default class DisplayPorts {
             .replace('"', "")
             .replace('"', "")}"/>`
         h += `<div class="port-name">${port.name}</div>`
-        h += `<div>\u2000${port.county} ${port.availableForAll}</div>`
+        h += `<div>\u2000${port.county}</div>`
         h += "</div>"
         if (port.attack.length > 0) {
             h += `<div class="alert alert-danger mt-2" role="alert">${port.attack}</div>`
         }
 
-        h += `<p>${port.depth} water port ${port.countyCapital}${port.captured}<br>`
+        if (port.shallow) {
+            h += `<i class="icon icon-shallow" aria-hidden="true"></i><span class="sr-only">Shallow</span>`
+        } else {
+            h += `<i class="icon icon-deep" aria-hidden="true"></i><span class="sr-only">Deep</span>`
+        }
+
+        if (port.availableForAll) {
+            h += `<i class="icon open" aria-hidden="true"></i><span class="sr-only">Accessible to all nations</span>`
+        }
+
+        h += `<p>${port.countyCapital}${port.captured}<br>`
         if (port.nonCapturable) {
             h += "Not capturable"
             h += `<br>${port.portTax} tax`
@@ -1112,8 +1124,8 @@ export default class DisplayPorts {
         let netTotal = 0
 
         if (numberPorts) {
-            taxTotal = this.portData.map((d) => d.taxIncome).reduce((a, b) => a + b)
-            netTotal = this.portData.map((d) => d.netIncome).reduce((a, b) => a + b)
+            taxTotal = d3Sum(this.portData, (d) => d.taxIncome)
+            netTotal = d3Sum(this.portData, (d) => d.netIncome)
         }
 
         this._portSummaryTextNumPorts.text(`${numberPorts}`)
