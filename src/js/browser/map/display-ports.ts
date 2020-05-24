@@ -20,6 +20,8 @@ import { ScaleLinear, scaleLinear as d3ScaleLinear, ScaleOrdinal, scaleOrdinal a
 import { select as d3Select } from "d3-selection"
 import * as d3Selection from "d3-selection"
 import * as d3Zoom from "d3-zoom"
+import { html, render, TemplateResult } from "lit-html"
+
 // import { curveCatmullRomClosed as d3CurveCatmullRomClosed, line as d3Line } from "d3-shape";
 
 import moment from "moment"
@@ -43,11 +45,11 @@ import {
     degreesToRadians,
     distancePoints,
     getDistance,
-    getOrdinal,
+    getOrdinal, getOrdinalLitHtml,
     getSailingDistanceInK,
     Point,
-    roundToThousands,
-} from "../../common/common-math"
+    roundToThousands
+} from "../../common/common-math";
 
 import { displayClan } from "../util"
 import Cookie from "../util/cookie"
@@ -90,7 +92,7 @@ interface PortForDisplay {
     county: string
     countyCapital: string
     nonCapturable: boolean
-    captured: string
+    captured: TemplateResult
     lastPortBattle: string
     attack: string
     pbTimeRange: string
@@ -111,7 +113,7 @@ interface PortForDisplay {
     tradePortId: number
     goodsToSellInTradePort: string
     goodsToBuyInTradePort: string
-    pbType: string
+    pbType: TemplateResult
 }
 
 interface ReadData {
@@ -722,6 +724,8 @@ export default class DisplayPorts {
             return getDistance(fromPortCoord, toPortCoord)
         }
 
+        const displayClanLitHtml = (clan: string): TemplateResult => html`<span class="caps">${clan}</span>`
+
         // eslint-disable-next-line unicorn/consistent-function-scoping
         const sortByProfit = (a: TradeGoodProfit, b: TradeGoodProfit): number => b.profit.profit - a.profit.profit
         moment.locale("en-gb")
@@ -750,10 +754,9 @@ export default class DisplayPorts {
             countyCapital: portProperties.countyCapital ? " (county capital)" : "",
             nonCapturable: portProperties.nonCapturable,
             captured: portProperties.capturer
-                ? `captured by ${displayClan(portProperties.capturer)} ${moment
-                      .utc(portProperties.lastPortBattle)
-                      .fromNow()}`
-                : "",
+                ? html`captured by ${displayClanLitHtml(portProperties.capturer)}
+                  ${moment.utc(portProperties.lastPortBattle).fromNow()}`
+                : html``,
             lastPortBattle: portProperties.lastPortBattle,
             attack: portProperties.attackHostility ? attackHostility : "",
             pbTimeRange: portProperties.nonCapturable ? "" : portBattleStartTime,
@@ -818,97 +821,122 @@ export default class DisplayPorts {
 
         switch (portProperties.portBattleType) {
             case "Large":
-                port.pbType = getOrdinal(1)
+                port.pbType = getOrdinalLitHtml(1)
                 break
             case "Medium":
-                port.pbType = getOrdinal(4)
+                port.pbType = getOrdinalLitHtml(4)
                 break
             default:
-                port.pbType = getOrdinal(6)
+                port.pbType = getOrdinalLitHtml(6)
                 break
         }
 
         return port
     }
 
-    _tooltipData(port: PortForDisplay): HtmlString {
-        let h: HtmlString = '<div class="d-flex align-items-baseline mb-1">'
-        h += `<img alt="${port.icon}" class="flag-icon align-self-stretch" src="${this._nationIcons[port.icon]
-            .replace('"', "")
-            .replace('"', "")}"/>`
-        h += `<div class="port-name">${port.name}</div>`
-        h += `<div>\u2000${port.county}</div>`
-        h += "</div>"
-        if (port.attack.length > 0) {
-            h += `<div class="alert alert-danger mt-2" role="alert">${port.attack}</div>`
-        }
+    _tooltipData(port: PortForDisplay): TemplateResult {
+        const h = html`<div class="d-flex align-items-baseline mb-1">
+                <img
+                    alt="${port.icon}"
+                    class="flag-icon align-self-stretch"
+                    src="${this._nationIcons[port.icon].replace('"', "").replace('"', "")}"
+                />
+                <div class="port-name">${port.name}</div>
+                <div>${port.county}</div>
+            </div>
 
-        if (port.shallow) {
-            h += `<i class="icon icon-shallow" aria-hidden="true"></i><span class="sr-only">Shallow</span>`
-        } else {
-            h += `<i class="icon icon-deep" aria-hidden="true"></i><span class="sr-only">Deep</span>`
-        }
-
-        if (port.availableForAll) {
-            h += `<i class="icon open" aria-hidden="true"></i><span class="sr-only">Accessible to all nations</span>`
-        }
-
-        h += `<p>${port.countyCapital}${port.captured}<br>`
-        if (port.nonCapturable) {
-            h += "Not capturable"
-            h += `<br>${port.portTax} tax`
-        } else {
-            h += `Port battle ${port.pbTimeRange}, ${port.brLimit} <span class="caps">BR</span>,`
-            h += `${port.pbType}\u202Frate <span class="caps">AI</span>,`
-            h += `${port.conquestMarksPension}\u202Fconquest point`
-            h += port.conquestMarksPension > 1 ? "s" : ""
-            h += `, ${port.portPoints}\u202Fport points`
-            h += `<br>Tax income ${port.taxIncome} (${port.portTax}), net income ${port.netIncome}`
-            h += port.tradingCompany
-            h += port.laborHoursDiscount
-        }
-
-        h += "</p>"
-        h += "<table class='table table-sm'>"
-        if (port.producesNonTrading.length > 0) {
-            h += "<tr><td class='pl-0'>Produces\u00A0</td><td>"
-            h += `<span class="non-trading">${port.producesNonTrading}</span>`
-            h += "</td></tr>"
-        }
-
-        if (port.dropsTrading.length > 0 || port.dropsNonTrading.length > 0) {
-            h += `<tr><td class='pl-0'>Drops\u00A0${port.dropsNonTrading.length > 0 ? "\u00A0" : ""}</td><td>`
-            if (port.dropsNonTrading.length > 0) {
-                h += `<span class="non-trading">${port.dropsNonTrading}</span>`
-                if (port.dropsTrading.length > 0) {
-                    h += "<br>"
-                }
+            ${
+                port.attack.length > 0
+                    ? html`<div class="alert alert-danger mt-2" role="alert">${port.attack}</div>`
+                    : html``
+            }
+            ${
+                port.shallow
+                    ? html`<i class="icon icon-shallow" aria-hidden="true"></i><span class="sr-only">Shallow</span>`
+                    : html`<i class="icon icon-deep" aria-hidden="true"></i><span class="sr-only">Deep</span>`
+            }
+            ${
+                port.availableForAll
+                    ? html`<i class="icon open" aria-hidden="true"></i
+                          ><span class="sr-only">Accessible to all nations</span>`
+                    : html``
             }
 
-            if (port.dropsTrading.length > 0) {
-                h += `${port.dropsTrading}`
+            <p>${port.countyCapital}${port.captured}<br /></p>
+
+            ${
+                port.nonCapturable
+                    ? html`Not capturable<br />${port.portTax} tax`
+                    : html`Port battle ${port.pbTimeRange}, ${port.brLimit} <span class="caps">BR</span>, ${port.pbType}
+                          rate <span class="caps">AI</span>, ${port.conquestMarksPension} conquest point
+                          ${port.conquestMarksPension > 1 ? html`s` : html``}, ${port.portPoints} port points <br />Tax
+                          income ${port.taxIncome} (${port.portTax}), net income ${port.netIncome}
+                          ${port.tradingCompany} ${port.laborHoursDiscount}`
             }
 
-            h += "</td></tr>"
+        </p>
+        
+        <table class='table table-sm'>
+        ${
+            port.producesNonTrading.length > 0
+                ? html`<tr>
+                      <td class="pl-0">Produces</td>
+                      <td>
+                          <span class="non-trading">${port.producesNonTrading}</span>
+                      </td>
+                  </tr>`
+                : html``
         }
 
-        if (port.consumesTrading.length > 0) {
-            h += "<tr><td class='pl-0'>Consumes\u00A0</td><td>"
-            h += port.consumesTrading
-            h += "</td></tr>"
+        ${
+            port.dropsTrading.length > 0 || port.dropsNonTrading.length > 0
+                ? html`<tr>
+                      <td class="pl-0">Drops ${port.dropsNonTrading.length > 0 ? html`` : html``}</td>
+                      <td>
+                          ${port.dropsNonTrading.length > 0
+                              ? html`<span class="non-trading">${port.dropsNonTrading}</span> ${port.dropsTrading
+                                        .length > 0
+                                        ? html`<br />`
+                                        : html``}`
+                              : html``}
+                          ${port.dropsTrading.length > 0 ? html`${port.dropsTrading}` : html``}
+                      </td>
+                  </tr> `
+                : html``
+        }
+        
+
+        ${
+            port.consumesTrading.length > 0
+                ? html`<tr>
+                      <td class="pl-0">Consumes</td>
+                      <td>
+                          ${port.consumesTrading}
+                      </td>
+                  </tr>`
+                : html``
+        }
+           
+
+        ${
+            this.showRadius === "tradePorts"
+                ? html`${port.goodsToSellInTradePort.length > 0
+                      ? html`<tr>
+                            <td class="pl-0">Sell in ${port.tradePort} (distance ${port.sailingDistance})</td>
+                            <td>${port.goodsToSellInTradePort}</td>
+                        </tr>`
+                      : html``}
+                  ${port.goodsToBuyInTradePort.length > 0
+                      ? html`<tr>
+                            <td class="pl-0">Buy in ${port.tradePort} (distance ${port.sailingDistance})</td>
+                            <td>${port.goodsToBuyInTradePort}</td>
+                        </tr>`
+                      : html``}`
+                : html``
         }
 
-        if (this.showRadius === "tradePorts") {
-            if (port.goodsToSellInTradePort.length > 0) {
-                h += `<tr><td class='pl-0'>Sell in ${port.tradePort} (distance ${port.sailingDistance})\u00A0</td><td>${port.goodsToSellInTradePort}</td></tr>`
-            }
-
-            if (port.goodsToBuyInTradePort.length > 0) {
-                h += `<tr><td class='pl-0'>Buy in ${port.tradePort} (distance ${port.sailingDistance})\u00A0</td><td>${port.goodsToBuyInTradePort}</td></tr>`
-            }
-        }
-
-        h += "</table>"
+        </table>
+        `
 
         return h
     }
@@ -918,15 +946,20 @@ export default class DisplayPorts {
         i: number,
         nodes: SVGCircleElement[] | d3Selection.ArrayLike<SVGCircleElement>
     ): void {
-        $(d3Select(nodes[i]).node() as JQuery.PlainObject)
-            .tooltip({
-                html: true,
-                placement: "auto",
-                title: this._tooltipData(this._getText(d)),
-                trigger: "manual",
-                sanitize: false,
-            })
-            .tooltip("show")
+        const node$ = $(d3Select(nodes[i]).node() as JQuery.PlainObject).tooltip({
+            html: true,
+            placement: "auto",
+            trigger: "manual",
+            title: "Wait...",
+            sanitize: false,
+        })
+        // Inject tooltip text
+        node$.on("inserted.bs.tooltip", () => {
+            const tooltipInner = $(document.body).find(".tooltip").find(".tooltip-inner")[0]
+            render(this._tooltipData(this._getText(d)), tooltipInner)
+            node$.tooltip("update")
+        })
+        node$.tooltip("show")
 
         if (this.map.showTrades.show) {
             if (this.map.showTrades.listType !== "inventory") {
