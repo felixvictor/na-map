@@ -8,7 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { distanceMapSize, mapSize } from "./common-var"
+import { html, TemplateResult } from "lit-html"
 
 export const timeFactor = 2.63
 export const speedFactor = 390
@@ -165,6 +165,21 @@ export function getOrdinal(n: number, sup = true): string {
     // noinspection MagicNumberJS
     const text = s[(v - 20) % 10] || s[v] || s[0]
     return String(n) + (sup ? `<span class="super">${text}</span>` : `${text}`)
+}
+
+/**
+ * Format ordinal
+ * @param   n - Integer
+ * @param   sup - True if superscript tags needed
+ * @returns Formatted Ordinal
+ */
+export function getOrdinalLitHtml(n: number, sup = true): TemplateResult {
+    const s = ["th", "st", "nd", "rd"]
+    // noinspection MagicNumberJS
+    const v = n % 100
+    // noinspection MagicNumberJS
+    const text = s[(v - 20) % 10] || s[v] || s[0]
+    return html`${String(n)}${sup ? html`<span class="super">${text}</span>` : html`${text}`}`
 }
 
 /**

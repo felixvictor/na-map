@@ -46,6 +46,7 @@
                     }
                 ],
                 "prefer-template": "error",
+                "no-irregular-whitespace": "off",
                 "operator-linebreak": ["error", "after", { "overrides": { "?": "before", ":": "before" } }],
                 "quotes": ["error", "double", { "allowTemplateLiterals": true, "avoidEscape": true }],
                 "semi": ["error", "never"],
