@@ -27,9 +27,7 @@ import {
 import moment from "moment"
 import "moment/locale/en-gb"
 
-import "../../../scss/roundslider.scss"
 import "round-slider/src/roundslider"
-import "round-slider/src/roundslider.css"
 
 import { registerEvent } from "../analytics"
 import { degreesPerSecond, HtmlString, insertBaseModal } from "../../common/common-browser"
