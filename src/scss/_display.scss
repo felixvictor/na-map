@@ -195,9 +195,37 @@ text {
 }
 
 .flag-icon {
-    width: 2rem;
+    width: 4.5rem;
     height: 100%;
     margin-right: 0.4rem;
+}
+
+.flag-icon-border-light {
+    background-clip: padding-box;
+    border: 0.3rem solid transparentize($white, 0.2);
+}
+
+.flag-icon-border-middle {
+    background-clip: padding-box;
+    border: 0.3rem solid transparentize($yellow, 0.1);
+}
+
+.icon-light {
+    background-color: $secondary-400;
+}
+
+.text-lighter {
+    color: $secondary-600;
+    font-variant-numeric: normal;
+}
+
+.x-large {
+    font-size: x-large;
+}
+
+.large {
+    font-size: large;
+    font-variant-numeric: normal;
 }
 
 .rate {
@@ -510,12 +538,6 @@ svg {
 //// Display ports
 ////
 
-.port-name {
-    font-size: x-large;
-    @include caps();
-    font-variant-numeric: normal;
-}
-
 .non-trading {
     font-style: italic;
 }
@@ -661,7 +683,7 @@ pattern > circle {
     fill: none;
     stroke: $white;
     stroke-opacity: 0.8;
-    stroke-width: 4;
+    stroke-width: 0.4rem;
 }
 
 ///

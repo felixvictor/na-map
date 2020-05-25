@@ -24,10 +24,19 @@ import { html, render, TemplateResult } from "lit-html"
 
 // import { curveCatmullRomClosed as d3CurveCatmullRomClosed, line as d3Line } from "d3-shape";
 
-import moment from "moment"
-import "moment/locale/en-gb"
+import dayjs from "dayjs"
+import "dayjs/locale/en-gb"
+import customParseFormat from "dayjs/plugin/customParseFormat.js"
+import relativeTime from "dayjs/plugin/relativeTime.js"
+import utc from "dayjs/plugin/utc.js"
 
-import { nations, NationShortName, NationShortNameAlternative, putImportError } from "../../common/common"
+import {
+    capitalizeFirstLetter,
+    nations,
+    NationShortName,
+    NationShortNameAlternative,
+    putImportError,
+} from "../../common/common"
 import {
     Bound,
     colourGreenDark,
@@ -45,13 +54,10 @@ import {
     degreesToRadians,
     distancePoints,
     getDistance,
-    getOrdinal, getOrdinalLitHtml,
-    getSailingDistanceInK,
     Point,
-    roundToThousands
-} from "../../common/common-math";
+    roundToThousands,
+} from "../../common/common-math"
 
-import { displayClan } from "../util"
 import Cookie from "../util/cookie"
 import RadioButton from "../util/radio-button"
 import {
@@ -69,6 +75,10 @@ import TrilateratePosition from "../map-tools/get-position"
 import { NAMap } from "./na-map"
 import ShowF11 from "../map-tools/show-f11"
 import { simpleStringSort } from "../../common/common-node"
+
+dayjs.extend(customParseFormat)
+dayjs.extend(relativeTime)
+dayjs.extend(utc)
 
 type PortCircleStringF = (d: PortWithTrades) => string
 type PortCircleNumberF = (d: PortWithTrades) => number
@@ -90,30 +100,28 @@ interface PortForDisplay {
     availableForAll: boolean
     shallow: boolean
     county: string
-    countyCapital: string
-    nonCapturable: boolean
-    captured: TemplateResult
+    countyCapital: boolean
+    capital: boolean
+    capturer: TemplateResult
+    captureTime: string
     lastPortBattle: string
-    attack: string
-    pbTimeRange: string
+    attack: TemplateResult
+    pbTimeRange: TemplateResult
     brLimit: string
     portPoints: string
-    conquestMarksPension: number
     taxIncome: string
     portTax: string
     netIncome: string
-    tradingCompany: string
-    laborHoursDiscount: string
-    sailingDistance: string
+    tradingCompany: number
+    laborHoursDiscount: number
     dropsTrading: string
     consumesTrading: string
     producesNonTrading: string
     dropsNonTrading: string
     tradePort: string
-    tradePortId: number
+    tradePortId?: number
     goodsToSellInTradePort: string
     goodsToBuyInTradePort: string
-    pbType: TemplateResult
 }
 
 interface ReadData {
@@ -718,6 +726,7 @@ export default class DisplayPorts {
             return { x: port.coordinates[0], y: port.coordinates[1] }
         }
 
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const getKDistance = (fromPortId: number, toPortId: number): number => {
             const fromPortCoord = getCoord(fromPortId)
             const toPortCoord = getCoord(toPortId)
@@ -727,22 +736,28 @@ export default class DisplayPorts {
         const displayClanLitHtml = (clan: string): TemplateResult => html`<span class="caps">${clan}</span>`
 
         // eslint-disable-next-line unicorn/consistent-function-scoping
+        const formatFromToTime = (from: number, to: number): HtmlString => `${String(from)}\u202F–\u202F${String(to)}`
+
+        const formatTime = (from: number, to: number): TemplateResult => {
+            const fromLocal = Number(dayjs.utc().hour(from).local().format("H"))
+            const toLocal = Number(dayjs.utc().hour(to).local().format("H"))
+            return html`${formatFromToTime(from, to)} (${formatFromToTime(fromLocal, toLocal)})`
+        }
+
+        // eslint-disable-next-line unicorn/consistent-function-scoping
         const sortByProfit = (a: TradeGoodProfit, b: TradeGoodProfit): number => b.profit.profit - a.profit.profit
-        moment.locale("en-gb")
-        const portBattleLT = moment.utc(portProperties.portBattle).local()
-        const portBattleST = moment.utc(portProperties.portBattle)
+        const portBattleLT = dayjs.utc(portProperties.portBattle).local()
+        const portBattleST = dayjs.utc(portProperties.portBattle)
         const localTime = portBattleST === portBattleLT ? "" : ` (${portBattleLT.format("H.mm")} local)`
         const portBattleStartTime = portProperties.portBattleStartTime
-            ? `${(portProperties.portBattleStartTime + 10) % 24}.00\u202F–\u202F${
-                  (portProperties.portBattleStartTime + 13) % 24
-              }.00`
-            : "11.00\u202F–\u202F8.00"
-        const endSyllable = portBattleST.isAfter(moment.utc()) ? "s" : "ed"
-        const attackHostility = `${displayClan(portProperties.attackerClan)} (${portProperties.attackerNation}) attack${
-            portProperties.portBattle.length > 0
-                ? `${endSyllable} ${portBattleST.fromNow()} at ${portBattleST.format("H.mm")}${localTime}`
-                : `s: ${formatPercent(portProperties.attackHostility)} hostility`
-        }`
+            ? formatTime((portProperties.portBattleStartTime + 10) % 24, (portProperties.portBattleStartTime + 13) % 24)
+            : formatTime(11, 8)
+        const endSyllable = portBattleST.isAfter(dayjs.utc()) ? "s" : "ed"
+        const attackHostility = html`${displayClanLitHtml(portProperties.attackerClan)}
+        (${portProperties.attackerNation})
+        attack${portProperties.portBattle.length > 0
+            ? html`${endSyllable} ${portBattleST.fromNow()} at ${portBattleST.format("H.mm")}${localTime}`
+            : html`s: ${formatPercent(portProperties.attackHostility)} hostility`}`
 
         const port = {
             name: portProperties.name,
@@ -751,38 +766,27 @@ export default class DisplayPorts {
             shallow: portProperties.shallow,
             county:
                 (portProperties.county === "" ? "" : `${portProperties.county}\u200A/\u200A`) + portProperties.region,
-            countyCapital: portProperties.countyCapital ? " (county capital)" : "",
-            nonCapturable: portProperties.nonCapturable,
-            captured: portProperties.capturer
-                ? html`captured by ${displayClanLitHtml(portProperties.capturer)}
-                  ${moment.utc(portProperties.lastPortBattle).fromNow()}`
-                : html``,
+            countyCapital: portProperties.countyCapital,
+            capital: portProperties.nonCapturable && portProperties.nation !== "FT",
+            capturer: portProperties.capturer ? html`${displayClanLitHtml(portProperties.capturer)}` : html``,
+            captureTime: portProperties.capturer
+                ? `${capitalizeFirstLetter(dayjs.utc(portProperties.lastPortBattle).fromNow())}`
+                : "",
             lastPortBattle: portProperties.lastPortBattle,
-            attack: portProperties.attackHostility ? attackHostility : "",
+            attack: portProperties.attackHostility ? attackHostility : html``,
             pbTimeRange: portProperties.nonCapturable ? "" : portBattleStartTime,
             brLimit: formatInt(portProperties.brLimit),
             portPoints: formatInt(portProperties.portPoints),
-            conquestMarksPension: portProperties.conquestMarksPension,
             taxIncome: formatSiInt(portProperties.taxIncome),
             portTax: formatPercent(portProperties.portTax),
             netIncome: formatSiInt(portProperties.netIncome),
-            tradingCompany: portProperties.tradingCompany
-                ? `, trading company level\u202F${portProperties.tradingCompany}`
-                : "",
-            laborHoursDiscount: portProperties.laborHoursDiscount
-                ? `, labor hours discount level\u202F${portProperties.laborHoursDiscount}`
-                : "",
+            tradingCompany: portProperties.tradingCompany,
+            laborHoursDiscount: portProperties.laborHoursDiscount,
             dropsTrading:
                 portProperties.dropsTrading
                     ?.map((item) => this.tradeItem.get(item)?.name ?? "")
                     .sort(simpleStringSort)
                     .join(", ") ?? "",
-            sailingDistance:
-                this.showRadius === "tradePorts"
-                    ? `Old ${formatInt(getKDistance(portProperties.id, this.tradePortId))}k -- new ${String(
-                          portProperties.sailingDistanceToTradePort
-                      )} -> ${formatInt(getSailingDistanceInK(portProperties.sailingDistanceToTradePort))}k`
-                    : "",
             consumesTrading:
                 portProperties.consumesTrading
                     ?.map((item) => this.tradeItem.get(item)?.name ?? "")
@@ -801,141 +805,130 @@ export default class DisplayPorts {
             tradePort: this._getPortName(this.tradePortId),
             goodsToSellInTradePort: portProperties.goodsToSellInTradePort
                 ?.sort(sortByProfit)
-                ?.map(
-                    (good) =>
-                        `${good.name} (${formatSiInt(good.profit.profit)}/${formatSiInt(
-                            good.profit.profitPerDistance
-                        )})`
-                )
+                ?.map((good) => `${good.name} (${formatSiInt(good.profit.profit)})`)
                 .join(", "),
             goodsToBuyInTradePort: portProperties.goodsToBuyInTradePort
                 ?.sort(sortByProfit)
-                ?.map(
-                    (good) =>
-                        `${good.name} (${formatSiInt(good.profit.profit)}/${formatSiInt(
-                            good.profit.profitPerDistance
-                        )})`
-                )
+                ?.map((good) => `${good.name} (${formatSiInt(good.profit.profit)})`)
                 .join(", "),
         } as PortForDisplay
 
-        switch (portProperties.portBattleType) {
-            case "Large":
-                port.pbType = getOrdinalLitHtml(1)
-                break
-            case "Medium":
-                port.pbType = getOrdinalLitHtml(4)
-                break
-            default:
-                port.pbType = getOrdinalLitHtml(6)
-                break
+        if (port.dropsTrading.length > 0 && port.dropsNonTrading.length > 0) {
+            port.dropsNonTrading += " \u2015 "
         }
 
         return port
     }
 
     _tooltipData(port: PortForDisplay): TemplateResult {
-        const h = html`<div class="d-flex align-items-baseline mb-1">
+        const iconBorder = port.capital ? "flag-icon-border-middle" : port.countyCapital ? "flag-icon-border-light" : ""
+
+        const h = html`
+            <div class="d-flex align-items-center mb-4">
                 <img
                     alt="${port.icon}"
-                    class="flag-icon align-self-stretch"
+                    class="flag-icon mr-3 align-self-stretch ${iconBorder}"
                     src="${this._nationIcons[port.icon].replace('"', "").replace('"', "")}"
                 />
-                <div class="port-name">${port.name}</div>
-                <div>${port.county}</div>
+
+                <div class="text-left">
+                    <div class="large">${port.name}</div>
+                    <div class="caps">${port.county}</div>
+                </div>
+
+                <div class="ml-auto inline-block">
+                    <span class="x-large text-lighter align-top mr-2">${port.portPoints}</span>
+                    ${port.availableForAll
+                        ? html`<i class="icon icon-light icon-open" aria-hidden="true"></i
+                              ><span class="sr-only">Accessible to all</span>`
+                        : html``}
+                    ${port.laborHoursDiscount
+                        ? html`<i class="icon icon-light icon-labour" aria-hidden="true"></i
+                              ><span class="sr-only">Labour hour discount level ${port.laborHoursDiscount}</span>`
+                        : html``}
+                    ${port.tradingCompany
+                        ? html`<i class="icon icon-light icon-trading mr-1" aria-hidden="true"></i
+                              ><span class="sr-only">Trading company level ${port.tradingCompany}</span>`
+                        : html``}
+                    ${port.shallow
+                        ? html`<i class="icon icon-light icon-shallow" aria-hidden="true"></i
+                              ><span class="sr-only">Shallow</span>`
+                        : html`<i class="icon icon-light icon-deep" aria-hidden="true"></i
+                              ><span class="sr-only">Deep</span>`}
+                </div>
             </div>
 
-            ${
-                port.attack.length > 0
-                    ? html`<div class="alert alert-danger mt-2" role="alert">${port.attack}</div>`
-                    : html``
-            }
-            ${
-                port.shallow
-                    ? html`<i class="icon icon-shallow" aria-hidden="true"></i><span class="sr-only">Shallow</span>`
-                    : html`<i class="icon icon-deep" aria-hidden="true"></i><span class="sr-only">Deep</span>`
-            }
-            ${
-                port.availableForAll
-                    ? html`<i class="icon open" aria-hidden="true"></i
-                          ><span class="sr-only">Accessible to all nations</span>`
-                    : html``
-            }
+            ${port.attack.values.length > 0
+                ? html`<div class="alert alert-danger mt-2" role="alert">${port.attack}</div>`
+                : html``}
 
-            <p>${port.countyCapital}${port.captured}<br /></p>
+            <div class="d-flex text-left mb-2">
+                ${port.capital
+                    ? html`<div>${port.portTax}<br /><span class="des">Tax rate</span></div>`
+                    : html`
+                          <div class="mr-3">
+                              ${port.pbTimeRange}<br />
+                              <span class="des">Battle timer</span>
+                          </div>
+                          <div class="mr-3">
+                              ${port.brLimit}<br />
+                              <span class="des">Rating</span>
+                          </div>
+                          <div class="mr-3">
+                              ${port.capturer}<br />
+                              <span class="des">Capturer</span>
+                          </div>
+                          <div class="mr-5">
+                              ${port.captureTime}<br />
+                              <span class="des">Capture</span>
+                          </div>
 
-            ${
-                port.nonCapturable
-                    ? html`Not capturable<br />${port.portTax} tax`
-                    : html`Port battle ${port.pbTimeRange}, ${port.brLimit} <span class="caps">BR</span>, ${port.pbType}
-                          rate <span class="caps">AI</span>, ${port.conquestMarksPension} conquest point
-                          ${port.conquestMarksPension > 1 ? html`s` : html``}, ${port.portPoints} port points <br />Tax
-                          income ${port.taxIncome} (${port.portTax}), net income ${port.netIncome}
-                          ${port.tradingCompany} ${port.laborHoursDiscount}`
-            }
+                          <div class="ml-auto mr-3">
+                              ${port.taxIncome} (${port.portTax})<br />
+                              <span class="des">Tax income</span>
+                          </div>
+                          <div>
+                              ${port.netIncome}<br />
+                              <span class="des">Net income</span>
+                          </div>
+                      `}
+            </div>
 
-        </p>
-        
-        <table class='table table-sm'>
-        ${
-            port.producesNonTrading.length > 0
-                ? html`<tr>
-                      <td class="pl-0">Produces</td>
-                      <td>
-                          <span class="non-trading">${port.producesNonTrading}</span>
-                      </td>
-                  </tr>`
-                : html``
-        }
-
-        ${
-            port.dropsTrading.length > 0 || port.dropsNonTrading.length > 0
-                ? html`<tr>
-                      <td class="pl-0">Drops ${port.dropsNonTrading.length > 0 ? html`` : html``}</td>
-                      <td>
-                          ${port.dropsNonTrading.length > 0
-                              ? html`<span class="non-trading">${port.dropsNonTrading}</span> ${port.dropsTrading
-                                        .length > 0
-                                        ? html`<br />`
-                                        : html``}`
-                              : html``}
-                          ${port.dropsTrading.length > 0 ? html`${port.dropsTrading}` : html``}
-                      </td>
-                  </tr> `
-                : html``
-        }
-        
-
-        ${
-            port.consumesTrading.length > 0
-                ? html`<tr>
-                      <td class="pl-0">Consumes</td>
-                      <td>
-                          ${port.consumesTrading}
-                      </td>
-                  </tr>`
-                : html``
-        }
-           
-
-        ${
-            this.showRadius === "tradePorts"
+            ${port.producesNonTrading.length > 0
+                ? html`<p class="mb-2">
+                      <span class="caps">Produces</span>
+                      ―
+                      <span class="non-trading">${port.producesNonTrading}</span>
+                  </p>`
+                : html``}
+            ${port.dropsTrading.length > 0 || port.dropsNonTrading.length > 0
+                ? html`<p class="mb-2">
+                      <span class="caps">Drops</span>
+                      ―
+                      ${port.dropsNonTrading ? html`<span class="non-trading">${port.dropsNonTrading}</span>` : html``}
+                      ${port.dropsTrading}
+                  </p> `
+                : html``}
+            ${port.consumesTrading.length > 0
+                ? html`<p class="mb-2">
+                      <span class="caps">Consumes</span>
+                      ― ${port.consumesTrading}
+                  </p>`
+                : html``}
+            ${this.showRadius === "tradePorts"
                 ? html`${port.goodsToSellInTradePort.length > 0
-                      ? html`<tr>
-                            <td class="pl-0">Sell in ${port.tradePort} (distance ${port.sailingDistance})</td>
-                            <td>${port.goodsToSellInTradePort}</td>
-                        </tr>`
+                      ? html`<p class="mb-2">
+                            <span class="caps">Sell in ${port.tradePort}</span> (net profit) ―
+                            ${port.goodsToSellInTradePort}
+                        </p>`
                       : html``}
                   ${port.goodsToBuyInTradePort.length > 0
-                      ? html`<tr>
-                            <td class="pl-0">Buy in ${port.tradePort} (distance ${port.sailingDistance})</td>
-                            <td>${port.goodsToBuyInTradePort}</td>
-                        </tr>`
+                      ? html`<p class="mb-2">
+                            <span class="caps">Buy in ${port.tradePort}</span> (net profit) ―
+                            ${port.goodsToBuyInTradePort}
+                        </p>`
                       : html``}`
-                : html``
-        }
-
-        </table>
+                : html``}
         `
 
         return h
