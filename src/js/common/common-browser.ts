@@ -8,6 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+import { color as d3Color, rgb as d3Rgb } from "d3-color"
 import { select as d3Select } from "d3-selection"
 import Hashids from "hashids"
 import { html, TemplateResult } from "lit-html"
@@ -249,3 +250,10 @@ export const getCurrencyAmount = (amount: number | string): string =>
  * Lower or upper bound coordinates
  */
 export type Bound = [number, number]
+
+export const getContrastColour = (colour: string): string => {
+    const { r, g, b } = d3Rgb(colour)
+    const yiq = (r * 299 + g * 587 + b * 114) / 1000
+
+    return yiq >= 128 ? d3Color(colourWhite)?.darker(5).toString() ?? "#111" : colourWhite
+}
