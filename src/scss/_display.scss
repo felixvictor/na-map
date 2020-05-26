@@ -745,6 +745,7 @@ pattern > circle {
     }
 
     .text-light-separation {
+        font-size: smaller;
         fill: $overlay-text-colour-contrast !important;
     }
 }
