@@ -415,6 +415,13 @@ const config = {
                 use: [
                     ExtractCssChunks.loader,
                     {
+                        loader: require.resolve("string-replace-loader"),
+                        options: {
+                            search: "url(ata:image",
+                            replace: "url(data:image",
+                        },
+                    },
+                    {
                         loader: require.resolve("css-loader"),
                         options: cssOpt,
                     },
