@@ -108,7 +108,7 @@ export default class PredictWind {
             return pos
         }
 
-        // @ts-ignore
+        // @ts-expect-error
         window.tooltip = (arguments_) => `${displayCompass(arguments_.value)}<br>${String(arguments_.value)}°`
 
         $(`#${this._sliderId}`).roundSlider({
@@ -123,7 +123,7 @@ export default class PredictWind {
             editableTooltip: false,
             tooltipFormat: "tooltip",
             create() {
-                // @ts-ignore
+                // @ts-expect-error
                 this.control.css("display", "block")
             },
         })
@@ -172,6 +172,7 @@ export default class PredictWind {
         $(`#${this._timeGroupId}`).datetimepicker({
             defaultDate: moment.utc(),
             format: "LT",
+            locale: "en-gb",
         })
     }
 
@@ -208,8 +209,6 @@ export default class PredictWind {
     }
 
     _predictWind(currentUserWind: number, predictUserTime: string): void {
-        moment.locale("en-gb")
-
         const timeFormat = "H.mm"
         let currentWindDegrees: number | string
 
@@ -260,7 +259,7 @@ export default class PredictWind {
 
         // Compass rose
         const compassElem = this._svg.append("svg").attr("class", "compass").attr("x", xCompass).attr("y", yCompass)
-        // @ts-ignore
+        // @ts-expect-error
         printCompassRose({ element: compassElem, radius })
 
         // Wind direction
