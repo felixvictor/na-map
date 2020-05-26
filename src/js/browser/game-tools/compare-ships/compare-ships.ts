@@ -519,7 +519,6 @@ export class CompareShips {
         const element = document.querySelector(
             `#${this._modalId} .modal-dialog .modal-content .modal-body`
         ) as HTMLElement
-        console.log("_makeImage", element.scrollHeight, element.scrollWidth)
         if (element) {
             const canvas = await html2canvas(element, {
                 allowTaint: true,
@@ -607,6 +606,7 @@ export class CompareShips {
                         const typeIndex = [...this._moduleTypes].indexOf(type)
                         const moduleIds = this._selectedUpgradeIdsPerType[columnId][type]
 
+                        // eslint-disable-next-line max-depth
                         if (moduleIds?.length) {
                             const param = `${columnIndex}${typeIndex}`
 
@@ -821,7 +821,7 @@ export class CompareShips {
                 )
             )
 
-        let options = ""
+        let options
         const moduleTypeWithSingleOption = new Set(["Permanent", "Ship trim"])
         if (modules.length > 1) {
             // Get options with sub types as optgroups
@@ -1060,7 +1060,7 @@ export class CompareShips {
 
                 // Add modifier amount for both frame and trim
                 for (const type of woodType) {
-                    // @ts-ignore
+                    // @ts-expect-error
                     for (const property of this.woodCompare.instances[compareId][dataLink][type].properties) {
                         if (this._moduleAndWoodChanges.has(property.modifier)) {
                             this._setModifier(property)
@@ -1238,9 +1238,8 @@ export class CompareShips {
         this._selectedUpgradeIdsPerType[compareId] = {} as ArrayIndex<number>
 
         for (const type of this._moduleTypes) {
-            // @ts-ignore
+            // @ts-expect-error
             this._selectedUpgradeIdsPerType[compareId][type] = this._selectModule$[compareId][type].val()
-            // @ts-ignore
             if (Array.isArray(this._selectedUpgradeIdsPerType[compareId][type])) {
                 // Multiple selects
                 this._selectedUpgradeIdsPerType[compareId][type] = this._selectedUpgradeIdsPerType[compareId][
