@@ -35,7 +35,7 @@ import TimelinesChart, { Group } from "timelines-chart"
 
 import { registerEvent } from "../analytics"
 import { NationFullName, nations, NationShortName, putImportError } from "../../common/common"
-import { colourList, HtmlString, insertBaseModal } from "../../common/common-browser"
+import { colourList, getContrastColour, HtmlString, insertBaseModal } from "../../common/common-browser";
 
 import { Ownership, OwnershipNation } from "../../common/gen-json"
 
@@ -286,6 +286,7 @@ export default class ListPortOwnerships {
                         .append("text")
                         .attr("class", "area-label")
                         .text((d) => labelNames.get(d.key))
+                        .attr("fill", (d) => getContrastColour(this._colourScale(d.key)))
                         .attr("transform", d3AreaLabel(area))
                 )
         }
