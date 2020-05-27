@@ -359,7 +359,6 @@ export default class MakeJourney {
             .attr("class", "compass")
             .attr("x", x)
             .attr("y", y)
-            .call(this._drag)
 
         this._compassG = this._compass.append("g")
         // @ts-expect-error
