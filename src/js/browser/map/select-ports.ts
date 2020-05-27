@@ -33,10 +33,9 @@ import { Nation, nations, NationShortName, putImportError, range, validNationSho
 import { HtmlString, initMultiDropdownNavbar } from "../../common/common-browser"
 import { formatInt, formatSiCurrency } from "../../common/common-format"
 import { Coordinate, Distance, getDistance, Point } from "../../common/common-math"
-import { simpleNumberSort, simpleStringSort, sortBy } from "../../common/common-node"
+import { simpleStringSort, sortBy } from "../../common/common-node"
 import { serverMaintenanceHour } from "../../common/common-var"
 import {
-    ConquestMarksPension,
     FrontlinesPerServer,
     GoodList,
     InventoryEntity,
@@ -86,8 +85,6 @@ export default class SelectPorts {
     private readonly _portNamesSelector: HTMLSelectElement
     private readonly _propClanId: string
     private readonly _propClanSelector: HTMLSelectElement
-    private readonly _propCMId: string
-    private readonly _propCMSelector: HTMLSelectElement
     private readonly _propNationId: string
     private readonly _propNationSelector: HTMLSelectElement
     private readonly _sellProfit: Map<string, TradeProfit> = new Map()
@@ -128,9 +125,6 @@ export default class SelectPorts {
         this._propClanId = "prop-clan-select"
         this._propClanSelector = document.querySelector(`#${this._propClanId}`) as HTMLSelectElement
 
-        this._propCMId = "prop-cm-select"
-        this._propCMSelector = document.querySelector(`#${this._propCMId}`) as HTMLSelectElement
-
         this.isInventorySelected = false
 
         this._setupSelects()
@@ -143,7 +137,6 @@ export default class SelectPorts {
         this._setupFrontlinesNationSelect()
         this._setupNationSelect()
         this._setupClanSelect()
-        this._setupCMSelect()
     }
 
     _resetOtherSelects(activeSelectSelector: HTMLSelectElement): void {
@@ -155,7 +148,6 @@ export default class SelectPorts {
             this._frontlineDefendingNationSelector,
             this._propNationSelector,
             this._propClanSelector,
-            this._propCMSelector,
         ]) {
             // noinspection OverlyComplexBooleanExpressionJS
             if (
@@ -249,12 +241,6 @@ export default class SelectPorts {
         this._propClanSelector.addEventListener("change", (event) => {
             this._resetOtherSelects(this._propClanSelector)
             this._clanSelected()
-            event.preventDefault()
-        })
-
-        this._propCMSelector.addEventListener("change", (event) => {
-            this._resetOtherSelects(this._propCMSelector)
-            this._CMSelected()
             event.preventDefault()
         })
 
@@ -502,22 +488,6 @@ export default class SelectPorts {
             liveSearch: false,
             virtualScroll: true,
         } as BootstrapSelectOptions)
-    }
-
-    _setupCMSelect(): void {
-        const cmList = new Set<ConquestMarksPension>()
-
-        for (const d of this._ports.portData) {
-            cmList.add(d.conquestMarksPension)
-        }
-
-        const options = `${[...cmList]
-            .sort(simpleNumberSort)
-            .map((cm) => `<option value="${cm}">${cm}</option>`)
-            .join("")}`
-        this._propCMSelector.insertAdjacentHTML("beforeend", options)
-        this._propCMSelector.classList.add("selectpicker")
-        $(this._propCMSelector).selectpicker()
     }
 
     _getSailingDistance(fromPortId: number, toPortId: number): number {
@@ -843,21 +813,6 @@ export default class SelectPorts {
 
     _portSizeSelected(size: PortBattleType): void {
         const portData = this._ports.portDataDefault.filter((d) => size === d.portBattleType)
-
-        this._ports.portData = portData
-        this._ports.showRadius = ""
-        this._ports.update()
-    }
-
-    _CMSelected(): void {
-        const value = Number(this._propCMSelector.options[this._propCMSelector.selectedIndex].value)
-        let portData
-
-        if (value === 0) {
-            portData = this._ports.portDataDefault
-        } else {
-            portData = this._ports.portDataDefault.filter((d) => value === d.conquestMarksPension)
-        }
 
         this._ports.portData = portData
         this._ports.showRadius = ""
