@@ -13,10 +13,20 @@ import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/dropdown"
 
 import "bootstrap-select/js/bootstrap-select"
-import moment, { Moment } from "moment"
 import "tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4"
 import { DatetimepickerEvent, DatetimepickerOption } from "../../@types/tempusdominus-bootstrap-4"
 import "tempusdominus-core/build/js/tempusdominus-core"
+
+import dayjs, { Dayjs } from "dayjs"
+import "dayjs/locale/en-gb"
+import customParseFormat from "dayjs/plugin/customParseFormat"
+import isBetween from "dayjs/plugin/isBetween"
+import utc from "dayjs/plugin/utc"
+
+dayjs.extend(customParseFormat)
+dayjs.extend(isBetween)
+dayjs.extend(utc)
+dayjs.locale("en-gb")
 
 import { registerEvent } from "../analytics"
 import { Nation, nations, NationShortName, putImportError, range, validNationShortName } from "../../common/common"
@@ -258,7 +268,7 @@ export default class SelectPorts {
         document.querySelector("#menu-prop-medium")?.addEventListener("click", () => this._portSizeSelected("Medium"))
         document.querySelector("#menu-prop-small")?.addEventListener("click", () => this._portSizeSelected("Small"))
 
-        // @ts-ignore
+        // @ts-expect-error
         $.fn.datetimepicker.Constructor.Default = $.extend({}, $.fn.datetimepicker.Constructor.Default, {
             icons: {
                 time: "icon icon-clock",
@@ -298,9 +308,11 @@ export default class SelectPorts {
             format: this._dateFormat,
             useCurrent: false,
         })
+        // @ts-expect-error
         portFrom.on("change.datetimepicker", (event: DatetimepickerEvent) =>
             portTo.datetimepicker({ minDate: event.date })
         )
+        // @ts-expect-error
         portTo.on("change.datetimepicker", (event: DatetimepickerEvent) =>
             portFrom.datetimepicker({ maxDate: event.date })
         )
@@ -324,7 +336,6 @@ export default class SelectPorts {
                         nation: d.nation,
                     } as SelectPort)
             )
-            // @ts-ignore
             .sort(sortBy(["name"]))
         const options = `${selectPorts
             .map(
@@ -858,11 +869,11 @@ export default class SelectPorts {
         // 24 hours minus black-out hours
         const maxStartTime = 24 - (blackOutTimes.length + 1)
         const startTimes = new Set()
-        const begin = moment(
+        const begin = dayjs(
             (document.querySelector("#prop-pb-from-input") as HTMLSelectElement)?.value,
             this._timeFormat
         ).hour()
-        let end = moment(
+        let end = dayjs(
             (document.querySelector("#prop-pb-to-input") as HTMLSelectElement)?.value,
             this._timeFormat
         ).hour()
@@ -889,10 +900,10 @@ export default class SelectPorts {
         this._ports.update()
     }
 
-    _filterCaptured(begin: Moment, end: Moment): void {
+    _filterCaptured(begin: Dayjs, end: Dayjs): void {
         // console.log("Between %s and %s", begin.format("dddd D MMMM YYYY H:mm"), end.format("dddd D MMMM YYYY H:mm"));
         const portData = this._ports.portDataDefault.filter((port) =>
-            moment(port.lastPortBattle, "YYYY-MM-DD HH:mm").isBetween(begin, end, "hours", "(]")
+            dayjs(port.lastPortBattle, "YYYY-MM-DD HH:mm").isBetween(begin, end, "hour", "(]")
         )
 
         this._ports.portData = portData
@@ -901,39 +912,39 @@ export default class SelectPorts {
     }
 
     _capturedToday(): void {
-        const now = moment.utc()
-        let begin = moment().utc().hour(serverMaintenanceHour).minute(0)
+        const now = dayjs.utc()
+        let begin = dayjs().utc().hour(serverMaintenanceHour).minute(0)
         if (now.hour() < begin.hour()) {
             begin = begin.subtract(1, "day")
         }
 
-        this._filterCaptured(begin, moment.utc(begin).add(1, "day"))
+        this._filterCaptured(begin, dayjs.utc(begin).add(1, "day"))
     }
 
     _capturedYesterday(): void {
-        const now = moment.utc()
-        let begin = moment().utc().hour(serverMaintenanceHour).minute(0).subtract(1, "day")
+        const now = dayjs.utc()
+        let begin = dayjs().utc().hour(serverMaintenanceHour).minute(0).subtract(1, "day")
         if (now.hour() < begin.hour()) {
             begin = begin.subtract(1, "day")
         }
 
-        this._filterCaptured(begin, moment.utc(begin).add(1, "day"))
+        this._filterCaptured(begin, dayjs.utc(begin).add(1, "day"))
     }
 
     _capturedThisWeek(): void {
-        const currentMondayOfWeek = moment().utc().startOf("week")
+        const currentMondayOfWeek = dayjs().utc().startOf("week")
         // This Monday
         const begin = currentMondayOfWeek.utc().hour(serverMaintenanceHour)
         // Next Monday
-        const end = moment(currentMondayOfWeek).utc().add(7, "day").hour(serverMaintenanceHour)
+        const end = dayjs(currentMondayOfWeek).utc().add(7, "day").hour(serverMaintenanceHour)
 
         this._filterCaptured(begin, end)
     }
 
     _capturedLastWeek(): void {
-        const currentMondayOfWeek = moment().utc().startOf("week")
+        const currentMondayOfWeek = dayjs().utc().startOf("week")
         // Monday last week
-        const begin = moment(currentMondayOfWeek).utc().subtract(7, "day").hour(serverMaintenanceHour)
+        const begin = dayjs(currentMondayOfWeek).utc().subtract(7, "day").hour(serverMaintenanceHour)
         // This Monday
         const end = currentMondayOfWeek.utc().hour(serverMaintenanceHour)
 

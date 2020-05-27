@@ -24,8 +24,6 @@ import {
     zoomTransform as d3ZoomTransform,
     ZoomTransform as D3ZoomTransform,
 } from "d3-zoom"
-import moment from "moment"
-import "moment/locale/en-gb"
 
 import "round-slider/src/roundslider"
 
@@ -138,8 +136,6 @@ export default class MakeJourney {
     }
 
     static _getHumanisedDuration(duration: number): string {
-        moment.locale("en-gb")
-
         const durationHours = Math.floor(duration / 60)
         const durationMinutes = Math.round(duration % 60)
 
