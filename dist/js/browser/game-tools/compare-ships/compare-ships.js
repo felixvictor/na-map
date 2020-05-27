@@ -347,7 +347,6 @@ export class CompareShips {
         registerEvent("Menu", "Ship compare image");
         event.preventDefault();
         const element = document.querySelector(`#${this._modalId} .modal-dialog .modal-content .modal-body`);
-        console.log("_makeImage", element.scrollHeight, element.scrollWidth);
         if (element) {
             const canvas = await html2canvas(element, {
                 allowTaint: true,
@@ -548,7 +547,7 @@ export class CompareShips {
             .entries([...this._moduleProperties].filter((module) => module[1].type.replace(/\s–\s[\s/A-Za-z\u25CB]+/, "") === moduleType &&
             (module[1].moduleLevel === "U" ||
                 module[1].moduleLevel === CompareShips._getModuleLevel(shipClass))));
-        let options = "";
+        let options;
         const moduleTypeWithSingleOption = new Set(["Permanent", "Ship trim"]);
         if (modules.length > 1) {
             options = modules

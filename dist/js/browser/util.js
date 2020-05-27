@@ -196,7 +196,7 @@ const copyToClipboardFallback = (text, modal$) => {
         return false;
     }
 };
-const writeClipboard = (text) => {
+const writeClipboard = async (text) => {
     return navigator.clipboard
         .writeText(text)
         .then(() => {
@@ -211,15 +211,7 @@ export const copyToClipboard = (text, modal$) => {
     if (!navigator.clipboard) {
         copyToClipboardFallback(text, modal$);
     }
-    writeClipboard(text);
-};
-export const copyF11ToClipboard = (x, z, modal$) => {
-    if (Number.isFinite(x) && Number.isFinite(z)) {
-        const F11Url = new URL(window.location.href);
-        F11Url.searchParams.set("x", String(x));
-        F11Url.searchParams.set("z", String(z));
-        copyToClipboard(F11Url.href, modal$);
-    }
+    void writeClipboard(text);
 };
 export const colourRamp = (element, colourScale, steps = 512) => {
     var _a;

@@ -7,6 +7,7 @@
  * @copyright 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
+import { color as d3Color, rgb as d3Rgb } from "d3-color";
 import { select as d3Select } from "d3-selection";
 import Hashids from "hashids";
 import { html } from "lit-html";
@@ -147,4 +148,10 @@ export const insertBaseModalHTML = ({ id, title, size = "xl", body, footer }) =>
     `;
 };
 export const getCurrencyAmount = (amount) => `${amount}\u00A0real${Number(amount) > 1 ? "s" : ""}`;
+export const getContrastColour = (colour) => {
+    var _a, _b;
+    const { r, g, b } = d3Rgb(colour);
+    const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+    return yiq >= 128 ? (_b = (_a = d3Color(colourWhite)) === null || _a === void 0 ? void 0 : _a.darker(5).toString()) !== null && _b !== void 0 ? _b : "#111" : colourWhite;
+};
 //# sourceMappingURL=common-browser.js.map
