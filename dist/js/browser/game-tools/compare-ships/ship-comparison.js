@@ -17,7 +17,7 @@ import { degreesToCompass, getOrdinal, roundToThousands } from "../../../common/
 import { hullRepairsVolume, repairsSetSize, rigRepairsVolume, rumRepairsFactor, segmentRadians, } from "../../../common/common-browser";
 import { rotationAngleInDegrees } from "../../util";
 import { default as shipIcon } from "Icons/icon-ship.svg";
-import { Ship } from ".";
+import { Ship } from "./ship";
 export class ShipComparison extends Ship {
     constructor(compareId, shipBaseData, shipCompareData, shipCompare) {
         super(compareId, shipCompare);

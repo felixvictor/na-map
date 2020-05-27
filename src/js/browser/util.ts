@@ -10,7 +10,7 @@
 
 /// <reference types="jquery" />
 
-import { scaleBand as d3ScaleBand } from "d3-scale"
+import { scaleBand as d3ScaleBand, ScaleLinear } from "d3-scale"
 import { BaseType, Selection } from "d3-selection"
 
 import { numberSegments } from "../common/common-browser"
@@ -316,7 +316,7 @@ const copyToClipboardFallback = (text: string, modal$: JQuery): boolean => {
  * @param   text - String
  * @returns Clipboard promise
  */
-const writeClipboard = (text: string): Promise<boolean> => {
+const writeClipboard = async (text: string): Promise<boolean> => {
     return navigator.clipboard
         .writeText(text)
         .then(() => {
@@ -339,25 +339,8 @@ export const copyToClipboard = (text: string, modal$: JQuery): void => {
         copyToClipboardFallback(text, modal$)
     }
 
-    // noinspection JSIgnoredPromiseFromCall
-    writeClipboard(text)
-}
-
-/**
- * Copy F11 coordinates to clipboard
- * @param x - X Coordinate
- * @param z - Z Coordinate
- * @param modal$ - Modal
- */
-export const copyF11ToClipboard = (x: number, z: number, modal$: JQuery): void => {
-    if (Number.isFinite(x) && Number.isFinite(z)) {
-        const F11Url = new URL(window.location.href)
-
-        F11Url.searchParams.set("x", String(x))
-        F11Url.searchParams.set("z", String(z))
-
-        copyToClipboard(F11Url.href, modal$)
-    }
+    // eslint-disable-next-line no-void
+    void writeClipboard(text)
 }
 
 /**
@@ -367,33 +350,33 @@ export const copyF11ToClipboard = (x: number, z: number, modal$: JQuery): void =
  * @param colourScale - Colour
  * @param steps - Number of steps (default 512)
  */
-/*
 export const colourRamp = (
-    element: Selection<GElement, OldDatum, HTMLElement, any>,
-    colourScale,
+    element: Selection<SVGElement | HTMLElement, unknown, HTMLElement, any>,
+    colourScale: ScaleLinear<string | CanvasGradient | CanvasPattern, string | CanvasGradient | CanvasPattern>,
     steps = 512
 ): void => {
-    const height = 50
-    const width = element.node().clientWidth
-    const canvas = element
-        .insert("canvas")
-        .attr("width", width)
-        .attr("height", height)
+    const height = 200
+    const width = 1000
+    const canvas = element.insert("canvas").attr("width", width).attr("height", height)
     const context = canvas.node()?.getContext("2d")
+    // @ts-expect-error
     canvas.style.imageRendering = "pixelated"
-
     const min = colourScale.domain()[0]
+
     const max = colourScale.domain()[colourScale.domain().length - 1]
     const step = (max - min) / steps
-    const stepWidth = width / steps
+    const stepWidth = Math.floor(width / steps)
     let x = 0
-    for (let currentStep = min; currentStep < max; currentStep += step) {
-        context.fillStyle = colourScale(currentStep)
-        context.fillRect(x, 0, stepWidth, height)
-        x += stepWidth
+    console.log(canvas, context)
+    console.log(min, max, steps, step)
+    if (context) {
+        for (let currentStep = min; currentStep < max; currentStep += step) {
+            context.fillStyle = colourScale(currentStep)
+            context.fillRect(x, 0, stepWidth, height)
+            x += stepWidth
+        }
     }
 }
-*/
 
 export const drawSvgCircle = (x: number, y: number, r: number): string =>
     `M${x},${y} m${-r},0 a${r},${r} 0,1,0 ${r * 2},0 a${r},${r} 0,1,0 ${-r * 2},0`

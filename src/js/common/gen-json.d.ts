@@ -14,11 +14,10 @@ import { ModifiersEntity } from "../node/api-item"
 import { Point } from "./common-math"
 import { ValuesType } from "utility-types"
 
-import { LootType } from "../browser/game-tools/list-loot"
 import { CannonType, NationFullName, NationShortName, NationShortNameAlternative } from "./common"
 import { ArrayIndex } from "./interface"
 import { Group } from "timelines-chart"
-import { FrontlinesType } from "../browser/map/select-ports"
+import { FrontlinesType, LootType } from "./types"
 
 /****************************
  * buildings.json
@@ -72,13 +71,6 @@ export interface ObjectIndexer<T> {
 type Cannon = {
     [K in CannonType]: CannonEntity[]
 }
-export type CannonGroupIndex =
-    | string
-    | CannonDamage
-    | CannonTraverse
-    | CannonDispersion
-    | CannonGeneric
-    | CannonPenetration
 export interface CannonEntity {
     name: string
     damage: CannonDamage
@@ -121,33 +113,51 @@ export interface CannonValue {
 }
 
 /****************************
+ * items.json
+ */
+
+export interface TradeItem {
+    id: number
+    name: string
+    price: number
+    distanceFactor: number
+}
+
+/****************************
  * loot.json
  */
+
 export type LootTypeList<T> = {
     [K in LootType]: T
 }
 export type Loot = LootTypeList<LootLootEntity[] | LootChestsEntity[]>
-interface LootLootEntity {
+interface LootGenericEntity {
     id: number
     name: string
-    items: LootItemsEntity[]
 }
-export interface LootItemsEntity {
+interface LootLootEntity extends LootGenericEntity {
+    items: LootLootItemsEntity[]
+}
+interface LootChestsEntity extends LootGenericEntity {
+    weight: number
+    lifetime: number
+    itemGroup: LootChestGroup[]
+}
+export interface LootChestGroup {
+    chance: number
+    items: LootChestItemsEntity[]
+}
+export interface LootChestItemsEntity {
     id: number
     name: string
-    chance: number
     amount: LootAmount
+}
+export interface LootLootItemsEntity extends LootChestItemsEntity {
+    chance: number
 }
 interface LootAmount {
     min: number
     max: number
-}
-interface LootChestsEntity {
-    id: number
-    name: string
-    weight: number
-    lifetime: number
-    items: LootItemsEntity[]
 }
 
 /****************************
@@ -221,14 +231,8 @@ export interface PbZoneBasic {
     joinCircle: Point
     pbCircles: Point[]
 }
-export interface PbZoneRaid {
-    id: number
-    joinCircle: Point
-    raidCircles: Point[]
-    raidPoints: Point[]
-}
 
-export interface PbZone extends PbZoneBasic, PbZoneDefence, PbZoneRaid {
+export interface PbZone extends PbZoneBasic, PbZoneDefence {
     id: number
     position: Point
 }
@@ -256,20 +260,37 @@ export interface PortBasic {
 }
 
 type PortIntersection =
-    | ValuesType<PortWithTrades>
-    | ValuesType<Port>
-    | ValuesType<PortBasic>
-    | ValuesType<PortPerServer>
-    | ValuesType<PortBattlePerServer>
-export interface Port extends PortBasic, PortPerServer, PortBattlePerServer {}
+    | boolean
+    | number
+    | string
+    | undefined
+    | GoodList
+    | Point
+    | Array<string | InventoryEntity | TradeGoodProfit>
+export interface Port extends PortBasic, PortPerServer, PortBattlePerServer {
+    [index: string]: PortIntersection
+}
 
+export interface TradeProfit {
+    profit: number
+    profitPerDistance: number
+}
+
+export interface TradeGoodProfit {
+    name: string
+    profit: TradeProfit
+}
 export interface PortWithTrades extends Port {
     tradePortId: number
-    goodsToBuyInTradePort?: string[]
+    sailingDistanceToTradePort: number
+    goodsToBuyInTradePort: TradeGoodProfit[]
     buyInTradePort: boolean
-    goodsToSellInTradePort?: string[]
+    goodsToSellInTradePort: TradeGoodProfit[]
     sellInTradePort: boolean
     distance: number
+    isSource: boolean
+    ownPort: boolean
+    enemyPort: boolean
 }
 
 /****************************
@@ -279,7 +300,7 @@ export interface PortWithTrades extends Port {
 export type ConquestMarksPension = 1 | 3
 export type TradingCompany = 0 | 1 | 2
 export type LaborHoursDiscount = 0 | 1 | 2
-export type GoodList = string[]
+export type GoodList = number[]
 export interface PortPerServer {
     [index: string]: PortIntersection
     id: number
@@ -428,6 +449,7 @@ interface ShipBlueprintShip {
  * ships.json
  */
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface ShipData extends ObjectIndexer<any> {
     battleRating: number
     bow: ShipHealth

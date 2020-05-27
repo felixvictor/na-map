@@ -14,7 +14,8 @@ import * as d3Selection from "d3-selection"
 
 import { HtmlString, numberSegments } from "../../../common/common-browser"
 
-import { CompareShips, ShipDisplayData } from "."
+import { CompareShips } from "./compare-ships"
+import { ShipDisplayData } from "./types"
 
 export class Ship {
     readonly ticksSpeed: number[]
@@ -237,7 +238,7 @@ export class Ship {
             .attr("transform", `translate(${this._shipCompare.svgWidth / 2},${this._shipCompare.svgHeight / 2})`)
         d3Select(`${this.select} div`).remove()
 
-        element.append("div").attr("class", "block-small")
+        element.append("div")
     }
 
     /**

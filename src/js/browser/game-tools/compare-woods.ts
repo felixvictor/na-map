@@ -21,7 +21,7 @@ import { registerEvent } from "../analytics"
 import { formatFloat, formatPercent, formatSignFloat } from "../../common/common-format"
 import { HtmlString, insertBaseModal } from "../../common/common-browser"
 import * as d3Selection from "d3-selection"
-import { putImportError, woodType, WoodType, WoodTypeList } from "../../common/common";
+import { putImportError, woodType, WoodType, WoodTypeList } from "../../common/common"
 import { simpleStringSort, sortBy } from "../../common/common-node"
 import { WoodData, WoodTrimOrFrame } from "../../common/gen-json"
 import { ArrayIndex, Index, NestedIndex } from "../../common/interface"
@@ -381,6 +381,10 @@ export default class CompareWoods {
     async woodInit(): Promise<void> {
         await this._loadAndSetupData()
         this._initData()
+    }
+
+    getWoodName(type: WoodType, woodId: number): string {
+        return this._woodData[type].find((wood) => wood.id === woodId)?.name ?? ""
     }
 
     _findWoodId(type: WoodType, woodName: string): number {

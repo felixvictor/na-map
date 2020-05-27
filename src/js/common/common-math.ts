@@ -23,7 +23,7 @@ const transformMatrix = {
     A: -0.00499866779363828,
     B: -0.00000021464254980645,
     C: 4096.88635151897,
-    D: 4096.90282787469
+    D: 4096.90282787469,
 }
 
 // noinspection MagicNumberJS
@@ -31,7 +31,7 @@ const transformMatrixInv = {
     A: -200.053302087577,
     B: -0.00859027897636011,
     C: 819630.836437126,
-    D: -819563.745651571
+    D: -819563.745651571,
 }
 
 // F11 coord to svg coord
@@ -134,15 +134,21 @@ export const roundToThousands = (x: number): number => round(x, 3)
 export const getDistance = (pt0: Coordinate, pt1: Coordinate): number => {
     const fromF11 = {
         x: convertInvCoordX(pt0.x, pt0.y),
-        y: convertInvCoordY(pt0.x, pt0.y)
+        y: convertInvCoordY(pt0.x, pt0.y),
     }
     const toF11 = {
         x: convertInvCoordX(pt1.x, pt1.y),
-        y: convertInvCoordY(pt1.x, pt1.y)
+        y: convertInvCoordY(pt1.x, pt1.y),
     }
 
     return distancePoints(fromF11, toF11) / (timeFactor * speedFactor)
 }
+
+/**
+ * Calculate/Estimate the k distance from pixelDistance
+ * @param pixelDistance - Distance in pixels
+ */
+export const getSailingDistanceInK = (pixelDistance: number): number => pixelDistance / 5 + 12
 
 /**
  * Format ordinal
@@ -156,7 +162,7 @@ export function getOrdinal(n: number, sup = true): string {
     const v = n % 100
     // noinspection MagicNumberJS
     const text = s[(v - 20) % 10] || s[v] || s[0]
-    return n + (sup ? `<span class="super">${text}</span>` : `${text}`)
+    return String(n) + (sup ? `<span class="super">${text}</span>` : `${text}`)
 }
 
 /**
@@ -186,7 +192,7 @@ export const compassDirections = [
     "W⅔NW",
     "NW",
     "N⅔NW",
-    "N⅓NW"
+    "N⅓NW",
 ]
 
 /**

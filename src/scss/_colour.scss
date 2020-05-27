@@ -54,7 +54,7 @@ $grays: (
     "600": $gray-600,
     "700": $gray-700,
     "800": $gray-800,
-    "900": $gray-900
+    "900": $gray-900,
 );
 
 $blue: colour-mixin(#0d6efd);
@@ -215,7 +215,7 @@ $theme-colors: (
     "warning": $warning,
     "danger": $danger,
     "light": $light,
-    "dark": $dark
+    "dark": $dark,
 );
 
 $primarys: (
@@ -228,7 +228,7 @@ $primarys: (
     "600": $primary-600,
     "700": $primary-700,
     "800": $primary-800,
-    "900": $primary-900
+    "900": $primary-900,
 );
 
 $secondarys: (
@@ -241,7 +241,7 @@ $secondarys: (
     "600": $secondary-600,
     "700": $secondary-700,
     "800": $secondary-800,
-    "900": $secondary-900
+    "900": $secondary-900,
 );
 
 $colors: (
@@ -262,5 +262,5 @@ $colors: (
     "white": $white,
     "gray": $gray-500,
     "gray-dark": $gray-900,
-    "black": $black
+    "black": $black,
 );
