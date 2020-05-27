@@ -14,7 +14,7 @@ import * as d3Zoom from "d3-zoom"
 
 import { putImportError } from "../../common/common"
 import { Bound } from "../../common/common-browser"
-import { PbZone, PbZoneBasic, PbZoneDefence, PbZoneRaid, PortBasic } from "../../common/gen-json"
+import { PbZone, PbZoneBasic, PbZoneDefence } from "../../common/gen-json"
 import { SVGGDatum, SVGSVGDatum } from "../../common/interface"
 import { drawSvgCircle, drawSvgRect } from "../util"
 
@@ -35,7 +35,6 @@ export default class DisplayPbZones {
     private _upperBound!: Bound
     private _defencesFiltered!: PbZoneDefence[]
     private _pbZonesFiltered!: PbZoneBasic[]
-    private _raidZonesFiltered!: PbZoneRaid[]
     private _g!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, any>
 
     constructor(ports: DisplayPorts) {
@@ -46,7 +45,7 @@ export default class DisplayPbZones {
         /**
          * Possible values for show port battle zones radio buttons (first is default value)
          */
-        this._showValues = ["pb-all", "pb-single", "raid-all", "raid-single", "off"]
+        this._showValues = ["pb-all", "pb-single", "off"]
 
         /**
          * Show port battle zones cookie
@@ -147,45 +146,6 @@ export default class DisplayPbZones {
             )
 
         this._g
-            .selectAll<SVGGElement, PbZoneRaid>("g.raid-zones")
-            .data(this._raidZonesFiltered, (d) => String(d.id))
-            .join(
-                (enter): d3Selection.Selection<SVGGElement, PbZoneRaid, SVGGElement, any> => {
-                    const g = enter.append("g").attr("class", "raid-zones")
-
-                    // Raid join circles
-                    g.append("path")
-                        .attr("class", "raid-join-circle")
-                        .attr("d", (d) => drawSvgCircle(d.joinCircle[0], d.joinCircle[1], 35))
-
-                    // Raid circles
-                    g.append("path")
-                        .attr("class", "raid-circle")
-                        .attr("d", (d) =>
-                            d.raidCircles.map((raidCircle) => drawSvgCircle(raidCircle[0], raidCircle[1], 4.5)).join("")
-                        )
-                    g.append("text")
-                        .attr("class", "pb-text raid-circle-text")
-                        .attr("x", (d) => d.raidCircles.map((raidCircle) => raidCircle[0]).join(","))
-                        .attr("y", (d) => d.raidCircles.map((raidCircle) => raidCircle[1]).join(","))
-                        .text((d) => d.raidCircles.map((raidCircle, i) => String.fromCharCode(65 + i)).join(""))
-
-                    // Raid points
-                    g.append("path")
-                        .attr("class", "raid-point")
-                        .attr("d", (d) =>
-                            d.raidPoints.map((raidPoint) => drawSvgCircle(raidPoint[0], raidPoint[1], 1.5)).join("")
-                        )
-                    g.append("text")
-                        .attr("class", "pb-text raid-point-text")
-                        .attr("x", (d) => d.raidPoints.map((raidPoint) => raidPoint[0]).join(","))
-                        .attr("y", (d) => d.raidPoints.map((raidPoint) => raidPoint[1]).join(","))
-                        .text((d) => d.raidPoints.map((raidPoint, i) => String.fromCharCode(49 + i)).join(""))
-                    return g
-                }
-            )
-
-        this._g
             .selectAll<SVGGElement, PbZoneDefence>("g.defence")
             .data(this._defencesFiltered, (d) => String(d.id))
             .join(
@@ -200,7 +160,7 @@ export default class DisplayPbZones {
                         .attr("class", "pb-text pb-fort-text")
                         .attr("x", (d) => d.forts.map((fort) => fort[0]).join(","))
                         .attr("y", (d) => d.forts.map((fort) => fort[1]).join(","))
-                        .text((d) => d.forts.map((fort, i) =>`${i + 1}`).join(""))
+                        .text((d) => d.forts.map((fort, i) => `${i + 1}`).join(""))
 
                     // Towers
                     g.append("path")
@@ -210,19 +170,14 @@ export default class DisplayPbZones {
                         .attr("class", "pb-text pb-tower-text")
                         .attr("x", (d) => d.towers.map((tower) => tower[0]).join(","))
                         .attr("y", (d) => d.towers.map((tower) => tower[1]).join(","))
-                        .text((d) => d.towers.map((tower, i) =>`${i + 1}`).join(""))
+                        .text((d) => d.towers.map((tower, i) => `${i + 1}`).join(""))
                     return g
                 }
             )
     }
 
     _isPortIn(d: PbZone): boolean {
-        return (
-            this.showPB === "pb-all" ||
-            this.showPB === "raid-all" ||
-            ((this.showPB === "pb-single" || this.showPB === "raid-single") &&
-                Number(d.id) === this._ports.currentPort.id)
-        )
+        return this.showPB === "pb-all" || (this.showPB === "pb-single" && Number(d.id) === this._ports.currentPort.id)
     }
 
     _setData(): void {
@@ -238,7 +193,6 @@ export default class DisplayPbZones {
         } else {
             this._defencesFiltered = []
             this._pbZonesFiltered = []
-            this._raidZonesFiltered = []
         }
     }
 
@@ -261,15 +215,8 @@ export default class DisplayPbZones {
                 pbCircles: port.pbCircles,
                 joinCircle: port.joinCircle,
             }))
-            this._raidZonesFiltered = []
         } else {
             this._pbZonesFiltered = []
-            this._raidZonesFiltered = portsFiltered.map((port) => ({
-                id: port.id,
-                joinCircle: port.joinCircle,
-                raidCircles: port.raidCircles,
-                raidPoints: port.raidPoints,
-            }))
         }
     }
 

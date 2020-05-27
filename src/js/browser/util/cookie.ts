@@ -40,7 +40,7 @@ export default class Cookie {
         this.#baseId = baseId
         this.#expire = expire
 
-        this.#name =`${appName}--${this.#baseId}`
+        this.#name = `${appName}--${this.#baseId}`
         this.#values = values
         this.#default = values?.[0]
     }
@@ -56,6 +56,7 @@ export default class Cookie {
         } else {
             Cookies.set(this.#name, cookieValue, {
                 expires: this.#expire,
+                sameSite: "strict",
             })
         }
     }
@@ -64,7 +65,7 @@ export default class Cookie {
      * Get cookie
      */
     get(): string {
-        let cookieValue = Cookies.get(this.#name) ?? null
+        let cookieValue = Cookies.get(this.#name) ?? undefined
 
         if (cookieValue) {
             if (this.#values.length > 0 && !this.#values.includes(cookieValue)) {

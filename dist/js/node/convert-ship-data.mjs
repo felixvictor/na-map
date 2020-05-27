@@ -84,7 +84,7 @@ const shipNames = new Map([
     ["wasa", { id: 1021, master: "" }],
     ["wasa_prototype", { id: 1938, master: "" }],
     ["yacht", { id: 295, master: "" }],
-    ["yachtsilver", { id: 393, master: "" }]
+    ["yachtsilver", { id: 393, master: "" }],
 ]);
 const getShipId = (baseFileName) => { var _a, _b; return (_b = (_a = shipNames.get(baseFileName)) === null || _a === void 0 ? void 0 : _a.id) !== null && _b !== void 0 ? _b : 0; };
 const getShipMaster = (baseFileName) => { var _a, _b; return (_b = (_a = shipNames.get(baseFileName)) === null || _a === void 0 ? void 0 : _a.master) !== null && _b !== void 0 ? _b : ""; };
@@ -93,22 +93,22 @@ const subFileStructure = [
         ext: "b armor",
         elements: new Map([
             ["ARMOR_THICKNESS", { group: "stern", element: "thickness" }],
-            ["REPAIR_MODULE_TIME", { group: "repairTime", element: "stern" }]
-        ])
+            ["REPAIR_MODULE_TIME", { group: "repairTime", element: "stern" }],
+        ]),
     },
     {
         ext: "f armor",
         elements: new Map([
             ["ARMOR_THICKNESS", { group: "bow", element: "thickness" }],
-            ["REPAIR_MODULE_TIME", { group: "repairTime", element: "bow" }]
-        ])
+            ["REPAIR_MODULE_TIME", { group: "repairTime", element: "bow" }],
+        ]),
     },
     {
         ext: "l armor",
         elements: new Map([
             ["ARMOR_THICKNESS", { group: "sides", element: "thickness" }],
-            ["REPAIR_MODULE_TIME", { group: "repairTime", element: "sides" }]
-        ])
+            ["REPAIR_MODULE_TIME", { group: "repairTime", element: "sides" }],
+        ]),
     },
     {
         ext: "hull",
@@ -119,16 +119,16 @@ const subFileStructure = [
             ["SHIP_STRUCTURE_LEAKS_PER_SECOND", { group: "ship", element: "structureLeaksPerSecond" }],
             ["SHIP_TURNING_ACCELERATION_TIME", { group: "ship", element: "turningAcceleration" }],
             ["SHIP_TURNING_ACCELERATION_TIME_RHEAS", { group: "ship", element: "turningYardAcceleration" }],
-            ["SHIP_WATERLINE_HEIGHT", { group: "ship", element: "waterlineHeight" }]
-        ])
+            ["SHIP_WATERLINE_HEIGHT", { group: "ship", element: "waterlineHeight" }],
+        ]),
     },
     {
         ext: "mast",
         elements: new Map([
             ["MAST_BOTTOM_SECTION_HP", { group: "mast", element: "bottomArmour" }],
             ["MAST_MIDDLE_SECTION_HP", { group: "mast", element: "middleArmour" }],
-            ["MAST_TOP_SECTION_HP", { group: "mast", element: "topArmour" }]
-        ])
+            ["MAST_TOP_SECTION_HP", { group: "mast", element: "topArmour" }],
+        ]),
     },
     {
         ext: "rudder",
@@ -136,8 +136,8 @@ const subFileStructure = [
             ["ARMOR_THICKNESS", { group: "rudder", element: "thickness" }],
             ["REPAIR_MODULE_TIME", { group: "repairTime", element: "rudder" }],
             ["RUDDER_HALFTURN_TIME", { group: "rudder", element: "halfturnTime" }],
-            ["SHIP_TURNING_SPEED", { group: "rudder", element: "turnSpeed" }]
-        ])
+            ["SHIP_TURNING_SPEED", { group: "rudder", element: "turnSpeed" }],
+        ]),
     },
     {
         ext: "sail",
@@ -146,34 +146,41 @@ const subFileStructure = [
             ["REPAIR_MODULE_TIME", { group: "repairTime", element: "sails" }],
             ["SAIL_RISING_SPEED", { group: "sails", element: "risingSpeed" }],
             ["SAILING_CREW_REQUIRED", { group: "crew", element: "sailing" }],
-            ["SHIP_MAX_SPEED", { group: "ship", element: "maxSpeed" }]
-        ])
+            ["SHIP_MAX_SPEED", { group: "ship", element: "maxSpeed" }],
+        ]),
     },
     {
         ext: "structure",
         elements: new Map([
-            ["REPAIR_MODULE_TIME", { group: "repairTime", element: "structure" }]
-        ])
-    }
+            ["REPAIR_MODULE_TIME", { group: "repairTime", element: "structure" }],
+        ]),
+    },
 ];
 let apiItems;
 let ships;
-const getItemNames = () => new Map(apiItems.map(item => [item.Id, cleanName(item.Name)]));
-const getShipMass = (id) => { var _a, _b; return (_b = (_a = apiItems.find(apiItem => id === apiItem.Id)) === null || _a === void 0 ? void 0 : _a.ShipMass) !== null && _b !== void 0 ? _b : 0; };
+const getItemNames = () => new Map(apiItems.map((item) => [item.Id, cleanName(item.Name)]));
+const getShipMass = (id) => { var _a, _b; return (_b = (_a = apiItems.find((apiItem) => id === apiItem.Id)) === null || _a === void 0 ? void 0 : _a.ShipMass) !== null && _b !== void 0 ? _b : 0; };
 const convertGenericShipData = () => {
     const cannonWeight = [0, 42, 32, 24, 18, 12, 9, 0, 6, 4, 3, 2];
     const carroWeight = [0, 0, 68, 42, 32, 24, 0, 18, 12];
-    return apiItems.filter(item => item.ItemType === "Ship" && !item.NotUsed).map((ship) => {
+    const shipsWith36lb = new Set(["Admiraal de Ruyter", "Implacable", "Redoutable"]);
+    return apiItems.filter((item) => item.ItemType === "Ship" && !item.NotUsed).map((ship) => {
         const calcPortSpeed = ship.Specs.MaxSpeed * speedConstA - speedConstB;
-        const speedDegrees = ship.Specs.SpeedToWind.map(speed => roundToThousands(speed * calcPortSpeed));
+        const speedDegrees = ship.Specs.SpeedToWind.map((speed) => roundToThousands(speed * calcPortSpeed));
         const { length } = ship.Specs.SpeedToWind;
+        if (shipsWith36lb.has(ship.Name)) {
+            cannonWeight[2] = 36;
+        }
+        else {
+            cannonWeight[2] = 32;
+        }
         for (let i = 1; i < (length - 1) * 2; i += 2) {
             speedDegrees.unshift(speedDegrees[i]);
         }
         speedDegrees.pop();
-        const deckClassLimit = ship.DeckClassLimit.map(deck => [
+        const deckClassLimit = ship.DeckClassLimit.map((deck) => [
             cannonWeight[deck.Limitation1.Min],
-            carroWeight[deck.Limitation2.Min]
+            carroWeight[deck.Limitation2.Min],
         ]);
         const gunsPerDeck = ship.GunsPerDeck;
         gunsPerDeck.pop();
@@ -198,16 +205,16 @@ const convertGenericShipData = () => {
         }
         const broadside = { cannons: cannonBroadside, carronades: carronadesBroadside };
         const frontDeck = ship.FrontDecks
-            ? ship.FrontDeckClassLimit.map(deck => [
+            ? ship.FrontDeckClassLimit.map((deck) => [
                 cannonWeight[deck.Limitation1.Min],
-                carroWeight[deck.Limitation2.Min]
+                carroWeight[deck.Limitation2.Min],
             ])[0]
             : emptyDeck;
         deckClassLimit.push(frontDeck);
         const backDeck = ship.BackDecks
-            ? ship.BackDeckClassLimit.map(deck => [
+            ? ship.BackDeckClassLimit.map((deck) => [
                 cannonWeight[deck.Limitation1.Min],
-                carroWeight[deck.Limitation2.Min]
+                carroWeight[deck.Limitation2.Min],
             ])[0]
             : emptyDeck;
         deckClassLimit.push(backDeck);
@@ -228,7 +235,7 @@ const convertGenericShipData = () => {
             speedDegrees,
             speed: {
                 min: speedDegrees.reduce((a, b) => Math.min(a, b)),
-                max: roundToThousands(calcPortSpeed)
+                max: roundToThousands(calcPortSpeed),
             },
             sides: { armour: ship.HealthInfo.LeftArmor, thickness: 0 },
             bow: { armour: ship.HealthInfo.FrontArmor, thickness: 0 },
@@ -240,7 +247,7 @@ const convertGenericShipData = () => {
                 armour: ship.HealthInfo.Rudder,
                 turnSpeed: 0,
                 halfturnTime: 0,
-                thickness: 0
+                thickness: 0,
             },
             upgradeXP: ship.OverrideTotalXpForUpgradeSlots,
             repairTime: { stern: 120, bow: 120, sides: 120, rudder: 30, sails: 120, structure: 60 },
@@ -252,7 +259,7 @@ const convertGenericShipData = () => {
                 acceleration: 0,
                 turningAcceleration: 0,
                 turningYardAcceleration: 0,
-                maxSpeed: 0
+                maxSpeed: 0,
             },
             mast: {
                 bottomArmour: 0,
@@ -260,10 +267,10 @@ const convertGenericShipData = () => {
                 topArmour: 0,
                 bottomThickness: 0,
                 middleThickness: 0,
-                topThickness: 0
+                topThickness: 0,
             },
             premium: ship.Premium,
-            tradeShip: ship.ShipType === 1
+            tradeShip: ship.ShipType === 1,
         };
     });
 };
@@ -305,8 +312,8 @@ const getAddData = (elements, fileData) => {
 };
 const addAddData = (addData, id) => {
     ships
-        .filter(ship => ship.id === id)
-        .forEach(ship => {
+        .filter((ship) => ship.id === id)
+        .forEach((ship) => {
         for (const [group, values] of Object.entries(addData)) {
             if (!ship[group]) {
                 ship[group] = {};
@@ -356,8 +363,8 @@ const convertAddShipData = (ships) => {
 };
 const convertShipBlueprints = async () => {
     const itemNames = getItemNames();
-    const shipBlueprints = apiItems.filter(apiItem => !apiItem.NotUsed && apiItem.ItemType === "RecipeShip")
-        .map(apiBlueprint => {
+    const shipBlueprints = apiItems.filter((apiItem) => !apiItem.NotUsed && apiItem.ItemType === "RecipeShip")
+        .map((apiBlueprint) => {
         var _a, _b, _c, _d, _e, _f;
         const shipMass = getShipMass(apiBlueprint.Results[0].Template);
         return {
@@ -365,32 +372,32 @@ const convertShipBlueprints = async () => {
             name: cleanName(apiBlueprint.Name).replace(" Blueprint", ""),
             wood: [
                 { name: "Frame", amount: apiBlueprint.WoodTypeDescs[0].Requirements[0].Amount },
-                { name: "Planking", amount: Math.round(shipMass * plankingRatio) },
-                { name: "Crew Space", amount: Math.round(shipMass * crewSpaceRatio) }
+                { name: "Planking", amount: Math.round(shipMass * plankingRatio + 0.5) },
+                { name: "Crew Space", amount: Math.round(shipMass * crewSpaceRatio + 0.5) },
             ],
-            resources: apiBlueprint.FullRequirements.filter(requirement => {
+            resources: apiBlueprint.FullRequirements.filter((requirement) => {
                 var _a, _b;
                 return !(((_b = (_a = itemNames.get(requirement.Template)) === null || _a === void 0 ? void 0 : _a.endsWith(" Permit")) !== null && _b !== void 0 ? _b : itemNames.get(requirement.Template) === "Doubloons") ||
                     itemNames.get(requirement.Template) === "Provisions");
-            }).map(requirement => {
+            }).map((requirement) => {
                 var _a;
                 return ({
                     name: (_a = itemNames.get(requirement.Template)) === null || _a === void 0 ? void 0 : _a.replace(" Log", ""),
-                    amount: requirement.Amount
+                    amount: requirement.Amount,
                 });
             }),
-            provisions: (_b = ((_a = apiBlueprint.FullRequirements.find(requirement => itemNames.get(requirement.Template) === "Provisions")) !== null && _a !== void 0 ? _a : {}).Amount) !== null && _b !== void 0 ? _b : 0,
-            doubloons: (_d = ((_c = apiBlueprint.FullRequirements.find(requirement => itemNames.get(requirement.Template) === "Doubloons")) !== null && _c !== void 0 ? _c : {}).Amount) !== null && _d !== void 0 ? _d : 0,
-            permit: (_f = ((_e = apiBlueprint.FullRequirements.find(requirement => { var _a; return (_a = itemNames.get(requirement.Template)) === null || _a === void 0 ? void 0 : _a.endsWith(" Permit"); })) !== null && _e !== void 0 ? _e : {}).Amount) !== null && _f !== void 0 ? _f : 0,
+            provisions: (_b = ((_a = apiBlueprint.FullRequirements.find((requirement) => itemNames.get(requirement.Template) === "Provisions")) !== null && _a !== void 0 ? _a : {}).Amount) !== null && _b !== void 0 ? _b : 0,
+            doubloons: (_d = ((_c = apiBlueprint.FullRequirements.find((requirement) => itemNames.get(requirement.Template) === "Doubloons")) !== null && _c !== void 0 ? _c : {}).Amount) !== null && _d !== void 0 ? _d : 0,
+            permit: (_f = ((_e = apiBlueprint.FullRequirements.find((requirement) => { var _a; return (_a = itemNames.get(requirement.Template)) === null || _a === void 0 ? void 0 : _a.endsWith(" Permit"); })) !== null && _e !== void 0 ? _e : {}).Amount) !== null && _f !== void 0 ? _f : 0,
             ship: {
                 id: apiBlueprint.Results[0].Template,
                 name: itemNames.get(apiBlueprint.Results[0].Template),
-                mass: shipMass
+                mass: shipMass,
             },
             shipyardLevel: apiBlueprint.BuildingRequirements[0].Level + 1,
             craftLevel: apiBlueprint.RequiresLevel,
             craftXP: apiBlueprint.GivesXP,
-            labourHours: apiBlueprint.LaborPrice
+            labourHours: apiBlueprint.LaborPrice,
         };
     })
         .sort(sortBy(["id"]));

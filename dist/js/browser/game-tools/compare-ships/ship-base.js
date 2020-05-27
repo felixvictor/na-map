@@ -17,7 +17,7 @@ import * as d3Drag from "d3-drag";
 import { isEmpty } from "../../../common/common";
 import { hullRepairsVolume, repairsSetSize, rigRepairsVolume, rumRepairsFactor, segmentRadians, } from "../../../common/common-browser";
 import { default as shipIcon } from "Icons/icon-ship.svg";
-import { Ship } from ".";
+import { Ship } from "./ship";
 export class ShipBase extends Ship {
     constructor(id, shipData, shipCompare) {
         super(id, shipCompare);

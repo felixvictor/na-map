@@ -32,8 +32,12 @@ import {
 } from "../../../common/common-browser"
 import { default as shipIcon } from "Icons/icon-ship.svg"
 
-import { CompareShips, DragData, Ship, ShipComparison, ShipDisplayData } from "."
+import { Ship } from "./ship"
+import { CompareShips } from "./compare-ships"
+import { ShipComparison } from "./ship-comparison"
+
 import { ShipData } from "../../../common/gen-json"
+import { DragData, ShipDisplayData } from "./types"
 
 /**
  * Base ship for comparison (displayed on the left side)

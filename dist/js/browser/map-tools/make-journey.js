@@ -16,15 +16,10 @@ import { scaleLinear as d3ScaleLinear } from "d3-scale";
 import { event as d3Event, select as d3Select } from "d3-selection";
 import { line as d3Line } from "d3-shape";
 import { zoomIdentity as d3ZoomIdentity, zoomTransform as d3ZoomTransform, } from "d3-zoom";
-import moment from "moment";
-import "moment/locale/en-gb";
-import "../../../scss/roundslider.scss";
 import "round-slider/src/roundslider";
-import "round-slider/src/roundslider.css";
 import { registerEvent } from "../analytics";
 import { degreesPerSecond, insertBaseModal } from "../../common/common-browser";
-import { formatF11 } from "../../common/common-format";
-import { compassDirections, convertInvCoordX, convertInvCoordY, degreesFullCircle, degreesToCompass, getDistance, speedFactor, } from "../../common/common-math";
+import { compassDirections, degreesFullCircle, degreesToCompass, getDistance, speedFactor, } from "../../common/common-math";
 import { displayCompass, displayCompassAndDegrees, printCompassRose, rotationAngleInDegrees } from "../util";
 import { CompareShips } from "../game-tools/compare-ships";
 export default class MakeJourney {
@@ -62,7 +57,6 @@ export default class MakeJourney {
         return `${number} ${word + (number === 1 ? "" : "s")}`;
     }
     static _getHumanisedDuration(duration) {
-        moment.locale("en-gb");
         const durationHours = Math.floor(duration / 60);
         const durationMinutes = Math.round(duration % 60);
         let s = "in ";
@@ -192,7 +186,7 @@ export default class MakeJourney {
         this._injectModal();
         this._setupWindInput();
         this._shipCompare = new CompareShips(this._shipId);
-        this._shipCompare.CompareShipsInit();
+        void this._shipCompare.CompareShipsInit();
     }
     _useUserInput() {
         this._resetJourneyData();
@@ -219,8 +213,7 @@ export default class MakeJourney {
             .attr("id", this._compassId)
             .attr("class", "compass")
             .attr("x", x)
-            .attr("y", y)
-            .call(this._drag);
+            .attr("y", y);
         this._compassG = this._compass.append("g");
         printCompassRose({ element: this._compassG, radius: this._compassRadius });
     }
@@ -241,7 +234,7 @@ export default class MakeJourney {
         return select$.length > 0 ? currentUserWind : 0;
     }
     _setShipSpeed() {
-        let speedDegrees = [];
+        let speedDegrees;
         if (this._journey.shipName === this._defaultShipName) {
             speedDegrees = [...new Array(24).fill(this._defaultShipSpeed / 2)];
         }
@@ -396,8 +389,8 @@ export default class MakeJourney {
                 .attr("d", this._line);
         }
     }
-    _getTextDirection(courseCompass, courseDegrees, pt1) {
-        return `${displayCompassAndDegrees(courseCompass, true)} \u2056 F11: ${formatF11(convertInvCoordX(pt1.x, pt1.y))}\u202F/\u202F${formatF11(convertInvCoordY(pt1.x, pt1.y))}`;
+    _getTextDirection(courseCompass) {
+        return `${displayCompassAndDegrees(courseCompass, true)}`;
     }
     _getTextDistance(distanceK, minutes, addTotal) {
         let textDistance = `${Math.round(distanceK)}\u2009k ${MakeJourney._getHumanisedDuration(minutes)}`;
@@ -418,7 +411,7 @@ export default class MakeJourney {
         const minutes = this._calculateMinutesForSegment(courseDegrees, this._journey.currentWindDegrees, distanceK * 1000);
         this._journey.totalDistance += distanceK;
         this._journey.totalMinutes += minutes;
-        const textDirection = this._getTextDirection(courseCompass, courseDegrees, pt1);
+        const textDirection = this._getTextDirection(courseCompass);
         const textDistance = this._getTextDistance(distanceK, minutes, index > 1);
         this._journey.segments[index].label = `${textDirection}|${textDistance}`;
     }
@@ -459,9 +452,6 @@ export default class MakeJourney {
         this._printSummary();
         this._printCompass();
         this._gJourneyPath = this._g.append("path");
-    }
-    setSummaryPosition(topMargin, rightMargin) {
-        this._divJourneySummary.style("top", `${topMargin}px`).style("right", `${rightMargin}px`);
     }
     plotCourse(x, y) {
         if (this._journey.segments[0].position[0] > 0) {
