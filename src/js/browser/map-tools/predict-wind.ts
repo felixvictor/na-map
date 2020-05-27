@@ -17,9 +17,6 @@ import { select as d3Select } from "d3-selection"
 import * as d3Selection from "d3-selection"
 import { line as d3Line } from "d3-shape"
 
-import moment from "moment"
-import "moment/locale/en-gb"
-
 import "round-slider/src/roundslider"
 
 import "tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4"
@@ -29,6 +26,14 @@ import { registerEvent } from "../analytics"
 import { degreesPerSecond, HtmlString, insertBaseModal } from "../../common/common-browser"
 import { compassDirections, compassToDegrees, degreesToCompass, degreesToRadians } from "../../common/common-math"
 import { displayCompass, displayCompassAndDegrees, getUserWind, printCompassRose } from "../util"
+import dayjs from "dayjs"
+import "dayjs/locale/en-gb"
+import customParseFormat from "dayjs/plugin/customParseFormat"
+import utc from "dayjs/plugin/utc"
+
+dayjs.extend(customParseFormat)
+dayjs.extend(utc)
+dayjs.locale("en-gb")
 
 export default class PredictWind {
     private readonly _height: number
@@ -130,8 +135,6 @@ export default class PredictWind {
     }
 
     _injectModal(): void {
-        moment.locale("en-gb")
-
         insertBaseModal({ id: this._modalId, title: this._baseName, size: "sm" })
 
         const body = d3Select(`#${this._modalId} .modal-body`)
@@ -170,7 +173,7 @@ export default class PredictWind {
             .attr("class", "icon icon-clock")
 
         $(`#${this._timeGroupId}`).datetimepicker({
-            defaultDate: moment.utc(),
+            defaultDate: dayjs.utc(),
             format: "LT",
             locale: "en-gb",
         })
@@ -224,13 +227,13 @@ export default class PredictWind {
             currentWindDegrees = Number(currentUserWind)
         }
 
-        const currentTime = moment().utc().seconds(0).milliseconds(0)
-        const predictTime = moment(currentTime).hour(predictHours).minutes(predictMinutes)
+        const currentTime = dayjs().utc().second(0).millisecond(0)
+        const predictTime = dayjs(currentTime).hour(predictHours).minute(predictMinutes)
         if (predictTime.isBefore(currentTime)) {
             predictTime.add(1, "day")
         }
 
-        const timeDiffInSec = predictTime.diff(currentTime, "seconds")
+        const timeDiffInSec = predictTime.diff(currentTime, "second")
         const predictedWindDegrees = 360 + ((currentWindDegrees - degreesPerSecond * timeDiffInSec) % 360)
 
         this._printPredictedWind(
