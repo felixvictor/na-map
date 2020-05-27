@@ -53,6 +53,7 @@
     "browserslist": [
         ">= 1%",
         "last 1 major version",
+        "not edge <= 18",
         "not dead",
         "not ie > 0",
         "not android > 0"
