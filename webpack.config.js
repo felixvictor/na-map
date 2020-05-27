@@ -120,8 +120,8 @@ const babelOpt = {
     cacheDirectory: true,
     plugins: [
         "@babel/plugin-proposal-nullish-coalescing-operator",
-        "@babel/plugin-transform-spread",
-        "@babel/proposal-class-properties",
+        ["@babel/plugin-transform-spread", { loose: true }],
+        ["@babel/plugin-proposal-class-properties", { loose: true }],
     ],
     presets: [
         [
